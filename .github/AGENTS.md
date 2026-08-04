@@ -479,6 +479,31 @@ A feature is complete only if
 
 ---
 
+# Feature Size Policy
+
+Implement features in small, reviewable increments.
+
+Rules
+
+- A Release Candidate (RC) should normally require no more than 2–3 hours of implementation.
+- If a feature requires significant changes across many files, split it into multiple RCs.
+- Every RC should be independently buildable and testable.
+- Every RC should leave the project in a releasable state.
+- Prefer many small commits over one large commit.
+
+Each RC should have:
+
+- a clearly defined goal
+- behaviour tests
+- updated documentation
+- successful lint
+- successful build
+- successful regression tests
+
+Do not start implementing the next RC until the current RC has been reviewed and accepted.
+
+---
+
 # AI Self Review
 
 Before finishing any task the AI should review
