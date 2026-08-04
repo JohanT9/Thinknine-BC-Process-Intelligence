@@ -138,3 +138,24 @@ Version 3.7.1 återställer dashboardens uppstart och dataladdning.
 
 Inställningar läses nu med standardvärden som fallback och sessionlistan
 renderas även när lagringen är tom eller ett äldre lagringsformat används.
+
+
+## Word Generator 4.0
+
+Word-exporten använder nu biblioteket `docx` i stället för handskriven OpenXML.
+
+Installera beroenden efter att patchen packats upp:
+
+```powershell
+npm.cmd install
+npm.cmd run ci
+npm.cmd run build
+```
+
+Byggskriptet paketerar `docx` och Word-exportören till:
+
+```text
+dist/exporters/word-exporter-docx.bundle.js
+```
+
+Edge laddar endast den färdiga bundlen. Inga externa CDN-anrop görs när tillägget används.

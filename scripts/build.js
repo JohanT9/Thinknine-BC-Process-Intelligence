@@ -41,6 +41,37 @@ function replaceVersionInFile(filePath) {
   fs.writeFileSync(filePath, content, "utf8");
 }
 
+
+function bundleWordExporter() {
+  let esbuild;
+
+  try {
+    esbuild = require("esbuild");
+  } catch {
+    throw new Error(
+      "esbuild saknas. Kör npm install innan npm run build."
+    );
+  }
+
+  esbuild.buildSync({
+    entryPoints: [
+      path.join(src, "exporters", "word-exporter-docx.mjs")
+    ],
+    outfile: path.join(
+      dist,
+      "exporters",
+      "word-exporter-docx.bundle.js"
+    ),
+    bundle: true,
+    format: "iife",
+    platform: "browser",
+    target: ["chrome120", "edge120"],
+    minify: false,
+    sourcemap: false,
+    legalComments: "eof",
+  });
+}
+
 function syncManifest() {
   const sourceManifest = path.join(src, "ui", "manifest.json");
   const targetManifest = path.join(dist, "manifest.json");
@@ -106,6 +137,8 @@ for (const file of [
     path.join(dist, file)
   );
 }
+
+bundleWordExporter();
 
 syncManifest();
 

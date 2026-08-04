@@ -1,18 +1,24 @@
-THINKNINE BC PROCESS INTELLIGENCE 3.7.3 WORD HOTFIX
+THINKNINE BC PROCESS INTELLIGENCE 4.0.0
 
-1. Packa upp HOTFIX_PATCH.zip i repositoryts rot.
+VIKTIGT: VERSION 4.0 HAR NYA NPM-BEROENDEN
+
+1. Packa upp GITHUB_PATCH.zip i repositoryts rot.
 2. Ersätt befintliga filer.
 3. Kör:
+   npm.cmd install
+4. Kör:
    npm.cmd run ci
-4. Commit och push.
-5. Kör:
+5. Commit och push.
+6. Kör:
    npm.cmd run build
-6. Öppna edge://extensions.
-7. Klicka Läs in igen.
+7. Öppna edge://extensions.
+8. Klicka Läs in igen.
 
-TESTA
+WORD-TEST
 
-1. Öppna en session i Review Studio.
-2. Välj Exportera Word.
-3. Kontrollera att DOCX-filen öppnas i Microsoft Word.
-4. Kontrollera att skärmbilder visas.
+1. Öppna en avslutad session.
+2. Välj Granska.
+3. Välj Exportera Word.
+4. Kontrollera att filen öppnas direkt i Microsoft Word.
+
+Word-exporten använder nu biblioteket docx 9.7.1.

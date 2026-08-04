@@ -1,11 +1,11 @@
 {
   "name": "thinknine-bc-process-intelligence",
-  "version": "3.7.3",
+  "version": "4.0.0",
   "private": true,
   "description": "Modular Edge-only Business Central process intelligence and documentation engine.",
   "scripts": {
     "build": "node scripts/build.js",
-    "test": "node tests/engine.test.js && node tests/review.test.js && node tests/word-exporter.test.js && node tests/dashboard-regression.test.js && node tests/ui-id-regression.test.js && node tests/word-image-format.test.js",
+    "test": "node tests/engine.test.js && node tests/review.test.js && node tests/dashboard-regression.test.js && node tests/ui-id-regression.test.js && node tests/docx-library-source.test.js",
     "check": "node --check dist/background.js && node --check dist/content.js && node --check dist/dashboard.js",
     "lint": "node scripts/lint.js",
     "release:zip": "node scripts/release.js",
@@ -15,5 +15,11 @@
   },
   "engines": {
     "node": ">=20"
+  },
+  "dependencies": {
+    "docx": "9.7.1"
+  },
+  "devDependencies": {
+    "esbuild": "0.25.8"
   }
 }

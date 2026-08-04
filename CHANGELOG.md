@@ -1,5 +1,16 @@
 # Changelog
 
+## 4.0.0
+
+- Replaced the hand-written OpenXML Word generator with the established `docx` library.
+- Added `docx` 9.7.1 as a runtime dependency.
+- Added esbuild bundling for Edge.
+- Word documents are now created through `Document`, `ImageRun` and `Packer.toBlob`.
+- Preserved Review Studio, screenshots, comments, metadata, headers, footers and page numbers.
+- Removed the old custom ZIP/OpenXML Word pipeline from the active dashboard.
+- Added build-time checks for the library-based exporter.
+
+
 ## 3.7.3
 
 - Fixed DOCX files that Microsoft Word could not open.

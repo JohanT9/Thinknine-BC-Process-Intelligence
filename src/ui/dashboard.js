@@ -3328,8 +3328,10 @@ async function exportActiveReviewToWord() {
     throw new Error("Ingen granskning är öppen.");
   }
 
-  if (!globalThis.T9Export?.word || !globalThis.T9Export?.zipWriter) {
-    throw new Error("Word-exportmodulerna kunde inte laddas.");
+  if (!globalThis.T9Export?.word?.createDocx) {
+    throw new Error(
+      "Word-exportbiblioteket kunde inte laddas. Kör npm install och npm run build."
+    );
   }
 
   if (!activeReviewModel) {
@@ -3339,34 +3341,27 @@ async function exportActiveReviewToWord() {
   }
 
   const screenshotData = {};
+
   for (const [path, dataUrl] of Object.entries(
     activeReviewModel.screenshotData || {}
   )) {
     const imageData = dataUrlToImageData(dataUrl);
-    if (imageData) screenshotData[path] = imageData;
+
+    if (imageData) {
+      screenshotData[path] = imageData;
+    }
   }
 
-  const reviewForExport = {
-    ...activeReview,
-    tasks: reviewedTasksForWord()
-  };
-
-  const result = globalThis.T9Export.word.createDocx(
-    {
-      session: activeReviewModel.response.session,
-      review: reviewForExport,
-      screenshotData
+  const result = await globalThis.T9Export.word.createDocx({
+    session: activeReviewModel.response.session,
+    review: {
+      ...activeReview,
+      tasks: reviewedTasksForWord(),
     },
-    globalThis.T9Export.zipWriter
-  );
+    screenshotData,
+  });
 
-  const blob = new Blob(
-    [result.bytes],
-    {
-      type: "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
-    }
-  );
-  const url = URL.createObjectURL(blob);
+  const url = URL.createObjectURL(result.blob);
   const link = document.createElement("a");
 
   link.href = url;
@@ -3377,8 +3372,8 @@ async function exportActiveReviewToWord() {
   setTimeout(() => URL.revokeObjectURL(url), 60000);
 
   show(
-    `Word-dokument skapat: ${result.taskCount} steg och ` +
-    `${result.imageCount} skärmbilder.`
+    `Word-dokument skapat med docx-biblioteket: ` +
+    `${result.taskCount} steg och ${result.imageCount} skärmbilder.`
   );
 }
 

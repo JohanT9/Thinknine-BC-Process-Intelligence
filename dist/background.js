@@ -1,4 +1,4 @@
-const VERSION = "3.7.3";
+const VERSION = "4.0.0";
 
 const DEFAULT_SETTINGS = {
   documentationProfile: "generic",
