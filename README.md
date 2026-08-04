@@ -102,3 +102,10 @@ Windows-hjälpskript:
 ```powershell
 powershell -ExecutionPolicy Bypass -File .\scripts\build-and-open.ps1
 ```
+
+
+## Synlig Review Studio
+
+På sidan **Sessioner och export** visas nu knappen **Granska** för avslutade sessioner.
+
+Klicka **Granska** för att öppna Review Studio och kontrollera att gränssnittet fungerar innan fler funktioner läggs till.

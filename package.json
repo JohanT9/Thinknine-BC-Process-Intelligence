@@ -1,6 +1,6 @@
 {
   "name": "thinknine-bc-process-intelligence",
-  "version": "3.6.1",
+  "version": "3.6.2",
   "private": true,
   "description": "Modular Edge-only Business Central process intelligence and documentation engine.",
   "scripts": {

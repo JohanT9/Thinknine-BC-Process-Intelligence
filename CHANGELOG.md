@@ -1,5 +1,15 @@
 # Changelog
 
+## 3.6.2
+
+- Connected Review Studio visibly to the Sessions page.
+- Added a visible Granska button for completed sessions.
+- Added a minimal Review Studio overlay.
+- Added editable instruction text and approval checkbox.
+- Added save and close actions.
+- Ensured Review Studio runtime script is loaded in the dashboard.
+
+
 ## 3.6.1
 
 - Made `dist` the permanent Edge development folder.
