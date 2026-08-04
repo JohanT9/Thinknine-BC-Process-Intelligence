@@ -1,0 +1,149 @@
+{
+  "packId": "bc-manufacturing",
+  "name": "Business Central Manufacturing",
+  "version": "2.0.0",
+  "priority": 200,
+  "rules": [
+    {
+      "ruleId": "Manufacturing.OpenProductionOrder",
+      "taskType": "OpenProductionOrder",
+      "semanticAction": "OpenRecord",
+      "entity": "ProductionOrder",
+      "priority": 1000,
+      "confidence": 0.98,
+      "match": {
+        "pagePatterns": [
+          "produktionsorder",
+          "production order"
+        ],
+        "actionPatterns": [
+          "open record",
+          "öppna post"
+        ],
+        "fieldPatterns": [],
+        "automationIdPatterns": []
+      },
+      "instructionTemplate": "",
+      "languages": [
+        "sv-SE",
+        "en-US"
+      ],
+      "aliases": []
+    },
+    {
+      "ruleId": "Manufacturing.RefreshProductionOrder",
+      "taskType": "RefreshProductionOrder",
+      "semanticAction": "RunAction",
+      "entity": "ProductionOrder",
+      "priority": 900,
+      "confidence": 0.95,
+      "match": {
+        "pagePatterns": [],
+        "actionPatterns": [
+          "uppdatera.*produktionsorder",
+          "refresh.*production order"
+        ],
+        "fieldPatterns": [],
+        "automationIdPatterns": []
+      },
+      "instructionTemplate": "",
+      "languages": [
+        "sv-SE",
+        "en-US"
+      ],
+      "aliases": []
+    },
+    {
+      "ruleId": "Manufacturing.ChangeStatus",
+      "taskType": "ChangeProductionOrderStatus",
+      "semanticAction": "ChangeDocumentStatus",
+      "entity": "ProductionOrder",
+      "priority": 1000,
+      "confidence": 0.97,
+      "match": {
+        "pagePatterns": [],
+        "actionPatterns": [
+          "ändra status",
+          "change status"
+        ],
+        "fieldPatterns": [],
+        "automationIdPatterns": []
+      },
+      "instructionTemplate": "",
+      "languages": [
+        "sv-SE",
+        "en-US"
+      ],
+      "aliases": []
+    },
+    {
+      "ruleId": "Manufacturing.PostConsumption",
+      "taskType": "PostConsumption",
+      "semanticAction": "PostDocument",
+      "entity": "Consumption",
+      "priority": 1000,
+      "confidence": 0.96,
+      "match": {
+        "pagePatterns": [],
+        "actionPatterns": [
+          "bokför.*förbrukning",
+          "post.*consumption"
+        ],
+        "fieldPatterns": [],
+        "automationIdPatterns": []
+      },
+      "instructionTemplate": "",
+      "languages": [
+        "sv-SE",
+        "en-US"
+      ],
+      "aliases": []
+    },
+    {
+      "ruleId": "Manufacturing.PostOutput",
+      "taskType": "PostOutput",
+      "semanticAction": "PostDocument",
+      "entity": "Output",
+      "priority": 1000,
+      "confidence": 0.96,
+      "match": {
+        "pagePatterns": [],
+        "actionPatterns": [
+          "bokför.*utflöde",
+          "post.*output"
+        ],
+        "fieldPatterns": [],
+        "automationIdPatterns": []
+      },
+      "instructionTemplate": "",
+      "languages": [
+        "sv-SE",
+        "en-US"
+      ],
+      "aliases": []
+    },
+    {
+      "ruleId": "Manufacturing.SelectItem",
+      "taskType": "SelectProductionItem",
+      "semanticAction": "SelectItem",
+      "entity": "Item",
+      "priority": 900,
+      "confidence": 0.95,
+      "match": {
+        "pagePatterns": [],
+        "actionPatterns": [],
+        "fieldPatterns": [
+          "artikelnr",
+          "item no"
+        ],
+        "automationIdPatterns": []
+      },
+      "instructionTemplate": "",
+      "languages": [
+        "sv-SE",
+        "en-US"
+      ],
+      "aliases": []
+    }
+  ]
+}

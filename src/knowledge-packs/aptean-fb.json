@@ -1,0 +1,250 @@
+{
+  "packId": "aptean-fb",
+  "name": "Aptean Food & Beverage",
+  "version": "2.0.0",
+  "priority": 300,
+  "rules": [
+    {
+      "ruleId": "Aptean.OpenQCCheck",
+      "taskType": "OpenQualityCheck",
+      "semanticAction": "OpenRecord",
+      "entity": "QualityCheck",
+      "priority": 1000,
+      "confidence": 0.96,
+      "match": {
+        "pagePatterns": [
+          "quality.*check",
+          "qc.*check",
+          "kvalitetskontroll"
+        ],
+        "actionPatterns": [
+          "open record",
+          "öppna post"
+        ],
+        "fieldPatterns": [],
+        "automationIdPatterns": []
+      },
+      "instructionTemplate": "",
+      "languages": [
+        "sv-SE",
+        "en-US"
+      ],
+      "aliases": []
+    },
+    {
+      "ruleId": "Aptean.CreateQCCheck",
+      "taskType": "CreateQualityCheck",
+      "semanticAction": "RunAction",
+      "entity": "QualityCheck",
+      "priority": 1000,
+      "confidence": 0.95,
+      "match": {
+        "pagePatterns": [],
+        "actionPatterns": [
+          "create.*check",
+          "skapa.*kontroll"
+        ],
+        "fieldPatterns": [],
+        "automationIdPatterns": []
+      },
+      "instructionTemplate": "",
+      "languages": [
+        "sv-SE",
+        "en-US"
+      ],
+      "aliases": []
+    },
+    {
+      "ruleId": "Aptean.ReleaseQCHold",
+      "taskType": "ReleaseQualityHold",
+      "semanticAction": "RunAction",
+      "entity": "QualityHold",
+      "priority": 900,
+      "confidence": 0.93,
+      "match": {
+        "pagePatterns": [],
+        "actionPatterns": [
+          "release.*hold",
+          "släpp.*hold",
+          "frisläpp.*spärr"
+        ],
+        "fieldPatterns": [],
+        "automationIdPatterns": []
+      },
+      "instructionTemplate": "",
+      "languages": [
+        "sv-SE",
+        "en-US"
+      ],
+      "aliases": []
+    },
+    {
+      "ruleId": "Aptean.OpenSFP",
+      "taskType": "OpenShopFloorProduction",
+      "semanticAction": "Navigate",
+      "entity": "ShopFloorProduction",
+      "priority": 900,
+      "confidence": 0.95,
+      "match": {
+        "pagePatterns": [
+          "shop floor production",
+          "sfp"
+        ],
+        "actionPatterns": [],
+        "fieldPatterns": [],
+        "automationIdPatterns": []
+      },
+      "instructionTemplate": "",
+      "languages": [
+        "sv-SE",
+        "en-US"
+      ],
+      "aliases": []
+    },
+    {
+      "ruleId": "Aptean.RegisterConsumption",
+      "taskType": "RegisterConsumption",
+      "semanticAction": "RunAction",
+      "entity": "Consumption",
+      "priority": 1000,
+      "confidence": 0.95,
+      "match": {
+        "pagePatterns": [],
+        "actionPatterns": [
+          "register.*consumption",
+          "registrera.*förbrukning"
+        ],
+        "fieldPatterns": [],
+        "automationIdPatterns": []
+      },
+      "instructionTemplate": "",
+      "languages": [
+        "sv-SE",
+        "en-US"
+      ],
+      "aliases": []
+    },
+    {
+      "ruleId": "Aptean.RegisterOutput",
+      "taskType": "RegisterOutput",
+      "semanticAction": "RunAction",
+      "entity": "Output",
+      "priority": 1000,
+      "confidence": 0.95,
+      "match": {
+        "pagePatterns": [],
+        "actionPatterns": [
+          "register.*output",
+          "registrera.*utflöde"
+        ],
+        "fieldPatterns": [],
+        "automationIdPatterns": []
+      },
+      "instructionTemplate": "",
+      "languages": [
+        "sv-SE",
+        "en-US"
+      ],
+      "aliases": []
+    },
+    {
+      "ruleId": "Aptean.OpenClaim",
+      "taskType": "OpenClaim",
+      "semanticAction": "OpenRecord",
+      "entity": "Claim",
+      "priority": 900,
+      "confidence": 0.95,
+      "match": {
+        "pagePatterns": [
+          "claim",
+          "reklamation"
+        ],
+        "actionPatterns": [
+          "open record",
+          "öppna post"
+        ],
+        "fieldPatterns": [],
+        "automationIdPatterns": []
+      },
+      "instructionTemplate": "",
+      "languages": [
+        "sv-SE",
+        "en-US"
+      ],
+      "aliases": []
+    },
+    {
+      "ruleId": "Aptean.CreateClaim",
+      "taskType": "CreateClaim",
+      "semanticAction": "CreateNew",
+      "entity": "Claim",
+      "priority": 1000,
+      "confidence": 0.96,
+      "match": {
+        "pagePatterns": [],
+        "actionPatterns": [
+          "create.*claim",
+          "skapa.*reklamation"
+        ],
+        "fieldPatterns": [],
+        "automationIdPatterns": []
+      },
+      "instructionTemplate": "",
+      "languages": [
+        "sv-SE",
+        "en-US"
+      ],
+      "aliases": []
+    },
+    {
+      "ruleId": "Aptean.SelectLotBatch",
+      "taskType": "SelectLotBatchNo",
+      "semanticAction": "Select",
+      "entity": "LotBatchNo",
+      "priority": 1000,
+      "confidence": 0.95,
+      "match": {
+        "pagePatterns": [],
+        "actionPatterns": [],
+        "fieldPatterns": [
+          "lot.*no",
+          "lotnummer",
+          "batchnummer",
+          "batchnr",
+          "partinr"
+        ],
+        "automationIdPatterns": []
+      },
+      "instructionTemplate": "",
+      "languages": [
+        "sv-SE",
+        "en-US"
+      ],
+      "aliases": []
+    },
+    {
+      "ruleId": "Aptean.EnterCatchWeight",
+      "taskType": "EnterCatchWeight",
+      "semanticAction": "ChangeField",
+      "entity": "CatchWeight",
+      "priority": 900,
+      "confidence": 0.93,
+      "match": {
+        "pagePatterns": [],
+        "actionPatterns": [],
+        "fieldPatterns": [
+          "catch weight",
+          "fångstvikt",
+          "verklig vikt"
+        ],
+        "automationIdPatterns": []
+      },
+      "instructionTemplate": "",
+      "languages": [
+        "sv-SE",
+        "en-US"
+      ],
+      "aliases": []
+    }
+  ]
+}

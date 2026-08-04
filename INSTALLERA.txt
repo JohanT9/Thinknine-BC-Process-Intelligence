@@ -1,0 +1,21 @@
+THINKNINE BC PROCESS INTELLIGENCE 3.5.0
+
+SNABB INSTALLATION I EDGE
+
+1. Packa upp ZIP-filen.
+2. Öppna edge://extensions.
+3. Ta bort tidigare version.
+4. Aktivera Utvecklarläge.
+5. Klicka Läs in opaketerat.
+6. Välj mappen:
+   Thinknine_BC_Process_Intelligence_v3.5.0\dist
+7. Kontrollera version 3.5.0.
+8. Uppdatera Business Central med Ctrl+F5.
+
+UTVECKLING
+
+Öppna terminalen i projektets rot och kör:
+
+npm.cmd test
+npm.cmd run build
+npm.cmd run check

@@ -1,0 +1,19 @@
+THINKNINE BC RECORDER 3.4.0 — CONTEXT BUILDER
+
+1. Packa upp ZIP-filen.
+2. Öppna edge://extensions.
+3. Ta bort version 3.3.1.
+4. Klicka Läs in opaketerat.
+5. Välj mappen Thinknine_BC_Recorder_Edge_v3.4.0_CONTEXT_FULL.
+6. Kontrollera version 3.4.0.
+7. Uppdatera Business Central med Ctrl+F5.
+8. Spela in samma process.
+9. Exportera ZIP.
+
+Kontrollera:
+- context-events.json
+- context-candidates.json
+- business-tasks.json
+- unmatched-knowledge.json
+- quality-report.json
+- documentation.md

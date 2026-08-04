@@ -1,0 +1,217 @@
+{
+  "packId": "bc-core",
+  "name": "Business Central Core",
+  "version": "2.0.0",
+  "priority": 100,
+  "rules": [
+    {
+      "ruleId": "Core.SearchAndOpenPage",
+      "taskType": "SearchAndOpenPage",
+      "semanticAction": "SearchAndOpenPage",
+      "entity": "",
+      "priority": 1000,
+      "confidence": 0.99,
+      "match": {
+        "pagePatterns": [],
+        "actionPatterns": [
+          "^Sök$",
+          "^Search$"
+        ],
+        "fieldPatterns": [],
+        "automationIdPatterns": []
+      },
+      "instructionTemplate": "",
+      "languages": [
+        "sv-SE",
+        "en-US"
+      ],
+      "aliases": []
+    },
+    {
+      "ruleId": "Core.NavigateBack",
+      "taskType": "NavigateBack",
+      "semanticAction": "NavigateBack",
+      "entity": "",
+      "priority": 900,
+      "confidence": 0.99,
+      "match": {
+        "pagePatterns": [],
+        "actionPatterns": [
+          "^Tillbaka$",
+          "^Back$"
+        ],
+        "fieldPatterns": [],
+        "automationIdPatterns": []
+      },
+      "instructionTemplate": "",
+      "languages": [
+        "sv-SE",
+        "en-US"
+      ],
+      "aliases": []
+    },
+    {
+      "ruleId": "Core.CreateNew",
+      "taskType": "CreateNew",
+      "semanticAction": "CreateNew",
+      "entity": "",
+      "priority": 900,
+      "confidence": 0.98,
+      "match": {
+        "pagePatterns": [],
+        "actionPatterns": [
+          "^Ny$",
+          "^New$",
+          "^Skapa ny$"
+        ],
+        "fieldPatterns": [],
+        "automationIdPatterns": []
+      },
+      "instructionTemplate": "",
+      "languages": [
+        "sv-SE",
+        "en-US"
+      ],
+      "aliases": []
+    },
+    {
+      "ruleId": "Core.EditRecord",
+      "taskType": "EditRecord",
+      "semanticAction": "EditRecord",
+      "entity": "",
+      "priority": 900,
+      "confidence": 0.98,
+      "match": {
+        "pagePatterns": [],
+        "actionPatterns": [
+          "^Redigera$",
+          "^Edit$"
+        ],
+        "fieldPatterns": [],
+        "automationIdPatterns": []
+      },
+      "instructionTemplate": "",
+      "languages": [
+        "sv-SE",
+        "en-US"
+      ],
+      "aliases": []
+    },
+    {
+      "ruleId": "Core.DeleteRecord",
+      "taskType": "DeleteRecord",
+      "semanticAction": "DeleteRecord",
+      "entity": "",
+      "priority": 900,
+      "confidence": 0.98,
+      "match": {
+        "pagePatterns": [],
+        "actionPatterns": [
+          "^Ta bort$",
+          "^Delete$"
+        ],
+        "fieldPatterns": [],
+        "automationIdPatterns": []
+      },
+      "instructionTemplate": "",
+      "languages": [
+        "sv-SE",
+        "en-US"
+      ],
+      "aliases": []
+    },
+    {
+      "ruleId": "Core.ConfirmYes",
+      "taskType": "ConfirmYes",
+      "semanticAction": "ConfirmYes",
+      "entity": "",
+      "priority": 950,
+      "confidence": 0.99,
+      "match": {
+        "pagePatterns": [],
+        "actionPatterns": [
+          "^Ja$",
+          "^Yes$"
+        ],
+        "fieldPatterns": [],
+        "automationIdPatterns": []
+      },
+      "instructionTemplate": "",
+      "languages": [
+        "sv-SE",
+        "en-US"
+      ],
+      "aliases": []
+    },
+    {
+      "ruleId": "Core.ConfirmNo",
+      "taskType": "ConfirmNo",
+      "semanticAction": "ConfirmNo",
+      "entity": "",
+      "priority": 950,
+      "confidence": 0.99,
+      "match": {
+        "pagePatterns": [],
+        "actionPatterns": [
+          "^Nej$",
+          "^No$"
+        ],
+        "fieldPatterns": [],
+        "automationIdPatterns": []
+      },
+      "instructionTemplate": "",
+      "languages": [
+        "sv-SE",
+        "en-US"
+      ],
+      "aliases": []
+    },
+    {
+      "ruleId": "Core.Lookup",
+      "taskType": "OpenLookup",
+      "semanticAction": "OpenLookup",
+      "entity": "",
+      "priority": 500,
+      "confidence": 0.85,
+      "match": {
+        "pagePatterns": [],
+        "actionPatterns": [
+          "uppslag",
+          "lookup",
+          "assistedit"
+        ],
+        "fieldPatterns": [],
+        "automationIdPatterns": []
+      },
+      "instructionTemplate": "",
+      "languages": [
+        "sv-SE",
+        "en-US"
+      ],
+      "aliases": []
+    },
+    {
+      "ruleId": "Core.ChangeDate",
+      "taskType": "ChangeDate",
+      "semanticAction": "ChangeDate",
+      "entity": "",
+      "priority": 400,
+      "confidence": 0.85,
+      "match": {
+        "pagePatterns": [],
+        "actionPatterns": [],
+        "fieldPatterns": [
+          "datum",
+          "date"
+        ],
+        "automationIdPatterns": []
+      },
+      "instructionTemplate": "",
+      "languages": [
+        "sv-SE",
+        "en-US"
+      ],
+      "aliases": []
+    }
+  ]
+}

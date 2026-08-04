@@ -1,0 +1,35 @@
+{
+  "frameworkVersion": "2.0.0",
+  "packs": [
+    {
+      "file": "knowledge-packs/core.json",
+      "packId": "bc-core",
+      "enabled": true
+    },
+    {
+      "file": "knowledge-packs/sales.json",
+      "packId": "bc-sales",
+      "enabled": true
+    },
+    {
+      "file": "knowledge-packs/purchase.json",
+      "packId": "bc-purchase",
+      "enabled": true
+    },
+    {
+      "file": "knowledge-packs/warehouse.json",
+      "packId": "bc-warehouse",
+      "enabled": true
+    },
+    {
+      "file": "knowledge-packs/manufacturing.json",
+      "packId": "bc-manufacturing",
+      "enabled": true
+    },
+    {
+      "file": "knowledge-packs/aptean-fb.json",
+      "packId": "aptean-fb",
+      "enabled": true
+    }
+  ]
+}

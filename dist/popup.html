@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="sv">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Thinknine BC Recorder</title>
+<style>
+body{margin:0;width:350px;font-family:"Segoe UI",Arial,sans-serif;background:#f7f8fa;color:#1f2933}
+header{background:#111827;color:#fff;padding:16px 18px 12px}
+.brand{font-size:11px;letter-spacing:.22em;opacity:.75}
+h1{font-size:19px;margin:4px 0 0}.version{font-size:11px;font-weight:400;opacity:.7}
+main{padding:16px 18px 18px}
+.status{padding:9px 11px;border-radius:6px;margin-bottom:14px;font-weight:600;background:#e5e7eb}
+.status.rec{background:#fee2e2;color:#991b1b}
+label{display:block;font-size:12px;font-weight:600;margin-bottom:12px}
+input,textarea{width:100%;box-sizing:border-box;margin-top:5px;padding:8px;border:1px solid #cbd2d9;border-radius:5px;font:inherit}
+button{width:100%;padding:10px 12px;border:0;border-radius:5px;font-weight:600;cursor:pointer;margin-bottom:8px}
+.primary{background:#0f6cbd;color:#fff}.danger{background:#b42318;color:#fff}.secondary{background:#dbeafe;color:#1e3a8a}.debug{background:#e5e7eb;color:#374151}
+dl{display:grid;grid-template-columns:90px 1fr;gap:5px;font-size:12px}dt{font-weight:600}dd{margin:0}
+.message{font-size:12px;min-height:18px}
+</style>
+</head>
+<body>
+<header>
+<div class="brand">THINKNINE</div>
+<h1>BC Recorder <span class="version">v3.5.0</span></h1>
+</header>
+<main>
+<div id="status" class="status">Inte aktiv</div>
+<section id="startPanel">
+<label>Processnamn<input id="name" value="Business Central-process"></label>
+<label>Syfte<textarea id="purpose" rows="3"></textarea></label>
+<button id="start" class="primary">Starta inspelning</button>
+</section>
+<section id="recordingPanel" hidden>
+<dl>
+<dt>Session</dt><dd id="sessionName"></dd>
+<dt>Händelser</dt><dd id="count">0</dd>
+</dl>
+<button id="stop" class="danger">Stoppa inspelning</button>
+</section>
+<button id="dashboard" class="secondary">Sessioner och export</button>
+<button id="debug" class="debug">Debugpanel</button>
+<p id="message" class="message"></p>
+</main>
+<script src="popup.js"></script>
+</body>
+</html>

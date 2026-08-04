@@ -1,0 +1,195 @@
+{
+  "packId": "bc-sales",
+  "name": "Business Central Sales",
+  "version": "2.0.0",
+  "priority": 200,
+  "rules": [
+    {
+      "ruleId": "Sales.OpenSalesOrder",
+      "taskType": "OpenSalesOrder",
+      "semanticAction": "OpenRecord",
+      "entity": "SalesOrder",
+      "priority": 1000,
+      "confidence": 0.98,
+      "match": {
+        "pagePatterns": [
+          "förs\\.?\\s*order",
+          "försäljningsorder",
+          "sales order"
+        ],
+        "actionPatterns": [
+          "open record",
+          "öppna post"
+        ],
+        "fieldPatterns": [],
+        "automationIdPatterns": []
+      },
+      "instructionTemplate": "Öppna den försäljningsorder som ska hanteras.",
+      "languages": [
+        "sv-SE",
+        "en-US"
+      ],
+      "aliases": []
+    },
+    {
+      "ruleId": "Sales.Release",
+      "taskType": "ReleaseDocument",
+      "semanticAction": "ReleaseDocument",
+      "entity": "SalesOrder",
+      "priority": 1100,
+      "confidence": 0.99,
+      "match": {
+        "pagePatterns": [
+          "förs\\.?\\s*order",
+          "sales order"
+        ],
+        "actionPatterns": [
+          "^Släpp$",
+          "^Frisläpp$",
+          "^Release$"
+        ],
+        "fieldPatterns": [],
+        "automationIdPatterns": []
+      },
+      "instructionTemplate": "",
+      "languages": [
+        "sv-SE",
+        "en-US"
+      ],
+      "aliases": []
+    },
+    {
+      "ruleId": "Sales.Reopen",
+      "taskType": "ReopenDocument",
+      "semanticAction": "ReopenDocument",
+      "entity": "SalesOrder",
+      "priority": 1100,
+      "confidence": 0.99,
+      "match": {
+        "pagePatterns": [
+          "förs\\.?\\s*order",
+          "sales order"
+        ],
+        "actionPatterns": [
+          "^Öppna igen$",
+          "^Reopen$"
+        ],
+        "fieldPatterns": [],
+        "automationIdPatterns": []
+      },
+      "instructionTemplate": "",
+      "languages": [
+        "sv-SE",
+        "en-US"
+      ],
+      "aliases": []
+    },
+    {
+      "ruleId": "Sales.Post",
+      "taskType": "PostSalesDocument",
+      "semanticAction": "PostDocument",
+      "entity": "SalesDocument",
+      "priority": 1100,
+      "confidence": 0.99,
+      "match": {
+        "pagePatterns": [
+          "förs\\.?\\s*order",
+          "sales order",
+          "försäljningsfaktura"
+        ],
+        "actionPatterns": [
+          "^Bokför$",
+          "^Post$"
+        ],
+        "fieldPatterns": [],
+        "automationIdPatterns": []
+      },
+      "instructionTemplate": "",
+      "languages": [
+        "sv-SE",
+        "en-US"
+      ],
+      "aliases": []
+    },
+    {
+      "ruleId": "Sales.ChangeShipmentDate",
+      "taskType": "ChangeShipmentDate",
+      "semanticAction": "ChangeShipmentDate",
+      "entity": "SalesOrder",
+      "priority": 1200,
+      "confidence": 0.99,
+      "match": {
+        "pagePatterns": [
+          "förs\\.?\\s*order",
+          "sales order"
+        ],
+        "actionPatterns": [],
+        "fieldPatterns": [
+          "^Utleveransdatum$",
+          "^Shipment Date$"
+        ],
+        "automationIdPatterns": []
+      },
+      "instructionTemplate": "",
+      "languages": [
+        "sv-SE",
+        "en-US"
+      ],
+      "aliases": []
+    },
+    {
+      "ruleId": "Sales.SelectCustomer",
+      "taskType": "SelectCustomer",
+      "semanticAction": "SelectCustomer",
+      "entity": "Customer",
+      "priority": 1000,
+      "confidence": 0.95,
+      "match": {
+        "pagePatterns": [
+          "förs\\.?\\s*order",
+          "sales order"
+        ],
+        "actionPatterns": [],
+        "fieldPatterns": [
+          "^Kundnr$",
+          "^Kundens namn$",
+          "^Customer No\\.?$",
+          "^Customer Name$"
+        ],
+        "automationIdPatterns": []
+      },
+      "instructionTemplate": "",
+      "languages": [
+        "sv-SE",
+        "en-US"
+      ],
+      "aliases": []
+    },
+    {
+      "ruleId": "Sales.OpenPostedInvoice",
+      "taskType": "OpenPostedSalesInvoice",
+      "semanticAction": "OpenRecord",
+      "entity": "PostedSalesInvoice",
+      "priority": 1000,
+      "confidence": 0.98,
+      "match": {
+        "pagePatterns": [
+          "bokförda försäljningsfakturor",
+          "posted sales invoices"
+        ],
+        "actionPatterns": [
+          "open record",
+          "öppna post"
+        ],
+        "fieldPatterns": [],
+        "automationIdPatterns": []
+      },
+      "instructionTemplate": "",
+      "languages": [
+        "sv-SE",
+        "en-US"
+      ],
+      "aliases": []
+    }
+  ]
+}

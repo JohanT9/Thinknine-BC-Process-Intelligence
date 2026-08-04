@@ -1,0 +1,4 @@
+Thinknine BC Recorder
+Version 3.4.0
+Context Builder 1.0
+Knowledge Pack Framework 2.0

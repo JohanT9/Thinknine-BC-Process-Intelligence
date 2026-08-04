@@ -1,0 +1,160 @@
+{
+  "packId": "bc-purchase",
+  "name": "Business Central Purchase",
+  "version": "2.0.0",
+  "priority": 200,
+  "rules": [
+    {
+      "ruleId": "Purchase.OpenPurchaseOrder",
+      "taskType": "OpenPurchaseOrder",
+      "semanticAction": "OpenRecord",
+      "entity": "PurchaseOrder",
+      "priority": 1000,
+      "confidence": 0.98,
+      "match": {
+        "pagePatterns": [
+          "inköpsorder",
+          "purchase order"
+        ],
+        "actionPatterns": [
+          "open record",
+          "öppna post"
+        ],
+        "fieldPatterns": [],
+        "automationIdPatterns": []
+      },
+      "instructionTemplate": "",
+      "languages": [
+        "sv-SE",
+        "en-US"
+      ],
+      "aliases": []
+    },
+    {
+      "ruleId": "Purchase.Release",
+      "taskType": "ReleasePurchaseDocument",
+      "semanticAction": "ReleaseDocument",
+      "entity": "PurchaseOrder",
+      "priority": 1100,
+      "confidence": 0.99,
+      "match": {
+        "pagePatterns": [
+          "inköpsorder",
+          "purchase order"
+        ],
+        "actionPatterns": [
+          "^Släpp$",
+          "^Frisläpp$",
+          "^Release$"
+        ],
+        "fieldPatterns": [],
+        "automationIdPatterns": []
+      },
+      "instructionTemplate": "",
+      "languages": [
+        "sv-SE",
+        "en-US"
+      ],
+      "aliases": []
+    },
+    {
+      "ruleId": "Purchase.Reopen",
+      "taskType": "ReopenPurchaseDocument",
+      "semanticAction": "ReopenDocument",
+      "entity": "PurchaseOrder",
+      "priority": 1100,
+      "confidence": 0.99,
+      "match": {
+        "pagePatterns": [
+          "inköpsorder",
+          "purchase order"
+        ],
+        "actionPatterns": [
+          "^Öppna igen$",
+          "^Reopen$"
+        ],
+        "fieldPatterns": [],
+        "automationIdPatterns": []
+      },
+      "instructionTemplate": "",
+      "languages": [
+        "sv-SE",
+        "en-US"
+      ],
+      "aliases": []
+    },
+    {
+      "ruleId": "Purchase.Post",
+      "taskType": "PostPurchaseDocument",
+      "semanticAction": "PostDocument",
+      "entity": "PurchaseDocument",
+      "priority": 1100,
+      "confidence": 0.99,
+      "match": {
+        "pagePatterns": [
+          "inköpsorder",
+          "purchase order",
+          "inköpsfaktura"
+        ],
+        "actionPatterns": [
+          "^Bokför$",
+          "^Post$"
+        ],
+        "fieldPatterns": [],
+        "automationIdPatterns": []
+      },
+      "instructionTemplate": "",
+      "languages": [
+        "sv-SE",
+        "en-US"
+      ],
+      "aliases": []
+    },
+    {
+      "ruleId": "Purchase.SelectVendor",
+      "taskType": "SelectVendor",
+      "semanticAction": "SelectVendor",
+      "entity": "Vendor",
+      "priority": 900,
+      "confidence": 0.95,
+      "match": {
+        "pagePatterns": [],
+        "actionPatterns": [],
+        "fieldPatterns": [
+          "leverantörsnr",
+          "vendor no"
+        ],
+        "automationIdPatterns": []
+      },
+      "instructionTemplate": "",
+      "languages": [
+        "sv-SE",
+        "en-US"
+      ],
+      "aliases": []
+    },
+    {
+      "ruleId": "Purchase.ChangeExpectedReceiptDate",
+      "taskType": "ChangeExpectedReceiptDate",
+      "semanticAction": "ChangeDate",
+      "entity": "PurchaseOrder",
+      "priority": 1000,
+      "confidence": 0.98,
+      "match": {
+        "pagePatterns": [],
+        "actionPatterns": [],
+        "fieldPatterns": [
+          "förväntat inleveransdatum",
+          "expected receipt date"
+        ],
+        "automationIdPatterns": []
+      },
+      "instructionTemplate": "",
+      "languages": [
+        "sv-SE",
+        "en-US"
+      ],
+      "aliases": []
+    }
+  ]
+}

@@ -1,0 +1,204 @@
+{
+  "packId": "bc-warehouse",
+  "name": "Business Central Warehouse",
+  "version": "2.0.0",
+  "priority": 200,
+  "rules": [
+    {
+      "ruleId": "Warehouse.OpenReceipt",
+      "taskType": "OpenWarehouseReceipt",
+      "semanticAction": "OpenRecord",
+      "entity": "WarehouseReceipt",
+      "priority": 900,
+      "confidence": 0.97,
+      "match": {
+        "pagePatterns": [
+          "distlagerinleverans",
+          "warehouse receipt"
+        ],
+        "actionPatterns": [
+          "open record",
+          "öppna post"
+        ],
+        "fieldPatterns": [],
+        "automationIdPatterns": []
+      },
+      "instructionTemplate": "",
+      "languages": [
+        "sv-SE",
+        "en-US"
+      ],
+      "aliases": []
+    },
+    {
+      "ruleId": "Warehouse.OpenShipment",
+      "taskType": "OpenWarehouseShipment",
+      "semanticAction": "OpenRecord",
+      "entity": "WarehouseShipment",
+      "priority": 900,
+      "confidence": 0.97,
+      "match": {
+        "pagePatterns": [
+          "distlagerutleverans",
+          "warehouse shipment"
+        ],
+        "actionPatterns": [
+          "open record",
+          "öppna post"
+        ],
+        "fieldPatterns": [],
+        "automationIdPatterns": []
+      },
+      "instructionTemplate": "",
+      "languages": [
+        "sv-SE",
+        "en-US"
+      ],
+      "aliases": []
+    },
+    {
+      "ruleId": "Warehouse.CreatePick",
+      "taskType": "CreateWarehousePick",
+      "semanticAction": "RunAction",
+      "entity": "WarehousePick",
+      "priority": 1000,
+      "confidence": 0.96,
+      "match": {
+        "pagePatterns": [],
+        "actionPatterns": [
+          "skapa.*plock",
+          "create.*pick"
+        ],
+        "fieldPatterns": [],
+        "automationIdPatterns": []
+      },
+      "instructionTemplate": "",
+      "languages": [
+        "sv-SE",
+        "en-US"
+      ],
+      "aliases": []
+    },
+    {
+      "ruleId": "Warehouse.RegisterPick",
+      "taskType": "RegisterWarehousePick",
+      "semanticAction": "RunAction",
+      "entity": "WarehousePick",
+      "priority": 1000,
+      "confidence": 0.96,
+      "match": {
+        "pagePatterns": [],
+        "actionPatterns": [
+          "registrera.*plock",
+          "register.*pick"
+        ],
+        "fieldPatterns": [],
+        "automationIdPatterns": []
+      },
+      "instructionTemplate": "",
+      "languages": [
+        "sv-SE",
+        "en-US"
+      ],
+      "aliases": []
+    },
+    {
+      "ruleId": "Warehouse.PostReceipt",
+      "taskType": "PostWarehouseReceipt",
+      "semanticAction": "PostDocument",
+      "entity": "WarehouseReceipt",
+      "priority": 1000,
+      "confidence": 0.97,
+      "match": {
+        "pagePatterns": [
+          "distlagerinleverans",
+          "warehouse receipt"
+        ],
+        "actionPatterns": [
+          "^Bokför$",
+          "^Post$"
+        ],
+        "fieldPatterns": [],
+        "automationIdPatterns": []
+      },
+      "instructionTemplate": "",
+      "languages": [
+        "sv-SE",
+        "en-US"
+      ],
+      "aliases": []
+    },
+    {
+      "ruleId": "Warehouse.PostShipment",
+      "taskType": "PostWarehouseShipment",
+      "semanticAction": "PostDocument",
+      "entity": "WarehouseShipment",
+      "priority": 1000,
+      "confidence": 0.97,
+      "match": {
+        "pagePatterns": [
+          "distlagerutleverans",
+          "warehouse shipment"
+        ],
+        "actionPatterns": [
+          "^Bokför$",
+          "^Post$"
+        ],
+        "fieldPatterns": [],
+        "automationIdPatterns": []
+      },
+      "instructionTemplate": "",
+      "languages": [
+        "sv-SE",
+        "en-US"
+      ],
+      "aliases": []
+    },
+    {
+      "ruleId": "Warehouse.SelectLocation",
+      "taskType": "SelectLocation",
+      "semanticAction": "Select",
+      "entity": "Location",
+      "priority": 900,
+      "confidence": 0.94,
+      "match": {
+        "pagePatterns": [],
+        "actionPatterns": [],
+        "fieldPatterns": [
+          "lagerplatskod",
+          "location code"
+        ],
+        "automationIdPatterns": []
+      },
+      "instructionTemplate": "",
+      "languages": [
+        "sv-SE",
+        "en-US"
+      ],
+      "aliases": []
+    },
+    {
+      "ruleId": "Warehouse.SelectBin",
+      "taskType": "SelectBin",
+      "semanticAction": "Select",
+      "entity": "Bin",
+      "priority": 800,
+      "confidence": 0.9,
+      "match": {
+        "pagePatterns": [],
+        "actionPatterns": [],
+        "fieldPatterns": [
+          "lagerplats",
+          "bin code"
+        ],
+        "automationIdPatterns": []
+      },
+      "instructionTemplate": "",
+      "languages": [
+        "sv-SE",
+        "en-US"
+      ],
+      "aliases": []
+    }
+  ]
+}

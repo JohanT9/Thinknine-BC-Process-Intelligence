@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="sv">
+<head>
+<meta charset="utf-8">
+<title>Thinknine BC Recorder</title>
+<style>
+body{font-family:"Segoe UI",Arial,sans-serif;max-width:1050px;margin:35px auto;padding:0 20px;color:#1f2933}
+h1{margin-bottom:5px}.muted{color:#52606d}
+fieldset{border:1px solid #d8dee5;border-radius:8px;padding:18px;margin:20px 0}
+legend{font-weight:600}
+label{display:block;margin:9px 0}
+input[type=number],input[type=text],select{padding:8px;width:380px;max-width:100%;box-sizing:border-box}
+button{border:0;border-radius:5px;padding:9px 13px;font-weight:600;cursor:pointer;margin-right:6px}
+.primary{background:#0f6cbd;color:white}.danger{background:#fee2e2;color:#991b1b}.secondary{background:#dbeafe;color:#1e3a8a}.debug{background:#e5e7eb;color:#374151}
+table{width:100%;border-collapse:collapse}th,td{text-align:left;padding:9px;border-bottom:1px solid #e5e7eb;font-size:13px}
+#message{min-height:20px;margin:10px 0}
+.profile-help{padding:12px;background:#f3f6fa;border-radius:6px;margin-top:10px}
+.advanced{display:none}.advanced.open{display:block}
+.summary{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px;margin:15px 0}
+.summary div{border:1px solid #d8dee5;border-radius:6px;padding:12px}
+.summary strong{display:block;font-size:18px;margin-top:4px}
+</style>
+</head>
+<body>
+<h1>Thinknine BC Recorder <small>v3.5.0</small></h1>
+<p class="muted">Spela in en Business Central-process och exportera en återanvändbar manual med exakt UI-terminologi.</p>
+
+<fieldset>
+<legend>Dokumentation</legend>
+
+<label for="documentationProfile">Dokumentationstyp</label>
+<select id="documentationProfile">
+  <option value="generic">Generisk manual</option>
+  <option value="customer">Kundspecifik manual</option>
+  <option value="internal">Intern dokumentation</option>
+  <option value="training">Utbildningsmaterial</option>
+</select>
+
+<div id="profileHelp" class="profile-help"></div>
+
+<label for="environmentName">Miljönamn</label>
+<input id="environmentName" type="text">
+
+<button id="advancedToggle" class="secondary" type="button">Visa avancerade dataskyddsinställningar</button>
+
+<div id="advancedPanel" class="advanced">
+  <h3>Dataskydd</h3>
+  <label><input id="maskSalesOrderNo" type="checkbox"> Försäljningsordernummer</label>
+  <label><input id="maskPurchaseOrderNo" type="checkbox"> Inköpsordernummer</label>
+  <label><input id="maskInvoiceNo" type="checkbox"> Fakturanummer</label>
+  <label><input id="maskReceiptNo" type="checkbox"> Inleveransnummer</label>
+  <label><input id="maskShipmentNo" type="checkbox"> Utleveransnummer</label>
+  <label><input id="maskProductionOrderNo" type="checkbox"> Produktionsordernummer</label>
+  <label><input id="maskPostedDocumentNo" type="checkbox"> Övriga bokförda dokumentnummer</label>
+  <label><input id="maskCompanyName" type="checkbox"> Företagsnamn</label>
+  <label><input id="maskTenantAndUrl" type="checkbox"> Tenant och URL</label>
+
+  <h3>Masterdata och testdata</h3>
+  <label><input id="maskCustomerNo" type="checkbox"> Kundnummer</label>
+  <label><input id="maskVendorNo" type="checkbox"> Leverantörsnummer</label>
+  <label><input id="maskItemNo" type="checkbox"> Artikelnummer</label>
+  <label><input id="maskLocationCode" type="checkbox"> Lagerplatskoder</label>
+  <label><input id="maskLotBatchNo" type="checkbox"> Lot-/Batchnummer</label>
+</div>
+</fieldset>
+
+<fieldset>
+<legend>Inspelning</legend>
+<label><input id="captureScreenshots" type="checkbox"> Ta skärmbilder</label>
+
+<label for="screenshotMode">Skärmbilder</label>
+<select id="screenshotMode">
+  <option value="important">Endast viktiga steg</option>
+  <option value="all">Alla åtgärder och sidbyten</option>
+  <option value="none">Inga skärmbilder</option>
+</select>
+
+<label for="maxEvents">Maximalt antal händelser</label>
+<input id="maxEvents" type="number" min="100" max="50000">
+
+<button id="save" class="primary">Spara inställningar</button>
+</fieldset>
+
+<h2>Sessioner</h2>
+<button id="refresh" class="secondary">Uppdatera listan</button>
+<button id="debug" class="debug">Öppna debugpanel</button>
+<div id="message"></div>
+<table>
+<thead><tr><th>Namn</th><th>Startad</th><th>Händelser</th><th>Status</th><th></th></tr></thead>
+<tbody id="sessions"></tbody>
+</table>
+
+<script src="engine/noise-filter.js"></script>
+<script src="engine/entity-memory.js"></script>
+<script src="engine/session-graph.js"></script>
+<script src="engine/confidence-engine.js"></script>
+<script src="engine/documentation-engine.js"></script>
+
+<script src="dashboard.js"></script>
+</body>
+</html>

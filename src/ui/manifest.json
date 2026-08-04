@@ -1,0 +1,50 @@
+{
+  "manifest_version": 3,
+  "name": "Thinknine BC Process Intelligence",
+  "version": "3.5.0",
+  "description": "Records and interprets Business Central processes using modular Edge-only intelligence.",
+  "permissions": [
+    "storage",
+    "downloads",
+    "tabs",
+    "activeTab",
+    "scripting",
+    "unlimitedStorage"
+  ],
+  "host_permissions": [
+    "https://businesscentral.dynamics.com/*",
+    "https://*.businesscentral.dynamics.com/*"
+  ],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "action": {
+    "default_title": "Thinknine BC Recorder",
+    "default_popup": "popup.html"
+  },
+  "options_page": "dashboard.html",
+  "content_scripts": [
+    {
+      "matches": [
+        "https://businesscentral.dynamics.com/*",
+        "https://*.businesscentral.dynamics.com/*"
+      ],
+      "js": [
+        "content.js"
+      ],
+      "all_frames": true,
+      "match_about_blank": true,
+      "run_at": "document_start"
+    }
+  ],
+  "web_accessible_resources": [
+    {
+      "resources": [
+        "knowledge-packs/*.json"
+      ],
+      "matches": [
+        "<all_urls>"
+      ]
+    }
+  ]
+}
