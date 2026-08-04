@@ -1,5 +1,18 @@
 # Changelog
 
+## 3.7.1
+
+- Fixed dashboard startup regression.
+- Restored loading of environment name and maximum event count.
+- Restored session list loading.
+- Added guarded sequential dashboard initialization.
+- Added defaults fallback when stored settings are missing or unreadable.
+- Added explicit empty-session state.
+- Hardened background responses for settings and sessions.
+- Added dashboard regression tests.
+- Word Generator remains unchanged.
+
+
 ## 3.7.0
 
 - Added professional Word DOCX generator.

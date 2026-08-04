@@ -1,4 +1,4 @@
-const VERSION = "3.7.0";
+const VERSION = "3.7.1";
 
 const DEFAULT_SETTINGS = {
   documentationProfile: "generic",
@@ -736,9 +736,15 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
         sendResponse({ ok: true });
         break;
 
-      case "T9_LIST_SESSIONS":
-        sendResponse({ ok: true, sessions: await listSessions() });
+      case "T9_LIST_SESSIONS": {
+        const sessions = await listSessions();
+
+        sendResponse({
+          ok: true,
+          sessions: Array.isArray(sessions) ? sessions : []
+        });
         break;
+      }
 
       case "T9_GET_SESSION_DATA":
         sendResponse({
@@ -801,7 +807,15 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
       }
 
       case "T9_GET_SETTINGS": {
-        sendResponse({ ok: true, settings: await getSettings() });
+        const data = await chrome.storage.local.get("t9-settings");
+
+        sendResponse({
+          ok: true,
+          settings: {
+            ...DEFAULT_SETTINGS,
+            ...(data["t9-settings"] || {})
+          }
+        });
         break;
       }
 

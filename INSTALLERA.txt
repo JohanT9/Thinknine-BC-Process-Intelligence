@@ -1,18 +1,19 @@
-THINKNINE BC PROCESS INTELLIGENCE 3.7.0
+THINKNINE BC PROCESS INTELLIGENCE 3.7.1 HOTFIX
 
-1. Packa upp GITHUB_PATCH.zip i repositoryts rot.
+1. Packa upp HOTFIX_PATCH.zip i repositoryts rot.
 2. Ersätt befintliga filer.
 3. Kör:
    npm.cmd run ci
 4. Commit och push.
 5. Kör:
    npm.cmd run build
-6. Öppna edge://extensions och klicka Läs in igen.
+6. Öppna edge://extensions.
+7. Klicka Läs in igen.
 
-WORD-EXPORT
+KONTROLLERA
 
-1. Öppna Sessioner och export.
-2. Välj Granska för en avslutad session.
-3. Justera och godkänn stegen.
-4. Välj Exportera Word.
-5. En DOCX-fil sparas via Edge.
+- Miljönamn visas.
+- Maximalt antal händelser visas.
+- Befintliga sessioner visas.
+- Granska öppnas.
+- Exportera Word fungerar.

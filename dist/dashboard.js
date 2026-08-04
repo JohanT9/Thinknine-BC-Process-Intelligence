@@ -26,7 +26,7 @@ const $ = id => document.getElementById(id);
 const send = message => chrome.runtime.sendMessage(message);
 
 
-const CONTEXT_BUILDER_VERSION = "3.7.0";
+const CONTEXT_BUILDER_VERSION = "3.7.1";
 
 function contextPageCaption(event) {
   return cleanUiCaption(
@@ -311,7 +311,7 @@ function createContextCandidates(contextEvents) {
 }
 
 
-const KNOWLEDGE_PACK_FRAMEWORK_VERSION = "3.7.0";
+const KNOWLEDGE_PACK_FRAMEWORK_VERSION = "3.7.1";
 let loadedKnowledgePacks = [];
 let loadedKnowledgeRules = [];
 let unmatchedKnowledgeItems = [];
@@ -2666,7 +2666,7 @@ Processen är genomförd enligt arbetsgången.
 Dokumentationskvalitet: **${quality} %**
 
 ---
-Genererad från Business Tasks av Thinknine BC Recorder 3.7.0.
+Genererad från Business Tasks av Thinknine BC Recorder 3.7.1.
 `;
 }
 
@@ -2706,7 +2706,7 @@ ${rendered || "Inga meningsfulla arbetssteg kunde identifieras."}
 Processen är genomförd och de registrerade ändringarna har sparats i Business Central.
 
 ---
-Automatiskt tolkat av Thinknine BC Recorder 3.7.0.
+Automatiskt tolkat av Thinknine BC Recorder 3.7.1.
 `;
 }
 
@@ -2723,7 +2723,7 @@ function createDiagnostics(session, rawEvents, businessSteps, screenshotCount) {
   }
 
   return {
-    recorderVersion: "3.7.0",
+    recorderVersion: "3.7.1",
     uiFidelityMode: true,
     sessionId: session.id,
     environment: session.settings?.environmentName || "",
@@ -2791,9 +2791,17 @@ function createDiagnostics(session, rawEvents, businessSteps, screenshotCount) {
 }
 
 async function loadSettings() {
-  await loadKnowledgePacks();
+  try {
+    await loadKnowledgePacks();
+  } catch (error) {
+    console.warn("Knowledge Packs could not be loaded.", error);
+  }
+
   const response = await send({ type: "T9_GET_SETTINGS" });
-  const settings = { ...DEFAULTS, ...(response.settings || {}) };
+  const settings = {
+    ...DEFAULTS,
+    ...(response?.settings || {})
+  };
 
   for (const [key, value] of Object.entries(settings)) {
     const element = $(key);
@@ -2801,14 +2809,23 @@ async function loadSettings() {
 
     if (typeof value === "boolean") {
       element.checked = value;
-    } else {
+    } else if (
+      value !== undefined &&
+      value !== null
+    ) {
       element.value = value;
     }
   }
 
   $("documentationProfile").value =
-    settings.documentationProfile || "generic";
-  applyProfile($("documentationProfile").value, false);
+    settings.documentationProfile ||
+    DEFAULTS.documentationProfile ||
+    "generic";
+
+  applyProfile(
+    $("documentationProfile").value,
+    false
+  );
 }
 
 async function saveSettings() {
@@ -3048,7 +3065,7 @@ async function exportSession(session) {
 
   diagnostics.businessTaskCount = finalBusinessTasks.length;
   diagnostics.businessTaskQuality = knowledgeQuality;
-  diagnostics.knowledgePackVersion = "3.7.0";
+  diagnostics.knowledgePackVersion = "3.7.1";
   diagnostics.knowledgeFrameworkVersion = KNOWLEDGE_PACK_FRAMEWORK_VERSION;
   diagnostics.loadedKnowledgePacks = loadedKnowledgePacks.map(pack => ({
     packId: pack.packId,
@@ -3233,7 +3250,7 @@ async function exportSession(session) {
     {
       name: `${prefix}ui-fidelity.json`,
       data: bytes(JSON.stringify({
-        version: "3.7.0",
+        version: "3.7.1",
         principle: "Visible Business Central captions are preserved exactly.",
         rules: [
           "actionCaption is the text shown on the action or button.",
@@ -3527,10 +3544,25 @@ function closeReview() {
 
 async function loadSessions() {
   const response = await send({ type: "T9_LIST_SESSIONS" });
+  const sessions = Array.isArray(response?.sessions)
+    ? response.sessions
+    : [];
   const body = $("sessions");
   body.innerHTML = "";
 
-  for (const session of response.sessions || []) {
+  if (!sessions.length) {
+    const row = document.createElement("tr");
+    const cell = document.createElement("td");
+    cell.colSpan = 5;
+    cell.className = "muted";
+    cell.textContent = "Inga sessioner har sparats ännu.";
+    row.appendChild(cell);
+    body.appendChild(row);
+    return;
+  }
+  body.innerHTML = "";
+
+  for (const session of sessions) {
     const row = document.createElement("tr");
 
     row.innerHTML = `
@@ -3674,5 +3706,44 @@ $("debug").addEventListener("click", () => {
   });
 });
 
-loadSettings();
-loadSessions();
+
+async function initializeDashboard() {
+  try {
+    await loadSettings();
+  } catch (error) {
+    console.error("T9 loadSettings failed", error);
+
+    // Keep the UI usable even if stored settings cannot be read.
+    for (const [key, value] of Object.entries(DEFAULTS)) {
+      const element = $(key);
+      if (!element) continue;
+
+      if (typeof value === "boolean") {
+        element.checked = value;
+      } else {
+        element.value = value;
+      }
+    }
+
+    $("documentationProfile").value =
+      DEFAULTS.documentationProfile || "generic";
+    applyProfile($("documentationProfile").value, false);
+    show(
+      "Inställningarna kunde inte läsas. Standardvärden visas.",
+      true
+    );
+  }
+
+  try {
+    await loadSessions();
+  } catch (error) {
+    console.error("T9 loadSessions failed", error);
+    show(
+      "Sessionerna kunde inte läsas. Öppna debugpanelen för mer information.",
+      true
+    );
+  }
+}
+
+initializeDashboard();
+

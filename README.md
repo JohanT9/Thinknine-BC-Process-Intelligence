@@ -130,3 +130,11 @@ Dokumentet innehåller:
 - sidhuvud och sidnummer
 
 Word-exporten arbetar mot den sparade granskningsmodellen. Råhändelser används inte direkt i dokumentet.
+
+
+## Hotfix 3.7.1
+
+Version 3.7.1 återställer dashboardens uppstart och dataladdning.
+
+Inställningar läses nu med standardvärden som fallback och sessionlistan
+renderas även när lagringen är tom eller ett äldre lagringsformat används.
