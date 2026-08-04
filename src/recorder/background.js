@@ -1,7 +1,6 @@
-const VERSION = "3.6.0";
+const VERSION = "4.1.1";
 
 const DEFAULT_SETTINGS = {
-  alwaysAskExportLocation: true,
   exportFileNamePattern: "{process} - {environment} - {date}",
   documentationProfile: "generic",
   captureScreenshots: true,
@@ -763,7 +762,6 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
         const downloadId = await chrome.downloads.download({
           url: message.url,
           filename: message.filename,
-          saveAs: Boolean(message.saveAs),
           conflictAction: "uniquify"
         });
 

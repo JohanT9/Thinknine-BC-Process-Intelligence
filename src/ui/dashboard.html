@@ -41,6 +41,12 @@ table{width:100%;border-collapse:collapse}th,td{text-align:left;padding:9px;bord
 @media(max-width:800px){.review-card{grid-template-columns:44px 1fr}.review-actions{grid-column:1/-1;flex-direction:row;flex-wrap:wrap}}
 
 .summary strong{display:block;font-size:18px;margin-top:4px}
+.filename-variables{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0}
+.filename-variables button{margin:0;padding:6px 9px;font-family:Consolas,monospace}
+.filename-preview{margin-top:10px;padding:10px;background:#f3f6fa;border-radius:6px}
+.filename-preview.invalid{background:#fef2f2;color:#991b1b}
+.filename-template-invalid{border-color:#b91c1c;outline:1px solid #b91c1c}
+.filename-validation{min-height:18px;margin-top:5px;color:#991b1b;font-size:13px}
 </style>
 </head>
 <body>
@@ -89,21 +95,36 @@ table{width:100%;border-collapse:collapse}th,td{text-align:left;padding:9px;bord
 <fieldset>
 <legend>Export</legend>
 
-<label>
-<input id="alwaysAskExportLocation" type="checkbox">
-Fråga alltid var filer ska sparas
-</label>
-
 <label for="exportFileNamePattern">Filnamnsmall</label>
 <input
   id="exportFileNamePattern"
   type="text"
   placeholder="{process} - {environment} - {date}"
+  aria-describedby="filenameVariableHelp filenamePreview filenameValidation"
+  aria-errormessage="filenameValidation"
 >
 
-<div class="muted">
-Tillgängliga variabler: {process}, {environment}, {date}, {time}, {version}
-</div>
+<div id="filenameVariableHelp" class="muted"></div>
+<div
+  id="filenameVariables"
+  class="filename-variables"
+  role="group"
+  aria-label="Infoga filnamnsvariabel. Använd vänster och höger pil för att navigera."
+></div>
+<div
+  id="filenamePreview"
+  class="filename-preview"
+  role="status"
+  aria-live="polite"
+  aria-atomic="true"
+></div>
+<div
+  id="filenameValidation"
+  class="filename-validation"
+  role="status"
+  aria-live="polite"
+  aria-atomic="true"
+></div>
 </fieldset>
 
 <fieldset>
@@ -167,6 +188,7 @@ Tillgängliga variabler: {process}, {environment}, {date}, {time}, {version}
 <script src="engine/session-graph.js"></script>
 <script src="engine/confidence-engine.js"></script>
 <script src="engine/documentation-engine.js"></script>
+<script src="engine/export-settings.js"></script>
 
 <script src="exporters/word-exporter-docx.bundle.js"></script>
 <script src="review/review-studio.js"></script>

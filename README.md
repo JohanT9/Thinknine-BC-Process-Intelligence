@@ -161,22 +161,29 @@ dist/exporters/word-exporter-docx.bundle.js
 Edge laddar endast den färdiga bundlen. Inga externa CDN-anrop görs när tillägget används.
 
 
-## Exportinställningar 4.1
+## Exportinställningar 4.1.1
 
-Aktivera **Fråga alltid var filer ska sparas** för att visa Edges dialog **Spara som**.
+Filnamnsmallen har direkt förhandsvisning och variabelknappar som infogar en
+variabel vid markörens aktuella position. Okända och felaktigt skrivna variabler
+markeras med tydliga valideringsmeddelanden utan att blockera exporten.
+Befintliga mallar fortsätter att fungera.
 
-Filnamnsmallen stöder:
-
-```text
-{process}
-{environment}
-{date}
-{time}
-{version}
-```
+De variabler som stöds genereras och visas i dashboarden. Samma centrala
+definition används för knappar, hjälptext, validering och filnamnsgenerering.
 
 Exempel:
 
 ```text
 {process} - {environment} - {date}
 ```
+
+Exporter sparas via Edge Downloads med automatiskt unika filnamn vid konflikt.
+
+Variabler för företag och användare exponeras inte eftersom inspelade sessioner
+ännu inte innehåller tillförlitliga värden för dessa uppgifter.
+
+Variabelgruppen kan användas med Tab, Shift+Tab, piltangenter, Home och End.
+Preview och valideringsfel meddelas även till skärmläsare.
+
+Se [Release Notes 4.1.1](docs/RELEASE_NOTES_4.1.1.md) för en fullständig
+sammanställning av ändringarna.

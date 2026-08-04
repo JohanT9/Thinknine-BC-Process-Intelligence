@@ -1,75 +1,189 @@
-# Thinknine BC Recorder v3.4.0
+# Thinknine BC Process Intelligence v3.5.0
 
-Version 3.4 inför ett **Context Builder-lager** före Knowledge Pack.
+Detta är den första git-redo, modulära versionen av Edge-projektet.
 
-## Ny kedja
-
-```text
-Råhändelser
-    ↓
-Context Builder
-    ↓
-BC-tolkning
-    ↓
-Business Steps
-    ↓
-Process Pattern Engine
-    ↓
-Business Tasks
-    ↓
-Knowledge Pack 2.0
-    ↓
-Dokumentation
-```
-
-## Context Builder lagrar
-
-- aktuell sida
-- föregående sida
-- aktuell affärsentitet
-- vald post
-- väntande åtgärd
-- aktiv dialog
-- efterföljande navigation
-- destinationssida och destinationsentitet
-
-## Exempel
-
-När användaren väljer:
+## Struktur
 
 ```text
-Öppna posten 101002
+src/
+├── recorder/
+├── engine/
+│   ├── noise-filter.js
+│   ├── entity-memory.js
+│   ├── session-graph.js
+│   ├── confidence-engine.js
+│   └── documentation-engine.js
+├── ui/
+└── knowledge-packs/
+
+dist/                 Laddas som opaketerat Edge-tillägg
+scripts/build.js
+tests/engine.test.js
 ```
 
-kan Context Builder nu samtidigt veta:
+## Kommandon
 
-```json
-{
-  "currentPageCaption": "Förs.order",
-  "currentEntity": "SalesOrder",
-  "followingPageCaption": "Förs.order",
-  "followingEntity": "SalesOrder",
-  "selectedRecordValue": "101002"
-}
+```powershell
+npm.cmd test
+npm.cmd run build
+npm.cmd run check
 ```
 
-Knowledge Pack behöver därför inte gissa utifrån knapptexten ensam.
+## Edge-installation
+
+Öppna `edge://extensions`, välj **Läs in opaketerat** och välj mappen `dist`.
 
 ## Nya exportfiler
 
+- `session-graph.json`
+- `confidence-report.json`
+
+Session Graph grupperar uppgifter per affärsentitet. Confidence Report visar sessionskvalitet, Knowledge Pack-träff och grafens täckning.
+
+## Nästa milstolpe
+
+Review Mode ska arbeta direkt mot `business-tasks.json` och `session-graph.json`.
+
+
+## GitHub-arbetsflöde
+
+Varje push eller pull request mot `main` kör:
+
 ```text
-context-events.json
-context-candidates.json
+lint → tester → build → syntaxkontroll
 ```
 
-`context-candidates.json` innehåller färdiga kandidater som OpenRecord,
-ReopenDocument, ReleaseDocument, PostDocument och ChangeDate.
+Skapa en release genom att tagga en version:
 
-## Manualfilter
+```powershell
+git tag v3.5.1
+git push origin v3.5.1
+```
 
-Följande ska inte längre visas som egna manualsteg:
+GitHub Actions bygger då automatiskt en Edge-ZIP och bifogar den till en GitHub Release.
 
-- Navigate
-- NavigateBack
-- ConfirmYes
-- ConfirmNo
+
+## Review Studio 3.6
+
+Öppna en avslutad session och välj **Granska**.
+
+Review Studio stöder:
+
+- redigering av instruktioner
+- kommentarer
+- godkännande per steg
+- ändrad ordning
+- manuella steg
+- borttagning av steg
+- skärmbildsförhandsvisning
+- lokal lagring per session
+
+Den sparade modellen används som underlag för kommande Word- och PDF-generator.
+
+
+## Fast Edge development folder
+
+Edge ska alltid läsa det opaketerade tillägget från:
+
+```text
+C:\Development\Thinknine-BC-Process-Intelligence\dist
+```
+
+Kör inför varje omladdning:
+
+```powershell
+npm.cmd run build
+```
+
+Byggskriptet synkar `dist` från `src` och sätter versionsnumret i `manifest.json` från `package.json`.
+
+Windows-hjälpskript:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File .\scripts\build-and-open.ps1
+```
+
+
+## Synlig Review Studio
+
+På sidan **Sessioner och export** visas nu knappen **Granska** för avslutade sessioner.
+
+Klicka **Granska** för att öppna Review Studio och kontrollera att gränssnittet fungerar innan fler funktioner läggs till.
+
+
+## Word Generator 3.7
+
+Öppna en session i **Review Studio** och välj **Exportera Word**.
+
+Dokumentet innehåller:
+
+- försättssida
+- dokumentmetadata
+- innehållsförteckningsfält
+- syfte
+- förutsättningar
+- granskade arbetssteg
+- skärmbilder
+- kommentarer
+- förväntat resultat
+- versionshistorik
+- sidhuvud och sidnummer
+
+Word-exporten arbetar mot den sparade granskningsmodellen. Råhändelser används inte direkt i dokumentet.
+
+
+## Hotfix 3.7.1
+
+Version 3.7.1 återställer dashboardens uppstart och dataladdning.
+
+Inställningar läses nu med standardvärden som fallback och sessionlistan
+renderas även när lagringen är tom eller ett äldre lagringsformat används.
+
+
+## Word Generator 4.0
+
+Word-exporten använder nu biblioteket `docx` i stället för handskriven OpenXML.
+
+Installera beroenden efter att patchen packats upp:
+
+```powershell
+npm.cmd install
+npm.cmd run ci
+npm.cmd run build
+```
+
+Byggskriptet paketerar `docx` och Word-exportören till:
+
+```text
+dist/exporters/word-exporter-docx.bundle.js
+```
+
+Edge laddar endast den färdiga bundlen. Inga externa CDN-anrop görs när tillägget används.
+
+
+## Exportinställningar 4.1.1
+
+Filnamnsmallen har direkt förhandsvisning och variabelknappar som infogar en
+variabel vid markörens aktuella position. Okända och felaktigt skrivna variabler
+markeras med tydliga valideringsmeddelanden utan att blockera exporten.
+Befintliga mallar fortsätter att fungera.
+
+De variabler som stöds genereras och visas i dashboarden. Samma centrala
+definition används för knappar, hjälptext, validering och filnamnsgenerering.
+
+Exempel:
+
+```text
+{process} - {environment} - {date}
+```
+
+Exporter sparas via Edge Downloads med automatiskt unika filnamn vid konflikt.
+
+Variabler för företag och användare exponeras inte eftersom inspelade sessioner
+ännu inte innehåller tillförlitliga värden för dessa uppgifter.
+
+Variabelgruppen kan användas med Tab, Shift+Tab, piltangenter, Home och End.
+Preview och valideringsfel meddelas även till skärmläsare.
+
+Se [Release Notes 4.1.1](docs/RELEASE_NOTES_4.1.1.md) för en fullständig
+sammanställning av ändringarna.

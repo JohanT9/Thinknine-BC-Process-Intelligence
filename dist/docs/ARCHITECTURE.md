@@ -1,23 +1,23 @@
-# Architecture 2.0
+# Architecture 3.5
 
 ```text
-Business Central frames
-        │
-        ▼
-content.js
-        │ chrome.runtime.sendMessage
-        ▼
-background.js
-        ├── session state
-        ├── event queue
-        ├── screenshots
-        ├── chrome.storage.local
-        └── debug state
-                │
-                ├── popup
-                ├── dashboard
-                └── debug panel
+Recorder
+  ↓
+Noise Filter
+  ↓
+Context Builder
+  ↓
+Entity Memory
+  ↓
+Knowledge Pack
+  ↓
+Business Tasks
+  ↓
+Session Graph
+  ↓
+Confidence Engine
+  ↓
+Documentation Engine
 ```
 
-The service worker wakes for runtime messages and is not required to remain continuously active.
-All persistent state lives in chrome.storage.local.
+Modulerna är browser-kompatibla IIFE-moduler och kan samtidigt importeras med CommonJS i enhetstester.

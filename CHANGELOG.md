@@ -1,5 +1,21 @@
 # Changelog
 
+## 4.1.1
+
+- Removed the "Always ask where to save files" option and Save As behavior.
+- Added a live filename preview.
+- Added cursor-aware buttons for process, environment, date, time and version
+  variables.
+- Deferred company and user variables until reliable session data is available.
+- Added validation feedback for unknown filename variables.
+- Added validation for missing braces, duplicate opening braces and malformed
+  variables without blocking export.
+- Added a single variable definition shared by generation, validation and UI.
+- Added accessible descriptions, live regions and keyboard navigation.
+- Preserved compatibility with existing filename templates.
+- Replaced source-string regression checks with export settings behaviour tests.
+
+
 ## 4.1.0
 
 - Added export settings to the dashboard.

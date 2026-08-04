@@ -1,5 +1,4 @@
 const DEFAULTS = {
-  alwaysAskExportLocation: true,
   exportFileNamePattern: "{process} - {environment} - {date}",
   documentationProfile: "generic",
   captureScreenshots: true,
@@ -619,10 +618,7 @@ function escapeHtml(value) {
 }
 
 function safeFileName(value) {
-  return String(value || "BC-process")
-    .replace(/[<>:"/\\|?*\x00-\x1F]/g, "_")
-    .replace(/\s+/g, "-")
-    .slice(0, 110);
+  return globalThis.T9Engine.exportSettings.safeFileName(value);
 }
 
 function bytes(text) {
@@ -2828,6 +2824,7 @@ async function loadSettings() {
     $("documentationProfile").value,
     false
   );
+  updateFilenamePreview();
 }
 
 async function saveSettings() {
@@ -3293,56 +3290,63 @@ async function exportSession(session) {
 
 
 
-function twoDigits(value) {
-  return String(value).padStart(2, "0");
+function currentFilenamePreviewSession() {
+  return activeReviewModel?.response?.session ||
+    activeReviewSession ||
+    { name: "Business Central-process", settings: {} };
 }
 
-function exportDateParts(date = new Date()) {
+function currentFilenamePreviewSettings() {
   return {
-    date:
-      `${date.getFullYear()}-${twoDigits(date.getMonth() + 1)}-${twoDigits(date.getDate())}`,
-    time:
-      `${twoDigits(date.getHours())}-${twoDigits(date.getMinutes())}`
+    ...DEFAULTS,
+    exportFileNamePattern:
+      $("exportFileNamePattern")?.value ||
+      DEFAULTS.exportFileNamePattern,
+    environmentName:
+      $("environmentName")?.value ||
+      DEFAULTS.environmentName
   };
 }
 
-function buildExportFileName(extension, session, settings) {
-  const parts = exportDateParts();
-  const pattern =
-    settings.exportFileNamePattern ||
-    "{process} - {environment} - {date}";
+function updateFilenamePreview(
+  session = currentFilenamePreviewSession(),
+  settings = currentFilenamePreviewSettings()
+) {
+  const input = $("exportFileNamePattern");
+  const preview = $("filenamePreview");
+  const validation = $("filenameValidation");
+  if (!input || !preview || !validation) return "";
 
-  const values = {
-    process:
-      session.name ||
-      session.processName ||
-      "Business Central-process",
-    environment:
-      session.settings?.environmentName ||
-      settings.environmentName ||
-      "Miljö",
-    date: parts.date,
-    time: parts.time,
-    version: "4.1.0"
-  };
-
-  const raw = pattern.replace(
-    /\{(process|environment|date|time|version)\}/g,
-    (_, key) => values[key] || ""
+  return globalThis.T9Engine.exportSettings.updatePreview(
+    { input, preview, validation },
+    session,
+    settings
   );
-
-  return `${safeFileName(raw || values.process)}.${extension}`;
 }
 
-async function downloadBlob(blob, filename, saveAs) {
+function insertFilenameVariable(variable) {
+  const input = $("exportFileNamePattern");
+  if (!input) return;
+  globalThis.T9Engine.exportSettings.insertVariable(input, variable);
+  input.dispatchEvent(new Event("input", { bubbles: true }));
+}
+
+function initializeFilenameVariables() {
+  globalThis.T9Engine.exportSettings.renderVariableControls(
+    $("filenameVariables"),
+    $("filenameVariableHelp"),
+    insertFilenameVariable
+  );
+}
+
+async function downloadBlob(blob, filename) {
   const url = URL.createObjectURL(blob);
 
   try {
     const response = await send({
       type: "T9_DOWNLOAD_FILE",
       url,
-      filename,
-      saveAs
+      filename
     });
 
     if (!response.ok) {
@@ -3433,17 +3437,12 @@ async function exportActiveReviewToWord() {
     ...DEFAULTS,
     ...(settingsResponse?.settings || {})
   };
-  const filename = buildExportFileName(
-    "docx",
+  const filename = updateFilenamePreview(
     activeReviewModel.response.session,
     exportSettings
   );
 
-  await downloadBlob(
-    result.blob,
-    filename,
-    exportSettings.alwaysAskExportLocation
-  );
+  await downloadBlob(result.blob, filename);
 
   show(
     `Word-dokument skapat med docx-biblioteket: ` +
@@ -3595,6 +3594,7 @@ async function openReview(session) {
   show(`Förbereder granskning av "${session.name}"...`);
 
   activeReviewSession = session;
+  updateFilenamePreview();
   activeReviewModel = await prepareSessionModel(session);
 
   const existing = await send({
@@ -3612,12 +3612,17 @@ async function openReview(session) {
   $("reviewOverlay").classList.add("open");
   $("reviewOverlay").setAttribute("aria-hidden", "false");
   renderReview();
+  updateFilenamePreview();
   show("");
 }
 
 function closeReview() {
   $("reviewOverlay").classList.remove("open");
   $("reviewOverlay").setAttribute("aria-hidden", "true");
+  activeReviewSession = null;
+  activeReview = null;
+  activeReviewModel = null;
+  updateFilenamePreview();
 }
 
 async function loadSessions() {
@@ -3780,6 +3785,8 @@ $("reviewOverlay").addEventListener("click", event => {
 
 $("save").addEventListener("click", saveSettings);
 $("refresh").addEventListener("click", loadSessions);
+$("exportFileNamePattern").addEventListener("input", updateFilenamePreview);
+$("environmentName").addEventListener("input", updateFilenamePreview);
 $("debug").addEventListener("click", () => {
   chrome.tabs.create({
     url: chrome.runtime.getURL("debug.html")
@@ -3788,6 +3795,7 @@ $("debug").addEventListener("click", () => {
 
 
 async function initializeDashboard() {
+  initializeFilenameVariables();
   try {
     await loadSettings();
   } catch (error) {
@@ -3808,6 +3816,7 @@ async function initializeDashboard() {
     $("documentationProfile").value =
       DEFAULTS.documentationProfile || "generic";
     applyProfile($("documentationProfile").value, false);
+    updateFilenamePreview();
     show(
       "Inställningarna kunde inte läsas. Standardvärden visas.",
       true
@@ -3826,4 +3835,3 @@ async function initializeDashboard() {
 }
 
 initializeDashboard();
-
