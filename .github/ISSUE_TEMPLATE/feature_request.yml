@@ -1,0 +1,28 @@
+name: Feature request
+description: Föreslå en förbättring eller ny funktion.
+title: "[Feature]: "
+labels: ["enhancement"]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: Vilket problem ska lösas?
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Föreslagen lösning
+    validations:
+      required: true
+  - type: dropdown
+    id: area
+    attributes:
+      label: Område
+      options:
+        - Recorder
+        - Context Builder
+        - Knowledge Pack
+        - Review Mode
+        - Word/PDF export
+        - Annat

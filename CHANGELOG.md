@@ -1,5 +1,17 @@
 # Changelog
 
+## 3.5.1
+
+- Added GitHub Actions CI.
+- Added automatic tagged release workflow.
+- Added dependency-free linting.
+- Added Edge ZIP release script.
+- Added EditorConfig and Git attributes.
+- Added bug and feature issue templates.
+- Added pull request template.
+- Added project roadmap.
+
+
 ## 3.5.0
 
 - Reorganized project into a git-ready source/dist structure.

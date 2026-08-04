@@ -1,0 +1,34 @@
+name: Bug report
+description: Rapportera ett fel i Edge-tillägget eller tolkningsmotorn.
+title: "[Bug]: "
+labels: ["bug"]
+body:
+  - type: input
+    id: version
+    attributes:
+      label: Version
+      placeholder: "3.5.1"
+    validations:
+      required: true
+  - type: textarea
+    id: description
+    attributes:
+      label: Vad hände?
+      description: Beskriv felet och vad du förväntade dig.
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steg för att återskapa
+      placeholder: |
+        1. Starta inspelning
+        2. Öppna ...
+        3. Klicka ...
+    validations:
+      required: true
+  - type: textarea
+    id: diagnostics
+    attributes:
+      label: Diagnostik
+      description: Klistra in relevanta delar av diagnostics.json eller debugpanelen.

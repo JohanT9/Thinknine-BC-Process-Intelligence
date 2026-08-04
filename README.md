@@ -43,3 +43,21 @@ Session Graph grupperar uppgifter per affärsentitet. Confidence Report visar se
 ## Nästa milstolpe
 
 Review Mode ska arbeta direkt mot `business-tasks.json` och `session-graph.json`.
+
+
+## GitHub-arbetsflöde
+
+Varje push eller pull request mot `main` kör:
+
+```text
+lint → tester → build → syntaxkontroll
+```
+
+Skapa en release genom att tagga en version:
+
+```powershell
+git tag v3.5.1
+git push origin v3.5.1
+```
+
+GitHub Actions bygger då automatiskt en Edge-ZIP och bifogar den till en GitHub Release.
