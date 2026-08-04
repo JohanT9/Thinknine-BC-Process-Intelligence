@@ -1,6 +1,8 @@
 const VERSION = "3.6.0";
 
 const DEFAULT_SETTINGS = {
+  alwaysAskExportLocation: true,
+  exportFileNamePattern: "{process} - {environment} - {date}",
   documentationProfile: "generic",
   captureScreenshots: true,
   screenshotMode: "important",
@@ -756,6 +758,23 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
             : await getScreenshots(message.sessionId)
         });
         break;
+
+      case "T9_DOWNLOAD_FILE": {
+        const downloadId = await chrome.downloads.download({
+          url: message.url,
+          filename: message.filename,
+          saveAs: Boolean(message.saveAs),
+          conflictAction: "uniquify"
+        });
+
+        sendResponse({
+          ok: true,
+          downloadId
+        });
+        break;
+      }
+
+
 
       case "T9_GET_REVIEW": {
         const data = await chrome.storage.local.get(

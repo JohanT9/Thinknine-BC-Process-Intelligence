@@ -1,4 +1,6 @@
 const DEFAULTS = {
+  alwaysAskExportLocation: true,
+  exportFileNamePattern: "{process} - {environment} - {date}",
   documentationProfile: "generic",
   captureScreenshots: true,
   screenshotMode: "important",
@@ -3290,6 +3292,69 @@ async function exportSession(session) {
 
 
 
+
+function twoDigits(value) {
+  return String(value).padStart(2, "0");
+}
+
+function exportDateParts(date = new Date()) {
+  return {
+    date:
+      `${date.getFullYear()}-${twoDigits(date.getMonth() + 1)}-${twoDigits(date.getDate())}`,
+    time:
+      `${twoDigits(date.getHours())}-${twoDigits(date.getMinutes())}`
+  };
+}
+
+function buildExportFileName(extension, session, settings) {
+  const parts = exportDateParts();
+  const pattern =
+    settings.exportFileNamePattern ||
+    "{process} - {environment} - {date}";
+
+  const values = {
+    process:
+      session.name ||
+      session.processName ||
+      "Business Central-process",
+    environment:
+      session.settings?.environmentName ||
+      settings.environmentName ||
+      "Miljö",
+    date: parts.date,
+    time: parts.time,
+    version: "4.1.0"
+  };
+
+  const raw = pattern.replace(
+    /\{(process|environment|date|time|version)\}/g,
+    (_, key) => values[key] || ""
+  );
+
+  return `${safeFileName(raw || values.process)}.${extension}`;
+}
+
+async function downloadBlob(blob, filename, saveAs) {
+  const url = URL.createObjectURL(blob);
+
+  try {
+    const response = await send({
+      type: "T9_DOWNLOAD_FILE",
+      url,
+      filename,
+      saveAs
+    });
+
+    if (!response.ok) {
+      throw new Error(response.error || "Filen kunde inte sparas.");
+    }
+
+    return response.downloadId;
+  } finally {
+    setTimeout(() => URL.revokeObjectURL(url), 60000);
+  }
+}
+
 function dataUrlToImageData(dataUrl) {
   if (!dataUrl) return null;
 
@@ -3361,15 +3426,24 @@ async function exportActiveReviewToWord() {
     screenshotData,
   });
 
-  const url = URL.createObjectURL(result.blob);
-  const link = document.createElement("a");
+  const settingsResponse = await send({
+    type: "T9_GET_SETTINGS"
+  });
+  const exportSettings = {
+    ...DEFAULTS,
+    ...(settingsResponse?.settings || {})
+  };
+  const filename = buildExportFileName(
+    "docx",
+    activeReviewModel.response.session,
+    exportSettings
+  );
 
-  link.href = url;
-  link.download =
-    `${safeFileName(activeReviewSession.name)}-Arbetsinstruktion.docx`;
-  link.click();
-
-  setTimeout(() => URL.revokeObjectURL(url), 60000);
+  await downloadBlob(
+    result.blob,
+    filename,
+    exportSettings.alwaysAskExportLocation
+  );
 
   show(
     `Word-dokument skapat med docx-biblioteket: ` +

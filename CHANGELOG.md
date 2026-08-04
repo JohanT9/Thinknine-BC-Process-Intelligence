@@ -1,5 +1,17 @@
 # Changelog
 
+## 4.1.0
+
+- Added export settings to the dashboard.
+- Added option to always show the Edge Save As dialog.
+- Added configurable filename pattern.
+- Added variables for process, environment, date, time and version.
+- Added Edge Downloads API integration.
+- Word exports now use the centralized download service.
+- Added automatic conflict handling with unique filenames.
+- Added export settings regression tests.
+
+
 ## 4.0.1
 
 - Fixed CI failure caused by linting the generated esbuild bundle.

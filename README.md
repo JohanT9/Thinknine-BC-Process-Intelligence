@@ -159,3 +159,24 @@ dist/exporters/word-exporter-docx.bundle.js
 ```
 
 Edge laddar endast den färdiga bundlen. Inga externa CDN-anrop görs när tillägget används.
+
+
+## Exportinställningar 4.1
+
+Aktivera **Fråga alltid var filer ska sparas** för att visa Edges dialog **Spara som**.
+
+Filnamnsmallen stöder:
+
+```text
+{process}
+{environment}
+{date}
+{time}
+{version}
+```
+
+Exempel:
+
+```text
+{process} - {environment} - {date}
+```

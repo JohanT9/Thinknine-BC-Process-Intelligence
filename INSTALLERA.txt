@@ -1,6 +1,6 @@
-THINKNINE BC PROCESS INTELLIGENCE 4.0.1 CI HOTFIX
+THINKNINE BC PROCESS INTELLIGENCE 4.1.0
 
-1. Packa upp CI_HOTFIX_PATCH.zip i repositoryts rot.
+1. Packa upp EXPORT_SETTINGS_PATCH.zip i repositoryts rot.
 2. Ersätt befintliga filer.
 3. Kör:
    npm.cmd install
@@ -9,7 +9,16 @@ THINKNINE BC PROCESS INTELLIGENCE 4.0.1 CI HOTFIX
 5. Commit och push.
 6. Kör:
    npm.cmd run build
-7. Öppna edge://extensions och klicka Läs in igen.
+7. Öppna edge://extensions.
+8. Klicka Läs in igen.
 
-Hotfixen ändrar bara lint-konfigurationen och versionsnumret.
-Word-exporten är oförändrad.
+TESTA
+
+1. Öppna dashboarden.
+2. Kontrollera sektionen Export.
+3. Markera Fråga alltid var filer ska sparas.
+4. Ange filnamnsmall:
+   {process} - {environment} - {date}
+5. Spara inställningar.
+6. Exportera Word.
+7. Kontrollera att Edge visar dialogen Spara som.

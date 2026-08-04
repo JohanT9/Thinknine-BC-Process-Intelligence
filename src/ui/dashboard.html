@@ -87,6 +87,26 @@ table{width:100%;border-collapse:collapse}th,td{text-align:left;padding:9px;bord
 </fieldset>
 
 <fieldset>
+<legend>Export</legend>
+
+<label>
+<input id="alwaysAskExportLocation" type="checkbox">
+Fråga alltid var filer ska sparas
+</label>
+
+<label for="exportFileNamePattern">Filnamnsmall</label>
+<input
+  id="exportFileNamePattern"
+  type="text"
+  placeholder="{process} - {environment} - {date}"
+>
+
+<div class="muted">
+Tillgängliga variabler: {process}, {environment}, {date}, {time}, {version}
+</div>
+</fieldset>
+
+<fieldset>
 <legend>Inspelning</legend>
 <label><input id="captureScreenshots" type="checkbox"> Ta skärmbilder</label>
 
