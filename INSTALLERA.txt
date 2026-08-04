@@ -1,32 +1,18 @@
-THINKNINE BC PROCESS INTELLIGENCE 3.6.1
+THINKNINE BC PROCESS INTELLIGENCE 3.7.0
 
-EDGE SKA ALLTID ANVÄNDA DENNA MAPP
-
-C:\Development\Thinknine-BC-Process-Intelligence\dist
-
-FÖRSTA GÅNGEN
-
-1. Öppna edge://extensions.
-2. Ta bort den gamla versionen som pekar mot Downloads.
-3. Klicka Läs in opaketerat.
-4. Välj:
-   C:\Development\Thinknine-BC-Process-Intelligence\dist
-
-VID VARJE NY VERSION
-
-1. Öppna PowerShell i projektets rot.
-2. Kör:
+1. Packa upp GITHUB_PATCH.zip i repositoryts rot.
+2. Ersätt befintliga filer.
+3. Kör:
+   npm.cmd run ci
+4. Commit och push.
+5. Kör:
    npm.cmd run build
-3. Öppna edge://extensions.
-4. Klicka Läs in igen på tillägget.
+6. Öppna edge://extensions och klicka Läs in igen.
 
-ALTERNATIVT
+WORD-EXPORT
 
-Kör:
-powershell -ExecutionPolicy Bypass -File .\scripts\build-and-open.ps1
-
-Byggskriptet:
-- synkar dist från src
-- uppdaterar manifestversion från package.json
-- uppdaterar VERSION.txt
-- skriver ut exakt vilken mapp Edge ska använda
+1. Öppna Sessioner och export.
+2. Välj Granska för en avslutad session.
+3. Justera och godkänn stegen.
+4. Välj Exportera Word.
+5. En DOCX-fil sparas via Edge.

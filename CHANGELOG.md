@@ -1,5 +1,19 @@
 # Changelog
 
+## 3.7.0
+
+- Added professional Word DOCX generator.
+- Added Exportera Word button in Review Studio.
+- Generates cover page, metadata table and table of contents field.
+- Generates purpose, prerequisites and reviewed workflow.
+- Embeds selected screenshots in the DOCX.
+- Includes step comments, expected result and version history.
+- Adds Thinknine styling, header, footer and page number fields.
+- Word export uses the reviewed task model, not raw events.
+- Added browser-compatible ZIP writer.
+- Added automated DOCX package tests.
+
+
 ## 3.6.2
 
 - Connected Review Studio visibly to the Sessions page.

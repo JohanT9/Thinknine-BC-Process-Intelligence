@@ -109,3 +109,24 @@ powershell -ExecutionPolicy Bypass -File .\scripts\build-and-open.ps1
 På sidan **Sessioner och export** visas nu knappen **Granska** för avslutade sessioner.
 
 Klicka **Granska** för att öppna Review Studio och kontrollera att gränssnittet fungerar innan fler funktioner läggs till.
+
+
+## Word Generator 3.7
+
+Öppna en session i **Review Studio** och välj **Exportera Word**.
+
+Dokumentet innehåller:
+
+- försättssida
+- dokumentmetadata
+- innehållsförteckningsfält
+- syfte
+- förutsättningar
+- granskade arbetssteg
+- skärmbilder
+- kommentarer
+- förväntat resultat
+- versionshistorik
+- sidhuvud och sidnummer
+
+Word-exporten arbetar mot den sparade granskningsmodellen. Råhändelser används inte direkt i dokumentet.

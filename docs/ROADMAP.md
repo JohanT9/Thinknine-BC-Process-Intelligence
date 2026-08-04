@@ -19,11 +19,13 @@
 
 ## 3.7 — Word Generator
 
-- Thinknine-mall
-- försättssida
-- arbetsgång med bilder
-- versionshistorik
-- DOCX-export
+- [x] Thinknine-mall
+- [x] försättssida
+- [x] arbetsgång med bilder
+- [x] versionshistorik
+- [x] DOCX-export
+- [ ] valbar kundlogotyp
+- [ ] alternativa dokumentmallar
 
 ## 3.8 — PDF Generator
 

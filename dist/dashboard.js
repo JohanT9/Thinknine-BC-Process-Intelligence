@@ -26,7 +26,7 @@ const $ = id => document.getElementById(id);
 const send = message => chrome.runtime.sendMessage(message);
 
 
-const CONTEXT_BUILDER_VERSION = "3.6.2";
+const CONTEXT_BUILDER_VERSION = "3.7.0";
 
 function contextPageCaption(event) {
   return cleanUiCaption(
@@ -311,7 +311,7 @@ function createContextCandidates(contextEvents) {
 }
 
 
-const KNOWLEDGE_PACK_FRAMEWORK_VERSION = "3.6.2";
+const KNOWLEDGE_PACK_FRAMEWORK_VERSION = "3.7.0";
 let loadedKnowledgePacks = [];
 let loadedKnowledgeRules = [];
 let unmatchedKnowledgeItems = [];
@@ -2666,7 +2666,7 @@ Processen är genomförd enligt arbetsgången.
 Dokumentationskvalitet: **${quality} %**
 
 ---
-Genererad från Business Tasks av Thinknine BC Recorder 3.6.2.
+Genererad från Business Tasks av Thinknine BC Recorder 3.7.0.
 `;
 }
 
@@ -2706,7 +2706,7 @@ ${rendered || "Inga meningsfulla arbetssteg kunde identifieras."}
 Processen är genomförd och de registrerade ändringarna har sparats i Business Central.
 
 ---
-Automatiskt tolkat av Thinknine BC Recorder 3.6.2.
+Automatiskt tolkat av Thinknine BC Recorder 3.7.0.
 `;
 }
 
@@ -2723,7 +2723,7 @@ function createDiagnostics(session, rawEvents, businessSteps, screenshotCount) {
   }
 
   return {
-    recorderVersion: "3.6.2",
+    recorderVersion: "3.7.0",
     uiFidelityMode: true,
     sessionId: session.id,
     environment: session.settings?.environmentName || "",
@@ -3048,7 +3048,7 @@ async function exportSession(session) {
 
   diagnostics.businessTaskCount = finalBusinessTasks.length;
   diagnostics.businessTaskQuality = knowledgeQuality;
-  diagnostics.knowledgePackVersion = "3.6.2";
+  diagnostics.knowledgePackVersion = "3.7.0";
   diagnostics.knowledgeFrameworkVersion = KNOWLEDGE_PACK_FRAMEWORK_VERSION;
   diagnostics.loadedKnowledgePacks = loadedKnowledgePacks.map(pack => ({
     packId: pack.packId,
@@ -3233,7 +3233,7 @@ async function exportSession(session) {
     {
       name: `${prefix}ui-fidelity.json`,
       data: bytes(JSON.stringify({
-        version: "3.6.2",
+        version: "3.7.0",
         principle: "Visible Business Central captions are preserved exactly.",
         rules: [
           "actionCaption is the text shown on the action or button.",
@@ -3271,6 +3271,90 @@ async function exportSession(session) {
   show(`ZIP-export skapad i UI Fidelity-läge: ${response.events.length} råhändelser blev ${businessSteps.length} arbetssteg och ${imageFiles.length} bilder.`);
 }
 
+
+
+function dataUrlToUint8Array(dataUrl) {
+  if (!dataUrl) return null;
+
+  const base64 = dataUrl.slice(dataUrl.indexOf(",") + 1);
+  const binary = atob(base64);
+  const output = new Uint8Array(binary.length);
+
+  for (let index = 0; index < binary.length; index += 1) {
+    output[index] = binary.charCodeAt(index);
+  }
+
+  return output;
+}
+
+function reviewedTasksForWord() {
+  const reviewTasks = activeReview?.tasks || [];
+  return reviewTasks
+    .filter(task => !task.deleted)
+    .map((task, index) => ({
+      ...task,
+      taskNo: index + 1
+    }));
+}
+
+async function exportActiveReviewToWord() {
+  if (!activeReviewSession || !activeReview) {
+    throw new Error("Ingen granskning är öppen.");
+  }
+
+  if (!globalThis.T9Export?.word || !globalThis.T9Export?.zipWriter) {
+    throw new Error("Word-exportmodulerna kunde inte laddas.");
+  }
+
+  if (!activeReviewModel) {
+    activeReviewModel = await prepareSessionModel(
+      activeReviewSession
+    );
+  }
+
+  const screenshotData = {};
+  for (const [path, dataUrl] of Object.entries(
+    activeReviewModel.screenshotData || {}
+  )) {
+    const data = dataUrlToUint8Array(dataUrl);
+    if (data) screenshotData[path] = data;
+  }
+
+  const reviewForExport = {
+    ...activeReview,
+    tasks: reviewedTasksForWord()
+  };
+
+  const result = globalThis.T9Export.word.createDocx(
+    {
+      session: activeReviewModel.response.session,
+      review: reviewForExport,
+      screenshotData
+    },
+    globalThis.T9Export.zipWriter
+  );
+
+  const blob = new Blob(
+    [result.bytes],
+    {
+      type: "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+    }
+  );
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+
+  link.href = url;
+  link.download =
+    `${safeFileName(activeReviewSession.name)}-Arbetsinstruktion.docx`;
+  link.click();
+
+  setTimeout(() => URL.revokeObjectURL(url), 60000);
+
+  show(
+    `Word-dokument skapat: ${result.taskCount} steg och ` +
+    `${result.imageCount} skärmbilder.`
+  );
+}
 
 let activeReviewSession = null;
 let activeReview = null;
@@ -3520,6 +3604,32 @@ $("advancedToggle").addEventListener("click", () => {
 });
 
 $("closeReview").addEventListener("click", closeReview);
+$("exportWordReview").addEventListener("click", async () => {
+  const button = $("exportWordReview");
+  button.disabled = true;
+  button.textContent = "Skapar Word...";
+
+  try {
+    await saveActiveReview?.();
+  } catch {
+    // Minimal Review Studio may use saveReview instead.
+    try {
+      await saveReview?.();
+    } catch {
+      // Export can continue with the active in-memory review.
+    }
+  }
+
+  try {
+    await exportActiveReviewToWord();
+  } catch (error) {
+    show(error.message, true);
+  } finally {
+    button.disabled = false;
+    button.textContent = "Exportera Word";
+  }
+});
+
 $("saveReview").addEventListener("click", async () => {
   try {
     await saveActiveReview();

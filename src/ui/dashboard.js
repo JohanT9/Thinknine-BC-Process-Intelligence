@@ -3272,6 +3272,90 @@ async function exportSession(session) {
 }
 
 
+
+function dataUrlToUint8Array(dataUrl) {
+  if (!dataUrl) return null;
+
+  const base64 = dataUrl.slice(dataUrl.indexOf(",") + 1);
+  const binary = atob(base64);
+  const output = new Uint8Array(binary.length);
+
+  for (let index = 0; index < binary.length; index += 1) {
+    output[index] = binary.charCodeAt(index);
+  }
+
+  return output;
+}
+
+function reviewedTasksForWord() {
+  const reviewTasks = activeReview?.tasks || [];
+  return reviewTasks
+    .filter(task => !task.deleted)
+    .map((task, index) => ({
+      ...task,
+      taskNo: index + 1
+    }));
+}
+
+async function exportActiveReviewToWord() {
+  if (!activeReviewSession || !activeReview) {
+    throw new Error("Ingen granskning är öppen.");
+  }
+
+  if (!globalThis.T9Export?.word || !globalThis.T9Export?.zipWriter) {
+    throw new Error("Word-exportmodulerna kunde inte laddas.");
+  }
+
+  if (!activeReviewModel) {
+    activeReviewModel = await prepareSessionModel(
+      activeReviewSession
+    );
+  }
+
+  const screenshotData = {};
+  for (const [path, dataUrl] of Object.entries(
+    activeReviewModel.screenshotData || {}
+  )) {
+    const data = dataUrlToUint8Array(dataUrl);
+    if (data) screenshotData[path] = data;
+  }
+
+  const reviewForExport = {
+    ...activeReview,
+    tasks: reviewedTasksForWord()
+  };
+
+  const result = globalThis.T9Export.word.createDocx(
+    {
+      session: activeReviewModel.response.session,
+      review: reviewForExport,
+      screenshotData
+    },
+    globalThis.T9Export.zipWriter
+  );
+
+  const blob = new Blob(
+    [result.bytes],
+    {
+      type: "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+    }
+  );
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+
+  link.href = url;
+  link.download =
+    `${safeFileName(activeReviewSession.name)}-Arbetsinstruktion.docx`;
+  link.click();
+
+  setTimeout(() => URL.revokeObjectURL(url), 60000);
+
+  show(
+    `Word-dokument skapat: ${result.taskCount} steg och ` +
+    `${result.imageCount} skärmbilder.`
+  );
+}
+
 let activeReviewSession = null;
 let activeReview = null;
 let activeReviewModel = null;
@@ -3520,6 +3604,32 @@ $("advancedToggle").addEventListener("click", () => {
 });
 
 $("closeReview").addEventListener("click", closeReview);
+$("exportWordReview").addEventListener("click", async () => {
+  const button = $("exportWordReview");
+  button.disabled = true;
+  button.textContent = "Skapar Word...";
+
+  try {
+    await saveActiveReview?.();
+  } catch {
+    // Minimal Review Studio may use saveReview instead.
+    try {
+      await saveReview?.();
+    } catch {
+      // Export can continue with the active in-memory review.
+    }
+  }
+
+  try {
+    await exportActiveReviewToWord();
+  } catch (error) {
+    show(error.message, true);
+  } finally {
+    button.disabled = false;
+    button.textContent = "Exportera Word";
+  }
+});
+
 $("saveReview").addEventListener("click", async () => {
   try {
     await saveActiveReview();

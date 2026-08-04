@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Thinknine BC Process Intelligence",
-  "version": "3.6.2",
+  "version": "3.7.0",
   "description": "Records and interprets Business Central processes using modular Edge-only intelligence.",
   "permissions": [
     "storage",
