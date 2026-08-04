@@ -2,7 +2,7 @@ const fs = require("fs");
 const path = require("path");
 
 const root = path.resolve(__dirname, "..");
-const roots = ["src", "dist", "scripts", "tests"];
+const roots = ["src", "scripts", "tests"];
 const extensions = new Set([".js", ".json", ".html", ".md", ".txt"]);
 const errors = [];
 

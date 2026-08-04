@@ -26,7 +26,7 @@ const $ = id => document.getElementById(id);
 const send = message => chrome.runtime.sendMessage(message);
 
 
-const CONTEXT_BUILDER_VERSION = "4.0.0";
+const CONTEXT_BUILDER_VERSION = "4.0.1";
 
 function contextPageCaption(event) {
   return cleanUiCaption(
@@ -311,7 +311,7 @@ function createContextCandidates(contextEvents) {
 }
 
 
-const KNOWLEDGE_PACK_FRAMEWORK_VERSION = "4.0.0";
+const KNOWLEDGE_PACK_FRAMEWORK_VERSION = "4.0.1";
 let loadedKnowledgePacks = [];
 let loadedKnowledgeRules = [];
 let unmatchedKnowledgeItems = [];
@@ -2666,7 +2666,7 @@ Processen är genomförd enligt arbetsgången.
 Dokumentationskvalitet: **${quality} %**
 
 ---
-Genererad från Business Tasks av Thinknine BC Recorder 4.0.0.
+Genererad från Business Tasks av Thinknine BC Recorder 4.0.1.
 `;
 }
 
@@ -2706,7 +2706,7 @@ ${rendered || "Inga meningsfulla arbetssteg kunde identifieras."}
 Processen är genomförd och de registrerade ändringarna har sparats i Business Central.
 
 ---
-Automatiskt tolkat av Thinknine BC Recorder 4.0.0.
+Automatiskt tolkat av Thinknine BC Recorder 4.0.1.
 `;
 }
 
@@ -2723,7 +2723,7 @@ function createDiagnostics(session, rawEvents, businessSteps, screenshotCount) {
   }
 
   return {
-    recorderVersion: "4.0.0",
+    recorderVersion: "4.0.1",
     uiFidelityMode: true,
     sessionId: session.id,
     environment: session.settings?.environmentName || "",
@@ -3065,7 +3065,7 @@ async function exportSession(session) {
 
   diagnostics.businessTaskCount = finalBusinessTasks.length;
   diagnostics.businessTaskQuality = knowledgeQuality;
-  diagnostics.knowledgePackVersion = "4.0.0";
+  diagnostics.knowledgePackVersion = "4.0.1";
   diagnostics.knowledgeFrameworkVersion = KNOWLEDGE_PACK_FRAMEWORK_VERSION;
   diagnostics.loadedKnowledgePacks = loadedKnowledgePacks.map(pack => ({
     packId: pack.packId,
@@ -3250,7 +3250,7 @@ async function exportSession(session) {
     {
       name: `${prefix}ui-fidelity.json`,
       data: bytes(JSON.stringify({
-        version: "4.0.0",
+        version: "4.0.1",
         principle: "Visible Business Central captions are preserved exactly.",
         rules: [
           "actionCaption is the text shown on the action or button.",

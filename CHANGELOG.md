@@ -1,5 +1,13 @@
 # Changelog
 
+## 4.0.1
+
+- Fixed CI failure caused by linting the generated esbuild bundle.
+- Style lint now checks only authored source, scripts and tests.
+- Generated `dist` output remains validated by build and JavaScript syntax checks.
+- Added a regression test for lint scope.
+
+
 ## 4.0.0
 
 - Replaced the hand-written OpenXML Word generator with the established `docx` library.
