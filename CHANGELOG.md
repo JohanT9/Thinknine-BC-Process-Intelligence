@@ -1,5 +1,14 @@
 # Changelog
 
+## 3.7.2
+
+- Fixed dashboard startup crash caused by missing `exportWordReview` element.
+- Restored the Exportera Word button in Review Studio.
+- Made the Word button event binding defensive.
+- Added automated HTML/JavaScript ID consistency regression tests.
+- Restored settings and session loading by preventing the startup script crash.
+
+
 ## 3.7.1
 
 - Fixed dashboard startup regression.

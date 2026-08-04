@@ -3636,31 +3636,33 @@ $("advancedToggle").addEventListener("click", () => {
 });
 
 $("closeReview").addEventListener("click", closeReview);
-$("exportWordReview").addEventListener("click", async () => {
-  const button = $("exportWordReview");
-  button.disabled = true;
-  button.textContent = "Skapar Word...";
+const exportWordButton = $("exportWordReview");
+if (exportWordButton) {
+  exportWordButton.addEventListener("click", async () => {
+    const button = exportWordButton;
+    button.disabled = true;
+    button.textContent = "Skapar Word...";
 
-  try {
-    await saveActiveReview?.();
-  } catch {
-    // Minimal Review Studio may use saveReview instead.
     try {
-      await saveReview?.();
+      if (typeof saveActiveReview === "function") {
+        await saveActiveReview();
+      } else if (typeof saveReview === "function") {
+        await saveReview();
+      }
     } catch {
-      // Export can continue with the active in-memory review.
+      // Export may continue with the active in-memory review.
     }
-  }
 
-  try {
-    await exportActiveReviewToWord();
-  } catch (error) {
-    show(error.message, true);
-  } finally {
-    button.disabled = false;
-    button.textContent = "Exportera Word";
-  }
-});
+    try {
+      await exportActiveReviewToWord();
+    } catch (error) {
+      show(error.message, true);
+    } finally {
+      button.disabled = false;
+      button.textContent = "Exportera Word";
+    }
+  });
+}
 
 $("saveReview").addEventListener("click", async () => {
   try {

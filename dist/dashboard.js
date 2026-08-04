@@ -26,7 +26,7 @@ const $ = id => document.getElementById(id);
 const send = message => chrome.runtime.sendMessage(message);
 
 
-const CONTEXT_BUILDER_VERSION = "3.7.1";
+const CONTEXT_BUILDER_VERSION = "3.7.2";
 
 function contextPageCaption(event) {
   return cleanUiCaption(
@@ -311,7 +311,7 @@ function createContextCandidates(contextEvents) {
 }
 
 
-const KNOWLEDGE_PACK_FRAMEWORK_VERSION = "3.7.1";
+const KNOWLEDGE_PACK_FRAMEWORK_VERSION = "3.7.2";
 let loadedKnowledgePacks = [];
 let loadedKnowledgeRules = [];
 let unmatchedKnowledgeItems = [];
@@ -2666,7 +2666,7 @@ Processen är genomförd enligt arbetsgången.
 Dokumentationskvalitet: **${quality} %**
 
 ---
-Genererad från Business Tasks av Thinknine BC Recorder 3.7.1.
+Genererad från Business Tasks av Thinknine BC Recorder 3.7.2.
 `;
 }
 
@@ -2706,7 +2706,7 @@ ${rendered || "Inga meningsfulla arbetssteg kunde identifieras."}
 Processen är genomförd och de registrerade ändringarna har sparats i Business Central.
 
 ---
-Automatiskt tolkat av Thinknine BC Recorder 3.7.1.
+Automatiskt tolkat av Thinknine BC Recorder 3.7.2.
 `;
 }
 
@@ -2723,7 +2723,7 @@ function createDiagnostics(session, rawEvents, businessSteps, screenshotCount) {
   }
 
   return {
-    recorderVersion: "3.7.1",
+    recorderVersion: "3.7.2",
     uiFidelityMode: true,
     sessionId: session.id,
     environment: session.settings?.environmentName || "",
@@ -3065,7 +3065,7 @@ async function exportSession(session) {
 
   diagnostics.businessTaskCount = finalBusinessTasks.length;
   diagnostics.businessTaskQuality = knowledgeQuality;
-  diagnostics.knowledgePackVersion = "3.7.1";
+  diagnostics.knowledgePackVersion = "3.7.2";
   diagnostics.knowledgeFrameworkVersion = KNOWLEDGE_PACK_FRAMEWORK_VERSION;
   diagnostics.loadedKnowledgePacks = loadedKnowledgePacks.map(pack => ({
     packId: pack.packId,
@@ -3250,7 +3250,7 @@ async function exportSession(session) {
     {
       name: `${prefix}ui-fidelity.json`,
       data: bytes(JSON.stringify({
-        version: "3.7.1",
+        version: "3.7.2",
         principle: "Visible Business Central captions are preserved exactly.",
         rules: [
           "actionCaption is the text shown on the action or button.",
@@ -3636,31 +3636,33 @@ $("advancedToggle").addEventListener("click", () => {
 });
 
 $("closeReview").addEventListener("click", closeReview);
-$("exportWordReview").addEventListener("click", async () => {
-  const button = $("exportWordReview");
-  button.disabled = true;
-  button.textContent = "Skapar Word...";
+const exportWordButton = $("exportWordReview");
+if (exportWordButton) {
+  exportWordButton.addEventListener("click", async () => {
+    const button = exportWordButton;
+    button.disabled = true;
+    button.textContent = "Skapar Word...";
 
-  try {
-    await saveActiveReview?.();
-  } catch {
-    // Minimal Review Studio may use saveReview instead.
     try {
-      await saveReview?.();
+      if (typeof saveActiveReview === "function") {
+        await saveActiveReview();
+      } else if (typeof saveReview === "function") {
+        await saveReview();
+      }
     } catch {
-      // Export can continue with the active in-memory review.
+      // Export may continue with the active in-memory review.
     }
-  }
 
-  try {
-    await exportActiveReviewToWord();
-  } catch (error) {
-    show(error.message, true);
-  } finally {
-    button.disabled = false;
-    button.textContent = "Exportera Word";
-  }
-});
+    try {
+      await exportActiveReviewToWord();
+    } catch (error) {
+      show(error.message, true);
+    } finally {
+      button.disabled = false;
+      button.textContent = "Exportera Word";
+    }
+  });
+}
 
 $("saveReview").addEventListener("click", async () => {
   try {

@@ -1,4 +1,4 @@
-THINKNINE BC PROCESS INTELLIGENCE 3.7.1 HOTFIX
+THINKNINE BC PROCESS INTELLIGENCE 3.7.2 HOTFIX
 
 1. Packa upp HOTFIX_PATCH.zip i repositoryts rot.
 2. Ersätt befintliga filer.
@@ -12,8 +12,8 @@ THINKNINE BC PROCESS INTELLIGENCE 3.7.1 HOTFIX
 
 KONTROLLERA
 
-- Miljönamn visas.
-- Maximalt antal händelser visas.
-- Befintliga sessioner visas.
+- Miljönamn visar ApteanAdvance eller sparat värde.
+- Maximalt antal händelser visar 20000 eller sparat värde.
+- Sessionlistan visas.
 - Granska öppnas.
-- Exportera Word fungerar.
+- Exportera Word visas i Review Studio.
