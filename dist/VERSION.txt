@@ -1,4 +1,3 @@
-Thinknine BC Recorder
-Version 3.4.0
-Context Builder 1.0
-Knowledge Pack Framework 2.0
+Thinknine BC Process Intelligence
+Version 3.6.1
+Edge development folder: dist

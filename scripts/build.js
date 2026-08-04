@@ -2,7 +2,12 @@ const fs = require("fs");
 const path = require("path");
 
 const root = path.resolve(__dirname, "..");
+const src = path.join(root, "src");
 const dist = path.join(root, "dist");
+const packageJson = JSON.parse(
+  fs.readFileSync(path.join(root, "package.json"), "utf8")
+);
+const version = packageJson.version;
 
 function copyFile(source, target) {
   fs.mkdirSync(path.dirname(target), { recursive: true });
@@ -11,32 +16,120 @@ function copyFile(source, target) {
 
 function copyDir(source, target) {
   fs.mkdirSync(target, { recursive: true });
+
   for (const entry of fs.readdirSync(source, { withFileTypes: true })) {
-    const src = path.join(source, entry.name);
-    const dst = path.join(target, entry.name);
-    if (entry.isDirectory()) copyDir(src, dst);
-    else copyFile(src, dst);
+    const sourcePath = path.join(source, entry.name);
+    const targetPath = path.join(target, entry.name);
+
+    if (entry.isDirectory()) {
+      copyDir(sourcePath, targetPath);
+    } else {
+      copyFile(sourcePath, targetPath);
+    }
   }
 }
 
-const engineSource = path.join(root, "src", "engine");
-const engineTarget = path.join(dist, "engine");
-fs.rmSync(engineTarget, { recursive: true, force: true });
-copyDir(engineSource, engineTarget);
+function replaceVersionInFile(filePath) {
+  if (!fs.existsSync(filePath)) return;
 
-const packsSource = path.join(root, "src", "knowledge-packs");
-const packsTarget = path.join(dist, "knowledge-packs");
-if (fs.existsSync(packsSource)) {
-  fs.rmSync(packsTarget, { recursive: true, force: true });
-  copyDir(packsSource, packsTarget);
+  let content = fs.readFileSync(filePath, "utf8");
+
+  content = content
+    .replace(/v\d+\.\d+\.\d+/g, `v${version}`)
+    .replace(/\b\d+\.\d+\.\d+\b/g, version);
+
+  fs.writeFileSync(filePath, content, "utf8");
 }
 
+function syncManifest() {
+  const sourceManifest = path.join(src, "ui", "manifest.json");
+  const targetManifest = path.join(dist, "manifest.json");
 
-const reviewSource = path.join(root, "src", "review");
-const reviewTarget = path.join(dist, "review");
-if (fs.existsSync(reviewSource)) {
-  fs.rmSync(reviewTarget, { recursive: true, force: true });
-  copyDir(reviewSource, reviewTarget);
+  const manifest = JSON.parse(
+    fs.readFileSync(sourceManifest, "utf8")
+  );
+
+  manifest.version = version;
+
+  fs.writeFileSync(
+    sourceManifest,
+    JSON.stringify(manifest, null, 2) + "\n",
+    "utf8"
+  );
+
+  fs.writeFileSync(
+    targetManifest,
+    JSON.stringify(manifest, null, 2) + "\n",
+    "utf8"
+  );
 }
 
-console.log("Build complete:", dist);
+function cleanRuntimeFolders() {
+  for (const folder of ["engine", "review", "knowledge-packs"]) {
+    fs.rmSync(path.join(dist, folder), {
+      recursive: true,
+      force: true
+    });
+  }
+}
+
+fs.mkdirSync(dist, { recursive: true });
+cleanRuntimeFolders();
+
+copyDir(path.join(src, "engine"), path.join(dist, "engine"));
+copyDir(path.join(src, "review"), path.join(dist, "review"));
+copyDir(
+  path.join(src, "knowledge-packs"),
+  path.join(dist, "knowledge-packs")
+);
+
+copyFile(
+  path.join(src, "recorder", "background.js"),
+  path.join(dist, "background.js")
+);
+copyFile(
+  path.join(src, "recorder", "content.js"),
+  path.join(dist, "content.js")
+);
+
+for (const file of [
+  "dashboard.html",
+  "dashboard.js",
+  "debug.html",
+  "debug.js",
+  "popup.html",
+  "popup.js"
+]) {
+  copyFile(
+    path.join(src, "ui", file),
+    path.join(dist, file)
+  );
+}
+
+syncManifest();
+
+for (const file of [
+  "background.js",
+  "dashboard.js",
+  "debug.js",
+  "dashboard.html",
+  "popup.html"
+]) {
+  replaceVersionInFile(path.join(dist, file));
+}
+
+const versionText =
+  "Thinknine BC Process Intelligence\n" +
+  `Version ${version}\n` +
+  "Edge development folder: dist\n";
+
+fs.writeFileSync(
+  path.join(dist, "VERSION.txt"),
+  versionText,
+  "utf8"
+);
+
+console.log(`Build complete: ${dist}`);
+console.log(`Manifest version: ${version}`);
+console.log("Load this folder in Edge:");
+console.log(dist);

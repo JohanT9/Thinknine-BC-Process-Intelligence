@@ -1,19 +1,32 @@
-THINKNINE BC PROCESS INTELLIGENCE 3.6.0
+THINKNINE BC PROCESS INTELLIGENCE 3.6.1
 
-PATCHA GITHUB-PROJEKTET
+EDGE SKA ALLTID ANVÄNDA DENNA MAPP
 
-1. Packa upp GITHUB_PATCH.zip i repositoryts rot.
-2. Tillåt att befintliga filer ersätts.
-3. Kör:
-   npm.cmd run ci
-4. Commit och push.
+C:\Development\Thinknine-BC-Process-Intelligence\dist
 
-INSTALLERA I EDGE
+FÖRSTA GÅNGEN
 
-1. Kör npm.cmd run build.
-2. Öppna edge://extensions.
-3. Läs in mappen dist som opaketerat tillägg.
-4. Kontrollera version 3.6.0.
-5. Spela in en session.
-6. Öppna Sessioner och export.
-7. Välj Granska.
+1. Öppna edge://extensions.
+2. Ta bort den gamla versionen som pekar mot Downloads.
+3. Klicka Läs in opaketerat.
+4. Välj:
+   C:\Development\Thinknine-BC-Process-Intelligence\dist
+
+VID VARJE NY VERSION
+
+1. Öppna PowerShell i projektets rot.
+2. Kör:
+   npm.cmd run build
+3. Öppna edge://extensions.
+4. Klicka Läs in igen på tillägget.
+
+ALTERNATIVT
+
+Kör:
+powershell -ExecutionPolicy Bypass -File .\scripts\build-and-open.ps1
+
+Byggskriptet:
+- synkar dist från src
+- uppdaterar manifestversion från package.json
+- uppdaterar VERSION.txt
+- skriver ut exakt vilken mapp Edge ska använda

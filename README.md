@@ -79,3 +79,26 @@ Review Studio stöder:
 - lokal lagring per session
 
 Den sparade modellen används som underlag för kommande Word- och PDF-generator.
+
+
+## Fast Edge development folder
+
+Edge ska alltid läsa det opaketerade tillägget från:
+
+```text
+C:\Development\Thinknine-BC-Process-Intelligence\dist
+```
+
+Kör inför varje omladdning:
+
+```powershell
+npm.cmd run build
+```
+
+Byggskriptet synkar `dist` från `src` och sätter versionsnumret i `manifest.json` från `package.json`.
+
+Windows-hjälpskript:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File .\scripts\build-and-open.ps1
+```

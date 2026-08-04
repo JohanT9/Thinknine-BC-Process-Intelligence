@@ -29,7 +29,7 @@ async function load() {
   const screenshots = debug.screenshotStats || {};
 
   const rows = [
-    ["Version", debug.version || "3.5.0"],
+    ["Version", debug.version || "3.6.1"],
     ["Anslutning till BC", debug.connected ? "OK" : "Inte bekräftad", debug.connected ? "ok" : "error"],
     ["Inspelning", state.recording ? "Pågår" : "Inte aktiv"],
     ["Aktiv session", state.sessionId || "Ingen"],

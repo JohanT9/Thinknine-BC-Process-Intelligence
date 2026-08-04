@@ -1,5 +1,15 @@
 # Changelog
 
+## 3.6.1
+
+- Made `dist` the permanent Edge development folder.
+- Build now synchronizes runtime files from `src`.
+- Manifest version is generated from `package.json`.
+- Added `VERSION.txt` generation.
+- Added Windows build-and-open helper script.
+- Build output now prints the exact Edge extension folder.
+
+
 ## 3.6.0
 
 - Added Review Studio.
