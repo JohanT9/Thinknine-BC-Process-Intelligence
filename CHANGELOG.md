@@ -1,5 +1,20 @@
 # Changelog
 
+## 3.6.0
+
+- Added Review Studio.
+- Added per-session review storage in Edge.
+- Added editable instructions and comments.
+- Added approve/unapprove per step.
+- Added move up/down.
+- Added add/remove manual steps.
+- Added review completion and progress.
+- Added screenshot previews.
+- Added Review button to completed sessions.
+- Added review.json model foundation for Word/PDF generation.
+- Added Review Studio unit tests.
+
+
 ## 3.5.1
 
 - Added GitHub Actions CI.

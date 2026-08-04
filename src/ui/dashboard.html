@@ -18,11 +18,33 @@ table{width:100%;border-collapse:collapse}th,td{text-align:left;padding:9px;bord
 .advanced{display:none}.advanced.open{display:block}
 .summary{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px;margin:15px 0}
 .summary div{border:1px solid #d8dee5;border-radius:6px;padding:12px}
+.review-overlay{position:fixed;inset:0;background:rgba(15,23,42,.58);display:none;z-index:1000;padding:24px;overflow:auto}
+.review-overlay.open{display:block}
+.review-shell{max-width:1100px;margin:0 auto;background:white;border-radius:10px;box-shadow:0 20px 55px rgba(0,0,0,.3);overflow:hidden}
+.review-header{position:sticky;top:0;background:white;border-bottom:1px solid #d8dee5;padding:18px;z-index:2}
+.review-title-row{display:flex;justify-content:space-between;gap:12px;align-items:center}
+.review-toolbar{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
+.review-progress{height:10px;background:#e5e7eb;border-radius:99px;overflow:hidden;margin-top:12px}
+.review-progress-bar{height:100%;background:#0f6cbd;width:0}
+.review-list{padding:18px}
+.review-card{border:1px solid #d8dee5;border-radius:8px;margin-bottom:14px;padding:14px;display:grid;grid-template-columns:56px 1fr 210px;gap:14px}
+.review-card.approved{border-color:#65a30d;background:#f7fee7}
+.review-card.needs-review{border-color:#f59e0b}
+.review-number{font-size:24px;font-weight:700;color:#52606d;text-align:center}
+.review-fields textarea{width:100%;min-height:72px;box-sizing:border-box;padding:8px;font-family:inherit}
+.review-fields input[type=text]{width:100%}
+.review-meta{font-size:12px;color:#52606d;margin:8px 0}
+.review-actions{display:flex;flex-direction:column;gap:7px}
+.review-actions button{margin:0}
+.review-image{max-width:100%;border:1px solid #d8dee5;border-radius:5px;margin-top:10px}
+.review-footer{padding:16px;border-top:1px solid #d8dee5;display:flex;justify-content:space-between;background:#f8fafc}
+@media(max-width:800px){.review-card{grid-template-columns:44px 1fr}.review-actions{grid-column:1/-1;flex-direction:row;flex-wrap:wrap}}
+
 .summary strong{display:block;font-size:18px;margin-top:4px}
 </style>
 </head>
 <body>
-<h1>Thinknine BC Recorder <small>v3.5.0</small></h1>
+<h1>Thinknine BC Recorder <small>v3.6.0</small></h1>
 <p class="muted">Spela in en Business Central-process och exportera en återanvändbar manual med exakt UI-terminologi.</p>
 
 <fieldset>
@@ -90,12 +112,42 @@ table{width:100%;border-collapse:collapse}th,td{text-align:left;padding:9px;bord
 <tbody id="sessions"></tbody>
 </table>
 
+
+<div id="reviewOverlay" class="review-overlay" aria-hidden="true">
+  <section class="review-shell">
+    <header class="review-header">
+      <div class="review-title-row">
+        <div>
+          <h2 id="reviewTitle">Review Studio</h2>
+          <div id="reviewSummary" class="muted"></div>
+        </div>
+        <button id="closeReview" class="debug">Stäng</button>
+      </div>
+      <div class="review-toolbar">
+        <button id="addReviewStep" class="secondary">Lägg till steg</button>
+        <button id="approveAllReview" class="secondary">Godkänn alla</button>
+        <button id="saveReview" class="primary">Spara granskning</button>
+        <button id="completeReview" class="primary">Slutför granskning</button>
+      </div>
+      <div class="review-progress">
+        <div id="reviewProgressBar" class="review-progress-bar"></div>
+      </div>
+    </header>
+    <main id="reviewList" class="review-list"></main>
+    <footer class="review-footer">
+      <span id="reviewFooterText"></span>
+      <button id="saveReviewBottom" class="primary">Spara</button>
+    </footer>
+  </section>
+</div>
+
 <script src="engine/noise-filter.js"></script>
 <script src="engine/entity-memory.js"></script>
 <script src="engine/session-graph.js"></script>
 <script src="engine/confidence-engine.js"></script>
 <script src="engine/documentation-engine.js"></script>
 
+<script src="review/review-studio.js"></script>
 <script src="dashboard.js"></script>
 </body>
 </html>

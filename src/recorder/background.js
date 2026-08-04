@@ -1,4 +1,4 @@
-const VERSION = "3.5.0";
+const VERSION = "3.6.0";
 
 const DEFAULT_SETTINGS = {
   documentationProfile: "generic",
@@ -650,7 +650,8 @@ async function deleteSession(id) {
   await chrome.storage.local.remove([
     SESSION_PREFIX + id,
     EVENT_PREFIX + id,
-    SCREENSHOT_PREFIX + id
+    SCREENSHOT_PREFIX + id,
+    REVIEW_PREFIX + id
   ]);
 }
 
@@ -748,6 +749,37 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
             ? {}
             : await getScreenshots(message.sessionId)
         });
+        break;
+
+      case "T9_GET_REVIEW": {
+        const data = await chrome.storage.local.get(
+          REVIEW_PREFIX + message.sessionId
+        );
+        sendResponse({
+          ok: true,
+          review: data[REVIEW_PREFIX + message.sessionId] || null
+        });
+        break;
+      }
+
+      case "T9_SAVE_REVIEW": {
+        const review = {
+          ...(message.review || {}),
+          sessionId: message.sessionId,
+          updatedAt: new Date().toISOString()
+        };
+        await chrome.storage.local.set({
+          [REVIEW_PREFIX + message.sessionId]: review
+        });
+        sendResponse({ ok: true, review });
+        break;
+      }
+
+      case "T9_DELETE_REVIEW":
+        await chrome.storage.local.remove(
+          REVIEW_PREFIX + message.sessionId
+        );
+        sendResponse({ ok: true });
         break;
 
       case "T9_DELETE_SESSION":

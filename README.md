@@ -61,3 +61,21 @@ git push origin v3.5.1
 ```
 
 GitHub Actions bygger då automatiskt en Edge-ZIP och bifogar den till en GitHub Release.
+
+
+## Review Studio 3.6
+
+Öppna en avslutad session och välj **Granska**.
+
+Review Studio stöder:
+
+- redigering av instruktioner
+- kommentarer
+- godkännande per steg
+- ändrad ordning
+- manuella steg
+- borttagning av steg
+- skärmbildsförhandsvisning
+- lokal lagring per session
+
+Den sparade modellen används som underlag för kommande Word- och PDF-generator.

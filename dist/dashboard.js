@@ -2666,7 +2666,7 @@ Processen är genomförd enligt arbetsgången.
 Dokumentationskvalitet: **${quality} %**
 
 ---
-Genererad från Business Tasks av Thinknine BC Recorder 3.5.0.
+Genererad från Business Tasks av Thinknine BC Recorder 3.6.0.
 `;
 }
 
@@ -2706,7 +2706,7 @@ ${rendered || "Inga meningsfulla arbetssteg kunde identifieras."}
 Processen är genomförd och de registrerade ändringarna har sparats i Business Central.
 
 ---
-Automatiskt tolkat av Thinknine BC Recorder 3.5.0.
+Automatiskt tolkat av Thinknine BC Recorder 3.6.0.
 `;
 }
 
@@ -2723,7 +2723,7 @@ function createDiagnostics(session, rawEvents, businessSteps, screenshotCount) {
   }
 
   return {
-    recorderVersion: "3.5.0",
+    recorderVersion: "3.6.0",
     uiFidelityMode: true,
     sessionId: session.id,
     environment: session.settings?.environmentName || "",
@@ -2835,6 +2835,111 @@ async function saveSettings() {
   });
 
   show("Inställningarna har sparats.");
+}
+
+
+async function prepareSessionModel(session) {
+  const response = await send({
+    type: "T9_GET_SESSION_DATA",
+    sessionId: session.id,
+    includeScreenshots: true
+  });
+
+  if (!response.ok) {
+    throw new Error(response.error || "Sessionen kunde inte läsas.");
+  }
+
+  const imagePaths = {};
+  const screenshotData = {};
+
+  for (const [eventNo, dataUrl] of Object.entries(response.screenshots || {})) {
+    imagePaths[eventNo] =
+      `screenshots/${String(eventNo).padStart(6, "0")}.png`;
+    screenshotData[imagePaths[eventNo]] = dataUrl;
+  }
+
+  const filteredEvents = globalThis.T9Engine?.noiseFilter
+    ? globalThis.T9Engine.noiseFilter.filter(response.events)
+    : response.events;
+
+  const contextEvents = buildContextEvents(filteredEvents);
+  const contextCandidates = createContextCandidates(contextEvents);
+
+  const interpretedSteps = buildBusinessSteps(
+    contextEvents,
+    imagePaths,
+    response.session.settings || DEFAULTS
+  );
+  const businessSteps = runProcessPatternEngine(interpretedSteps);
+  const taskResult = runBusinessTaskEngine(businessSteps);
+  const contextByEventNo = new Map(
+    contextEvents.map(event => [event.eventNo, event.context || {}])
+  );
+
+  const legacyTasks = finalizeKnowledgeTasks(
+    taskResult.tasks,
+    response.session.settings || DEFAULTS
+  ).map(task => {
+    const contexts = (task.sourceEventNos || [])
+      .map(eventNo => contextByEventNo.get(eventNo))
+      .filter(Boolean);
+
+    return {
+      ...task,
+      context:
+        contexts.find(context => context.currentEntity) ||
+        contexts[0] ||
+        {},
+      automationId: task.automationId || ""
+    };
+  });
+
+  const businessTasks = applyKnowledgePackFramework(
+    legacyTasks,
+    response.session.settings || DEFAULTS
+  ).map((task, index) => ({
+    ...task,
+    taskNo: index + 1,
+    taskId: taskId(task.taskType, index)
+  }));
+
+  const entityNodes = globalThis.T9Engine?.entityMemory
+    ? globalThis.T9Engine.entityMemory.build(contextEvents)
+    : [];
+
+  const sessionGraph = globalThis.T9Engine?.sessionGraph
+    ? globalThis.T9Engine.sessionGraph.build(
+        response.session,
+        businessTasks,
+        entityNodes
+      )
+    : { nodes: [], edges: [] };
+
+  const confidenceResult = globalThis.T9Engine?.confidence
+    ? globalThis.T9Engine.confidence.evaluate(
+        businessTasks,
+        sessionGraph
+      )
+    : {
+        tasks: businessTasks,
+        sessionConfidence: calculateTaskQuality(businessTasks),
+        knowledgeMatchPercent: 0,
+        graphCoveragePercent: 0,
+        reviewSuggestedCount: 0
+      };
+
+  return {
+    response,
+    imagePaths,
+    screenshotData,
+    contextEvents,
+    contextCandidates,
+    interpretedSteps,
+    businessSteps,
+    sessionGraph,
+    confidenceResult,
+    businessTasks: confidenceResult.tasks
+  };
 }
 
 async function exportSession(session) {
@@ -3128,7 +3233,7 @@ async function exportSession(session) {
     {
       name: `${prefix}ui-fidelity.json`,
       data: bytes(JSON.stringify({
-        version: "3.5.0",
+        version: "3.6.0",
         principle: "Visible Business Central captions are preserved exactly.",
         rules: [
           "actionCaption is the text shown on the action or button.",
@@ -3166,6 +3271,176 @@ async function exportSession(session) {
   show(`ZIP-export skapad i UI Fidelity-läge: ${response.events.length} råhändelser blev ${businessSteps.length} arbetssteg och ${imageFiles.length} bilder.`);
 }
 
+
+let activeReviewSession = null;
+let activeReview = null;
+let activeReviewModel = null;
+
+function reviewImageUrl(task) {
+  if (!task.screenshot || !activeReviewModel) return "";
+  return activeReviewModel.screenshotData[task.screenshot] || "";
+}
+
+function renderReview() {
+  const list = $("reviewList");
+  list.innerHTML = "";
+
+  const tasks = globalThis.T9Review.activeTasks(activeReview);
+  const progress = globalThis.T9Review.progress(activeReview);
+
+  $("reviewProgressBar").style.width = `${progress}%`;
+  $("reviewSummary").textContent =
+    `${tasks.length} steg · ${progress}% godkända · ` +
+    `Session confidence ${activeReviewModel.confidenceResult.sessionConfidence}%`;
+  $("reviewFooterText").textContent =
+    activeReview.status === "completed"
+      ? "Granskningen är slutförd."
+      : "Ändringar sparas lokalt i Edge.";
+
+  tasks.forEach((task, visibleIndex) => {
+    const actualIndex = activeReview.tasks.indexOf(task);
+    const card = document.createElement("article");
+    card.className =
+      "review-card " +
+      (task.approved
+        ? "approved"
+        : task.reviewSuggested || task.confidenceScore < 80
+          ? "needs-review"
+          : "");
+
+    const imageUrl = reviewImageUrl(task);
+
+    card.innerHTML = `
+      <div class="review-number">${visibleIndex + 1}</div>
+      <div class="review-fields">
+        <label>Instruktion</label>
+        <textarea data-field="instruction">${escapeHtml(task.instruction)}</textarea>
+        <label>Kommentar</label>
+        <input data-field="userComment" type="text"
+          value="${escapeHtml(task.userComment || "")}">
+        <div class="review-meta">
+          ${escapeHtml(task.taskType || "Task")}
+          · Confidence ${task.confidenceScore ?? task.confidence ?? 0}%
+          ${task.knowledgeRule
+            ? ` · ${escapeHtml(task.knowledgeRule)}`
+            : ""}
+        </div>
+        ${imageUrl
+          ? `<img class="review-image" src="${imageUrl}"
+              alt="Skärmbild för steg ${visibleIndex + 1}">`
+          : ""}
+      </div>
+      <div class="review-actions">
+        <label>
+          <input data-action="approve" type="checkbox"
+            ${task.approved ? "checked" : ""}>
+          Godkänd
+        </label>
+        <button data-action="up" class="secondary">Flytta upp</button>
+        <button data-action="down" class="secondary">Flytta ned</button>
+        <button data-action="add" class="secondary">Lägg till efter</button>
+        <button data-action="remove" class="danger">Ta bort</button>
+      </div>`;
+
+    card.querySelector('[data-field="instruction"]')
+      .addEventListener("input", event => {
+        globalThis.T9Review.updateTask(activeReview, actualIndex, {
+          instruction: event.target.value
+        });
+      });
+
+    card.querySelector('[data-field="userComment"]')
+      .addEventListener("input", event => {
+        globalThis.T9Review.updateTask(activeReview, actualIndex, {
+          userComment: event.target.value
+        });
+      });
+
+    card.querySelector('[data-action="approve"]')
+      .addEventListener("change", event => {
+        globalThis.T9Review.approveTask(
+          activeReview,
+          actualIndex,
+          event.target.checked
+        );
+        renderReview();
+      });
+
+    card.querySelector('[data-action="up"]')
+      .addEventListener("click", () => {
+        globalThis.T9Review.move(activeReview, actualIndex, -1);
+        renderReview();
+      });
+
+    card.querySelector('[data-action="down"]')
+      .addEventListener("click", () => {
+        globalThis.T9Review.move(activeReview, actualIndex, 1);
+        renderReview();
+      });
+
+    card.querySelector('[data-action="add"]')
+      .addEventListener("click", () => {
+        globalThis.T9Review.add(activeReview, actualIndex);
+        renderReview();
+      });
+
+    card.querySelector('[data-action="remove"]')
+      .addEventListener("click", () => {
+        globalThis.T9Review.remove(activeReview, actualIndex);
+        renderReview();
+      });
+
+    list.appendChild(card);
+  });
+}
+
+async function saveActiveReview() {
+  if (!activeReviewSession || !activeReview) return;
+
+  const response = await send({
+    type: "T9_SAVE_REVIEW",
+    sessionId: activeReviewSession.id,
+    review: activeReview
+  });
+
+  if (!response.ok) {
+    throw new Error(response.error || "Granskningen kunde inte sparas.");
+  }
+
+  activeReview = response.review;
+  show(`Granskningen för "${activeReviewSession.name}" har sparats.`);
+  renderReview();
+}
+
+async function openReview(session) {
+  show(`Förbereder granskning av "${session.name}"...`);
+
+  activeReviewSession = session;
+  activeReviewModel = await prepareSessionModel(session);
+
+  const existing = await send({
+    type: "T9_GET_REVIEW",
+    sessionId: session.id
+  });
+
+  activeReview = existing.review ||
+    globalThis.T9Review.createReview(
+      session,
+      activeReviewModel.businessTasks
+    );
+
+  $("reviewTitle").textContent = `Granska: ${session.name}`;
+  $("reviewOverlay").classList.add("open");
+  $("reviewOverlay").setAttribute("aria-hidden", "false");
+  renderReview();
+  show("");
+}
+
+function closeReview() {
+  $("reviewOverlay").classList.remove("open");
+  $("reviewOverlay").setAttribute("aria-hidden", "true");
+}
+
 async function loadSessions() {
   const response = await send({ type: "T9_LIST_SESSIONS" });
   const body = $("sessions");
@@ -3182,6 +3457,21 @@ async function loadSessions() {
       <td></td>`;
 
     const actions = row.lastElementChild;
+
+    const reviewButton = document.createElement("button");
+    reviewButton.textContent = "Granska";
+    reviewButton.className = "primary";
+    reviewButton.disabled = session.status === "recording";
+    reviewButton.addEventListener("click", async () => {
+      reviewButton.disabled = true;
+      try {
+        await openReview(session);
+      } catch (error) {
+        show(error.message, true);
+      } finally {
+        reviewButton.disabled = false;
+      }
+    });
 
     const exportButton = document.createElement("button");
     exportButton.textContent = "Exportera ZIP";
@@ -3212,7 +3502,7 @@ async function loadSessions() {
       await loadSessions();
     });
 
-    actions.append(exportButton, deleteButton);
+    actions.append(reviewButton, exportButton, deleteButton);
     body.appendChild(row);
   }
 }
@@ -3227,6 +3517,43 @@ $("advancedToggle").addEventListener("click", () => {
   $("advancedToggle").textContent = panel.classList.contains("open")
     ? "Dölj avancerade dataskyddsinställningar"
     : "Visa avancerade dataskyddsinställningar";
+});
+
+$("closeReview").addEventListener("click", closeReview);
+$("saveReview").addEventListener("click", async () => {
+  try {
+    await saveActiveReview();
+  } catch (error) {
+    show(error.message, true);
+  }
+});
+$("saveReviewBottom").addEventListener("click", async () => {
+  try {
+    await saveActiveReview();
+  } catch (error) {
+    show(error.message, true);
+  }
+});
+$("addReviewStep").addEventListener("click", () => {
+  globalThis.T9Review.add(activeReview);
+  renderReview();
+});
+$("approveAllReview").addEventListener("click", () => {
+  activeReview.tasks.forEach((task, index) => {
+    globalThis.T9Review.approveTask(activeReview, index, true);
+  });
+  renderReview();
+});
+$("completeReview").addEventListener("click", async () => {
+  globalThis.T9Review.complete(activeReview);
+  try {
+    await saveActiveReview();
+  } catch (error) {
+    show(error.message, true);
+  }
+});
+$("reviewOverlay").addEventListener("click", event => {
+  if (event.target === $("reviewOverlay")) closeReview();
 });
 
 $("save").addEventListener("click", saveSettings);

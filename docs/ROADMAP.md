@@ -10,11 +10,12 @@
 
 ## 3.6 — Review Mode
 
-- redigera instruktion
-- ta bort och lägga till steg
-- ändra ordning
-- välja skärmbild
-- markera steg som granskat
+- [x] redigera instruktion
+- [x] ta bort och lägga till steg
+- [x] ändra ordning
+- [ ] välja alternativ skärmbild
+- [x] markera steg som granskat
+- [x] spara granskningsmodell lokalt
 
 ## 3.7 — Word Generator
 

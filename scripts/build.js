@@ -31,4 +31,12 @@ if (fs.existsSync(packsSource)) {
   copyDir(packsSource, packsTarget);
 }
 
+
+const reviewSource = path.join(root, "src", "review");
+const reviewTarget = path.join(dist, "review");
+if (fs.existsSync(reviewSource)) {
+  fs.rmSync(reviewTarget, { recursive: true, force: true });
+  copyDir(reviewSource, reviewTarget);
+}
+
 console.log("Build complete:", dist);

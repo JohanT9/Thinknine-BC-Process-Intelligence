@@ -1,21 +1,19 @@
-THINKNINE BC PROCESS INTELLIGENCE 3.5.0
+THINKNINE BC PROCESS INTELLIGENCE 3.6.0
 
-SNABB INSTALLATION I EDGE
+PATCHA GITHUB-PROJEKTET
 
-1. Packa upp ZIP-filen.
+1. Packa upp GITHUB_PATCH.zip i repositoryts rot.
+2. Tillåt att befintliga filer ersätts.
+3. Kör:
+   npm.cmd run ci
+4. Commit och push.
+
+INSTALLERA I EDGE
+
+1. Kör npm.cmd run build.
 2. Öppna edge://extensions.
-3. Ta bort tidigare version.
-4. Aktivera Utvecklarläge.
-5. Klicka Läs in opaketerat.
-6. Välj mappen:
-   Thinknine_BC_Process_Intelligence_v3.5.0\dist
-7. Kontrollera version 3.5.0.
-8. Uppdatera Business Central med Ctrl+F5.
-
-UTVECKLING
-
-Öppna terminalen i projektets rot och kör:
-
-npm.cmd test
-npm.cmd run build
-npm.cmd run check
+3. Läs in mappen dist som opaketerat tillägg.
+4. Kontrollera version 3.6.0.
+5. Spela in en session.
+6. Öppna Sessioner och export.
+7. Välj Granska.
