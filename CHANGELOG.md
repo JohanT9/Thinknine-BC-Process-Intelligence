@@ -1,5 +1,16 @@
 # Changelog
 
+## 3.7.3
+
+- Fixed DOCX files that Microsoft Word could not open.
+- Preserves actual screenshot MIME type from Edge.
+- Detects PNG and JPEG from both MIME metadata and binary signature.
+- Stores images with the correct file extension in the DOCX package.
+- Adds correct image Content-Type declarations.
+- Adds JPEG dimension parsing.
+- Added mixed PNG/JPEG DOCX regression tests.
+
+
 ## 3.7.2
 
 - Fixed dashboard startup crash caused by missing `exportWordReview` element.

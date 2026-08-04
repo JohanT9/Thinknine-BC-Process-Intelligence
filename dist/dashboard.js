@@ -26,7 +26,7 @@ const $ = id => document.getElementById(id);
 const send = message => chrome.runtime.sendMessage(message);
 
 
-const CONTEXT_BUILDER_VERSION = "3.7.2";
+const CONTEXT_BUILDER_VERSION = "3.7.3";
 
 function contextPageCaption(event) {
   return cleanUiCaption(
@@ -311,7 +311,7 @@ function createContextCandidates(contextEvents) {
 }
 
 
-const KNOWLEDGE_PACK_FRAMEWORK_VERSION = "3.7.2";
+const KNOWLEDGE_PACK_FRAMEWORK_VERSION = "3.7.3";
 let loadedKnowledgePacks = [];
 let loadedKnowledgeRules = [];
 let unmatchedKnowledgeItems = [];
@@ -2666,7 +2666,7 @@ Processen är genomförd enligt arbetsgången.
 Dokumentationskvalitet: **${quality} %**
 
 ---
-Genererad från Business Tasks av Thinknine BC Recorder 3.7.2.
+Genererad från Business Tasks av Thinknine BC Recorder 3.7.3.
 `;
 }
 
@@ -2706,7 +2706,7 @@ ${rendered || "Inga meningsfulla arbetssteg kunde identifieras."}
 Processen är genomförd och de registrerade ändringarna har sparats i Business Central.
 
 ---
-Automatiskt tolkat av Thinknine BC Recorder 3.7.2.
+Automatiskt tolkat av Thinknine BC Recorder 3.7.3.
 `;
 }
 
@@ -2723,7 +2723,7 @@ function createDiagnostics(session, rawEvents, businessSteps, screenshotCount) {
   }
 
   return {
-    recorderVersion: "3.7.2",
+    recorderVersion: "3.7.3",
     uiFidelityMode: true,
     sessionId: session.id,
     environment: session.settings?.environmentName || "",
@@ -3065,7 +3065,7 @@ async function exportSession(session) {
 
   diagnostics.businessTaskCount = finalBusinessTasks.length;
   diagnostics.businessTaskQuality = knowledgeQuality;
-  diagnostics.knowledgePackVersion = "3.7.2";
+  diagnostics.knowledgePackVersion = "3.7.3";
   diagnostics.knowledgeFrameworkVersion = KNOWLEDGE_PACK_FRAMEWORK_VERSION;
   diagnostics.loadedKnowledgePacks = loadedKnowledgePacks.map(pack => ({
     packId: pack.packId,
@@ -3250,7 +3250,7 @@ async function exportSession(session) {
     {
       name: `${prefix}ui-fidelity.json`,
       data: bytes(JSON.stringify({
-        version: "3.7.2",
+        version: "3.7.3",
         principle: "Visible Business Central captions are preserved exactly.",
         rules: [
           "actionCaption is the text shown on the action or button.",
@@ -3290,18 +3290,27 @@ async function exportSession(session) {
 
 
 
-function dataUrlToUint8Array(dataUrl) {
+function dataUrlToImageData(dataUrl) {
   if (!dataUrl) return null;
 
-  const base64 = dataUrl.slice(dataUrl.indexOf(",") + 1);
+  const headerEnd = dataUrl.indexOf(",");
+  if (headerEnd < 0) return null;
+
+  const header = dataUrl.slice(0, headerEnd);
+  const mimeMatch = header.match(/^data:([^;]+)/i);
+  const mimeType = mimeMatch?.[1]?.toLowerCase() || "";
+  const base64 = dataUrl.slice(headerEnd + 1);
   const binary = atob(base64);
-  const output = new Uint8Array(binary.length);
+  const bytes = new Uint8Array(binary.length);
 
   for (let index = 0; index < binary.length; index += 1) {
-    output[index] = binary.charCodeAt(index);
+    bytes[index] = binary.charCodeAt(index);
   }
 
-  return output;
+  return {
+    bytes,
+    mimeType
+  };
 }
 
 function reviewedTasksForWord() {
@@ -3333,8 +3342,8 @@ async function exportActiveReviewToWord() {
   for (const [path, dataUrl] of Object.entries(
     activeReviewModel.screenshotData || {}
   )) {
-    const data = dataUrlToUint8Array(dataUrl);
-    if (data) screenshotData[path] = data;
+    const imageData = dataUrlToImageData(dataUrl);
+    if (imageData) screenshotData[path] = imageData;
   }
 
   const reviewForExport = {

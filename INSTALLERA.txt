@@ -1,4 +1,4 @@
-THINKNINE BC PROCESS INTELLIGENCE 3.7.2 HOTFIX
+THINKNINE BC PROCESS INTELLIGENCE 3.7.3 WORD HOTFIX
 
 1. Packa upp HOTFIX_PATCH.zip i repositoryts rot.
 2. Ersätt befintliga filer.
@@ -10,10 +10,9 @@ THINKNINE BC PROCESS INTELLIGENCE 3.7.2 HOTFIX
 6. Öppna edge://extensions.
 7. Klicka Läs in igen.
 
-KONTROLLERA
+TESTA
 
-- Miljönamn visar ApteanAdvance eller sparat värde.
-- Maximalt antal händelser visar 20000 eller sparat värde.
-- Sessionlistan visas.
-- Granska öppnas.
-- Exportera Word visas i Review Studio.
+1. Öppna en session i Review Studio.
+2. Välj Exportera Word.
+3. Kontrollera att DOCX-filen öppnas i Microsoft Word.
+4. Kontrollera att skärmbilder visas.

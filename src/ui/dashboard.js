@@ -3290,18 +3290,27 @@ async function exportSession(session) {
 
 
 
-function dataUrlToUint8Array(dataUrl) {
+function dataUrlToImageData(dataUrl) {
   if (!dataUrl) return null;
 
-  const base64 = dataUrl.slice(dataUrl.indexOf(",") + 1);
+  const headerEnd = dataUrl.indexOf(",");
+  if (headerEnd < 0) return null;
+
+  const header = dataUrl.slice(0, headerEnd);
+  const mimeMatch = header.match(/^data:([^;]+)/i);
+  const mimeType = mimeMatch?.[1]?.toLowerCase() || "";
+  const base64 = dataUrl.slice(headerEnd + 1);
   const binary = atob(base64);
-  const output = new Uint8Array(binary.length);
+  const bytes = new Uint8Array(binary.length);
 
   for (let index = 0; index < binary.length; index += 1) {
-    output[index] = binary.charCodeAt(index);
+    bytes[index] = binary.charCodeAt(index);
   }
 
-  return output;
+  return {
+    bytes,
+    mimeType
+  };
 }
 
 function reviewedTasksForWord() {
@@ -3333,8 +3342,8 @@ async function exportActiveReviewToWord() {
   for (const [path, dataUrl] of Object.entries(
     activeReviewModel.screenshotData || {}
   )) {
-    const data = dataUrlToUint8Array(dataUrl);
-    if (data) screenshotData[path] = data;
+    const imageData = dataUrlToImageData(dataUrl);
+    if (imageData) screenshotData[path] = imageData;
   }
 
   const reviewForExport = {

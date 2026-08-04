@@ -185,8 +185,109 @@
     return { width: 1200, height: 700 };
   }
 
+
+  function detectImageFormat(imageData) {
+    const wrapped =
+      imageData &&
+      imageData.bytes instanceof Uint8Array;
+
+    const bytes = wrapped ? imageData.bytes : imageData;
+    const declaredMime = wrapped
+      ? String(imageData.mimeType || "").toLowerCase()
+      : "";
+
+    if (
+      declaredMime === "image/png" ||
+      (
+        bytes?.length >= 8 &&
+        bytes[0] === 0x89 &&
+        bytes[1] === 0x50 &&
+        bytes[2] === 0x4e &&
+        bytes[3] === 0x47
+      )
+    ) {
+      return {
+        bytes,
+        extension: "png",
+        contentType: "image/png"
+      };
+    }
+
+    if (
+      declaredMime === "image/jpeg" ||
+      declaredMime === "image/jpg" ||
+      (
+        bytes?.length >= 3 &&
+        bytes[0] === 0xff &&
+        bytes[1] === 0xd8 &&
+        bytes[2] === 0xff
+      )
+    ) {
+      return {
+        bytes,
+        extension: "jpg",
+        contentType: "image/jpeg"
+      };
+    }
+
+    throw new Error(
+      "Skärmbilden har ett bildformat som Word-exporten inte stöder."
+    );
+  }
+
+  function jpegSize(bytes) {
+    if (
+      !bytes ||
+      bytes.length < 4 ||
+      bytes[0] !== 0xff ||
+      bytes[1] !== 0xd8
+    ) {
+      return null;
+    }
+
+    let offset = 2;
+
+    while (offset + 9 < bytes.length) {
+      if (bytes[offset] !== 0xff) {
+        offset += 1;
+        continue;
+      }
+
+      const marker = bytes[offset + 1];
+      offset += 2;
+
+      if (marker === 0xd8 || marker === 0xd9) continue;
+      if (offset + 2 > bytes.length) break;
+
+      const length = (bytes[offset] << 8) | bytes[offset + 1];
+
+      if (
+        [
+          0xc0, 0xc1, 0xc2, 0xc3,
+          0xc5, 0xc6, 0xc7,
+          0xc9, 0xca, 0xcb,
+          0xcd, 0xce, 0xcf
+        ].includes(marker)
+      ) {
+        return {
+          height: (bytes[offset + 3] << 8) | bytes[offset + 4],
+          width: (bytes[offset + 5] << 8) | bytes[offset + 6]
+        };
+      }
+
+      if (length < 2) break;
+      offset += length;
+    }
+
+    return null;
+  }
+
   function imageDimensions(bytes) {
-    const size = pngSize(bytes);
+    const size =
+      pngSize(bytes).width !== 1200
+        ? pngSize(bytes)
+        : jpegSize(bytes) || { width: 1200, height: 700 };
+
     let cx = size.width * EMU_PER_PIXEL;
     let cy = size.height * EMU_PER_PIXEL;
 
@@ -568,16 +669,24 @@
 </w:ftr>`;
   }
 
-  function contentTypesXml(imageCount) {
-    const pngDefault = imageCount
-      ? '<Default Extension="png" ContentType="image/png"/>'
-      : "";
+  function contentTypesXml(images) {
+    const extensions = new Map();
+
+    for (const image of images || []) {
+      extensions.set(image.extension, image.contentType);
+    }
+
+    const imageDefaults = [...extensions.entries()]
+      .map(([extension, contentType]) =>
+        `<Default Extension="${extension}" ContentType="${contentType}"/>`
+      )
+      .join("");
 
     return `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types">
   <Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/>
   <Default Extension="xml" ContentType="application/xml"/>
-  ${pngDefault}
+  ${imageDefaults}
   <Override PartName="/word/document.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.document.main+xml"/>
   <Override PartName="/word/styles.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.styles+xml"/>
   <Override PartName="/word/numbering.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.numbering+xml"/>
@@ -684,15 +793,19 @@
 
     tasks.forEach((task, index) => {
       if (!task.screenshot) return;
-      const data = screenshotData[task.screenshot];
-      if (!(data instanceof Uint8Array)) return;
+      const rawImageData = screenshotData[task.screenshot];
+      if (!rawImageData) return;
 
+      const format = detectImageFormat(rawImageData);
       const imageInfo = {
         taskId: task.taskId || String(index),
         relId: `rIdImage${images.length + 1}`,
         imageIndex: images.length + 1,
-        fileName: `image${images.length + 1}.png`,
-        data
+        fileName:
+          `image${images.length + 1}.${format.extension}`,
+        extension: format.extension,
+        contentType: format.contentType,
+        data: format.bytes
       };
 
       images.push(imageInfo);
@@ -792,7 +905,7 @@
     const files = [
       {
         name: "[Content_Types].xml",
-        data: contentTypesXml(images.length)
+        data: contentTypesXml(images)
       },
       {
         name: "_rels/.rels",
@@ -862,6 +975,8 @@
     xml,
     cleanMarkdown,
     pngSize,
-    imageDimensions
+    imageDimensions,
+    detectImageFormat,
+    jpegSize
   };
 });
