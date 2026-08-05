@@ -151,7 +151,9 @@ assert.ok(
 );
 assert.ok(
   html.includes('class="annotation-editor-sticky"') &&
-    html.includes(".annotation-editor-sticky{position:sticky;top:0;"),
+    html.includes("top:var(--review-header-height,0px)") &&
+    js.includes("function updateAnnotationStickyOffset()") &&
+    js.includes('globalThis.addEventListener("resize", updateAnnotationStickyOffset)'),
   "Annotation editor actions should remain available while scrolling."
 );
 

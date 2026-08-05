@@ -3955,6 +3955,15 @@ function renderAnnotationControls() {
     '<div class="annotation-properties-actions"><button data-action="apply-annotation-geometry" class="primary">Tillämpa</button></div>';
 }
 
+function updateAnnotationStickyOffset() {
+  if (!annotationEditorState) return;
+  const reviewHeader = $("reviewDialog").querySelector(".review-header");
+  $("reviewDialog").style.setProperty(
+    "--review-header-height",
+    `${reviewHeader.offsetHeight}px`
+  );
+}
+
 function openAnnotationEditor(task, imageData) {
   annotationEditorBaseline = globalThis.T9ReviewAnnotationEditor.baseline(
     activeReview
@@ -3965,6 +3974,7 @@ function openAnnotationEditor(task, imageData) {
     imageUrl: imageData.imageUrl
   });
   $("reviewDialog").classList.add("annotation-mode");
+  updateAnnotationStickyOffset();
   $("reviewList").hidden = true;
   $("reviewFooter").hidden = true;
   $("annotationEditor").hidden = false;
@@ -4002,6 +4012,7 @@ async function closeAnnotationEditor(options = {}) {
   $("reviewList").hidden = false;
   $("reviewFooter").hidden = false;
   $("reviewDialog").classList.remove("annotation-mode");
+  $("reviewDialog").style.removeProperty("--review-header-height");
   renderReview();
   const card = [...$("reviewList").querySelectorAll("[data-review-task-id]")]
     .find(element => element.dataset.reviewTaskId === taskId);
@@ -4376,6 +4387,7 @@ async function closeReview() {
   $("reviewList").hidden = false;
   $("reviewFooter").hidden = false;
   $("reviewDialog").classList.remove("annotation-mode");
+  $("reviewDialog").style.removeProperty("--review-header-height");
   $("reviewOverlay").classList.remove("open");
   $("reviewOverlay").setAttribute("aria-hidden", "true");
   activeReviewSession = null;
@@ -4555,6 +4567,7 @@ $("annotationProperties").addEventListener("click", event => {
 $("annotationImage").addEventListener("load", () => {
   renderActiveAnnotation(false);
 });
+globalThis.addEventListener("resize", updateAnnotationStickyOffset);
 $("annotationSurface").addEventListener("pointerdown", event => {
   if (!annotationEditorState || event.button !== 0) return;
   const start = globalThis.T9ReviewAnnotationEditor.point(

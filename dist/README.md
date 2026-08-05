@@ -72,8 +72,9 @@ beteende, historikskydd i annotationsläget och felhantering vid export. Ogiltig
 framtida annotationsstilar renderas med säkra standardvärden utan att lagrad
 data ändras. Bildresurser och canvasminne frigörs även på felvägar.
 
-Annotationseditorns titel, **Avbryt**, **Klar** och verktyg ligger kvar högst
-upp i Review Studio när användaren scrollar genom en lång skärmbild.
+Review-huvudet samt annotationseditorns titel, **Avbryt**, **Klar** och verktyg
+ligger kvar tillsammans högst upp när användaren scrollar genom en lång
+skärmbild.
 
 ## Struktur
 

@@ -2,8 +2,8 @@
 
 ## 4.3.0 RC6 — Release Hardening
 
-- Kept the annotation editor header and tools sticky while scrolling long
-  screenshots.
+- Kept the Review header, annotation editor header and tools stacked and sticky
+  while scrolling long screenshots.
 - Excluded controls inside hidden editor sections and CSS-hidden toolbars from
   the focus trap, and made Escape close the editor before Review Studio.
 - Prevented annotation-editor shortcuts from undoing hidden task commands and
