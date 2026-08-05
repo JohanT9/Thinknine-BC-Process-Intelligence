@@ -7,6 +7,7 @@
   const EVENT_PREFIX = "t9_events_";
   const SCREENSHOT_PREFIX = "t9_screenshots_";
   const REVIEW_PREFIX = "t9_review_";
+  const DOCUMENT_LIBRARY_KEY = "t9_document_library";
 
   function sessionDataKeys(sessionId) {
     return [
@@ -19,6 +20,7 @@
 
   return {
     EVENT_PREFIX,
+    DOCUMENT_LIBRARY_KEY,
     REVIEW_PREFIX,
     SCREENSHOT_PREFIX,
     SESSION_PREFIX,

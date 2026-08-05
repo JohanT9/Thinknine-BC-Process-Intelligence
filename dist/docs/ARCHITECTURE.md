@@ -180,3 +180,29 @@ Documentation Engine
 ```
 
 Modulerna är browser-kompatibla IIFE-moduler och kan samtidigt importeras med CommonJS i enhetstester.
+
+## Document Library 4.5 UX6
+
+UX6 lägger ett separat metadataindex bredvid dokumentproduktionskedjan:
+
+```text
+Session metadata ───────────────┐
+Already materialized Document  ├─→ Document Library metadata index
+Health/profile/theme summaries ┘                 ↓
+                                      Search/filter/cards/preview
+
+Review → Semantic Document → Planner → Word (oförändrad och on demand)
+```
+
+`document-library.js` äger versionerad normalisering, ett förberäknat
+sökindex, kombinerbara filter, sortering, profilgruppering och selection state.
+Modellen är renderer-neutral, immutable och bevarar okända framtida fält.
+`document-library-view.js` är en tunn DOM-adapter för kort och preview.
+Dashboarden är composition root och kopplar ett biblioteksprojekt till dess
+befintliga session med stabilt `projectId`/`sessionId`.
+
+Biblioteksnyckeln i lokal extension storage innehåller metadata endast. Den får
+aldrig innehålla Review, Semantic Document, Document Plan, Word-strukturer,
+renderer-state eller skärmbildsbytes. Grundposter projiceras från redan laddad
+sessionslista. Rikare metadata materialiseras enbart när den ordinarie Document
+Workspace-pipelinen redan har körts; biblioteket initierar den aldrig.

@@ -39,6 +39,18 @@ assert.ok(
     dashboard.includes("function exportActiveReviewToWord()"),
   "Profile switching must use cached presentation variants and preserve context."
 );
+assert.ok(
+  dashboard.includes("function loadDocumentLibrary(sessions)") &&
+    dashboard.includes("T9_GET_DOCUMENT_LIBRARY") &&
+    dashboard.includes("DOCUMENT_LIBRARY_RENDER_LIMIT") &&
+    background.includes("T9_SAVE_DOCUMENT_LIBRARY"),
+  "Document Library must use lightweight metadata storage and bounded rendering."
+);
+assert.ok(
+  !background.includes("T9_GET_DOCUMENT_LIBRARY\", { includeReview") &&
+    !dashboard.includes("loadDocumentLibrary(activeReview"),
+  "Opening Document Library must not load Review state."
+);
 
 assert.ok(
   dashboard.includes("await loadSettings();"),

@@ -41,3 +41,12 @@ state and is deliberately absent from Review persistence and history.
 Profiles contain positive confirmation labels. Documentation Intelligence uses
 them to acknowledge completed workflow, screenshots, accessibility, metadata,
 purpose and revision history as often as it suggests improvement.
+
+## Document Library integration (UX6)
+
+The library stores the last materialized profile identity and display name as
+metadata, enabling filtering and grouping across Business Processes, SOPs,
+Training Guides, Quick References and Troubleshooting Guides. This snapshot is
+for discovery only: it does not persist profile choice into Review and does not
+change the profile model, planning or Word export. Celebrate Progress labels
+already produced for that profile may be shown on cards and in Quick Preview.

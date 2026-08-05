@@ -131,6 +131,7 @@ copyFile(
 for (const file of [
   "dashboard.html",
   "dashboard.js",
+  "document-library-view.js",
   "document-workspace-experience.js",
   "document-workspace-view.js",
   "debug.html",

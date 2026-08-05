@@ -3501,6 +3501,140 @@ let activeDocumentProfileId = "business-process";
 let documentProfileVariants = new Map();
 let documentWorkspaceMediaSources = {};
 let documentProfileSource = null;
+let documentLibraryRecords = [];
+let documentLibraryIndex = [];
+let documentLibrarySessions = new Map();
+let documentLibrarySelection = { selectedId: null, focusedId: null };
+const DOCUMENT_LIBRARY_RENDER_LIMIT = 200;
+
+function librarySessionRecord(session) {
+  return {
+    projectId: session.id,
+    sessionId: session.id,
+    title: session.name,
+    createdAt: session.startedAt,
+    modifiedAt: session.updatedAt || session.completedAt || session.startedAt,
+    workflowName: session.name,
+    metadata: {
+      environment: session.settings?.environmentName || "",
+      eventCount: session.eventCount || 0,
+      status: session.status || ""
+    }
+  };
+}
+
+async function persistDocumentLibrary() {
+  const response = await send({
+    type: "T9_SAVE_DOCUMENT_LIBRARY",
+    records: documentLibraryRecords
+  });
+  if (!response?.ok) throw new Error(
+    response?.error || "Dokumentbiblioteket kunde inte sparas."
+  );
+}
+
+function libraryOptions() {
+  return {
+    search: $("librarySearch").value,
+    sort: $("librarySort").value,
+    filters: {
+      profile: $("libraryProfileFilter").value,
+      theme: $("libraryThemeFilter").value,
+      health: $("libraryHealthFilter").value,
+      favourite: $("libraryFavouriteFilter").checked,
+      recent: $("libraryRecentFilter").checked,
+      created: { from: $("libraryCreatedFrom").value,
+        to: $("libraryCreatedTo").value },
+      modified: { from: $("libraryModifiedFrom").value,
+        to: $("libraryModifiedTo").value }
+    }
+  };
+}
+
+function fillLibraryFilter(id, values, selected) {
+  const select = $(id);
+  const first = select.options[0];
+  select.innerHTML = "";
+  select.appendChild(first);
+  values.forEach(([value, label]) => {
+    const option = document.createElement("option");
+    option.value = value;
+    option.textContent = label;
+    select.appendChild(option);
+  });
+  select.value = values.some(([value]) => value === selected) ? selected : "";
+}
+
+function renderDocumentLibrary() {
+  documentLibraryIndex = globalThis.T9DocumentLibrary.create(
+    documentLibraryRecords
+  );
+  const matches = globalThis.T9DocumentLibrary.query(
+    documentLibraryIndex, libraryOptions()
+  );
+  const records = matches.slice(0, DOCUMENT_LIBRARY_RENDER_LIMIT);
+  const view = globalThis.T9DocumentLibraryView;
+  documentLibrarySelection.selectedId = $("libraryGroupProfiles").checked
+    ? view.renderGrouped($("libraryResults"),
+      globalThis.T9DocumentLibrary.groupByProfile(records),
+      documentLibrarySelection)
+    : view.renderList($("libraryResults"), records, documentLibrarySelection);
+  documentLibrarySelection.focusedId = documentLibrarySelection.selectedId;
+  const selected = records.find(record =>
+    record.projectId === documentLibrarySelection.selectedId
+  );
+  view.renderPreview($("libraryPreview"), selected);
+  $("libraryStatus").textContent = matches.length > records.length
+    ? `${matches.length} dokument matchar. De första ${records.length} visas.`
+    : records.length === 1
+    ? "1 dokument visas."
+    : `${records.length} dokument visas.`;
+}
+
+function refreshLibraryFilters() {
+  const profiles = new Map();
+  const themes = new Map();
+  const health = new Set();
+  documentLibraryRecords.forEach(record => {
+    profiles.set(record.profile.profileId, record.profile.displayName);
+    themes.set(record.theme.themeId, record.theme.displayName);
+    health.add(record.health.overall);
+  });
+  fillLibraryFilter("libraryProfileFilter", [...profiles],
+    $("libraryProfileFilter").value);
+  fillLibraryFilter("libraryThemeFilter", [...themes],
+    $("libraryThemeFilter").value);
+  fillLibraryFilter("libraryHealthFilter", [...health].sort().map(value =>
+    [value, healthStatusLabel(value)]), $("libraryHealthFilter").value);
+}
+
+async function loadDocumentLibrary(sessions) {
+  documentLibrarySessions = new Map(sessions.map(session => [session.id, session]));
+  const response = await send({ type: "T9_GET_DOCUMENT_LIBRARY" });
+  const stored = new Map((response?.records || []).map(record =>
+    [record.projectId || record.sessionId, record]
+  ));
+  documentLibraryRecords = sessions.map(session =>
+    globalThis.T9DocumentLibrary.merge(
+      stored.get(session.id) || {}, librarySessionRecord(session)
+    )
+  );
+  const activeIds = new Set(sessions.map(session => session.id));
+  if ([...stored.keys()].some(projectId => !activeIds.has(projectId))) {
+    await persistDocumentLibrary();
+  }
+  refreshLibraryFilters();
+  renderDocumentLibrary();
+}
+
+async function updateDocumentLibraryRecord(projectId, patch) {
+  documentLibraryRecords = globalThis.T9DocumentLibrary.update(
+    documentLibraryRecords, projectId, patch
+  );
+  refreshLibraryFilters();
+  renderDocumentLibrary();
+  await persistDocumentLibrary();
+}
 
 function documentProfiles() {
   return globalThis.T9DocumentProfile.list(
@@ -3552,6 +3686,8 @@ function applyDocumentProfileVariant(options = {}) {
       workspaceContext,
       profile: variant.profile
     });
+  indexActiveDocumentVariant(variant, options.semanticDocument ||
+    documentProfileSource?.semanticDocument);
   workspaceContextBinding = globalThis.T9WorkspaceContext.bind(variant.model, {
     taskIds: globalThis.T9Review.activeTasks(activeReview).map(task => task.taskId),
     screenshotsByTask: reviewScreenshotsByTask()
@@ -3580,13 +3716,69 @@ function applyDocumentProfileVariant(options = {}) {
   return result;
 }
 
+function indexActiveDocumentVariant(variant, semanticDocument) {
+  if (!activeReviewSession || !semanticDocument || !documentationIntelligenceModel) {
+    return;
+  }
+  const sectionNames = (semanticDocument.sections || []).map(section =>
+    section.title || section.kind
+  ).filter(Boolean);
+  const paragraphTexts = [];
+  function visit(blocks) {
+    (blocks || []).forEach(block => {
+      if (block.kind === "paragraph" && block.text) paragraphTexts.push(block.text);
+      visit(block.blocks);
+    });
+  }
+  semanticDocument.sections?.forEach(section => visit(section.blocks));
+  const wordCount = paragraphTexts.join(" ").trim().split(/\s+/).filter(Boolean).length;
+  const patch = {
+    title: semanticDocument.title || activeReviewSession.name,
+    modifiedAt: activeReview?.updatedAt || activeReviewSession.updatedAt ||
+      activeReviewSession.startedAt,
+    profile: {
+      profileId: variant.profile.profileId,
+      displayName: variant.profile.displayName
+    },
+    theme: {
+      themeId: variant.theme.themeId,
+      displayName: variant.theme.name || variant.theme.displayName ||
+        variant.theme.themeId
+    },
+    summary: semanticDocument.purpose || semanticDocument.metadata?.purpose ||
+      paragraphTexts[0] || "",
+    workflowName: activeReviewSession.name,
+    sectionNames,
+    readingMinutes: Math.max(1, Math.ceil(wordCount / 200)),
+    health: {
+      overall: healthStatusLabel(documentationIntelligenceModel.health.overall),
+      suggestionLabel: documentationIntelligenceModel.health.suggestionLabel,
+      confirmations: documentationIntelligenceModel.positiveConfirmations.map(
+        value => value.title
+      )
+    },
+    recentActivity: ["Dokumentinformationen indexerades"]
+  };
+  const previous = documentLibraryRecords.find(record =>
+    record.projectId === activeReviewSession.id
+  );
+  const next = globalThis.T9DocumentLibrary.merge(previous ||
+    librarySessionRecord(activeReviewSession), patch);
+  if (JSON.stringify(previous) === JSON.stringify(next)) return;
+  documentLibraryRecords = globalThis.T9DocumentLibrary.update(
+    documentLibraryRecords, activeReviewSession.id, patch
+  );
+  persistDocumentLibrary().catch(error => show(error.message, true));
+}
+
 function healthStatusLabel(status) {
   return {
     "Ready for Review": "Redo för granskning",
     "Needs Attention": "Behöver uppmärksamhet",
     Complete: "Komplett",
     Good: "Bra",
-    "Good with Suggestions": "Bra med förslag"
+    "Good with Suggestions": "Bra med förslag",
+    "Not assessed": "Inte bedömd"
   }[status] || status;
 }
 
@@ -4929,6 +5121,9 @@ async function openReview(session) {
 }
 
 async function closeReview() {
+  const returnProjectId = reviewReturnFocus?.closest?.(
+    "[data-library-project-id]"
+  )?.dataset.libraryProjectId;
   releaseActiveAnnotationPointer();
   if (annotationEditorState) {
     annotationEditorState = globalThis.T9ReviewAnnotationEditor.cancel(
@@ -4978,7 +5173,15 @@ async function closeReview() {
   $("documentWorkspaceStatus").textContent = "";
   applyWorkspaceState();
   updateFilenamePreview();
-  if (reviewReturnFocus?.isConnected) reviewReturnFocus.focus();
+  refreshLibraryFilters();
+  renderDocumentLibrary();
+  const libraryReturnTarget = returnProjectId
+    ? $("libraryResults").querySelector(
+      `[data-library-project-id="${CSS.escape(returnProjectId)}"]`
+    )
+    : null;
+  if (libraryReturnTarget) libraryReturnTarget.focus();
+  else if (reviewReturnFocus?.isConnected) reviewReturnFocus.focus();
   reviewReturnFocus = null;
 }
 
@@ -4989,6 +5192,7 @@ async function loadSessions() {
     : [];
   const body = $("sessions");
   body.innerHTML = "";
+  await loadDocumentLibrary(sessions);
 
   if (!sessions.length) {
     const row = document.createElement("tr");
@@ -5607,6 +5811,68 @@ globalThis.T9ReviewMove.bind($("reviewList"), {
 
 $("save").addEventListener("click", saveSettings);
 $("refresh").addEventListener("click", loadSessions);
+for (const id of ["librarySearch", "libraryProfileFilter",
+  "libraryThemeFilter", "libraryHealthFilter", "librarySort",
+  "libraryFavouriteFilter", "libraryRecentFilter", "libraryGroupProfiles",
+  "libraryCreatedFrom", "libraryCreatedTo", "libraryModifiedFrom",
+  "libraryModifiedTo"]) {
+  $(id).addEventListener(id === "librarySearch" ? "input" : "change",
+    renderDocumentLibrary);
+}
+$("libraryResults").addEventListener("click", async event => {
+  const card = event.target.closest?.("[data-library-project-id]");
+  if (!card) return;
+  const projectId = card.dataset.libraryProjectId;
+  documentLibrarySelection = { selectedId: projectId, focusedId: projectId };
+  if (event.target.closest?.('[data-library-action="favourite"]')) {
+    const record = documentLibraryRecords.find(value => value.projectId === projectId);
+    try {
+      await updateDocumentLibraryRecord(projectId, {
+        favourite: !record?.favourite
+      });
+    } catch (error) {
+      show(error.message, true);
+    }
+    $("libraryResults").querySelector(
+      `[data-library-project-id="${CSS.escape(projectId)}"]`
+    )?.focus();
+    return;
+  }
+  renderDocumentLibrary();
+  if (!event.target.closest?.('[data-library-action="open"]')) return;
+  const session = documentLibrarySessions.get(projectId);
+  if (!session || session.status === "recording") return;
+  try {
+    await updateDocumentLibraryRecord(projectId, {
+    lastOpenedAt: new Date().toISOString(),
+    recentActivity: ["Dokumentationen öppnades"]
+    });
+    await openReview(session);
+  } catch (error) {
+    show(error.message, true);
+  }
+});
+$("libraryResults").addEventListener("keydown", event => {
+  const card = event.target.closest?.("[data-library-project-id]");
+  if (event.key === "Enter" && event.target === card) {
+    event.preventDefault();
+    card.querySelector('[data-library-action="open"]')?.click();
+    return;
+  }
+  if (!["ArrowDown", "ArrowUp", "ArrowLeft", "ArrowRight", "Home", "End"]
+    .includes(event.key)) return;
+  const records = globalThis.T9DocumentLibrary.query(
+    documentLibraryIndex, libraryOptions()
+  ).slice(0, DOCUMENT_LIBRARY_RENDER_LIMIT);
+  event.preventDefault();
+  documentLibrarySelection = globalThis.T9DocumentLibrary.selection(
+    documentLibrarySelection, records, event.key
+  );
+  renderDocumentLibrary();
+  $("libraryResults").querySelector(
+    `[data-library-project-id="${CSS.escape(documentLibrarySelection.focusedId)}"]`
+  )?.focus();
+});
 $("exportFileNamePattern").addEventListener("input", updateFilenamePreview);
 $("environmentName").addEventListener("input", updateFilenamePreview);
 $("debug").addEventListener("click", () => {

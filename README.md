@@ -1,7 +1,21 @@
-# Thinknine BC Process Intelligence v4.5.0 UX5
+# Thinknine BC Process Intelligence v4.5.0 UX6
 
 Ett modulärt Edge-tillägg för att spela in, granska och exportera dokumenterade
 Business Central-processer.
+
+## Document Library 4.5 UX6
+
+Dashboarden innehåller nu ett metadata-baserat dokumentbibliotek för snabb
+återanvändning av tidigare dokumentation. Sökning omfattar titel, profil,
+taggar, metadata, arbetsflöde och indexerade avsnittsnamn. Profil, tema,
+dokumenthälsa, favorit, nyligen använd samt skapad/ändrad-datum kan kombineras,
+och resultat kan sorteras eller grupperas per Document Profile.
+
+Kort och snabbförhandsvisning visar endast lättviktsmetadata. Biblioteket laddar
+inte Review, bygger inte Semantic Document, kör inte Planner och renderar inte
+Word när det öppnas. Mer innehållsmetadata och kvalitativ Document Health
+materialiseras när användaren ändå öppnar Document Workspace. Se
+[Document Library 4.5](docs/DOCUMENT_LIBRARY_4.5.md).
 
 ## Smart Document Profiles 4.5 UX5
 

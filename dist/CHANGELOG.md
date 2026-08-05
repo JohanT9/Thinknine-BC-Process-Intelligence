@@ -1,5 +1,21 @@
 # Changelog
 
+## 4.5.0 UX6 — Document Library
+
+- Added a renderer-neutral, immutable metadata-only Document Library model.
+- Added continuous search, combinable profile/theme/health/favourite/recent/date
+  filters, six sort orders and profile-aware grouping.
+- Added document cards, favourites, recently used documents and a lightweight
+  Quick Preview that never opens Review.
+- Surfaced qualitative Document Health and Celebrate Progress confirmations
+  from already materialized Documentation Intelligence results.
+- Added keyboard navigation, screen-reader labels, live result counts,
+  high-contrast support and reduced-motion support.
+- Added deterministic large-library, discovery, immutability, performance and
+  accessibility coverage.
+- Kept Semantic Document, Documentation Intelligence, Review persistence,
+  screenshot storage and Word export behaviour unchanged.
+
 ## 4.5.0 UX5 — Smart Document Profiles
 
 - Added a versioned immutable renderer-neutral Document Profile model and

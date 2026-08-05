@@ -1,4 +1,5 @@
 importScripts("engine/storage-keys.js");
+importScripts("document/document-library.js");
 
 const VERSION = "__APP_VERSION__";
 
@@ -652,6 +653,25 @@ async function listSessions() {
     .sort((a, b) => String(b.startedAt).localeCompare(String(a.startedAt)));
 }
 
+async function getDocumentLibrary() {
+  const data = await chrome.storage.local.get(
+    globalThis.T9StorageKeys.DOCUMENT_LIBRARY_KEY
+  );
+  return Array.isArray(data[globalThis.T9StorageKeys.DOCUMENT_LIBRARY_KEY])
+    ? data[globalThis.T9StorageKeys.DOCUMENT_LIBRARY_KEY]
+    : [];
+}
+
+async function saveDocumentLibrary(records) {
+  const normalized = records.map(record =>
+    globalThis.T9DocumentLibrary.normalize(record)
+  );
+  await chrome.storage.local.set({
+    [globalThis.T9StorageKeys.DOCUMENT_LIBRARY_KEY]: normalized
+  });
+  return normalized;
+}
+
 async function deleteSession(id) {
   await chrome.storage.local.remove(
     globalThis.T9StorageKeys.sessionDataKeys(id)
@@ -746,6 +766,18 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
           ok: true,
           sessions: Array.isArray(sessions) ? sessions : []
         });
+        break;
+      }
+
+      case "T9_GET_DOCUMENT_LIBRARY": {
+        sendResponse({ ok: true, records: await getDocumentLibrary() });
+        break;
+      }
+
+      case "T9_SAVE_DOCUMENT_LIBRARY": {
+        const records = Array.isArray(message.records) ? message.records : [];
+        const savedRecords = await saveDocumentLibrary(records);
+        sendResponse({ ok: true, records: savedRecords });
         break;
       }
 

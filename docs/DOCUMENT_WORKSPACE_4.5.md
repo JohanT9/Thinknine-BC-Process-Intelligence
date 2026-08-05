@@ -142,3 +142,13 @@ variant and refreshes advisory intelligence.
 Workspace Context and the viewport focal position are preserved. Review
 history, Undo, Redo and editing state are untouched. Profiles are not persisted
 inside Review and are not passed to Word export.
+
+## Document Library boundary (UX6)
+
+Document Library is a separate knowledge index, not a third document renderer.
+It references the existing session and stores only lightweight metadata. When
+Document Workspace has already produced a profile variant and Documentation
+Intelligence result, dashboard may materialize profile, theme, section names,
+reading-time estimate, qualitative health and Celebrate Progress confirmations
+into that index. Opening the library never causes workspace synchronization,
+media preparation, Review loading, projection or planning.
