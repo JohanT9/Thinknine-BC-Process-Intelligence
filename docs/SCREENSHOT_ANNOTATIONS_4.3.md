@@ -74,3 +74,32 @@ that annotation state while retaining task changes made outside the editor,
 then persists it after any earlier queued write. Done flushes persistence and
 retains the changes. Original screenshot bytes and Word image rendering remain
 untouched.
+
+## RC5 Word rendering
+
+Word export resolves the screenshot paths from the current, non-deleted Review
+tasks after pending persistence has been flushed. Each unique annotated image
+uses this pipeline:
+
+```text
+original screenshot -> normalized scene -> shared SVG descriptors
+                    -> SVG overlay -> original-size canvas -> temporary PNG
+```
+
+The scene remains the single geometry source for step-card previews, the editor
+and export. Shared SVG descriptors define rectangles, arrow lines and
+arrowheads for both DOM rendering and serialized export overlays. The DOCX
+generator receives ordinary image bytes and remains unaware of annotation
+storage.
+
+Composition is sequential to bound transient canvas memory for large exports.
+Each screenshot is composed at most once, the canvas backing store is released
+after PNG encoding, and source images without supported annotations retain the
+previous byte path. Unknown future annotation types are ignored by the scene
+and their stored fields remain untouched.
+
+The visual regression test uses deterministic SVG structure and exact scene
+coordinates as its approved reference. Browser rasterizers may differ by
+anti-aliasing at subpixel edges, so pixel-perfect PNG comparison is deliberately
+not used; acceptable variation is limited to edge anti-aliasing while geometry,
+colors, dimensions and element ordering must match exactly.

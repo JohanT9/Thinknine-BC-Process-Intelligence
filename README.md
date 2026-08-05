@@ -54,6 +54,17 @@ till läget när editorn öppnades, utan att skriva över stegändringar som gjo
 utanför editorn. **Klar** behåller och sparar sessionens ändringar.
 Originalskärmbilden förändras fortfarande aldrig.
 
+### RC5 — Annoteringar i Word
+
+Word-exporten visar nu rektanglar och pilar ovanpå respektive skärmbild. Vid
+export skapas en tillfällig PNG i skärmbildens originalupplösning från samma
+annotationsscen som används i Review Studio. Review-data, annoteringar och den
+lagrade originalbilden förändras inte.
+
+Varje använd skärmbild komponeras högst en gång per export. Skärmbilder utan
+stödda annoteringar exporteras byte-identiskt enligt den tidigare vägen, och
+okända framtida annotationstyper ignoreras utan att stoppa exporten.
+
 ## Struktur
 
 ```text

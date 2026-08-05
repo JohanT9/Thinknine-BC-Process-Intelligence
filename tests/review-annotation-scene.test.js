@@ -227,7 +227,10 @@ svgRenderer.render(
 );
 assert.strictEqual(svg.attributes.viewBox, "0 0 800 400");
 assert.strictEqual(svg.children.length, 1);
-assert.strictEqual(svg.children[0].dataset.annotationId, "ann_rectangle");
+assert.strictEqual(
+  svg.children[0].attributes["data-annotation-id"],
+  "ann_rectangle"
+);
 assert.strictEqual(svg.children[0].attributes.x, "80");
 assert.ok(
   Math.abs(Number(svg.children[0].attributes.width) - 160) < Number.EPSILON * 160

@@ -1,5 +1,19 @@
 # Changelog
 
+## 4.3.0 RC5 — Word Annotation Rendering
+
+- Added temporary, non-destructive PNG composition for annotated Word images.
+- Reused the normalized annotation scene and shared SVG descriptors for Review
+  Studio, the annotation editor and export.
+- Preserved source-image resolution, aspect ratio, colors and normalized line
+  geometry during rasterization.
+- Composed each referenced screenshot once per export and released temporary
+  canvases immediately after encoding.
+- Kept unannotated screenshots on the previous byte-identical export path.
+- Ignored unsupported future annotation types without changing stored data.
+- Added rendering, workflow-state, compatibility, cleanup and deterministic
+  SVG visual-regression coverage.
+
 ## 4.3.0 RC4 — Annotation History and Persistence
 
 - Extended the existing Review command history with optional version 2

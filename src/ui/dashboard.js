@@ -3410,23 +3410,22 @@ async function exportActiveReviewToWord() {
     );
   }
 
-  const screenshotData = {};
-
-  for (const [path, dataUrl] of Object.entries(
-    activeReviewModel.screenshotData || {}
-  )) {
-    const imageData = dataUrlToImageData(dataUrl);
-
-    if (imageData) {
-      screenshotData[path] = imageData;
-    }
-  }
+  const tasks = reviewedTasksForWord();
+  const screenshotPaths = globalThis.T9ReviewAnnotationCompositor
+    .pathsForTasks(tasks);
+  const screenshotData = await globalThis.T9ReviewAnnotationCompositor
+    .composeReview({
+      review: activeReview,
+      paths: screenshotPaths,
+      screenshotSources: activeReviewModel.screenshotData || {},
+      convertOriginal: dataUrlToImageData
+    });
 
   const result = await globalThis.T9Export.word.createDocx({
     session: activeReviewModel.response.session,
     review: {
       ...activeReview,
-      tasks: reviewedTasksForWord(),
+      tasks,
     },
     screenshotData,
   });
