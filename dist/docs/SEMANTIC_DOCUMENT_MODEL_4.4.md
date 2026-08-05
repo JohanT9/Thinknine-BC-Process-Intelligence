@@ -174,7 +174,19 @@ introducing format-specific properties into the semantic model or duplicating
 planning. It has no access to Review tasks, history, raw annotations, unresolved
 themes or the theme registry.
 
-## RC5 exclusions
+RC6 adds a reusable component contract inside the Document Plan boundary.
+Definitions describe semantic roles, required content and source references,
+accessibility metadata, renderer-neutral presentation intent, optional theme
+token references and capability requirements. Unknown future component kinds
+and fields remain normalized and serialization-safe.
+
+The built-in registry owns one definition per component kind and rejects
+duplicates. Extensions can add new kinds without changing the component model.
+Component validation is separate from plan construction and never renders or
+mutates inputs. Planner remains the only producer of plans and component
+instances.
+
+## RC6 exclusions
 
 - no theme selection or branding UI;
 - no PDF or HTML integration;

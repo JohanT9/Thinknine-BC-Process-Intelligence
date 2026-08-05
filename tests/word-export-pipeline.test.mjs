@@ -1,6 +1,9 @@
 import assert from "node:assert";
 import JSZip from "jszip";
 import pipeline from "../src/exporters/word-export-pipeline.js";
+import semantic from "../src/document/semantic-document.js";
+import themeRegistry from "../src/document/document-theme-registry.js";
+import planner from "../src/document/document-planner.js";
 import "../src/exporters/word-exporter-docx.mjs";
 
 const png = new Uint8Array(Buffer.from(
@@ -217,6 +220,39 @@ const repeatB = await exportReview(baseReview);
 assert.strictEqual(repeatA.documentXml, repeatB.documentXml);
 assert.strictEqual(repeatA.headerXml, repeatB.headerXml);
 assert.strictEqual(repeatA.footerXml, repeatB.footerXml);
+
+const tocDocument = semantic.normalize({
+  documentId: "document-toc",
+  metadata: { title: "TOC parity" },
+  sections: [{
+    sectionId: "section-toc",
+    kind: "workflow",
+    blocks: [{
+      blockId: "heading-toc",
+      kind: "heading",
+      level: 1,
+      text: "Innehållstest"
+    }, {
+      blockId: "toc-block",
+      kind: "toc"
+    }, {
+      blockId: "page-break-block",
+      kind: "pageBreak"
+    }]
+  }]
+});
+const tocPlan = planner.plan(tocDocument, themeRegistry.resolve(
+  themeRegistry.BUILT_IN_REGISTRY,
+  "thinknine"
+));
+const tocResult = await globalThis.T9Export.word.renderPlan({
+  plan: tocPlan,
+  mediaAssets: {}
+});
+const tocArchive = await JSZip.loadAsync(await tocResult.blob.arrayBuffer());
+const tocXml = await tocArchive.file("word/document.xml").async("string");
+assert.ok(tocXml.includes("TOC"));
+assert.ok(tocXml.includes('w:type="page"'));
 
 const preparedMissing = pipeline.create({
   review: review([{

@@ -30,6 +30,7 @@ function documentFixture() {
       blocks: [{
         blockId: "step-1",
         kind: "step",
+        stepNumber: 1,
         blocks: [{
           blockId: "paragraph-1",
           kind: "paragraph",
@@ -37,6 +38,7 @@ function documentFixture() {
         }, {
           blockId: "callout-1",
           kind: "callout",
+          calloutType: "note",
           blocks: [{
             blockId: "callout-paragraph-1",
             kind: "paragraph",
@@ -156,6 +158,13 @@ assert.deepStrictEqual(
   ["header", "footer"]
 );
 const components = flattenComponents(result);
+for (const component of components) {
+  assert.ok(component.componentId);
+  assert.ok(component.accessibility.label);
+  assert.strictEqual(component.presentationIntent.rendererNeutral, true);
+  assert.ok(Array.isArray(component.themeTokenReferences));
+  assert.ok(Array.isArray(component.capabilityRequirements));
+}
 for (const kind of [
   "cover", "metadata", "workflow", "step", "screenshot", "callout",
   "list", "table", "revisionHistory", "toc", "pageBreak", "group"
@@ -170,6 +179,15 @@ assert.strictEqual(
 assert.strictEqual(
   components.find(component => component.kind === "step").keepTogether,
   true
+);
+assert.strictEqual(
+  components.find(component => component.kind === "step").content.title,
+  "Steg 1"
+);
+assert.strictEqual(
+  components.find(component => component.kind === "screenshot")
+    .accessibility.label,
+  "Skärmbild 1 steg 1"
 );
 assert.strictEqual(
   components.find(component => component.kind === "pageBreak").pageIntent,
@@ -307,6 +325,36 @@ assert.deepStrictEqual(
 const futureReloaded = planModel.deserialize(planModel.serialize(futurePlan));
 assert.deepStrictEqual(futureReloaded.futurePlanField, { preserve: true });
 assert.strictEqual(futureReloaded.sections[0].futureSectionField, true);
+
+const futureComponentPlan = JSON.parse(serialized);
+futureComponentPlan.components.push({
+  componentId: "component:future:1",
+  kind: "futurePanel",
+  sourceRef: {},
+  accessibility: { role: "document", label: "Future panel" },
+  presentationIntent: { rendererNeutral: true },
+  themeTokenReferences: ["components.futurePanel"],
+  capabilityRequirements: [],
+  pageIntent: "normal",
+  visibility: "visible",
+  futureComponentField: { preserve: true },
+  components: []
+});
+const normalizedFutureComponentPlan = planModel.deserialize(
+  planModel.serialize(futureComponentPlan)
+);
+assert.deepStrictEqual(
+  normalizedFutureComponentPlan.components.at(-1).futureComponentField,
+  { preserve: true }
+);
+const futureComponentValidation = planValidation.validate(
+  normalizedFutureComponentPlan,
+  { document, theme: resolvedTheme, plannerVersion: planner.PLANNER_VERSION }
+);
+assert.strictEqual(futureComponentValidation.valid, true);
+assert.ok(futureComponentValidation.issues.some(
+  issue => issue.code === "future-component-kind"
+));
 
 const missingComponent = JSON.parse(serialized);
 missingComponent.sections[1].components[0].components = [];

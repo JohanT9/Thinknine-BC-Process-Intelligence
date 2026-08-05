@@ -11,14 +11,20 @@
   const planModel = typeof module === "object" && module.exports
     ? require("./document-plan")
     : root.T9DocumentPlan;
-  const api = factory(semantic, themeValidation, themeModel, planModel);
+  const componentRegistry = typeof module === "object" && module.exports
+    ? require("./document-component-registry")
+    : root.T9DocumentComponentRegistry;
+  const api = factory(
+    semantic, themeValidation, themeModel, planModel, componentRegistry
+  );
   if (typeof module === "object" && module.exports) module.exports = api;
   root.T9DocumentPlanner = api;
 })(typeof globalThis !== "undefined" ? globalThis : this, function (
   semantic,
   themeValidation,
   themeModel,
-  planModel
+  planModel,
+  componentRegistry
 ) {
   const PLANNER_VERSION = "1.0.0";
 
@@ -96,18 +102,33 @@
 
   function componentKind(blockKind) {
     if (blockKind === "image") return "screenshot";
-    return planModel.COMPONENT_KINDS.includes(blockKind)
+    return componentRegistry.get(
+      componentRegistry.BUILT_IN_REGISTRY,
+      blockKind
+    )
       ? blockKind
       : "generic";
   }
 
   function visibilityFor(kind, theme) {
-    const capability = planModel.CAPABILITY_BY_COMPONENT[kind];
+    const capability = componentRegistry.get(
+      componentRegistry.BUILT_IN_REGISTRY,
+      kind
+    )?.capabilityRequirements[0];
     return capability && !supports(theme, capability) ? "hidden" : "visible";
+  }
+
+  function componentContract(kind, overrides = {}) {
+    return componentRegistry.contract(
+      componentRegistry.BUILT_IN_REGISTRY,
+      kind,
+      overrides
+    );
   }
 
   function groupingComponent(id, grouping, sourceRef, children, theme) {
     return {
+      ...componentContract("group"),
       componentId: `component:group:${id}`,
       kind: "group",
       sourceRef,
@@ -165,9 +186,13 @@
   function planBlock(block, sectionKind, theme) {
     const kind = componentKind(block.kind);
     const components = nestedComponents(block, sectionKind, theme);
+    const stepInstruction = block.kind === "step"
+      ? block.blocks?.find(child => child.kind === "paragraph")?.text || ""
+      : "";
+    const calloutText = block.kind === "callout"
+      ? block.blocks?.find(child => child.kind === "paragraph")?.text || ""
+      : "";
     if (block.kind === "step") {
-      const instruction = block.blocks?.find(child => child.kind === "paragraph")
-        ?.text || "";
       let imageIndex = 0;
       components.forEach(component => {
         if (component.kind !== "screenshot") return;
@@ -176,13 +201,27 @@
           ...component.content,
           imageIndex,
           stepNumber: block.stepNumber,
-          description: instruction,
+          description: stepInstruction,
           altTitle: `Skärmbild ${imageIndex} steg ${block.stepNumber}`,
           altName: `step-${block.stepNumber}-${imageIndex}`
+        };
+        component.accessibility = {
+          ...component.accessibility,
+          label: `Skärmbild ${imageIndex} steg ${block.stepNumber}`,
+          description: stepInstruction
         };
       });
     }
     return {
+      ...componentContract(kind, {
+        accessibility: kind === "step"
+          ? { label: `Steg ${block.stepNumber}` }
+          : kind === "callout"
+            ? { label: "Kommentar", description: calloutText }
+          : kind === "screenshot"
+            ? { label: block.altText || "Processkärmbild" }
+            : {}
+      }),
       componentId: `component:block:${block.blockId}`,
       kind,
       sourceRef: {
@@ -206,9 +245,34 @@
         ...(block.level !== undefined ? { level: block.level } : {}),
         ...(block.stepNumber !== undefined ? { stepNumber: block.stepNumber } : {}),
         ...(block.stepNumber !== undefined ? {
-          title: `Steg ${block.stepNumber}`
+          title: `Steg ${block.stepNumber}`,
+          instruction: stepInstruction,
+          commentComponentIds: components.filter(component =>
+            component.kind === "callout").map(component => component.componentId),
+          screenshotComponentIds: components.filter(component =>
+            component.kind === "screenshot").map(component => component.componentId)
         } : {}),
         ...(block.calloutType ? { calloutType: block.calloutType } : {}),
+        ...(block.kind === "callout" ? {
+          label: "Kommentar",
+          text: calloutText
+        } : {}),
+        ...(block.kind === "toc" ? {
+          headingLevelRange: [1, 3],
+          updateField: true
+        } : {}),
+        ...(block.kind === "image" ? {
+          captionIntent: "none",
+          presentationRole: "processEvidence"
+        } : {}),
+        ...(block.kind === "revisionHistory" ? {
+          columns: [
+            { key: "version", label: "Version" },
+            { key: "createdAt", label: "Datum" },
+            { key: "change", label: "Ändring" },
+            { key: "reviewer", label: "Granskad av" }
+          ]
+        } : {}),
         ...(block.assetId ? { assetId: block.assetId } : {}),
         ...(block.entries ? { entries: clone(block.entries) } : {})
       },
@@ -224,10 +288,10 @@
   }
 
   function sectionCapability(kind) {
-    return {
-      cover: planModel.CAPABILITY_BY_COMPONENT.cover,
-      revisionHistory: planModel.CAPABILITY_BY_COMPONENT.revisionHistory
-    }[kind];
+    return componentRegistry.get(
+      componentRegistry.BUILT_IN_REGISTRY,
+      kind
+    )?.capabilityRequirements[0];
   }
 
   function planSection(section, document, theme) {
@@ -239,6 +303,7 @@
       planBlock(block, section.kind, theme));
     if (section.kind === "cover") {
       children.push({
+        ...componentContract("metadata"),
         componentId: `component:metadata:${document.documentId}`,
         kind: "metadata",
         sourceRef: { documentId: document.documentId },
@@ -252,13 +317,20 @@
         spacingIntent: spacingIntent(theme),
         appearance: clone(theme.components.metadataTable || {}),
         content: {
+          accessibilityLabel: "Dokumentmetadata",
           rows: [
-            ["Version", document.metadata.documentVersion],
-            ["Datum", document.metadata.updatedAt || document.metadata.createdAt],
-            ["Miljö", document.metadata.environment],
-            ["Dokumentationstyp", document.metadata.documentationProfile],
-            ["Granskningsstatus", document.metadata.statusLabel],
-            ["Granskad av", document.metadata.reviewer]
+            { key: "version", label: "Version",
+              value: document.metadata.documentVersion },
+            { key: "date", label: "Datum",
+              value: document.metadata.updatedAt || document.metadata.createdAt },
+            { key: "environment", label: "Miljö",
+              value: document.metadata.environment },
+            { key: "documentationProfile", label: "Dokumentationstyp",
+              value: document.metadata.documentationProfile },
+            { key: "reviewStatus", label: "Granskningsstatus",
+              value: document.metadata.statusLabel },
+            { key: "reviewer", label: "Granskad av",
+              value: document.metadata.reviewer }
           ]
         },
         components: []
@@ -273,6 +345,7 @@
       keepTogether: section.kind === "cover",
       spacingIntent: spacingIntent(theme, "section"),
       components: [{
+        ...componentContract(wrapperKind),
         componentId: `component:section:${section.sectionId}`,
         kind: wrapperKind,
         sourceRef: { sectionId: section.sectionId },
@@ -287,7 +360,21 @@
           : "visible",
         spacingIntent: spacingIntent(theme, "section"),
         appearance: clone(theme.components[section.kind] || {}),
-        content: { sectionKind: section.kind },
+        content: {
+          sectionKind: section.kind,
+          ...(section.kind === "cover" ? {
+            title: document.metadata.title,
+            documentId: document.documentId,
+            metadataComponentId: `component:metadata:${document.documentId}`
+          } : {}),
+          ...(section.kind === "workflow" ? {
+            heading: children.find(component => component.kind === "heading")
+              ?.content.text || "",
+            introduction: "",
+            stepComponentIds: children.filter(component =>
+              component.kind === "step").map(component => component.componentId)
+          } : {})
+        },
         components: children
       }]
     };
@@ -302,6 +389,11 @@
       ["footer", "supportsFooter"]
     ].filter(([, capability]) => supports(theme, capability))
       .map(([kind]) => ({
+        ...componentContract(kind, {
+          accessibility: { label: kind === "header"
+            ? "Dokumenthuvud"
+            : "Dokumentsidfot" }
+        }),
         componentId: `component:${kind}:${document.documentId}`,
         kind,
         sourceRef: { documentId: document.documentId },
@@ -320,9 +412,13 @@
         content: {
           title: document.metadata.title,
           text: kind === "footer" ? branding.footer : document.metadata.title,
+          brandingReference: supports(theme, "supportsBranding")
+            ? "theme.branding"
+            : "",
           ...(kind === "footer" ? {
             pageLabel: "Sida",
-            totalSeparator: " av "
+            totalSeparator: " av ",
+            pageFieldIntent: { current: true, total: true }
           } : {})
         },
         components: []

@@ -1,5 +1,20 @@
 # Changelog
 
+## 4.4.0 RC6 — Reusable Document Components
+
+- Added a renderer-neutral, serialization-safe document component contract.
+- Added an immutable built-in component registry with duplicate-kind detection
+  and extension support.
+- Added structural validation for semantic content, source references,
+  accessibility metadata, theme token references and capability requirements.
+- Made Cover, Header, Footer, Metadata, Workflow, Step, Screenshot, Callout,
+  Revision History, TOC and Page Break explicit reusable plan components.
+- Moved remaining semantic labels, columns, page-field intent and accessibility
+  descriptions out of the Word adapter and into planned component data.
+- Preserved the RC5 Word structure and appearance without changing Review data,
+  themes, branding UI or export formats.
+- Added behaviour, integrity, registry and Word parity coverage.
+
 ## 4.4.0 RC5 — Word Adapter Migration with Output Parity
 
 - Migrated the production Word flow to Review projection, the semantic document,

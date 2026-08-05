@@ -19391,8 +19391,10 @@
     return new Table({
       width: { size: 100, type: WidthType.PERCENTAGE },
       borders: tableBorders(component.appearance),
-      rows: (component.content.rows || []).map(([label, rawValue]) => {
-        const value = label === "Datum" ? safeDate(rawValue) : rawValue;
+      rows: (component.content.rows || []).map((row) => {
+        const label = row.label;
+        const rawValue = row.value;
+        const value = row.key === "date" ? safeDate(rawValue) : rawValue;
         return new TableRow({ children: [
           new TableCell({
             width: { size: 30, type: WidthType.PERCENTAGE },
@@ -19415,7 +19417,6 @@
     });
   }
   function commentBox(component) {
-    const paragraph = component.components.find((child) => child.kind === "paragraph");
     const border = color(component.appearance.borderColor, "D6A700");
     return new Table({
       width: { size: 100, type: WidthType.PERCENTAGE },
@@ -19431,20 +19432,18 @@
           fill: color(component.appearance.fillColor, "FFF7CC")
         },
         children: [new Paragraph({ children: [new TextRun({
-          text: `Kommentar: ${plainText(paragraph?.content.text)}`,
+          text: `${component.content.label}: ${plainText(component.content.text)}`,
           bold: true
         })] })]
       })] })]
     });
   }
   function revisionTable(component) {
-    const headers = ["Version", "Datum", "\xC4ndring", "Granskad av"];
-    const rows = (component.content.entries || []).map((entry) => [
-      entry.version,
-      safeDate(entry.createdAt),
-      entry.change,
-      entry.reviewer
-    ]);
+    const columns = component.content.columns || [];
+    const headers = columns.map((column) => column.label);
+    const rows = (component.content.entries || []).map((entry) => columns.map(
+      (column) => column.key === "createdAt" ? safeDate(entry[column.key]) : entry[column.key]
+    ));
     return new Table({
       width: { size: 100, type: WidthType.PERCENTAGE },
       borders: tableBorders(component.appearance),
@@ -19485,8 +19484,8 @@
         type: imageType(media, bytes),
         transformation: fittedImageSize(bytes, component.appearance),
         altText: {
-          title: component.content.altTitle,
-          description: component.content.description,
+          title: component.accessibility.label,
+          description: component.accessibility.description,
           name: component.content.altName
         }
       })]
@@ -19536,11 +19535,11 @@
     if (component.kind === "toc") {
       return [new TableOfContents(component.appearance.title, {
         hyperlink: true,
-        headingStyleRange: "1-3"
+        headingStyleRange: component.content.headingLevelRange.join("-")
       })];
     }
     if (component.kind === "cover") {
-      const title = component.components.find((child) => child.kind === "heading")?.content.text || "";
+      const title = component.content.title;
       const metadata = component.components.find((child) => child.kind === "metadata");
       const accent = color(component.appearance.accentColor, "0F4C81");
       const muted = color(component.appearance.mutedColor, "5F6B76");

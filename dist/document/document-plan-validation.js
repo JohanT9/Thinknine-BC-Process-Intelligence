@@ -5,12 +5,22 @@
   const themeModel = typeof module === "object" && module.exports
     ? require("./document-theme")
     : root.T9DocumentTheme;
-  const api = factory(plan, themeModel);
+  const componentRegistry = typeof module === "object" && module.exports
+    ? require("./document-component-registry")
+    : root.T9DocumentComponentRegistry;
+  const componentValidation = typeof module === "object" && module.exports
+    ? require("./document-component-validation")
+    : root.T9DocumentComponentValidation;
+  const api = factory(
+    plan, themeModel, componentRegistry, componentValidation
+  );
   if (typeof module === "object" && module.exports) module.exports = api;
   root.T9DocumentPlanValidation = api;
 })(typeof globalThis !== "undefined" ? globalThis : this, function (
   plan,
-  themeModel
+  themeModel,
+  componentRegistry,
+  componentValidation
 ) {
   function issue(issues, code, path, message, severity = "error") {
     issues.push({ code, path, message, severity });
@@ -91,7 +101,10 @@
   }
 
   function capabilityFor(kind) {
-    return plan.CAPABILITY_BY_COMPONENT[kind];
+    return componentRegistry.get(
+      componentRegistry.BUILT_IN_REGISTRY,
+      kind
+    )?.capabilityRequirements[0];
   }
 
   function validateComponent(component, path, context) {
@@ -105,11 +118,15 @@
     if (typeof component.kind !== "string" || !component.kind.trim()) {
       issue(context.issues, "invalid-component-kind", `${path}.kind`,
         "Component kind must be a non-empty string.");
-    } else if (!plan.COMPONENT_KINDS.includes(component.kind)) {
-      issue(context.issues, "future-component-kind", `${path}.kind`,
-        `Unknown future component kind is preserved: ${component.kind}.`,
-        "warning");
     }
+    const contractResult = componentValidation.validate(component);
+    contractResult.issues.forEach(item => issue(
+      context.issues,
+      item.code,
+      `${path}${item.path.slice(1)}`,
+      item.message,
+      item.severity
+    ));
     validateSourceRef(component.sourceRef, `${path}.sourceRef`, context);
     validatePageIntent(component.pageIntent, `${path}.pageIntent`,
       context.issues);

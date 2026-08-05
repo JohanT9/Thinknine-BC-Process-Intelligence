@@ -80,6 +80,19 @@ versionshistorik behåller tidigare struktur och utseende. Review-persistence,
 filnamn och skärmbildslagring är också oförändrade. Se
 [Word Export Architecture 4.4](docs/WORD_EXPORT_ARCHITECTURE_4.4.md).
 
+### RC6 — Återanvändbara dokumentkomponenter
+
+Document Planner skapar nu explicita, renderer-neutrala komponentkontrakt för
+försättssida, sidhuvud, sidfot, metadata, workflow, steg, skärmbilder, callouts,
+versionshistorik, innehållsförteckning och sidbrytningar. Varje instans har ett
+stabilt ID, semantiskt innehåll, källreferenser, tillgänglighetsmetadata,
+presentationsintention, temareferenser och eventuella kapabilitetskrav.
+
+Ett immutable register är enda källan för inbyggda komponentdefinitioner och kan
+utökas med framtida komponenttyper. Valideringen kontrollerar kontrakten utan att
+kassera okända framtida typer eller fält. Word-adaptern renderar fortsatt endast
+Document Plan och synlig Word-output är oförändrad.
+
 ## Screenshot annotations 4.3 RC1
 
 Review-modellen har en ny, versionshanterad grund för icke-destruktiva

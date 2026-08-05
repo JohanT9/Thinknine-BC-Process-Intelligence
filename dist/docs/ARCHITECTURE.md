@@ -37,6 +37,13 @@ validerade, immutabla planen och förberedda bildbytes. Dashboarden är composit
 root men fattar inga layoutbeslut. DOCX-objekt och Word-enheter förekommer endast
 i adaptern; Review-persistence och skärmbildslagring är oförändrade.
 
+RC6 gör planens komponenter explicita och återanvändbara. `document-components`
+äger normalisering och immutabilitet, `document-component-registry` äger de
+inbyggda definitionerna och utökningspunkten, och
+`document-component-validation` äger kontraktskontrollerna. Planner är fortsatt
+den enda producenten av komponentinstanser och Document Plans. Komponenterna är
+renderer-neutrala och innehåller inga DOCX-, XML-, DOM-, PDF- eller Word-enheter.
+
 ```text
 Recorder
   ↓

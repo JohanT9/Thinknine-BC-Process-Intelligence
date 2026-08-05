@@ -33,6 +33,21 @@ downloads the resulting blob. It contains no document layout decisions.
   storage, theme inheritance or the registry.
 - `word-exporter-docx.mjs` is a build-compatible facade for the adapter.
 
+## Reusable components (RC6)
+
+`document-components.js` defines the stable, immutable and serialization-safe
+component contract. `document-component-registry.js` contains one built-in
+definition per kind, supports extensions and rejects duplicate kinds.
+`document-component-validation.js` checks required semantic content, source
+references, accessibility labels, renderer neutrality, theme token references
+and capability declarations.
+
+Cover, Header, Footer, Metadata Table, Workflow Section, Step, Screenshot,
+Callout, Revision History, TOC and Page Break are explicit reusable components.
+Their contracts contain content and intent, never `docx` objects, Word XML,
+twips, browser nodes or PDF primitives. Capabilities affect inclusion only in
+Planner. The Word adapter only maps already planned components to Word.
+
 The old `word-exporter.js` is retained only as a quarantined compatibility
 implementation for isolated tests. It is not loaded by the production dashboard.
 `documentation-engine.js` remains a separately tested legacy documentation
