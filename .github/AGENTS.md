@@ -148,7 +148,29 @@ Continuously Improve
 
 The product is not a click recorder.
 
-It is a Business Process Intelligence platform.
+It transforms recorded user activity into professional process documentation.
+
+Documentation excellence is the foundation upon which future process intelligence capabilities will be built.
+
+---
+
+## Documentation First
+
+The primary purpose of Thinknine Process Intelligence is to generate high-quality process documentation with minimal manual editing.
+
+New features should first improve one or more of the following:
+
+- documentation quality
+- documentation consistency
+- documentation readability
+- documentation efficiency
+- documentation maintainability
+
+Expanding the scope of the product must not come at the expense of documentation quality.
+
+When prioritizing future work, prefer making documentation exceptional over adding project-management functionality.
+
+Documentation excellence is the product's primary competitive advantage.
 
 ---
 
