@@ -23,6 +23,28 @@ Whenever multiple implementation alternatives exist, prefer the solution that wi
 
 ---
 
+# Product Philosophy
+
+Documentation Excellence exists to improve the daily workflow of professional consultants.
+
+Every significant implementation must create a noticeable improvement in everyday use.
+
+Architecture, abstractions and internal design exist only to enable better user experiences. They are never goals by themselves.
+
+When evaluating competing implementations, prefer the solution that delivers the greatest practical value to the consultant while preserving long-term maintainability.
+
+Before implementing a feature, ask:
+
+"Will a consultant using this product every day immediately notice that their work has become easier, faster or more professional?"
+
+If the answer is no, reconsider whether the feature belongs in the current milestone.
+
+## Guiding Principle
+
+**The consultant's time is the product's most valuable resource. Every significant feature should save time, improve document quality, increase confidence in the final result, or clearly enable one of those outcomes in a future milestone. If it does none of these, it probably does not belong in the product.**
+
+---
+
 # Development Workflow
 
 Every non-trivial implementation follows the same workflow.
@@ -270,6 +292,25 @@ the engineering principles take precedence.
 
 ---
 
+# Product Review Gate
+
+Every milestone must satisfy two independent criteria.
+
+## Engineering
+
+- Correct
+- Maintainable
+- Tested
+- Backward compatible
+
+## User Value
+
+The improvement must be perceptible during normal daily use.
+
+Features that improve architecture without improving the user experience should generally be implemented only when they clearly enable future user-facing improvements.
+
+---
+
 ## Domain First
 
 The domain model defines the product.
@@ -295,6 +336,26 @@ Colors, typography, spacing and branding should be data.
 Rendering engines consume tokens.
 
 They do not define them.
+
+---
+
+## Planning Before Rendering
+
+Place it after Token First.
+
+Use the following wording:
+
+Rendering engines must never decide document structure.
+
+Document structure is created by the Document Planner.
+
+Renderers consume the Document Plan.
+
+They do not create it.
+
+Keep the existing formatting and document structure.
+
+Do not modify any product code.
 
 ---
 
