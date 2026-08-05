@@ -29,9 +29,16 @@
     ensure(review);
     const beforeTasks = snapshot(command.beforeTasks);
     const afterTasks = snapshot(command.afterTasks);
+    const beforeAnnotations = command.beforeAnnotations === undefined
+      ? undefined
+      : clone(command.beforeAnnotations);
+    const afterAnnotations = command.afterAnnotations === undefined
+      ? undefined
+      : clone(command.afterAnnotations);
     if (
       JSON.stringify(beforeTasks) === JSON.stringify(afterTasks) &&
-      command.beforeStatus === command.afterStatus
+      command.beforeStatus === command.afterStatus &&
+      JSON.stringify(beforeAnnotations) === JSON.stringify(afterAnnotations)
     ) {
       return review;
     }
@@ -46,9 +53,14 @@
         ...previous,
         updatedAt: command.createdAt,
         afterTasks,
+        afterAnnotations,
         afterSelection: command.afterSelection === undefined
           ? previous.afterSelection
-          : clone(command.afterSelection)
+          : clone(command.afterSelection),
+        afterAnnotationSelection:
+          command.afterAnnotationSelection === undefined
+            ? previous.afterAnnotationSelection
+            : clone(command.afterAnnotationSelection)
       };
     } else {
       entries.push({
@@ -59,8 +71,16 @@
         groupKey: command.groupKey || null,
         beforeTasks,
         afterTasks,
+        beforeAnnotations,
+        afterAnnotations,
         beforeSelection: clone(command.beforeSelection ?? null),
         afterSelection: clone(command.afterSelection ?? null),
+        beforeAnnotationSelection: clone(
+          command.beforeAnnotationSelection ?? null
+        ),
+        afterAnnotationSelection: clone(
+          command.afterAnnotationSelection ?? null
+        ),
         metadata: clone(command.metadata || {}),
         beforeStatus: command.beforeStatus,
         afterStatus: command.afterStatus
@@ -71,6 +91,9 @@
     }
     review.commandHistory = entries;
     review.historyIndex = entries.length;
+    if (beforeAnnotations !== undefined || afterAnnotations !== undefined) {
+      review.commandHistoryVersion = "2.0.0";
+    }
     return review;
   }
 
@@ -103,6 +126,10 @@
     review.tasks = snapshot(
       direction === "undo" ? entry.beforeTasks : entry.afterTasks
     );
+    const annotations = direction === "undo"
+      ? entry.beforeAnnotations
+      : entry.afterAnnotations;
+    if (annotations !== undefined) review.annotations = clone(annotations);
     if (entry.beforeStatus !== undefined || entry.afterStatus !== undefined) {
       review.status = direction === "undo" ? entry.beforeStatus : entry.afterStatus;
     }
@@ -113,6 +140,11 @@
       entry,
       selection: clone(
         direction === "undo" ? entry.beforeSelection : entry.afterSelection
+      ),
+      annotationSelection: clone(
+        direction === "undo"
+          ? entry.beforeAnnotationSelection
+          : entry.afterAnnotationSelection
       )
     };
   }

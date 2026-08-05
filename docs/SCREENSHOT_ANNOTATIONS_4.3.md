@@ -50,3 +50,27 @@ Create, update, and remove operations all pass through the annotation domain.
 The annotation set revision increments for every committed operation. RC3 still
 uses the existing manual Review Save command; command history and autosave are
 reserved for RC4.
+
+## RC4 history and persistence
+
+RC4 extends the existing Review command history instead of introducing a
+second Undo/Redo engine. Version 2 history entries may contain annotation
+snapshots and annotation selection in addition to the existing task snapshots.
+Version 1 entries remain readable and retain their previous restore semantics.
+
+Add, move, resize, endpoint, style, and delete commits create history entries.
+The domain rejects no-op updates before revision timestamps change. Pointer
+drafts remain transient, while consecutive keyboard nudges use a group key and
+may become one logical command.
+
+Committed annotation changes use the existing debounce scheduler. A serialized
+save queue snapshots each Review request and ensures older writes finish before
+newer writes. Response state is applied only when it still represents the
+latest unchanged in-memory Review. Editor close, explicit Save, and export wait
+for both the debounce timer and the save queue.
+
+Opening the editor captures an annotation and history baseline. Cancel restores
+that annotation state while retaining task changes made outside the editor,
+then persists it after any earlier queued write. Done flushes persistence and
+retains the changes. Original screenshot bytes and Word image rendering remain
+untouched.

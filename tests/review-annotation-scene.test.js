@@ -142,7 +142,10 @@ annotations.update(
   futureReview,
   "screenshots/future.png",
   futureRectangle.annotationId,
-  { geometry: { x: 0.2, y: 0.2, width: 0.3, height: 0.2 } },
+  {
+    geometry: { x: 0.2, y: 0.2, width: 0.3, height: 0.2 },
+    style: { opacity: 0.7 }
+  },
   { now: "future-updated" }
 );
 const preservedFuture = annotations.findScreenshotSet(
@@ -151,6 +154,8 @@ const preservedFuture = annotations.findScreenshotSet(
 ).items[0];
 assert.deepStrictEqual(preservedFuture.futureField, { preserve: true });
 assert.strictEqual(preservedFuture.style.futureStyle, "preserve");
+assert.strictEqual(preservedFuture.style.stroke, "#dc2626");
+assert.strictEqual(preservedFuture.style.opacity, 0.7);
 const beforeInvalidUpdate = JSON.stringify(futureReview);
 for (const geometry of [
   { x: Number.NaN, y: 0, width: 0.2, height: 0.2 },

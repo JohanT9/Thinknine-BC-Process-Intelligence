@@ -233,15 +233,22 @@
       ...clone(patch || {}),
       annotationId: current.annotationId,
       type: current.type,
+      style: patch?.style
+        ? { ...clone(current.style || {}), ...clone(patch.style) }
+        : clone(current.style),
       geometry: patch?.geometry
         ? normalizeGeometry(current.type, patch.geometry)
         : clone(current.geometry),
-      updatedAt: options.now || new Date().toISOString()
+      updatedAt: current.updatedAt
     };
     const result = validation(next);
     if (!result.valid || !result.supported) {
       throw new TypeError(result.errors[0] || "Unsupported annotation.");
     }
+    if (JSON.stringify(current) === JSON.stringify(next)) {
+      return clone(current);
+    }
+    next.updatedAt = options.now || new Date().toISOString();
     set.items = set.items.map((annotation, itemIndex) =>
       itemIndex === index ? next : annotation
     );

@@ -132,11 +132,73 @@
     };
   }
 
+  function createSaveQueue(save) {
+    let chain = Promise.resolve();
+    let lastOperation = Promise.resolve();
+    let latestRevision = 0;
+    let pendingCount = 0;
+
+    function enqueue(payload) {
+      const revision = ++latestRevision;
+      pendingCount += 1;
+      const operation = chain.then(() => save(payload, revision));
+      chain = operation.catch(() => undefined);
+      lastOperation = operation.finally(() => {
+        pendingCount -= 1;
+      });
+      return lastOperation.then(value => ({
+        value,
+        revision,
+        latest: revision === latestRevision
+      }));
+    }
+
+    return {
+      enqueue,
+      flush() {
+        return lastOperation.then(() => undefined);
+      },
+      pending() {
+        return pendingCount > 0;
+      },
+      revision() {
+        return latestRevision;
+      }
+    };
+  }
+
+  function createPersistenceCoordinator(options) {
+    async function flush() {
+      await options.autoSave.flush();
+      await options.saveQueue.flush();
+    }
+
+    async function saveExplicitly(saveOptions) {
+      await flush();
+      await options.save(saveOptions);
+      await options.saveQueue.flush();
+    }
+
+    return { flush, saveExplicitly };
+  }
+
+  function isCurrentSave(details) {
+    return Boolean(
+      details.latest &&
+      details.currentSession &&
+      details.currentReview === details.savedReview &&
+      details.currentReview?.updatedAt === details.savedUpdatedAt
+    );
+  }
+
   return {
     DEFAULT_DELAY,
     bind,
     commandFromKey,
     createAutoSave,
+    createSaveQueue,
+    createPersistenceCoordinator,
+    isCurrentSave,
     createSession,
     result,
     update

@@ -1,5 +1,24 @@
 # Changelog
 
+## 4.3.0 RC4 — Annotation History and Persistence
+
+- Extended the existing Review command history with optional version 2
+  annotation snapshots and stable annotation selection.
+- Added Undo/Redo for annotation add, move, resize, arrow endpoints, style and
+  delete operations without creating a second history engine.
+- Added no-op filtering, redo invalidation and grouped keyboard nudging.
+- Added debounced annotation autosave that never persists active gesture drafts.
+- Added a serialized save queue and stale-response protection.
+- Added persistence flush before editor close, explicit Save and Word export.
+- Added editor baselines so Cancel restores annotation state and its history
+  without overwriting concurrent task changes.
+- Preserved old history entries, unknown future annotations, styles and schema
+  fields.
+- Added accessible pending, saved and failed persistence status.
+- Added annotation history, baseline, save queue, flush and race-condition
+  behaviour tests.
+- Kept original screenshot storage and Word rendering unchanged.
+
 ## 4.3.0 RC3 — Arrow and Annotation Interaction
 
 - Added non-destructive arrow annotations to the shared scene and SVG pipeline.

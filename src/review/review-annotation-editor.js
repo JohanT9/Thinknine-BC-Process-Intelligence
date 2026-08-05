@@ -33,6 +33,15 @@
     };
   }
 
+  function reconcileSelection(state, annotationItems) {
+    if (!state?.selectedId) return state;
+    return (annotationItems || []).some(
+      annotation => annotation.annotationId === state.selectedId
+    )
+      ? state
+      : select(state, null);
+  }
+
   function point(clientX, clientY, bounds) {
     if (!bounds || bounds.width <= 0 || bounds.height <= 0) return null;
     return {
@@ -172,10 +181,65 @@
     }
   }
 
+  function baseline(review) {
+    return JSON.parse(JSON.stringify({
+      annotations: review.annotations,
+      commandHistoryVersion: review.commandHistoryVersion,
+      commandHistory: review.commandHistory || [],
+      historyIndex: review.historyIndex || 0
+    }));
+  }
+
+  function restoreBaseline(review, value, options = {}) {
+    const current = JSON.parse(JSON.stringify(review));
+    const saved = JSON.parse(JSON.stringify(value));
+    const baselineIds = new Set(
+      saved.commandHistory.map(entry => entry.historyId)
+    );
+    const currentById = new Map(
+      (current.commandHistory || []).map(entry => [entry.historyId, entry])
+    );
+    const baselineEntries = saved.commandHistory.map(entry =>
+      !entry.type?.startsWith("annotation-") && currentById.has(entry.historyId)
+        ? currentById.get(entry.historyId)
+        : entry
+    );
+    const externalEntries = (current.commandHistory || []).filter(entry =>
+      !baselineIds.has(entry.historyId) &&
+      !entry.type?.startsWith("annotation-")
+    );
+    const hasExternalEntries = externalEntries.length > 0;
+    const restoredEntries = hasExternalEntries
+      ? baselineEntries.slice(0, saved.historyIndex)
+      : baselineEntries;
+    const combinedHistory = [...restoredEntries, ...externalEntries];
+    const removedEntryCount = Math.max(0, combinedHistory.length - 100);
+    const commandHistory = combinedHistory.slice(removedEntryCount);
+    const restoredIndex = hasExternalEntries
+      ? combinedHistory.length
+      : saved.historyIndex;
+    return {
+      ...current,
+      annotations: saved.annotations,
+      commandHistoryVersion: saved.commandHistoryVersion,
+      commandHistory,
+      historyIndex: Math.max(
+        0,
+        Math.min(commandHistory.length, restoredIndex - removedEntryCount)
+      ),
+      updatedAt: options.now || new Date().toISOString()
+    };
+  }
+
+  function hasActiveGesture(state) {
+    return Boolean(state?.draft || state?.translation);
+  }
+
   return {
     create,
     selectTool,
     select,
+    reconcileSelection,
     point,
     begin,
     move,
@@ -188,6 +252,9 @@
     beginTranslation,
     moveTranslation,
     finishTranslation,
-    releasePointer
+    releasePointer,
+    baseline,
+    restoreBaseline,
+    hasActiveGesture
   };
 });

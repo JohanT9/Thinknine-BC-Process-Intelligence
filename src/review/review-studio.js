@@ -127,6 +127,88 @@
     return review;
   }
 
+  function recordAnnotationChange(
+    review,
+    type,
+    beforeAnnotations,
+    options = {}
+  ) {
+    const createdAt = options.now || new Date().toISOString();
+    historyEngine.record(review, {
+      historyId: options.commandHistoryId || `${type}-${createdAt}`,
+      type,
+      createdAt,
+      groupKey: options.groupKey,
+      beforeTasks: review.tasks,
+      afterTasks: review.tasks,
+      beforeAnnotations,
+      afterAnnotations: review.annotations,
+      beforeAnnotationSelection: options.beforeAnnotationSelection,
+      afterAnnotationSelection: options.afterAnnotationSelection,
+      metadata: options.metadata,
+      beforeStatus: review.status,
+      afterStatus: review.status
+    });
+    return review;
+  }
+
+  function addAnnotation(review, screenshotRef, annotation, options = {}) {
+    const beforeAnnotations = historyEngine.snapshot(review.annotations);
+    const added = annotations.add(review, screenshotRef, annotation, options);
+    recordAnnotationChange(review, "annotation-add", beforeAnnotations, options);
+    return added;
+  }
+
+  function updateAnnotation(
+    review,
+    screenshotRef,
+    annotationId,
+    patch,
+    options = {}
+  ) {
+    const beforeAnnotations = historyEngine.snapshot(review.annotations);
+    const updated = annotations.update(
+      review,
+      screenshotRef,
+      annotationId,
+      patch,
+      options
+    );
+    if (updated) {
+      recordAnnotationChange(
+        review,
+        options.type || "annotation-update",
+        beforeAnnotations,
+        options
+      );
+    }
+    return updated;
+  }
+
+  function removeAnnotation(
+    review,
+    screenshotRef,
+    annotationId,
+    options = {}
+  ) {
+    const beforeAnnotations = historyEngine.snapshot(review.annotations);
+    const removed = annotations.remove(
+      review,
+      screenshotRef,
+      annotationId,
+      options
+    );
+    if (removed) {
+      recordAnnotationChange(
+        review,
+        "annotation-delete",
+        beforeAnnotations,
+        options
+      );
+    }
+    return removed;
+  }
+
   function move(review, index, delta, options = {}) {
     const task = review.tasks[index];
     if (!task) return review;
@@ -315,6 +397,9 @@
   return {
     createReview,
     normalizeReview: annotations.normalizeReview,
+    addAnnotation,
+    updateAnnotation,
+    removeAnnotation,
     normalizeTasks,
     renumber,
     move,

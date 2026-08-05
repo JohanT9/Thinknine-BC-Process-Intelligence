@@ -3460,16 +3460,43 @@ let reviewReturnFocus = null;
 let reviewLayoutState = globalThis.T9ReviewLayout.create();
 let annotationEditorState = null;
 let annotationChangesPending = false;
+let annotationEditorBaseline = null;
+
+const reviewSaveQueue = globalThis.T9ReviewEdit.createSaveQueue(
+  payload => send({
+    type: "T9_SAVE_REVIEW",
+    sessionId: payload.sessionId,
+    review: payload.review
+  })
+);
 
 const reviewAutoSave = globalThis.T9ReviewEdit.createAutoSave(
-  () => saveActiveReview({ render: false, announce: false }),
+  () => {
+    if (globalThis.T9ReviewAnnotationEditor.hasActiveGesture(
+      annotationEditorState
+    )) {
+      reviewAutoSave.schedule();
+      return undefined;
+    }
+    return saveActiveReview({ render: false, announce: false });
+  },
   {
     onError(error) {
       show(error.message, true);
       $("reviewFooterText").textContent = "Automatisk sparning misslyckades.";
+      if (annotationEditorState) {
+        $("annotationStatus").textContent =
+          "Automatisk sparning misslyckades. Försök spara igen.";
+      }
     }
   }
 );
+
+const reviewPersistence = globalThis.T9ReviewEdit.createPersistenceCoordinator({
+  autoSave: reviewAutoSave,
+  saveQueue: reviewSaveQueue,
+  save: saveActiveReview
+});
 
 function reviewTaskIds() {
   return globalThis.T9Review.activeTasks(activeReview || { tasks: [] })
@@ -3662,12 +3689,35 @@ function restoreReviewHistory(direction) {
     ? globalThis.T9Review.undo(activeReview)
     : globalThis.T9Review.redo(activeReview);
   if (!result) return;
+  if (annotationEditorState) {
+    annotationEditorState = globalThis.T9ReviewAnnotationEditor.select(
+      annotationEditorState,
+      result.annotationSelection
+    );
+    annotationEditorState = globalThis.T9ReviewAnnotationEditor
+      .reconcileSelection(
+        annotationEditorState,
+        annotationItems(annotationEditorState.screenshotRef)
+      );
+    annotationChangesPending = true;
+    reviewAutoSave.schedule();
+    renderActiveAnnotation();
+    applyReviewToolbarState();
+    $("annotationStatus").textContent = direction === "undo"
+      ? "Annoteringsändringen ångrades."
+      : "Annoteringsändringen gjordes om.";
+    return;
+  }
   activeReviewSelection = result.selection ||
     globalThis.T9ReviewSelection.reconcile(
       activeReviewSelection,
       reviewTaskIds()
     );
   renderMovedReview(previous, activeReviewSelection.activeId);
+  if (result.entry.type.startsWith("annotation-")) {
+    annotationChangesPending = true;
+    reviewAutoSave.schedule();
+  }
   show(direction === "undo" ? "Senaste ändringen ångrades." : "Ändringen gjordes om.");
 }
 
@@ -3866,12 +3916,8 @@ function renderAnnotationControls() {
   const selected = items.find(
     annotation => annotation.annotationId === annotationEditorState.selectedId
   );
-  if (!selected && annotationEditorState.selectedId) {
-    annotationEditorState = globalThis.T9ReviewAnnotationEditor.select(
-      annotationEditorState,
-      null
-    );
-  }
+  annotationEditorState = globalThis.T9ReviewAnnotationEditor
+    .reconcileSelection(annotationEditorState, items);
   $("rectangleAnnotationTool").setAttribute(
     "aria-pressed",
     String(annotationEditorState.tool === "rectangle")
@@ -3902,6 +3948,9 @@ function renderAnnotationControls() {
 }
 
 function openAnnotationEditor(task, imageData) {
+  annotationEditorBaseline = globalThis.T9ReviewAnnotationEditor.baseline(
+    activeReview
+  );
   annotationEditorState = globalThis.T9ReviewAnnotationEditor.create({
     taskId: task.taskId,
     screenshotRef: imageData.path,
@@ -3919,11 +3968,28 @@ function openAnnotationEditor(task, imageData) {
   $("annotationSurface").focus();
 }
 
-function closeAnnotationEditor() {
+async function closeAnnotationEditor(options = {}) {
   if (!annotationEditorState) return;
   const taskId = annotationEditorState.taskId;
   releaseActiveAnnotationPointer();
+  annotationEditorState = globalThis.T9ReviewAnnotationEditor.cancel(
+    annotationEditorState
+  );
+  if (options.cancel) {
+    reviewAutoSave.cancel();
+    activeReview = globalThis.T9ReviewAnnotationEditor.restoreBaseline(
+      activeReview,
+      annotationEditorBaseline
+    );
+    annotationChangesPending = true;
+    await saveActiveReview({ render: false, announce: false });
+    await reviewSaveQueue.flush();
+  } else {
+    $("annotationStatus").textContent = "Sparar annoteringar.";
+    await flushReviewPersistence();
+  }
   annotationEditorState = null;
+  annotationEditorBaseline = null;
   $("annotationEditor").hidden = true;
   $("reviewList").hidden = false;
   $("reviewFooter").hidden = false;
@@ -3936,10 +4002,12 @@ function closeAnnotationEditor() {
 
 function markAnnotationsChanged(message) {
   annotationChangesPending = true;
+  reviewAutoSave.schedule();
   renderActiveAnnotation();
-  $("annotationStatus").textContent = message;
+  $("annotationStatus").textContent =
+    `${message} Väntar på automatisk sparning.`;
   $("reviewFooterText").textContent =
-    "Annoteringen är inte sparad ännu. Välj Spara när editorn stängts.";
+    "Annoteringen väntar på automatisk sparning.";
 }
 
 function addAnnotation(type, geometry) {
@@ -3949,10 +4017,14 @@ function addAnnotation(type, geometry) {
       type,
       geometry
     );
-    globalThis.T9ReviewAnnotations.add(
+    globalThis.T9Review.addAnnotation(
       activeReview,
       annotationEditorState.screenshotRef,
-      annotation
+      annotation,
+      {
+        beforeAnnotationSelection: annotationEditorState.selectedId,
+        afterAnnotationSelection: annotation.annotationId
+      }
     );
     annotationEditorState = globalThis.T9ReviewAnnotationEditor.select(
       annotationEditorState,
@@ -3967,16 +4039,27 @@ function addAnnotation(type, geometry) {
   }
 }
 
-function updateAnnotation(annotationId, geometry, message) {
+function updateAnnotation(annotationId, geometry, message, options = {}) {
   if (!annotationEditorState) return false;
   try {
-    const updated = globalThis.T9ReviewAnnotations.update(
+    const before = annotationById(annotationId);
+    const updated = globalThis.T9Review.updateAnnotation(
       activeReview,
       annotationEditorState.screenshotRef,
       annotationId,
-      { geometry }
+      { geometry },
+      {
+        type: options.type,
+        groupKey: options.groupKey,
+        beforeAnnotationSelection: annotationEditorState.selectedId,
+        afterAnnotationSelection: annotationId
+      }
     );
     if (!updated) return false;
+    if (JSON.stringify(before) === JSON.stringify(updated)) {
+      renderActiveAnnotation();
+      return true;
+    }
     markAnnotationsChanged(message || "Markeringen uppdaterades.");
     return true;
   } catch (error) {
@@ -3990,10 +4073,14 @@ function deleteSelectedAnnotation() {
   const annotationId = annotationEditorState?.selectedId;
   if (!annotationId) return false;
   releaseActiveAnnotationPointer();
-  const removed = globalThis.T9ReviewAnnotations.remove(
+  const removed = globalThis.T9Review.removeAnnotation(
     activeReview,
     annotationEditorState.screenshotRef,
-    annotationId
+    annotationId,
+    {
+      beforeAnnotationSelection: annotationId,
+      afterAnnotationSelection: null
+    }
   );
   if (!removed) return false;
   annotationEditorState = globalThis.T9ReviewAnnotationEditor.select(
@@ -4178,32 +4265,45 @@ async function saveActiveReview(options = {}) {
   const savedSession = activeReviewSession;
   const savedReview = activeReview;
   const savedUpdatedAt = activeReview.updatedAt;
-
-  const response = await send({
-    type: "T9_SAVE_REVIEW",
+  const savedSnapshot = JSON.parse(JSON.stringify(activeReview));
+  const queued = await reviewSaveQueue.enqueue({
     sessionId: savedSession.id,
-    review: activeReview
+    review: savedSnapshot
   });
+  const response = queued.value;
 
   if (!response.ok) {
     throw new Error(response.error || "Granskningen kunde inte sparas.");
   }
 
   const currentSession = activeReviewSession === savedSession;
-  if (currentSession) annotationChangesPending = false;
-  const unchanged = currentSession &&
-    activeReview === savedReview &&
-    activeReview.updatedAt === savedUpdatedAt;
+  const unchanged = globalThis.T9ReviewEdit.isCurrentSave({
+    latest: queued.latest,
+    currentSession,
+    currentReview: activeReview,
+    savedReview,
+    savedUpdatedAt
+  });
   if (unchanged) {
     activeReview = response.review;
+    annotationChangesPending = false;
   }
   if (options.announce !== false && currentSession) {
     show(`Granskningen för "${savedSession.name}" har sparats.`);
   }
   if (options.render !== false && unchanged) renderReview();
   else if (options.render === false && currentSession) {
-    $("reviewFooterText").textContent = "Alla ändringar är sparade.";
+    $("reviewFooterText").textContent = unchanged
+      ? "Alla ändringar är sparade."
+      : "Nyare ändringar väntar på att sparas.";
+    if (annotationEditorState && unchanged) {
+      $("annotationStatus").textContent = "Annoteringarna är sparade.";
+    }
   }
+}
+
+async function flushReviewPersistence() {
+  await reviewPersistence.flush();
 }
 
 async function openReview(session) {
@@ -4245,15 +4345,29 @@ async function openReview(session) {
   show("");
 }
 
-function closeReview() {
+async function closeReview() {
   releaseActiveAnnotationPointer();
+  if (annotationEditorState) {
+    annotationEditorState = globalThis.T9ReviewAnnotationEditor.cancel(
+      annotationEditorState
+    );
+  }
+  try {
+    await flushReviewPersistence();
+  } catch (error) {
+    show(error.message, true);
+    $("reviewFooterText").textContent =
+      "Granskningen kunde inte stängas eftersom sparningen misslyckades.";
+    return;
+  }
   annotationEditorState = null;
+  annotationEditorBaseline = null;
   annotationChangesPending = false;
+  reviewAutoSave.cancel();
   $("annotationEditor").hidden = true;
   $("reviewList").hidden = false;
   $("reviewFooter").hidden = false;
   $("reviewDialog").classList.remove("annotation-mode");
-  reviewAutoSave.flush();
   $("reviewOverlay").classList.remove("open");
   $("reviewOverlay").setAttribute("aria-hidden", "true");
   activeReviewSession = null;
@@ -4368,7 +4482,22 @@ $("advancedToggle").addEventListener("click", () => {
 });
 
 $("closeReview").addEventListener("click", closeReview);
-$("closeAnnotationEditor").addEventListener("click", closeAnnotationEditor);
+$("closeAnnotationEditor").addEventListener("click", async () => {
+  try {
+    await closeAnnotationEditor();
+  } catch (error) {
+    $("annotationStatus").textContent =
+      `Annoteringarna kunde inte sparas: ${error.message}`;
+  }
+});
+$("cancelAnnotationEditor").addEventListener("click", async () => {
+  try {
+    await closeAnnotationEditor({ cancel: true });
+  } catch (error) {
+    $("annotationStatus").textContent =
+      `Återställningen kunde inte sparas: ${error.message}`;
+  }
+});
 $("rectangleAnnotationTool").addEventListener("click", () => {
   annotationEditorState = globalThis.T9ReviewAnnotationEditor.selectTool(
     annotationEditorState,
@@ -4408,7 +4537,12 @@ $("annotationProperties").addEventListener("click", event => {
   )) {
     geometry[input.dataset.annotationGeometry] = Number(input.value) / 100;
   }
-  updateAnnotation(selected.annotationId, geometry);
+  updateAnnotation(
+    selected.annotationId,
+    geometry,
+    "Markeringens geometri uppdaterades.",
+    { type: selected.type === "arrow" ? "annotation-endpoints" : "annotation-resize" }
+  );
 });
 $("annotationImage").addEventListener("load", () => {
   renderActiveAnnotation(false);
@@ -4471,7 +4605,8 @@ $("annotationSurface").addEventListener("pointerup", event => {
       updateAnnotation(
         result.change.annotationId,
         result.change.geometry,
-        "Markeringen flyttades."
+        "Markeringen flyttades.",
+        { type: "annotation-move" }
       );
     } else {
       const movedState = globalThis.T9ReviewAnnotationEditor.move(
@@ -4534,7 +4669,11 @@ $("annotationSurface").addEventListener("keydown", event => {
         deltaX,
         deltaY
       ),
-      "Markeringen flyttades."
+      "Markeringen flyttades.",
+      {
+        type: "annotation-move",
+        groupKey: `annotation-nudge:${annotationEditorState.screenshotRef}:${annotation.annotationId}`
+      }
     );
   } else if (event.key === "Escape" &&
       (annotationEditorState.draft || annotationEditorState.translation)) {
@@ -4551,8 +4690,7 @@ async function exportReviewFromToolbar(button) {
   button.disabled = true;
   button.textContent = "Skapar Word...";
   try {
-    await reviewAutoSave.flush();
-    await saveActiveReview({ render: false });
+    await reviewPersistence.saveExplicitly({ render: false });
   } catch {
     // Export may continue with the active in-memory review.
   }
@@ -4588,14 +4726,14 @@ globalThis.T9ReviewToolbar.bind($("reviewToolbar"), (command, button) => {
 
 $("saveReview").addEventListener("click", async () => {
   try {
-    await saveActiveReview();
+    await reviewPersistence.saveExplicitly();
   } catch (error) {
     show(error.message, true);
   }
 });
 $("saveReviewBottom").addEventListener("click", async () => {
   try {
-    await saveActiveReview();
+    await reviewPersistence.saveExplicitly();
   } catch (error) {
     show(error.message, true);
   }

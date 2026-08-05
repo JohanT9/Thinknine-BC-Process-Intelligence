@@ -37,6 +37,23 @@ redigering av pilarnas start- och slutpunkter. Delete eller knappen **Ta bort
 markering** raderar den valda markeringen. Ändringarna sparas med Reviewns
 befintliga manuella Spara-kommando. Undo/Redo och autosave kopplas in i RC4.
 
+### RC4 — Undo/Redo och säker persistence
+
+Alla bekräftade annotationsändringar använder nu Review Studios befintliga
+Undo/Redo-historik. Det omfattar tillägg, flytt, storleksändring, piländpunkter,
+stil och borttagning. En komplett pekargest skapar en historikpost och upprepade
+tangentbordsförflyttningar grupperas när de följer direkt på varandra.
+
+Annoteringar autosparas efter en kort fördröjning. Pågående ritning eller drag
+sparas aldrig som delgeometri. Sparningar serialiseras och äldre svar kan inte
+skriva över nyare Review-data. Väntande persistence flushas före **Klar**,
+manuell **Spara** och Word-export.
+
+**Avbryt** i annotationseditorn återställer annoteringarna och deras historik
+till läget när editorn öppnades, utan att skriva över stegändringar som gjorts
+utanför editorn. **Klar** behåller och sparar sessionens ändringar.
+Originalskärmbilden förändras fortfarande aldrig.
+
 ## Struktur
 
 ```text
