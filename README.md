@@ -14,9 +14,24 @@ identifierade dokument, sektioner, block och resurser kan normaliseras och
 valideras utan att indata ändras. Okända framtida egenskaper och välformade
 blocktyper bevaras vid normalisering och omladdning.
 
-Detta är en arkitekturgrund. Review projiceras ännu inte till modellen, och den
-befintliga Word-exporten använder fortfarande sitt oförändrade flöde. Se
+RC1 etablerade arkitekturgrunden; RC2-projektorn nedan producerar nu modellen.
+Den befintliga Word-exporten använder fortfarande sitt oförändrade flöde. Se
 [Semantic Document Model 4.4](docs/SEMANTIC_DOCUMENT_MODEL_4.4.md).
+
+### RC2 — Review-projektion
+
+`review-document-projector` är nu den enda produktionskomponenten som skapar
+semantiska dokument från Review. Den rena projektionen omvandlar metadata, steg,
+kommentarer, skärmbildsreferenser, annoteringsreferenser och revisionshistorik
+till frysta semantiska sektioner, block och generiska bildresurser.
+
+Projektorn genererar stabila ID:n och deterministisk provenance från Reviewns
+egna tidsstämplar. Kvalitetsproblem som saknad titel, metadata, instruktion eller
+skärmbild rapporteras separat som skrivskyddad diagnostik och bäddas inte in i
+dokumentet. Inga bildbytes laddas och Review-data ändras aldrig.
+
+Word-exporten använder ännu inte det semantiska dokumentet. Layout, teman och
+Document Planner tillkommer i senare RC-steg.
 
 ## Screenshot annotations 4.3 RC1
 

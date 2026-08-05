@@ -6,14 +6,16 @@ Den semantiska dokumentmodellen är en fristående gräns för dokumentinnehåll
 
 ```text
 Review (oförändrad)
-  ↓ framtida projektion
+  ↓ Review Document Projector
 Semantic Document Model
   ↓ framtida layoutplan
 Word / framtida PDF-renderare
 ```
 
-RC1 implementerar endast modellgränsen. Den har inga beroenden till Review,
-DOCX, DOM, CSS eller canvas och används ännu inte av exportflödet.
+RC2 lägger till en ren och deterministisk projektor som ensam översätter Review
+till modellen. Projektorn skapar provenance och separat diagnostik men äger
+aldrig Review-objekt eller bilddata. Modell och projektor saknar beroenden till
+DOCX, DOM, CSS och canvas och används ännu inte av exportflödet.
 
 ```text
 Recorder

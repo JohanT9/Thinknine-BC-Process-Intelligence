@@ -172,6 +172,13 @@ const missingAsset = validDocument();
 missingAsset.sections[0].blocks[1].blocks[1].assetId = "missing";
 assert.ok(issueCodes(missingAsset).includes("invalid-asset-reference"));
 
+const invalidAnnotationReference = validDocument();
+invalidAnnotationReference.sections[0].blocks[1].blocks[1]
+  .annotationRefs = [{}];
+assert.ok(issueCodes(invalidAnnotationReference).includes(
+  "invalid-annotation-reference"
+));
+
 const malformedKind = validDocument();
 malformedKind.sections[0].blocks[0].kind = "Invalid kind";
 assert.ok(issueCodes(malformedKind).includes("invalid-block-kind"));

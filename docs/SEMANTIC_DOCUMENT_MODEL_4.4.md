@@ -6,15 +6,15 @@ The semantic document model is the renderer-independent contract for future
 Documentation Excellence work. It describes what a document contains, not how
 Word, PDF or a browser should lay it out.
 
-RC1 does not project Review data, plan pages, apply themes or alter export. The
-existing Word exporter remains the production path.
+RC2 adds the Review projector but does not plan pages, apply themes or alter
+export. The existing Word exporter remains the production path.
 
 ## Data flow and boundaries
 
 ```text
 Review data (existing, unchanged)
-  ↓ future Review-to-document projector
-Semantic document model (RC1)
+  ↓ Review Document Projector (RC2)
+Semantic document model
   ↓ future layout planner
 Renderer input
   ├─ Word renderer
@@ -35,6 +35,9 @@ the single schema-version definition. A document contains:
 - blocks with stable `blockId` and one of the supported semantic kinds;
 - generic assets with stable `assetId`, `kind` and optional `sourceRef`;
 - optional source references: `taskId`, `annotationId` and `screenshotRef`.
+
+Image blocks may carry ordered `annotationRefs`. Each entry identifies an
+annotation and its screenshot without copying or owning annotation data.
 
 Supported RC1 block kinds are heading, paragraph, step, image, table, callout,
 list, revision history, page break and TOC. Nested list items, table structures
@@ -67,14 +70,41 @@ without manual migration. Unknown root, metadata, section, asset and supported
 block properties survive normalize-save-load unchanged. Unknown well-formed
 future blocks are retained verbatim.
 
+## Review projection
+
+`src/document/review-document-projector.js` is the single producer that maps a
+Review to this model. It projects document metadata, active tasks, comments,
+screenshot references, annotation references and Review history. Screenshots
+become generic image assets that contain references only; image bytes are never
+loaded or copied.
+
+Task and screenshot identity produces stable document IDs without randomness or
+array-position identity. Reordering valid tasks therefore changes semantic
+order without changing their step IDs. Legacy tasks without IDs receive the
+same deterministic compatibility IDs used by Review normalization and produce
+a diagnostic.
+
+The projector returns `{ document, diagnostics }`. Both values are recursively
+immutable. Diagnostics remain outside the document and report missing titles,
+metadata, screenshots, empty steps and invalid references without affecting
+rendering or persistence.
+
+## Provenance
+
+Projection adds serialization-safe document provenance with the fixed origin
+`review-document-projector`, projector version, Review-derived generation time
+and an explicit transformation list. It is metadata only: it does not affect
+layout, rendering, Review persistence or Undo/Redo. Unknown provenance fields
+provided through the projection boundary survive normalization and
+serialization.
+
 Future work should extend the block registry and normalization/validation in
-this module, then add a separate Review projector and layout planner. Renderers
+this module, then add a separate layout planner. Renderers
 must consume planned output rather than introduce format-specific properties
 into this semantic model.
 
-## RC1 exclusions
+## RC2 exclusions
 
-- no Review-to-document projection;
 - no theme or layout engine;
 - no Word or PDF integration;
 - no automated document-improvement processors;

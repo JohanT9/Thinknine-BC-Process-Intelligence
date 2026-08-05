@@ -1,5 +1,20 @@
 # Changelog
 
+## 4.4.0 RC2 — Review Projection
+
+- Added the deterministic Review-to-semantic-document projector.
+- Projected Review metadata, active tasks, comments, screenshots, annotation
+  references and revision history into semantic sections and blocks.
+- Added stable source-derived IDs and generic screenshot assets without loading
+  or owning image bytes.
+- Added immutable, serialization-safe provenance with one projector version.
+- Returned immutable quality diagnostics separately from document content.
+- Added compatibility handling for legacy Reviews, missing IDs, malformed
+  annotation references and unknown future Review fields.
+- Added behaviour and data-integrity tests for projection, deterministic output,
+  provenance, references, serialization and future schema preservation.
+- Kept Word export, themes, layout and the future Document Planner unchanged.
+
 ## 4.4.0 RC1 — Semantic Document Model
 
 - Added a renderer-independent semantic document model with one schema version.

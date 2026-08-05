@@ -185,6 +185,22 @@
       issue(issues, "invalid-asset-reference", `${path}.assetId`,
         "Image blocks must reference an existing asset.");
     }
+    if (block.kind === "image" && block.annotationRefs !== undefined) {
+      if (!Array.isArray(block.annotationRefs)) {
+        issue(issues, "invalid-annotation-references", `${path}.annotationRefs`,
+          "Annotation references must be an array.");
+      } else {
+        block.annotationRefs.forEach((reference, index) => {
+          const referencePath = `${path}.annotationRefs[${index}]`;
+          validateSourceRef(reference, referencePath, issues);
+          if (typeof reference?.annotationId !== "string" ||
+              !reference.annotationId.trim()) {
+            issue(issues, "invalid-annotation-reference", referencePath,
+              "Annotation reference requires an annotation ID.");
+          }
+        });
+      }
+    }
     if (block.kind === "heading" &&
         (!Number.isInteger(block.level) || block.level < 1 || block.level > 6)) {
       issue(issues, "invalid-heading-level", `${path}.level`,
