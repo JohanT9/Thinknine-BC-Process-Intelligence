@@ -110,8 +110,8 @@ The generated documentation is the product.
 
 Everything else exists to support producing better documentation.
 
-Review Studio, annotations, themes, planning, quality diagnostics and export
-are all parts of a single documentation workflow.
+Review Workspace, Document Workspace, annotations, themes, planning, quality
+diagnostics and export are all parts of a single documentation workflow.
 
 No subsystem should optimize itself at the expense of documentation quality.
 
@@ -703,9 +703,21 @@ Follow these principles regardless of feature size.
 
 ---
 
-# Review Studio
+# Documentation Workspaces
 
-Review Studio is the primary workspace.
+Review Workspace and Document Workspace are coordinated first-class workspaces.
+
+Both represent the same Semantic Document through the validated Document Plan.
+
+Review Workspace owns editing and review management.
+
+Document Workspace owns read-only inspection and verification.
+
+Document Workspace renderers must never consume Review directly.
+
+## Review Workspace
+
+Review Workspace is the primary editing workspace.
 
 It exists to help consultants transform recorded work into professional
 documentation.

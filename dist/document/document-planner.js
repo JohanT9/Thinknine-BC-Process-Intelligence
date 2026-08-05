@@ -363,7 +363,8 @@
         } : {}),
         ...(block.kind === "image" ? {
           captionIntent: "none",
-          presentationRole: "processEvidence"
+          presentationRole: "processEvidence",
+          annotationRefs: clone(block.annotationRefs || [])
         } : {}),
         ...(block.kind === "revisionHistory" ? {
           columns: [

@@ -1,7 +1,25 @@
-# Thinknine BC Process Intelligence v4.4.0
+# Thinknine BC Process Intelligence v4.5.0 UX1
 
 Ett modulärt Edge-tillägg för att spela in, granska och exportera dokumenterade
 Business Central-processer.
+
+## Document Workspace 4.5 UX1
+
+Documentation Excellence har nu två samordnade förstaklassarbetsytor:
+**Review Workspace** för ändringar och **Document Workspace** för skrivskyddad
+läsning och verifiering. Växlingen sker direkt i samma vy utan sidladdning eller
+ytterligare dialog.
+
+Document Workspace använder exakt samma produktionskedja som Word-exporten:
+Review Projector, Semantic Document, upplöst tema, Document Planner och Document
+Plan. Den renderer-neutrala workspace-modellen läser aldrig Review. Dashboarden
+förbereder samma skärmbildsmedia som Word, inklusive icke-destruktiva
+annoteringar.
+
+Ändringar från redigering, annotering, flytt, merge, split, delete och Undo/Redo
+invaliderar dokumentvyn automatiskt. Stabilt identifierade avsnitt återanvänds
+när innehållet inte förändrats. Se
+[Document Workspace 4.5](docs/DOCUMENT_WORKSPACE_4.5.md).
 
 Documentation Excellence v4.4.0 är produktionsklar. Inspelning, Review Studio,
 icke-destruktiva annoteringar, dokumentkvalitetsanalys, professionell planering

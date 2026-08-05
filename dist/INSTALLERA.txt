@@ -1,4 +1,4 @@
-THINKNINE BC PROCESS INTELLIGENCE 4.4.0 RELEASE CANDIDATE
+THINKNINE BC PROCESS INTELLIGENCE 4.5.0 UX1
 
 FÖRUTSÄTTNINGAR
 
@@ -49,6 +49,8 @@ RC-KONTROLL
 7. Kontrollera toolbarens automatiska knapplägen och statusrad.
 8. Exportera Word och kontrollera text, ordning, annoteringar och presentation.
 9. Navigera popup, dialog, toolbar, annoteringar och steg med endast tangentbord.
+10. Växla mellan Review Workspace och Document Workspace med mus och piltangenter.
+11. Ändra ett steg, ångra ändringen och kontrollera att dokumentvyn synkroniseras.
 
 EXPORTINSTÄLLNINGAR
 

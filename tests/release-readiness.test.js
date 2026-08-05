@@ -8,7 +8,7 @@ const packageJson = JSON.parse(read("package.json"));
 const manifest = JSON.parse(read("src/ui/manifest.json"));
 
 assert.strictEqual(manifest.version, packageJson.version);
-assert.strictEqual(packageJson.version, "4.4.0");
+assert.strictEqual(packageJson.version, "4.5.0");
 
 const comparisonAssets = fs.readdirSync(
   path.join(root, "docs/assets/rc8-comparison")

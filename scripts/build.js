@@ -131,10 +131,12 @@ copyFile(
 for (const file of [
   "dashboard.html",
   "dashboard.js",
+  "document-workspace-view.js",
   "debug.html",
   "debug.js",
   "popup.html",
-  "popup.js"
+  "popup.js",
+  "workspace-controller.js"
 ]) {
   copyFile(
     path.join(src, "ui", file),

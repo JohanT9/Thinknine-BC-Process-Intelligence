@@ -1,5 +1,22 @@
 # Changelog
 
+## 4.5.0 UX1 — Document Workspace Foundation
+
+- Added Review Workspace and Document Workspace as coordinated first-class
+  workspaces with immediate keyboard-accessible switching.
+- Added a deterministic, immutable and renderer-neutral Document Workspace
+  model that consumes only validated Document Plans.
+- Added a read-only DOM adapter for title, metadata, headings, workflow steps,
+  instructions, screenshots and composed annotations.
+- Reused the exact Review projection, theme, planning and prepared-media path
+  used by Word export; Word behaviour remains unchanged.
+- Added revision-based synchronization for edit, annotation, move, merge,
+  split, delete, Undo and Redo changes with stale-render protection.
+- Added stable section reconciliation so unaffected document sections retain
+  their DOM nodes whenever practical.
+- Added behaviour, determinism, immutability, isolation, synchronization,
+  accessibility, theme and incremental-rendering tests.
+
 ## 4.4.0 RC9 — Release Hardening & Production Readiness
 
 - Completed an end-to-end consultant workflow, architecture, UX,

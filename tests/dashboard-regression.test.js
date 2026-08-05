@@ -49,5 +49,12 @@ assert.ok(
   background.includes("T9StorageKeys.sessionDataKeys(id)"),
   "Session deletion must remove all data through the shared key definition."
 );
+assert.ok(
+  dashboard.includes("function createActiveDocumentPipeline()") &&
+    dashboard.includes("function prepareDocumentMedia(pipeline)") &&
+    dashboard.includes("const pipeline = createActiveDocumentPipeline();") &&
+    dashboard.includes("const mediaAssets = await prepareDocumentMedia(pipeline);"),
+  "Document Workspace and Word must share pipeline and prepared-media composition."
+);
 
 console.log("Dashboard regression tests passed.");

@@ -24,6 +24,9 @@ table{width:100%;border-collapse:collapse}th,td{text-align:left;padding:9px;bord
 .review-shell{max-width:1100px;margin:0 auto;background:white;border-radius:10px;box-shadow:0 20px 55px rgba(0,0,0,.3);overflow:clip}
 .review-header{position:sticky;top:0;background:white;border-bottom:1px solid #d8dee5;padding:18px;z-index:2}
 .review-title-row{display:flex;justify-content:space-between;gap:12px;align-items:center}
+.workspace-tabs{display:flex;gap:6px;margin-top:12px;border-bottom:1px solid #d8dee5}
+.workspace-tabs button{margin:0 0 -1px;border-radius:5px 5px 0 0;background:#e5e7eb;color:#374151}
+.workspace-tabs button[aria-selected="true"]{background:white;color:#0f4c81;border:1px solid #d8dee5;border-bottom-color:white}
 .review-toolbar{display:flex;flex-wrap:wrap;gap:10px;margin-top:12px;align-items:center}
 .review-toolbar-group{display:flex;gap:4px;padding-right:10px;border-right:1px solid #d8dee5}
 .review-toolbar-group:last-child{padding-right:0;border-right:0}
@@ -68,6 +71,23 @@ table{width:100%;border-collapse:collapse}th,td{text-align:left;padding:9px;bord
 .review-card.compact .review-actions{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));align-content:start;gap:5px}
 .review-card.compact .review-actions label{margin:0;align-self:center}
 .review-footer{padding:16px;border-top:1px solid #d8dee5;display:flex;justify-content:space-between;background:#f8fafc}
+.document-workspace-panel{background:#e8edf1;padding:22px;min-height:650px}
+.document-workspace-page{max-width:780px;min-height:900px;margin:0 auto;background:white;padding:54px 64px;box-shadow:0 3px 14px rgba(15,23,42,.15)}
+.document-workspace-section{margin-bottom:30px}
+.document-workspace-section.cover{padding-top:50px;padding-bottom:35px}
+.document-workspace-heading{color:#0f4c81;border-bottom:2px solid #38a3d1;padding-bottom:7px}
+.document-workspace-section.cover .document-workspace-heading{font-size:32px;border:0;padding:0;margin-bottom:24px}
+.document-workspace-step-title{color:#0f4c81;background:#eaf2f8;border-left:5px solid #38a3d1;padding:8px 12px}
+.document-workspace-paragraph{line-height:1.5}
+.document-workspace-metadata{display:grid;grid-template-columns:minmax(150px,34%) 1fr;border:1px solid #d5dce3}
+.document-workspace-metadata dt,.document-workspace-metadata dd{margin:0;padding:7px 9px;border-bottom:1px solid #d5dce3}
+.document-workspace-metadata dt{font-weight:700;color:#0f4c81;background:#eaf2f8}
+.document-workspace-image{margin:18px 0;padding:5px;border:1px solid #c8d5df;background:#f7fafc}
+.document-workspace-image img{display:block;width:100%;height:auto}
+.document-workspace-callout{margin:14px 0;padding:8px 12px;border-left:5px solid #2673a8;background:#edf6fb}
+.document-workspace-callout p{margin:0}
+.document-workspace-status{display:block;max-width:780px;margin:0 auto 10px;color:#52606d}
+.review-shell.document-workspace-mode .review-toolbar,.review-shell.document-workspace-mode .review-toolbar-secondary,.review-shell.document-workspace-mode .review-progress,.review-shell.document-workspace-mode #reviewStatus{display:none}
 .annotation-editor{padding:18px}
 .annotation-editor-sticky{position:sticky;top:var(--review-header-height,0px);z-index:3;background:white;margin:-18px -18px 0;padding:18px 18px 1px}
 .annotation-editor-header{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:12px}
@@ -213,10 +233,18 @@ table{width:100%;border-collapse:collapse}th,td{text-align:left;padding:9px;bord
     <header class="review-header">
       <div class="review-title-row">
         <div>
-          <h2 id="reviewTitle">Review Studio</h2>
+          <h2 id="reviewTitle">Documentation Excellence</h2>
           <div id="reviewSummary" class="muted"></div>
         </div>
-        <button id="closeReview" class="debug" aria-label="Stäng Review Studio">Stäng</button>
+        <button id="closeReview" class="debug"
+          aria-label="Stäng Documentation Excellence">Stäng</button>
+      </div>
+      <div id="workspaceTabs" class="workspace-tabs" role="tablist"
+        aria-label="Dokumentationsarbetsyta">
+        <button id="reviewWorkspaceTab" role="tab" aria-selected="true"
+          aria-controls="reviewWorkspacePanel" tabindex="0">Review Workspace</button>
+        <button id="documentWorkspaceTab" role="tab" aria-selected="false"
+          aria-controls="documentWorkspacePanel" tabindex="-1">Document Workspace</button>
       </div>
       <div id="reviewToolbar" class="review-toolbar" role="toolbar" aria-label="Redigeringskommandon">
         <div class="review-toolbar-group" role="group" aria-label="Historik">
@@ -254,15 +282,17 @@ table{width:100%;border-collapse:collapse}th,td{text-align:left;padding:9px;bord
         </dl>
       </div>
     </header>
-    <main
-      id="reviewList"
-      class="review-list"
-      role="grid"
-      aria-multiselectable="true"
-      aria-labelledby="reviewTitle"
-      aria-describedby="reviewStatus"
-    ></main>
-    <section id="annotationEditor" class="annotation-editor" aria-labelledby="annotationTitle" hidden>
+    <section id="reviewWorkspacePanel" role="tabpanel"
+      aria-labelledby="reviewWorkspaceTab">
+      <main
+        id="reviewList"
+        class="review-list"
+        role="grid"
+        aria-multiselectable="true"
+        aria-labelledby="reviewTitle"
+        aria-describedby="reviewStatus"
+      ></main>
+      <section id="annotationEditor" class="annotation-editor" aria-labelledby="annotationTitle" hidden>
       <div class="annotation-editor-sticky">
         <div class="annotation-editor-header">
           <div>
@@ -298,11 +328,19 @@ table{width:100%;border-collapse:collapse}th,td{text-align:left;padding:9px;bord
         </div>
       </div>
       <div id="annotationStatus" class="sr-only" role="status" aria-live="polite" aria-atomic="true"></div>
+      </section>
+      <footer id="reviewFooter" class="review-footer">
+        <span id="reviewFooterText" role="status" aria-live="polite"></span>
+        <button id="saveReviewBottom" class="primary">Spara</button>
+      </footer>
     </section>
-    <footer id="reviewFooter" class="review-footer">
-      <span id="reviewFooterText" role="status" aria-live="polite"></span>
-      <button id="saveReviewBottom" class="primary">Spara</button>
-    </footer>
+    <main id="documentWorkspacePanel" class="document-workspace-panel"
+      role="tabpanel" aria-labelledby="documentWorkspaceTab" tabindex="0" hidden>
+      <span id="documentWorkspaceStatus" class="document-workspace-status"
+        role="status" aria-live="polite" aria-atomic="true"></span>
+      <article id="documentWorkspace" class="document-workspace-page"
+        aria-label="Dokument"></article>
+    </main>
   </section>
 </div>
 
@@ -327,6 +365,7 @@ table{width:100%;border-collapse:collapse}th,td{text-align:left;padding:9px;bord
 <script src="document/document-plan.js"></script>
 <script src="document/document-planner.js"></script>
 <script src="document/document-plan-validation.js"></script>
+<script src="document/document-workspace.js"></script>
 <script src="exporters/word-export-pipeline.js"></script>
 <script src="exporters/word-exporter-docx.bundle.js"></script>
 <script src="review/review-move.js"></script>
@@ -345,6 +384,8 @@ table{width:100%;border-collapse:collapse}th,td{text-align:left;padding:9px;bord
 <script src="review/review-annotation-editor.js"></script>
 <script src="review/review-studio.js"></script>
 <script src="review/review-selection.js"></script>
+<script src="workspace-controller.js"></script>
+<script src="document-workspace-view.js"></script>
 <script src="dashboard.js"></script>
 </body>
 </html>

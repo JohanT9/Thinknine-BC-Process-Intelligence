@@ -183,5 +183,20 @@ assert.ok(
     popupJs.includes("if (element.textContent !== text)"),
   "Popup status must be live without repeated unchanged DOM announcements."
 );
+assert.ok(
+  html.includes('id="workspaceTabs" class="workspace-tabs" role="tablist"') &&
+    html.includes('id="reviewWorkspaceTab" role="tab"') &&
+    html.includes('id="documentWorkspaceTab" role="tab"') &&
+    html.includes('id="reviewWorkspacePanel" role="tabpanel"') &&
+    html.includes('id="documentWorkspacePanel" class="document-workspace-panel"') &&
+    html.includes('role="tabpanel" aria-labelledby="documentWorkspaceTab"'),
+  "Review and Document must be accessible first-class workspaces."
+);
+assert.ok(
+  html.includes('<script src="document/document-workspace.js"></script>') &&
+    html.includes('<script src="workspace-controller.js"></script>') &&
+    html.includes('<script src="document-workspace-view.js"></script>'),
+  "Dashboard must load the isolated Document Workspace renderer and controller."
+);
 
 console.log("UI ID regression tests passed.");

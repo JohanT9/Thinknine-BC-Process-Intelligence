@@ -80,6 +80,29 @@ Planner skapar inga Word-objekt, projektorn planerar inte presentation och
 kvalitetslagret ändrar varken semantik eller plan. Den äldre exportören är
 fortsatt karantäniserad för kompatibilitet och laddas inte av dashboarden.
 
+## Document Workspace 4.5
+
+v4.5 introducerar två samordnade arbetsytor över samma dokumentkälla:
+
+```text
+Review Workspace (redigering)
+  ↓ Review
+Review Projector → Semantic Document + Theme → Document Planner → Document Plan
+                                                        ↙             ↘
+                                      Document Workspace Renderer   Word Adapter
+```
+
+`document-workspace.js` är en ren, deterministisk planrenderer. Den skapar en
+immutable och renderer-neutral workspace-modell och känner inte till Review,
+DOM eller Word. `document-workspace-view.js` är den tunna DOM-adaptern som
+materialiserar modellen. `workspace-controller.js` äger endast aktiv arbetsyta
+och synkroniseringsrevision.
+
+Dashboarden är fortsatt composition root. Den kör samma pipeline och samma
+annotationskomposition för Document Workspace och Word, men äger ingen
+dokumentstruktur. Stabilt identifierade plansektioner gör att DOM-adaptern kan
+ersätta ändrade avsnitt och återanvända oförändrade avsnitt.
+
 ```text
 Recorder
   ↓
