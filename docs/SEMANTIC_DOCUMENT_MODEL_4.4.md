@@ -6,8 +6,9 @@ The semantic document model is the renderer-independent contract for future
 Documentation Excellence work. It describes what a document contains, not how
 Word, PDF or a browser should lay it out.
 
-RC2 adds the Review projector but does not plan pages, apply themes or alter
-export. The existing Word exporter remains the production path.
+RC2 adds the Review projector and RC3 adds an independent theme system. Neither
+plans pages nor alters export. The existing Word exporter remains the production
+path.
 
 ## Data flow and boundaries
 
@@ -20,6 +21,9 @@ Renderer input
   ├─ Word renderer
   └─ future PDF renderer
 ```
+
+The future planner will consume the semantic document together with one
+resolved theme. Theme data is never stored in or inferred from semantic blocks.
 
 The model must not contain renderer instructions such as fonts, margins, page
 sizes, pagination, spacing or DOCX units. Source references point back to
@@ -98,14 +102,42 @@ layout, rendering, Review persistence or Undo/Redo. Unknown provenance fields
 provided through the projection boundary survive normalization and
 serialization.
 
+## Document Theme System
+
+The theme system is split by responsibility:
+
+- `document-theme.js` owns schema versioning, normalization, immutable data,
+  deep merge, serialization and token resolution;
+- `document-theme-validation.js` reports malformed or incomplete themes without
+  mutation;
+- `document-theme-registry.js` owns immutable registration, inheritance,
+  explicit overrides and built-in themes.
+
+Themes define appearance values for colors, typography, spacing, pages,
+branding and semantic components. Page and spacing tokens are values only; no
+module places content, calculates pages or interprets renderer units.
+
+Inheritance is resolved from the oldest parent to the selected child and then
+explicit overrides. Objects merge recursively, arrays and scalar values replace
+their inherited value, and token references such as `{colors.primary}` resolve
+against the fully inherited theme. Missing parents, duplicate IDs, inheritance
+cycles and token-reference cycles fail predictably.
+
+Capabilities such as `supportsCover`, `supportsFooter` and `supportsCallouts`
+are descriptive metadata. They never gate document features. Unknown fields,
+future versions and future capabilities remain serializable and immutable.
+
+The built-in registry contains Base, Thinknine, Minimal and Corporate themes.
+There is no UI selection and no renderer consumes them in RC3.
+
 Future work should extend the block registry and normalization/validation in
 this module, then add a separate layout planner. Renderers
 must consume planned output rather than introduce format-specific properties
 into this semantic model.
 
-## RC2 exclusions
+## RC3 exclusions
 
-- no theme or layout engine;
+- no layout engine or theme selection UI;
 - no Word or PDF integration;
 - no automated document-improvement processors;
-- no branding, templates or export behaviour changes.
+- no branding UI, branding asset loading, templates or export behaviour changes.

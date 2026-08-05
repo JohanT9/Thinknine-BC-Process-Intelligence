@@ -8,6 +8,7 @@ Den semantiska dokumentmodellen är en fristående gräns för dokumentinnehåll
 Review (oförändrad)
   ↓ Review Document Projector
 Semantic Document Model
+  + Document Theme System
   ↓ framtida layoutplan
 Word / framtida PDF-renderare
 ```
@@ -16,6 +17,12 @@ RC2 lägger till en ren och deterministisk projektor som ensam översätter Revi
 till modellen. Projektorn skapar provenance och separat diagnostik men äger
 aldrig Review-objekt eller bilddata. Modell och projektor saknar beroenden till
 DOCX, DOM, CSS och canvas och används ännu inte av exportflödet.
+
+RC3 introducerar en parallell, innehållsoberoende källa för dokumentutseende.
+Temasystemet definierar endast värden och tokenrelationer. Det inspekterar inte
+Review eller Semantic Document och beräknar inte placering, sidbrytning eller
+renderarformat. Den framtida Document Planner blir första konsumenten av både
+semantisk modell och ett upplöst tema.
 
 ```text
 Recorder

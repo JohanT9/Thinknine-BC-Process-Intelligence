@@ -1,5 +1,22 @@
 # Changelog
 
+## 4.4.0 RC3 — Document Theme System
+
+- Added an immutable, renderer-independent and versioned document theme model.
+- Added tokens for colors, typography, spacing, page values, branding and
+  semantic components.
+- Added deterministic token references, deep inheritance and explicit overrides.
+- Added an immutable theme registry with Base, Thinknine, Minimal and Corporate
+  built-in themes.
+- Added descriptive theme capabilities without feature-gating behaviour.
+- Added validation for required and invalid tokens, duplicate IDs, missing or
+  cyclic inheritance, duplicate capabilities and invalid token references.
+- Preserved unknown fields, future versions and future capabilities through
+  normalization and serialization.
+- Added behaviour and integrity tests for themes, registry, inheritance,
+  resolution, validation, immutability and compatibility.
+- Kept Review projection, semantic documents, layout and Word export unchanged.
+
 ## 4.4.0 RC2 — Review Projection
 
 - Added the deterministic Review-to-semantic-document projector.

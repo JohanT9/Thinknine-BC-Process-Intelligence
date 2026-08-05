@@ -33,6 +33,22 @@ dokumentet. Inga bildbytes laddas och Review-data ändras aldrig.
 Word-exporten använder ännu inte det semantiska dokumentet. Layout, teman och
 Document Planner tillkommer i senare RC-steg.
 
+### RC3 — Document Theme System
+
+Ett fristående, versionshanterat temasystem definierar nu värden för färger,
+typografi, mellanrum, sida, branding och semantiska komponenter. Teman är
+rekursivt immutable, serialiserbara och oberoende av Review, dokumentinnehåll,
+layoutmotorer och renderare.
+
+Temaregistret innehåller **Thinknine**, **Minimal** och **Corporate** samt ett
+komplett bastema. Saknade värden ärvs i kedjan bastema → valt tema → explicita
+overrides. Tokenreferenser löses först efter arv, så exempelvis en ändrad
+primärfärg används konsekvent av rubriker och komponenter.
+
+Kapabiliteter beskriver vad ett tema har värden för men aktiverar eller stänger
+aldrig av funktioner. Det finns ännu inget val av tema i UI, ingen layout och
+ingen koppling till den befintliga Word-exporten.
+
 ## Screenshot annotations 4.3 RC1
 
 Review-modellen har en ny, versionshanterad grund för icke-destruktiva
