@@ -126,6 +126,21 @@ composition root. Kontextbyte ändrar endast fokus, markering och position i
 redan renderad DOM och passerar aldrig Review Projector, Semantic Document,
 Theme, Planner eller Word Adapter.
 
+UX4 lägger en skrivskyddad advisory-projektion bredvid renderingen:
+
+```text
+Semantic Document + Document Plan + Quality Diagnostics + Workspace Context
+                                ↓
+                   Documentation Intelligence
+                                ↓
+        Qualitative Health + immutable grouped Guidance
+```
+
+`documentation-intelligence.js` återanvänder diagnostics och översätter dem till
+positivt formulerad vägledning. Modulen läser aldrig Review, muterar inga indata,
+blockerar aldrig export och anropar ingen renderer. Dashboarden visar modellen
+med stabil ID-reconciliation och använder Workspace Context för navigation.
+
 ```text
 Recorder
   ↓

@@ -78,6 +78,10 @@ table{width:100%;border-collapse:collapse}th,td{text-align:left;padding:9px;bord
 .document-toolbar button[aria-pressed="true"]{background:#0f6cbd;color:white}.document-page-indicator{min-width:92px;text-align:center;font-variant-numeric:tabular-nums}
 .document-toolbar.compact{gap:4px;padding:8px}.document-toolbar.compact button{padding-left:9px;padding-right:9px}.document-toolbar.compact .document-toolbar-group{gap:2px;padding-right:4px}
 .document-workspace-viewport{padding:22px;min-height:0;flex:1;overflow:auto}
+.document-workspace-body{display:flex;min-height:0;flex:1}.documentation-guidance{width:300px;flex:0 0 300px;background:#f8fafc;border-left:1px solid #cbd5df;padding:16px;overflow:auto}
+.documentation-guidance h3{margin:0 0 4px}.documentation-guidance-filter{width:100%;margin:10px 0 14px}.document-health{padding:12px;background:white;border:1px solid #d8dee5;border-radius:7px}
+.document-health strong{display:block;color:#0f4c81}.document-health dl{margin:10px 0 0}.document-health dl div{display:flex;justify-content:space-between;gap:8px;padding:5px 0;border-top:1px solid #edf1f5}.document-health dt{color:#52606d}.document-health dd{margin:0;font-weight:600}
+.guidance-group h4{margin:18px 0 7px}.guidance-list{list-style:none;margin:0;padding:0}.guidance-item{width:100%;margin:0 0 7px;text-align:left;background:white;border:1px solid #d8dee5;padding:10px;color:#1f2933}.guidance-item:hover,.guidance-item:focus-visible{border-color:#0f6cbd}.guidance-status{display:block;font-size:12px;color:#52606d;margin-bottom:3px}.guidance-action{display:block;font-weight:400;margin-top:5px;color:#334e68}.guidance-empty{color:#52606d}
 .document-workspace-page{width:780px;min-height:900px;margin:0 auto;background:white;padding:54px 64px;box-sizing:border-box;transform-origin:top center;zoom:var(--document-zoom)}
 .document-workspace-panel.adaptive-reading{background:#dfe5ea}
 .document-workspace-panel.adaptive-reading .document-workspace-page{box-shadow:0 8px 28px rgba(15,23,42,.18)}
@@ -127,6 +131,7 @@ table{width:100%;border-collapse:collapse}th,td{text-align:left;padding:9px;bord
 .annotation-properties-actions{grid-column:1/-1}
 .review-shell.annotation-mode .review-toolbar,.review-shell.annotation-mode .review-toolbar-secondary,.review-shell.annotation-mode .review-progress,.review-shell.annotation-mode #reviewStatus{display:none}
 @media(max-width:800px){.review-card,.review-card.compact{grid-template-columns:44px 1fr}.review-actions{grid-column:1/-1;flex-direction:row;flex-wrap:wrap}}
+@media(max-width:900px){.documentation-guidance{width:250px;flex-basis:250px}}
 @media(prefers-reduced-motion:reduce){.document-workspace-panel *{scroll-behavior:auto!important;transition:none!important}}
 @media(forced-colors:active){.document-workspace-page{border:1px solid CanvasText}.document-toolbar{border-color:CanvasText}}
 
@@ -374,12 +379,36 @@ table{width:100%;border-collapse:collapse}th,td{text-align:left;padding:9px;bord
         </div>
         <button id="openDocumentViewSettings" class="debug" aria-haspopup="dialog">Vyinställningar</button>
       </div>
-      <div id="documentWorkspaceViewport" class="document-workspace-viewport">
-        <p id="documentContextHelp" class="sr-only">Tryck Enter eller blanksteg för att öppna motsvarande plats i Review Workspace.</p>
-        <span id="documentWorkspaceStatus" class="document-workspace-status"
-          role="status" aria-live="polite" aria-atomic="true"></span>
-        <article id="documentWorkspace" class="document-workspace-page"
-          aria-label="Dokument"></article>
+      <div class="document-workspace-body">
+        <div id="documentWorkspaceViewport" class="document-workspace-viewport">
+          <p id="documentContextHelp" class="sr-only">Tryck Enter eller blanksteg för att öppna motsvarande plats i Review Workspace.</p>
+          <span id="documentWorkspaceStatus" class="document-workspace-status"
+            role="status" aria-live="polite" aria-atomic="true"></span>
+          <article id="documentWorkspace" class="document-workspace-page"
+            aria-label="Dokument"></article>
+        </div>
+        <aside id="documentationGuidance" class="documentation-guidance"
+          aria-labelledby="documentationGuidanceTitle">
+          <h3 id="documentationGuidanceTitle">Dokumentationsvägledning</h3>
+          <p class="muted">Förslag som hjälper dig vidare utan att ändra dokumentet.</p>
+          <label for="documentationGuidanceFilter">Visa</label>
+          <select id="documentationGuidanceFilter" class="documentation-guidance-filter">
+            <option value="all">All vägledning</option>
+            <option value="attention">Behöver uppmärksamhet</option>
+            <option value="recommendation">Rekommendationer</option>
+            <option value="information">Förslag</option>
+            <option value="Workflow">Arbetsflöde</option>
+            <option value="Screenshots">Skärmbilder</option>
+            <option value="Accessibility">Tillgänglighet</option>
+            <option value="Metadata">Metadata</option>
+            <option value="Revision History">Revisionshistorik</option>
+            <option value="Documentation">Dokumentation</option>
+          </select>
+          <section id="documentHealth" class="document-health" aria-labelledby="documentHealthTitle"></section>
+          <div id="documentationGuidanceGroups"></div>
+          <div id="documentationGuidanceStatus" class="sr-only" role="status"
+            aria-live="polite" aria-atomic="true"></div>
+        </aside>
       </div>
     </main>
   </section>
@@ -426,6 +455,7 @@ table{width:100%;border-collapse:collapse}th,td{text-align:left;padding:9px;bord
 <script src="document/document-planner.js"></script>
 <script src="document/document-plan-validation.js"></script>
 <script src="document/document-workspace.js"></script>
+<script src="document/documentation-intelligence.js"></script>
 <script src="exporters/word-export-pipeline.js"></script>
 <script src="exporters/word-exporter-docx.bundle.js"></script>
 <script src="review/review-move.js"></script>

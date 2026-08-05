@@ -1,5 +1,20 @@
 # Changelog
 
+## 4.5.0 UX4 — Documentation Intelligence
+
+- Added a non-modal Documentation Guidance panel with qualitative Document
+  Health, grouped guidance and severity/group filtering.
+- Reused immutable Quality Diagnostics from the active document pipeline;
+  guidance performs no duplicate validation.
+- Added positive advisory wording for recommendations, suggestions, information
+  and areas that need attention without numeric quality scoring.
+- Connected guidance navigation through Workspace Context to matching document
+  and Review locations without editing content.
+- Added stable-ID reconciliation so unchanged guidance DOM and focus are reused.
+- Added empty-, large-document, deduplication, filtering, immutability,
+  determinism, accessibility and renderer-isolation tests.
+- Kept export non-blocking and left Word output unchanged.
+
 ## 4.5.0 UX3 — Connected Workspaces
 
 - Added immutable Workspace Context as the single source of truth for shared

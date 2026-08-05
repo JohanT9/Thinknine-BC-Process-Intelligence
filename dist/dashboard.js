@@ -3496,6 +3496,94 @@ let documentScrollFrame = 0;
 let workspaceContext = globalThis.T9WorkspaceContext.create();
 let workspaceContextBinding = null;
 let workspaceHighlightTimer = 0;
+let documentationIntelligenceModel = null;
+
+function healthStatusLabel(status) {
+  return {
+    "Ready for Review": "Redo för granskning",
+    "Needs Attention": "Behöver uppmärksamhet",
+    Complete: "Komplett",
+    Good: "Bra",
+    "Good with Suggestions": "Bra med förslag"
+  }[status] || status;
+}
+
+function renderDocumentationGuidance() {
+  if (!documentationIntelligenceModel) {
+    $("documentHealth").innerHTML =
+      '<h4 id="documentHealthTitle">Dokumenthälsa</h4><p>Förbereder vägledning...</p>';
+    $("documentationGuidanceGroups").innerHTML = "";
+    return;
+  }
+  const health = documentationIntelligenceModel.health;
+  $("documentHealth").innerHTML = `
+    <h4 id="documentHealthTitle">Dokumenthälsa</h4>
+    <strong>${escapeHtml(healthStatusLabel(health.overall))}</strong>
+    <span>${escapeHtml(health.suggestionLabel)}</span>
+    <dl>${health.categories.map(category => `<div>
+      <dt>${escapeHtml(category.name)}</dt>
+      <dd>${escapeHtml(healthStatusLabel(category.status))}</dd>
+    </div>`).join("")}</dl>`;
+  const visible = globalThis.T9DocumentationIntelligence.filter(
+    documentationIntelligenceModel,
+    $("documentationGuidanceFilter").value
+  );
+  $("documentationGuidanceStatus").textContent =
+    `Vägledningen är uppdaterad. ${visible.length} förslag visas.`;
+  const groups = globalThis.T9DocumentationIntelligence.GROUPS
+    .map(name => ({ name, items: visible.filter(item => item.group === name) }))
+    .filter(group => group.items.length);
+  const container = $("documentationGuidanceGroups");
+  if (!groups.length) {
+    container.innerHTML = '<p class="guidance-empty">Inga förslag i det här filtret. Dokumentet är redo för fortsatt granskning.</p>';
+    return;
+  }
+  const existingGroups = new Map([...container.querySelectorAll(
+    "[data-guidance-group]"
+  )].map(element => [element.dataset.guidanceGroup, element]));
+  const existingItems = new Map([...container.querySelectorAll(
+    "[data-guidance-id]"
+  )].map(element => [element.dataset.guidanceId, element]));
+  container.querySelector(".guidance-empty")?.remove();
+  for (const group of groups) {
+    let section = existingGroups.get(group.name);
+    if (!section) {
+      section = document.createElement("section");
+      section.className = "guidance-group";
+      section.dataset.guidanceGroup = group.name;
+      const heading = document.createElement("h4");
+      heading.textContent = group.name;
+      section.append(heading, document.createElement("ul"));
+      section.lastElementChild.className = "guidance-list";
+    }
+    const list = section.querySelector(".guidance-list");
+    for (const item of group.items) {
+      let button = existingItems.get(item.guidanceId);
+      const fingerprint = JSON.stringify(item);
+      if (!button) {
+        const listItem = document.createElement("li");
+        button = document.createElement("button");
+        button.className = "guidance-item";
+        button.dataset.guidanceId = item.guidanceId;
+        listItem.appendChild(button);
+      }
+      if (button.dataset.guidanceFingerprint !== fingerprint) {
+        button.innerHTML = `
+          <span class="guidance-status">${escapeHtml(item.status)}</span>
+          <strong>${escapeHtml(item.title)}</strong>
+          <span class="guidance-action">${escapeHtml(item.description)}</span>
+          <span class="guidance-action">${escapeHtml(item.recommendedAction)}</span>`;
+        button.dataset.guidanceFingerprint = fingerprint;
+      }
+      list.appendChild(button.parentElement);
+      existingItems.delete(item.guidanceId);
+    }
+    container.appendChild(section);
+    existingGroups.delete(group.name);
+  }
+  existingItems.forEach(button => button.parentElement.remove());
+  existingGroups.forEach(section => section.remove());
+}
 
 function reviewScreenshotsByTask() {
   return Object.fromEntries((activeReview?.tasks || []).map(task => [
@@ -3566,7 +3654,7 @@ function revealReviewContext(options = {}) {
   applyReviewSelection(Boolean(options.focus), false);
   const card = [...$("reviewList").querySelectorAll("[data-review-task-id]")]
     .find(element => element.dataset.reviewTaskId === taskId);
-  card?.scrollIntoView({ block: "center" });
+  if (options.scroll !== false) card?.scrollIntoView({ block: "center" });
   if (options.focus && workspaceContext.selectedScreenshotId) {
     const task = (activeReview?.tasks || []).find(item => item.taskId === taskId);
     const imageIndex = reviewImages(task || {}).findIndex(
@@ -3751,6 +3839,13 @@ async function synchronizeDocumentWorkspace() {
         const mediaAssets = await prepareDocumentMedia(pipeline);
         if (requestedRevision !== workspaceState.revision) continue;
         const model = globalThis.T9DocumentWorkspace.render(pipeline.plan);
+        documentationIntelligenceModel = globalThis.T9DocumentationIntelligence
+          .create({
+            document: pipeline.semanticDocument,
+            plan: pipeline.plan,
+            qualityDiagnostics: pipeline.qualityDiagnostics,
+            workspaceContext
+          });
         workspaceContextBinding = globalThis.T9WorkspaceContext.bind(model, {
           taskIds: globalThis.T9Review.activeTasks(activeReview)
             .map(task => task.taskId),
@@ -3774,6 +3869,7 @@ async function synchronizeDocumentWorkspace() {
         $("documentWorkspaceStatus").textContent =
           `Dokumentet är synkroniserat. ${result.sectionCount} avsnitt.`;
         applyDocumentView({ persist: false });
+        renderDocumentationGuidance();
         revealDocumentContext();
       } catch (error) {
         $("documentWorkspaceStatus").textContent =
@@ -4729,6 +4825,7 @@ async function openReview(session) {
   activeReviewEdit = null;
   workspaceContext = globalThis.T9WorkspaceContext.create();
   workspaceContextBinding = null;
+  documentationIntelligenceModel = null;
   workspaceState = globalThis.T9WorkspaceController.create();
   documentWorkspaceSync = null;
   documentViewState = globalThis.T9DocumentWorkspaceExperience.update(
@@ -4792,6 +4889,8 @@ async function closeReview() {
   workspaceHighlightTimer = 0;
   workspaceContext = globalThis.T9WorkspaceContext.create();
   workspaceContextBinding = null;
+  documentationIntelligenceModel = null;
+  renderDocumentationGuidance();
   globalThis.T9DocumentWorkspaceView.clear($("documentWorkspace"));
   $("documentWorkspaceStatus").textContent = "";
   applyWorkspaceState();
@@ -4987,6 +5086,24 @@ $("documentWorkspace").addEventListener("keydown", event => {
   if (!item) return;
   event.preventDefault();
   activateDocumentContext(item);
+});
+$("documentationGuidanceFilter").addEventListener("change", () => {
+  renderDocumentationGuidance();
+  $("documentationGuidanceStatus").textContent =
+    "Vägledningen har filtrerats.";
+});
+$("documentationGuidanceGroups").addEventListener("click", event => {
+  const button = event.target.closest?.("[data-guidance-id]");
+  if (!button || !documentationIntelligenceModel) return;
+  const item = documentationIntelligenceModel.items.find(
+    value => value.guidanceId === button.dataset.guidanceId
+  );
+  if (!item) return;
+  publishWorkspaceContext(item.context, "guidance-navigation", "guidance");
+  revealReviewContext({ focus: false, scroll: false });
+  revealDocumentContext({ focus: true });
+  $("documentationGuidanceStatus").textContent =
+    `Visar dokumentplatsen för ${item.title}.`;
 });
 $("documentWorkspacePanel").addEventListener("keydown", event => {
   if (event.target.closest("button,select,dialog")) return;

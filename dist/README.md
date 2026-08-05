@@ -1,7 +1,19 @@
-# Thinknine BC Process Intelligence v4.5.0 UX3
+# Thinknine BC Process Intelligence v4.5.0 UX4
 
 Ett modulärt Edge-tillägg för att spela in, granska och exportera dokumenterade
 Business Central-processer.
+
+## Documentation Intelligence 4.5 UX4
+
+Document Workspace innehåller nu en lugn vägledningspanel med kvalitativ
+dokumenthälsa, grupperade förbättringsförslag och filter. Vägledningen bygger på
+befintliga Semantic Document-, Document Plan- och Quality Diagnostics-resultat.
+Den är rådgivande, blockerar aldrig export och ändrar aldrig dokumentet.
+
+Förslag använder Workspace Context för att visa rätt dokumentposition och
+förbereda motsvarande Review-steg. Document Health använder medvetet inga poäng
+eller procentsatser. Se
+[Documentation Intelligence 4.5](docs/DOCUMENTATION_INTELLIGENCE_4.5.md).
 
 ## Document Workspace 4.5 UX3
 

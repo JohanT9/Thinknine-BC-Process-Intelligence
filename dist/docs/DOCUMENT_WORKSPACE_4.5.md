@@ -113,3 +113,20 @@ matching Review card. Enter and Space use the same path as pointer activation.
 Synchronization reuses existing DOM and updates only selection, visibility,
 scrolling, focus and a temporary highlight. Smooth movement is disabled when
 reduced motion is requested, and status messages announce synchronization.
+
+## Documentation Intelligence (UX4)
+
+Document Workspace includes a dedicated, non-modal Guidance panel. It presents
+qualitative Document Health followed by grouped guidance for Documentation,
+Workflow, Screenshots, Accessibility, Metadata, Revision History and General.
+Filters can focus on attention, recommendations, suggestions or one subject.
+
+Guidance is projected from the active pipeline's existing Quality Diagnostics.
+No manual refresh or second validation pass is used. When Review changes, the
+normal workspace invalidation produces the latest diagnostics on the next
+Document perspective; guidance then reconciles stable IDs and updates only
+changed items.
+
+Activating guidance publishes its location to Workspace Context, reveals and
+highlights the corresponding document content and prepares the matching Review
+selection. It never performs the recommended action and never edits data.

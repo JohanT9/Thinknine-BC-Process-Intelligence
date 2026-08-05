@@ -30,6 +30,7 @@
     const byStepId = {};
     const byScreenshotId = {};
     const bySectionId = {};
+    const byAnchor = {};
     let taskIndex = -1;
     let screenshotIndex = 0;
     let currentStepId = null;
@@ -37,6 +38,8 @@
       currentStepId = null;
       screenshotIndex = 0;
       bySectionId[section.sourceSectionId] = section.workspaceSectionId;
+      byAnchor[section.sourceSectionId] = section.workspaceSectionId;
+      byAnchor[section.workspaceSectionId] = section.workspaceSectionId;
       const firstSectionStepId = (section.items || []).some(
         item => item.kind === "stepTitle"
       ) ? taskIds[taskIndex + 1] || null : null;
@@ -62,6 +65,12 @@
           scrollAnchor: item.workspaceItemId
         });
         byItemId[item.workspaceItemId] = itemContext;
+        byAnchor[item.workspaceItemId] = item.workspaceItemId;
+        if (item.sourceComponentId) {
+          byAnchor[item.sourceComponentId] = item.workspaceItemId;
+          const blockId = item.sourceComponentId.replace(/^component:block:/, "");
+          byAnchor[blockId] = item.workspaceItemId;
+        }
         if (screenshotId) byScreenshotId[screenshotId] = item.workspaceItemId;
       }
     }
@@ -69,13 +78,15 @@
       byItemId: Object.freeze(byItemId),
       byStepId: Object.freeze(byStepId),
       byScreenshotId: Object.freeze(byScreenshotId),
-      bySectionId: Object.freeze(bySectionId)
+      bySectionId: Object.freeze(bySectionId),
+      byAnchor: Object.freeze(byAnchor)
     });
   }
 
   function target(binding, context) {
     const itemId = binding?.byScreenshotId?.[context.selectedScreenshotId] ||
-      binding?.byStepId?.[context.selectedStepId] || context.scrollAnchor;
+      binding?.byStepId?.[context.selectedStepId] ||
+      binding?.byAnchor?.[context.scrollAnchor] || context.scrollAnchor;
     return Object.freeze({
       itemId: itemId || null,
       sectionId: context.selectedSectionId

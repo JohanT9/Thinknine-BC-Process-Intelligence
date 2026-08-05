@@ -23,6 +23,14 @@ assert.ok(
     !dashboard.includes("T9DocumentWorkspaceView.selectReview"),
   "Both workspaces must coordinate only through Workspace Context."
 );
+assert.ok(
+  dashboard.includes("pipeline.qualityDiagnostics") &&
+    dashboard.includes("T9DocumentationIntelligence") &&
+    dashboard.includes("function renderDocumentationGuidance()") &&
+    dashboard.includes("guidanceFingerprint") &&
+    !dashboard.includes("qualityDiagnostics.findings.push"),
+  "Guidance must reuse immutable pipeline diagnostics without editing them."
+);
 
 assert.ok(
   dashboard.includes("await loadSettings();"),

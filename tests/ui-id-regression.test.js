@@ -220,5 +220,13 @@ assert.ok(
     js.includes('["Enter", " "]'),
   "Document-to-Review navigation must be explained and keyboard accessible."
 );
+assert.ok(
+  html.includes('<script src="document/documentation-intelligence.js"></script>') &&
+    html.includes('id="documentationGuidance"') &&
+    html.includes('aria-labelledby="documentationGuidanceTitle"') &&
+    html.includes('id="documentationGuidanceStatus"') &&
+    html.includes('aria-live="polite"'),
+  "Documentation Guidance must be an accessible, non-modal document panel."
+);
 
 console.log("UI ID regression tests passed.");

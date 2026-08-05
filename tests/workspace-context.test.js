@@ -26,7 +26,8 @@ const model = {
     sourceSectionId: "workflow",
     items: [
       { workspaceItemId: "title-1", kind: "stepTitle" },
-      { workspaceItemId: "text-1", kind: "paragraph" },
+      { workspaceItemId: "text-1", kind: "paragraph",
+        sourceComponentId: "component:block:instruction-1" },
       { workspaceItemId: "image-1", kind: "image" },
       { workspaceItemId: "callout-1", kind: "callout" },
       { workspaceItemId: "title-2", kind: "stepTitle" },
@@ -47,6 +48,7 @@ const binding = context.bind(model, {
 });
 assert.ok(Object.isFrozen(binding));
 assert.strictEqual(binding.byItemId["text-1"].selectedStepId, "step-1");
+assert.strictEqual(binding.byAnchor["instruction-1"], "text-1");
 assert.strictEqual(binding.byItemId["image-1"].selectedScreenshotId, "one.png");
 assert.strictEqual(binding.byItemId["callout-1"].selectedStepId, "step-1");
 assert.strictEqual(binding.byItemId["image-2"].selectedStepId, "step-2");
