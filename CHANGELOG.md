@@ -1,5 +1,17 @@
 # Changelog
 
+## 4.3.0 RC2 — SVG Annotation Editor
+
+- Added a shared normalized-to-pixel annotation scene model.
+- Added reusable SVG rendering for screenshot annotation overlays.
+- Added a Review Studio annotation mode without introducing another modal.
+- Added non-destructive rectangle drawing with pointer input.
+- Added keyboard rectangle creation with Enter and Escape gesture cancellation.
+- Added accessible toolbar, drawing-region descriptions, focus and live feedback.
+- Added annotation overlays to Review Studio screenshot previews.
+- Added behaviour tests for scene conversion, SVG output and editor gestures.
+- Kept Undo/Redo, annotation autosave, arrows and Word rasterization out of RC2.
+
 ## 4.3.0 RC1 — Screenshot Annotation Foundation
 
 - Added a versioned, non-destructive screenshot annotation domain model.

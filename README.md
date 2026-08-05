@@ -14,6 +14,17 @@ RC1 innehåller endast domänmodell, validering och migreringsstöd. Den synliga
 SVG-editorn och annoteringar i Word-exporten tillkommer i senare RC-steg. Se
 [Screenshot Annotations 4.3](docs/SCREENSHOT_ANNOTATIONS_4.3.md).
 
+### RC2 — SVG-editor
+
+Varje skärmbild i Review Studio har nu valet **Annotera**. Editorn ritar röda
+rektanglar som ett separat SVG-lager över originalbilden. Dra på bilden med mus
+eller pekdon, eller tryck Enter på ritytan för en tangentbordsstyrd centrerad
+rektangel. Escape avbryter en pågående ritgest.
+
+Annoteringarna visas även över skärmbilden i stegkortet. De sparas tillsammans
+med Review-data när **Spara** används; originalskärmbilden förändras aldrig.
+Undo/Redo, pilar, automatisk sparning och Word-rendering ingår i senare RC-steg.
+
 ## Struktur
 
 ```text

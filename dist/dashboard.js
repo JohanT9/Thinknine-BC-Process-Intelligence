@@ -3458,6 +3458,8 @@ let activeReviewSelection = globalThis.T9ReviewSelection.create();
 let activeReviewEdit = null;
 let reviewReturnFocus = null;
 let reviewLayoutState = globalThis.T9ReviewLayout.create();
+let annotationEditorState = null;
+let annotationChangesPending = false;
 
 const reviewAutoSave = globalThis.T9ReviewEdit.createAutoSave(
   () => saveActiveReview({ render: false, announce: false }),
@@ -3738,7 +3740,7 @@ globalThis.T9ReviewEdit.bind($("reviewList"), {
   }
 });
 
-function reviewImageUrls(task) {
+function reviewImages(task) {
   if (!activeReviewModel) return [];
   const paths = task.screenshots?.length
     ? task.screenshots
@@ -3746,8 +3748,127 @@ function reviewImageUrls(task) {
       ? [task.screenshot]
       : [];
   return [...new Set(paths)]
-    .map(path => activeReviewModel.screenshotData[path])
-    .filter(Boolean);
+    .map(path => ({ path, imageUrl: activeReviewModel.screenshotData[path] }))
+    .filter(image => Boolean(image.imageUrl));
+}
+
+function annotationItems(screenshotRef) {
+  return globalThis.T9ReviewAnnotations.findScreenshotSet(
+    activeReview?.annotations,
+    screenshotRef
+  )?.items || [];
+}
+
+function renderAnnotationSvg(svg, image, screenshotRef, draft = null) {
+  if (!image.naturalWidth || !image.naturalHeight) return;
+  const items = [...annotationItems(screenshotRef)];
+  if (draft) {
+    items.push({
+      annotationId: "annotation-draft",
+      type: globalThis.T9ReviewAnnotations.TYPES.RECTANGLE,
+      geometry: draft,
+      style: globalThis.T9ReviewAnnotations.DEFAULT_STYLES.rectangle
+    });
+  }
+  globalThis.T9ReviewAnnotationSvg.render(
+    svg,
+    items,
+    image.naturalWidth,
+    image.naturalHeight
+  );
+}
+
+function initializeReviewScreenshots(card, task, images) {
+  for (const [index, imageData] of images.entries()) {
+    const stage = card.querySelector(`[data-review-image-index="${index}"]`);
+    const image = stage.querySelector("img");
+    const svg = stage.querySelector("svg");
+    const render = () => renderAnnotationSvg(svg, image, imageData.path);
+    if (image.complete) render();
+    else image.addEventListener("load", render, { once: true });
+    stage.parentElement.querySelector('[data-action="annotate"]')
+      .addEventListener("click", () => {
+        openAnnotationEditor(task, imageData);
+      });
+  }
+}
+
+function renderActiveAnnotation(draft = null) {
+  if (!annotationEditorState) return;
+  renderAnnotationSvg(
+    $("annotationSurface"),
+    $("annotationImage"),
+    annotationEditorState.screenshotRef,
+    draft
+  );
+}
+
+function releaseActiveAnnotationPointer() {
+  const pointerId = annotationEditorState?.pointerId;
+  globalThis.T9ReviewAnnotationEditor.releasePointer(
+    $("annotationSurface"),
+    pointerId
+  );
+  if (annotationEditorState) {
+    annotationEditorState = { ...annotationEditorState, pointerId: null };
+  }
+}
+
+function openAnnotationEditor(task, imageData) {
+  annotationEditorState = globalThis.T9ReviewAnnotationEditor.create({
+    taskId: task.taskId,
+    screenshotRef: imageData.path,
+    imageUrl: imageData.imageUrl
+  });
+  $("reviewDialog").classList.add("annotation-mode");
+  $("reviewList").hidden = true;
+  $("reviewFooter").hidden = true;
+  $("annotationEditor").hidden = false;
+  $("annotationTitle").textContent =
+    `Annotera skärmbild för steg ${task.taskNo}`;
+  $("annotationImage").src = imageData.imageUrl;
+  if ($("annotationImage").complete) renderActiveAnnotation();
+  $("annotationSurface").focus();
+}
+
+function closeAnnotationEditor() {
+  if (!annotationEditorState) return;
+  const taskId = annotationEditorState.taskId;
+  releaseActiveAnnotationPointer();
+  annotationEditorState = null;
+  $("annotationEditor").hidden = true;
+  $("reviewList").hidden = false;
+  $("reviewFooter").hidden = false;
+  $("reviewDialog").classList.remove("annotation-mode");
+  renderReview();
+  const card = [...$("reviewList").querySelectorAll("[data-review-task-id]")]
+    .find(element => element.dataset.reviewTaskId === taskId);
+  card?.querySelector('[data-action="annotate"]')?.focus();
+}
+
+function addRectangleAnnotation(geometry) {
+  if (!annotationEditorState) return false;
+  try {
+    const annotation = globalThis.T9ReviewAnnotations.createAnnotation(
+      globalThis.T9ReviewAnnotations.TYPES.RECTANGLE,
+      geometry
+    );
+    globalThis.T9ReviewAnnotations.add(
+      activeReview,
+      annotationEditorState.screenshotRef,
+      annotation
+    );
+    annotationChangesPending = true;
+    renderActiveAnnotation();
+    $("annotationStatus").textContent = "Rektangel tillagd.";
+    $("reviewFooterText").textContent =
+      "Annoteringen är inte sparad ännu. Välj Spara när editorn stängts.";
+    return true;
+  } catch (error) {
+    $("annotationStatus").textContent =
+      `Rektangeln kunde inte läggas till: ${error.message}`;
+    return false;
+  }
 }
 
 function renderReview() {
@@ -3764,7 +3885,9 @@ function renderReview() {
     `${progress}% godkända · ` +
     `Session confidence ${activeReviewModel.confidenceResult.sessionConfidence}%`;
   $("reviewFooterText").textContent =
-    activeReview.status === "completed"
+    annotationChangesPending
+      ? "Annoteringar har ändrats. Välj Spara för att lagra dem."
+      : activeReview.status === "completed"
       ? "Granskningen är slutförd."
       : "Ändringar sparas lokalt i Edge.";
 
@@ -3783,7 +3906,7 @@ function renderReview() {
           ? "needs-review"
           : "");
 
-    const imageUrls = reviewImageUrls(task);
+    const images = reviewImages(task);
 
     card.innerHTML = `
       <div class="review-number" role="gridcell">${visibleIndex + 1}</div>
@@ -3820,9 +3943,16 @@ function renderReview() {
             ? ` · ${escapeHtml(task.knowledgeRule)}`
             : ""}
         </div>
-        ${imageUrls.map((imageUrl, imageIndex) =>
-          `<img class="review-image" src="${imageUrl}"
-              alt="Skärmbild ${imageIndex + 1} för steg ${visibleIndex + 1}">`
+        ${images.map((image, imageIndex) =>
+          `<div class="review-screenshot">
+            <div class="review-image-stage" data-review-image-index="${imageIndex}">
+              <img class="review-image" src="${image.imageUrl}"
+                alt="Skärmbild ${imageIndex + 1} för steg ${visibleIndex + 1}">
+              <svg class="review-annotation-layer" aria-hidden="true"></svg>
+            </div>
+            <button data-action="annotate" class="secondary review-annotate-button"
+              aria-label="Annotera skärmbild ${imageIndex + 1} för steg ${visibleIndex + 1}">Annotera</button>
+          </div>`
         ).join("")}
       </div>
       <div class="review-actions" role="gridcell">
@@ -3839,6 +3969,8 @@ function renderReview() {
         <button data-action="remove" class="danger" aria-label="Ta bort steg ${visibleIndex + 1}">Ta bort</button>
         <button data-action="toggle-layout" class="secondary" aria-pressed="false">Komprimera</button>
       </div>`;
+
+    initializeReviewScreenshots(card, task, images);
 
     card.querySelector('[data-action="approve"]')
       .addEventListener("change", event => {
@@ -3924,6 +4056,7 @@ async function saveActiveReview(options = {}) {
   }
 
   const currentSession = activeReviewSession === savedSession;
+  if (currentSession) annotationChangesPending = false;
   const unchanged = currentSession &&
     activeReview === savedReview &&
     activeReview.updatedAt === savedUpdatedAt;
@@ -3944,6 +4077,7 @@ async function openReview(session) {
   show(`Förbereder granskning av "${session.name}"...`);
 
   activeReviewSession = session;
+  annotationChangesPending = false;
   updateFilenamePreview();
   activeReviewModel = await prepareSessionModel(session);
 
@@ -3978,6 +4112,13 @@ async function openReview(session) {
 }
 
 function closeReview() {
+  releaseActiveAnnotationPointer();
+  annotationEditorState = null;
+  annotationChangesPending = false;
+  $("annotationEditor").hidden = true;
+  $("reviewList").hidden = false;
+  $("reviewFooter").hidden = false;
+  $("reviewDialog").classList.remove("annotation-mode");
   reviewAutoSave.flush();
   $("reviewOverlay").classList.remove("open");
   $("reviewOverlay").setAttribute("aria-hidden", "true");
@@ -4093,6 +4234,95 @@ $("advancedToggle").addEventListener("click", () => {
 });
 
 $("closeReview").addEventListener("click", closeReview);
+$("closeAnnotationEditor").addEventListener("click", closeAnnotationEditor);
+$("rectangleAnnotationTool").addEventListener("click", () => {
+  $("annotationSurface").focus();
+});
+$("annotationImage").addEventListener("load", () => {
+  renderActiveAnnotation(
+    globalThis.T9ReviewAnnotationEditor.geometry(annotationEditorState)
+  );
+});
+$("annotationSurface").addEventListener("pointerdown", event => {
+  if (!annotationEditorState || event.button !== 0) return;
+  const start = globalThis.T9ReviewAnnotationEditor.point(
+    event.clientX,
+    event.clientY,
+    event.currentTarget.getBoundingClientRect()
+  );
+  annotationEditorState = {
+    ...globalThis.T9ReviewAnnotationEditor.begin(annotationEditorState, start),
+    pointerId: event.pointerId
+  };
+  event.currentTarget.setPointerCapture?.(event.pointerId);
+  event.preventDefault();
+});
+$("annotationSurface").addEventListener("pointermove", event => {
+  if (!annotationEditorState?.draft ||
+      annotationEditorState.pointerId !== event.pointerId) return;
+  const end = globalThis.T9ReviewAnnotationEditor.point(
+    event.clientX,
+    event.clientY,
+    event.currentTarget.getBoundingClientRect()
+  );
+  annotationEditorState = globalThis.T9ReviewAnnotationEditor.move(
+    annotationEditorState,
+    end
+  );
+  renderActiveAnnotation(
+    globalThis.T9ReviewAnnotationEditor.geometry(annotationEditorState)
+  );
+});
+$("annotationSurface").addEventListener("pointerup", event => {
+  if (!annotationEditorState?.draft ||
+      annotationEditorState.pointerId !== event.pointerId) return;
+  try {
+    const end = globalThis.T9ReviewAnnotationEditor.point(
+      event.clientX,
+      event.clientY,
+      event.currentTarget.getBoundingClientRect()
+    );
+    const movedState = globalThis.T9ReviewAnnotationEditor.move(
+      annotationEditorState,
+      end
+    );
+    const result = globalThis.T9ReviewAnnotationEditor.finish(
+      movedState
+    );
+    annotationEditorState = result.state;
+    addRectangleAnnotation(result.geometry);
+  } finally {
+    releaseActiveAnnotationPointer();
+  }
+});
+$("annotationSurface").addEventListener("pointercancel", event => {
+  if (!annotationEditorState?.draft) return;
+  try {
+    annotationEditorState = globalThis.T9ReviewAnnotationEditor.cancel(
+      annotationEditorState
+    );
+    renderActiveAnnotation();
+  } finally {
+    releaseActiveAnnotationPointer();
+  }
+});
+$("annotationSurface").addEventListener("keydown", event => {
+  if (!annotationEditorState) return;
+  if (event.key === "Enter") {
+    event.preventDefault();
+    addRectangleAnnotation(
+      globalThis.T9ReviewAnnotationEditor.centeredRectangle()
+    );
+  } else if (event.key === "Escape" && annotationEditorState.draft) {
+    event.preventDefault();
+    annotationEditorState = globalThis.T9ReviewAnnotationEditor.cancel(
+      annotationEditorState
+    );
+    releaseActiveAnnotationPointer();
+    renderActiveAnnotation();
+    $("annotationStatus").textContent = "Pågående rektangel avbröts.";
+  }
+});
 async function exportReviewFromToolbar(button) {
   button.disabled = true;
   button.textContent = "Skapar Word...";

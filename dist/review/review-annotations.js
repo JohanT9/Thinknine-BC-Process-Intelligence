@@ -134,13 +134,17 @@
     return normalized;
   }
 
-  function createScreenshotSet(screenshotRef, options = {}) {
+  function normalizedScreenshotRef(screenshotRef) {
     if (typeof screenshotRef !== "string" || !screenshotRef.trim()) {
       throw new TypeError("Screenshot reference is required.");
     }
+    return screenshotRef.trim();
+  }
+
+  function createScreenshotSet(screenshotRef, options = {}) {
     return {
       annotationSetId: createId("annset", options.idFactory),
-      screenshotRef: screenshotRef.trim(),
+      screenshotRef: normalizedScreenshotRef(screenshotRef),
       revision: 0,
       updatedAt: options.now || new Date().toISOString(),
       items: []
@@ -169,9 +173,40 @@
   function findScreenshotSet(store, screenshotRef) {
     const sets = normalizeStore(store).screenshotSets;
     if (!Array.isArray(sets)) return null;
+    const reference = normalizedScreenshotRef(screenshotRef);
     return sets.find(
-      set => set.screenshotRef === screenshotRef
+      set => set.screenshotRef === reference
     ) || null;
+  }
+
+  function add(review, screenshotRef, annotation, options = {}) {
+    const result = validation(annotation);
+    if (!result.valid || !result.supported) {
+      throw new TypeError(result.errors[0] || "Unsupported annotation.");
+    }
+    const store = normalizeStore(review.annotations);
+    if (!Array.isArray(store.screenshotSets)) {
+      throw new Error("This annotation schema cannot be edited by this version.");
+    }
+    const reference = normalizedScreenshotRef(screenshotRef);
+    let set = store.screenshotSets.find(
+      candidate => candidate.screenshotRef === reference
+    );
+    if (!set) {
+      set = createScreenshotSet(reference, options);
+      store.screenshotSets.push(set);
+    }
+    const items = Array.isArray(set.items) ? set.items : [];
+    if (items.some(item => item.annotationId === annotation.annotationId)) {
+      throw new Error(`Duplicate annotation ID: ${annotation.annotationId}`);
+    }
+    const now = options.now || new Date().toISOString();
+    set.items = [...items, clone(annotation)];
+    set.revision = Number.isInteger(set.revision) ? set.revision + 1 : 1;
+    set.updatedAt = now;
+    review.annotations = store;
+    review.updatedAt = now;
+    return clone(annotation);
   }
 
   return {
@@ -185,6 +220,7 @@
     validation,
     createScreenshotSet,
     createAnnotation,
-    findScreenshotSet
+    findScreenshotSet,
+    add
   };
 });

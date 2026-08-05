@@ -56,14 +56,30 @@ table{width:100%;border-collapse:collapse}th,td{text-align:left;padding:9px;bord
 .review-meta{font-size:12px;color:#52606d;margin:8px 0}
 .review-actions{display:flex;flex-direction:column;gap:7px}
 .review-actions button{margin:0}
-.review-image{max-width:100%;border:1px solid #d8dee5;border-radius:5px;margin-top:10px}
+.review-screenshot{margin-top:10px}
+.review-image-stage{position:relative;display:block;width:fit-content;max-width:100%;line-height:0}
+.review-image{display:block;max-width:100%;height:auto;border:1px solid #d8dee5;border-radius:5px;box-sizing:border-box}
+.review-annotation-layer{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;overflow:visible}
+.review-annotate-button{margin-top:6px}
 .review-card.compact{grid-template-columns:44px minmax(0,1fr) 300px;gap:10px;margin-bottom:7px;padding:8px}
 .review-card.compact .review-number{font-size:18px}
-.review-card.compact .review-field-heading,.review-card.compact .review-comment-section,.review-card.compact .review-add-comment,.review-card.compact .review-meta,.review-card.compact .review-image{display:none}
+.review-card.compact .review-field-heading,.review-card.compact .review-comment-section,.review-card.compact .review-add-comment,.review-card.compact .review-meta,.review-card.compact .review-screenshot{display:none}
 .review-card.compact textarea[data-edit-field="instruction"]{height:38px;min-height:38px;resize:none;overflow:hidden;white-space:nowrap}
 .review-card.compact .review-actions{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));align-content:start;gap:5px}
 .review-card.compact .review-actions label{margin:0;align-self:center}
 .review-footer{padding:16px;border-top:1px solid #d8dee5;display:flex;justify-content:space-between;background:#f8fafc}
+.annotation-editor{padding:18px}
+.annotation-editor-header{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:12px}
+.annotation-editor-header h3{margin:0 0 4px}
+.annotation-toolbar{display:flex;gap:6px;align-items:center;margin-bottom:12px}
+.annotation-toolbar button{margin:0}
+.annotation-stage{position:relative;width:fit-content;max-width:100%;margin:0 auto;background:#f3f6fa;line-height:0;touch-action:none;cursor:crosshair}
+.annotation-stage img{display:block;max-width:100%;height:auto}
+.annotation-stage svg{position:absolute;inset:0;width:100%;height:100%;outline-offset:3px}
+.annotation-stage .review-annotation-layer{pointer-events:auto}
+.annotation-stage svg:focus-visible{outline:3px solid #0f6cbd}
+.annotation-help{margin:10px 0;color:#52606d;font-size:13px;line-height:1.4}
+.review-shell.annotation-mode .review-toolbar,.review-shell.annotation-mode .review-toolbar-secondary,.review-shell.annotation-mode .review-progress,.review-shell.annotation-mode #reviewStatus{display:none}
 @media(max-width:800px){.review-card,.review-card.compact{grid-template-columns:44px 1fr}.review-actions{grid-column:1/-1;flex-direction:row;flex-wrap:wrap}}
 
 .summary strong{display:block;font-size:18px;margin-top:4px}
@@ -234,7 +250,27 @@ table{width:100%;border-collapse:collapse}th,td{text-align:left;padding:9px;bord
       aria-labelledby="reviewTitle"
       aria-describedby="reviewStatus"
     ></main>
-    <footer class="review-footer">
+    <section id="annotationEditor" class="annotation-editor" aria-labelledby="annotationTitle" hidden>
+      <div class="annotation-editor-header">
+        <div>
+          <h3 id="annotationTitle">Annotera skärmbild</h3>
+          <p id="annotationDescription" class="muted">Markera viktiga områden utan att ändra originalbilden.</p>
+        </div>
+        <button id="closeAnnotationEditor" class="secondary">Klar</button>
+      </div>
+      <div class="annotation-toolbar" role="toolbar" aria-label="Annotationsverktyg">
+        <button id="rectangleAnnotationTool" class="secondary" aria-pressed="true">Rektangel</button>
+      </div>
+      <div id="annotationStage" class="annotation-stage">
+        <img id="annotationImage" alt="Skärmbild som annoteras">
+        <svg id="annotationSurface" class="review-annotation-layer" tabindex="0"
+          role="img" aria-label="Rityta för skärmbildsannotering"
+          aria-describedby="annotationHelp" aria-keyshortcuts="Enter Escape"></svg>
+      </div>
+      <p id="annotationHelp" class="annotation-help">Dra på bilden för att skapa en rektangel. Tryck Enter för att lägga till en centrerad rektangel. Escape avbryter en pågående markering.</p>
+      <div id="annotationStatus" class="sr-only" role="status" aria-live="polite" aria-atomic="true"></div>
+    </section>
+    <footer id="reviewFooter" class="review-footer">
       <span id="reviewFooterText" role="status" aria-live="polite"></span>
       <button id="saveReviewBottom" class="primary">Spara</button>
     </footer>
@@ -260,6 +296,9 @@ table{width:100%;border-collapse:collapse}th,td{text-align:left;padding:9px;bord
 <script src="review/review-accessibility.js"></script>
 <script src="review/review-layout.js"></script>
 <script src="review/review-annotations.js"></script>
+<script src="review/review-annotation-scene.js"></script>
+<script src="review/review-annotation-svg.js"></script>
+<script src="review/review-annotation-editor.js"></script>
 <script src="review/review-studio.js"></script>
 <script src="review/review-selection.js"></script>
 <script src="dashboard.js"></script>
