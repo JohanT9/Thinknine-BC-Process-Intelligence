@@ -1,9 +1,20 @@
-# Thinknine BC Process Intelligence v4.5.0 UX1
+# Thinknine BC Process Intelligence v4.5.0 UX2
 
 Ett modulärt Edge-tillägg för att spela in, granska och exportera dokumenterade
 Business Central-processer.
 
 ## Document Workspace 4.5 UX1
+
+UX2 gör Document Workspace till en adaptiv läsmiljö för långa dokument. Ett
+tillgängligt dokumentverktygsfält erbjuder anpassa bredd, anpassa sida, 100 %,
+zoom in/ut, kontinuerligt läge, sidläge och sidnavigering. Home, End, Page Up,
+Page Down och Ctrl-baserade zoomkommandon fungerar direkt i dokumentarbetsytan.
+
+Zoom, visningsläge, adaptiv läspreferens och verktygsfältslayout sparas lokalt
+som vypreferenser och blir aldrig del av Review-data. Adaptiv läsning väljer
+automatiskt lugn bakgrund, centrering, separation och sidelevation utifrån
+arbetsytans storlek, zoom och visningsläge. Avancerade vyinställningar erbjuder
+Auto, Alltid på och Alltid av utan att göra valet till en vardagsinställning.
 
 Documentation Excellence har nu två samordnade förstaklassarbetsytor:
 **Review Workspace** för ändringar och **Document Workspace** för skrivskyddad

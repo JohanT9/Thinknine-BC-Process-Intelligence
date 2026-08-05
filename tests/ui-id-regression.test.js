@@ -195,8 +195,18 @@ assert.ok(
 assert.ok(
   html.includes('<script src="document/document-workspace.js"></script>') &&
     html.includes('<script src="workspace-controller.js"></script>') &&
-    html.includes('<script src="document-workspace-view.js"></script>'),
+    html.includes('<script src="document-workspace-view.js"></script>') &&
+    html.includes('<script src="document-workspace-experience.js"></script>'),
   "Dashboard must load the isolated Document Workspace renderer and controller."
+);
+assert.ok(
+  html.includes('id="documentToolbar"') &&
+    html.includes('role="toolbar"') &&
+    html.includes('id="documentPageIndicator"') &&
+    html.includes('aria-live="polite"') &&
+    html.includes('id="documentViewSettings"') &&
+    html.includes('aria-labelledby="documentViewSettingsTitle"'),
+  "Document Workspace must expose accessible reading controls and advanced settings."
 );
 
 console.log("UI ID regression tests passed.");

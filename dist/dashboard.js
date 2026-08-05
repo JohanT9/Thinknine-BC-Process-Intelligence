@@ -3488,6 +3488,148 @@ let annotationChangesPending = false;
 let annotationEditorBaseline = null;
 let workspaceState = globalThis.T9WorkspaceController.create();
 let documentWorkspaceSync = null;
+let documentViewState = globalThis.T9DocumentWorkspaceExperience.load(
+  globalThis.localStorage
+);
+let documentViewFrame = 0;
+let documentScrollFrame = 0;
+
+function documentSections() {
+  return [...$("documentWorkspace").children].filter(element =>
+    element.dataset.documentWorkspaceSectionId
+  );
+}
+
+function documentPageCount() {
+  return Math.max(1, documentSections().length);
+}
+
+function saveDocumentViewPreferences() {
+  globalThis.T9DocumentWorkspaceExperience.save(
+    globalThis.localStorage,
+    documentViewState
+  );
+}
+
+function applyDocumentView(options = {}) {
+  const panel = $("documentWorkspacePanel");
+  const viewport = $("documentWorkspaceViewport");
+  const page = $("documentWorkspace");
+  const experience = globalThis.T9DocumentWorkspaceExperience;
+  const pageCount = documentPageCount();
+  documentViewState = experience.navigate(
+    documentViewState,
+    documentViewState.currentPage,
+    pageCount
+  );
+  const zoom = experience.effectiveZoom(documentViewState, {
+    availableWidth: Math.max(1, viewport.clientWidth - 44),
+    availableHeight: Math.max(1, viewport.clientHeight - 44),
+    pageWidth: 780,
+    pageHeight: 900
+  });
+  panel.style.setProperty("--document-zoom", String(zoom / 100));
+  panel.dataset.viewMode = documentViewState.viewMode;
+  panel.classList.toggle("adaptive-reading", experience.adaptiveEnabled(
+    documentViewState,
+    { workspaceWidth: panel.clientWidth, documentWidth: 780, zoom }
+  ));
+  $("documentToolbar").classList.toggle("compact", experience.compactToolbar(
+    documentViewState,
+    panel.clientWidth
+  ));
+  $("documentZoomValue").textContent = `${zoom}%`;
+  $("documentFitWidth").setAttribute(
+    "aria-pressed",
+    String(documentViewState.zoomMode === "fitWidth")
+  );
+  $("documentFitPage").setAttribute(
+    "aria-pressed",
+    String(documentViewState.zoomMode === "fitPage")
+  );
+  $("documentContinuousMode").setAttribute(
+    "aria-pressed",
+    String(documentViewState.viewMode === "continuous")
+  );
+  $("documentPageMode").setAttribute(
+    "aria-pressed",
+    String(documentViewState.viewMode === "page")
+  );
+  const sections = documentSections();
+  sections.forEach((section, index) => {
+    section.hidden = documentViewState.viewMode === "page" &&
+      index + 1 !== documentViewState.currentPage;
+  });
+  $("documentPageIndicator").textContent =
+    `Sida ${documentViewState.currentPage} av ${pageCount}`;
+  $("documentPreviousPage").disabled = documentViewState.currentPage <= 1;
+  $("documentNextPage").disabled = documentViewState.currentPage >= pageCount;
+  page.setAttribute("aria-label", page.getAttribute("aria-label") || "Dokument");
+  if (options.announce) {
+    $("documentWorkspaceStatus").textContent =
+      `Sida ${documentViewState.currentPage} av ${pageCount}, zoom ${zoom} procent.`;
+  }
+  if (options.persist !== false) saveDocumentViewPreferences();
+}
+
+function scheduleDocumentView(options = {}) {
+  cancelAnimationFrame(documentViewFrame);
+  documentViewFrame = requestAnimationFrame(() => {
+    documentViewFrame = 0;
+    applyDocumentView(options);
+  });
+}
+
+function changeDocumentView(nextState, options = {}) {
+  const viewport = $("documentWorkspaceViewport");
+  const focalRatio = (viewport.scrollTop + viewport.clientHeight / 2) /
+    Math.max(1, viewport.scrollHeight);
+  documentViewState = nextState;
+  applyDocumentView({ announce: true, ...options });
+  if (options.preserveFocalPosition !== false) {
+    viewport.scrollTop = Math.max(
+      0,
+      focalRatio * viewport.scrollHeight - viewport.clientHeight / 2
+    );
+  }
+}
+
+function navigateDocument(destination) {
+  documentViewState = globalThis.T9DocumentWorkspaceExperience.navigate(
+    documentViewState,
+    destination,
+    documentPageCount()
+  );
+  applyDocumentView({ announce: true, persist: false });
+  const section = documentSections()[documentViewState.currentPage - 1];
+  if (documentViewState.viewMode === "continuous") {
+    section?.scrollIntoView({ block: "start" });
+  } else {
+    $("documentWorkspaceViewport").scrollTop = 0;
+  }
+}
+
+function updateContinuousDocumentPage() {
+  if (documentViewState.viewMode !== "continuous") return;
+  const viewport = $("documentWorkspaceViewport");
+  const sections = documentSections();
+  if (!sections.length) return;
+  const marker = viewport.getBoundingClientRect().top + 80;
+  let page = 1;
+  for (let index = 0; index < sections.length; index += 1) {
+    if (sections[index].getBoundingClientRect().top <= marker) page = index + 1;
+  }
+  if (page !== documentViewState.currentPage) {
+    documentViewState = globalThis.T9DocumentWorkspaceExperience.navigate(
+      documentViewState,
+      page,
+      sections.length
+    );
+    $("documentPageIndicator").textContent = `Sida ${page} av ${sections.length}`;
+    $("documentPreviousPage").disabled = page <= 1;
+    $("documentNextPage").disabled = page >= sections.length;
+  }
+}
 
 function invalidateDocumentWorkspace() {
   workspaceState = globalThis.T9WorkspaceController.invalidate(workspaceState);
@@ -3539,6 +3681,7 @@ async function synchronizeDocumentWorkspace() {
         );
         $("documentWorkspaceStatus").textContent =
           `Dokumentet är synkroniserat. ${result.sectionCount} avsnitt.`;
+        applyDocumentView({ persist: false });
       } catch (error) {
         $("documentWorkspaceStatus").textContent =
           `Dokumentet kunde inte visas: ${error.message}`;
@@ -4468,6 +4611,10 @@ async function openReview(session) {
   activeReviewEdit = null;
   workspaceState = globalThis.T9WorkspaceController.create();
   documentWorkspaceSync = null;
+  documentViewState = globalThis.T9DocumentWorkspaceExperience.update(
+    documentViewState,
+    { currentPage: 1 }
+  );
   reviewLayoutState = globalThis.T9ReviewLayout.create(
     reviewLayoutState.allCompact
   );
@@ -4517,6 +4664,10 @@ async function closeReview() {
   activeReviewEdit = null;
   workspaceState = globalThis.T9WorkspaceController.create();
   documentWorkspaceSync = null;
+  cancelAnimationFrame(documentViewFrame);
+  documentViewFrame = 0;
+  cancelAnimationFrame(documentScrollFrame);
+  documentScrollFrame = 0;
   globalThis.T9DocumentWorkspaceView.clear($("documentWorkspace"));
   $("documentWorkspaceStatus").textContent = "";
   applyWorkspaceState();
@@ -4640,6 +4791,130 @@ $("workspaceTabs").addEventListener("keydown", event => {
   if (workspace === workspaceState.active) return;
   event.preventDefault();
   switchWorkspace(workspace, true);
+});
+
+$("documentFitWidth").addEventListener("click", () => {
+  changeDocumentView(globalThis.T9DocumentWorkspaceExperience.fit(
+    documentViewState,
+    "fitWidth"
+  ));
+});
+$("documentFitPage").addEventListener("click", () => {
+  changeDocumentView(globalThis.T9DocumentWorkspaceExperience.fit(
+    documentViewState,
+    "fitPage"
+  ));
+});
+$("documentResetZoom").addEventListener("click", () => {
+  changeDocumentView(globalThis.T9DocumentWorkspaceExperience.setZoom(
+    documentViewState,
+    100
+  ));
+});
+$("documentZoomOut").addEventListener("click", () => {
+  changeDocumentView(globalThis.T9DocumentWorkspaceExperience.zoomBy(
+    documentViewState,
+    -1
+  ));
+});
+$("documentZoomIn").addEventListener("click", () => {
+  changeDocumentView(globalThis.T9DocumentWorkspaceExperience.zoomBy(
+    documentViewState,
+    1
+  ));
+});
+$("documentContinuousMode").addEventListener("click", () => {
+  changeDocumentView(globalThis.T9DocumentWorkspaceExperience.setViewMode(
+    documentViewState,
+    "continuous"
+  ), { preserveFocalPosition: false });
+  documentSections()[documentViewState.currentPage - 1]
+    ?.scrollIntoView({ block: "start" });
+});
+$("documentPageMode").addEventListener("click", () => {
+  changeDocumentView(globalThis.T9DocumentWorkspaceExperience.setViewMode(
+    documentViewState,
+    "page"
+  ), { preserveFocalPosition: false });
+  $("documentWorkspaceViewport").scrollTop = 0;
+});
+$("documentPreviousPage").addEventListener("click", () => {
+  navigateDocument("previous");
+});
+$("documentNextPage").addEventListener("click", () => {
+  navigateDocument("next");
+});
+$("documentWorkspacePanel").addEventListener("keydown", event => {
+  if (event.target.closest("button,select,dialog")) return;
+  if (event.key === "Home") {
+    event.preventDefault();
+    navigateDocument("home");
+  } else if (event.key === "End") {
+    event.preventDefault();
+    navigateDocument("end");
+  } else if (event.key === "PageUp") {
+    event.preventDefault();
+    navigateDocument("previous");
+  } else if (event.key === "PageDown") {
+    event.preventDefault();
+    navigateDocument("next");
+  } else if (event.ctrlKey && ["+", "="].includes(event.key)) {
+    event.preventDefault();
+    changeDocumentView(globalThis.T9DocumentWorkspaceExperience.zoomBy(
+      documentViewState,
+      1
+    ));
+  } else if (event.ctrlKey && event.key === "-") {
+    event.preventDefault();
+    changeDocumentView(globalThis.T9DocumentWorkspaceExperience.zoomBy(
+      documentViewState,
+      -1
+    ));
+  } else if (event.ctrlKey && event.key === "0") {
+    event.preventDefault();
+    changeDocumentView(globalThis.T9DocumentWorkspaceExperience.setZoom(
+      documentViewState,
+      100
+    ));
+  }
+});
+$("documentWorkspaceViewport").addEventListener(
+  "scroll",
+  () => {
+    if (documentScrollFrame) return;
+    documentScrollFrame = requestAnimationFrame(() => {
+      documentScrollFrame = 0;
+      updateContinuousDocumentPage();
+    });
+  },
+  { passive: true }
+);
+globalThis.addEventListener("resize", () => {
+  if (workspaceState.active === "document") {
+    scheduleDocumentView({ persist: false });
+  }
+});
+$("openDocumentViewSettings").addEventListener("click", () => {
+  $("documentAdaptiveReading").value = documentViewState.adaptiveReading;
+  $("documentToolbarLayout").value = documentViewState.toolbarLayout;
+  $("documentViewSettings").showModal();
+  $("documentAdaptiveReading").focus();
+});
+$("documentAdaptiveReading").addEventListener("change", event => {
+  changeDocumentView(globalThis.T9DocumentWorkspaceExperience.update(
+    documentViewState,
+    { adaptiveReading: event.target.value }
+  ));
+});
+$("documentToolbarLayout").addEventListener("change", event => {
+  changeDocumentView(globalThis.T9DocumentWorkspaceExperience.update(
+    documentViewState,
+    { toolbarLayout: event.target.value }
+  ));
+});
+$("closeDocumentViewSettings").addEventListener("click", () => {
+  $("documentViewSettings").close();
+  $("openDocumentViewSettings").focus();
 });
 
 $("closeReview").addEventListener("click", closeReview);

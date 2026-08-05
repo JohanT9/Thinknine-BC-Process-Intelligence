@@ -45,9 +45,44 @@ Home/End move between workspaces. Selection state, focusability, document sync
 status and the read-only document landmark are exposed to assistive technology.
 No motion is required for switching.
 
-## UX1 boundaries
+## Adaptive Document Experience (UX2)
 
-UX1 intentionally provides only foundational rendering. It does not include
-zoom, fit-width controls, thumbnails, page navigation, virtualized scrolling or
-document editing. All editing remains in Review Workspace. Word export behaviour
-is unchanged.
+`document-workspace-experience.js` owns immutable presentation state only. It
+normalizes zoom, view mode, current page, Adaptive Reading preference and
+toolbar layout; calculates fit values; bounds navigation; and persists only
+view preferences. It never consumes or modifies Document Plan.
+
+The document toolbar supports Fit Width, Fit Page, 100%, Zoom In, Zoom Out,
+Continuous Mode, Page Mode, Previous Page and Next Page. In the document panel,
+Home and End move to the first and last logical page, Page Up and Page Down move
+one page, and Ctrl+Plus, Ctrl+Minus and Ctrl+0 control zoom. Page changes are
+announced through the existing polite live status.
+
+Continuous Mode retains the complete semantic DOM and tracks the current
+section during scrolling. Page Mode hides all but the current planned section;
+it does not split, clone or rebuild document content. Switching modes preserves
+the current logical section whenever possible.
+
+Adaptive Reading is a visual presentation policy. Auto considers available
+workspace width, view mode and effective zoom. It may soften the surrounding
+background and strengthen page separation and elevation. Advanced settings
+allow Auto, Always On or Always Off and an automatic, full or compact toolbar.
+None of these settings changes Semantic Document, Theme, Document Components,
+Document Plan, Review persistence or Word output.
+
+Zoom, mode, Adaptive Reading and toolbar layout are stored under a dedicated
+local preference key. Current page is deliberately session-local so opening a
+different document never resumes at an unrelated page.
+
+View changes update CSS, visibility and accessibility state on existing DOM.
+They do not rerun projection, theme resolution, planning, component creation,
+media composition or workspace rendering. Resize handling and scroll-based
+page tracking are limited to one animation frame, and pending frames are
+cancelled when Review Studio closes.
+
+## Current boundaries
+
+UX2 does not include thumbnails, free-form page-number entry, print-layout page
+breaking, virtualized scrolling or document editing. A logical page currently
+corresponds to a planned document section. All editing remains in Review
+Workspace. Word export behaviour is unchanged.

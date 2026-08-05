@@ -1,5 +1,22 @@
 # Changelog
 
+## 4.5.0 UX2 — Adaptive Document Experience
+
+- Added an accessible renderer-neutral document toolbar for fit width, fit
+  page, 100%, zoom in/out, view modes and page navigation.
+- Added continuous and page reading modes while preserving the current logical
+  section whenever practical.
+- Added Home, End, Page Up, Page Down and Ctrl-based zoom keyboard navigation
+  scoped exclusively to Document Workspace.
+- Added automatic Adaptive Reading based on workspace width, mode and zoom,
+  with advanced Auto, Always On and Always Off preferences.
+- Persisted zoom, view mode, Adaptive Reading and toolbar-layout preferences
+  separately from Review persistence.
+- Reused the existing document DOM for every view operation; Semantic Document,
+  components, planning, diagnostics and Word export remain unchanged.
+- Added large-document, resize, persistence, boundary, accessibility and
+  pipeline-isolation regression coverage.
+
 ## 4.5.0 UX1 — Document Workspace Foundation
 
 - Added Review Workspace and Document Workspace as coordinated first-class

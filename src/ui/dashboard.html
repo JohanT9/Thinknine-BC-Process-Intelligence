@@ -71,8 +71,18 @@ table{width:100%;border-collapse:collapse}th,td{text-align:left;padding:9px;bord
 .review-card.compact .review-actions{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));align-content:start;gap:5px}
 .review-card.compact .review-actions label{margin:0;align-self:center}
 .review-footer{padding:16px;border-top:1px solid #d8dee5;display:flex;justify-content:space-between;background:#f8fafc}
-.document-workspace-panel{background:#e8edf1;padding:22px;min-height:650px}
-.document-workspace-page{max-width:780px;min-height:900px;margin:0 auto;background:white;padding:54px 64px;box-shadow:0 3px 14px rgba(15,23,42,.15)}
+.document-workspace-panel{--document-zoom:1;background:#e8edf1;padding:0;height:calc(100vh - 190px);min-height:500px;display:flex;flex-direction:column;overflow:hidden}
+.document-toolbar{position:sticky;top:0;z-index:2;display:flex;flex-wrap:wrap;align-items:center;gap:8px;padding:10px 14px;background:rgba(255,255,255,.97);border-bottom:1px solid #cbd5df}
+.document-toolbar-group{display:flex;align-items:center;gap:4px;padding-right:8px;border-right:1px solid #d8dee5}
+.document-toolbar-group:last-child{border:0;padding:0}.document-toolbar button{margin:0;min-height:36px}
+.document-toolbar button[aria-pressed="true"]{background:#0f6cbd;color:white}.document-page-indicator{min-width:92px;text-align:center;font-variant-numeric:tabular-nums}
+.document-toolbar.compact{gap:4px;padding:8px}.document-toolbar.compact button{padding-left:9px;padding-right:9px}.document-toolbar.compact .document-toolbar-group{gap:2px;padding-right:4px}
+.document-workspace-viewport{padding:22px;min-height:0;flex:1;overflow:auto}
+.document-workspace-page{width:780px;min-height:900px;margin:0 auto;background:white;padding:54px 64px;box-sizing:border-box;transform-origin:top center;zoom:var(--document-zoom)}
+.document-workspace-panel.adaptive-reading{background:#dfe5ea}
+.document-workspace-panel.adaptive-reading .document-workspace-page{box-shadow:0 8px 28px rgba(15,23,42,.18)}
+.document-workspace-panel[data-view-mode="page"] .document-workspace-section[hidden]{display:none}
+.document-workspace-panel[data-view-mode="page"] .document-workspace-section{min-height:790px;margin:0}
 .document-workspace-section{margin-bottom:30px}
 .document-workspace-section.cover{padding-top:50px;padding-bottom:35px}
 .document-workspace-heading{color:#0f4c81;border-bottom:2px solid #38a3d1;padding-bottom:7px}
@@ -87,6 +97,9 @@ table{width:100%;border-collapse:collapse}th,td{text-align:left;padding:9px;bord
 .document-workspace-callout{margin:14px 0;padding:8px 12px;border-left:5px solid #2673a8;background:#edf6fb}
 .document-workspace-callout p{margin:0}
 .document-workspace-status{display:block;max-width:780px;margin:0 auto 10px;color:#52606d}
+.document-view-settings{border:0;border-radius:9px;box-shadow:0 18px 55px rgba(15,23,42,.3);padding:22px;min-width:min(360px,calc(100vw - 48px))}
+.document-view-settings::backdrop{background:rgba(15,23,42,.42)}.document-view-settings h3{margin-top:0}.document-view-settings footer{text-align:right;margin-top:18px}
+.document-view-settings select{width:100%}
 .review-shell.document-workspace-mode .review-toolbar,.review-shell.document-workspace-mode .review-toolbar-secondary,.review-shell.document-workspace-mode .review-progress,.review-shell.document-workspace-mode #reviewStatus{display:none}
 .annotation-editor{padding:18px}
 .annotation-editor-sticky{position:sticky;top:var(--review-header-height,0px);z-index:3;background:white;margin:-18px -18px 0;padding:18px 18px 1px}
@@ -112,6 +125,8 @@ table{width:100%;border-collapse:collapse}th,td{text-align:left;padding:9px;bord
 .annotation-properties-actions{grid-column:1/-1}
 .review-shell.annotation-mode .review-toolbar,.review-shell.annotation-mode .review-toolbar-secondary,.review-shell.annotation-mode .review-progress,.review-shell.annotation-mode #reviewStatus{display:none}
 @media(max-width:800px){.review-card,.review-card.compact{grid-template-columns:44px 1fr}.review-actions{grid-column:1/-1;flex-direction:row;flex-wrap:wrap}}
+@media(prefers-reduced-motion:reduce){.document-workspace-panel *{scroll-behavior:auto!important;transition:none!important}}
+@media(forced-colors:active){.document-workspace-page{border:1px solid CanvasText}.document-toolbar{border-color:CanvasText}}
 
 .summary strong{display:block;font-size:18px;margin-top:4px}
 .filename-variables{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0}
@@ -230,7 +245,7 @@ table{width:100%;border-collapse:collapse}th,td{text-align:left;padding:9px;bord
 
 <div id="reviewOverlay" class="review-overlay" aria-hidden="true">
   <section id="reviewDialog" class="review-shell" role="dialog" aria-modal="true" aria-labelledby="reviewTitle" aria-describedby="reviewSummary reviewKeyboardHelp" tabindex="-1">
-    <header class="review-header">
+    <header id="reviewHeader" class="review-header">
       <div class="review-title-row">
         <div>
           <h2 id="reviewTitle">Documentation Excellence</h2>
@@ -336,13 +351,55 @@ table{width:100%;border-collapse:collapse}th,td{text-align:left;padding:9px;bord
     </section>
     <main id="documentWorkspacePanel" class="document-workspace-panel"
       role="tabpanel" aria-labelledby="documentWorkspaceTab" tabindex="0" hidden>
-      <span id="documentWorkspaceStatus" class="document-workspace-status"
-        role="status" aria-live="polite" aria-atomic="true"></span>
-      <article id="documentWorkspace" class="document-workspace-page"
-        aria-label="Dokument"></article>
+      <div id="documentToolbar" class="document-toolbar" role="toolbar"
+        aria-label="Dokumentvisning" aria-controls="documentWorkspace">
+        <div class="document-toolbar-group" role="group" aria-label="Anpassa storlek">
+          <button id="documentFitWidth" class="secondary" aria-pressed="false">Anpassa bredd</button>
+          <button id="documentFitPage" class="secondary" aria-pressed="false">Anpassa sida</button>
+          <button id="documentResetZoom" class="secondary" aria-keyshortcuts="Control+0">100%</button>
+          <button id="documentZoomOut" class="secondary" aria-label="Zooma ut" aria-keyshortcuts="Control+-">−</button>
+          <output id="documentZoomValue" aria-label="Aktuell zoom">100%</output>
+          <button id="documentZoomIn" class="secondary" aria-label="Zooma in" aria-keyshortcuts="Control++">+</button>
+        </div>
+        <div class="document-toolbar-group" role="group" aria-label="Visningsläge">
+          <button id="documentContinuousMode" class="secondary" aria-pressed="true"><span class="document-toolbar-label">Kontinuerligt</span></button>
+          <button id="documentPageMode" class="secondary" aria-pressed="false"><span class="document-toolbar-label">Sidläge</span></button>
+        </div>
+        <div class="document-toolbar-group" role="group" aria-label="Sidnavigering">
+          <button id="documentPreviousPage" class="secondary" aria-label="Föregående sida">Föregående</button>
+          <output id="documentPageIndicator" class="document-page-indicator" aria-live="polite" aria-label="Aktuell sida">Sida 1 av 1</output>
+          <button id="documentNextPage" class="secondary" aria-label="Nästa sida">Nästa</button>
+        </div>
+        <button id="openDocumentViewSettings" class="debug" aria-haspopup="dialog">Vyinställningar</button>
+      </div>
+      <div id="documentWorkspaceViewport" class="document-workspace-viewport">
+        <span id="documentWorkspaceStatus" class="document-workspace-status"
+          role="status" aria-live="polite" aria-atomic="true"></span>
+        <article id="documentWorkspace" class="document-workspace-page"
+          aria-label="Dokument"></article>
+      </div>
     </main>
   </section>
 </div>
+
+<dialog id="documentViewSettings" class="document-view-settings" aria-labelledby="documentViewSettingsTitle">
+  <h3 id="documentViewSettingsTitle">Avancerade vyinställningar</h3>
+  <label>Adaptiv läsmiljö
+    <select id="documentAdaptiveReading">
+      <option value="auto">Auto (rekommenderas)</option>
+      <option value="on">Alltid på</option>
+      <option value="off">Alltid av</option>
+    </select>
+  </label>
+  <label>Verktygsfält
+    <select id="documentToolbarLayout">
+      <option value="auto">Auto</option>
+      <option value="full">Fullständigt</option>
+      <option value="compact">Kompakt</option>
+    </select>
+  </label>
+  <footer><button id="closeDocumentViewSettings" class="primary">Klar</button></footer>
+</dialog>
 
 <script src="engine/noise-filter.js"></script>
 <script src="engine/entity-memory.js"></script>
@@ -386,6 +443,7 @@ table{width:100%;border-collapse:collapse}th,td{text-align:left;padding:9px;bord
 <script src="review/review-selection.js"></script>
 <script src="workspace-controller.js"></script>
 <script src="document-workspace-view.js"></script>
+<script src="document-workspace-experience.js"></script>
 <script src="dashboard.js"></script>
 </body>
 </html>

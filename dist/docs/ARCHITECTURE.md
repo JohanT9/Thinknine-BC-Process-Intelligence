@@ -103,6 +103,21 @@ annotationskomposition för Document Workspace och Word, men äger ingen
 dokumentstruktur. Stabilt identifierade plansektioner gör att DOM-adaptern kan
 ersätta ändrade avsnitt och återanvända oförändrade avsnitt.
 
+UX2 lägger ett fristående presentationslager efter DOM-adaptern:
+
+```text
+Document Plan → pure workspace renderer → stable semantic DOM
+                                           ↓
+                         Document Workspace Experience
+                         (zoom, mode, page, adaptive presentation)
+```
+
+`document-workspace-experience.js` äger immutable vypreferenser, zoom- och
+navigeringsberäkningar samt lokal preferensserialisering. Dashboarden applicerar
+resultatet som CSS, sektionssynlighet och ARIA-state på befintlig DOM. Lagret
+kan därför inte ändra Semantic Document, tema, planner, komponenter eller Word.
+Vypreferenser använder en separat lokal nyckel och ingår aldrig i Review.
+
 ```text
 Recorder
   ↓

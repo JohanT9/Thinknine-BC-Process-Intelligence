@@ -56,5 +56,12 @@ assert.ok(
     dashboard.includes("const mediaAssets = await prepareDocumentMedia(pipeline);"),
   "Document Workspace and Word must share pipeline and prepared-media composition."
 );
+assert.ok(
+  dashboard.includes("function applyDocumentView(options = {})") &&
+    dashboard.includes("T9DocumentWorkspaceExperience.effectiveZoom") === false &&
+    dashboard.includes("globalThis.T9DocumentWorkspaceExperience") &&
+    !dashboard.includes("createActiveDocumentPipeline({ zoom"),
+  "Document view changes must remain isolated from the document pipeline."
+);
 
 console.log("Dashboard regression tests passed.");
