@@ -1,4 +1,4 @@
-THINKNINE BC PROCESS INTELLIGENCE 4.2.0 RELEASE CANDIDATE
+THINKNINE BC PROCESS INTELLIGENCE 4.4.0 RELEASE CANDIDATE
 
 FÖRUTSÄTTNINGAR
 
@@ -22,6 +22,13 @@ LADDA TILLÄGGET I EDGE
 3. Välj Läs in opaketerat.
 4. Välj repositoryts dist-mapp.
 5. Efter en ny build, välj Läs in igen på tilläggets kort.
+
+WORD-EXPORT 4.4 RC5
+
+Produktionsbygget paketerar Word-adaptern i
+dist/exporters/word-exporter-docx.bundle.js och kopierar den validerade
+Document Plan-pipelinen till dist. Kör alltid npm.cmd run build före omladdning
+så att adapter, pipeline och övriga genererade filer hålls synkroniserade.
 
 UPPDATERA EN BEFINTLIG INSTALLATION
 

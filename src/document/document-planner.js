@@ -120,6 +120,7 @@
       visibility: "visible",
       spacingIntent: spacingIntent(theme),
       appearance: {},
+      content: clone(sourceRef),
       components: children
     };
   }
@@ -163,6 +164,24 @@
 
   function planBlock(block, sectionKind, theme) {
     const kind = componentKind(block.kind);
+    const components = nestedComponents(block, sectionKind, theme);
+    if (block.kind === "step") {
+      const instruction = block.blocks?.find(child => child.kind === "paragraph")
+        ?.text || "";
+      let imageIndex = 0;
+      components.forEach(component => {
+        if (component.kind !== "screenshot") return;
+        imageIndex += 1;
+        component.content = {
+          ...component.content,
+          imageIndex,
+          stepNumber: block.stepNumber,
+          description: instruction,
+          altTitle: `Skärmbild ${imageIndex} steg ${block.stepNumber}`,
+          altName: `step-${block.stepNumber}-${imageIndex}`
+        };
+      });
+    }
     return {
       componentId: `component:block:${block.blockId}`,
       kind,
@@ -182,7 +201,18 @@
         block.kind === "paragraph" ? "paragraph" : "component"
       ),
       appearance: appearanceFor(block, theme, sectionKind),
-      components: nestedComponents(block, sectionKind, theme)
+      content: {
+        ...(block.text !== undefined ? { text: block.text } : {}),
+        ...(block.level !== undefined ? { level: block.level } : {}),
+        ...(block.stepNumber !== undefined ? { stepNumber: block.stepNumber } : {}),
+        ...(block.stepNumber !== undefined ? {
+          title: `Steg ${block.stepNumber}`
+        } : {}),
+        ...(block.calloutType ? { calloutType: block.calloutType } : {}),
+        ...(block.assetId ? { assetId: block.assetId } : {}),
+        ...(block.entries ? { entries: clone(block.entries) } : {})
+      },
+      components
     };
   }
 
@@ -221,6 +251,16 @@
         visibility: "visible",
         spacingIntent: spacingIntent(theme),
         appearance: clone(theme.components.metadataTable || {}),
+        content: {
+          rows: [
+            ["Version", document.metadata.documentVersion],
+            ["Datum", document.metadata.updatedAt || document.metadata.createdAt],
+            ["Miljö", document.metadata.environment],
+            ["Dokumentationstyp", document.metadata.documentationProfile],
+            ["Granskningsstatus", document.metadata.statusLabel],
+            ["Granskad av", document.metadata.reviewer]
+          ]
+        },
         components: []
       });
     }
@@ -247,6 +287,7 @@
           : "visible",
         spacingIntent: spacingIntent(theme, "section"),
         appearance: clone(theme.components[section.kind] || {}),
+        content: { sectionKind: section.kind },
         components: children
       }]
     };
@@ -272,7 +313,18 @@
         keepWithNext: false,
         visibility: "visible",
         spacingIntent: spacingIntent(theme),
-        appearance: { branding },
+        appearance: {
+          ...clone(theme.components[kind] || {}),
+          branding
+        },
+        content: {
+          title: document.metadata.title,
+          text: kind === "footer" ? branding.footer : document.metadata.title,
+          ...(kind === "footer" ? {
+            pageLabel: "Sida",
+            totalSeparator: " av "
+          } : {})
+        },
         components: []
       }));
   }
@@ -296,6 +348,13 @@
       flow: "document",
       page: clone(resolvedTheme.page),
       spacing: clone(resolvedTheme.spacing),
+      content: {
+        title: document.metadata.title,
+        creator: "Thinknine Process Intelligence",
+        subject: "Business Central arbetsinstruktion",
+        description: "Genererad från en granskad Business Central-process.",
+        documentAppearance: clone(resolvedTheme.components.document || {})
+      },
       components: globalComponents(document, resolvedTheme),
       sections: document.sections.map(section =>
         planSection(section, document, resolvedTheme)),

@@ -1,0 +1,117 @@
+(function (root, factory) {
+  const projector = typeof module === "object" && module.exports
+    ? require("../document/review-document-projector")
+    : root.T9ReviewDocumentProjector;
+  const semantic = typeof module === "object" && module.exports
+    ? require("../document/semantic-document")
+    : root.T9DocumentModel;
+  const registry = typeof module === "object" && module.exports
+    ? require("../document/document-theme-registry")
+    : root.T9DocumentThemeRegistry;
+  const themeValidation = typeof module === "object" && module.exports
+    ? require("../document/document-theme-validation")
+    : root.T9DocumentThemeValidation;
+  const planner = typeof module === "object" && module.exports
+    ? require("../document/document-planner")
+    : root.T9DocumentPlanner;
+  const planValidation = typeof module === "object" && module.exports
+    ? require("../document/document-plan-validation")
+    : root.T9DocumentPlanValidation;
+  const api = factory(
+    projector,
+    semantic,
+    registry,
+    themeValidation,
+    planner,
+    planValidation
+  );
+  if (typeof module === "object" && module.exports) module.exports = api;
+  root.T9WordExportPipeline = api;
+})(typeof globalThis !== "undefined" ? globalThis : this, function (
+  projector,
+  semantic,
+  registry,
+  themeValidation,
+  planner,
+  planValidation
+) {
+  function create(options = {}) {
+    const projection = projector.project(options.review, {
+      session: options.session,
+      prerequisites: options.prerequisites,
+      expectedResult: options.expectedResult
+    });
+    const documentResult = semantic.validate(projection.document);
+    if (!documentResult.valid) {
+      throw new Error(
+        `Semantic Document validation failed: ${documentResult.issues[0].message}`
+      );
+    }
+    const resolvedTheme = registry.resolve(
+      registry.BUILT_IN_REGISTRY,
+      options.themeId || "thinknine",
+      options.themeOverrides || {}
+    );
+    const themeResult = themeValidation.validate(resolvedTheme, {
+      requireValues: true
+    });
+    if (!themeResult.valid) {
+      throw new Error(
+        `Document Theme validation failed: ${themeResult.issues[0].message}`
+      );
+    }
+    const plan = planner.plan(projection.document, resolvedTheme);
+    const planResult = planValidation.validate(plan, {
+      document: projection.document,
+      theme: resolvedTheme,
+      plannerVersion: planner.PLANNER_VERSION
+    });
+    if (!planResult.valid) {
+      throw new Error(
+        `Document Plan validation failed: ${planResult.issues[0].message}`
+      );
+    }
+    return semantic.deepFreeze({
+      semanticDocument: projection.document,
+      theme: resolvedTheme,
+      plan,
+      diagnostics: projection.diagnostics
+    });
+  }
+
+  function screenshotComponents(plan) {
+    const result = [];
+    function visit(components) {
+      (components || []).forEach(component => {
+        if (component.kind === "screenshot" &&
+            component.visibility !== "hidden") {
+          result.push(component);
+        }
+        visit(component.components);
+      });
+    }
+    visit(plan?.components);
+    (plan?.sections || []).forEach(section => visit(section.components));
+    return result;
+  }
+
+  function requiredMediaAssetIds(plan) {
+    return [...new Set(screenshotComponents(plan).map(component =>
+      component.content?.assetId || component.sourceRef?.assetId
+    ).filter(Boolean))];
+  }
+
+  function validateMedia(plan, mediaAssets = {}) {
+    const missing = requiredMediaAssetIds(plan).filter(assetId => {
+      const value = mediaAssets[assetId];
+      return !(value instanceof Uint8Array) &&
+        !(value?.bytes instanceof Uint8Array);
+    });
+    if (missing.length) {
+      throw new Error(`Word export is missing media assets: ${missing.join(", ")}.`);
+    }
+    return true;
+  }
+
+  return { create, requiredMediaAssetIds, screenshotComponents, validateMedia };
+});

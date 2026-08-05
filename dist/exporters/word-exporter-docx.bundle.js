@@ -2243,7 +2243,7 @@
     module.exports = require_function_bind().call(call, $hasOwn);
   });
   var require_get_intrinsic = /* @__PURE__ */ __commonJSMin((exports, module) => {
-    var undefined;
+    var undefined2;
     var $Object = require_es_object_atoms();
     var $Error = require_es_errors();
     var $EvalError = require_eval();
@@ -2290,24 +2290,24 @@
     var $apply = require_functionApply();
     var $call = require_functionCall();
     var needsEval = {};
-    var TypedArray = typeof Uint8Array === "undefined" || !getProto ? undefined : getProto(Uint8Array);
+    var TypedArray = typeof Uint8Array === "undefined" || !getProto ? undefined2 : getProto(Uint8Array);
     var INTRINSICS = {
       __proto__: null,
-      "%AggregateError%": typeof AggregateError === "undefined" ? undefined : AggregateError,
+      "%AggregateError%": typeof AggregateError === "undefined" ? undefined2 : AggregateError,
       "%Array%": Array,
-      "%ArrayBuffer%": typeof ArrayBuffer === "undefined" ? undefined : ArrayBuffer,
-      "%ArrayIteratorPrototype%": hasSymbols && getProto ? getProto([][Symbol.iterator]()) : undefined,
-      "%AsyncFromSyncIteratorPrototype%": undefined,
+      "%ArrayBuffer%": typeof ArrayBuffer === "undefined" ? undefined2 : ArrayBuffer,
+      "%ArrayIteratorPrototype%": hasSymbols && getProto ? getProto([][Symbol.iterator]()) : undefined2,
+      "%AsyncFromSyncIteratorPrototype%": undefined2,
       "%AsyncFunction%": needsEval,
       "%AsyncGenerator%": needsEval,
       "%AsyncGeneratorFunction%": needsEval,
       "%AsyncIteratorPrototype%": needsEval,
-      "%Atomics%": typeof Atomics === "undefined" ? undefined : Atomics,
-      "%BigInt%": typeof BigInt === "undefined" ? undefined : BigInt,
-      "%BigInt64Array%": typeof BigInt64Array === "undefined" ? undefined : BigInt64Array,
-      "%BigUint64Array%": typeof BigUint64Array === "undefined" ? undefined : BigUint64Array,
+      "%Atomics%": typeof Atomics === "undefined" ? undefined2 : Atomics,
+      "%BigInt%": typeof BigInt === "undefined" ? undefined2 : BigInt,
+      "%BigInt64Array%": typeof BigInt64Array === "undefined" ? undefined2 : BigInt64Array,
+      "%BigUint64Array%": typeof BigUint64Array === "undefined" ? undefined2 : BigUint64Array,
       "%Boolean%": Boolean,
-      "%DataView%": typeof DataView === "undefined" ? undefined : DataView,
+      "%DataView%": typeof DataView === "undefined" ? undefined2 : DataView,
       "%Date%": Date,
       "%decodeURI%": decodeURI,
       "%decodeURIComponent%": decodeURIComponent,
@@ -2316,51 +2316,51 @@
       "%Error%": $Error,
       "%eval%": eval,
       "%EvalError%": $EvalError,
-      "%Float16Array%": typeof Float16Array === "undefined" ? undefined : Float16Array,
-      "%Float32Array%": typeof Float32Array === "undefined" ? undefined : Float32Array,
-      "%Float64Array%": typeof Float64Array === "undefined" ? undefined : Float64Array,
-      "%FinalizationRegistry%": typeof FinalizationRegistry === "undefined" ? undefined : FinalizationRegistry,
+      "%Float16Array%": typeof Float16Array === "undefined" ? undefined2 : Float16Array,
+      "%Float32Array%": typeof Float32Array === "undefined" ? undefined2 : Float32Array,
+      "%Float64Array%": typeof Float64Array === "undefined" ? undefined2 : Float64Array,
+      "%FinalizationRegistry%": typeof FinalizationRegistry === "undefined" ? undefined2 : FinalizationRegistry,
       "%Function%": $Function,
       "%GeneratorFunction%": needsEval,
-      "%Int8Array%": typeof Int8Array === "undefined" ? undefined : Int8Array,
-      "%Int16Array%": typeof Int16Array === "undefined" ? undefined : Int16Array,
-      "%Int32Array%": typeof Int32Array === "undefined" ? undefined : Int32Array,
+      "%Int8Array%": typeof Int8Array === "undefined" ? undefined2 : Int8Array,
+      "%Int16Array%": typeof Int16Array === "undefined" ? undefined2 : Int16Array,
+      "%Int32Array%": typeof Int32Array === "undefined" ? undefined2 : Int32Array,
       "%isFinite%": isFinite,
       "%isNaN%": isNaN,
-      "%IteratorPrototype%": hasSymbols && getProto ? getProto(getProto([][Symbol.iterator]())) : undefined,
-      "%JSON%": typeof JSON === "object" ? JSON : undefined,
-      "%Map%": typeof Map === "undefined" ? undefined : Map,
-      "%MapIteratorPrototype%": typeof Map === "undefined" || !hasSymbols || !getProto ? undefined : getProto((/* @__PURE__ */ new Map())[Symbol.iterator]()),
+      "%IteratorPrototype%": hasSymbols && getProto ? getProto(getProto([][Symbol.iterator]())) : undefined2,
+      "%JSON%": typeof JSON === "object" ? JSON : undefined2,
+      "%Map%": typeof Map === "undefined" ? undefined2 : Map,
+      "%MapIteratorPrototype%": typeof Map === "undefined" || !hasSymbols || !getProto ? undefined2 : getProto((/* @__PURE__ */ new Map())[Symbol.iterator]()),
       "%Math%": Math,
       "%Number%": Number,
       "%Object%": $Object,
       "%Object.getOwnPropertyDescriptor%": $gOPD,
       "%parseFloat%": parseFloat,
       "%parseInt%": parseInt,
-      "%Promise%": typeof Promise === "undefined" ? undefined : Promise,
-      "%Proxy%": typeof Proxy === "undefined" ? undefined : Proxy,
+      "%Promise%": typeof Promise === "undefined" ? undefined2 : Promise,
+      "%Proxy%": typeof Proxy === "undefined" ? undefined2 : Proxy,
       "%RangeError%": $RangeError,
       "%ReferenceError%": $ReferenceError,
-      "%Reflect%": typeof Reflect === "undefined" ? undefined : Reflect,
+      "%Reflect%": typeof Reflect === "undefined" ? undefined2 : Reflect,
       "%RegExp%": RegExp,
-      "%Set%": typeof Set === "undefined" ? undefined : Set,
-      "%SetIteratorPrototype%": typeof Set === "undefined" || !hasSymbols || !getProto ? undefined : getProto((/* @__PURE__ */ new Set())[Symbol.iterator]()),
-      "%SharedArrayBuffer%": typeof SharedArrayBuffer === "undefined" ? undefined : SharedArrayBuffer,
+      "%Set%": typeof Set === "undefined" ? undefined2 : Set,
+      "%SetIteratorPrototype%": typeof Set === "undefined" || !hasSymbols || !getProto ? undefined2 : getProto((/* @__PURE__ */ new Set())[Symbol.iterator]()),
+      "%SharedArrayBuffer%": typeof SharedArrayBuffer === "undefined" ? undefined2 : SharedArrayBuffer,
       "%String%": String,
-      "%StringIteratorPrototype%": hasSymbols && getProto ? getProto(""[Symbol.iterator]()) : undefined,
-      "%Symbol%": hasSymbols ? Symbol : undefined,
+      "%StringIteratorPrototype%": hasSymbols && getProto ? getProto(""[Symbol.iterator]()) : undefined2,
+      "%Symbol%": hasSymbols ? Symbol : undefined2,
       "%SyntaxError%": $SyntaxError,
       "%ThrowTypeError%": ThrowTypeError,
       "%TypedArray%": TypedArray,
       "%TypeError%": $TypeError,
-      "%Uint8Array%": typeof Uint8Array === "undefined" ? undefined : Uint8Array,
-      "%Uint8ClampedArray%": typeof Uint8ClampedArray === "undefined" ? undefined : Uint8ClampedArray,
-      "%Uint16Array%": typeof Uint16Array === "undefined" ? undefined : Uint16Array,
-      "%Uint32Array%": typeof Uint32Array === "undefined" ? undefined : Uint32Array,
+      "%Uint8Array%": typeof Uint8Array === "undefined" ? undefined2 : Uint8Array,
+      "%Uint8ClampedArray%": typeof Uint8ClampedArray === "undefined" ? undefined2 : Uint8ClampedArray,
+      "%Uint16Array%": typeof Uint16Array === "undefined" ? undefined2 : Uint16Array,
+      "%Uint32Array%": typeof Uint32Array === "undefined" ? undefined2 : Uint32Array,
       "%URIError%": $URIError,
-      "%WeakMap%": typeof WeakMap === "undefined" ? undefined : WeakMap,
-      "%WeakRef%": typeof WeakRef === "undefined" ? undefined : WeakRef,
-      "%WeakSet%": typeof WeakSet === "undefined" ? undefined : WeakSet,
+      "%WeakMap%": typeof WeakMap === "undefined" ? undefined2 : WeakMap,
+      "%WeakRef%": typeof WeakRef === "undefined" ? undefined2 : WeakRef,
+      "%WeakSet%": typeof WeakSet === "undefined" ? undefined2 : WeakSet,
       "%Function.prototype.call%": $call,
       "%Function.prototype.apply%": $apply,
       "%Object.defineProperty%": $defineProperty,
@@ -7896,7 +7896,7 @@
       value: type
     } }
   });
-  var createBorderElement = (elementName, { color, size, space, style }) => new BuilderElement({
+  var createBorderElement = (elementName, { color: color2, size, space, style }) => new BuilderElement({
     name: elementName,
     attributes: {
       style: {
@@ -7905,7 +7905,7 @@
       },
       color: {
         key: "w:color",
-        value: color === void 0 ? void 0 : hexColorValue(color)
+        value: color2 === void 0 ? void 0 : hexColorValue(color2)
       },
       size: {
         key: "w:sz",
@@ -8088,7 +8088,7 @@
       this.root.push("SECTION");
     }
   };
-  var createShading = ({ fill, color, type }) => new BuilderElement({
+  var createShading = ({ fill, color: color2, type }) => new BuilderElement({
     name: "w:shd",
     attributes: {
       fill: {
@@ -8097,7 +8097,7 @@
       },
       color: {
         key: "w:color",
-        value: color === void 0 ? void 0 : hexColorValue(color)
+        value: color2 === void 0 ? void 0 : hexColorValue(color2)
       },
       type: {
         key: "w:val",
@@ -8193,21 +8193,21 @@
     }
   };
   var Color = class extends XmlComponent {
-    constructor(color) {
+    constructor(color2) {
       super("w:color");
-      this.root.push(new Attributes({ val: hexColorValue(color) }));
+      this.root.push(new Attributes({ val: hexColorValue(color2) }));
     }
   };
   var Highlight = class extends XmlComponent {
-    constructor(color) {
+    constructor(color2) {
       super("w:highlight");
-      this.root.push(new Attributes({ val: color }));
+      this.root.push(new Attributes({ val: color2 }));
     }
   };
   var HighlightComplexScript = class extends XmlComponent {
-    constructor(color) {
+    constructor(color2) {
       super("w:highlightCs");
-      this.root.push(new Attributes({ val: color }));
+      this.root.push(new Attributes({ val: color2 }));
     }
   };
   var createLanguageComponent = (options) => new BuilderElement({
@@ -8330,7 +8330,7 @@
     /** No underline */
     NONE: "none"
   };
-  var createUnderline = (underlineType = UnderlineType.SINGLE, color) => new BuilderElement({
+  var createUnderline = (underlineType = UnderlineType.SINGLE, color2) => new BuilderElement({
     name: "w:u",
     attributes: {
       val: {
@@ -8339,7 +8339,7 @@
       },
       color: {
         key: "w:color",
-        value: color === void 0 ? void 0 : hexColorValue(color)
+        value: color2 === void 0 ? void 0 : hexColorValue(color2)
       }
     }
   });
@@ -11152,6 +11152,11 @@
       super("w:endnoteRef");
     }
   };
+  var Tab = class extends EmptyElement {
+    constructor() {
+      super("w:tab");
+    }
+  };
   var BreakType = {
     /** Column break - text continues at the beginning of the next column */
     COLUMN: "column",
@@ -11333,6 +11338,11 @@
       children.forEach((child) => {
         this.root.push(child);
       });
+    }
+  };
+  var InternalHyperlink = class extends ConcreteHyperlink {
+    constructor(options) {
+      super(options.children, uniqueId(), options.anchor);
     }
   };
   var ExternalHyperlink = class extends XmlComponent {
@@ -14713,6 +14723,136 @@
     }
     get FontTable() {
       return this.fontWrapper;
+    }
+  };
+  var FieldInstruction = class extends XmlComponent {
+    constructor(properties = {}) {
+      super("w:instrText");
+      _defineProperty(this, "properties", void 0);
+      this.properties = properties;
+      this.root.push(new TextAttributes({ space: SpaceType.PRESERVE }));
+      let instruction = "TOC";
+      if (this.properties.captionLabel) instruction = `${instruction} \\a "${this.properties.captionLabel}"`;
+      if (this.properties.entriesFromBookmark) instruction = `${instruction} \\b "${this.properties.entriesFromBookmark}"`;
+      if (this.properties.captionLabelIncludingNumbers) instruction = `${instruction} \\c "${this.properties.captionLabelIncludingNumbers}"`;
+      if (this.properties.sequenceAndPageNumbersSeparator) instruction = `${instruction} \\d "${this.properties.sequenceAndPageNumbersSeparator}"`;
+      if (this.properties.tcFieldIdentifier) instruction = `${instruction} \\f "${this.properties.tcFieldIdentifier}"`;
+      if (this.properties.hyperlink) instruction = `${instruction} \\h`;
+      if (this.properties.tcFieldLevelRange) instruction = `${instruction} \\l "${this.properties.tcFieldLevelRange}"`;
+      if (this.properties.pageNumbersEntryLevelsRange) instruction = `${instruction} \\n "${this.properties.pageNumbersEntryLevelsRange}"`;
+      if (this.properties.headingStyleRange) instruction = `${instruction} \\o "${this.properties.headingStyleRange}"`;
+      if (this.properties.entryAndPageNumberSeparator) instruction = `${instruction} \\p "${this.properties.entryAndPageNumberSeparator}"`;
+      if (this.properties.seqFieldIdentifierForPrefix) instruction = `${instruction} \\s "${this.properties.seqFieldIdentifierForPrefix}"`;
+      if (this.properties.stylesWithLevels && this.properties.stylesWithLevels.length) {
+        const styles = this.properties.stylesWithLevels.map((sl) => `${sl.styleName},${sl.level}`).join(",");
+        instruction = `${instruction} \\t "${styles}"`;
+      }
+      if (this.properties.useAppliedParagraphOutlineLevel) instruction = `${instruction} \\u`;
+      if (this.properties.preserveTabInEntries) instruction = `${instruction} \\w`;
+      if (this.properties.preserveNewLineInEntries) instruction = `${instruction} \\x`;
+      if (this.properties.hideTabAndPageNumbersInWebView) instruction = `${instruction} \\z`;
+      this.root.push(instruction);
+    }
+  };
+  var StructuredDocumentTagContent = class extends XmlComponent {
+    constructor() {
+      super("w:sdtContent");
+    }
+  };
+  var StructuredDocumentTagProperties = class extends XmlComponent {
+    constructor(alias) {
+      super("w:sdtPr");
+      if (alias) this.root.push(new StringValueElement("w:alias", alias));
+    }
+  };
+  function _objectWithoutPropertiesLoose(r, e) {
+    if (null == r) return {};
+    var t = {};
+    for (var n in r) if ({}.hasOwnProperty.call(r, n)) {
+      if (e.includes(n)) continue;
+      t[n] = r[n];
+    }
+    return t;
+  }
+  function _objectWithoutProperties(e, t) {
+    if (null == e) return {};
+    var o, r, i = _objectWithoutPropertiesLoose(e, t);
+    if (Object.getOwnPropertySymbols) {
+      var s = Object.getOwnPropertySymbols(e);
+      for (r = 0; r < s.length; r++) o = s[r], t.includes(o) || {}.propertyIsEnumerable.call(e, o) && (i[o] = e[o]);
+    }
+    return i;
+  }
+  var _excluded$1 = [
+    "contentChildren",
+    "cachedEntries",
+    "beginDirty"
+  ];
+  var TableOfContents = class extends FileChild {
+    constructor(alias = "Table of Contents", _ref = {}) {
+      let { contentChildren = [], cachedEntries = [], beginDirty = true } = _ref, properties = _objectWithoutProperties(_ref, _excluded$1);
+      super("w:sdt");
+      this.root.push(new StructuredDocumentTagProperties(alias));
+      const content = new StructuredDocumentTagContent();
+      const beginParagraphMandatoryChildren = [new Run({ children: [
+        createBegin(beginDirty),
+        new FieldInstruction(properties),
+        createSeparate()
+      ] })];
+      const endParagraphMandatoryChildren = [new Run({ children: [createEnd()] })];
+      if (cachedEntries !== void 0 && cachedEntries.length > 0) {
+        const { stylesWithLevels } = properties;
+        const cachedParagraphs = cachedEntries.map((entry, i) => {
+          var _stylesWithLevels$fin, _stylesWithLevels$fin2;
+          const contentChild = this.buildCachedContentParagraphChild(entry, properties);
+          const style = (_stylesWithLevels$fin = stylesWithLevels === null || stylesWithLevels === void 0 || (_stylesWithLevels$fin2 = stylesWithLevels.find((s) => s.level === entry.level)) === null || _stylesWithLevels$fin2 === void 0 ? void 0 : _stylesWithLevels$fin2.styleName) !== null && _stylesWithLevels$fin !== void 0 ? _stylesWithLevels$fin : `TOC${entry.level}`;
+          const children = i === 0 ? [...beginParagraphMandatoryChildren, contentChild] : i === cachedEntries.length - 1 ? [contentChild, ...endParagraphMandatoryChildren] : [contentChild];
+          return new Paragraph({
+            style,
+            tabStops: this.getTabStopsForLevel(entry.level),
+            children
+          });
+        });
+        let paragraphs = cachedParagraphs;
+        if (cachedEntries.length <= 1) paragraphs = [...cachedParagraphs, new Paragraph({ children: endParagraphMandatoryChildren })];
+        for (const paragraph of paragraphs) content.addChildElement(paragraph);
+      } else {
+        const beginParagraph = new Paragraph({ children: beginParagraphMandatoryChildren });
+        content.addChildElement(beginParagraph);
+        for (const child of contentChildren) content.addChildElement(child);
+        const endParagraph = new Paragraph({ children: endParagraphMandatoryChildren });
+        content.addChildElement(endParagraph);
+      }
+      this.root.push(content);
+    }
+    getTabStopsForLevel(level, pageWidth = 9025) {
+      return [{
+        type: "clear",
+        position: pageWidth + 1 - (level - 1) * 240
+      }, {
+        type: "right",
+        position: pageWidth,
+        leader: "dot"
+      }];
+    }
+    buildCachedContentRun(entry, properties) {
+      var _entry$page$toString, _entry$page;
+      return new Run({
+        style: (properties === null || properties === void 0 ? void 0 : properties.hyperlink) && entry.href !== void 0 ? "IndexLink" : void 0,
+        children: [
+          new Text({ text: entry.title }),
+          new Tab(),
+          new Text({ text: (_entry$page$toString = (_entry$page = entry.page) === null || _entry$page === void 0 ? void 0 : _entry$page.toString()) !== null && _entry$page$toString !== void 0 ? _entry$page$toString : "" })
+        ]
+      });
+    }
+    buildCachedContentParagraphChild(entry, properties) {
+      const run = this.buildCachedContentRun(entry, properties);
+      if ((properties === null || properties === void 0 ? void 0 : properties.hyperlink) && entry.href !== void 0) return new InternalHyperlink({
+        anchor: entry.href,
+        children: [run]
+      });
+      return run;
     }
   };
   var Header = class {
@@ -19130,46 +19270,34 @@
     return (_text$match = text.match(pattern)) !== null && _text$match !== void 0 ? _text$match : [];
   };
 
-  // src/exporters/word-exporter-docx.mjs
+  // src/exporters/word-document-adapter.mjs
   var import_text_format = __toESM(require_text_format(), 1);
-  var PAGE_IMAGE_WIDTH = 590;
-  var PAGE_IMAGE_HEIGHT = 390;
   function plainText(value) {
     return globalThis.T9TextFormat.quoteEmphasis(value).replace(/`/g, "").trim();
   }
+  function color(value, fallback) {
+    return String(value || fallback || "").replace(/^#/, "").toUpperCase();
+  }
   function safeDate(value) {
-    const date = new Date(value || Date.now());
-    return Number.isNaN(date.getTime()) ? (/* @__PURE__ */ new Date()).toLocaleDateString("sv-SE") : date.toLocaleDateString("sv-SE");
+    const date = new Date(value || "");
+    return Number.isNaN(date.getTime()) ? "" : date.toLocaleDateString("sv-SE");
   }
   function imageBytes(imageData) {
-    if (imageData instanceof Uint8Array) {
-      return imageData;
-    }
-    if (imageData?.bytes instanceof Uint8Array) {
-      return imageData.bytes;
-    }
+    if (imageData instanceof Uint8Array) return imageData;
+    if (imageData?.bytes instanceof Uint8Array) return imageData.bytes;
     return null;
   }
   function imageType(imageData, bytes) {
     const mime = String(imageData?.mimeType || "").toLowerCase();
-    if (mime === "image/jpeg" || mime === "image/jpg" || bytes?.length >= 3 && bytes[0] === 255 && bytes[1] === 216 && bytes[2] === 255) {
-      return "jpg";
-    }
+    if (mime === "image/jpeg" || mime === "image/jpg" || bytes?.length >= 3 && bytes[0] === 255 && bytes[1] === 216 && bytes[2] === 255) return "jpg";
     return "png";
   }
   function pngSize(bytes) {
     if (!bytes || bytes.length < 24 || bytes[0] !== 137 || bytes[1] !== 80 || bytes[2] !== 78 || bytes[3] !== 71) {
       return null;
     }
-    const view = new DataView(
-      bytes.buffer,
-      bytes.byteOffset,
-      bytes.byteLength
-    );
-    return {
-      width: view.getUint32(16, false),
-      height: view.getUint32(20, false)
-    };
+    const view = new DataView(bytes.buffer, bytes.byteOffset, bytes.byteLength);
+    return { width: view.getUint32(16, false), height: view.getUint32(20, false) };
   }
   function jpegSize(bytes) {
     if (!bytes || bytes.length < 4 || bytes[0] !== 255 || bytes[1] !== 216) {
@@ -19183,12 +19311,8 @@
       }
       const marker = bytes[offset + 1];
       offset += 2;
-      if (marker === 216 || marker === 217) {
-        continue;
-      }
-      if (offset + 2 > bytes.length) {
-        break;
-      }
+      if (marker === 216 || marker === 217) continue;
+      if (offset + 2 > bytes.length) break;
       const length = bytes[offset] << 8 | bytes[offset + 1];
       if ([
         192,
@@ -19210,476 +19334,369 @@
           width: bytes[offset + 5] << 8 | bytes[offset + 6]
         };
       }
-      if (length < 2) {
-        break;
-      }
+      if (length < 2) break;
       offset += length;
     }
     return null;
   }
-  function fittedImageSize(bytes) {
+  function fittedImageSize(bytes, limits = {}) {
     const size = pngSize(bytes) || jpegSize(bytes) || { width: 1200, height: 700 };
-    const widthFactor = PAGE_IMAGE_WIDTH / size.width;
-    const heightFactor = PAGE_IMAGE_HEIGHT / size.height;
-    const factor = Math.min(1, widthFactor, heightFactor);
+    const maxWidth = Number(limits.maxWidth) || 590;
+    const maxHeight = Number(limits.maxHeight) || 390;
+    const factor = Math.min(1, maxWidth / size.width, maxHeight / size.height);
     return {
       width: Math.max(1, Math.round(size.width * factor)),
       height: Math.max(1, Math.round(size.height * factor))
     };
   }
-  function labelCell(text) {
-    return new TableCell({
-      width: {
-        size: 30,
-        type: WidthType.PERCENTAGE
-      },
-      shading: {
-        type: ShadingType.CLEAR,
-        fill: "EAF2F8"
-      },
-      children: [
-        new Paragraph({
-          children: [
-            new TextRun({
-              text,
-              bold: true
-            })
-          ]
-        })
-      ]
-    });
-  }
-  function valueCell(text) {
-    return new TableCell({
-      width: {
-        size: 70,
-        type: WidthType.PERCENTAGE
-      },
-      children: [
-        new Paragraph({
-          children: [
-            new TextRun(String(text || ""))
-          ]
-        })
-      ]
-    });
-  }
-  function metadataTable(rows) {
-    return new Table({
-      width: {
-        size: 100,
-        type: WidthType.PERCENTAGE
-      },
-      borders: {
-        top: { style: BorderStyle.SINGLE, size: 1, color: "B8C2CC" },
-        bottom: { style: BorderStyle.SINGLE, size: 1, color: "B8C2CC" },
-        left: { style: BorderStyle.SINGLE, size: 1, color: "B8C2CC" },
-        right: { style: BorderStyle.SINGLE, size: 1, color: "B8C2CC" },
-        insideHorizontal: { style: BorderStyle.SINGLE, size: 1, color: "D5DCE3" },
-        insideVertical: { style: BorderStyle.SINGLE, size: 1, color: "D5DCE3" }
-      },
-      rows: rows.map(
-        ([label, value]) => new TableRow({
-          children: [
-            labelCell(label),
-            valueCell(value)
-          ]
-        })
-      )
-    });
-  }
-  function heading(text, level = HeadingLevel.HEADING_1) {
-    return new Paragraph({
-      heading: level,
-      spacing: {
-        before: level === HeadingLevel.HEADING_1 ? 320 : 220,
-        after: 120
-      },
-      children: [
-        new TextRun({
-          text,
-          bold: true,
-          color: level === HeadingLevel.HEADING_1 ? "0F4C81" : "1E5E8C"
-        })
-      ]
-    });
-  }
   function bodyParagraph(text, options = {}) {
     return new Paragraph({
-      spacing: {
-        after: options.after ?? 140
-      },
+      spacing: { after: options.after ?? 140 },
       alignment: options.alignment,
-      children: [
-        new TextRun({
-          text: plainText(text),
-          bold: Boolean(options.bold),
-          italics: Boolean(options.italics),
-          color: options.color,
-          size: options.size
-        })
-      ]
+      children: [new TextRun({
+        text: plainText(text),
+        bold: Boolean(options.bold),
+        italics: Boolean(options.italics),
+        color: options.color,
+        size: options.size
+      })]
     });
   }
-  function bulletParagraph(text) {
+  function headingComponent(component, levelOverride) {
+    const level = levelOverride || (component.content.level === 2 ? HeadingLevel.HEADING_2 : HeadingLevel.HEADING_1);
+    const fallback = level === HeadingLevel.HEADING_1 ? "0F4C81" : "1E5E8C";
     return new Paragraph({
-      bullet: {
-        level: 0
-      },
-      spacing: {
-        after: 80
-      },
-      children: [
-        new TextRun(plainText(text))
-      ]
+      heading: level,
+      spacing: { before: level === HeadingLevel.HEADING_1 ? 320 : 220, after: 120 },
+      children: [new TextRun({
+        text: plainText(component.content.text),
+        bold: true,
+        color: color(component.appearance.typography?.color, fallback)
+      })]
     });
   }
-  function commentBox(text) {
-    return new Table({
-      width: {
-        size: 100,
-        type: WidthType.PERCENTAGE
-      },
-      borders: {
-        top: { style: BorderStyle.SINGLE, size: 2, color: "D6A700" },
-        bottom: { style: BorderStyle.SINGLE, size: 2, color: "D6A700" },
-        left: { style: BorderStyle.SINGLE, size: 2, color: "D6A700" },
-        right: { style: BorderStyle.SINGLE, size: 2, color: "D6A700" }
-      },
-      rows: [
-        new TableRow({
-          children: [
-            new TableCell({
-              shading: {
-                type: ShadingType.CLEAR,
-                fill: "FFF7CC"
-              },
-              children: [
-                new Paragraph({
-                  children: [
-                    new TextRun({
-                      text: `Kommentar: ${plainText(text)}`,
-                      bold: true
-                    })
-                  ]
-                })
-              ]
-            })
-          ]
-        })
-      ]
-    });
-  }
-  function taskElements(task, index, screenshotData) {
-    const children = [];
-    const instruction = plainText(
-      task.instruction || task.description || "Utf\xF6r uppgiften."
-    );
-    children.push(
-      heading(`Steg ${index + 1}`, HeadingLevel.HEADING_2)
-    );
-    children.push(
-      bodyParagraph(instruction, {
-        size: 24,
-        after: 100
-      })
-    );
-    if (task.userComment) {
-      children.push(new Paragraph({ children: [] }));
-      children.push(commentBox(task.userComment));
-    }
-    const screenshotPaths = [...new Set(
-      task.screenshots?.length ? task.screenshots : task.screenshot ? [task.screenshot] : []
-    )];
-    screenshotPaths.forEach((path, imageIndex) => {
-      const imageData = screenshotData[path];
-      const bytes = imageBytes(imageData);
-      if (!bytes) return;
-      const dimensions = fittedImageSize(bytes);
-      children.push(
-        new Paragraph({
-          alignment: AlignmentType.CENTER,
-          spacing: {
-            before: 120,
-            after: 200
-          },
-          children: [
-            new ImageRun({
-              data: bytes,
-              type: imageType(imageData, bytes),
-              transformation: dimensions,
-              altText: {
-                title: `Sk\xE4rmbild ${imageIndex + 1} steg ${index + 1}`,
-                description: instruction,
-                name: `step-${index + 1}-${imageIndex + 1}`
-              }
-            })
-          ]
-        })
-      );
-    });
-    return children;
-  }
-  function versionTable(date, reviewer) {
-    const headerOptions = {
-      shading: {
-        type: ShadingType.CLEAR,
-        fill: "D9EAF7"
-      }
+  function tableBorders(appearance, size = 1) {
+    const outer = color(appearance.borderColor, "B8C2CC");
+    const inside = color(appearance.insideBorderColor, "D5DCE3");
+    return {
+      top: { style: BorderStyle.SINGLE, size, color: outer },
+      bottom: { style: BorderStyle.SINGLE, size, color: outer },
+      left: { style: BorderStyle.SINGLE, size, color: outer },
+      right: { style: BorderStyle.SINGLE, size, color: outer },
+      insideHorizontal: { style: BorderStyle.SINGLE, size, color: inside },
+      insideVertical: { style: BorderStyle.SINGLE, size, color: inside }
     };
+  }
+  function metadataTable(component) {
     return new Table({
-      width: {
-        size: 100,
-        type: WidthType.PERCENTAGE
-      },
+      width: { size: 100, type: WidthType.PERCENTAGE },
+      borders: tableBorders(component.appearance),
+      rows: (component.content.rows || []).map(([label, rawValue]) => {
+        const value = label === "Datum" ? safeDate(rawValue) : rawValue;
+        return new TableRow({ children: [
+          new TableCell({
+            width: { size: 30, type: WidthType.PERCENTAGE },
+            shading: {
+              type: ShadingType.CLEAR,
+              fill: color(component.appearance.labelFill, "EAF2F8")
+            },
+            children: [new Paragraph({
+              children: [new TextRun({ text: String(label), bold: true })]
+            })]
+          }),
+          new TableCell({
+            width: { size: 70, type: WidthType.PERCENTAGE },
+            children: [new Paragraph({
+              children: [new TextRun(String(value || ""))]
+            })]
+          })
+        ] });
+      })
+    });
+  }
+  function commentBox(component) {
+    const paragraph = component.components.find((child) => child.kind === "paragraph");
+    const border = color(component.appearance.borderColor, "D6A700");
+    return new Table({
+      width: { size: 100, type: WidthType.PERCENTAGE },
       borders: {
-        top: { style: BorderStyle.SINGLE, size: 1, color: "B8C2CC" },
-        bottom: { style: BorderStyle.SINGLE, size: 1, color: "B8C2CC" },
-        left: { style: BorderStyle.SINGLE, size: 1, color: "B8C2CC" },
-        right: { style: BorderStyle.SINGLE, size: 1, color: "B8C2CC" },
-        insideHorizontal: { style: BorderStyle.SINGLE, size: 1, color: "D5DCE3" },
-        insideVertical: { style: BorderStyle.SINGLE, size: 1, color: "D5DCE3" }
+        top: { style: BorderStyle.SINGLE, size: 2, color: border },
+        bottom: { style: BorderStyle.SINGLE, size: 2, color: border },
+        left: { style: BorderStyle.SINGLE, size: 2, color: border },
+        right: { style: BorderStyle.SINGLE, size: 2, color: border }
       },
+      rows: [new TableRow({ children: [new TableCell({
+        shading: {
+          type: ShadingType.CLEAR,
+          fill: color(component.appearance.fillColor, "FFF7CC")
+        },
+        children: [new Paragraph({ children: [new TextRun({
+          text: `Kommentar: ${plainText(paragraph?.content.text)}`,
+          bold: true
+        })] })]
+      })] })]
+    });
+  }
+  function revisionTable(component) {
+    const headers = ["Version", "Datum", "\xC4ndring", "Granskad av"];
+    const rows = (component.content.entries || []).map((entry) => [
+      entry.version,
+      safeDate(entry.createdAt),
+      entry.change,
+      entry.reviewer
+    ]);
+    return new Table({
+      width: { size: 100, type: WidthType.PERCENTAGE },
+      borders: tableBorders(component.appearance),
       rows: [
         new TableRow({
           tableHeader: true,
-          children: ["Version", "Datum", "\xC4ndring", "Granskad av"].map(
-            (text) => new TableCell({
-              ...headerOptions,
-              children: [
-                new Paragraph({
-                  children: [
-                    new TextRun({
-                      text,
-                      bold: true
-                    })
-                  ]
-                })
-              ]
-            })
-          )
+          children: headers.map((text) => new TableCell({
+            shading: {
+              type: ShadingType.CLEAR,
+              fill: color(component.appearance.headerFill, "D9EAF7")
+            },
+            children: [new Paragraph({
+              children: [new TextRun({ text, bold: true })]
+            })]
+          }))
         }),
-        new TableRow({
-          children: ["1.0", date, "F\xF6rsta version", reviewer || ""].map(
-            (text) => new TableCell({
-              children: [
-                new Paragraph({
-                  children: [
-                    new TextRun(text)
-                  ]
-                })
-              ]
-            })
-          )
-        })
+        ...rows.map((row) => new TableRow({
+          children: row.map((text) => new TableCell({
+            children: [new Paragraph({
+              children: [new TextRun(String(text || ""))]
+            })]
+          }))
+        }))
       ]
     });
   }
-  function buildDocument(options) {
-    const session = options.session || {};
-    const review = options.review || {};
-    const screenshotData = options.screenshotData || {};
-    const tasks = (review.tasks || options.tasks || []).filter((task) => !task.deleted);
-    const title = plainText(
-      options.title || review.sessionName || session.name || "Business Central-process"
-    );
-    const date = safeDate(
-      review.updatedAt || session.endedAt || session.startedAt
-    );
-    const environment = session.settings?.environmentName || options.environment || "Ej angiven";
-    const reviewer = review.reviewer || "Ej angiven";
-    const purpose = session.purpose || options.purpose || "Beskriver hur processen genomf\xF6rs i Business Central.";
-    const prerequisites = options.prerequisites || [
-      "Anv\xE4ndaren har beh\xF6righet till ber\xF6rda sidor och \xE5tg\xE4rder.",
-      "N\xF6dv\xE4ndiga grunddata och inst\xE4llningar finns upplagda.",
-      "Instruktionerna f\xF6ljer de ben\xE4mningar som visades i Business Central."
-    ];
-    const workflowChildren = tasks.flatMap(
-      (task, index) => taskElements(task, index, screenshotData)
-    );
-    const header = new Header({
-      children: [
-        new Paragraph({
-          alignment: AlignmentType.RIGHT,
-          border: {
-            bottom: {
-              style: BorderStyle.SINGLE,
-              size: 6,
-              color: "0F4C81"
-            }
-          },
-          children: [
-            new TextRun({
-              text: title,
-              color: "5F6B76",
-              size: 18
-            })
-          ]
-        })
-      ]
+  function screenshotParagraph(component, mediaAssets) {
+    const media = mediaAssets[component.content.assetId];
+    const bytes = imageBytes(media);
+    if (!bytes) {
+      throw new Error(`Word export is missing media asset: ${component.content.assetId}.`);
+    }
+    return new Paragraph({
+      alignment: AlignmentType.CENTER,
+      spacing: { before: 120, after: 200 },
+      children: [new ImageRun({
+        data: bytes,
+        type: imageType(media, bytes),
+        transformation: fittedImageSize(bytes, component.appearance),
+        altText: {
+          title: component.content.altTitle,
+          description: component.content.description,
+          name: component.content.altName
+        }
+      })]
     });
-    const footer = new Footer({
-      children: [
-        new Paragraph({
+  }
+  function renderComponent(component, mediaAssets, context = {}) {
+    if (component.visibility === "hidden") return [];
+    if (component.kind === "heading") return [headingComponent(component)];
+    if (component.kind === "paragraph") {
+      return [bodyParagraph(component.content.text, context.step ? { size: 24, after: 100 } : {})];
+    }
+    if (component.kind === "screenshot") {
+      return [screenshotParagraph(component, mediaAssets)];
+    }
+    if (component.kind === "callout") {
+      return [new Paragraph({ children: [] }), commentBox(component)];
+    }
+    if (component.kind === "step") {
+      const heading = {
+        content: { text: component.content.title, level: 2 },
+        appearance: {
+          typography: { color: component.appearance.headingColor || "#1e5e8c" }
+        }
+      };
+      return [
+        headingComponent(heading, HeadingLevel.HEADING_2),
+        ...component.components.flatMap((child) => renderComponent(child, mediaAssets, { step: true }))
+      ];
+    }
+    if (component.kind === "list") {
+      return component.components.flatMap((group) => {
+        const paragraph = group.components.find((child) => child.kind === "paragraph");
+        return paragraph ? [new Paragraph({
+          bullet: { level: 0 },
+          spacing: { after: 80 },
+          children: [new TextRun(plainText(paragraph.content.text))]
+        })] : [];
+      });
+    }
+    if (component.kind === "metadata") return [metadataTable(component)];
+    if (component.kind === "revisionHistory" && component.sourceRef.blockId) {
+      return [revisionTable(component)];
+    }
+    if (component.kind === "pageBreak") {
+      return [new Paragraph({ children: [new PageBreak()] })];
+    }
+    if (component.kind === "toc") {
+      return [new TableOfContents(component.appearance.title, {
+        hyperlink: true,
+        headingStyleRange: "1-3"
+      })];
+    }
+    if (component.kind === "cover") {
+      const title = component.components.find((child) => child.kind === "heading")?.content.text || "";
+      const metadata = component.components.find((child) => child.kind === "metadata");
+      const accent = color(component.appearance.accentColor, "0F4C81");
+      const muted = color(component.appearance.mutedColor, "5F6B76");
+      return [
+        bodyParagraph(component.appearance.brandText, {
+          bold: true,
+          color: accent,
+          size: 24,
           alignment: AlignmentType.CENTER,
-          border: {
-            top: {
-              style: BorderStyle.SINGLE,
-              size: 4,
-              color: "B8C2CC"
-            }
-          },
-          children: [
-            new TextRun({
-              text: "Thinknine Process Intelligence | Sida ",
-              color: "5F6B76",
-              size: 18
-            }),
-            new TextRun({
-              children: [PageNumber.CURRENT],
-              color: "5F6B76",
-              size: 18
-            }),
-            new TextRun({
-              text: " av ",
-              color: "5F6B76",
-              size: 18
-            }),
-            new TextRun({
-              children: [PageNumber.TOTAL_PAGES],
-              color: "5F6B76",
-              size: 18
-            })
-          ]
-        })
+          after: 120
+        }),
+        bodyParagraph(component.appearance.documentType, {
+          color: muted,
+          size: 26,
+          alignment: AlignmentType.CENTER,
+          after: 160
+        }),
+        bodyParagraph(title, {
+          bold: true,
+          color: accent,
+          size: 52,
+          alignment: AlignmentType.CENTER,
+          after: 220
+        }),
+        bodyParagraph(component.appearance.subtitle, {
+          color: muted,
+          size: 26,
+          alignment: AlignmentType.CENTER,
+          after: 360
+        }),
+        ...metadata ? [metadataTable(metadata)] : [],
+        new Paragraph({ children: [new PageBreak()] })
+      ];
+    }
+    return component.components.flatMap((child) => renderComponent(child, mediaAssets, context));
+  }
+  function wordHeader(component) {
+    if (!component) return void 0;
+    return new Header({ children: [new Paragraph({
+      alignment: AlignmentType.RIGHT,
+      border: { bottom: {
+        style: BorderStyle.SINGLE,
+        size: 6,
+        color: color(component.appearance.borderColor, "0F4C81")
+      } },
+      children: [new TextRun({
+        text: component.content.text,
+        color: color(component.appearance.textColor, "5F6B76"),
+        size: 18
+      })]
+    })] });
+  }
+  function wordFooter(component) {
+    if (!component) return void 0;
+    const textColor = color(component.appearance.textColor, "5F6B76");
+    return new Footer({ children: [new Paragraph({
+      alignment: AlignmentType.CENTER,
+      border: { top: {
+        style: BorderStyle.SINGLE,
+        size: 4,
+        color: color(component.appearance.borderColor, "B8C2CC")
+      } },
+      children: [
+        new TextRun({
+          text: `${component.content.text} | ${component.content.pageLabel} `,
+          color: textColor,
+          size: 18
+        }),
+        new TextRun({ children: [PageNumber.CURRENT], color: textColor, size: 18 }),
+        new TextRun({
+          text: component.content.totalSeparator,
+          color: textColor,
+          size: 18
+        }),
+        new TextRun({ children: [PageNumber.TOTAL_PAGES], color: textColor, size: 18 })
       ]
-    });
-    return {
-      document: new File({
-        creator: "Thinknine Process Intelligence",
-        title,
-        subject: "Business Central arbetsinstruktion",
-        description: "Genererad fr\xE5n en granskad Business Central-process.",
-        styles: {
-          default: {
-            document: {
-              run: {
-                font: "Aptos",
-                size: 22
-              },
-              paragraph: {
-                spacing: {
-                  after: 120,
-                  line: 276
-                }
-              }
-            }
-          }
+    })] });
+  }
+  function allComponents(plan) {
+    const result = [];
+    function visit(components) {
+      (components || []).forEach((component) => {
+        result.push(component);
+        visit(component.components);
+      });
+    }
+    visit(plan.components);
+    plan.sections.forEach((section) => visit(section.components));
+    return result;
+  }
+  function validatePlanMedia(plan, mediaAssets) {
+    if (!plan || !Array.isArray(plan.sections)) {
+      throw new TypeError("Word adapter requires a valid Document Plan.");
+    }
+    const missing = allComponents(plan).filter((component) => component.kind === "screenshot" && component.visibility !== "hidden").map((component) => component.content.assetId).filter((assetId, index, values) => values.indexOf(assetId) === index).filter((assetId) => !imageBytes(mediaAssets[assetId]));
+    if (missing.length) {
+      throw new Error(`Word export is missing media assets: ${missing.join(", ")}.`);
+    }
+  }
+  function buildDocument({ plan, mediaAssets = {} }) {
+    validatePlanMedia(plan, mediaAssets);
+    const planBefore = JSON.stringify(plan);
+    const headerComponent = plan.components.find((component) => component.kind === "header" && component.visibility !== "hidden");
+    const footerComponent = plan.components.find((component) => component.kind === "footer" && component.visibility !== "hidden");
+    const children = plan.sections.flatMap((section) => section.components.flatMap((component) => renderComponent(component, mediaAssets)));
+    const appearance = plan.content.documentAppearance || {};
+    const document2 = new File({
+      creator: plan.content.creator,
+      title: plan.content.title,
+      subject: plan.content.subject,
+      description: plan.content.description,
+      styles: { default: { document: {
+        run: {
+          font: appearance.fontFamily || "Aptos",
+          size: (Number(appearance.fontSize) || 11) * 2
         },
-        sections: [
-          {
-            headers: {
-              default: header
-            },
-            footers: {
-              default: footer
-            },
-            properties: {
-              page: {
-                margin: {
-                  top: 1134,
-                  right: 1134,
-                  bottom: 1134,
-                  left: 1134,
-                  header: 567,
-                  footer: 567
-                }
-              }
-            },
-            children: [
-              bodyParagraph("THINKNINE", {
-                bold: true,
-                color: "0F4C81",
-                size: 24,
-                alignment: AlignmentType.CENTER,
-                after: 120
-              }),
-              bodyParagraph("Arbetsinstruktion", {
-                color: "5F6B76",
-                size: 26,
-                alignment: AlignmentType.CENTER,
-                after: 160
-              }),
-              bodyParagraph(title, {
-                bold: true,
-                color: "0F4C81",
-                size: 52,
-                alignment: AlignmentType.CENTER,
-                after: 220
-              }),
-              bodyParagraph("Business Central Process Documentation", {
-                color: "5F6B76",
-                size: 26,
-                alignment: AlignmentType.CENTER,
-                after: 360
-              }),
-              metadataTable([
-                ["Version", "1.0"],
-                ["Datum", date],
-                ["Milj\xF6", environment],
-                [
-                  "Dokumentationstyp",
-                  session.settings?.documentationProfile || "generic"
-                ],
-                [
-                  "Granskningsstatus",
-                  review.status === "completed" ? "Slutf\xF6rd" : "P\xE5g\xE5ende"
-                ],
-                ["Granskad av", reviewer]
-              ]),
-              new Paragraph({
-                children: [new PageBreak()]
-              }),
-              heading("Syfte"),
-              bodyParagraph(purpose),
-              heading("F\xF6ruts\xE4ttningar"),
-              ...prerequisites.map(bulletParagraph),
-              heading("Arbetsg\xE5ng"),
-              ...workflowChildren,
-              heading("F\xF6rv\xE4ntat resultat"),
-              bodyParagraph(
-                options.expectedResult || "Processen \xE4r genomf\xF6rd enligt arbetsg\xE5ngen och de registrerade \xE4ndringarna har sparats i Business Central."
-              ),
-              heading("Versionshistorik"),
-              versionTable(date, review.reviewer || "")
-            ]
-          }
-        ]
-      }),
-      title,
-      taskCount: tasks.length,
-      imageCount: tasks.reduce((count, task) => {
-        const paths = task.screenshots?.length ? task.screenshots : task.screenshot ? [task.screenshot] : [];
-        return count + [...new Set(paths)].filter(
-          (path) => imageBytes(screenshotData[path])
-        ).length;
-      }, 0)
+        paragraph: { spacing: { after: 120, line: 276 } }
+      } } },
+      sections: [{
+        headers: headerComponent ? { default: wordHeader(headerComponent) } : {},
+        footers: footerComponent ? { default: wordFooter(footerComponent) } : {},
+        properties: { page: { margin: {
+          top: 1134,
+          right: 1134,
+          bottom: 1134,
+          left: 1134,
+          header: 567,
+          footer: 567
+        } } },
+        children
+      }]
+    });
+    if (JSON.stringify(plan) !== planBefore) {
+      throw new Error("Word adapter mutated the Document Plan.");
+    }
+    const components = allComponents(plan);
+    return {
+      document: document2,
+      title: plan.content.title,
+      taskCount: components.filter((component) => component.kind === "step" && component.visibility !== "hidden").length,
+      imageCount: components.filter((component) => component.kind === "screenshot" && component.visibility !== "hidden").length
     };
   }
-  async function createDocx(options) {
+  async function renderPlan(options) {
     const built = buildDocument(options);
     const blob = await Packer.toBlob(built.document);
-    return {
-      ...built,
-      blob
-    };
+    return { ...built, blob };
   }
+  var createDocx = renderPlan;
   globalThis.T9Export = globalThis.T9Export || {};
   globalThis.T9Export.word = {
-    createDocx,
     buildDocument,
+    createDocx,
+    fittedImageSize,
     plainText,
-    fittedImageSize
+    renderPlan
   };
 })();
 /*! Bundled license information:

@@ -23,7 +23,8 @@
       "organizationName", "logo", "footer"
     ]),
     components: Object.freeze([
-      "cover", "metadataTable", "step", "callout", "revisionHistory", "toc"
+      "document", "header", "footer", "cover", "metadataTable", "step",
+      "screenshot", "callout", "revisionHistory", "toc"
     ])
   });
   const CAPABILITIES = Object.freeze([

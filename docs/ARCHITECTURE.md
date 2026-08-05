@@ -11,7 +11,7 @@ Semantic Document Model
   + Document Theme System
   ↓ Document Planner
 Document Plan
-  ↓ framtida adaptrar
+  ↓ formatadapter + förberedda medier
 Word / framtida PDF-renderare
 ```
 
@@ -31,6 +31,11 @@ enda producenten av Document Plans. Planen innehåller stabila referenser till
 semantiskt innehåll samt renderer-neutrala beslut om flöde, komponenter,
 gruppering, synlighet och sidintention. Framtida adaptrar är konsumenter och får
 inte återskapa planeringslogik.
+
+RC5 gör kedjan till produktionsväg för Word. Word-adaptern tar endast emot den
+validerade, immutabla planen och förberedda bildbytes. Dashboarden är composition
+root men fattar inga layoutbeslut. DOCX-objekt och Word-enheter förekommer endast
+i adaptern; Review-persistence och skärmbildslagring är oförändrade.
 
 ```text
 Recorder

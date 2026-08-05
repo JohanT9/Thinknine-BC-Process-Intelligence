@@ -167,12 +167,16 @@
     page: { size: "A4", orientation: "portrait", background: "{colors.background}" },
     branding: { organizationName: "", logo: "", footer: "" },
     components: {
+      document: { fontFamily: "Arial", fontSize: 11 },
+      header: { textColor: "{colors.muted}", borderColor: "{colors.primary}" },
+      footer: { textColor: "{colors.muted}", borderColor: "{colors.border}" },
       cover: { accentColor: "{colors.primary}" },
       metadataTable: { borderColor: "{colors.border}" },
       step: { accentColor: "{colors.primary}" },
+      screenshot: {},
       callout: { noteColor: "{colors.note}", warningColor: "{colors.warning}" },
       revisionHistory: { borderColor: "{colors.border}" },
-      toc: { textColor: "{colors.text}" }
+      toc: { textColor: "{colors.text}", title: "Innehåll" }
     },
     capabilities: [
       "supportsCover",
@@ -199,6 +203,39 @@
       primary: "#0f4c81",
       secondary: "#5f6b76",
       note: "#dbeafe"
+    },
+    typography: {
+      title: { family: "Aptos", size: 26, weight: 700, color: "{colors.primary}" },
+      heading1: { family: "Aptos", size: 16, weight: 700, color: "{colors.primary}" },
+      heading2: { family: "Aptos", size: 13, weight: 700, color: "#1e5e8c" },
+      body: { family: "Aptos", size: 11, weight: 400, color: "{colors.text}" },
+      caption: { family: "Aptos", size: 9, weight: 400, color: "{colors.muted}" }
+    },
+    components: {
+      document: { fontFamily: "Aptos", fontSize: 11 },
+      header: { textColor: "#5f6b76", borderColor: "#0f4c81" },
+      footer: { textColor: "#5f6b76", borderColor: "#b8c2cc" },
+      cover: {
+        brandText: "THINKNINE",
+        documentType: "Arbetsinstruktion",
+        subtitle: "Business Central Process Documentation",
+        accentColor: "#0f4c81",
+        mutedColor: "#5f6b76"
+      },
+      metadataTable: {
+        labelFill: "#eaf2f8",
+        borderColor: "#b8c2cc",
+        insideBorderColor: "#d5dce3"
+      },
+      step: { headingColor: "#1e5e8c", instructionSize: 12 },
+      screenshot: { maxWidth: 590, maxHeight: 390 },
+      callout: { borderColor: "#d6a700", fillColor: "#fff7cc" },
+      revisionHistory: {
+        headerFill: "#d9eaf7",
+        borderColor: "#b8c2cc",
+        insideBorderColor: "#d5dce3"
+      },
+      toc: { textColor: "{colors.text}", title: "Innehåll" }
     },
     branding: {
       organizationName: "Thinknine AB",

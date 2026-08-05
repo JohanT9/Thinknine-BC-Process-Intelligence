@@ -1,3 +1,5 @@
+// Legacy compatibility implementation for isolated tests. The production
+// dashboard uses word-export-pipeline.js and word-document-adapter.mjs.
 (function (root, factory) {
   const api = factory();
   if (typeof module === "object" && module.exports) module.exports = api;

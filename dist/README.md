@@ -15,7 +15,7 @@ valideras utan att indata ändras. Okända framtida egenskaper och välformade
 blocktyper bevaras vid normalisering och omladdning.
 
 RC1 etablerade arkitekturgrunden; RC2-projektorn nedan producerar nu modellen.
-Den befintliga Word-exporten använder fortfarande sitt oförändrade flöde. Se
+Sedan RC5 använder Word-exporten hela den nya dokumentkedjan. Se
 [Semantic Document Model 4.4](docs/SEMANTIC_DOCUMENT_MODEL_4.4.md).
 
 ### RC2 — Review-projektion
@@ -30,8 +30,8 @@ egna tidsstämplar. Kvalitetsproblem som saknad titel, metadata, instruktion ell
 skärmbild rapporteras separat som skrivskyddad diagnostik och bäddas inte in i
 dokumentet. Inga bildbytes laddas och Review-data ändras aldrig.
 
-Word-exporten använder ännu inte det semantiska dokumentet. Layout, teman och
-Document Planner tillkommer i senare RC-steg.
+Word-exporten använder sedan RC5 projektorns semantiska dokument via ett
+upplöst paritetstema och Document Planner.
 
 ### RC3 — Document Theme System
 
@@ -65,8 +65,20 @@ Temamodellen skiljer nu `themeSchemaVersion` från det enskilda temats `version`
 och stödjer immutable `origin` samt kompatibilitetsdeklarationer för Semantic
 Document och Planner. Äldre teman får säkra wildcard-standarder utan migrering.
 
-Ingen renderer använder planen ännu och Word-exportens nuvarande beteende är
-oförändrat.
+Word-adaptern använder sedan RC5 planen som sin enda dokumentkälla.
+
+### RC5 — Word Adapter Migration
+
+Den aktiva Word-exporten går nu genom `Review → projektor → Semantic Document →
+Thinknine-paritetstema → Document Planner → Document Plan → Word-adapter`.
+Adaptern tar endast emot den validerade planen och förberedda bildresurser. Den
+läser inte Review, steg, historik, annoteringsdata eller temaregistret.
+
+Dokumentets synliga layout är avsiktligt oförändrad: försättssida, metadata,
+rubriker, steg, kommentarer, skärmbilder med annoteringar, sidhuvud, sidfot och
+versionshistorik behåller tidigare struktur och utseende. Review-persistence,
+filnamn och skärmbildslagring är också oförändrade. Se
+[Word Export Architecture 4.4](docs/WORD_EXPORT_ARCHITECTURE_4.4.md).
 
 ## Screenshot annotations 4.3 RC1
 

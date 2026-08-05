@@ -3383,22 +3383,13 @@ function dataUrlToImageData(dataUrl) {
   };
 }
 
-function reviewedTasksForWord() {
-  const reviewTasks = activeReview?.tasks || [];
-  return reviewTasks
-    .filter(task => !task.deleted)
-    .map((task, index) => ({
-      ...task,
-      taskNo: index + 1
-    }));
-}
-
 async function exportActiveReviewToWord() {
   if (!activeReviewSession || !activeReview) {
     throw new Error("Ingen granskning är öppen.");
   }
 
-  if (!globalThis.T9Export?.word?.createDocx) {
+  if (!globalThis.T9Export?.word?.renderPlan ||
+      !globalThis.T9WordExportPipeline) {
     throw new Error(
       "Word-exportbiblioteket kunde inte laddas. Kör npm install och npm run build."
     );
@@ -3410,9 +3401,16 @@ async function exportActiveReviewToWord() {
     );
   }
 
-  const tasks = reviewedTasksForWord();
-  const screenshotPaths = globalThis.T9ReviewAnnotationCompositor
-    .pathsForTasks(tasks);
+  const pipeline = globalThis.T9WordExportPipeline.create({
+    session: activeReviewModel.response.session,
+    review: activeReview,
+    themeId: "thinknine"
+  });
+  const screenshotAssets = pipeline.semanticDocument.assets.filter(asset =>
+    asset.kind === "image" && asset.sourceRef?.screenshotRef);
+  const screenshotPaths = [...new Set(screenshotAssets.map(
+    asset => asset.sourceRef.screenshotRef
+  ))];
   const screenshotData = await globalThis.T9ReviewAnnotationCompositor
     .composeReview({
       review: activeReview,
@@ -3421,13 +3419,17 @@ async function exportActiveReviewToWord() {
       convertOriginal: dataUrlToImageData
     });
 
-  const result = await globalThis.T9Export.word.createDocx({
-    session: activeReviewModel.response.session,
-    review: {
-      ...activeReview,
-      tasks,
-    },
-    screenshotData,
+  const mediaAssets = Object.fromEntries(screenshotAssets.map(asset => [
+    asset.assetId,
+    screenshotData[asset.sourceRef.screenshotRef]
+  ]));
+  globalThis.T9WordExportPipeline.validateMedia(
+    pipeline.plan,
+    mediaAssets
+  );
+  const result = await globalThis.T9Export.word.renderPlan({
+    plan: pipeline.plan,
+    mediaAssets
   });
 
   const settingsResponse = await send({

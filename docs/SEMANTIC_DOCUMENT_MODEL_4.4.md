@@ -7,8 +7,8 @@ Documentation Excellence work. It describes what a document contains, not how
 Word, PDF or a browser should lay it out.
 
 RC2 adds the Review projector, RC3 adds the independent theme system and RC4
-adds the Document Planner. The existing Word exporter remains the production
-path and does not consume plans yet.
+adds the Document Planner. RC5 makes the validated plan the production Word
+export contract.
 
 ## Data flow and boundaries
 
@@ -169,12 +169,14 @@ Plans intentionally contain no Word paragraphs, DOCX/PDF objects, twips, page
 numbers or calculated pagination. Renderer adapters will consume plans but must
 never create them.
 
-Future work should add adapters that consume planned output without introducing
-format-specific properties into the semantic model or duplicating planning.
+The RC5 Word adapter consumes planned output plus prepared media without
+introducing format-specific properties into the semantic model or duplicating
+planning. It has no access to Review tasks, history, raw annotations, unresolved
+themes or the theme registry.
 
-## RC4 exclusions
+## RC5 exclusions
 
 - no theme selection or branding UI;
-- no Word or PDF integration;
+- no PDF or HTML integration;
 - no automated document-improvement processors;
-- no branding UI, branding asset loading, templates or export behaviour changes.
+- no branding UI, branding asset loading, templates or visible layout changes.

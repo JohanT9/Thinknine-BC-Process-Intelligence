@@ -90,6 +90,8 @@ assert.deepStrictEqual(result.document.metadata, {
   purpose: "Beskriv orderflödet.",
   environment: "Test",
   documentationProfile: "generic",
+  documentVersion: "1.0",
+  statusLabel: "Pågående",
   createdAt: "2026-08-01T08:00:00.000Z",
   updatedAt: "2026-08-05T10:00:00.000Z"
 });
@@ -109,24 +111,32 @@ assert.deepStrictEqual(result.document.provenance, {
 
 assert.deepStrictEqual(
   result.document.sections.map(section => section.kind),
-  ["cover", "workflow", "revisionHistory"]
+  [
+    "cover",
+    "purpose",
+    "prerequisites",
+    "workflow",
+    "expectedResult",
+    "revisionHistory"
+  ]
 );
 const workflow = result.document.sections.find(
   section => section.kind === "workflow"
 );
-assert.strictEqual(workflow.blocks.length, 2);
-assert.strictEqual(workflow.blocks[0].kind, "step");
-assert.deepStrictEqual(workflow.blocks[0].sourceRef, { taskId: "task-1" });
-assert.strictEqual(workflow.blocks[0].blocks[0].text, "Öppna ordern.");
-assert.strictEqual(workflow.blocks[0].blocks[1].kind, "callout");
+assert.strictEqual(workflow.blocks.length, 3);
+assert.strictEqual(workflow.blocks[1].kind, "step");
+assert.deepStrictEqual(workflow.blocks[1].sourceRef, { taskId: "task-1" });
+assert.strictEqual(workflow.blocks[1].blocks[0].text, "Öppna ordern.");
+assert.strictEqual(workflow.blocks[1].blocks[1].kind, "callout");
 assert.strictEqual(
-  workflow.blocks[0].blocks[1].blocks[0].text,
+  workflow.blocks[1].blocks[1].blocks[0].text,
   "Kontrollera kundnumret."
 );
 
-const imageBlocks = workflow.blocks.flatMap(step =>
+const imageBlocks = workflow.blocks.filter(block => block.kind === "step")
+  .flatMap(step =>
   step.blocks.filter(block => block.kind === "image")
-);
+  );
 assert.strictEqual(imageBlocks.length, 3);
 assert.strictEqual(result.document.assets.length, 2);
 assert.strictEqual(imageBlocks[0].assetId, imageBlocks[2].assetId);
@@ -173,12 +183,12 @@ const reordered = reviewFixture();
 reordered.tasks = [reordered.tasks[1], reordered.tasks[0]];
 const reorderedResult = projector.project(reordered, options);
 const originalIdsByTask = new Map(workflow.blocks.map(
-  step => [step.sourceRef.taskId, step.blockId]
-));
+  step => [step.sourceRef?.taskId, step.blockId]
+).filter(([taskId]) => taskId));
 const reorderedWorkflow = reorderedResult.document.sections.find(
   section => section.kind === "workflow"
 );
-for (const step of reorderedWorkflow.blocks) {
+for (const step of reorderedWorkflow.blocks.filter(item => item.kind === "step")) {
   assert.strictEqual(step.blockId, originalIdsByTask.get(step.sourceRef.taskId));
 }
 
@@ -188,7 +198,8 @@ const legacy = projector.project({
 });
 assert.strictEqual(legacy.document.metadata.title, "Äldre Review");
 assert.strictEqual(
-  legacy.document.sections[1].blocks[0].sourceRef.taskId,
+  legacy.document.sections.find(section => section.kind === "workflow")
+    .blocks.find(block => block.kind === "step").sourceRef.taskId,
   "ReviewTask-1"
 );
 assert.ok(legacy.diagnostics.some(item => item.code === "missing-metadata"));

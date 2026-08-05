@@ -1,5 +1,21 @@
 # Changelog
 
+## 4.4.0 RC5 — Word Adapter Migration with Output Parity
+
+- Migrated the production Word flow to Review projection, the semantic document,
+  the resolved Thinknine parity theme, Document Planner and a dedicated adapter.
+- Made the immutable Document Plan plus prepared media the adapter's complete
+  input boundary.
+- Preserved the existing visible Word structure, styling, screenshots,
+  annotations, page fields, filename behaviour and image fitting.
+- Added validation at every pipeline boundary and actionable failures for
+  invalid plans or missing media.
+- Quarantined the pre-DOCX compatibility exporter from the production path.
+- Added DOCX package and XML parity tests for content, ordering, styles, media,
+  annotations, Review history states and deterministic repeated export.
+- Kept Review persistence and screenshot storage unchanged; added no PDF, HTML,
+  theme-selection UI or other RC6 functionality.
+
 ## 4.4.0 RC4 — Document Planner
 
 - Added the immutable, renderer-independent and versioned Document Plan model.

@@ -1,6 +1,7 @@
 import assert from "node:assert";
 import JSZip from "jszip";
 import "../src/exporters/word-exporter-docx.mjs";
+import pipeline from "../src/exporters/word-export-pipeline.js";
 
 assert.strictEqual(
   globalThis.T9Export.word.plainText("Välj **Sök**."),
@@ -11,9 +12,16 @@ const png = new Uint8Array(Buffer.from(
   "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAusB9Wl8lJ0AAAAASUVORK5CYII=",
   "base64"
 ));
-const result = await globalThis.T9Export.word.createDocx({
-  session: { id: "merge-session", name: "Merge export" },
+const exportInput = pipeline.create({
+  session: {
+    id: "merge-session",
+    name: "Merge export",
+    startedAt: "2026-08-05T08:00:00.000Z"
+  },
   review: {
+    sessionId: "merge-session",
+    sessionName: "Merge export",
+    updatedAt: "2026-08-05T09:00:00.000Z",
     tasks: [{
       taskId: "merged",
       instruction: "Sammanslaget steg",
@@ -23,11 +31,14 @@ const result = await globalThis.T9Export.word.createDocx({
       screenshot: "one.png",
       screenshots: ["one.png", "two.png"]
     }]
-  },
-  screenshotData: {
-    "one.png": { bytes: png, mimeType: "image/png" },
-    "two.png": { bytes: png, mimeType: "image/png" }
   }
+});
+const mediaAssets = Object.fromEntries(exportInput.semanticDocument.assets.map(
+  asset => [asset.assetId, { bytes: png, mimeType: "image/png" }]
+));
+const result = await globalThis.T9Export.word.renderPlan({
+  plan: exportInput.plan,
+  mediaAssets
 });
 
 assert.strictEqual(result.taskCount, 1);

@@ -8,6 +8,16 @@
 })(typeof globalThis !== "undefined" ? globalThis : this, function (model) {
   const PROJECTOR_VERSION = "1.0.0";
   const ORIGIN = "review-document-projector";
+  const DEFAULT_PURPOSE =
+    "Beskriver hur processen genomförs i Business Central.";
+  const DEFAULT_PREREQUISITES = Object.freeze([
+    "Användaren har behörighet till berörda sidor och åtgärder.",
+    "Nödvändiga grunddata och inställningar finns upplagda.",
+    "Instruktionerna följer de benämningar som visades i Business Central."
+  ]);
+  const DEFAULT_EXPECTED_RESULT =
+    "Processen är genomförd enligt arbetsgången och de registrerade " +
+    "ändringarna har sparats i Business Central.";
 
   function clone(value) {
     if (value === undefined) return undefined;
@@ -106,14 +116,20 @@
 
   function projectMetadata(review, session) {
     return {
-      title: firstText(review.sessionName, session.name),
+      title: firstText(
+        review.sessionName,
+        session.name,
+        "Business Central-process"
+      ),
       sessionId: firstText(review.sessionId, session.id),
       status: text(review.status),
-      reviewer: text(review.reviewer),
+      reviewer: text(review.reviewer) || "Ej angiven",
       notes: text(review.notes),
-      purpose: text(session.purpose),
-      environment: text(session.settings?.environmentName),
-      documentationProfile: text(session.settings?.documentationProfile),
+      purpose: text(session.purpose) || DEFAULT_PURPOSE,
+      environment: text(session.settings?.environmentName) || "Ej angiven",
+      documentationProfile: text(session.settings?.documentationProfile) || "generic",
+      documentVersion: "1.0",
+      statusLabel: review.status === "completed" ? "Slutförd" : "Pågående",
       createdAt: firstText(review.createdAt, session.startedAt),
       updatedAt: firstText(review.updatedAt, session.endedAt)
     };
@@ -147,7 +163,7 @@
     const metadata = projectMetadata(review, session);
     const sessionId = metadata.sessionId;
 
-    if (!metadata.title) {
+    if (!firstText(review.sessionName, session.name)) {
       diagnostics.push(diagnostic(
         "missing-title", "$.sessionName", "Review has no document title."
       ));
@@ -171,13 +187,6 @@
       level: 1,
       text: metadata.title
     }];
-    if (metadata.purpose) {
-      coverBlocks.push({
-        blockId: "block:cover:purpose",
-        kind: "paragraph",
-        text: metadata.purpose
-      });
-    }
 
     const assets = [];
     const assetByScreenshot = new Map();
@@ -310,32 +319,91 @@
       }
     });
 
+    const prerequisites = Array.isArray(options.prerequisites)
+      ? options.prerequisites.map(text).filter(Boolean)
+      : [...DEFAULT_PREREQUISITES];
+    const expectedResult = text(options.expectedResult) ||
+      DEFAULT_EXPECTED_RESULT;
     const sections = [{
       sectionId: "section:cover",
       kind: "cover",
       blocks: coverBlocks
     }, {
+      sectionId: "section:purpose",
+      kind: "purpose",
+      blocks: [{
+        blockId: "heading:purpose",
+        kind: "heading",
+        level: 1,
+        text: "Syfte"
+      }, {
+        blockId: "paragraph:purpose",
+        kind: "paragraph",
+        text: metadata.purpose
+      }]
+    }, {
+      sectionId: "section:prerequisites",
+      kind: "prerequisites",
+      blocks: [{
+        blockId: "heading:prerequisites",
+        kind: "heading",
+        level: 1,
+        text: "Förutsättningar"
+      }, {
+        blockId: "list:prerequisites",
+        kind: "list",
+        items: prerequisites.map((value, index) => ({
+          itemId: `prerequisite:${index + 1}`,
+          blocks: [{
+            blockId: `paragraph:prerequisite:${index + 1}`,
+            kind: "paragraph",
+            text: value
+          }]
+        }))
+      }]
+    }, {
       sectionId: "section:workflow",
       kind: "workflow",
-      blocks: workflowBlocks
-    }];
-
-    if (Array.isArray(review.history) && review.history.length) {
-      sections.push({
-        sectionId: "section:revision-history",
+      blocks: [{
+        blockId: "heading:workflow",
+        kind: "heading",
+        level: 1,
+        text: "Arbetsgång"
+      }, ...workflowBlocks]
+    }, {
+      sectionId: "section:expected-result",
+      kind: "expectedResult",
+      blocks: [{
+        blockId: "heading:expected-result",
+        kind: "heading",
+        level: 1,
+        text: "Förväntat resultat"
+      }, {
+        blockId: "paragraph:expected-result",
+        kind: "paragraph",
+        text: expectedResult
+      }]
+    }, {
+      sectionId: "section:revision-history",
+      kind: "revisionHistory",
+      blocks: [{
+        blockId: "heading:revision-history",
+        kind: "heading",
+        level: 1,
+        text: "Versionshistorik"
+      }, {
+        blockId: "block:revision-history",
         kind: "revisionHistory",
-        blocks: [{
-          blockId: "block:revision-history",
-          kind: "revisionHistory",
-          entries: review.history.map((entry, index) => ({
-            revisionId: `revision:${idPart(entry?.historyId || index + 1)}:${index + 1}`,
-            type: text(entry?.type),
-            createdAt: text(entry?.createdAt),
-            sourceHistoryId: text(entry?.historyId)
-          }))
-        }]
-      });
-    }
+        entries: [{
+          revisionId: "revision:document:1",
+          version: metadata.documentVersion,
+          createdAt: metadata.updatedAt || metadata.createdAt,
+          change: "Första version",
+          reviewer: text(review.reviewer)
+        }],
+        sourceHistory: clone(Array.isArray(review.history) ? review.history : [])
+      }]
+    }];
 
     const document = model.normalize({
       documentId: `document:review:${idPart(sessionId || "unknown")}`,

@@ -65,6 +65,7 @@
         : "visible",
       spacingIntent: object(input.spacingIntent),
       appearance: object(input.appearance),
+      content: object(input.content),
       components: Array.isArray(input.components)
         ? input.components.map(normalizeComponent)
         : []
@@ -87,6 +88,7 @@
       flow: typeof input.flow === "string" ? input.flow : "document",
       page: object(input.page),
       spacing: object(input.spacing),
+      content: object(input.content),
       components: Array.isArray(input.components)
         ? input.components.map(normalizeComponent)
         : [],
