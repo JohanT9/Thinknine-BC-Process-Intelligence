@@ -50,3 +50,12 @@ Training Guides, Quick References and Troubleshooting Guides. This snapshot is
 for discovery only: it does not persist profile choice into Review and does not
 change the profile model, planning or Word export. Celebrate Progress labels
 already produced for that profile may be shown on cards and in Quick Preview.
+
+## Batch profile assignment (UX7)
+
+Batch assignment updates only the library's profile metadata and marks the old
+health snapshot as requiring reassessment. It preserves Review and document
+content. Opening the project later selects the assigned built-in profile and
+the normal advisory Documentation Intelligence path recalculates expectations
+and qualitative Document Health. No background projection or Planner run is
+triggered by the batch operation.

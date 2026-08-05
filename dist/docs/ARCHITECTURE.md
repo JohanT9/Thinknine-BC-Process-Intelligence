@@ -206,3 +206,25 @@ aldrig innehålla Review, Semantic Document, Document Plan, Word-strukturer,
 renderer-state eller skärmbildsbytes. Grundposter projiceras från redan laddad
 sessionslista. Rikare metadata materialiseras enbart när den ordinarie Document
 Workspace-pipelinen redan har körts; biblioteket initierar den aldrig.
+
+## Batch Operations 4.5 UX7
+
+`document-batch-operations.js` är ett renderer-neutralt kommandolager ovanpå
+Document Library-metadata:
+
+```text
+Visible library IDs + modifiers → immutable multi-selection
+Selected metadata + explicit fields → batch command → normalized metadata
+Export intent → dashboard queue → one Review at a time → unchanged Word pipeline
+```
+
+Domänen äger urval, range/toggle/select-all, reconciliation, explicit
+metadata-patch, exportplan och deleteplan. Den importerar endast
+`document-library.js` och känner inte till Review, Semantic Document, Planner,
+Document Plan, DOM eller Word. Dashboarden äger bekräftelse, progress,
+persistence och externa effekter.
+
+Profil- och temaassignment lagras som presentationsmetadata. Profilbyte
+ogiltigförklarar den gamla rådgivande hälsosnapshoten tills ordinarie Document
+Workspace senare materialiserar nya förväntningar. Batch-export laddar aldrig
+en Review-samling; ett projekt hämtas, renderas och släpps innan nästa startar.

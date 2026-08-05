@@ -3407,24 +3407,67 @@ function createActiveDocumentPipeline() {
   });
 }
 
-async function prepareDocumentMedia(pipeline) {
+async function composeDocumentMedia(pipeline, review, screenshotSources) {
   const screenshotAssets = pipeline.semanticDocument.assets.filter(asset =>
     asset.kind === "image" && asset.sourceRef?.screenshotRef
   );
   const screenshotPaths = [...new Set(screenshotAssets.map(
     asset => asset.sourceRef.screenshotRef
   ))];
-  const screenshotData = await globalThis.T9ReviewAnnotationCompositor
+  const composedScreenshots = await globalThis.T9ReviewAnnotationCompositor
     .composeReview({
-      review: activeReview,
+      review,
       paths: screenshotPaths,
-      screenshotSources: activeReviewModel.screenshotData || {},
+      screenshotSources: screenshotSources || {},
       convertOriginal: dataUrlToImageData
     });
   return Object.fromEntries(screenshotAssets.map(asset => [
     asset.assetId,
-    screenshotData[asset.sourceRef.screenshotRef]
+    composedScreenshots[asset.sourceRef.screenshotRef]
   ]));
+}
+
+async function prepareDocumentMedia(pipeline) {
+  return composeDocumentMedia(
+    pipeline, activeReview, activeReviewModel?.screenshotData
+  );
+}
+
+async function exportLibraryDocument(record, exportSettings) {
+  const session = documentLibrarySessions.get(record.projectId);
+  if (!session || session.status === "recording") {
+    throw new Error(`Dokumentet "${record.title}" kan inte exporteras.`);
+  }
+  const model = await prepareSessionModel(session);
+  const existing = await send({ type: "T9_GET_REVIEW", sessionId: session.id });
+  const review = existing.review
+    ? globalThis.T9Review.normalizeReview({
+      ...existing.review,
+      tasks: globalThis.T9Review.normalizeTasks(existing.review.tasks)
+    })
+    : globalThis.T9Review.createReview(session, model.businessTasks);
+  const themeId = globalThis.T9DocumentThemeRegistry.get(
+    globalThis.T9DocumentThemeRegistry.BUILT_IN_REGISTRY,
+    record.theme.themeId
+  ) ? record.theme.themeId : "thinknine";
+  const pipeline = globalThis.T9WordExportPipeline.create({
+    session: model.response.session,
+    review,
+    themeId
+  });
+  const mediaAssets = await composeDocumentMedia(
+    pipeline, review, model.screenshotData
+  );
+  globalThis.T9WordExportPipeline.validateMedia(pipeline.plan, mediaAssets);
+  const result = await globalThis.T9Export.word.renderPlan({
+    plan: pipeline.plan,
+    mediaAssets
+  });
+  const filename = globalThis.T9Engine.exportSettings.buildFileName(
+    "docx", model.response.session, exportSettings
+  );
+  await downloadBlob(result.blob, filename);
+  return result;
 }
 
 async function exportActiveReviewToWord() {
@@ -3504,7 +3547,7 @@ let documentProfileSource = null;
 let documentLibraryRecords = [];
 let documentLibraryIndex = [];
 let documentLibrarySessions = new Map();
-let documentLibrarySelection = { selectedId: null, focusedId: null };
+let documentLibrarySelection = globalThis.T9DocumentBatchOperations.selection();
 const DOCUMENT_LIBRARY_RENDER_LIMIT = 200;
 
 function librarySessionRecord(session) {
@@ -3574,14 +3617,17 @@ function renderDocumentLibrary() {
   );
   const records = matches.slice(0, DOCUMENT_LIBRARY_RENDER_LIMIT);
   const view = globalThis.T9DocumentLibraryView;
-  documentLibrarySelection.selectedId = $("libraryGroupProfiles").checked
+  const activeId = $("libraryGroupProfiles").checked
     ? view.renderGrouped($("libraryResults"),
       globalThis.T9DocumentLibrary.groupByProfile(records),
       documentLibrarySelection)
     : view.renderList($("libraryResults"), records, documentLibrarySelection);
-  documentLibrarySelection.focusedId = documentLibrarySelection.selectedId;
+  documentLibrarySelection = globalThis.T9DocumentBatchOperations.selection({
+    ...documentLibrarySelection,
+    activeId
+  });
   const selected = records.find(record =>
-    record.projectId === documentLibrarySelection.selectedId
+    record.projectId === documentLibrarySelection.activeId
   );
   view.renderPreview($("libraryPreview"), selected);
   $("libraryStatus").textContent = matches.length > records.length
@@ -3589,6 +3635,15 @@ function renderDocumentLibrary() {
     : records.length === 1
     ? "1 dokument visas."
     : `${records.length} dokument visas.`;
+  renderLibraryBatchToolbar();
+}
+
+function renderLibraryBatchToolbar(message = "") {
+  const count = documentLibrarySelection.selectedIds.length;
+  $("libraryBatchToolbar").hidden = count === 0;
+  $("libraryBatchCount").textContent = count === 1
+    ? "1 dokument valt" : `${count} dokument valda`;
+  if (message) $("libraryBatchStatus").textContent = message;
 }
 
 function refreshLibraryFilters() {
@@ -3619,6 +3674,10 @@ async function loadDocumentLibrary(sessions) {
       stored.get(session.id) || {}, librarySessionRecord(session)
     )
   );
+  documentLibrarySelection = globalThis.T9DocumentBatchOperations.reconcile(
+    documentLibrarySelection,
+    documentLibraryRecords.map(record => record.projectId)
+  );
   const activeIds = new Set(sessions.map(session => session.id));
   if ([...stored.keys()].some(projectId => !activeIds.has(projectId))) {
     await persistDocumentLibrary();
@@ -3636,6 +3695,91 @@ async function updateDocumentLibraryRecord(projectId, patch) {
   await persistDocumentLibrary();
 }
 
+function selectedLibraryRecords() {
+  return globalThis.T9DocumentBatchOperations.selected(
+    documentLibraryRecords, documentLibrarySelection
+  );
+}
+
+async function commitLibraryBatch(result, confirmation) {
+  if (!result.affected) {
+    renderLibraryBatchToolbar("Inga metadataändringar behövdes.");
+    return 0;
+  }
+  const previous = documentLibraryRecords;
+  documentLibraryRecords = result.records;
+  try {
+    await persistDocumentLibrary();
+  } catch (error) {
+    documentLibraryRecords = previous;
+    renderDocumentLibrary();
+    throw error;
+  }
+  documentLibrarySelection = globalThis.T9DocumentBatchOperations.reconcile(
+    documentLibrarySelection,
+    documentLibraryRecords.map(record => record.projectId)
+  );
+  refreshLibraryFilters();
+  renderDocumentLibrary();
+  renderLibraryBatchToolbar(confirmation.replace("{count}", result.affected));
+  return result.affected;
+}
+
+function populateBatchMetadataOptions() {
+  $("libraryBatchProfileValue").innerHTML = documentProfiles().map(profile =>
+    `<option value="${escapeHtml(profile.profileId)}">` +
+      `${escapeHtml(profile.displayName)}</option>`
+  ).join("");
+  const themes = globalThis.T9DocumentThemeRegistry.list(
+    globalThis.T9DocumentThemeRegistry.BUILT_IN_REGISTRY
+  ).filter(theme => theme.themeId !== "base");
+  $("libraryBatchThemeValue").innerHTML = themes.map(theme =>
+    `<option value="${escapeHtml(theme.themeId)}">` +
+      `${escapeHtml(theme.displayName)}</option>`
+  ).join("");
+}
+
+function openBatchMetadataDialog(mode = "metadata") {
+  const count = documentLibrarySelection.selectedIds.length;
+  if (!count) return;
+  for (const id of ["Tags", "Profile", "Theme", "Author", "Status", "Archived"]) {
+    $("libraryBatchUse" + id).checked = false;
+  }
+  const modeField = { tags: "Tags", profile: "Profile", theme: "Theme" }[mode];
+  if (modeField) $("libraryBatchUse" + modeField).checked = true;
+  $("libraryBatchMetadataDescription").textContent =
+    `Endast markerade fält ändras för ${count} dokument.`;
+  $("libraryBatchMetadataDialog").returnValue = "";
+  $("libraryBatchMetadataDialog").showModal();
+  $(modeField ? "libraryBatch" + modeField + "Value" :
+    "libraryBatchUseTags").focus();
+}
+
+function batchMetadataOperation() {
+  const profileSelect = $("libraryBatchProfileValue");
+  const themeSelect = $("libraryBatchThemeValue");
+  return {
+    type: "metadata",
+    fields: {
+      tags: { selected: $("libraryBatchUseTags").checked,
+        value: $("libraryBatchTagsValue").value.split(",")
+          .map(value => value.trim()).filter(Boolean) },
+      profile: { selected: $("libraryBatchUseProfile").checked,
+        value: { profileId: profileSelect.value,
+          displayName: profileSelect.selectedOptions[0]?.textContent || "" } },
+      theme: { selected: $("libraryBatchUseTheme").checked,
+        value: { themeId: themeSelect.value,
+          displayName: themeSelect.selectedOptions[0]?.textContent || "" } },
+      author: { selected: $("libraryBatchUseAuthor").checked,
+        value: $("libraryBatchAuthorValue").value.trim() },
+      status: { selected: $("libraryBatchUseStatus").checked,
+        value: $("libraryBatchStatusValue").value.trim() },
+      archived: { selected: $("libraryBatchUseArchived").checked,
+        value: $("libraryBatchArchivedValue").value === "true" }
+    }
+  };
+}
+
 function documentProfiles() {
   return globalThis.T9DocumentProfile.list(
     globalThis.T9DocumentProfile.BUILT_IN_REGISTRY
@@ -3651,12 +3795,22 @@ function populateDocumentProfileSelector() {
 }
 
 function buildDocumentProfileVariants(pipeline) {
+  const availableThemeIds = new Set(globalThis.T9DocumentThemeRegistry.list(
+    globalThis.T9DocumentThemeRegistry.BUILT_IN_REGISTRY
+  ).map(theme => theme.themeId));
   return new Map(documentProfiles().map(profile => {
-    const theme = profile.theme.themeId === pipeline.theme.themeId
+    const assignedThemeId = profile.profileId === activeDocumentProfileId
+      ? documentLibraryRecords.find(record =>
+        record.projectId === activeReviewSession?.id
+      )?.theme.themeId
+      : null;
+    const themeId = availableThemeIds.has(assignedThemeId)
+      ? assignedThemeId : profile.theme.themeId;
+    const theme = themeId === pipeline.theme.themeId
       ? pipeline.theme
       : globalThis.T9DocumentThemeRegistry.resolve(
         globalThis.T9DocumentThemeRegistry.BUILT_IN_REGISTRY,
-        profile.theme.themeId,
+        themeId,
         profile.theme.overrides || {}
       );
     const plan = theme === pipeline.theme
@@ -5093,7 +5247,12 @@ async function openReview(session) {
   workspaceContext = globalThis.T9WorkspaceContext.create();
   workspaceContextBinding = null;
   documentationIntelligenceModel = null;
-  activeDocumentProfileId = "business-process";
+  const assignedProfileId = documentLibraryRecords.find(record =>
+    record.projectId === session.id
+  )?.profile.profileId;
+  activeDocumentProfileId = documentProfiles().some(profile =>
+    profile.profileId === assignedProfileId
+  ) ? assignedProfileId : "business-process";
   documentProfileVariants = new Map();
   documentWorkspaceMediaSources = {};
   documentProfileSource = null;
@@ -5823,7 +5982,24 @@ $("libraryResults").addEventListener("click", async event => {
   const card = event.target.closest?.("[data-library-project-id]");
   if (!card) return;
   const projectId = card.dataset.libraryProjectId;
-  documentLibrarySelection = { selectedId: projectId, focusedId: projectId };
+  const visibleIds = [...$("libraryResults").querySelectorAll(
+    "[data-library-project-id]"
+  )].map(element => element.dataset.libraryProjectId);
+  const selectionControl = event.target.closest?.('[data-library-action="select"]');
+  const cardAction = event.target.closest?.("[data-library-action]");
+  if (selectionControl || !cardAction) {
+    documentLibrarySelection = globalThis.T9DocumentBatchOperations.select(
+      documentLibrarySelection, visibleIds, projectId, {
+        shift: event.shiftKey,
+        toggle: Boolean(selectionControl || event.ctrlKey || event.metaKey)
+      }
+    );
+    renderDocumentLibrary();
+    $("libraryResults").querySelector(
+      `[data-library-project-id="${CSS.escape(projectId)}"]`
+    )?.focus();
+    return;
+  }
   if (event.target.closest?.('[data-library-action="favourite"]')) {
     const record = documentLibraryRecords.find(value => value.projectId === projectId);
     try {
@@ -5854,6 +6030,35 @@ $("libraryResults").addEventListener("click", async event => {
 });
 $("libraryResults").addEventListener("keydown", event => {
   const card = event.target.closest?.("[data-library-project-id]");
+  const records = globalThis.T9DocumentLibrary.query(
+    documentLibraryIndex, libraryOptions()
+  ).slice(0, DOCUMENT_LIBRARY_RENDER_LIMIT);
+  const visibleIds = records.map(record => record.projectId);
+  if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === "a") {
+    event.preventDefault();
+    documentLibrarySelection = globalThis.T9DocumentBatchOperations.selectAll(
+      documentLibrarySelection, visibleIds
+    );
+    renderDocumentLibrary();
+    renderLibraryBatchToolbar(`${visibleIds.length} synliga dokument valdes.`);
+    return;
+  }
+  if (event.key === "Escape" && documentLibrarySelection.selectedIds.length) {
+    event.preventDefault();
+    documentLibrarySelection = globalThis.T9DocumentBatchOperations.clear();
+    renderDocumentLibrary();
+    renderLibraryBatchToolbar("Dokumentvalet rensades.");
+    return;
+  }
+  if (event.key === " " && event.target === card) {
+    event.preventDefault();
+    documentLibrarySelection = globalThis.T9DocumentBatchOperations.select(
+      documentLibrarySelection, visibleIds, card.dataset.libraryProjectId,
+      { toggle: true }
+    );
+    renderDocumentLibrary();
+    return;
+  }
   if (event.key === "Enter" && event.target === card) {
     event.preventDefault();
     card.querySelector('[data-library-action="open"]')?.click();
@@ -5861,17 +6066,152 @@ $("libraryResults").addEventListener("keydown", event => {
   }
   if (!["ArrowDown", "ArrowUp", "ArrowLeft", "ArrowRight", "Home", "End"]
     .includes(event.key)) return;
-  const records = globalThis.T9DocumentLibrary.query(
-    documentLibraryIndex, libraryOptions()
-  ).slice(0, DOCUMENT_LIBRARY_RENDER_LIMIT);
   event.preventDefault();
-  documentLibrarySelection = globalThis.T9DocumentLibrary.selection(
-    documentLibrarySelection, records, event.key
+  const focused = globalThis.T9DocumentBatchOperations.focus(
+    documentLibrarySelection, visibleIds, event.key
   );
+  documentLibrarySelection = event.shiftKey
+    ? globalThis.T9DocumentBatchOperations.select(
+      documentLibrarySelection, visibleIds, focused.activeId, { shift: true }
+    )
+    : focused;
   renderDocumentLibrary();
   $("libraryResults").querySelector(
-    `[data-library-project-id="${CSS.escape(documentLibrarySelection.focusedId)}"]`
+    `[data-library-project-id="${CSS.escape(documentLibrarySelection.activeId)}"]`
   )?.focus();
+});
+$("libraryBatchSelectAll").addEventListener("click", () => {
+  const matches = globalThis.T9DocumentLibrary.query(
+    documentLibraryIndex, libraryOptions()
+  );
+  documentLibrarySelection = globalThis.T9DocumentBatchOperations.selectAll(
+    documentLibrarySelection, matches.map(record => record.projectId)
+  );
+  renderDocumentLibrary();
+  renderLibraryBatchToolbar(`${matches.length} dokument valdes.`);
+});
+$("libraryBatchClear").addEventListener("click", () => {
+  documentLibrarySelection = globalThis.T9DocumentBatchOperations.clear();
+  renderDocumentLibrary();
+  $("librarySearch").focus();
+  $("libraryBatchStatus").textContent = "Dokumentvalet rensades.";
+});
+$("libraryBatchExport").addEventListener("click", async () => {
+  const records = selectedLibraryRecords();
+  if (!records.length || !confirm(
+    `Exportera ${records.length} dokument till separata Word-filer? ` +
+    "Dokumenten ändras inte. Välj Avbryt för att stoppa innan exporten startar."
+  )) return;
+  const progress = $("libraryBatchProgress");
+  const controls = [...$("libraryBatchToolbar").querySelectorAll("button")];
+  progress.hidden = false;
+  progress.max = records.length;
+  progress.value = 0;
+  controls.forEach(button => { button.disabled = true; });
+  let exported = 0;
+  try {
+    const settingsResponse = await send({ type: "T9_GET_SETTINGS" });
+    const exportSettings = { ...DEFAULTS,
+      ...(settingsResponse?.settings || {}) };
+    const recordsById = new Map(records.map(record =>
+      [record.projectId, record]
+    ));
+    const plan = globalThis.T9DocumentBatchOperations.exportPlan(
+      documentLibraryRecords, documentLibrarySelection
+    );
+    const result = await globalThis.T9DocumentBatchOperations.execute(
+      plan,
+      projectId => exportLibraryDocument(recordsById.get(projectId),
+        exportSettings),
+      { onProgress(value) {
+        const record = recordsById.get(value.projectId);
+        if (value.phase === "starting") {
+          $("libraryBatchStatus").textContent =
+            `Exporterar ${value.completed + 1} av ${value.total}: ${record.title}.`;
+        } else {
+          exported = value.completed;
+          progress.value = exported;
+        }
+      } }
+    );
+    exported = result.completed;
+    $("libraryBatchStatus").textContent =
+      `✓ ${exported} dokument exporterades.`;
+  } catch (error) {
+    exported = Number.isInteger(error.completed) ? error.completed : exported;
+    show(`${error.message} ${exported} dokument exporterades innan felet.`, true);
+    $("libraryBatchStatus").textContent =
+      `Exporten avbröts efter ${exported} av ${records.length} dokument.`;
+  } finally {
+    controls.forEach(button => { button.disabled = false; });
+    progress.hidden = true;
+  }
+});
+$("libraryBatchFavourite").addEventListener("click", async () => {
+  try {
+    const result = globalThis.T9DocumentBatchOperations.favourite(
+      documentLibraryRecords, documentLibrarySelection, true
+    );
+    await commitLibraryBatch(result, "✓ {count} dokument favoritmarkerades.");
+  } catch (error) {
+    show(error.message, true);
+  }
+});
+for (const [id, mode] of [["libraryBatchTags", "tags"],
+  ["libraryBatchProfile", "profile"], ["libraryBatchTheme", "theme"],
+  ["libraryBatchMetadata", "metadata"]]) {
+  $(id).addEventListener("click", () => openBatchMetadataDialog(mode));
+}
+$("libraryBatchMetadataDialog").addEventListener("close", async event => {
+  if (event.target.returnValue !== "apply") return;
+  try {
+    const result = globalThis.T9DocumentBatchOperations.apply(
+      documentLibraryRecords, documentLibrarySelection,
+      batchMetadataOperation()
+    );
+    await commitLibraryBatch(result, "✓ Metadata uppdaterades för {count} dokument.");
+  } catch (error) {
+    show(error.message, true);
+  }
+});
+$("libraryBatchArchive").addEventListener("click", async () => {
+  const count = documentLibrarySelection.selectedIds.length;
+  if (!confirm(`Arkivera ${count} dokument? Åtgärden ändrar endast metadata ` +
+      "och kan återställas via metadataredigering.")) return;
+  try {
+    const result = globalThis.T9DocumentBatchOperations.apply(
+      documentLibraryRecords, documentLibrarySelection, { type: "archive",
+        fields: { archived: { selected: true, value: true } } }
+    );
+    await commitLibraryBatch(result, "✓ {count} dokument arkiverades.");
+  } catch (error) {
+    show(error.message, true);
+  }
+});
+$("libraryBatchDelete").addEventListener("click", async () => {
+  const count = documentLibrarySelection.selectedIds.length;
+  if (!confirm(`Ta bort ${count} dokument och tillhörande sessioner permanent? ` +
+      "Åtgärden kan inte ångras.")) return;
+  const plan = globalThis.T9DocumentBatchOperations.remove(
+    documentLibraryRecords, documentLibrarySelection
+  );
+  let deleted = 0;
+  try {
+    for (const projectId of plan.projectIds) {
+      const response = await send({ type: "T9_DELETE_SESSION",
+        sessionId: projectId });
+      if (!response?.ok) throw new Error(
+        response?.error || "Ett dokument kunde inte tas bort."
+      );
+      deleted += 1;
+    }
+    documentLibrarySelection = globalThis.T9DocumentBatchOperations.clear();
+    await loadSessions();
+    $("libraryBatchStatus").textContent = `✓ ${deleted} dokument togs bort.`;
+  } catch (error) {
+    await loadSessions();
+    show(`${error.message} ${deleted} dokument hann tas bort.`, true);
+  }
 });
 $("exportFileNamePattern").addEventListener("input", updateFilenamePreview);
 $("environmentName").addEventListener("input", updateFilenamePreview);
@@ -5884,6 +6224,7 @@ $("debug").addEventListener("click", () => {
 
 async function initializeDashboard() {
   initializeFilenameVariables();
+  populateBatchMetadataOptions();
   try {
     await loadSettings();
   } catch (error) {

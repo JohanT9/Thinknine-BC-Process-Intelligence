@@ -9,9 +9,12 @@ const record = library.normalize({ projectId: "doc-1", title: "Order <test>",
   summary: "En kort sammanfattning", workflowName: "Orderflöde",
   recentActivity: ["Öppnades idag"], tags: ["Order"], readingMinutes: 3 });
 const container = { innerHTML: "" };
-assert.strictEqual(view.renderList(container, [record], {}), "doc-1");
-assert(container.innerHTML.includes('role="option"'));
-assert(container.innerHTML.includes('aria-selected="true"'));
+assert.strictEqual(view.renderList(container, [record], {
+  selectedIds: ["doc-1"], activeId: "doc-1"
+}), "doc-1");
+assert(container.innerHTML.includes('role="listitem"'));
+assert(container.innerHTML.includes('data-selected="true"'));
+assert(container.innerHTML.includes('type="checkbox"'));
 assert(container.innerHTML.includes('aria-pressed="true"'));
 assert(container.innerHTML.includes("Order &lt;test&gt;"));
 assert(container.innerHTML.includes("Arbetsflödet är dokumenterat"));
@@ -19,7 +22,9 @@ view.renderPreview(container, record);
 assert(container.innerHTML.includes("Orderflöde"));
 assert(container.innerHTML.includes("Öppnades idag"));
 assert(container.innerHTML.includes("Dokumenthälsa"));
-assert.strictEqual(view.renderGrouped(container, library.groupByProfile([record]), {}),
+assert.strictEqual(view.renderGrouped(container, library.groupByProfile([record]), {
+  selectedIds: ["doc-1"], activeId: "doc-1"
+}),
   "doc-1");
 assert(container.innerHTML.includes("library-group-cards"));
 assert.strictEqual(view.renderList(container, [], {}), null);

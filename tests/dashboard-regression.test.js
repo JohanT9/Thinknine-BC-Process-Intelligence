@@ -47,6 +47,13 @@ assert.ok(
   "Document Library must use lightweight metadata storage and bounded rendering."
 );
 assert.ok(
+  dashboard.includes("T9DocumentBatchOperations") &&
+    dashboard.includes("async function exportLibraryDocument") &&
+    dashboard.includes("composeDocumentMedia(pipeline, review, screenshotSources)") &&
+    !dashboard.includes("batchSemanticDocuments"),
+  "Batch operations must remain metadata-only and reuse sequential Word export."
+);
+assert.ok(
   !background.includes("T9_GET_DOCUMENT_LIBRARY\", { includeReview") &&
     !dashboard.includes("loadDocumentLibrary(activeReview"),
   "Opening Document Library must not load Review state."

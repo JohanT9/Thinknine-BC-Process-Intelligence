@@ -13,16 +13,22 @@
     return value ? new Date(value).toLocaleDateString("sv-SE") : "Okänt datum";
   }
 
-  function card(record, selected) {
+  function card(record, selected, active) {
     const confirmations = record.health.confirmations.slice(0, 2).map(value =>
       `<li>${escape(value)}</li>`).join("");
-    return `<article class="library-card" role="option" tabindex="${selected ? 0 : -1}"
-      aria-selected="${selected}" data-library-project-id="${escape(record.projectId)}">
-      <div class="library-card-heading"><h4>${escape(record.title)}</h4>
+    return `<article class="library-card" role="listitem" tabindex="${active ? 0 : -1}"
+      data-selected="${selected}" ${active ? 'aria-current="true"' : ""}
+      data-library-project-id="${escape(record.projectId)}">
+      <div class="library-card-heading"><label class="library-select">
+        <input type="checkbox" data-library-action="select"
+          ${selected ? "checked" : ""} aria-label="Välj ${escape(record.title)}">
+        <span class="sr-only">Välj dokument</span></label><h4>${escape(record.title)}</h4>
         <button class="library-favourite" data-library-action="favourite"
           aria-pressed="${record.favourite}" aria-label="${record.favourite ? "Ta bort från" : "Lägg till i"} favoriter">${record.favourite ? "★" : "☆"}</button></div>
       <p class="library-profile">${escape(record.profile.displayName)} · ${escape(record.theme.displayName)}</p>
+      ${record.archived ? '<p><strong>Arkiverad</strong></p>' : ""}
       ${record.author ? `<p class="muted">Av ${escape(record.author)}</p>` : ""}
+      ${record.status ? `<p class="muted">Status: ${escape(record.status)}</p>` : ""}
       <p><strong>${escape(record.health.overall)}</strong>${record.health.suggestionLabel ? ` · ${escape(record.health.suggestionLabel)}` : ""}</p>
       ${confirmations ? `<ul class="library-confirmations">${confirmations}</ul>` : ""}
       <p class="muted">Ändrad ${date(record.modifiedAt)}${record.readingMinutes ? ` · ${record.readingMinutes} min läsning` : ""}</p>
@@ -32,30 +38,33 @@
   }
 
   function renderList(container, records, state = {}) {
-    const selectedId = records.some(value => value.projectId === state.selectedId)
-      ? state.selectedId : records[0]?.projectId;
+    const selectedIds = new Set(state.selectedIds || []);
+    const activeId = records.some(value => value.projectId === state.activeId)
+      ? state.activeId : records[0]?.projectId;
     if (!records.length) {
       container.innerHTML = '<p class="library-empty">Inga dokument matchar sökningen och filtren.</p>';
       return null;
     }
-    container.innerHTML = records.map(record => card(
-      record, record.projectId === selectedId
+    container.innerHTML = records.map(record => card(record,
+      selectedIds.has(record.projectId), record.projectId === activeId
     )).join("");
-    return selectedId;
+    return activeId;
   }
 
   function renderGrouped(container, groups, state = {}) {
     const records = groups.flatMap(group => group.documents);
-    const selectedId = records.some(value => value.projectId === state.selectedId)
-      ? state.selectedId : records[0]?.projectId;
+    const selectedIds = new Set(state.selectedIds || []);
+    const activeId = records.some(value => value.projectId === state.activeId)
+      ? state.activeId : records[0]?.projectId;
     if (!records.length) return renderList(container, records, state);
     container.innerHTML = groups.map(group =>
       `<section class="library-group" aria-labelledby="library-group-${escape(group.profileId)}">
         <h3 id="library-group-${escape(group.profileId)}">${escape(group.displayName)}</h3>
         <div class="library-group-cards">${group.documents.map(record =>
-          card(record, record.projectId === selectedId)).join("")}</div></section>`
+          card(record, selectedIds.has(record.projectId),
+            record.projectId === activeId)).join("")}</div></section>`
     ).join("");
-    return selectedId;
+    return activeId;
   }
 
   function renderPreview(container, record) {

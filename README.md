@@ -1,7 +1,20 @@
-# Thinknine BC Process Intelligence v4.5.0 UX6
+# Thinknine BC Process Intelligence v4.5.0 UX7
 
 Ett modulärt Edge-tillägg för att spela in, granska och exportera dokumenterade
 Business Central-processer.
+
+## Batch Operations 4.5 UX7
+
+Document Library stöder nu flerval med mus och tangentbord samt en kontextuell
+batch-toolbar för Word-export, favoriter, taggar, profil, tema, författare,
+status, arkivering och borttagning. Endast uttryckligen markerade metadatafält
+ändras. Arkivering och permanent borttagning beskriver antal, åtgärd och
+reversibilitet innan de genomförs.
+
+Batchlagret konsumerar endast biblioteksmetadata, Workspace Context-identiteter,
+Document Profiles och teman. Word-exporten behandlar ett dokument i taget genom
+den befintliga pipelinen; Review batchladdas aldrig. Se
+[Batch Operations 4.5](docs/BATCH_OPERATIONS_4.5.md).
 
 ## Document Library 4.5 UX6
 

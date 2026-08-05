@@ -1,5 +1,21 @@
 # Changelog
 
+## 4.5.0 UX7 — Batch Operations
+
+- Added immutable renderer-neutral multi-selection and batch command models.
+- Added mouse, Ctrl/Cmd, Shift, Space, arrow, Home/End, Select All and Clear
+  Selection workflows with stable selection across filtering and sorting.
+- Added a contextual accessible toolbar for Word export, favourites, tags,
+  profile, theme, metadata, archive and delete operations.
+- Added explicit-field metadata updates with atomic local persistence rollback.
+- Added sequential multi-document Word export through the unchanged production
+  pipeline, progress announcements and cancellation before processing starts.
+- Added clear destructive confirmations and calm Celebrate Progress results.
+- Added deterministic 10,000-document, immutability, accessibility, export,
+  metadata, profile, theme, archive and delete coverage.
+- Kept Review, Semantic Document, Document Plan and document content outside the
+  batch domain.
+
 ## 4.5.0 UX6 — Document Library
 
 - Added a renderer-neutral, immutable metadata-only Document Library model.

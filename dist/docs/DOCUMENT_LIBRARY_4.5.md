@@ -84,3 +84,22 @@ references existing projects.
 - Quick Preview is metadata-only and deliberately does not preview screenshots
   or the full document.
 - There is no version control or AI search.
+
+## Batch Operations (UX7)
+
+Cards expose native selection checkboxes and retain stable selected IDs when
+the result order or active filters change. Shift selects a visible range;
+Ctrl/Cmd toggles; Ctrl/Cmd+A selects all current matches; Space toggles the
+focused card; Escape and Clear Selection remove the selection. The contextual
+toolbar exists only while at least one document is selected.
+
+Favourite, tags, profile, theme, author, status and archive changes operate on
+normalized library metadata. The metadata dialog changes only fields whose
+checkbox is explicitly selected. Archive is reversible metadata. Delete removes
+the referenced local sessions and is therefore permanent and confirmed.
+
+Batch Word export creates a metadata-only export intent. Dashboard resolves
+each reference sequentially through the existing Word pipeline and never keeps
+multiple Review objects loaded. Progress is announced; the user may cancel in
+the preflight confirmation before processing begins. Export never mutates a
+document.
