@@ -2391,6 +2391,7 @@ function createBusinessTasks(businessSteps) {
 
   return tasks.map((task, index) => ({
     ...task,
+    instruction: globalThis.T9TextFormat.quoteEmphasis(task.instruction),
     taskId: taskId(task.taskType, index),
     taskNo: index + 1
   }));
@@ -3453,10 +3454,300 @@ async function exportActiveReviewToWord() {
 let activeReviewSession = null;
 let activeReview = null;
 let activeReviewModel = null;
+let activeReviewSelection = globalThis.T9ReviewSelection.create();
+let activeReviewEdit = null;
+let reviewReturnFocus = null;
+let reviewLayoutState = globalThis.T9ReviewLayout.create();
 
-function reviewImageUrl(task) {
-  if (!task.screenshot || !activeReviewModel) return "";
-  return activeReviewModel.screenshotData[task.screenshot] || "";
+const reviewAutoSave = globalThis.T9ReviewEdit.createAutoSave(
+  () => saveActiveReview({ render: false, announce: false }),
+  {
+    onError(error) {
+      show(error.message, true);
+      $("reviewFooterText").textContent = "Automatisk sparning misslyckades.";
+    }
+  }
+);
+
+function reviewTaskIds() {
+  return globalThis.T9Review.activeTasks(activeReview || { tasks: [] })
+    .map(task => task.taskId);
+}
+
+function applyReviewToolbarState() {
+  const state = globalThis.T9ReviewToolbar.derive({
+    taskIds: reviewTaskIds(),
+    selection: activeReviewSelection,
+    canUndo: activeReview && globalThis.T9Review.canUndo(activeReview),
+    canRedo: activeReview && globalThis.T9Review.canRedo(activeReview),
+    canExport: activeReview && activeReviewSession && activeReviewModel
+  });
+  globalThis.T9ReviewToolbar.apply($("reviewToolbar"), state);
+  $("completeReview").disabled = !activeReview ||
+    !globalThis.T9Review.canComplete(activeReview);
+}
+
+function applyReviewStatus() {
+  const status = globalThis.T9ReviewStatus.derive(
+    activeReview?.tasks || [],
+    activeReviewSelection
+  );
+  globalThis.T9ReviewStatus.apply($("reviewStatus"), status);
+}
+
+function applyReviewSelection(focusActive = false) {
+  const taskIds = reviewTaskIds();
+  activeReviewSelection = globalThis.T9ReviewSelection.reconcile(
+    activeReviewSelection,
+    taskIds
+  );
+  for (const card of $("reviewList").querySelectorAll("[data-review-task-id]")) {
+    const selected = activeReviewSelection.selectedIds.includes(
+      card.dataset.reviewTaskId
+    );
+    const active = activeReviewSelection.activeId === card.dataset.reviewTaskId;
+    card.classList.toggle("selected", selected);
+    card.setAttribute("aria-selected", String(selected));
+    const initial = !activeReviewSelection.activeId &&
+      card === $("reviewList").firstElementChild;
+    card.tabIndex = active || initial ? 0 : -1;
+    if (focusActive && active) card.focus();
+  }
+  applyReviewToolbarState();
+  applyReviewStatus();
+}
+
+function dispatchReviewSelection(command, focusActive = false) {
+  activeReviewSelection = globalThis.T9ReviewSelection.reduce(
+    activeReviewSelection,
+    command,
+    reviewTaskIds()
+  );
+  applyReviewSelection(focusActive);
+}
+
+function selectedReviewTaskIds(fallbackId) {
+  return activeReviewSelection.selectedIds.includes(fallbackId)
+    ? activeReviewSelection.selectedIds
+    : [fallbackId];
+}
+
+function renderMovedReview(previousPositions, focusId) {
+  renderReview();
+  if (focusId) {
+    activeReviewSelection = {
+      ...activeReviewSelection,
+      activeId: focusId
+    };
+    applyReviewSelection(true);
+  }
+  const reducedMotion = globalThis.matchMedia?.(
+    "(prefers-reduced-motion: reduce)"
+  ).matches;
+  globalThis.T9ReviewMove.animatePositions(
+    $("reviewList"),
+    previousPositions,
+    reducedMotion
+  );
+}
+
+function moveReviewTasksByOffset(delta, fallbackId) {
+  const previous = globalThis.T9ReviewMove.capturePositions($("reviewList"));
+  const fallbackSelected = activeReviewSelection.selectedIds.includes(fallbackId);
+  const movedIds = selectedReviewTaskIds(fallbackId);
+  const tasks = globalThis.T9ReviewMove.moveByOffset(
+    activeReview.tasks,
+    movedIds,
+    delta
+  );
+  globalThis.T9Review.reorder(activeReview, tasks, {
+    beforeSelection: activeReviewSelection,
+    afterSelection: activeReviewSelection
+  });
+  const focusId = fallbackSelected
+    ? activeReviewSelection.activeId || fallbackId
+    : fallbackId;
+  renderMovedReview(previous, focusId);
+}
+
+function moveReviewTasksTo({ draggedId, targetId, position }) {
+  const previous = globalThis.T9ReviewMove.capturePositions($("reviewList"));
+  const draggedSelected = activeReviewSelection.selectedIds.includes(draggedId);
+  const movedIds = selectedReviewTaskIds(draggedId);
+  const tasks = globalThis.T9ReviewMove.moveTo(
+    activeReview.tasks,
+    movedIds,
+    targetId,
+    position
+  );
+  globalThis.T9Review.reorder(activeReview, tasks, {
+    beforeSelection: activeReviewSelection,
+    afterSelection: activeReviewSelection
+  });
+  const focusId = draggedSelected
+    ? activeReviewSelection.activeId || draggedId
+    : draggedId;
+  renderMovedReview(previous, focusId);
+}
+
+function deleteReviewTasks(selectedIds) {
+  const taskIds = reviewTaskIds();
+  if (!selectedIds.length) return;
+  const firstIndex = Math.min(...selectedIds.map(id => taskIds.indexOf(id)));
+  globalThis.T9Review.removeTasks(activeReview, selectedIds, {
+    beforeSelection: activeReviewSelection
+  });
+  const remainingIds = reviewTaskIds();
+  const nextId = remainingIds[Math.min(firstIndex, remainingIds.length - 1)] || null;
+  activeReviewSelection = nextId
+    ? { selectedIds: [nextId], activeId: nextId, anchorId: nextId }
+    : globalThis.T9ReviewSelection.create();
+  renderReview();
+  applyReviewSelection(Boolean(nextId));
+}
+
+function mergeSelectedReviewTasks() {
+  const selectedIds = activeReviewSelection.selectedIds;
+  if (selectedIds.length < 2) return;
+  const previous = globalThis.T9ReviewMove.capturePositions($("reviewList"));
+  const result = globalThis.T9Review.merge(activeReview, selectedIds, {
+    beforeSelection: activeReviewSelection
+  });
+  if (!result.mergedTask) return;
+  const mergedId = result.mergedTask.taskId;
+  activeReviewSelection = {
+    selectedIds: [mergedId],
+    activeId: mergedId,
+    anchorId: mergedId
+  };
+  renderMovedReview(previous, mergedId);
+}
+
+function splitSelectedReviewTask() {
+  const [taskId] = activeReviewSelection.selectedIds;
+  if (!taskId || activeReviewSelection.selectedIds.length !== 1) return;
+  const card = [...$("reviewList").querySelectorAll("[data-review-task-id]")]
+    .find(element => element.dataset.reviewTaskId === taskId);
+  const instruction = card?.querySelector('[data-field="instruction"]');
+  const splitAt = instruction?.selectionStart;
+  const previous = globalThis.T9ReviewMove.capturePositions($("reviewList"));
+  const result = globalThis.T9Review.split(
+    activeReview,
+    taskId,
+    { splitAt },
+    { beforeSelection: activeReviewSelection }
+  );
+  if (!result.splitTasks.length) {
+    $("reviewFooterText").textContent =
+      "Placera markören mellan två textdelar i instruktionen.";
+    instruction?.focus();
+    return;
+  }
+  const splitIds = result.splitTasks.map(task => task.taskId);
+  activeReviewSelection = {
+    selectedIds: splitIds,
+    activeId: splitIds[0],
+    anchorId: splitIds[0]
+  };
+  renderMovedReview(previous, splitIds[0]);
+  show(`Steget delades i ${splitIds.length} delar.`);
+}
+
+function restoreReviewHistory(direction) {
+  if (!activeReview) return;
+  const previous = globalThis.T9ReviewMove.capturePositions($("reviewList"));
+  const result = direction === "undo"
+    ? globalThis.T9Review.undo(activeReview)
+    : globalThis.T9Review.redo(activeReview);
+  if (!result) return;
+  activeReviewSelection = result.selection ||
+    globalThis.T9ReviewSelection.reconcile(
+      activeReviewSelection,
+      reviewTaskIds()
+    );
+  renderMovedReview(previous, activeReviewSelection.activeId);
+  show(direction === "undo" ? "Senaste ändringen ångrades." : "Ändringen gjordes om.");
+}
+
+function finishReviewEdit(control, commit) {
+  if (!activeReviewEdit || !control) return;
+  const edit = globalThis.T9ReviewEdit.result(activeReviewEdit);
+  if (commit && edit.changed) {
+    const index = activeReview.tasks.findIndex(task => task.taskId === edit.taskId);
+    if (index >= 0) {
+      globalThis.T9Review.editTask(
+        activeReview,
+        index,
+        { [edit.field]: edit.value },
+        {
+          beforeSelection: activeReviewSelection,
+          afterSelection: activeReviewSelection
+        }
+      );
+      reviewAutoSave.schedule();
+      $("reviewFooterText").textContent = "Ändringen sparas automatiskt.";
+    }
+  } else if (!commit) {
+    control.value = activeReviewEdit.originalValue;
+  }
+  if (edit.field === "userComment" && !control.value) {
+    const card = control.closest("[data-review-task-id]");
+    card.querySelector(".review-comment-section").hidden = true;
+    card.querySelector('[data-action="add-comment"]').hidden = false;
+  }
+  control.readOnly = true;
+  delete control.dataset.editing;
+  activeReviewEdit = null;
+  applyReviewSelection();
+}
+
+function beginReviewEdit({ control, taskId, field }) {
+  if (activeReviewEdit) {
+    const current = $("reviewList").querySelector('[data-editing="true"]');
+    finishReviewEdit(current, true);
+  }
+  activeReviewEdit = globalThis.T9ReviewEdit.createSession(
+    taskId,
+    field,
+    control.value
+  );
+  control.readOnly = false;
+  control.dataset.editing = "true";
+  control.focus();
+  control.select();
+}
+
+function editReviewField(card, taskId, field) {
+  const control = card.querySelector(`[data-edit-field="${field}"]`);
+  if (!control) return;
+  beginReviewEdit({ control, taskId, field });
+}
+
+globalThis.T9ReviewEdit.bind($("reviewList"), {
+  start: beginReviewEdit,
+  update({ value }) {
+    if (activeReviewEdit) {
+      activeReviewEdit = globalThis.T9ReviewEdit.update(activeReviewEdit, value);
+    }
+  },
+  commit({ control }) {
+    finishReviewEdit(control, true);
+  },
+  cancel({ control }) {
+    finishReviewEdit(control, false);
+  }
+});
+
+function reviewImageUrls(task) {
+  if (!activeReviewModel) return [];
+  const paths = task.screenshots?.length
+    ? task.screenshots
+    : task.screenshot
+      ? [task.screenshot]
+      : [];
+  return [...new Set(paths)]
+    .map(path => activeReviewModel.screenshotData[path])
+    .filter(Boolean);
 }
 
 function renderReview() {
@@ -3467,8 +3758,10 @@ function renderReview() {
   const progress = globalThis.T9Review.progress(activeReview);
 
   $("reviewProgressBar").style.width = `${progress}%`;
+  $("reviewProgress").setAttribute("aria-valuenow", String(progress));
+  list.setAttribute("aria-rowcount", String(tasks.length));
   $("reviewSummary").textContent =
-    `${tasks.length} steg · ${progress}% godkända · ` +
+    `${progress}% godkända · ` +
     `Session confidence ${activeReviewModel.confidenceResult.sessionConfidence}%`;
   $("reviewFooterText").textContent =
     activeReview.status === "completed"
@@ -3478,6 +3771,10 @@ function renderReview() {
   tasks.forEach((task, visibleIndex) => {
     const actualIndex = activeReview.tasks.indexOf(task);
     const card = document.createElement("article");
+    card.dataset.reviewTaskId = task.taskId;
+    card.setAttribute("role", "row");
+    card.setAttribute("aria-rowindex", String(visibleIndex + 1));
+    card.setAttribute("aria-label", `Steg ${visibleIndex + 1}`);
     card.className =
       "review-card " +
       (task.approved
@@ -3486,16 +3783,36 @@ function renderReview() {
           ? "needs-review"
           : "");
 
-    const imageUrl = reviewImageUrl(task);
+    const imageUrls = reviewImageUrls(task);
 
     card.innerHTML = `
-      <div class="review-number">${visibleIndex + 1}</div>
-      <div class="review-fields">
-        <label>Instruktion</label>
-        <textarea data-field="instruction">${escapeHtml(task.instruction)}</textarea>
-        <label>Kommentar</label>
-        <input data-field="userComment" type="text"
-          value="${escapeHtml(task.userComment || "")}">
+      <div class="review-number" role="gridcell">${visibleIndex + 1}</div>
+      <div class="review-fields" role="gridcell">
+        <div class="review-field-heading">
+          <label for="review-instruction-${visibleIndex}">Instruktion</label>
+          <button data-action="edit-instruction" class="secondary"
+            aria-label="Redigera instruktion för steg ${visibleIndex + 1}">Redigera</button>
+        </div>
+        <textarea id="review-instruction-${visibleIndex}" data-field="instruction" data-edit-field="instruction"
+          aria-label="Instruktion för steg ${visibleIndex + 1}"
+          aria-keyshortcuts="Enter Escape Shift+Enter"
+          title="Dubbelklicka eller tryck Enter för att redigera"
+          readonly>${escapeHtml(globalThis.T9TextFormat.quoteEmphasis(task.instruction))}</textarea>
+        <div class="review-comment-section" ${task.userComment ? "" : "hidden"}>
+          <div class="review-field-heading">
+            <label for="review-comment-${visibleIndex}">Kommentar</label>
+            <button data-action="edit-comment" class="secondary"
+              aria-label="Redigera kommentar för steg ${visibleIndex + 1}">Redigera</button>
+          </div>
+          <input id="review-comment-${visibleIndex}" data-field="userComment" data-edit-field="userComment" type="text"
+            aria-label="Kommentar för steg ${visibleIndex + 1}"
+            aria-keyshortcuts="Enter Escape"
+            title="Dubbelklicka för att redigera" readonly
+            value="${escapeHtml(task.userComment || "")}">
+        </div>
+        <button data-action="add-comment" class="secondary review-add-comment"
+          ${task.userComment ? "hidden" : ""}
+          aria-label="Lägg till kommentar för steg ${visibleIndex + 1}">Lägg till kommentar</button>
         <div class="review-meta">
           ${escapeHtml(task.taskType || "Task")}
           · Confidence ${task.confidenceScore ?? task.confidence ?? 0}%
@@ -3503,81 +3820,102 @@ function renderReview() {
             ? ` · ${escapeHtml(task.knowledgeRule)}`
             : ""}
         </div>
-        ${imageUrl
-          ? `<img class="review-image" src="${imageUrl}"
-              alt="Skärmbild för steg ${visibleIndex + 1}">`
-          : ""}
+        ${imageUrls.map((imageUrl, imageIndex) =>
+          `<img class="review-image" src="${imageUrl}"
+              alt="Skärmbild ${imageIndex + 1} för steg ${visibleIndex + 1}">`
+        ).join("")}
       </div>
-      <div class="review-actions">
+      <div class="review-actions" role="gridcell">
+        <button data-drag-handle class="secondary" draggable="true"
+          aria-label="Dra steg ${visibleIndex + 1} för att flytta"
+          aria-keyshortcuts="Alt+ArrowUp Alt+ArrowDown">Flytta</button>
         <label>
           <input data-action="approve" type="checkbox"
+            aria-label="Godkänn steg ${visibleIndex + 1}"
             ${task.approved ? "checked" : ""}>
           Godkänd
         </label>
-        <button data-action="up" class="secondary">Flytta upp</button>
-        <button data-action="down" class="secondary">Flytta ned</button>
-        <button data-action="add" class="secondary">Lägg till efter</button>
-        <button data-action="remove" class="danger">Ta bort</button>
+        <button data-action="add" class="secondary" aria-label="Lägg till steg efter steg ${visibleIndex + 1}">Lägg till efter</button>
+        <button data-action="remove" class="danger" aria-label="Ta bort steg ${visibleIndex + 1}">Ta bort</button>
+        <button data-action="toggle-layout" class="secondary" aria-pressed="false">Komprimera</button>
       </div>`;
-
-    card.querySelector('[data-field="instruction"]')
-      .addEventListener("input", event => {
-        globalThis.T9Review.updateTask(activeReview, actualIndex, {
-          instruction: event.target.value
-        });
-      });
-
-    card.querySelector('[data-field="userComment"]')
-      .addEventListener("input", event => {
-        globalThis.T9Review.updateTask(activeReview, actualIndex, {
-          userComment: event.target.value
-        });
-      });
 
     card.querySelector('[data-action="approve"]')
       .addEventListener("change", event => {
         globalThis.T9Review.approveTask(
           activeReview,
           actualIndex,
-          event.target.checked
+          event.target.checked,
+          {
+            beforeSelection: activeReviewSelection,
+            afterSelection: activeReviewSelection
+          }
         );
         renderReview();
       });
 
-    card.querySelector('[data-action="up"]')
+    card.querySelector('[data-action="edit-instruction"]')
       .addEventListener("click", () => {
-        globalThis.T9Review.move(activeReview, actualIndex, -1);
-        renderReview();
+        editReviewField(card, task.taskId, "instruction");
       });
 
-    card.querySelector('[data-action="down"]')
+    card.querySelector('[data-action="edit-comment"]')
       .addEventListener("click", () => {
-        globalThis.T9Review.move(activeReview, actualIndex, 1);
-        renderReview();
+        editReviewField(card, task.taskId, "userComment");
+      });
+
+    card.querySelector('[data-action="add-comment"]')
+      .addEventListener("click", event => {
+        card.querySelector(".review-comment-section").hidden = false;
+        event.currentTarget.hidden = true;
+        editReviewField(card, task.taskId, "userComment");
       });
 
     card.querySelector('[data-action="add"]')
       .addEventListener("click", () => {
-        globalThis.T9Review.add(activeReview, actualIndex);
+        globalThis.T9Review.add(activeReview, actualIndex, {
+          beforeSelection: activeReviewSelection
+        });
         renderReview();
       });
 
     card.querySelector('[data-action="remove"]')
       .addEventListener("click", () => {
-        globalThis.T9Review.remove(activeReview, actualIndex);
-        renderReview();
+        deleteReviewTasks([task.taskId]);
+      });
+
+    card.querySelector('[data-action="toggle-layout"]')
+      .addEventListener("click", () => {
+        reviewLayoutState = globalThis.T9ReviewLayout.toggleTask(
+          reviewLayoutState,
+          task.taskId
+        );
+        globalThis.T9ReviewLayout.apply(
+          list,
+          $("compactReviewSteps"),
+          reviewLayoutState
+        );
       });
 
     list.appendChild(card);
   });
+  globalThis.T9ReviewLayout.apply(
+    list,
+    $("compactReviewSteps"),
+    reviewLayoutState
+  );
+  applyReviewSelection();
 }
 
-async function saveActiveReview() {
+async function saveActiveReview(options = {}) {
   if (!activeReviewSession || !activeReview) return;
+  const savedSession = activeReviewSession;
+  const savedReview = activeReview;
+  const savedUpdatedAt = activeReview.updatedAt;
 
   const response = await send({
     type: "T9_SAVE_REVIEW",
-    sessionId: activeReviewSession.id,
+    sessionId: savedSession.id,
     review: activeReview
   });
 
@@ -3585,12 +3923,24 @@ async function saveActiveReview() {
     throw new Error(response.error || "Granskningen kunde inte sparas.");
   }
 
-  activeReview = response.review;
-  show(`Granskningen för "${activeReviewSession.name}" har sparats.`);
-  renderReview();
+  const currentSession = activeReviewSession === savedSession;
+  const unchanged = currentSession &&
+    activeReview === savedReview &&
+    activeReview.updatedAt === savedUpdatedAt;
+  if (unchanged) {
+    activeReview = response.review;
+  }
+  if (options.announce !== false && currentSession) {
+    show(`Granskningen för "${savedSession.name}" har sparats.`);
+  }
+  if (options.render !== false && unchanged) renderReview();
+  else if (options.render === false && currentSession) {
+    $("reviewFooterText").textContent = "Alla ändringar är sparade.";
+  }
 }
 
 async function openReview(session) {
+  reviewReturnFocus = document.activeElement;
   show(`Förbereder granskning av "${session.name}"...`);
 
   activeReviewSession = session;
@@ -3602,27 +3952,43 @@ async function openReview(session) {
     sessionId: session.id
   });
 
-  activeReview = existing.review ||
-    globalThis.T9Review.createReview(
+  activeReview = existing.review
+    ? globalThis.T9Review.normalizeReview({
+        ...existing.review,
+        tasks: globalThis.T9Review.normalizeTasks(existing.review.tasks)
+      })
+    : globalThis.T9Review.createReview(
       session,
       activeReviewModel.businessTasks
     );
+  activeReviewSelection = globalThis.T9ReviewSelection.create();
+  activeReviewEdit = null;
+  reviewLayoutState = globalThis.T9ReviewLayout.create(
+    reviewLayoutState.allCompact
+  );
+  reviewAutoSave.cancel();
 
   $("reviewTitle").textContent = `Granska: ${session.name}`;
   $("reviewOverlay").classList.add("open");
   $("reviewOverlay").setAttribute("aria-hidden", "false");
   renderReview();
+  $("closeReview").focus();
   updateFilenamePreview();
   show("");
 }
 
 function closeReview() {
+  reviewAutoSave.flush();
   $("reviewOverlay").classList.remove("open");
   $("reviewOverlay").setAttribute("aria-hidden", "true");
   activeReviewSession = null;
   activeReview = null;
   activeReviewModel = null;
+  activeReviewSelection = globalThis.T9ReviewSelection.create();
+  activeReviewEdit = null;
   updateFilenamePreview();
+  if (reviewReturnFocus?.isConnected) reviewReturnFocus.focus();
+  reviewReturnFocus = null;
 }
 
 async function loadSessions() {
@@ -3692,13 +4058,21 @@ async function loadSessions() {
     deleteButton.className = "danger";
     deleteButton.addEventListener("click", async () => {
       if (!confirm(`Ta bort sessionen "${session.name}"?`)) return;
-
-      await send({
-        type: "T9_DELETE_SESSION",
-        sessionId: session.id
-      });
-
-      await loadSessions();
+      deleteButton.disabled = true;
+      try {
+        const response = await send({
+          type: "T9_DELETE_SESSION",
+          sessionId: session.id
+        });
+        if (!response?.ok) {
+          throw new Error(response?.error || "Sessionen kunde inte tas bort.");
+        }
+        await loadSessions();
+        show(`Sessionen "${session.name}" har tagits bort.`);
+      } catch (error) {
+        show(error.message, true);
+        deleteButton.disabled = false;
+      }
     });
 
     actions.append(reviewButton, exportButton, deleteButton);
@@ -3719,33 +4093,44 @@ $("advancedToggle").addEventListener("click", () => {
 });
 
 $("closeReview").addEventListener("click", closeReview);
-const exportWordButton = $("exportWordReview");
-if (exportWordButton) {
-  exportWordButton.addEventListener("click", async () => {
-    const button = exportWordButton;
-    button.disabled = true;
-    button.textContent = "Skapar Word...";
-
-    try {
-      if (typeof saveActiveReview === "function") {
-        await saveActiveReview();
-      } else if (typeof saveReview === "function") {
-        await saveReview();
-      }
-    } catch {
-      // Export may continue with the active in-memory review.
-    }
-
-    try {
-      await exportActiveReviewToWord();
-    } catch (error) {
-      show(error.message, true);
-    } finally {
-      button.disabled = false;
-      button.textContent = "Exportera Word";
-    }
-  });
+async function exportReviewFromToolbar(button) {
+  button.disabled = true;
+  button.textContent = "Skapar Word...";
+  try {
+    await reviewAutoSave.flush();
+    await saveActiveReview({ render: false });
+  } catch {
+    // Export may continue with the active in-memory review.
+  }
+  try {
+    await exportActiveReviewToWord();
+  } catch (error) {
+    show(error.message, true);
+  } finally {
+    button.textContent = "Exportera Word";
+    applyReviewToolbarState();
+  }
 }
+
+globalThis.T9ReviewToolbar.bind($("reviewToolbar"), (command, button) => {
+  if (command === "undo") restoreReviewHistory("undo");
+  else if (command === "redo") restoreReviewHistory("redo");
+  else if (command === "merge") mergeSelectedReviewTasks();
+  else if (command === "split") splitSelectedReviewTask();
+  else if (command === "move-up") {
+    moveReviewTasksByOffset(
+      -1,
+      activeReviewSelection.activeId || activeReviewSelection.selectedIds[0]
+    );
+  } else if (command === "move-down") {
+    moveReviewTasksByOffset(
+      1,
+      activeReviewSelection.activeId || activeReviewSelection.selectedIds[0]
+    );
+  } else if (command === "export") {
+    exportReviewFromToolbar(button);
+  }
+});
 
 $("saveReview").addEventListener("click", async () => {
   try {
@@ -3761,26 +4146,51 @@ $("saveReviewBottom").addEventListener("click", async () => {
     show(error.message, true);
   }
 });
-$("addReviewStep").addEventListener("click", () => {
-  globalThis.T9Review.add(activeReview);
-  renderReview();
+$("compactReviewSteps").addEventListener("click", () => {
+  reviewLayoutState = globalThis.T9ReviewLayout.toggleAll(
+    reviewLayoutState,
+    reviewTaskIds()
+  );
+  globalThis.T9ReviewLayout.apply(
+    $("reviewList"),
+    $("compactReviewSteps"),
+    reviewLayoutState
+  );
 });
-$("approveAllReview").addEventListener("click", () => {
-  activeReview.tasks.forEach((task, index) => {
-    globalThis.T9Review.approveTask(activeReview, index, true);
+$("addReviewStep").addEventListener("click", () => {
+  globalThis.T9Review.add(activeReview, undefined, {
+    beforeSelection: activeReviewSelection
   });
   renderReview();
 });
 $("completeReview").addEventListener("click", async () => {
-  globalThis.T9Review.complete(activeReview);
+  globalThis.T9Review.complete(activeReview, {
+    beforeSelection: activeReviewSelection,
+    afterSelection: activeReviewSelection
+  });
   try {
     await saveActiveReview();
   } catch (error) {
     show(error.message, true);
   }
 });
+globalThis.T9ReviewAccessibility.bindDialog($("reviewDialog"), closeReview);
 $("reviewOverlay").addEventListener("click", event => {
   if (event.target === $("reviewOverlay")) closeReview();
+});
+$("reviewOverlay").addEventListener("keydown", event => {
+  if (event.target.closest?.('[data-editing="true"]')) return;
+  const direction = globalThis.T9Review.historyDirectionFromKey(event);
+  if (!direction) return;
+  event.preventDefault();
+  restoreReviewHistory(direction);
+});
+globalThis.T9ReviewSelection.bind($("reviewList"), {
+  dispatch: dispatchReviewSelection,
+  move: moveReviewTasksByOffset
+});
+globalThis.T9ReviewMove.bind($("reviewList"), {
+  move: moveReviewTasksTo
 });
 
 $("save").addEventListener("click", saveSettings);

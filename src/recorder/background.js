@@ -1,4 +1,6 @@
-const VERSION = "4.1.1";
+importScripts("engine/storage-keys.js");
+
+const VERSION = "4.2.0";
 
 const DEFAULT_SETTINGS = {
   exportFileNamePattern: "{process} - {environment} - {date}",
@@ -27,9 +29,12 @@ const DEFAULT_SETTINGS = {
 
 const STATE_KEY = "t9_state";
 const SETTINGS_KEY = "t9_settings";
-const SESSION_PREFIX = "t9_session_";
-const EVENT_PREFIX = "t9_events_";
-const SCREENSHOT_PREFIX = "t9_screenshots_";
+const {
+  EVENT_PREFIX,
+  REVIEW_PREFIX,
+  SCREENSHOT_PREFIX,
+  SESSION_PREFIX
+} = globalThis.T9StorageKeys;
 const DEBUG_KEY = "t9_debug";
 
 let writeQueue = Promise.resolve();
@@ -648,12 +653,9 @@ async function listSessions() {
 }
 
 async function deleteSession(id) {
-  await chrome.storage.local.remove([
-    SESSION_PREFIX + id,
-    EVENT_PREFIX + id,
-    SCREENSHOT_PREFIX + id,
-    REVIEW_PREFIX + id
-  ]);
+  await chrome.storage.local.remove(
+    globalThis.T9StorageKeys.sessionDataKeys(id)
+  );
 }
 
 chrome.runtime.onInstalled.addListener(async () => {

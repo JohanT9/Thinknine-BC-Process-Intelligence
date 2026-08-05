@@ -1,6 +1,18 @@
-# Thinknine BC Process Intelligence v3.5.0
+# Thinknine BC Process Intelligence v4.3.0 Release Candidate
 
-Detta är den första git-redo, modulära versionen av Edge-projektet.
+Ett modulärt Edge-tillägg för att spela in, granska och exportera dokumenterade
+Business Central-processer.
+
+## Screenshot annotations 4.3 RC1
+
+Review-modellen har en ny, versionshanterad grund för icke-destruktiva
+skärmbildsannoteringar. Rektanglar och pilar använder stabila ID:n och
+normaliserade koordinater mellan 0 och 1. Originalbilder ändras aldrig, och
+äldre Reviews utan annotationsdata fortsätter att fungera.
+
+RC1 innehåller endast domänmodell, validering och migreringsstöd. Den synliga
+SVG-editorn och annoteringar i Word-exporten tillkommer i senare RC-steg. Se
+[Screenshot Annotations 4.3](docs/SCREENSHOT_ANNOTATIONS_4.3.md).
 
 ## Struktur
 
@@ -13,6 +25,8 @@ src/
 │   ├── session-graph.js
 │   ├── confidence-engine.js
 │   └── documentation-engine.js
+├── review/
+├── exporters/
 ├── ui/
 └── knowledge-packs/
 
@@ -40,11 +54,6 @@ npm.cmd run check
 
 Session Graph grupperar uppgifter per affärsentitet. Confidence Report visar sessionskvalitet, Knowledge Pack-träff och grafens täckning.
 
-## Nästa milstolpe
-
-Review Mode ska arbeta direkt mot `business-tasks.json` och `session-graph.json`.
-
-
 ## GitHub-arbetsflöde
 
 Varje push eller pull request mot `main` kör:
@@ -56,8 +65,8 @@ lint → tester → build → syntaxkontroll
 Skapa en release genom att tagga en version:
 
 ```powershell
-git tag v3.5.1
-git push origin v3.5.1
+git tag v4.2.0-rc
+git push origin v4.2.0-rc
 ```
 
 GitHub Actions bygger då automatiskt en Edge-ZIP och bifogar den till en GitHub Release.
@@ -78,7 +87,7 @@ Review Studio stöder:
 - skärmbildsförhandsvisning
 - lokal lagring per session
 
-Den sparade modellen används som underlag för kommande Word- och PDF-generator.
+Den sparade modellen används direkt av Word-exportören.
 
 
 ## Fast Edge development folder
@@ -187,3 +196,159 @@ Preview och valideringsfel meddelas även till skärmläsare.
 
 Se [Release Notes 4.1.1](docs/RELEASE_NOTES_4.1.1.md) för en fullständig
 sammanställning av ändringarna.
+
+
+## Review Studio 4.2 Release Candidate
+
+4.2 samlar Review Studio kring små, återanvändbara moduler för selection, Move,
+Merge, Split, Undo/Redo, inline-redigering, toolbar-state, dokumentstatus och
+tillgänglig dialoghantering. Domänoperationerna arbetar mot stabila task-ID:n;
+dashboarden ansvarar för rendering, persistence och exportintegration.
+
+Release Candidate innehåller:
+
+- enkel-, intervall- och multiselection med mus och tangentbord
+- drag-and-drop och tangentbordsstyrd omordning
+- Merge, Split och borttagning direkt på varje steg
+- Undo/Redo för Move, Merge, Split, Delete och Edit
+- inline-redigering med commit, cancel och autosave
+- selection-driven toolbar och live statusrad
+- modal dialog, fokusfälla, ARIA-grid och skärmläsarstöd
+- Word-export med bevarad ordning, metadata och samtliga skärmbilder
+
+Se [Release Notes 4.2.0](docs/RELEASE_NOTES_4.2.0.md) och
+[Review Studio Architecture 4.2](docs/REVIEW_STUDIO_ARCHITECTURE_4.2.md).
+
+### Utvecklingssteg: RC1 foundation
+
+Review Studio har ett separat, transient urvalslager som inte ändrar eller
+sparar reviewinnehållet. Klick väljer ett steg, Ctrl/Cmd+klick växlar enskilda
+steg och Shift+klick väljer ett intervall.
+
+När ett stegkort har fokus stöds:
+
+- pil vänster/upp och höger/ned för föregående eller nästa steg
+- Home och End för första eller sista steget
+- Shift tillsammans med navigering för intervallmarkering
+- Ctrl/Cmd+A för att välja alla steg
+- Enter eller Blanksteg för att välja aktivt steg
+
+Urvalet exponeras som ett flervals-grid för hjälpmedel. RC1 innehåller ingen
+redigering av flera steg; modellen är en grund för kommande funktioner.
+
+Se [Review Studio Architecture 4.2](docs/REVIEW_STUDIO_ARCHITECTURE_4.2.md).
+
+### Drag & Drop RC2
+
+Steg kan flyttas med det särskilda **Flytta**-handtaget. Om det dragna steget
+ingår i ett flerval flyttas hela urvalet som ett block. Annars flyttas endast
+det dragna steget och befintligt urval bevaras.
+
+Samma move-engine används av drag-and-drop, knapparna **Flytta upp/ned** och
+Alt+pil upp/ned. Fokus och selection följer stabila task-ID:n efter flytten.
+Animationen stängs automatiskt av när operativsystemet föredrar reducerad
+rörelse.
+
+### Merge Steps RC3
+
+Markera minst två steg och välj **Slå samman**. Det nya steget placeras där det
+första valda steget låg och innehåller instruktioner, originaltext, kommentarer,
+skärmbilder, source events och metadata från samtliga källsteg.
+
+Efter merge markeras det sammanslagna steget och får fokus. Varje merge sparar
+en history entry med källstegens fulla snapshots och ursprungliga index. Undo är
+inte aktiverat i RC3, men historikformatet innehåller allt som behövs för exakt
+återställning.
+
+### Split Step RC4
+
+Markera ett steg, placera textmarkören där instruktionen ska delas och välj
+**Dela steg**. Delarna ersätter källsteget på samma plats och markeras
+tillsammans efter operationen.
+
+Varje del återanvänder källstegets skärmbilder, source events och metadata.
+Split sparas i samma versionshanterade history som merge, med en komplett
+snapshot av källsteget och ID:n för de skapade delarna.
+
+Split-engine kan även ta emot färdiga textsegment med valfri metadata och en
+`suggestionSource`. Detta är integrationspunkten för framtida AI-förslag; RC4
+innehåller ingen AI-tjänst eller automatisk uppdelning.
+
+### Undo / Redo RC5
+
+Review Studio har en gemensam kommandohistorik för flytt, sammanslagning,
+delning, borttagning och redigering. Använd **Ångra**/**Gör om**, Ctrl/Cmd+Z
+eller Ctrl+Y. Cmd/Ctrl+Shift+Z fungerar också för Gör om.
+
+Historiken sparas med reviewn, begränsas till 100 kommandon och behåller
+selection när kommandot har ett känt urval. Varje bekräftad inline-redigering
+skapar en separat Undo-post.
+
+### Professional Editing RC6
+
+Instruktioner och kommentarer visas inline. Dubbelklicka på ett fält eller
+markera ett steg och tryck Enter för att börja redigera instruktionen. Enter
+bekräftar, Escape avbryter och återställer ursprungsvärdet. Använd Shift+Enter
+för en ny rad i instruktionen.
+
+Bekräftade ändringar sparas automatiskt efter en kort fördröjning. Flera snabba
+ändringar samlas till en save-operation, medan knapparna för manuell sparning
+finns kvar. Native Undo/Redo i textfältet prioriteras under pågående redigering;
+Review Studios kommandohistorik tar över när redigeringen har bekräftats.
+
+### Professional Toolbar RC7
+
+Review Studios primära toolbar samlar Ångra, Gör om, Slå samman, Dela,
+Flytta upp, Flytta ned och Exportera Word i funktionella grupper. Knapparnas
+tillstånd beräknas automatiskt från aktuellt urval, stegens position,
+kommandohistoriken och exportberedskapen.
+
+Move och strukturkommandon arbetar på hela urvalet. Flyttknapparna stängs av vid
+dokumentets respektive gräns. Varje steg har en egen **Ta bort**-knapp och
+borttagningen kan ångras. Toolbaren kan navigeras med Tab samt
+vänster/högerpil, Home och End; disabled kommandon hoppas över.
+
+Välj **Komprimera alla** för att tillfälligt dölja kommentarer, metadata och
+skärmbilder och göra långa reviews enklare att överblicka och ordna. Varje steg
+har dessutom en egen **Komprimera**/**Expandera**-knapp. Knapptexten visar alltid
+nästa åtgärd utifrån stegets aktuella läge. Visningsläget ändrar inte sparad
+reviewdata eller export.
+
+Varje steg godkänns individuellt med **Godkänd**. När samtliga aktiva steg är
+godkända aktiveras **Slutför granskning**. Det tidigare snabbkommandot
+**Godkänn alla** har tagits bort för att slutstatusen ska representera en
+faktisk genomgång av varje steg.
+
+Instruktionen redigeras med den synliga **Redigera**-knappen. Kommentar är ett
+valfritt komplement för exempelvis undantag, kontroller eller kundspecifika
+anvisningar och läggs till med **Lägg till kommentar**. Befintliga kommentarer
+har en egen **Redigera**-knapp och följer med i Word-exporten. Enter sparar och
+Escape avbryter redigeringen.
+
+### Status Bar RC8
+
+Statusraden visar antal aktiva steg, valda steg, uppskattade dokumentsidor och
+antal skärmbilder. Den uppdateras direkt vid selection, Move, Merge, Split,
+Delete, Add samt Undo/Redo.
+
+Sidantalet är en planeringsuppskattning: dokumentets försättsdel räknas först,
+varefter stegtext och skärmbilder vägs in. Skärmbilder dedupliceras inom varje
+steg enligt samma princip som Word-exporten, men en bild som används av flera
+steg räknas vid varje placering eftersom den också renderas flera gånger.
+
+Statusvärdena är en semantisk definitionslista i en atomisk, polite live-region.
+Review-gridens `aria-describedby` refererar samma status, så aktuella värden är
+tillgängliga även utan visuell avläsning.
+
+### Accessibility Review RC9
+
+Review Studio exponeras som en namngiven modal dialog. Fokus flyttas till
+dialogen när den öppnas, hålls inom dialogen med Tab/Shift+Tab och återgår till
+kontrollen som öppnade den när dialogen stängs. Escape stänger dialogen, men
+fortsätter att avbryta inline-redigering utan att samtidigt stänga Review Studio.
+
+Review-grid innehåller dynamiska radantal och radindex. Instruktions- och
+kommentarsfält har programmatiskt kopplade labels, kontextknappar annonserar
+aktuellt steg och granskningsförloppet exponeras som en progressbar med aktuellt
+procentvärde. En visuellt dold hjälptext beskriver selection, redigering och
+tangentbordsflyttning för skärmläsare.

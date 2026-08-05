@@ -1,5 +1,145 @@
 # Changelog
 
+## 4.3.0 RC1 — Screenshot Annotation Foundation
+
+- Added a versioned, non-destructive screenshot annotation domain model.
+- Added stable UUID-based IDs for annotation sets and individual annotations.
+- Added normalized rectangle and arrow geometry constrained between 0 and 1.
+- Added validation for malformed, invisible and non-finite geometry.
+- Preserved unknown annotation types and schema fields for forward compatibility.
+- Added backward-compatible normalization for Reviews without annotation data.
+- Added behaviour tests for creation, validation, IDs, migration and future data.
+- Kept original screenshot bytes, Review UI, Undo/Redo and Word export unchanged.
+
+## 4.2.0 Release Candidate
+
+- Added a blank paragraph between step instructions and comments in Word
+  exports.
+- Removed the per-step page and confidence metadata line from Word exports while
+  retaining those values in review data.
+- Added explicit Edit Instruction and Add/Edit Comment controls so inline
+  editing no longer depends on discovering double-click or Enter shortcuts.
+- Replaced paired instruction emphasis markers such as `**Sök**` with one
+  double quote on each side (`"Sök"`) across Review Studio and Word export.
+- Removed the overlapping Approve All action; reviews can now be completed only
+  after every step has been individually approved.
+- Added accessible global and per-step compact/expanded Review Studio controls
+  for easier movement through long reviews without changing review data.
+- Moved Delete from the global toolbar to an accessible action on every review
+  step while retaining Undo and predictable focus restoration.
+- Fixed the Review Studio command header so it remains visible while scrolling
+  long reviews.
+- Fixed session deletion failing before storage removal because the review
+  storage prefix was undefined.
+- Centralized session, event, screenshot and review storage-key definitions.
+- Added visible error feedback when a session cannot be deleted.
+- Completed senior release review across architecture, regressions, UX,
+  performance and accessibility.
+- Removed a dead dashboard renumber branch after all mutations were centralized
+  in the Review domain layer.
+- Ensured separate committed inline-edit sessions create separate Undo entries.
+- Refreshed installation instructions and consolidated release documentation.
+- Added complete 4.2.0 release notes and retained compatibility with saved
+  reviews and existing public Review APIs.
+
+### RC1 — Selection Foundation
+
+- Added a reusable Review Studio selection model.
+- Added single, additive and range selection for review tasks.
+- Added keyboard navigation with arrows, Home, End, Enter, Space and Select All.
+- Added delegated selection event handling for the review task list.
+- Added accessible grid, row and selection state semantics.
+- Added stable fallback task identifiers when normalizing legacy reviews.
+- Added Review Studio selection behaviour tests.
+- Prepared the foundation for future multi-task editing without adding editing
+  commands.
+
+### RC2 — Drag & Drop
+
+- Added reusable ID-based move operations for single and multi-selection.
+- Added delegated drag-and-drop handling with explicit drag handles.
+- Added FLIP animations with reduced-motion support.
+- Added Alt+Arrow keyboard reordering.
+- Preserved selection and active focus across every move method.
+- Routed existing move buttons through the shared move engine.
+- Added move, drag lifecycle and animation behaviour tests.
+
+### RC3 — Merge Steps
+
+- Added an ID-based merge engine for selected review tasks.
+- Merged instructions, original text, comments, screenshots and source metadata.
+- Preserved task ordering by inserting the merged task at the first source task.
+- Added versioned review history with indexed source snapshots for future Undo.
+- Preserved all merged screenshots in Review Studio and Word exports.
+- Added merge-domain, history and DOCX multi-image behaviour tests.
+
+### RC4 — Split Step
+
+- Added a reusable split engine for review tasks.
+- Added manual text splitting at the instruction cursor.
+- Preserved screenshots, source events and metadata on every split part.
+- Added suggestion segments and metadata hooks for future AI integrations.
+- Added reversible split history with the complete source snapshot and created
+  task IDs.
+- Added split-domain, collision, ordering, history and AI-suggestion behaviour
+  tests.
+
+### RC5 — Undo / Redo
+
+- Added a reusable, versioned command history engine with a 100-entry limit.
+- Added Undo and Redo for move, merge, split, delete and edit commands.
+- Added Ctrl/Cmd+Z, Ctrl+Y and Cmd/Ctrl+Shift+Z keyboard shortcuts.
+- Preserved task selection across history navigation where command context is
+  available.
+- Coalesced consecutive edits to the same field into one undoable command.
+- Added redo-branch invalidation, no-op filtering and command behaviour tests.
+
+### RC6 — Professional Editing
+
+- Added a reusable inline editing controller for Review Studio fields.
+- Added edit activation with double-click or Enter.
+- Added Enter-to-commit, Escape-to-cancel and blur-to-commit behaviour.
+- Preserved multiline instructions with Shift+Enter while editing.
+- Added debounced automatic persistence after committed edits.
+- Prevented stale save responses from overwriting newer in-memory edits.
+- Kept native text-field Undo/Redo active while an inline editor is open.
+- Added editing lifecycle, delegated event and autosave behaviour tests.
+
+### RC7 — Professional Toolbar
+
+- Added a modern, grouped Review Studio command toolbar.
+- Added centralized selection-driven state for Undo, Redo, Merge, Split,
+  Move Up, Move Down and Export.
+- Added reusable ID-based deletion with Undo history support.
+- Added boundary-aware movement state for the first and last selected tasks.
+- Added delegated command routing and arrow, Home and End toolbar navigation.
+- Kept Add, Save and Complete available as secondary actions.
+- Added toolbar state, disabled-command, navigation and bulk-delete tests.
+
+### RC8 — Status Bar
+
+- Added a live Review Studio status bar for steps, selection, estimated pages
+  and screenshots.
+- Added a reusable status model shared by rendering and behaviour tests.
+- Updated status automatically after selection and every task-list operation.
+- Matched screenshot counting to export semantics by deduplicating per task.
+- Added an explicit, documented page-estimation heuristic.
+- Added semantic definition-list markup, `role=status`, polite live updates,
+  atomic announcements and a grid description relationship.
+
+### RC9 — Accessibility Review
+
+- Added complete modal dialog semantics and accessible naming/descriptions.
+- Added a reusable focus trap, Escape handling and opener-focus restoration.
+- Moved initial focus into Review Studio when the dialog opens.
+- Added accessible progressbar values and dynamic grid row counts/indexes.
+- Connected instruction and comment labels to their inline editing controls.
+- Added task-specific labels for approval and contextual add actions.
+- Added screen-reader keyboard instructions and polite save-status updates.
+- Preserved native editing Escape and Undo behaviour inside active fields.
+- Added dialog keyboard, focus cycling, handled-event and ARIA regression tests.
+
+
 ## 4.1.1
 
 - Removed the "Always ask where to save files" option and Save As behavior.

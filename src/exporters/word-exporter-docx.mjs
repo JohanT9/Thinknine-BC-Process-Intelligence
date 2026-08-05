@@ -17,13 +17,13 @@ import {
   TextRun,
   WidthType,
 } from "docx";
+import "../engine/text-format.js";
 
 const PAGE_IMAGE_WIDTH = 590;
 const PAGE_IMAGE_HEIGHT = 390;
 
 function plainText(value) {
-  return String(value || "")
-    .replace(/\*\*/g, "")
+  return globalThis.T9TextFormat.quoteEmphasis(value)
     .replace(/`/g, "")
     .trim();
 }
@@ -332,36 +332,22 @@ function taskElements(task, index, screenshotData) {
     })
   );
 
-  const meta = [
-    task.pageCaption ? `Sida: ${task.pageCaption}` : "",
-    task.confidenceScore !== undefined
-      ? `Säkerhet: ${task.confidenceScore}%`
-      : task.confidence !== undefined
-        ? `Säkerhet: ${task.confidence}%`
-        : "",
-  ].filter(Boolean).join(" | ");
-
-  if (meta) {
-    children.push(
-      bodyParagraph(meta, {
-        italics: true,
-        color: "5F6B76",
-        size: 18,
-        after: 100,
-      })
-    );
-  }
-
   if (task.userComment) {
+    children.push(new Paragraph({ children: [] }));
     children.push(commentBox(task.userComment));
   }
 
-  const imageData = task.screenshot
-    ? screenshotData[task.screenshot]
-    : null;
-  const bytes = imageBytes(imageData);
-
-  if (bytes) {
+  const screenshotPaths = [...new Set(
+    task.screenshots?.length
+      ? task.screenshots
+      : task.screenshot
+        ? [task.screenshot]
+        : []
+  )];
+  screenshotPaths.forEach((path, imageIndex) => {
+    const imageData = screenshotData[path];
+    const bytes = imageBytes(imageData);
+    if (!bytes) return;
     const dimensions = fittedImageSize(bytes);
 
     children.push(
@@ -377,15 +363,15 @@ function taskElements(task, index, screenshotData) {
             type: imageType(imageData, bytes),
             transformation: dimensions,
             altText: {
-              title: `Skärmbild steg ${index + 1}`,
+              title: `Skärmbild ${imageIndex + 1} steg ${index + 1}`,
               description: instruction,
-              name: `step-${index + 1}`,
+              name: `step-${index + 1}-${imageIndex + 1}`,
             },
           }),
         ],
       })
     );
-  }
+  });
 
   return children;
 }
@@ -650,10 +636,16 @@ function buildDocument(options) {
     }),
     title,
     taskCount: tasks.length,
-    imageCount: tasks.filter(task =>
-      task.screenshot &&
-      imageBytes(screenshotData[task.screenshot])
-    ).length,
+    imageCount: tasks.reduce((count, task) => {
+      const paths = task.screenshots?.length
+        ? task.screenshots
+        : task.screenshot
+          ? [task.screenshot]
+          : [];
+      return count + [...new Set(paths)].filter(path =>
+        imageBytes(screenshotData[path])
+      ).length;
+    }, 0),
   };
 }
 

@@ -1,31 +1,72 @@
 (() => {
-  var __require = /* @__PURE__ */ ((x) => typeof require !== "undefined" ? require : typeof Proxy !== "undefined" ? new Proxy(x, {
-    get: (a, b) => (typeof require !== "undefined" ? require : a)[b]
-  }) : x)(function(x) {
-    if (typeof require !== "undefined") return require.apply(this, arguments);
-    throw Error('Dynamic require of "' + x + '" is not supported');
-  });
-
-  // node_modules/docx/dist/index.mjs
   var __create = Object.create;
   var __defProp = Object.defineProperty;
   var __getOwnPropDesc = Object.getOwnPropertyDescriptor;
   var __getOwnPropNames = Object.getOwnPropertyNames;
   var __getProtoOf = Object.getPrototypeOf;
   var __hasOwnProp = Object.prototype.hasOwnProperty;
+  var __require = /* @__PURE__ */ ((x) => typeof require !== "undefined" ? require : typeof Proxy !== "undefined" ? new Proxy(x, {
+    get: (a, b) => (typeof require !== "undefined" ? require : a)[b]
+  }) : x)(function(x) {
+    if (typeof require !== "undefined") return require.apply(this, arguments);
+    throw Error('Dynamic require of "' + x + '" is not supported');
+  });
+  var __commonJS = (cb, mod) => function __require3() {
+    return mod || (0, cb[__getOwnPropNames(cb)[0]])((mod = { exports: {} }).exports, mod), mod.exports;
+  };
+  var __copyProps = (to, from, except, desc) => {
+    if (from && typeof from === "object" || typeof from === "function") {
+      for (let key of __getOwnPropNames(from))
+        if (!__hasOwnProp.call(to, key) && key !== except)
+          __defProp(to, key, { get: () => from[key], enumerable: !(desc = __getOwnPropDesc(from, key)) || desc.enumerable });
+    }
+    return to;
+  };
+  var __toESM = (mod, isNodeMode, target) => (target = mod != null ? __create(__getProtoOf(mod)) : {}, __copyProps(
+    // If the importer is in node compatibility mode or this is not an ESM
+    // file that has been converted to a CommonJS file using a Babel-
+    // compatible transform (i.e. "__esModule" has not been set), then set
+    // "default" to the CommonJS "module.exports" for node compatibility.
+    isNodeMode || !mod || !mod.__esModule ? __defProp(target, "default", { value: mod, enumerable: true }) : target,
+    mod
+  ));
+
+  // src/engine/text-format.js
+  var require_text_format = __commonJS({
+    "src/engine/text-format.js"(exports, module) {
+      (function(root, factory) {
+        const api = factory();
+        if (typeof module === "object" && module.exports) module.exports = api;
+        root.T9TextFormat = api;
+      })(typeof globalThis !== "undefined" ? globalThis : exports, function() {
+        function quoteEmphasis(value) {
+          return String(value ?? "").replace(/\*\*([^*]+?)\*\*/g, '"$1"');
+        }
+        return { quoteEmphasis };
+      });
+    }
+  });
+
+  // node_modules/docx/dist/index.mjs
+  var __create2 = Object.create;
+  var __defProp2 = Object.defineProperty;
+  var __getOwnPropDesc2 = Object.getOwnPropertyDescriptor;
+  var __getOwnPropNames2 = Object.getOwnPropertyNames;
+  var __getProtoOf2 = Object.getPrototypeOf;
+  var __hasOwnProp2 = Object.prototype.hasOwnProperty;
   var __esmMin = (fn, res) => () => (fn && (res = fn(fn = 0)), res);
   var __commonJSMin = (cb, mod) => () => (mod || (cb((mod = { exports: {} }).exports, mod), cb = null), mod.exports);
-  var __copyProps = (to, from, except, desc) => {
-    if (from && typeof from === "object" || typeof from === "function") for (var keys = __getOwnPropNames(from), i = 0, n = keys.length, key; i < n; i++) {
+  var __copyProps2 = (to, from, except, desc) => {
+    if (from && typeof from === "object" || typeof from === "function") for (var keys = __getOwnPropNames2(from), i = 0, n = keys.length, key; i < n; i++) {
       key = keys[i];
-      if (!__hasOwnProp.call(to, key) && key !== except) __defProp(to, key, {
+      if (!__hasOwnProp2.call(to, key) && key !== except) __defProp2(to, key, {
         get: ((k) => from[k]).bind(null, key),
-        enumerable: !(desc = __getOwnPropDesc(from, key)) || desc.enumerable
+        enumerable: !(desc = __getOwnPropDesc2(from, key)) || desc.enumerable
       });
     }
     return to;
   };
-  var __toESM = (mod, isNodeMode, target) => (target = mod != null ? __create(__getProtoOf(mod)) : {}, __copyProps(isNodeMode || !mod || !mod.__esModule ? __defProp(target, "default", {
+  var __toESM2 = (mod, isNodeMode, target) => (target = mod != null ? __create2(__getProtoOf2(mod)) : {}, __copyProps2(isNodeMode || !mod || !mod.__esModule ? __defProp2(target, "default", {
     value: mod,
     enumerable: true
   }) : target, mod));
@@ -2202,7 +2243,7 @@
     module.exports = require_function_bind().call(call, $hasOwn);
   });
   var require_get_intrinsic = /* @__PURE__ */ __commonJSMin((exports, module) => {
-    var undefined2;
+    var undefined;
     var $Object = require_es_object_atoms();
     var $Error = require_es_errors();
     var $EvalError = require_eval();
@@ -2249,24 +2290,24 @@
     var $apply = require_functionApply();
     var $call = require_functionCall();
     var needsEval = {};
-    var TypedArray = typeof Uint8Array === "undefined" || !getProto ? undefined2 : getProto(Uint8Array);
+    var TypedArray = typeof Uint8Array === "undefined" || !getProto ? undefined : getProto(Uint8Array);
     var INTRINSICS = {
       __proto__: null,
-      "%AggregateError%": typeof AggregateError === "undefined" ? undefined2 : AggregateError,
+      "%AggregateError%": typeof AggregateError === "undefined" ? undefined : AggregateError,
       "%Array%": Array,
-      "%ArrayBuffer%": typeof ArrayBuffer === "undefined" ? undefined2 : ArrayBuffer,
-      "%ArrayIteratorPrototype%": hasSymbols && getProto ? getProto([][Symbol.iterator]()) : undefined2,
-      "%AsyncFromSyncIteratorPrototype%": undefined2,
+      "%ArrayBuffer%": typeof ArrayBuffer === "undefined" ? undefined : ArrayBuffer,
+      "%ArrayIteratorPrototype%": hasSymbols && getProto ? getProto([][Symbol.iterator]()) : undefined,
+      "%AsyncFromSyncIteratorPrototype%": undefined,
       "%AsyncFunction%": needsEval,
       "%AsyncGenerator%": needsEval,
       "%AsyncGeneratorFunction%": needsEval,
       "%AsyncIteratorPrototype%": needsEval,
-      "%Atomics%": typeof Atomics === "undefined" ? undefined2 : Atomics,
-      "%BigInt%": typeof BigInt === "undefined" ? undefined2 : BigInt,
-      "%BigInt64Array%": typeof BigInt64Array === "undefined" ? undefined2 : BigInt64Array,
-      "%BigUint64Array%": typeof BigUint64Array === "undefined" ? undefined2 : BigUint64Array,
+      "%Atomics%": typeof Atomics === "undefined" ? undefined : Atomics,
+      "%BigInt%": typeof BigInt === "undefined" ? undefined : BigInt,
+      "%BigInt64Array%": typeof BigInt64Array === "undefined" ? undefined : BigInt64Array,
+      "%BigUint64Array%": typeof BigUint64Array === "undefined" ? undefined : BigUint64Array,
       "%Boolean%": Boolean,
-      "%DataView%": typeof DataView === "undefined" ? undefined2 : DataView,
+      "%DataView%": typeof DataView === "undefined" ? undefined : DataView,
       "%Date%": Date,
       "%decodeURI%": decodeURI,
       "%decodeURIComponent%": decodeURIComponent,
@@ -2275,51 +2316,51 @@
       "%Error%": $Error,
       "%eval%": eval,
       "%EvalError%": $EvalError,
-      "%Float16Array%": typeof Float16Array === "undefined" ? undefined2 : Float16Array,
-      "%Float32Array%": typeof Float32Array === "undefined" ? undefined2 : Float32Array,
-      "%Float64Array%": typeof Float64Array === "undefined" ? undefined2 : Float64Array,
-      "%FinalizationRegistry%": typeof FinalizationRegistry === "undefined" ? undefined2 : FinalizationRegistry,
+      "%Float16Array%": typeof Float16Array === "undefined" ? undefined : Float16Array,
+      "%Float32Array%": typeof Float32Array === "undefined" ? undefined : Float32Array,
+      "%Float64Array%": typeof Float64Array === "undefined" ? undefined : Float64Array,
+      "%FinalizationRegistry%": typeof FinalizationRegistry === "undefined" ? undefined : FinalizationRegistry,
       "%Function%": $Function,
       "%GeneratorFunction%": needsEval,
-      "%Int8Array%": typeof Int8Array === "undefined" ? undefined2 : Int8Array,
-      "%Int16Array%": typeof Int16Array === "undefined" ? undefined2 : Int16Array,
-      "%Int32Array%": typeof Int32Array === "undefined" ? undefined2 : Int32Array,
+      "%Int8Array%": typeof Int8Array === "undefined" ? undefined : Int8Array,
+      "%Int16Array%": typeof Int16Array === "undefined" ? undefined : Int16Array,
+      "%Int32Array%": typeof Int32Array === "undefined" ? undefined : Int32Array,
       "%isFinite%": isFinite,
       "%isNaN%": isNaN,
-      "%IteratorPrototype%": hasSymbols && getProto ? getProto(getProto([][Symbol.iterator]())) : undefined2,
-      "%JSON%": typeof JSON === "object" ? JSON : undefined2,
-      "%Map%": typeof Map === "undefined" ? undefined2 : Map,
-      "%MapIteratorPrototype%": typeof Map === "undefined" || !hasSymbols || !getProto ? undefined2 : getProto((/* @__PURE__ */ new Map())[Symbol.iterator]()),
+      "%IteratorPrototype%": hasSymbols && getProto ? getProto(getProto([][Symbol.iterator]())) : undefined,
+      "%JSON%": typeof JSON === "object" ? JSON : undefined,
+      "%Map%": typeof Map === "undefined" ? undefined : Map,
+      "%MapIteratorPrototype%": typeof Map === "undefined" || !hasSymbols || !getProto ? undefined : getProto((/* @__PURE__ */ new Map())[Symbol.iterator]()),
       "%Math%": Math,
       "%Number%": Number,
       "%Object%": $Object,
       "%Object.getOwnPropertyDescriptor%": $gOPD,
       "%parseFloat%": parseFloat,
       "%parseInt%": parseInt,
-      "%Promise%": typeof Promise === "undefined" ? undefined2 : Promise,
-      "%Proxy%": typeof Proxy === "undefined" ? undefined2 : Proxy,
+      "%Promise%": typeof Promise === "undefined" ? undefined : Promise,
+      "%Proxy%": typeof Proxy === "undefined" ? undefined : Proxy,
       "%RangeError%": $RangeError,
       "%ReferenceError%": $ReferenceError,
-      "%Reflect%": typeof Reflect === "undefined" ? undefined2 : Reflect,
+      "%Reflect%": typeof Reflect === "undefined" ? undefined : Reflect,
       "%RegExp%": RegExp,
-      "%Set%": typeof Set === "undefined" ? undefined2 : Set,
-      "%SetIteratorPrototype%": typeof Set === "undefined" || !hasSymbols || !getProto ? undefined2 : getProto((/* @__PURE__ */ new Set())[Symbol.iterator]()),
-      "%SharedArrayBuffer%": typeof SharedArrayBuffer === "undefined" ? undefined2 : SharedArrayBuffer,
+      "%Set%": typeof Set === "undefined" ? undefined : Set,
+      "%SetIteratorPrototype%": typeof Set === "undefined" || !hasSymbols || !getProto ? undefined : getProto((/* @__PURE__ */ new Set())[Symbol.iterator]()),
+      "%SharedArrayBuffer%": typeof SharedArrayBuffer === "undefined" ? undefined : SharedArrayBuffer,
       "%String%": String,
-      "%StringIteratorPrototype%": hasSymbols && getProto ? getProto(""[Symbol.iterator]()) : undefined2,
-      "%Symbol%": hasSymbols ? Symbol : undefined2,
+      "%StringIteratorPrototype%": hasSymbols && getProto ? getProto(""[Symbol.iterator]()) : undefined,
+      "%Symbol%": hasSymbols ? Symbol : undefined,
       "%SyntaxError%": $SyntaxError,
       "%ThrowTypeError%": ThrowTypeError,
       "%TypedArray%": TypedArray,
       "%TypeError%": $TypeError,
-      "%Uint8Array%": typeof Uint8Array === "undefined" ? undefined2 : Uint8Array,
-      "%Uint8ClampedArray%": typeof Uint8ClampedArray === "undefined" ? undefined2 : Uint8ClampedArray,
-      "%Uint16Array%": typeof Uint16Array === "undefined" ? undefined2 : Uint16Array,
-      "%Uint32Array%": typeof Uint32Array === "undefined" ? undefined2 : Uint32Array,
+      "%Uint8Array%": typeof Uint8Array === "undefined" ? undefined : Uint8Array,
+      "%Uint8ClampedArray%": typeof Uint8ClampedArray === "undefined" ? undefined : Uint8ClampedArray,
+      "%Uint16Array%": typeof Uint16Array === "undefined" ? undefined : Uint16Array,
+      "%Uint32Array%": typeof Uint32Array === "undefined" ? undefined : Uint32Array,
       "%URIError%": $URIError,
-      "%WeakMap%": typeof WeakMap === "undefined" ? undefined2 : WeakMap,
-      "%WeakRef%": typeof WeakRef === "undefined" ? undefined2 : WeakRef,
-      "%WeakSet%": typeof WeakSet === "undefined" ? undefined2 : WeakSet,
+      "%WeakMap%": typeof WeakMap === "undefined" ? undefined : WeakMap,
+      "%WeakRef%": typeof WeakRef === "undefined" ? undefined : WeakRef,
+      "%WeakSet%": typeof WeakSet === "undefined" ? undefined : WeakSet,
       "%Function.prototype.call%": $call,
       "%Function.prototype.apply%": $apply,
       "%Object.defineProperty%": $defineProperty,
@@ -9857,7 +9898,7 @@
       return this.outer.digest(enc);
     };
   });
-  var import_hash = /* @__PURE__ */ __toESM((/* @__PURE__ */ __commonJSMin((exports) => {
+  var import_hash = /* @__PURE__ */ __toESM2((/* @__PURE__ */ __commonJSMin((exports) => {
     var hash = exports;
     hash.utils = require_utils();
     hash.common = require_common$1();
@@ -18000,8 +18041,8 @@
     module.exports.element = module.exports.Element = element;
   });
   var import_stream_browserify = require_stream_browserify();
-  var import_jszip_min = /* @__PURE__ */ __toESM(require_jszip_min(), 1);
-  var import_xml = /* @__PURE__ */ __toESM(require_xml(), 1);
+  var import_jszip_min = /* @__PURE__ */ __toESM2(require_jszip_min(), 1);
+  var import_xml = /* @__PURE__ */ __toESM2(require_xml(), 1);
   var obfuscatedStartOffset = 0;
   var obfuscatedEndOffset = 32;
   var guidSize = 32;
@@ -19090,10 +19131,11 @@
   };
 
   // src/exporters/word-exporter-docx.mjs
+  var import_text_format = __toESM(require_text_format(), 1);
   var PAGE_IMAGE_WIDTH = 590;
   var PAGE_IMAGE_HEIGHT = 390;
   function plainText(value) {
-    return String(value || "").replace(/\*\*/g, "").replace(/`/g, "").trim();
+    return globalThis.T9TextFormat.quoteEmphasis(value).replace(/`/g, "").trim();
   }
   function safeDate(value) {
     const date = new Date(value || Date.now());
@@ -19342,26 +19384,17 @@
         after: 100
       })
     );
-    const meta = [
-      task.pageCaption ? `Sida: ${task.pageCaption}` : "",
-      task.confidenceScore !== void 0 ? `S\xE4kerhet: ${task.confidenceScore}%` : task.confidence !== void 0 ? `S\xE4kerhet: ${task.confidence}%` : ""
-    ].filter(Boolean).join(" | ");
-    if (meta) {
-      children.push(
-        bodyParagraph(meta, {
-          italics: true,
-          color: "5F6B76",
-          size: 18,
-          after: 100
-        })
-      );
-    }
     if (task.userComment) {
+      children.push(new Paragraph({ children: [] }));
       children.push(commentBox(task.userComment));
     }
-    const imageData = task.screenshot ? screenshotData[task.screenshot] : null;
-    const bytes = imageBytes(imageData);
-    if (bytes) {
+    const screenshotPaths = [...new Set(
+      task.screenshots?.length ? task.screenshots : task.screenshot ? [task.screenshot] : []
+    )];
+    screenshotPaths.forEach((path, imageIndex) => {
+      const imageData = screenshotData[path];
+      const bytes = imageBytes(imageData);
+      if (!bytes) return;
       const dimensions = fittedImageSize(bytes);
       children.push(
         new Paragraph({
@@ -19376,15 +19409,15 @@
               type: imageType(imageData, bytes),
               transformation: dimensions,
               altText: {
-                title: `Sk\xE4rmbild steg ${index + 1}`,
+                title: `Sk\xE4rmbild ${imageIndex + 1} steg ${index + 1}`,
                 description: instruction,
-                name: `step-${index + 1}`
+                name: `step-${index + 1}-${imageIndex + 1}`
               }
             })
           ]
         })
       );
-    }
+    });
     return children;
   }
   function versionTable(date, reviewer) {
@@ -19625,9 +19658,12 @@
       }),
       title,
       taskCount: tasks.length,
-      imageCount: tasks.filter(
-        (task) => task.screenshot && imageBytes(screenshotData[task.screenshot])
-      ).length
+      imageCount: tasks.reduce((count, task) => {
+        const paths = task.screenshots?.length ? task.screenshots : task.screenshot ? [task.screenshot] : [];
+        return count + [...new Set(paths)].filter(
+          (path) => imageBytes(screenshotData[path])
+        ).length;
+      }, 0)
     };
   }
   async function createDocx(options) {

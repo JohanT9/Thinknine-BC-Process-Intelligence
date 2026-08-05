@@ -362,12 +362,6 @@
       task.description ||
       "Utför uppgiften."
     );
-    const confidence = task.confidenceScore ?? task.confidence;
-    const meta = [
-      task.pageCaption ? `Sida: ${task.pageCaption}` : "",
-      confidence !== undefined ? `Säkerhet: ${confidence}%` : ""
-    ].filter(Boolean).join("  |  ");
-
     let content = paragraph(
       `Steg ${index + 1}`,
       "Heading2",
@@ -386,20 +380,8 @@
       }
     );
 
-    if (meta) {
-      content += paragraph(
-        meta,
-        "Caption",
-        {
-          italic: true,
-          color: "5F6B76",
-          size: 18,
-          spacingAfter: 80
-        }
-      );
-    }
-
     if (task.userComment) {
+      content += "<w:p/>";
       content += `<w:tbl>
         <w:tblPr>
           <w:tblW w:w="0" w:type="auto"/>

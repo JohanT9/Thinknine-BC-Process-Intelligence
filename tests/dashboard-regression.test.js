@@ -45,5 +45,9 @@ assert.ok(
   background.includes("Array.isArray(sessions) ? sessions : []"),
   "Background must always return an array of sessions."
 );
+assert.ok(
+  background.includes("T9StorageKeys.sessionDataKeys(id)"),
+  "Session deletion must remove all data through the shared key definition."
+);
 
 console.log("Dashboard regression tests passed.");

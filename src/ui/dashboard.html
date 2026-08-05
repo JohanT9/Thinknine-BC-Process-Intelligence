@@ -5,6 +5,7 @@
 <title>Thinknine BC Recorder</title>
 <style>
 body{font-family:"Segoe UI",Arial,sans-serif;max-width:1050px;margin:35px auto;padding:0 20px;color:#1f2933}
+.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
 h1{margin-bottom:5px}.muted{color:#52606d}
 fieldset{border:1px solid #d8dee5;border-radius:8px;padding:18px;margin:20px 0}
 legend{font-weight:600}
@@ -20,25 +21,50 @@ table{width:100%;border-collapse:collapse}th,td{text-align:left;padding:9px;bord
 .summary div{border:1px solid #d8dee5;border-radius:6px;padding:12px}
 .review-overlay{position:fixed;inset:0;background:rgba(15,23,42,.58);display:none;z-index:1000;padding:24px;overflow:auto}
 .review-overlay.open{display:block}
-.review-shell{max-width:1100px;margin:0 auto;background:white;border-radius:10px;box-shadow:0 20px 55px rgba(0,0,0,.3);overflow:hidden}
+.review-shell{max-width:1100px;margin:0 auto;background:white;border-radius:10px;box-shadow:0 20px 55px rgba(0,0,0,.3);overflow:clip}
 .review-header{position:sticky;top:0;background:white;border-bottom:1px solid #d8dee5;padding:18px;z-index:2}
 .review-title-row{display:flex;justify-content:space-between;gap:12px;align-items:center}
-.review-toolbar{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
+.review-toolbar{display:flex;flex-wrap:wrap;gap:10px;margin-top:12px;align-items:center}
+.review-toolbar-group{display:flex;gap:4px;padding-right:10px;border-right:1px solid #d8dee5}
+.review-toolbar-group:last-child{padding-right:0;border-right:0}
+.review-toolbar button{margin:0;min-height:38px}
+.review-toolbar button:disabled{cursor:not-allowed;opacity:.48}
+.review-toolbar-secondary{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
 .review-progress{height:10px;background:#e5e7eb;border-radius:99px;overflow:hidden;margin-top:12px}
 .review-progress-bar{height:100%;background:#0f6cbd;width:0}
+.review-status{display:flex;flex-wrap:wrap;gap:18px;margin:12px 0 0;padding:10px 12px;background:#f3f6fa;border-radius:7px}
+.review-status div{display:flex;gap:6px;align-items:baseline}
+.review-status dt{font-size:12px;color:#52606d}
+.review-status dd{margin:0;font-size:16px;font-weight:700;color:#1f2933}
 .review-list{padding:18px}
 .review-card{border:1px solid #d8dee5;border-radius:8px;margin-bottom:14px;padding:14px;display:grid;grid-template-columns:56px 1fr 210px;gap:14px}
 .review-card.approved{border-color:#65a30d;background:#f7fee7}
 .review-card.needs-review{border-color:#f59e0b}
+.review-card.selected{outline:3px solid #0f6cbd;outline-offset:1px}
+.review-card.dragging{opacity:.55}
+.review-card.drop-before{box-shadow:inset 0 4px 0 #0f6cbd}
+.review-card.drop-after{box-shadow:inset 0 -4px 0 #0f6cbd}
 .review-number{font-size:24px;font-weight:700;color:#52606d;text-align:center}
 .review-fields textarea{width:100%;min-height:72px;box-sizing:border-box;padding:8px;font-family:inherit}
 .review-fields input[type=text]{width:100%}
+.review-field-heading{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:9px 0}
+.review-field-heading label{margin:0}
+.review-field-heading button{padding:5px 8px;margin:0;font-size:12px}
+.review-add-comment{margin:9px 0}
+.review-fields [data-edit-field][readonly]{border-color:transparent;background:transparent;cursor:text}
+.review-fields [data-edit-field][data-editing=true]{border-color:#0f6cbd;background:white;outline:2px solid rgba(15,108,189,.2)}
 .review-meta{font-size:12px;color:#52606d;margin:8px 0}
 .review-actions{display:flex;flex-direction:column;gap:7px}
 .review-actions button{margin:0}
 .review-image{max-width:100%;border:1px solid #d8dee5;border-radius:5px;margin-top:10px}
+.review-card.compact{grid-template-columns:44px minmax(0,1fr) 300px;gap:10px;margin-bottom:7px;padding:8px}
+.review-card.compact .review-number{font-size:18px}
+.review-card.compact .review-field-heading,.review-card.compact .review-comment-section,.review-card.compact .review-add-comment,.review-card.compact .review-meta,.review-card.compact .review-image{display:none}
+.review-card.compact textarea[data-edit-field="instruction"]{height:38px;min-height:38px;resize:none;overflow:hidden;white-space:nowrap}
+.review-card.compact .review-actions{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));align-content:start;gap:5px}
+.review-card.compact .review-actions label{margin:0;align-self:center}
 .review-footer{padding:16px;border-top:1px solid #d8dee5;display:flex;justify-content:space-between;background:#f8fafc}
-@media(max-width:800px){.review-card{grid-template-columns:44px 1fr}.review-actions{grid-column:1/-1;flex-direction:row;flex-wrap:wrap}}
+@media(max-width:800px){.review-card,.review-card.compact{grid-template-columns:44px 1fr}.review-actions{grid-column:1/-1;flex-direction:row;flex-wrap:wrap}}
 
 .summary strong{display:block;font-size:18px;margin-top:4px}
 .filename-variables{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0}
@@ -155,29 +181,61 @@ table{width:100%;border-collapse:collapse}th,td{text-align:left;padding:9px;bord
 
 
 <div id="reviewOverlay" class="review-overlay" aria-hidden="true">
-  <section class="review-shell">
+  <section id="reviewDialog" class="review-shell" role="dialog" aria-modal="true" aria-labelledby="reviewTitle" aria-describedby="reviewSummary reviewKeyboardHelp" tabindex="-1">
     <header class="review-header">
       <div class="review-title-row">
         <div>
           <h2 id="reviewTitle">Review Studio</h2>
           <div id="reviewSummary" class="muted"></div>
         </div>
-        <button id="closeReview" class="debug">Stäng</button>
+        <button id="closeReview" class="debug" aria-label="Stäng Review Studio">Stäng</button>
       </div>
-      <div class="review-toolbar">
+      <div id="reviewToolbar" class="review-toolbar" role="toolbar" aria-label="Redigeringskommandon">
+        <div class="review-toolbar-group" role="group" aria-label="Historik">
+          <button id="undoReview" data-review-command="undo" class="secondary" aria-keyshortcuts="Control+Z Meta+Z" disabled>Ångra</button>
+          <button id="redoReview" data-review-command="redo" class="secondary" aria-keyshortcuts="Control+Y Meta+Shift+Z" disabled>Gör om</button>
+        </div>
+        <div class="review-toolbar-group" role="group" aria-label="Struktur">
+          <button id="mergeReviewSteps" data-review-command="merge" class="secondary" disabled>Slå samman</button>
+          <button id="splitReviewStep" data-review-command="split" class="secondary" disabled>Dela</button>
+        </div>
+        <div class="review-toolbar-group" role="group" aria-label="Ordning">
+          <button id="moveUpReviewSteps" data-review-command="move-up" class="secondary" disabled>Flytta upp</button>
+          <button id="moveDownReviewSteps" data-review-command="move-down" class="secondary" disabled>Flytta ned</button>
+        </div>
+        <div class="review-toolbar-group" role="group" aria-label="Export">
+          <button id="exportWordReview" data-review-command="export" class="primary" disabled>Exportera Word</button>
+        </div>
+      </div>
+      <div class="review-toolbar-secondary">
+        <button id="compactReviewSteps" class="secondary" aria-pressed="false">Komprimera alla</button>
         <button id="addReviewStep" class="secondary">Lägg till steg</button>
-        <button id="approveAllReview" class="secondary">Godkänn alla</button>
         <button id="saveReview" class="primary">Spara granskning</button>
-        <button id="exportWordReview" class="primary">Exportera Word</button>
-        <button id="completeReview" class="primary">Slutför granskning</button>
+        <button id="completeReview" class="primary" disabled>Slutför granskning</button>
       </div>
-      <div class="review-progress">
+      <div id="reviewProgress" class="review-progress" role="progressbar" aria-label="Granskningsförlopp" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
         <div id="reviewProgressBar" class="review-progress-bar"></div>
       </div>
+      <p id="reviewKeyboardHelp" class="sr-only">Välj steg med piltangenterna. Använd Ctrl för flerval och Shift för intervall. Tryck Enter för att redigera. Alt plus pil flyttar valda steg.</p>
+      <div id="reviewStatus" role="status" aria-live="polite" aria-atomic="true" aria-label="Dokumentstatus">
+        <dl class="review-status">
+          <div><dt>Steg</dt><dd data-review-stat="steps">0</dd></div>
+          <div><dt>Valda</dt><dd data-review-stat="selected">0</dd></div>
+          <div><dt>Uppskattade sidor</dt><dd data-review-stat="estimatedPages">0</dd></div>
+          <div><dt>Skärmbilder</dt><dd data-review-stat="screenshots">0</dd></div>
+        </dl>
+      </div>
     </header>
-    <main id="reviewList" class="review-list"></main>
+    <main
+      id="reviewList"
+      class="review-list"
+      role="grid"
+      aria-multiselectable="true"
+      aria-labelledby="reviewTitle"
+      aria-describedby="reviewStatus"
+    ></main>
     <footer class="review-footer">
-      <span id="reviewFooterText"></span>
+      <span id="reviewFooterText" role="status" aria-live="polite"></span>
       <button id="saveReviewBottom" class="primary">Spara</button>
     </footer>
   </section>
@@ -189,9 +247,21 @@ table{width:100%;border-collapse:collapse}th,td{text-align:left;padding:9px;bord
 <script src="engine/confidence-engine.js"></script>
 <script src="engine/documentation-engine.js"></script>
 <script src="engine/export-settings.js"></script>
+<script src="engine/text-format.js"></script>
 
 <script src="exporters/word-exporter-docx.bundle.js"></script>
+<script src="review/review-move.js"></script>
+<script src="review/review-merge.js"></script>
+<script src="review/review-split.js"></script>
+<script src="review/review-history.js"></script>
+<script src="review/review-edit.js"></script>
+<script src="review/review-toolbar.js"></script>
+<script src="review/review-status.js"></script>
+<script src="review/review-accessibility.js"></script>
+<script src="review/review-layout.js"></script>
+<script src="review/review-annotations.js"></script>
 <script src="review/review-studio.js"></script>
+<script src="review/review-selection.js"></script>
 <script src="dashboard.js"></script>
 </body>
 </html>

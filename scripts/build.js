@@ -119,6 +119,7 @@ copyDir(
 copyDir(path.join(root, "docs"), path.join(dist, "docs"));
 copyFile(path.join(root, "README.md"), path.join(dist, "README.md"));
 copyFile(path.join(root, "CHANGELOG.md"), path.join(dist, "CHANGELOG.md"));
+copyFile(path.join(root, "INSTALLERA.txt"), path.join(dist, "INSTALLERA.txt"));
 
 copyFile(
   path.join(src, "recorder", "background.js"),

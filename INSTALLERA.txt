@@ -1,24 +1,50 @@
-THINKNINE BC PROCESS INTELLIGENCE 4.1.0
+THINKNINE BC PROCESS INTELLIGENCE 4.2.0 RELEASE CANDIDATE
 
-1. Packa upp EXPORT_SETTINGS_PATCH.zip i repositoryts rot.
-2. Ersätt befintliga filer.
-3. Kör:
-   npm.cmd install
-4. Kör:
+FÖRUTSÄTTNINGAR
+
+- Microsoft Edge
+- Node.js 20 eller senare
+- npm
+
+INSTALLERA OCH BYGG
+
+1. Öppna PowerShell i repositoryts rot.
+2. Installera låsta beroenden:
+   npm.cmd ci
+3. Kör releasekontrollen:
    npm.cmd run ci
-5. Commit och push.
-6. Kör:
-   npm.cmd run build
-7. Öppna edge://extensions.
-8. Klicka Läs in igen.
+4. Kontrollera att kommandot avslutas utan fel.
 
-TESTA
+LADDA TILLÄGGET I EDGE
 
-1. Öppna dashboarden.
-2. Kontrollera sektionen Export.
-3. Markera Fråga alltid var filer ska sparas.
-4. Ange filnamnsmall:
-   {process} - {environment} - {date}
-5. Spara inställningar.
-6. Exportera Word.
-7. Kontrollera att Edge visar dialogen Spara som.
+1. Öppna edge://extensions.
+2. Aktivera Utvecklarläge.
+3. Välj Läs in opaketerat.
+4. Välj repositoryts dist-mapp.
+5. Efter en ny build, välj Läs in igen på tilläggets kort.
+
+UPPDATERA EN BEFINTLIG INSTALLATION
+
+1. Hämta den nya koden.
+2. Kör:
+   npm.cmd ci
+   npm.cmd run ci
+3. Öppna edge://extensions och välj Läs in igen.
+
+RC-KONTROLL
+
+1. Spela in och avsluta en testsession.
+2. Öppna Review Studio med Granska.
+3. Kontrollera selection med klick, Ctrl/Cmd+klick och Shift+klick.
+4. Kontrollera Move, Merge, Split, Delete samt Undo/Redo.
+5. Redigera inline med dubbelklick eller Enter; testa Escape och autosave.
+6. Kontrollera toolbarens automatiska knapplägen och statusrad.
+7. Exportera Word och kontrollera text, ordning och skärmbilder.
+8. Navigera dialog, toolbar och steg med endast tangentbord.
+
+EXPORTINSTÄLLNINGAR
+
+Filnamnsmallen stöder variablerna process, environment, date, time och version
+inom klammerparenteser. Preview och validering uppdateras direkt. Exporten
+använder automatiskt unika filnamn vid konflikt; något separat Save As-val finns
+inte i 4.2.0.

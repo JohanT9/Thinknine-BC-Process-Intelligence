@@ -75,7 +75,7 @@ const settings = {
 };
 assert.strictEqual(
   exportSettings.buildFileName("docx", session, settings, now),
-  "Lägg-order-Produktion-2026-08-04-09-07-4.1.1.docx"
+  "Lägg-order-Produktion-2026-08-04-09-07-4.2.0.docx"
 );
 
 const elements = previewElements("{process}-{environment}");

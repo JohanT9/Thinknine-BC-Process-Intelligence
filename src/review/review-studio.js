@@ -1,29 +1,80 @@
 (function (root, factory) {
-  const api = factory();
+  const moveEngine = typeof module === "object" && module.exports
+    ? require("./review-move")
+    : root.T9ReviewMove;
+  const mergeEngine = typeof module === "object" && module.exports
+    ? require("./review-merge")
+    : root.T9ReviewMerge;
+  const splitEngine = typeof module === "object" && module.exports
+    ? require("./review-split")
+    : root.T9ReviewSplit;
+  const historyEngine = typeof module === "object" && module.exports
+    ? require("./review-history")
+    : root.T9ReviewHistory;
+  const textFormat = typeof module === "object" && module.exports
+    ? require("../engine/text-format")
+    : root.T9TextFormat;
+  const annotations = typeof module === "object" && module.exports
+    ? require("./review-annotations")
+    : root.T9ReviewAnnotations;
+  const api = factory(
+    moveEngine,
+    mergeEngine,
+    splitEngine,
+    historyEngine,
+    textFormat,
+    annotations
+  );
   if (typeof module === "object" && module.exports) module.exports = api;
   root.T9Review = api;
-})(typeof globalThis !== "undefined" ? globalThis : this, function () {
+})(typeof globalThis !== "undefined" ? globalThis : this, function (
+  moveEngine,
+  mergeEngine,
+  splitEngine,
+  historyEngine,
+  textFormat,
+  annotations
+) {
   function clone(value) {
     return JSON.parse(JSON.stringify(value));
   }
 
   function normalizeTasks(tasks) {
-    return (tasks || []).map((task, index) => ({
-      ...clone(task),
-      taskNo: index + 1,
-      reviewStatus: task.reviewStatus || "unreviewed",
-      approved: Boolean(task.approved),
-      deleted: Boolean(task.deleted),
-      userComment: task.userComment || "",
-      originalInstruction:
-        task.originalInstruction ||
-        task.instruction ||
-        "",
-      instruction:
-        task.instruction ||
-        task.description ||
-        "Utför uppgiften."
-    }));
+    const usedIds = new Set();
+    return (tasks || []).map((task, index) => {
+      const baseId = task.taskId || `ReviewTask-${index + 1}`;
+      let taskId = baseId;
+      let suffix = 2;
+      while (usedIds.has(taskId)) {
+        taskId = `${baseId}-${suffix}`;
+        suffix += 1;
+      }
+      usedIds.add(taskId);
+      return {
+        ...clone(task),
+        taskId,
+        taskNo: index + 1,
+        reviewStatus: task.reviewStatus || "unreviewed",
+        approved: Boolean(task.approved),
+        deleted: Boolean(task.deleted),
+        userComment: task.userComment || "",
+        originalInstruction: textFormat.quoteEmphasis(
+          task.originalInstruction ||
+          task.instruction ||
+          ""
+        ),
+        instruction: textFormat.quoteEmphasis(
+          task.instruction ||
+          task.description ||
+          "Utför uppgiften."
+        ),
+        screenshots: task.screenshots?.length
+          ? [...task.screenshots]
+          : task.screenshot
+            ? [task.screenshot]
+            : []
+      };
+    });
   }
 
   function createReview(session, tasks) {
@@ -37,6 +88,12 @@
       status: "in-progress",
       reviewer: "",
       notes: "",
+      historyVersion: "1.0.0",
+      history: [],
+      commandHistoryVersion: "1.0.0",
+      commandHistory: [],
+      historyIndex: 0,
+      annotations: annotations.emptyStore(),
       tasks: normalizeTasks(tasks)
     };
   }
@@ -50,25 +107,67 @@
     return review;
   }
 
-  function move(review, index, delta) {
-    const target = index + delta;
-    if (target < 0 || target >= review.tasks.length) return review;
+  function record(review, type, beforeTasks, options = {}) {
+    const createdAt = options.now || new Date().toISOString();
+    historyEngine.record(review, {
+      historyId: options.commandHistoryId || `${type}-${createdAt}`,
+      type,
+      createdAt,
+      groupKey: options.groupKey,
+      beforeTasks,
+      afterTasks: review.tasks,
+      beforeSelection: options.beforeSelection,
+      afterSelection: options.afterSelection,
+      metadata: options.metadata,
+      beforeStatus: options.beforeStatus === undefined
+        ? review.status
+        : options.beforeStatus,
+      afterStatus: review.status
+    });
+    return review;
+  }
 
-    const tasks = [...review.tasks];
-    const [task] = tasks.splice(index, 1);
-    tasks.splice(target, 0, task);
+  function move(review, index, delta, options = {}) {
+    const task = review.tasks[index];
+    if (!task) return review;
+    const beforeTasks = historyEngine.snapshot(review.tasks);
+    review.tasks = moveEngine.moveByOffset(
+      review.tasks,
+      [task.taskId],
+      delta
+    );
+    renumber(review);
+    return record(review, "move", beforeTasks, options);
+  }
+
+  function reorder(review, tasks, options = {}) {
+    const beforeTasks = historyEngine.snapshot(review.tasks);
     review.tasks = tasks;
-    return renumber(review);
+    renumber(review);
+    return record(review, "move", beforeTasks, options);
   }
 
-  function remove(review, index) {
+  function remove(review, index, options = {}) {
+    if (!review.tasks[index]) return review;
+    const beforeTasks = historyEngine.snapshot(review.tasks);
     review.tasks.splice(index, 1);
-    return renumber(review);
+    renumber(review);
+    return record(review, "delete", beforeTasks, options);
   }
 
-  function add(review, afterIndex = review.tasks.length - 1) {
+  function removeTasks(review, taskIds, options = {}) {
+    const removed = new Set(taskIds || []);
+    if (!review.tasks.some(task => removed.has(task.taskId))) return review;
+    const beforeTasks = historyEngine.snapshot(review.tasks);
+    review.tasks = review.tasks.filter(task => !removed.has(task.taskId));
+    renumber(review);
+    return record(review, "delete", beforeTasks, options);
+  }
+
+  function add(review, afterIndex = review.tasks.length - 1, options = {}) {
+    const beforeTasks = historyEngine.snapshot(review.tasks);
     const newTask = {
-      taskId: `Manual-${Date.now()}`,
+      taskId: `Manual-${Date.now()}-${review.tasks.length + 1}`,
       taskNo: 0,
       taskType: "Manual",
       semanticAction: "Manual",
@@ -89,7 +188,8 @@
     };
 
     review.tasks.splice(afterIndex + 1, 0, newTask);
-    return renumber(review);
+    renumber(review);
+    return record(review, "add", beforeTasks, options);
   }
 
   function updateTask(review, index, patch) {
@@ -106,14 +206,38 @@
     return review;
   }
 
-  function approveTask(review, index, approved) {
-    return updateTask(review, index, {
+  function editTask(review, index, patch, options = {}) {
+    if (!review.tasks[index]) return review;
+    const beforeTasks = historyEngine.snapshot(review.tasks);
+    updateTask(review, index, patch);
+    return record(review, "edit", beforeTasks, options);
+  }
+
+  function approveTask(review, index, approved, options = {}) {
+    if (!review.tasks[index]) return review;
+    const beforeTasks = historyEngine.snapshot(review.tasks);
+    updateTask(review, index, {
       approved: Boolean(approved),
       reviewStatus: approved ? "approved" : "unreviewed"
     });
+    return record(review, "approve", beforeTasks, options);
   }
 
-  function complete(review) {
+  function approveAll(review, options = {}) {
+    const beforeTasks = historyEngine.snapshot(review.tasks);
+    review.tasks = review.tasks.map(task => ({
+      ...task,
+      approved: true,
+      reviewStatus: "approved"
+    }));
+    review.updatedAt = new Date().toISOString();
+    return record(review, "approve-all", beforeTasks, options);
+  }
+
+  function complete(review, options = {}) {
+    if (!canComplete(review)) return review;
+    const beforeTasks = historyEngine.snapshot(review.tasks);
+    const beforeStatus = review.status;
     review.status = "completed";
     review.updatedAt = new Date().toISOString();
     review.tasks = review.tasks.map(task => ({
@@ -121,11 +245,62 @@
       approved: true,
       reviewStatus: "approved"
     }));
-    return review;
+    return record(review, "complete", beforeTasks, { ...options, beforeStatus });
+  }
+
+  function merge(review, selectedIds, options = {}) {
+    const beforeTasks = historyEngine.snapshot(review.tasks);
+    const result = mergeEngine.merge(review.tasks, selectedIds, options);
+    if (!result.mergedTask) return { review, mergedTask: null };
+    review.tasks = result.tasks;
+    review.historyVersion = review.historyVersion || "1.0.0";
+    review.history = [...(review.history || []), result.historyEntry];
+    renumber(review);
+    record(review, "merge", beforeTasks, {
+      ...options,
+      afterSelection: {
+        selectedIds: [result.mergedTask.taskId],
+        activeId: result.mergedTask.taskId,
+        anchorId: result.mergedTask.taskId
+      },
+      metadata: result.historyEntry
+    });
+    return { review, mergedTask: result.mergedTask };
+  }
+
+  function split(review, taskId, specification, options = {}) {
+    const beforeTasks = historyEngine.snapshot(review.tasks);
+    const result = splitEngine.split(
+      review.tasks,
+      taskId,
+      specification,
+      options
+    );
+    if (!result.splitTasks.length) return { review, splitTasks: [] };
+    review.tasks = result.tasks;
+    review.historyVersion = review.historyVersion || "1.0.0";
+    review.history = [...(review.history || []), result.historyEntry];
+    renumber(review);
+    const createdIds = result.splitTasks.map(task => task.taskId);
+    record(review, "split", beforeTasks, {
+      ...options,
+      afterSelection: {
+        selectedIds: createdIds,
+        activeId: createdIds[0],
+        anchorId: createdIds[0]
+      },
+      metadata: result.historyEntry
+    });
+    return { review, splitTasks: result.splitTasks };
   }
 
   function activeTasks(review) {
     return review.tasks.filter(task => !task.deleted);
+  }
+
+  function canComplete(review) {
+    const tasks = activeTasks(review);
+    return tasks.length > 0 && tasks.every(task => task.approved);
   }
 
   function progress(review) {
@@ -139,15 +314,28 @@
 
   return {
     createReview,
+    normalizeReview: annotations.normalizeReview,
     normalizeTasks,
     renumber,
     move,
+    reorder,
     remove,
+    removeTasks,
     add,
     updateTask,
+    editTask,
     approveTask,
+    approveAll,
     complete,
+    merge,
+    split,
+    canUndo: historyEngine.canUndo,
+    canRedo: historyEngine.canRedo,
+    undo: historyEngine.undo,
+    redo: historyEngine.redo,
+    historyDirectionFromKey: historyEngine.directionFromKey,
     activeTasks,
+    canComplete,
     progress
   };
 });
