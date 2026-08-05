@@ -286,6 +286,18 @@ Always design the UI around the domain.
 
 ---
 
+## Token First
+
+Visual appearance should be defined through tokens rather than hard-coded values.
+
+Colors, typography, spacing and branding should be data.
+
+Rendering engines consume tokens.
+
+They do not define them.
+
+---
+
 ## Single Source of Truth
 
 Business logic must exist only once.
