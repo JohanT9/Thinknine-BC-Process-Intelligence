@@ -33,3 +33,20 @@ named toolbar, described drawing region, visible focus, and polite live status.
 RC2 changes Review data only in memory until the existing Save command is used.
 Undo/Redo integration, annotation autosave, arrows, and Word rasterization are
 deliberately reserved for later milestones.
+
+## RC3 arrow and interaction
+
+RC3 adds arrows to the same normalized scene consumed by the SVG renderer.
+Arrowheads are calculated in source-image pixel space, which keeps their shape
+consistent across image aspect ratios without adding a second geometry engine.
+
+Annotations can be selected on the SVG surface or through an accessible list.
+Selected annotations support pointer dragging, one-pixel keyboard movement,
+ten-pixel movement with Shift, and deletion. Percentage-based property fields
+provide an accessible method for resizing rectangles and changing arrow
+endpoints.
+
+Create, update, and remove operations all pass through the annotation domain.
+The annotation set revision increments for every committed operation. RC3 still
+uses the existing manual Review Save command; command history and autosave are
+reserved for RC4.

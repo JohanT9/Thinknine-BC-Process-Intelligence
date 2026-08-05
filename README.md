@@ -23,7 +23,19 @@ rektangel. Escape avbryter en pågående ritgest.
 
 Annoteringarna visas även över skärmbilden i stegkortet. De sparas tillsammans
 med Review-data när **Spara** används; originalskärmbilden förändras aldrig.
-Undo/Redo, pilar, automatisk sparning och Word-rendering ingår i senare RC-steg.
+Undo/Redo, automatisk sparning och Word-rendering ingår i senare RC-steg.
+
+### RC3 — Pilar och professionell interaktion
+
+Annotationseditorn stöder nu både **Rektangel** och **Pil**. Befintliga
+markeringar kan väljas direkt på bilden eller i den tillgängliga listan. Dra en
+vald markering för att flytta den, använd piltangenterna för pixelsteg eller
+Shift+piltangent för tio pixelsteg.
+
+Egenskapsfält i procent ger exakt flytt och storleksändring av rektanglar samt
+redigering av pilarnas start- och slutpunkter. Delete eller knappen **Ta bort
+markering** raderar den valda markeringen. Ändringarna sparas med Reviewns
+befintliga manuella Spara-kommando. Undo/Redo och autosave kopplas in i RC4.
 
 ## Struktur
 

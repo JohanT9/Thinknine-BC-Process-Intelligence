@@ -3759,22 +3759,31 @@ function annotationItems(screenshotRef) {
   )?.items || [];
 }
 
-function renderAnnotationSvg(svg, image, screenshotRef, draft = null) {
+function renderAnnotationSvg(svg, image, screenshotRef, options = {}) {
   if (!image.naturalWidth || !image.naturalHeight) return;
-  const items = [...annotationItems(screenshotRef)];
-  if (draft) {
+  let items = [...annotationItems(screenshotRef)];
+  if (options.preview) {
+    items = items.map(annotation =>
+      annotation.annotationId === options.preview.annotationId
+        ? { ...annotation, geometry: options.preview.geometry }
+        : annotation
+    );
+  }
+  if (options.draft) {
     items.push({
       annotationId: "annotation-draft",
-      type: globalThis.T9ReviewAnnotations.TYPES.RECTANGLE,
-      geometry: draft,
-      style: globalThis.T9ReviewAnnotations.DEFAULT_STYLES.rectangle
+      type: options.draftType,
+      geometry: options.draft,
+      style: globalThis.T9ReviewAnnotations.DEFAULT_STYLES[options.draftType]
     });
   }
   globalThis.T9ReviewAnnotationSvg.render(
     svg,
     items,
     image.naturalWidth,
-    image.naturalHeight
+    image.naturalHeight,
+    document,
+    { selectedId: options.selectedId }
   );
 }
 
@@ -3793,14 +3802,25 @@ function initializeReviewScreenshots(card, task, images) {
   }
 }
 
-function renderActiveAnnotation(draft = null) {
+function renderActiveAnnotation(updateControls = true) {
   if (!annotationEditorState) return;
   renderAnnotationSvg(
     $("annotationSurface"),
     $("annotationImage"),
     annotationEditorState.screenshotRef,
-    draft
+    {
+      draft: globalThis.T9ReviewAnnotationEditor.geometry(
+        annotationEditorState
+      ),
+      draftType: annotationEditorState.draft?.type,
+      preview: annotationEditorState.translation && {
+        annotationId: annotationEditorState.translation.annotationId,
+        geometry: annotationEditorState.translation.geometry
+      },
+      selectedId: annotationEditorState.selectedId
+    }
   );
+  if (updateControls) renderAnnotationControls();
 }
 
 function releaseActiveAnnotationPointer() {
@@ -3812,6 +3832,73 @@ function releaseActiveAnnotationPointer() {
   if (annotationEditorState) {
     annotationEditorState = { ...annotationEditorState, pointerId: null };
   }
+}
+
+function annotationById(annotationId) {
+  return annotationItems(annotationEditorState?.screenshotRef)
+    .find(annotation => annotation.annotationId === annotationId) || null;
+}
+
+function annotationGeometryFields(annotation) {
+  if (annotation.type === "arrow") {
+    return [
+      ["startX", "Start X"],
+      ["startY", "Start Y"],
+      ["endX", "Slut X"],
+      ["endY", "Slut Y"]
+    ];
+  }
+  return [
+    ["x", "X"],
+    ["y", "Y"],
+    ["width", "Bredd"],
+    ["height", "Höjd"]
+  ];
+}
+
+function renderAnnotationControls() {
+  if (!annotationEditorState) return;
+  const items = annotationItems(annotationEditorState.screenshotRef)
+    .filter(annotation => {
+      const result = globalThis.T9ReviewAnnotations.validation(annotation);
+      return result.valid && result.supported;
+    });
+  const selected = items.find(
+    annotation => annotation.annotationId === annotationEditorState.selectedId
+  );
+  if (!selected && annotationEditorState.selectedId) {
+    annotationEditorState = globalThis.T9ReviewAnnotationEditor.select(
+      annotationEditorState,
+      null
+    );
+  }
+  $("rectangleAnnotationTool").setAttribute(
+    "aria-pressed",
+    String(annotationEditorState.tool === "rectangle")
+  );
+  $("arrowAnnotationTool").setAttribute(
+    "aria-pressed",
+    String(annotationEditorState.tool === "arrow")
+  );
+  $("deleteAnnotation").disabled = !selected;
+  $("annotationList").innerHTML = items.map((annotation, index) => {
+    const type = annotation.type === "arrow" ? "Pil" : "Rektangel";
+    return `<li><button class="secondary" data-annotation-id="${escapeHtml(annotation.annotationId)}"
+      aria-current="${annotation.annotationId === annotationEditorState.selectedId}">${type} ${index + 1}</button></li>`;
+  }).join("");
+  if (!selected) {
+    $("annotationProperties").innerHTML =
+      '<p class="muted">Välj en markering för att ändra dess geometri.</p>';
+    return;
+  }
+  $("annotationProperties").innerHTML = annotationGeometryFields(selected)
+    .map(([key, label]) => `<label>${label}
+      <input type="number" min="0" max="100" step="1"
+        data-annotation-geometry="${key}"
+        value="${Math.round(selected.geometry[key] * 100)}">
+    </label>`)
+    .join("") +
+    '<div class="annotation-properties-actions"><button data-action="apply-annotation-geometry" class="primary">Tillämpa</button></div>';
 }
 
 function openAnnotationEditor(task, imageData) {
@@ -3827,6 +3914,7 @@ function openAnnotationEditor(task, imageData) {
   $("annotationTitle").textContent =
     `Annotera skärmbild för steg ${task.taskNo}`;
   $("annotationImage").src = imageData.imageUrl;
+  renderAnnotationControls();
   if ($("annotationImage").complete) renderActiveAnnotation();
   $("annotationSurface").focus();
 }
@@ -3846,11 +3934,19 @@ function closeAnnotationEditor() {
   card?.querySelector('[data-action="annotate"]')?.focus();
 }
 
-function addRectangleAnnotation(geometry) {
+function markAnnotationsChanged(message) {
+  annotationChangesPending = true;
+  renderActiveAnnotation();
+  $("annotationStatus").textContent = message;
+  $("reviewFooterText").textContent =
+    "Annoteringen är inte sparad ännu. Välj Spara när editorn stängts.";
+}
+
+function addAnnotation(type, geometry) {
   if (!annotationEditorState) return false;
   try {
     const annotation = globalThis.T9ReviewAnnotations.createAnnotation(
-      globalThis.T9ReviewAnnotations.TYPES.RECTANGLE,
+      type,
       geometry
     );
     globalThis.T9ReviewAnnotations.add(
@@ -3858,17 +3954,55 @@ function addRectangleAnnotation(geometry) {
       annotationEditorState.screenshotRef,
       annotation
     );
-    annotationChangesPending = true;
-    renderActiveAnnotation();
-    $("annotationStatus").textContent = "Rektangel tillagd.";
-    $("reviewFooterText").textContent =
-      "Annoteringen är inte sparad ännu. Välj Spara när editorn stängts.";
+    annotationEditorState = globalThis.T9ReviewAnnotationEditor.select(
+      annotationEditorState,
+      annotation.annotationId
+    );
+    markAnnotationsChanged(type === "arrow" ? "Pil tillagd." : "Rektangel tillagd.");
     return true;
   } catch (error) {
     $("annotationStatus").textContent =
-      `Rektangeln kunde inte läggas till: ${error.message}`;
+      `Markeringen kunde inte läggas till: ${error.message}`;
     return false;
   }
+}
+
+function updateAnnotation(annotationId, geometry, message) {
+  if (!annotationEditorState) return false;
+  try {
+    const updated = globalThis.T9ReviewAnnotations.update(
+      activeReview,
+      annotationEditorState.screenshotRef,
+      annotationId,
+      { geometry }
+    );
+    if (!updated) return false;
+    markAnnotationsChanged(message || "Markeringen uppdaterades.");
+    return true;
+  } catch (error) {
+    $("annotationStatus").textContent =
+      `Markeringen kunde inte uppdateras: ${error.message}`;
+    return false;
+  }
+}
+
+function deleteSelectedAnnotation() {
+  const annotationId = annotationEditorState?.selectedId;
+  if (!annotationId) return false;
+  releaseActiveAnnotationPointer();
+  const removed = globalThis.T9ReviewAnnotations.remove(
+    activeReview,
+    annotationEditorState.screenshotRef,
+    annotationId
+  );
+  if (!removed) return false;
+  annotationEditorState = globalThis.T9ReviewAnnotationEditor.select(
+    annotationEditorState,
+    null
+  );
+  markAnnotationsChanged("Markeringen togs bort.");
+  $("annotationSurface").focus();
+  return true;
 }
 
 function renderReview() {
@@ -4236,12 +4370,48 @@ $("advancedToggle").addEventListener("click", () => {
 $("closeReview").addEventListener("click", closeReview);
 $("closeAnnotationEditor").addEventListener("click", closeAnnotationEditor);
 $("rectangleAnnotationTool").addEventListener("click", () => {
+  annotationEditorState = globalThis.T9ReviewAnnotationEditor.selectTool(
+    annotationEditorState,
+    "rectangle"
+  );
+  renderActiveAnnotation();
   $("annotationSurface").focus();
 });
-$("annotationImage").addEventListener("load", () => {
-  renderActiveAnnotation(
-    globalThis.T9ReviewAnnotationEditor.geometry(annotationEditorState)
+$("arrowAnnotationTool").addEventListener("click", () => {
+  annotationEditorState = globalThis.T9ReviewAnnotationEditor.selectTool(
+    annotationEditorState,
+    "arrow"
   );
+  renderActiveAnnotation();
+  $("annotationSurface").focus();
+});
+$("deleteAnnotation").addEventListener("click", deleteSelectedAnnotation);
+$("annotationList").addEventListener("click", event => {
+  const button = event.target.closest?.("[data-annotation-id]");
+  if (!button || !annotationEditorState) return;
+  annotationEditorState = globalThis.T9ReviewAnnotationEditor.select(
+    annotationEditorState,
+    button.dataset.annotationId
+  );
+  renderActiveAnnotation();
+  $("annotationSurface").focus();
+});
+$("annotationProperties").addEventListener("click", event => {
+  if (!event.target.closest?.('[data-action="apply-annotation-geometry"]')) {
+    return;
+  }
+  const selected = annotationById(annotationEditorState?.selectedId);
+  if (!selected) return;
+  const geometry = { ...selected.geometry };
+  for (const input of $("annotationProperties").querySelectorAll(
+    "[data-annotation-geometry]"
+  )) {
+    geometry[input.dataset.annotationGeometry] = Number(input.value) / 100;
+  }
+  updateAnnotation(selected.annotationId, geometry);
+});
+$("annotationImage").addEventListener("load", () => {
+  renderActiveAnnotation(false);
 });
 $("annotationSurface").addEventListener("pointerdown", event => {
   if (!annotationEditorState || event.button !== 0) return;
@@ -4250,31 +4420,38 @@ $("annotationSurface").addEventListener("pointerdown", event => {
     event.clientY,
     event.currentTarget.getBoundingClientRect()
   );
-  annotationEditorState = {
-    ...globalThis.T9ReviewAnnotationEditor.begin(annotationEditorState, start),
-    pointerId: event.pointerId
-  };
+  const annotationId = event.target.dataset?.annotationId;
+  const annotation = annotationById(annotationId);
+  const nextState = annotation
+    ? globalThis.T9ReviewAnnotationEditor.beginTranslation(
+      annotationEditorState,
+      annotation,
+      start
+    )
+    : globalThis.T9ReviewAnnotationEditor.begin(annotationEditorState, start);
+  annotationEditorState = { ...nextState, pointerId: event.pointerId };
+  renderActiveAnnotation();
   event.currentTarget.setPointerCapture?.(event.pointerId);
   event.preventDefault();
 });
 $("annotationSurface").addEventListener("pointermove", event => {
-  if (!annotationEditorState?.draft ||
+  if ((!annotationEditorState?.draft && !annotationEditorState?.translation) ||
       annotationEditorState.pointerId !== event.pointerId) return;
   const end = globalThis.T9ReviewAnnotationEditor.point(
     event.clientX,
     event.clientY,
     event.currentTarget.getBoundingClientRect()
   );
-  annotationEditorState = globalThis.T9ReviewAnnotationEditor.move(
-    annotationEditorState,
-    end
-  );
-  renderActiveAnnotation(
-    globalThis.T9ReviewAnnotationEditor.geometry(annotationEditorState)
-  );
+  annotationEditorState = annotationEditorState.translation
+    ? globalThis.T9ReviewAnnotationEditor.moveTranslation(
+      annotationEditorState,
+      end
+    )
+    : globalThis.T9ReviewAnnotationEditor.move(annotationEditorState, end);
+  renderActiveAnnotation(false);
 });
 $("annotationSurface").addEventListener("pointerup", event => {
-  if (!annotationEditorState?.draft ||
+  if ((!annotationEditorState?.draft && !annotationEditorState?.translation) ||
       annotationEditorState.pointerId !== event.pointerId) return;
   try {
     const end = globalThis.T9ReviewAnnotationEditor.point(
@@ -4282,21 +4459,36 @@ $("annotationSurface").addEventListener("pointerup", event => {
       event.clientY,
       event.currentTarget.getBoundingClientRect()
     );
-    const movedState = globalThis.T9ReviewAnnotationEditor.move(
-      annotationEditorState,
-      end
-    );
-    const result = globalThis.T9ReviewAnnotationEditor.finish(
-      movedState
-    );
-    annotationEditorState = result.state;
-    addRectangleAnnotation(result.geometry);
+    if (annotationEditorState.translation) {
+      const movedState = globalThis.T9ReviewAnnotationEditor.moveTranslation(
+        annotationEditorState,
+        end
+      );
+      const result = globalThis.T9ReviewAnnotationEditor.finishTranslation(
+        movedState
+      );
+      annotationEditorState = result.state;
+      updateAnnotation(
+        result.change.annotationId,
+        result.change.geometry,
+        "Markeringen flyttades."
+      );
+    } else {
+      const movedState = globalThis.T9ReviewAnnotationEditor.move(
+        annotationEditorState,
+        end
+      );
+      const type = movedState.draft.type;
+      const result = globalThis.T9ReviewAnnotationEditor.finish(movedState);
+      annotationEditorState = result.state;
+      addAnnotation(type, result.geometry);
+    }
   } finally {
     releaseActiveAnnotationPointer();
   }
 });
 $("annotationSurface").addEventListener("pointercancel", event => {
-  if (!annotationEditorState?.draft) return;
+  if (!annotationEditorState?.draft && !annotationEditorState?.translation) return;
   try {
     annotationEditorState = globalThis.T9ReviewAnnotationEditor.cancel(
       annotationEditorState
@@ -4310,10 +4502,42 @@ $("annotationSurface").addEventListener("keydown", event => {
   if (!annotationEditorState) return;
   if (event.key === "Enter") {
     event.preventDefault();
-    addRectangleAnnotation(
-      globalThis.T9ReviewAnnotationEditor.centeredRectangle()
+    const type = annotationEditorState.tool;
+    addAnnotation(
+      type,
+      type === "arrow"
+        ? globalThis.T9ReviewAnnotationEditor.centeredArrow()
+        : globalThis.T9ReviewAnnotationEditor.centeredRectangle()
     );
-  } else if (event.key === "Escape" && annotationEditorState.draft) {
+  } else if (event.key === "Delete") {
+    event.preventDefault();
+    deleteSelectedAnnotation();
+  } else if (event.key.startsWith("Arrow") &&
+      annotationEditorState.selectedId) {
+    event.preventDefault();
+    const annotation = annotationById(annotationEditorState.selectedId);
+    const image = $("annotationImage");
+    const multiplier = event.shiftKey ? 10 : 1;
+    const horizontal = multiplier / image.naturalWidth;
+    const vertical = multiplier / image.naturalHeight;
+    const deltaX = event.key === "ArrowLeft"
+      ? -horizontal
+      : event.key === "ArrowRight" ? horizontal : 0;
+    const deltaY = event.key === "ArrowUp"
+      ? -vertical
+      : event.key === "ArrowDown" ? vertical : 0;
+    updateAnnotation(
+      annotation.annotationId,
+      globalThis.T9ReviewAnnotationEditor.translatedGeometry(
+        annotation.type,
+        annotation.geometry,
+        deltaX,
+        deltaY
+      ),
+      "Markeringen flyttades."
+    );
+  } else if (event.key === "Escape" &&
+      (annotationEditorState.draft || annotationEditorState.translation)) {
     event.preventDefault();
     annotationEditorState = globalThis.T9ReviewAnnotationEditor.cancel(
       annotationEditorState

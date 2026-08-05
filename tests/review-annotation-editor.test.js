@@ -34,6 +34,59 @@ assert.deepStrictEqual(editor.centeredRectangle(), {
   width: 0.4,
   height: 0.25
 });
+state = editor.selectTool(state, "arrow");
+assert.strictEqual(state.tool, "arrow");
+state = editor.begin(state, { x: 0.2, y: 0.8 });
+state = editor.move(state, { x: 0.8, y: 0.2 });
+assert.deepStrictEqual(editor.finish(state).geometry, {
+  startX: 0.2,
+  startY: 0.8,
+  endX: 0.8,
+  endY: 0.2
+});
+assert.deepStrictEqual(editor.centeredArrow(), {
+  startX: 0.3,
+  startY: 0.65,
+  endX: 0.7,
+  endY: 0.35
+});
+
+const selectedAnnotation = {
+  annotationId: "ann_selected",
+  type: "rectangle",
+  geometry: { x: 0.7, y: 0.7, width: 0.2, height: 0.2 }
+};
+state = editor.select(editor.create({
+  taskId: "task",
+  screenshotRef: "screenshot",
+  imageUrl: "image"
+}), selectedAnnotation.annotationId);
+state = editor.beginTranslation(state, selectedAnnotation, { x: 0.7, y: 0.7 });
+state = editor.moveTranslation(state, { x: 1, y: 1 });
+const translation = editor.finishTranslation(state);
+assert.deepStrictEqual(translation.change.geometry, {
+  x: 0.8,
+  y: 0.8,
+  width: 0.2,
+  height: 0.2
+});
+assert.strictEqual(translation.state.translation, null);
+assert.strictEqual(translation.state.selectedId, selectedAnnotation.annotationId);
+const pointerTranslation = translation.change.geometry;
+const keyboardTranslation = editor.translatedGeometry(
+  selectedAnnotation.type,
+  selectedAnnotation.geometry,
+  0.3,
+  0.3
+);
+assert.deepStrictEqual(pointerTranslation, keyboardTranslation);
+const translatedArrow = editor.translatedGeometry("arrow", {
+  startX: 0.1, startY: 0.2, endX: 0.8, endY: 0.7
+}, -0.5, 0.5);
+assert.strictEqual(translatedArrow.startX, 0);
+assert.strictEqual(translatedArrow.startY, 0.5);
+assert.ok(Math.abs(translatedArrow.endX - 0.7) < Number.EPSILON);
+assert.strictEqual(translatedArrow.endY, 1);
 
 const persistedReview = {
   annotations: annotations.emptyStore(),

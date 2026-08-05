@@ -13,7 +13,23 @@
       screenshotRef: options.screenshotRef,
       imageUrl: options.imageUrl,
       tool: "rectangle",
-      draft: null
+      selectedId: null,
+      draft: null,
+      translation: null
+    };
+  }
+
+  function selectTool(state, tool) {
+    if (tool !== "rectangle" && tool !== "arrow") return state;
+    return { ...state, tool, draft: null, translation: null };
+  }
+
+  function select(state, annotationId) {
+    return {
+      ...state,
+      selectedId: annotationId || null,
+      draft: null,
+      translation: null
     };
   }
 
@@ -26,8 +42,13 @@
   }
 
   function begin(state, start) {
-    if (!start || state.tool !== "rectangle") return state;
-    return { ...state, draft: { start, end: start } };
+    if (!start || !["rectangle", "arrow"].includes(state.tool)) return state;
+    return {
+      ...state,
+      selectedId: null,
+      draft: { type: state.tool, start, end: start },
+      translation: null
+    };
   }
 
   function move(state, end) {
@@ -37,6 +58,14 @@
 
   function geometry(state) {
     if (!state?.draft) return null;
+    if (state.draft.type === "arrow") {
+      return {
+        startX: state.draft.start.x,
+        startY: state.draft.start.y,
+        endX: state.draft.end.x,
+        endY: state.draft.end.y
+      };
+    }
     return {
       x: state.draft.start.x,
       y: state.draft.start.y,
@@ -50,11 +79,85 @@
   }
 
   function cancel(state) {
-    return { ...state, draft: null };
+    return { ...state, draft: null, translation: null };
   }
 
   function centeredRectangle() {
     return { x: 0.3, y: 0.375, width: 0.4, height: 0.25 };
+  }
+
+  function centeredArrow() {
+    return { startX: 0.3, startY: 0.65, endX: 0.7, endY: 0.35 };
+  }
+
+  function translatedGeometry(type, geometry, deltaX, deltaY) {
+    if (type === "rectangle") {
+      const x = clamp(geometry.x + deltaX);
+      const y = clamp(geometry.y + deltaY);
+      return {
+        ...geometry,
+        x: Math.min(x, 1 - geometry.width),
+        y: Math.min(y, 1 - geometry.height)
+      };
+    }
+    const minimumX = Math.min(geometry.startX, geometry.endX);
+    const maximumX = Math.max(geometry.startX, geometry.endX);
+    const minimumY = Math.min(geometry.startY, geometry.endY);
+    const maximumY = Math.max(geometry.startY, geometry.endY);
+    const adjustedX = Math.max(-minimumX, Math.min(1 - maximumX, deltaX));
+    const adjustedY = Math.max(-minimumY, Math.min(1 - maximumY, deltaY));
+    return {
+      ...geometry,
+      startX: geometry.startX + adjustedX,
+      startY: geometry.startY + adjustedY,
+      endX: geometry.endX + adjustedX,
+      endY: geometry.endY + adjustedY
+    };
+  }
+
+  function beginTranslation(state, annotation, start) {
+    if (!annotation || !start) return state;
+    return {
+      ...state,
+      selectedId: annotation.annotationId,
+      draft: null,
+      translation: {
+        annotationId: annotation.annotationId,
+        type: annotation.type,
+        originalGeometry: annotation.geometry,
+        start,
+        geometry: annotation.geometry
+      }
+    };
+  }
+
+  function moveTranslation(state, pointValue) {
+    if (!state.translation || !pointValue) return state;
+    const deltaX = pointValue.x - state.translation.start.x;
+    const deltaY = pointValue.y - state.translation.start.y;
+    return {
+      ...state,
+      translation: {
+        ...state.translation,
+        geometry: translatedGeometry(
+          state.translation.type,
+          state.translation.originalGeometry,
+          deltaX,
+          deltaY
+        )
+      }
+    };
+  }
+
+  function finishTranslation(state) {
+    if (!state.translation) return { state, change: null };
+    return {
+      state: { ...state, translation: null },
+      change: {
+        annotationId: state.translation.annotationId,
+        geometry: state.translation.geometry
+      }
+    };
   }
 
   function releasePointer(surface, pointerId) {
@@ -71,6 +174,8 @@
 
   return {
     create,
+    selectTool,
+    select,
     point,
     begin,
     move,
@@ -78,6 +183,11 @@
     finish,
     cancel,
     centeredRectangle,
+    centeredArrow,
+    translatedGeometry,
+    beginTranslation,
+    moveTranslation,
+    finishTranslation,
     releasePointer
   };
 });

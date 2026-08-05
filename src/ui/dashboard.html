@@ -77,8 +77,18 @@ table{width:100%;border-collapse:collapse}th,td{text-align:left;padding:9px;bord
 .annotation-stage img{display:block;max-width:100%;height:auto}
 .annotation-stage svg{position:absolute;inset:0;width:100%;height:100%;outline-offset:3px}
 .annotation-stage .review-annotation-layer{pointer-events:auto}
+.annotation-stage [data-selected="true"]{stroke:#0f6cbd}
+.annotation-stage polygon[data-selected="true"]{fill:#0f6cbd}
 .annotation-stage svg:focus-visible{outline:3px solid #0f6cbd}
 .annotation-help{margin:10px 0;color:#52606d;font-size:13px;line-height:1.4}
+.annotation-details{display:grid;grid-template-columns:minmax(180px,280px) 1fr;gap:16px;margin-top:12px}
+.annotation-list{margin:0;padding:0;list-style:none}
+.annotation-list button{width:100%;margin:0 0 5px;text-align:left}
+.annotation-list button[aria-current="true"]{outline:3px solid #0f6cbd}
+.annotation-properties{display:grid;grid-template-columns:repeat(4,minmax(90px,1fr));gap:8px;align-items:end}
+.annotation-properties label{margin:0;font-size:12px}
+.annotation-properties input{width:100%;box-sizing:border-box}
+.annotation-properties-actions{grid-column:1/-1}
 .review-shell.annotation-mode .review-toolbar,.review-shell.annotation-mode .review-toolbar-secondary,.review-shell.annotation-mode .review-progress,.review-shell.annotation-mode #reviewStatus{display:none}
 @media(max-width:800px){.review-card,.review-card.compact{grid-template-columns:44px 1fr}.review-actions{grid-column:1/-1;flex-direction:row;flex-wrap:wrap}}
 
@@ -260,14 +270,26 @@ table{width:100%;border-collapse:collapse}th,td{text-align:left;padding:9px;bord
       </div>
       <div class="annotation-toolbar" role="toolbar" aria-label="Annotationsverktyg">
         <button id="rectangleAnnotationTool" class="secondary" aria-pressed="true">Rektangel</button>
+        <button id="arrowAnnotationTool" class="secondary" aria-pressed="false">Pil</button>
+        <button id="deleteAnnotation" class="danger" disabled>Ta bort markering</button>
       </div>
       <div id="annotationStage" class="annotation-stage">
         <img id="annotationImage" alt="Skärmbild som annoteras">
         <svg id="annotationSurface" class="review-annotation-layer" tabindex="0"
           role="img" aria-label="Rityta för skärmbildsannotering"
-          aria-describedby="annotationHelp" aria-keyshortcuts="Enter Escape"></svg>
+          aria-describedby="annotationHelp" aria-keyshortcuts="Enter Escape Delete ArrowUp ArrowDown ArrowLeft ArrowRight"></svg>
       </div>
-      <p id="annotationHelp" class="annotation-help">Dra på bilden för att skapa en rektangel. Tryck Enter för att lägga till en centrerad rektangel. Escape avbryter en pågående markering.</p>
+      <p id="annotationHelp" class="annotation-help">Välj rektangel eller pil och dra på bilden. Enter skapar vald markering centrerat. Välj en markering för att flytta den med pekare eller piltangenter. Delete tar bort och Escape avbryter en pågående gest.</p>
+      <div class="annotation-details">
+        <div>
+          <h4>Markeringar</h4>
+          <ul id="annotationList" class="annotation-list" aria-label="Markeringar i skärmbilden"></ul>
+        </div>
+        <div>
+          <h4>Egenskaper</h4>
+          <div id="annotationProperties" class="annotation-properties" aria-live="polite"></div>
+        </div>
+      </div>
       <div id="annotationStatus" class="sr-only" role="status" aria-live="polite" aria-atomic="true"></div>
     </section>
     <footer id="reviewFooter" class="review-footer">

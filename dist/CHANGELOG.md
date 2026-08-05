@@ -1,5 +1,20 @@
 # Changelog
 
+## 4.3.0 RC3 — Arrow and Annotation Interaction
+
+- Added non-destructive arrow annotations to the shared scene and SVG pipeline.
+- Added rectangle and arrow tool selection with accessible pressed state.
+- Added annotation selection from the SVG surface and an accessible list.
+- Added pointer dragging and pixel-based keyboard movement for annotations.
+- Added exact percentage geometry controls for moving and resizing rectangles
+  and editing arrow endpoints.
+- Added Delete support with live screen-reader feedback.
+- Added reusable domain update and remove operations with annotation-set
+  revision tracking.
+- Added behaviour tests for arrows, selection geometry, movement, update and
+  removal.
+- Kept annotation Undo/Redo and autosave reserved for RC4.
+
 ## 4.3.0 RC2 — SVG Annotation Editor
 
 - Added a shared normalized-to-pixel annotation scene model.

@@ -37,6 +37,50 @@
     };
   }
 
+  function arrowPrimitive(annotation, width, height) {
+    const geometry = annotations.normalizeGeometry(
+      annotations.TYPES.ARROW,
+      annotation.geometry
+    );
+    const style = {
+      ...annotations.DEFAULT_STYLES[annotations.TYPES.ARROW],
+      ...(annotation.style || {})
+    };
+    const startX = geometry.startX * width;
+    const startY = geometry.startY * height;
+    const endX = geometry.endX * width;
+    const endY = geometry.endY * height;
+    const deltaX = endX - startX;
+    const deltaY = endY - startY;
+    const distance = Math.hypot(deltaX, deltaY);
+    const unitX = deltaX / distance;
+    const unitY = deltaY / distance;
+    const scale = Math.min(width, height);
+    const headLength = Math.min(style.arrowheadLength * scale, distance * 0.6);
+    const halfWidth = Math.min(
+      style.arrowheadWidth * scale / 2,
+      distance * 0.3
+    );
+    const baseX = endX - unitX * headLength;
+    const baseY = endY - unitY * headLength;
+    return {
+      annotationId: annotation.annotationId,
+      type: annotations.TYPES.ARROW,
+      startX,
+      startY,
+      endX,
+      endY,
+      headPoints: [
+        [endX, endY],
+        [baseX - unitY * halfWidth, baseY + unitX * halfWidth],
+        [baseX + unitY * halfWidth, baseY - unitX * halfWidth]
+      ],
+      stroke: style.stroke,
+      strokeWidth: style.strokeWidth * scale,
+      opacity: style.opacity
+    };
+  }
+
   function create(items, width, height) {
     const sceneWidth = positiveDimension(width, "width");
     const sceneHeight = positiveDimension(height, "height");
@@ -45,6 +89,9 @@
       if (!result.valid || !result.supported) return [];
       if (annotation.type === annotations.TYPES.RECTANGLE) {
         return [rectanglePrimitive(annotation, sceneWidth, sceneHeight)];
+      }
+      if (annotation.type === annotations.TYPES.ARROW) {
+        return [arrowPrimitive(annotation, sceneWidth, sceneHeight)];
       }
       return [];
     });
