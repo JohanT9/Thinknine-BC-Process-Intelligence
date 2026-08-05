@@ -44,6 +44,9 @@ assert.ok(html.includes("exporters/word-export-pipeline.js"));
 assert.ok(html.includes("document/document-components.js"));
 assert.ok(html.includes("document/document-component-registry.js"));
 assert.ok(html.includes("document/document-component-validation.js"));
+assert.ok(html.includes("document/document-quality.js"));
+assert.ok(html.includes("document/document-quality-rules.js"));
+assert.ok(html.includes("document/document-quality-validation.js"));
 assert.ok(
   !html.includes('src="exporters/word-exporter.js"')
 );

@@ -1,5 +1,20 @@
 # Changelog
 
+## 4.4.0 RC7 — Document Quality Diagnostics
+
+- Added renderer-neutral, immutable and serialization-safe document quality
+  diagnostics derived from Semantic Documents and Document Plans.
+- Added an extensible versioned rule registry with duplicate-ID protection and
+  isolated rule execution.
+- Added deterministic rules for document structure, steps, screenshots,
+  annotations, callouts, metadata and plan consistency.
+- Added stable diagnostic IDs, specific source references, locations, suggested
+  actions and summaries by severity, rule, section and task.
+- Integrated non-blocking quality analysis before Word rendering without adding
+  persistence, UI, AI, layout changes or new export formats.
+- Added behaviour, immutability, determinism, failure-isolation and Word parity
+  regression tests.
+
 ## 4.4.0 RC6 — Reusable Document Components
 
 - Added a renderer-neutral, serialization-safe document component contract.

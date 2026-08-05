@@ -17,13 +17,25 @@
   const planValidation = typeof module === "object" && module.exports
     ? require("../document/document-plan-validation")
     : root.T9DocumentPlanValidation;
+  const quality = typeof module === "object" && module.exports
+    ? require("../document/document-quality")
+    : root.T9DocumentQuality;
+  const qualityRules = typeof module === "object" && module.exports
+    ? require("../document/document-quality-rules")
+    : root.T9DocumentQualityRules;
+  const qualityValidation = typeof module === "object" && module.exports
+    ? require("../document/document-quality-validation")
+    : root.T9DocumentQualityValidation;
   const api = factory(
     projector,
     semantic,
     registry,
     themeValidation,
     planner,
-    planValidation
+    planValidation,
+    quality,
+    qualityRules,
+    qualityValidation
   );
   if (typeof module === "object" && module.exports) module.exports = api;
   root.T9WordExportPipeline = api;
@@ -33,8 +45,40 @@
   registry,
   themeValidation,
   planner,
-  planValidation
+  planValidation,
+  quality,
+  qualityRules,
+  qualityValidation
 ) {
+  function analyzeQuality(document, plan) {
+    try {
+      const result = quality.analyze(
+        document,
+        plan,
+        qualityRules.BUILT_IN_REGISTRY
+      );
+      return qualityValidation.validate(result).valid
+        ? result
+        : emptyQualityResult();
+    } catch {
+      return emptyQualityResult();
+    }
+  }
+
+  function emptyQualityResult() {
+    return semantic.deepFreeze({
+      diagnosticSchemaVersion: quality?.DIAGNOSTIC_SCHEMA_VERSION || "1.0.0",
+      findings: [],
+      summary: {
+        totalFindings: 0,
+        bySeverity: { error: 0, warning: 0, information: 0 },
+        byRule: {},
+        affectedSections: [],
+        affectedSteps: []
+      }
+    });
+  }
+
   function create(options = {}) {
     const projection = projector.project(options.review, {
       session: options.session,
@@ -75,7 +119,8 @@
       semanticDocument: projection.document,
       theme: resolvedTheme,
       plan,
-      diagnostics: projection.diagnostics
+      diagnostics: projection.diagnostics,
+      qualityDiagnostics: analyzeQuality(projection.document, plan)
     });
   }
 
@@ -113,5 +158,11 @@
     return true;
   }
 
-  return { create, requiredMediaAssetIds, screenshotComponents, validateMedia };
+  return {
+    analyzeQuality,
+    create,
+    requiredMediaAssetIds,
+    screenshotComponents,
+    validateMedia
+  };
 });

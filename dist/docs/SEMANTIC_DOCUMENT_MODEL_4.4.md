@@ -186,7 +186,12 @@ Component validation is separate from plan construction and never renders or
 mutates inputs. Planner remains the only producer of plans and component
 instances.
 
-## RC6 exclusions
+RC7 quality diagnostics are deliberately outside both the Semantic Document
+and Document Plan schemas. The analysis receives immutable document and plan
+snapshots and returns disposable findings with stable source references. No
+diagnostic, summary or rule state is persisted into either model.
+
+## RC7 exclusions
 
 - no theme selection or branding UI;
 - no PDF or HTML integration;

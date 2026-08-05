@@ -86,6 +86,12 @@ const output = await exportReview(baseReview);
 assert.strictEqual(output.taskCount, 2);
 assert.strictEqual(output.imageCount, 2);
 assert.strictEqual(output.theme.themeId, "thinknine");
+assert.ok(Object.isFrozen(output.qualityDiagnostics));
+assert.ok(Object.isFrozen(output.qualityDiagnostics.findings));
+assert.strictEqual(
+  output.qualityDiagnostics.diagnosticSchemaVersion,
+  "1.0.0"
+);
 assert.strictEqual(
   output.plan.sections.find(section => section.kind === "workflow")
     .components[0].components.find(component => component.kind === "step")
@@ -220,6 +226,10 @@ const repeatB = await exportReview(baseReview);
 assert.strictEqual(repeatA.documentXml, repeatB.documentXml);
 assert.strictEqual(repeatA.headerXml, repeatB.headerXml);
 assert.strictEqual(repeatA.footerXml, repeatB.footerXml);
+assert.deepStrictEqual(
+  repeatA.qualityDiagnostics,
+  repeatB.qualityDiagnostics
+);
 
 const tocDocument = semantic.normalize({
   documentId: "document-toc",

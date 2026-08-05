@@ -44,6 +44,19 @@ inbyggda definitionerna och utökningspunkten, och
 den enda producenten av komponentinstanser och Document Plans. Komponenterna är
 renderer-neutrala och innehåller inga DOCX-, XML-, DOM-, PDF- eller Word-enheter.
 
+RC7 lägger en separat analysgren bredvid rendering:
+
+```text
+Semantic Document + Document Plan
+  ↓ Document Quality Rules
+Immutable diagnostics + quality summary
+```
+
+Kvalitetslagret läser endast dokumentet och planen. Findings lagras inte i någon
+av dem och påverkar varken Planner eller renderer. Regelregistret kan utökas utan
+ändring av exekveringsmotorn, och ett regelundantag isoleras så att exporten
+fortsätter.
+
 ```text
 Recorder
   ↓

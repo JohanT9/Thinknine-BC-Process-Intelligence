@@ -74,6 +74,12 @@ Rendering treats its inputs as immutable and verifies that the plan has not been
 mutated. Errors reject export before download and never modify Review state or
 original screenshot bytes.
 
+RC7 also runs quality diagnostics after planning and before media preparation
+and Word rendering. The derived `qualityDiagnostics` result is returned by the
+pipeline for programmatic use. Findings never block rendering, change the plan,
+change media or alter the generated DOCX. Rule failures are isolated and do not
+become export failures.
+
 ## Test strategy
 
 Behaviour tests inspect the generated DOCX package and its document, header,

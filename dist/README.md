@@ -93,6 +93,20 @@ utökas med framtida komponenttyper. Valideringen kontrollerar kontrakten utan a
 kassera okända framtida typer eller fält. Word-adaptern renderar fortsatt endast
 Document Plan och synlig Word-output är oförändrad.
 
+### RC7 — Dokumentkvalitetsdiagnostik
+
+Före Word-rendering analyseras Semantic Document och Document Plan av ett
+fristående, renderer-neutralt kvalitetslager. Findings har stabila ID:n,
+severity, meddelande, specifik källreferens, plats, detaljer och föreslagen
+åtgärd. En sammanfattning visar antal per severity och regel samt berörda
+sektioner och steg.
+
+Reglerna kontrollerar dokumentstruktur, steginstruktioner, skärmbilder,
+annoteringsreferenser, callouts, metadata och planens konsistens. Analysen är
+deterministisk, immutable, härledd och blockerar aldrig export. RC7 visar ingen
+ny stor UI; resultatet finns programmässigt som `qualityDiagnostics` i
+Word-pipelinen. Se [Document Quality 4.4](docs/DOCUMENT_QUALITY_4.4.md).
+
 ## Screenshot annotations 4.3 RC1
 
 Review-modellen har en ny, versionshanterad grund för icke-destruktiva
