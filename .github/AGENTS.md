@@ -460,6 +460,10 @@ Projectors describe WHAT exists.
 
 Never HOW it will be rendered.
 
+Keep the existing style, formatting and document structure.
+
+Do not modify any product code.
+
 ---
 
 ## Backward Compatibility
