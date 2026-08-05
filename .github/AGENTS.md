@@ -430,6 +430,26 @@ Temporary rendering data must never be persisted.
 
 ---
 
+## Projection Purity
+
+Projection is a pure transformation.
+
+Projectors receive immutable Review data and produce immutable Semantic Documents.
+
+Projectors must never:
+
+- mutate Review
+- perform rendering
+- perform layout
+- generate Word objects
+- generate PDF objects
+
+Projectors describe WHAT exists.
+
+Never HOW it will be rendered.
+
+---
+
 ## Backward Compatibility
 
 Backward compatibility is the default.
