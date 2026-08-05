@@ -199,7 +199,14 @@ ett upplöst tema och Document Planner. Samma semantiska dokument ger därför
 samma innehåll oavsett presentation, och framtida renderare kan återanvända
 planens renderer-neutrala intentioner utan att semantik kopieras.
 
-## RC8 exclusions
+## Production status
+
+RC9 verifierar modellen som produktionsgräns för v4.4.0. Normalisering,
+validering, projektion, planering, diagnostik och rendering bevarar immutable
+indata och deterministiskt resultat. Inga manuella Review- eller
+Semantic Document-migreringar krävs.
+
+## Intentional product boundaries
 
 - no theme selection or branding UI;
 - no PDF or HTML export integration;

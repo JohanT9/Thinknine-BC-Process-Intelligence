@@ -618,7 +618,7 @@ Components
 
 Quality
 
-src/export/
+src/exporters/
 
 Renderer adapters
 

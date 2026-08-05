@@ -1,5 +1,23 @@
 # Changelog
 
+## 4.4.0 RC9 — Release Hardening & Production Readiness
+
+- Completed an end-to-end consultant workflow, architecture, UX,
+  accessibility, performance and regression review without adding features.
+- Added accessible live feedback for dashboard and popup status, disclosure
+  state for advanced privacy settings and busy state for Word export.
+- Avoided repeated unchanged popup DOM updates during recording polling.
+- Restricted build-time product-version injection to explicit placeholders so
+  internal schema and subsystem versions remain intact in production output.
+- Removed redundant session-list rendering work and duplicate visual-comparison
+  artifacts from source and generated output.
+- Corrected architecture, installation and release documentation to describe
+  the final v4.4.0 production path and intentional product boundaries.
+- Added release-readiness regression checks for canonical assets, documentation,
+  accessibility feedback and production version consistency.
+- Verified the complete v4.2, v4.3 and v4.4 behaviour suite, DOCX structure,
+  visual snapshots, production build and generated JavaScript syntax.
+
 ## 4.4.0 RC8 — Smart Presentation & Professional Layout
 
 - Added professional, renderer-neutral presentation intent for cover, metadata,

@@ -27,7 +27,7 @@ const $ = id => document.getElementById(id);
 const send = message => chrome.runtime.sendMessage(message);
 
 
-const CONTEXT_BUILDER_VERSION = "4.4.0";
+const CONTEXT_BUILDER_VERSION = "1.0.0";
 
 function contextPageCaption(event) {
   return cleanUiCaption(
@@ -312,7 +312,7 @@ function createContextCandidates(contextEvents) {
 }
 
 
-const KNOWLEDGE_PACK_FRAMEWORK_VERSION = "4.4.0";
+const KNOWLEDGE_PACK_FRAMEWORK_VERSION = "2.0.0";
 let loadedKnowledgePacks = [];
 let loadedKnowledgeRules = [];
 let unmatchedKnowledgeItems = [];
@@ -3065,7 +3065,7 @@ async function exportSession(session) {
 
   diagnostics.businessTaskCount = finalBusinessTasks.length;
   diagnostics.businessTaskQuality = knowledgeQuality;
-  diagnostics.knowledgePackVersion = "4.4.0";
+  diagnostics.knowledgePackVersion = "2.0.0";
   diagnostics.knowledgeFrameworkVersion = KNOWLEDGE_PACK_FRAMEWORK_VERSION;
   diagnostics.loadedKnowledgePacks = loadedKnowledgePacks.map(pack => ({
     packId: pack.packId,
@@ -4420,8 +4420,6 @@ async function loadSessions() {
     body.appendChild(row);
     return;
   }
-  body.innerHTML = "";
-
   for (const session of sessions) {
     const row = document.createElement("tr");
 
@@ -4498,7 +4496,9 @@ $("documentationProfile").addEventListener("change", event => {
 $("advancedToggle").addEventListener("click", () => {
   const panel = $("advancedPanel");
   panel.classList.toggle("open");
-  $("advancedToggle").textContent = panel.classList.contains("open")
+  const expanded = panel.classList.contains("open");
+  $("advancedToggle").setAttribute("aria-expanded", String(expanded));
+  $("advancedToggle").textContent = expanded
     ? "Dölj avancerade dataskyddsinställningar"
     : "Visa avancerade dataskyddsinställningar";
 });
@@ -4728,6 +4728,7 @@ $("annotationSurface").addEventListener("keydown", event => {
 });
 async function exportReviewFromToolbar(button) {
   button.disabled = true;
+  button.setAttribute("aria-busy", "true");
   button.textContent = "Skapar Word...";
   let persistenceWarning = "";
   try {
@@ -4743,6 +4744,7 @@ async function exportReviewFromToolbar(button) {
   } catch (error) {
     show(error.message, true);
   } finally {
+    button.removeAttribute("aria-busy");
     button.textContent = "Exportera Word";
     applyReviewToolbarState();
   }

@@ -2665,7 +2665,7 @@ Processen är genomförd enligt arbetsgången.
 Dokumentationskvalitet: **${quality} %**
 
 ---
-Genererad från Business Tasks av Thinknine BC Recorder 3.6.0.
+Genererad från Business Tasks av Thinknine BC Recorder __APP_VERSION__.
 `;
 }
 
@@ -2705,7 +2705,7 @@ ${rendered || "Inga meningsfulla arbetssteg kunde identifieras."}
 Processen är genomförd och de registrerade ändringarna har sparats i Business Central.
 
 ---
-Automatiskt tolkat av Thinknine BC Recorder 3.6.0.
+Automatiskt tolkat av Thinknine BC Recorder __APP_VERSION__.
 `;
 }
 
@@ -2722,7 +2722,7 @@ function createDiagnostics(session, rawEvents, businessSteps, screenshotCount) {
   }
 
   return {
-    recorderVersion: "3.6.0",
+    recorderVersion: "__APP_VERSION__",
     uiFidelityMode: true,
     sessionId: session.id,
     environment: session.settings?.environmentName || "",
@@ -3250,7 +3250,7 @@ async function exportSession(session) {
     {
       name: `${prefix}ui-fidelity.json`,
       data: bytes(JSON.stringify({
-        version: "3.6.0",
+        version: "__APP_VERSION__",
         principle: "Visible Business Central captions are preserved exactly.",
         rules: [
           "actionCaption is the text shown on the action or button.",
@@ -4420,8 +4420,6 @@ async function loadSessions() {
     body.appendChild(row);
     return;
   }
-  body.innerHTML = "";
-
   for (const session of sessions) {
     const row = document.createElement("tr");
 
@@ -4498,7 +4496,9 @@ $("documentationProfile").addEventListener("change", event => {
 $("advancedToggle").addEventListener("click", () => {
   const panel = $("advancedPanel");
   panel.classList.toggle("open");
-  $("advancedToggle").textContent = panel.classList.contains("open")
+  const expanded = panel.classList.contains("open");
+  $("advancedToggle").setAttribute("aria-expanded", String(expanded));
+  $("advancedToggle").textContent = expanded
     ? "Dölj avancerade dataskyddsinställningar"
     : "Visa avancerade dataskyddsinställningar";
 });
@@ -4728,6 +4728,7 @@ $("annotationSurface").addEventListener("keydown", event => {
 });
 async function exportReviewFromToolbar(button) {
   button.disabled = true;
+  button.setAttribute("aria-busy", "true");
   button.textContent = "Skapar Word...";
   let persistenceWarning = "";
   try {
@@ -4743,6 +4744,7 @@ async function exportReviewFromToolbar(button) {
   } catch (error) {
     show(error.message, true);
   } finally {
+    button.removeAttribute("aria-busy");
     button.textContent = "Exportera Word";
     applyReviewToolbarState();
   }

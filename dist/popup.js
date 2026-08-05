@@ -1,5 +1,10 @@
 const $ = id => document.getElementById(id);
 
+function updateText(element, value) {
+  const text = String(value);
+  if (element.textContent !== text) element.textContent = text;
+}
+
 function withTimeout(promise, milliseconds, label) {
   return Promise.race([
     promise,
@@ -29,7 +34,7 @@ async function currentTab() {
 }
 
 function showMessage(text, error = false) {
-  $("message").textContent = text || "";
+  updateText($("message"), text || "");
   $("message").style.color = error ? "#b42318" : "#166534";
 }
 
@@ -98,12 +103,12 @@ async function refresh() {
 
     $("startPanel").hidden = active;
     $("recordingPanel").hidden = !active;
-    $("status").textContent = active ? "● Inspelning pågår" : "Inte aktiv";
+    updateText($("status"), active ? "● Inspelning pågår" : "Inte aktiv");
     $("status").className = "status" + (active ? " rec" : "");
 
     if (response?.session) {
-      $("sessionName").textContent = response.session.name;
-      $("count").textContent = response.session.eventCount || 0;
+      updateText($("sessionName"), response.session.name);
+      updateText($("count"), response.session.eventCount || 0);
     }
   } catch (error) {
     showMessage(error.message, true);

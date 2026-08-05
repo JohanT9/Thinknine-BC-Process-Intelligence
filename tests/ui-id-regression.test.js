@@ -10,6 +10,14 @@ const js = fs.readFileSync(
   path.join(__dirname, "../src/ui/dashboard.js"),
   "utf8"
 );
+const popupHtml = fs.readFileSync(
+  path.join(__dirname, "../src/ui/popup.html"),
+  "utf8"
+);
+const popupJs = fs.readFileSync(
+  path.join(__dirname, "../src/ui/popup.js"),
+  "utf8"
+);
 
 assert.ok(
   html.includes(".review-header{position:sticky;top:0") &&
@@ -155,6 +163,25 @@ assert.ok(
     js.includes("function updateAnnotationStickyOffset()") &&
     js.includes('globalThis.addEventListener("resize", updateAnnotationStickyOffset)'),
   "Annotation editor actions should remain available while scrolling."
+);
+assert.ok(
+  html.includes('id="message" role="status" aria-live="polite"') &&
+    html.includes('aria-controls="advancedPanel"') &&
+    html.includes('aria-expanded="false"') &&
+    js.includes('setAttribute("aria-expanded", String(expanded))'),
+  "Dashboard feedback and disclosure state must be available to assistive technology."
+);
+assert.ok(
+  js.includes('button.setAttribute("aria-busy", "true")') &&
+    js.includes('button.removeAttribute("aria-busy")'),
+  "Word export must expose and clear its busy state."
+);
+assert.ok(
+  popupHtml.includes('id="status" class="status" role="status"') &&
+    popupHtml.includes('id="message" class="message" role="status"') &&
+    popupJs.includes("function updateText(element, value)") &&
+    popupJs.includes("if (element.textContent !== text)"),
+  "Popup status must be live without repeated unchanged DOM announcements."
 );
 
 console.log("UI ID regression tests passed.");

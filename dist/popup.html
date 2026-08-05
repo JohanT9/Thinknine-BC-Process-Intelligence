@@ -26,7 +26,8 @@ dl{display:grid;grid-template-columns:90px 1fr;gap:5px;font-size:12px}dt{font-we
 <h1>BC Recorder <span class="version">v4.4.0</span></h1>
 </header>
 <main>
-<div id="status" class="status">Inte aktiv</div>
+<div id="status" class="status" role="status" aria-live="polite"
+  aria-atomic="true">Inte aktiv</div>
 <section id="startPanel">
 <label>Processnamn<input id="name" value="Business Central-process"></label>
 <label>Syfte<textarea id="purpose" rows="3"></textarea></label>
@@ -41,7 +42,8 @@ dl{display:grid;grid-template-columns:90px 1fr;gap:5px;font-size:12px}dt{font-we
 </section>
 <button id="dashboard" class="secondary">Sessioner och export</button>
 <button id="debug" class="debug">Debugpanel</button>
-<p id="message" class="message"></p>
+<p id="message" class="message" role="status" aria-live="polite"
+  aria-atomic="true"></p>
 </main>
 <script src="popup.js"></script>
 </body>

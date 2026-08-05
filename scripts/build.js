@@ -29,14 +29,11 @@ function copyDir(source, target) {
   }
 }
 
-function replaceVersionInFile(filePath) {
+function injectProductVersion(filePath) {
   if (!fs.existsSync(filePath)) return;
 
-  let content = fs.readFileSync(filePath, "utf8");
-
-  content = content
-    .replace(/v\d+\.\d+\.\d+/g, `v${version}`)
-    .replace(/\b\d+\.\d+\.\d+\b/g, version);
+  const content = fs.readFileSync(filePath, "utf8")
+    .replace(/__APP_VERSION__/g, version);
 
   fs.writeFileSync(filePath, content, "utf8");
 }
@@ -156,7 +153,7 @@ for (const file of [
   "dashboard.html",
   "popup.html"
 ]) {
-  replaceVersionInFile(path.join(dist, file));
+  injectProductVersion(path.join(dist, file));
 }
 
 const versionText =

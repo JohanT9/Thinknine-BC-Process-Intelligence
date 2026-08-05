@@ -103,7 +103,7 @@ table{width:100%;border-collapse:collapse}th,td{text-align:left;padding:9px;bord
 </style>
 </head>
 <body>
-<h1>Thinknine BC Recorder <small>v3.6.0</small></h1>
+<h1>Thinknine BC Recorder <small>v__APP_VERSION__</small></h1>
 <p class="muted">Spela in en Business Central-process och exportera en återanvändbar manual med exakt UI-terminologi.</p>
 
 <fieldset>
@@ -122,7 +122,8 @@ table{width:100%;border-collapse:collapse}th,td{text-align:left;padding:9px;bord
 <label for="environmentName">Miljönamn</label>
 <input id="environmentName" type="text">
 
-<button id="advancedToggle" class="secondary" type="button">Visa avancerade dataskyddsinställningar</button>
+<button id="advancedToggle" class="secondary" type="button"
+  aria-expanded="false" aria-controls="advancedPanel">Visa avancerade dataskyddsinställningar</button>
 
 <div id="advancedPanel" class="advanced">
   <h3>Dataskydd</h3>
@@ -200,7 +201,7 @@ table{width:100%;border-collapse:collapse}th,td{text-align:left;padding:9px;bord
 <h2>Sessioner</h2>
 <button id="refresh" class="secondary">Uppdatera listan</button>
 <button id="debug" class="debug">Öppna debugpanel</button>
-<div id="message"></div>
+<div id="message" role="status" aria-live="polite" aria-atomic="true"></div>
 <table>
 <thead><tr><th>Namn</th><th>Startad</th><th>Händelser</th><th>Status</th><th></th></tr></thead>
 <tbody id="sessions"></tbody>

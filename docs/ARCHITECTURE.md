@@ -1,4 +1,4 @@
-# Architecture 3.5
+# Architecture 4.4
 
 ## Documentation Excellence 4.4
 
@@ -18,7 +18,8 @@ Word / framtida PDF-renderare
 RC2 lägger till en ren och deterministisk projektor som ensam översätter Review
 till modellen. Projektorn skapar provenance och separat diagnostik men äger
 aldrig Review-objekt eller bilddata. Modell och projektor saknar beroenden till
-DOCX, DOM, CSS och canvas och används ännu inte av exportflödet.
+DOCX, DOM, CSS och canvas. Sedan RC5 är denna projektion den enda aktiva vägen
+från Review till Word-export.
 
 RC3 introducerar en parallell, innehållsoberoende källa för dokumentutseende.
 Temasystemet definierar endast värden och tokenrelationer. Det inspekterar inte
@@ -73,6 +74,11 @@ callout-roller, whitespace-intention och `keep`-relationer. Alla visuella värde
 kommer från det upplösta temat. Word-adaptern mappar endast dessa beslut till
 `docx`-objekt och Word-enheter. Review Projector och Semantic Document ändrades
 inte, och kvalitetsdiagnostiken är fortsatt rådgivande och skrivskyddad.
+
+RC9 verifierar ansvaren som produktionsgränser. Ingen renderer läser Review,
+Planner skapar inga Word-objekt, projektorn planerar inte presentation och
+kvalitetslagret ändrar varken semantik eller plan. Den äldre exportören är
+fortsatt karantäniserad för kompatibilitet och laddas inte av dashboarden.
 
 ```text
 Recorder

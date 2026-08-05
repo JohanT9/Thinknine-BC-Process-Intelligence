@@ -1,7 +1,13 @@
-# Thinknine BC Process Intelligence v4.4.0 Release Candidate
+# Thinknine BC Process Intelligence v4.4.0
 
 Ett modulärt Edge-tillägg för att spela in, granska och exportera dokumenterade
 Business Central-processer.
+
+Documentation Excellence v4.4.0 är produktionsklar. Inspelning, Review Studio,
+icke-destruktiva annoteringar, dokumentkvalitetsanalys, professionell planering
+och Word-export fungerar som ett sammanhängande dokumentationsflöde. Se
+[Release Notes 4.4.0](docs/RELEASE_NOTES_4.4.0.md) och
+[Production Readiness 4.4](docs/PRODUCTION_READINESS_4.4.md).
 
 ## Documentation Excellence 4.4 RC1
 
@@ -46,8 +52,8 @@ overrides. Tokenreferenser löses först efter arv, så exempelvis en ändrad
 primärfärg används konsekvent av rubriker och komponenter.
 
 Kapabiliteter beskriver vad ett tema har värden för men aktiverar eller stänger
-aldrig av funktioner. Det finns ännu inget val av tema i UI, ingen layout och
-ingen koppling till den befintliga Word-exporten.
+aldrig av funktioner. RC3 introducerade ingen UI-väljare eller exportkoppling;
+sedan RC5 används det upplösta Thinknine-temat i Word-produktionsflödet.
 
 ### RC4 — Document Planner
 
@@ -118,6 +124,14 @@ presentationsbeslut fattas av Planner utifrån temats tokens; Word-adaptern
 Review och Semantic Document är oförändrade, så innehållet är detsamma och inga
 migreringar krävs. Se [Presentation Planning 4.4](docs/PRESENTATION_PLANNING_4.4.md)
 och den [visuella RC7/RC8-jämförelsen](docs/RC8_VISUAL_COMPARISON.md).
+
+### RC9 — Release Hardening
+
+RC9 verifierar hela konsultflödet, arkitekturlagren, tillgängligheten,
+prestandan och regressionstäckningen utan att lägga till nya produktfunktioner.
+Statusåterkoppling har härdats för skärmläsare, oförändrad popupstatus orsakar
+inte längre onödiga DOM-uppdateringar och överflödiga releaseartefakter har
+tagits bort. Alla v4.2-, v4.3- och v4.4-regressioner ingår i releasegrinden.
 
 ## Screenshot annotations 4.3 RC1
 

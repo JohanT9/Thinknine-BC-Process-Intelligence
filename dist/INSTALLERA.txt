@@ -23,7 +23,7 @@ LADDA TILLÄGGET I EDGE
 4. Välj repositoryts dist-mapp.
 5. Efter en ny build, välj Läs in igen på tilläggets kort.
 
-WORD-EXPORT 4.4 RC5
+WORD-EXPORT 4.4
 
 Produktionsbygget paketerar Word-adaptern i
 dist/exporters/word-exporter-docx.bundle.js och kopierar den validerade
@@ -45,13 +45,14 @@ RC-KONTROLL
 3. Kontrollera selection med klick, Ctrl/Cmd+klick och Shift+klick.
 4. Kontrollera Move, Merge, Split, Delete samt Undo/Redo.
 5. Redigera inline med dubbelklick eller Enter; testa Escape och autosave.
-6. Kontrollera toolbarens automatiska knapplägen och statusrad.
-7. Exportera Word och kontrollera text, ordning och skärmbilder.
-8. Navigera dialog, toolbar och steg med endast tangentbord.
+6. Annotera en skärmbild med rektangel och pil; testa Undo/Redo och Avbryt.
+7. Kontrollera toolbarens automatiska knapplägen och statusrad.
+8. Exportera Word och kontrollera text, ordning, annoteringar och presentation.
+9. Navigera popup, dialog, toolbar, annoteringar och steg med endast tangentbord.
 
 EXPORTINSTÄLLNINGAR
 
 Filnamnsmallen stöder variablerna process, environment, date, time och version
 inom klammerparenteser. Preview och validering uppdateras direkt. Exporten
 använder automatiskt unika filnamn vid konflikt; något separat Save As-val finns
-inte i 4.2.0.
+inte i 4.4.0.
