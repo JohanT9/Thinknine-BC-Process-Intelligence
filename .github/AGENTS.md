@@ -468,6 +468,28 @@ Not implementation.
 
 ---
 
+# Visual Regression Testing
+
+Features that render graphics should include visual regression tests whenever practical.
+
+Examples include:
+
+- SVG rendering
+- Canvas rendering
+- Screenshot composition
+- Image annotations
+- Export rendering
+
+Prefer comparing rendered output against approved reference images.
+
+Behavior tests verify functionality.
+
+Visual regression tests verify appearance.
+
+Both are required for rendering-related features whenever feasible.
+
+---
+
 # Milestone Commits
 
 The project uses milestone commits.
@@ -567,6 +589,8 @@ A feature is complete only if
 ✓ self-review completed
 
 ✔ Milestone reviewed and accepted
+
+✔ Visual regression tests added for rendering features (when applicable)
 
 ---
 
