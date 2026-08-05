@@ -1,294 +1,119 @@
 # Thinknine Process Intelligence
-# Engineering Standards
+## Engineering Handbook
+### Version 4.0
 
-Version: 3.0
+---
+
+# Quick Start
+
+If you only read five sections, read these:
+
+1. Product Philosophy
+2. Consultant First
+3. Architecture Philosophy
+4. Rendering Purity
+5. Development Workflow
+
+---
+
+# Vision
+
+Thinknine Process Intelligence exists to help professional consultants create
+high-quality documentation with the least possible effort and the highest
+possible confidence.
+
+The product should disappear into the user's workflow.
+
+Consultants should focus on understanding business processes, not on producing
+documentation.
+
+Every architectural decision should ultimately contribute to that goal.
 
 ---
 
 # Purpose
 
-This document defines the engineering standards for the Thinknine Process Intelligence project.
+This document defines the engineering principles, architectural rules,
+development workflow and product philosophy governing the entire project.
 
-These standards apply to:
+Its purpose is to ensure that every implementation:
 
-- AI agents
-- Human developers
-- Future contributors
+- improves the product,
+- preserves long-term maintainability,
+- remains backward compatible,
+- follows a consistent architectural direction,
+- and delivers meaningful value to professional consultants.
 
-The objective is to ensure that every implementation improves the product without increasing unnecessary complexity or technical debt.
-
-The project should evolve through small, well-tested, maintainable milestones.
-
-Whenever multiple implementation alternatives exist, prefer the solution that will still be easy to understand and maintain five years from now.
+This handbook applies to every implementation, regardless of size.
 
 ---
 
 # Product Philosophy
 
-Documentation Excellence exists to improve the daily workflow of professional consultants.
+Documentation Excellence is not a document exporter.
 
-Every significant implementation must create a noticeable improvement in everyday use.
+It is a professional documentation workspace.
 
-Architecture, abstractions and internal design exist only to enable better user experiences. They are never goals by themselves.
+The application exists to reduce the effort required to create accurate,
+professional process documentation.
 
-When evaluating competing implementations, prefer the solution that delivers the greatest practical value to the consultant while preserving long-term maintainability.
+Architecture exists to enable better user experiences.
 
-Before implementing a feature, ask:
+Architecture is never a product goal by itself.
 
-"Will a consultant using this product every day immediately notice that their work has become easier, faster or more professional?"
+When architecture and user experience appear to conflict,
+search for a solution that satisfies both.
 
-If the answer is no, reconsider whether the feature belongs in the current milestone.
-
-## Guiding Principle
-
-**The consultant's time is the product's most valuable resource. Every significant feature should save time, improve document quality, increase confidence in the final result, or clearly enable one of those outcomes in a future milestone. If it does none of these, it probably does not belong in the product.**
+If no such solution exists, user value takes precedence.
 
 ---
 
-# Development Workflow
+# Consultant First
 
-Every non-trivial implementation follows the same workflow.
+The consultant's daily workflow is the primary design target.
 
-## 1. Understand
+Every significant implementation should satisfy at least one of the following:
 
-Study the existing implementation before writing code.
+- save time,
+- improve document quality,
+- increase confidence in the final result,
+- or clearly enable one of those improvements in a future milestone.
 
-Understand:
+If an implementation satisfies none of these goals,
+it should normally not be implemented.
 
-- architecture
-- responsibilities
-- existing abstractions
-- public APIs
-- persistence
-- tests
-
-Never assume functionality.
+The consultant's time is the product's most valuable resource.
 
 ---
 
-## 2. Design
+# Workflow Before Features
 
-Before implementation, identify:
+Prefer improving an existing workflow over introducing additional features.
 
-- affected modules
-- affected data
-- architectural impact
-- compatibility risks
-- performance risks
+Reducing friction creates more value than increasing functionality.
 
-If a simpler solution exists, prefer it.
+Whenever possible:
 
----
+- reduce clicks,
+- reduce context switching,
+- reduce repeated exports,
+- reduce manual corrections,
+- reduce unnecessary decisions.
 
-## 3. Implement
-
-Implement the smallest possible change.
-
-Avoid:
-
-- unnecessary refactoring
-- unrelated improvements
-- unnecessary renaming
-- large diffs
-
-Each implementation should solve one clearly defined problem.
+Professional software should feel effortless.
 
 ---
 
-## 4. Verify
+# Documentation First
 
-Run whenever applicable:
+The generated documentation is the product.
 
-- lint
-- behaviour tests
-- visual regression tests
-- data integrity tests
-- build
-- syntax verification
+Everything else exists to support producing better documentation.
 
-Fix confirmed issues before continuing.
+Review Studio, annotations, themes, planning, quality diagnostics and export
+are all parts of a single documentation workflow.
 
----
-
-## 5. Review
-
-Perform a critical self-review.
-
-Review:
-
-- architecture
-- duplication
-- maintainability
-- accessibility
-- performance
-- compatibility
-- data integrity
-
-Do not consider work complete until this review has been performed.
-
----
-
-# Product Vision
-
-Thinknine Process Intelligence is an AI-assisted platform for documenting, reviewing and continuously improving Microsoft Dynamics 365 Business Central processes.
-
-The platform is intended for:
-
-- Business Central consultants
-- Solution architects
-- Implementation partners
-- Key users
-- Customers
-
-The product supports the complete documentation lifecycle:
-
-Record
-
-↓
-
-Review
-
-↓
-
-Improve
-
-↓
-
-Document
-
-↓
-
-Reuse
-
-↓
-
-Build Knowledge
-
-↓
-
-Continuously Improve
-
-The product is not a click recorder.
-
-It transforms recorded user activity into professional process documentation.
-
-Documentation excellence is the foundation upon which future process intelligence capabilities will be built.
-
----
-
-## Documentation First
-
-The primary purpose of Thinknine Process Intelligence is to generate high-quality process documentation with minimal manual editing.
-
-New features should first improve one or more of the following:
-
-- documentation quality
-- documentation consistency
-- documentation readability
-- documentation efficiency
-- documentation maintainability
-
-Expanding the scope of the product must not come at the expense of documentation quality.
-
-When prioritizing future work, prefer making documentation exceptional over adding project-management functionality.
-
-Documentation excellence is the product's primary competitive advantage.
-
----
-
-# Product Modules
-
-The system consists of independent modules.
-
-Each module has one clearly defined responsibility.
-
----
-
-## Recorder
-
-Responsible for:
-
-- capturing browser activity
-- recording screenshots
-- recording events
-
-Recorder never performs documentation.
-
-Recorder never performs business analysis.
-
----
-
-## Review Studio
-
-Review Studio is the primary workspace.
-
-Most user interaction should happen here.
-
-Responsibilities:
-
-- review
-- edit
-- merge
-- split
-- reorder
-- annotate
-- validate
-- prepare documentation
-
-Whenever UX decisions are required, optimize Review Studio first.
-
----
-
-## Document Generator
-
-Responsible for generating:
-
-- Word
-- PDF (future)
-- HTML (future)
-
-Document generation should never duplicate business logic.
-
-Formatting, metadata and rendering should be shared whenever possible.
-
----
-
-## Knowledge Base
-
-Responsible for storing reusable business knowledge.
-
-Future responsibilities include:
-
-- similar process detection
-- reusable documentation
-- knowledge packs
-- process comparison
-
-Knowledge must remain independent from Recorder.
-
----
-
-## AI Assistant
-
-Responsible for:
-
-- suggestions
-- validation
-- summarisation
-- quality improvements
-
-AI assists the user.
-
-AI must never unexpectedly modify documentation.
-
----
-
-# Engineering Principles
-
-Engineering principles override implementation preferences.
-
-Whenever a conflict exists between convenience and these principles,
-the engineering principles take precedence.
+No subsystem should optimize itself at the expense of documentation quality.
 
 ---
 
@@ -296,918 +121,536 @@ the engineering principles take precedence.
 
 Every milestone must satisfy two independent criteria.
 
-## Engineering
+## Engineering Quality
 
-- Correct
-- Maintainable
-- Tested
-- Backward compatible
+Every implementation must be:
+
+- correct,
+- maintainable,
+- deterministic,
+- fully tested,
+- backward compatible.
 
 ## User Value
 
-The improvement must be perceptible during normal daily use.
+Every implementation must provide value that is noticeable during normal
+consulting work.
 
-Features that improve architecture without improving the user experience should generally be implemented only when they clearly enable future user-facing improvements.
-
----
-
-## Domain First
-
-The domain model defines the product.
-
-The UI visualizes the domain.
-
-Exports represent the domain.
-
-Rendering represents the domain.
-
-Never design the domain around the UI.
-
-Always design the UI around the domain.
+If users cannot perceive the improvement, reconsider whether the feature
+belongs in the current milestone.
 
 ---
 
-## Token First
+# Consultant Validation
 
-Visual appearance should be defined through tokens rather than hard-coded values.
+Before completing any milestone, evaluate the implementation from the
+perspective of a professional consultant.
 
-Colors, typography, spacing and branding should be data.
+Ask the following questions:
 
-Rendering engines consume tokens.
+- Does this save time?
+- Does this improve document quality?
+- Does this increase confidence?
+- Does this simplify the workflow?
+- Would I personally use this every day?
 
-They do not define them.
-
----
-
-## Planning Before Rendering
-
-Place it after Token First.
-
-Use the following wording:
-
-Rendering engines must never decide document structure.
-
-Document structure is created by the Document Planner.
-
-Renderers consume the Document Plan.
-
-They do not create it.
-
-Keep the existing formatting and document structure.
-
-Do not modify any product code.
+If the answer to every question is "no",
+the implementation should be reconsidered.
 
 ---
 
-## Single Source of Truth
+# Product Evolution
 
-Business logic must exist only once.
+Features are introduced only when they strengthen the overall workflow.
 
-Examples:
+Avoid feature accumulation.
 
-Filename generation
+Every new capability should integrate naturally into the existing experience.
 
-↓
-
-Preview
-
-↓
-
-Word
-
-↓
-
-Workspace
-
-↓
-
-ZIP
-
-All use the same implementation.
-
-Never duplicate business algorithms.
-
----
-
-## Data Integrity
-
-Data integrity has higher priority than feature completeness.
-
-Never risk corruption of:
-
-- Reviews
-- Tasks
-- Screenshots
-- Annotations
-- History
-
-When functionality conflicts with correctness,
-
-correctness always wins.
-
----
-
-## Stable Identity
-
-Every persistent object should have a stable identifier.
-
-Prefer:
-
-UUIDs
-
-Stable IDs
-
-Persistent references
-
-Never rely on:
-
-array indexes
-
-visual order
-
-temporary positions
-
-Identity must survive:
-
-- reorder
-- merge
-- split
-- undo
-- redo
-- persistence
-
----
-
-## Immutable Inputs
-
-Functions responsible for:
-
-- normalization
-- validation
-- rendering
-
-must never mutate input objects.
-
-Return new objects whenever transformations are required.
-
-Mutation should happen only through explicit domain commands.
-
----
-
-## Single Rendering Pipeline
-
-Rendering logic must exist only once.
-
-Preview
-
-↓
-
-Annotation Editor
-
-↓
-
-Word Export
-
-↓
-
-Future PDF Export
-
-should reuse the same rendering pipeline whenever practical.
-
-Different rendering targets are acceptable.
-
-Different rendering implementations are not.
-
-Geometry calculations must never be duplicated.
-
----
-
-## Rendering Purity
-
-Rendering is a pure transformation.
-
-Rendering modules receive immutable domain objects and produce rendered output.
-
-Rendering must never modify:
-
-- Review
-- Task
-- Screenshot
-- Annotation
-
-Rendered output is disposable.
-
-The domain model is the single source of truth.
-
-Temporary rendering data must never be persisted.
-
----
-
-## Projection Purity
-
-Projection is a pure transformation.
-
-Projectors receive immutable Review data and produce immutable Semantic Documents.
-
-Projectors must never:
-
-- mutate Review
-- perform rendering
-- perform layout
-- generate Word objects
-- generate PDF objects
-
-Projectors describe WHAT exists.
-
-Never HOW it will be rendered.
-
-Keep the existing style, formatting and document structure.
-
-Do not modify any product code.
-
----
-
-## Backward Compatibility
-
-Backward compatibility is the default.
-
-Existing Review data should continue working whenever possible.
-
-Avoid mandatory migrations.
-
-Unknown future schema fields must be preserved.
-
-Unknown object types must never be discarded.
-
-Normalize without mutating original input.
-
----
-
-## Separation of Concerns
-
-Keep responsibilities separated.
-
-UI
-
-↓
-
-Application Logic
-
-↓
-
-Business Logic
-
-↓
-
-Persistence
-
-↓
-
-Rendering
-
-↓
-
-Export
-
-Never mix these responsibilities.
-
----
-
-## Reuse Before Creating
-
-Before introducing:
-
-- utilities
-- helpers
-- services
-- rendering logic
-- persistence logic
-
-search the project.
-
-Prefer extending existing implementations over introducing new ones.
-
----
-
-## Generated Files
-
-Never edit:
-
-dist/
-
-Generated files are outputs.
-
-Modify only source files.
-
-Generated files should only change through the build process.
-
-# Folder Responsibilities
-
-Every folder has one primary responsibility.
-
-Do not mix responsibilities across folders.
-
----
-
-## src/
-
-Contains application source code.
-
-Only manually maintained production code belongs here.
-
----
-
-## tests/
-
-Contains:
-
-- behaviour tests
-- regression tests
-- visual regression tests
-- data integrity tests
-
-Tests should verify observable behaviour.
-
-Avoid testing implementation details whenever practical.
-
----
-
-## docs/
-
-Contains:
-
-- architecture
-- design decisions
-- implementation guides
-- release documentation
-
-Documentation should explain why decisions were made.
-
----
-
-## .github/
-
-Contains:
-
-- workflows
-- automation
-- AI guidance
-- templates
-
-Automation should never contain business logic.
-
----
-
-## dist/
-
-Contains generated output only.
-
-Never edit files inside:
-
-dist/
-
-All changes must originate from source files.
-
----
-
-# Review Studio Principles
-
-Review Studio is the core of the product.
-
-Users should spend most of their time here.
-
-Whenever a design decision exists between Recorder and Review Studio,
-
-prefer improving Review Studio.
-
----
-
-## Editing
-
-Editing should always be:
-
-- predictable
-- reversible
-- non-destructive
-
-Users should feel safe making changes.
-
----
-
-## Selection
-
-Selection should always use stable object identifiers.
-
-Never use visual indexes.
-
-Selection should survive:
-
-- sorting
-- moving
-- merging
-- splitting
-- Undo
-- Redo
-
----
-
-## History
-
-Undo and Redo should represent logical user actions.
-
-Examples
-
-GOOD
-
-Drag an item
-
-↓
-
-One Undo
-
-BAD
-
-Drag an item
-
-↓
-
-200 Undo entries
-
-History should represent intent.
-
-Not implementation details.
-
----
-
-## Review Sessions
-
-Opening a Review establishes a safe editing context.
-
-Users must always be able to:
-
-- continue
-- save
-- cancel
-
-without corrupting Review data.
-
----
-
-# Annotation Principles
-
-Annotations extend screenshots.
-
-They never replace screenshots.
-
----
-
-## Original Images
-
-Original screenshots are immutable.
-
-Never modify:
-
-- pixels
-- metadata
-- stored bytes
-
-All annotations are stored separately.
-
----
-
-## Annotation Storage
-
-Annotations belong to Reviews.
-
-Never embed annotations inside screenshots.
-
-Support future annotation types.
-
-Unknown annotation types must survive load-save cycles unchanged.
-
----
-
-## Annotation Identity
-
-Each annotation has a stable identifier.
-
-Annotation IDs survive:
-
-- editing
-- moving
-- saving
-- loading
-- Undo
-- Redo
-
----
-
-## Annotation Geometry
-
-Annotation geometry is stored in normalized coordinates.
-
-Never persist pixel coordinates.
-
-Rendering decides pixel placement.
-
-Storage never does.
-
----
-
-## Annotation Editing
-
-The editor modifies only annotation data.
-
-The editor must never:
-
-- modify screenshots
-- modify rendering output
-- modify export data
-
----
-
-# Export Principles
-
-Export represents the current Review.
-
-Export never owns business logic.
-
----
-
-## Export Behaviour
-
-Export should define only:
-
-- destination
-- output format
-
-Everything else should reuse existing implementations.
-
----
-
-## Export Integrity
-
-Export must faithfully represent:
-
-- Review
-- Tasks
-- Comments
-- Images
-- Annotations
-- Metadata
-
-Never export stale data.
-
-Always export the latest committed Review state.
-
----
-
-## Export Isolation
-
-Export must never modify:
-
-- Review
-- Tasks
-- Screenshots
-- Annotations
-- History
-
-Export is read-only.
-
----
-
-## Rendering
-
-Rendering exists only to produce output.
-
-Rendering must never become persistence.
-
----
-
-# Word Generator
-
-Word generation uses:
-
-docx
-
-Never generate OpenXML manually.
-
----
-
-## Image Handling
-
-Preserve:
-
-- aspect ratio
-- resolution
-- image quality
-
-Avoid unnecessary recompression.
-
----
-
-## Screenshot Composition
-
-Annotated screenshots are composed during export.
-
-Original screenshots remain unchanged.
-
-Temporary export images must never be persisted.
-
----
-
-## Future Compatibility
-
-Future export formats should reuse the same rendering pipeline whenever practical.
-
-Examples:
-
-- Word
-- PDF
-- HTML
-
-Only the final output adapter should differ.
-
----
-
-# Business Central Principles
-
-Thinknine Process Intelligence is built for Microsoft Dynamics 365 Business Central.
-
-Design accordingly.
-
----
-
-## Stable References
-
-Never assume captions are unique.
-
-Prefer:
-
-- IDs
-- GUIDs
-- internal identifiers
-
----
-
-## Localisation
-
-Do not depend on translated captions.
-
-Support:
-
-- multiple languages
-- custom translations
-- partner extensions
-
----
-
-## Extensions
-
-Assume customer environments contain extensions.
-
-Avoid assumptions about:
-
-- page layouts
-- captions
-- actions
-- object ordering
-
----
-
-## Compatibility
-
-Design for:
-
-- Business Central
-- Aptean Food & Beverage
-
-Future ERP extensions should integrate naturally.
-
----
-
-# Coding Standards
-
-Write code that is easy to understand.
-
-Future maintainability is more important than cleverness.
-
----
-
-## Prefer
-
-- small functions
-- composition
-- descriptive names
-- explicit behaviour
-- immutable data where practical
-
----
-
-## Avoid
-
-- large classes
-- deep nesting
-- duplicated logic
-- magic numbers
-- magic strings
-- hidden side effects
-
----
-
-## Naming
-
-Names should describe intent.
-
-Good examples:
-
-generateFilename()
-
-renderAnnotationScene()
-
-normalizeReview()
-
-Bad examples:
-
-process()
-
-run()
-
-helper()
-
-util()
-
----
-
-## Comments
-
-Explain:
-
-WHY
-
-Avoid explaining:
-
-WHAT
-
-Good code should explain itself.
-
----
-
-## Error Handling
-
-Fail predictably.
-
-Never silently ignore failures.
-
-Provide actionable error messages whenever possible.
-
-Errors should preserve user data.
-
----
-
-## Performance
-
-Optimize only after correctness.
-
-Prefer:
-
-- incremental updates
-- cached calculations
-- shared rendering
-- reusable components
-
-Avoid:
-
-- repeated rendering
-- repeated storage writes
-- unnecessary DOM rebuilding
-- duplicated calculations
-
-Performance optimizations must never reduce correctness.
-
-# Thinknine Process Intelligence
-# Engineering Standards
-
-Version: 3.0
-
----
-
-# Purpose
-
-This document defines the engineering standards for the Thinknine Process Intelligence project.
-
-These standards apply to:
-
-- AI agents
-- Human developers
-- Future contributors
-
-The objective is to ensure that every implementation improves the product without increasing unnecessary complexity or technical debt.
-
-The project should evolve through small, well-tested, maintainable milestones.
-
-Whenever multiple implementation alternatives exist, prefer the solution that will still be easy to understand and maintain five years from now.
+Users should experience Documentation Excellence as one coherent application,
+not as a collection of independent tools.
 
 ---
 
 # Development Workflow
 
-Every non-trivial implementation follows the same workflow.
+Every milestone follows the same lifecycle.
 
-## 1. Understand
+```
+Planning
 
-Study the existing implementation before writing code.
+↓
 
-Understand:
+Implementation
 
-- architecture
-- responsibilities
-- existing abstractions
-- public APIs
-- persistence
-- tests
+↓
 
-Never assume functionality.
+Self Review
+
+↓
+
+Integrity Review
+
+↓
+
+Regression Testing
+
+↓
+
+Documentation
+
+↓
+
+Release Review
+
+↓
+
+Milestone Commit
+```
+
+No milestone is considered complete before every stage has finished
+successfully.
 
 ---
 
-## 2. Design
+# Milestone Rules
 
-Before implementation, identify:
+Each Release Candidate should have:
 
-- affected modules
-- affected data
-- architectural impact
-- compatibility risks
-- performance risks
+- one clearly defined objective,
+- explicit acceptance criteria,
+- limited scope,
+- complete regression coverage,
+- updated documentation,
+- one milestone commit.
 
-If a simpler solution exists, prefer it.
+Avoid mixing unrelated improvements.
+
+Large features should be divided into multiple Release Candidates.
 
 ---
 
-## 3. Implement
+# Definition of Done
 
-Implement the smallest possible change.
+A milestone is complete only when all of the following are true:
+
+- implementation complete,
+- architecture reviewed,
+- integrity verified,
+- accessibility reviewed,
+- regression tests passing,
+- production build successful,
+- documentation updated,
+- release notes completed,
+- milestone committed,
+- workspace clean.
+
+Only then may the next milestone begin.
+
+---
+
+# Architecture Handbook
+
+The Documentation Excellence architecture is intentionally layered.
+
+Each layer has one clearly defined responsibility.
+
+Information always flows in one direction.
+
+No layer should depend on implementation details from layers below it.
+
+---
+
+# Architectural Layers
+
+```
+Review
+
+↓
+
+Review Projector
+
+↓
+
+Semantic Document
+
+↓
+
+Theme System
+
+↓
+
+Document Planner
+
+↓
+
+Document Components
+
+↓
+
+Quality Diagnostics
+
+↓
+
+Renderer Adapter
+
+↓
+
+Output
+```
+
+Each layer transforms information into a more specialized representation.
+
+No layer should bypass another layer.
+
+---
+
+# Architecture Philosophy
+
+Architecture exists to support the product.
+
+The architecture should make future improvements easier while remaining
+invisible to the end user.
+
+Prefer:
+
+- simple ownership,
+- deterministic behaviour,
+- immutable data,
+- explicit contracts,
+- isolated responsibilities.
 
 Avoid:
 
-- unnecessary refactoring
-- unrelated improvements
-- unnecessary renaming
-- large diffs
-
-Each implementation should solve one clearly defined problem.
+- hidden coupling,
+- duplicated behaviour,
+- renderer-specific leakage,
+- business logic in the UI.
 
 ---
 
-## 4. Verify
+# Domain First
 
-Run whenever applicable:
+Business concepts always take precedence over implementation details.
 
-- lint
-- behaviour tests
-- visual regression tests
-- data integrity tests
-- build
-- syntax verification
+Model the problem before implementing the solution.
 
-Fix confirmed issues before continuing.
+Never introduce technical concepts into the domain model merely because a
+particular renderer or storage format requires them.
 
----
-
-## 5. Review
-
-Perform a critical self-review.
-
-Review:
-
-- architecture
-- duplication
-- maintainability
-- accessibility
-- performance
-- compatibility
-- data integrity
-
-Do not consider work complete until this review has been performed.
+The domain must remain understandable without knowledge of Word, PDF,
+HTML, SVG or browser APIs.
 
 ---
 
-# Product Vision
+# Semantic Document First
 
-Thinknine Process Intelligence is an AI-assisted platform for documenting, reviewing and continuously improving Microsoft Dynamics 365 Business Central processes.
+Semantic Document is the canonical representation of every document.
 
-The platform is intended for:
+All downstream systems consume Semantic Document.
 
-- Business Central consultants
-- Solution architects
-- Implementation partners
-- Key users
-- Customers
+No renderer should reconstruct semantics from lower-level structures.
 
-The product supports the complete documentation lifecycle:
+Semantic Document owns:
 
-Record
+- meaning,
+- document structure,
+- relationships,
+- provenance.
+
+Semantic Document never owns layout.
+
+---
+
+# Projection Purity
+
+Review Projector is the only production component allowed to translate
+Review data into Semantic Document.
+
+No renderer may consume Review directly.
+
+No planner may consume Review directly.
+
+No quality rule may consume Review directly.
+
+All downstream processing begins with Semantic Document.
+
+---
+
+# Theme First
+
+Themes define appearance.
+
+Themes never define semantics.
+
+Themes may influence:
+
+- colours,
+- typography,
+- spacing,
+- branding,
+- visibility,
+- presentation intent.
+
+Themes never own document content.
+
+---
+
+# Planning Before Rendering
+
+Rendering begins only after planning has completed.
+
+The planner determines:
+
+- document flow,
+- grouping,
+- visibility,
+- ordering,
+- page intent,
+- keep rules,
+- presentation intent.
+
+Renderers must never invent planning decisions.
+
+---
+
+# Components Before Rendering
+
+Document Components define reusable presentation contracts.
+
+Renderers consume components.
+
+Renderers never recreate document structure.
+
+Component contracts must remain renderer-neutral.
+
+---
+
+# Rendering Purity
+
+Renderers translate.
+
+They do not decide.
+
+Renderers must not:
+
+- reorder content,
+- change grouping,
+- infer metadata,
+- invent headings,
+- apply business rules,
+- access Review.
+
+Renderers consume validated plans.
+
+Nothing else.
+
+---
+
+# Quality Before Rendering
+
+Quality diagnostics evaluate documents before rendering.
+
+Quality rules:
+
+- never mutate data,
+- never block export,
+- never alter planning,
+- never alter rendering.
+
+Diagnostics exist to inform users.
+
+They never repair documents automatically.
+
+---
+
+# Single Source of Truth
+
+Every responsibility has exactly one owner.
+
+Examples:
+
+Review Projector
+
+- Review → Semantic Document
+
+Theme Registry
+
+- theme resolution
+
+Document Planner
+
+- document planning
+
+Document Components
+
+- presentation contracts
+
+Quality Diagnostics
+
+- document evaluation
+
+Renderer Adapter
+
+- output generation
+
+Avoid duplicated ownership.
+
+---
+
+# Separation of Concerns
+
+Every module should have one primary responsibility.
+
+When responsibilities begin to overlap,
+extract a dedicated module.
+
+Do not merge unrelated concerns simply to reduce file count.
+
+Large files are acceptable when they represent one coherent responsibility.
+
+---
+
+# Identity
+
+Stable identifiers are preferred over positional references.
+
+Never use array indices as permanent identities.
+
+IDs must survive:
+
+- reload,
+- reorder,
+- merge,
+- split,
+- undo,
+- redo,
+- export.
+
+---
+
+# Immutability
+
+Treat all normalized models as immutable.
+
+Functions should return new objects instead of mutating existing ones.
+
+Mutation is allowed only where explicitly documented.
+
+Normalizers must never mutate input.
+
+---
+
+# Validation
+
+Validation should detect problems.
+
+Validation should not silently repair data.
+
+Validation returns:
+
+- errors,
+- warnings,
+- diagnostics.
+
+Repair belongs to dedicated transformation stages.
+
+---
+
+# Backward Compatibility
+
+Backward compatibility is a product feature.
+
+Older Reviews, Documents and Themes must continue to work whenever
+reasonably possible.
+
+Unknown future fields should be preserved.
+
+Future schema versions should produce warnings rather than data loss.
+
+---
+
+# Determinism
+
+Identical input must produce identical output.
+
+Deterministic behaviour is required for:
+
+- planning,
+- rendering,
+- diagnostics,
+- serialization,
+- export.
+
+Randomness is not permitted unless explicitly documented.
+
+---
+
+# Folder Responsibilities
+
+Each folder owns a distinct architectural layer.
+
+src/review/
+
+Review Studio
+
+Recorder
+
+Annotations
+
+History
+
+Editing
+
+Selection
+
+src/document/
+
+Semantic Document
+
+Projector
+
+Themes
+
+Planner
+
+Components
+
+Quality
+
+src/export/
+
+Renderer adapters
+
+DOCX
+
+Future PDF
+
+Future HTML
+
+src/ui/
+
+User interface
+
+Dialogs
+
+Dashboard
+
+Interaction
+
+UI must orchestrate.
+
+UI must not own business rules.
+
+---
+
+# Dependency Rules
+
+Dependencies should point downward.
+
+Allowed:
+
+UI
 
 ↓
 
@@ -1215,356 +658,414 @@ Review
 
 ↓
 
-Improve
-
-↓
-
 Document
 
 ↓
 
-Reuse
+Renderer
+
+Not allowed:
+
+Renderer
 
 ↓
 
-Build Knowledge
+Review
+
+Planner
 
 ↓
-
-Continuously Improve
-
-The product is not a click recorder.
-
-It is a Business Process Intelligence platform.
-
----
-
-# Product Modules
-
-The system consists of independent modules.
-
-Each module has one clearly defined responsibility.
-
----
-
-## Recorder
-
-Responsible for:
-
-- capturing browser activity
-- recording screenshots
-- recording events
-
-Recorder never performs documentation.
-
-Recorder never performs business analysis.
-
----
-
-## Review Studio
-
-Review Studio is the primary workspace.
-
-Most user interaction should happen here.
-
-Responsibilities:
-
-- review
-- edit
-- merge
-- split
-- reorder
-- annotate
-- validate
-- prepare documentation
-
-Whenever UX decisions are required, optimize Review Studio first.
-
----
-
-## Document Generator
-
-Responsible for generating:
-
-- Word
-- PDF (future)
-- HTML (future)
-
-Document generation should never duplicate business logic.
-
-Formatting, metadata and rendering should be shared whenever possible.
-
----
-
-## Knowledge Base
-
-Responsible for storing reusable business knowledge.
-
-Future responsibilities include:
-
-- similar process detection
-- reusable documentation
-- knowledge packs
-- process comparison
-
-Knowledge must remain independent from Recorder.
-
----
-
-## AI Assistant
-
-Responsible for:
-
-- suggestions
-- validation
-- summarisation
-- quality improvements
-
-AI assists the user.
-
-AI must never unexpectedly modify documentation.
-
----
-
-# Engineering Principles
-
-Engineering principles override implementation preferences.
-
-Whenever a conflict exists between convenience and these principles,
-the engineering principles take precedence.
-
----
-
-## Domain First
-
-The domain model defines the product.
-
-The UI visualizes the domain.
-
-Exports represent the domain.
-
-Rendering represents the domain.
-
-Never design the domain around the UI.
-
-Always design the UI around the domain.
-
----
-
-## Single Source of Truth
-
-Business logic must exist only once.
-
-Examples:
-
-Filename generation
-
-↓
-
-Preview
-
-↓
-
-Word
-
-↓
-
-Workspace
-
-↓
-
-ZIP
-
-All use the same implementation.
-
-Never duplicate business algorithms.
-
----
-
-## Data Integrity
-
-Data integrity has higher priority than feature completeness.
-
-Never risk corruption of:
-
-- Reviews
-- Tasks
-- Screenshots
-- Annotations
-- History
-
-When functionality conflicts with correctness,
-
-correctness always wins.
-
----
-
-## Stable Identity
-
-Every persistent object should have a stable identifier.
-
-Prefer:
-
-UUIDs
-
-Stable IDs
-
-Persistent references
-
-Never rely on:
-
-array indexes
-
-visual order
-
-temporary positions
-
-Identity must survive:
-
-- reorder
-- merge
-- split
-- undo
-- redo
-- persistence
-
----
-
-## Immutable Inputs
-
-Functions responsible for:
-
-- normalization
-- validation
-- rendering
-
-must never mutate input objects.
-
-Return new objects whenever transformations are required.
-
-Mutation should happen only through explicit domain commands.
-
----
-
-## Single Rendering Pipeline
-
-Rendering logic must exist only once.
-
-Preview
-
-↓
-
-Annotation Editor
-
-↓
-
-Word Export
-
-↓
-
-Future PDF Export
-
-should reuse the same rendering pipeline whenever practical.
-
-Different rendering targets are acceptable.
-
-Different rendering implementations are not.
-
-Geometry calculations must never be duplicated.
-
----
-
-## Rendering Purity
-
-Rendering is a pure transformation.
-
-Rendering modules receive immutable domain objects and produce rendered output.
-
-Rendering must never modify:
-
-- Review
-- Task
-- Screenshot
-- Annotation
-
-Rendered output is disposable.
-
-The domain model is the single source of truth.
-
-Temporary rendering data must never be persisted.
-
----
-
-## Backward Compatibility
-
-Backward compatibility is the default.
-
-Existing Review data should continue working whenever possible.
-
-Avoid mandatory migrations.
-
-Unknown future schema fields must be preserved.
-
-Unknown object types must never be discarded.
-
-Normalize without mutating original input.
-
----
-
-## Separation of Concerns
-
-Keep responsibilities separated.
 
 UI
 
-↓
-
-Application Logic
+Theme
 
 ↓
 
-Business Logic
+Review
+
+Quality
 
 ↓
 
-Persistence
+Renderer
 
-↓
-
-Rendering
-
-↓
-
-Export
-
-Never mix these responsibilities.
+When in doubt,
+introduce a new abstraction rather than violating dependency direction.
 
 ---
 
-## Reuse Before Creating
+# Implementation Handbook
 
-Before introducing:
+This section defines the implementation standards for all new development.
 
-- utilities
-- helpers
-- services
-- rendering logic
-- persistence logic
-
-search the project.
-
-Prefer extending existing implementations over introducing new ones.
+Follow these principles regardless of feature size.
 
 ---
 
-## Generated Files
+# Review Studio
 
-Never edit:
+Review Studio is the primary workspace.
 
-dist/
+It exists to help consultants transform recorded work into professional
+documentation.
 
-Generated files are outputs.
+Every implementation should reduce effort during review.
 
-Modify only source files.
+Avoid introducing workflows that require unnecessary dialogs,
+repeated exports or excessive mouse interaction.
 
-Generated files should only change through the build process.
+---
+
+# User Experience
+
+User experience is a first-class engineering concern.
+
+Prefer:
+
+- fewer clicks,
+- fewer dialogs,
+- predictable behaviour,
+- immediate feedback,
+- keyboard support,
+- progressive disclosure.
+
+Professional users should rarely need documentation to operate the product.
+
+---
+
+# Keyboard First
+
+Every frequently used operation should be available from the keyboard.
+
+Keyboard behaviour must be:
+
+- consistent,
+- discoverable,
+- accessible,
+- deterministic.
+
+Mouse interaction should never be the only supported workflow.
+
+---
+
+# Annotation Principles
+
+Annotations extend screenshots.
+
+They never modify them.
+
+Always preserve:
+
+- original screenshots,
+- annotation identity,
+- revision history,
+- future compatibility.
+
+Store annotation intent.
+
+Never store renderer-specific drawing instructions.
+
+---
+
+# Editing Principles
+
+Editing should always be reversible.
+
+Support:
+
+- Undo
+- Redo
+- Cancel
+- Autosave
+
+Edits should commit only when confirmed.
+
+Temporary editing state must remain isolated until committed.
+
+---
+
+# Export Principles
+
+Export is the final transformation.
+
+Exporters consume validated plans.
+
+They must never:
+
+- infer document structure,
+- reconstruct semantics,
+- modify document content,
+- change ordering,
+- apply business rules.
+
+The exported document should faithfully represent the planned document.
+
+---
+
+# Performance
+
+Optimise only confirmed bottlenecks.
+
+Prefer:
+
+- deterministic algorithms,
+- shared rendering,
+- cached immutable structures,
+- lazy evaluation,
+- reusable resources.
+
+Avoid premature optimisation.
+
+---
+
+# Memory Management
+
+Temporary resources must be released.
+
+Examples include:
+
+- canvas buffers,
+- object URLs,
+- event listeners,
+- pointer capture,
+- timers.
+
+Every allocation should have an explicit cleanup path.
+
+---
+
+# Error Handling
+
+Errors should be informative.
+
+Avoid silent failures.
+
+Provide:
+
+- clear user messages,
+- recoverable workflows,
+- safe fallbacks,
+- structured diagnostics.
+
+Applications should fail gracefully.
+
+---
+
+# Accessibility
+
+Accessibility is required.
+
+Every feature should support:
+
+- keyboard navigation,
+- screen readers,
+- logical focus order,
+- reduced motion,
+- sufficient contrast,
+- semantic roles.
+
+Accessibility is reviewed during every milestone.
+
+---
+
+# Testing
+
+Every implementation requires tests.
+
+Prefer behaviour tests over implementation tests.
+
+Cover:
+
+- normal behaviour,
+- edge cases,
+- regression,
+- compatibility,
+- accessibility where applicable.
+
+Tests should describe expected behaviour rather than implementation details.
+
+---
+
+# Regression Protection
+
+Every milestone must verify:
+
+- previous functionality,
+- previous exports,
+- backward compatibility,
+- deterministic output.
+
+Never assume unrelated functionality remains correct.
+
+Verify it.
+
+---
+
+# Documentation
+
+Documentation evolves together with the implementation.
+
+Update documentation whenever behaviour changes.
+
+Typical updates include:
+
+README.md
+
+CHANGELOG.md
+
+Architecture documentation
+
+Release notes
+
+Installation documentation
+
+AGENTS.md
+
+Outdated documentation is considered a defect.
+
+---
+
+# Release Process
+
+Each Release Candidate follows the same release sequence.
+
+Implementation
+
+↓
+
+Self Review
+
+↓
+
+Integrity Review
+
+↓
+
+Regression
+
+↓
+
+Documentation
+
+↓
+
+Release Review
+
+↓
+
+Milestone Commit
+
+↓
+
+Clean Workspace
+
+Do not skip stages.
+
+---
+
+# Milestone Commits
+
+Every Release Candidate should end with one milestone commit.
+
+The commit message should describe:
+
+- the milestone,
+- its purpose,
+- its architectural impact.
+
+Avoid mixing unrelated work.
+
+---
+
+# Code Quality
+
+Prefer:
+
+- explicit code,
+- descriptive names,
+- deterministic behaviour,
+- small responsibilities,
+- isolated modules.
+
+Avoid:
+
+- hidden coupling,
+- duplicated logic,
+- magic constants,
+- renderer leakage,
+- business logic in the UI.
+
+Readable code is preferred over clever code.
+
+---
+
+# Continuous Improvement
+
+Every milestone should leave the codebase in a better state.
+
+Improvements may include:
+
+- removing duplication,
+- simplifying architecture,
+- improving naming,
+- strengthening tests,
+- improving documentation,
+- reducing complexity.
+
+Never postpone obvious improvements without reason.
+
+---
+
+# Product Boundaries
+
+Documentation Excellence is intentionally focused.
+
+It is not:
+
+- a BPM suite,
+- a process mining platform,
+- a document management system,
+- an AI document generator.
+
+Its purpose is to help consultants create professional documentation
+efficiently and confidently.
+
+Future integrations may expand the ecosystem without changing this core
+purpose.
+
+---
+
+# Future Evolution
+
+Future milestones should continue to follow the same architectural direction.
+
+Major initiatives may include:
+
+- improved user experience,
+- productisation,
+- AI-assisted review,
+- additional renderers,
+- collaboration,
+- automation.
+
+New functionality should strengthen the existing workflow rather than
+replace it.
+
+---
+
+# Final Principle
+
+Every implementation should leave the product more professional than it
+was before.
+
+The goal is not to build more software.
+
+The goal is to make consultants better at documenting business processes.
+
+If a future developer is unsure whether a feature belongs in the product,
+return to the Product Philosophy.
+
+Everything begins there.
+
+---
