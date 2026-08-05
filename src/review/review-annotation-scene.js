@@ -15,6 +15,19 @@
     return value;
   }
 
+  function finiteStyle(value, fallback, minimum = 0, maximum = 1) {
+    return Number.isFinite(value) && value >= minimum && value <= maximum
+      ? value
+      : fallback;
+  }
+
+  function colorStyle(value, fallback) {
+    return typeof value === "string" && value.trim() &&
+      !/^url\s*\(/i.test(value.trim())
+      ? value
+      : fallback;
+  }
+
   function rectanglePrimitive(annotation, width, height) {
     const geometry = annotations.normalizeGeometry(
       annotations.TYPES.RECTANGLE,
@@ -31,9 +44,18 @@
       y: geometry.y * height,
       width: geometry.width * width,
       height: geometry.height * height,
-      stroke: style.stroke,
-      strokeWidth: style.strokeWidth * Math.min(width, height),
-      opacity: style.opacity
+      stroke: colorStyle(
+        style.stroke,
+        annotations.DEFAULT_STYLES[annotations.TYPES.RECTANGLE].stroke
+      ),
+      strokeWidth: finiteStyle(
+        style.strokeWidth,
+        annotations.DEFAULT_STYLES[annotations.TYPES.RECTANGLE].strokeWidth
+      ) * Math.min(width, height),
+      opacity: finiteStyle(
+        style.opacity,
+        annotations.DEFAULT_STYLES[annotations.TYPES.RECTANGLE].opacity
+      )
     };
   }
 
@@ -56,9 +78,15 @@
     const unitX = deltaX / distance;
     const unitY = deltaY / distance;
     const scale = Math.min(width, height);
-    const headLength = Math.min(style.arrowheadLength * scale, distance * 0.6);
+    const headLength = Math.min(finiteStyle(
+      style.arrowheadLength,
+      annotations.DEFAULT_STYLES[annotations.TYPES.ARROW].arrowheadLength
+    ) * scale, distance * 0.6);
     const halfWidth = Math.min(
-      style.arrowheadWidth * scale / 2,
+      finiteStyle(
+        style.arrowheadWidth,
+        annotations.DEFAULT_STYLES[annotations.TYPES.ARROW].arrowheadWidth
+      ) * scale / 2,
       distance * 0.3
     );
     const baseX = endX - unitX * headLength;
@@ -75,9 +103,18 @@
         [baseX - unitY * halfWidth, baseY + unitX * halfWidth],
         [baseX + unitY * halfWidth, baseY - unitX * halfWidth]
       ],
-      stroke: style.stroke,
-      strokeWidth: style.strokeWidth * scale,
-      opacity: style.opacity
+      stroke: colorStyle(
+        style.stroke,
+        annotations.DEFAULT_STYLES[annotations.TYPES.ARROW].stroke
+      ),
+      strokeWidth: finiteStyle(
+        style.strokeWidth,
+        annotations.DEFAULT_STYLES[annotations.TYPES.ARROW].strokeWidth
+      ) * scale,
+      opacity: finiteStyle(
+        style.opacity,
+        annotations.DEFAULT_STYLES[annotations.TYPES.ARROW].opacity
+      )
     };
   }
 

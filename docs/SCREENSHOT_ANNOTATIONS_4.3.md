@@ -103,3 +103,22 @@ coordinates as its approved reference. Browser rasterizers may differ by
 anti-aliasing at subpixel edges, so pixel-perfect PNG comparison is deliberately
 not used; acceptable variation is limited to edge anti-aliasing while geometry,
 colors, dimensions and element ordering must match exactly.
+
+## RC6 release hardening
+
+The final integrity pass prevents Undo/Redo shortcuts in annotation mode from
+crossing into task commands that are not visible in that mode. This keeps the
+editor baseline, current task state and history index consistent. Escape first
+closes the active annotation editor; the outer Review dialog remains available
+and focus returns to the originating screenshot action.
+
+The focus trap excludes descendants of hidden editor sections and CSS-hidden
+toolbars. Pointer-capture failure and stale keyboard selection are reconciled
+without committing partial geometry. Invalid persisted style values fall back
+only during scene rendering; the source annotation and all unknown future
+fields remain unchanged.
+
+Export image loaders release their event callbacks after settling, dimensions
+are validated before canvas allocation, and temporary canvas storage is cleared
+on both success and failure. A failed persistence attempt remains recoverable in
+memory and is reported if Word generation succeeds from that current state.

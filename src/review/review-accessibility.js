@@ -14,7 +14,9 @@
 
   function focusableElements(dialog) {
     return [...dialog.querySelectorAll(FOCUSABLE)].filter(element =>
-      element.getAttribute?.("aria-hidden") !== "true"
+      element.getAttribute?.("aria-hidden") !== "true" &&
+      !element.closest?.("[hidden]") &&
+      (!element.getClientRects || element.getClientRects().length > 0)
     );
   }
 

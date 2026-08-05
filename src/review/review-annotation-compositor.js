@@ -20,8 +20,16 @@
     }
     return new Promise((resolve, reject) => {
       const image = new ImageConstructor();
-      image.onload = () => resolve(image);
-      image.onerror = () => reject(new Error("The export image could not be loaded."));
+      image.onload = () => {
+        image.onload = null;
+        image.onerror = null;
+        resolve(image);
+      };
+      image.onerror = () => {
+        image.onload = null;
+        image.onerror = null;
+        reject(new Error("The export image could not be loaded."));
+      };
       image.src = source;
     });
   }
@@ -41,6 +49,10 @@
     const baseImage = await loadImage(source, options);
     const width = baseImage.naturalWidth || baseImage.width;
     const height = baseImage.naturalHeight || baseImage.height;
+    if (!Number.isFinite(width) || width <= 0 ||
+        !Number.isFinite(height) || height <= 0) {
+      throw new Error("The export image has invalid dimensions.");
+    }
     const canvas = createCanvas(width, height);
     canvas.width = width;
     canvas.height = height;

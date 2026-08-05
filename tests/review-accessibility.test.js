@@ -1,12 +1,18 @@
 const assert = require("assert");
 const accessibility = require("../src/review/review-accessibility");
 
-function element(hidden = false) {
+function element(hidden = false, hiddenAncestor = false, cssHidden = false) {
   return {
     focused: false,
     focus() { this.focused = true; },
     getAttribute(name) {
       return name === "aria-hidden" && hidden ? "true" : null;
+    },
+    closest(selector) {
+      return selector === "[hidden]" && hiddenAncestor ? {} : null;
+    },
+    getClientRects() {
+      return cssHidden ? [] : [{}];
     }
   };
 }
@@ -15,13 +21,15 @@ const first = element();
 const middle = element();
 const last = element();
 const hidden = element(true);
+const insideHiddenSection = element(false, true);
+const cssHidden = element(false, false, true);
 const listeners = {};
 const removed = {};
 const dialog = {
   focused: false,
   querySelectorAll(selector) {
     assert.strictEqual(selector, accessibility.FOCUSABLE);
-    return [first, hidden, middle, last];
+    return [first, hidden, insideHiddenSection, cssHidden, middle, last];
   },
   focus() { this.focused = true; },
   addEventListener(type, listener) { listeners[type] = listener; },

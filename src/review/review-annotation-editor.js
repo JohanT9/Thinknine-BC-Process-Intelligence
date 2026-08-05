@@ -235,6 +235,14 @@
     return Boolean(state?.draft || state?.translation);
   }
 
+  function canRestoreAnnotation(review, direction) {
+    const index = direction === "undo"
+      ? review.historyIndex - 1
+      : review.historyIndex;
+    return review.commandHistory?.[index]?.type?.startsWith("annotation-") ||
+      false;
+  }
+
   return {
     create,
     selectTool,
@@ -255,6 +263,7 @@
     releasePointer,
     baseline,
     restoreBaseline,
-    hasActiveGesture
+    hasActiveGesture,
+    canRestoreAnnotation
   };
 });

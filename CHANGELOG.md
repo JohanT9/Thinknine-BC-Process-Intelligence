@@ -1,5 +1,21 @@
 # Changelog
 
+## 4.3.0 RC6 — Release Hardening
+
+- Excluded controls inside hidden editor sections and CSS-hidden toolbars from
+  the focus trap, and made Escape close the editor before Review Studio.
+- Prevented annotation-editor shortcuts from undoing hidden task commands and
+  corrupting the editor baseline/history relationship.
+- Reconciled stale annotation selection during keyboard movement and hardened
+  pointer-capture failure handling.
+- Added safe rendering fallbacks for invalid persisted annotation styles and
+  invalid source-image dimensions without mutating stored data.
+- Released image event handlers after load and retained guaranteed canvas
+  cleanup for successful and failed exports.
+- Added an actionable warning when Word export succeeds from in-memory changes
+  that could not be persisted.
+- Added focused accessibility, history, rendering and memory regressions.
+
 ## 4.3.0 RC5 — Word Annotation Rendering
 
 - Added temporary, non-destructive PNG composition for annotated Word images.

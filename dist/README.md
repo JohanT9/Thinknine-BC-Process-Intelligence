@@ -65,6 +65,13 @@ Varje använd skärmbild komponeras högst en gång per export. Skärmbilder uta
 stödda annoteringar exporteras byte-identiskt enligt den tidigare vägen, och
 okända framtida annotationstyper ignoreras utan att stoppa exporten.
 
+### RC6 — Release hardening
+
+Den slutliga kvalitetsgranskningen har förstärkt tangentbordsfokus, Escape-
+beteende, historikskydd i annotationsläget och felhantering vid export. Ogiltiga
+framtida annotationsstilar renderas med säkra standardvärden utan att lagrad
+data ändras. Bildresurser och canvasminne frigörs även på felvägar.
+
 ## Struktur
 
 ```text

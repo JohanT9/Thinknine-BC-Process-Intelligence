@@ -169,6 +169,22 @@ function renderingEnvironment() {
   );
   assert.deepStrictEqual([failedCanvas.width, failedCanvas.height], [0, 0]);
 
+  class InvalidImage {
+    set src(value) {
+      this._src = value;
+      this.naturalWidth = 0;
+      this.naturalHeight = 0;
+      queueMicrotask(() => this.onload());
+    }
+  }
+  await assert.rejects(
+    compositor.composeScreenshot(sources["one.png"], [rectangle], {
+      ImageConstructor: InvalidImage,
+      createCanvas() { throw new Error("Canvas must not be allocated."); }
+    }),
+    /invalid dimensions/
+  );
+
   const workflowReview = reviewStudio.createReview(
     { id: "workflow", name: "Workflow" },
     [

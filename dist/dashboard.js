@@ -3683,6 +3683,15 @@ function splitSelectedReviewTask() {
 
 function restoreReviewHistory(direction) {
   if (!activeReview) return;
+  if (annotationEditorState &&
+      !globalThis.T9ReviewAnnotationEditor.canRestoreAnnotation(
+        activeReview,
+        direction
+      )) {
+    $("annotationStatus").textContent =
+      "Det finns ingen annoteringsändring att återställa.";
+    return;
+  }
   const previous = globalThis.T9ReviewMove.capturePositions($("reviewList"));
   const result = direction === "undo"
     ? globalThis.T9Review.undo(activeReview)
@@ -4563,8 +4572,17 @@ $("annotationSurface").addEventListener("pointerdown", event => {
     )
     : globalThis.T9ReviewAnnotationEditor.begin(annotationEditorState, start);
   annotationEditorState = { ...nextState, pointerId: event.pointerId };
+  try {
+    event.currentTarget.setPointerCapture?.(event.pointerId);
+  } catch {
+    annotationEditorState = globalThis.T9ReviewAnnotationEditor.cancel(
+      annotationEditorState
+    );
+    releaseActiveAnnotationPointer();
+    $("annotationStatus").textContent =
+      "Pekgesten kunde inte startas. Försök igen.";
+  }
   renderActiveAnnotation();
-  event.currentTarget.setPointerCapture?.(event.pointerId);
   event.preventDefault();
 });
 $("annotationSurface").addEventListener("pointermove", event => {
@@ -4650,6 +4668,14 @@ $("annotationSurface").addEventListener("keydown", event => {
       annotationEditorState.selectedId) {
     event.preventDefault();
     const annotation = annotationById(annotationEditorState.selectedId);
+    if (!annotation) {
+      annotationEditorState = globalThis.T9ReviewAnnotationEditor.select(
+        annotationEditorState,
+        null
+      );
+      renderActiveAnnotation();
+      return;
+    }
     const image = $("annotationImage");
     const multiplier = event.shiftKey ? 10 : 1;
     const horizontal = multiplier / image.naturalWidth;
@@ -4682,19 +4708,23 @@ $("annotationSurface").addEventListener("keydown", event => {
     );
     releaseActiveAnnotationPointer();
     renderActiveAnnotation();
-    $("annotationStatus").textContent = "Pågående rektangel avbröts.";
+    $("annotationStatus").textContent = "Pågående markering avbröts.";
   }
 });
 async function exportReviewFromToolbar(button) {
   button.disabled = true;
   button.textContent = "Skapar Word...";
+  let persistenceWarning = "";
   try {
     await reviewPersistence.saveExplicitly({ render: false });
-  } catch {
-    // Export may continue with the active in-memory review.
+  } catch (error) {
+    persistenceWarning =
+      `Word skapades från aktuella ändringar, men de kunde inte sparas: ` +
+      error.message;
   }
   try {
     await exportActiveReviewToWord();
+    if (persistenceWarning) show(persistenceWarning, true);
   } catch (error) {
     show(error.message, true);
   } finally {
@@ -4765,7 +4795,17 @@ $("completeReview").addEventListener("click", async () => {
     show(error.message, true);
   }
 });
-globalThis.T9ReviewAccessibility.bindDialog($("reviewDialog"), closeReview);
+globalThis.T9ReviewAccessibility.bindDialog($("reviewDialog"), async () => {
+  try {
+    if (annotationEditorState) await closeAnnotationEditor();
+    else await closeReview();
+  } catch (error) {
+    const target = annotationEditorState
+      ? $("annotationStatus")
+      : $("reviewFooterText");
+    target.textContent = `Det gick inte att stänga: ${error.message}`;
+  }
+});
 $("reviewOverlay").addEventListener("click", event => {
   if (event.target === $("reviewOverlay")) closeReview();
 });

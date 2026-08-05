@@ -30,6 +30,24 @@ assert.deepStrictEqual(scene.create([{
 }], 100, 100), []);
 assert.throws(() => scene.create([], 0, 100), /greater than zero/);
 
+const invalidStyleAnnotation = {
+  annotationId: "ann_invalid_style",
+  type: "rectangle",
+  geometry: { x: 0.1, y: 0.1, width: 0.2, height: 0.2 },
+  style: {
+    stroke: "url(https://invalid.example/image)",
+    strokeWidth: Number.POSITIVE_INFINITY,
+    opacity: 2,
+    futureStyle: { preserved: true }
+  }
+};
+const invalidStyleSnapshot = JSON.stringify(invalidStyleAnnotation);
+const safePrimitive = scene.create([invalidStyleAnnotation], 1000, 500)[0];
+assert.strictEqual(safePrimitive.stroke, annotations.DEFAULT_STYLES.rectangle.stroke);
+assert.strictEqual(safePrimitive.strokeWidth, 3);
+assert.strictEqual(safePrimitive.opacity, 1);
+assert.strictEqual(JSON.stringify(invalidStyleAnnotation), invalidStyleSnapshot);
+
 const arrowPrimitives = scene.create([{
   annotationId: "ann_arrow",
   type: "arrow",

@@ -112,6 +112,28 @@ assert.strictEqual(editor.hasActiveGesture(cancelled), false);
 assert.strictEqual(cancelled.draft, null);
 assert.strictEqual(JSON.stringify(persistedReview), persistedSnapshot);
 
+assert.strictEqual(editor.canRestoreAnnotation({
+  commandHistory: [
+    { type: "edit" },
+    { type: "annotation-move" }
+  ],
+  historyIndex: 2
+}, "undo"), true);
+assert.strictEqual(editor.canRestoreAnnotation({
+  commandHistory: [
+    { type: "edit" },
+    { type: "annotation-move" }
+  ],
+  historyIndex: 1
+}, "undo"), false);
+assert.strictEqual(editor.canRestoreAnnotation({
+  commandHistory: [
+    { type: "edit" },
+    { type: "annotation-move" }
+  ],
+  historyIndex: 1
+}, "redo"), true);
+
 const released = [];
 const capturedSurface = {
   hasPointerCapture(pointerId) { return pointerId === 7; },
