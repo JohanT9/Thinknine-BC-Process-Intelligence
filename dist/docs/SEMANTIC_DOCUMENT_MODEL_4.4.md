@@ -191,9 +191,18 @@ and Document Plan schemas. The analysis receives immutable document and plan
 snapshots and returns disposable findings with stable source references. No
 diagnostic, summary or rule state is persisted into either model.
 
-## RC7 exclusions
+## RC8 presentation boundary
+
+RC8 ändrar inte Semantic Document-schemat eller projektorn. Professionell
+presentation härleds först efter den semantiska gränsen genom kombinationen av
+ett upplöst tema och Document Planner. Samma semantiska dokument ger därför
+samma innehåll oavsett presentation, och framtida renderare kan återanvända
+planens renderer-neutrala intentioner utan att semantik kopieras.
+
+## RC8 exclusions
 
 - no theme selection or branding UI;
-- no PDF or HTML integration;
+- no PDF or HTML export integration;
 - no automated document-improvement processors;
-- no branding UI, branding asset loading, templates or visible layout changes.
+- no AI, branding UI, branding asset loading or template editor;
+- no exact pagination engine; final pagination remains Word's responsibility.

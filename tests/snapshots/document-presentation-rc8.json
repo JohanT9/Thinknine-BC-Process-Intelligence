@@ -1,0 +1,66 @@
+{
+  "document": {
+    "profile": "professional",
+    "margins": {
+      "top": 18,
+      "right": 18,
+      "bottom": 18,
+      "left": 20,
+      "header": 9,
+      "footer": 9,
+      "unit": "mm"
+    },
+    "lineHeight": 1.22
+  },
+  "cover": {
+    "composition": "balancedCover",
+    "hierarchy": "brandTypeTitleSubtitleMetadata",
+    "titleSize": 30,
+    "metadataWidth": 86,
+    "metadataGrouping": [
+      "identity",
+      "identity",
+      "context",
+      "context",
+      "review",
+      "review"
+    ]
+  },
+  "workflow": {
+    "composition": "orderedWorkflow",
+    "headingDivider": 8,
+    "stepComposition": "instructionWithEvidence",
+    "stepHeadingStyle": "band",
+    "instructionKeepWithNext": true
+  },
+  "screenshots": [
+    {
+      "emphasis": "primary",
+      "widthIntent": "fullContent",
+      "grouping": "screenshotSequence",
+      "maxWidth": 640,
+      "frame": "framed",
+      "preserveAspectRatio": true,
+      "preserveQuality": true
+    },
+    {
+      "emphasis": "supporting",
+      "widthIntent": "consistentSupporting",
+      "grouping": "screenshotSequence",
+      "maxWidth": 600,
+      "frame": "framed",
+      "preserveAspectRatio": true,
+      "preserveQuality": true
+    }
+  ],
+  "callout": {
+    "role": "note",
+    "grouping": "stepSupport",
+    "borderColor": "#2673a8",
+    "fillColor": "#edf6fb"
+  },
+  "revision": {
+    "rowIntegrity": true,
+    "headerFill": "#d9eaf7"
+  }
+}

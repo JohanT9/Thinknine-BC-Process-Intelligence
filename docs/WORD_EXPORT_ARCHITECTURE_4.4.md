@@ -92,3 +92,15 @@ Known limitation: Word performs final pagination, so automated tests validate
 page-field instructions and structural intent rather than the final page count.
 Malformed Reviews without any usable timestamp produce a blank date instead of
 introducing a non-deterministic current date.
+
+## RC8 presentation mapping
+
+RC8 changes visible presentation without widening the adapter boundary. Planner
+resolves hierarchy, grouping, image emphasis, whitespace, callout roles and
+flow intent from the selected theme. The Word adapter maps that plan to DOCX
+paragraphs, tables, borders, shading, fonts, spacing and image dimensions.
+
+Backward fallbacks remain in the adapter so valid pre-RC8 Document Plans render
+with their previous defaults. These fallbacks are format mapping, not a second
+planning implementation. The adapter still never imports Review, the projector,
+the theme registry or quality rules.

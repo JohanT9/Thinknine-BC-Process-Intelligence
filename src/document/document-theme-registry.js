@@ -167,14 +167,42 @@
     page: { size: "A4", orientation: "portrait", background: "{colors.background}" },
     branding: { organizationName: "", logo: "", footer: "" },
     components: {
-      document: { fontFamily: "Arial", fontSize: 11 },
-      header: { textColor: "{colors.muted}", borderColor: "{colors.primary}" },
-      footer: { textColor: "{colors.muted}", borderColor: "{colors.border}" },
-      cover: { accentColor: "{colors.primary}" },
-      metadataTable: { borderColor: "{colors.border}" },
-      step: { accentColor: "{colors.primary}" },
-      screenshot: {},
+      document: {
+        fontFamily: "Arial", fontSize: 11, lineHeight: 1.15,
+        paragraphAfter: 6,
+        margins: { top: 20, right: 20, bottom: 20, left: 20,
+          header: 10, footer: 10, unit: "mm" }
+      },
+      header: {
+        textColor: "{colors.muted}", borderColor: "{colors.primary}",
+        fontSize: 9
+      },
+      footer: {
+        textColor: "{colors.muted}", borderColor: "{colors.border}",
+        fontSize: 9
+      },
+      cover: {
+        accentColor: "{colors.primary}", mutedColor: "{colors.muted}",
+        brandSize: 12, documentTypeSize: 13, titleSize: 26,
+        subtitleSize: 13, metadataWidth: 100,
+        spacing: { brandAfter: 6, typeAfter: 8, titleAfter: 11,
+          subtitleAfter: 18 }
+      },
+      metadataTable: {
+        width: 100, labelWidth: 30, borderColor: "{colors.border}",
+        labelFill: "{colors.background}", valueFill: "{colors.background}",
+        cellPadding: 4
+      },
+      heading: { dividerColor: "{colors.primary}", dividerSize: 0 },
+      step: {
+        accentColor: "{colors.primary}", headingColor: "{colors.primary}",
+        headingStyle: "plain"
+      },
+      screenshot: {
+        maxWidth: 590, maxHeight: 390, presentationStyle: "plain"
+      },
       callout: { noteColor: "{colors.note}", warningColor: "{colors.warning}" },
+      table: { borderColor: "{colors.border}" },
       revisionHistory: { borderColor: "{colors.border}" },
       toc: { textColor: "{colors.text}", title: "Innehåll" }
     },
@@ -204,6 +232,7 @@
       secondary: "#5f6b76",
       note: "#dbeafe"
     },
+    spacing: { page: 10, section: 9, paragraph: 5, component: 7 },
     typography: {
       title: { family: "Aptos", size: 26, weight: 700, color: "{colors.primary}" },
       heading1: { family: "Aptos", size: 16, weight: 700, color: "{colors.primary}" },
@@ -212,28 +241,106 @@
       caption: { family: "Aptos", size: 9, weight: 400, color: "{colors.muted}" }
     },
     components: {
-      document: { fontFamily: "Aptos", fontSize: 11 },
-      header: { textColor: "#5f6b76", borderColor: "#0f4c81" },
-      footer: { textColor: "#5f6b76", borderColor: "#b8c2cc" },
+      document: {
+        fontFamily: "Aptos", fontSize: 10.5, lineHeight: 1.22,
+        paragraphAfter: 6,
+        margins: { top: 18, right: 18, bottom: 18, left: 20,
+          header: 9, footer: 9, unit: "mm" }
+      },
+      header: {
+        textColor: "#5f6b76", borderColor: "#0f4c81", fontSize: 8.5
+      },
+      footer: {
+        textColor: "#5f6b76", borderColor: "#b8c2cc", fontSize: 8.5
+      },
       cover: {
         brandText: "THINKNINE",
         documentType: "Arbetsinstruktion",
         subtitle: "Business Central Process Documentation",
         accentColor: "#0f4c81",
-        mutedColor: "#5f6b76"
+        mutedColor: "#5f6b76",
+        dividerColor: "#38a3d1",
+        dividerSize: 2,
+        brandSize: 11,
+        documentTypeSize: 14,
+        titleSize: 30,
+        subtitleSize: 12,
+        metadataWidth: 86,
+        spacing: { brandAfter: 10, typeAfter: 16, titleAfter: 10,
+          subtitleAfter: 24 }
       },
       metadataTable: {
+        width: 86,
+        labelWidth: 34,
         labelFill: "#eaf2f8",
+        valueFill: "#ffffff",
         borderColor: "#b8c2cc",
-        insideBorderColor: "#d5dce3"
+        insideBorderColor: "#d5dce3",
+        cellPadding: 5,
+        groupSpacing: 2,
+        style: "compact"
       },
-      step: { headingColor: "#1e5e8c", instructionSize: 12 },
-      screenshot: { maxWidth: 590, maxHeight: 390 },
-      callout: { borderColor: "#d6a700", fillColor: "#fff7cc" },
+      heading: {
+        dividerColor: "#38a3d1",
+        dividerSize: 8,
+        before: 14,
+        after: 7
+      },
+      step: {
+        headingColor: "#0f4c81",
+        headingFill: "#eaf2f8",
+        headingBorderColor: "#38a3d1",
+        headingStyle: "band",
+        instructionSize: 11,
+        before: 10,
+        after: 5
+      },
+      screenshot: {
+        maxWidth: 640,
+        maxHeight: 455,
+        supportingMaxWidth: 600,
+        presentationStyle: "framed",
+        borderColor: "#c8d5df",
+        backgroundColor: "#f7fafc",
+        borderSize: 4,
+        cellPadding: 5,
+        before: 7,
+        after: 12
+      },
+      callout: {
+        borderColor: "#2673a8",
+        fillColor: "#edf6fb",
+        labelColor: "#0f4c81",
+        borderSize: 12,
+        roleStyles: {
+          information: { borderColor: "#2673a8", fillColor: "#edf6fb" },
+          note: { borderColor: "#2673a8", fillColor: "#edf6fb" },
+          warning: { borderColor: "#c27a00", fillColor: "#fff4d6" },
+          tip: { borderColor: "#2f855a", fillColor: "#edf8f2" },
+          decision: { borderColor: "#6b46a1", fillColor: "#f4effb" },
+          example: { borderColor: "#5f6b76", fillColor: "#f3f5f7" }
+        },
+        before: 6,
+        after: 9
+      },
+      table: {
+        borderColor: "#b8c2cc",
+        insideBorderColor: "#d5dce3",
+        headerFill: "#eaf2f8",
+        rowIntegrity: true,
+        cellPadding: 4,
+        before: 6,
+        after: 9
+      },
       revisionHistory: {
         headerFill: "#d9eaf7",
         borderColor: "#b8c2cc",
-        insideBorderColor: "#d5dce3"
+        insideBorderColor: "#d5dce3",
+        headerEmphasis: true,
+        rowIntegrity: true,
+        cellPadding: 4,
+        before: 6,
+        after: 8
       },
       toc: { textColor: "{colors.text}", title: "Innehåll" }
     },

@@ -33,9 +33,11 @@
     ["toc", "tableOfContents", ["headingLevelRange", "updateField"], ["blockId"], "table of contents",
       ["components.toc"], ["supportsTOC"]],
     ["pageBreak", "pageBreak", [], ["blockId"], "page break", [], []],
-    ["heading", "heading", ["text", "level"], ["blockId"], "heading", [], []],
+    ["heading", "heading", ["text", "level"], ["blockId"], "heading",
+      ["components.heading"], []],
     ["paragraph", "paragraph", ["text"], ["blockId"], "paragraph", [], []],
-    ["table", "table", [], ["blockId"], "table", [], []],
+    ["table", "table", [], ["blockId"], "table",
+      ["components.table"], []],
     ["list", "list", [], ["blockId"], "list", [], []],
     ["group", "group", [], [], "content group", [], []],
     ["generic", "content", [], [], "document content", [], []]

@@ -24,7 +24,7 @@
     ]),
     components: Object.freeze([
       "document", "header", "footer", "cover", "metadataTable", "step",
-      "screenshot", "callout", "revisionHistory", "toc"
+      "heading", "screenshot", "callout", "table", "revisionHistory", "toc"
     ])
   });
   const CAPABILITIES = Object.freeze([

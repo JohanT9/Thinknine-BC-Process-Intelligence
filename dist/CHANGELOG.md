@@ -1,5 +1,24 @@
 # Changelog
 
+## 4.4.0 RC8 — Smart Presentation & Professional Layout
+
+- Added professional, renderer-neutral presentation intent for cover, metadata,
+  headings, steps, screenshots, callouts, tables and revision history.
+- Expanded the Theme System with backward-compatible typography, spacing,
+  document, component and semantic-role presentation tokens.
+- Improved screenshot emphasis, aspect-ratio preservation, supporting-image
+  consistency and grouping without changing screenshot or annotation data.
+- Improved section flow using `keepWithNext`, `keepTogether`, row integrity and
+  grouping intent, while leaving final pagination to Word.
+- Kept the Word adapter renderer-only: it consumes resolved Document Plan values
+  and contains no Review, semantic projection or theme resolution logic.
+- Preserved existing Reviews, Semantic Documents, themes and legacy Document
+  Plans without migration.
+- Added behaviour, snapshot, DOCX structure, determinism, immutability,
+  repeated-export and legacy-plan compatibility tests.
+- Added same-Review RC7/RC8 visual comparison artifacts for the cover and
+  workflow presentation.
+
 ## 4.4.0 RC7 — Document Quality Diagnostics
 
 - Added renderer-neutral, immutable and serialization-safe document quality

@@ -107,6 +107,18 @@ deterministisk, immutable, härledd och blockerar aldrig export. RC7 visar ingen
 ny stor UI; resultatet finns programmässigt som `qualityDiagnostics` i
 Word-pipelinen. Se [Document Quality 4.4](docs/DOCUMENT_QUALITY_4.4.md).
 
+### RC8 — Smart Presentation och professionell layout
+
+Word-dokumenten använder nu Document Plan fullt ut för en tydligare visuell
+hierarki, balanserad försättssida, kompakt metadata, konsekventa stegband,
+rollstyrda callouts, större skärmbilder och bättre sektionsflöde. Allt
+presentationsbeslut fattas av Planner utifrån temats tokens; Word-adaptern
+översätter bara den färdiga planen till DOCX.
+
+Review och Semantic Document är oförändrade, så innehållet är detsamma och inga
+migreringar krävs. Se [Presentation Planning 4.4](docs/PRESENTATION_PLANNING_4.4.md)
+och den [visuella RC7/RC8-jämförelsen](docs/RC8_VISUAL_COMPARISON.md).
+
 ## Screenshot annotations 4.3 RC1
 
 Review-modellen har en ny, versionshanterad grund för icke-destruktiva

@@ -57,6 +57,23 @@ av dem och påverkar varken Planner eller renderer. Regelregistret kan utökas u
 ändring av exekveringsmotorn, och ett regelundantag isoleras så att exporten
 fortsätter.
 
+RC8 aktiverar professionell presentation inom samma ansvarsfördelning:
+
+```text
+Semantic Document (vad dokumentet säger)
+  + Resolved Theme (visuella tokens)
+  ↓ Document Planner
+Document Plan (hierarki, gruppering, presentation och flödesintention)
+  ↓ Word Adapter
+DOCX (formatmappning, ingen planering)
+```
+
+Planner äger bildbetoning, sekvensgruppering, metadataformat, sektionsövergångar,
+callout-roller, whitespace-intention och `keep`-relationer. Alla visuella värden
+kommer från det upplösta temat. Word-adaptern mappar endast dessa beslut till
+`docx`-objekt och Word-enheter. Review Projector och Semantic Document ändrades
+inte, och kvalitetsdiagnostiken är fortsatt rådgivande och skrivskyddad.
+
 ```text
 Recorder
   ↓

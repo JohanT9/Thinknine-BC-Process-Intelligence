@@ -102,16 +102,47 @@ function fittedImageSize(bytes, limits = {}) {
   };
 }
 
+function halfPoints(value, fallback) {
+  return Math.round((Number(value) || fallback) * 2);
+}
+
+function pointSpacing(value, fallback) {
+  return Math.round((Number.isFinite(Number(value))
+    ? Number(value)
+    : fallback) * 20);
+}
+
+function componentSpacing(component, fallback = {}) {
+  return {
+    before: pointSpacing(component?.spacingIntent?.before, fallback.before || 0),
+    after: pointSpacing(component?.spacingIntent?.after, fallback.after || 0),
+  };
+}
+
+function cellMargins(value) {
+  const margin = pointSpacing(value, 0);
+  return { top: margin, right: margin, bottom: margin, left: margin };
+}
+
+function millimeters(value, fallback) {
+  return Math.round((Number(value) || fallback) * 56.6929);
+}
+
 function bodyParagraph(text, options = {}) {
   return new Paragraph({
-    spacing: { after: options.after ?? 140 },
+    spacing: options.spacing || { after: options.after ?? 140 },
     alignment: options.alignment,
+    keepNext: Boolean(options.keepNext),
+    keepLines: Boolean(options.keepLines),
+    border: options.border,
+    shading: options.shading,
     children: [new TextRun({
       text: plainText(text),
       bold: Boolean(options.bold),
       italics: Boolean(options.italics),
       color: options.color,
       size: options.size,
+      font: options.font,
     })],
   });
 }
@@ -121,13 +152,43 @@ function headingComponent(component, levelOverride) {
     ? HeadingLevel.HEADING_2
     : HeadingLevel.HEADING_1);
   const fallback = level === HeadingLevel.HEADING_1 ? "0F4C81" : "1E5E8C";
+  const professionalBand = component.appearance.headingStyle === "band";
+  const dividerSize = Number(component.appearance.dividerSize) || 0;
+  const professional = professionalBand || dividerSize > 0 ||
+    component.presentationIntent?.avoidOrphan;
   return new Paragraph({
     heading: level,
-    spacing: { before: level === HeadingLevel.HEADING_1 ? 320 : 220, after: 120 },
+    keepNext: component.keepWithNext !== false,
+    keepLines: true,
+    spacing: professional && component.spacingIntent
+      ? componentSpacing(component, {
+        before: level === HeadingLevel.HEADING_1 ? 16 : 11,
+        after: 6,
+      })
+      : { before: level === HeadingLevel.HEADING_1 ? 320 : 220, after: 120 },
+    shading: professionalBand ? {
+      type: ShadingType.CLEAR,
+      fill: color(component.appearance.headingFill, "EAF2F8"),
+    } : undefined,
+    border: professionalBand ? { left: {
+      style: BorderStyle.SINGLE,
+      size: 18,
+      color: color(component.appearance.headingBorderColor, "38A3D1"),
+      space: 8,
+    } } : dividerSize ? { bottom: {
+      style: BorderStyle.SINGLE,
+      size: dividerSize,
+      color: color(component.appearance.dividerColor, fallback),
+      space: 5,
+    } } : undefined,
     children: [new TextRun({
       text: plainText(component.content.text),
       bold: true,
       color: color(component.appearance.typography?.color, fallback),
+      size: component.appearance.typography?.size
+        ? halfPoints(component.appearance.typography.size, 13)
+        : undefined,
+      font: component.appearance.typography?.family,
     })],
   });
 }
@@ -146,8 +207,13 @@ function tableBorders(appearance, size = 1) {
 }
 
 function metadataTable(component) {
+  const compact = component.appearance.style === "compact";
   return new Table({
-    width: { size: 100, type: WidthType.PERCENTAGE },
+    width: {
+      size: Number(component.appearance.width) || 100,
+      type: WidthType.PERCENTAGE,
+    },
+    alignment: compact ? AlignmentType.CENTER : undefined,
     borders: tableBorders(component.appearance),
     rows: (component.content.rows || []).map(row => {
       const label = row.label;
@@ -155,9 +221,15 @@ function metadataTable(component) {
       const value = row.key === "date"
         ? safeDate(rawValue)
         : rawValue;
-      return new TableRow({ children: [
+      return new TableRow({ cantSplit: true, children: [
         new TableCell({
-          width: { size: 30, type: WidthType.PERCENTAGE },
+          width: {
+            size: Number(component.appearance.labelWidth) || 30,
+            type: WidthType.PERCENTAGE,
+          },
+          margins: compact
+            ? cellMargins(component.appearance.cellPadding)
+            : undefined,
           shading: {
             type: ShadingType.CLEAR,
             fill: color(component.appearance.labelFill, "EAF2F8"),
@@ -167,7 +239,17 @@ function metadataTable(component) {
           })],
         }),
         new TableCell({
-          width: { size: 70, type: WidthType.PERCENTAGE },
+          width: {
+            size: 100 - (Number(component.appearance.labelWidth) || 30),
+            type: WidthType.PERCENTAGE,
+          },
+          margins: compact
+            ? cellMargins(component.appearance.cellPadding)
+            : undefined,
+          shading: compact ? {
+            type: ShadingType.CLEAR,
+            fill: color(component.appearance.valueFill, "FFFFFF"),
+          } : undefined,
           children: [new Paragraph({
             children: [new TextRun(String(value || ""))],
           })],
@@ -179,23 +261,43 @@ function metadataTable(component) {
 
 function commentBox(component) {
   const border = color(component.appearance.borderColor, "D6A700");
+  const professional = Number(component.appearance.borderSize) > 2;
+  const none = { style: BorderStyle.NONE, size: 0, color: border };
   return new Table({
     width: { size: 100, type: WidthType.PERCENTAGE },
     borders: {
-      top: { style: BorderStyle.SINGLE, size: 2, color: border },
-      bottom: { style: BorderStyle.SINGLE, size: 2, color: border },
-      left: { style: BorderStyle.SINGLE, size: 2, color: border },
-      right: { style: BorderStyle.SINGLE, size: 2, color: border },
+      top: professional ? none : { style: BorderStyle.SINGLE, size: 2, color: border },
+      bottom: professional ? none : { style: BorderStyle.SINGLE, size: 2, color: border },
+      left: {
+        style: BorderStyle.SINGLE,
+        size: Number(component.appearance.borderSize) || 2,
+        color: border,
+      },
+      right: professional ? none : { style: BorderStyle.SINGLE, size: 2, color: border },
     },
-    rows: [new TableRow({ children: [new TableCell({
+    rows: [new TableRow({ cantSplit: true, children: [new TableCell({
+      margins: professional
+        ? cellMargins(component.appearance.cellPadding || 6)
+        : undefined,
       shading: {
         type: ShadingType.CLEAR,
         fill: color(component.appearance.fillColor, "FFF7CC"),
       },
-      children: [new Paragraph({ children: [new TextRun({
-        text: `${component.content.label}: ${plainText(component.content.text)}`,
-        bold: true,
-      })] })],
+      children: [new Paragraph({
+        spacing: componentSpacing(component, { before: 0, after: 0 }),
+        keepLines: true,
+        children: professional ? [
+          new TextRun({
+            text: `${component.content.label}: `,
+            bold: true,
+            color: color(component.appearance.labelColor, border),
+          }),
+          new TextRun({ text: plainText(component.content.text) }),
+        ] : [new TextRun({
+          text: `${component.content.label}: ${plainText(component.content.text)}`,
+          bold: true,
+        })],
+      })],
     })] })],
   });
 }
@@ -214,6 +316,7 @@ function revisionTable(component) {
     rows: [
       new TableRow({
         tableHeader: true,
+        cantSplit: true,
         children: headers.map(text => new TableCell({
           shading: {
             type: ShadingType.CLEAR,
@@ -225,6 +328,7 @@ function revisionTable(component) {
         })),
       }),
       ...rows.map(row => new TableRow({
+        cantSplit: Boolean(component.appearance.rowIntegrity),
         children: row.map(text => new TableCell({
           children: [new Paragraph({
             children: [new TextRun(String(text || ""))],
@@ -235,15 +339,18 @@ function revisionTable(component) {
   });
 }
 
-function screenshotParagraph(component, mediaAssets) {
+function screenshotBlock(component, mediaAssets) {
   const media = mediaAssets[component.content.assetId];
   const bytes = imageBytes(media);
   if (!bytes) {
     throw new Error(`Word export is missing media asset: ${component.content.assetId}.`);
   }
-  return new Paragraph({
+  const image = new Paragraph({
     alignment: AlignmentType.CENTER,
-    spacing: { before: 120, after: 200 },
+    spacing: component.appearance.presentationStyle === "framed"
+      ? componentSpacing(component, { before: 6, after: 10 })
+      : { before: 120, after: 200 },
+    keepLines: true,
     children: [new ImageRun({
       data: bytes,
       type: imageType(media, bytes),
@@ -255,27 +362,102 @@ function screenshotParagraph(component, mediaAssets) {
       },
     })],
   });
+  if (component.appearance.presentationStyle !== "framed") return image;
+  const border = color(component.appearance.borderColor, "C8D5DF");
+  return new Table({
+    width: { size: 100, type: WidthType.PERCENTAGE },
+    alignment: AlignmentType.CENTER,
+    borders: {
+      top: { style: BorderStyle.SINGLE,
+        size: Number(component.appearance.borderSize) || 4, color: border },
+      bottom: { style: BorderStyle.SINGLE,
+        size: Number(component.appearance.borderSize) || 4, color: border },
+      left: { style: BorderStyle.SINGLE,
+        size: Number(component.appearance.borderSize) || 4, color: border },
+      right: { style: BorderStyle.SINGLE,
+        size: Number(component.appearance.borderSize) || 4, color: border },
+    },
+    rows: [new TableRow({ cantSplit: true, children: [new TableCell({
+      margins: cellMargins(component.appearance.cellPadding),
+      shading: {
+        type: ShadingType.CLEAR,
+        fill: color(component.appearance.backgroundColor, "F7FAFC"),
+      },
+      children: [image],
+    })] })],
+  });
+}
+
+function plannedTable(component, mediaAssets, context) {
+  const columns = component.content.columns || [];
+  const headerLabels = columns.map(column => column.label || column.title || "");
+  const hasHeader = headerLabels.some(Boolean);
+  const rows = component.components.map(rowGroup => new TableRow({
+    cantSplit: component.presentationIntent.rowIntegrity !== false,
+    children: rowGroup.components.map(cellGroup => new TableCell({
+      margins: cellMargins(component.appearance.cellPadding),
+      children: cellGroup.components.flatMap(child =>
+        renderComponent(child, mediaAssets, context)),
+    })),
+  }));
+  return new Table({
+    width: { size: 100, type: WidthType.PERCENTAGE },
+    borders: tableBorders(component.appearance),
+    rows: [
+      ...(hasHeader ? [new TableRow({
+        tableHeader: true,
+        cantSplit: true,
+        children: headerLabels.map(label => new TableCell({
+          shading: { type: ShadingType.CLEAR,
+            fill: color(component.appearance.headerFill, "EAF2F8") },
+          margins: cellMargins(component.appearance.cellPadding),
+          children: [bodyParagraph(label, { bold: true, after: 0 })],
+        })),
+      })] : []),
+      ...rows,
+    ],
+  });
 }
 
 function renderComponent(component, mediaAssets, context = {}) {
   if (component.visibility === "hidden") return [];
   if (component.kind === "heading") return [headingComponent(component)];
   if (component.kind === "paragraph") {
-    return [bodyParagraph(component.content.text, context.step
-      ? { size: 24, after: 100 }
-      : {})];
+    const professional = component.presentationIntent?.readableMeasure;
+    return [bodyParagraph(component.content.text, {
+      size: component.appearance.typography?.size
+        ? halfPoints(component.appearance.typography.size, 11)
+        : context.step ? 24 : undefined,
+      font: component.appearance.typography?.family,
+      color: component.appearance.typography?.color
+        ? color(component.appearance.typography.color)
+        : undefined,
+      spacing: professional && component.spacingIntent
+        ? componentSpacing(component, { before: 0, after: context.step ? 5 : 7 })
+        : undefined,
+      keepNext: component.keepWithNext,
+      keepLines: true,
+    })];
   }
   if (component.kind === "screenshot") {
-    return [screenshotParagraph(component, mediaAssets)];
+    return [screenshotBlock(component, mediaAssets)];
   }
   if (component.kind === "callout") {
-    return [new Paragraph({ children: [] }), commentBox(component)];
+    return component.presentationIntent.semanticRole
+      ? [commentBox(component)]
+      : [new Paragraph({ children: [] }), commentBox(component)];
   }
   if (component.kind === "step") {
     const heading = {
       content: { text: component.content.title, level: 2 },
+      keepWithNext: true,
+      spacingIntent: component.spacingIntent,
       appearance: {
-        typography: { color: component.appearance.headingColor || "#1e5e8c" },
+        ...component.appearance,
+        typography: {
+          ...component.appearance.typography,
+          color: component.appearance.headingColor || "#1e5e8c",
+        },
       },
     };
     return [
@@ -293,6 +475,9 @@ function renderComponent(component, mediaAssets, context = {}) {
         children: [new TextRun(plainText(paragraph.content.text))],
       })] : [];
     });
+  }
+  if (component.kind === "table") {
+    return [plannedTable(component, mediaAssets, context)];
   }
   if (component.kind === "metadata") return [metadataTable(component)];
   if (component.kind === "revisionHistory" && component.sourceRef.blockId) {
@@ -314,18 +499,35 @@ function renderComponent(component, mediaAssets, context = {}) {
     const muted = color(component.appearance.mutedColor, "5F6B76");
     return [
       bodyParagraph(component.appearance.brandText, {
-        bold: true, color: accent, size: 24,
-        alignment: AlignmentType.CENTER, after: 120,
+        bold: true, color: accent,
+        size: halfPoints(component.appearance.brandSize, 12),
+        alignment: AlignmentType.CENTER,
+        after: pointSpacing(component.appearance.spacing?.brandAfter, 6),
       }),
       bodyParagraph(component.appearance.documentType, {
-        color: muted, size: 26, alignment: AlignmentType.CENTER, after: 160,
+        color: muted,
+        size: halfPoints(component.appearance.documentTypeSize, 13),
+        alignment: AlignmentType.CENTER,
+        after: pointSpacing(component.appearance.spacing?.typeAfter, 8),
+        border: component.appearance.dividerSize ? { bottom: {
+          style: BorderStyle.SINGLE,
+          size: Number(component.appearance.dividerSize) * 4,
+          color: color(component.appearance.dividerColor, accent),
+          space: 9,
+        } } : undefined,
       }),
       bodyParagraph(title, {
-        bold: true, color: accent, size: 52,
-        alignment: AlignmentType.CENTER, after: 220,
+        bold: true, color: accent,
+        size: halfPoints(component.appearance.titleSize, 26),
+        alignment: AlignmentType.CENTER,
+        after: pointSpacing(component.appearance.spacing?.titleAfter, 11),
+        keepLines: true,
       }),
       bodyParagraph(component.appearance.subtitle, {
-        color: muted, size: 26, alignment: AlignmentType.CENTER, after: 360,
+        color: muted,
+        size: halfPoints(component.appearance.subtitleSize, 13),
+        alignment: AlignmentType.CENTER,
+        after: pointSpacing(component.appearance.spacing?.subtitleAfter, 18),
       }),
       ...(metadata ? [metadataTable(metadata)] : []),
       new Paragraph({ children: [new PageBreak()] }),
@@ -347,7 +549,7 @@ function wordHeader(component) {
     children: [new TextRun({
       text: component.content.text,
       color: color(component.appearance.textColor, "5F6B76"),
-      size: 18,
+      size: halfPoints(component.appearance.fontSize, 9),
     })],
   })] });
 }
@@ -366,15 +568,23 @@ function wordFooter(component) {
       new TextRun({
         text: `${component.content.text} | ${component.content.pageLabel} `,
         color: textColor,
-        size: 18,
+        size: halfPoints(component.appearance.fontSize, 9),
       }),
-      new TextRun({ children: [PageNumber.CURRENT], color: textColor, size: 18 }),
+      new TextRun({
+        children: [PageNumber.CURRENT],
+        color: textColor,
+        size: halfPoints(component.appearance.fontSize, 9),
+      }),
       new TextRun({
         text: component.content.totalSeparator,
         color: textColor,
-        size: 18,
+        size: halfPoints(component.appearance.fontSize, 9),
       }),
-      new TextRun({ children: [PageNumber.TOTAL_PAGES], color: textColor, size: 18 }),
+      new TextRun({
+        children: [PageNumber.TOTAL_PAGES],
+        color: textColor,
+        size: halfPoints(component.appearance.fontSize, 9),
+      }),
     ],
   })] });
 }
@@ -418,6 +628,7 @@ function buildDocument({ plan, mediaAssets = {} }) {
     section.components.flatMap(component =>
       renderComponent(component, mediaAssets)));
   const appearance = plan.content.documentAppearance || {};
+  const margins = appearance.margins || {};
   const document = new Document({
     creator: plan.content.creator,
     title: plan.content.title,
@@ -426,16 +637,23 @@ function buildDocument({ plan, mediaAssets = {} }) {
     styles: { default: { document: {
       run: {
         font: appearance.fontFamily || "Aptos",
-        size: (Number(appearance.fontSize) || 11) * 2,
+        size: halfPoints(appearance.fontSize, 11),
       },
-      paragraph: { spacing: { after: 120, line: 276 } },
+      paragraph: { spacing: {
+        after: pointSpacing(appearance.paragraphAfter, 6),
+        line: Math.round((Number(appearance.lineHeight) || 1.15) * 240),
+      } },
     } } },
     sections: [{
       headers: headerComponent ? { default: wordHeader(headerComponent) } : {},
       footers: footerComponent ? { default: wordFooter(footerComponent) } : {},
       properties: { page: { margin: {
-        top: 1134, right: 1134, bottom: 1134, left: 1134,
-        header: 567, footer: 567,
+        top: millimeters(margins.top, 20),
+        right: millimeters(margins.right, 20),
+        bottom: millimeters(margins.bottom, 20),
+        left: millimeters(margins.left, 20),
+        header: millimeters(margins.header, 10),
+        footer: millimeters(margins.footer, 10),
       } } },
       children,
     }],

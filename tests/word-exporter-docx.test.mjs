@@ -51,7 +51,7 @@ assert.ok(!documentXml.includes("Säkerhet: 98%"));
 assert.ok(documentXml.includes("Sammanslaget steg"));
 assert.match(
   documentXml,
-  /Sammanslaget steg[\s\S]*?<w:p\/>[\s\S]*?Kommentar: Kontrollera resultatet/
+  /Sammanslaget steg[\s\S]*?Kommentar: [\s\S]*?Kontrollera resultatet/
 );
 
 console.log("docx merged screenshot behaviour tests passed.");

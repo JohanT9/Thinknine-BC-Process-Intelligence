@@ -91,13 +91,81 @@
         : block.level === 1
           ? "heading1"
           : "heading2";
-      return { typography: clone(theme.typography[role] || {}) };
+      return {
+        ...clone(theme.components.heading || {}),
+        typography: clone(theme.typography[role] || {})
+      };
     }
     if (block.kind === "paragraph") {
       return { typography: clone(theme.typography.body || {}) };
     }
+    if (block.kind === "step") {
+      return {
+        ...clone(theme.components.step || {}),
+        typography: clone(theme.typography.heading2 || {})
+      };
+    }
     const key = block.kind === "image" ? "screenshot" : block.kind;
-    return clone(theme.components[key] || {});
+    const appearance = clone(theme.components[key] || {});
+    if (block.kind !== "callout") return appearance;
+    const { roleStyles = {}, ...base } = appearance;
+    return {
+      ...base,
+      ...(roleStyles[block.calloutType] || {}),
+      semanticRole: block.calloutType
+    };
+  }
+
+  function presentationIntentFor(block, childComponents = []) {
+    const byKind = {
+      heading: {
+        hierarchy: `heading${block.level || 1}`,
+        avoidOrphan: true
+      },
+      paragraph: { readableMeasure: true },
+      step: {
+        composition: "instructionWithEvidence",
+        avoidFragmentation: true,
+        relatedComponentIds: childComponents.map(item => item.componentId)
+      },
+      image: {
+        emphasis: "primary",
+        widthIntent: "fullContent",
+        avoidIsolated: true,
+        preserveAspectRatio: true,
+        preserveQuality: true
+      },
+      callout: {
+        emphasis: "supporting",
+        semanticRole: block.calloutType,
+        avoidFragmentation: true
+      },
+      table: {
+        headerEmphasis: true,
+        rowIntegrity: true,
+        avoidFragmentation: true
+      },
+      revisionHistory: {
+        headerEmphasis: true,
+        rowIntegrity: true
+      },
+      pageBreak: { transition: "explicit" },
+      toc: { navigationAid: true }
+    };
+    return byKind[block.kind] || { composition: "flow" };
+  }
+
+  function plannedSpacing(block, theme, appearance) {
+    const token = block.kind === "heading"
+      ? "section"
+      : block.kind === "paragraph"
+        ? "paragraph"
+        : "component";
+    const fallback = spacingIntent(theme, token);
+    return {
+      before: appearance.before ?? fallback.before,
+      after: appearance.after ?? fallback.after
+    };
   }
 
   function componentKind(blockKind) {
@@ -128,7 +196,13 @@
 
   function groupingComponent(id, grouping, sourceRef, children, theme) {
     return {
-      ...componentContract("group"),
+      ...componentContract("group", {
+        presentationIntent: {
+          composition: grouping,
+          rowIntegrity: grouping === "tableRow",
+          avoidFragmentation: ["tableRow", "listItem"].includes(grouping)
+        }
+      }),
       componentId: `component:group:${id}`,
       kind: "group",
       sourceRef,
@@ -192,11 +266,13 @@
     const calloutText = block.kind === "callout"
       ? block.blocks?.find(child => child.kind === "paragraph")?.text || ""
       : "";
+    const appearance = appearanceFor(block, theme, sectionKind);
     if (block.kind === "step") {
       let imageIndex = 0;
       components.forEach(component => {
         if (component.kind !== "screenshot") return;
         imageIndex += 1;
+        const primary = imageIndex === 1;
         component.content = {
           ...component.content,
           imageIndex,
@@ -210,6 +286,32 @@
           label: `Skärmbild ${imageIndex} steg ${block.stepNumber}`,
           description: stepInstruction
         };
+        component.grouping = "screenshotSequence";
+        component.placement = "supportingVisual";
+        component.presentationIntent = {
+          ...component.presentationIntent,
+          emphasis: primary ? "primary" : "supporting",
+          widthIntent: primary ? "fullContent" : "consistentSupporting",
+          avoidIsolated: true,
+          preserveAspectRatio: true,
+          preserveQuality: true,
+          sequencePosition: imageIndex,
+          sequenceLength: components.filter(item =>
+            item.kind === "screenshot").length
+        };
+        component.appearance = {
+          ...component.appearance,
+          maxWidth: primary
+            ? component.appearance.maxWidth
+            : component.appearance.supportingMaxWidth ||
+              component.appearance.maxWidth
+        };
+      });
+      components.forEach((component, index) => {
+        if (component.kind === "paragraph" && components[index + 1]) {
+          component.keepWithNext = true;
+        }
+        if (component.kind === "callout") component.grouping = "stepSupport";
       });
     }
     return {
@@ -220,7 +322,8 @@
             ? { label: "Kommentar", description: calloutText }
           : kind === "screenshot"
             ? { label: block.altText || "Processkärmbild" }
-            : {}
+            : {},
+        presentationIntent: presentationIntentFor(block, components)
       }),
       componentId: `component:block:${block.blockId}`,
       kind,
@@ -235,11 +338,8 @@
       keepTogether: ["step", "image", "callout"].includes(block.kind),
       keepWithNext: block.kind === "heading",
       visibility: visibilityFor(kind, theme),
-      spacingIntent: spacingIntent(
-        theme,
-        block.kind === "paragraph" ? "paragraph" : "component"
-      ),
-      appearance: appearanceFor(block, theme, sectionKind),
+      spacingIntent: plannedSpacing(block, theme, appearance),
+      appearance,
       content: {
         ...(block.text !== undefined ? { text: block.text } : {}),
         ...(block.level !== undefined ? { level: block.level } : {}),
@@ -273,6 +373,9 @@
             { key: "reviewer", label: "Granskad av" }
           ]
         } : {}),
+        ...(block.kind === "table" ? {
+          columns: clone(block.columns || [])
+        } : {}),
         ...(block.assetId ? { assetId: block.assetId } : {}),
         ...(block.entries ? { entries: clone(block.entries) } : {})
       },
@@ -303,7 +406,14 @@
       planBlock(block, section.kind, theme));
     if (section.kind === "cover") {
       children.push({
-        ...componentContract("metadata"),
+        ...componentContract("metadata", {
+          presentationIntent: {
+            composition: "compactKeyValueGroups",
+            hierarchy: "coverSupporting",
+            align: "center",
+            avoidFragmentation: true
+          }
+        }),
         componentId: `component:metadata:${document.documentId}`,
         kind: "metadata",
         sourceRef: { documentId: document.documentId },
@@ -314,22 +424,28 @@
         keepTogether: true,
         keepWithNext: false,
         visibility: "visible",
-        spacingIntent: spacingIntent(theme),
+        spacingIntent: {
+          before: theme.components.metadataTable?.before ??
+            theme.spacing.component,
+          after: theme.components.metadataTable?.after ??
+            theme.spacing.component
+        },
         appearance: clone(theme.components.metadataTable || {}),
         content: {
           accessibilityLabel: "Dokumentmetadata",
           rows: [
-            { key: "version", label: "Version",
+            { key: "version", group: "identity", label: "Version",
               value: document.metadata.documentVersion },
-            { key: "date", label: "Datum",
+            { key: "date", group: "identity", label: "Datum",
               value: document.metadata.updatedAt || document.metadata.createdAt },
-            { key: "environment", label: "Miljö",
+            { key: "environment", group: "context", label: "Miljö",
               value: document.metadata.environment },
-            { key: "documentationProfile", label: "Dokumentationstyp",
+            { key: "documentationProfile", group: "context",
+              label: "Dokumentationstyp",
               value: document.metadata.documentationProfile },
-            { key: "reviewStatus", label: "Granskningsstatus",
+            { key: "reviewStatus", group: "review", label: "Granskningsstatus",
               value: document.metadata.statusLabel },
-            { key: "reviewer", label: "Granskad av",
+            { key: "reviewer", group: "review", label: "Granskad av",
               value: document.metadata.reviewer }
           ]
         },
@@ -345,7 +461,24 @@
       keepTogether: section.kind === "cover",
       spacingIntent: spacingIntent(theme, "section"),
       components: [{
-        ...componentContract(wrapperKind),
+        ...componentContract(wrapperKind, {
+          presentationIntent: section.kind === "cover"
+            ? {
+              composition: "balancedCover",
+              hierarchy: "brandTypeTitleSubtitleMetadata",
+              verticalBalance: true
+            }
+            : section.kind === "workflow"
+              ? {
+                composition: "orderedWorkflow",
+                transition: "sectionOpening",
+                avoidTinySection: true
+              }
+              : {
+                composition: "section",
+                transition: "continuous"
+              }
+        }),
         componentId: `component:section:${section.sectionId}`,
         kind: wrapperKind,
         sourceRef: { sectionId: section.sectionId },
@@ -392,7 +525,12 @@
         ...componentContract(kind, {
           accessibility: { label: kind === "header"
             ? "Dokumenthuvud"
-            : "Dokumentsidfot" }
+            : "Dokumentsidfot" },
+          presentationIntent: {
+            placement: kind,
+            repetition: "everyPage",
+            unobtrusive: true
+          }
         }),
         componentId: `component:${kind}:${document.documentId}`,
         kind,
@@ -449,13 +587,15 @@
         creator: "Thinknine Process Intelligence",
         subject: "Business Central arbetsinstruktion",
         description: "Genererad från en granskad Business Central-process.",
-        documentAppearance: clone(resolvedTheme.components.document || {})
+        documentAppearance: clone(resolvedTheme.components.document || {}),
+        presentationProfile: "professional"
       },
       components: globalComponents(document, resolvedTheme),
       sections: document.sections.map(section =>
         planSection(section, document, resolvedTheme)),
       metadata: {
         producer: "document-planner",
+        presentationPlannerVersion: "1.0.0",
         capabilities: clone(resolvedTheme.capabilities)
       }
     });
