@@ -1,5 +1,21 @@
 # Changelog
 
+## 4.4.0 RC1 — Semantic Document Model
+
+- Added a renderer-independent semantic document model with one schema version.
+- Added stable IDs for documents, sections, blocks, assets and nested content.
+- Added heading, paragraph, step, image, table, callout, list, revision history,
+  page-break and TOC blocks.
+- Added generic assets and read-only Review source references for tasks,
+  screenshots and annotations.
+- Added non-mutating normalization, recursive immutability, validation and
+  serialization helpers.
+- Preserved unknown future properties, assets and well-formed block kinds across
+  normalize/serialize/deserialize cycles.
+- Added behaviour tests for compatibility, integrity, malformed input,
+  references and immutable updates.
+- Kept Review persistence, layout planning and Word/PDF rendering unchanged.
+
 ## 4.3.0 RC6 — Release Hardening
 
 - Kept the Review header, annotation editor header and tools stacked and sticky

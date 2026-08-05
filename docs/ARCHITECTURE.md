@@ -1,5 +1,20 @@
 # Architecture 3.5
 
+## Documentation Excellence 4.4
+
+Den semantiska dokumentmodellen är en fristående gräns för dokumentinnehåll:
+
+```text
+Review (oförändrad)
+  ↓ framtida projektion
+Semantic Document Model
+  ↓ framtida layoutplan
+Word / framtida PDF-renderare
+```
+
+RC1 implementerar endast modellgränsen. Den har inga beroenden till Review,
+DOCX, DOM, CSS eller canvas och används ännu inte av exportflödet.
+
 ```text
 Recorder
   ↓

@@ -1,7 +1,22 @@
-# Thinknine BC Process Intelligence v4.3.0 Release Candidate
+# Thinknine BC Process Intelligence v4.4.0 Release Candidate
 
 Ett modulärt Edge-tillägg för att spela in, granska och exportera dokumenterade
 Business Central-processer.
+
+## Documentation Excellence 4.4 RC1
+
+RC1 introducerar en fristående, semantisk dokumentmodell mellan Review-data och
+framtida dokumentrenderare. Modellen beskriver innehåll, struktur, källreferenser
+och generiska resurser utan Word-, PDF-, sid- eller typografispecifika värden.
+
+Modellen är versionshanterad, serialiserbar och rekursivt immutabel. Stabilt
+identifierade dokument, sektioner, block och resurser kan normaliseras och
+valideras utan att indata ändras. Okända framtida egenskaper och välformade
+blocktyper bevaras vid normalisering och omladdning.
+
+Detta är en arkitekturgrund. Review projiceras ännu inte till modellen, och den
+befintliga Word-exporten använder fortfarande sitt oförändrade flöde. Se
+[Semantic Document Model 4.4](docs/SEMANTIC_DOCUMENT_MODEL_4.4.md).
 
 ## Screenshot annotations 4.3 RC1
 

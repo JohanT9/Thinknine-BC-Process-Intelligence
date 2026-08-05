@@ -97,7 +97,7 @@ function syncManifest() {
 
 function cleanRuntimeFolders() {
   for (const folder of [
-    "docs", "engine", "review", "exporters", "knowledge-packs"
+    "docs", "document", "engine", "review", "exporters", "knowledge-packs"
   ]) {
     fs.rmSync(path.join(dist, folder), {
       recursive: true,
@@ -110,6 +110,7 @@ fs.mkdirSync(dist, { recursive: true });
 cleanRuntimeFolders();
 
 copyDir(path.join(src, "engine"), path.join(dist, "engine"));
+copyDir(path.join(src, "document"), path.join(dist, "document"));
 copyDir(path.join(src, "review"), path.join(dist, "review"));
 copyDir(path.join(src, "exporters"), path.join(dist, "exporters"));
 copyDir(
