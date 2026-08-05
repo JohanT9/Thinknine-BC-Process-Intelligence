@@ -1,5 +1,18 @@
 # Changelog
 
+## 4.5.0 UX3 — Connected Workspaces
+
+- Added immutable Workspace Context as the single source of truth for shared
+  section, step, screenshot, annotation, anchor, focus and navigation state.
+- Connected Review selection, move, merge, split, delete, Undo and Redo with
+  the corresponding Document Workspace location through deterministic rebinding.
+- Added keyboard- and pointer-accessible navigation from document sections,
+  steps, instructions, screenshots and callouts to their Review step.
+- Added context preservation, logical focus transfer, live announcements and
+  subtle reduced-motion-aware synchronization feedback.
+- Kept both workspaces independent: they publish and observe context only.
+- Kept context changes outside projection, planning, components and Word export.
+
 ## 4.5.0 UX2 — Adaptive Document Experience
 
 - Added an accessible renderer-neutral document toolbar for fit width, fit

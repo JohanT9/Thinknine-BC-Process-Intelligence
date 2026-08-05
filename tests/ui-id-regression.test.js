@@ -195,6 +195,7 @@ assert.ok(
 assert.ok(
   html.includes('<script src="document/document-workspace.js"></script>') &&
     html.includes('<script src="workspace-controller.js"></script>') &&
+    html.includes('<script src="workspace-context.js"></script>') &&
     html.includes('<script src="document-workspace-view.js"></script>') &&
     html.includes('<script src="document-workspace-experience.js"></script>'),
   "Dashboard must load the isolated Document Workspace renderer and controller."
@@ -207,6 +208,17 @@ assert.ok(
     html.includes('id="documentViewSettings"') &&
     html.includes('aria-labelledby="documentViewSettingsTitle"'),
   "Document Workspace must expose accessible reading controls and advanced settings."
+);
+assert.ok(
+  html.includes('@media(prefers-reduced-motion:reduce)') &&
+    js.includes('"(prefers-reduced-motion: reduce)"') &&
+    js.includes('behavior: reducedMotion ? "auto" : "smooth"'),
+  "Connected-workspace feedback must respect reduced-motion preferences."
+);
+assert.ok(
+  html.includes('id="documentContextHelp" class="sr-only"') &&
+    js.includes('["Enter", " "]'),
+  "Document-to-Review navigation must be explained and keyboard accessible."
 );
 
 console.log("UI ID regression tests passed.");

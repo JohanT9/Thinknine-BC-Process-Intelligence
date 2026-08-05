@@ -1,9 +1,16 @@
-# Thinknine BC Process Intelligence v4.5.0 UX2
+# Thinknine BC Process Intelligence v4.5.0 UX3
 
 Ett modulärt Edge-tillägg för att spela in, granska och exportera dokumenterade
 Business Central-processer.
 
-## Document Workspace 4.5 UX1
+## Document Workspace 4.5 UX3
+
+UX3 kopplar samman arbetsytorna genom ett immutable **Workspace Context**.
+Markerat Review-steg, skärmbild eller annotering följer med till motsvarande
+dokumentposition. Steg, instruktioner, skärmbilder, kommentarer och avsnitt i
+Document Workspace kan aktiveras med mus eller tangentbord för att direkt hitta
+rätt redigeringssteg i Review Workspace. Synkronisering använder stabila ID:n,
+varsam markering och rörelse som respekterar reducerad motion.
 
 UX2 gör Document Workspace till en adaptiv läsmiljö för långa dokument. Ett
 tillgängligt dokumentverktygsfält erbjuder anpassa bredd, anpassa sida, 100 %,

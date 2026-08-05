@@ -67,6 +67,13 @@ const cover = container.children[0];
 const workflow = container.children[1];
 assert.strictEqual(cover.children[0].style.color, "#123456");
 assert.strictEqual(workflow.children[0].children[0].src, media["asset-1"].source);
+assert.strictEqual(workflow.dataset.workspaceContextTarget, "true");
+assert.strictEqual(workflow.children[0].dataset.workspaceContextTarget, "true");
+assert.strictEqual(workflow.children[0].tabIndex, 0);
+assert.strictEqual(
+  workflow.children[0].attributes["aria-describedby"],
+  "documentContextHelp"
+);
 assert.strictEqual(view.render(container, model, media, documentValue).changedSections, 0);
 assert.strictEqual(container.children[0], cover);
 assert.strictEqual(container.children[1], workflow);

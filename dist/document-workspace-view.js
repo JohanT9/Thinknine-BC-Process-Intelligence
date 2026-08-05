@@ -88,6 +88,12 @@
       element = documentValue.createElement("div");
     }
     element.dataset.documentWorkspaceItemId = item.workspaceItemId;
+    if (["stepTitle", "paragraph", "image", "callout"].includes(item.kind)) {
+      element.dataset.workspaceContextTarget = "true";
+      element.tabIndex = 0;
+      element.setAttribute("aria-describedby", "documentContextHelp");
+      element.setAttribute("aria-keyshortcuts", "Enter Space");
+    }
     applyAppearance(element, item);
     return element;
   }
@@ -103,6 +109,11 @@
   function createSection(section, mediaAssets, documentValue) {
     const element = documentValue.createElement("section");
     element.dataset.documentWorkspaceSectionId = section.workspaceSectionId;
+    element.dataset.documentWorkspaceItemId = section.workspaceSectionId;
+    element.dataset.workspaceContextTarget = "true";
+    element.tabIndex = 0;
+    element.setAttribute("aria-describedby", "documentContextHelp");
+    element.setAttribute("aria-keyshortcuts", "Enter Space");
     element.className = `document-workspace-section ${section.kind}`;
     const heading = section.items.find(item =>
       item.kind === "heading" || item.kind === "stepTitle"

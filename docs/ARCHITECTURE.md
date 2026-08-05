@@ -118,6 +118,14 @@ resultatet som CSS, sektionssynlighet och ARIA-state på befintlig DOM. Lagret
 kan därför inte ändra Semantic Document, tema, planner, komponenter eller Word.
 Vypreferenser använder en separat lokal nyckel och ingår aldrig i Review.
 
+UX3 introducerar `workspace-context.js` som enda ägare av delad
+navigationsposition. Kontexten innehåller endast stabila identiteter och
+navigationsavsikt. Den äger ingen Review-logik, rendererlogik eller DOM.
+Arbetsytorna känner inte till varandra; dashboarden binder deras identiteter vid
+composition root. Kontextbyte ändrar endast fokus, markering och position i
+redan renderad DOM och passerar aldrig Review Projector, Semantic Document,
+Theme, Planner eller Word Adapter.
+
 ```text
 Recorder
   ↓

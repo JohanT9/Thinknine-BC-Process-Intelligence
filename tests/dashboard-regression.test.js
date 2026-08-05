@@ -15,6 +15,14 @@ assert.ok(
   dashboard.includes("async function initializeDashboard()"),
   "Dashboard must use guarded initialization."
 );
+assert.ok(
+  dashboard.includes("function publishWorkspaceContext(") &&
+    dashboard.includes("function revealDocumentContext(") &&
+    dashboard.includes("function revealReviewContext(") &&
+    dashboard.includes("T9WorkspaceContext.bind(model") &&
+    !dashboard.includes("T9DocumentWorkspaceView.selectReview"),
+  "Both workspaces must coordinate only through Workspace Context."
+);
 
 assert.ok(
   dashboard.includes("await loadSettings();"),

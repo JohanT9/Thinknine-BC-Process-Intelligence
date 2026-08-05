@@ -3493,6 +3493,93 @@ let documentViewState = globalThis.T9DocumentWorkspaceExperience.load(
 );
 let documentViewFrame = 0;
 let documentScrollFrame = 0;
+let workspaceContext = globalThis.T9WorkspaceContext.create();
+let workspaceContextBinding = null;
+let workspaceHighlightTimer = 0;
+
+function reviewScreenshotsByTask() {
+  return Object.fromEntries((activeReview?.tasks || []).map(task => [
+    task.taskId,
+    reviewImages(task).map(image => image.path)
+  ]));
+}
+
+function publishWorkspaceContext(patch, reason, origin) {
+  workspaceContext = globalThis.T9WorkspaceContext.update(workspaceContext, {
+    ...patch,
+    navigationReason: reason,
+    focusOrigin: origin
+  });
+}
+
+function documentContextElement(itemId) {
+  return [...$("documentWorkspace").querySelectorAll(
+    "[data-document-workspace-item-id]"
+  )].find(element => element.dataset.documentWorkspaceItemId === itemId) || null;
+}
+
+function revealDocumentContext(options = {}) {
+  if (!workspaceContextBinding) return;
+  const target = globalThis.T9WorkspaceContext.target(
+    workspaceContextBinding,
+    workspaceContext
+  );
+  const element = documentContextElement(target.itemId);
+  if (!element) return;
+  const section = element.closest("[data-document-workspace-section-id]");
+  const sectionIndex = documentSections().indexOf(section);
+  if (sectionIndex >= 0) {
+    documentViewState = globalThis.T9DocumentWorkspaceExperience.navigate(
+      documentViewState,
+      sectionIndex + 1,
+      documentPageCount()
+    );
+    applyDocumentView({ persist: false });
+  }
+  clearTimeout(workspaceHighlightTimer);
+  $("documentWorkspace").querySelectorAll(".workspace-context-highlight")
+    .forEach(item => item.classList.remove("workspace-context-highlight"));
+  element.classList.add("workspace-context-highlight");
+  const reducedMotion = globalThis.matchMedia?.(
+    "(prefers-reduced-motion: reduce)"
+  ).matches;
+  element.scrollIntoView({
+    block: "center",
+    behavior: reducedMotion ? "auto" : "smooth"
+  });
+  if (options.focus) element.focus({ preventScroll: true });
+  workspaceHighlightTimer = setTimeout(() => {
+    element.classList.remove("workspace-context-highlight");
+  }, reducedMotion ? 0 : 1400);
+  $("documentWorkspaceStatus").textContent =
+    "Motsvarande dokumentposition visas.";
+}
+
+function revealReviewContext(options = {}) {
+  const taskId = workspaceContext.selectedStepId;
+  if (!taskId || !reviewTaskIds().includes(taskId)) return;
+  activeReviewSelection = {
+    selectedIds: [taskId],
+    activeId: taskId,
+    anchorId: taskId
+  };
+  applyReviewSelection(Boolean(options.focus), false);
+  const card = [...$("reviewList").querySelectorAll("[data-review-task-id]")]
+    .find(element => element.dataset.reviewTaskId === taskId);
+  card?.scrollIntoView({ block: "center" });
+  if (options.focus && workspaceContext.selectedScreenshotId) {
+    const task = (activeReview?.tasks || []).find(item => item.taskId === taskId);
+    const imageIndex = reviewImages(task || {}).findIndex(
+      image => image.path === workspaceContext.selectedScreenshotId
+    );
+    if (imageIndex >= 0) {
+      card?.querySelectorAll('[data-action="annotate"]')[imageIndex]?.focus({
+        preventScroll: true
+      });
+    }
+  }
+  $("reviewFooterText").textContent = "Motsvarande granskningssteg visas.";
+}
 
 function documentSections() {
   return [...$("documentWorkspace").children].filter(element =>
@@ -3664,6 +3751,11 @@ async function synchronizeDocumentWorkspace() {
         const mediaAssets = await prepareDocumentMedia(pipeline);
         if (requestedRevision !== workspaceState.revision) continue;
         const model = globalThis.T9DocumentWorkspace.render(pipeline.plan);
+        workspaceContextBinding = globalThis.T9WorkspaceContext.bind(model, {
+          taskIds: globalThis.T9Review.activeTasks(activeReview)
+            .map(task => task.taskId),
+          screenshotsByTask: reviewScreenshotsByTask()
+        });
         const mediaSources = Object.fromEntries(Object.entries(mediaAssets).map(
           ([assetId, value]) => [assetId, {
             source: imageDataToDataUrl(value),
@@ -3682,6 +3774,7 @@ async function synchronizeDocumentWorkspace() {
         $("documentWorkspaceStatus").textContent =
           `Dokumentet är synkroniserat. ${result.sectionCount} avsnitt.`;
         applyDocumentView({ persist: false });
+        revealDocumentContext();
       } catch (error) {
         $("documentWorkspaceStatus").textContent =
           `Dokumentet kunde inte visas: ${error.message}`;
@@ -3705,7 +3798,12 @@ async function switchWorkspace(workspace, focusTab = false) {
     workspace
   );
   applyWorkspaceState();
-  if (workspace === "document") await synchronizeDocumentWorkspace();
+  if (workspace === "document") {
+    await synchronizeDocumentWorkspace();
+    revealDocumentContext({ focus: focusTab });
+  } else {
+    revealReviewContext({ focus: focusTab });
+  }
   if (focusTab) {
     $(workspace === "document"
       ? "documentWorkspaceTab"
@@ -3776,7 +3874,7 @@ function applyReviewStatus() {
   globalThis.T9ReviewStatus.apply($("reviewStatus"), status);
 }
 
-function applyReviewSelection(focusActive = false) {
+function applyReviewSelection(focusActive = false, publish = true) {
   const taskIds = reviewTaskIds();
   activeReviewSelection = globalThis.T9ReviewSelection.reconcile(
     activeReviewSelection,
@@ -3796,6 +3894,14 @@ function applyReviewSelection(focusActive = false) {
   }
   applyReviewToolbarState();
   applyReviewStatus();
+  if (publish && activeReviewSelection.activeId) {
+    publishWorkspaceContext({
+      selectedStepId: activeReviewSelection.activeId,
+      selectedScreenshotId: null,
+      selectedAnnotationId: null,
+      scrollAnchor: activeReviewSelection.activeId
+    }, "review-selection", "review");
+  }
 }
 
 function dispatchReviewSelection(command, focusActive = false) {
@@ -4181,6 +4287,12 @@ function renderAnnotationControls() {
   );
   annotationEditorState = globalThis.T9ReviewAnnotationEditor
     .reconcileSelection(annotationEditorState, items);
+  publishWorkspaceContext({
+    selectedStepId: annotationEditorState.taskId,
+    selectedScreenshotId: annotationEditorState.screenshotRef,
+    selectedAnnotationId: annotationEditorState.selectedId,
+    scrollAnchor: annotationEditorState.screenshotRef
+  }, "annotation-selection", "review");
   $("rectangleAnnotationTool").setAttribute(
     "aria-pressed",
     String(annotationEditorState.tool === "rectangle")
@@ -4228,6 +4340,12 @@ function openAnnotationEditor(task, imageData) {
     screenshotRef: imageData.path,
     imageUrl: imageData.imageUrl
   });
+  publishWorkspaceContext({
+    selectedStepId: task.taskId,
+    selectedScreenshotId: imageData.path,
+    selectedAnnotationId: null,
+    scrollAnchor: imageData.path
+  }, "screenshot-selection", "review");
   $("documentWorkspaceTab").disabled = true;
   $("reviewDialog").classList.add("annotation-mode");
   updateAnnotationStickyOffset();
@@ -4609,6 +4727,8 @@ async function openReview(session) {
     );
   activeReviewSelection = globalThis.T9ReviewSelection.create();
   activeReviewEdit = null;
+  workspaceContext = globalThis.T9WorkspaceContext.create();
+  workspaceContextBinding = null;
   workspaceState = globalThis.T9WorkspaceController.create();
   documentWorkspaceSync = null;
   documentViewState = globalThis.T9DocumentWorkspaceExperience.update(
@@ -4668,6 +4788,10 @@ async function closeReview() {
   documentViewFrame = 0;
   cancelAnimationFrame(documentScrollFrame);
   documentScrollFrame = 0;
+  clearTimeout(workspaceHighlightTimer);
+  workspaceHighlightTimer = 0;
+  workspaceContext = globalThis.T9WorkspaceContext.create();
+  workspaceContextBinding = null;
   globalThis.T9DocumentWorkspaceView.clear($("documentWorkspace"));
   $("documentWorkspaceStatus").textContent = "";
   applyWorkspaceState();
@@ -4843,6 +4967,26 @@ $("documentPreviousPage").addEventListener("click", () => {
 });
 $("documentNextPage").addEventListener("click", () => {
   navigateDocument("next");
+});
+async function activateDocumentContext(target) {
+  const item = target.closest?.("[data-workspace-context-target=true]");
+  const itemContext = workspaceContextBinding?.byItemId?.[
+    item?.dataset.documentWorkspaceItemId
+  ];
+  if (!itemContext?.selectedStepId) return;
+  publishWorkspaceContext(itemContext, "document-selection", "document");
+  await switchWorkspace("review");
+  revealReviewContext({ focus: true });
+}
+$("documentWorkspace").addEventListener("click", event => {
+  activateDocumentContext(event.target);
+});
+$("documentWorkspace").addEventListener("keydown", event => {
+  if (!["Enter", " "].includes(event.key)) return;
+  const item = event.target.closest?.("[data-workspace-context-target=true]");
+  if (!item) return;
+  event.preventDefault();
+  activateDocumentContext(item);
 });
 $("documentWorkspacePanel").addEventListener("keydown", event => {
   if (event.target.closest("button,select,dialog")) return;

@@ -86,3 +86,30 @@ UX2 does not include thumbnails, free-form page-number entry, print-layout page
 breaking, virtualized scrolling or document editing. A logical page currently
 corresponds to a planned document section. All editing remains in Review
 Workspace. Word export behaviour is unchanged.
+
+## Connected Workspaces (UX3)
+
+Workspace Context is the single source of truth for shared navigation. Its
+immutable value may identify the current semantic section, Review step,
+screenshot, annotation, scroll anchor, focus origin and navigation reason. It
+contains no Review commands, rendering decisions or document business logic.
+
+```text
+Review Workspace --publish--+
+                            +-- Workspace Context --observe--> active perspective
+Document Workspace --publish+
+```
+
+Neither workspace invokes the other. Dashboard is the composition root: it
+binds stable Document Workspace item IDs to active Review task and screenshot
+IDs in document order. Rebinding after move, merge, split, delete, Undo or Redo
+is deterministic and never modifies Document Plan.
+
+Review selection reveals the matching document element. Screenshot and
+annotation selection reveal the composed screenshot. Activating a document
+section, step title, instruction, screenshot or callout selects and focuses the
+matching Review card. Enter and Space use the same path as pointer activation.
+
+Synchronization reuses existing DOM and updates only selection, visibility,
+scrolling, focus and a temporary highlight. Smooth movement is disabled when
+reduced motion is requested, and status messages announce synchronization.
