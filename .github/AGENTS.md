@@ -157,6 +157,21 @@ Never duplicate algorithms.
 
 ---
 
+## Development Workflow
+
+For every Release Candidate:
+
+1. Review the existing implementation.
+2. Explain the proposed solution.
+3. Implement the smallest possible change.
+4. Run lint, tests and build.
+5. Perform a self-review.
+6. Summarize modified files and architectural decisions.
+
+Do not implement unrelated improvements unless explicitly requested.
+
+---
+
 ## Separation of Concerns
 
 UI
@@ -453,6 +468,80 @@ Not implementation.
 
 ---
 
+# Milestone Commits
+
+The project uses milestone commits.
+
+Every milestone commit should represent a complete, stable and testable increment.
+
+Rules
+
+- Every milestone must have a clearly defined objective.
+- Every milestone should normally require no more than 2–3 hours of implementation.
+- Every milestone must leave the project in a releasable state.
+- Every milestone must pass:
+  - lint
+  - build
+  - regression tests
+- Documentation must be updated.
+- CHANGELOG must be updated.
+- README must be updated when user-visible behaviour changes.
+
+Large features must be split into multiple milestone commits.
+
+Example
+
+v4.2
+
+- RC0 Architecture Review
+- RC1 Foundation
+- RC2 Drag & Drop
+- RC3 Merge
+- RC4 Split
+- RC5 Undo/Redo
+- RC6 Editing
+- RC7 Toolbar
+- RC8 Status Bar
+- RC9 Accessibility
+- Release Candidate
+
+Do not begin the next milestone until the current milestone has been reviewed and accepted.
+
+---
+
+# Commit Message Convention
+
+Use clear milestone-based commit messages.
+
+Examples
+
+Release v4.1.1 - Export UX improvements
+
+v4.2 RC0 - Review Studio architecture
+
+v4.2 RC1 - Review Studio foundation
+
+v4.2 RC2 - Drag & Drop
+
+v4.2 RC3 - Merge steps
+
+v4.2 RC4 - Split steps
+
+v4.2 RC5 - Undo/Redo
+
+v4.2 RC6 - Editing improvements
+
+v4.2 RC7 - Toolbar
+
+v4.2 RC8 - Status Bar
+
+v4.2 RC9 - Accessibility
+
+Release v4.2.0 - Review Studio Professional
+
+---
+
+
 # Definition of Done
 
 A feature is complete only if
@@ -476,6 +565,8 @@ A feature is complete only if
 ✓ accessibility reviewed
 
 ✓ self-review completed
+
+✔ Milestone reviewed and accepted
 
 ---
 
