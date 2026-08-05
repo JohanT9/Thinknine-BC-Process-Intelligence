@@ -88,6 +88,7 @@ assert.strictEqual(registry.validate(baseRegistry).valid, true);
 
 const original = {
   themeId: "future",
+  themeSchemaVersion: "2.0.0",
   version: "2.0.0",
   displayName: "Future",
   futureRoot: { enabled: true },
@@ -98,7 +99,18 @@ const original = {
   branding: {},
   components: { futureComponent: { mode: "future" } },
   capabilities: ["supportsFutureDocuments"],
-  metadata: { futureMetadata: true }
+  metadata: { futureMetadata: true },
+  origin: {
+    provider: "marketplace",
+    package: "future-package",
+    id: "future",
+    futureOriginField: true
+  },
+  compatibility: {
+    semanticDocument: "*",
+    planner: "2.0.0",
+    futureCompatibilityField: true
+  }
 };
 const originalBefore = JSON.stringify(original);
 const normalized = theme.normalize(original);
@@ -116,8 +128,15 @@ const futureValidation = validation.validate(normalized, {
 assert.strictEqual(futureValidation.valid, true);
 assert.deepStrictEqual(
   futureValidation.issues.map(item => item.code),
-  ["future-theme-version", "future-capability"]
+  [
+    "future-theme-version",
+    "future-theme-schema-version",
+    "future-capability"
+  ]
 );
+assert.strictEqual(normalized.themeSchemaVersion, "2.0.0");
+assert.strictEqual(normalized.origin.futureOriginField, true);
+assert.strictEqual(normalized.compatibility.futureCompatibilityField, true);
 
 const serialized = theme.serialize(normalized);
 const reloaded = theme.deserialize(serialized);
@@ -128,6 +147,12 @@ const legacy = theme.normalize({ themeId: "legacy", displayName: "Legacy" });
 assert.strictEqual(legacy.version, theme.THEME_VERSION);
 assert.deepStrictEqual(legacy.colors, {});
 assert.deepStrictEqual(legacy.capabilities, []);
+assert.strictEqual(legacy.themeSchemaVersion, theme.THEME_SCHEMA_VERSION);
+assert.deepStrictEqual(legacy.origin, {});
+assert.deepStrictEqual(legacy.compatibility, {
+  semanticDocument: "*",
+  planner: "*"
+});
 
 const duplicateRegistry = registry.create([
   { themeId: "duplicate", displayName: "First" },
@@ -171,6 +196,17 @@ const malformedInheritanceCodes = registry.validate(malformedInheritance)
   .issues.map(item => item.code);
 assert.ok(malformedInheritanceCodes.includes("invalid-inheritance"));
 assert.ok(malformedInheritanceCodes.includes("invalid-capabilities"));
+
+const malformedThemeMetadata = registry.create([{
+  themeId: "malformed-metadata",
+  displayName: "Malformed metadata",
+  origin: "imported",
+  compatibility: { semanticDocument: "", planner: 1 }
+}]);
+const malformedMetadataCodes = registry.validate(malformedThemeMetadata)
+  .issues.map(item => item.code);
+assert.ok(malformedMetadataCodes.includes("invalid-theme-origin"));
+assert.ok(malformedMetadataCodes.includes("invalid-theme-compatibility"));
 
 const duplicateCapabilities = theme.normalize({
   ...registry.BUILT_IN_THEMES[0],

@@ -6,9 +6,9 @@ The semantic document model is the renderer-independent contract for future
 Documentation Excellence work. It describes what a document contains, not how
 Word, PDF or a browser should lay it out.
 
-RC2 adds the Review projector and RC3 adds an independent theme system. Neither
-plans pages nor alters export. The existing Word exporter remains the production
-path.
+RC2 adds the Review projector, RC3 adds the independent theme system and RC4
+adds the Document Planner. The existing Word exporter remains the production
+path and does not consume plans yet.
 
 ## Data flow and boundaries
 
@@ -16,14 +16,16 @@ path.
 Review data (existing, unchanged)
   ↓ Review Document Projector (RC2)
 Semantic document model
-  ↓ future layout planner
-Renderer input
+  + resolved Document Theme
+  ↓ Document Planner
+Document Plan
+  ↓ future renderer adapters
   ├─ Word renderer
   └─ future PDF renderer
 ```
 
-The future planner will consume the semantic document together with one
-resolved theme. Theme data is never stored in or inferred from semantic blocks.
+The planner consumes the semantic document together with one resolved theme.
+Theme data is never stored in or inferred from semantic blocks.
 
 The model must not contain renderer instructions such as fonts, margins, page
 sizes, pagination, spacing or DOCX units. Source references point back to
@@ -128,16 +130,51 @@ are descriptive metadata. They never gate document features. Unknown fields,
 future versions and future capabilities remain serializable and immutable.
 
 The built-in registry contains Base, Thinknine, Minimal and Corporate themes.
-There is no UI selection and no renderer consumes them in RC3.
+There is no UI selection and no renderer consumes them in RC4.
 
-Future work should extend the block registry and normalization/validation in
-this module, then add a separate layout planner. Renderers
-must consume planned output rather than introduce format-specific properties
-into this semantic model.
+Theme schema format is identified by `themeSchemaVersion`, independently of a
+theme package's own `version`. `origin` records provider/package identity as
+metadata. `compatibility.semanticDocument` and `compatibility.planner` declare
+supported producer contracts. Legacy themes normalize to the current schema and
+wildcard compatibility, while future schema versions remain preserved and are
+rejected by the current Planner until supported.
 
-## RC3 exclusions
+## Document Planner and Document Plan
 
-- no layout engine or theme selection UI;
+The planning layer is split by responsibility:
+
+- `document-plan.js` owns plan schema, normalization, immutability and JSON
+  serialization;
+- `document-planner.js` is the single producer and owns planning decisions;
+- `document-plan-validation.js` validates plan consistency and references
+  without mutation.
+
+A Document Plan contains stable plan identity, Semantic Document and Theme
+references, global components, ordered plan sections, nested components, page
+and spacing values, and planner metadata. Components describe placement,
+grouping, priority, visibility, page intent, `keepTogether` and `keepWithNext`.
+They reference semantic content instead of copying or owning it.
+
+Cover, metadata, workflow, steps, screenshots, callouts, tables, lists,
+revision history, TOC, header and footer use reusable component structures.
+List items, table rows and table cells retain explicit grouping. Capabilities
+influence component presence or visibility; they never render anything.
+
+The Planner accepts only a valid Semantic Document and a resolved, compatible
+theme. Its output depends exclusively on those two immutable inputs. Plan
+validation detects missing components, duplicate planning IDs, conflicting
+capabilities, unsupported compatibility and invalid semantic references.
+
+Plans intentionally contain no Word paragraphs, DOCX/PDF objects, twips, page
+numbers or calculated pagination. Renderer adapters will consume plans but must
+never create them.
+
+Future work should add adapters that consume planned output without introducing
+format-specific properties into the semantic model or duplicating planning.
+
+## RC4 exclusions
+
+- no theme selection or branding UI;
 - no Word or PDF integration;
 - no automated document-improvement processors;
 - no branding UI, branding asset loading, templates or export behaviour changes.

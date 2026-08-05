@@ -49,6 +49,25 @@ Kapabiliteter beskriver vad ett tema har värden för men aktiverar eller stäng
 aldrig av funktioner. Det finns ännu inget val av tema i UI, ingen layout och
 ingen koppling till den befintliga Word-exporten.
 
+### RC4 — Document Planner
+
+Document Planner är nu den enda komponenten som producerar renderer-neutrala
+Document Plans. Planeraren kombinerar ett Semantic Document med ett upplöst
+tema och beskriver sektioner, komponenthierarki, dokumentflöde, gruppering,
+placering, prioritet, synlighet samt page- och spacing-intent.
+
+Tema-kapabiliteter påverkar planeringen: exempelvis planeras header, footer,
+cover, callouts, revisionshistorik och TOC endast som synliga när temat beskriver
+stöd. Kapabiliteter skapar aldrig rendering. Planens källreferenser pekar tillbaka
+på semantiska sektioner, block och assets utan att kopiera innehållet.
+
+Temamodellen skiljer nu `themeSchemaVersion` från det enskilda temats `version`
+och stödjer immutable `origin` samt kompatibilitetsdeklarationer för Semantic
+Document och Planner. Äldre teman får säkra wildcard-standarder utan migrering.
+
+Ingen renderer använder planen ännu och Word-exportens nuvarande beteende är
+oförändrat.
+
 ## Screenshot annotations 4.3 RC1
 
 Review-modellen har en ny, versionshanterad grund för icke-destruktiva

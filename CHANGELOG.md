@@ -1,5 +1,23 @@
 # Changelog
 
+## 4.4.0 RC4 — Document Planner
+
+- Added the immutable, renderer-independent and versioned Document Plan model.
+- Added the deterministic Document Planner as the single producer of plans.
+- Planned sections, reusable component trees, flow, grouping, placement,
+  priority, visibility, page intent, keep intent and spacing intent.
+- Consumed resolved theme appearance values and interpreted capabilities without
+  rendering or feature mutation.
+- Added semantic source references for plan sections, blocks and assets.
+- Extended themes with independent `themeSchemaVersion`, immutable origin
+  metadata and Semantic Document/Planner compatibility declarations.
+- Added plan validation for missing components, consistency, capability
+  conflicts, compatibility and invalid references.
+- Added Base-theme defaults that keep older themes compatible without migration.
+- Added behaviour and integrity tests for planning, themes, serialization,
+  future versions and architectural boundaries.
+- Kept Word export, Review projection and Semantic Document Model unchanged.
+
 ## 4.4.0 RC3 — Document Theme System
 
 - Added an immutable, renderer-independent and versioned document theme model.

@@ -4,6 +4,7 @@
   root.T9DocumentTheme = api;
 })(typeof globalThis !== "undefined" ? globalThis : this, function () {
   const THEME_VERSION = "1.0.0";
+  const THEME_SCHEMA_VERSION = "1.0.0";
   const TOKEN_GROUPS = Object.freeze({
     colors: Object.freeze([
       "primary", "secondary", "text", "muted", "border", "warning",
@@ -61,6 +62,9 @@
     const normalized = {
       ...input,
       themeId: typeof input.themeId === "string" ? input.themeId : "",
+      themeSchemaVersion: typeof input.themeSchemaVersion === "string"
+        ? input.themeSchemaVersion
+        : THEME_SCHEMA_VERSION,
       version: typeof input.version === "string"
         ? input.version
         : THEME_VERSION,
@@ -80,7 +84,17 @@
       capabilities: Array.isArray(input.capabilities)
         ? clone(input.capabilities)
         : [],
-      metadata: object(input.metadata)
+      metadata: object(input.metadata),
+      origin: object(input.origin),
+      compatibility: {
+        ...object(input.compatibility),
+        semanticDocument: typeof input.compatibility?.semanticDocument === "string"
+          ? input.compatibility.semanticDocument
+          : "*",
+        planner: typeof input.compatibility?.planner === "string"
+          ? input.compatibility.planner
+          : "*"
+      }
     };
     return deepFreeze(normalized);
   }
@@ -105,6 +119,10 @@
     const match = TOKEN_REFERENCE.exec(reference);
     if (!match) return undefined;
     return theme[match[1]]?.[match[2]];
+  }
+
+  function isCompatible(declaration, version) {
+    return declaration === "*" || declaration === version;
   }
 
   function resolveTokenValue(value, theme, chain = []) {
@@ -150,12 +168,14 @@
   return {
     CAPABILITIES,
     THEME_VERSION,
+    THEME_SCHEMA_VERSION,
     TOKEN_GROUPS,
     TOKEN_REFERENCE,
     deepFreeze,
     deserialize,
     merge,
     normalize,
+    isCompatible,
     resolveTokens,
     serialize,
     tokenValue

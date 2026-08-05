@@ -206,6 +206,16 @@
       issue(issues, "future-theme-version", "$.version",
         `Theme version ${value.version} is preserved.`, "warning");
     }
+    if (value.themeSchemaVersion === undefined && options.allowPartial) {
+      // Normalization supplies the schema version for legacy themes.
+    } else if (typeof value.themeSchemaVersion !== "string" ||
+        !value.themeSchemaVersion.trim()) {
+      issue(issues, "invalid-theme-schema-version", "$.themeSchemaVersion",
+        "Theme schema version must be a non-empty string.");
+    } else if (value.themeSchemaVersion !== theme.THEME_SCHEMA_VERSION) {
+      issue(issues, "future-theme-schema-version", "$.themeSchemaVersion",
+        `Theme schema version ${value.themeSchemaVersion} is preserved.`, "warning");
+    }
     if (typeof value.displayName !== "string" || !value.displayName.trim()) {
       issue(issues, "missing-display-name", "$.displayName",
         "Theme requires a display name.");
@@ -214,6 +224,32 @@
         (typeof value.extends !== "string" || !value.extends.trim())) {
       issue(issues, "invalid-inheritance", "$.extends",
         "Theme parent ID must be a non-empty string.");
+    }
+    if (value.origin !== undefined && !object(value.origin)) {
+      issue(issues, "invalid-theme-origin", "$.origin",
+        "Theme origin must be an object.");
+    } else if (object(value.origin)) {
+      for (const key of ["provider", "package", "id"]) {
+        if (value.origin[key] !== undefined &&
+            typeof value.origin[key] !== "string") {
+          issue(issues, "invalid-theme-origin", `$.origin.${key}`,
+            `Theme origin ${key} must be a string.`);
+        }
+      }
+    }
+    if (value.compatibility !== undefined && !object(value.compatibility)) {
+      issue(issues, "invalid-theme-compatibility", "$.compatibility",
+        "Theme compatibility must be an object.");
+    } else if (object(value.compatibility)) {
+      for (const key of ["semanticDocument", "planner"]) {
+        if (value.compatibility[key] !== undefined &&
+            (typeof value.compatibility[key] !== "string" ||
+             !value.compatibility[key].trim())) {
+          issue(issues, "invalid-theme-compatibility",
+            `$.compatibility.${key}`,
+            `Theme compatibility ${key} must be a non-empty string.`);
+        }
+      }
     }
     if (value.colors !== undefined || !options.allowPartial) {
       validateStringTokens(value.colors, "colors", issues);

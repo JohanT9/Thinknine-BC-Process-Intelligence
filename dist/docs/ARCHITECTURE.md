@@ -9,7 +9,9 @@ Review (oförändrad)
   ↓ Review Document Projector
 Semantic Document Model
   + Document Theme System
-  ↓ framtida layoutplan
+  ↓ Document Planner
+Document Plan
+  ↓ framtida adaptrar
 Word / framtida PDF-renderare
 ```
 
@@ -23,6 +25,12 @@ Temasystemet definierar endast värden och tokenrelationer. Det inspekterar inte
 Review eller Semantic Document och beräknar inte placering, sidbrytning eller
 renderarformat. Den framtida Document Planner blir första konsumenten av både
 semantisk modell och ett upplöst tema.
+
+RC4 implementerar denna kombination. Planner är en ren transformation och den
+enda producenten av Document Plans. Planen innehåller stabila referenser till
+semantiskt innehåll samt renderer-neutrala beslut om flöde, komponenter,
+gruppering, synlighet och sidintention. Framtida adaptrar är konsumenter och får
+inte återskapa planeringslogik.
 
 ```text
 Recorder

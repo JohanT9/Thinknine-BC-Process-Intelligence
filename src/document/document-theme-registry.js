@@ -141,6 +141,7 @@
 
   const BASE_THEME = {
     themeId: "base",
+    themeSchemaVersion: theme.THEME_SCHEMA_VERSION,
     version: theme.THEME_VERSION,
     displayName: "Base",
     description: "Complete renderer-independent document appearance defaults.",
@@ -182,11 +183,14 @@
       "supportsBranding",
       "supportsCallouts"
     ],
-    metadata: { builtIn: true }
+    metadata: { builtIn: true },
+    origin: { provider: "built-in", package: "thinknine", id: "base" },
+    compatibility: { semanticDocument: "1.0.0", planner: "1.0.0" }
   };
 
   const BUILT_IN_THEMES = theme.deepFreeze([BASE_THEME, {
     themeId: "thinknine",
+    themeSchemaVersion: theme.THEME_SCHEMA_VERSION,
     version: theme.THEME_VERSION,
     displayName: "Thinknine",
     description: "Thinknine document appearance.",
@@ -200,9 +204,11 @@
       organizationName: "Thinknine AB",
       footer: "Thinknine Process Intelligence"
     },
-    metadata: { builtIn: true }
+    metadata: { builtIn: true },
+    origin: { provider: "built-in", package: "thinknine", id: "thinknine" }
   }, {
     themeId: "minimal",
+    themeSchemaVersion: theme.THEME_SCHEMA_VERSION,
     version: theme.THEME_VERSION,
     displayName: "Minimal",
     description: "Quiet document appearance with restrained accents.",
@@ -219,9 +225,11 @@
       "supportsTOC",
       "supportsCallouts"
     ],
-    metadata: { builtIn: true }
+    metadata: { builtIn: true },
+    origin: { provider: "built-in", package: "thinknine", id: "minimal" }
   }, {
     themeId: "corporate",
+    themeSchemaVersion: theme.THEME_SCHEMA_VERSION,
     version: theme.THEME_VERSION,
     displayName: "Corporate",
     description: "Neutral corporate document appearance.",
@@ -234,7 +242,8 @@
     typography: {
       title: { family: "Arial", size: 28, weight: 700, color: "{colors.primary}" }
     },
-    metadata: { builtIn: true }
+    metadata: { builtIn: true },
+    origin: { provider: "built-in", package: "thinknine", id: "corporate" }
   }]);
   const BUILT_IN_REGISTRY = create(BUILT_IN_THEMES);
 
