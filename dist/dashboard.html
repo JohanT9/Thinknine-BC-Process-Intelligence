@@ -69,6 +69,7 @@ table{width:100%;border-collapse:collapse}th,td{text-align:left;padding:9px;bord
 .review-card.compact .review-actions label{margin:0;align-self:center}
 .review-footer{padding:16px;border-top:1px solid #d8dee5;display:flex;justify-content:space-between;background:#f8fafc}
 .annotation-editor{padding:18px}
+.annotation-editor-sticky{position:sticky;top:0;z-index:3;background:white;margin:-18px -18px 0;padding:18px 18px 1px}
 .annotation-editor-header{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:12px}
 .annotation-editor-header h3{margin:0 0 4px}
 .annotation-toolbar{display:flex;gap:6px;align-items:center;margin-bottom:12px}
@@ -261,20 +262,22 @@ table{width:100%;border-collapse:collapse}th,td{text-align:left;padding:9px;bord
       aria-describedby="reviewStatus"
     ></main>
     <section id="annotationEditor" class="annotation-editor" aria-labelledby="annotationTitle" hidden>
-      <div class="annotation-editor-header">
-        <div>
-          <h3 id="annotationTitle">Annotera skärmbild</h3>
-          <p id="annotationDescription" class="muted">Markera viktiga områden utan att ändra originalbilden.</p>
+      <div class="annotation-editor-sticky">
+        <div class="annotation-editor-header">
+          <div>
+            <h3 id="annotationTitle">Annotera skärmbild</h3>
+            <p id="annotationDescription" class="muted">Markera viktiga områden utan att ändra originalbilden.</p>
+          </div>
+          <div>
+            <button id="cancelAnnotationEditor" class="debug">Avbryt</button>
+            <button id="closeAnnotationEditor" class="secondary">Klar</button>
+          </div>
         </div>
-        <div>
-          <button id="cancelAnnotationEditor" class="debug">Avbryt</button>
-          <button id="closeAnnotationEditor" class="secondary">Klar</button>
+        <div class="annotation-toolbar" role="toolbar" aria-label="Annotationsverktyg">
+          <button id="rectangleAnnotationTool" class="secondary" aria-pressed="true">Rektangel</button>
+          <button id="arrowAnnotationTool" class="secondary" aria-pressed="false">Pil</button>
+          <button id="deleteAnnotation" class="danger" disabled>Ta bort markering</button>
         </div>
-      </div>
-      <div class="annotation-toolbar" role="toolbar" aria-label="Annotationsverktyg">
-        <button id="rectangleAnnotationTool" class="secondary" aria-pressed="true">Rektangel</button>
-        <button id="arrowAnnotationTool" class="secondary" aria-pressed="false">Pil</button>
-        <button id="deleteAnnotation" class="danger" disabled>Ta bort markering</button>
       </div>
       <div id="annotationStage" class="annotation-stage">
         <img id="annotationImage" alt="Skärmbild som annoteras">

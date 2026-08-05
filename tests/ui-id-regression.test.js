@@ -149,5 +149,10 @@ assert.ok(
     js.includes('card.setAttribute("aria-selected", String(selected))'),
   "Review cards must expose selection state as grid rows."
 );
+assert.ok(
+  html.includes('class="annotation-editor-sticky"') &&
+    html.includes(".annotation-editor-sticky{position:sticky;top:0;"),
+  "Annotation editor actions should remain available while scrolling."
+);
 
 console.log("UI ID regression tests passed.");
