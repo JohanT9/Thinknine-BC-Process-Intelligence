@@ -66,6 +66,16 @@ search for a solution that satisfies both.
 
 If no such solution exists, user value takes precedence.
 
+Celebrate Progress
+
+Documentation Excellence should acknowledge completed work as often as it
+identifies opportunities for improvement.
+
+The objective is to increase confidence rather than simply report issues.
+
+Users should leave the product feeling confident that their documentation
+is improving.
+
 ---
 
 # Consultant First
