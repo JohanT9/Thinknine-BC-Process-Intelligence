@@ -1,7 +1,18 @@
-# Thinknine BC Process Intelligence v4.5.0 UX4
+# Thinknine BC Process Intelligence v4.5.0 UX5
 
 Ett modulärt Edge-tillägg för att spela in, granska och exportera dokumenterade
 Business Central-processer.
+
+## Smart Document Profiles 4.5 UX5
+
+Dokumentprofilen beskriver dokumentets syfte och förväntningar utan att ändra
+innehållet. Inbyggda profiler finns för Business Process, SOP, Training Guide,
+Quick Reference och Troubleshooting Guide. Ett direkt profilbyte uppdaterar
+Document Workspace-tema, planerad presentation, Document Health, prioriterad
+vägledning och positiva bekräftelser från cachade immutable varianter.
+
+Profilerna definierar endast förväntningar och lagras aldrig i Review. Se
+[Document Profiles 4.5](docs/DOCUMENT_PROFILES_4.5.md).
 
 ## Documentation Intelligence 4.5 UX4
 

@@ -44,3 +44,15 @@ is prepared. Guidance never applies corrections.
 - no export blocking
 - no Review persistence
 - no Word rendering changes
+
+## Profile-aware guidance and Celebrate Progress
+
+UX5 optionally supplies an immutable Document Profile to the intelligence
+projection. Profile expectations add advisory recommendations only when they
+are relevant and reorder groups according to profile priorities. They never
+become validation failures.
+
+Document Health includes the active profile and positive confirmations alongside
+recommendations. Completed workflow, screenshot support, accessibility,
+metadata, purpose and revision history are acknowledged when appropriate.
+Confirmations are qualitative and no score or percentage is introduced.

@@ -96,6 +96,149 @@
     };
   }
 
+  function documentFacts(document) {
+    const sections = document?.sections || [];
+    const blocks = [];
+    function visit(values) {
+      (values || []).forEach(value => {
+        blocks.push(value);
+        visit(value.blocks);
+      });
+    }
+    sections.forEach(section => visit(section.blocks));
+    const steps = blocks.filter(block => block.kind === "step");
+    return {
+      sectionKinds: new Set(sections.map(section => section.kind)),
+      steps,
+      stepHasScreenshot: steps.map(step =>
+        (step.blocks || []).some(block => block.kind === "image")),
+      instructions: steps.map(step =>
+        (step.blocks || []).find(block => block.kind === "paragraph")?.text || "")
+    };
+  }
+
+  function profileItem(profile, key, group, title, action, context = {}) {
+    return {
+      guidanceId: `profile:${profile.profileId}:${key}`,
+      diagnosticId: null,
+      group,
+      title: `Recommendation: ${title}`,
+      description: `Det här är särskilt värdefullt för ${profile.displayName}.`,
+      severity: "recommendation",
+      documentLocation: context.selectedSectionId || "document",
+      recommendedAction: action,
+      status: "Recommendation",
+      context: {
+        selectedSectionId: context.selectedSectionId || null,
+        selectedStepId: context.selectedStepId || null,
+        selectedScreenshotId: null,
+        selectedAnnotationId: null,
+        scrollAnchor: context.scrollAnchor || null
+      }
+    };
+  }
+
+  function profileGuidance(document, profile, diagnosticRules) {
+    if (!profile) return [];
+    const facts = documentFacts(document);
+    const values = [];
+    for (const section of profile.recommendedSections || []) {
+      const covered = section === "purpose"
+        ? diagnosticRules.has("document.missing-purpose")
+        : section === "workflow"
+          ? diagnosticRules.has("document.missing-workflow")
+          : section === "revisionHistory"
+            ? diagnosticRules.has("document.missing-revision-history")
+            : false;
+      if (!facts.sectionKinds.has(section) && !covered) {
+        values.push(profileItem(profile, `section:${section}`, section === "workflow"
+          ? "Workflow" : section === "revisionHistory"
+            ? "Revision History" : "Documentation",
+        section === "purpose" ? "Beskriv dokumentets syfte" :
+          section === "revisionHistory" ? "Ta med revisionshistorik" :
+            "Beskriv arbetsflödet",
+        "Överväg att komplettera den rekommenderade dokumentstrukturen."));
+      }
+    }
+    for (const field of profile.recommendedMetadata || []) {
+      const diagnosticRule = field === "documentVersion"
+        ? "metadata.missing-revision"
+        : `metadata.missing-${field.replace(/[A-Z]/g,
+          match => `-${match.toLowerCase()}`)}`;
+      if (!document?.metadata?.[field] &&
+          !diagnosticRules.has(diagnosticRule)) {
+        values.push(profileItem(profile, `metadata:${field}`, "Metadata",
+          "Komplettera dokumentinformationen",
+          "Överväg att lägga till den profilrekommenderade informationen."));
+      }
+    }
+    if (profile.expectedScreenshots?.perStep &&
+        facts.stepHasScreenshot.some(value => !value) &&
+        !diagnosticRules.has("screenshot.missing")) {
+      values.push(profileItem(profile, "screenshots", "Screenshots",
+        "Stärk stegen med visuellt stöd",
+        "Överväg en skärmbild för steg där den underlättar förståelsen."));
+    }
+    if (profile.workflowExpectations?.explanatoryText === "expanded" &&
+        facts.instructions.some(value => value.trim().length < 40) &&
+        !diagnosticRules.has("step.very-short-instruction")) {
+      values.push(profileItem(profile, "expanded-text", "Workflow",
+        "Utöka förklaringen i korta steg",
+        "Lägg gärna till sammanhang som hjälper en ny användare."));
+    }
+    if (profile.revisionExpectations?.approvalInformation) {
+      values.push(profileItem(profile, "approval-information", "Metadata",
+        "Beskriv godkännandeansvar",
+        "Överväg att dokumentera vem som godkänner instruktionen."));
+    }
+    return values;
+  }
+
+  function confirmations(document, profile, items) {
+    if (!profile) return [];
+    const facts = documentFacts(document);
+    const values = [];
+    function add(key, group, condition) {
+      const title = profile.positiveConfirmations?.[key];
+      if (condition && title && !items.some(itemValue => itemValue.group === group &&
+          itemValue.severity === "attention")) {
+        values.push({ confirmationId: `confirmation:${profile.profileId}:${key}`,
+          group, title });
+      }
+    }
+    add("workflow", "Workflow", facts.steps.length >=
+      (profile.workflowExpectations?.minimumSteps || 1));
+    add("screenshots", "Screenshots", facts.stepHasScreenshot.length > 0 &&
+      facts.stepHasScreenshot.every(Boolean));
+    add("accessibility", "Accessibility",
+      !items.some(value => value.group === "Accessibility"));
+    add("metadata", "Metadata", (profile.recommendedMetadata || []).every(
+      field => Boolean(document?.metadata?.[field])) &&
+      !profile.revisionExpectations?.approvalInformation);
+    add("purpose", "Documentation", facts.sectionKinds.has("purpose"));
+    add("revisionHistory", "Revision History",
+      facts.sectionKinds.has("revisionHistory"));
+    return values;
+  }
+
+  function findingRelevant(finding, profile) {
+    if (!profile) return true;
+    if (["document.missing-revision-history", "metadata.missing-revision"]
+      .includes(finding.ruleId)) {
+      return profile.revisionExpectations?.recommended === true;
+    }
+    if (finding.ruleId === "screenshot.missing") {
+      return profile.expectedScreenshots?.perStep === true;
+    }
+    if (finding.ruleId === "document.missing-purpose") {
+      return profile.recommendedSections?.includes("purpose");
+    }
+    if (finding.ruleId === "metadata.missing-reviewer") {
+      return profile.recommendedMetadata?.includes("reviewer");
+    }
+    return true;
+  }
+
   function categoryStatus(items, group, completeLabel = "Complete") {
     const values = items.filter(value => value.group === group);
     if (!values.length) return completeLabel;
@@ -107,11 +250,25 @@
   function create(options = {}) {
     const seen = new Set();
     const items = [];
+    const profile = options.profile || null;
     for (const finding of options.qualityDiagnostics?.findings || []) {
-      if (!finding?.diagnosticId || seen.has(finding.diagnosticId)) continue;
+      if (!finding?.diagnosticId || seen.has(finding.diagnosticId) ||
+          !findingRelevant(finding, profile)) continue;
       seen.add(finding.diagnosticId);
       items.push(item(finding));
     }
+    const diagnosticRules = new Set(
+      (options.qualityDiagnostics?.findings || []).map(finding => finding.ruleId)
+    );
+    items.push(...profileGuidance(options.document, profile, diagnosticRules));
+    const priority = new Map((profile?.guidancePriorities || []).map(
+      (group, index) => [group, index]
+    ));
+    items.sort((left, right) =>
+      (priority.get(left.group) ?? 999) - (priority.get(right.group) ?? 999) ||
+      left.guidanceId.localeCompare(right.guidanceId)
+    );
+    const positiveConfirmations = confirmations(options.document, profile, items);
     const groups = GROUPS.map(name => ({
       name,
       items: items.filter(value => value.group === name)
@@ -135,7 +292,13 @@
       documentId: options.document?.documentId || "",
       planId: options.plan?.planId || "",
       activeContext: { ...(options.workspaceContext || {}) },
+      profile: profile ? {
+        profileId: profile.profileId,
+        displayName: profile.displayName,
+        description: profile.description
+      } : null,
       health,
+      positiveConfirmations,
       groups,
       items
     });

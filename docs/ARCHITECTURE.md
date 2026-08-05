@@ -141,6 +141,24 @@ positivt formulerad vägledning. Modulen läser aldrig Review, muterar inga inda
 blockerar aldrig export och anropar ingen renderer. Dashboarden visar modellen
 med stabil ID-reconciliation och använder Workspace Context för navigation.
 
+UX5 inför ett renderer-neutralt förväntningslager mellan Semantic Document och
+presentationen:
+
+```text
+Semantic Document + Document Profile
+              ↓
+   cached Resolved Theme + Document Plan variant
+              ↓
+Documentation Intelligence + Document Workspace
+```
+
+`document-profile.js` äger schema, normalisering, register och inbyggda
+profiler. En profil beskriver förväntningar men skapar eller ändrar aldrig
+dokumentinnehåll. Dashboarden beräknar immutable tema-/planvarianter en gång per
+dokumentrevision. Profilbyte väljer en cachad variant, så Review, Semantic
+Document och komponenter regenereras inte vid bytet. Word använder fortsatt sin
+oförändrade produktionspipeline.
+
 ```text
 Recorder
   ↓

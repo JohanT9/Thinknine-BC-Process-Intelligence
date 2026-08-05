@@ -19,7 +19,7 @@ assert.ok(
   dashboard.includes("function publishWorkspaceContext(") &&
     dashboard.includes("function revealDocumentContext(") &&
     dashboard.includes("function revealReviewContext(") &&
-    dashboard.includes("T9WorkspaceContext.bind(model") &&
+    dashboard.includes("T9WorkspaceContext.bind(variant.model") &&
     !dashboard.includes("T9DocumentWorkspaceView.selectReview"),
   "Both workspaces must coordinate only through Workspace Context."
 );
@@ -30,6 +30,14 @@ assert.ok(
     dashboard.includes("guidanceFingerprint") &&
     !dashboard.includes("qualityDiagnostics.findings.push"),
   "Guidance must reuse immutable pipeline diagnostics without editing them."
+);
+assert.ok(
+  dashboard.includes("function buildDocumentProfileVariants(pipeline)") &&
+    dashboard.includes("function applyDocumentProfileVariant(options = {})") &&
+    dashboard.includes("documentProfileVariants.has(nextProfileId)") &&
+    dashboard.includes("preservePosition: true") &&
+    dashboard.includes("function exportActiveReviewToWord()"),
+  "Profile switching must use cached presentation variants and preserve context."
 );
 
 assert.ok(

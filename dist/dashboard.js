@@ -3497,6 +3497,88 @@ let workspaceContext = globalThis.T9WorkspaceContext.create();
 let workspaceContextBinding = null;
 let workspaceHighlightTimer = 0;
 let documentationIntelligenceModel = null;
+let activeDocumentProfileId = "business-process";
+let documentProfileVariants = new Map();
+let documentWorkspaceMediaSources = {};
+let documentProfileSource = null;
+
+function documentProfiles() {
+  return globalThis.T9DocumentProfile.list(
+    globalThis.T9DocumentProfile.BUILT_IN_REGISTRY
+  );
+}
+
+function populateDocumentProfileSelector() {
+  $("documentProfileSelector").innerHTML = documentProfiles().map(profile =>
+    `<option value="${escapeHtml(profile.profileId)}">` +
+    `${escapeHtml(profile.displayName)}</option>`
+  ).join("");
+  $("documentProfileSelector").value = activeDocumentProfileId;
+}
+
+function buildDocumentProfileVariants(pipeline) {
+  return new Map(documentProfiles().map(profile => {
+    const theme = profile.theme.themeId === pipeline.theme.themeId
+      ? pipeline.theme
+      : globalThis.T9DocumentThemeRegistry.resolve(
+        globalThis.T9DocumentThemeRegistry.BUILT_IN_REGISTRY,
+        profile.theme.themeId,
+        profile.theme.overrides || {}
+      );
+    const plan = theme === pipeline.theme
+      ? pipeline.plan
+      : globalThis.T9DocumentPlanner.plan(pipeline.semanticDocument, theme);
+    return [profile.profileId, {
+      profile,
+      theme,
+      plan,
+      model: globalThis.T9DocumentWorkspace.render(plan)
+    }];
+  }));
+}
+
+function applyDocumentProfileVariant(options = {}) {
+  const variant = documentProfileVariants.get(activeDocumentProfileId);
+  if (!variant) return null;
+  const viewport = $("documentWorkspaceViewport");
+  const focalRatio = (viewport.scrollTop + viewport.clientHeight / 2) /
+    Math.max(1, viewport.scrollHeight);
+  documentationIntelligenceModel = globalThis.T9DocumentationIntelligence
+    .create({
+      document: options.semanticDocument || documentProfileSource?.semanticDocument,
+      plan: variant.plan,
+      qualityDiagnostics: options.qualityDiagnostics ||
+        documentProfileSource?.qualityDiagnostics,
+      workspaceContext,
+      profile: variant.profile
+    });
+  workspaceContextBinding = globalThis.T9WorkspaceContext.bind(variant.model, {
+    taskIds: globalThis.T9Review.activeTasks(activeReview).map(task => task.taskId),
+    screenshotsByTask: reviewScreenshotsByTask()
+  });
+  const result = globalThis.T9DocumentWorkspaceView.render(
+    $("documentWorkspace"),
+    variant.model,
+    documentWorkspaceMediaSources
+  );
+  $("documentProfileSelector").value = variant.profile.profileId;
+  $("documentProfileDescription").textContent = variant.profile.description;
+  renderDocumentationGuidance();
+  applyDocumentView({ persist: false });
+  if (options.preservePosition) {
+    viewport.scrollTop = Math.max(
+      0,
+      focalRatio * viewport.scrollHeight - viewport.clientHeight / 2
+    );
+  } else {
+    revealDocumentContext();
+  }
+  if (options.announce) {
+    $("documentationGuidanceStatus").textContent =
+      `${variant.profile.displayName} är aktiv. Dokumentet och vägledningen har uppdaterats.`;
+  }
+  return result;
+}
 
 function healthStatusLabel(status) {
   return {
@@ -3518,12 +3600,16 @@ function renderDocumentationGuidance() {
   const health = documentationIntelligenceModel.health;
   $("documentHealth").innerHTML = `
     <h4 id="documentHealthTitle">Dokumenthälsa</h4>
+    <span>${escapeHtml(documentationIntelligenceModel.profile?.displayName || "")}</span>
     <strong>${escapeHtml(healthStatusLabel(health.overall))}</strong>
     <span>${escapeHtml(health.suggestionLabel)}</span>
     <dl>${health.categories.map(category => `<div>
       <dt>${escapeHtml(category.name)}</dt>
       <dd>${escapeHtml(healthStatusLabel(category.status))}</dd>
-    </div>`).join("")}</dl>`;
+    </div>`).join("")}</dl>
+    <ul class="positive-confirmations">${documentationIntelligenceModel
+      .positiveConfirmations.map(value =>
+        `<li>${escapeHtml(value.title)}</li>`).join("")}</ul>`;
   const visible = globalThis.T9DocumentationIntelligence.filter(
     documentationIntelligenceModel,
     $("documentationGuidanceFilter").value
@@ -3838,39 +3924,28 @@ async function synchronizeDocumentWorkspace() {
         const pipeline = createActiveDocumentPipeline();
         const mediaAssets = await prepareDocumentMedia(pipeline);
         if (requestedRevision !== workspaceState.revision) continue;
-        const model = globalThis.T9DocumentWorkspace.render(pipeline.plan);
-        documentationIntelligenceModel = globalThis.T9DocumentationIntelligence
-          .create({
-            document: pipeline.semanticDocument,
-            plan: pipeline.plan,
-            qualityDiagnostics: pipeline.qualityDiagnostics,
-            workspaceContext
-          });
-        workspaceContextBinding = globalThis.T9WorkspaceContext.bind(model, {
-          taskIds: globalThis.T9Review.activeTasks(activeReview)
-            .map(task => task.taskId),
-          screenshotsByTask: reviewScreenshotsByTask()
-        });
-        const mediaSources = Object.fromEntries(Object.entries(mediaAssets).map(
+        documentProfileSource = {
+          semanticDocument: pipeline.semanticDocument,
+          qualityDiagnostics: pipeline.qualityDiagnostics
+        };
+        documentProfileVariants = buildDocumentProfileVariants(pipeline);
+        documentWorkspaceMediaSources = Object.fromEntries(
+          Object.entries(mediaAssets).map(
           ([assetId, value]) => [assetId, {
             source: imageDataToDataUrl(value),
             revision: requestedRevision
           }]
         ));
-        const result = globalThis.T9DocumentWorkspaceView.render(
-          $("documentWorkspace"),
-          model,
-          mediaSources
-        );
+        const result = applyDocumentProfileVariant({
+          semanticDocument: pipeline.semanticDocument,
+          qualityDiagnostics: pipeline.qualityDiagnostics
+        });
         workspaceState = globalThis.T9WorkspaceController.complete(
           workspaceState,
           requestedRevision
         );
         $("documentWorkspaceStatus").textContent =
           `Dokumentet är synkroniserat. ${result.sectionCount} avsnitt.`;
-        applyDocumentView({ persist: false });
-        renderDocumentationGuidance();
-        revealDocumentContext();
       } catch (error) {
         $("documentWorkspaceStatus").textContent =
           `Dokumentet kunde inte visas: ${error.message}`;
@@ -4826,6 +4901,11 @@ async function openReview(session) {
   workspaceContext = globalThis.T9WorkspaceContext.create();
   workspaceContextBinding = null;
   documentationIntelligenceModel = null;
+  activeDocumentProfileId = "business-process";
+  documentProfileVariants = new Map();
+  documentWorkspaceMediaSources = {};
+  documentProfileSource = null;
+  populateDocumentProfileSelector();
   workspaceState = globalThis.T9WorkspaceController.create();
   documentWorkspaceSync = null;
   documentViewState = globalThis.T9DocumentWorkspaceExperience.update(
@@ -4890,6 +4970,9 @@ async function closeReview() {
   workspaceContext = globalThis.T9WorkspaceContext.create();
   workspaceContextBinding = null;
   documentationIntelligenceModel = null;
+  documentProfileVariants = new Map();
+  documentWorkspaceMediaSources = {};
+  documentProfileSource = null;
   renderDocumentationGuidance();
   globalThis.T9DocumentWorkspaceView.clear($("documentWorkspace"));
   $("documentWorkspaceStatus").textContent = "";
@@ -5091,6 +5174,12 @@ $("documentationGuidanceFilter").addEventListener("change", () => {
   renderDocumentationGuidance();
   $("documentationGuidanceStatus").textContent =
     "Vägledningen har filtrerats.";
+});
+$("documentProfileSelector").addEventListener("change", event => {
+  const nextProfileId = event.target.value;
+  if (!documentProfileVariants.has(nextProfileId)) return;
+  activeDocumentProfileId = nextProfileId;
+  applyDocumentProfileVariant({ announce: true, preservePosition: true });
 });
 $("documentationGuidanceGroups").addEventListener("click", event => {
   const button = event.target.closest?.("[data-guidance-id]");

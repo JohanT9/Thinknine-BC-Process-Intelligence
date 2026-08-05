@@ -1,5 +1,21 @@
 # Changelog
 
+## 4.5.0 UX5 — Smart Document Profiles
+
+- Added a versioned immutable renderer-neutral Document Profile model and
+  extensible registry with future-field preservation.
+- Added Business Process, SOP, Training Guide, Quick Reference and
+  Troubleshooting Guide built-in profiles.
+- Added an accessible profile selector that immediately switches cached theme,
+  planned presentation, profile-aware guidance and qualitative Document Health.
+- Added profile-specific expectations and deterministic guidance priorities
+  without mandatory validation or document mutation.
+- Integrated Celebrate Progress confirmations for workflow, screenshots,
+  accessibility, metadata, purpose and revision history.
+- Preserved Workspace Context, reading position, Review history, Undo and Redo
+  across profile switches.
+- Kept profile selection outside Review persistence and Word export behaviour.
+
 ## 4.5.0 UX4 — Documentation Intelligence
 
 - Added a non-modal Documentation Guidance panel with qualitative Document

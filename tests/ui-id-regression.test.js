@@ -228,5 +228,12 @@ assert.ok(
     html.includes('aria-live="polite"'),
   "Documentation Guidance must be an accessible, non-modal document panel."
 );
+assert.ok(
+  html.includes('<script src="document/document-profile.js"></script>') &&
+    html.includes('id="documentProfileSelector"') &&
+    html.includes('for="documentProfileSelector"') &&
+    html.includes('id="documentProfileDescription"'),
+  "Smart Document Profiles must expose a labelled, described selector."
+);
 
 console.log("UI ID regression tests passed.");

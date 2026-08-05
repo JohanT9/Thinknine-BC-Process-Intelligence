@@ -130,3 +130,15 @@ changed items.
 Activating guidance publishes its location to Workspace Context, reveals and
 highlights the corresponding document content and prepares the matching Review
 selection. It never performs the recommended action and never edits data.
+
+## Smart Document Profiles (UX5)
+
+The profile selector changes the document perspective without changing content.
+Each profile resolves a built-in renderer-neutral theme and a Document Plan
+variant from the same immutable Semantic Document. Variants are cached for the
+current document revision; switching profile only selects and renders a cached
+variant and refreshes advisory intelligence.
+
+Workspace Context and the viewport focal position are preserved. Review
+history, Undo, Redo and editing state are untouched. Profiles are not persisted
+inside Review and are not passed to Word export.
