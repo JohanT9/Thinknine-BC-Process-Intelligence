@@ -1,5 +1,22 @@
 # Changelog
 
+## 4.6.0 R2 — Screenshot Intelligence
+
+- Added one renderer-neutral owner for deterministic screenshot candidate
+  normalization, evaluation, selection and test-accessible explanations.
+- Integrated screenshot selection after Language Excellence and before Document
+  Profile presentation planning, shared by Document Workspace and Word.
+- Added safe precedence for manual choices and annotations, plus fallback for
+  missing, incomplete, equivalent or conflicting candidate metadata.
+- Added explainable rules for supported target, stability, transient state,
+  dialog, resolution, source-event, near-duplicate, narrative and profile data.
+- Added immutable per-revision/profile caching without image bytes, OCR, AI,
+  computer vision, DOM, canvas or renderer dependencies.
+- Added real-shaped recorder fixtures and behavior coverage for selection,
+  compatibility, annotation integrity, caching and renderer parity.
+- Recorded that no real persisted Review was available for a non-manufactured
+  before-and-after assessment; user-visible success is therefore not claimed.
+
 ## 4.6.0 R1 — Language Excellence
 
 - Added a renderer-neutral Language Excellence transformation between Review

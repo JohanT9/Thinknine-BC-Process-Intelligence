@@ -3403,14 +3403,27 @@ function createActiveDocumentPipeline() {
   return globalThis.T9WordExportPipeline.create({
     session: activeReviewModel.response.session,
     review: activeReview,
+    screenshotCandidates: screenshotCandidatesFor(activeReviewModel, activeReview),
     profileId: activeDocumentProfileId,
     themeId: "thinknine"
   });
 }
 
+function screenshotCandidatesFor(model, review) {
+  return globalThis.T9ScreenshotIntelligence.fromEvents({
+    events: model?.contextEvents || [],
+    imagePaths: model?.imagePaths || {},
+    tasks: review?.tasks || []
+  });
+}
+
 async function composeDocumentMedia(pipeline, review, screenshotSources) {
+  const requiredAssetIds = new Set(
+    globalThis.T9WordExportPipeline.requiredMediaAssetIds(pipeline.plan)
+  );
   const screenshotAssets = pipeline.semanticDocument.assets.filter(asset =>
-    asset.kind === "image" && asset.sourceRef?.screenshotRef
+    asset.kind === "image" && requiredAssetIds.has(asset.assetId) &&
+    asset.sourceRef?.screenshotRef
   );
   const screenshotPaths = [...new Set(screenshotAssets.map(
     asset => asset.sourceRef.screenshotRef
@@ -3454,6 +3467,7 @@ async function exportLibraryDocument(record, exportSettings) {
   const pipeline = globalThis.T9WordExportPipeline.create({
     session: model.response.session,
     review,
+    screenshotCandidates: screenshotCandidatesFor(model, review),
     profileId: record.profile.profileId,
     themeId
   });
@@ -3848,14 +3862,19 @@ function buildDocumentProfileVariants(pipeline) {
       pipeline.sourceSemanticDocument,
       profile
     );
+    const screenshotResult = globalThis.T9ScreenshotIntelligence.select(
+      semanticDocument,
+      { candidates: pipeline.screenshotCandidates, profile }
+    );
     const plan = profile.profileId === pipeline.languageProfile.profileId &&
       theme === pipeline.theme
       ? pipeline.plan
-      : globalThis.T9DocumentPlanner.plan(semanticDocument, theme);
+      : globalThis.T9DocumentPlanner.plan(screenshotResult.document, theme);
     return [profile.profileId, {
       profile,
       theme,
-      semanticDocument,
+      semanticDocument: screenshotResult.document,
+      screenshotSelections: screenshotResult.selections,
       plan,
       model: globalThis.T9DocumentWorkspace.render(plan)
     }];

@@ -3,6 +3,20 @@
 Ett modulärt Edge-tillägg för att spela in, granska och exportera dokumenterade
 Business Central-processer.
 
+## Screenshot Intelligence 4.6 R2
+
+Screenshot Intelligence väljer deterministiskt den tydligaste tillgängliga
+skärmbildskandidaten före dokumentplanering. Lagret använder endast immutable
+Semantic Document, recorder-metadata, stabila referenser, annoteringsreferenser
+och Document Profile. Det läser aldrig bildbytes, DOM, canvas eller Word-data.
+
+Ensam skärmbild, manuellt val, annoteringar och ofullständig metadata har säkra
+fallbackregler. Likvärdiga kandidater behåller befintligt beteende; ett val görs
+bara när metadata ger en tydlig skillnad. Dokumentvy och Word konsumerar samma
+Document Plan och därför samma val. Se
+[Screenshot Intelligence 4.6](docs/SCREENSHOT_INTELLIGENCE_4.6.md) och
+[Release Notes 4.6 R2](docs/RELEASE_NOTES_4.6_R2.md).
+
 ## Language Excellence 4.6 R1
 
 Alla befintliga inspelningar och Reviews får nu automatiskt ett tydligare,

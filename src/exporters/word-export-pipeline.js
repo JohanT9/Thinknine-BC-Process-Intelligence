@@ -8,6 +8,9 @@
   const language = typeof module === "object" && module.exports
     ? require("../document/language-excellence")
     : root.T9LanguageExcellence;
+  const screenshotIntelligence = typeof module === "object" && module.exports
+    ? require("../document/screenshot-intelligence")
+    : root.T9ScreenshotIntelligence;
   const profiles = typeof module === "object" && module.exports
     ? require("../document/document-profile")
     : root.T9DocumentProfile;
@@ -36,6 +39,7 @@
     projector,
     semantic,
     language,
+    screenshotIntelligence,
     profiles,
     registry,
     themeValidation,
@@ -51,6 +55,7 @@
   projector,
   semantic,
   language,
+  screenshotIntelligence,
   profiles,
   registry,
   themeValidation,
@@ -106,6 +111,14 @@
       options.profileId || "business-process"
     ) || profiles.get(profiles.BUILT_IN_REGISTRY, "business-process");
     const languageDocument = language.process(projection.document, profile);
+    const screenshotCandidates = screenshotIntelligence.normalizeCandidates(
+      options.screenshotCandidates
+    );
+    const screenshotResult = screenshotIntelligence.select(languageDocument, {
+      candidates: screenshotCandidates,
+      profile
+    });
+    const presentationDocument = screenshotResult.document;
     const resolvedTheme = registry.resolve(
       registry.BUILT_IN_REGISTRY,
       options.themeId || "thinknine",
@@ -119,9 +132,9 @@
         `Document Theme validation failed: ${themeResult.issues[0].message}`
       );
     }
-    const plan = planner.plan(languageDocument, resolvedTheme);
+    const plan = planner.plan(presentationDocument, resolvedTheme);
     const planResult = planValidation.validate(plan, {
-      document: languageDocument,
+      document: presentationDocument,
       theme: resolvedTheme,
       plannerVersion: planner.PLANNER_VERSION
     });
@@ -132,12 +145,15 @@
     }
     return semantic.deepFreeze({
       sourceSemanticDocument: projection.document,
-      semanticDocument: languageDocument,
+      languageDocument,
+      semanticDocument: presentationDocument,
       languageProfile: profile,
+      screenshotCandidates,
+      screenshotSelections: screenshotResult.selections,
       theme: resolvedTheme,
       plan,
       diagnostics: projection.diagnostics,
-      qualityDiagnostics: analyzeQuality(languageDocument, plan)
+      qualityDiagnostics: analyzeQuality(presentationDocument, plan)
     });
   }
 

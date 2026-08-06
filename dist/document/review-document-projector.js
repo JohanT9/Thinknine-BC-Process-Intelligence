@@ -216,7 +216,10 @@
         ));
       }
       const stepKey = `${idPart(sourceTaskId)}:${occurrence}`;
-      const sourceRef = { taskId: sourceTaskId };
+      const sourceEventIds = Array.isArray(task.sourceEventNos)
+        ? task.sourceEventNos.map(String) : [];
+      const sourceRef = { taskId: sourceTaskId,
+        ...(sourceEventIds.length ? { sourceEventIds } : {}) };
       const instruction = firstText(task.instruction, task.description);
       if (!instruction) {
         diagnostics.push(diagnostic(
@@ -295,6 +298,9 @@
         kind: "step",
         stepNumber: workflowBlocks.length + 1,
         sourceRef,
+        ...(task.screenshotSelection &&
+          typeof task.screenshotSelection === "object"
+          ? { screenshotSelection: clone(task.screenshotSelection) } : {}),
         blocks
       });
     });

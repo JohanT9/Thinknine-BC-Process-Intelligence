@@ -26,6 +26,8 @@ const v45ReleaseNotes = read("docs/RELEASE_NOTES_4.5.0.md");
 const v45Readiness = read("docs/PRODUCTION_READINESS_4.5.md");
 const languageExcellence = read("docs/LANGUAGE_EXCELLENCE_4.6.md");
 const v46ReleaseNotes = read("docs/RELEASE_NOTES_4.6_R1.md");
+const screenshotIntelligence = read("docs/SCREENSHOT_INTELLIGENCE_4.6.md");
+const v46R2ReleaseNotes = read("docs/RELEASE_NOTES_4.6_R2.md");
 const installation = read("INSTALLERA.txt");
 const handbook = read(".github/AGENTS.md");
 assert.ok(architecture.startsWith("# Architecture 4.6"));
@@ -38,18 +40,33 @@ assert.ok(v45Readiness.includes(
 assert.ok(languageExcellence.includes("Existing recordings require no migration."));
 assert.ok(languageExcellence.includes("Semantic meaning is preserved."));
 assert.ok(v46ReleaseNotes.includes("Documentation Excellence v4.6 R1"));
+assert.ok(screenshotIntelligence.includes("Existing recordings require no migration."));
+assert.ok(screenshotIntelligence.includes(
+  "Manual screenshot choices remain authoritative."));
+assert.ok(screenshotIntelligence.includes("R1's lack of a verified visible"));
+assert.ok(v46R2ReleaseNotes.includes("Documentation Excellence v4.6 R2"));
 assert.ok(installation.includes("WORD-EXPORT 4.4"));
 assert.ok(handbook.includes("src/exporters/"));
 assert.ok(!handbook.includes("src/export/\n"));
 
 const adapter = read("src/exporters/word-document-adapter.mjs");
 const languageLayer = read("src/document/language-excellence.js");
+const screenshotLayer = read("src/document/screenshot-intelligence.js");
+const workspaceRenderer = read("src/document/document-workspace.js");
 for (const forbidden of [
   "review-document-projector",
   "document-theme-registry",
   "src/review"
 ]) {
   assert.ok(!adapter.includes(forbidden), `Word adapter must not import ${forbidden}.`);
+}
+assert.ok(!adapter.includes("screenshot-intelligence"));
+assert.ok(!workspaceRenderer.includes("screenshot-intelligence"));
+for (const forbidden of ["src/review", "../review", "document-planner",
+  "word-document-adapter", "word-export", "document.querySelector",
+  "canvas", "imageData"]) {
+  assert.ok(!screenshotLayer.includes(forbidden),
+    `Screenshot Intelligence must not import or consume ${forbidden}.`);
 }
 for (const forbidden of ["src/review", "../review", "document-planner",
   "word-document-adapter", "word-export"]) {

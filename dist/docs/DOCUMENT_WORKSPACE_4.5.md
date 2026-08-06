@@ -1,5 +1,14 @@
 # Document Workspace 4.5
 
+## Screenshot Intelligence 4.6 R2 integration
+
+Document Workspace does not choose screenshots. Screenshot Intelligence runs
+before planning, and Workspace renders the same selected screenshot component
+and asset identity that Word receives from the validated Document Plan. Profile
+changes may recompute selection from the same immutable candidate set without
+reading Review or image bytes. Selection explanations remain derived,
+test-accessible data and add no mandatory user interface.
+
 ## Purpose
 
 Documentation Excellence has two first-class workspaces representing the same

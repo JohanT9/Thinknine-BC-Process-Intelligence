@@ -1,5 +1,31 @@
 # Architecture 4.6
 
+## Screenshot Intelligence 4.6 R2
+
+```text
+Review → Review Projector → Semantic Document → Language Excellence
+  → Screenshot Intelligence → Document Profile → Theme → Document Planner
+  → Components / Diagnostics → Document Workspace / Word Adapter
+```
+
+`screenshot-intelligence.js` solely owns candidate normalization, explainable
+evaluation and selection. It consumes no Review, DOM, image bytes, canvas,
+Planner or renderer structure. The composition root derives immutable candidate
+metadata from existing recorder events and screenshot paths. Selection returns a
+new Semantic Document plus disposable explanations; neither is persisted to
+Review.
+
+Review Projector carries stable source-event references and the minimal optional
+`screenshotSelection: { mode: "manual", screenshotRef }` contract into step
+semantics. A valid manual reference is authoritative. Annotated candidates are
+protected, and multiple annotated candidates retain the previous presentation
+instead of orphaning annotations.
+
+Language output is the selection input. The selected document is the only
+document passed to Planner, so Document Workspace and Word cannot select
+independently. Results are cached only for immutable document and candidate
+identities and per profile; mutable inputs always run again.
+
 ## Language Excellence 4.6 R1
 
 ```text
