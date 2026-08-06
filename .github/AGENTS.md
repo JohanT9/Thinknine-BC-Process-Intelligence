@@ -76,6 +76,9 @@ The objective is to increase confidence rather than simply report issues.
 Users should leave the product feeling confident that their documentation
 is improving.
 
+Every document should be improved until no further stylistic improvements
+can be made without changing its meaning.
+
 ---
 
 # Consultant First
@@ -93,6 +96,35 @@ If an implementation satisfies none of these goals,
 it should normally not be implemented.
 
 The consultant's time is the product's most valuable resource.
+
+## Language Excellence
+
+Documentation Excellence should continuously improve the quality of written
+documentation.
+
+Every document should read as if it were written by an experienced Business
+Central consultant.
+
+Language should be:
+
+- clear
+- concise
+- consistent
+- professional
+- easy to follow
+
+Improve wording wherever possible without changing the meaning of the
+documentation.
+
+Language Excellence must never:
+
+- invent information
+- remove information
+- change workflow logic
+- change document intent
+- alter semantic meaning
+
+The objective is to improve expression, never interpretation.
 
 ---
 
