@@ -461,6 +461,23 @@ Each rule should describe one business interaction only.
 
 Generic rules should never override more specific rules.
 
+### Semantic Noise Filtering
+
+User documentation should ignore technical interaction events that do not
+contribute to understanding the workflow.
+
+Examples include:
+
+- focus
+- blur
+- hover
+- tab navigation
+- transient UI states
+
+Noise filtering must never remove business actions or destroy traceability.
+
+Underlying events remain available for diagnostics and auditing.
+
 ---
 
 # Projection Purity

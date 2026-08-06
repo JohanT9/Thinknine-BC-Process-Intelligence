@@ -56,6 +56,12 @@ record selection and matching field result becomes one generic lookup action.
 A selection prompt without a selected value is also suppressed. Actual typed
 values, option changes and record selections remain visible.
 
+Recorder deduplication includes the input source, preventing a later focusout
+from replacing evidence of real input. For backward compatibility, a non-empty
+field value remains instructional even when an older recording contains only
+focusout provenance. Generic lookup labels remove the technical `Sortera efter`
+prefix, producing wording such as `Välj Nr "136"`.
+
 ## Semantic Action model
 
 A Semantic Action contains:

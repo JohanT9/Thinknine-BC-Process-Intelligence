@@ -102,6 +102,32 @@ assert.deepStrictEqual(semanticInteractionOutput.semanticActionsDocument.section
   .find(block => block.kind === "step").semanticAction.sourceEventNos,
 ["40", "41"]);
 
+const fieldNoiseOutput = await exportReview(review([{
+  taskId: "number-focus", taskType: "ChangeField",
+  fieldCaption: "Sortera efter Nr", inputSources: ["focusout"],
+  instruction: "Ändra fältet.", sourceEventNos: [50]
+}, {
+  taskId: "number-row", taskType: "Select",
+  selectedCaption: 'Välj posten "136"', instruction: "Välj post.",
+  sourceEventNos: [51]
+}, {
+  taskId: "number-result", taskType: "ChangeField",
+  fieldCaption: "Sortera efter Nr", value: "136",
+  inputSources: ["focusout"], instruction: "Ange 136.", sourceEventNos: [52]
+}, {
+  taskId: "tour-focus", taskType: "ChangeField",
+  fieldCaption: "Sortera efter Tur Nr", inputSources: ["focusout"],
+  instruction: "Ändra fältet.", sourceEventNos: [53]
+}, {
+  taskId: "quantity", taskType: "ChangeField",
+  fieldCaption: "Sortera efter Antal", value: "500",
+  inputSources: ["focusout"], instruction: "Ange 500.", sourceEventNos: [54]
+}]));
+assert.ok(fieldNoiseOutput.documentXml.includes("Välj Nr"));
+assert.ok(fieldNoiseOutput.documentXml.includes("136"));
+assert.ok(fieldNoiseOutput.documentXml.includes("500"));
+assert.ok(!fieldNoiseOutput.documentXml.includes("Sortera efter Tur Nr"));
+
 assert.strictEqual(output.taskCount, 2);
 assert.strictEqual(output.imageCount, 2);
 assert.strictEqual(output.theme.themeId, "thinknine");

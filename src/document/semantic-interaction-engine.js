@@ -66,7 +66,11 @@
   function focusOnly(value) {
     const sources = value?.inputSources || [];
     return value?.taskType === "ChangeField" && sources.length > 0 &&
-      !sources.includes("input");
+      !sources.includes("input") && !meaningfulValue(value);
+  }
+
+  function businessField(value) {
+    return text(value).replace(/^(?:sortera efter|sort by)\s+/iu, "");
   }
 
   function checkboxEnabled(value, selectedValue) {
@@ -220,18 +224,18 @@
         const selectedValue = values.map(selectedRecordValue).find(Boolean) || "";
         if (selectedValue && cursor < context.interactions.length) {
           const result = context.interactions[cursor];
-          if (result?.taskType === "ChangeField" && typed(result) &&
+          if (result?.taskType === "ChangeField" &&
               text(result.fieldCaption) === text(first.fieldCaption) &&
               meaningfulValue(result) === selectedValue) {
             values.push(result);
           }
         }
-        const targetField = text(first.fieldCaption);
+        const targetField = businessField(first.fieldCaption);
         return { consumed: values.length, action: action(rule, values, {
           actionType: "SelectLookupValue",
           displayText: selectedValue
             ? targetField
-              ? `Välj **${selectedValue}** i **${targetField}**.`
+              ? `Välj ${targetField} **${selectedValue}**.`
               : `Välj värde **${selectedValue}**.`
             : "Välj värde.",
           selectedValue,
@@ -289,8 +293,9 @@
       actionType: "SelectDimension", fieldPattern: DIMENSION,
       verb: "Välj dimensionsvärde", targetField: "Dimension", requireValue: true }),
     singleRule({ ruleId: "quantity-entry", priority: 75,
-      match: value => typed(value) && /^(?:sortera efter\s+)?(?:antal|quantity)$/iu
-        .test(text(value?.fieldCaption)),
+      match: value => Boolean(meaningfulValue(value)) &&
+        /^(?:sortera efter\s+)?(?:antal|quantity)$/iu
+          .test(text(value?.fieldCaption)),
       actionType: () => "EnterQuantity",
       targetField: "Antal",
       display: (_value, selected) => selected
@@ -318,7 +323,8 @@
         : `Välj ett alternativ i **${text(value.fieldCaption)}**.` }),
     genericLookupRule(),
     singleRule({ ruleId: "generic-field-entry", priority: 10,
-      match: value => typed(value) && value?.taskType === "ChangeField",
+      match: value => value?.taskType === "ChangeField" &&
+        (typed(value) || Boolean(meaningfulValue(value))),
       actionType: () => "EnterFieldValue",
       display: (value, selected) => selected
         ? `Ange **${selected}** i **${text(value.fieldCaption)}**.`

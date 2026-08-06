@@ -17,6 +17,10 @@
   visible documentation while retaining their source trace in semantic output.
 - Consolidated a focus/lookup/result sequence into one generic selection and
   retained field steps only when a value was actually entered.
+- Fixed recorder deduplication so input and focusout retain distinct provenance,
+  and preserved non-empty legacy field values even when only focusout survived.
+- Removed the technical `Sortera efter` prefix from generic lookup wording;
+  list selection now reads `Välj Nr "136"`.
 
 ## 4.6.0 — Customer-selection consolidation
 

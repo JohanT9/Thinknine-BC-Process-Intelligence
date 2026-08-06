@@ -140,6 +140,7 @@ function signature(event) {
     event.label,
     event.fieldName,
     event.value,
+    event.inputSource,
     event.pageId,
     event.pageCaption,
     event.frameUrl

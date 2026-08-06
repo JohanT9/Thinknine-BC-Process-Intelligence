@@ -61,7 +61,7 @@ const fieldLandingSequence = [{ taskId: "number-focus",
   selectedCaption: 'Välj posten "136"', sourceEventNos: [11]
 }, { taskId: "number-result", taskType: "ChangeField",
   fieldCaption: "Sortera efter Nr", value: "136",
-  inputSources: ["input", "focusout"], sourceEventNos: [12]
+  inputSources: ["focusout"], sourceEventNos: [12]
 }, { taskId: "vendor-empty", taskType: "SelectVendor",
   fieldCaption: "Leverantör", instruction: "Välj leverantör.",
   inputSources: ["focusout"], sourceEventNos: [13]
@@ -70,11 +70,11 @@ const fieldLandingSequence = [{ taskId: "number-focus",
   sourceEventNos: [14]
 }, { taskId: "quantity-value", taskType: "ChangeField",
   fieldCaption: "Sortera efter Antal", value: "500",
-  inputSources: ["input", "focusout"], sourceEventNos: [15] }];
+  inputSources: ["focusout"], sourceEventNos: [15] }];
 const visibleFieldActions = engine.consolidateInteractions(fieldLandingSequence);
 assert.strictEqual(visibleFieldActions.length, 2);
 assert.strictEqual(visibleFieldActions[0].instruction,
-  "Välj **136** i **Sortera efter Nr**.");
+  "Välj Nr **136**.");
 assert.deepStrictEqual(visibleFieldActions[0].sourceEventNos, [10, 11, 12]);
 assert.strictEqual(visibleFieldActions[1].instruction,
   "Ange **500** i **Antal**.");

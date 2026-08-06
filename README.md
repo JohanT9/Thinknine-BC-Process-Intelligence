@@ -21,6 +21,9 @@ En fältförflyttning skapar inte längre ett dokumentationssteg. Händelser som
 `Ändra fältet "Sortera efter …"` tas bara med när användaren faktiskt matar in
 ett nytt värde. Ett uppslag med ett verkligt radval blir ett enda val-steg och
 tomma val, exempelvis `Välj leverantör` utan valt värde, visas inte.
+Tekniska listprefix tas bort, så `Sortera efter Nr` presenteras som
+`Välj Nr "136"`. Ett registrerat värde, exempelvis 500 i Antal, bevaras även i
+äldre inspelningar där endast den avslutande focusout-källan finns kvar.
 
 ## Konsoliderade affärshändelser
 

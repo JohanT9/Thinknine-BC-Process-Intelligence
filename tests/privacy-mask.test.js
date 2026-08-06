@@ -22,5 +22,7 @@ const background = fs.readFileSync(path.join(__dirname,
 assert(background.includes('importScripts("engine/privacy-mask.js")'));
 assert(background.includes("globalThis.T9PrivacyMask.mask("));
 assert(!background.includes('return "[antal]"'));
+assert(background.includes("event.inputSource,"),
+  "input and focusout events must not share a deduplication signature");
 
 console.log("Recorder privacy masking behaviour tests passed.");
