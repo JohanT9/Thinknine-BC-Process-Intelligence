@@ -9,7 +9,8 @@
     "scripting",
     "storage",
     "tabs",
-    "unlimitedStorage"
+    "unlimitedStorage",
+    "webNavigation"
   ],
   "host_permissions": [
     "https://businesscentral.dynamics.com/*",
@@ -30,10 +31,12 @@
         "https://*.businesscentral.dynamics.com/*"
       ],
       "js": [
+        "frame-capture.js",
         "content.js"
       ],
       "all_frames": true,
       "match_about_blank": true,
+      "match_origin_as_fallback": true,
       "run_at": "document_start"
     }
   ],

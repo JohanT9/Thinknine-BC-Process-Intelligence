@@ -1,5 +1,21 @@
 # Changelog
 
+## 4.6.0 R3.3 — React and Control Add-in Capture Compatibility
+
+- Added one frame-aware event contract for top-frame, nested and authorized
+  cross-origin content-script contexts.
+- Added browser-bound identity, local sequence, timestamps, duplicate rejection
+  and service-worker restart recovery.
+- Added composed-path targeting and open Shadow DOM host metadata without React
+  internals.
+- Added local and same-origin top-viewport bounds while respecting cross-origin
+  security boundaries.
+- Unified static, registered and manual MV3 injection with inherited-origin
+  fallback and narrow Business Central hosts.
+- Added sanitized frame diagnostics and explicit listener/observer cleanup.
+- Added behavior coverage for validation, ordering, nested coordinates,
+  screenshot policy and semantic/presentation compatibility.
+
 ## 4.6.0 R3.2 — Presentation Grammar
 
 - Added a dedicated renderer-neutral Presentation Grammar layer after Language

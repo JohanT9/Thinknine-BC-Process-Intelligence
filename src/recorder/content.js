@@ -6,13 +6,19 @@
   let sessionId = null;
   let lastUrl = location.href;
   let lastPageSignature = "";
+  let localSequence = 0;
+  const frameRuntimeId = globalThis.crypto?.randomUUID?.() ||
+    `${Date.now()}-${Math.random().toString(36).slice(2)}`;
   const inputTimers = new WeakMap();
+  const pendingInputTimers = new Set();
+  let captureController = null;
 
   try {
     chrome.runtime.sendMessage({ type: "T9_GET_STATE" }, response => {
       if (chrome.runtime.lastError) return;
       recording = Boolean(response?.state?.recording);
       sessionId = response?.state?.sessionId || null;
+      if (recording) installCapture();
     });
   } catch {
     // The extension context may be invalidated during an extension reload.
@@ -34,10 +40,31 @@
   sendPing();
   setInterval(sendPing, 5000);
 
+  function reportFrameStatus(type, extra = {}) {
+    try {
+      chrome.runtime.sendMessage({
+        type,
+        contractVersion: globalThis.T9FrameCapture?.CONTRACT_VERSION,
+        frameRuntimeId,
+        frameUrl: location.href,
+        topFrameUrl: getTopUrl(),
+        frameOrigin: location.origin,
+        frameDepth: getFrameDepth(),
+        devicePixelRatio: window.devicePixelRatio || 1,
+        visualViewportScale: window.visualViewport?.scale || 1,
+        listenerStatus: captureController ? "active" : "standby",
+        recordable: true,
+        ...extra
+      }, () => { void chrome.runtime.lastError; });
+    } catch {}
+  }
+
   chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     if (message.type === "T9_STATE_CHANGED") {
       recording = Boolean(message.recording);
       sessionId = message.sessionId || null;
+      if (recording) installCapture();
+      else uninstallCapture();
       sendResponse({ ok: true });
       return false;
     }
@@ -48,7 +75,7 @@
         recording,
         sessionId,
         frameUrl: location.href,
-        version: "2.0.1"
+        version: "3.0.0"
       });
       return false;
     }
@@ -127,7 +154,9 @@
       documentTitle: clean(document.title, 250),
       frameUrl: location.href,
       topUrl: getTopUrl(),
-      frameDepth: getFrameDepth()
+      frameDepth: getFrameDepth(),
+      devicePixelRatio: window.devicePixelRatio || 1,
+      visualViewportScale: window.visualViewport?.scale || 1
     };
   }
 
@@ -217,6 +246,7 @@
   }
 
   function descriptor(element) {
+    const shadowHost = element?.getRootNode?.()?.host;
     return {
       role: element?.getAttribute?.("role") || element?.tagName?.toLowerCase() || "",
       controlType: element?.tagName?.toLowerCase() || "",
@@ -225,8 +255,42 @@
         element?.getAttribute?.("data-control-id") ||
         element?.getAttribute?.("data-control-name") ||
         "",
-      label: textOf(element) || getLabel(element)
+      label: textOf(element) || getLabel(element),
+      checked: element?.getAttribute?.("aria-checked") ||
+        (element instanceof HTMLInputElement && element.type === "checkbox"
+          ? element.checked : undefined),
+      selected: element?.getAttribute?.("aria-selected") || undefined,
+      ...(shadowHost instanceof Element ? { shadowHost: {
+        role: shadowHost.getAttribute("role") || "",
+        label: textOf(shadowHost) || getLabel(shadowHost)
+      } } : {})
     };
+  }
+
+  function elementBounds(element) {
+    if (!(element instanceof Element)) return { localBounds: null,
+      topViewportBounds: null };
+    const rect = element.getBoundingClientRect();
+    const localBounds = { x: rect.x, y: rect.y, width: rect.width,
+      height: rect.height };
+    let x = rect.x;
+    let y = rect.y;
+    let current = window;
+    try {
+      while (current !== current.top) {
+        const frame = current.frameElement;
+        if (!frame) return { localBounds, topViewportBounds: null };
+        const frameRect = frame.getBoundingClientRect();
+        x += frameRect.x;
+        y += frameRect.y;
+        current = current.parent;
+      }
+      return { localBounds, topViewportBounds: {
+        x, y, width: rect.width, height: rect.height
+      } };
+    } catch {
+      return { localBounds, topViewportBounds: null };
+    }
   }
 
   function valueOf(element) {
@@ -246,6 +310,14 @@
       return clean(element.textContent, 500);
     }
 
+    if (element?.hasAttribute?.("aria-checked")) {
+      return element.getAttribute("aria-checked") === "true";
+    }
+    if (element?.hasAttribute?.("aria-selected")) {
+      return element.getAttribute("aria-selected") === "true"
+        ? textOf(element) : "";
+    }
+
     return "";
   }
 
@@ -253,10 +325,22 @@
     if (!recording || !sessionId) return;
 
     try {
+      localSequence += 1;
+      const captureTimestamp = new Date().toISOString();
       chrome.runtime.sendMessage({
-        type: "T9_RECORD_EVENT",
+        type: globalThis.T9FrameCapture.MESSAGE_TYPES.EVENT,
+        sessionId,
+        frameRuntimeId,
+        frameUrl: location.href,
+        topFrameUrl: getTopUrl(),
+        frameOrigin: location.origin,
+        frameDepth: getFrameDepth(),
         event: {
-          timestamp: new Date().toISOString(),
+          sourceEventId: `${frameRuntimeId}:${localSequence}`,
+          localSequence,
+          captureTimestamp,
+          timestamp: captureTimestamp,
+          eventSource: "frame-dom",
           ...context(),
           ...event
         }
@@ -268,17 +352,23 @@
     }
   }
 
+  function installCapture() {
+    if (captureController) return;
+    captureController = new AbortController();
+    const captureOptions = { capture: true, signal: captureController.signal };
 
-  document.addEventListener("click", event => {
-    const target = interactiveTarget(event.target);
+    document.addEventListener("click", event => {
+    const effective = globalThis.T9FrameCapture.effectiveTarget(event);
+    const target = interactiveTarget(effective);
     if (!target) return;
 
     record({
       type: "click",
       category: categoryOf(target),
+      ...elementBounds(target),
       ...descriptor(target)
     });
-  }, true);
+    }, captureOptions);
 
   function emitField(element, source) {
     if (!(element instanceof Element)) return;
@@ -289,29 +379,33 @@
       fieldName: getLabel(element) || "Okänt fält",
       value: valueOf(element),
       inputSource: source,
+      ...elementBounds(element),
       ...descriptor(element)
     });
   }
 
-  document.addEventListener("input", event => {
-    const element = event.target;
+    document.addEventListener("input", event => {
+    const element = globalThis.T9FrameCapture.effectiveTarget(event);
     if (!(element instanceof Element)) return;
 
     clearTimeout(inputTimers.get(element));
-    inputTimers.set(
-      element,
-      setTimeout(() => emitField(element, "input"), 600)
-    );
-  }, true);
+    const timer = setTimeout(() => {
+      pendingInputTimers.delete(timer);
+      emitField(element, "input");
+    }, 600);
+    inputTimers.set(element, timer);
+    pendingInputTimers.add(timer);
+    }, captureOptions);
 
-  document.addEventListener("change", event => {
-    if (event.target instanceof Element) {
-      emitField(event.target, "change");
+    document.addEventListener("change", event => {
+    const element = globalThis.T9FrameCapture.effectiveTarget(event);
+    if (element instanceof Element) {
+      emitField(element, "change");
     }
-  }, true);
+    }, captureOptions);
 
-  document.addEventListener("focusout", event => {
-    const element = event.target;
+    document.addEventListener("focusout", event => {
+    const element = globalThis.T9FrameCapture.effectiveTarget(event);
 
     if (
       element instanceof Element &&
@@ -319,7 +413,7 @@
     ) {
       emitField(element, "focusout");
     }
-  }, true);
+    }, captureOptions);
 
   document.addEventListener("keydown", event => {
     if (!["Enter", "Escape", "F4"].includes(event.key)) return;
@@ -328,9 +422,23 @@
       type: "key",
       category: "interaction",
       key: event.key,
-      fieldName: getLabel(event.target)
+      fieldName: getLabel(globalThis.T9FrameCapture.effectiveTarget(event))
     });
-  }, true);
+    }, captureOptions);
+    startObserver();
+    reportFrameStatus(globalThis.T9FrameCapture.MESSAGE_TYPES.READY);
+  }
+
+  function uninstallCapture() {
+    captureController?.abort();
+    captureController = null;
+    pendingInputTimers.forEach(clearTimeout);
+    pendingInputTimers.clear();
+    observer.disconnect();
+    reportFrameStatus(globalThis.T9FrameCapture.MESSAGE_TYPES.STOPPED, {
+      listenerStatus: "removed", recordable: false
+    });
+  }
 
   const observer = new MutationObserver(() => {
     document
@@ -357,6 +465,7 @@
   });
 
   function startObserver() {
+    if (!captureController) return;
     if (!document.documentElement) {
       requestAnimationFrame(startObserver);
       return;
@@ -368,7 +477,7 @@
     });
   }
 
-  startObserver();
+  reportFrameStatus(globalThis.T9FrameCapture.MESSAGE_TYPES.READY);
 
   setInterval(() => {
     if (location.href === lastUrl) return;

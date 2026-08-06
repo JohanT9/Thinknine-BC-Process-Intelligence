@@ -2,6 +2,7 @@ importScripts("engine/storage-keys.js");
 importScripts("engine/privacy-mask.js");
 importScripts("engine/screenshot-capture-policy.js");
 importScripts("document/document-library.js");
+importScripts("frame-capture.js");
 
 const VERSION = "4.6.0";
 
@@ -41,6 +42,8 @@ const {
 const DEBUG_KEY = "t9_debug";
 
 let writeQueue = Promise.resolve();
+const frameSourceEvents = new Set();
+const frameDiagnostics = new Map();
 
 const SCREENSHOT_MIN_INTERVAL_MS = 1100;
 let screenshotQueue = [];
@@ -96,6 +99,21 @@ async function setDebug(patch) {
     ...patch
   };
   await chrome.storage.local.set({ [DEBUG_KEY]: debug });
+}
+
+async function parentFrameId(sender) {
+  if (!Number.isInteger(sender.tab?.id) || !Number.isInteger(sender.frameId) ||
+      sender.frameId === 0 || !chrome.webNavigation?.getFrame) return null;
+  try {
+    const details = await chrome.webNavigation.getFrame({
+      tabId: sender.tab.id,
+      frameId: sender.frameId
+    });
+    return Number.isInteger(details?.parentFrameId)
+      ? details.parentFrameId : null;
+  } catch {
+    return null;
+  }
 }
 
 async function getSession(id) {
@@ -389,7 +407,7 @@ async function registerRecorderContentScript() {
         "https://businesscentral.dynamics.com/*",
         "https://*.businesscentral.dynamics.com/*"
       ],
-      js: ["content.js"],
+      js: ["frame-capture.js", "content.js"],
       allFrames: true,
       matchOriginAsFallback: true,
       runAt: "document_start",
@@ -453,7 +471,7 @@ async function injectRecorderIntoExistingBcTabs() {
           tabId: tab.id,
           allFrames: true
         },
-        files: ["content.js"],
+        files: ["frame-capture.js", "content.js"],
         world: "ISOLATED"
       });
       results.push({ tabId: tab.id, ok: true });
@@ -502,7 +520,7 @@ async function ensureContentScript(tabId) {
         tabId,
         allFrames: true
       },
-      files: ["content.js"]
+      files: ["frame-capture.js", "content.js"]
     });
   } catch (error) {
     await setDebug({
@@ -548,6 +566,8 @@ async function startSession(message, tabId) {
   screenshotStats.reused = 0;
   screenshotStats.dropped = 0;
   screenshotStats.errors = 0;
+  frameSourceEvents.clear();
+  frameDiagnostics.clear();
 
   const session = {
     id,
@@ -613,6 +633,7 @@ async function stopSession() {
 
   screenshotStats.dropped += screenshotQueue.length;
   screenshotQueue = [];
+  frameSourceEvents.clear();
 
   await setState({
     recording: false,
@@ -690,6 +711,65 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
         });
         sendResponse({ ok: true, version: VERSION });
         break;
+
+      case "T9_FRAME_RECORDER_READY":
+      case "T9_FRAME_RECORDER_UNAVAILABLE":
+      case "T9_FRAME_RECORDER_STOPPED": {
+        const frame = { ...globalThis.T9FrameCapture.frameContext(sender, message),
+          parentFrameId: await parentFrameId(sender) };
+        frame.frameUrl = globalThis.T9FrameCapture.diagnosticUrl(frame.frameUrl);
+        frame.topFrameUrl = globalThis.T9FrameCapture.diagnosticUrl(
+          frame.topFrameUrl
+        );
+        const key = `${frame.tabId}:${frame.frameId}`;
+        frameDiagnostics.set(key, {
+          ...frame,
+          injected: message.type !== "T9_FRAME_RECORDER_UNAVAILABLE",
+          recordable: message.type === "T9_FRAME_RECORDER_READY" &&
+            message.recordable !== false,
+          listenerStatus: message.listenerStatus || "unknown",
+          reason: message.reason || (message.type ===
+            "T9_FRAME_RECORDER_STOPPED" ? "recording-stopped" : ""),
+          capturedEvents: frameDiagnostics.get(key)?.capturedEvents || 0,
+          updatedAt: new Date().toISOString()
+        });
+        await setDebug({ frameCaptureDiagnostics: [...frameDiagnostics.values()] });
+        sendResponse({ ok: true });
+        break;
+      }
+
+      case "T9_FRAME_INTERACTION_EVENT": {
+        const state = await getState();
+        if (!frameSourceEvents.size && state.sessionId) {
+          const existingEvents = await getEvents(state.sessionId);
+          existingEvents.forEach(event => {
+            if (event.sourceEventId && Number.isInteger(event.frameId)) {
+              frameSourceEvents.add(
+                `${state.tabId}:${event.frameId}:${event.sourceEventId}`
+              );
+            }
+          });
+        }
+        const validation = globalThis.T9FrameCapture.validateMessage(
+          message, sender, state, frameSourceEvents
+        );
+        if (!validation.valid) {
+          await setDebug({ lastFrameMessageRejection: validation.reason });
+          sendResponse({ ok: false, reason: validation.reason });
+          break;
+        }
+        validation.event.parentFrameId = await parentFrameId(sender);
+        frameSourceEvents.add(validation.identity);
+        const key = `${validation.event.tabId}:${validation.event.frameId}`;
+        const diagnostic = frameDiagnostics.get(key) || {};
+        frameDiagnostics.set(key, { ...diagnostic,
+          capturedEvents: (diagnostic.capturedEvents || 0) + 1,
+          updatedAt: new Date().toISOString() });
+        await recordEvent(validation.event, validation.event.tabId);
+        await setDebug({ frameCaptureDiagnostics: [...frameDiagnostics.values()] });
+        sendResponse({ ok: true });
+        break;
+      }
 
       case "T9_REGISTER_CONTENT_SCRIPT": {
         const registered = await registerRecorderContentScript();
