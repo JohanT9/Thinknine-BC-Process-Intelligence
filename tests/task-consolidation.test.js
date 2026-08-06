@@ -53,4 +53,36 @@ assert.strictEqual(consolidation.consolidate(unrelated).length, 1);
 assert.strictEqual(consolidation.consolidate(unrelated)[0].selectedCaption,
   'Välj posten "136"');
 
+const salesLineTasks = [{ taskId: "filter", taskType: "ChangeField",
+  entity: "Item", fieldCaption: "Sortera efter Nr", value: "",
+  inputSources: ["focusout"], sourceEventNos: [31]
+}, { taskId: "row", taskType: "Select", entity: "Item",
+  selectedCaption: 'Välj posten "136"', sourceEventNos: [32],
+  screenshot: "screenshots/000032.png"
+}, { taskId: "filter-result", taskType: "ChangeField", entity: "Item",
+  fieldCaption: "Sortera efter Nr", value: "136",
+  inputSources: ["focusout"], sourceEventNos: [33],
+  screenshot: "screenshots/000033.png"
+}, { taskId: "vendor-focus", taskType: "ChangeField",
+  fieldCaption: "Leverantörsnummer för direktleverans", value: "",
+  inputSources: ["focusout"], sourceEventNos: [34]
+}, { taskId: "tour-focus", taskType: "ChangeField",
+  fieldCaption: "Sortera efter Tur Nr", value: "",
+  inputSources: ["focusout"], sourceEventNos: [35]
+}, { taskId: "quantity", taskType: "ChangeField",
+  fieldCaption: "Sortera efter Antal", value: "500",
+  instructionValue: "500", inputSources: ["input", "focusout"],
+  sourceEventNos: [36], screenshot: "screenshots/000036.png"
+}, { taskId: "release", taskType: "ReleaseDocument",
+  instruction: "Välj Släpp.", sourceEventNos: [37]
+}];
+const salesLine = consolidation.consolidate(salesLineTasks);
+assert.strictEqual(salesLine.length, 3);
+assert.strictEqual(salesLine[0].instruction, "Välj artikel **136**.");
+assert.strictEqual(salesLine[0].screenshot, "screenshots/000033.png");
+assert.deepStrictEqual(salesLine[0].sourceEventNos, [31, 32, 33]);
+assert.strictEqual(salesLine[1].fieldCaption, "Antal");
+assert.strictEqual(salesLine[1].instruction, "Ange **500** i **Antal**.");
+assert.strictEqual(salesLine[2].taskType, "ReleaseDocument");
+
 console.log("Business task consolidation behaviour tests passed.");

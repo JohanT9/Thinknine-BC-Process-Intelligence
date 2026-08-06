@@ -1,4 +1,5 @@
 importScripts("engine/storage-keys.js");
+importScripts("engine/privacy-mask.js");
 importScripts("document/document-library.js");
 
 const VERSION = "__APP_VERSION__";
@@ -130,23 +131,6 @@ async function saveScreenshots(id, screenshots) {
   await chrome.storage.local.set({
     [SCREENSHOT_PREFIX + id]: screenshots
   });
-}
-
-function maskValue(fieldName, value, enabled) {
-  if (!enabled) return value;
-  const name = String(fieldName || "").toLowerCase();
-  const text = String(value ?? "");
-  if (/password|lösenord|secret|token|api.?key/.test(name)) return "[maskerat]";
-  if (/email|e-post/.test(name)) return "[e-postadress]";
-  if (/customer|kund/.test(name)) return "[aktuell kund]";
-  if (/vendor|leverant/.test(name)) return "[aktuell leverantör]";
-  if (/item|artikel/.test(name)) return "[aktuell artikel]";
-  if (/price|cost|amount|pris|kostnad|belopp/.test(name)) return "[belopp]";
-  if (/quantity|qty|antal/.test(name)) return "[antal]";
-  if (/date|datum/.test(name)) return "[datum]";
-  return text
-    .replace(/\b[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}\b/gi, "[e-postadress]")
-    .replace(/\b[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}\b/gi, "[id]");
 }
 
 function signature(event) {
@@ -323,7 +307,9 @@ async function recordEvent(rawEvent, senderTabId) {
     };
 
     if ("value" in event) {
-      event.value = maskValue(event.fieldName, event.value, settings.maskValues);
+      event.value = globalThis.T9PrivacyMask.mask(
+        event.fieldName, event.value, settings
+      );
     }
 
     event.signature = signature(event);

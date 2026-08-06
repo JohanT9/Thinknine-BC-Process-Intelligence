@@ -9,6 +9,11 @@ Tekniska delhändelser från samma kunduppslag—fältfokus, öppnad värdelista
 radval och efterföljande fältuppdatering—samlas till ett dokumentationssteg.
 Ett val av kund 1033 skrivs därför som **Välj kund "1033".** med den sista
 relevanta skärmbilden, samtidigt som samtliga källevent finns kvar för spårbarhet.
+Samma regel gäller artikeluppslag. Ett val av artikel 136 skrivs som
+**Välj artikel "136".** Rena focusout-fält efter artikelvalet ignoreras tills
+nästa faktiska inmatning, exempelvis **Ange "500" i "Antal".** Antal och datum
+maskeras inte längre automatiskt; uttryckliga kund-, leverantörs- och
+artikelinställningar respekteras fortfarande.
 
 ## Screenshot Intelligence 4.6 R2
 

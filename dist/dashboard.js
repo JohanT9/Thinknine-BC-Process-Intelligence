@@ -1012,6 +1012,8 @@ function uiStep({
   return {
     step: 0,
     sourceEventNos: sourceEvents.map(event => event.eventNo),
+    inputSources: [...new Set(sourceEvents.map(event => event.inputSource)
+      .filter(Boolean))],
     timestamp: sourceEvents[0]?.timestamp || "",
     pageId: String(pageId || ""),
     pageCaption,
@@ -2377,6 +2379,7 @@ function createBusinessTasks(businessSteps) {
           : "",
       sourceStepNos: [step.step],
       sourceEventNos: step.sourceEventNos || [],
+      inputSources: step.inputSources || [],
       screenshot: step.screenshot || null,
       importance: step.importance || "normal",
       confirmationIncluded: Boolean(step.confirmationIncluded),

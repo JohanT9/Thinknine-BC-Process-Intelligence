@@ -52,6 +52,9 @@ assert.ok(v46R2ReleaseNotes.includes("Documentation Excellence v4.6 R2"));
 assert.ok(terminologyReleaseNotes.includes(
   "Documentation Excellence v4.6 R1.1 — Dokumentbibliotek"));
 assert.ok(customerSelectionNotes.includes('Välj kund "1033".'));
+assert.ok(customerSelectionNotes.includes('Välj artikel "136".'));
+assert.ok(customerSelectionNotes.includes('Ange "500" i "Antal".'));
+assert.ok(customerSelectionNotes.includes("cannot be recovered"));
 assert.ok(installation.includes("WORD-EXPORT 4.4"));
 assert.ok(handbook.includes("src/exporters/"));
 assert.ok(!handbook.includes("src/export/\n"));

@@ -10,6 +10,11 @@
   selections, such as item selection, from joining the customer operation.
 - Added a behavior regression shaped from the observed five-step customer 1033
   sequence in the latest exported Word document.
+- Consolidated the observed item lookup into `Välj artikel "136"`, suppressed
+  focus-only fields after the selection and retained the next typed quantity as
+  `Ange "500" i "Antal"`.
+- Extracted recorder privacy masking so customer, vendor and item settings are
+  respected and quantities/dates are no longer irreversibly masked at capture.
 
 ## 4.6.0 R1.1 — Dokumentbibliotek terminology
 

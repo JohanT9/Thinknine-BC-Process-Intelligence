@@ -5,6 +5,8 @@
 })(typeof globalThis !== "undefined" ? globalThis : this, function () {
   const CUSTOMER_FIELD = /kundens namn|kundnr|customer name|customer no\.?/iu;
   const CUSTOMER_LOOKUP = /välj ett värde för\s+(?:kundens namn|kundnr)|select a value for\s+(?:customer name|customer no\.?)/iu;
+  const ITEM_FIELD = /artikelnr|artikelnummer|item no\.?/iu;
+  const ITEM_LOOKUP = /välj ett värde för\s+(?:artikelnr|artikelnummer|nr)|select a value for\s+(?:item no\.?|no\.?)/iu;
   const RECORD_SELECTION = /^(?:välj posten|select record)\s+["“]?(.+?)["”]?\.?$/iu;
 
   function clone(value) {
@@ -28,6 +30,18 @@
 
   function lookupHelper(task) {
     return CUSTOMER_LOOKUP.test(taskText(task));
+  }
+
+  function itemTask(task) {
+    return task?.taskType === "SelectItem" ||
+      task?.semanticAction === "SelectItem" ||
+      ITEM_FIELD.test(taskText(task)) ||
+      (task?.entity === "Item" &&
+        /sortera efter nr|sort by no\.?/iu.test(taskText(task)));
+  }
+
+  function itemLookupHelper(task) {
+    return ITEM_LOOKUP.test(taskText(task));
   }
 
   function selectedRecordValue(task) {
@@ -92,6 +106,89 @@
     };
   }
 
+  function consolidateItemRun(run) {
+    const explicit = run.map(selectedRecordValue).find(Boolean);
+    const fallback = [...run].reverse().map(meaningfulValue).find(Boolean);
+    const value = explicit || fallback || "";
+    const screenshot = [...run].reverse().map(task => task.screenshot)
+      .find(Boolean) || null;
+    const first = run[0];
+    return {
+      ...clone(first),
+      taskType: "SelectItem",
+      semanticAction: "SelectItem",
+      entity: "Item",
+      fieldCaption: "Artikelnummer",
+      selectedCaption: value,
+      value,
+      instructionValue: value,
+      instruction: value ? `Välj artikel **${value}**.` : "Välj artikel.",
+      description: value ? `Välj artikel **${value}**.` : "Välj artikel.",
+      screenshot,
+      screenshots: screenshot ? [screenshot] : [],
+      sourceStepNos: unique(run.flatMap(task => task.sourceStepNos || [])),
+      sourceEventNos: unique(run.flatMap(task => task.sourceEventNos || [])),
+      sourceTaskIds: unique(run.map(task => task.taskId)),
+      inputSources: unique(run.flatMap(task => task.inputSources || [])),
+      consolidation: { type: "item-selection", sourceTaskCount: run.length }
+    };
+  }
+
+  function consolidateItems(tasks) {
+    const result = [];
+    let index = 0;
+    while (index < tasks.length) {
+      if (!itemTask(tasks[index])) {
+        result.push(clone(tasks[index]));
+        index += 1;
+        continue;
+      }
+      const run = [tasks[index]];
+      let cursor = index + 1;
+      while (cursor < tasks.length && (itemTask(tasks[cursor]) ||
+          itemLookupHelper(tasks[cursor]) || recordSelection(tasks[cursor]))) {
+        run.push(tasks[cursor]);
+        cursor += 1;
+      }
+      result.push(run.length > 1 ? consolidateItemRun(run) : clone(run[0]));
+      index = cursor;
+    }
+    return result;
+  }
+
+  function normalizeQuantity(task) {
+    const caption = text(task.fieldCaption);
+    const typed = (task.inputSources || []).includes("input");
+    if (!typed || !/^(?:sortera efter\s+)?(?:antal|quantity)$/iu.test(caption)) {
+      return clone(task);
+    }
+    const value = text(task.value || task.instructionValue);
+    return { ...clone(task), fieldCaption: "Antal", instructionValue: value,
+      instruction: value ? `Ange **${value}** i **Antal**.` : "Ange Antal.",
+      description: value ? `Ange **${value}** i **Antal**.` : "Ange Antal." };
+  }
+
+  function removePostItemFocusNoise(tasks) {
+    const result = [];
+    let afterItem = false;
+    for (const task of tasks) {
+      if (task.consolidation?.type === "item-selection") {
+        result.push(clone(task));
+        afterItem = true;
+        continue;
+      }
+      const inputSources = task.inputSources || [];
+      const typed = inputSources.includes("input");
+      if (afterItem && task.taskType === "ChangeField" &&
+          inputSources.length && !typed) {
+        continue;
+      }
+      result.push(normalizeQuantity(task));
+      if (typed || task.taskType !== "ChangeField") afterItem = false;
+    }
+    return result;
+  }
+
   function consolidate(tasks = []) {
     const input = Array.isArray(tasks) ? tasks : [];
     const result = [];
@@ -112,11 +209,13 @@
       result.push(run.length > 1 ? consolidateCustomerRun(run) : clone(run[0]));
       index = cursor;
     }
-    return result.map((task, taskIndex) => ({ ...task,
+    const consolidated = removePostItemFocusNoise(consolidateItems(result));
+    return consolidated.map((task, taskIndex) => ({ ...task,
       taskNo: taskIndex + 1,
       taskId: `${task.taskType || "Task"}-${String(taskIndex + 1).padStart(3, "0")}`
     }));
   }
 
-  return { consolidate, customerTask, lookupHelper, selectedRecordValue };
+  return { consolidate, customerTask, itemTask, lookupHelper,
+    selectedRecordValue };
 });
