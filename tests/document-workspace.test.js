@@ -69,6 +69,14 @@ assert.deepStrictEqual(items(first.model, "image")[0].content, {
 assert.strictEqual(items(first.model, "metadata")[0].content.rows[2].value, "Test");
 assert.deepStrictEqual(workspace.render(first.prepared.plan), first.model);
 
+const emphasizedReview = reviewFixture();
+emphasizedReview.tasks[0].instruction = "Ange **400** i **Antal**.";
+const emphasizedWorkspace = render(emphasizedReview);
+assert.ok(items(emphasizedWorkspace.model, "paragraph").some(item =>
+  item.content.text === 'Ange "400" i "Antal".'));
+assert.ok(!items(emphasizedWorkspace.model, "paragraph").some(item =>
+  item.content.text.includes("**")));
+
 const interactionReview = reviewFixture();
 interactionReview.tasks = reviewStudio.normalizeTasks([{
   taskId: "customer-field", taskType: "SelectCustomer",

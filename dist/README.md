@@ -30,6 +30,9 @@ det dokumentationssteget. En inmatning av 500 i Antal får därmed en bild från
 själva inmatningstillfället. Ren focusout tar ingen bild. Redan avslutade
 inspelningar utan en sådan bild kan inte återskapa den retroaktivt.
 
+Dokumentvyn använder samma citattecken som Granskningsvyn och Word. Intern
+betoning som `**400**` visas därför som `"400"` och aldrig som rå Markdown.
+
 ## Konsoliderade affärshändelser
 
 Tekniska delhändelser från samma kunduppslag—fältfokus, öppnad värdelista,

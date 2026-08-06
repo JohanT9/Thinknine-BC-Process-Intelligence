@@ -2,10 +2,16 @@
   const planModel = typeof module === "object" && module.exports
     ? require("./document-plan")
     : root.T9DocumentPlan;
-  const api = factory(planModel);
+  const textFormat = typeof module === "object" && module.exports
+    ? require("../engine/text-format")
+    : root.T9TextFormat;
+  const api = factory(planModel, textFormat);
   if (typeof module === "object" && module.exports) module.exports = api;
   root.T9DocumentWorkspace = api;
-})(typeof globalThis !== "undefined" ? globalThis : this, function (planModel) {
+})(typeof globalThis !== "undefined" ? globalThis : this, function (
+  planModel,
+  textFormat
+) {
   const RENDERER_VERSION = "1.0.0";
 
   function clone(value) {
@@ -44,7 +50,7 @@
         renderComponents(component.components, result);
       } else if (component.kind === "paragraph") {
         result.push(workspaceItem(component, "paragraph", "paragraph", {
-          text: component.content.text
+          text: textFormat.quoteEmphasis(component.content.text)
         }));
       } else if (component.kind === "screenshot") {
         result.push(workspaceItem(component, "image", "image", {
@@ -55,7 +61,7 @@
       } else if (component.kind === "callout") {
         result.push(workspaceItem(component, "callout", "callout", {
           label: component.accessibility?.label || "Kommentar",
-          text: component.content.text || ""
+          text: textFormat.quoteEmphasis(component.content.text || "")
         }));
       } else {
         renderComponents(component.components, result);

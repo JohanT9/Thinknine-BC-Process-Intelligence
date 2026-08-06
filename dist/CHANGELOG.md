@@ -25,6 +25,8 @@
   giving entered values such as quantity 500 their own step screenshot.
 - Prevented field-input screenshots from being merged with nearby action or
   different-field captures; focusout-only navigation still captures nothing.
+- Aligned Document Workspace text presentation with Review and Word by rendering
+  internal `**value**` emphasis as quoted text instead of visible Markdown.
 
 ## 4.6.0 — Customer-selection consolidation
 
