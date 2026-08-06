@@ -1,5 +1,19 @@
 # Changelog
 
+## 4.6.0 R1 — Language Excellence
+
+- Added a renderer-neutral Language Excellence transformation between Review
+  projection and document planning.
+- Added one deterministic writing guide for concise, active, precise and
+  consistent Swedish and English instruction wording.
+- Integrated professional, precise, explanatory, concise and diagnostic tone
+  contracts with the five built-in Document Profiles.
+- Reused immutable processed output per Semantic Document revision and profile.
+- Preserved Review data, document structure, stable IDs, source references,
+  screenshots, annotations, unknown fields and renderer behavior.
+- Added behavior and compatibility coverage for existing recordings and Reviews,
+  terminology, profile tone, semantic preservation, immutability and determinism.
+
 ## 4.5.0 UX9 — Production Readiness & Ship Review
 
 - Completed the end-to-end first-time, daily consultant, power-user,

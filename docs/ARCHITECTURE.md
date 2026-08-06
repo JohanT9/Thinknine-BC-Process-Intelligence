@@ -1,4 +1,29 @@
-# Architecture 4.4
+# Architecture 4.6
+
+## Language Excellence 4.6 R1
+
+```text
+Review → Review Projector → Semantic Document
+  → Language Excellence → Document Profile → Theme → Document Planner
+  → Components / Diagnostics → Document Workspace / Word Adapter
+```
+
+`language-excellence.js` is the single owner of deterministic writing rules.
+It accepts only Semantic Document plus the selected profile's language contract
+and returns a new normalized, recursively immutable Semantic Document. It never
+imports Review, UI, Planner or a renderer. Unknown document fields and unknown
+future block kinds pass through unchanged.
+
+The composition pipeline retains the projector result as an immutable source and
+passes only the language-enhanced copy downstream. Document Profile owns tone
+configuration, while the language layer owns wording. Theme and Planner remain
+presentation-only. Document Workspace and Word continue consuming the same
+validated Document Plan, so no wording logic leaks into either renderer.
+
+Processing is cached by immutable source-document identity and profile tone.
+A changed Review produces a new projected document and therefore a new cache
+entry; repeated planning for an unchanged revision and profile reuses the same
+frozen result. No language output is persisted into Review or screenshot storage.
 
 ## Documentation Excellence 4.4
 

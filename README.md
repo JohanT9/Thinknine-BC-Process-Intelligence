@@ -1,7 +1,21 @@
-# Thinknine BC Process Intelligence v4.5.0 UX8
+# Thinknine BC Process Intelligence v4.6.0 R1
 
 Ett modulärt Edge-tillägg för att spela in, granska och exportera dokumenterade
 Business Central-processer.
+
+## Language Excellence 4.6 R1
+
+Alla befintliga inspelningar och Reviews får nu automatiskt ett tydligare,
+kortare och mer konsekvent instruktionsspråk i Dokumentvy och Word-export.
+Language Excellence arbetar deterministiskt på en immutable kopia av Semantic
+Document efter Review Projector och före profil, tema och planering. Review,
+historik, arbetsflöde, skärmbilder, annoteringar och originalsemantik ändras inte.
+
+Den gemensamma skrivguiden standardiserar säkra handlingsverb på svenska och
+engelska och låter Document Profiles välja professionell, exakt, förklarande,
+kortfattad eller diagnostisk ton. Bearbetat resultat återanvänds per dokument-
+revision och profil. Se [Language Excellence 4.6](docs/LANGUAGE_EXCELLENCE_4.6.md)
+och [Release Notes 4.6 R1](docs/RELEASE_NOTES_4.6_R1.md).
 
 ## Workflow Polish 4.5 UX8
 

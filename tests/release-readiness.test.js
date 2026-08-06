@@ -8,7 +8,7 @@ const packageJson = JSON.parse(read("package.json"));
 const manifest = JSON.parse(read("src/ui/manifest.json"));
 
 assert.strictEqual(manifest.version, packageJson.version);
-assert.strictEqual(packageJson.version, "4.5.0");
+assert.strictEqual(packageJson.version, "4.6.0");
 
 const comparisonAssets = fs.readdirSync(
   path.join(root, "docs/assets/rc8-comparison")
@@ -24,26 +24,37 @@ const architecture = read("docs/ARCHITECTURE.md");
 const releaseNotes = read("docs/RELEASE_NOTES_4.4.0.md");
 const v45ReleaseNotes = read("docs/RELEASE_NOTES_4.5.0.md");
 const v45Readiness = read("docs/PRODUCTION_READINESS_4.5.md");
+const languageExcellence = read("docs/LANGUAGE_EXCELLENCE_4.6.md");
+const v46ReleaseNotes = read("docs/RELEASE_NOTES_4.6_R1.md");
 const installation = read("INSTALLERA.txt");
 const handbook = read(".github/AGENTS.md");
-assert.ok(architecture.startsWith("# Architecture 4.4"));
+assert.ok(architecture.startsWith("# Architecture 4.6"));
 assert.ok(releaseNotes.includes("Documentation Excellence v4.4.0"));
 assert.ok(releaseNotes.includes("No AI functionality was introduced."));
 assert.ok(v45ReleaseNotes.includes("Documentation Excellence v4.5.0"));
 assert.ok(v45Readiness.includes(
   "Documentation Excellence v4.5.0 is production ready."
 ));
+assert.ok(languageExcellence.includes("Existing recordings require no migration."));
+assert.ok(languageExcellence.includes("Semantic meaning is preserved."));
+assert.ok(v46ReleaseNotes.includes("Documentation Excellence v4.6 R1"));
 assert.ok(installation.includes("WORD-EXPORT 4.4"));
 assert.ok(handbook.includes("src/exporters/"));
 assert.ok(!handbook.includes("src/export/\n"));
 
 const adapter = read("src/exporters/word-document-adapter.mjs");
+const languageLayer = read("src/document/language-excellence.js");
 for (const forbidden of [
   "review-document-projector",
   "document-theme-registry",
   "src/review"
 ]) {
   assert.ok(!adapter.includes(forbidden), `Word adapter must not import ${forbidden}.`);
+}
+for (const forbidden of ["src/review", "../review", "document-planner",
+  "word-document-adapter", "word-export"]) {
+  assert.ok(!languageLayer.includes(forbidden),
+    `Language Excellence must not import ${forbidden}.`);
 }
 
 const build = read("scripts/build.js");

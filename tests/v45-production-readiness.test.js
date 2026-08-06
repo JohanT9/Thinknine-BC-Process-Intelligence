@@ -6,7 +6,7 @@ const root = path.resolve(__dirname, "..");
 const read = value => fs.readFileSync(path.join(root, value), "utf8");
 const packageJson = JSON.parse(read("package.json"));
 const manifest = JSON.parse(read("src/ui/manifest.json"));
-assert.strictEqual(packageJson.version, "4.5.0");
+assert.strictEqual(packageJson.version, "4.6.0");
 assert.strictEqual(manifest.version, packageJson.version);
 
 const library = read("src/document/document-library.js");
@@ -34,7 +34,7 @@ assert(dashboardHtml.includes('<details id="settingsPanel" class="settings-panel
   dashboardHtml.includes("Inställningar för dokumentation, export och inspelning"));
 
 const installation = read("INSTALLERA.txt");
-assert(installation.startsWith("THINKNINE BC PROCESS INTELLIGENCE 4.5.0"));
+assert(installation.startsWith("THINKNINE BC PROCESS INTELLIGENCE 4.6.0"));
 assert(installation.includes("Dokumentbiblioteket") &&
   installation.includes("Batch-exportera") &&
   !installation.includes("4.5.0 UX1"));

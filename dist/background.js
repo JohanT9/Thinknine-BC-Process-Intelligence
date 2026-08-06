@@ -1,7 +1,7 @@
 importScripts("engine/storage-keys.js");
 importScripts("document/document-library.js");
 
-const VERSION = "4.5.0";
+const VERSION = "4.6.0";
 
 const DEFAULT_SETTINGS = {
   exportFileNamePattern: "{process} - {environment} - {date}",

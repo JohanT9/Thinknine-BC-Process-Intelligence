@@ -2665,7 +2665,7 @@ Processen är genomförd enligt arbetsgången.
 Dokumentationskvalitet: **${quality} %**
 
 ---
-Genererad från Business Tasks av Thinknine BC Recorder 4.5.0.
+Genererad från Business Tasks av Thinknine BC Recorder 4.6.0.
 `;
 }
 
@@ -2705,7 +2705,7 @@ ${rendered || "Inga meningsfulla arbetssteg kunde identifieras."}
 Processen är genomförd och de registrerade ändringarna har sparats i Business Central.
 
 ---
-Automatiskt tolkat av Thinknine BC Recorder 4.5.0.
+Automatiskt tolkat av Thinknine BC Recorder 4.6.0.
 `;
 }
 
@@ -2722,7 +2722,7 @@ function createDiagnostics(session, rawEvents, businessSteps, screenshotCount) {
   }
 
   return {
-    recorderVersion: "4.5.0",
+    recorderVersion: "4.6.0",
     uiFidelityMode: true,
     sessionId: session.id,
     environment: session.settings?.environmentName || "",
@@ -3250,7 +3250,7 @@ async function exportSession(session) {
     {
       name: `${prefix}ui-fidelity.json`,
       data: bytes(JSON.stringify({
-        version: "4.5.0",
+        version: "4.6.0",
         principle: "Visible Business Central captions are preserved exactly.",
         rules: [
           "actionCaption is the text shown on the action or button.",
@@ -3403,6 +3403,7 @@ function createActiveDocumentPipeline() {
   return globalThis.T9WordExportPipeline.create({
     session: activeReviewModel.response.session,
     review: activeReview,
+    profileId: activeDocumentProfileId,
     themeId: "thinknine"
   });
 }
@@ -3453,6 +3454,7 @@ async function exportLibraryDocument(record, exportSettings) {
   const pipeline = globalThis.T9WordExportPipeline.create({
     session: model.response.session,
     review,
+    profileId: record.profile.profileId,
     themeId
   });
   const mediaAssets = await composeDocumentMedia(
@@ -3842,12 +3844,18 @@ function buildDocumentProfileVariants(pipeline) {
         themeId,
         profile.theme.overrides || {}
       );
-    const plan = theme === pipeline.theme
+    const semanticDocument = globalThis.T9LanguageExcellence.process(
+      pipeline.sourceSemanticDocument,
+      profile
+    );
+    const plan = profile.profileId === pipeline.languageProfile.profileId &&
+      theme === pipeline.theme
       ? pipeline.plan
-      : globalThis.T9DocumentPlanner.plan(pipeline.semanticDocument, theme);
+      : globalThis.T9DocumentPlanner.plan(semanticDocument, theme);
     return [profile.profileId, {
       profile,
       theme,
+      semanticDocument,
       plan,
       model: globalThis.T9DocumentWorkspace.render(plan)
     }];
@@ -3862,15 +3870,14 @@ function applyDocumentProfileVariant(options = {}) {
     Math.max(1, viewport.scrollHeight);
   documentationIntelligenceModel = globalThis.T9DocumentationIntelligence
     .create({
-      document: options.semanticDocument || documentProfileSource?.semanticDocument,
+      document: variant.semanticDocument,
       plan: variant.plan,
       qualityDiagnostics: options.qualityDiagnostics ||
         documentProfileSource?.qualityDiagnostics,
       workspaceContext,
       profile: variant.profile
     });
-  indexActiveDocumentVariant(variant, options.semanticDocument ||
-    documentProfileSource?.semanticDocument);
+  indexActiveDocumentVariant(variant, variant.semanticDocument);
   workspaceContextBinding = globalThis.T9WorkspaceContext.bind(variant.model, {
     taskIds: globalThis.T9Review.activeTasks(activeReview).map(task => task.taskId),
     screenshotsByTask: reviewScreenshotsByTask()

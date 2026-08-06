@@ -47,6 +47,22 @@ assert.strictEqual(language.process(document, profile("business-process")), impr
 assert.deepStrictEqual(language.process(document, profile("business-process")),
   language.process(document, profile("business-process")),
   "processing must be deterministic");
+assert.strictEqual(language.improveText("Tryck på Enter.", profile("sop")),
+  "Tryck på Enter.", "keyboard meaning must be preserved");
+assert.strictEqual(language.improveText("Press Escape.", profile("quick-reference")),
+  "Press Escape.", "English keyboard meaning must be preserved");
+assert.ok(improved.sections[0].blocks[0].blocks[0].text.includes("Bokför"));
+assert.strictEqual(improved.sections[0].blocks[0].blockId, "step-1");
+assert.deepStrictEqual(improved.sections[0].blocks[0].sourceRef,
+  document.sections[0].blocks[0].sourceRef);
+
+const mutable = JSON.parse(JSON.stringify(document));
+const firstMutable = language.process(mutable, profile("business-process"));
+mutable.sections[0].blocks[0].blocks[0].text = "Gå till Kundkort.";
+const secondMutable = language.process(mutable, profile("business-process"));
+assert.notStrictEqual(firstMutable, secondMutable);
+assert.strictEqual(secondMutable.sections[0].blocks[0].blocks[0].text,
+  "Öppna Kundkort.");
 
 const precise = language.process(semantic.normalize({
   documentId: "profile-language", assets: [], sections: [{
@@ -73,7 +89,7 @@ const reviewBefore = JSON.stringify(review);
 const prepared = pipeline.create({ review, session, profileId: "quick-reference" });
 assert.strictEqual(JSON.stringify(review), reviewBefore);
 assert.strictEqual(prepared.languageProfile.profileId, "quick-reference");
-assert.strictEqual(prepared.semanticDocument.languageExcellence.tone, "concise");
+assert.strictEqual(language.toneFor(prepared.languageProfile), "concise");
 assert.ok(JSON.stringify(prepared.plan).includes("Välj Bokför."));
 assert.ok(!JSON.stringify(prepared.plan).includes("Klicka på Bokför."));
 const sourceStep = prepared.sourceSemanticDocument.sections.find(section =>

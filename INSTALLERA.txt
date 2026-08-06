@@ -1,4 +1,4 @@
-THINKNINE BC PROCESS INTELLIGENCE 4.5.0
+THINKNINE BC PROCESS INTELLIGENCE 4.6.0
 
 FÖRUTSÄTTNINGAR
 
@@ -63,4 +63,4 @@ EXPORTINSTÄLLNINGAR
 Filnamnsmallen stöder variablerna process, environment, date, time och version
 inom klammerparenteser. Preview och validering uppdateras direkt. Exporten
 använder automatiskt unika filnamn vid konflikt; något separat Save As-val finns
-inte i 4.5.0.
+inte i 4.6.0.
