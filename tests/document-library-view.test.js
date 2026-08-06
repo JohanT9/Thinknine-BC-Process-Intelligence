@@ -29,4 +29,27 @@ assert.strictEqual(view.renderGrouped(container, library.groupByProfile([record]
 assert(container.innerHTML.includes("library-group-cards"));
 assert.strictEqual(view.renderList(container, [], {}), null);
 assert(container.innerHTML.includes("Inga dokument"));
+
+function fakeCard(projectId) {
+  const attributes = {};
+  const checkbox = { checked: false };
+  return { dataset: { libraryProjectId: projectId }, tabIndex: -1, attributes,
+    checkbox,
+    setAttribute(name, value) { attributes[name] = value; },
+    removeAttribute(name) { delete attributes[name]; },
+    querySelector() { return checkbox; } };
+}
+const firstCard = fakeCard("doc-1");
+const secondCard = fakeCard("doc-2");
+const selectionContainer = {
+  querySelectorAll() { return [firstCard, secondCard]; }
+};
+assert.strictEqual(view.applySelection(selectionContainer, {
+  selectedIds: ["doc-2"], activeId: "doc-2"
+}), secondCard);
+assert.strictEqual(firstCard.dataset.selected, "false");
+assert.strictEqual(secondCard.dataset.selected, "true");
+assert.strictEqual(secondCard.checkbox.checked, true);
+assert.strictEqual(secondCard.tabIndex, 0);
+assert.strictEqual(secondCard.attributes["aria-current"], "true");
 console.log("Document Library view and accessibility tests passed.");

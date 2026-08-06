@@ -228,3 +228,24 @@ Profil- och temaassignment lagras som presentationsmetadata. Profilbyte
 ogiltigförklarar den gamla rådgivande hälsosnapshoten tills ordinarie Document
 Workspace senare materialiserar nya förväntningar. Batch-export laddar aldrig
 en Review-samling; ett projekt hämtas, renderas och släpps innan nästa startar.
+
+## Workflow Polish 4.5 UX8
+
+UX8 ändrar inga domängränser. Det renodlar dashboardens interaktionsadapter:
+
+```text
+Metadata change → rebuild immutable library index → reconcile full view
+Selection/focus change → patch visible card state + preview only
+Filter/sort change → reuse index → reconcile bounded result DOM
+```
+
+`document-library-view.applySelection` uppdaterar endast `data-selected`, native
+checkbox, roving tab stop och `aria-current`. Semantiskt kortinnehåll och noder
+återanvänds. Dashboarden behåller högst 200 renderade kort men söker och väljer
+fortsatt i hela metadataindexet.
+
+Metadata-persistence använder rollback innan synlig reconciliation. Öppning av
+Review sparar senaste aktivitet utan att först ersätta det fokuserade kortets
+DOM, så returfokus kan bindas till samma stabila projekt-ID. Tangentbordsgenvägar
+är UI-kommandon och passerar aldrig Review Projector, Semantic Document,
+Documentation Intelligence, Planner eller Word-adaptern.

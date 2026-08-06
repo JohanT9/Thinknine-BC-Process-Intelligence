@@ -3549,6 +3549,7 @@ let documentLibraryIndex = [];
 let documentLibrarySessions = new Map();
 let documentLibrarySelection = globalThis.T9DocumentBatchOperations.selection();
 const DOCUMENT_LIBRARY_RENDER_LIMIT = 200;
+let visibleDocumentLibraryRecords = [];
 
 function librarySessionRecord(session) {
   return {
@@ -3609,13 +3610,11 @@ function fillLibraryFilter(id, values, selected) {
 }
 
 function renderDocumentLibrary() {
-  documentLibraryIndex = globalThis.T9DocumentLibrary.create(
-    documentLibraryRecords
-  );
   const matches = globalThis.T9DocumentLibrary.query(
     documentLibraryIndex, libraryOptions()
   );
   const records = matches.slice(0, DOCUMENT_LIBRARY_RENDER_LIMIT);
+  visibleDocumentLibraryRecords = records;
   const view = globalThis.T9DocumentLibraryView;
   const activeId = $("libraryGroupProfiles").checked
     ? view.renderGrouped($("libraryResults"),
@@ -3635,6 +3634,23 @@ function renderDocumentLibrary() {
     : records.length === 1
     ? "1 dokument visas."
     : `${records.length} dokument visas.`;
+  renderLibraryBatchToolbar();
+}
+
+function rebuildDocumentLibraryIndex() {
+  documentLibraryIndex = globalThis.T9DocumentLibrary.create(
+    documentLibraryRecords
+  );
+}
+
+function renderDocumentLibrarySelection() {
+  globalThis.T9DocumentLibraryView.applySelection(
+    $("libraryResults"), documentLibrarySelection
+  );
+  const active = visibleDocumentLibraryRecords.find(record =>
+    record.projectId === documentLibrarySelection.activeId
+  );
+  globalThis.T9DocumentLibraryView.renderPreview($("libraryPreview"), active);
   renderLibraryBatchToolbar();
 }
 
@@ -3678,6 +3694,7 @@ async function loadDocumentLibrary(sessions) {
     documentLibrarySelection,
     documentLibraryRecords.map(record => record.projectId)
   );
+  rebuildDocumentLibraryIndex();
   const activeIds = new Set(sessions.map(session => session.id));
   if ([...stored.keys()].some(projectId => !activeIds.has(projectId))) {
     await persistDocumentLibrary();
@@ -3686,13 +3703,23 @@ async function loadDocumentLibrary(sessions) {
   renderDocumentLibrary();
 }
 
-async function updateDocumentLibraryRecord(projectId, patch) {
+async function updateDocumentLibraryRecord(projectId, patch, options = {}) {
+  const previous = documentLibraryRecords;
   documentLibraryRecords = globalThis.T9DocumentLibrary.update(
     documentLibraryRecords, projectId, patch
   );
-  refreshLibraryFilters();
-  renderDocumentLibrary();
-  await persistDocumentLibrary();
+  rebuildDocumentLibraryIndex();
+  try {
+    await persistDocumentLibrary();
+  } catch (error) {
+    documentLibraryRecords = previous;
+    rebuildDocumentLibraryIndex();
+    throw error;
+  }
+  if (options.render !== false) {
+    refreshLibraryFilters();
+    renderDocumentLibrary();
+  }
 }
 
 function selectedLibraryRecords() {
@@ -3708,10 +3735,12 @@ async function commitLibraryBatch(result, confirmation) {
   }
   const previous = documentLibraryRecords;
   documentLibraryRecords = result.records;
+  rebuildDocumentLibraryIndex();
   try {
     await persistDocumentLibrary();
   } catch (error) {
     documentLibraryRecords = previous;
+    rebuildDocumentLibraryIndex();
     renderDocumentLibrary();
     throw error;
   }
@@ -3922,6 +3951,7 @@ function indexActiveDocumentVariant(variant, semanticDocument) {
   documentLibraryRecords = globalThis.T9DocumentLibrary.update(
     documentLibraryRecords, activeReviewSession.id, patch
   );
+  rebuildDocumentLibraryIndex();
   persistDocumentLibrary().catch(error => show(error.message, true));
 }
 
@@ -5352,6 +5382,7 @@ async function loadSessions() {
   const body = $("sessions");
   body.innerHTML = "";
   await loadDocumentLibrary(sessions);
+  if (!$("sessionTools").open) return;
 
   if (!sessions.length) {
     const row = document.createElement("tr");
@@ -5897,20 +5928,15 @@ globalThis.T9ReviewToolbar.bind($("reviewToolbar"), (command, button) => {
   }
 });
 
-$("saveReview").addEventListener("click", async () => {
+async function saveReviewExplicitly() {
   try {
     await reviewPersistence.saveExplicitly();
   } catch (error) {
     show(error.message, true);
   }
-});
-$("saveReviewBottom").addEventListener("click", async () => {
-  try {
-    await reviewPersistence.saveExplicitly();
-  } catch (error) {
-    show(error.message, true);
-  }
-});
+}
+$("saveReview").addEventListener("click", saveReviewExplicitly);
+$("saveReviewBottom").addEventListener("click", saveReviewExplicitly);
 $("compactReviewSteps").addEventListener("click", () => {
   reviewLayoutState = globalThis.T9ReviewLayout.toggleAll(
     reviewLayoutState,
@@ -5954,6 +5980,11 @@ $("reviewOverlay").addEventListener("click", event => {
   if (event.target === $("reviewOverlay")) closeReview();
 });
 $("reviewOverlay").addEventListener("keydown", event => {
+  if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === "s") {
+    event.preventDefault();
+    saveReviewExplicitly();
+    return;
+  }
   if (event.target.closest?.('[data-editing="true"]')) return;
   const direction = globalThis.T9Review.historyDirectionFromKey(event);
   if (!direction) return;
@@ -5970,6 +6001,13 @@ globalThis.T9ReviewMove.bind($("reviewList"), {
 
 $("save").addEventListener("click", saveSettings);
 $("refresh").addEventListener("click", loadSessions);
+$("sessionTools").addEventListener("toggle", () => {
+  if ($("sessionTools").open) {
+    loadSessions().catch(error => show(error.message, true));
+  } else {
+    $("sessions").replaceChildren();
+  }
+});
 for (const id of ["librarySearch", "libraryProfileFilter",
   "libraryThemeFilter", "libraryHealthFilter", "librarySort",
   "libraryFavouriteFilter", "libraryRecentFilter", "libraryGroupProfiles",
@@ -5978,6 +6016,13 @@ for (const id of ["librarySearch", "libraryProfileFilter",
   $(id).addEventListener(id === "librarySearch" ? "input" : "change",
     renderDocumentLibrary);
 }
+$("librarySearch").addEventListener("keydown", event => {
+  if (event.key !== "Escape" || !event.currentTarget.value) return;
+  event.preventDefault();
+  event.currentTarget.value = "";
+  renderDocumentLibrary();
+  $("libraryStatus").textContent += " Sökningen rensades.";
+});
 $("libraryResults").addEventListener("click", async event => {
   const card = event.target.closest?.("[data-library-project-id]");
   if (!card) return;
@@ -5994,7 +6039,7 @@ $("libraryResults").addEventListener("click", async event => {
         toggle: Boolean(selectionControl || event.ctrlKey || event.metaKey)
       }
     );
-    renderDocumentLibrary();
+    renderDocumentLibrarySelection();
     $("libraryResults").querySelector(
       `[data-library-project-id="${CSS.escape(projectId)}"]`
     )?.focus();
@@ -6014,15 +6059,18 @@ $("libraryResults").addEventListener("click", async event => {
     )?.focus();
     return;
   }
-  renderDocumentLibrary();
   if (!event.target.closest?.('[data-library-action="open"]')) return;
   const session = documentLibrarySessions.get(projectId);
   if (!session || session.status === "recording") return;
   try {
     await updateDocumentLibraryRecord(projectId, {
-    lastOpenedAt: new Date().toISOString(),
-    recentActivity: ["Dokumentationen öppnades"]
-    });
+      lastOpenedAt: new Date().toISOString(),
+      recentActivity: ["Dokumentationen öppnades"]
+    }, { render: false });
+  } catch (error) {
+    show(error.message, true);
+  }
+  try {
     await openReview(session);
   } catch (error) {
     show(error.message, true);
@@ -6030,23 +6078,23 @@ $("libraryResults").addEventListener("click", async event => {
 });
 $("libraryResults").addEventListener("keydown", event => {
   const card = event.target.closest?.("[data-library-project-id]");
-  const records = globalThis.T9DocumentLibrary.query(
-    documentLibraryIndex, libraryOptions()
-  ).slice(0, DOCUMENT_LIBRARY_RENDER_LIMIT);
-  const visibleIds = records.map(record => record.projectId);
+  const visibleIds = visibleDocumentLibraryRecords.map(record => record.projectId);
   if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === "a") {
+    const matches = globalThis.T9DocumentLibrary.query(
+      documentLibraryIndex, libraryOptions()
+    );
     event.preventDefault();
     documentLibrarySelection = globalThis.T9DocumentBatchOperations.selectAll(
-      documentLibrarySelection, visibleIds
+      documentLibrarySelection, matches.map(record => record.projectId)
     );
-    renderDocumentLibrary();
-    renderLibraryBatchToolbar(`${visibleIds.length} synliga dokument valdes.`);
+    renderDocumentLibrarySelection();
+    renderLibraryBatchToolbar(`${matches.length} dokument valdes.`);
     return;
   }
   if (event.key === "Escape" && documentLibrarySelection.selectedIds.length) {
     event.preventDefault();
     documentLibrarySelection = globalThis.T9DocumentBatchOperations.clear();
-    renderDocumentLibrary();
+    renderDocumentLibrarySelection();
     renderLibraryBatchToolbar("Dokumentvalet rensades.");
     return;
   }
@@ -6056,7 +6104,7 @@ $("libraryResults").addEventListener("keydown", event => {
       documentLibrarySelection, visibleIds, card.dataset.libraryProjectId,
       { toggle: true }
     );
-    renderDocumentLibrary();
+    renderDocumentLibrarySelection();
     return;
   }
   if (event.key === "Enter" && event.target === card) {
@@ -6075,7 +6123,7 @@ $("libraryResults").addEventListener("keydown", event => {
       documentLibrarySelection, visibleIds, focused.activeId, { shift: true }
     )
     : focused;
-  renderDocumentLibrary();
+  renderDocumentLibrarySelection();
   $("libraryResults").querySelector(
     `[data-library-project-id="${CSS.escape(documentLibrarySelection.activeId)}"]`
   )?.focus();
@@ -6087,12 +6135,12 @@ $("libraryBatchSelectAll").addEventListener("click", () => {
   documentLibrarySelection = globalThis.T9DocumentBatchOperations.selectAll(
     documentLibrarySelection, matches.map(record => record.projectId)
   );
-  renderDocumentLibrary();
+  renderDocumentLibrarySelection();
   renderLibraryBatchToolbar(`${matches.length} dokument valdes.`);
 });
 $("libraryBatchClear").addEventListener("click", () => {
   documentLibrarySelection = globalThis.T9DocumentBatchOperations.clear();
-  renderDocumentLibrary();
+  renderDocumentLibrarySelection();
   $("librarySearch").focus();
   $("libraryBatchStatus").textContent = "Dokumentvalet rensades.";
 });
@@ -6107,6 +6155,7 @@ $("libraryBatchExport").addEventListener("click", async () => {
   progress.hidden = false;
   progress.max = records.length;
   progress.value = 0;
+  $("libraryBatchToolbar").setAttribute("aria-busy", "true");
   controls.forEach(button => { button.disabled = true; });
   let exported = 0;
   try {
@@ -6145,6 +6194,7 @@ $("libraryBatchExport").addEventListener("click", async () => {
   } finally {
     controls.forEach(button => { button.disabled = false; });
     progress.hidden = true;
+    $("libraryBatchToolbar").setAttribute("aria-busy", "false");
   }
 });
 $("libraryBatchFavourite").addEventListener("click", async () => {
@@ -6219,6 +6269,17 @@ $("debug").addEventListener("click", () => {
   chrome.tabs.create({
     url: chrome.runtime.getURL("debug.html")
   });
+});
+document.addEventListener("keydown", event => {
+  if (event.key !== "/" || event.ctrlKey || event.metaKey || event.altKey ||
+      $("reviewOverlay").classList.contains("open") ||
+      document.querySelector("dialog[open]") ||
+      event.target.closest?.("input, textarea, select, [contenteditable=true]")) {
+    return;
+  }
+  event.preventDefault();
+  $("librarySearch").focus();
+  $("librarySearch").select();
 });
 
 

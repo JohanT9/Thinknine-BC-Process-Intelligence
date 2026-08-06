@@ -13,6 +13,7 @@ label{display:block;margin:9px 0}
 input[type=number],input[type=text],select{padding:8px;width:380px;max-width:100%;box-sizing:border-box}
 button{border:0;border-radius:5px;padding:9px 13px;font-weight:600;cursor:pointer;margin-right:6px}
 .primary{background:#0f6cbd;color:white}.danger{background:#fee2e2;color:#991b1b}.secondary{background:#dbeafe;color:#1e3a8a}.debug{background:#e5e7eb;color:#374151}
+button{transition:background-color .12s ease,box-shadow .12s ease}button:focus-visible,input:focus-visible,select:focus-visible,summary:focus-visible{outline:3px solid #0f6cbd;outline-offset:2px}.primary:hover{background:#0b5fa8}.secondary:hover{background:#c7ddf8}.danger:hover{background:#fecaca}.debug:hover{background:#d1d5db}button:disabled{cursor:not-allowed;opacity:.55}
 table{width:100%;border-collapse:collapse}th,td{text-align:left;padding:9px;border-bottom:1px solid #e5e7eb;font-size:13px}
 #message{min-height:20px;margin:10px 0}
 .profile-help{padding:12px;background:#f3f6fa;border-radius:6px;margin-top:10px}
@@ -32,7 +33,9 @@ table{width:100%;border-collapse:collapse}th,td{text-align:left;padding:9px;bord
 .library-confirmations{list-style:none;padding:0;margin:8px 0;color:#166534}.library-confirmations li::before{content:"✓ ";font-weight:700}
 .library-preview{position:sticky;top:12px;border:1px solid #d8dee5;border-radius:8px;background:#f8fafc;padding:16px}.library-preview h3{margin-top:0}.library-preview dl div{padding:7px 0;border-top:1px solid #d8dee5}.library-preview dt{font-weight:600}.library-preview dd{margin:3px 0 0}
 .library-empty{grid-column:1/-1;padding:28px;text-align:center;background:#f8fafc;border-radius:8px}.library-status{min-height:20px}
+.session-tools{margin:28px 0}.session-tools>summary{font-size:18px;font-weight:700;cursor:pointer;padding:10px 0}.session-tools-body{padding:0 0 12px}
 .library-select{margin:2px 0}.library-select input{width:auto}.library-batch-toolbar{position:sticky;top:0;z-index:5;display:flex;flex-wrap:wrap;align-items:center;gap:6px;padding:10px 12px;margin:10px 0;background:#eef6ff;border:1px solid #9bc4e2;border-radius:8px}.library-batch-toolbar button{margin:0}.library-batch-count{font-weight:700;margin-right:auto}.library-batch-progress{width:100%;margin:4px 0 0}.library-batch-dialog{border:0;border-radius:9px;box-shadow:0 18px 55px rgba(15,23,42,.3);padding:22px;min-width:min(520px,calc(100vw - 48px))}.library-batch-dialog::backdrop{background:rgba(15,23,42,.42)}.library-batch-fields{display:grid;grid-template-columns:auto 1fr;gap:10px;align-items:center}.library-batch-fields label{display:contents}.library-batch-fields input[type=checkbox]{width:auto}.library-batch-fields input[type=text],.library-batch-fields select{width:100%}.library-batch-dialog footer{text-align:right;margin-top:18px}
+.library-batch-more{position:relative}.library-batch-more>summary{cursor:pointer;font-weight:600;padding:9px 13px;background:#e5e7eb;border-radius:5px;color:#374151}.library-batch-more[open]{width:100%;padding-top:4px}.library-batch-more[open]>summary{width:max-content;margin-bottom:7px}.library-batch-more button{margin-right:6px}
 .review-overlay{position:fixed;inset:0;background:rgba(15,23,42,.58);display:none;z-index:1000;padding:24px;overflow:auto}
 .review-overlay.open{display:block}
 .review-shell{max-width:1100px;margin:0 auto;background:white;border-radius:10px;box-shadow:0 20px 55px rgba(0,0,0,.3);overflow:clip}
@@ -148,7 +151,7 @@ table{width:100%;border-collapse:collapse}th,td{text-align:left;padding:9px;bord
 .review-shell.annotation-mode .review-toolbar,.review-shell.annotation-mode .review-toolbar-secondary,.review-shell.annotation-mode .review-progress,.review-shell.annotation-mode #reviewStatus{display:none}
 @media(max-width:800px){.review-card,.review-card.compact{grid-template-columns:44px 1fr}.review-actions{grid-column:1/-1;flex-direction:row;flex-wrap:wrap}.library-controls,.library-layout{grid-template-columns:1fr}.library-preview{position:static}}
 @media(max-width:900px){.documentation-guidance{width:250px;flex-basis:250px}}
-@media(prefers-reduced-motion:reduce){.document-workspace-panel *,.document-library *{scroll-behavior:auto!important;transition:none!important}}
+@media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important;transition:none!important;animation:none!important}}
 @media(forced-colors:active){.document-workspace-page,.library-card,.library-preview{border:1px solid CanvasText}.document-toolbar{border-color:CanvasText}}
 
 .summary strong{display:block;font-size:18px;margin-top:4px}
@@ -256,12 +259,13 @@ table{width:100%;border-collapse:collapse}th,td{text-align:left;padding:9px;bord
 <button id="save" class="primary">Spara inställningar</button>
 </fieldset>
 
+<div id="message" role="status" aria-live="polite" aria-atomic="true"></div>
 <section class="document-library" aria-labelledby="documentLibraryTitle">
   <h2 id="documentLibraryTitle">Dokumentbibliotek</h2>
   <p class="muted">Hitta tidigare dokumentation med hjälp av innehåll och dokumentinformation.</p>
   <div class="library-controls" role="search">
     <label for="librarySearch">Sök dokument
-      <input id="librarySearch" type="search" autocomplete="off"
+      <input id="librarySearch" type="search" autocomplete="off" aria-keyshortcuts="/ Escape"
         aria-describedby="libraryStatus" placeholder="Titel, profil, tagg eller arbetsflöde">
     </label>
     <label for="libraryProfileFilter">Dokumentprofil
@@ -303,9 +307,12 @@ table{width:100%;border-collapse:collapse}th,td{text-align:left;padding:9px;bord
     <button id="libraryBatchTags" class="secondary">Taggar</button>
     <button id="libraryBatchProfile" class="secondary">Profil</button>
     <button id="libraryBatchTheme" class="secondary">Tema</button>
-    <button id="libraryBatchMetadata" class="secondary">Metadata</button>
-    <button id="libraryBatchArchive" class="secondary">Arkivera</button>
-    <button id="libraryBatchDelete" class="danger">Ta bort</button>
+    <details class="library-batch-more">
+      <summary>Fler åtgärder</summary>
+      <button id="libraryBatchMetadata" class="secondary">Redigera metadata</button>
+      <button id="libraryBatchArchive" class="secondary">Arkivera</button>
+      <button id="libraryBatchDelete" class="danger">Ta bort permanent</button>
+    </details>
     <progress id="libraryBatchProgress" class="library-batch-progress" max="1"
       value="0" hidden aria-label="Batchförlopp"></progress>
   </div>
@@ -345,14 +352,18 @@ table{width:100%;border-collapse:collapse}th,td{text-align:left;padding:9px;bord
   </form>
 </dialog>
 
-<h2>Sessioner</h2>
-<button id="refresh" class="secondary">Uppdatera listan</button>
-<button id="debug" class="debug">Öppna debugpanel</button>
-<div id="message" role="status" aria-live="polite" aria-atomic="true"></div>
-<table>
-<thead><tr><th>Namn</th><th>Startad</th><th>Händelser</th><th>Status</th><th></th></tr></thead>
-<tbody id="sessions"></tbody>
-</table>
+<details id="sessionTools" class="session-tools">
+  <summary>Inspelningar och tekniska verktyg</summary>
+  <div class="session-tools-body">
+    <p class="muted">Hantera råinspelningar, ZIP-export och felsökning.</p>
+    <button id="refresh" class="secondary">Uppdatera inspelningar</button>
+    <button id="debug" class="debug">Öppna debugpanel</button>
+    <table>
+    <thead><tr><th>Namn</th><th>Startad</th><th>Händelser</th><th>Status</th><th>Åtgärder</th></tr></thead>
+    <tbody id="sessions"></tbody>
+    </table>
+  </div>
+</details>
 
 
 <div id="reviewOverlay" class="review-overlay" aria-hidden="true">
@@ -369,9 +380,9 @@ table{width:100%;border-collapse:collapse}th,td{text-align:left;padding:9px;bord
       <div id="workspaceTabs" class="workspace-tabs" role="tablist"
         aria-label="Dokumentationsarbetsyta">
         <button id="reviewWorkspaceTab" role="tab" aria-selected="true"
-          aria-controls="reviewWorkspacePanel" tabindex="0">Review Workspace</button>
+          aria-controls="reviewWorkspacePanel" tabindex="0">Granskning</button>
         <button id="documentWorkspaceTab" role="tab" aria-selected="false"
-          aria-controls="documentWorkspacePanel" tabindex="-1">Document Workspace</button>
+          aria-controls="documentWorkspacePanel" tabindex="-1">Dokumentvy</button>
       </div>
       <div id="reviewToolbar" class="review-toolbar" role="toolbar" aria-label="Redigeringskommandon">
         <div class="review-toolbar-group" role="group" aria-label="Historik">
@@ -393,7 +404,7 @@ table{width:100%;border-collapse:collapse}th,td{text-align:left;padding:9px;bord
       <div class="review-toolbar-secondary">
         <button id="compactReviewSteps" class="secondary" aria-pressed="false">Komprimera alla</button>
         <button id="addReviewStep" class="secondary">Lägg till steg</button>
-        <button id="saveReview" class="primary">Spara granskning</button>
+        <button id="saveReview" class="primary" aria-keyshortcuts="Control+S Meta+S">Spara granskning</button>
         <button id="completeReview" class="primary" disabled>Slutför granskning</button>
       </div>
       <div id="reviewProgress" class="review-progress" role="progressbar" aria-label="Granskningsförlopp" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">

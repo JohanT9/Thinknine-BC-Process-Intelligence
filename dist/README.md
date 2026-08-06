@@ -1,7 +1,20 @@
-# Thinknine BC Process Intelligence v4.5.0 UX7
+# Thinknine BC Process Intelligence v4.5.0 UX8
 
 Ett modulärt Edge-tillägg för att spela in, granska och exportera dokumenterade
 Business Central-processer.
+
+## Workflow Polish 4.5 UX8
+
+Det dagliga flödet är nu snabbare och lugnare utan nya produktfunktioner.
+Dokumentbiblioteket har tydligast visuell prioritet; råinspelningar, ZIP-export
+och debug finns kvar under **Inspelningar och tekniska verktyg**. Vanliga
+batchkommandon visas direkt medan sällsynta och destruktiva åtgärder samlas under
+**Fler åtgärder**.
+
+Tryck `/` för att fokusera bibliotekssökningen, Escape för att rensa den och
+Ctrl/Cmd+S för att spara i Granskning. Urval och fokus uppdateras inkrementellt
+utan att bygga om korten, och metadataindexet återanvänds mellan sökningar. Se
+[Workflow Polish 4.5](docs/WORKFLOW_POLISH_4.5.md).
 
 ## Batch Operations 4.5 UX7
 

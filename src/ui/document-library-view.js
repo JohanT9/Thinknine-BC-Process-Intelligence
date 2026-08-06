@@ -82,5 +82,23 @@
         `<li>${escape(value)}</li>`).join("")}</ul>`;
   }
 
-  return { card, renderGrouped, renderList, renderPreview };
+  function applySelection(container, state = {}) {
+    const selectedIds = new Set(state.selectedIds || []);
+    const cards = [...container.querySelectorAll("[data-library-project-id]")];
+    cards.forEach(cardValue => {
+      const selected = selectedIds.has(cardValue.dataset.libraryProjectId);
+      const active = cardValue.dataset.libraryProjectId === state.activeId;
+      cardValue.dataset.selected = String(selected);
+      cardValue.tabIndex = active ? 0 : -1;
+      if (active) cardValue.setAttribute("aria-current", "true");
+      else cardValue.removeAttribute("aria-current");
+      const checkbox = cardValue.querySelector('[data-library-action="select"]');
+      if (checkbox) checkbox.checked = selected;
+    });
+    return cards.find(cardValue =>
+      cardValue.dataset.libraryProjectId === state.activeId
+    ) || null;
+  }
+
+  return { applySelection, card, renderGrouped, renderList, renderPreview };
 });

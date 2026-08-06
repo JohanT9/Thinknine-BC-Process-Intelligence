@@ -1,5 +1,23 @@
 # Changelog
 
+## 4.5.0 UX8 — Workflow Polish
+
+- Made Document Library the primary daily surface and grouped raw sessions,
+  ZIP export and debugging under a secondary disclosure.
+- Standardized workspace terminology to Granskning and Dokumentvy.
+- Added `/` search focus, Escape search clearing and Ctrl/Cmd+S Review saving.
+- Reused the library search index until metadata changes instead of rebuilding
+  it for selection, filtering and sorting interactions.
+- Added incremental card selection/focus/preview updates without replacing card
+  DOM, preserving focus and reducing work in large libraries.
+- Grouped infrequent and destructive batch controls under Fler åtgärder and
+  clarified permanent deletion language.
+- Added atomic single-record metadata rollback, non-blocking recent-use
+  persistence and correct return focus when opening and closing Review.
+- Standardized hover, focus, disabled, busy, reduced-motion and status feedback.
+- Added workflow, keyboard, focus, accessibility and render-frequency regression
+  coverage without changing document or export semantics.
+
 ## 4.5.0 UX7 — Batch Operations
 
 - Added immutable renderer-neutral multi-selection and batch command models.
