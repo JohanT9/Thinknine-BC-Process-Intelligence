@@ -62,7 +62,9 @@ const model = {
       content: { text: 'Ange 400 i "Antal".', runs: [
         { text: "Ange ", bold: false },
         { text: "400", bold: true },
-        { text: ' i "Antal".', bold: false }
+        { text: ' i "Antal".', bold: false },
+        { text: " Tryck " },
+        { text: "Ctrl+S", role: "shortcut", monospace: true }
       ] }
     }]
   }]
@@ -78,6 +80,9 @@ assert.strictEqual(cover.children[0].style.color, "#123456");
 assert.strictEqual(workflow.children[0].children[0].src, media["asset-1"].source);
 assert.strictEqual(workflow.children[1].children[1].tagName, "strong");
 assert.strictEqual(workflow.children[1].children[1].textContent, "400");
+assert.strictEqual(workflow.children[1].children[4].tagName, "code");
+assert.strictEqual(workflow.children[1].children.map(child => child.textContent)
+  .join(""), 'Ange 400 i "Antal". Tryck Ctrl+S');
 assert.strictEqual(workflow.dataset.workspaceContextTarget, "true");
 assert.strictEqual(workflow.children[0].dataset.workspaceContextTarget, "true");
 assert.strictEqual(workflow.children[0].tabIndex, 0);

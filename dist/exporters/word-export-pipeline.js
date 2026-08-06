@@ -11,6 +11,9 @@
   const language = typeof module === "object" && module.exports
     ? require("../document/language-excellence")
     : root.T9LanguageExcellence;
+  const presentation = typeof module === "object" && module.exports
+    ? require("../document/presentation-grammar")
+    : root.T9PresentationGrammar;
   const screenshotIntelligence = typeof module === "object" && module.exports
     ? require("../document/screenshot-intelligence")
     : root.T9ScreenshotIntelligence;
@@ -43,6 +46,7 @@
     semantic,
     interactions,
     language,
+    presentation,
     screenshotIntelligence,
     profiles,
     registry,
@@ -60,6 +64,7 @@
   semantic,
   interactions,
   language,
+  presentation,
   screenshotIntelligence,
   profiles,
   registry,
@@ -126,10 +131,11 @@
       );
     }
     const languageDocument = language.process(semanticActionsDocument, profile);
+    const grammarDocument = presentation.process(languageDocument);
     const screenshotCandidates = screenshotIntelligence.normalizeCandidates(
       options.screenshotCandidates
     );
-    const screenshotResult = screenshotIntelligence.select(languageDocument, {
+    const screenshotResult = screenshotIntelligence.select(grammarDocument, {
       candidates: screenshotCandidates,
       profile
     });
@@ -162,6 +168,7 @@
       sourceSemanticDocument: projection.document,
       semanticActionsDocument,
       languageDocument,
+      presentationDocument: grammarDocument,
       semanticDocument: presentationDocument,
       languageProfile: profile,
       screenshotCandidates,

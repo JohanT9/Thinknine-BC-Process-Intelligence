@@ -342,6 +342,8 @@
       appearance,
       content: {
         ...(block.text !== undefined ? { text: block.text } : {}),
+        ...(Array.isArray(block.presentationRuns)
+          ? { runs: clone(block.presentationRuns) } : {}),
         ...(block.level !== undefined ? { level: block.level } : {}),
         ...(block.stepNumber !== undefined ? { stepNumber: block.stepNumber } : {}),
         ...(block.stepNumber !== undefined ? {

@@ -26,7 +26,8 @@
 
   function appendRuns(element, runs, documentValue) {
     for (const run of runs || []) {
-      const child = documentValue.createElement(run.bold ? "strong" : "span");
+      const child = documentValue.createElement(run.bold
+        ? "strong" : run.monospace ? "code" : "span");
       child.textContent = run.text || "";
       element.appendChild(child);
     }

@@ -1,5 +1,18 @@
 # Changelog
 
+## 4.6.0 R3.2 — Presentation Grammar
+
+- Added a dedicated renderer-neutral Presentation Grammar layer after Language
+  Excellence and before Screenshot Intelligence.
+- Standardized plain actions, quoted interface elements, bold user values and
+  monospace shortcuts or technical identifiers.
+- Added deterministic word order for selections, field entry, options and
+  semantic checkbox actions without changing workflow meaning.
+- Made Document Workspace and Word consume the same immutable presentation runs.
+- Preserved legacy marker syntax, unknown future fields and old Reviews without
+  migration or persistence changes.
+- Added behavior, Workspace, accessibility and DOCX formatting regressions.
+
 ## 4.6.0 R4 — Review Workspace Refinement
 
 - Reduced the primary Review toolbar to Undo, Redo, Save and Word export while

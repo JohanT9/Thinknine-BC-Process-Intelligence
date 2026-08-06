@@ -49,7 +49,8 @@
         }));
         renderComponents(component.components, result);
       } else if (component.kind === "paragraph") {
-        const runs = textFormat.instructionSegments(component.content.text);
+        const runs = component.content.runs ||
+          textFormat.instructionSegments(component.content.text);
         result.push(workspaceItem(component, "paragraph", "paragraph", {
           text: runs.map(run => run.text).join(""),
           runs
@@ -61,7 +62,8 @@
           annotationRefs: component.content.annotationRefs || []
         }));
       } else if (component.kind === "callout") {
-        const runs = textFormat.instructionSegments(component.content.text || "");
+        const runs = component.content.runs ||
+          textFormat.instructionSegments(component.content.text || "");
         result.push(workspaceItem(component, "callout", "callout", {
           label: component.accessibility?.label || "Kommentar",
           text: runs.map(run => run.text).join(""),

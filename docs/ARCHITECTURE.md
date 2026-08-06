@@ -1,5 +1,26 @@
 # Architecture 4.6
 
+## Presentation Grammar 4.6 R3.2
+
+```text
+Review → Projector → Semantic Document → Semantic Interaction Rules
+  → Language Excellence → Presentation Grammar → Screenshot Intelligence
+  → Document Profile → Theme → Planner → Workspace / Word
+```
+
+`presentation-grammar.js` is the sole owner of renderer-neutral visual text
+grammar. It consumes the Language Excellence document and returns an immutable
+Semantic Document containing natural paragraph text plus explicit presentation
+runs. Actions, interface elements, values, shortcuts and identifiers have
+distinct roles; no renderer parses semantic action intent.
+
+Planner transports the runs unchanged. Document Workspace maps the contracts to
+semantic DOM elements, while the Word adapter maps the same contracts to DOCX
+text properties. Both retain the plain concatenated sentence for accessibility.
+The layer does not change workflow structure, screenshots, source references,
+planning or persistence. Legacy marker parsing is a compatibility boundary only
+and remains outside both renderers.
+
 ## Review Workspace Refinement 4.6 R4
 
 R4 changes presentation and interaction composition only. Review domain

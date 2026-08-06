@@ -3,6 +3,19 @@
 Ett modulärt Edge-tillägg för att spela in, granska och exportera dokumenterade
 Business Central-processer.
 
+## Presentation Grammar 4.6 R3.2
+
+Dokumentvyn och Word-exporten använder nu samma visuella grammatik. Åtgärder
+visas som vanlig text, gränssnittselement inom citationstecken och värden som
+användaren anger eller väljer i fetstil. Tangentbordsgenvägar och tekniska
+identifierare visas i monospace. Exempel: `Välj "Nr"` **136** och
+`Ange` **500** `i "Antal"`.
+
+Ett separat, renderer-neutralt lager skapar explicita presentationssegment
+efter Language Excellence och före Screenshot Intelligence. Äldre dokument och
+befintliga markörer fortsätter fungera utan migrering. Se
+[Presentation Grammar 4.6](docs/PRESENTATION_GRAMMAR_4.6.md).
+
 ## Review Workspace Refinement 4.6 R4
 
 Granskningsytan prioriterar nu de dagliga åtgärderna: Ångra, Gör om, Spara och

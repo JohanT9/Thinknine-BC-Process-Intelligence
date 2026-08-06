@@ -3861,9 +3861,12 @@ function buildDocumentProfileVariants(pipeline) {
         themeId,
         profile.theme.overrides || {}
       );
-    const semanticDocument = globalThis.T9LanguageExcellence.process(
+    const languageDocument = globalThis.T9LanguageExcellence.process(
       pipeline.semanticActionsDocument,
       profile
+    );
+    const semanticDocument = globalThis.T9PresentationGrammar.process(
+      languageDocument
     );
     const screenshotResult = globalThis.T9ScreenshotIntelligence.select(
       semanticDocument,

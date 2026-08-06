@@ -92,8 +92,18 @@ const semanticInteractionOutput = await exportReview(review([{
   selectedCaption: 'Välj posten "1033"', instruction: "Välj post.",
   sourceEventNos: [41], screenshot: "customer-row.png"
 }]));
-assert.ok(semanticInteractionOutput.documentXml.includes("Välj kund"));
+assert.ok(semanticInteractionOutput.documentXml.includes("Välj "));
+assert.ok(semanticInteractionOutput.documentXml.includes("&quot;Kund&quot;"));
 assert.ok(semanticInteractionOutput.documentXml.includes("1033"));
+assert.match(semanticInteractionOutput.documentXml,
+  /<w:b(?: [^>]*)?\/>[\s\S]{0,500}<w:t[^>]*>1033<\/w:t>/);
+const customerInstruction = semanticInteractionOutput.plan.sections
+  .flatMap(section => section.components)
+  .find(component => component.kind === "workflow").components
+  .find(component => component.kind === "step").components
+  .find(component => component.kind === "paragraph");
+assert.ok(customerInstruction.content.runs.find(run =>
+  run.text === "1033" && run.bold && run.role === "value"));
 assert.strictEqual(semanticInteractionOutput.semanticActionsDocument.sections
   .find(section => section.kind === "workflow").blocks
   .filter(block => block.kind === "step").length, 1);
@@ -123,7 +133,7 @@ const fieldNoiseOutput = await exportReview(review([{
   fieldCaption: "Sortera efter Antal", value: "500",
   inputSources: ["focusout"], instruction: "Ange 500.", sourceEventNos: [54]
 }]));
-assert.ok(fieldNoiseOutput.documentXml.includes("Välj Nr"));
+assert.ok(fieldNoiseOutput.documentXml.includes("&quot;Nr&quot;"));
 assert.ok(fieldNoiseOutput.documentXml.includes("136"));
 assert.ok(fieldNoiseOutput.documentXml.includes("500"));
 assert.match(fieldNoiseOutput.documentXml,

@@ -79,9 +79,11 @@ assert.ok(!items(emphasizedWorkspace.model, "paragraph").some(item =>
 const emphasizedParagraph = items(emphasizedWorkspace.model, "paragraph")
   .find(item => item.content.text === 'Ange 400 i "Antal".');
 assert.deepStrictEqual(emphasizedParagraph.content.runs, [
-  { text: "Ange ", bold: false },
-  { text: "400", bold: true },
-  { text: ' i "Antal".', bold: false }
+  { text: "Ange ", role: "text" },
+  { text: "400", role: "value", bold: true },
+  { text: " i ", role: "text" },
+  { text: '"Antal"', role: "interface" },
+  { text: ".", role: "text" }
 ]);
 
 const interactionReview = reviewFixture();

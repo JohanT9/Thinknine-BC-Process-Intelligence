@@ -27,14 +27,16 @@ function plainText(value) {
 }
 
 function formattedTextRuns(value, options = {}) {
-  return globalThis.T9TextFormat.instructionSegments(value).map(segment =>
+  const segments = options.runs ||
+    globalThis.T9TextFormat.instructionSegments(value);
+  return segments.map(segment =>
     new TextRun({
       text: segment.text.replace(/`/g, ""),
       bold: Boolean(options.bold) || segment.bold,
       italics: Boolean(options.italics),
       color: options.color,
       size: options.size,
-      font: options.font,
+      font: segment.monospace ? "Consolas" : options.font,
     })
   );
 }
@@ -431,6 +433,7 @@ function renderComponent(component, mediaAssets, context = {}) {
   if (component.kind === "paragraph") {
     const professional = component.presentationIntent?.readableMeasure;
     return [bodyParagraph(component.content.text, {
+      runs: component.content.runs,
       size: component.appearance.typography?.size
         ? halfPoints(component.appearance.typography.size, 11)
         : context.step ? 24 : undefined,
