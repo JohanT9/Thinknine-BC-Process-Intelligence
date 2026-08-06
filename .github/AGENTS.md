@@ -126,6 +126,17 @@ Language Excellence must never:
 
 The objective is to improve expression, never interpretation.
 
+### Screenshot Excellence
+
+Every selected screenshot should be the clearest visual representation
+of the documented step.
+
+Screenshot selection should favour clarity,
+stability and instructional value over capture order.
+
+The objective is to minimise manual screenshot replacement while
+preserving the original workflow.
+
 ---
 
 # Workflow Before Features
