@@ -12,6 +12,8 @@
 - Preserved legacy marker syntax, unknown future fields and old Reviews without
   migration or persistence changes.
 - Added behavior, Workspace, accessibility and DOCX formatting regressions.
+- Fixed batch Word export reporting a false failure after a successful download
+  when its result contained a non-freezable typed image buffer.
 
 ## 4.6.0 R4 — Review Workspace Refinement
 

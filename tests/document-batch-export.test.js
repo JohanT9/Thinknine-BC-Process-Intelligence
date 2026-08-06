@@ -17,6 +17,15 @@ const batch = require("../src/document/document-batch-operations");
     .map(value => value.completed), [1, 2, 3]);
   assert(Object.isFrozen(result));
 
+  const binary = new Uint8Array([1, 2, 3]);
+  const binaryResult = await batch.execute({ operation: "export",
+    projectIds: ["binary"] }, async () => ({ bytes: binary }));
+  assert.strictEqual(binaryResult.results[0].bytes, binary);
+  assert.deepStrictEqual([...binaryResult.results[0].bytes], [1, 2, 3]);
+  assert(Object.isFrozen(binaryResult));
+  assert(!Object.isFrozen(binary),
+    "opaque renderer bytes must not be frozen by the batch domain");
+
   const partialOrder = [];
   await assert.rejects(batch.execute(plan, async projectId => {
     partialOrder.push(projectId);

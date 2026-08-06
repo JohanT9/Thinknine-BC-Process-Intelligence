@@ -10,6 +10,9 @@
 
   function freeze(value) {
     if (!value || typeof value !== "object" || Object.isFrozen(value)) return value;
+    if (typeof ArrayBuffer !== "undefined" && ArrayBuffer.isView(value)) {
+      return value;
+    }
     Object.freeze(value);
     Object.values(value).forEach(freeze);
     return value;

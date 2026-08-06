@@ -27,3 +27,7 @@ No Review migration is needed. Source events, workflow, screenshots,
 annotations, profiles and planner behavior are unchanged. Older instruction
 markers remain supported, and plain accessible sentences contain no formatting
 artifacts.
+
+Batch Word export also treats renderer-owned binary buffers as opaque values.
+This prevents a successful download from being followed by a false
+`Cannot freeze array buffer views` error.
