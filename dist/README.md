@@ -436,12 +436,13 @@ powershell -ExecutionPolicy Bypass -File .\scripts\build-and-open.ps1
 ```
 
 
-## Synlig Review Studio
+## Synlig granskning
 
-I **Documentation Excellence** öppnas avslutade dokument från Dokumentbiblioteket.
+Välj **Öppna Dokumentbibliotek** i popupfönstret. I **Dokumentbiblioteket** finns
+tidigare sparad dokumentation.
 Råsessioner och ZIP-export finns under **Inspelningar och tekniska verktyg**.
 
-Klicka **Granska** för att öppna Review Studio och kontrollera att gränssnittet fungerar innan fler funktioner läggs till.
+Välj **Öppna dokumentation** för att granska ett dokument.
 
 
 ## Word Generator 3.7

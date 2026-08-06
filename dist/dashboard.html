@@ -2,7 +2,7 @@
 <html lang="sv">
 <head>
 <meta charset="utf-8">
-<title>Thinknine BC Recorder</title>
+<title>Dokumentbibliotek – Thinknine BC Recorder</title>
 <style>
 body{font-family:"Segoe UI",Arial,sans-serif;max-width:1050px;margin:35px auto;padding:0 20px;color:#1f2933}
 .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
@@ -288,7 +288,7 @@ table{width:100%;border-collapse:collapse}th,td{text-align:left;padding:9px;bord
       </select>
     </label>
   </div>
-  <div class="library-toggle-row" role="group" aria-label="Biblioteksfilter">
+  <div class="library-toggle-row" role="group" aria-label="Filter för Dokumentbibliotek">
     <label><input id="libraryFavouriteFilter" type="checkbox"> Endast favoriter</label>
     <label><input id="libraryRecentFilter" type="checkbox"> Nyligen använda</label>
     <label><input id="libraryGroupProfiles" type="checkbox"> Gruppera per profil</label>
@@ -327,7 +327,7 @@ table{width:100%;border-collapse:collapse}th,td{text-align:left;padding:9px;bord
   <p id="libraryStatus" class="library-status muted" role="status" aria-live="polite" aria-atomic="true"></p>
   <div class="library-layout">
     <div id="libraryResults" class="library-results" role="list"
-      aria-label="Dokument" aria-describedby="libraryStatus"></div>
+      aria-label="Dokument i Dokumentbiblioteket" aria-describedby="libraryStatus"></div>
     <aside id="libraryPreview" class="library-preview" aria-live="polite"
       aria-label="Snabbförhandsvisning"><h3>Snabbförhandsvisning</h3><p>Välj ett dokument.</p></aside>
   </div>
@@ -377,11 +377,11 @@ table{width:100%;border-collapse:collapse}th,td{text-align:left;padding:9px;bord
     <header id="reviewHeader" class="review-header">
       <div class="review-title-row">
         <div>
-          <h2 id="reviewTitle">Documentation Excellence</h2>
+          <h2 id="reviewTitle">Granskning</h2>
           <div id="reviewSummary" class="muted"></div>
         </div>
         <button id="closeReview" class="debug"
-          aria-label="Stäng Documentation Excellence">Stäng</button>
+          aria-label="Stäng granskning">Stäng</button>
       </div>
       <div id="workspaceTabs" class="workspace-tabs" role="tablist"
         aria-label="Dokumentationsarbetsyta">

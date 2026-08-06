@@ -1,5 +1,15 @@
 # Changelog
 
+## 4.6.0 R1.1 — Dokumentbibliotek terminology
+
+- Renamed the user-facing library entry from Documentation Excellence to
+  Dokumentbibliotek while retaining Documentation Excellence as the product name.
+- Updated the popup action, dashboard window title, empty state and library ARIA
+  names with consistent task-oriented Swedish terminology.
+- Replaced the hidden Review product heading and close label with Granskning
+  terminology without changing Review behavior or internal architecture names.
+- Added terminology, accessible-name, navigation and regression coverage.
+
 ## 4.6.0 R2 — Screenshot Intelligence
 
 - Added one renderer-neutral owner for deterministic screenshot candidate

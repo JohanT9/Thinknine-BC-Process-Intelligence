@@ -26,7 +26,7 @@ assert(!adapter.includes("src/review") &&
 assert(popup.includes("T9AsyncOperations.singleFlight") &&
   popup.includes('addEventListener("pagehide"') &&
   popup.includes("clearInterval(refreshInterval)"));
-assert(popupHtml.includes("Öppna Documentation Excellence") &&
+assert(popupHtml.includes("Öppna Dokumentbibliotek") &&
   popupHtml.includes("Tekniska verktyg") &&
   popupHtml.includes('src="async-operations.js"'));
 

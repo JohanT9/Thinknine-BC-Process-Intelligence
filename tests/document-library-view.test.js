@@ -28,7 +28,7 @@ assert.strictEqual(view.renderGrouped(container, library.groupByProfile([record]
   "doc-1");
 assert(container.innerHTML.includes("library-group-cards"));
 assert.strictEqual(view.renderList(container, [], {}), null);
-assert(container.innerHTML.includes("Inga dokument"));
+assert(container.innerHTML.includes("inga dokument i Dokumentbiblioteket"));
 
 function fakeCard(projectId) {
   const attributes = {};

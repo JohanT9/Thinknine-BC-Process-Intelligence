@@ -42,7 +42,7 @@
     const activeId = records.some(value => value.projectId === state.activeId)
       ? state.activeId : records[0]?.projectId;
     if (!records.length) {
-      container.innerHTML = '<p class="library-empty">Inga dokument matchar sökningen och filtren.</p>';
+      container.innerHTML = '<p class="library-empty">Det finns inga dokument i Dokumentbiblioteket som matchar sökningen och filtren.</p>';
       return null;
     }
     container.innerHTML = records.map(record => card(record,
