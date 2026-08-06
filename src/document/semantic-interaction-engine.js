@@ -115,6 +115,7 @@
       actionId: stableId(rule.ruleId, values),
       actionType: properties.actionType,
       displayText: properties.displayText,
+      ...(properties.hidden ? { hidden: true } : {}),
       selectedValue: properties.selectedValue || "",
       targetField: properties.targetField || "",
       ...sources,
@@ -166,7 +167,8 @@
             displayText: selectedValue
               ? `${config.verb} **${selectedValue}**.` : `${config.verb}.`,
             selectedValue,
-            targetField: config.targetField
+            targetField: config.targetField,
+            hidden: config.requireValue && !selectedValue
           })
         };
       }
@@ -195,6 +197,72 @@
     return deepFreeze(rule);
   }
 
+  function genericLookupRule() {
+    const rule = {
+      ruleId: "generic-lookup",
+      priority: 20,
+      match(context) {
+        const current = context.interactions[context.index];
+        const next = context.interactions[context.index + 1];
+        return LOOKUP.test(interactionText(current)) ||
+          (focusOnly(current) && Boolean(selectedRecordValue(next)));
+      },
+      consolidate(context) {
+        const first = context.interactions[context.index];
+        const values = [first];
+        let cursor = context.index + 1;
+        while (cursor < context.interactions.length &&
+            (LOOKUP.test(interactionText(context.interactions[cursor])) ||
+             Boolean(selectedRecordValue(context.interactions[cursor])))) {
+          values.push(context.interactions[cursor]);
+          cursor += 1;
+        }
+        const selectedValue = values.map(selectedRecordValue).find(Boolean) || "";
+        if (selectedValue && cursor < context.interactions.length) {
+          const result = context.interactions[cursor];
+          if (result?.taskType === "ChangeField" && typed(result) &&
+              text(result.fieldCaption) === text(first.fieldCaption) &&
+              meaningfulValue(result) === selectedValue) {
+            values.push(result);
+          }
+        }
+        const targetField = text(first.fieldCaption);
+        return { consumed: values.length, action: action(rule, values, {
+          actionType: "SelectLookupValue",
+          displayText: selectedValue
+            ? targetField
+              ? `Välj **${selectedValue}** i **${targetField}**.`
+              : `Välj värde **${selectedValue}**.`
+            : "Välj värde.",
+          selectedValue,
+          targetField,
+          hidden: !selectedValue
+        }) };
+      }
+    };
+    return deepFreeze(rule);
+  }
+
+  function focusTransitionRule() {
+    const rule = {
+      ruleId: "focus-transition",
+      priority: 1,
+      match(context) {
+        return focusOnly(context.interactions[context.index]);
+      },
+      consolidate(context) {
+        const value = context.interactions[context.index];
+        return { consumed: 1, action: action(rule, [value], {
+          actionType: "FocusTransition",
+          displayText: "",
+          targetField: text(value.fieldCaption),
+          hidden: true
+        }) };
+      }
+    };
+    return deepFreeze(rule);
+  }
+
   const CUSTOMER = /kundens namn|kundnr|customer name|customer no\.?/iu;
   const ITEM = /artikelnr|artikelnummer|item no\.?/iu;
   const VENDOR = /leverantör(?:ens namn|snr|snummer)?|vendor(?: name| no\.?)?/iu;
@@ -204,21 +272,22 @@
   const BUILT_IN_RULES = deepFreeze([
     selectionRule({ ruleId: "customer-selection", priority: 100,
       actionType: "SelectCustomer", fieldPattern: CUSTOMER,
-      verb: "Välj kund", targetField: "Kund" }),
+      verb: "Välj kund", targetField: "Kund", requireValue: true }),
     selectionRule({ ruleId: "item-selection", priority: 95,
       actionType: "SelectItem", fieldPattern: ITEM, verb: "Välj artikel",
       targetField: "Artikelnummer", consumeFocusAfter: true,
+      requireValue: true,
       extraMatch: value => value?.entity === "Item" &&
         /sortera efter nr|sort by no\.?/iu.test(interactionText(value)) }),
     selectionRule({ ruleId: "vendor-selection", priority: 90,
       actionType: "SelectVendor", fieldPattern: VENDOR,
-      verb: "Välj leverantör", targetField: "Leverantör" }),
+      verb: "Välj leverantör", targetField: "Leverantör", requireValue: true }),
     selectionRule({ ruleId: "location-selection", priority: 85,
       actionType: "SelectLocation", fieldPattern: LOCATION,
-      verb: "Välj lagerställe", targetField: "Lagerställe" }),
+      verb: "Välj lagerställe", targetField: "Lagerställe", requireValue: true }),
     selectionRule({ ruleId: "dimension-selection", priority: 80,
       actionType: "SelectDimension", fieldPattern: DIMENSION,
-      verb: "Välj dimensionsvärde", targetField: "Dimension" }),
+      verb: "Välj dimensionsvärde", targetField: "Dimension", requireValue: true }),
     singleRule({ ruleId: "quantity-entry", priority: 75,
       match: value => typed(value) && /^(?:sortera efter\s+)?(?:antal|quantity)$/iu
         .test(text(value?.fieldCaption)),
@@ -247,21 +316,15 @@
       display: (value, selected) => selected
         ? `Välj **${selected}** i **${text(value.fieldCaption)}**.`
         : `Välj ett alternativ i **${text(value.fieldCaption)}**.` }),
-    selectionRule({ ruleId: "generic-lookup", priority: 20,
-      actionType: "SelectLookupValue", fieldPattern: /$a/iu,
-      verb: "Välj värde", targetField: "" }),
+    genericLookupRule(),
     singleRule({ ruleId: "generic-field-entry", priority: 10,
       match: value => typed(value) && value?.taskType === "ChangeField",
       actionType: () => "EnterFieldValue",
       display: (value, selected) => selected
         ? `Ange **${selected}** i **${text(value.fieldCaption)}**.`
-        : `Fyll i **${text(value.fieldCaption)}**.` })
+        : `Fyll i **${text(value.fieldCaption)}**.` }),
+    focusTransitionRule()
   ]);
-
-  function genericLookupMatch(rule, context) {
-    if (rule.ruleId !== "generic-lookup") return rule.match(context);
-    return LOOKUP.test(interactionText(context.interactions[context.index]));
-  }
 
   function registry(rules = BUILT_IN_RULES) {
     return deepFreeze([...rules].map(value => value).sort((left, right) =>
@@ -275,7 +338,7 @@
     let index = 0;
     while (index < interactions.length) {
       const context = { interactions, index };
-      const matches = ordered.filter(rule => genericLookupMatch(rule, context));
+      const matches = ordered.filter(rule => rule.match(context));
       const highest = matches[0]?.priority;
       const winners = matches.filter(rule => rule.priority === highest);
       if (winners.length !== 1) {
@@ -325,7 +388,8 @@
   }
 
   function consolidateInteractions(values, rules) {
-    return processInteractions(values, rules).map(actionToInteraction);
+    return processInteractions(values, rules).filter(value => !value.hidden)
+      .map(actionToInteraction);
   }
 
   function instructionBlock(step) {
@@ -357,11 +421,16 @@
       }));
       const actions = processInteractions(interactions, rules);
       let stepIndex = 0;
+      const suppressedInteractions = [];
       const semanticSteps = actions.map(entry => {
         const consumed = entry.inputInteractionCount || 1;
         const sourceSteps = steps.slice(stepIndex, stepIndex + consumed);
         stepIndex += consumed;
         if (entry.passthrough) return clone(sourceSteps[0]);
+        if (entry.hidden) {
+          suppressedInteractions.push(clone(entry));
+          return null;
+        }
         const first = clone(sourceSteps[0]);
         const firstInstruction = instructionBlock(first);
         if (firstInstruction) firstInstruction.text = entry.displayText;
@@ -377,9 +446,11 @@
         first.semanticAction = clone(entry);
         delete first.interaction;
         return first;
-      });
+      }).filter(Boolean);
       semanticSteps.forEach((step, index) => { step.stepNumber = index + 1; });
-      return { ...section, blocks: [...prefix, ...semanticSteps] };
+      return { ...section, blocks: [...prefix, ...semanticSteps],
+        ...(suppressedInteractions.length
+          ? { suppressedInteractions } : {}) };
     });
     document.provenance = {
       ...clone(document.provenance || {}),

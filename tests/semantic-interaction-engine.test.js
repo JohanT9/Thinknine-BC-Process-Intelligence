@@ -54,6 +54,44 @@ only([{ taskId: "field", taskType: "ChangeField", fieldCaption: "Referens",
   value: "ABC", inputSources: ["input"], unknown: { version: 2 } }],
 "EnterFieldValue", "Ange **ABC** i **Referens**.");
 
+const fieldLandingSequence = [{ taskId: "number-focus",
+  taskType: "ChangeField", fieldCaption: "Sortera efter Nr",
+  inputSources: ["focusout"], sourceEventNos: [10]
+}, { taskId: "number-row", taskType: "Select",
+  selectedCaption: 'Välj posten "136"', sourceEventNos: [11]
+}, { taskId: "number-result", taskType: "ChangeField",
+  fieldCaption: "Sortera efter Nr", value: "136",
+  inputSources: ["input", "focusout"], sourceEventNos: [12]
+}, { taskId: "vendor-empty", taskType: "SelectVendor",
+  fieldCaption: "Leverantör", instruction: "Välj leverantör.",
+  inputSources: ["focusout"], sourceEventNos: [13]
+}, { taskId: "tour-focus", taskType: "ChangeField",
+  fieldCaption: "Sortera efter Tur Nr", inputSources: ["focusout"],
+  sourceEventNos: [14]
+}, { taskId: "quantity-value", taskType: "ChangeField",
+  fieldCaption: "Sortera efter Antal", value: "500",
+  inputSources: ["input", "focusout"], sourceEventNos: [15] }];
+const visibleFieldActions = engine.consolidateInteractions(fieldLandingSequence);
+assert.strictEqual(visibleFieldActions.length, 2);
+assert.strictEqual(visibleFieldActions[0].instruction,
+  "Välj **136** i **Sortera efter Nr**.");
+assert.deepStrictEqual(visibleFieldActions[0].sourceEventNos, [10, 11, 12]);
+assert.strictEqual(visibleFieldActions[1].instruction,
+  "Ange **500** i **Antal**.");
+const allFieldActions = engine.processInteractions(fieldLandingSequence);
+assert.strictEqual(allFieldActions.filter(value => value.hidden).length, 2);
+assert.deepStrictEqual(allFieldActions.filter(value => value.hidden)
+  .flatMap(value => value.sourceEventNos), [13, 14]);
+const focusProjection = projector.project({ sessionId: "focus-session",
+  sessionName: "Focus", tasks: fieldLandingSequence }).document;
+const focusDocument = engine.processDocument(focusProjection);
+const focusWorkflow = focusDocument.sections.find(value =>
+  value.kind === "workflow");
+assert.strictEqual(focusWorkflow.blocks.filter(value =>
+  value.kind === "step").length, 2);
+assert.deepStrictEqual(focusWorkflow.suppressedInteractions.flatMap(value =>
+  value.sourceEventNos), ["13", "14"]);
+
 const original = select("Kundnr", "1033");
 const before = JSON.stringify(original);
 const first = engine.processInteractions(original);

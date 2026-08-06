@@ -17,6 +17,11 @@ Intelligence väljer fortsatt bild och Language Excellence ansvarar fortsatt
 endast för formulering. Befintliga Reviews kräver ingen migrering. Se
 [Semantic Interaction Engine 4.6](docs/SEMANTIC_INTERACTION_ENGINE_4.6.md).
 
+En fältförflyttning skapar inte längre ett dokumentationssteg. Händelser som
+`Ändra fältet "Sortera efter …"` tas bara med när användaren faktiskt matar in
+ett nytt värde. Ett uppslag med ett verkligt radval blir ett enda val-steg och
+tomma val, exempelvis `Välj leverantör` utan valt värde, visas inte.
+
 ## Konsoliderade affärshändelser
 
 Tekniska delhändelser från samma kunduppslag—fältfokus, öppnad värdelista,

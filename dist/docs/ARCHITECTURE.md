@@ -21,6 +21,11 @@ metadata. The projector carries interaction semantics without interpreting
 them. The engine never consumes Review directly, mutates input, evaluates image
 quality or applies profile-specific language.
 
+Focus-only transitions and selection prompts without a resulting value are
+non-visible Semantic Actions stored in the workflow section's suppressed trace.
+Deterministic focus/record/result sequences become one lookup action. This keeps
+technical navigation available for diagnostics without creating document steps.
+
 An immutable projected document revision is processed once and cached by object
 identity. Language Excellence consumes the semantic-action document. Screenshot
 Intelligence remains the sole image-selection owner. Both Document Workspace

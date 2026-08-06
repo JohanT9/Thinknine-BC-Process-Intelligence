@@ -13,6 +13,10 @@
   and shared Document Workspace/Word pipeline integration.
 - Added behavior coverage for every built-in rule, priority, fallback,
   determinism, immutability, traceability and future-field preservation.
+- Suppressed focus-only field transitions and value-less selection prompts from
+  visible documentation while retaining their source trace in semantic output.
+- Consolidated a focus/lookup/result sequence into one generic selection and
+  retained field steps only when a value was actually entered.
 
 ## 4.6.0 — Customer-selection consolidation
 

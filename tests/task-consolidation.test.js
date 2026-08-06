@@ -49,8 +49,8 @@ assert.strictEqual(JSON.stringify(tasks), before, "input tasks must not mutate")
 
 const single = [{ taskId: "customer", taskType: "SelectCustomer",
   instruction: "Välj kunden.", future: { preserve: true } }];
-assert.deepStrictEqual(consolidation.consolidate(single)[0].future,
-  { preserve: true });
+assert.strictEqual(consolidation.consolidate(single).length, 0,
+  "a selection without a selected value must not become a visible step");
 const unrelated = [{ taskId: "item", taskType: "Select",
   selectedCaption: 'Välj posten "136"', instruction: "Välj artikel 136." }];
 assert.strictEqual(consolidation.consolidate(unrelated).length, 1);

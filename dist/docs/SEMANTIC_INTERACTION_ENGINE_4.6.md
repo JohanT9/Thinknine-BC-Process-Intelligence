@@ -50,6 +50,12 @@ Specific rules therefore win over generic rules. If multiple matching rules
 share the highest priority, the engine preserves the original interaction
 instead of guessing. Invalid rule results also fall back safely.
 
+Focus-only `ChangeField` interactions are represented as suppressed semantic
+trace rather than visible steps. A focus transition followed by a deterministic
+record selection and matching field result becomes one generic lookup action.
+A selection prompt without a selected value is also suppressed. Actual typed
+values, option changes and record selections remain visible.
+
 ## Semantic Action model
 
 A Semantic Action contains:
@@ -97,5 +103,6 @@ priority distinct enough to avoid ambiguous ownership.
 - Rules never invent information.
 - Semantic Actions preserve workflow meaning.
 - Unknown future metadata survives processing.
+- Suppressed UI mechanics remain available as ordered semantic trace.
 - Screenshot Intelligence remains responsible for image selection.
 - Language Excellence remains responsible for wording.
