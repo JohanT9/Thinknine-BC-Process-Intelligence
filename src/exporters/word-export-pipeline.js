@@ -5,6 +5,12 @@
   const semantic = typeof module === "object" && module.exports
     ? require("../document/semantic-document")
     : root.T9DocumentModel;
+  const language = typeof module === "object" && module.exports
+    ? require("../document/language-excellence")
+    : root.T9LanguageExcellence;
+  const profiles = typeof module === "object" && module.exports
+    ? require("../document/document-profile")
+    : root.T9DocumentProfile;
   const registry = typeof module === "object" && module.exports
     ? require("../document/document-theme-registry")
     : root.T9DocumentThemeRegistry;
@@ -29,6 +35,8 @@
   const api = factory(
     projector,
     semantic,
+    language,
+    profiles,
     registry,
     themeValidation,
     planner,
@@ -42,6 +50,8 @@
 })(typeof globalThis !== "undefined" ? globalThis : this, function (
   projector,
   semantic,
+  language,
+  profiles,
   registry,
   themeValidation,
   planner,
@@ -91,6 +101,11 @@
         `Semantic Document validation failed: ${documentResult.issues[0].message}`
       );
     }
+    const profile = profiles.get(
+      profiles.BUILT_IN_REGISTRY,
+      options.profileId || "business-process"
+    ) || profiles.get(profiles.BUILT_IN_REGISTRY, "business-process");
+    const languageDocument = language.process(projection.document, profile);
     const resolvedTheme = registry.resolve(
       registry.BUILT_IN_REGISTRY,
       options.themeId || "thinknine",
@@ -104,9 +119,9 @@
         `Document Theme validation failed: ${themeResult.issues[0].message}`
       );
     }
-    const plan = planner.plan(projection.document, resolvedTheme);
+    const plan = planner.plan(languageDocument, resolvedTheme);
     const planResult = planValidation.validate(plan, {
-      document: projection.document,
+      document: languageDocument,
       theme: resolvedTheme,
       plannerVersion: planner.PLANNER_VERSION
     });
@@ -116,11 +131,13 @@
       );
     }
     return semantic.deepFreeze({
-      semanticDocument: projection.document,
+      sourceSemanticDocument: projection.document,
+      semanticDocument: languageDocument,
+      languageProfile: profile,
       theme: resolvedTheme,
       plan,
       diagnostics: projection.diagnostics,
-      qualityDiagnostics: analyzeQuality(projection.document, plan)
+      qualityDiagnostics: analyzeQuality(languageDocument, plan)
     });
   }
 

@@ -3403,6 +3403,7 @@ function createActiveDocumentPipeline() {
   return globalThis.T9WordExportPipeline.create({
     session: activeReviewModel.response.session,
     review: activeReview,
+    profileId: activeDocumentProfileId,
     themeId: "thinknine"
   });
 }
@@ -3453,6 +3454,7 @@ async function exportLibraryDocument(record, exportSettings) {
   const pipeline = globalThis.T9WordExportPipeline.create({
     session: model.response.session,
     review,
+    profileId: record.profile.profileId,
     themeId
   });
   const mediaAssets = await composeDocumentMedia(
@@ -3842,12 +3844,18 @@ function buildDocumentProfileVariants(pipeline) {
         themeId,
         profile.theme.overrides || {}
       );
-    const plan = theme === pipeline.theme
+    const semanticDocument = globalThis.T9LanguageExcellence.process(
+      pipeline.sourceSemanticDocument,
+      profile
+    );
+    const plan = profile.profileId === pipeline.languageProfile.profileId &&
+      theme === pipeline.theme
       ? pipeline.plan
-      : globalThis.T9DocumentPlanner.plan(pipeline.semanticDocument, theme);
+      : globalThis.T9DocumentPlanner.plan(semanticDocument, theme);
     return [profile.profileId, {
       profile,
       theme,
+      semanticDocument,
       plan,
       model: globalThis.T9DocumentWorkspace.render(plan)
     }];
@@ -3862,15 +3870,14 @@ function applyDocumentProfileVariant(options = {}) {
     Math.max(1, viewport.scrollHeight);
   documentationIntelligenceModel = globalThis.T9DocumentationIntelligence
     .create({
-      document: options.semanticDocument || documentProfileSource?.semanticDocument,
+      document: variant.semanticDocument,
       plan: variant.plan,
       qualityDiagnostics: options.qualityDiagnostics ||
         documentProfileSource?.qualityDiagnostics,
       workspaceContext,
       profile: variant.profile
     });
-  indexActiveDocumentVariant(variant, options.semanticDocument ||
-    documentProfileSource?.semanticDocument);
+  indexActiveDocumentVariant(variant, variant.semanticDocument);
   workspaceContextBinding = globalThis.T9WorkspaceContext.bind(variant.model, {
     taskIds: globalThis.T9Review.activeTasks(activeReview).map(task => task.taskId),
     screenshotsByTask: reviewScreenshotsByTask()

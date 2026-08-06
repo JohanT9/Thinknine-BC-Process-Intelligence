@@ -33,6 +33,8 @@
       guidancePriorities: Array.isArray(input.guidancePriorities)
         ? input.guidancePriorities : [],
       positiveConfirmations: { ...(input.positiveConfirmations || {}) },
+      language: { tone: input.language?.tone || "professional",
+        ...(input.language || {}) },
       capabilities: Array.isArray(input.capabilities) ? input.capabilities : []
     });
   }
@@ -55,6 +57,7 @@
     profile("business-process", "Business Process",
       "Balanced process documentation for analysis and handover.", {
         theme: { themeId: "thinknine" },
+        language: { tone: "professional" },
         recommendedSections: ["purpose", "workflow"],
         recommendedMetadata: ["environment"],
         workflowExpectations: { minimumSteps: 1, explanatoryText: "standard" },
@@ -67,6 +70,7 @@
     profile("sop", "Standard Operating Procedure (SOP)",
       "Controlled operational instructions with revision expectations.", {
         theme: { themeId: "corporate" },
+        language: { tone: "precise" },
         recommendedSections: ["purpose", "workflow", "revisionHistory"],
         recommendedMetadata: ["environment", "reviewer", "documentVersion"],
         workflowExpectations: { minimumSteps: 1, explanatoryText: "precise" },
@@ -79,6 +83,7 @@
     profile("training-guide", "Training Guide",
       "Explanatory learning material with strong visual support.", {
         theme: { themeId: "thinknine" },
+        language: { tone: "explanatory" },
         recommendedSections: ["purpose", "workflow"],
         recommendedMetadata: ["environment"],
         workflowExpectations: { minimumSteps: 1, explanatoryText: "expanded" },
@@ -91,6 +96,7 @@
     profile("quick-reference", "Quick Reference",
       "Concise instructions optimized for fast lookup.", {
         theme: { themeId: "minimal" },
+        language: { tone: "concise" },
         recommendedSections: ["workflow"],
         recommendedMetadata: ["environment"],
         workflowExpectations: { minimumSteps: 1, explanatoryText: "concise" },
@@ -103,6 +109,7 @@
     profile("troubleshooting-guide", "Troubleshooting Guide",
       "Diagnostic instructions with clear evidence and recovery steps.", {
         theme: { themeId: "corporate" },
+        language: { tone: "diagnostic" },
         recommendedSections: ["purpose", "workflow"],
         recommendedMetadata: ["environment", "reviewer"],
         workflowExpectations: { minimumSteps: 1, explanatoryText: "diagnostic" },
