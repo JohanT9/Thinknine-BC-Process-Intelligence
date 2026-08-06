@@ -35,10 +35,10 @@ only(select("Dimensionsvärde", "SALES"), "SelectDimension",
   "Välj dimensionsvärde **SALES**.");
 only([{ taskId: "quantity", taskType: "ChangeField", fieldCaption: "Antal",
   value: "500", inputSources: ["input"] }], "EnterQuantity",
-"Ange **500** i **Antal**.");
+"Ange __500__ i **Antal**.");
 only([{ taskId: "date", taskType: "ChangeField", fieldCaption: "Bokföringsdatum",
   value: "2026-08-06", inputSources: ["input"] }], "SelectDate",
-"Ange **2026-08-06** i **Bokföringsdatum**.");
+"Ange __2026-08-06__ i **Bokföringsdatum**.");
 only([{ taskId: "option", taskType: "SelectOption", fieldCaption: "Status",
   value: "Öppen" }], "SelectOption", "Välj **Öppen** i **Status**.");
 only([{ taskId: "enable", taskType: "Checkbox", fieldCaption: "Spärrad",
@@ -52,7 +52,13 @@ only([{ taskId: "lookup", taskType: "RunAction",
 "Välj värde **30D**.");
 only([{ taskId: "field", taskType: "ChangeField", fieldCaption: "Referens",
   value: "ABC", inputSources: ["input"], unknown: { version: 2 } }],
-"EnterFieldValue", "Ange **ABC** i **Referens**.");
+"EnterFieldValue", "Ange __ABC__ i **Referens**.");
+const fieldAdapter = engine.consolidateInteractions([{
+  taskId: "field-roundtrip", taskType: "ChangeField",
+  fieldCaption: "Referens", value: "ABC", inputSources: ["input"]
+}])[0];
+assert.strictEqual(engine.consolidateInteractions([fieldAdapter])[0].instruction,
+  "Ange __ABC__ i **Referens**.");
 
 const fieldLandingSequence = [{ taskId: "number-focus",
   taskType: "ChangeField", fieldCaption: "Sortera efter Nr",
@@ -77,7 +83,7 @@ assert.strictEqual(visibleFieldActions[0].instruction,
   "Välj Nr **136**.");
 assert.deepStrictEqual(visibleFieldActions[0].sourceEventNos, [10, 11, 12]);
 assert.strictEqual(visibleFieldActions[1].instruction,
-  "Ange **500** i **Antal**.");
+  "Ange __500__ i **Antal**.");
 const allFieldActions = engine.processInteractions(fieldLandingSequence);
 assert.strictEqual(allFieldActions.filter(value => value.hidden).length, 2);
 assert.deepStrictEqual(allFieldActions.filter(value => value.hidden)

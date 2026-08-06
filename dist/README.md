@@ -30,8 +30,10 @@ det dokumentationssteget. En inmatning av 500 i Antal får därmed en bild från
 själva inmatningstillfället. Ren focusout tar ingen bild. Redan avslutade
 inspelningar utan en sådan bild kan inte återskapa den retroaktivt.
 
-Dokumentvyn använder samma citattecken som Granskningsvyn och Word. Intern
-betoning som `**400**` visas därför som `"400"` och aldrig som rå Markdown.
+Instruktioner skiljer nu på angivna värden och UI-benämningar. Ett manuellt
+värde visas i fetstil, medan fältnamn, sidnamn, rapportnamn och andra benämningar
+visas inom citattecken: Ange **400** i "Antal". Samma formatering används
+i Dokumentvyn och Word; interna markörer visas aldrig som rå text.
 
 ## Konsoliderade affärshändelser
 

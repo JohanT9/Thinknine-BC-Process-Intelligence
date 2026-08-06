@@ -27,6 +27,10 @@
   different-field captures; focusout-only navigation still captures nothing.
 - Aligned Document Workspace text presentation with Review and Word by rendering
   internal `**value**` emphasis as quoted text instead of visible Markdown.
+- Added semantic instruction runs: manually entered values render bold, while
+  field, page, report and other UI labels continue to render in quotation marks.
+- Reused the shared text-format parser in Document Workspace and Word so rich
+  presentation does not leak into Semantic Document or stored Review data.
 
 ## 4.6.0 — Customer-selection consolidation
 

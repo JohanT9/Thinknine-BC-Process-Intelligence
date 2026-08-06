@@ -70,12 +70,19 @@ assert.strictEqual(items(first.model, "metadata")[0].content.rows[2].value, "Tes
 assert.deepStrictEqual(workspace.render(first.prepared.plan), first.model);
 
 const emphasizedReview = reviewFixture();
-emphasizedReview.tasks[0].instruction = "Ange **400** i **Antal**.";
+emphasizedReview.tasks[0].instruction = "Ange __400__ i **Antal**.";
 const emphasizedWorkspace = render(emphasizedReview);
 assert.ok(items(emphasizedWorkspace.model, "paragraph").some(item =>
-  item.content.text === 'Ange "400" i "Antal".'));
+  item.content.text === 'Ange 400 i "Antal".'));
 assert.ok(!items(emphasizedWorkspace.model, "paragraph").some(item =>
   item.content.text.includes("**")));
+const emphasizedParagraph = items(emphasizedWorkspace.model, "paragraph")
+  .find(item => item.content.text === 'Ange 400 i "Antal".');
+assert.deepStrictEqual(emphasizedParagraph.content.runs, [
+  { text: "Ange ", bold: false },
+  { text: "400", bold: true },
+  { text: ' i "Antal".', bold: false }
+]);
 
 const interactionReview = reviewFixture();
 interactionReview.tasks = reviewStudio.normalizeTasks([{

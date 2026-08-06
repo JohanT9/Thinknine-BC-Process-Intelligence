@@ -26,6 +26,19 @@ function plainText(value) {
     .trim();
 }
 
+function formattedTextRuns(value, options = {}) {
+  return globalThis.T9TextFormat.instructionSegments(value).map(segment =>
+    new TextRun({
+      text: segment.text.replace(/`/g, ""),
+      bold: Boolean(options.bold) || segment.bold,
+      italics: Boolean(options.italics),
+      color: options.color,
+      size: options.size,
+      font: options.font,
+    })
+  );
+}
+
 function color(value, fallback) {
   return String(value || fallback || "").replace(/^#/, "").toUpperCase();
 }
@@ -136,14 +149,7 @@ function bodyParagraph(text, options = {}) {
     keepLines: Boolean(options.keepLines),
     border: options.border,
     shading: options.shading,
-    children: [new TextRun({
-      text: plainText(text),
-      bold: Boolean(options.bold),
-      italics: Boolean(options.italics),
-      color: options.color,
-      size: options.size,
-      font: options.font,
-    })],
+    children: formattedTextRuns(text, options),
   });
 }
 

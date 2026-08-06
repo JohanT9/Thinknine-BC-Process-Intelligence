@@ -299,12 +299,12 @@
       actionType: () => "EnterQuantity",
       targetField: "Antal",
       display: (_value, selected) => selected
-        ? `Ange **${selected}** i **Antal**.` : "Ange Antal." }),
+        ? `Ange __${selected}__ i **Antal**.` : "Ange Antal." }),
     singleRule({ ruleId: "date-selection", priority: 70,
       match: value => typed(value) && /datum|date/iu.test(text(value?.fieldCaption)),
       actionType: () => "SelectDate",
       display: (value, selected) => selected
-        ? `Ange **${selected}** i **${text(value.fieldCaption)}**.`
+        ? `Ange __${selected}__ i **${text(value.fieldCaption)}**.`
         : `Ange ${text(value.fieldCaption)}.` }),
     singleRule({ ruleId: "checkbox", priority: 60,
       match: value => /checkbox|toggle|boolean/iu.test(text(value?.taskType)) ||
@@ -323,11 +323,12 @@
         : `Välj ett alternativ i **${text(value.fieldCaption)}**.` }),
     genericLookupRule(),
     singleRule({ ruleId: "generic-field-entry", priority: 10,
-      match: value => value?.taskType === "ChangeField" &&
-        (typed(value) || Boolean(meaningfulValue(value))),
+      match: value => value?.taskType === "EnterFieldValue" ||
+        (value?.taskType === "ChangeField" &&
+          (typed(value) || Boolean(meaningfulValue(value)))),
       actionType: () => "EnterFieldValue",
       display: (value, selected) => selected
-        ? `Ange **${selected}** i **${text(value.fieldCaption)}**.`
+        ? `Ange __${selected}__ i **${text(value.fieldCaption)}**.`
         : `Fyll i **${text(value.fieldCaption)}**.` }),
     focusTransitionRule()
   ]);

@@ -126,6 +126,8 @@ const fieldNoiseOutput = await exportReview(review([{
 assert.ok(fieldNoiseOutput.documentXml.includes("Välj Nr"));
 assert.ok(fieldNoiseOutput.documentXml.includes("136"));
 assert.ok(fieldNoiseOutput.documentXml.includes("500"));
+assert.match(fieldNoiseOutput.documentXml,
+  /<w:b\/>.*?<w:t[^>]*>500<\/w:t>/s);
 assert.ok(!fieldNoiseOutput.documentXml.includes("Sortera efter Tur Nr"));
 
 assert.strictEqual(output.taskCount, 2);

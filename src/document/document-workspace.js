@@ -49,8 +49,10 @@
         }));
         renderComponents(component.components, result);
       } else if (component.kind === "paragraph") {
+        const runs = textFormat.instructionSegments(component.content.text);
         result.push(workspaceItem(component, "paragraph", "paragraph", {
-          text: textFormat.quoteEmphasis(component.content.text)
+          text: runs.map(run => run.text).join(""),
+          runs
         }));
       } else if (component.kind === "screenshot") {
         result.push(workspaceItem(component, "image", "image", {
@@ -59,9 +61,11 @@
           annotationRefs: component.content.annotationRefs || []
         }));
       } else if (component.kind === "callout") {
+        const runs = textFormat.instructionSegments(component.content.text || "");
         result.push(workspaceItem(component, "callout", "callout", {
           label: component.accessibility?.label || "Kommentar",
-          text: textFormat.quoteEmphasis(component.content.text || "")
+          text: runs.map(run => run.text).join(""),
+          runs
         }));
       } else {
         renderComponents(component.components, result);

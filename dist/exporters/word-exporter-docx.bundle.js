@@ -40,9 +40,33 @@
         root.T9TextFormat = api;
       })(typeof globalThis !== "undefined" ? globalThis : exports, function() {
         function quoteEmphasis(value) {
-          return String(value ?? "").replace(/\*\*([^*]+?)\*\*/g, '"$1"');
+          return instructionSegments(value).map((segment) => segment.text).join("");
         }
-        return { quoteEmphasis };
+        function instructionSegments(value) {
+          const source = String(value ?? "");
+          const segments = [];
+          let cursor = 0;
+          const valuePattern = /__([\s\S]+?)__/g;
+          let match;
+          while (match = valuePattern.exec(source)) {
+            if (match.index > cursor) {
+              segments.push({
+                text: quoteLabels(source.slice(cursor, match.index)),
+                bold: false
+              });
+            }
+            segments.push({ text: quoteLabels(match[1]), bold: true });
+            cursor = match.index + match[0].length;
+          }
+          if (cursor < source.length || !segments.length) {
+            segments.push({ text: quoteLabels(source.slice(cursor)), bold: false });
+          }
+          return segments.filter((segment) => segment.text !== "");
+        }
+        function quoteLabels(value) {
+          return String(value).replace(/\*\*([^*]+?)\*\*/g, '"$1"');
+        }
+        return { instructionSegments, quoteEmphasis };
       });
     }
   });
@@ -19275,6 +19299,18 @@
   function plainText(value) {
     return globalThis.T9TextFormat.quoteEmphasis(value).replace(/`/g, "").trim();
   }
+  function formattedTextRuns(value, options = {}) {
+    return globalThis.T9TextFormat.instructionSegments(value).map(
+      (segment) => new TextRun({
+        text: segment.text.replace(/`/g, ""),
+        bold: Boolean(options.bold) || segment.bold,
+        italics: Boolean(options.italics),
+        color: options.color,
+        size: options.size,
+        font: options.font
+      })
+    );
+  }
   function color(value, fallback) {
     return String(value || fallback || "").replace(/^#/, "").toUpperCase();
   }
@@ -19376,14 +19412,7 @@
       keepLines: Boolean(options.keepLines),
       border: options.border,
       shading: options.shading,
-      children: [new TextRun({
-        text: plainText(text),
-        bold: Boolean(options.bold),
-        italics: Boolean(options.italics),
-        color: options.color,
-        size: options.size,
-        font: options.font
-      })]
+      children: formattedTextRuns(text, options)
     });
   }
   function headingComponent(component, levelOverride) {

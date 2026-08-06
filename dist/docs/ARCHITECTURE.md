@@ -32,6 +32,12 @@ the recorder queue. Non-empty input/change events receive the dedicated
 capture for another field, while repeated events for the same field may share
 one image. Focusout remains non-capturing.
 
+Instruction text carries renderer-neutral semantic markers: `__value__` denotes
+a manually entered value and `**label**` denotes a UI label. `text-format.js` is
+the single parser and emits plain accessible text plus bold run metadata.
+Document Workspace and Word consume those runs; Review and Semantic Document do
+not store HTML, DOCX runs or renderer-specific formatting.
+
 An immutable projected document revision is processed once and cached by object
 identity. Language Excellence consumes the semantic-action document. Screenshot
 Intelligence remains the sole image-selection owner. Both Document Workspace

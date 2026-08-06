@@ -86,7 +86,7 @@ assert.strictEqual(salesLine[0].instruction, "Välj artikel **136**.");
 assert.strictEqual(salesLine[0].screenshot, "screenshots/000033.png");
 assert.deepStrictEqual(salesLine[0].sourceEventNos, [31, 32, 33, 34, 35]);
 assert.strictEqual(salesLine[1].fieldCaption, "Antal");
-assert.strictEqual(salesLine[1].instruction, "Ange **500** i **Antal**.");
+assert.strictEqual(salesLine[1].instruction, "Ange __500__ i **Antal**.");
 assert.strictEqual(salesLine[2].taskType, "ReleaseDocument");
 
 console.log("Business task consolidation behaviour tests passed.");

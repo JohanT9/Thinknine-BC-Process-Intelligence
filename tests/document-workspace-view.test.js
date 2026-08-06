@@ -55,6 +55,15 @@ const model = {
       kind: "image",
       appearance: {},
       content: { assetId: "asset-1", alt: "Order" }
+    }, {
+      workspaceItemId: "instruction",
+      kind: "paragraph",
+      appearance: {},
+      content: { text: 'Ange 400 i "Antal".', runs: [
+        { text: "Ange ", bold: false },
+        { text: "400", bold: true },
+        { text: ' i "Antal".', bold: false }
+      ] }
     }]
   }]
 };
@@ -67,6 +76,8 @@ const cover = container.children[0];
 const workflow = container.children[1];
 assert.strictEqual(cover.children[0].style.color, "#123456");
 assert.strictEqual(workflow.children[0].children[0].src, media["asset-1"].source);
+assert.strictEqual(workflow.children[1].children[1].tagName, "strong");
+assert.strictEqual(workflow.children[1].children[1].textContent, "400");
 assert.strictEqual(workflow.dataset.workspaceContextTarget, "true");
 assert.strictEqual(workflow.children[0].dataset.workspaceContextTarget, "true");
 assert.strictEqual(workflow.children[0].tabIndex, 0);

@@ -24,6 +24,14 @@
     }
   }
 
+  function appendRuns(element, runs, documentValue) {
+    for (const run of runs || []) {
+      const child = documentValue.createElement(run.bold ? "strong" : "span");
+      child.textContent = run.text || "";
+      element.appendChild(child);
+    }
+  }
+
   function createItem(item, mediaAssets, documentValue) {
     let element;
     if (item.kind === "heading") {
@@ -42,12 +50,10 @@
         "document-workspace-step-title"
       );
     } else if (item.kind === "paragraph") {
-      element = textElement(
-        documentValue,
-        "p",
-        item.content.text,
-        "document-workspace-paragraph"
-      );
+      element = textElement(documentValue, "p", "",
+        "document-workspace-paragraph");
+      appendRuns(element, item.content.runs || [{ text: item.content.text }],
+        documentValue);
     } else if (item.kind === "metadata") {
       element = documentValue.createElement("dl");
       element.className = "document-workspace-metadata";
@@ -78,12 +84,10 @@
       element = documentValue.createElement("aside");
       element.className = "document-workspace-callout";
       element.setAttribute("aria-label", item.content.label);
-      element.appendChild(textElement(
-        documentValue,
-        "p",
-        item.content.text,
-        ""
-      ));
+      const paragraph = textElement(documentValue, "p", "", "");
+      appendRuns(paragraph,
+        item.content.runs || [{ text: item.content.text }], documentValue);
+      element.appendChild(paragraph);
     } else {
       element = documentValue.createElement("div");
     }
