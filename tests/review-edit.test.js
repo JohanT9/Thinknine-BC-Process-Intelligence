@@ -9,7 +9,11 @@ assert.deepStrictEqual(edit.result(session), {
 assert.strictEqual(edit.result(edit.createSession("a", "instruction", "A")).changed, false);
 assert.strictEqual(edit.commandFromKey({ key: "Enter" }, false), "start");
 assert.strictEqual(edit.commandFromKey({ key: "Enter", shiftKey: false }, true), "commit");
-assert.strictEqual(edit.commandFromKey({ key: "Enter", shiftKey: true }, true), null);
+const textareaTarget = { tagName: "TEXTAREA" };
+assert.strictEqual(edit.commandFromKey({ key: "Enter", target: textareaTarget }, true), null);
+assert.strictEqual(edit.commandFromKey({ key: "Enter", shiftKey: true, target: textareaTarget }, true), null);
+assert.strictEqual(edit.commandFromKey({ key: "Enter", ctrlKey: true, target: textareaTarget }, true), "commit");
+assert.strictEqual(edit.commandFromKey({ key: "Enter", metaKey: true, target: textareaTarget }, true), "commit");
 assert.strictEqual(edit.commandFromKey({ key: "Escape" }, true), "cancel");
 
 const listeners = {};
@@ -20,6 +24,7 @@ const container = {
   removeEventListener(type, listener) { removed[type] = listener; }
 };
 const control = {
+  tagName: "TEXTAREA",
   dataset: { editField: "instruction" }, value: "A",
   closest(selector) {
     if (selector === "[data-review-task-id]") return card;
@@ -47,6 +52,12 @@ let prevented = false;
 control.dataset.editing = "true";
 listeners.keydown({
   target: control, key: "Enter", shiftKey: false,
+  preventDefault() { prevented = true; }
+});
+assert.strictEqual(prevented, false);
+assert.notDeepStrictEqual(calls.at(-1), ["commit"]);
+listeners.keydown({
+  target: control, key: "Enter", ctrlKey: true,
   preventDefault() { prevented = true; }
 });
 assert.strictEqual(prevented, true);

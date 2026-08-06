@@ -5112,8 +5112,8 @@ function renderReview() {
         </div>
         <textarea id="review-instruction-${visibleIndex}" data-field="instruction" data-edit-field="instruction"
           aria-label="Instruktion för steg ${visibleIndex + 1}"
-          aria-keyshortcuts="Enter Escape Shift+Enter"
-          title="Dubbelklicka eller tryck Enter för att redigera"
+          aria-keyshortcuts="Enter Control+Enter Meta+Enter Escape"
+          title="Dubbelklicka eller tryck Enter för att redigera. Ctrl+Enter sparar"
           readonly>${escapeHtml(globalThis.T9TextFormat.quoteEmphasis(task.instruction))}</textarea>
         <div class="review-comment-section" ${task.userComment ? "" : "hidden"}>
           <div class="review-field-heading">

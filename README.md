@@ -670,8 +670,8 @@ skapar en separat Undo-post.
 
 Instruktioner och kommentarer visas inline. Dubbelklicka på ett fält eller
 markera ett steg och tryck Enter för att börja redigera instruktionen. Enter
-bekräftar, Escape avbryter och återställer ursprungsvärdet. Använd Shift+Enter
-för en ny rad i instruktionen.
+skapar en ny rad i instruktionen. Ctrl+Enter (Cmd+Enter på macOS) bekräftar,
+medan Escape avbryter och återställer ursprungsvärdet.
 
 Bekräftade ändringar sparas automatiskt efter en kort fördröjning. Flera snabba
 ändringar samlas till en save-operation, medan knapparna för manuell sparning

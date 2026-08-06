@@ -29,7 +29,11 @@
 
   function commandFromKey(event, editing) {
     if (editing && event.key === "Escape") return "cancel";
-    if (editing && event.key === "Enter" && !event.shiftKey) return "commit";
+    if (editing && event.key === "Enter") {
+      const multiline = event.target?.tagName?.toLowerCase() === "textarea";
+      if (multiline && !event.ctrlKey && !event.metaKey) return null;
+      return "commit";
+    }
     if (!editing && event.key === "Enter") return "start";
     return null;
   }

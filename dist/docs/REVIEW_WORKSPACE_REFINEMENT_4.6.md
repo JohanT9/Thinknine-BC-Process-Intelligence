@@ -21,8 +21,9 @@ retain native document order.
 
 ## Editing model
 
-Enter and double click begin inline editing. Enter commits, Shift+Enter inserts
-a line break, Escape cancels and focusout commits as before. The editor now has
+Enter and double click begin inline editing. While editing an instruction,
+Enter inserts a line break, Ctrl/Cmd+Enter commits, Escape cancels and focusout
+commits as before. Single-line comments still commit with Enter. The editor now has
 more padding, a professional line height, vertical resizing and a stronger
 focus-visible state. Nearest-position scrolling plus focus without browser
 scrolling keeps the current step stable.

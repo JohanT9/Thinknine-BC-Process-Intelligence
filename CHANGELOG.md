@@ -574,8 +574,8 @@
 
 - Added a reusable inline editing controller for Review Studio fields.
 - Added edit activation with double-click or Enter.
-- Added Enter-to-commit, Escape-to-cancel and blur-to-commit behaviour.
-- Preserved multiline instructions with Shift+Enter while editing.
+- Added Ctrl/Cmd+Enter-to-commit, Escape-to-cancel and blur-to-commit behaviour.
+- Made Enter create natural line breaks in multiline instructions while preserving Enter-to-commit for single-line comments.
 - Added debounced automatic persistence after committed edits.
 - Prevented stale save responses from overwriting newer in-memory edits.
 - Kept native text-field Undo/Redo active while an inline editor is open.
