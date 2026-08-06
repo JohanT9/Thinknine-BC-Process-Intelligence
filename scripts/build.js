@@ -127,10 +127,6 @@ copyFile(
   path.join(src, "recorder", "content.js"),
   path.join(dist, "content.js")
 );
-copyFile(
-  path.join(src, "recorder", "frame-capture.js"),
-  path.join(dist, "frame-capture.js")
-);
 
 for (const file of [
   "dashboard.html",

@@ -1,23 +1,5 @@
 # Architecture 4.6
 
-## React and Control Add-in Capture 4.6 R3.3
-
-```text
-Authorized frame → local DOM normalization → validated frame message
-  → background session coordinator → existing Recorder event stream
-  → Review → Semantic Interaction Rules → Language → Presentation → export
-```
-
-`frame-capture.js` owns the message contract, browser identity normalization,
-ordering, coordinate arithmetic and validation. `content.js` owns listeners in
-its document frame. `background.js` binds browser-supplied identity and remains
-the sole event, screenshot and persistence coordinator.
-
-Frame capture introduces no React semantics and no alternate document pipeline.
-Content scripts never traverse cross-origin DOM. Browser host permissions and
-frame injection remain the security boundary. Optional frame metadata coexists
-with legacy events and flows through the existing semantic architecture.
-
 ## Presentation Grammar 4.6 R3.2
 
 ```text

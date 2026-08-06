@@ -1,14 +1,5 @@
 THINKNINE BC PROCESS INTELLIGENCE 4.6.0
 
-R3.3 FRAME-INSPELNING
-
-Efter uppdatering ska tillägget läsas in på nytt från dist-mappen och Business
-Central-fliken uppdateras innan en ny iframe-inspelning görs. Behörigheten
-webNavigation används för att identifiera överordnad frame men ger inte åtkomst
-till nya webbplatser. Host-behörigheten är fortsatt begränsad till
-businesscentral.dynamics.com. Befintliga inspelningar utan frame-händelser kan
-inte repareras.
-
 FÖRUTSÄTTNINGAR
 
 - Microsoft Edge

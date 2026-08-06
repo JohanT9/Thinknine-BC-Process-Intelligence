@@ -19,19 +19,6 @@ function objectSummary(value) {
   return entries.map(([key, count]) => `${key}: ${count}`).join(", ");
 }
 
-function frameSummary(values) {
-  if (!Array.isArray(values) || !values.length) return "Inga frames rapporterade";
-  return values.map(frame => {
-    const identity = frame.frameId === 0 ? "Top frame" : `Frame ${frame.frameId}`;
-    const parent = frame.parentFrameId === null ? "" :
-      `, parent ${frame.parentFrameId}`;
-    const status = frame.recordable ? "recordable" :
-      frame.reason || frame.listenerStatus || "unavailable";
-    return `${identity}${parent}: ${status}, ${frame.capturedEvents || 0} events, ` +
-      `${frame.frameUrl || "URL unavailable"}`;
-  }).join("\n");
-}
-
 async function load() {
   const response = await send({ type: "T9_GET_DEBUG" });
   const grid = document.getElementById("grid");
@@ -52,8 +39,6 @@ async function load() {
     ["Senaste event", debug.lastEvent ? JSON.stringify(debug.lastEvent) : "Inget"],
     ["Senaste BC-ping", debug.lastPingAt || "Ingen"],
     ["Senaste ram-URL", debug.lastFrameUrl || "Ingen"],
-    ["Frame Capture Diagnostics",
-      frameSummary(debug.frameCaptureDiagnostics)],
     ["Skärmbilder begärda", String(screenshots.requested || 0)],
     ["Skärmbilder tagna", String(screenshots.captured || 0)],
     ["Bildförfrågningar sammanslagna", String(screenshots.reused || 0)],

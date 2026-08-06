@@ -1012,22 +1012,6 @@ function uiStep({
   return {
     step: 0,
     sourceEventNos: sourceEvents.map(event => event.eventNo),
-    frameContexts: sourceEvents.filter(event => event.sourceEventId).map(event => ({
-      sourceEventId: event.sourceEventId,
-      tabId: event.tabId ?? null,
-      frameId: event.frameId ?? null,
-      parentFrameId: event.parentFrameId ?? null,
-      documentId: event.documentId || "",
-      frameUrl: event.frameUrl || "",
-      topFrameUrl: event.topFrameUrl || event.topUrl || "",
-      frameOrigin: event.frameOrigin || "",
-      localSequence: event.localSequence ?? null,
-      captureTimestamp: event.captureTimestamp || event.timestamp || "",
-      localBounds: event.localBounds || null,
-      topViewportBounds: event.topViewportBounds || null,
-      devicePixelRatio: event.devicePixelRatio || 1,
-      visualViewportScale: event.visualViewportScale || 1
-    })),
     inputSources: [...new Set(sourceEvents.map(event => event.inputSource)
       .filter(Boolean))],
     timestamp: sourceEvents[0]?.timestamp || "",

@@ -3,19 +3,6 @@
 Ett modulärt Edge-tillägg för att spela in, granska och exportera dokumenterade
 Business Central-processer.
 
-## React och Control Add-in Capture 4.6 R3.3
-
-Inspelaren är nu frame-aware och kan samla DOM-interaktioner från top-frame,
-nested same-origin-frames och iframe-dokument inom tilläggets Business
-Central-behörighet. React behandlas som vanliga tillgängliga DOM-kontroller;
-inga privata React-egenskaper används.
-
-Händelser får stabil frame-identitet, lokal sekvens, säkra koordinater och ett
-deduplicerbart source-ID innan de går genom den vanliga dokumentationskedjan.
-Befintliga inspelningar utan iframe-händelser kan inte återskapas; tillägget
-måste laddas om och processen spelas in på nytt. Se
-[React och Control Add-in Capture](docs/REACT_CONTROL_ADDIN_CAPTURE_4.6.md).
-
 ## Presentation Grammar 4.6 R3.2
 
 Dokumentvyn och Word-exporten använder nu samma visuella grammatik. Åtgärder
