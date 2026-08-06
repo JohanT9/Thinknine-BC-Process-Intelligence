@@ -29,6 +29,9 @@ const v46ReleaseNotes = read("docs/RELEASE_NOTES_4.6_R1.md");
 const screenshotIntelligence = read("docs/SCREENSHOT_INTELLIGENCE_4.6.md");
 const v46R2ReleaseNotes = read("docs/RELEASE_NOTES_4.6_R2.md");
 const terminologyReleaseNotes = read("docs/RELEASE_NOTES_4.6_R1_1.md");
+const customerSelectionNotes = read(
+  "docs/RELEASE_NOTES_4.6_CUSTOMER_SELECTION.md"
+);
 const installation = read("INSTALLERA.txt");
 const handbook = read(".github/AGENTS.md");
 assert.ok(architecture.startsWith("# Architecture 4.6"));
@@ -48,6 +51,7 @@ assert.ok(screenshotIntelligence.includes("R1's lack of a verified visible"));
 assert.ok(v46R2ReleaseNotes.includes("Documentation Excellence v4.6 R2"));
 assert.ok(terminologyReleaseNotes.includes(
   "Documentation Excellence v4.6 R1.1 — Dokumentbibliotek"));
+assert.ok(customerSelectionNotes.includes('Välj kund "1033".'));
 assert.ok(installation.includes("WORD-EXPORT 4.4"));
 assert.ok(handbook.includes("src/exporters/"));
 assert.ok(!handbook.includes("src/export/\n"));

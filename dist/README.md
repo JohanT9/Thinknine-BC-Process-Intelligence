@@ -3,6 +3,13 @@
 Ett modulärt Edge-tillägg för att spela in, granska och exportera dokumenterade
 Business Central-processer.
 
+## Konsoliderade affärshändelser
+
+Tekniska delhändelser från samma kunduppslag—fältfokus, öppnad värdelista,
+radval och efterföljande fältuppdatering—samlas till ett dokumentationssteg.
+Ett val av kund 1033 skrivs därför som **Välj kund "1033".** med den sista
+relevanta skärmbilden, samtidigt som samtliga källevent finns kvar för spårbarhet.
+
 ## Screenshot Intelligence 4.6 R2
 
 Screenshot Intelligence väljer deterministiskt den tydligaste tillgängliga

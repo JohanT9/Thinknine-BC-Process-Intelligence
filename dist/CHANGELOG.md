@@ -1,5 +1,16 @@
 # Changelog
 
+## 4.6.0 — Customer-selection consolidation
+
+- Consolidated adjacent customer field, lookup-helper, record-selection and
+  resulting field-update tasks into one business instruction.
+- Preferred the explicit selected customer number over masked transitional
+  values and retained the final relevant screenshot.
+- Preserved all source-event references while preventing unrelated record
+  selections, such as item selection, from joining the customer operation.
+- Added a behavior regression shaped from the observed five-step customer 1033
+  sequence in the latest exported Word document.
+
 ## 4.6.0 R1.1 — Dokumentbibliotek terminology
 
 - Renamed the user-facing library entry from Documentation Excellence to

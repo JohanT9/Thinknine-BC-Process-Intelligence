@@ -506,9 +506,9 @@ function applyKnowledgeRule(task, match, settings) {
 
 function applyKnowledgePackFramework(tasks, settings) {
   unmatchedKnowledgeItems = [];
-  return tasks.map(task =>
+  return globalThis.T9TaskConsolidation.consolidate(tasks.map(task =>
     applyKnowledgeRule(task, matchKnowledgeRule(task), settings)
-  );
+  ));
 }
 
 
