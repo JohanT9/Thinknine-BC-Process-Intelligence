@@ -126,6 +126,28 @@ Language Excellence must never:
 
 The objective is to improve expression, never interpretation.
 
+## Presentation Grammar
+
+Documentation should use a consistent visual grammar.
+
+Actions describe what to do.
+
+Interface elements identify where to do it.
+
+Values identify what the user should enter or select.
+
+Recommended conventions:
+
+- Actions use plain text.
+- Entered or selected values use bold.
+- Interface labels use quotation marks.
+- Keyboard shortcuts use monospace.
+- Technical identifiers use monospace where appropriate.
+
+Presentation Grammar improves readability only.
+
+It must never alter semantic meaning.
+
 ### Screenshot Excellence
 
 Every selected screenshot should be the clearest visual representation
