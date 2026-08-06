@@ -413,6 +413,42 @@ Semantic Document owns:
 
 Semantic Document never owns layout.
 
+## Semantic Interaction Consolidation
+
+Documentation should describe user intent, not individual UI events.
+
+Whenever a deterministic semantic action can be inferred without changing
+meaning, it should be preferred over documenting the underlying interaction
+sequence.
+
+Examples include consolidating:
+
+- lookup navigation
+- search
+- row selection
+- confirmation
+
+into a single semantic action such as:
+
+> Select customer "1033".
+
+Semantic Interaction Consolidation must:
+
+- preserve all underlying source events for traceability,
+- preserve stable references,
+- preserve workflow order,
+- preserve screenshots and annotations,
+- remain deterministic,
+- remain reversible where applicable,
+- and never invent missing values or intent.
+
+If the semantic action cannot be inferred safely, preserve the original
+interaction sequence.
+
+Consolidation improves representation.
+
+It must never alter meaning.
+
 ---
 
 # Projection Purity
