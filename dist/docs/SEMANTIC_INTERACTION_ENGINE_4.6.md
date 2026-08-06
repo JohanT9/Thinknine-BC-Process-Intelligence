@@ -62,6 +62,11 @@ field value remains instructional even when an older recording contains only
 focusout provenance. Generic lookup labels remove the technical `Sortera efter`
 prefix, producing wording such as `Välj Nr "136"`.
 
+The recorder's separate screenshot capture policy captures non-empty input and
+change events but not focusout. Field input cannot reuse a nearby action image
+or another field's image, ensuring that a retained value step can reference the
+screen state in which its value was entered.
+
 ## Semantic Action model
 
 A Semantic Action contains:

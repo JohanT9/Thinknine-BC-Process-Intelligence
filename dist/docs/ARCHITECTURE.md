@@ -26,6 +26,12 @@ non-visible Semantic Actions stored in the workflow section's suppressed trace.
 Deterministic focus/record/result sequences become one lookup action. This keeps
 technical navigation available for diagnostics without creating document steps.
 
+`screenshot-capture-policy.js` independently decides capture eligibility before
+the recorder queue. Non-empty input/change events receive the dedicated
+`field-input` category. That category cannot reuse a nearby action capture or a
+capture for another field, while repeated events for the same field may share
+one image. Focusout remains non-capturing.
+
 An immutable projected document revision is processed once and cached by object
 identity. Language Excellence consumes the semantic-action document. Screenshot
 Intelligence remains the sole image-selection owner. Both Document Workspace

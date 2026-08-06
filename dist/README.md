@@ -25,6 +25,11 @@ Tekniska listprefix tas bort, så `Sortera efter Nr` presenteras som
 `Välj Nr "136"`. Ett registrerat värde, exempelvis 500 i Antal, bevaras även i
 äldre inspelningar där endast den avslutande focusout-källan finns kvar.
 
+När ett fält faktiskt ändras via input eller change tas nu en egen skärmbild för
+det dokumentationssteget. En inmatning av 500 i Antal får därmed en bild från
+själva inmatningstillfället. Ren focusout tar ingen bild. Redan avslutade
+inspelningar utan en sådan bild kan inte återskapa den retroaktivt.
+
 ## Konsoliderade affärshändelser
 
 Tekniska delhändelser från samma kunduppslag—fältfokus, öppnad värdelista,

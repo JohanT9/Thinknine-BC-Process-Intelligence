@@ -1,5 +1,6 @@
 importScripts("engine/storage-keys.js");
 importScripts("engine/privacy-mask.js");
+importScripts("engine/screenshot-capture-policy.js");
 importScripts("document/document-library.js");
 
 const VERSION = "4.6.0";
@@ -147,19 +148,6 @@ function signature(event) {
   ]);
 }
 
-async function shouldScreenshot(settings, category) {
-  if (!settings.captureScreenshots) return false;
-
-  const mode = settings.screenshotMode || "important";
-  if (mode === "none") return false;
-  if (mode === "all") {
-    return ["action", "dialog", "navigation"].includes(category);
-  }
-
-  // important
-  return ["action", "dialog"].includes(category);
-}
-
 async function capture(tabId) {
   try {
     const tab = await chrome.tabs.get(tabId);
@@ -180,6 +168,7 @@ async function capture(tabId) {
 
 function screenshotPriority(category) {
   if (category === "dialog") return 3;
+  if (category === "field-input") return 2;
   if (category === "action") return 2;
   if (category === "navigation") return 1;
   return 0;
@@ -189,13 +178,17 @@ async function enqueueScreenshot({
   sessionId,
   eventNo,
   tabId,
-  category
+  category,
+  captureKey = ""
 }) {
   screenshotStats.requested += 1;
 
   const existing = screenshotQueue.find(item =>
     item.sessionId === sessionId &&
-    Math.abs(item.eventNo - eventNo) <= 2
+    Math.abs(item.eventNo - eventNo) <= 2 &&
+    globalThis.T9ScreenshotCapturePolicy.canReuse(item, {
+      category, captureKey
+    })
   );
 
   if (existing) {
@@ -217,6 +210,7 @@ async function enqueueScreenshot({
     eventNo,
     tabId,
     category,
+    captureKey,
     queuedAt: Date.now()
   });
 
@@ -329,12 +323,14 @@ async function recordEvent(rawEvent, senderTabId) {
     session.updatedAt = event.timestamp;
     await saveSession(session);
 
-    if (await shouldScreenshot(settings, event.category)) {
+    if (globalThis.T9ScreenshotCapturePolicy.shouldCapture(settings, event)) {
+      const captureCategory = globalThis.T9ScreenshotCapturePolicy.category(event);
       await enqueueScreenshot({
         sessionId: state.sessionId,
         eventNo: event.eventNo,
         tabId: senderTabId || state.tabId,
-        category: event.category
+        category: captureCategory,
+        captureKey: event.fieldName || ""
       });
     }
 

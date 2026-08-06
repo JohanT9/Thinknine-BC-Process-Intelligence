@@ -21,6 +21,10 @@
   and preserved non-empty legacy field values even when only focusout survived.
 - Removed the technical `Sortera efter` prefix from generic lookup wording;
   list selection now reads `Välj Nr "136"`.
+- Added an isolated screenshot capture policy for non-empty input/change events,
+  giving entered values such as quantity 500 their own step screenshot.
+- Prevented field-input screenshots from being merged with nearby action or
+  different-field captures; focusout-only navigation still captures nothing.
 
 ## 4.6.0 — Customer-selection consolidation
 
