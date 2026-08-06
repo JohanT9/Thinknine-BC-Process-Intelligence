@@ -1,5 +1,24 @@
 # Architecture 4.6
 
+## Review Workspace Refinement 4.6 R4
+
+R4 changes presentation and interaction composition only. Review domain
+commands, selection, history, annotation persistence, Semantic Document and the
+export pipeline remain unchanged. The toolbar continues to derive command state
+from `review-toolbar.js`; HTML disclosure changes do not create a second state
+owner.
+
+Primary commands remain in the toolbar's first focus sequence. Secondary
+commands retain their stable IDs and command attributes inside a native
+`details` disclosure. The toolbar binding owns arrow navigation and Escape focus
+restoration. Native Tab order remains intact.
+
+Editor refinement uses existing controls and listeners. `scrollIntoView` with
+nearest alignment followed by focus with `preventScroll` avoids viewport jumps.
+Annotation geometry uses native progressive disclosure and introduces no new
+editor state. Responsive and accessibility behavior is CSS-only, adding no DOM
+observers, polling, layout measurement or render pass.
+
 ## Semantic Interaction Rules Engine 4.6 R3
 
 ```text

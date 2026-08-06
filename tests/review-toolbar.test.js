@@ -81,6 +81,25 @@ listeners.keydown({
 });
 assert.strictEqual(arrowPrevented, true);
 assert.strictEqual(buttons.get("split").focused, true);
+const summary = { focused: false, focus() { this.focused = true; } };
+const disclosure = {
+  open: true,
+  querySelector(selector) {
+    assert.strictEqual(selector, "summary");
+    return summary;
+  }
+};
+let escapePrevented = false;
+listeners.keydown({
+  target: { closest(selector) {
+    return selector === "details[open]" ? disclosure : null;
+  } },
+  key: "Escape",
+  preventDefault() { escapePrevented = true; }
+});
+assert.strictEqual(escapePrevented, true);
+assert.strictEqual(disclosure.open, false);
+assert.strictEqual(summary.focused, true);
 unbind();
 assert.strictEqual(removed.click, listeners.click);
 assert.strictEqual(removed.keydown, listeners.keydown);

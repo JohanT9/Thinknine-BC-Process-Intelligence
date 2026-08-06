@@ -1,5 +1,20 @@
 # Changelog
 
+## 4.6.0 R4 — Review Workspace Refinement
+
+- Reduced the primary Review toolbar to Undo, Redo, Save and Word export while
+  retaining structural and maintenance commands under More Actions.
+- Added keyboard-aware disclosure behavior with Escape restoration, arrow-key
+  toolbar navigation and explicit expanded state for assistive technology.
+- Improved instruction-editor padding, line spacing, focus visibility, resize
+  behavior and nearest-position scrolling.
+- Moved exact annotation geometry behind progressive disclosure while retaining
+  drawing, selection and deletion controls beside the image.
+- Strengthened responsive, forced-colors and reduced-motion behavior without
+  adding observers, polling or extra workspace rendering.
+- Added R4 regression coverage for toolbar hierarchy, keyboard focus, editing,
+  annotation disclosure and responsive/accessibility contracts.
+
 ## 4.6.0 R3 — Semantic Interaction Rules Engine
 
 - Replaced isolated consolidation implementations with one immutable,

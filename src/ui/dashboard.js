@@ -4710,7 +4710,8 @@ function beginReviewEdit({ control, taskId, field }) {
   );
   control.readOnly = false;
   control.dataset.editing = "true";
-  control.focus();
+  control.scrollIntoView({ block: "nearest", inline: "nearest" });
+  control.focus({ preventScroll: true });
   control.select();
 }
 
@@ -5966,6 +5967,18 @@ async function saveReviewExplicitly() {
 }
 $("saveReview").addEventListener("click", saveReviewExplicitly);
 $("saveReviewBottom").addEventListener("click", saveReviewExplicitly);
+$("reviewMoreActions").addEventListener("toggle", event => {
+  event.currentTarget.querySelector("summary").setAttribute(
+    "aria-expanded",
+    String(event.currentTarget.open)
+  );
+});
+$("reviewMoreActions").addEventListener("click", event => {
+  const button = event.target.closest?.("button");
+  if (!button || button.disabled) return;
+  event.currentTarget.open = false;
+  event.currentTarget.querySelector("summary").focus();
+});
 $("compactReviewSteps").addEventListener("click", () => {
   reviewLayoutState = globalThis.T9ReviewLayout.toggleAll(
     reviewLayoutState,

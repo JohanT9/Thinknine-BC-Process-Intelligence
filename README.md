@@ -3,6 +3,19 @@
 Ett modulärt Edge-tillägg för att spela in, granska och exportera dokumenterade
 Business Central-processer.
 
+## Review Workspace Refinement 4.6 R4
+
+Granskningsytan prioriterar nu de dagliga åtgärderna: Ångra, Gör om, Spara och
+Exportera Word ligger alltid synliga. Struktur- och underhållsåtgärder som slå
+samman, dela, flytta, komprimera, lägga till och slutföra finns samlade under
+**Fler åtgärder**. Alla tidigare kortkommandon och kommandobeteenden finns kvar.
+
+Instruktionseditorn har större skrivyta, tydligare radavstånd och stabil
+fokusering utan oväntade scrollhopp. Exakta annotationskoordinater visas först
+när de efterfrågas, medan rektangel, pil, val och borttagning ligger kvar nära
+bilden. Mobil layout, high contrast och reduced motion har egna säkra regler.
+Se [Review Workspace Refinement 4.6](docs/REVIEW_WORKSPACE_REFINEMENT_4.6.md).
+
 ## Semantic Interaction Rules Engine 4.6 R3
 
 Dokumentationskedjan använder nu ett gemensamt, prioriterat regelsystem för att

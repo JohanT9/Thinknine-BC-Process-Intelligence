@@ -37,13 +37,29 @@
       const button = event.target.closest?.("[data-review-command]");
       if (!button || button.disabled || !container.contains(button)) return;
       execute(button.dataset.reviewCommand, button);
+      const disclosure = button.closest?.("details");
+      if (disclosure?.open) {
+        disclosure.open = false;
+        disclosure.querySelector("summary")?.focus();
+      }
     }
     function handleKeydown(event) {
+      if (event.key === "Escape") {
+        const disclosure = event.target.closest?.("details[open]");
+        if (disclosure) {
+          event.preventDefault();
+          disclosure.open = false;
+          disclosure.querySelector("summary")?.focus();
+        }
+        return;
+      }
       if (!["ArrowLeft", "ArrowRight", "Home", "End"].includes(event.key)) return;
-      const current = event.target.closest?.("[data-review-command]");
+      const current = event.target.closest?.("[data-review-toolbar-item]");
       if (!current) return;
       const buttons = [...container.querySelectorAll(
-        "[data-review-command]:not(:disabled)"
+        "summary[data-review-toolbar-item], " +
+        "[data-review-toolbar-item]:not(:disabled):not(summary):not(" +
+        "details:not([open]) [data-review-toolbar-item])"
       )];
       const index = buttons.indexOf(current);
       if (index < 0 || !buttons.length) return;

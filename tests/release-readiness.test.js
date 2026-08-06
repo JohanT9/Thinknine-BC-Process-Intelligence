@@ -35,6 +35,9 @@ const customerSelectionNotes = read(
 const semanticInteractionEngine = read(
   "docs/SEMANTIC_INTERACTION_ENGINE_4.6.md"
 );
+const reviewWorkspaceRefinement = read(
+  "docs/REVIEW_WORKSPACE_REFINEMENT_4.6.md"
+);
 const installation = read("INSTALLERA.txt");
 const handbook = read(".github/AGENTS.md");
 assert.ok(architecture.startsWith("# Architecture 4.6"));
@@ -64,6 +67,10 @@ assert.ok(semanticInteractionEngine.includes(
   "Traceability is fully preserved."));
 assert.ok(semanticInteractionEngine.includes(
   "Rules never invent information."));
+assert.ok(reviewWorkspaceRefinement.includes(
+  "Workflow Before Features"));
+assert.ok(reviewWorkspaceRefinement.includes(
+  "introduces no observers, polling"));
 assert.ok(installation.includes("WORD-EXPORT 4.4"));
 assert.ok(handbook.includes("src/exporters/"));
 assert.ok(!handbook.includes("src/export/\n"));
