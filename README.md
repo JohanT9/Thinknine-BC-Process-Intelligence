@@ -10,6 +10,9 @@ Dokumentbiblioteket har tydligast visuell prioritet; råinspelningar, ZIP-export
 och debug finns kvar under **Inspelningar och tekniska verktyg**. Vanliga
 batchkommandon visas direkt medan sällsynta och destruktiva åtgärder samlas under
 **Fler åtgärder**.
+Inställningar för dokumentation, export och inspelning ligger i en expanderbar
+sektion så den dagliga dokumentarbetsytan visas först utan att någon inställning
+försvinner.
 
 Tryck `/` för att fokusera bibliotekssökningen, Escape för att rensa den och
 Ctrl/Cmd+S för att spara i Granskning. Urval och fokus uppdateras inkrementellt
@@ -102,11 +105,12 @@ invaliderar dokumentvyn automatiskt. Stabilt identifierade avsnitt återanvänds
 när innehållet inte förändrats. Se
 [Document Workspace 4.5](docs/DOCUMENT_WORKSPACE_4.5.md).
 
-Documentation Excellence v4.4.0 är produktionsklar. Inspelning, Review Studio,
+Documentation Excellence v4.5.0 är produktionsklar. Inspelning, Granskning,
 icke-destruktiva annoteringar, dokumentkvalitetsanalys, professionell planering
 och Word-export fungerar som ett sammanhängande dokumentationsflöde. Se
-[Release Notes 4.4.0](docs/RELEASE_NOTES_4.4.0.md) och
-[Production Readiness 4.4](docs/PRODUCTION_READINESS_4.4.md).
+[Release Notes 4.5.0](docs/RELEASE_NOTES_4.5.0.md),
+[Production Readiness 4.5](docs/PRODUCTION_READINESS_4.5.md) och
+[Ship Review 4.5](docs/SHIP_REVIEW_4.5.md).
 
 ## Documentation Excellence 4.4 RC1
 
@@ -406,7 +410,8 @@ powershell -ExecutionPolicy Bypass -File .\scripts\build-and-open.ps1
 
 ## Synlig Review Studio
 
-På sidan **Sessioner och export** visas nu knappen **Granska** för avslutade sessioner.
+I **Documentation Excellence** öppnas avslutade dokument från Dokumentbiblioteket.
+Råsessioner och ZIP-export finns under **Inspelningar och tekniska verktyg**.
 
 Klicka **Granska** för att öppna Review Studio och kontrollera att gränssnittet fungerar innan fler funktioner läggs till.
 

@@ -1,4 +1,4 @@
-THINKNINE BC PROCESS INTELLIGENCE 4.5.0 UX1
+THINKNINE BC PROCESS INTELLIGENCE 4.5.0
 
 FÖRUTSÄTTNINGAR
 
@@ -38,7 +38,7 @@ UPPDATERA EN BEFINTLIG INSTALLATION
    npm.cmd run ci
 3. Öppna edge://extensions och välj Läs in igen.
 
-RC-KONTROLL
+PRODUKTIONSKONTROLL
 
 1. Spela in och avsluta en testsession.
 2. Öppna Review Studio med Granska.
@@ -49,12 +49,18 @@ RC-KONTROLL
 7. Kontrollera toolbarens automatiska knapplägen och statusrad.
 8. Exportera Word och kontrollera text, ordning, annoteringar och presentation.
 9. Navigera popup, dialog, toolbar, annoteringar och steg med endast tangentbord.
-10. Växla mellan Review Workspace och Document Workspace med mus och piltangenter.
+10. Växla mellan Granskning och Dokumentvy med mus och piltangenter.
 11. Ändra ett steg, ångra ändringen och kontrollera att dokumentvyn synkroniseras.
+12. Sök, filtrera och sortera i Dokumentbiblioteket; testa / och Escape.
+13. Markera flera dokument med Ctrl/Cmd, Shift och Ctrl/Cmd+A.
+14. Testa favorit, metadata, profil, tema och reversibel arkivering i batch.
+15. Kontrollera bekräftelsetexten för permanent borttagning utan att godkänna.
+16. Batch-exportera minst två testdokument och kontrollera progress och DOCX-filer.
+17. Stäng och öppna Granskning och kontrollera att fokus återgår till rätt dokument.
 
 EXPORTINSTÄLLNINGAR
 
 Filnamnsmallen stöder variablerna process, environment, date, time och version
 inom klammerparenteser. Preview och validering uppdateras direkt. Exporten
 använder automatiskt unika filnamn vid konflikt; något separat Save As-val finns
-inte i 4.4.0.
+inte i 4.5.0.

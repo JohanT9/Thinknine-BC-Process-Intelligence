@@ -249,3 +249,27 @@ Review sparar senaste aktivitet utan att först ersätta det fokuserade kortets
 DOM, så returfokus kan bindas till samma stabila projekt-ID. Tangentbordsgenvägar
 är UI-kommandon och passerar aldrig Review Projector, Semantic Document,
 Documentation Intelligence, Planner eller Word-adaptern.
+
+## Production boundary assessment 4.5 UX9
+
+Ship review confirms the dependency direction remains intact:
+
+```text
+Review → Projector → Semantic Document → Profile/Theme → Planner → Components
+                                                     ↘ Intelligence (advisory)
+                                                      ↘ Document Workspace
+                                                       ↘ Word Adapter
+
+Session metadata → Document Library → Batch command plans
+                                      ↘ sequential Word orchestration (one Review)
+```
+
+Document Library persistence rejects Review, semantic, plan, renderer, Word and
+screenshot payloads. Batch Operations imports only the library model and emits
+immutable metadata results or stable-ID plans. Dashboard remains the composition
+root; it is the only layer that resolves an explicit batch export reference to
+one Review and the unchanged Word pipeline.
+
+`async-operations.js` is UI infrastructure only. It owns timeout timer cleanup
+and single-flight request coalescing for popup polling, has no product-domain
+dependencies and stores no state after a request settles.

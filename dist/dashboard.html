@@ -161,12 +161,16 @@ table{width:100%;border-collapse:collapse}th,td{text-align:left;padding:9px;bord
 .filename-preview.invalid{background:#fef2f2;color:#991b1b}
 .filename-template-invalid{border-color:#b91c1c;outline:1px solid #b91c1c}
 .filename-validation{min-height:18px;margin-top:5px;color:#991b1b;font-size:13px}
+.settings-panel{margin:16px 0}.settings-panel>summary{cursor:pointer;font-weight:700;color:#17365d}.settings-panel-body{margin-top:12px}
 </style>
 </head>
 <body>
 <h1>Thinknine BC Recorder <small>v4.5.0</small></h1>
 <p class="muted">Spela in en Business Central-process och exportera en återanvändbar manual med exakt UI-terminologi.</p>
 
+<details id="settingsPanel" class="settings-panel">
+<summary>Inställningar för dokumentation, export och inspelning</summary>
+<div class="settings-panel-body">
 <fieldset>
 <legend>Dokumentation</legend>
 
@@ -258,6 +262,8 @@ table{width:100%;border-collapse:collapse}th,td{text-align:left;padding:9px;bord
 
 <button id="save" class="primary">Spara inställningar</button>
 </fieldset>
+</div>
+</details>
 
 <div id="message" role="status" aria-live="polite" aria-atomic="true"></div>
 <section class="document-library" aria-labelledby="documentLibraryTitle">
@@ -497,7 +503,7 @@ table{width:100%;border-collapse:collapse}th,td{text-align:left;padding:9px;bord
       </div>
       <div class="document-workspace-body">
         <div id="documentWorkspaceViewport" class="document-workspace-viewport">
-          <p id="documentContextHelp" class="sr-only">Tryck Enter eller blanksteg för att öppna motsvarande plats i Review Workspace.</p>
+          <p id="documentContextHelp" class="sr-only">Tryck Enter eller blanksteg för att öppna motsvarande plats i Granskning.</p>
           <span id="documentWorkspaceStatus" class="document-workspace-status"
             role="status" aria-live="polite" aria-atomic="true"></span>
           <article id="documentWorkspace" class="document-workspace-page"

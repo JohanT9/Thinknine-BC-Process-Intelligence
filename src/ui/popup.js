@@ -5,17 +5,7 @@ function updateText(element, value) {
   if (element.textContent !== text) element.textContent = text;
 }
 
-function withTimeout(promise, milliseconds, label) {
-  return Promise.race([
-    promise,
-    new Promise((_, reject) => {
-      setTimeout(
-        () => reject(new Error(`${label} tog för lång tid.`)),
-        milliseconds
-      );
-    })
-  ]);
-}
+const withTimeout = globalThis.T9AsyncOperations.withTimeout;
 
 async function send(message, timeout = 5000) {
   return withTimeout(
@@ -96,7 +86,7 @@ async function ensureContentScript(tab) {
   return response;
 }
 
-async function refresh() {
+const refresh = globalThis.T9AsyncOperations.singleFlight(async function () {
   try {
     const response = await send({ type: "T9_GET_STATE" }, 3000);
     const active = Boolean(response?.state?.recording);
@@ -113,7 +103,7 @@ async function refresh() {
   } catch (error) {
     showMessage(error.message, true);
   }
-}
+});
 
 $("start").addEventListener("click", async () => {
   setStarting(true);
@@ -179,4 +169,7 @@ $("debug").addEventListener("click", () => {
 });
 
 refresh();
-setInterval(refresh, 1000);
+const refreshInterval = setInterval(refresh, 1000);
+globalThis.addEventListener("pagehide", () => clearInterval(refreshInterval), {
+  once: true
+});

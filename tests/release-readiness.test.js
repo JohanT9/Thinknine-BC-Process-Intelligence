@@ -22,11 +22,17 @@ assert.deepStrictEqual(comparisonAssets, [
 
 const architecture = read("docs/ARCHITECTURE.md");
 const releaseNotes = read("docs/RELEASE_NOTES_4.4.0.md");
+const v45ReleaseNotes = read("docs/RELEASE_NOTES_4.5.0.md");
+const v45Readiness = read("docs/PRODUCTION_READINESS_4.5.md");
 const installation = read("INSTALLERA.txt");
 const handbook = read(".github/AGENTS.md");
 assert.ok(architecture.startsWith("# Architecture 4.4"));
 assert.ok(releaseNotes.includes("Documentation Excellence v4.4.0"));
 assert.ok(releaseNotes.includes("No AI functionality was introduced."));
+assert.ok(v45ReleaseNotes.includes("Documentation Excellence v4.5.0"));
+assert.ok(v45Readiness.includes(
+  "Documentation Excellence v4.5.0 is production ready."
+));
 assert.ok(installation.includes("WORD-EXPORT 4.4"));
 assert.ok(handbook.includes("src/exporters/"));
 assert.ok(!handbook.includes("src/export/\n"));

@@ -1,5 +1,22 @@
 # Changelog
 
+## 4.5.0 UX9 — Production Readiness & Ship Review
+
+- Completed the end-to-end first-time, daily consultant, power-user,
+  accessibility, performance, architecture, documentation and recovery review.
+- Corrected popup and installation terminology for the shipped Documentation
+  Excellence, Document Library, Batch Operations, Granskning and Dokumentvy.
+- Moved popup debugging behind a native technical disclosure.
+- Added a reusable timeout/single-flight guard so popup polling cannot overlap,
+  successful requests release timers and popup teardown clears its interval.
+- Grouped dashboard settings in a keyboard-accessible disclosure so Document
+  Library remains the clear primary workspace.
+- Added v4.5 production-boundary and async-concurrency regression coverage.
+- Updated installation verification, v4.5 release notes, production-readiness
+  assessment and ship-review evidence.
+- Confirmed unchanged Review, Semantic Document, Planner, Documentation
+  Intelligence, screenshot and Word export boundaries.
+
 ## 4.5.0 UX8 — Workflow Polish
 
 - Made Document Library the primary daily surface and grouped raw sessions,
