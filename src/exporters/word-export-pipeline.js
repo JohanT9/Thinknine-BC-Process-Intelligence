@@ -5,6 +5,9 @@
   const semantic = typeof module === "object" && module.exports
     ? require("../document/semantic-document")
     : root.T9DocumentModel;
+  const interactions = typeof module === "object" && module.exports
+    ? require("../document/semantic-interaction-engine")
+    : root.T9SemanticInteractionEngine;
   const language = typeof module === "object" && module.exports
     ? require("../document/language-excellence")
     : root.T9LanguageExcellence;
@@ -38,6 +41,7 @@
   const api = factory(
     projector,
     semantic,
+    interactions,
     language,
     screenshotIntelligence,
     profiles,
@@ -54,6 +58,7 @@
 })(typeof globalThis !== "undefined" ? globalThis : this, function (
   projector,
   semantic,
+  interactions,
   language,
   screenshotIntelligence,
   profiles,
@@ -110,7 +115,17 @@
       profiles.BUILT_IN_REGISTRY,
       options.profileId || "business-process"
     ) || profiles.get(profiles.BUILT_IN_REGISTRY, "business-process");
-    const languageDocument = language.process(projection.document, profile);
+    const semanticActionsDocument = interactions.processDocument(
+      projection.document
+    );
+    const semanticActionsResult = semantic.validate(semanticActionsDocument);
+    if (!semanticActionsResult.valid) {
+      throw new Error(
+        "Semantic Interaction validation failed: " +
+        semanticActionsResult.issues[0].message
+      );
+    }
+    const languageDocument = language.process(semanticActionsDocument, profile);
     const screenshotCandidates = screenshotIntelligence.normalizeCandidates(
       options.screenshotCandidates
     );
@@ -145,6 +160,7 @@
     }
     return semantic.deepFreeze({
       sourceSemanticDocument: projection.document,
+      semanticActionsDocument,
       languageDocument,
       semanticDocument: presentationDocument,
       languageProfile: profile,

@@ -32,6 +32,9 @@ const terminologyReleaseNotes = read("docs/RELEASE_NOTES_4.6_R1_1.md");
 const customerSelectionNotes = read(
   "docs/RELEASE_NOTES_4.6_CUSTOMER_SELECTION.md"
 );
+const semanticInteractionEngine = read(
+  "docs/SEMANTIC_INTERACTION_ENGINE_4.6.md"
+);
 const installation = read("INSTALLERA.txt");
 const handbook = read(".github/AGENTS.md");
 assert.ok(architecture.startsWith("# Architecture 4.6"));
@@ -55,6 +58,12 @@ assert.ok(customerSelectionNotes.includes('Välj kund "1033".'));
 assert.ok(customerSelectionNotes.includes('Välj artikel "136".'));
 assert.ok(customerSelectionNotes.includes('Ange "500" i "Antal".'));
 assert.ok(customerSelectionNotes.includes("cannot be recovered"));
+assert.ok(semanticInteractionEngine.includes(
+  "Existing Reviews require no migration."));
+assert.ok(semanticInteractionEngine.includes(
+  "Traceability is fully preserved."));
+assert.ok(semanticInteractionEngine.includes(
+  "Rules never invent information."));
 assert.ok(installation.includes("WORD-EXPORT 4.4"));
 assert.ok(handbook.includes("src/exporters/"));
 assert.ok(!handbook.includes("src/export/\n"));

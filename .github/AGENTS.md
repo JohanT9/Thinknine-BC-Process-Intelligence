@@ -449,6 +449,18 @@ Consolidation improves representation.
 
 It must never alter meaning.
 
+Semantic Interaction Rules should be:
+
+- deterministic
+- composable
+- independently testable
+- immutable
+- ordered by priority
+
+Each rule should describe one business interaction only.
+
+Generic rules should never override more specific rules.
+
 ---
 
 # Projection Purity

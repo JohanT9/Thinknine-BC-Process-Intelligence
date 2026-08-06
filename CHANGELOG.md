@@ -1,5 +1,19 @@
 # Changelog
 
+## 4.6.0 R3 — Semantic Interaction Rules Engine
+
+- Replaced isolated consolidation implementations with one immutable,
+  renderer-neutral and priority-ordered rules engine after Semantic Document.
+- Migrated customer, item and quantity behavior unchanged and added deterministic
+  vendor, location, dimension, date, option, checkbox, generic lookup and field
+  entry rules.
+- Added a stable Semantic Action model preserving raw interactions, source IDs,
+  event order, screenshots, annotations and unknown future metadata.
+- Added conflict-safe fallback, immutable-revision caching, legacy compatibility
+  and shared Document Workspace/Word pipeline integration.
+- Added behavior coverage for every built-in rule, priority, fallback,
+  determinism, immutability, traceability and future-field preservation.
+
 ## 4.6.0 — Customer-selection consolidation
 
 - Consolidated adjacent customer field, lookup-helper, record-selection and

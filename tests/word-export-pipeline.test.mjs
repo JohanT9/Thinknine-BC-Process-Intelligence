@@ -83,6 +83,25 @@ const baseReview = review([{
 }]);
 const output = await exportReview(baseReview);
 
+const semanticInteractionOutput = await exportReview(review([{
+  taskId: "customer-field", taskType: "SelectCustomer",
+  fieldCaption: "Kundnr", instruction: "Öppna kunduppslag.",
+  sourceEventNos: [40], screenshot: "customer-field.png"
+}, {
+  taskId: "customer-row", taskType: "Select",
+  selectedCaption: 'Välj posten "1033"', instruction: "Välj post.",
+  sourceEventNos: [41], screenshot: "customer-row.png"
+}]));
+assert.ok(semanticInteractionOutput.documentXml.includes("Välj kund"));
+assert.ok(semanticInteractionOutput.documentXml.includes("1033"));
+assert.strictEqual(semanticInteractionOutput.semanticActionsDocument.sections
+  .find(section => section.kind === "workflow").blocks
+  .filter(block => block.kind === "step").length, 1);
+assert.deepStrictEqual(semanticInteractionOutput.semanticActionsDocument.sections
+  .find(section => section.kind === "workflow").blocks
+  .find(block => block.kind === "step").semanticAction.sourceEventNos,
+["40", "41"]);
+
 assert.strictEqual(output.taskCount, 2);
 assert.strictEqual(output.imageCount, 2);
 assert.strictEqual(output.theme.themeId, "thinknine");

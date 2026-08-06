@@ -1,5 +1,31 @@
 # Architecture 4.6
 
+## Semantic Interaction Rules Engine 4.6 R3
+
+```text
+Review → Review Projector → Semantic Document → Semantic Interaction Rules
+  → Language Excellence → Screenshot Intelligence → Document Profile → Theme
+  → Document Planner → Components / Diagnostics → Document Workspace / Word
+```
+
+`semantic-interaction-engine.js` is the single owner of interaction
+consolidation. The Review adapter delegates its compatibility view to this same
+engine; it contains no rules. The ordered registry evaluates specific rules
+before generic rules. Equal-priority conflicts and unsafe inference fall back to
+the original sequence.
+
+Each result is an immutable Semantic Action containing stable action and source
+identities, ordered event references, selected value, target field, every
+screenshot and annotation reference, raw interactions and preserved future
+metadata. The projector carries interaction semantics without interpreting
+them. The engine never consumes Review directly, mutates input, evaluates image
+quality or applies profile-specific language.
+
+An immutable projected document revision is processed once and cached by object
+identity. Language Excellence consumes the semantic-action document. Screenshot
+Intelligence remains the sole image-selection owner. Both Document Workspace
+and Word consume the same downstream Document Plan.
+
 ## Screenshot Intelligence 4.6 R2
 
 ```text

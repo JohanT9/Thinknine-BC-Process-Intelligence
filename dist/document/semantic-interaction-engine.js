@@ -1,0 +1,409 @@
+(function (root, factory) {
+  const api = factory();
+  if (typeof module === "object" && module.exports) module.exports = api;
+  root.T9SemanticInteractionEngine = api;
+})(typeof globalThis !== "undefined" ? globalThis : this, function () {
+  const ENGINE_VERSION = "1.0.0";
+  const documentCache = new WeakMap();
+
+  function clone(value) {
+    return value === undefined ? undefined : JSON.parse(JSON.stringify(value));
+  }
+
+  function deepFreeze(value) {
+    if (!value || typeof value !== "object" || Object.isFrozen(value)) return value;
+    Object.freeze(value);
+    Object.values(value).forEach(deepFreeze);
+    return value;
+  }
+
+  function text(value) {
+    return typeof value === "string" ? value.trim() : "";
+  }
+
+  function interactionText(value) {
+    return [value?.fieldCaption, value?.actionCaption, value?.selectedCaption,
+      value?.instruction, value?.description].map(text).join(" ");
+  }
+
+  function unique(values) {
+    return [...new Set(values.filter(value => value !== undefined &&
+      value !== null && value !== ""))];
+  }
+
+  const RECORD_SELECTION = /^(?:välj posten|select record)\s+["“]?(.+?)["”]?\.?$/iu;
+  const LOOKUP = /(?:välj|select)(?: ett)? värde för|select a value for/iu;
+
+  function selectedRecordValue(value) {
+    for (const candidate of [value?.selectedCaption, value?.actionCaption,
+      value?.instruction, value?.description]) {
+      const match = text(candidate).replace(/\*\*/gu, "").match(RECORD_SELECTION);
+      if (match) return match[1].replace(/["“”]+$/gu, "").trim();
+    }
+    return "";
+  }
+
+  function meaningfulValue(value) {
+    for (const candidate of [value?.instructionValue, value?.value,
+      value?.selectedCaption]) {
+      const result = text(candidate).replace(/^\*\*|\*\*$/gu, "");
+      if (result && !/^\[.+\]$/u.test(result) && !LOOKUP.test(result) &&
+          !RECORD_SELECTION.test(result)) {
+        return result.replace(/^['"“]|['"”]$/gu, "");
+      }
+    }
+    return "";
+  }
+
+  function fieldMatches(value, pattern) {
+    return pattern.test(interactionText(value));
+  }
+
+  function typed(value) {
+    return (value?.inputSources || []).includes("input");
+  }
+
+  function focusOnly(value) {
+    const sources = value?.inputSources || [];
+    return value?.taskType === "ChangeField" && sources.length > 0 &&
+      !sources.includes("input");
+  }
+
+  function checkboxEnabled(value, selectedValue) {
+    if (typeof value?.value === "boolean") return value.value;
+    return /true|ja|yes|1/iu.test(selectedValue);
+  }
+
+  function stableId(ruleId, values) {
+    if (values.length === 1 && text(values[0]?.semanticActionModel?.actionId)) {
+      return values[0].semanticActionModel.actionId;
+    }
+    const source = values.map((value, index) =>
+      text(value.semanticActionModel?.actionId) || text(value.taskId) ||
+      `interaction-${index + 1}`).join("|");
+    return `semantic:${ruleId}:${source}`;
+  }
+
+  function rawData(values) {
+    return values.flatMap(value => value.semanticActionModel?.rawInteractions
+      ? clone(value.semanticActionModel.rawInteractions) : [clone(value)]);
+  }
+
+  function sourceData(values) {
+    return {
+      sourceTaskIds: unique(values.flatMap(value =>
+        value.semanticActionModel?.sourceTaskIds || (value.sourceTaskIds?.length
+          ? value.sourceTaskIds : value.taskId ? [value.taskId] : []))),
+      sourceStepNos: unique(values.flatMap(value =>
+        value.semanticActionModel?.sourceStepNos || value.sourceStepNos || [])),
+      sourceEventNos: unique(values.flatMap(value =>
+        value.semanticActionModel?.sourceEventNos || value.sourceEventNos || [])),
+      screenshotRefs: unique(values.flatMap(value =>
+        value.semanticActionModel?.screenshotRefs || (value.screenshots?.length
+          ? value.screenshots : value.screenshot ? [value.screenshot] : []))),
+      annotationRefs: unique(values.flatMap(value => value.annotationRefs || [])
+        .map(value => JSON.stringify(value))).map(value => JSON.parse(value))
+    };
+  }
+
+  function action(rule, values, properties) {
+    const sources = sourceData(values);
+    const futureMetadata = clone(values[0]?.semanticActionModel ||
+      values[0]?.semanticActionMetadata || {});
+    return deepFreeze({
+      ...futureMetadata,
+      actionId: stableId(rule.ruleId, values),
+      actionType: properties.actionType,
+      displayText: properties.displayText,
+      selectedValue: properties.selectedValue || "",
+      targetField: properties.targetField || "",
+      ...sources,
+      rawInteractions: rawData(values),
+      inputInteractionCount: values.length,
+      ruleId: rule.ruleId,
+      rulePriority: rule.priority,
+      engineVersion: ENGINE_VERSION
+    });
+  }
+
+  function selectionRule(config) {
+    const fieldPattern = config.fieldPattern;
+    const rule = {
+      ruleId: config.ruleId,
+      priority: config.priority,
+      match(context) {
+        const value = context.interactions[context.index];
+        return value?.taskType === config.actionType ||
+          value?.semanticAction === config.actionType ||
+          fieldMatches(value, fieldPattern) || Boolean(config.extraMatch?.(value));
+      },
+      consolidate(context) {
+        const values = [context.interactions[context.index]];
+        let cursor = context.index + 1;
+        while (cursor < context.interactions.length) {
+          const candidate = context.interactions[cursor];
+          const isRelated = fieldMatches(candidate, fieldPattern) ||
+            Boolean(config.extraMatch?.(candidate)) ||
+            LOOKUP.test(interactionText(candidate)) ||
+            Boolean(selectedRecordValue(candidate));
+          if (!isRelated) break;
+          values.push(candidate);
+          cursor += 1;
+        }
+        if (config.consumeFocusAfter) {
+          while (cursor < context.interactions.length &&
+              focusOnly(context.interactions[cursor])) {
+            values.push(context.interactions[cursor]);
+            cursor += 1;
+          }
+        }
+        const selectedValue = values.map(selectedRecordValue).find(Boolean) ||
+          [...values].reverse().map(meaningfulValue).find(Boolean) || "";
+        return {
+          consumed: values.length,
+          action: action(rule, values, {
+            actionType: config.actionType,
+            displayText: selectedValue
+              ? `${config.verb} **${selectedValue}**.` : `${config.verb}.`,
+            selectedValue,
+            targetField: config.targetField
+          })
+        };
+      }
+    };
+    return deepFreeze(rule);
+  }
+
+  function singleRule(config) {
+    const rule = {
+      ruleId: config.ruleId,
+      priority: config.priority,
+      match(context) {
+        return config.match(context.interactions[context.index]);
+      },
+      consolidate(context) {
+        const value = context.interactions[context.index];
+        const selectedValue = meaningfulValue(value);
+        return { consumed: 1, action: action(rule, [value], {
+          actionType: config.actionType(value, selectedValue),
+          displayText: config.display(value, selectedValue),
+          selectedValue,
+          targetField: config.targetField || text(value.fieldCaption)
+        }) };
+      }
+    };
+    return deepFreeze(rule);
+  }
+
+  const CUSTOMER = /kundens namn|kundnr|customer name|customer no\.?/iu;
+  const ITEM = /artikelnr|artikelnummer|item no\.?/iu;
+  const VENDOR = /leverantör(?:ens namn|snr|snummer)?|vendor(?: name| no\.?)?/iu;
+  const LOCATION = /lagerställe|location(?: code)?/iu;
+  const DIMENSION = /dimension|dimensionsvärde|dimension value/iu;
+
+  const BUILT_IN_RULES = deepFreeze([
+    selectionRule({ ruleId: "customer-selection", priority: 100,
+      actionType: "SelectCustomer", fieldPattern: CUSTOMER,
+      verb: "Välj kund", targetField: "Kund" }),
+    selectionRule({ ruleId: "item-selection", priority: 95,
+      actionType: "SelectItem", fieldPattern: ITEM, verb: "Välj artikel",
+      targetField: "Artikelnummer", consumeFocusAfter: true,
+      extraMatch: value => value?.entity === "Item" &&
+        /sortera efter nr|sort by no\.?/iu.test(interactionText(value)) }),
+    selectionRule({ ruleId: "vendor-selection", priority: 90,
+      actionType: "SelectVendor", fieldPattern: VENDOR,
+      verb: "Välj leverantör", targetField: "Leverantör" }),
+    selectionRule({ ruleId: "location-selection", priority: 85,
+      actionType: "SelectLocation", fieldPattern: LOCATION,
+      verb: "Välj lagerställe", targetField: "Lagerställe" }),
+    selectionRule({ ruleId: "dimension-selection", priority: 80,
+      actionType: "SelectDimension", fieldPattern: DIMENSION,
+      verb: "Välj dimensionsvärde", targetField: "Dimension" }),
+    singleRule({ ruleId: "quantity-entry", priority: 75,
+      match: value => typed(value) && /^(?:sortera efter\s+)?(?:antal|quantity)$/iu
+        .test(text(value?.fieldCaption)),
+      actionType: () => "EnterQuantity",
+      targetField: "Antal",
+      display: (_value, selected) => selected
+        ? `Ange **${selected}** i **Antal**.` : "Ange Antal." }),
+    singleRule({ ruleId: "date-selection", priority: 70,
+      match: value => typed(value) && /datum|date/iu.test(text(value?.fieldCaption)),
+      actionType: () => "SelectDate",
+      display: (value, selected) => selected
+        ? `Ange **${selected}** i **${text(value.fieldCaption)}**.`
+        : `Ange ${text(value.fieldCaption)}.` }),
+    singleRule({ ruleId: "checkbox", priority: 60,
+      match: value => /checkbox|toggle|boolean/iu.test(text(value?.taskType)) ||
+        typeof value?.value === "boolean",
+      actionType: (value, selected) => checkboxEnabled(value, selected)
+        ? "EnableCheckbox" : "DisableCheckbox",
+      display: (value, selected) =>
+        `${checkboxEnabled(value, selected) ? "Aktivera" : "Inaktivera"} ` +
+        `**${text(value.fieldCaption)}**.` }),
+    singleRule({ ruleId: "option-selection", priority: 50,
+      match: value => /selectoption|option|dropdown|combobox/iu
+        .test(text(value?.taskType)),
+      actionType: () => "SelectOption",
+      display: (value, selected) => selected
+        ? `Välj **${selected}** i **${text(value.fieldCaption)}**.`
+        : `Välj ett alternativ i **${text(value.fieldCaption)}**.` }),
+    selectionRule({ ruleId: "generic-lookup", priority: 20,
+      actionType: "SelectLookupValue", fieldPattern: /$a/iu,
+      verb: "Välj värde", targetField: "" }),
+    singleRule({ ruleId: "generic-field-entry", priority: 10,
+      match: value => typed(value) && value?.taskType === "ChangeField",
+      actionType: () => "EnterFieldValue",
+      display: (value, selected) => selected
+        ? `Ange **${selected}** i **${text(value.fieldCaption)}**.`
+        : `Fyll i **${text(value.fieldCaption)}**.` })
+  ]);
+
+  function genericLookupMatch(rule, context) {
+    if (rule.ruleId !== "generic-lookup") return rule.match(context);
+    return LOOKUP.test(interactionText(context.interactions[context.index]));
+  }
+
+  function registry(rules = BUILT_IN_RULES) {
+    return deepFreeze([...rules].map(value => value).sort((left, right) =>
+      right.priority - left.priority));
+  }
+
+  function processInteractions(values = [], rules = BUILT_IN_RULES) {
+    const interactions = Array.isArray(values) ? clone(values) : [];
+    const ordered = registry(rules);
+    const actions = [];
+    let index = 0;
+    while (index < interactions.length) {
+      const context = { interactions, index };
+      const matches = ordered.filter(rule => genericLookupMatch(rule, context));
+      const highest = matches[0]?.priority;
+      const winners = matches.filter(rule => rule.priority === highest);
+      if (winners.length !== 1) {
+        actions.push(deepFreeze({ passthrough: true,
+          rawInteractions: [clone(interactions[index])] }));
+        index += 1;
+        continue;
+      }
+      const result = winners[0].consolidate(context);
+      if (!result?.action || !Number.isInteger(result.consumed) ||
+          result.consumed < 1) {
+        actions.push(deepFreeze({ passthrough: true,
+          rawInteractions: [clone(interactions[index])] }));
+        index += 1;
+        continue;
+      }
+      actions.push(result.action);
+      index += result.consumed;
+    }
+    return deepFreeze(actions);
+  }
+
+  function actionToInteraction(value) {
+    if (value.passthrough) return clone(value.rawInteractions[0]);
+    const first = clone(value.rawInteractions[0] || {});
+    const screenshot = value.screenshotRefs[value.screenshotRefs.length - 1] || null;
+    return {
+      ...first,
+      taskType: value.actionType,
+      semanticAction: value.actionType,
+      semanticActionModel: clone(value),
+      instruction: value.displayText,
+      description: value.displayText,
+      fieldCaption: value.targetField || first.fieldCaption,
+      selectedCaption: value.selectedValue,
+      value: value.selectedValue,
+      instructionValue: value.selectedValue,
+      screenshot,
+      screenshots: screenshot ? [screenshot] : [],
+      sourceTaskIds: clone(value.sourceTaskIds),
+      sourceStepNos: clone(value.sourceStepNos),
+      sourceEventNos: clone(value.sourceEventNos),
+      rawInteractions: clone(value.rawInteractions),
+      consolidation: { type: value.ruleId,
+        sourceTaskCount: value.rawInteractions.length }
+    };
+  }
+
+  function consolidateInteractions(values, rules) {
+    return processInteractions(values, rules).map(actionToInteraction);
+  }
+
+  function instructionBlock(step) {
+    return (step.blocks || []).find(block => block.kind === "paragraph");
+  }
+
+  function processDocument(documentValue, rules = BUILT_IN_RULES) {
+    if (rules === BUILT_IN_RULES && documentValue &&
+        typeof documentValue === "object" && documentCache.has(documentValue)) {
+      return documentCache.get(documentValue);
+    }
+    const document = clone(documentValue || {});
+    document.sections = (document.sections || []).map(section => {
+      if (section.kind !== "workflow") return section;
+      const prefix = [];
+      const steps = [];
+      (section.blocks || []).forEach(block =>
+        block.kind === "step" ? steps.push(block) : prefix.push(block));
+      const interactions = steps.map(step => ({
+        ...(clone(step.interaction || {})),
+        taskId: step.sourceRef?.taskId || step.interaction?.taskId,
+        sourceEventNos: step.sourceRef?.sourceEventIds ||
+          step.interaction?.sourceEventNos || [],
+        instruction: instructionBlock(step)?.text || step.interaction?.instruction,
+        screenshots: (step.blocks || []).filter(block => block.kind === "image")
+          .map(block => block.sourceRef?.screenshotRef).filter(Boolean),
+        annotationRefs: (step.blocks || []).filter(block => block.kind === "image")
+          .flatMap(block => block.annotationRefs || [])
+      }));
+      const actions = processInteractions(interactions, rules);
+      let stepIndex = 0;
+      const semanticSteps = actions.map(entry => {
+        const consumed = entry.inputInteractionCount || 1;
+        const sourceSteps = steps.slice(stepIndex, stepIndex + consumed);
+        stepIndex += consumed;
+        if (entry.passthrough) return clone(sourceSteps[0]);
+        const first = clone(sourceSteps[0]);
+        const firstInstruction = instructionBlock(first);
+        if (firstInstruction) firstInstruction.text = entry.displayText;
+        const extraBlocks = sourceSteps.slice(1).flatMap(step =>
+          (step.blocks || []).filter(block => block.kind !== "paragraph"));
+        first.blocks = [...(first.blocks || []), ...clone(extraBlocks)];
+        first.stepNumber = 0;
+        first.sourceRef = {
+          ...clone(first.sourceRef || {}),
+          sourceTaskIds: clone(entry.sourceTaskIds),
+          sourceEventIds: entry.sourceEventNos.map(String)
+        };
+        first.semanticAction = clone(entry);
+        delete first.interaction;
+        return first;
+      });
+      semanticSteps.forEach((step, index) => { step.stepNumber = index + 1; });
+      return { ...section, blocks: [...prefix, ...semanticSteps] };
+    });
+    document.provenance = {
+      ...clone(document.provenance || {}),
+      transformations: unique([
+        ...(document.provenance?.transformations || []),
+        "semantic-interaction-rules"
+      ]),
+      semanticInteractionEngineVersion: ENGINE_VERSION
+    };
+    const result = deepFreeze(document);
+    if (rules === BUILT_IN_RULES && documentValue &&
+        typeof documentValue === "object") {
+      documentCache.set(documentValue, result);
+    }
+    return result;
+  }
+
+  return {
+    BUILT_IN_RULES,
+    ENGINE_VERSION,
+    consolidateInteractions,
+    processDocument,
+    processInteractions,
+    registry,
+    selectedRecordValue
+  };
+});

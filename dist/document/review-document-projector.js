@@ -298,6 +298,7 @@
         kind: "step",
         stepNumber: workflowBlocks.length + 1,
         sourceRef,
+        interaction: clone(task),
         ...(task.screenshotSelection &&
           typeof task.screenshotSelection === "object"
           ? { screenshotSelection: clone(task.screenshotSelection) } : {}),

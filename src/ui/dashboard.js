@@ -3862,7 +3862,7 @@ function buildDocumentProfileVariants(pipeline) {
         profile.theme.overrides || {}
       );
     const semanticDocument = globalThis.T9LanguageExcellence.process(
-      pipeline.sourceSemanticDocument,
+      pipeline.semanticActionsDocument,
       profile
     );
     const screenshotResult = globalThis.T9ScreenshotIntelligence.select(

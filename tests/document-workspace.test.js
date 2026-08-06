@@ -69,6 +69,21 @@ assert.deepStrictEqual(items(first.model, "image")[0].content, {
 assert.strictEqual(items(first.model, "metadata")[0].content.rows[2].value, "Test");
 assert.deepStrictEqual(workspace.render(first.prepared.plan), first.model);
 
+const interactionReview = reviewFixture();
+interactionReview.tasks = reviewStudio.normalizeTasks([{
+  taskId: "customer-field", taskType: "SelectCustomer",
+  fieldCaption: "Kundnr", instruction: "Öppna kunduppslag.",
+  sourceEventNos: [40]
+}, {
+  taskId: "customer-row", taskType: "Select",
+  selectedCaption: 'Välj posten "1033"', instruction: "Välj post.",
+  sourceEventNos: [41]
+}]);
+const interactionWorkspace = render(interactionReview);
+assert.strictEqual(items(interactionWorkspace.model, "stepTitle").length, 1);
+assert.ok(items(interactionWorkspace.model, "paragraph").some(item =>
+  item.content.text.includes("1033")));
+
 const annotatedReview = reviewFixture();
 reviewStudio.addAnnotation(
   annotatedReview,

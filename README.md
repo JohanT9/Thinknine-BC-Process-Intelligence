@@ -3,6 +3,20 @@
 Ett modulärt Edge-tillägg för att spela in, granska och exportera dokumenterade
 Business Central-processer.
 
+## Semantic Interaction Rules Engine 4.6 R3
+
+Dokumentationskedjan använder nu ett gemensamt, prioriterat regelsystem för att
+översätta tekniska interaktionssekvenser till affärshändelser. Kund-, artikel-,
+leverantörs-, lagerställe- och dimensionsval samt antal, datum, alternativ,
+kryssrutor, generiska uppslag och fältinmatning följer samma oföränderliga
+regelkontrakt. Om två likvärdiga regler konkurrerar bevaras originalhändelsen.
+
+Varje semantisk åtgärd behåller stabila käll-ID:n, händelseordning, samtliga
+skärmbilds- och annoteringsreferenser samt rå interaktionshistorik. Screenshot
+Intelligence väljer fortsatt bild och Language Excellence ansvarar fortsatt
+endast för formulering. Befintliga Reviews kräver ingen migrering. Se
+[Semantic Interaction Engine 4.6](docs/SEMANTIC_INTERACTION_ENGINE_4.6.md).
+
 ## Konsoliderade affärshändelser
 
 Tekniska delhändelser från samma kunduppslag—fältfokus, öppnad värdelista,

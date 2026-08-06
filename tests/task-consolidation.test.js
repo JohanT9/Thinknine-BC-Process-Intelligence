@@ -39,6 +39,10 @@ assert.strictEqual(result[0].instructionValue, "1033");
 assert.deepStrictEqual(result[0].sourceEventNos, [21, 22, 23, 24, 25]);
 assert.strictEqual(result[0].screenshot, "screenshots/000025.png");
 assert.deepStrictEqual(result[0].screenshots, ["screenshots/000025.png"]);
+assert.deepStrictEqual(result[0].semanticActionModel.screenshotRefs, [
+  "screenshots/000021.png", "screenshots/000022.png",
+  "screenshots/000024.png", "screenshots/000025.png"
+]);
 assert.strictEqual(result[0].consolidation.sourceTaskCount, 5);
 assert.strictEqual(result[1].taskType, "ChangeField");
 assert.strictEqual(JSON.stringify(tasks), before, "input tasks must not mutate");
@@ -80,7 +84,7 @@ const salesLine = consolidation.consolidate(salesLineTasks);
 assert.strictEqual(salesLine.length, 3);
 assert.strictEqual(salesLine[0].instruction, "Välj artikel **136**.");
 assert.strictEqual(salesLine[0].screenshot, "screenshots/000033.png");
-assert.deepStrictEqual(salesLine[0].sourceEventNos, [31, 32, 33]);
+assert.deepStrictEqual(salesLine[0].sourceEventNos, [31, 32, 33, 34, 35]);
 assert.strictEqual(salesLine[1].fieldCaption, "Antal");
 assert.strictEqual(salesLine[1].instruction, "Ange **500** i **Antal**.");
 assert.strictEqual(salesLine[2].taskType, "ReleaseDocument");
