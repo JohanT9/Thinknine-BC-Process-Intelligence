@@ -4573,8 +4573,11 @@ function deleteReviewTasks(selectedIds) {
   const taskIds = reviewTaskIds();
   if (!selectedIds.length) return;
   const firstIndex = Math.min(...selectedIds.map(id => taskIds.indexOf(id)));
-  globalThis.T9Review.removeTasks(activeReview, selectedIds, {
-    beforeSelection: activeReviewSelection
+  selectedIds.forEach(taskId => {
+    const index = activeReview.tasks.findIndex(task => task.taskId === taskId);
+    globalThis.T9Review.setTaskHidden(activeReview, index, true, {
+      beforeSelection: activeReviewSelection
+    });
   });
   const remainingIds = reviewTaskIds();
   const nextId = remainingIds[Math.min(firstIndex, remainingIds.length - 1)] || null;
@@ -4685,6 +4688,9 @@ function finishReviewEdit(control, commit) {
   if (!activeReviewEdit || !control) return;
   const edit = globalThis.T9ReviewEdit.result(activeReviewEdit);
   if (commit && edit.changed) {
+    const revisionChanged = globalThis.T9ReviewEdit.hasRevisionConflict(
+      activeReviewEdit, activeReview.updatedAt
+    );
     const index = activeReview.tasks.findIndex(task => task.taskId === edit.taskId);
     if (index >= 0) {
       globalThis.T9Review.editTask(
@@ -4699,6 +4705,10 @@ function finishReviewEdit(control, commit) {
       invalidateDocumentWorkspace();
       reviewAutoSave.schedule();
       $("reviewFooterText").textContent = "Ändringen sparas automatiskt.";
+      if (revisionChanged) {
+        $("reviewFooterText").textContent =
+          "Steget ändrades under redigering. Din text bevarades och sparas.";
+      }
     }
   } else if (!commit) {
     control.value = activeReviewEdit.originalValue;
@@ -4722,7 +4732,8 @@ function beginReviewEdit({ control, taskId, field }) {
   activeReviewEdit = globalThis.T9ReviewEdit.createSession(
     taskId,
     field,
-    control.value
+    control.value,
+    activeReview.updatedAt
   );
   control.readOnly = false;
   control.dataset.editing = "true";
@@ -4754,7 +4765,9 @@ globalThis.T9ReviewEdit.bind($("reviewList"), {
 
 function reviewImages(task) {
   if (!activeReviewModel) return [];
-  const paths = task.screenshots?.length
+  const paths = task.sourceScreenshotAssetIds?.length
+    ? task.sourceScreenshotAssetIds
+    : task.screenshots?.length
     ? task.screenshots
     : task.screenshot
       ? [task.screenshot]
@@ -5102,7 +5115,9 @@ function renderReview() {
       : "Ändringar sparas lokalt i Edge.";
 
   tasks.forEach((task, visibleIndex) => {
-    const actualIndex = activeReview.tasks.indexOf(task);
+    const actualIndex = activeReview.tasks.findIndex(candidate =>
+      candidate.taskId === task.taskId
+    );
     const card = document.createElement("article");
     card.dataset.reviewTaskId = task.taskId;
     card.setAttribute("role", "row");
@@ -5149,6 +5164,8 @@ function renderReview() {
         <div class="review-meta">
           ${escapeHtml(task.taskType || "Task")}
           · Confidence ${task.confidenceScore ?? task.confidence ?? 0}%
+          ${task.stepOverride ? " · Redigerad" : " · Genererad"}
+          ${task.stepOverride?.screenshotOverride ? " · Manuell skärmbild" : ""}
           ${task.knowledgeRule
             ? ` · ${escapeHtml(task.knowledgeRule)}`
             : ""}
@@ -5162,6 +5179,10 @@ function renderReview() {
             </div>
             <button data-action="annotate" class="secondary review-annotate-button"
               aria-label="Annotera skärmbild ${imageIndex + 1} för steg ${visibleIndex + 1}">Annotera</button>
+            ${images.length > 1 ? `<button data-action="select-screenshot"
+              data-screenshot-index="${imageIndex}" class="secondary"
+              aria-label="Använd skärmbild ${imageIndex + 1} för steg ${visibleIndex + 1}"
+              ${task.selectedScreenshotAssetId === image.path ? "disabled" : ""}>Använd</button>` : ""}
           </div>`
         ).join("")}
       </div>
@@ -5176,7 +5197,10 @@ function renderReview() {
           Godkänd
         </label>
         <button data-action="add" class="secondary" aria-label="Lägg till steg efter steg ${visibleIndex + 1}">Lägg till efter</button>
-        <button data-action="remove" class="danger" aria-label="Ta bort steg ${visibleIndex + 1}">Ta bort</button>
+        <button data-action="reset-instruction" class="secondary"
+          ${task.fieldProvenance?.instruction === "user-edited" ? "" : "disabled"}
+          aria-label="Återställ instruktion för steg ${visibleIndex + 1}">Återställ text</button>
+        <button data-action="remove" class="danger" aria-label="Dölj steg ${visibleIndex + 1} från dokumentet">Dölj</button>
         <button data-action="toggle-layout" class="secondary" aria-pressed="false">Komprimera</button>
       </div>`;
 
@@ -5221,9 +5245,38 @@ function renderReview() {
         renderReview();
       });
 
+    card.querySelector('[data-action="reset-instruction"]')
+      .addEventListener("click", () => {
+        globalThis.T9Review.resetTaskField(activeReview, actualIndex, "instruction", {
+          beforeSelection: activeReviewSelection,
+          afterSelection: activeReviewSelection
+        });
+        reviewAutoSave.schedule();
+        renderReview();
+      });
+
+    for (const button of card.querySelectorAll('[data-action="select-screenshot"]')) {
+      button.addEventListener("click", () => {
+        const image = images[Number(button.dataset.screenshotIndex)];
+        const result = globalThis.T9Review.selectTaskScreenshot(
+          activeReview, actualIndex, image.path, {
+            beforeSelection: activeReviewSelection,
+            afterSelection: activeReviewSelection
+          }
+        );
+        if (!result.ok) {
+          show("Skärmbilden har annoteringar. Ta bort eller byt annoteringarna först.", true);
+          return;
+        }
+        reviewAutoSave.schedule();
+        renderReview();
+      });
+    }
+
     card.querySelector('[data-action="remove"]')
       .addEventListener("click", () => {
         deleteReviewTasks([task.taskId]);
+        reviewAutoSave.schedule();
       });
 
     card.querySelector('[data-action="toggle-layout"]')

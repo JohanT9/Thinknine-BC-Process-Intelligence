@@ -63,6 +63,9 @@
   function improveBlock(block, profile) {
     const result = clone(block);
     if (!semantic.BLOCK_KINDS.includes(result.kind)) return result;
+    if (result.preserveUserText || result.provenance === "user-edited") {
+      return result;
+    }
     for (const property of ["text", "caption", "title", "note", "label"]) {
       if (typeof result[property] === "string") {
         result[property] = improveText(result[property], profile);

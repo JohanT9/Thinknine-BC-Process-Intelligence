@@ -1,5 +1,8 @@
 # Event â†’ Step Grouping
 
+Review merge, split, movement, visibility, and overrides affect document
+structure only. They never rewrite Step Groups or source links.
+
 ## Purpose and architecture
 
 Step Grouping converts ordered normalized mechanics into candidate documentation

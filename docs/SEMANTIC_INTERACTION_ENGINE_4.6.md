@@ -1,5 +1,8 @@
 # Documentation Excellence v4.6 R3 — Semantic Interaction Rules Engine
 
+Instructions with `user-edited` provenance pass through semantic rules unchanged.
+Reset restores the latest generated semantic instruction.
+
 ## Purpose
 
 The engine now exposes `processStepGroups` as its primary normalized-recording

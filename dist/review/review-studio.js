@@ -17,13 +17,17 @@
   const annotations = typeof module === "object" && module.exports
     ? require("./review-annotations")
     : root.T9ReviewAnnotations;
+  const stepEditor = typeof module === "object" && module.exports
+    ? require("./step-editor")
+    : root.T9StepEditor;
   const api = factory(
     moveEngine,
     mergeEngine,
     splitEngine,
     historyEngine,
     textFormat,
-    annotations
+    annotations,
+    stepEditor
   );
   if (typeof module === "object" && module.exports) module.exports = api;
   root.T9Review = api;
@@ -33,13 +37,14 @@
   splitEngine,
   historyEngine,
   textFormat,
-  annotations
+  annotations,
+  stepEditor
 ) {
   function clone(value) {
     return JSON.parse(JSON.stringify(value));
   }
 
-  function normalizeTasks(tasks) {
+  function normalizeTasks(tasks, options = {}) {
     const usedIds = new Set();
     return (tasks || []).map((task, index) => {
       const baseId = task.taskId || `ReviewTask-${index + 1}`;
@@ -50,6 +55,35 @@
         suffix += 1;
       }
       usedIds.add(taskId);
+      const instruction = textFormat.quoteEmphasis(
+        task.instruction || task.description || "Utför uppgiften."
+      );
+      const screenshots = task.screenshots?.length
+        ? [...task.screenshots] : task.screenshot ? [task.screenshot] : [];
+      const derivedStep = task.derivedStep || {
+        title: task.title || task.stepTitle || "",
+        instruction: textFormat.quoteEmphasis(
+          task.originalInstruction || instruction
+        ),
+        comment: "",
+        sourceScreenshotAssetIds: screenshots,
+        selectedScreenshotAssetId: screenshots[0] || null,
+        visibility: "visible"
+      };
+      let stepOverride = stepEditor.normalizeOverride(task.stepOverride, task);
+      if (!stepOverride && task.originalInstruction &&
+          textFormat.quoteEmphasis(task.originalInstruction) !== instruction) {
+        stepOverride = stepEditor.edit(
+          { ...task, taskId, derivedStep }, "instruction", instruction,
+          { now: task.updatedAt || task.createdAt }
+        );
+      }
+      if (!stepOverride && task.userComment) {
+        stepOverride = stepEditor.edit(
+          { ...task, taskId, derivedStep }, "comment", task.userComment,
+          { now: task.updatedAt || task.createdAt }
+        );
+      }
       return {
         ...clone(task),
         taskId,
@@ -63,16 +97,11 @@
           task.instruction ||
           ""
         ),
-        instruction: textFormat.quoteEmphasis(
-          task.instruction ||
-          task.description ||
-          "Utför uppgiften."
-        ),
-        screenshots: task.screenshots?.length
-          ? [...task.screenshots]
-          : task.screenshot
-            ? [task.screenshot]
-            : []
+        instruction,
+        screenshots,
+        derivedStep,
+        stepOverride,
+        legacyFullCopy: task.legacyFullCopy ?? !options.modern
       };
     });
   }
@@ -94,7 +123,7 @@
       commandHistory: [],
       historyIndex: 0,
       annotations: annotations.emptyStore(),
-      tasks: normalizeTasks(tasks)
+      tasks: normalizeTasks(tasks, { modern: true })
     };
   }
 
@@ -275,9 +304,28 @@
   }
 
   function updateTask(review, index, patch) {
+    const task = review.tasks[index];
+    const now = new Date().toISOString();
+    let stepOverride = task.stepOverride || null;
+    if (patch.instruction !== undefined) {
+      stepOverride = stepEditor.edit(
+        { ...task, stepOverride }, "instruction", patch.instruction, { now }
+      );
+    }
+    if (patch.userComment !== undefined) {
+      stepOverride = stepEditor.edit(
+        { ...task, stepOverride }, "comment", patch.userComment, { now }
+      );
+    }
+    if (patch.title !== undefined) {
+      stepOverride = stepEditor.edit(
+        { ...task, stepOverride }, "title", patch.title, { now }
+      );
+    }
     review.tasks[index] = {
-      ...review.tasks[index],
+      ...task,
       ...patch,
+      stepOverride,
       reviewStatus:
         patch.instruction !== undefined ||
         patch.userComment !== undefined
@@ -334,6 +382,16 @@
     const beforeTasks = historyEngine.snapshot(review.tasks);
     const result = mergeEngine.merge(review.tasks, selectedIds, options);
     if (!result.mergedTask) return { review, mergedTask: null };
+    result.mergedTask.derivedStep = {
+      title: result.mergedTask.title || "",
+      instruction: result.mergedTask.instruction,
+      comment: result.mergedTask.userComment || "",
+      sourceScreenshotAssetIds: [...(result.mergedTask.screenshots || [])],
+      selectedScreenshotAssetId: result.mergedTask.screenshots?.[0] || null,
+      visibility: "visible"
+    };
+    result.mergedTask.stepOverride = null;
+    result.mergedTask.legacyFullCopy = false;
     review.tasks = result.tasks;
     review.historyVersion = review.historyVersion || "1.0.0";
     review.history = [...(review.history || []), result.historyEntry];
@@ -359,6 +417,18 @@
       options
     );
     if (!result.splitTasks.length) return { review, splitTasks: [] };
+    result.splitTasks.forEach(task => {
+      task.derivedStep = {
+        title: task.title || "",
+        instruction: task.instruction,
+        comment: task.userComment || "",
+        sourceScreenshotAssetIds: [...(task.screenshots || [])],
+        selectedScreenshotAssetId: task.screenshots?.[0] || null,
+        visibility: "visible"
+      };
+      task.stepOverride = null;
+      task.legacyFullCopy = false;
+    });
     review.tasks = result.tasks;
     review.historyVersion = review.historyVersion || "1.0.0";
     review.history = [...(review.history || []), result.historyEntry];
@@ -377,7 +447,40 @@
   }
 
   function activeTasks(review) {
-    return review.tasks.filter(task => !task.deleted);
+    return review.tasks.map(stepEditor.resolve).filter(task => !task.deleted);
+  }
+
+  function resetTaskField(review, index, field, options = {}) {
+    if (!review.tasks[index]) return review;
+    const beforeTasks = historyEngine.snapshot(review.tasks);
+    review.tasks[index].stepOverride = stepEditor.reset(
+      review.tasks[index], field, options
+    );
+    review.updatedAt = options.now || new Date().toISOString();
+    return record(review, "step-reset", beforeTasks, options);
+  }
+
+  function selectTaskScreenshot(review, index, assetId, options = {}) {
+    if (!review.tasks[index]) return { review, ok: false, reason: "missing-step" };
+    const beforeTasks = historyEngine.snapshot(review.tasks);
+    const result = stepEditor.selectScreenshot(
+      review.tasks[index], assetId, review, options
+    );
+    if (!result.ok) return { review, ...result };
+    review.tasks[index].stepOverride = result.override;
+    review.updatedAt = options.now || new Date().toISOString();
+    record(review, "step-screenshot", beforeTasks, options);
+    return { review, ok: true };
+  }
+
+  function setTaskHidden(review, index, hidden, options = {}) {
+    if (!review.tasks[index]) return review;
+    const beforeTasks = historyEngine.snapshot(review.tasks);
+    review.tasks[index].stepOverride = stepEditor.setVisibility(
+      review.tasks[index], hidden, options
+    );
+    review.updatedAt = options.now || new Date().toISOString();
+    return record(review, "step-visibility", beforeTasks, options);
   }
 
   function canComplete(review) {
@@ -409,6 +512,10 @@
     add,
     updateTask,
     editTask,
+    resetTaskField,
+    selectTaskScreenshot,
+    setTaskHidden,
+    resolveTask: stepEditor.resolve,
     approveTask,
     approveAll,
     complete,

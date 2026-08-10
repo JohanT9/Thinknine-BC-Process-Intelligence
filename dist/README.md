@@ -1,5 +1,12 @@
 # Thinknine BC Process Intelligence v4.6.0 R1
 
+## Step Editor
+
+Review editing uses sparse Step Overrides and deterministic Resolved Steps.
+Consultants can refine instructions/comments, choose a candidate screenshot,
+hide a step, undo/redo, and reset to generated content without changing evidence.
+See [docs/STEP_EDITOR.md](docs/STEP_EDITOR.md).
+
 Ett modulärt Edge-tillägg för att spela in, granska och exportera dokumenterade
 Business Central-processer.
 

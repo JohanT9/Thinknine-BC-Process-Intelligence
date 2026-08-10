@@ -1,5 +1,12 @@
 # Changelog
 
+## Step Editor — v4.6
+
+- Added sparse Step Overrides and deterministic Resolved Steps.
+- Added reset, screenshot/annotation safeguards, visibility, provenance,
+  orphan diagnostics, and legacy Review projection.
+- Reused Review Undo/Redo, autosave, export flushing, and shared rendering.
+
 ## 4.6.0 â€” Screenshot Selection Engine
 
 - Added deterministic schema-v1 screenshot selection results with algorithm

@@ -5,12 +5,13 @@
 })(typeof globalThis !== "undefined" ? globalThis : this, function () {
   const DEFAULT_DELAY = 750;
 
-  function createSession(taskId, field, value) {
+  function createSession(taskId, field, value, revision = null) {
     return {
       taskId,
       field,
       originalValue: value ?? "",
-      draftValue: value ?? ""
+      draftValue: value ?? "",
+      sourceRevision: revision
     };
   }
 
@@ -25,6 +26,11 @@
       value: session.draftValue,
       changed: session.draftValue !== session.originalValue
     };
+  }
+
+  function hasRevisionConflict(session, currentRevision) {
+    return session?.sourceRevision !== null &&
+      session?.sourceRevision !== currentRevision;
   }
 
   function commandFromKey(event, editing) {
@@ -203,6 +209,7 @@
     createSaveQueue,
     createPersistenceCoordinator,
     isCurrentSave,
+    hasRevisionConflict,
     createSession,
     result,
     update

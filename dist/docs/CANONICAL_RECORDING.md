@@ -1,5 +1,8 @@
 # Canonical Recording
 
+Step Editor changes are sparse Review-layer overrides. They can alter or hide a
+document projection but can never update or delete canonical events or assets.
+
 The Canonical Recording is the permanent source of truth for captured activity.
 Generated documentation, review edits, process models, and exports are derived
 data; they must not replace or rewrite the original events.

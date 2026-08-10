@@ -482,6 +482,9 @@
         const consumed = entry.inputInteractionCount || 1;
         const sourceSteps = steps.slice(stepIndex, stepIndex + consumed);
         stepIndex += consumed;
+        if (instructionBlock(sourceSteps[0])?.preserveUserText) {
+          return clone(sourceSteps[0]);
+        }
         if (entry.passthrough) return clone(sourceSteps[0]);
         if (entry.hidden) {
           suppressedInteractions.push(clone(entry));

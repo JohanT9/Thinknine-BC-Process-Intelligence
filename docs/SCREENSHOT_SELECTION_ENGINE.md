@@ -1,5 +1,9 @@
 # Screenshot Selection Engine
 
+Step Editor manual selection stores only the candidate asset ID and is
+authoritative in Workspace and Word. Annotated evidence cannot be replaced
+silently; automatic recommendation and image bytes remain intact.
+
 ## Purpose and architecture
 
 The engine chooses the most instructionally relevant screenshot reference for a

@@ -1,5 +1,11 @@
 # Architecture 4.6
 
+## Step Editing boundary
+
+The Review layer owns sparse Step Overrides. Derived Step plus Step Override
+resolves before document projection. Evidence layers remain immutable, and
+Workspace and Word consume the same Resolved Step.
+
 ## Screenshot Selection Engine
 
 ```text

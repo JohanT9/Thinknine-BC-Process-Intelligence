@@ -2,10 +2,13 @@
   const model = typeof module === "object" && module.exports
     ? require("./semantic-document")
     : root.T9DocumentModel;
-  const api = factory(model);
+  const stepEditor = typeof module === "object" && module.exports
+    ? require("../review/step-editor")
+    : root.T9StepEditor;
+  const api = factory(model, stepEditor);
   if (typeof module === "object" && module.exports) module.exports = api;
   root.T9ReviewDocumentProjector = api;
-})(typeof globalThis !== "undefined" ? globalThis : this, function (model) {
+})(typeof globalThis !== "undefined" ? globalThis : this, function (model, stepEditor) {
   const PROJECTOR_VERSION = "1.0.0";
   const ORIGIN = "review-document-projector";
   const DEFAULT_PURPOSE =
@@ -157,7 +160,7 @@
   }
 
   function project(reviewValue, options = {}) {
-    const review = object(reviewValue);
+    const review = object(stepEditor.resolveReview(reviewValue));
     const session = object(options.session);
     const diagnostics = [];
     const metadata = projectMetadata(review, session);
@@ -216,8 +219,9 @@
         ));
       }
       const stepKey = `${idPart(sourceTaskId)}:${occurrence}`;
-      const sourceEventIds = Array.isArray(task.sourceEventNos)
-        ? task.sourceEventNos.map(String) : [];
+      const sourceEventIds = Array.isArray(task.sourceEventIds)
+        ? task.sourceEventIds.map(String)
+        : Array.isArray(task.sourceEventNos) ? task.sourceEventNos.map(String) : [];
       const sourceRef = { taskId: sourceTaskId,
         ...(sourceEventIds.length ? { sourceEventIds } : {}) };
       const instruction = firstText(task.instruction, task.description);
@@ -234,7 +238,9 @@
         blockId: `block:instruction:${stepKey}`,
         kind: "paragraph",
         text: instruction,
-        sourceRef
+        sourceRef,
+        provenance: task.fieldProvenance?.instruction || "generated",
+        preserveUserText: task.fieldProvenance?.instruction === "user-edited"
       }];
 
       const comment = text(task.userComment);
@@ -248,7 +254,9 @@
             blockId: `block:comment-text:${stepKey}`,
             kind: "paragraph",
             text: comment,
-            sourceRef
+            sourceRef,
+            provenance: task.fieldProvenance?.comment || "generated",
+            preserveUserText: task.fieldProvenance?.comment === "user-edited"
           }]
         });
       }
