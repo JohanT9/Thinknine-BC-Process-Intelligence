@@ -1,5 +1,8 @@
 # Step Editor
 
+The editor hierarchy keeps instruction, screenshot/annotations, and Notes distinct.
+User-authored note text is authoritative and uses the existing Review history.
+
 Manual Steps reuse the normal content editing surface. Their text is authoritative,
 their screenshots are optional references, and their provenance remains manual.
 

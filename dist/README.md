@@ -1,5 +1,12 @@
 # Thinknine BC Process Intelligence v4.6.0 R1
 
+## Notes & Annotations
+
+Review now distinguishes stable textual Notes from screenshot-owned visual
+Annotations, with shared Undo/Redo, autosave, accessibility, and non-destructive
+Workspace/Word rendering. See
+[docs/NOTES_AND_ANNOTATIONS.md](docs/NOTES_AND_ANNOTATIONS.md).
+
 ## Manual Information Steps
 
 Consultants can insert anchored information, instruction, note, warning, tip,

@@ -122,6 +122,7 @@
     const sceneWidth = positiveDimension(width, "width");
     const sceneHeight = positiveDimension(height, "height");
     return (items || []).flatMap(annotation => {
+      if (annotation.visibility === "hidden") return [];
       const result = annotations.validation(annotation);
       if (!result.valid || !result.supported) return [];
       if (annotation.type === annotations.TYPES.RECTANGLE) {
@@ -129,6 +130,25 @@
       }
       if (annotation.type === annotations.TYPES.ARROW) {
         return [arrowPrimitive(annotation, sceneWidth, sceneHeight)];
+      }
+      if ([annotations.TYPES.HIGHLIGHT,
+        annotations.TYPES.NUMBERED_CALLOUT,
+        annotations.TYPES.TEXT_LABEL].includes(annotation.type)) {
+        const geometry = annotations.normalizeGeometry(
+          annotation.type, annotation.geometry
+        );
+        const style = { ...annotations.DEFAULT_STYLES[annotation.type],
+          ...(annotation.style || {}) };
+        return [{ annotationId: annotation.annotationId,
+          type: annotation.type, x: geometry.x * sceneWidth,
+          y: geometry.y * sceneHeight, width: geometry.width * sceneWidth,
+          height: geometry.height * sceneHeight,
+          fill: colorStyle(style.fill,
+            annotations.DEFAULT_STYLES[annotation.type].fill),
+          opacity: finiteStyle(style.opacity,
+            annotations.DEFAULT_STYLES[annotation.type].opacity),
+          label: annotation.label || "",
+          accessibleLabel: annotation.accessibleLabel || annotation.label || "" }];
       }
       return [];
     });

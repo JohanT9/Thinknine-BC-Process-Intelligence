@@ -1,5 +1,8 @@
 # Screenshot Selection Engine
 
+Visible annotations are a preservation constraint. Automatic selection cannot
+silently replace annotated authoritative evidence or migrate annotations.
+
 Resolved merged and split steps provide bounded candidate sets. Structure logic
 does not rank screenshots; manual selection and annotation safeguards remain
 authoritative.

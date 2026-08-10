@@ -11,14 +11,22 @@
   const manualSteps = typeof module === "object" && module.exports
     ? require("../review/manual-information-steps")
     : root.T9ManualInformationSteps;
-  const api = factory(model, stepEditor, structure, manualSteps);
+  const notes = typeof module === "object" && module.exports
+    ? require("../review/review-notes")
+    : root.T9ReviewNotes;
+  const annotations = typeof module === "object" && module.exports
+    ? require("../review/review-annotations")
+    : root.T9ReviewAnnotations;
+  const api = factory(model, stepEditor, structure, manualSteps, notes, annotations);
   if (typeof module === "object" && module.exports) module.exports = api;
   root.T9ReviewDocumentProjector = api;
 })(typeof globalThis !== "undefined" ? globalThis : this, function (
   model,
   stepEditor,
   structure,
-  manualSteps
+  manualSteps,
+  notes,
+  annotations
 ) {
   const PROJECTOR_VERSION = "1.0.0";
   const ORIGIN = "review-document-projector";
@@ -277,7 +285,15 @@
           Boolean(task.structureProvenance) || task.provenance === "manual"
       }];
 
-      const comment = text(task.userComment);
+      const ownedNotes = (review.stepNotes || []).filter(note => {
+        const ownerIds = [task.stepId, task.taskId,
+          ...(task.sourceStepIds || []), ...(task.manualStepIds || [])]
+          .filter(Boolean).map(String);
+        return note.ownerType === "step" && ownerIds.includes(note.ownerId) &&
+          note.visibility !== "hidden";
+      });
+      const comment = reviewValue?.stepNotes === undefined
+        ? text(task.userComment) : "";
       if (comment) {
         blocks.push({
           blockId: `block:comment:${stepKey}`,
@@ -294,6 +310,25 @@
           }]
         });
       }
+
+      ownedNotes.forEach((note, noteIndex) => {
+        blocks.push({
+          blockId: `block:note:${stepKey}:${noteIndex}`,
+          kind: "callout",
+          calloutType: note.noteType,
+          sourceRef,
+          provenance: note.provenance || "manual",
+          preserveUserText: true,
+          blocks: [{
+            blockId: `block:note-text:${stepKey}:${noteIndex}`,
+            kind: "paragraph",
+            text: note.content,
+            sourceRef,
+            provenance: note.provenance || "manual",
+            preserveUserText: true
+          }]
+        });
+      });
 
       const manualCallout = object(task.callout);
       const calloutText = text(manualCallout.text);
@@ -474,6 +509,24 @@
         sourceHistory: clone(Array.isArray(review.history) ? review.history : [])
       }]
     }];
+
+    const visibleTaskIds = tasks.flatMap(task => [task.stepId, task.taskId,
+      ...(task.sourceStepIds || []), ...(task.manualStepIds || [])])
+      .filter(Boolean).map(String);
+    const screenshotAssetIds = options.screenshotAssetIds || [
+      ...assets.map(asset => asset.sourceRef?.screenshotRef).filter(Boolean),
+      ...annotationSets(review).map(set => set.screenshotRef).filter(Boolean)
+    ];
+    notes.resolve(review.stepNotes || [], visibleTaskIds).diagnostics
+      .forEach(issue => diagnostics.push(diagnostic(
+        issue.code, "$.stepNotes", "Note owner no longer resolves.",
+        "warning", { noteId: issue.noteId, ownerId: issue.ownerId }
+      )));
+    annotations.diagnostics(review.annotations, screenshotAssetIds, visibleTaskIds)
+      .forEach(issue => diagnostics.push(diagnostic(
+        issue.code, "$.annotations", "Annotation ownership requires review.",
+        "warning", issue
+      )));
 
     const document = model.normalize({
       documentId: `document:review:${idPart(sessionId || "unknown")}`,

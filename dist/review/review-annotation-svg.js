@@ -36,6 +36,30 @@
           children: []
         };
       }
+      if (["highlight", "numbered-callout", "text-label"].includes(
+        primitive.type
+      )) {
+        const shape = primitive.type === "numbered-callout" ? "ellipse" : "rect";
+        const shapeAttributes = shape === "ellipse" ? {
+          cx: primitive.x + primitive.width / 2,
+          cy: primitive.y + primitive.height / 2,
+          rx: primitive.width / 2,
+          ry: primitive.height / 2
+        } : { x: primitive.x, y: primitive.y,
+          width: primitive.width, height: primitive.height };
+        return { name: "g", attributes: { ...common,
+          opacity: primitive.opacity,
+          role: "img", "aria-label": primitive.accessibleLabel }, children: [
+          { name: shape, attributes: { ...shapeAttributes,
+            fill: primitive.fill }, children: [] },
+          ...(primitive.label ? [{ name: "text", attributes: {
+            x: primitive.x + primitive.width / 2,
+            y: primitive.y + primitive.height / 2,
+            "text-anchor": "middle", "dominant-baseline": "middle",
+            fill: primitive.type === "highlight" ? "#111827" : "#ffffff"
+          }, text: primitive.label, children: [] }] : [])
+        ] };
+      }
       return {
         name: "g",
         attributes: { ...common, opacity: primitive.opacity },
@@ -81,6 +105,7 @@
       .map(([name, value]) => ` ${name}="${escapeAttribute(value)}"`)
       .join("");
     return `<${descriptor.name}${attributeText}>` +
+      (descriptor.text ? escapeAttribute(descriptor.text) : "") +
       descriptor.children.map(serialize).join("") +
       `</${descriptor.name}>`;
   }
@@ -117,6 +142,7 @@
       for (const child of descriptor.children) {
         element.appendChild(createElement(child));
       }
+      if (descriptor.text) element.textContent = descriptor.text;
       return element;
     }
 

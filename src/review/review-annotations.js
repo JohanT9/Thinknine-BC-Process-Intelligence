@@ -6,7 +6,10 @@
   const SCHEMA_VERSION = "1.0.0";
   const TYPES = Object.freeze({
     RECTANGLE: "rectangle",
-    ARROW: "arrow"
+    ARROW: "arrow",
+    HIGHLIGHT: "highlight",
+    NUMBERED_CALLOUT: "numbered-callout",
+    TEXT_LABEL: "text-label"
   });
   const DEFAULT_STYLES = Object.freeze({
     [TYPES.RECTANGLE]: Object.freeze({
@@ -20,7 +23,10 @@
       opacity: 1,
       arrowheadLength: 0.025,
       arrowheadWidth: 0.018
-    })
+    }),
+    [TYPES.HIGHLIGHT]: Object.freeze({ fill: "#fde047", opacity: 0.35 }),
+    [TYPES.NUMBERED_CALLOUT]: Object.freeze({ fill: "#dc2626", opacity: 1 }),
+    [TYPES.TEXT_LABEL]: Object.freeze({ fill: "#111827", opacity: 1 })
   });
 
   function clone(value) {
@@ -76,7 +82,8 @@
   }
 
   function normalizeGeometry(type, geometry) {
-    if (type === TYPES.RECTANGLE) return normalizedRectangle(geometry);
+    if ([TYPES.RECTANGLE, TYPES.HIGHLIGHT, TYPES.NUMBERED_CALLOUT,
+      TYPES.TEXT_LABEL].includes(type)) return normalizedRectangle(geometry);
     if (type === TYPES.ARROW) return normalizedArrow(geometry);
     return clone(geometry || {});
   }
@@ -89,6 +96,10 @@
       return { valid: false, errors: ["Annotation ID is required."] };
     }
     if (!Object.values(TYPES).includes(annotation.type)) {
+      return { valid: true, errors: [], supported: false };
+    }
+    if (![TYPES.RECTANGLE, TYPES.ARROW].includes(annotation.type) &&
+        annotation.schemaVersion !== SCHEMA_VERSION) {
       return { valid: true, errors: [], supported: false };
     }
     try {
@@ -156,15 +167,31 @@
       throw new TypeError(`Unsupported annotation type: ${type}`);
     }
     const now = options.now || new Date().toISOString();
+    const label = String(options.label || "");
+    if ([TYPES.NUMBERED_CALLOUT, TYPES.TEXT_LABEL].includes(type) &&
+        !label.trim()) {
+      throw new TypeError("Labeled annotations require a label.");
+    }
     return {
       annotationId: createId("ann", options.idFactory),
+      schemaVersion: SCHEMA_VERSION,
+      recordingId: String(options.recordingId || ""),
+      screenshotAssetId: options.screenshotAssetId
+        ? normalizedScreenshotRef(options.screenshotAssetId) : null,
+      ownerStepId: options.ownerStepId ? String(options.ownerStepId) : null,
       type,
       geometry: normalizeGeometry(type, geometry),
       style: {
         ...DEFAULT_STYLES[type],
         ...clone(options.style || {})
       },
-      accessibleLabel: options.accessibleLabel || "",
+      label,
+      accessibleLabel: options.accessibleLabel || label,
+      styleRole: options.styleRole || "attention",
+      visibility: options.visibility === "hidden" ? "hidden" : "visible",
+      provenance: options.provenance || "manual",
+      metadata: clone(options.metadata || {}),
+      futureFields: clone(options.futureFields || {}),
       createdAt: now,
       updatedAt: now
     };
@@ -201,7 +228,7 @@
       throw new Error(`Duplicate annotation ID: ${annotation.annotationId}`);
     }
     const now = options.now || new Date().toISOString();
-    set.items = [...items, clone(annotation)];
+    set.items = [...items, { ...clone(annotation), screenshotAssetId: reference }];
     set.revision = Number.isInteger(set.revision) ? set.revision + 1 : 1;
     set.updatedAt = now;
     review.annotations = store;
@@ -232,12 +259,13 @@
       ...current,
       ...clone(patch || {}),
       annotationId: current.annotationId,
-      type: current.type,
+      type: patch?.type && Object.values(TYPES).includes(patch.type)
+        ? patch.type : current.type,
       style: patch?.style
         ? { ...clone(current.style || {}), ...clone(patch.style) }
         : clone(current.style),
       geometry: patch?.geometry
-        ? normalizeGeometry(current.type, patch.geometry)
+        ? normalizeGeometry(patch?.type || current.type, patch.geometry)
         : clone(current.geometry),
       updatedAt: current.updatedAt
     };
@@ -277,6 +305,32 @@
     return clone(removed);
   }
 
+  function diagnostics(store, screenshotAssetIds = [], ownerStepIds = []) {
+    const assets = new Set(screenshotAssetIds.map(String));
+    const owners = new Set(ownerStepIds.map(String));
+    return (normalizeStore(store).screenshotSets || []).flatMap(set =>
+      (set.items || []).flatMap(annotation => {
+        const issues = [];
+        if (!assets.has(set.screenshotRef)) issues.push({
+          code: "orphaned-annotation-screenshot",
+          annotationId: annotation.annotationId,
+          screenshotAssetId: set.screenshotRef
+        });
+        if (annotation.ownerStepId && !owners.has(annotation.ownerStepId)) {
+          issues.push({ code: "orphaned-annotation-step",
+            annotationId: annotation.annotationId,
+            ownerStepId: annotation.ownerStepId });
+        }
+        if ([TYPES.NUMBERED_CALLOUT, TYPES.TEXT_LABEL].includes(annotation.type) &&
+            !String(annotation.accessibleLabel || annotation.label || "").trim()) {
+          issues.push({ code: "inaccessible-annotation",
+            annotationId: annotation.annotationId });
+        }
+        return issues;
+      })
+    );
+  }
+
   return {
     SCHEMA_VERSION,
     TYPES,
@@ -289,6 +343,7 @@
     createScreenshotSet,
     createAnnotation,
     findScreenshotSet,
+    diagnostics,
     add,
     update,
     remove

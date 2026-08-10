@@ -1,5 +1,11 @@
 # Architecture 4.6
 
+## Notes and visual annotations
+
+Notes attach prose to documentation identities. Annotations attach normalized
+geometry to screenshot assets. They remain separate Review models and resolve
+through the shared Semantic Document and media-composition pipeline.
+
 ## Manual documentation boundary
 
 Manual Steps are Review-owned documentation state with no fabricated evidence.

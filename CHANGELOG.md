@@ -1,5 +1,13 @@
 # Changelog
 
+## Notes & Annotations — v4.6
+
+- Added immutable Note ownership, types, visibility, provenance, orphan and empty diagnostics.
+- Formalized screenshot-owned Annotation schema with normalized geometry, labels,
+  semantic roles, visibility, provenance, and preserved future fields.
+- Added highlight, numbered-callout, and text-label composition alongside rectangle/arrow.
+- Integrated notes with Review history and shared semantic Workspace/Word callouts.
+
 ## Manual Information Steps — v4.6
 
 - Added versioned manual documentation objects with explicit manual provenance.

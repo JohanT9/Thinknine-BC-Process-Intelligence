@@ -26,6 +26,9 @@
   const manual = typeof module === "object" && module.exports
     ? require("./manual-information-steps")
     : root.T9ManualInformationSteps;
+  const notes = typeof module === "object" && module.exports
+    ? require("./review-notes")
+    : root.T9ReviewNotes;
   const api = factory(
     moveEngine,
     mergeEngine,
@@ -35,7 +38,8 @@
     annotations,
     stepEditor,
     structure,
-    manual
+    manual,
+    notes
   );
   if (typeof module === "object" && module.exports) module.exports = api;
   root.T9Review = api;
@@ -48,7 +52,8 @@
   annotations,
   stepEditor,
   structure,
-  manual
+  manual,
+  notes
 ) {
   function clone(value) {
     return JSON.parse(JSON.stringify(value));
@@ -127,6 +132,11 @@
 
   function createReview(session, tasks) {
     const now = new Date().toISOString();
+    const normalizedTasks = normalizeTasks(tasks, { modern: true });
+    const initialNotes = normalizedTasks.filter(task => task.userComment)
+      .map(task => notes.create({ recordingId: session.id,
+        ownerType: "step", ownerId: task.stepId || task.taskId,
+        content: task.userComment, now }));
     return {
       reviewVersion: "1.0.0",
       sessionId: session.id,
@@ -146,8 +156,10 @@
       structureOverrides: [],
       manualStepVersion: "1.0.0",
       manualSteps: [],
-      generatedTasks: normalizeTasks(tasks, { modern: true }),
-      tasks: normalizeTasks(tasks, { modern: true })
+      noteModelVersion: "1.0.0",
+      stepNotes: initialNotes,
+      generatedTasks: clone(normalizedTasks),
+      tasks: normalizedTasks
     };
   }
 
@@ -173,6 +185,8 @@
       afterStructureOverrides: review.structureOverrides,
       beforeManualSteps: options.beforeManualSteps,
       afterManualSteps: review.manualSteps,
+      beforeStepNotes: options.beforeStepNotes,
+      afterStepNotes: review.stepNotes,
       beforeSelection: options.beforeSelection,
       afterSelection: options.afterSelection,
       metadata: options.metadata,
@@ -365,6 +379,26 @@
   function updateTask(review, index, patch) {
     const task = review.tasks[index];
     const now = new Date().toISOString();
+    if (patch.userComment !== undefined) {
+      const ownerId = task.stepId || task.taskId;
+      const noteIndex = (review.stepNotes || []).findIndex(note =>
+        note.ownerType === "step" && note.ownerId === ownerId
+      );
+      if (patch.userComment) {
+        const value = noteIndex >= 0
+          ? notes.update(review.stepNotes[noteIndex], {
+            content: patch.userComment }, { now })
+          : notes.create({ recordingId: review.sessionId,
+            ownerType: "step", ownerId, content: patch.userComment, now });
+        review.stepNotes = [...(review.stepNotes || [])];
+        if (noteIndex >= 0) review.stepNotes[noteIndex] = value;
+        else review.stepNotes.push(value);
+      } else if (noteIndex >= 0) {
+        review.stepNotes = review.stepNotes.filter((_, itemIndex) =>
+          itemIndex !== noteIndex
+        );
+      }
+    }
     if (task.manualStepId) {
       const manualIndex = (review.manualSteps || []).findIndex(item =>
         item.manualStepId === task.manualStepId
@@ -430,9 +464,10 @@
     if (!review.tasks[index]) return review;
     const beforeTasks = historyEngine.snapshot(review.tasks);
     const beforeManualSteps = historyEngine.snapshot(review.manualSteps || []);
+    const beforeStepNotes = historyEngine.snapshot(review.stepNotes || []);
     updateTask(review, index, patch);
     return record(review, "edit", beforeTasks, {
-      ...options, beforeManualSteps
+      ...options, beforeManualSteps, beforeStepNotes
     });
   }
 
@@ -704,6 +739,44 @@
     return { review, ok: true };
   }
 
+  function addNote(review, ownerId, content, options = {}) {
+    const beforeTasks = historyEngine.snapshot(review.tasks);
+    const beforeStepNotes = historyEngine.snapshot(review.stepNotes || []);
+    const note = notes.create({ recordingId: review.sessionId,
+      ownerType: options.ownerType || "step", ownerId,
+      noteType: options.noteType || "note", content,
+      createdBy: options.createdBy, now: options.now,
+      futureFields: options.futureFields });
+    review.stepNotes = [...(review.stepNotes || []), note];
+    review.updatedAt = options.now || new Date().toISOString();
+    record(review, "note-create", beforeTasks, {
+      ...options, beforeStepNotes
+    });
+    return note;
+  }
+
+  function updateNote(review, noteId, patch, options = {}) {
+    const index = (review.stepNotes || []).findIndex(note => note.noteId === noteId);
+    if (index < 0) return null;
+    const beforeTasks = historyEngine.snapshot(review.tasks);
+    const beforeStepNotes = historyEngine.snapshot(review.stepNotes);
+    review.stepNotes[index] = notes.update(review.stepNotes[index], patch, options);
+    review.updatedAt = options.now || new Date().toISOString();
+    record(review, "note-update", beforeTasks, { ...options, beforeStepNotes });
+    return review.stepNotes[index];
+  }
+
+  function removeNote(review, noteId, options = {}) {
+    const existing = (review.stepNotes || []).find(note => note.noteId === noteId);
+    if (!existing) return null;
+    const beforeTasks = historyEngine.snapshot(review.tasks);
+    const beforeStepNotes = historyEngine.snapshot(review.stepNotes);
+    review.stepNotes = review.stepNotes.filter(note => note.noteId !== noteId);
+    review.updatedAt = options.now || new Date().toISOString();
+    record(review, "note-delete", beforeTasks, { ...options, beforeStepNotes });
+    return existing;
+  }
+
   function resetStructure(review, options = {}) {
     const beforeTasks = historyEngine.snapshot(review.tasks);
     const beforeStructureOverrides = historyEngine.snapshot(
@@ -768,6 +841,9 @@
     setTaskHidden,
     deleteManualStep,
     setManualStepScreenshot,
+    addNote,
+    updateNote,
+    removeNote,
     resetStructure,
     resolveTask: stepEditor.resolve,
     approveTask,

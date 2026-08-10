@@ -1,5 +1,8 @@
 # Manual Information Steps
 
+Manual Steps may own supplementary Notes and may reference annotated screenshots.
+Neither relationship fabricates captured-event traceability.
+
 ## Purpose and architecture
 
 Manual Information Steps are consultant-authored documentation objects. They

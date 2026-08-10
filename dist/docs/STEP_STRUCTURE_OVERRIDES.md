@@ -1,5 +1,8 @@
 # Step Structure Overrides
 
+Structure resolution preserves source note identities and screenshot annotation
+ownership. Merge never concatenates notes; split never guesses ownership.
+
 Manual Steps are anchor-resolved before Structure Overrides, allowing adjacent
 manual/recorded merge and manual split without assigning recorded evidence to
 manual content. Structural results retain both evidence and documentation provenance.

@@ -43,13 +43,18 @@
       ? undefined : clone(command.beforeManualSteps);
     const afterManualSteps = command.afterManualSteps === undefined
       ? undefined : clone(command.afterManualSteps);
+    const beforeStepNotes = command.beforeStepNotes === undefined
+      ? undefined : clone(command.beforeStepNotes);
+    const afterStepNotes = command.afterStepNotes === undefined
+      ? undefined : clone(command.afterStepNotes);
     if (
       JSON.stringify(beforeTasks) === JSON.stringify(afterTasks) &&
       command.beforeStatus === command.afterStatus &&
       JSON.stringify(beforeAnnotations) === JSON.stringify(afterAnnotations) &&
       JSON.stringify(beforeStructureOverrides) ===
         JSON.stringify(afterStructureOverrides) &&
-      JSON.stringify(beforeManualSteps) === JSON.stringify(afterManualSteps)
+      JSON.stringify(beforeManualSteps) === JSON.stringify(afterManualSteps) &&
+      JSON.stringify(beforeStepNotes) === JSON.stringify(afterStepNotes)
     ) {
       return review;
     }
@@ -67,6 +72,7 @@
         afterAnnotations,
         afterStructureOverrides,
         afterManualSteps,
+        afterStepNotes,
         afterSelection: command.afterSelection === undefined
           ? previous.afterSelection
           : clone(command.afterSelection),
@@ -90,6 +96,8 @@
         afterStructureOverrides,
         beforeManualSteps,
         afterManualSteps,
+        beforeStepNotes,
+        afterStepNotes,
         beforeSelection: clone(command.beforeSelection ?? null),
         afterSelection: clone(command.afterSelection ?? null),
         beforeAnnotationSelection: clone(
@@ -155,6 +163,9 @@
     const manualSteps = direction === "undo"
       ? entry.beforeManualSteps : entry.afterManualSteps;
     if (manualSteps !== undefined) review.manualSteps = clone(manualSteps);
+    const stepNotes = direction === "undo"
+      ? entry.beforeStepNotes : entry.afterStepNotes;
+    if (stepNotes !== undefined) review.stepNotes = clone(stepNotes);
     if (entry.beforeStatus !== undefined || entry.afterStatus !== undefined) {
       review.status = direction === "undo" ? entry.beforeStatus : entry.afterStatus;
     }
