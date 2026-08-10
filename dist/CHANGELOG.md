@@ -1,5 +1,12 @@
 # Changelog
 
+## Hide / Merge / Split — v4.6
+
+- Added versioned Step Structure Overrides with deterministic merge/partition IDs.
+- Added adjacent-merge validation, exact split-event partition validation,
+  structure reset, regeneration/orphan diagnostics, and preserved traceability.
+- Integrated structure state with Review Undo/Redo, autosave, and renderer parity.
+
 ## Step Editor — v4.6
 
 - Added sparse Step Overrides and deterministic Resolved Steps.

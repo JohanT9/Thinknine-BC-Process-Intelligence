@@ -1,5 +1,9 @@
 # Screenshot Selection Engine
 
+Resolved merged and split steps provide bounded candidate sets. Structure logic
+does not rank screenshots; manual selection and annotation safeguards remain
+authoritative.
+
 Step Editor manual selection stores only the candidate asset ID and is
 authoritative in Workspace and Word. Annotated evidence cannot be replaced
 silently; automatic recommendation and image bytes remain intact.

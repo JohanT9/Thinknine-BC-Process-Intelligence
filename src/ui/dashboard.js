@@ -4451,9 +4451,12 @@ function applyReviewToolbarState() {
     selection: activeReviewSelection,
     canUndo: activeReview && globalThis.T9Review.canUndo(activeReview),
     canRedo: activeReview && globalThis.T9Review.canRedo(activeReview),
+    hasStructureOverrides: Boolean(activeReview?.structureOverrides?.length),
     canExport: activeReview && activeReviewSession && activeReviewModel
   });
   globalThis.T9ReviewToolbar.apply($("reviewToolbar"), state);
+  $("resetReviewStructure").disabled =
+    !activeReview?.structureOverrides?.length;
   $("completeReview").disabled = !activeReview ||
     !globalThis.T9Review.canComplete(activeReview);
 }
@@ -4595,7 +4598,12 @@ function mergeSelectedReviewTasks() {
   const result = globalThis.T9Review.merge(activeReview, selectedIds, {
     beforeSelection: activeReviewSelection
   });
-  if (!result.mergedTask) return;
+  if (!result.mergedTask) {
+    show(result.reason === "non-adjacent-steps"
+      ? "Välj intilliggande steg för att slå samman dem."
+      : "Stegen kunde inte slås samman.", true);
+    return;
+  }
   const mergedId = result.mergedTask.taskId;
   activeReviewSelection = {
     selectedIds: [mergedId],
@@ -6012,6 +6020,15 @@ globalThis.T9ReviewToolbar.bind($("reviewToolbar"), (command, button) => {
   else if (command === "redo") restoreReviewHistory("redo");
   else if (command === "merge") mergeSelectedReviewTasks();
   else if (command === "split") splitSelectedReviewTask();
+  else if (command === "reset-structure") {
+    globalThis.T9Review.resetStructure(activeReview, {
+      beforeSelection: activeReviewSelection
+    });
+    activeReviewSelection = globalThis.T9ReviewSelection.create();
+    reviewAutoSave.schedule();
+    renderReview();
+    show("Dokumentstrukturen återställdes till genererad struktur.");
+  }
   else if (command === "move-up") {
     moveReviewTasksByOffset(
       -1,

@@ -410,6 +410,7 @@ table{width:100%;border-collapse:collapse}th,td{text-align:left;padding:9px;bord
             <div class="review-toolbar-group" role="group" aria-label="Struktur">
               <button id="mergeReviewSteps" data-review-command="merge" data-review-toolbar-item class="secondary" disabled>Slå samman</button>
               <button id="splitReviewStep" data-review-command="split" data-review-toolbar-item class="secondary" disabled>Dela</button>
+              <button id="resetReviewStructure" data-review-command="reset-structure" data-review-toolbar-item class="secondary" disabled>Återställ struktur</button>
             </div>
             <div class="review-toolbar-group" role="group" aria-label="Ordning">
               <button id="moveUpReviewSteps" data-review-command="move-up" data-review-toolbar-item class="secondary" disabled>Flytta upp</button>
@@ -580,6 +581,7 @@ table{width:100%;border-collapse:collapse}th,td{text-align:left;padding:9px;bord
 
 <script src="document/semantic-document.js"></script>
 <script src="review/step-editor.js"></script>
+<script src="review/step-structure-overrides.js"></script>
 <script src="document/review-document-projector.js"></script>
 <script src="document/language-excellence.js"></script>
 <script src="document/presentation-grammar.js"></script>

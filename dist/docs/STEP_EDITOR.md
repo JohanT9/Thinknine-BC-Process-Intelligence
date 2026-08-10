@@ -1,5 +1,9 @@
 # Step Editor
 
+Structure Overrides apply before Step Content Overrides. Content edits on stable
+resolved identities remain sparse; Reset Structure retains safely matchable
+content edits and preserves unmatched edits as orphan metadata.
+
 ## Purpose and architecture
 
 The Step Editor lets consultants refine generated documentation without changing

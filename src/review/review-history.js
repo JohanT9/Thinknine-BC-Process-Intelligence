@@ -35,10 +35,16 @@
     const afterAnnotations = command.afterAnnotations === undefined
       ? undefined
       : clone(command.afterAnnotations);
+    const beforeStructureOverrides = command.beforeStructureOverrides === undefined
+      ? undefined : clone(command.beforeStructureOverrides);
+    const afterStructureOverrides = command.afterStructureOverrides === undefined
+      ? undefined : clone(command.afterStructureOverrides);
     if (
       JSON.stringify(beforeTasks) === JSON.stringify(afterTasks) &&
       command.beforeStatus === command.afterStatus &&
-      JSON.stringify(beforeAnnotations) === JSON.stringify(afterAnnotations)
+      JSON.stringify(beforeAnnotations) === JSON.stringify(afterAnnotations) &&
+      JSON.stringify(beforeStructureOverrides) ===
+        JSON.stringify(afterStructureOverrides)
     ) {
       return review;
     }
@@ -54,6 +60,7 @@
         updatedAt: command.createdAt,
         afterTasks,
         afterAnnotations,
+        afterStructureOverrides,
         afterSelection: command.afterSelection === undefined
           ? previous.afterSelection
           : clone(command.afterSelection),
@@ -73,6 +80,8 @@
         afterTasks,
         beforeAnnotations,
         afterAnnotations,
+        beforeStructureOverrides,
+        afterStructureOverrides,
         beforeSelection: clone(command.beforeSelection ?? null),
         afterSelection: clone(command.afterSelection ?? null),
         beforeAnnotationSelection: clone(
@@ -130,6 +139,11 @@
       ? entry.beforeAnnotations
       : entry.afterAnnotations;
     if (annotations !== undefined) review.annotations = clone(annotations);
+    const structureOverrides = direction === "undo"
+      ? entry.beforeStructureOverrides : entry.afterStructureOverrides;
+    if (structureOverrides !== undefined) {
+      review.structureOverrides = clone(structureOverrides);
+    }
     if (entry.beforeStatus !== undefined || entry.afterStatus !== undefined) {
       review.status = direction === "undo" ? entry.beforeStatus : entry.afterStatus;
     }

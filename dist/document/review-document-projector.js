@@ -5,10 +5,17 @@
   const stepEditor = typeof module === "object" && module.exports
     ? require("../review/step-editor")
     : root.T9StepEditor;
-  const api = factory(model, stepEditor);
+  const structure = typeof module === "object" && module.exports
+    ? require("../review/step-structure-overrides")
+    : root.T9StepStructureOverrides;
+  const api = factory(model, stepEditor, structure);
   if (typeof module === "object" && module.exports) module.exports = api;
   root.T9ReviewDocumentProjector = api;
-})(typeof globalThis !== "undefined" ? globalThis : this, function (model, stepEditor) {
+})(typeof globalThis !== "undefined" ? globalThis : this, function (
+  model,
+  stepEditor,
+  structure
+) {
   const PROJECTOR_VERSION = "1.0.0";
   const ORIGIN = "review-document-projector";
   const DEFAULT_PURPOSE =
@@ -160,7 +167,23 @@
   }
 
   function project(reviewValue, options = {}) {
-    const review = object(stepEditor.resolveReview(reviewValue));
+    const structural = Array.isArray(reviewValue?.generatedTasks)
+      ? structure.resolve(reviewValue.generatedTasks,
+        reviewValue.structureOverrides || []) : null;
+    const currentTasks = reviewValue?.tasks || [];
+    const structuralTasks = structural ? structural.steps.map(step => {
+      const identity = step.stepId || step.taskId;
+      const current = currentTasks.find(task =>
+        (task.stepId || task.taskId) === identity
+      );
+      return current?.stepOverride
+        ? { ...step, stepOverride: clone(current.stepOverride) } : step;
+    }) : currentTasks;
+    const review = object(stepEditor.resolveReview({
+      ...clone(reviewValue), tasks: structuralTasks,
+      orphanedStructureOverrides: structural?.orphanedOverrides ||
+        reviewValue?.orphanedStructureOverrides || []
+    }));
     const session = object(options.session);
     const diagnostics = [];
     const metadata = projectMetadata(review, session);
@@ -239,8 +262,10 @@
         kind: "paragraph",
         text: instruction,
         sourceRef,
-        provenance: task.fieldProvenance?.instruction || "generated",
-        preserveUserText: task.fieldProvenance?.instruction === "user-edited"
+        provenance: task.fieldProvenance?.instruction ||
+          (task.structureProvenance ? "system-derived" : "generated"),
+        preserveUserText: task.fieldProvenance?.instruction === "user-edited" ||
+          Boolean(task.structureProvenance)
       }];
 
       const comment = text(task.userComment);

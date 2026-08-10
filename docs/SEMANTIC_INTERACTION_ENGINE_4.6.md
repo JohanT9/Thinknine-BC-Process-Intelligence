@@ -5,6 +5,9 @@ Reset restores the latest generated semantic instruction.
 
 ## Purpose
 
+Semantic Actions remain generated inputs. Structure resolution can reshape their
+document presentation but never changes the semantic interpretation itself.
+
 The engine now exposes `processStepGroups` as its primary normalized-recording
 entry point. A renderer-neutral adapter maps group structure into the established
 rule contract without generating final wording in the grouping layer. Semantic

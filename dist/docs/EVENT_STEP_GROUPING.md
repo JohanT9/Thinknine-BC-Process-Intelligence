@@ -5,6 +5,9 @@ structure only. They never rewrite Step Groups or source links.
 
 ## Purpose and architecture
 
+Manual Structure Overrides layer above this generated grouping. Merge does not
+combine Step Groups, and Split partitions presentation rather than evidence.
+
 Step Grouping converts ordered normalized mechanics into candidate documentation
 step boundaries:
 

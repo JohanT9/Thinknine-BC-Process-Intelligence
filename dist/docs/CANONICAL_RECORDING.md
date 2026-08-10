@@ -1,5 +1,8 @@
 # Canonical Recording
 
+Hide, Merge, and Split are document-presentation intent. They never delete or
+partition canonical evidence; their stored source IDs preserve the evidence chain.
+
 Step Editor changes are sparse Review-layer overrides. They can alter or hide a
 document projection but can never update or delete canonical events or assets.
 

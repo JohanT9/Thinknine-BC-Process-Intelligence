@@ -20,6 +20,9 @@
   const stepEditor = typeof module === "object" && module.exports
     ? require("./step-editor")
     : root.T9StepEditor;
+  const structure = typeof module === "object" && module.exports
+    ? require("./step-structure-overrides")
+    : root.T9StepStructureOverrides;
   const api = factory(
     moveEngine,
     mergeEngine,
@@ -27,7 +30,8 @@
     historyEngine,
     textFormat,
     annotations,
-    stepEditor
+    stepEditor,
+    structure
   );
   if (typeof module === "object" && module.exports) module.exports = api;
   root.T9Review = api;
@@ -38,10 +42,20 @@
   historyEngine,
   textFormat,
   annotations,
-  stepEditor
+  stepEditor,
+  structure
 ) {
   function clone(value) {
     return JSON.parse(JSON.stringify(value));
+  }
+
+  function ensureGeneratedStructure(review) {
+    review.structureOverrides = Array.isArray(review.structureOverrides)
+      ? review.structureOverrides : [];
+    review.generatedTasks = Array.isArray(review.generatedTasks)
+      ? review.generatedTasks : clone(review.tasks || []);
+    review.structureOverrideVersion = review.structureOverrideVersion || "1.0.0";
+    return review;
   }
 
   function normalizeTasks(tasks, options = {}) {
@@ -123,6 +137,9 @@
       commandHistory: [],
       historyIndex: 0,
       annotations: annotations.emptyStore(),
+      structureOverrideVersion: "1.0.0",
+      structureOverrides: [],
+      generatedTasks: normalizeTasks(tasks, { modern: true }),
       tasks: normalizeTasks(tasks, { modern: true })
     };
   }
@@ -145,6 +162,8 @@
       groupKey: options.groupKey,
       beforeTasks,
       afterTasks: review.tasks,
+      beforeStructureOverrides: options.beforeStructureOverrides,
+      afterStructureOverrides: review.structureOverrides,
       beforeSelection: options.beforeSelection,
       afterSelection: options.afterSelection,
       metadata: options.metadata,
@@ -379,7 +398,18 @@
   }
 
   function merge(review, selectedIds, options = {}) {
+    ensureGeneratedStructure(review);
     const beforeTasks = historyEngine.snapshot(review.tasks);
+    const beforeStructureOverrides = historyEngine.snapshot(
+      review.structureOverrides || []
+    );
+    const structural = structure.merge(review.tasks, selectedIds, {
+      recordingId: review.sessionId,
+      sequence: (review.structureOverrides || []).length,
+      now: options.now
+    });
+    if (!structural.ok) return { review, mergedTask: null,
+      reason: structural.reason };
     const result = mergeEngine.merge(review.tasks, selectedIds, options);
     if (!result.mergedTask) return { review, mergedTask: null };
     result.mergedTask.derivedStep = {
@@ -392,12 +422,18 @@
     };
     result.mergedTask.stepOverride = null;
     result.mergedTask.legacyFullCopy = false;
+    review.structureOverrides = [
+      ...(review.structureOverrides || []), structural.override
+    ];
+    result.mergedTask.structureOverrideId = structural.override.structureOverrideId;
+    result.mergedTask.stepId = structural.resolvedStepId;
     review.tasks = result.tasks;
     review.historyVersion = review.historyVersion || "1.0.0";
     review.history = [...(review.history || []), result.historyEntry];
     renumber(review);
     record(review, "merge", beforeTasks, {
       ...options,
+      beforeStructureOverrides,
       afterSelection: {
         selectedIds: [result.mergedTask.taskId],
         activeId: result.mergedTask.taskId,
@@ -409,7 +445,12 @@
   }
 
   function split(review, taskId, specification, options = {}) {
+    ensureGeneratedStructure(review);
     const beforeTasks = historyEngine.snapshot(review.tasks);
+    const beforeStructureOverrides = historyEngine.snapshot(
+      review.structureOverrides || []
+    );
+    const source = review.tasks.find(task => task.taskId === taskId);
     const result = splitEngine.split(
       review.tasks,
       taskId,
@@ -417,6 +458,23 @@
       options
     );
     if (!result.splitTasks.length) return { review, splitTasks: [] };
+    const sourceEvents = structure.eventIds(source);
+    const partitions = result.splitTasks.map((task, index) => ({
+      partitionId: task.taskId,
+      sourceEventIds: sourceEvents.filter((eventId, eventIndex) =>
+        eventIndex % result.splitTasks.length === index
+      ),
+      instruction: task.instruction
+    }));
+    const structural = structure.split(source, partitions, {
+      recordingId: review.sessionId,
+      sequence: (review.structureOverrides || []).length,
+      now: options.now
+    });
+    if (!structural.ok) return { review, splitTasks: [], reason: structural.reason };
+    review.structureOverrides = [
+      ...(review.structureOverrides || []), structural.override
+    ];
     result.splitTasks.forEach(task => {
       task.derivedStep = {
         title: task.title || "",
@@ -428,6 +486,11 @@
       };
       task.stepOverride = null;
       task.legacyFullCopy = false;
+      const partitionIndex = result.splitTasks.indexOf(task);
+      task.sourceStepIds = [taskId];
+      task.sourceEventIds = [...partitions[partitionIndex].sourceEventIds];
+      task.structureOverrideId = structural.override.structureOverrideId;
+      task.stepId = structural.resolvedStepIds[partitionIndex];
     });
     review.tasks = result.tasks;
     review.historyVersion = review.historyVersion || "1.0.0";
@@ -436,6 +499,7 @@
     const createdIds = result.splitTasks.map(task => task.taskId);
     record(review, "split", beforeTasks, {
       ...options,
+      beforeStructureOverrides,
       afterSelection: {
         selectedIds: createdIds,
         activeId: createdIds[0],
@@ -475,12 +539,62 @@
 
   function setTaskHidden(review, index, hidden, options = {}) {
     if (!review.tasks[index]) return review;
+    ensureGeneratedStructure(review);
     const beforeTasks = historyEngine.snapshot(review.tasks);
+    const beforeStructureOverrides = historyEngine.snapshot(
+      review.structureOverrides || []
+    );
+    if (hidden) {
+      review.structureOverrides = [...(review.structureOverrides || []),
+        structure.hide(review.tasks[index], {
+          recordingId: review.sessionId,
+          sequence: (review.structureOverrides || []).length,
+          now: options.now
+        })];
+    } else {
+      review.structureOverrides = (review.structureOverrides || []).filter(item =>
+        !(item.type === "hide" && item.sourceStepIds?.includes(
+          review.tasks[index].taskId
+        ))
+      );
+    }
     review.tasks[index].stepOverride = stepEditor.setVisibility(
       review.tasks[index], hidden, options
     );
     review.updatedAt = options.now || new Date().toISOString();
-    return record(review, "step-visibility", beforeTasks, options);
+    return record(review, "step-visibility", beforeTasks, {
+      ...options, beforeStructureOverrides
+    });
+  }
+
+  function resetStructure(review, options = {}) {
+    const beforeTasks = historyEngine.snapshot(review.tasks);
+    const beforeStructureOverrides = historyEngine.snapshot(
+      review.structureOverrides || []
+    );
+    review.structureOverrides = [];
+    if (Array.isArray(review.generatedTasks)) {
+      const contentOverrides = (review.tasks || []).filter(task => task.stepOverride)
+        .map(task => ({ taskId: task.taskId, stepId: task.stepId,
+          stepOverride: historyEngine.snapshot(task.stepOverride) }));
+      review.tasks = historyEngine.snapshot(review.generatedTasks).map(task => {
+        const match = contentOverrides.find(item => item.taskId === task.taskId ||
+          item.stepId === task.stepId);
+        return match ? { ...task, stepOverride: match.stepOverride } : task;
+      });
+      const matched = new Set(review.tasks.filter(task => task.stepOverride)
+        .map(task => task.stepOverride.overrideId));
+      review.orphanedStepOverrides = [
+        ...(review.orphanedStepOverrides || []),
+        ...contentOverrides.map(item => item.stepOverride).filter(override =>
+          !matched.has(override.overrideId)
+        )
+      ];
+    }
+    renumber(review);
+    return record(review, "structure-reset", beforeTasks, {
+      ...options, beforeStructureOverrides
+    });
   }
 
   function canComplete(review) {
@@ -515,6 +629,7 @@
     resetTaskField,
     selectTaskScreenshot,
     setTaskHidden,
+    resetStructure,
     resolveTask: stepEditor.resolve,
     approveTask,
     approveAll,

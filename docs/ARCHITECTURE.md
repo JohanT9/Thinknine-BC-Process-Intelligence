@@ -1,5 +1,11 @@
 # Architecture 4.6
 
+## Resolved structure
+
+Generated steps remain unchanged. Review Structure Overrides apply Hide, Merge,
+and Split before sparse content overrides. The resulting resolved structure is
+the sole input to document analysis, planning, Workspace, and Word.
+
 ## Step Editing boundary
 
 The Review layer owns sparse Step Overrides. Derived Step plus Step Override

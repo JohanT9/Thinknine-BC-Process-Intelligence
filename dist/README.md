@@ -1,5 +1,12 @@
 # Thinknine BC Process Intelligence v4.6.0 R1
 
+## Step Structure Overrides
+
+Review supports reversible Hide, adjacent Merge, and evidence-partitioned Split
+without rewriting generated Step Groups. Stable structural identities and source
+links feed the shared Workspace/Word pipeline. See
+[docs/STEP_STRUCTURE_OVERRIDES.md](docs/STEP_STRUCTURE_OVERRIDES.md).
+
 ## Step Editor
 
 Review editing uses sparse Step Overrides and deterministic Resolved Steps.
