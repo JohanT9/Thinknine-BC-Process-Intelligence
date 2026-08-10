@@ -39,6 +39,10 @@ Each normalized event references a primary canonical event and every contributin
 source ID. Raw browser type and evidence remain reconstructable. See
 [Event Normalization](EVENT_NORMALIZATION.md).
 
+Step Groups are a second derived projection over normalized mechanics. They
+preserve canonical source IDs but are never written into or used to modify the
+Canonical Recording.
+
 ## Identification metadata
 
 New events may contain `identification`, an immutable schema-v1 derived object

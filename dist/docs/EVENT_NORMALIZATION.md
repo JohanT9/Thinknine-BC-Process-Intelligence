@@ -103,3 +103,9 @@ Normalization performs no DOM access, external lookup, AI, OCR, or network
 request. Results are cached by immutable canonical recording identity. A large
 recording regression guards deterministic linear projection cost. Sensitive
 values are not copied into diagnostics or evidence.
+
+## Step grouping handoff
+
+Ordered normalized output is consumed by Event â†’ Step Grouping. Normalization
+owns browser-mechanic coalescing; grouping owns candidate documentation-step
+boundaries. Semantic business meaning remains downstream of both layers.

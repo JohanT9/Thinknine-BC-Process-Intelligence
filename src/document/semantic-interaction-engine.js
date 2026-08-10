@@ -116,6 +116,12 @@
         value.semanticActionModel?.sourceStepNos || value.sourceStepNos || [])),
       sourceEventNos: unique(values.flatMap(value =>
         value.semanticActionModel?.sourceEventNos || value.sourceEventNos || [])),
+      sourceEventIds: unique(values.flatMap(value =>
+        value.semanticActionModel?.sourceEventIds || value.sourceEventIds ||
+        (value.stepGroups || []).flatMap(group => group.sourceEventIds || []))),
+      stepGroupIds: unique(values.flatMap(value =>
+        value.semanticActionModel?.stepGroupIds ||
+        (value.stepGroups || []).map(group => group.stepGroupId))),
       screenshotRefs: unique(values.flatMap(value =>
         value.semanticActionModel?.screenshotRefs || (value.screenshots?.length
           ? value.screenshots : value.screenshot ? [value.screenshot] : []))),
@@ -382,6 +388,35 @@
     return deepFreeze(actions);
   }
 
+  function interactionFromStepGroup(group) {
+    const primary = group?.primaryNormalizedEvent || {};
+    const control = group?.controlContext || primary.controlIdentification || {};
+    const action = group?.actionContext || primary.actionIdentification || {};
+    const types = {
+      "field-edit": "ChangeField", "lookup-interaction": "Select",
+      selection: "SelectOption", "toggle-interaction": "Checkbox",
+      action: "RunAction", navigation: "Navigate",
+      "dialog-interaction": "Dialog", "row-interaction": "Select"
+    };
+    const selected = primary.selection?.caption ?? primary.selection?.value ?? "";
+    return {
+      taskId: group.stepGroupId,
+      taskType: types[group.groupKind] || "Unclassified",
+      fieldCaption: control.caption || "",
+      actionCaption: action.caption || "",
+      selectedCaption: selected ? String(selected) : "",
+      value: primary.value?.normalized ?? primary.state?.checked ?? selected,
+      inputSources: primary.subtype ? [primary.subtype] : [],
+      sourceEventIds: group.sourceEventIds || [],
+      stepGroups: [group],
+      normalizedInteractions: [primary]
+    };
+  }
+
+  function processStepGroups(groups = [], rules = BUILT_IN_RULES) {
+    return processInteractions(groups.map(interactionFromStepGroup), rules);
+  }
+
   function actionToInteraction(value) {
     if (value.passthrough) return clone(value.rawInteractions[0]);
     const first = clone(value.rawInteractions[0] || {});
@@ -495,6 +530,7 @@
     consolidateInteractions,
     processDocument,
     processInteractions,
+    processStepGroups,
     registry,
     selectedRecordValue
   };

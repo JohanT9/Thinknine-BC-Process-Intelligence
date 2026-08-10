@@ -3,6 +3,13 @@
 Ett modulärt Edge-tillägg för att spela in, granska och exportera dokumenterade
 Business Central-processer.
 
+## Event â†’ Step Grouping
+
+Ordered normalized mechanics now become immutable, versioned candidate Step
+Groups before semantic interpretation. Grouping owns safe interaction boundaries,
+preserves every canonical source and screenshot candidate, and emits no final
+instruction text. See [Event Step Grouping](docs/EVENT_STEP_GROUPING.md).
+
 ## Event Normalization
 
 Canonical raw evidence and BC identification can now be projected into one

@@ -14,6 +14,8 @@ event is saved. Identification is derived metadata stored separately from
 `event.raw`; persistence never rewrites raw evidence to match identification.
 Event Normalization subsequently derives mechanics in memory and performs no
 canonical or legacy storage writes.
+Step Grouping is likewise derived and cannot suppress or delete persisted raw
+evidence.
 
 ## Storage contract
 

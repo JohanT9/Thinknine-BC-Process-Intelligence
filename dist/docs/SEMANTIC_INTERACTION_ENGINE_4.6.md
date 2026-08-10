@@ -2,6 +2,13 @@
 
 ## Purpose
 
+The engine now exposes `processStepGroups` as its primary normalized-recording
+entry point. A renderer-neutral adapter maps group structure into the established
+rule contract without generating final wording in the grouping layer. Semantic
+Actions retain Step Group and canonical source IDs. Existing task-sequence
+consolidation remains temporarily available for legacy Reviews and recordings
+lacking modern grouping metadata.
+
 The engine converts deterministic low-level interaction sequences into concise
 business actions. It improves representation only: rules never invent values,
 change workflow meaning, mutate Review, remove provenance or inspect images.

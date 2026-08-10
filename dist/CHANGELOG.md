@@ -1,5 +1,18 @@
 # Changelog
 
+## 4.6.0 â€” Event â†’ Step Grouping
+
+- Added deterministic schema-v1 Step Groups with grouping algorithm version
+  `1.0.0`, stable source-derived IDs, primary/supporting events, and diagnostics.
+- Grouped same-control edit sequences and verified lookup/search/row/result
+  round-trips while preserving conservative boundaries for ambiguous relations.
+- Added toggle, selection, action, navigation, dialog, row, unknown, page, and
+  frame-aware grouping plus ordered screenshot candidate aggregation.
+- Classified focus-only and scroll-only mechanics explicitly as non-step noise;
+  every other normalized event is assigned exactly once or reported unassigned.
+- Added a Step Group entry point for Semantic Interaction Rules while retaining
+  legacy consolidation fallback and unchanged Review/Workspace/Word behavior.
+
 ## 4.6.0 â€” Event Normalization
 
 - Added immutable schema-v1 Normalized Interaction Events derived from canonical

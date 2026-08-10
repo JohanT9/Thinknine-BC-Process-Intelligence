@@ -3,6 +3,7 @@ importScripts("engine/canonical-recording.js");
 importScripts("engine/raw-event-persistence.js");
 importScripts("engine/bc-ui-identification.js");
 importScripts("engine/event-normalization.js");
+importScripts("engine/event-step-grouping.js");
 importScripts("engine/privacy-mask.js");
 importScripts("engine/screenshot-capture-policy.js");
 importScripts("document/document-library.js");
@@ -831,7 +832,12 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
         const normalized = recording
           ? globalThis.T9EventNormalization.normalizeRecording(recording)
           : { schemaVersion: 1, recordingId: message.sessionId, events: [] };
+        const grouped = globalThis.T9EventStepGrouping.group(normalized);
         const mechanicsBySource = new Map();
+        const groupsByNormalizedEvent = new Map();
+        grouped.groups.forEach(group => group.normalizedEventIds.forEach(id =>
+          groupsByNormalizedEvent.set(id, group)
+        ));
         normalized.events.forEach(item => item.sourceEventIds.forEach(id =>
           mechanicsBySource.set(id, item)
         ));
@@ -840,6 +846,10 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
               ...event,
               normalizedInteraction: mechanicsBySource.get(
                 recording.events[index]?.id
+              ) || null,
+              stepGroup: groupsByNormalizedEvent.get(
+                mechanicsBySource.get(recording.events[index]?.id)
+                  ?.normalizedEventId
               ) || null
             }))
           : legacy.events;
@@ -849,6 +859,8 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
           session: legacy.session,
           events: projectedEvents,
           normalizedEvents: normalized.events,
+          stepGroups: grouped.groups,
+          groupingDiagnostics: grouped.diagnostics,
           screenshots: message.includeScreenshots === false
             ? {}
             : await getScreenshots(message.sessionId)

@@ -1,5 +1,19 @@
 # Architecture 4.6
 
+## Event â†’ Step Grouping
+
+```text
+Canonical Evidence -> Identification -> Normalization -> Step Grouping
+  -> Semantic Interaction Rules -> existing document pipeline
+```
+
+`event-step-grouping.js` is the single owner of candidate documentation-step
+boundaries for normalized input. Its versioned, immutable state machine groups
+same-control committed edits and only verifiable lookup round-trips. Strong
+action, navigation, page, unrelated-control, and ambiguity boundaries remain
+small and safe. Semantic rules receive Step Groups through a dedicated adapter;
+legacy task consolidation remains a compatibility fallback.
+
 ## Event Normalization
 
 ```text

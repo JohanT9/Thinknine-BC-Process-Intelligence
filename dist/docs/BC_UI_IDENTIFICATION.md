@@ -17,6 +17,8 @@ Raw evidence is never changed.
 Identification is the structural input to Event Normalization. The normalizer
 references page, control, action, container, and frame metadata without changing
 the identification result or duplicating its evidence into raw capture.
+Stable control and page identities are also the preferred evidence for safe Step
+Group continuity; captions are used only as an in-recording fallback.
 
 ## Pages
 

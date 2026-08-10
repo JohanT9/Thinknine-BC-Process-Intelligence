@@ -1020,6 +1020,8 @@ function uiStep({
     normalizedInteractions: [...new Map(sourceEvents
       .map(event => event.normalizedInteraction).filter(Boolean)
       .map(item => [item.normalizedEventId, item])).values()],
+    stepGroups: [...new Map(sourceEvents.map(event => event.stepGroup)
+      .filter(Boolean).map(group => [group.stepGroupId, group])).values()],
     inputSources: [...new Set(sourceEvents.map(event => event.inputSource)
       .filter(Boolean))],
     timestamp: sourceEvents[0]?.timestamp || "",
@@ -2389,6 +2391,7 @@ function createBusinessTasks(businessSteps) {
       sourceEventNos: step.sourceEventNos || [],
       identifications: step.identifications || [],
       normalizedInteractions: step.normalizedInteractions || [],
+      stepGroups: step.stepGroups || [],
       inputSources: step.inputSources || [],
       screenshot: step.screenshot || null,
       importance: step.importance || "normal",
