@@ -1,0 +1,32 @@
+# Canonical Recording
+
+The Canonical Recording is the permanent source of truth for captured activity.
+Generated documentation, review edits, process models, and exports are derived
+data; they must not replace or rewrite the original events.
+
+```text
+Capture -> Canonical Recording -> Future interpretation layer
+        -> Process / Support / Training -> Exporters
+```
+
+## Schema version 1
+
+`RecordingSession` contains `id`, `schemaVersion`, `metadata`, immutable source
+`events`, referenced `assets`, `createdAt`, and `updatedAt`. Understood event
+properties are normalized while the complete captured event, including unknown
+fields, is retained in `raw`.
+
+Screenshots remain physically stored by the existing browser-storage mechanism.
+Each recording asset has a stable ID and storage-compatible path; an event uses
+`screenshotAssetId`, so the filename is not its identity.
+
+Schema handling is centralized in `engine/canonical-recording.js`. Future
+non-destructive migrations belong in `normalize`. Legacy session, event, and
+screenshot records are normalized in memory as schema v1 without modifying the
+original stored values.
+
+New captures are dual-written to the canonical key and established storage keys.
+Dashboard processing and Word export receive a legacy-shaped projection from the
+canonical recording, preserving current behavior. Review edits remain separate
+and cannot remove canonical source events. Future process steps should reference
+source event IDs instead of replacing events.

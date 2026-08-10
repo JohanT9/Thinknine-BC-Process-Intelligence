@@ -4,6 +4,7 @@
   root.T9StorageKeys = api;
 })(typeof globalThis !== "undefined" ? globalThis : this, function () {
   const SESSION_PREFIX = "t9_session_";
+  const RECORDING_PREFIX = "t9_recording_";
   const EVENT_PREFIX = "t9_events_";
   const SCREENSHOT_PREFIX = "t9_screenshots_";
   const REVIEW_PREFIX = "t9_review_";
@@ -12,6 +13,7 @@
   function sessionDataKeys(sessionId) {
     return [
       SESSION_PREFIX + sessionId,
+      RECORDING_PREFIX + sessionId,
       EVENT_PREFIX + sessionId,
       SCREENSHOT_PREFIX + sessionId,
       REVIEW_PREFIX + sessionId
@@ -22,6 +24,7 @@
     EVENT_PREFIX,
     DOCUMENT_LIBRARY_KEY,
     REVIEW_PREFIX,
+    RECORDING_PREFIX,
     SCREENSHOT_PREFIX,
     SESSION_PREFIX,
     sessionDataKeys

@@ -1,4 +1,5 @@
 importScripts("engine/storage-keys.js");
+importScripts("engine/canonical-recording.js");
 importScripts("engine/privacy-mask.js");
 importScripts("engine/screenshot-capture-policy.js");
 importScripts("document/document-library.js");
@@ -34,6 +35,7 @@ const STATE_KEY = "t9_state";
 const SETTINGS_KEY = "t9_settings";
 const {
   EVENT_PREFIX,
+  RECORDING_PREFIX,
   REVIEW_PREFIX,
   SCREENSHOT_PREFIX,
   SESSION_PREFIX
@@ -41,6 +43,7 @@ const {
 const DEBUG_KEY = "t9_debug";
 
 let writeQueue = Promise.resolve();
+let canonicalWriteQueue = Promise.resolve();
 
 const SCREENSHOT_MIN_INTERVAL_MS = 1100;
 let screenshotQueue = [];
@@ -132,6 +135,27 @@ async function saveScreenshots(id, screenshots) {
   await chrome.storage.local.set({
     [SCREENSHOT_PREFIX + id]: screenshots
   });
+}
+
+async function getCanonicalRecording(id) {
+  const key = RECORDING_PREFIX + id;
+  const data = await chrome.storage.local.get(key);
+  if (data[key]) return globalThis.T9CanonicalRecording.normalize(data[key]);
+  const session = await getSession(id);
+  if (!session) return null;
+  return globalThis.T9CanonicalRecording.fromLegacy(session, await getEvents(id), await getScreenshots(id));
+}
+
+async function saveCanonicalRecording(recording) {
+  await chrome.storage.local.set({ [RECORDING_PREFIX + recording.id]: recording });
+}
+
+function updateCanonicalRecording(id, change) {
+  canonicalWriteQueue = canonicalWriteQueue.then(async () => {
+    const recording = await getCanonicalRecording(id);
+    if (recording) await saveCanonicalRecording(change(recording));
+  });
+  return canonicalWriteQueue;
 }
 
 function signature(event) {
@@ -265,6 +289,9 @@ async function processScreenshotQueue() {
       // Reuse the same screenshot for nearby events instead of taking another one.
       screenshots[item.eventNo] = image;
       await saveScreenshots(item.sessionId, screenshots);
+      await updateCanonicalRecording(item.sessionId, recording =>
+        globalThis.T9CanonicalRecording.addScreenshot(recording, item.eventNo, image)
+      );
 
       screenshotStats.captured += 1;
 
@@ -318,6 +345,9 @@ async function recordEvent(rawEvent, senderTabId) {
 
     events.push(event);
     await saveEvents(state.sessionId, events);
+    await updateCanonicalRecording(state.sessionId, recording =>
+      globalThis.T9CanonicalRecording.addEvent(recording, event)
+    );
 
     session.eventCount = events.length;
     session.updatedAt = event.timestamp;
@@ -565,6 +595,9 @@ async function startSession(message, tabId) {
   await saveSession(session);
   await saveEvents(id, []);
   await saveScreenshots(id, {});
+  await saveCanonicalRecording(globalThis.T9CanonicalRecording.create({
+    id, startedAt: now, legacySession: session
+  }));
   await setState({
     recording: true,
     sessionId: id,
@@ -599,6 +632,9 @@ async function stopSession() {
     session.completedAt = new Date().toISOString();
     session.updatedAt = session.completedAt;
     await saveSession(session);
+    await updateCanonicalRecording(state.sessionId, recording =>
+      globalThis.T9CanonicalRecording.finish(recording, session.completedAt)
+    );
   }
 
   try {
@@ -764,16 +800,22 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
         break;
       }
 
-      case "T9_GET_SESSION_DATA":
+      case "T9_GET_SESSION_DATA": {
+        const recording = await getCanonicalRecording(message.sessionId);
+        const legacy = recording
+          ? globalThis.T9CanonicalRecording.legacyView(recording)
+          : { session: null, events: [] };
         sendResponse({
           ok: true,
-          session: await getSession(message.sessionId),
-          events: await getEvents(message.sessionId),
+          recording,
+          session: legacy.session,
+          events: legacy.events,
           screenshots: message.includeScreenshots === false
             ? {}
             : await getScreenshots(message.sessionId)
         });
         break;
+      }
 
       case "T9_DOWNLOAD_FILE": {
         const downloadId = await chrome.downloads.download({
