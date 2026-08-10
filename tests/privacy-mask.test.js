@@ -22,7 +22,9 @@ const background = fs.readFileSync(path.join(__dirname,
 assert(background.includes('importScripts("engine/privacy-mask.js")'));
 assert(background.includes("globalThis.T9PrivacyMask.mask("));
 assert(!background.includes('return "[antal]"'));
-assert(background.includes("event.inputSource,"),
-  "input and focusout events must not share a deduplication signature");
+assert(background.includes("item.source?.eventId === sourceEventId"),
+  "only exact source-message redelivery may be deduplicated");
+assert(!background.includes("previous?.signature"),
+  "semantic similarity must not remove raw evidence");
 
 console.log("Recorder privacy masking behaviour tests passed.");

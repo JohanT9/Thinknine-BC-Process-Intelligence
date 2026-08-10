@@ -1,5 +1,19 @@
 # Changelog
 
+## 4.6.0 â€” Raw Event Persistence
+
+- Made Canonical Recording the first durable write for newly accepted events.
+- Added source-generated event identities, canonical insertion ordering, frame
+  provenance, accessible target metadata, and complete raw payload retention.
+- Replaced semantic-similarity deduplication with exact source-delivery
+  duplicate protection so legitimate repeated interactions remain evidence.
+- Added one serialized canonical writer for event append, delayed screenshot
+  association, recovery-safe storage failure handling, and finalization.
+- Made stop wait for accepted event and screenshot writes before establishing
+  the completed-recording immutability boundary.
+- Preserved legacy loading, Review behavior, semantic output, Document Workspace,
+  and Word/DOCX output without migration or visible UI changes.
+
 ## 4.6.0 R3.2 — Presentation Grammar
 
 - Added a dedicated renderer-neutral Presentation Grammar layer after Language

@@ -6,6 +6,8 @@
   let sessionId = null;
   let lastUrl = location.href;
   let lastPageSignature = "";
+  const sourceFrameId = crypto.randomUUID();
+  let sourceSequence = 0;
   const inputTimers = new WeakMap();
 
   try {
@@ -256,6 +258,10 @@
       chrome.runtime.sendMessage({
         type: "T9_RECORD_EVENT",
         event: {
+          sourceEventId: crypto.randomUUID(),
+          source: "business-central-content-script",
+          sourceFrameId,
+          sourceSequence: ++sourceSequence,
           timestamp: new Date().toISOString(),
           ...context(),
           ...event
@@ -276,6 +282,8 @@
     record({
       type: "click",
       category: categoryOf(target),
+      clientX: event.clientX,
+      clientY: event.clientY,
       ...descriptor(target)
     });
   }, true);

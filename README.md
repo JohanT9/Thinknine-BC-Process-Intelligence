@@ -3,6 +3,20 @@
 Ett modulärt Edge-tillägg för att spela in, granska och exportera dokumenterade
 Business Central-processer.
 
+## Raw Event Persistence
+
+New recordings persist accepted interactions to the Canonical Recording before
+legacy compatibility storage or document interpretation. Canonical events are
+append-only while capture is active and immutable after finalization. Stable
+source-event IDs and canonical insertion sequence make equal-timestamp and
+multi-frame events deterministic. Screenshots are associated later as separate
+assets without becoming a prerequisite for retaining an event.
+
+Review, semantic interpretation, Document Workspace, and Word remain derived
+consumers and cannot rewrite canonical evidence. Existing recordings are
+normalized non-destructively and require no migration. See
+[Raw Event Persistence](docs/RAW_EVENT_PERSISTENCE.md).
+
 ## Presentation Grammar 4.6 R3.2
 
 Dokumentvyn och Word-exporten använder nu samma visuella grammatik. Åtgärder

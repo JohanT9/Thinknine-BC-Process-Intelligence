@@ -30,3 +30,12 @@ Dashboard processing and Word export receive a legacy-shaped projection from the
 canonical recording, preserving current behavior. Review edits remain separate
 and cannot remove canonical source events. Future process steps should reference
 source event IDs instead of replacing events.
+
+## Raw persistence boundary
+
+For new captures, canonical append is the first durable evidence write. Events
+carry a source delivery ID and monotonically increasing canonical `sequence`.
+They may receive a delayed `screenshotAssetId` while recording is active, but
+cannot be replaced or deleted. Finalization waits for accepted writes and then
+prevents further event or asset changes. The serialized ownership and recovery
+contract is documented in [Raw Event Persistence](RAW_EVENT_PERSISTENCE.md).

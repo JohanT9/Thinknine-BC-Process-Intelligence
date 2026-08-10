@@ -1,5 +1,28 @@
 # Architecture 4.6
 
+## Raw Event Persistence
+
+```text
+Browser interaction -> capture normalization -> canonical raw persistence
+  -> Canonical Recording -> semantic interpretation -> document pipeline
+```
+
+`raw-event-persistence.js` is the sole owner of canonical write serialization.
+Every mutation reloads the last durable recording, applies one append,
+association, or finalization operation, and saves it before the next operation.
+The canonical write precedes the temporary legacy event projection. Stop blocks
+new acceptance, drains accepted writes and screenshot associations, then writes
+the completion boundary.
+
+Capture frames assign a UUID to each source delivery plus frame-local sequence.
+Canonical insertion sequence is authoritative ordering; timestamps and source
+sequences remain evidence rather than sorting keys. Exact source IDs reject
+message redelivery, while semantically repeated interactions remain distinct.
+
+Review and every document layer operate on projections. Their mutations never
+flow back into Canonical Recording. See `RAW_EVENT_PERSISTENCE.md` for the full
+storage, recovery, privacy, and immutability contracts.
+
 ## Presentation Grammar 4.6 R3.2
 
 ```text

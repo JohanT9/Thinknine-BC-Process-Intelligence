@@ -1,5 +1,6 @@
 importScripts("engine/storage-keys.js");
 importScripts("engine/canonical-recording.js");
+importScripts("engine/raw-event-persistence.js");
 importScripts("engine/privacy-mask.js");
 importScripts("engine/screenshot-capture-policy.js");
 importScripts("document/document-library.js");
@@ -43,11 +44,13 @@ const {
 const DEBUG_KEY = "t9_debug";
 
 let writeQueue = Promise.resolve();
-let canonicalWriteQueue = Promise.resolve();
+let stoppingSessionId = null;
+let canonicalPersistenceError = null;
 
 const SCREENSHOT_MIN_INTERVAL_MS = 1100;
 let screenshotQueue = [];
 let screenshotWorkerRunning = false;
+let screenshotWorkerPromise = Promise.resolve();
 let lastScreenshotAt = 0;
 
 const screenshotStats = {
@@ -150,27 +153,10 @@ async function saveCanonicalRecording(recording) {
   await chrome.storage.local.set({ [RECORDING_PREFIX + recording.id]: recording });
 }
 
-function updateCanonicalRecording(id, change) {
-  canonicalWriteQueue = canonicalWriteQueue.then(async () => {
-    const recording = await getCanonicalRecording(id);
-    if (recording) await saveCanonicalRecording(change(recording));
-  });
-  return canonicalWriteQueue;
-}
-
-function signature(event) {
-  return JSON.stringify([
-    event.type,
-    event.category,
-    event.label,
-    event.fieldName,
-    event.value,
-    event.inputSource,
-    event.pageId,
-    event.pageCaption,
-    event.frameUrl
-  ]);
-}
+const canonicalStore = globalThis.T9RawEventPersistence.createStore({
+  load: getCanonicalRecording,
+  save: saveCanonicalRecording
+});
 
 async function capture(tabId) {
   try {
@@ -201,6 +187,7 @@ function screenshotPriority(category) {
 async function enqueueScreenshot({
   sessionId,
   eventNo,
+  eventId,
   tabId,
   category,
   captureKey = ""
@@ -219,6 +206,7 @@ async function enqueueScreenshot({
     if (screenshotPriority(category) > screenshotPriority(existing.category)) {
       existing.category = category;
       existing.eventNo = eventNo;
+      existing.eventId = eventId;
       existing.tabId = tabId;
     }
     screenshotStats.reused += 1;
@@ -232,6 +220,7 @@ async function enqueueScreenshot({
   screenshotQueue.push({
     sessionId,
     eventNo,
+    eventId,
     tabId,
     category,
     captureKey,
@@ -249,7 +238,7 @@ async function enqueueScreenshot({
   });
 
   if (!screenshotWorkerRunning) {
-    void processScreenshotQueue();
+    screenshotWorkerPromise = processScreenshotQueue();
   }
 }
 
@@ -289,8 +278,8 @@ async function processScreenshotQueue() {
       // Reuse the same screenshot for nearby events instead of taking another one.
       screenshots[item.eventNo] = image;
       await saveScreenshots(item.sessionId, screenshots);
-      await updateCanonicalRecording(item.sessionId, recording =>
-        globalThis.T9CanonicalRecording.addScreenshot(recording, item.eventNo, image)
+      await canonicalStore.associateScreenshot(
+        item.sessionId, item.eventId, image, new Date().toISOString()
       );
 
       screenshotStats.captured += 1;
@@ -308,24 +297,32 @@ async function processScreenshotQueue() {
 }
 
 async function recordEvent(rawEvent, senderTabId) {
-  writeQueue = writeQueue.then(async () => {
-    const state = await getState();
-    if (!state.recording || !state.sessionId) return;
+  const acceptedState = await getState();
+  if (!acceptedState.recording || !acceptedState.sessionId ||
+      stoppingSessionId === acceptedState.sessionId) return;
 
-    const session = await getSession(state.sessionId);
+  const operation = writeQueue.then(async () => {
+    const recordingId = acceptedState.sessionId;
+    const session = await getSession(recordingId);
     if (!session || session.status !== "recording") return;
 
     const settings = session.settings || await getSettings();
-    const events = await getEvents(state.sessionId);
-    if (events.length >= settings.maxEvents) {
+    const canonicalBefore = await getCanonicalRecording(recordingId);
+    if (canonicalBefore.events.length >= settings.maxEvents) {
       await setDebug({ lastError: "Maximalt antal händelser har uppnåtts." });
       return;
     }
 
+    const sourceEventId = rawEvent?.sourceEventId || crypto.randomUUID();
+    if (canonicalBefore.events.some(item =>
+      item.source?.eventId === sourceEventId
+    )) return;
+
     const event = {
-      eventNo: events.length + 1,
-      timestamp: rawEvent.timestamp || new Date().toISOString(),
-      ...rawEvent
+      ...rawEvent,
+      eventNo: canonicalBefore.events.length + 1,
+      timestamp: rawEvent?.timestamp || new Date().toISOString(),
+      sourceEventId
     };
 
     if ("value" in event) {
@@ -334,20 +331,12 @@ async function recordEvent(rawEvent, senderTabId) {
       );
     }
 
-    event.signature = signature(event);
-    const previous = events.at(-1);
-    if (
-      previous?.signature === event.signature &&
-      Math.abs(new Date(event.timestamp) - new Date(previous.timestamp)) < 700
-    ) {
-      return;
-    }
-
-    events.push(event);
-    await saveEvents(state.sessionId, events);
-    await updateCanonicalRecording(state.sessionId, recording =>
-      globalThis.T9CanonicalRecording.addEvent(recording, event)
+    const canonical = await canonicalStore.append(recordingId, event);
+    const canonicalEvent = canonical.events.find(item =>
+      item.source?.eventId === event.sourceEventId
     );
+    const events = canonical.events.map(item => item.raw);
+    await saveEvents(recordingId, events);
 
     session.eventCount = events.length;
     session.updatedAt = event.timestamp;
@@ -356,9 +345,10 @@ async function recordEvent(rawEvent, senderTabId) {
     if (globalThis.T9ScreenshotCapturePolicy.shouldCapture(settings, event)) {
       const captureCategory = globalThis.T9ScreenshotCapturePolicy.category(event);
       await enqueueScreenshot({
-        sessionId: state.sessionId,
+        sessionId: recordingId,
         eventNo: event.eventNo,
-        tabId: senderTabId || state.tabId,
+        eventId: canonicalEvent.id,
+        tabId: senderTabId || acceptedState.tabId,
         category: captureCategory,
         captureKey: event.fieldName || ""
       });
@@ -376,7 +366,7 @@ async function recordEvent(rawEvent, senderTabId) {
 
     await setDebug({
       connected: true,
-      activeSessionId: state.sessionId,
+      activeSessionId: recordingId,
       eventCount: events.length,
       eventTypeCounts,
       eventCategoryCounts,
@@ -390,11 +380,13 @@ async function recordEvent(rawEvent, senderTabId) {
       },
       lastError: null
     });
-  }).catch(async error => {
+  });
+  writeQueue = operation.catch(async error => {
+    canonicalPersistenceError ||= error;
     await setDebug({ lastError: String(error) });
   });
 
-  return writeQueue;
+  return operation;
 }
 
 
@@ -572,6 +564,8 @@ async function startSession(message, tabId) {
   const now = new Date().toISOString();
 
   screenshotQueue = [];
+  stoppingSessionId = null;
+  canonicalPersistenceError = null;
   lastScreenshotAt = 0;
   screenshotStats.requested = 0;
   screenshotStats.captured = 0;
@@ -595,7 +589,7 @@ async function startSession(message, tabId) {
   await saveSession(session);
   await saveEvents(id, []);
   await saveScreenshots(id, {});
-  await saveCanonicalRecording(globalThis.T9CanonicalRecording.create({
+  await canonicalStore.create(globalThis.T9CanonicalRecording.create({
     id, startedAt: now, legacySession: session
   }));
   await setState({
@@ -625,17 +619,7 @@ async function startSession(message, tabId) {
 async function stopSession() {
   const state = await getState();
   if (!state.sessionId) return null;
-
-  const session = await getSession(state.sessionId);
-  if (session) {
-    session.status = "completed";
-    session.completedAt = new Date().toISOString();
-    session.updatedAt = session.completedAt;
-    await saveSession(session);
-    await updateCanonicalRecording(state.sessionId, recording =>
-      globalThis.T9CanonicalRecording.finish(recording, session.completedAt)
-    );
-  }
+  stoppingSessionId = state.sessionId;
 
   try {
     if (state.tabId) {
@@ -646,6 +630,25 @@ async function stopSession() {
       });
     }
   } catch {}
+
+  // All accepted events and delayed screenshot associations become durable
+  // before the immutable completion boundary is written.
+  await writeQueue;
+  if (canonicalPersistenceError) {
+    throw new Error(
+      "Recording remains incomplete because canonical evidence could not be persisted."
+    );
+  }
+  await screenshotWorkerPromise;
+
+  const session = await getSession(state.sessionId);
+  if (session) {
+    session.status = "completed";
+    session.completedAt = new Date().toISOString();
+    session.updatedAt = session.completedAt;
+    await canonicalStore.finalize(state.sessionId, session.completedAt);
+    await saveSession(session);
+  }
 
   screenshotStats.dropped += screenshotQueue.length;
   screenshotQueue = [];
@@ -660,6 +663,7 @@ async function stopSession() {
     activeSessionId: null,
     lastError: null
   });
+  stoppingSessionId = null;
 
   return session;
 }
