@@ -23,7 +23,19 @@
 
   function interactionText(value) {
     return [value?.fieldCaption, value?.actionCaption, value?.selectedCaption,
-      value?.instruction, value?.description].map(text).join(" ");
+      value?.instruction, value?.description,
+      ...(value?.identifications || []).flatMap(identification => [
+        identification?.page?.caption,
+        identification?.control?.caption,
+        identification?.action?.caption
+      ])].map(text).join(" ");
+  }
+
+  function controlCaption(value) {
+    return text(value?.fieldCaption) || text(
+      value?.identifications?.find(item => item?.control?.caption)
+        ?.control?.caption
+    );
   }
 
   function unique(values) {
@@ -295,7 +307,7 @@
     singleRule({ ruleId: "quantity-entry", priority: 75,
       match: value => Boolean(meaningfulValue(value)) &&
         /^(?:sortera efter\s+)?(?:antal|quantity)$/iu
-          .test(text(value?.fieldCaption)),
+          .test(controlCaption(value)),
       actionType: () => "EnterQuantity",
       targetField: "Antal",
       display: (_value, selected) => selected

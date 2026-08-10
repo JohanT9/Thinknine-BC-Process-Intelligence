@@ -3,6 +3,16 @@
 Ett modulärt Edge-tillägg för att spela in, granska och exportera dokumenterade
 Business Central-processer.
 
+## BC Page / Control / Action Identification
+
+Captured canonical events now include renderer-neutral `identification` metadata
+describing observable Business Central page, control, action, container, and
+frame structure. Technical identity is retained only when exposed by route or
+DOM metadata; localized captions remain separate display evidence. Identification
+uses bounded target ancestry and deterministic accessible-name precedence, and
+never rewrites raw evidence or generates documentation language. See
+[BC UI Identification](docs/BC_UI_IDENTIFICATION.md).
+
 ## Raw Event Persistence
 
 New recordings persist accepted interactions to the Canonical Recording before

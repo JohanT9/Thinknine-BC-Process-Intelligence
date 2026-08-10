@@ -1,6 +1,7 @@
 importScripts("engine/storage-keys.js");
 importScripts("engine/canonical-recording.js");
 importScripts("engine/raw-event-persistence.js");
+importScripts("engine/bc-ui-identification.js");
 importScripts("engine/privacy-mask.js");
 importScripts("engine/screenshot-capture-policy.js");
 importScripts("document/document-library.js");
@@ -331,7 +332,13 @@ async function recordEvent(rawEvent, senderTabId) {
       );
     }
 
-    const canonical = await canonicalStore.append(recordingId, event);
+    const canonicalEventId = `${recordingId}:event:${sourceEventId}`;
+    const identification = globalThis.T9BCUIIdentification.identify(event, {
+      eventId: canonicalEventId
+    });
+    const canonical = await canonicalStore.append(
+      recordingId, event, identification
+    );
     const canonicalEvent = canonical.events.find(item =>
       item.source?.eventId === event.sourceEventId
     );

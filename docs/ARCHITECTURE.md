@@ -1,5 +1,23 @@
 # Architecture 4.6
 
+## BC UI Identification
+
+```text
+Canonical Raw Event -> BC UI Identification -> compatible event projection
+  -> Semantic Interaction Rules -> existing document pipeline
+```
+
+`bc-ui-identification.js` deterministically derives immutable, versioned UI
+structure from captured browser evidence. The result is stored beside—not
+inside—the canonical event's unchanged `raw` payload and references the stable
+canonical event ID. Identification describes page, control, action, observable
+hierarchy, frame context, evidence, and qualitative confidence.
+
+The content recorder performs only target-local and eight-ancestor-bounded
+capture. Captions never become technical identities. Existing dashboard caption
+fallbacks may read identification, but interpretation and language remain owned
+by downstream layers.
+
 ## Raw Event Persistence
 
 ```text

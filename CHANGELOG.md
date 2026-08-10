@@ -1,5 +1,17 @@
 # Changelog
 
+## 4.6.0 â€” BC Page / Control / Action Identification
+
+- Added immutable schema-v1 identification linked to canonical source events.
+- Captured explicit page-route IDs, technical control/action attributes,
+  accessible names, state, frame context, and bounded observable UI hierarchy.
+- Added conservative field, lookup, option, checkbox, action, repeater, dialog,
+  FactBox, subpage, and control-add-in classification with qualitative evidence.
+- Preserved localized captions separately from technical identity and retained
+  honest unknown results when Business Central exposes no identifier.
+- Exposed detached identification metadata to existing processing while keeping
+  Review, semantic wording, Document Workspace, and Word behavior unchanged.
+
 ## 4.6.0 â€” Raw Event Persistence
 
 - Made Canonical Recording the first durable write for newly accepted events.

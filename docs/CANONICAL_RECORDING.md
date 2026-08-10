@@ -31,6 +31,14 @@ canonical recording, preserving current behavior. Review edits remain separate
 and cannot remove canonical source events. Future process steps should reference
 source event IDs instead of replacing events.
 
+## Identification metadata
+
+New events may contain `identification`, an immutable schema-v1 derived object
+referencing the canonical event ID. It is persisted beside `raw`; it never
+changes raw capture fields, identity, ordering, values, frames, or screenshots.
+Legacy events without identification remain valid. See
+[BC UI Identification](BC_UI_IDENTIFICATION.md).
+
 ## Raw persistence boundary
 
 For new captures, canonical append is the first durable evidence write. Events

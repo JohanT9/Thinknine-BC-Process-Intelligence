@@ -9,7 +9,7 @@
   function eventType(type) {
     return ({ "page-state": "pageOpened", "field-change": "fieldChanged", dialog: "dialogOpened" })[type] || type || "other";
   }
-  function canonicalEvent(sessionId, source = {}, index = 0) {
+  function canonicalEvent(sessionId, source = {}, index = 0, identification = null) {
     const eventNo = source.eventNo || index + 1;
     const sourceEventId = source.sourceEventId || source.captureId || null;
     const event = {
@@ -31,6 +31,7 @@
       },
       raw: clone(source)
     };
+    if (identification) event.identification = clone(identification);
     if (source.pageId || source.pageCaption || source.frameUrl) event.page = { id: source.pageId || undefined, name: source.pageCaption || undefined, url: source.frameUrl || undefined };
     if (source.pageId || source.pageCaption) event.businessCentral = { pageId: source.pageId || undefined, pageName: source.pageCaption || undefined };
     if (source.fieldName || source.label || source.role) event.control = { name: source.fieldName || source.label || undefined, role: source.role || undefined };
@@ -84,13 +85,13 @@
     if (Number(input.schemaVersion) !== SCHEMA_VERSION) throw new Error(`Unsupported recording schema: ${input.schemaVersion}`);
     const result = clone(input); result.events = Array.isArray(result.events) ? result.events : []; result.assets = Array.isArray(result.assets) ? result.assets : []; result.metadata ||= {}; return result;
   }
-  function addEvent(recording, source) {
+  function addEvent(recording, source, identification = null) {
     if (!source || typeof source !== "object" || Array.isArray(source) || !source.type) throw new TypeError("A raw event with a type is required.");
     const sourceId = source.sourceEventId || source.captureId;
     if (sourceId && recording.events?.some(event => event.source?.eventId === sourceId)) return recording;
     const result = normalize(recording);
     if (result.metadata.finishedAt) throw new Error("Completed recording evidence is immutable.");
-    result.events.push(canonicalEvent(result.id, source, result.events.length));
+    result.events.push(canonicalEvent(result.id, source, result.events.length, identification));
     result.updatedAt = source.timestamp || new Date().toISOString();
     return result;
   }
@@ -110,6 +111,6 @@
     return result;
   }
   function finish(recording, finishedAt) { if (recording.metadata?.finishedAt) { if (recording.metadata.finishedAt === finishedAt) return recording; throw new Error("Completed recording evidence is immutable."); } const result = normalize(recording); result.metadata.finishedAt = finishedAt; result.updatedAt = finishedAt; if (result.compatibility?.session) Object.assign(result.compatibility.session, { completedAt: finishedAt, updatedAt: finishedAt, status: "completed" }); return result; }
-  function legacyView(recording) { const value = normalize(recording); const session = clone(value.compatibility?.session || {}); Object.assign(session, { id: value.id, name: session.name || value.metadata.title, purpose: session.purpose || value.metadata.recordingPurpose || "", startedAt: session.startedAt || value.metadata.startedAt, completedAt: session.completedAt || value.metadata.finishedAt || null, updatedAt: value.updatedAt, eventCount: value.events.length }); return { session, events: value.events.map(event => clone(event.raw || { id: event.id, timestamp: event.timestamp, type: event.type })) }; }
+  function legacyView(recording) { const value = normalize(recording); const session = clone(value.compatibility?.session || {}); Object.assign(session, { id: value.id, name: session.name || value.metadata.title, purpose: session.purpose || value.metadata.recordingPurpose || "", startedAt: session.startedAt || value.metadata.startedAt, completedAt: session.completedAt || value.metadata.finishedAt || null, updatedAt: value.updatedAt, eventCount: value.events.length }); return { session, events: value.events.map(event => ({ ...clone(event.raw || { id: event.id, timestamp: event.timestamp, type: event.type }), ...(event.identification ? { identification: clone(event.identification) } : {}) })) }; }
   return { SCHEMA_VERSION, addEvent, addScreenshot, create, finish, fromLegacy, legacyView, normalize };
 });

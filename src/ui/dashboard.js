@@ -31,6 +31,7 @@ const CONTEXT_BUILDER_VERSION = "1.0.0";
 
 function contextPageCaption(event) {
   return cleanUiCaption(
+    event.identification?.page?.caption ||
     event.pageCaption ||
     event.documentTitle ||
     ""
@@ -39,6 +40,7 @@ function contextPageCaption(event) {
 
 function eventControlCaption(event) {
   return cleanUiCaption(
+    event.identification?.control?.caption ||
     event.fieldName ||
     event.label ||
     ""
@@ -1012,6 +1014,7 @@ function uiStep({
   return {
     step: 0,
     sourceEventNos: sourceEvents.map(event => event.eventNo),
+    identifications: sourceEvents.map(event => event.identification).filter(Boolean),
     inputSources: [...new Set(sourceEvents.map(event => event.inputSource)
       .filter(Boolean))],
     timestamp: sourceEvents[0]?.timestamp || "",
@@ -2379,6 +2382,7 @@ function createBusinessTasks(businessSteps) {
           : "",
       sourceStepNos: [step.step],
       sourceEventNos: step.sourceEventNos || [],
+      identifications: step.identifications || [],
       inputSources: step.inputSources || [],
       screenshot: step.screenshot || null,
       importance: step.importance || "normal",

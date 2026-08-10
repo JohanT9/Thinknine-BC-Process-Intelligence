@@ -8,6 +8,11 @@ normalization only. Semantic Actions, language, presentation, screenshot
 selection, document plans, Review state, and exports are derived interpretations
 and cannot write back to raw evidence.
 
+After privacy normalization, accepted raw evidence is structurally identified
+by the deterministic BC UI Identification layer before the combined canonical
+event is saved. Identification is derived metadata stored separately from
+`event.raw`; persistence never rewrites raw evidence to match identification.
+
 ## Storage contract
 
 - Canonical key: `t9_recording_<recordingId>`.

@@ -219,6 +219,48 @@
   }
 
   function descriptor(element) {
+    const labelledBy = element?.getAttribute?.("aria-labelledby") || "";
+    const labelledText = labelledBy.split(/\s+/).filter(Boolean)
+      .map(id => document.getElementById(id)).filter(Boolean).map(textOf).join(" ");
+    let associatedLabel = "";
+    if (element?.id) {
+      try { associatedLabel = textOf(document.querySelector(`label[for="${CSS.escape(element.id)}"]`)); }
+      catch {}
+    }
+    const ariaLabel = element?.getAttribute?.("aria-label") || "";
+    const title = element?.getAttribute?.("title") || "";
+    const placeholder = element?.getAttribute?.("placeholder") || "";
+    const elementText = clean(element?.innerText || element?.textContent || "");
+    const accessibleName = labelledText || ariaLabel || associatedLabel || elementText || title || placeholder || getLabel(element);
+    const accessibleNameSource = labelledText ? "aria-labelledby" : ariaLabel
+      ? "aria-label" : associatedLabel ? "label-for" : elementText
+        ? "element-text" : title ? "title" : placeholder
+          ? "placeholder" : "surrounding-label";
+    const uiHierarchy = [];
+    let ancestor = element?.parentElement;
+    for (let depth = 0; ancestor && depth < 8; depth += 1, ancestor = ancestor.parentElement) {
+      const role = ancestor.getAttribute("role") || "";
+      const classes = String(ancestor.className || "");
+      const explicit = ancestor.getAttribute("data-control-type") || ancestor.getAttribute("data-part-type") || "";
+      let type = explicit;
+      let heuristic = false;
+      if (!type && (role === "dialog" || ancestor.getAttribute("aria-modal") === "true")) type = "dialog";
+      else if (!type && /fasttab/i.test(classes)) { type = "fastTab"; heuristic = true; }
+      else if (!type && /factbox/i.test(classes)) { type = "factBox"; heuristic = true; }
+      else if (!type && /subpage|part-container/i.test(classes)) { type = "subpage"; heuristic = true; }
+      else if (!type && /actiongroup/i.test(classes)) { type = "actionGroup"; heuristic = true; }
+      else if (!type && /actionbar/i.test(classes)) { type = "actionBar"; heuristic = true; }
+      else if (!type && /controladdin/i.test(classes)) { type = "controlAddIn"; heuristic = true; }
+      else if (!type && role === "grid") type = "repeater";
+      else if (!type && role === "row") type = "row";
+      else if (!type && role === "group") type = "group";
+      if (type) uiHierarchy.unshift({
+        type,
+        caption: clean(ancestor.getAttribute("aria-label") || ancestor.getAttribute("data-caption") || "", 180),
+        identity: clean(ancestor.getAttribute("data-control-id") || ancestor.getAttribute("data-control-name") || "", 180),
+        heuristic
+      });
+    }
     return {
       role: element?.getAttribute?.("role") || element?.tagName?.toLowerCase() || "",
       controlType: element?.tagName?.toLowerCase() || "",
@@ -227,7 +269,24 @@
         element?.getAttribute?.("data-control-id") ||
         element?.getAttribute?.("data-control-name") ||
         "",
-      label: textOf(element) || getLabel(element)
+      dataControlId: element?.getAttribute?.("data-control-id") || "",
+      dataControlName: element?.getAttribute?.("data-control-name") || "",
+      fieldId: element?.getAttribute?.("data-field-id") || "",
+      controlId: element?.getAttribute?.("data-control-id") || "",
+      elementId: element?.id || "",
+      nameAttribute: element?.getAttribute?.("name") || "",
+      inputType: element?.getAttribute?.("type") || "",
+      ariaHasPopup: element?.getAttribute?.("aria-haspopup") || "",
+      placeholder,
+      accessibleName,
+      accessibleNameSource,
+      label: accessibleName,
+      readOnly: Boolean(element?.readOnly),
+      disabled: Boolean(element?.disabled || element?.getAttribute?.("aria-disabled") === "true"),
+      checked: element?.checked ?? undefined,
+      selected: element?.getAttribute?.("aria-selected") === "true" || undefined,
+      controlAddIn: uiHierarchy.some(item => item.type === "controlAddIn") || /Mui[A-Z]/.test(String(element?.className || "")),
+      uiHierarchy
     };
   }
 
@@ -331,12 +390,15 @@
 
   document.addEventListener("keydown", event => {
     if (!["Enter", "Escape", "F4"].includes(event.key)) return;
+    const target = interactiveTarget(event.target) || event.target;
 
     record({
       type: "key",
       category: "interaction",
       key: event.key,
-      fieldName: getLabel(event.target)
+      inputSource: "keyboard",
+      fieldName: getLabel(event.target),
+      ...descriptor(target)
     });
   }, true);
 
@@ -347,10 +409,14 @@
         if (dialog.dataset.t9RecordedDialog === "1") return;
 
         dialog.dataset.t9RecordedDialog = "1";
+        const dialogDescriptor = descriptor(dialog);
         record({
           type: "dialog",
           category: "dialog",
-          label: textOf(dialog).slice(0, 600)
+          ...dialogDescriptor,
+          label: textOf(dialog).slice(0, 600),
+          uiHierarchy: [{ type: "dialog", caption: textOf(dialog).slice(0, 180) },
+            ...dialogDescriptor.uiHierarchy]
         });
       });
 

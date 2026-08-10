@@ -26,10 +26,10 @@
       create(recording) {
         return enqueue(recording.id, () => recording);
       },
-      append(recordingId, rawEvent) {
+      append(recordingId, rawEvent, identification = null) {
         return enqueue(recordingId, current => {
           if (!current) throw new Error(`Recording not found: ${recordingId}`);
-          return canonical.addEvent(current, rawEvent);
+          return canonical.addEvent(current, rawEvent, identification);
         });
       },
       associateScreenshot(recordingId, eventId, dataUrl, createdAt) {
