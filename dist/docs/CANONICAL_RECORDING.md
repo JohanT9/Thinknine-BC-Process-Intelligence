@@ -31,6 +31,14 @@ canonical recording, preserving current behavior. Review edits remain separate
 and cannot remove canonical source events. Future process steps should reference
 source event IDs instead of replacing events.
 
+## Normalized interaction projection
+
+Normalized Interaction Events are derived on read from immutable canonical
+events and identification. They are not stored back into Canonical Recording.
+Each normalized event references a primary canonical event and every contributing
+source ID. Raw browser type and evidence remain reconstructable. See
+[Event Normalization](EVENT_NORMALIZATION.md).
+
 ## Identification metadata
 
 New events may contain `identification`, an immutable schema-v1 derived object

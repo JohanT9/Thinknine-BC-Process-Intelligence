@@ -2,6 +2,7 @@ importScripts("engine/storage-keys.js");
 importScripts("engine/canonical-recording.js");
 importScripts("engine/raw-event-persistence.js");
 importScripts("engine/bc-ui-identification.js");
+importScripts("engine/event-normalization.js");
 importScripts("engine/privacy-mask.js");
 importScripts("engine/screenshot-capture-policy.js");
 importScripts("document/document-library.js");
@@ -297,7 +298,7 @@ async function processScreenshotQueue() {
   }
 }
 
-async function recordEvent(rawEvent, senderTabId) {
+async function recordEvent(rawEvent, captureContext = {}) {
   const acceptedState = await getState();
   if (!acceptedState.recording || !acceptedState.sessionId ||
       stoppingSessionId === acceptedState.sessionId) return;
@@ -323,7 +324,12 @@ async function recordEvent(rawEvent, senderTabId) {
       ...rawEvent,
       eventNo: canonicalBefore.events.length + 1,
       timestamp: rawEvent?.timestamp || new Date().toISOString(),
-      sourceEventId
+      sourceEventId,
+      tabId: captureContext.tabId ?? rawEvent?.tabId,
+      browserFrameId: captureContext.frameId ?? rawEvent?.browserFrameId,
+      parentFrameId: captureContext.parentFrameId ?? rawEvent?.parentFrameId,
+      documentId: captureContext.documentId || rawEvent?.documentId,
+      frameOrigin: captureContext.origin || rawEvent?.frameOrigin
     };
 
     if ("value" in event) {
@@ -355,7 +361,7 @@ async function recordEvent(rawEvent, senderTabId) {
         sessionId: recordingId,
         eventNo: event.eventNo,
         eventId: canonicalEvent.id,
-        tabId: senderTabId || acceptedState.tabId,
+        tabId: captureContext.tabId || acceptedState.tabId,
         category: captureCategory,
         captureKey: event.fieldName || ""
       });
@@ -785,7 +791,13 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
       }
 
       case "T9_RECORD_EVENT":
-        await recordEvent(message.event, sender.tab?.id);
+        await recordEvent(message.event, {
+          tabId: sender.tab?.id,
+          frameId: sender.frameId,
+          parentFrameId: sender.parentFrameId,
+          documentId: sender.documentId,
+          origin: sender.origin || sender.url
+        });
         sendResponse({ ok: true });
         break;
 
@@ -816,11 +828,27 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
         const legacy = recording
           ? globalThis.T9CanonicalRecording.legacyView(recording)
           : { session: null, events: [] };
+        const normalized = recording
+          ? globalThis.T9EventNormalization.normalizeRecording(recording)
+          : { schemaVersion: 1, recordingId: message.sessionId, events: [] };
+        const mechanicsBySource = new Map();
+        normalized.events.forEach(item => item.sourceEventIds.forEach(id =>
+          mechanicsBySource.set(id, item)
+        ));
+        const projectedEvents = recording
+          ? legacy.events.map((event, index) => ({
+              ...event,
+              normalizedInteraction: mechanicsBySource.get(
+                recording.events[index]?.id
+              ) || null
+            }))
+          : legacy.events;
         sendResponse({
           ok: true,
           recording,
           session: legacy.session,
-          events: legacy.events,
+          events: projectedEvents,
+          normalizedEvents: normalized.events,
           screenshots: message.includeScreenshots === false
             ? {}
             : await getScreenshots(message.sessionId)

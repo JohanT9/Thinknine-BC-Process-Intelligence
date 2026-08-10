@@ -1,5 +1,19 @@
 # Changelog
 
+## 4.6.0 â€” Event Normalization
+
+- Added immutable schema-v1 Normalized Interaction Events derived from canonical
+  raw evidence and BC identification.
+- Added deterministic activation, value, selection, toggle, keyboard,
+  navigation, focus, lookup, dialog, row-selection, and unknown mechanics.
+- Coalesced consecutive input/change/focusout deliveries for the same committed
+  value while retaining every contributing canonical source ID.
+- Added changed-value focusout fallback for standard and React/MUI inputs,
+  focus-only suppression, stable IDs, canonical ordering, and frame/coordinate
+  preservation.
+- Exposed normalized mechanics to Semantic Interaction Rules while preserving
+  legacy fallbacks and unchanged Review, Workspace, and Word behavior.
+
 ## 4.6.0 â€” BC Page / Control / Action Identification
 
 - Added immutable schema-v1 identification linked to canonical source events.

@@ -14,6 +14,10 @@ control, action, nearest container, ordered hierarchy, frame context,
 qualitative confidence, and safe evidence. It is persisted beside `event.raw`.
 Raw evidence is never changed.
 
+Identification is the structural input to Event Normalization. The normalizer
+references page, control, action, container, and frame metadata without changing
+the identification result or duplicating its evidence into raw capture.
+
 ## Pages
 
 The layer retains page caption, route, explicitly captured page name, and the

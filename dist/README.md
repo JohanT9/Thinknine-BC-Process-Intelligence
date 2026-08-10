@@ -3,6 +3,14 @@
 Ett modulärt Edge-tillägg för att spela in, granska och exportera dokumenterade
 Business Central-processer.
 
+## Event Normalization
+
+Canonical raw evidence and BC identification can now be projected into one
+immutable, renderer-neutral interaction contract. Browser-specific input,
+change, focus, pointer, keyboard, navigation, selection, toggle, lookup, and
+dialog mechanics normalize deterministically without changing raw events or
+interpreting business intent. See [Event Normalization](docs/EVENT_NORMALIZATION.md).
+
 ## BC Page / Control / Action Identification
 
 Captured canonical events now include renderer-neutral `identification` metadata

@@ -9,6 +9,7 @@
   const sourceFrameId = crypto.randomUUID();
   let sourceSequence = 0;
   const inputTimers = new WeakMap();
+  const initialValues = new WeakMap();
 
   try {
     chrome.runtime.sendMessage({ type: "T9_GET_STATE" }, response => {
@@ -219,6 +220,7 @@
   }
 
   function descriptor(element) {
+    const bounds = element?.getBoundingClientRect?.();
     const labelledBy = element?.getAttribute?.("aria-labelledby") || "";
     const labelledText = labelledBy.split(/\s+/).filter(Boolean)
       .map(id => document.getElementById(id)).filter(Boolean).map(textOf).join(" ");
@@ -286,7 +288,11 @@
       checked: element?.checked ?? undefined,
       selected: element?.getAttribute?.("aria-selected") === "true" || undefined,
       controlAddIn: uiHierarchy.some(item => item.type === "controlAddIn") || /Mui[A-Z]/.test(String(element?.className || "")),
-      uiHierarchy
+      uiHierarchy,
+      localBounds: bounds ? { x: bounds.x, y: bounds.y,
+        width: bounds.width, height: bounds.height } : undefined,
+      devicePixelRatio: window.devicePixelRatio || 1,
+      viewportScale: window.visualViewport?.scale || 1
     };
   }
 
@@ -355,6 +361,9 @@
       category: "field",
       fieldName: getLabel(element) || "Okänt fält",
       value: valueOf(element),
+      previousValue: initialValues.has(element)
+        ? initialValues.get(element)
+        : undefined,
       inputSource: source,
       ...descriptor(element)
     });
@@ -371,6 +380,15 @@
     );
   }, true);
 
+  document.addEventListener("focusin", event => {
+    const element = event.target;
+    if (!(element instanceof Element) ||
+        !element.matches('input,textarea,select,[contenteditable="true"]')) return;
+    initialValues.set(element, valueOf(element));
+    record({ type: "focus", category: "lifecycle", value: valueOf(element),
+      ...descriptor(element) });
+  }, true);
+
   document.addEventListener("change", event => {
     if (event.target instanceof Element) {
       emitField(event.target, "change");
@@ -384,18 +402,26 @@
       element instanceof Element &&
       element.matches('input,textarea,select,[contenteditable="true"]')
     ) {
+      clearTimeout(inputTimers.get(element));
       emitField(element, "focusout");
+      initialValues.delete(element);
     }
   }, true);
 
   document.addEventListener("keydown", event => {
-    if (!["Enter", "Escape", "F4"].includes(event.key)) return;
+    if (!["Enter", " ", "Spacebar", "Escape", "F4"].includes(event.key)) return;
     const target = interactiveTarget(event.target) || event.target;
 
     record({
       type: "key",
       category: "interaction",
       key: event.key,
+      code: event.code,
+      altKey: event.altKey,
+      ctrlKey: event.ctrlKey,
+      metaKey: event.metaKey,
+      shiftKey: event.shiftKey,
+      repeat: event.repeat,
       inputSource: "keyboard",
       fieldName: getLabel(event.target),
       ...descriptor(target)

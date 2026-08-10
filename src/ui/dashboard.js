@@ -985,7 +985,9 @@ function semanticActionForCaption(caption, event) {
 function isTechnicalEvent(event) {
   return (
     event.type === "pointer" ||
+    event.type === "focus" ||
     event.type === "page-state" ||
+    event.category === "lifecycle" ||
     event.category === "technical"
   );
 }
@@ -1015,6 +1017,9 @@ function uiStep({
     step: 0,
     sourceEventNos: sourceEvents.map(event => event.eventNo),
     identifications: sourceEvents.map(event => event.identification).filter(Boolean),
+    normalizedInteractions: [...new Map(sourceEvents
+      .map(event => event.normalizedInteraction).filter(Boolean)
+      .map(item => [item.normalizedEventId, item])).values()],
     inputSources: [...new Set(sourceEvents.map(event => event.inputSource)
       .filter(Boolean))],
     timestamp: sourceEvents[0]?.timestamp || "",
@@ -2383,6 +2388,7 @@ function createBusinessTasks(businessSteps) {
       sourceStepNos: [step.step],
       sourceEventNos: step.sourceEventNos || [],
       identifications: step.identifications || [],
+      normalizedInteractions: step.normalizedInteractions || [],
       inputSources: step.inputSources || [],
       screenshot: step.screenshot || null,
       importance: step.importance || "normal",

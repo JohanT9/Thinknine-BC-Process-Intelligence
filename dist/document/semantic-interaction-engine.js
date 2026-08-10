@@ -72,7 +72,9 @@
   }
 
   function typed(value) {
-    return (value?.inputSources || []).includes("input");
+    return (value?.normalizedInteractions || []).some(item =>
+      item.kind === "value-change"
+    ) || (value?.inputSources || []).includes("input");
   }
 
   function focusOnly(value) {

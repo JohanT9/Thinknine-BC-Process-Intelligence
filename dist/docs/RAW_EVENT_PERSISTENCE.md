@@ -12,6 +12,8 @@ After privacy normalization, accepted raw evidence is structurally identified
 by the deterministic BC UI Identification layer before the combined canonical
 event is saved. Identification is derived metadata stored separately from
 `event.raw`; persistence never rewrites raw evidence to match identification.
+Event Normalization subsequently derives mechanics in memory and performs no
+canonical or legacy storage writes.
 
 ## Storage contract
 

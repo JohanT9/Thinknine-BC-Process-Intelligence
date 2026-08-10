@@ -1,5 +1,20 @@
 # Architecture 4.6
 
+## Event Normalization
+
+```text
+Canonical Raw Event -> BC UI Identification -> Event Normalization
+  -> Semantic Interaction Rules -> existing document pipeline
+```
+
+`event-normalization.js` owns business-neutral UI mechanics. It derives an
+immutable recording projection and never writes Canonical Recording. Consecutive
+input/change/focusout evidence for one control and committed value is mechanically
+coalesced at the final source position; all contributing canonical IDs remain.
+The dashboard transports normalized mechanics alongside legacy fields, allowing
+Semantic Interaction Rules to prefer the stable contract while retaining old
+recording fallbacks.
+
 ## BC UI Identification
 
 ```text
