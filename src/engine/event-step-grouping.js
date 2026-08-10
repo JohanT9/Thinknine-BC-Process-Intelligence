@@ -41,7 +41,9 @@
       controlContext: clone(primary.controlIdentification || {}),
       actionContext: clone(primary.actionIdentification),
       groupKind: groupKind(events), groupingReason: unique(reasons),
-      screenshotAssetIds: unique(events.map(event => event.screenshotAssetId)),
+      screenshotAssetIds: unique(events.flatMap(event =>
+        event.screenshotAssetIds || (event.screenshotAssetId
+          ? [event.screenshotAssetId] : []))),
       frameContexts: events.map(event => clone(event.frameContext || {})),
       primaryNormalizedEvent: clone(primary),
       supportingNormalizedEventIds: events.filter(event => event !== primary).map(event => event.normalizedEventId),

@@ -844,6 +844,9 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
         const projectedEvents = recording
           ? legacy.events.map((event, index) => ({
               ...event,
+              canonicalSourceEventId: recording.events[index]?.id || "",
+              canonicalScreenshotAssetId:
+                recording.events[index]?.screenshotAssetId || "",
               normalizedInteraction: mechanicsBySource.get(
                 recording.events[index]?.id
               ) || null,

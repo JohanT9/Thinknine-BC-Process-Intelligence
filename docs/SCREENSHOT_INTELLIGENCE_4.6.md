@@ -1,5 +1,10 @@
 # Screenshot Intelligence 4.6 R2
 
+Screenshot Intelligence is now the Semantic Document compatibility adapter over
+the versioned Screenshot Selection Engine. The engine is the single owner of
+manual/annotation-safe automatic choice; this adapter maps image blocks and
+legacy candidate paths to asset metadata and applies the returned reference.
+
 ## Executive summary
 
 Screenshot Intelligence is a deterministic, renderer-neutral layer that can

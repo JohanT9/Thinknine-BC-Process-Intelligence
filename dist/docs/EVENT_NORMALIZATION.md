@@ -109,3 +109,5 @@ values are not copied into diagnostics or evidence.
 Ordered normalized output is consumed by Event â†’ Step Grouping. Normalization
 owns browser-mechanic coalescing; grouping owns candidate documentation-step
 boundaries. Semantic business meaning remains downstream of both layers.
+Normalized event kind and primary-event alignment later provide metadata signals
+to Screenshot Selection; normalization itself never chooses an image.

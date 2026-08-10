@@ -43,6 +43,10 @@ Step Groups are a second derived projection over normalized mechanics. They
 preserve canonical source IDs but are never written into or used to modify the
 Canonical Recording.
 
+Screenshot Selection consumes only asset references already traceable to a Step
+Group. Its result is derived and never changes canonical assets, bytes, events,
+or screenshot associations.
+
 ## Identification metadata
 
 New events may contain `identification`, an immutable schema-v1 derived object

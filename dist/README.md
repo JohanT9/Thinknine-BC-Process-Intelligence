@@ -3,6 +3,14 @@
 Ett modulärt Edge-tillägg för att spela in, granska och exportera dokumenterade
 Business Central-processer.
 
+## Screenshot Selection Engine
+
+A versioned metadata-only engine now owns automatic screenshot selection for
+Step Groups. It respects manual choices and annotations, explains every result,
+and passes one selected reference to the shared Workspace/Word pipeline without
+reading or modifying image bytes. See
+[Screenshot Selection Engine](docs/SCREENSHOT_SELECTION_ENGINE.md).
+
 ## Event â†’ Step Grouping
 
 Ordered normalized mechanics now become immutable, versioned candidate Step

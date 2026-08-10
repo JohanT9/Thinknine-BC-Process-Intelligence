@@ -83,3 +83,7 @@ migration is required.
 Grouping is a cached linear state machine with no DOM, pixel, AI, OCR, language,
 network, or all-pairs work. A 5,000-event regression guards performance and event
 ownership.
+
+Step Groups aggregate all valid screenshot asset IDs in source order. The
+Screenshot Selection Engine consumes that bounded set after semantic and
+presentation processing. Grouping never ranks or selects candidates.

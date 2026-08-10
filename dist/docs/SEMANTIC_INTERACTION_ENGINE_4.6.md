@@ -9,6 +9,9 @@ Actions retain Step Group and canonical source IDs. Existing task-sequence
 consolidation remains temporarily available for legacy Reviews and recordings
 lacking modern grouping metadata.
 
+Semantic Actions may expose primary mechanics and target context to Screenshot
+Selection, but the rules engine never ranks or chooses screenshot assets.
+
 The engine converts deterministic low-level interaction sequences into concise
 business actions. It improves representation only: rules never invent values,
 change workflow meaning, mutate Review, remove provenance or inspect images.

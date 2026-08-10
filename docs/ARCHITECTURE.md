@@ -1,5 +1,18 @@
 # Architecture 4.6
 
+## Screenshot Selection Engine
+
+```text
+Step Group + canonical asset metadata + Review intent + profile
+  -> Screenshot Selection Engine -> selected reference
+  -> Presentation Document -> Planner -> Workspace / Word
+```
+
+`screenshot-selection-engine.js` is the single automatic choice owner.
+`screenshot-intelligence.js` adapts Semantic Document blocks and legacy metadata,
+then applies the returned reference; it no longer owns ranking policy. Planner
+and both renderers receive the same already-selected Semantic Document.
+
 ## Event â†’ Step Grouping
 
 ```text

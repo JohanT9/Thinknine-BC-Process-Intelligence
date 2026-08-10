@@ -69,6 +69,8 @@
         devicePixelRatio: raw.devicePixelRatio ?? undefined,
         viewportScale: raw.viewportScale ?? undefined },
       screenshotAssetId: event.screenshotAssetId, source: clone(event.source || {}),
+      screenshotAssetIds: [...new Set(sources.map(item =>
+        item.screenshotAssetId).filter(Boolean))],
       evidence: [{ source: "normalization-rule", value: reason }], rawEventType: raw.type || "unknown"
     });
   }

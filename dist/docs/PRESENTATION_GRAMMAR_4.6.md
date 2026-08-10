@@ -1,5 +1,10 @@
 # Presentation Grammar 4.6 R3.2
 
+Presentation Grammar continues to own renderer-neutral text formatting only.
+Its output is passed to the Screenshot Selection adapter, which applies the
+single reference chosen by Screenshot Selection Engine. Presentation Grammar,
+Planner, Workspace, and Word contain no screenshot-ranking policy.
+
 ## Executive summary
 
 Presentation Grammar is the renderer-neutral owner of visual instruction

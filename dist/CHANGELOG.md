@@ -1,5 +1,19 @@
 # Changelog
 
+## 4.6.0 â€” Screenshot Selection Engine
+
+- Added deterministic schema-v1 screenshot selection results with algorithm
+  version `1.0.0`, stable input fingerprints, reasons, and rejected candidates.
+- Made Step Group source assets the authoritative candidate boundary and added
+  primary-event, control/page, field, lookup, toggle, action, stability, profile,
+  annotation, and visual-continuity metadata policies.
+- Preserved manual Review choices and all conflicting annotated screenshots;
+  unavailable manual choices retain the existing candidate set safely.
+- Refactored Screenshot Intelligence into a document adapter over the new single
+  selection owner while preserving legacy fallback and Workspace/Word parity.
+- Added null-selection, duplicate, legacy, future-field, and 5,000-candidate
+  performance coverage without image loading, OCR, AI, or computer vision.
+
 ## 4.6.0 â€” Event â†’ Step Grouping
 
 - Added deterministic schema-v1 Step Groups with grouping algorithm version

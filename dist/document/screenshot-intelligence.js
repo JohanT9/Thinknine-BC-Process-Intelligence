@@ -2,10 +2,14 @@
   const semantic = typeof module === "object" && module.exports
     ? require("./semantic-document")
     : root.T9DocumentModel;
-  const api = factory(semantic);
+  const selectionEngine = typeof module === "object" && module.exports
+    ? require("../engine/screenshot-selection-engine")
+    : root.T9ScreenshotSelectionEngine;
+  const api = factory(semantic, selectionEngine);
   if (typeof module === "object" && module.exports) module.exports = api;
   root.T9ScreenshotIntelligence = api;
-})(typeof globalThis !== "undefined" ? globalThis : this, function (semantic) {
+})(typeof globalThis !== "undefined" ? globalThis : this, function (semantic,
+  selectionEngine) {
   const CANDIDATE_SCHEMA_VERSION = "1.0.0";
   const cache = new WeakMap();
 
@@ -74,7 +78,16 @@
       const task = taskByScreenshot.get(ref) || taskByEvent.get(String(eventId));
       return {
         screenshotRef: ref,
+        screenshotAssetId:
+          event.canonicalScreenshotAssetId ||
+          event.normalizedInteraction?.screenshotAssetId || ref,
         sourceEventId: eventId,
+        canonicalSourceEventId:
+          event.canonicalSourceEventId ||
+          event.normalizedInteraction?.sourceEventId || "",
+        normalizedEventId:
+          event.normalizedInteraction?.normalizedEventId || "",
+        normalizedKind: event.normalizedInteraction?.kind || "",
         taskId: task?.taskId || "",
         capturedAt: event.timestamp || "",
         interactionType: event.category || event.type || "",
@@ -86,7 +99,8 @@
         },
         uiState: {
           pageId: event.pageId || "",
-          pageCaption: event.pageCaption || ""
+          pageCaption: event.pageCaption || "",
+          ...(event.normalizedInteraction?.pageIdentification || {})
         }
       };
     }));
@@ -204,6 +218,7 @@
     const images = imagesInStep(step);
     const refs = images.map(image => image.sourceRef?.screenshotRef).filter(Boolean);
     const uniqueRefs = [...new Set(refs)];
+    const exactDuplicate = refs.length > uniqueRefs.length;
     const manual = manualReference(step);
     const explanation = {
       taskId: step.sourceRef?.taskId || "",
@@ -322,6 +337,86 @@
     }) };
   }
 
+  function selectStepWithEngine(step, candidateByRef, context) {
+    const images = imagesInStep(step);
+    const refs = images.map(image => image.sourceRef?.screenshotRef).filter(Boolean);
+    const uniqueRefs = [...new Set(refs)];
+    const exactDuplicate = refs.length > uniqueRefs.length;
+    const stepGroup = step.interaction?.stepGroups?.[0] || null;
+    const candidates = uniqueRefs.map(ref => {
+      const image = images.find(item => item.sourceRef?.screenshotRef === ref);
+      const metadata = candidateByRef.get(ref) || {};
+      return selectionEngine.normalizeCandidate({ ...metadata,
+        screenshotAssetId: metadata.screenshotAssetId || ref,
+        screenshotRef: ref,
+        sourceEventId: metadata.canonicalSourceEventId || metadata.sourceEventId,
+        annotationRefs: image?.annotationRefs || metadata.annotationRefs || []
+      });
+    });
+    const manualRef = manualReference(step);
+    const manualCandidate = candidates.find(candidate =>
+      candidate.screenshotRef === manualRef || candidate.screenshotAssetId === manualRef);
+    const existingCandidate = candidates.find(candidate =>
+      candidate.screenshotRef === refs[0]);
+    const incomplete = uniqueRefs.some(ref => !candidateByRef.has(ref));
+    const result = selectionEngine.select({ stepGroup,
+      candidates: semantic.deepFreeze(candidates),
+      manualOverride: manualCandidate?.screenshotAssetId || manualRef,
+      existingSelection: existingCandidate?.screenshotAssetId,
+      profile: context.profile || {},
+      previousPageId: context.previousPageId });
+    const selectedCandidate = candidates.find(candidate =>
+      candidate.screenshotAssetId === result.selectedScreenshotAssetId);
+    const selectedRef = selectedCandidate?.screenshotRef || null;
+    const equivalentFallback = uniqueRefs.length > 1 &&
+      result.selectionReasons.includes("existing-selection-fallback");
+    let reasons = [...result.selectionReasons];
+    if (refs.length === 1) reasons = ["single-candidate"];
+    else if (exactDuplicate) reasons = ["exact-duplicate"];
+    else if (manualRef && result.selectionMode === "manual") reasons =
+      ["manual-selection", ...(result.preserveAllAnnotated
+        ? ["annotation-preservation-fallback"] : [])];
+    else if (manualRef && !manualCandidate) reasons =
+      ["manual-selection-unavailable-fallback"];
+    else if (result.preserveAllAnnotated) reasons =
+      ["annotation-preservation-fallback"];
+    else if (incomplete && !manualRef) reasons = ["incomplete-metadata-fallback"];
+    else if (result.selectionReasons.includes("near-duplicate-stable-order"))
+      reasons = ["near-duplicate-stable-order"];
+    else if ((!selectedRef || equivalentFallback) && uniqueRefs.length > 1) reasons =
+      ["equivalent-candidates-fallback"];
+    const keepAll = result.preserveAllAnnotated ||
+      (manualRef && !manualCandidate) ||
+      (incomplete && !manualRef && !exactDuplicate) ||
+      (equivalentFallback &&
+        !result.selectionReasons.includes("near-duplicate-stable-order")) ||
+      (!selectedRef && uniqueRefs.length > 1);
+    const explanation = {
+      selectionId: result.selectionId,
+      selectionVersion: result.selectionVersion,
+      taskId: step.sourceRef?.taskId || "",
+      stepGroupId: result.stepGroupId,
+      previousScreenshotRef: refs[0] || null,
+      selectedScreenshotRef: selectedRef,
+      selectedScreenshotAssetId: result.selectedScreenshotAssetId,
+      manualSelectionPreserved: result.selectionMode === "manual",
+      selectionMode: result.selectionMode,
+      selectionResult: result,
+      candidateScreenshotAssetIds: result.candidateScreenshotAssetIds,
+      sourceEventIds: result.sourceEventIds,
+      candidates: candidates.map(candidate => ({ screenshotRef: candidate.screenshotRef,
+        score: null, reasons: [], rejectedReasons: [], metadata: candidate })),
+      reasons,
+      rejectedReasons: Object.fromEntries(result.rejectedCandidates.map(item => {
+        const candidate = candidates.find(value =>
+          value.screenshotAssetId === item.screenshotAssetId);
+        return [candidate?.screenshotRef || item.screenshotAssetId, item.reasons];
+      }))
+    };
+    return { step: keepAll || !selectedRef ? clone(step) : keepImage(step, selectedRef),
+      explanation, changed: !keepAll && refs.some(ref => ref !== selectedRef) };
+  }
+
   function profileTone(profile) {
     return profile?.language?.tone || "professional";
   }
@@ -345,8 +440,9 @@
         if (block.kind !== "step") return clone(block);
         const sourceEventIds = Array.isArray(block.sourceRef?.sourceEventIds)
           ? block.sourceRef.sourceEventIds : [];
-        const result = selectStep(block, candidateByRef, {
-          sourceEventIds, previousPageId, profileTone: profileTone(profile)
+        const result = selectStepWithEngine(block, candidateByRef, {
+          sourceEventIds, previousPageId, profileTone: profileTone(profile),
+          profile
         });
         selections.push(result.explanation);
         const selectedCandidate = candidateByRef.get(
