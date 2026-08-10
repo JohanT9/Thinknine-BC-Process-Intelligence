@@ -5,6 +5,9 @@ structure only. They never rewrite Step Groups or source links.
 
 ## Purpose and architecture
 
+Manual Steps do not enter Event-to-Step Grouping. They are inserted later through
+stable documentation anchors and therefore cannot rewrite generated groups.
+
 Manual Structure Overrides layer above this generated grouping. Merge does not
 combine Step Groups, and Split partitions presentation rather than evidence.
 

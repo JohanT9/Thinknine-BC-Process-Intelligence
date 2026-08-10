@@ -4591,6 +4591,25 @@ function deleteReviewTasks(selectedIds) {
   applyReviewSelection(Boolean(nextId));
 }
 
+function addManualInformationStep(afterIndex) {
+  globalThis.T9Review.add(activeReview, afterIndex, {
+    beforeSelection: activeReviewSelection
+  });
+  const created = activeReview.manualSteps.at(-1);
+  activeReviewSelection = {
+    selectedIds: [created.manualStepId],
+    activeId: created.manualStepId,
+    anchorId: created.manualStepId
+  };
+  reviewAutoSave.schedule();
+  renderReview();
+  const card = $("reviewList").querySelector(
+    `[data-review-task-id="${created.manualStepId}"]`
+  );
+  if (card) editReviewField(card, created.manualStepId, "instruction");
+  show("Informationssteget lades till. Skriv texten och spara.");
+}
+
 function mergeSelectedReviewTasks() {
   const selectedIds = activeReviewSelection.selectedIds;
   if (selectedIds.length < 2) return;
@@ -5169,10 +5188,29 @@ function renderReview() {
         <button data-action="add-comment" class="secondary review-add-comment"
           ${task.userComment ? "hidden" : ""}
           aria-label="Lägg till kommentar för steg ${visibleIndex + 1}">Lägg till kommentar</button>
+        ${task.manualStepId ? `<div class="review-field-heading">
+          <label for="review-manual-type-${visibleIndex}">Informationstyp</label>
+          <select id="review-manual-type-${visibleIndex}" data-action="manual-type"
+            aria-label="Informationstyp för manuellt steg ${visibleIndex + 1}">
+            ${globalThis.T9ManualInformationSteps.STEP_TYPES.map(type =>
+              `<option value="${type}" ${task.stepType === type ? "selected" : ""}>${type}</option>`
+            ).join("")}
+          </select>
+        </div>
+        <div class="review-field-heading">
+          <label for="review-callout-${visibleIndex}">Faktaruta</label>
+          <button data-action="edit-callout" class="secondary"
+            aria-label="Redigera faktaruta för steg ${visibleIndex + 1}">Redigera</button>
+        </div>
+        <input id="review-callout-${visibleIndex}" data-edit-field="manualCallout"
+          aria-label="Faktaruta för manuellt steg ${visibleIndex + 1}"
+          value="${escapeHtml(task.callout?.text || "")}" readonly>` : ""}
         <div class="review-meta">
           ${escapeHtml(task.taskType || "Task")}
           · Confidence ${task.confidenceScore ?? task.confidence ?? 0}%
           ${task.stepOverride ? " · Redigerad" : " · Genererad"}
+          ${task.provenance === "manual"
+            ? ` · Manuellt ${escapeHtml(task.stepType || "information")}` : ""}
           ${task.stepOverride?.screenshotOverride ? " · Manuell skärmbild" : ""}
           ${task.knowledgeRule
             ? ` · ${escapeHtml(task.knowledgeRule)}`
@@ -5209,6 +5247,8 @@ function renderReview() {
           ${task.fieldProvenance?.instruction === "user-edited" ? "" : "disabled"}
           aria-label="Återställ instruktion för steg ${visibleIndex + 1}">Återställ text</button>
         <button data-action="remove" class="danger" aria-label="Dölj steg ${visibleIndex + 1} från dokumentet">Dölj</button>
+        ${task.manualStepId ? `<button data-action="delete-manual" class="danger"
+          aria-label="Ta bort manuellt steg ${visibleIndex + 1}">Ta bort manuellt steg</button>` : ""}
         <button data-action="toggle-layout" class="secondary" aria-pressed="false">Komprimera</button>
       </div>`;
 
@@ -5245,12 +5285,27 @@ function renderReview() {
         editReviewField(card, task.taskId, "userComment");
       });
 
+    card.querySelector('[data-action="edit-callout"]')
+      ?.addEventListener("click", () => {
+        editReviewField(card, task.taskId, "manualCallout");
+      });
+
+    card.querySelector('[data-action="manual-type"]')
+      ?.addEventListener("change", event => {
+        globalThis.T9Review.editTask(activeReview, actualIndex, {
+          stepType: event.target.value,
+          ...(task.callout?.text ? { manualCallout: task.callout.text } : {})
+        }, {
+          beforeSelection: activeReviewSelection,
+          afterSelection: activeReviewSelection
+        });
+        reviewAutoSave.schedule();
+        renderReview();
+      });
+
     card.querySelector('[data-action="add"]')
       .addEventListener("click", () => {
-        globalThis.T9Review.add(activeReview, actualIndex, {
-          beforeSelection: activeReviewSelection
-        });
-        renderReview();
+        addManualInformationStep(actualIndex);
       });
 
     card.querySelector('[data-action="reset-instruction"]')
@@ -5285,6 +5340,18 @@ function renderReview() {
       .addEventListener("click", () => {
         deleteReviewTasks([task.taskId]);
         reviewAutoSave.schedule();
+      });
+
+    card.querySelector('[data-action="delete-manual"]')
+      ?.addEventListener("click", () => {
+        globalThis.T9Review.deleteManualStep(
+          activeReview, task.manualStepId, {
+            beforeSelection: activeReviewSelection
+          }
+        );
+        reviewAutoSave.schedule();
+        renderReview();
+        show("Det manuella informationssteget togs bort.");
       });
 
     card.querySelector('[data-action="toggle-layout"]')
@@ -6077,10 +6144,7 @@ $("compactReviewSteps").addEventListener("click", () => {
   );
 });
 $("addReviewStep").addEventListener("click", () => {
-  globalThis.T9Review.add(activeReview, undefined, {
-    beforeSelection: activeReviewSelection
-  });
-  renderReview();
+  addManualInformationStep(undefined);
 });
 $("completeReview").addEventListener("click", async () => {
   globalThis.T9Review.complete(activeReview, {

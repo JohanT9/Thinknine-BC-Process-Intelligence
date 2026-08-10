@@ -39,12 +39,17 @@
       ? undefined : clone(command.beforeStructureOverrides);
     const afterStructureOverrides = command.afterStructureOverrides === undefined
       ? undefined : clone(command.afterStructureOverrides);
+    const beforeManualSteps = command.beforeManualSteps === undefined
+      ? undefined : clone(command.beforeManualSteps);
+    const afterManualSteps = command.afterManualSteps === undefined
+      ? undefined : clone(command.afterManualSteps);
     if (
       JSON.stringify(beforeTasks) === JSON.stringify(afterTasks) &&
       command.beforeStatus === command.afterStatus &&
       JSON.stringify(beforeAnnotations) === JSON.stringify(afterAnnotations) &&
       JSON.stringify(beforeStructureOverrides) ===
-        JSON.stringify(afterStructureOverrides)
+        JSON.stringify(afterStructureOverrides) &&
+      JSON.stringify(beforeManualSteps) === JSON.stringify(afterManualSteps)
     ) {
       return review;
     }
@@ -61,6 +66,7 @@
         afterTasks,
         afterAnnotations,
         afterStructureOverrides,
+        afterManualSteps,
         afterSelection: command.afterSelection === undefined
           ? previous.afterSelection
           : clone(command.afterSelection),
@@ -82,6 +88,8 @@
         afterAnnotations,
         beforeStructureOverrides,
         afterStructureOverrides,
+        beforeManualSteps,
+        afterManualSteps,
         beforeSelection: clone(command.beforeSelection ?? null),
         afterSelection: clone(command.afterSelection ?? null),
         beforeAnnotationSelection: clone(
@@ -144,6 +152,9 @@
     if (structureOverrides !== undefined) {
       review.structureOverrides = clone(structureOverrides);
     }
+    const manualSteps = direction === "undo"
+      ? entry.beforeManualSteps : entry.afterManualSteps;
+    if (manualSteps !== undefined) review.manualSteps = clone(manualSteps);
     if (entry.beforeStatus !== undefined || entry.afterStatus !== undefined) {
       review.status = direction === "undo" ? entry.beforeStatus : entry.afterStatus;
     }

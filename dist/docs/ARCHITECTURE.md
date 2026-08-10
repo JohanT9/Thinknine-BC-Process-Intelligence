@@ -1,5 +1,11 @@
 # Architecture 4.6
 
+## Manual documentation boundary
+
+Manual Steps are Review-owned documentation state with no fabricated evidence.
+They are anchor-resolved alongside generated steps before Structure and Content
+Overrides, then enter the shared document pipeline as ordinary Resolved Steps.
+
 ## Resolved structure
 
 Generated steps remain unchanged. Review Structure Overrides apply Hide, Merge,

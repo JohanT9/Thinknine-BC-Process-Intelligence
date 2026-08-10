@@ -1,5 +1,8 @@
 # Step Editor
 
+Manual Steps reuse the normal content editing surface. Their text is authoritative,
+their screenshots are optional references, and their provenance remains manual.
+
 Structure Overrides apply before Step Content Overrides. Content edits on stable
 resolved identities remain sparse; Reset Structure retains safely matchable
 content edits and preserves unmatched edits as orphan metadata.

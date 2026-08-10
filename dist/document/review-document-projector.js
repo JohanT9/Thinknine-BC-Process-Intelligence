@@ -8,13 +8,17 @@
   const structure = typeof module === "object" && module.exports
     ? require("../review/step-structure-overrides")
     : root.T9StepStructureOverrides;
-  const api = factory(model, stepEditor, structure);
+  const manualSteps = typeof module === "object" && module.exports
+    ? require("../review/manual-information-steps")
+    : root.T9ManualInformationSteps;
+  const api = factory(model, stepEditor, structure, manualSteps);
   if (typeof module === "object" && module.exports) module.exports = api;
   root.T9ReviewDocumentProjector = api;
 })(typeof globalThis !== "undefined" ? globalThis : this, function (
   model,
   stepEditor,
-  structure
+  structure,
+  manualSteps
 ) {
   const PROJECTOR_VERSION = "1.0.0";
   const ORIGIN = "review-document-projector";
@@ -167,9 +171,12 @@
   }
 
   function project(reviewValue, options = {}) {
-    const structural = Array.isArray(reviewValue?.generatedTasks)
-      ? structure.resolve(reviewValue.generatedTasks,
-        reviewValue.structureOverrides || []) : null;
+    const manual = Array.isArray(reviewValue?.generatedTasks)
+      ? manualSteps.resolve(reviewValue.generatedTasks,
+        reviewValue.manualSteps || []) : null;
+    const structural = manual
+      ? structure.resolve(manual.steps, reviewValue.structureOverrides || [])
+      : null;
     const currentTasks = reviewValue?.tasks || [];
     const structuralTasks = structural ? structural.steps.map(step => {
       const identity = step.stepId || step.taskId;
@@ -182,7 +189,8 @@
     const review = object(stepEditor.resolveReview({
       ...clone(reviewValue), tasks: structuralTasks,
       orphanedStructureOverrides: structural?.orphanedOverrides ||
-        reviewValue?.orphanedStructureOverrides || []
+        reviewValue?.orphanedStructureOverrides || [],
+      manualStepDiagnostics: manual?.diagnostics || []
     }));
     const session = object(options.session);
     const diagnostics = [];
@@ -262,10 +270,11 @@
         kind: "paragraph",
         text: instruction,
         sourceRef,
-        provenance: task.fieldProvenance?.instruction ||
+        provenance: task.provenance === "manual" ? "manual" :
+          task.fieldProvenance?.instruction ||
           (task.structureProvenance ? "system-derived" : "generated"),
         preserveUserText: task.fieldProvenance?.instruction === "user-edited" ||
-          Boolean(task.structureProvenance)
+          Boolean(task.structureProvenance) || task.provenance === "manual"
       }];
 
       const comment = text(task.userComment);
@@ -282,6 +291,27 @@
             sourceRef,
             provenance: task.fieldProvenance?.comment || "generated",
             preserveUserText: task.fieldProvenance?.comment === "user-edited"
+          }]
+        });
+      }
+
+      const manualCallout = object(task.callout);
+      const calloutText = text(manualCallout.text);
+      if (calloutText) {
+        blocks.push({
+          blockId: `block:manual-callout:${stepKey}`,
+          kind: "callout",
+          calloutType: text(manualCallout.type) || task.stepType || "information",
+          sourceRef,
+          provenance: "manual",
+          preserveUserText: true,
+          blocks: [{
+            blockId: `block:manual-callout-text:${stepKey}`,
+            kind: "paragraph",
+            text: calloutText,
+            sourceRef,
+            provenance: "manual",
+            preserveUserText: true
           }]
         });
       }

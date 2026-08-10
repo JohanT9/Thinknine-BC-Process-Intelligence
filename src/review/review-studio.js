@@ -23,6 +23,9 @@
   const structure = typeof module === "object" && module.exports
     ? require("./step-structure-overrides")
     : root.T9StepStructureOverrides;
+  const manual = typeof module === "object" && module.exports
+    ? require("./manual-information-steps")
+    : root.T9ManualInformationSteps;
   const api = factory(
     moveEngine,
     mergeEngine,
@@ -31,7 +34,8 @@
     textFormat,
     annotations,
     stepEditor,
-    structure
+    structure,
+    manual
   );
   if (typeof module === "object" && module.exports) module.exports = api;
   root.T9Review = api;
@@ -43,7 +47,8 @@
   textFormat,
   annotations,
   stepEditor,
-  structure
+  structure,
+  manual
 ) {
   function clone(value) {
     return JSON.parse(JSON.stringify(value));
@@ -139,6 +144,8 @@
       annotations: annotations.emptyStore(),
       structureOverrideVersion: "1.0.0",
       structureOverrides: [],
+      manualStepVersion: "1.0.0",
+      manualSteps: [],
       generatedTasks: normalizeTasks(tasks, { modern: true }),
       tasks: normalizeTasks(tasks, { modern: true })
     };
@@ -164,6 +171,8 @@
       afterTasks: review.tasks,
       beforeStructureOverrides: options.beforeStructureOverrides,
       afterStructureOverrides: review.structureOverrides,
+      beforeManualSteps: options.beforeManualSteps,
+      afterManualSteps: review.manualSteps,
       beforeSelection: options.beforeSelection,
       afterSelection: options.afterSelection,
       metadata: options.metadata,
@@ -272,9 +281,24 @@
 
   function reorder(review, tasks, options = {}) {
     const beforeTasks = historyEngine.snapshot(review.tasks);
+    const beforeManualSteps = historyEngine.snapshot(review.manualSteps || []);
     review.tasks = tasks;
+    review.manualSteps = (review.manualSteps || []).map(item => {
+      const index = tasks.findIndex(task => task.manualStepId === item.manualStepId);
+      if (index < 0) return item;
+      const previous = tasks.slice(0, index).reverse().find(task =>
+        !task.manualStepId
+      );
+      return manual.update(item, { positionAnchor: previous
+        ? { relation: "after", targetStepId: previous.stepId || previous.taskId,
+          sectionId: "workflow" }
+        : { relation: "section-start", sectionId: "workflow" }
+      });
+    });
     renumber(review);
-    return record(review, "move", beforeTasks, options);
+    return record(review, "move", beforeTasks, {
+      ...options, beforeManualSteps
+    });
   }
 
   function remove(review, index, options = {}) {
@@ -296,8 +320,23 @@
 
   function add(review, afterIndex = review.tasks.length - 1, options = {}) {
     const beforeTasks = historyEngine.snapshot(review.tasks);
+    const beforeManualSteps = historyEngine.snapshot(review.manualSteps || []);
+    const target = review.tasks[afterIndex];
+    const manualStep = manual.create({
+      recordingId: review.sessionId,
+      manualStepId: options.manualStepId,
+      now: options.now,
+      nonce: String((review.manualSteps || []).length + 1),
+      stepType: options.stepType || "information",
+      instruction: options.instruction || "Nytt manuellt steg.",
+      positionAnchor: target
+        ? { relation: "after", targetStepId: target.stepId || target.taskId,
+          sectionId: "workflow" }
+        : { relation: "section-end", sectionId: "workflow" }
+    });
+    review.manualSteps = [...(review.manualSteps || []), manualStep];
     const newTask = {
-      taskId: `Manual-${Date.now()}-${review.tasks.length + 1}`,
+      ...manual.project(manualStep),
       taskNo: 0,
       taskType: "Manual",
       semanticAction: "Manual",
@@ -313,18 +352,43 @@
       approved: false,
       deleted: false,
       userComment: "",
-      manuallyAdded: true,
-      sourceEventNos: []
+      manuallyAdded: true
     };
 
     review.tasks.splice(afterIndex + 1, 0, newTask);
     renumber(review);
-    return record(review, "add", beforeTasks, options);
+    return record(review, "manual-step-create", beforeTasks, {
+      ...options, beforeManualSteps
+    });
   }
 
   function updateTask(review, index, patch) {
     const task = review.tasks[index];
     const now = new Date().toISOString();
+    if (task.manualStepId) {
+      const manualIndex = (review.manualSteps || []).findIndex(item =>
+        item.manualStepId === task.manualStepId
+      );
+      if (manualIndex >= 0) {
+        const manualPatch = {};
+        if (patch.instruction !== undefined) {
+          manualPatch.instruction = patch.instruction;
+        }
+        if (patch.userComment !== undefined) manualPatch.comment = patch.userComment;
+        if (patch.title !== undefined) manualPatch.title = patch.title;
+        if (patch.callout !== undefined) manualPatch.callout = patch.callout;
+        if (patch.manualCallout !== undefined) {
+          manualPatch.callout = patch.manualCallout
+            ? { type: patch.stepType || task.stepType || "information",
+              text: patch.manualCallout }
+            : null;
+        }
+        if (patch.stepType !== undefined) manualPatch.stepType = patch.stepType;
+        review.manualSteps[manualIndex] = manual.update(
+          review.manualSteps[manualIndex], manualPatch, { now }
+        );
+      }
+    }
     let stepOverride = task.stepOverride || null;
     if (patch.instruction !== undefined) {
       stepOverride = stepEditor.edit(
@@ -341,9 +405,16 @@
         { ...task, stepOverride }, "title", patch.title, { now }
       );
     }
+    const compatibilityPatch = { ...patch };
+    if (patch.manualCallout !== undefined) {
+      compatibilityPatch.callout = patch.manualCallout
+        ? { type: patch.stepType || task.stepType || "information",
+          text: patch.manualCallout } : null;
+      delete compatibilityPatch.manualCallout;
+    }
     review.tasks[index] = {
       ...task,
-      ...patch,
+      ...compatibilityPatch,
       stepOverride,
       reviewStatus:
         patch.instruction !== undefined ||
@@ -358,8 +429,11 @@
   function editTask(review, index, patch, options = {}) {
     if (!review.tasks[index]) return review;
     const beforeTasks = historyEngine.snapshot(review.tasks);
+    const beforeManualSteps = historyEngine.snapshot(review.manualSteps || []);
     updateTask(review, index, patch);
-    return record(review, "edit", beforeTasks, options);
+    return record(review, "edit", beforeTasks, {
+      ...options, beforeManualSteps
+    });
   }
 
   function approveTask(review, index, approved, options = {}) {
@@ -544,6 +618,22 @@
     const beforeStructureOverrides = historyEngine.snapshot(
       review.structureOverrides || []
     );
+    const beforeManualSteps = historyEngine.snapshot(review.manualSteps || []);
+    if (review.tasks[index].manualStepId) {
+      const manualIndex = (review.manualSteps || []).findIndex(item =>
+        item.manualStepId === review.tasks[index].manualStepId
+      );
+      review.manualSteps[manualIndex] = manual.update(
+        review.manualSteps[manualIndex],
+        { visibility: hidden ? "hidden" : "visible" }, options
+      );
+      review.tasks[index] = { ...review.tasks[index],
+        deleted: Boolean(hidden), visibility: hidden ? "hidden" : "visible" };
+      review.updatedAt = options.now || new Date().toISOString();
+      return record(review, "manual-step-visibility", beforeTasks, {
+        ...options, beforeStructureOverrides, beforeManualSteps
+      });
+    }
     if (hidden) {
       review.structureOverrides = [...(review.structureOverrides || []),
         structure.hide(review.tasks[index], {
@@ -565,6 +655,53 @@
     return record(review, "step-visibility", beforeTasks, {
       ...options, beforeStructureOverrides
     });
+  }
+
+  function deleteManualStep(review, manualStepId, options = {}) {
+    const index = review.tasks.findIndex(task => task.manualStepId === manualStepId);
+    if (index < 0) return review;
+    const beforeTasks = historyEngine.snapshot(review.tasks);
+    const beforeManualSteps = historyEngine.snapshot(review.manualSteps || []);
+    review.tasks.splice(index, 1);
+    review.manualSteps = (review.manualSteps || []).filter(item =>
+      item.manualStepId !== manualStepId
+    );
+    renumber(review);
+    return record(review, "manual-step-delete", beforeTasks, {
+      ...options, beforeManualSteps
+    });
+  }
+
+  function setManualStepScreenshot(review, manualStepId, assetId, options = {}) {
+    const index = review.tasks.findIndex(task => task.manualStepId === manualStepId);
+    const manualIndex = (review.manualSteps || []).findIndex(item =>
+      item.manualStepId === manualStepId
+    );
+    if (index < 0 || manualIndex < 0) {
+      return { review, ok: false, reason: "missing-manual-step" };
+    }
+    const currentAssetId = review.manualSteps[manualIndex]
+      .selectedScreenshotAssetId;
+    if (currentAssetId && currentAssetId !== assetId &&
+        annotations.findScreenshotSet(review.annotations, currentAssetId)
+          ?.items?.length) {
+      return { review, ok: false, reason: "annotation-protected" };
+    }
+    const beforeTasks = historyEngine.snapshot(review.tasks);
+    const beforeManualSteps = historyEngine.snapshot(review.manualSteps);
+    review.manualSteps[manualIndex] = manual.update(
+      review.manualSteps[manualIndex],
+      { selectedScreenshotAssetId: assetId || null }, options
+    );
+    review.tasks[index] = { ...review.tasks[index],
+      selectedScreenshotAssetId: assetId || null,
+      screenshots: assetId ? [assetId] : [],
+      sourceScreenshotAssetIds: assetId ? [assetId] : [] };
+    review.updatedAt = options.now || new Date().toISOString();
+    record(review, "manual-step-screenshot", beforeTasks, {
+      ...options, beforeManualSteps
+    });
+    return { review, ok: true };
   }
 
   function resetStructure(review, options = {}) {
@@ -629,6 +766,8 @@
     resetTaskField,
     selectTaskScreenshot,
     setTaskHidden,
+    deleteManualStep,
+    setManualStepScreenshot,
     resetStructure,
     resolveTask: stepEditor.resolve,
     approveTask,

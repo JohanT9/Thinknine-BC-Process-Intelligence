@@ -1,5 +1,8 @@
 # Canonical Recording
 
+Manual Information Steps never create canonical events. Their manual provenance
+and empty event references explicitly separate documentation from evidence.
+
 Hide, Merge, and Split are document-presentation intent. They never delete or
 partition canonical evidence; their stored source IDs preserve the evidence chain.
 

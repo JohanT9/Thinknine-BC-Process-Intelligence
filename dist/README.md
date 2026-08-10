@@ -1,5 +1,12 @@
 # Thinknine BC Process Intelligence v4.6.0 R1
 
+## Manual Information Steps
+
+Consultants can insert anchored information, instruction, note, warning, tip,
+verification, or prerequisite steps without creating recorder events. Manual
+content uses the shared Review, Workspace, and Word pipeline. See
+[docs/MANUAL_INFORMATION_STEPS.md](docs/MANUAL_INFORMATION_STEPS.md).
+
 ## Step Structure Overrides
 
 Review supports reversible Hide, adjacent Merge, and evidence-partitioned Split

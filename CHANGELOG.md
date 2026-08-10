@@ -1,5 +1,13 @@
 # Changelog
 
+## Manual Information Steps — v4.6
+
+- Added versioned manual documentation objects with explicit manual provenance.
+- Added stable before/after/section anchors, deterministic unresolved-anchor
+  fallback, optional screenshots, semantic callouts, and empty-content validation.
+- Integrated manual create/edit/move/hide/delete/merge/split with existing Review
+  history, autosave, structural resolution, Workspace, and Word.
+
 ## Hide / Merge / Split — v4.6
 
 - Added versioned Step Structure Overrides with deterministic merge/partition IDs.

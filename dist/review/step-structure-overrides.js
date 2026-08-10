@@ -179,12 +179,18 @@
       },
       stepOverride: null,
       sourceStepIds: [...override.sourceStepIds],
+      manualStepIds: unique(sources.map(step => step.manualStepId)),
+      documentationProvenance: unique(sources.map(step =>
+        step.provenance || "generated"
+      )),
       sourceStepGroupIds: unique(sources.flatMap(stepGroupIds)),
       sourceEventIds: [...override.sourceEventIds],
       sourceScreenshotAssetIds: screenshots,
       screenshots,
       structureOverrideId: override.structureOverrideId,
       structureProvenance: "user-edited",
+      provenance: sources.some(step => step.manualStepId)
+        ? "merged" : sources[0].provenance,
       merged: true
     };
   }
@@ -221,6 +227,9 @@
         structureOverrideId: override.structureOverrideId,
         partitionId: partition.partitionId,
         structureProvenance: "user-edited",
+        ...(source.manualStepId
+          ? { originalManualStepId: source.manualStepId,
+            provenance: "manual" } : {}),
         split: true
       };
     });

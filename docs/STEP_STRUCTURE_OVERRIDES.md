@@ -1,5 +1,9 @@
 # Step Structure Overrides
 
+Manual Steps are anchor-resolved before Structure Overrides, allowing adjacent
+manual/recorded merge and manual split without assigning recorded evidence to
+manual content. Structural results retain both evidence and documentation provenance.
+
 ## Purpose and pipeline
 
 Consultants can hide, merge, or split documentation steps without modifying
