@@ -20,6 +20,12 @@ assert.ok(
     dashboardHtml.indexOf('src="document/review-document-projector.js"'),
   "Review Annotations must load before the browser projector captures its dependency."
 );
+assert.ok(
+  dashboardHtml.includes('.annotation-toolbar button[aria-pressed="true"]') &&
+    dashboard.includes('$("rectangleAnnotationTool").setAttribute(') &&
+    dashboard.includes('$("arrowAnnotationTool").setAttribute('),
+  "The active annotation tool must expose synchronized visual and pressed states."
+);
 
 assert.ok(
   dashboard.includes("async function initializeDashboard()"),
