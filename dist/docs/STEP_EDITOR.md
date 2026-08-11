@@ -1,5 +1,8 @@
 # Step Editor
 
+Step content remains independently editable after hierarchy assignment. Hierarchy
+titles and ownership are separate from sparse Step content overrides.
+
 The editor hierarchy keeps instruction, screenshot/annotations, and Notes distinct.
 User-authored note text is authoritative and uses the existing Review history.
 

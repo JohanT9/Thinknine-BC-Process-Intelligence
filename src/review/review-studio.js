@@ -29,6 +29,9 @@
   const notes = typeof module === "object" && module.exports
     ? require("./review-notes")
     : root.T9ReviewNotes;
+  const hierarchy = typeof module === "object" && module.exports
+    ? require("./documentation-hierarchy")
+    : root.T9DocumentationHierarchy;
   const api = factory(
     moveEngine,
     mergeEngine,
@@ -39,7 +42,8 @@
     stepEditor,
     structure,
     manual,
-    notes
+    notes,
+    hierarchy
   );
   if (typeof module === "object" && module.exports) module.exports = api;
   root.T9Review = api;
@@ -53,7 +57,8 @@
   stepEditor,
   structure,
   manual,
-  notes
+  notes,
+  hierarchy
 ) {
   function clone(value) {
     return JSON.parse(JSON.stringify(value));
@@ -158,6 +163,7 @@
       manualSteps: [],
       noteModelVersion: "1.0.0",
       stepNotes: initialNotes,
+      hierarchy: hierarchy.empty(session.id),
       generatedTasks: clone(normalizedTasks),
       tasks: normalizedTasks
     };
@@ -187,6 +193,8 @@
       afterManualSteps: review.manualSteps,
       beforeStepNotes: options.beforeStepNotes,
       afterStepNotes: review.stepNotes,
+      beforeHierarchy: options.beforeHierarchy,
+      afterHierarchy: review.hierarchy,
       beforeSelection: options.beforeSelection,
       afterSelection: options.afterSelection,
       metadata: options.metadata,
@@ -296,7 +304,12 @@
   function reorder(review, tasks, options = {}) {
     const beforeTasks = historyEngine.snapshot(review.tasks);
     const beforeManualSteps = historyEngine.snapshot(review.manualSteps || []);
+    const beforeHierarchy = historyEngine.snapshot(review.hierarchy);
     review.tasks = tasks;
+    if (review.hierarchy?.assignments?.length) {
+      review.hierarchy = hierarchy.reorder(review.hierarchy, "step",
+        tasks.map(task => task.stepId || task.taskId), options);
+    }
     review.manualSteps = (review.manualSteps || []).map(item => {
       const index = tasks.findIndex(task => task.manualStepId === item.manualStepId);
       if (index < 0) return item;
@@ -311,7 +324,7 @@
     });
     renumber(review);
     return record(review, "move", beforeTasks, {
-      ...options, beforeManualSteps
+      ...options, beforeManualSteps, beforeHierarchy
     });
   }
 
@@ -512,6 +525,14 @@
     const beforeStructureOverrides = historyEngine.snapshot(
       review.structureOverrides || []
     );
+    const beforeHierarchy = historyEngine.snapshot(review.hierarchy);
+    const locations = selectedIds.map(stepId =>
+      review.hierarchy?.assignments?.find(item => item.stepId === stepId)
+    ).filter(Boolean);
+    if (new Set(locations.map(item => `${item.sectionId}:${item.subtaskId || ""}`))
+      .size > 1) {
+      return { review, mergedTask: null, reason: "cross-hierarchy-boundary" };
+    }
     const structural = structure.merge(review.tasks, selectedIds, {
       recordingId: review.sessionId,
       sequence: (review.structureOverrides || []).length,
@@ -536,6 +557,17 @@
     ];
     result.mergedTask.structureOverrideId = structural.override.structureOverrideId;
     result.mergedTask.stepId = structural.resolvedStepId;
+    if (locations[0]) {
+      const withoutSources = { ...review.hierarchy,
+        assignments: review.hierarchy.assignments.filter(item =>
+          !selectedIds.includes(item.stepId)
+        ) };
+      review.hierarchy = hierarchy.assign(withoutSources,
+        [structural.resolvedStepId], locations[0].sectionId,
+        locations[0].subtaskId, {
+          position: Math.min(...locations.map(item => item.presentationOrder))
+        }).state;
+    }
     review.tasks = result.tasks;
     review.historyVersion = review.historyVersion || "1.0.0";
     review.history = [...(review.history || []), result.historyEntry];
@@ -543,6 +575,7 @@
     record(review, "merge", beforeTasks, {
       ...options,
       beforeStructureOverrides,
+      beforeHierarchy,
       afterSelection: {
         selectedIds: [result.mergedTask.taskId],
         activeId: result.mergedTask.taskId,
@@ -559,7 +592,12 @@
     const beforeStructureOverrides = historyEngine.snapshot(
       review.structureOverrides || []
     );
+    const beforeHierarchy = historyEngine.snapshot(review.hierarchy);
     const source = review.tasks.find(task => task.taskId === taskId);
+    const sourceIdentity = source?.stepId || source?.taskId;
+    const location = review.hierarchy?.assignments?.find(item =>
+      item.stepId === sourceIdentity
+    );
     const result = splitEngine.split(
       review.tasks,
       taskId,
@@ -601,6 +639,16 @@
       task.structureOverrideId = structural.override.structureOverrideId;
       task.stepId = structural.resolvedStepIds[partitionIndex];
     });
+    if (location) {
+      const withoutSource = { ...review.hierarchy,
+        assignments: review.hierarchy.assignments.filter(item =>
+          item.stepId !== sourceIdentity
+        ) };
+      review.hierarchy = hierarchy.assign(withoutSource,
+        structural.resolvedStepIds, location.sectionId, location.subtaskId, {
+          position: location.presentationOrder
+        }).state;
+    }
     review.tasks = result.tasks;
     review.historyVersion = review.historyVersion || "1.0.0";
     review.history = [...(review.history || []), result.historyEntry];
@@ -609,6 +657,7 @@
     record(review, "split", beforeTasks, {
       ...options,
       beforeStructureOverrides,
+      beforeHierarchy,
       afterSelection: {
         selectedIds: createdIds,
         activeId: createdIds[0],
@@ -777,6 +826,85 @@
     return existing;
   }
 
+  function createSection(review, title, stepIds = [], options = {}) {
+    const beforeTasks = historyEngine.snapshot(review.tasks);
+    const beforeHierarchy = historyEngine.snapshot(review.hierarchy);
+    const recordedOrders = Object.fromEntries(review.tasks.map((task, index) =>
+      [task.stepId || task.taskId, index]
+    ));
+    const result = hierarchy.createSection(review.hierarchy, title, stepIds, {
+      ...options, recordingId: review.sessionId, recordedOrders
+    });
+    review.hierarchy = result.state;
+    review.updatedAt = options.now || new Date().toISOString();
+    record(review, "hierarchy-create-section", beforeTasks, {
+      ...options, beforeHierarchy
+    });
+    return result.section;
+  }
+
+  function createSubtask(review, sectionId, title, stepIds = [], options = {}) {
+    const beforeTasks = historyEngine.snapshot(review.tasks);
+    const beforeHierarchy = historyEngine.snapshot(review.hierarchy);
+    const result = hierarchy.createSubtask(
+      review.hierarchy, sectionId, title, stepIds,
+      { ...options, recordingId: review.sessionId }
+    );
+    if (!result.ok) return result;
+    review.hierarchy = result.state;
+    review.updatedAt = options.now || new Date().toISOString();
+    record(review, "hierarchy-create-subtask", beforeTasks, {
+      ...options, beforeHierarchy
+    });
+    return result;
+  }
+
+  function renameHierarchy(review, targetId, title, options = {}) {
+    const beforeTasks = historyEngine.snapshot(review.tasks);
+    const beforeHierarchy = historyEngine.snapshot(review.hierarchy);
+    const result = hierarchy.rename(review.hierarchy, targetId, title, options);
+    if (!result.ok) return result;
+    review.hierarchy = result.state;
+    review.updatedAt = options.now || new Date().toISOString();
+    record(review, "hierarchy-rename", beforeTasks, { ...options, beforeHierarchy });
+    return result;
+  }
+
+  function assignHierarchy(review, stepIds, sectionId, subtaskId, options = {}) {
+    const beforeTasks = historyEngine.snapshot(review.tasks);
+    const beforeHierarchy = historyEngine.snapshot(review.hierarchy);
+    const recordedOrders = Object.fromEntries(review.tasks.map((task, index) =>
+      [task.stepId || task.taskId, index]
+    ));
+    const result = hierarchy.assign(review.hierarchy, stepIds, sectionId,
+      subtaskId, { ...options, recordedOrders });
+    if (!result.ok) return result;
+    review.hierarchy = result.state;
+    review.updatedAt = options.now || new Date().toISOString();
+    record(review, "hierarchy-move", beforeTasks, { ...options, beforeHierarchy });
+    return result;
+  }
+
+  function reorderHierarchy(review, kind, ids, options = {}) {
+    const beforeTasks = historyEngine.snapshot(review.tasks);
+    const beforeHierarchy = historyEngine.snapshot(review.hierarchy);
+    review.hierarchy = hierarchy.reorder(review.hierarchy, kind, ids, options);
+    review.updatedAt = options.now || new Date().toISOString();
+    return record(review, "hierarchy-reorder", beforeTasks, {
+      ...options, beforeHierarchy
+    });
+  }
+
+  function resetHierarchy(review, options = {}) {
+    const beforeTasks = historyEngine.snapshot(review.tasks);
+    const beforeHierarchy = historyEngine.snapshot(review.hierarchy);
+    review.hierarchy = hierarchy.empty(review.sessionId);
+    review.updatedAt = options.now || new Date().toISOString();
+    return record(review, "hierarchy-reset", beforeTasks, {
+      ...options, beforeHierarchy
+    });
+  }
+
   function resetStructure(review, options = {}) {
     const beforeTasks = historyEngine.snapshot(review.tasks);
     const beforeStructureOverrides = historyEngine.snapshot(
@@ -844,6 +972,12 @@
     addNote,
     updateNote,
     removeNote,
+    createSection,
+    createSubtask,
+    renameHierarchy,
+    assignHierarchy,
+    reorderHierarchy,
+    resetHierarchy,
     resetStructure,
     resolveTask: stepEditor.resolve,
     approveTask,

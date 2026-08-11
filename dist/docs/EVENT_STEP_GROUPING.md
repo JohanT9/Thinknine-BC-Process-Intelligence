@@ -5,6 +5,9 @@ structure only. They never rewrite Step Groups or source links.
 
 ## Purpose and architecture
 
+Sections/Subtasks consume resolved Step identities after grouping. Moving a Step
+in documentation never rewrites its Step Group or canonical chronology.
+
 Manual Steps do not enter Event-to-Step Grouping. They are inserted later through
 stable documentation anchors and therefore cannot rewrite generated groups.
 

@@ -4457,6 +4457,13 @@ function applyReviewToolbarState() {
   globalThis.T9ReviewToolbar.apply($("reviewToolbar"), state);
   $("resetReviewStructure").disabled =
     !activeReview?.structureOverrides?.length;
+  $("createReviewSection").disabled = !activeReviewSelection.selectedIds.length;
+  const selectedHierarchyLocations = activeReviewSelection.selectedIds.map(id =>
+    activeReview?.hierarchy?.assignments?.find(item => item.stepId === id)
+  ).filter(Boolean);
+  $("createReviewSubtask").disabled = !selectedHierarchyLocations.length ||
+    new Set(selectedHierarchyLocations.map(item => item.sectionId)).size !== 1;
+  $("resetReviewHierarchy").disabled = !activeReview?.hierarchy?.sections?.length;
   $("completeReview").disabled = !activeReview ||
     !globalThis.T9Review.canComplete(activeReview);
 }
@@ -5127,6 +5134,34 @@ function renderReview() {
 
   const tasks = globalThis.T9Review.activeTasks(activeReview);
   const progress = globalThis.T9Review.progress(activeReview);
+  const hierarchyState = globalThis.T9DocumentationHierarchy.resolve(
+    tasks, activeReview.hierarchy
+  );
+  $("reviewHierarchy").innerHTML = hierarchyState.sections.length
+    ? `<ul>${hierarchyState.sections.map(section =>
+      `<li><details open><summary>${escapeHtml(section.title)}</summary>
+        <label>Sektionstitel <input data-hierarchy-title="${section.sectionId}"
+          value="${escapeHtml(section.title)}" aria-label="Sektionstitel"></label>${section.subtasks.length
+          ? `<ul>${section.subtasks.map(subtask =>
+            `<li><details open><summary>${escapeHtml(subtask.title)} (${subtask.steps.length})</summary>
+              <label>Deluppgiftstitel <input data-hierarchy-title="${subtask.subtaskId}"
+                value="${escapeHtml(subtask.title)}" aria-label="Deluppgiftstitel"></label>
+            </details></li>`
+          ).join("")}</ul>` : ""}</details></li>`
+    ).join("")}</ul>`
+    : "";
+  for (const input of $("reviewHierarchy").querySelectorAll(
+    "[data-hierarchy-title]"
+  )) {
+    input.addEventListener("change", () => {
+      if (!input.value.trim()) return;
+      globalThis.T9Review.renameHierarchy(activeReview,
+        input.dataset.hierarchyTitle, input.value.trim());
+      reviewAutoSave.schedule();
+      invalidateDocumentWorkspace();
+      show("Hierarkititeln uppdaterades.");
+    });
+  }
 
   $("reviewProgressBar").style.width = `${progress}%`;
   $("reviewProgress").setAttribute("aria-valuenow", String(progress));
@@ -6095,6 +6130,26 @@ globalThis.T9ReviewToolbar.bind($("reviewToolbar"), (command, button) => {
     reviewAutoSave.schedule();
     renderReview();
     show("Dokumentstrukturen återställdes till genererad struktur.");
+  } else if (command === "create-section") {
+    globalThis.T9Review.createSection(activeReview, "Ny sektion",
+      activeReviewSelection.selectedIds);
+    reviewAutoSave.schedule();
+    renderReview();
+    show("Sektionen skapades. Titeln kan redigeras i hierarkimodellen.");
+  } else if (command === "create-subtask") {
+    const location = activeReview.hierarchy.assignments.find(item =>
+      activeReviewSelection.selectedIds.includes(item.stepId)
+    );
+    globalThis.T9Review.createSubtask(activeReview, location.sectionId,
+      "Ny deluppgift", activeReviewSelection.selectedIds);
+    reviewAutoSave.schedule();
+    renderReview();
+    show("Deluppgiften skapades.");
+  } else if (command === "reset-hierarchy") {
+    globalThis.T9Review.resetHierarchy(activeReview);
+    reviewAutoSave.schedule();
+    renderReview();
+    show("Dokumenthierarkin återställdes.");
   }
   else if (command === "move-up") {
     moveReviewTasksByOffset(

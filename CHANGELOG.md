@@ -1,5 +1,12 @@
 # Changelog
 
+## Sections / Subtasks — v4.6
+
+- Added immutable Section/Subtask models and sparse Hierarchy Overrides.
+- Added exactly-once Step ownership, stable move/reorder, separate recorded and
+  presentation order, regeneration/orphan diagnostics, and hierarchy reset.
+- Added Review hierarchy navigation/actions and shared Workspace/Word headings.
+
 ## Notes & Annotations — v4.6
 
 - Added immutable Note ownership, types, visibility, provenance, orphan and empty diagnostics.

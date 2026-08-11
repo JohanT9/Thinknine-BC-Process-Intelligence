@@ -1,5 +1,8 @@
 # Notes & Annotations
 
+Hierarchy moves preserve stable Step Note ownership and never alter screenshot
+Annotation ownership or geometry.
+
 ## Distinct documentation models
 
 A Note explains; an Annotation points. They share Review persistence and history

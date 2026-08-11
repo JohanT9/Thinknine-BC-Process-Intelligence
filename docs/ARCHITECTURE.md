@@ -1,5 +1,10 @@
 # Architecture 4.6
 
+## Documentation hierarchy
+
+Resolved Steps may be organized into exactly Section → Subtask → Step. Hierarchy
+owns logical presentation; Planner owns styling, and evidence order remains intact.
+
 ## Notes and visual annotations
 
 Notes attach prose to documentation identities. Annotations attach normalized

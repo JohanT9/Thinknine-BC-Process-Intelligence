@@ -1,5 +1,12 @@
 # Thinknine BC Process Intelligence v4.6.0 R1
 
+## Sections and Subtasks
+
+Long workflows can be organized into a bounded Document → Section → Subtask →
+Step hierarchy without changing evidence order. The shared Workspace/Word plan
+uses stable manual organization. See
+[docs/SECTIONS_AND_SUBTASKS.md](docs/SECTIONS_AND_SUBTASKS.md).
+
 ## Notes & Annotations
 
 Review now distinguishes stable textual Notes from screenshot-owned visual

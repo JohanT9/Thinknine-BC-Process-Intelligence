@@ -411,6 +411,9 @@ table{width:100%;border-collapse:collapse}th,td{text-align:left;padding:9px;bord
               <button id="mergeReviewSteps" data-review-command="merge" data-review-toolbar-item class="secondary" disabled>Slå samman</button>
               <button id="splitReviewStep" data-review-command="split" data-review-toolbar-item class="secondary" disabled>Dela</button>
               <button id="resetReviewStructure" data-review-command="reset-structure" data-review-toolbar-item class="secondary" disabled>Återställ struktur</button>
+              <button id="createReviewSection" data-review-command="create-section" data-review-toolbar-item class="secondary" disabled>Skapa sektion</button>
+              <button id="createReviewSubtask" data-review-command="create-subtask" data-review-toolbar-item class="secondary" disabled>Skapa deluppgift</button>
+              <button id="resetReviewHierarchy" data-review-command="reset-hierarchy" data-review-toolbar-item class="secondary" disabled>Återställ hierarki</button>
             </div>
             <div class="review-toolbar-group" role="group" aria-label="Ordning">
               <button id="moveUpReviewSteps" data-review-command="move-up" data-review-toolbar-item class="secondary" disabled>Flytta upp</button>
@@ -439,6 +442,7 @@ table{width:100%;border-collapse:collapse}th,td{text-align:left;padding:9px;bord
     </header>
     <section id="reviewWorkspacePanel" role="tabpanel"
       aria-labelledby="reviewWorkspaceTab">
+      <nav id="reviewHierarchy" aria-label="Dokumenthierarki"></nav>
       <main
         id="reviewList"
         class="review-list"
@@ -582,6 +586,7 @@ table{width:100%;border-collapse:collapse}th,td{text-align:left;padding:9px;bord
 <script src="document/semantic-document.js"></script>
 <script src="review/step-editor.js"></script>
 <script src="review/review-notes.js"></script>
+<script src="review/documentation-hierarchy.js"></script>
 <script src="review/manual-information-steps.js"></script>
 <script src="review/step-structure-overrides.js"></script>
 <script src="document/review-document-projector.js"></script>

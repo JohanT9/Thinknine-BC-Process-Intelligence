@@ -1,5 +1,8 @@
 # Step Structure Overrides
 
+Structure Overrides resolve step shape before hierarchy assignment. Merge must
+stay inside one hierarchy location; split parts inherit their parent's location.
+
 Structure resolution preserves source note identities and screenshot annotation
 ownership. Merge never concatenates notes; split never guesses ownership.
 

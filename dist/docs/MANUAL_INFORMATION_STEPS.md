@@ -1,5 +1,8 @@
 # Manual Information Steps
 
+Manual Steps participate normally in Section/Subtask ownership and ordering while
+retaining manual provenance and empty captured-event traceability.
+
 Manual Steps may own supplementary Notes and may reference annotated screenshots.
 Neither relationship fabricates captured-event traceability.
 

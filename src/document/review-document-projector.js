@@ -17,7 +17,11 @@
   const annotations = typeof module === "object" && module.exports
     ? require("../review/review-annotations")
     : root.T9ReviewAnnotations;
-  const api = factory(model, stepEditor, structure, manualSteps, notes, annotations);
+  const hierarchy = typeof module === "object" && module.exports
+    ? require("../review/documentation-hierarchy")
+    : root.T9DocumentationHierarchy;
+  const api = factory(model, stepEditor, structure, manualSteps, notes,
+    annotations, hierarchy);
   if (typeof module === "object" && module.exports) module.exports = api;
   root.T9ReviewDocumentProjector = api;
 })(typeof globalThis !== "undefined" ? globalThis : this, function (
@@ -26,7 +30,8 @@
   structure,
   manualSteps,
   notes,
-  annotations
+  annotations,
+  hierarchy
 ) {
   const PROJECTOR_VERSION = "1.0.0";
   const ORIGIN = "review-document-projector";
@@ -429,6 +434,51 @@
       : [...DEFAULT_PREREQUISITES];
     const expectedResult = text(options.expectedResult) ||
       DEFAULT_EXPECTED_RESULT;
+    let resolvedWorkflowBlocks = workflowBlocks;
+    if (review.hierarchy?.sections?.length) {
+      const visibleTasks = tasks.filter(task => !task?.deleted);
+      const resolvedHierarchy = hierarchy.resolve(visibleTasks, review.hierarchy);
+      const blockByStepId = new Map();
+      visibleTasks.forEach((task, index) => {
+        const block = workflowBlocks[index];
+        for (const id of [task.stepId, task.taskId]) {
+          if (id) blockByStepId.set(String(id), block);
+        }
+      });
+      resolvedWorkflowBlocks = resolvedHierarchy.sections.flatMap(section => [
+        { blockId: `block:hierarchy-section:${idPart(section.sectionId)}`,
+          kind: "heading", level: 2, text: section.title,
+          provenance: section.provenance,
+          preserveUserText: section.provenance !== "generated",
+          sourceRef: { sectionId: section.sectionId } },
+        ...section.directSteps.map(step =>
+          blockByStepId.get(String(step.stepId || step.taskId))
+        ).filter(Boolean),
+        ...section.subtasks.flatMap(subtask => [
+          { blockId: `block:hierarchy-subtask:${idPart(subtask.subtaskId)}`,
+            kind: "heading", level: 3, text: subtask.title,
+            provenance: subtask.provenance,
+            preserveUserText: subtask.provenance !== "generated",
+            sourceRef: { sectionId: section.sectionId,
+              subtaskId: subtask.subtaskId } },
+          ...subtask.steps.map(step =>
+            blockByStepId.get(String(step.stepId || step.taskId))
+          ).filter(Boolean)
+        ])
+      ]);
+      if (resolvedHierarchy.unassignedSteps.length) {
+        diagnostics.push(diagnostic("unassigned-hierarchy-step", "$.hierarchy",
+          "Visible steps require a hierarchy assignment."));
+        resolvedWorkflowBlocks.push(...resolvedHierarchy.unassignedSteps.map(step =>
+          blockByStepId.get(String(step.stepId || step.taskId))
+        ).filter(Boolean));
+      }
+      resolvedHierarchy.diagnostics.forEach(item => diagnostics.push(diagnostic(
+        item.code, "$.hierarchy", "Hierarchy reference requires review.",
+        "warning", item
+      )));
+    }
+
     const sections = [{
       sectionId: "section:cover",
       kind: "cover",
@@ -474,7 +524,7 @@
         kind: "heading",
         level: 1,
         text: "Arbetsgång"
-      }, ...workflowBlocks]
+      }, ...resolvedWorkflowBlocks]
     }, {
       sectionId: "section:expected-result",
       kind: "expectedResult",
