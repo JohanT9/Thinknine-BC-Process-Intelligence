@@ -51,6 +51,7 @@ let stoppingSessionId = null;
 let canonicalPersistenceError = null;
 
 const SCREENSHOT_MIN_INTERVAL_MS = 1100;
+const CANONICAL_SETTLE_TIMEOUT_MS = 60000;
 let screenshotQueue = [];
 let screenshotWorkerRunning = false;
 let screenshotWorkerPromise = Promise.resolve();
@@ -63,6 +64,20 @@ const screenshotStats = {
   dropped: 0,
   errors: 0
 };
+
+async function settleBounded(promise, operation) {
+  let timer;
+  try {
+    return await Promise.race([promise, new Promise((_, reject) => {
+      timer = setTimeout(() => reject(Object.assign(new Error(
+        `Timed out while waiting for ${operation}.`
+      ), { code: "canonical-pending-write-timeout", operation })),
+      CANONICAL_SETTLE_TIMEOUT_MS);
+    })]);
+  } finally {
+    clearTimeout(timer);
+  }
+}
 
 function safe(value) {
   return String(value || "BC-process")
@@ -280,10 +295,10 @@ async function processScreenshotQueue() {
 
       // Reuse the same screenshot for nearby events instead of taking another one.
       screenshots[item.eventNo] = image;
-      await saveScreenshots(item.sessionId, screenshots);
       await canonicalStore.associateScreenshot(
         item.sessionId, item.eventId, image, new Date().toISOString()
       );
+      await saveScreenshots(item.sessionId, screenshots);
 
       screenshotStats.captured += 1;
 
@@ -647,16 +662,60 @@ async function stopSession() {
 
   // All accepted events and delayed screenshot associations become durable
   // before the immutable completion boundary is written.
-  await writeQueue;
+  try {
+    await settleBounded(writeQueue, "accepted event writes");
+  } catch (error) {
+    await setDebug({ lastError: String(error), canonicalIntegrityDiagnostic: {
+      code: error.code || "canonical-write-failure",
+      operation: error.operation || "accepted-event-write"
+    } });
+    throw error;
+  }
   if (canonicalPersistenceError) {
+    await setDebug({ lastError: String(canonicalPersistenceError),
+      canonicalIntegrityDiagnostic: { code: "canonical-write-failure",
+        operation: "accepted-event-write" } });
     throw new Error(
       "Recording remains incomplete because canonical evidence could not be persisted."
     );
   }
-  await screenshotWorkerPromise;
+  try {
+    await settleBounded(screenshotWorkerPromise, "screenshot registrations");
+    await settleBounded(canonicalStore.flush(), "canonical persistence queue");
+  } catch (error) {
+    await setDebug({ lastError: String(error), canonicalIntegrityDiagnostic: {
+      code: error.code || "canonical-write-failure",
+      operation: error.operation || "screenshot-registration"
+    } });
+    throw error;
+  }
+
+  const storeIntegrity = canonicalStore.diagnostics();
+  if (storeIntegrity.pendingWrites || storeIntegrity.failures.length) {
+    await setDebug({ canonicalIntegrityDiagnostic: {
+      code: storeIntegrity.pendingWrites ? "canonical-pending-write" :
+        "canonical-write-failure", pendingWrites: storeIntegrity.pendingWrites,
+      failures: storeIntegrity.failures.map(item => ({
+        operationType: item.operationType, message: item.message
+      })) } });
+    throw new Error("Recording remains incomplete because canonical writes did not settle.");
+  }
 
   const session = await getSession(state.sessionId);
   if (session) {
+    const legacyEvents = await getEvents(state.sessionId);
+    const canonicalRecording = await getCanonicalRecording(state.sessionId);
+    const integrityDiagnostics = globalThis.T9CanonicalRecording
+      .integrityDiagnostics(canonicalRecording, {
+        legacyEventCount: legacyEvents.length
+      });
+    if (integrityDiagnostics.length) {
+      await setDebug({ canonicalIntegrityDiagnostic: {
+        code: "canonical-integrity-validation-failed",
+        diagnostics: integrityDiagnostics
+      } });
+      throw new Error("Recording remains incomplete because evidence integrity validation failed.");
+    }
     session.status = "completed";
     session.completedAt = new Date().toISOString();
     session.updatedAt = session.completedAt;

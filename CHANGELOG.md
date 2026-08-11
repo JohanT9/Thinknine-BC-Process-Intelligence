@@ -1,5 +1,14 @@
 # Changelog
 
+## Canonical Recording Hardening & CI Safety — v4.6
+
+- Added Canonical Recording tests to the standard `npm test` and CI lifecycle,
+  with a configuration regression preventing silent removal.
+- Formalized immutable input, append-only Event, stable screenshot association,
+  schema compatibility, and integrity-diagnostic contracts.
+- Added canonical-first screenshot dual-write ordering, bounded finalization,
+  queue failure/pending diagnostics, and pre-finish legacy/canonical validation.
+
 ## Regenerate From Recording — v4.6
 
 - Added fresh deterministic interpretation orchestration with independently

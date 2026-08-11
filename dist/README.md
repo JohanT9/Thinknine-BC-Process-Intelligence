@@ -1,5 +1,12 @@
 # Thinknine BC Process Intelligence v4.6.0 R1
 
+## Canonical Recording Hardening
+
+Canonical Recording is the immutable captured-evidence source of truth. Standard
+`npm test`/CI now includes its dedicated integrity suite; finalization uses
+bounded queue settlement, canonical-first screenshot registration, structured
+diagnostics, and pre-finish evidence validation without changing Review or Word.
+
 ## Regenerate From Recording
 
 Existing Canonical Recordings can now be reinterpreted through the current

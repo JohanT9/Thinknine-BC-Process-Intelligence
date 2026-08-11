@@ -80,6 +80,38 @@
     result.events.forEach(event => { const id = assets.get(Number(event.raw?.eventNo)); if (id) event.screenshotAssetId = id; });
     return result;
   }
+  function integrityDiagnostics(input, options = {}) {
+    const diagnostics = [];
+    if (!input || Number(input.schemaVersion) !== SCHEMA_VERSION) {
+      diagnostics.push({ code: "unsupported-canonical-schema", severity: "error",
+        schemaVersion: input?.schemaVersion ?? null, supportedSchemaVersion: SCHEMA_VERSION });
+      return diagnostics;
+    }
+    const events = Array.isArray(input.events) ? input.events : [];
+    const assets = Array.isArray(input.assets) ? input.assets : [];
+    const eventIds = new Set();
+    const assetIds = new Set(assets.map(asset => String(asset.id)));
+    events.forEach((event, index) => {
+      if (!event.id || eventIds.has(String(event.id))) diagnostics.push({
+        code: "duplicate-canonical-event-id", severity: "error",
+        eventId: event.id || null });
+      eventIds.add(String(event.id));
+      if (event.sequence !== index + 1) diagnostics.push({
+        code: "canonical-event-order-mismatch", severity: "error",
+        eventId: event.id || null, expectedSequence: index + 1,
+        actualSequence: event.sequence });
+      if (event.screenshotAssetId && !assetIds.has(String(event.screenshotAssetId))) {
+        diagnostics.push({ code: "missing-canonical-screenshot-asset",
+          severity: "error", eventId: event.id,
+          screenshotAssetId: event.screenshotAssetId });
+      }
+    });
+    if (Number.isFinite(options.legacyEventCount) &&
+        options.legacyEventCount !== events.length) diagnostics.push({
+      code: "legacy-canonical-event-count-mismatch", severity: "error",
+      canonicalEventCount: events.length, legacyEventCount: options.legacyEventCount });
+    return diagnostics;
+  }
   function normalize(input, legacy = {}) {
     if (!input || input.schemaVersion == null) return (!legacy.session && !input) ? null : fromLegacy(legacy.session || input, legacy.events, legacy.screenshots);
     if (Number(input.schemaVersion) !== SCHEMA_VERSION) throw new Error(`Unsupported recording schema: ${input.schemaVersion}`);
@@ -101,9 +133,15 @@
     const event = result.events.find(item =>
       item.id === eventReference || Number(item.raw?.eventNo) === Number(eventReference)
     );
-    if (!event) return result;
+    if (!event) throw new Error(`Canonical screenshot event not found: ${eventReference}`);
     const eventNo = event.raw?.eventNo || event.sequence;
     const asset = { ...assetFor(result.id, eventNo, dataUrl), createdAt };
+    if (event.screenshotAssetId) {
+      if (!result.assets.some(item => item.id === event.screenshotAssetId)) {
+        throw new Error(`Missing canonical screenshot asset: ${event.screenshotAssetId}`);
+      }
+      return result;
+    }
     const existing = result.assets.findIndex(item => item.id === asset.id);
     if (existing >= 0) result.assets[existing] = asset; else result.assets.push(asset);
     event.screenshotAssetId = asset.id;
@@ -112,5 +150,6 @@
   }
   function finish(recording, finishedAt) { if (recording.metadata?.finishedAt) { if (recording.metadata.finishedAt === finishedAt) return recording; throw new Error("Completed recording evidence is immutable."); } const result = normalize(recording); result.metadata.finishedAt = finishedAt; result.updatedAt = finishedAt; if (result.compatibility?.session) Object.assign(result.compatibility.session, { completedAt: finishedAt, updatedAt: finishedAt, status: "completed" }); return result; }
   function legacyView(recording) { const value = normalize(recording); const session = clone(value.compatibility?.session || {}); Object.assign(session, { id: value.id, name: session.name || value.metadata.title, purpose: session.purpose || value.metadata.recordingPurpose || "", startedAt: session.startedAt || value.metadata.startedAt, completedAt: session.completedAt || value.metadata.finishedAt || null, updatedAt: value.updatedAt, eventCount: value.events.length }); return { session, events: value.events.map(event => ({ ...clone(event.raw || { id: event.id, timestamp: event.timestamp, type: event.type }), ...(event.identification ? { identification: clone(event.identification) } : {}) })) }; }
-  return { SCHEMA_VERSION, addEvent, addScreenshot, create, finish, fromLegacy, legacyView, normalize };
+  return { SCHEMA_VERSION, addEvent, addScreenshot, create, finish, fromLegacy,
+    integrityDiagnostics, legacyView, normalize };
 });

@@ -39,6 +39,7 @@ function raw(id, overrides = {}) {
   const store = persistence.createStore(adapter);
   const recording = canonical.create({ id: "raw-1", title: "Sales order" });
   await store.create(recording);
+  assert.strictEqual(store.diagnostics().pendingWrites, 0);
 
   // Same timestamps and semantically identical interactions remain distinct.
   await Promise.all([
@@ -85,27 +86,39 @@ function raw(id, overrides = {}) {
   // Failure does not poison the queue and an already stored recording survives.
   adapter.fail();
   await assert.rejects(store.append("raw-1", raw("source-failed")), /storage unavailable/);
+  await Promise.resolve();
+  assert(store.diagnostics().failures.some(item =>
+    item.code === "canonical-write-failure" && item.operationType === "append-event"));
   assert.strictEqual(adapter.inspect().events.length, 3);
   await store.append("raw-1", raw("source-recovered"));
   assert.strictEqual(adapter.inspect().events.length, 4);
+  await assert.rejects(store.finalize("raw-1", "2026-08-10T11:00:00.000Z"),
+    /failed writes/);
 
+  // A clean queue serializes every accepted event before successful completion.
+  const finalAdapter = memoryAdapter();
+  const finalStore = persistence.createStore(finalAdapter);
+  await finalStore.create(canonical.create({ id: "final-1" }));
   const finishedAt = "2026-08-10T11:00:00.000Z";
   await Promise.all([
-    store.append("raw-1", raw("source-pending")),
-    store.finalize("raw-1", finishedAt)
+    finalStore.append("final-1", raw("source-pending")),
+    finalStore.finalize("final-1", finishedAt)
   ]);
-  saved = adapter.inspect();
+  await finalStore.flush();
+  assert.strictEqual(finalStore.diagnostics().pendingWrites, 0);
+  saved = finalAdapter.inspect();
   assert.strictEqual(saved.events.at(-1).source.eventId, "source-pending");
   assert.strictEqual(saved.metadata.finishedAt, finishedAt);
-  await assert.rejects(store.append("raw-1", raw("source-too-late")), /immutable/);
+  await assert.rejects(finalStore.append("final-1", raw("source-too-late")), /immutable/);
   await assert.rejects(
-    store.associateScreenshot("raw-1", saved.events[0].id, "data:image/png;base64,late"),
+    finalStore.associateScreenshot("final-1", saved.events[0].id,
+      "data:image/png;base64,late"),
     /immutable/
   );
 
   // A new store simulates service-worker recovery from durable state.
-  const recovered = persistence.createStore(adapter);
-  await assert.rejects(recovered.append("raw-1", raw("after-restart")), /immutable/);
+  const recovered = persistence.createStore(finalAdapter);
+  await assert.rejects(recovered.append("final-1", raw("after-restart")), /immutable/);
 
   const legacySession = { id: "legacy", name: "Legacy", startedAt: finishedAt };
   const legacyEvent = { eventNo: 7, type: "click", timestamp: finishedAt, custom: true };

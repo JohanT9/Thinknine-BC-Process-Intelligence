@@ -9,6 +9,13 @@ const manifest = JSON.parse(read("src/ui/manifest.json"));
 
 assert.strictEqual(manifest.version, packageJson.version);
 assert.strictEqual(packageJson.version, "4.6.0");
+assert.strictEqual(packageJson.scripts.posttest, "npm run test:canonical",
+  "Canonical Recording tests must remain in the standard npm test lifecycle.");
+assert.ok(packageJson.scripts["test:canonical"].includes(
+  "raw-event-persistence.test.js"),
+"Canonical persistence integrity tests must remain in the canonical suite.");
+assert.ok(packageJson.scripts.ci.includes("npm test"),
+  "Standard CI must execute the npm test lifecycle.");
 
 const comparisonAssets = fs.readdirSync(
   path.join(root, "docs/assets/rc8-comparison")

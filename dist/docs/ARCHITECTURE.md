@@ -1,5 +1,18 @@
 # Architecture 4.6
 
+## Canonical domains and evidence safety
+
+Canonical Recording is the permanent captured-evidence source of truth.
+Semantic Document is the canonical renderer-neutral document representation.
+The two “canonical” contracts belong to different domains; document projection
+never replaces recording evidence.
+
+The capture compatibility boundary writes Canonical Recording before legacy
+events/screenshots. A serialized persistence queue exposes pending/failure
+diagnostics. Stop performs bounded settlement and validates Event counts,
+ordering, identity, and screenshot references before the immutable finish write.
+Derived interpretation, Review, Workspace, and Word remain read-only consumers.
+
 ## Documentation hierarchy
 
 Resolved Steps may be organized into exactly Section → Subtask → Step. Hierarchy

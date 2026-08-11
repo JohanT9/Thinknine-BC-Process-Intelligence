@@ -1,5 +1,52 @@
 # Canonical Recording
 
+## Hardened evidence contract
+
+Canonical Recording is the canonical source of truth for captured activity.
+Here, “canonical” refers to recording evidence. Semantic Document is separately
+the canonical document representation for rendering; it is not captured evidence.
+
+Schema-v1 operations `create`, `normalize`, `addEvent`, `addScreenshot`, and
+`finish` do not mutate their inputs and accept deeply frozen/serialized state.
+Events are append-only, retain insertion sequence, and cannot be edited, removed,
+reordered, or replaced by derived Steps. Completed evidence rejects further
+events and screenshot associations.
+
+Generated Event IDs remain deterministic for their source identity:
+`recordingId:event:sourceEventId` for new multi-frame deliveries and the backward-
+compatible `recordingId:event:eventNo` fallback for legacy input. No identity
+format changed. The source delivery ID remains stable through serialized
+service-worker persistence, and queue order owns canonical sequence.
+
+Screenshot asset IDs remain `recordingId:screenshot:eventNo`; they do not depend
+on filename or image bytes. Registration locates the source Event first, creates
+the deterministic asset, and links by ID. A repeated association is idempotent;
+it cannot replace accepted asset evidence. Unknown or broken Event/asset
+references are explicit errors/diagnostics.
+
+`integrityDiagnostics` reports unsupported schema, duplicate Event identity,
+ordering errors, missing screenshot assets, and detectable legacy/canonical count
+mismatch. Unsupported schemas fail with their actual version. Current-schema
+unknown fields survive cloning/normalization, while legacy normalization remains
+in-memory and non-destructive.
+
+Standard `npm test` runs `test:canonical` through its `posttest` lifecycle, so
+`npm run ci` cannot omit the evidence suite. Release-readiness and canonical
+hardening regressions lock this configuration.
+
+During capture, canonical Event/asset writes precede compatibility writes.
+Finalization waits up to 60 seconds for accepted Event writes, screenshot
+registrations, and the canonical persistence queue. Pending/failed writes or
+integrity mismatches are recorded in technical debug diagnostics and prevent the
+recording from being marked complete. Successful legacy projection, Review,
+Document Workspace, and Word behavior is unchanged.
+
+The queue and its failure journal live in the service worker. A browser or worker
+termination between accepting a delivery and its durable canonical save can
+therefore still lose that in-memory delivery. Durable delivery acknowledgement
+and replay belong to Raw Event Persistence hardening; successful finalization in
+the current worker does not conceal a known load/save failure.
+
 Manual Information Steps never create canonical events. Their manual provenance
 and empty event references explicitly separate documentation from evidence.
 
