@@ -9,7 +9,8 @@
   ]);
   const FORBIDDEN_PROJECT_FIELDS = Object.freeze([
     "review", "reviewState", "semanticDocument", "documentPlan", "plannerState",
-    "wordDocument", "wordStructures", "rendererState", "screenshots"
+    "wordDocument", "wordStructures", "rendererState", "screenshots",
+    "processVersions", "processSnapshots", "processDiffCache"
   ]);
 
   function clone(value) {
@@ -71,6 +72,15 @@
         suggestionLabel: text(source.health?.suggestionLabel),
         confirmations: list(source.health?.confirmations)
       },
+      processVersion: {
+        currentVersion: text(source.processVersion?.currentVersion),
+        currentVersionId: text(source.processVersion?.currentVersionId),
+        versionCount: Math.max(0, Number(source.processVersion?.versionCount) || 0),
+        baselineVersion: text(source.processVersion?.baselineVersion),
+        baselineVersionId: text(source.processVersion?.baselineVersionId),
+        approvedVersion: text(source.processVersion?.approvedVersion),
+        lastProcessChangeAt: timestamp(source.processVersion?.lastProcessChangeAt)
+      },
       recentActivity: list(source.recentActivity).slice(0, 5),
       metadata: source.metadata && typeof source.metadata === "object" &&
         !Array.isArray(source.metadata) ? source.metadata : {}
@@ -86,6 +96,7 @@
       profile: { ...left.profile, ...(right.profile || {}) },
       theme: { ...left.theme, ...(right.theme || {}) },
       health: { ...left.health, ...(right.health || {}) },
+      processVersion: { ...left.processVersion, ...(right.processVersion || {}) },
       metadata: { ...left.metadata, ...(right.metadata || {}) }
     });
   }

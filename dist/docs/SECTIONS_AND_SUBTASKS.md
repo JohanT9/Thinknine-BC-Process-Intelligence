@@ -89,3 +89,10 @@ Sections project as phase containers, never executable activities. Multi-step
 Subtasks may become bounded subprocesses; one-step Subtasks are not over-modeled.
 Recorded and presentation order remain intact when separate process order is
 defined. See [PROCESS_MODEL.md](PROCESS_MODEL.md).
+
+## Versioning relationship
+
+Process Version snapshots capture resolved process containment at creation time.
+A later Section/Subtask edit affects only the current Process Model until another
+intentional version is created; movement between process containers is then
+reported structurally. See [PROCESS_VERSIONING.md](PROCESS_VERSIONING.md).

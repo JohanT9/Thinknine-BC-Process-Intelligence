@@ -79,3 +79,11 @@ Generated process activities store canonical Event IDs as references; the
 Process Model never copies or rewrites Canonical Recording payloads. Manual
 nodes remain explicitly manual and claim no canonical evidence. See
 [PROCESS_MODEL.md](PROCESS_MODEL.md).
+
+## Historical traceability
+
+Process Versions preserve the canonical Event references present when their
+Process Model snapshot is created. Version creation and comparison never mutate
+or replay Canonical Recording. External evidence retention may limit future deep
+navigation, but stored semantic history remains intact. See
+[PROCESS_VERSIONING.md](PROCESS_VERSIONING.md).

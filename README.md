@@ -1,5 +1,13 @@
 # Thinknine BC Process Intelligence v4.6.0 R1
 
+## Process Versioning
+
+Consultants can create intentional immutable Process Model snapshots, detect
+unchanged semantics, compare historical/current/baseline states, and receive
+structured node, transition, movement, and container changes. Versioning is
+renderer-neutral and does not change current Workspace or Word output. See
+[docs/PROCESS_VERSIONING.md](docs/PROCESS_VERSIONING.md).
+
 ## Process Model
 
 Resolved documentation now projects into a deterministic, renderer-neutral

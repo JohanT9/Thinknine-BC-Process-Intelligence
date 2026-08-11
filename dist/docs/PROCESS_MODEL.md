@@ -106,3 +106,11 @@ can map the same semantics; none is implemented here.
 Projection is near-linear, performs no all-pairs inference, and has a 5,000-Step
 regression. It is local, uses no AI or external service, mutates no upstream
 state, and requires no migration for existing Reviews.
+
+## Historical versions
+
+Process Versioning freezes a complete Process Model snapshot so future projector
+or override changes cannot rewrite history. Semantic comparison ignores generated
+wording and visual documentation state while retaining graph structure,
+provenance, order, containment, and evidence references. See
+[PROCESS_VERSIONING.md](PROCESS_VERSIONING.md).

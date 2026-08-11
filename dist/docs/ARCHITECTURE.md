@@ -527,3 +527,10 @@ and before presentation planning. It separates process semantics from document
 organization, preserves source identity, and emits graph data plus validation
 diagnostics. Current Planner, Workspace, and Word behavior remains unchanged.
 See [PROCESS_MODEL.md](PROCESS_MODEL.md).
+
+## Process Versioning boundary (4.6)
+
+Intentional immutable Process Model snapshots live separately from Canonical
+Recording, current Review/Process state, and renderer output. Semantic Diff is
+derived from two snapshots or a snapshot and current model. Library integration
+is bounded metadata only. See [PROCESS_VERSIONING.md](PROCESS_VERSIONING.md).

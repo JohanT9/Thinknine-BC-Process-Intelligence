@@ -282,6 +282,19 @@
           selectedScreenshotId: null, selectedAnnotationId: null,
           scrollAnchor: finding.nodeId || null } });
     }
+    if (options.processVersionState?.currentDiff?.summary?.changed) {
+      const state = options.processVersionState;
+      const baselineLabel = state.baselineVersion?.versionNumber || "baseline";
+      items.push({ guidanceId: `process-version:changed:${baselineLabel}`,
+        diagnosticId: null, group: "Workflow",
+        title: "Recommendation: Processen har ändrats sedan baslinjen",
+        description: `Den aktuella processmodellen skiljer sig från ${baselineLabel}.`,
+        severity: "recommendation", documentLocation: "process-version",
+        recommendedAction: "Granska den strukturerade ändringsmängden och skapa en version vid behov.",
+        status: "Recommendation", context: { selectedSectionId: null,
+          selectedStepId: null, selectedScreenshotId: null,
+          selectedAnnotationId: null, scrollAnchor: null } });
+    }
     const diagnosticRules = new Set(
       (options.qualityDiagnostics?.findings || []).map(finding => finding.ruleId)
     );

@@ -1,5 +1,14 @@
 # Changelog
 
+## Process Versioning — v4.6
+
+- Added immutable complete Process Model snapshots with stable identity,
+  major/minor labels, explicit parent, baseline, status, notes, and provenance.
+- Added semantic fingerprints, duplicate detection, conservative identity/
+  traceability matching, and deterministic node/transition/container diffs.
+- Added lightweight Document Library version metadata and advisory baseline
+  guidance without changing Workspace or Word output.
+
 ## Process Model — v4.6
 
 - Added deterministic nodes, transitions, boundaries, phase/subprocess
