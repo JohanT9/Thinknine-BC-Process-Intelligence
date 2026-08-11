@@ -140,3 +140,10 @@ Generated activities may reference stable Semantic Action IDs. The Process
 Model does not reinterpret rule output, turn every UI mechanic into an activity,
 or infer branches from captions or controls. See
 [PROCESS_MODEL.md](PROCESS_MODEL.md).
+
+## Regeneration
+
+Semantic rules run through their existing owner and record their component
+version in the Derived Revision. Fresh generated semantics can improve without
+overwriting explicit consultant fields. See
+[REGENERATE_FROM_RECORDING.md](REGENERATE_FROM_RECORDING.md).

@@ -90,3 +90,10 @@ Visible merged Steps project as one activity with combined evidence; split
 parts may project separately. Hidden Steps do not create visible activities.
 Process overrides remain separate sparse state. See
 [PROCESS_MODEL.md](PROCESS_MODEL.md).
+
+## Regeneration
+
+Hide and Merge survive unique mappings. Split retains exact canonical Event
+partitions. Incompatible generated structure produces preserved unresolved state
+and is never guessed or flattened. See
+[REGENERATE_FROM_RECORDING.md](REGENERATE_FROM_RECORDING.md).

@@ -82,3 +82,10 @@ same projection; Word has no special override logic.
 Resolution is linear and metadata-only. Editing does not normalize or regroup
 recording evidence, inspect image bytes, invoke Word, call external services, or
 use AI.
+
+## Regeneration
+
+Sparse explicit fields retarget only through unique identity/evidence mappings.
+Edited fields survive; reset or untouched fields receive new generated values.
+Ambiguous split/consolidation targets remain unresolved. See
+[REGENERATE_FROM_RECORDING.md](REGENERATE_FROM_RECORDING.md).

@@ -93,3 +93,10 @@ become activities. Verification requires an explicit procedural marker, while
 warnings, notes, and tips stay documentation context. Manual projections retain
 manual provenance and no fabricated Event references. See
 [PROCESS_MODEL.md](PROCESS_MODEL.md).
+
+## Regeneration
+
+Manual Information Steps always survive because they are not recording-derived.
+Anchors retarget through unique Step identity; missing targets retain the existing
+conservative fallback/orphan behavior. See
+[REGENERATE_FROM_RECORDING.md](REGENERATE_FROM_RECORDING.md).

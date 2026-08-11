@@ -295,6 +295,18 @@
           selectedStepId: null, selectedScreenshotId: null,
           selectedAnnotationId: null, scrollAnchor: null } });
     }
+    if ((options.regenerationState?.unresolvedOverrideCount || 0) > 0) {
+      const count = options.regenerationState.unresolvedOverrideCount;
+      items.push({ guidanceId: "regeneration:unresolved-overrides",
+        diagnosticId: null, group: "Workflow",
+        title: "Recommendation: Granska ändringar efter regenerering",
+        description: `${count} manuella ändringar kunde inte kopplas säkert.`,
+        severity: "recommendation", documentLocation: "regeneration",
+        recommendedAction: "Granska de bevarade olösta ändringarna utan att ändra inspelningen.",
+        status: "Recommendation", context: { selectedSectionId: null,
+          selectedStepId: null, selectedScreenshotId: null,
+          selectedAnnotationId: null, scrollAnchor: null } });
+    }
     const diagnosticRules = new Set(
       (options.qualityDiagnostics?.findings || []).map(finding => finding.ruleId)
     );

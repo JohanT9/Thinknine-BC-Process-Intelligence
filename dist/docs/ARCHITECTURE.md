@@ -534,3 +534,10 @@ Intentional immutable Process Model snapshots live separately from Canonical
 Recording, current Review/Process state, and renderer output. Semantic Diff is
 derived from two snapshots or a snapshot and current model. Library integration
 is bounded metadata only. See [PROCESS_VERSIONING.md](PROCESS_VERSIONING.md).
+
+## Regeneration boundary (4.6)
+
+Regeneration starts only from a detached Canonical Recording and calls the
+existing interpretation owners once. Fresh generated state is reconciled with
+authoritative consultant state before validation and atomic pointer replacement.
+See [REGENERATE_FROM_RECORDING.md](REGENERATE_FROM_RECORDING.md).

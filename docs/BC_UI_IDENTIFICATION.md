@@ -98,3 +98,10 @@ The capture path does not scan the complete DOM for ancestry. Associated-label
 and `aria-labelledby` resolution use direct indexed lookups. No values are added
 to evidence, no data is logged or sent externally, and no AI/OCR/network lookup
 is used.
+
+## Regeneration
+
+The current identification owner may run again over stored observable evidence.
+Its independent version is recorded in the Derived Revision; it may improve
+derived identity but cannot add facts absent from capture. See
+[REGENERATE_FROM_RECORDING.md](REGENERATE_FROM_RECORDING.md).

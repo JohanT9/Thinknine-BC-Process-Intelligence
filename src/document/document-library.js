@@ -10,7 +10,8 @@
   const FORBIDDEN_PROJECT_FIELDS = Object.freeze([
     "review", "reviewState", "semanticDocument", "documentPlan", "plannerState",
     "wordDocument", "wordStructures", "rendererState", "screenshots",
-    "processVersions", "processSnapshots", "processDiffCache"
+    "processVersions", "processSnapshots", "processDiffCache",
+    "generatedState", "derivedRevisions", "regenerationResult"
   ]);
 
   function clone(value) {
@@ -81,6 +82,15 @@
         approvedVersion: text(source.processVersion?.approvedVersion),
         lastProcessChangeAt: timestamp(source.processVersion?.lastProcessChangeAt)
       },
+      regeneration: {
+        derivedRevisionId: text(source.regeneration?.derivedRevisionId),
+        derivedRevisionDate: timestamp(source.regeneration?.derivedRevisionDate),
+        regenerationVersion: text(source.regeneration?.regenerationVersion),
+        pipelineVersion: text(source.regeneration?.pipelineVersion),
+        processChanged: Boolean(source.regeneration?.processChanged),
+        unresolvedOverrideCount: Math.max(0,
+          Number(source.regeneration?.unresolvedOverrideCount) || 0)
+      },
       recentActivity: list(source.recentActivity).slice(0, 5),
       metadata: source.metadata && typeof source.metadata === "object" &&
         !Array.isArray(source.metadata) ? source.metadata : {}
@@ -97,6 +107,7 @@
       theme: { ...left.theme, ...(right.theme || {}) },
       health: { ...left.health, ...(right.health || {}) },
       processVersion: { ...left.processVersion, ...(right.processVersion || {}) },
+      regeneration: { ...left.regeneration, ...(right.regeneration || {}) },
       metadata: { ...left.metadata, ...(right.metadata || {}) }
     });
   }

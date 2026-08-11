@@ -96,3 +96,10 @@ Process Version snapshots capture resolved process containment at creation time.
 A later Section/Subtask edit affects only the current Process Model until another
 intentional version is created; movement between process containers is then
 reported structurally. See [PROCESS_VERSIONING.md](PROCESS_VERSIONING.md).
+
+## Regeneration
+
+Generated hierarchy may improve, while manual Sections, Subtasks, titles, and
+placements remain authoritative. Assignments retarget only through unique Step
+mappings; unsafe ownership remains unresolved. See
+[REGENERATE_FROM_RECORDING.md](REGENERATE_FROM_RECORDING.md).

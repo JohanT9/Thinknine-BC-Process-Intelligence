@@ -112,3 +112,10 @@ Capture values continue through existing privacy masking before canonical
 persistence. Production diagnostics contain counts and a short label but never
 dump complete raw payloads or recording data. No canonical data leaves the
 extension or is sent to AI services.
+
+## Regeneration
+
+Persisted raw events are read through the Canonical Recording boundary for local
+reinterpretation. No raw persistence write, migration, upload, or reconstruction
+is part of regeneration. See
+[REGENERATE_FROM_RECORDING.md](REGENERATE_FROM_RECORDING.md).

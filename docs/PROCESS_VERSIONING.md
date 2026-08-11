@@ -118,3 +118,10 @@ Unknown future fields are preserved through central normalization.
 No graphical or colour-based diff UI, approval workflow, branching version
 management, destructive restore, or visual renderer is implemented. The
 structured model is ready for an accessible future history or visual diff view.
+
+## Regeneration interaction
+
+Regeneration creates a Derived Revision, never a Process Version. Historical
+snapshots remain byte/structure equivalent. Current regenerated Process Model
+may be compared with the baseline so the consultant can explicitly version it
+later. See [REGENERATE_FROM_RECORDING.md](REGENERATE_FROM_RECORDING.md).

@@ -1,5 +1,13 @@
 # Thinknine BC Process Intelligence v4.6.0 R1
 
+## Regenerate From Recording
+
+Existing Canonical Recordings can now be reinterpreted through the current
+pipeline into a fresh Derived Revision, with deterministic reconciliation of
+consultant edits and a dry-run/atomic-apply contract. Uncertain mappings are
+preserved for review rather than guessed. See
+[docs/REGENERATE_FROM_RECORDING.md](docs/REGENERATE_FROM_RECORDING.md).
+
 ## Process Versioning
 
 Consultants can create intentional immutable Process Model snapshots, detect

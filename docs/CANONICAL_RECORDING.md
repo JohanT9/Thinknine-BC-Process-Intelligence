@@ -87,3 +87,10 @@ Process Model snapshot is created. Version creation and comparison never mutate
 or replay Canonical Recording. External evidence retention may limit future deep
 navigation, but stored semantic history remains intact. See
 [PROCESS_VERSIONING.md](PROCESS_VERSIONING.md).
+
+## Regeneration source
+
+Canonical Recording is the sole evidence source for regeneration and is checked
+for structural equivalence before and after projection. Regeneration cannot add
+missing evidence or rewrite historical events. See
+[REGENERATE_FROM_RECORDING.md](REGENERATE_FROM_RECORDING.md).

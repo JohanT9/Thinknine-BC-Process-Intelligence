@@ -83,3 +83,10 @@ Screen readers receive callout text and annotation labels, never geometry.
 Editing is metadata-only and does not renormalize events, regroup steps, reload
 unrelated images, invoke Word, or call an external service. Note text and labels
 remain local; no AI or automatic visual annotation generation is used.
+
+## Regeneration
+
+Notes map to unique owners or remain explicit orphans. Annotations stay with
+their screenshot assets and are copied unchanged; regeneration never migrates
+geometry to another screenshot. See
+[REGENERATE_FROM_RECORDING.md](REGENERATE_FROM_RECORDING.md).

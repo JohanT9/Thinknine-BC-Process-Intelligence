@@ -106,3 +106,10 @@ Activities reference resolved Steps and their Semantic Action, Step Group, and
 canonical Event identities. Process order is separate from grouping chronology;
 the Process Model never rewrites or regroups events. See
 [PROCESS_MODEL.md](PROCESS_MODEL.md).
+
+## Regeneration reconciliation
+
+Fresh Step Groups may change Step boundaries. Reconciliation prefers stable
+Group identity, then exact semantic/Event evidence; exact partitions and
+consolidations are reported, while ambiguous overrides remain unresolved. See
+[REGENERATE_FROM_RECORDING.md](REGENERATE_FROM_RECORDING.md).

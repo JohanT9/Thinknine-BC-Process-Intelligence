@@ -100,3 +100,10 @@ Group/candidate/profile fingerprints. A 5,000-candidate regression guards cost.
 The existing Screenshot Intelligence layer only adapts document blocks and
 applies the result. Document Planner, Workspace, and Word consume the same
 selected Semantic Document and cannot choose independently.
+
+## Regeneration
+
+Automatic selection may improve in fresh state. A manual choice remains
+authoritative while its asset exists; a missing asset becomes unresolved rather
+than silently switching the manual choice. Screenshot-owned Annotations never
+move. See [REGENERATE_FROM_RECORDING.md](REGENERATE_FROM_RECORDING.md).

@@ -114,3 +114,10 @@ or override changes cannot rewrite history. Semantic comparison ignores generate
 wording and visual documentation state while retaining graph structure,
 provenance, order, containment, and evidence references. See
 [PROCESS_VERSIONING.md](PROCESS_VERSIONING.md).
+
+## Regeneration
+
+The current Process Model is freshly projected from regenerated resolved inputs.
+Process Overrides retarget through stable source identity or remain unresolved;
+historical Process Versions are outside the operation. See
+[REGENERATE_FROM_RECORDING.md](REGENERATE_FROM_RECORDING.md).

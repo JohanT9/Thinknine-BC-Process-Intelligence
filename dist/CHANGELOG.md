@@ -1,5 +1,14 @@
 # Changelog
 
+## Regenerate From Recording — v4.6
+
+- Added fresh deterministic interpretation orchestration with independently
+  recorded pipeline versions and stable Derived Revision fingerprints.
+- Added identity/traceability reconciliation for content, screenshots,
+  structure, manual information, Notes, hierarchy, and Process Overrides.
+- Added structured preview, unresolved-state preservation, atomic commit/
+  rollback contract, Workspace Context mapping, and bounded library guidance.
+
 ## Process Versioning — v4.6
 
 - Added immutable complete Process Model snapshots with stable identity,

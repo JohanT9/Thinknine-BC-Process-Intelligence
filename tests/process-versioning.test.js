@@ -120,7 +120,7 @@ oldIds.nodes.find(node => node.nodeId === aId).nodeId = "new-projector-node-a";
 oldIds.transitions = [];
 const fallback = versions.compareProcessVersions(firstModel, oldIds);
 assert(fallback.nodeChanges.some(change => change.previousNodeId === aId &&
-  change.matchStrategy === "stable-traceability"));
+  change.matchStrategy.endsWith("traceability")));
 
 const historical = JSON.stringify(v1);
 firstModel.nodes[0].title = "Cannot mutate frozen model";

@@ -181,12 +181,6 @@
       }) });
   }
 
-  function traceKey(node) {
-    const groups = [node.sourceStepIds, node.sourceSemanticActionIds, node.sourceEventIds]
-      .map(unique).filter(values => values.length);
-    return groups.length ? groups.map(values => values.join("\u001e")).join("\u001d") : null;
-  }
-
   function matchNodes(fromNodes, toNodes) {
     const matches = [];
     const unmatchedFrom = new Map(fromNodes.map(node => [node.nodeId, node]));
@@ -196,21 +190,29 @@
       matches.push({ from, to: unmatchedTo.get(id), strategy: "node-id" });
       unmatchedFrom.delete(id); unmatchedTo.delete(id);
     }
-    const fromTrace = new Map();
-    const toTrace = new Map();
-    for (const node of unmatchedFrom.values()) {
-      const key = traceKey(node);
-      if (key) fromTrace.set(key, fromTrace.has(key) ? null : node);
-    }
-    for (const node of unmatchedTo.values()) {
-      const key = traceKey(node);
-      if (key) toTrace.set(key, toTrace.has(key) ? null : node);
-    }
-    for (const [key, from] of fromTrace) {
-      const to = toTrace.get(key);
-      if (!from || !to) continue;
-      matches.push({ from, to, strategy: "stable-traceability" });
-      unmatchedFrom.delete(from.nodeId); unmatchedTo.delete(to.nodeId);
+    for (const [strategy, keyOf] of [
+      ["source-step-traceability", node => unique(node.sourceStepIds).join("\u001e")],
+      ["semantic-action-traceability", node =>
+        unique(node.sourceSemanticActionIds).join("\u001e")],
+      ["source-event-traceability", node => unique(node.sourceEventIds).join("\u001e")]
+    ]) {
+      const fromTrace = new Map();
+      const toTrace = new Map();
+      for (const node of unmatchedFrom.values()) {
+        const key = keyOf(node);
+        if (key) fromTrace.set(key, fromTrace.has(key) ? null : node);
+      }
+      for (const node of unmatchedTo.values()) {
+        const key = keyOf(node);
+        if (key) toTrace.set(key, toTrace.has(key) ? null : node);
+      }
+      for (const [key, from] of fromTrace) {
+        const to = toTrace.get(key);
+        if (!from || !to || !unmatchedFrom.has(from.nodeId) ||
+            !unmatchedTo.has(to.nodeId)) continue;
+        matches.push({ from, to, strategy });
+        unmatchedFrom.delete(from.nodeId); unmatchedTo.delete(to.nodeId);
+      }
     }
     return { matches, removed: [...unmatchedFrom.values()], added: [...unmatchedTo.values()] };
   }

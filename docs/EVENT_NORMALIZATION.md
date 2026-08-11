@@ -111,3 +111,10 @@ owns browser-mechanic coalescing; grouping owns candidate documentation-step
 boundaries. Semantic business meaning remains downstream of both layers.
 Normalized event kind and primary-event alignment later provide metadata signals
 to Screenshot Selection; normalization itself never chooses an image.
+
+## Regeneration
+
+Normalization is rerun by its existing implementation against detached
+canonical evidence. Its component version is recorded independently, and it
+never receives edited documentation or renderer state. See
+[REGENERATE_FROM_RECORDING.md](REGENERATE_FROM_RECORDING.md).
