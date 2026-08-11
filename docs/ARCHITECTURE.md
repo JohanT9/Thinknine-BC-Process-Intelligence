@@ -519,3 +519,11 @@ one Review and the unchanged Word pipeline.
 `async-operations.js` is UI infrastructure only. It owns timeout timer cleanup
 and single-flight request coalescing for popup polling, has no product-domain
 dependencies and stores no state after a request settles.
+
+## Process Model boundary (4.6)
+
+The renderer-neutral Process Model projects after resolved Sections/Subtasks
+and before presentation planning. It separates process semantics from document
+organization, preserves source identity, and emits graph data plus validation
+diagnostics. Current Planner, Workspace, and Word behavior remains unchanged.
+See [PROCESS_MODEL.md](PROCESS_MODEL.md).

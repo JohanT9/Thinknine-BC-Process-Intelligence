@@ -83,3 +83,10 @@ Documentation Intelligence analyzes visible resolved structure. Workspace and
 Word share the same Semantic Document and Document Plan; neither contains
 special hide/merge/split logic. Operations are metadata-only, local, reversible,
 and do not use AI or external services.
+
+## Process projection
+
+Visible merged Steps project as one activity with combined evidence; split
+parts may project separately. Hidden Steps do not create visible activities.
+Process overrides remain separate sparse state. See
+[PROCESS_MODEL.md](PROCESS_MODEL.md).

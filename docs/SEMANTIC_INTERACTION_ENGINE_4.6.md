@@ -133,3 +133,10 @@ priority distinct enough to avoid ambiguous ownership.
 - Suppressed UI mechanics remain available as ordered semantic trace.
 - Screenshot Intelligence remains responsible for image selection.
 - Language Excellence remains responsible for wording.
+
+## Process Model consumer
+
+Generated activities may reference stable Semantic Action IDs. The Process
+Model does not reinterpret rule output, turn every UI mechanic into an activity,
+or infer branches from captions or controls. See
+[PROCESS_MODEL.md](PROCESS_MODEL.md).

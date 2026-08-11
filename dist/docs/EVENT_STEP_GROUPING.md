@@ -99,3 +99,10 @@ ownership.
 Step Groups aggregate all valid screenshot asset IDs in source order. The
 Screenshot Selection Engine consumes that bounded set after semantic and
 presentation processing. Grouping never ranks or selects candidates.
+
+## Process projection
+
+Activities reference resolved Steps and their Semantic Action, Step Group, and
+canonical Event identities. Process order is separate from grouping chronology;
+the Process Model never rewrites or regroups events. See
+[PROCESS_MODEL.md](PROCESS_MODEL.md).

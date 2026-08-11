@@ -85,3 +85,11 @@ Intelligence, Planner, Workspace, and Word consume the same Resolved Step; Word
 does not expose manual provenance or use a special renderer. Manual text remains
 local, is not emitted to production diagnostics, and uses no AI, network, or
 external service.
+
+## Process projection
+
+Prerequisites and information become information nodes; explicit instructions
+become activities. Verification requires an explicit procedural marker, while
+warnings, notes, and tips stay documentation context. Manual projections retain
+manual provenance and no fabricated Event references. See
+[PROCESS_MODEL.md](PROCESS_MODEL.md).

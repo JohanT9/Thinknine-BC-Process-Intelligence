@@ -82,3 +82,10 @@ contrast, reduced motion, and live announcements remain applicable.
 Hierarchy resolution is linear for normal assignments and metadata-only. It does
 not rerun recording, normalization, grouping, semantic rules, screenshot
 selection, or Word rendering, and it uses no AI or external services.
+
+## Process Model mapping
+
+Sections project as phase containers, never executable activities. Multi-step
+Subtasks may become bounded subprocesses; one-step Subtasks are not over-modeled.
+Recorded and presentation order remain intact when separate process order is
+defined. See [PROCESS_MODEL.md](PROCESS_MODEL.md).

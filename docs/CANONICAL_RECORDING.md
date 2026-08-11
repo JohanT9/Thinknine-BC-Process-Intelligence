@@ -72,3 +72,10 @@ They may receive a delayed `screenshotAssetId` while recording is active, but
 cannot be replaced or deleted. Finalization waits for accepted writes and then
 prevents further event or asset changes. The serialized ownership and recovery
 contract is documented in [Raw Event Persistence](RAW_EVENT_PERSISTENCE.md).
+
+## Process Model traceability
+
+Generated process activities store canonical Event IDs as references; the
+Process Model never copies or rewrites Canonical Recording payloads. Manual
+nodes remain explicitly manual and claim no canonical evidence. See
+[PROCESS_MODEL.md](PROCESS_MODEL.md).

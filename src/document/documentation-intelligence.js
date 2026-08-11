@@ -257,6 +257,31 @@
       seen.add(finding.diagnosticId);
       items.push(item(finding));
     }
+    for (const finding of options.processDiagnostics?.diagnostics || []) {
+      const diagnosticId = `process:${finding.code}:` +
+        String(finding.nodeId || finding.transitionId ||
+          finding.processOverrideId || items.length);
+      if (seen.has(diagnosticId)) continue;
+      seen.add(diagnosticId);
+      const titles = {
+        "missing-start": "Processen saknar en tydlig start",
+        "missing-end": "Processen saknar ett tydligt slut",
+        "unreachable-node": "En processaktivitet kan inte nås",
+        "orphaned-process-override": "En manuell processändring saknar mål",
+        "orphan-transition": "En processövergång saknar målpunkt"
+      };
+      items.push({ guidanceId: `guidance:${diagnosticId}`, diagnosticId,
+        group: "Workflow", title: `Recommendation: ${titles[finding.code] ||
+          "Granska processmodellen"}`,
+        description: "Processmodellens validering har hittat något som bör granskas.",
+        severity: finding.severity === "error" ? "attention" : "recommendation",
+        documentLocation: finding.nodeId || "process-model",
+        recommendedAction: "Granska processens struktur utan att ändra inspelad evidens.",
+        status: finding.severity === "error" ? "Needs Attention" : "Recommendation",
+        context: { selectedSectionId: null, selectedStepId: null,
+          selectedScreenshotId: null, selectedAnnotationId: null,
+          scrollAnchor: finding.nodeId || null } });
+    }
     const diagnosticRules = new Set(
       (options.qualityDiagnostics?.findings || []).map(finding => finding.ruleId)
     );

@@ -1,5 +1,13 @@
 # Thinknine BC Process Intelligence v4.6.0 R1
 
+## Process Model
+
+Resolved documentation now projects into a deterministic, renderer-neutral
+process graph with neutral boundaries, traceable activities, phase/subprocess
+containers, explicit manual decisions, sparse overrides, and validation. It
+does not alter Workspace or Word output. See
+[docs/PROCESS_MODEL.md](docs/PROCESS_MODEL.md).
+
 ## Sections and Subtasks
 
 Long workflows can be organized into a bounded Document → Section → Subtask →

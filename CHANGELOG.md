@@ -1,5 +1,13 @@
 # Changelog
 
+## Process Model — v4.6
+
+- Added deterministic nodes, transitions, boundaries, phase/subprocess
+  containers, and canonical traceability in a renderer-neutral graph.
+- Added sparse manual process overrides, explicit branches, orphan preservation,
+  separate process order, structured validation, and profile guidance.
+- Kept existing Review, Workspace, and Word behavior unchanged.
+
 ## Sections / Subtasks — v4.6
 
 - Added immutable Section/Subtask models and sparse Hierarchy Overrides.
