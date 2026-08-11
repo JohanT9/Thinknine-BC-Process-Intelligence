@@ -6,9 +6,19 @@ const dashboard = fs.readFileSync(
   path.join(__dirname, "../src/ui/dashboard.js"),
   "utf8"
 );
+const dashboardHtml = fs.readFileSync(
+  path.join(__dirname, "../src/ui/dashboard.html"),
+  "utf8"
+);
 const background = fs.readFileSync(
   path.join(__dirname, "../src/recorder/background.js"),
   "utf8"
+);
+
+assert.ok(
+  dashboardHtml.indexOf('src="review/review-annotations.js"') <
+    dashboardHtml.indexOf('src="document/review-document-projector.js"'),
+  "Review Annotations must load before the browser projector captures its dependency."
 );
 
 assert.ok(
