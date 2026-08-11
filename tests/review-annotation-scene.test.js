@@ -80,10 +80,10 @@ const longArrow = scene.create([{
   geometry: { startX: 0.1, startY: 0.5, endX: 0.9, endY: 0.5 },
   style: annotations.DEFAULT_STYLES.arrow
 }], 1000, 1000)[0];
-assert.strictEqual(longArrow.endX - longArrow.headPoints[1][0], 25);
+assert.strictEqual(longArrow.endX - longArrow.headPoints[1][0], 40);
 assert.strictEqual(
   Math.abs(longArrow.endY - longArrow.headPoints[1][1]),
-  9
+  20
 );
 
 const review = { annotations: annotations.emptyStore(), updatedAt: "old" };
@@ -264,5 +264,7 @@ svgRenderer.render(arrowSvg, [{
 assert.strictEqual(arrowSvg.children.length, 1);
 assert.strictEqual(arrowSvg.children[0].children.length, 2);
 assert.strictEqual(arrowSvg.children[0].attributes["data-selected"], "true");
+assert.strictEqual(arrowSvg.children[0].children[0].attributes["stroke-linecap"],
+  "round");
 
 console.log("Review annotation scene tests passed.");

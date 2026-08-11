@@ -44,8 +44,8 @@ assert.deepStrictEqual(arrow.geometry, {
   endX: 1,
   endY: 0.8
 });
-assert.strictEqual(arrow.style.arrowheadLength, 0.025);
-assert.strictEqual(arrow.style.arrowheadWidth, 0.018);
+assert.strictEqual(arrow.style.arrowheadLength, 0.04);
+assert.strictEqual(arrow.style.arrowheadWidth, 0.04);
 
 assert.throws(
   () => annotations.createAnnotation(

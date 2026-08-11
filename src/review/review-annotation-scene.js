@@ -78,13 +78,19 @@
     const unitX = deltaX / distance;
     const unitY = deltaY / distance;
     const scale = Math.min(width, height);
+    const configuredLength = style.arrowheadLength === 0.025
+      ? annotations.DEFAULT_STYLES[annotations.TYPES.ARROW].arrowheadLength
+      : style.arrowheadLength;
+    const configuredWidth = style.arrowheadWidth === 0.018
+      ? annotations.DEFAULT_STYLES[annotations.TYPES.ARROW].arrowheadWidth
+      : style.arrowheadWidth;
     const headLength = Math.min(finiteStyle(
-      style.arrowheadLength,
+      configuredLength,
       annotations.DEFAULT_STYLES[annotations.TYPES.ARROW].arrowheadLength
     ) * scale, distance * 0.6);
     const halfWidth = Math.min(
       finiteStyle(
-        style.arrowheadWidth,
+        configuredWidth,
         annotations.DEFAULT_STYLES[annotations.TYPES.ARROW].arrowheadWidth
       ) * scale / 2,
       distance * 0.3

@@ -21,8 +21,8 @@
       stroke: "#dc2626",
       strokeWidth: 0.006,
       opacity: 1,
-      arrowheadLength: 0.025,
-      arrowheadWidth: 0.018
+      arrowheadLength: 0.04,
+      arrowheadWidth: 0.04
     }),
     [TYPES.HIGHLIGHT]: Object.freeze({ fill: "#fde047", opacity: 0.35 }),
     [TYPES.NUMBERED_CALLOUT]: Object.freeze({ fill: "#dc2626", opacity: 1 }),

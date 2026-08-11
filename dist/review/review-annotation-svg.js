@@ -74,6 +74,8 @@
               y2: primitive.endY,
               stroke: primitive.stroke,
               "stroke-width": primitive.strokeWidth,
+              "stroke-linecap": "round",
+              "stroke-linejoin": "round",
               "vector-effect": "non-scaling-stroke"
             },
             children: []
