@@ -1,5 +1,11 @@
 # Changelog
 
+## 4.6 - Dashboard Composition Root
+
+- Added a DOM-independent canonical session interpretation pipeline.
+- Extracted Knowledge Pack matching, scoring, and enrichment from UI orchestration.
+- Routed Review preparation and session export through the same domain pipeline.
+
 ## 4.6 - Canonical traceability migration
 
 - Made Canonical Event IDs authoritative through normalization, grouping,

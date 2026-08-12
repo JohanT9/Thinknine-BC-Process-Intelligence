@@ -2842,87 +2842,20 @@ async function prepareSessionModel(session) {
     screenshotData[imagePaths[eventNo]] = dataUrl;
   }
 
-  const filteredEvents = globalThis.T9Engine?.noiseFilter
-    ? globalThis.T9Engine.noiseFilter.filter(response.events)
-    : response.events;
-
-  const contextEvents = buildContextEvents(filteredEvents);
-  const contextCandidates = createContextCandidates(contextEvents);
-
-  const interpretedSteps = buildBusinessSteps(
-    contextEvents,
-    imagePaths,
-    response.session.settings || DEFAULTS
-  );
-  const businessSteps = runProcessPatternEngine(interpretedSteps);
-  const taskResult = runBusinessTaskEngine(businessSteps);
-  const contextByEventNo = new Map(
-    contextEvents.map(event => [event.eventNo, event.context || {}])
-  );
-
-  const legacyTasks = finalizeKnowledgeTasks(
-    taskResult.tasks,
-    response.session.settings || DEFAULTS
-  ).map(task => {
-    const contexts = (task.sourceEventNos || [])
-      .map(eventNo => contextByEventNo.get(eventNo))
-      .filter(Boolean);
-
-    return {
-      ...task,
-      context:
-        contexts.find(context => context.currentEntity) ||
-        contexts[0] ||
-        {},
-      automationId: task.automationId || ""
-    };
-  });
-
-  const businessTasks = applyKnowledgePackFramework(
-    legacyTasks,
-    response.session.settings || DEFAULTS
-  ).map((task, index) => ({
-    ...task,
-    taskNo: index + 1,
-    taskId: stableTaskId(task, index)
-  }));
-
-  const entityNodes = globalThis.T9Engine?.entityMemory
-    ? globalThis.T9Engine.entityMemory.build(contextEvents)
-    : [];
-
-  const sessionGraph = globalThis.T9Engine?.sessionGraph
-    ? globalThis.T9Engine.sessionGraph.build(
-        response.session,
-        businessTasks,
-        entityNodes
-      )
-    : { nodes: [], edges: [] };
-
-  const confidenceResult = globalThis.T9Engine?.confidence
-    ? globalThis.T9Engine.confidence.evaluate(
-        businessTasks,
-        sessionGraph
-      )
-    : {
-        tasks: businessTasks,
-        sessionConfidence: calculateTaskQuality(businessTasks),
-        knowledgeMatchPercent: 0,
-        graphCoveragePercent: 0,
-        reviewSuggestedCount: 0
-      };
+  const model = globalThis.T9SessionInterpretationPipeline.interpret({
+    session: response.session, events: response.events,
+    normalizedEvents: response.normalizedEvents, stepGroups: response.stepGroups,
+    imagePaths, knowledgePacks: loadedKnowledgePacks
+  }, { entityMemory: globalThis.T9Engine?.entityMemory,
+    sessionGraph: globalThis.T9Engine?.sessionGraph,
+    confidence: globalThis.T9Engine?.confidence });
+  unmatchedKnowledgeItems = model.unmatchedKnowledgeItems;
 
   return {
     response,
     imagePaths,
     screenshotData,
-    contextEvents,
-    contextCandidates,
-    interpretedSteps,
-    businessSteps,
-    sessionGraph,
-    confidenceResult,
-    businessTasks: confidenceResult.tasks
+    ...model
   };
 }
 
@@ -2951,76 +2884,17 @@ async function exportSession(session) {
     });
   }
 
-  const filteredEvents = globalThis.T9Engine?.noiseFilter
-    ? globalThis.T9Engine.noiseFilter.filter(response.events)
-    : response.events;
-
-  const contextEvents = buildContextEvents(filteredEvents);
-  const contextCandidates = createContextCandidates(contextEvents);
-
-  const interpretedSteps = buildBusinessSteps(
-    contextEvents,
-    imagePaths,
-    response.session.settings || DEFAULTS
-  );
-  const businessSteps = runProcessPatternEngine(interpretedSteps);
-  const taskResult = runBusinessTaskEngine(businessSteps);
-  const contextByEventNo = new Map(
-    contextEvents.map(event => [event.eventNo, event.context || {}])
-  );
-
-  const legacyTasks = finalizeKnowledgeTasks(
-    taskResult.tasks,
-    response.session.settings || DEFAULTS
-  ).map(task => {
-    const contexts = (task.sourceEventNos || [])
-      .map(eventNo => contextByEventNo.get(eventNo))
-      .filter(Boolean);
-
-    const strongestContext =
-      contexts.find(context => context.currentEntity) ||
-      contexts[0] ||
-      {};
-
-    return {
-      ...task,
-      context: strongestContext,
-      automationId:
-        task.automationId ||
-        ""
-    };
-  });
-  const businessTasks = applyKnowledgePackFramework(
-    legacyTasks,
-    response.session.settings || DEFAULTS
-  ).map((task, index) => ({
-    ...task,
-    taskNo: index + 1,
-    taskId: stableTaskId(task, index)
-  }));
-  const entityNodes = globalThis.T9Engine?.entityMemory
-    ? globalThis.T9Engine.entityMemory.build(contextEvents)
-    : [];
-
-  const sessionGraph = globalThis.T9Engine?.sessionGraph
-    ? globalThis.T9Engine.sessionGraph.build(
-        response.session,
-        businessTasks,
-        entityNodes
-      )
-    : { nodes: [], edges: [] };
-
-  const confidenceResult = globalThis.T9Engine?.confidence
-    ? globalThis.T9Engine.confidence.evaluate(businessTasks, sessionGraph)
-    : {
-        tasks: businessTasks,
-        sessionConfidence: calculateTaskQuality(businessTasks),
-        knowledgeMatchPercent: 0,
-        graphCoveragePercent: 0,
-        reviewSuggestedCount: 0
-      };
-
-  const finalBusinessTasks = confidenceResult.tasks;
+  const model = globalThis.T9SessionInterpretationPipeline.interpret({
+    session: response.session, events: response.events,
+    normalizedEvents: response.normalizedEvents, stepGroups: response.stepGroups,
+    imagePaths, knowledgePacks: loadedKnowledgePacks
+  }, { entityMemory: globalThis.T9Engine?.entityMemory,
+    sessionGraph: globalThis.T9Engine?.sessionGraph,
+    confidence: globalThis.T9Engine?.confidence });
+  unmatchedKnowledgeItems = model.unmatchedKnowledgeItems;
+  const { contextEvents, contextCandidates, interpretedSteps, businessSteps,
+    confidenceResult } = model;
+  const finalBusinessTasks = model.businessTasks;
   const knowledgeQuality = confidenceResult.sessionConfidence;
   const diagnostics = createDiagnostics(
     response.session,
