@@ -10,6 +10,7 @@
   let sourceSequence = 0;
   const inputTimers = new WeakMap();
   const initialValues = new WeakMap();
+  const observedDialogs = new Set();
 
   try {
     chrome.runtime.sendMessage({ type: "T9_GET_STATE" }, response => {
@@ -199,6 +200,11 @@
     ].join(","));
   }
 
+  function eventElement(event) {
+    return event.composedPath?.().find(item => item instanceof Element) ||
+      event.target;
+  }
+
   function categoryOf(element) {
     const role = element?.getAttribute?.("role");
     const tag = element?.tagName?.toLowerCase();
@@ -348,7 +354,7 @@
 
 
   document.addEventListener("click", event => {
-    const target = interactiveTarget(event.target);
+    const target = interactiveTarget(eventElement(event));
     if (!target) return;
 
     record({
@@ -377,7 +383,7 @@
   }
 
   document.addEventListener("input", event => {
-    const element = event.target;
+    const element = eventElement(event);
     if (!(element instanceof Element)) return;
 
     clearTimeout(inputTimers.get(element));
@@ -388,7 +394,7 @@
   }, true);
 
   document.addEventListener("focusin", event => {
-    const element = event.target;
+    const element = eventElement(event);
     if (!(element instanceof Element) ||
         !element.matches('input,textarea,select,[contenteditable="true"]')) return;
     initialValues.set(element, valueOf(element));
@@ -397,13 +403,15 @@
   }, true);
 
   document.addEventListener("change", event => {
-    if (event.target instanceof Element) {
-      emitField(event.target, "change");
+    const element = eventElement(event);
+    if (element instanceof Element) {
+      clearTimeout(inputTimers.get(element));
+      emitField(element, "change");
     }
   }, true);
 
   document.addEventListener("focusout", event => {
-    const element = event.target;
+    const element = eventElement(event);
 
     if (
       element instanceof Element &&
@@ -417,7 +425,8 @@
 
   document.addEventListener("keydown", event => {
     if (!["Enter", " ", "Spacebar", "Escape", "F4"].includes(event.key)) return;
-    const target = interactiveTarget(event.target) || event.target;
+    const eventTarget = eventElement(event);
+    const target = interactiveTarget(eventTarget) || eventTarget;
 
     record({
       type: "key",
@@ -430,21 +439,20 @@
       shiftKey: event.shiftKey,
       repeat: event.repeat,
       inputSource: "keyboard",
-      fieldName: getLabel(event.target),
+      fieldName: getLabel(eventTarget),
       ...descriptor(target)
     });
   }, true);
 
   const observer = new MutationObserver(() => {
-    document
-      .querySelectorAll('[role="dialog"],[aria-modal="true"]')
-      .forEach(dialog => {
-        if (dialog.dataset.t9RecordedDialog === "1") return;
-
-        dialog.dataset.t9RecordedDialog = "1";
+    const currentDialogs = new Set(document
+      .querySelectorAll('[role="dialog"],[aria-modal="true"]'));
+    currentDialogs.forEach(dialog => {
+        if (observedDialogs.has(dialog)) return;
+        observedDialogs.add(dialog);
         const dialogDescriptor = descriptor(dialog);
         record({
-          type: "dialog",
+          type: "dialog-open",
           category: "dialog",
           ...dialogDescriptor,
           label: textOf(dialog).slice(0, 600),
@@ -452,6 +460,12 @@
             ...dialogDescriptor.uiHierarchy]
         });
       });
+    observedDialogs.forEach(dialog => {
+      if (currentDialogs.has(dialog)) return;
+      observedDialogs.delete(dialog);
+      record({ type: "dialog-close", category: "dialog",
+        label: textOf(dialog).slice(0, 600), ...descriptor(dialog) });
+    });
 
     const signature = `${getPageId()}|${getPageCaption()}|${location.href}`;
     if (signature !== lastPageSignature) {

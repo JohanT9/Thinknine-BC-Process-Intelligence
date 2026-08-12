@@ -24,6 +24,14 @@ structured identities through compatibility adapters and contains no primary BC
 caption-recognition rules. Caption fallback is language-grouped inside the
 engine and is used only when stronger technical evidence is absent.
 
+## Event Normalization boundary
+
+Event Normalization 2.0.0 is the sole owner of browser-mechanic coalescing. It
+consumes durable Raw Events and BC UI Identification, emits immutable normalized
+interactions, and never groups them into Steps. React/MUI focus comparison is
+capture evidence; only normalization may classify a verified difference as a
+`value-change`.
+
 ## Documentation hierarchy
 
 Resolved Steps may be organized into exactly Section → Subtask → Step. Hierarchy

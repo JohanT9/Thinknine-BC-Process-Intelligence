@@ -13,6 +13,12 @@ Persisted Raw Events receive renderer-neutral Page, Control, Action, and Entity
 identity before derived mechanics. Stable BC and automation IDs outrank a small,
 engine-owned localized-caption fallback; dashboard only consumes the result.
 
+## Event Normalization 2.0.0
+
+Persisted and identified browser mechanics normalize into a small stable
+interaction vocabulary. Native commits and React/MUI focus-session fallback
+coalesce mechanically while preserving every Raw Event source ID.
+
 ## Canonical Recording Hardening
 
 Canonical Recording is the immutable evidence projection consumed by derived

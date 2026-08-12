@@ -13,6 +13,8 @@ assert.ok(packageJson.scripts.posttest.includes("npm run test:canonical"),
   "Canonical Recording tests must remain in the standard npm test lifecycle.");
 assert.ok(packageJson.scripts.posttest.includes("npm run test:bc-identification"),
   "BC UI Identification tests must remain in the standard npm test lifecycle.");
+assert.ok(packageJson.scripts.posttest.includes("npm run test:event-normalization"),
+  "Event Normalization tests must remain in the standard npm test lifecycle.");
 assert.ok(packageJson.scripts["test:canonical"].includes(
   "raw-event-persistence.test.js"),
 "Canonical persistence integrity tests must remain in the canonical suite.");

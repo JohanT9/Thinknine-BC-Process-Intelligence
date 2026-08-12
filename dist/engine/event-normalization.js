@@ -5,11 +5,12 @@
 })(typeof globalThis !== "undefined" ? globalThis : this, function () {
   "use strict";
   const SCHEMA_VERSION = 1;
+  const NORMALIZATION_VERSION = "2.0.0";
   const cache = new WeakMap();
   const clone = value => value == null ? value : JSON.parse(JSON.stringify(value));
   function freeze(value) { if (!value || typeof value !== "object" || Object.isFrozen(value)) return value; Object.values(value).forEach(freeze); return Object.freeze(value); }
   function rawOf(event) { return event?.raw || event || {}; }
-  function controlKey(event) { const id = event.identification || {}; const raw = rawOf(event); return id.control?.identity?.value || raw.automationId || raw.fieldName || raw.label || event.id; }
+  function controlKey(event) { const id = event.identification || {}; const raw = rawOf(event); return id.controlIdentity?.controlIdentity || id.control?.identity?.value || raw.automationId || raw.fieldName || raw.label || event.id; }
   function mechanism(raw) { if (raw.inputSource === "keyboard" || /^(?:key|keydown)$/.test(raw.type)) return "keyboard"; if (raw.type === "click") return "pointer"; if (/pointer/.test(raw.type || "")) return "pointer"; if (/mouse/.test(raw.type || "")) return "mouse"; return "unknown"; }
   function valueModel(raw, identified) {
     if (!Object.prototype.hasOwnProperty.call(raw, "value")) return null;
@@ -22,20 +23,21 @@
     const raw = rawOf(event); const identified = event.identification || {};
     const control = identified.control?.type || ""; const type = raw.type || "unknown";
     if (type === "click" && (control === "checkbox" || raw.checked != null)) return ["toggle-change", "verified-checked-state"];
-    if ((type === "click" || /pointer|mouse/.test(type)) && control === "lookup") return ["lookup-open", "identified-lookup-trigger"];
-    if (["click", "key", "keydown"].includes(type) && identified.page?.modal && identified.action) return ["dialog-action", "identified-dialog-action"];
+    if (["dialog", "dialog-open"].includes(type)) return ["dialog-open", "observed-dialog-open"];
+    if (type === "dialog-close") return ["dialog-close", "observed-dialog-close"];
+    if ((type === "click" || /pointer|mouse/.test(type)) && control === "lookup") return ["activation", "identified-lookup-trigger"];
     if (["click", "key", "keydown"].includes(type) && identified.action && (type === "click" || ["Enter", " ", "Space"].includes(raw.key))) return ["activation", "identified-action-activation"];
-    if (type === "click" && ["listRow", "repeaterCell"].includes(control)) return ["row-selection", "identified-row-activation"];
+    if (type === "click" && ["listRow", "repeaterCell"].includes(control)) return ["selection-change", "identified-row-selection"];
     if (["field-change", "change", "input"].includes(type) && (control === "checkbox" || typeof raw.value === "boolean" || raw.checked != null)) return ["toggle-change", "verified-checked-state"];
     if (["field-change", "change"].includes(type) && control === "option") return ["selection-change", "identified-option-change"];
     if (["field-change", "input", "change"].includes(type)) {
       if (raw.inputSource === "focusout" && raw.previousValue === raw.value) return [null, "unchanged-focusout"];
-      if (raw.inputSource === "focusout" && raw.previousValue === undefined) return ["focus-transition", "unverified-focusout"];
+      if (raw.inputSource === "focusout" && raw.previousValue === undefined) return [null, "unverified-focusout"];
       return ["value-change", raw.inputSource === "focusout" ? "changed-value-on-focusout-fallback" : "browser-value-event"];
     }
     if (["focus", "focusin", "focusout"].includes(type)) return [null, "focus-only-no-change"];
     if (["navigation", "page-state"].includes(type)) return ["navigation", "observed-navigation"];
-    if (["key", "keydown"].includes(type)) return ["keyboard-action", "observed-keyboard-action"];
+    if (["key", "keydown"].includes(type)) return ["key-command", "observed-key-command"];
     if (type === "click") return ["activation", "generic-activation"];
     return ["unknown", "unmapped-raw-event"];
   }
@@ -46,16 +48,25 @@
     return freeze({
       normalizedEventId: `normalized:${sourceIds.map(id => `${id.length}:${id}`).join("|")}`,
       schemaVersion: SCHEMA_VERSION,
+      normalizationVersion: NORMALIZATION_VERSION,
       sourceEventId: event.id, sourceEventIds: sourceIds, recordingId: event.recordingId,
       kind, subtype: raw.inputSource || raw.category || undefined,
-      timestamp: event.timestamp, sequence: event.sequence,
+      timestamp: event.timestamp, timestampRange: {
+        start: sources[0]?.timestamp, end: sources.at(-1)?.timestamp
+      }, sequence: event.sequence,
       frameContext: { ...clone(identified.frameContext || event.frame || {}),
         tabId: raw.tabId ?? undefined, browserFrameId: raw.browserFrameId ?? undefined,
         parentFrameId: raw.parentFrameId ?? undefined,
         documentId: raw.documentId || undefined, origin: raw.frameOrigin || undefined,
         localSequence: event.source?.sequence ?? raw.sourceSequence ?? undefined },
-      pageIdentification: clone(identified.page || {}), controlIdentification: clone(identified.control || {}),
-      actionIdentification: clone(identified.action), containerIdentification: clone(identified.container),
+      pageIdentification: clone({ ...(identified.page || {}),
+        ...(identified.pageIdentity || {}) }),
+      controlIdentification: clone({ ...(identified.control || {}),
+        ...(identified.controlIdentity || {}) }),
+      actionIdentification: clone(identified.action || identified.actionIdentity
+        ? { ...(identified.action || {}), ...(identified.actionIdentity || {}) }
+        : null),
+      containerIdentification: clone(identified.container),
       interaction: { mechanism: mechanism(raw), key: raw.key || undefined, code: raw.code || undefined,
         altKey: raw.altKey || undefined, ctrlKey: raw.ctrlKey || undefined,
         metaKey: raw.metaKey || undefined, shiftKey: raw.shiftKey || undefined,
@@ -71,14 +82,17 @@
       screenshotAssetId: event.screenshotAssetId, source: clone(event.source || {}),
       screenshotAssetIds: [...new Set(sources.map(item =>
         item.screenshotAssetId).filter(Boolean))],
-      evidence: [{ source: "normalization-rule", value: reason }], rawEventType: raw.type || "unknown"
+      evidence: [{ source: "normalization-rule", value: reason }],
+      futureMetadata: clone(raw.futureMetadata || raw.futureRawMetadata),
+      rawEventType: raw.type || "unknown"
     });
   }
   function canCoalesce(pending, event, kind) {
     if (!pending || pending.kind !== "value-change" || kind !== "value-change") return false;
     const previous = rawOf(pending.sources.at(-1)); const raw = rawOf(event);
     if (previous.inputSource === "focusout") return false;
-    return controlKey(pending.sources[0]) === controlKey(event) && previous.value === raw.value && ["input", "change", "focusout"].includes(raw.inputSource || raw.type);
+    return controlKey(pending.sources[0]) === controlKey(event) &&
+      ["input", "change", "focusout"].includes(raw.inputSource || raw.type);
   }
   function normalizeRecording(recording) {
     if (cache.has(recording)) return cache.get(recording);
@@ -93,10 +107,13 @@
       } else { flush(); events.push(create(event, kind, reason)); }
     }
     flush();
-    const result = freeze({ schemaVersion: SCHEMA_VERSION, recordingId: recording?.id, events });
+    const result = freeze({ schemaVersion: SCHEMA_VERSION,
+      normalizationVersion: NORMALIZATION_VERSION,
+      recordingId: recording?.id, events });
     if (recording && typeof recording === "object") cache.set(recording, result);
     return result;
   }
   function normalizeEvent(value) { if (!value || Number(value.schemaVersion) !== SCHEMA_VERSION) throw new Error("Unsupported normalized event schema."); return freeze(clone(value)); }
-  return { SCHEMA_VERSION, classify, normalizeEvent, normalizeRecording };
+  return { NORMALIZATION_VERSION, SCHEMA_VERSION, classify, normalizeEvent,
+    normalizeRecording };
 });

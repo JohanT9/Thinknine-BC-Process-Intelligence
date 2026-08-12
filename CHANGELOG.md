@@ -1,5 +1,12 @@
 # Changelog
 
+## Event Normalization with React/MUI compatibility — v4.6
+
+- Added normalization version 2.0.0 and a compact renderer-neutral taxonomy.
+- Added committed typing coalescing and verified focusout value fallback.
+- Added open Shadow DOM target resolution and dialog close capture.
+- Added full traceability, immutability, determinism, large-recording, and CI tests.
+
 ## BC Page / Control / Action Identification — v4.6
 
 - Centralized technical-first Page, Control, Action, and Entity identification.

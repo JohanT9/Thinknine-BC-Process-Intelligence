@@ -1,4 +1,5 @@
 const assert = require("assert");
+const fs = require("fs");
 const canonical = require("../src/engine/canonical-recording");
 const identifier = require("../src/engine/bc-ui-identification");
 const normalization = require("../src/engine/event-normalization");
@@ -13,6 +14,11 @@ function raw(id, type, extra = {}) {
   return { sourceEventId: id, timestamp: "2026-08-10T10:00:00.000Z",
     type, sourceFrameId: "top", sourceSequence: Number(id.replace(/\D/g, "")) || 1,
     ...extra };
+}
+function deepFreeze(value) {
+  if (!value || typeof value !== "object" || Object.isFrozen(value)) return value;
+  Object.values(value).forEach(deepFreeze);
+  return Object.freeze(value);
 }
 
 let model = recording();
@@ -31,6 +37,8 @@ model = append(model, raw("e4", "field-change", { fieldName: "Quantity",
 let result = normalization.normalizeRecording(model);
 assert.strictEqual(JSON.stringify(original), before);
 assert.strictEqual(result.schemaVersion, 1);
+assert.strictEqual(result.normalizationVersion, "2.0.0");
+assert.strictEqual(normalization.NORMALIZATION_VERSION, "2.0.0");
 assert.strictEqual(result.events.length, 1);
 assert.strictEqual(result.events[0].kind, "value-change");
 assert.deepStrictEqual(result.events[0].sourceEventIds,
@@ -38,6 +46,9 @@ assert.deepStrictEqual(result.events[0].sourceEventIds,
 assert.strictEqual(result.events[0].sourceEventId, "normalize:event:e4");
 assert.strictEqual(result.events[0].sequence, 4);
 assert.strictEqual(result.events[0].rawEventType, "field-change");
+assert.deepStrictEqual(result.events[0].timestampRange, {
+  start: "2026-08-10T10:00:00.000Z", end: "2026-08-10T10:00:00.000Z"
+});
 assert.deepStrictEqual(result.events[0].value,
   { raw: "500", normalized: "500", display: "500" });
 assert.strictEqual(typeof result.events[0].value.normalized, "string");
@@ -63,8 +74,8 @@ controls = append(controls, raw("o1", "field-change", { value: "Open",
   { controlType: "select", accessibleName: "Status" });
 result = normalization.normalizeRecording(controls);
 assert.deepStrictEqual(result.events.map(event => event.kind), [
-  "activation", "activation", "toggle-change", "lookup-open",
-  "row-selection", "selection-change"
+  "activation", "activation", "toggle-change", "activation",
+  "selection-change", "selection-change"
 ]);
 assert.strictEqual(result.events[0].interaction.mechanism, "pointer");
 assert.deepStrictEqual(result.events[0].coordinates.pointer, { x: 10, y: 20 });
@@ -102,6 +113,44 @@ noise = append(noise, raw("f1", "focus", { value: "same" }),
 noise = append(noise, raw("f2", "field-change", { value: "same",
   previousValue: "same", inputSource: "focusout" }), { controlType: "input" });
 assert.strictEqual(normalization.normalizeRecording(noise).events.length, 0);
+let focusOnly = recording("focus-only");
+focusOnly = append(focusOnly, raw("only-focus", "focus", { value: "same" }),
+  { controlType: "input" });
+assert.strictEqual(normalization.normalizeRecording(focusOnly).events.length, 0);
+
+let nativeOnly = recording("native-only");
+nativeOnly = append(nativeOnly, raw("native-input", "field-change", {
+  fieldName: "Quantity", value: "5", previousValue: "", inputSource: "input"
+}), { controlType: "input", automationId: "Quantity" });
+assert.strictEqual(normalization.normalizeRecording(nativeOnly).events[0].kind,
+  "value-change");
+
+let typing = recording("typing");
+typing = append(typing, raw("t0", "focus", { fieldName: "Quantity", value: "" }),
+  { controlType: "input", automationId: "Quantity" });
+for (const [index, value] of ["5", "50", "500"].entries()) {
+  typing = append(typing, raw(`t${index + 1}`, "field-change", {
+    fieldName: "Quantity", value, previousValue: "", inputSource: "input"
+  }), { controlType: "input", automationId: "Quantity" });
+}
+typing = append(typing, raw("t4", "field-change", { fieldName: "Quantity",
+  value: "500", previousValue: "", inputSource: "change" }),
+  { controlType: "input", automationId: "Quantity" });
+const committedTyping = normalization.normalizeRecording(typing);
+assert.strictEqual(committedTyping.events.length, 1);
+assert.strictEqual(committedTyping.events[0].value.normalized, "500");
+assert.deepStrictEqual(committedTyping.events[0].sourceEventIds,
+  ["typing:event:t1", "typing:event:t2", "typing:event:t3", "typing:event:t4"]);
+
+let mechanics = recording("mechanics");
+mechanics = append(mechanics, raw("dialog-open", "dialog-open", {
+  label: "Confirm" }), { uiHierarchy: [{ type: "dialog", caption: "Confirm" }] });
+mechanics = append(mechanics, raw("dialog-close", "dialog-close", {
+  label: "Confirm" }));
+mechanics = append(mechanics, raw("key-command", "keydown", {
+  key: "Escape", inputSource: "keyboard" }));
+assert.deepStrictEqual(normalization.normalizeRecording(mechanics).events
+  .map(event => event.kind), ["dialog-open", "dialog-close", "key-command"]);
 
 let repeated = recording("repeat");
 for (const suffix of ["a", "b"]) {
@@ -121,10 +170,16 @@ const unknown = normalization.normalizeRecording(future).events[0];
 assert.strictEqual(unknown.kind, "unknown");
 assert.strictEqual(unknown.rawEventType, "future-browser-event");
 assert.strictEqual(unknown.sourceEventId, "future:event:u1");
+assert.deepStrictEqual(unknown.futureMetadata, { retained: true });
 const futureNormalized = normalization.normalizeEvent({
   ...unknown, futureNormalizedMetadata: { retained: true }
 });
 assert.deepStrictEqual(futureNormalized.futureNormalizedMetadata, { retained: true });
+
+const frozenModel = deepFreeze(JSON.parse(JSON.stringify(future)));
+const frozenBefore = JSON.stringify(frozenModel);
+normalization.normalizeRecording(frozenModel);
+assert.strictEqual(JSON.stringify(frozenModel), frozenBefore);
 
 const legacySession = { id: "legacy-normalize", startedAt: "2026-08-10T09:00:00Z" };
 const legacy = canonical.fromLegacy(legacySession, [{ eventNo: 1, type: "click",
@@ -139,5 +194,9 @@ for (let index = 0; index < 3000; index += 1) large = append(large,
 const started = Date.now();
 assert.strictEqual(normalization.normalizeRecording(large).events.length, 3000);
 assert.ok(Date.now() - started < 4000, "large normalization regression");
+
+const contentSource = fs.readFileSync("src/recorder/content.js", "utf8");
+assert.ok(contentSource.includes("event.composedPath?.()"));
+assert.ok(contentSource.includes('type: "dialog-close"'));
 
 console.log("Event normalization tests passed.");

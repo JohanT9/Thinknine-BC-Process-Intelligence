@@ -1,120 +1,79 @@
 # Event Normalization
 
-## Purpose and ownership
+## Boundary and version
 
-Event Normalization converts browser-shaped canonical evidence into stable,
-business-neutral UI mechanics:
+Event Normalization 2.0.0 converts persisted browser mechanics plus BC UI
+Identification into deterministic, renderer-neutral interactions:
 
 ```text
-Canonical Raw Event -> BC Identification -> Normalized Interaction Event
+Raw Event Persistence -> BC UI Identification -> Event Normalization
 ```
 
-Normalization is a derived, immutable, in-memory projection. Canonical events,
-`event.raw`, identification, assets, Review state, and exports are never mutated.
-The original browser event type remains available as `rawEventType`.
+It is an immutable in-memory projection. Raw Events, Canonical Recording,
+identification, screenshots, Review, and document data are never replaced or
+modified. Dashboard receives normalized results from the background read
+contract and does not perform normalization.
 
-## Schema and kinds
+## Stable taxonomy
 
-Schema v1 contains deterministic normalized and source IDs, recording ID, kind,
-subtype, canonical timestamp and sequence, frame and identification metadata,
-interaction mechanism, value, previous value, selection, state, coordinates,
-screenshot reference, source provenance, evidence, and future fields.
-
-The stable kinds are:
+The deliberately small vocabulary is:
 
 - `activation`
 - `value-change`
 - `selection-change`
 - `toggle-change`
-- `keyboard-action`
 - `navigation`
-- `focus-transition`
-- `lookup-open`
-- `dialog-action`
-- `row-selection`
+- `dialog-open`
+- `dialog-close`
+- `key-command`
 - `unknown`
 
-These describe UI mechanics, never business intent.
+Focus lifecycle is supporting evidence only and creates no meaningful normalized
+event by itself. Browser event names remain in `rawEventType` for traceability,
+not as semantic meaning.
 
-## Mapping and values
+## Traceability
 
-Identified button pointer activation and Enter/Space activation both become
-`activation`, while mechanism remains `pointer` or `keyboard`. Input/change and
-verified changed-value focusout become `value-change`. Checked controls become
-`toggle-change`; options become `selection-change`; identified lookup triggers
-become `lookup-open`; list/repeater cells become `row-selection`. Navigation,
-non-activation keys, dialog actions, and unknown future events retain distinct
-safe fallbacks.
+Every normalized event carries a deterministic `normalizedEventId`, all
+contributing `sourceEventIds`, recording ID, normalization version, timestamp
+range, sequence, Page/Control/Action identity, complete frame context, previous
+and committed values, state/selection, coordinates, screenshot references,
+evidence, source provenance, and retained future metadata. IDs use a
+length-prefixed composition of source IDs and do not depend on localized text.
 
-Values retain their original type and representation in `value.raw` and
-`value.normalized`. Numeric-looking strings are never coerced. An ISO date from
-an identified date control is marked `iso-date` without timezone conversion.
-Localized dates are preserved without locale guessing. Verified boolean state is
-stored as `state.checked`; no enable/disable wording is generated.
+## Native commits and React/MUI fallback
 
-## React/MUI and focus policy
+Native input/change evidence is preferred. Consecutive input values such as
+`5`, `50`, and `500` remain raw evidence but normalize to one committed
+`value-change`. A matching change or focusout joins the same normalized event;
+all source IDs remain attached and the final source owns end timestamp/sequence.
 
-Capture stores the value present at focus and includes it as `previousValue` on
-field events. If a React/MUI control changes DOM value without input/change, a
-focusout whose value differs from the captured initial value becomes the same
-`value-change` contract. There is no React-specific normalized model.
+Capture also tracks a safe focus session for input, textarea, select, and
+contenteditable elements. It records the initial observable value at focus-in
+and the final observable value at focusout. If a React/MUI or control-add-in DOM
+value changed without a reliable native event, differing initial/final values
+produce one fallback `value-change` with
+`changed-value-on-focusout-fallback` evidence. Equal values or focus movement
+alone produce no meaningful normalized event. A focusout lacking an initial
+value does not invent a change.
 
-Focus-only and unchanged focusout evidence produces no normalized event. An old
-focusout lacking verifiable previous value degrades to diagnostic
-`focus-transition`. Raw focus evidence is always retained canonically and does
-not become a visible documentation step.
+Native and fallback events for the same identified control coalesce only within
+the current focus/commit sequence. A new focus boundary closes the previous
+edit, so two genuine edits with the same final value remain distinct.
 
-## Mechanical coalescing, identity, and ordering
+## Cross-renderer capture
 
-Consecutive input/change/focusout events for the same identified control and
-exact same committed value coalesce into one normalized mechanic. This is not
-semantic consolidation. Every contributing canonical ID is retained in
-`sourceEventIds`; the final committed source event is the primary
-`sourceEventId` and owns timestamp/sequence.
+Capture resolves targets through `Event.composedPath()` when available, allowing
+open Shadow DOM controls to expose their actual interactive element. Standard
+BC, React, Material UI, same-origin frames, nested frames, and control add-ins
+share the same value and identity contracts. No React-specific semantic engine
+exists.
 
-The deterministic ID uses a collision-safe, length-prefixed composition of
-stable contributing canonical event IDs.
-Language, Review edits, semantic rules, and export runs cannot change it.
-Normalization never reorders evidence. A focus lifecycle boundary prevents two
-separate interactions with the same value from coalescing.
+Checkbox click/change mechanics with observed checked state become
+`toggle-change`. Option and list/repeater selection become `selection-change`.
+Dialog presence transitions are captured and normalized separately as
+`dialog-open` and `dialog-close`. Navigation requires captured page/URL
+transition evidence; MutationObserver activity alone is not a business action.
 
-## Frames, coordinates, diagnostics, and fallback
-
-Top-frame and iframe mechanics normalize identically. Frame metadata retains
-tab/frame/parent/document identifiers, origin, frame depth, source frame UUID,
-and local sequence when available. Coordinates retain pointer position, local
-and top-viewport bounds, device pixel ratio, and viewport scale without making
-screenshot decisions.
-
-Evidence stores a sanitized rule reason such as
-`changed-value-on-focusout-fallback`, never the entered value. Unknown event
-types produce `unknown` rather than failure or invented meaning. Legacy canonical
-events normalize without migration and degrade when modern metadata is absent.
-
-## Semantic integration, performance, and privacy
-
-The session read contract exposes normalized events and attaches matching
-mechanics to detached legacy projections. Semantic Interaction Rules prefer
-`value-change` mechanics for typed-field detection while retaining legacy
-`inputSource` fallback. Language, presentation, screenshot selection, Review,
-Workspace, and Word remain unchanged.
-
-Normalization performs no DOM access, external lookup, AI, OCR, or network
-request. Results are cached by immutable canonical recording identity. A large
-recording regression guards deterministic linear projection cost. Sensitive
-values are not copied into diagnostics or evidence.
-
-## Step grouping handoff
-
-Ordered normalized output is consumed by Event â†’ Step Grouping. Normalization
-owns browser-mechanic coalescing; grouping owns candidate documentation-step
-boundaries. Semantic business meaning remains downstream of both layers.
-Normalized event kind and primary-event alignment later provide metadata signals
-to Screenshot Selection; normalization itself never chooses an image.
-
-## Regeneration
-
-Normalization is rerun by its existing implementation against detached
-canonical evidence. Its component version is recorded independently, and it
-never receives edited documentation or renderer state. See
-[REGENERATE_FROM_RECORDING.md](REGENERATE_FROM_RECORDING.md).
+Unknown mechanics remain `unknown` with their raw source identity and evidence.
+No wording, intent, step boundary, or business outcome is generated here.
