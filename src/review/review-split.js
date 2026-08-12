@@ -1,8 +1,10 @@
 (function (root, factory) {
-  const api = factory();
+  const refs = typeof module === "object" && module.exports
+    ? require("../engine/source-reference") : root.T9SourceReference;
+  const api = factory(refs);
   if (typeof module === "object" && module.exports) module.exports = api;
   root.T9ReviewSplit = api;
-})(typeof globalThis !== "undefined" ? globalThis : this, function () {
+})(typeof globalThis !== "undefined" ? globalThis : this, function (refs) {
   function clone(value) {
     return JSON.parse(JSON.stringify(value));
   }
@@ -69,6 +71,7 @@
         screenshot: sourceScreenshots[0] || null,
         screenshots: [...sourceScreenshots],
         sourceEventNos: clone(source.sourceEventNos || []),
+        ...refs.normalize(source),
         sourceMetadata: clone(source.sourceMetadata || []),
         sourceTaskIds: clone(source.sourceTaskIds || []),
         splitSourceTaskId: taskId,

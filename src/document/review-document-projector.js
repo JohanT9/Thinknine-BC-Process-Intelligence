@@ -20,8 +20,10 @@
   const hierarchy = typeof module === "object" && module.exports
     ? require("../review/documentation-hierarchy")
     : root.T9DocumentationHierarchy;
+  const sourceReference = typeof module === "object" && module.exports
+    ? require("../engine/source-reference") : root.T9SourceReference;
   const api = factory(model, stepEditor, structure, manualSteps, notes,
-    annotations, hierarchy);
+    annotations, hierarchy, sourceReference);
   if (typeof module === "object" && module.exports) module.exports = api;
   root.T9ReviewDocumentProjector = api;
 })(typeof globalThis !== "undefined" ? globalThis : this, function (
@@ -31,7 +33,8 @@
   manualSteps,
   notes,
   annotations,
-  hierarchy
+  hierarchy,
+  sourceReference
 ) {
   const PROJECTOR_VERSION = "1.0.0";
   const ORIGIN = "review-document-projector";
@@ -246,6 +249,10 @@
       const task = object(taskValue);
       const taskId = text(task.taskId);
       const sourceTaskId = taskId || `ReviewTask-${taskIndex + 1}`;
+      const originalTask = (reviewValue?.tasks || []).find(candidate =>
+        text(candidate?.taskId) === sourceTaskId) || {};
+      const legacyOnly = !originalTask.sourceEventIds?.length &&
+        originalTask.sourceEventNos?.length;
       if (!taskId) {
         diagnostics.push(diagnostic(
           "invalid-reference",
@@ -263,11 +270,19 @@
         ));
       }
       const stepKey = `${idPart(sourceTaskId)}:${occurrence}`;
-      const sourceEventIds = Array.isArray(task.sourceEventIds)
-        ? task.sourceEventIds.map(String)
-        : Array.isArray(task.sourceEventNos) ? task.sourceEventNos.map(String) : [];
-      const sourceRef = { taskId: sourceTaskId,
-        ...(sourceEventIds.length ? { sourceEventIds } : {}) };
+      const hasTrace = [task.sourceEventIds, task.sourceEventNos,
+        task.normalizedEventIds, task.stepGroupIds, task.sourceStepGroupIds,
+        task.semanticActionIds].some(value => Array.isArray(value) && value.length) ||
+        Boolean(task.semanticActionModel?.actionId);
+      const sourceRef = { taskId: sourceTaskId, ...sourceReference.normalize({
+        recordingId: hasTrace ? task.recordingId || review.sessionId : undefined,
+        sourceEventIds: legacyOnly ? undefined : task.sourceEventIds,
+        sourceEventNos: task.sourceEventNos,
+        normalizedEventIds: task.normalizedEventIds,
+        stepGroupIds: task.stepGroupIds || task.sourceStepGroupIds,
+        semanticActionIds: task.semanticActionIds ||
+          (task.semanticActionModel?.actionId ? [task.semanticActionModel.actionId] : [])
+      }) };
       const instruction = firstText(task.instruction, task.description);
       if (!instruction) {
         diagnostics.push(diagnostic(
@@ -391,7 +406,7 @@
           blockId: `block:image:${stepKey}:${idPart(screenshotRef)}:${imageOccurrence}`,
           kind: "image",
           assetId,
-          sourceRef: { taskId: sourceTaskId, screenshotRef },
+          sourceRef: { ...sourceRef, screenshotRef },
           annotationRefs: clone(annotationRefsByScreenshot.get(screenshotRef))
         });
       });
@@ -401,7 +416,11 @@
         kind: "step",
         stepNumber: workflowBlocks.length + 1,
         sourceRef,
-        interaction: clone(task),
+        interaction: {
+          ...clone(task),
+          ...(legacyOnly ? { sourceEventIds: undefined,
+            legacyEventNos: clone(task.sourceEventNos || []) } : {})
+        },
         ...(task.screenshotSelection &&
           typeof task.screenshotSelection === "object"
           ? { screenshotSelection: clone(task.screenshotSelection) } : {}),

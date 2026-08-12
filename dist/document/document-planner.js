@@ -328,6 +328,7 @@
       componentId: `component:block:${block.blockId}`,
       kind,
       sourceRef: {
+        ...clone(block.sourceRef || {}),
         blockId: block.blockId,
         ...(block.assetId ? { assetId: block.assetId } : {})
       },

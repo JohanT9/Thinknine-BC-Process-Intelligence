@@ -72,6 +72,11 @@ const baseReview = review([{
   taskId: "task-a",
   instruction: "Öppna ordern.",
   userComment: "Kontrollera kundnumret.",
+  recordingId: session.id,
+  sourceEventIds: ["session-parity:event:open-order"],
+  normalizedEventIds: ["normalized:open-order"],
+  stepGroupIds: ["group:open-order"],
+  semanticActionIds: ["semantic:open-order"],
   screenshots: ["one.png", "two.png"]
 }, {
   taskId: "task-b",
@@ -82,6 +87,16 @@ const baseReview = review([{
   deleted: true
 }]);
 const output = await exportReview(baseReview);
+const tracedWordComponent = output.plan.sections
+  .flatMap(section => section.components)
+  .flatMap(function flatten(component) {
+    return [component, ...(component.components || []).flatMap(flatten)];
+  }).find(component => component.sourceRef?.taskId === "task-a" &&
+    component.sourceRef?.sourceEventIds?.length);
+assert.deepStrictEqual(tracedWordComponent.sourceRef.sourceEventIds,
+  ["session-parity:event:open-order"]);
+assert.deepStrictEqual(tracedWordComponent.sourceRef.semanticActionIds,
+  ["semantic:open-order"]);
 
 const semanticInteractionOutput = await exportReview(review([{
   taskId: "customer-field", taskType: "SelectCustomer",

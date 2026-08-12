@@ -971,6 +971,12 @@ function uiStep({
   return {
     step: 0,
     sourceEventNos: sourceEvents.map(event => event.eventNo),
+    sourceEventIds: [...new Set(sourceEvents.map(event =>
+      event.canonicalSourceEventId).filter(Boolean))],
+    normalizedEventIds: [...new Set(sourceEvents.flatMap(event =>
+      event.normalizedInteraction?.normalizedEventId || []).filter(Boolean))],
+    stepGroupIds: [...new Set(sourceEvents.flatMap(event =>
+      event.stepGroup?.stepGroupId || []).filter(Boolean))],
     identifications: sourceEvents.map(event => event.identification).filter(Boolean),
     normalizedInteractions: [...new Map(sourceEvents
       .map(event => event.normalizedInteraction).filter(Boolean)
@@ -2155,6 +2161,7 @@ function removeKnowledgePackNoise(tasks) {
           ...(task.sourceEventNos || [])
         ])
       ];
+      Object.assign(previous, canonicalTrace(previous, task));
       previous.screenshot = task.screenshot || previous.screenshot;
       continue;
     }
@@ -2166,6 +2173,7 @@ function removeKnowledgePackNoise(tasks) {
     ) {
       result[result.length - 1] = {
         ...task,
+        ...canonicalTrace(previous, task),
         sourceEventNos: [
           ...new Set([
             ...(previous.sourceEventNos || []),
@@ -2190,7 +2198,7 @@ function finalizeKnowledgeTasks(tasks, settings) {
   return cleaned.map((task, index) => ({
     ...task,
     taskNo: index + 1,
-    taskId: taskId(task.taskType, index),
+    taskId: stableTaskId(task, index),
     instruction: taskInstructionFromKnowledge(task, settings),
     reviewStatus: task.reviewSuggested ? "review-suggested" : "unreviewed"
   }));
@@ -2199,6 +2207,25 @@ function finalizeKnowledgeTasks(tasks, settings) {
 
 function taskId(taskType, index) {
   return `${taskType}-${String(index + 1).padStart(3, "0")}`;
+}
+
+function canonicalTrace(...values) {
+  const merged = globalThis.T9SourceReference.merge(...values);
+  delete merged.legacyEventNos;
+  return merged;
+}
+
+function stableTaskId(task, index) {
+  const semanticActionIds = task.semanticActionModel?.actionId
+    ? [task.semanticActionModel.actionId] : task.semanticActionIds;
+  const identity = globalThis.T9SourceReference.stableIdentity({
+    sourceEventIds: task.sourceEventIds,
+    normalizedEventIds: task.normalizedEventIds,
+    stepGroupIds: task.stepGroupIds || (task.stepGroups || [])
+      .map(group => group.stepGroupId),
+    semanticActionIds
+  }, "");
+  return identity ? `${task.taskType}:${identity}` : taskId(task.taskType, index);
 }
 
 function taskInstruction(task) {
@@ -2302,6 +2329,12 @@ function createBusinessTasks(businessSteps) {
           : "",
       sourceStepNos: [step.step],
       sourceEventNos: step.sourceEventNos || [],
+      sourceEventIds: step.sourceEventIds || [],
+      normalizedEventIds: step.normalizedEventIds || [],
+      stepGroupIds: step.stepGroupIds || (step.stepGroups || [])
+        .map(group => group.stepGroupId),
+      semanticActionIds: step.semanticActionModel?.actionId
+        ? [step.semanticActionModel.actionId] : step.semanticActionIds || [],
       identifications: step.identifications || [],
       normalizedInteractions: step.normalizedInteractions || [],
       stepGroups: step.stepGroups || [],
@@ -2321,7 +2354,7 @@ function createBusinessTasks(businessSteps) {
   return tasks.map((task, index) => ({
     ...task,
     instruction: globalThis.T9TextFormat.quoteEmphasis(task.instruction),
-    taskId: taskId(task.taskType, index),
+    taskId: stableTaskId(task, index),
     taskNo: index + 1
   }));
 }
@@ -2342,6 +2375,7 @@ function mergeAdjacentBusinessTasks(tasks) {
     ) {
       result.push({
         ...current,
+        ...canonicalTrace(current, next),
         sourceStepNos: [
           ...new Set([
             ...(current.sourceStepNos || []),
@@ -2368,6 +2402,7 @@ function mergeAdjacentBusinessTasks(tasks) {
     ) {
       result.push({
         ...current,
+        ...canonicalTrace(current, next),
         sourceStepNos: [
           ...new Set([
             ...(current.sourceStepNos || []),
@@ -2395,6 +2430,7 @@ function mergeAdjacentBusinessTasks(tasks) {
     ) {
       result.push({
         ...next,
+        ...canonicalTrace(current, next),
         sourceStepNos: [
           ...new Set([
             ...(current.sourceStepNos || []),
@@ -2426,6 +2462,7 @@ function mergeAdjacentBusinessTasks(tasks) {
       result.push({
         ...current,
         confirmationIncluded: true,
+        ...canonicalTrace(current, next),
         sourceStepNos: [
           ...new Set([
             ...(current.sourceStepNos || []),
@@ -2457,6 +2494,7 @@ function mergeAdjacentBusinessTasks(tasks) {
       result.push({
         ...current,
         confirmationIncluded: true,
+        ...canonicalTrace(current, next),
         sourceStepNos: [
           ...new Set([
             ...(current.sourceStepNos || []),
@@ -2482,7 +2520,7 @@ function mergeAdjacentBusinessTasks(tasks) {
   return result.map((task, taskIndex) => ({
     ...task,
     taskNo: taskIndex + 1,
-    taskId: taskId(task.taskType, taskIndex),
+    taskId: stableTaskId(task, taskIndex),
     instruction: taskInstruction(task)
   }));
 }
@@ -2846,7 +2884,7 @@ async function prepareSessionModel(session) {
   ).map((task, index) => ({
     ...task,
     taskNo: index + 1,
-    taskId: taskId(task.taskType, index)
+    taskId: stableTaskId(task, index)
   }));
 
   const entityNodes = globalThis.T9Engine?.entityMemory
@@ -2958,7 +2996,7 @@ async function exportSession(session) {
   ).map((task, index) => ({
     ...task,
     taskNo: index + 1,
-    taskId: taskId(task.taskType, index)
+    taskId: stableTaskId(task, index)
   }));
   const entityNodes = globalThis.T9Engine?.entityMemory
     ? globalThis.T9Engine.entityMemory.build(contextEvents)

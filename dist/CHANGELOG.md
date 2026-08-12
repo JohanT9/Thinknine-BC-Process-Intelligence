@@ -1,5 +1,14 @@
 # Changelog
 
+## 4.6 - Canonical traceability migration
+
+- Made Canonical Event IDs authoritative through normalization, grouping,
+  semantic interpretation, Review, Semantic Document, Document Plan, Workspace,
+  and Word export.
+- Separated legacy `sourceEventNos` as `legacyEventNos` at document boundaries.
+- Derived generated Review task identity from stable interpretation evidence.
+- Preserved traceability through merge, split, screenshots, and annotations.
+
 ## Event → Step Grouping responsibility migration — v4.6
 
 - Moved normalized lookup/focus/result boundaries into Step Grouping.

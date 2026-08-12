@@ -23,6 +23,7 @@
     return {
       workspaceItemId: `${component.componentId}:${suffix}`,
       sourceComponentId: component.componentId,
+      sourceRef: clone(component.sourceRef || {}),
       kind,
       accessibility: clone(component.accessibility || {}),
       appearance: clone(component.appearance || {}),

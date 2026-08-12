@@ -1,8 +1,10 @@
 (function (root, factory) {
-  const api = factory();
+  const refs = typeof module === "object" && module.exports
+    ? require("../engine/source-reference") : root.T9SourceReference;
+  const api = factory(refs);
   if (typeof module === "object" && module.exports) module.exports = api;
   root.T9ReviewMerge = api;
-})(typeof globalThis !== "undefined" ? globalThis : this, function () {
+})(typeof globalThis !== "undefined" ? globalThis : this, function (refs) {
   function clone(value) {
     return JSON.parse(JSON.stringify(value));
   }
@@ -39,7 +41,8 @@
       confidence: task.confidence,
       confidenceScore: task.confidenceScore,
       knowledgeRule: task.knowledgeRule,
-      sourceEventNos: task.sourceEventNos || []
+      sourceEventNos: task.sourceEventNos || [],
+      ...refs.normalize(task)
     });
   }
 
@@ -65,6 +68,7 @@
       screenshot: images[0] || null,
       screenshots: images,
       sourceEventNos: unique(sourceTasks.flatMap(task => task.sourceEventNos || [])),
+      ...refs.merge(...sourceTasks),
       sourceTaskIds: sourceTasks.map(task => task.taskId),
       sourceMetadata: sourceTasks.map(sourceMetadata),
       confidenceScore: scores.length ? Math.min(...scores) : undefined,

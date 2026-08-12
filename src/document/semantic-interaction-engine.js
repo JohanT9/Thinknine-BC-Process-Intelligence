@@ -1,8 +1,10 @@
 (function (root, factory) {
-  const api = factory();
+  const sourceReference = typeof module === "object" && module.exports
+    ? require("../engine/source-reference") : root.T9SourceReference;
+  const api = factory(sourceReference);
   if (typeof module === "object" && module.exports) module.exports = api;
   root.T9SemanticInteractionEngine = api;
-})(typeof globalThis !== "undefined" ? globalThis : this, function () {
+})(typeof globalThis !== "undefined" ? globalThis : this, function (sourceReference) {
   const ENGINE_VERSION = "1.0.0";
   const documentCache = new WeakMap();
 
@@ -98,7 +100,14 @@
     if (values.length === 1 && text(values[0]?.semanticActionModel?.actionId)) {
       return values[0].semanticActionModel.actionId;
     }
-    const source = values.map((value, index) =>
+    const traced = sourceReference.stableIdentity(sourceReference.merge(
+      ...values.map(value => ({ sourceEventIds: value.sourceEventIds,
+        sourceEventNos: value.sourceEventNos,
+        normalizedEventIds: value.normalizedEventIds,
+        stepGroupIds: value.stepGroupIds || (value.stepGroups || [])
+          .map(group => group.stepGroupId) }))
+    ), "");
+    const source = traced || values.map((value, index) =>
       text(value.semanticActionModel?.actionId) || text(value.taskId) ||
       `interaction-${index + 1}`).join("|");
     return `semantic:${ruleId}:${source}`;
@@ -110,20 +119,28 @@
   }
 
   function sourceData(values) {
+    const canonical = sourceReference.merge(...values.map(value => ({
+      recordingId: value.recordingId,
+      sourceEventIds: value.semanticActionModel?.sourceEventIds ||
+        value.sourceEventIds || (value.stepGroups || []).flatMap(group =>
+          group.sourceEventIds || []),
+      sourceEventNos: value.semanticActionModel?.sourceEventNos || value.sourceEventNos,
+      normalizedEventIds: value.semanticActionModel?.normalizedEventIds ||
+        value.normalizedEventIds || (value.stepGroups || []).flatMap(group =>
+          group.normalizedEventIds || []),
+      stepGroupIds: value.semanticActionModel?.stepGroupIds ||
+        value.stepGroupIds || (value.stepGroups || []).map(group => group.stepGroupId),
+      semanticActionIds: value.semanticActionIds
+    })));
     return {
       sourceTaskIds: unique(values.flatMap(value =>
         value.semanticActionModel?.sourceTaskIds || (value.sourceTaskIds?.length
           ? value.sourceTaskIds : value.taskId ? [value.taskId] : []))),
       sourceStepNos: unique(values.flatMap(value =>
         value.semanticActionModel?.sourceStepNos || value.sourceStepNos || [])),
+      ...canonical,
       sourceEventNos: unique(values.flatMap(value =>
         value.semanticActionModel?.sourceEventNos || value.sourceEventNos || [])),
-      sourceEventIds: unique(values.flatMap(value =>
-        value.semanticActionModel?.sourceEventIds || value.sourceEventIds ||
-        (value.stepGroups || []).flatMap(group => group.sourceEventIds || []))),
-      stepGroupIds: unique(values.flatMap(value =>
-        value.semanticActionModel?.stepGroupIds ||
-        (value.stepGroups || []).map(group => group.stepGroupId))),
       screenshotRefs: unique(values.flatMap(value =>
         value.semanticActionModel?.screenshotRefs || (value.screenshots?.length
           ? value.screenshots : value.screenshot ? [value.screenshot] : []))),
@@ -419,6 +436,9 @@
       value: primary.value?.normalized ?? primary.state?.checked ?? selected,
       inputSources: primary.subtype ? [primary.subtype] : [],
       sourceEventIds: group.sourceEventIds || [],
+      normalizedEventIds: group.normalizedEventIds || [],
+      stepGroupIds: group.stepGroupId ? [group.stepGroupId] : [],
+      recordingId: group.recordingId,
       stepGroups: [group],
       normalizedInteractions: [primary]
     };
@@ -449,6 +469,10 @@
       sourceTaskIds: clone(value.sourceTaskIds),
       sourceStepNos: clone(value.sourceStepNos),
       sourceEventNos: clone(value.sourceEventNos),
+      sourceEventIds: clone(value.sourceEventIds),
+      normalizedEventIds: clone(value.normalizedEventIds),
+      stepGroupIds: clone(value.stepGroupIds),
+      semanticActionIds: [value.actionId],
       rawInteractions: clone(value.rawInteractions),
       consolidation: { type: value.ruleId,
         sourceTaskCount: value.rawInteractions.length }
@@ -479,8 +503,12 @@
       const interactions = steps.map(step => ({
         ...(clone(step.interaction || {})),
         taskId: step.sourceRef?.taskId || step.interaction?.taskId,
-        sourceEventNos: step.sourceRef?.sourceEventIds ||
+        sourceEventIds: step.sourceRef?.sourceEventIds ||
+          step.interaction?.sourceEventIds || [],
+        sourceEventNos: step.sourceRef?.legacyEventNos ||
           step.interaction?.sourceEventNos || [],
+        normalizedEventIds: step.sourceRef?.normalizedEventIds || [],
+        stepGroupIds: step.sourceRef?.stepGroupIds || [],
         instruction: instructionBlock(step)?.text || step.interaction?.instruction,
         screenshots: (step.blocks || []).filter(block => block.kind === "image")
           .map(block => block.sourceRef?.screenshotRef).filter(Boolean),
@@ -509,11 +537,11 @@
           (step.blocks || []).filter(block => block.kind !== "paragraph"));
         first.blocks = [...(first.blocks || []), ...clone(extraBlocks)];
         first.stepNumber = 0;
-        first.sourceRef = {
-          ...clone(first.sourceRef || {}),
+        first.sourceRef = { ...clone(first.sourceRef || {}),
           sourceTaskIds: clone(entry.sourceTaskIds),
-          sourceEventIds: entry.sourceEventNos.map(String)
-        };
+          ...sourceReference.merge(first.sourceRef, entry, {
+            semanticActionIds: [entry.actionId]
+          }) };
         first.semanticAction = clone(entry);
         delete first.interaction;
         return first;
