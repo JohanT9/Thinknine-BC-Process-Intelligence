@@ -7,7 +7,7 @@ const read = file => fs.readFileSync(path.join(root, file), "utf8");
 const packageJson = JSON.parse(read("package.json"));
 const background = read("src/recorder/background.js");
 
-assert.strictEqual(packageJson.scripts.posttest, "npm run test:canonical");
+assert.ok(packageJson.scripts.posttest.includes("npm run test:canonical"));
 assert.ok(packageJson.scripts["test:canonical"].includes(
   "canonical-recording.test.js"));
 assert.ok(packageJson.scripts["test:canonical"].includes(

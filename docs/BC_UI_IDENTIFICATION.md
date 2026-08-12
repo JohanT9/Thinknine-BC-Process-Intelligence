@@ -1,107 +1,61 @@
 # Business Central UI Identification
 
-## Purpose and architecture
+## Boundary
 
-BC UI Identification describes observable interface structure without assigning
-business meaning:
+BC UI Identification is the renderer-neutral layer between authoritative Raw
+Event Persistence and future Event Normalization:
 
 ```text
-Canonical Raw Event -> immutable BCUIIdentification -> semantic interpretation
+Raw Event -> BC UI Identification -> Identified Event -> derived mechanics
 ```
 
-Each schema-v1 result references its canonical `eventId` and contains page,
-control, action, nearest container, ordered hierarchy, frame context,
-qualitative confidence, and safe evidence. It is persisted beside `event.raw`.
-Raw evidence is never changed.
+It produces immutable Page, Control, Action, Entity/context, hierarchy, and
+frame identity. It does not alter Canonical Recording, group events, generate
+wording, or run in UI code. Dashboard consumes the module through compatibility
+adapters; Knowledge Packs may consume its result but are not its identity owner.
 
-Identification is the structural input to Event Normalization. The normalizer
-references page, control, action, container, and frame metadata without changing
-the identification result or duplicating its evidence into raw capture.
-Stable control and page identities are also the preferred evidence for safe Step
-Group continuity; captions are used only as an in-recording fallback.
+## Evidence priority
 
-## Pages
+Identity follows this order: stable BC/automation IDs, page IDs, control/data
+attributes, accessibility and structural metadata, stable route metadata, then
+localized caption fallback. A technical page or automation ID always wins over
+a conflicting caption.
 
-The layer retains page caption, route, explicitly captured page name, and the
-Business Central `page` route parameter when present. A route parameter is an
-exact observed page ID; captions are never mapped to IDs. Dialog hierarchy adds
-modal status and observed dialog caption. Parent/subpage relationships are kept
-only when present in captured bounded ancestry.
+Known BC page IDs identify Sales Order, Purchase Order, Customer, Vendor, Item,
+Warehouse Shipment, and Production Order independently of display language.
+`pageIdentity` is `bc:page:<pageId>`. Page results also carry page type, observed
+caption, entity, source, and evidence.
 
-## Controls and actions
+Control identity prefers `data-automation-id`, `data-control-id`,
+`data-control-name`, name, then element ID. Control results keep ID fields,
+automation ID, type, role, caption, conservative field hint, source, and
+evidence. React/MUI and control-add-in elements use observable attributes, ARIA,
+element/input type, bounded ancestry, and frame context—never framework internals.
 
-Control identity and caption are separate. Technical identity may come from
-`data-automation-id`, `data-control-id`, `data-control-name`, `name`, or element
-`id`, in that order. Explicit field/control IDs are retained when exposed. The
-layer conservatively classifies fields, lookups, options, checkboxes, date
-inputs, buttons, links, tabs, repeater cells, rows, and unknown controls using
-element type, input type, ARIA role, and `aria-haspopup`.
+Action identity prefers automation/control ID and derives a technical action
+type only for recognizable stable identifiers. Caption fallback may identify
+Open, Reopen, Release, Post, Search, and confirmation actions when no technical
+identity provides the type. Unknown actions retain their caption and evidence
+with `actionIdentity: null` and `actionType: null`.
 
-Actions are separate metadata with observed caption, technical identity,
-enabled state, invocation mechanism, and captured action-group hierarchy. An
-action ID is never inferred from its caption.
+## Localization and unknown UI
 
-## Hierarchy and complex surfaces
+Captions are display evidence, not primary identity. Small fallback rule groups
+are owned here by language (`sv`, `en`, and deliberately limited Danish-shaped
+`da` forms), so another language can be added without changing semantic or UI
+rules. The fallback never manufactures a BC page ID.
 
-Capture inspects at most eight target ancestors. Explicit control/part type and
-semantic ARIA roles are preferred. Compatibility class-name heuristics may mark
-FastTabs, FactBoxes, subpages, action bars, and control add-ins; evidence and
-qualitative confidence expose that limitation. Observable lookup dialogs,
-repeaters, rows, subpages, FactBoxes, groups, and action groups retain their
-ordered hierarchy. A visual row index may survive as evidence but is never a
-record identity.
-
-React and control-add-in content uses only browser-visible attributes, labels,
-roles, input types, frame metadata, and bounded containers. React internals are
-never inspected. A text input with a date-shaped placeholder can be classified
-as `dateInput` with `partial` confidence; its placeholder is not a Business
-Central field identity.
-
-## Accessible names and localization
-
-Capture precedence is:
-
-1. `aria-labelledby`
-2. `aria-label`
-3. associated `label[for]`
-4. interactive element text
-5. `title`
-6. `placeholder`
-7. bounded surrounding-label fallback
-
-Localized captions are preserved exactly as display metadata. Language-neutral
-technical attributes remain identity when available. There are no caption-to-ID
-tables or Swedish/English identification dictionaries.
-
-## Evidence, confidence, and fallback
-
-Evidence records structural sources such as route parameter, technical
-attribute, accessible-name source, role, element type, and bounded ancestor. It
-does not duplicate entered values. Confidence is deterministic: `exact`,
-`strong`, `partial`, or `unknown`; it is not a probability.
-
-Unknown is valid. If only a page caption is observed, only that caption is
-stored. If a control has no technical identifier, its caption and conservative
-classification remain without an invented ID. Unknown future raw metadata stays
-in canonical `raw` and unknown future identification fields survive schema-v1
+Unknown pages and controls are valid. They keep observable caption, conservative
+control classification, hierarchy, frame data, and evidence while identity and
+entity remain `null`. Missing captions are equally valid. Unknown future raw
+metadata remains in raw evidence; unknown schema-v1 identification fields survive
 normalization.
 
-## Integration, traceability, performance, and privacy
+## Dashboard compatibility
 
-Detached legacy projections expose identification so existing caption selection
-can prefer structured metadata. Semantic rules retain all prior fallbacks;
-identification does not consolidate events, generate sentences, format text, or
-select screenshots. Full Canonical Source Traceability remains a future task.
-
-Identification is synchronous, target-local, dictionary-free, and immutable.
-The capture path does not scan the complete DOM for ancestry. Associated-label
-and `aria-labelledby` resolution use direct indexed lookups. No values are added
-to evidence, no data is logged or sent externally, and no AI/OCR/network lookup
-is used.
-
-## Regeneration
-
-The current identification owner may run again over stored observable evidence.
-Its independent version is recorded in the Derived Revision; it may improve
-derived identity but cannot add facts absent from capture. See
-[REGENERATE_FROM_RECORDING.md](REGENERATE_FROM_RECORDING.md).
+Dashboard no longer owns primary Page, Control, Action, status/post/open-record,
+or entity caption rules. Its compatibility adapters call
+`T9BCUIIdentification.identifyPage`, `identifyControl`, and `identifyAction`.
+Existing presentation-only generic document labels remain in dashboard so this
+milestone does not change document wording. Review, Document Workspace, and Word
+behavior remain unchanged.

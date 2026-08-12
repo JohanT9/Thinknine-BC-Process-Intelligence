@@ -7,6 +7,12 @@ is durably appended with stable source identity and accepted order before BC UI
 identification or canonical/legacy projection. Only an identical `sourceEventId`
 is redelivery; rapid, visually identical interactions remain distinct.
 
+## BC UI Identification
+
+Persisted Raw Events receive renderer-neutral Page, Control, Action, and Entity
+identity before derived mechanics. Stable BC and automation IDs outrank a small,
+engine-owned localized-caption fallback; dashboard only consumes the result.
+
 ## Canonical Recording Hardening
 
 Canonical Recording is the immutable evidence projection consumed by derived

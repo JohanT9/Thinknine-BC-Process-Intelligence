@@ -1,5 +1,12 @@
 # Changelog
 
+## BC Page / Control / Action Identification — v4.6
+
+- Centralized technical-first Page, Control, Action, and Entity identification.
+- Removed primary BC caption/entity/action matching from dashboard composition.
+- Added structured Swedish, English, and limited Danish caption fallback.
+- Added unknown UI, frame, React/MUI, immutability, determinism, and CI coverage.
+
 ## Raw Event Persistence intake authority — v4.6
 
 - Added durable raw intake before BC identification and Canonical Recording.

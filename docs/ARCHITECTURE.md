@@ -16,6 +16,14 @@ diagnostics. Stop performs bounded settlement and validates Event counts,
 ordering, identity, and screenshot references before the immutable finish write.
 Derived interpretation, Review, Workspace, and Word remain read-only consumers.
 
+## BC UI Identification boundary
+
+After durable Raw Event intake, `bc-ui-identification.js` exclusively owns
+technical-first Page, Control, Action, and Entity identity. Dashboard consumes
+structured identities through compatibility adapters and contains no primary BC
+caption-recognition rules. Caption fallback is language-grouped inside the
+engine and is used only when stronger technical evidence is absent.
+
 ## Documentation hierarchy
 
 Resolved Steps may be organized into exactly Section → Subtask → Step. Hierarchy

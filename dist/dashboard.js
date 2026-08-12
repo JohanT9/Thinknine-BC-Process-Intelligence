@@ -48,59 +48,32 @@ function eventControlCaption(event) {
 }
 
 function isOpenRecordEvent(event) {
-  return (
-    event.type === "click" &&
-    /open record|öppna post/i.test(eventControlCaption(event))
-  );
+  return event.type === "click" &&
+    identifiedActionType(event) === "OpenRecord";
 }
 
 function isConfirmEvent(event) {
-  return (
-    event.type === "click" &&
-    /^(ja|nej|yes|no)$/i.test(eventControlCaption(event))
-  );
+  return event.type === "click" && ["ConfirmYes", "ConfirmNo"]
+    .includes(identifiedActionType(event));
 }
 
 function isStatusActionEvent(event) {
-  return (
-    event.type === "click" &&
-    /^(öppna igen|reopen|släpp|frisläpp|release)$/i.test(
-      eventControlCaption(event)
-    )
-  );
+  return event.type === "click" && ["ReopenDocument", "ReleaseDocument"]
+    .includes(identifiedActionType(event));
 }
 
 function isPostActionEvent(event) {
-  return (
-    event.type === "click" &&
-    /^(bokför|post)$/i.test(eventControlCaption(event))
-  );
+  return event.type === "click" && identifiedActionType(event) === "PostDocument";
 }
 
-function detectContextEntity(pageCaption) {
-  const value = String(pageCaption || "");
+function identifiedActionType(event) {
+  return event.identification?.actionIdentity?.actionType ||
+    globalThis.T9BCUIIdentification.identifyAction(event).actionType || "";
+}
 
-  const mappings = [
-    { entity: "SalesOrder", patterns: [/förs\.?\s*order/i, /försäljningsorder/i, /sales order/i] },
-    { entity: "PurchaseOrder", patterns: [/inköpsorder/i, /purchase order/i] },
-    { entity: "PostedSalesInvoice", patterns: [/bokförd.*försäljningsfaktura/i, /posted sales invoice/i] },
-    { entity: "Customer", patterns: [/kund/i, /customer/i] },
-    { entity: "Vendor", patterns: [/leverantör/i, /vendor/i] },
-    { entity: "Item", patterns: [/artikel/i, /item/i] },
-    { entity: "WarehouseReceipt", patterns: [/distlagerinleverans/i, /warehouse receipt/i] },
-    { entity: "WarehouseShipment", patterns: [/distlagerutleverans/i, /warehouse shipment/i] },
-    { entity: "ProductionOrder", patterns: [/produktionsorder/i, /production order/i] },
-    { entity: "QualityCheck", patterns: [/qc.*check/i, /quality.*check/i, /kvalitetskontroll/i] },
-    { entity: "Claim", patterns: [/reklamation/i, /claim/i] }
-  ];
-
-  for (const mapping of mappings) {
-    if (mapping.patterns.some(pattern => pattern.test(value))) {
-      return mapping.entity;
-    }
-  }
-
-  return "";
+function detectContextEntity(pageCaption, identification = null) {
+  return identification?.pageIdentity?.entity ||
+    globalThis.T9BCUIIdentification.identifyPage({ pageCaption }).entity || "";
 }
 
 function extractRecordValueFromOpenCaption(caption) {
@@ -133,7 +106,7 @@ function buildContextEvents(rawEvents) {
     if (eventPage && eventPage !== currentPage) {
       previousPage = currentPage;
       currentPage = eventPage;
-      currentEntity = detectContextEntity(currentPage) || currentEntity;
+      currentEntity = detectContextEntity(currentPage, event.identification) || currentEntity;
     }
 
     if (isOpenRecordEvent(event)) {
@@ -154,11 +127,7 @@ function buildContextEvents(rawEvents) {
       pendingAction = {
         eventNo: event.eventNo,
         caption: eventControlCaption(event),
-        semanticHint: isPostActionEvent(event)
-          ? "PostDocument"
-          : /öppna igen|reopen/i.test(eventControlCaption(event))
-            ? "ReopenDocument"
-            : "ReleaseDocument"
+        semanticHint: identifiedActionType(event)
       };
     }
 
@@ -182,7 +151,8 @@ function buildContextEvents(rawEvents) {
         activeDialogCaption: activeDialog?.caption || "",
         hasFollowingNavigation: Boolean(navigationTarget),
         followingPageCaption: navigationTarget,
-        followingEntity: detectContextEntity(navigationTarget),
+        followingEntity: detectContextEntity(navigationTarget,
+          next?.category === "navigation" ? next.identification : next2?.identification),
         isOpenRecord: isOpenRecordEvent(event),
         isConfirmation: isConfirmEvent(event),
         isStatusAction: isStatusActionEvent(event),
@@ -199,7 +169,7 @@ function buildContextEvents(rawEvents) {
 
     if (event.category === "navigation" && eventPage) {
       currentPage = eventPage;
-      currentEntity = detectContextEntity(eventPage) || currentEntity;
+      currentEntity = detectContextEntity(eventPage, event.identification) || currentEntity;
     }
   }
 
@@ -953,26 +923,11 @@ function extractDatePickerField(value) {
 }
 
 function semanticActionForCaption(caption, event) {
-  const value = cleanUiCaption(caption);
-
-  const rules = [
-    { patterns: [/^Öppna igen$/i, /^Reopen$/i, /^Genåbn$/i], semantic: "ReopenDocument" },
-    { patterns: [/^Släpp$/i, /^Frisläpp$/i, /^Release$/i, /^Frigiv$/i], semantic: "ReleaseDocument" },
-    { patterns: [/^Bokför$/i, /^Post$/i, /^Bogfør$/i], semantic: "PostDocument" },
-    { patterns: [/^Ja$/i, /^Yes$/i, /^Oui$/i], semantic: "ConfirmYes" },
-    { patterns: [/^Nej$/i, /^No$/i, /^Non$/i], semantic: "ConfirmNo" },
-    { patterns: [/^Sök$/i, /^Search$/i], semantic: "OpenSearch" },
-    { patterns: [/^Tillbaka$/i, /^Back$/i], semantic: "NavigateBack" },
-    { patterns: [/^Ny$/i, /^New$/i, /^Ny post$/i], semantic: "CreateNew" },
-    { patterns: [/^Redigera$/i, /^Edit$/i], semantic: "EditRecord" },
-    { patterns: [/^Ta bort$/i, /^Delete$/i], semantic: "DeleteRecord" }
-  ];
-
-  for (const rule of rules) {
-    if (rule.patterns.some(pattern => pattern.test(value))) {
-      return rule.semantic;
-    }
-  }
+  const identified = event?.identification?.actionIdentity?.actionType ||
+    globalThis.T9BCUIIdentification.identifyAction({ ...event,
+      accessibleName: cleanUiCaption(caption) }).actionType;
+  if (identified) return identified === "SearchAndOpenPage"
+    ? "OpenSearch" : identified;
 
   if (event?.category === "dialog") return "Dialog";
   if (event?.type === "field-change") return "ChangeField";
@@ -1931,58 +1886,26 @@ const BC_KNOWLEDGE_PACK_VERSION = "1.0";
 const BC_ENTITIES = [
   {
     entity: "SalesOrder",
-    pagePatterns: [
-      /förs\.?\s*order/i,
-      /försäljningsorder/i,
-      /sales order/i
-    ],
-    listPatterns: [
-      /förs\.?\s*order/i,
-      /försäljningsorder/i,
-      /sales orders?/i
-    ],
     genericDocument: "den försäljningsorder som ska hanteras"
   },
   {
     entity: "PurchaseOrder",
-    pagePatterns: [
-      /inköpsorder/i,
-      /purchase order/i
-    ],
-    listPatterns: [
-      /inköpsorder/i,
-      /purchase orders?/i
-    ],
     genericDocument: "den inköpsorder som ska hanteras"
   },
   {
     entity: "Customer",
-    pagePatterns: [/kund/i, /customer/i],
-    listPatterns: [/kunder/i, /customers?/i],
     genericDocument: "den kund som ska hanteras"
   },
   {
     entity: "Vendor",
-    pagePatterns: [/leverantör/i, /vendor/i],
-    listPatterns: [/leverantörer/i, /vendors?/i],
     genericDocument: "den leverantör som ska hanteras"
   },
   {
     entity: "Item",
-    pagePatterns: [/artikel/i, /item/i],
-    listPatterns: [/artiklar/i, /items?/i],
     genericDocument: "den artikel som ska hanteras"
   },
   {
     entity: "PostedSalesInvoice",
-    pagePatterns: [
-      /bokförd.*försäljningsfaktura/i,
-      /posted sales invoice/i
-    ],
-    listPatterns: [
-      /bokförda.*försäljningsfakturor/i,
-      /posted sales invoices/i
-    ],
     genericDocument: "den bokförda försäljningsfaktura som ska visas"
   }
 ];
@@ -1990,28 +1913,24 @@ const BC_ENTITIES = [
 const BC_ACTION_RULES = [
   {
     ruleId: "ReopenDocument",
-    patterns: [/^öppna igen$/i, /^reopen$/i],
     taskType: "ReopenDocument",
     semanticAction: "ReopenDocument",
     confidence: 0.99
   },
   {
     ruleId: "ReleaseDocument",
-    patterns: [/^släpp$/i, /^frisläpp$/i, /^release$/i],
     taskType: "ReleaseDocument",
     semanticAction: "ReleaseDocument",
     confidence: 0.99
   },
   {
     ruleId: "PostDocument",
-    patterns: [/^bokför$/i, /^post$/i],
     taskType: "PostDocument",
     semanticAction: "PostDocument",
     confidence: 0.99
   },
   {
     ruleId: "OpenSearch",
-    patterns: [/^sök$/i, /^search$/i],
     taskType: "SearchAndOpenPage",
     semanticAction: "SearchAndOpenPage",
     confidence: 0.98
@@ -2021,21 +1940,21 @@ const BC_ACTION_RULES = [
 const BC_FIELD_RULES = [
   {
     ruleId: "ChangeShipmentDate",
-    patterns: [/^utleveransdatum$/i, /^shipment date$/i],
+    fieldSemanticHint: "ShipmentDate",
     taskType: "ChangeShipmentDate",
     semanticAction: "ChangeShipmentDate",
     confidence: 0.99
   },
   {
     ruleId: "SelectCustomer",
-    patterns: [/^kundnr$/i, /^kundens namn$/i, /^customer no\.?$/i, /^customer name$/i],
+    fieldSemanticHint: "Customer",
     taskType: "SelectCustomer",
     semanticAction: "SelectCustomer",
     confidence: 0.90
   },
   {
     ruleId: "SelectItem",
-    patterns: [/^artikelnr$/i, /^item no\.?$/i],
+    fieldSemanticHint: "Item",
     taskType: "SelectItem",
     semanticAction: "SelectItem",
     confidence: 0.95
@@ -2043,32 +1962,26 @@ const BC_FIELD_RULES = [
 ];
 
 function detectEntity(pageCaption, selectedCaption = "") {
-  const context = `${pageCaption || ""} ${selectedCaption || ""}`;
-
-  for (const entity of BC_ENTITIES) {
-    if (
-      entity.pagePatterns.some(pattern => pattern.test(context)) ||
-      entity.listPatterns.some(pattern => pattern.test(context))
-    ) {
-      return entity;
-    }
-  }
-
-  return null;
+  const identity = globalThis.T9BCUIIdentification.identifyPage({
+    pageCaption: `${pageCaption || ""} ${selectedCaption || ""}`
+  });
+  return BC_ENTITIES.find(item => item.entity === identity.entity) || null;
 }
 
 function findActionRule(caption) {
-  const value = cleanUiCaption(caption);
+  const identity = globalThis.T9BCUIIdentification.identifyAction({
+    type: "click", category: "action", accessibleName: cleanUiCaption(caption)
+  });
   return BC_ACTION_RULES.find(rule =>
-    rule.patterns.some(pattern => pattern.test(value))
-  ) || null;
+    rule.semanticAction === identity.actionType) || null;
 }
 
 function findFieldRule(caption) {
-  const value = cleanUiCaption(caption);
+  const identity = globalThis.T9BCUIIdentification.identifyControl({
+    type: "field-change", accessibleName: cleanUiCaption(caption)
+  });
   return BC_FIELD_RULES.find(rule =>
-    rule.patterns.some(pattern => pattern.test(value))
-  ) || null;
+    rule.fieldSemanticHint === identity.fieldSemanticHint) || null;
 }
 
 function documentationProfileName(settings) {

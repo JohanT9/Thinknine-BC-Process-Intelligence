@@ -5,6 +5,61 @@
 })(typeof globalThis !== "undefined" ? globalThis : this, function () {
   "use strict";
   const SCHEMA_VERSION = 1;
+  const PAGE_IDS = {
+    "21": { entity: "Customer", pageType: "card" },
+    "22": { entity: "Customer", pageType: "list" },
+    "26": { entity: "Vendor", pageType: "card" },
+    "27": { entity: "Vendor", pageType: "list" },
+    "30": { entity: "Item", pageType: "card" },
+    "31": { entity: "Item", pageType: "list" },
+    "42": { entity: "SalesOrder", pageType: "document" },
+    "50": { entity: "PurchaseOrder", pageType: "document" },
+    "9307": { entity: "PurchaseOrder", pageType: "list" },
+    "7335": { entity: "WarehouseShipment", pageType: "document" },
+    "7336": { entity: "WarehouseShipment", pageType: "list" },
+    "99000831": { entity: "ProductionOrder", pageType: "document" }
+  };
+  const CAPTION_RULES = {
+    sv: [
+      ["PostedSalesInvoice", /bokförd.*försäljningsfaktura/i],
+      ["SalesOrder", /förs\.?\s*order|försäljningsorder/i],
+      ["PurchaseOrder", /inköpsorder/i], ["WarehouseShipment", /distlagerutleverans/i],
+      ["ProductionOrder", /produktionsorder/i], ["Customer", /kund/i],
+      ["Vendor", /leverantör/i], ["Item", /artikel/i]
+    ],
+    en: [
+      ["PostedSalesInvoice", /posted sales invoice/i], ["SalesOrder", /sales orders?/i],
+      ["PurchaseOrder", /purchase orders?/i], ["WarehouseShipment", /warehouse shipment/i],
+      ["ProductionOrder", /production order/i], ["Customer", /customers?/i],
+      ["Vendor", /vendors?/i], ["Item", /items?/i]
+    ],
+    da: [
+      ["SalesOrder", /salgsordre/i], ["PurchaseOrder", /købsordre/i],
+      ["WarehouseShipment", /lagerleverance/i], ["ProductionOrder", /produktionsordre/i],
+      ["Customer", /kunde/i], ["Vendor", /leverandør/i], ["Item", /vare/i]
+    ]
+  };
+  const ACTION_RULES = {
+    reopen: { actionType: "ReopenDocument", captions: /^(öppna igen|reopen|genåbn)$/i },
+    release: { actionType: "ReleaseDocument", captions: /^(släpp|frisläpp|release|frigiv)$/i },
+    post: { actionType: "PostDocument", captions: /^(bokför|post|bogfør)$/i },
+    search: { actionType: "SearchAndOpenPage", captions: /^(sök|search|søg)$/i },
+    confirmyes: { actionType: "ConfirmYes", captions: /^(ja|yes|oui)$/i },
+    confirmno: { actionType: "ConfirmNo", captions: /^(nej|no|non)$/i },
+    open: { actionType: "OpenRecord", captions: /open record|öppna post|åbn post/i },
+    back: { actionType: "NavigateBack", captions: /^(tillbaka|back|tilbage)$/i },
+    new: { actionType: "CreateNew", captions: /^(ny|new|ny post)$/i },
+    edit: { actionType: "EditRecord", captions: /^(redigera|edit|rediger)$/i },
+    delete: { actionType: "DeleteRecord", captions: /^(ta bort|delete|slet)$/i }
+  };
+  const FIELD_RULES = [
+    { hint: "ShipmentDate", ids: /shipmentdate/i,
+      captions: /^(utleveransdatum|shipment date|leveringsdato)$/i },
+    { hint: "Customer", ids: /customer(no|name)/i,
+      captions: /^(kundnr\.?|kundens namn|customer no\.?|customer name|kundenr\.?)$/i },
+    { hint: "Item", ids: /itemno/i,
+      captions: /^(artikelnr\.?|item no\.?|varenr\.?)$/i }
+  ];
   const clone = value => value == null ? value : JSON.parse(JSON.stringify(value));
   function freeze(value) {
     if (!value || typeof value !== "object" || Object.isFrozen(value)) return value;
@@ -29,6 +84,81 @@
     };
     return null;
   }
+  function captionEntity(caption) {
+    for (const [language, rules] of Object.entries(CAPTION_RULES)) {
+      for (const [entity, pattern] of rules) if (pattern.test(text(caption))) {
+        return { entity, language };
+      }
+    }
+    return null;
+  }
+  function identifyPage(raw = {}) {
+    const pageId = text(raw.pageId);
+    const caption = text(raw.pageName || raw.pageCaption);
+    const known = PAGE_IDS[pageId];
+    const fallback = known ? null : captionEntity(caption);
+    const source = known ? "page-id" : fallback ? `caption-fallback:${fallback.language}` : null;
+    return {
+      pageIdentity: pageId ? `bc:page:${pageId}` : null,
+      pageId: pageId || null,
+      pageType: known?.pageType || null,
+      caption: caption || null,
+      entity: known?.entity || fallback?.entity || null,
+      source,
+      evidence: [evidence("route-page-parameter", pageId),
+        evidence("observed-page-caption", caption)].filter(Boolean)
+    };
+  }
+  function identifyControl(raw = {}) {
+    const technical = identity(raw);
+    const classified = controlType(raw);
+    const caption = text(raw.accessibleName || raw.fieldName || raw.label);
+    const stableField = text(raw.fieldId || raw.automationId || raw.dataControlId);
+    const fieldRule = FIELD_RULES.find(rule => rule.ids.test(stableField)) ||
+      FIELD_RULES.find(rule => rule.captions.test(caption));
+    return {
+      controlIdentity: technical ? `bc:control:${technical.value}` : null,
+      controlId: text(raw.controlId || raw.dataControlId) || null,
+      automationId: text(raw.automationId) || null,
+      controlType: classified.value,
+      role: text(raw.role) || null,
+      caption: caption || null,
+      fieldSemanticHint: fieldRule?.hint || text(raw.fieldId) || null,
+      source: technical?.source || classified.source,
+      evidence: [technical && evidence(technical.source, technical.value),
+        evidence(classified.source, classified.value),
+        evidence(raw.accessibleNameSource || "observed-caption", caption)].filter(Boolean)
+    };
+  }
+  function technicalAction(raw) {
+    const value = text(raw.automationId || raw.dataControlId || raw.dataControlName);
+    if (!value) return null;
+    const normalized = value.replace(/[^a-z]/gi, "").toLowerCase();
+    for (const [key, rule] of Object.entries(ACTION_RULES)) {
+      if (normalized.includes(key)) return { ...rule, key, source: "technical-action-id" };
+    }
+    return null;
+  }
+  function identifyAction(raw = {}) {
+    const caption = text(raw.accessibleName || raw.label || raw.fieldName);
+    const technical = technicalAction(raw);
+    let fallback = null;
+    if (!technical) for (const [key, rule] of Object.entries(ACTION_RULES)) {
+      if (rule.captions.test(caption)) { fallback = { ...rule, key,
+        source: "caption-fallback" }; break; }
+    }
+    const match = technical || fallback;
+    const automationId = text(raw.automationId || raw.dataControlId);
+    return {
+      actionIdentity: automationId ? `bc:action:${automationId}` : null,
+      automationId: automationId || null,
+      actionType: match?.actionType || null,
+      caption: caption || null,
+      source: match?.source || null,
+      evidence: [evidence("data-automation-id", automationId),
+        evidence("observed-action-caption", caption)].filter(Boolean)
+    };
+  }
   function controlType(raw) {
     const explicit = text(raw.controlKind);
     if (explicit) return { value: explicit, quality: "exact", source: "explicit-control-kind" };
@@ -51,6 +181,9 @@
   function identify(raw = {}, options = {}) {
     const eventId = options.eventId || raw.id || "";
     const allEvidence = [];
+    const pageIdentity = identifyPage(raw);
+    const controlIdentity = identifyControl(raw);
+    const actionIdentity = identifyAction(raw);
     const page = {};
     if (text(raw.pageId)) { page.id = text(raw.pageId); allEvidence.push(evidence("route-page-parameter", raw.pageId)); }
     if (text(raw.pageName)) { page.name = text(raw.pageName); allEvidence.push(evidence("explicit-page-name", raw.pageName)); }
@@ -104,6 +237,11 @@
       page,
       control,
       action,
+      pageIdentity,
+      controlIdentity,
+      actionIdentity,
+      entityContext: { entity: pageIdentity.entity,
+        source: pageIdentity.source, evidence: clone(pageIdentity.evidence) },
       container,
       hierarchy,
       lookupContext,
@@ -122,5 +260,6 @@
     if (!value || Number(value.schemaVersion) !== SCHEMA_VERSION) throw new Error("Unsupported BC UI identification schema.");
     return freeze(clone(value));
   }
-  return { SCHEMA_VERSION, identify, normalize };
+  return { SCHEMA_VERSION, identify, identifyAction, identifyControl,
+    identifyPage, normalize };
 });
