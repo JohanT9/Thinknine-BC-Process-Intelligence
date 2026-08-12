@@ -1,5 +1,12 @@
 # Changelog
 
+## Raw Event Persistence intake authority — v4.6
+
+- Added durable raw intake before BC identification and Canonical Recording.
+- Preserved rapid identical interactions unless `sourceEventId` is identical.
+- Added explicit max-event truncation and raw-write health diagnostics.
+- Added restart, multi-frame, failure, projection, and 20,000-event regressions.
+
 ## Canonical Recording Hardening & CI Safety — v4.6
 
 - Added Canonical Recording tests to the standard `npm test` and CI lifecycle,

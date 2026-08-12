@@ -2,13 +2,16 @@
 
 ## Canonical domains and evidence safety
 
-Canonical Recording is the permanent captured-evidence source of truth.
+Raw Event Persistence is the authoritative intake source for new captures.
+Canonical Recording is its immutable captured-evidence projection and the
+permanent source consumed by derived layers.
 Semantic Document is the canonical renderer-neutral document representation.
 The two “canonical” contracts belong to different domains; document projection
 never replaces recording evidence.
 
-The capture compatibility boundary writes Canonical Recording before legacy
-events/screenshots. A serialized persistence queue exposes pending/failure
+The capture boundary writes Raw Event Persistence before identification,
+Canonical Recording, and legacy events/screenshots. Serialized persistence
+queues expose pending/failure
 diagnostics. Stop performs bounded settlement and validates Event counts,
 ordering, identity, and screenshot references before the immutable finish write.
 Derived interpretation, Review, Workspace, and Word remain read-only consumers.

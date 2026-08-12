@@ -1,6 +1,8 @@
 const assert = require("assert");
 const canonical = require("../src/engine/canonical-recording");
 const persistence = require("../src/engine/raw-event-persistence");
+const fs = require("fs");
+const path = require("path");
 
 function memoryAdapter(initial = null) {
   let value = initial;
@@ -31,6 +33,20 @@ function raw(id, overrides = {}) {
     label: "Sales Orders",
     unknownFutureCapture: { version: 27 },
     ...overrides
+  };
+}
+
+function rawMemoryAdapter(initial = null) {
+  let value = initial;
+  let failNext = false;
+  return {
+    async load() { return value; },
+    async save(next) {
+      if (failNext) { failNext = false; throw new Error("raw storage unavailable"); }
+      value = next;
+    },
+    fail() { failNext = true; },
+    inspect() { return JSON.parse(JSON.stringify(value)); }
   };
 }
 
@@ -135,6 +151,84 @@ function raw(id, overrides = {}) {
   }
   assert.strictEqual(largeAdapter.inspect().events.length, 1000);
   assert.ok(Date.now() - started < 15000, "1,000 event persistence regression");
+
+  // Raw Event Persistence is authoritative before Canonical interpretation.
+  const rawAdapter = rawMemoryAdapter();
+  let intake = persistence.createRawStore(rawAdapter);
+  await intake.create("intake-1", "2026-08-10T09:00:00.000Z");
+  const identical = { type: "click", label: "Post", value: "10000",
+    timestamp: "2026-08-10T10:00:00.000Z" };
+  await intake.appendRawEvent("intake-1", raw("frame-a:1", {
+    ...identical, sourceFrameId: "top", sourceSequence: 1,
+    futureMetadata: { retained: true } }));
+  await intake.appendRawEvent("intake-1", raw("frame-a:2", {
+    ...identical, sourceFrameId: "top", sourceSequence: 2 }));
+  await intake.appendRawEvent("intake-1", raw("frame-b:1", {
+    ...identical, sourceFrameId: "nested", sourceSequence: 1 }));
+  assert.deepStrictEqual(rawAdapter.inspect().events.map(item =>
+    item.acceptedSequence), [1, 2, 3]);
+  assert.deepStrictEqual(rawAdapter.inspect().events.map(item =>
+    item.sourceEventId), ["frame-a:1", "frame-a:2", "frame-b:1"]);
+  assert.deepStrictEqual(rawAdapter.inspect().events[0].futureMetadata,
+    { retained: true });
+
+  // Restart loads durable identity and suppresses only the same delivery.
+  intake = persistence.createRawStore(rawAdapter);
+  const duplicate = await intake.appendRawEvent("intake-1",
+    raw("frame-a:2", identical));
+  assert.strictEqual(duplicate.status, "duplicate");
+  assert.strictEqual(rawAdapter.inspect().events.length, 3);
+  await intake.appendRawEvent("intake-1", raw("frame-a:3", identical));
+  assert.strictEqual(rawAdapter.inspect().events[3].acceptedSequence, 4);
+
+  rawAdapter.fail();
+  await assert.rejects(intake.appendRawEvent("intake-1",
+    raw("failed:1")), /raw storage unavailable/);
+  assert(intake.diagnostics().failures.some(item =>
+    item.code === "raw-event-write-failure"));
+  assert.strictEqual(rawAdapter.inspect().events.length, 4);
+
+  const limitedAdapter = rawMemoryAdapter();
+  const limited = persistence.createRawStore(limitedAdapter);
+  await limited.create("limited");
+  await limited.appendRawEvent("limited", raw("limit:1"), { maxEvents: 1 });
+  const truncated = await limited.appendRawEvent("limited", raw("limit:2"),
+    { maxEvents: 1 });
+  assert.strictEqual(truncated.status, "truncated");
+  assert.strictEqual(limitedAdapter.inspect().events.length, 1);
+  assert.strictEqual(limitedAdapter.inspect().truncated, true);
+  assert(limitedAdapter.inspect().diagnostics.some(item =>
+    item.code === "raw-event-limit-reached"));
+
+  const scaleAdapter = rawMemoryAdapter();
+  const scale = persistence.createRawStore(scaleAdapter);
+  await scale.create("scale");
+  const scaleStarted = Date.now();
+  let tenThousandElapsed = 0;
+  for (let index = 0; index < 20000; index += 1) {
+    await scale.appendRawEvent("scale", raw(`scale:${index}`, {
+      sourceSequence: index + 1 }));
+    if (index === 9999) tenThousandElapsed = Date.now() - scaleStarted;
+  }
+  assert.strictEqual(scaleAdapter.inspect().events[9999].acceptedSequence, 10000);
+  assert.ok(tenThousandElapsed < 15000,
+    "10,000 raw event intake regression");
+  assert.strictEqual(scaleAdapter.inspect().events.length, 20000);
+  assert.ok(Date.now() - scaleStarted < 15000,
+    "20,000 raw event intake regression");
+
+  const background = fs.readFileSync(path.join(__dirname,
+    "../src/recorder/background.js"), "utf8");
+  const content = fs.readFileSync(path.join(__dirname,
+    "../src/recorder/content.js"), "utf8");
+  assert(background.indexOf("rawEventStore.appendRawEvent(") <
+    background.indexOf("T9BCUIIdentification.identify(event"),
+  "Raw evidence must be durable before Canonical interpretation.");
+  assert(background.indexOf("canonicalStore.append(") <
+    background.indexOf("saveEvents(recordingId, events)"),
+  "Canonical projection must precede legacy compatibility projection.");
+  assert(content.includes("`${sessionId}:${sourceFrameId}:${localSequence}`"));
+  assert(!background.includes("previous?.signature"));
 
   console.log("Raw event persistence tests passed.");
 })().catch(error => { console.error(error); process.exitCode = 1; });

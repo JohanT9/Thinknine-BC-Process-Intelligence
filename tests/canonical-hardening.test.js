@@ -19,6 +19,7 @@ assert.ok(packageJson.scripts.ci.includes("npm test"));
 assert.ok(background.includes("settleBounded(writeQueue"));
 assert.ok(background.includes("settleBounded(screenshotWorkerPromise"));
 assert.ok(background.includes("settleBounded(canonicalStore.flush()"));
+assert.ok(background.includes("settleBounded(rawEventStore.flush()"));
 assert.ok(background.includes("CANONICAL_SETTLE_TIMEOUT_MS = 60000"));
 assert.ok(background.indexOf("canonicalStore.associateScreenshot(") <
   background.indexOf("saveScreenshots(item.sessionId, screenshots)"),
@@ -27,7 +28,9 @@ assert.ok(background.indexOf("integrityDiagnostics(canonicalRecording") <
   background.indexOf("canonicalStore.finalize(state.sessionId"),
 "Integrity validation must precede immutable finalization.");
 for (const diagnostic of ["canonical-write-failure", "canonical-pending-write",
-  "canonical-integrity-validation-failed"]) {
+  "canonical-integrity-validation-failed", "raw-recording-truncated",
+  "raw-canonical-event-count-mismatch", "raw-event-pending-write",
+  "raw-event-write-failure"]) {
   assert.ok(background.includes(diagnostic), `Missing diagnostic: ${diagnostic}`);
 }
 

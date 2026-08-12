@@ -1,8 +1,16 @@
 # Thinknine BC Process Intelligence v4.6.0 R1
 
+## Raw Event Persistence
+
+Raw Event Persistence now precedes Canonical Recording. Every accepted delivery
+is durably appended with stable source identity and accepted order before BC UI
+identification or canonical/legacy projection. Only an identical `sourceEventId`
+is redelivery; rapid, visually identical interactions remain distinct.
+
 ## Canonical Recording Hardening
 
-Canonical Recording is the immutable captured-evidence source of truth. Standard
+Canonical Recording is the immutable evidence projection consumed by derived
+layers; Raw Event Persistence owns authoritative intake. Standard
 `npm test`/CI now includes its dedicated integrity suite; finalization uses
 bounded queue settlement, canonical-first screenshot registration, structured
 diagnostics, and pre-finish evidence validation without changing Review or Word.

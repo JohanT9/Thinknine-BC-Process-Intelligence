@@ -320,13 +320,20 @@
     if (!recording || !sessionId) return;
 
     try {
+      const localSequence = ++sourceSequence;
       chrome.runtime.sendMessage({
         type: "T9_RECORD_EVENT",
         event: {
-          sourceEventId: crypto.randomUUID(),
+          sourceEventId: `${sessionId}:${sourceFrameId}:${localSequence}`,
+          recordingId: sessionId,
           source: "business-central-content-script",
           sourceFrameId,
-          sourceSequence: ++sourceSequence,
+          sourceSequence: localSequence,
+          captureProvenance: {
+            producer: "business-central-content-script",
+            frameInstanceId: sourceFrameId,
+            localSequence
+          },
           timestamp: new Date().toISOString(),
           ...context(),
           ...event

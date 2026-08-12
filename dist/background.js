@@ -39,6 +39,7 @@ const STATE_KEY = "t9_state";
 const SETTINGS_KEY = "t9_settings";
 const {
   EVENT_PREFIX,
+  RAW_RECORDING_PREFIX,
   RECORDING_PREFIX,
   REVIEW_PREFIX,
   SCREENSHOT_PREFIX,
@@ -170,6 +171,23 @@ async function getCanonicalRecording(id) {
 async function saveCanonicalRecording(recording) {
   await chrome.storage.local.set({ [RECORDING_PREFIX + recording.id]: recording });
 }
+
+async function getRawRecording(id) {
+  const key = RAW_RECORDING_PREFIX + id;
+  const data = await chrome.storage.local.get(key);
+  return data[key] || null;
+}
+
+async function saveRawRecording(recording) {
+  await chrome.storage.local.set({
+    [RAW_RECORDING_PREFIX + recording.recordingId]: recording
+  });
+}
+
+const rawEventStore = globalThis.T9RawEventPersistence.createRawStore({
+  load: getRawRecording,
+  save: saveRawRecording
+});
 
 const canonicalStore = globalThis.T9RawEventPersistence.createStore({
   load: getCanonicalRecording,
@@ -325,42 +343,56 @@ async function recordEvent(rawEvent, captureContext = {}) {
     if (!session || session.status !== "recording") return;
 
     const settings = session.settings || await getSettings();
-    const canonicalBefore = await getCanonicalRecording(recordingId);
-    if (canonicalBefore.events.length >= settings.maxEvents) {
-      await setDebug({ lastError: "Maximalt antal händelser har uppnåtts." });
-      return;
-    }
-
-    const sourceEventId = rawEvent?.sourceEventId || crypto.randomUUID();
-    if (canonicalBefore.events.some(item =>
-      item.source?.eventId === sourceEventId
-    )) return;
-
-    const event = {
+    const sourceEventId = rawEvent?.sourceEventId ||
+      `${recordingId}:background:${crypto.randomUUID()}`;
+    const sourceEvent = {
       ...rawEvent,
-      eventNo: canonicalBefore.events.length + 1,
+      recordingId,
       timestamp: rawEvent?.timestamp || new Date().toISOString(),
       sourceEventId,
       tabId: captureContext.tabId ?? rawEvent?.tabId,
       browserFrameId: captureContext.frameId ?? rawEvent?.browserFrameId,
       parentFrameId: captureContext.parentFrameId ?? rawEvent?.parentFrameId,
       documentId: captureContext.documentId || rawEvent?.documentId,
-      frameOrigin: captureContext.origin || rawEvent?.frameOrigin
+      frameOrigin: captureContext.origin || rawEvent?.frameOrigin,
+      captureProvenance: {
+        ...(rawEvent?.captureProvenance || {}),
+        tabId: captureContext.tabId ?? rawEvent?.tabId,
+        frameId: captureContext.frameId ?? rawEvent?.browserFrameId,
+        documentId: captureContext.documentId || rawEvent?.documentId
+      }
     };
 
-    if ("value" in event) {
-      event.value = globalThis.T9PrivacyMask.mask(
-        event.fieldName, event.value, settings
+    if ("value" in sourceEvent) {
+      sourceEvent.value = globalThis.T9PrivacyMask.mask(
+        sourceEvent.fieldName, sourceEvent.value, settings
       );
     }
 
-    const canonicalEventId = `${recordingId}:event:${sourceEventId}`;
-    const identification = globalThis.T9BCUIIdentification.identify(event, {
-      eventId: canonicalEventId
-    });
-    const canonical = await canonicalStore.append(
-      recordingId, event, identification
+    const rawResult = await rawEventStore.appendRawEvent(
+      recordingId, sourceEvent, { maxEvents: settings.maxEvents }
     );
+    if (rawResult.status === "truncated") {
+      await setDebug({ lastError: "Maximalt antal händelser har uppnåtts.",
+        recordingHealth: { status: "truncated",
+          diagnostic: rawResult.diagnostic } });
+      return;
+    }
+
+    const canonicalBefore = await getCanonicalRecording(recordingId);
+    const alreadyCanonical = canonicalBefore.events.some(item =>
+      item.source?.eventId === sourceEventId
+    );
+    const event = { ...rawResult.event,
+      eventNo: canonicalBefore.events.length + 1 };
+
+    // Interpretation starts only after authoritative raw persistence succeeds.
+    const canonicalEventId = `${recordingId}:event:${sourceEventId}`;
+    const canonical = alreadyCanonical ? canonicalBefore :
+      await canonicalStore.append(recordingId, event,
+        globalThis.T9BCUIIdentification.identify(event, {
+          eventId: canonicalEventId
+        }));
     const canonicalEvent = canonical.events.find(item =>
       item.source?.eventId === event.sourceEventId
     );
@@ -370,6 +402,8 @@ async function recordEvent(rawEvent, captureContext = {}) {
     session.eventCount = events.length;
     session.updatedAt = event.timestamp;
     await saveSession(session);
+
+    if (alreadyCanonical) return;
 
     if (globalThis.T9ScreenshotCapturePolicy.shouldCapture(settings, event)) {
       const captureCategory = globalThis.T9ScreenshotCapturePolicy.category(event);
@@ -618,6 +652,7 @@ async function startSession(message, tabId) {
   await saveSession(session);
   await saveEvents(id, []);
   await saveScreenshots(id, {});
+  await rawEventStore.create(id, now);
   await canonicalStore.create(globalThis.T9CanonicalRecording.create({
     id, startedAt: now, legacySession: session
   }));
@@ -664,6 +699,7 @@ async function stopSession() {
   // before the immutable completion boundary is written.
   try {
     await settleBounded(writeQueue, "accepted event writes");
+    await settleBounded(rawEventStore.flush(), "raw event persistence queue");
   } catch (error) {
     await setDebug({ lastError: String(error), canonicalIntegrityDiagnostic: {
       code: error.code || "canonical-write-failure",
@@ -691,24 +727,40 @@ async function stopSession() {
   }
 
   const storeIntegrity = canonicalStore.diagnostics();
-  if (storeIntegrity.pendingWrites || storeIntegrity.failures.length) {
+  const rawStoreIntegrity = rawEventStore.diagnostics();
+  if (storeIntegrity.pendingWrites || storeIntegrity.failures.length ||
+      rawStoreIntegrity.pendingWrites || rawStoreIntegrity.failures.length) {
     await setDebug({ canonicalIntegrityDiagnostic: {
-      code: storeIntegrity.pendingWrites ? "canonical-pending-write" :
-        "canonical-write-failure", pendingWrites: storeIntegrity.pendingWrites,
-      failures: storeIntegrity.failures.map(item => ({
+      code: rawStoreIntegrity.pendingWrites ? "raw-event-pending-write" :
+        rawStoreIntegrity.failures.length ? "raw-event-write-failure" :
+          storeIntegrity.pendingWrites ? "canonical-pending-write" :
+            "canonical-write-failure",
+      pendingWrites: storeIntegrity.pendingWrites,
+      rawPendingWrites: rawStoreIntegrity.pendingWrites,
+      failures: [...rawStoreIntegrity.failures, ...storeIntegrity.failures].map(item => ({
         operationType: item.operationType, message: item.message
       })) } });
-    throw new Error("Recording remains incomplete because canonical writes did not settle.");
+    throw new Error("Recording remains incomplete because evidence writes did not settle.");
   }
 
   const session = await getSession(state.sessionId);
   if (session) {
     const legacyEvents = await getEvents(state.sessionId);
     const canonicalRecording = await getCanonicalRecording(state.sessionId);
+    const rawRecording = await getRawRecording(state.sessionId);
     const integrityDiagnostics = globalThis.T9CanonicalRecording
       .integrityDiagnostics(canonicalRecording, {
         legacyEventCount: legacyEvents.length
       });
+    if (rawRecording && rawRecording.events.length !== canonicalRecording.events.length) {
+      integrityDiagnostics.push({ code: "raw-canonical-event-count-mismatch",
+        severity: "error", rawEventCount: rawRecording.events.length,
+        canonicalEventCount: canonicalRecording.events.length });
+    }
+    if (rawRecording?.truncated) {
+      integrityDiagnostics.push({ code: "raw-recording-truncated",
+        severity: "error", diagnostics: rawRecording.diagnostics || [] });
+    }
     if (integrityDiagnostics.length) {
       await setDebug({ canonicalIntegrityDiagnostic: {
         code: "canonical-integrity-validation-failed",

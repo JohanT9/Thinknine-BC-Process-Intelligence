@@ -2,9 +2,11 @@
 
 ## Hardened evidence contract
 
-Canonical Recording is the canonical source of truth for captured activity.
-Here, “canonical” refers to recording evidence. Semantic Document is separately
-the canonical document representation for rendering; it is not captured evidence.
+Canonical Recording is the canonical immutable evidence projection consumed by
+derived layers. Raw Event Persistence is the authoritative intake for new
+captures. Here, “canonical” refers to recording evidence. Semantic Document is
+separately the canonical document representation for rendering; it is not
+captured evidence.
 
 Schema-v1 operations `create`, `normalize`, `addEvent`, `addScreenshot`, and
 `finish` do not mutate their inputs and accept deeply frozen/serialized state.
@@ -34,18 +36,18 @@ Standard `npm test` runs `test:canonical` through its `posttest` lifecycle, so
 `npm run ci` cannot omit the evidence suite. Release-readiness and canonical
 hardening regressions lock this configuration.
 
-During capture, canonical Event/asset writes precede compatibility writes.
+During capture, authoritative raw append precedes identification and canonical
+projection; canonical Event/asset writes precede compatibility writes.
 Finalization waits up to 60 seconds for accepted Event writes, screenshot
 registrations, and the canonical persistence queue. Pending/failed writes or
 integrity mismatches are recorded in technical debug diagnostics and prevent the
 recording from being marked complete. Successful legacy projection, Review,
 Document Workspace, and Word behavior is unchanged.
 
-The queue and its failure journal live in the service worker. A browser or worker
-termination between accepting a delivery and its durable canonical save can
-therefore still lose that in-memory delivery. Durable delivery acknowledgement
-and replay belong to Raw Event Persistence hardening; successful finalization in
-the current worker does not conceal a known load/save failure.
+The source identity and accepted order live in durable raw storage rather than
+only in the service-worker queue. After restart, redelivery is idempotent and can
+repair a missing Canonical projection. Successful finalization requires raw and
+Canonical counts to match and does not conceal known load/save failure.
 
 Manual Information Steps never create canonical events. Their manual provenance
 and empty event references explicitly separate documentation from evidence.
@@ -113,7 +115,8 @@ Legacy events without identification remain valid. See
 
 ## Raw persistence boundary
 
-For new captures, canonical append is the first durable evidence write. Events
+For new captures, the separate Raw Event Persistence append is authoritative
+and occurs before identification or canonical projection. Events
 carry a source delivery ID and monotonically increasing canonical `sequence`.
 They may receive a delayed `screenshotAssetId` while recording is active, but
 cannot be replaced or deleted. Finalization waits for accepted writes and then
