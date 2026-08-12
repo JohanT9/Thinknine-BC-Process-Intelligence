@@ -1,5 +1,12 @@
 # Changelog
 
+## Event → Step Grouping responsibility migration — v4.6
+
+- Moved normalized lookup/focus/result boundaries into Step Grouping.
+- Changed Semantic Rules Step Group intake to isolated structured groups.
+- Preserved Customer, Item, Vendor, and Quantity interpretation regressions.
+- Documented the remaining legacy-only ungrouped compatibility adapter.
+
 ## Event Normalization with React/MUI compatibility — v4.6
 
 - Added normalization version 2.0.0 and a compact renderer-neutral taxonomy.

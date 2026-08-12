@@ -49,13 +49,14 @@ assert.strictEqual(semantic.processStepGroups(quantity.groups)[0].actionType,
   "EnterQuantity");
 
 const lookupEvents = [
-  event("l1", "lookup-open", {
-    controlIdentification: { identity: { value: "CustomerNo" }, caption: "Customer No." } }),
+  event("l1", "activation", {
+    controlIdentification: { identity: { value: "CustomerNo" },
+      controlType: "lookup", caption: "Customer No." } }),
   event("l2", "value-change", { pageIdentification: { caption: "Customers", modal: true },
     controlIdentification: { identity: { value: "LookupSearch" }, caption: "Search" },
     value: { normalized: "103" }, frameContext: { frameId: "dialog" } }),
-  event("l3", "row-selection", { pageIdentification: { caption: "Customers", modal: true },
-    controlIdentification: { type: "repeaterCell", caption: "No." },
+  event("l3", "selection-change", { pageIdentification: { caption: "Customers", modal: true },
+    controlIdentification: { controlType: "repeaterCell", caption: "No." },
     selection: { value: "1033", caption: "1033" }, frameContext: { frameId: "dialog" } }),
   event("l4", "value-change", {
     controlIdentification: { identity: { value: "CustomerNo" }, caption: "Customer No." },
@@ -69,16 +70,27 @@ assert.ok(customer.groups[0].groupingReason.includes("selected-record"));
 assert.ok(customer.groups[0].groupingReason.includes("resulting-control-value-match"));
 assert.deepStrictEqual(customer.groups[0].frameContexts.map(value => value.frameId),
   ["top", "dialog", "dialog", "top"]);
-assert.strictEqual(semantic.processStepGroups(customer.groups)[0].actionType,
-  "SelectCustomer");
+const customerAction = semantic.processStepGroups(customer.groups)[0];
+assert.strictEqual(customerAction.actionType, "SelectCustomer");
+assert.strictEqual(customerAction.selectedValue, "1033");
+assert.strictEqual(customerAction.rawInteractions[0].kind, "lookup-interaction");
+assert.strictEqual(customerAction.rawInteractions[0].targetControl.caption,
+  "Customer No.");
+assert.deepStrictEqual(customerAction.sourceEventIds,
+  ["source:l1", "source:l2", "source:l3", "source:l4"]);
 
-for (const identity of ["ItemNo", "VendorNo"]) {
+for (const [identity, actionType] of [["ItemNo", "SelectItem"],
+  ["VendorNo", "SelectVendor"]]) {
   const values = lookupEvents.map(item => ({ ...item,
     controlIdentification: item.normalizedEventId === "normalized:l1" ||
       item.normalizedEventId === "normalized:l4"
-      ? { identity: { value: identity }, caption: identity } : item.controlIdentification
+      ? { identity: { value: identity }, controlType: "lookup",
+        caption: identity } : item.controlIdentification
   }));
-  assert.strictEqual(run(values).groups[0].groupKind, "lookup-interaction");
+  const grouped = run(values);
+  assert.strictEqual(grouped.groups[0].groupKind, "lookup-interaction");
+  assert.strictEqual(semantic.processStepGroups(grouped.groups)[0].actionType,
+    actionType);
 }
 
 const option = run([
@@ -104,9 +116,10 @@ assert.deepStrictEqual(actionDialog.groups.map(group => group.groupKind),
   ["action", "dialog-interaction"]);
 
 const date = run([
-  event("d1", "lookup-open", { controlIdentification: {
-    identity: { value: "PostingDate" }, type: "dateInput" } }),
-  event("d2", "row-selection", { pageIdentification: { modal: true },
+  event("d1", "activation", { controlIdentification: {
+    identity: { value: "PostingDate" }, controlType: "lookup", type: "dateInput" } }),
+  event("d2", "selection-change", { pageIdentification: { modal: true },
+    controlIdentification: { controlType: "repeaterCell" },
     selection: { value: "2026-08-07" } }),
   event("d3", "value-change", { controlIdentification: {
     identity: { value: "PostingDate" }, type: "dateInput" },
@@ -157,8 +170,8 @@ const pageBoundary = run([
 assert.strictEqual(pageBoundary.groups.length, 3);
 
 const ambiguous = run([
-  event("x1", "lookup-open", { controlIdentification: {
-    identity: { value: "CustomerNo" } } }),
+  event("x1", "activation", { controlIdentification: {
+    identity: { value: "CustomerNo" }, controlType: "lookup" } }),
   event("x2", "value-change", { controlIdentification: {
     identity: { value: "Unrelated" } }, value: { normalized: "1033" } })
 ]);

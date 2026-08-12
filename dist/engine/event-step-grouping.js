@@ -13,27 +13,34 @@
   function controlKey(event) { return identity(event.controlIdentification) || event.controlIdentification?.caption || event.normalizedEventId; }
   function pageKey(event) { const page = event.pageIdentification || {}; return page.id || page.name || page.caption || ""; }
   function selectedValue(event) { return event.selection?.value ?? event.selection?.key ?? event.selection?.caption ?? event.value?.normalized; }
+  function isLookupOrigin(event) { return event?.kind === "activation" &&
+    event.controlIdentification?.controlType === "lookup"; }
+  function isRowSelection(event) { return event?.kind === "selection-change" &&
+    ["listRow", "repeaterCell"].includes(
+      event.controlIdentification?.controlType || event.controlIdentification?.type
+    ); }
   function unique(values) { return [...new Set(values.filter(Boolean))]; }
   function groupId(sourceIds) { return `step-group:${GROUPING_VERSION}:${sourceIds.map(id => `${id.length}:${id}`).join("|")}`; }
   function groupKind(events) {
     const kinds = new Set(events.map(event => event.kind));
-    if (kinds.has("lookup-open")) return "lookup-interaction";
+    if (events.some(isLookupOrigin)) return "lookup-interaction";
     if (kinds.has("toggle-change")) return "toggle-interaction";
     if (kinds.has("selection-change")) return "selection";
     if (kinds.has("value-change")) return "field-edit";
     if (kinds.has("dialog-action")) return "dialog-interaction";
-    if (kinds.has("row-selection")) return "row-interaction";
+    if (events.some(isRowSelection)) return "row-interaction";
     if (kinds.has("activation")) return "action";
     if (kinds.has("navigation")) return "navigation";
     return "unknown";
   }
   function makeGroup(recordingId, events, reasons, sequence) {
-    const primary = [...events].reverse().find(event => ["value-change", "toggle-change", "selection-change", "row-selection", "activation", "dialog-action", "navigation"].includes(event.kind)) || events.at(-1);
+    const primary = [...events].reverse().find(event => ["value-change", "toggle-change", "selection-change", "activation", "dialog-open", "dialog-close", "navigation"].includes(event.kind)) || events.at(-1);
     const sourceEventIds = unique(events.flatMap(event => event.sourceEventIds || [event.sourceEventId]));
     return freeze({
       stepGroupId: groupId(sourceEventIds), schemaVersion: SCHEMA_VERSION,
       groupingVersion: GROUPING_VERSION, recordingId, sourceEventIds,
       normalizedEventIds: events.map(event => event.normalizedEventId),
+      normalizedEvents: clone(events),
       startTimestamp: events[0].timestamp, endTimestamp: events.at(-1).timestamp,
       sequence, primaryEventId: primary.normalizedEventId,
       primarySourceEventId: primary.sourceEventId,
@@ -69,10 +76,10 @@
   }
   function lookupCanClose(events, event) {
     const origin = events[0];
-    if (origin.kind !== "lookup-open" || event.kind !== "value-change") return false;
+    if (!isLookupOrigin(origin) || event.kind !== "value-change") return false;
     const originId = identity(origin.controlIdentification);
     if (!originId || originId !== identity(event.controlIdentification)) return false;
-    const row = [...events].reverse().find(item => item.kind === "row-selection");
+    const row = [...events].reverse().find(isRowSelection);
     if (!row) return false;
     const selected = selectedValue(row); const committed = event.value?.normalized;
     return selected != null && committed != null && String(selected) === String(committed);
@@ -91,17 +98,17 @@
     };
     for (const event of normalizedRecording.events || []) {
       if (isNoise(event)) { emit(); supportingEvents.push(freeze({ normalizedEventId: event.normalizedEventId, classification: "noise", reason: "non-step-mechanic" })); assignments.set(event.normalizedEventId, "supporting"); continue; }
-      if (pending?.events[0]?.kind === "lookup-open") {
+      if (isLookupOrigin(pending?.events[0])) {
         const lookupOrigin = pending.events[0];
         const sameLookupPage = pageKey(event) === pageKey(lookupOrigin) || event.pageIdentification?.modal;
         const candidateEvents = [...pending.events, event];
         const finalLookupValue = lookupCanClose(candidateEvents, event);
         const supportingLookupEvent = sameLookupPage &&
-          (["activation", "keyboard-action", "row-selection", "selection-change"].includes(event.kind) ||
+          (["activation", "key-command", "selection-change"].includes(event.kind) ||
             (event.kind === "value-change" &&
               (event.pageIdentification?.modal || finalLookupValue)));
         if (supportingLookupEvent) {
-          pending.events.push(event); pending.reasons.push(event.kind === "row-selection" ? "selected-record" : "lookup-supporting-mechanic");
+          pending.events.push(event); pending.reasons.push(isRowSelection(event) ? "selected-record" : "lookup-supporting-mechanic");
           if (finalLookupValue) {
             pending.reasons.push("resulting-control-value-match");
             emit();
@@ -115,12 +122,12 @@
         continue;
       }
       emit();
-      const reason = event.kind === "lookup-open" ? "lookup-origin" :
+      const reason = isLookupOrigin(event) ? "lookup-origin" :
         event.kind === "navigation" ? "page-boundary" :
         event.kind === "activation" ? "committed-action" :
         isCommit(event.kind) ? "committed-interaction" : "conservative-single-event";
       pending = { events: [event], reasons: [reason] };
-      if (["activation", "navigation", "dialog-action", "unknown", "keyboard-action"].includes(event.kind)) emit();
+      if (["activation", "navigation", "dialog-open", "dialog-close", "unknown", "key-command"].includes(event.kind) && !isLookupOrigin(event)) emit();
     }
     emit();
     const unassignedMeaningfulEventIds = (normalizedRecording.events || [])

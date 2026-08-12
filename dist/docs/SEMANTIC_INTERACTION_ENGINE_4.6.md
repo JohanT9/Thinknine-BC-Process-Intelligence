@@ -1,5 +1,18 @@
 # Documentation Excellence v4.6 R3 — Semantic Interaction Rules Engine
 
+## Remaining low-level compatibility responsibility
+
+For Step Group input, none: mechanical lookup, focus, selection, result, and
+commit boundaries belong exclusively to Event Step Grouping. The engine receives
+one structure at a time, such as `kind: "lookup-interaction"` with
+`targetControl`, `selectedValue`, and `sourceEventIds`, and applies only business
+interpretation such as Customer, Item, Vendor, or Quantity.
+
+The engine retains an explicitly temporary adapter for historical ungrouped
+Review/document interactions. Only that path may scan adjacent legacy lookup
+captions, selected-record text, matching field results, or focus-only noise. No
+such scan runs in `processStepGroups`.
+
 Instructions with `user-edited` provenance pass through semantic rules unchanged.
 Reset restores the latest generated semantic instruction.
 

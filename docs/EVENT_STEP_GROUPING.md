@@ -86,6 +86,18 @@ grouping explanations.
 
 ## Semantic integration, compatibility, and performance
 
+Step Grouping owns all mechanical lookup boundaries: identified lookup
+activation, supporting modal mechanics, row/option selection, matching resulting
+field value, focus/commit boundaries, and abandonment/ambiguity termination. Its
+handoff contains `kind`, `targetControl`, `selectedValue`, ordered normalized
+events, and every `sourceEventId`. Semantic Interaction Rules process each group
+independently and cannot rediscover or consume adjacent mechanical groups.
+
+The temporary compatibility path for older Review/document inputs without Step
+Groups still performs legacy adjacent lookup/focus/result consumption. It is not
+used by `processStepGroups` and can be removed when ungrouped historical input
+is retired.
+
 The session read contract exposes Step Groups and attaches them to detached
 compatibility events/tasks. Semantic Interaction Rules provide a dedicated Step
 Group adapter and retain group/source identity. Legacy low-level task

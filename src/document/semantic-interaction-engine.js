@@ -28,7 +28,9 @@
         identification?.page?.caption,
         identification?.control?.caption,
         identification?.action?.caption
-      ])].map(text).join(" ");
+      ]), value?.targetControl?.controlIdentity,
+      value?.targetControl?.automationId,
+      value?.targetControl?.fieldSemanticHint].map(text).join(" ");
   }
 
   function controlCaption(value) {
@@ -287,9 +289,9 @@
     return deepFreeze(rule);
   }
 
-  const CUSTOMER = /kundens namn|kundnr|customer name|customer no\.?/iu;
-  const ITEM = /artikelnr|artikelnummer|item no\.?/iu;
-  const VENDOR = /leverantör(?:ens namn|snr|snummer)?|vendor(?: name| no\.?)?/iu;
+  const CUSTOMER = /kundens namn|kundnr|customer name|customer\s*no\.?/iu;
+  const ITEM = /artikelnr|artikelnummer|item\s*no\.?/iu;
+  const VENDOR = /leverantör(?:ens namn|snr|snummer)?|vendor(?:\s*name|\s*no\.?)?/iu;
   const LOCATION = /lagerställe|location(?: code)?/iu;
   const DIMENSION = /dimension|dimensionsvärde|dimension value/iu;
 
@@ -398,13 +400,22 @@
       action: "RunAction", navigation: "Navigate",
       "dialog-interaction": "Dialog", "row-interaction": "Select"
     };
-    const selected = primary.selection?.caption ?? primary.selection?.value ?? "";
+    const selectedEvent = [...(group?.evidence || [])].reverse().find(item =>
+      item.kind === "selection-change");
+    const selectedMechanic = (group?.normalizedEvents || []).find(item =>
+      item.normalizedEventId === selectedEvent?.normalizedEventId);
+    const selected = selectedMechanic?.selection?.caption ??
+      selectedMechanic?.selection?.value ?? primary.selection?.caption ??
+      primary.selection?.value ?? primary.value?.normalized ?? "";
     return {
+      kind: group.groupKind,
       taskId: group.stepGroupId,
       taskType: types[group.groupKind] || "Unclassified",
       fieldCaption: control.caption || "",
       actionCaption: action.caption || "",
       selectedCaption: selected ? String(selected) : "",
+      selectedValue: selected,
+      targetControl: clone(control),
       value: primary.value?.normalized ?? primary.state?.checked ?? selected,
       inputSources: primary.subtype ? [primary.subtype] : [],
       sourceEventIds: group.sourceEventIds || [],
@@ -414,7 +425,8 @@
   }
 
   function processStepGroups(groups = [], rules = BUILT_IN_RULES) {
-    return processInteractions(groups.map(interactionFromStepGroup), rules);
+    return deepFreeze(groups.flatMap(group =>
+      processInteractions([interactionFromStepGroup(group)], rules)));
   }
 
   function actionToInteraction(value) {
