@@ -7,9 +7,9 @@ customer secrets in the repository. Fixture IDs and aggregate metrics may be
 committed; screenshots, URLs, tenant/company/user names, document numbers, and
 business values remain in approved local evidence storage.
 
-The existing 15-sample screenshot metadata corpus is an engine-validation
+The existing 20-sample screenshot metadata corpus is an engine-validation
 baseline, not a substitute for this product dogfooding run. Its current result is
-9/12 eligible automatic choices before targeted rules and 12/12 after, with one
+14/17 eligible automatic choices before targeted rules and 17/17 after, with one
 capture failure, one ambiguous case, and one manual-override case.
 
 ## Recording matrix
