@@ -1,4 +1,17 @@
-# Thinknine BC Process Intelligence v4.6.0 R1
+# Thinknine BC Process Intelligence v4.6.0 — Current Baseline
+
+Edge is the production target. The architecture and build are Chromium-compatible,
+with modern Chrome and Edge bundle targets, but Chrome product support is not
+claimed until the manual Chrome verification plan is completed. See
+[Chrome readiness](docs/CHROME_READINESS.md).
+
+Current pipeline:
+
+`Canonical Recording (captured evidence) → Identification → Normalization → Step Grouping → Semantic Interpretation → Resolved Steps → Semantic Document (renderer-neutral document) → Document Planner → Workspace / Word`
+
+The detailed current boundary is maintained in
+[Architecture 4.6](docs/ARCHITECTURE.md). Milestone-specific sections below are
+release history and should not be read as competing current architectures.
 
 ## Raw Event Persistence
 
@@ -86,8 +99,8 @@ Consultants can refine instructions/comments, choose a candidate screenshot,
 hide a step, undo/redo, and reset to generated content without changing evidence.
 See [docs/STEP_EDITOR.md](docs/STEP_EDITOR.md).
 
-Ett modulärt Edge-tillägg för att spela in, granska och exportera dokumenterade
-Business Central-processer.
+Ett modulärt Business Central-tillägg med Edge som produktionsmål och en
+Chromium-kompatibel arkitektur för inspelning, granskning och dokumentexport.
 
 ## Screenshot Selection Engine
 
@@ -591,11 +604,13 @@ lint → tester → build → syntaxkontroll
 Skapa en release genom att tagga en version:
 
 ```powershell
-git tag v4.2.0-rc
-git push origin v4.2.0-rc
+git tag v4.6.0
+git push origin v4.6.0
 ```
 
-GitHub Actions bygger då automatiskt en Edge-ZIP och bifogar den till en GitHub Release.
+GitHub Actions bygger då automatiskt den Edge-märkta produktions-ZIP:en och
+bifogar den till en GitHub Release. Chrome-paketering införs först efter godkänd
+manuell Chrome-verifiering.
 
 
 ## Review Studio 3.6

@@ -1,5 +1,24 @@
 # Changelog
 
+## 4.6.0 - Architecture, Chromium readiness, and dogfooding baseline
+
+- Re-established one authoritative current architecture and explicitly separated
+  Canonical Recording evidence from the canonical Semantic Document domain.
+- Added a static Chrome MV3/API compatibility matrix without claiming untested
+  Chrome product support.
+- Added a 24–30 recording dogfooding plan, operational KPI formulas, freeze-list
+  guidance, and explicit not-yet-established product baselines.
+- Aligned current README/release wording, package/manifest descriptions, and the
+  exported `{version}` filename variable with 4.6.0.
+
+## 4.6 - Screenshot Selection real-world validation
+
+- Added a 15-sample sanitized BC metadata corpus with deterministic golden
+  screenshot expectations and failure classifications.
+- Corrected evidenced focus-only, before-value, and late dialog-close choices.
+- Established a 9/12 baseline and verified 12/12 eligible automatic selections,
+  with capture, ambiguity, and manual cases reported separately.
+
 ## 4.6 - Dashboard Composition Root
 
 - Added a DOM-independent canonical session interpretation pipeline.

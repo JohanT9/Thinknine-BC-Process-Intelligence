@@ -33,7 +33,7 @@ IDs, canonical source IDs, primary event, mode, explicit reasons, rejected
 candidates, manual override, fallback state, and annotation-preservation flags.
 Unknown future fields survive normalization.
 
-Selection version is `1.0.0`. Identity fingerprints include the version, Step
+Selection version is `1.1.0`. Identity fingerprints include the version, Step
 Group, profile, previous-page continuity, manual state, candidate IDs, source and
 normalized event identities, kind, annotations, and relevant stability/context
 signals. Random values and array positions alone are never identities.
@@ -78,6 +78,41 @@ Profile metadata provides a secondary preference: Business Process and Training
 favor overview, SOP favors precise state, Quick Reference favors focused context,
 and Troubleshooting favors diagnostic state. Accuracy signals remain stronger.
 Previous-page visual continuity is a small secondary signal only.
+
+Explicit `focus-transition`/`focusOnly` metadata is rejected as insufficient
+evidence, and explicit `beforeValue`/`capturePhase: before-value` metadata is
+rejected as premature. For dialog interactions, a completed dialog action is
+preferred over a later explicit dialog-close state. These rules do not infer
+image contents.
+
+## Real-world validation corpus
+
+The reusable metadata-only corpus is stored in
+`tests/fixtures/screenshot-selection/sanitized-bc-recordings.json`. It contains
+15 sanitized, real-shaped BC samples covering field entry, lookup, customer,
+item, quantity, date, checkbox, action, dialog, navigation, standard BC, and
+React/control add-in behavior. It contains no screenshots, OCR output, customer
+names, document numbers, URLs, tenant values, or other sensitive payloads.
+
+Each sample records its deterministic expected screenshot reference, candidate
+metadata, Step Group boundary, baseline result, and—where applicable—an error
+classification. `tests/screenshot-selection-corpus.test.js` reports counts and
+percentages; the measurement is verification output and is not a Document Health
+score.
+
+Baseline was 9/12 eligible automatic selections (75.0%). Three evidenced rules
+were corrected: reject focus-only primary captures when a committed state exists,
+reject explicitly marked before-value React captures, and prefer the completed
+dialog action over a later dialog-close capture. The corrected result is 12/12
+(100.0%) on the eligible corpus. Separately, one sample is a capture failure, one
+is intentionally ambiguous, and one requires a manual override. Those cases are
+not presented as automatically solved.
+
+The classification vocabulary is: wrong previous-step screenshot, focus-only
+screenshot, before-value screenshot, after-navigation screenshot, dialog closed
+too late, wrong control, missing capture, ambiguous candidates, and manual
+override expected. Zero-count categories remain visible in test output so new
+failures can be compared consistently.
 
 ## Fallback and no-screenshot behavior
 

@@ -34,7 +34,7 @@ const quantityCandidates = Object.freeze([
 const quantity = engine.select({ stepGroup: quantityGroup,
   candidates: quantityCandidates });
 assert.strictEqual(quantity.schemaVersion, 1);
-assert.strictEqual(quantity.selectionVersion, "1.0.0");
+assert.strictEqual(quantity.selectionVersion, "1.1.0");
 assert.strictEqual(quantity.selectedScreenshotAssetId, "shot-commit");
 assert.ok(quantity.selectionReasons.includes("primary-event"));
 assert.ok(quantity.selectionReasons.includes("same-control"));

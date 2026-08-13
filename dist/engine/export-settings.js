@@ -21,7 +21,7 @@
     },
     { name: "date", resolve: context => context.parts.date },
     { name: "time", resolve: context => context.parts.time },
-    { name: "version", resolve: () => "4.2.0" }
+    { name: "version", resolve: () => "4.6.0" }
   ];
   const definitionByName = new Map(
     variableDefinitions.map(definition => [definition.name, definition])

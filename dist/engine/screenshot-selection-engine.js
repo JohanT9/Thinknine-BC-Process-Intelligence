@@ -5,7 +5,7 @@
 })(typeof globalThis !== "undefined" ? globalThis : this, function () {
   "use strict";
   const SCHEMA_VERSION = 1;
-  const SELECTION_VERSION = "1.0.0";
+  const SELECTION_VERSION = "1.1.0";
   const cache = new WeakMap();
   const clone = value => value == null ? value : JSON.parse(JSON.stringify(value));
   function freeze(value) { if (!value || typeof value !== "object" || Object.isFrozen(value)) return value; Object.values(value).forEach(freeze); return Object.freeze(value); }
@@ -77,10 +77,30 @@
       ["hoverState", "temporary-hover"]]) {
       if (candidate.uiState[property] === true) { state.score -= property === "loading" || property === "spinner" ? 40 : 12; state.rejected.push(reason); state.informative = true; }
     }
+    if (candidate.normalizedKind === "focus-transition" ||
+        candidate.uiState.focusOnly === true) {
+      state.score -= 130; state.rejected.push("focus-only-state");
+      state.informative = true;
+    }
+    if (candidate.uiState.beforeValue === true ||
+        candidate.capturePhase === "before-value") {
+      state.score -= 150; state.rejected.push("before-value-state");
+      state.informative = true;
+    }
     const kind = stepGroup?.groupKind;
     if (kind === "field-edit" && candidate.normalizedKind === "value-change") add(state, true, 35, "committed-value", null);
     if (kind === "toggle-interaction" && candidate.normalizedKind === "toggle-change") add(state, true, 45, "confirmed-toggle-state", null);
     if (kind === "action" && candidate.normalizedKind === "activation") add(state, true, 40, "action-invocation", null);
+    if (kind === "dialog-interaction") {
+      if (["dialog-action", "activation"].includes(candidate.normalizedKind)) {
+        add(state, true, 95, "dialog-action-state", null);
+      }
+      if (candidate.normalizedKind === "dialog-close" ||
+          candidate.uiState.dialogClosed === true) {
+        state.score -= 45; state.rejected.push("dialog-closed-too-late");
+        state.informative = true;
+      }
+    }
     if (candidate.interactionType === "dialog") add(state, true,
       profilePreference(profile) === "focused" ? 2 : 8,
       "dialog-state", null);

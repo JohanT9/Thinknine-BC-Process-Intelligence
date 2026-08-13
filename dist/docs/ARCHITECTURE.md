@@ -1,5 +1,59 @@
 # Architecture 4.6
 
+## Current architecture baseline
+
+This section is authoritative. Later version-labelled sections retain useful
+decision history; they are not parallel current architectures.
+
+```text
+CAPTURE
+Browser events → Raw Event Persistence → Canonical Recording
+
+INTERPRETATION
+Canonical Recording → BC Identification → Event Normalization
+  → Step Grouping → Semantic Interpretation → generated steps
+
+DOCUMENTATION
+Generated + manual Review state → Resolved Steps → hierarchy
+  → Review Projector → Semantic Document → Semantic Interaction compatibility
+  → Language Excellence → Presentation Grammar → Screenshot Selection
+  → profile/theme → Document Planner → Document Plan
+
+OUTPUT
+Document Plan → Document Workspace
+Document Plan + prepared media → Word Adapter
+
+FUTURE PROCESS DOMAIN (not the document production path)
+Resolved Steps → Process Model → future Process Renderers
+```
+
+Raw Event Persistence is authoritative intake. **Canonical Recording** is the
+canonical captured-evidence model: immutable event and screenshot identity from
+which interpretation can be regenerated. **Semantic Document** is the canonical
+renderer-neutral document representation: document meaning after Review
+resolution and before planning/rendering. “Canonical” therefore names authority
+inside two different domains; neither model replaces the other.
+
+`dashboard.js` is the browser Composition Root. A non-DOM shell invokes the same
+interpretation through `session-interpretation-pipeline.js`. Domain modules do
+not import dashboard code. Workspace and Word consume one Document Plan and do
+not independently interpret recording evidence, wording, screenshots, or layout.
+
+## Current legacy compatibility path
+
+Pre-canonical recordings and Reviews remain readable through explicitly bounded
+adapters: legacy event projections, `sourceEventNos`/`legacyEventNos`, legacy task
+consolidation, old screenshot references, marker parsing, and the quarantined old
+exporter. Compatibility metadata must not masquerade as Canonical Event IDs.
+New recordings use canonical IDs end to end. No compatibility path may mutate
+Canonical Recording, Semantic Document, or the current Document Plan.
+
+## Historical architecture record
+
+The remaining milestone sections below document how the current boundaries were
+introduced. Where their diagrams conflict with the baseline above, the baseline
+is current and the older diagram is historical context.
+
 ## Canonical domains and evidence safety
 
 Raw Event Persistence is the authoritative intake source for new captures.

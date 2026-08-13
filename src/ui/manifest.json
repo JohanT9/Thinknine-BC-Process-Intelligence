@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "Thinknine BC Process Intelligence",
   "version": "4.6.0",
-  "description": "Records and interprets Business Central processes using modular Edge-only intelligence.",
+  "description": "Records and interprets Business Central processes; Edge production target with Chromium-compatible architecture.",
   "permissions": [
     "activeTab",
     "downloads",
