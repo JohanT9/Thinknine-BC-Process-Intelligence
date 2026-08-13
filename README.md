@@ -110,6 +110,10 @@ and passes one selected reference to the shared Workspace/Word pipeline without
 reading or modifying image bytes. See
 [Screenshot Selection Engine](docs/SCREENSHOT_SELECTION_ENGINE.md).
 
+Its reusable metadata-only validation corpus contains 20 sanitized, real-shaped
+Business Central cases. It distinguishes selection failures from missing
+captures and validates manual/annotated intent without inspecting image bytes.
+
 ## Event â†’ Step Grouping
 
 Ordered normalized mechanics now become immutable, versioned candidate Step

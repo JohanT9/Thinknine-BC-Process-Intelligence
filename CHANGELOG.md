@@ -13,10 +13,14 @@
 
 ## 4.6 - Screenshot Selection real-world validation
 
-- Added a 15-sample sanitized BC metadata corpus with deterministic golden
-  screenshot expectations and failure classifications.
+- Expanded the reusable corpus to 20 sanitized, real-shaped BC metadata samples,
+  including vendor lookup, option field, multi-frame, annotation-preservation,
+  and legacy single-screenshot coverage.
+- Added the complete error-classification vocabulary and per-sample determinism
+  checks without changing production selection rules.
+- Added deterministic golden screenshot expectations and failure classifications.
 - Corrected evidenced focus-only, before-value, and late dialog-close choices.
-- Established a 9/12 baseline and verified 12/12 eligible automatic selections,
+- Established a 14/17 baseline and verified 17/17 eligible automatic selections,
   with capture, ambiguity, and manual cases reported separately.
 
 ## 4.6 - Dashboard Composition Root

@@ -12,18 +12,27 @@ function inputs(sample) {
     page: { id: candidate.page || sample.group.pageContext?.id },
     control: { caption: candidate.control ||
       sample.group.controlContext?.caption, visible: true },
+    frameContext: candidate.frameId ? { frameId: candidate.frameId } : undefined,
     stability: { stable: Boolean(candidate.stable) },
+    annotationRefs: (candidate.annotations || []).map(annotationId =>
+      ({ annotationId })),
     capturePhase: candidate.beforeValue ? "before-value" : undefined,
     uiState: { dialogComplete: candidate.dialogComplete,
       dialogClosed: candidate.dialogClosed,
       beforeValue: candidate.beforeValue }
   }));
-  return { stepGroup: group, candidates,
-    manualOverride: sample.manualOverride };
+  if (sample.legacySingle) return { candidates,
+    existingSelection: sample.expected };
+  return { stepGroup: group, candidates, manualOverride: sample.manualOverride };
 }
 
-const results = corpus.samples.map(sample => ({ sample,
-  selected: engine.select(inputs(sample)).selectedScreenshotAssetId }));
+const results = corpus.samples.map(sample => {
+  const first = engine.select(inputs(sample));
+  const second = engine.select(inputs(sample));
+  assert.deepStrictEqual(second, first, `${sample.id}: deterministic result`);
+  return { sample, result: first,
+    selected: first.selectedScreenshotAssetId };
+});
 const eligible = results.filter(({ sample }) => !sample.captureFailure &&
   !sample.manualOverride && sample.expected);
 const baselineCorrect = eligible.filter(({ sample }) =>
@@ -46,8 +55,12 @@ for (const { sample, selected } of manual) {
 assert(ambiguous.every(item => item.selected === null));
 assert.strictEqual(captureFailures.length, 1);
 assert.strictEqual(selectionFailures.length, 0);
-assert.strictEqual(baselineCorrect, 9);
-assert.strictEqual(afterCorrect, 12);
+assert.strictEqual(baselineCorrect, 14);
+assert.strictEqual(afterCorrect, 17);
+assert.strictEqual(results.find(item => item.sample.id ===
+  "annotated-consultant-choice").result.selectionMode, "annotation-safe");
+assert.strictEqual(results.find(item => item.sample.id ===
+  "legacy-single-screenshot").selected, "legacy-only");
 
 const percentage = (value, total) => `${((value / total) * 100).toFixed(1)}%`;
 console.log(`Screenshot corpus: ${corpus.samples.length} samples`);
@@ -56,10 +69,11 @@ console.log(`After: ${afterCorrect} / ${eligible.length} automatically correct (
 console.log(`Capture failures: ${captureFailures.length}`);
 console.log(`Selection failures after correction: ${selectionFailures.length}`);
 console.log(`Ambiguous candidates: ${ambiguous.length}; manual override expected: ${manual.length}`);
-for (const reason of ["wrong previous-step screenshot", "focus-only screenshot",
-  "before-value screenshot", "after-navigation screenshot",
-  "dialog closed too late", "wrong control", "missing capture",
-  "ambiguous candidates", "manual override expected"]) {
+for (const reason of ["previous-step screenshot", "focus-only screenshot",
+  "pre-value screenshot", "after-navigation screenshot", "wrong control",
+  "wrong dialog state", "stale screenshot", "transient UI", "missing capture",
+  "ambiguous candidates", "manual override expected",
+  "annotation-preservation conflict"]) {
   console.log(`${reason}: ${results.filter(({ sample }) =>
-    sample.failure === reason).length}`);
+    sample.failure === reason || sample.classification === reason).length}`);
 }

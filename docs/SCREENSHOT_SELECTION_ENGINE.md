@@ -89,9 +89,10 @@ image contents.
 
 The reusable metadata-only corpus is stored in
 `tests/fixtures/screenshot-selection/sanitized-bc-recordings.json`. It contains
-15 sanitized, real-shaped BC samples covering field entry, lookup, customer,
-item, quantity, date, checkbox, action, dialog, navigation, standard BC, and
-React/control add-in behavior. It contains no screenshots, OCR output, customer
+20 sanitized, real-shaped BC samples covering field entry, customer/item/vendor
+lookup, quantity, date, checkbox, option fields, actions, dialogs, navigation,
+standard BC, React/control add-in, multi-frame capture, annotation preservation,
+and legacy single-screenshot behavior. It contains no screenshots, OCR output, customer
 names, document numbers, URLs, tenant values, or other sensitive payloads.
 
 Each sample records its deterministic expected screenshot reference, candidate
@@ -100,19 +101,21 @@ classification. `tests/screenshot-selection-corpus.test.js` reports counts and
 percentages; the measurement is verification output and is not a Document Health
 score.
 
-Baseline was 9/12 eligible automatic selections (75.0%). Three evidenced rules
+Baseline was 14/17 eligible automatic selections (82.4%). Three evidenced rules
 were corrected: reject focus-only primary captures when a committed state exists,
 reject explicitly marked before-value React captures, and prefer the completed
-dialog action over a later dialog-close capture. The corrected result is 12/12
+dialog action over a later dialog-close capture. The corrected result is 17/17
 (100.0%) on the eligible corpus. Separately, one sample is a capture failure, one
 is intentionally ambiguous, and one requires a manual override. Those cases are
 not presented as automatically solved.
 
-The classification vocabulary is: wrong previous-step screenshot, focus-only
-screenshot, before-value screenshot, after-navigation screenshot, dialog closed
-too late, wrong control, missing capture, ambiguous candidates, and manual
-override expected. Zero-count categories remain visible in test output so new
-failures can be compared consistently.
+The classification vocabulary is: previous-step screenshot, focus-only
+screenshot, pre-value screenshot, after-navigation screenshot, wrong control,
+wrong dialog state, stale screenshot, transient UI, missing capture, ambiguous
+candidates, manual override expected, and annotation-preservation conflict.
+Zero-count categories remain visible in test output so new failures can be
+compared consistently. The runner also proves deterministic output for every
+sample and reports capture failures outside automatic-selection accuracy.
 
 ## Fallback and no-screenshot behavior
 
