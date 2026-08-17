@@ -5,6 +5,7 @@ const normalization = require("../src/engine/event-normalization");
 const grouping = require("../src/engine/event-step-grouping");
 const pipeline = require("../src/engine/session-interpretation-pipeline");
 const knowledge = require("../src/engine/knowledge-domain");
+const projector = require("../src/document/review-document-projector");
 
 const recordingId = "composition-root";
 const raw = { sourceEventId: "quantity", type: "field-change",
@@ -33,6 +34,42 @@ assert.deepStrictEqual(result.businessTasks[0].stepGroupIds,
 assert.ok(result.businessTasks[0].semanticActionIds.length);
 assert.strictEqual(result.businessTasks[0].screenshot,
   "screenshots/000001.png");
+
+const reactSurfaceRaw = {
+  sourceEventId: "react-surface", type: "click", category: "interaction",
+  timestamp: "2026-08-13T08:01:00.000Z", controlType: "div",
+  accessibleName: "R101312", label: "R101312", reactInteractive: true,
+  controlAddIn: true
+};
+const reactSurfaceRecording = canonical.addEvent(canonical.create({
+  id: "react-surface"
+}), reactSurfaceRaw, identify.identify(reactSurfaceRaw));
+const reactSurfaceNormalized = normalization.normalizeRecording(
+  reactSurfaceRecording);
+const reactSurfaceGrouped = grouping.group(reactSurfaceNormalized);
+const reactSurfaceEvent = { ...reactSurfaceRaw, eventNo: 1,
+  canonicalSourceEventId: reactSurfaceRecording.events[0].id };
+const reactSurfaceResult = pipeline.interpret({
+  session: { id: "react-surface", name: "Production order" },
+  events: [reactSurfaceEvent], normalizedEvents: reactSurfaceNormalized.events,
+  stepGroups: reactSurfaceGrouped.groups,
+  imagePaths: { 1: "screenshots/react-surface.png" }, knowledgePacks: []
+});
+assert.strictEqual(reactSurfaceResult.businessTasks.length, 1);
+assert.strictEqual(reactSurfaceResult.businessTasks[0].taskType, "RunAction");
+assert.strictEqual(reactSurfaceResult.businessTasks[0].instruction,
+  "Välj **R101312**.");
+assert.deepStrictEqual(reactSurfaceResult.businessTasks[0].sourceEventIds,
+  [reactSurfaceRecording.events[0].id]);
+const reactSurfaceDocument = projector.project({
+  sessionId: "react-surface", sessionName: "Production order",
+  tasks: reactSurfaceResult.businessTasks
+}, { session: { id: "react-surface", name: "Production order" } }).document;
+const reactSurfaceParagraphs = reactSurfaceDocument.sections.flatMap(section =>
+  section.blocks || []).flatMap(block => block.blocks || [block])
+  .filter(block => block.kind === "paragraph");
+assert(reactSurfaceParagraphs.some(block =>
+  block.text === "Välj **R101312**."));
 
 const legacyWithoutCanonicalIds = pipeline.interpret({
   session: { id: "legacy-source-less", name: "Legacy" },

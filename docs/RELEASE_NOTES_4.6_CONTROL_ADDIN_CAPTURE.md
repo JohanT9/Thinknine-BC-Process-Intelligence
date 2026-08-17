@@ -7,6 +7,8 @@ en namngiven checkboxändring i stället för en generell fältändring.
 Klickbara React-rader och kort som saknar native knapp-, länk- eller ARIA-markup
 kan också fångas genom observerbar MUI-/automation-metadata och pekarmarkör.
 Den semantiska tolkningen sker fortsatt efter inspelningen i engine-lagret.
+Namngivna interaktiva ytor blir där ett spårbart handlingssteg som kan nå Review
+och dokumentet även när ingen mer specifik verksamhetsregel matchar.
 
 React and Business Central control-add-in interactions no longer depend on the
 top frame receiving recording-state messages. Every injected frame observes the

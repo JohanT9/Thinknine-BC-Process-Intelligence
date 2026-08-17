@@ -196,6 +196,12 @@ function memoryAdapter() {
     reactRowRecording)).groups;
   assert.strictEqual(reactRowGroups[0].groupKind, "action");
   assert.strictEqual(reactRowGroups[0].actionContext.caption, "R101312");
+  const reactRowActions = require("../src/document/semantic-interaction-engine")
+    .processStepGroups(reactRowGroups);
+  assert.strictEqual(reactRowActions[0].actionType, "RunAction");
+  assert.strictEqual(reactRowActions[0].displayText, "Välj **R101312**.");
+  assert.deepStrictEqual(reactRowActions[0].sourceEventIds,
+    [reactRowRecording.events[0].id]);
 
   console.log("React/control add-in capture reliability tests passed.");
 })().catch(error => { console.error(error); process.exitCode = 1; });

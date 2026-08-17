@@ -531,6 +531,12 @@
       display: (value, selected) =>
         `${checkboxEnabled(value, selected) ? "Aktivera" : "Inaktivera"} ` +
         `**${text(value.fieldCaption)}**.` }),
+    singleRule({ ruleId: "react-interactive-surface", priority: 55,
+      match: value => value?.taskType === "RunAction" &&
+        value?.targetControl?.type === "interactiveSurface" &&
+        Boolean(text(value?.actionCaption)),
+      actionType: () => "RunAction",
+      display: value => `Välj **${text(value.actionCaption)}**.` }),
     singleRule({ ruleId: "option-selection", priority: 50,
       match: value => /selectoption|option|dropdown|combobox/iu
         .test(text(value?.taskType)),
