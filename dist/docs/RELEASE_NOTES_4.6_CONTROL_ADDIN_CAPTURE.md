@@ -15,6 +15,9 @@ kortets synliga namn.
 Om ingen interaktiv komponent kan identifieras bevaras ändå det faktiska
 klickmålet som rå evidens. Okänd eller framtida React-markup kan därför inte
 stoppa själva inspelningen.
+Namngivna pointer-mål behandlas som viktiga skärmbildshändelser. Deras synliga
+namn begränsas till kort lokal text från event-sökvägen så att stora React-
+containrar inte kopieras in som instruktionstext.
 
 React and Business Central control-add-in interactions no longer depend on the
 top frame receiving recording-state messages. Every injected frame observes the

@@ -315,6 +315,23 @@
         left.pathIndex - right.pathIndex)[0]?.element || null;
   }
 
+  function concisePointerLabel(event, target) {
+    const candidates = [target, ...(event?.composedPath?.() || [])]
+      .filter((element, index, values) => element instanceof Element &&
+        values.indexOf(element) === index)
+      .map(element => {
+        try {
+          return clean(element.getAttribute("aria-label") ||
+            element.getAttribute("title") ||
+            element.getAttribute("data-caption") || element.innerText ||
+            element.textContent || "", 160);
+        } catch { return ""; }
+      })
+      .filter(value => value.length >= 2 && value.length <= 120 &&
+        /[\p{L}\p{N}]/u.test(value));
+    return candidates[0] || "";
+  }
+
   function interactiveTarget(target, event) {
     if (!(target instanceof Element)) return null;
     const nativeTarget = target.closest(NATIVE_INTERACTIVE_SELECTOR);
@@ -525,6 +542,9 @@
     const selectedCaption = category === "selection"
       ? clean(selectedElement?.innerText || selectedElement?.textContent || "")
       : "";
+    const targetDescriptor = descriptor(target);
+    const pointerLabel = category === "interaction"
+      ? concisePointerLabel(event, target) : "";
 
     record({
       type: "click",
@@ -534,7 +554,9 @@
       clientX: event.clientX,
       clientY: event.clientY,
       pointerTarget: true,
-      ...descriptor(target)
+      ...targetDescriptor,
+      ...(pointerLabel ? { accessibleName: pointerLabel,
+        accessibleNameSource: "pointer-path-text", label: pointerLabel } : {})
     });
   }, true);
 

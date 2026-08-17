@@ -29,6 +29,8 @@ assert(content.includes("reactInteractiveTarget"));
 assert(content.includes("right.score - left.score"));
 assert(content.includes("catch { return -1; }"));
 assert(content.includes("pointerTarget: true"));
+assert(content.includes("concisePointerLabel"));
+assert(content.includes('accessibleNameSource: "pointer-path-text"'));
 assert(content.includes("interactiveTarget(observedTarget, event) ||"));
 assert(content.includes('getComputedStyle(element).cursor === "pointer"'));
 for (const reactClass of ["CardActionArea", "ListItemButton", "TableRow"]) {

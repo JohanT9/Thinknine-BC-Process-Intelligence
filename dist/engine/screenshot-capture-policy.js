@@ -17,6 +17,8 @@
             event.previousValue !== event.value)) && hasValue(event)) {
       return FIELD_INPUT;
     }
+    if (event?.type === "click" && event.pointerTarget === true &&
+        String(event.accessibleName || event.label || "").trim()) return "action";
     return event?.category || "";
   }
 

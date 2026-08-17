@@ -22,6 +22,12 @@ assert.strictEqual(policy.shouldCapture({ ...settings, captureScreenshots: false
   quantityInput), false);
 assert.strictEqual(policy.shouldCapture(settings,
   { type: "click", category: "action" }), true);
+const namedReactClick = { type: "click", category: "interaction",
+  pointerTarget: true, accessibleName: "R101312" };
+assert.strictEqual(policy.category(namedReactClick), "action");
+assert.strictEqual(policy.shouldCapture(settings, namedReactClick), true);
+assert.strictEqual(policy.shouldCapture(settings, { type: "click",
+  category: "interaction", pointerTarget: true }), false);
 
 assert.strictEqual(policy.canReuse(
   { category: "action", captureKey: "" },

@@ -15,6 +15,9 @@
 - Klickfångsten är nu fail-open: okänd framtida React-markup bevaras som rå
   klick-evidens i stället för att händelsen avvisas. Namngivna mål kan därefter
   klassificeras säkert i engine-lagret.
+- Namngivna React-klick begär nu skärmbild i läget `important`, och deras
+  instruktion använder kort lokal text från klickets event-sökväg i stället för
+  texten från en hel överordnad vy.
 - Fixed recording-state propagation to already mounted Business Central
   control-add-in frames; all injected frames now follow durable recording state
   across start, stop, remount, and service-worker restart lifecycles.
