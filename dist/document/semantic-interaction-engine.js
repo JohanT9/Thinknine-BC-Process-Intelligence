@@ -426,6 +426,36 @@
     return deepFreeze(rule);
   }
 
+  function closeDialogRule() {
+    const closeCaption = value => text(value?.actionCaption) ||
+      text(value?.selectedCaption) || text(value?.instruction)
+        .replace(/^(?:välj|select)\s+["“]?/iu, "").replace(/["”]?\.?$/u, "");
+    const rule = {
+      ruleId: "close-dialog-with-visible-control",
+      priority: 105,
+      match(context) {
+        const value = context.interactions[context.index];
+        return ["RunAction", "ClickAction"].includes(value?.taskType) &&
+          /^(?:stäng|close)$/iu.test(closeCaption(value));
+      },
+      consolidate(context) {
+        const value = context.interactions[context.index];
+        const visibleDialog = context.interactions[context.index - 1];
+        const preferredScreenshots = visibleDialog?.semanticActionModel
+          ?.screenshotRefs || visibleDialog?.screenshots ||
+          (visibleDialog?.screenshot ? [visibleDialog.screenshot] : []);
+        return { consumed: 1, action: action(rule, [value], {
+          actionType: "CloseDialog",
+          displayText: "Välj **Stäng**.",
+          selectedValue: "Stäng",
+          preferredSourceEventId: visibleDialog?.sourceEventIds?.at(-1),
+          preferredScreenshotRef: preferredScreenshots.at(-1)
+        }) };
+      }
+    };
+    return deepFreeze(rule);
+  }
+
   const CUSTOMER = /kundens namn|kundnr|customer name|customer\s*no\.?/iu;
   const ITEM = /artikelnr|artikelnummer|item\s*no\.?/iu;
   const VENDOR = /leverantör(?:ens namn|snr|snummer)?|vendor(?:\s*name|\s*no\.?)?/iu;
@@ -435,6 +465,7 @@
   const BUILT_IN_RULES = deepFreeze([
     salesPriceDiscountMenuPathRule(),
     manualPriceMenuPathRule(),
+    closeDialogRule(),
     selectionRule({ ruleId: "customer-selection", priority: 100,
       actionType: "SelectCustomer", fieldPattern: CUSTOMER,
       verb: "Välj kund", targetField: "Kund", requireValue: true }),

@@ -109,6 +109,33 @@ assert.strictEqual(manualPriceResult.businessTasks[0].taskType, "RunActionPath")
 assert.strictEqual(manualPriceResult.businessTasks[0].screenshot,
   "screenshots/manual-price-visible.png");
 
+const closeResult = pipeline.interpret({
+  session: { id: "close-session", name: "Close dialog" },
+  events: menuEvents.slice(0, 2),
+  stepGroups: ["Öppna information", "Stäng"].map((caption, index) => ({
+    schemaVersion: 1,
+    stepGroupId: `close-group-${index + 1}`,
+    groupingVersion: "1.0.0",
+    groupKind: "action",
+    sourceEventIds: [menuEvents[index].canonicalSourceEventId],
+    normalizedEventIds: [`normalized-close-${index + 1}`],
+    normalizedEvents: [],
+    primaryNormalizedEvent: { kind: "action-invocation" },
+    actionContext: { caption }
+  })),
+  imagePaths: {
+    20: "screenshots/dialog-open.png",
+    21: "screenshots/dialog-closed.png"
+  },
+  knowledgePacks: []
+});
+const closeTask = closeResult.businessTasks.find(task =>
+  task.taskType === "CloseDialog");
+assert.ok(closeTask);
+assert.strictEqual(closeTask.instruction, "Välj **Stäng**.");
+assert.strictEqual(closeTask.screenshot, "screenshots/dialog-open.png");
+assert.deepStrictEqual(closeTask.sourceEventIds, ["menu-event-related"]);
+
 const compatibilityTasks = [{ taskId: "legacy-action", taskType: "RunAction",
   instruction: "Välj Släpp.", sourceEventNos: [1] }];
 const unknownCompatibilityGroups = [1, 2, 3].map(index => ({

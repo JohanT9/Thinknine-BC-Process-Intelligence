@@ -1012,6 +1012,19 @@
       })));
   }
 
+  function hasGeneratedCloseScreenshotLeak(review) {
+    const tasks = Array.isArray(review?.tasks) ? review.tasks : [];
+    const consultantOwned = tasks.some(task => task?.approved ||
+      task?.userComment || task?.stepOverride || task?.manualStepId ||
+      task?.provenance === "manual");
+    if (consultantOwned) return false;
+    return tasks.some((task, index) => task?.taskType === "RunAction" &&
+      /(?:(?:välj|select)\s+)?["“]?(?:stäng|close)["”]?\.?/iu.test(String(
+        task.actionCaption || task.instruction || task.description || "")) &&
+      Boolean(tasks[index - 1]?.screenshot) && Boolean(task.screenshot) &&
+      tasks[index - 1].screenshot !== task.screenshot);
+  }
+
   return {
     createReview,
     normalizeReview: annotations.normalizeReview,
@@ -1058,6 +1071,7 @@
     progress,
     isGeneratedPlaceholderOnly,
     hasGeneratedLookupSearchLeak,
-    hasGeneratedMenuPathLeak
+    hasGeneratedMenuPathLeak,
+    hasGeneratedCloseScreenshotLeak
   };
 });

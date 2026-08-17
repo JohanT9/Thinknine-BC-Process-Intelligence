@@ -133,5 +133,16 @@ assert.strictEqual(review.hasGeneratedMenuPathLeak({ tasks: [
   { taskType: "RunAction", instruction: "Välj Funktion." },
   { taskType: "RunAction", instruction: "Välj Manuellt pris." }
 ] }), true);
+const closeScreenshotLeak = { tasks: [
+  { taskType: "RunAction", instruction: "Öppna dialog.",
+    screenshot: "dialog-open.png" },
+  { taskType: "RunAction", instruction: 'Välj "Stäng".',
+    screenshot: "dialog-closed.png" }
+] };
+assert.strictEqual(review.hasGeneratedCloseScreenshotLeak(closeScreenshotLeak),
+  true);
+assert.strictEqual(review.hasGeneratedCloseScreenshotLeak({ tasks:
+  closeScreenshotLeak.tasks.map((task, index) => index
+    ? { ...task, userComment: "Behåll" } : task) }), false);
 
 console.log("Review Studio tests passed.");

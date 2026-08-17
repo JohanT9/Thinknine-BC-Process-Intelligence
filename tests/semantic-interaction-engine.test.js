@@ -81,6 +81,18 @@ assert.strictEqual(manualPricePath.preferredScreenshotRef,
   "manual-price-visible.png");
 assert.strictEqual(engine.consolidateInteractions(
   manualPricePath.rawInteractions)[0].screenshot, "manual-price-visible.png");
+const closeDialog = engine.processInteractions([{
+  taskId: "dialog", taskType: "RunAction", actionCaption: "Öppna information",
+  sourceEventIds: ["event-dialog"], screenshot: "dialog-open.png"
+}, {
+  taskId: "close", taskType: "RunAction", actionCaption: "Stäng",
+  sourceEventIds: ["event-close"], screenshot: "dialog-closed.png"
+}])[1];
+assert.strictEqual(closeDialog.actionType, "CloseDialog");
+assert.strictEqual(closeDialog.displayText, "Välj **Stäng**.");
+assert.deepStrictEqual(closeDialog.sourceEventIds, ["event-close"]);
+assert.strictEqual(closeDialog.preferredSourceEventId, "event-dialog");
+assert.strictEqual(closeDialog.preferredScreenshotRef, "dialog-open.png");
 assert.deepStrictEqual(customer.sourceEventNos, [1, 2]);
 assert.deepStrictEqual(customer.screenshotRefs, ["lookup.png", "selected.png"]);
 assert.deepStrictEqual(customer.annotationRefs, [{ annotationId: "ann-1" }]);

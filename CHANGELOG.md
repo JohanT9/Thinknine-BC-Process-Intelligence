@@ -25,6 +25,8 @@
   final action screenshot.
 - Consolidated `Åtgärder → Funktion → Manuellt pris` and explicitly prefer the
   open-submenu screenshot where `Manuellt pris` remains visible.
+- Select the preceding open-dialog screenshot for `Välj Stäng` steps so the
+  documented control remains visible instead of showing the post-close state.
 - Fixed Document Library opening for recordings whose compatibility projection
   correctly omits empty Canonical `sourceEventIds`.
 - Kept legacy evidence source-less instead of fabricating Canonical IDs, while

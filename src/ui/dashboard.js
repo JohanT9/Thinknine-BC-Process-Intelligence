@@ -5390,7 +5390,8 @@ async function openReview(session) {
   const replacePlaceholderReview = existing.review &&
     (globalThis.T9Review.isGeneratedPlaceholderOnly(existing.review) ||
       globalThis.T9Review.hasGeneratedLookupSearchLeak(existing.review) ||
-      globalThis.T9Review.hasGeneratedMenuPathLeak(existing.review)) &&
+      globalThis.T9Review.hasGeneratedMenuPathLeak(existing.review) ||
+      globalThis.T9Review.hasGeneratedCloseScreenshotLeak(existing.review)) &&
     activeReviewModel.businessTasks.length > 0;
   activeReview = existing.review && !replacePlaceholderReview
     ? globalThis.T9Review.normalizeReview({
