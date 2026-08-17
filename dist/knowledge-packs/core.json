@@ -9,6 +9,11 @@
       "pageObjectId": "21",
       "entity": "Customer",
       "pageType": "card",
+      "localizedCaptions": {
+        "en-US": ["Customer Card"],
+        "sv-SE": ["Kundkort"],
+        "da-DK": ["Debitorkort"]
+      },
       "captionRules": [
         { "locale": "sv-SE", "pattern": "^Kundkort$" },
         { "locale": "en-US", "pattern": "^Customer Card$" }
@@ -19,6 +24,11 @@
       "pageObjectId": "30",
       "entity": "Item",
       "pageType": "card",
+      "localizedCaptions": {
+        "en-US": ["Item Card"],
+        "sv-SE": ["Artikelkort"],
+        "da-DK": ["Varekort"]
+      },
       "captionRules": [
         { "locale": "sv-SE", "pattern": "^Artikelkort$" },
         { "locale": "en-US", "pattern": "^Item Card$" }

@@ -101,6 +101,11 @@ and remain eligible for recording, screenshots, Review generation, document
 generation, Workspace use, and export. Historical recordings are enriched in
 memory and their persisted Canonical Recording is not rewritten.
 
+Localized aliases and explicit customer overrides remain Knowledge Pack data.
+The Page Identification Engine is their only resolver. Entity Memory owns only
+continuity, the dashboard only invokes pack loading, and semantic `pagePatterns`
+remain scoped to action/field interpretation rather than page classification.
+
 ## Event Normalization boundary
 
 Event Normalization 2.0.0 is the sole owner of browser-mechanic coalescing. It

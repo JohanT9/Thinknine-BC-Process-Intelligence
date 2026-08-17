@@ -1,0 +1,21 @@
+{
+  "packId": "customer-contoso-pages",
+  "name": "Contoso Business Central Pages",
+  "version": "1.0.0",
+  "priority": 600,
+  "pageDefinitions": [
+    {
+      "ruleId": "Contoso.ExtendedSalesOrder",
+      "provider": "customer-contoso",
+      "pageObjectId": "50100",
+      "entity": "ContosoSalesOrder",
+      "pageType": "document",
+      "localizedCaptions": {
+        "en-US": ["Contoso Sales Order"],
+        "sv-SE": ["Contoso försäljningsorder"],
+        "da-DK": ["Contoso salgsordre"]
+      }
+    }
+  ],
+  "rules": []
+}

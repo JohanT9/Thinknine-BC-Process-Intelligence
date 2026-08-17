@@ -11,10 +11,15 @@
       "pageType": "document",
       "recordType": "PurchaseOrder",
       "documentType": "purchase-order",
+      "localizedCaptions": {
+        "en-US": ["Purchase Order"],
+        "sv-SE": ["Inköpsorder"],
+        "da-DK": ["Købsordre"]
+      },
       "captionRules": [
-        { "locale": "sv-SE", "pattern": "^Inköpsorder(?:\\s+.*)?$" },
-        { "locale": "en-US", "pattern": "^Purchase Order(?:\\s+.*)?$" },
-        { "locale": "da-DK", "pattern": "^Købsordre(?:\\s+.*)?$" }
+        { "locale": "sv-SE", "pattern": "^Inköpsorder$" },
+        { "locale": "en-US", "pattern": "^Purchase Order$" },
+        { "locale": "da-DK", "pattern": "^Købsordre$" }
       ]
     }
   ],

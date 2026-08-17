@@ -11,10 +11,15 @@
       "pageType": "document",
       "recordType": "SalesOrder",
       "documentType": "sales-order",
+      "localizedCaptions": {
+        "en-US": ["Sales Order"],
+        "sv-SE": ["Förs.order", "Försäljningsorder"],
+        "da-DK": ["Salgsordre"]
+      },
       "captionRules": [
-        { "locale": "sv-SE", "pattern": "^(?:Förs\\.?\\s*order|F\\u00f6rs\\u00e4ljningsorder)(?:\\s+.*)?$" },
-        { "locale": "en-US", "pattern": "^Sales Order(?:\\s+.*)?$" },
-        { "locale": "da-DK", "pattern": "^Salgsordre(?:\\s+.*)?$" }
+        { "locale": "sv-SE", "pattern": "^(?:Förs\\.?\\s*order|F\\u00f6rs\\u00e4ljningsorder)$" },
+        { "locale": "en-US", "pattern": "^Sales Order$" },
+        { "locale": "da-DK", "pattern": "^Salgsordre$" }
       ]
     }
   ],

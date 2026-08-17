@@ -291,197 +291,20 @@ let unmatchedKnowledgeItems = [];
 
 async function loadKnowledgePacks() {
   const indexUrl = chrome.runtime.getURL("knowledge-packs/index.json");
-  const indexResponse = await fetch(indexUrl);
-  const index = await indexResponse.json();
-
-  const packs = [];
-  for (const descriptor of index.packs || []) {
-    if (descriptor.enabled === false) continue;
-    const url = chrome.runtime.getURL(descriptor.file);
-    const response = await fetch(url);
-    const pack = await response.json();
-    packs.push(pack);
-  }
-
-  loadedKnowledgePacks = packs;
-  globalThis.T9PageIdentificationEngine.configureKnowledgePacks(packs);
-  loadedKnowledgeRules = packs
-    .flatMap(pack => (pack.rules || []).map(rule => ({
-      ...rule,
-      packId: pack.packId,
-      packName: pack.name,
-      packVersion: pack.version,
-      packPriority: pack.priority || 0
-    })))
-    .sort((a, b) =>
-      (b.priority + b.packPriority) - (a.priority + a.packPriority)
-    );
-
-  return packs;
-}
-
-function testPatterns(patterns, value) {
-  const text = String(value || "");
-  if (!patterns?.length) return true;
-
-  return patterns.some(pattern => {
-    try {
-      return new RegExp(pattern, "i").test(text);
-    } catch {
-      return false;
-    }
+  const loaded = await globalThis.T9PageIdentificationEngine.loadKnowledgePacks({
+    indexUrl,
+    resolveUrl: file => chrome.runtime.getURL(file)
   });
+  loadedKnowledgePacks = [...loaded.packs];
+  loadedKnowledgeRules = globalThis.T9KnowledgeDomain.rules(loadedKnowledgePacks);
+
+  return loadedKnowledgePacks;
 }
 
-function knowledgeRuleScore(rule, task) {
-  const match = rule.match || {};
-  let score = 0;
-  let matched = 0;
-  let required = 0;
-
-  const context = task.context || {};
-
-  const checks = [
-    [
-      "pagePatterns",
-      task.pageCaption ||
-      context.currentPageCaption ||
-      context.previousPageCaption
-    ],
-    ["actionPatterns", task.actionCaption],
-    ["fieldPatterns", task.fieldCaption],
-    ["automationIdPatterns", task.automationId]
-  ];
-
-  for (const [key, value] of checks) {
-    const patterns = match[key] || [];
-    if (!patterns.length) continue;
-    required += 1;
-
-    if (testPatterns(patterns, value)) {
-      matched += 1;
-      score += 25;
-    }
-  }
-
-  if (required === 0) return 0;
-  if (matched === 0) return 0;
-
-  // Require all declared dimensions to match.
-  if (matched < required) return 0;
-
-  score += Math.round((rule.confidence || 0.5) * 50);
-  score += Math.min(25, Math.round((rule.priority || 0) / 50));
-
-  if (
-    task.context?.currentEntity &&
-    rule.entity &&
-    task.context.currentEntity === rule.entity
-  ) {
-    score += 20;
-  }
-
-  if (
-    task.context?.followingEntity &&
-    rule.entity &&
-    task.context.followingEntity === rule.entity
-  ) {
-    score += 20;
-  }
-
-  if (
-    task.context?.pendingSemanticHint &&
-    rule.semanticAction === task.context.pendingSemanticHint
-  ) {
-    score += 25;
-  }
-
-  return score;
-}
-
-function matchKnowledgeRule(task) {
-  let best = null;
-  let bestScore = 0;
-
-  for (const rule of loadedKnowledgeRules) {
-    const score = knowledgeRuleScore(rule, task);
-    if (score > bestScore) {
-      best = rule;
-      bestScore = score;
-    }
-  }
-
-  return best ? { rule: best, score: bestScore } : null;
-}
-
-function applyKnowledgeRule(task, match, settings) {
-  if (!match) {
-    unmatchedKnowledgeItems.push({
-      pageId: task.pageId || "",
-      pageCaption: task.pageCaption || "",
-      actionCaption: task.actionCaption || "",
-      fieldCaption: task.fieldCaption || "",
-      selectedCaption: task.selectedCaption || "",
-      automationId: task.automationId || "",
-      context: task.context || {},
-      suggestedRule: {
-        ruleId: `Custom.${task.context?.currentEntity || task.taskType || "Task"}`,
-        taskType: task.taskType || "RunAction",
-        semanticAction: task.semanticAction || "",
-        entity: task.entity || "",
-        priority: 500,
-        confidence: 0.75,
-        match: {
-          pagePatterns:
-            task.context?.currentPageCaption
-              ? [`^${task.context.currentPageCaption}$`]
-              : task.pageCaption
-                ? [`^${task.pageCaption}$`]
-                : [],
-          actionPatterns: task.actionCaption ? [`^${task.actionCaption}$`] : [],
-          fieldPatterns: task.fieldCaption ? [`^${task.fieldCaption}$`] : [],
-          automationIdPatterns: task.automationId ? [`^${task.automationId}$`] : []
-        }
-      }
-    });
-
-    return {
-      ...task,
-      knowledgeFrameworkVersion: KNOWLEDGE_PACK_FRAMEWORK_VERSION,
-      knowledgeMatched: false,
-      confidence: task.confidence || 0.55,
-      reviewSuggested: true
-    };
-  }
-
-  const rule = match.rule;
-  const updated = {
-    ...task,
-    taskType: rule.taskType || task.taskType,
-    semanticAction: rule.semanticAction || task.semanticAction,
-    entity: rule.entity || task.entity || "",
-    knowledgeFrameworkVersion: KNOWLEDGE_PACK_FRAMEWORK_VERSION,
-    knowledgeMatched: true,
-    knowledgeRule: rule.ruleId,
-    knowledgePackId: rule.packId,
-    knowledgePackName: rule.packName,
-    knowledgePackVersion: rule.packVersion,
-    confidence: rule.confidence || task.confidence || 0.8,
-    reviewSuggested: (rule.confidence || 0.8) < 0.85
-  };
-
-  if (rule.instructionTemplate) {
-    updated.instruction = rule.instructionTemplate;
-  }
-
-  return updated;
-}
-
-function applyKnowledgePackFramework(tasks, settings) {
-  unmatchedKnowledgeItems = [];
-  return globalThis.T9TaskConsolidation.consolidate(tasks.map(task =>
-    applyKnowledgeRule(task, matchKnowledgeRule(task), settings)
-  ));
+function applyKnowledgePackFramework(tasks) {
+  const result = globalThis.T9KnowledgeDomain.apply(tasks, loadedKnowledgePacks);
+  unmatchedKnowledgeItems = result.unmatched;
+  return result.tasks;
 }
 
 

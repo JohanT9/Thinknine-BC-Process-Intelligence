@@ -65,12 +65,15 @@ assert.deepStrictEqual({ ...genericCaption, pageIdentity: "stable" }, {
   source: "generic-fallback", confidence: 0.25 });
 
 const highPriority = { packId: "customer", priority: 500, pageDefinitions: [{
-  ...baseDefinition, ruleId: "Customer.Override", entity: "CustomerOrder"
+  ...baseDefinition, ruleId: "Customer.Override", entity: "CustomerOrder",
+  override: { targetRuleId: "Sales.Order", targetProvider: "sales",
+    reason: "Customer extension replaces the standard page semantics.", priority: 500 }
 }] };
 const prioritized = engine.resolvePageIdentity({ pageObjectId: "42" },
   [salesPack, highPriority]);
 assert.strictEqual(prioritized.entity, "CustomerOrder");
 assert.strictEqual(prioritized.provider, "customer");
+assert.strictEqual(prioritized.override.targetRuleId, "Sales.Order");
 assert.ok(prioritized.diagnostics.some(item =>
   item.code === "conflicting-page-definitions"));
 
