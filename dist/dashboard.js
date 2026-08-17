@@ -4873,6 +4873,11 @@ function renderReview() {
   invalidateDocumentWorkspace();
   const list = $("reviewList");
   list.innerHTML = "";
+  const expectedResultEditor = $("expectedResultEditor");
+  if (document.activeElement !== expectedResultEditor) {
+    expectedResultEditor.value = activeReview.documentFields?.expectedResult ||
+      globalThis.T9ReviewDocumentProjector.DEFAULT_EXPECTED_RESULT;
+  }
 
   const tasks = globalThis.T9Review.activeTasks(activeReview);
   const progress = globalThis.T9Review.progress(activeReview);
@@ -5214,6 +5219,8 @@ async function openReview(session) {
   });
 
   const replacePlaceholderReview = existing.review &&
+    !String(existing.review.documentFields?.expectedResult ||
+      existing.review.expectedResult || "").trim() &&
     (globalThis.T9Review.isGeneratedPlaceholderOnly(existing.review) ||
       globalThis.T9Review.hasGeneratedLookupSearchLeak(existing.review) ||
       globalThis.T9Review.hasGeneratedMenuPathLeak(existing.review) ||
@@ -5934,6 +5941,34 @@ async function saveReviewExplicitly() {
 }
 $("saveReview").addEventListener("click", saveReviewExplicitly);
 $("saveReviewBottom").addEventListener("click", saveReviewExplicitly);
+$("expectedResultEditor").addEventListener("input", event => {
+  globalThis.T9Review.setDocumentField(
+    activeReview,
+    "expectedResult",
+    event.currentTarget.value,
+    { beforeSelection: activeReviewSelection,
+      afterSelection: activeReviewSelection }
+  );
+  reviewAutoSave.schedule();
+  invalidateDocumentWorkspace();
+  applyReviewToolbarState();
+});
+$("resetExpectedResult").addEventListener("click", () => {
+  globalThis.T9Review.setDocumentField(
+    activeReview,
+    "expectedResult",
+    "",
+    { beforeSelection: activeReviewSelection,
+      afterSelection: activeReviewSelection,
+      groupKey: "document-field-reset:expectedResult" }
+  );
+  $("expectedResultEditor").value =
+    globalThis.T9ReviewDocumentProjector.DEFAULT_EXPECTED_RESULT;
+  reviewAutoSave.schedule();
+  invalidateDocumentWorkspace();
+  applyReviewToolbarState();
+  show("Förväntat resultat återställdes till standardtexten.");
+});
 $("reviewMoreActions").addEventListener("toggle", event => {
   event.currentTarget.querySelector("summary").setAttribute(
     "aria-expanded",

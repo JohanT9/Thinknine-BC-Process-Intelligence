@@ -51,6 +51,10 @@
       ? undefined : clone(command.beforeHierarchy);
     const afterHierarchy = command.afterHierarchy === undefined
       ? undefined : clone(command.afterHierarchy);
+    const beforeDocumentFields = command.beforeDocumentFields === undefined
+      ? undefined : clone(command.beforeDocumentFields);
+    const afterDocumentFields = command.afterDocumentFields === undefined
+      ? undefined : clone(command.afterDocumentFields);
     if (
       JSON.stringify(beforeTasks) === JSON.stringify(afterTasks) &&
       command.beforeStatus === command.afterStatus &&
@@ -59,7 +63,8 @@
         JSON.stringify(afterStructureOverrides) &&
       JSON.stringify(beforeManualSteps) === JSON.stringify(afterManualSteps) &&
       JSON.stringify(beforeStepNotes) === JSON.stringify(afterStepNotes) &&
-      JSON.stringify(beforeHierarchy) === JSON.stringify(afterHierarchy)
+      JSON.stringify(beforeHierarchy) === JSON.stringify(afterHierarchy) &&
+      JSON.stringify(beforeDocumentFields) === JSON.stringify(afterDocumentFields)
     ) {
       return review;
     }
@@ -79,6 +84,7 @@
         afterManualSteps,
         afterStepNotes,
         afterHierarchy,
+        afterDocumentFields,
         afterSelection: command.afterSelection === undefined
           ? previous.afterSelection
           : clone(command.afterSelection),
@@ -106,6 +112,8 @@
         afterStepNotes,
         beforeHierarchy,
         afterHierarchy,
+        beforeDocumentFields,
+        afterDocumentFields,
         beforeSelection: clone(command.beforeSelection ?? null),
         afterSelection: clone(command.afterSelection ?? null),
         beforeAnnotationSelection: clone(
@@ -177,6 +185,9 @@
     const hierarchy = direction === "undo"
       ? entry.beforeHierarchy : entry.afterHierarchy;
     if (hierarchy !== undefined) review.hierarchy = clone(hierarchy);
+    const documentFields = direction === "undo"
+      ? entry.beforeDocumentFields : entry.afterDocumentFields;
+    if (documentFields !== undefined) review.documentFields = clone(documentFields);
     if (entry.beforeStatus !== undefined || entry.afterStatus !== undefined) {
       review.status = direction === "undo" ? entry.beforeStatus : entry.afterStatus;
     }

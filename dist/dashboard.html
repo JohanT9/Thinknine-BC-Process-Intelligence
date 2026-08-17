@@ -96,6 +96,12 @@ table{width:100%;border-collapse:collapse}th,td{text-align:left;padding:9px;bord
 .review-card.compact .review-actions label{margin:0;align-self:center}
 .review-footer{padding:16px;border-top:1px solid #d8dee5;display:flex;justify-content:space-between;background:#f8fafc}
 #reviewWorkspacePanel{min-height:0;flex:1;overflow:auto;overscroll-behavior:contain}
+.review-document-fields{margin:16px 20px;padding:16px;border:1px solid #cbd8e6;border-radius:8px;background:#f7faff}
+.review-document-fields h3{margin:0 0 10px}
+.review-document-fields label{display:block;font-weight:700;margin-bottom:6px}
+.review-document-fields textarea{box-sizing:border-box;width:100%;min-height:84px;resize:vertical}
+.review-document-fields-actions{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:8px}
+.review-document-fields-actions p{margin:0}
 .review-zoom-content{zoom:var(--review-zoom,1)}
 .review-shell>[role="tabpanel"][hidden]{display:none!important}
 .document-workspace-panel{--document-zoom:1;background:#e8edf1;padding:0;height:calc(100vh - 190px);min-height:500px;display:flex;flex-direction:column;overflow:hidden}
@@ -459,6 +465,17 @@ table{width:100%;border-collapse:collapse}th,td{text-align:left;padding:9px;bord
     <section id="reviewWorkspacePanel" role="tabpanel"
       aria-labelledby="reviewWorkspaceTab">
       <div id="reviewZoomContent" class="review-zoom-content">
+      <section class="review-document-fields" aria-labelledby="reviewDocumentFieldsTitle">
+        <h3 id="reviewDocumentFieldsTitle">Dokumentinformation</h3>
+        <label for="expectedResultEditor">Förväntat resultat</label>
+        <textarea id="expectedResultEditor" rows="3"
+          aria-describedby="expectedResultHelp"
+          placeholder="Beskriv vad som ska vara uppnått när arbetsflödet är klart."></textarea>
+        <div class="review-document-fields-actions">
+          <p id="expectedResultHelp" class="muted">Texten visas i Dokumentvy och Word.</p>
+          <button id="resetExpectedResult" class="secondary" type="button">Återställ standardtext</button>
+        </div>
+      </section>
       <nav id="reviewHierarchy" aria-label="Dokumenthierarki"></nav>
       <main
         id="reviewList"

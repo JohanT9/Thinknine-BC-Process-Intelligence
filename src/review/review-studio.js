@@ -164,9 +164,48 @@
       noteModelVersion: "1.0.0",
       stepNotes: initialNotes,
       hierarchy: hierarchy.empty(session.id),
+      documentFields: { expectedResult: "" },
       generatedTasks: clone(normalizedTasks),
       tasks: normalizedTasks
     };
+  }
+
+  function normalizeReview(review) {
+    const normalized = annotations.normalizeReview(review);
+    normalized.documentFields = {
+      ...(normalized.documentFields || {}),
+      expectedResult: String(normalized.documentFields?.expectedResult ||
+        normalized.expectedResult || "")
+    };
+    return normalized;
+  }
+
+  function setDocumentField(review, field, value, options = {}) {
+    if (field !== "expectedResult") {
+      throw new TypeError(`Unsupported review document field: ${field}.`);
+    }
+    const beforeDocumentFields = historyEngine.snapshot(
+      review.documentFields || { expectedResult: "" }
+    );
+    review.documentFields = { ...(review.documentFields || {}),
+      [field]: String(value || "") };
+    review.updatedAt = options.now || new Date().toISOString();
+    historyEngine.record(review, {
+      historyId: options.commandHistoryId ||
+        `document-field-${field}-${review.updatedAt}`,
+      type: "document-field-edit",
+      createdAt: review.updatedAt,
+      groupKey: options.groupKey || `document-field:${field}`,
+      beforeTasks: review.tasks,
+      afterTasks: review.tasks,
+      beforeDocumentFields,
+      afterDocumentFields: review.documentFields,
+      beforeSelection: options.beforeSelection,
+      afterSelection: options.afterSelection,
+      beforeStatus: review.status,
+      afterStatus: review.status
+    });
+    return review;
   }
 
   function renumber(review) {
@@ -1068,7 +1107,8 @@
 
   return {
     createReview,
-    normalizeReview: annotations.normalizeReview,
+    normalizeReview,
+    setDocumentField,
     addAnnotation,
     updateAnnotation,
     removeAnnotation,

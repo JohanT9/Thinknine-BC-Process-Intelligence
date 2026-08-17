@@ -85,6 +85,12 @@ assert.ok(
   "Review Studio must contain the Word export button."
 );
 assert.ok(
+  htmlIds.has("expectedResultEditor") && htmlIds.has("resetExpectedResult") &&
+    html.includes('aria-describedby="expectedResultHelp"') &&
+    js.includes('T9Review.setDocumentField('),
+  "Review Studio must provide an accessible persisted expected-result editor."
+);
+assert.ok(
   htmlIds.has("mergeReviewSteps"),
   "Review Studio must contain the merge selection button."
 );

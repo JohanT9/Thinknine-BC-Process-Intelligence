@@ -451,7 +451,9 @@
     const prerequisites = Array.isArray(options.prerequisites)
       ? options.prerequisites.map(text).filter(Boolean)
       : [...DEFAULT_PREREQUISITES];
-    const expectedResult = text(options.expectedResult) ||
+    const expectedResult = text(review.documentFields?.expectedResult) ||
+      text(review.expectedResult) ||
+      text(options.expectedResult) ||
       DEFAULT_EXPECTED_RESULT;
     let resolvedWorkflowBlocks = workflowBlocks;
     if (review.hierarchy?.sections?.length) {
@@ -611,6 +613,7 @@
   }
 
   return {
+    DEFAULT_EXPECTED_RESULT,
     ORIGIN,
     PROJECTOR_VERSION,
     project

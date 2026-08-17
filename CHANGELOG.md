@@ -2,6 +2,11 @@
 
 ## 4.6.0 - Legacy documentation opening compatibility
 
+- Added manual editing of the document-level expected result in Granskning,
+  including autosave, undo/redo, reset to the standard text, and consistent
+  output in Dokumentvy and Word.
+- Preserve the expected-result override as additive Review metadata and accept
+  the historical top-level field without changing generated step evidence.
 - Completed the Page Identification release review across 17 representative
   standard, localized, Aptean, customer-extension, legacy, unknown, and framed
   flows through Canonical Recording, Review, Workspace, screenshots, and Word.

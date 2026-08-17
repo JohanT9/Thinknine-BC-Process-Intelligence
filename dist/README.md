@@ -100,6 +100,9 @@ links feed the shared Workspace/Word pipeline. See
 Review editing uses sparse Step Overrides and deterministic Resolved Steps.
 Consultants can refine instructions/comments, choose a candidate screenshot,
 hide a step, undo/redo, and reset to generated content without changing evidence.
+Review also owns the document-level expected result: consultants can edit it
+directly in Granskning, with autosave and undo/redo, and the same text is then
+used by Dokumentvy and Word export. An empty override retains the standard text.
 See [docs/STEP_EDITOR.md](docs/STEP_EDITOR.md).
 
 Ett modulärt Business Central-tillägg med Edge som produktionsmål och en

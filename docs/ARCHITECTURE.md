@@ -467,6 +467,14 @@ Review Projector → Semantic Document + Theme → Document Planner → Document
                                       Document Workspace Renderer   Word Adapter
 ```
 
+Document-level manual content is owned by Review.
+`documentFields.expectedResult` is an additive, reversible autosaved override;
+an empty value means that the shared default text is used. Review Projector is
+the only component that projects the value into the Semantic Document expected
+result section. Document Workspace and Word then consume the same Document Plan.
+During normalization, historical Reviews may still supply the legacy top-level
+`expectedResult` field.
+
 `document-workspace.js` är en ren, deterministisk planrenderer. Den skapar en
 immutable och renderer-neutral workspace-modell och känner inte till Review,
 DOM eller Word. `document-workspace-view.js` är den tunna DOM-adaptern som
