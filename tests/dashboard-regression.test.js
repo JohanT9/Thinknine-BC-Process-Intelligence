@@ -116,6 +116,12 @@ assert.ok(
   "Document Workspace and Word must share pipeline and prepared-media composition."
 );
 assert.ok(
+  dashboard.includes("businessSteps,\n    sessionGraph, confidenceResult } = model;") &&
+    dashboard.includes("JSON.stringify(sessionGraph, null, 2)") &&
+    dashboard.includes("response.session,\n          finalBusinessTasks,\n          knowledgeQuality"),
+  "ZIP export must consume graph and documentation tasks from its interpreted session model."
+);
+assert.ok(
   dashboard.includes("function applyDocumentView(options = {})") &&
     dashboard.includes("T9DocumentWorkspaceExperience.effectiveZoom") === false &&
     dashboard.includes("globalThis.T9DocumentWorkspaceExperience") &&

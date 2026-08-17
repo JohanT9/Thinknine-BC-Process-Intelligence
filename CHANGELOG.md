@@ -10,6 +10,8 @@
   including consolidated item-number lookup interactions.
 - Use the same viewport-filling workspace for Review and Document View, with
   Review content scrolling inside the full-screen dialog.
+- Fixed ZIP export after the Composition Root migration by reading the session
+  graph and final business tasks from the interpreted session model.
 - Fixed Document Library opening for recordings whose compatibility projection
   correctly omits empty Canonical `sourceEventIds`.
 - Kept legacy evidence source-less instead of fabricating Canonical IDs, while

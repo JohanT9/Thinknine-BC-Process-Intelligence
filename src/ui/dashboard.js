@@ -2932,7 +2932,7 @@ async function exportSession(session) {
     compatibilityInterpret: interpretLegacyCompatibility });
   unmatchedKnowledgeItems = model.unmatchedKnowledgeItems;
   const { contextEvents, contextCandidates, interpretedSteps, businessSteps,
-    confidenceResult } = model;
+    sessionGraph, confidenceResult } = model;
   const finalBusinessTasks = model.businessTasks;
   const knowledgeQuality = confidenceResult.sessionConfidence;
   const diagnostics = createDiagnostics(
@@ -3035,7 +3035,7 @@ async function exportSession(session) {
       data: bytes(
         createTaskDocumentationMarkdown(
           response.session,
-          businessTasks,
+          finalBusinessTasks,
           knowledgeQuality
         )
       )
