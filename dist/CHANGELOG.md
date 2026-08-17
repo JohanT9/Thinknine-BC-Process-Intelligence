@@ -2,6 +2,9 @@
 
 ## 4.6.0 - Legacy documentation opening compatibility
 
+- React/MUI-checkboxar bevarar nu texten från en omslutande HTML-label, så
+  avmarkerade val dokumenteras med sitt synliga fältnamn i stället för
+  `Okänt fält` och det tekniska värdet `false`.
 - Fixed recording-state propagation to already mounted Business Central
   control-add-in frames; all injected frames now follow durable recording state
   across start, stop, remount, and service-worker restart lifecycles.

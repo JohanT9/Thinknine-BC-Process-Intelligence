@@ -1,5 +1,9 @@
 # Documentation Excellence v4.6 - Control add-in capture reliability
 
+React- och MUI-checkboxar hämtar även sitt observerbara namn från en
+omslutande HTML-label. Ett avmarkerat `Skriv ut etikett` kan därmed tolkas som
+en namngiven checkboxändring i stället för en generell fältändring.
+
 React and Business Central control-add-in interactions no longer depend on the
 top frame receiving recording-state messages. Every injected frame observes the
 durable recording state, including frames that existed before recording began,

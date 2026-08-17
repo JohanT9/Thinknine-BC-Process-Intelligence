@@ -21,6 +21,8 @@ for (const type of ["click", "input", "change", "focusin", "focusout",
 }
 assert((content.match(/\}, true\);/gu) || []).length >= 6);
 assert(content.includes("event.composedPath?.()"));
+assert(content.includes('element.closest("label")'));
+assert(content.includes('"wrapping-label"'));
 assert(content.includes("chrome.storage.onChanged.addListener"));
 assert(content.includes("globalThis.T9CaptureFocusSession ||"));
 assert(content.indexOf("const focusSessions = focusSessionApi.create()") <
@@ -143,6 +145,32 @@ function memoryAdapter() {
   }
   assert.deepStrictEqual(normalization.normalizeRecording(activations).events
     .map(event => event.kind), ["activation", "toggle-change", "activation"]);
+
+  const checkboxRecording = canonical.addEvent(canonical.create({
+    id: "react-checkbox-label"
+  }), {
+    sourceEventId: "react-checkbox-label:addin-frame:1",
+    recordingId: "react-checkbox-label",
+    source: "business-central-content-script",
+    sourceFrameId: "addin-frame", sourceSequence: 1,
+    timestamp: "2026-08-17T10:01:00.000Z",
+    type: "field-change", category: "field", inputSource: "change",
+    fieldName: "Skriv ut etikett", accessibleName: "Skriv ut etikett",
+    accessibleNameSource: "wrapping-label", controlType: "input",
+    inputType: "checkbox", value: false, checked: false,
+    controlAddIn: true
+  });
+  const checkboxNormalized = normalization.normalizeRecording(
+    checkboxRecording);
+  assert.strictEqual(checkboxNormalized.events[0].kind, "toggle-change");
+  const checkboxGroups = grouping.group(checkboxNormalized).groups;
+  assert.strictEqual(checkboxGroups[0].groupKind, "toggle-interaction");
+  const checkboxActions = require("../src/document/semantic-interaction-engine")
+    .processStepGroups(checkboxGroups);
+  assert.strictEqual(checkboxActions[0].actionType, "DisableCheckbox");
+  assert.strictEqual(checkboxActions[0].targetField, "Skriv ut etikett");
+  assert.strictEqual(checkboxActions[0].displayText,
+    "Inaktivera **Skriv ut etikett**.");
 
   console.log("React/control add-in capture reliability tests passed.");
 })().catch(error => { console.error(error); process.exitCode = 1; });

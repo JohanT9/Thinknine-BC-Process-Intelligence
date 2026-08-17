@@ -177,7 +177,7 @@ assert.strictEqual(identifiedSemantic[0].actionType, "EnterQuantity");
 
 const contentSource = fs.readFileSync("src/recorder/content.js", "utf8");
 const dashboardSource = fs.readFileSync("src/ui/dashboard.js", "utf8");
-assert.ok(contentSource.indexOf("labelledText || ariaLabel || associatedLabel || elementText") >= 0,
+assert.ok(contentSource.indexOf("labelledText || ariaLabel || associatedLabel ||\n      wrappingLabelText || elementText") >= 0,
   "accessible name precedence must be deterministic");
 assert.ok(contentSource.includes("depth < 8"), "ancestor traversal must be bounded");
 assert.ok(!dashboardSource.includes("function detectContextEntity(pageCaption)"));

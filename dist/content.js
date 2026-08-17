@@ -230,6 +230,12 @@
       } catch {}
     }
 
+    const wrappingLabel = element.closest("label");
+    if (wrappingLabel) {
+      const text = textOf(wrappingLabel);
+      if (text) return text;
+    }
+
     const container = element.closest(
       '[role="group"],[role="row"],[class*="field"],[class*="control"],td,li'
     );
@@ -321,15 +327,18 @@
       try { associatedLabel = textOf(document.querySelector(`label[for="${CSS.escape(element.id)}"]`)); }
       catch {}
     }
+    const wrappingLabel = element?.closest?.("label");
+    const wrappingLabelText = textOf(wrappingLabel);
     const ariaLabel = element?.getAttribute?.("aria-label") || "";
     const title = element?.getAttribute?.("title") || "";
     const placeholder = element?.getAttribute?.("placeholder") || "";
     const elementText = clean(element?.innerText || element?.textContent || "");
-    const accessibleName = labelledText || ariaLabel || associatedLabel || elementText || title || placeholder || getLabel(element);
+    const accessibleName = labelledText || ariaLabel || associatedLabel ||
+      wrappingLabelText || elementText || title || placeholder || getLabel(element);
     const accessibleNameSource = labelledText ? "aria-labelledby" : ariaLabel
-      ? "aria-label" : associatedLabel ? "label-for" : elementText
-        ? "element-text" : title ? "title" : placeholder
-          ? "placeholder" : "surrounding-label";
+      ? "aria-label" : associatedLabel ? "label-for" : wrappingLabelText
+        ? "wrapping-label" : elementText ? "element-text" : title
+          ? "title" : placeholder ? "placeholder" : "surrounding-label";
     const uiHierarchy = [];
     let ancestor = element?.parentElement;
     for (let depth = 0; ancestor && depth < 8; depth += 1, ancestor = ancestor.parentElement) {
