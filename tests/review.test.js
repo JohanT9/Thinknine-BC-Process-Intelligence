@@ -117,5 +117,16 @@ const itemLookupLeak = { tasks: [{ taskType: "EnterFieldValue",
 }, { taskType: "EnterFieldValue", fieldCaption: "Sortera efter Nr",
   instruction: "Ange 30043." }] };
 assert.strictEqual(review.hasGeneratedLookupSearchLeak(itemLookupLeak), true);
+const menuPathLeak = { tasks: [
+  { taskType: "RunAction", actionCaption: "Välj rad" },
+  { taskType: "RunAction", actionCaption: "Relaterad information" },
+  { taskType: "RunAction",
+    actionCaption: "Tillämpat försäljningspris och rabatt" }
+] };
+assert.strictEqual(review.hasGeneratedMenuPathLeak(menuPathLeak), true);
+assert.strictEqual(review.hasGeneratedMenuPathLeak({ tasks:
+  menuPathLeak.tasks.map((task, index) => index === 1
+    ? { ...task, approved: true } : task) }), false,
+"consultant-owned menu steps must not regenerate automatically");
 
 console.log("Review Studio tests passed.");

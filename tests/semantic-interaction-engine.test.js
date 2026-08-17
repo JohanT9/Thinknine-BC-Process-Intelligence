@@ -50,6 +50,22 @@ const itemNumberEntry = only([{
   instruction: 'Ange 30043 i "Sortera efter Nr".'
 }], "EnterItemNumber", "Ange __30043__ i **Artikel Nr**.");
 assert.strictEqual(itemNumberEntry.inputInteractionCount, 3);
+const menuPath = only([{
+  taskId: "row", taskType: "RunAction", actionCaption: "Välj rad",
+  sourceEventIds: ["event-row"], screenshot: "row.png"
+}, {
+  taskId: "related", taskType: "RunAction", actionCaption: "Relaterad information",
+  sourceEventIds: ["event-related"], screenshot: "related.png"
+}, {
+  taskId: "discount", taskType: "RunAction",
+  actionCaption: "Tillämpat försäljningspris och rabatt",
+  sourceEventIds: ["event-discount"], screenshot: "discount.png"
+}], "RunActionPath", "Välj **Rad** → **Relaterad information** → " +
+  "**Tillämpat försäljningspris och rabatt**.");
+assert.deepStrictEqual(menuPath.sourceEventIds,
+  ["event-row", "event-related", "event-discount"]);
+assert.strictEqual(menuPath.screenshotRefs.at(-1), "discount.png");
+assert.strictEqual(menuPath.inputInteractionCount, 3);
 assert.deepStrictEqual(customer.sourceEventNos, [1, 2]);
 assert.deepStrictEqual(customer.screenshotRefs, ["lookup.png", "selected.png"]);
 assert.deepStrictEqual(customer.annotationRefs, [{ annotationId: "ann-1" }]);

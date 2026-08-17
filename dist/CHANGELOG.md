@@ -20,6 +20,9 @@
   proportionally instead of wider responsive cards cancelling most of the zoom.
 - Added persistent 50–200 percent Review zoom controls that scale text,
   screenshots, and annotations together while preserving scroll position.
+- Consolidated the evidenced `Välj rad → Relaterad information → Tillämpat
+  försäljningspris och rabatt` menu path into one semantic step and select the
+  final action screenshot.
 - Fixed Document Library opening for recordings whose compatibility projection
   correctly omits empty Canonical `sourceEventIds`.
 - Kept legacy evidence source-less instead of fabricating Canonical IDs, while

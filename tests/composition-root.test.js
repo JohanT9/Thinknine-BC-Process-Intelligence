@@ -48,6 +48,40 @@ assert.strictEqual(legacyWithoutCanonicalIds.businessTasks.length, 1);
 assert.strictEqual(legacyWithoutCanonicalIds.businessTasks[0].sourceEventIds,
   undefined, "legacy evidence must not invent canonical IDs");
 
+const menuEvents = ["row", "related", "discount"].map((name, index) => ({
+  canonicalSourceEventId: `menu-event-${name}`,
+  eventNo: index + 20
+}));
+const menuCaptions = ["Välj rad", "Relaterad information",
+  "Tillämpat försäljningspris och rabatt"];
+const menuResult = pipeline.interpret({
+  session: { id: "menu-session", name: "Menu" },
+  events: menuEvents,
+  stepGroups: menuCaptions.map((caption, index) => ({
+    schemaVersion: 1,
+    stepGroupId: `menu-group-${index + 1}`,
+    groupingVersion: "1.0.0",
+    groupKind: "action",
+    sourceEventIds: [menuEvents[index].canonicalSourceEventId],
+    normalizedEventIds: [`normalized-menu-${index + 1}`],
+    normalizedEvents: [],
+    primaryNormalizedEvent: { kind: "action-invocation" },
+    actionContext: { caption }
+  })),
+  imagePaths: {
+    20: "screenshots/menu-row.png",
+    21: "screenshots/menu-related.png",
+    22: "screenshots/menu-discount.png"
+  },
+  knowledgePacks: []
+});
+assert.strictEqual(menuResult.businessTasks.length, 1);
+assert.strictEqual(menuResult.businessTasks[0].taskType, "RunActionPath");
+assert.strictEqual(menuResult.businessTasks[0].screenshot,
+  "screenshots/menu-discount.png");
+assert.deepStrictEqual(menuResult.businessTasks[0].sourceEventIds,
+  ["menu-event-row", "menu-event-related", "menu-event-discount"]);
+
 const compatibilityTasks = [{ taskId: "legacy-action", taskType: "RunAction",
   instruction: "Välj Släpp.", sourceEventNos: [1] }];
 const unknownCompatibilityGroups = [1, 2, 3].map(index => ({

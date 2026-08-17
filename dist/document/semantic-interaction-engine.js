@@ -349,6 +349,40 @@
     return deepFreeze(rule);
   }
 
+  function salesPriceDiscountMenuPathRule() {
+    const captions = [
+      /^(?:välj\s+)?rad$/iu,
+      /^(?:relaterad information|related information)$/iu,
+      /^(?:tillämpat försäljningspris och rabatt|applied sales price and discount)$/iu
+    ];
+    const isAction = value => ["RunAction", "ClickAction"].includes(
+      value?.taskType
+    );
+    const caption = value => text(value?.actionCaption) ||
+      text(value?.selectedCaption);
+    const rule = {
+      ruleId: "sales-price-discount-menu-path",
+      priority: 110,
+      match(context) {
+        return captions.every((pattern, offset) => {
+          const value = context.interactions[context.index + offset];
+          return isAction(value) && pattern.test(caption(value));
+        });
+      },
+      consolidate(context) {
+        const values = context.interactions.slice(context.index,
+          context.index + captions.length);
+        return { consumed: values.length, action: action(rule, values, {
+          actionType: "RunActionPath",
+          displayText: "Välj **Rad** → **Relaterad information** → " +
+            "**Tillämpat försäljningspris och rabatt**.",
+          selectedValue: caption(values.at(-1))
+        }) };
+      }
+    };
+    return deepFreeze(rule);
+  }
+
   const CUSTOMER = /kundens namn|kundnr|customer name|customer\s*no\.?/iu;
   const ITEM = /artikelnr|artikelnummer|item\s*no\.?/iu;
   const VENDOR = /leverantör(?:ens namn|snr|snummer)?|vendor(?:\s*name|\s*no\.?)?/iu;
@@ -356,6 +390,7 @@
   const DIMENSION = /dimension|dimensionsvärde|dimension value/iu;
 
   const BUILT_IN_RULES = deepFreeze([
+    salesPriceDiscountMenuPathRule(),
     selectionRule({ ruleId: "customer-selection", priority: 100,
       actionType: "SelectCustomer", fieldPattern: CUSTOMER,
       verb: "Välj kund", targetField: "Kund", requireValue: true }),
@@ -489,8 +524,7 @@
   }
 
   function processStepGroups(groups = [], rules = BUILT_IN_RULES) {
-    return deepFreeze(groups.flatMap(group =>
-      processInteractions([interactionFromStepGroup(group)], rules)));
+    return processInteractions(groups.map(interactionFromStepGroup), rules);
   }
 
   function actionToInteraction(value) {

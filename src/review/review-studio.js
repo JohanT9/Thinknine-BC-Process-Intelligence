@@ -989,6 +989,25 @@
     return lookupPair || itemTriplet;
   }
 
+  function hasGeneratedMenuPathLeak(review) {
+    const tasks = Array.isArray(review?.tasks) ? review.tasks : [];
+    const consultantOwned = tasks.some(task => task?.approved ||
+      task?.userComment || task?.stepOverride || task?.manualStepId ||
+      task?.provenance === "manual");
+    if (consultantOwned) return false;
+    const patterns = [
+      /(?:välj\s+)?rad/iu,
+      /relaterad information|related information/iu,
+      /tillämpat försäljningspris och rabatt|applied sales price and discount/iu
+    ];
+    return tasks.some((_task, index) => patterns.every((pattern, offset) => {
+      const candidate = tasks[index + offset];
+      return ["RunAction", "ClickAction"].includes(candidate?.taskType) &&
+        pattern.test(String(candidate?.actionCaption || candidate?.instruction ||
+          candidate?.description || ""));
+    }));
+  }
+
   return {
     createReview,
     normalizeReview: annotations.normalizeReview,
@@ -1034,6 +1053,7 @@
     canComplete,
     progress,
     isGeneratedPlaceholderOnly,
-    hasGeneratedLookupSearchLeak
+    hasGeneratedLookupSearchLeak,
+    hasGeneratedMenuPathLeak
   };
 });
