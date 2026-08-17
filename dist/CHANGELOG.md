@@ -16,6 +16,8 @@
   panel cannot be displayed by its flex layout declaration.
 - Prevented scrolling past the end of Document View from scrolling and
   permanently offsetting the outer full-screen dialog.
+- Capped Review screenshot stages in CSS pixels so browser zoom reduces images
+  proportionally instead of wider responsive cards cancelling most of the zoom.
 - Fixed Document Library opening for recordings whose compatibility projection
   correctly omits empty Canonical `sourceEventIds`.
 - Kept legacy evidence source-less instead of fabricating Canonical IDs, while
