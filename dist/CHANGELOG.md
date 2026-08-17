@@ -11,6 +11,9 @@
 - Automatically regenerate previously saved placeholder-dominated Reviews while
   preserving every Review containing consultant edits, approvals, comments, or
   manual steps.
+- Corrected lookup semantics so an explicit selected row number (for example
+  customer `905`) wins over earlier lookup search text (for example `iberi`).
+- Capture selected row/cell values explicitly for new recordings.
 
 ## 4.6.0 - Architecture, Chromium readiness, and dogfooding baseline
 

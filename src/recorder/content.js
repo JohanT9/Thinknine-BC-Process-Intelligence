@@ -356,10 +356,19 @@
   document.addEventListener("click", event => {
     const target = interactiveTarget(eventElement(event));
     if (!target) return;
+    const category = categoryOf(target);
+    const role = target.getAttribute?.("role") || "";
+    const selectedElement = role === "row"
+      ? target.querySelector?.('[role="gridcell"]') || target : target;
+    const selectedCaption = category === "selection"
+      ? clean(selectedElement?.innerText || selectedElement?.textContent || "")
+      : "";
 
     record({
       type: "click",
-      category: categoryOf(target),
+      category,
+      ...(selectedCaption ? { selectedValue: selectedCaption,
+        selectedCaption } : {}),
       clientX: event.clientX,
       clientY: event.clientY,
       ...descriptor(target)

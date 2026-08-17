@@ -188,6 +188,8 @@
           const candidate = context.interactions[cursor];
           const isRelated = fieldMatches(candidate, fieldPattern) ||
             Boolean(config.extraMatch?.(candidate)) ||
+            ["Select", "SelectOption", "SelectLookupValue"].includes(
+              candidate?.taskType || candidate?.semanticAction) ||
             LOOKUP.test(interactionText(candidate)) ||
             Boolean(selectedRecordValue(candidate));
           if (!isRelated) break;
@@ -201,7 +203,13 @@
             cursor += 1;
           }
         }
+        const explicitSelection = [...values].reverse().find(value =>
+          ["Select", "SelectOption", "SelectLookupValue"].includes(
+            value?.taskType || value?.semanticAction) &&
+          meaningfulValue({ selectedCaption: value?.selectedCaption })
+        );
         const selectedValue = values.map(selectedRecordValue).find(Boolean) ||
+          meaningfulValue({ selectedCaption: explicitSelection?.selectedCaption }) ||
           [...values].reverse().map(meaningfulValue).find(Boolean) || "";
         return {
           consumed: values.length,
@@ -421,9 +429,9 @@
       item.kind === "selection-change");
     const selectedMechanic = (group?.normalizedEvents || []).find(item =>
       item.normalizedEventId === selectedEvent?.normalizedEventId);
-    const selected = selectedMechanic?.selection?.caption ??
-      selectedMechanic?.selection?.value ?? primary.selection?.caption ??
-      primary.selection?.value ?? primary.value?.normalized ?? "";
+    const selected = selectedMechanic?.selection?.value ??
+      selectedMechanic?.selection?.caption ?? primary.selection?.value ??
+      primary.selection?.caption ?? primary.value?.normalized ?? "";
     return {
       kind: group.groupKind,
       taskId: group.stepGroupId,

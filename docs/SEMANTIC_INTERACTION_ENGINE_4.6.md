@@ -13,6 +13,12 @@ Review/document interactions. Only that path may scan adjacent legacy lookup
 captions, selected-record text, matching field results, or focus-only noise. No
 such scan runs in `processStepGroups`.
 
+Within that adapter, an explicit structured `Select` interaction is authoritative
+for the chosen lookup value and wins over preceding search/filter text. Modern
+Step Groups use `selection.value` before descriptive `selection.caption`, so a
+Business Central row number remains the documented value while the row caption
+remains supporting context.
+
 Instructions with `user-edited` provenance pass through semantic rules unchanged.
 Reset restores the latest generated semantic instruction.
 

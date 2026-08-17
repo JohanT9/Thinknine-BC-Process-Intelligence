@@ -22,6 +22,14 @@ function only(values, expectedType, expectedText) {
 
 const customer = only(select("Kundnr", "1033"), "SelectCustomer",
   "Välj kund **1033**.");
+const customerSearchThenNumber = only([{
+  taskId: "customer-search", taskType: "SelectCustomer",
+  fieldCaption: "Kundnr", instructionValue: "iberi",
+  instruction: "Välj kunden iberi."
+}, { taskId: "customer-number", taskType: "Select",
+  selectedCaption: "905", instruction: "Välj 905."
+}], "SelectCustomer", "Välj kund **905**.");
+assert.strictEqual(customerSearchThenNumber.selectedValue, "905");
 assert.deepStrictEqual(customer.sourceEventNos, [1, 2]);
 assert.deepStrictEqual(customer.screenshotRefs, ["lookup.png", "selected.png"]);
 assert.deepStrictEqual(customer.annotationRefs, [{ annotationId: "ann-1" }]);

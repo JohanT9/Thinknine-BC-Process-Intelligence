@@ -78,6 +78,15 @@ assert.strictEqual(customerAction.rawInteractions[0].targetControl.caption,
   "Customer No.");
 assert.deepStrictEqual(customerAction.sourceEventIds,
   ["source:l1", "source:l2", "source:l3", "source:l4"]);
+const numberPreferredToCaption = run(lookupEvents.map(item => {
+  if (item.normalizedEventId === "normalized:l3") return { ...item,
+    selection: { value: "905", caption: "Iberi AB" } };
+  if (item.normalizedEventId === "normalized:l4") return { ...item,
+    value: { normalized: "905" } };
+  return item;
+}));
+assert.strictEqual(semantic.processStepGroups(
+  numberPreferredToCaption.groups)[0].selectedValue, "905");
 
 for (const [identity, actionType] of [["ItemNo", "SelectItem"],
   ["VendorNo", "SelectVendor"]]) {
