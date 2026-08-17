@@ -1,4 +1,5 @@
 const assert = require("assert");
+require("./search-interaction-presentation.test");
 const fs = require("fs");
 const projector = require("../src/document/review-document-projector");
 const semantic = require("../src/document/semantic-document");

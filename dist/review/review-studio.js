@@ -1025,6 +1025,17 @@
       tasks[index - 1].screenshot !== task.screenshot);
   }
 
+  function hasGeneratedSearchResultTypeLeak(review) {
+    const tasks = Array.isArray(review?.tasks) ? review.tasks : [];
+    const consultantOwned = tasks.some(task => task?.approved ||
+      task?.userComment || task?.stepOverride || task?.manualStepId ||
+      task?.provenance === "manual");
+    if (consultantOwned) return false;
+    return tasks.some(task => task?.taskType === "SearchAndOpenPage" &&
+      /\s(?:Listor|Lists)(?:["â€]|\*\*)?\.?\s*$/iu.test(String(
+        task.resultCaption || task.instruction || task.description || "")));
+  }
+
   return {
     createReview,
     normalizeReview: annotations.normalizeReview,
@@ -1072,6 +1083,7 @@
     isGeneratedPlaceholderOnly,
     hasGeneratedLookupSearchLeak,
     hasGeneratedMenuPathLeak,
-    hasGeneratedCloseScreenshotLeak
+    hasGeneratedCloseScreenshotLeak,
+    hasGeneratedSearchResultTypeLeak
   };
 });

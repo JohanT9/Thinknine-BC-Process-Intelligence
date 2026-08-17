@@ -2,6 +2,9 @@
 
 ## 4.6.0 - Legacy documentation opening compatibility
 
+- Use the visible Business Central search-result caption without appending its
+  result type (for example `FÃ¶rs.order`, not `FÃ¶rs.order Listor`) and retain the
+  screenshot where that result is visible instead of the loading/navigation state.
 - Expanded Document View to fill the available review viewport and removed the
   competing fixed-height calculation that could leave half the screen unused.
 - Let the document canvas shrink beside guidance without forcing a horizontal

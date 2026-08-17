@@ -145,4 +145,12 @@ assert.strictEqual(review.hasGeneratedCloseScreenshotLeak({ tasks:
   closeScreenshotLeak.tasks.map((task, index) => index
     ? { ...task, userComment: "Behåll" } : task) }), false);
 
+const searchResultTypeLeak = { tasks: [{ taskType: "SearchAndOpenPage",
+  resultCaption: "FÃ¶rs.order Listor",
+  instruction: 'VÃ¤lj "SÃ¶k" och vÃ¤lj "FÃ¶rs.order Listor".' }] };
+assert.strictEqual(review.hasGeneratedSearchResultTypeLeak(searchResultTypeLeak),
+  true);
+assert.strictEqual(review.hasGeneratedSearchResultTypeLeak({ tasks:
+  searchResultTypeLeak.tasks.map(task => ({ ...task, approved: true })) }), false);
+
 console.log("Review Studio tests passed.");

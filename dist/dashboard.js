@@ -1056,7 +1056,8 @@ function buildBusinessSteps(rawEvents, screenshots, settings) {
           candidate.type === "click" &&
           candidate.category === "selection"
         ) {
-          resultCaption = cleanUiCaption(candidate.label);
+          resultCaption = globalThis.T9SearchInteractionPresentation
+            .visibleResultCaption(candidate.label);
           grouped.push(candidate);
           cursor += 1;
           continue;
@@ -1092,7 +1093,8 @@ function buildBusinessSteps(rawEvents, screenshots, settings) {
             `Välj **${searchCaption}**, ange ${searchValue || "söktext"} i ` +
             `**${searchFieldCaption || "sökfältet"}** och välj ` +
             `**${resultCaption || pageCaption}**.`,
-          screenshot: screenshotFor(grouped, screenshots),
+          screenshot: globalThis.T9SearchInteractionPresentation
+            .screenshotForResult(grouped, screenshots),
           importance: "high"
         }));
 
@@ -1582,7 +1584,8 @@ function mergeSearchPattern(steps) {
       action: "SearchAndOpen",
       semanticAction: "SearchAndOpenPage",
       processPattern: "SearchAndOpenPage",
-      importance: "high"
+      importance: "high",
+      screenshot: current.screenshot
     }));
 
     index = cursor;
@@ -2388,7 +2391,7 @@ function mergeAdjacentBusinessTasks(tasks) {
             ...(next.sourceEventNos || [])
           ])
         ],
-        screenshot: next.screenshot || current.screenshot
+        screenshot: current.screenshot || next.screenshot
       });
       index += 2;
       continue;
@@ -5391,7 +5394,8 @@ async function openReview(session) {
     (globalThis.T9Review.isGeneratedPlaceholderOnly(existing.review) ||
       globalThis.T9Review.hasGeneratedLookupSearchLeak(existing.review) ||
       globalThis.T9Review.hasGeneratedMenuPathLeak(existing.review) ||
-      globalThis.T9Review.hasGeneratedCloseScreenshotLeak(existing.review)) &&
+      globalThis.T9Review.hasGeneratedCloseScreenshotLeak(existing.review) ||
+      globalThis.T9Review.hasGeneratedSearchResultTypeLeak(existing.review)) &&
     activeReviewModel.businessTasks.length > 0;
   activeReview = existing.review && !replacePlaceholderReview
     ? globalThis.T9Review.normalizeReview({
