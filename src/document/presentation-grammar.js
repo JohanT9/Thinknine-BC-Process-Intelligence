@@ -68,7 +68,7 @@
       return sentence(run("Välj ", "action"), quoted(selectLabels[action.actionType]),
         run(" "), run(value, "value"), run("."));
     }
-    if (["EnterQuantity", "SelectDate", "EnterFieldValue"].includes(
+    if (["EnterQuantity", "EnterItemNumber", "SelectDate", "EnterFieldValue"].includes(
       action?.actionType) && value && field) {
       return sentence(run("Ange ", "action"), run(value, "value"),
         run(" i "), quoted(field), run("."));

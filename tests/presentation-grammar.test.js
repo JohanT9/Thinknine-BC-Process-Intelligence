@@ -38,6 +38,12 @@ const customer = grammar.presentationFor({
 assert.strictEqual(customer.text, 'Välj "Kund" 1033.');
 assert.strictEqual(customer.runs.find(run => run.text === "1033").bold, true);
 
+const itemNumber = grammar.presentationFor({
+  actionType: "EnterItemNumber", targetField: "Artikel Nr", selectedValue: "30043"
+}, 'Ange 30043 i "Artikel Nr".');
+assert.strictEqual(itemNumber.text, 'Ange 30043 i "Artikel Nr".');
+assert.strictEqual(itemNumber.runs.find(run => run.text === "30043").bold, true);
+
 const option = paragraph({
   taskId: "status", taskType: "SelectOption", fieldCaption: "Status",
   value: "Frisläppt", instruction: "Välj status."
