@@ -146,8 +146,8 @@ assert.strictEqual(review.hasGeneratedCloseScreenshotLeak({ tasks:
     ? { ...task, userComment: "Behåll" } : task) }), false);
 
 const searchResultTypeLeak = { tasks: [{ taskType: "SearchAndOpenPage",
-  resultCaption: "FÃ¶rs.order Listor",
-  instruction: 'VÃ¤lj "SÃ¶k" och vÃ¤lj "FÃ¶rs.order Listor".' }] };
+  resultCaption: "FÃ¶rs.order Listor îœ",
+  instruction: 'VÃ¤lj "SÃ¶k" och vÃ¤lj "FÃ¶rs.order Listor îœ".' }] };
 assert.strictEqual(review.hasGeneratedSearchResultTypeLeak(searchResultTypeLeak),
   true);
 assert.strictEqual(review.hasGeneratedSearchResultTypeLeak({ tasks:

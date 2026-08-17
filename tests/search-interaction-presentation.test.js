@@ -3,6 +3,8 @@ const presentation = require("../src/engine/search-interaction-presentation");
 
 assert.strictEqual(presentation.visibleResultCaption("FÃ¶rs.order Listor"),
   "FÃ¶rs.order");
+assert.strictEqual(presentation.visibleResultCaption("FÃ¶rs.order Listor îœ"),
+  "FÃ¶rs.order");
 assert.strictEqual(presentation.visibleResultCaption("Sales Orders Lists"),
   "Sales Orders");
 assert.strictEqual(presentation.visibleResultCaption("Artikelregister"),

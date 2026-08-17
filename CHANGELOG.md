@@ -5,6 +5,8 @@
 - Use the visible Business Central search-result caption without appending its
   result type (for example `FÃ¶rs.order`, not `FÃ¶rs.order Listor`) and retain the
   screenshot where that result is visible instead of the loading/navigation state.
+- Recognize the trailing Business Central result-row icon when repairing existing
+  automatically generated search steps.
 - Expanded Document View to fill the available review viewport and removed the
   competing fixed-height calculation that could leave half the screen unused.
 - Let the document canvas shrink beside guidance without forcing a horizontal

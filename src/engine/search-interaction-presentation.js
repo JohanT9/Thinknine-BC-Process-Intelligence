@@ -12,7 +12,7 @@
   function visibleResultCaption(value) {
     // BC combines the visible caption and result-type column in the accessible
     // name. Documentation should reproduce the visible action caption only.
-    return clean(value).replace(/\s+(?:Listor|Lists)\s*$/iu, "").trim();
+    return clean(value).replace(/\s+(?:Listor|Lists)\b.*$/iu, "").trim();
   }
 
   function screenshotForResult(events = [], screenshots = {}) {

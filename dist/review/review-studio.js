@@ -1032,8 +1032,9 @@
       task?.provenance === "manual");
     if (consultantOwned) return false;
     return tasks.some(task => task?.taskType === "SearchAndOpenPage" &&
-      /\s(?:Listor|Lists)(?:["â€]|\*\*)?\.?\s*$/iu.test(String(
-        task.resultCaption || task.instruction || task.description || "")));
+      /\s(?:Listor|Lists)\b/iu.test([
+        task.resultCaption, task.instruction, task.description
+      ].filter(Boolean).join(" ")));
   }
 
   return {
