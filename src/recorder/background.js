@@ -69,6 +69,7 @@ let screenshotQueue = [];
 let screenshotWorkerRunning = false;
 let screenshotWorkerPromise = Promise.resolve();
 let lastScreenshotAt = 0;
+const preActionCaptures = new Map();
 
 const screenshotStats = {
   requested: 0,
@@ -413,6 +414,17 @@ async function processScreenshotQueue() {
   }
 }
 
+async function consumePreActionCapture(event, captureContext, recordingId) {
+  const id = event.preActionCaptureId;
+  if (!id) return null;
+  const pending = preActionCaptures.get(id);
+  preActionCaptures.delete(id);
+  if (!pending || pending.sessionId !== recordingId ||
+      pending.tabId !== (captureContext.tabId || pending.tabId) ||
+      Date.now() - pending.createdAt > 10000) return null;
+  return pending.promise;
+}
+
 async function recordEvent(rawEvent, captureContext = {}) {
   const acceptedState = await getState();
   if (!acceptedState.recording || !acceptedState.sessionId ||
@@ -499,14 +511,26 @@ async function recordEvent(rawEvent, captureContext = {}) {
 
     if (globalThis.T9ScreenshotCapturePolicy.shouldCapture(settings, event)) {
       const captureCategory = globalThis.T9ScreenshotCapturePolicy.category(event);
-      await enqueueScreenshot({
-        sessionId: recordingId,
-        eventNo: event.eventNo,
-        eventId: canonicalEvent.id,
-        tabId: captureContext.tabId || acceptedState.tabId,
-        category: captureCategory,
-        captureKey: event.fieldName || ""
-      });
+      const preActionImage = await consumePreActionCapture(event,
+        captureContext, recordingId);
+      if (preActionImage) {
+        const screenshots = await getScreenshots(recordingId);
+        screenshots[event.eventNo] = preActionImage;
+        await canonicalStore.associateScreenshot(recordingId,
+          canonicalEvent.id, preActionImage, new Date().toISOString());
+        await saveScreenshots(recordingId, screenshots);
+        lastScreenshotAt = Date.now();
+        screenshotStats.captured += 1;
+      } else {
+        await enqueueScreenshot({
+          sessionId: recordingId,
+          eventNo: event.eventNo,
+          eventId: canonicalEvent.id,
+          tabId: captureContext.tabId || acceptedState.tabId,
+          category: captureCategory,
+          captureKey: event.fieldName || ""
+        });
+      }
     }
 
     const eventTypeCounts = {};
@@ -983,6 +1007,35 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
         await appendCaptureDiagnostic(message.diagnostic, sender);
         sendResponse({ ok: true });
         break;
+
+      case "T9_CAPTURE_BEFORE_ACTION": {
+        const preActionState = await getState();
+        const preActionTabId = sender.tab?.id;
+        const preActionSession = preActionState.sessionId
+          ? await getSession(preActionState.sessionId) : null;
+        const preActionSettings = preActionSession?.settings ||
+          await getSettings();
+        if (!preActionState.recording || !preActionState.sessionId ||
+            !preActionTabId || !message.interactionId ||
+            !preActionSettings.captureScreenshots ||
+            preActionSettings.screenshotMode === "none") {
+          sendResponse({ ok: false });
+          break;
+        }
+        screenshotStats.requested += 1;
+        const entry = { sessionId: preActionState.sessionId,
+          tabId: preActionTabId, createdAt: Date.now(),
+          promise: capture(preActionTabId) };
+        preActionCaptures.set(message.interactionId, entry);
+        setTimeout(() => {
+          if (preActionCaptures.get(message.interactionId) === entry) {
+            preActionCaptures.delete(message.interactionId);
+            screenshotStats.dropped += 1;
+          }
+        }, 10000);
+        sendResponse({ ok: true });
+        break;
+      }
 
       case "T9_SET_CAPTURE_DIAGNOSTICS":
         await setDebug(message.enabled

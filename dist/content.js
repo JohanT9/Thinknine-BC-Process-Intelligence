@@ -46,6 +46,7 @@
   let sourceSequence = 0;
   const inputTimers = new WeakMap();
   const observedDialogs = new Set();
+  let pendingPointerCapture = null;
 
   function diagnostic(stage, details = {}) {
     if (!diagnosticsEnabled) return;
@@ -524,6 +525,21 @@
     }
   }
 
+  window.addEventListener("pointerdown", event => {
+    if (!recording || !sessionId || event.button !== 0) return;
+    const observedTarget = eventElement(event);
+    const target = interactiveTarget(observedTarget, event) ||
+      (observedTarget instanceof Element ? observedTarget : null);
+    const label = concisePointerLabel(event, target);
+    if (!target || !label) return;
+    const interactionId = `${sourceFrameId}:${crypto.randomUUID()}`;
+    pendingPointerCapture = { interactionId, target, createdAt: Date.now() };
+    try {
+      chrome.runtime.sendMessage({ type: "T9_CAPTURE_BEFORE_ACTION",
+        interactionId }, () => { void chrome.runtime.lastError; });
+    } catch {}
+  }, true);
+
 
   window.addEventListener("click", event => {
     const observedTarget = eventElement(event);
@@ -545,6 +561,13 @@
     const targetDescriptor = descriptor(target);
     const pointerLabel = category === "interaction"
       ? concisePointerLabel(event, target) : "";
+    const pointerPath = event.composedPath?.() || [];
+    const preActionCaptureId = pendingPointerCapture &&
+      Date.now() - pendingPointerCapture.createdAt < 5000 &&
+      (pointerPath.includes(pendingPointerCapture.target) ||
+        pendingPointerCapture.target.contains?.(observedTarget))
+      ? pendingPointerCapture.interactionId : "";
+    pendingPointerCapture = null;
 
     record({
       type: "click",
@@ -554,6 +577,7 @@
       clientX: event.clientX,
       clientY: event.clientY,
       pointerTarget: true,
+      ...(preActionCaptureId ? { preActionCaptureId } : {}),
       ...targetDescriptor,
       ...(pointerLabel ? { accessibleName: pointerLabel,
         accessibleNameSource: "pointer-path-text", label: pointerLabel } : {})

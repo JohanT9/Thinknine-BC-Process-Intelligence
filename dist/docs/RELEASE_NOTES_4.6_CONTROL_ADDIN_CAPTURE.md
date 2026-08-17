@@ -18,6 +18,9 @@ stoppa själva inspelningen.
 Namngivna pointer-mål behandlas som viktiga skärmbildshändelser. Deras synliga
 namn begränsas till kort lokal text från event-sökvägen så att stora React-
 containrar inte kopieras in som instruktionstext.
+För namngivna primära klick tas bilden vid `pointerdown` och kopplas först till
+den efterföljande Canonical Event-händelsen. Dokumentationen visar därmed
+kontrollen före aktivering i stället för React-vyn efter navigeringen.
 
 React and Business Central control-add-in interactions no longer depend on the
 top frame receiving recording-state messages. Every injected frame observes the

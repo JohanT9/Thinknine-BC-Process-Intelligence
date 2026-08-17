@@ -15,7 +15,7 @@ const manifest = JSON.parse(fs.readFileSync("src/ui/manifest.json", "utf8"));
 
 // Listener and lifecycle contract: delegated capture-phase observation survives
 // React stopPropagation and storage synchronization reaches existing frames.
-for (const type of ["click", "input", "change", "focusin", "focusout",
+for (const type of ["pointerdown", "click", "input", "change", "focusin", "focusout",
   "keydown"]) {
   assert(content.includes(`window.addEventListener("${type}"`));
 }
@@ -31,6 +31,8 @@ assert(content.includes("catch { return -1; }"));
 assert(content.includes("pointerTarget: true"));
 assert(content.includes("concisePointerLabel"));
 assert(content.includes('accessibleNameSource: "pointer-path-text"'));
+assert(content.includes('type: "T9_CAPTURE_BEFORE_ACTION"'));
+assert(content.includes("preActionCaptureId"));
 assert(content.includes("interactiveTarget(observedTarget, event) ||"));
 assert(content.includes('getComputedStyle(element).cursor === "pointer"'));
 for (const reactClass of ["CardActionArea", "ListItemButton", "TableRow"]) {
@@ -75,6 +77,8 @@ assert(background.includes("updateFrameDiagnostic(sender, message.frameUrl,"));
 assert(background.includes("captureDiagnosticsEnabled"));
 assert(background.includes("recorderActive: Boolean(state.recording)"));
 assert(background.includes("chrome.webNavigation.getAllFrames"));
+assert(background.includes('case "T9_CAPTURE_BEFORE_ACTION"'));
+assert(background.includes("consumePreActionCapture"));
 assert(background.includes("activeContent.sessionId !== id"));
 assert(popup.includes('files: ["capture-focus-session.js", "content.js"]'));
 assert((background.match(/await registerRecorderContentScript\(\);/gu) || [])
