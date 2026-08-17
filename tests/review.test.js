@@ -89,7 +89,9 @@ assert.strictEqual(mergeModel.history[1].historyId, "split-history");
 
 assert.strictEqual(review.isGeneratedPlaceholderOnly({ tasks: [
   { taskType: "Unclassified", instruction: "Utför uppgiften." },
-  { taskType: "Unclassified", instruction: "" }
+  { taskType: "Unclassified", instruction: "" },
+  { taskType: "Unclassified", instruction: "Utför uppgiften." },
+  { taskType: "RunAction", instruction: "Välj Släpp." }
 ] }), true);
 for (const protectedChange of [{ approved: true }, { userComment: "Behåll" },
   { stepOverride: { fields: {} } }, { manualStepId: "manual-1" }]) {

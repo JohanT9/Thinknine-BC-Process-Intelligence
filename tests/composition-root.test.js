@@ -50,17 +50,20 @@ assert.strictEqual(legacyWithoutCanonicalIds.businessTasks[0].sourceEventIds,
 
 const compatibilityTasks = [{ taskId: "legacy-action", taskType: "RunAction",
   instruction: "Välj Släpp.", sourceEventNos: [1] }];
+const unknownCompatibilityGroups = [1, 2, 3].map(index => ({
+  schemaVersion: 1, stepGroupId: `unknown-${index}`,
+  groupingVersion: "1.0.0", groupKind: "unknown", sourceEventIds: [],
+  normalizedEventIds: [], normalizedEvents: [],
+  primaryNormalizedEvent: { kind: "unknown" }, controlContext: {}
+}));
 const unclassifiedFallback = pipeline.interpret({ session: { id: "legacy" },
-  events: [], stepGroups: [{ schemaVersion: 1, stepGroupId: "unknown",
-    groupingVersion: "1.0.0", groupKind: "unknown", sourceEventIds: [],
-    normalizedEventIds: [], normalizedEvents: [],
-    primaryNormalizedEvent: { kind: "unknown" }, controlContext: {} }]
+  events: [], stepGroups: unknownCompatibilityGroups
 }, { compatibilityInterpret: () => ({ businessTasks: compatibilityTasks,
   confidenceResult: { tasks: compatibilityTasks, sessionConfidence: 70 },
   sessionGraph: { nodes: [], edges: [] }, contextEvents: [],
   contextCandidates: [], interpretedSteps: [], businessSteps: [] }) });
 assert.strictEqual(unclassifiedFallback.compatibilityMode,
-  "legacy-unclassified");
+  "legacy-placeholder-dominated");
 assert.deepStrictEqual(unclassifiedFallback.businessTasks, compatibilityTasks);
 
 const packs = [{ packId: "sales", name: "Sales", version: "1", rules: [{

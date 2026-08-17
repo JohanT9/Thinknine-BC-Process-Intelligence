@@ -951,13 +951,15 @@
 
   function isGeneratedPlaceholderOnly(review) {
     const tasks = Array.isArray(review?.tasks) ? review.tasks : [];
-    return tasks.length > 0 && tasks.every(task =>
+    const consultantOwned = tasks.some(task => task?.approved ||
+      task?.userComment || task?.stepOverride || task?.manualStepId ||
+      task?.provenance === "manual");
+    const placeholderCount = tasks.filter(task =>
       task?.taskType === "Unclassified" &&
       ["", "Utför uppgiften."].includes(String(
-        task.instruction || task.description || "").trim()) &&
-      !task.approved && !task.userComment && !task.stepOverride &&
-      !task.manualStepId && task.provenance !== "manual"
-    );
+        task.instruction || task.description || "").trim())).length;
+    return !consultantOwned && placeholderCount >= 3 &&
+      placeholderCount / tasks.length >= 0.25;
   }
 
   return {

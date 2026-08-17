@@ -6,9 +6,9 @@
   correctly omits empty Canonical `sourceEventIds`.
 - Kept legacy evidence source-less instead of fabricating Canonical IDs, while
   making screenshot fallback tolerant of the absent optional reference level.
-- Restored the isolated legacy interpreter only when every modern generated
-  action is an empty `Unclassified` placeholder.
-- Automatically regenerate previously saved placeholder-only Reviews while
+- Restored the isolated legacy interpreter when modern output is dominated by
+  empty `Unclassified` placeholders (at least three and at least 25 percent).
+- Automatically regenerate previously saved placeholder-dominated Reviews while
   preserving every Review containing consultant edits, approvals, comments, or
   manual steps.
 

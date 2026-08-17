@@ -46,9 +46,10 @@ No active BC business interpretation is required by these paths.
 
 The file still contains legacy interpretation helpers retained for one
 compatibility milestone. They are isolated behind the session pipeline's
-`compatibilityInterpret` service and run only when every modern generated action
-is an empty `Unclassified` placeholder. Modern Step Group input never uses this
-path. Context candidate construction, pre-canonical event-to-step rules,
+`compatibilityInterpret` service and run only when modern generated output is
+dominated by empty `Unclassified` placeholders (at least three and at least 25
+percent). Healthy modern Step Group input never uses this path. Context candidate
+construction, pre-canonical event-to-step rules,
 process-pattern merges, and legacy Knowledge Pack scoring should be deleted once
 legacy recordings have been regenerated or production parity has been observed.
 The explicit adapter is technical debt, not a second canonical pipeline.
