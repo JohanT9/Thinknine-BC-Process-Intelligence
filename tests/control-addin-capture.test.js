@@ -10,6 +10,7 @@ const focusSession = require("../src/recorder/capture-focus-session");
 
 const content = fs.readFileSync("src/recorder/content.js", "utf8");
 const background = fs.readFileSync("src/recorder/background.js", "utf8");
+const popup = fs.readFileSync("src/ui/popup.js", "utf8");
 const manifest = JSON.parse(fs.readFileSync("src/ui/manifest.json", "utf8"));
 
 // Listener and lifecycle contract: delegated capture-phase observation survives
@@ -57,6 +58,8 @@ assert(background.includes("matchOriginAsFallback: true"));
 assert(background.includes("updateFrameDiagnostic(sender, message.frameUrl,"));
 assert(background.includes("captureDiagnosticsEnabled"));
 assert(background.includes("recorderActive: Boolean(state.recording)"));
+assert(background.includes("activeContent.sessionId !== id"));
+assert(popup.includes('files: ["capture-focus-session.js", "content.js"]'));
 assert((background.match(/await registerRecorderContentScript\(\);/gu) || [])
   .length >= 2, "Install and browser startup must refresh persistent registration.");
 

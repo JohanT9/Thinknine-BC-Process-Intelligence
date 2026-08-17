@@ -14,6 +14,8 @@
 - Kept `content.js` self-sufficient when an older persistent dynamic registration
   injects it without the newly separated focus-session helper, preventing an
   early startup exception from disabling all event listeners.
+- Updated the popup's manual recovery injection to load the focus-session helper
+  before `content.js`, matching static and background injection paths.
 - Treat Business Central's `Sortera efter`/`Sort by` text as lookup state rather
   than part of a field caption, so instructions use `Nr` instead of
   `Sortera efter Nr`.

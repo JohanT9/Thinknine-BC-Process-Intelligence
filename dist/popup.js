@@ -60,7 +60,7 @@ async function ensureContentScript(tab) {
           tabId: tab.id,
           allFrames: true
         },
-        files: ["content.js"]
+        files: ["capture-focus-session.js", "content.js"]
       }),
       4000,
       "Inläsningen av inspelningsskriptet"

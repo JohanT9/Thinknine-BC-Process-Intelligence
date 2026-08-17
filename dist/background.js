@@ -653,17 +653,16 @@ async function injectRecorderIntoExistingBcTabs() {
 
 async function pingContentScript(tabId) {
   try {
-    const response = await chrome.tabs.sendMessage(tabId, {
+    return await chrome.tabs.sendMessage(tabId, {
       type: "T9_CONTENT_PING"
     });
-    return Boolean(response?.ok);
   } catch {
-    return false;
+    return null;
   }
 }
 
 async function ensureContentScript(tabId) {
-  if (await pingContentScript(tabId)) {
+  if ((await pingContentScript(tabId))?.ok) {
     await setDebug({
       connected: true,
       connectedTabId: tabId,
@@ -691,7 +690,7 @@ async function ensureContentScript(tabId) {
   }
 
   await new Promise(resolve => setTimeout(resolve, 500));
-  const connected = await pingContentScript(tabId);
+  const connected = Boolean((await pingContentScript(tabId))?.ok);
 
   await setDebug({
     connected,
@@ -767,7 +766,33 @@ async function startSession(message, tabId) {
       recording: true,
       sessionId: id
     });
-  } catch {}
+  } catch (error) {
+    session.status = "failed";
+    session.completedAt = new Date().toISOString();
+    session.updatedAt = session.completedAt;
+    await saveSession(session);
+    await setState({ recording: false, sessionId: null, tabId: null,
+      startedAt: null });
+    await setDebug({ lastError:
+      `Inspelningsstatus kunde inte levereras: ${String(error)}` });
+    throw new Error("Inspelningsskriptet tog inte emot startstatus.");
+  }
+
+  const activeContent = await pingContentScript(tabId);
+  if (!activeContent?.ok || !activeContent.recording ||
+      activeContent.sessionId !== id) {
+    session.status = "failed";
+    session.completedAt = new Date().toISOString();
+    session.updatedAt = session.completedAt;
+    await saveSession(session);
+    await setState({ recording: false, sessionId: null, tabId: null,
+      startedAt: null });
+    await setDebug({ lastError:
+      "Inspelningsskriptet bekräftade inte den aktiva sessionen." });
+    throw new Error(
+      "Inspelningen kunde inte verifieras i Business Central-fliken."
+    );
+  }
 
   return session;
 }
