@@ -124,6 +124,12 @@ only([{ taskId: "lookup", taskType: "RunAction",
 only([{ taskId: "field", taskType: "ChangeField", fieldCaption: "Referens",
   value: "ABC", inputSources: ["input"], unknown: { version: 2 } }],
 "EnterFieldValue", "Ange __ABC__ i **Referens**.");
+const sortedFieldEntry = engine.consolidateInteractions([{
+  taskId: "sorted-number", taskType: "EnterFieldValue",
+  fieldCaption: "Sortera efter Nr", value: "30043", inputSources: ["input"]
+}])[0];
+assert.strictEqual(sortedFieldEntry.instruction, "Ange __30043__ i **Nr**.");
+assert.strictEqual(sortedFieldEntry.fieldCaption, "Nr");
 const fieldAdapter = engine.consolidateInteractions([{
   taskId: "field-roundtrip", taskType: "ChangeField",
   fieldCaption: "Referens", value: "ABC", inputSources: ["input"]

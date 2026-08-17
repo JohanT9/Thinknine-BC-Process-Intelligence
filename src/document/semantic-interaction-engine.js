@@ -255,11 +255,12 @@
       consolidate(context) {
         const value = context.interactions[context.index];
         const selectedValue = meaningfulValue(value);
+        const targetField = businessField(config.targetField || value.fieldCaption);
         return { consumed: 1, action: action(rule, [value], {
           actionType: config.actionType(value, selectedValue),
           displayText: config.display(value, selectedValue),
           selectedValue,
-          targetField: config.targetField || text(value.fieldCaption)
+          targetField
         }) };
       }
     };
@@ -543,9 +544,12 @@
         (value?.taskType === "ChangeField" &&
           (typed(value) || Boolean(meaningfulValue(value)))),
       actionType: () => "EnterFieldValue",
-      display: (value, selected) => selected
-        ? `Ange __${selected}__ i **${text(value.fieldCaption)}**.`
-        : `Fyll i **${text(value.fieldCaption)}**.` }),
+      display: (value, selected) => {
+        const field = businessField(value.fieldCaption);
+        return selected
+          ? `Ange __${selected}__ i **${field}**.`
+          : `Fyll i **${field}**.`;
+      } }),
     focusTransitionRule()
   ]);
 
