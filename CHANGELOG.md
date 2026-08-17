@@ -12,6 +12,8 @@
   earlier loading-state image; preserve manual selections and annotations.
 - Include persisted captures associated with filtered technical events when
   choosing search-result evidence, bounded by search start and result selection.
+- Include the recorded search phrase in Search and Open instructions and present
+  it as a bold value while keeping Business Central labels in quotation marks.
 - Expanded Document View to fill the available review viewport and removed the
   competing fixed-height calculation that could leave half the screen unused.
 - Let the document canvas shrink beside guidance without forcing a horizontal

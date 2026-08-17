@@ -45,6 +45,15 @@ const itemNumber = grammar.presentationFor({
 assert.strictEqual(itemNumber.text, 'Ange 30043 i "Artikel Nr".');
 assert.strictEqual(itemNumber.runs.find(run => run.text === "30043").bold, true);
 
+const search = paragraph({ taskId: "search", taskType: "SearchAndOpenPage",
+  searchCaption: "Sök", searchFieldCaption: "Berätta vad du vill göra.",
+  resultCaption: "Förs.order", value: "för ord",
+  instruction: "Äldre generell söktext." });
+assert.strictEqual(search.text,
+  'Välj "Sök", ange för ord i "Berätta vad du vill göra." och välj "Förs.order".');
+assert.strictEqual(search.presentationRuns.find(run => run.text === "för ord").bold,
+  true);
+
 const option = paragraph({
   taskId: "status", taskType: "SelectOption", fieldCaption: "Status",
   value: "Frisläppt", instruction: "Välj status."

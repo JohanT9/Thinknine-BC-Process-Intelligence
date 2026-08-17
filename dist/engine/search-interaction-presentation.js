@@ -15,6 +15,18 @@
     return clean(value).replace(/\s+(?:Listor|Lists)\b.*$/iu, "").trim();
   }
 
+  function instruction(value = {}) {
+    const searchCaption = clean(value.searchCaption || value.actionCaption || "Sök");
+    const searchField = clean(value.searchFieldCaption || value.fieldCaption ||
+      "sökfältet");
+    const searchValue = clean(value.searchValue ?? value.value ?? "");
+    const resultCaption = visibleResultCaption(value.resultCaption ||
+      value.selectedCaption || value.pageCaption || "");
+    return `Välj **${searchCaption}**, ange ` +
+      `${searchValue ? `__${searchValue}__` : "söktext"} i ` +
+      `**${searchField}** och välj **${resultCaption}**.`;
+  }
+
   function screenshotForResult(events = [], screenshots = {}) {
     const selection = [...events].reverse().find(event =>
       event?.type === "click" && event?.category === "selection");
@@ -43,5 +55,5 @@
       .find(Boolean) || null;
   }
 
-  return { visibleResultCaption, screenshotForResult };
+  return { visibleResultCaption, instruction, screenshotForResult };
 });

@@ -1058,8 +1058,11 @@
         generatedSearchTasks[ordinal];
       const selected = value => value?.selectedScreenshotAssetId ||
         value?.screenshot || value?.screenshots?.[0] || "";
-      return Boolean(generated && selected(task) && selected(generated) &&
-        selected(task) !== selected(generated));
+      const instructionChanged = String(task.instruction || "").trim() !==
+        String(generated?.instruction || "").trim();
+      const screenshotChanged = selected(task) && selected(generated) &&
+        selected(task) !== selected(generated);
+      return Boolean(generated && (instructionChanged || screenshotChanged));
     });
   }
 

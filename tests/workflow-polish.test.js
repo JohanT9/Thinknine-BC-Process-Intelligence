@@ -37,4 +37,7 @@ assert(dashboard.includes('if (!$("sessionTools").open) return;') &&
 "collapsed raw-session tools must not retain unnecessary table DOM");
 assert(dashboard.includes('document.querySelector("dialog[open]")'),
   "global search shortcut must not move focus behind a modal dialog");
+assert(dashboard.includes("reviewInstructionHtml(task)") &&
+  dashboard.includes("review-instruction-preview"),
+"Review must render structured value emphasis outside the plain-text editor");
 console.log("Workflow polish regression tests passed.");

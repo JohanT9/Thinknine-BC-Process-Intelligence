@@ -158,6 +158,14 @@ const freshSearchEvidence = [{ taskId: "search-1",
   taskType: "SearchAndOpenPage", screenshot: "screenshots/000008.png" }];
 assert.strictEqual(review.hasGeneratedSearchEvidenceDrift(staleSearchEvidence,
   freshSearchEvidence), true);
+assert.strictEqual(review.hasGeneratedSearchEvidenceDrift({ tasks: [{
+  taskId: "search-1", taskType: "SearchAndOpenPage",
+  instruction: 'Välj "Sök", ange söktext i "sökfältet".',
+  screenshot: "screenshots/000008.png"
+}] }, [{ taskId: "search-1", taskType: "SearchAndOpenPage",
+  instruction: 'Välj "Sök", ange för ord i "sökfältet".',
+  screenshot: "screenshots/000008.png" }]), true,
+"untouched generic search instructions must refresh with the recorded phrase");
 assert.strictEqual(review.hasGeneratedSearchEvidenceDrift({
   ...staleSearchEvidence,
   annotations: { screenshotSets: [{ screenshotRef: "loading.png",

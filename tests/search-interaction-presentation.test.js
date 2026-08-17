@@ -9,6 +9,11 @@ assert.strictEqual(presentation.visibleResultCaption("Sales Orders Lists"),
   "Sales Orders");
 assert.strictEqual(presentation.visibleResultCaption("Artikelregister"),
   "Artikelregister");
+assert.strictEqual(presentation.instruction({ searchCaption: "Sök",
+  searchFieldCaption: "Berätta vad du vill göra.", value: "för ord",
+  resultCaption: "Förs.order Listor " }),
+  "Välj **Sök**, ange __för ord__ i **Berätta vad du vill göra.** och " +
+    "välj **Förs.order**.");
 
 const events = [
   { eventNo: 6, type: "field-change", category: "input" },

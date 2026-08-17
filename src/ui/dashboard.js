@@ -2037,7 +2037,7 @@ function taskInstructionFromKnowledge(task, settings) {
 
     case "SearchAndOpenPage":
       return task.searchCaption && task.resultCaption
-        ? `Välj **${task.searchCaption}**, ange söktext i **${task.searchFieldCaption || "sökfältet"}** och välj **${task.resultCaption}**.`
+        ? globalThis.T9SearchInteractionPresentation.instruction(task)
         : `Öppna sidan **${task.pageCaption}**.`;
 
     default:
@@ -2235,7 +2235,7 @@ function taskInstruction(task) {
   switch (task.taskType) {
     case "SearchAndOpenPage":
       return task.searchCaption && task.resultCaption
-        ? `Välj **${task.searchCaption}**, ange söktext i **${task.searchFieldCaption || "sökfältet"}** och välj **${task.resultCaption}**.`
+        ? globalThis.T9SearchInteractionPresentation.instruction(task)
         : `Öppna sidan **${task.pageCaption}**.`;
 
     case "OpenDocument":
@@ -4673,6 +4673,16 @@ function finishReviewEdit(control, commit) {
   control.readOnly = true;
   delete control.dataset.editing;
   activeReviewEdit = null;
+  if (edit.field === "instruction") {
+    const card = control.closest("[data-review-task-id]");
+    const task = activeReview.tasks.find(value => value.taskId === edit.taskId);
+    const preview = card?.querySelector(".review-instruction-preview");
+    if (preview && task) {
+      preview.innerHTML = reviewInstructionHtml(task);
+      preview.hidden = false;
+      control.hidden = true;
+    }
+  }
   applyReviewSelection();
 }
 
@@ -4687,6 +4697,12 @@ function beginReviewEdit({ control, taskId, field }) {
     control.value,
     activeReview.updatedAt
   );
+  if (field === "instruction") {
+    control.closest("[data-review-task-id]")
+      ?.querySelector(".review-instruction-preview")
+      ?.setAttribute("hidden", "");
+    control.hidden = false;
+  }
   control.readOnly = false;
   control.dataset.editing = "true";
   control.scrollIntoView({ block: "nearest", inline: "nearest" });
@@ -4727,6 +4743,18 @@ function reviewImages(task) {
   return [...new Set(paths)]
     .map(path => ({ path, imageUrl: activeReviewModel.screenshotData[path] }))
     .filter(image => Boolean(image.imageUrl));
+}
+
+function reviewInstructionHtml(task) {
+  const generated = task.taskType === "SearchAndOpenPage" &&
+    task.fieldProvenance?.instruction !== "user-edited"
+    ? globalThis.T9SearchInteractionPresentation.instruction(task)
+    : task.instruction;
+  return globalThis.T9TextFormat.instructionSegments(generated)
+    .map(segment => segment.bold
+      ? `<strong>${escapeHtml(segment.text)}</strong>`
+      : escapeHtml(segment.text))
+    .join("");
 }
 
 function annotationItems(screenshotRef) {
@@ -5121,11 +5149,13 @@ function renderReview() {
           <button data-action="edit-instruction" class="secondary"
             aria-label="Redigera instruktion för steg ${visibleIndex + 1}">Redigera</button>
         </div>
+        <div class="review-instruction-preview" role="textbox" aria-readonly="true"
+          aria-label="Instruktion för steg ${visibleIndex + 1}">${reviewInstructionHtml(task)}</div>
         <textarea id="review-instruction-${visibleIndex}" data-field="instruction" data-edit-field="instruction"
           aria-label="Instruktion för steg ${visibleIndex + 1}"
           aria-keyshortcuts="Enter Control+Enter Meta+Enter Escape"
           title="Dubbelklicka eller tryck Enter för att redigera. Ctrl+Enter sparar"
-          readonly>${escapeHtml(globalThis.T9TextFormat.quoteEmphasis(task.instruction))}</textarea>
+          hidden readonly>${escapeHtml(globalThis.T9TextFormat.quoteEmphasis(task.instruction))}</textarea>
         <div class="review-comment-section" ${task.userComment ? "" : "hidden"}>
           <div class="review-field-heading">
             <label for="review-comment-${visibleIndex}">Kommentar</label>
@@ -5223,6 +5253,10 @@ function renderReview() {
 
     card.querySelector('[data-action="edit-instruction"]')
       .addEventListener("click", () => {
+        editReviewField(card, task.taskId, "instruction");
+      });
+    card.querySelector(".review-instruction-preview")
+      .addEventListener("dblclick", () => {
         editReviewField(card, task.taskId, "instruction");
       });
 

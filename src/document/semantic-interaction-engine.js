@@ -485,6 +485,19 @@
     selectionRule({ ruleId: "dimension-selection", priority: 80,
       actionType: "SelectDimension", fieldPattern: DIMENSION,
       verb: "Välj dimensionsvärde", targetField: "Dimension", requireValue: true }),
+    singleRule({ ruleId: "search-and-open-page", priority: 79,
+      match: value => value?.taskType === "SearchAndOpenPage",
+      actionType: () => "SearchAndOpenPage",
+      display: (value, selected) => {
+        const search = text(value.searchCaption || value.actionCaption || "Sök");
+        const field = text(value.searchFieldCaption || value.fieldCaption ||
+          "sökfältet");
+        const result = text(value.resultCaption || value.selectedCaption ||
+          value.pageCaption);
+        return `Välj **${search}**, ange ` +
+          `${selected ? `__${selected}__` : "söktext"} i **${field}** och ` +
+          `välj **${result}**.`;
+      } }),
     singleRule({ ruleId: "quantity-entry", priority: 75,
       match: value => Boolean(meaningfulValue(value)) &&
         /^(?:sortera efter\s+)?(?:antal|quantity)$/iu
