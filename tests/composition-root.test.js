@@ -48,6 +48,21 @@ assert.strictEqual(legacyWithoutCanonicalIds.businessTasks.length, 1);
 assert.strictEqual(legacyWithoutCanonicalIds.businessTasks[0].sourceEventIds,
   undefined, "legacy evidence must not invent canonical IDs");
 
+const compatibilityTasks = [{ taskId: "legacy-action", taskType: "RunAction",
+  instruction: "Välj Släpp.", sourceEventNos: [1] }];
+const unclassifiedFallback = pipeline.interpret({ session: { id: "legacy" },
+  events: [], stepGroups: [{ schemaVersion: 1, stepGroupId: "unknown",
+    groupingVersion: "1.0.0", groupKind: "unknown", sourceEventIds: [],
+    normalizedEventIds: [], normalizedEvents: [],
+    primaryNormalizedEvent: { kind: "unknown" }, controlContext: {} }]
+}, { compatibilityInterpret: () => ({ businessTasks: compatibilityTasks,
+  confidenceResult: { tasks: compatibilityTasks, sessionConfidence: 70 },
+  sessionGraph: { nodes: [], edges: [] }, contextEvents: [],
+  contextCandidates: [], interpretedSteps: [], businessSteps: [] }) });
+assert.strictEqual(unclassifiedFallback.compatibilityMode,
+  "legacy-unclassified");
+assert.deepStrictEqual(unclassifiedFallback.businessTasks, compatibilityTasks);
+
 const packs = [{ packId: "sales", name: "Sales", version: "1", rules: [{
   ruleId: "quantity", priority: 100, confidence: 0.95,
   match: { fieldPatterns: ["Quantity"] }, taskType: "ChangeQuantity",

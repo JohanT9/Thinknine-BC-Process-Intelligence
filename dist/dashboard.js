@@ -2822,6 +2822,43 @@ async function saveSettings() {
 }
 
 
+function interpretLegacyCompatibility(input) {
+  const filteredEvents = globalThis.T9Engine?.noiseFilter
+    ? globalThis.T9Engine.noiseFilter.filter(input.events || [])
+    : input.events || [];
+  const contextEvents = buildContextEvents(filteredEvents);
+  const contextCandidates = createContextCandidates(contextEvents);
+  const interpretedSteps = buildBusinessSteps(contextEvents, input.imagePaths || {},
+    input.session?.settings || DEFAULTS);
+  const businessSteps = runProcessPatternEngine(interpretedSteps);
+  const taskResult = runBusinessTaskEngine(businessSteps);
+  const contextByEventNo = new Map(contextEvents.map(event =>
+    [event.eventNo, event.context || {}]));
+  const legacyTasks = finalizeKnowledgeTasks(taskResult.tasks,
+    input.session?.settings || DEFAULTS).map(task => {
+    const contexts = (task.sourceEventNos || []).map(eventNo =>
+      contextByEventNo.get(eventNo)).filter(Boolean);
+    return { ...task, context: contexts.find(value => value.currentEntity) ||
+      contexts[0] || {}, automationId: task.automationId || "" };
+  });
+  const businessTasks = applyKnowledgePackFramework(legacyTasks,
+    input.session?.settings || DEFAULTS).map((task, index) => ({ ...task,
+    taskNo: index + 1, taskId: stableTaskId(task, index) }));
+  const entityNodes = globalThis.T9Engine?.entityMemory
+    ? globalThis.T9Engine.entityMemory.build(contextEvents) : [];
+  const sessionGraph = globalThis.T9Engine?.sessionGraph
+    ? globalThis.T9Engine.sessionGraph.build(input.session, businessTasks,
+      entityNodes) : { nodes: [], edges: [] };
+  const confidenceResult = globalThis.T9Engine?.confidence
+    ? globalThis.T9Engine.confidence.evaluate(businessTasks, sessionGraph)
+    : { tasks: businessTasks, sessionConfidence: calculateTaskQuality(businessTasks),
+      knowledgeMatchPercent: 0, graphCoveragePercent: 0,
+      reviewSuggestedCount: 0 };
+  return { contextEvents, contextCandidates, interpretedSteps, businessSteps,
+    businessTasks: confidenceResult.tasks, sessionGraph, confidenceResult,
+    unmatchedKnowledgeItems: [] };
+}
+
 async function prepareSessionModel(session) {
   const response = await send({
     type: "T9_GET_SESSION_DATA",
@@ -2848,7 +2885,8 @@ async function prepareSessionModel(session) {
     imagePaths, knowledgePacks: loadedKnowledgePacks
   }, { entityMemory: globalThis.T9Engine?.entityMemory,
     sessionGraph: globalThis.T9Engine?.sessionGraph,
-    confidence: globalThis.T9Engine?.confidence });
+    confidence: globalThis.T9Engine?.confidence,
+    compatibilityInterpret: interpretLegacyCompatibility });
   unmatchedKnowledgeItems = model.unmatchedKnowledgeItems;
 
   return {
@@ -2890,7 +2928,8 @@ async function exportSession(session) {
     imagePaths, knowledgePacks: loadedKnowledgePacks
   }, { entityMemory: globalThis.T9Engine?.entityMemory,
     sessionGraph: globalThis.T9Engine?.sessionGraph,
-    confidence: globalThis.T9Engine?.confidence });
+    confidence: globalThis.T9Engine?.confidence,
+    compatibilityInterpret: interpretLegacyCompatibility });
   unmatchedKnowledgeItems = model.unmatchedKnowledgeItems;
   const { contextEvents, contextCandidates, interpretedSteps, businessSteps,
     confidenceResult } = model;
@@ -5297,7 +5336,10 @@ async function openReview(session) {
     sessionId: session.id
   });
 
-  activeReview = existing.review
+  const replacePlaceholderReview = existing.review &&
+    globalThis.T9Review.isGeneratedPlaceholderOnly(existing.review) &&
+    activeReviewModel.businessTasks.length > 0;
+  activeReview = existing.review && !replacePlaceholderReview
     ? globalThis.T9Review.normalizeReview({
         ...existing.review,
         tasks: globalThis.T9Review.normalizeTasks(existing.review.tasks)

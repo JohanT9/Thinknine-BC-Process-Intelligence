@@ -75,6 +75,18 @@ function (semantic, knowledge, refs) {
           screenshots: [...source.screenshots] } : {};
       })() : {})
     }));
+    const onlyUnclassified = tasks.length > 0 && tasks.every(value =>
+      value.taskType === "Unclassified" &&
+      (!String(value.instruction || "").trim() ||
+        String(value.instruction).trim() === "Utför uppgiften."));
+    if (onlyUnclassified && typeof services.compatibilityInterpret === "function") {
+      const compatibility = services.compatibilityInterpret(input);
+      if (compatibility?.businessTasks?.length) {
+        return { ...compatibility, pipelineVersion: VERSION,
+          normalizedEvents: input.normalizedEvents || [], stepGroups: groups,
+          semanticActions: actions, compatibilityMode: "legacy-unclassified" };
+      }
+    }
     const entityNodes = services.entityMemory?.build(input.events || []) || [];
     const sessionGraph = services.sessionGraph?.build(input.session, tasks,
       entityNodes) || { nodes: [], edges: [] };

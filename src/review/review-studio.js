@@ -949,6 +949,17 @@
     );
   }
 
+  function isGeneratedPlaceholderOnly(review) {
+    const tasks = Array.isArray(review?.tasks) ? review.tasks : [];
+    return tasks.length > 0 && tasks.every(task =>
+      task?.taskType === "Unclassified" &&
+      ["", "Utför uppgiften."].includes(String(
+        task.instruction || task.description || "").trim()) &&
+      !task.approved && !task.userComment && !task.stepOverride &&
+      !task.manualStepId && task.provenance !== "manual"
+    );
+  }
+
   return {
     createReview,
     normalizeReview: annotations.normalizeReview,
@@ -992,6 +1003,7 @@
     historyDirectionFromKey: historyEngine.directionFromKey,
     activeTasks,
     canComplete,
-    progress
+    progress,
+    isGeneratedPlaceholderOnly
   };
 });

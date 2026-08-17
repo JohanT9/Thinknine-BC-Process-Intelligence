@@ -44,14 +44,14 @@ No active BC business interpretation is required by these paths.
 
 ## Technical debt
 
-The file still contains dormant legacy interpretation helpers retained for one
-compatibility milestone. They are no longer called by `prepareSessionModel` or
-`exportSession`: context candidate construction, pre-canonical event-to-step
-rules, process-pattern merges, legacy Knowledge Pack scoring, and markdown/
-diagnostic transformation. They should be deleted after production parity has
-been observed, rather than moved into another module and mistaken for current
-domain ownership. Static removal is the remaining line-count reduction; it is
-not a dependency-boundary blocker.
+The file still contains legacy interpretation helpers retained for one
+compatibility milestone. They are isolated behind the session pipeline's
+`compatibilityInterpret` service and run only when every modern generated action
+is an empty `Unclassified` placeholder. Modern Step Group input never uses this
+path. Context candidate construction, pre-canonical event-to-step rules,
+process-pattern merges, and legacy Knowledge Pack scoring should be deleted once
+legacy recordings have been regenerated or production parity has been observed.
+The explicit adapter is technical debt, not a second canonical pipeline.
 
 At this milestone `dashboard.js` changed from 6,525 to 6,399 lines. The small
 change is intentional: the metric reflects retained dormant compatibility code,

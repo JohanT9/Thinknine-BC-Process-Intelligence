@@ -87,4 +87,19 @@ assert.strictEqual(mergeModel.tasks.length, 2);
 assert.strictEqual(mergeModel.history.length, 2);
 assert.strictEqual(mergeModel.history[1].historyId, "split-history");
 
+assert.strictEqual(review.isGeneratedPlaceholderOnly({ tasks: [
+  { taskType: "Unclassified", instruction: "Utför uppgiften." },
+  { taskType: "Unclassified", instruction: "" }
+] }), true);
+for (const protectedChange of [{ approved: true }, { userComment: "Behåll" },
+  { stepOverride: { fields: {} } }, { manualStepId: "manual-1" }]) {
+  assert.strictEqual(review.isGeneratedPlaceholderOnly({ tasks: [{
+    taskType: "Unclassified", instruction: "Utför uppgiften.",
+    ...protectedChange
+  }] }), false, "consultant state must never be regenerated automatically");
+}
+assert.strictEqual(review.isGeneratedPlaceholderOnly({ tasks: [{
+  taskType: "RunAction", instruction: "Välj Släpp."
+}] }), false);
+
 console.log("Review Studio tests passed.");
