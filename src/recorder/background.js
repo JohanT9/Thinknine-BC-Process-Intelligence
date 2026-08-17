@@ -135,6 +135,73 @@ async function setDebug(patch) {
   await chrome.storage.local.set({ [DEBUG_KEY]: debug });
 }
 
+function diagnosticUrl(value) {
+  try {
+    const url = new URL(String(value || ""));
+    return `${url.origin}${url.pathname}`.slice(0, 300);
+  } catch {
+    return "";
+  }
+}
+
+async function appendCaptureDiagnostic(value = {}, sender = {}) {
+  const data = await chrome.storage.local.get(DEBUG_KEY);
+  const current = data[DEBUG_KEY] || {};
+  const entry = {
+    timestamp: value.timestamp || new Date().toISOString(),
+    stage: String(value.stage || "unknown").slice(0, 50),
+    eventType: String(value.eventType || "").slice(0, 30),
+    targetTag: String(value.targetTag || "").slice(0, 30),
+    role: String(value.role || "").slice(0, 50),
+    inputType: String(value.inputType || "").slice(0, 30),
+    hasValue: Boolean(value.hasValue),
+    accepted: value.accepted,
+    rejectionReason: String(value.rejectionReason || "").slice(0, 100),
+    sourceEventId: String(value.sourceEventId || "").slice(0, 180),
+    tabId: sender.tab?.id ?? sender.tabId,
+    frameId: sender.frameId,
+    parentFrameId: sender.parentFrameId,
+    documentId: sender.documentId || ""
+  };
+  const captureDiagnostics = [...(current.captureDiagnostics || []), entry]
+    .slice(-100);
+  const captureStageCounts = { ...(current.captureStageCounts || {}) };
+  captureStageCounts[entry.stage] = (captureStageCounts[entry.stage] || 0) + 1;
+  await setDebug({ captureDiagnostics, captureStageCounts,
+    lastCaptureDiagnostic: entry });
+}
+
+async function updateFrameDiagnostic(sender = {}, frameUrl = "", frameDepth,
+  state = {}) {
+  const data = await chrome.storage.local.get(DEBUG_KEY);
+  const current = data[DEBUG_KEY] || {};
+  const key = `${sender.tab?.id ?? "?"}:${sender.frameId ?? "?"}:` +
+    `${sender.documentId || "unknown"}`;
+  const frames = { ...(current.frameDiagnostics || {}), [key]: {
+    tabId: sender.tab?.id,
+    frameId: sender.frameId,
+    parentFrameId: sender.parentFrameId,
+    documentId: sender.documentId || "",
+    url: diagnosticUrl(frameUrl || sender.url),
+    origin: (() => { try { return new URL(frameUrl || sender.url).origin; }
+      catch { return ""; } })(),
+    depth: Number.isInteger(frameDepth) ? frameDepth : undefined,
+    injected: true,
+    recordable: true,
+    recorderActive: Boolean(state.recording),
+    lastPingAt: new Date().toISOString()
+  } };
+  const frameDiagnostics = Object.fromEntries(Object.entries(frames).slice(-100));
+  await setDebug({ frameDiagnostics,
+    framePermissionScope: ["https://businesscentral.dynamics.com/*",
+      "https://*.businesscentral.dynamics.com/*"],
+    externalFramesRequireExplicitHostPermission: true,
+    connected: true,
+    lastPingAt: new Date().toISOString(),
+    lastFrameUrl: diagnosticUrl(frameUrl || sender.url),
+    lastError: null });
+}
+
 async function getSession(id) {
   const key = SESSION_PREFIX + id;
   const data = await chrome.storage.local.get(key);
@@ -390,6 +457,12 @@ async function recordEvent(rawEvent, captureContext = {}) {
           diagnostic: rawResult.diagnostic } });
       return;
     }
+    const debugState = await chrome.storage.local.get(DEBUG_KEY);
+    if (debugState[DEBUG_KEY]?.captureDiagnosticsEnabled) {
+      await appendCaptureDiagnostic({ stage: "raw-event-persisted",
+        eventType: rawResult.event.type, accepted: true, sourceEventId },
+      captureContext);
+    }
 
     const canonicalBefore = await getCanonicalRecording(recordingId);
     const alreadyCanonical = canonicalBefore.events.some(item =>
@@ -409,6 +482,10 @@ async function recordEvent(rawEvent, captureContext = {}) {
     const canonicalEvent = canonical.events.find(item =>
       item.source?.eventId === event.sourceEventId
     );
+    if (debugState[DEBUG_KEY]?.captureDiagnosticsEnabled) {
+      await appendCaptureDiagnostic({ stage: "canonical-event-appended",
+        eventType: event.type, accepted: true, sourceEventId }, captureContext);
+    }
     const events = canonical.events.map(item => item.raw);
     await saveEvents(recordingId, events);
 
@@ -452,7 +529,9 @@ async function recordEvent(rawEvent, captureContext = {}) {
         eventNo: event.eventNo,
         type: event.type,
         category: event.category,
-        label: event.label || event.fieldName || event.pageCaption || ""
+        hasAccessibleLabel: Boolean(
+          event.label || event.fieldName || event.pageCaption
+        )
       },
       lastError: null
     });
@@ -487,7 +566,7 @@ async function registerRecorderContentScript() {
         "https://businesscentral.dynamics.com/*",
         "https://*.businesscentral.dynamics.com/*"
       ],
-      js: ["content.js"],
+      js: ["capture-focus-session.js", "content.js"],
       allFrames: true,
       matchOriginAsFallback: true,
       runAt: "document_start",
@@ -551,7 +630,7 @@ async function injectRecorderIntoExistingBcTabs() {
           tabId: tab.id,
           allFrames: true
         },
-        files: ["content.js"],
+        files: ["capture-focus-session.js", "content.js"],
         world: "ISOLATED"
       });
       results.push({ tabId: tab.id, ok: true });
@@ -600,7 +679,7 @@ async function ensureContentScript(tabId) {
         tabId,
         allFrames: true
       },
-      files: ["content.js"]
+      files: ["capture-focus-session.js", "content.js"]
     });
   } catch (error) {
     await setDebug({
@@ -859,14 +938,29 @@ chrome.runtime.onStartup.addListener(async () => {
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   (async () => {
     switch (message.type) {
-      case "T9_PING":
-        await setDebug({
-          connected: true,
-          lastPingAt: new Date().toISOString(),
-          lastFrameUrl: message.frameUrl || sender.url || "",
-          lastError: null
-        });
-        sendResponse({ ok: true, version: VERSION });
+      case "T9_PING": {
+        const pingState = await getState();
+        await updateFrameDiagnostic(sender, message.frameUrl,
+          message.frameDepth, pingState);
+        const pingDebug = await chrome.storage.local.get(DEBUG_KEY);
+        sendResponse({ ok: true, version: VERSION, state: pingState,
+          diagnosticsEnabled: Boolean(
+            pingDebug[DEBUG_KEY]?.captureDiagnosticsEnabled
+          ) });
+        break;
+      }
+
+      case "T9_CAPTURE_DIAGNOSTIC":
+        await appendCaptureDiagnostic(message.diagnostic, sender);
+        sendResponse({ ok: true });
+        break;
+
+      case "T9_SET_CAPTURE_DIAGNOSTICS":
+        await setDebug(message.enabled
+          ? { captureDiagnosticsEnabled: true, captureDiagnostics: [],
+            captureStageCounts: {}, lastCaptureDiagnostic: null }
+          : { captureDiagnosticsEnabled: false });
+        sendResponse({ ok: true, enabled: Boolean(message.enabled) });
         break;
 
       case "T9_REGISTER_CONTENT_SCRIPT": {
@@ -915,7 +1009,13 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
         break;
       }
 
-      case "T9_RECORD_EVENT":
+      case "T9_RECORD_EVENT": {
+        const captureDebug = await chrome.storage.local.get(DEBUG_KEY);
+        if (captureDebug[DEBUG_KEY]?.captureDiagnosticsEnabled) {
+          await appendCaptureDiagnostic({ stage: "background-message-received",
+            eventType: message.event?.type, accepted: true,
+            sourceEventId: message.event?.sourceEventId }, sender);
+        }
         await recordEvent(message.event, {
           tabId: sender.tab?.id,
           frameId: sender.frameId,
@@ -925,6 +1025,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
         });
         sendResponse({ ok: true });
         break;
+      }
 
       case "T9_LIST_SESSIONS": {
         const sessions = await listSessions();

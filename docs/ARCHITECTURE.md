@@ -129,6 +129,34 @@ interactions, and never groups them into Steps. React/MUI focus comparison is
 capture evidence; only normalization may classify a verified difference as a
 `value-change`.
 
+### React and control-add-in capture reliability
+
+The recorder installs delegated capture-phase listeners at `document` level in
+every supported frame. Interactive targets are resolved through `composedPath()`
+and bounded ancestry, so application-level `stopPropagation()` and open Shadow
+DOM do not hide browser-observable interactions. No React internals, Fiber data,
+MUI class identities, page-world patches, polling, or per-control listeners are
+used.
+
+Recording state is persisted by the background worker and observed through
+`chrome.storage.onChanged` by every injected frame. This closes the lifecycle
+gap where `tabs.sendMessage` updated only the top frame after a control-add-in
+frame had already initialized. Frames mounted later still initialize through
+`T9_GET_STATE`; periodic pings recover state and inventory after worker restart.
+
+Editable controls retain their initial observable value on `focusin`. On
+`focusout`, a `field-change` Raw Event is emitted only when the value changed and
+no equivalent native `input` or `change` commit was already emitted. Event
+Normalization remains the owner of the `value-change` classification.
+
+Capture diagnostics are opt-in and bounded. They retain event/control shape,
+frame/document identity, acceptance state, rejection reason, and source-event
+identity, but never entered values or URL query strings. Supported inherited
+`about:blank` documents use the registered origin fallback. Cross-origin frames
+outside the Business Central host patterns are explicitly unsupported until a
+verified narrow host permission is added. Closed Shadow DOM remains opaque by
+browser design.
+
 ## Documentation hierarchy
 
 Resolved Steps may be organized into exactly Section → Subtask → Step. Hierarchy

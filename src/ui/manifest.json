@@ -30,6 +30,7 @@
         "https://*.businesscentral.dynamics.com/*"
       ],
       "js": [
+        "capture-focus-session.js",
         "content.js"
       ],
       "all_frames": true,

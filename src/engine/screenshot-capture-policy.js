@@ -12,7 +12,9 @@
 
   function category(event) {
     if (event?.type === "field-change" &&
-        ["input", "change"].includes(event.inputSource) && hasValue(event)) {
+        (["input", "change"].includes(event.inputSource) ||
+          (event.inputSource === "focusout" &&
+            event.previousValue !== event.value)) && hasValue(event)) {
       return FIELD_INPUT;
     }
     return event?.category || "";

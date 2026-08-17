@@ -2,6 +2,15 @@
 
 ## 4.6.0 - Legacy documentation opening compatibility
 
+- Fixed recording-state propagation to already mounted Business Central
+  control-add-in frames; all injected frames now follow durable recording state
+  across start, stop, remount, and service-worker restart lifecycles.
+- Added a generic capture-phase focus-session fallback for editable controls,
+  with native-commit deduplication, composed-path target resolution, and
+  screenshot eligibility for verified fallback commits.
+- Added opt-in sanitized Frame Capture Diagnostics covering observed events,
+  policy decisions, message delivery, Raw Event persistence, and Canonical append
+  without recording entered values or URL query strings.
 - Treat Business Central's `Sortera efter`/`Sort by` text as lookup state rather
   than part of a field caption, so instructions use `Nr` instead of
   `Sortera efter Nr`.

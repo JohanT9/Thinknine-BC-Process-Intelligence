@@ -39,6 +39,13 @@ async function load() {
     ["Senaste event", debug.lastEvent ? JSON.stringify(debug.lastEvent) : "Inget"],
     ["Senaste BC-ping", debug.lastPingAt || "Ingen"],
     ["Senaste ram-URL", debug.lastFrameUrl || "Ingen"],
+    ["Ramar med content script", String(Object.keys(
+      debug.frameDiagnostics || {}).length)],
+    ["Fångstdiagnostik", debug.captureDiagnosticsEnabled
+      ? "Aktiv (sanerad)" : "Avstängd"],
+    ["Fångststeg", objectSummary(debug.captureStageCounts)],
+    ["Senaste fångstdiagnostik", debug.lastCaptureDiagnostic
+      ? JSON.stringify(debug.lastCaptureDiagnostic) : "Ingen"],
     ["Skärmbilder begärda", String(screenshots.requested || 0)],
     ["Skärmbilder tagna", String(screenshots.captured || 0)],
     ["Bildförfrågningar sammanslagna", String(screenshots.reused || 0)],
@@ -56,7 +63,18 @@ async function load() {
 
   document.getElementById("raw").textContent =
     JSON.stringify(response, null, 2);
+  const toggle = document.getElementById("toggleCaptureDiagnostics");
+  toggle.textContent = debug.captureDiagnosticsEnabled
+    ? "Stäng av fångstdiagnostik" : "Aktivera fångstdiagnostik";
+  toggle.dataset.enabled = String(Boolean(debug.captureDiagnosticsEnabled));
 }
 
 document.getElementById("refresh").addEventListener("click", load);
+document.getElementById("toggleCaptureDiagnostics").addEventListener(
+  "click", async event => {
+    await send({ type: "T9_SET_CAPTURE_DIAGNOSTICS",
+      enabled: event.currentTarget.dataset.enabled !== "true" });
+    await load();
+  }
+);
 load();

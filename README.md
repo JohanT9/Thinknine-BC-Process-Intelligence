@@ -35,6 +35,13 @@ Persisted and identified browser mechanics normalize into a small stable
 interaction vocabulary. Native commits and React/MUI focus-session fallback
 coalesce mechanically while preserving every Raw Event source ID.
 
+Control add-ins use the same delegated capture-phase DOM observation as standard
+Business Central. Recording state is synchronized to every injected frame,
+including frames already mounted when recording starts. A changed editable value
+is captured on focus exit when no equivalent native commit was observed. The
+debug panel can temporarily enable sanitized, bounded capture-stage diagnostics.
+External-origin frames still require an explicit narrow host permission.
+
 ## Canonical Recording Hardening
 
 Canonical Recording is the immutable evidence projection consumed by derived

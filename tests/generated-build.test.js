@@ -17,6 +17,7 @@ assert.ok(dashboard.includes('const CONTEXT_BUILDER_VERSION = "1.0.0"'));
 assert.ok(dashboard.includes(
   'const KNOWLEDGE_PACK_FRAMEWORK_VERSION = "2.0.0"'
 ));
-assert.ok(content.includes('version: "2.0.1"'));
+assert.ok(content.includes('version: "2.1.0"'));
+assert.ok(fs.existsSync(path.join(root, "dist/capture-focus-session.js")));
 
 console.log("Generated build version integrity tests passed.");

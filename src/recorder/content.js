@@ -4,13 +4,30 @@
 
   let recording = false;
   let sessionId = null;
+  let diagnosticsEnabled = false;
   let lastUrl = location.href;
   let lastPageSignature = "";
   const sourceFrameId = crypto.randomUUID();
   let sourceSequence = 0;
   const inputTimers = new WeakMap();
-  const initialValues = new WeakMap();
+  const focusSessions = globalThis.T9CaptureFocusSession.create();
   const observedDialogs = new Set();
+
+  function diagnostic(stage, details = {}) {
+    if (!diagnosticsEnabled) return;
+    try {
+      chrome.runtime.sendMessage({ type: "T9_CAPTURE_DIAGNOSTIC",
+        diagnostic: { stage, timestamp: new Date().toISOString(),
+          eventType: details.eventType || "",
+          targetTag: details.targetTag || "", role: details.role || "",
+          inputType: details.inputType || "", hasValue: Boolean(details.hasValue),
+          accepted: details.accepted,
+          rejectionReason: details.rejectionReason || "",
+          sourceEventId: details.sourceEventId || "" } }, () => {
+        void chrome.runtime.lastError;
+      });
+    } catch {}
+  }
 
   try {
     chrome.runtime.sendMessage({ type: "T9_GET_STATE" }, response => {
@@ -26,9 +43,15 @@
     try {
       chrome.runtime.sendMessage({
         type: "T9_PING",
-        frameUrl: location.href
-      }, () => {
-        void chrome.runtime.lastError;
+        frameUrl: location.href,
+        frameDepth: getFrameDepth()
+      }, response => {
+        if (chrome.runtime.lastError) return;
+        if (response?.state) {
+          recording = Boolean(response.state.recording);
+          sessionId = response.state.sessionId || null;
+        }
+        diagnosticsEnabled = Boolean(response?.diagnosticsEnabled);
       });
     } catch {
       // Ignore transient errors while Edge reloads the extension.
@@ -51,13 +74,23 @@
         ok: true,
         recording,
         sessionId,
+        diagnosticsEnabled,
         frameUrl: location.href,
-        version: "2.0.1"
+        version: "2.1.0"
       });
       return false;
     }
 
     return false;
+  });
+
+  // tabs.sendMessage without a frame target reaches only the top document.
+  // Storage state changes reach every already-injected frame and keep control
+  // add-ins synchronized across service-worker restarts and frame remounts.
+  chrome.storage.onChanged.addListener((changes, areaName) => {
+    if (areaName !== "local" || !changes.t9_state?.newValue) return;
+    recording = Boolean(changes.t9_state.newValue.recording);
+    sessionId = changes.t9_state.newValue.sessionId || null;
   });
 
   function clean(value, max = 300) {
@@ -194,6 +227,9 @@
       '[role="menuitem"]',
       '[role="tab"]',
       '[role="option"]',
+      '[role="checkbox"]',
+      '[role="radio"]',
+      '[role="listbox"]',
       '[role="row"]',
       '[role="gridcell"]',
       '[tabindex]'
@@ -203,6 +239,20 @@
   function eventElement(event) {
     return event.composedPath?.().find(item => item instanceof Element) ||
       event.target;
+  }
+
+  const EDITABLE_SELECTOR = [
+    'input:not([type="button"]):not([type="submit"]):not([type="reset"])',
+    "textarea", "select", '[contenteditable="true"]'
+  ].join(",");
+
+  function editableTarget(event) {
+    const path = event.composedPath?.() || [event.target];
+    const direct = path.find(item => item instanceof Element &&
+      item.matches?.(EDITABLE_SELECTOR));
+    if (direct) return direct;
+    const element = path.find(item => item instanceof Element) || event.target;
+    return element instanceof Element ? element.closest(EDITABLE_SELECTOR) : null;
   }
 
   function categoryOf(element) {
@@ -323,14 +373,29 @@
   }
 
   function record(event) {
-    if (!recording || !sessionId) return;
+    const summary = { eventType: event.type,
+      targetTag: event.controlType, role: event.role,
+      inputType: event.inputType,
+      hasValue: Object.prototype.hasOwnProperty.call(event, "value") };
+    if (!recording || !sessionId) {
+      diagnostic("capture-policy", { ...summary, accepted: false,
+        rejectionReason: "recorder-inactive" });
+      return;
+    }
 
     try {
       const localSequence = ++sourceSequence;
+      const sourceEventId = `${sessionId}:${sourceFrameId}:${localSequence}`;
+      diagnostic("target-resolved", { ...summary, accepted: true,
+        sourceEventId });
+      diagnostic("capture-policy", { ...summary, accepted: true,
+        sourceEventId });
+      diagnostic("runtime-message-sent", { ...summary, accepted: true,
+        sourceEventId });
       chrome.runtime.sendMessage({
         type: "T9_RECORD_EVENT",
         event: {
-          sourceEventId: `${sessionId}:${sourceFrameId}:${localSequence}`,
+          sourceEventId,
           recordingId: sessionId,
           source: "business-central-content-script",
           sourceFrameId,
@@ -355,6 +420,11 @@
 
   document.addEventListener("click", event => {
     const target = interactiveTarget(eventElement(event));
+    diagnostic("native-event-observed", { eventType: "click",
+      targetTag: eventElement(event)?.tagName?.toLowerCase?.() || "",
+      role: eventElement(event)?.getAttribute?.("role") || "",
+      accepted: Boolean(target),
+      rejectionReason: target ? "" : "no-interactive-target" });
     if (!target) return;
     const category = categoryOf(target);
     const role = target.getAttribute?.("role") || "";
@@ -375,24 +445,32 @@
     });
   }, true);
 
-  function emitField(element, source) {
-    if (!(element instanceof Element)) return;
+  function emitField(element, source, previousValue) {
+    if (!(element instanceof Element)) return false;
+    const value = valueOf(element);
 
     record({
       type: "field-change",
       category: "field",
       fieldName: getLabel(element) || "Okänt fält",
-      value: valueOf(element),
-      previousValue: initialValues.has(element)
-        ? initialValues.get(element)
-        : undefined,
+      value,
+      previousValue: previousValue === undefined
+        ? focusSessions.previous(element) : previousValue,
       inputSource: source,
       ...descriptor(element)
     });
+    if (source !== "focusout") focusSessions.commit(element, value);
+    return true;
   }
 
   document.addEventListener("input", event => {
-    const element = eventElement(event);
+    const element = editableTarget(event);
+    diagnostic("native-event-observed", { eventType: "input",
+      targetTag: element?.tagName?.toLowerCase?.() || "",
+      role: element?.getAttribute?.("role") || "",
+      inputType: element?.getAttribute?.("type") || "",
+      hasValue: Boolean(element), accepted: Boolean(element),
+      rejectionReason: element ? "" : "no-editable-target" });
     if (!(element instanceof Element)) return;
 
     clearTimeout(inputTimers.get(element));
@@ -403,16 +481,15 @@
   }, true);
 
   document.addEventListener("focusin", event => {
-    const element = eventElement(event);
-    if (!(element instanceof Element) ||
-        !element.matches('input,textarea,select,[contenteditable="true"]')) return;
-    initialValues.set(element, valueOf(element));
+    const element = editableTarget(event);
+    if (!(element instanceof Element)) return;
+    focusSessions.start(element, valueOf(element));
     record({ type: "focus", category: "lifecycle", value: valueOf(element),
       ...descriptor(element) });
   }, true);
 
   document.addEventListener("change", event => {
-    const element = eventElement(event);
+    const element = editableTarget(event);
     if (element instanceof Element) {
       clearTimeout(inputTimers.get(element));
       emitField(element, "change");
@@ -420,15 +497,22 @@
   }, true);
 
   document.addEventListener("focusout", event => {
-    const element = eventElement(event);
+    const element = editableTarget(event);
 
-    if (
-      element instanceof Element &&
-      element.matches('input,textarea,select,[contenteditable="true"]')
-    ) {
+    if (element instanceof Element) {
       clearTimeout(inputTimers.get(element));
-      emitField(element, "focusout");
-      initialValues.delete(element);
+      const finalValue = valueOf(element);
+      const outcome = focusSessions.finish(element, finalValue);
+      if (outcome.emit) {
+        emitField(element, "focusout", outcome.previousValue);
+      } else {
+        diagnostic("capture-policy", { eventType: "focusout",
+          targetTag: element.tagName.toLowerCase(),
+          role: element.getAttribute("role") || "",
+          inputType: element.getAttribute("type") || "",
+          hasValue: finalValue !== "", accepted: false,
+          rejectionReason: outcome.reason });
+      }
     }
   }, true);
 

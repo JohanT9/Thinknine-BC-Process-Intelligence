@@ -11,7 +11,9 @@ assert.strictEqual(policy.shouldCapture(settings, quantityInput), true);
 assert.strictEqual(policy.shouldCapture(settings,
   { ...quantityInput, inputSource: "change" }), true);
 assert.strictEqual(policy.shouldCapture(settings,
-  { ...quantityInput, inputSource: "focusout" }), false);
+  { ...quantityInput, previousValue: "", inputSource: "focusout" }), true);
+assert.strictEqual(policy.shouldCapture(settings,
+  { ...quantityInput, previousValue: "500", inputSource: "focusout" }), false);
 assert.strictEqual(policy.shouldCapture(settings,
   { ...quantityInput, value: "" }), false);
 assert.strictEqual(policy.shouldCapture({ ...settings, screenshotMode: "none" },
