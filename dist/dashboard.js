@@ -304,6 +304,7 @@ async function loadKnowledgePacks() {
   }
 
   loadedKnowledgePacks = packs;
+  globalThis.T9PageIdentificationEngine.configureKnowledgePacks(packs);
   loadedKnowledgeRules = packs
     .flatMap(pack => (pack.rules || []).map(rule => ({
       ...rule,

@@ -1,4 +1,6 @@
 importScripts("engine/storage-keys.js");
+importScripts("engine/page-identity.js");
+importScripts("engine/page-identification-engine.js");
 importScripts("engine/canonical-recording.js");
 importScripts("engine/raw-event-persistence.js");
 importScripts("engine/bc-ui-identification.js");
@@ -9,6 +11,16 @@ importScripts("engine/screenshot-capture-policy.js");
 importScripts("document/document-library.js");
 
 const VERSION = "4.6.0";
+const pageKnowledgePacksReady = globalThis.T9PageIdentificationEngine
+  .loadKnowledgePacks({
+    indexUrl: chrome.runtime.getURL("knowledge-packs/index.json"),
+    resolveUrl: file => chrome.runtime.getURL(file)
+  }).catch(error => {
+    console.warn("Page identification Knowledge Packs could not be loaded.", error);
+    return { packs: [], validation: { diagnostics: [{
+      code: "page-knowledge-pack-load-failed", message: String(error)
+    }] } };
+  });
 
 const DEFAULT_SETTINGS = {
   exportFileNamePattern: "{process} - {environment} - {date}",
@@ -387,6 +399,7 @@ async function recordEvent(rawEvent, captureContext = {}) {
       eventNo: canonicalBefore.events.length + 1 };
 
     // Interpretation starts only after authoritative raw persistence succeeds.
+    await pageKnowledgePacksReady;
     const canonicalEventId = `${recordingId}:event:${sourceEventId}`;
     const canonical = alreadyCanonical ? canonicalBefore :
       await canonicalStore.append(recordingId, event,

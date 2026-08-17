@@ -3,6 +3,21 @@
   "name": "Business Central Purchase",
   "version": "2.0.0",
   "priority": 200,
+  "pageDefinitions": [
+    {
+      "ruleId": "Purchase.PurchaseOrder",
+      "pageObjectId": "50",
+      "entity": "PurchaseOrder",
+      "pageType": "document",
+      "recordType": "PurchaseOrder",
+      "documentType": "purchase-order",
+      "captionRules": [
+        { "locale": "sv-SE", "pattern": "^Inköpsorder(?:\\s+.*)?$" },
+        { "locale": "en-US", "pattern": "^Purchase Order(?:\\s+.*)?$" },
+        { "locale": "da-DK", "pattern": "^Købsordre(?:\\s+.*)?$" }
+      ]
+    }
+  ],
   "rules": [
     {
       "ruleId": "Purchase.OpenPurchaseOrder",

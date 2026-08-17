@@ -11,7 +11,10 @@
   function freeze(value) { if (!value || typeof value !== "object" || Object.isFrozen(value)) return value; Object.values(value).forEach(freeze); return Object.freeze(value); }
   function identity(control = {}) { return control.identity?.value || control.controlId || control.fieldId || ""; }
   function controlKey(event) { return identity(event.controlIdentification) || event.controlIdentification?.caption || event.normalizedEventId; }
-  function pageKey(event) { const page = event.pageIdentification || {}; return page.id || page.name || page.caption || ""; }
+  function pageKey(event) { const page = event.pageIdentification || {}; return page.pageIdentity ||
+    (page.pageObjectId ? `bc:page:${page.pageObjectId}` : "") ||
+    page.id || page.pageId || page.legacyPageId || page.name ||
+    page.pageCaption || page.caption || ""; }
   function selectedValue(event) { return event.selection?.value ?? event.selection?.key ?? event.selection?.caption ?? event.value?.normalized; }
   function isLookupOrigin(event) { return event?.kind === "activation" &&
     event.controlIdentification?.controlType === "lookup"; }

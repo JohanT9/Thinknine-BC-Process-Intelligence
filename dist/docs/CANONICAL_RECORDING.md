@@ -113,6 +113,36 @@ changes raw capture fields, identity, ordering, values, frames, or screenshots.
 Legacy events without identification remain valid. See
 [BC UI Identification](BC_UI_IDENTIFICATION.md).
 
+### Business Central page identity
+
+Schema version 1 uses an additive page identity contract. The complete source
+event remains unchanged under `raw`. Canonical `page.id` and
+`businessCentral.pageId` retain the source `pageId` exactly for compatibility.
+They must therefore be treated as opaque legacy values.
+
+When a positive numeric source `pageId` is verified against the captured
+Business Central `page` route parameter, its normalized string is also exposed
+as `page.pageObjectId` and `businessCentral.pageObjectId`. The observed caption
+is exposed consistently as `page.caption` and
+`businessCentral.pageCaption`; established aliases `page.name` and
+`businessCentral.pageName` remain available.
+
+Derived `entity`, `pageType`, optional `tableId`, and optional `recordType` may
+be carried in `page` when identification supplies them. `entity` is semantic,
+not numeric. `tableId` is never inferred from a page object ID. Missing or
+malformed page evidence remains valid and does not prevent capture.
+
+The Page Identification Engine supplies classification provenance in the
+separate event `identification.pageIdentity` object, including source, provider,
+rule, confidence, and conflict diagnostics when known. Canonical Recording does
+not resolve definitions and never writes the result into `raw`.
+
+These optional fields do not change required schema-v1 invariants, so the
+Canonical Recording schema version remains 1. `fromLegacy` derives only the
+verified route fact while preserving the historical raw event. `legacyView`
+continues to return the original legacy shape and does not inject derived
+`pageObjectId` into raw source data.
+
 ## Raw persistence boundary
 
 For new captures, the separate Raw Event Persistence append is authoritative

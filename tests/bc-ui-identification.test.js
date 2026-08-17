@@ -1,8 +1,14 @@
 const assert = require("assert");
 const fs = require("fs");
+const pageEngine = require("../src/engine/page-identification-engine");
 const identification = require("../src/engine/bc-ui-identification");
 const canonical = require("../src/engine/canonical-recording");
 const semantic = require("../src/document/semantic-interaction-engine");
+pageEngine.configureKnowledgePacks([
+  require("../src/knowledge-packs/core.json"),
+  require("../src/knowledge-packs/sales.json"),
+  require("../src/knowledge-packs/purchase.json")
+]);
 
 function identify(overrides = {}) {
   return identification.identify({
@@ -17,7 +23,7 @@ function identify(overrides = {}) {
 const standard = identify({ pageId: "42", automationId: "CustomerNo" });
 assert.strictEqual(standard.eventId, "recording:event:source-1");
 assert.deepStrictEqual(standard.page, {
-  id: "42", caption: "Sales Order",
+  id: "42", pageObjectId: "42", caption: "Sales Order",
   route: "https://businesscentral.dynamics.com/?page=42"
 });
 assert.deepStrictEqual(standard.control.identity,
@@ -28,12 +34,17 @@ assert.strictEqual(standard.confidence.page, "exact");
 assert.strictEqual(standard.confidence.control, "exact");
 assert.ok(standard.evidence.some(item => item.source === "aria-labelledby"));
 assert.ok(Object.isFrozen(standard) && Object.isFrozen(standard.control));
-assert.deepStrictEqual(standard.pageIdentity, {
-  pageIdentity: "bc:page:42", pageId: "42", pageType: "document",
-  caption: "Sales Order", entity: "SalesOrder", source: "page-id",
-  evidence: [{ source: "route-page-parameter", value: "42" },
-    { source: "observed-page-caption", value: "Sales Order" }]
-});
+assert.strictEqual(standard.pageIdentity.pageIdentity, "bc:page:42");
+assert.strictEqual(standard.pageIdentity.pageId, "42");
+assert.strictEqual(standard.pageIdentity.pageObjectId, "42");
+assert.strictEqual(standard.pageIdentity.pageType, "document");
+assert.strictEqual(standard.pageIdentity.caption, "Sales Order");
+assert.strictEqual(standard.pageIdentity.entity, "SalesOrder");
+assert.strictEqual(standard.pageIdentity.recordType, "SalesOrder");
+assert.strictEqual(standard.pageIdentity.source, "page-object-id");
+assert.strictEqual(standard.pageIdentity.provider, "bc-sales");
+assert.strictEqual(standard.pageIdentity.ruleId, "Sales.SalesOrder");
+assert.strictEqual(standard.pageIdentity.confidence, 1);
 assert.strictEqual(standard.controlIdentity.controlIdentity,
   "bc:control:CustomerNo");
 assert.strictEqual(standard.controlIdentity.fieldSemanticHint, "Customer");
@@ -94,7 +105,8 @@ const unknown = identify({ pageCaption: "", role: "custom-future-role", controlT
 assert.strictEqual(unknown.control.type, "unknownInteractiveControl");
 assert.strictEqual(unknown.control.identity, undefined);
 assert.strictEqual(unknown.confidence.control, "unknown");
-assert.strictEqual(unknown.pageIdentity.pageIdentity, null);
+assert.strictEqual(unknown.pageIdentity.pageIdentity
+  .startsWith("bc:observed:"), true);
 assert.strictEqual(unknown.pageIdentity.entity, null);
 assert.strictEqual(unknown.controlIdentity.controlIdentity, null);
 assert.strictEqual(unknown.actionIdentity.actionIdentity, null);
@@ -111,18 +123,18 @@ assert.strictEqual(localized.control.caption, "Kundnr.");
 assert.strictEqual(localized.control.identity.value, standard.control.identity.value);
 
 for (const [pageId, entity] of Object.entries({ "42": "SalesOrder",
-  "50": "PurchaseOrder", "21": "Customer", "26": "Vendor", "30": "Item",
-  "7335": "WarehouseShipment", "99000831": "ProductionOrder" })) {
-  const identified = identify({ pageId, pageCaption: "Localized caption" });
+  "50": "PurchaseOrder", "21": "Customer", "30": "Item" })) {
+  const identified = identify({ pageId, pageCaption: "Localized caption",
+    frameUrl: `https://businesscentral.dynamics.com/?page=${pageId}` });
   assert.strictEqual(identified.pageIdentity.entity, entity);
-  assert.strictEqual(identified.pageIdentity.source, "page-id");
+  assert.strictEqual(identified.pageIdentity.source, "page-object-id");
 }
 assert.strictEqual(identify({ pageId: "", pageCaption: "Salgsordre" })
   .pageIdentity.entity, "SalesOrder");
 assert.strictEqual(identify({ pageId: "", pageCaption: "Købsordre" })
   .pageIdentity.entity, "PurchaseOrder");
 assert.strictEqual(identify({ pageId: "", pageCaption: "Produktionsordre" })
-  .pageIdentity.entity, "ProductionOrder");
+  .pageIdentity.entity, null);
 assert.strictEqual(identify({ pageId: "", pageCaption: "Foo" })
   .pageIdentity.entity, null);
 assert.strictEqual(identify({ pageId: "42", pageCaption: "Købsordre" })

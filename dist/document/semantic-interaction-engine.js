@@ -157,6 +157,8 @@
     const sources = sourceData(values);
     const futureMetadata = clone(values[0]?.semanticActionModel ||
       values[0]?.semanticActionMetadata || {});
+    const first = values[0] || {};
+    const page = clone(first.pageContext || first.pageIdentification || {});
     return deepFreeze({
       ...futureMetadata,
       actionId: stableId(rule.ruleId, values),
@@ -165,6 +167,14 @@
       ...(properties.hidden ? { hidden: true } : {}),
       selectedValue: properties.selectedValue || "",
       targetField: properties.targetField || "",
+      ...(Object.keys(page).length ? { pageContext: page,
+        pageIdentification: clone(page),
+        pageIdentity: page.pageIdentity || null,
+        pageObjectId: page.pageObjectId || null,
+        pageId: page.legacyPageId || page.pageId || page.id || "",
+        pageCaption: page.pageCaption || page.caption || page.name || "",
+        entity: page.entity || "", pageConfidence: page.confidence ?? null,
+        pageIdentificationSource: page.source || "" } : {}),
       ...(properties.preferredSourceEventId
         ? { preferredSourceEventId: properties.preferredSourceEventId } : {}),
       ...(properties.preferredScreenshotRef
@@ -578,6 +588,7 @@
     const primary = group?.primaryNormalizedEvent || {};
     const control = group?.controlContext || primary.controlIdentification || {};
     const action = group?.actionContext || primary.actionIdentification || {};
+    const page = group?.pageContext || primary.pageIdentification || {};
     const types = {
       "field-edit": "ChangeField", "lookup-interaction": "Select",
       selection: "SelectOption", "toggle-interaction": "Checkbox",
@@ -599,6 +610,13 @@
       actionCaption: action.caption || "",
       selectedCaption: selected ? String(selected) : "",
       selectedValue: selected,
+      pageContext: clone(page), pageIdentification: clone(page),
+      pageIdentity: page.pageIdentity || null,
+      pageObjectId: page.pageObjectId || null,
+      pageId: page.legacyPageId || page.pageId || page.id || "",
+      pageCaption: page.pageCaption || page.caption || page.name || "",
+      entity: page.entity || "", pageConfidence: page.confidence ?? null,
+      pageIdentificationSource: page.source || "",
       targetControl: clone(control),
       value: primary.value?.normalized ?? primary.state?.checked ?? selected,
       inputSources: primary.subtype ? [primary.subtype] : [],

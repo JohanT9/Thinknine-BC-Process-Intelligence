@@ -10,6 +10,10 @@
   const clone = value => value == null ? value : JSON.parse(JSON.stringify(value));
   function freeze(value) { if (!value || typeof value !== "object" || Object.isFrozen(value)) return value; Object.values(value).forEach(freeze); return Object.freeze(value); }
   function text(value) { return value == null ? "" : String(value).trim(); }
+  function pageKey(value = {}) { return value.pageIdentity ||
+    (value.pageObjectId ? `bc:page:${value.pageObjectId}` : "") ||
+    value.id || value.pageId || value.legacyPageId ||
+    value.caption || value.pageCaption || ""; }
   function candidateId(value) { return text(value.screenshotAssetId || value.screenshotRef); }
   function normalizeCandidate(value = {}) {
     const input = clone(value);
@@ -55,8 +59,8 @@
     const candidateControl = candidate.control.identity?.value || candidate.control.automationId || candidate.control.caption || candidate.control.label;
     if (groupControl && candidateControl) add(state, groupControl === candidateControl,
       30, "same-control", "mismatched-control");
-    const groupPage = stepGroup?.pageContext?.id || stepGroup?.pageContext?.caption;
-    const candidatePage = candidate.page.id || candidate.page.pageId || candidate.page.caption || candidate.page.pageCaption;
+    const groupPage = pageKey(stepGroup?.pageContext);
+    const candidatePage = pageKey(candidate.page);
     if (groupPage && candidatePage) add(state, groupPage === candidatePage,
       15, "same-page", "stale-page-context");
     add(state, candidate.control.visible, 12, "target-visible", "target-not-visible");
@@ -116,7 +120,7 @@
     if (candidate.uiState.context === preference) add(state, true, 8,
       `profile-${preference}-context`, null);
     if (context.previousPageId &&
-        (candidate.page.id || candidate.page.pageId) === context.previousPageId) {
+        pageKey(candidate.page) === context.previousPageId) {
       add(state, true, 3, "visual-continuity", null);
     }
     return freeze({ candidate, ...state });
@@ -140,7 +144,7 @@
       candidate.control.identity?.value || candidate.control.automationId ||
         candidate.control.caption || candidate.control.label || "",
       candidate.dimensions?.width || null, candidate.dimensions?.height || null,
-      candidate.page.id || candidate.page.pageId || "",
+      pageKey(candidate.page),
       candidate.uiState.signature || ""
     ]);
     const value = signature(left);

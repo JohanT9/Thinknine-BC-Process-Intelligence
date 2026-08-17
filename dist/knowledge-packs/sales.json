@@ -3,6 +3,21 @@
   "name": "Business Central Sales",
   "version": "2.0.0",
   "priority": 200,
+  "pageDefinitions": [
+    {
+      "ruleId": "Sales.SalesOrder",
+      "pageObjectId": "42",
+      "entity": "SalesOrder",
+      "pageType": "document",
+      "recordType": "SalesOrder",
+      "documentType": "sales-order",
+      "captionRules": [
+        { "locale": "sv-SE", "pattern": "^(?:Förs\\.?\\s*order|F\\u00f6rs\\u00e4ljningsorder)(?:\\s+.*)?$" },
+        { "locale": "en-US", "pattern": "^Sales Order(?:\\s+.*)?$" },
+        { "locale": "da-DK", "pattern": "^Salgsordre(?:\\s+.*)?$" }
+      ]
+    }
+  ],
   "rules": [
     {
       "ruleId": "Sales.OpenSalesOrder",

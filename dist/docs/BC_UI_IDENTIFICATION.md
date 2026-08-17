@@ -12,19 +12,40 @@ Raw Event -> BC UI Identification -> Identified Event -> derived mechanics
 It produces immutable Page, Control, Action, Entity/context, hierarchy, and
 frame identity. It does not alter Canonical Recording, group events, generate
 wording, or run in UI code. Dashboard consumes the module through compatibility
-adapters; Knowledge Packs may consume its result but are not its identity owner.
+adapters. Page classification delegates exclusively to the Page Identification
+Engine; Knowledge Packs own its modular definition data.
 
 ## Evidence priority
 
-Identity follows this order: stable BC/automation IDs, page IDs, control/data
+Identity follows this order: stable BC/automation IDs, verified page object IDs, control/data
 attributes, accessibility and structural metadata, stable route metadata, then
 localized caption fallback. A technical page or automation ID always wins over
 a conflicting caption.
 
-Known BC page IDs identify Sales Order, Purchase Order, Customer, Vendor, Item,
-Warehouse Shipment, and Production Order independently of display language.
-`pageIdentity` is `bc:page:<pageId>`. Page results also carry page type, observed
-caption, entity, source, and evidence.
+## Page identity contract
+
+Page fields have deliberately separate meanings:
+
+- `pageId` is the unchanged legacy compatibility value. Existing consumers may
+  contain either a route value or a semantic key such as `SalesOrder`.
+- `pageObjectId` is a normalized positive numeric string only when the captured
+  `pageId` agrees with the `page` query parameter in captured frame/top URL
+  evidence. It is absent otherwise.
+- `pageCaption`/`caption` is the observed user-facing text and is never an object
+  identifier.
+- `entity` is a stable semantic string, never a numeric page object identifier.
+- `pageType` is derived engine metadata such as `card`, `list`, or `document`.
+- `tableId` is optional verified metadata and is never inferred from either
+  `pageId` or `pageObjectId`.
+- `recordType` is optional semantic metadata and is never assigned by the
+  recorder.
+
+Known BC page object IDs may identify Sales Order, Purchase Order, Customer,
+Vendor, Item, Warehouse Shipment, and Production Order independently of display
+language. For verified values, `pageIdentity` is
+`bc:page:<pageObjectId>`. A numeric legacy `pageId` without matching route
+evidence remains a legacy value and does not activate technical classification.
+Malformed values and semantic legacy values never become `pageObjectId`.
 
 Control identity prefers `data-automation-id`, `data-control-id`,
 `data-control-name`, name, then element ID. Control results keep ID fields,
@@ -40,10 +61,11 @@ with `actionIdentity: null` and `actionType: null`.
 
 ## Localization and unknown UI
 
-Captions are display evidence, not primary identity. Small fallback rule groups
-are owned here by language (`sv`, `en`, and deliberately limited Danish-shaped
-`da` forms), so another language can be added without changing semantic or UI
-rules. The fallback never manufactures a BC page ID.
+Captions are display evidence, not primary identity. Localized page caption
+rules live in optional Knowledge Pack `pageDefinitions` and are resolved only by
+the Page Identification Engine. The fallback never manufactures a BC page
+object ID, table ID, or record type. See
+[Page Identification Engine](PAGE_IDENTIFICATION_ENGINE.md).
 
 Unknown pages and controls are valid. They keep observable caption, conservative
 control classification, hierarchy, frame data, and evidence while identity and

@@ -1,44 +1,16 @@
 (function (root, factory) {
-  const api = factory();
+  const pageIdentityContract = typeof module === "object" && module.exports
+    ? require("./page-identity") : root.T9PageIdentity;
+  const pageIdentificationEngine = typeof module === "object" && module.exports
+    ? require("./page-identification-engine") : root.T9PageIdentificationEngine;
+  const api = factory(pageIdentityContract, pageIdentificationEngine);
   if (typeof module === "object" && module.exports) module.exports = api;
   root.T9BCUIIdentification = api;
-})(typeof globalThis !== "undefined" ? globalThis : this, function () {
+})(typeof globalThis !== "undefined" ? globalThis : this, function (
+  pageIdentityContract, pageIdentificationEngine
+) {
   "use strict";
   const SCHEMA_VERSION = 1;
-  const PAGE_IDS = {
-    "21": { entity: "Customer", pageType: "card" },
-    "22": { entity: "Customer", pageType: "list" },
-    "26": { entity: "Vendor", pageType: "card" },
-    "27": { entity: "Vendor", pageType: "list" },
-    "30": { entity: "Item", pageType: "card" },
-    "31": { entity: "Item", pageType: "list" },
-    "42": { entity: "SalesOrder", pageType: "document" },
-    "50": { entity: "PurchaseOrder", pageType: "document" },
-    "9307": { entity: "PurchaseOrder", pageType: "list" },
-    "7335": { entity: "WarehouseShipment", pageType: "document" },
-    "7336": { entity: "WarehouseShipment", pageType: "list" },
-    "99000831": { entity: "ProductionOrder", pageType: "document" }
-  };
-  const CAPTION_RULES = {
-    sv: [
-      ["PostedSalesInvoice", /bokförd.*försäljningsfaktura/i],
-      ["SalesOrder", /förs\.?\s*order|försäljningsorder/i],
-      ["PurchaseOrder", /inköpsorder/i], ["WarehouseShipment", /distlagerutleverans/i],
-      ["ProductionOrder", /produktionsorder/i], ["Customer", /kund/i],
-      ["Vendor", /leverantör/i], ["Item", /artikel/i]
-    ],
-    en: [
-      ["PostedSalesInvoice", /posted sales invoice/i], ["SalesOrder", /sales orders?/i],
-      ["PurchaseOrder", /purchase orders?/i], ["WarehouseShipment", /warehouse shipment/i],
-      ["ProductionOrder", /production order/i], ["Customer", /customers?/i],
-      ["Vendor", /vendors?/i], ["Item", /items?/i]
-    ],
-    da: [
-      ["SalesOrder", /salgsordre/i], ["PurchaseOrder", /købsordre/i],
-      ["WarehouseShipment", /lagerleverance/i], ["ProductionOrder", /produktionsordre/i],
-      ["Customer", /kunde/i], ["Vendor", /leverandør/i], ["Item", /vare/i]
-    ]
-  };
   const ACTION_RULES = {
     reopen: { actionType: "ReopenDocument", captions: /^(öppna igen|reopen|genåbn)$/i },
     release: { actionType: "ReleaseDocument", captions: /^(släpp|frisläpp|release|frigiv)$/i },
@@ -84,28 +56,31 @@
     };
     return null;
   }
-  function captionEntity(caption) {
-    for (const [language, rules] of Object.entries(CAPTION_RULES)) {
-      for (const [entity, pattern] of rules) if (pattern.test(text(caption))) {
-        return { entity, language };
-      }
-    }
-    return null;
-  }
-  function identifyPage(raw = {}) {
+  function identifyPage(raw = {}, options = {}) {
     const pageId = text(raw.pageId);
+    const pageObjectId = pageIdentityContract.observedPageObjectId(raw);
     const caption = text(raw.pageName || raw.pageCaption);
-    const known = PAGE_IDS[pageId];
-    const fallback = known ? null : captionEntity(caption);
-    const source = known ? "page-id" : fallback ? `caption-fallback:${fallback.language}` : null;
+    const resolved = pageIdentificationEngine.identifyPage({ pageObjectId,
+      legacyPageId: pageId, pageCaption: caption,
+      documentTitle: raw.documentTitle, frameUrl: raw.frameUrl,
+      topUrl: raw.topUrl, locale: raw.locale }, options);
     return {
-      pageIdentity: pageId ? `bc:page:${pageId}` : null,
+      pageIdentity: resolved.pageIdentity,
       pageId: pageId || null,
-      pageType: known?.pageType || null,
+      pageObjectId,
+      pageType: resolved.pageType || null,
       caption: caption || null,
-      entity: known?.entity || fallback?.entity || null,
-      source,
-      evidence: [evidence("route-page-parameter", pageId),
+      entity: resolved.entity || null,
+      tableId: resolved.tableId || null,
+      recordType: resolved.recordType || null,
+      documentType: resolved.documentType || null,
+      source: resolved.source,
+      provider: resolved.provider || null,
+      ruleId: resolved.ruleId || null,
+      confidence: resolved.confidence,
+      diagnostics: clone(resolved.diagnostics || []),
+      documentTitle: text(raw.documentTitle) || null,
+      evidence: [evidence("route-page-parameter", pageObjectId),
         evidence("observed-page-caption", caption)].filter(Boolean)
     };
   }
@@ -181,11 +156,12 @@
   function identify(raw = {}, options = {}) {
     const eventId = options.eventId || raw.id || "";
     const allEvidence = [];
-    const pageIdentity = identifyPage(raw);
+    const pageIdentity = identifyPage(raw, options);
     const controlIdentity = identifyControl(raw);
     const actionIdentity = identifyAction(raw);
     const page = {};
     if (text(raw.pageId)) { page.id = text(raw.pageId); allEvidence.push(evidence("route-page-parameter", raw.pageId)); }
+    if (pageIdentity.pageObjectId) page.pageObjectId = pageIdentity.pageObjectId;
     if (text(raw.pageName)) { page.name = text(raw.pageName); allEvidence.push(evidence("explicit-page-name", raw.pageName)); }
     if (text(raw.pageCaption)) { page.caption = text(raw.pageCaption); allEvidence.push(evidence("observed-page-caption", raw.pageCaption)); }
     if (text(raw.frameUrl)) page.route = text(raw.frameUrl);

@@ -26,6 +26,13 @@
     return typeof value === "string" ? value.trim() : "";
   }
 
+  function pageKey(value = {}) {
+    return value.pageIdentity ||
+      (value.pageObjectId ? `bc:page:${value.pageObjectId}` : "") ||
+      value.pageId || value.legacyPageId || value.id ||
+      value.pageCaption || value.caption || "";
+  }
+
   function normalizeCandidate(value = {}) {
     const input = clone(object(value));
     return semantic.deepFreeze({
@@ -183,7 +190,7 @@
       state.reasons.push(`profile-${profilePreference}-context`);
       state.informative = true;
     }
-    if (context.previousPageId && candidate.uiState.pageId === context.previousPageId) {
+    if (context.previousPageId && pageKey(candidate.uiState) === context.previousPageId) {
       state.score += 3;
       state.reasons.push("visual-continuity");
       state.informative = true;
@@ -207,7 +214,7 @@
     const signature = candidate => JSON.stringify([
       candidate.target.automationId || candidate.target.label || "",
       candidate.dimensions.width || null, candidate.dimensions.height || null,
-      candidate.uiState.pageId || "", candidate.uiState.signature || ""
+      pageKey(candidate.uiState), candidate.uiState.signature || ""
     ]);
     const value = signature(left);
     return value !== JSON.stringify(["", null, null, "", ""]) &&
@@ -448,7 +455,7 @@
         const selectedCandidate = candidateByRef.get(
           result.explanation.selectedScreenshotRef
         );
-        previousPageId = selectedCandidate?.uiState.pageId || previousPageId;
+        previousPageId = pageKey(selectedCandidate?.uiState) || previousPageId;
         return result.step;
       })
     }));

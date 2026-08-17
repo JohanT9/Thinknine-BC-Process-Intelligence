@@ -1,8 +1,10 @@
 (function (root, factory) {
-  const api = factory();
+  const pageIdentity = typeof module === "object" && module.exports
+    ? require("./page-identity") : root.T9PageIdentity;
+  const api = factory(pageIdentity);
   if (typeof module === "object" && module.exports) module.exports = api;
   root.T9CanonicalRecording = api;
-})(typeof globalThis !== "undefined" ? globalThis : this, function () {
+})(typeof globalThis !== "undefined" ? globalThis : this, function (pageIdentity) {
   "use strict";
   const SCHEMA_VERSION = 1;
   const clone = value => value == null ? value : JSON.parse(JSON.stringify(value));
@@ -32,8 +34,26 @@
       raw: clone(source)
     };
     if (identification) event.identification = clone(identification);
-    if (source.pageId || source.pageCaption || source.frameUrl) event.page = { id: source.pageId || undefined, name: source.pageCaption || undefined, url: source.frameUrl || undefined };
-    if (source.pageId || source.pageCaption) event.businessCentral = { pageId: source.pageId || undefined, pageName: source.pageCaption || undefined };
+    const identifiedPage = identification?.pageIdentity || {};
+    const pageObjectId = pageIdentity.observedPageObjectId(source);
+    const pageCaption = source.pageCaption || source.pageName || undefined;
+    if (source.pageId || pageObjectId || pageCaption || source.frameUrl) event.page = {
+      id: source.pageId || undefined,
+      pageObjectId: pageObjectId || undefined,
+      name: pageCaption,
+      caption: pageCaption,
+      entity: identifiedPage.entity || undefined,
+      pageType: identifiedPage.pageType || undefined,
+      tableId: identifiedPage.tableId || undefined,
+      recordType: identifiedPage.recordType || undefined,
+      url: source.frameUrl || undefined
+    };
+    if (source.pageId || pageObjectId || pageCaption) event.businessCentral = {
+      pageId: source.pageId || undefined,
+      pageObjectId: pageObjectId || undefined,
+      pageName: pageCaption,
+      pageCaption
+    };
     if (source.fieldName || source.label || source.role) event.control = { name: source.fieldName || source.label || undefined, role: source.role || undefined };
     if (source.category || source.inputSource || source.key) event.action = { category: source.category || undefined, inputSource: source.inputSource || undefined, key: source.key || undefined };
     if (Object.prototype.hasOwnProperty.call(source, "value")) event.value = clone(source.value);

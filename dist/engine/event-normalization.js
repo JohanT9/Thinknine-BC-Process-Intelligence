@@ -1,8 +1,14 @@
 (function (root, factory) {
-  const api = factory();
+  const identification = typeof module === "object" && module.exports
+    ? require("./bc-ui-identification") : root.T9BCUIIdentification;
+  const pageIdentification = typeof module === "object" && module.exports
+    ? require("./page-identification-engine") : root.T9PageIdentificationEngine;
+  const api = factory(identification, pageIdentification);
   if (typeof module === "object" && module.exports) module.exports = api;
   root.T9EventNormalization = api;
-})(typeof globalThis !== "undefined" ? globalThis : this, function () {
+})(typeof globalThis !== "undefined" ? globalThis : this, function (
+  identification, pageIdentification
+) {
   "use strict";
   const SCHEMA_VERSION = 1;
   const NORMALIZATION_VERSION = "2.0.0";
@@ -10,6 +16,21 @@
   const clone = value => value == null ? value : JSON.parse(JSON.stringify(value));
   function freeze(value) { if (!value || typeof value !== "object" || Object.isFrozen(value)) return value; Object.values(value).forEach(freeze); return Object.freeze(value); }
   function rawOf(event) { return event?.raw || event || {}; }
+  function identificationFor(event, options = {}) {
+    const raw = rawOf(event);
+    const derived = identification.identify(raw, { eventId: event?.id || "",
+      knowledgePacks: options.knowledgePacks });
+    const existing = event?.identification || {};
+    return { ...clone(existing),
+      page: clone(derived.page), pageIdentity: clone(derived.pageIdentity),
+      entityContext: clone(derived.entityContext),
+      frameContext: { ...clone(derived.frameContext || {}),
+        ...clone(existing.frameContext || {}) },
+      control: clone(existing.control || derived.control),
+      controlIdentity: clone(existing.controlIdentity || derived.controlIdentity),
+      action: clone(existing.action || derived.action),
+      actionIdentity: clone(existing.actionIdentity || derived.actionIdentity) };
+  }
   function controlKey(event) { const id = event.identification || {}; const raw = rawOf(event); return id.controlIdentity?.controlIdentity || id.control?.identity?.value || raw.automationId || raw.fieldName || raw.label || event.id; }
   function mechanism(raw) { if (raw.inputSource === "keyboard" || /^(?:key|keydown)$/.test(raw.type)) return "keyboard"; if (raw.type === "click") return "pointer"; if (/pointer/.test(raw.type || "")) return "pointer"; if (/mouse/.test(raw.type || "")) return "mouse"; return "unknown"; }
   function valueModel(raw, identified) {
@@ -19,8 +40,8 @@
     if (identified?.control?.type === "dateInput" && typeof raw.value === "string" && /^\d{4}-\d{2}-\d{2}$/.test(raw.value)) model.format = "iso-date";
     return model;
   }
-  function classify(event) {
-    const raw = rawOf(event); const identified = event.identification || {};
+  function classify(event, options = {}) {
+    const raw = rawOf(event); const identified = identificationFor(event, options);
     const control = identified.control?.type || ""; const type = raw.type || "unknown";
     if (type === "click" && (control === "checkbox" || raw.checked != null)) return ["toggle-change", "verified-checked-state"];
     if (["dialog", "dialog-open"].includes(type)) return ["dialog-open", "observed-dialog-open"];
@@ -41,8 +62,8 @@
     if (type === "click") return ["activation", "generic-activation"];
     return ["unknown", "unmapped-raw-event"];
   }
-  function create(event, kind, reason, sources = [event]) {
-    const raw = rawOf(event); const identified = event.identification || {};
+  function create(event, kind, reason, sources = [event], options = {}) {
+    const raw = rawOf(event); const identified = identificationFor(event, options);
     const sourceIds = sources.map(item => item.id);
     const selection = raw.selectedValue != null || raw.selectedCaption || raw.selectedKey ? { value: clone(raw.selectedValue), caption: raw.selectedCaption || undefined, key: raw.selectedKey || undefined, transientIndex: raw.selectedIndex ?? undefined } : null;
     return freeze({
@@ -60,7 +81,14 @@
         documentId: raw.documentId || undefined, origin: raw.frameOrigin || undefined,
         localSequence: event.source?.sequence ?? raw.sourceSequence ?? undefined },
       pageIdentification: clone({ ...(identified.page || {}),
-        ...(identified.pageIdentity || {}) }),
+        ...(identified.pageIdentity || {}),
+        legacyPageId: raw.pageId || identified.pageIdentity?.pageId || undefined,
+        pageCaption: raw.pageCaption || identified.pageIdentity?.caption || undefined,
+        documentTitle: raw.documentTitle || identified.pageIdentity?.documentTitle || undefined,
+        frameUrl: raw.frameUrl || identified.frameContext?.frameUrl || undefined,
+        topUrl: raw.topUrl || identified.frameContext?.topUrl || undefined,
+        frameDepth: raw.frameDepth ?? identified.frameContext?.depth ?? undefined,
+        controlAddIn: raw.controlAddIn ?? identified.frameContext?.controlAddIn ?? undefined }),
       controlIdentification: clone({ ...(identified.control || {}),
         ...(identified.controlIdentity || {}) }),
       actionIdentification: clone(identified.action || identified.actionIdentity
@@ -94,23 +122,28 @@
     return controlKey(pending.sources[0]) === controlKey(event) &&
       ["input", "change", "focusout"].includes(raw.inputSource || raw.type);
   }
-  function normalizeRecording(recording) {
-    if (cache.has(recording)) return cache.get(recording);
+  function normalizeRecording(recording, options = {}) {
+    const useCache = !options.knowledgePacks;
+    const revision = useCache ? pageIdentification.configurationVersion() : null;
+    const cached = useCache && recording && typeof recording === "object"
+      ? cache.get(recording) : null;
+    if (cached && cached.revision === revision) return cached.result;
     const events = []; let pending = null;
-    const flush = () => { if (!pending) return; const owner = pending.sources.at(-1); events.push(create(owner, pending.kind, pending.reason, pending.sources)); pending = null; };
+    const flush = () => { if (!pending) return; const owner = pending.sources.at(-1); events.push(create(owner, pending.kind, pending.reason, pending.sources, options)); pending = null; };
     for (const event of recording?.events || []) {
-      const [kind, reason] = classify(event);
+      const [kind, reason] = classify(event, options);
       if (!kind) { if (rawOf(event).type === "focus") flush(); continue; }
       if (kind === "value-change") {
         if (canCoalesce(pending, event, kind)) pending.sources.push(event);
         else { flush(); pending = { kind, reason, sources: [event] }; }
-      } else { flush(); events.push(create(event, kind, reason)); }
+      } else { flush(); events.push(create(event, kind, reason, [event], options)); }
     }
     flush();
     const result = freeze({ schemaVersion: SCHEMA_VERSION,
       normalizationVersion: NORMALIZATION_VERSION,
       recordingId: recording?.id, events });
-    if (recording && typeof recording === "object") cache.set(recording, result);
+    if (useCache && recording && typeof recording === "object") cache.set(recording,
+      { revision, result });
     return result;
   }
   function normalizeEvent(value) { if (!value || Number(value.schemaVersion) !== SCHEMA_VERSION) throw new Error("Unsupported normalized event schema."); return freeze(clone(value)); }

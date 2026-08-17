@@ -10,7 +10,7 @@ CAPTURE
 Browser events → Raw Event Persistence → Canonical Recording
 
 INTERPRETATION
-Canonical Recording → BC Identification → Event Normalization
+Canonical Recording → Page Identification → Event Normalization
   → Step Grouping → Semantic Interpretation → generated steps
 
 DOCUMENTATION
@@ -77,6 +77,29 @@ technical-first Page, Control, Action, and Entity identity. Dashboard consumes
 structured identities through compatibility adapters and contains no primary BC
 caption-recognition rules. Caption fallback is language-grouped inside the
 engine and is used only when stronger technical evidence is absent.
+
+`page-identity.js` defines the shared page-field contract used by Canonical
+Recording and BC UI Identification. Legacy `pageId` remains opaque and
+backward-compatible. Only a positive numeric value corroborated by the captured
+Business Central `page` URL parameter becomes `pageObjectId`. Captions and
+semantic entities never become object IDs, and table identity is never inferred
+from page identity. The recorder captures the source URL value and caption but
+assigns no entity, page type, table ID, or record type.
+
+`page-identification-engine.js` is the single page-classification owner. It
+validates and resolves optional Knowledge Pack `pageDefinitions`, applies exact
+ID, scoped caption, runtime, and generic precedence, and returns explicit
+provenance/confidence. Equal-priority semantic conflicts produce diagnostics and
+safe fallback. BC UI Identification delegates to it; Entity Memory consumes its
+resolved entity before legacy caption fallback; Screenshot Intelligence only
+transports resolved context. See
+[Page Identification Engine](PAGE_IDENTIFICATION_ENGINE.md).
+
+Unknown standard, AppSource, tenant, customer, Aptean, frame, and control-add-in
+pages follow the same pipeline. They receive a stable non-semantic page context
+and remain eligible for recording, screenshots, Review generation, document
+generation, Workspace use, and export. Historical recordings are enriched in
+memory and their persisted Canonical Recording is not rewritten.
 
 ## Event Normalization boundary
 

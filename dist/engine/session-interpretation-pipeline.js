@@ -27,6 +27,14 @@ function (semantic, knowledge, refs) {
   function context(action, sourceEvents) {
     const primary = sourceEvents.at(-1) || {};
     return { currentPageCaption: action.pageCaption || primary.pageCaption || "",
+      currentPageIdentity: action.pageIdentity ||
+        primary.identification?.pageIdentity?.pageIdentity || "",
+      currentPageObjectId: action.pageObjectId ||
+        primary.identification?.pageIdentity?.pageObjectId || "",
+      pageIdentificationSource: action.pageIdentificationSource ||
+        primary.identification?.pageIdentity?.source || "",
+      pageIdentificationConfidence: action.pageConfidence ??
+        primary.identification?.pageIdentity?.confidence ?? null,
       previousPageCaption: primary.context?.previousPageCaption || "",
       currentEntity: action.entity || primary.identification?.pageIdentity?.entity || "",
       followingEntity: primary.context?.followingEntity || "",
@@ -49,7 +57,11 @@ function (semantic, knowledge, refs) {
       taskNo: index + 1, taskType: action.actionType || "Unclassified",
       semanticAction: action.actionType || "", semanticActionModel: action,
       instruction: action.displayText || "", description: action.displayText || "",
-      pageId: action.pageId || "", pageCaption: action.pageCaption || "",
+      pageId: action.pageId || "", pageObjectId: action.pageObjectId || "",
+      pageIdentity: action.pageIdentity || "",
+      pageCaption: action.pageCaption || "",
+      pageIdentification: action.pageIdentification ?
+        { ...action.pageIdentification } : {},
       actionCaption: action.actionCaption || "", fieldCaption: action.targetField || "",
       selectedCaption: action.selectedValue || "", value: action.selectedValue ?? "",
       instructionValue: action.selectedValue ?? "", sourceEventNos: eventNos,
@@ -93,7 +105,9 @@ function (semantic, knowledge, refs) {
           compatibilityMode: "legacy-placeholder-dominated" };
       }
     }
-    const entityNodes = services.entityMemory?.build(input.events || []) || [];
+    const entityNodes = services.entityMemory?.build(
+      input.normalizedEvents?.length ? input.normalizedEvents : input.events || []
+    ) || [];
     const sessionGraph = services.sessionGraph?.build(input.session, tasks,
       entityNodes) || { nodes: [], edges: [] };
     const confidenceResult = services.confidence?.evaluate(tasks, sessionGraph) ||
