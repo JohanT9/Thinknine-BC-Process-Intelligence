@@ -14,6 +14,8 @@
   choosing search-result evidence, bounded by search start and result selection.
 - Include the recorded search phrase in Search and Open instructions and present
   it as a bold value while keeping Business Central labels in quotation marks.
+- Preserve structured field/value roles for already consolidated item-number
+  steps so values such as `30043` render bold in Document View and Word.
 - Expanded Document View to fill the available review viewport and removed the
   competing fixed-height calculation that could leave half the screen unused.
 - Let the document canvas shrink beside guidance without forcing a horizontal

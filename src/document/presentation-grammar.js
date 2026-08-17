@@ -55,8 +55,10 @@
   }
 
   function presentationFor(action, fallbackText) {
-    const value = String(action?.selectedValue ?? "").trim();
-    const field = String(action?.targetField ?? "").trim();
+    const actionType = action?.actionType || action?.taskType;
+    const value = String(action?.selectedValue ?? action?.instructionValue ??
+      action?.value ?? "").trim();
+    const field = String(action?.targetField ?? action?.fieldCaption ?? "").trim();
     const selectLabels = {
       SelectCustomer: field || "Kund",
       SelectItem: field || "Artikelnummer",
@@ -64,25 +66,25 @@
       SelectLocation: field || "Lagerställe",
       SelectDimension: field || "Dimension"
     };
-    if (selectLabels[action?.actionType] && value) {
-      return sentence(run("Välj ", "action"), quoted(selectLabels[action.actionType]),
+    if (selectLabels[actionType] && value) {
+      return sentence(run("Välj ", "action"), quoted(selectLabels[actionType]),
         run(" "), run(value, "value"), run("."));
     }
     if (["EnterQuantity", "EnterItemNumber", "SelectDate", "EnterFieldValue"].includes(
-      action?.actionType) && value && field) {
+      actionType) && value && field) {
       return sentence(run("Ange ", "action"), run(value, "value"),
         run(" i "), quoted(field), run("."));
     }
-    if (["SelectOption", "SelectLookupValue"].includes(action?.actionType) &&
+    if (["SelectOption", "SelectLookupValue"].includes(actionType) &&
         value) {
       return field
         ? sentence(run("Välj ", "action"), quoted(field), run(" "),
           run(value, "value"), run("."))
         : sentence(run("Välj ", "action"), run(value, "value"), run("."));
     }
-    if (["EnableCheckbox", "DisableCheckbox"].includes(action?.actionType) &&
+    if (["EnableCheckbox", "DisableCheckbox"].includes(actionType) &&
         field) {
-      return sentence(run(action.actionType === "EnableCheckbox"
+      return sentence(run(actionType === "EnableCheckbox"
         ? "Aktivera " : "Inaktivera ", "action"), quoted(field), run("."));
     }
     const runs = legacyRuns(fallbackText);
@@ -91,7 +93,9 @@
 
   function processBlock(block, action) {
     const result = clone(block);
-    const blockAction = result.kind === "step" ? result.semanticAction || action : action;
+    const blockAction = result.kind === "step"
+      ? result.semanticAction || result.interaction || action
+      : action;
     if (result.kind === "paragraph" && typeof result.text === "string") {
       const presentation = presentationFor(blockAction, result.text);
       result.text = presentation.text;
@@ -101,7 +105,7 @@
       result.blocks = result.blocks.map(child => processBlock(
         child,
         result.kind === "step" && child.kind === "paragraph"
-          ? blockAction
+          ? child.preserveUserText ? null : blockAction
           : action
       ));
     }
