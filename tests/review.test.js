@@ -110,5 +110,12 @@ assert.strictEqual(review.hasGeneratedLookupSearchLeak(lookupLeak), true);
 assert.strictEqual(review.hasGeneratedLookupSearchLeak({ tasks:
   lookupLeak.tasks.map((task, index) => index ? task : { ...task,
     userComment: "Behåll" }) }), false);
+const itemLookupLeak = { tasks: [{ taskType: "EnterFieldValue",
+  fieldCaption: "Sortera efter Nr", instruction: "Ange 30043." }, {
+  taskType: "RunAction",
+  instruction: 'Välj "Nr, sorterade i Stigande order Välj posten "30043"".'
+}, { taskType: "EnterFieldValue", fieldCaption: "Sortera efter Nr",
+  instruction: "Ange 30043." }] };
+assert.strictEqual(review.hasGeneratedLookupSearchLeak(itemLookupLeak), true);
 
 console.log("Review Studio tests passed.");

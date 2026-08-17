@@ -968,12 +968,25 @@
       task?.userComment || task?.stepOverride || task?.manualStepId ||
       task?.provenance === "manual");
     if (consultantOwned) return false;
-    return tasks.some((task, index) =>
+    const embeddedSelection = value =>
+      /(?:välj posten|select record)\s+["“][^"”]+["”]/iu.test(String(
+        value?.instruction || value?.description || ""));
+    const lookupPair = tasks.some((task, index) =>
       ["SelectCustomer", "SelectItem", "SelectVendor", "SelectLocation",
         "SelectDimension"].includes(task?.taskType) &&
-      /(?:välj posten|select record)\s+["“][^"”]+["”]/iu.test(String(
-        tasks[index + 1]?.instruction || tasks[index + 1]?.description || ""))
+      embeddedSelection(tasks[index + 1])
     );
+    const itemTriplet = tasks.some((task, index) => {
+      const selected = tasks[index + 1];
+      const result = tasks[index + 2];
+      const sortingNumber = value => /(?:sortera efter|sort by)\s+nr\.?/iu
+        .test(String(value?.fieldCaption || value?.instruction || ""));
+      return ["EnterFieldValue", "ChangeField"].includes(task?.taskType) &&
+        sortingNumber(task) && embeddedSelection(selected) &&
+        ["EnterFieldValue", "ChangeField"].includes(result?.taskType) &&
+        sortingNumber(result);
+    });
+    return lookupPair || itemTriplet;
   }
 
   return {

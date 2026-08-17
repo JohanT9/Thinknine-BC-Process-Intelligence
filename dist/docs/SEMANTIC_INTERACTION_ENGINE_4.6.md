@@ -25,6 +25,12 @@ adapter extracts the quoted record value from the embedded selection phrase and
 consolidates it with the preceding lookup step; the sort/search wording is not a
 separate documentation action.
 
+The legacy item-number shape `EnterFieldValue → embedded RunAction selection →
+repeated EnterFieldValue` is likewise one interaction. When the selected and
+resulting values match, it becomes `Ange <value> i Artikel Nr`; the mechanical
+`Sortera efter Nr` controls are not exposed as separate steps. This compatibility
+rule does not replace or reinterpret structured modern `Select` interactions.
+
 Instructions with `user-edited` provenance pass through semantic rules unchanged.
 Reset restores the latest generated semantic instruction.
 

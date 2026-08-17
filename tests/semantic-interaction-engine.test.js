@@ -39,6 +39,17 @@ const embeddedCustomerNumber = only([{
   instruction: 'Välj "Nr, sorterade i Stigande order Välj posten "905"".'
 }], "SelectCustomer", "Välj kund **905**.");
 assert.strictEqual(embeddedCustomerNumber.selectedValue, "905");
+const itemNumberEntry = only([{
+  taskId: "item-search", taskType: "EnterFieldValue",
+  fieldCaption: "Sortera efter Nr", instructionValue: "30043",
+  instruction: 'Ange 30043 i "Sortera efter Nr".'
+}, { taskId: "item-row", taskType: "RunAction",
+  instruction: 'Välj "Nr, sorterade i Stigande order Välj posten "30043"".'
+}, { taskId: "item-result", taskType: "EnterFieldValue",
+  fieldCaption: "Sortera efter Nr", instructionValue: "30043",
+  instruction: 'Ange 30043 i "Sortera efter Nr".'
+}], "EnterItemNumber", "Ange __30043__ i **Artikel Nr**.");
+assert.strictEqual(itemNumberEntry.inputInteractionCount, 3);
 assert.deepStrictEqual(customer.sourceEventNos, [1, 2]);
 assert.deepStrictEqual(customer.screenshotRefs, ["lookup.png", "selected.png"]);
 assert.deepStrictEqual(customer.annotationRefs, [{ annotationId: "ann-1" }]);

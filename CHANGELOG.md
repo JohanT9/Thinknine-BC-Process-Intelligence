@@ -17,6 +17,9 @@
 - Recognize Business Central accessibility captions where `Välj posten "905"`
   is embedded after sort metadata, and safely regenerate untouched Reviews that
   previously split this into search-text and row-action steps.
+- Consolidate the evidenced legacy item-number triplet (filter entry, embedded
+  row action, repeated result) into `Ange 30043 i Artikel Nr` while leaving
+  structured lookup selections unchanged.
 
 ## 4.6.0 - Architecture, Chromium readiness, and dogfooding baseline
 

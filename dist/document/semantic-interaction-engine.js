@@ -318,6 +318,37 @@
     return deepFreeze(rule);
   }
 
+  function itemNumberLookupEntryRule() {
+    const sortingNumber = value => /^(?:sortera efter|sort by)\s+nr\.?$/iu
+      .test(controlCaption(value));
+    const rule = {
+      ruleId: "item-number-lookup-entry",
+      priority: 97,
+      match(context) {
+        const current = context.interactions[context.index];
+        const selected = context.interactions[context.index + 1];
+        const result = context.interactions[context.index + 2];
+        const selectedValue = selectedRecordValue(selected);
+        return ["EnterFieldValue", "ChangeField"].includes(current?.taskType) &&
+          sortingNumber(current) && selected?.taskType === "RunAction" &&
+          Boolean(selectedValue) &&
+          ["EnterFieldValue", "ChangeField"].includes(result?.taskType) &&
+          sortingNumber(result) && meaningfulValue(result) === selectedValue;
+      },
+      consolidate(context) {
+        const values = context.interactions.slice(context.index,
+          context.index + 3);
+        const selectedValue = selectedRecordValue(values[1]);
+        return { consumed: 3, action: action(rule, values, {
+          actionType: "EnterItemNumber",
+          displayText: `Ange __${selectedValue}__ i **Artikel Nr**.`,
+          selectedValue, targetField: "Artikel Nr"
+        }) };
+      }
+    };
+    return deepFreeze(rule);
+  }
+
   const CUSTOMER = /kundens namn|kundnr|customer name|customer\s*no\.?/iu;
   const ITEM = /artikelnr|artikelnummer|item\s*no\.?/iu;
   const VENDOR = /leverantör(?:ens namn|snr|snummer)?|vendor(?:\s*name|\s*no\.?)?/iu;
@@ -328,6 +359,7 @@
     selectionRule({ ruleId: "customer-selection", priority: 100,
       actionType: "SelectCustomer", fieldPattern: CUSTOMER,
       verb: "Välj kund", targetField: "Kund", requireValue: true }),
+    itemNumberLookupEntryRule(),
     selectionRule({ ruleId: "item-selection", priority: 95,
       actionType: "SelectItem", fieldPattern: ITEM, verb: "Välj artikel",
       targetField: "Artikelnummer", consumeFocusAfter: true,
