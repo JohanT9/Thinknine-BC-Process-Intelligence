@@ -44,6 +44,7 @@ table{width:100%;border-collapse:collapse}th,td{text-align:left;padding:9px;bord
 .workspace-tabs{display:flex;gap:6px;margin-top:12px;border-bottom:1px solid #d8dee5}
 .workspace-tabs button{margin:0 0 -1px;border-radius:5px 5px 0 0;background:#e5e7eb;color:#374151}
 .workspace-tabs button[aria-selected="true"]{background:white;color:#0f4c81;border:1px solid #d8dee5;border-bottom-color:white}
+.review-zoom-toolbar{display:flex;align-items:center;gap:4px;margin-top:12px}.review-zoom-toolbar button{margin:0;min-height:36px}.review-zoom-value{min-width:48px;text-align:center;font-variant-numeric:tabular-nums}
 .review-toolbar{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px;align-items:center}
 .review-toolbar-group{display:flex;gap:4px;padding-right:10px;border-right:1px solid #d8dee5}
 .review-toolbar-group:last-child{padding-right:0;border-right:0}
@@ -95,6 +96,7 @@ table{width:100%;border-collapse:collapse}th,td{text-align:left;padding:9px;bord
 .review-card.compact .review-actions label{margin:0;align-self:center}
 .review-footer{padding:16px;border-top:1px solid #d8dee5;display:flex;justify-content:space-between;background:#f8fafc}
 #reviewWorkspacePanel{min-height:0;flex:1;overflow:auto;overscroll-behavior:contain}
+.review-zoom-content{zoom:var(--review-zoom,1)}
 .review-shell>[role="tabpanel"][hidden]{display:none!important}
 .document-workspace-panel{--document-zoom:1;background:#e8edf1;padding:0;height:calc(100vh - 190px);min-height:500px;display:flex;flex-direction:column;overflow:hidden}
 .document-toolbar{position:sticky;top:0;z-index:2;display:flex;flex-wrap:wrap;align-items:center;gap:8px;padding:10px 14px;background:rgba(255,255,255,.97);border-bottom:1px solid #cbd5df}
@@ -135,7 +137,7 @@ table{width:100%;border-collapse:collapse}th,td{text-align:left;padding:9px;bord
 .document-view-settings select{width:100%}
 .review-shell.document-workspace-mode .review-header{flex:0 0 auto}
 .review-shell.document-workspace-mode .document-workspace-panel{height:auto;min-height:0;flex:1}
-.review-shell.document-workspace-mode .review-toolbar,.review-shell.document-workspace-mode .review-toolbar-secondary,.review-shell.document-workspace-mode .review-progress,.review-shell.document-workspace-mode #reviewStatus{display:none}
+.review-shell.document-workspace-mode .review-zoom-toolbar,.review-shell.document-workspace-mode .review-toolbar,.review-shell.document-workspace-mode .review-toolbar-secondary,.review-shell.document-workspace-mode .review-progress,.review-shell.document-workspace-mode #reviewStatus{display:none}
 .annotation-editor{padding:18px}
 .annotation-editor-sticky{position:sticky;top:var(--review-header-height,0px);z-index:3;background:white;margin:-18px -18px 0;padding:18px 18px 1px}
 .annotation-editor-header{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:12px}
@@ -402,6 +404,14 @@ table{width:100%;border-collapse:collapse}th,td{text-align:left;padding:9px;bord
         <button id="documentWorkspaceTab" role="tab" aria-selected="false"
           aria-controls="documentWorkspacePanel" tabindex="-1">Dokumentvy</button>
       </div>
+      <div id="reviewZoomToolbar" class="review-zoom-toolbar" role="toolbar"
+        aria-label="Zooma granskning" aria-controls="reviewZoomContent">
+        <button id="reviewResetZoom" class="secondary">100%</button>
+        <button id="reviewZoomOut" class="secondary" aria-label="Zooma ut granskning">−</button>
+        <output id="reviewZoomValue" class="review-zoom-value"
+          aria-label="Aktuell zoom i granskning" aria-live="polite">100%</output>
+        <button id="reviewZoomIn" class="secondary" aria-label="Zooma in granskning">+</button>
+      </div>
       <div id="reviewToolbar" class="review-toolbar" role="toolbar" aria-label="Redigeringskommandon">
         <div class="review-toolbar-group" role="group" aria-label="Historik">
           <button id="undoReview" data-review-command="undo" data-review-toolbar-item class="secondary" aria-keyshortcuts="Control+Z Meta+Z" disabled>Ångra</button>
@@ -447,6 +457,7 @@ table{width:100%;border-collapse:collapse}th,td{text-align:left;padding:9px;bord
     </header>
     <section id="reviewWorkspacePanel" role="tabpanel"
       aria-labelledby="reviewWorkspaceTab">
+      <div id="reviewZoomContent" class="review-zoom-content">
       <nav id="reviewHierarchy" aria-label="Dokumenthierarki"></nav>
       <main
         id="reviewList"
@@ -497,6 +508,7 @@ table{width:100%;border-collapse:collapse}th,td{text-align:left;padding:9px;bord
         <span id="reviewFooterText" role="status" aria-live="polite"></span>
         <button id="saveReviewBottom" class="primary">Spara</button>
       </footer>
+      </div>
     </section>
     <main id="documentWorkspacePanel" class="document-workspace-panel"
       role="tabpanel" aria-labelledby="documentWorkspaceTab" tabindex="0" hidden>

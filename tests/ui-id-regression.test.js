@@ -33,6 +33,17 @@ assert.ok(
 );
 
 assert.ok(
+  html.includes('id="reviewZoomToolbar" class="review-zoom-toolbar" role="toolbar"') &&
+    html.includes('id="reviewResetZoom"') && html.includes('id="reviewZoomOut"') &&
+    html.includes('id="reviewZoomValue"') && html.includes('id="reviewZoomIn"') &&
+    html.includes('.review-zoom-content{zoom:var(--review-zoom,1)}') &&
+    js.includes('const REVIEW_ZOOM_MIN = 50;') &&
+    js.includes('const REVIEW_ZOOM_MAX = 200;') &&
+    js.includes('function changeReviewZoom(value)'),
+  "Review must provide persistent zoom controls that scale all review content together."
+);
+
+assert.ok(
   html.includes(".review-overlay{position:fixed;inset:0") &&
     html.includes("padding:24px;overflow:hidden}") &&
     html.includes(".document-workspace-viewport{padding:22px;min-height:0;flex:1;overflow:auto;overscroll-behavior:contain}"),

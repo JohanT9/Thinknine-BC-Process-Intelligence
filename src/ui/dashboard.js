@@ -3422,6 +3422,28 @@ let activeReviewSelection = globalThis.T9ReviewSelection.create();
 let activeReviewEdit = null;
 let reviewReturnFocus = null;
 let reviewLayoutState = globalThis.T9ReviewLayout.create();
+const REVIEW_ZOOM_STORAGE_KEY = "t9.reviewWorkspace.zoom";
+const REVIEW_ZOOM_MIN = 50;
+const REVIEW_ZOOM_MAX = 200;
+const REVIEW_ZOOM_STEP = 10;
+function normalizedReviewZoom(value) {
+  if (value === null || value === undefined || value === "") return 100;
+  const numeric = Number(value);
+  const rounded = Number.isFinite(numeric)
+    ? Math.round(numeric / REVIEW_ZOOM_STEP) * REVIEW_ZOOM_STEP
+    : 100;
+  return Math.max(REVIEW_ZOOM_MIN, Math.min(REVIEW_ZOOM_MAX, rounded));
+}
+function loadReviewZoom() {
+  try {
+    return normalizedReviewZoom(
+      globalThis.localStorage?.getItem(REVIEW_ZOOM_STORAGE_KEY)
+    );
+  } catch {
+    return 100;
+  }
+}
+let reviewZoom = loadReviewZoom();
 let annotationEditorState = null;
 let annotationChangesPending = false;
 let annotationEditorBaseline = null;
@@ -4055,6 +4077,35 @@ function saveDocumentViewPreferences() {
     globalThis.localStorage,
     documentViewState
   );
+}
+
+function applyReviewZoom(options = {}) {
+  const panel = $("reviewWorkspacePanel");
+  const focalRatio = (panel.scrollTop + panel.clientHeight / 2) /
+    Math.max(1, panel.scrollHeight);
+  reviewZoom = normalizedReviewZoom(reviewZoom);
+  panel.style.setProperty("--review-zoom", String(reviewZoom / 100));
+  $("reviewZoomValue").textContent = `${reviewZoom}%`;
+  $("reviewZoomOut").disabled = reviewZoom <= REVIEW_ZOOM_MIN;
+  $("reviewZoomIn").disabled = reviewZoom >= REVIEW_ZOOM_MAX;
+  if (options.preservePosition !== false) {
+    panel.scrollTop = Math.max(
+      0,
+      focalRatio * panel.scrollHeight - panel.clientHeight / 2
+    );
+  }
+  if (options.persist !== false) {
+    try {
+      globalThis.localStorage?.setItem(REVIEW_ZOOM_STORAGE_KEY, String(reviewZoom));
+    } catch {
+      // Zoom remains available for the current dashboard session.
+    }
+  }
+}
+
+function changeReviewZoom(value) {
+  reviewZoom = normalizedReviewZoom(value);
+  applyReviewZoom();
 }
 
 function applyDocumentView(options = {}) {
@@ -5381,6 +5432,7 @@ async function openReview(session) {
   $("documentWorkspaceTab").disabled = false;
   applyWorkspaceState();
   renderReview();
+  applyReviewZoom({ persist: false, preservePosition: false });
   $("closeReview").focus();
   updateFilenamePreview();
   show("");
@@ -5568,6 +5620,14 @@ $("workspaceTabs").addEventListener("keydown", event => {
   if (workspace === workspaceState.active) return;
   event.preventDefault();
   switchWorkspace(workspace, true);
+});
+
+$("reviewResetZoom").addEventListener("click", () => changeReviewZoom(100));
+$("reviewZoomOut").addEventListener("click", () => {
+  changeReviewZoom(reviewZoom - REVIEW_ZOOM_STEP);
+});
+$("reviewZoomIn").addEventListener("click", () => {
+  changeReviewZoom(reviewZoom + REVIEW_ZOOM_STEP);
 });
 
 $("documentFitWidth").addEventListener("click", () => {
