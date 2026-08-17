@@ -12,6 +12,8 @@
   Review content scrolling inside the full-screen dialog.
 - Fixed ZIP export after the Composition Root migration by reading the session
   graph and final business tasks from the interpreted session model.
+- Restored Review as the visible initial workspace by ensuring a hidden tab
+  panel cannot be displayed by its flex layout declaration.
 - Fixed Document Library opening for recordings whose compatibility projection
   correctly omits empty Canonical `sourceEventIds`.
 - Kept legacy evidence source-less instead of fabricating Canonical IDs, while
