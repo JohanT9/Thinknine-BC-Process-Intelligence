@@ -1037,6 +1037,32 @@
       ].filter(Boolean).join(" ")));
   }
 
+  function hasGeneratedSearchEvidenceDrift(review, generatedTasks = []) {
+    const tasks = Array.isArray(review?.tasks) ? review.tasks : [];
+    const consultantOwned = tasks.some(task => task?.approved ||
+      task?.userComment || task?.stepOverride || task?.manualStepId ||
+      task?.provenance === "manual");
+    const annotated = (review?.annotations?.screenshotSets || [])
+      .some(set => Array.isArray(set?.items) && set.items.length > 0);
+    if (consultantOwned || annotated) return false;
+
+    const generatedSearchTasks = generatedTasks.filter(task =>
+      task?.taskType === "SearchAndOpenPage");
+    let searchIndex = 0;
+    return tasks.some(task => {
+      if (task?.taskType !== "SearchAndOpenPage") return false;
+      const ordinal = searchIndex;
+      searchIndex += 1;
+      const generated = generatedTasks.find(candidate =>
+        candidate?.taskId && candidate.taskId === task.taskId) ||
+        generatedSearchTasks[ordinal];
+      const selected = value => value?.selectedScreenshotAssetId ||
+        value?.screenshot || value?.screenshots?.[0] || "";
+      return Boolean(generated && selected(task) && selected(generated) &&
+        selected(task) !== selected(generated));
+    });
+  }
+
   return {
     createReview,
     normalizeReview: annotations.normalizeReview,
@@ -1085,6 +1111,7 @@
     hasGeneratedLookupSearchLeak,
     hasGeneratedMenuPathLeak,
     hasGeneratedCloseScreenshotLeak,
-    hasGeneratedSearchResultTypeLeak
+    hasGeneratedSearchResultTypeLeak,
+    hasGeneratedSearchEvidenceDrift
   };
 });

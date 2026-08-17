@@ -7,6 +7,9 @@
   screenshot where that result is visible instead of the loading/navigation state.
 - Recognize the trailing Business Central result-row icon when repairing existing
   automatically generated search steps.
+- Refresh stale system-selected evidence on untouched generated search steps so
+  the completed result list (for example `screenshots/000008.png`) replaces the
+  earlier loading-state image; preserve manual selections and annotations.
 - Expanded Document View to fill the available review viewport and removed the
   competing fixed-height calculation that could leave half the screen unused.
 - Let the document canvas shrink beside guidance without forcing a horizontal

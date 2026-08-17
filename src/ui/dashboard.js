@@ -5395,7 +5395,9 @@ async function openReview(session) {
       globalThis.T9Review.hasGeneratedLookupSearchLeak(existing.review) ||
       globalThis.T9Review.hasGeneratedMenuPathLeak(existing.review) ||
       globalThis.T9Review.hasGeneratedCloseScreenshotLeak(existing.review) ||
-      globalThis.T9Review.hasGeneratedSearchResultTypeLeak(existing.review)) &&
+      globalThis.T9Review.hasGeneratedSearchResultTypeLeak(existing.review) ||
+      globalThis.T9Review.hasGeneratedSearchEvidenceDrift(existing.review,
+        activeReviewModel.businessTasks)) &&
     activeReviewModel.businessTasks.length > 0;
   activeReview = existing.review && !replacePlaceholderReview
     ? globalThis.T9Review.normalizeReview({

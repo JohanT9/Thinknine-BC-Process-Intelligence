@@ -152,5 +152,21 @@ assert.strictEqual(review.hasGeneratedSearchResultTypeLeak(searchResultTypeLeak)
   true);
 assert.strictEqual(review.hasGeneratedSearchResultTypeLeak({ tasks:
   searchResultTypeLeak.tasks.map(task => ({ ...task, approved: true })) }), false);
+const staleSearchEvidence = { tasks: [{ taskId: "search-1",
+  taskType: "SearchAndOpenPage", screenshot: "loading.png" }] };
+const freshSearchEvidence = [{ taskId: "search-1",
+  taskType: "SearchAndOpenPage", screenshot: "screenshots/000008.png" }];
+assert.strictEqual(review.hasGeneratedSearchEvidenceDrift(staleSearchEvidence,
+  freshSearchEvidence), true);
+assert.strictEqual(review.hasGeneratedSearchEvidenceDrift({
+  ...staleSearchEvidence,
+  annotations: { screenshotSets: [{ screenshotRef: "loading.png",
+    items: [{ annotationId: "keep" }] }] }
+}, freshSearchEvidence), false, "annotated screenshots must remain consultant-owned");
+assert.strictEqual(review.hasGeneratedSearchEvidenceDrift({ tasks:
+  staleSearchEvidence.tasks.map(task => ({ ...task,
+    stepOverride: { screenshotOverride: {
+      selectedScreenshotAssetId: "manual.png" } } }))
+}, freshSearchEvidence), false, "manual screenshot choices must be preserved");
 
 console.log("Review Studio tests passed.");
