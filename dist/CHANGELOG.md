@@ -5,6 +5,8 @@
 - Treat Business Central's `Sortera efter`/`Sort by` text as lookup state rather
   than part of a field caption, so instructions use `Nr` instead of
   `Sortera efter Nr`.
+- Repair that caption in previously saved untouched generated Review steps when
+  they are opened, while preserving manual steps and explicit step overrides.
 - Added manual editing of the document-level expected result in Granskning,
   including autosave, undo/redo, reset to the standard text, and consistent
   output in Dokumentvy and Word.

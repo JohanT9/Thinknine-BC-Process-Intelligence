@@ -117,6 +117,29 @@ const itemLookupLeak = { tasks: [{ taskType: "EnterFieldValue",
 }, { taskType: "EnterFieldValue", fieldCaption: "Sortera efter Nr",
   instruction: "Ange 30043." }] };
 assert.strictEqual(review.hasGeneratedLookupSearchLeak(itemLookupLeak), true);
+const repairedExistingSortingStep = review.normalizeTasks([{
+  taskId: "legacy-sorted-number", taskType: "EnterFieldValue",
+  fieldCaption: "Sortera efter Nr", value: "30043",
+  instruction: 'Ange 30043 i "Sortera efter Nr".', provenance: "generated",
+  derivedStep: { instruction: 'Ange 30043 i "Sortera efter Nr".' },
+  semanticActionModel: { targetField: "Sortera efter Nr",
+    displayText: 'Ange __30043__ i **Sortera efter Nr**.' }
+}])[0];
+assert.strictEqual(repairedExistingSortingStep.instruction,
+  'Ange 30043 i "Nr".');
+assert.strictEqual(repairedExistingSortingStep.fieldCaption, "Nr");
+assert.strictEqual(repairedExistingSortingStep.derivedStep.instruction,
+  'Ange 30043 i "Nr".');
+assert.strictEqual(repairedExistingSortingStep.semanticActionModel.targetField,
+  "Nr");
+assert.strictEqual(repairedExistingSortingStep.stepOverride, null);
+const preservedManualSortingStep = review.normalizeTasks([{
+  taskId: "manual-sorted-number", taskType: "EnterFieldValue",
+  fieldCaption: "Sortera efter Nr", instruction: 'Behåll "Sortera efter Nr".',
+  provenance: "manual"
+}])[0];
+assert.strictEqual(preservedManualSortingStep.instruction,
+  'Behåll "Sortera efter Nr".');
 const menuPathLeak = { tasks: [
   { taskType: "RunAction", actionCaption: "Välj rad" },
   { taskType: "RunAction", actionCaption: "Relaterad information" },

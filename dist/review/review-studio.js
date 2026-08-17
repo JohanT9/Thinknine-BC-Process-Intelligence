@@ -73,6 +73,45 @@
     return review;
   }
 
+  function stripSortingState(value) {
+    return String(value || "").trim()
+      .replace(/^(?:sortera efter|sort by)\s+/iu, "");
+  }
+
+  function repairGeneratedSortingCaption(task, instruction) {
+    const unchanged = () => ({ repaired: false, instruction,
+      originalInstruction: task.originalInstruction,
+      fieldCaption: task.fieldCaption,
+      derivedStep: task.derivedStep, semanticActionModel: task.semanticActionModel });
+    if (task.stepOverride || task.manualStepId || task.provenance === "manual") {
+      return unchanged();
+    }
+    const fieldCaption = String(task.fieldCaption || "").trim();
+    const businessCaption = stripSortingState(fieldCaption);
+    if (!businessCaption || businessCaption === fieldCaption ||
+        !["EnterFieldValue", "ChangeField"].includes(task.taskType)) {
+      return unchanged();
+    }
+    const repairText = value => String(value || "").replace(
+      /(?:sortera efter|sort by)\s+([^"”*]+)(?=["”]|\*\*)/giu,
+      (_match, caption) => caption.trim()
+    );
+    const repairedInstruction = repairText(instruction);
+    if (repairedInstruction === instruction) return unchanged();
+    return {
+      repaired: true,
+      instruction: repairedInstruction,
+      originalInstruction: repairText(task.originalInstruction || instruction),
+      fieldCaption: businessCaption,
+      derivedStep: task.derivedStep ? { ...clone(task.derivedStep),
+        instruction: repairText(task.derivedStep.instruction) } : task.derivedStep,
+      semanticActionModel: task.semanticActionModel
+        ? { ...clone(task.semanticActionModel), targetField: businessCaption,
+          displayText: repairText(task.semanticActionModel.displayText) }
+        : task.semanticActionModel
+    };
+  }
+
   function normalizeTasks(tasks, options = {}) {
     const usedIds = new Set();
     return (tasks || []).map((task, index) => {
@@ -84,12 +123,14 @@
         suffix += 1;
       }
       usedIds.add(taskId);
-      const instruction = textFormat.quoteEmphasis(
+      let instruction = textFormat.quoteEmphasis(
         task.instruction || task.description || "Utför uppgiften."
       );
+      const sortingRepair = repairGeneratedSortingCaption(task, instruction);
+      instruction = sortingRepair.instruction;
       const screenshots = task.screenshots?.length
         ? [...task.screenshots] : task.screenshot ? [task.screenshot] : [];
-      const derivedStep = task.derivedStep || {
+      const derivedStep = sortingRepair.derivedStep || {
         title: task.title || task.stepTitle || "",
         instruction: textFormat.quoteEmphasis(
           task.originalInstruction || instruction
@@ -100,7 +141,7 @@
         visibility: "visible"
       };
       let stepOverride = stepEditor.normalizeOverride(task.stepOverride, task);
-      if (!stepOverride && task.originalInstruction &&
+      if (!stepOverride && !sortingRepair.repaired && task.originalInstruction &&
           textFormat.quoteEmphasis(task.originalInstruction) !== instruction) {
         stepOverride = stepEditor.edit(
           { ...task, taskId, derivedStep }, "instruction", instruction,
@@ -122,11 +163,14 @@
         deleted: Boolean(task.deleted),
         userComment: task.userComment || "",
         originalInstruction: textFormat.quoteEmphasis(
+          sortingRepair.originalInstruction ||
           task.originalInstruction ||
           task.instruction ||
           ""
         ),
         instruction,
+        fieldCaption: sortingRepair.fieldCaption,
+        semanticActionModel: sortingRepair.semanticActionModel,
         screenshots,
         derivedStep,
         stepOverride,
