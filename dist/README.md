@@ -23,8 +23,11 @@ is redelivery; rapid, visually identical interactions remain distinct.
 ## BC UI Identification
 
 Persisted Raw Events receive renderer-neutral Page, Control, Action, and Entity
-identity before derived mechanics. Stable BC and automation IDs outrank a small,
-engine-owned localized-caption fallback; dashboard only consumes the result.
+identity before derived mechanics. Verified Business Central Page Object IDs
+outrank exact localized aliases supplied by Knowledge Packs. Unknown standard,
+Aptean, AppSource, tenant, customer, and control-add-in pages remain recordable
+through Review, Workspace, and export without fabricated entity or table data.
+The Page Identification Engine owns resolution; dashboard only orchestrates.
 
 ## Event Normalization 2.0.0
 

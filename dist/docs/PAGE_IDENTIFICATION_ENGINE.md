@@ -190,3 +190,34 @@ engine-owned services; it retains only loading, diagnostics, and UI
 orchestration. Existing Knowledge Pack `pagePatterns` remain business-semantic
 constraints for action/field rules and are not consulted as a second page
 registry.
+
+## Verified registry coverage
+
+| Provider | Verified page definitions | Functional coverage |
+| --- | --- | --- |
+| `bc-core` | Customer Card (21), Item Card (30) | Core master-data cards |
+| `bc-sales` | Sales Order (42) | Sales documents |
+| `bc-purchase` | Purchase Order (50) | Purchase documents |
+| `bc-warehouse` | None | Semantic action rules only |
+| `bc-manufacturing` | None | Semantic action rules only |
+| `aptean-fb` | None | Existing semantic action/field rules only |
+| Customer packs | None bundled | Local explicit format and override contract |
+
+English, Swedish, and Danish exact aliases cover the four verified Microsoft
+definitions. The release test's synthetic Aptean definition verifies the
+evidence-gated exact-ID contract only; it is not shipped as registry data.
+
+## Release verification and performance
+
+Seventeen representative two-page flows cover customer, sales, purchase,
+warehouse, manufacturing, item tracking, three locales, known/unknown Aptean,
+unknown customer extensions, missing IDs, frames/control add-ins, legacy
+semantic `pageId`, and known/unknown transitions. Every flow verifies immutable
+raw evidence, Review generation, semantic boundary preservation, screenshot
+selection, Document Workspace, Word export, and diagnostic privacy.
+
+On the release-review workstation, validation/configuration of the seven-pack
+test registry took approximately 1 ms and 10,000 repeated configured exact-ID
+resolutions took approximately 20 ms. Runtime resolution uses the immutable
+engine-owned configured compilation. Explicit test-supplied pack arrays are
+compiled per call by design. No new cache was justified.

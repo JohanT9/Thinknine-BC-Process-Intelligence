@@ -2,6 +2,16 @@
 
 ## 4.6.0 - Legacy documentation opening compatibility
 
+- Completed the Page Identification release review across 17 representative
+  standard, localized, Aptean, customer-extension, legacy, unknown, and framed
+  flows through Canonical Recording, Review, Workspace, screenshots, and Word.
+- Added deterministic English, Swedish, and Danish page aliases, explicit and
+  traceable customer override rules, safe optional-pack loading, and mandatory
+  verification evidence for future Aptean Page Object and Table IDs.
+- Kept unknown pages fully usable without inventing entity, record, document, or
+  table metadata; diagnostics omit entered values and unrelated URL queries.
+- Removed dashboard-owned Knowledge Pack scoring in favour of the existing
+  engine Knowledge Domain, leaving UI code responsible for orchestration only.
 - Use the visible Business Central search-result caption without appending its
   result type (for example `FÃ¶rs.order`, not `FÃ¶rs.order Listor`) and retain the
   screenshot where that result is visible instead of the loading/navigation state.

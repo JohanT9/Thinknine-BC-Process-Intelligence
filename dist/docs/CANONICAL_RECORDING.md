@@ -143,6 +143,14 @@ verified route fact while preserving the historical raw event. `legacyView`
 continues to return the original legacy shape and does not inject derived
 `pageObjectId` into raw source data.
 
+The final integration review reconfirmed this contract across current,
+schema-version-1 historical, semantic legacy `pageId`, unknown numeric page,
+caption-only, and frame/control-add-in recordings. Normalization enriched each
+recording in memory without mutating either the caller input or canonical `raw`.
+Unknown future fields and `legacyView` compatibility remain covered by the
+canonical CI suite. No schema increase or destructive historical migration is
+required for derived page identity.
+
 ## Raw persistence boundary
 
 For new captures, the separate Raw Event Persistence append is authoritative
