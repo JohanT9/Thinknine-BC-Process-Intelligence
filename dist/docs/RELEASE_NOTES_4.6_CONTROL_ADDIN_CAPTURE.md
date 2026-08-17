@@ -9,6 +9,9 @@ kan också fångas genom observerbar MUI-/automation-metadata och pekarmarkör.
 Den semantiska tolkningen sker fortsatt efter inspelningen i engine-lagret.
 Namngivna interaktiva ytor blir där ett spårbart handlingssteg som kan nå Review
 och dokumentet även när ingen mer specifik verksamhetsregel matchar.
+För nästlade komponenter väljer inspelaren den mest informativa observerbara
+ytan i event-sökvägen, så att tomma interna ikoner inte skymmer radens eller
+kortets synliga namn.
 
 React and Business Central control-add-in interactions no longer depend on the
 top frame receiving recording-state messages. Every injected frame observes the

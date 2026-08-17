@@ -24,6 +24,9 @@ assert(content.includes("event.composedPath?.()"));
 assert(content.includes('element.closest("label")'));
 assert(content.includes('"wrapping-label"'));
 assert(content.includes("isObservableReactTarget"));
+assert(content.includes("reactTargetScore"));
+assert(content.includes("reactInteractiveTarget"));
+assert(content.includes("right.score - left.score"));
 assert(content.includes('getComputedStyle(element).cursor === "pointer"'));
 for (const reactClass of ["CardActionArea", "ListItemButton", "TableRow"]) {
   assert(content.includes(reactClass));

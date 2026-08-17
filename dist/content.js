@@ -288,12 +288,36 @@
     catch { return false; }
   }
 
+  function reactTargetScore(element, pathIndex) {
+    if (!isObservableReactTarget(element)) return -1;
+    const explicit = ["data-testid", "data-automation-id", "data-control-id",
+      "data-control-name"].some(name => element.hasAttribute(name));
+    const classes = String(element.className || "");
+    const component = /(?:Mui(?:Button|IconButton|CardActionArea|ListItemButton|MenuItem|TableRow|Tab)|clickable|action|selectable)/u
+      .test(classes);
+    const visibleText = clean(element.getAttribute("aria-label") ||
+      element.getAttribute("title") || element.getAttribute("data-caption") ||
+      element.innerText || element.textContent || "", 500);
+    const informative = visibleText && visibleText.length <= 300;
+    return (explicit ? 40 : 0) + (component ? 30 : 0) +
+      (informative ? 20 : visibleText ? 5 : 0) - Math.min(pathIndex, 12);
+  }
+
+  function reactInteractiveTarget(event) {
+    return (event?.composedPath?.() || [])
+      .map((element, pathIndex) => ({ element, pathIndex,
+        score: element instanceof Element
+          ? reactTargetScore(element, pathIndex) : -1 }))
+      .filter(candidate => candidate.score >= 0)
+      .sort((left, right) => right.score - left.score ||
+        left.pathIndex - right.pathIndex)[0]?.element || null;
+  }
+
   function interactiveTarget(target, event) {
     if (!(target instanceof Element)) return null;
     const nativeTarget = target.closest(NATIVE_INTERACTIVE_SELECTOR);
     if (nativeTarget) return nativeTarget;
-    return (event?.composedPath?.() || [])
-      .find(isObservableReactTarget) || null;
+    return reactInteractiveTarget(event);
   }
 
   function eventElement(event) {
