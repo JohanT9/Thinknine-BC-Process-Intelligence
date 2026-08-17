@@ -4,6 +4,10 @@ React- och MUI-checkboxar hämtar även sitt observerbara namn från en
 omslutande HTML-label. Ett avmarkerat `Skriv ut etikett` kan därmed tolkas som
 en namngiven checkboxändring i stället för en generell fältändring.
 
+Klickbara React-rader och kort som saknar native knapp-, länk- eller ARIA-markup
+kan också fångas genom observerbar MUI-/automation-metadata och pekarmarkör.
+Den semantiska tolkningen sker fortsatt efter inspelningen i engine-lagret.
+
 React and Business Central control-add-in interactions no longer depend on the
 top frame receiving recording-state messages. Every injected frame observes the
 durable recording state, including frames that existed before recording began,

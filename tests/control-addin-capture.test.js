@@ -23,6 +23,11 @@ assert((content.match(/\}, true\);/gu) || []).length >= 6);
 assert(content.includes("event.composedPath?.()"));
 assert(content.includes('element.closest("label")'));
 assert(content.includes('"wrapping-label"'));
+assert(content.includes("isObservableReactTarget"));
+assert(content.includes('getComputedStyle(element).cursor === "pointer"'));
+for (const reactClass of ["CardActionArea", "ListItemButton", "TableRow"]) {
+  assert(content.includes(reactClass));
+}
 assert(content.includes("chrome.storage.onChanged.addListener"));
 assert(content.includes("globalThis.T9CaptureFocusSession ||"));
 assert(content.indexOf("const focusSessions = focusSessionApi.create()") <
@@ -171,6 +176,26 @@ function memoryAdapter() {
   assert.strictEqual(checkboxActions[0].targetField, "Skriv ut etikett");
   assert.strictEqual(checkboxActions[0].displayText,
     "Inaktivera **Skriv ut etikett**.");
+
+  const reactRow = {
+    recordingId: "react-row", sourceEventId: "react-row:addin-frame:1",
+    source: "business-central-content-script", sourceFrameId: "addin-frame",
+    sourceSequence: 1, timestamp: "2026-08-17T10:02:00.000Z",
+    type: "click", category: "interaction", controlType: "div",
+    label: "R101312", accessibleName: "R101312", reactInteractive: true,
+    controlAddIn: true
+  };
+  const reactRowIdentification = identification.identify(reactRow);
+  assert.strictEqual(reactRowIdentification.control.type,
+    "interactiveSurface");
+  assert.strictEqual(reactRowIdentification.action.caption, "R101312");
+  const reactRowRecording = canonical.addEvent(canonical.create({
+    id: "react-row"
+  }), reactRow, reactRowIdentification);
+  const reactRowGroups = grouping.group(normalization.normalizeRecording(
+    reactRowRecording)).groups;
+  assert.strictEqual(reactRowGroups[0].groupKind, "action");
+  assert.strictEqual(reactRowGroups[0].actionContext.caption, "R101312");
 
   console.log("React/control add-in capture reliability tests passed.");
 })().catch(error => { console.error(error); process.exitCode = 1; });

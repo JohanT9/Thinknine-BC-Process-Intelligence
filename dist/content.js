@@ -255,27 +255,45 @@
     );
   }
 
-  function interactiveTarget(target) {
-    if (!(target instanceof Element)) return null;
+  const NATIVE_INTERACTIVE_SELECTOR = [
+    "button",
+    "a",
+    "input",
+    "textarea",
+    "select",
+    '[contenteditable="true"]',
+    '[role="button"]',
+    '[role="menuitem"]',
+    '[role="tab"]',
+    '[role="option"]',
+    '[role="checkbox"]',
+    '[role="radio"]',
+    '[role="listbox"]',
+    '[role="row"]',
+    '[role="gridcell"]',
+    '[tabindex]'
+  ].join(",");
 
-    return target.closest([
-      "button",
-      "a",
-      "input",
-      "textarea",
-      "select",
-      '[contenteditable="true"]',
-      '[role="button"]',
-      '[role="menuitem"]',
-      '[role="tab"]',
-      '[role="option"]',
-      '[role="checkbox"]',
-      '[role="radio"]',
-      '[role="listbox"]',
-      '[role="row"]',
-      '[role="gridcell"]',
-      '[tabindex]'
-    ].join(","));
+  function isObservableReactTarget(element) {
+    if (!(element instanceof Element) ||
+        ["HTML", "BODY", "MAIN"].includes(element.tagName)) return false;
+    if (element.hasAttribute("data-testid") ||
+        element.hasAttribute("data-automation-id") ||
+        element.hasAttribute("data-control-id") ||
+        element.hasAttribute("data-control-name")) return true;
+    const classes = String(element.className || "");
+    if (/(?:Mui(?:Button|IconButton|CardActionArea|ListItemButton|MenuItem|TableRow|Tab)|clickable|action|selectable)/u
+      .test(classes)) return true;
+    try { return getComputedStyle(element).cursor === "pointer"; }
+    catch { return false; }
+  }
+
+  function interactiveTarget(target, event) {
+    if (!(target instanceof Element)) return null;
+    const nativeTarget = target.closest(NATIVE_INTERACTIVE_SELECTOR);
+    if (nativeTarget) return nativeTarget;
+    return (event?.composedPath?.() || [])
+      .find(isObservableReactTarget) || null;
   }
 
   function eventElement(event) {
@@ -388,6 +406,7 @@
       disabled: Boolean(element?.disabled || element?.getAttribute?.("aria-disabled") === "true"),
       checked: element?.checked ?? undefined,
       selected: element?.getAttribute?.("aria-selected") === "true" || undefined,
+      reactInteractive: isObservableReactTarget(element) || undefined,
       controlAddIn: uiHierarchy.some(item => item.type === "controlAddIn") || /Mui[A-Z]/.test(String(element?.className || "")),
       uiHierarchy,
       localBounds: bounds ? { x: bounds.x, y: bounds.y,
@@ -464,7 +483,7 @@
 
 
   window.addEventListener("click", event => {
-    const target = interactiveTarget(eventElement(event));
+    const target = interactiveTarget(eventElement(event), event);
     diagnostic("native-event-observed", { eventType: "click",
       targetTag: eventElement(event)?.tagName?.toLowerCase?.() || "",
       role: eventElement(event)?.getAttribute?.("role") || "",
@@ -564,7 +583,7 @@
   window.addEventListener("keydown", event => {
     if (!["Enter", " ", "Spacebar", "Escape", "F4"].includes(event.key)) return;
     const eventTarget = eventElement(event);
-    const target = interactiveTarget(eventTarget) || eventTarget;
+    const target = interactiveTarget(eventTarget, event) || eventTarget;
 
     record({
       type: "key",

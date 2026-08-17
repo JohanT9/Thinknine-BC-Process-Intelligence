@@ -5,6 +5,9 @@
 - React/MUI-checkboxar bevarar nu texten från en omslutande HTML-label, så
   avmarkerade val dokumenteras med sitt synliga fältnamn i stället för
   `Okänt fält` och det tekniska värdet `false`.
+- Klickbara React-rader, kort och andra sammansatta ytor identifieras nu via
+  observerbar MUI-/automation-metadata eller webbläsarens pekarmarkör, även när
+  komponenten saknar native knapp- eller länkmarkup.
 - Fixed recording-state propagation to already mounted Business Central
   control-add-in frames; all injected frames now follow durable recording state
   across start, stop, remount, and service-worker restart lifecycles.

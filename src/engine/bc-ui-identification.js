@@ -149,6 +149,8 @@
     if (role === "tab") return { value: "tab", quality: "exact", source: "role" };
     if (role === "row") return { value: "listRow", quality: "strong", source: "role" };
     if (role === "gridcell") return { value: "repeaterCell", quality: "strong", source: "role" };
+    if (raw.reactInteractive === true) return { value: "interactiveSurface",
+      quality: "strong", source: "observed-react-interactive-surface" };
     if (raw.ariaHasPopup === "listbox" || raw.ariaHasPopup === "grid") return { value: "lookup", quality: "strong", source: "aria-haspopup" };
     if (["input", "textarea"].includes(tag) || role === "textbox") return { value: "field", quality: "strong", source: role ? "role" : "element-name" };
     return { value: "unknownInteractiveControl", quality: "unknown", source: "fallback" };
@@ -187,7 +189,8 @@
     const hierarchy = Array.isArray(raw.uiHierarchy) ? clone(raw.uiHierarchy) : [];
     hierarchy.forEach(item => allEvidence.push(evidence("bounded-ancestor", `${item.type}${item.caption ? `:${item.caption}` : ""}`)));
     const container = hierarchy.length ? clone(hierarchy.at(-1)) : null;
-    const actionLike = raw.category === "action" || ["button", "link"].includes(classified.value);
+    const actionLike = raw.category === "action" ||
+      ["button", "link", "interactiveSurface"].includes(classified.value);
     const action = actionLike ? {
       caption: caption || undefined,
       identity: technicalIdentity || undefined,
