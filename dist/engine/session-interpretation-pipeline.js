@@ -69,7 +69,7 @@ function (semantic, knowledge, refs) {
       taskId: `${value.taskType || "Task"}:${refs.stableIdentity(value)}`,
       ...(!value.screenshot ? (() => {
         const evidence = new Set(value.sourceEventIds || []);
-        const source = baseTasks.find(candidate => candidate.sourceEventIds
+        const source = baseTasks.find(candidate => (candidate.sourceEventIds || [])
           .some(id => evidence.has(id)) && candidate.screenshot);
         return source ? { screenshot: source.screenshot,
           screenshots: [...source.screenshots] } : {};

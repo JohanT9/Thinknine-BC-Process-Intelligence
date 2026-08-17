@@ -1,5 +1,12 @@
 # Changelog
 
+## 4.6.0 - Legacy documentation opening compatibility
+
+- Fixed Document Library opening for recordings whose compatibility projection
+  correctly omits empty Canonical `sourceEventIds`.
+- Kept legacy evidence source-less instead of fabricating Canonical IDs, while
+  making screenshot fallback tolerant of the absent optional reference level.
+
 ## 4.6.0 - Architecture, Chromium readiness, and dogfooding baseline
 
 - Re-established one authoritative current architecture and explicitly separated

@@ -34,6 +34,20 @@ assert.ok(result.businessTasks[0].semanticActionIds.length);
 assert.strictEqual(result.businessTasks[0].screenshot,
   "screenshots/000001.png");
 
+const legacyWithoutCanonicalIds = pipeline.interpret({
+  session: { id: "legacy-source-less", name: "Legacy" },
+  events: [], normalizedEvents: [], stepGroups: [{
+    schemaVersion: 1, stepGroupId: "legacy-group", groupingVersion: "1.0.0",
+    groupKind: "field-edit", normalizedEventIds: [], normalizedEvents: [],
+    primaryNormalizedEvent: { kind: "value-change",
+      value: { normalized: "Legacy value" } },
+    controlContext: { caption: "Legacy field" }
+  }], imagePaths: {}, knowledgePacks: []
+});
+assert.strictEqual(legacyWithoutCanonicalIds.businessTasks.length, 1);
+assert.strictEqual(legacyWithoutCanonicalIds.businessTasks[0].sourceEventIds,
+  undefined, "legacy evidence must not invent canonical IDs");
+
 const packs = [{ packId: "sales", name: "Sales", version: "1", rules: [{
   ruleId: "quantity", priority: 100, confidence: 0.95,
   match: { fieldPatterns: ["Quantity"] }, taskType: "ChangeQuantity",
