@@ -14,6 +14,8 @@
   graph and final business tasks from the interpreted session model.
 - Restored Review as the visible initial workspace by ensuring a hidden tab
   panel cannot be displayed by its flex layout declaration.
+- Prevented scrolling past the end of Document View from scrolling and
+  permanently offsetting the outer full-screen dialog.
 - Fixed Document Library opening for recordings whose compatibility projection
   correctly omits empty Canonical `sourceEventIds`.
 - Kept legacy evidence source-less instead of fabricating Canonical IDs, while
