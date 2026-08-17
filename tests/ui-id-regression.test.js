@@ -26,6 +26,13 @@ assert.ok(
   "Review Studio must keep its header sticky without an overflow container blocking it."
 );
 
+assert.ok(
+  html.includes(".review-shell.document-workspace-mode{width:100%;max-width:none;height:calc(100vh - 48px);height:calc(100dvh - 48px);display:flex;flex-direction:column}") &&
+    html.includes(".review-shell.document-workspace-mode .document-workspace-panel{height:auto;min-height:0;flex:1}") &&
+    html.includes(".document-workspace-body{display:flex;min-width:0;min-height:0;flex:1}"),
+  "Document view must fill the review viewport without creating a competing fixed-height or horizontal layout."
+);
+
 const htmlIds = new Set(
   [...html.matchAll(/id="([^"]+)"/g)].map(match => match[1])
 );

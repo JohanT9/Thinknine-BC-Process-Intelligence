@@ -2,6 +2,10 @@
 
 ## 4.6.0 - Legacy documentation opening compatibility
 
+- Expanded Document View to fill the available review viewport and removed the
+  competing fixed-height calculation that could leave half the screen unused.
+- Let the document canvas shrink beside guidance without forcing a horizontal
+  dialog scrollbar, and stack guidance below the document on narrow screens.
 - Fixed Document Library opening for recordings whose compatibility projection
   correctly omits empty Canonical `sourceEventIds`.
 - Kept legacy evidence source-less instead of fabricating Canonical IDs, while
