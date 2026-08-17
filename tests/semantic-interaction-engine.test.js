@@ -30,6 +30,15 @@ const customerSearchThenNumber = only([{
   selectedCaption: "905", instruction: "Välj 905."
 }], "SelectCustomer", "Välj kund **905**.");
 assert.strictEqual(customerSearchThenNumber.selectedValue, "905");
+const embeddedCustomerNumber = only([{
+  taskId: "customer-search-embedded", taskType: "SelectCustomer",
+  fieldCaption: "Kundnr", instructionValue: "iberi",
+  instruction: "Välj kund iberi."
+}, { taskId: "customer-number-embedded", taskType: "RunAction",
+  actionCaption: 'Nr, sorterade i Stigande order Välj posten "905"',
+  instruction: 'Välj "Nr, sorterade i Stigande order Välj posten "905"".'
+}], "SelectCustomer", "Välj kund **905**.");
+assert.strictEqual(embeddedCustomerNumber.selectedValue, "905");
 assert.deepStrictEqual(customer.sourceEventNos, [1, 2]);
 assert.deepStrictEqual(customer.screenshotRefs, ["lookup.png", "selected.png"]);
 assert.deepStrictEqual(customer.annotationRefs, [{ annotationId: "ann-1" }]);

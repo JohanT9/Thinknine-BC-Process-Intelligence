@@ -19,6 +19,12 @@ Step Groups use `selection.value` before descriptive `selection.caption`, so a
 Business Central row number remains the documented value while the row caption
 remains supporting context.
 
+Legacy Business Central accessibility text may prefix the selection with sort
+metadata, for example `Nr, sorterade i Stigande order Välj posten "905"`. The
+adapter extracts the quoted record value from the embedded selection phrase and
+consolidates it with the preceding lookup step; the sort/search wording is not a
+separate documentation action.
+
 Instructions with `user-edited` provenance pass through semantic rules unchanged.
 Reset restores the latest generated semantic instruction.
 

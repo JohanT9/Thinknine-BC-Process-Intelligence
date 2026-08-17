@@ -48,6 +48,7 @@
   }
 
   const RECORD_SELECTION = /^(?:välj posten|select record)\s+["“]?(.+?)["”]?\.?$/iu;
+  const EMBEDDED_RECORD_SELECTION = /(?:välj posten|select record)\s+["“]([^"”]+)["”]/iu;
   const LOOKUP = /(?:välj|select)(?: ett)? värde för|select a value for/iu;
 
   function selectedRecordValue(value) {
@@ -55,6 +56,9 @@
       value?.instruction, value?.description]) {
       const match = text(candidate).replace(/\*\*/gu, "").match(RECORD_SELECTION);
       if (match) return match[1].replace(/["“”]+$/gu, "").trim();
+      const embedded = text(candidate).replace(/\*\*/gu, "")
+        .match(EMBEDDED_RECORD_SELECTION);
+      if (embedded) return embedded[1].trim();
     }
     return "";
   }

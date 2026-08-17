@@ -14,6 +14,9 @@
 - Corrected lookup semantics so an explicit selected row number (for example
   customer `905`) wins over earlier lookup search text (for example `iberi`).
 - Capture selected row/cell values explicitly for new recordings.
+- Recognize Business Central accessibility captions where `Välj posten "905"`
+  is embedded after sort metadata, and safely regenerate untouched Reviews that
+  previously split this into search-text and row-action steps.
 
 ## 4.6.0 - Architecture, Chromium readiness, and dogfooding baseline
 

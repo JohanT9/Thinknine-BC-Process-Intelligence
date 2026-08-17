@@ -103,5 +103,12 @@ for (const protectedChange of [{ approved: true }, { userComment: "Behåll" },
 assert.strictEqual(review.isGeneratedPlaceholderOnly({ tasks: [{
   taskType: "RunAction", instruction: "Välj Släpp."
 }] }), false);
+const lookupLeak = { tasks: [{ taskType: "SelectCustomer",
+  instruction: 'Välj kund "iberi".' }, { taskType: "RunAction",
+  instruction: 'Välj "Nr, sorterade i Stigande order Välj posten "905"".' }] };
+assert.strictEqual(review.hasGeneratedLookupSearchLeak(lookupLeak), true);
+assert.strictEqual(review.hasGeneratedLookupSearchLeak({ tasks:
+  lookupLeak.tasks.map((task, index) => index ? task : { ...task,
+    userComment: "Behåll" }) }), false);
 
 console.log("Review Studio tests passed.");

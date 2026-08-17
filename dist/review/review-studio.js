@@ -962,6 +962,20 @@
       placeholderCount / tasks.length >= 0.25;
   }
 
+  function hasGeneratedLookupSearchLeak(review) {
+    const tasks = Array.isArray(review?.tasks) ? review.tasks : [];
+    const consultantOwned = tasks.some(task => task?.approved ||
+      task?.userComment || task?.stepOverride || task?.manualStepId ||
+      task?.provenance === "manual");
+    if (consultantOwned) return false;
+    return tasks.some((task, index) =>
+      ["SelectCustomer", "SelectItem", "SelectVendor", "SelectLocation",
+        "SelectDimension"].includes(task?.taskType) &&
+      /(?:välj posten|select record)\s+["“][^"”]+["”]/iu.test(String(
+        tasks[index + 1]?.instruction || tasks[index + 1]?.description || ""))
+    );
+  }
+
   return {
     createReview,
     normalizeReview: annotations.normalizeReview,
@@ -1006,6 +1020,7 @@
     activeTasks,
     canComplete,
     progress,
-    isGeneratedPlaceholderOnly
+    isGeneratedPlaceholderOnly,
+    hasGeneratedLookupSearchLeak
   };
 });
