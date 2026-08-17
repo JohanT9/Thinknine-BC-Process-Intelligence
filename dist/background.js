@@ -127,9 +127,9 @@ async function setState(state) {
 async function setDebug(patch) {
   const data = await chrome.storage.local.get(DEBUG_KEY);
   const debug = {
+    ...(data[DEBUG_KEY] || {}),
     version: VERSION,
     updatedAt: new Date().toISOString(),
-    ...(data[DEBUG_KEY] || {}),
     ...patch
   };
   await chrome.storage.local.set({ [DEBUG_KEY]: debug });
@@ -172,7 +172,7 @@ async function appendCaptureDiagnostic(value = {}, sender = {}) {
 }
 
 async function updateFrameDiagnostic(sender = {}, frameUrl = "", frameDepth,
-  state = {}) {
+  state = {}, reported = {}) {
   const data = await chrome.storage.local.get(DEBUG_KEY);
   const current = data[DEBUG_KEY] || {};
   const key = `${sender.tab?.id ?? "?"}:${sender.frameId ?? "?"}:` +
@@ -189,6 +189,8 @@ async function updateFrameDiagnostic(sender = {}, frameUrl = "", frameDepth,
     injected: true,
     recordable: true,
     recorderActive: Boolean(state.recording),
+    contentRecorderActive: Boolean(reported.recorderActive),
+    contentDiagnosticsEnabled: Boolean(reported.diagnosticsEnabled),
     lastPingAt: new Date().toISOString()
   } };
   const frameDiagnostics = Object.fromEntries(Object.entries(frames).slice(-100));
@@ -968,7 +970,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
       case "T9_PING": {
         const pingState = await getState();
         await updateFrameDiagnostic(sender, message.frameUrl,
-          message.frameDepth, pingState);
+          message.frameDepth, pingState, message);
         const pingDebug = await chrome.storage.local.get(DEBUG_KEY);
         sendResponse({ ok: true, version: VERSION, state: pingState,
           diagnosticsEnabled: Boolean(
@@ -1179,11 +1181,26 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
         const data = await chrome.storage.local.get(DEBUG_KEY);
         const state = await getState();
         const registration = await getRecorderRegistrationStatus();
+        let browserFrames = [];
+        try {
+          browserFrames = state.tabId
+            ? await chrome.webNavigation.getAllFrames({ tabId: state.tabId })
+            : [];
+        } catch (error) {
+          browserFrames = [{ error: String(error) }];
+        }
         sendResponse({
           ok: true,
           debug: data[DEBUG_KEY] || {},
           state,
-          registration
+          registration,
+          browserFrames: browserFrames.map(frame => frame.error ? frame : {
+            frameId: frame.frameId, parentFrameId: frame.parentFrameId,
+            documentId: frame.documentId || "",
+            url: diagnosticUrl(frame.url),
+            origin: (() => { try { return new URL(frame.url).origin; }
+              catch { return ""; } })()
+          })
         });
         break;
       }

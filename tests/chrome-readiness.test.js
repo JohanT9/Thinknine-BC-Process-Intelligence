@@ -10,7 +10,7 @@ assert.strictEqual(manifest.background.service_worker, "background.js");
 assert(manifest.content_scripts[0].all_frames);
 assert(manifest.content_scripts[0].match_about_blank);
 for (const permission of ["activeTab", "downloads", "scripting", "storage",
-  "tabs"]) assert(manifest.permissions.includes(permission));
+  "tabs", "webNavigation"]) assert(manifest.permissions.includes(permission));
 
 const runtimeFiles = ["src/recorder/background.js", "src/recorder/content.js",
   "src/ui/popup.js", "src/ui/dashboard.js"].map(file =>

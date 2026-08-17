@@ -78,7 +78,9 @@
       chrome.runtime.sendMessage({
         type: "T9_PING",
         frameUrl: location.href,
-        frameDepth: getFrameDepth()
+        frameDepth: getFrameDepth(),
+        recorderActive: recording,
+        diagnosticsEnabled
       }, response => {
         if (chrome.runtime.lastError) return;
         if (response?.state) {
@@ -452,7 +454,7 @@
   }
 
 
-  document.addEventListener("click", event => {
+  window.addEventListener("click", event => {
     const target = interactiveTarget(eventElement(event));
     diagnostic("native-event-observed", { eventType: "click",
       targetTag: eventElement(event)?.tagName?.toLowerCase?.() || "",
@@ -497,7 +499,7 @@
     return true;
   }
 
-  document.addEventListener("input", event => {
+  window.addEventListener("input", event => {
     const element = editableTarget(event);
     diagnostic("native-event-observed", { eventType: "input",
       targetTag: element?.tagName?.toLowerCase?.() || "",
@@ -514,7 +516,7 @@
     );
   }, true);
 
-  document.addEventListener("focusin", event => {
+  window.addEventListener("focusin", event => {
     const element = editableTarget(event);
     if (!(element instanceof Element)) return;
     focusSessions.start(element, valueOf(element));
@@ -522,7 +524,7 @@
       ...descriptor(element) });
   }, true);
 
-  document.addEventListener("change", event => {
+  window.addEventListener("change", event => {
     const element = editableTarget(event);
     if (element instanceof Element) {
       clearTimeout(inputTimers.get(element));
@@ -530,7 +532,7 @@
     }
   }, true);
 
-  document.addEventListener("focusout", event => {
+  window.addEventListener("focusout", event => {
     const element = editableTarget(event);
 
     if (element instanceof Element) {
@@ -550,7 +552,7 @@
     }
   }, true);
 
-  document.addEventListener("keydown", event => {
+  window.addEventListener("keydown", event => {
     if (!["Enter", " ", "Spacebar", "Escape", "F4"].includes(event.key)) return;
     const eventTarget = eventElement(event);
     const target = interactiveTarget(eventTarget) || eventTarget;

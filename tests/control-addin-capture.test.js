@@ -17,7 +17,7 @@ const manifest = JSON.parse(fs.readFileSync("src/ui/manifest.json", "utf8"));
 // React stopPropagation and storage synchronization reaches existing frames.
 for (const type of ["click", "input", "change", "focusin", "focusout",
   "keydown"]) {
-  assert(content.includes(`document.addEventListener("${type}"`));
+  assert(content.includes(`window.addEventListener("${type}"`));
 }
 assert((content.match(/\}, true\);/gu) || []).length >= 6);
 assert(content.includes("event.composedPath?.()"));
@@ -53,11 +53,13 @@ assert.strictEqual(manifest.content_scripts[0].match_about_blank, true);
 assert.deepStrictEqual(manifest.content_scripts[0].js,
   ["capture-focus-session.js", "content.js"]);
 assert(!manifest.host_permissions.includes("<all_urls>"));
+assert(manifest.permissions.includes("webNavigation"));
 assert(background.includes("allFrames: true"));
 assert(background.includes("matchOriginAsFallback: true"));
 assert(background.includes("updateFrameDiagnostic(sender, message.frameUrl,"));
 assert(background.includes("captureDiagnosticsEnabled"));
 assert(background.includes("recorderActive: Boolean(state.recording)"));
+assert(background.includes("chrome.webNavigation.getAllFrames"));
 assert(background.includes("activeContent.sessionId !== id"));
 assert(popup.includes('files: ["capture-focus-session.js", "content.js"]'));
 assert((background.match(/await registerRecorderContentScript\(\);/gu) || [])

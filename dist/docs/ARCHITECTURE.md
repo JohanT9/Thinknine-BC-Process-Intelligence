@@ -131,10 +131,11 @@ capture evidence; only normalization may classify a verified difference as a
 
 ### React and control-add-in capture reliability
 
-The recorder installs delegated capture-phase listeners at `document` level in
+The recorder installs delegated capture-phase listeners at `window` level in
 every supported frame. Interactive targets are resolved through `composedPath()`
-and bounded ancestry, so application-level `stopPropagation()` and open Shadow
-DOM do not hide browser-observable interactions. No React internals, Fiber data,
+and bounded ancestry. Installing before the application at the earliest DOM
+capture boundary prevents handlers above `document` from hiding observable
+interactions; open Shadow DOM remains supported. No React internals, Fiber data,
 MUI class identities, page-world patches, polling, or per-control listeners are
 used.
 
@@ -156,6 +157,10 @@ identity, but never entered values or URL query strings. Supported inherited
 outside the Business Central host patterns are explicitly unsupported until a
 verified narrow host permission is added. Closed Shadow DOM remains opaque by
 browser design.
+
+The `webNavigation` permission is used only to enumerate the browser's actual
+frame tree and compare it with content-script pings. It grants no additional
+host access. URLs are reduced to origin and path before diagnostics are stored.
 
 ## Documentation hierarchy
 

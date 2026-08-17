@@ -41,6 +41,9 @@ async function load() {
     ["Senaste ram-URL", debug.lastFrameUrl || "Ingen"],
     ["Ramar med content script", String(Object.keys(
       debug.frameDiagnostics || {}).length)],
+    ["Ramar enligt webbläsaren", String((response.browserFrames || []).length)],
+    ["Aktiva content-ramar", String(Object.values(debug.frameDiagnostics || {})
+      .filter(frame => frame.contentRecorderActive).length)],
     ["Fångstdiagnostik", debug.captureDiagnosticsEnabled
       ? "Aktiv (sanerad)" : "Avstängd"],
     ["Fångststeg", objectSummary(debug.captureStageCounts)],

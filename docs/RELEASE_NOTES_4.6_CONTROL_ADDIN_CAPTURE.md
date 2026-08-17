@@ -9,6 +9,8 @@ Editable controls use native capture-phase browser events. If a framework does
 not deliver a usable `input` or `change` commit, a changed observable value is
 captured when focus leaves the control. An identical native commit suppresses
 the fallback, and an unchanged focus session emits no field-change event.
+Observation begins at `window` so a React application handler above `document`
+cannot prevent the recorder from seeing supported native interactions.
 
 The debug panel can enable temporary capture diagnostics showing frame presence,
 events observed, policy decisions, delivery, Raw Event persistence, and Canonical
@@ -21,3 +23,6 @@ origin to be verified before a narrow host permission can be considered. Closed
 Shadow DOM cannot be inspected by an extension content script. This milestone
 was verified synthetically against a real-shaped Material UI date input; the
 actual affected customer view was not available for manual verification.
+
+The non-host `webNavigation` permission provides a browser-owned frame inventory
+for diagnostics. It does not permit capture on additional origins.

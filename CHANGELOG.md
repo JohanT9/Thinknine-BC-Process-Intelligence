@@ -16,6 +16,11 @@
   early startup exception from disabling all event listeners.
 - Updated the popup's manual recovery injection to load the focus-session helper
   before `content.js`, matching static and background injection paths.
+- Observe supported interactions at `window` capture phase so an application
+  handler above `document` cannot hide genuine React/control-add-in events.
+- Added browser-owned frame inventory through the non-host `webNavigation`
+  permission and corrected debug snapshot ordering so current version, time, and
+  content-frame recorder state cannot be masked by stale diagnostic fields.
 - Treat Business Central's `Sortera efter`/`Sort by` text as lookup state rather
   than part of a field caption, so instructions use `Nr` instead of
   `Sortera efter Nr`.
