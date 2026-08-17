@@ -8,6 +8,8 @@
   dialog scrollbar, and stack guidance below the document on narrow screens.
 - Render entered item numbers as emphasized values in Document View and Word,
   including consolidated item-number lookup interactions.
+- Use the same viewport-filling workspace for Review and Document View, with
+  Review content scrolling inside the full-screen dialog.
 - Fixed Document Library opening for recordings whose compatibility projection
   correctly omits empty Canonical `sourceEventIds`.
 - Kept legacy evidence source-less instead of fabricating Canonical IDs, while

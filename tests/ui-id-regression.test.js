@@ -27,10 +27,11 @@ assert.ok(
 );
 
 assert.ok(
-  html.includes(".review-shell.document-workspace-mode{width:100%;max-width:none;height:calc(100vh - 48px);height:calc(100dvh - 48px);display:flex;flex-direction:column}") &&
+  html.includes(".review-shell{width:100%;max-width:none;height:calc(100vh - 48px);height:calc(100dvh - 48px)") &&
+    html.includes("#reviewWorkspacePanel{min-height:0;flex:1;overflow:auto}") &&
     html.includes(".review-shell.document-workspace-mode .document-workspace-panel{height:auto;min-height:0;flex:1}") &&
     html.includes(".document-workspace-body{display:flex;min-width:0;min-height:0;flex:1}"),
-  "Document view must fill the review viewport without creating a competing fixed-height or horizontal layout."
+  "Review and Document views must fill the viewport without competing fixed-height or horizontal layouts."
 );
 
 const htmlIds = new Set(
