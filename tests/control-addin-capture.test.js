@@ -27,6 +27,9 @@ assert(content.includes("isObservableReactTarget"));
 assert(content.includes("reactTargetScore"));
 assert(content.includes("reactInteractiveTarget"));
 assert(content.includes("right.score - left.score"));
+assert(content.includes("catch { return -1; }"));
+assert(content.includes("pointerTarget: true"));
+assert(content.includes("interactiveTarget(observedTarget, event) ||"));
 assert(content.includes('getComputedStyle(element).cursor === "pointer"'));
 for (const reactClass of ["CardActionArea", "ListItemButton", "TableRow"]) {
   assert(content.includes(reactClass));
@@ -205,6 +208,12 @@ function memoryAdapter() {
   assert.strictEqual(reactRowActions[0].displayText, "Välj **R101312**.");
   assert.deepStrictEqual(reactRowActions[0].sourceEventIds,
     [reactRowRecording.events[0].id]);
+
+  const unknownNamedClick = identification.identify({ type: "click",
+    category: "interaction", controlType: "div", pointerTarget: true,
+    accessibleName: "Produktion", label: "Produktion" });
+  assert.strictEqual(unknownNamedClick.control.type, "interactiveSurface");
+  assert.strictEqual(unknownNamedClick.action.caption, "Produktion");
 
   console.log("React/control add-in capture reliability tests passed.");
 })().catch(error => { console.error(error); process.exitCode = 1; });

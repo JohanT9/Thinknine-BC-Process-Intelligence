@@ -12,6 +12,9 @@
   Semantic Document i stället för att stanna som interna passthrough-händelser.
 - Vid nästlade React-klick prioriteras nu den mest informativa raden eller ytan
   framför en tom intern ikon, SVG eller `span` som ärver klickmarkören.
+- Klickfångsten är nu fail-open: okänd framtida React-markup bevaras som rå
+  klick-evidens i stället för att händelsen avvisas. Namngivna mål kan därefter
+  klassificeras säkert i engine-lagret.
 - Fixed recording-state propagation to already mounted Business Central
   control-add-in frames; all injected frames now follow durable recording state
   across start, stop, remount, and service-worker restart lifecycles.

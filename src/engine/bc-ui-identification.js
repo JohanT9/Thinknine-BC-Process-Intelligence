@@ -151,6 +151,10 @@
     if (role === "gridcell") return { value: "repeaterCell", quality: "strong", source: "role" };
     if (raw.reactInteractive === true) return { value: "interactiveSurface",
       quality: "strong", source: "observed-react-interactive-surface" };
+    if (raw.pointerTarget === true && text(raw.accessibleName || raw.label)) {
+      return { value: "interactiveSurface", quality: "partial",
+        source: "observed-named-pointer-target" };
+    }
     if (raw.ariaHasPopup === "listbox" || raw.ariaHasPopup === "grid") return { value: "lookup", quality: "strong", source: "aria-haspopup" };
     if (["input", "textarea"].includes(tag) || role === "textbox") return { value: "field", quality: "strong", source: role ? "role" : "element-name" };
     return { value: "unknownInteractiveControl", quality: "unknown", source: "fallback" };

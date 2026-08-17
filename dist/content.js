@@ -289,18 +289,20 @@
   }
 
   function reactTargetScore(element, pathIndex) {
-    if (!isObservableReactTarget(element)) return -1;
-    const explicit = ["data-testid", "data-automation-id", "data-control-id",
-      "data-control-name"].some(name => element.hasAttribute(name));
-    const classes = String(element.className || "");
-    const component = /(?:Mui(?:Button|IconButton|CardActionArea|ListItemButton|MenuItem|TableRow|Tab)|clickable|action|selectable)/u
-      .test(classes);
-    const visibleText = clean(element.getAttribute("aria-label") ||
-      element.getAttribute("title") || element.getAttribute("data-caption") ||
-      element.innerText || element.textContent || "", 500);
-    const informative = visibleText && visibleText.length <= 300;
-    return (explicit ? 40 : 0) + (component ? 30 : 0) +
-      (informative ? 20 : visibleText ? 5 : 0) - Math.min(pathIndex, 12);
+    try {
+      if (!isObservableReactTarget(element)) return -1;
+      const explicit = ["data-testid", "data-automation-id", "data-control-id",
+        "data-control-name"].some(name => element.hasAttribute(name));
+      const classes = String(element.className || "");
+      const component = /(?:Mui(?:Button|IconButton|CardActionArea|ListItemButton|MenuItem|TableRow|Tab)|clickable|action|selectable)/u
+        .test(classes);
+      const visibleText = clean(element.getAttribute("aria-label") ||
+        element.getAttribute("title") || element.getAttribute("data-caption") ||
+        element.innerText || element.textContent || "", 500);
+      const informative = visibleText && visibleText.length <= 300;
+      return (explicit ? 40 : 0) + (component ? 30 : 0) +
+        (informative ? 20 : visibleText ? 5 : 0) - Math.min(pathIndex, 12);
+    } catch { return -1; }
   }
 
   function reactInteractiveTarget(event) {
@@ -507,7 +509,9 @@
 
 
   window.addEventListener("click", event => {
-    const target = interactiveTarget(eventElement(event), event);
+    const observedTarget = eventElement(event);
+    const target = interactiveTarget(observedTarget, event) ||
+      (observedTarget instanceof Element ? observedTarget : null);
     diagnostic("native-event-observed", { eventType: "click",
       targetTag: eventElement(event)?.tagName?.toLowerCase?.() || "",
       role: eventElement(event)?.getAttribute?.("role") || "",
@@ -529,6 +533,7 @@
         selectedCaption } : {}),
       clientX: event.clientX,
       clientY: event.clientY,
+      pointerTarget: true,
       ...descriptor(target)
     });
   }, true);

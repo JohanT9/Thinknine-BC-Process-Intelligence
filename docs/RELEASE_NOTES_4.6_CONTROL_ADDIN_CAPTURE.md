@@ -12,6 +12,9 @@ och dokumentet även när ingen mer specifik verksamhetsregel matchar.
 För nästlade komponenter väljer inspelaren den mest informativa observerbara
 ytan i event-sökvägen, så att tomma interna ikoner inte skymmer radens eller
 kortets synliga namn.
+Om ingen interaktiv komponent kan identifieras bevaras ändå det faktiska
+klickmålet som rå evidens. Okänd eller framtida React-markup kan därför inte
+stoppa själva inspelningen.
 
 React and Business Central control-add-in interactions no longer depend on the
 top frame receiving recording-state messages. Every injected frame observes the
