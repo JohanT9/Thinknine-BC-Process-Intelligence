@@ -924,6 +924,7 @@ chrome.runtime.onInstalled.addListener(async () => {
     await chrome.storage.local.set({ [SETTINGS_KEY]: DEFAULT_SETTINGS });
   }
   await setState(await getState());
+  await registerRecorderContentScript();
   await setDebug({
     installedAt: new Date().toISOString(),
     connected: false,
@@ -933,6 +934,7 @@ chrome.runtime.onInstalled.addListener(async () => {
 
 chrome.runtime.onStartup.addListener(async () => {
   await setState(await getState());
+  await registerRecorderContentScript();
 });
 
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {

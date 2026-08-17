@@ -1,5 +1,40 @@
 (() => {
   if (window.__T9_RECORDER_V2__) return;
+
+  // Compatibility for a persistent dynamic registration created before the
+  // focus-session helper became a separate content-script resource. Extension
+  // reloads do not necessarily recreate same-version dynamic registrations.
+  const focusSessionApi = globalThis.T9CaptureFocusSession || {
+    create() {
+      const sessions = new WeakMap();
+      return {
+        start(element, value) {
+          sessions.set(element, { initialValue: value, committed: false,
+            committedValue: undefined });
+        },
+        commit(element, value) {
+          const current = sessions.get(element);
+          if (current) sessions.set(element, { ...current, committed: true,
+            committedValue: value });
+        },
+        previous(element) { return sessions.get(element)?.initialValue; },
+        finish(element, finalValue) {
+          const current = sessions.get(element);
+          sessions.delete(element);
+          if (!current) return { emit: false, reason: "missing-focus-session" };
+          if (current.initialValue === finalValue) {
+            return { emit: false, reason: "unchanged-focus-session" };
+          }
+          if (current.committed && current.committedValue === finalValue) {
+            return { emit: false, reason: "equivalent-native-commit" };
+          }
+          return { emit: true, reason: "changed-value-on-focusout-fallback",
+            previousValue: current.initialValue, value: finalValue };
+        }
+      };
+    }
+  };
+  const focusSessions = focusSessionApi.create();
   window.__T9_RECORDER_V2__ = true;
 
   let recording = false;
@@ -10,7 +45,6 @@
   const sourceFrameId = crypto.randomUUID();
   let sourceSequence = 0;
   const inputTimers = new WeakMap();
-  const focusSessions = globalThis.T9CaptureFocusSession.create();
   const observedDialogs = new Set();
 
   function diagnostic(stage, details = {}) {

@@ -21,6 +21,10 @@ for (const type of ["click", "input", "change", "focusin", "focusout",
 assert((content.match(/\}, true\);/gu) || []).length >= 6);
 assert(content.includes("event.composedPath?.()"));
 assert(content.includes("chrome.storage.onChanged.addListener"));
+assert(content.includes("globalThis.T9CaptureFocusSession ||"));
+assert(content.indexOf("const focusSessions = focusSessionApi.create()") <
+  content.indexOf("window.__T9_RECORDER_V2__ = true"),
+"The installation guard must not be set before compatibility dependencies load.");
 const fallback = focusSession.create();
 const muiDate = {};
 fallback.start(muiDate, "2026-08-06");
@@ -53,6 +57,8 @@ assert(background.includes("matchOriginAsFallback: true"));
 assert(background.includes("updateFrameDiagnostic(sender, message.frameUrl,"));
 assert(background.includes("captureDiagnosticsEnabled"));
 assert(background.includes("recorderActive: Boolean(state.recording)"));
+assert((background.match(/await registerRecorderContentScript\(\);/gu) || [])
+  .length >= 2, "Install and browser startup must refresh persistent registration.");
 
 function memoryAdapter() {
   let stored = null;

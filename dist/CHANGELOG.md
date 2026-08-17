@@ -11,6 +11,9 @@
 - Added opt-in sanitized Frame Capture Diagnostics covering observed events,
   policy decisions, message delivery, Raw Event persistence, and Canonical append
   without recording entered values or URL query strings.
+- Kept `content.js` self-sufficient when an older persistent dynamic registration
+  injects it without the newly separated focus-session helper, preventing an
+  early startup exception from disabling all event listeners.
 - Treat Business Central's `Sortera efter`/`Sort by` text as lookup state rather
   than part of a field caption, so instructions use `Nr` instead of
   `Sortera efter Nr`.
