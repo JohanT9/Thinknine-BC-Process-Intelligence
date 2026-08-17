@@ -12,14 +12,14 @@ assert.strictEqual(presentation.visibleResultCaption("Artikelregister"),
 
 const events = [
   { eventNo: 6, type: "field-change", category: "input" },
-  { eventNo: 8, type: "click", category: "selection" },
-  { eventNo: 9, type: "navigation", category: "navigation" }
+  { eventNo: 9, type: "click", category: "selection" },
+  { eventNo: 10, type: "navigation", category: "navigation" }
 ];
 assert.strictEqual(presentation.screenshotForResult(events, {
-  6: "loading.png", 8: "fors-order-visible.png", 9: "destination.png"
+  6: "loading.png", 8: "fors-order-visible.png", 10: "destination.png"
 }), "fors-order-visible.png");
 assert.strictEqual(presentation.screenshotForResult(events, {
-  6: "search-results.png", 9: "destination.png"
+  6: "search-results.png", 10: "destination.png"
 }), "search-results.png");
 
 console.log("Search interaction presentation tests passed.");

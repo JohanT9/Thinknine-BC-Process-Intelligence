@@ -10,6 +10,8 @@
 - Refresh stale system-selected evidence on untouched generated search steps so
   the completed result list (for example `screenshots/000008.png`) replaces the
   earlier loading-state image; preserve manual selections and annotations.
+- Include persisted captures associated with filtered technical events when
+  choosing search-result evidence, bounded by search start and result selection.
 - Expanded Document View to fill the available review viewport and removed the
   competing fixed-height calculation that could leave half the screen unused.
 - Let the document canvas shrink beside guidance without forcing a horizontal

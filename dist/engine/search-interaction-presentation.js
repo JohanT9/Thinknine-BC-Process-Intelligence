@@ -17,9 +17,22 @@
 
   function screenshotForResult(events = [], screenshots = {}) {
     const selection = [...events].reverse().find(event =>
-      event?.type === "click" && event?.category === "selection" &&
-      screenshots[event.eventNo]);
-    if (selection) return screenshots[selection.eventNo];
+      event?.type === "click" && event?.category === "selection");
+    const firstEventNo = Number(events[0]?.eventNo);
+    const selectionEventNo = Number(selection?.eventNo);
+
+    // Screenshot capture may be associated with a technical event that the
+    // interpretation stream correctly filters out. Consider every persisted
+    // capture inside the search boundary, not only instructional events.
+    if (Number.isFinite(firstEventNo) && Number.isFinite(selectionEventNo)) {
+      const resultState = Object.keys(screenshots)
+        .map(Number)
+        .filter(eventNo => Number.isFinite(eventNo) &&
+          eventNo >= firstEventNo && eventNo <= selectionEventNo)
+        .sort((left, right) => right - left)
+        .find(eventNo => screenshots[eventNo]);
+      if (resultState !== undefined) return screenshots[resultState];
+    }
 
     const stableSearchState = [...events].reverse().find(event =>
       event?.category !== "navigation" && screenshots[event.eventNo]);
