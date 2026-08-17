@@ -37,8 +37,10 @@ function (semantic, knowledge, refs) {
     const sourceEvents = (action.sourceEventIds || []).map(id =>
       eventsById.get(id)).filter(Boolean);
     const eventNos = unique(sourceEvents.map(event => event.eventNo));
-    const screenshot = [...eventNos].reverse().map(no => screenshots[no])
-      .find(Boolean) || action.screenshotRefs?.at(-1) || null;
+    const preferredEventNo = eventsById.get(action.preferredSourceEventId)?.eventNo;
+    const screenshot = screenshots[preferredEventNo] || action.preferredScreenshotRef ||
+      [...eventNos].reverse().map(no => screenshots[no]).find(Boolean) ||
+      action.screenshotRefs?.at(-1) || null;
     const trace = refs.normalize({ recordingId: action.recordingId,
       sourceEventIds: action.sourceEventIds,
       normalizedEventIds: action.normalizedEventIds,

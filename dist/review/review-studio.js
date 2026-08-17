@@ -995,17 +995,21 @@
       task?.userComment || task?.stepOverride || task?.manualStepId ||
       task?.provenance === "manual");
     if (consultantOwned) return false;
-    const patterns = [
-      /(?:välj\s+)?rad/iu,
-      /relaterad information|related information/iu,
-      /tillämpat försäljningspris och rabatt|applied sales price and discount/iu
+    const paths = [
+      [/(?:välj\s+)?rad/iu,
+        /relaterad information|related information/iu,
+        /tillämpat försäljningspris och rabatt|applied sales price and discount/iu],
+      [/(?:välj\s+)?(?:åtgärder|actions)/iu,
+        /(?:välj\s+)?(?:funktion|function|functions)/iu,
+        /(?:välj\s+)?(?:manuellt pris|manual price)/iu]
     ];
-    return tasks.some((_task, index) => patterns.every((pattern, offset) => {
-      const candidate = tasks[index + offset];
-      return ["RunAction", "ClickAction"].includes(candidate?.taskType) &&
-        pattern.test(String(candidate?.actionCaption || candidate?.instruction ||
-          candidate?.description || ""));
-    }));
+    return tasks.some((_task, index) => paths.some(patterns =>
+      patterns.every((pattern, offset) => {
+        const candidate = tasks[index + offset];
+        return ["RunAction", "ClickAction"].includes(candidate?.taskType) &&
+          pattern.test(String(candidate?.actionCaption || candidate?.instruction ||
+            candidate?.description || ""));
+      })));
   }
 
   return {

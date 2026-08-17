@@ -165,6 +165,10 @@
       ...(properties.hidden ? { hidden: true } : {}),
       selectedValue: properties.selectedValue || "",
       targetField: properties.targetField || "",
+      ...(properties.preferredSourceEventId
+        ? { preferredSourceEventId: properties.preferredSourceEventId } : {}),
+      ...(properties.preferredScreenshotRef
+        ? { preferredScreenshotRef: properties.preferredScreenshotRef } : {}),
       ...sources,
       rawInteractions: rawData(values),
       inputInteractionCount: values.length,
@@ -383,6 +387,45 @@
     return deepFreeze(rule);
   }
 
+  function manualPriceMenuPathRule() {
+    const captions = [
+      /^(?:välj\s+)?(?:åtgärder|actions)$/iu,
+      /^(?:välj\s+)?(?:funktion|function|functions)$/iu,
+      /^(?:välj\s+)?(?:manuellt pris|manual price)/iu
+    ];
+    const isAction = value => ["RunAction", "ClickAction"].includes(
+      value?.taskType
+    );
+    const caption = value => text(value?.actionCaption) ||
+      text(value?.selectedCaption);
+    const rule = {
+      ruleId: "manual-price-menu-path",
+      priority: 110,
+      match(context) {
+        return captions.every((pattern, offset) => {
+          const value = context.interactions[context.index + offset];
+          return isAction(value) && pattern.test(caption(value));
+        });
+      },
+      consolidate(context) {
+        const values = context.interactions.slice(context.index,
+          context.index + captions.length);
+        const menuEvidence = values[1];
+        const preferredScreenshots = menuEvidence?.semanticActionModel
+          ?.screenshotRefs || menuEvidence?.screenshots ||
+          (menuEvidence?.screenshot ? [menuEvidence.screenshot] : []);
+        return { consumed: values.length, action: action(rule, values, {
+          actionType: "RunActionPath",
+          displayText: "Välj **Åtgärder** → **Funktion** → **Manuellt pris**.",
+          selectedValue: caption(values.at(-1)),
+          preferredSourceEventId: menuEvidence?.sourceEventIds?.at(-1),
+          preferredScreenshotRef: preferredScreenshots.at(-1)
+        }) };
+      }
+    };
+    return deepFreeze(rule);
+  }
+
   const CUSTOMER = /kundens namn|kundnr|customer name|customer\s*no\.?/iu;
   const ITEM = /artikelnr|artikelnummer|item\s*no\.?/iu;
   const VENDOR = /leverantör(?:ens namn|snr|snummer)?|vendor(?:\s*name|\s*no\.?)?/iu;
@@ -391,6 +434,7 @@
 
   const BUILT_IN_RULES = deepFreeze([
     salesPriceDiscountMenuPathRule(),
+    manualPriceMenuPathRule(),
     selectionRule({ ruleId: "customer-selection", priority: 100,
       actionType: "SelectCustomer", fieldPattern: CUSTOMER,
       verb: "Välj kund", targetField: "Kund", requireValue: true }),
@@ -530,7 +574,8 @@
   function actionToInteraction(value) {
     if (value.passthrough) return clone(value.rawInteractions[0]);
     const first = clone(value.rawInteractions[0] || {});
-    const screenshot = value.screenshotRefs[value.screenshotRefs.length - 1] || null;
+    const screenshot = value.preferredScreenshotRef ||
+      value.screenshotRefs[value.screenshotRefs.length - 1] || null;
     return {
       ...first,
       taskType: value.actionType,

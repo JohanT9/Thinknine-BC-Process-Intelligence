@@ -23,6 +23,8 @@
 - Consolidated the evidenced `Välj rad → Relaterad information → Tillämpat
   försäljningspris och rabatt` menu path into one semantic step and select the
   final action screenshot.
+- Consolidated `Åtgärder → Funktion → Manuellt pris` and explicitly prefer the
+  open-submenu screenshot where `Manuellt pris` remains visible.
 - Fixed Document Library opening for recordings whose compatibility projection
   correctly omits empty Canonical `sourceEventIds`.
 - Kept legacy evidence source-less instead of fabricating Canonical IDs, while

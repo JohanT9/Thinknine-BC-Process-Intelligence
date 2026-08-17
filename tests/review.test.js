@@ -128,5 +128,10 @@ assert.strictEqual(review.hasGeneratedMenuPathLeak({ tasks:
   menuPathLeak.tasks.map((task, index) => index === 1
     ? { ...task, approved: true } : task) }), false,
 "consultant-owned menu steps must not regenerate automatically");
+assert.strictEqual(review.hasGeneratedMenuPathLeak({ tasks: [
+  { taskType: "RunAction", instruction: "Välj Åtgärder." },
+  { taskType: "RunAction", instruction: "Välj Funktion." },
+  { taskType: "RunAction", instruction: "Välj Manuellt pris." }
+] }), true);
 
 console.log("Review Studio tests passed.");

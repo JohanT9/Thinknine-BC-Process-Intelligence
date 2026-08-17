@@ -82,6 +82,33 @@ assert.strictEqual(menuResult.businessTasks[0].screenshot,
 assert.deepStrictEqual(menuResult.businessTasks[0].sourceEventIds,
   ["menu-event-row", "menu-event-related", "menu-event-discount"]);
 
+const manualPriceCaptions = ["Åtgärder", "Funktion", "Manuellt pris"];
+const manualPriceResult = pipeline.interpret({
+  session: { id: "manual-price-session", name: "Manual price" },
+  events: menuEvents,
+  stepGroups: manualPriceCaptions.map((caption, index) => ({
+    schemaVersion: 1,
+    stepGroupId: `manual-price-group-${index + 1}`,
+    groupingVersion: "1.0.0",
+    groupKind: "action",
+    sourceEventIds: [menuEvents[index].canonicalSourceEventId],
+    normalizedEventIds: [`normalized-manual-price-${index + 1}`],
+    normalizedEvents: [],
+    primaryNormalizedEvent: { kind: "action-invocation" },
+    actionContext: { caption }
+  })),
+  imagePaths: {
+    20: "screenshots/actions.png",
+    21: "screenshots/manual-price-visible.png",
+    22: "screenshots/menu-closed.png"
+  },
+  knowledgePacks: []
+});
+assert.strictEqual(manualPriceResult.businessTasks.length, 1);
+assert.strictEqual(manualPriceResult.businessTasks[0].taskType, "RunActionPath");
+assert.strictEqual(manualPriceResult.businessTasks[0].screenshot,
+  "screenshots/manual-price-visible.png");
+
 const compatibilityTasks = [{ taskId: "legacy-action", taskType: "RunAction",
   instruction: "Välj Släpp.", sourceEventNos: [1] }];
 const unknownCompatibilityGroups = [1, 2, 3].map(index => ({

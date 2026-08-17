@@ -66,6 +66,21 @@ assert.deepStrictEqual(menuPath.sourceEventIds,
   ["event-row", "event-related", "event-discount"]);
 assert.strictEqual(menuPath.screenshotRefs.at(-1), "discount.png");
 assert.strictEqual(menuPath.inputInteractionCount, 3);
+const manualPricePath = only([{
+  taskId: "actions", taskType: "RunAction", actionCaption: "Åtgärder",
+  sourceEventIds: ["event-actions"], screenshot: "actions.png"
+}, {
+  taskId: "function", taskType: "RunAction", actionCaption: "Funktion",
+  sourceEventIds: ["event-function"], screenshot: "manual-price-visible.png"
+}, {
+  taskId: "manual-price", taskType: "RunAction", actionCaption: "Manuellt pris",
+  sourceEventIds: ["event-manual-price"], screenshot: "menu-closed.png"
+}], "RunActionPath", "Välj **Åtgärder** → **Funktion** → **Manuellt pris**.");
+assert.strictEqual(manualPricePath.preferredSourceEventId, "event-function");
+assert.strictEqual(manualPricePath.preferredScreenshotRef,
+  "manual-price-visible.png");
+assert.strictEqual(engine.consolidateInteractions(
+  manualPricePath.rawInteractions)[0].screenshot, "manual-price-visible.png");
 assert.deepStrictEqual(customer.sourceEventNos, [1, 2]);
 assert.deepStrictEqual(customer.screenshotRefs, ["lookup.png", "selected.png"]);
 assert.deepStrictEqual(customer.annotationRefs, [{ annotationId: "ann-1" }]);
