@@ -5,6 +5,13 @@
 This section is authoritative. Later version-labelled sections retain useful
 decision history; they are not parallel current architectures.
 
+Packaging is outside the domain/document pipeline. One `src` tree produces the
+Manifest V3 runtime in `dist`; Edge Add-ons or enterprise browser policy owns
+production installation and updates. Customer evidence/state remains in
+`chrome.storage.local` under the stable extension identity. There is currently
+no native Windows component and therefore no justified installer. See
+[Packaging and update architecture](PACKAGING_AND_UPDATE_ARCHITECTURE.md).
+
 ```text
 CAPTURE
 Browser events → Raw Event Persistence → Canonical Recording

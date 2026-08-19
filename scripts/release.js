@@ -1,6 +1,7 @@
 const fs = require("fs");
 const path = require("path");
 const { execFileSync } = require("child_process");
+const metadata = require("./release-metadata");
 
 const root = path.resolve(__dirname, "..");
 const dist = path.join(root, "dist");
@@ -9,7 +10,8 @@ const manifest = JSON.parse(
   fs.readFileSync(path.join(dist, "manifest.json"), "utf8")
 );
 const version = manifest.version;
-const zipName = `Thinknine_BC_Process_Intelligence_v${version}_EDGE.zip`;
+const channel = metadata.releaseChannel(process.env.RELEASE_CHANNEL || "beta");
+const zipName = `extension-edge-${version}.zip`;
 const zipPath = path.join(releaseDir, zipName);
 
 fs.mkdirSync(releaseDir, { recursive: true });
@@ -32,4 +34,21 @@ if (process.platform === "win32") {
   });
 }
 
+const releaseManifest = metadata.createReleaseManifest({
+  version,
+  channel,
+  minimumCompatibleVersion:
+    process.env.MINIMUM_COMPATIBLE_VERSION || version,
+  artifacts: [{
+    component: "browser-extension",
+    browser: "edge",
+    file: zipName,
+    mediaType: "application/zip",
+    sha256: metadata.sha256(zipPath)
+  }]
+});
+fs.writeFileSync(path.join(releaseDir, "release-manifest.json"),
+  JSON.stringify(releaseManifest, null, 2) + "\n", "utf8");
+
 console.log(`Release package created: ${zipPath}`);
+console.log(`Release channel: ${channel}`);

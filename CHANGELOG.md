@@ -2,6 +2,13 @@
 
 ## 4.6.0 - Legacy documentation opening compatibility
 
+- Defined the packaging and update architecture: Edge Add-ons/store-owned
+  updates, stable extension identity, browser-owned customer storage, optional
+  enterprise/offline deployment, future Chrome store parity, and no Windows
+  installer until a real native component exists.
+- Release ZIP generation now emits a validated channel-aware
+  `release-manifest.json` with SHA-256 artifact evidence; `package.json` remains
+  the product-version source and schema versions remain independent.
 - React/MUI-checkboxar bevarar nu texten från en omslutande HTML-label, så
   avmarkerade val dokumenteras med sitt synliga fältnamn i stället för
   `Okänt fält` och det tekniska värdet `false`.

@@ -5,6 +5,12 @@ with modern Chrome and Edge bundle targets, but Chrome product support is not
 claimed until the manual Chrome verification plan is completed. See
 [Chrome readiness](docs/CHROME_READINESS.md).
 
+The current runtime is entirely a browser extension; there is no Windows
+executable or native companion. Unpacked `dist` is for development. The target
+commercial installation uses Edge Add-ons (or managed enterprise deployment),
+which owns extension updates and preserves `chrome.storage.local` under a stable
+extension identity. See [Packaging and update architecture](docs/PACKAGING_AND_UPDATE_ARCHITECTURE.md).
+
 Current pipeline:
 
 `Canonical Recording (captured evidence) → Identification → Normalization → Step Grouping → Semantic Interpretation → Resolved Steps → Semantic Document (renderer-neutral document) → Document Planner → Workspace / Word`
@@ -599,9 +605,12 @@ npm.cmd run build
 npm.cmd run check
 ```
 
-## Edge-installation
+## Edge-installation (development)
 
 Öppna `edge://extensions`, välj **Läs in opaketerat** och välj mappen `dist`.
+
+Det opaketerade tillägget är inte den planerade kommersiella
+distributionsmetoden.
 
 ## Nya exportfiler
 
@@ -625,8 +634,10 @@ git tag v4.6.0
 git push origin v4.6.0
 ```
 
-GitHub Actions bygger då automatiskt den Edge-märkta produktions-ZIP:en och
-bifogar den till en GitHub Release. Chrome-paketering införs först efter godkänd
+GitHub Actions bygger då automatiskt Edge-ZIP, SHA-256 och
+`release-manifest.json` och bifogar dem till en GitHub Release. ZIP-filen är en
+kontrollerad pilot/offline-artefakt, inte en egen uppdateringskanal.
+Chrome-paketering införs först efter godkänd
 manuell Chrome-verifiering.
 
 

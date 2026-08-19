@@ -1,5 +1,14 @@
 THINKNINE BC PROCESS INTELLIGENCE 4.6.0
 
+DISTRIBUTIONSSTATUS
+
+Instruktionerna nedan avser utveckling och kontrollerade pilotinstallationer.
+Kommersiell distribution ska ske via Microsoft Edge Add-ons eller hanterad
+enterprise-distribution, där webbläsaren äger installation och uppdatering.
+Den opaketerade dist-mappen är inte den planerade kommersiella leveransformen.
+Se docs/PACKAGING_AND_UPDATE_ARCHITECTURE.md för versions-, kanal-, data- och
+rollbackkontraktet.
+
 FÖRUTSÄTTNINGAR
 
 - Microsoft Edge
