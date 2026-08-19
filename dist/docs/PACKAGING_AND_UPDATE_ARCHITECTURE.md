@@ -188,9 +188,14 @@ and the actual Chrome product remains unverified.
 
 ## Recommended P2 implementation
 
+The repository now validates Edge listing identity and can generate checksumed
+Edge submission, enterprise-policy, and deployment-metadata artifacts with
+`npm run package:edge`. This does not publish or install anything and therefore
+preserves Edge as the single update owner. See `docs/EDGE_DISTRIBUTION.md`.
+
 1. Establish the verified publisher organization and reserve Stable/Beta Edge
-   listing identities.
-2. Add icons, privacy/support metadata, store policy review, and pilot release.
+   listing identities; feed the verified ID to the packaging command.
+2. Add store privacy/support metadata, complete policy review, and run the pilot.
 3. Add explicit encrypted/local backup and restore validation before wider use.
 4. Add CI provenance/signing controls and staged release approval.
 5. Complete Chrome manual verification, then generate a Chrome store package.

@@ -11,6 +11,11 @@ commercial installation uses Edge Add-ons (or managed enterprise deployment),
 which owns extension updates and preserves `chrome.storage.local` under a stable
 extension identity. See [Packaging and update architecture](docs/PACKAGING_AND_UPDATE_ARCHITECTURE.md).
 
+Create a validated pilot artifact for an existing Edge Add-ons listing with
+`npm run package:edge`. The command requires `EDGE_EXTENSION_ID`, runs the full
+verification chain, and never publishes anything. See
+[Edge distribution and managed updates](docs/EDGE_DISTRIBUTION.md).
+
 Current pipeline:
 
 `Canonical Recording (captured evidence) → Identification → Normalization → Step Grouping → Semantic Interpretation → Resolved Steps → Semantic Document (renderer-neutral document) → Document Planner → Workspace / Word`

@@ -8,6 +8,8 @@ enterprise-distribution, där webbläsaren äger installation och uppdatering.
 Den opaketerade dist-mappen är inte den planerade kommersiella leveransformen.
 Se docs/PACKAGING_AND_UPDATE_ARCHITECTURE.md för versions-, kanal-, data- och
 rollbackkontraktet.
+Se docs/EDGE_DISTRIBUTION.md för Edge Add-ons-pilot, enterprise-policy och
+hanterade uppdateringar. Repositoryt innehåller ingen Windows-installer.
 
 FÖRUTSÄTTNINGAR
 
