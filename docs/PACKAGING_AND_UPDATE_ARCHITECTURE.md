@@ -193,6 +193,12 @@ Edge submission, enterprise-policy, and deployment-metadata artifacts with
 `npm run package:edge`. This does not publish or install anything and therefore
 preserves Edge as the single update owner. See `docs/EDGE_DISTRIBUTION.md`.
 
+Pilot publication candidates use `npm run release:pilot`, which requires clean
+Git source, binds the full commit SHA into release metadata, runs the expanded
+release gate, independently validates ZIP contents, and emits versioned
+checksums and release notes. The controlled listing and real update lifecycle
+remain browser/human-owned. See `docs/PILOT_RELEASE.md`.
+
 1. Establish the verified publisher organization and reserve Stable/Beta Edge
    listing identities; feed the verified ID to the packaging command.
 2. Add store privacy/support metadata, complete policy review, and run the pilot.

@@ -7,7 +7,8 @@ const sourceManifest = JSON.parse(fs.readFileSync(
   "src/ui/manifest.json", "utf8"));
 assert.strictEqual(sourceManifest.version, packageJson.version,
   "package.json and the checked-in manifest must not drift");
-assert.deepStrictEqual(metadata.CHANNELS, ["stable", "beta", "development"]);
+assert.deepStrictEqual(metadata.CHANNELS,
+  ["stable", "pilot", "beta", "development"]);
 assert.throws(() => metadata.releaseChannel("nightly"),
   /Unsupported release channel/u);
 
@@ -22,6 +23,7 @@ const release = metadata.createReleaseManifest({
 assert.strictEqual(release.manifestVersion, 1);
 assert.strictEqual(release.version, packageJson.version);
 assert.strictEqual(release.channel, "beta");
+assert.strictEqual(release.sourceClean, true);
 assert.strictEqual(release.minimumCompatibleVersion, packageJson.version);
 assert.strictEqual(release.artifacts[0].component, "browser-extension");
 assert(!JSON.stringify(release).includes("certificate"));

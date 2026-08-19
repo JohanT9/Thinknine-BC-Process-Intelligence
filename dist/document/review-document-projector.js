@@ -471,7 +471,8 @@
           kind: "heading", level: 2, text: section.title,
           provenance: section.provenance,
           preserveUserText: section.provenance !== "generated",
-          sourceRef: { sectionId: section.sectionId } },
+          sourceRef: { sectionId: "section:workflow",
+            hierarchySectionId: section.sectionId } },
         ...section.directSteps.map(step =>
           blockByStepId.get(String(step.stepId || step.taskId))
         ).filter(Boolean),
@@ -480,7 +481,8 @@
             kind: "heading", level: 3, text: subtask.title,
             provenance: subtask.provenance,
             preserveUserText: subtask.provenance !== "generated",
-            sourceRef: { sectionId: section.sectionId,
+            sourceRef: { sectionId: "section:workflow",
+              hierarchySectionId: section.sectionId,
               subtaskId: subtask.subtaskId } },
           ...subtask.steps.map(step =>
             blockByStepId.get(String(step.stepId || step.taskId))

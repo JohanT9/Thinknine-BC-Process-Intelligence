@@ -1,0 +1,28 @@
+{
+  "fixtureVersion": 1,
+  "sanitized": true,
+  "storage": {
+    "t9-recording-fixture": {
+      "schemaVersion": 1,
+      "id": "recording-pilot-fixture",
+      "name": "Sanitized order process",
+      "events": [{ "id": "event-fixture-1", "type": "click", "label": "Open order" }]
+    },
+    "t9-review-fixture": {
+      "id": "review-pilot-fixture",
+      "recordingId": "recording-pilot-fixture",
+      "tasks": [{ "id": "step-fixture-1", "instruction": "Open the order." }],
+      "stepOverrides": { "step-fixture-1": { "instruction": "Open the selected order." } },
+      "structureOverrides": [{ "kind": "section", "id": "section-fixture-1" }],
+      "manualSteps": [{ "id": "manual-fixture-1", "instruction": "Verify the result." }],
+      "notes": [{ "id": "note-fixture-1", "text": "Sanitized note" }],
+      "annotations": [{ "id": "annotation-fixture-1", "kind": "rectangle" }],
+      "sections": [{ "id": "section-fixture-1", "title": "Order" }],
+      "subtasks": [{ "id": "subtask-fixture-1", "title": "Verification" }]
+    },
+    "t9-process-model-fixture": { "id": "process-fixture-1", "reviewId": "review-pilot-fixture" },
+    "t9-process-version-fixture": { "id": "version-fixture-1", "version": 1 },
+    "t9-settings": { "locale": "sv-SE", "theme": "professional" },
+    "t9-document-library": [{ "id": "document-fixture-1", "title": "Sanitized order process" }]
+  }
+}

@@ -2,7 +2,7 @@ const crypto = require("crypto");
 const fs = require("fs");
 
 const RELEASE_MANIFEST_VERSION = 1;
-const CHANNELS = Object.freeze(["stable", "beta", "development"]);
+const CHANNELS = Object.freeze(["stable", "pilot", "beta", "development"]);
 
 function releaseChannel(value = "beta") {
   const channel = String(value || "").trim().toLowerCase();
@@ -35,6 +35,8 @@ function createReleaseManifest(options = {}) {
     product: "Thinknine BC Process Intelligence",
     version,
     channel,
+    gitCommit: options.gitCommit,
+    sourceClean: options.sourceClean !== false,
     publishedAt: options.publishedAt || new Date().toISOString(),
     minimumCompatibleVersion: options.minimumCompatibleVersion || version,
     artifacts,

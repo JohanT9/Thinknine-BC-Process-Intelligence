@@ -12,6 +12,10 @@
 - Edge pilot packaging can now validate a real listing ID and generate
   checksumed submission, deployment, and enterprise-policy metadata without
   publishing, installing, or introducing a second updater.
+- Controlled pilot readiness now adds a clean-tree release gate, Git commit
+  traceability, independent ZIP validation, sanitized stored-state compatibility
+  evidence, permission/privacy review, store material, and consultant go/no-go
+  guides; browser publication and real A-to-B updates remain human actions.
 - React/MUI-checkboxar bevarar nu texten från en omslutande HTML-label, så
   avmarkerade val dokumenteras med sitt synliga fältnamn i stället för
   `Okänt fält` och det tekniska värdet `false`.

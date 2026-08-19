@@ -16,6 +16,11 @@ Create a validated pilot artifact for an existing Edge Add-ons listing with
 verification chain, and never publishes anything. See
 [Edge distribution and managed updates](docs/EDGE_DISTRIBUTION.md).
 
+Pilot candidates use the stricter `npm run release:pilot` gate: clean source,
+full verification, commit traceability, package-content validation and SHA-256.
+Publication remains a human Edge Partner Center action. See
+[Controlled Edge pilot release](docs/PILOT_RELEASE.md).
+
 Current pipeline:
 
 `Canonical Recording (captured evidence) → Identification → Normalization → Step Grouping → Semantic Interpretation → Resolved Steps → Semantic Document (renderer-neutral document) → Document Planner → Workspace / Word`
