@@ -8,18 +8,11 @@ function updateText(element, value) {
 const withTimeout = globalThis.T9AsyncOperations.withTimeout;
 
 async function send(message, timeout = 5000) {
-  return withTimeout(
-    chrome.runtime.sendMessage(message),
-    timeout,
-    "Kommunikationen med tillägget"
-  );
+  return withTimeout(chrome.runtime.sendMessage(message), timeout, "Kommunikationen med tillägget");
 }
 
 async function currentTab() {
-  const [tab] = await chrome.tabs.query({
-    active: true,
-    currentWindow: true
-  });
+  const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
   return tab;
 }
 
@@ -29,21 +22,15 @@ function showMessage(text, error = false) {
 }
 
 function setStarting(starting) {
-  $("start").disabled = starting;
-  $("start").textContent = starting
-    ? "Startar inspelning..."
-    : "Starta inspelning";
+  $("startProcess").disabled = starting;
+  $("startBug").disabled = starting;
 }
 
 async function pingTab(tabId) {
   try {
-    return await withTimeout(
-      chrome.tabs.sendMessage(tabId, {
-        type: "T9_CONTENT_PING"
-      }),
-      1800,
-      "Kontrollen av Business Central-fliken"
-    );
+    return await withTimeout(chrome.tabs.sendMessage(tabId, {
+      type: "T9_CONTENT_PING"
+    }), 1800, "Kontrollen av Business Central-fliken");
   } catch {
     return null;
   }
@@ -54,35 +41,21 @@ async function ensureContentScript(tab) {
   if (response?.ok) return response;
 
   try {
-    await withTimeout(
-      chrome.scripting.executeScript({
-        target: {
-          tabId: tab.id,
-          allFrames: true
-        },
-        files: ["capture-focus-session.js", "bc-error-detector.js", "content.js"]
-      }),
-      4000,
-      "Inläsningen av inspelningsskriptet"
-    );
+    await withTimeout(chrome.scripting.executeScript({
+      target: { tabId: tab.id, allFrames: true },
+      files: ["capture-focus-session.js", "bc-error-detector.js", "content.js"]
+    }), 4000, "Inläsningen av inspelningsskriptet");
   } catch (error) {
-    throw new Error(
-      "Edge kunde inte läsa in inspelningsskriptet i Business Central. " +
-      "Kontrollera tilläggets webbplatsåtkomst. " +
-      error.message
-    );
+    throw new Error("Edge kunde inte läsa in inspelningsskriptet i Business Central. " +
+      "Kontrollera tilläggets webbplatsåtkomst. " + error.message);
   }
 
   await new Promise(resolve => setTimeout(resolve, 500));
   response = await pingTab(tab.id);
-
   if (!response?.ok) {
-    throw new Error(
-      "Business Central-fliken svarar fortfarande inte. " +
-      "Uppdatera BC med Ctrl+F5 och kontrollera att webbplatsåtkomsten är tillåten."
-    );
+    throw new Error("Business Central-fliken svarar fortfarande inte. " +
+      "Uppdatera BC med Ctrl+F5 och kontrollera att webbplatsåtkomsten är tillåten.");
   }
-
   return response;
 }
 
@@ -90,86 +63,102 @@ const refresh = globalThis.T9AsyncOperations.singleFlight(async function () {
   try {
     const response = await send({ type: "T9_GET_STATE" }, 3000);
     const active = Boolean(response?.state?.recording);
+    const bugRecording = response?.state?.recordingPurpose === "bug-report";
 
     $("startPanel").hidden = active;
     $("recordingPanel").hidden = !active;
-    updateText($("status"), active ? "● Inspelning pågår" : "Inte aktiv");
+    updateText($("status"), active
+      ? (bugRecording ? "Felrapportering pågår" : "Processinspelning pågår")
+      : "Inte aktiv");
     $("status").className = "status" + (active ? " rec" : "");
+    updateText($("recordingGuidance"), bugRecording
+      ? "Återskapa felet och kopiera gärna Business Central-feldetaljerna. Stoppa sedan för att granska rapporten."
+      : "Utför processen i Business Central och stoppa när du är klar.");
+    updateText($("stop"), bugRecording
+      ? "Stoppa och öppna felrapport"
+      : "Stoppa inspelning");
 
     if (response?.session) {
       updateText($("sessionName"), response.session.name);
       updateText($("count"), response.session.eventCount || 0);
+      const feedback = $("errorCaptureFeedback");
+      const errorCaptured = bugRecording && response.session.errorEvidenceCount > 0;
+      feedback.hidden = !errorCaptured;
+      if (errorCaptured) {
+        updateText(feedback,
+          response.session.lastErrorCaptureStatus === "details-captured"
+            ? "Business Central-felet och tekniska detaljer har fångats."
+            : "Business Central-felet har fångats. Alla tekniska detaljer var inte tillgängliga.");
+      }
     }
   } catch (error) {
     showMessage(error.message, true);
   }
 });
 
-$("start").addEventListener("click", async () => {
+async function startRecording(recordingPurpose) {
   setStarting(true);
   showMessage("Kontrollerar anslutningen till Business Central...");
-
   try {
     const tab = await currentTab();
-
     if (!tab?.url?.includes("businesscentral.dynamics.com")) {
       throw new Error("Öppna Business Central i den aktiva fliken först.");
     }
-
     await ensureContentScript(tab);
     showMessage("Anslutningen fungerar. Startar sessionen...");
 
     const response = await send({
-      type: "T9_START",
+      type: recordingPurpose === "bug-report" ? "T9_START_BUG_RECORDING" : "T9_START",
       tabId: tab.id,
-      name: $("name").value.trim() || "Business Central-process",
+      name: recordingPurpose === "bug-report"
+        ? "Business Central-fel"
+        : ($("name").value.trim() || "Business Central-process"),
       purpose: $("purpose").value.trim()
     }, 6000);
-
     if (!response?.ok) {
-      throw new Error(
-        response?.error || "Bakgrundsprocessen kunde inte starta sessionen."
-      );
+      throw new Error(response?.error || "Bakgrundsprocessen kunde inte starta sessionen.");
     }
-
-    showMessage("Inspelningen har startats.");
+    showMessage(recordingPurpose === "bug-report"
+      ? "Felrapporteringen har startats. Återskapa felet i Business Central."
+      : "Processinspelningen har startats.");
     await refresh();
   } catch (error) {
     showMessage(error.message, true);
   } finally {
     setStarting(false);
   }
-});
+}
+
+$("startProcess").addEventListener("click", () => startRecording("documentation"));
+$("startBug").addEventListener("click", () => startRecording("bug-report"));
 
 $("stop").addEventListener("click", async () => {
   try {
-    const response = await send({ type: "T9_STOP" }, 5000);
-
+    const state = await send({ type: "T9_GET_STATE" }, 3000);
+    const bugRecording = state?.state?.recordingPurpose === "bug-report";
+    showMessage(bugRecording
+      ? "Skapar felrapport och öppnar den för granskning..."
+      : "Stoppar inspelningen...");
+    const response = await send({
+      type: bugRecording ? "T9_FINISH_BUG_RECORDING" : "T9_STOP"
+    }, bugRecording ? 30000 : 5000);
     if (!response?.ok) {
-      throw new Error(
-        response?.error || "Kunde inte stoppa inspelningen."
-      );
+      throw new Error(response?.error || "Kunde inte stoppa inspelningen.");
     }
-
-    showMessage("Inspelningen har stoppats.");
+    showMessage(bugRecording
+      ? "Felrapporten har skapats och öppnats."
+      : "Inspelningen har stoppats.");
     await refresh();
   } catch (error) {
     showMessage(error.message, true);
   }
 });
 
-$("dashboard").addEventListener("click", () => {
-  chrome.runtime.openOptionsPage();
-});
-
+$("dashboard").addEventListener("click", () => chrome.runtime.openOptionsPage());
 $("debug").addEventListener("click", () => {
-  chrome.tabs.create({
-    url: chrome.runtime.getURL("debug.html")
-  });
+  chrome.tabs.create({ url: chrome.runtime.getURL("debug.html") });
 });
 
 refresh();
 const refreshInterval = setInterval(refresh, 1000);
-globalThis.addEventListener("pagehide", () => clearInterval(refreshInterval), {
-  once: true
-});
+globalThis.addEventListener("pagehide", () => clearInterval(refreshInterval), { once: true });

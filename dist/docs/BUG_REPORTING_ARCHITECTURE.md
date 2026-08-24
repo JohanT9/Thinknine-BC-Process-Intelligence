@@ -1,5 +1,9 @@
 # Bug Recording and Bug Reporting architecture
 
+## End-to-end UX boundary
+
+Bug Reporting starts as a first-class popup action. Stop finalizes the existing recording, derives reproduction through the shared interpretation pipeline, creates the existing Bug Report model, and opens its workspace automatically. Silent problems remain valid reports. Error dialogs add evidence but are not required. Telemetry, AI, and issue submission remain optional explicit downstream actions.
+
 ## Architectural position
 
 Bug Reporting reuses the existing recorder and evidence pipeline. There is no

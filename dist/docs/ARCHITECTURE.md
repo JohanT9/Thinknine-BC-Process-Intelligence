@@ -1,5 +1,9 @@
 # Architecture 4.6
 
+## Bug Reporting UX orchestration
+
+The extension popup presents Process Documentation and Bug Reporting as separate user intents. Both use the same recorder and Canonical Recording. Finishing Bug Reporting invokes shared interpretation and Bug Report services, persists a local draft, and opens the Technical Report Workspace; UI code does not recreate evidence or report semantics.
+
 ## Current architecture baseline
 
 This section is authoritative. Later version-labelled sections retain useful

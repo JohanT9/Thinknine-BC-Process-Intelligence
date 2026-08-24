@@ -32,6 +32,7 @@
     "test:telemetry-enrichment": "node tests/application-insights-telemetry.test.js",
     "test:ai-analysis": "node tests/ai-technical-analysis.test.js",
     "test:issue-package": "node tests/issue-package-integration.test.js",
+    "test:bug-reporting-ux": "node tests/bug-reporting-ux.test.js",
     "test:step-editor": "node tests/step-editor.test.js",
     "test:step-structure": "node tests/step-structure-overrides.test.js",
     "test:manual-steps": "node tests/manual-information-steps.test.js",
@@ -49,6 +50,7 @@
     "package:edge": "npm run ci && node scripts/release.js --require-enterprise-config",
     "release:verify": "node scripts/release-verify.js",
     "release:pilot": "node scripts/pilot-release.js",
+    "preci": "npm run test:bug-reporting-ux",
     "ci": "npm run lint && npm test && npm run build && npm run check",
     "dev:build": "node scripts/build.js",
     "dev:check": "npm run build && npm run check"

@@ -55,6 +55,14 @@
       editor.append(label, input);
     });
     container.appendChild(editor);
+    const technicalDetails = doc.createElement("details");
+    technicalDetails.className = "technical-details";
+    technicalDetails.appendChild(element(doc, "summary", "Technical details"));
+    technicalDetails.appendChild(element(doc, "p",
+      "Diagnostics, AL call stack, referenced objects, telemetry, AI analysis and traceability."));
+    const advancedKinds = new Set(["metadata", "diagnostics", "call-stack",
+      "objects", "telemetry", "timeline", "ai-analysis", "traceability"]);
+    let technicalSectionCount = 0;
     for (const section of report.sections) {
       const node = doc.createElement("section");
       node.dataset.technicalReportSection = section.id;
@@ -191,10 +199,17 @@
           addItems("Warnings and limitations", analysis.warnings || []);
         }
       }
-      container.appendChild(node);
+      if (advancedKinds.has(section.kind)) {
+        technicalDetails.appendChild(node); technicalSectionCount += 1;
+      } else container.appendChild(node);
     }
+    if (technicalSectionCount) container.appendChild(technicalDetails);
     const guidance = doc.createElement("section");
+    guidance.className = report.completeness.ready ? "report-ready" : "report-incomplete";
     guidance.appendChild(element(doc, "h2", "Completeness"));
+    guidance.appendChild(element(doc, "p", report.completeness.ready
+      ? "Ready to share. Review the preview before any external submission."
+      : "Complete the required human context below before sharing."));
     const list = doc.createElement("ul");
     report.completeness.issues.forEach(issue => list.appendChild(element(doc,
       "li", issue.message))); guidance.appendChild(list); container.appendChild(guidance);

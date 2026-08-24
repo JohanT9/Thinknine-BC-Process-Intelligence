@@ -1,5 +1,9 @@
 # Thinknine BC Process Intelligence v4.6.0 — Current Baseline
 
+## Report a Business Central bug
+
+Open the extension while Business Central is active and choose **Report a Bug**. Reproduce the problem, then choose **Stop and open bug report**. Thinknine creates and opens a local draft with reproduction steps, screenshots, captured BC error evidence, and technical diagnostics when available. Add the expected result and any missing business context, then copy or export locally—or explicitly preview and submit to a configured issue destination. Telemetry, AI analysis, and external integrations are optional.
+
 Edge is the production target. The architecture and build are Chromium-compatible,
 with modern Chrome and Edge bundle targets, but Chrome product support is not
 claimed until the manual Chrome verification plan is completed. See

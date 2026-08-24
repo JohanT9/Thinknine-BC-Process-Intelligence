@@ -149,6 +149,13 @@
         onSelectPrimaryError: id => workspace.selectPrimaryError(id)
       });
     workspace.subscribe(render); render(workspace.state());
+    if (query.get("new") === "1") {
+      const title = document.getElementById("technical-report-title");
+      const expected = document.getElementById("technical-report-expectedResult");
+      const firstMissing = !title?.value.trim() ? title :
+        (!expected?.value.trim() ? expected : null);
+      firstMissing?.focus();
+    }
     document.getElementById("saveReport").addEventListener("click", () =>
       workspace.save().catch(error => { message.textContent = error.message; }));
     document.getElementById("undoReport").addEventListener("click", workspace.undo);

@@ -6,6 +6,11 @@ importScripts("engine/raw-event-persistence.js");
 importScripts("engine/bc-ui-identification.js");
 importScripts("engine/event-normalization.js");
 importScripts("engine/event-step-grouping.js");
+importScripts("engine/source-reference.js");
+importScripts("document/semantic-interaction-engine.js");
+importScripts("engine/task-consolidation.js");
+importScripts("engine/knowledge-domain.js");
+importScripts("engine/session-interpretation-pipeline.js");
 importScripts("engine/privacy-mask.js");
 importScripts("engine/screenshot-capture-policy.js");
 importScripts("bug-report/bc-diagnostic-evidence.js");
@@ -841,6 +846,14 @@ async function captureBcErrorEvidence(input, sender) {
     screenshotSucceeded: evidence.screenshotStatus === "screenshot-captured",
     evidencePersisted: true, bugReportLinked: false
   } });
+  const updatedSession = await getSession(state.sessionId);
+  if (updatedSession) { updatedSession.errorEvidenceCount = Number(
+    updatedSession.errorEvidenceCount || 0) + 1;
+    updatedSession.lastErrorCaptureStatus = evidence.rawDiagnostics
+      ? "details-captured" : "error-captured";
+    updatedSession.updatedAt = new Date().toISOString();
+    await saveSession(updatedSession);
+  }
   return evidence;
 }
 
@@ -1216,6 +1229,48 @@ async function stopSession() {
   return session;
 }
 
+function draftBugTitle(tasks, errors) {
+  const finalTask = [...(tasks || [])].reverse().find(item =>
+    String(item.instruction || "").trim());
+  const action = String(finalTask?.actionCaption || "").trim();
+  const field = String(finalTask?.fieldCaption || "").trim();
+  const page = String(finalTask?.pageCaption || "").trim();
+  if (errors.length && action) return `Error when selecting "${action}"`;
+  if (errors.length && field) return `Validation error in "${field}"`;
+  if (errors.length && page) return `Business Central error in "${page}"`;
+  return errors.length ? "Business Central error during recorded process" :
+    "Reported Business Central problem";
+}
+
+async function createAndOpenBugReport(recordingId) {
+  const recording = await getCanonicalRecording(recordingId);
+  const normalized = globalThis.T9EventNormalization.normalizeRecording(recording);
+  const grouped = globalThis.T9EventStepGrouping.group(normalized);
+  const legacy = globalThis.T9CanonicalRecording.legacyView(recording);
+  const screenshots = await getScreenshots(recordingId);
+  const projectedEvents = legacy.events.map((event, index) => ({ ...event,
+    canonicalSourceEventId: recording.events[index]?.id || "",
+    canonicalScreenshotAssetId: recording.events[index]?.screenshotAssetId || "" }));
+  const packResult = await pageKnowledgePacksReady;
+  const interpretation = globalThis.T9SessionInterpretationPipeline.interpret({
+    session: legacy.session, events: projectedEvents,
+    normalizedEvents: normalized.events, stepGroups: grouped.groups,
+    imagePaths: screenshots, knowledgePacks: packResult.packs || [] });
+  const byCanonicalId = new Map(recording.events.map(event => [event.id, event]));
+  const tasks = (interpretation.businessTasks || []).map(task => ({ ...task,
+    screenshotAssetIds: [...new Set((task.sourceEventIds || []).map(id =>
+      byCanonicalId.get(id)?.screenshotAssetId).filter(Boolean))] }));
+  const errors = await getBcErrorEvidenceForRecording(recordingId);
+  const report = globalThis.T9BugReportService.createBugReportFromRecording(
+    recording, tasks, { extensionVersion: VERSION, productVersion: VERSION,
+      errorEvidence: errors, title: draftBugTitle(tasks, errors) });
+  const saved = await bugReportStore.save(report);
+  const workspaceUrl = chrome.runtime.getURL(
+    `technical-report.html?bugReportId=${encodeURIComponent(saved.bugReportId)}&new=1`);
+  const tab = await chrome.tabs.create({ url: workspaceUrl });
+  return { report: saved, workspaceUrl, tabId: tab.id };
+}
+
 async function listSessions() {
   const all = await chrome.storage.local.get(null);
   return Object.entries(all)
@@ -1388,7 +1443,9 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
           throw new Error("Ingen aktiv felinspelning finns.");
         }
         const session = await stopSession();
-        sendResponse({ ok: true, session, canCreateBugReport: true });
+        const created = await createAndOpenBugReport(session.id);
+        sendResponse({ ok: true, session, report: created.report,
+          workspaceUrl: created.workspaceUrl, tabId: created.tabId });
         break;
       }
 

@@ -1,5 +1,12 @@
 # Changelog
 
+## Unreleased
+
+- Added first-class Process Documentation and Bug Reporting start modes.
+- Bug recording now creates and opens a local report automatically on Stop.
+- Added non-blocking BC error-capture feedback and deterministic draft titles.
+- Refined report hierarchy with prominent human context and captured errors plus progressively disclosed technical details.
+
 ## 4.6.0 - Legacy documentation opening compatibility
 
 - Added provider-neutral Issue Package preview/offline export and explicit
