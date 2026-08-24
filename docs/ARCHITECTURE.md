@@ -12,6 +12,14 @@ production installation and updates. Customer evidence/state remains in
 no native Windows component and therefore no justified installer. See
 [Packaging and update architecture](PACKAGING_AND_UPDATE_ARCHITECTURE.md).
 
+Canonical Recording also supports an additive explicit `recordingPurpose` and
+remains the single evidence source for both documentation and Bug Reporting.
+Bug Reports are renderer-neutral derived models with independent identity,
+schema, lifecycle and persistence; they reference Canonical Events, derived
+Steps and screenshot assets rather than copying evidence. See
+[Bug Reporting architecture](BUG_REPORTING_ARCHITECTURE.md) and
+[Bug Report model](BUG_REPORT_MODEL.md).
+
 ```text
 CAPTURE
 Browser events → Raw Event Persistence → Canonical Recording

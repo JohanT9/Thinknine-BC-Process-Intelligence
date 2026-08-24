@@ -10,6 +10,7 @@
   const SCREENSHOT_PREFIX = "t9_screenshots_";
   const REVIEW_PREFIX = "t9_review_";
   const DOCUMENT_LIBRARY_KEY = "t9_document_library";
+  const BUG_REPORT_PREFIX = "t9_bug_report_";
 
   function sessionDataKeys(sessionId) {
     return [
@@ -23,6 +24,7 @@
   }
 
   return {
+    BUG_REPORT_PREFIX,
     EVENT_PREFIX,
     DOCUMENT_LIBRARY_KEY,
     REVIEW_PREFIX,

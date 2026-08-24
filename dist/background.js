@@ -8,6 +8,9 @@ importScripts("engine/event-normalization.js");
 importScripts("engine/event-step-grouping.js");
 importScripts("engine/privacy-mask.js");
 importScripts("engine/screenshot-capture-policy.js");
+importScripts("bug-report/bug-report-model.js");
+importScripts("bug-report/bug-report-service.js");
+importScripts("bug-report/bug-report-store.js");
 importScripts("document/document-library.js");
 
 const VERSION = "4.6.0";
@@ -50,6 +53,7 @@ const DEFAULT_SETTINGS = {
 const STATE_KEY = "t9_state";
 const SETTINGS_KEY = "t9_settings";
 const {
+  BUG_REPORT_PREFIX,
   EVENT_PREFIX,
   RAW_RECORDING_PREFIX,
   RECORDING_PREFIX,
@@ -115,7 +119,8 @@ async function getState() {
     recording: false,
     sessionId: null,
     tabId: null,
-    startedAt: null
+    startedAt: null,
+    recordingPurpose: null
   };
 }
 
@@ -275,6 +280,16 @@ const canonicalStore = globalThis.T9RawEventPersistence.createStore({
   load: getCanonicalRecording,
   save: saveCanonicalRecording
 });
+
+const bugReportStore = globalThis.T9BugReportStore.createStore({
+  async get(key) {
+    const data = await chrome.storage.local.get(key);
+    return data[key] || null;
+  },
+  async set(key, value) { await chrome.storage.local.set({ [key]: value }); },
+  async remove(key) { await chrome.storage.local.remove(key); },
+  async all() { return chrome.storage.local.get(null); }
+}, BUG_REPORT_PREFIX);
 
 async function capture(tabId) {
   try {
@@ -757,6 +772,8 @@ async function startSession(message, tabId) {
     id,
     name: message.name || "Business Central-process",
     purpose: message.purpose || "",
+    recordingPurpose: globalThis.T9CanonicalRecording
+      .normalizeRecordingPurpose(message.recordingPurpose),
     startedAt: now,
     completedAt: null,
     updatedAt: now,
@@ -777,7 +794,8 @@ async function startSession(message, tabId) {
     recording: true,
     sessionId: id,
     tabId,
-    startedAt: now
+    startedAt: now,
+    recordingPurpose: session.recordingPurpose
   });
   await setDebug({
     activeSessionId: id,
@@ -798,7 +816,7 @@ async function startSession(message, tabId) {
     session.updatedAt = session.completedAt;
     await saveSession(session);
     await setState({ recording: false, sessionId: null, tabId: null,
-      startedAt: null });
+      startedAt: null, recordingPurpose: null });
     await setDebug({ lastError:
       `Inspelningsstatus kunde inte levereras: ${String(error)}` });
     throw new Error("Inspelningsskriptet tog inte emot startstatus.");
@@ -812,7 +830,7 @@ async function startSession(message, tabId) {
     session.updatedAt = session.completedAt;
     await saveSession(session);
     await setState({ recording: false, sessionId: null, tabId: null,
-      startedAt: null });
+      startedAt: null, recordingPurpose: null });
     await setDebug({ lastError:
       "Inspelningsskriptet bekräftade inte den aktiva sessionen." });
     throw new Error(
@@ -925,7 +943,8 @@ async function stopSession() {
     recording: false,
     sessionId: null,
     tabId: state.tabId,
-    startedAt: null
+    startedAt: null,
+    recordingPurpose: null
   });
   await setDebug({
     activeSessionId: null,
@@ -1078,11 +1097,72 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
         break;
       }
 
+      case "T9_START_BUG_RECORDING": {
+        const tabId = message.tabId || sender.tab?.id;
+        if (!tabId) throw new Error("Ingen Business Central-flik angavs.");
+        const session = await startSession({ ...message,
+          recordingPurpose: "bug-report" }, tabId);
+        sendResponse({ ok: true, session });
+        break;
+      }
+
       case "T9_STOP": {
         const session = await stopSession();
         sendResponse({ ok: true, session });
         break;
       }
+
+      case "T9_FINISH_BUG_RECORDING": {
+        const state = await getState();
+        const active = state.sessionId ? await getSession(state.sessionId) : null;
+        if (!active || active.recordingPurpose !== "bug-report") {
+          throw new Error("Ingen aktiv felinspelning finns.");
+        }
+        const session = await stopSession();
+        sendResponse({ ok: true, session, canCreateBugReport: true });
+        break;
+      }
+
+      case "T9_CREATE_BUG_REPORT": {
+        const recording = await getCanonicalRecording(message.recordingId);
+        const report = globalThis.T9BugReportService
+          .createBugReportFromRecording(recording,
+            Array.isArray(message.derivedSteps) ? message.derivedSteps : [], {
+              ...(message.context || {}), extensionVersion: VERSION,
+              productVersion: VERSION
+            });
+        sendResponse({ ok: true, report: await bugReportStore.save(report) });
+        break;
+      }
+
+      case "T9_LOAD_BUG_REPORT":
+        sendResponse({ ok: true,
+          report: await bugReportStore.load(message.bugReportId) });
+        break;
+
+      case "T9_LIST_BUG_REPORTS":
+        sendResponse({ ok: true, reports: await bugReportStore.list() });
+        break;
+
+      case "T9_UPDATE_BUG_REPORT": {
+        const current = await bugReportStore.load(message.bugReportId);
+        if (!current) throw new Error("Bug Report kunde inte hittas.");
+        const updated = globalThis.T9BugReportModel.updateHumanContent(
+          current, message.humanContent || {}, new Date().toISOString()
+        );
+        sendResponse({ ok: true, report: await bugReportStore.save(updated) });
+        break;
+      }
+
+      case "T9_ARCHIVE_BUG_REPORT":
+        sendResponse({ ok: true, report: await bugReportStore.archive(
+          message.bugReportId, new Date().toISOString()) });
+        break;
+
+      case "T9_DELETE_BUG_REPORT":
+        await bugReportStore.remove(message.bugReportId);
+        sendResponse({ ok: true });
+        break;
 
       case "T9_GET_STATE": {
         const state = await getState();

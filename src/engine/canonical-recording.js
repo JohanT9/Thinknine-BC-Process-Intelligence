@@ -7,7 +7,16 @@
 })(typeof globalThis !== "undefined" ? globalThis : this, function (pageIdentity) {
   "use strict";
   const SCHEMA_VERSION = 1;
+  const RECORDING_PURPOSES = Object.freeze({
+    DOCUMENTATION: "documentation",
+    BUG_REPORT: "bug-report"
+  });
   const clone = value => value == null ? value : JSON.parse(JSON.stringify(value));
+  function normalizeRecordingPurpose(value) {
+    return value === RECORDING_PURPOSES.BUG_REPORT
+      ? RECORDING_PURPOSES.BUG_REPORT
+      : RECORDING_PURPOSES.DOCUMENTATION;
+  }
   function eventType(type) {
     return ({ "page-state": "pageOpened", "field-change": "fieldChanged", dialog: "dialogOpened" })[type] || type || "other";
   }
@@ -82,14 +91,14 @@
     return event;
   }
   function metadataFromSession(session = {}) {
-    return { title: session.name || undefined, startedAt: session.startedAt || new Date(0).toISOString(), finishedAt: session.completedAt || session.finishedAt || undefined, sourceApplication: session.sourceApplication || "Microsoft Dynamics 365 Business Central", sourceUrl: session.sourceUrl || undefined, businessCentral: clone(session.businessCentral || { environment: session.settings?.environmentName || undefined }), recordingPurpose: session.recordingPurpose || session.purpose || undefined };
+    return { title: session.name || undefined, startedAt: session.startedAt || new Date(0).toISOString(), finishedAt: session.completedAt || session.finishedAt || undefined, sourceApplication: session.sourceApplication || "Microsoft Dynamics 365 Business Central", sourceUrl: session.sourceUrl || undefined, businessCentral: clone(session.businessCentral || { environment: session.settings?.environmentName || undefined }), recordingPurpose: normalizeRecordingPurpose(session.recordingPurpose) };
   }
   function assetFor(sessionId, eventNo, value) {
     return { id: `${sessionId}:screenshot:${eventNo}`, type: "screenshot", path: `screenshots/${String(eventNo).padStart(6, "0")}.png`, mimeType: /^data:([^;,]+)/.exec(String(value || ""))?.[1] || "image/png", metadata: { legacyEventNo: Number(eventNo) } };
   }
   function create(options = {}) {
     const now = options.startedAt || new Date().toISOString();
-    const session = options.legacySession || { id: options.id, name: options.title, purpose: options.recordingPurpose, startedAt: now, completedAt: options.finishedAt, updatedAt: options.updatedAt || now, settings: clone(options.settings || {}) };
+    const session = options.legacySession || { id: options.id, name: options.title, recordingPurpose: normalizeRecordingPurpose(options.recordingPurpose), startedAt: now, completedAt: options.finishedAt, updatedAt: options.updatedAt || now, settings: clone(options.settings || {}) };
     return { id: options.id, schemaVersion: SCHEMA_VERSION, metadata: metadataFromSession(session), events: [], assets: [], createdAt: now, updatedAt: options.updatedAt || now, compatibility: { session: clone(session) } };
   }
   function fromLegacy(session, events = [], screenshots = {}) {
@@ -135,7 +144,7 @@
   function normalize(input, legacy = {}) {
     if (!input || input.schemaVersion == null) return (!legacy.session && !input) ? null : fromLegacy(legacy.session || input, legacy.events, legacy.screenshots);
     if (Number(input.schemaVersion) !== SCHEMA_VERSION) throw new Error(`Unsupported recording schema: ${input.schemaVersion}`);
-    const result = clone(input); result.events = Array.isArray(result.events) ? result.events : []; result.assets = Array.isArray(result.assets) ? result.assets : []; result.metadata ||= {}; return result;
+    const result = clone(input); result.events = Array.isArray(result.events) ? result.events : []; result.assets = Array.isArray(result.assets) ? result.assets : []; result.metadata ||= {}; result.metadata.recordingPurpose = normalizeRecordingPurpose(result.metadata.recordingPurpose); return result;
   }
   function addEvent(recording, source, identification = null) {
     if (!source || typeof source !== "object" || Array.isArray(source) || !source.type) throw new TypeError("A raw event with a type is required.");
@@ -169,7 +178,8 @@
     return result;
   }
   function finish(recording, finishedAt) { if (recording.metadata?.finishedAt) { if (recording.metadata.finishedAt === finishedAt) return recording; throw new Error("Completed recording evidence is immutable."); } const result = normalize(recording); result.metadata.finishedAt = finishedAt; result.updatedAt = finishedAt; if (result.compatibility?.session) Object.assign(result.compatibility.session, { completedAt: finishedAt, updatedAt: finishedAt, status: "completed" }); return result; }
-  function legacyView(recording) { const value = normalize(recording); const session = clone(value.compatibility?.session || {}); Object.assign(session, { id: value.id, name: session.name || value.metadata.title, purpose: session.purpose || value.metadata.recordingPurpose || "", startedAt: session.startedAt || value.metadata.startedAt, completedAt: session.completedAt || value.metadata.finishedAt || null, updatedAt: value.updatedAt, eventCount: value.events.length }); return { session, events: value.events.map(event => ({ ...clone(event.raw || { id: event.id, timestamp: event.timestamp, type: event.type }), ...(event.identification ? { identification: clone(event.identification) } : {}) })) }; }
-  return { SCHEMA_VERSION, addEvent, addScreenshot, create, finish, fromLegacy,
-    integrityDiagnostics, legacyView, normalize };
+  function legacyView(recording) { const value = normalize(recording); const session = clone(value.compatibility?.session || {}); Object.assign(session, { id: value.id, name: session.name || value.metadata.title, purpose: session.purpose || "", recordingPurpose: value.metadata.recordingPurpose, startedAt: session.startedAt || value.metadata.startedAt, completedAt: session.completedAt || value.metadata.finishedAt || null, updatedAt: value.updatedAt, eventCount: value.events.length }); return { session, events: value.events.map(event => ({ ...clone(event.raw || { id: event.id, timestamp: event.timestamp, type: event.type }), ...(event.identification ? { identification: clone(event.identification) } : {}) })) }; }
+  return { RECORDING_PURPOSES, SCHEMA_VERSION, addEvent, addScreenshot, create,
+    finish, fromLegacy, integrityDiagnostics, legacyView, normalize,
+    normalizeRecordingPurpose };
 });

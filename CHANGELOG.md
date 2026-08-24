@@ -2,6 +2,11 @@
 
 ## 4.6.0 - Legacy documentation opening compatibility
 
+- Added the first Bug Recording architecture milestone: explicit recording
+  purpose with documentation compatibility, a renderer-neutral versioned Bug
+  Report model, evidence references, regeneration-safe human content, local
+  persistence and application entry points—without a second recorder, error
+  scraping, call-stack parsing, telemetry or AI.
 - Defined the packaging and update architecture: Edge Add-ons/store-owned
   updates, stable extension identity, browser-owned customer storage, optional
   enterprise/offline deployment, future Chrome store parity, and no Windows
