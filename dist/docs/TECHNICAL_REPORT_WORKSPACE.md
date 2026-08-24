@@ -24,6 +24,8 @@ labels, status regions, table captions, keyboard-native controls and expandable
 details provide the accessibility baseline. Long evidence is wrapped, not
 truncated.
 
-Nothing is transmitted. There is no telemetry, Application Insights query, AI
-or issue submission. No real BC Bug Report was available locally; verification
-uses sanitized synthetic fixtures.
+The optional Application Insights panel stores public resource configuration,
+tests the connection, and refreshes one explicitly selected error. Telemetry
+and the derived timeline are read-only, escaped, and exported from the shared
+projection. Raw results are collapsed. No AI or issue submission exists. No real
+BC/Application Insights pair was available locally; tests use synthetic data.

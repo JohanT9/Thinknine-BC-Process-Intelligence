@@ -149,6 +149,24 @@
       } else if (section.kind === "notes") {
         section.content.forEach(note => node.appendChild(element(doc, "p",
           note.text || note.content || "")));
+      } else if (section.kind === "telemetry") {
+        if (!section.content.configured) node.appendChild(element(doc, "p",
+          "Telemetry is optional and has not been fetched."));
+        section.content.contexts.forEach(context => {
+          node.appendChild(element(doc, "h3", `Error ${context.errorEvidenceId}`));
+          node.appendChild(element(doc, "p", `Status: ${context.status}`));
+          const list = doc.createElement("ul");
+          context.events.forEach(event => list.appendChild(element(doc, "li",
+            `${event.timestamp} — ${event.eventName || event.message} (${(event.correlationReasons || []).join(", ")})`)));
+          node.appendChild(list);
+          node.appendChild(details(doc, "Raw telemetry query results",
+            JSON.stringify(context.queries, null, 2), onCopy));
+        });
+      } else if (section.kind === "timeline") {
+        const list = doc.createElement("ol");
+        section.content.forEach(item => list.appendChild(element(doc, "li",
+          `${item.timestamp} [${item.source}] ${item.label}`)));
+        node.appendChild(list);
       }
       container.appendChild(node);
     }

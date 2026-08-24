@@ -6,7 +6,8 @@ never the source of truth.
 
 Default order is Summary, Environment, Steps to Reproduce, Expected Result,
 Actual Result, Business Central Error, Technical Diagnostics, AL Call Stack,
-Referenced AL Objects, Screenshots and Evidence, Notes, and Traceability.
+Referenced AL Objects, optional Application Insights Telemetry, Correlated
+Timeline, Screenshots and Evidence, Notes, and Traceability.
 
 Title, summary, severity, category, expected result, human actual-result text and
 notes remain editable. Captured messages, diagnostics, screenshots and IDs are

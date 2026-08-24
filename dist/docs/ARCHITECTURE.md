@@ -745,3 +745,13 @@ Regeneration starts only from a detached Canonical Recording and calls the
 existing interpretation owners once. Fresh generated state is reconciled with
 authoritative consultant state before validation and atomic pointer replacement.
 See [REGENERATE_FROM_RECORDING.md](REGENERATE_FROM_RECORDING.md).
+
+## Application Insights enrichment boundary (4.6)
+
+Optional external telemetry is queried by one provider through versioned query
+definitions after explicit user action. It is persisted per BC error under the
+Bug Report, never in Canonical Recording. The Technical Report projection joins
+local and external references into a derived timeline without merging stores or
+claiming causation. Authentication is Entra authorization code with PKCE; no
+confidential credential or token is persisted. See
+[APPLICATION_INSIGHTS_ENRICHMENT.md](APPLICATION_INSIGHTS_ENRICHMENT.md).

@@ -10,8 +10,13 @@ Reports. Bug Recording can passively capture supported Business Central modal
 errors, exact messages, visible diagnostic details, raw AL call-stack text and
 a dedicated screenshot. Versioned deterministic AL parsing organizes explicit
 frames and Technical Diagnostics while preserving unknown syntax. Evidence
-stays local; clipboard monitoring, Application Insights queries, AI analysis,
-object/app guessing and root-cause inference are absent.
+can optionally be enriched for one selected error with read-only Application
+Insights data. This requires explicit configuration and refresh, uses Microsoft
+Entra PKCE, persists no secret or token, and never affects recording/export when
+unavailable. See [telemetry enrichment](docs/APPLICATION_INSIGHTS_ENRICHMENT.md).
+Captured evidence stays local except for explicitly requested Microsoft
+telemetry queries; clipboard monitoring, AI analysis, object/app guessing and
+root-cause inference are absent.
 
 Saved Bug Reports can be reviewed in a dedicated Technical Report Workspace
 with editable consultant context, exact errors, structured/raw AL stacks,

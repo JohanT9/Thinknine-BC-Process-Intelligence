@@ -21,3 +21,8 @@ codes—not stack content, object names or business data.
 
 The Bug Report Generator presents these values as neutral referenced objects and
 apps. It never labels a referenced object or app as causal.
+
+Optional Application Insights enrichment stays a separate external-evidence
+section. It is never inserted into parsed AL frames or used to assign object/app
+ownership or causation. Shared object identifiers may later support an explicit
+factual cross-reference only.

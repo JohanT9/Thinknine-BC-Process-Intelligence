@@ -11,6 +11,10 @@
       else resolve(response);
     });
   });
+  const action = handler => async () => {
+    try { await handler(); }
+    catch (error) { message.textContent = error.message || String(error); }
+  };
   function download(text, filename) {
     const blob = new Blob([text], { type: "text/markdown;charset=utf-8" });
     const url = URL.createObjectURL(blob);
@@ -27,6 +31,20 @@
       .then(response => response.report) };
     const workspace = globalThis.T9TechnicalReportWorkspace.create({
       report: loaded.report, errorEvidence: session.bcErrorEvidence, store
+    });
+    const telemetryConfiguration = (await send({
+      type: "T9_GET_TELEMETRY_CONFIGURATION" })).configuration;
+    document.getElementById("telemetryTenantId").value = telemetryConfiguration.tenantId || "";
+    document.getElementById("telemetryClientId").value = telemetryConfiguration.clientId || "";
+    document.getElementById("telemetryApplicationId").value = telemetryConfiguration.applicationId || "";
+    document.getElementById("telemetryEnvironment").value = telemetryConfiguration.environmentName || "";
+    document.getElementById("telemetryEnabled").checked = Boolean(telemetryConfiguration.enabled);
+    const configurationFromForm = () => ({
+      enabled: document.getElementById("telemetryEnabled").checked,
+      tenantId: document.getElementById("telemetryTenantId").value,
+      clientId: document.getElementById("telemetryClientId").value,
+      applicationId: document.getElementById("telemetryApplicationId").value,
+      environmentName: document.getElementById("telemetryEnvironment").value
     });
     const mediaAssets = {};
     (loaded.report.evidence?.screenshots || []).forEach(item => {
@@ -62,6 +80,30 @@
       await download(await workspace.exportMarkdown(), `${bugReportId}.md`);
       message.textContent = "Markdown exported.";
     });
+    document.getElementById("saveTelemetryConfig").addEventListener("click", action(async () => {
+      await send({ type: "T9_SAVE_TELEMETRY_CONFIGURATION",
+        configuration: configurationFromForm() });
+      message.textContent = "Telemetry configuration saved. No secret or token was stored.";
+    }));
+    document.getElementById("testTelemetry").addEventListener("click", action(async () => {
+      await send({ type: "T9_SAVE_TELEMETRY_CONFIGURATION",
+        configuration: configurationFromForm() });
+      const response = await send({ type: "T9_TEST_TELEMETRY_CONNECTION" });
+      message.textContent = `Telemetry connection: ${response.result.status}.`;
+    }));
+    document.getElementById("refreshTelemetry").addEventListener("click", action(async () => {
+      await workspace.flush();
+      const state = workspace.state().report;
+      const ids = state.businessCentralError?.errorEvidenceIds || [];
+      const errorEvidenceId = state.businessCentralError?.primaryErrorEvidenceId ||
+        (ids.length === 1 ? ids[0] : "");
+      if (!errorEvidenceId) throw new Error("Select a primary error before telemetry refresh.");
+      message.textContent = "Fetching telemetry from the configured Microsoft endpoint…";
+      await send({ type: "T9_REFRESH_BUG_REPORT_TELEMETRY", bugReportId,
+        errorEvidenceId, windowMinutes: Number(
+          document.getElementById("telemetryWindow").value) });
+      location.reload();
+    }));
   }
   start().catch(error => { message.textContent = error.message; });
 })();

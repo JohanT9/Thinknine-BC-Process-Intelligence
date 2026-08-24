@@ -2,6 +2,9 @@
 
 ## 4.6.0 - Legacy documentation opening compatibility
 
+- Added opt-in Application Insights read enrichment with Microsoft Entra PKCE,
+  bounded/versioned Business Central queries, per-error correlation, partial
+  failure, timeline/export integration, and no persisted confidential token.
 - Added a deterministic Bug Report Generator and dedicated Technical Report
   Workspace with human-field editing, save/undo/redo, multiple-error selection,
   exact evidence, structured/raw stacks, explicit completeness checks,

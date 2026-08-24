@@ -21,6 +21,17 @@
     <button id="redoReport" type="button">Redo</button>
     <button id="copyMarkdown" type="button">Copy full report</button>
     <button id="downloadMarkdown" type="button">Export Markdown</button>
+    <details><summary>Application Insights (optional)</summary>
+      <label>Tenant ID <input id="telemetryTenantId" autocomplete="off"></label>
+      <label>Public client ID <input id="telemetryClientId" autocomplete="off"></label>
+      <label>Application Insights App ID <input id="telemetryApplicationId" autocomplete="off"></label>
+      <label>Expected environment <input id="telemetryEnvironment" autocomplete="off"></label>
+      <label><input id="telemetryEnabled" type="checkbox"> Enable optional enrichment</label>
+      <label>Window (minutes) <input id="telemetryWindow" type="number" min="1" max="30" value="5"></label>
+      <button id="saveTelemetryConfig" type="button">Save telemetry configuration</button>
+      <button id="testTelemetry" type="button">Test telemetry connection</button>
+      <button id="refreshTelemetry" type="button">Refresh telemetry for selected error</button>
+    </details>
     <span id="workspaceMessage" role="status"></span></header>
   <main id="technicalReport" aria-live="polite"></main>
   <script src="bug-report/bug-report-model.js"></script>

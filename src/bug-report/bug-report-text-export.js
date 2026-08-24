@@ -43,6 +43,13 @@
     const objects = byId.get("affected-objects").content;
     add("Referenced AL Objects", objects.objects.map(item =>
       `- ${item.objectType} ${item.objectId} — ${item.objectName}`));
+    const telemetry = byId.get("telemetry")?.content;
+    add("Application Insights Telemetry", !telemetry?.configured
+      ? ["Not configured or not fetched."] : telemetry.contexts.flatMap(context => [
+        `Error evidence: ${context.errorEvidenceId}`, `Status: ${context.status}`,
+        ...context.events.map(event => `- ${event.timestamp} [${event.category}] ${event.eventName || event.message} (correlation: ${(event.correlationReasons || []).join(", ")})`)]));
+    add("Correlated Timeline", (byId.get("correlated-timeline")?.content || [])
+      .map(item => `- ${item.timestamp} [${item.source}] ${item.label}`));
     add("Notes", byId.get("notes").content.map(note =>
       `- ${note.text || note.content || ""}`));
     return `${out.join("\n").trim()}\n`;

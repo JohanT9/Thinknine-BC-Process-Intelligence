@@ -6,6 +6,7 @@
   "permissions": [
     "activeTab",
     "downloads",
+    "identity",
     "scripting",
     "storage",
     "tabs",
@@ -14,7 +15,9 @@
   ],
   "host_permissions": [
     "https://businesscentral.dynamics.com/*",
-    "https://*.businesscentral.dynamics.com/*"
+    "https://*.businesscentral.dynamics.com/*",
+    "https://login.microsoftonline.com/*",
+    "https://api.applicationinsights.io/*"
   ],
   "background": {
     "service_worker": "background.js"

@@ -22,7 +22,7 @@ BugReport
   evidence: screenshot/diagnostic/attachment references
   notes / annotations (human)
   traceability
-  enrichment: future telemetry and non-authoritative analysis
+  enrichment: optional telemetry per error and future analysis
 ```
 
 Statuses are deliberately limited to `draft`, `ready`, `resolved`, and
@@ -97,3 +97,8 @@ Technical Report projection adds no authority. Manual primary-error selection
 is stored in `businessCentralError.primaryErrorEvidenceId`; one error may be
 treated as primary for display without rewriting evidence. Existing Step
 Overrides may travel with reproduction and remain owned by Step architecture.
+
+Application Insights enrichment is additive schema-version-1 data under
+`enrichment.telemetry.byErrorEvidenceId`. It has separate query versions,
+provenance, correlation context, status, raw records, normalized events, and
+warnings. It is not Canonical evidence and never changes captured errors.

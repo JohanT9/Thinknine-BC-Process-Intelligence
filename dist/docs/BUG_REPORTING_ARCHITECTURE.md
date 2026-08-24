@@ -70,8 +70,9 @@ Three origins stay explicit:
 - **Human-authored content:** title, summary, severity, category, expected
   result, actual-result explanation, notes and annotations.
 
-Bug Reports remain local in `chrome.storage.local`. No external transmission,
-telemetry query, Azure permission, credential, OAuth, AI call, or analytics is
+Bug Reports and optional enrichment remain local in `chrome.storage.local`.
+Application Insights is queried only after explicit opt-in through Microsoft
+Entra PKCE. No confidential credential, AI call, or product analytics is
 introduced. Business values, company/user/session identifiers, errors, call
 stacks and screenshots may be sensitive. The internal model is therefore not an
 external support package. A future sanitization/export policy must explicitly
@@ -104,8 +105,8 @@ and [Technical Report Workspace](TECHNICAL_REPORT_WORKSPACE.md).
   surfaces and already-visible diagnostic DOM, without clipboard permission.
 - **AL call stack:** version 1 derives only explicitly present frame fields and
   preserves every unknown segment; it never invents object, app or line data.
-- **Application Insights:** optional enrichment references only; no query or
-  credential behavior exists now.
+- **Application Insights:** optional external evidence is implemented; see
+  [Application Insights enrichment](APPLICATION_INSIGHTS_ENRICHMENT.md).
 - **AI:** a future analysis service may consume selected evidence and produce a
   separate non-authoritative analysis object.
 - **Export:** future Workspace, Word, PDF, Markdown, JSON support package and
@@ -121,4 +122,4 @@ and [Technical Report Workspace](TECHNICAL_REPORT_WORKSPACE.md).
 - Error capture implemented? **Yes, for documented observable modal surfaces.**
 - AL call-stack frame parsing implemented? **Yes, deterministic version 1.0.0.**
 - Root-cause analysis implemented? **No.**
-- Telemetry or AI added? **No.**
+- Telemetry added? **Optional read enrichment.** AI added? **No.**

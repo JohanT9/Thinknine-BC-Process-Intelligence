@@ -14,6 +14,11 @@ importScripts("bug-report/technical-diagnostics.js");
 importScripts("bug-report/bug-report-model.js");
 importScripts("bug-report/bug-report-service.js");
 importScripts("bug-report/bug-report-store.js");
+importScripts("bug-report/telemetry-query-definitions.js");
+importScripts("bug-report/telemetry-enrichment.js");
+importScripts("bug-report/application-insights-provider.js");
+importScripts("bug-report/application-insights-auth.js");
+importScripts("bug-report/application-insights-transport.js");
 importScripts("document/document-library.js");
 
 const VERSION = "__APP_VERSION__";
@@ -66,11 +71,13 @@ const {
   SESSION_PREFIX
 } = globalThis.T9StorageKeys;
 const DEBUG_KEY = "t9_debug";
+const TELEMETRY_CONFIG_KEY = "t9_application_insights_configuration";
 
 let writeQueue = Promise.resolve();
 let stoppingSessionId = null;
 let canonicalPersistenceError = null;
 let errorEvidenceWrites = Promise.resolve();
+const telemetryRefreshGeneration = new Map();
 
 const SCREENSHOT_MIN_INTERVAL_MS = 1100;
 const CANONICAL_SETTLE_TIMEOUT_MS = 60000;
@@ -295,6 +302,29 @@ const bugReportStore = globalThis.T9BugReportStore.createStore({
   async remove(key) { await chrome.storage.local.remove(key); },
   async all() { return chrome.storage.local.get(null); }
 }, BUG_REPORT_PREFIX);
+
+const telemetryProvider = globalThis.T9ApplicationInsightsProvider.create({
+  authenticate: globalThis.T9ApplicationInsightsAuth.authenticate,
+  query: globalThis.T9ApplicationInsightsTransport.query,
+  sanitizeError(error) { return globalThis.T9ApplicationInsightsAuth.scrub(error).message; }
+});
+
+async function getTelemetryConfiguration() {
+  const data = await chrome.storage.local.get(TELEMETRY_CONFIG_KEY);
+  return data[TELEMETRY_CONFIG_KEY] || { enabled: false, tenantId: "",
+    clientId: "", applicationId: "", environmentName: "" };
+}
+
+async function saveTelemetryConfiguration(value = {}) {
+  const configuration = { enabled: Boolean(value.enabled),
+    tenantId: String(value.tenantId || "").trim(),
+    clientId: String(value.clientId || "").trim(),
+    applicationId: String(value.applicationId || "").trim(),
+    environmentName: String(value.environmentName || "").trim() };
+  await chrome.storage.local.set({ [TELEMETRY_CONFIG_KEY]: configuration });
+  globalThis.T9ApplicationInsightsAuth.clear();
+  return configuration;
+}
 
 async function capture(tabId) {
   try {
@@ -1286,6 +1316,56 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
         sendResponse({ ok: true,
           report: await bugReportStore.save(message.report) });
         break;
+
+      case "T9_GET_TELEMETRY_CONFIGURATION":
+        sendResponse({ ok: true, configuration: await getTelemetryConfiguration() });
+        break;
+
+      case "T9_SAVE_TELEMETRY_CONFIGURATION":
+        sendResponse({ ok: true, configuration: await saveTelemetryConfiguration(
+          message.configuration) });
+        break;
+
+      case "T9_TEST_TELEMETRY_CONNECTION":
+        sendResponse({ ok: true, result: await telemetryProvider.testConnection(
+          await getTelemetryConfiguration()) });
+        break;
+
+      case "T9_REFRESH_BUG_REPORT_TELEMETRY": { // Explicit user action only.
+        const report = await bugReportStore.load(message.bugReportId);
+        if (!report) throw new Error("Bug Report kunde inte hittas.");
+        const errorId = String(message.errorEvidenceId || "");
+        if (!(report.businessCentralError?.errorEvidenceIds || []).includes(errorId)) {
+          throw new Error("Välj ett specifikt Business Central-fel för korrelation.");
+        }
+        const errorEvidence = (await getBcErrorEvidenceForRecording(
+          report.recordingId)).find(item => item.errorEvidenceId === errorId);
+        if (!errorEvidence) throw new Error("Felevidensen kunde inte hittas.");
+        const identifiers = errorEvidence.structuredDiagnostics || {};
+        const refreshKey = `${report.bugReportId}:${errorId}`;
+        const generation = (telemetryRefreshGeneration.get(refreshKey) || 0) + 1;
+        telemetryRefreshGeneration.set(refreshKey, generation);
+        const telemetry = await telemetryProvider.queryBugContext({ errorEvidenceId: errorId,
+          timestamp: identifiers.timestamp || errorEvidence.capturedAt,
+          applicationInsightsSessionId: identifiers.applicationInsightsSessionId,
+          clientActivityId: identifiers.clientActivityId,
+          internalSessionId: identifiers.internalSessionId,
+          environmentName: identifiers.environment || "" },
+        await getTelemetryConfiguration(), { windowMinutes: message.windowMinutes });
+        if (telemetryRefreshGeneration.get(refreshKey) !== generation) {
+          sendResponse({ ok: true, ignored: true, reason: "superseded-refresh" });
+          break;
+        }
+        const latestReport = await bugReportStore.load(message.bugReportId);
+        if (!latestReport) {
+          sendResponse({ ok: true, ignored: true, reason: "report-removed" });
+          break;
+        }
+        const updated = globalThis.T9BugReportModel.attachTelemetry(latestReport, errorId,
+          telemetry, new Date().toISOString());
+        sendResponse({ ok: true, report: await bugReportStore.save(updated), telemetry });
+        break;
+      }
 
       case "T9_ARCHIVE_BUG_REPORT":
         sendResponse({ ok: true, report: await bugReportStore.archive(

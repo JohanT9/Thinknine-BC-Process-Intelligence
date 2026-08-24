@@ -10,7 +10,8 @@
   const text = value => typeof value === "string" ? value : "";
   const SECTION_ORDER = Object.freeze(["summary", "environment", "reproduction",
     "expected-result", "actual-result", "bc-errors", "technical-diagnostics",
-    "al-call-stack", "affected-objects", "evidence", "notes", "traceability"]);
+    "al-call-stack", "affected-objects", "telemetry", "correlated-timeline",
+    "evidence", "notes", "traceability"]);
   const LABELS = Object.freeze({ timestamp: "Timestamp",
     internalSessionId: "Internal Session ID",
     applicationInsightsSessionId: "Application Insights Session ID",
@@ -62,6 +63,26 @@
     const referencedApps = [...new Map(diagnostics.flatMap(item =>
       item.explicitExtensions || []).map(item => [JSON.stringify(item), clone(item)]
     )).values()];
+    const telemetryByError = clone(report.enrichment?.telemetry?.byErrorEvidenceId || {});
+    const telemetryContexts = Object.entries(telemetryByError).map(([errorEvidenceId, value]) => ({
+      errorEvidenceId, status: value.status || "not-configured",
+      queriedAt: value.queriedAt || "", connectionContext: clone(value.connectionContext || {}),
+      correlationContext: clone(value.correlationContext || {}),
+      eventCount: (value.events || []).length,
+      events: clone((value.events || []).filter(event =>
+        event.category !== "other-context").slice(0, 100)),
+      queries: clone(value.queries || []),
+      warnings: clone(value.warnings || []) }));
+    const timeline = [...errors.map(item => ({ timestamp: item.capturedAt,
+      source: "captured-error", label: "Business Central error captured",
+      referenceId: item.errorEvidenceId, provenance: "captured-local-evidence" })),
+    ...telemetryContexts.flatMap(context => context.events.map(event => ({
+      timestamp: event.timestamp, source: "telemetry",
+      label: event.eventName || event.message || "Telemetry event observed",
+      referenceId: event.telemetryEventId,
+      correlationReasons: clone(event.correlationReasons || []),
+      provenance: "external-telemetry-evidence" })))]
+      .filter(item => item.timestamp).sort((a, b) => a.timestamp.localeCompare(b.timestamp));
     const checks = completeness.evaluate(report, errors);
     const sections = [
       { id: "summary", title: "Summary", kind: "summary", provenance: "manual",
@@ -90,6 +111,12 @@
       { id: "affected-objects", title: "Referenced AL Objects",
         kind: "objects", provenance: "derived",
         content: { objects: affectedObjects, apps: referencedApps } },
+      { id: "telemetry", title: "Application Insights Telemetry",
+        kind: "telemetry", provenance: "external-telemetry",
+        content: { configured: telemetryContexts.length > 0,
+          contexts: telemetryContexts } },
+      { id: "correlated-timeline", title: "Correlated Timeline",
+        kind: "timeline", provenance: "derived-correlation", content: timeline },
       { id: "evidence", title: "Screenshots and Evidence", kind: "evidence",
         provenance: "mixed", content: { screenshots: clone(
           report.evidence?.screenshots || []), annotations: clone(report.annotations || []) } },

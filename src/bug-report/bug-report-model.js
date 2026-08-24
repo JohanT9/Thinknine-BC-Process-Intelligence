@@ -124,6 +124,16 @@
     return normalize(result);
   }
 
+  function attachTelemetry(report, errorEvidenceId, enrichment, updatedAt) {
+    const result = normalize(report);
+    const current = result.enrichment.telemetry?.byErrorEvidenceId || {};
+    result.enrichment.telemetry = { schemaVersion: 1,
+      byErrorEvidenceId: { ...clone(current), [String(errorEvidenceId)]:
+        clone(enrichment) } };
+    result.updatedAt = updatedAt || result.updatedAt;
+    return normalize(result);
+  }
+
   return { CATEGORIES, SCHEMA_VERSION, STATUSES, normalize, normalizeStep,
-    selectPrimaryError, updateHumanContent };
+    attachTelemetry, selectPrimaryError, updateHumanContent };
 });
