@@ -72,11 +72,15 @@ Three origins stay explicit:
 
 Bug Reports and optional enrichment remain local in `chrome.storage.local`.
 Application Insights is queried only after explicit opt-in through Microsoft
-Entra PKCE. No confidential credential, AI call, or product analytics is
-introduced. Business values, company/user/session identifiers, errors, call
+Entra PKCE. Optional AI Technical Analysis is a separate derived-enrichment
+stage invoked only by explicit user consent through an Entra-protected broker;
+it cannot mutate source evidence. Business values, company/user/session identifiers, errors, call
 stacks and screenshots may be sensitive. The internal model is therefore not an
 external support package. A future sanitization/export policy must explicitly
 select and redact data before sharing.
+
+See `AI_TECHNICAL_ANALYSIS.md`, `AI_EVIDENCE_POLICY.md`, and
+`AI_PRIVACY_AND_SECURITY.md` for this optional external-analysis boundary.
 
 ## Captured BC error evidence
 

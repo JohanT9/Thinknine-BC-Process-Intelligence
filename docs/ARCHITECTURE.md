@@ -755,3 +755,11 @@ local and external references into a derived timeline without merging stores or
 claiming causation. Authentication is Entra authorization code with PKCE; no
 confidential credential or token is persisted. See
 [APPLICATION_INSIGHTS_ENRICHMENT.md](APPLICATION_INSIGHTS_ENRICHMENT.md).
+# Optional AI Technical Analysis
+
+Bug Reporting can invoke a renderer-neutral Technical Analysis Provider after
+explicit consent. A deterministic policy/input layer separates authoritative
+capture, telemetry, diagnostics, human content, and derived AI output. UI only
+orchestrates; an Entra-protected broker owns confidential credentials. AI has no
+autonomous tools and cannot modify Canonical Recording or Bug Report evidence.
+See `AI_TECHNICAL_ANALYSIS.md`.

@@ -134,6 +134,19 @@
     return normalize(result);
   }
 
+  function attachAiAnalysis(report, analysis, updatedAt) {
+    const result = normalize(report);
+    result.enrichment.analysis = clone(analysis);
+    result.updatedAt = updatedAt || result.updatedAt;
+    return normalize(result);
+  }
+
+  function removeAiAnalysis(report, updatedAt) {
+    const result = normalize(report); result.enrichment.analysis = null;
+    result.updatedAt = updatedAt || result.updatedAt; return normalize(result);
+  }
+
   return { CATEGORIES, SCHEMA_VERSION, STATUSES, normalize, normalizeStep,
-    attachTelemetry, selectPrimaryError, updateHumanContent };
+    attachAiAnalysis, attachTelemetry, removeAiAnalysis, selectPrimaryError,
+    updateHumanContent };
 });

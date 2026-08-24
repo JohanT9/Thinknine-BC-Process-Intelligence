@@ -2,6 +2,10 @@
 
 ## 4.6.0 - Legacy documentation opening compatibility
 
+- Added optional, explicitly consented AI-assisted Bug Report analysis through
+  an Entra-protected broker, with bounded/redacted evidence, deterministic
+  fingerprints, structured cited output, hallucination guards, stale analysis,
+  no autonomous tools, no screenshots, and export exclusion by default.
 - Added opt-in Application Insights read enrichment with Microsoft Entra PKCE,
   bounded/versioned Business Central queries, per-error correlation, partial
   failure, timeline/export integration, and no persisted confidential token.

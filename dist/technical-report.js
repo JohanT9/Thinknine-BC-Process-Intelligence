@@ -46,6 +46,31 @@
       applicationId: document.getElementById("telemetryApplicationId").value,
       environmentName: document.getElementById("telemetryEnvironment").value
     });
+    const aiConfiguration = (await send({ type: "T9_GET_AI_CONFIGURATION" })).configuration;
+    for (const [id, field] of [["aiTenantId", "tenantId"], ["aiClientId", "clientId"],
+      ["aiScope", "scope"], ["aiBrokerUrl", "brokerUrl"], ["aiModel", "model"]]) {
+      document.getElementById(id).value = aiConfiguration[field] || "";
+    }
+    document.getElementById("aiEnabled").checked = Boolean(aiConfiguration.enabled);
+    const aiConfigurationFromForm = () => ({
+      enabled: document.getElementById("aiEnabled").checked,
+      tenantId: document.getElementById("aiTenantId").value,
+      clientId: document.getElementById("aiClientId").value,
+      scope: document.getElementById("aiScope").value,
+      brokerUrl: document.getElementById("aiBrokerUrl").value,
+      model: document.getElementById("aiModel").value,
+      maxInputTokens: 12000 });
+    const aiPolicyFromForm = () => ({
+      includeTelemetry: document.getElementById("aiIncludeTelemetry").checked,
+      includeTelemetryMessages: document.getElementById(
+        "aiIncludeTelemetryMessages").checked,
+      includeHumanNotes: document.getElementById("aiIncludeNotes").checked });
+    async function requestBrokerPermission(configuration) {
+      const origin = `${new URL(configuration.brokerUrl).origin}/*`;
+      if (!await chrome.permissions.request({ origins: [origin] })) {
+        throw new Error("Permission for the configured AI broker was not granted.");
+      }
+    }
     const mediaAssets = {};
     (loaded.report.evidence?.screenshots || []).forEach(item => {
       const event = session.recording?.events?.find(value =>
@@ -73,11 +98,13 @@
     document.getElementById("undoReport").addEventListener("click", workspace.undo);
     document.getElementById("redoReport").addEventListener("click", workspace.redo);
     document.getElementById("copyMarkdown").addEventListener("click", async () => {
-      await navigator.clipboard.writeText(await workspace.exportMarkdown());
+      await navigator.clipboard.writeText(await workspace.exportMarkdown({
+        includeAiAnalysis: document.getElementById("includeAiExport").checked }));
       message.textContent = "Report copied.";
     });
     document.getElementById("downloadMarkdown").addEventListener("click", async () => {
-      await download(await workspace.exportMarkdown(), `${bugReportId}.md`);
+      await download(await workspace.exportMarkdown({ includeAiAnalysis:
+        document.getElementById("includeAiExport").checked }), `${bugReportId}.md`);
       message.textContent = "Markdown exported.";
     });
     document.getElementById("saveTelemetryConfig").addEventListener("click", action(async () => {
@@ -102,6 +129,25 @@
       await send({ type: "T9_REFRESH_BUG_REPORT_TELEMETRY", bugReportId,
         errorEvidenceId, windowMinutes: Number(
           document.getElementById("telemetryWindow").value) });
+      location.reload();
+    }));
+    document.getElementById("saveAiConfig").addEventListener("click", action(async () => {
+      const configuration = aiConfigurationFromForm();
+      if (configuration.enabled) await requestBrokerPermission(configuration);
+      await send({ type: "T9_SAVE_AI_CONFIGURATION", configuration });
+      message.textContent = "Public AI broker configuration saved. No provider key was stored.";
+    }));
+    document.getElementById("analyzeBugReport").addEventListener("click", action(async () => {
+      if (!document.getElementById("aiConsent").checked) {
+        throw new Error("Explicit consent is required before AI analysis.");
+      }
+      await workspace.flush();
+      message.textContent = "Sending minimized evidence to the configured AI broker…";
+      await send({ type: "T9_ANALYZE_BUG_REPORT", bugReportId,
+        policy: aiPolicyFromForm() }); location.reload();
+    }));
+    document.getElementById("removeAiAnalysis").addEventListener("click", action(async () => {
+      await send({ type: "T9_REMOVE_BUG_REPORT_AI_ANALYSIS", bugReportId });
       location.reload();
     }));
   }

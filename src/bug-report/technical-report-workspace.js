@@ -56,12 +56,17 @@
       async flush() { if (saveState === "unsaved" || saveState === "failed") {
         await api.save();
       } else await savePromise; return report; },
-      async exportMarkdown() { await api.flush(); return textExport.markdown(
-        generator.project(report, { errorEvidence: evidence })); },
-      async exportPlainText() { await api.flush(); return textExport.plainText(
-        generator.project(report, { errorEvidence: evidence })); },
+      async exportMarkdown(exportOptions = {}) { await api.flush(); return textExport.markdown(
+        generator.project(report, { errorEvidence: evidence }), exportOptions); },
+      async exportPlainText(exportOptions = {}) { await api.flush(); return textExport.plainText(
+        generator.project(report, { errorEvidence: evidence }), exportOptions); },
       replaceTelemetry(errorEvidenceId, telemetry, now) {
         return commit(model.attachTelemetry(report, errorEvidenceId, telemetry, now));
+      },
+      replaceAiAnalysis(analysis, now) {
+        return commit(model.attachAiAnalysis(report, analysis, now));
+      },
+      removeAiAnalysis(now) { return commit(model.removeAiAnalysis(report, now));
       }
     };
     return api;

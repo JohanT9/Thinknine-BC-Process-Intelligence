@@ -1,16 +1,22 @@
 (function (root, factory) {
   const completeness = typeof module === "object" && module.exports
     ? require("./bug-report-completeness") : root.T9BugReportCompleteness;
-  const api = factory(completeness);
+  const aiInput = typeof module === "object" && module.exports
+    ? require("./ai-analysis-input") : root.T9AiAnalysisInput;
+  const aiModel = typeof module === "object" && module.exports
+    ? require("./ai-analysis-model") : root.T9AiAnalysisModel;
+  const api = factory(completeness, aiInput, aiModel);
   if (typeof module === "object" && module.exports) module.exports = api;
   root.T9BugReportGenerator = api;
-})(typeof globalThis !== "undefined" ? globalThis : this, function (completeness) {
+})(typeof globalThis !== "undefined" ? globalThis : this, function (
+  completeness, aiInput, aiModel
+) {
   "use strict";
   const clone = value => value == null ? value : JSON.parse(JSON.stringify(value));
   const text = value => typeof value === "string" ? value : "";
   const SECTION_ORDER = Object.freeze(["summary", "environment", "reproduction",
     "expected-result", "actual-result", "bc-errors", "technical-diagnostics",
-    "al-call-stack", "affected-objects", "telemetry", "correlated-timeline",
+    "al-call-stack", "affected-objects", "telemetry", "correlated-timeline", "ai-analysis",
     "evidence", "notes", "traceability"]);
   const LABELS = Object.freeze({ timestamp: "Timestamp",
     internalSessionId: "Internal Session ID",
@@ -83,6 +89,10 @@
       correlationReasons: clone(event.correlationReasons || []),
       provenance: "external-telemetry-evidence" })))]
       .filter(item => item.timestamp).sort((a, b) => a.timestamp.localeCompare(b.timestamp));
+    const currentAiInput = aiInput.build(report, errors,
+      report.enrichment?.analysis?.inputPolicy || {});
+    const analysis = aiModel.withStaleness(report.enrichment?.analysis,
+      currentAiInput.sourceEvidenceFingerprint);
     const checks = completeness.evaluate(report, errors);
     const sections = [
       { id: "summary", title: "Summary", kind: "summary", provenance: "manual",
@@ -117,6 +127,11 @@
           contexts: telemetryContexts } },
       { id: "correlated-timeline", title: "Correlated Timeline",
         kind: "timeline", provenance: "derived-correlation", content: timeline },
+      { id: "ai-analysis", title: "AI-assisted Technical Analysis",
+        kind: "ai-analysis", provenance: "ai-analysis", content: {
+          available: Boolean(analysis), analysis,
+          currentFingerprint: currentAiInput.sourceEvidenceFingerprint,
+          disclosure: currentAiInput.disclosure } },
       { id: "evidence", title: "Screenshots and Evidence", kind: "evidence",
         provenance: "mixed", content: { screenshots: clone(
           report.evidence?.screenshots || []), annotations: clone(report.annotations || []) } },

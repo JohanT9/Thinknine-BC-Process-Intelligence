@@ -19,6 +19,9 @@
     "https://login.microsoftonline.com/*",
     "https://api.applicationinsights.io/*"
   ],
+  "optional_host_permissions": [
+    "https://*/*"
+  ],
   "background": {
     "service_worker": "background.js"
   },

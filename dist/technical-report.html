@@ -21,6 +21,7 @@
     <button id="redoReport" type="button">Redo</button>
     <button id="copyMarkdown" type="button">Copy full report</button>
     <button id="downloadMarkdown" type="button">Export Markdown</button>
+    <label><input id="includeAiExport" type="checkbox"> Include AI analysis in copy/export</label>
     <details><summary>Application Insights (optional)</summary>
       <label>Tenant ID <input id="telemetryTenantId" autocomplete="off"></label>
       <label>Public client ID <input id="telemetryClientId" autocomplete="off"></label>
@@ -32,10 +33,32 @@
       <button id="testTelemetry" type="button">Test telemetry connection</button>
       <button id="refreshTelemetry" type="button">Refresh telemetry for selected error</button>
     </details>
+    <details><summary>AI technical analysis (optional)</summary>
+      <p>Explicit analysis sends a minimized, redacted technical evidence package
+        to your configured Entra-protected broker. Screenshots, raw events, raw
+        diagnostics, tenant/company/user/session IDs and raw telemetry are excluded.</p>
+      <label>Tenant ID <input id="aiTenantId" autocomplete="off"></label>
+      <label>Public client ID <input id="aiClientId" autocomplete="off"></label>
+      <label>Broker OAuth scope <input id="aiScope" autocomplete="off"></label>
+      <label>HTTPS broker URL <input id="aiBrokerUrl" type="url" autocomplete="off"></label>
+      <label>Provider model <input id="aiModel" autocomplete="off"></label>
+      <label><input id="aiEnabled" type="checkbox"> Organization policy enables AI analysis</label>
+      <label><input id="aiIncludeTelemetry" type="checkbox"> Include filtered telemetry events</label>
+      <label><input id="aiIncludeTelemetryMessages" type="checkbox"> Include redacted telemetry messages</label>
+      <label><input id="aiIncludeNotes" type="checkbox"> Include redacted human notes</label>
+      <label><input id="aiConsent" type="checkbox"> I understand that the selected evidence will leave this extension</label>
+      <button id="saveAiConfig" type="button">Save public broker configuration</button>
+      <button id="analyzeBugReport" type="button">Analyze technical evidence</button>
+      <button id="removeAiAnalysis" type="button">Remove AI analysis</button>
+    </details>
     <span id="workspaceMessage" role="status"></span></header>
   <main id="technicalReport" aria-live="polite"></main>
   <script src="bug-report/bug-report-model.js"></script>
   <script src="bug-report/bug-report-completeness.js"></script>
+  <script src="bug-report/ai-evidence-policy.js"></script>
+  <script src="bug-report/ai-analysis-input.js"></script>
+  <script src="bug-report/ai-analysis-model.js"></script>
+  <script src="bug-report/ai-analysis-prompt.js"></script>
   <script src="bug-report/bug-report-generator.js"></script>
   <script src="bug-report/bug-report-text-export.js"></script>
   <script src="bug-report/technical-report-workspace.js"></script>

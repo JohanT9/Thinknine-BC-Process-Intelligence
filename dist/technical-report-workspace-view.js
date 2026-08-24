@@ -167,6 +167,29 @@
         section.content.forEach(item => list.appendChild(element(doc, "li",
           `${item.timestamp} [${item.source}] ${item.label}`)));
         node.appendChild(list);
+      } else if (section.kind === "ai-analysis") {
+        if (!section.content.available) node.appendChild(element(doc, "p",
+          "AI analysis is optional and has not been run."));
+        else {
+          const analysis = section.content.analysis;
+          node.appendChild(element(doc, "p", analysis.status === "stale"
+            ? "This AI analysis is stale. Re-analyze before relying on it."
+            : "Derived AI analysis — not captured evidence."));
+          node.appendChild(element(doc, "h3", "Summary"));
+          node.appendChild(element(doc, "p", analysis.summary));
+          const addItems = (title, items, prefix = "") => {
+            node.appendChild(element(doc, "h3", title));
+            const values = doc.createElement("ul");
+            items.forEach(item => values.appendChild(element(doc, "li",
+              `${prefix}${item.text || item}`))); node.appendChild(values);
+          };
+          addItems("Evidence-based observations", analysis.observations || []);
+          addItems("Possible root-cause hypotheses", analysis.hypotheses || [],
+            "Not verified: ");
+          addItems("Recommended investigation", analysis.recommendedNextChecks || []);
+          addItems("Missing evidence", analysis.missingEvidence || []);
+          addItems("Warnings and limitations", analysis.warnings || []);
+        }
       }
       container.appendChild(node);
     }

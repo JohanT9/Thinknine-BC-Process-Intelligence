@@ -18,3 +18,10 @@ collapsed raw-query details.
 
 See [correlation](TELEMETRY_CORRELATION.md) and
 [security](TELEMETRY_SECURITY.md).
+# AI analysis boundary
+
+Application Insights enrichment remains external telemetry evidence. AI does
+not receive it by default. With explicit telemetry consent, only bounded,
+normalized relevant events are projected; message text has a separate opt-in.
+AI output remains derived state and never changes stored telemetry or its
+correlation reasons.

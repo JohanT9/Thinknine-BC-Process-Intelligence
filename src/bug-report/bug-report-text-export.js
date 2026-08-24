@@ -13,7 +13,7 @@
           [`- ${label}: ${value(child)}`];
     });
   }
-  function markdown(document) {
+  function markdown(document, options = {}) {
     const byId = new Map(document.sections.map(section => [section.id, section]));
     const out = [`# ${document.title}`, ""];
     const add = (title, lines) => {
@@ -50,12 +50,19 @@
         ...context.events.map(event => `- ${event.timestamp} [${event.category}] ${event.eventName || event.message} (correlation: ${(event.correlationReasons || []).join(", ")})`)]));
     add("Correlated Timeline", (byId.get("correlated-timeline")?.content || [])
       .map(item => `- ${item.timestamp} [${item.source}] ${item.label}`));
+    const ai = byId.get("ai-analysis")?.content?.analysis;
+    if (options.includeAiAnalysis && ai) add("AI-assisted Technical Analysis", [
+      `Status: ${ai.status}`, ai.summary,
+      ...ai.observations.map(item => `- Observation: ${item.text} [${(item.citations || []).join(", ")}]`),
+      ...ai.hypotheses.map(item => `- Possible hypothesis (not verified): ${item.text}`),
+      ...ai.recommendedNextChecks.map(item => `- Next check: ${item.text}`),
+      ...ai.missingEvidence.map(item => `- Missing evidence: ${item.text}`)]);
     add("Notes", byId.get("notes").content.map(note =>
       `- ${note.text || note.content || ""}`));
     return `${out.join("\n").trim()}\n`;
   }
-  function plainText(document) {
-    return markdown(document).replace(/^#{1,6}\s+/gmu, "")
+  function plainText(document, options = {}) {
+    return markdown(document, options).replace(/^#{1,6}\s+/gmu, "")
       .replace(/```text\n|```/gu, "").replace(/`([^`]*)`/gu, "$1");
   }
   return { markdown, plainText };

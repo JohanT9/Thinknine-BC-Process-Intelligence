@@ -30,5 +30,7 @@ assert.ok(fs.existsSync(path.join(root, "dist/technical-report.html")));
 assert.ok(fs.existsSync(path.join(root, "dist/technical-report.js")));
 assert.ok(fs.existsSync(path.join(root,
   "dist/bug-report/application-insights-provider.js")));
+assert.ok(fs.existsSync(path.join(root,
+  "dist/bug-report/technical-analysis-provider.js")));
 
 console.log("Generated build version integrity tests passed.");

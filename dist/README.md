@@ -15,7 +15,8 @@ Insights data. This requires explicit configuration and refresh, uses Microsoft
 Entra PKCE, persists no secret or token, and never affects recording/export when
 unavailable. See [telemetry enrichment](docs/APPLICATION_INSIGHTS_ENRICHMENT.md).
 Captured evidence stays local except for explicitly requested Microsoft
-telemetry queries; clipboard monitoring, AI analysis, object/app guessing and
+telemetry queries or explicitly consented minimized AI analysis; clipboard
+monitoring, automatic AI calls, object/app guessing and
 root-cause inference are absent.
 
 Saved Bug Reports can be reviewed in a dedicated Technical Report Workspace
@@ -951,3 +952,11 @@ kommentarsfält har programmatiskt kopplade labels, kontextknappar annonserar
 aktuellt steg och granskningsförloppet exponeras som en progressbar med aktuellt
 procentvärde. En visuellt dold hjälptext beskriver selection, redigering och
 tangentbordsflyttning för skärmläsare.
+# Optional AI-assisted bug analysis
+
+Technical Bug Reports can optionally send a minimized, redacted evidence set to
+an administrator-configured Entra-protected broker. Analysis requires explicit
+consent/action, is visibly non-authoritative, excludes screenshots, and is
+excluded from export by default. The extension contains no confidential AI key,
+and Bug Reporting works fully without AI. See
+`docs/AI_TECHNICAL_ANALYSIS.md` and `docs/AI_PRIVACY_AND_SECURITY.md`.
