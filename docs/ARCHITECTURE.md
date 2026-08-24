@@ -20,6 +20,15 @@ Steps and screenshot assets rather than copying evidence. See
 [Bug Reporting architecture](BUG_REPORTING_ARCHITECTURE.md) and
 [Bug Report model](BUG_REPORT_MODEL.md).
 
+During Bug Recording only, a browser-side BC Error Detector observes supported
+modal error semantics. The background composition root serializes a separate
+local diagnostic-evidence record, appends a traceable Canonical `bc-error`
+event, and attaches a dedicated screenshot. The detector does not normalize,
+group or semantically interpret events; the diagnostic extractor does not
+mutate Canonical Recording. Bug Reports reference this evidence. See
+[BC error capture](BC_ERROR_CAPTURE.md) and
+[BC diagnostic evidence](BC_DIAGNOSTIC_EVIDENCE.md).
+
 ```text
 CAPTURE
 Browser events → Raw Event Persistence → Canonical Recording

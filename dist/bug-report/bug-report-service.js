@@ -54,6 +54,13 @@
       step.source.sourceCanonicalEventIds));
     const screenshotAssetIds = unique(steps.flatMap(step =>
       step.source.screenshotAssetIds));
+    const errorEvidence = Array.isArray(context.errorEvidence)
+      ? context.errorEvidence : [];
+    const errorEvidenceIds = unique(errorEvidence.map(item =>
+      item.errorEvidenceId));
+    const errorScreenshotIds = unique(errorEvidence.map(item =>
+      item.errorScreenshotAssetId));
+    const callStackEvidence = errorEvidence.find(item => item.callStackAvailable);
     return model.normalize({ bugReportId: context.bugReportId || stableId(recording.id),
       schemaVersion: model.SCHEMA_VERSION, recordingId: recording.id,
       createdAt: now, updatedAt: now, status: "draft",
@@ -63,15 +70,21 @@
       reproduction: { authorship: "derived", steps },
       expectedResult: { text: "", authorship: "human" },
       actualResult: { human: { text: "", authorship: "human" },
-        capturedErrorRef: null }, businessCentralError: null,
-      diagnostics: { rawEvidenceRefs: [], parsed: null },
-      callStack: { rawEvidenceRef: null, frames: [], parsed: false },
-      evidence: { screenshots: screenshotAssetIds.map(assetId => ({
+        capturedErrorRef: null, capturedErrorRefs: errorEvidenceIds },
+      businessCentralError: errorEvidenceIds.length ? {
+        primaryErrorEvidenceId: null, errorEvidenceIds
+      } : null,
+      diagnostics: { rawEvidenceRefs: errorEvidenceIds, parsed: null },
+      callStack: { rawEvidenceRef: callStackEvidence?.errorEvidenceId || null,
+        frames: [], parsed: false },
+      evidence: { screenshots: [...screenshotAssetIds.map(assetId => ({
         assetId, role: "reproduction"
-      })), diagnosticRefs: [], attachmentRefs: [] }, notes: [], annotations: [],
+      })), ...errorScreenshotIds.map(assetId => ({ assetId, role: "error" }))],
+      diagnosticRefs: errorEvidenceIds, attachmentRefs: [] }, notes: [], annotations: [],
       traceability: { canonicalEventIds,
         sourceStepIds: unique(derivedSteps.map(step => step.taskId || step.stepId)),
-        screenshotAssetIds, recordingRevisionRefs:
+        screenshotAssetIds: unique([...screenshotAssetIds, ...errorScreenshotIds]),
+        recordingRevisionRefs:
           unique(context.recordingRevisionRefs) },
       enrichment: { telemetry: null, analysis: null } });
   }
@@ -89,11 +102,16 @@
       summary: clone(current.summary), expectedResult: clone(current.expectedResult),
       actualResult: { ...regenerated.actualResult,
         human: clone(current.actualResult.human),
-        capturedErrorRef: current.actualResult.capturedErrorRef },
+        capturedErrorRef: current.actualResult.capturedErrorRef,
+        capturedErrorRefs: clone(current.actualResult.capturedErrorRefs) },
       businessCentralError: clone(current.businessCentralError),
       diagnostics: clone(current.diagnostics), callStack: clone(current.callStack),
       notes: clone(current.notes), annotations: clone(current.annotations),
       evidence: { ...regenerated.evidence,
+        screenshots: unique([
+          ...regenerated.evidence.screenshots.map(item => JSON.stringify(item)),
+          ...current.evidence.screenshots.map(item => JSON.stringify(item))
+        ]).map(item => JSON.parse(item)),
         diagnosticRefs: clone(current.evidence.diagnosticRefs),
         attachmentRefs: clone(current.evidence.attachmentRefs) },
       enrichment: clone(current.enrichment) });

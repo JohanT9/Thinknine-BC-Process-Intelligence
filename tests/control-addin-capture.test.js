@@ -68,7 +68,7 @@ assert(content.includes("[role=\\\"checkbox\\\"]") ||
 assert.strictEqual(manifest.content_scripts[0].all_frames, true);
 assert.strictEqual(manifest.content_scripts[0].match_about_blank, true);
 assert.deepStrictEqual(manifest.content_scripts[0].js,
-  ["capture-focus-session.js", "content.js"]);
+  ["capture-focus-session.js", "bc-error-detector.js", "content.js"]);
 assert(!manifest.host_permissions.includes("<all_urls>"));
 assert(manifest.permissions.includes("webNavigation"));
 assert(background.includes("allFrames: true"));
@@ -80,7 +80,8 @@ assert(background.includes("chrome.webNavigation.getAllFrames"));
 assert(background.includes('case "T9_CAPTURE_BEFORE_ACTION"'));
 assert(background.includes("consumePreActionCapture"));
 assert(background.includes("activeContent.sessionId !== id"));
-assert(popup.includes('files: ["capture-focus-session.js", "content.js"]'));
+assert(popup.includes(
+  'files: ["capture-focus-session.js", "bc-error-detector.js", "content.js"]'));
 assert((background.match(/await registerRecorderContentScript\(\);/gu) || [])
   .length >= 2, "Install and browser startup must refresh persistent registration.");
 

@@ -77,10 +77,19 @@ stacks and screenshots may be sensitive. The internal model is therefore not an
 external support package. A future sanitization/export policy must explicitly
 select and redact data before sharing.
 
+## Captured BC error evidence
+
+During Bug Recording, the browser detector passively identifies supported BC
+error dialogs. The worker persists separate evidence, appends a Canonical
+`bc-error` event and associates a fresh error-state screenshot. Bug Reports
+reference every occurrence; no primary error is chosen automatically. See
+[BC error capture](BC_ERROR_CAPTURE.md) and
+[diagnostic evidence](BC_DIAGNOSTIC_EVIDENCE.md).
+
 ## Future extension boundaries
 
-- **BC Error Dialog & Copy Details Capture:** preserve raw evidence first, then
-  populate optional structured error and diagnostic fields with provenance.
+- **BC Error Dialog & Copy Details Capture:** implemented for observable modal
+  surfaces and already-visible diagnostic DOM, without clipboard permission.
 - **AL call stack:** preserve raw evidence and later derive frames; never invent
   object, extension, method or line information.
 - **Application Insights:** optional enrichment references only; no query or
@@ -97,5 +106,6 @@ select and redact data before sharing.
 - Canonical Recording authoritative? **Yes.**
 - Both purposes use the same evidence pipeline? **Yes.**
 - Human-authored content survives regeneration? **Yes.**
-- Error scraping or call-stack parsing implemented? **No.**
+- Error capture implemented? **Yes, for documented observable modal surfaces.**
+- AL call-stack frame parsing implemented? **No.**
 - Telemetry or AI added? **No.**

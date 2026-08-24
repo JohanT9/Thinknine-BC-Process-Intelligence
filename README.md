@@ -5,10 +5,11 @@ with modern Chrome and Edge bundle targets, but Chrome product support is not
 claimed until the manual Chrome verification plan is completed. See
 [Chrome readiness](docs/CHROME_READINESS.md).
 
-The same Canonical Recording evidence can underpin structured technical Bug
-Reports. The first architecture milestone adds explicit bug-recording purpose,
-traceable reproduction references and a local renderer-neutral report model;
-Business Central error-dialog capture is intentionally a later step.
+The same Canonical Recording evidence underpins structured technical Bug
+Reports. Bug Recording can passively capture supported Business Central modal
+errors, exact messages, visible diagnostic details, raw AL call-stack text and
+a dedicated screenshot. Evidence stays local; clipboard monitoring, Application
+Insights queries, AI analysis and AL frame parsing are absent.
 
 The current runtime is entirely a browser extension; there is no Windows
 executable or native companion. Unpacked `dist` is for development. The target

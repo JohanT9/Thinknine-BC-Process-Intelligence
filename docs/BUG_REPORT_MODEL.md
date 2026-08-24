@@ -14,7 +14,7 @@ BugReport
   environment: safe evidence/context metadata
   reproduction.steps[] (derived references)
   expectedResult (human)
-  actualResult.human + capturedErrorRef
+  actualResult.human + capturedErrorRefs
   businessCentralError (optional captured/structured evidence)
   diagnostics: rawEvidenceRefs + optional parsed representation
   callStack: rawEvidenceRef + future derived frames
@@ -77,7 +77,8 @@ flag, and future frames. A future frame may contain only observed/derivable
 object type/ID/name, method or trigger, publisher/subscriber context, line
 information, and extension/app context.
 
-No parser or capture implementation exists in this milestone.
+Raw call-stack sections are captured where browser-observable, but frames are
+not parsed. Error evidence is stored once and referenced from the report.
 
 ## Persistence API
 

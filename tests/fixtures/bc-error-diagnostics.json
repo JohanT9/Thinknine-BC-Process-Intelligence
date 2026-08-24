@@ -1,0 +1,6 @@
+{
+  "fullEnglish": "Timestamp: 2026-08-24T10:00:00Z\nInternal Session ID: session-sanitized\nClient Activity ID: activity-sanitized\nEnvironment: Sandbox\nAL Call Stack:\nSample.Codeunit line 10",
+  "swedish": "Datum och tid: 2026-08-24 12:00\nInternt sessions-ID: session-sanitized\nMiljö: Sandbox\nAL-anropsstack:\nSample.Codeunit rad 10",
+  "withoutStack": "Client Activity ID: activity-sanitized\nCompany: Sample Company",
+  "unknownField": "Future Diagnostic Label: preserved value"
+}

@@ -2,6 +2,10 @@
 
 ## 4.6.0 - Legacy documentation opening compatibility
 
+- Bug Recording now passively captures supported Business Central modal errors,
+  exact messages, observable diagnostics, raw AL call-stack text, frame context,
+  preceding-action candidates and dedicated screenshots. Multiple occurrences
+  survive regeneration without clipboard, telemetry or AI access.
 - Added the first Bug Recording architecture milestone: explicit recording
   purpose with documentation compatibility, a renderer-neutral versioned Bug
   Report model, evidence references, regeneration-safe human content, local

@@ -40,6 +40,7 @@
   let recording = false;
   let sessionId = null;
   let diagnosticsEnabled = false;
+  let recordingPurpose = null;
   let lastUrl = location.href;
   let lastPageSignature = "";
   const sourceFrameId = crypto.randomUUID();
@@ -69,6 +70,7 @@
       if (chrome.runtime.lastError) return;
       recording = Boolean(response?.state?.recording);
       sessionId = response?.state?.sessionId || null;
+      recordingPurpose = response?.state?.recordingPurpose || null;
     });
   } catch {
     // The extension context may be invalidated during an extension reload.
@@ -87,6 +89,7 @@
         if (response?.state) {
           recording = Boolean(response.state.recording);
           sessionId = response.state.sessionId || null;
+          recordingPurpose = response.state.recordingPurpose || null;
         }
         diagnosticsEnabled = Boolean(response?.diagnosticsEnabled);
       });
@@ -102,6 +105,7 @@
     if (message.type === "T9_STATE_CHANGED") {
       recording = Boolean(message.recording);
       sessionId = message.sessionId || null;
+      recordingPurpose = message.recordingPurpose || null;
       sendResponse({ ok: true });
       return false;
     }
@@ -128,6 +132,7 @@
     if (areaName !== "local" || !changes.t9_state?.newValue) return;
     recording = Boolean(changes.t9_state.newValue.recording);
     sessionId = changes.t9_state.newValue.sessionId || null;
+    recordingPurpose = changes.t9_state.newValue.recordingPurpose || null;
   });
 
   function clean(value, max = 300) {
@@ -525,6 +530,51 @@
     }
   }
 
+  const errorDialogLifecycles = new WeakMap();
+
+  function observeBugError(dialog) {
+    if (recordingPurpose !== "bug-report" || !globalThis.T9BcErrorDetector) return;
+    const current = errorDialogLifecycles.get(dialog);
+    const openedAt = current?.openedAt || new Date().toISOString();
+    const buttons = [...dialog.querySelectorAll(
+      'button,[role="button"],[role="menuitem"]'
+    )].map(textOf).filter(Boolean);
+    const details = dialog.querySelector(
+      '[data-diagnostic-details],[data-error-details],pre,textarea,[role="log"]'
+    );
+    const heading = dialog.querySelector(
+      '[role="heading"],h1,h2,h3,[aria-live="assertive"]'
+    );
+    const snapshot = { role: dialog.getAttribute("role") || "",
+      modal: dialog.getAttribute("aria-modal") === "true",
+      ariaInvalid: dialog.getAttribute("aria-invalid") === "true",
+      liveAssertive: dialog.getAttribute("aria-live") === "assertive" ||
+        Boolean(dialog.querySelector('[aria-live="assertive"],[role="alert"]')),
+      accessibleName: dialog.getAttribute("aria-label") || textOf(heading),
+      actions: buttons, detailsText: details?.value || details?.innerText ||
+        details?.textContent || "", message: textOf(dialog),
+      elementIdentity: dialog.id || dialog.getAttribute("data-control-id") ||
+        dialog.getAttribute("aria-labelledby") || "dialog",
+      frameInstanceId: sourceFrameId, openedAt };
+    const identified = globalThis.T9BcErrorDetector.classifySnapshot(snapshot);
+    if (!identified.detected || current?.captured) return;
+    const errorEvidenceId = `bc-error:${sessionId}:${crypto.randomUUID()}`;
+    errorDialogLifecycles.set(dialog, { openedAt, captured: true,
+      errorEvidenceId });
+    try {
+      chrome.runtime.sendMessage({ type: "T9_CAPTURE_BC_ERROR",
+        evidence: { errorEvidenceId, capturedAt: new Date().toISOString(),
+          rawMessage: snapshot.message, rawDiagnostics: snapshot.detailsText,
+          diagnosticsAvailable: identified.detailsAvailable,
+          source: { kind: "business-central-ui", surface: identified.surface,
+            confidence: identified.confidence },
+          frameContext: { sourceFrameId, frameUrl: location.href,
+            topUrl: getTopUrl(), frameDepth: getFrameDepth() } } }, () => {
+          void chrome.runtime.lastError;
+        });
+    } catch {}
+  }
+
   window.addEventListener("pointerdown", event => {
     if (!recording || !sessionId || event.button !== 0) return;
     const observedTarget = eventElement(event);
@@ -680,6 +730,7 @@
     const currentDialogs = new Set(document
       .querySelectorAll('[role="dialog"],[aria-modal="true"]'));
     currentDialogs.forEach(dialog => {
+        observeBugError(dialog);
         if (observedDialogs.has(dialog)) return;
         observedDialogs.add(dialog);
         const dialogDescriptor = descriptor(dialog);

@@ -11,6 +11,7 @@
   const REVIEW_PREFIX = "t9_review_";
   const DOCUMENT_LIBRARY_KEY = "t9_document_library";
   const BUG_REPORT_PREFIX = "t9_bug_report_";
+  const BC_ERROR_EVIDENCE_PREFIX = "t9_bc_error_evidence_";
 
   function sessionDataKeys(sessionId) {
     return [
@@ -25,6 +26,7 @@
 
   return {
     BUG_REPORT_PREFIX,
+    BC_ERROR_EVIDENCE_PREFIX,
     EVENT_PREFIX,
     DOCUMENT_LIBRARY_KEY,
     REVIEW_PREFIX,

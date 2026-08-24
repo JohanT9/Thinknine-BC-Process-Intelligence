@@ -51,8 +51,14 @@
     result.expectedResult = humanText(result.expectedResult);
     result.actualResult = { ...(result.actualResult || {}),
       human: humanText(result.actualResult?.human),
-      capturedErrorRef: result.actualResult?.capturedErrorRef || null };
-    result.businessCentralError = clone(result.businessCentralError || null);
+      capturedErrorRef: result.actualResult?.capturedErrorRef || null,
+      capturedErrorRefs: unique(result.actualResult?.capturedErrorRefs) };
+    result.businessCentralError = result.businessCentralError ? {
+      ...clone(result.businessCentralError),
+      primaryErrorEvidenceId:
+        result.businessCentralError.primaryErrorEvidenceId || null,
+      errorEvidenceIds: unique(result.businessCentralError.errorEvidenceIds)
+    } : null;
     result.diagnostics = { ...clone(result.diagnostics || {}),
       rawEvidenceRefs: unique(result.diagnostics?.rawEvidenceRefs),
       parsed: clone(result.diagnostics?.parsed || null),

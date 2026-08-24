@@ -8,6 +8,7 @@ importScripts("engine/event-normalization.js");
 importScripts("engine/event-step-grouping.js");
 importScripts("engine/privacy-mask.js");
 importScripts("engine/screenshot-capture-policy.js");
+importScripts("bug-report/bc-diagnostic-evidence.js");
 importScripts("bug-report/bug-report-model.js");
 importScripts("bug-report/bug-report-service.js");
 importScripts("bug-report/bug-report-store.js");
@@ -53,6 +54,7 @@ const DEFAULT_SETTINGS = {
 const STATE_KEY = "t9_state";
 const SETTINGS_KEY = "t9_settings";
 const {
+  BC_ERROR_EVIDENCE_PREFIX,
   BUG_REPORT_PREFIX,
   EVENT_PREFIX,
   RAW_RECORDING_PREFIX,
@@ -66,6 +68,7 @@ const DEBUG_KEY = "t9_debug";
 let writeQueue = Promise.resolve();
 let stoppingSessionId = null;
 let canonicalPersistenceError = null;
+let errorEvidenceWrites = Promise.resolve();
 
 const SCREENSHOT_MIN_INTERVAL_MS = 1100;
 const CANONICAL_SETTLE_TIMEOUT_MS = 60000;
@@ -522,7 +525,7 @@ async function recordEvent(rawEvent, captureContext = {}) {
     session.updatedAt = event.timestamp;
     await saveSession(session);
 
-    if (alreadyCanonical) return;
+    if (alreadyCanonical) return { recordingId, canonicalEvent, event };
 
     if (globalThis.T9ScreenshotCapturePolicy.shouldCapture(settings, event)) {
       const captureCategory = globalThis.T9ScreenshotCapturePolicy.category(event);
@@ -576,6 +579,7 @@ async function recordEvent(rawEvent, captureContext = {}) {
       },
       lastError: null
     });
+    return { recordingId, canonicalEvent, event };
   });
   writeQueue = operation.catch(async error => {
     canonicalPersistenceError ||= error;
@@ -583,6 +587,84 @@ async function recordEvent(rawEvent, captureContext = {}) {
   });
 
   return operation;
+}
+
+async function saveBcErrorEvidence(evidence) {
+  const normalized = globalThis.T9BcDiagnosticEvidence.normalize(evidence);
+  await chrome.storage.local.set({
+    [BC_ERROR_EVIDENCE_PREFIX + normalized.errorEvidenceId]: normalized
+  });
+  return normalized;
+}
+
+async function getBcErrorEvidenceForRecording(recordingId) {
+  const all = await chrome.storage.local.get(null);
+  return Object.entries(all).filter(([key, value]) =>
+    key.startsWith(BC_ERROR_EVIDENCE_PREFIX) && value?.recordingId === recordingId)
+    .map(([, value]) => globalThis.T9BcDiagnosticEvidence.normalize(value))
+    .sort((a, b) => String(a.capturedAt).localeCompare(String(b.capturedAt)));
+}
+
+async function captureBcErrorEvidence(input, sender) {
+  const state = await getState();
+  const session = state.sessionId ? await getSession(state.sessionId) : null;
+  if (!state.recording || session?.recordingPurpose !== "bug-report") return null;
+  const recording = await getCanonicalRecording(state.sessionId);
+  const preceding = [...recording.events].reverse().find(item =>
+    !["focus", "page-state", "dialog-open", "bc-error"].includes(item.raw?.type));
+  let evidence = await saveBcErrorEvidence({ ...input,
+    recordingId: state.sessionId,
+    precedingActionEventId: preceding?.id || null,
+    triggerRelationship: preceding ? "preceding-interaction-candidate" : "none",
+    frameContext: { ...(input.frameContext || {}), tabId: sender.tab?.id,
+      frameId: sender.frameId, parentFrameId: sender.parentFrameId,
+      documentId: sender.documentId,
+      frameUrl: diagnosticUrl(input.frameContext?.frameUrl),
+      topUrl: diagnosticUrl(input.frameContext?.topUrl),
+      frameOrigin: diagnosticUrl(sender.origin || sender.url) },
+    diagnosticsStatus: input.rawDiagnostics ? "diagnostics-captured" :
+      input.diagnosticsAvailable ? "diagnostics-capture-failed" :
+        "diagnostics-unavailable",
+    screenshotStatus: "not-attempted" });
+  const recorded = await recordEvent({ type: "bc-error", category: "diagnostic",
+    timestamp: evidence.capturedAt, label: "Business Central error",
+    errorEvidenceId: evidence.errorEvidenceId,
+    precedingActionEventId: evidence.precedingActionEventId,
+    diagnosticCaptureStatus: evidence.diagnosticsStatus }, {
+      tabId: sender.tab?.id, frameId: sender.frameId,
+      parentFrameId: sender.parentFrameId, documentId: sender.documentId,
+      origin: sender.origin || sender.url
+    });
+  evidence = await saveBcErrorEvidence({ ...evidence,
+    canonicalEventId: recorded?.canonicalEvent?.id || null,
+    screenshotStatus: "screenshot-requested" });
+  const image = await capture(sender.tab?.id || state.tabId);
+  if (image && recorded?.canonicalEvent) {
+    const associatedRecording = await canonicalStore.associateScreenshot(
+      state.sessionId, recorded.canonicalEvent.id, image, new Date().toISOString());
+    const associated = associatedRecording.events.find(item =>
+      item.id === recorded.canonicalEvent.id);
+    const screenshots = await getScreenshots(state.sessionId);
+    screenshots[recorded.event.eventNo] = image;
+    await saveScreenshots(state.sessionId, screenshots);
+    evidence = await saveBcErrorEvidence({ ...evidence,
+      errorScreenshotAssetId: associated?.screenshotAssetId || null,
+      screenshotStatus: "screenshot-captured" });
+  } else {
+    evidence = await saveBcErrorEvidence({ ...evidence,
+      screenshotStatus: "screenshot-failed" });
+  }
+  await setDebug({ bcErrorCapture: {
+    detected: true, messageCaptured: Boolean(evidence.rawMessage),
+    detailsAvailable: Boolean(evidence.diagnosticsAvailable),
+    diagnosticAcquisitionAttempted: Boolean(evidence.diagnosticsAvailable),
+    diagnosticAcquisitionSucceeded: Boolean(evidence.rawDiagnostics),
+    rawCallStackPresent: evidence.callStackAvailable,
+    screenshotRequested: true,
+    screenshotSucceeded: evidence.screenshotStatus === "screenshot-captured",
+    evidencePersisted: true, bugReportLinked: false
+  } });
+  return evidence;
 }
 
 
@@ -607,7 +689,7 @@ async function registerRecorderContentScript() {
         "https://businesscentral.dynamics.com/*",
         "https://*.businesscentral.dynamics.com/*"
       ],
-      js: ["capture-focus-session.js", "content.js"],
+      js: ["capture-focus-session.js", "bc-error-detector.js", "content.js"],
       allFrames: true,
       matchOriginAsFallback: true,
       runAt: "document_start",
@@ -671,7 +753,7 @@ async function injectRecorderIntoExistingBcTabs() {
           tabId: tab.id,
           allFrames: true
         },
-        files: ["capture-focus-session.js", "content.js"],
+        files: ["capture-focus-session.js", "bc-error-detector.js", "content.js"],
         world: "ISOLATED"
       });
       results.push({ tabId: tab.id, ok: true });
@@ -719,7 +801,7 @@ async function ensureContentScript(tabId) {
         tabId,
         allFrames: true
       },
-      files: ["capture-focus-session.js", "content.js"]
+      files: ["capture-focus-session.js", "bc-error-detector.js", "content.js"]
     });
   } catch (error) {
     await setDebug({
@@ -808,7 +890,8 @@ async function startSession(message, tabId) {
     await chrome.tabs.sendMessage(tabId, {
       type: "T9_STATE_CHANGED",
       recording: true,
-      sessionId: id
+      sessionId: id,
+      recordingPurpose: session.recordingPurpose
     });
   } catch (error) {
     session.status = "failed";
@@ -844,6 +927,7 @@ async function startSession(message, tabId) {
 async function stopSession() {
   const state = await getState();
   if (!state.sessionId) return null;
+  await settleBounded(errorEvidenceWrites, "BC error evidence writes");
   stoppingSessionId = state.sessionId;
 
   try {
@@ -1027,6 +1111,14 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
         sendResponse({ ok: true });
         break;
 
+      case "T9_CAPTURE_BC_ERROR": {
+        const operation = errorEvidenceWrites.then(() =>
+          captureBcErrorEvidence(message.evidence || {}, sender));
+        errorEvidenceWrites = operation.catch(() => {});
+        sendResponse({ ok: true, evidence: await operation });
+        break;
+      }
+
       case "T9_CAPTURE_BEFORE_ACTION": {
         const preActionState = await getState();
         const preActionTabId = sender.tab?.id;
@@ -1125,11 +1217,13 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
 
       case "T9_CREATE_BUG_REPORT": {
         const recording = await getCanonicalRecording(message.recordingId);
+        const errorEvidence = await getBcErrorEvidenceForRecording(
+          message.recordingId);
         const report = globalThis.T9BugReportService
           .createBugReportFromRecording(recording,
             Array.isArray(message.derivedSteps) ? message.derivedSteps : [], {
               ...(message.context || {}), extensionVersion: VERSION,
-              productVersion: VERSION
+              productVersion: VERSION, errorEvidence
             });
         sendResponse({ ok: true, report: await bugReportStore.save(report) });
         break;
@@ -1253,7 +1347,8 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
           groupingDiagnostics: grouped.diagnostics,
           screenshots: message.includeScreenshots === false
             ? {}
-            : await getScreenshots(message.sessionId)
+            : await getScreenshots(message.sessionId),
+          bcErrorEvidence: await getBcErrorEvidenceForRecording(message.sessionId)
         });
         break;
       }

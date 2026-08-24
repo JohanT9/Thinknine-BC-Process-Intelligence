@@ -122,6 +122,10 @@ copyFile(path.join(root, "CHANGELOG.md"), path.join(dist, "CHANGELOG.md"));
 copyFile(path.join(root, "INSTALLERA.txt"), path.join(dist, "INSTALLERA.txt"));
 
 copyFile(
+  path.join(src, "recorder", "bc-error-detector.js"),
+  path.join(dist, "bc-error-detector.js")
+);
+copyFile(
   path.join(src, "recorder", "background.js"),
   path.join(dist, "background.js")
 );
