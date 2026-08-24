@@ -150,7 +150,9 @@ for (const file of [
   "popup.html",
   "popup.js",
   "workspace-controller.js",
-  "workspace-context.js"
+  "workspace-context.js",
+  "technical-report.html", "technical-report.js",
+  "technical-report-workspace-view.js"
 ]) {
   copyFile(
     path.join(src, "ui", file),

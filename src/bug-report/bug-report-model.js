@@ -6,6 +6,8 @@
   "use strict";
   const SCHEMA_VERSION = 1;
   const STATUSES = Object.freeze(["draft", "ready", "resolved", "archived"]);
+  const CATEGORIES = Object.freeze(["", "functional", "technical", "integration",
+    "performance", "permission", "data", "unknown"]);
   const clone = value => value == null ? value : JSON.parse(JSON.stringify(value));
   const unique = values => [...new Set((values || []).filter(Boolean).map(String))];
   const text = value => typeof value === "string" ? value : "";
@@ -111,6 +113,17 @@
     return normalize(result);
   }
 
-  return { SCHEMA_VERSION, STATUSES, normalize, normalizeStep,
-    updateHumanContent };
+  function selectPrimaryError(report, errorEvidenceId, updatedAt) {
+    const result = normalize(report);
+    const ids = result.businessCentralError?.errorEvidenceIds || [];
+    if (!ids.includes(String(errorEvidenceId))) {
+      throw new TypeError("Primary error must reference captured report evidence.");
+    }
+    result.businessCentralError.primaryErrorEvidenceId = String(errorEvidenceId);
+    result.updatedAt = updatedAt || result.updatedAt;
+    return normalize(result);
+  }
+
+  return { CATEGORIES, SCHEMA_VERSION, STATUSES, normalize, normalizeStep,
+    selectPrimaryError, updateHumanContent };
 });

@@ -1236,7 +1236,19 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
           unknownFrameCount: item.summary.unknownFrameCount,
           warningCodes: item.warnings.map(value => value.code)
         })) });
-        sendResponse({ ok: true, report: saved });
+        sendResponse({ ok: true, report: saved, workspaceUrl:
+          chrome.runtime.getURL(`technical-report.html?bugReportId=${encodeURIComponent(
+            saved.bugReportId)}`) });
+        break;
+      }
+
+      case "T9_OPEN_TECHNICAL_REPORT": {
+        const report = await bugReportStore.load(message.bugReportId);
+        if (!report) throw new Error("Bug Report kunde inte hittas.");
+        const tab = await chrome.tabs.create({ url: chrome.runtime.getURL(
+          `technical-report.html?bugReportId=${encodeURIComponent(
+            report.bugReportId)}`) });
+        sendResponse({ ok: true, tabId: tab.id });
         break;
       }
 
@@ -1269,6 +1281,11 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
         sendResponse({ ok: true, report: await bugReportStore.save(updated) });
         break;
       }
+
+      case "T9_SAVE_BUG_REPORT":
+        sendResponse({ ok: true,
+          report: await bugReportStore.save(message.report) });
+        break;
 
       case "T9_ARCHIVE_BUG_REPORT":
         sendResponse({ ok: true, report: await bugReportStore.archive(

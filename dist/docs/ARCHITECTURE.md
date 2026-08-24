@@ -34,6 +34,11 @@ and Technical Diagnostics projector. These derived Bug Reporting services do
 not mutate evidence, participate in ordinary documentation, depend on UI or
 renderers, or call external services. Results can be recomputed from raw data.
 
+Bug Report Generator is the single Technical Report projection owner. A
+dedicated Workspace and text adapters consume that projection; neither rebuilds
+report semantics. Human edits persist to Bug Report while captured evidence and
+derived diagnostics retain separate provenance.
+
 ```text
 CAPTURE
 Browser events → Raw Event Persistence → Canonical Recording

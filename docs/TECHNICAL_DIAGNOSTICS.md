@@ -18,3 +18,6 @@ exceptions become a safe `parser-failure` result so reports still load.
 
 Default debug state contains only parser version, status, counts and warning
 codes—not stack content, object names or business data.
+
+The Bug Report Generator presents these values as neutral referenced objects and
+apps. It never labels a referenced object or app as causal.

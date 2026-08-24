@@ -13,6 +13,11 @@ frames and Technical Diagnostics while preserving unknown syntax. Evidence
 stays local; clipboard monitoring, Application Insights queries, AI analysis,
 object/app guessing and root-cause inference are absent.
 
+Saved Bug Reports can be reviewed in a dedicated Technical Report Workspace
+with editable consultant context, exact errors, structured/raw AL stacks,
+screenshots, explicit completeness guidance and local Markdown/plain-text
+output. No report data is submitted externally.
+
 The current runtime is entirely a browser extension; there is no Windows
 executable or native companion. Unpacked `dist` is for development. The target
 commercial installation uses Edge Add-ons (or managed enterprise deployment),

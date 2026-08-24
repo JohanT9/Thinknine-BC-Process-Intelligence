@@ -2,6 +2,10 @@
 
 ## 4.6.0 - Legacy documentation opening compatibility
 
+- Added a deterministic Bug Report Generator and dedicated Technical Report
+  Workspace with human-field editing, save/undo/redo, multiple-error selection,
+  exact evidence, structured/raw stacks, explicit completeness checks,
+  screenshots and local Markdown/plain-text output.
 - Added versioned AL call-stack parsing and renderer-neutral Technical
   Diagnostics with ordered raw-frame traceability, partial/unknown preservation,
   explicit object/app summaries and safe re-parsing—without root-cause inference,

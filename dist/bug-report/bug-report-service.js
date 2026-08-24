@@ -23,6 +23,8 @@
     ]);
     return { reproductionStepId: `bug-step:${step.taskId || step.stepId || index + 1}`,
       order: index + 1, instruction: step.instruction || step.displayText || "",
+      ...(step.stepOverride ? { stepOverride: clone(step.stepOverride) } : {}),
+      ...(step.visibility ? { visibility: step.visibility } : {}),
       authorship: "derived", source: { recordingId,
         sourceCanonicalEventIds: canonicalIds,
         sourceStepId: step.taskId || step.stepId || undefined,

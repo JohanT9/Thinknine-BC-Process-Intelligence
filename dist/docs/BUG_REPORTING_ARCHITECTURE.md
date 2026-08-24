@@ -92,6 +92,12 @@ re-parsed from unchanged evidence. Parser failure cannot invalidate the report.
 See [AL Call Stack Parser](AL_CALL_STACK_PARSER.md) and
 [Technical Diagnostics](TECHNICAL_DIAGNOSTICS.md).
 
+Bug Report Generator projects domain state and evidence references into one
+renderer-neutral Technical Report consumed by the dedicated local Workspace and
+Markdown/plain-text adapters. UI remains an editor/orchestrator; save and export
+return to the Bug Report store. See [Bug Report Generator](BUG_REPORT_GENERATOR.md)
+and [Technical Report Workspace](TECHNICAL_REPORT_WORKSPACE.md).
+
 ## Future extension boundaries
 
 - **BC Error Dialog & Copy Details Capture:** implemented for observable modal

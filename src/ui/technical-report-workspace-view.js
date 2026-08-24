@@ -1,0 +1,164 @@
+(function (root, factory) {
+  const api = factory();
+  if (typeof module === "object" && module.exports) module.exports = api;
+  root.T9TechnicalReportWorkspaceView = api;
+})(typeof globalThis !== "undefined" ? globalThis : this, function () {
+  "use strict";
+  const element = (doc, tag, text, className = "") => {
+    const value = doc.createElement(tag); value.className = className;
+    value.textContent = text || ""; return value;
+  };
+  function copyButton(doc, label, value, onCopy) {
+    const button = element(doc, "button", "Copy", "technical-copy");
+    button.type = "button"; button.setAttribute("aria-label", label);
+    button.addEventListener("click", () => onCopy(String(value || "")));
+    return button;
+  }
+  function details(doc, summary, text, onCopy) {
+    const wrapper = doc.createElement("details");
+    wrapper.appendChild(element(doc, "summary", summary));
+    const pre = element(doc, "pre", text, "technical-raw-evidence");
+    wrapper.append(pre, copyButton(doc, `Copy ${summary}`, text, onCopy));
+    return wrapper;
+  }
+  function render(container, workspaceState, options = {}, doc = document) {
+    const onCopy = options.onCopy || (() => {});
+    const onEdit = options.onEdit || (() => {});
+    const report = workspaceState.document;
+    container.replaceChildren();
+    container.setAttribute("aria-label", `Technical Bug Report: ${report.title}`);
+    container.appendChild(element(doc, "h1", report.title));
+    const status = element(doc, "p", workspaceState.saveState, "save-state");
+    status.setAttribute("role", "status"); container.appendChild(status);
+    const editor = doc.createElement("fieldset");
+    editor.appendChild(element(doc, "legend", "Editable report fields"));
+    const fields = [{ name: "title", label: "Title",
+      value: workspaceState.report.summary.title },
+    { name: "summary", label: "Summary",
+      value: workspaceState.report.summary.summary },
+    { name: "severity", label: "Severity",
+      value: workspaceState.report.summary.severity },
+    { name: "category", label: "Category",
+      value: workspaceState.report.summary.category },
+    { name: "expectedResult", label: "Expected Result",
+      value: workspaceState.report.expectedResult.text, multiline: true },
+    { name: "actualResult", label: "Actual Result",
+      value: workspaceState.report.actualResult.human.text, multiline: true },
+    { name: "notes", label: "Notes", value: (workspaceState.report.notes || [])
+      .map(note => note.text || note.content || "").join("\n"), multiline: true }];
+    fields.forEach(field => {
+      const id = `technical-report-${field.name}`;
+      const label = element(doc, "label", field.label); label.htmlFor = id;
+      const input = doc.createElement(field.multiline ? "textarea" : "input");
+      input.id = id; input.name = field.name; input.value = field.value || "";
+      input.addEventListener("change", () => onEdit(field.name, input.value));
+      editor.append(label, input);
+    });
+    container.appendChild(editor);
+    for (const section of report.sections) {
+      const node = doc.createElement("section");
+      node.dataset.technicalReportSection = section.id;
+      node.appendChild(element(doc, "h2", section.title));
+      if (section.kind === "text") node.appendChild(element(doc, "p",
+        section.content || "Incomplete"));
+      else if (section.kind === "reproduction") {
+        const list = doc.createElement("ol");
+        section.content.forEach(step => list.appendChild(element(doc, "li",
+          step.instruction))); node.appendChild(list);
+      } else if (section.kind === "actual-result") {
+        if (section.content.userDescription) node.appendChild(element(doc, "p",
+          section.content.userDescription));
+        section.content.capturedErrors.forEach(error => {
+          const block = element(doc, "blockquote", error.rawMessage);
+          block.setAttribute("aria-label", "Captured Business Central error");
+          node.append(block, copyButton(doc, "Copy Business Central error",
+            error.rawMessage, onCopy));
+        });
+      } else if (section.kind === "diagnostics") {
+        const dl = doc.createElement("dl");
+        section.content.rows.forEach(row => {
+          dl.append(element(doc, "dt", row.label), element(doc, "dd", row.value),
+            copyButton(doc, `Copy ${row.label}`, row.value, onCopy));
+        }); node.appendChild(dl);
+        section.content.captureStatuses.forEach(status => node.appendChild(
+          element(doc, "p", status.diagnosticsStatus === "diagnostics-capture-failed"
+            ? "Diagnostic capture failed."
+            : status.diagnosticsStatus === "diagnostics-unavailable"
+              ? "Diagnostics were not provided by Business Central."
+              : "Diagnostics captured.")));
+      } else if (section.kind === "call-stack") {
+        section.content.forEach(stack => {
+          const table = doc.createElement("table");
+          table.appendChild(element(doc, "caption",
+            `Structured AL call stack — ${stack.parseStatus}`));
+          const head = doc.createElement("thead");
+          const header = doc.createElement("tr");
+          ["#", "Object", "Method / Trigger", "App / Extension", "Source / Line",
+            "Parse Status"].forEach(value => header.appendChild(element(doc, "th",
+            value))); head.appendChild(header); table.appendChild(head);
+          const body = doc.createElement("tbody");
+          stack.frames.forEach(frame => {
+            const row = doc.createElement("tr");
+            [frame.frameIndex + 1, `${frame.objectType || ""} ${frame.objectId || ""} ${frame.objectName || ""}`,
+              frame.methodName || frame.triggerName || "", frame.extensionName || "",
+              frame.sourceLocation || frame.lineNumber || "", frame.parseStatus]
+              .forEach(value => row.appendChild(element(doc, "td", String(value))));
+            body.appendChild(row);
+          }); table.appendChild(body); node.appendChild(table);
+          if (stack.rawCallStack) node.appendChild(details(doc, "Raw AL call stack",
+            stack.rawCallStack, onCopy));
+          if (stack.unparsedSegments.length) node.appendChild(details(doc,
+            "Unparsed call-stack segments", stack.unparsedSegments.map(item =>
+              item.rawText).join("\n"), onCopy));
+        });
+      } else if (section.kind === "errors") {
+        const all = [section.content.primary, ...section.content.additional]
+          .filter(Boolean);
+        all.forEach(error => {
+          if (all.length > 1) {
+            const choose = doc.createElement("button"); choose.type = "button";
+            choose.textContent = error.errorEvidenceId ===
+              section.content.primaryErrorEvidenceId ? "Primary error" :
+              "Select as primary error";
+            choose.setAttribute("aria-pressed", String(error.errorEvidenceId ===
+              section.content.primaryErrorEvidenceId));
+            choose.addEventListener("click", () => options.onSelectPrimaryError?.(
+              error.errorEvidenceId)); node.appendChild(choose);
+          }
+          node.appendChild(element(doc, "p", error.rawMessage));
+          if (error.rawDiagnostics) node.appendChild(details(doc,
+            "Raw Business Central diagnostics", error.rawDiagnostics, onCopy));
+        });
+      } else if (section.kind === "evidence") {
+        const assets = options.mediaAssets || {};
+        [...section.content.screenshots].sort((a, b) =>
+          (a.role === "error" ? -1 : 0) - (b.role === "error" ? -1 : 0))
+          .forEach(screenshot => {
+            const figure = doc.createElement("figure");
+            const media = assets[screenshot.assetId];
+            if (media?.source) {
+              const image = doc.createElement("img"); image.src = media.source;
+              image.alt = screenshot.role === "error"
+                ? "Captured Business Central error" : "Reproduction evidence";
+              figure.appendChild(image);
+            }
+            figure.appendChild(element(doc, "figcaption",
+              screenshot.role === "error" ? "Error screenshot" :
+                "Reproduction screenshot")); node.appendChild(figure);
+          });
+      } else if (section.kind === "notes") {
+        section.content.forEach(note => node.appendChild(element(doc, "p",
+          note.text || note.content || "")));
+      }
+      container.appendChild(node);
+    }
+    const guidance = doc.createElement("section");
+    guidance.appendChild(element(doc, "h2", "Completeness"));
+    const list = doc.createElement("ul");
+    report.completeness.issues.forEach(issue => list.appendChild(element(doc,
+      "li", issue.message))); guidance.appendChild(list); container.appendChild(guidance);
+    return { sectionCount: report.sections.length,
+      ready: report.completeness.ready };
+  }
+  return { render };
+});

@@ -92,3 +92,8 @@ through an injected adapter. Storage keys use centralized
 Human-content updates accept summary fields, expected result, human actual
 result, notes, annotations and valid status only. Captured and derived evidence
 cannot be silently rewritten through that command.
+
+Technical Report projection adds no authority. Manual primary-error selection
+is stored in `businessCentralError.primaryErrorEvidenceId`; one error may be
+treated as primary for display without rewriting evidence. Existing Step
+Overrides may travel with reproduction and remain owned by Step architecture.
