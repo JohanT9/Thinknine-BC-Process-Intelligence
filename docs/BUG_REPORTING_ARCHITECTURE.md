@@ -86,12 +86,18 @@ reference every occurrence; no primary error is chosen automatically. See
 [BC error capture](BC_ERROR_CAPTURE.md) and
 [diagnostic evidence](BC_DIAGNOSTIC_EVIDENCE.md).
 
+Raw AL stacks feed a synchronous renderer-neutral parser and Technical
+Diagnostics projection. Results are persisted on the Bug Report and can be
+re-parsed from unchanged evidence. Parser failure cannot invalidate the report.
+See [AL Call Stack Parser](AL_CALL_STACK_PARSER.md) and
+[Technical Diagnostics](TECHNICAL_DIAGNOSTICS.md).
+
 ## Future extension boundaries
 
 - **BC Error Dialog & Copy Details Capture:** implemented for observable modal
   surfaces and already-visible diagnostic DOM, without clipboard permission.
-- **AL call stack:** preserve raw evidence and later derive frames; never invent
-  object, extension, method or line information.
+- **AL call stack:** version 1 derives only explicitly present frame fields and
+  preserves every unknown segment; it never invents object, app or line data.
 - **Application Insights:** optional enrichment references only; no query or
   credential behavior exists now.
 - **AI:** a future analysis service may consume selected evidence and produce a
@@ -107,5 +113,6 @@ reference every occurrence; no primary error is chosen automatically. See
 - Both purposes use the same evidence pipeline? **Yes.**
 - Human-authored content survives regeneration? **Yes.**
 - Error capture implemented? **Yes, for documented observable modal surfaces.**
-- AL call-stack frame parsing implemented? **No.**
+- AL call-stack frame parsing implemented? **Yes, deterministic version 1.0.0.**
+- Root-cause analysis implemented? **No.**
 - Telemetry or AI added? **No.**

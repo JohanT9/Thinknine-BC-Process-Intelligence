@@ -17,7 +17,8 @@ BugReport
   actualResult.human + capturedErrorRefs
   businessCentralError (optional captured/structured evidence)
   diagnostics: rawEvidenceRefs + optional parsed representation
-  callStack: rawEvidenceRef + future derived frames
+  callStack: rawEvidenceRef + versioned derived frames
+  technicalDiagnostics[] (derived)
   evidence: screenshot/diagnostic/attachment references
   notes / annotations (human)
   traceability
@@ -77,8 +78,10 @@ flag, and future frames. A future frame may contain only observed/derivable
 object type/ID/name, method or trigger, publisher/subscriber context, line
 information, and extension/app context.
 
-Raw call-stack sections are captured where browser-observable, but frames are
-not parsed. Error evidence is stored once and referenced from the report.
+Raw call-stack sections are captured where browser-observable. Parser version
+`1.0.0` derives ordered frames, unknown segments and warnings. Technical
+Diagnostics adds structured counts and explicit object/app summaries. Evidence
+is stored once and referenced from the report.
 
 ## Persistence API
 

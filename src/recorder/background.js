@@ -9,6 +9,8 @@ importScripts("engine/event-step-grouping.js");
 importScripts("engine/privacy-mask.js");
 importScripts("engine/screenshot-capture-policy.js");
 importScripts("bug-report/bc-diagnostic-evidence.js");
+importScripts("bug-report/al-call-stack-parser.js");
+importScripts("bug-report/technical-diagnostics.js");
 importScripts("bug-report/bug-report-model.js");
 importScripts("bug-report/bug-report-service.js");
 importScripts("bug-report/bug-report-store.js");
@@ -1225,7 +1227,27 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
               ...(message.context || {}), extensionVersion: VERSION,
               productVersion: VERSION, errorEvidence
             });
-        sendResponse({ ok: true, report: await bugReportStore.save(report) });
+        const saved = await bugReportStore.save(report);
+        await setDebug({ alCallStackParser: saved.technicalDiagnostics.map(item => ({
+          parserVersion: item.callStack.parserVersion,
+          parseStatus: item.summary.parseStatus,
+          frameCount: item.summary.frameCount,
+          parsedFrameCount: item.summary.parsedFrameCount,
+          unknownFrameCount: item.summary.unknownFrameCount,
+          warningCodes: item.warnings.map(value => value.code)
+        })) });
+        sendResponse({ ok: true, report: saved });
+        break;
+      }
+
+      case "T9_REPARSE_BUG_REPORT_TECHNICAL_DIAGNOSTICS": {
+        const current = await bugReportStore.load(message.bugReportId);
+        if (!current) throw new Error("Bug Report kunde inte hittas.");
+        const errorEvidence = await getBcErrorEvidenceForRecording(
+          current.recordingId);
+        const reparsed = globalThis.T9BugReportService
+          .reparseTechnicalDiagnostics(current, errorEvidence);
+        sendResponse({ ok: true, report: await bugReportStore.save(reparsed) });
         break;
       }
 

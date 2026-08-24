@@ -1,0 +1,17 @@
+{
+  "fixtureProvenance": "synthetic robustness fixtures shaped like documented/sanitized BC diagnostic output; no local real customer stack was available",
+  "standard": "\"Sales-Post\"(Codeunit 80).OnRun(Trigger) line 12 - Base Application by Microsoft version 26.0.0.0\n\"Sales Header\"(Table 36).Modify(Boolean) line 44 - Base Application by Microsoft version 26.0.0.0",
+  "alternate": "Page 42 \"Sales Order\".OnOpenPage(Trigger) line 3",
+  "extension": "\"Post Handler\"(Codeunit 50100).Handle(EventSubscriber: OnAfterPost) line 7 - Sample Extension by Sample Publisher version 1.2.3.4 (11111111-1111-1111-1111-111111111111)",
+  "publisher": "\"Event Source\"(Codeunit 50101).Publish(EventPublisher: OnSomething) line 8",
+  "source": "\"Helper\"(Codeunit 50102).Run() at src/Helper.Codeunit.al line 19",
+  "partial": "\"Known\"(Codeunit 50103).Run() line 1\nFuture stack syntax without recognized tokens",
+  "unknown": "Future stack syntax without recognized tokens",
+  "multiline": "\"Multiline\"(Codeunit 50104).Run() line 2 - Sample App by Publisher version 1.0.0.0\n  continuation metadata that remains in raw frame",
+  "truncated": "\"Truncated\"(Codeunit 50105).Run() line 2\n...",
+  "malformed": "\"Broken(Codeunit x).Run(\n???",
+  "localized": "\"Lokal\"(Codeunit 50106).OnValidate(Trigger) rad 21",
+  "futureObjectType": "\"Future Object\"(DataVerseProxy 60000).Execute() line 4",
+  "duplicateObject": "\"Repeat\"(Codeunit 50107).First() line 1\n\"Repeat\"(Codeunit 50107).Second() line 2",
+  "empty": ""
+}

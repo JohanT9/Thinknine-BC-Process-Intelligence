@@ -1,10 +1,12 @@
 (function (root, factory) {
   const model = typeof module === "object" && module.exports
     ? require("./bug-report-model") : root.T9BugReportModel;
-  const api = factory(model);
+  const technical = typeof module === "object" && module.exports
+    ? require("./technical-diagnostics") : root.T9TechnicalDiagnostics;
+  const api = factory(model, technical);
   if (typeof module === "object" && module.exports) module.exports = api;
   root.T9BugReportService = api;
-})(typeof globalThis !== "undefined" ? globalThis : this, function (model) {
+})(typeof globalThis !== "undefined" ? globalThis : this, function (model, technical) {
   "use strict";
   const clone = value => value == null ? value : JSON.parse(JSON.stringify(value));
   const unique = values => [...new Set((values || []).filter(Boolean).map(String))];
@@ -61,6 +63,10 @@
     const errorScreenshotIds = unique(errorEvidence.map(item =>
       item.errorScreenshotAssetId));
     const callStackEvidence = errorEvidence.find(item => item.callStackAvailable);
+    const technicalDiagnostics = errorEvidence.map(item =>
+      technical.safelyDerive(item));
+    const primaryCallStack = technicalDiagnostics.find(item =>
+      item.summary.callStackAvailable)?.callStack;
     return model.normalize({ bugReportId: context.bugReportId || stableId(recording.id),
       schemaVersion: model.SCHEMA_VERSION, recordingId: recording.id,
       createdAt: now, updatedAt: now, status: "draft",
@@ -76,7 +82,11 @@
       } : null,
       diagnostics: { rawEvidenceRefs: errorEvidenceIds, parsed: null },
       callStack: { rawEvidenceRef: callStackEvidence?.errorEvidenceId || null,
-        frames: [], parsed: false },
+        frames: clone(primaryCallStack?.frames || []),
+        parsed: ["parsed", "partially-parsed"].includes(primaryCallStack?.status),
+        parserVersion: primaryCallStack?.parserVersion,
+        parseStatus: primaryCallStack?.status },
+      technicalDiagnostics,
       evidence: { screenshots: [...screenshotAssetIds.map(assetId => ({
         assetId, role: "reproduction"
       })), ...errorScreenshotIds.map(assetId => ({ assetId, role: "error" }))],
@@ -105,7 +115,12 @@
         capturedErrorRef: current.actualResult.capturedErrorRef,
         capturedErrorRefs: clone(current.actualResult.capturedErrorRefs) },
       businessCentralError: clone(current.businessCentralError),
-      diagnostics: clone(current.diagnostics), callStack: clone(current.callStack),
+      diagnostics: clone(current.diagnostics),
+      callStack: context.errorEvidence ? clone(regenerated.callStack) :
+        clone(current.callStack),
+      technicalDiagnostics: context.errorEvidence
+        ? clone(regenerated.technicalDiagnostics) :
+        clone(current.technicalDiagnostics),
       notes: clone(current.notes), annotations: clone(current.annotations),
       evidence: { ...regenerated.evidence,
         screenshots: unique([
@@ -117,5 +132,17 @@
       enrichment: clone(current.enrichment) });
   }
 
-  return { createBugReportFromRecording, regenerate, stableId };
+  function reparseTechnicalDiagnostics(report, errorEvidence = []) {
+    const current = model.normalize(report);
+    const derived = errorEvidence.map(item => technical.safelyDerive(item));
+    const primary = derived.find(item => item.summary.callStackAvailable)?.callStack;
+    return model.normalize({ ...clone(current), technicalDiagnostics: derived,
+      callStack: { ...clone(current.callStack),
+        frames: clone(primary?.frames || []), parserVersion: primary?.parserVersion,
+        parseStatus: primary?.status,
+        parsed: ["parsed", "partially-parsed"].includes(primary?.status) } });
+  }
+
+  return { createBugReportFromRecording, regenerate,
+    reparseTechnicalDiagnostics, stableId };
 });

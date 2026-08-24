@@ -20,5 +20,9 @@ assert.ok(dashboard.includes(
 assert.ok(content.includes('version: "2.1.0"'));
 assert.ok(fs.existsSync(path.join(root, "dist/capture-focus-session.js")));
 assert.ok(fs.existsSync(path.join(root, "dist/bc-error-detector.js")));
+assert.ok(fs.existsSync(path.join(root,
+  "dist/bug-report/al-call-stack-parser.js")));
+assert.ok(fs.existsSync(path.join(root,
+  "dist/bug-report/technical-diagnostics.js")));
 
 console.log("Generated build version integrity tests passed.");

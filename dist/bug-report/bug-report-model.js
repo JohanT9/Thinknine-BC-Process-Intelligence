@@ -68,6 +68,8 @@
       frames: clone(result.callStack?.frames || []),
       parsed: Boolean(result.callStack?.parsed),
       rawAuthorship: "captured", framesAuthorship: "derived" };
+    result.technicalDiagnostics = (result.technicalDiagnostics || []).map(item =>
+      ({ ...clone(item), authorship: "derived" }));
     result.evidence = { ...(result.evidence || {}),
       screenshots: (result.evidence?.screenshots || []).map(item => ({
         ...clone(item), assetId: String(item.assetId),

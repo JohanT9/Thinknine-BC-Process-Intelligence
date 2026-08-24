@@ -29,6 +29,11 @@ mutate Canonical Recording. Bug Reports reference this evidence. See
 [BC error capture](BC_ERROR_CAPTURE.md) and
 [BC diagnostic evidence](BC_DIAGNOSTIC_EVIDENCE.md).
 
+Raw AL call stacks flow into a browser-neutral, synchronous, versioned parser
+and Technical Diagnostics projector. These derived Bug Reporting services do
+not mutate evidence, participate in ordinary documentation, depend on UI or
+renderers, or call external services. Results can be recomputed from raw data.
+
 ```text
 CAPTURE
 Browser events → Raw Event Persistence → Canonical Recording

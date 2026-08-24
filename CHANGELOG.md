@@ -2,6 +2,10 @@
 
 ## 4.6.0 - Legacy documentation opening compatibility
 
+- Added versioned AL call-stack parsing and renderer-neutral Technical
+  Diagnostics with ordered raw-frame traceability, partial/unknown preservation,
+  explicit object/app summaries and safe re-parsing—without root-cause inference,
+  source lookup, telemetry, external services or AI.
 - Bug Recording now passively captures supported Business Central modal errors,
   exact messages, observable diagnostics, raw AL call-stack text, frame context,
   preceding-action candidates and dedicated screenshots. Multiple occurrences

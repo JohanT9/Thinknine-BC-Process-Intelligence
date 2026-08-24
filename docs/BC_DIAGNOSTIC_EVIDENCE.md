@@ -16,7 +16,8 @@ English, Swedish and Danish labels are recognized. Unknown fields and raw text
 remain preserved.
 
 An AL call-stack section is retained as `rawCallStack`. It is never fabricated;
-JavaScript stacks are not used. Frames remain unparsed (`callStackParsed: false`).
+JavaScript stacks are not used. A separate versioned parser derives frames
+without changing evidence. See [AL Call Stack Parser](AL_CALL_STACK_PARSER.md).
 
 `diagnostics-unavailable` means BC exposed no observable details.
 `diagnostics-capture-failed` means details were advertised but could not be

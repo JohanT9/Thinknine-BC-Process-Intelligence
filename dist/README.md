@@ -8,8 +8,10 @@ claimed until the manual Chrome verification plan is completed. See
 The same Canonical Recording evidence underpins structured technical Bug
 Reports. Bug Recording can passively capture supported Business Central modal
 errors, exact messages, visible diagnostic details, raw AL call-stack text and
-a dedicated screenshot. Evidence stays local; clipboard monitoring, Application
-Insights queries, AI analysis and AL frame parsing are absent.
+a dedicated screenshot. Versioned deterministic AL parsing organizes explicit
+frames and Technical Diagnostics while preserving unknown syntax. Evidence
+stays local; clipboard monitoring, Application Insights queries, AI analysis,
+object/app guessing and root-cause inference are absent.
 
 The current runtime is entirely a browser extension; there is no Windows
 executable or native companion. Unpacked `dist` is for development. The target
