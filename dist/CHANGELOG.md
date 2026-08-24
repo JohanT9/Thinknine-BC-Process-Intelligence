@@ -2,6 +2,10 @@
 
 ## 4.6.0 - Legacy documentation opening compatibility
 
+- Added provider-neutral Issue Package preview/offline export and explicit
+  Azure DevOps/GitHub issue creation, with Entra/GitHub App credential
+  boundaries, staleness and duplicate protection, selected attachments,
+  optional telemetry/AI, partial-failure handling, and historical external refs.
 - Added optional, explicitly consented AI-assisted Bug Report analysis through
   an Entra-protected broker, with bounded/redacted evidence, deterministic
   fingerprints, structured cited output, hallucination guards, stale analysis,

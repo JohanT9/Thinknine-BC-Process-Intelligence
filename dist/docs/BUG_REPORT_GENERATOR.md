@@ -23,8 +23,9 @@ Completeness uses explicit required/recommended issues, never a score. Title, a
 visible reproduction step and human/captured actual result determine readiness.
 Missing BC diagnostics, screenshots and call stacks are advisory.
 
-Markdown and plain text consume this same projection. Current export policy is
-local full technical report; no sanitization or issue submission is implemented.
+Markdown and plain text consume this same projection. Issue Package now consumes
+the same projection through an explicit preview/privacy boundary; destination
+adapters never reconstruct Bug Report semantics.
 
 Word export is deferred because existing Word components do not represent raw
 technical-frame semantics cleanly without renderer-specific branching. Document

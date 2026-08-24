@@ -27,7 +27,7 @@ truncated.
 The optional Application Insights panel stores public resource configuration,
 tests the connection, and refreshes one explicitly selected error. Telemetry
 and the derived timeline are read-only, escaped, and exported from the shared
-projection. Raw results are collapsed. No issue submission exists. No real
+projection. Raw results are collapsed. No real
 BC/Application Insights pair was available locally; tests use synthetic data.
 
 Optional AI analysis requires broker configuration, exact-host permission,
@@ -35,3 +35,9 @@ explicit consent, and an explicit Analyze action. It appears in a separately
 labelled read-only section; stale results require explicit re-analysis. Export
 excludes AI unless the user selects the dedicated inclusion option. No real AI
 provider was available locally; deterministic tests use a synthetic provider.
+
+Create Issue opens a modal Issue Package Preview without cluttering the report
+editor. It displays destination, type/configuration, title, complete description,
+selected attachments, telemetry/AI inclusion, sensitive categories, existing
+external-reference warning, copy and offline export. Submission remains disabled
+during an active request and requires explicit review consent.

@@ -763,3 +763,8 @@ capture, telemetry, diagnostics, human content, and derived AI output. UI only
 orchestrates; an Entra-protected broker owns confidential credentials. AI has no
 autonomous tools and cannot modify Canonical Recording or Bug Report evidence.
 See `AI_TECHNICAL_ANALYSIS.md`.
+
+Issue Package is a downstream renderer/provider-neutral projection of the same
+Technical Report. Azure DevOps and GitHub adapters map that package without
+owning report semantics. External systems are write-only initial destinations;
+no synchronization or read-back can overwrite the Bug Report.

@@ -32,5 +32,10 @@ assert.ok(fs.existsSync(path.join(root,
   "dist/bug-report/application-insights-provider.js")));
 assert.ok(fs.existsSync(path.join(root,
   "dist/bug-report/technical-analysis-provider.js")));
+assert.ok(fs.existsSync(path.join(root, "dist/bug-report/issue-package.js")));
+assert.ok(fs.existsSync(path.join(root,
+  "dist/bug-report/azure-devops-adapter.js")));
+assert.ok(fs.existsSync(path.join(root,
+  "dist/bug-report/github-issue-adapter.js")));
 
 console.log("Generated build version integrity tests passed.");

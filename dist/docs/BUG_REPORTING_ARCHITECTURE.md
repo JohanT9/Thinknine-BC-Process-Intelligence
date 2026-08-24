@@ -105,17 +105,23 @@ and [Technical Report Workspace](TECHNICAL_REPORT_WORKSPACE.md).
 
 ## Future extension boundaries
 
+Issue Package and initial Azure DevOps/GitHub creation are now downstream
+derived projections. Preview and explicit consent are mandatory; destination
+formatting cannot mutate evidence. Lightweight External Issue References are
+historical metadata, never a new source of truth. See `ISSUE_PACKAGE.md` and
+`EXTERNAL_ISSUE_SECURITY.md`.
+
 - **BC Error Dialog & Copy Details Capture:** implemented for observable modal
   surfaces and already-visible diagnostic DOM, without clipboard permission.
 - **AL call stack:** version 1 derives only explicitly present frame fields and
   preserves every unknown segment; it never invents object, app or line data.
 - **Application Insights:** optional external evidence is implemented; see
   [Application Insights enrichment](APPLICATION_INSIGHTS_ENRICHMENT.md).
-- **AI:** a future analysis service may consume selected evidence and produce a
-  separate non-authoritative analysis object.
-- **Export:** future Workspace, Word, PDF, Markdown, JSON support package and
-  issue-system adapters consume the model through an explicit sanitization and
-  rendering boundary. The domain does not depend on DOCX.
+- **AI:** optional analysis consumes selected evidence and produces a separate
+  non-authoritative analysis object.
+- **Export:** Markdown, offline Issue Package, Azure DevOps, and GitHub consume
+  derived report projections. Future Word/PDF support remains separate. The
+  domain does not depend on DOCX or destination APIs.
 
 ## Self review
 
@@ -125,5 +131,6 @@ and [Technical Report Workspace](TECHNICAL_REPORT_WORKSPACE.md).
 - Human-authored content survives regeneration? **Yes.**
 - Error capture implemented? **Yes, for documented observable modal surfaces.**
 - AL call-stack frame parsing implemented? **Yes, deterministic version 1.0.0.**
-- Root-cause analysis implemented? **No.**
-- Telemetry added? **Optional read enrichment.** AI added? **No.**
+- Root-cause assistance implemented? **Optional, non-authoritative AI analysis.**
+- Telemetry added? **Optional read enrichment.** AI added? **Optional.**
+- External creation added? **Explicit Azure DevOps/GitHub destinations.**

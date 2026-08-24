@@ -13,6 +13,9 @@
     textarea{min-height:80px}button{margin:4px;padding:8px 12px}pre{white-space:pre-wrap;overflow-wrap:anywhere}
     table{border-collapse:collapse;width:100%}td,th{border:1px solid #ccd5df;padding:6px;text-align:left}
     img{max-width:100%;height:auto}@media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important}}
+    dialog{width:min(960px,90vw);max-height:90vh;overflow:auto;border:1px solid #8392a5;border-radius:8px}
+    dialog pre{max-height:320px;overflow:auto;background:#f5f7fa;padding:12px}
+    input[type=checkbox]{width:auto}select{padding:8px}
   </style>
 </head>
 <body>
@@ -21,6 +24,7 @@
     <button id="redoReport" type="button">Redo</button>
     <button id="copyMarkdown" type="button">Copy full report</button>
     <button id="downloadMarkdown" type="button">Export Markdown</button>
+    <button id="openIssuePreview" type="button">Create Issue</button>
     <label><input id="includeAiExport" type="checkbox"> Include AI analysis in copy/export</label>
     <details><summary>Application Insights (optional)</summary>
       <label>Tenant ID <input id="telemetryTenantId" autocomplete="off"></label>
@@ -53,6 +57,52 @@
     </details>
     <span id="workspaceMessage" role="status"></span></header>
   <main id="technicalReport" aria-live="polite"></main>
+  <dialog id="issuePreview" aria-labelledby="issuePreviewTitle">
+    <form method="dialog"><button value="cancel" aria-label="Close issue preview">Close</button></form>
+    <h2 id="issuePreviewTitle">Issue Package Preview</h2>
+    <p>The Bug Report remains local and authoritative. Nothing is submitted until
+      you review this package and select Create Issue.</p>
+    <label>Destination <select id="issueProvider"><option value="">Offline package only</option>
+      <option value="azure-devops">Azure DevOps</option><option value="github">GitHub</option></select></label>
+    <label><input id="issueIncludeTelemetry" type="checkbox"> Include telemetry summary</label>
+    <label><input id="issueIncludeAi" type="checkbox"> Include current AI-assisted analysis</label>
+    <details><summary>Azure DevOps configuration</summary>
+      <label><input id="adoEnabled" type="checkbox"> Enabled</label>
+      <label>Organization <input id="adoOrganization" autocomplete="off"></label>
+      <label>Project <input id="adoProject" autocomplete="off"></label>
+      <label>Work item type <input id="adoWorkItemType" value="Bug" autocomplete="off"></label>
+      <label>Area path <input id="adoAreaPath" autocomplete="off"></label>
+      <label>Iteration path <input id="adoIterationPath" autocomplete="off"></label>
+      <label>Tags, comma separated <input id="adoTags" autocomplete="off"></label>
+      <label>Tenant ID <input id="adoTenantId" autocomplete="off"></label>
+      <label>Public client ID <input id="adoClientId" autocomplete="off"></label>
+      <label>Entra scope <input id="adoScope" value="499b84ac-1321-427f-aa17-267ca6975798/.default" autocomplete="off"></label>
+      <button id="testAdoConnection" type="button">Test Azure DevOps connection</button>
+    </details>
+    <details><summary>GitHub configuration</summary>
+      <label><input id="githubEnabled" type="checkbox"> Enabled</label>
+      <label>Repository (owner/name) <input id="githubRepository" autocomplete="off"></label>
+      <label>Labels, comma separated <input id="githubLabels" autocomplete="off"></label>
+      <label>GitHub App broker URL <input id="githubBrokerUrl" type="url" autocomplete="off"></label>
+      <label>Broker Entra tenant ID <input id="githubTenantId" autocomplete="off"></label>
+      <label>Broker public client ID <input id="githubClientId" autocomplete="off"></label>
+      <label>Broker OAuth scope <input id="githubScope" autocomplete="off"></label>
+      <button id="testGithubConnection" type="button">Test GitHub connection</button>
+    </details>
+    <button id="saveIssueConfiguration" type="button">Save public destination configuration</button>
+    <button id="refreshIssuePreview" type="button">Generate preview</button>
+    <h3>Transmission summary</h3><div id="issueTransmissionSummary"></div>
+    <h3>Title</h3><p id="issueTitle"></p>
+    <h3>Description</h3><pre id="issueDescription"></pre>
+    <h3>Attachments</h3><ul id="issueAttachments"></ul>
+    <label><input id="issueConsent" type="checkbox"> I reviewed the destination,
+      description, attachments, telemetry/AI choices, and sensitive-data warning</label>
+    <label><input id="issueConfirmDuplicate" type="checkbox"> Create another issue even if this report already has an external reference</label>
+    <button id="copyIssueDescription" type="button">Copy Issue Description</button>
+    <button id="downloadIssuePackage" type="button">Export Offline Issue Package</button>
+    <button id="submitExternalIssue" type="button">Create Issue</button>
+    <p id="issueResult" role="status"></p>
+  </dialog>
   <script src="bug-report/bug-report-model.js"></script>
   <script src="bug-report/bug-report-completeness.js"></script>
   <script src="bug-report/ai-evidence-policy.js"></script>

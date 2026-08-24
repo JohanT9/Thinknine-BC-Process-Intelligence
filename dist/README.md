@@ -960,3 +960,10 @@ consent/action, is visibly non-authoritative, excludes screenshots, and is
 excluded from export by default. The extension contains no confidential AI key,
 and Bug Reporting works fully without AI. See
 `docs/AI_TECHNICAL_ANALYSIS.md` and `docs/AI_PRIVACY_AND_SECURITY.md`.
+
+Completed Technical Bug Reports can also be previewed as provider-neutral Issue
+Packages, copied/exported offline, or explicitly submitted to configured Azure
+DevOps or GitHub destinations. Azure DevOps uses Entra PKCE; GitHub uses an
+administrator GitHub App broker. No destination credential is stored in report
+data, and ordinary recording/documentation is unaffected. See
+`docs/ISSUE_PACKAGE.md`.

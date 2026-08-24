@@ -22,7 +22,7 @@ BugReport
   evidence: screenshot/diagnostic/attachment references
   notes / annotations (human)
   traceability
-  enrichment: optional telemetry per error and future analysis
+  enrichment: optional telemetry, AI analysis, and external issue references
 ```
 
 Statuses are deliberately limited to `draft`, `ready`, `resolved`, and
@@ -109,3 +109,9 @@ validated citations, disclosure, and stale state. Attaching or removing it
 returns a new report and never rewrites evidence, telemetry, deterministic
 diagnostics, or human content. This compatible optional field does not increase
 the Bug Report schema version.
+
+Successful issue creation appends a lightweight record to
+`enrichment.externalIssues`: provider, destination, external ID/URL, creation
+time, source revision, and inclusion flags. Payloads, attachments, credentials,
+and authorization data are not duplicated. The record is historical and does
+not give the destination authority over local content.
