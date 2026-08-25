@@ -1,5 +1,7 @@
 # Changelog
 
+- Made recording cancellation compatible with an older still-running Edge
+  service worker by falling back to its established stop-and-delete commands.
 - Added a confirmed `Avbryt inspelning` action that safely stops and removes an
   unwanted recording without generating process documentation or a Bug Report.
 - Simplified the toolbar icon from `BC` to `B` and relabelled the recording-name

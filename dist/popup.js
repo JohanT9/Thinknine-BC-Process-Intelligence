@@ -155,6 +155,25 @@ async function finishRecording(name) {
   }
 }
 
+async function discardWithLegacyBackground() {
+  const stateResponse = await send({ type: "T9_GET_STATE" }, 3000);
+  const sessionId = stateResponse?.state?.sessionId;
+  if (!sessionId) return { ok: true, sessionId: null };
+
+  const stopped = await send({ type: "T9_STOP" }, 30000);
+  if (!stopped?.ok) {
+    throw new Error(stopped?.error || "Kunde inte stoppa inspelningen.");
+  }
+  const removed = await send({
+    type: "T9_DELETE_SESSION",
+    sessionId
+  }, 10000);
+  if (!removed?.ok) {
+    throw new Error(removed?.error || "Inspelningen stoppades men kunde inte tas bort.");
+  }
+  return { ok: true, sessionId };
+}
+
 async function discardActiveRecording() {
   const confirmed = globalThis.confirm(
     "Vill du avbryta inspelningen? Alla registrerade händelser och bilder i den tas bort."
@@ -164,7 +183,10 @@ async function discardActiveRecording() {
   try {
     $("discardRecording").disabled = true;
     showMessage("Avbryter inspelningen...");
-    const response = await send({ type: "T9_CANCEL_RECORDING" }, 30000);
+    let response = await send({ type: "T9_CANCEL_RECORDING" }, 30000);
+    if (!response?.ok && /okänt meddelande/i.test(String(response?.error || ""))) {
+      response = await discardWithLegacyBackground();
+    }
     if (!response?.ok) {
       throw new Error(response?.error || "Kunde inte avbryta inspelningen.");
     }
