@@ -140,6 +140,7 @@ copyFile(
 
 for (const file of [
   "dashboard.html",
+  "design-system.css",
   "dashboard.js",
   "async-operations.js",
   "document-library-view.js",

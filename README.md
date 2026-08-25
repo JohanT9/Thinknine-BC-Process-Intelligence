@@ -10,6 +10,14 @@ Capture. Document. Improve.
 
 BC Process Studio captures real Business Central workflows and turns them into reviewed, structured and reusable process knowledge. The implemented lifecycle is **Record → Review → Document → Reuse → Improve**.
 
+The extension UI uses a shared Fluent-compatible design system inspired by
+Business Central's compact, task-oriented interaction language. The dashboard,
+Knowledge Base, recorder popup, Review Studio, Document Generator preview,
+diagnostics and technical report workspace share semantic tokens, controls,
+focus treatment and responsive rules. See
+[docs/UI_DESIGN_SYSTEM.md](docs/UI_DESIGN_SYSTEM.md) for the supported patterns
+and migration status.
+
 Current product areas:
 
 - **BC Process Recorder** captures browser activity, interactions, screenshots and process events.

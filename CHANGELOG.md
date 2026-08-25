@@ -2,6 +2,12 @@
 
 ## 4.7.0 — BC Process Studio
 
+- Harmonised the dashboard, Knowledge Base, recorder popup, Review Studio,
+  Document Generator preview, diagnostics and technical report workspace with a
+  central Fluent-compatible, Business Central-inspired design system.
+- Added semantic colour, typography, spacing, control, focus and status tokens;
+  compact operational list presentation; responsive rules; reduced-motion and
+  forced-colour safeguards; and automated build/design-contract coverage.
 - Renamed and repositioned the user-facing product as **BC Process Studio by Thinknine**.
 - Introduced the descriptor, tagline, supporting message and canonical module vocabulary.
 - Updated extension, popup, dashboard, diagnostics, installer, release metadata and restrained Word attribution.

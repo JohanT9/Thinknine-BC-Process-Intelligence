@@ -1,5 +1,18 @@
 # BC Process Studio Architecture 4.7
 
+## UI design-system boundary
+
+`src/ui/design-system.css` is the single source of truth for shared visual
+semantics: colour, typography, spacing, sizing, controls, focus, status,
+responsive behaviour and forced-colour support. HTML pages own structure and
+page-specific layout; UI JavaScript owns orchestration and interaction. The
+design system contains no recording, review, documentation or export rules.
+
+The production build copies the source stylesheet into `dist`; generated files
+remain build output. Existing embedded CSS is transitional layout code and must
+not become a second shared theme. The complete component and migration contract
+is documented in `docs/UI_DESIGN_SYSTEM.md`.
+
 ## Product identity boundary
 
 `src/engine/product-brand.js` is the canonical source for current product and module terminology. UI and export surfaces use **BC Process Studio by Thinknine**. Stable technical identifiers—including the npm package name, extension listing identity, storage keys, `T9*` namespaces, schema versions, file-compatible release names and built-in theme ID `thinknine`—remain unchanged to preserve existing installations and data.

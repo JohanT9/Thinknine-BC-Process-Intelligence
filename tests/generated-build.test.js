@@ -28,6 +28,7 @@ assert.ok(fs.existsSync(path.join(root,
   "dist/bug-report/bug-report-generator.js")));
 assert.ok(fs.existsSync(path.join(root, "dist/technical-report.html")));
 assert.ok(fs.existsSync(path.join(root, "dist/technical-report.js")));
+assert.ok(fs.existsSync(path.join(root, "dist/design-system.css")));
 assert.ok(fs.existsSync(path.join(root,
   "dist/bug-report/application-insights-provider.js")));
 assert.ok(fs.existsSync(path.join(root,
