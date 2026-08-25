@@ -2,6 +2,9 @@
 
 ## 4.7.0 — BC Process Studio
 
+- Split recorded Business Central context into `{environment}` and the new
+  `{company}` filename variable, while preserving compatibility metadata from
+  recordings created before the split.
 - Fixed dashboard settings loading and Word filename precedence so the recorded
   session environment reaches `{environment}` instead of an older global value.
 - Environment Name now follows the Business Central tab being recorded by using

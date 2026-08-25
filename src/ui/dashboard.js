@@ -6,6 +6,7 @@ const DEFAULTS = {
   maskValues: true,
   maxEvents: 20000,
   environmentName: "ApteanAdvance",
+  companyName: "",
   advancedOverridesEnabled: false,
   maskSalesOrderNo: true,
   maskPurchaseOrderNo: true,
@@ -3012,7 +3013,10 @@ function currentFilenamePreviewSettings() {
       DEFAULTS.exportFileNamePattern,
     environmentName:
       $("environmentName")?.value ||
-      DEFAULTS.environmentName
+      DEFAULTS.environmentName,
+    companyName:
+      $("companyName")?.value ||
+      DEFAULTS.companyName
   };
 }
 
@@ -6306,6 +6310,7 @@ $("libraryBatchDelete").addEventListener("click", async () => {
 });
 $("exportFileNamePattern").addEventListener("input", updateFilenamePreview);
 $("environmentName").addEventListener("input", updateFilenamePreview);
+$("companyName").addEventListener("input", updateFilenamePreview);
 $("debug").addEventListener("click", () => {
   chrome.tabs.create({
     url: chrome.runtime.getURL("debug.html")

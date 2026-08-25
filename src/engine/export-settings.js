@@ -15,9 +15,18 @@
     {
       name: "environment",
       resolve: context =>
+        context.session.settings?.businessCentralEnvironment ||
         context.session.settings?.environmentName ||
         context.settings.environmentName ||
         "Miljö"
+    },
+    {
+      name: "company",
+      resolve: context =>
+        context.session.settings?.businessCentralCompany ||
+        context.session.settings?.companyName ||
+        context.settings.companyName ||
+        "Företag"
     },
     { name: "date", resolve: context => context.parts.date },
     { name: "time", resolve: context => context.parts.time },

@@ -92,6 +92,17 @@ const fallbackSession = { name: "Ny order", settings: {} };
 assert.strictEqual(exportSettings.buildFileName("docx", fallbackSession,
   settings, now), "Ny-order-Produktion-2026-08-04-09-07-4.7.0.docx");
 
+const observedSession = { name: "Kundinspektion", settings: {
+  environmentName: "Feldts_SE_Sandbox — Feldts Fisk & Skaldjur AB",
+  businessCentralEnvironment: "Feldts_SE_Sandbox",
+  businessCentralCompany: "Feldts Fisk & Skaldjur AB"
+} };
+assert.strictEqual(exportSettings.buildFileName("docx", observedSession, {
+  ...settings,
+  exportFileNamePattern: "{process}-{environment}-{company}-{date}"
+}, now),
+"Kundinspektion-Feldts_SE_Sandbox-Feldts-Fisk-&-Skaldjur-AB-2026-08-04.docx");
+
 elements.input.value = "Manual-{date}";
 const updatedPreview = exportSettings.updatePreview(
   elements,
@@ -185,7 +196,7 @@ const variableNames = exportSettings.variableDefinitions.map(
 );
 assert.deepStrictEqual(
   variableNames,
-  ["process", "environment", "date", "time", "version"]
+  ["process", "environment", "company", "date", "time", "version"]
 );
 
 const createdButtons = [];
@@ -232,21 +243,21 @@ assert.deepStrictEqual(
 );
 assert.strictEqual(
   variableHelp.textContent,
-  "Tillgängliga variabler: {process}, {environment}, {date}, {time}, {version}"
+  "Tillgängliga variabler: {process}, {environment}, {company}, {date}, {time}, {version}"
 );
-createdButtons[2].listeners.click();
+createdButtons[3].listeners.click();
 assert.strictEqual(selectedToken, "{date}");
-assert.strictEqual(createdButtons[2].attributes["aria-label"], "Infoga variabeln {date}");
+assert.strictEqual(createdButtons[3].attributes["aria-label"], "Infoga variabeln {date}");
 
 let prevented = false;
-createdButtons[2].listeners.keydown({
+createdButtons[3].listeners.keydown({
   key: "ArrowRight",
   preventDefault() {
     prevented = true;
   }
 });
 assert.strictEqual(prevented, true);
-assert.strictEqual(createdButtons[3].focused, true);
+assert.strictEqual(createdButtons[4].focused, true);
 
 createdButtons[2].listeners.keydown({ key: "Home", preventDefault() {} });
 assert.strictEqual(createdButtons[0].focused, true);

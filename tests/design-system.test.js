@@ -36,6 +36,7 @@ assert.ok(dashboard.includes('<input id="documentationProfile" type="hidden" val
 assert.ok(dashboard.includes('aria-controls="advancedPanel" hidden'));
 assert.ok(dashboard.includes('<div id="advancedPanel" class="advanced" hidden>'));
 assert.ok(dashboard.includes('id="environmentName"'));
+assert.ok(dashboard.includes('id="companyName"'));
 
 assert.ok(css.includes("prefers-reduced-motion: reduce"));
 assert.ok(css.includes("forced-colors: active"));

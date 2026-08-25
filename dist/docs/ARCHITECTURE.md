@@ -19,8 +19,9 @@ is documented in `docs/UI_DESIGN_SYSTEM.md`.
 the active recording tab's Business Central URL. At session start the recorder
 reads only observable URL facts: the environment path segment and the decoded
 `company` query parameter. It stores those values in the session settings and
-updates the environment display label used by the dashboard and filename
-template. Non-Business Central URLs, malformed URLs and missing values fall back
+updates the separate environment and company fields used by the dashboard and
+filename variables `{environment}` and `{company}`. Non-Business Central URLs,
+malformed URLs and missing values fall back
 without blocking capture. This is capture context, not page or entity semantic
 classification.
 

@@ -19,11 +19,11 @@ focus treatment and responsive rules. See
 and migration status.
 
 When a recording starts, BC Process Studio reads the observable Business Central
-URL of that tab and updates the stored environment label from its environment
-path and `company` parameter. For example, `Feldts_SE_Sandbox` and
-`Feldts Fisk & Skaldjur AB` become
-`Feldts_SE_Sandbox — Feldts Fisk & Skaldjur AB`. A manually entered value remains
-the fallback when the URL does not expose this context.
+URL of that tab and updates the stored environment and company from its
+environment path and `company` parameter. The filename variables expose these
+separately as `{environment}` (for example `Feldts_SE_Sandbox`) and `{company}`
+(for example `Feldts Fisk & Skaldjur AB`). Manually entered values remain the
+fallback when the URL does not expose this context.
 
 Current product areas:
 

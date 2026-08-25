@@ -60,6 +60,7 @@ const DEFAULT_SETTINGS = {
   maskValues: true,
   maxEvents: 20000,
   environmentName: "ApteanAdvance",
+  companyName: "",
   advancedOverridesEnabled: false,
   maskSalesOrderNo: true,
   maskPurchaseOrderNo: true,
@@ -1031,17 +1032,19 @@ async function startSession(message, tabId) {
   const recordingTab = await chrome.tabs.get(tabId);
   const observedContext = globalThis.T9BusinessCentralUrlContext
     .parseBusinessCentralUrl(recordingTab.url);
-  const observedDisplayName = globalThis.T9BusinessCentralUrlContext
-    .displayName(observedContext, storedSettings.environmentName);
   const settings = {
     ...storedSettings,
-    environmentName: observedDisplayName,
+    environmentName: observedContext.environmentName ||
+      storedSettings.businessCentralEnvironment || storedSettings.environmentName,
+    companyName: observedContext.companyName ||
+      storedSettings.businessCentralCompany || storedSettings.companyName || "",
     ...(observedContext.environmentName
       ? { businessCentralEnvironment: observedContext.environmentName } : {}),
     ...(observedContext.companyName
       ? { businessCentralCompany: observedContext.companyName } : {})
   };
-  if (observedDisplayName !== storedSettings.environmentName) {
+  if (settings.environmentName !== storedSettings.environmentName ||
+      settings.companyName !== storedSettings.companyName) {
     await chrome.storage.local.set({ [SETTINGS_KEY]: settings });
   }
   const id = sessionId(message.name);
@@ -1915,12 +1918,17 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
 
       case "T9_GET_SETTINGS": {
         const data = await chrome.storage.local.get(SETTINGS_KEY);
+        const storedSettings = data[SETTINGS_KEY] || {};
 
         sendResponse({
           ok: true,
           settings: {
             ...DEFAULT_SETTINGS,
-            ...(data[SETTINGS_KEY] || {})
+            ...storedSettings,
+            environmentName: storedSettings.businessCentralEnvironment ||
+              storedSettings.environmentName || DEFAULT_SETTINGS.environmentName,
+            companyName: storedSettings.businessCentralCompany ||
+              storedSettings.companyName || ""
           }
         });
         break;
