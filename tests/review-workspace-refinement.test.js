@@ -25,6 +25,9 @@ for (const id of ["mergeReviewSteps", "splitReviewStep",
 assert(toolbar.includes('aria-controls="reviewMoreActionsPanel"'));
 assert(toolbar.includes('aria-expanded="false"'));
 assert(html.includes(".review-fields textarea{width:100%;min-height:88px"));
+assert(html.includes(".review-list{padding:18px;width:min(100%,1400px);box-sizing:border-box}"));
+assert(html.includes("width:min(calc(100% - 40px),1360px)"));
+assert(html.includes("padding:16px max(16px,calc(100% - 1384px)) 16px 16px"));
 assert(html.includes("line-height:1.55"));
 assert(html.includes("scroll-margin-top:260px"));
 assert(html.includes("@media(max-width:800px)"));

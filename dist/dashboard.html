@@ -63,8 +63,8 @@ table{width:100%;border-collapse:collapse}th,td{text-align:left;padding:9px;bord
 .review-status div{display:flex;gap:6px;align-items:baseline}
 .review-status dt{font-size:12px;color:#52606d}
 .review-status dd{margin:0;font-size:16px;font-weight:700;color:#1f2933}
-.review-list{padding:18px}
-.review-card{border:1px solid #d8dee5;border-radius:8px;margin-bottom:14px;padding:14px;display:grid;grid-template-columns:56px 1fr 210px;gap:14px}
+.review-list{padding:18px;width:min(100%,1400px);box-sizing:border-box}
+.review-card{border:1px solid #d8dee5;border-radius:8px;margin-bottom:14px;padding:14px;display:grid;grid-template-columns:56px minmax(0,1fr) 210px;gap:14px}
 .review-card.approved{border-color:#65a30d;background:#f7fee7}
 .review-card.needs-review{border-color:#f59e0b}
 .review-card.selected{outline:3px solid #0f6cbd;outline-offset:1px}
@@ -94,9 +94,9 @@ table{width:100%;border-collapse:collapse}th,td{text-align:left;padding:9px;bord
 .review-card.compact textarea[data-edit-field="instruction"]{height:38px;min-height:38px;resize:none;overflow:hidden;white-space:nowrap}
 .review-card.compact .review-actions{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));align-content:start;gap:5px}
 .review-card.compact .review-actions label{margin:0;align-self:center}
-.review-footer{padding:16px;border-top:1px solid #d8dee5;display:flex;justify-content:space-between;background:#f8fafc}
+.review-footer{padding:16px max(16px,calc(100% - 1384px)) 16px 16px;border-top:1px solid #d8dee5;display:flex;justify-content:space-between;background:#f8fafc}
 #reviewWorkspacePanel{min-height:0;flex:1;overflow:auto;overscroll-behavior:contain}
-.review-document-fields{margin:16px 20px;padding:16px;border:1px solid #cbd8e6;border-radius:8px;background:#f7faff}
+.review-document-fields{margin:16px 20px;padding:16px;border:1px solid #cbd8e6;border-radius:8px;background:#f7faff;width:min(calc(100% - 40px),1360px);box-sizing:border-box}
 .review-document-fields h3{margin:0 0 10px}
 .review-document-fields label{display:block;font-weight:700;margin-bottom:6px}
 .review-document-fields textarea{box-sizing:border-box;width:100%;min-height:84px;resize:vertical}

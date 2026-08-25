@@ -1,5 +1,7 @@
 # Changelog
 
+- Added a responsive maximum workbench width in Review Studio so instructions,
+  document fields and step actions remain visually connected on wide displays.
 - Optically centred the single-letter toolbar icon at small Edge toolbar sizes.
 - Made recording cancellation compatible with an older still-running Edge
   service worker by falling back to its established stop-and-delete commands.
