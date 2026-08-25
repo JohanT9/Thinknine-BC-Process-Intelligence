@@ -1,4 +1,5 @@
 importScripts("engine/storage-keys.js");
+importScripts("engine/business-central-url-context.js");
 importScripts("engine/page-identity.js");
 importScripts("engine/page-identification-engine.js");
 importScripts("engine/canonical-recording.js");
@@ -1026,7 +1027,23 @@ async function startSession(message, tabId) {
     );
   }
 
-  const settings = await getSettings();
+  const storedSettings = await getSettings();
+  const recordingTab = await chrome.tabs.get(tabId);
+  const observedContext = globalThis.T9BusinessCentralUrlContext
+    .parseBusinessCentralUrl(recordingTab.url);
+  const observedDisplayName = globalThis.T9BusinessCentralUrlContext
+    .displayName(observedContext, storedSettings.environmentName);
+  const settings = {
+    ...storedSettings,
+    environmentName: observedDisplayName,
+    ...(observedContext.environmentName
+      ? { businessCentralEnvironment: observedContext.environmentName } : {}),
+    ...(observedContext.companyName
+      ? { businessCentralCompany: observedContext.companyName } : {})
+  };
+  if (observedDisplayName !== storedSettings.environmentName) {
+    await chrome.storage.local.set({ [SETTINGS_KEY]: settings });
+  }
   const id = sessionId(message.name);
   const now = new Date().toISOString();
 

@@ -19,6 +19,8 @@ assert.ok(dashboard.includes(
 ));
 assert.ok(content.includes('version: "2.1.0"'));
 assert.ok(fs.existsSync(path.join(root, "dist/capture-focus-session.js")));
+assert.ok(fs.existsSync(path.join(root,
+  "dist/engine/business-central-url-context.js")));
 assert.ok(fs.existsSync(path.join(root, "dist/bc-error-detector.js")));
 assert.ok(fs.existsSync(path.join(root,
   "dist/bug-report/al-call-stack-parser.js")));

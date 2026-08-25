@@ -2,6 +2,9 @@
 
 ## 4.7.0 — BC Process Studio
 
+- Environment Name now follows the Business Central tab being recorded by using
+  its observable environment path and decoded `company` URL parameter, with the
+  manual value retained as fallback.
 - Simplified Documentation settings to the useful Environment Name field; the
   profile and privacy values remain internal for stored-state and masking
   compatibility.

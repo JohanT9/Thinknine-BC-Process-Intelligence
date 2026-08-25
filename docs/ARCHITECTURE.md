@@ -13,6 +13,17 @@ remain build output. Existing embedded CSS is transitional layout code and must
 not become a second shared theme. The complete component and migration contract
 is documented in `docs/UI_DESIGN_SYSTEM.md`.
 
+## Observed Business Central URL context
+
+`src/engine/business-central-url-context.js` owns the deterministic parsing of
+the active recording tab's Business Central URL. At session start the recorder
+reads only observable URL facts: the environment path segment and the decoded
+`company` query parameter. It stores those values in the session settings and
+updates the environment display label used by the dashboard and filename
+template. Non-Business Central URLs, malformed URLs and missing values fall back
+without blocking capture. This is capture context, not page or entity semantic
+classification.
+
 ## Product identity boundary
 
 `src/engine/product-brand.js` is the canonical source for current product and module terminology. UI and export surfaces use **BC Process Studio by Thinknine**. Stable technical identifiers—including the npm package name, extension listing identity, storage keys, `T9*` namespaces, schema versions, file-compatible release names and built-in theme ID `thinknine`—remain unchanged to preserve existing installations and data.

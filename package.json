@@ -52,7 +52,8 @@
     "release:pilot": "node scripts/pilot-release.js",
     "test:branding": "node tests/product-branding.test.js",
     "test:design-system": "node tests/design-system.test.js",
-    "preci": "npm run test:branding && npm run test:design-system && npm run test:bug-reporting-ux",
+    "test:bc-url-context": "node tests/business-central-url-context.test.js",
+    "preci": "npm run test:branding && npm run test:design-system && npm run test:bc-url-context && npm run test:bug-reporting-ux",
     "ci": "npm run lint && npm test && npm run build && npm run check",
     "dev:build": "node scripts/build.js",
     "dev:check": "npm run build && npm run check"
