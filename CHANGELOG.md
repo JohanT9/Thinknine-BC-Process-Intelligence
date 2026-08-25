@@ -1,5 +1,7 @@
 # Changelog
 
+- Simplified the toolbar icon from `BC` to `B` and relabelled the recording-name
+  dialog's continue-recording action as the clearer `Avbryt` command.
 - Replaced Edge's generic monochrome extension placeholder with a coloured
   BC Process Studio icon in the browser toolbar and extension surfaces.
 - Aligned Knowledge Base filter checkboxes with their labels and prevented the

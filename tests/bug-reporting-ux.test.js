@@ -18,6 +18,8 @@ assert.match(popupLogic, /Felrapportering pågår/);
 assert.match(popupLogic, /Business Central-felet.*fångats/);
 assert.match(popupLogic, /T9_FINISH_BUG_RECORDING/);
 assert.match(popup, /id="nameDialog"/);
+assert.match(popup, /id="cancelName"[^>]*>Avbryt<\/button>/);
+assert.doesNotMatch(popup, /id="cancelName"[^>]*>Fortsätt spela in<\/button>/);
 assert.match(popup, /id="recordingName" required/);
 assert.match(popupLogic, /nameDialog.*showModal/);
 assert.match(popupLogic, /finishRecording\(name\)/);
