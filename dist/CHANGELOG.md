@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- Recording starts immediately; the process or Bug Report is now named in an accessible dialog when Stop is selected.
 - Added first-class Process Documentation and Bug Reporting start modes.
 - Bug recording now creates and opens a local report automatically on Stop.
 - Added non-blocking BC error-capture feedback and deterministic draft titles.

@@ -4,6 +4,8 @@
 
 Open the extension while Business Central is active and choose **Report a Bug**. Reproduce the problem, then choose **Stop and open bug report**. Thinknine creates and opens a local draft with reproduction steps, screenshots, captured BC error evidence, and technical diagnostics when available. Add the expected result and any missing business context, then copy or export locally—or explicitly preview and submit to a configured issue destination. Telemetry, AI analysis, and external integrations are optional.
 
+Both process and bug recording start immediately. When you select Stop, enter the final process or report name in the naming dialog. Canceling the dialog continues the active recording.
+
 Edge is the production target. The architecture and build are Chromium-compatible,
 with modern Chrome and Edge bundle targets, but Chrome product support is not
 claimed until the manual Chrome verification plan is completed. See

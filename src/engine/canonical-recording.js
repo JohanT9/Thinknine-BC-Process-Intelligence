@@ -178,8 +178,9 @@
     return result;
   }
   function finish(recording, finishedAt) { if (recording.metadata?.finishedAt) { if (recording.metadata.finishedAt === finishedAt) return recording; throw new Error("Completed recording evidence is immutable."); } const result = normalize(recording); result.metadata.finishedAt = finishedAt; result.updatedAt = finishedAt; if (result.compatibility?.session) Object.assign(result.compatibility.session, { completedAt: finishedAt, updatedAt: finishedAt, status: "completed" }); return result; }
+  function rename(recording, title) { const value = String(title || "").trim(); if (!value) return normalize(recording); if (recording.metadata?.finishedAt) throw new Error("Completed recording evidence is immutable."); const result = normalize(recording); result.metadata.title = value; if (result.compatibility?.session) result.compatibility.session.name = value; return result; }
   function legacyView(recording) { const value = normalize(recording); const session = clone(value.compatibility?.session || {}); Object.assign(session, { id: value.id, name: session.name || value.metadata.title, purpose: session.purpose || "", recordingPurpose: value.metadata.recordingPurpose, startedAt: session.startedAt || value.metadata.startedAt, completedAt: session.completedAt || value.metadata.finishedAt || null, updatedAt: value.updatedAt, eventCount: value.events.length }); return { session, events: value.events.map(event => ({ ...clone(event.raw || { id: event.id, timestamp: event.timestamp, type: event.type }), ...(event.identification ? { identification: clone(event.identification) } : {}) })) }; }
   return { RECORDING_PURPOSES, SCHEMA_VERSION, addEvent, addScreenshot, create,
-    finish, fromLegacy, integrityDiagnostics, legacyView, normalize,
+    finish, fromLegacy, integrityDiagnostics, legacyView, normalize, rename,
     normalizeRecordingPurpose };
 });

@@ -49,12 +49,18 @@ assert.throws(() => recording.addScreenshot(withEvent, "missing-event",
   "data:image/png;base64,abc"), /event not found/);
 const finishedInput = deepFreeze(withAsset);
 const finishedSnapshot = JSON.stringify(finishedInput);
+const renamed = recording.rename(finishedInput, "Skapa försäljningsorder");
+assert.strictEqual(renamed.metadata.title, "Skapa försäljningsorder");
+assert.strictEqual(renamed.compatibility.session.name, "Skapa försäljningsorder");
+assert.strictEqual(JSON.stringify(finishedInput), finishedSnapshot,
+  "Renaming must not mutate Canonical Recording input.");
 const finished = recording.finish(finishedInput, "2026-08-10T09:00:00.000Z");
 assert.strictEqual(JSON.stringify(finishedInput), finishedSnapshot);
 assert.strictEqual(finished.metadata.finishedAt, "2026-08-10T09:00:00.000Z");
 assert.throws(() => recording.addEvent(finished, raw), /immutable/);
 assert.throws(() => recording.addScreenshot(finished, 1,
   "data:image/png;base64,late"), /immutable/);
+assert.throws(() => recording.rename(finished, "Too late"), /immutable/);
 const normalizedInput = deepFreeze({ ...JSON.parse(JSON.stringify(withAsset)),
   unknownTopLevel: { retained: true } });
 const normalizedSnapshot = JSON.stringify(normalizedInput);

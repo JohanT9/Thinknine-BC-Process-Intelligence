@@ -112,8 +112,8 @@ async function startRecording(recordingPurpose) {
       tabId: tab.id,
       name: recordingPurpose === "bug-report"
         ? "Business Central-fel"
-        : ($("name").value.trim() || "Business Central-process"),
-      purpose: $("purpose").value.trim()
+        : "Business Central-process",
+      purpose: ""
     }, 6000);
     if (!response?.ok) {
       throw new Error(response?.error || "Bakgrundsprocessen kunde inte starta sessionen.");
@@ -132,26 +132,60 @@ async function startRecording(recordingPurpose) {
 $("startProcess").addEventListener("click", () => startRecording("documentation"));
 $("startBug").addEventListener("click", () => startRecording("bug-report"));
 
-$("stop").addEventListener("click", async () => {
+let pendingBugRecording = false;
+
+async function finishRecording(name) {
   try {
-    const state = await send({ type: "T9_GET_STATE" }, 3000);
-    const bugRecording = state?.state?.recordingPurpose === "bug-report";
-    showMessage(bugRecording
+    showMessage(pendingBugRecording
       ? "Skapar felrapport och öppnar den för granskning..."
       : "Stoppar inspelningen...");
     const response = await send({
-      type: bugRecording ? "T9_FINISH_BUG_RECORDING" : "T9_STOP"
-    }, bugRecording ? 30000 : 5000);
+      type: pendingBugRecording ? "T9_FINISH_BUG_RECORDING" : "T9_STOP",
+      name
+    }, pendingBugRecording ? 30000 : 5000);
     if (!response?.ok) {
       throw new Error(response?.error || "Kunde inte stoppa inspelningen.");
     }
-    showMessage(bugRecording
+    showMessage(pendingBugRecording
       ? "Felrapporten har skapats och öppnats."
       : "Inspelningen har stoppats.");
     await refresh();
   } catch (error) {
     showMessage(error.message, true);
   }
+}
+
+$("stop").addEventListener("click", async () => {
+  try {
+    const state = await send({ type: "T9_GET_STATE" }, 3000);
+    pendingBugRecording = state?.state?.recordingPurpose === "bug-report";
+    updateText($("nameDialogTitle"), pendingBugRecording
+      ? "Namnge felrapporten"
+      : "Namnge processinspelningen");
+    updateText($("nameDialogHelp"), pendingBugRecording
+      ? "Ange ett tydligt namn på problemet. Rapporten skapas när du fortsätter."
+      : "Ange namnet som ska visas i Dokumentbiblioteket.");
+    $("recordingName").value = "";
+    $("recordingName").placeholder = pendingBugRecording
+      ? "Exempel: Fel vid frisläppning av order"
+      : "Exempel: Skapa försäljningsorder";
+    $("nameDialog").showModal();
+    $("recordingName").focus();
+  } catch (error) {
+    showMessage(error.message, true);
+  }
+});
+
+$("cancelName").addEventListener("click", () => $("nameDialog").close());
+$("nameForm").addEventListener("submit", event => {
+  event.preventDefault();
+  const name = $("recordingName").value.trim();
+  if (!name) {
+    $("recordingName").focus();
+    return;
+  }
+  $("nameDialog").close();
+  finishRecording(name);
 });
 
 $("dashboard").addEventListener("click", () => chrome.runtime.openOptionsPage());

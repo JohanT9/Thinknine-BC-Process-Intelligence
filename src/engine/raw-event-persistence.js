@@ -128,7 +128,13 @@
         return enqueue(recordingId, current => {
           if (!current) throw new Error(`Recording not found: ${recordingId}`);
           return canonical.addScreenshot(current, eventId, dataUrl, createdAt);
-        }, "associate-screenshot");
+      }, "associate-screenshot");
+      },
+      rename(recordingId, title) {
+        return enqueue(recordingId, current => {
+          if (!current) throw new Error(`Recording not found: ${recordingId}`);
+          return canonical.rename(current, title);
+        }, "rename-recording");
       },
       finalize(recordingId, finishedAt) {
         if (failures.some(item => item.recordingId === recordingId &&
