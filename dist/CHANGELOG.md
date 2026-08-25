@@ -2,6 +2,8 @@
 
 ## 4.7.0 — BC Process Studio
 
+- Filename variables now preserve spaces inside values; only separators written
+  in the filename template appear between values.
 - Split recorded Business Central context into `{environment}` and the new
   `{company}` filename variable, while preserving compatibility metadata from
   recordings created before the split.

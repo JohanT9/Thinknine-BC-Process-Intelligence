@@ -75,7 +75,7 @@ const settings = {
 };
 assert.strictEqual(
   exportSettings.buildFileName("docx", session, settings, now),
-  "Lägg-order-Gammal-miljö-2026-08-04-09-07-4.7.0.docx"
+  "Lägg order Gammal miljö 2026-08-04 09-07 4.7.0.docx"
 );
 
 const elements = previewElements("{process}-{environment}");
@@ -85,12 +85,12 @@ const firstPreview = exportSettings.updatePreview(
   { ...settings, exportFileNamePattern: elements.input.value },
   now
 );
-assert.strictEqual(firstPreview, "Lägg-order-Gammal-miljö.docx");
-assert.strictEqual(elements.preview.textContent, "Förhandsvisning: Lägg-order-Gammal-miljö.docx");
+assert.strictEqual(firstPreview, "Lägg order-Gammal miljö.docx");
+assert.strictEqual(elements.preview.textContent, "Förhandsvisning: Lägg order-Gammal miljö.docx");
 
 const fallbackSession = { name: "Ny order", settings: {} };
 assert.strictEqual(exportSettings.buildFileName("docx", fallbackSession,
-  settings, now), "Ny-order-Produktion-2026-08-04-09-07-4.7.0.docx");
+  settings, now), "Ny order Produktion 2026-08-04 09-07 4.7.0.docx");
 
 const observedSession = { name: "Kundinspektion", settings: {
   environmentName: "Feldts_SE_Sandbox — Feldts Fisk & Skaldjur AB",
@@ -101,7 +101,7 @@ assert.strictEqual(exportSettings.buildFileName("docx", observedSession, {
   ...settings,
   exportFileNamePattern: "{process}-{environment}-{company}-{date}"
 }, now),
-"Kundinspektion-Feldts_SE_Sandbox-Feldts-Fisk-&-Skaldjur-AB-2026-08-04.docx");
+"Kundinspektion-Feldts_SE_Sandbox-Feldts Fisk & Skaldjur AB-2026-08-04.docx");
 
 elements.input.value = "Manual-{date}";
 const updatedPreview = exportSettings.updatePreview(
@@ -123,7 +123,10 @@ const contextPreview = exportSettings.updatePreview(
   },
   now
 );
-assert.strictEqual(contextPreview, "Ny-session-Gammal-miljö.docx");
+assert.strictEqual(contextPreview, "Ny session-Gammal miljö.docx");
+
+assert.strictEqual(exportSettings.safeFileName("  Kund   Nord / Test.  "),
+  "Kund Nord _ Test");
 
 assert.deepStrictEqual(
   exportSettings.validateTemplate("{process}-{customer}-{future}")

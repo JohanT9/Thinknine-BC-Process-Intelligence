@@ -39,7 +39,9 @@
   function safeFileName(value) {
     return String(value || "BC-process")
       .replace(/[<>:"/\\|?*\x00-\x1F]/g, "_")
-      .replace(/\s+/g, "-")
+      .replace(/\s+/g, " ")
+      .trim()
+      .replace(/[ .]+$/g, "")
       .slice(0, 110);
   }
 
