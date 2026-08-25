@@ -3163,6 +3163,12 @@ async function exportLibraryDocument(record, exportSettings) {
   if (!session || session.status === "recording") {
     throw new Error(`Dokumentet "${record.title}" kan inte exporteras.`);
   }
+  if (session.recordingPurpose === "bug-report" ||
+      record.metadata?.recordingPurpose === "bug-report") {
+    throw new Error(
+      `Felrapporten "${record.title}" exporteras från Technical Report Workspace.`
+    );
+  }
   const model = await prepareSessionModel(session);
   const existing = await send({ type: "T9_GET_REVIEW", sessionId: session.id });
   const review = existing.review
@@ -3301,6 +3307,7 @@ const DOCUMENT_LIBRARY_RENDER_LIMIT = 200;
 let visibleDocumentLibraryRecords = [];
 
 function librarySessionRecord(session) {
+  const bugReport = session.recordingPurpose === "bug-report";
   return {
     projectId: session.id,
     sessionId: session.id,
@@ -3308,10 +3315,17 @@ function librarySessionRecord(session) {
     createdAt: session.startedAt,
     modifiedAt: session.updatedAt || session.completedAt || session.startedAt,
     workflowName: session.name,
+    profile: bugReport ? {
+      profileId: "bug-report", displayName: "Bug Report"
+    } : undefined,
+    theme: bugReport ? {
+      themeId: "technical-report", displayName: "Technical Report"
+    } : undefined,
     metadata: {
       environment: session.settings?.environmentName || "",
       eventCount: session.eventCount || 0,
-      status: session.status || ""
+      status: session.status || "",
+      recordingPurpose: session.recordingPurpose || "documentation"
     }
   };
 }
@@ -6107,16 +6121,26 @@ $("libraryResults").addEventListener("click", async event => {
   if (!event.target.closest?.('[data-library-action="open"]')) return;
   const session = documentLibrarySessions.get(projectId);
   if (!session || session.status === "recording") return;
+  const libraryRecord = documentLibraryRecords.find(record =>
+    record.projectId === projectId);
+  const bugReport = session.recordingPurpose === "bug-report" ||
+    libraryRecord?.metadata?.recordingPurpose === "bug-report";
   try {
     await updateDocumentLibraryRecord(projectId, {
       lastOpenedAt: new Date().toISOString(),
-      recentActivity: ["Dokumentationen öppnades"]
+      recentActivity: [bugReport
+        ? "Felrapporten öppnades" : "Dokumentationen öppnades"]
     }, { render: false });
   } catch (error) {
     show(error.message, true);
   }
   try {
-    await openReview(session);
+    if (bugReport) {
+      await send({ type: "T9_OPEN_TECHNICAL_REPORT",
+        bugReportId: `bug-report:${session.id}` });
+    } else {
+      await openReview(session);
+    }
   } catch (error) {
     show(error.message, true);
   }

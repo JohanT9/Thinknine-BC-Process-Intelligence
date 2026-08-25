@@ -33,6 +33,13 @@ classification.
 
 The extension popup presents Process Documentation and Bug Reporting as separate user intents. Both use the same recorder and Canonical Recording. Finishing Bug Reporting invokes shared interpretation and Bug Report services, persists a local draft, and opens the Technical Report Workspace; UI code does not recreate evidence or report semantics.
 
+BC Knowledge Base preserves `recordingPurpose` as routing metadata. Opening a
+`bug-report` recording resolves its stable Bug Report identity and opens
+Technical Report Workspace; it must never enter process Review, Semantic
+Document or Word export. Documentation recordings continue through the process
+pipeline. Historical sessions without a purpose retain the documentation
+fallback.
+
 ## Current architecture baseline
 
 This section is authoritative. Later version-labelled sections retain useful

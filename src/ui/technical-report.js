@@ -158,6 +158,8 @@
     }
     document.getElementById("saveReport").addEventListener("click", () =>
       workspace.save().catch(error => { message.textContent = error.message; }));
+    document.getElementById("closeReport").addEventListener("click", () =>
+      window.close());
     document.getElementById("undoReport").addEventListener("click", workspace.undo);
     document.getElementById("redoReport").addEventListener("click", workspace.redo);
     document.getElementById("copyMarkdown").addEventListener("click", async () => {

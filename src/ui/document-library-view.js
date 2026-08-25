@@ -14,6 +14,7 @@
   }
 
   function card(record, selected, active) {
+    const bugReport = record.metadata?.recordingPurpose === "bug-report";
     const confirmations = record.health.confirmations.slice(0, 2).map(value =>
       `<li>${escape(value)}</li>`).join("");
     return `<article class="library-card" role="listitem" tabindex="${active ? 0 : -1}"
@@ -33,7 +34,8 @@
       ${confirmations ? `<ul class="library-confirmations">${confirmations}</ul>` : ""}
       <p class="muted">Ändrad ${date(record.modifiedAt)}${record.readingMinutes ? ` · ${record.readingMinutes} min läsning` : ""}</p>
       <div class="library-tags">${record.tags.map(tag => `<span>${escape(tag)}</span>`).join("")}</div>
-      <button class="secondary" data-library-action="open">Öppna dokumentation</button>
+      <button class="secondary" data-library-action="open">${bugReport
+        ? "Öppna felrapport" : "Öppna dokumentation"}</button>
     </article>`;
   }
 

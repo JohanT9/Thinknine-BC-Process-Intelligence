@@ -2,6 +2,9 @@
 
 ## 4.7.0 — BC Process Studio
 
+- Bug recordings now retain their type in BC Knowledge Base, reopen in
+  Technical Report Workspace instead of process Review, show a dedicated open
+  label, and provide a Close button in the report workspace.
 - Suppressed empty generated `Unclassified` placeholders such as
   "Utför uppgiften." from BC Review Studio, Document Workspace and exports
   while preserving the Review, source traceability, screenshots and all

@@ -27,6 +27,12 @@ assert.strictEqual(view.renderGrouped(container, library.groupByProfile([record]
 }),
   "doc-1");
 assert(container.innerHTML.includes("library-group-cards"));
+const bugRecord = library.normalize({ projectId: "bug-1", title: "Feltest",
+  profile: { profileId: "bug-report", displayName: "Bug Report" },
+  metadata: { recordingPurpose: "bug-report" } });
+view.renderList(container, [bugRecord], {});
+assert(container.innerHTML.includes("Öppna felrapport"));
+assert(!container.innerHTML.includes("Öppna dokumentation"));
 assert.strictEqual(view.renderList(container, [], {}), null);
 assert(container.innerHTML.includes("inga dokument i Dokumentbiblioteket"));
 
