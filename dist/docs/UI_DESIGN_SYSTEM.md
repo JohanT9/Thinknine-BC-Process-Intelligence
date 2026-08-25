@@ -2,9 +2,11 @@
 
 ## Purpose
 
-BC Process Studio uses the interaction principles of Microsoft Dynamics 365
-Business Central and Microsoft Fluent 2 while retaining an independent Thinknine
-identity. The application is not a copy of Business Central and does not use
+BC Process Studio uses the interaction principles and teal-led colour scale of
+Microsoft Dynamics 365 Business Central while retaining an independent Thinknine
+identity. Primary actions and links use accessible BC teal, selected and
+informational surfaces use pale cyan, and neutral content remains predominantly
+white. The application is not a copy of Business Central and does not use
 Microsoft product logos or imply Microsoft ownership.
 
 The source of truth is `src/ui/design-system.css`. Page-specific CSS may describe
@@ -55,6 +57,10 @@ Token names describe intent rather than a particular colour. The core groups are
 
 Segoe UI is preferred when installed; no proprietary font is downloaded. Code,
 identifiers and technical values use Cascadia Mono or Consolas fallbacks.
+
+The current primary colour is `#008489`, with darker hover/pressed variants and
+`#e4f5f5`/`#b7e8eb` for subtle and informational surfaces. Semantic success,
+warning and danger colours remain distinct; teal must not replace status meaning.
 
 ## Component and page patterns
 

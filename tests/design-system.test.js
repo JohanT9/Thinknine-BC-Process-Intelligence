@@ -46,6 +46,9 @@ assert.ok(css.includes("header:not(.app-shell-bar) h1"));
 assert.ok(css.includes("button.library-favourite"));
 assert.ok(css.includes("border-color: transparent !important"));
 assert.ok(css.includes("@media (max-width: 700px)"));
+assert.ok(css.includes("--colorBrandPrimary: #008489"));
+assert.ok(css.includes("--colorBrandInformation: #b7e8eb"));
+assert.ok(!css.includes("--colorBrandPrimary: #0f6cbd"));
 
 const build = read("scripts/build.js");
 assert.ok(build.includes('"design-system.css"'), "production build must include the shared theme");

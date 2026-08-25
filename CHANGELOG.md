@@ -2,6 +2,9 @@
 
 ## 4.7.0 — BC Process Studio
 
+- Rebased the shared application colour system on Business Central's teal,
+  pale-cyan, white and neutral scale, including commands, links, focus,
+  selections, annotations and workspace context states.
 - Bug recordings now retain their type in BC Knowledge Base, reopen in
   Technical Report Workspace instead of process Review, show a dedicated open
   label, and provide a Close button in the report workspace.
