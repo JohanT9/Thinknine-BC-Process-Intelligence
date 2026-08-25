@@ -2459,7 +2459,7 @@ Processen är genomförd enligt arbetsgången.
 Dokumentationskvalitet: **${quality} %**
 
 ---
-Genererad från Business Tasks av Thinknine BC Recorder __APP_VERSION__.
+Genererad av BC Process Studio by Thinknine __APP_VERSION__.
 `;
 }
 
@@ -2499,7 +2499,7 @@ ${rendered || "Inga meningsfulla arbetssteg kunde identifieras."}
 Processen är genomförd och de registrerade ändringarna har sparats i Business Central.
 
 ---
-Automatiskt tolkat av Thinknine BC Recorder __APP_VERSION__.
+Automatiskt tolkat av BC Process Studio by Thinknine __APP_VERSION__.
 `;
 }
 

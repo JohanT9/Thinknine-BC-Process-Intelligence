@@ -8,7 +8,7 @@ const packageJson = JSON.parse(read("package.json"));
 const manifest = JSON.parse(read("src/ui/manifest.json"));
 
 assert.strictEqual(manifest.version, packageJson.version);
-assert.strictEqual(packageJson.version, "4.6.0");
+assert.strictEqual(packageJson.version, "4.7.0");
 assert.ok(packageJson.scripts.posttest.includes("npm run test:canonical"),
   "Canonical Recording tests must remain in the standard npm test lifecycle.");
 assert.ok(packageJson.scripts.posttest.includes("npm run test:bc-identification"),
@@ -51,9 +51,13 @@ const semanticInteractionEngine = read(
 const reviewWorkspaceRefinement = read(
   "docs/REVIEW_WORKSPACE_REFINEMENT_4.6.md"
 );
+const v47ReleaseNotes = read("docs/RELEASE_NOTES_4.7.0.md");
 const installation = read("INSTALLERA.txt");
 const handbook = read(".github/AGENTS.md");
-assert.ok(architecture.startsWith("# Architecture 4.6"));
+assert.ok(architecture.startsWith("# BC Process Studio Architecture 4.7"));
+assert.ok(v47ReleaseNotes.includes("BC Process Studio 4.7"));
+assert.ok(v47ReleaseNotes.includes("BC Process Recorder"));
+assert.ok(v47ReleaseNotes.includes("BC Process Maps"));
 assert.ok(releaseNotes.includes("Documentation Excellence v4.4.0"));
 assert.ok(releaseNotes.includes("No AI functionality was introduced."));
 assert.ok(v45ReleaseNotes.includes("Documentation Excellence v4.5.0"));

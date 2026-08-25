@@ -2,7 +2,7 @@
 
 ## Executive summary
 
-Thinknine BC Process Intelligence 4.6 is a Manifest V3 browser extension. The
+BC Process Studio 4.7 is a Manifest V3 browser extension. The
 repository contains no Windows executable, service, native messaging host, or
 local companion application. **No Windows installer is required** for the
 current product. Production distribution should therefore use the browser's

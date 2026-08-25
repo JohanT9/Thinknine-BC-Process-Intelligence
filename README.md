@@ -1,8 +1,27 @@
-# Thinknine BC Process Intelligence v4.6.0 — Current Baseline
+# BC Process Studio 4.7
+
+**by Thinknine**
+
+**Business Process Intelligence for Microsoft Dynamics 365 Business Central**
+
+**Turn Business Central processes into knowledge.**
+
+Capture. Document. Improve.
+
+BC Process Studio captures real Business Central workflows and turns them into reviewed, structured and reusable process knowledge. The implemented lifecycle is **Record → Review → Document → Reuse → Improve**.
+
+Current product areas:
+
+- **BC Process Recorder** captures browser activity, interactions, screenshots and process events.
+- **BC Review Studio** supports editing, merging, splitting, reordering, annotation and validation.
+- **BC Document Generator** creates professional Word documentation from reviewed recordings.
+- **BC Knowledge Base** stores and helps retrieve reusable process documentation.
+
+**BC Process Maps** and broader **BC Process AI** capabilities are future product areas. They are not presented as available production functionality in 4.7. Existing optional AI technical analysis for Bug Reports remains explicitly user-triggered and evidence-bounded.
 
 ## Report a Business Central bug
 
-Open the extension while Business Central is active and choose **Report a Bug**. Reproduce the problem, then choose **Stop and open bug report**. Thinknine creates and opens a local draft with reproduction steps, screenshots, captured BC error evidence, and technical diagnostics when available. Add the expected result and any missing business context, then copy or export locally—or explicitly preview and submit to a configured issue destination. Telemetry, AI analysis, and external integrations are optional.
+Open the extension while Business Central is active and choose **Report a Bug**. Reproduce the problem, then choose **Stop and open bug report**. BC Process Studio creates and opens a local draft with reproduction steps, screenshots, captured BC error evidence, and technical diagnostics when available. Add the expected result and any missing business context, then copy or export locally—or explicitly preview and submit to a configured issue destination. Telemetry, AI analysis, and external integrations are optional.
 
 Both process and bug recording start immediately. When you select Stop, enter the final process or report name in the naming dialog. Canceling the dialog continues the active recording.
 
@@ -391,7 +410,7 @@ automatiskt lugn bakgrund, centrering, separation och sidelevation utifrån
 arbetsytans storlek, zoom och visningsläge. Avancerade vyinställningar erbjuder
 Auto, Alltid på och Alltid av utan att göra valet till en vardagsinställning.
 
-Documentation Excellence har nu två samordnade förstaklassarbetsytor:
+BC Process Studio har två samordnade förstaklassarbetsytor:
 **Review Workspace** för ändringar och **Document Workspace** för skrivskyddad
 läsning och verifiering. Växlingen sker direkt i samma vy utan sidladdning eller
 ytterligare dialog.
@@ -407,14 +426,14 @@ invaliderar dokumentvyn automatiskt. Stabilt identifierade avsnitt återanvänds
 när innehållet inte förändrats. Se
 [Document Workspace 4.5](docs/DOCUMENT_WORKSPACE_4.5.md).
 
-Documentation Excellence v4.5.0 är produktionsklar. Inspelning, Granskning,
+BC Process Studio bygger vidare på den produktionsklara 4.5-grunden. Inspelning, granskning,
 icke-destruktiva annoteringar, dokumentkvalitetsanalys, professionell planering
 och Word-export fungerar som ett sammanhängande dokumentationsflöde. Se
 [Release Notes 4.5.0](docs/RELEASE_NOTES_4.5.0.md),
 [Production Readiness 4.5](docs/PRODUCTION_READINESS_4.5.md) och
 [Ship Review 4.5](docs/SHIP_REVIEW_4.5.md).
 
-## Documentation Excellence 4.4 RC1
+## Historisk grund: version 4.4 RC1
 
 RC1 introducerar en fristående, semantisk dokumentmodell mellan Review-data och
 framtida dokumentrenderare. Modellen beskriver innehåll, struktur, källreferenser
@@ -665,8 +684,8 @@ lint → tester → build → syntaxkontroll
 Skapa en release genom att tagga en version:
 
 ```powershell
-git tag v4.6.0
-git push origin v4.6.0
+git tag v4.7.0
+git push origin v4.7.0
 ```
 
 GitHub Actions bygger då automatiskt Edge-ZIP, SHA-256 och

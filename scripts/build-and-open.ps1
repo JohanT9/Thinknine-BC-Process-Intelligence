@@ -1,6 +1,6 @@
 $ErrorActionPreference = "Stop"
 
-Write-Host "Building Thinknine BC Process Intelligence..." -ForegroundColor Cyan
+Write-Host "Building BC Process Studio..." -ForegroundColor Cyan
 npm.cmd run build
 
 $distPath = Join-Path $PSScriptRoot "..\dist"

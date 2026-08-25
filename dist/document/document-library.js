@@ -55,7 +55,7 @@
       },
       theme: {
         themeId: text(source.theme?.themeId) || "thinknine",
-        displayName: text(source.theme?.displayName) || "Thinknine"
+        displayName: text(source.theme?.displayName) || "BC Process Studio"
       },
       createdAt: timestamp(source.createdAt),
       modifiedAt: timestamp(source.modifiedAt || source.createdAt),

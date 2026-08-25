@@ -224,8 +224,8 @@
     themeId: "thinknine",
     themeSchemaVersion: theme.THEME_SCHEMA_VERSION,
     version: theme.THEME_VERSION,
-    displayName: "Thinknine",
-    description: "Thinknine document appearance.",
+    displayName: "BC Process Studio",
+    description: "BC Process Studio document appearance.",
     extends: "base",
     colors: {
       primary: "#0f4c81",
@@ -254,7 +254,7 @@
         textColor: "#5f6b76", borderColor: "#b8c2cc", fontSize: 8.5
       },
       cover: {
-        brandText: "THINKNINE",
+        brandText: "BC PROCESS STUDIO",
         documentType: "Arbetsinstruktion",
         subtitle: "Business Central Process Documentation",
         accentColor: "#0f4c81",
@@ -346,7 +346,7 @@
     },
     branding: {
       organizationName: "Thinknine AB",
-      footer: "Thinknine Process Intelligence"
+      footer: "BC Process Studio by Thinknine"
     },
     metadata: { builtIn: true },
     origin: { provider: "built-in", package: "thinknine", id: "thinknine" }

@@ -1,5 +1,6 @@
 const crypto = require("crypto");
 const fs = require("fs");
+const brand = require("../src/engine/product-brand");
 
 const RELEASE_MANIFEST_VERSION = 1;
 const CHANNELS = Object.freeze(["stable", "pilot", "beta", "development"]);
@@ -32,7 +33,7 @@ function createReleaseManifest(options = {}) {
   }));
   return {
     manifestVersion: RELEASE_MANIFEST_VERSION,
-    product: "Thinknine BC Process Intelligence",
+    product: brand.productName,
     version,
     channel,
     gitCommit: options.gitCommit,

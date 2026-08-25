@@ -1,4 +1,8 @@
-# Architecture 4.6
+# BC Process Studio Architecture 4.7
+
+## Product identity boundary
+
+`src/engine/product-brand.js` is the canonical source for current product and module terminology. UI and export surfaces use **BC Process Studio by Thinknine**. Stable technical identifiers—including the npm package name, extension listing identity, storage keys, `T9*` namespaces, schema versions, file-compatible release names and built-in theme ID `thinknine`—remain unchanged to preserve existing installations and data.
 
 ## Bug Reporting UX orchestration
 
@@ -446,7 +450,7 @@ A changed Review produces a new projected document and therefore a new cache
 entry; repeated planning for an unchanged revision and profile reuses the same
 frozen result. No language output is persisted into Review or screenshot storage.
 
-## Documentation Excellence 4.4
+## Historical architecture baseline: version 4.4
 
 Den semantiska dokumentmodellen är en fristående gräns för dokumentinnehåll:
 

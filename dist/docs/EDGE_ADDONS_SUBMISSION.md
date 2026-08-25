@@ -2,9 +2,9 @@
 
 ## Listing copy
 
-- Product name: **Thinknine BC Process Intelligence**
-- Short description: Record Business Central work and turn it into reviewable,
-  reusable process documentation.
+- Product name: **BC Process Studio**
+- Short description: Turn Business Central processes into reviewed, reusable
+  process knowledge and professional documentation.
 - Primary use case: Consultant-led capture, review, annotation, document
   workspace inspection, and Word export for Business Central processes.
 - Target users: Business Central consultants, process owners, and authorized
@@ -14,10 +14,10 @@
 - Privacy-policy URL/status: **HUMAN INPUT AND LEGAL APPROVAL REQUIRED**.
 - Product website: **HUMAN INPUT REQUIRED**.
 
-Long description: Thinknine BC Process Intelligence records authorized user
+Long description: BC Process Studio by Thinknine captures authorized user
 interactions in Microsoft Dynamics 365 Business Central, preserves traceable
 source events and screenshots locally, and creates editable professional
-documentation. Users review generated steps, correct wording and structure,
+process knowledge and documentation. Users review generated steps, correct wording and structure,
 annotate screenshots, inspect the document, and export Word files. No external
 analytics, AI service, or application-content upload is part of the extension.
 

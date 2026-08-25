@@ -188,7 +188,7 @@ function position(text) {
   assert.ok(index >= 0, text);
   return index;
 }
-assert.ok(position("THINKNINE") < position("Arbetsinstruktion"));
+assert.ok(position("BC PROCESS STUDIO") < position("Arbetsinstruktion"));
 assert.ok(position("Arbetsinstruktion") < position("Orderprocess"));
 assert.ok(position("Orderprocess") < position("Syfte"));
 assert.ok(position("Syfte") < position("Förutsättningar"));
@@ -207,7 +207,7 @@ assert.ok(output.documentXml.includes("Användaren har behörighet"));
 assert.ok(output.documentXml.includes("Slutförd"));
 assert.ok(output.documentXml.includes("Första version"));
 assert.ok(output.headerXml.includes("Orderprocess"));
-assert.ok(output.footerXml.includes("Thinknine Process Intelligence"));
+assert.ok(output.footerXml.includes("BC Process Studio by Thinknine"));
 assert.ok(output.footerXml.includes("PAGE"));
 assert.ok(output.footerXml.includes("NUMPAGES"));
 assert.match(output.relationships, /relationships\/image/);

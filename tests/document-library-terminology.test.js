@@ -17,12 +17,12 @@ assert(popupScript.includes('$("dashboard").addEventListener("click"') &&
   popupScript.includes("chrome.runtime.openOptionsPage()"),
 "renaming must preserve popup navigation");
 assert(dashboardHtml.includes(
-  "<title>Dokumentbibliotek – Thinknine BC Recorder</title>"
+  "<title>BC Process Studio — BC Knowledge Base</title>"
 ));
-assert(dashboardHtml.includes('<h2 id="documentLibraryTitle">Dokumentbibliotek</h2>'));
+assert(dashboardHtml.includes('<h2 id="documentLibraryTitle">BC Knowledge Base</h2>'));
 assert(dashboardHtml.includes('aria-label="Filter för Dokumentbibliotek"'));
 assert(dashboardHtml.includes('aria-label="Dokument i Dokumentbiblioteket"'));
-assert(dashboardHtml.includes('<h2 id="reviewTitle">Granskning</h2>'));
+assert(dashboardHtml.includes('<h2 id="reviewTitle">BC Review Studio</h2>'));
 assert(dashboardHtml.includes('aria-label="Stäng granskning"'));
 assert(!dashboardHtml.includes("Documentation Excellence"));
 assert(libraryView.includes(

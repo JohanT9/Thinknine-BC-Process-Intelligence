@@ -26,5 +26,5 @@ const packageJson = JSON.parse(fs.readFileSync(
   path.join(root, "package.json"), "utf8"));
 assert.strictEqual(manifest.version, packageJson.version);
 assert(!manifest.description.includes("Edge-only"));
-assert(packageJson.description.includes("Edge production target"));
+assert(packageJson.description.includes("Business Process Intelligence"));
 console.log("Chrome static readiness checks passed; manual product verification remains required.");

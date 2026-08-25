@@ -21,8 +21,8 @@ assert(dashboard.includes('event.key.toLowerCase() === "s"') &&
 assert(html.includes('aria-keyshortcuts="/ Escape"'));
 assert(html.includes("Inspelningar och tekniska verktyg") &&
   html.includes('id="sessionTools" class="session-tools"'));
-assert(html.includes(">Granskning</button>") &&
-  html.includes(">Dokumentvy</button>"));
+assert(html.includes(">BC Review Studio</button>") &&
+  html.includes(">BC Document Generator</button>"));
 assert(html.includes("Fler åtgärder") && html.includes("Ta bort permanent"));
 assert(dashboard.includes('setAttribute("aria-busy", "true")') &&
   dashboard.includes('setAttribute("aria-busy", "false")'));

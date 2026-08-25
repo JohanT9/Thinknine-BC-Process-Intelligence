@@ -588,7 +588,7 @@
       spacing: clone(resolvedTheme.spacing),
       content: {
         title: document.metadata.title,
-        creator: "Thinknine Process Intelligence",
+        creator: "BC Process Studio by Thinknine",
         subject: "Business Central arbetsinstruktion",
         description: "Genererad från en granskad Business Central-process.",
         documentAppearance: clone(resolvedTheme.components.document || {}),

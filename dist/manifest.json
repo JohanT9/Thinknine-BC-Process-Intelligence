@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
-  "name": "Thinknine BC Process Intelligence",
-  "version": "4.6.0",
-  "description": "Records and interprets Business Central processes; Edge production target with Chromium-compatible architecture.",
+  "name": "BC Process Studio",
+  "version": "4.7.0",
+  "description": "Business Process Intelligence for Microsoft Dynamics 365 Business Central. Capture, review and document real processes.",
   "permissions": [
     "activeTab",
     "downloads",
@@ -26,7 +26,7 @@
     "service_worker": "background.js"
   },
   "action": {
-    "default_title": "Thinknine BC Recorder",
+    "default_title": "BC Process Recorder — BC Process Studio",
     "default_popup": "popup.html"
   },
   "options_page": "dashboard.html",

@@ -1,8 +1,8 @@
 {
   "name": "thinknine-bc-process-intelligence",
-  "version": "4.6.0",
+  "version": "4.7.0",
   "private": true,
-  "description": "Business Central process intelligence with an Edge production target and Chromium-compatible architecture.",
+  "description": "BC Process Studio — Business Process Intelligence for Microsoft Dynamics 365 Business Central.",
   "scripts": {
     "pretest": "node tests/presentation-grammar.test.js && node tests/privacy-mask.test.js && node tests/review-workspace-refinement.test.js && node tests/screenshot-capture-policy.test.js && node tests/semantic-interaction-engine.test.js && node tests/task-consolidation.test.js && node tests/document-library-terminology.test.js && node tests/language-excellence.test.js && node tests/screenshot-intelligence.test.js && node tests/async-operations.test.js && node tests/document-library.test.js && node tests/document-library-view.test.js && node tests/document-batch-operations.test.js && node tests/document-batch-export.test.js && node tests/document-batch-accessibility.test.js && node tests/workflow-polish.test.js && node tests/v45-production-readiness.test.js",
     "test:canonical": "node tests/canonical-recording.test.js && node tests/raw-event-persistence.test.js && node tests/canonical-hardening.test.js",
@@ -50,7 +50,8 @@
     "package:edge": "npm run ci && node scripts/release.js --require-enterprise-config",
     "release:verify": "node scripts/release-verify.js",
     "release:pilot": "node scripts/pilot-release.js",
-    "preci": "npm run test:bug-reporting-ux",
+    "test:branding": "node tests/product-branding.test.js",
+    "preci": "npm run test:branding && npm run test:bug-reporting-ux",
     "ci": "npm run lint && npm test && npm run build && npm run check",
     "dev:build": "node scripts/build.js",
     "dev:check": "npm run build && npm run check"

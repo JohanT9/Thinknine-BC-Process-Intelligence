@@ -175,7 +175,7 @@ for (const file of [
 }
 
 const versionText =
-  "Thinknine BC Process Intelligence\n" +
+  "BC Process Studio by Thinknine\n" +
   `Version ${version}\n` +
   "Edge development folder: dist\n";
 

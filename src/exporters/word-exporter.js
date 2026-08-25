@@ -636,7 +636,7 @@
         <w:sz w:val="18"/>
         <w:szCs w:val="18"/>
       </w:rPr>
-      <w:t>Thinknine Process Intelligence  |  Sida </w:t>
+      <w:t>BC Process Studio by Thinknine  |  Sida </w:t>
     </w:r>
     <w:r><w:fldChar w:fldCharType="begin"/></w:r>
     <w:r><w:instrText xml:space="preserve"> PAGE </w:instrText></w:r>
@@ -719,8 +719,8 @@
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <dc:title>${xml(title)}</dc:title>
   <dc:subject>Business Central arbetsinstruktion</dc:subject>
-  <dc:creator>Thinknine Process Intelligence</dc:creator>
-  <cp:lastModifiedBy>Thinknine Process Intelligence</cp:lastModifiedBy>
+  <dc:creator>BC Process Studio by Thinknine</dc:creator>
+  <cp:lastModifiedBy>BC Process Studio by Thinknine</cp:lastModifiedBy>
   <dcterms:created xsi:type="dcterms:W3CDTF">${iso}</dcterms:created>
   <dcterms:modified xsi:type="dcterms:W3CDTF">${iso}</dcterms:modified>
   <cp:revision>1</cp:revision>
@@ -732,7 +732,7 @@
 <Properties
   xmlns="http://schemas.openxmlformats.org/officeDocument/2006/extended-properties"
   xmlns:vt="http://schemas.openxmlformats.org/officeDocument/2006/docPropsVTypes">
-  <Application>Thinknine Process Intelligence</Application>
+  <Application>BC Process Studio</Application>
   <AppVersion>3.7.0</AppVersion>
   <Company>Thinknine AB</Company>
 </Properties>`;
@@ -797,7 +797,7 @@
     });
 
     let body = "";
-    body += paragraph("THINKNINE", "", {
+    body += paragraph("BC PROCESS STUDIO", "", {
       bold: true,
       color: "0F4C81",
       size: 24,

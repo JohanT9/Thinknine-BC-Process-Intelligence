@@ -1,5 +1,6 @@
 const EDGE_STORE_UPDATE_URL =
   "https://edge.microsoft.com/extensionwebstorebase/v1/crx";
+const brand = require("../src/engine/product-brand");
 
 function normalizeExtensionId(value) {
   const extensionId = String(value || "").trim().toLowerCase();
@@ -43,7 +44,7 @@ function createDeploymentManifest(options = {}) {
   const updateUrl = normalizeUpdateUrl(options.updateUrl);
   return {
     schemaVersion: 1,
-    product: "Thinknine BC Process Intelligence",
+    product: brand.productName,
     component: "browser-extension",
     browser: "edge",
     version: options.version,

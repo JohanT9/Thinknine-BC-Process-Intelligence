@@ -39,7 +39,7 @@ importScripts("bug-report/azure-devops-adapter.js");
 importScripts("bug-report/github-issue-adapter.js");
 importScripts("document/document-library.js");
 
-const VERSION = "4.6.0";
+const VERSION = "4.7.0";
 const pageKnowledgePacksReady = globalThis.T9PageIdentificationEngine
   .loadKnowledgePacks({
     indexUrl: chrome.runtime.getURL("knowledge-packs/index.json"),

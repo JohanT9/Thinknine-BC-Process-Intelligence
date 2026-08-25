@@ -1,5 +1,13 @@
 # Changelog
 
+## 4.7.0 — BC Process Studio
+
+- Renamed and repositioned the user-facing product as **BC Process Studio by Thinknine**.
+- Introduced the descriptor, tagline, supporting message and canonical module vocabulary.
+- Updated extension, popup, dashboard, diagnostics, installer, release metadata and restrained Word attribution.
+- Preserved stable package names, extension identity, storage keys, namespaces, schema versions and the legacy `thinknine` theme ID for compatibility.
+- Positioned BC Process Maps and broad BC Process AI capabilities as future areas rather than available functionality.
+
 ## Unreleased
 
 - Recording starts immediately; the process or Bug Report is now named in an accessible dialog when Stop is selected.

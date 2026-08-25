@@ -2,7 +2,7 @@
 
 ## Scope
 
-Thinknine BC Process Intelligence is installed as a Microsoft Edge extension.
+BC Process Studio is installed as a Microsoft Edge extension.
 There is no Windows application, service, native messaging host, Start menu
 entry, desktop shortcut, or MSIX package. Microsoft Edge owns installation,
 integrity validation, update checks, activation, and uninstall of extension
