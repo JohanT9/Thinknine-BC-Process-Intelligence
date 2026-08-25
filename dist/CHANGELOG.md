@@ -2,6 +2,9 @@
 
 ## 4.7.0 — BC Process Studio
 
+- Suppressed empty generated `Unclassified` placeholders such as
+  "Utför uppgiften." from Document Workspace and exports while preserving the
+  Review, source traceability, screenshots and all consultant-owned steps.
 - Filename variables now preserve spaces inside values; only separators written
   in the filename template appear between values.
 - Split recorded Business Central context into `{environment}` and the new

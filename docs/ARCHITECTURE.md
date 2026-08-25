@@ -445,6 +445,13 @@ semantics. A valid manual reference is authoritative. Annotated candidates are
 protected, and multiple annotated candidates retain the previous presentation
 instead of orphaning annotations.
 
+Review Projector also owns the final semantic-noise boundary for document
+content. An automatically generated `Unclassified` task whose only wording is
+the empty fallback "Utför uppgiften." (or its English equivalent) is omitted
+when it has no screenshot or consultant-owned content. The Review and its source
+references remain unchanged. Approved, edited, manual, annotated, commented or
+screenshot-backed tasks are always preserved.
+
 Language output is the selection input. The selected document is the only
 document passed to Planner, so Document Workspace and Word cannot select
 independently. Results are cached only for immutable document and candidate

@@ -179,6 +179,48 @@ assert.deepStrictEqual(
   { preserve: true }
 );
 
+const placeholderReview = reviewFixture();
+placeholderReview.tasks = [{
+  taskId: "real-step",
+  taskType: "RunAction",
+  instruction: 'Välj "Aptean Food & Beverage ERP-aktiviteter".',
+  screenshot: "screenshots/home.png"
+}, ...Array.from({ length: 4 }, (_value, index) => ({
+  taskId: `placeholder-${index + 1}`,
+  taskType: "Unclassified",
+  instruction: "Utför uppgiften.",
+  sourceEventIds: [`event-${index + 1}`]
+}))];
+const placeholderBefore = JSON.stringify(placeholderReview);
+const placeholderResult = projector.project(placeholderReview, options);
+const placeholderWorkflow = placeholderResult.document.sections.find(
+  section => section.kind === "workflow"
+);
+assert.strictEqual(placeholderWorkflow.blocks.filter(
+  block => block.kind === "step"
+).length, 1, "generated empty placeholders must not become document steps");
+assert.strictEqual(JSON.stringify(placeholderReview), placeholderBefore,
+  "noise filtering must not mutate or remove Review/source traceability");
+
+for (const protectedPlaceholder of [{ approved: true }, {
+  userComment: "Behåll detta steg"
+}, { stepOverride: { fields: {} } }, {
+  screenshot: "screenshots/evidence.png"
+}, { provenance: "manual" }]) {
+  const protectedReview = reviewFixture();
+  protectedReview.tasks = [{
+    taskId: "protected-placeholder",
+    taskType: "Unclassified",
+    instruction: "Utför uppgiften.",
+    ...protectedPlaceholder
+  }];
+  const protectedWorkflow = projector.project(protectedReview, options)
+    .document.sections.find(section => section.kind === "workflow");
+  assert.strictEqual(protectedWorkflow.blocks.filter(
+    block => block.kind === "step"
+  ).length, 1, "consultant-owned or evidenced placeholders must be preserved");
+}
+
 const reordered = reviewFixture();
 reordered.tasks = [reordered.tasks[1], reordered.tasks[0]];
 const reorderedResult = projector.project(reordered, options);
