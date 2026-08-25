@@ -148,7 +148,7 @@ table{width:100%;border-collapse:collapse}th,td{text-align:left;padding:9px;bord
 .annotation-toolbar{display:flex;gap:6px;align-items:center;margin-bottom:12px}
 .annotation-toolbar button{margin:0}
 .annotation-toolbar button[aria-pressed="true"]{background:#0f6cbd;color:white;box-shadow:inset 0 0 0 2px #084f8a}
-.annotation-stage{position:relative;width:fit-content;max-width:100%;margin:0 auto;background:#f3f6fa;line-height:0;touch-action:none;cursor:crosshair}
+.annotation-stage{position:relative;width:fit-content;max-width:min(100%,960px);margin:0;background:#f3f6fa;line-height:0;touch-action:none;cursor:crosshair}
 .annotation-stage img{display:block;max-width:100%;height:auto}
 .annotation-stage svg{position:absolute;inset:0;width:100%;height:100%;outline-offset:3px}
 .annotation-stage .review-annotation-layer{pointer-events:auto}
@@ -482,7 +482,7 @@ table{width:100%;border-collapse:collapse}th,td{text-align:left;padding:9px;bord
       <div class="annotation-editor-sticky">
         <div class="annotation-editor-header">
           <div>
-            <h3 id="annotationTitle">Annotera skärmbild</h3>
+            <h3 id="annotationTitle">Redigera bild</h3>
             <p id="annotationDescription" class="muted">Markera viktiga områden utan att ändra originalbilden.</p>
           </div>
           <div>
@@ -497,7 +497,7 @@ table{width:100%;border-collapse:collapse}th,td{text-align:left;padding:9px;bord
         </div>
       </div>
       <div id="annotationStage" class="annotation-stage">
-        <img id="annotationImage" alt="Skärmbild som annoteras">
+        <img id="annotationImage" alt="Skärmbild som redigeras">
         <svg id="annotationSurface" class="review-annotation-layer" tabindex="0"
           role="img" aria-label="Rityta för skärmbildsannotering"
           aria-describedby="annotationHelp" aria-keyshortcuts="Enter Escape Delete ArrowUp ArrowDown ArrowLeft ArrowRight"></svg>

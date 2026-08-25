@@ -1,5 +1,7 @@
 # Changelog
 
+- Kept screenshots at their Review Studio size when opening the image editor
+  and renamed the user-facing `Annotera` action to `Redigera bild`.
 - Added a responsive maximum workbench width in Review Studio so instructions,
   document fields and step actions remain visually connected on wide displays.
 - Optically centred the single-letter toolbar icon at small Edge toolbar sizes.

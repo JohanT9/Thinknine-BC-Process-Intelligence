@@ -4658,7 +4658,7 @@ function openAnnotationEditor(task, imageData) {
   $("reviewFooter").hidden = true;
   $("annotationEditor").hidden = false;
   $("annotationTitle").textContent =
-    `Annotera skärmbild för steg ${task.taskNo}`;
+    `Redigera bild för steg ${task.taskNo}`;
   $("annotationImage").src = imageData.imageUrl;
   renderAnnotationControls();
   if ($("annotationImage").complete) renderActiveAnnotation();
@@ -4929,7 +4929,7 @@ function renderReview() {
               <svg class="review-annotation-layer" aria-hidden="true"></svg>
             </div>
             <button data-action="annotate" class="secondary review-annotate-button"
-              aria-label="Annotera skärmbild ${imageIndex + 1} för steg ${visibleIndex + 1}">Annotera</button>
+              aria-label="Redigera bild ${imageIndex + 1} för steg ${visibleIndex + 1}">Redigera bild</button>
             ${images.length > 1 ? `<button data-action="select-screenshot"
               data-screenshot-index="${imageIndex}" class="secondary"
               aria-label="Använd skärmbild ${imageIndex + 1} för steg ${visibleIndex + 1}"
