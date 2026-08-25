@@ -56,6 +56,20 @@ assert.equal(resetProjection.document.sections.find(section =>
   section.kind === "expectedResult").blocks[1].text,
 projector.DEFAULT_EXPECTED_RESULT);
 
+const configuredDefault = "Kontrollen är genomförd och verifierad.";
+const configuredProjection = projector.project(review, {
+  session,
+  expectedResult: configuredDefault
+});
+assert.equal(configuredProjection.document.sections.find(section =>
+  section.kind === "expectedResult").blocks[1].text, configuredDefault);
+const sessionConfiguredProjection = projector.project(review, { session: {
+  ...session, settings: { defaultExpectedResult: "Standard från sessionen." }
+} });
+assert.equal(sessionConfiguredProjection.document.sections.find(section =>
+  section.kind === "expectedResult").blocks[1].text,
+"Standard från sessionen.");
+
 assert.throws(() => reviewModel.setDocumentField(review, "unknown", "value"),
   /Unsupported review document field/);
 

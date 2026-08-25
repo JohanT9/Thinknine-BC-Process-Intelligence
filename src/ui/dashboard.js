@@ -1,6 +1,9 @@
 const DEFAULTS = {
   exportFileNamePattern: "{process} - {environment} - {date}",
   documentationProfile: "generic",
+  defaultExpectedResult:
+    "Processen är genomförd enligt arbetsgången och de registrerade " +
+    "ändringarna har sparats i Business Central.",
   captureScreenshots: true,
   screenshotMode: "important",
   maskValues: true,
@@ -23,6 +26,8 @@ const DEFAULTS = {
   maskLocationCode: false,
   maskLotBatchNo: false
 };
+
+let applicationSettings = { ...DEFAULTS };
 
 const $ = id => document.getElementById(id);
 const send = message => chrome.runtime.sendMessage(message);
@@ -2596,6 +2601,7 @@ async function loadSettings() {
     ...DEFAULTS,
     ...(response?.settings || {})
   };
+  applicationSettings = { ...settings };
 
   for (const [key, value] of Object.entries(settings)) {
     const element = $(key);
@@ -2645,6 +2651,8 @@ async function saveSettings() {
     type: "T9_SAVE_SETTINGS",
     settings
   });
+
+  applicationSettings = { ...settings };
 
   show("Inställningarna har sparats.");
 }
@@ -3114,10 +3122,16 @@ function createActiveDocumentPipeline() {
   return globalThis.T9WordExportPipeline.create({
     session: activeReviewModel.response.session,
     review: activeReview,
+    expectedResult: configuredExpectedResult(),
     screenshotCandidates: screenshotCandidatesFor(activeReviewModel, activeReview),
     profileId: activeDocumentProfileId,
     themeId: "thinknine"
   });
+}
+
+function configuredExpectedResult(settings = applicationSettings) {
+  return String(settings?.defaultExpectedResult || "").trim() ||
+    globalThis.T9ReviewDocumentProjector.DEFAULT_EXPECTED_RESULT;
 }
 
 function screenshotCandidatesFor(model, review) {
@@ -3184,6 +3198,7 @@ async function exportLibraryDocument(record, exportSettings) {
   const pipeline = globalThis.T9WordExportPipeline.create({
     session: model.response.session,
     review,
+    expectedResult: configuredExpectedResult(exportSettings),
     screenshotCandidates: screenshotCandidatesFor(model, review),
     profileId: record.profile.profileId,
     themeId
@@ -4803,7 +4818,7 @@ function renderReview() {
   const expectedResultEditor = $("expectedResultEditor");
   if (document.activeElement !== expectedResultEditor) {
     expectedResultEditor.value = activeReview.documentFields?.expectedResult ||
-      globalThis.T9ReviewDocumentProjector.DEFAULT_EXPECTED_RESULT;
+      configuredExpectedResult();
   }
 
   const tasks = globalThis.T9Review.activeTasks(activeReview);
@@ -5864,7 +5879,7 @@ $("resetExpectedResult").addEventListener("click", () => {
       groupKey: "document-field-reset:expectedResult" }
   );
   $("expectedResultEditor").value =
-    globalThis.T9ReviewDocumentProjector.DEFAULT_EXPECTED_RESULT;
+    configuredExpectedResult();
   reviewAutoSave.schedule();
   invalidateDocumentWorkspace();
   applyReviewToolbarState();

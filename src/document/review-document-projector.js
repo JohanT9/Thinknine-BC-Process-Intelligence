@@ -458,6 +458,7 @@
     const expectedResult = text(review.documentFields?.expectedResult) ||
       text(review.expectedResult) ||
       text(options.expectedResult) ||
+      text(session.settings?.defaultExpectedResult) ||
       DEFAULT_EXPECTED_RESULT;
     let resolvedWorkflowBlocks = workflowBlocks;
     if (review.hierarchy?.sections?.length) {

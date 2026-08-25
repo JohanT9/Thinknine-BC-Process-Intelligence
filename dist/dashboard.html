@@ -202,6 +202,13 @@ table{width:100%;border-collapse:collapse}th,td{text-align:left;padding:9px;bord
 <label for="companyName">Företag</label>
 <input id="companyName" type="text">
 
+<label for="defaultExpectedResult">Standardtext för förväntat resultat</label>
+<textarea id="defaultExpectedResult" rows="3"
+  aria-describedby="defaultExpectedResultHelp"></textarea>
+<p id="defaultExpectedResultHelp" class="muted">
+  Används i nya och befintliga dokument som inte har en egen manuellt ändrad text.
+</p>
+
 <button id="advancedToggle" class="secondary" type="button"
   aria-expanded="false" aria-controls="advancedPanel" hidden>Visa avancerade dataskyddsinställningar</button>
 

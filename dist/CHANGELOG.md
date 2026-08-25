@@ -1,5 +1,8 @@
 # Changelog
 
+- Added a configurable default Expected Result under Documentation settings;
+  Review Studio, Document Generator and Word use it whenever a document has no
+  consultant-authored Expected Result of its own.
 - Kept Image Editor step numbers synchronized with the visible Review Studio
   order after steps are hidden or removed.
 - Kept Image Editor inside the same centred, responsive workbench as Review

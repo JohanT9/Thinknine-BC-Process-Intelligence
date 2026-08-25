@@ -55,6 +55,9 @@ const pageKnowledgePacksReady = globalThis.T9PageIdentificationEngine
 const DEFAULT_SETTINGS = {
   exportFileNamePattern: "{process} - {environment} - {date}",
   documentationProfile: "generic",
+  defaultExpectedResult:
+    "Processen är genomförd enligt arbetsgången och de registrerade " +
+    "ändringarna har sparats i Business Central.",
   captureScreenshots: true,
   screenshotMode: "important",
   maskValues: true,

@@ -92,6 +92,11 @@ assert.ok(
   dashboard.includes("...DEFAULTS"),
   "Dashboard must merge stored settings with defaults."
 );
+assert.ok(
+  dashboard.includes("expectedResult: configuredExpectedResult()") &&
+    dashboard.includes("expectedResult: configuredExpectedResult(exportSettings)"),
+  "Configured expected-result defaults must reach active and library exports."
+);
 
 assert.ok(
   dashboard.includes("Inga sessioner har sparats ännu."),
