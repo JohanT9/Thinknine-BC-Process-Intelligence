@@ -15,8 +15,8 @@
     {
       name: "environment",
       resolve: context =>
-        context.settings.environmentName ||
         context.session.settings?.environmentName ||
+        context.settings.environmentName ||
         "Miljö"
     },
     { name: "date", resolve: context => context.parts.date },

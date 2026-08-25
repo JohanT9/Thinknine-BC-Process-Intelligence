@@ -1914,13 +1914,13 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
       }
 
       case "T9_GET_SETTINGS": {
-        const data = await chrome.storage.local.get("t9-settings");
+        const data = await chrome.storage.local.get(SETTINGS_KEY);
 
         sendResponse({
           ok: true,
           settings: {
             ...DEFAULT_SETTINGS,
-            ...(data["t9-settings"] || {})
+            ...(data[SETTINGS_KEY] || {})
           }
         });
         break;

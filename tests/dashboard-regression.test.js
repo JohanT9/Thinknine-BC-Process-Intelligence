@@ -15,6 +15,9 @@ const background = fs.readFileSync(
   "utf8"
 );
 
+assert.ok(background.includes("chrome.storage.local.get(SETTINGS_KEY)"));
+assert.ok(!background.includes('chrome.storage.local.get("t9-settings")'));
+
 assert.ok(
   dashboardHtml.indexOf('src="review/review-annotations.js"') <
     dashboardHtml.indexOf('src="document/review-document-projector.js"'),

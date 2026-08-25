@@ -2,6 +2,8 @@
 
 ## 4.7.0 — BC Process Studio
 
+- Fixed dashboard settings loading and Word filename precedence so the recorded
+  session environment reaches `{environment}` instead of an older global value.
 - Environment Name now follows the Business Central tab being recorded by using
   its observable environment path and decoded `company` URL parameter, with the
   manual value retained as fallback.
