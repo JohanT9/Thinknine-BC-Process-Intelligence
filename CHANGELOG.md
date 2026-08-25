@@ -1,5 +1,7 @@
 # Changelog
 
+- Kept Image Editor inside the same centred, responsive workbench as Review
+  Studio instead of expanding it back to the full viewport width.
 - Centred the responsive Review Studio workbench while retaining fluid growth
   up to its readable maximum width on large displays.
 - Aligned Review Studio's header commands, including `Stäng` and
