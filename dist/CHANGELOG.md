@@ -1,5 +1,8 @@
 # Changelog
 
+- Aligned Knowledge Base filter checkboxes with their labels and prevented the
+  shared text-control sizing from displacing checkbox and radio controls.
+
 ## 4.7.0 — BC Process Studio
 
 - Removed the low-value Documentation Guidance sidebar, profile selector and

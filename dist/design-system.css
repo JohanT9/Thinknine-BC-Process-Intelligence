@@ -100,13 +100,20 @@ button:disabled { color: var(--colorTextDisabled) !important; background: var(--
   outline: var(--focusWidth) solid var(--colorFocusIndicator) !important;
   outline-offset: 2px;
 }
-input, textarea, select {
+input:not([type="checkbox"]):not([type="radio"]), textarea, select {
   min-height: var(--controlHeight);
   border: 1px solid var(--colorBorderDefault);
   border-radius: var(--radiusSmall);
   background: var(--colorBackgroundSurface);
   color: var(--colorTextPrimary);
   padding: var(--space6) var(--space8);
+}
+input[type="checkbox"], input[type="radio"] {
+  width: auto;
+  min-height: 0;
+  margin: 0;
+  padding: 0;
+  accent-color: var(--colorBrandPrimary);
 }
 label { color: var(--colorTextPrimary); }
 fieldset { border-color: var(--colorBorderDefault) !important; border-radius: var(--radiusMedium) !important; background: var(--colorBackgroundSurface); }

@@ -37,6 +37,7 @@ assert.ok(dashboard.includes('aria-controls="advancedPanel" hidden'));
 assert.ok(dashboard.includes('<div id="advancedPanel" class="advanced" hidden>'));
 assert.ok(dashboard.includes('id="environmentName"'));
 assert.ok(dashboard.includes('id="companyName"'));
+assert.ok(dashboard.includes(".library-toggle-row label{display:inline-flex;align-items:center;gap:8px;margin:0}"));
 
 assert.ok(css.includes("prefers-reduced-motion: reduce"));
 assert.ok(css.includes("forced-colors: active"));
@@ -45,6 +46,9 @@ assert.ok(css.includes("[hidden] { display: none !important; }"));
 assert.ok(css.includes("header:not(.app-shell-bar) h1"));
 assert.ok(css.includes("button.library-favourite"));
 assert.ok(css.includes("border-color: transparent !important"));
+assert.ok(css.includes('input:not([type="checkbox"]):not([type="radio"])'));
+assert.ok(css.includes('input[type="checkbox"], input[type="radio"]'));
+assert.ok(css.includes("accent-color: var(--colorBrandPrimary)"));
 assert.ok(css.includes("@media (max-width: 700px)"));
 assert.ok(css.includes("--colorBrandPrimary: #008489"));
 assert.ok(css.includes("--colorBrandInformation: #b7e8eb"));
