@@ -1,5 +1,6 @@
 # Changelog
 
+- Optically centred the single-letter toolbar icon at small Edge toolbar sizes.
 - Made recording cancellation compatible with an older still-running Edge
   service worker by falling back to its established stop-and-delete commands.
 - Added a confirmed `Avbryt inspelning` action that safely stops and removes an
