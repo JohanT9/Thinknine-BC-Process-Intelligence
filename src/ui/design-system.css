@@ -87,6 +87,11 @@ button.primary:hover:not(:disabled) { background: var(--colorBrandHover) !import
 button.primary:active:not(:disabled) { background: var(--colorBrandPressed) !important; }
 button.secondary, button.debug { background: var(--colorBackgroundSurface) !important; color: var(--colorTextPrimary) !important; }
 button.danger { background: var(--colorBackgroundSurface) !important; border-color: var(--colorStatusDanger) !important; color: var(--colorStatusDanger) !important; }
+button.library-favourite {
+  border-color: transparent !important;
+  background: transparent !important;
+}
+button.library-favourite:hover:not(:disabled) { background: var(--colorBackgroundSubtle) !important; }
 button:disabled { color: var(--colorTextDisabled) !important; background: var(--colorBackgroundSubtle) !important; opacity: 1 !important; }
 :where(button, input, textarea, select, summary, [tabindex]):focus-visible {
   outline: var(--focusWidth) solid var(--colorFocusIndicator) !important;

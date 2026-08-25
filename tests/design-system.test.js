@@ -37,6 +37,8 @@ assert.ok(css.includes("forced-colors: active"));
 assert.ok(css.includes(":focus-visible"));
 assert.ok(css.includes("[hidden] { display: none !important; }"));
 assert.ok(css.includes("header:not(.app-shell-bar) h1"));
+assert.ok(css.includes("button.library-favourite"));
+assert.ok(css.includes("border-color: transparent !important"));
 assert.ok(css.includes("@media (max-width: 700px)"));
 
 const build = read("scripts/build.js");
