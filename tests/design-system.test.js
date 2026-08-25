@@ -33,6 +33,9 @@ const dashboard = read("src/ui/dashboard.html");
 assert.ok(!dashboard.includes("BC Process Maps</a>"), "unimplemented modules must not be exposed");
 assert.ok(!dashboard.includes('<select id="documentationProfile">'));
 assert.ok(dashboard.includes('<input id="documentationProfile" type="hidden" value="generic">'));
+assert.ok(dashboard.includes('aria-controls="advancedPanel" hidden'));
+assert.ok(dashboard.includes('<div id="advancedPanel" class="advanced" hidden>'));
+assert.ok(dashboard.includes('id="environmentName"'));
 
 assert.ok(css.includes("prefers-reduced-motion: reduce"));
 assert.ok(css.includes("forced-colors: active"));
