@@ -197,15 +197,8 @@ table{width:100%;border-collapse:collapse}th,td{text-align:left;padding:9px;bord
 <fieldset>
 <legend>Dokumentation</legend>
 
-<label for="documentationProfile">Dokumentationstyp</label>
-<select id="documentationProfile">
-  <option value="generic">Generisk manual</option>
-  <option value="customer">Kundspecifik manual</option>
-  <option value="internal">Intern dokumentation</option>
-  <option value="training">Utbildningsmaterial</option>
-</select>
-
-<div id="profileHelp" class="profile-help"></div>
+<input id="documentationProfile" type="hidden" value="generic">
+<div id="profileHelp" hidden></div>
 
 <label for="environmentName">Miljönamn</label>
 <input id="environmentName" type="text">

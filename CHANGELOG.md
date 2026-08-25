@@ -2,6 +2,8 @@
 
 ## 4.7.0 — BC Process Studio
 
+- Removed the redundant Documentation Type selector from settings while retaining
+  its internal compatibility value for existing projects and export behaviour.
 - Harmonised the dashboard, Knowledge Base, recorder popup, Review Studio,
   Document Generator preview, diagnostics and technical report workspace with a
   central Fluent-compatible, Business Central-inspired design system.

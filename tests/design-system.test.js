@@ -31,6 +31,8 @@ for (const file of [
 
 const dashboard = read("src/ui/dashboard.html");
 assert.ok(!dashboard.includes("BC Process Maps</a>"), "unimplemented modules must not be exposed");
+assert.ok(!dashboard.includes('<select id="documentationProfile">'));
+assert.ok(dashboard.includes('<input id="documentationProfile" type="hidden" value="generic">'));
 
 assert.ok(css.includes("prefers-reduced-motion: reduce"));
 assert.ok(css.includes("forced-colors: active"));
