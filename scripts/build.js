@@ -116,6 +116,7 @@ copyDir(
   path.join(src, "knowledge-packs"),
   path.join(dist, "knowledge-packs")
 );
+copyDir(path.join(src, "ui", "icons"), path.join(dist, "icons"));
 copyDir(path.join(root, "docs"), path.join(dist, "docs"));
 copyFile(path.join(root, "README.md"), path.join(dist, "README.md"));
 copyFile(path.join(root, "CHANGELOG.md"), path.join(dist, "CHANGELOG.md"));

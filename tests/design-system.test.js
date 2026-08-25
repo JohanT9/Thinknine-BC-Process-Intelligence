@@ -56,5 +56,14 @@ assert.ok(!css.includes("--colorBrandPrimary: #0f6cbd"));
 
 const build = read("scripts/build.js");
 assert.ok(build.includes('"design-system.css"'), "production build must include the shared theme");
+assert.ok(build.includes('path.join(src, "ui", "icons")'), "production build must include product icons");
+
+const manifest = JSON.parse(read("src/ui/manifest.json"));
+for (const size of ["16", "32", "48", "128"]) {
+  assert.strictEqual(manifest.icons[size], `icons/icon${size}.png`);
+  assert.ok(fs.existsSync(path.join(root, "src", "ui", manifest.icons[size])), `missing ${size}px product icon`);
+}
+assert.strictEqual(manifest.action.default_icon["16"], "icons/icon16.png");
+assert.strictEqual(manifest.action.default_icon["32"], "icons/icon32.png");
 
 console.log("Design system contract tests passed.");

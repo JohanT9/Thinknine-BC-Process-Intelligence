@@ -1,5 +1,7 @@
 # Changelog
 
+- Replaced Edge's generic monochrome extension placeholder with a coloured
+  BC Process Studio icon in the browser toolbar and extension surfaces.
 - Aligned Knowledge Base filter checkboxes with their labels and prevented the
   shared text-control sizing from displacing checkbox and radio controls.
 
