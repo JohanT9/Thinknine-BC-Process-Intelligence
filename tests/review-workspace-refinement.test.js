@@ -36,6 +36,8 @@ assert(html.includes("margin:-18px 0 0;padding:18px 0 1px"));
 assert(html.includes('<h3 id="annotationTitle">Redigera bild</h3>'));
 assert(dashboard.includes(">Redigera bild</button>"));
 assert(!dashboard.includes(">Annotera</button>"));
+assert(dashboard.includes("T9Review.visibleTaskNumber("));
+assert(!dashboard.includes("`Redigera bild för steg ${task.taskNo}`"));
 assert(html.includes("line-height:1.55"));
 assert(html.includes("scroll-margin-top:260px"));
 assert(html.includes("@media(max-width:800px)"));

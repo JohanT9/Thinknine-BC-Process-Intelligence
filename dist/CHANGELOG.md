@@ -1,5 +1,7 @@
 # Changelog
 
+- Kept Image Editor step numbers synchronized with the visible Review Studio
+  order after steps are hidden or removed.
 - Kept Image Editor inside the same centred, responsive workbench as Review
   Studio instead of expanding it back to the full viewport width.
 - Centred the responsive Review Studio workbench while retaining fluid growth

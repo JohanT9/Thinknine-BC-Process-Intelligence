@@ -109,6 +109,18 @@ const visibleReview = { tasks: [{ taskId: "real", taskType: "RunAction",
   sourceEventIds: ["event-noise"] }] };
 assert.deepStrictEqual(review.activeTasks(visibleReview).map(task => task.taskId),
   ["real"], "Review Studio must hide generated empty placeholders");
+const renumberedVisibleReview = { tasks: [
+  { taskId: "first", taskNo: 1, taskType: "RunAction",
+    instruction: "Välj den första aktiviteten." },
+  { taskId: "hidden", taskNo: 2, taskType: "RunAction",
+    instruction: "Välj den dolda aktiviteten.", deleted: true },
+  { taskId: "target", taskNo: 6, taskType: "RunAction",
+    instruction: "Välj kunden." }
+] };
+assert.strictEqual(review.visibleTaskNumber(renumberedVisibleReview, "target"), 2,
+  "visible step numbers must ignore hidden steps and legacy taskNo values");
+assert.strictEqual(review.visibleTaskNumber(renumberedVisibleReview, "hidden"), null,
+  "hidden steps must not retain a visible step number");
 assert.strictEqual(visibleReview.tasks.length, 2,
   "Review filtering must preserve source tasks and traceability");
 const lookupLeak = { tasks: [{ taskType: "SelectCustomer",

@@ -761,6 +761,11 @@
       .filter(task => taskVisibility.isVisible(task, review));
   }
 
+  function visibleTaskNumber(review, taskId) {
+    const index = activeTasks(review).findIndex(task => task.taskId === taskId);
+    return index < 0 ? null : index + 1;
+  }
+
   function resetTaskField(review, index, field, options = {}) {
     if (!review.tasks[index]) return review;
     const beforeTasks = historyEngine.snapshot(review.tasks);
@@ -1198,6 +1203,7 @@
     redo: historyEngine.redo,
     historyDirectionFromKey: historyEngine.directionFromKey,
     activeTasks,
+    visibleTaskNumber,
     canComplete,
     progress,
     isGeneratedPlaceholderOnly,

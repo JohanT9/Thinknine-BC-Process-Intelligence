@@ -4657,8 +4657,12 @@ function openAnnotationEditor(task, imageData) {
   $("reviewList").hidden = true;
   $("reviewFooter").hidden = true;
   $("annotationEditor").hidden = false;
+  const visibleStepNumber = globalThis.T9Review.visibleTaskNumber(
+    activeReview,
+    task.taskId
+  );
   $("annotationTitle").textContent =
-    `Redigera bild för steg ${task.taskNo}`;
+    `Redigera bild för steg ${visibleStepNumber ?? task.taskNo}`;
   $("annotationImage").src = imageData.imageUrl;
   renderAnnotationControls();
   if ($("annotationImage").complete) renderActiveAnnotation();
