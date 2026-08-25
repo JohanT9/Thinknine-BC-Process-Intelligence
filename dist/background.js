@@ -1324,8 +1324,18 @@ async function saveDocumentLibrary(records) {
 
 async function deleteSession(id) {
   await chrome.storage.local.remove(
-    globalThis.T9StorageKeys.sessionDataKeys(id)
+    [
+      ...globalThis.T9StorageKeys.sessionDataKeys(id),
+      globalThis.T9StorageKeys.BC_ERROR_EVIDENCE_PREFIX + id
+    ]
   );
+}
+
+async function cancelActiveSession() {
+  const session = await stopSession();
+  if (!session) return null;
+  await deleteSession(session.id);
+  return session;
 }
 
 chrome.runtime.onInstalled.addListener(async () => {
@@ -1457,6 +1467,12 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
       case "T9_STOP": {
         const session = await stopSession(message.name);
         sendResponse({ ok: true, session });
+        break;
+      }
+
+      case "T9_CANCEL_RECORDING": {
+        const session = await cancelActiveSession();
+        sendResponse({ ok: true, sessionId: session?.id || null });
         break;
       }
 

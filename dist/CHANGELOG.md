@@ -1,5 +1,7 @@
 # Changelog
 
+- Added a confirmed `Avbryt inspelning` action that safely stops and removes an
+  unwanted recording without generating process documentation or a Bug Report.
 - Simplified the toolbar icon from `BC` to `B` and relabelled the recording-name
   dialog's continue-recording action as the clearer `Avbryt` command.
 - Replaced Edge's generic monochrome extension placeholder with a coloured

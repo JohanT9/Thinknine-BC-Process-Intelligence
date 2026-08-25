@@ -155,6 +155,29 @@ async function finishRecording(name) {
   }
 }
 
+async function discardActiveRecording() {
+  const confirmed = globalThis.confirm(
+    "Vill du avbryta inspelningen? Alla registrerade händelser och bilder i den tas bort."
+  );
+  if (!confirmed) return;
+
+  try {
+    $("discardRecording").disabled = true;
+    showMessage("Avbryter inspelningen...");
+    const response = await send({ type: "T9_CANCEL_RECORDING" }, 30000);
+    if (!response?.ok) {
+      throw new Error(response?.error || "Kunde inte avbryta inspelningen.");
+    }
+    $("nameDialog").close();
+    showMessage("Inspelningen avbröts och togs bort.");
+    await refresh();
+  } catch (error) {
+    showMessage(error.message, true);
+  } finally {
+    $("discardRecording").disabled = false;
+  }
+}
+
 $("stop").addEventListener("click", async () => {
   try {
     const state = await send({ type: "T9_GET_STATE" }, 3000);
@@ -177,6 +200,7 @@ $("stop").addEventListener("click", async () => {
 });
 
 $("cancelName").addEventListener("click", () => $("nameDialog").close());
+$("discardRecording").addEventListener("click", discardActiveRecording);
 $("nameForm").addEventListener("submit", event => {
   event.preventDefault();
   const name = $("recordingName").value.trim();
