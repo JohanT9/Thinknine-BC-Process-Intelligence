@@ -30,9 +30,6 @@ for (const file of [
 }
 
 const dashboard = read("src/ui/dashboard.html");
-assert.ok(dashboard.includes('class="app-shell-bar"'));
-assert.ok(dashboard.includes('aria-label="Huvudnavigering"'));
-assert.ok(dashboard.includes('aria-current="page"'));
 assert.ok(!dashboard.includes("BC Process Maps</a>"), "unimplemented modules must not be exposed");
 
 assert.ok(css.includes("prefers-reduced-motion: reduce"));

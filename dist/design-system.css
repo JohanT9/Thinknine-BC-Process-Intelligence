@@ -128,28 +128,8 @@ th { height: 36px; color: var(--colorTextSecondary); font-weight: 600; backgroun
 td { height: 40px; border-bottom-color: var(--colorBorderSubtle) !important; }
 tbody tr:hover { background: var(--colorBrandSubtle); }
 
-.library-layout { grid-template-columns: minmax(0, 1fr) minmax(260px, 320px) !important; }
-.library-results, .library-group-cards { display: block !important; border-top: 1px solid var(--colorBorderDefault); }
-.library-card {
-  display: grid;
-  grid-template-columns: 28px minmax(160px, 1.2fr) minmax(150px, .8fr) minmax(210px, 1fr) auto;
-  align-items: center;
-  gap: var(--space12);
-  min-height: 48px;
-  padding: var(--space8) var(--space12) !important;
-  border: 0 !important;
-  border-bottom: 1px solid var(--colorBorderSubtle) !important;
-  border-radius: 0 !important;
-}
+.library-card { border-radius: var(--radiusMedium) !important; box-shadow: none !important; }
 .library-card:hover { background: var(--colorBrandSubtle); }
-.library-card-heading { display: contents !important; }
-.library-card h4 { grid-column: 2; }
-.library-card-heading > div:last-child { grid-column: 5; grid-row: 1; }
-.library-card > p { margin: 0; }
-.library-card .library-profile { grid-column: 3; }
-.library-card .library-tags { grid-column: 4; margin: 0; }
-.library-card .library-confirmations { display: none; }
-.library-card > button, .library-card > .primary { grid-column: 5; }
 .library-preview, .document-health, .review-document-fields { border-radius: var(--radiusMedium) !important; box-shadow: none !important; }
 .library-batch-toolbar, .review-toolbar, .document-toolbar { border-radius: 0 !important; background: var(--colorBackgroundSurface) !important; }
 
@@ -176,13 +156,9 @@ dialog::backdrop { background: rgb(0 0 0 / 40%) !important; }
   .app-shell-bar { flex-wrap: wrap; padding: var(--space8) var(--space12); gap: var(--space8); }
   .app-shell-nav { order: 3; width: 100%; min-height: 36px; }
   .app-shell-context { margin-left: auto; }
-  .library-card { grid-template-columns: 28px minmax(0, 1fr) auto; }
-  .library-card .library-profile, .library-card .library-tags { grid-column: 2; }
-  .library-card-heading > div:last-child, .library-card > button, .library-card > .primary { grid-column: 3; }
 }
 @media (max-width: 700px) {
   .app-shell-context { display: none; }
-  .library-card { display: grid; }
   .review-card { grid-template-columns: 36px minmax(0, 1fr) !important; }
   .review-actions { grid-column: 1 / -1; }
 }

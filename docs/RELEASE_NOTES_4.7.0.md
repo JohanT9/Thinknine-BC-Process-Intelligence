@@ -4,7 +4,7 @@
 
 BC Process Studio now uses one shared Fluent-compatible design system across the
 implemented extension surfaces. The result is denser and more task-oriented,
-with Business Central-inspired action bars, compact Knowledge Base rows,
+with Business Central-inspired action bars, consistent Knowledge Base cards,
 consistent fields and dialogs, full-height review workspaces, visible keyboard
 focus, status treatments, reduced-motion support and narrower-window layouts.
 

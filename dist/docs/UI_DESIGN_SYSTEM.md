@@ -61,9 +61,8 @@ identifiers and technical values use Cascadia Mono or Consolas fallbacks.
 - Primary commands use the brand-filled treatment. Secondary commands use a
   neutral surface. Destructive commands use explicit danger text and border.
 - Controls share height, border, radius, disabled state and focus treatment.
-- The dashboard shell provides product identity, implemented-area navigation
-  and version context. The library is a compact list with a secondary preview
-  FactBox rather than a grid of decorative cards.
+- The dashboard heading provides product identity and version context. The
+  library keeps its scannable card grid with a secondary preview FactBox.
 - Review Studio is a full-height document workspace with command bars, tabs,
   compact status information and a secondary guidance panel.
 - Native dialogs remain the modal primitive and retain existing focus handling.
@@ -91,7 +90,7 @@ focus on close. Never use colour as the sole status signal.
 
 | Existing area | Shared pattern | Status |
 | --- | --- | --- |
-| Dashboard / Knowledge Base | Shell, compact list, command bar, FactBox | Migrated |
+| Dashboard / Knowledge Base | Heading, card grid, command bar, FactBox | Migrated |
 | Review Studio | Document workspace, tabs, action bar, status strip | Migrated |
 | Document Generator preview | Document canvas, view action bar, FactBox | Migrated |
 | Recorder popup | Compact task dialog and persistent status | Migrated |

@@ -6,7 +6,7 @@
   Document Generator preview, diagnostics and technical report workspace with a
   central Fluent-compatible, Business Central-inspired design system.
 - Added semantic colour, typography, spacing, control, focus and status tokens;
-  compact operational list presentation; responsive rules; reduced-motion and
+  consistent document-card presentation; responsive rules; reduced-motion and
   forced-colour safeguards; and automated build/design-contract coverage.
 - Renamed and repositioned the user-facing product as **BC Process Studio by Thinknine**.
 - Introduced the descriptor, tagline, supporting message and canonical module vocabulary.
