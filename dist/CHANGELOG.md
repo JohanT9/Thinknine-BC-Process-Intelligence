@@ -1,5 +1,7 @@
 # Changelog
 
+- Aligned Review Studio's header commands, including `Stäng` and
+  `Fler åtgärder`, with the responsive right edge of the review cards.
 - Kept screenshots at their Review Studio size when opening the image editor
   and renamed the user-facing `Annotera` action to `Redigera bild`.
 - Added a responsive maximum workbench width in Review Studio so instructions,
