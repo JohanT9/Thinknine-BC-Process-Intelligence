@@ -261,18 +261,15 @@ assert.ok(
 );
 assert.ok(
   html.includes('<script src="document/documentation-intelligence.js"></script>') &&
-    html.includes('id="documentationGuidance"') &&
-    html.includes('aria-labelledby="documentationGuidanceTitle"') &&
-    html.includes('id="documentationGuidanceStatus"') &&
-    html.includes('aria-live="polite"'),
-  "Documentation Guidance must be an accessible, non-modal document panel."
+    !html.includes('id="documentationGuidance"') &&
+    !html.includes('id="documentationGuidanceStatus"'),
+  "Quality intelligence may remain internal but Guidance must not occupy the document view."
 );
 assert.ok(
   html.includes('<script src="document/document-profile.js"></script>') &&
-    html.includes('id="documentProfileSelector"') &&
-    html.includes('for="documentProfileSelector"') &&
-    html.includes('id="documentProfileDescription"'),
-  "Smart Document Profiles must expose a labelled, described selector."
+    !html.includes('id="documentProfileSelector"') &&
+    !html.includes('id="documentProfileDescription"'),
+  "Assigned document profiles must not add a permanent selector to the document view."
 );
 
 console.log("UI ID regression tests passed.");

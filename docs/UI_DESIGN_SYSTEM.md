@@ -69,8 +69,9 @@ warning and danger colours remain distinct; teal must not replace status meaning
 - Controls share height, border, radius, disabled state and focus treatment.
 - The dashboard heading provides product identity and version context. The
   library keeps its scannable card grid with a secondary preview FactBox.
-- Review Studio is a full-height document workspace with command bars, tabs,
-  compact status information and a secondary guidance panel.
+- Review Studio and BC Document Generator are full-height workspaces with
+  command bars, tabs and compact status information. Document Generator uses
+  the full available width without a permanent guidance panel.
 - Native dialogs remain the modal primitive and retain existing focus handling.
 - The popup keeps recording state persistent in text; active recording also has
   a semantic danger accent.
@@ -85,8 +86,7 @@ introduced; critical actions must retain accessible text or names.
 ## Responsive and accessibility rules
 
 At narrower widths secondary context collapses before the main task. Library
-rows reduce their columns, Review Studio actions wrap below the selected step,
-and the existing documentation guidance panel stacks below the document.
+rows reduce their columns and Review Studio actions wrap below the selected step.
 Animations and transitions are suppressed for reduced-motion users. Native
 forced-colour mode is respected. All interactive elements require an accessible
 name, a visible focus indicator, and keyboard operation. Dialogs must restore

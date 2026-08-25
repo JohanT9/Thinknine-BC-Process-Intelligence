@@ -45,18 +45,18 @@ assert.ok(
 assert.ok(
   dashboard.includes("pipeline.qualityDiagnostics") &&
     dashboard.includes("T9DocumentationIntelligence") &&
-    dashboard.includes("function renderDocumentationGuidance()") &&
-    dashboard.includes("guidanceFingerprint") &&
+    !dashboard.includes("function renderDocumentationGuidance()") &&
+    !dashboard.includes("guidanceFingerprint") &&
     !dashboard.includes("qualityDiagnostics.findings.push"),
-  "Guidance must reuse immutable pipeline diagnostics without editing them."
+  "Quality metadata must reuse immutable diagnostics without rendering guidance."
 );
 assert.ok(
   dashboard.includes("function buildDocumentProfileVariants(pipeline)") &&
     dashboard.includes("function applyDocumentProfileVariant(options = {})") &&
-    dashboard.includes("documentProfileVariants.has(nextProfileId)") &&
-    dashboard.includes("preservePosition: true") &&
+    dashboard.includes("profile.profileId === activeDocumentProfileId") &&
+    !dashboard.includes("documentProfileVariants.has(nextProfileId)") &&
     dashboard.includes("function exportActiveReviewToWord()"),
-  "Profile switching must use cached presentation variants and preserve context."
+  "The assigned profile must use one cached presentation variant."
 );
 assert.ok(
   dashboard.includes("function loadDocumentLibrary(sessions)") &&

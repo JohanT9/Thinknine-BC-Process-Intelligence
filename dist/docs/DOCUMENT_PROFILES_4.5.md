@@ -27,14 +27,12 @@ editing instructions.
 
 ## Runtime integration
 
-For each current document revision, Documentation Excellence resolves and caches
-the theme and Document Plan variant for every built-in profile. Changing the
-selector chooses a cached variant, recalculates advisory intelligence and
-updates Document Health. It does not regenerate Review or Semantic Document at
-switch time and never alters Word export.
+For each current document revision, BC Process Studio resolves and caches the
+theme and Document Plan variant for the profile assigned through Document
+Library metadata. It does not regenerate Review or Semantic Document and the
+permanent profile/guidance sidebar has been removed from Document Generator.
 
-Workspace Context and reading position are preserved. Profile choice is UI
-state and is deliberately absent from Review persistence and history.
+Profile assignment is deliberately absent from Review persistence and history.
 
 ## Celebrate Progress
 

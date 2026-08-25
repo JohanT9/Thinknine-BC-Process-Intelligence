@@ -386,23 +386,18 @@ materialiseras när användaren ändå öppnar Document Workspace. Se
 
 Dokumentprofilen beskriver dokumentets syfte och förväntningar utan att ändra
 innehållet. Inbyggda profiler finns för Business Process, SOP, Training Guide,
-Quick Reference och Troubleshooting Guide. Ett direkt profilbyte uppdaterar
-Document Workspace-tema, planerad presentation, Document Health, prioriterad
-vägledning och positiva bekräftelser från cachade immutable varianter.
+Quick Reference och Troubleshooting Guide. Profilen tilldelas via bibliotekets
+metadata och den aktiva profilen används när dokumentet planeras.
 
 Profilerna definierar endast förväntningar och lagras aldrig i Review. Se
 [Document Profiles 4.5](docs/DOCUMENT_PROFILES_4.5.md).
 
 ## Documentation Intelligence 4.5 UX4
 
-Document Workspace innehåller nu en lugn vägledningspanel med kvalitativ
-dokumenthälsa, grupperade förbättringsförslag och filter. Vägledningen bygger på
-befintliga Semantic Document-, Document Plan- och Quality Diagnostics-resultat.
-Den är rådgivande, blockerar aldrig export och ändrar aldrig dokumentet.
-
-Förslag använder Workspace Context för att visa rätt dokumentposition och
-förbereda motsvarande Review-steg. Document Health använder medvetet inga poäng
-eller procentsatser. Se
+Documentation Intelligence beräknas från Semantic Document, Document Plan och
+Quality Diagnostics men visas inte som en permanent panel i Document Generator.
+Relevant kvalitetsmetadata materialiseras i BC Knowledge Base utan att blockera
+export eller ändra dokumentet. Se
 [Documentation Intelligence 4.5](docs/DOCUMENTATION_INTELLIGENCE_4.5.md).
 
 ## Document Workspace 4.5 UX3

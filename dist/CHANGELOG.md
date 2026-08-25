@@ -2,6 +2,9 @@
 
 ## 4.7.0 — BC Process Studio
 
+- Removed the low-value Documentation Guidance sidebar, profile selector and
+  repeated health display from BC Document Generator, giving the document the
+  full workspace width while retaining quality metadata in BC Knowledge Base.
 - Rebased the shared application colour system on Business Central's teal,
   pale-cyan, white and neutral scale, including commands, links, focus,
   selections, annotations and workspace context states.

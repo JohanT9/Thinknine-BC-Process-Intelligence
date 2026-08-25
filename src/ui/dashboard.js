@@ -3578,19 +3578,12 @@ function documentProfiles() {
   );
 }
 
-function populateDocumentProfileSelector() {
-  $("documentProfileSelector").innerHTML = documentProfiles().map(profile =>
-    `<option value="${escapeHtml(profile.profileId)}">` +
-    `${escapeHtml(profile.displayName)}</option>`
-  ).join("");
-  $("documentProfileSelector").value = activeDocumentProfileId;
-}
-
 function buildDocumentProfileVariants(pipeline) {
   const availableThemeIds = new Set(globalThis.T9DocumentThemeRegistry.list(
     globalThis.T9DocumentThemeRegistry.BUILT_IN_REGISTRY
   ).map(theme => theme.themeId));
-  return new Map(documentProfiles().map(profile => {
+  return new Map(documentProfiles().filter(profile =>
+    profile.profileId === activeDocumentProfileId).map(profile => {
     const assignedThemeId = profile.profileId === activeDocumentProfileId
       ? documentLibraryRecords.find(record =>
         record.projectId === activeReviewSession?.id
@@ -3656,9 +3649,6 @@ function applyDocumentProfileVariant(options = {}) {
     variant.model,
     documentWorkspaceMediaSources
   );
-  $("documentProfileSelector").value = variant.profile.profileId;
-  $("documentProfileDescription").textContent = variant.profile.description;
-  renderDocumentationGuidance();
   applyDocumentView({ persist: false });
   if (options.preservePosition) {
     viewport.scrollTop = Math.max(
@@ -3667,10 +3657,6 @@ function applyDocumentProfileVariant(options = {}) {
     );
   } else {
     revealDocumentContext();
-  }
-  if (options.announce) {
-    $("documentationGuidanceStatus").textContent =
-      `${variant.profile.displayName} är aktiv. Dokumentet och vägledningen har uppdaterats.`;
   }
   return result;
 }
@@ -3740,87 +3726,6 @@ function healthStatusLabel(status) {
     "Good with Suggestions": "Bra med förslag",
     "Not assessed": "Inte bedömd"
   }[status] || status;
-}
-
-function renderDocumentationGuidance() {
-  if (!documentationIntelligenceModel) {
-    $("documentHealth").innerHTML =
-      '<h4 id="documentHealthTitle">Dokumenthälsa</h4><p>Förbereder vägledning...</p>';
-    $("documentationGuidanceGroups").innerHTML = "";
-    return;
-  }
-  const health = documentationIntelligenceModel.health;
-  $("documentHealth").innerHTML = `
-    <h4 id="documentHealthTitle">Dokumenthälsa</h4>
-    <span>${escapeHtml(documentationIntelligenceModel.profile?.displayName || "")}</span>
-    <strong>${escapeHtml(healthStatusLabel(health.overall))}</strong>
-    <span>${escapeHtml(health.suggestionLabel)}</span>
-    <dl>${health.categories.map(category => `<div>
-      <dt>${escapeHtml(category.name)}</dt>
-      <dd>${escapeHtml(healthStatusLabel(category.status))}</dd>
-    </div>`).join("")}</dl>
-    <ul class="positive-confirmations">${documentationIntelligenceModel
-      .positiveConfirmations.map(value =>
-        `<li>${escapeHtml(value.title)}</li>`).join("")}</ul>`;
-  const visible = globalThis.T9DocumentationIntelligence.filter(
-    documentationIntelligenceModel,
-    $("documentationGuidanceFilter").value
-  );
-  $("documentationGuidanceStatus").textContent =
-    `Vägledningen är uppdaterad. ${visible.length} förslag visas.`;
-  const groups = globalThis.T9DocumentationIntelligence.GROUPS
-    .map(name => ({ name, items: visible.filter(item => item.group === name) }))
-    .filter(group => group.items.length);
-  const container = $("documentationGuidanceGroups");
-  if (!groups.length) {
-    container.innerHTML = '<p class="guidance-empty">Inga förslag i det här filtret. Dokumentet är redo för fortsatt granskning.</p>';
-    return;
-  }
-  const existingGroups = new Map([...container.querySelectorAll(
-    "[data-guidance-group]"
-  )].map(element => [element.dataset.guidanceGroup, element]));
-  const existingItems = new Map([...container.querySelectorAll(
-    "[data-guidance-id]"
-  )].map(element => [element.dataset.guidanceId, element]));
-  container.querySelector(".guidance-empty")?.remove();
-  for (const group of groups) {
-    let section = existingGroups.get(group.name);
-    if (!section) {
-      section = document.createElement("section");
-      section.className = "guidance-group";
-      section.dataset.guidanceGroup = group.name;
-      const heading = document.createElement("h4");
-      heading.textContent = group.name;
-      section.append(heading, document.createElement("ul"));
-      section.lastElementChild.className = "guidance-list";
-    }
-    const list = section.querySelector(".guidance-list");
-    for (const item of group.items) {
-      let button = existingItems.get(item.guidanceId);
-      const fingerprint = JSON.stringify(item);
-      if (!button) {
-        const listItem = document.createElement("li");
-        button = document.createElement("button");
-        button.className = "guidance-item";
-        button.dataset.guidanceId = item.guidanceId;
-        listItem.appendChild(button);
-      }
-      if (button.dataset.guidanceFingerprint !== fingerprint) {
-        button.innerHTML = `
-          <span class="guidance-status">${escapeHtml(item.status)}</span>
-          <strong>${escapeHtml(item.title)}</strong>
-          <span class="guidance-action">${escapeHtml(item.description)}</span>
-          <span class="guidance-action">${escapeHtml(item.recommendedAction)}</span>`;
-        button.dataset.guidanceFingerprint = fingerprint;
-      }
-      list.appendChild(button.parentElement);
-      existingItems.delete(item.guidanceId);
-    }
-    container.appendChild(section);
-    existingGroups.delete(group.name);
-  }
-  existingItems.forEach(button => button.parentElement.remove());
-  existingGroups.forEach(section => section.remove());
 }
 
 function reviewScreenshotsByTask() {
@@ -5270,7 +5175,6 @@ async function openReview(session) {
   documentProfileVariants = new Map();
   documentWorkspaceMediaSources = {};
   documentProfileSource = null;
-  populateDocumentProfileSelector();
   workspaceState = globalThis.T9WorkspaceController.create();
   documentWorkspaceSync = null;
   documentViewState = globalThis.T9DocumentWorkspaceExperience.update(
@@ -5342,7 +5246,6 @@ async function closeReview() {
   documentProfileVariants = new Map();
   documentWorkspaceMediaSources = {};
   documentProfileSource = null;
-  renderDocumentationGuidance();
   globalThis.T9DocumentWorkspaceView.clear($("documentWorkspace"));
   $("documentWorkspaceStatus").textContent = "";
   applyWorkspaceState();
@@ -5556,30 +5459,6 @@ $("documentWorkspace").addEventListener("keydown", event => {
   if (!item) return;
   event.preventDefault();
   activateDocumentContext(item);
-});
-$("documentationGuidanceFilter").addEventListener("change", () => {
-  renderDocumentationGuidance();
-  $("documentationGuidanceStatus").textContent =
-    "Vägledningen har filtrerats.";
-});
-$("documentProfileSelector").addEventListener("change", event => {
-  const nextProfileId = event.target.value;
-  if (!documentProfileVariants.has(nextProfileId)) return;
-  activeDocumentProfileId = nextProfileId;
-  applyDocumentProfileVariant({ announce: true, preservePosition: true });
-});
-$("documentationGuidanceGroups").addEventListener("click", event => {
-  const button = event.target.closest?.("[data-guidance-id]");
-  if (!button || !documentationIntelligenceModel) return;
-  const item = documentationIntelligenceModel.items.find(
-    value => value.guidanceId === button.dataset.guidanceId
-  );
-  if (!item) return;
-  publishWorkspaceContext(item.context, "guidance-navigation", "guidance");
-  revealReviewContext({ focus: false, scroll: false });
-  revealDocumentContext({ focus: true });
-  $("documentationGuidanceStatus").textContent =
-    `Visar dokumentplatsen för ${item.title}.`;
 });
 $("documentWorkspacePanel").addEventListener("keydown", event => {
   if (event.target.closest("button,select,dialog")) return;

@@ -140,7 +140,7 @@ tbody tr:hover { background: var(--colorBrandSubtle); }
 .library-card:hover { background: var(--colorBrandSubtle); }
 .library-card[data-selected="true"], .library-card:focus-visible,
 .review-card.selected { outline-color: var(--colorFocusIndicator) !important; }
-.library-preview, .document-health, .review-document-fields { border-radius: var(--radiusMedium) !important; box-shadow: none !important; }
+.library-preview, .review-document-fields { border-radius: var(--radiusMedium) !important; box-shadow: none !important; }
 .library-batch-toolbar, .review-toolbar, .document-toolbar { border-radius: 0 !important; background: var(--colorBackgroundSurface) !important; }
 
 .review-overlay { padding: 0 !important; }
