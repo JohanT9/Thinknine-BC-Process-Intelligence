@@ -1,5 +1,7 @@
 # Changelog
 
+- Centred the responsive Review Studio workbench while retaining fluid growth
+  up to its readable maximum width on large displays.
 - Aligned Review Studio's header commands, including `Stäng` and
   `Fler åtgärder`, with the responsive right edge of the review cards.
 - Kept screenshots at their Review Studio size when opening the image editor

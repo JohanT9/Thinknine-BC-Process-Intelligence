@@ -25,10 +25,11 @@ for (const id of ["mergeReviewSteps", "splitReviewStep",
 assert(toolbar.includes('aria-controls="reviewMoreActionsPanel"'));
 assert(toolbar.includes('aria-expanded="false"'));
 assert(html.includes(".review-fields textarea{width:100%;min-height:88px"));
-assert(html.includes(".review-list{padding:18px;width:min(100%,1400px);box-sizing:border-box}"));
-assert(html.includes('.review-header>.review-title-row,.review-header>.workspace-tabs,.review-header>.review-zoom-toolbar,.review-header>.review-toolbar,.review-header>.review-progress,.review-header>#reviewStatus{width:100%;max-width:1364px;box-sizing:border-box}'));
+assert(html.includes(".review-list{padding:18px;width:min(100%,1400px);margin-inline:auto;box-sizing:border-box}"));
+assert(html.includes('.review-header>.review-title-row,.review-header>.workspace-tabs,.review-header>.review-zoom-toolbar,.review-header>.review-toolbar,.review-header>.review-progress,.review-header>#reviewStatus{width:100%;max-width:1364px;margin-inline:auto;box-sizing:border-box}'));
 assert(html.includes("width:min(calc(100% - 40px),1360px)"));
-assert(html.includes("padding:16px max(16px,calc(100% - 1384px)) 16px 16px"));
+assert(html.includes(".review-document-fields{margin:16px auto"));
+assert(html.includes("padding:16px max(16px,calc((100% - 1368px)/2))"));
 assert(html.includes(".annotation-stage{position:relative;width:fit-content;max-width:min(100%,960px);margin:0"));
 assert(html.includes('<h3 id="annotationTitle">Redigera bild</h3>'));
 assert(dashboard.includes(">Redigera bild</button>"));
