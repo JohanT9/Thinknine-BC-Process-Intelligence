@@ -39,6 +39,7 @@ assert.ok(dashboard.includes('id="environmentName"'));
 assert.ok(dashboard.includes('id="companyName"'));
 assert.ok(dashboard.includes('id="defaultExpectedResult"'));
 assert.ok(dashboard.includes('aria-describedby="defaultExpectedResultHelp"'));
+assert.ok(dashboard.includes("#defaultExpectedResult{width:380px;max-width:100%;box-sizing:border-box;resize:vertical}"));
 assert.ok(dashboard.includes(".library-toggle-row label{display:inline-flex;align-items:center;gap:8px;margin:0}"));
 
 assert.ok(css.includes("prefers-reduced-motion: reduce"));

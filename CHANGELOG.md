@@ -1,5 +1,7 @@
 # Changelog
 
+- Matched the configurable Expected Result field width to the other
+  Documentation settings while retaining responsive sizing.
 - Added a configurable default Expected Result under Documentation settings;
   Review Studio, Document Generator and Word use it whenever a document has no
   consultant-authored Expected Result of its own.
