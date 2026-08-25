@@ -452,6 +452,10 @@ when it has no screenshot or consultant-owned content. The Review and its source
 references remain unchanged. Approved, edited, manual, annotated, commented or
 screenshot-backed tasks are always preserved.
 
+The same immutable visibility policy is shared with BC Review Studio so its
+cards, numbering, progress and document output cannot disagree. Visibility is
+a derived view only; it never deletes tasks from Review storage.
+
 Language output is the selection input. The selected document is the only
 document passed to Planner, so Document Workspace and Word cannot select
 independently. Results are cached only for immutable document and candidate

@@ -103,6 +103,14 @@ for (const protectedChange of [{ approved: true }, { userComment: "Behåll" },
 assert.strictEqual(review.isGeneratedPlaceholderOnly({ tasks: [{
   taskType: "RunAction", instruction: "Välj Släpp."
 }] }), false);
+const visibleReview = { tasks: [{ taskId: "real", taskType: "RunAction",
+  instruction: "Välj aktiviteten." }, { taskId: "noise",
+  taskType: "Unclassified", instruction: "Utför uppgiften.",
+  sourceEventIds: ["event-noise"] }] };
+assert.deepStrictEqual(review.activeTasks(visibleReview).map(task => task.taskId),
+  ["real"], "Review Studio must hide generated empty placeholders");
+assert.strictEqual(visibleReview.tasks.length, 2,
+  "Review filtering must preserve source tasks and traceability");
 const lookupLeak = { tasks: [{ taskType: "SelectCustomer",
   instruction: 'Välj kund "iberi".' }, { taskType: "RunAction",
   instruction: 'Välj "Nr, sorterade i Stigande order Välj posten "905"".' }] };

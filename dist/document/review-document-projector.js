@@ -22,8 +22,10 @@
     : root.T9DocumentationHierarchy;
   const sourceReference = typeof module === "object" && module.exports
     ? require("../engine/source-reference") : root.T9SourceReference;
+  const taskVisibility = typeof module === "object" && module.exports
+    ? require("../review/task-visibility") : root.T9ReviewTaskVisibility;
   const api = factory(model, stepEditor, structure, manualSteps, notes,
-    annotations, hierarchy, sourceReference);
+    annotations, hierarchy, sourceReference, taskVisibility);
   if (typeof module === "object" && module.exports) module.exports = api;
   root.T9ReviewDocumentProjector = api;
 })(typeof globalThis !== "undefined" ? globalThis : this, function (
@@ -34,7 +36,8 @@
   notes,
   annotations,
   hierarchy,
-  sourceReference
+  sourceReference,
+  taskVisibility
 ) {
   const PROJECTOR_VERSION = "1.0.0";
   const ORIGIN = "review-document-projector";
@@ -94,27 +97,6 @@
         ? [task.screenshot]
         : [];
     return values.map(text).filter(Boolean);
-  }
-
-  function isGeneratedPlaceholderTask(task, review) {
-    const instruction = firstText(task?.instruction, task?.description);
-    const placeholder = !instruction || [
-      "Utför uppgiften.",
-      "Perform the task."
-    ].includes(instruction);
-    if (task?.taskType !== "Unclassified" || !placeholder) return false;
-
-    const consultantOwned = task.approved || text(task.userComment) ||
-      task.stepOverride || task.manualStepId || task.provenance === "manual" ||
-      task.fieldProvenance?.instruction === "user-edited" ||
-      text(task.callout?.text) || screenshotRefs(task).length > 0;
-    if (consultantOwned) return false;
-
-    const ownerIds = [task.stepId, task.taskId].filter(Boolean).map(String);
-    return !(review?.stepNotes || []).some(note =>
-      note?.ownerType === "step" && note.visibility !== "hidden" &&
-      ownerIds.includes(String(note.ownerId)) && text(note.content)
-    );
   }
 
   function annotationSets(review) {
@@ -265,7 +247,7 @@
     const taskIdCounts = new Map();
     const workflowBlocks = [];
     const tasks = (Array.isArray(review.tasks) ? review.tasks : [])
-      .filter(task => !isGeneratedPlaceholderTask(task, review));
+      .filter(task => !taskVisibility.isGeneratedPlaceholder(task, review));
 
     tasks.filter(task => !task?.deleted).forEach((taskValue, taskIndex) => {
       const task = object(taskValue);

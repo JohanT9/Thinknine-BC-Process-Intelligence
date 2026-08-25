@@ -32,6 +32,9 @@
   const hierarchy = typeof module === "object" && module.exports
     ? require("./documentation-hierarchy")
     : root.T9DocumentationHierarchy;
+  const taskVisibility = typeof module === "object" && module.exports
+    ? require("./task-visibility")
+    : root.T9ReviewTaskVisibility;
   const api = factory(
     moveEngine,
     mergeEngine,
@@ -43,7 +46,8 @@
     structure,
     manual,
     notes,
-    hierarchy
+    hierarchy,
+    taskVisibility
   );
   if (typeof module === "object" && module.exports) module.exports = api;
   root.T9Review = api;
@@ -58,7 +62,8 @@
   structure,
   manual,
   notes,
-  hierarchy
+  hierarchy,
+  taskVisibility
 ) {
   function clone(value) {
     return JSON.parse(JSON.stringify(value));
@@ -752,7 +757,8 @@
   }
 
   function activeTasks(review) {
-    return review.tasks.map(stepEditor.resolve).filter(task => !task.deleted);
+    return review.tasks.map(stepEditor.resolve)
+      .filter(task => taskVisibility.isVisible(task, review));
   }
 
   function resetTaskField(review, index, field, options = {}) {
