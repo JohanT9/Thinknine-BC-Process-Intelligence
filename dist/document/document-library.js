@@ -42,6 +42,9 @@
     const source = clone(value && typeof value === "object" ? value : {});
     FORBIDDEN_PROJECT_FIELDS.forEach(field => delete source[field]);
     const projectId = text(source.projectId || source.sessionId);
+    const metadata = source.metadata && typeof source.metadata === "object" &&
+      !Array.isArray(source.metadata) ? source.metadata : {};
+    const companyTag = text(metadata.company);
     return deepFreeze({
       ...source,
       librarySchemaVersion: text(source.librarySchemaVersion) ||
@@ -64,7 +67,10 @@
       summary: text(source.summary),
       workflowName: text(source.workflowName),
       sectionNames: list(source.sectionNames),
-      tags: [...new Set(list(source.tags))],
+      tags: [...new Set([
+        ...list(source.tags),
+        ...(companyTag ? [companyTag] : [])
+      ])],
       favourite: Boolean(source.favourite),
       readingMinutes: Math.max(0, Number(source.readingMinutes) || 0),
       thumbnailRef: text(source.thumbnailRef),
@@ -92,8 +98,7 @@
           Number(source.regeneration?.unresolvedOverrideCount) || 0)
       },
       recentActivity: list(source.recentActivity).slice(0, 5),
-      metadata: source.metadata && typeof source.metadata === "object" &&
-        !Array.isArray(source.metadata) ? source.metadata : {}
+      metadata
     });
   }
 
@@ -144,6 +149,18 @@
     return time >= from && time <= to;
   }
 
+  function matchesSearch(searchText, search) {
+    if (!search) return true;
+    if (!search.includes("*")) return searchText.includes(search);
+    const escaped = search.replace(/[|\\{}()[\]^$+?.]/g, "\\$&")
+      .replace(/\*/g, ".*");
+    const startsAnywhere = search.startsWith("*");
+    const endsAnywhere = search.endsWith("*");
+    const expression = `${startsAnywhere ? "" : "(?:^|\\s)"}${escaped}` +
+      `${endsAnywhere ? "" : "(?=$|\\s)"}`;
+    return new RegExp(expression, "u").test(searchText);
+  }
+
   function compare(sort) {
     const textCompare = (left, right) => left.localeCompare(right, "sv-SE", {
       sensitivity: "base", numeric: true
@@ -173,7 +190,7 @@
       : now - 30 * 86400000;
     const values = index.filter(item => {
       const record = item.record;
-      return (!search || item.searchText.includes(search)) &&
+      return matchesSearch(item.searchText, search) &&
         (!filters.profile || record.profile.profileId === filters.profile) &&
         (!filters.theme || record.theme.themeId === filters.theme) &&
         (!filters.health || record.health.overall === filters.health) &&

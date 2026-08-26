@@ -97,6 +97,11 @@ assert.ok(
     dashboard.includes("expectedResult: configuredExpectedResult(exportSettings)"),
   "Configured expected-result defaults must reach active and library exports."
 );
+assert.ok(
+  dashboard.includes("session.settings?.businessCentralCompany") &&
+    dashboard.includes("company: companyName"),
+  "Document Library records must receive observed Business Central company metadata."
+);
 
 assert.ok(
   dashboard.includes("Inga sessioner har sparats ännu."),

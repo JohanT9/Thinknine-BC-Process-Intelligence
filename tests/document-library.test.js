@@ -47,6 +47,29 @@ assert.deepStrictEqual(library.query(index, { sort: "recent" })
 assert.deepStrictEqual(library.groupByProfile(library.query(index))
   .map(group => group.profileId), ["quick-reference", "sop", "training-guide"]);
 
+const companyIndex = library.create([{
+  projectId: "feldts", title: "Kundinspektion",
+  tags: ["Kvalitet"], metadata: { company: "Feldts Fisk & Skaldjur AB" }
+}, {
+  projectId: "oldfeld", title: "Historik",
+  metadata: { company: "Westfeld Industri AB" }
+}, {
+  projectId: "other", title: "Annat företag",
+  metadata: { company: "Contoso AB" }
+}]);
+assert.deepStrictEqual(companyIndex[0].record.tags,
+  ["Kvalitet", "Feldts Fisk & Skaldjur AB"],
+  "company metadata must become an additive derived tag");
+assert.deepStrictEqual(library.query(companyIndex, { search: "Feld*" })
+  .map(value => value.projectId).sort(), ["feldts"],
+"a trailing wildcard must match words beginning with the query");
+assert.deepStrictEqual(library.query(companyIndex, { search: "*feld*" })
+  .map(value => value.projectId).sort(), ["feldts", "oldfeld"],
+"surrounding wildcards must match the query anywhere in a company name");
+assert.deepStrictEqual(library.query(companyIndex, { search: "feld" })
+  .map(value => value.projectId).sort(), ["feldts", "oldfeld"],
+"plain search must remain case-insensitive substring matching");
+
 const updated = library.update(records, "training-1", { favourite: true });
 assert.strictEqual(updated[1].favourite, true);
 assert.strictEqual(records[1].favourite, undefined);

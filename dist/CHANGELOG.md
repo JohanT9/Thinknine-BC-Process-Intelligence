@@ -1,5 +1,8 @@
 # Changelog
 
+- Added the observed Business Central company as an automatic, additive
+  Document Library tag and introduced case-insensitive `Feld*` prefix and
+  `*feld*` contains wildcard searches without requiring new recordings.
 - Matched the configurable Expected Result field width to the other
   Documentation settings while retaining responsive sizing.
 - Added a configurable default Expected Result under Documentation settings;

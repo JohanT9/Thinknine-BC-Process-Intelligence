@@ -3323,6 +3323,8 @@ let visibleDocumentLibraryRecords = [];
 
 function librarySessionRecord(session) {
   const bugReport = session.recordingPurpose === "bug-report";
+  const companyName = session.settings?.businessCentralCompany ||
+    session.settings?.companyName || "";
   return {
     projectId: session.id,
     sessionId: session.id,
@@ -3338,6 +3340,7 @@ function librarySessionRecord(session) {
     } : undefined,
     metadata: {
       environment: session.settings?.environmentName || "",
+      company: companyName,
       eventCount: session.eventCount || 0,
       status: session.status || "",
       recordingPurpose: session.recordingPurpose || "documentation"
