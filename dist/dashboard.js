@@ -4068,6 +4068,10 @@ async function switchWorkspace(workspace, focusTab = false) {
       "Slutför eller avbryt annoteringen innan du byter arbetsyta.";
     return false;
   }
+  if (workspace === "document" && activeReviewEdit) {
+    const current = $("reviewList").querySelector('[data-editing="true"]');
+    finishReviewEdit(current, true);
+  }
   workspaceState = globalThis.T9WorkspaceController.switchTo(
     workspaceState,
     workspace

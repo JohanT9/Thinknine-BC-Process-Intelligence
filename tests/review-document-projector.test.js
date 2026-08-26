@@ -256,8 +256,13 @@ const formatted = projector.project({
     instruction: "Ange 30043.",
     instructionRuns: [{ text: "Ange " },
       { text: "30043", bold: true, italic: true,
-        fontFamily: "Aptos", fontSize: 12 }, { text: "." }],
-    stepOverride: { fields: { instruction: "Ange 30043." } },
+        fontFamily: "Aptos", fontSize: 12, textColor: "#C50F1F",
+        backgroundColor: "#FFF100" }, { text: "." }],
+    stepOverride: { fields: { instruction: "Ange 30043.",
+      instructionRuns: [{ text: "Ange " },
+        { text: "30043", bold: true, italic: true,
+          fontFamily: "Aptos", fontSize: 12, textColor: "#C50F1F",
+          backgroundColor: "#FFF100" }, { text: "." }] } },
     fieldProvenance: { instruction: "user-edited" }
   }]
 });
@@ -268,7 +273,8 @@ const formattedParagraph = formatted.document.sections.find(
 );
 assert.deepStrictEqual(formattedParagraph.presentationRuns[1], {
   text: "30043", bold: true, italic: true,
-  fontFamily: "Aptos", fontSize: 12
+  fontFamily: "Aptos", fontSize: 12, textColor: "#C50F1F",
+  backgroundColor: "#FFF100"
 });
 assert.strictEqual(formattedParagraph.preserveUserText, true);
 

@@ -64,6 +64,8 @@ assert(dashboard.includes("instructionRunsFromEditor"));
 assert(dashboard.includes("restoreInstructionSelection"));
 assert(dashboard.includes('addEventListener("pointerdown"'));
 assert(dashboard.includes("const collapsed = from === to"));
+assert(dashboard.includes('workspace === "document" && activeReviewEdit'));
+assert(dashboard.includes("finishReviewEdit(current, true)"));
 assert(dashboard.includes("documentInstructionRunsByTask"));
 assert(dashboard.includes("createActiveDocumentPipeline().semanticDocument"));
 assert(html.includes('.review-fields textarea[hidden]{display:none}'));

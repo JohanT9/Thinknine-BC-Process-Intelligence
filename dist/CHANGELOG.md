@@ -1,5 +1,7 @@
 # Changelog
 
+- Committed an active rich-instruction edit before opening Document Generator,
+  ensuring the preview always consumes the same latest formatting as Review.
 - Preserved the active rich-text range before opening formatting controls,
   restored it after applying a format, and made the toolbar report the format
   at a collapsed caret instead of treating the entire instruction as selected.
