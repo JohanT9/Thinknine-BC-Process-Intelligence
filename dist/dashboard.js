@@ -4484,7 +4484,7 @@ function beginReviewEdit({ control, taskId, field }) {
   if (field === "instruction") {
     const task = globalThis.T9Review.activeTasks(activeReview)
       .find(candidate => candidate.taskId === taskId);
-    const runs = reviewInstructionRuns(task);
+    const runs = reviewInstructionRuns(task, documentInstructionRunsByTask());
     activeReviewEdit.instructionRuns = runs;
     activeReviewEdit.originalInstructionRuns = JSON.stringify(runs);
     activeReviewEdit.selectionStart = 0;
@@ -4874,7 +4874,30 @@ function deleteSelectedAnnotation() {
   return true;
 }
 
-function reviewInstructionRuns(task) {
+function documentInstructionRunsByTask() {
+  const result = new Map();
+  try {
+    const documentModel = createActiveDocumentPipeline().semanticDocument;
+    const visit = blocks => {
+      for (const block of blocks || []) {
+        if (block.kind === "step" && block.sourceRef?.taskId) {
+          const paragraph = block.blocks?.find(child =>
+            child.kind === "paragraph" && Array.isArray(child.presentationRuns)
+          );
+          if (paragraph) result.set(block.sourceRef.taskId,
+            paragraph.presentationRuns);
+        }
+        visit(block.blocks);
+      }
+    };
+    for (const section of documentModel.sections || []) visit(section.blocks);
+  } catch {
+    // Review remains usable while an incomplete document is being assembled.
+  }
+  return result;
+}
+
+function reviewInstructionRuns(task, documentRunsByTask = null) {
   const instruction = globalThis.T9TextFormat.quoteEmphasis(
     task?.instruction || ""
   );
@@ -4888,7 +4911,8 @@ function reviewInstructionRuns(task) {
     ...(run.monospace ? { monospace: true } : {})
   }));
   return globalThis.T9TextFormat.normalizeInstructionRuns(
-    Array.isArray(task?.instructionRuns) ? task.instructionRuns : automatic,
+    Array.isArray(task?.instructionRuns) ? task.instructionRuns :
+      documentRunsByTask?.get(task?.taskId) || automatic,
     instruction
   );
 }
@@ -5019,6 +5043,7 @@ function renderReview() {
   }
 
   const tasks = globalThis.T9Review.activeTasks(activeReview);
+  const documentRunsByTask = documentInstructionRunsByTask();
   const progress = globalThis.T9Review.progress(activeReview);
   const hierarchyState = globalThis.T9DocumentationHierarchy.resolve(
     tasks, activeReview.hierarchy
@@ -5091,7 +5116,7 @@ function renderReview() {
         </div>
         <div id="review-instruction-preview-${visibleIndex}"
           class="review-instruction-preview" data-field="instruction"
-          data-instruction-preview tabindex="0">${instructionRunsHtml(reviewInstructionRuns(task))}</div>
+          data-instruction-preview tabindex="0">${instructionRunsHtml(reviewInstructionRuns(task, documentRunsByTask))}</div>
         <div class="instruction-format-toolbar" data-instruction-format-toolbar hidden
           role="toolbar" aria-label="Textformatering">
           <button type="button" class="secondary" data-instruction-format="bold"

@@ -57,6 +57,8 @@ assert(dashboard.includes("data-instruction-size"));
 assert(dashboard.includes("normalizeInstructionRuns"));
 assert(dashboard.includes('editor.contentEditable = "true"'));
 assert(dashboard.includes("instructionRunsFromEditor"));
+assert(dashboard.includes("documentInstructionRunsByTask"));
+assert(dashboard.includes("createActiveDocumentPipeline().semanticDocument"));
 assert(html.includes('.review-fields textarea[hidden]{display:none}'));
 assert(dashboard.includes('$("reviewMoreActions").addEventListener("toggle"'));
 
