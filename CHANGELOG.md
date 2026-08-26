@@ -1,5 +1,7 @@
 # Changelog
 
+- Added an origin-aware `Restore text` action to inline comment editing; it is
+  disabled until the comment differs from its generated source.
 - Made resolved Semantic Document paragraph text and `presentationRuns` the
   shared default presentation for both Review Studio and Document Generator.
 - Rendered Review instruction formatting through CSP-safe data attributes and

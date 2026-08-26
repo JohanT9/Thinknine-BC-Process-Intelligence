@@ -93,6 +93,10 @@ and `presentationRuns` as its standard presentation. It does not independently
 reconstruct formatting from the lower-level Review instruction when the
 resolved paragraph is available. A consultant edit then becomes the explicit
 Review override used by both workspaces.
+When a consultant edits a step comment, Review Studio exposes an accessible
+`Restore text` action only for that editing session. It is enabled only when
+the draft differs from the generated source comment and removes the sparse
+comment override when invoked.
 Tests cover structured selection, field entry,
 options, booleans, legacy text, shortcuts, identifiers, immutable processing,
 future-field preservation, Document Workspace output, screen-reader text and

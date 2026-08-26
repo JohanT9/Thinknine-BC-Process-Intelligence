@@ -50,6 +50,13 @@ function step() {
   const resolved = editor.resolve(regenerated);
   assert.equal(resolved.instruction, "Select article 136");
   assert.equal(resolved.comment, "Keep this note");
+  const commentReset = editor.reset(regenerated, "comment", {
+    now: "2026-08-10T10:30:00.000Z"
+  });
+  const resetComment = editor.resolve({ ...regenerated,
+    stepOverride: commentReset });
+  assert.equal(resetComment.comment, "Generated note");
+  assert.equal(resetComment.fieldProvenance.comment, "generated");
   const reset = editor.reset({ ...regenerated, stepOverride: editor.edit(
     regenerated, "instruction", "My wording", { now: NOW }
   ) }, "instruction", { now: "2026-08-10T11:00:00.000Z" });
@@ -108,7 +115,7 @@ function step() {
   reviewStudio.editTask(review, 0, { instruction: "Select article 136" }, { now: NOW });
   assert.equal(review.tasks[0].derivedStep.instruction, "Click on No. 136");
   assert.deepEqual(review.tasks[0].stepOverride.fields,
-    { instruction: "Select article 136" });
+    { instruction: "Select article 136", instructionRuns: null });
   assert.equal(reviewStudio.activeTasks(review)[0].instruction, "Select article 136");
   reviewStudio.undo(review);
   assert.equal(reviewStudio.activeTasks(review)[0].instruction, "Click on No. 136");

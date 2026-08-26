@@ -4455,6 +4455,11 @@ function finishReviewEdit(control, commit) {
     card.querySelector(".review-comment-section").hidden = true;
     card.querySelector('[data-action="add-comment"]').hidden = false;
   }
+  if (edit.field === "userComment") {
+    const reset = control.closest("[data-review-task-id]")
+      ?.querySelector('[data-action="reset-comment"]');
+    if (reset) reset.hidden = true;
+  }
   control.readOnly = true;
   if (edit.field === "instruction") {
     control.hidden = true;
@@ -4517,9 +4522,18 @@ function beginReviewEdit({ control, taskId, field }) {
   }
   control.readOnly = false;
   control.dataset.editing = "true";
+  if (field === "userComment") updateCommentResetState(control);
   control.scrollIntoView({ block: "nearest", inline: "nearest" });
   control.focus({ preventScroll: true });
   control.select();
+}
+
+function updateCommentResetState(control) {
+  const reset = control?.closest("[data-review-task-id]")
+    ?.querySelector('[data-action="reset-comment"]');
+  if (!reset) return;
+  reset.hidden = control.dataset.editing !== "true";
+  reset.disabled = control.value === (control.dataset.originalValue || "");
 }
 
 function editReviewField(card, taskId, field) {
@@ -4537,6 +4551,13 @@ globalThis.T9ReviewEdit.bind($("reviewList"), {
         activeReviewEdit.instructionRuns = [{ text: value }];
         updateInstructionPreview(activeReviewEdit.taskId,
           activeReviewEdit.instructionRuns);
+      }
+      if (activeReviewEdit.field === "userComment") {
+        const control = $("reviewList").querySelector(
+          `[data-review-task-id="${CSS.escape(activeReviewEdit.taskId)}"] ` +
+          '[data-edit-field="userComment"]'
+        );
+        updateCommentResetState(control);
       }
     }
   },
@@ -5243,6 +5264,9 @@ function renderReview() {
     const images = reviewImages(task);
     const instructionPresentation = reviewInstructionPresentation(task,
       documentPresentations);
+    const generatedComment = globalThis.T9StepEditor.generated(
+      activeReview.tasks[actualIndex]
+    ).comment;
 
     card.innerHTML = `
       <div class="review-number" role="gridcell">${visibleIndex + 1}</div>
@@ -5286,10 +5310,16 @@ function renderReview() {
         <div class="review-comment-section" ${task.userComment ? "" : "hidden"}>
           <div class="review-field-heading">
             <label for="review-comment-${visibleIndex}">Kommentar</label>
-            <button data-action="edit-comment" class="secondary"
-              aria-label="Redigera kommentar för steg ${visibleIndex + 1}">Redigera</button>
+            <span>
+              <button data-action="reset-comment" class="secondary" hidden
+                ${task.userComment === generatedComment ? "disabled" : ""}
+                aria-label="Återställ kommentar för steg ${visibleIndex + 1} till ursprungstexten">Återställ text</button>
+              <button data-action="edit-comment" class="secondary"
+                aria-label="Redigera kommentar för steg ${visibleIndex + 1}">Redigera</button>
+            </span>
           </div>
           <input id="review-comment-${visibleIndex}" data-field="userComment" data-edit-field="userComment" type="text"
+            data-original-value="${escapeHtml(generatedComment)}"
             aria-label="Kommentar för steg ${visibleIndex + 1}"
             aria-keyshortcuts="Enter Escape"
             title="Dubbelklicka för att redigera" readonly
@@ -5471,6 +5501,23 @@ function renderReview() {
       .addEventListener("click", () => {
         editReviewField(card, task.taskId, "userComment");
       });
+
+    const resetComment = card.querySelector('[data-action="reset-comment"]');
+    resetComment.addEventListener("pointerdown", event => event.preventDefault());
+    resetComment.addEventListener("click", () => {
+      const control = card.querySelector('[data-edit-field="userComment"]');
+      if (activeReviewEdit?.field === "userComment" &&
+          activeReviewEdit.taskId === task.taskId) {
+        finishReviewEdit(control, false);
+      }
+      globalThis.T9Review.resetTaskField(activeReview, actualIndex, "comment", {
+        beforeSelection: activeReviewSelection,
+        afterSelection: activeReviewSelection
+      });
+      reviewAutoSave.schedule();
+      invalidateDocumentWorkspace();
+      renderReview();
+    });
 
     card.querySelector('[data-action="add-comment"]')
       .addEventListener("click", event => {
