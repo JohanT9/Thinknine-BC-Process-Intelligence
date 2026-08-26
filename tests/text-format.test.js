@@ -51,5 +51,14 @@ assert.deepStrictEqual(textFormat.normalizeInstructionRuns([
 ], "Rätt text"), [{ text: "Rätt text" }]);
 assert(Object.isFrozen(textFormat.FONT_FAMILIES));
 assert(Object.isFrozen(textFormat.FONT_SIZES));
+assert.strictEqual(textFormat.COLORS.length, 8);
+assert(Object.isFrozen(textFormat.COLORS));
+assert.deepStrictEqual(textFormat.applyInstructionFormat(
+  [{ text: "Text" }], "Text", 0, 4,
+  { textColor: "#C50F1F", backgroundColor: "#FFF100" }
+), [{ text: "Text", textColor: "#C50F1F", backgroundColor: "#FFF100" }]);
+assert.deepStrictEqual(textFormat.normalizeInstructionRuns([
+  { text: "Text", textColor: "#123456", backgroundColor: "transparent" }
+], "Text"), [{ text: "Text" }]);
 
 console.log("Text formatting behaviour tests passed.");

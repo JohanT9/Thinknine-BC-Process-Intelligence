@@ -1,5 +1,8 @@
 # Changelog
 
+- Made the instruction formatting toolbar report the selected text's effective
+  font family and point size, and added eight-option text and highlight colour
+  palettes that flow consistently through Review, Document Generator and Word.
 - Brought Presentation Grammar into BC Review Studio so generated emphasis is
   visible before opening BC Document Generator, and added a directly formatted
   instruction editor for bold, italic, font family and font size with matching

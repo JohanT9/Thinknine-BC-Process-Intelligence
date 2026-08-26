@@ -47,6 +47,16 @@
           "Times New Roman"
         ]);
         const FONT_SIZES = Object.freeze([9, 10, 11, 12, 14, 16, 18]);
+        const COLORS = Object.freeze([
+          Object.freeze({ name: "Svart", value: "#000000" }),
+          Object.freeze({ name: "Vit", value: "#FFFFFF" }),
+          Object.freeze({ name: "M\xF6rkbl\xE5", value: "#0F4C81" }),
+          Object.freeze({ name: "Turkos", value: "#008C95" }),
+          Object.freeze({ name: "R\xF6d", value: "#C50F1F" }),
+          Object.freeze({ name: "Gr\xF6n", value: "#107C10" }),
+          Object.freeze({ name: "Gul", value: "#FFF100" }),
+          Object.freeze({ name: "Orange", value: "#CA5010" })
+        ]);
         function quoteEmphasis(value) {
           return instructionSegments(value).map((segment) => segment.text).join("");
         }
@@ -75,7 +85,15 @@
           return String(value).replace(/\*\*([^*]+?)\*\*/g, '"$1"');
         }
         function sameFormatting(left, right) {
-          return ["bold", "italic", "monospace", "fontFamily", "fontSize"].every((key) => left?.[key] === right?.[key]);
+          return [
+            "bold",
+            "italic",
+            "monospace",
+            "fontFamily",
+            "fontSize",
+            "textColor",
+            "backgroundColor"
+          ].every((key) => left?.[key] === right?.[key]);
         }
         function mergeInstructionRuns(runs) {
           const merged = [];
@@ -98,7 +116,9 @@
               ...run?.italic ? { italic: true } : {},
               ...run?.monospace ? { monospace: true } : {},
               ...FONT_FAMILIES.includes(run?.fontFamily) ? { fontFamily: run.fontFamily } : {},
-              ...FONT_SIZES.includes(fontSize) ? { fontSize } : {}
+              ...FONT_SIZES.includes(fontSize) ? { fontSize } : {},
+              ...COLORS.some((color2) => color2.value === run?.textColor) ? { textColor: run.textColor } : {},
+              ...COLORS.some((color2) => color2.value === run?.backgroundColor) ? { backgroundColor: run.backgroundColor } : {}
             };
           }).filter((run) => run.text !== "");
           if (runs.map((run) => run.text).join("") !== fallback) {
@@ -148,6 +168,7 @@
           return normalizeInstructionRuns(mergeInstructionRuns(result), text);
         }
         return {
+          COLORS,
           FONT_FAMILIES,
           FONT_SIZES,
           applyInstructionFormat,
@@ -19394,7 +19415,11 @@
         text: segment.text.replace(/`/g, ""),
         bold: Boolean(options.bold) || segment.bold,
         italics: Boolean(options.italics) || segment.italic,
-        color: options.color,
+        color: segment.textColor ? color(segment.textColor) : options.color,
+        shading: segment.backgroundColor ? {
+          type: ShadingType.CLEAR,
+          fill: color(segment.backgroundColor)
+        } : void 0,
         size: segment.fontSize ? halfPoints(segment.fontSize, 11) : options.size,
         font: segment.monospace ? "Consolas" : segment.fontFamily || options.font
       })

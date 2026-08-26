@@ -32,6 +32,8 @@
       if (run.italic && run.bold) child.style.fontStyle = "italic";
       if (run.fontFamily) child.style.fontFamily = run.fontFamily;
       if (run.fontSize) child.style.fontSize = `${run.fontSize}pt`;
+      if (run.textColor) child.style.color = run.textColor;
+      if (run.backgroundColor) child.style.backgroundColor = run.backgroundColor;
       element.appendChild(child);
     }
   }

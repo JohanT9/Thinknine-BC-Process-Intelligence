@@ -7,6 +7,16 @@
     "Aptos", "Arial", "Calibri", "Segoe UI", "Times New Roman"
   ]);
   const FONT_SIZES = Object.freeze([9, 10, 11, 12, 14, 16, 18]);
+  const COLORS = Object.freeze([
+    Object.freeze({ name: "Svart", value: "#000000" }),
+    Object.freeze({ name: "Vit", value: "#FFFFFF" }),
+    Object.freeze({ name: "Mörkblå", value: "#0F4C81" }),
+    Object.freeze({ name: "Turkos", value: "#008C95" }),
+    Object.freeze({ name: "Röd", value: "#C50F1F" }),
+    Object.freeze({ name: "Grön", value: "#107C10" }),
+    Object.freeze({ name: "Gul", value: "#FFF100" }),
+    Object.freeze({ name: "Orange", value: "#CA5010" })
+  ]);
 
   function quoteEmphasis(value) {
     return instructionSegments(value).map(segment => segment.text).join("");
@@ -37,7 +47,8 @@
   }
 
   function sameFormatting(left, right) {
-    return ["bold", "italic", "monospace", "fontFamily", "fontSize"]
+    return ["bold", "italic", "monospace", "fontFamily", "fontSize",
+      "textColor", "backgroundColor"]
       .every(key => left?.[key] === right?.[key]);
   }
 
@@ -64,7 +75,11 @@
         ...(run?.monospace ? { monospace: true } : {}),
         ...(FONT_FAMILIES.includes(run?.fontFamily)
           ? { fontFamily: run.fontFamily } : {}),
-        ...(FONT_SIZES.includes(fontSize) ? { fontSize } : {})
+        ...(FONT_SIZES.includes(fontSize) ? { fontSize } : {}),
+        ...(COLORS.some(color => color.value === run?.textColor)
+          ? { textColor: run.textColor } : {}),
+        ...(COLORS.some(color => color.value === run?.backgroundColor)
+          ? { backgroundColor: run.backgroundColor } : {})
       };
     }).filter(run => run.text !== "");
     if (runs.map(run => run.text).join("") !== fallback) {
@@ -110,6 +125,6 @@
     return normalizeInstructionRuns(mergeInstructionRuns(result), text);
   }
 
-  return { FONT_FAMILIES, FONT_SIZES, applyInstructionFormat,
+  return { COLORS, FONT_FAMILIES, FONT_SIZES, applyInstructionFormat,
     instructionSegments, normalizeInstructionRuns, quoteEmphasis };
 });

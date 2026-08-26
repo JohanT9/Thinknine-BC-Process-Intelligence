@@ -84,7 +84,10 @@ derived in memory, while an explicit consultant formatting override is stored
 as renderer-neutral `instructionRuns` on that Review step. The projector maps
 those runs to Semantic Document `presentationRuns`; Document Workspace and Word
 consume the same contract. Supported overrides are bold, italic, a constrained
-font-family list and a constrained point-size list. Raw HTML is never stored.
+font-family list, a constrained point-size list and separate constrained
+eight-colour text and background palettes. The Review toolbar reports the
+effective format of the current selection and uses a mixed state when required.
+Raw HTML is never stored.
 Tests cover structured selection, field entry,
 options, booleans, legacy text, shortcuts, identifiers, immutable processing,
 future-field preservation, Document Workspace output, screen-reader text and

@@ -34,7 +34,11 @@ function formattedTextRuns(value, options = {}) {
       text: segment.text.replace(/`/g, ""),
       bold: Boolean(options.bold) || segment.bold,
       italics: Boolean(options.italics) || segment.italic,
-      color: options.color,
+      color: segment.textColor ? color(segment.textColor) : options.color,
+      shading: segment.backgroundColor ? {
+        type: ShadingType.CLEAR,
+        fill: color(segment.backgroundColor)
+      } : undefined,
       size: segment.fontSize ? halfPoints(segment.fontSize, 11) : options.size,
       font: segment.monospace ? "Consolas" :
         segment.fontFamily || options.font,

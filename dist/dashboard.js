@@ -4503,6 +4503,7 @@ function beginReviewEdit({ control, taskId, field }) {
       const selection = globalThis.getSelection?.();
       selection?.removeAllRanges();
       selection?.addRange(range);
+      updateInstructionToolbar(card, editor);
     }
     control.dataset.editing = "true";
     return;
@@ -4924,9 +4925,16 @@ function instructionRunsHtml(runs) {
       run.italic ? "font-style:italic" : "",
       run.monospace ? "font-family:monospace" : "",
       run.fontFamily ? `font-family:${run.fontFamily}` : "",
-      run.fontSize ? `font-size:${run.fontSize}pt` : ""
+      run.fontSize ? `font-size:${run.fontSize}pt` : "",
+      run.textColor ? `color:${run.textColor}` : "",
+      run.backgroundColor ? `background-color:${run.backgroundColor}` : ""
     ].filter(Boolean).join(";");
-    return `<span${styles ? ` style="${styles}"` : ""}>${escapeHtml(run.text)}</span>`;
+    const data = [
+      run.textColor ? ` data-text-color="${run.textColor}"` : "",
+      run.backgroundColor
+        ? ` data-background-color="${run.backgroundColor}"` : ""
+    ].join("");
+    return `<span${styles ? ` style="${styles}"` : ""}${data}>${escapeHtml(run.text)}</span>`;
   }).join("");
 }
 
@@ -5001,7 +5009,13 @@ function instructionRunsFromEditor(editor) {
       ...(globalThis.T9TextFormat.FONT_FAMILIES.includes(style.fontFamily)
         ? { fontFamily: style.fontFamily } : {}),
       ...(globalThis.T9TextFormat.FONT_SIZES.includes(parseFloat(style.fontSize))
-        ? { fontSize: parseFloat(style.fontSize) } : {})
+        ? { fontSize: parseFloat(style.fontSize) } : {}),
+      ...(globalThis.T9TextFormat.COLORS.some(color =>
+        color.value === node.dataset.textColor)
+        ? { textColor: node.dataset.textColor } : {}),
+      ...(globalThis.T9TextFormat.COLORS.some(color =>
+        color.value === node.dataset.backgroundColor)
+        ? { backgroundColor: node.dataset.backgroundColor } : {})
     };
     for (const child of node.childNodes) visit(child, next);
   };
@@ -5017,6 +5031,70 @@ function rememberInstructionSelection(editor) {
   activeReviewEdit.selectionEnd = offsets.end;
 }
 
+function selectedInstructionRuns(editor) {
+  if (!activeReviewEdit) return [];
+  rememberInstructionSelection(editor);
+  let from = activeReviewEdit.selectionStart ?? 0;
+  let to = activeReviewEdit.selectionEnd ?? 0;
+  const length = activeReviewEdit.draftValue?.length || 0;
+  if (from === to) { from = 0; to = length; }
+  let offset = 0;
+  return (activeReviewEdit.instructionRuns || []).filter(run => {
+    const overlaps = offset < to && offset + run.text.length > from;
+    offset += run.text.length;
+    return overlaps;
+  });
+}
+
+function setFormattingSelect(select, value, mixed) {
+  select.querySelector('[data-mixed-format]')?.remove();
+  if (mixed) {
+    const option = document.createElement("option");
+    option.value = "";
+    option.textContent = "Blandat";
+    option.dataset.mixedFormat = "true";
+    select.prepend(option);
+    select.value = "";
+  } else {
+    select.value = String(value);
+  }
+  if (select.dataset.colorSelect !== undefined) {
+    select.style.backgroundColor = mixed ? "" : value;
+    select.style.color = !mixed && ["#000000", "#0F4C81", "#008C95",
+      "#C50F1F", "#107C10", "#CA5010"].includes(value)
+      ? "#FFFFFF" : "#000000";
+  }
+}
+
+function updateInstructionToolbar(card, editor) {
+  const runs = selectedInstructionRuns(editor);
+  const common = (property, fallback) => {
+    const values = runs.map(run => run[property] ?? fallback);
+    return { value: values[0] ?? fallback,
+      mixed: values.some(value => value !== (values[0] ?? fallback)) };
+  };
+  const font = common("fontFamily", "Arial");
+  const size = common("fontSize", 11);
+  const textColor = common("textColor", "#000000");
+  const backgroundColor = common("backgroundColor", "#FFFFFF");
+  for (const property of ["bold", "italic"]) {
+    const state = common(property, false);
+    const button = card.querySelector(
+      `[data-instruction-format="${property}"]`
+    );
+    button.setAttribute("aria-pressed",
+      state.mixed ? "mixed" : String(Boolean(state.value)));
+  }
+  setFormattingSelect(card.querySelector("[data-instruction-font]"),
+    font.value, font.mixed);
+  setFormattingSelect(card.querySelector("[data-instruction-size]"),
+    size.value, size.mixed);
+  setFormattingSelect(card.querySelector("[data-instruction-text-color]"),
+    textColor.value, textColor.mixed);
+  setFormattingSelect(card.querySelector("[data-instruction-background-color]"),
+    backgroundColor.value, backgroundColor.mixed);
+}
+
 function applyInstructionFormatting(control, editor, patch) {
   if (!activeReviewEdit || activeReviewEdit.field !== "instruction") return;
   rememberInstructionSelection(editor);
@@ -5030,6 +5108,7 @@ function applyInstructionFormatting(control, editor, patch) {
   updateInstructionPreview(activeReviewEdit.taskId,
     activeReviewEdit.instructionRuns);
   editor.focus({ preventScroll: true });
+  updateInstructionToolbar(editor.closest("[data-review-task-id]"), editor);
 }
 
 function renderReview() {
@@ -5124,14 +5203,20 @@ function renderReview() {
           <button type="button" class="secondary" data-instruction-format="italic"
             aria-label="Kursiv stil" aria-pressed="false"><em>K</em></button>
           <label>Typsnitt<select data-instruction-font>
-            <option value="">Behåll</option>
             ${globalThis.T9TextFormat.FONT_FAMILIES.map(font =>
-              `<option value="${escapeHtml(font)}">${escapeHtml(font)}</option>`).join("")}
+              `<option value="${escapeHtml(font)}" ${font === "Arial" ? "selected" : ""}>${escapeHtml(font)}</option>`).join("")}
           </select></label>
           <label>Storlek<select data-instruction-size>
-            <option value="">Behåll</option>
             ${globalThis.T9TextFormat.FONT_SIZES.map(size =>
-              `<option value="${size}">${size} pt</option>`).join("")}
+              `<option value="${size}" ${size === 11 ? "selected" : ""}>${size} pt</option>`).join("")}
+          </select></label>
+          <label>Textfärg<select data-instruction-text-color data-color-select>
+            ${globalThis.T9TextFormat.COLORS.map(color =>
+              `<option value="${color.value}" style="background:${color.value};color:${["#000000", "#0F4C81", "#008C95", "#C50F1F", "#107C10", "#CA5010"].includes(color.value) ? "#FFFFFF" : "#000000"}">${escapeHtml(color.name)}</option>`).join("")}
+          </select></label>
+          <label>Bakgrund<select data-instruction-background-color data-color-select>
+            ${globalThis.T9TextFormat.COLORS.map(color =>
+              `<option value="${color.value}" style="background:${color.value};color:${["#000000", "#0F4C81", "#008C95", "#C50F1F", "#107C10", "#CA5010"].includes(color.value) ? "#FFFFFF" : "#000000"}">${escapeHtml(color.name)}</option>`).join("")}
           </select></label>
         </div>
         <textarea id="review-instruction-${visibleIndex}" data-edit-field="instruction" hidden
@@ -5245,6 +5330,9 @@ function renderReview() {
     for (const eventName of ["mouseup", "keyup"]) {
       instructionEditor.addEventListener(eventName, () => {
         rememberInstructionSelection(instructionEditor);
+        if (instructionEditor.dataset.editing === "true") {
+          updateInstructionToolbar(card, instructionEditor);
+        }
       });
     }
     instructionEditor.addEventListener("input", () => {
@@ -5255,6 +5343,7 @@ function renderReview() {
       activeReviewEdit.instructionRuns = globalThis.T9TextFormat
         .normalizeInstructionRuns(instructionRunsFromEditor(instructionEditor), value);
       rememberInstructionSelection(instructionEditor);
+      updateInstructionToolbar(card, instructionEditor);
     });
     instructionEditor.addEventListener("keydown", event => {
       if (instructionEditor.dataset.editing !== "true") return;
@@ -5296,14 +5385,22 @@ function renderReview() {
         if (event.target.value) applyInstructionFormatting(instructionControl,
           instructionEditor,
           { fontFamily: event.target.value });
-        event.target.value = "";
       });
     card.querySelector("[data-instruction-size]")
       .addEventListener("change", event => {
         if (event.target.value) applyInstructionFormatting(instructionControl,
           instructionEditor,
           { fontSize: Number(event.target.value) });
-        event.target.value = "";
+      });
+    card.querySelector("[data-instruction-text-color]")
+      .addEventListener("change", event => {
+        if (event.target.value) applyInstructionFormatting(instructionControl,
+          instructionEditor, { textColor: event.target.value });
+      });
+    card.querySelector("[data-instruction-background-color]")
+      .addEventListener("change", event => {
+        if (event.target.value) applyInstructionFormatting(instructionControl,
+          instructionEditor, { backgroundColor: event.target.value });
       });
     card.querySelector('[data-action="edit-comment"]')
       .addEventListener("click", () => {

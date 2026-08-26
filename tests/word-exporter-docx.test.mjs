@@ -25,6 +25,19 @@ const exportInput = pipeline.create({
     tasks: [{
       taskId: "merged",
       instruction: "Sammanslaget steg",
+      instructionRuns: [
+        { text: "Sammanslaget ", textColor: "#C50F1F",
+          backgroundColor: "#FFF100", fontFamily: "Arial", fontSize: 12 },
+        { text: "steg" }
+      ],
+      stepOverride: { fields: {
+        instruction: "Sammanslaget steg",
+        instructionRuns: [
+          { text: "Sammanslaget ", textColor: "#C50F1F",
+            backgroundColor: "#FFF100", fontFamily: "Arial", fontSize: 12 },
+          { text: "steg" }
+        ]
+      } },
       pageCaption: "Förs.order",
       confidenceScore: 98,
       userComment: "Kontrollera resultatet",
@@ -49,9 +62,13 @@ const documentXml = await archive.file("word/document.xml").async("string");
 assert.ok(!documentXml.includes("Sida: Förs.order"));
 assert.ok(!documentXml.includes("Säkerhet: 98%"));
 assert.ok(documentXml.includes("Sammanslaget steg"));
-assert.match(
-  documentXml,
-  /Sammanslaget steg[\s\S]*?Kommentar: [\s\S]*?Kontrollera resultatet/
-);
+assert.ok(documentXml.includes('w:color w:val="C50F1F"'));
+assert.match(documentXml, /<w:shd[^>]*w:fill="FFF100"/);
+const instructionStart = documentXml.indexOf("Sammanslaget ");
+const instructionEnd = documentXml.indexOf("steg", instructionStart);
+const commentLabel = documentXml.indexOf("Kommentar: ", instructionEnd);
+const commentText = documentXml.indexOf("Kontrollera resultatet", commentLabel);
+assert.ok(instructionStart >= 0 && instructionEnd > instructionStart);
+assert.ok(commentLabel > instructionEnd && commentText > commentLabel);
 
 console.log("docx merged screenshot behaviour tests passed.");
