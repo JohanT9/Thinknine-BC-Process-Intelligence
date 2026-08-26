@@ -604,6 +604,15 @@ DOM eller Word. `document-workspace-view.js` är den tunna DOM-adaptern som
 materialiserar modellen. `workspace-controller.js` äger endast aktiv arbetsyta
 och synkroniseringsrevision.
 
+Composition root keeps one frozen document-pipeline value for the active Review
+revision, profile and expected-result configuration. Review Studio first uses
+that value for its document-consistent instruction presentation; opening
+Document Workspace reuses the same value instead of repeating projection,
+language, presentation, screenshot selection, planning and diagnostics. A
+Review invalidation changes the revision key, and closing the Review releases
+the retained value. The active profile variant also reuses the pipeline's
+already resolved Semantic Document, screenshot selections and plan.
+
 Dashboarden är fortsatt composition root. Den kör samma pipeline och samma
 annotationskomposition för Document Workspace och Word, men äger ingen
 dokumentstruktur. Stabilt identifierade plansektioner gör att DOM-adaptern kan

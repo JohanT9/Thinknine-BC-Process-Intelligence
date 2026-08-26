@@ -27,4 +27,28 @@ assert.strictEqual(rendered.renderedRevision, 1);
 assert.strictEqual(controller.needsRender(rendered), false);
 assert.strictEqual(controller.invalidate(rendered).renderedRevision, 1);
 
+let builds = 0;
+const cache = controller.createRevisionCache();
+const review = {};
+const first = cache.get([review, 1, "business-process"], () => {
+  builds += 1;
+  return Object.freeze({ revision: 1 });
+});
+assert.strictEqual(cache.get([review, 1, "business-process"], () => {
+  builds += 1;
+  return {};
+}), first);
+assert.strictEqual(builds, 1);
+assert.notStrictEqual(cache.get([review, 2, "business-process"], () => {
+  builds += 1;
+  return Object.freeze({ revision: 2 });
+}), first);
+assert.strictEqual(builds, 2);
+cache.clear();
+cache.get([review, 2, "business-process"], () => {
+  builds += 1;
+  return Object.freeze({ revision: 2 });
+});
+assert.strictEqual(builds, 3);
+
 console.log("Workspace switching behaviour tests passed.");

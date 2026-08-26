@@ -3119,14 +3119,21 @@ function createActiveDocumentPipeline() {
   if (!activeReviewModel || !activeReview) {
     throw new Error("Dokumentet är inte tillgängligt ännu.");
   }
-  return globalThis.T9WordExportPipeline.create({
-    session: activeReviewModel.response.session,
-    review: activeReview,
-    expectedResult: configuredExpectedResult(),
-    screenshotCandidates: screenshotCandidatesFor(activeReviewModel, activeReview),
-    profileId: activeDocumentProfileId,
-    themeId: "thinknine"
-  });
+  const expectedResult = configuredExpectedResult();
+  return activeDocumentPipelineCache.get([
+    activeReviewModel,
+    activeReview,
+    workspaceState.revision,
+    activeDocumentProfileId,
+    expectedResult
+  ], () => globalThis.T9WordExportPipeline.create({
+      session: activeReviewModel.response.session,
+      review: activeReview,
+      expectedResult,
+      screenshotCandidates: screenshotCandidatesFor(activeReviewModel, activeReview),
+      profileId: activeDocumentProfileId,
+      themeId: "thinknine"
+    }));
 }
 
 function configuredExpectedResult(settings = applicationSettings) {
@@ -3301,6 +3308,8 @@ let annotationChangesPending = false;
 let annotationEditorBaseline = null;
 let workspaceState = globalThis.T9WorkspaceController.create();
 let documentWorkspaceSync = null;
+const activeDocumentPipelineCache = globalThis.T9WorkspaceController
+  .createRevisionCache();
 let documentViewState = globalThis.T9DocumentWorkspaceExperience.load(
   globalThis.localStorage
 );
@@ -3616,26 +3625,33 @@ function buildDocumentProfileVariants(pipeline) {
         themeId,
         profile.theme.overrides || {}
       );
-    const languageDocument = globalThis.T9LanguageExcellence.process(
-      pipeline.semanticActionsDocument,
-      profile
-    );
-    const semanticDocument = globalThis.T9PresentationGrammar.process(
-      languageDocument
-    );
-    const screenshotResult = globalThis.T9ScreenshotIntelligence.select(
-      semanticDocument,
-      { candidates: pipeline.screenshotCandidates, profile }
-    );
-    const plan = profile.profileId === pipeline.languageProfile.profileId &&
-      theme === pipeline.theme
-      ? pipeline.plan
-      : globalThis.T9DocumentPlanner.plan(screenshotResult.document, theme);
+    const matchesPipeline =
+      profile.profileId === pipeline.languageProfile.profileId &&
+      theme === pipeline.theme;
+    let semanticDocument = pipeline.semanticDocument;
+    let screenshotSelections = pipeline.screenshotSelections;
+    let plan = pipeline.plan;
+    if (!matchesPipeline) {
+      const languageDocument = globalThis.T9LanguageExcellence.process(
+        pipeline.semanticActionsDocument,
+        profile
+      );
+      const presentationDocument = globalThis.T9PresentationGrammar.process(
+        languageDocument
+      );
+      const screenshotResult = globalThis.T9ScreenshotIntelligence.select(
+        presentationDocument,
+        { candidates: pipeline.screenshotCandidates, profile }
+      );
+      semanticDocument = screenshotResult.document;
+      screenshotSelections = screenshotResult.selections;
+      plan = globalThis.T9DocumentPlanner.plan(semanticDocument, theme);
+    }
     return [profile.profileId, {
       profile,
       theme,
-      semanticDocument: screenshotResult.document,
-      screenshotSelections: screenshotResult.selections,
+      semanticDocument,
+      screenshotSelections,
       plan,
       model: globalThis.T9DocumentWorkspace.render(plan)
     }];
@@ -5769,6 +5785,7 @@ async function closeReview() {
   activeReviewModel = null;
   activeReviewSelection = globalThis.T9ReviewSelection.create();
   activeReviewEdit = null;
+  activeDocumentPipelineCache.clear();
   workspaceState = globalThis.T9WorkspaceController.create();
   documentWorkspaceSync = null;
   cancelAnimationFrame(documentViewFrame);

@@ -93,7 +93,8 @@ assert.ok(
   "Dashboard must merge stored settings with defaults."
 );
 assert.ok(
-  dashboard.includes("expectedResult: configuredExpectedResult()") &&
+  dashboard.includes("const expectedResult = configuredExpectedResult()") &&
+    dashboard.includes("expectedResult,") &&
     dashboard.includes("expectedResult: configuredExpectedResult(exportSettings)"),
   "Configured expected-result defaults must reach active and library exports."
 );
@@ -127,6 +128,14 @@ assert.ok(
     dashboard.includes("const pipeline = createActiveDocumentPipeline();") &&
     dashboard.includes("const mediaAssets = await prepareDocumentMedia(pipeline);"),
   "Document Workspace and Word must share pipeline and prepared-media composition."
+);
+assert.ok(
+  dashboard.includes("activeDocumentPipelineCache.get") &&
+    dashboard.includes("workspaceState.revision") &&
+    dashboard.includes("const matchesPipeline") &&
+    dashboard.includes("semanticDocument = pipeline.semanticDocument") &&
+    dashboard.includes("screenshotSelections = pipeline.screenshotSelections"),
+  "Review and Document workspaces must reuse one revision-bound document pipeline."
 );
 assert.ok(
   dashboard.includes("businessSteps,\n    sessionGraph, confidenceResult } = model;") &&

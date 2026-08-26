@@ -40,10 +40,32 @@
     return current;
   }
 
+  function createRevisionCache() {
+    let previousKeys = null;
+    let previousValue;
+    return Object.freeze({
+      get(keys, createValue) {
+        const nextKeys = Array.isArray(keys) ? [...keys] : [keys];
+        if (previousKeys?.length === nextKeys.length &&
+            previousKeys.every((key, index) => Object.is(key, nextKeys[index]))) {
+          return previousValue;
+        }
+        previousValue = createValue();
+        previousKeys = nextKeys;
+        return previousValue;
+      },
+      clear() {
+        previousKeys = null;
+        previousValue = undefined;
+      }
+    });
+  }
+
   return {
     WORKSPACES,
     complete,
     create,
+    createRevisionCache,
     invalidate,
     needsRender,
     switchTo,
