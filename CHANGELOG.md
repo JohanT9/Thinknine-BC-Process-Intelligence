@@ -1,5 +1,8 @@
 # Changelog
 
+- Preserved the active rich-text range before opening formatting controls,
+  restored it after applying a format, and made the toolbar report the format
+  at a collapsed caret instead of treating the entire instruction as selected.
 - Kept rich instruction editing active while clicking and dragging within the
   contenteditable text, so selections can be adjusted without focus returning
   to the surrounding review card.

@@ -5031,18 +5031,59 @@ function rememberInstructionSelection(editor) {
   activeReviewEdit.selectionEnd = offsets.end;
 }
 
+function restoreInstructionSelection(editor, start, end) {
+  const range = document.createRange();
+  const selection = globalThis.getSelection?.();
+  if (!selection) return;
+  let offset = 0;
+  let startPoint = null;
+  let endPoint = null;
+  const visit = node => {
+    if (node.nodeType === Node.TEXT_NODE) {
+      const next = offset + node.textContent.length;
+      if (!startPoint && start >= offset && start <= next) {
+        startPoint = [node, start - offset];
+      }
+      if (!endPoint && end >= offset && end <= next) {
+        endPoint = [node, end - offset];
+      }
+      offset = next;
+      return;
+    }
+    for (const child of node.childNodes) visit(child);
+  };
+  visit(editor);
+  if (!startPoint || !endPoint) return;
+  range.setStart(...startPoint);
+  range.setEnd(...endPoint);
+  selection.removeAllRanges();
+  selection.addRange(range);
+}
+
 function selectedInstructionRuns(editor) {
   if (!activeReviewEdit) return [];
   rememberInstructionSelection(editor);
   let from = activeReviewEdit.selectionStart ?? 0;
   let to = activeReviewEdit.selectionEnd ?? 0;
-  const length = activeReviewEdit.draftValue?.length || 0;
-  if (from === to) { from = 0; to = length; }
+  if (from > to) [from, to] = [to, from];
+  const collapsed = from === to;
+  const runs = activeReviewEdit.instructionRuns || [];
+  if (collapsed) {
+    let caretOffset = 0;
+    return runs.filter((run, index) => {
+      const start = caretOffset;
+      const end = caretOffset + run.text.length;
+      caretOffset = end;
+      return (from >= start && from < end) ||
+        (index === runs.length - 1 && from === end);
+    });
+  }
   let offset = 0;
-  return (activeReviewEdit.instructionRuns || []).filter(run => {
-    const overlaps = offset < to && offset + run.text.length > from;
-    offset += run.text.length;
-    return overlaps;
+  return runs.filter(run => {
+    const start = offset;
+    const end = offset + run.text.length;
+    offset = end;
+    return start < to && end > from;
   });
 }
 
@@ -5108,6 +5149,8 @@ function applyInstructionFormatting(control, editor, patch) {
   updateInstructionPreview(activeReviewEdit.taskId,
     activeReviewEdit.instructionRuns);
   editor.focus({ preventScroll: true });
+  restoreInstructionSelection(editor, activeReviewEdit.selectionStart,
+    activeReviewEdit.selectionEnd);
   updateInstructionToolbar(editor.closest("[data-review-task-id]"), editor);
 }
 
@@ -5327,6 +5370,12 @@ function renderReview() {
       '[data-edit-field="instruction"]'
     );
     const instructionEditor = card.querySelector("[data-instruction-preview]");
+    card.querySelector("[data-instruction-format-toolbar]")
+      .addEventListener("pointerdown", () => {
+        if (instructionEditor.dataset.editing === "true") {
+          rememberInstructionSelection(instructionEditor);
+        }
+      });
     for (const eventName of ["mouseup", "keyup"]) {
       instructionEditor.addEventListener(eventName, () => {
         rememberInstructionSelection(instructionEditor);
