@@ -4328,7 +4328,15 @@ function splitSelectedReviewTask() {
   const card = [...$("reviewList").querySelectorAll("[data-review-task-id]")]
     .find(element => element.dataset.reviewTaskId === taskId);
   const instruction = card?.querySelector('[data-field="instruction"]');
-  const splitAt = instruction?.selectionStart;
+  const selection = globalThis.getSelection?.();
+  let splitAt = instruction?.selectionStart;
+  if (!Number.isInteger(splitAt) && instruction && selection?.rangeCount &&
+      instruction.contains(selection.anchorNode)) {
+    const range = selection.getRangeAt(0).cloneRange();
+    range.selectNodeContents(instruction);
+    range.setEnd(selection.anchorNode, selection.anchorOffset);
+    splitAt = range.toString().length;
+  }
   const previous = globalThis.T9ReviewMove.capturePositions($("reviewList"));
   const result = globalThis.T9Review.split(
     activeReview,
@@ -4404,7 +4412,10 @@ function restoreReviewHistory(direction) {
 function finishReviewEdit(control, commit) {
   if (!activeReviewEdit || !control) return;
   const edit = globalThis.T9ReviewEdit.result(activeReviewEdit);
-  if (commit && edit.changed) {
+  const formattedInstructionChanged = edit.field === "instruction" &&
+    JSON.stringify(activeReviewEdit.instructionRuns) !==
+      activeReviewEdit.originalInstructionRuns;
+  if (commit && (edit.changed || formattedInstructionChanged)) {
     const revisionChanged = globalThis.T9ReviewEdit.hasRevisionConflict(
       activeReviewEdit, activeReview.updatedAt
     );
@@ -4413,7 +4424,12 @@ function finishReviewEdit(control, commit) {
       globalThis.T9Review.editTask(
         activeReview,
         index,
-        { [edit.field]: edit.value },
+        edit.field === "instruction"
+          ? { instruction: edit.value,
+            instructionRuns: globalThis.T9TextFormat.normalizeInstructionRuns(
+              activeReviewEdit.instructionRuns, edit.value
+            ) }
+          : { [edit.field]: edit.value },
         {
           beforeSelection: activeReviewSelection,
           afterSelection: activeReviewSelection
@@ -4436,8 +4452,13 @@ function finishReviewEdit(control, commit) {
     card.querySelector('[data-action="add-comment"]').hidden = false;
   }
   control.readOnly = true;
+  if (edit.field === "instruction") control.hidden = true;
   delete control.dataset.editing;
   activeReviewEdit = null;
+  if (edit.field === "instruction") {
+    renderReview();
+    return;
+  }
   applyReviewSelection();
 }
 
@@ -4452,6 +4473,19 @@ function beginReviewEdit({ control, taskId, field }) {
     control.value,
     activeReview.updatedAt
   );
+  if (field === "instruction") {
+    const task = globalThis.T9Review.activeTasks(activeReview)
+      .find(candidate => candidate.taskId === taskId);
+    const runs = reviewInstructionRuns(task);
+    activeReviewEdit.instructionRuns = runs;
+    activeReviewEdit.originalInstructionRuns = JSON.stringify(runs);
+    activeReviewEdit.selectionStart = 0;
+    activeReviewEdit.selectionEnd = control.value.length;
+    control.hidden = false;
+    control.closest("[data-review-task-id]")
+      ?.querySelector("[data-instruction-format-toolbar]")
+      ?.removeAttribute("hidden");
+  }
   control.readOnly = false;
   control.dataset.editing = "true";
   control.scrollIntoView({ block: "nearest", inline: "nearest" });
@@ -4470,6 +4504,11 @@ globalThis.T9ReviewEdit.bind($("reviewList"), {
   update({ value }) {
     if (activeReviewEdit) {
       activeReviewEdit = globalThis.T9ReviewEdit.update(activeReviewEdit, value);
+      if (activeReviewEdit.field === "instruction") {
+        activeReviewEdit.instructionRuns = [{ text: value }];
+        updateInstructionPreview(activeReviewEdit.taskId,
+          activeReviewEdit.instructionRuns);
+      }
     }
   },
   commit({ control }) {
@@ -4814,6 +4853,67 @@ function deleteSelectedAnnotation() {
   return true;
 }
 
+function reviewInstructionRuns(task) {
+  const instruction = globalThis.T9TextFormat.quoteEmphasis(
+    task?.instruction || ""
+  );
+  const automatic = globalThis.T9PresentationGrammar.presentationFor(
+    task?.semanticActionModel || task,
+    task?.instruction || ""
+  ).runs.map(run => ({
+    text: run.text,
+    ...(run.bold ? { bold: true } : {}),
+    ...(run.italic ? { italic: true } : {}),
+    ...(run.monospace ? { monospace: true } : {})
+  }));
+  return globalThis.T9TextFormat.normalizeInstructionRuns(
+    Array.isArray(task?.instructionRuns) ? task.instructionRuns : automatic,
+    instruction
+  );
+}
+
+function instructionRunsHtml(runs) {
+  return runs.map(run => {
+    const styles = [
+      run.bold ? "font-weight:700" : "",
+      run.italic ? "font-style:italic" : "",
+      run.monospace ? "font-family:monospace" : "",
+      run.fontFamily ? `font-family:${run.fontFamily}` : "",
+      run.fontSize ? `font-size:${run.fontSize}pt` : ""
+    ].filter(Boolean).join(";");
+    return `<span${styles ? ` style="${styles}"` : ""}>${escapeHtml(run.text)}</span>`;
+  }).join("");
+}
+
+function updateInstructionPreview(taskId, runs) {
+  const card = [...$("reviewList").querySelectorAll("[data-review-task-id]")]
+    .find(element => element.dataset.reviewTaskId === taskId);
+  const preview = card?.querySelector("[data-instruction-preview]");
+  if (preview) preview.innerHTML = instructionRunsHtml(runs);
+}
+
+function rememberInstructionSelection(control) {
+  if (!activeReviewEdit || activeReviewEdit.field !== "instruction") return;
+  activeReviewEdit.selectionStart = control.selectionStart;
+  activeReviewEdit.selectionEnd = control.selectionEnd;
+}
+
+function applyInstructionFormatting(control, patch) {
+  if (!activeReviewEdit || activeReviewEdit.field !== "instruction") return;
+  activeReviewEdit.instructionRuns = globalThis.T9TextFormat.applyInstructionFormat(
+    activeReviewEdit.instructionRuns,
+    control.value,
+    activeReviewEdit.selectionStart,
+    activeReviewEdit.selectionEnd,
+    patch
+  );
+  updateInstructionPreview(activeReviewEdit.taskId,
+    activeReviewEdit.instructionRuns);
+  control.focus({ preventScroll: true });
+  control.setSelectionRange(activeReviewEdit.selectionStart,
+    activeReviewEdit.selectionEnd);
+}
+
 function renderReview() {
   invalidateDocumentWorkspace();
   const list = $("reviewList");
@@ -4895,7 +4995,27 @@ function renderReview() {
           <button data-action="edit-instruction" class="secondary"
             aria-label="Redigera instruktion för steg ${visibleIndex + 1}">Redigera</button>
         </div>
-        <textarea id="review-instruction-${visibleIndex}" data-field="instruction" data-edit-field="instruction"
+        <div id="review-instruction-preview-${visibleIndex}"
+          class="review-instruction-preview" data-field="instruction"
+          data-instruction-preview tabindex="0">${instructionRunsHtml(reviewInstructionRuns(task))}</div>
+        <div class="instruction-format-toolbar" data-instruction-format-toolbar hidden
+          role="toolbar" aria-label="Textformatering">
+          <button type="button" class="secondary" data-instruction-format="bold"
+            aria-label="Fet stil" aria-pressed="false"><strong>F</strong></button>
+          <button type="button" class="secondary" data-instruction-format="italic"
+            aria-label="Kursiv stil" aria-pressed="false"><em>K</em></button>
+          <label>Typsnitt<select data-instruction-font>
+            <option value="">Behåll</option>
+            ${globalThis.T9TextFormat.FONT_FAMILIES.map(font =>
+              `<option value="${escapeHtml(font)}">${escapeHtml(font)}</option>`).join("")}
+          </select></label>
+          <label>Storlek<select data-instruction-size>
+            <option value="">Behåll</option>
+            ${globalThis.T9TextFormat.FONT_SIZES.map(size =>
+              `<option value="${size}">${size} pt</option>`).join("")}
+          </select></label>
+        </div>
+        <textarea id="review-instruction-${visibleIndex}" data-edit-field="instruction" hidden
           aria-label="Instruktion för steg ${visibleIndex + 1}"
           aria-keyshortcuts="Enter Control+Enter Meta+Enter Escape"
           title="Dubbelklicka eller tryck Enter för att redigera. Ctrl+Enter sparar"
@@ -4998,6 +5118,46 @@ function renderReview() {
     card.querySelector('[data-action="edit-instruction"]')
       .addEventListener("click", () => {
         editReviewField(card, task.taskId, "instruction");
+      });
+    const instructionControl = card.querySelector(
+      '[data-edit-field="instruction"]'
+    );
+    for (const eventName of ["select", "click", "keyup"]) {
+      instructionControl.addEventListener(eventName, () => {
+        rememberInstructionSelection(instructionControl);
+      });
+    }
+    for (const button of card.querySelectorAll("[data-instruction-format]")) {
+      button.addEventListener("mousedown", event => event.preventDefault());
+      button.addEventListener("click", () => {
+        const property = button.dataset.instructionFormat;
+        const allRuns = activeReviewEdit?.instructionRuns || [];
+        let from = activeReviewEdit?.selectionStart ?? 0;
+        let to = activeReviewEdit?.selectionEnd ?? instructionControl.value.length;
+        if (from === to) { from = 0; to = instructionControl.value.length; }
+        let offset = 0;
+        const selectedRuns = allRuns.filter(run => {
+          const overlaps = offset < to && offset + run.text.length > from;
+          offset += run.text.length;
+          return overlaps;
+        });
+        const enabled = !selectedRuns.every(run => run[property] === true);
+        button.setAttribute("aria-pressed", String(enabled));
+        applyInstructionFormatting(instructionControl,
+          { [property]: enabled });
+      });
+    }
+    card.querySelector("[data-instruction-font]")
+      .addEventListener("change", event => {
+        if (event.target.value) applyInstructionFormatting(instructionControl,
+          { fontFamily: event.target.value });
+        event.target.value = "";
+      });
+    card.querySelector("[data-instruction-size]")
+      .addEventListener("change", event => {
+        if (event.target.value) applyInstructionFormatting(instructionControl,
+          { fontSize: Number(event.target.value) });
+        event.target.value = "";
       });
     card.querySelector('[data-action="edit-comment"]')
       .addEventListener("click", () => {

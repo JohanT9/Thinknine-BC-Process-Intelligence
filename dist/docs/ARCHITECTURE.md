@@ -365,6 +365,11 @@ distinct roles; no renderer parses semantic action intent.
 Planner transports the runs unchanged. Document Workspace maps the contracts to
 semantic DOM elements, while the Word adapter maps the same contracts to DOCX
 text properties. Both retain the plain concatenated sentence for accessibility.
+Review Studio renders the same generated runs before projection. When a
+consultant explicitly formats an instruction, Review owns that reversible
+override as structured `instructionRuns`; the projector alone translates it to
+Semantic Document `presentationRuns`. This keeps font and emphasis choices out
+of raw recording events and avoids renderer-specific HTML in the domain model.
 The layer does not change workflow structure, screenshots, source references,
 planning or persistence. Legacy marker parsing is a compatibility boundary only
 and remains outside both renderers.

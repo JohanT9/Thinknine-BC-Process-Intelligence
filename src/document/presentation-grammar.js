@@ -97,9 +97,11 @@
       ? result.semanticAction || result.interaction || action
       : action;
     if (result.kind === "paragraph" && typeof result.text === "string") {
-      const presentation = presentationFor(blockAction, result.text);
-      result.text = presentation.text;
-      result.presentationRuns = presentation.runs;
+      if (!(result.preserveUserText && Array.isArray(result.presentationRuns))) {
+        const presentation = presentationFor(blockAction, result.text);
+        result.text = presentation.text;
+        result.presentationRuns = presentation.runs;
+      }
     }
     if (Array.isArray(result.blocks)) {
       result.blocks = result.blocks.map(child => processBlock(

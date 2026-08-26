@@ -4,7 +4,9 @@
   root.T9StepEditor = api;
 })(typeof globalThis !== "undefined" ? globalThis : this, function () {
   const SCHEMA_VERSION = "1.0.0";
-  const EDITABLE_FIELDS = Object.freeze(["title", "instruction", "comment"]);
+  const EDITABLE_FIELDS = Object.freeze([
+    "title", "instruction", "instructionRuns", "comment"
+  ]);
 
   function clone(value) {
     return value === undefined ? undefined : JSON.parse(JSON.stringify(value));
@@ -25,6 +27,7 @@
     return {
       title: text(legacy.title || legacy.stepTitle),
       instruction: text(legacy.instruction || legacy.description),
+      instructionRuns: clone(legacy.instructionRuns || value.instructionRuns || null),
       comment: text(legacy.comment || legacy.userComment),
       screenshotAssetIds: sourceIds(value, "sourceScreenshotAssetIds", "screenshots"),
       selectedScreenshotAssetId: value.selectedScreenshotAssetId ||
@@ -154,6 +157,8 @@
         ? fields.title : base.title,
       instruction: Object.prototype.hasOwnProperty.call(fields, "instruction")
         ? fields.instruction : base.instruction,
+      instructionRuns: Object.prototype.hasOwnProperty.call(fields,
+        "instructionRuns") ? clone(fields.instructionRuns) : base.instructionRuns,
       userComment: Object.prototype.hasOwnProperty.call(fields, "comment")
         ? fields.comment : base.comment,
       comment: Object.prototype.hasOwnProperty.call(fields, "comment")

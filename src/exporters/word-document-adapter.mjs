@@ -33,10 +33,11 @@ function formattedTextRuns(value, options = {}) {
     new TextRun({
       text: segment.text.replace(/`/g, ""),
       bold: Boolean(options.bold) || segment.bold,
-      italics: Boolean(options.italics),
+      italics: Boolean(options.italics) || segment.italic,
       color: options.color,
-      size: options.size,
-      font: segment.monospace ? "Consolas" : options.font,
+      size: segment.fontSize ? halfPoints(segment.fontSize, 11) : options.size,
+      font: segment.monospace ? "Consolas" :
+        segment.fontFamily || options.font,
     })
   );
 }

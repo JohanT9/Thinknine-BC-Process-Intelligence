@@ -105,6 +105,30 @@ assert.strictEqual(legacy.runs.find(run => run.text === "Table 27").role,
   "identifier");
 assert.strictEqual(legacy.runs.find(run => run.text === "ABC123").bold, true);
 
+const userFormattedDocument = grammar.process({
+  schemaVersion: 1,
+  documentId: "formatted",
+  metadata: {},
+  sections: [{ sectionId: "workflow", kind: "workflow", title: "Arbetsgång",
+    blocks: [{ blockId: "step", kind: "step", blocks: [{
+      blockId: "instruction", kind: "paragraph", text: "Ange 30043.",
+      preserveUserText: true,
+      presentationRuns: [
+        { text: "Ange " },
+        { text: "30043", bold: true, italic: true,
+          fontFamily: "Aptos", fontSize: 12 },
+        { text: "." }
+      ]
+    }] }]
+  }],
+  provenance: { transformations: [] }
+});
+assert.deepStrictEqual(userFormattedDocument.sections[0].blocks[0].blocks[0]
+  .presentationRuns[1], {
+  text: "30043", bold: true, italic: true,
+  fontFamily: "Aptos", fontSize: 12
+});
+
 const futureProjection = JSON.parse(JSON.stringify(projector.project({
   sessionId: "immutable", sessionName: "Immutable", tasks: [{
     taskId: "future", instruction: "Behåll framtida data."

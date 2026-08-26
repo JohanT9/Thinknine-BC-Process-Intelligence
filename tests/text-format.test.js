@@ -28,4 +28,28 @@ assert.deepStrictEqual(
     { text: ' i "Referens".', bold: false }]
 );
 
+const formatted = textFormat.applyInstructionFormat(
+  [{ text: "Ange 30043 i Nr." }], "Ange 30043 i Nr.", 5, 10,
+  { bold: true, fontFamily: "Aptos", fontSize: 12 }
+);
+assert.deepStrictEqual(formatted, [
+  { text: "Ange " },
+  { text: "30043", bold: true, fontFamily: "Aptos", fontSize: 12 },
+  { text: " i Nr." }
+]);
+assert.deepStrictEqual(textFormat.applyInstructionFormat(
+  formatted, "Ange 30043 i Nr.", 5, 10, { italic: true }
+)[1], {
+  text: "30043", bold: true, italic: true,
+  fontFamily: "Aptos", fontSize: 12
+});
+assert.deepStrictEqual(textFormat.normalizeInstructionRuns([
+  { text: "Text", fontFamily: "Comic Sans MS", fontSize: 72, bold: true }
+], "Text"), [{ text: "Text", bold: true }]);
+assert.deepStrictEqual(textFormat.normalizeInstructionRuns([
+  { text: "Fel text", bold: true }
+], "Rätt text"), [{ text: "Rätt text" }]);
+assert(Object.isFrozen(textFormat.FONT_FAMILIES));
+assert(Object.isFrozen(textFormat.FONT_SIZES));
+
 console.log("Text formatting behaviour tests passed.");

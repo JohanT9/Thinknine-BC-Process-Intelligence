@@ -91,6 +91,10 @@
     function handleFocusOut(event) {
       const details = context(event.target);
       if (details?.control?.dataset.editing === "true") {
+        if (event.relatedTarget?.closest?.("[data-instruction-format-toolbar]") &&
+            event.relatedTarget.closest("[data-review-task-id]") === details.card) {
+          return;
+        }
         options.commit(details);
       }
     }

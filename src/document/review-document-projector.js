@@ -301,6 +301,8 @@
         blockId: `block:instruction:${stepKey}`,
         kind: "paragraph",
         text: instruction,
+        ...(Array.isArray(task.instructionRuns)
+          ? { presentationRuns: clone(task.instructionRuns) } : {}),
         sourceRef,
         provenance: task.provenance === "manual" ? "manual" :
           task.fieldProvenance?.instruction ||

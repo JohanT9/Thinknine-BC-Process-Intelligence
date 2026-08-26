@@ -26,9 +26,12 @@
 
   function appendRuns(element, runs, documentValue) {
     for (const run of runs || []) {
-      const child = documentValue.createElement(run.bold
-        ? "strong" : run.monospace ? "code" : "span");
+      const child = documentValue.createElement(run.bold ? "strong" :
+        run.italic ? "em" : run.monospace ? "code" : "span");
       child.textContent = run.text || "";
+      if (run.italic && run.bold) child.style.fontStyle = "italic";
+      if (run.fontFamily) child.style.fontFamily = run.fontFamily;
+      if (run.fontSize) child.style.fontSize = `${run.fontSize}pt`;
       element.appendChild(child);
     }
   }

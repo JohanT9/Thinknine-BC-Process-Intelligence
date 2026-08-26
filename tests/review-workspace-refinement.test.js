@@ -47,6 +47,14 @@ assert(html.indexOf('<details class="annotation-advanced">') <
   html.indexOf('id="annotationProperties"'));
 assert(dashboard.includes('control.scrollIntoView({ block: "nearest"'));
 assert(dashboard.includes('control.focus({ preventScroll: true })'));
+assert(html.includes(".review-instruction-preview"));
+assert(html.includes(".instruction-format-toolbar"));
+assert(dashboard.includes("data-instruction-preview"));
+assert(dashboard.includes("data-instruction-format=\"bold\""));
+assert(dashboard.includes("data-instruction-format=\"italic\""));
+assert(dashboard.includes("data-instruction-font"));
+assert(dashboard.includes("data-instruction-size"));
+assert(dashboard.includes("normalizeInstructionRuns"));
 assert(dashboard.includes('$("reviewMoreActions").addEventListener("toggle"'));
 
 console.log("Review Workspace refinement regression tests passed.");

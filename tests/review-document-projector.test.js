@@ -248,6 +248,30 @@ assert.ok(legacy.diagnostics.some(item => item.code === "missing-metadata"));
 assert.ok(legacy.diagnostics.some(item => item.code === "invalid-reference"));
 assert.strictEqual(model.validate(legacy.document).valid, true);
 
+const formatted = projector.project({
+  sessionId: "formatted",
+  sessionName: "Formatted",
+  tasks: [{
+    taskId: "formatted-step",
+    instruction: "Ange 30043.",
+    instructionRuns: [{ text: "Ange " },
+      { text: "30043", bold: true, italic: true,
+        fontFamily: "Aptos", fontSize: 12 }, { text: "." }],
+    stepOverride: { fields: { instruction: "Ange 30043." } },
+    fieldProvenance: { instruction: "user-edited" }
+  }]
+});
+const formattedParagraph = formatted.document.sections.find(
+  section => section.kind === "workflow"
+).blocks.find(block => block.kind === "step").blocks.find(
+  block => block.kind === "paragraph"
+);
+assert.deepStrictEqual(formattedParagraph.presentationRuns[1], {
+  text: "30043", bold: true, italic: true,
+  fontFamily: "Aptos", fontSize: 12
+});
+assert.strictEqual(formattedParagraph.preserveUserText, true);
+
 const incomplete = projector.project({
   sessionId: "incomplete",
   tasks: [{ taskId: "empty" }],

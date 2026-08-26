@@ -529,6 +529,17 @@
       stepOverride = stepEditor.edit(
         { ...task, stepOverride }, "instruction", patch.instruction, { now }
       );
+      if (patch.instructionRuns === undefined) {
+        stepOverride = stepEditor.edit(
+          { ...task, stepOverride }, "instructionRuns", null, { now }
+        );
+      }
+    }
+    if (patch.instructionRuns !== undefined) {
+      stepOverride = stepEditor.edit(
+        { ...task, stepOverride }, "instructionRuns", patch.instructionRuns,
+        { now }
+      );
     }
     if (patch.userComment !== undefined) {
       stepOverride = stepEditor.edit(
@@ -772,6 +783,11 @@
     review.tasks[index].stepOverride = stepEditor.reset(
       review.tasks[index], field, options
     );
+    if (field === "instruction" && review.tasks[index].stepOverride) {
+      review.tasks[index].stepOverride = stepEditor.reset(
+        review.tasks[index], "instructionRuns", options
+      );
+    }
     review.updatedAt = options.now || new Date().toISOString();
     return record(review, "step-reset", beforeTasks, options);
   }

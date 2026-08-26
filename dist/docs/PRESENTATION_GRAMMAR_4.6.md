@@ -79,8 +79,13 @@ same Document Plan runs and must not recreate grammar rules.
 
 ## Compatibility and verification
 
-Existing Reviews need no migration and Presentation Grammar output is never
-persisted back to Review. Tests cover structured selection, field entry,
+Existing Reviews need no migration. Generated Presentation Grammar output is
+derived in memory, while an explicit consultant formatting override is stored
+as renderer-neutral `instructionRuns` on that Review step. The projector maps
+those runs to Semantic Document `presentationRuns`; Document Workspace and Word
+consume the same contract. Supported overrides are bold, italic, a constrained
+font-family list and a constrained point-size list. Raw HTML is never stored.
+Tests cover structured selection, field entry,
 options, booleans, legacy text, shortcuts, identifiers, immutable processing,
 future-field preservation, Document Workspace output, screen-reader text and
 DOCX bold formatting.

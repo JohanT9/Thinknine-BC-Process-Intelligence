@@ -1,5 +1,9 @@
 # Changelog
 
+- Brought Presentation Grammar into BC Review Studio so generated emphasis is
+  visible before opening BC Document Generator, and added reversible instruction
+  formatting for bold, italic, font family and font size with matching Document
+  Generator and Word output.
 - Added the observed Business Central company as an automatic, additive
   Document Library tag and introduced case-insensitive `Feld*` prefix and
   `*feld*` contains wildcard searches without requiring new recordings.
