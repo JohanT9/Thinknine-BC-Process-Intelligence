@@ -130,6 +130,12 @@ assert.ok(
   "Document Workspace and Word must share pipeline and prepared-media composition."
 );
 assert.ok(
+  dashboard.includes("function composeDocumentWorkspaceMedia(") &&
+    dashboard.includes("screenshotSources, source => source") &&
+    dashboard.includes('source: typeof value === "string"'),
+  "Document Workspace must preserve original data URLs instead of decoding and re-encoding them."
+);
+assert.ok(
   dashboard.includes("activeDocumentPipelineCache.get") &&
     dashboard.includes("workspaceState.revision") &&
     dashboard.includes("const matchesPipeline") &&

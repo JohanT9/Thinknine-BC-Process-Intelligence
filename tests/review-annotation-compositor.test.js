@@ -137,6 +137,15 @@ function renderingEnvironment() {
   assert.strictEqual(batchEnvironment.canvases.length, 2);
   assert.deepStrictEqual(originals, [sources["plain.png"], sources["future.png"]]);
 
+  const workspaceBatch = await compositor.composeReview({
+    review,
+    paths: ["plain.png", "future.png"],
+    screenshotSources: sources,
+    convertOriginal(source) { return source; }
+  });
+  assert.strictEqual(workspaceBatch["plain.png"], sources["plain.png"]);
+  assert.strictEqual(workspaceBatch["future.png"], sources["future.png"]);
+
   const repeatedEnvironment = renderingEnvironment();
   await compositor.composeReview({
     review,

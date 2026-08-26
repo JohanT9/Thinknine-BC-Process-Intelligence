@@ -3150,6 +3150,27 @@ function screenshotCandidatesFor(model, review) {
 }
 
 async function composeDocumentMedia(pipeline, review, screenshotSources) {
+  return composeDocumentMediaForTarget(
+    pipeline, review, screenshotSources, dataUrlToImageData
+  );
+}
+
+async function composeDocumentWorkspaceMedia(
+  pipeline,
+  review,
+  screenshotSources
+) {
+  return composeDocumentMediaForTarget(
+    pipeline, review, screenshotSources, source => source
+  );
+}
+
+async function composeDocumentMediaForTarget(
+  pipeline,
+  review,
+  screenshotSources,
+  convertOriginal
+) {
   const requiredAssetIds = new Set(
     globalThis.T9WordExportPipeline.requiredMediaAssetIds(pipeline.plan)
   );
@@ -3165,7 +3186,7 @@ async function composeDocumentMedia(pipeline, review, screenshotSources) {
       review,
       paths: screenshotPaths,
       screenshotSources: screenshotSources || {},
-      convertOriginal: dataUrlToImageData
+      convertOriginal
     });
   return Object.fromEntries(screenshotAssets.map(asset => [
     asset.assetId,
@@ -4042,7 +4063,9 @@ async function synchronizeDocumentWorkspace() {
       $("documentWorkspaceStatus").textContent = "Uppdaterar dokumentet...";
       try {
         const pipeline = createActiveDocumentPipeline();
-        const mediaAssets = await prepareDocumentMedia(pipeline);
+        const mediaAssets = await composeDocumentWorkspaceMedia(
+          pipeline, activeReview, activeReviewModel?.screenshotData
+        );
         if (requestedRevision !== workspaceState.revision) continue;
         documentProfileSource = {
           semanticDocument: pipeline.semanticDocument,
@@ -4052,7 +4075,9 @@ async function synchronizeDocumentWorkspace() {
         documentWorkspaceMediaSources = Object.fromEntries(
           Object.entries(mediaAssets).map(
           ([assetId, value]) => [assetId, {
-            source: imageDataToDataUrl(value),
+            source: typeof value === "string"
+              ? value
+              : imageDataToDataUrl(value),
             revision: requestedRevision
           }]
         ));

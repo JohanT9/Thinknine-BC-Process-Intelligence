@@ -612,6 +612,10 @@ language, presentation, screenshot selection, planning and diagnostics. A
 Review invalidation changes the revision key, and closing the Review releases
 the retained value. The active profile variant also reuses the pipeline's
 already resolved Semantic Document, screenshot selections and plan.
+Document Workspace also keeps unannotated screenshots as their existing data
+URLs. Only annotated screenshots enter canvas composition. Byte-array conversion
+remains isolated to Word export, which avoids a decode/re-encode cycle for every
+image while opening the browser workspace.
 
 Dashboarden är fortsatt composition root. Den kör samma pipeline och samma
 annotationskomposition för Document Workspace och Word, men äger ingen
