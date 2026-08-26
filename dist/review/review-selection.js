@@ -121,7 +121,7 @@
       const card = cardFrom(event.target);
       if (!card) return;
       const interactive = event.target.closest?.(
-        "button, input, textarea, select, a"
+        "button, input, textarea, select, a, [contenteditable=\"true\"]"
       );
       options.dispatch({
         type: "select",

@@ -1,5 +1,8 @@
 # Changelog
 
+- Kept rich instruction editing active while clicking and dragging within the
+  contenteditable text, so selections can be adjusted without focus returning
+  to the surrounding review card.
 - Made the instruction formatting toolbar report the selected text's effective
   font family and point size, and added eight-option text and highlight colour
   palettes that flow consistently through Review, Document Generator and Word.

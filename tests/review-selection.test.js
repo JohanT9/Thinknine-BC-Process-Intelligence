@@ -123,6 +123,21 @@ listeners.click({
 });
 assert.strictEqual(dispatched.at(-1).focus, false);
 
+const richTextTarget = {
+  closest(selector) {
+    if (selector === "[data-review-task-id]") return card;
+    if (selector.includes("[contenteditable=\"true\"]")) return this;
+    return null;
+  }
+};
+listeners.click({
+  target: richTextTarget,
+  ctrlKey: false,
+  metaKey: false,
+  shiftKey: false
+});
+assert.strictEqual(dispatched.at(-1).focus, false);
+
 let prevented = false;
 listeners.keydown({
   target: card,
