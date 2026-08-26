@@ -4924,21 +4924,18 @@ function reviewInstructionRuns(task, documentRunsByTask = null) {
 
 function instructionRunsHtml(runs) {
   return runs.map(run => {
-    const styles = [
-      run.bold ? "font-weight:700" : "",
-      run.italic ? "font-style:italic" : "",
-      run.monospace ? "font-family:monospace" : "",
-      run.fontFamily ? `font-family:${run.fontFamily}` : "",
-      run.fontSize ? `font-size:${run.fontSize}pt` : "",
-      run.textColor ? `color:${run.textColor}` : "",
-      run.backgroundColor ? `background-color:${run.backgroundColor}` : ""
-    ].filter(Boolean).join(";");
     const data = [
+      run.bold ? ' data-format-bold="true"' : "",
+      run.italic ? ' data-format-italic="true"' : "",
+      run.monospace ? ' data-format-monospace="true"' : "",
+      run.fontFamily
+        ? ` data-font-family="${escapeHtml(run.fontFamily)}"` : "",
+      run.fontSize ? ` data-font-size="${run.fontSize}"` : "",
       run.textColor ? ` data-text-color="${run.textColor}"` : "",
       run.backgroundColor
         ? ` data-background-color="${run.backgroundColor}"` : ""
     ].join("");
-    return `<span${styles ? ` style="${styles}"` : ""}${data}>${escapeHtml(run.text)}</span>`;
+    return `<span${data}>${escapeHtml(run.text)}</span>`;
   }).join("");
 }
 
@@ -5004,16 +5001,21 @@ function instructionRunsFromEditor(editor) {
     }
     if (node.nodeType !== Node.ELEMENT_NODE) return;
     const style = node.style || {};
+    const fontFamily = node.dataset.fontFamily || style.fontFamily;
+    const fontSize = Number(node.dataset.fontSize || parseFloat(style.fontSize));
     const next = {
       ...format,
-      ...(style.fontWeight === "700" || style.fontWeight === "bold"
+      ...(node.dataset.formatBold === "true" ||
+          style.fontWeight === "700" || style.fontWeight === "bold"
         ? { bold: true } : {}),
-      ...(style.fontStyle === "italic" ? { italic: true } : {}),
-      ...(style.fontFamily === "monospace" ? { monospace: true } : {}),
-      ...(globalThis.T9TextFormat.FONT_FAMILIES.includes(style.fontFamily)
-        ? { fontFamily: style.fontFamily } : {}),
-      ...(globalThis.T9TextFormat.FONT_SIZES.includes(parseFloat(style.fontSize))
-        ? { fontSize: parseFloat(style.fontSize) } : {}),
+      ...(node.dataset.formatItalic === "true" || style.fontStyle === "italic"
+        ? { italic: true } : {}),
+      ...(node.dataset.formatMonospace === "true" ||
+          style.fontFamily === "monospace" ? { monospace: true } : {}),
+      ...(globalThis.T9TextFormat.FONT_FAMILIES.includes(fontFamily)
+        ? { fontFamily } : {}),
+      ...(globalThis.T9TextFormat.FONT_SIZES.includes(fontSize)
+        ? { fontSize } : {}),
       ...(globalThis.T9TextFormat.COLORS.some(color =>
         color.value === node.dataset.textColor)
         ? { textColor: node.dataset.textColor } : {}),

@@ -1,5 +1,7 @@
 # Changelog
 
+- Rendered Review instruction formatting through CSP-safe data attributes and
+  static stylesheet rules instead of inline styles injected through HTML.
 - Committed an active rich-instruction edit before opening Document Generator,
   ensuring the preview always consumes the same latest formatting as Review.
 - Preserved the active rich-text range before opening formatting controls,
