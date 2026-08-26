@@ -55,6 +55,9 @@ assert(dashboard.includes("data-instruction-format=\"italic\""));
 assert(dashboard.includes("data-instruction-font"));
 assert(dashboard.includes("data-instruction-size"));
 assert(dashboard.includes("normalizeInstructionRuns"));
+assert(dashboard.includes('editor.contentEditable = "true"'));
+assert(dashboard.includes("instructionRunsFromEditor"));
+assert(html.includes('.review-fields textarea[hidden]{display:none}'));
 assert(dashboard.includes('$("reviewMoreActions").addEventListener("toggle"'));
 
 console.log("Review Workspace refinement regression tests passed.");

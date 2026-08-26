@@ -66,6 +66,19 @@
       SelectLocation: field || "Lagerställe",
       SelectDimension: field || "Dimension"
     };
+    if (actionType === "SearchAndOpenPage") {
+      const search = String(action?.searchCaption || "Sök").trim();
+      const searchField = String(action?.searchFieldCaption || field ||
+        "Berätta vad du vill göra.").trim();
+      const result = String(action?.resultCaption || action?.selectedCaption ||
+        action?.pageCaption || "").trim();
+      if (result) {
+        return sentence(run("Välj ", "action"), quoted(search),
+          run(", ange "), value ? run(value, "value") : run("söktext"),
+          run(" i "), quoted(searchField), run(" och välj "),
+          quoted(result), run("."));
+      }
+    }
     if (selectLabels[actionType] && value) {
       return sentence(run("Välj ", "action"), quoted(selectLabels[actionType]),
         run(" "), run(value, "value"), run("."));

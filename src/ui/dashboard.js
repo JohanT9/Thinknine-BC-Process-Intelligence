@@ -4452,7 +4452,15 @@ function finishReviewEdit(control, commit) {
     card.querySelector('[data-action="add-comment"]').hidden = false;
   }
   control.readOnly = true;
-  if (edit.field === "instruction") control.hidden = true;
+  if (edit.field === "instruction") {
+    control.hidden = true;
+    const editor = control.closest("[data-review-task-id]")
+      ?.querySelector("[data-instruction-preview]");
+    if (editor) {
+      editor.contentEditable = "false";
+      delete editor.dataset.editing;
+    }
+  }
   delete control.dataset.editing;
   activeReviewEdit = null;
   if (edit.field === "instruction") {
@@ -4481,10 +4489,23 @@ function beginReviewEdit({ control, taskId, field }) {
     activeReviewEdit.originalInstructionRuns = JSON.stringify(runs);
     activeReviewEdit.selectionStart = 0;
     activeReviewEdit.selectionEnd = control.value.length;
-    control.hidden = false;
-    control.closest("[data-review-task-id]")
-      ?.querySelector("[data-instruction-format-toolbar]")
+    const card = control.closest("[data-review-task-id]");
+    card?.querySelector("[data-instruction-format-toolbar]")
       ?.removeAttribute("hidden");
+    const editor = card?.querySelector("[data-instruction-preview]");
+    if (editor) {
+      editor.contentEditable = "true";
+      editor.dataset.editing = "true";
+      editor.scrollIntoView({ block: "nearest", inline: "nearest" });
+      editor.focus({ preventScroll: true });
+      const range = document.createRange();
+      range.selectNodeContents(editor);
+      const selection = globalThis.getSelection?.();
+      selection?.removeAllRanges();
+      selection?.addRange(range);
+    }
+    control.dataset.editing = "true";
+    return;
   }
   control.readOnly = false;
   control.dataset.editing = "true";
@@ -4889,17 +4910,92 @@ function updateInstructionPreview(taskId, runs) {
   const card = [...$("reviewList").querySelectorAll("[data-review-task-id]")]
     .find(element => element.dataset.reviewTaskId === taskId);
   const preview = card?.querySelector("[data-instruction-preview]");
-  if (preview) preview.innerHTML = instructionRunsHtml(runs);
+  if (preview) {
+    preview.innerHTML = instructionRunsHtml(runs);
+    if (preview.dataset.editing === "true") {
+      restoreInstructionSelection(preview,
+        activeReviewEdit.selectionStart, activeReviewEdit.selectionEnd);
+    }
+  }
 }
 
-function rememberInstructionSelection(control) {
-  if (!activeReviewEdit || activeReviewEdit.field !== "instruction") return;
-  activeReviewEdit.selectionStart = control.selectionStart;
-  activeReviewEdit.selectionEnd = control.selectionEnd;
+function instructionSelectionOffsets(editor) {
+  const selection = globalThis.getSelection?.();
+  if (!selection?.rangeCount || !editor.contains(selection.anchorNode) ||
+      !editor.contains(selection.focusNode)) return null;
+  const offset = (node, position) => {
+    const range = document.createRange();
+    range.selectNodeContents(editor);
+    range.setEnd(node, position);
+    return range.toString().length;
+  };
+  const anchor = offset(selection.anchorNode, selection.anchorOffset);
+  const focus = offset(selection.focusNode, selection.focusOffset);
+  return { start: Math.min(anchor, focus), end: Math.max(anchor, focus) };
 }
 
-function applyInstructionFormatting(control, patch) {
+function restoreInstructionSelection(editor, start, end) {
+  const range = document.createRange();
+  const selection = globalThis.getSelection?.();
+  let offset = 0;
+  let startPoint = null;
+  let endPoint = null;
+  const walker = document.createTreeWalker(editor, NodeFilter.SHOW_TEXT);
+  let node;
+  while ((node = walker.nextNode())) {
+    const next = offset + node.textContent.length;
+    if (!startPoint && start <= next) startPoint = [node, start - offset];
+    if (!endPoint && end <= next) { endPoint = [node, end - offset]; break; }
+    offset = next;
+  }
+  const fallback = editor.lastChild || editor;
+  const fallbackOffset = fallback.nodeType === Node.TEXT_NODE
+    ? fallback.textContent.length : fallback.childNodes.length;
+  startPoint ||= [fallback, fallbackOffset];
+  endPoint ||= [fallback, fallbackOffset];
+  range.setStart(...startPoint);
+  range.setEnd(...endPoint);
+  selection?.removeAllRanges();
+  selection?.addRange(range);
+}
+
+function instructionRunsFromEditor(editor) {
+  const runs = [];
+  const visit = (node, format = {}) => {
+    if (node.nodeType === Node.TEXT_NODE) {
+      if (node.textContent) runs.push({ text: node.textContent, ...format });
+      return;
+    }
+    if (node.nodeType !== Node.ELEMENT_NODE) return;
+    const style = node.style || {};
+    const next = {
+      ...format,
+      ...(style.fontWeight === "700" || style.fontWeight === "bold"
+        ? { bold: true } : {}),
+      ...(style.fontStyle === "italic" ? { italic: true } : {}),
+      ...(style.fontFamily === "monospace" ? { monospace: true } : {}),
+      ...(globalThis.T9TextFormat.FONT_FAMILIES.includes(style.fontFamily)
+        ? { fontFamily: style.fontFamily } : {}),
+      ...(globalThis.T9TextFormat.FONT_SIZES.includes(parseFloat(style.fontSize))
+        ? { fontSize: parseFloat(style.fontSize) } : {})
+    };
+    for (const child of node.childNodes) visit(child, next);
+  };
+  for (const child of editor.childNodes) visit(child);
+  return runs;
+}
+
+function rememberInstructionSelection(editor) {
   if (!activeReviewEdit || activeReviewEdit.field !== "instruction") return;
+  const offsets = instructionSelectionOffsets(editor);
+  if (!offsets) return;
+  activeReviewEdit.selectionStart = offsets.start;
+  activeReviewEdit.selectionEnd = offsets.end;
+}
+
+function applyInstructionFormatting(control, editor, patch) {
+  if (!activeReviewEdit || activeReviewEdit.field !== "instruction") return;
+  rememberInstructionSelection(editor);
   activeReviewEdit.instructionRuns = globalThis.T9TextFormat.applyInstructionFormat(
     activeReviewEdit.instructionRuns,
     control.value,
@@ -4909,9 +5005,7 @@ function applyInstructionFormatting(control, patch) {
   );
   updateInstructionPreview(activeReviewEdit.taskId,
     activeReviewEdit.instructionRuns);
-  control.focus({ preventScroll: true });
-  control.setSelectionRange(activeReviewEdit.selectionStart,
-    activeReviewEdit.selectionEnd);
+  editor.focus({ preventScroll: true });
 }
 
 function renderReview() {
@@ -5122,11 +5216,36 @@ function renderReview() {
     const instructionControl = card.querySelector(
       '[data-edit-field="instruction"]'
     );
-    for (const eventName of ["select", "click", "keyup"]) {
-      instructionControl.addEventListener(eventName, () => {
-        rememberInstructionSelection(instructionControl);
+    const instructionEditor = card.querySelector("[data-instruction-preview]");
+    for (const eventName of ["mouseup", "keyup"]) {
+      instructionEditor.addEventListener(eventName, () => {
+        rememberInstructionSelection(instructionEditor);
       });
     }
+    instructionEditor.addEventListener("input", () => {
+      if (instructionEditor.dataset.editing !== "true" || !activeReviewEdit) return;
+      const value = instructionEditor.textContent || "";
+      instructionControl.value = value;
+      activeReviewEdit = globalThis.T9ReviewEdit.update(activeReviewEdit, value);
+      activeReviewEdit.instructionRuns = globalThis.T9TextFormat
+        .normalizeInstructionRuns(instructionRunsFromEditor(instructionEditor), value);
+      rememberInstructionSelection(instructionEditor);
+    });
+    instructionEditor.addEventListener("keydown", event => {
+      if (instructionEditor.dataset.editing !== "true") return;
+      if (event.key === "Escape" ||
+          (event.key === "Enter" && (event.ctrlKey || event.metaKey))) {
+        event.preventDefault();
+        finishReviewEdit(instructionControl, event.key !== "Escape");
+      }
+    });
+    instructionEditor.addEventListener("focusout", event => {
+      if (instructionEditor.dataset.editing !== "true") return;
+      if (event.relatedTarget?.closest?.("[data-instruction-format-toolbar]")) {
+        return;
+      }
+      finishReviewEdit(instructionControl, true);
+    });
     for (const button of card.querySelectorAll("[data-instruction-format]")) {
       button.addEventListener("mousedown", event => event.preventDefault());
       button.addEventListener("click", () => {
@@ -5143,19 +5262,21 @@ function renderReview() {
         });
         const enabled = !selectedRuns.every(run => run[property] === true);
         button.setAttribute("aria-pressed", String(enabled));
-        applyInstructionFormatting(instructionControl,
+        applyInstructionFormatting(instructionControl, instructionEditor,
           { [property]: enabled });
       });
     }
     card.querySelector("[data-instruction-font]")
       .addEventListener("change", event => {
         if (event.target.value) applyInstructionFormatting(instructionControl,
+          instructionEditor,
           { fontFamily: event.target.value });
         event.target.value = "";
       });
     card.querySelector("[data-instruction-size]")
       .addEventListener("change", event => {
         if (event.target.value) applyInstructionFormatting(instructionControl,
+          instructionEditor,
           { fontSize: Number(event.target.value) });
         event.target.value = "";
       });

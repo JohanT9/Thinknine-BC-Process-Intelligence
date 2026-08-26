@@ -63,6 +63,14 @@ assert.strictEqual(search.text,
 assert.strictEqual(search.presentationRuns.find(run => run.text === "för ord").bold,
   true);
 
+const reviewSearch = grammar.presentationFor({
+  taskType: "SearchAndOpenPage", searchCaption: "Sök",
+  searchFieldCaption: "Berätta vad du vill göra.",
+  resultCaption: "Förs.order", value: "för ord"
+}, "Äldre text.");
+assert.strictEqual(reviewSearch.runs.find(run => run.text === "för ord").bold,
+  true);
+
 const option = paragraph({
   taskId: "status", taskType: "SelectOption", fieldCaption: "Status",
   value: "Frisläppt", instruction: "Välj status."
