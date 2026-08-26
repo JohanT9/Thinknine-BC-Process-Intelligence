@@ -4488,7 +4488,10 @@ function beginReviewEdit({ control, taskId, field }) {
   if (field === "instruction") {
     const task = globalThis.T9Review.activeTasks(activeReview)
       .find(candidate => candidate.taskId === taskId);
-    const runs = reviewInstructionRuns(task, documentInstructionRunsByTask());
+    const presentation = reviewInstructionPresentation(task,
+      documentInstructionPresentationsByTask());
+    control.value = presentation.text;
+    const runs = presentation.runs;
     activeReviewEdit.instructionRuns = runs;
     activeReviewEdit.originalInstructionRuns = JSON.stringify(runs);
     activeReviewEdit.selectionStart = 0;
@@ -4879,7 +4882,7 @@ function deleteSelectedAnnotation() {
   return true;
 }
 
-function documentInstructionRunsByTask() {
+function documentInstructionPresentationsByTask() {
   const result = new Map();
   try {
     const documentModel = createActiveDocumentPipeline().semanticDocument;
@@ -4889,8 +4892,10 @@ function documentInstructionRunsByTask() {
           const paragraph = block.blocks?.find(child =>
             child.kind === "paragraph" && Array.isArray(child.presentationRuns)
           );
-          if (paragraph) result.set(block.sourceRef.taskId,
-            paragraph.presentationRuns);
+          if (paragraph) result.set(block.sourceRef.taskId, {
+            text: paragraph.text,
+            runs: paragraph.presentationRuns
+          });
         }
         visit(block.blocks);
       }
@@ -4902,10 +4907,10 @@ function documentInstructionRunsByTask() {
   return result;
 }
 
-function reviewInstructionRuns(task, documentRunsByTask = null) {
-  const instruction = globalThis.T9TextFormat.quoteEmphasis(
-    task?.instruction || ""
-  );
+function reviewInstructionPresentation(task, documentPresentations = null) {
+  const reviewText = globalThis.T9TextFormat.quoteEmphasis(
+    task?.instruction || "");
+  const documentPresentation = documentPresentations?.get(task?.taskId);
   const automatic = globalThis.T9PresentationGrammar.presentationFor(
     task?.semanticActionModel || task,
     task?.instruction || ""
@@ -4915,11 +4920,14 @@ function reviewInstructionRuns(task, documentRunsByTask = null) {
     ...(run.italic ? { italic: true } : {}),
     ...(run.monospace ? { monospace: true } : {})
   }));
-  return globalThis.T9TextFormat.normalizeInstructionRuns(
-    Array.isArray(task?.instructionRuns) ? task.instructionRuns :
-      documentRunsByTask?.get(task?.taskId) || automatic,
-    instruction
-  );
+  return globalThis.T9TextFormat.resolveInstructionPresentation({
+    reviewText,
+    reviewRuns: task?.instructionRuns,
+    reviewRunsUserEdited:
+      task?.fieldProvenance?.instructionRuns === "user-edited",
+    documentPresentation,
+    automaticRuns: automatic
+  });
 }
 
 function instructionRunsHtml(runs) {
@@ -5171,7 +5179,7 @@ function renderReview() {
   }
 
   const tasks = globalThis.T9Review.activeTasks(activeReview);
-  const documentRunsByTask = documentInstructionRunsByTask();
+  const documentPresentations = documentInstructionPresentationsByTask();
   const progress = globalThis.T9Review.progress(activeReview);
   const hierarchyState = globalThis.T9DocumentationHierarchy.resolve(
     tasks, activeReview.hierarchy
@@ -5233,6 +5241,8 @@ function renderReview() {
           : "");
 
     const images = reviewImages(task);
+    const instructionPresentation = reviewInstructionPresentation(task,
+      documentPresentations);
 
     card.innerHTML = `
       <div class="review-number" role="gridcell">${visibleIndex + 1}</div>
@@ -5244,7 +5254,7 @@ function renderReview() {
         </div>
         <div id="review-instruction-preview-${visibleIndex}"
           class="review-instruction-preview" data-field="instruction"
-          data-instruction-preview tabindex="0">${instructionRunsHtml(reviewInstructionRuns(task, documentRunsByTask))}</div>
+          data-instruction-preview tabindex="0">${instructionRunsHtml(instructionPresentation.runs)}</div>
         <div class="instruction-format-toolbar" data-instruction-format-toolbar hidden
           role="toolbar" aria-label="Textformatering">
           <button type="button" class="secondary" data-instruction-format="bold"
@@ -5272,7 +5282,7 @@ function renderReview() {
           aria-label="Instruktion för steg ${visibleIndex + 1}"
           aria-keyshortcuts="Enter Control+Enter Meta+Enter Escape"
           title="Dubbelklicka eller tryck Enter för att redigera. Ctrl+Enter sparar"
-          readonly>${escapeHtml(globalThis.T9TextFormat.quoteEmphasis(task.instruction))}</textarea>
+          readonly>${escapeHtml(instructionPresentation.text)}</textarea>
         <div class="review-comment-section" ${task.userComment ? "" : "hidden"}>
           <div class="review-field-heading">
             <label for="review-comment-${visibleIndex}">Kommentar</label>

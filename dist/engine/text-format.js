@@ -125,6 +125,29 @@
     return normalizeInstructionRuns(mergeInstructionRuns(result), text);
   }
 
+  function resolveInstructionPresentation(options = {}) {
+    const reviewText = String(options.reviewText ?? "");
+    const documentPresentation = options.documentPresentation;
+    const hasDocumentText = typeof documentPresentation?.text === "string";
+    const useReviewOverride = options.reviewRunsUserEdited === true &&
+      Array.isArray(options.reviewRuns);
+    const text = useReviewOverride || !hasDocumentText
+      ? reviewText
+      : documentPresentation.text;
+    const runs = useReviewOverride
+      ? options.reviewRuns
+      : Array.isArray(documentPresentation?.runs)
+        ? documentPresentation.runs
+        : options.automaticRuns;
+    return {
+      text,
+      runs: normalizeInstructionRuns(runs, text),
+      source: useReviewOverride ? "review-override" :
+        hasDocumentText ? "semantic-document" : "automatic"
+    };
+  }
+
   return { COLORS, FONT_FAMILIES, FONT_SIZES, applyInstructionFormat,
-    instructionSegments, normalizeInstructionRuns, quoteEmphasis };
+    instructionSegments, normalizeInstructionRuns, quoteEmphasis,
+    resolveInstructionPresentation };
 });

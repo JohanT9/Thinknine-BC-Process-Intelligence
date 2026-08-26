@@ -88,6 +88,11 @@ font-family list, a constrained point-size list and separate constrained
 eight-colour text and background palettes. The Review toolbar reports the
 effective format of the current selection and uses a mixed state when required.
 Raw HTML is never stored.
+BC Review Studio also consumes the resolved Semantic Document paragraph text
+and `presentationRuns` as its standard presentation. It does not independently
+reconstruct formatting from the lower-level Review instruction when the
+resolved paragraph is available. A consultant edit then becomes the explicit
+Review override used by both workspaces.
 Tests cover structured selection, field entry,
 options, booleans, legacy text, shortcuts, identifiers, immutable processing,
 future-field preservation, Document Workspace output, screen-reader text and

@@ -61,4 +61,39 @@ assert.deepStrictEqual(textFormat.normalizeInstructionRuns([
   { text: "Text", textColor: "#123456", backgroundColor: "transparent" }
 ], "Text"), [{ text: "Text" }]);
 
+assert.deepStrictEqual(textFormat.resolveInstructionPresentation({
+  reviewText: 'Ange "Nr".',
+  documentPresentation: {
+    text: 'Ange 30043 i "Nr".',
+    runs: [
+      { text: "Ange " },
+      { text: "30043", bold: true },
+      { text: ' i "Nr".' }
+    ]
+  },
+  automaticRuns: [{ text: 'Ange "Nr".' }]
+}), {
+  text: 'Ange 30043 i "Nr".',
+  runs: [
+    { text: "Ange " },
+    { text: "30043", bold: true },
+    { text: ' i "Nr".' }
+  ],
+  source: "semantic-document"
+});
+
+assert.deepStrictEqual(textFormat.resolveInstructionPresentation({
+  reviewText: "Konsultens text",
+  reviewRuns: [{ text: "Konsultens", italic: true }, { text: " text" }],
+  reviewRunsUserEdited: true,
+  documentPresentation: {
+    text: "Dokumentets text",
+    runs: [{ text: "Dokumentets text", bold: true }]
+  }
+}), {
+  text: "Konsultens text",
+  runs: [{ text: "Konsultens", italic: true }, { text: " text" }],
+  source: "review-override"
+});
+
 console.log("Text formatting behaviour tests passed.");

@@ -1,5 +1,7 @@
 # Changelog
 
+- Made resolved Semantic Document paragraph text and `presentationRuns` the
+  shared default presentation for both Review Studio and Document Generator.
 - Rendered Review instruction formatting through CSP-safe data attributes and
   static stylesheet rules instead of inline styles injected through HTML.
 - Committed an active rich-instruction edit before opening Document Generator,
