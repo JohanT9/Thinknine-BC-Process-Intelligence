@@ -4986,26 +4986,34 @@ function documentInstructionPresentationsByTask() {
 }
 
 function reviewInstructionPresentation(task, documentPresentations = null) {
-  const reviewText = globalThis.T9TextFormat.quoteEmphasis(
-    task?.instruction || "");
-  const documentPresentation = documentPresentations?.get(task?.taskId);
-  const automatic = globalThis.T9PresentationGrammar.presentationFor(
-    task?.semanticActionModel || task,
-    task?.instruction || ""
-  ).runs.map(run => ({
-    text: run.text,
-    ...(run.bold ? { bold: true } : {}),
-    ...(run.italic ? { italic: true } : {}),
-    ...(run.monospace ? { monospace: true } : {})
-  }));
-  return globalThis.T9TextFormat.resolveInstructionPresentation({
-    reviewText,
-    reviewRuns: task?.instructionRuns,
-    reviewRunsUserEdited:
-      task?.fieldProvenance?.instructionRuns === "user-edited",
-    documentPresentation,
-    automaticRuns: automatic
-  });
+  const sourceText = String(task?.instruction || "");
+  try {
+    const reviewText = globalThis.T9TextFormat.quoteEmphasis(sourceText);
+    const documentPresentation = documentPresentations?.get(task?.taskId);
+    const automatic = globalThis.T9PresentationGrammar.presentationFor(
+      task?.semanticActionModel || task,
+      sourceText
+    ).runs.map(run => ({
+      text: run.text,
+      ...(run.bold ? { bold: true } : {}),
+      ...(run.italic ? { italic: true } : {}),
+      ...(run.monospace ? { monospace: true } : {})
+    }));
+    return globalThis.T9TextFormat.resolveInstructionPresentation({
+      reviewText,
+      reviewRuns: task?.instructionRuns,
+      reviewRunsUserEdited:
+        task?.fieldProvenance?.instructionRuns === "user-edited",
+      documentPresentation,
+      automaticRuns: automatic
+    });
+  } catch (error) {
+    console.warn("Instruction presentation fallback", {
+      taskId: task?.taskId,
+      error: error?.message
+    });
+    return { text: sourceText, runs: [{ text: sourceText }] };
+  }
 }
 
 function instructionRunsHtml(runs) {
@@ -5023,6 +5031,18 @@ function instructionRunsHtml(runs) {
     ].join("");
     return `<span${data}>${escapeHtml(run.text)}</span>`;
   }).join("");
+}
+
+function resolveReviewHierarchyForDisplay(tasks, hierarchy) {
+  try {
+    return globalThis.T9DocumentationHierarchy.resolve(tasks, hierarchy);
+  } catch (error) {
+    console.warn("Review hierarchy display fallback", {
+      error: error?.message,
+      taskCount: tasks.length
+    });
+    return { sections: [] };
+  }
 }
 
 function updateInstructionPreview(taskId, runs) {
@@ -5249,7 +5269,6 @@ function applyInstructionFormatting(control, editor, patch) {
 function renderReview() {
   invalidateDocumentWorkspace();
   const list = $("reviewList");
-  list.innerHTML = "";
   const expectedResultEditor = $("expectedResultEditor");
   if (document.activeElement !== expectedResultEditor) {
     expectedResultEditor.value = activeReview.documentFields?.expectedResult ||
@@ -5259,9 +5278,10 @@ function renderReview() {
   const tasks = globalThis.T9Review.activeTasks(activeReview);
   const documentPresentations = documentInstructionPresentationsByTask();
   const progress = globalThis.T9Review.progress(activeReview);
-  const hierarchyState = globalThis.T9DocumentationHierarchy.resolve(
+  const hierarchyState = resolveReviewHierarchyForDisplay(
     tasks, activeReview.hierarchy
   );
+  list.innerHTML = "";
   $("reviewHierarchy").innerHTML = hierarchyState.sections.length
     ? `<ul>${hierarchyState.sections.map(section =>
       `<li><details open><summary>${escapeHtml(section.title)}</summary>
@@ -5448,6 +5468,10 @@ function renderReview() {
           aria-label="Ta bort manuellt steg ${visibleIndex + 1}">Ta bort manuellt steg</button>` : ""}
         <button data-action="toggle-layout" class="secondary" aria-pressed="false">Komprimera</button>
       </div>`;
+
+    // Make the step visible before optional enhancements and event bindings.
+    // A compatibility problem in one enhancement must never blank the Review.
+    list.appendChild(card);
 
     initializeReviewScreenshots(card, task, images);
 
@@ -5665,7 +5689,6 @@ function renderReview() {
         );
       });
 
-    list.appendChild(card);
   });
   globalThis.T9ReviewLayout.apply(
     list,

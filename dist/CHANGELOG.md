@@ -1,5 +1,8 @@
 # Changelog
 
+- Kept Review steps visible when optional instruction presentation or card
+  enhancement fails, with a plain-text formatting fallback instead of an empty
+  workspace.
 - Prevented regeneration from replacing a populated Review with an empty
   interpretation, and recover empty generated Reviews when source-derived Steps
   are available on the next open.

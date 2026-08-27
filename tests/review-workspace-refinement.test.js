@@ -78,6 +78,12 @@ assert(dashboard.includes("text: paragraph.text"));
 assert(dashboard.includes("runs: paragraph.presentationRuns"));
 assert(dashboard.includes("instructionPresentation.runs"));
 assert(dashboard.includes("instructionPresentation.text"));
+assert(dashboard.includes("Instruction presentation fallback"));
+assert(dashboard.includes("list.appendChild(card);\n\n    initializeReviewScreenshots"));
+assert(dashboard.includes("Review hierarchy display fallback"));
+assert(dashboard.indexOf('const hierarchyState = resolveReviewHierarchyForDisplay') <
+  dashboard.indexOf('list.innerHTML = "";',
+    dashboard.indexOf("function renderReview()")));
 assert(dashboard.includes('data-action="reset-comment"'));
 assert(dashboard.includes("updateCommentResetState"));
 assert(dashboard.includes('data-original-value="${escapeHtml(generatedComment)}"'));
