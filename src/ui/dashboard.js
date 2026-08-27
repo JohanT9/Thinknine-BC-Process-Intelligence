@@ -3459,10 +3459,6 @@ function renderDocumentLibrary() {
     ...documentLibrarySelection,
     activeId
   });
-  const selected = records.find(record =>
-    record.projectId === documentLibrarySelection.activeId
-  );
-  view.renderPreview($("libraryPreview"), selected);
   $("libraryStatus").textContent = matches.length > records.length
     ? `${matches.length} dokument matchar. De första ${records.length} visas.`
     : records.length === 1
@@ -3481,10 +3477,6 @@ function renderDocumentLibrarySelection() {
   globalThis.T9DocumentLibraryView.applySelection(
     $("libraryResults"), documentLibrarySelection
   );
-  const active = visibleDocumentLibraryRecords.find(record =>
-    record.projectId === documentLibrarySelection.activeId
-  );
-  globalThis.T9DocumentLibraryView.renderPreview($("libraryPreview"), active);
   renderLibraryBatchToolbar();
 }
 

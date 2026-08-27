@@ -69,21 +69,6 @@
     return activeId;
   }
 
-  function renderPreview(container, record) {
-    if (!record) {
-      container.innerHTML = "<h3>Snabbförhandsvisning</h3><p>Välj ett dokument.</p>";
-      return;
-    }
-    container.innerHTML = `<h3>${escape(record.title)}</h3>
-      <p class="library-profile">${escape(record.profile.displayName)}</p>
-      <p><strong>Dokumenthälsa:</strong> ${escape(record.health.overall)}</p>
-      <p>${escape(record.summary || "Ingen sammanfattning har indexerats ännu.")}</p>
-      <dl><div><dt>Arbetsflöde</dt><dd>${escape(record.workflowName || "Inte angivet")}</dd></div>
-        <div><dt>Senaste aktivitet</dt><dd>${escape(record.recentActivity[0] || "Ingen aktivitet registrerad")}</dd></div></dl>
-      <ul class="library-confirmations">${record.health.confirmations.map(value =>
-        `<li>${escape(value)}</li>`).join("")}</ul>`;
-  }
-
   function applySelection(container, state = {}) {
     const selectedIds = new Set(state.selectedIds || []);
     const cards = [...container.querySelectorAll("[data-library-project-id]")];
@@ -102,5 +87,5 @@
     ) || null;
   }
 
-  return { applySelection, card, renderGrouped, renderList, renderPreview };
+  return { applySelection, card, renderGrouped, renderList };
 });

@@ -18,10 +18,7 @@ assert(container.innerHTML.includes('type="checkbox"'));
 assert(container.innerHTML.includes('aria-pressed="true"'));
 assert(container.innerHTML.includes("Order &lt;test&gt;"));
 assert(container.innerHTML.includes("Arbetsflödet är dokumenterat"));
-view.renderPreview(container, record);
-assert(container.innerHTML.includes("Orderflöde"));
-assert(container.innerHTML.includes("Öppnades idag"));
-assert(container.innerHTML.includes("Dokumenthälsa"));
+assert.strictEqual(view.renderPreview, undefined);
 assert.strictEqual(view.renderGrouped(container, library.groupByProfile([record]), {
   selectedIds: ["doc-1"], activeId: "doc-1"
 }),

@@ -1,5 +1,7 @@
 # Changelog
 
+- Removed the redundant Knowledge Base preview sidebar so document cards use
+  the full available width without duplicating selected-document metadata.
 - Replaced quotation marks around Business Central interface labels with a
   cleaner italic presentation in Review Studio, Document Generator and Word.
 - Reused the immutable document pipeline and its resolved presentation across
