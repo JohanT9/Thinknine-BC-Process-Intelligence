@@ -1033,18 +1033,27 @@ async function startSession(message, tabId) {
 
   const storedSettings = await getSettings();
   const recordingTab = await chrome.tabs.get(tabId);
-  const observedContext = globalThis.T9BusinessCentralUrlContext
+  const urlContext = globalThis.T9BusinessCentralUrlContext
     .parseBusinessCentralUrl(recordingTab.url);
+  const contentContext = (await pingContentScript(tabId))?.observedContext || {};
+  const observedContext = {
+    ...urlContext,
+    companyName: urlContext.companyName || contentContext.companyName || ""
+  };
+  const environmentChanged = Boolean(observedContext.environmentName) &&
+    observedContext.environmentName !==
+      (storedSettings.businessCentralEnvironment || storedSettings.environmentName);
   const settings = {
     ...storedSettings,
     environmentName: observedContext.environmentName ||
       storedSettings.businessCentralEnvironment || storedSettings.environmentName,
     companyName: observedContext.companyName ||
-      storedSettings.businessCentralCompany || storedSettings.companyName || "",
+      (environmentChanged ? "" :
+        storedSettings.businessCentralCompany || storedSettings.companyName || ""),
     ...(observedContext.environmentName
       ? { businessCentralEnvironment: observedContext.environmentName } : {}),
-    ...(observedContext.companyName
-      ? { businessCentralCompany: observedContext.companyName } : {})
+    businessCentralCompany: observedContext.companyName ||
+      (environmentChanged ? "" : storedSettings.businessCentralCompany || "")
   };
   if (settings.environmentName !== storedSettings.environmentName ||
       settings.companyName !== storedSettings.companyName) {

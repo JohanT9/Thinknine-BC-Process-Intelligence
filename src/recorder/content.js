@@ -116,6 +116,7 @@
         recording,
         sessionId,
         diagnosticsEnabled,
+        observedContext: context(),
         frameUrl: location.href,
         version: "2.1.0"
       });
@@ -199,11 +200,44 @@
     return clean(document.title, 180);
   }
 
+  function getCompanyName() {
+    for (const value of [getTopUrl(), location.href]) {
+      try {
+        const companyName = clean(new URL(value).searchParams.get("company"));
+        if (companyName) return companyName;
+      } catch {}
+    }
+
+    const labelledSelectors = [
+      '[data-control-name="CompanyName"]',
+      '[data-testid*="company" i]',
+      '[class*="company-name" i]',
+      '[class*="CompanyName"]'
+    ];
+    for (const selector of labelledSelectors) {
+      for (const element of document.querySelectorAll(selector)) {
+        const value = textOf(element);
+        if (value && value.length <= 180) return value;
+      }
+    }
+
+    const labelledElements = document.querySelectorAll("[aria-label],[title]");
+    const labelPattern = /(?:current\s+company|company|företag|virksomhed)\s*[:：]\s*(.+)$/i;
+    for (const element of labelledElements) {
+      for (const attribute of ["aria-label", "title"]) {
+        const match = clean(element.getAttribute(attribute), 250).match(labelPattern);
+        if (match?.[1]) return clean(match[1], 180);
+      }
+    }
+    return "";
+  }
+
   function context() {
     return {
       pageId: getPageId(),
       pageCaption: getPageCaption(),
       documentTitle: clean(document.title, 250),
+      companyName: getCompanyName(),
       frameUrl: location.href,
       topUrl: getTopUrl(),
       frameDepth: getFrameDepth()

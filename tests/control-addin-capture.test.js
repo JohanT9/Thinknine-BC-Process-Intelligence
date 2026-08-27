@@ -13,6 +13,11 @@ const background = fs.readFileSync("src/recorder/background.js", "utf8");
 const popup = fs.readFileSync("src/ui/popup.js", "utf8");
 const manifest = JSON.parse(fs.readFileSync("src/ui/manifest.json", "utf8"));
 
+assert(content.includes("function getCompanyName()"));
+assert(content.includes("observedContext: context()"));
+assert(background.includes("const environmentChanged ="));
+assert(background.includes('environmentChanged ? ""'));
+
 // Listener and lifecycle contract: delegated capture-phase observation survives
 // React stopPropagation and storage synchronization reaches existing frames.
 for (const type of ["pointerdown", "click", "input", "change", "focusin", "focusout",

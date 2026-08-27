@@ -1,5 +1,8 @@
 # Changelog
 
+- Corrected Business Central company detection at recording start: observable
+  company context now supplements the URL, and a company from another
+  environment is never reused when the active URL omits `company`.
 - Added a last-resort Review renderer that exposes the concrete runtime failure
   while restoring stored Step instructions instead of leaving a blank workspace.
 - Recovered stored non-deleted Review Steps when legacy or incompatible derived
