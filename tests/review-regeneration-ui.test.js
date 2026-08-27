@@ -41,4 +41,9 @@ assert.strictEqual(blocked.blocked, true);
 assert(blocked.blockingReasons.includes("step-edits"));
 assert.throws(() => regeneration.apply(edited, blocked), /consultant-owned state/);
 
+const empty = regeneration.preview(oldReview, session, []);
+assert.strictEqual(empty.blocked, true,
+  "A non-empty stored Review must never be replaced by an empty interpretation.");
+assert(empty.blockingReasons.includes("empty-generated-result"));
+
 console.log("Review regeneration UI adapter tests passed.");

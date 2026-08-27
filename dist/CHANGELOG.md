@@ -1,5 +1,8 @@
 # Changelog
 
+- Prevented regeneration from replacing a populated Review with an empty
+  interpretation, and recover empty generated Reviews when source-derived Steps
+  are available on the next open.
 - Exposed safe **Regenerera frÃ¥n inspelning** in Review Studio so stored generated
   Reviews can adopt current grouping and semantic rules without a new recording.
 - Absorbed an immediately duplicated `Manuellt pris` capture into the existing

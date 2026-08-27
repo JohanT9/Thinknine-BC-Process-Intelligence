@@ -35,6 +35,12 @@ assert.ok(
   "Dashboard must use guarded initialization."
 );
 assert.ok(
+  dashboardHtml.includes("Regenerera fr&aring;n inspelning") &&
+    dashboard.includes("const replaceEmptyReview = existing.review") &&
+    dashboard.includes('"empty-generated-result"'),
+  "Review regeneration must use a correctly encoded label, reject empty output and recover an empty stored Review."
+);
+assert.ok(
   dashboard.includes("function publishWorkspaceContext(") &&
     dashboard.includes("function revealDocumentContext(") &&
     dashboard.includes("function revealReviewContext(") &&

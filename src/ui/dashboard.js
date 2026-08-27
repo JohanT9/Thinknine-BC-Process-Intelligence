@@ -5735,6 +5735,9 @@ async function openReview(session) {
     sessionId: session.id
   });
 
+  const replaceEmptyReview = existing.review &&
+    (!Array.isArray(existing.review.tasks) || existing.review.tasks.length === 0) &&
+    activeReviewModel.businessTasks.length > 0;
   const replacePlaceholderReview = existing.review &&
     !String(existing.review.documentFields?.expectedResult ||
       existing.review.expectedResult || "").trim() &&
@@ -5746,7 +5749,7 @@ async function openReview(session) {
       globalThis.T9Review.hasGeneratedSearchEvidenceDrift(existing.review,
         activeReviewModel.businessTasks)) &&
     activeReviewModel.businessTasks.length > 0;
-  activeReview = existing.review && !replacePlaceholderReview
+  activeReview = existing.review && !replaceEmptyReview && !replacePlaceholderReview
     ? globalThis.T9Review.normalizeReview({
         ...existing.review,
         tasks: globalThis.T9Review.normalizeTasks(existing.review.tasks)
@@ -6497,13 +6500,18 @@ $("regenerateReview").addEventListener("click", async () => {
       activeReviewModel.businessTasks
     );
     if (preview.blocked) {
-      show("Granskningen innehÃ¥ller manuella Ã¤ndringar. Regenereringen avbrÃ¶ts sÃ¥ att inget konsultarbete skrivs Ã¶ver.", true);
+      const emptyResult = preview.blockingReasons.includes(
+        "empty-generated-result"
+      );
+      show(emptyResult
+        ? "Regenereringen avbr\u00f6ts eftersom den nya tolkningen inte gav n\u00e5gra steg. Den sparade granskningen har inte \u00e4ndrats."
+        : "Granskningen inneh\u00e5ller manuella \u00e4ndringar. Regenereringen avbr\u00f6ts s\u00e5 att inget konsultarbete skrivs \u00f6ver.", true);
       return;
     }
     const summary = preview.consolidatedStepCount > 0
-      ? ` ${preview.consolidatedStepCount} dubbla steg slÃ¥s samman.`
+      ? ` ${preview.consolidatedStepCount} dubbla steg sl\u00e5s samman.`
       : "";
-    if (!confirm(`Regenerera dokumentationen frÃ¥n den befintliga inspelningen? ` +
+    if (!confirm(`Regenerera dokumentationen fr\u00e5n den befintliga inspelningen? ` +
         `${preview.previousStepCount} steg blir ${preview.nextStepCount}.${summary}`)) {
       return;
     }
@@ -6513,7 +6521,7 @@ $("regenerateReview").addEventListener("click", async () => {
     invalidateDocumentWorkspace();
     await saveActiveReview({ announce: false, render: false });
     renderReview();
-    show(`Dokumentationen har regenererats frÃ¥n inspelningen. ` +
+    show(`Dokumentationen har regenererats fr\u00e5n inspelningen. ` +
       `${preview.previousStepCount} steg blev ${preview.nextStepCount}.`);
   } catch (error) {
     show(`Dokumentationen kunde inte regenereras: ${error.message}`, true);

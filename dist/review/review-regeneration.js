@@ -49,6 +49,9 @@
     const stepMap = regenerationEngine.mapSteps(previousTasks,
       freshReview.generatedTasks);
     const reasons = consultantState(currentReview);
+    if (previousTasks.length > 0 && freshReview.generatedTasks.length === 0) {
+      reasons.push("empty-generated-result");
+    }
     const consolidated = stepMap.mappings.filter(item =>
       item.mappingType === "many-to-one"
     ).reduce((count, item) => count + Math.max(0, item.oldStepIds.length - 1), 0);
