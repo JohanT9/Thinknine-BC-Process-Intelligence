@@ -475,6 +475,7 @@ table{width:100%;border-collapse:collapse}th,td{text-align:left;padding:9px;bord
               <button id="moveDownReviewSteps" data-review-command="move-down" data-review-toolbar-item class="secondary" disabled>Flytta ned</button>
             </div>
             <div class="review-toolbar-group" role="group" aria-label="Arbetsyta">
+              <button id="regenerateReview" data-review-toolbar-item class="secondary">Regenerera frÃ¥n inspelning</button>
               <button id="compactReviewSteps" data-review-toolbar-item class="secondary" aria-pressed="false">Komprimera alla</button>
               <button id="addReviewStep" data-review-toolbar-item class="secondary">Lägg till steg</button>
               <button id="completeReview" class="primary" disabled data-review-toolbar-item>Slutför granskning</button>
@@ -678,6 +679,8 @@ table{width:100%;border-collapse:collapse}th,td{text-align:left;padding:9px;bord
 <script src="review/review-annotation-compositor.js"></script>
 <script src="review/review-annotation-editor.js"></script>
 <script src="review/review-studio.js"></script>
+<script src="document/regenerate-from-recording.js"></script>
+<script src="review/review-regeneration.js"></script>
 <script src="review/review-selection.js"></script>
 <script src="workspace-controller.js"></script>
 <script src="workspace-context.js"></script>

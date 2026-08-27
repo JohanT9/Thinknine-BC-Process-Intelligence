@@ -6488,6 +6488,37 @@ $("compactReviewSteps").addEventListener("click", () => {
 $("addReviewStep").addEventListener("click", () => {
   addManualInformationStep(undefined);
 });
+$("regenerateReview").addEventListener("click", async () => {
+  if (!activeReview || !activeReviewSession || !activeReviewModel) return;
+  try {
+    const preview = globalThis.T9ReviewRegeneration.preview(
+      activeReview,
+      activeReviewSession,
+      activeReviewModel.businessTasks
+    );
+    if (preview.blocked) {
+      show("Granskningen innehÃ¥ller manuella Ã¤ndringar. Regenereringen avbrÃ¶ts sÃ¥ att inget konsultarbete skrivs Ã¶ver.", true);
+      return;
+    }
+    const summary = preview.consolidatedStepCount > 0
+      ? ` ${preview.consolidatedStepCount} dubbla steg slÃ¥s samman.`
+      : "";
+    if (!confirm(`Regenerera dokumentationen frÃ¥n den befintliga inspelningen? ` +
+        `${preview.previousStepCount} steg blir ${preview.nextStepCount}.${summary}`)) {
+      return;
+    }
+    activeReview = globalThis.T9ReviewRegeneration.apply(activeReview, preview);
+    activeReviewSelection = globalThis.T9ReviewSelection.create();
+    activeReviewEdit = null;
+    invalidateDocumentWorkspace();
+    await saveActiveReview({ announce: false, render: false });
+    renderReview();
+    show(`Dokumentationen har regenererats frÃ¥n inspelningen. ` +
+      `${preview.previousStepCount} steg blev ${preview.nextStepCount}.`);
+  } catch (error) {
+    show(`Dokumentationen kunde inte regenereras: ${error.message}`, true);
+  }
+});
 $("completeReview").addEventListener("click", async () => {
   globalThis.T9Review.complete(activeReview, {
     beforeSelection: activeReviewSelection,

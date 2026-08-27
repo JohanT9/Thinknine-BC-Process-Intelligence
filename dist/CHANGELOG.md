@@ -1,5 +1,7 @@
 # Changelog
 
+- Exposed safe **Regenerera frÃ¥n inspelning** in Review Studio so stored generated
+  Reviews can adopt current grouping and semantic rules without a new recording.
 - Absorbed an immediately duplicated `Manuellt pris` capture into the existing
   menu-path action so it remains traceable without creating a redundant step.
 - Consolidated the manual-price menu path even when a React/Business Central

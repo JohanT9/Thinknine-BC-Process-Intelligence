@@ -147,8 +147,14 @@ Map-based matching is linear or near-linear for normal recordings and has a
 5,000-Step regression. Regeneration does not load screenshot bytes, access DOM,
 render Word, call external services, upload data, or use AI.
 
-This milestone provides model/API preview and commit contracts, not a graphical
-preview, startup trigger, arbitrary Derived Revision history, persistence engine,
-or new regeneration button. Future UI must provide keyboard invocation, explicit
-explanation, semantic change/unresolved summaries, focus restoration, high
-contrast, reduced-motion compatibility, and non-colour status communication.
+Review Studio exposes **Regenerera frÃ¥n inspelning** under **Fler Ã¥tgÃ¤rder**.
+The command previews the generated Step count, asks for explicit confirmation,
+reuses the already loaded current interpretation, replaces the generated Review
+baseline and persists it before reporting success. It never changes Canonical
+Recording evidence and no new recording is required.
+
+The first UI integration is deliberately conservative: when consultant-owned
+Step edits, approvals, manual Steps, structure overrides, Notes, Annotations or
+manual hierarchy are present, apply is blocked instead of risking data loss.
+The engine-level reconciliation contract remains the owner of future safe
+retargeting for those Reviews. Regeneration never runs automatically on startup.
