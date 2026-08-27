@@ -1,5 +1,7 @@
 # Changelog
 
+- Reset Review Studio out of image-editing mode whenever a document opens so
+  an old hidden-list state cannot conceal otherwise intact Steps.
 - Kept Review steps visible when optional instruction presentation or card
   enhancement fails, with a plain-text formatting fallback instead of an empty
   workspace.

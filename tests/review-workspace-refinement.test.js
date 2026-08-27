@@ -81,6 +81,11 @@ assert(dashboard.includes("instructionPresentation.text"));
 assert(dashboard.includes("Instruction presentation fallback"));
 assert(dashboard.includes("list.appendChild(card);\n\n    initializeReviewScreenshots"));
 assert(dashboard.includes("Review hierarchy display fallback"));
+assert(dashboard.includes("function resetReviewSurfaceForOpen()"));
+assert(dashboard.includes('$("reviewList").hidden = false;'));
+assert(dashboard.indexOf("resetReviewSurfaceForOpen();") <
+  dashboard.indexOf('$("reviewTitle").textContent',
+    dashboard.indexOf("async function openReview(session)")));
 assert(dashboard.indexOf('const hierarchyState = resolveReviewHierarchyForDisplay') <
   dashboard.indexOf('list.innerHTML = "";',
     dashboard.indexOf("function renderReview()")));

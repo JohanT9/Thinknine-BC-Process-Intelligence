@@ -5744,6 +5744,18 @@ async function flushReviewPersistence() {
   await reviewPersistence.flush();
 }
 
+function resetReviewSurfaceForOpen() {
+  releaseActiveAnnotationPointer();
+  annotationEditorState = null;
+  annotationEditorBaseline = null;
+  $("annotationEditor").hidden = true;
+  $("reviewList").hidden = false;
+  $("reviewFooter").hidden = false;
+  $("documentWorkspaceTab").disabled = false;
+  $("reviewDialog").classList.remove("annotation-mode");
+  $("reviewDialog").style.removeProperty("--review-header-height");
+}
+
 async function openReview(session) {
   reviewReturnFocus = document.activeElement;
   show(`Förbereder granskning av "${session.name}"...`);
@@ -5805,6 +5817,7 @@ async function openReview(session) {
     reviewLayoutState.allCompact
   );
   reviewAutoSave.cancel();
+  resetReviewSurfaceForOpen();
 
   $("reviewTitle").textContent = `Dokumentation: ${session.name}`;
   $("reviewOverlay").classList.add("open");
