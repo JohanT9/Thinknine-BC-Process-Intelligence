@@ -31,6 +31,13 @@ resulting values match, it becomes `Ange <value> i Artikel Nr`; the mechanical
 `Sortera efter Nr` controls are not exposed as separate steps. This compatibility
 rule does not replace or reinterpret structured modern `Select` interactions.
 
+The Business Central manual-price menu path is documented as one action:
+`Åtgärder → Funktion → Manuellt pris`. Some React surfaces do not emit a
+separate interaction for the intermediate `Funktion` menu. The compatibility
+rule therefore also accepts the exact adjacent endpoints `Åtgärder → Manuellt
+pris`, retains only their real source references, and uses the final focused-menu
+screenshot. It does not match when any unrelated action occurs between them.
+
 Instructions with `user-edited` provenance pass through semantic rules unchanged.
 Reset restores the latest generated semantic instruction.
 

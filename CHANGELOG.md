@@ -1,5 +1,9 @@
 # Changelog
 
+- Consolidated the manual-price menu path even when a React/Business Central
+  surface exposes only the adjacent `Åtgärder` and `Manuellt pris` captures;
+  the documented path remains `Åtgärder → Funktion → Manuellt pris` and uses
+  the final focused-menu screenshot.
 - Removed the redundant Knowledge Base preview sidebar so document cards use
   the full available width without duplicating selected-document metadata.
 - Replaced quotation marks around Business Central interface labels with a

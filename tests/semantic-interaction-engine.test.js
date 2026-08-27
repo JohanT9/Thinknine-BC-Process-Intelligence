@@ -81,6 +81,31 @@ assert.strictEqual(manualPricePath.preferredScreenshotRef,
   "manual-price-visible.png");
 assert.strictEqual(engine.consolidateInteractions(
   manualPricePath.rawInteractions)[0].screenshot, "manual-price-visible.png");
+const manualPriceWithoutFunctionCapture = only([{
+  taskId: "actions-short", taskType: "RunAction", actionCaption: "Åtgärder",
+  sourceEventIds: ["event-actions-short"], screenshot: "actions-short.png"
+}, {
+  taskId: "manual-price-short", taskType: "RunAction",
+  actionCaption: "Manuellt pris...",
+  sourceEventIds: ["event-manual-price-short"],
+  screenshot: "manual-price-focused.png"
+}], "RunActionPath", "Välj **Åtgärder** → **Funktion** → **Manuellt pris**.");
+assert.deepStrictEqual(manualPriceWithoutFunctionCapture.sourceEventIds,
+  ["event-actions-short", "event-manual-price-short"]);
+assert.strictEqual(manualPriceWithoutFunctionCapture.preferredSourceEventId,
+  "event-manual-price-short");
+assert.strictEqual(manualPriceWithoutFunctionCapture.preferredScreenshotRef,
+  "manual-price-focused.png");
+const unrelatedBetweenMenuActions = engine.processInteractions([{
+  taskType: "RunAction", actionCaption: "Åtgärder"
+}, {
+  taskType: "RunAction", actionCaption: "Bokför"
+}, {
+  taskType: "RunAction", actionCaption: "Manuellt pris"
+}]);
+assert.strictEqual(unrelatedBetweenMenuActions.length, 3);
+assert.ok(!unrelatedBetweenMenuActions.some(value =>
+  value.actionType === "RunActionPath"));
 const closeDialog = engine.processInteractions([{
   taskId: "dialog", taskType: "RunAction", actionCaption: "Öppna information",
   sourceEventIds: ["event-dialog"], screenshot: "dialog-open.png"
