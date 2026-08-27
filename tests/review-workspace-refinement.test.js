@@ -82,7 +82,9 @@ assert(dashboard.includes('data-action="reset-comment"'));
 assert(dashboard.includes("updateCommentResetState"));
 assert(dashboard.includes('data-original-value="${escapeHtml(generatedComment)}"'));
 assert(dashboard.includes('resetTaskField(activeReview, actualIndex, "comment"'));
-assert(dashboard.includes("createActiveDocumentPipeline().semanticDocument"));
+assert(dashboard.includes("const documentModel = createActiveDocumentPresentation()"));
+assert(dashboard.includes(".presentationDocument;"));
+assert(!dashboard.includes("createActiveDocumentPipeline().semanticDocument"));
 assert(html.includes('.review-fields textarea[hidden]{display:none}'));
 assert(dashboard.includes('$("reviewMoreActions").addEventListener("toggle"'));
 

@@ -137,6 +137,9 @@ assert.ok(
 );
 assert.ok(
   dashboard.includes("activeDocumentPipelineCache.get") &&
+    dashboard.includes("activeDocumentPresentationCache.get") &&
+    dashboard.includes("createActiveDocumentPresentation()") &&
+    dashboard.includes("preparedPresentation,") &&
     dashboard.includes("workspaceState.revision") &&
     dashboard.includes("const matchesPipeline") &&
     dashboard.includes("semanticDocument = pipeline.semanticDocument") &&

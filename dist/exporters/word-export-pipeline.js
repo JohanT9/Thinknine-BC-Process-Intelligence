@@ -104,7 +104,7 @@
     });
   }
 
-  function create(options = {}) {
+  function createPresentation(options = {}) {
     const projection = projector.project(options.review, {
       session: options.session,
       prerequisites: options.prerequisites,
@@ -132,6 +132,20 @@
     }
     const languageDocument = language.process(semanticActionsDocument, profile);
     const grammarDocument = presentation.process(languageDocument);
+    return semantic.deepFreeze({
+      sourceSemanticDocument: projection.document,
+      semanticActionsDocument,
+      languageDocument,
+      presentationDocument: grammarDocument,
+      languageProfile: profile,
+      diagnostics: projection.diagnostics
+    });
+  }
+
+  function create(options = {}) {
+    const prepared = options.preparedPresentation || createPresentation(options);
+    const grammarDocument = prepared.presentationDocument;
+    const profile = prepared.languageProfile;
     const screenshotCandidates = screenshotIntelligence.normalizeCandidates(
       options.screenshotCandidates
     );
@@ -165,17 +179,17 @@
       );
     }
     return semantic.deepFreeze({
-      sourceSemanticDocument: projection.document,
-      semanticActionsDocument,
-      languageDocument,
-      presentationDocument: grammarDocument,
+      sourceSemanticDocument: prepared.sourceSemanticDocument,
+      semanticActionsDocument: prepared.semanticActionsDocument,
+      languageDocument: prepared.languageDocument,
+      presentationDocument: prepared.presentationDocument,
       semanticDocument: presentationDocument,
       languageProfile: profile,
       screenshotCandidates,
       screenshotSelections: screenshotResult.selections,
       theme: resolvedTheme,
       plan,
-      diagnostics: projection.diagnostics,
+      diagnostics: prepared.diagnostics,
       qualityDiagnostics: analyzeQuality(presentationDocument, plan)
     });
   }
@@ -217,6 +231,7 @@
   return {
     analyzeQuality,
     create,
+    createPresentation,
     requiredMediaAssetIds,
     screenshotComponents,
     validateMedia

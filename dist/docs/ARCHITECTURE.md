@@ -612,6 +612,11 @@ language, presentation, screenshot selection, planning and diagnostics. A
 Review invalidation changes the revision key, and closing the Review releases
 the retained value. The active profile variant also reuses the pipeline's
 already resolved Semantic Document, screenshot selections and plan.
+The first Review render stops at the shared frozen presentation-document
+boundary. It does not run screenshot selection, theme resolution, planning or
+quality diagnostics merely to display formatted instruction text. The full
+pipeline accepts that prepared presentation and continues from it when Document
+Workspace or Word is requested.
 Document Workspace also keeps unannotated screenshots as their existing data
 URLs. Only annotated screenshots enter canvas composition. Byte-array conversion
 remains isolated to Word export, which avoids a decode/re-encode cycle for every

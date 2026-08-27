@@ -68,7 +68,7 @@ async function exportReview(reviewValue) {
   };
 }
 
-const baseReview = review([{ 
+const baseReview = review([{
   taskId: "task-a",
   instruction: "Öppna ordern.",
   userComment: "Kontrollera kundnumret.",
@@ -86,6 +86,21 @@ const baseReview = review([{
   instruction: "Detta steg ska inte exporteras.",
   deleted: true
 }]);
+const preparedPresentation = pipeline.createPresentation({
+  review: baseReview,
+  session
+});
+assert.ok(Object.isFrozen(preparedPresentation));
+assert.ok(Object.isFrozen(preparedPresentation.presentationDocument));
+const preparedOutput = pipeline.create({
+  review: baseReview,
+  session,
+  preparedPresentation
+});
+const directOutput = pipeline.create({ review: baseReview, session });
+assert.deepStrictEqual(preparedOutput.semanticDocument,
+  directOutput.semanticDocument);
+assert.deepStrictEqual(preparedOutput.plan, directOutput.plan);
 const output = await exportReview(baseReview);
 const tracedWordComponent = output.plan.sections
   .flatMap(section => section.components)

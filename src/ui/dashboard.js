@@ -3120,6 +3120,7 @@ function createActiveDocumentPipeline() {
     throw new Error("Dokumentet är inte tillgängligt ännu.");
   }
   const expectedResult = configuredExpectedResult();
+  const preparedPresentation = createActiveDocumentPresentation();
   return activeDocumentPipelineCache.get([
     activeReviewModel,
     activeReview,
@@ -3130,9 +3131,29 @@ function createActiveDocumentPipeline() {
       session: activeReviewModel.response.session,
       review: activeReview,
       expectedResult,
+      preparedPresentation,
       screenshotCandidates: screenshotCandidatesFor(activeReviewModel, activeReview),
       profileId: activeDocumentProfileId,
       themeId: "thinknine"
+    }));
+}
+
+function createActiveDocumentPresentation() {
+  if (!activeReviewModel || !activeReview) {
+    throw new Error("Dokumentet är inte tillgängligt ännu.");
+  }
+  const expectedResult = configuredExpectedResult();
+  return activeDocumentPresentationCache.get([
+    activeReviewModel,
+    activeReview,
+    workspaceState.revision,
+    activeDocumentProfileId,
+    expectedResult
+  ], () => globalThis.T9WordExportPipeline.createPresentation({
+      session: activeReviewModel.response.session,
+      review: activeReview,
+      expectedResult,
+      profileId: activeDocumentProfileId
     }));
 }
 
@@ -3330,6 +3351,8 @@ let annotationEditorBaseline = null;
 let workspaceState = globalThis.T9WorkspaceController.create();
 let documentWorkspaceSync = null;
 const activeDocumentPipelineCache = globalThis.T9WorkspaceController
+  .createRevisionCache();
+const activeDocumentPresentationCache = globalThis.T9WorkspaceController
   .createRevisionCache();
 let documentViewState = globalThis.T9DocumentWorkspaceExperience.load(
   globalThis.localStorage
@@ -4947,7 +4970,8 @@ function deleteSelectedAnnotation() {
 function documentInstructionPresentationsByTask() {
   const result = new Map();
   try {
-    const documentModel = createActiveDocumentPipeline().semanticDocument;
+    const documentModel = createActiveDocumentPresentation()
+      .presentationDocument;
     const visit = blocks => {
       for (const block of blocks || []) {
         if (block.kind === "step" && block.sourceRef?.taskId) {
@@ -5811,6 +5835,7 @@ async function closeReview() {
   activeReviewSelection = globalThis.T9ReviewSelection.create();
   activeReviewEdit = null;
   activeDocumentPipelineCache.clear();
+  activeDocumentPresentationCache.clear();
   workspaceState = globalThis.T9WorkspaceController.create();
   documentWorkspaceSync = null;
   cancelAnimationFrame(documentViewFrame);
