@@ -1,5 +1,7 @@
 # Changelog
 
+- Replaced quotation marks around Business Central interface labels with a
+  cleaner italic presentation in Review Studio, Document Generator and Word.
 - Reused the immutable document pipeline and its resolved presentation across
   Review Studio and Document Generator for the same content revision.
 - Avoided base64 decode/re-encode cycles for unannotated screenshots when

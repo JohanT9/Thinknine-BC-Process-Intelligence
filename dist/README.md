@@ -244,10 +244,10 @@ normalized non-destructively and require no migration. See
 ## Presentation Grammar 4.6 R3.2
 
 Dokumentvyn och Word-exporten använder nu samma visuella grammatik. Åtgärder
-visas som vanlig text, gränssnittselement inom citationstecken och värden som
+visas som vanlig text, gränssnittselement i kursiv stil utan citationstecken och värden som
 användaren anger eller väljer i fetstil. Tangentbordsgenvägar och tekniska
-identifierare visas i monospace. Exempel: `Välj "Nr"` **136** och
-`Ange` **500** `i "Antal"`.
+identifierare visas i monospace. Exempel: `Välj` *Nr* **136** och
+`Ange` **500** `i` *Antal*.
 
 Ett separat, renderer-neutralt lager skapar explicita presentationssegment
 efter Language Excellence och före Screenshot Intelligence. Äldre dokument och

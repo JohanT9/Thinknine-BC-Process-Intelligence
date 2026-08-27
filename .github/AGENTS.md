@@ -140,7 +140,7 @@ Recommended conventions:
 
 - Actions use plain text.
 - Entered or selected values use bold.
-- Interface labels use quotation marks.
+- Interface labels use italic text without quotation marks.
 - Keyboard shortcuts use monospace.
 - Technical identifiers use monospace where appropriate.
 

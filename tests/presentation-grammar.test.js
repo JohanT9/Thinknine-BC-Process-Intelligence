@@ -24,25 +24,25 @@ const quantity = paragraph({
   taskId: "quantity", taskType: "ChangeField", fieldCaption: "Antal",
   value: "500", inputSources: ["input"], instruction: "Teknisk text."
 });
-assert.strictEqual(quantity.text, 'Ange 500 i "Antal".');
+assert.strictEqual(quantity.text, "Ange 500 i Antal.");
 assert.deepStrictEqual(quantity.presentationRuns, [
   { text: "Ange ", role: "action" },
   { text: "500", role: "value", bold: true },
   { text: " i ", role: "text" },
-  { text: '"Antal"', role: "interface" },
+  { text: "Antal", role: "interface", italic: true },
   { text: ".", role: "text" }
 ]);
 
 const customer = grammar.presentationFor({
   actionType: "SelectCustomer", targetField: "Kund", selectedValue: "1033"
 }, "Äldre formulering.");
-assert.strictEqual(customer.text, 'Välj "Kund" 1033.');
+assert.strictEqual(customer.text, "Välj Kund 1033.");
 assert.strictEqual(customer.runs.find(run => run.text === "1033").bold, true);
 
 const itemNumber = grammar.presentationFor({
   actionType: "EnterItemNumber", targetField: "Artikel Nr", selectedValue: "30043"
 }, 'Ange 30043 i "Artikel Nr".');
-assert.strictEqual(itemNumber.text, 'Ange 30043 i "Artikel Nr".');
+assert.strictEqual(itemNumber.text, "Ange 30043 i Artikel Nr.");
 assert.strictEqual(itemNumber.runs.find(run => run.text === "30043").bold, true);
 
 const projectedItemNumber = paragraph({
@@ -50,7 +50,7 @@ const projectedItemNumber = paragraph({
   fieldCaption: "Artikel Nr", value: "30043",
   instruction: 'Ange 30043 i "Artikel Nr".'
 });
-assert.strictEqual(projectedItemNumber.text, 'Ange 30043 i "Artikel Nr".');
+assert.strictEqual(projectedItemNumber.text, "Ange 30043 i Artikel Nr.");
 assert.strictEqual(projectedItemNumber.presentationRuns
   .find(run => run.text === "30043").bold, true);
 
@@ -59,7 +59,11 @@ const search = paragraph({ taskId: "search", taskType: "SearchAndOpenPage",
   resultCaption: "Förs.order", value: "för ord",
   instruction: "Äldre generell söktext." });
 assert.strictEqual(search.text,
-  'Välj "Sök", ange för ord i "Berätta vad du vill göra." och välj "Förs.order".');
+  "Välj Sök, ange för ord i Berätta vad du vill göra. och välj Förs.order.");
+assert.strictEqual(search.presentationRuns.find(run => run.text === "Sök").italic,
+  true);
+assert.strictEqual(search.presentationRuns.find(run => run.text === "Förs.order").italic,
+  true);
 assert.strictEqual(search.presentationRuns.find(run => run.text === "för ord").bold,
   true);
 
@@ -75,7 +79,7 @@ const option = paragraph({
   taskId: "status", taskType: "SelectOption", fieldCaption: "Status",
   value: "Frisläppt", instruction: "Välj status."
 });
-assert.strictEqual(option.text, 'Välj "Status" Frisläppt.');
+assert.strictEqual(option.text, "Välj Status Frisläppt.");
 assert.strictEqual(option.presentationRuns[0].role, "action");
 assert.strictEqual(option.presentationRuns[1].role, "interface");
 assert.strictEqual(option.presentationRuns[3].role, "value");
@@ -84,7 +88,7 @@ const checkbox = paragraph({
   taskId: "blocked", taskType: "Checkbox", fieldCaption: "Spärrad",
   value: false, instruction: "Sätt nej."
 });
-assert.strictEqual(checkbox.text, 'Inaktivera "Spärrad".');
+assert.strictEqual(checkbox.text, "Inaktivera Spärrad.");
 assert.ok(!checkbox.text.includes("Nej"));
 
 const commentProjection = projector.project({
@@ -106,7 +110,8 @@ assert.strictEqual(callout.blocks.find(block => block.kind === "paragraph").text
 const legacy = grammar.presentationFor(null,
   "Tryck `Ctrl+S` och kontrollera `Table 27` i **Status** med __ABC123__.");
 assert.strictEqual(legacy.text,
-  'Tryck Ctrl+S och kontrollera Table 27 i "Status" med ABC123.');
+  "Tryck Ctrl+S och kontrollera Table 27 i Status med ABC123.");
+assert.strictEqual(legacy.runs.find(run => run.text === "Status").italic, true);
 assert.strictEqual(legacy.runs.find(run => run.text === "Ctrl+S").role,
   "shortcut");
 assert.strictEqual(legacy.runs.find(run => run.text === "Table 27").role,

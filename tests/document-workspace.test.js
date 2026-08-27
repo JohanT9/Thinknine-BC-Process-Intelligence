@@ -73,16 +73,16 @@ const emphasizedReview = reviewFixture();
 emphasizedReview.tasks[0].instruction = "Ange __400__ i **Antal**.";
 const emphasizedWorkspace = render(emphasizedReview);
 assert.ok(items(emphasizedWorkspace.model, "paragraph").some(item =>
-  item.content.text === 'Ange 400 i "Antal".'));
+  item.content.text === "Ange 400 i Antal."));
 assert.ok(!items(emphasizedWorkspace.model, "paragraph").some(item =>
   item.content.text.includes("**")));
 const emphasizedParagraph = items(emphasizedWorkspace.model, "paragraph")
-  .find(item => item.content.text === 'Ange 400 i "Antal".');
+  .find(item => item.content.text === "Ange 400 i Antal.");
 assert.deepStrictEqual(emphasizedParagraph.content.runs, [
   { text: "Ange ", role: "text" },
   { text: "400", role: "value", bold: true },
   { text: " i ", role: "text" },
-  { text: '"Antal"', role: "interface" },
+  { text: "Antal", role: "interface", italic: true },
   { text: ".", role: "text" }
 ]);
 

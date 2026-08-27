@@ -23,8 +23,8 @@
   }
 
   function quoted(value) {
-    return run(`"${String(value ?? "").replace(/^['"“]|['"”]$/gu, "")}"`,
-      "interface");
+    return { ...run(String(value ?? "").replace(/^['"“]|['"”]$/gu, ""),
+      "interface"), italic: true };
   }
 
   function sentence(...runs) {
@@ -35,14 +35,15 @@
   function legacyRuns(value) {
     const source = String(value ?? "");
     const result = [];
-    const pattern = /(__([\s\S]+?)__|\*\*([\s\S]+?)\*\*|`([^`]+?)`)/g;
+    const pattern = /(__([\s\S]+?)__|\*\*([\s\S]+?)\*\*|`([^`]+?)`|["“]([^"”]+?)["”])/g;
     let cursor = 0;
     let match;
     while ((match = pattern.exec(source))) {
       if (match.index > cursor) result.push(run(source.slice(cursor, match.index)));
       if (match[2] !== undefined) result.push(run(match[2], "value"));
       else if (match[3] !== undefined) result.push(quoted(match[3]));
-      else result.push(run(match[4], technicalRole(match[4])));
+      else if (match[4] !== undefined) result.push(run(match[4], technicalRole(match[4])));
+      else result.push(quoted(match[5]));
       cursor = match.index + match[0].length;
     }
     if (cursor < source.length || !result.length) result.push(run(source.slice(cursor)));

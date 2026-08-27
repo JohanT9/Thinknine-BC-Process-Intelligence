@@ -58,26 +58,24 @@
           Object.freeze({ name: "Orange", value: "#CA5010" })
         ]);
         function quoteEmphasis(value) {
-          return instructionSegments(value).map((segment) => segment.text).join("");
+          return String(value ?? "").replace(/__([\s\S]+?)__/g, "$1").replace(/\*\*([^*]+?)\*\*/g, '"$1"');
         }
         function instructionSegments(value) {
           const source = String(value ?? "");
           const segments = [];
           let cursor = 0;
-          const valuePattern = /__([\s\S]+?)__/g;
+          const valuePattern = /(__([\s\S]+?)__|\*\*([\s\S]+?)\*\*|["“]([^"”]+?)["”])/g;
           let match;
           while (match = valuePattern.exec(source)) {
             if (match.index > cursor) {
-              segments.push({
-                text: quoteLabels(source.slice(cursor, match.index)),
-                bold: false
-              });
+              segments.push({ text: source.slice(cursor, match.index) });
             }
-            segments.push({ text: quoteLabels(match[1]), bold: true });
+            if (match[2] !== void 0) segments.push({ text: match[2], bold: true });
+            else segments.push({ text: match[3] ?? match[4], italic: true });
             cursor = match.index + match[0].length;
           }
           if (cursor < source.length || !segments.length) {
-            segments.push({ text: quoteLabels(source.slice(cursor)), bold: false });
+            segments.push({ text: source.slice(cursor) });
           }
           return segments.filter((segment) => segment.text !== "");
         }

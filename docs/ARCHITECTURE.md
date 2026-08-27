@@ -361,6 +361,10 @@ grammar. It consumes the Language Excellence document and returns an immutable
 Semantic Document containing natural paragraph text plus explicit presentation
 runs. Actions, interface elements, values, shortcuts and identifiers have
 distinct roles; no renderer parses semantic action intent.
+Interface-role runs contain the observed label without surrounding quotation
+marks and use italic emphasis consistently in Review Studio, Document Workspace
+and Word. Legacy generated labels in `**markers**` or quotation marks are
+normalized to that same presentation in memory without migrating recordings.
 
 Planner transports the runs unchanged. Document Workspace maps the contracts to
 semantic DOM elements, while the Word adapter maps the same contracts to DOCX

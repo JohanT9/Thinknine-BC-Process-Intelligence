@@ -36,15 +36,16 @@ The grammar separates three concepts:
 | Concept | Representation | Example |
 | --- | --- | --- |
 | Action | normal text | `Ange` |
-| Interface element | quotation marks | `"Antal"` |
+| Interface element | italic, without quotation marks | *Antal* |
 | Entered or selected value | bold | **500** |
 | Keyboard shortcut | monospace | `Ctrl+S` |
 | Technical identifier | monospace | `Table 27` |
 
 Structured Semantic Actions are authoritative. For legacy prose, the existing
 markers remain compatible: `__value__` becomes a bold value, `**label**` becomes
-a quoted interface element and backticks become monospace. Unmarked legacy text
-is preserved as natural text.
+an italic interface element and backticks become monospace. Quoted labels from
+older generated Reviews receive the same italic presentation. Unmarked legacy
+text is preserved as natural text.
 
 ## Wording hierarchy and examples
 
@@ -52,11 +53,11 @@ Presentation Grammar uses the Semantic Action's explicit action type, target
 field and selected value. It never guesses from screenshots or visual position.
 
 - Before: `Välj **136** i "Nr".`
-- After: `Välj "Nr" **136**.`
+- After: `Välj` *Nr* **136**.
 - Before: `Ange **500** i Antal.`
-- After: `Ange **500** i "Antal".`
+- After: `Ange` **500** `i` *Antal*.
 - Before: `Sätt "Spärrad" till **Nej**.`
-- After: `Inaktivera "Spärrad".`
+- After: `Inaktivera` *Spärrad*.
 
 The boolean form is used only when the Semantic Interaction Rules Engine has
 already established enable/disable intent.
@@ -66,8 +67,8 @@ already established enable/disable intent.
 The plain paragraph text is the concatenation of all runs and contains no
 formatting markers. Screen readers therefore receive a normal sentence without
 spoken Markdown artifacts. Document Workspace maps bold to `strong` and
-monospace to `code`. Word maps the same runs to bold and fixed-width `TextRun`
-properties. Quotation marks remain part of natural accessible text.
+monospace to `code`. Word maps the same runs to bold, italic and fixed-width
+`TextRun` properties.
 
 ## Extension strategy
 

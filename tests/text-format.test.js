@@ -19,13 +19,13 @@ assert.strictEqual(
 );
 assert.deepStrictEqual(
   textFormat.instructionSegments("Ange __400__ i **Antal**."),
-  [{ text: "Ange ", bold: false }, { text: "400", bold: true },
-    { text: ' i "Antal".', bold: false }]
+  [{ text: "Ange " }, { text: "400", bold: true },
+    { text: " i " }, { text: "Antal", italic: true }, { text: "." }]
 );
 assert.deepStrictEqual(
   textFormat.instructionSegments("Ange __ABC_400__ i **Referens**."),
-  [{ text: "Ange ", bold: false }, { text: "ABC_400", bold: true },
-    { text: ' i "Referens".', bold: false }]
+  [{ text: "Ange " }, { text: "ABC_400", bold: true },
+    { text: " i " }, { text: "Referens", italic: true }, { text: "." }]
 );
 
 const formatted = textFormat.applyInstructionFormat(
