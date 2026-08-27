@@ -1,5 +1,8 @@
 # Changelog
 
+- Added the full rich-text editing toolbar to Step comments, with the same bold,
+  italic, font, size, text-colour and background-colour options as instructions;
+  comment formatting now flows through Document Workspace and Word export.
 - Corrected Business Central company detection at recording start: observable
   company context now supplements the URL, and a company from another
   environment is never reused when the active URL omits `company`.

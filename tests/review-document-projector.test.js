@@ -278,6 +278,34 @@ assert.deepStrictEqual(formattedParagraph.presentationRuns[1], {
 });
 assert.strictEqual(formattedParagraph.preserveUserText, true);
 
+const formattedComment = projector.project({
+  sessionId: "formatted-comment",
+  sessionName: "Formatted comment",
+  tasks: [{
+    taskId: "formatted-comment-step",
+    instruction: "Gör något.",
+    userComment: "Kontrollera värdet.",
+    commentRuns: [{ text: "Kontrollera ", italic: true },
+      { text: "värdet", bold: true, textColor: "#C50F1F" },
+      { text: "." }],
+    stepOverride: { fields: {
+      comment: "Kontrollera värdet.",
+      commentRuns: [{ text: "Kontrollera ", italic: true },
+        { text: "värdet", bold: true, textColor: "#C50F1F" },
+        { text: "." }]
+    } }
+  }]
+});
+const commentParagraph = formattedComment.document.sections.find(
+  section => section.kind === "workflow"
+).blocks.find(block => block.kind === "step").blocks.find(
+  block => block.kind === "callout"
+).blocks.find(block => block.kind === "paragraph");
+assert.deepStrictEqual(commentParagraph.presentationRuns[1], {
+  text: "värdet", bold: true, textColor: "#C50F1F"
+});
+assert.strictEqual(commentParagraph.preserveUserText, true);
+
 const incomplete = projector.project({
   sessionId: "incomplete",
   tasks: [{ taskId: "empty" }],

@@ -5,7 +5,7 @@
 })(typeof globalThis !== "undefined" ? globalThis : this, function () {
   const SCHEMA_VERSION = "1.0.0";
   const EDITABLE_FIELDS = Object.freeze([
-    "title", "instruction", "instructionRuns", "comment"
+    "title", "instruction", "instructionRuns", "comment", "commentRuns"
   ]);
 
   function clone(value) {
@@ -29,6 +29,7 @@
       instruction: text(legacy.instruction || legacy.description),
       instructionRuns: clone(legacy.instructionRuns || value.instructionRuns || null),
       comment: text(legacy.comment || legacy.userComment),
+      commentRuns: clone(legacy.commentRuns || value.commentRuns || null),
       screenshotAssetIds: sourceIds(value, "sourceScreenshotAssetIds", "screenshots"),
       selectedScreenshotAssetId: value.selectedScreenshotAssetId ||
         value.screenshot || value.screenshots?.[0] || null,
@@ -163,6 +164,8 @@
         ? fields.comment : base.comment,
       comment: Object.prototype.hasOwnProperty.call(fields, "comment")
         ? fields.comment : base.comment,
+      commentRuns: Object.prototype.hasOwnProperty.call(fields, "commentRuns")
+        ? clone(fields.commentRuns) : base.commentRuns,
       selectedScreenshotAssetId: override?.screenshotOverride
         ?.selectedScreenshotAssetId || base.selectedScreenshotAssetId,
       screenshots: override?.screenshotOverride?.selectedScreenshotAssetId

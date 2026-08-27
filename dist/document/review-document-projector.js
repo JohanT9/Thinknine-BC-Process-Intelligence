@@ -330,6 +330,8 @@
             blockId: `block:comment-text:${stepKey}`,
             kind: "paragraph",
             text: comment,
+            ...(Array.isArray(task.commentRuns)
+              ? { presentationRuns: clone(task.commentRuns) } : {}),
             sourceRef,
             provenance: task.fieldProvenance?.comment || "generated",
             preserveUserText: task.fieldProvenance?.comment === "user-edited"
