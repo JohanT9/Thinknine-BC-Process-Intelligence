@@ -83,6 +83,10 @@ assert(dashboard.includes("list.appendChild(card);\n\n    initializeReviewScreen
 assert(dashboard.includes("Review hierarchy display fallback"));
 assert(dashboard.includes("function reviewTasksForDisplay(review)"));
 assert(dashboard.includes("Review visibility fallback"));
+assert(dashboard.includes("Review active-task resolution failed"));
+assert(dashboard.includes("function renderStoredReviewFallback(error)"));
+assert(dashboard.includes("function renderReviewContent()"));
+assert(dashboard.includes("renderStoredReviewFallback(error)"));
 assert(dashboard.includes('task?.stepOverride?.visibilityOverride !== "hidden"'));
 assert(dashboard.includes("const displayTasks = reviewTasksForDisplay(activeReview)"));
 assert(dashboard.includes("function resetReviewSurfaceForOpen()"));
@@ -92,7 +96,7 @@ assert(dashboard.indexOf("resetReviewSurfaceForOpen();") <
     dashboard.indexOf("async function openReview(session)")));
 assert(dashboard.indexOf('const hierarchyState = resolveReviewHierarchyForDisplay') <
   dashboard.indexOf('list.innerHTML = "";',
-    dashboard.indexOf("function renderReview()")));
+    dashboard.indexOf("function renderReviewContent()")));
 assert(dashboard.includes('data-action="reset-comment"'));
 assert(dashboard.includes("updateCommentResetState"));
 assert(dashboard.includes('data-original-value="${escapeHtml(generatedComment)}"'));

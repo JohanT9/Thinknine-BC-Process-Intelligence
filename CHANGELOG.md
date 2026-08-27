@@ -1,5 +1,7 @@
 # Changelog
 
+- Added a last-resort Review renderer that exposes the concrete runtime failure
+  while restoring stored Step instructions instead of leaving a blank workspace.
 - Recovered stored non-deleted Review Steps when legacy or incompatible derived
   visibility metadata would otherwise filter the entire workspace to zero;
   explicit user hide overrides remain respected.

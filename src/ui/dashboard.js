@@ -5046,9 +5046,16 @@ function resolveReviewHierarchyForDisplay(tasks, hierarchy) {
 }
 
 function reviewTasksForDisplay(review) {
-  const visible = globalThis.T9Review.activeTasks(review);
+  let visible = [];
+  let activeTasksError = null;
+  try {
+    visible = globalThis.T9Review.activeTasks(review);
+  } catch (error) {
+    activeTasksError = error;
+    console.error("Review active-task resolution failed", error);
+  }
   if (visible.length || !review?.tasks?.length) {
-    return { tasks: visible, recovered: false };
+    return { tasks: visible, recovered: false, error: activeTasksError };
   }
   const recoverable = review.tasks.filter(task =>
     !task?.deleted &&
@@ -5066,7 +5073,38 @@ function reviewTasksForDisplay(review) {
       recoveredTaskCount: recoverable.length
     });
   }
-  return { tasks: recoverable, recovered: recoverable.length > 0 };
+  return {
+    tasks: recoverable,
+    recovered: recoverable.length > 0,
+    error: activeTasksError
+  };
+}
+
+function renderStoredReviewFallback(error) {
+  const list = $("reviewList");
+  list.hidden = false;
+  list.innerHTML = "";
+  const stored = (activeReview?.tasks || []).filter(task =>
+    !task?.deleted && task?.stepOverride?.visibilityOverride !== "hidden"
+  );
+  stored.forEach((storedTask, index) => {
+    let task = storedTask;
+    try { task = globalThis.T9StepEditor.resolve(storedTask); } catch {}
+    const card = document.createElement("article");
+    card.className = "review-card needs-review";
+    card.dataset.reviewTaskId = task?.taskId || `stored-task-${index + 1}`;
+    const instruction = String(task?.instruction || task?.description ||
+      "Steget saknar instruktion.");
+    card.innerHTML = `<div class="review-number">${index + 1}</div>
+      <div class="review-fields"><div class="review-field-heading">Instruktion</div>
+      <p>${escapeHtml(instruction)}</p></div>
+      <div class="review-actions"><span class="muted">Säkert visningsläge</span></div>`;
+    list.appendChild(card);
+  });
+  list.setAttribute("aria-rowcount", String(stored.length));
+  const reason = String(error?.message || "okänt renderingsfel");
+  show(`Stegen visas i säkert läge. Renderingsfel: ${reason}`, true);
+  console.error("Review rendering fallback", error);
 }
 
 function updateInstructionPreview(taskId, runs) {
@@ -5290,7 +5328,7 @@ function applyInstructionFormatting(control, editor, patch) {
   updateInstructionToolbar(editor.closest("[data-review-task-id]"), editor);
 }
 
-function renderReview() {
+function renderReviewContent() {
   invalidateDocumentWorkspace();
   const list = $("reviewList");
   const expectedResultEditor = $("expectedResultEditor");
@@ -5721,6 +5759,19 @@ function renderReview() {
     reviewLayoutState
   );
   applyReviewSelection();
+}
+
+function renderReview() {
+  try {
+    renderReviewContent();
+    if (!$('reviewList').children.length && activeReview?.tasks?.length) {
+      renderStoredReviewFallback(new Error(
+        "Den filtrerade steglistan blev tom trots lagrade steg."
+      ));
+    }
+  } catch (error) {
+    renderStoredReviewFallback(error);
+  }
 }
 
 async function saveActiveReview(options = {}) {
