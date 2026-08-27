@@ -81,6 +81,10 @@ assert(dashboard.includes("instructionPresentation.text"));
 assert(dashboard.includes("Instruction presentation fallback"));
 assert(dashboard.includes("list.appendChild(card);\n\n    initializeReviewScreenshots"));
 assert(dashboard.includes("Review hierarchy display fallback"));
+assert(dashboard.includes("function reviewTasksForDisplay(review)"));
+assert(dashboard.includes("Review visibility fallback"));
+assert(dashboard.includes('task?.stepOverride?.visibilityOverride !== "hidden"'));
+assert(dashboard.includes("const displayTasks = reviewTasksForDisplay(activeReview)"));
 assert(dashboard.includes("function resetReviewSurfaceForOpen()"));
 assert(dashboard.includes('$("reviewList").hidden = false;'));
 assert(dashboard.indexOf("resetReviewSurfaceForOpen();") <

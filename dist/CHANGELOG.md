@@ -1,5 +1,8 @@
 # Changelog
 
+- Recovered stored non-deleted Review Steps when legacy or incompatible derived
+  visibility metadata would otherwise filter the entire workspace to zero;
+  explicit user hide overrides remain respected.
 - Reset Review Studio out of image-editing mode whenever a document opens so
   an old hidden-list state cannot conceal otherwise intact Steps.
 - Kept Review steps visible when optional instruction presentation or card

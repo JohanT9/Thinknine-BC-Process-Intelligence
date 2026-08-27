@@ -5045,6 +5045,30 @@ function resolveReviewHierarchyForDisplay(tasks, hierarchy) {
   }
 }
 
+function reviewTasksForDisplay(review) {
+  const visible = globalThis.T9Review.activeTasks(review);
+  if (visible.length || !review?.tasks?.length) {
+    return { tasks: visible, recovered: false };
+  }
+  const recoverable = review.tasks.filter(task =>
+    !task?.deleted &&
+    task?.stepOverride?.visibilityOverride !== "hidden"
+  ).map(task => {
+    try {
+      return globalThis.T9StepEditor.resolve(task);
+    } catch {
+      return task;
+    }
+  });
+  if (recoverable.length) {
+    console.warn("Review visibility fallback", {
+      storedTaskCount: review.tasks.length,
+      recoveredTaskCount: recoverable.length
+    });
+  }
+  return { tasks: recoverable, recovered: recoverable.length > 0 };
+}
+
 function updateInstructionPreview(taskId, runs) {
   const card = [...$("reviewList").querySelectorAll("[data-review-task-id]")]
     .find(element => element.dataset.reviewTaskId === taskId);
@@ -5275,7 +5299,8 @@ function renderReview() {
       configuredExpectedResult();
   }
 
-  const tasks = globalThis.T9Review.activeTasks(activeReview);
+  const displayTasks = reviewTasksForDisplay(activeReview);
+  const tasks = displayTasks.tasks;
   const documentPresentations = documentInstructionPresentationsByTask();
   const progress = globalThis.T9Review.progress(activeReview);
   const hierarchyState = resolveReviewHierarchyForDisplay(
