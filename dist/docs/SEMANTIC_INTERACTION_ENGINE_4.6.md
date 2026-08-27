@@ -37,6 +37,9 @@ separate interaction for the intermediate `Funktion` menu. The compatibility
 rule therefore also accepts the exact adjacent endpoints `Åtgärder → Manuellt
 pris`, retains only their real source references, and uses the final focused-menu
 screenshot. It does not match when any unrelated action occurs between them.
+An immediately repeated `Manuellt pris` capture is retained as evidence on the
+same Semantic Action and suppressed as a duplicate visible step. The preferred
+image remains the first capture where the final menu choice is visibly focused.
 
 Instructions with `user-edited` provenance pass through semantic rules unchanged.
 Reset restores the latest generated semantic instruction.

@@ -96,6 +96,42 @@ assert.strictEqual(manualPriceWithoutFunctionCapture.preferredSourceEventId,
   "event-manual-price-short");
 assert.strictEqual(manualPriceWithoutFunctionCapture.preferredScreenshotRef,
   "manual-price-focused.png");
+const duplicatedManualPriceCapture = only([{
+  taskId: "actions-duplicate", taskType: "RunAction", actionCaption: "Åtgärder",
+  sourceEventIds: ["event-actions-duplicate"], screenshot: "actions.png"
+}, {
+  taskId: "function-duplicate", taskType: "RunAction", actionCaption: "Funktion",
+  sourceEventIds: ["event-function-duplicate"], screenshot: "menu-focused.png"
+}, {
+  taskId: "manual-price-duplicate-1", taskType: "RunAction",
+  actionCaption: "Manuellt pris",
+  sourceEventIds: ["event-manual-price-duplicate-1"], screenshot: "clicked.png"
+}, {
+  taskId: "manual-price-duplicate-2", taskType: "RunAction",
+  actionCaption: "Manuellt pris...",
+  sourceEventIds: ["event-manual-price-duplicate-2"], screenshot: "result.png"
+}], "RunActionPath", "Välj **Åtgärder** → **Funktion** → **Manuellt pris**.");
+assert.strictEqual(duplicatedManualPriceCapture.inputInteractionCount, 4);
+assert.deepStrictEqual(duplicatedManualPriceCapture.sourceEventIds, [
+  "event-actions-duplicate", "event-function-duplicate",
+  "event-manual-price-duplicate-1", "event-manual-price-duplicate-2"
+]);
+assert.strictEqual(duplicatedManualPriceCapture.preferredScreenshotRef,
+  "menu-focused.png");
+const duplicatedReducedCapture = engine.processInteractions([{
+  taskType: "RunAction", actionCaption: "Åtgärder",
+  sourceEventIds: ["event-actions-reduced"]
+}, {
+  taskType: "RunAction", actionCaption: "Manuellt pris",
+  sourceEventIds: ["event-manual-price-reduced-1"], screenshot: "focused.png"
+}, {
+  taskType: "RunAction", actionCaption: "Manuellt pris...",
+  sourceEventIds: ["event-manual-price-reduced-2"], screenshot: "after.png"
+}]);
+assert.strictEqual(duplicatedReducedCapture.length, 1);
+assert.strictEqual(duplicatedReducedCapture[0].inputInteractionCount, 3);
+assert.strictEqual(duplicatedReducedCapture[0].preferredScreenshotRef,
+  "focused.png");
 const unrelatedBetweenMenuActions = engine.processInteractions([{
   taskType: "RunAction", actionCaption: "Åtgärder"
 }, {

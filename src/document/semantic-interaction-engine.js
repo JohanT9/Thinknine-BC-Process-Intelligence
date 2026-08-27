@@ -409,6 +409,11 @@
     );
     const caption = value => text(value?.actionCaption) ||
       text(value?.selectedCaption);
+    const includeTrailingDuplicate = (context, values) => {
+      const candidate = context.interactions[context.index + values.length];
+      return isAction(candidate) && captions[2].test(caption(candidate))
+        ? [...values, candidate] : values;
+    };
     const matchingValues = context => {
       const first = context.interactions[context.index];
       const second = context.interactions[context.index + 1];
@@ -416,10 +421,10 @@
       if (!isAction(first) || !captions[0].test(caption(first))) return [];
       if (isAction(second) && captions[1].test(caption(second)) &&
           isAction(third) && captions[2].test(caption(third))) {
-        return [first, second, third];
+        return includeTrailingDuplicate(context, [first, second, third]);
       }
       return isAction(second) && captions[2].test(caption(second))
-        ? [first, second] : [];
+        ? includeTrailingDuplicate(context, [first, second]) : [];
     };
     const rule = {
       ruleId: "manual-price-menu-path",
@@ -429,7 +434,7 @@
       },
       consolidate(context) {
         const values = matchingValues(context);
-        const menuEvidence = values.length === 3 ? values[1] : values.at(-1);
+        const menuEvidence = values[1];
         const preferredScreenshots = menuEvidence?.semanticActionModel
           ?.screenshotRefs || menuEvidence?.screenshots ||
           (menuEvidence?.screenshot ? [menuEvidence.screenshot] : []);

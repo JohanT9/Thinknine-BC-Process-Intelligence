@@ -1,5 +1,7 @@
 # Changelog
 
+- Absorbed an immediately duplicated `Manuellt pris` capture into the existing
+  menu-path action so it remains traceable without creating a redundant step.
 - Consolidated the manual-price menu path even when a React/Business Central
   surface exposes only the adjacent `Åtgärder` and `Manuellt pris` captures;
   the documented path remains `Åtgärder → Funktion → Manuellt pris` and uses
