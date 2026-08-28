@@ -83,6 +83,17 @@ dialog{width:calc(100% - 36px);box-sizing:border-box;border:1px solid #8392a5;bo
     </menu>
   </form>
 </dialog>
+<dialog id="completionDialog" aria-labelledby="completionDialogTitle"
+  aria-describedby="completionDialogHelp">
+  <form method="dialog">
+    <h2 id="completionDialogTitle">Inspelningen är klar</h2>
+    <p id="completionDialogHelp" class="hint">Vill du öppna Dokumentbiblioteket och fortsätta arbeta med dokumentationen?</p>
+    <menu>
+      <button id="stayAfterRecording" type="button" class="debug">Inte nu</button>
+      <button id="openLibraryAfterRecording" type="button" class="primary">Öppna Dokumentbiblioteket</button>
+    </menu>
+  </form>
+</dialog>
 </main>
 <script src="async-operations.js"></script>
 <script src="popup.js"></script>

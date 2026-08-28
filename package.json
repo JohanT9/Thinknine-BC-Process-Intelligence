@@ -36,6 +36,7 @@
     "test:bug-reporting-ux": "node tests/bug-reporting-ux.test.js",
     "test:recording-live-status": "node tests/recording-live-status.test.js",
     "test:recording-indicator": "node tests/recording-indicator.test.js",
+    "test:recording-completion-navigation": "node tests/recording-completion-navigation.test.js",
     "test:step-editor": "node tests/step-editor.test.js",
     "test:step-structure": "node tests/step-structure-overrides.test.js",
     "test:manual-steps": "node tests/manual-information-steps.test.js",
@@ -57,7 +58,7 @@
     "test:branding": "node tests/product-branding.test.js",
     "test:design-system": "node tests/design-system.test.js",
     "test:bc-url-context": "node tests/business-central-url-context.test.js",
-    "preci": "npm run test:branding && npm run test:design-system && npm run test:bc-url-context && npm run test:bug-reporting-ux && npm run test:recording-live-status && npm run test:recording-indicator && npm run test:review-regeneration-ui",
+    "preci": "npm run test:branding && npm run test:design-system && npm run test:bc-url-context && npm run test:bug-reporting-ux && npm run test:recording-live-status && npm run test:recording-indicator && npm run test:recording-completion-navigation && npm run test:review-regeneration-ui",
     "ci": "npm run lint && npm test && npm run build && npm run check",
     "dev:build": "node scripts/build.js",
     "dev:check": "npm run build && npm run check"

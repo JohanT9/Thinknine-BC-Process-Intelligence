@@ -160,6 +160,22 @@ $("startBug").addEventListener("click", () => startRecording("bug-report"));
 
 let pendingBugRecording = false;
 
+function openCompletionDialog() {
+  const dialog = $("completionDialog");
+  if (!dialog.open) dialog.showModal();
+  $("openLibraryAfterRecording").focus();
+}
+
+function stayAfterRecording() {
+  $("completionDialog").close();
+  showMessage("Inspelningen har sparats i Dokumentbiblioteket.");
+}
+
+function openLibraryAfterRecording() {
+  $("completionDialog").close();
+  chrome.runtime.openOptionsPage();
+}
+
 async function finishRecording(name) {
   try {
     showMessage(pendingBugRecording
@@ -176,6 +192,7 @@ async function finishRecording(name) {
       ? "Felrapporten har skapats och öppnats."
       : "Inspelningen har stoppats.");
     await refresh();
+    if (!pendingBugRecording) openCompletionDialog();
   } catch (error) {
     showMessage(error.message, true);
   }
@@ -252,6 +269,8 @@ $("stop").addEventListener("click", async () => {
 
 $("cancelName").addEventListener("click", () => $("nameDialog").close());
 $("discardRecording").addEventListener("click", discardActiveRecording);
+$("stayAfterRecording").addEventListener("click", stayAfterRecording);
+$("openLibraryAfterRecording").addEventListener("click", openLibraryAfterRecording);
 $("nameForm").addEventListener("submit", event => {
   event.preventDefault();
   const name = $("recordingName").value.trim();

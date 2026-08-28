@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+- Processinspelningar erbjuder nu direkt efter namngivning och sparning ett val
+  att öppna Dokumentbiblioteket eller stanna kvar.
+
 - Added immutable capture packets to Step Grouping so matching control/action
   mechanics, immediate results, and screenshots travel together. Duplicate
   activations are consolidated, result captures are preferred, and unknown
