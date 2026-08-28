@@ -212,11 +212,16 @@ manufacturing, and Aptean rules are not misrepresented as verified page records.
 
 ## Event Normalization boundary
 
-Event Normalization 2.1.0 is the sole owner of browser-mechanic coalescing. It
+Event Normalization 2.2.0 is the sole owner of browser-mechanic coalescing. It
 consumes durable Raw Events and BC UI Identification, emits immutable normalized
 interactions, and never groups them into Steps. React/MUI focus comparison is
 capture evidence; only normalization may classify a verified difference as a
 `value-change`.
+
+Step Grouping 1.2.0 attaches additive result verification to capture packets.
+Observed navigation, dialog, value, selection, toggle, and error outcomes flow
+to Semantic Actions and Review without modifying Canonical Recording or
+overwriting the consultant's expected-result text.
 
 ### React and control-add-in capture reliability
 

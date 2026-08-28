@@ -30,7 +30,7 @@ const quantity = run([
     value: { normalized: "500" }, screenshotAssetId: "shot-2" })
 ]);
 assert.strictEqual(quantity.schemaVersion, 1);
-assert.strictEqual(quantity.groupingVersion, "1.1.0");
+assert.strictEqual(quantity.groupingVersion, "1.2.0");
 assert.strictEqual(quantity.groups.length, 1);
 assert.strictEqual(quantity.groups[0].groupKind, "field-edit");
 assert.deepStrictEqual(quantity.groups[0].sourceEventIds,
@@ -42,7 +42,7 @@ assert.deepStrictEqual(quantity.groups[0].supportingNormalizedEventIds,
   ["normalized:q1", "normalized:q2"]);
 assert.deepStrictEqual(quantity.groups[0].screenshotAssetIds,
   ["shot-1", "shot-2"]);
-assert.strictEqual(quantity.groups[0].capturePacket.packetVersion, "1.0.0");
+assert.strictEqual(quantity.groups[0].capturePacket.packetVersion, "1.1.0");
 assert.strictEqual(quantity.groups[0].capturePacket.preferredScreenshotAssetId,
   "shot-2");
 assert.strictEqual(quantity.groups[0].capturePacket.completeness, "complete");

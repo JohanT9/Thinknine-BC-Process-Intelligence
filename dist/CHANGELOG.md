@@ -11,6 +11,11 @@
 
 ## Unreleased
 
+- Added deterministic interaction-result verification for navigation, dialogs,
+  changed values, selections, toggles, and Business Central errors. Review
+  Studio shows the observed outcome while preserving raw evidence and leaving
+  the editable expected-result text untouched.
+
 - Added an automatic, deterministic capture-surface mode for React, Material UI,
   nested control add-ins, and observable ARIA controls while preserving the
   existing standard Business Central capture path and raw-event traceability.

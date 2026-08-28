@@ -5,8 +5,9 @@
 })(typeof globalThis !== "undefined" ? globalThis : this, function () {
   "use strict";
   const SCHEMA_VERSION = 1;
-  const GROUPING_VERSION = "1.1.0";
-  const CAPTURE_PACKET_VERSION = "1.0.0";
+  const GROUPING_VERSION = "1.2.0";
+  const CAPTURE_PACKET_VERSION = "1.1.0";
+  const RESULT_VERIFICATION_VERSION = "1.0.0";
   const cache = new WeakMap();
   const clone = value => value == null ? value : JSON.parse(JSON.stringify(value));
   function freeze(value) { if (!value || typeof value !== "object" || Object.isFrozen(value)) return value; Object.values(value).forEach(freeze); return Object.freeze(value); }
@@ -45,7 +46,7 @@
   }
   function outcomeEvents(events) { return events.filter(event =>
     ["dialog-open", "dialog-close", "navigation", "value-change",
-      "selection-change", "toggle-change"].includes(event.kind)); }
+      "selection-change", "toggle-change", "error-outcome"].includes(event.kind)); }
   function primaryEvent(events) {
     if (events.some(event => event.kind === "activation") &&
         !events.some(isLookupOrigin) && outcomeEvents(events).length) {
@@ -53,7 +54,58 @@
     }
     return [...events].reverse().find(event => ["value-change", "toggle-change",
       "selection-change", "activation", "dialog-open", "dialog-close",
-      "navigation"].includes(event.kind)) || events.at(-1);
+      "navigation", "error-outcome"].includes(event.kind)) || events.at(-1);
+  }
+  function observedCaption(event, type) {
+    if (type === "page") return event.pageIdentification?.pageCaption ||
+      event.pageIdentification?.caption || event.pageIdentification?.name || "";
+    return event.controlIdentification?.caption ||
+      event.actionIdentification?.caption || "";
+  }
+  function outcomeDescription(event) {
+    const pageCaption = observedCaption(event, "page");
+    const controlCaption = observedCaption(event, "control");
+    switch (event.kind) {
+      case "navigation": return pageCaption
+        ? `Sidan ${pageCaption} \u00f6ppnades.` : "En ny sida \u00f6ppnades.";
+      case "dialog-open": return pageCaption
+        ? `Dialogrutan ${pageCaption} \u00f6ppnades.` : "En dialogruta \u00f6ppnades.";
+      case "dialog-close": return "Dialogrutan st\u00e4ngdes.";
+      case "value-change": return controlCaption
+        ? `${controlCaption} uppdaterades.` : "F\u00e4ltv\u00e4rdet uppdaterades.";
+      case "selection-change": return controlCaption
+        ? `Ett val registrerades i ${controlCaption}.` : "Ett val registrerades.";
+      case "toggle-change": return controlCaption
+        ? `${controlCaption} ${event.state?.checked ? "aktiverades" : "inaktiverades"}.`
+        : `Alternativet ${event.state?.checked ? "aktiverades" : "inaktiverades"}.`;
+      case "error-outcome": return "Business Central visade ett fel.";
+      default: return "";
+    }
+  }
+  function resultVerification(outcomes) {
+    const values = outcomes.map(event => ({
+      kind: event.kind,
+      normalizedEventId: event.normalizedEventId,
+      sourceEventIds: unique(event.sourceEventIds || [event.sourceEventId]),
+      ...(observedCaption(event, "page")
+        ? { pageCaption: observedCaption(event, "page") } : {}),
+      ...(observedCaption(event, "control")
+        ? { controlCaption: observedCaption(event, "control") } : {}),
+      ...(event.kind === "toggle-change" && event.state?.checked != null
+        ? { checked: Boolean(event.state.checked) } : {}),
+      description: outcomeDescription(event)
+    }));
+    const error = values.find(value => value.kind === "error-outcome");
+    const primary = error || values.at(-1) || null;
+    return {
+      version: RESULT_VERIFICATION_VERSION,
+      status: error ? "error" : primary ? "verified" : "unverified",
+      primaryOutcome: primary?.kind || null,
+      outcomes: values,
+      summary: primary?.description || "Resultatet kunde inte verifieras automatiskt.",
+      expectedResultSuggestion: primary?.description || "",
+      sourceEventIds: unique(values.flatMap(value => value.sourceEventIds))
+    };
   }
   function capturePacket(events, primary, screenshots) {
     const interaction = events.find(event => event.kind === "activation") || primary;
@@ -61,7 +113,7 @@
     const outcomes = observedOutcomes.length ? observedOutcomes :
       primary && primary !== interaction ? [primary] :
         primary && ["value-change", "selection-change", "toggle-change",
-          "navigation", "dialog-open", "dialog-close"].includes(primary.kind)
+          "navigation", "dialog-open", "dialog-close", "error-outcome"].includes(primary.kind)
           ? [primary] : [];
     const preferredScreenshotEvent = [...events].reverse().find(event =>
       event?.screenshotAssetId || event?.screenshotAssetIds?.length);
@@ -84,6 +136,7 @@
       screenshotAssetIds: screenshots,
       preferredScreenshotAssetId,
       preferredSourceEventId: preferredScreenshotEvent?.sourceEventId || null,
+      resultVerification: resultVerification(outcomes),
       completeness: missing.length ? "partial" : "complete",
       missing
     };
@@ -151,7 +204,7 @@
   function isActionOutcome(events, event) {
     const origin = events?.[0];
     if (origin?.kind !== "activation") return false;
-    if (["dialog-open", "dialog-close", "navigation"].includes(event.kind)) return true;
+    if (["dialog-open", "dialog-close", "navigation", "error-outcome"].includes(event.kind)) return true;
     if (["value-change", "selection-change", "toggle-change"].includes(event.kind)) {
       return pageKey(origin) === pageKey(event) &&
         (controlKey(origin) === controlKey(event) || Boolean(
@@ -212,7 +265,6 @@
       if (pending && isActionOutcome(pending.events, event)) {
         pending.events.push(event);
         pending.reasons.push("observed-action-result");
-        emit();
         continue;
       }
       if (pending && canContinueField(pending.events, event)) {
@@ -266,6 +318,7 @@
     return result;
   }
   function normalizeStepGroup(value) { if (!value || Number(value.schemaVersion) !== SCHEMA_VERSION) throw new Error("Unsupported Step Group schema."); return freeze(clone(value)); }
-  return { CAPTURE_PACKET_VERSION, GROUPING_VERSION, SCHEMA_VERSION, group,
+  return { CAPTURE_PACKET_VERSION, GROUPING_VERSION, RESULT_VERIFICATION_VERSION,
+    SCHEMA_VERSION, group,
     normalizeStepGroup };
 });

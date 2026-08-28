@@ -5541,6 +5541,9 @@ function renderReviewContent() {
             ? ` · ${escapeHtml(task.knowledgeRule)}`
             : ""}
         </div>
+        ${task.resultVerified && task.observedResult
+          ? `<p class="review-observed-result"><strong>Observerat resultat:</strong> ${escapeHtml(task.observedResult)}</p>`
+          : ""}
         ${images.map((image, imageIndex) =>
           `<div class="review-screenshot">
             <div class="review-image-stage" data-review-image-index="${imageIndex}">

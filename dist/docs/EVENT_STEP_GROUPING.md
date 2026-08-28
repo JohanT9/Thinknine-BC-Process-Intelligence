@@ -35,13 +35,15 @@ candidate status, and an additive immutable `capturePacket`. Unknown future
 fields survive normalization.
 
 The capture packet explicitly relates the observed interaction to its immediate
-verified result and captured screenshot evidence. It records interaction and
+verified result and captured screenshot evidence. Version `1.1.0` also carries
+the formal `resultVerification` contract described in
+[INTERACTION_RESULT_VERIFICATION.md](INTERACTION_RESULT_VERIFICATION.md). It records interaction and
 result event IDs separately, all screenshot asset IDs, the source event owning
 the latest result capture, completeness (`complete` or `partial`), and any
 missing role. It is derived evidence: Canonical Recording and raw events remain
 unchanged.
 
-Algorithm version is `1.1.0`. IDs use the version plus collision-safe,
+Algorithm version is `1.2.0`. IDs use the version plus collision-safe,
 length-prefixed canonical source IDs. They do not use random values, execution
 time, Review order, export state, or captions.
 
@@ -53,7 +55,9 @@ The structural kinds are `field-edit`, `lookup-interaction`, `selection`,
 
 Navigation and dialog mechanics normally remain boundaries. When they are the
 immediate observed result of a captioned action, they complete that action's
-capture packet instead of creating a duplicate step. Repeated activations of
+capture packet instead of creating a duplicate step. Multiple immediate
+outcomes may remain in the same packet, such as dialog-open followed by a
+Business Central error. Repeated activations of
 the same identified action/control may be coalesced only inside a bounded
 1.2-second interaction window. Timing is never sufficient without matching page
 and action/control identity. Page identity changes, unrelated controls, and

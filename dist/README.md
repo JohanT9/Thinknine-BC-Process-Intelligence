@@ -104,7 +104,7 @@ Aptean, AppSource, tenant, customer, and control-add-in pages remain recordable
 through Review, Workspace, and export without fabricated entity or table data.
 The Page Identification Engine owns resolution; dashboard only orchestrates.
 
-## Event Normalization 2.1.0
+## Event Normalization 2.2.0
 
 During recording, the in-page panel can optionally mark the latest captured
 interaction as important, choose its screenshot, start a new section, or ignore
@@ -126,6 +126,14 @@ React-, MUI- och Control Add-in-ytor identifieras automatiskt genom observerbar
 DOM- och rammetadata. Ett avgränsat förstärkt fångstläge hanterar fler
 tillgänglighetsroller utan att ändra fångsten i vanliga Business Central-vyer.
 Ingen React-intern data, OCR eller extern kommunikation används.
+
+## Interaction result verification
+
+Capture packets retain deterministic observed outcomes after an action:
+navigation, dialogs, changed controls, selections, toggles, and Business Central
+errors. Review Studio shows the verified result without replacing the manual
+expected-result field. See
+[Interaction Result Verification](docs/INTERACTION_RESULT_VERIFICATION.md).
 
 ## Canonical Recording Hardening
 

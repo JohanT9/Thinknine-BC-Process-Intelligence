@@ -175,6 +175,10 @@
       markerSourceEventIds: unique([...(result.markerSourceEventIds || []),
         ...(value.captureGuidance?.markerSourceEventIds || [])])
     }), {});
+    const resultVerification = values.map(value =>
+      value.resultVerification || value.capturePacket?.resultVerification ||
+      value.stepGroups?.at(-1)?.capturePacket?.resultVerification
+    ).filter(Boolean).at(-1);
     return deepFreeze({
       ...futureMetadata,
       actionId: stableId(rule.ruleId, values),
@@ -184,6 +188,7 @@
       selectedValue: properties.selectedValue || "",
       targetField: properties.targetField || "",
       captureGuidance,
+      ...(resultVerification ? { resultVerification: clone(resultVerification) } : {}),
       ...(Object.keys(page).length ? { pageContext: page,
         pageIdentification: clone(page),
         pageIdentity: page.pageIdentity || null,

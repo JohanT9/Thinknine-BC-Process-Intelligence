@@ -67,6 +67,14 @@ function (semantic, knowledge, refs) {
       instructionValue: action.selectedValue ?? "", sourceEventNos: eventNos,
       ...trace, screenshot, screenshots: screenshot ? [screenshot] : [],
       captureGuidance: { ...(action.captureGuidance || {}) },
+      ...(action.resultVerification ? {
+        resultVerification: { ...action.resultVerification },
+        observedResult: action.resultVerification.summary || "",
+        expectedResultSuggestion:
+          action.resultVerification.expectedResultSuggestion || "",
+        resultVerified: ["verified", "error"].includes(
+          action.resultVerification.status)
+      } : {}),
       important: Boolean(action.captureGuidance?.important),
       sectionBoundaryAfter: Boolean(action.captureGuidance?.sectionBoundaryAfter),
       context: context(action, sourceEvents), automationId: "",

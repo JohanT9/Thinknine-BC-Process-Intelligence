@@ -2,7 +2,7 @@
 
 ## Boundary and version
 
-Event Normalization 2.1.0 converts persisted browser mechanics plus BC UI
+Event Normalization 2.2.0 converts persisted browser mechanics plus BC UI
 Identification into deterministic, renderer-neutral interactions:
 
 ```text
@@ -25,6 +25,7 @@ The deliberately small vocabulary is:
 - `navigation`
 - `dialog-open`
 - `dialog-close`
+- `error-outcome`
 - `key-command`
 - `unknown`
 
@@ -74,6 +75,8 @@ Checkbox click/change mechanics with observed checked state become
 Dialog presence transitions are captured and normalized separately as
 `dialog-open` and `dialog-close`. Navigation requires captured page/URL
 transition evidence; MutationObserver activity alone is not a business action.
+Captured `bc-error` evidence becomes `error-outcome`; sensitive diagnostic
+details remain only in their dedicated raw/bug-report evidence model.
 
 Unknown mechanics remain `unknown` with their raw source identity and evidence.
 No wording, intent, step boundary, or business outcome is generated here.
