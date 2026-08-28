@@ -226,22 +226,25 @@ async function discardActiveRecording() {
   }
 }
 
+function openNameDialog(bugRecording) {
+  pendingBugRecording = bugRecording;
+  updateText($("nameDialogTitle"), pendingBugRecording
+    ? "Namnge felrapporten" : "Namnge processinspelningen");
+  updateText($("nameDialogHelp"), pendingBugRecording
+    ? "Ange ett tydligt namn på problemet. Rapporten skapas när du fortsätter."
+    : "Ange namnet som ska visas i Dokumentbiblioteket.");
+  $("recordingName").value = "";
+  $("recordingName").placeholder = pendingBugRecording
+    ? "Exempel: Fel vid frisläppning av order"
+    : "Exempel: Skapa försäljningsorder";
+  if (!$("nameDialog").open) $("nameDialog").showModal();
+  $("recordingName").focus();
+}
+
 $("stop").addEventListener("click", async () => {
   try {
     const state = await send({ type: "T9_GET_STATE" }, 3000);
-    pendingBugRecording = state?.state?.recordingPurpose === "bug-report";
-    updateText($("nameDialogTitle"), pendingBugRecording
-      ? "Namnge felrapporten"
-      : "Namnge processinspelningen");
-    updateText($("nameDialogHelp"), pendingBugRecording
-      ? "Ange ett tydligt namn på problemet. Rapporten skapas när du fortsätter."
-      : "Ange namnet som ska visas i Dokumentbiblioteket.");
-    $("recordingName").value = "";
-    $("recordingName").placeholder = pendingBugRecording
-      ? "Exempel: Fel vid frisläppning av order"
-      : "Exempel: Skapa försäljningsorder";
-    $("nameDialog").showModal();
-    $("recordingName").focus();
+    openNameDialog(state?.state?.recordingPurpose === "bug-report");
   } catch (error) {
     showMessage(error.message, true);
   }
@@ -265,6 +268,15 @@ $("debug").addEventListener("click", () => {
   chrome.tabs.create({ url: chrome.runtime.getURL("debug.html") });
 });
 
-refresh();
+refresh().then(async () => {
+  try {
+    const response = await send({ type: "T9_GET_STATE" }, 3000);
+    if (!response?.state?.recording || !response.state.stopPromptRequested) return;
+    openNameDialog(response.state.recordingPurpose === "bug-report");
+    await send({ type: "T9_CLEAR_STOP_REQUEST" }, 3000);
+  } catch (error) {
+    showMessage(error.message, true);
+  }
+});
 const refreshInterval = setInterval(refresh, 1000);
 globalThis.addEventListener("pagehide", () => clearInterval(refreshInterval), { once: true });

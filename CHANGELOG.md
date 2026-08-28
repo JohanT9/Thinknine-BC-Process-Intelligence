@@ -1,5 +1,9 @@
 # Changelog
 
+- Added a persistent, minimizable recording indicator inside the active
+  Business Central tab. Its coloured frame shows capture health, its panel
+  reports live event/image progress, and Stop opens the existing safe naming
+  flow without recording the indicator's own interactions.
 - Added an accessible live recording status in the recorder popup showing the
   latest captured action, page, screenshot progress, Business Central context
   and connection state, with immediate warnings for missing events or images.

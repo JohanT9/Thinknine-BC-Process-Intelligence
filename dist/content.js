@@ -48,6 +48,124 @@
   const inputTimers = new WeakMap();
   const observedDialogs = new Set();
   let pendingPointerCapture = null;
+  const recordingIndicator = { host: null, shadow: null, minimized: false,
+    refreshTimer: null };
+
+  function isTopDocument() {
+    try { return window === window.top; } catch { return false; }
+  }
+
+  function isRecorderUiEvent(event) {
+    return Boolean(recordingIndicator.host &&
+      event.composedPath?.().includes(recordingIndicator.host));
+  }
+
+  function indicatorTone(liveStatus) {
+    const codes = new Set((liveStatus?.warnings || []).map(item => item.code));
+    if (!liveStatus?.connected || codes.has("screenshot-error") ||
+        codes.has("recording-truncated")) return "error";
+    return codes.size ? "warning" : "ok";
+  }
+
+  function updateRecordingIndicator(liveStatus) {
+    const shadow = recordingIndicator.shadow;
+    if (!shadow) return;
+    const tone = indicatorTone(liveStatus);
+    recordingIndicator.host.dataset.tone = tone;
+    const action = liveStatus?.latestAction;
+    shadow.getElementById("indicatorState").textContent = tone === "error"
+      ? "Inspelningen behöver kontrolleras" : "Inspelning pågår";
+    shadow.getElementById("indicatorLatest").textContent = action
+      ? (action.label || action.category || action.type || "Händelse registrerad")
+      : "Väntar på första händelsen";
+    shadow.getElementById("indicatorCounts").textContent =
+      `${liveStatus?.eventCount || 0} händelser · ` +
+      `${liveStatus?.screenshots?.captured || 0} bilder`;
+    const warning = shadow.getElementById("indicatorWarning");
+    const messages = (liveStatus?.warnings || []).map(item => item.message);
+    warning.hidden = messages.length === 0;
+    warning.textContent = messages[0] || "";
+  }
+
+  function refreshRecordingIndicator() {
+    if (!recording || !isTopDocument()) return;
+    try {
+      chrome.runtime.sendMessage({ type: "T9_GET_STATE" }, response => {
+        if (chrome.runtime.lastError || !response?.state?.recording) return;
+        updateRecordingIndicator(response.liveStatus);
+      });
+    } catch {}
+  }
+
+  function removeRecordingIndicator() {
+    if (recordingIndicator.refreshTimer) {
+      clearInterval(recordingIndicator.refreshTimer);
+      recordingIndicator.refreshTimer = null;
+    }
+    recordingIndicator.host?.remove();
+    recordingIndicator.host = null;
+    recordingIndicator.shadow = null;
+  }
+
+  function showRecordingIndicator() {
+    if (!recording || !isTopDocument() || recordingIndicator.host ||
+        !document.documentElement) return;
+    const host = document.createElement("div");
+    host.id = "t9-recording-indicator-host";
+    host.dataset.tone = "warning";
+    const shadow = host.attachShadow({ mode: "closed" });
+    shadow.innerHTML = `<style>
+      :host{--tone:#008c95;position:fixed;inset:0;z-index:2147483647;
+        pointer-events:none;box-shadow:inset 0 0 0 3px var(--tone)}
+      :host([data-tone="warning"]){--tone:#c35a00}
+      :host([data-tone="error"]){--tone:#c50f1f}
+      .panel{position:absolute;right:16px;bottom:16px;width:270px;box-sizing:border-box;
+        pointer-events:auto;background:#fff;color:#242424;border:2px solid var(--tone);
+        border-radius:8px;box-shadow:0 5px 18px rgba(0,0,0,.24);font:13px "Segoe UI",Arial,sans-serif}
+      .head{display:flex;align-items:center;gap:8px;padding:9px 10px;background:#f5f5f5;
+        border-radius:6px 6px 0 0}.dot{width:10px;height:10px;border-radius:50%;background:var(--tone)}
+      strong{flex:1}.body{padding:9px 10px}.latest{margin:0 0 5px;font-weight:600}
+      .counts,.warning{margin:0;color:#5c5c5c}.warning{margin-top:6px;color:#9a3412}
+      button{font:inherit;border:1px solid #8a8886;border-radius:4px;background:#fff;
+        color:#242424;padding:5px 9px;cursor:pointer}.stop{border-color:#008c95;color:#006b70}
+      .actions{display:flex;gap:6px;padding:0 10px 10px}.actions .stop{flex:1}
+      :host([data-minimized="true"]) .body,:host([data-minimized="true"]) .actions{display:none}
+      :host([data-minimized="true"]) .panel{width:190px}
+    </style><aside class="panel" role="status" aria-live="polite">
+      <div class="head"><span class="dot"></span><strong id="indicatorState">Inspelning pågår</strong>
+        <button id="indicatorMinimize" type="button" title="Minimera">−</button></div>
+      <div class="body"><p id="indicatorLatest" class="latest">Väntar på första händelsen</p>
+        <p id="indicatorCounts" class="counts">0 händelser · 0 bilder</p>
+        <p id="indicatorWarning" class="warning" hidden></p></div>
+      <div class="actions"><button id="indicatorStop" class="stop" type="button">Stoppa</button></div>
+    </aside>`;
+    recordingIndicator.host = host;
+    recordingIndicator.shadow = shadow;
+    shadow.getElementById("indicatorMinimize").addEventListener("click", event => {
+      event.stopPropagation();
+      recordingIndicator.minimized = !recordingIndicator.minimized;
+      host.dataset.minimized = String(recordingIndicator.minimized);
+      event.currentTarget.textContent = recordingIndicator.minimized ? "+" : "−";
+      event.currentTarget.title = recordingIndicator.minimized ? "Visa" : "Minimera";
+    });
+    shadow.getElementById("indicatorStop").addEventListener("click", event => {
+      event.stopPropagation();
+      chrome.runtime.sendMessage({ type: "T9_REQUEST_STOP_DIALOG" }, response => {
+        if (chrome.runtime.lastError || response?.ok) return;
+        shadow.getElementById("indicatorWarning").hidden = false;
+        shadow.getElementById("indicatorWarning").textContent =
+          response?.error || "Öppna tillägget för att stoppa inspelningen.";
+      });
+    });
+    document.documentElement.append(host);
+    refreshRecordingIndicator();
+    recordingIndicator.refreshTimer = setInterval(refreshRecordingIndicator, 1000);
+  }
+
+  function syncRecordingIndicator() {
+    if (recording) showRecordingIndicator();
+    else removeRecordingIndicator();
+  }
 
   function diagnostic(stage, details = {}) {
     if (!diagnosticsEnabled) return;
@@ -68,9 +186,11 @@
   try {
     chrome.runtime.sendMessage({ type: "T9_GET_STATE" }, response => {
       if (chrome.runtime.lastError) return;
-      recording = Boolean(response?.state?.recording);
-      sessionId = response?.state?.sessionId || null;
-      recordingPurpose = response?.state?.recordingPurpose || null;
+      recording = Boolean(response?.state?.recording && response.isRecordingTab);
+      sessionId = recording ? response?.state?.sessionId || null : null;
+      recordingPurpose = recording
+        ? response?.state?.recordingPurpose || null : null;
+      syncRecordingIndicator();
     });
   } catch {
     // The extension context may be invalidated during an extension reload.
@@ -90,6 +210,7 @@
           recording = Boolean(response.state.recording);
           sessionId = response.state.sessionId || null;
           recordingPurpose = response.state.recordingPurpose || null;
+          syncRecordingIndicator();
         }
         diagnosticsEnabled = Boolean(response?.diagnosticsEnabled);
       });
@@ -106,6 +227,7 @@
       recording = Boolean(message.recording);
       sessionId = message.sessionId || null;
       recordingPurpose = message.recordingPurpose || null;
+      syncRecordingIndicator();
       sendResponse({ ok: true });
       return false;
     }
@@ -123,6 +245,19 @@
       return false;
     }
 
+    if (message.type === "T9_SET_INDICATOR_CAPTURE_VISIBILITY") {
+      if (recordingIndicator.host) {
+        recordingIndicator.host.style.display = message.hidden ? "none" : "";
+      }
+      if (!message.hidden) {
+        sendResponse({ ok: true });
+        return false;
+      }
+      requestAnimationFrame(() => requestAnimationFrame(() =>
+        sendResponse({ ok: true })));
+      return true;
+    }
+
     return false;
   });
 
@@ -131,9 +266,14 @@
   // add-ins synchronized across service-worker restarts and frame remounts.
   chrome.storage.onChanged.addListener((changes, areaName) => {
     if (areaName !== "local" || !changes.t9_state?.newValue) return;
-    recording = Boolean(changes.t9_state.newValue.recording);
-    sessionId = changes.t9_state.newValue.sessionId || null;
-    recordingPurpose = changes.t9_state.newValue.recordingPurpose || null;
+    if (!changes.t9_state.newValue.recording) {
+      recording = false;
+      sessionId = null;
+      recordingPurpose = null;
+      syncRecordingIndicator();
+      return;
+    }
+    sendPing();
   });
 
   function clean(value, max = 300) {
@@ -610,6 +750,7 @@
   }
 
   window.addEventListener("pointerdown", event => {
+    if (isRecorderUiEvent(event)) return;
     if (!recording || !sessionId || event.button !== 0) return;
     const observedTarget = eventElement(event);
     const target = interactiveTarget(observedTarget, event) ||
@@ -626,6 +767,7 @@
 
 
   window.addEventListener("click", event => {
+    if (isRecorderUiEvent(event)) return;
     const observedTarget = eventElement(event);
     const target = interactiveTarget(observedTarget, event) ||
       (observedTarget instanceof Element ? observedTarget : null);

@@ -39,6 +39,15 @@ Business Central context and bounded warnings without reading or changing raw
 events. The contract deliberately omits entered values and URL query data;
 Canonical Recording remains the evidence source of truth.
 
+The active top-level Business Central document also hosts an isolated recording
+indicator in a closed Shadow DOM. It consumes the same live-status contract and
+never interprets or persists events. Indicator interactions are excluded before
+the recorder's pointer/click pipeline, and its Stop action delegates to the
+existing popup naming flow. Child frames and non-recording tabs never render it.
+The background capture boundary temporarily hides the indicator for two paint
+frames before taking a screenshot and restores it afterwards, so recorder UI
+never becomes part of documentation evidence.
+
 BC Knowledge Base preserves `recordingPurpose` as routing metadata. Opening a
 `bug-report` recording resolves its stable Bug Report identity and opens
 Technical Report Workspace; it must never enter process Review, Semantic

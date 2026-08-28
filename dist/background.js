@@ -483,9 +483,17 @@ function createGitHubProvider(configuration) {
 }
 
 async function capture(tabId) {
+  let indicatorHidden = false;
   try {
     const tab = await chrome.tabs.get(tabId);
     if (!tab.active) return null;
+
+    try {
+      await chrome.tabs.sendMessage(tabId, {
+        type: "T9_SET_INDICATOR_CAPTURE_VISIBILITY", hidden: true
+      }, { frameId: 0 });
+      indicatorHidden = true;
+    } catch {}
 
     return await chrome.tabs.captureVisibleTab(tab.windowId, {
       format: "png"
@@ -497,6 +505,14 @@ async function capture(tabId) {
       screenshotStats: { ...screenshotStats }
     });
     return null;
+  } finally {
+    if (indicatorHidden) {
+      try {
+        await chrome.tabs.sendMessage(tabId, {
+          type: "T9_SET_INDICATOR_CAPTURE_VISIBILITY", hidden: false
+        }, { frameId: 0 });
+      } catch {}
+    }
   }
 }
 
@@ -1383,7 +1399,13 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
         await updateFrameDiagnostic(sender, message.frameUrl,
           message.frameDepth, pingState, message);
         const pingDebug = await chrome.storage.local.get(DEBUG_KEY);
-        sendResponse({ ok: true, version: VERSION, state: pingState,
+        const recordingForSender = Boolean(pingState.recording &&
+          sender.tab?.id === pingState.tabId);
+        sendResponse({ ok: true, version: VERSION,
+          state: { ...pingState, recording: recordingForSender,
+            sessionId: recordingForSender ? pingState.sessionId : null,
+            recordingPurpose: recordingForSender
+              ? pingState.recordingPurpose : null },
           diagnosticsEnabled: Boolean(
             pingDebug[DEBUG_KEY]?.captureDiagnosticsEnabled
           ) });
@@ -1781,10 +1803,36 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
         const debugData = await chrome.storage.local.get(DEBUG_KEY);
         const debug = debugData[DEBUG_KEY] || {};
         sendResponse({ ok: true, state, session,
+          isRecordingTab: Boolean(state.recording &&
+            sender.tab?.id === state.tabId),
           liveStatus: state.recording
             ? globalThis.T9RecordingLiveStatus.derive({ session, debug,
               connected: debug.connected !== false })
             : null });
+        break;
+      }
+
+      case "T9_REQUEST_STOP_DIALOG": {
+        const state = await getState();
+        if (!state.recording) throw new Error("Ingen aktiv inspelning finns.");
+        await setState({ ...state, stopPromptRequested: true });
+        try {
+          await chrome.action.openPopup();
+          sendResponse({ ok: true });
+        } catch (error) {
+          await setState({ ...state, stopPromptRequested: false });
+          throw new Error("Kunde inte öppna inspelningsdialogen. " +
+            "Öppna tillägget för att stoppa inspelningen.");
+        }
+        break;
+      }
+
+      case "T9_CLEAR_STOP_REQUEST": {
+        const state = await getState();
+        if (state.stopPromptRequested) {
+          await setState({ ...state, stopPromptRequested: false });
+        }
+        sendResponse({ ok: true });
         break;
       }
 
