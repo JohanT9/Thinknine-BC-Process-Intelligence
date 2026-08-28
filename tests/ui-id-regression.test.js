@@ -223,6 +223,13 @@ assert.ok(
   "Popup status must be live without repeated unchanged DOM announcements."
 );
 assert.ok(
+  popupHtml.includes('id="liveStatusTitle"') &&
+    popupHtml.includes('id="captureWarning"') &&
+    popupHtml.includes('aria-live="polite"') &&
+    popupJs.includes("function renderLiveStatus(liveStatus)"),
+  "Popup must expose accessible live recording quality feedback."
+);
+assert.ok(
   html.includes('id="workspaceTabs" class="workspace-tabs" role="tablist"') &&
     html.includes('id="reviewWorkspaceTab" role="tab"') &&
     html.includes('id="documentWorkspaceTab" role="tab"') &&

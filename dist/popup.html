@@ -20,6 +20,7 @@ dl{display:grid;grid-template-columns:90px 1fr;gap:5px;font-size:12px}dt{font-we
 .message{font-size:12px;min-height:18px}
 .technical-tools{margin-top:4px}.technical-tools summary{cursor:pointer;font-size:12px;font-weight:600;margin-bottom:8px}.technical-tools button{margin-top:4px}
 .mode-grid{display:grid;gap:10px}.mode-card{text-align:left;padding:13px}.mode-card strong,.mode-card span{display:block}.mode-card span{font-weight:400;font-size:12px;margin-top:4px}.hint{font-size:12px;color:#52606d}.captured{padding:8px;background:#ecfdf3;color:#166534;border-radius:5px;font-size:12px}
+.live-card{margin:12px 0;padding:10px;border:1px solid #cbd2d9;border-radius:7px;background:#fff}.live-card h2{font-size:14px;margin:0 0 8px}.live-grid{grid-template-columns:92px 1fr;margin:0}.live-ok{color:#166534}.live-warning{margin:8px 0 0;padding:8px;border-radius:5px;background:#fff7ed;color:#9a3412;font-size:12px}.live-warning[hidden]{display:none}
 dialog{width:calc(100% - 36px);box-sizing:border-box;border:1px solid #8392a5;border-radius:8px;padding:18px}dialog::backdrop{background:rgba(15,23,42,.55)}dialog form{margin:0}dialog menu{display:flex;flex-wrap:wrap;gap:8px;padding:12px 0 0;margin:0}dialog menu button{margin:0;flex:1}.discard-recording{flex-basis:100%}
 </style>
 <link rel="stylesheet" href="design-system.css">
@@ -48,6 +49,17 @@ dialog{width:calc(100% - 36px);box-sizing:border-box;border:1px solid #8392a5;bo
 <dt>Session</dt><dd id="sessionName"></dd>
 <dt>Händelser</dt><dd id="count">0</dd>
 </dl>
+<section class="live-card" aria-labelledby="liveStatusTitle">
+  <h2 id="liveStatusTitle">Live-status</h2>
+  <dl class="live-grid">
+    <dt>Senaste</dt><dd id="latestAction">Väntar på första händelsen</dd>
+    <dt>Sida</dt><dd id="latestPage">Ej registrerad</dd>
+    <dt>Skärmbilder</dt><dd id="screenshotStatus">0 sparade</dd>
+    <dt>Kontext</dt><dd id="recordingContext">Ej identifierad</dd>
+    <dt>Anslutning</dt><dd id="connectionStatus">Kontrollerar</dd>
+  </dl>
+  <p id="captureWarning" class="live-warning" role="status" aria-live="polite" hidden></p>
+</section>
 <p id="errorCaptureFeedback" class="captured" hidden></p>
 <button id="stop" class="danger">Stoppa inspelning</button>
 </section>

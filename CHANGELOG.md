@@ -1,5 +1,8 @@
 # Changelog
 
+- Added an accessible live recording status in the recorder popup showing the
+  latest captured action, page, screenshot progress, Business Central context
+  and connection state, with immediate warnings for missing events or images.
 - Added the full rich-text editing toolbar to Step comments, with the same bold,
   italic, font, size, text-colour and background-colour options as instructions;
   comment formatting now flows through Document Workspace and Word export.

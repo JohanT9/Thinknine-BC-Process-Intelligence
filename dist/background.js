@@ -14,6 +14,7 @@ importScripts("engine/knowledge-domain.js");
 importScripts("engine/session-interpretation-pipeline.js");
 importScripts("engine/privacy-mask.js");
 importScripts("engine/screenshot-capture-policy.js");
+importScripts("engine/recording-live-status.js");
 importScripts("bug-report/bc-diagnostic-evidence.js");
 importScripts("bug-report/al-call-stack-parser.js");
 importScripts("bug-report/technical-diagnostics.js");
@@ -760,6 +761,11 @@ async function recordEvent(rawEvent, captureContext = {}) {
         eventNo: event.eventNo,
         type: event.type,
         category: event.category,
+        actionCaption: event.actionCaption || "",
+        fieldName: event.fieldName || "",
+        controlCaption: event.controlCaption || "",
+        pageCaption: event.pageCaption || "",
+        capturedAt: event.timestamp || "",
         hasAccessibleLabel: Boolean(
           event.label || event.fieldName || event.pageCaption
         )
@@ -1772,7 +1778,13 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
       case "T9_GET_STATE": {
         const state = await getState();
         const session = state.sessionId ? await getSession(state.sessionId) : null;
-        sendResponse({ ok: true, state, session });
+        const debugData = await chrome.storage.local.get(DEBUG_KEY);
+        const debug = debugData[DEBUG_KEY] || {};
+        sendResponse({ ok: true, state, session,
+          liveStatus: state.recording
+            ? globalThis.T9RecordingLiveStatus.derive({ session, debug,
+              connected: debug.connected !== false })
+            : null });
         break;
       }
 

@@ -26,6 +26,31 @@ function setStarting(starting) {
   $("startBug").disabled = starting;
 }
 
+function displayLatestAction(action) {
+  if (!action) return "Väntar på första händelsen";
+  return action.label || action.category || action.type || "Händelse registrerad";
+}
+
+function renderLiveStatus(liveStatus) {
+  if (!liveStatus) return;
+  updateText($("latestAction"), displayLatestAction(liveStatus.latestAction));
+  updateText($("latestPage"), liveStatus.latestAction?.pageCaption ||
+    "Ej registrerad");
+  const screenshots = liveStatus.screenshots || {};
+  updateText($("screenshotStatus"), `${screenshots.captured || 0} sparade` +
+    (screenshots.pending ? ` · ${screenshots.pending} väntar` : ""));
+  const context = [liveStatus.context?.environmentName,
+    liveStatus.context?.companyName].filter(Boolean).join(" · ");
+  updateText($("recordingContext"), context || "Ej identifierad");
+  updateText($("connectionStatus"), liveStatus.connected
+    ? "Ansluten" : "Inte bekräftad");
+  $("connectionStatus").className = liveStatus.connected ? "live-ok" : "";
+  const warning = $("captureWarning");
+  const messages = (liveStatus.warnings || []).map(item => item.message);
+  warning.hidden = messages.length === 0;
+  updateText(warning, messages.join(" "));
+}
+
 async function pingTab(tabId) {
   try {
     return await withTimeout(chrome.tabs.sendMessage(tabId, {
@@ -91,6 +116,7 @@ const refresh = globalThis.T9AsyncOperations.singleFlight(async function () {
             : "Business Central-felet har fångats. Alla tekniska detaljer var inte tillgängliga.");
       }
     }
+    if (active) renderLiveStatus(response.liveStatus);
   } catch (error) {
     showMessage(error.message, true);
   }
