@@ -27,7 +27,8 @@ assert.ok(
 );
 
 assert.ok(
-  html.includes(".review-image-stage{position:relative;display:block;width:fit-content;max-width:min(100%,960px)") &&
+  html.includes(".review-image-stage{position:relative;display:block;width:fit-content;max-width:100%") &&
+  html.includes(".review-image{display:block;max-width:100%;height:auto;border:1px solid #d8dee5;border-radius:5px;box-sizing:border-box;image-rendering:-webkit-optimize-contrast}") &&
     html.includes(".review-annotation-layer{position:absolute;inset:0;width:100%;height:100%"),
   "Review screenshots and their annotation layer must scale together at browser zoom levels."
 );

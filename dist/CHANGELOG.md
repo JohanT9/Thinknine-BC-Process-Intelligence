@@ -1,5 +1,9 @@
 # Changelog
 
+## Unreleased
+
+- Improved screenshot clarity in Review Studio, image editing, and Document Generator by using the available workspace width and optimized Chromium downscaling while preserving the original lossless PNG assets.
+
 - Added a persistent, minimizable recording indicator inside the active
   Business Central tab. Its coloured frame shows capture health, its panel
   reports live event/image progress, and Stop opens the existing safe naming

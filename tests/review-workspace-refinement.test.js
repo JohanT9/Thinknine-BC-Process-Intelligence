@@ -30,7 +30,8 @@ assert(html.includes('.review-header>.review-title-row,.review-header>.workspace
 assert(html.includes("width:min(calc(100% - 40px),1360px)"));
 assert(html.includes(".review-document-fields{margin:16px auto"));
 assert(html.includes("padding:16px max(16px,calc((100% - 1368px)/2))"));
-assert(html.includes(".annotation-stage{position:relative;width:fit-content;max-width:min(100%,960px);margin:0"));
+assert(html.includes(".annotation-stage{position:relative;width:fit-content;max-width:100%;margin:0"));
+assert(html.includes(".annotation-stage img{display:block;max-width:100%;height:auto;image-rendering:-webkit-optimize-contrast}"));
 assert(html.includes(".annotation-editor{padding:18px;width:min(100%,1400px);margin-inline:auto;box-sizing:border-box}"));
 assert(html.includes("margin:-18px 0 0;padding:18px 0 1px"));
 assert(html.includes('<h3 id="annotationTitle">Redigera bild</h3>'));
