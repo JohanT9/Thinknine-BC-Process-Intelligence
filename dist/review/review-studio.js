@@ -191,6 +191,22 @@
       .map(task => notes.create({ recordingId: session.id,
         ownerType: "step", ownerId: task.stepId || task.taskId,
         content: task.userComment, now }));
+    let guidedHierarchy = hierarchy.empty(session.id);
+    if (normalizedTasks.some(task => task.sectionBoundaryAfter)) {
+      const chunks = []; let chunk = [];
+      normalizedTasks.forEach(task => {
+        chunk.push(task.taskId);
+        if (task.sectionBoundaryAfter) { chunks.push(chunk); chunk = []; }
+      });
+      if (chunk.length) chunks.push(chunk);
+      chunks.forEach((stepIds, index) => {
+        guidedHierarchy = hierarchy.createSection(guidedHierarchy,
+          `Sektion ${index + 1}`, stepIds, { recordingId: session.id,
+            now, nonce: index, provenance: "recording-guidance",
+            recordedOrders: Object.fromEntries(stepIds.map((id, position) =>
+              [id, position + 1])) }).state;
+      });
+    }
     return {
       reviewVersion: "1.0.0",
       sessionId: session.id,
@@ -212,7 +228,7 @@
       manualSteps: [],
       noteModelVersion: "1.0.0",
       stepNotes: initialNotes,
-      hierarchy: hierarchy.empty(session.id),
+      hierarchy: guidedHierarchy,
       documentFields: { expectedResult: "" },
       generatedTasks: clone(normalizedTasks),
       tasks: normalizedTasks

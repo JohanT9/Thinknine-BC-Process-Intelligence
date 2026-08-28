@@ -41,7 +41,7 @@ the latest result capture, completeness (`complete` or `partial`), and any
 missing role. It is derived evidence: Canonical Recording and raw events remain
 unchanged.
 
-Algorithm version is `1.0.0`. IDs use the version plus collision-safe,
+Algorithm version is `1.1.0`. IDs use the version plus collision-safe,
 length-prefixed canonical source IDs. They do not use random values, execution
 time, Review order, export state, or captions.
 

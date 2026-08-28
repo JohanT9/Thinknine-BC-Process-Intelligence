@@ -104,7 +104,12 @@ Aptean, AppSource, tenant, customer, and control-add-in pages remain recordable
 through Review, Workspace, and export without fabricated entity or table data.
 The Page Identification Engine owns resolution; dashboard only orchestrates.
 
-## Event Normalization 2.0.0
+## Event Normalization 2.1.0
+
+During recording, the in-page panel can optionally mark the latest captured
+interaction as important, choose its screenshot, start a new section, or ignore
+it in generated documentation. These commands preserve the original evidence
+and are documented in [Recording Guidance](docs/RECORDING_GUIDANCE.md).
 
 Persisted and identified browser mechanics normalize into a small stable
 interaction vocabulary. Native commits and React/MUI focus-session fallback

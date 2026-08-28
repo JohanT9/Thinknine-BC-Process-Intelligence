@@ -66,6 +66,9 @@ function (semantic, knowledge, refs) {
       selectedCaption: action.selectedValue || "", value: action.selectedValue ?? "",
       instructionValue: action.selectedValue ?? "", sourceEventNos: eventNos,
       ...trace, screenshot, screenshots: screenshot ? [screenshot] : [],
+      captureGuidance: { ...(action.captureGuidance || {}) },
+      important: Boolean(action.captureGuidance?.important),
+      sectionBoundaryAfter: Boolean(action.captureGuidance?.sectionBoundaryAfter),
       context: context(action, sourceEvents), automationId: "",
       reviewStatus: action.confidence < 0.85 ? "review-suggested" : "unreviewed",
       confidence: action.confidence || 0.55 };
@@ -73,7 +76,8 @@ function (semantic, knowledge, refs) {
 
   function interpret(input = {}, services = {}) {
     const groups = input.stepGroups || [];
-    const actions = semantic.processStepGroups(groups);
+    const activeGroups = groups.filter(group => !group.guidance?.ignored);
+    const actions = semantic.processStepGroups(activeGroups);
     const byId = eventIndex(input.events);
     const baseTasks = actions.filter(action => !action.hidden)
       .map((action, index) => task(action, index, byId, input.imagePaths));

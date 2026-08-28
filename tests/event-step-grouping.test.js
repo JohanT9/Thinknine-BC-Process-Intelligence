@@ -30,7 +30,7 @@ const quantity = run([
     value: { normalized: "500" }, screenshotAssetId: "shot-2" })
 ]);
 assert.strictEqual(quantity.schemaVersion, 1);
-assert.strictEqual(quantity.groupingVersion, "1.0.0");
+assert.strictEqual(quantity.groupingVersion, "1.1.0");
 assert.strictEqual(quantity.groups.length, 1);
 assert.strictEqual(quantity.groups[0].groupKind, "field-edit");
 assert.deepStrictEqual(quantity.groups[0].sourceEventIds,

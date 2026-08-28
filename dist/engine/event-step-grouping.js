@@ -5,7 +5,7 @@
 })(typeof globalThis !== "undefined" ? globalThis : this, function () {
   "use strict";
   const SCHEMA_VERSION = 1;
-  const GROUPING_VERSION = "1.0.0";
+  const GROUPING_VERSION = "1.1.0";
   const CAPTURE_PACKET_VERSION = "1.0.0";
   const cache = new WeakMap();
   const clone = value => value == null ? value : JSON.parse(JSON.stringify(value));
@@ -161,7 +161,8 @@
   }
   function group(normalizedRecording) {
     if (cache.has(normalizedRecording)) return cache.get(normalizedRecording);
-    const groups = []; const supportingEvents = []; const assignments = new Map();
+    const groups = []; const guidanceEvents = []; const supportingEvents = [];
+    const assignments = new Map();
     let pending = null;
     const emit = () => {
       if (!pending) return;
@@ -172,6 +173,13 @@
       pending = null;
     };
     for (const event of normalizedRecording.events || []) {
+      if (event.kind === "capture-guidance") {
+        emit(); guidanceEvents.push(event);
+        supportingEvents.push(freeze({ normalizedEventId: event.normalizedEventId,
+          classification: "guidance", reason: "explicit-recording-guidance" }));
+        assignments.set(event.normalizedEventId, "supporting");
+        continue;
+      }
       if (isNoise(event)) { emit(); supportingEvents.push(freeze({ normalizedEventId: event.normalizedEventId, classification: "noise", reason: "non-step-mechanic" })); assignments.set(event.normalizedEventId, "supporting"); continue; }
       if (isUnclassifiedMechanic(event)) { emit(); supportingEvents.push(freeze({
         normalizedEventId: event.normalizedEventId, classification: "unclassified",
@@ -223,9 +231,33 @@
     const unassignedMeaningfulEventIds = (normalizedRecording.events || [])
       .filter(event => !assignments.has(event.normalizedEventId) && !isNoise(event))
       .map(event => event.normalizedEventId);
+    const resolvedGroups = groups.map(group => {
+      const directives = guidanceEvents.filter(event =>
+        group.sourceEventIds.includes(event.guidance?.targetSourceEventId));
+      if (!directives.length) return group;
+      const kinds = new Set(directives.map(event => event.guidance?.kind));
+      const requestedImage = [...directives].reverse().map(event =>
+        event.guidance?.preferredScreenshotAssetId).find(Boolean);
+      const preferredImage = group.screenshotAssetIds.includes(requestedImage)
+        ? requestedImage : group.capturePacket?.preferredScreenshotAssetId;
+      const preferredEvent = preferredImage ? group.normalizedEvents.find(event =>
+        (event.screenshotAssetIds || [event.screenshotAssetId]).includes(preferredImage)) : null;
+      return freeze({ ...clone(group),
+        capturePacket: { ...clone(group.capturePacket),
+          preferredScreenshotAssetId: preferredImage || null,
+          preferredSourceEventId: preferredEvent?.sourceEventId ||
+            group.capturePacket?.preferredSourceEventId || null },
+        guidance: {
+          important: kinds.has("important"), ignored: kinds.has("ignore"),
+          sectionBoundaryAfter: kinds.has("new-section"),
+          preferredScreenshotAssetId: preferredImage || null,
+          markerSourceEventIds: unique(directives.flatMap(event =>
+            event.sourceEventIds || [event.sourceEventId]))
+        }, status: kinds.has("ignore") ? "ignored" : group.status });
+    });
     const result = freeze({ schemaVersion: SCHEMA_VERSION,
       groupingVersion: GROUPING_VERSION, recordingId: normalizedRecording.recordingId,
-      groups, supportingEvents, diagnostics: {
+      groups: resolvedGroups, supportingEvents, diagnostics: {
         assignedEventCount: assignments.size,
         inputEventCount: normalizedRecording.events?.length || 0,
         unassignedMeaningfulEventIds

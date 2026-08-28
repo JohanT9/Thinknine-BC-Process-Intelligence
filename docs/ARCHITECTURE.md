@@ -212,7 +212,7 @@ manufacturing, and Aptean rules are not misrepresented as verified page records.
 
 ## Event Normalization boundary
 
-Event Normalization 2.0.0 is the sole owner of browser-mechanic coalescing. It
+Event Normalization 2.1.0 is the sole owner of browser-mechanic coalescing. It
 consumes durable Raw Events and BC UI Identification, emits immutable normalized
 interactions, and never groups them into Steps. React/MUI focus comparison is
 capture evidence; only normalization may classify a verified difference as a

@@ -11,7 +11,7 @@
 ) {
   "use strict";
   const SCHEMA_VERSION = 1;
-  const NORMALIZATION_VERSION = "2.0.0";
+  const NORMALIZATION_VERSION = "2.1.0";
   const cache = new WeakMap();
   const clone = value => value == null ? value : JSON.parse(JSON.stringify(value));
   function freeze(value) { if (!value || typeof value !== "object" || Object.isFrozen(value)) return value; Object.values(value).forEach(freeze); return Object.freeze(value); }
@@ -43,6 +43,7 @@
   function classify(event, options = {}) {
     const raw = rawOf(event); const identified = identificationFor(event, options);
     const control = identified.control?.type || ""; const type = raw.type || "unknown";
+    if (type === "capture-guidance") return ["capture-guidance", "explicit-recording-guidance"];
     if (type === "click" && (control === "checkbox" || raw.checked != null)) return ["toggle-change", "verified-checked-state"];
     if (["dialog", "dialog-open"].includes(type)) return ["dialog-open", "observed-dialog-open"];
     if (type === "dialog-close") return ["dialog-close", "observed-dialog-close"];
@@ -108,6 +109,11 @@
         devicePixelRatio: raw.devicePixelRatio ?? undefined,
         viewportScale: raw.viewportScale ?? undefined },
       screenshotAssetId: event.screenshotAssetId, source: clone(event.source || {}),
+      guidance: kind === "capture-guidance" ? clone({
+        kind: raw.guidanceKind,
+        targetSourceEventId: raw.targetSourceEventId,
+        preferredScreenshotAssetId: raw.preferredScreenshotAssetId || undefined
+      }) : null,
       screenshotAssetIds: [...new Set(sources.map(item =>
         item.screenshotAssetId).filter(Boolean))],
       evidence: [{ source: "normalization-rule", value: reason }],

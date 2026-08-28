@@ -1,5 +1,14 @@
 # Changelog
 
+## 4.7.0 - Recording guidance
+
+- Added accessible in-recording commands for important steps, explicit screenshot
+  choice, section boundaries, and ignored interactions.
+- Persisted every command as traceable raw evidence linked by Canonical Event ID;
+  marker events do not create duplicate documentation steps.
+- Kept automatic capture as the default and added safe feedback when no step or
+  screenshot is available to mark.
+
 ## Unreleased
 
 - Added an automatic, deterministic capture-surface mode for React, Material UI,

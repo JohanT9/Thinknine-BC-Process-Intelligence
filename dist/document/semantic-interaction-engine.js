@@ -165,6 +165,16 @@
       values[0]?.semanticActionMetadata || {});
     const first = values[0] || {};
     const page = clone(first.pageContext || first.pageIdentification || {});
+    const captureGuidance = values.reduce((result, value) => ({
+      important: result.important || Boolean(value.captureGuidance?.important),
+      ignored: result.ignored || Boolean(value.captureGuidance?.ignored),
+      sectionBoundaryAfter: result.sectionBoundaryAfter ||
+        Boolean(value.captureGuidance?.sectionBoundaryAfter),
+      preferredScreenshotAssetId: value.captureGuidance
+        ?.preferredScreenshotAssetId || result.preferredScreenshotAssetId || null,
+      markerSourceEventIds: unique([...(result.markerSourceEventIds || []),
+        ...(value.captureGuidance?.markerSourceEventIds || [])])
+    }), {});
     return deepFreeze({
       ...futureMetadata,
       actionId: stableId(rule.ruleId, values),
@@ -173,6 +183,7 @@
       ...(properties.hidden ? { hidden: true } : {}),
       selectedValue: properties.selectedValue || "",
       targetField: properties.targetField || "",
+      captureGuidance,
       ...(Object.keys(page).length ? { pageContext: page,
         pageIdentification: clone(page),
         pageIdentity: page.pageIdentity || null,
@@ -660,6 +671,7 @@
       recordingId: group.recordingId,
       preferredSourceEventId: group.capturePacket?.preferredSourceEventId || undefined,
       capturePacket: clone(group.capturePacket || {}),
+      captureGuidance: clone(group.guidance || {}),
       stepGroups: [group],
       normalizedInteractions: [primary]
     };

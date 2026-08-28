@@ -134,8 +134,11 @@
       .counts,.warning{margin:0;color:#5c5c5c}.warning{margin-top:6px;color:#9a3412}
       button{font:inherit;border:1px solid #8a8886;border-radius:4px;background:#fff;
         color:#242424;padding:5px 9px;cursor:pointer}.stop{border-color:#008c95;color:#006b70}
-      .actions{display:flex;gap:6px;padding:0 10px 10px}.actions .stop{flex:1}
-      :host([data-minimized="true"]) .body,:host([data-minimized="true"]) .actions{display:none}
+      .guidance{display:grid;grid-template-columns:1fr 1fr;gap:6px;padding:0 10px 8px}
+      .guidance button{padding:6px 5px}.actions{display:flex;gap:6px;padding:0 10px 10px}
+      .actions .stop{flex:1}
+      :host([data-minimized="true"]) .body,:host([data-minimized="true"]) .guidance,
+      :host([data-minimized="true"]) .actions{display:none}
       :host([data-minimized="true"]) .panel{width:190px}
     </style><aside class="panel" role="status" aria-live="polite">
       <div class="head"><span class="dot"></span><strong id="indicatorState">Inspelning pågår</strong>
@@ -143,6 +146,12 @@
       <div class="body"><p id="indicatorLatest" class="latest">Väntar på första händelsen</p>
         <p id="indicatorCounts" class="counts">0 händelser · 0 bilder</p>
         <p id="indicatorWarning" class="warning" hidden></p></div>
+      <div class="guidance" aria-label="Markera senaste steget">
+        <button id="indicatorImportant" type="button" title="Markera senaste steget som viktigt">Viktigt steg</button>
+        <button id="indicatorUseImage" type="button" title="Anv\u00e4nd senaste stegets bild">Anv\u00e4nd denna bild</button>
+        <button id="indicatorSection" type="button" title="Skapa en ny sektion efter senaste steget">Ny sektion</button>
+        <button id="indicatorIgnore" type="button" title="Ignorera senaste steget i dokumentet">Ignorera</button>
+      </div>
       <div class="actions"><button id="indicatorStop" class="stop" type="button">Stoppa</button></div>
     </aside>`;
     recordingIndicator.host = host;
@@ -163,6 +172,28 @@
           response?.error || "Öppna tillägget för att stoppa inspelningen.";
       });
     });
+    const sendGuidance = (kind, confirmation) => event => {
+      event.stopPropagation();
+      chrome.runtime.sendMessage({ type: "T9_CAPTURE_GUIDANCE", kind }, response => {
+        const warning = shadow.getElementById("indicatorWarning");
+        if (chrome.runtime.lastError || !response?.ok) {
+          warning.hidden = false;
+          warning.textContent = response?.error ||
+            "Markeringen kunde inte sparas. F\u00f6rs\u00f6k igen efter n\u00e4sta h\u00e4ndelse.";
+          return;
+        }
+        warning.hidden = true;
+        shadow.getElementById("indicatorLatest").textContent = confirmation;
+      });
+    };
+    shadow.getElementById("indicatorImportant").addEventListener("click",
+      sendGuidance("important", "Senaste steget markerades som viktigt"));
+    shadow.getElementById("indicatorUseImage").addEventListener("click",
+      sendGuidance("use-image", "Senaste bilden har valts"));
+    shadow.getElementById("indicatorSection").addEventListener("click",
+      sendGuidance("new-section", "Ny sektion skapas efter senaste steget"));
+    shadow.getElementById("indicatorIgnore").addEventListener("click",
+      sendGuidance("ignore", "Senaste steget ignoreras i dokumentet"));
     document.documentElement.append(host);
     refreshRecordingIndicator();
     recordingIndicator.refreshTimer = setInterval(refreshRecordingIndicator, 1000);

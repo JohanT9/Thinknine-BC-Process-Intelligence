@@ -798,6 +798,44 @@ async function recordEvent(rawEvent, captureContext = {}) {
   return operation;
 }
 
+const CAPTURE_GUIDANCE_KINDS = new Set([
+  "important", "use-image", "new-section", "ignore"
+]);
+
+async function recordCaptureGuidance(kind, sender = {}) {
+  if (!CAPTURE_GUIDANCE_KINDS.has(kind)) {
+    throw new Error("Ok\u00e4nd inspelningsmarkering.");
+  }
+  const state = await getState();
+  if (!state.recording || !state.sessionId || sender.tab?.id !== state.tabId) {
+    throw new Error("Ingen aktiv inspelning hittades i den h\u00e4r fliken.");
+  }
+  await settleBounded(writeQueue, "accepted event writes before guidance");
+  if (kind === "use-image") {
+    await settleBounded(screenshotWorkerPromise,
+      "screenshot registrations before image guidance");
+  }
+  const recording = await getCanonicalRecording(state.sessionId);
+  const target = [...(recording.events || [])].reverse().find(event =>
+    event.raw?.type !== "capture-guidance");
+  if (!target) throw new Error("Registrera ett steg innan du markerar det.");
+  const preferredScreenshotAssetId = target.screenshotAssetId || "";
+  if (kind === "use-image" && !preferredScreenshotAssetId) {
+    throw new Error("Det finns \u00e4nnu ingen bild f\u00f6r det senaste steget.");
+  }
+  const recorded = await recordEvent({
+    type: "capture-guidance", category: "guidance", guidanceKind: kind,
+    targetSourceEventId: target.id,
+    ...(preferredScreenshotAssetId ? { preferredScreenshotAssetId } : {}),
+    source: "recording-indicator"
+  }, { tabId: sender.tab?.id, frameId: sender.frameId,
+    parentFrameId: sender.parentFrameId, documentId: sender.documentId,
+    origin: sender.origin || sender.url });
+  return { targetSourceEventId: target.id,
+    markerSourceEventId: recorded?.canonicalEvent?.id || "",
+    preferredScreenshotAssetId: preferredScreenshotAssetId || undefined };
+}
+
 async function saveBcErrorEvidence(evidence) {
   const normalized = globalThis.T9BcDiagnosticEvidence.normalize(evidence);
   await chrome.storage.local.set({
@@ -1854,6 +1892,16 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
           origin: sender.origin || sender.url
         });
         sendResponse({ ok: true });
+        break;
+      }
+
+      case "T9_CAPTURE_GUIDANCE": {
+        try {
+          const guidance = await recordCaptureGuidance(message.kind, sender);
+          sendResponse({ ok: true, guidance });
+        } catch (error) {
+          sendResponse({ ok: false, error: String(error?.message || error) });
+        }
         break;
       }
 

@@ -2,7 +2,7 @@
 
 ## Boundary and version
 
-Event Normalization 2.0.0 converts persisted browser mechanics plus BC UI
+Event Normalization 2.1.0 converts persisted browser mechanics plus BC UI
 Identification into deterministic, renderer-neutral interactions:
 
 ```text

@@ -37,8 +37,8 @@ model = append(model, raw("e4", "field-change", { fieldName: "Quantity",
 let result = normalization.normalizeRecording(model);
 assert.strictEqual(JSON.stringify(original), before);
 assert.strictEqual(result.schemaVersion, 1);
-assert.strictEqual(result.normalizationVersion, "2.0.0");
-assert.strictEqual(normalization.NORMALIZATION_VERSION, "2.0.0");
+assert.strictEqual(result.normalizationVersion, "2.1.0");
+assert.strictEqual(normalization.NORMALIZATION_VERSION, "2.1.0");
 assert.strictEqual(result.events.length, 1);
 assert.strictEqual(result.events[0].kind, "value-change");
 assert.deepStrictEqual(result.events[0].sourceEventIds,
