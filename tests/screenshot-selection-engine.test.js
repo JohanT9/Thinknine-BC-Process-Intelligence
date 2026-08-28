@@ -34,11 +34,13 @@ const quantityCandidates = Object.freeze([
 const quantity = engine.select({ stepGroup: quantityGroup,
   candidates: quantityCandidates });
 assert.strictEqual(quantity.schemaVersion, 1);
-assert.strictEqual(quantity.selectionVersion, "1.1.0");
+assert.strictEqual(quantity.selectionVersion, "1.2.0");
+assert.strictEqual(quantity.captureRoleVersion, "1.0.0");
 assert.strictEqual(quantity.selectedScreenshotAssetId, "shot-commit");
+assert.strictEqual(quantity.selectedCaptureRole, "result-visible");
 assert.ok(quantity.selectionReasons.includes("primary-event"));
 assert.ok(quantity.selectionReasons.includes("same-control"));
-assert.ok(quantity.selectionReasons.includes("committed-value"));
+assert.ok(quantity.selectionReasons.includes("role-result-visible"));
 assert.strictEqual(quantity.selectionMode, "automatic");
 assert.ok(quantity.rejectedCandidates.find(item =>
   item.screenshotAssetId === "shot-item").reasons.includes("mismatched-control"));
@@ -64,7 +66,8 @@ const lookup = engine.select({ stepGroup: lookupGroup, candidates: [
 ] });
 assert.strictEqual(lookup.selectedScreenshotAssetId, "lookup-result",
   "primary final value wins when it is explicitly tied to the group primary event");
-assert.ok(lookup.selectionReasons.includes("resulting-field-value"));
+assert.strictEqual(lookup.selectedCaptureRole, "result-visible");
+assert.ok(lookup.selectionReasons.includes("role-result-visible"));
 
 const rowPrimary = engine.select({ stepGroup: { ...lookupGroup,
   primarySourceEventId: "event:row", primaryEventId: "normalized:row" }, candidates: [
@@ -72,7 +75,7 @@ const rowPrimary = engine.select({ stepGroup: { ...lookupGroup,
   candidate("lookup-row", "event:row", "row-selection")
 ] });
 assert.strictEqual(rowPrimary.selectedScreenshotAssetId, "lookup-row");
-assert.ok(rowPrimary.selectionReasons.includes("selected-row"));
+assert.ok(rowPrimary.selectionReasons.includes("role-selection-visible"));
 
 const toggle = engine.select({ stepGroup: group({ groupKind: "toggle-interaction",
   primarySourceEventId: "event:after", sourceEventIds: ["event:before", "event:after"],
@@ -81,7 +84,7 @@ const toggle = engine.select({ stepGroup: group({ groupKind: "toggle-interaction
   candidate("after", "event:after", "toggle-change")
 ] });
 assert.strictEqual(toggle.selectedScreenshotAssetId, "after");
-assert.ok(toggle.selectionReasons.includes("confirmed-toggle-state"));
+assert.ok(toggle.selectionReasons.includes("role-result-visible"));
 
 const action = engine.select({ stepGroup: group({ groupKind: "action",
   primarySourceEventId: "event:post", sourceEventIds: ["event:post", "event:result"],
@@ -90,7 +93,50 @@ const action = engine.select({ stepGroup: group({ groupKind: "action",
   candidate("result", "event:result", "navigation", { page: { id: "99" } })
 ] });
 assert.strictEqual(action.selectedScreenshotAssetId, "post");
-assert.ok(action.selectionReasons.includes("action-invocation"));
+assert.ok(action.selectionReasons.includes("role-action-visible"));
+
+const captureRoles = [
+  [{ normalizedKind: "lookup-open" }, "menu-open"],
+  [{ normalizedKind: "activation", uiState: { menuOpen: true,
+    selectedOptionVisible: true } }, "selection-visible"],
+  [{ normalizedKind: "value-change" }, "result-visible"],
+  [{ normalizedKind: "dialog-action", uiState: { dialogComplete: true } },
+    "dialog-before-close"],
+  [{ normalizedKind: "dialog-close" }, "dialog-closed"],
+  [{ normalizedKind: "activation" }, "action-visible"],
+  [{ normalizedKind: "focus-transition" }, "focus-only"],
+  [{ normalizedKind: "value-change", capturePhase: "before-value" },
+    "before-value"],
+  [{ normalizedKind: "unknown" }, "context"]
+];
+for (const [input, expected] of captureRoles) {
+  assert.strictEqual(engine.classifyCaptureRole(input), expected);
+  const normalized = engine.normalizeCandidate(input);
+  assert.strictEqual(normalized.captureRole, expected);
+  assert.strictEqual(normalized.captureRoleVersion, "1.0.0");
+  assert.ok(Object.isFrozen(normalized));
+}
+
+const menuSelection = engine.select({ stepGroup: group({ groupKind: "action",
+  primarySourceEventId: "event:menu", sourceEventIds: ["event:open", "event:menu"],
+  screenshotAssetIds: ["menu-open", "menu-selected"] }), candidates: [
+  candidate("menu-open", "event:open", "activation", {
+    uiState: { menuOpen: true } }),
+  candidate("menu-selected", "event:menu", "activation", {
+    uiState: { menuOpen: true, selectedOptionVisible: true } })
+] });
+assert.strictEqual(menuSelection.selectedScreenshotAssetId, "menu-selected");
+assert.strictEqual(menuSelection.selectedCaptureRole, "selection-visible");
+assert.ok(menuSelection.selectionReasons.includes("role-selection-visible"));
+
+const derivedCandidates = screenshotIntelligence.fromEvents({ events: [{
+  eventNo: 8, timestamp: "2026-08-28T10:00:00.000Z", type: "click",
+  category: "action", normalizedInteraction: { kind: "dialog-action" },
+  dialogComplete: true, canonicalScreenshotAssetId: "asset-dialog"
+}], imagePaths: { 8: "dialog.png" }, tasks: [{ taskId: "dialog-task",
+  sourceEventNos: [8], screenshot: "dialog.png" }] });
+assert.strictEqual(engine.normalizeCandidate(derivedCandidates[0]).captureRole,
+  "dialog-before-close", "observable capture metadata should reach role classification");
 
 const manual = engine.select({ stepGroup: quantityGroup,
   candidates: quantityCandidates, manualOverride: "shot-focus" });

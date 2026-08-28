@@ -95,6 +95,7 @@
         normalizedEventId:
           event.normalizedInteraction?.normalizedEventId || "",
         normalizedKind: event.normalizedInteraction?.kind || "",
+        capturePhase: event.capturePhase || event.uiState?.capturePhase || "",
         taskId: task?.taskId || "",
         capturedAt: event.timestamp || "",
         interactionType: event.category || event.type || "",
@@ -107,8 +108,19 @@
         uiState: {
           pageId: event.pageId || "",
           pageCaption: event.pageCaption || "",
+          dialogComplete: event.dialogComplete ?? event.uiState?.dialogComplete,
+          dialogClosed: event.type === "dialog-close" ||
+            event.uiState?.dialogClosed === true,
+          menuOpen: event.menuOpen ?? event.uiState?.menuOpen,
+          lookupOpen: event.lookupOpen ?? event.uiState?.lookupOpen,
+          selectedOptionVisible: event.selectedOptionVisible ??
+            event.uiState?.selectedOptionVisible,
+          resultVisible: event.resultVisible ?? event.uiState?.resultVisible,
+          focusOnly: event.focusOnly ?? event.uiState?.focusOnly,
+          beforeValue: event.beforeValue ?? event.uiState?.beforeValue,
           ...(event.normalizedInteraction?.pageIdentification || {})
-        }
+        },
+        stability: { stable: event.stable ?? event.uiState?.stable }
       };
     }));
   }

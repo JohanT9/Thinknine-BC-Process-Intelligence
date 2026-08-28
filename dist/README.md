@@ -198,6 +198,11 @@ and passes one selected reference to the shared Workspace/Word pipeline without
 reading or modifying image bytes. See
 [Screenshot Selection Engine](docs/SCREENSHOT_SELECTION_ENGINE.md).
 
+Screenshot candidates also receive deterministic instructional roles such as
+menu open, selected option visible, committed result visible, and dialog before
+close. The selected role remains explainable while raw screenshots and
+Canonical Recording evidence stay unchanged.
+
 Its reusable metadata-only validation corpus contains 20 sanitized, real-shaped
 Business Central cases. It distinguishes selection failures from missing
 captures and validates manual/annotated intent without inspecting image bytes.

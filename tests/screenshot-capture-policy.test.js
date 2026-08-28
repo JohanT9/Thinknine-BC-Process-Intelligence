@@ -45,5 +45,15 @@ const background = fs.readFileSync(path.join(__dirname,
   "../src/recorder/background.js"), "utf8");
 assert(background.includes('importScripts("engine/screenshot-capture-policy.js")'));
 assert(background.includes("T9ScreenshotCapturePolicy.shouldCapture"));
+const content = fs.readFileSync(path.join(__dirname,
+  "../src/recorder/content.js"), "utf8");
+assert(content.includes("dialogComplete: Boolean(dialog?.isConnected)"),
+  "recorder should preserve observable dialog visibility");
+assert(content.includes("selectedOptionVisible:"),
+  "recorder should preserve observable selected menu or row visibility");
+assert(content.includes("resultVisible: true"),
+  "recorder should preserve observable committed and navigation results");
+assert(!content.includes("captureRole:"),
+  "recorder must not own screenshot-role classification");
 
 console.log("Screenshot capture policy behaviour tests passed.");

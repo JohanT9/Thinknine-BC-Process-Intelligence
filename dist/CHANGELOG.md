@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+- Added versioned screenshot capture roles for menu, selection, result, action,
+  and dialog states. Screenshot Selection now reports the selected role and
+  deterministically prefers the state that best explains each Step Group.
+
 - Processinspelningar erbjuder nu direkt efter namngivning och sparning ett val
   att öppna Dokumentbiblioteket eller stanna kvar.
 

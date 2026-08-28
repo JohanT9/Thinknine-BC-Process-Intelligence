@@ -574,6 +574,9 @@
     const title = element?.getAttribute?.("title") || "";
     const placeholder = element?.getAttribute?.("placeholder") || "";
     const elementText = clean(element?.innerText || element?.textContent || "");
+    const role = element?.getAttribute?.("role") || "";
+    const dialog = element?.closest?.('[role="dialog"],[aria-modal="true"]');
+    const menu = element?.closest?.('[role="menu"],[role="listbox"]');
     const accessibleName = labelledText || ariaLabel || associatedLabel ||
       wrappingLabelText || elementText || title || placeholder || getLabel(element);
     const accessibleNameSource = labelledText ? "aria-labelledby" : ariaLabel
@@ -606,7 +609,7 @@
       });
     }
     return {
-      role: element?.getAttribute?.("role") || element?.tagName?.toLowerCase() || "",
+      role: role || element?.tagName?.toLowerCase() || "",
       controlType: element?.tagName?.toLowerCase() || "",
       automationId:
         element?.getAttribute?.("data-automation-id") ||
@@ -635,7 +638,14 @@
       localBounds: bounds ? { x: bounds.x, y: bounds.y,
         width: bounds.width, height: bounds.height } : undefined,
       devicePixelRatio: window.devicePixelRatio || 1,
-      viewportScale: window.visualViewport?.scale || 1
+      viewportScale: window.visualViewport?.scale || 1,
+      uiState: {
+        dialogComplete: Boolean(dialog?.isConnected),
+        menuOpen: Boolean(menu?.isConnected) ||
+          element?.getAttribute?.("aria-expanded") === "true",
+        selectedOptionVisible: ["menuitem", "option", "row", "gridcell"]
+          .includes(role) && Boolean(element?.isConnected)
+      }
     };
   }
 
@@ -814,6 +824,7 @@
     if (!(element instanceof Element)) return false;
     const value = valueOf(element);
 
+    const targetDescriptor = descriptor(element);
     record({
       type: "field-change",
       category: "field",
@@ -822,7 +833,8 @@
       previousValue: previousValue === undefined
         ? focusSessions.previous(element) : previousValue,
       inputSource: source,
-      ...descriptor(element)
+      ...targetDescriptor,
+      uiState: { ...targetDescriptor.uiState, resultVisible: true }
     });
     if (source !== "focusout") focusSessions.commit(element, value);
     return true;
@@ -849,8 +861,10 @@
     const element = editableTarget(event);
     if (!(element instanceof Element)) return;
     focusSessions.start(element, valueOf(element));
+    const targetDescriptor = descriptor(element);
     record({ type: "focus", category: "lifecycle", value: valueOf(element),
-      ...descriptor(element) });
+      ...targetDescriptor,
+      uiState: { ...targetDescriptor.uiState, focusOnly: true } });
   }, true);
 
   window.addEventListener("change", event => {
@@ -922,8 +936,11 @@
     observedDialogs.forEach(dialog => {
       if (currentDialogs.has(dialog)) return;
       observedDialogs.delete(dialog);
+      const dialogDescriptor = descriptor(dialog);
       record({ type: "dialog-close", category: "dialog",
-        label: textOf(dialog).slice(0, 600), ...descriptor(dialog) });
+        label: textOf(dialog).slice(0, 600), ...dialogDescriptor,
+        uiState: { ...dialogDescriptor.uiState, dialogComplete: false,
+          dialogClosed: true } });
     });
 
     const signature = `${getPageId()}|${getPageCaption()}|${location.href}`;
@@ -931,7 +948,8 @@
       lastPageSignature = signature;
       record({
         type: "page-state",
-        category: "navigation"
+        category: "navigation",
+        uiState: { resultVisible: true }
       });
     }
   });
@@ -959,6 +977,7 @@
     record({
       type: "navigation",
       category: "navigation",
+      uiState: { resultVisible: true },
       from,
       to: location.href
     });

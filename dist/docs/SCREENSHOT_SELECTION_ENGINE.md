@@ -33,10 +33,30 @@ IDs, canonical source IDs, primary event, mode, explicit reasons, rejected
 candidates, manual override, fallback state, and annotation-preservation flags.
 Unknown future fields survive normalization.
 
-Selection version is `1.1.0`. Identity fingerprints include the version, Step
+Selection version is `1.2.0`. Identity fingerprints include the version, Step
 Group, profile, previous-page continuity, manual state, candidate IDs, source and
 normalized event identities, kind, annotations, and relevant stability/context
 signals. Random values and array positions alone are never identities.
+
+## Capture roles
+
+The engine is the single owner of deterministic screenshot-role classification.
+It derives a role from existing event and UI-state metadata without inspecting
+pixels or changing the captured evidence. The role contract is version `1.0.0`:
+
+- `menu-open`: a lookup or menu is open but no final choice is yet visible.
+- `selection-visible`: the selected row or menu option is visible.
+- `result-visible`: a committed value, toggle state, or navigation result is visible.
+- `dialog-before-close`: the complete dialog and invoked choice are still visible.
+- `dialog-closed`: the dialog has already disappeared.
+- `action-visible`: the invoked action is visible at capture time.
+- `focus-only` and `before-value`: premature evidence that is normally rejected.
+- `context`: safe fallback when no stronger observable role is known.
+
+Candidates preserve `captureRole` and `captureRoleVersion`. Selection results
+expose `selectedCaptureRole`, allowing diagnostics to explain both which image
+won and what instructional role it serves. Unknown explicit roles fall back to
+deterministic derivation.
 
 ## Candidate boundary
 
@@ -63,6 +83,11 @@ Primary-event and same-control/page alignment are strong general signals.
 Visible, unobstructed, stable states are positive; loading, spinner, tooltip,
 hover, transient notification, mismatched control, and stale page metadata are
 negative when explicitly captured.
+
+Role precedence is scoped to the Step Group: committed result for field/toggle
+and navigation steps, selected option for menu actions, action-visible for a
+plain action, and dialog-before-close for dialog steps. A role never expands the
+candidate boundary or overrides a manual or annotated choice.
 
 - Field edit: prefer the committed `value-change`, especially the primary event
   on the same field.

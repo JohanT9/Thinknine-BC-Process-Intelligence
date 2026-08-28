@@ -5,7 +5,11 @@
 })(typeof globalThis !== "undefined" ? globalThis : this, function () {
   "use strict";
   const SCHEMA_VERSION = 1;
-  const SELECTION_VERSION = "1.1.0";
+  const SELECTION_VERSION = "1.2.0";
+  const CAPTURE_ROLE_VERSION = "1.0.0";
+  const CAPTURE_ROLES = Object.freeze(["menu-open", "selection-visible",
+    "result-visible", "dialog-before-close", "dialog-closed", "action-visible",
+    "focus-only", "before-value", "context"]);
   const cache = new WeakMap();
   const clone = value => value == null ? value : JSON.parse(JSON.stringify(value));
   function freeze(value) { if (!value || typeof value !== "object" || Object.isFrozen(value)) return value; Object.values(value).forEach(freeze); return Object.freeze(value); }
@@ -15,8 +19,32 @@
     value.id || value.pageId || value.legacyPageId ||
     value.caption || value.pageCaption || ""; }
   function candidateId(value) { return text(value.screenshotAssetId || value.screenshotRef); }
+  function classifyCaptureRole(value = {}) {
+    const explicit = text(value.captureRole);
+    if (CAPTURE_ROLES.includes(explicit)) return explicit;
+    const kind = text(value.normalizedKind || value.kind);
+    const ui = value.uiState || {};
+    if (ui.dialogClosed === true || kind === "dialog-close") return "dialog-closed";
+    if (ui.dialogComplete === true && ["dialog-action", "activation"].includes(kind)) {
+      return "dialog-before-close";
+    }
+    if (ui.beforeValue === true || value.capturePhase === "before-value") {
+      return "before-value";
+    }
+    if (ui.focusOnly === true || kind === "focus-transition") return "focus-only";
+    if (["row-selection", "selection-change"].includes(kind) ||
+        ui.selectedOptionVisible === true) return "selection-visible";
+    if (ui.menuOpen === true || ui.lookupOpen === true || kind === "lookup-open") {
+      return "menu-open";
+    }
+    if (["value-change", "toggle-change", "navigation"].includes(kind) ||
+        ui.resultVisible === true) return "result-visible";
+    if (["activation", "dialog-action"].includes(kind)) return "action-visible";
+    return "context";
+  }
   function normalizeCandidate(value = {}) {
     const input = clone(value);
+    const captureRole = classifyCaptureRole(input);
     return freeze({ ...input, screenshotAssetId: candidateId(input),
       screenshotRef: text(input.screenshotRef || input.screenshotAssetId),
       sourceEventId: text(input.sourceEventId), normalizedEventId: text(input.normalizedEventId),
@@ -24,6 +52,7 @@
       page: { ...(input.page || input.uiState || {}) },
       control: { ...(input.control || input.target || {}) },
       uiState: { ...(input.uiState || {}) }, stability: { ...(input.stability || {}) },
+      captureRole, captureRoleVersion: CAPTURE_ROLE_VERSION,
       annotationRefs: Array.isArray(input.annotationRefs) ? clone(input.annotationRefs) : [] });
   }
   function normalizeCandidates(values = []) {
@@ -50,6 +79,7 @@
   function evaluate(candidate, stepGroup, profile, context = {}) {
     const state = { score: 0, reasons: [], rejected: [], informative: false };
     const primary = stepGroup?.primaryNormalizedEvent || {};
+    const role = candidate.captureRole;
     const sourceIds = new Set(stepGroup?.sourceEventIds || []);
     add(state, candidate.sourceEventId && candidate.sourceEventId === stepGroup?.primarySourceEventId,
       70, "primary-event", "supporting-event");
@@ -81,27 +111,30 @@
       ["hoverState", "temporary-hover"]]) {
       if (candidate.uiState[property] === true) { state.score -= property === "loading" || property === "spinner" ? 40 : 12; state.rejected.push(reason); state.informative = true; }
     }
-    if (candidate.normalizedKind === "focus-transition" ||
-        candidate.uiState.focusOnly === true) {
+    if (role === "focus-only") {
       state.score -= 130; state.rejected.push("focus-only-state");
       state.informative = true;
     }
-    if (candidate.uiState.beforeValue === true ||
-        candidate.capturePhase === "before-value") {
+    if (role === "before-value") {
       state.score -= 150; state.rejected.push("before-value-state");
       state.informative = true;
     }
     const kind = stepGroup?.groupKind;
-    if (kind === "field-edit" && candidate.normalizedKind === "value-change") add(state, true, 35, "committed-value", null);
-    if (kind === "toggle-interaction" && candidate.normalizedKind === "toggle-change") add(state, true, 45, "confirmed-toggle-state", null);
-    if (kind === "action" && candidate.normalizedKind === "activation") add(state, true, 40, "action-invocation", null);
+    if (kind === "field-edit" && role === "result-visible") add(state, true,
+      35, "role-result-visible", null);
+    if (kind === "toggle-interaction" && role === "result-visible") add(state,
+      true, 45, "role-result-visible", null);
+    if (kind === "action" && role === "action-visible") add(state, true,
+      40, "role-action-visible", null);
+    if (kind === "action" && role === "selection-visible") add(state, true,
+      55, "role-selection-visible", null);
+    if (kind === "navigation" && role === "result-visible") add(state, true,
+      50, "role-result-visible", null);
     if (kind === "dialog-interaction") {
-      if (["dialog-action", "activation"].includes(candidate.normalizedKind)) {
-        add(state, true, 95, "dialog-action-state", null);
-      }
-      if (candidate.normalizedKind === "dialog-close" ||
-          candidate.uiState.dialogClosed === true) {
-        state.score -= 45; state.rejected.push("dialog-closed-too-late");
+      if (role === "dialog-before-close") add(state, true, 95,
+        "role-dialog-before-close", null);
+      if (role === "dialog-closed") {
+        state.score -= 55; state.rejected.push("role-dialog-closed");
         state.informative = true;
       }
     }
@@ -109,12 +142,12 @@
       profilePreference(profile) === "focused" ? 2 : 8,
       "dialog-state", null);
     if (kind === "lookup-interaction") {
-      const lookupPoints = { "row-selection": 55, "value-change": 45,
-        "selection-change": 40, "lookup-open": 20 }[candidate.normalizedKind] || 0;
-      if (lookupPoints) add(state, true, lookupPoints,
-        candidate.normalizedKind === "row-selection" ? "selected-row" :
-          candidate.normalizedKind === "value-change" ? "resulting-field-value" :
-            candidate.normalizedKind === "lookup-open" ? "lookup-open-state" : "selected-value", null);
+      if (role === "selection-visible") add(state, true, 55,
+        "role-selection-visible", null);
+      if (role === "result-visible") add(state, true, 45,
+        "role-result-visible", null);
+      if (role === "menu-open") add(state, true, 20,
+        "role-menu-open", null);
     }
     const preference = profilePreference(profile);
     if (candidate.uiState.context === preference) add(state, true, 8,
@@ -132,6 +165,7 @@
       ...candidates.map(candidate => JSON.stringify([
         candidateId(candidate), candidate.sourceEventId,
         candidate.normalizedEventId, candidate.normalizedKind,
+        candidate.captureRole,
         candidate.annotationRefs.map(item => item.annotationId || item.id || ""),
         candidate.stability.stable, candidate.uiState.context,
         candidate.uiState.loading, candidate.uiState.spinner
@@ -236,9 +270,12 @@
     const result = freeze({
       selectionId: `screenshot-selection:${idFingerprint}`,
       schemaVersion: SCHEMA_VERSION, selectionVersion: SELECTION_VERSION,
+      captureRoleVersion: CAPTURE_ROLE_VERSION,
       stepGroupId: stepGroup?.stepGroupId || "", selectedScreenshotAssetId: selected,
       candidateScreenshotAssetIds: ids, sourceEventIds: clone(stepGroup?.sourceEventIds || []),
       primaryEventId: stepGroup?.primaryEventId || "", selectionMode: mode,
+      selectedCaptureRole: selected ? scoped.find(candidate =>
+        candidateId(candidate) === selected)?.captureRole || null : null,
       selectionReasons: [...new Set(reasons)], rejectedCandidates,
       manualOverride: manual || null, fallbackUsed, preserveAllAnnotated,
       preserveExistingCandidates
@@ -253,6 +290,7 @@
     return result;
   }
   function normalizeSelection(value) { if (!value || Number(value.schemaVersion) !== SCHEMA_VERSION) throw new Error("Unsupported Screenshot Selection schema."); return freeze(clone(value)); }
-  return { SCHEMA_VERSION, SELECTION_VERSION, evaluate, normalizeCandidate,
+  return { SCHEMA_VERSION, SELECTION_VERSION, CAPTURE_ROLE_VERSION,
+    CAPTURE_ROLES, classifyCaptureRole, evaluate, normalizeCandidate,
     normalizeCandidates, normalizeSelection, select };
 });
