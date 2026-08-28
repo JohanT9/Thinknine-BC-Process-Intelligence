@@ -117,6 +117,11 @@ is captured on focus exit when no equivalent native commit was observed. The
 debug panel can temporarily enable sanitized, bounded capture-stage diagnostics.
 External-origin frames still require an explicit narrow host permission.
 
+React-, MUI- och Control Add-in-ytor identifieras automatiskt genom observerbar
+DOM- och rammetadata. Ett avgränsat förstärkt fångstläge hanterar fler
+tillgänglighetsroller utan att ändra fångsten i vanliga Business Central-vyer.
+Ingen React-intern data, OCR eller extern kommunikation används.
+
 ## Canonical Recording Hardening
 
 Canonical Recording is the immutable evidence projection consumed by derived

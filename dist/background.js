@@ -906,7 +906,8 @@ async function registerRecorderContentScript() {
         "https://businesscentral.dynamics.com/*",
         "https://*.businesscentral.dynamics.com/*"
       ],
-      js: ["capture-focus-session.js", "bc-error-detector.js", "content.js"],
+      js: ["capture-focus-session.js", "capture-surface-mode.js",
+        "bc-error-detector.js", "content.js"],
       allFrames: true,
       matchOriginAsFallback: true,
       runAt: "document_start",
@@ -970,7 +971,8 @@ async function injectRecorderIntoExistingBcTabs() {
           tabId: tab.id,
           allFrames: true
         },
-        files: ["capture-focus-session.js", "bc-error-detector.js", "content.js"],
+        files: ["capture-focus-session.js", "capture-surface-mode.js",
+          "bc-error-detector.js", "content.js"],
         world: "ISOLATED"
       });
       results.push({ tabId: tab.id, ok: true });
@@ -1018,7 +1020,8 @@ async function ensureContentScript(tabId) {
         tabId,
         allFrames: true
       },
-      files: ["capture-focus-session.js", "bc-error-detector.js", "content.js"]
+      files: ["capture-focus-session.js", "capture-surface-mode.js",
+        "bc-error-detector.js", "content.js"]
     });
   } catch (error) {
     await setDebug({

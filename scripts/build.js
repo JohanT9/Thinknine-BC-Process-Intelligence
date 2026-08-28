@@ -138,6 +138,10 @@ copyFile(
   path.join(src, "recorder", "capture-focus-session.js"),
   path.join(dist, "capture-focus-session.js")
 );
+copyFile(
+  path.join(src, "recorder", "capture-surface-mode.js"),
+  path.join(dist, "capture-surface-mode.js")
+);
 
 for (const file of [
   "dashboard.html",

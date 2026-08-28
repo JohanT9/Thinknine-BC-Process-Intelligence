@@ -35,6 +35,12 @@
     }
   };
   const focusSessions = focusSessionApi.create();
+  const surfaceModeApi = globalThis.T9CaptureSurfaceMode || {
+    VERSION: "compatibility", STANDARD: "standard-bc", ENHANCED: "control-addin",
+    detect: () => Object.freeze({ version: "compatibility", mode: "standard-bc",
+      enhanced: false, signals: Object.freeze([]), confidence: 1 }),
+    supportsEnhancedRole: () => false
+  };
   window.__T9_RECORDER_V2__ = true;
 
   let recording = false;
@@ -468,6 +474,26 @@
     catch { return false; }
   }
 
+  function surfaceSignals(element) {
+    if (!(element instanceof Element)) return surfaceModeApi.detect({
+      frameDepth: getFrameDepth() });
+    const classes = String(element.className || "");
+    const root = element.closest?.("[data-reactroot],[data-react-root]," +
+      "[data-control-addin],[class*='controladdin' i]");
+    return surfaceModeApi.detect({
+      frameDepth: getFrameDepth(),
+      controlAddInPath: getFrameDepth() > 0 &&
+        /(?:controladdin|control-addin|clientcontrol|addin)/i.test(location.pathname),
+      controlAddIn: Boolean(root && (root.hasAttribute?.("data-control-addin") ||
+        /controladdin/i.test(String(root.className || "")))),
+      reactRoot: Boolean(root?.hasAttribute?.("data-reactroot") ||
+        root?.hasAttribute?.("data-react-root")),
+      materialUi: /Mui[A-Z]/.test(classes) || Boolean(element.closest?.("[class*='Mui']")),
+      automationMetadata: ["data-testid", "data-automation-id", "data-control-id",
+        "data-control-name"].some(name => element.hasAttribute(name))
+    });
+  }
+
   function reactTargetScore(element, pathIndex) {
     try {
       if (!isObservableReactTarget(element)) return -1;
@@ -516,7 +542,12 @@
     if (!(target instanceof Element)) return null;
     const nativeTarget = target.closest(NATIVE_INTERACTIVE_SELECTOR);
     if (nativeTarget) return nativeTarget;
-    return reactInteractiveTarget(event);
+    const reactTarget = reactInteractiveTarget(event);
+    if (reactTarget) return reactTarget;
+    const mode = surfaceSignals(target);
+    if (!mode.enhanced) return null;
+    return (event?.composedPath?.() || []).find(item => item instanceof Element &&
+      surfaceModeApi.supportsEnhancedRole(item.getAttribute?.("role"))) || null;
   }
 
   function eventElement(event) {
@@ -545,7 +576,7 @@
     if (
       role === "button" ||
       role === "menuitem" ||
-      role === "tab" ||
+      role === "tab" || role === "switch" || role === "treeitem" ||
       tag === "button"
     ) return "action";
 
@@ -608,6 +639,7 @@
         heuristic
       });
     }
+    const captureSurface = surfaceSignals(element);
     return {
       role: role || element?.tagName?.toLowerCase() || "",
       controlType: element?.tagName?.toLowerCase() || "",
@@ -634,6 +666,7 @@
       selected: element?.getAttribute?.("aria-selected") === "true" || undefined,
       reactInteractive: isObservableReactTarget(element) || undefined,
       controlAddIn: uiHierarchy.some(item => item.type === "controlAddIn") || /Mui[A-Z]/.test(String(element?.className || "")),
+      captureSurface,
       uiHierarchy,
       localBounds: bounds ? { x: bounds.x, y: bounds.y,
         width: bounds.width, height: bounds.height } : undefined,

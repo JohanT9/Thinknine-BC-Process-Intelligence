@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+- Added an automatic, deterministic capture-surface mode for React, Material UI,
+  nested control add-ins, and observable ARIA controls while preserving the
+  existing standard Business Central capture path and raw-event traceability.
+
 - Added versioned screenshot capture roles for menu, selection, result, action,
   and dialog states. Screenshot Selection now reports the selected role and
   deterministically prefers the state that best explains each Step Group.

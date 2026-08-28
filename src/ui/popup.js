@@ -68,7 +68,8 @@ async function ensureContentScript(tab) {
   try {
     await withTimeout(chrome.scripting.executeScript({
       target: { tabId: tab.id, allFrames: true },
-      files: ["capture-focus-session.js", "bc-error-detector.js", "content.js"]
+      files: ["capture-focus-session.js", "capture-surface-mode.js",
+        "bc-error-detector.js", "content.js"]
     }), 4000, "Inläsningen av inspelningsskriptet");
   } catch (error) {
     throw new Error("Edge kunde inte läsa in inspelningsskriptet i Business Central. " +

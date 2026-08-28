@@ -7,6 +7,7 @@ const normalization = require("../src/engine/event-normalization");
 const grouping = require("../src/engine/event-step-grouping");
 const screenshotPolicy = require("../src/engine/screenshot-capture-policy");
 const focusSession = require("../src/recorder/capture-focus-session");
+const surfaceMode = require("../src/recorder/capture-surface-mode");
 
 const content = fs.readFileSync("src/recorder/content.js", "utf8");
 const background = fs.readFileSync("src/recorder/background.js", "utf8");
@@ -31,6 +32,32 @@ assert(content.includes('"wrapping-label"'));
 assert(content.includes("isObservableReactTarget"));
 assert(content.includes("reactTargetScore"));
 assert(content.includes("reactInteractiveTarget"));
+assert.strictEqual(surfaceMode.detect({ frameDepth: 0 }).mode, "standard-bc");
+assert.strictEqual(surfaceMode.detect({ frameDepth: 1 }).mode, "standard-bc",
+  "a nested frame alone must not alter standard capture behavior");
+assert.strictEqual(surfaceMode.detect({ frameDepth: 1,
+  automationMetadata: true }).mode, "control-addin");
+assert.strictEqual(surfaceMode.detect({ frameDepth: 1,
+  controlAddInPath: true }).mode, "control-addin");
+assert.strictEqual(surfaceMode.detect({ materialUi: true }).mode, "control-addin");
+assert.strictEqual(surfaceMode.detect({ reactRoot: true }).mode, "control-addin");
+assert.strictEqual(surfaceMode.supportsEnhancedRole("switch"), true);
+assert.strictEqual(surfaceMode.supportsEnhancedRole("button"), false,
+  "native roles remain owned by standard target resolution");
+assert.strictEqual(surfaceMode.eventFamily("click"), "delegated-capture");
+assert.deepStrictEqual(surfaceMode.detect({ controlAddIn: true }),
+  surfaceMode.detect({ controlAddIn: true }), "mode detection must be deterministic");
+const surfaceInput = Object.freeze({ frameDepth: 2, automationMetadata: true });
+const surfaceResult = surfaceMode.detect(surfaceInput);
+assert.strictEqual(surfaceInput.frameDepth, 2, "mode detection must not mutate input");
+assert.ok(Object.isFrozen(surfaceResult));
+assert.ok(Object.isFrozen(surfaceResult.signals));
+assert.deepStrictEqual(surfaceResult.signals,
+  ["nested-frame", "automation-metadata"]);
+assert.strictEqual(surfaceMode.detect({ frameDepth: "invalid" }).mode,
+  "standard-bc", "malformed optional evidence must fall back safely");
+assert(content.includes("surfaceSignals"));
+assert(content.includes("captureSurface,"));
 assert(content.includes("right.score - left.score"));
 assert(content.includes("catch { return -1; }"));
 assert(content.includes("pointerTarget: true"));
@@ -73,7 +100,8 @@ assert(content.includes("[role=\\\"checkbox\\\"]") ||
 assert.strictEqual(manifest.content_scripts[0].all_frames, true);
 assert.strictEqual(manifest.content_scripts[0].match_about_blank, true);
 assert.deepStrictEqual(manifest.content_scripts[0].js,
-  ["capture-focus-session.js", "bc-error-detector.js", "content.js"]);
+  ["capture-focus-session.js", "capture-surface-mode.js",
+    "bc-error-detector.js", "content.js"]);
 assert(!manifest.host_permissions.includes("<all_urls>"));
 assert(manifest.permissions.includes("webNavigation"));
 assert(background.includes("allFrames: true"));
@@ -86,7 +114,7 @@ assert(background.includes('case "T9_CAPTURE_BEFORE_ACTION"'));
 assert(background.includes("consumePreActionCapture"));
 assert(background.includes("activeContent.sessionId !== id"));
 assert(popup.includes(
-  'files: ["capture-focus-session.js", "bc-error-detector.js", "content.js"]'));
+  'files: ["capture-focus-session.js", "capture-surface-mode.js",'));
 assert((background.match(/await registerRecorderContentScript\(\);/gu) || [])
   .length >= 2, "Install and browser startup must refresh persistent registration.");
 
@@ -110,7 +138,8 @@ function memoryAdapter() {
     browserFrameId: 7, parentFrameId: 3, documentId: "document-react-2",
     frameUrl: "https://businesscentral.dynamics.com/controladdin/frame",
     topUrl: "https://businesscentral.dynamics.com/?page=42",
-    futureCaptureField: { retained: true }
+    captureSurface: surfaceMode.detect({ frameDepth: 2,
+      automationMetadata: true }), futureCaptureField: { retained: true }
   };
 
   const rawAdapter = memoryAdapter();
@@ -121,6 +150,8 @@ function memoryAdapter() {
   assert.strictEqual(rawAdapter.inspect().events[0].acceptedSequence, 1);
   assert.deepStrictEqual(rawAdapter.inspect().events[0].futureCaptureField,
     { retained: true });
+  assert.strictEqual(rawAdapter.inspect().events[0].captureSurface.mode,
+    "control-addin");
 
   const identified = identification.identify(rawResult.event, {
     eventId: `${recordingId}:event:${sourceEvent.sourceEventId}`
@@ -131,6 +162,8 @@ function memoryAdapter() {
     sourceEvent.sourceEventId);
   assert.strictEqual(canonicalRecording.events[0].raw.documentId,
     "document-react-2");
+  assert.strictEqual(canonicalRecording.events[0].raw.captureSurface.mode,
+    "control-addin", "canonical evidence must preserve the observed capture mode");
 
   const normalized = normalization.normalizeRecording(canonicalRecording);
   assert.strictEqual(normalized.events.length, 1);

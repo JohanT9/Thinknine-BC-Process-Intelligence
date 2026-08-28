@@ -239,6 +239,21 @@ Editable controls retain their initial observable value on `focusin`. On
 no equivalent native `input` or `change` commit was already emitted. Event
 Normalization remains the owner of the `value-change` classification.
 
+Capture Surface Mode 1.0 is the single owner of the recorder's technical
+surface mode. It deterministically selects `standard-bc` or `control-addin`
+from observable frame paths, automation, React-root, Material UI, and
+control-add-in markers. A nested frame alone is insufficient, so normal Business Central
+frames retain the standard path. The enhanced mode expands delegated target
+resolution for observable ARIA roles such as `switch`, `treeitem`, `slider`,
+and `combobox`; it does not inspect React Fiber, patch the page world, poll the
+DOM, or classify business meaning.
+
+Each accepted Raw Event may carry additive `captureSurface` evidence with the
+mode version, matched signals, and deterministic confidence. Canonical
+Recording preserves this evidence in the original raw event. Semantic
+classification remains downstream, and absence of mode evidence remains fully
+backward compatible.
+
 Capture diagnostics are opt-in and bounded. They retain event/control shape,
 frame/document identity, acceptance state, rejection reason, and source-event
 identity, but never entered values or URL query strings. Supported inherited
