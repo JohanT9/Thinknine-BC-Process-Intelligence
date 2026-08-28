@@ -209,6 +209,11 @@ Groups before semantic interpretation. Grouping owns safe interaction boundaries
 preserves every canonical source and screenshot candidate, and emits no final
 instruction text. See [Event Step Grouping](docs/EVENT_STEP_GROUPING.md).
 
+Step Groups include an immutable capture packet that binds an observed control
+and user action to its verified immediate result and screenshot evidence. This
+reduces duplicate mechanics and prevents unknown framework events from becoming
+empty *Utför uppgiften* steps without discarding their traceability.
+
 ## Event Normalization
 
 Canonical raw evidence and BC identification can now be projected into one

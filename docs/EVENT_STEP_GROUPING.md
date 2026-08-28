@@ -31,7 +31,15 @@ Schema-v1 Step Groups contain recording and deterministic group IDs, grouping
 version, all canonical and normalized source IDs, start/end timestamp, sequence,
 primary event, page/control/action context, structural group kind, explicit
 reasons, all screenshot candidates, frame contexts, supporting IDs, evidence,
-and candidate status. Unknown future fields survive normalization.
+candidate status, and an additive immutable `capturePacket`. Unknown future
+fields survive normalization.
+
+The capture packet explicitly relates the observed interaction to its immediate
+verified result and captured screenshot evidence. It records interaction and
+result event IDs separately, all screenshot asset IDs, the source event owning
+the latest result capture, completeness (`complete` or `partial`), and any
+missing role. It is derived evidence: Canonical Recording and raw events remain
+unchanged.
 
 Algorithm version is `1.0.0`. IDs use the version plus collision-safe,
 length-prefixed canonical source IDs. They do not use random values, execution
@@ -43,9 +51,13 @@ The structural kinds are `field-edit`, `lookup-interaction`, `selection`,
 `toggle-interaction`, `action`, `navigation`, `dialog-interaction`,
 `row-interaction`, and `unknown`.
 
-Navigation, committed action/dialog mechanics, page identity changes, unrelated
-controls, and uncertain relationships are boundaries. Timing is not used as the
-sole reason to merge. Ambiguity produces smaller groups.
+Navigation and dialog mechanics normally remain boundaries. When they are the
+immediate observed result of a captioned action, they complete that action's
+capture packet instead of creating a duplicate step. Repeated activations of
+the same identified action/control may be coalesced only inside a bounded
+1.2-second interaction window. Timing is never sufficient without matching page
+and action/control identity. Page identity changes, unrelated controls, and
+uncertain relationships remain boundaries; ambiguity produces smaller groups.
 
 ## Field editing, dates, toggles, and selection
 
@@ -73,16 +85,23 @@ selection. Unverified result relationships remain separate groups.
 
 ## Primary/supporting events, screenshots, and diagnostics
 
-The final committed value, toggle, selection, row, action, dialog action, or
-navigation mechanic is primary. Earlier mechanics remain supporting and retain
-full traceability. Screenshot asset IDs are aggregated uniquely in stable source
-order; no screenshot is selected.
+The final committed value, toggle, selection, row, dialog action, or standalone
+navigation mechanic is primary. For an action packet with an observed result,
+the user's activation remains primary while the navigation/dialog/value result
+is explicitly recorded as outcome evidence. Earlier mechanics remain supporting
+and retain full traceability. Screenshot asset IDs are aggregated uniquely in
+stable source order. The packet identifies the latest result-bearing capture as
+its preferred evidence, but final document screenshot ranking remains owned by
+Screenshot Intelligence.
 
 Focus transitions and scroll/pointer-movement noise are explicitly classified
-as supporting/noise and create no group. Every other normalized event is assigned
-to exactly one group. Diagnostics report input count, assignment count, supporting
-classification, and any unassigned meaningful IDs. Values are not duplicated in
-grouping explanations.
+as supporting/noise and create no group. Unknown normalized mechanics without a
+documentable interaction are classified as supporting/unclassified. They remain
+traceable but cannot create an `Unclassified` placeholder step. Every normalized
+event is assigned to a group or an explicit supporting classification.
+Diagnostics report input count, assignment count, supporting classification,
+and any unassigned meaningful IDs. Values are not duplicated in grouping
+explanations.
 
 ## Semantic integration, compatibility, and performance
 

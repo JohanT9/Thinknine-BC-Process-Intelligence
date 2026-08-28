@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+- Added immutable capture packets to Step Grouping so matching control/action
+  mechanics, immediate results, and screenshots travel together. Duplicate
+  activations are consolidated, result captures are preferred, and unknown
+  framework mechanics remain traceable without creating *Utför uppgiften*
+  placeholder steps.
 - Improved screenshot clarity in Review Studio, image editing, and Document Generator by using the available workspace width and optimized Chromium downscaling while preserving the original lossless PNG assets.
 
 - Added a persistent, minimizable recording indicator inside the active

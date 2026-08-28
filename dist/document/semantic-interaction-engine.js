@@ -136,6 +136,11 @@
         value.stepGroupIds || (value.stepGroups || []).map(group => group.stepGroupId),
       semanticActionIds: value.semanticActionIds
     })));
+    const preferredSourceEventId = [...values].reverse().map(value =>
+      value.semanticActionModel?.preferredSourceEventId ||
+        value.preferredSourceEventId || value.capturePacket?.preferredSourceEventId ||
+        value.stepGroups?.at(-1)?.capturePacket?.preferredSourceEventId)
+      .find(Boolean);
     return {
       sourceTaskIds: unique(values.flatMap(value =>
         value.semanticActionModel?.sourceTaskIds || (value.sourceTaskIds?.length
@@ -148,6 +153,7 @@
       screenshotRefs: unique(values.flatMap(value =>
         value.semanticActionModel?.screenshotRefs || (value.screenshots?.length
           ? value.screenshots : value.screenshot ? [value.screenshot] : []))),
+      ...(preferredSourceEventId ? { preferredSourceEventId } : {}),
       annotationRefs: unique(values.flatMap(value => value.annotationRefs || [])
         .map(value => JSON.stringify(value))).map(value => JSON.parse(value))
     };
@@ -569,6 +575,11 @@
           ? `Ange __${selected}__ i **${field}**.`
           : `Fyll i **${field}**.`;
       } }),
+    singleRule({ ruleId: "generic-captioned-action", priority: 5,
+      match: value => value?.taskType === "RunAction" &&
+        Boolean(text(value?.actionCaption)),
+      actionType: () => "RunAction",
+      display: value => `Välj **${text(value.actionCaption)}**.` }),
     focusTransitionRule()
   ]);
 
@@ -647,6 +658,8 @@
       normalizedEventIds: group.normalizedEventIds || [],
       stepGroupIds: group.stepGroupId ? [group.stepGroupId] : [],
       recordingId: group.recordingId,
+      preferredSourceEventId: group.capturePacket?.preferredSourceEventId || undefined,
+      capturePacket: clone(group.capturePacket || {}),
       stepGroups: [group],
       normalizedInteractions: [primary]
     };

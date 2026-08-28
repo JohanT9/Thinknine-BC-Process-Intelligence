@@ -6,6 +6,7 @@
   "use strict";
   const SCHEMA_VERSION = 1;
   const GROUPING_VERSION = "1.0.0";
+  const CAPTURE_PACKET_VERSION = "1.0.0";
   const cache = new WeakMap();
   const clone = value => value == null ? value : JSON.parse(JSON.stringify(value));
   function freeze(value) { if (!value || typeof value !== "object" || Object.isFrozen(value)) return value; Object.values(value).forEach(freeze); return Object.freeze(value); }
@@ -16,6 +17,12 @@
     page.id || page.pageId || page.legacyPageId || page.name ||
     page.pageCaption || page.caption || ""; }
   function selectedValue(event) { return event.selection?.value ?? event.selection?.key ?? event.selection?.caption ?? event.value?.normalized; }
+  function actionKey(event) { const action = event?.actionIdentification || {};
+    return action.actionIdentity || action.identity?.value || action.actionId ||
+      action.caption || controlKey(event); }
+  function elapsed(first, second) { const start = Date.parse(first?.timestamp || "");
+    const end = Date.parse(second?.timestamp || "");
+    return Number.isFinite(start) && Number.isFinite(end) ? Math.max(0, end - start) : 0; }
   function isLookupOrigin(event) { return event?.kind === "activation" &&
     event.controlIdentification?.controlType === "lookup"; }
   function isRowSelection(event) { return event?.kind === "selection-change" &&
@@ -36,9 +43,57 @@
     if (kinds.has("navigation")) return "navigation";
     return "unknown";
   }
+  function outcomeEvents(events) { return events.filter(event =>
+    ["dialog-open", "dialog-close", "navigation", "value-change",
+      "selection-change", "toggle-change"].includes(event.kind)); }
+  function primaryEvent(events) {
+    if (events.some(event => event.kind === "activation") &&
+        !events.some(isLookupOrigin) && outcomeEvents(events).length) {
+      return events.find(event => event.kind === "activation");
+    }
+    return [...events].reverse().find(event => ["value-change", "toggle-change",
+      "selection-change", "activation", "dialog-open", "dialog-close",
+      "navigation"].includes(event.kind)) || events.at(-1);
+  }
+  function capturePacket(events, primary, screenshots) {
+    const interaction = events.find(event => event.kind === "activation") || primary;
+    const observedOutcomes = outcomeEvents(events).filter(event => event !== interaction);
+    const outcomes = observedOutcomes.length ? observedOutcomes :
+      primary && primary !== interaction ? [primary] :
+        primary && ["value-change", "selection-change", "toggle-change",
+          "navigation", "dialog-open", "dialog-close"].includes(primary.kind)
+          ? [primary] : [];
+    const preferredScreenshotEvent = [...events].reverse().find(event =>
+      event?.screenshotAssetId || event?.screenshotAssetIds?.length);
+    const preferredScreenshotAssetId = preferredScreenshotEvent
+      ? (preferredScreenshotEvent.screenshotAssetIds ||
+          [preferredScreenshotEvent.screenshotAssetId]).filter(Boolean).at(-1)
+      : screenshots.at(-1) || null;
+    const missing = [];
+    if (!primary) missing.push("interaction");
+    if (!outcomes.length) missing.push("result");
+    if (!screenshots.length) missing.push("screenshot");
+    return {
+      packetVersion: CAPTURE_PACKET_VERSION,
+      interactionEventId: interaction?.normalizedEventId || null,
+      interactionSourceEventIds: unique(interaction?.sourceEventIds ||
+        [interaction?.sourceEventId]),
+      resultEventIds: outcomes.map(event => event.normalizedEventId),
+      resultSourceEventIds: unique(outcomes.flatMap(event =>
+        event.sourceEventIds || [event.sourceEventId])),
+      screenshotAssetIds: screenshots,
+      preferredScreenshotAssetId,
+      preferredSourceEventId: preferredScreenshotEvent?.sourceEventId || null,
+      completeness: missing.length ? "partial" : "complete",
+      missing
+    };
+  }
   function makeGroup(recordingId, events, reasons, sequence) {
-    const primary = [...events].reverse().find(event => ["value-change", "toggle-change", "selection-change", "activation", "dialog-open", "dialog-close", "navigation"].includes(event.kind)) || events.at(-1);
+    const primary = primaryEvent(events);
     const sourceEventIds = unique(events.flatMap(event => event.sourceEventIds || [event.sourceEventId]));
+    const screenshotAssetIds = unique(events.flatMap(event =>
+      event.screenshotAssetIds || (event.screenshotAssetId
+        ? [event.screenshotAssetId] : [])));
     return freeze({
       stepGroupId: groupId(sourceEventIds), schemaVersion: SCHEMA_VERSION,
       groupingVersion: GROUPING_VERSION, recordingId, sourceEventIds,
@@ -51,9 +106,8 @@
       controlContext: clone(primary.controlIdentification || {}),
       actionContext: clone(primary.actionIdentification),
       groupKind: groupKind(events), groupingReason: unique(reasons),
-      screenshotAssetIds: unique(events.flatMap(event =>
-        event.screenshotAssetIds || (event.screenshotAssetId
-          ? [event.screenshotAssetId] : []))),
+      screenshotAssetIds,
+      capturePacket: capturePacket(events, primary, screenshotAssetIds),
       frameContexts: events.map(event => clone(event.frameContext || {})),
       primaryNormalizedEvent: clone(primary),
       supportingNormalizedEventIds: events.filter(event => event !== primary).map(event => event.normalizedEventId),
@@ -62,6 +116,7 @@
     });
   }
   function isNoise(event) { return event.kind === "focus-transition" || ["scroll", "mousemove", "mouseover", "pointermove"].includes(event.rawEventType); }
+  function isUnclassifiedMechanic(event) { return event.kind === "unknown"; }
   function isCommit(kind) { return ["value-change", "selection-change", "toggle-change", "row-selection"].includes(kind); }
   function canContinueField(events, event) {
     const last = events.at(-1);
@@ -87,6 +142,23 @@
     const selected = selectedValue(row); const committed = event.value?.normalized;
     return selected != null && committed != null && String(selected) === String(committed);
   }
+  function sameActivation(events, event) {
+    const origin = events?.[0];
+    return origin?.kind === "activation" && event.kind === "activation" &&
+      pageKey(origin) === pageKey(event) && actionKey(origin) === actionKey(event) &&
+      elapsed(origin, event) <= 1200;
+  }
+  function isActionOutcome(events, event) {
+    const origin = events?.[0];
+    if (origin?.kind !== "activation") return false;
+    if (["dialog-open", "dialog-close", "navigation"].includes(event.kind)) return true;
+    if (["value-change", "selection-change", "toggle-change"].includes(event.kind)) {
+      return pageKey(origin) === pageKey(event) &&
+        (controlKey(origin) === controlKey(event) || Boolean(
+          event.screenshotAssetId || event.screenshotAssetIds?.length));
+    }
+    return false;
+  }
   function group(normalizedRecording) {
     if (cache.has(normalizedRecording)) return cache.get(normalizedRecording);
     const groups = []; const supportingEvents = []; const assignments = new Map();
@@ -101,6 +173,10 @@
     };
     for (const event of normalizedRecording.events || []) {
       if (isNoise(event)) { emit(); supportingEvents.push(freeze({ normalizedEventId: event.normalizedEventId, classification: "noise", reason: "non-step-mechanic" })); assignments.set(event.normalizedEventId, "supporting"); continue; }
+      if (isUnclassifiedMechanic(event)) { emit(); supportingEvents.push(freeze({
+        normalizedEventId: event.normalizedEventId, classification: "unclassified",
+        reason: "no-documentable-interaction" }));
+      assignments.set(event.normalizedEventId, "supporting"); continue; }
       if (isLookupOrigin(pending?.events[0])) {
         const lookupOrigin = pending.events[0];
         const sameLookupPage = pageKey(event) === pageKey(lookupOrigin) || event.pageIdentification?.modal;
@@ -120,6 +196,17 @@
         }
         emit();
       }
+      if (pending && sameActivation(pending.events, event)) {
+        pending.events.push(event);
+        pending.reasons.push("duplicate-activation", "same-control-action-window");
+        continue;
+      }
+      if (pending && isActionOutcome(pending.events, event)) {
+        pending.events.push(event);
+        pending.reasons.push("observed-action-result");
+        emit();
+        continue;
+      }
       if (pending && canContinueField(pending.events, event)) {
         pending.events.push(event); pending.reasons.push("same-control", "committed-edit-sequence");
         continue;
@@ -130,7 +217,7 @@
         event.kind === "activation" ? "committed-action" :
         isCommit(event.kind) ? "committed-interaction" : "conservative-single-event";
       pending = { events: [event], reasons: [reason] };
-      if (["activation", "navigation", "dialog-open", "dialog-close", "unknown", "key-command"].includes(event.kind) && !isLookupOrigin(event)) emit();
+      if (["navigation", "dialog-open", "dialog-close", "key-command"].includes(event.kind) && !isLookupOrigin(event)) emit();
     }
     emit();
     const unassignedMeaningfulEventIds = (normalizedRecording.events || [])
@@ -147,5 +234,6 @@
     return result;
   }
   function normalizeStepGroup(value) { if (!value || Number(value.schemaVersion) !== SCHEMA_VERSION) throw new Error("Unsupported Step Group schema."); return freeze(clone(value)); }
-  return { GROUPING_VERSION, SCHEMA_VERSION, group, normalizeStepGroup };
+  return { CAPTURE_PACKET_VERSION, GROUPING_VERSION, SCHEMA_VERSION, group,
+    normalizeStepGroup };
 });

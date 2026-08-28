@@ -42,6 +42,11 @@ assert.deepStrictEqual(quantity.groups[0].supportingNormalizedEventIds,
   ["normalized:q1", "normalized:q2"]);
 assert.deepStrictEqual(quantity.groups[0].screenshotAssetIds,
   ["shot-1", "shot-2"]);
+assert.strictEqual(quantity.groups[0].capturePacket.packetVersion, "1.0.0");
+assert.strictEqual(quantity.groups[0].capturePacket.preferredScreenshotAssetId,
+  "shot-2");
+assert.strictEqual(quantity.groups[0].capturePacket.completeness, "complete");
+assert.deepStrictEqual(quantity.groups[0].capturePacket.missing, []);
 assert.ok(quantity.groups[0].groupingReason.includes("same-control"));
 assert.ok(Object.isFrozen(quantity.groups[0]));
 assert.strictEqual(quantity.diagnostics.unassignedMeaningfulEventIds.length, 0);
@@ -124,6 +129,40 @@ const actionDialog = run([
 assert.deepStrictEqual(actionDialog.groups.map(group => group.groupKind),
   ["action", "dialog-interaction"]);
 
+const actionResult = run([
+  event("ar1", "activation", { actionIdentification: { caption: "Open" },
+    screenshotAssetId: "shot-before" }),
+  event("ar2", "navigation", { pageIdentification: {
+    id: "43", caption: "Sales Order" }, screenshotAssetId: "shot-result" })
+]);
+assert.strictEqual(actionResult.groups.length, 1);
+assert.strictEqual(actionResult.groups[0].groupKind, "action");
+assert.strictEqual(actionResult.groups[0].primaryEventId, "normalized:ar1");
+assert.deepStrictEqual(actionResult.groups[0].capturePacket.resultEventIds,
+  ["normalized:ar2"]);
+assert.strictEqual(actionResult.groups[0].capturePacket.preferredScreenshotAssetId,
+  "shot-result");
+assert.strictEqual(actionResult.groups[0].capturePacket.preferredSourceEventId,
+  "source:ar2");
+assert.strictEqual(actionResult.groups[0].capturePacket.completeness, "complete");
+assert.ok(actionResult.groups[0].groupingReason.includes("observed-action-result"));
+const actionResultSemantic = semantic.processStepGroups(actionResult.groups)[0];
+assert.strictEqual(actionResultSemantic.actionType, "RunAction");
+assert.strictEqual(actionResultSemantic.preferredSourceEventId, "source:ar2");
+assert.strictEqual(actionResultSemantic.rawInteractions[0].capturePacket.completeness,
+  "complete");
+
+const duplicateActivation = run([
+  event("da1", "activation", { actionIdentification: { caption: "Edit" },
+    screenshotAssetId: "shot-action" }),
+  event("da2", "activation", { actionIdentification: { caption: "Edit" } })
+]);
+assert.strictEqual(duplicateActivation.groups.length, 1);
+assert.deepStrictEqual(duplicateActivation.groups[0].sourceEventIds,
+  ["source:da1", "source:da2"]);
+assert.ok(duplicateActivation.groups[0].groupingReason.includes(
+  "duplicate-activation"));
+
 const date = run([
   event("d1", "activation", { controlIdentification: {
     identity: { value: "PostingDate" }, controlType: "lookup", type: "dateInput" } }),
@@ -187,7 +226,10 @@ const ambiguous = run([
 assert.strictEqual(ambiguous.groups.length, 2);
 
 const unknown = run([event("u1", "unknown", { rawEventType: "future-event" })]);
-assert.strictEqual(unknown.groups[0].groupKind, "unknown");
+assert.strictEqual(unknown.groups.length, 0);
+assert.strictEqual(unknown.supportingEvents[0].classification, "unclassified");
+assert.strictEqual(unknown.supportingEvents[0].reason,
+  "no-documentable-interaction");
 assert.strictEqual(unknown.diagnostics.unassignedMeaningfulEventIds.length, 0);
 
 const again = run(quantity.groups.flatMap(() => [
@@ -203,7 +245,7 @@ assert.strictEqual(again.groups[0].stepGroupId,
       identity: { value: "Quantity" } } })]).groups[0].stepGroupId);
 
 const future = grouping.normalizeStepGroup({
-  ...unknown.groups[0], futureGroupingMetadata: { retained: true }
+  ...quantity.groups[0], futureGroupingMetadata: { retained: true }
 });
 assert.deepStrictEqual(future.futureGroupingMetadata, { retained: true });
 

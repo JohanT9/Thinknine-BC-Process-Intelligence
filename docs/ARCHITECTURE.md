@@ -307,6 +307,14 @@ action, navigation, page, unrelated-control, and ambiguity boundaries remain
 small and safe. Semantic rules receive Step Groups through a dedicated adapter;
 legacy task consolidation remains a compatibility fallback.
 
+Each Step Group now also exposes an additive capture-packet contract. The packet
+separates the user's primary interaction from its verified immediate result and
+screenshot evidence. Duplicate same-action mechanics are consumed here, while
+unknown mechanics without documentable meaning remain diagnostic support rather
+than generating placeholder steps. The packet can nominate the result-bearing
+capture event, but Screenshot Intelligence remains the sole owner of final
+document screenshot selection.
+
 ## Event Normalization
 
 ```text
