@@ -90,6 +90,7 @@ assert.deepStrictEqual(result.document.metadata, {
   purpose: "Beskriv orderflödet.",
   environment: "Test",
   documentationProfile: "generic",
+  documentLanguage: "sv-SE",
   documentVersion: "1.0",
   statusLabel: "Pågående",
   createdAt: "2026-08-01T08:00:00.000Z",

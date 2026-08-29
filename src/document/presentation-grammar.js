@@ -55,64 +55,73 @@
       .test(String(value)) ? "shortcut" : "identifier";
   }
 
-  function presentationFor(action, fallbackText) {
+  function presentationFor(action, fallbackText, documentLanguage = "sv-SE") {
+    const english = documentLanguage === "en-US";
+    const words = english
+      ? { choose: "Choose ", enter: "Enter ", in: " in ", andChoose: ", and choose ",
+        searchText: "search text", enable: "Enable ", disable: "Disable " }
+      : { choose: "Välj ", enter: "Ange ", in: " i ", andChoose: " och välj ",
+        searchText: "söktext", enable: "Aktivera ", disable: "Inaktivera " };
     const actionType = action?.actionType || action?.taskType;
     const value = String(action?.selectedValue ?? action?.instructionValue ??
       action?.value ?? "").trim();
     const field = String(action?.targetField ?? action?.fieldCaption ?? "").trim();
     const selectLabels = {
-      SelectCustomer: field || "Kund",
-      SelectItem: field || "Artikelnummer",
-      SelectVendor: field || "Leverantör",
-      SelectLocation: field || "Lagerställe",
+      SelectCustomer: field || (english ? "Customer" : "Kund"),
+      SelectItem: field || (english ? "Item No." : "Artikelnummer"),
+      SelectVendor: field || (english ? "Vendor" : "Leverantör"),
+      SelectLocation: field || (english ? "Location" : "Lagerställe"),
       SelectDimension: field || "Dimension"
     };
     if (actionType === "SearchAndOpenPage") {
-      const search = String(action?.searchCaption || "Sök").trim();
+      const search = String(action?.searchCaption || (english ? "Search" : "Sök")).trim();
       const searchField = String(action?.searchFieldCaption || field ||
-        "Berätta vad du vill göra.").trim();
+        (english ? "Tell me what you want to do." :
+          "Berätta vad du vill göra.")).trim();
       const result = String(action?.resultCaption || action?.selectedCaption ||
         action?.pageCaption || "").trim();
       if (result) {
-        return sentence(run("Välj ", "action"), quoted(search),
-          run(", ange "), value ? run(value, "value") : run("söktext"),
-          run(" i "), quoted(searchField), run(" och välj "),
+        return sentence(run(words.choose, "action"), quoted(search),
+          run(english ? ", enter " : ", ange "),
+          value ? run(value, "value") : run(words.searchText),
+          run(words.in), quoted(searchField), run(words.andChoose),
           quoted(result), run("."));
       }
     }
     if (selectLabels[actionType] && value) {
-      return sentence(run("Välj ", "action"), quoted(selectLabels[actionType]),
+      return sentence(run(words.choose, "action"), quoted(selectLabels[actionType]),
         run(" "), run(value, "value"), run("."));
     }
     if (["EnterQuantity", "EnterItemNumber", "SelectDate", "EnterFieldValue"].includes(
       actionType) && value && field) {
-      return sentence(run("Ange ", "action"), run(value, "value"),
-        run(" i "), quoted(field), run("."));
+      return sentence(run(words.enter, "action"), run(value, "value"),
+        run(words.in), quoted(field), run("."));
     }
     if (["SelectOption", "SelectLookupValue"].includes(actionType) &&
         value) {
       return field
-        ? sentence(run("Välj ", "action"), quoted(field), run(" "),
+        ? sentence(run(words.choose, "action"), quoted(field), run(" "),
           run(value, "value"), run("."))
-        : sentence(run("Välj ", "action"), run(value, "value"), run("."));
+        : sentence(run(words.choose, "action"), run(value, "value"), run("."));
     }
     if (["EnableCheckbox", "DisableCheckbox"].includes(actionType) &&
         field) {
       return sentence(run(actionType === "EnableCheckbox"
-        ? "Aktivera " : "Inaktivera ", "action"), quoted(field), run("."));
+        ? words.enable : words.disable, "action"), quoted(field), run("."));
     }
     const runs = legacyRuns(fallbackText);
     return sentence(runs);
   }
 
-  function processBlock(block, action) {
+  function processBlock(block, action, documentLanguage) {
     const result = clone(block);
     const blockAction = result.kind === "step"
       ? result.semanticAction || result.interaction || action
       : action;
     if (result.kind === "paragraph" && typeof result.text === "string") {
       if (!(result.preserveUserText && Array.isArray(result.presentationRuns))) {
-        const presentation = presentationFor(blockAction, result.text);
+        const presentation = presentationFor(blockAction, result.text,
+          documentLanguage);
         result.text = presentation.text;
         result.presentationRuns = presentation.runs;
       }
@@ -122,19 +131,22 @@
         child,
         result.kind === "step" && child.kind === "paragraph"
           ? child.preserveUserText ? null : blockAction
-          : action
+          : action,
+        documentLanguage
       ));
     }
     if (Array.isArray(result.items)) {
       result.items = result.items.map(item => ({ ...item,
         blocks: Array.isArray(item.blocks)
-          ? item.blocks.map(child => processBlock(child, blockAction)) : item.blocks }));
+          ? item.blocks.map(child => processBlock(child, blockAction,
+            documentLanguage)) : item.blocks }));
     }
     if (Array.isArray(result.rows)) {
       result.rows = result.rows.map(row => ({ ...row,
         cells: Array.isArray(row.cells) ? row.cells.map(cell => ({ ...cell,
           blocks: Array.isArray(cell.blocks)
-            ? cell.blocks.map(child => processBlock(child, blockAction)) : cell.blocks
+            ? cell.blocks.map(child => processBlock(child, blockAction,
+              documentLanguage)) : cell.blocks
         })) : row.cells }));
     }
     return result;
@@ -145,10 +157,13 @@
       Object.isFrozen(document);
     if (cacheable && cache.has(document)) return cache.get(document);
     const normalized = semantic.normalize(document);
+    const documentLanguage = normalized.metadata?.documentLanguage === "en-US"
+      ? "en-US" : "sv-SE";
     const result = semantic.normalize({
       ...clone(normalized),
       sections: normalized.sections.map(section => ({ ...clone(section),
-        blocks: section.blocks.map(block => processBlock(block)) })),
+        blocks: section.blocks.map(block => processBlock(block, null,
+          documentLanguage)) })),
       provenance: {
         ...clone(normalized.provenance),
         transformations: [...new Set([

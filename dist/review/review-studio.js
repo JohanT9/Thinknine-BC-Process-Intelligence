@@ -229,7 +229,9 @@
       noteModelVersion: "1.0.0",
       stepNotes: initialNotes,
       hierarchy: guidedHierarchy,
-      documentFields: { expectedResult: "" },
+      documentFields: { expectedResult: "",
+        documentLanguage: session.settings?.documentLanguage === "en-US"
+          ? "en-US" : "sv-SE" },
       generatedTasks: clone(normalizedTasks),
       tasks: normalizedTasks
     };
@@ -240,20 +242,24 @@
     normalized.documentFields = {
       ...(normalized.documentFields || {}),
       expectedResult: String(normalized.documentFields?.expectedResult ||
-        normalized.expectedResult || "")
+        normalized.expectedResult || ""),
+      documentLanguage: normalized.documentFields?.documentLanguage === "en-US"
+        ? "en-US" : "sv-SE"
     };
     return normalized;
   }
 
   function setDocumentField(review, field, value, options = {}) {
-    if (field !== "expectedResult") {
+    if (!["expectedResult", "documentLanguage"].includes(field)) {
       throw new TypeError(`Unsupported review document field: ${field}.`);
     }
     const beforeDocumentFields = historyEngine.snapshot(
       review.documentFields || { expectedResult: "" }
     );
     review.documentFields = { ...(review.documentFields || {}),
-      [field]: String(value || "") };
+      [field]: field === "documentLanguage" && value === "en-US"
+        ? "en-US" : field === "documentLanguage" ? "sv-SE"
+          : String(value || "") };
     review.updatedAt = options.now || new Date().toISOString();
     historyEngine.record(review, {
       historyId: options.commandHistoryId ||

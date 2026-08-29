@@ -239,6 +239,16 @@ table{width:100%;border-collapse:collapse}th,td{text-align:left;padding:9px;bord
   Ändrar språket i BC Process Studio. Inspelat innehåll och dokument påverkas inte.
 </p>
 
+<label for="documentLanguage" data-i18n="settings.documentLanguage">Dokumentspråk</label>
+<select id="documentLanguage" aria-describedby="documentLanguageHelp">
+  <option value="sv-SE">Svenska</option>
+  <option value="en-US">English</option>
+</select>
+<p id="documentLanguageHelp" class="muted"
+  data-i18n="settings.documentLanguageHelp">
+  Standardspråk för nya processdokument. Observerade Business Central-benämningar ändras inte.
+</p>
+
 <input id="documentationProfile" type="hidden" value="generic">
 <div id="profileHelp" hidden></div>
 
@@ -512,6 +522,12 @@ table{width:100%;border-collapse:collapse}th,td{text-align:left;padding:9px;bord
       <div id="reviewZoomContent" class="review-zoom-content">
       <section class="review-document-fields" aria-labelledby="reviewDocumentFieldsTitle">
         <h3 id="reviewDocumentFieldsTitle">Dokumentinformation</h3>
+        <label for="reviewDocumentLanguage"
+          data-i18n="review.documentLanguage">Dokumentspråk</label>
+        <select id="reviewDocumentLanguage">
+          <option value="sv-SE">Svenska</option>
+          <option value="en-US">English</option>
+        </select>
         <label for="expectedResultEditor">Förväntat resultat</label>
         <textarea id="expectedResultEditor" rows="3"
           aria-describedby="expectedResultHelp"
@@ -709,6 +725,7 @@ table{width:100%;border-collapse:collapse}th,td{text-align:left;padding:9px;bord
 <script src="review/task-visibility.js"></script>
 <script src="document/review-document-projector.js"></script>
 <script src="document/language-excellence.js"></script>
+<script src="document/document-language.js"></script>
 <script src="document/presentation-grammar.js"></script>
 <script src="document/screenshot-intelligence.js"></script>
 <script src="document/document-theme.js"></script>

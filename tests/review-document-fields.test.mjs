@@ -16,7 +16,13 @@ assert.equal(review.documentFields.expectedResult, "");
 
 const legacy = reviewModel.normalizeReview({ sessionId: "legacy", tasks: [],
   annotations: { schemaVersion: "1.0.0", screenshotSets: [] } });
-assert.deepEqual(legacy.documentFields, { expectedResult: "" });
+assert.deepEqual(legacy.documentFields, { expectedResult: "",
+  documentLanguage: "sv-SE" });
+assert.equal(review.documentFields.documentLanguage, "sv-SE");
+reviewModel.setDocumentField(review, "documentLanguage", "en-US", {
+  now: "2026-08-17T12:00:30.000Z"
+});
+assert.equal(review.documentFields.documentLanguage, "en-US");
 const legacyTopLevel = reviewModel.normalizeReview({ sessionId: "legacy-top",
   expectedResult: "Legacy expected result", tasks: [],
   annotations: { schemaVersion: "1.0.0", screenshotSets: [] } });

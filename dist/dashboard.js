@@ -1,5 +1,6 @@
 const DEFAULTS = {
   uiLocale: "sv-SE",
+  documentLanguage: "sv-SE",
   exportFileNamePattern: "{process} - {environment} - {date}",
   documentationProfile: "generic",
   defaultExpectedResult:
@@ -3147,17 +3148,20 @@ function createActiveDocumentPipeline() {
     throw new Error("Dokumentet är inte tillgängligt ännu.");
   }
   const expectedResult = configuredExpectedResult();
+  const documentLanguage = activeDocumentLanguage();
   const preparedPresentation = createActiveDocumentPresentation();
   return activeDocumentPipelineCache.get([
     activeReviewModel,
     activeReview,
     workspaceState.revision,
     activeDocumentProfileId,
-    expectedResult
+    expectedResult,
+    documentLanguage
   ], () => globalThis.T9WordExportPipeline.create({
       session: activeReviewModel.response.session,
       review: activeReview,
       expectedResult,
+      documentLanguage,
       preparedPresentation,
       screenshotCandidates: screenshotCandidatesFor(activeReviewModel, activeReview),
       profileId: activeDocumentProfileId,
@@ -3170,16 +3174,19 @@ function createActiveDocumentPresentation() {
     throw new Error("Dokumentet är inte tillgängligt ännu.");
   }
   const expectedResult = configuredExpectedResult();
+  const documentLanguage = activeDocumentLanguage();
   return activeDocumentPresentationCache.get([
     activeReviewModel,
     activeReview,
     workspaceState.revision,
     activeDocumentProfileId,
-    expectedResult
+    expectedResult,
+    documentLanguage
   ], () => globalThis.T9WordExportPipeline.createPresentation({
       session: activeReviewModel.response.session,
       review: activeReview,
       expectedResult,
+      documentLanguage,
       profileId: activeDocumentProfileId
     }));
 }
@@ -3187,6 +3194,21 @@ function createActiveDocumentPresentation() {
 function configuredExpectedResult(settings = applicationSettings) {
   return String(settings?.defaultExpectedResult || "").trim() ||
     globalThis.T9ReviewDocumentProjector.DEFAULT_EXPECTED_RESULT;
+}
+
+function activeDocumentLanguage() {
+  return activeReview?.documentFields?.documentLanguage === "en-US"
+    ? "en-US"
+    : "sv-SE";
+}
+
+function displayedExpectedResult() {
+  const stored = String(activeReview?.documentFields?.expectedResult || "").trim();
+  if (stored) return stored;
+  return globalThis.T9DocumentLanguage.systemText(
+    configuredExpectedResult(),
+    activeDocumentLanguage()
+  );
 }
 
 function screenshotCandidatesFor(model, review) {
@@ -5509,9 +5531,9 @@ function renderReviewContent() {
   const list = $("reviewList");
   const expectedResultEditor = $("expectedResultEditor");
   if (document.activeElement !== expectedResultEditor) {
-    expectedResultEditor.value = activeReview.documentFields?.expectedResult ||
-      configuredExpectedResult();
+    expectedResultEditor.value = displayedExpectedResult();
   }
+  $("reviewDocumentLanguage").value = activeDocumentLanguage();
 
   const displayTasks = reviewTasksForDisplay(activeReview);
   const tasks = displayTasks.tasks;
@@ -6834,6 +6856,20 @@ $("expectedResultEditor").addEventListener("input", event => {
   invalidateDocumentWorkspace();
   applyReviewToolbarState();
 });
+$("reviewDocumentLanguage").addEventListener("change", event => {
+  globalThis.T9Review.setDocumentField(
+    activeReview,
+    "documentLanguage",
+    event.currentTarget.value,
+    { beforeSelection: activeReviewSelection,
+      afterSelection: activeReviewSelection,
+      groupKey: "document-field:documentLanguage" }
+  );
+  reviewAutoSave.schedule();
+  invalidateDocumentWorkspace();
+  renderReviewContent();
+  applyReviewToolbarState();
+});
 $("resetExpectedResult").addEventListener("click", () => {
   globalThis.T9Review.setDocumentField(
     activeReview,
@@ -6844,7 +6880,7 @@ $("resetExpectedResult").addEventListener("click", () => {
       groupKey: "document-field-reset:expectedResult" }
   );
   $("expectedResultEditor").value =
-    configuredExpectedResult();
+    displayedExpectedResult();
   reviewAutoSave.schedule();
   invalidateDocumentWorkspace();
   applyReviewToolbarState();

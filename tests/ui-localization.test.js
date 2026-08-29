@@ -38,9 +38,14 @@ const technical = fs.readFileSync(path.join(root,
 const build = fs.readFileSync(path.join(root, "scripts/build.js"), "utf8");
 
 assert.match(dashboardHtml, /id="uiLocale"[\s\S]*value="sv-SE"[\s\S]*value="en-US"/);
+assert.match(dashboardHtml, /id="documentLanguage"[\s\S]*value="sv-SE"[\s\S]*value="en-US"/);
+assert.match(dashboardHtml, /id="reviewDocumentLanguage"/);
+assert.match(dashboardHtml, /document\/document-language\.js/);
 assert.match(dashboardHtml, /<script src="i18n\.js"><\/script>/);
 assert.match(popupHtml, /<script src="i18n\.js"><\/script>/);
 assert.match(dashboard, /uiLocale: "sv-SE"/);
+assert.match(dashboard, /documentLanguage: "sv-SE"/);
+assert.match(dashboard, /activeDocumentLanguage/);
 assert.match(dashboard, /T9UiI18n\.apply\(settings\.uiLocale\)/);
 assert.match(dashboard, /T9UiI18n\.observe/);
 assert.match(dashboard, /uiTf\("document\.page"/);

@@ -11,6 +11,12 @@
 
 ## Unreleased
 
+- Added an independent Swedish/English document-language setting with a
+  per-Review override. Generated headings, standard text, statuses, instruction
+  grammar, Document Generator output, and Word now use one shared localization
+  stage while observed Business Central labels and consultant-authored text are
+  preserved. Existing Reviews remain Swedish.
+
 - Added the first localization foundation for BC Process Studio with a persisted
   Swedish/English interface-language setting, deterministic Swedish fallback,
   and shared translations used by the dashboard and recorder popup shell.

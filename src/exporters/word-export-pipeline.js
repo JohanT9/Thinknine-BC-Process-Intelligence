@@ -11,6 +11,9 @@
   const language = typeof module === "object" && module.exports
     ? require("../document/language-excellence")
     : root.T9LanguageExcellence;
+  const documentLanguage = typeof module === "object" && module.exports
+    ? require("../document/document-language")
+    : root.T9DocumentLanguage;
   const presentation = typeof module === "object" && module.exports
     ? require("../document/presentation-grammar")
     : root.T9PresentationGrammar;
@@ -46,6 +49,7 @@
     semantic,
     interactions,
     language,
+    documentLanguage,
     presentation,
     screenshotIntelligence,
     profiles,
@@ -64,6 +68,7 @@
   semantic,
   interactions,
   language,
+  documentLanguage,
   presentation,
   screenshotIntelligence,
   profiles,
@@ -131,11 +136,14 @@
       );
     }
     const languageDocument = language.process(semanticActionsDocument, profile);
-    const grammarDocument = presentation.process(languageDocument);
+    const localizedDocument = documentLanguage.process(languageDocument,
+      options.documentLanguage || projection.document.metadata?.documentLanguage);
+    const grammarDocument = presentation.process(localizedDocument);
     return semantic.deepFreeze({
       sourceSemanticDocument: projection.document,
       semanticActionsDocument,
       languageDocument,
+      localizedDocument,
       presentationDocument: grammarDocument,
       languageProfile: profile,
       diagnostics: projection.diagnostics
@@ -182,6 +190,7 @@
       sourceSemanticDocument: prepared.sourceSemanticDocument,
       semanticActionsDocument: prepared.semanticActionsDocument,
       languageDocument: prepared.languageDocument,
+      localizedDocument: prepared.localizedDocument,
       presentationDocument: prepared.presentationDocument,
       semanticDocument: presentationDocument,
       languageProfile: profile,

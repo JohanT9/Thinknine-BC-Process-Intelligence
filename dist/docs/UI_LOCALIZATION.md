@@ -3,6 +3,10 @@
 BC Process Studio separates its interface language from observed Business
 Central content and generated document content.
 
+Generated process documents have a separate `documentLanguage` contract.
+Changing `uiLocale` does not change a document's language. See
+`DOCUMENT_LANGUAGE.md`.
+
 ## Contract
 
 - `uiLocale` owns the application interface language.
@@ -35,4 +39,5 @@ and user-authored report fields remain source content and are never translated.
 
 The recorder popup also exposes a compact `SV`/`EN` language switch in its header. It
 changes and persists the shared `uiLocale` immediately, including before a
-recording starts, without changing captured or generated content.
+recording starts, without changing captured or generated content. Document
+language is selected independently in dashboard settings and per Review.

@@ -220,16 +220,18 @@
     };
   }
 
-  function nestedComponents(block, sectionKind, theme) {
+  function nestedComponents(block, sectionKind, theme, documentLanguage) {
     if (Array.isArray(block.blocks)) {
-      return block.blocks.map(child => planBlock(child, sectionKind, theme));
+      return block.blocks.map(child => planBlock(child, sectionKind, theme,
+        documentLanguage));
     }
     if (block.kind === "list") {
       return (block.items || []).map(item => groupingComponent(
         item.itemId,
         "listItem",
         { blockId: block.blockId, itemId: item.itemId },
-        (item.blocks || []).map(child => planBlock(child, sectionKind, theme)),
+        (item.blocks || []).map(child => planBlock(child, sectionKind, theme,
+          documentLanguage)),
         theme
       ));
     }
@@ -248,7 +250,7 @@
             columnId: cell.columnId
           },
           (cell.blocks || []).map(child =>
-            planBlock(child, sectionKind, theme)),
+            planBlock(child, sectionKind, theme, documentLanguage)),
           theme
         )),
         theme
@@ -257,9 +259,14 @@
     return [];
   }
 
-  function planBlock(block, sectionKind, theme) {
+  function planBlock(block, sectionKind, theme, documentLanguage = "sv-SE") {
     const kind = componentKind(block.kind);
-    const components = nestedComponents(block, sectionKind, theme);
+    const components = nestedComponents(block, sectionKind, theme,
+      documentLanguage);
+    const english = documentLanguage === "en-US";
+    const stepLabel = english ? "Step" : "Steg";
+    const commentLabel = english ? "Comment" : "Kommentar";
+    const screenshotLabel = english ? "Screenshot" : "Skärmbild";
     const stepInstruction = block.kind === "step"
       ? block.blocks?.find(child => child.kind === "paragraph")?.text || ""
       : "";
@@ -278,12 +285,12 @@
           imageIndex,
           stepNumber: block.stepNumber,
           description: stepInstruction,
-          altTitle: `Skärmbild ${imageIndex} steg ${block.stepNumber}`,
+          altTitle: `${screenshotLabel} ${imageIndex} ${stepLabel.toLowerCase()} ${block.stepNumber}`,
           altName: `step-${block.stepNumber}-${imageIndex}`
         };
         component.accessibility = {
           ...component.accessibility,
-          label: `Skärmbild ${imageIndex} steg ${block.stepNumber}`,
+          label: `${screenshotLabel} ${imageIndex} ${stepLabel.toLowerCase()} ${block.stepNumber}`,
           description: stepInstruction
         };
         component.grouping = "screenshotSequence";
@@ -317,11 +324,12 @@
     return {
       ...componentContract(kind, {
         accessibility: kind === "step"
-          ? { label: `Steg ${block.stepNumber}` }
+          ? { label: `${stepLabel} ${block.stepNumber}` }
           : kind === "callout"
-            ? { label: "Kommentar", description: calloutText }
+            ? { label: commentLabel, description: calloutText }
           : kind === "screenshot"
-            ? { label: block.altText || "Processkärmbild" }
+            ? { label: block.altText || (english
+              ? "Process screenshot" : "Processkärmbild") }
             : {},
         presentationIntent: presentationIntentFor(block, components)
       }),
@@ -348,7 +356,7 @@
         ...(block.level !== undefined ? { level: block.level } : {}),
         ...(block.stepNumber !== undefined ? { stepNumber: block.stepNumber } : {}),
         ...(block.stepNumber !== undefined ? {
-          title: `Steg ${block.stepNumber}`,
+          title: `${stepLabel} ${block.stepNumber}`,
           instruction: stepInstruction,
           commentComponentIds: components.filter(component =>
             component.kind === "callout").map(component => component.componentId),
@@ -357,7 +365,7 @@
         } : {}),
         ...(block.calloutType ? { calloutType: block.calloutType } : {}),
         ...(block.kind === "callout" ? {
-          label: "Kommentar",
+          label: commentLabel,
           text: calloutText
         } : {}),
         ...(block.kind === "toc" ? {
@@ -372,9 +380,9 @@
         ...(block.kind === "revisionHistory" ? {
           columns: [
             { key: "version", label: "Version" },
-            { key: "createdAt", label: "Datum" },
-            { key: "change", label: "Ändring" },
-            { key: "reviewer", label: "Granskad av" }
+            { key: "createdAt", label: english ? "Date" : "Datum" },
+            { key: "change", label: english ? "Change" : "Ändring" },
+            { key: "reviewer", label: english ? "Reviewed by" : "Granskad av" }
           ]
         } : {}),
         ...(block.kind === "table" ? {
@@ -402,12 +410,14 @@
   }
 
   function planSection(section, document, theme) {
+    const english = document.metadata?.documentLanguage === "en-US";
     const capability = sectionCapability(section.kind);
     const wrapperKind = ["cover", "workflow", "revisionHistory"].includes(
       section.kind
     ) ? section.kind : "generic";
     const children = section.blocks.map(block =>
-      planBlock(block, section.kind, theme));
+      planBlock(block, section.kind, theme,
+        document.metadata?.documentLanguage));
     if (section.kind === "cover") {
       children.push({
         ...componentContract("metadata", {
@@ -436,20 +446,23 @@
         },
         appearance: clone(theme.components.metadataTable || {}),
         content: {
-          accessibilityLabel: "Dokumentmetadata",
+          accessibilityLabel: english ? "Document metadata" : "Dokumentmetadata",
           rows: [
             { key: "version", group: "identity", label: "Version",
               value: document.metadata.documentVersion },
-            { key: "date", group: "identity", label: "Datum",
+            { key: "date", group: "identity", label: english ? "Date" : "Datum",
               value: document.metadata.updatedAt || document.metadata.createdAt },
-            { key: "environment", group: "context", label: "Miljö",
+            { key: "environment", group: "context", label: english
+              ? "Environment" : "Miljö",
               value: document.metadata.environment },
             { key: "documentationProfile", group: "context",
-              label: "Dokumentationstyp",
+              label: english ? "Documentation type" : "Dokumentationstyp",
               value: document.metadata.documentationProfile },
-            { key: "reviewStatus", group: "review", label: "Granskningsstatus",
+            { key: "reviewStatus", group: "review", label: english
+              ? "Review status" : "Granskningsstatus",
               value: document.metadata.statusLabel },
-            { key: "reviewer", group: "review", label: "Granskad av",
+            { key: "reviewer", group: "review", label: english
+              ? "Reviewed by" : "Granskad av",
               value: document.metadata.reviewer }
           ]
         },
@@ -496,7 +509,13 @@
           ? "hidden"
           : "visible",
         spacingIntent: spacingIntent(theme, "section"),
-        appearance: clone(theme.components[section.kind] || {}),
+        appearance: {
+          ...clone(theme.components[section.kind] || {}),
+          ...(english && section.kind === "cover"
+            ? { documentType: "Work instruction" } : {}),
+          ...(english && section.kind === "toc"
+            ? { title: "Contents" } : {})
+        },
         content: {
           sectionKind: section.kind,
           ...(section.kind === "cover" ? {
@@ -518,6 +537,7 @@
   }
 
   function globalComponents(document, theme) {
+    const english = document.metadata?.documentLanguage === "en-US";
     const branding = supports(theme, "supportsBranding")
       ? clone(theme.branding)
       : {};
@@ -528,8 +548,8 @@
       .map(([kind]) => ({
         ...componentContract(kind, {
           accessibility: { label: kind === "header"
-            ? "Dokumenthuvud"
-            : "Dokumentsidfot" },
+            ? english ? "Document header" : "Dokumenthuvud"
+            : english ? "Document footer" : "Dokumentsidfot" },
           presentationIntent: {
             placement: kind,
             repetition: "everyPage",
@@ -558,8 +578,8 @@
             ? "theme.branding"
             : "",
           ...(kind === "footer" ? {
-            pageLabel: "Sida",
-            totalSeparator: " av ",
+            pageLabel: english ? "Page" : "Sida",
+            totalSeparator: english ? " of " : " av ",
             pageFieldIntent: { current: true, total: true }
           } : {})
         },

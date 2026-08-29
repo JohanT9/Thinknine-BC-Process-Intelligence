@@ -102,6 +102,21 @@ assert.deepStrictEqual(preparedOutput.semanticDocument,
   directOutput.semanticDocument);
 assert.deepStrictEqual(preparedOutput.plan, directOutput.plan);
 const output = await exportReview(baseReview);
+const englishOutput = await exportReview(review([{
+  taskId: "english-search", taskType: "SearchAndOpenPage",
+  searchCaption: "Sök", searchFieldCaption: "Berätta vad du vill göra.",
+  resultCaption: "Förs.order", value: "för ord",
+  instruction: "Äldre text."
+}], { documentFields: { documentLanguage: "en-US", expectedResult: "" } }));
+assert.ok(englishOutput.documentXml.includes("Purpose"));
+assert.ok(englishOutput.documentXml.includes("Prerequisites"));
+assert.ok(englishOutput.documentXml.includes("Workflow"));
+assert.ok(englishOutput.documentXml.includes("Expected result"));
+assert.ok(englishOutput.documentXml.includes("Step 1"));
+assert.ok(englishOutput.documentXml.includes("Work instruction"));
+assert.ok(englishOutput.footerXml.includes("Page"));
+assert.ok(englishOutput.documentXml.includes("Choose "));
+assert.ok(englishOutput.documentXml.includes(">Sök</w:t>"));
 const tracedWordComponent = output.plan.sections
   .flatMap(section => section.components)
   .flatMap(function flatten(component) {

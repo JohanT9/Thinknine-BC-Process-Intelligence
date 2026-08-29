@@ -161,6 +161,8 @@
       purpose: text(session.purpose) || DEFAULT_PURPOSE,
       environment: text(session.settings?.environmentName) || "Ej angiven",
       documentationProfile: text(session.settings?.documentationProfile) || "generic",
+      documentLanguage: firstText(review.documentFields?.documentLanguage,
+        session.settings?.documentLanguage) === "en-US" ? "en-US" : "sv-SE",
       documentVersion: "1.0",
       statusLabel: review.status === "completed" ? "Slutförd" : "Pågående",
       createdAt: firstText(review.createdAt, session.startedAt),

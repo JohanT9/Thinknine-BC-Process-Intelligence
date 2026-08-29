@@ -36,6 +36,10 @@ Current product areas:
 - **Interface language** is stored independently from recorded Business Central
   content. Swedish remains the backward-compatible default and English is
   available as the first additional UI locale.
+- **Document language** can independently be Swedish or English. Settings define
+  the default for new Reviews and each Review can override it; Review
+  presentation, Document Generator and Word stay aligned while observed BC
+  labels and manually edited text remain unchanged.
 - **BC Knowledge Base** stores and helps retrieve reusable process documentation.
 
 **BC Process Maps** and broader **BC Process AI** capabilities are future product areas. They are not presented as available production functionality in 4.7. Existing optional AI technical analysis for Bug Reports remains explicitly user-triggered and evidence-bounded.

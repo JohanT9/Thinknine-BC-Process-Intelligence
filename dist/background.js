@@ -55,6 +55,7 @@ const pageKnowledgePacksReady = globalThis.T9PageIdentificationEngine
 
 const DEFAULT_SETTINGS = {
   uiLocale: "sv-SE",
+  documentLanguage: "sv-SE",
   exportFileNamePattern: "{process} - {environment} - {date}",
   documentationProfile: "generic",
   defaultExpectedResult:

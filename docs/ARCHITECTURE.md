@@ -528,6 +528,22 @@ identities and per profile; mutable inputs always run again.
 
 ## Language Excellence 4.6 R1
 
+The current pipeline extends this baseline with one renderer-neutral document
+localization stage:
+
+```text
+Review → Review Projector → Semantic Document → Language Excellence
+  → Document Language → Presentation Grammar → Screenshot Intelligence
+  → Document Planner → Document Workspace / Word
+```
+
+`document-language.js` is the single owner of Swedish/English document
+localization. Review stores only the selected `documentLanguage`; known generated
+system text is localized in memory while observed Business Central labels and
+consultant-authored text are preserved. Document Workspace and Word consume the
+same localized Document Plan. Older Reviews default to Swedish without a schema
+migration.
+
 ```text
 Review → Review Projector → Semantic Document
   → Language Excellence → Document Profile → Theme → Document Planner
