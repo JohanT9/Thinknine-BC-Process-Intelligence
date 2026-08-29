@@ -4683,7 +4683,7 @@ function openStepRepair(taskIndex) {
     capturedAssetId: null, capturedAssetKey: null, capturedImage: null,
     capturedAt: null };
   $("stepRepairTitle").textContent =
-    `Reparera steg ${globalThis.T9Review.visibleTaskNumber(activeReview, taskIndex)}`;
+    `Byt bild för steg ${globalThis.T9Review.visibleTaskNumber(activeReview, taskIndex)}`;
   $("stepRepairStatus").textContent = "";
   renderStepRepairGallery();
   $("stepRepairDialog").showModal();
@@ -5689,7 +5689,7 @@ function renderReviewContent() {
         </label>
         <button data-action="add" class="secondary" aria-label="Lägg till steg efter steg ${visibleIndex + 1}">Lägg till efter</button>
         <button data-action="repair-step" class="secondary"
-          aria-label="Reparera steg ${visibleIndex + 1}">Reparera steg</button>
+          aria-label="Byt bild för steg ${visibleIndex + 1}">Byt bild</button>
         <button data-action="reset-instruction" class="secondary"
           ${task.fieldProvenance?.instruction === "user-edited" ? "" : "disabled"}
           aria-label="Återställ instruktion för steg ${visibleIndex + 1}">Återställ text</button>

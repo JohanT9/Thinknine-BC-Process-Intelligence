@@ -90,9 +90,9 @@ Edited fields survive; reset or untouched fields receive new generated values.
 Ambiguous split/consolidation targets remain unresolved. See
 [REGENERATE_FROM_RECORDING.md](REGENERATE_FROM_RECORDING.md).
 
-## Single-step repair
+## Screenshot replacement
 
-`Reparera steg` is the recovery path when one generated step has the wrong or
+`Byt bild` is the recovery path when one generated step has the wrong or
 missing screenshot. The dialog exposes recording-level screenshot assets rather
 than only the candidates originally assigned to that step. It may also capture
 one supplementary screenshot from the most recently used open Business Central

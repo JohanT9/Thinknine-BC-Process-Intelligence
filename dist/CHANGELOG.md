@@ -11,7 +11,7 @@
 
 ## Unreleased
 
-- Added single-step repair in BC Review Studio: consultants can choose any
+- Added **Byt bild** in BC Review Studio: consultants can choose any
   screenshot from the recording or capture a fresh supplementary BC screenshot
   without replaying the complete process. Repairs are traceable, reversible,
   annotation-safe, and leave raw recording events unchanged.

@@ -47,8 +47,10 @@ const dashboard = fs.readFileSync(path.join(__dirname, "../src/ui/dashboard.js")
 const background = fs.readFileSync(path.join(__dirname,
   "../src/recorder/background.js"), "utf8");
 assert.match(html, /id="stepRepairDialog"[^>]*aria-labelledby="stepRepairTitle"/);
+assert.match(html, /id="stepRepairTitle">Byt bild</);
 assert.match(html, /id="captureStepRepairScreenshot"[\s\S]*Ta ny sk&auml;rmbild/);
 assert.match(dashboard, /data-action="repair-step"/);
+assert.match(dashboard, /aria-label="Byt bild för steg/);
 assert.match(dashboard, /T9Review\.repairTaskScreenshot/);
 assert.match(background, /case "T9_CAPTURE_STEP_REPAIR_SCREENSHOT"/);
 assert.match(background, /case "T9_SAVE_STEP_REPAIR_SCREENSHOT"/);
