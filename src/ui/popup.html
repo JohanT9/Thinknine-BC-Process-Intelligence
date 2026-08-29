@@ -6,9 +6,10 @@
 <title>BC Process Recorder — BC Process Studio</title>
 <style>
 body{margin:0;width:350px;font-family:"Segoe UI",Arial,sans-serif;background:#f7f8fa;color:#1f2933}
-header{background:#111827;color:#fff;padding:16px 18px 12px}
+header{position:relative;background:#111827;color:#fff;padding:16px 58px 12px 18px}
 .brand{font-size:11px;letter-spacing:.22em;opacity:.75}
 h1{font-size:19px;margin:4px 0 0}.version{font-size:11px;font-weight:400;opacity:.7}
+header .language-switch{position:absolute;top:12px;right:12px;width:auto;min-width:38px;margin:0;padding:6px 8px;border:1px solid rgba(255,255,255,.35);background:transparent;color:#fff;font-size:12px;line-height:1}header .language-switch:hover{background:rgba(255,255,255,.12)}header .language-switch:focus-visible{outline:2px solid #fff;outline-offset:2px}.language-flag{font-size:15px;vertical-align:-1px}.language-code{margin-left:3px}
 main{padding:16px 18px 18px}
 .status{padding:9px 11px;border-radius:6px;margin-bottom:14px;font-weight:600;background:#e5e7eb}
 .status.rec{background:#fee2e2;color:#991b1b}
@@ -29,6 +30,10 @@ dialog{width:calc(100% - 36px);box-sizing:border-box;border:1px solid #8392a5;bo
 <header>
 <div class="brand">BC PROCESS STUDIO · BY THINKNINE</div>
 <h1>BC Process Recorder <span class="version">v__APP_VERSION__</span></h1>
+<button id="languageSwitch" class="language-switch" type="button">
+  <span id="languageFlag" class="language-flag" aria-hidden="true">🇸🇪</span>
+  <span id="languageCode" class="language-code" aria-hidden="true">SV</span>
+</button>
 </header>
 <main>
 <div id="status" class="status" role="status" aria-live="polite"

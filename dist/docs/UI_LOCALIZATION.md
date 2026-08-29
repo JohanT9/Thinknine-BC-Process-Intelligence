@@ -32,3 +32,7 @@ dialogs and status messages. Technical/debug surfaces and a complete audit of
 generated accessibility labels are covered by the third milestone. Technical
 evidence, raw diagnostics, AL call stacks, telemetry values, observed content,
 and user-authored report fields remain source content and are never translated.
+
+The recorder popup also exposes a compact language switch in its header. It
+changes and persists the shared `uiLocale` immediately, including before a
+recording starts, without changing captured or generated content.

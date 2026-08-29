@@ -10,15 +10,48 @@ let currentUiLocale = globalThis.T9UiI18n.DEFAULT_LOCALE;
 const t = key => globalThis.T9UiI18n.translate(key, currentUiLocale);
 const tf = (key, values) => globalThis.T9UiI18n.format(key, values, currentUiLocale);
 
+function updateLanguageSwitch() {
+  const isEnglish = currentUiLocale === "en-US";
+  updateText($("languageFlag"), isEnglish ? "🇬🇧" : "🇸🇪");
+  updateText($("languageCode"), isEnglish ? "EN" : "SV");
+  const label = t(isEnglish
+    ? "language.switchToSwedish" : "language.switchToEnglish");
+  $("languageSwitch").setAttribute("aria-label", label);
+  $("languageSwitch").title = label;
+}
+
 async function loadUiLocale() {
   try {
     const response = await send({ type: "T9_GET_SETTINGS" }, 3000);
     currentUiLocale = globalThis.T9UiI18n.apply(response?.settings?.uiLocale);
     globalThis.T9UiI18n.observe(() => currentUiLocale);
+    updateLanguageSwitch();
   } catch {
     currentUiLocale = globalThis.T9UiI18n.apply(
       globalThis.T9UiI18n.DEFAULT_LOCALE);
     globalThis.T9UiI18n.observe(() => currentUiLocale);
+    updateLanguageSwitch();
+  }
+}
+
+async function switchUiLocale() {
+  const previousLocale = currentUiLocale;
+  const uiLocale = previousLocale === "en-US" ? "sv-SE" : "en-US";
+  $("languageSwitch").disabled = true;
+  try {
+    currentUiLocale = globalThis.T9UiI18n.apply(uiLocale);
+    updateLanguageSwitch();
+    const response = await send({ type: "T9_SAVE_UI_LOCALE", uiLocale }, 3000);
+    if (!response?.ok) throw new Error(t("technical.requestFailed"));
+    currentUiLocale = globalThis.T9UiI18n.apply(response.uiLocale);
+    updateLanguageSwitch();
+    await refresh();
+  } catch (error) {
+    currentUiLocale = globalThis.T9UiI18n.apply(previousLocale);
+    updateLanguageSwitch();
+    showMessage(error.message, true);
+  } finally {
+    $("languageSwitch").disabled = false;
   }
 }
 
@@ -168,6 +201,7 @@ async function startRecording(recordingPurpose) {
 
 $("startProcess").addEventListener("click", () => startRecording("documentation"));
 $("startBug").addEventListener("click", () => startRecording("bug-report"));
+$("languageSwitch").addEventListener("click", switchUiLocale);
 
 let pendingBugRecording = false;
 

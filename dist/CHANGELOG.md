@@ -20,6 +20,8 @@
 - Localized technical-report controls, recorder failure guidance, the sanitized
   debug panel, and dynamic Review Studio accessibility labels without altering
   raw diagnostics, evidence, AL call stacks, telemetry, or user-authored text.
+- Added a compact Swedish/English language switch to the recorder popup header,
+  with immediate UI updates and persistence across the complete application.
 - Added **Byt bild** in BC Review Studio: consultants can choose any
   screenshot from the recording or capture a fresh supplementary BC screenshot
   without replaying the complete process. Repairs are traceable, reversible,
