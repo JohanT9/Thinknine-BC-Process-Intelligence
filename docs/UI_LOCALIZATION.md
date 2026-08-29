@@ -29,4 +29,6 @@ The first milestone established storage, language selection, runtime switching,
 and the shared module. The second milestone localizes the recorder popup,
 Document Library, BC Review Studio, BC Document Generator, and their primary
 dialogs and status messages. Technical/debug surfaces and a complete audit of
-generated accessibility labels remain separate follow-up work.
+generated accessibility labels are covered by the third milestone. Technical
+evidence, raw diagnostics, AL call stacks, telemetry values, observed content,
+and user-authored report fields remain source content and are never translated.

@@ -8,22 +8,26 @@
     const value = doc.createElement(tag); value.className = className;
     value.textContent = text || ""; return value;
   };
-  function copyButton(doc, label, value, onCopy) {
-    const button = element(doc, "button", "Copy", "technical-copy");
+  const ui = (text, locale) => globalThis.T9UiI18n?.translateStaticText(
+    text, locale) || text;
+  function copyButton(doc, label, value, onCopy, locale) {
+    const button = element(doc, "button", ui("Copy", locale), "technical-copy");
     button.type = "button"; button.setAttribute("aria-label", label);
     button.addEventListener("click", () => onCopy(String(value || "")));
     return button;
   }
-  function details(doc, summary, text, onCopy) {
+  function details(doc, summary, text, onCopy, locale) {
     const wrapper = doc.createElement("details");
-    wrapper.appendChild(element(doc, "summary", summary));
+    wrapper.appendChild(element(doc, "summary", ui(summary, locale)));
     const pre = element(doc, "pre", text, "technical-raw-evidence");
-    wrapper.append(pre, copyButton(doc, `Copy ${summary}`, text, onCopy));
+    wrapper.append(pre, copyButton(doc, `${ui("Copy", locale)} ${ui(summary,
+      locale)}`, text, onCopy, locale));
     return wrapper;
   }
   function render(container, workspaceState, options = {}, doc = document) {
     const onCopy = options.onCopy || (() => {});
     const onEdit = options.onEdit || (() => {});
+    const locale = options.locale || "en-US";
     const report = workspaceState.document;
     container.replaceChildren();
     container.setAttribute("aria-label", `Technical Bug Report: ${report.title}`);
@@ -31,7 +35,7 @@
     const status = element(doc, "p", workspaceState.saveState, "save-state");
     status.setAttribute("role", "status"); container.appendChild(status);
     const editor = doc.createElement("fieldset");
-    editor.appendChild(element(doc, "legend", "Editable report fields"));
+    editor.appendChild(element(doc, "legend", ui("Editable report fields", locale)));
     const fields = [{ name: "title", label: "Title",
       value: workspaceState.report.summary.title },
     { name: "summary", label: "Summary",
@@ -48,7 +52,7 @@
       .map(note => note.text || note.content || "").join("\n"), multiline: true }];
     fields.forEach(field => {
       const id = `technical-report-${field.name}`;
-      const label = element(doc, "label", field.label); label.htmlFor = id;
+      const label = element(doc, "label", ui(field.label, locale)); label.htmlFor = id;
       const input = doc.createElement(field.multiline ? "textarea" : "input");
       input.id = id; input.name = field.name; input.value = field.value || "";
       input.addEventListener("change", () => onEdit(field.name, input.value));
@@ -57,7 +61,7 @@
     container.appendChild(editor);
     const technicalDetails = doc.createElement("details");
     technicalDetails.className = "technical-details";
-    technicalDetails.appendChild(element(doc, "summary", "Technical details"));
+    technicalDetails.appendChild(element(doc, "summary", ui("Technical details", locale)));
     technicalDetails.appendChild(element(doc, "p",
       "Diagnostics, AL call stack, referenced objects, telemetry, AI analysis and traceability."));
     const advancedKinds = new Set(["metadata", "diagnostics", "call-stack",
@@ -78,15 +82,16 @@
           section.content.userDescription));
         section.content.capturedErrors.forEach(error => {
           const block = element(doc, "blockquote", error.rawMessage);
-          block.setAttribute("aria-label", "Captured Business Central error");
-          node.append(block, copyButton(doc, "Copy Business Central error",
-            error.rawMessage, onCopy));
+          block.setAttribute("aria-label", ui("Captured Business Central error", locale));
+          node.append(block, copyButton(doc, ui("Copy Business Central error", locale),
+            error.rawMessage, onCopy, locale));
         });
       } else if (section.kind === "diagnostics") {
         const dl = doc.createElement("dl");
         section.content.rows.forEach(row => {
           dl.append(element(doc, "dt", row.label), element(doc, "dd", row.value),
-            copyButton(doc, `Copy ${row.label}`, row.value, onCopy));
+            copyButton(doc, `${ui("Copy", locale)} ${row.label}`, row.value,
+              onCopy, locale));
         }); node.appendChild(dl);
         section.content.captureStatuses.forEach(status => node.appendChild(
           element(doc, "p", status.diagnosticsStatus === "diagnostics-capture-failed"
@@ -114,10 +119,10 @@
             body.appendChild(row);
           }); table.appendChild(body); node.appendChild(table);
           if (stack.rawCallStack) node.appendChild(details(doc, "Raw AL call stack",
-            stack.rawCallStack, onCopy));
+            stack.rawCallStack, onCopy, locale));
           if (stack.unparsedSegments.length) node.appendChild(details(doc,
             "Unparsed call-stack segments", stack.unparsedSegments.map(item =>
-              item.rawText).join("\n"), onCopy));
+              item.rawText).join("\n"), onCopy, locale));
         });
       } else if (section.kind === "errors") {
         const all = [section.content.primary, ...section.content.additional]
@@ -126,8 +131,8 @@
           if (all.length > 1) {
             const choose = doc.createElement("button"); choose.type = "button";
             choose.textContent = error.errorEvidenceId ===
-              section.content.primaryErrorEvidenceId ? "Primary error" :
-              "Select as primary error";
+              section.content.primaryErrorEvidenceId ? ui("Primary error", locale) :
+              ui("Select as primary error", locale);
             choose.setAttribute("aria-pressed", String(error.errorEvidenceId ===
               section.content.primaryErrorEvidenceId));
             choose.addEventListener("click", () => options.onSelectPrimaryError?.(
@@ -135,7 +140,8 @@
           }
           node.appendChild(element(doc, "p", error.rawMessage));
           if (error.rawDiagnostics) node.appendChild(details(doc,
-            "Raw Business Central diagnostics", error.rawDiagnostics, onCopy));
+            "Raw Business Central diagnostics", error.rawDiagnostics, onCopy,
+            locale));
         });
       } else if (section.kind === "evidence") {
         const assets = options.mediaAssets || {};
@@ -147,12 +153,13 @@
             if (media?.source) {
               const image = doc.createElement("img"); image.src = media.source;
               image.alt = screenshot.role === "error"
-                ? "Captured Business Central error" : "Reproduction evidence";
+                ? ui("Captured Business Central error", locale) :
+                  ui("Reproduction evidence", locale);
               figure.appendChild(image);
             }
             figure.appendChild(element(doc, "figcaption",
-              screenshot.role === "error" ? "Error screenshot" :
-                "Reproduction screenshot")); node.appendChild(figure);
+              screenshot.role === "error" ? ui("Error screenshot", locale) :
+                ui("Reproduction screenshot", locale))); node.appendChild(figure);
           });
       } else if (section.kind === "notes") {
         section.content.forEach(note => node.appendChild(element(doc, "p",
@@ -168,7 +175,7 @@
             `${event.timestamp} — ${event.eventName || event.message} (${(event.correlationReasons || []).join(", ")})`)));
           node.appendChild(list);
           node.appendChild(details(doc, "Raw telemetry query results",
-            JSON.stringify(context.queries, null, 2), onCopy));
+            JSON.stringify(context.queries, null, 2), onCopy, locale));
         });
       } else if (section.kind === "timeline") {
         const list = doc.createElement("ol");
@@ -206,7 +213,7 @@
     if (technicalSectionCount) container.appendChild(technicalDetails);
     const guidance = doc.createElement("section");
     guidance.className = report.completeness.ready ? "report-ready" : "report-incomplete";
-    guidance.appendChild(element(doc, "h2", "Completeness"));
+    guidance.appendChild(element(doc, "h2", ui("Completeness", locale)));
     guidance.appendChild(element(doc, "p", report.completeness.ready
       ? "Ready to share. Review the preview before any external submission."
       : "Complete the required human context below before sharing."));

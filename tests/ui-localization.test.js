@@ -29,6 +29,12 @@ const dashboard = fs.readFileSync(path.join(root, "src/ui/dashboard.js"), "utf8"
 const popup = fs.readFileSync(path.join(root, "src/ui/popup.js"), "utf8");
 const background = fs.readFileSync(path.join(root,
   "src/recorder/background.js"), "utf8");
+const debugHtml = fs.readFileSync(path.join(root, "src/ui/debug.html"), "utf8");
+const debug = fs.readFileSync(path.join(root, "src/ui/debug.js"), "utf8");
+const technicalHtml = fs.readFileSync(path.join(root,
+  "src/ui/technical-report.html"), "utf8");
+const technical = fs.readFileSync(path.join(root,
+  "src/ui/technical-report.js"), "utf8");
 const build = fs.readFileSync(path.join(root, "scripts/build.js"), "utf8");
 
 assert.match(dashboardHtml, /id="uiLocale"[\s\S]*value="sv-SE"[\s\S]*value="en-US"/);
@@ -45,5 +51,12 @@ assert.match(source, /#documentWorkspace, #reviewList, #annotationStage/);
 assert.match(background, /uiLocale: "sv-SE"/);
 assert.match(background, /case "T9_SAVE_UI_LOCALE"/);
 assert.match(build, /"i18n\.js"/);
+assert.match(debugHtml, /<script src="i18n\.js"><\/script>/);
+assert.match(debug, /T9_GET_SETTINGS/);
+assert.match(technicalHtml, /<script src="i18n\.js"><\/script>/);
+assert.match(technical, /technical\.reportCopied/);
+assert.match(dashboard, /uiTf\("a11y\.editInstruction"/);
+assert.equal(i18n.translateStaticText("Anslutning till BC", "en-US"),
+  "BC connection");
 
 console.log("UI localization foundation tests passed.");

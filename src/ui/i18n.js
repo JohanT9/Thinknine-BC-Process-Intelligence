@@ -25,6 +25,53 @@
       "document.synchronized": "Dokumentet är synkroniserat. {count} avsnitt.",
       "review.changeImageForStep": "Byt bild för steg {step}",
       "review.editImageForStep": "Redigera bild för steg {step}",
+      "technical.missingReportId": "Felrapportens ID saknas.",
+      "technical.reportNotFound": "Felrapporten kunde inte hittas.",
+      "technical.requestFailed": "Begäran misslyckades.",
+      "technical.reportCopied": "Rapporten har kopierats.",
+      "technical.markdownExported": "Markdown har exporterats.",
+      "technical.telemetrySaved": "Telemetriinställningen har sparats. Ingen hemlighet eller token lagrades.",
+      "technical.telemetryConnection": "Telemetrianslutning: {status}.",
+      "technical.selectPrimaryError": "Välj ett primärt fel innan telemetrin uppdateras.",
+      "technical.fetchingTelemetry": "Hämtar telemetri från den konfigurerade Microsoft-slutpunkten…",
+      "technical.aiSaved": "Den publika AI-brokerinställningen har sparats. Ingen leverantörsnyckel lagrades.",
+      "technical.aiConsent": "Uttryckligt samtycke krävs före AI-analys.",
+      "technical.sendingAi": "Skickar minimerade bevis till den konfigurerade AI-brokern…",
+      "technical.issueCopied": "Ärendebeskrivningen har kopierats.",
+      "technical.packageExported": "Det lokala ärendepaketet har exporterats.",
+      "technical.submissionConsent": "Granskning och uttryckligt samtycke krävs före överföring.",
+      "technical.selectProvider": "Välj Azure DevOps eller GitHub före överföring.",
+      "technical.openExternalIssue": "Öppna externt ärende",
+      "debug.none": "Inget",
+      "debug.noSession": "Ingen",
+      "debug.active": "Pågår",
+      "debug.inactive": "Inte aktiv",
+      "debug.enabled": "Aktiv (sanerad)",
+      "debug.disabled": "Avstängd",
+      "debug.title": "BC Process Recorder — Teknisk diagnostik",
+      "debug.help": "Här ser vi vad tillägget faktiskt gör, i stället för att tolka tystnad som ett användargränssnitt.",
+      "a11y.editInstruction": "Redigera instruktion för steg {step}",
+      "a11y.textFormatting": "Textformatering",
+      "a11y.bold": "Fet stil",
+      "a11y.italic": "Kursiv stil",
+      "a11y.instruction": "Instruktion för steg {step}",
+      "a11y.resetComment": "Återställ kommentar för steg {step} till ursprungstexten",
+      "a11y.editComment": "Redigera kommentar för steg {step}",
+      "a11y.commentFormatting": "Kommentarformatering",
+      "a11y.comment": "Kommentar för steg {step}",
+      "a11y.addComment": "Lägg till kommentar för steg {step}",
+      "a11y.editImage": "Redigera bild {image} för steg {step}",
+      "a11y.useScreenshot": "Använd skärmbild {image} för steg {step}",
+      "a11y.dragStep": "Dra steg {step} för att flytta",
+      "a11y.approveStep": "Godkänn steg {step}",
+      "a11y.addAfter": "Lägg till steg efter steg {step}",
+      "a11y.changeImage": "Byt bild för steg {step}",
+      "a11y.resetInstruction": "Återställ instruktion för steg {step}",
+      "a11y.hideStep": "Dölj steg {step} från dokumentet",
+      "a11y.editorHelp": "Dubbelklicka eller tryck Enter för att redigera. Ctrl+Enter sparar",
+      "a11y.saveEditor": "Ctrl+Enter sparar",
+      "technical.aiDisclosure": "En uttrycklig analys skickar ett minimerat och maskerat tekniskt bevispaket till den Entra-skyddade broker som du har konfigurerat. Skärmbilder, råa händelser, rå diagnostik, tenant-/företags-/användar-/sessions-ID:n och rå telemetri utesluts.",
+      "technical.issuePreviewHelp": "Felrapporten förblir lokal och auktoritativ. Ingenting skickas förrän du har granskat paketet och valt Skapa ärende.",
       "recorder.inactive": "Inte aktiv",
       "recorder.processActive": "Processinspelning pågår",
       "recorder.bugActive": "Felrapportering pågår",
@@ -71,6 +118,12 @@
       ,"recorder.nameProcessPlaceholder": "Exempel: Skapa försäljningsorder"
       ,"recorder.completionHelp": "Vill du öppna Dokumentbiblioteket och fortsätta arbeta med dokumentationen?"
       ,"recorder.cancelStopTitle": "Avbryt stopp och fortsätt spela in"
+      ,"recorder.injectFailed": "Edge kunde inte läsa in inspelningsskriptet i Business Central. Kontrollera tilläggets webbplatsåtkomst. {detail}"
+      ,"recorder.tabUnresponsive": "Business Central-fliken svarar fortfarande inte. Uppdatera BC med Ctrl+F5 och kontrollera att webbplatsåtkomsten är tillåten."
+      ,"recorder.startFailed": "Bakgrundsprocessen kunde inte starta sessionen."
+      ,"recorder.stopFailed": "Kunde inte stoppa inspelningen."
+      ,"recorder.deleteFailed": "Inspelningen stoppades men kunde inte tas bort."
+      ,"recorder.cancelFailed": "Kunde inte avbryta inspelningen."
     }),
     "en-US": Object.freeze({
       "app.tagline": "Business Process Intelligence for Microsoft Dynamics 365 Business Central.",
@@ -93,6 +146,53 @@
       "document.synchronized": "Document synchronized. {count} sections.",
       "review.changeImageForStep": "Change image for step {step}",
       "review.editImageForStep": "Edit image for step {step}",
+      "technical.missingReportId": "Bug Report ID is missing.",
+      "technical.reportNotFound": "Bug Report could not be found.",
+      "technical.requestFailed": "Request failed.",
+      "technical.reportCopied": "Report copied.",
+      "technical.markdownExported": "Markdown exported.",
+      "technical.telemetrySaved": "Telemetry configuration saved. No secret or token was stored.",
+      "technical.telemetryConnection": "Telemetry connection: {status}.",
+      "technical.selectPrimaryError": "Select a primary error before telemetry refresh.",
+      "technical.fetchingTelemetry": "Fetching telemetry from the configured Microsoft endpoint…",
+      "technical.aiSaved": "Public AI broker configuration saved. No provider key was stored.",
+      "technical.aiConsent": "Explicit consent is required before AI analysis.",
+      "technical.sendingAi": "Sending minimized evidence to the configured AI broker…",
+      "technical.issueCopied": "Issue description copied.",
+      "technical.packageExported": "Offline Issue Package exported.",
+      "technical.submissionConsent": "Review and explicit submission consent are required.",
+      "technical.selectProvider": "Select Azure DevOps or GitHub before submission.",
+      "technical.openExternalIssue": "Open external issue",
+      "debug.none": "None",
+      "debug.noSession": "None",
+      "debug.active": "In progress",
+      "debug.inactive": "Inactive",
+      "debug.enabled": "Active (sanitized)",
+      "debug.disabled": "Off",
+      "debug.title": "BC Process Recorder — Technical diagnostics",
+      "debug.help": "This shows what the extension is actually doing instead of interpreting silence as a user interface.",
+      "a11y.editInstruction": "Edit instruction for step {step}",
+      "a11y.textFormatting": "Text formatting",
+      "a11y.bold": "Bold",
+      "a11y.italic": "Italic",
+      "a11y.instruction": "Instruction for step {step}",
+      "a11y.resetComment": "Reset comment for step {step} to its original text",
+      "a11y.editComment": "Edit comment for step {step}",
+      "a11y.commentFormatting": "Comment formatting",
+      "a11y.comment": "Comment for step {step}",
+      "a11y.addComment": "Add comment to step {step}",
+      "a11y.editImage": "Edit image {image} for step {step}",
+      "a11y.useScreenshot": "Use screenshot {image} for step {step}",
+      "a11y.dragStep": "Drag step {step} to move it",
+      "a11y.approveStep": "Approve step {step}",
+      "a11y.addAfter": "Add a step after step {step}",
+      "a11y.changeImage": "Change image for step {step}",
+      "a11y.resetInstruction": "Reset instruction for step {step}",
+      "a11y.hideStep": "Hide step {step} from the document",
+      "a11y.editorHelp": "Double-click or press Enter to edit. Ctrl+Enter saves",
+      "a11y.saveEditor": "Ctrl+Enter saves",
+      "technical.aiDisclosure": "Explicit analysis sends a minimized, redacted technical evidence package to your configured Entra-protected broker. Screenshots, raw events, raw diagnostics, tenant/company/user/session IDs and raw telemetry are excluded.",
+      "technical.issuePreviewHelp": "The Bug Report remains local and authoritative. Nothing is submitted until you review this package and select Create Issue.",
       "recorder.inactive": "Not active",
       "recorder.processActive": "Process recording in progress",
       "recorder.bugActive": "Issue recording in progress",
@@ -139,6 +239,12 @@
       ,"recorder.nameProcessPlaceholder": "Example: Create sales order"
       ,"recorder.completionHelp": "Open the Document Library and continue working on the documentation?"
       ,"recorder.cancelStopTitle": "Cancel stopping and continue recording"
+      ,"recorder.injectFailed": "Edge could not load the recording script in Business Central. Check the extension's site access. {detail}"
+      ,"recorder.tabUnresponsive": "The Business Central tab is still not responding. Refresh BC with Ctrl+F5 and verify that site access is allowed."
+      ,"recorder.startFailed": "The background process could not start the session."
+      ,"recorder.stopFailed": "The recording could not be stopped."
+      ,"recorder.deleteFailed": "The recording stopped but could not be deleted."
+      ,"recorder.cancelFailed": "The recording could not be cancelled."
     })
   });
 
@@ -218,6 +324,91 @@
     ["Live-status", "Live status"], ["Namnge inspelningen", "Name the recording"],
     ["Spara och stoppa", "Save and stop"], ["Avbryt inspelning", "Cancel recording"],
     ["Inspelningen är klar", "Recording complete"], ["Inte nu", "Not now"]
+    ,["Teknisk diagnostik", "Technical diagnostics"]
+    ,["Här ser vi vad tillägget faktiskt gör, i stället för att tolka tystnad som ett användargränssnitt.",
+      "This shows what the extension is actually doing instead of interpreting silence as a user interface."]
+    ,["Uppdatera", "Refresh"], ["Aktivera fångstdiagnostik", "Enable capture diagnostics"]
+    ,["Stäng av fångstdiagnostik", "Disable capture diagnostics"]
+    ,["Rå diagnostik", "Raw diagnostics"], ["Teknisk felrapport", "Technical Bug Report"]
+    ,["Kopiera hela rapporten", "Copy full report"], ["Exportera Markdown", "Export Markdown"]
+    ,["Skapa ärende", "Create Issue"], ["Inkludera AI-analys i kopiering/export", "Include AI analysis in copy/export"]
+    ,["Application Insights (valfritt)", "Application Insights (optional)"]
+    ,["AI-teknisk analys (valfritt)", "AI technical analysis (optional)"]
+    ,["Spara telemetriinställning", "Save telemetry configuration"]
+    ,["Testa telemetrianslutning", "Test telemetry connection"]
+    ,["Uppdatera telemetri för valt fel", "Refresh telemetry for selected error"]
+    ,["Spara publik brokerinställning", "Save public broker configuration"]
+    ,["Analysera tekniska bevis", "Analyze technical evidence"]
+    ,["Ta bort AI-analys", "Remove AI analysis"]
+    ,["Förhandsgranska ärendepaket", "Issue Package Preview"]
+    ,["Mål", "Destination"], ["Endast lokalt paket", "Offline package only"]
+    ,["Azure DevOps-inställning", "Azure DevOps configuration"]
+    ,["GitHub-inställning", "GitHub configuration"]
+    ,["Aktiverad", "Enabled"], ["Organisation", "Organization"]
+    ,["Projekt", "Project"], ["Ärendetyp", "Work item type"]
+    ,["Områdessökväg", "Area path"], ["Iterationssökväg", "Iteration path"]
+    ,["Spara publik målkonfiguration", "Save public destination configuration"]
+    ,["Generera förhandsgranskning", "Generate preview"]
+    ,["Överföringssammanfattning", "Transmission summary"]
+    ,["Titel", "Title"], ["Beskrivning", "Description"], ["Bilagor", "Attachments"]
+    ,["Kopiera ärendebeskrivning", "Copy Issue Description"]
+    ,["Exportera lokalt ärendepaket", "Export Offline Issue Package"]
+    ,["Redigerbara rapportfält", "Editable report fields"]
+    ,["Sammanfattning", "Summary"], ["Allvarlighetsgrad", "Severity"]
+    ,["Kategori", "Category"], ["Förväntat resultat", "Expected Result"]
+    ,["Faktiskt resultat", "Actual Result"], ["Anteckningar", "Notes"]
+    ,["Tekniska detaljer", "Technical details"], ["Fullständighet", "Completeness"]
+    ,["Kopiera", "Copy"], ["Primärt fel", "Primary error"]
+    ,["Välj som primärt fel", "Select as primary error"]
+    ,["Rå AL-anropsstack", "Raw AL call stack"]
+    ,["Otolkade delar av anropsstacken", "Unparsed call-stack segments"]
+    ,["Rå Business Central-diagnostik", "Raw Business Central diagnostics"]
+    ,["Fångat Business Central-fel", "Captured Business Central error"]
+    ,["Kopiera Business Central-fel", "Copy Business Central error"]
+    ,["Reproduktionsbevis", "Reproduction evidence"]
+    ,["Felbild", "Error screenshot"], ["Reproduktionsbild", "Reproduction screenshot"]
+    ,["Anslutning till BC", "BC connection"], ["Aktiv session", "Active session"]
+    ,["Händelser", "Events"], ["Eventtyper", "Event types"]
+    ,["Kategorier", "Categories"], ["Senaste event", "Latest event"]
+    ,["Senaste BC-ping", "Latest BC ping"], ["Senaste ram-URL", "Latest frame URL"]
+    ,["Ramar med content script", "Frames with content script"]
+    ,["Ramar enligt webbläsaren", "Browser frames"]
+    ,["Aktiva content-ramar", "Active content frames"]
+    ,["Fångstdiagnostik", "Capture diagnostics"], ["Fångststeg", "Capture stages"]
+    ,["Senaste fångstdiagnostik", "Latest capture diagnostic"]
+    ,["Skärmbilder begärda", "Screenshots requested"]
+    ,["Skärmbilder tagna", "Screenshots captured"]
+    ,["Bildförfrågningar sammanslagna", "Screenshot requests reused"]
+    ,["Bildförfrågningar borttagna", "Screenshot requests dropped"]
+    ,["Skärmbildskö", "Screenshot queue"], ["Senaste skärmbild", "Latest screenshot"]
+    ,["Senaste fel", "Latest error"], ["Skärmbildsfel", "Screenshot error"]
+    ,["Senast uppdaterad", "Last updated"], ["Inte bekräftad", "Not confirmed"]
+    ,["Ångra", "Undo"], ["Gör om", "Redo"], ["Stäng", "Close"]
+    ,["Tenant-ID", "Tenant ID"], ["Publikt klient-ID", "Public client ID"]
+    ,["Application Insights App-ID", "Application Insights App ID"]
+    ,["Förväntad miljö", "Expected environment"]
+    ,["Aktivera valfri berikning", "Enable optional enrichment"]
+    ,["Fönster (minuter)", "Window (minutes)"]
+    ,["Broker OAuth-scope", "Broker OAuth scope"]
+    ,["HTTPS-adress till broker", "HTTPS broker URL"]
+    ,["Leverantörsmodell", "Provider model"]
+    ,["Organisationens policy aktiverar AI-analys", "Organization policy enables AI analysis"]
+    ,["Inkludera filtrerade telemetrihändelser", "Include filtered telemetry events"]
+    ,["Inkludera maskerade telemetrimeddelanden", "Include redacted telemetry messages"]
+    ,["Inkludera maskerade användaranteckningar", "Include redacted human notes"]
+    ,["Jag förstår att valda bevis lämnar det här tillägget", "I understand that the selected evidence will leave this extension"]
+    ,["Inkludera telemetrisammanfattning", "Include telemetry summary"]
+    ,["Inkludera aktuell AI-stödd analys", "Include current AI-assisted analysis"]
+    ,["Databas (ägare/namn)", "Repository (owner/name)"]
+    ,["Etiketter, kommaseparerade", "Labels, comma separated"]
+    ,["Taggar, kommaseparerade", "Tags, comma separated"]
+    ,["GitHub App-brokeradress", "GitHub App broker URL"]
+    ,["Broker Entra tenant-ID", "Broker Entra tenant ID"]
+    ,["Publikt klient-ID för broker", "Broker public client ID"]
+    ,["Testa Azure DevOps-anslutning", "Test Azure DevOps connection"]
+    ,["Testa GitHub-anslutning", "Test GitHub connection"]
+    ,["Jag har granskat mål, beskrivning, bilagor, telemetri-/AI-val och varningen om känsliga data", "I reviewed the destination, description, attachments, telemetry/AI choices, and sensitive-data warning"]
+    ,["Skapa ett nytt ärende även om rapporten redan har en extern referens", "Create another issue even if this report already has an external reference"]
   ]);
 
   const staticLookup = new Map();

@@ -44,13 +44,16 @@ assert.equal(reviewStudio.repairTaskScreenshot(protectedReview, 0,
 
 const html = fs.readFileSync(path.join(__dirname, "../src/ui/dashboard.html"), "utf8");
 const dashboard = fs.readFileSync(path.join(__dirname, "../src/ui/dashboard.js"), "utf8");
+const i18n = fs.readFileSync(path.join(__dirname, "../src/ui/i18n.js"), "utf8");
 const background = fs.readFileSync(path.join(__dirname,
   "../src/recorder/background.js"), "utf8");
 assert.match(html, /id="stepRepairDialog"[^>]*aria-labelledby="stepRepairTitle"/);
 assert.match(html, /id="stepRepairTitle">Byt bild</);
 assert.match(html, /id="captureStepRepairScreenshot"[\s\S]*Ta ny sk&auml;rmbild/);
 assert.match(dashboard, /data-action="repair-step"/);
-assert.match(dashboard, /aria-label="Byt bild för steg/);
+assert.match(dashboard, /uiTf\("a11y\.changeImage"/);
+assert.match(i18n, /"a11y\.changeImage": "Byt bild för steg \{step\}"/);
+assert.match(i18n, /"a11y\.changeImage": "Change image for step \{step\}"/);
 assert.match(dashboard, /T9Review\.repairTaskScreenshot/);
 assert.match(background, /case "T9_CAPTURE_STEP_REPAIR_SCREENSHOT"/);
 assert.match(background, /case "T9_SAVE_STEP_REPAIR_SCREENSHOT"/);

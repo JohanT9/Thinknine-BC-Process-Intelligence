@@ -4,10 +4,15 @@
   const bugReportId = query.get("bugReportId");
   const container = document.getElementById("technicalReport");
   const message = document.getElementById("workspaceMessage");
+  let currentUiLocale = globalThis.T9UiI18n.DEFAULT_LOCALE;
+  const t = key => globalThis.T9UiI18n.translate(key, currentUiLocale);
+  const tf = (key, values) => globalThis.T9UiI18n.format(
+    key, values, currentUiLocale);
   const send = payload => new Promise((resolve, reject) => {
     chrome.runtime.sendMessage(payload, response => {
       if (chrome.runtime.lastError) reject(chrome.runtime.lastError);
-      else if (!response?.ok) reject(new Error(response?.error || "Request failed"));
+      else if (!response?.ok) reject(new Error(response?.error ||
+        t("technical.requestFailed")));
       else resolve(response);
     });
   });
@@ -22,9 +27,9 @@
       URL.revokeObjectURL(url));
   }
   async function start() {
-    if (!bugReportId) throw new Error("Bug Report ID is missing.");
+    if (!bugReportId) throw new Error(t("technical.missingReportId"));
     const loaded = await send({ type: "T9_LOAD_BUG_REPORT", bugReportId });
-    if (!loaded.report) throw new Error("Bug Report could not be found.");
+    if (!loaded.report) throw new Error(t("technical.reportNotFound"));
     const session = await send({ type: "T9_GET_SESSION_DATA",
       sessionId: loaded.report.recordingId, includeScreenshots: true });
     const store = { save: report => send({ type: "T9_SAVE_BUG_REPORT", report })
@@ -136,7 +141,7 @@
       };
     });
     const render = state => globalThis.T9TechnicalReportWorkspaceView.render(
-      container, state, { mediaAssets,
+      container, state, { mediaAssets, locale: currentUiLocale,
         onCopy: value => navigator.clipboard.writeText(value),
         onEdit(name, value) {
           if (["title", "summary", "severity", "category"].includes(name)) {
@@ -165,23 +170,24 @@
     document.getElementById("copyMarkdown").addEventListener("click", async () => {
       await navigator.clipboard.writeText(await workspace.exportMarkdown({
         includeAiAnalysis: document.getElementById("includeAiExport").checked }));
-      message.textContent = "Report copied.";
+      message.textContent = t("technical.reportCopied");
     });
     document.getElementById("downloadMarkdown").addEventListener("click", async () => {
       await download(await workspace.exportMarkdown({ includeAiAnalysis:
         document.getElementById("includeAiExport").checked }), `${bugReportId}.md`);
-      message.textContent = "Markdown exported.";
+      message.textContent = t("technical.markdownExported");
     });
     document.getElementById("saveTelemetryConfig").addEventListener("click", action(async () => {
       await send({ type: "T9_SAVE_TELEMETRY_CONFIGURATION",
         configuration: configurationFromForm() });
-      message.textContent = "Telemetry configuration saved. No secret or token was stored.";
+      message.textContent = t("technical.telemetrySaved");
     }));
     document.getElementById("testTelemetry").addEventListener("click", action(async () => {
       await send({ type: "T9_SAVE_TELEMETRY_CONFIGURATION",
         configuration: configurationFromForm() });
       const response = await send({ type: "T9_TEST_TELEMETRY_CONNECTION" });
-      message.textContent = `Telemetry connection: ${response.result.status}.`;
+      message.textContent = tf("technical.telemetryConnection",
+        { status: response.result.status });
     }));
     document.getElementById("refreshTelemetry").addEventListener("click", action(async () => {
       await workspace.flush();
@@ -189,8 +195,8 @@
       const ids = state.businessCentralError?.errorEvidenceIds || [];
       const errorEvidenceId = state.businessCentralError?.primaryErrorEvidenceId ||
         (ids.length === 1 ? ids[0] : "");
-      if (!errorEvidenceId) throw new Error("Select a primary error before telemetry refresh.");
-      message.textContent = "Fetching telemetry from the configured Microsoft endpoint…";
+      if (!errorEvidenceId) throw new Error(t("technical.selectPrimaryError"));
+      message.textContent = t("technical.fetchingTelemetry");
       await send({ type: "T9_REFRESH_BUG_REPORT_TELEMETRY", bugReportId,
         errorEvidenceId, windowMinutes: Number(
           document.getElementById("telemetryWindow").value) });
@@ -200,14 +206,14 @@
       const configuration = aiConfigurationFromForm();
       if (configuration.enabled) await requestBrokerPermission(configuration);
       await send({ type: "T9_SAVE_AI_CONFIGURATION", configuration });
-      message.textContent = "Public AI broker configuration saved. No provider key was stored.";
+      message.textContent = t("technical.aiSaved");
     }));
     document.getElementById("analyzeBugReport").addEventListener("click", action(async () => {
       if (!document.getElementById("aiConsent").checked) {
-        throw new Error("Explicit consent is required before AI analysis.");
+        throw new Error(t("technical.aiConsent"));
       }
       await workspace.flush();
-      message.textContent = "Sending minimized evidence to the configured AI broker…";
+      message.textContent = t("technical.sendingAi");
       await send({ type: "T9_ANALYZE_BUG_REPORT", bugReportId,
         policy: aiPolicyFromForm() }); location.reload();
     }));
@@ -267,7 +273,8 @@
     document.getElementById("copyIssueDescription").addEventListener("click", action(async () => {
       if (!issuePreviewState) await generateIssuePreview();
       await navigator.clipboard.writeText(issuePreviewState.markdown);
-      document.getElementById("issueResult").textContent = "Issue description copied.";
+      document.getElementById("issueResult").textContent =
+        t("technical.issueCopied");
     }));
     document.getElementById("downloadIssuePackage").addEventListener("click", action(async () => {
       if (!issuePreviewState) await generateIssuePreview();
@@ -279,13 +286,14 @@
         bugReportMarkdown: issuePreviewState.markdown,
         attachments: issuePreviewState.offlineAttachments };
       await download(JSON.stringify(offline, null, 2), `${bugReportId}-issue-package.json`);
-      document.getElementById("issueResult").textContent = "Offline Issue Package exported.";
+      document.getElementById("issueResult").textContent =
+        t("technical.packageExported");
     }));
     document.getElementById("submitExternalIssue").addEventListener("click", action(async () => {
       if (!document.getElementById("issueConsent").checked) throw new Error(
-        "Review and explicit submission consent are required.");
+        t("technical.submissionConsent"));
       const provider = document.getElementById("issueProvider").value;
-      if (!provider) throw new Error("Select Azure DevOps or GitHub before submission.");
+      if (!provider) throw new Error(t("technical.selectProvider"));
       if (!issuePreviewState) await generateIssuePreview();
       const button = document.getElementById("submitExternalIssue"); button.disabled = true;
       try { const response = await send({ type: "T9_CREATE_EXTERNAL_ISSUE", bugReportId,
@@ -300,9 +308,21 @@
           "The destination returned an unsafe issue URL.");
         const link = document.createElement("a"); link.href = url.toString();
         link.target = "_blank"; link.rel = "noopener noreferrer";
-        link.textContent = "Open external issue"; result.append(link);
+        link.textContent = t("technical.openExternalIssue"); result.append(link);
       } finally { button.disabled = false; }
     }));
   }
-  start().catch(error => { message.textContent = error.message; });
+  async function initialize() {
+    try {
+      const response = await send({ type: "T9_GET_SETTINGS" });
+      currentUiLocale = globalThis.T9UiI18n.apply(response?.settings?.uiLocale);
+    } catch {
+      currentUiLocale = globalThis.T9UiI18n.apply(currentUiLocale);
+    }
+    globalThis.T9UiI18n.observe(() => currentUiLocale);
+    document.title = globalThis.T9UiI18n.translateStaticText(
+      "Technical Bug Report", currentUiLocale);
+    await start();
+  }
+  initialize().catch(error => { message.textContent = error.message; });
 })();

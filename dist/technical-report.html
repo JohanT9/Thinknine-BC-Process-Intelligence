@@ -45,7 +45,7 @@
       <button id="refreshTelemetry" type="button">Refresh telemetry for selected error</button>
     </details>
     <details><summary>AI technical analysis (optional)</summary>
-      <p>Explicit analysis sends a minimized, redacted technical evidence package
+      <p data-i18n="technical.aiDisclosure">Explicit analysis sends a minimized, redacted technical evidence package
         to your configured Entra-protected broker. Screenshots, raw events, raw
         diagnostics, tenant/company/user/session IDs and raw telemetry are excluded.</p>
       <label>Tenant ID <input id="aiTenantId" autocomplete="off"></label>
@@ -67,7 +67,7 @@
   <dialog id="issuePreview" aria-labelledby="issuePreviewTitle">
     <form method="dialog"><button value="cancel" aria-label="Close issue preview">Close</button></form>
     <h2 id="issuePreviewTitle">Issue Package Preview</h2>
-    <p>The Bug Report remains local and authoritative. Nothing is submitted until
+    <p data-i18n="technical.issuePreviewHelp">The Bug Report remains local and authoritative. Nothing is submitted until
       you review this package and select Create Issue.</p>
     <label>Destination <select id="issueProvider"><option value="">Offline package only</option>
       <option value="azure-devops">Azure DevOps</option><option value="github">GitHub</option></select></label>
@@ -110,6 +110,7 @@
     <button id="submitExternalIssue" type="button">Create Issue</button>
     <p id="issueResult" role="status"></p>
   </dialog>
+  <script src="i18n.js"></script>
   <script src="bug-report/bug-report-model.js"></script>
   <script src="bug-report/bug-report-completeness.js"></script>
   <script src="bug-report/ai-evidence-policy.js"></script>

@@ -88,15 +88,13 @@ async function ensureContentScript(tab) {
         "bc-error-detector.js", "content.js"]
     }), 4000, "Inläsningen av inspelningsskriptet");
   } catch (error) {
-    throw new Error("Edge kunde inte läsa in inspelningsskriptet i Business Central. " +
-      "Kontrollera tilläggets webbplatsåtkomst. " + error.message);
+    throw new Error(tf("recorder.injectFailed", { detail: error.message }));
   }
 
   await new Promise(resolve => setTimeout(resolve, 500));
   response = await pingTab(tab.id);
   if (!response?.ok) {
-    throw new Error("Business Central-fliken svarar fortfarande inte. " +
-      "Uppdatera BC med Ctrl+F5 och kontrollera att webbplatsåtkomsten är tillåten.");
+    throw new Error(t("recorder.tabUnresponsive"));
   }
   return response;
 }
@@ -156,7 +154,7 @@ async function startRecording(recordingPurpose) {
       purpose: ""
     }, 6000);
     if (!response?.ok) {
-      throw new Error(response?.error || "Bakgrundsprocessen kunde inte starta sessionen.");
+      throw new Error(response?.error || t("recorder.startFailed"));
     }
     showMessage(recordingPurpose === "bug-report"
       ? t("recorder.bugStarted") : t("recorder.processStarted"));
@@ -198,7 +196,7 @@ async function finishRecording(name) {
       name
     }, pendingBugRecording ? 30000 : 5000);
     if (!response?.ok) {
-      throw new Error(response?.error || "Kunde inte stoppa inspelningen.");
+      throw new Error(response?.error || t("recorder.stopFailed"));
     }
     showMessage(pendingBugRecording
       ? t("recorder.reportOpened") : t("recorder.stopped"));
@@ -216,14 +214,14 @@ async function discardWithLegacyBackground() {
 
   const stopped = await send({ type: "T9_STOP" }, 30000);
   if (!stopped?.ok) {
-    throw new Error(stopped?.error || "Kunde inte stoppa inspelningen.");
+    throw new Error(stopped?.error || t("recorder.stopFailed"));
   }
   const removed = await send({
     type: "T9_DELETE_SESSION",
     sessionId
   }, 10000);
   if (!removed?.ok) {
-    throw new Error(removed?.error || "Inspelningen stoppades men kunde inte tas bort.");
+    throw new Error(removed?.error || t("recorder.deleteFailed"));
   }
   return { ok: true, sessionId };
 }
@@ -240,7 +238,7 @@ async function discardActiveRecording() {
       response = await discardWithLegacyBackground();
     }
     if (!response?.ok) {
-      throw new Error(response?.error || "Kunde inte avbryta inspelningen.");
+      throw new Error(response?.error || t("recorder.cancelFailed"));
     }
     $("nameDialog").close();
     showMessage(t("recorder.discarded"));

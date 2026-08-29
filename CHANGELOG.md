@@ -17,6 +17,9 @@
 - Extended Swedish/English switching across the recorder popup, Document
   Library, BC Review Studio, BC Document Generator, and their primary dialogs
   while explicitly preserving recorded and generated document content.
+- Localized technical-report controls, recorder failure guidance, the sanitized
+  debug panel, and dynamic Review Studio accessibility labels without altering
+  raw diagnostics, evidence, AL call stacks, telemetry, or user-authored text.
 - Added **Byt bild** in BC Review Studio: consultants can choose any
   screenshot from the recording or capture a fresh supplementary BC screenshot
   without replaying the complete process. Repairs are traceable, reversible,

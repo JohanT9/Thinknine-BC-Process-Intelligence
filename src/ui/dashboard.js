@@ -5593,17 +5593,17 @@ function renderReviewContent() {
         <div class="review-field-heading">
           <label for="review-instruction-${visibleIndex}">Instruktion</label>
           <button data-action="edit-instruction" class="secondary"
-            aria-label="Redigera instruktion för steg ${visibleIndex + 1}">Redigera</button>
+            aria-label="${uiTf("a11y.editInstruction", { step: visibleIndex + 1 })}">Redigera</button>
         </div>
         <div id="review-instruction-preview-${visibleIndex}"
           class="review-instruction-preview" data-field="instruction"
           data-instruction-preview tabindex="0">${instructionRunsHtml(instructionPresentation.runs)}</div>
         <div class="instruction-format-toolbar" data-instruction-format-toolbar hidden
-          role="toolbar" aria-label="Textformatering">
+          role="toolbar" aria-label="${uiT("a11y.textFormatting")}">
           <button type="button" class="secondary" data-instruction-format="bold"
-            aria-label="Fet stil" aria-pressed="false"><strong>F</strong></button>
+            aria-label="${uiT("a11y.bold")}" aria-pressed="false"><strong>F</strong></button>
           <button type="button" class="secondary" data-instruction-format="italic"
-            aria-label="Kursiv stil" aria-pressed="false"><em>K</em></button>
+            aria-label="${uiT("a11y.italic")}" aria-pressed="false"><em>K</em></button>
           <label>Typsnitt<select data-instruction-font>
             ${globalThis.T9TextFormat.FONT_FAMILIES.map(font =>
               `<option value="${escapeHtml(font)}" ${font === "Arial" ? "selected" : ""}>${escapeHtml(font)}</option>`).join("")}
@@ -5622,9 +5622,9 @@ function renderReviewContent() {
           </select></label>
         </div>
         <textarea id="review-instruction-${visibleIndex}" data-edit-field="instruction" hidden
-          aria-label="Instruktion för steg ${visibleIndex + 1}"
+          aria-label="${uiTf("a11y.instruction", { step: visibleIndex + 1 })}"
           aria-keyshortcuts="Enter Control+Enter Meta+Enter Escape"
-          title="Dubbelklicka eller tryck Enter för att redigera. Ctrl+Enter sparar"
+          title="${uiT("a11y.editorHelp")}"
           readonly>${escapeHtml(instructionPresentation.text)}</textarea>
         <div class="review-comment-section" ${task.userComment ? "" : "hidden"}>
           <div class="review-field-heading">
@@ -5632,20 +5632,20 @@ function renderReviewContent() {
             <span>
               <button data-action="reset-comment" class="secondary" hidden
                 ${task.userComment === generatedComment ? "disabled" : ""}
-                aria-label="Återställ kommentar för steg ${visibleIndex + 1} till ursprungstexten">Återställ text</button>
+                aria-label="${uiTf("a11y.resetComment", { step: visibleIndex + 1 })}">Återställ text</button>
               <button data-action="edit-comment" class="secondary"
-                aria-label="Redigera kommentar för steg ${visibleIndex + 1}">Redigera</button>
+                aria-label="${uiTf("a11y.editComment", { step: visibleIndex + 1 })}">Redigera</button>
             </span>
           </div>
           <div id="review-comment-preview-${visibleIndex}"
             class="review-instruction-preview" data-field="userComment"
             data-comment-preview tabindex="0">${instructionRunsHtml(commentRuns)}</div>
           <div class="instruction-format-toolbar" data-comment-format-toolbar hidden
-            role="toolbar" aria-label="Kommentarformatering">
+            role="toolbar" aria-label="${uiT("a11y.commentFormatting")}">
             <button type="button" class="secondary" data-comment-format="bold"
-              aria-label="Fet stil" aria-pressed="false"><strong>F</strong></button>
+              aria-label="${uiT("a11y.bold")}" aria-pressed="false"><strong>F</strong></button>
             <button type="button" class="secondary" data-comment-format="italic"
-              aria-label="Kursiv stil" aria-pressed="false"><em>K</em></button>
+              aria-label="${uiT("a11y.italic")}" aria-pressed="false"><em>K</em></button>
             <label>Typsnitt<select data-comment-font>
               ${globalThis.T9TextFormat.FONT_FAMILIES.map(font =>
                 `<option value="${escapeHtml(font)}">${escapeHtml(font)}</option>`).join("")}
@@ -5665,13 +5665,13 @@ function renderReviewContent() {
           </div>
           <textarea id="review-comment-${visibleIndex}" data-field="userComment" data-edit-field="userComment" hidden
             data-original-value="${escapeHtml(generatedComment)}"
-            aria-label="Kommentar för steg ${visibleIndex + 1}"
+            aria-label="${uiTf("a11y.comment", { step: visibleIndex + 1 })}"
             aria-keyshortcuts="Control+Enter Meta+Enter Escape"
-            title="Ctrl+Enter sparar" readonly>${escapeHtml(task.userComment || "")}</textarea>
+            title="${uiT("a11y.saveEditor")}" readonly>${escapeHtml(task.userComment || "")}</textarea>
         </div>
         <button data-action="add-comment" class="secondary review-add-comment"
           ${task.userComment ? "hidden" : ""}
-          aria-label="Lägg till kommentar för steg ${visibleIndex + 1}">Lägg till kommentar</button>
+          aria-label="${uiTf("a11y.addComment", { step: visibleIndex + 1 })}">Lägg till kommentar</button>
         ${task.manualStepId ? `<div class="review-field-heading">
           <label for="review-manual-type-${visibleIndex}">Informationstyp</label>
           <select id="review-manual-type-${visibleIndex}" data-action="manual-type"
@@ -5711,31 +5711,31 @@ function renderReviewContent() {
               <svg class="review-annotation-layer" aria-hidden="true"></svg>
             </div>
             <button data-action="annotate" class="secondary review-annotate-button"
-              aria-label="Redigera bild ${imageIndex + 1} för steg ${visibleIndex + 1}">Redigera bild</button>
+              aria-label="${uiTf("a11y.editImage", { image: imageIndex + 1, step: visibleIndex + 1 })}">Redigera bild</button>
             ${images.length > 1 ? `<button data-action="select-screenshot"
               data-screenshot-index="${imageIndex}" class="secondary"
-              aria-label="Använd skärmbild ${imageIndex + 1} för steg ${visibleIndex + 1}"
+              aria-label="${uiTf("a11y.useScreenshot", { image: imageIndex + 1, step: visibleIndex + 1 })}"
               ${task.selectedScreenshotAssetId === image.path ? "disabled" : ""}>Använd</button>` : ""}
           </div>`
         ).join("")}
       </div>
       <div class="review-actions" role="gridcell">
         <button data-drag-handle class="secondary" draggable="true"
-          aria-label="Dra steg ${visibleIndex + 1} för att flytta"
+          aria-label="${uiTf("a11y.dragStep", { step: visibleIndex + 1 })}"
           aria-keyshortcuts="Alt+ArrowUp Alt+ArrowDown">Flytta</button>
         <label>
           <input data-action="approve" type="checkbox"
-            aria-label="Godkänn steg ${visibleIndex + 1}"
+            aria-label="${uiTf("a11y.approveStep", { step: visibleIndex + 1 })}"
             ${task.approved ? "checked" : ""}>
           Godkänd
         </label>
-        <button data-action="add" class="secondary" aria-label="Lägg till steg efter steg ${visibleIndex + 1}">Lägg till efter</button>
+        <button data-action="add" class="secondary" aria-label="${uiTf("a11y.addAfter", { step: visibleIndex + 1 })}">Lägg till efter</button>
         <button data-action="repair-step" class="secondary"
-          aria-label="Byt bild för steg ${visibleIndex + 1}">Byt bild</button>
+          aria-label="${uiTf("a11y.changeImage", { step: visibleIndex + 1 })}">Byt bild</button>
         <button data-action="reset-instruction" class="secondary"
           ${task.fieldProvenance?.instruction === "user-edited" ? "" : "disabled"}
-          aria-label="Återställ instruktion för steg ${visibleIndex + 1}">Återställ text</button>
-        <button data-action="remove" class="danger" aria-label="Dölj steg ${visibleIndex + 1} från dokumentet">Dölj</button>
+          aria-label="${uiTf("a11y.resetInstruction", { step: visibleIndex + 1 })}">Återställ text</button>
+        <button data-action="remove" class="danger" aria-label="${uiTf("a11y.hideStep", { step: visibleIndex + 1 })}">Dölj</button>
         ${task.manualStepId ? `<button data-action="delete-manual" class="danger"
           aria-label="Ta bort manuellt steg ${visibleIndex + 1}">Ta bort manuellt steg</button>` : ""}
         <button data-action="toggle-layout" class="secondary" aria-pressed="false">Komprimera</button>
