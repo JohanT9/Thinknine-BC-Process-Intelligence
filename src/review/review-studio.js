@@ -929,6 +929,20 @@
     return { review, ok: true };
   }
 
+  function repairTaskScreenshot(review, index, assetId, availableAssetIds,
+      options = {}) {
+    const task = review.tasks[index];
+    if (!task) return { review, ok: false, reason: "missing-step" };
+    const result = stepEditor.repairScreenshot(task, assetId, review,
+      availableAssetIds, options);
+    if (!result.ok) return { review, ...result };
+    const beforeTasks = historyEngine.snapshot(review.tasks);
+    review.tasks[index] = { ...task, stepOverride: result.override };
+    review.updatedAt = options.now || new Date().toISOString();
+    record(review, "step-screenshot-repair", beforeTasks, options);
+    return { review, ok: true, override: result.override };
+  }
+
   function addNote(review, ownerId, content, options = {}) {
     const beforeTasks = historyEngine.snapshot(review.tasks);
     const beforeStepNotes = historyEngine.snapshot(review.stepNotes || []);
@@ -1228,6 +1242,7 @@
     setTaskHidden,
     deleteManualStep,
     setManualStepScreenshot,
+    repairTaskScreenshot,
     addNote,
     updateNote,
     removeNote,

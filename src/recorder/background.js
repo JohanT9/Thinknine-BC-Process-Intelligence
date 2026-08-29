@@ -516,6 +516,60 @@ async function capture(tabId) {
   }
 }
 
+async function captureStepRepairScreenshot(recordingId, stepId, returnTabId) {
+  const session = await getSession(recordingId);
+  if (!session) throw new Error("Inspelningen kunde inte hittas.");
+  const tabs = await chrome.tabs.query({ url: [
+    "https://businesscentral.dynamics.com/*",
+    "https://*.businesscentral.dynamics.com/*"
+  ] });
+  const environment = String(session.settings?.environmentName || "").toLowerCase();
+  const candidates = tabs.filter(tab => Number.isInteger(tab.id)).sort((a, b) => {
+    const aContext = globalThis.T9BusinessCentralUrlContext
+      .parseBusinessCentralUrl(a.url || "");
+    const bContext = globalThis.T9BusinessCentralUrlContext
+      .parseBusinessCentralUrl(b.url || "");
+    const aMatch = String(aContext.environmentName || "").toLowerCase() === environment;
+    const bMatch = String(bContext.environmentName || "").toLowerCase() === environment;
+    return Number(bMatch) - Number(aMatch) ||
+      Number(b.lastAccessed || 0) - Number(a.lastAccessed || 0);
+  });
+  const target = candidates[0];
+  if (!target) throw new Error("Ingen öppen Business Central-flik hittades.");
+  await chrome.tabs.update(target.id, { active: true });
+  await chrome.windows.update(target.windowId, { focused: true });
+  await new Promise(resolve => setTimeout(resolve, 250));
+  const image = await capture(target.id);
+  if (returnTabId) {
+    try {
+      const returnTab = await chrome.tabs.get(returnTabId);
+      await chrome.tabs.update(returnTabId, { active: true });
+      await chrome.windows.update(returnTab.windowId, { focused: true });
+    } catch {}
+  }
+  if (!image) throw new Error("Den kompletterande skärmbilden kunde inte tas.");
+  const capturedAt = new Date().toISOString();
+  const safeStepId = String(stepId || "step").replace(/[^a-z0-9_-]+/giu, "-")
+    .slice(0, 48);
+  const assetKey = `repair-${safeStepId}-${Date.now()}`;
+  return { assetKey, assetId: `screenshots/${assetKey}.png`, image,
+    capturedAt, tabId: target.id };
+}
+
+async function saveStepRepairScreenshot(recordingId, assetKey, image) {
+  if (!/^repair-[a-z0-9_-]+-\d+$/iu.test(String(assetKey || "")) ||
+      !String(image || "").startsWith("data:image/png;base64,")) {
+    throw new Error("Den kompletterande skärmbilden är ogiltig.");
+  }
+  if (!await getSession(recordingId)) {
+    throw new Error("Inspelningen kunde inte hittas.");
+  }
+  const screenshots = await getScreenshots(recordingId);
+  screenshots[assetKey] = image;
+  await saveScreenshots(recordingId, screenshots);
+  return { assetId: `screenshots/${assetKey}.png` };
+}
+
 function screenshotPriority(category) {
   if (category === "dialog") return 3;
   if (category === "field-input") return 2;
@@ -1972,6 +2026,20 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
             : await getScreenshots(message.sessionId),
           bcErrorEvidence: await getBcErrorEvidenceForRecording(message.sessionId)
         });
+        break;
+      }
+
+      case "T9_CAPTURE_STEP_REPAIR_SCREENSHOT": {
+        const result = await captureStepRepairScreenshot(message.sessionId,
+          message.stepId, sender.tab?.id);
+        sendResponse({ ok: true, ...result });
+        break;
+      }
+
+      case "T9_SAVE_STEP_REPAIR_SCREENSHOT": {
+        const result = await saveStepRepairScreenshot(message.sessionId,
+          message.assetKey, message.image);
+        sendResponse({ ok: true, ...result });
         break;
       }
 

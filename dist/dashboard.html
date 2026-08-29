@@ -641,6 +641,35 @@ table{width:100%;border-collapse:collapse}th,td{text-align:left;padding:9px;bord
   </form>
 </dialog>
 
+<dialog id="stepRepairDialog" class="step-repair-dialog"
+  aria-labelledby="stepRepairTitle" aria-describedby="stepRepairDescription">
+  <form method="dialog">
+    <header>
+      <h3 id="stepRepairTitle">Reparera steg</h3>
+      <p id="stepRepairDescription" class="muted">
+        V&auml;lj en annan bild fr&aring;n inspelningen eller ta en kompletterande bild
+        fr&aring;n den &ouml;ppna Business Central-fliken.
+      </p>
+    </header>
+    <div class="step-repair-toolbar">
+      <button id="captureStepRepairScreenshot" type="button" class="primary">
+        Ta ny sk&auml;rmbild
+      </button>
+      <span id="stepRepairStatus" role="status" aria-live="polite"></span>
+    </div>
+    <fieldset>
+      <legend>Tillg&auml;ngliga sk&auml;rmbilder</legend>
+      <div id="stepRepairGallery" class="step-repair-gallery"></div>
+    </fieldset>
+    <footer>
+      <button value="cancel" class="secondary">Avbryt</button>
+      <button id="applyStepRepair" type="button" class="primary" disabled>
+        Anv&auml;nd vald bild
+      </button>
+    </footer>
+  </form>
+</dialog>
+
 <script src="engine/page-identity.js"></script>
 <script src="engine/page-identification-engine.js"></script>
 <script src="engine/bc-ui-identification.js"></script>

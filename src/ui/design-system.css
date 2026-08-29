@@ -218,6 +218,34 @@ dialog::backdrop { background: rgb(0 0 0 / 40%) !important; }
   border-left: 4px solid var(--colorStatusWarning); padding: var(--space12);
   background: #fff4ce;
 }
+.step-repair-dialog {
+  width: min(920px, calc(100vw - 32px));
+  max-height: min(820px, calc(100dvh - 32px));
+  padding: var(--space20);
+}
+.step-repair-dialog form { display: grid; gap: var(--space16); }
+.step-repair-dialog h3, .step-repair-dialog p { margin: 0; }
+.step-repair-toolbar, .step-repair-dialog footer {
+  display: flex; align-items: center; gap: var(--space12);
+}
+.step-repair-dialog footer { justify-content: flex-end; }
+.step-repair-gallery {
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
+  gap: var(--space12); max-height: 52vh; overflow: auto;
+}
+.step-repair-choice {
+  display: grid; gap: var(--space8); padding: var(--space8);
+  border: 2px solid transparent; border-radius: var(--radiusMedium);
+  background: var(--colorBackgroundSurface); cursor: pointer;
+}
+.step-repair-choice:has(input:checked) {
+  border-color: var(--colorBrandForeground1);
+  background: var(--colorBrandSubtle);
+}
+.step-repair-choice img {
+  width: 100%; aspect-ratio: 16 / 9; object-fit: contain;
+  background: var(--colorNeutralBackground3);
+}
 
 @media (max-width: 900px) {
   .app-shell-bar { flex-wrap: wrap; padding: var(--space8) var(--space12); gap: var(--space8); }

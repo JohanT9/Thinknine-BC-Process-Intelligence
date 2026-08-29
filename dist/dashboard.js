@@ -4651,6 +4651,123 @@ function reviewImages(task) {
     .filter(image => Boolean(image.imageUrl));
 }
 
+let stepRepairState = null;
+
+function renderStepRepairGallery() {
+  const gallery = $("stepRepairGallery");
+  const assets = Object.entries(activeReviewModel?.screenshotData || {});
+  gallery.innerHTML = assets.length ? assets.map(([path, imageUrl], index) =>
+    `<label class="step-repair-choice">
+      <input type="radio" name="stepRepairScreenshot"
+        value="${escapeHtml(path)}"
+        ${stepRepairState?.selectedAssetId === path ? "checked" : ""}>
+      <img src="${imageUrl}" alt="Skärmbild ${index + 1} från inspelningen">
+      <span>${stepRepairState?.capturedAssetId === path
+        ? "Ny kompletterande bild" : `Bild ${index + 1}`}</span>
+    </label>`).join("") :
+    `<p class="muted">Inga skärmbilder finns i inspelningen.</p>`;
+  for (const radio of gallery.querySelectorAll("input[type=radio]")) {
+    radio.addEventListener("change", () => {
+      stepRepairState.selectedAssetId = radio.value;
+      $("applyStepRepair").disabled = false;
+    });
+  }
+  $("applyStepRepair").disabled = !stepRepairState?.selectedAssetId;
+}
+
+function openStepRepair(taskIndex) {
+  const task = activeReview?.tasks?.[taskIndex];
+  if (!task || !activeReviewModel) return;
+  stepRepairState = { taskIndex, taskId: task.taskId || task.stepId,
+    selectedAssetId: task.selectedScreenshotAssetId || task.screenshot || null,
+    capturedAssetId: null, capturedAssetKey: null, capturedImage: null,
+    capturedAt: null };
+  $("stepRepairTitle").textContent =
+    `Reparera steg ${globalThis.T9Review.visibleTaskNumber(activeReview, taskIndex)}`;
+  $("stepRepairStatus").textContent = "";
+  renderStepRepairGallery();
+  $("stepRepairDialog").showModal();
+}
+
+$("captureStepRepairScreenshot").addEventListener("click", async () => {
+  if (!stepRepairState || !activeReviewSession) return;
+  const button = $("captureStepRepairScreenshot");
+  button.disabled = true;
+  $("stepRepairStatus").textContent =
+    "Tar en bild från den senast använda Business Central-fliken...";
+  try {
+    const response = await send({ type: "T9_CAPTURE_STEP_REPAIR_SCREENSHOT",
+      sessionId: activeReviewSession.id, stepId: stepRepairState.taskId });
+    if (!response.ok) throw new Error(response.error ||
+      "Skärmbilden kunde inte tas.");
+    activeReviewModel.screenshotData[response.assetId] = response.image;
+    stepRepairState.selectedAssetId = response.assetId;
+    stepRepairState.capturedAssetId = response.assetId;
+    stepRepairState.capturedAssetKey = response.assetKey;
+    stepRepairState.capturedImage = response.image;
+    stepRepairState.capturedAt = response.capturedAt;
+    renderStepRepairGallery();
+    $("stepRepairStatus").textContent =
+      "Den nya bilden är vald. Bekräfta för att uppdatera steget.";
+  } catch (error) {
+    $("stepRepairStatus").textContent = error.message;
+  } finally {
+    button.disabled = false;
+  }
+});
+
+$("applyStepRepair").addEventListener("click", async () => {
+  if (!stepRepairState?.selectedAssetId) return;
+  const button = $("applyStepRepair");
+  button.disabled = true;
+  const currentTask = activeReview?.tasks?.[stepRepairState.taskIndex];
+  const currentAssetId = currentTask
+    ? globalThis.T9Review.resolveTask(currentTask).selectedScreenshotAssetId
+    : null;
+  if (currentAssetId !== stepRepairState.selectedAssetId &&
+      annotationItems(currentAssetId).length) {
+    $("stepRepairStatus").textContent =
+      "Den nuvarande bilden har markeringar. Ta bort dem innan bilden byts.";
+    button.disabled = false;
+    return;
+  }
+  if (stepRepairState.selectedAssetId === stepRepairState.capturedAssetId) {
+    try {
+      const saved = await send({ type: "T9_SAVE_STEP_REPAIR_SCREENSHOT",
+        sessionId: activeReviewSession.id,
+        assetKey: stepRepairState.capturedAssetKey,
+        image: stepRepairState.capturedImage });
+      if (!saved.ok) throw new Error(saved.error || "Bilden kunde inte sparas.");
+    } catch (error) {
+      $("stepRepairStatus").textContent = error.message;
+      button.disabled = false;
+      return;
+    }
+  }
+  const availableAssetIds = Object.keys(activeReviewModel?.screenshotData || {});
+  const result = globalThis.T9Review.repairTaskScreenshot(activeReview,
+    stepRepairState.taskIndex, stepRepairState.selectedAssetId,
+    availableAssetIds, { capturedAt: stepRepairState.capturedAt,
+      beforeSelection: activeReviewSelection,
+      afterSelection: activeReviewSelection });
+  if (!result.ok) {
+    $("stepRepairStatus").textContent = result.reason === "annotation-protected"
+      ? "Den nuvarande bilden har markeringar. Ta bort dem innan bilden byts."
+      : "Den valda bilden kan inte kopplas till steget.";
+    button.disabled = false;
+    return;
+  }
+  $("stepRepairDialog").close("apply");
+  stepRepairState = null;
+  reviewAutoSave.schedule();
+  renderReview();
+  show("Stegets skärmbild har reparerats.");
+});
+
+$("stepRepairDialog").addEventListener("close", () => {
+  stepRepairState = null;
+});
+
 function annotationItems(screenshotRef) {
   return globalThis.T9ReviewAnnotations.findScreenshotSet(
     activeReview?.annotations,
@@ -5571,6 +5688,8 @@ function renderReviewContent() {
           Godkänd
         </label>
         <button data-action="add" class="secondary" aria-label="Lägg till steg efter steg ${visibleIndex + 1}">Lägg till efter</button>
+        <button data-action="repair-step" class="secondary"
+          aria-label="Reparera steg ${visibleIndex + 1}">Reparera steg</button>
         <button data-action="reset-instruction" class="secondary"
           ${task.fieldProvenance?.instruction === "user-edited" ? "" : "disabled"}
           aria-label="Återställ instruktion för steg ${visibleIndex + 1}">Återställ text</button>
@@ -5801,6 +5920,9 @@ function renderReviewContent() {
       .addEventListener("click", () => {
         addManualInformationStep(actualIndex);
       });
+
+    card.querySelector('[data-action="repair-step"]')
+      .addEventListener("click", () => openStepRepair(actualIndex));
 
     card.querySelector('[data-action="reset-instruction"]')
       .addEventListener("click", () => {

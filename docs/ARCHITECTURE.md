@@ -25,6 +25,12 @@ malformed URLs and missing values fall back
 without blocking capture. This is capture context, not page or entity semantic
 classification.
 
+Single-step screenshot repair is initiated by the Review UI and validated by
+the Step Editor domain service. Existing or newly captured recording media is
+referenced through a sparse Step Override. A supplementary capture never creates
+or rewrites a raw or Canonical Event; it remains derived repair evidence with
+explicit provenance and Review history.
+
 ## Product identity boundary
 
 `src/engine/product-brand.js` is the canonical source for current product and module terminology. UI and export surfaces use **BC Process Studio by Thinknine**. Stable technical identifiers—including the npm package name, extension listing identity, storage keys, `T9*` namespaces, schema versions, file-compatible release names and built-in theme ID `thinknine`—remain unchanged to preserve existing installations and data.

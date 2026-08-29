@@ -29,6 +29,9 @@ Current product areas:
 
 - **BC Process Recorder** captures browser activity, interactions, screenshots and process events.
 - **BC Review Studio** supports editing, merging, splitting, reordering, annotation and validation.
+- **Single-step repair** can replace one step's screenshot with any image from
+  its recording or capture a fresh supplementary Business Central screenshot,
+  without replaying the complete process.
 - **BC Document Generator** creates professional Word documentation from reviewed recordings.
 - **BC Knowledge Base** stores and helps retrieve reusable process documentation.
 

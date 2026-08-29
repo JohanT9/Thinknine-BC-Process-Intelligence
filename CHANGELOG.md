@@ -11,6 +11,11 @@
 
 ## Unreleased
 
+- Added single-step repair in BC Review Studio: consultants can choose any
+  screenshot from the recording or capture a fresh supplementary BC screenshot
+  without replaying the complete process. Repairs are traceable, reversible,
+  annotation-safe, and leave raw recording events unchanged.
+
 - Replaced the one-line regeneration confirmation with an accessible safe
   preview that lists added, removed, changed, merged, split, and screenshot-
   changed Steps. Blocked previews explain why and cannot be applied.

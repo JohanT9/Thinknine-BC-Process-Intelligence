@@ -89,3 +89,19 @@ Sparse explicit fields retarget only through unique identity/evidence mappings.
 Edited fields survive; reset or untouched fields receive new generated values.
 Ambiguous split/consolidation targets remain unresolved. See
 [REGENERATE_FROM_RECORDING.md](REGENERATE_FROM_RECORDING.md).
+
+## Single-step repair
+
+`Reparera steg` is the recovery path when one generated step has the wrong or
+missing screenshot. The dialog exposes recording-level screenshot assets rather
+than only the candidates originally assigned to that step. It may also capture
+one supplementary screenshot from the most recently used open Business Central
+tab. The browser briefly activates that tab for `captureVisibleTab` and returns
+to BC Review Studio afterwards.
+
+The selected asset is stored in the existing sparse Step Override with
+`provenance: step-repair`. A newly captured image is stored as supplementary
+recording media; it is not inserted as a raw or Canonical Event and therefore
+does not change the meaning or ordering of the original recording. Review
+history makes the operation undoable. An annotated current screenshot cannot be
+replaced until its annotations are removed, preventing orphaned consultant work.

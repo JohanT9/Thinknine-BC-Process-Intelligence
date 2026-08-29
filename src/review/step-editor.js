@@ -133,6 +133,36 @@
     }, step) };
   }
 
+  function repairScreenshot(step, assetId, review, availableAssetIds,
+      options = {}) {
+    const current = resolve(step);
+    if (current.selectedScreenshotAssetId !== assetId &&
+        annotationsFor(review, current.selectedScreenshotAssetId).length) {
+      return { ok: false, reason: "annotation-protected",
+        override: step.stepOverride || null };
+    }
+    const available = new Set((Array.isArray(availableAssetIds)
+      ? availableAssetIds : []).filter(Boolean).map(String));
+    if (!available.has(String(assetId))) {
+      return { ok: false, reason: "not-a-recording-asset",
+        override: step.stepOverride || null };
+    }
+    const now = options.now || new Date().toISOString();
+    const currentOverride = normalizeOverride(step.stepOverride, step) || {};
+    return { ok: true, override: normalizeOverride({
+      ...currentOverride,
+      createdAt: currentOverride.createdAt || now,
+      updatedAt: now,
+      screenshotOverride: {
+        selectedScreenshotAssetId: String(assetId),
+        provenance: "step-repair",
+        capturedAt: options.capturedAt || null
+      },
+      metadata: { ...(currentOverride.metadata || {}),
+        provenance: "user-edited", repair: true }
+    }, step) };
+  }
+
   function setVisibility(step, hidden, options = {}) {
     const now = options.now || new Date().toISOString();
     const current = normalizeOverride(step.stepOverride, step) || {};
@@ -195,6 +225,6 @@
   return {
     EDITABLE_FIELDS, SCHEMA_VERSION, annotationsFor, edit, generated,
     isEmpty, normalizeOverride, reset, resolve, resolveReview,
-    selectScreenshot, setVisibility
+    repairScreenshot, selectScreenshot, setVisibility
   };
 });
