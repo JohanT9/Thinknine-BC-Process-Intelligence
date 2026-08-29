@@ -8,14 +8,17 @@ function updateText(element, value) {
 const withTimeout = globalThis.T9AsyncOperations.withTimeout;
 let currentUiLocale = globalThis.T9UiI18n.DEFAULT_LOCALE;
 const t = key => globalThis.T9UiI18n.translate(key, currentUiLocale);
+const tf = (key, values) => globalThis.T9UiI18n.format(key, values, currentUiLocale);
 
 async function loadUiLocale() {
   try {
     const response = await send({ type: "T9_GET_SETTINGS" }, 3000);
     currentUiLocale = globalThis.T9UiI18n.apply(response?.settings?.uiLocale);
+    globalThis.T9UiI18n.observe(() => currentUiLocale);
   } catch {
     currentUiLocale = globalThis.T9UiI18n.apply(
       globalThis.T9UiI18n.DEFAULT_LOCALE);
+    globalThis.T9UiI18n.observe(() => currentUiLocale);
   }
 }
 
@@ -39,23 +42,24 @@ function setStarting(starting) {
 }
 
 function displayLatestAction(action) {
-  if (!action) return "Väntar på första händelsen";
-  return action.label || action.category || action.type || "Händelse registrerad";
+  if (!action) return t("recorder.waiting");
+  return action.label || action.category || action.type || t("recorder.eventCaptured");
 }
 
 function renderLiveStatus(liveStatus) {
   if (!liveStatus) return;
   updateText($("latestAction"), displayLatestAction(liveStatus.latestAction));
   updateText($("latestPage"), liveStatus.latestAction?.pageCaption ||
-    "Ej registrerad");
+    t("recorder.notRegistered"));
   const screenshots = liveStatus.screenshots || {};
-  updateText($("screenshotStatus"), `${screenshots.captured || 0} sparade` +
-    (screenshots.pending ? ` · ${screenshots.pending} väntar` : ""));
+  updateText($("screenshotStatus"), tf("recorder.savedCount",
+    { count: screenshots.captured || 0 }) + (screenshots.pending
+    ? tf("recorder.pendingCount", { count: screenshots.pending }) : ""));
   const context = [liveStatus.context?.environmentName,
     liveStatus.context?.companyName].filter(Boolean).join(" · ");
-  updateText($("recordingContext"), context || "Ej identifierad");
+  updateText($("recordingContext"), context || t("recorder.notIdentified"));
   updateText($("connectionStatus"), liveStatus.connected
-    ? "Ansluten" : "Inte bekräftad");
+    ? t("recorder.connected") : t("recorder.notConfirmed"));
   $("connectionStatus").className = liveStatus.connected ? "live-ok" : "";
   const warning = $("captureWarning");
   const messages = (liveStatus.warnings || []).map(item => item.message);
@@ -110,11 +114,9 @@ const refresh = globalThis.T9AsyncOperations.singleFlight(async function () {
       : t("recorder.inactive"));
     $("status").className = "status" + (active ? " rec" : "");
     updateText($("recordingGuidance"), bugRecording
-      ? "Återskapa felet och kopiera gärna Business Central-feldetaljerna. Stoppa sedan för att granska rapporten."
-      : "Utför processen i Business Central och stoppa när du är klar.");
+      ? t("recorder.bugGuidance") : t("recorder.processGuidance"));
     updateText($("stop"), bugRecording
-      ? "Stoppa och öppna felrapport"
-      : "Stoppa inspelning");
+      ? t("recorder.stopBug") : t("recorder.stopProcess"));
 
     if (response?.session) {
       updateText($("sessionName"), response.session.name);
@@ -125,8 +127,7 @@ const refresh = globalThis.T9AsyncOperations.singleFlight(async function () {
       if (errorCaptured) {
         updateText(feedback,
           response.session.lastErrorCaptureStatus === "details-captured"
-            ? "Business Central-felet och tekniska detaljer har fångats."
-            : "Business Central-felet har fångats. Alla tekniska detaljer var inte tillgängliga.");
+            ? t("recorder.errorDetailsCaptured") : t("recorder.errorCaptured"));
       }
     }
     if (active) renderLiveStatus(response.liveStatus);
@@ -137,14 +138,14 @@ const refresh = globalThis.T9AsyncOperations.singleFlight(async function () {
 
 async function startRecording(recordingPurpose) {
   setStarting(true);
-  showMessage("Kontrollerar anslutningen till Business Central...");
+  showMessage(t("recorder.checking"));
   try {
     const tab = await currentTab();
     if (!tab?.url?.includes("businesscentral.dynamics.com")) {
-      throw new Error("Öppna Business Central i den aktiva fliken först.");
+      throw new Error(t("recorder.openBcFirst"));
     }
     await ensureContentScript(tab);
-    showMessage("Anslutningen fungerar. Startar sessionen...");
+    showMessage(t("recorder.connectionWorks"));
 
     const response = await send({
       type: recordingPurpose === "bug-report" ? "T9_START_BUG_RECORDING" : "T9_START",
@@ -158,8 +159,7 @@ async function startRecording(recordingPurpose) {
       throw new Error(response?.error || "Bakgrundsprocessen kunde inte starta sessionen.");
     }
     showMessage(recordingPurpose === "bug-report"
-      ? "Felrapporteringen har startats. Återskapa felet i Business Central."
-      : "Processinspelningen har startats.");
+      ? t("recorder.bugStarted") : t("recorder.processStarted"));
     await refresh();
   } catch (error) {
     showMessage(error.message, true);
@@ -181,7 +181,7 @@ function openCompletionDialog() {
 
 function stayAfterRecording() {
   $("completionDialog").close();
-  showMessage("Inspelningen har sparats i Dokumentbiblioteket.");
+  showMessage(t("recorder.savedLibrary"));
 }
 
 function openLibraryAfterRecording() {
@@ -192,8 +192,7 @@ function openLibraryAfterRecording() {
 async function finishRecording(name) {
   try {
     showMessage(pendingBugRecording
-      ? "Skapar felrapport och öppnar den för granskning..."
-      : "Stoppar inspelningen...");
+      ? t("recorder.creatingReport") : t("recorder.stopping"));
     const response = await send({
       type: pendingBugRecording ? "T9_FINISH_BUG_RECORDING" : "T9_STOP",
       name
@@ -202,8 +201,7 @@ async function finishRecording(name) {
       throw new Error(response?.error || "Kunde inte stoppa inspelningen.");
     }
     showMessage(pendingBugRecording
-      ? "Felrapporten har skapats och öppnats."
-      : "Inspelningen har stoppats.");
+      ? t("recorder.reportOpened") : t("recorder.stopped"));
     await refresh();
     if (!pendingBugRecording) openCompletionDialog();
   } catch (error) {
@@ -231,14 +229,12 @@ async function discardWithLegacyBackground() {
 }
 
 async function discardActiveRecording() {
-  const confirmed = globalThis.confirm(
-    "Vill du avbryta inspelningen? Alla registrerade händelser och bilder i den tas bort."
-  );
+  const confirmed = globalThis.confirm(t("recorder.discardConfirm"));
   if (!confirmed) return;
 
   try {
     $("discardRecording").disabled = true;
-    showMessage("Avbryter inspelningen...");
+    showMessage(t("recorder.discarding"));
     let response = await send({ type: "T9_CANCEL_RECORDING" }, 30000);
     if (!response?.ok && /okänt meddelande/i.test(String(response?.error || ""))) {
       response = await discardWithLegacyBackground();
@@ -247,7 +243,7 @@ async function discardActiveRecording() {
       throw new Error(response?.error || "Kunde inte avbryta inspelningen.");
     }
     $("nameDialog").close();
-    showMessage("Inspelningen avbröts och togs bort.");
+    showMessage(t("recorder.discarded"));
     await refresh();
   } catch (error) {
     showMessage(error.message, true);
@@ -259,14 +255,12 @@ async function discardActiveRecording() {
 function openNameDialog(bugRecording) {
   pendingBugRecording = bugRecording;
   updateText($("nameDialogTitle"), pendingBugRecording
-    ? "Namnge felrapporten" : "Namnge processinspelningen");
+    ? t("recorder.nameBug") : t("recorder.nameProcess"));
   updateText($("nameDialogHelp"), pendingBugRecording
-    ? "Ange ett tydligt namn på problemet. Rapporten skapas när du fortsätter."
-    : "Ange namnet som ska visas i Dokumentbiblioteket.");
+    ? t("recorder.nameBugHelp") : t("recorder.nameProcessHelp"));
   $("recordingName").value = "";
   $("recordingName").placeholder = pendingBugRecording
-    ? "Exempel: Fel vid frisläppning av order"
-    : "Exempel: Skapa försäljningsorder";
+    ? t("recorder.nameBugPlaceholder") : t("recorder.nameProcessPlaceholder");
   if (!$("nameDialog").open) $("nameDialog").showModal();
   $("recordingName").focus();
 }

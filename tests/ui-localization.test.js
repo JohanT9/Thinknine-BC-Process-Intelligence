@@ -17,6 +17,10 @@ assert.equal(i18n.normalizeLocale("da-DK"), "sv-SE");
 assert.equal(i18n.translate("settings.language", "sv-SE"), "Gränssnittsspråk");
 assert.equal(i18n.translate("settings.language", "en-US"), "Interface language");
 assert.equal(i18n.translate("missing.key", "en-US"), "missing.key");
+assert.equal(i18n.format("library.manyShown", { count: 4 }, "en-US"),
+  "4 documents shown.");
+assert.equal(i18n.translateStaticText("Spara", "en-US"), "Save");
+assert.equal(i18n.translateStaticText("Save", "sv-SE"), "Spara");
 
 const dashboardHtml = fs.readFileSync(path.join(root,
   "src/ui/dashboard.html"), "utf8");
@@ -32,8 +36,12 @@ assert.match(dashboardHtml, /<script src="i18n\.js"><\/script>/);
 assert.match(popupHtml, /<script src="i18n\.js"><\/script>/);
 assert.match(dashboard, /uiLocale: "sv-SE"/);
 assert.match(dashboard, /T9UiI18n\.apply\(settings\.uiLocale\)/);
+assert.match(dashboard, /T9UiI18n\.observe/);
+assert.match(dashboard, /uiTf\("document\.page"/);
 assert.match(dashboard, /type: "T9_SAVE_UI_LOCALE", uiLocale/);
 assert.match(popup, /T9_GET_SETTINGS/);
+assert.match(popup, /T9UiI18n\.observe/);
+assert.match(source, /#documentWorkspace, #reviewList, #annotationStage/);
 assert.match(background, /uiLocale: "sv-SE"/);
 assert.match(background, /case "T9_SAVE_UI_LOCALE"/);
 assert.match(build, /"i18n\.js"/);

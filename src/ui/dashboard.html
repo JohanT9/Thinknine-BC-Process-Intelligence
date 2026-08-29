@@ -340,7 +340,8 @@ table{width:100%;border-collapse:collapse}th,td{text-align:left;padding:9px;bord
   <div class="library-controls" role="search">
     <label for="librarySearch">Sök dokument
       <input id="librarySearch" type="search" autocomplete="off" aria-keyshortcuts="/ Escape"
-        aria-describedby="libraryStatus" placeholder="Titel, profil, tagg eller arbetsflöde">
+        aria-describedby="libraryStatus" placeholder="Titel, profil, tagg eller arbetsflöde"
+        data-i18n-placeholder="library.searchPlaceholder">
     </label>
     <label for="libraryProfileFilter">Dokumentprofil
       <select id="libraryProfileFilter"><option value="">Alla profiler</option></select>
@@ -514,7 +515,8 @@ table{width:100%;border-collapse:collapse}th,td{text-align:left;padding:9px;bord
         <label for="expectedResultEditor">Förväntat resultat</label>
         <textarea id="expectedResultEditor" rows="3"
           aria-describedby="expectedResultHelp"
-          placeholder="Beskriv vad som ska vara uppnått när arbetsflödet är klart."></textarea>
+          placeholder="Beskriv vad som ska vara uppnått när arbetsflödet är klart."
+          data-i18n-placeholder="review.expectedPlaceholder"></textarea>
         <div class="review-document-fields-actions">
           <p id="expectedResultHelp" class="muted">Texten visas i Dokumentvy och Word.</p>
           <button id="resetExpectedResult" class="secondary" type="button">Återställ standardtext</button>

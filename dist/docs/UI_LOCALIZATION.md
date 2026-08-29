@@ -13,11 +13,20 @@ Central content and generated document content.
   semantic documents, or exports.
 - `src/ui/i18n.js` is the single owner of interface translations.
 - UI elements opt in through stable `data-i18n` keys; dynamic text uses
-  `T9UiI18n.translate`.
+  `T9UiI18n.translate` or `T9UiI18n.format`.
+- Static controls created by existing views use a constrained bidirectional
+  label dictionary. Translation is limited to interface elements such as
+  buttons, labels, options, headings, and table headers.
+- Review instructions, comments, observed Business Central labels, screenshots,
+  and the rendered Semantic Document are explicitly excluded from interface
+  translation.
+- Dynamically inserted controls are translated incrementally. The observer only
+  inspects added interface subtrees and does not rescan the complete page.
 
 ## Milestones
 
-The initial milestone establishes storage, language selection, runtime switching,
-and the shared module. It localizes representative application-shell text in the
-dashboard and recorder popup. Full dashboard, workspace, dialog, technical view,
-and accessibility-string coverage follows in later localization milestones.
+The first milestone established storage, language selection, runtime switching,
+and the shared module. The second milestone localizes the recorder popup,
+Document Library, BC Review Studio, BC Document Generator, and their primary
+dialogs and status messages. Technical/debug surfaces and a complete audit of
+generated accessibility labels remain separate follow-up work.

@@ -52,10 +52,10 @@ dialog{width:calc(100% - 36px);box-sizing:border-box;border:1px solid #8392a5;bo
 <section class="live-card" aria-labelledby="liveStatusTitle">
   <h2 id="liveStatusTitle">Live-status</h2>
   <dl class="live-grid">
-    <dt>Senaste</dt><dd id="latestAction">Väntar på första händelsen</dd>
-    <dt>Sida</dt><dd id="latestPage">Ej registrerad</dd>
+    <dt>Senaste</dt><dd id="latestAction" data-i18n="recorder.waiting">Väntar på första händelsen</dd>
+    <dt>Sida</dt><dd id="latestPage" data-i18n="recorder.notRegistered">Ej registrerad</dd>
     <dt>Skärmbilder</dt><dd id="screenshotStatus">0 sparade</dd>
-    <dt>Kontext</dt><dd id="recordingContext">Ej identifierad</dd>
+    <dt>Kontext</dt><dd id="recordingContext" data-i18n="recorder.notIdentified">Ej identifierad</dd>
     <dt>Anslutning</dt><dd id="connectionStatus">Kontrollerar</dd>
   </dl>
   <p id="captureWarning" class="live-warning" role="status" aria-live="polite" hidden></p>
@@ -77,7 +77,9 @@ dialog{width:calc(100% - 36px);box-sizing:border-box;border:1px solid #8392a5;bo
     <label for="recordingName">Namn</label>
     <input id="recordingName" required maxlength="120" autocomplete="off">
     <menu>
-      <button id="cancelName" type="button" class="debug" title="Avbryt stopp och fortsätt spela in">Avbryt</button>
+      <button id="cancelName" type="button" class="debug"
+        title="Avbryt stopp och fortsätt spela in"
+        data-i18n-title="recorder.cancelStopTitle">Avbryt</button>
       <button id="confirmName" type="submit" class="primary">Spara och stoppa</button>
       <button id="discardRecording" type="button" class="danger discard-recording">Avbryt inspelning</button>
     </menu>
@@ -87,7 +89,7 @@ dialog{width:calc(100% - 36px);box-sizing:border-box;border:1px solid #8392a5;bo
   aria-describedby="completionDialogHelp">
   <form method="dialog">
     <h2 id="completionDialogTitle">Inspelningen är klar</h2>
-    <p id="completionDialogHelp" class="hint">Vill du öppna Dokumentbiblioteket och fortsätta arbeta med dokumentationen?</p>
+    <p id="completionDialogHelp" class="hint" data-i18n="recorder.completionHelp">Vill du öppna Dokumentbiblioteket och fortsätta arbeta med dokumentationen?</p>
     <menu>
       <button id="stayAfterRecording" type="button" class="debug">Inte nu</button>
       <button id="openLibraryAfterRecording" type="button" class="primary">Öppna Dokumentbiblioteket</button>

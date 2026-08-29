@@ -30,6 +30,13 @@ const DEFAULTS = {
 
 let applicationSettings = { ...DEFAULTS };
 
+const uiT = key => globalThis.T9UiI18n.translate(
+  key, applicationSettings.uiLocale
+);
+const uiTf = (key, values) => globalThis.T9UiI18n.format(
+  key, values, applicationSettings.uiLocale
+);
+
 const $ = id => document.getElementById(id);
 const send = message => chrome.runtime.sendMessage(message);
 
@@ -2604,6 +2611,7 @@ async function loadSettings() {
   };
   applicationSettings = { ...settings };
   globalThis.T9UiI18n.apply(settings.uiLocale);
+  globalThis.T9UiI18n.observe(() => applicationSettings.uiLocale);
 
   for (const [key, value] of Object.entries(settings)) {
     const element = $(key);
@@ -3479,10 +3487,13 @@ function renderDocumentLibrary() {
     activeId
   });
   $("libraryStatus").textContent = matches.length > records.length
-    ? `${matches.length} dokument matchar. De första ${records.length} visas.`
+    ? uiTf("library.limitedShown", {
+      matches: matches.length,
+      count: records.length
+    })
     : records.length === 1
-    ? "1 dokument visas."
-    : `${records.length} dokument visas.`;
+    ? uiT("library.oneShown")
+    : uiTf("library.manyShown", { count: records.length });
   renderLibraryBatchToolbar();
 }
 
@@ -3503,7 +3514,8 @@ function renderLibraryBatchToolbar(message = "") {
   const count = documentLibrarySelection.selectedIds.length;
   $("libraryBatchToolbar").hidden = count === 0;
   $("libraryBatchCount").textContent = count === 1
-    ? "1 dokument valt" : `${count} dokument valda`;
+    ? uiT("library.oneSelected")
+    : uiTf("library.manySelected", { count });
   if (message) $("libraryBatchStatus").textContent = message;
 }
 
@@ -3996,14 +4008,18 @@ function applyDocumentView(options = {}) {
     section.hidden = documentViewState.viewMode === "page" &&
       index + 1 !== documentViewState.currentPage;
   });
-  $("documentPageIndicator").textContent =
-    `Sida ${documentViewState.currentPage} av ${pageCount}`;
+  $("documentPageIndicator").textContent = uiTf("document.page", {
+    page: documentViewState.currentPage,
+    count: pageCount
+  });
   $("documentPreviousPage").disabled = documentViewState.currentPage <= 1;
   $("documentNextPage").disabled = documentViewState.currentPage >= pageCount;
   page.setAttribute("aria-label", page.getAttribute("aria-label") || "Dokument");
   if (options.announce) {
-    $("documentWorkspaceStatus").textContent =
-      `Sida ${documentViewState.currentPage} av ${pageCount}, zoom ${zoom} procent.`;
+    $("documentWorkspaceStatus").textContent = uiTf(
+      "document.pageZoomAnnouncement",
+      { page: documentViewState.currentPage, count: pageCount, zoom }
+    );
   }
   if (options.persist !== false) saveDocumentViewPreferences();
 }
@@ -4061,7 +4077,10 @@ function updateContinuousDocumentPage() {
       page,
       sections.length
     );
-    $("documentPageIndicator").textContent = `Sida ${page} av ${sections.length}`;
+    $("documentPageIndicator").textContent = uiTf("document.page", {
+      page,
+      count: sections.length
+    });
     $("documentPreviousPage").disabled = page <= 1;
     $("documentNextPage").disabled = page >= sections.length;
   }
@@ -4123,8 +4142,10 @@ async function synchronizeDocumentWorkspace() {
           workspaceState,
           requestedRevision
         );
-        $("documentWorkspaceStatus").textContent =
-          `Dokumentet är synkroniserat. ${result.sectionCount} avsnitt.`;
+        $("documentWorkspaceStatus").textContent = uiTf(
+          "document.synchronized",
+          { count: result.sectionCount }
+        );
       } catch (error) {
         $("documentWorkspaceStatus").textContent =
           `Dokumentet kunde inte visas: ${error.message}`;
@@ -4701,8 +4722,9 @@ function openStepRepair(taskIndex) {
     selectedAssetId: task.selectedScreenshotAssetId || task.screenshot || null,
     capturedAssetId: null, capturedAssetKey: null, capturedImage: null,
     capturedAt: null };
-  $("stepRepairTitle").textContent =
-    `Byt bild för steg ${globalThis.T9Review.visibleTaskNumber(activeReview, taskIndex)}`;
+  $("stepRepairTitle").textContent = uiTf("review.changeImageForStep", {
+    step: globalThis.T9Review.visibleTaskNumber(activeReview, taskIndex)
+  });
   $("stepRepairStatus").textContent = "";
   renderStepRepairGallery();
   $("stepRepairDialog").showModal();
@@ -4972,8 +4994,9 @@ function openAnnotationEditor(task, imageData) {
     activeReview,
     task.taskId
   );
-  $("annotationTitle").textContent =
-    `Redigera bild för steg ${visibleStepNumber ?? task.taskNo}`;
+  $("annotationTitle").textContent = uiTf("review.editImageForStep", {
+    step: visibleStepNumber ?? task.taskNo
+  });
   $("annotationImage").src = imageData.imageUrl;
   renderAnnotationControls();
   if ($("annotationImage").complete) renderActiveAnnotation();
