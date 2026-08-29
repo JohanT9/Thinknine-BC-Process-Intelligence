@@ -147,6 +147,7 @@ for (const file of [
   "dashboard.html",
   "design-system.css",
   "dashboard.js",
+  "i18n.js",
   "async-operations.js",
   "document-library-view.js",
   "document-workspace-experience.js",

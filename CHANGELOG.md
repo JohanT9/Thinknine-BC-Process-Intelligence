@@ -11,6 +11,9 @@
 
 ## Unreleased
 
+- Added the first localization foundation for BC Process Studio with a persisted
+  Swedish/English interface-language setting, deterministic Swedish fallback,
+  and shared translations used by the dashboard and recorder popup shell.
 - Added **Byt bild** in BC Review Studio: consultants can choose any
   screenshot from the recording or capture a fresh supplementary BC screenshot
   without replaying the complete process. Repairs are traceable, reversible,

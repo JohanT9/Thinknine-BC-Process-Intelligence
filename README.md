@@ -33,6 +33,9 @@ Current product areas:
   its recording or capture a fresh supplementary Business Central screenshot,
   without replaying the complete process.
 - **BC Document Generator** creates professional Word documentation from reviewed recordings.
+- **Interface language** is stored independently from recorded Business Central
+  content. Swedish remains the backward-compatible default and English is
+  available as the first additional UI locale.
 - **BC Knowledge Base** stores and helps retrieve reusable process documentation.
 
 **BC Process Maps** and broader **BC Process AI** capabilities are future product areas. They are not presented as available production functionality in 4.7. Existing optional AI technical analysis for Bug Reports remains explicitly user-triggered and evidence-bounded.

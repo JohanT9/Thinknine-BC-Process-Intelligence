@@ -1,4 +1,5 @@
 const DEFAULTS = {
+  uiLocale: "sv-SE",
   exportFileNamePattern: "{process} - {environment} - {date}",
   documentationProfile: "generic",
   defaultExpectedResult:
@@ -2602,6 +2603,7 @@ async function loadSettings() {
     ...(response?.settings || {})
   };
   applicationSettings = { ...settings };
+  globalThis.T9UiI18n.apply(settings.uiLocale);
 
   for (const [key, value] of Object.entries(settings)) {
     const element = $(key);
@@ -2654,7 +2656,24 @@ async function saveSettings() {
 
   applicationSettings = { ...settings };
 
-  show("Inställningarna har sparats.");
+  show(globalThis.T9UiI18n.translate("settings.saved", settings.uiLocale));
+}
+
+async function changeUiLocale(event) {
+  const previousLocale = applicationSettings.uiLocale;
+  const uiLocale = globalThis.T9UiI18n.normalizeLocale(event.target.value);
+  globalThis.T9UiI18n.apply(uiLocale);
+  applicationSettings = { ...applicationSettings, uiLocale };
+  try {
+    const response = await send({ type: "T9_SAVE_UI_LOCALE", uiLocale });
+    if (!response?.ok) throw new Error(response?.error || "Language could not be saved.");
+    applicationSettings = { ...applicationSettings, uiLocale: response.uiLocale };
+  } catch (error) {
+    applicationSettings = { ...applicationSettings, uiLocale: previousLocale };
+    event.target.value = previousLocale;
+    globalThis.T9UiI18n.apply(previousLocale);
+    show(error.message, true);
+  }
 }
 
 
@@ -6967,6 +6986,7 @@ globalThis.T9ReviewMove.bind($("reviewList"), {
 });
 
 $("save").addEventListener("click", saveSettings);
+$("uiLocale").addEventListener("change", changeUiLocale);
 $("refresh").addEventListener("click", loadSessions);
 $("sessionTools").addEventListener("toggle", () => {
   if ($("sessionTools").open) {

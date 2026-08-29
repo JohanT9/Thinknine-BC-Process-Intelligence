@@ -6,6 +6,18 @@ function updateText(element, value) {
 }
 
 const withTimeout = globalThis.T9AsyncOperations.withTimeout;
+let currentUiLocale = globalThis.T9UiI18n.DEFAULT_LOCALE;
+const t = key => globalThis.T9UiI18n.translate(key, currentUiLocale);
+
+async function loadUiLocale() {
+  try {
+    const response = await send({ type: "T9_GET_SETTINGS" }, 3000);
+    currentUiLocale = globalThis.T9UiI18n.apply(response?.settings?.uiLocale);
+  } catch {
+    currentUiLocale = globalThis.T9UiI18n.apply(
+      globalThis.T9UiI18n.DEFAULT_LOCALE);
+  }
+}
 
 async function send(message, timeout = 5000) {
   return withTimeout(chrome.runtime.sendMessage(message), timeout, "Kommunikationen med tillägget");
@@ -94,8 +106,8 @@ const refresh = globalThis.T9AsyncOperations.singleFlight(async function () {
     $("startPanel").hidden = active;
     $("recordingPanel").hidden = !active;
     updateText($("status"), active
-      ? (bugRecording ? "Felrapportering pågår" : "Processinspelning pågår")
-      : "Inte aktiv");
+      ? t(bugRecording ? "recorder.bugActive" : "recorder.processActive")
+      : t("recorder.inactive"));
     $("status").className = "status" + (active ? " rec" : "");
     updateText($("recordingGuidance"), bugRecording
       ? "Återskapa felet och kopiera gärna Business Central-feldetaljerna. Stoppa sedan för att granska rapporten."
@@ -288,7 +300,7 @@ $("debug").addEventListener("click", () => {
   chrome.tabs.create({ url: chrome.runtime.getURL("debug.html") });
 });
 
-refresh().then(async () => {
+loadUiLocale().then(refresh).then(async () => {
   try {
     const response = await send({ type: "T9_GET_STATE" }, 3000);
     if (!response?.state?.recording || !response.state.stopPromptRequested) return;

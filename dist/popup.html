@@ -32,15 +32,15 @@ dialog{width:calc(100% - 36px);box-sizing:border-box;border:1px solid #8392a5;bo
 </header>
 <main>
 <div id="status" class="status" role="status" aria-live="polite"
-  aria-atomic="true">Inte aktiv</div>
+  aria-atomic="true" data-i18n="recorder.inactive">Inte aktiv</div>
 <section id="startPanel">
-<p class="hint">Turn Business Central processes into knowledge.<br>Capture. Document. Improve.</p>
-<h2>Ny inspelning</h2>
+<p class="hint"><span data-i18n="app.promise">Gör Business Central-processer till kunskap.</span><br><span data-i18n="app.promiseDetail">Spela in. Dokumentera. Förbättra.</span></p>
+<h2 data-i18n="recorder.new">Ny inspelning</h2>
 <div class="mode-grid">
-  <button id="startProcess" class="secondary mode-card"><strong>Dokumentera en process</strong>
-    <span>Spela in ett arbetsflöde och skapa steg-för-steg-dokumentation.</span></button>
-  <button id="startBug" class="primary mode-card"><strong>Rapportera ett fel</strong>
-    <span>Reproducera problemet och skapa en teknisk felrapport.</span></button>
+  <button id="startProcess" class="secondary mode-card"><strong data-i18n="recorder.process">Dokumentera en process</strong>
+    <span data-i18n="recorder.processHelp">Spela in ett arbetsflöde och skapa steg-för-steg-dokumentation.</span></button>
+  <button id="startBug" class="primary mode-card"><strong data-i18n="recorder.bug">Rapportera ett fel</strong>
+    <span data-i18n="recorder.bugHelp">Reproducera problemet och skapa en teknisk felrapport.</span></button>
 </div>
 </section>
 <section id="recordingPanel" hidden>
@@ -63,10 +63,10 @@ dialog{width:calc(100% - 36px);box-sizing:border-box;border:1px solid #8392a5;bo
 <p id="errorCaptureFeedback" class="captured" hidden></p>
 <button id="stop" class="danger">Stoppa inspelning</button>
 </section>
-<button id="dashboard" class="secondary">Öppna Dokumentbibliotek</button>
+<button id="dashboard" class="secondary" data-i18n="recorder.openLibrary">Öppna Dokumentbibliotek</button>
 <details class="technical-tools">
-  <summary>Tekniska verktyg</summary>
-  <button id="debug" class="debug">Öppna debugpanel</button>
+  <summary data-i18n="recorder.tools">Tekniska verktyg</summary>
+  <button id="debug" class="debug" data-i18n="recorder.openDebug">Öppna debugpanel</button>
 </details>
 <p id="message" class="message" role="status" aria-live="polite"
   aria-atomic="true"></p>
@@ -96,6 +96,7 @@ dialog{width:calc(100% - 36px);box-sizing:border-box;border:1px solid #8392a5;bo
 </dialog>
 </main>
 <script src="async-operations.js"></script>
+<script src="i18n.js"></script>
 <script src="popup.js"></script>
 </body>
 </html>

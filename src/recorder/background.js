@@ -54,6 +54,7 @@ const pageKnowledgePacksReady = globalThis.T9PageIdentificationEngine
   });
 
 const DEFAULT_SETTINGS = {
+  uiLocale: "sv-SE",
   exportFileNamePattern: "{process} - {environment} - {date}",
   documentationProfile: "generic",
   defaultExpectedResult:
@@ -2145,6 +2146,15 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
         const settings = { ...DEFAULT_SETTINGS, ...(message.settings || {}) };
         await chrome.storage.local.set({ [SETTINGS_KEY]: settings });
         sendResponse({ ok: true, settings });
+        break;
+      }
+
+      case "T9_SAVE_UI_LOCALE": {
+        const data = await chrome.storage.local.get(SETTINGS_KEY);
+        const settings = { ...DEFAULT_SETTINGS, ...(data[SETTINGS_KEY] || {}),
+          uiLocale: message.uiLocale === "en-US" ? "en-US" : "sv-SE" };
+        await chrome.storage.local.set({ [SETTINGS_KEY]: settings });
+        sendResponse({ ok: true, uiLocale: settings.uiLocale });
         break;
       }
 

@@ -220,14 +220,24 @@ table{width:100%;border-collapse:collapse}th,td{text-align:left;padding:9px;bord
 </head>
 <body>
 <h1>BC Process Studio <small>by Thinknine · v4.7.0</small></h1>
-<p class="muted">Business Process Intelligence for Microsoft Dynamics 365 Business Central.</p>
-<p><strong>Turn Business Central processes into knowledge.</strong> Capture. Document. Improve.</p>
+<p class="muted" data-i18n="app.tagline">Business Process Intelligence för Microsoft Dynamics 365 Business Central.</p>
+<p><strong data-i18n="app.promise">Gör Business Central-processer till kunskap.</strong>
+  <span data-i18n="app.promiseDetail">Spela in. Dokumentera. Förbättra.</span></p>
 
 <details id="settingsPanel" class="settings-panel">
-<summary>Inställningar för dokumentation, export och inspelning</summary>
+<summary data-i18n="settings.summary">Inställningar för dokumentation, export och inspelning</summary>
 <div class="settings-panel-body">
 <fieldset>
 <legend>Dokumentation</legend>
+
+<label for="uiLocale" data-i18n="settings.language">Gränssnittsspråk</label>
+<select id="uiLocale" aria-describedby="uiLocaleHelp">
+  <option value="sv-SE">Svenska</option>
+  <option value="en-US">English</option>
+</select>
+<p id="uiLocaleHelp" class="muted" data-i18n="settings.languageHelp">
+  Ändrar språket i BC Process Studio. Inspelat innehåll och dokument påverkas inte.
+</p>
 
 <input id="documentationProfile" type="hidden" value="generic">
 <div id="profileHelp" hidden></div>
@@ -318,7 +328,7 @@ table{width:100%;border-collapse:collapse}th,td{text-align:left;padding:9px;bord
 <label for="maxEvents">Maximalt antal händelser</label>
 <input id="maxEvents" type="number" min="100" max="50000">
 
-<button id="save" class="primary">Spara inställningar</button>
+<button id="save" class="primary" data-i18n="settings.save">Spara inställningar</button>
 </fieldset>
 </div>
 </details>
@@ -740,6 +750,7 @@ table{width:100%;border-collapse:collapse}th,td{text-align:left;padding:9px;bord
 <script src="document-workspace-view.js"></script>
 <script src="document-workspace-experience.js"></script>
 <script src="document-library-view.js"></script>
+<script src="i18n.js"></script>
 <script src="dashboard.js"></script>
 </body>
 </html>

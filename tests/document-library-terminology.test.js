@@ -9,9 +9,8 @@ const popupScript = read("src/ui/popup.js");
 const dashboardHtml = read("src/ui/dashboard.html");
 const libraryView = read("src/ui/document-library-view.js");
 
-assert(popupHtml.includes(
-  '<button id="dashboard" class="secondary">Öppna Dokumentbibliotek</button>'
-));
+assert.match(popupHtml,
+  /id="dashboard"[^>]*data-i18n="recorder\.openLibrary"[^>]*>Öppna Dokumentbibliotek<\/button>/);
 assert(!popupHtml.includes("Öppna Documentation Excellence"));
 assert(popupScript.includes('$("dashboard").addEventListener("click"') &&
   popupScript.includes("chrome.runtime.openOptionsPage()"),
