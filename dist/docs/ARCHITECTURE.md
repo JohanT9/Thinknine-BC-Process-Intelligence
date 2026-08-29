@@ -865,6 +865,8 @@ is bounded metadata only. See [PROCESS_VERSIONING.md](PROCESS_VERSIONING.md).
 Regeneration starts only from a detached Canonical Recording and calls the
 existing interpretation owners once. Fresh generated state is reconciled with
 authoritative consultant state before validation and atomic pointer replacement.
+Review Studio renders that dry-run as an inspectable change set and requires an
+explicit approval before replacement. A safety-blocked preview cannot apply.
 See [REGENERATE_FROM_RECORDING.md](REGENERATE_FROM_RECORDING.md).
 
 ## Application Insights enrichment boundary (4.6)

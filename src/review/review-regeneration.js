@@ -38,6 +38,60 @@
     return reasons;
   }
 
+  function stepId(step) {
+    return String(step?.taskId || step?.stepId || "");
+  }
+
+  function screenshotIds(step) {
+    return [...new Set([
+      step?.selectedScreenshotAssetId,
+      step?.screenshot,
+      ...(Array.isArray(step?.screenshots) ? step.screenshots : []),
+      ...(Array.isArray(step?.sourceScreenshotAssetIds)
+        ? step.sourceScreenshotAssetIds : [])
+    ].filter(Boolean).map(String))].sort();
+  }
+
+  function summary(step) {
+    return Object.freeze({ stepId: stepId(step),
+      instruction: String(step?.instruction || step?.description || ""),
+      screenshotIds: Object.freeze(screenshotIds(step)) });
+  }
+
+  function changeSet(previousTasks, nextTasks, stepMap) {
+    const oldById = new Map(previousTasks.map(step => [stepId(step), step]));
+    const newById = new Map(nextTasks.map(step => [stepId(step), step]));
+    const added = stepMap.addedStepIds.map(id => summary(newById.get(id)));
+    const removed = stepMap.removedStepIds.map(id => summary(oldById.get(id)));
+    const changed = [];
+    const screenshotChanges = [];
+    for (const mapping of stepMap.mappings.filter(item =>
+      item.mappingType === "one-to-one")) {
+      const before = summary(oldById.get(mapping.oldStepIds[0]));
+      const after = summary(newById.get(mapping.newStepIds[0]));
+      if (before.instruction !== after.instruction) changed.push(Object.freeze({
+        before, after, strategy: mapping.strategy
+      }));
+      if (JSON.stringify(before.screenshotIds) !==
+          JSON.stringify(after.screenshotIds)) screenshotChanges.push(Object.freeze({
+        before, after, strategy: mapping.strategy
+      }));
+    }
+    const mapped = type => stepMap.mappings.filter(item =>
+      item.mappingType === type).map(item => Object.freeze({
+        before: Object.freeze(item.oldStepIds.map(id => summary(oldById.get(id)))),
+        after: Object.freeze(item.newStepIds.map(id => summary(newById.get(id)))),
+        strategy: item.strategy
+      }));
+    return Object.freeze({
+      added: Object.freeze(added), removed: Object.freeze(removed),
+      changed: Object.freeze(changed),
+      screenshotChanges: Object.freeze(screenshotChanges),
+      splits: Object.freeze(mapped("one-to-many")),
+      merges: Object.freeze(mapped("many-to-one"))
+    });
+  }
+
   function preview(currentReview, session, generatedTasks) {
     if (!currentReview || !session) {
       throw new TypeError("Review regeneration requires a Review and recording session.");
@@ -55,6 +109,7 @@
     const consolidated = stepMap.mappings.filter(item =>
       item.mappingType === "many-to-one"
     ).reduce((count, item) => count + Math.max(0, item.oldStepIds.length - 1), 0);
+    const changes = changeSet(previousTasks, freshReview.generatedTasks, stepMap);
     return Object.freeze({
       blocked: reasons.length > 0,
       blockingReasons: Object.freeze(reasons),
@@ -63,6 +118,11 @@
       consolidatedStepCount: consolidated,
       addedStepCount: stepMap.addedStepIds.length,
       removedStepCount: stepMap.removedStepIds.length,
+      changedStepCount: changes.changed.length,
+      screenshotChangeCount: changes.screenshotChanges.length,
+      splitStepCount: changes.splits.length,
+      mergeStepCount: changes.merges.length,
+      changeSet: changes,
       mappings: stepMap.mappings,
       freshReview
     });

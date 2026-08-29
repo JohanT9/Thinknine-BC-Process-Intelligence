@@ -151,6 +151,10 @@ consultant edits and a dry-run/atomic-apply contract. Uncertain mappings are
 preserved for review rather than guessed. See
 [docs/REGENERATE_FROM_RECORDING.md](docs/REGENERATE_FROM_RECORDING.md).
 
+Review Studio presents the dry-run as a detailed comparison of added, removed,
+changed, merged, split, and screenshot-changed Steps. Nothing is applied until
+the consultant explicitly approves the preview.
+
 ## Process Versioning
 
 Consultants can create intentional immutable Process Model snapshots, detect

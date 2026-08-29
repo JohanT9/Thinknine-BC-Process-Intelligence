@@ -617,6 +617,30 @@ table{width:100%;border-collapse:collapse}th,td{text-align:left;padding:9px;bord
   <footer><button id="closeDocumentViewSettings" class="primary">Klar</button></footer>
 </dialog>
 
+<dialog id="regenerationPreviewDialog" class="regeneration-preview-dialog"
+  aria-labelledby="regenerationPreviewTitle"
+  aria-describedby="regenerationPreviewDescription">
+  <form method="dialog">
+    <header>
+      <h3 id="regenerationPreviewTitle">F&ouml;rhandsgranska regenerering</h3>
+      <p id="regenerationPreviewDescription" class="muted">
+        Granska vad som &auml;ndras innan dokumentationen uppdateras.
+      </p>
+    </header>
+    <div id="regenerationPreviewSummary" class="regeneration-preview-summary"
+      aria-live="polite"></div>
+    <div id="regenerationPreviewChanges" class="regeneration-preview-changes"></div>
+    <p id="regenerationPreviewWarning" class="regeneration-preview-warning"
+      role="alert" hidden></p>
+    <footer>
+      <button value="cancel" class="secondary">Avbryt</button>
+      <button id="applyRegenerationPreview" value="apply" class="primary">
+        Godk&auml;nn och regenerera
+      </button>
+    </footer>
+  </form>
+</dialog>
+
 <script src="engine/page-identity.js"></script>
 <script src="engine/page-identification-engine.js"></script>
 <script src="engine/bc-ui-identification.js"></script>

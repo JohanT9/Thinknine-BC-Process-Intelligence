@@ -23,6 +23,13 @@ assert.strictEqual(preview.blocked, false);
 assert.strictEqual(preview.previousStepCount, 4);
 assert.strictEqual(preview.nextStepCount, 1);
 assert.strictEqual(preview.consolidatedStepCount, 3);
+assert.strictEqual(preview.mergeStepCount, 1);
+assert.strictEqual(preview.changeSet.merges.length, 1);
+assert.deepStrictEqual(preview.changeSet.merges[0].before.map(step => step.stepId),
+  ["menu-actions", "menu-function", "manual-price", "manual-price-copy"]);
+assert.deepStrictEqual(preview.changeSet.merges[0].after.map(step => step.stepId),
+  ["manual-price-path"]);
+assert(Object.isFrozen(preview.changeSet));
 
 const updated = regeneration.apply(oldReview, preview, {
   now: "2026-08-27T10:00:00.000Z"
@@ -45,5 +52,23 @@ const empty = regeneration.preview(oldReview, session, []);
 assert.strictEqual(empty.blocked, true,
   "A non-empty stored Review must never be replaced by an empty interpretation.");
 assert(empty.blockingReasons.includes("empty-generated-result"));
+
+const changedReview = review.createReview(session, [{ taskId: "same-step",
+  instruction: "Old instruction", screenshot: "old.png",
+  sourceEventIds: ["event-1"] }]);
+const changedPreview = regeneration.preview(changedReview, session, [{
+  taskId: "same-step", instruction: "New instruction", screenshot: "new.png",
+  sourceEventIds: ["event-1"]
+}]);
+assert.strictEqual(changedPreview.changedStepCount, 1);
+assert.strictEqual(changedPreview.screenshotChangeCount, 1);
+assert.strictEqual(changedPreview.changeSet.changed[0].before.instruction,
+  "Old instruction");
+assert.strictEqual(changedPreview.changeSet.changed[0].after.instruction,
+  "New instruction");
+assert.deepStrictEqual(changedPreview.changeSet.screenshotChanges[0]
+  .before.screenshotIds, ["old.png"]);
+assert.deepStrictEqual(changedPreview.changeSet.screenshotChanges[0]
+  .after.screenshotIds, ["new.png"]);
 
 console.log("Review regeneration UI adapter tests passed.");

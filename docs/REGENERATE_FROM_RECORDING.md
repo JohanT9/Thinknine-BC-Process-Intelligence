@@ -148,10 +148,16 @@ Map-based matching is linear or near-linear for normal recordings and has a
 render Word, call external services, upload data, or use AI.
 
 Review Studio exposes **Regenerera frÃ¥n inspelning** under **Fler Ã¥tgÃ¤rder**.
-The command previews the generated Step count, asks for explicit confirmation,
-reuses the already loaded current interpretation, replaces the generated Review
-baseline and persists it before reporting success. It never changes Canonical
-Recording evidence and no new recording is required.
+The command opens an accessible, non-destructive comparison before apply. It
+shows current/next counts and lists added, removed, changed, merged, split, and
+screenshot-changed Steps. The user must explicitly approve the preview; Cancel
+and Escape leave the Review unchanged. A blocked preview explains the safety
+reason and offers no apply action.
+
+The preview reuses the already loaded current interpretation, replaces the
+generated Review baseline only after approval, and persists it before reporting
+success. It never changes Canonical Recording evidence and no new recording is
+required.
 
 The first UI integration is deliberately conservative: when consultant-owned
 Step edits, approvals, manual Steps, structure overrides, Notes, Annotations or

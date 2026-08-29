@@ -6712,6 +6712,68 @@ $("compactReviewSteps").addEventListener("click", () => {
 $("addReviewStep").addEventListener("click", () => {
   addManualInformationStep(undefined);
 });
+
+function regenerationStepLabel(step) {
+  return String(step?.instruction || "").trim() ||
+    `Steg ${String(step?.stepId || "utan namn")}`;
+}
+
+function regenerationChangeGroup(title, items) {
+  if (!items.length) return "";
+  return `<section class="regeneration-preview-group"><h4>${escapeHtml(title)}</h4>` +
+    `<ul>${items.map(item => `<li>${escapeHtml(item)}</li>`).join("")}</ul></section>`;
+}
+
+function regenerationBlockingMessage(reasons = []) {
+  if (reasons.includes("empty-generated-result")) {
+    return "Den nya tolkningen gav inga steg. Den sparade granskningen kommer inte att \u00e4ndras.";
+  }
+  return "Granskningen inneh\u00e5ller manuella \u00e4ndringar som inte kan flyttas s\u00e4kert. Regenereringen \u00e4r blockerad s\u00e5 att inget konsultarbete skrivs \u00f6ver.";
+}
+
+function showRegenerationPreview(preview) {
+  const dialog = $("regenerationPreviewDialog");
+  const changes = preview.changeSet || {};
+  const stats = [
+    [preview.previousStepCount, "Nuvarande"],
+    [preview.nextStepCount, "Efter"],
+    [preview.addedStepCount, "Tillagda"],
+    [preview.removedStepCount, "Borttagna"],
+    [preview.changedStepCount, "\u00c4ndrade"],
+    [preview.screenshotChangeCount, "Nya bilder"]
+  ];
+  $("regenerationPreviewSummary").innerHTML = stats.map(([value, label]) =>
+    `<div class="regeneration-preview-stat"><strong>${Number(value) || 0}</strong>` +
+      `<span>${escapeHtml(label)}</span></div>`).join("");
+  const groups = [
+    regenerationChangeGroup("Tillagda steg", (changes.added || [])
+      .map(regenerationStepLabel)),
+    regenerationChangeGroup("Borttagna steg", (changes.removed || [])
+      .map(regenerationStepLabel)),
+    regenerationChangeGroup("\u00c4ndrad instruktion", (changes.changed || [])
+      .map(item => `${regenerationStepLabel(item.before)} \u2192 ${regenerationStepLabel(item.after)}`)),
+    regenerationChangeGroup("Sammanslagna steg", (changes.merges || [])
+      .map(item => `${item.before.map(regenerationStepLabel).join(" + ")} \u2192 ${item.after.map(regenerationStepLabel).join(" + ")}`)),
+    regenerationChangeGroup("Delade steg", (changes.splits || [])
+      .map(item => `${item.before.map(regenerationStepLabel).join(" + ")} \u2192 ${item.after.map(regenerationStepLabel).join(" + ")}`)),
+    regenerationChangeGroup("Bytt sk\u00e4rmbild", (changes.screenshotChanges || [])
+      .map(item => regenerationStepLabel(item.after)))
+  ].filter(Boolean);
+  $("regenerationPreviewChanges").innerHTML = groups.join("") ||
+    `<p class="muted">Inga inneh\u00e5lls\u00e4ndringar uppt\u00e4cktes.</p>`;
+  const warning = $("regenerationPreviewWarning");
+  warning.hidden = !preview.blocked;
+  warning.textContent = preview.blocked
+    ? regenerationBlockingMessage(preview.blockingReasons) : "";
+  $("applyRegenerationPreview").hidden = preview.blocked;
+  $("applyRegenerationPreview").disabled = preview.blocked;
+  dialog.returnValue = "cancel";
+  dialog.showModal();
+  return new Promise(resolve => dialog.addEventListener("close", () => {
+    resolve(dialog.returnValue === "apply" && !preview.blocked);
+  }, { once: true }));
+}
+
 $("regenerateReview").addEventListener("click", async () => {
   if (!activeReview || !activeReviewSession || !activeReviewModel) return;
   try {
@@ -6720,20 +6782,9 @@ $("regenerateReview").addEventListener("click", async () => {
       activeReviewSession,
       activeReviewModel.businessTasks
     );
-    if (preview.blocked) {
-      const emptyResult = preview.blockingReasons.includes(
-        "empty-generated-result"
-      );
-      show(emptyResult
-        ? "Regenereringen avbr\u00f6ts eftersom den nya tolkningen inte gav n\u00e5gra steg. Den sparade granskningen har inte \u00e4ndrats."
-        : "Granskningen inneh\u00e5ller manuella \u00e4ndringar. Regenereringen avbr\u00f6ts s\u00e5 att inget konsultarbete skrivs \u00f6ver.", true);
-      return;
-    }
-    const summary = preview.consolidatedStepCount > 0
-      ? ` ${preview.consolidatedStepCount} dubbla steg sl\u00e5s samman.`
-      : "";
-    if (!confirm(`Regenerera dokumentationen fr\u00e5n den befintliga inspelningen? ` +
-        `${preview.previousStepCount} steg blir ${preview.nextStepCount}.${summary}`)) {
+    if (!await showRegenerationPreview(preview)) {
+      if (preview.blocked) show(regenerationBlockingMessage(
+        preview.blockingReasons), true);
       return;
     }
     activeReview = globalThis.T9ReviewRegeneration.apply(activeReview, preview);

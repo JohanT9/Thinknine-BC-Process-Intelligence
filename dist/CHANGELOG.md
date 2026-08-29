@@ -11,6 +11,10 @@
 
 ## Unreleased
 
+- Replaced the one-line regeneration confirmation with an accessible safe
+  preview that lists added, removed, changed, merged, split, and screenshot-
+  changed Steps. Blocked previews explain why and cannot be applied.
+
 - Added deterministic interaction-result verification for navigation, dialogs,
   changed values, selections, toggles, and Business Central errors. Review
   Studio shows the observed outcome while preserving raw evidence and leaving
