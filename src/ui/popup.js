@@ -12,7 +12,6 @@ const tf = (key, values) => globalThis.T9UiI18n.format(key, values, currentUiLoc
 
 function updateLanguageSwitch() {
   const isEnglish = currentUiLocale === "en-US";
-  updateText($("languageFlag"), isEnglish ? "🇬🇧" : "🇸🇪");
   updateText($("languageCode"), isEnglish ? "EN" : "SV");
   const label = t(isEnglish
     ? "language.switchToSwedish" : "language.switchToEnglish");

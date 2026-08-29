@@ -47,6 +47,7 @@ assert.match(dashboard, /uiTf\("document\.page"/);
 assert.match(dashboard, /type: "T9_SAVE_UI_LOCALE", uiLocale/);
 assert.match(popup, /T9_GET_SETTINGS/);
 assert.match(popupHtml, /id="languageSwitch"/);
+assert.doesNotMatch(popupHtml, /id="languageFlag"/);
 assert.match(popup, /T9_SAVE_UI_LOCALE/);
 assert.match(popup, /function switchUiLocale\(\)/);
 assert.equal(i18n.translate("language.switchToEnglish", "sv-SE"),
