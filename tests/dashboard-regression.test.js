@@ -72,6 +72,12 @@ assert.ok(
   "Document Library must use lightweight metadata storage and bounded rendering."
 );
 assert.ok(
+  dashboard.includes('const value = (id, fallback = "") => $(id)?.value ?? fallback;') &&
+    dashboard.includes('$(id)?.addEventListener(id === "librarySearch"') &&
+    dashboard.includes("if (!select) return;"),
+  "Document Library initialization must tolerate an already-open dashboard using older markup."
+);
+assert.ok(
   dashboard.includes("T9DocumentBatchOperations") &&
     dashboard.includes("async function exportLibraryDocument") &&
     dashboard.includes("composeDocumentMedia(pipeline, review, screenshotSources)") &&

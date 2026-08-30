@@ -11,6 +11,9 @@
 
 ## Unreleased
 
+- Fixed Document Library startup after an extension update when an already-open
+  dashboard still has older filter markup. Missing optional controls now use
+  safe defaults instead of stopping library rendering.
 - Centralized UI and document language registration so another fully translated language can be added without changing each consumer. Swedish and English remain active.
 - Added persistent recorder interaction identity from pointer, keyboard, and field actions through Canonical Recording, normalization, Step Group capture packets, and observed outcomes. Historical recordings retain deterministic compatibility grouping.
 - Stabilized Capture Packets across React/control-add-in framework noise, added explicit interaction/result/supporting evidence roles, preferred verified-result screenshots over later transient captures, and preserved packet identity through Semantic Actions and Review tasks.

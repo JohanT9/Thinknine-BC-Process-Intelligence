@@ -2628,13 +2628,14 @@ async function loadSettings() {
     }
   }
 
-  $("documentationProfile").value =
-    settings.documentationProfile ||
-    DEFAULTS.documentationProfile ||
-    "generic";
+  const documentationProfile = $("documentationProfile");
+  if (documentationProfile) {
+    documentationProfile.value = settings.documentationProfile ||
+      DEFAULTS.documentationProfile || "generic";
+  }
 
   applyProfile(
-    $("documentationProfile").value,
+    documentationProfile?.value || DEFAULTS.documentationProfile || "generic",
     false
   );
   updateFilenamePreview();
@@ -3464,26 +3465,29 @@ async function persistDocumentLibrary() {
 }
 
 function libraryOptions() {
+  const value = (id, fallback = "") => $(id)?.value ?? fallback;
+  const checked = id => $(id)?.checked === true;
   return {
-    search: $("librarySearch").value,
-    sort: $("librarySort").value,
+    search: value("librarySearch"),
+    sort: value("librarySort", "modified"),
     filters: {
-      profile: $("libraryProfileFilter").value,
-      theme: $("libraryThemeFilter").value,
-      health: $("libraryHealthFilter").value,
-      documentLanguage: $("libraryLanguageFilter").value,
-      favourite: $("libraryFavouriteFilter").checked,
-      recent: $("libraryRecentFilter").checked,
-      created: { from: $("libraryCreatedFrom").value,
-        to: $("libraryCreatedTo").value },
-      modified: { from: $("libraryModifiedFrom").value,
-        to: $("libraryModifiedTo").value }
+      profile: value("libraryProfileFilter"),
+      theme: value("libraryThemeFilter"),
+      health: value("libraryHealthFilter"),
+      documentLanguage: value("libraryLanguageFilter"),
+      favourite: checked("libraryFavouriteFilter"),
+      recent: checked("libraryRecentFilter"),
+      created: { from: value("libraryCreatedFrom"),
+        to: value("libraryCreatedTo") },
+      modified: { from: value("libraryModifiedFrom"),
+        to: value("libraryModifiedTo") }
     }
   };
 }
 
 function fillLibraryFilter(id, values, selected) {
   const select = $(id);
+  if (!select) return;
   const first = select.options[0];
   select.innerHTML = "";
   select.appendChild(first);
@@ -3555,11 +3559,11 @@ function refreshLibraryFilters() {
     health.add(record.health.overall);
   });
   fillLibraryFilter("libraryProfileFilter", [...profiles],
-    $("libraryProfileFilter").value);
+    $("libraryProfileFilter")?.value || "");
   fillLibraryFilter("libraryThemeFilter", [...themes],
-    $("libraryThemeFilter").value);
+    $("libraryThemeFilter")?.value || "");
   fillLibraryFilter("libraryHealthFilter", [...health].sort().map(value =>
-    [value, healthStatusLabel(value)]), $("libraryHealthFilter").value);
+    [value, healthStatusLabel(value)]), $("libraryHealthFilter")?.value || "");
 }
 
 async function loadDocumentLibrary(sessions) {
@@ -7075,7 +7079,7 @@ for (const id of ["librarySearch", "libraryProfileFilter",
   "libraryFavouriteFilter", "libraryRecentFilter", "libraryGroupProfiles",
   "libraryCreatedFrom", "libraryCreatedTo", "libraryModifiedFrom",
   "libraryModifiedTo"]) {
-  $(id).addEventListener(id === "librarySearch" ? "input" : "change",
+  $(id)?.addEventListener(id === "librarySearch" ? "input" : "change",
     renderDocumentLibrary);
 }
 $("librarySearch").addEventListener("keydown", event => {
@@ -7376,9 +7380,12 @@ async function initializeDashboard() {
       }
     }
 
-    $("documentationProfile").value =
-      DEFAULTS.documentationProfile || "generic";
-    applyProfile($("documentationProfile").value, false);
+    const documentationProfile = $("documentationProfile");
+    if (documentationProfile) {
+      documentationProfile.value = DEFAULTS.documentationProfile || "generic";
+    }
+    applyProfile(documentationProfile?.value ||
+      DEFAULTS.documentationProfile || "generic", false);
     updateFilenamePreview();
     show(
       "Inställningarna kunde inte läsas. Standardvärden visas.",

@@ -1,5 +1,9 @@
 # BC Process Studio 4.7
 
+- Fixed a Document Library startup error (`Cannot read properties of null`) when
+  an open dashboard and the updated extension temporarily use different markup
+  versions. The library now opens with safe filter defaults.
+
 ## Capture Packet-aware screenshot selection
 
 - Screenshot Selection now uses the stable interaction/result/supporting image
