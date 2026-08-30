@@ -278,6 +278,10 @@ and `combobox`; it does not inspect React Fiber, patch the page world, poll the
 DOM, or classify business meaning.
 
 Each accepted Raw Event may carry additive `captureSurface` evidence with the
+selected mode, deterministic version, confidence, and observable activation
+signals. Version 1.1 also recognizes standard ARIA add-in surfaces (`switch`,
+`treeitem`, `slider`, `combobox`, and presentation wrappers) when proprietary
+React/MUI markers are absent. Native controls remain on the standard BC path.
 mode version, matched signals, and deterministic confidence. Canonical
 Recording preserves this evidence in the original raw event. Semantic
 classification remains downstream, and absence of mode evidence remains fully

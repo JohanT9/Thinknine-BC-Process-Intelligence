@@ -11,6 +11,9 @@
 
 ## Unreleased
 
+- Extended automatic Control Add-in capture activation to observable ARIA
+  surfaces such as switches, trees, sliders, and comboboxes even when a custom
+  React application exposes no MUI class or proprietary add-in marker.
 - Fixed Document Library startup after an extension update when an already-open
   dashboard still has older filter markup. Missing optional controls now use
   safe defaults instead of stopping library rendering.

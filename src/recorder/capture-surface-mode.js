@@ -4,7 +4,7 @@
   root.T9CaptureSurfaceMode = api;
 })(typeof globalThis !== "undefined" ? globalThis : this, function () {
   "use strict";
-  const VERSION = "1.0.0";
+  const VERSION = "1.1.0";
   const STANDARD = "standard-bc";
   const ENHANCED = "control-addin";
   const ENHANCED_ROLES = Object.freeze(["switch", "treeitem", "slider",
@@ -19,9 +19,13 @@
     if (input.reactRoot === true) signals.push("react-root-marker");
     if (input.materialUi === true) signals.push("material-ui-marker");
     if (input.automationMetadata === true) signals.push("automation-metadata");
+    if (supportsEnhancedRole(input.enhancedRole)) {
+      signals.push("enhanced-aria-role");
+    }
     const enhanced = signals.includes("control-addin-marker") ||
       signals.includes("control-addin-frame-path") ||
       signals.includes("react-root-marker") || signals.includes("material-ui-marker") ||
+      signals.includes("enhanced-aria-role") ||
       (signals.includes("nested-frame") && signals.includes("automation-metadata"));
     return Object.freeze({ version: VERSION, mode: enhanced ? ENHANCED : STANDARD,
       enhanced, signals: Object.freeze(signals), confidence: enhanced ? 0.9 : 1 });

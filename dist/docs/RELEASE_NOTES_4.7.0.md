@@ -1,5 +1,9 @@
 # BC Process Studio 4.7
 
+- Custom React and Control Add-in surfaces using observable ARIA switches,
+  trees, sliders, comboboxes, or presentation wrappers now activate the existing
+  enhanced capture mode even without MUI classes or proprietary markers.
+
 - Fixed a Document Library startup error (`Cannot read properties of null`) when
   an open dashboard and the updated extension temporarily use different markup
   versions. The library now opens with safe filter defaults.

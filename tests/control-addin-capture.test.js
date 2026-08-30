@@ -41,6 +41,16 @@ assert.strictEqual(surfaceMode.detect({ frameDepth: 1,
   controlAddInPath: true }).mode, "control-addin");
 assert.strictEqual(surfaceMode.detect({ materialUi: true }).mode, "control-addin");
 assert.strictEqual(surfaceMode.detect({ reactRoot: true }).mode, "control-addin");
+for (const role of ["switch", "treeitem", "slider", "combobox"]) {
+  const detected = surfaceMode.detect({ enhancedRole: role });
+  assert.strictEqual(detected.mode, "control-addin",
+    `observable ARIA ${role} controls should activate control-addin mode`);
+  assert.ok(detected.signals.includes("enhanced-aria-role"));
+}
+assert.strictEqual(surfaceMode.detect({ enhancedRole: "presentation" }).mode,
+  "control-addin", "a presentation wrapper may expose the add-in surface");
+assert.strictEqual(surfaceMode.detect({ enhancedRole: "button" }).mode,
+  "standard-bc", "native controls remain on the standard BC path");
 assert.strictEqual(surfaceMode.supportsEnhancedRole("switch"), true);
 assert.strictEqual(surfaceMode.supportsEnhancedRole("button"), false,
   "native roles remain owned by standard target resolution");
@@ -57,6 +67,7 @@ assert.deepStrictEqual(surfaceResult.signals,
 assert.strictEqual(surfaceMode.detect({ frameDepth: "invalid" }).mode,
   "standard-bc", "malformed optional evidence must fall back safely");
 assert(content.includes("surfaceSignals"));
+assert(content.includes("enhancedRole: pathRole"));
 assert(content.includes("captureSurface,"));
 assert(content.includes("right.score - left.score"));
 assert(content.includes("catch { return -1; }"));

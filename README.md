@@ -150,6 +150,10 @@ DOM- och rammetadata. Ett avgränsat förstärkt fångstläge hanterar fler
 tillgänglighetsroller utan att ändra fångsten i vanliga Business Central-vyer.
 Ingen React-intern data, OCR eller extern kommunikation används.
 
+Egna Control Add-ins kan dessutom aktivera det förstärkta fångstläget genom
+standardiserade ARIA-roller som `switch`, `treeitem`, `slider` och `combobox`.
+Det kräver inga MUI-klasser eller leverantörsspecifika attribut.
+
 ## Interaction result verification
 
 Capture packets retain deterministic observed outcomes after an action:

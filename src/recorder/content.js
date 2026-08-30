@@ -554,6 +554,11 @@
     if (!(element instanceof Element)) return surfaceModeApi.detect({
       frameDepth: getFrameDepth() });
     const classes = String(element.className || "");
+    const enhancedRoleTarget = element.closest?.(
+      '[role="switch"],[role="treeitem"],[role="slider"],' +
+      '[role="combobox"],[role="presentation"]'
+    );
+    const pathRole = enhancedRoleTarget?.getAttribute?.("role") || "";
     const root = element.closest?.("[data-reactroot],[data-react-root]," +
       "[data-control-addin],[class*='controladdin' i]");
     return surfaceModeApi.detect({
@@ -565,6 +570,7 @@
       reactRoot: Boolean(root?.hasAttribute?.("data-reactroot") ||
         root?.hasAttribute?.("data-react-root")),
       materialUi: /Mui[A-Z]/.test(classes) || Boolean(element.closest?.("[class*='Mui']")),
+      enhancedRole: pathRole,
       automationMetadata: ["data-testid", "data-automation-id", "data-control-id",
         "data-control-name"].some(name => element.hasAttribute(name))
     });
