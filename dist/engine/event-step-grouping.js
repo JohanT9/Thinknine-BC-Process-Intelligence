@@ -5,7 +5,7 @@
 })(typeof globalThis !== "undefined" ? globalThis : this, function () {
   "use strict";
   const SCHEMA_VERSION = 1;
-  const GROUPING_VERSION = "1.4.0";
+  const GROUPING_VERSION = "1.5.0";
   const CAPTURE_PACKET_VERSION = "1.3.0";
   const RESULT_VERIFICATION_VERSION = "1.0.0";
   const cache = new WeakMap();
@@ -344,8 +344,12 @@
       .filter(event => !assignments.has(event.normalizedEventId) && !isNoise(event))
       .map(event => event.normalizedEventId);
     const resolvedGroups = groups.map(group => {
-      const directives = guidanceEvents.filter(event =>
-        group.sourceEventIds.includes(event.guidance?.targetSourceEventId));
+      const directives = guidanceEvents.filter(event => {
+        const targetInteractionId = event.guidance?.targetInteractionId;
+        return Boolean(targetInteractionId &&
+          group.interactionIds?.includes(targetInteractionId)) ||
+          group.sourceEventIds.includes(event.guidance?.targetSourceEventId);
+      });
       if (!directives.length) return group;
       const kinds = new Set(directives.map(event => event.guidance?.kind));
       const requestedImage = [...directives].reverse().map(event =>

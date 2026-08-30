@@ -51,7 +51,7 @@ exposes plural `interactionEventIds`, `resultEventIds`, and structured
 `screenshotEvidence`. A screenshot attached to verified result evidence is the
 packet preference; a later framework/supporting capture cannot displace it.
 
-Algorithm version is `1.4.0`. IDs use the version plus collision-safe,
+Algorithm version is `1.5.0`. IDs use the version plus collision-safe,
 length-prefixed canonical source IDs. They do not use random values, execution
 time, Review order, export state, or captions.
 

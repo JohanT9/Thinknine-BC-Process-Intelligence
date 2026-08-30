@@ -11,7 +11,7 @@
 ) {
   "use strict";
   const SCHEMA_VERSION = 1;
-  const NORMALIZATION_VERSION = "2.3.0";
+  const NORMALIZATION_VERSION = "2.4.0";
   const cache = new WeakMap();
   const clone = value => value == null ? value : JSON.parse(JSON.stringify(value));
   function freeze(value) { if (!value || typeof value !== "object" || Object.isFrozen(value)) return value; Object.values(value).forEach(freeze); return Object.freeze(value); }
@@ -118,6 +118,7 @@
       guidance: kind === "capture-guidance" ? clone({
         kind: raw.guidanceKind,
         targetSourceEventId: raw.targetSourceEventId,
+        targetInteractionId: raw.targetInteractionId || undefined,
         preferredScreenshotAssetId: raw.preferredScreenshotAssetId || undefined
       }) : null,
       screenshotAssetIds: [...new Set(sources.map(item =>

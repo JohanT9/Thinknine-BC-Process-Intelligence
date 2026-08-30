@@ -11,6 +11,10 @@
 
 ## Unreleased
 
+- Bound in-recording guidance commands to stable recorder interaction identity,
+  preventing React and Control Add-in support events from moving an important,
+  image, section, or ignore marker to the wrong Step Group. Canonical Event ID
+  targeting remains available for historical recordings.
 - Extended automatic Control Add-in capture activation to observable ARIA
   surfaces such as switches, trees, sliders, and comboboxes even when a custom
   React application exposes no MUI class or proprietary add-in marker.

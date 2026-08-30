@@ -873,9 +873,12 @@ async function recordCaptureGuidance(kind, sender = {}) {
       "screenshot registrations before image guidance");
   }
   const recording = await getCanonicalRecording(state.sessionId);
-  const target = [...(recording.events || [])].reverse().find(event =>
+  const candidates = [...(recording.events || [])].reverse().filter(event =>
     event.raw?.type !== "capture-guidance");
+  const target = candidates.find(event =>
+    event.raw?.interactionId || event.interaction?.id) || candidates[0];
   if (!target) throw new Error("Registrera ett steg innan du markerar det.");
+  const targetInteractionId = target.raw?.interactionId || target.interaction?.id || "";
   const preferredScreenshotAssetId = target.screenshotAssetId || "";
   if (kind === "use-image" && !preferredScreenshotAssetId) {
     throw new Error("Det finns \u00e4nnu ingen bild f\u00f6r det senaste steget.");
@@ -883,12 +886,14 @@ async function recordCaptureGuidance(kind, sender = {}) {
   const recorded = await recordEvent({
     type: "capture-guidance", category: "guidance", guidanceKind: kind,
     targetSourceEventId: target.id,
+    ...(targetInteractionId ? { targetInteractionId } : {}),
     ...(preferredScreenshotAssetId ? { preferredScreenshotAssetId } : {}),
     source: "recording-indicator"
   }, { tabId: sender.tab?.id, frameId: sender.frameId,
     parentFrameId: sender.parentFrameId, documentId: sender.documentId,
     origin: sender.origin || sender.url });
   return { targetSourceEventId: target.id,
+    targetInteractionId: targetInteractionId || undefined,
     markerSourceEventId: recorded?.canonicalEvent?.id || "",
     preferredScreenshotAssetId: preferredScreenshotAssetId || undefined };
 }

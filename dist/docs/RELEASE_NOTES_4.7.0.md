@@ -1,5 +1,10 @@
 # BC Process Studio 4.7
 
+- In-recording commands such as **Important step**, **Use this image**, **New
+  section**, and **Ignore** now follow the complete stable interaction packet.
+  React and Control Add-in support events can no longer redirect a marker to the
+  wrong documentation step, while historical recordings remain compatible.
+
 - Custom React and Control Add-in surfaces using observable ARIA switches,
   trees, sliders, comboboxes, or presentation wrappers now activate the existing
   enhanced capture mode even without MUI classes or proprietary markers.
