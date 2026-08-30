@@ -1,3 +1,4 @@
+importScripts("engine/language-registry.js");
 importScripts("engine/storage-keys.js");
 importScripts("engine/business-central-url-context.js");
 importScripts("engine/page-identity.js");
@@ -1333,8 +1334,9 @@ async function stopSession(finalName = "", documentLanguage = "") {
   const requestedName = String(finalName || "").trim();
   if (session && requestedName) session.name = requestedName;
   if (session) {
-    if (["sv-SE", "en-US"].includes(documentLanguage)) {
-      session.settings = { ...(session.settings || {}), documentLanguage };
+    if (documentLanguage) {
+      session.settings = { ...(session.settings || {}), documentLanguage:
+        globalThis.T9LanguageRegistry.normalize(documentLanguage, "document") };
     }
     const legacyEvents = await getEvents(state.sessionId);
     const canonicalRecording = await getCanonicalRecording(state.sessionId);
@@ -1363,8 +1365,9 @@ async function stopSession(finalName = "", documentLanguage = "") {
     session.completedAt = new Date().toISOString();
     session.updatedAt = session.completedAt;
     if (requestedName) await canonicalStore.rename(state.sessionId, requestedName);
-    if (["sv-SE", "en-US"].includes(documentLanguage)) {
-      await canonicalStore.setDocumentLanguage(state.sessionId, documentLanguage);
+    if (documentLanguage) {
+      await canonicalStore.setDocumentLanguage(state.sessionId,
+        globalThis.T9LanguageRegistry.normalize(documentLanguage, "document"));
     }
     await canonicalStore.finalize(state.sessionId, session.completedAt);
     await saveSession(session);
@@ -1424,8 +1427,9 @@ async function createAndOpenBugReport(recordingId, reportTitle = "") {
   const report = globalThis.T9BugReportService.createBugReportFromRecording(
     recording, tasks, { extensionVersion: VERSION, productVersion: VERSION,
       errorEvidence: errors,
-      documentLanguage: recording.metadata?.documentLanguage === "en-US"
-        ? "en-US" : "sv-SE",
+      documentLanguage: globalThis.T9LanguageRegistry.normalize(
+        recording.metadata?.documentLanguage, "document"
+      ),
       title: String(reportTitle || "").trim() ||
         draftBugTitle(tasks, errors) });
   const saved = await bugReportStore.save(report);
@@ -2154,6 +2158,10 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
 
       case "T9_SAVE_SETTINGS": {
         const settings = { ...DEFAULT_SETTINGS, ...(message.settings || {}) };
+        settings.uiLocale = globalThis.T9LanguageRegistry.normalize(
+          settings.uiLocale, "ui");
+        settings.documentLanguage = globalThis.T9LanguageRegistry.normalize(
+          settings.documentLanguage, "document");
         await chrome.storage.local.set({ [SETTINGS_KEY]: settings });
         sendResponse({ ok: true, settings });
         break;
@@ -2162,7 +2170,8 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
       case "T9_SAVE_UI_LOCALE": {
         const data = await chrome.storage.local.get(SETTINGS_KEY);
         const settings = { ...DEFAULT_SETTINGS, ...(data[SETTINGS_KEY] || {}),
-          uiLocale: message.uiLocale === "en-US" ? "en-US" : "sv-SE" };
+          uiLocale: globalThis.T9LanguageRegistry.normalize(
+            message.uiLocale, "ui") };
         await chrome.storage.local.set({ [SETTINGS_KEY]: settings });
         sendResponse({ ok: true, uiLocale: settings.uiLocale });
         break;

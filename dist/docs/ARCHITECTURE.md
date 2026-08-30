@@ -1,5 +1,9 @@
 # BC Process Studio Architecture 4.7
 
+## Language ownership
+
+`src/engine/language-registry.js` owns active locales, aliases, short codes, native names, and UI/document capabilities. Recording, Canonical Recording, Review, the Knowledge Base, and UI selectors consume this registry rather than maintaining separate language allowlists. Translation catalogs and language-specific presentation rules remain in their presentation layers.
+
 ## UI design-system boundary
 
 `src/ui/design-system.css` is the single source of truth for shared visual

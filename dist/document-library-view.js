@@ -1,8 +1,10 @@
 (function (root, factory) {
-  const api = factory();
+  const languages = typeof module === "object" && module.exports
+    ? require("../engine/language-registry") : root.T9LanguageRegistry;
+  const api = factory(languages);
   if (typeof module === "object" && module.exports) module.exports = api;
   root.T9DocumentLibraryView = api;
-})(typeof globalThis !== "undefined" ? globalThis : this, function () {
+})(typeof globalThis !== "undefined" ? globalThis : this, function (languages) {
   function escape(value) {
     return String(value || "").replace(/[&<>"']/g, character => ({
       "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"
@@ -15,6 +17,7 @@
 
   function card(record, selected, active) {
     const bugReport = record.metadata?.recordingPurpose === "bug-report";
+    const language = languages.get(record.documentLanguage);
     const confirmations = record.health.confirmations.slice(0, 2).map(value =>
       `<li>${escape(value)}</li>`).join("");
     return `<article class="library-card" role="listitem" tabindex="${active ? 0 : -1}"
@@ -24,7 +27,7 @@
         <input type="checkbox" data-library-action="select"
           ${selected ? "checked" : ""} aria-label="Välj ${escape(record.title)}">
         <span class="sr-only">Välj dokument</span></label><h4>${escape(record.title)}</h4>
-        <span class="library-language" aria-label="${record.documentLanguage === "en-US" ? "English" : "Svenska"}">${record.documentLanguage === "en-US" ? "EN" : "SV"}</span>
+        <span class="library-language" aria-label="${escape(language.nativeName)}">${escape(language.shortCode)}</span>
         <button class="library-favourite" data-library-action="favourite"
           aria-pressed="${record.favourite}" aria-label="${record.favourite ? "Ta bort från" : "Lägg till i"} favoriter">${record.favourite ? "★" : "☆"}</button></div>
       <p class="library-profile">${escape(record.profile.displayName)} · ${escape(record.theme.displayName)}</p>

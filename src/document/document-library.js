@@ -1,8 +1,10 @@
 (function (root, factory) {
-  const api = factory();
+  const languages = typeof module === "object" && module.exports
+    ? require("../engine/language-registry") : root.T9LanguageRegistry;
+  const api = factory(languages);
   if (typeof module === "object" && module.exports) module.exports = api;
   root.T9DocumentLibrary = api;
-})(typeof globalThis !== "undefined" ? globalThis : this, function () {
+})(typeof globalThis !== "undefined" ? globalThis : this, function (languages) {
   const LIBRARY_SCHEMA_VERSION = "1.0.0";
   const SORTS = Object.freeze([
     "modified", "created", "alphabetical", "recent", "profile", "health"
@@ -66,8 +68,9 @@
       author: text(source.author),
       summary: text(source.summary),
       workflowName: text(source.workflowName),
-      documentLanguage: text(source.documentLanguage || metadata.documentLanguage) ===
-        "en-US" ? "en-US" : "sv-SE",
+      documentLanguage: languages.normalize(
+        source.documentLanguage || metadata.documentLanguage, "document"
+      ),
       sectionNames: list(source.sectionNames),
       tags: [...new Set([
         ...list(source.tags),

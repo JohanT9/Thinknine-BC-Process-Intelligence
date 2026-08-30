@@ -231,7 +231,7 @@ table{width:100%;border-collapse:collapse}th,td{text-align:left;padding:9px;bord
 <legend>Dokumentation</legend>
 
 <label for="uiLocale" data-i18n="settings.language">Gränssnittsspråk</label>
-<select id="uiLocale" aria-describedby="uiLocaleHelp">
+<select id="uiLocale" aria-describedby="uiLocaleHelp" data-language-select="ui">
   <option value="sv-SE">Svenska</option>
   <option value="en-US">English</option>
 </select>
@@ -240,7 +240,8 @@ table{width:100%;border-collapse:collapse}th,td{text-align:left;padding:9px;bord
 </p>
 
 <label for="documentLanguage" data-i18n="settings.documentLanguage">Dokumentspråk</label>
-<select id="documentLanguage" aria-describedby="documentLanguageHelp">
+<select id="documentLanguage" aria-describedby="documentLanguageHelp"
+  data-language-select="document">
   <option value="sv-SE">Svenska</option>
   <option value="en-US">English</option>
 </select>
@@ -360,7 +361,8 @@ table{width:100%;border-collapse:collapse}th,td{text-align:left;padding:9px;bord
       <select id="libraryHealthFilter"><option value="">All hälsa</option></select>
     </label>
     <label for="libraryLanguageFilter" data-i18n="library.documentLanguage">Dokumentspråk
-      <select id="libraryLanguageFilter">
+      <select id="libraryLanguageFilter" data-language-select="document"
+        data-language-all-label="library.allLanguages">
         <option value="" data-i18n="library.allLanguages">Alla språk</option>
         <option value="sv-SE">Svenska</option>
         <option value="en-US">English</option>
@@ -531,7 +533,7 @@ table{width:100%;border-collapse:collapse}th,td{text-align:left;padding:9px;bord
         <h3 id="reviewDocumentFieldsTitle">Dokumentinformation</h3>
         <label for="reviewDocumentLanguage"
           data-i18n="review.documentLanguage">Dokumentspråk</label>
-        <select id="reviewDocumentLanguage">
+        <select id="reviewDocumentLanguage" data-language-select="document">
           <option value="sv-SE">Svenska</option>
           <option value="en-US">English</option>
         </select>
@@ -705,6 +707,7 @@ table{width:100%;border-collapse:collapse}th,td{text-align:left;padding:9px;bord
   </form>
 </dialog>
 
+<script src="engine/language-registry.js"></script>
 <script src="engine/page-identity.js"></script>
 <script src="engine/page-identification-engine.js"></script>
 <script src="engine/bc-ui-identification.js"></script>

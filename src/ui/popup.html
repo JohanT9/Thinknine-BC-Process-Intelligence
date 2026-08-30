@@ -81,7 +81,7 @@ dialog{width:calc(100% - 36px);box-sizing:border-box;border:1px solid #8392a5;bo
     <label for="recordingName">Namn</label>
     <input id="recordingName" required maxlength="120" autocomplete="off">
     <label for="recordingDocumentLanguage" data-i18n="settings.documentLanguage">Dokumentspråk</label>
-    <select id="recordingDocumentLanguage">
+    <select id="recordingDocumentLanguage" data-language-select="document">
       <option value="sv-SE">Svenska</option>
       <option value="en-US">English</option>
     </select>
@@ -108,6 +108,7 @@ dialog{width:calc(100% - 36px);box-sizing:border-box;border:1px solid #8392a5;bo
 </dialog>
 </main>
 <script src="async-operations.js"></script>
+<script src="engine/language-registry.js"></script>
 <script src="i18n.js"></script>
 <script src="popup.js"></script>
 </body>

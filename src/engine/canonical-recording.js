@@ -1,10 +1,12 @@
 (function (root, factory) {
   const pageIdentity = typeof module === "object" && module.exports
     ? require("./page-identity") : root.T9PageIdentity;
-  const api = factory(pageIdentity);
+  const languages = typeof module === "object" && module.exports
+    ? require("./language-registry") : root.T9LanguageRegistry;
+  const api = factory(pageIdentity, languages);
   if (typeof module === "object" && module.exports) module.exports = api;
   root.T9CanonicalRecording = api;
-})(typeof globalThis !== "undefined" ? globalThis : this, function (pageIdentity) {
+})(typeof globalThis !== "undefined" ? globalThis : this, function (pageIdentity, languages) {
   "use strict";
   const SCHEMA_VERSION = 1;
   const RECORDING_PURPOSES = Object.freeze({
@@ -179,7 +181,7 @@
   }
   function finish(recording, finishedAt) { if (recording.metadata?.finishedAt) { if (recording.metadata.finishedAt === finishedAt) return recording; throw new Error("Completed recording evidence is immutable."); } const result = normalize(recording); result.metadata.finishedAt = finishedAt; result.updatedAt = finishedAt; if (result.compatibility?.session) Object.assign(result.compatibility.session, { completedAt: finishedAt, updatedAt: finishedAt, status: "completed" }); return result; }
   function rename(recording, title) { const value = String(title || "").trim(); if (!value) return normalize(recording); if (recording.metadata?.finishedAt) throw new Error("Completed recording evidence is immutable."); const result = normalize(recording); result.metadata.title = value; if (result.compatibility?.session) result.compatibility.session.name = value; return result; }
-  function setDocumentLanguage(recording, language) { if (recording.metadata?.finishedAt) throw new Error("Completed recording evidence is immutable."); const result = normalize(recording); const value = language === "en-US" ? "en-US" : "sv-SE"; result.metadata.documentLanguage = value; if (result.compatibility?.session) result.compatibility.session.settings = { ...(result.compatibility.session.settings || {}), documentLanguage: value }; return result; }
+  function setDocumentLanguage(recording, language) { if (recording.metadata?.finishedAt) throw new Error("Completed recording evidence is immutable."); const result = normalize(recording); const value = languages.normalize(language, "document"); result.metadata.documentLanguage = value; if (result.compatibility?.session) result.compatibility.session.settings = { ...(result.compatibility.session.settings || {}), documentLanguage: value }; return result; }
   function legacyView(recording) { const value = normalize(recording); const session = clone(value.compatibility?.session || {}); Object.assign(session, { id: value.id, name: session.name || value.metadata.title, purpose: session.purpose || "", recordingPurpose: value.metadata.recordingPurpose, startedAt: session.startedAt || value.metadata.startedAt, completedAt: session.completedAt || value.metadata.finishedAt || null, updatedAt: value.updatedAt, eventCount: value.events.length }); return { session, events: value.events.map(event => ({ ...clone(event.raw || { id: event.id, timestamp: event.timestamp, type: event.type }), ...(event.identification ? { identification: clone(event.identification) } : {}) })) }; }
   return { RECORDING_PURPOSES, SCHEMA_VERSION, addEvent, addScreenshot, create,
     finish, fromLegacy, integrityDiagnostics, legacyView, normalize, rename,

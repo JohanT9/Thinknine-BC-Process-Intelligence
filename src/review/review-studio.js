@@ -35,6 +35,8 @@
   const taskVisibility = typeof module === "object" && module.exports
     ? require("./task-visibility")
     : root.T9ReviewTaskVisibility;
+  const languages = typeof module === "object" && module.exports
+    ? require("../engine/language-registry") : root.T9LanguageRegistry;
   const api = factory(
     moveEngine,
     mergeEngine,
@@ -47,7 +49,8 @@
     manual,
     notes,
     hierarchy,
-    taskVisibility
+    taskVisibility,
+    languages
   );
   if (typeof module === "object" && module.exports) module.exports = api;
   root.T9Review = api;
@@ -63,7 +66,8 @@
   manual,
   notes,
   hierarchy,
-  taskVisibility
+  taskVisibility,
+  languages
 ) {
   function clone(value) {
     return JSON.parse(JSON.stringify(value));
@@ -230,8 +234,9 @@
       stepNotes: initialNotes,
       hierarchy: guidedHierarchy,
       documentFields: { expectedResult: "",
-        documentLanguage: session.settings?.documentLanguage === "en-US"
-          ? "en-US" : "sv-SE" },
+        documentLanguage: languages.normalize(
+          session.settings?.documentLanguage, "document"
+        ) },
       generatedTasks: clone(normalizedTasks),
       tasks: normalizedTasks
     };
@@ -243,8 +248,9 @@
       ...(normalized.documentFields || {}),
       expectedResult: String(normalized.documentFields?.expectedResult ||
         normalized.expectedResult || ""),
-      documentLanguage: normalized.documentFields?.documentLanguage === "en-US"
-        ? "en-US" : "sv-SE"
+      documentLanguage: languages.normalize(
+        normalized.documentFields?.documentLanguage, "document"
+      )
     };
     return normalized;
   }
@@ -257,8 +263,8 @@
       review.documentFields || { expectedResult: "" }
     );
     review.documentFields = { ...(review.documentFields || {}),
-      [field]: field === "documentLanguage" && value === "en-US"
-        ? "en-US" : field === "documentLanguage" ? "sv-SE"
+      [field]: field === "documentLanguage"
+        ? languages.normalize(value, "document")
           : String(value || "") };
     review.updatedAt = options.now || new Date().toISOString();
     historyEngine.record(review, {

@@ -1,13 +1,16 @@
 (function (root, factory) {
   const semantic = typeof module === "object" && module.exports
     ? require("./semantic-document") : root.T9DocumentModel;
-  const api = factory(semantic);
+  const languages = typeof module === "object" && module.exports
+    ? require("../engine/language-registry") : root.T9LanguageRegistry;
+  const api = factory(semantic, languages);
   if (typeof module === "object" && module.exports) module.exports = api;
   root.T9DocumentLanguage = api;
-})(typeof globalThis !== "undefined" ? globalThis : this, function (semantic) {
+})(typeof globalThis !== "undefined" ? globalThis : this, function (semantic, languages) {
   const VERSION = "1.0.0";
-  const DEFAULT_LANGUAGE = "sv-SE";
-  const SUPPORTED_LANGUAGES = Object.freeze(["sv-SE", "en-US"]);
+  const DEFAULT_LANGUAGE = languages.DEFAULT_LANGUAGE;
+  const SUPPORTED_LANGUAGES = Object.freeze(languages.supported("document")
+    .map(language => language.locale));
   const SYSTEM_TEXT = Object.freeze({
     "en-US": Object.freeze({
       "Syfte": "Purpose",
@@ -39,8 +42,7 @@
   }
 
   function normalize(value) {
-    const input = String(value || "").trim().toLowerCase();
-    return input === "en" || input.startsWith("en-") ? "en-US" : DEFAULT_LANGUAGE;
+    return languages.normalize(value, "document");
   }
 
   function systemText(value, language) {

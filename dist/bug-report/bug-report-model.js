@@ -1,8 +1,10 @@
 (function (root, factory) {
-  const api = factory();
+  const languages = typeof module === "object" && module.exports
+    ? require("../engine/language-registry") : root.T9LanguageRegistry;
+  const api = factory(languages);
   if (typeof module === "object" && module.exports) module.exports = api;
   root.T9BugReportModel = api;
-})(typeof globalThis !== "undefined" ? globalThis : this, function () {
+})(typeof globalThis !== "undefined" ? globalThis : this, function (languages) {
   "use strict";
   const SCHEMA_VERSION = 1;
   const STATUSES = Object.freeze(["draft", "ready", "resolved", "archived"]);
@@ -37,8 +39,8 @@
     }
     result.bugReportId = String(result.bugReportId || "");
     result.recordingId = String(result.recordingId || "");
-    result.documentLanguage = result.documentLanguage === "sv-SE"
-      ? "sv-SE" : "en-US";
+    result.documentLanguage = result.documentLanguage
+      ? languages.normalize(result.documentLanguage, "document") : "en-US";
     if (!result.bugReportId || !result.recordingId) {
       throw new TypeError("Bug Report identity and recording reference are required.");
     }

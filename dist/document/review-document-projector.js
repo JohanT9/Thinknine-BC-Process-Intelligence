@@ -24,8 +24,10 @@
     ? require("../engine/source-reference") : root.T9SourceReference;
   const taskVisibility = typeof module === "object" && module.exports
     ? require("../review/task-visibility") : root.T9ReviewTaskVisibility;
+  const languages = typeof module === "object" && module.exports
+    ? require("../engine/language-registry") : root.T9LanguageRegistry;
   const api = factory(model, stepEditor, structure, manualSteps, notes,
-    annotations, hierarchy, sourceReference, taskVisibility);
+    annotations, hierarchy, sourceReference, taskVisibility, languages);
   if (typeof module === "object" && module.exports) module.exports = api;
   root.T9ReviewDocumentProjector = api;
 })(typeof globalThis !== "undefined" ? globalThis : this, function (
@@ -37,7 +39,8 @@
   annotations,
   hierarchy,
   sourceReference,
-  taskVisibility
+  taskVisibility,
+  languages
 ) {
   const PROJECTOR_VERSION = "1.0.0";
   const ORIGIN = "review-document-projector";
@@ -161,8 +164,9 @@
       purpose: text(session.purpose) || DEFAULT_PURPOSE,
       environment: text(session.settings?.environmentName) || "Ej angiven",
       documentationProfile: text(session.settings?.documentationProfile) || "generic",
-      documentLanguage: firstText(review.documentFields?.documentLanguage,
-        session.settings?.documentLanguage) === "en-US" ? "en-US" : "sv-SE",
+      documentLanguage: languages.normalize(firstText(
+        review.documentFields?.documentLanguage,
+        session.settings?.documentLanguage), "document"),
       documentVersion: "1.0",
       statusLabel: review.status === "completed" ? "Slutförd" : "Pågående",
       createdAt: firstText(review.createdAt, session.startedAt),

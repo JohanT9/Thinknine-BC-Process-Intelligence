@@ -3,10 +3,13 @@
     ? require("./bug-report-model") : root.T9BugReportModel;
   const technical = typeof module === "object" && module.exports
     ? require("./technical-diagnostics") : root.T9TechnicalDiagnostics;
-  const api = factory(model, technical);
+  const languages = typeof module === "object" && module.exports
+    ? require("../engine/language-registry") : root.T9LanguageRegistry;
+  const api = factory(model, technical, languages);
   if (typeof module === "object" && module.exports) module.exports = api;
   root.T9BugReportService = api;
-})(typeof globalThis !== "undefined" ? globalThis : this, function (model, technical) {
+})(typeof globalThis !== "undefined" ? globalThis : this, function (model, technical,
+  languages) {
   "use strict";
   const clone = value => value == null ? value : JSON.parse(JSON.stringify(value));
   const unique = values => [...new Set((values || []).filter(Boolean).map(String))];
@@ -71,7 +74,8 @@
       item.summary.callStackAvailable)?.callStack;
     return model.normalize({ bugReportId: context.bugReportId || stableId(recording.id),
       schemaVersion: model.SCHEMA_VERSION, recordingId: recording.id,
-      documentLanguage: context.documentLanguage === "sv-SE" ? "sv-SE" : "en-US",
+      documentLanguage: context.documentLanguage
+        ? languages.normalize(context.documentLanguage, "document") : "en-US",
       createdAt: now, updatedAt: now, status: "draft",
       summary: { title: context.title || "",
         summary: "", severity: "", category: "", authorship: "human" },

@@ -39,7 +39,7 @@ assert.match(popupLogic, /nameDialog.*showModal/);
 assert.match(popup, /id="recordingDocumentLanguage"[\s\S]*value="sv-SE"[\s\S]*value="en-US"/);
 assert.match(popupLogic, /finishRecording\(name, \$\("recordingDocumentLanguage"\)\.value\)/);
 assert.match(background, /stopSession\(message\.name, message\.documentLanguage\)/);
-assert.match(background, /setDocumentLanguage\(state\.sessionId, documentLanguage\)/);
+assert.match(background, /setDocumentLanguage\(state\.sessionId,[\s\S]*T9LanguageRegistry\.normalize\(documentLanguage, "document"\)/);
 assert.match(background, /createAndOpenBugReport\(session\.id, message\.name\)/);
 assert.match(background, /createAndOpenBugReport\(session\.id, message\.name\)/);
 assert.match(background, /technical-report\.html\?bugReportId=.*new=1/);

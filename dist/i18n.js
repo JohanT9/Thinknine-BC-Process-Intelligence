@@ -1,8 +1,10 @@
 (function initUiI18n(root) {
   "use strict";
 
-  const DEFAULT_LOCALE = "sv-SE";
-  const SUPPORTED_LOCALES = Object.freeze(["sv-SE", "en-US"]);
+  const languageRegistry = root.T9LanguageRegistry;
+  const DEFAULT_LOCALE = languageRegistry.DEFAULT_LANGUAGE;
+  const SUPPORTED_LOCALES = Object.freeze(languageRegistry.supported("ui")
+    .map(language => language.locale));
   const messages = Object.freeze({
     "sv-SE": Object.freeze({
       "app.tagline": "Business Process Intelligence för Microsoft Dynamics 365 Business Central.",
@@ -16,6 +18,7 @@
       "review.documentLanguage": "Dokumentspråk",
       "language.switchToEnglish": "Byt språk till engelska",
       "language.switchToSwedish": "Byt språk till svenska",
+      "language.switchToLanguage": "Byt språk till {language}",
       "settings.save": "Spara inställningar",
       "settings.saved": "Inställningarna har sparats.",
       "library.searchPlaceholder": "Titel, profil, tagg eller arbetsflöde",
@@ -145,6 +148,7 @@
       "review.documentLanguage": "Document language",
       "language.switchToEnglish": "Switch language to English",
       "language.switchToSwedish": "Switch language to Swedish",
+      "language.switchToLanguage": "Switch language to {language}",
       "settings.save": "Save settings",
       "settings.saved": "Settings saved.",
       "library.searchPlaceholder": "Title, profile, tag or workflow",
@@ -469,10 +473,34 @@
   }
 
   function normalizeLocale(value) {
-    const candidate = String(value || "").trim().toLowerCase();
-    if (candidate === "en" || candidate.startsWith("en-")) return "en-US";
-    if (candidate === "sv" || candidate.startsWith("sv-")) return "sv-SE";
-    return DEFAULT_LOCALE;
+    return languageRegistry.normalize(value, "ui");
+  }
+
+  function populateLanguageSelects(target = root.document) {
+    if (!target?.querySelectorAll) return;
+    target.querySelectorAll("[data-language-select]").forEach(select => {
+      const current = select.value || select.dataset.selectedLanguage ||
+        DEFAULT_LOCALE;
+      const capability = select.dataset.languageSelect || "document";
+      const allLabel = select.dataset.languageAllLabel;
+      select.replaceChildren();
+      if (allLabel) {
+        const option = target.createElement("option");
+        option.value = "";
+        option.textContent = translate(allLabel, normalizeLocale(
+          target.documentElement?.lang));
+        select.appendChild(option);
+      }
+      languageRegistry.supported(capability).forEach(language => {
+        const option = target.createElement("option");
+        option.value = language.locale;
+        option.textContent = language.nativeName;
+        select.appendChild(option);
+      });
+      select.value = current && [...select.options].some(option =>
+        option.value === current) ? current : allLabel ? "" :
+        languageRegistry.normalize(current, capability);
+    });
   }
 
   function translate(key, locale = DEFAULT_LOCALE) {
@@ -489,6 +517,7 @@
     if (!target?.querySelectorAll) return normalizeLocale(locale);
     const normalized = normalizeLocale(locale);
     target.documentElement?.setAttribute("lang", normalized.split("-")[0]);
+    populateLanguageSelects(target);
     target.querySelectorAll("[data-i18n]").forEach(element => {
       element.textContent = translate(element.dataset.i18n, normalized);
     });
@@ -525,6 +554,7 @@
     translate,
     format,
     translateStaticText,
+    populateLanguageSelects,
     apply,
     observe
   });

@@ -4,8 +4,11 @@ const path = require("path");
 const vm = require("vm");
 
 const root = path.resolve(__dirname, "..");
+const registrySource = fs.readFileSync(path.join(root,
+  "src/engine/language-registry.js"), "utf8");
 const source = fs.readFileSync(path.join(root, "src/ui/i18n.js"), "utf8");
 const context = { globalThis: {}, CustomEvent: class CustomEvent {} };
+vm.runInNewContext(registrySource, context);
 vm.runInNewContext(source, context);
 const i18n = context.globalThis.T9UiI18n;
 

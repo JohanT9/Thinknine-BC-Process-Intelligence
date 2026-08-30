@@ -8,6 +8,8 @@
 
 Capture. Document. Improve.
 
+Language support is centralized in one registry. Swedish and English are active; another language can be added without duplicating language selectors, normalization, or badges across the application.
+
 BC Process Studio captures real Business Central workflows and turns them into reviewed, structured and reusable process knowledge. The implemented lifecycle is **Record → Review → Document → Reuse → Improve**.
 
 The extension UI uses a shared Fluent-compatible design system inspired by

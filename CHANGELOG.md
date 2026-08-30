@@ -11,6 +11,8 @@
 
 ## Unreleased
 
+- Centralized UI and document language registration so another fully translated language can be added without changing each consumer. Swedish and English remain active.
+
 - Added an explicit Swedish/English document-language choice to the recording
   naming dialog. The choice follows process Reviews and Technical Bug Reports,
   while Canonical raw events remain unchanged.

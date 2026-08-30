@@ -12,10 +12,14 @@ const t = key => globalThis.T9UiI18n.translate(key, currentUiLocale);
 const tf = (key, values) => globalThis.T9UiI18n.format(key, values, currentUiLocale);
 
 function updateLanguageSwitch() {
-  const isEnglish = currentUiLocale === "en-US";
-  updateText($("languageCode"), isEnglish ? "EN" : "SV");
-  const label = t(isEnglish
-    ? "language.switchToSwedish" : "language.switchToEnglish");
+  const current = globalThis.T9LanguageRegistry.get(currentUiLocale);
+  const next = globalThis.T9LanguageRegistry.get(
+    globalThis.T9LanguageRegistry.next(currentUiLocale, "ui")
+  );
+  updateText($("languageCode"), current.shortCode);
+  const label = tf("language.switchToLanguage", {
+    language: next.nativeName
+  });
   $("languageSwitch").setAttribute("aria-label", label);
   $("languageSwitch").title = label;
 }
@@ -23,8 +27,9 @@ function updateLanguageSwitch() {
 async function loadUiLocale() {
   try {
     const response = await send({ type: "T9_GET_SETTINGS" }, 3000);
-    defaultDocumentLanguage = response?.settings?.documentLanguage === "en-US"
-      ? "en-US" : "sv-SE";
+    defaultDocumentLanguage = globalThis.T9LanguageRegistry.normalize(
+      response?.settings?.documentLanguage, "document"
+    );
     currentUiLocale = globalThis.T9UiI18n.apply(response?.settings?.uiLocale);
     globalThis.T9UiI18n.observe(() => currentUiLocale);
     updateLanguageSwitch();
@@ -38,7 +43,7 @@ async function loadUiLocale() {
 
 async function switchUiLocale() {
   const previousLocale = currentUiLocale;
-  const uiLocale = previousLocale === "en-US" ? "sv-SE" : "en-US";
+  const uiLocale = globalThis.T9LanguageRegistry.next(previousLocale, "ui");
   $("languageSwitch").disabled = true;
   try {
     currentUiLocale = globalThis.T9UiI18n.apply(uiLocale);
@@ -230,7 +235,9 @@ async function finishRecording(name, documentLanguage) {
     const response = await send({
       type: pendingBugRecording ? "T9_FINISH_BUG_RECORDING" : "T9_STOP",
       name,
-      documentLanguage: documentLanguage === "en-US" ? "en-US" : "sv-SE"
+      documentLanguage: globalThis.T9LanguageRegistry.normalize(
+        documentLanguage, "document"
+      )
     }, pendingBugRecording ? 30000 : 5000);
     if (!response?.ok) {
       throw new Error(response?.error || t("recorder.stopFailed"));

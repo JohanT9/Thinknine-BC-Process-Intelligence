@@ -3,6 +3,18 @@
 BC Process Studio supports Swedish and English process documents independently
 of the interface language.
 
+## Adding another language
+
+Swedish (`sv-SE`) and English (`en-US`) are active. To add another language:
+
+1. Add its locale, short code, native name, aliases, and capabilities to `src/engine/language-registry.js`.
+2. Add a complete UI catalog in `src/ui/i18n.js`.
+3. Add document text, presentation grammar, and export text for the language.
+4. Add behavioral coverage for UI, Review, Document Generator, Word, and technical reports.
+5. Do not enable the language capability until the complete path is verified.
+
+Language selectors, normalization, persistence, badges, and filtering are generated from the registry. Historical aliases are normalized without migrating existing recordings.
+
 ## Contract
 
 - `documentLanguage` is `sv-SE` or `en-US`.

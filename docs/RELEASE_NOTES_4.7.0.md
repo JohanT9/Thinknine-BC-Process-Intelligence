@@ -1,5 +1,7 @@
 # BC Process Studio 4.7
 
+The language architecture now uses one extensible registry. Swedish and English remain the selectable languages while the application is prepared for another fully translated language.
+
 ## Unified working experience
 
 BC Process Studio now uses one shared Fluent-compatible design system across the

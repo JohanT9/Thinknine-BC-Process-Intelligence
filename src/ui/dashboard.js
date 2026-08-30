@@ -3197,9 +3197,9 @@ function configuredExpectedResult(settings = applicationSettings) {
 }
 
 function activeDocumentLanguage() {
-  return activeReview?.documentFields?.documentLanguage === "en-US"
-    ? "en-US"
-    : "sv-SE";
+  return globalThis.T9LanguageRegistry.normalize(
+    activeReview?.documentFields?.documentLanguage, "document"
+  );
 }
 
 function displayedExpectedResult() {
@@ -3434,8 +3434,9 @@ function librarySessionRecord(session) {
     createdAt: session.startedAt,
     modifiedAt: session.updatedAt || session.completedAt || session.startedAt,
     workflowName: session.name,
-    documentLanguage: session.settings?.documentLanguage === "en-US"
-      ? "en-US" : "sv-SE",
+    documentLanguage: globalThis.T9LanguageRegistry.normalize(
+      session.settings?.documentLanguage, "document"
+    ),
     profile: bugReport ? {
       profileId: "bug-report", displayName: "Bug Report"
     } : undefined,
@@ -6864,8 +6865,9 @@ $("expectedResultEditor").addEventListener("input", event => {
   applyReviewToolbarState();
 });
 $("reviewDocumentLanguage").addEventListener("change", event => {
-  const documentLanguage = event.currentTarget.value === "en-US"
-    ? "en-US" : "sv-SE";
+  const documentLanguage = globalThis.T9LanguageRegistry.normalize(
+    event.currentTarget.value, "document"
+  );
   globalThis.T9Review.setDocumentField(
     activeReview,
     "documentLanguage",
