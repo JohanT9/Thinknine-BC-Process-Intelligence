@@ -40,6 +40,17 @@ assert.strictEqual(stableFirst.events[1].id,
 assert.strictEqual(stableDuplicate.events.length, stableFirst.events.length);
 assert.deepStrictEqual(stableDuplicate.events.map(event => event.id),
   stableFirst.events.map(event => event.id));
+const interactionSource = { ...raw, eventNo: 3,
+  sourceEventId: "frame-a:delivery-3", interactionId: "frame-a:interaction-1" };
+const withInteraction = recording.addEvent(stableFirst, interactionSource);
+assert.deepStrictEqual(withInteraction.events[2].interaction,
+  { id: "frame-a:interaction-1", source: "recorder" });
+assert.strictEqual(withInteraction.events[2].raw.interactionId,
+  "frame-a:interaction-1");
+assert.strictEqual(recording.legacyView(withInteraction).events[2].interactionId,
+  "frame-a:interaction-1");
+assert.strictEqual(withInteraction.schemaVersion, 1,
+  "interaction identity is additive to Canonical Recording schema v1");
 const assetAgain = recording.addScreenshot(withAsset, 1,
   "data:image/jpeg;base64,different", "2026-08-10T08:02:00.000Z");
 assert.strictEqual(assetAgain.assets[0].id, withAsset.assets[0].id);

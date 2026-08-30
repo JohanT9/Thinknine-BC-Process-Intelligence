@@ -11,7 +11,7 @@
 ) {
   "use strict";
   const SCHEMA_VERSION = 1;
-  const NORMALIZATION_VERSION = "2.2.0";
+  const NORMALIZATION_VERSION = "2.3.0";
   const cache = new WeakMap();
   const clone = value => value == null ? value : JSON.parse(JSON.stringify(value));
   function freeze(value) { if (!value || typeof value !== "object" || Object.isFrozen(value)) return value; Object.values(value).forEach(freeze); return Object.freeze(value); }
@@ -67,12 +67,17 @@
   function create(event, kind, reason, sources = [event], options = {}) {
     const raw = rawOf(event); const identified = identificationFor(event, options);
     const sourceIds = sources.map(item => item.id);
+    const interactionIds = [...new Set(sources.map(item =>
+      rawOf(item).interactionId || item.interaction?.id).filter(Boolean)
+      .map(String))];
     const selection = raw.selectedValue != null || raw.selectedCaption || raw.selectedKey ? { value: clone(raw.selectedValue), caption: raw.selectedCaption || undefined, key: raw.selectedKey || undefined, transientIndex: raw.selectedIndex ?? undefined } : null;
     return freeze({
       normalizedEventId: `normalized:${sourceIds.map(id => `${id.length}:${id}`).join("|")}`,
       schemaVersion: SCHEMA_VERSION,
       normalizationVersion: NORMALIZATION_VERSION,
       sourceEventId: event.id, sourceEventIds: sourceIds, recordingId: event.recordingId,
+      interactionId: interactionIds.length === 1 ? interactionIds[0] : undefined,
+      interactionIds,
       kind, subtype: raw.inputSource || raw.category || undefined,
       timestamp: event.timestamp, timestampRange: {
         start: sources[0]?.timestamp, end: sources.at(-1)?.timestamp
@@ -126,6 +131,11 @@
     if (!pending || pending.kind !== "value-change" || kind !== "value-change") return false;
     const previous = rawOf(pending.sources.at(-1)); const raw = rawOf(event);
     if (previous.inputSource === "focusout") return false;
+    const previousInteractionId = previous.interactionId ||
+      pending.sources.at(-1)?.interaction?.id;
+    const nextInteractionId = raw.interactionId || event?.interaction?.id;
+    if (previousInteractionId && nextInteractionId &&
+        String(previousInteractionId) !== String(nextInteractionId)) return false;
     return controlKey(pending.sources[0]) === controlKey(event) &&
       ["input", "change", "focusout"].includes(raw.inputSource || raw.type);
   }

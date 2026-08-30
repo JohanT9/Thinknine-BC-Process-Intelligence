@@ -222,16 +222,24 @@ manufacturing, and Aptean rules are not misrepresented as verified page records.
 
 ## Event Normalization boundary
 
-Event Normalization 2.2.0 is the sole owner of browser-mechanic coalescing. It
+Event Normalization 2.3.0 is the sole owner of browser-mechanic coalescing. It
 consumes durable Raw Events and BC UI Identification, emits immutable normalized
 interactions, and never groups them into Steps. React/MUI focus comparison is
 capture evidence; only normalization may classify a verified difference as a
 `value-change`.
 
-Step Grouping 1.2.0 attaches additive result verification to capture packets.
+Step Grouping 1.3.0 attaches additive result verification and recorder-owned
+interaction identity to capture packets.
 Observed navigation, dialog, value, selection, toggle, and error outcomes flow
 to Semantic Actions and Review without modifying Canonical Recording or
 overwriting the consultant's expected-result text.
+
+The recorder creates an opaque `interactionId` at the observable start of a
+pointer, keyboard, or field interaction. Raw Event Persistence stores it
+unchanged. Canonical Recording preserves it as additive schema-v1 metadata,
+Event Normalization propagates it, and Step Grouping uses matching IDs as an
+explicit boundary. Semantic rules consume the completed group and never create
+or reinterpret recorder interaction identity.
 
 ### React and control-add-in capture reliability
 

@@ -12,6 +12,7 @@
 ## Unreleased
 
 - Centralized UI and document language registration so another fully translated language can be added without changing each consumer. Swedish and English remain active.
+- Added persistent recorder interaction identity from pointer, keyboard, and field actions through Canonical Recording, normalization, Step Group capture packets, and observed outcomes. Historical recordings retain deterministic compatibility grouping.
 
 - Added an explicit Swedish/English document-language choice to the recording
   naming dialog. The choice follows process Reviews and Technical Bug Reports,

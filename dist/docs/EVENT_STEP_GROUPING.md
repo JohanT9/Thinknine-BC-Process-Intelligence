@@ -35,15 +35,18 @@ candidate status, and an additive immutable `capturePacket`. Unknown future
 fields survive normalization.
 
 The capture packet explicitly relates the observed interaction to its immediate
-verified result and captured screenshot evidence. Version `1.1.0` also carries
+verified result and captured screenshot evidence. Version `1.2.0` also carries
 the formal `resultVerification` contract described in
 [INTERACTION_RESULT_VERIFICATION.md](INTERACTION_RESULT_VERIFICATION.md). It records interaction and
 result event IDs separately, all screenshot asset IDs, the source event owning
 the latest result capture, completeness (`complete` or `partial`), and any
-missing role. It is derived evidence: Canonical Recording and raw events remain
-unchanged.
+missing role. It exposes `interactionId`, all contributing `interactionIds`, and
+`interactionIdentitySource`. `recorder` means the boundary came from captured
+identity; `compatibility-grouping` means historical evidence required the
+existing deterministic grouping rules. It is derived evidence: Canonical
+Recording and raw events remain unchanged.
 
-Algorithm version is `1.2.0`. IDs use the version plus collision-safe,
+Algorithm version is `1.3.0`. IDs use the version plus collision-safe,
 length-prefixed canonical source IDs. They do not use random values, execution
 time, Review order, export state, or captions.
 
@@ -62,6 +65,11 @@ the same identified action/control may be coalesced only inside a bounded
 1.2-second interaction window. Timing is never sufficient without matching page
 and action/control identity. Page identity changes, unrelated controls, and
 uncertain relationships remain boundaries; ambiguity produces smaller groups.
+
+Matching recorder interaction IDs take precedence over adjacency heuristics and
+allow an observable outcome to remain with its initiating action. Different
+recorder IDs are an explicit boundary. Events without IDs retain the established
+lookup, control-identity, value-match, and bounded timing compatibility path.
 
 ## Field editing, dates, toggles, and selection
 

@@ -52,8 +52,12 @@
   const sourceFrameId = crypto.randomUUID();
   let sourceSequence = 0;
   const inputTimers = new WeakMap();
+  const elementInteractions = new WeakMap();
   const observedDialogs = new Set();
+  const dialogInteractions = new WeakMap();
   let pendingPointerCapture = null;
+  let activeInteraction = null;
+  const INTERACTION_WINDOW_MS = 10000;
   const recordingIndicator = { host: null, shadow: null, minimized: false,
     refreshTimer: null };
 
@@ -64,6 +68,47 @@
   function isRecorderUiEvent(event) {
     return Boolean(recordingIndicator.host &&
       event.composedPath?.().includes(recordingIndicator.host));
+  }
+
+  function newInteractionId() {
+    return `${sourceFrameId}:${crypto.randomUUID()}`;
+  }
+
+  function activateInteraction(interactionId, target, source) {
+    const id = interactionId || newInteractionId();
+    activeInteraction = { interactionId: id, target: target || null,
+      source: source || "unknown", createdAt: Date.now(), lastObservedAt: Date.now() };
+    if (target instanceof Element) elementInteractions.set(target, id);
+    return id;
+  }
+
+  function currentInteractionId() {
+    if (!activeInteraction ||
+        Date.now() - activeInteraction.lastObservedAt > INTERACTION_WINDOW_MS) {
+      activeInteraction = null;
+      return "";
+    }
+    activeInteraction.lastObservedAt = Date.now();
+    return activeInteraction.interactionId;
+  }
+
+  function interactionForElement(element, createIfMissing = false) {
+    if (!(element instanceof Element)) return currentInteractionId();
+    const existing = elementInteractions.get(element);
+    if (existing) {
+      if (activeInteraction?.interactionId === existing) {
+        activeInteraction.lastObservedAt = Date.now();
+      }
+      return existing;
+    }
+    const active = currentInteractionId();
+    if (active && (activeInteraction?.target === element ||
+        activeInteraction?.target?.contains?.(element) ||
+        element.contains?.(activeInteraction?.target))) {
+      elementInteractions.set(element, active);
+      return active;
+    }
+    return createIfMissing ? activateInteraction("", element, "field") : "";
   }
 
   function indicatorTone(liveStatus) {
@@ -831,7 +876,7 @@
       (observedTarget instanceof Element ? observedTarget : null);
     const label = concisePointerLabel(event, target);
     if (!target || !label) return;
-    const interactionId = `${sourceFrameId}:${crypto.randomUUID()}`;
+    const interactionId = activateInteraction("", target, "pointer");
     pendingPointerCapture = { interactionId, target, createdAt: Date.now() };
     try {
       chrome.runtime.sendMessage({ type: "T9_CAPTURE_BEFORE_ACTION",
@@ -867,6 +912,9 @@
       (pointerPath.includes(pendingPointerCapture.target) ||
         pendingPointerCapture.target.contains?.(observedTarget))
       ? pendingPointerCapture.interactionId : "";
+    const interactionId = preActionCaptureId ||
+      activateInteraction("", target, "click");
+    activateInteraction(interactionId, target, "click");
     pendingPointerCapture = null;
 
     record({
@@ -877,6 +925,7 @@
       clientX: event.clientX,
       clientY: event.clientY,
       pointerTarget: true,
+      interactionId,
       ...(preActionCaptureId ? { preActionCaptureId } : {}),
       ...targetDescriptor,
       ...(pointerLabel ? { accessibleName: pointerLabel,
@@ -897,6 +946,7 @@
       previousValue: previousValue === undefined
         ? focusSessions.previous(element) : previousValue,
       inputSource: source,
+      interactionId: interactionForElement(element, true),
       ...targetDescriptor,
       uiState: { ...targetDescriptor.uiState, resultVisible: true }
     });
@@ -925,8 +975,10 @@
     const element = editableTarget(event);
     if (!(element instanceof Element)) return;
     focusSessions.start(element, valueOf(element));
+    const interactionId = interactionForElement(element, true);
     const targetDescriptor = descriptor(element);
     record({ type: "focus", category: "lifecycle", value: valueOf(element),
+      interactionId,
       ...targetDescriptor,
       uiState: { ...targetDescriptor.uiState, focusOnly: true } });
   }, true);
@@ -963,6 +1015,8 @@
     if (!["Enter", " ", "Spacebar", "Escape", "F4"].includes(event.key)) return;
     const eventTarget = eventElement(event);
     const target = interactiveTarget(eventTarget, event) || eventTarget;
+    const interactionId = interactionForElement(eventTarget, false) ||
+      activateInteraction("", target, "keyboard");
 
     record({
       type: "key",
@@ -975,6 +1029,7 @@
       shiftKey: event.shiftKey,
       repeat: event.repeat,
       inputSource: "keyboard",
+      interactionId,
       fieldName: getLabel(eventTarget),
       ...descriptor(target)
     });
@@ -987,10 +1042,13 @@
         observeBugError(dialog);
         if (observedDialogs.has(dialog)) return;
         observedDialogs.add(dialog);
+        const interactionId = currentInteractionId();
+        if (interactionId) dialogInteractions.set(dialog, interactionId);
         const dialogDescriptor = descriptor(dialog);
         record({
           type: "dialog-open",
           category: "dialog",
+          ...(interactionId ? { interactionId } : {}),
           ...dialogDescriptor,
           label: textOf(dialog).slice(0, 600),
           uiHierarchy: [{ type: "dialog", caption: textOf(dialog).slice(0, 180) },
@@ -1001,7 +1059,10 @@
       if (currentDialogs.has(dialog)) return;
       observedDialogs.delete(dialog);
       const dialogDescriptor = descriptor(dialog);
+      const interactionId = dialogInteractions.get(dialog) || currentInteractionId();
+      dialogInteractions.delete(dialog);
       record({ type: "dialog-close", category: "dialog",
+        ...(interactionId ? { interactionId } : {}),
         label: textOf(dialog).slice(0, 600), ...dialogDescriptor,
         uiState: { ...dialogDescriptor.uiState, dialogComplete: false,
           dialogClosed: true } });
@@ -1010,9 +1071,11 @@
     const signature = `${getPageId()}|${getPageCaption()}|${location.href}`;
     if (signature !== lastPageSignature) {
       lastPageSignature = signature;
+      const interactionId = currentInteractionId();
       record({
         type: "page-state",
         category: "navigation",
+        ...(interactionId ? { interactionId } : {}),
         uiState: { resultVisible: true }
       });
     }
@@ -1037,10 +1100,12 @@
 
     const from = lastUrl;
     lastUrl = location.href;
+    const interactionId = currentInteractionId();
 
     record({
       type: "navigation",
       category: "navigation",
+      ...(interactionId ? { interactionId } : {}),
       uiState: { resultVisible: true },
       from,
       to: location.href

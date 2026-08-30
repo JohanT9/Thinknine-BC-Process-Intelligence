@@ -5,8 +5,8 @@
 })(typeof globalThis !== "undefined" ? globalThis : this, function () {
   "use strict";
   const SCHEMA_VERSION = 1;
-  const GROUPING_VERSION = "1.2.0";
-  const CAPTURE_PACKET_VERSION = "1.1.0";
+  const GROUPING_VERSION = "1.3.0";
+  const CAPTURE_PACKET_VERSION = "1.2.0";
   const RESULT_VERIFICATION_VERSION = "1.0.0";
   const cache = new WeakMap();
   const clone = value => value == null ? value : JSON.parse(JSON.stringify(value));
@@ -31,6 +31,20 @@
       event.controlIdentification?.controlType || event.controlIdentification?.type
     ); }
   function unique(values) { return [...new Set(values.filter(Boolean))]; }
+  function interactionIds(events) { return unique(events.flatMap(event =>
+    event.interactionIds || [event.interactionId])); }
+  function sameRecordedInteraction(events, event) {
+    const pendingIds = interactionIds(events);
+    const nextIds = interactionIds([event]);
+    return pendingIds.length === 1 && nextIds.length === 1 &&
+      pendingIds[0] === nextIds[0];
+  }
+  function conflictingRecordedInteraction(events, event) {
+    const pendingIds = interactionIds(events);
+    const nextIds = interactionIds([event]);
+    return pendingIds.length > 0 && nextIds.length > 0 &&
+      !nextIds.some(id => pendingIds.includes(id));
+  }
   function groupId(sourceIds) { return `step-group:${GROUPING_VERSION}:${sourceIds.map(id => `${id.length}:${id}`).join("|")}`; }
   function groupKind(events) {
     const kinds = new Set(events.map(event => event.kind));
@@ -108,6 +122,7 @@
     };
   }
   function capturePacket(events, primary, screenshots) {
+    const recordedInteractionIds = interactionIds(events);
     const interaction = events.find(event => event.kind === "activation") || primary;
     const observedOutcomes = outcomeEvents(events).filter(event => event !== interaction);
     const outcomes = observedOutcomes.length ? observedOutcomes :
@@ -127,6 +142,11 @@
     if (!screenshots.length) missing.push("screenshot");
     return {
       packetVersion: CAPTURE_PACKET_VERSION,
+      interactionId: recordedInteractionIds.length === 1
+        ? recordedInteractionIds[0] : null,
+      interactionIds: recordedInteractionIds,
+      interactionIdentitySource: recordedInteractionIds.length === 1
+        ? "recorder" : "compatibility-grouping",
       interactionEventId: interaction?.normalizedEventId || null,
       interactionSourceEventIds: unique(interaction?.sourceEventIds ||
         [interaction?.sourceEventId]),
@@ -165,7 +185,8 @@
       primaryNormalizedEvent: clone(primary),
       supportingNormalizedEventIds: events.filter(event => event !== primary).map(event => event.normalizedEventId),
       evidence: events.map(event => ({ normalizedEventId: event.normalizedEventId,
-        kind: event.kind })), status: "candidate"
+        kind: event.kind, interactionId: event.interactionId || null })),
+      interactionIds: interactionIds(events), status: "candidate"
     });
   }
   function isNoise(event) { return event.kind === "focus-transition" || ["scroll", "mousemove", "mouseover", "pointermove"].includes(event.rawEventType); }
@@ -238,6 +259,12 @@
         normalizedEventId: event.normalizedEventId, classification: "unclassified",
         reason: "no-documentable-interaction" }));
       assignments.set(event.normalizedEventId, "supporting"); continue; }
+      if (pending && sameRecordedInteraction(pending.events, event)) {
+        pending.events.push(event);
+        pending.reasons.push("recorder-interaction-id");
+        continue;
+      }
+      if (pending && conflictingRecordedInteraction(pending.events, event)) emit();
       if (isLookupOrigin(pending?.events[0])) {
         const lookupOrigin = pending.events[0];
         const sameLookupPage = pageKey(event) === pageKey(lookupOrigin) || event.pageIdentification?.modal;

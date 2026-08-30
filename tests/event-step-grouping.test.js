@@ -30,7 +30,7 @@ const quantity = run([
     value: { normalized: "500" }, screenshotAssetId: "shot-2" })
 ]);
 assert.strictEqual(quantity.schemaVersion, 1);
-assert.strictEqual(quantity.groupingVersion, "1.2.0");
+assert.strictEqual(quantity.groupingVersion, "1.3.0");
 assert.strictEqual(quantity.groups.length, 1);
 assert.strictEqual(quantity.groups[0].groupKind, "field-edit");
 assert.deepStrictEqual(quantity.groups[0].sourceEventIds,
@@ -42,7 +42,7 @@ assert.deepStrictEqual(quantity.groups[0].supportingNormalizedEventIds,
   ["normalized:q1", "normalized:q2"]);
 assert.deepStrictEqual(quantity.groups[0].screenshotAssetIds,
   ["shot-1", "shot-2"]);
-assert.strictEqual(quantity.groups[0].capturePacket.packetVersion, "1.1.0");
+assert.strictEqual(quantity.groups[0].capturePacket.packetVersion, "1.2.0");
 assert.strictEqual(quantity.groups[0].capturePacket.preferredScreenshotAssetId,
   "shot-2");
 assert.strictEqual(quantity.groups[0].capturePacket.completeness, "complete");
@@ -199,6 +199,42 @@ const twoFields = run([
     identity: { value: "Quantity" } }, value: { normalized: "500" } })
 ]);
 assert.strictEqual(twoFields.groups.length, 2);
+
+const recorderBound = run([
+  event("ib1", "activation", { interactionId: "frame:interaction-1",
+    interactionIds: ["frame:interaction-1"],
+    actionIdentification: { caption: "Open" }, screenshotAssetId: "before" }),
+  event("ib2", "navigation", { interactionId: "frame:interaction-1",
+    interactionIds: ["frame:interaction-1"],
+    pageIdentification: { id: "99", caption: "Result" },
+    screenshotAssetId: "after" })
+]);
+assert.strictEqual(recorderBound.groups.length, 1);
+assert.strictEqual(recorderBound.groups[0].capturePacket.interactionId,
+  "frame:interaction-1");
+assert.deepStrictEqual(recorderBound.groups[0].interactionIds,
+  ["frame:interaction-1"]);
+assert.strictEqual(recorderBound.groups[0].capturePacket.interactionIdentitySource,
+  "recorder");
+assert.ok(recorderBound.groups[0].groupingReason.includes(
+  "recorder-interaction-id"));
+
+const recorderSeparated = run([
+  event("is1", "activation", { interactionId: "frame:interaction-1",
+    interactionIds: ["frame:interaction-1"],
+    actionIdentification: { caption: "Open" } }),
+  event("is2", "navigation", { interactionId: "frame:interaction-2",
+    interactionIds: ["frame:interaction-2"],
+    pageIdentification: { id: "99", caption: "Other result" } })
+]);
+assert.strictEqual(recorderSeparated.groups.length, 2,
+  "different recorder interaction IDs are an authoritative boundary");
+assert.strictEqual(recorderSeparated.groups[0].capturePacket.interactionIdentitySource,
+  "recorder");
+
+assert.strictEqual(actionResult.groups[0].capturePacket.interactionId, null);
+assert.strictEqual(actionResult.groups[0].capturePacket.interactionIdentitySource,
+  "compatibility-grouping", "legacy recordings retain heuristic grouping");
 
 const ambiguousFrames = run([
   event("cf1", "value-change", { frameContext: { frameId: "top" },

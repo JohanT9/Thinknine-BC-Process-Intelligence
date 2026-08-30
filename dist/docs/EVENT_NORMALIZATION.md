@@ -2,7 +2,7 @@
 
 ## Boundary and version
 
-Event Normalization 2.2.0 converts persisted browser mechanics plus BC UI
+Event Normalization 2.3.0 converts persisted browser mechanics plus BC UI
 Identification into deterministic, renderer-neutral interactions:
 
 ```text
@@ -41,6 +41,13 @@ range, sequence, Page/Control/Action identity, complete frame context, previous
 and committed values, state/selection, coordinates, screenshot references,
 evidence, source provenance, and retained future metadata. IDs use a
 length-prefixed composition of source IDs and do not depend on localized text.
+
+For new recordings, normalized events also expose additive `interactionId` and
+`interactionIds`. The opaque value originates in the recorder and is never
+reconstructed from wording, values, page captions, array position, or timing.
+Coalescing cannot combine two events carrying different recorder interaction
+IDs. Recordings without the field remain valid and use the previous mechanical
+coalescing behavior.
 
 ## Native commits and React/MUI fallback
 

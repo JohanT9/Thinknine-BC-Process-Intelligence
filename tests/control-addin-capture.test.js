@@ -65,6 +65,9 @@ assert(content.includes("concisePointerLabel"));
 assert(content.includes('accessibleNameSource: "pointer-path-text"'));
 assert(content.includes('type: "T9_CAPTURE_BEFORE_ACTION"'));
 assert(content.includes("preActionCaptureId"));
+assert(content.includes("interactionId,"));
+assert(content.includes("interactionForElement"));
+assert(content.includes("dialogInteractions"));
 assert(content.includes("interactiveTarget(observedTarget, event) ||"));
 assert(content.includes('getComputedStyle(element).cursor === "pointer"'));
 for (const reactClass of ["CardActionArea", "ListItemButton", "TableRow"]) {
@@ -132,6 +135,7 @@ function memoryAdapter() {
     source: "business-central-content-script", sourceFrameId: "addin-frame",
     sourceSequence: 1, timestamp: "2026-08-17T10:00:00.000Z",
     type: "field-change", category: "field", inputSource: "focusout",
+    interactionId: "addin-frame:interaction-1",
     fieldName: "Date", value: "2026-08-07", previousValue: "2026-08-06",
     controlType: "input", inputType: "text", placeholder: "YYYY-MM-DD",
     role: "input", controlAddIn: true, frameDepth: 2,
@@ -164,6 +168,8 @@ function memoryAdapter() {
     "document-react-2");
   assert.strictEqual(canonicalRecording.events[0].raw.captureSurface.mode,
     "control-addin", "canonical evidence must preserve the observed capture mode");
+  assert.strictEqual(canonicalRecording.events[0].interaction.id,
+    "addin-frame:interaction-1");
 
   const normalized = normalization.normalizeRecording(canonicalRecording);
   assert.strictEqual(normalized.events.length, 1);
@@ -171,10 +177,14 @@ function memoryAdapter() {
   assert.strictEqual(normalized.events[0].evidence[0].value,
     "changed-value-on-focusout-fallback");
   assert.strictEqual(normalized.events[0].frameContext.browserFrameId, 7);
+  assert.strictEqual(normalized.events[0].interactionId,
+    "addin-frame:interaction-1");
 
   const grouped = grouping.group(normalized);
   assert.strictEqual(grouped.groups.length, 1);
   assert.strictEqual(grouped.groups[0].groupKind, "field-edit");
+  assert.strictEqual(grouped.groups[0].capturePacket.interactionId,
+    "addin-frame:interaction-1");
   assert.deepStrictEqual(grouped.groups[0].sourceEventIds,
     [canonicalRecording.events[0].id]);
   assert.strictEqual(screenshotPolicy.shouldCapture({ captureScreenshots: true,

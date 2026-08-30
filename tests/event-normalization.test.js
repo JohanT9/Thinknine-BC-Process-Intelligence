@@ -37,8 +37,8 @@ model = append(model, raw("e4", "field-change", { fieldName: "Quantity",
 let result = normalization.normalizeRecording(model);
 assert.strictEqual(JSON.stringify(original), before);
 assert.strictEqual(result.schemaVersion, 1);
-assert.strictEqual(result.normalizationVersion, "2.2.0");
-assert.strictEqual(normalization.NORMALIZATION_VERSION, "2.2.0");
+assert.strictEqual(result.normalizationVersion, "2.3.0");
+assert.strictEqual(normalization.NORMALIZATION_VERSION, "2.3.0");
 assert.strictEqual(result.events.length, 1);
 assert.strictEqual(result.events[0].kind, "value-change");
 assert.deepStrictEqual(result.events[0].sourceEventIds,
@@ -54,6 +54,27 @@ assert.deepStrictEqual(result.events[0].value,
 assert.strictEqual(typeof result.events[0].value.normalized, "string");
 assert.ok(Object.isFrozen(result.events[0]));
 assert.strictEqual(normalization.normalizeRecording(model), result);
+
+let interactionModel = recording("interaction-normalization");
+interactionModel = append(interactionModel, raw("i1", "click", {
+  interactionId: "frame:interaction-1", label: "Open" }));
+interactionModel = append(interactionModel, raw("i2", "page-state", {
+  interactionId: "frame:interaction-1", pageCaption: "Sales Order" }));
+const normalizedInteraction = normalization.normalizeRecording(interactionModel);
+assert.deepStrictEqual(normalizedInteraction.events.map(item => item.interactionId),
+  ["frame:interaction-1", "frame:interaction-1"]);
+assert.deepStrictEqual(normalizedInteraction.events[0].interactionIds,
+  ["frame:interaction-1"]);
+
+let separateEdits = recording("separate-interactions");
+separateEdits = append(separateEdits, raw("si1", "field-change", {
+  interactionId: "frame:interaction-a", fieldName: "Quantity",
+  value: "5", inputSource: "input" }));
+separateEdits = append(separateEdits, raw("si2", "field-change", {
+  interactionId: "frame:interaction-b", fieldName: "Quantity",
+  value: "50", inputSource: "input" }));
+assert.strictEqual(normalization.normalizeRecording(separateEdits).events.length, 2,
+  "different recorded interactions must not coalesce during normalization");
 
 let controls = recording("controls");
 controls = append(controls, raw("b1", "click", { label: "Post", clientX: 10,

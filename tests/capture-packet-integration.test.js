@@ -19,13 +19,15 @@ function normalized(id, kind, extra = {}) {
   };
 }
 
+const recordedInteraction = { interactionId: "frame:interaction-1",
+  interactionIds: ["frame:interaction-1"] };
 const normalizedEvents = [
   normalized("1", "activation", { actionIdentification: { caption: "Släpp" },
     screenshotAssetId: "asset-before" }),
   normalized("2", "activation", { actionIdentification: { caption: "Släpp" } }),
   normalized("3", "navigation", { screenshotAssetId: "asset-result" }),
   normalized("4", "unknown", { rawEventType: "future-framework-mechanic" })
-];
+].map((event, index) => index < 3 ? { ...event, ...recordedInteraction } : event);
 const before = JSON.stringify(normalizedEvents);
 const grouped = grouping.group({ schemaVersion: 1, recordingId: "capture-packet",
   events: normalizedEvents });
@@ -41,6 +43,8 @@ assert.strictEqual(grouped.supportingEvents.length, 1,
 assert.strictEqual(grouped.groups[0].capturePacket.completeness, "complete");
 assert.strictEqual(grouped.groups[0].capturePacket.preferredSourceEventId,
   "source:3");
+assert.strictEqual(grouped.groups[0].capturePacket.interactionId,
+  "frame:interaction-1");
 
 const interpreted = pipeline.interpret({
   session: { id: "capture-packet", name: "Packet test" },

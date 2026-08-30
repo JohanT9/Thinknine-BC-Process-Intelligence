@@ -2,6 +2,13 @@
 
 The language architecture now uses one extensible registry. Swedish and English remain the selectable languages while the application is prepared for another fully translated language.
 
+Process recording now assigns an opaque interaction identity at the observable
+start of a user action. The identity survives raw persistence, Canonical
+Recording, normalization, and Capture Packets so matching results remain with
+their initiating action. Existing recordings without the field continue to use
+the established deterministic compatibility path; Canonical schema version 1
+is unchanged.
+
 ## Unified working experience
 
 BC Process Studio now uses one shared Fluent-compatible design system across the

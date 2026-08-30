@@ -44,6 +44,9 @@
       },
       raw: clone(source)
     };
+    if (source.interactionId) event.interaction = {
+      id: String(source.interactionId), source: "recorder"
+    };
     if (identification) event.identification = clone(identification);
     const identifiedPage = identification?.pageIdentity || {};
     const pageObjectId = pageIdentity.observedPageObjectId(source);

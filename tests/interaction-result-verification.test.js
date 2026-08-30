@@ -26,7 +26,7 @@ const sourceError = { id: "canonical:error", recordingId: "result-verification",
 const [errorKind, errorReason] = normalization.classify(sourceError);
 assert.strictEqual(errorKind, "error-outcome");
 assert.strictEqual(errorReason, "observed-business-central-error");
-assert.strictEqual(normalization.NORMALIZATION_VERSION, "2.2.0");
+assert.strictEqual(normalization.NORMALIZATION_VERSION, "2.3.0");
 assert.strictEqual(sourceError.raw.copiedDetails, "Sensitive diagnostic details");
 
 const grouped = grouping.group({ recordingId: "result-verification", events: [
@@ -40,8 +40,8 @@ const grouped = grouping.group({ recordingId: "result-verification", events: [
   event("error", "error-outcome", { screenshotAssetId: "error.png" })
 ] });
 
-assert.strictEqual(grouping.GROUPING_VERSION, "1.2.0");
-assert.strictEqual(grouping.CAPTURE_PACKET_VERSION, "1.1.0");
+assert.strictEqual(grouping.GROUPING_VERSION, "1.3.0");
+assert.strictEqual(grouping.CAPTURE_PACKET_VERSION, "1.2.0");
 assert.strictEqual(grouping.RESULT_VERIFICATION_VERSION, "1.0.0");
 assert.strictEqual(grouped.groups.length, 1,
   "an action and all its immediate outcomes form one packet");
