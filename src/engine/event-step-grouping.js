@@ -5,8 +5,8 @@
 })(typeof globalThis !== "undefined" ? globalThis : this, function () {
   "use strict";
   const SCHEMA_VERSION = 1;
-  const GROUPING_VERSION = "1.3.0";
-  const CAPTURE_PACKET_VERSION = "1.2.0";
+  const GROUPING_VERSION = "1.4.0";
+  const CAPTURE_PACKET_VERSION = "1.3.0";
   const RESULT_VERIFICATION_VERSION = "1.0.0";
   const cache = new WeakMap();
   const clone = value => value == null ? value : JSON.parse(JSON.stringify(value));
@@ -61,6 +61,13 @@
   function outcomeEvents(events) { return events.filter(event =>
     ["dialog-open", "dialog-close", "navigation", "value-change",
       "selection-change", "toggle-change", "error-outcome"].includes(event.kind)); }
+  function interactionEvents(events) { return events.filter(event =>
+    ["activation", "key-command", "dialog-action"].includes(event.kind)); }
+  function evidenceRole(event, interaction, outcomes) {
+    if (outcomes.includes(event)) return "result";
+    if (event === interaction) return "interaction";
+    return "supporting";
+  }
   function primaryEvent(events) {
     if (events.some(event => event.kind === "activation") &&
         !events.some(isLookupOrigin) && outcomeEvents(events).length) {
@@ -123,15 +130,23 @@
   }
   function capturePacket(events, primary, screenshots) {
     const recordedInteractionIds = interactionIds(events);
-    const interaction = events.find(event => event.kind === "activation") || primary;
-    const observedOutcomes = outcomeEvents(events).filter(event => event !== interaction);
+    const explicitInteractions = interactionEvents(events);
+    const interaction = explicitInteractions[0] || primary;
+    const observedOutcomes = outcomeEvents(events).filter(event =>
+      !explicitInteractions.includes(event));
     const outcomes = observedOutcomes.length ? observedOutcomes :
       primary && primary !== interaction ? [primary] :
         primary && ["value-change", "selection-change", "toggle-change",
           "navigation", "dialog-open", "dialog-close", "error-outcome"].includes(primary.kind)
           ? [primary] : [];
-    const preferredScreenshotEvent = [...events].reverse().find(event =>
+    const screenshotEvents = events.filter(event =>
       event?.screenshotAssetId || event?.screenshotAssetIds?.length);
+    const resultScreenshotEvent = [...outcomes].reverse().find(event =>
+      event?.screenshotAssetId || event?.screenshotAssetIds?.length);
+    const interactionScreenshotEvent = [...explicitInteractions].reverse()
+      .find(event => event?.screenshotAssetId || event?.screenshotAssetIds?.length);
+    const preferredScreenshotEvent = resultScreenshotEvent ||
+      interactionScreenshotEvent || screenshotEvents.at(-1);
     const preferredScreenshotAssetId = preferredScreenshotEvent
       ? (preferredScreenshotEvent.screenshotAssetIds ||
           [preferredScreenshotEvent.screenshotAssetId]).filter(Boolean).at(-1)
@@ -148,13 +163,24 @@
       interactionIdentitySource: recordedInteractionIds.length === 1
         ? "recorder" : "compatibility-grouping",
       interactionEventId: interaction?.normalizedEventId || null,
+      interactionEventIds: explicitInteractions.length
+        ? explicitInteractions.map(event => event.normalizedEventId)
+        : interaction ? [interaction.normalizedEventId] : [],
       interactionSourceEventIds: unique(interaction?.sourceEventIds ||
         [interaction?.sourceEventId]),
       resultEventIds: outcomes.map(event => event.normalizedEventId),
       resultSourceEventIds: unique(outcomes.flatMap(event =>
         event.sourceEventIds || [event.sourceEventId])),
       screenshotAssetIds: screenshots,
+      screenshotEvidence: screenshotEvents.flatMap(event =>
+        (event.screenshotAssetIds || [event.screenshotAssetId]).filter(Boolean)
+          .map(assetId => ({ assetId,
+            normalizedEventId: event.normalizedEventId,
+            sourceEventId: event.sourceEventId || null,
+            role: evidenceRole(event, interaction, outcomes) }))),
       preferredScreenshotAssetId,
+      preferredScreenshotRole: preferredScreenshotEvent
+        ? evidenceRole(preferredScreenshotEvent, interaction, outcomes) : null,
       preferredSourceEventId: preferredScreenshotEvent?.sourceEventId || null,
       resultVerification: resultVerification(outcomes),
       completeness: missing.length ? "partial" : "complete",
@@ -167,6 +193,8 @@
     const screenshotAssetIds = unique(events.flatMap(event =>
       event.screenshotAssetIds || (event.screenshotAssetId
         ? [event.screenshotAssetId] : [])));
+    const packet = capturePacket(events, primary, screenshotAssetIds);
+    const resultIds = new Set(packet.resultEventIds);
     return freeze({
       stepGroupId: groupId(sourceEventIds), schemaVersion: SCHEMA_VERSION,
       groupingVersion: GROUPING_VERSION, recordingId, sourceEventIds,
@@ -180,12 +208,15 @@
       actionContext: clone(primary.actionIdentification),
       groupKind: groupKind(events), groupingReason: unique(reasons),
       screenshotAssetIds,
-      capturePacket: capturePacket(events, primary, screenshotAssetIds),
+      capturePacket: packet,
       frameContexts: events.map(event => clone(event.frameContext || {})),
       primaryNormalizedEvent: clone(primary),
       supportingNormalizedEventIds: events.filter(event => event !== primary).map(event => event.normalizedEventId),
       evidence: events.map(event => ({ normalizedEventId: event.normalizedEventId,
-        kind: event.kind, interactionId: event.interactionId || null })),
+        kind: event.kind, interactionId: event.interactionId || null,
+        role: resultIds.has(event.normalizedEventId)
+          ? "result" : event.normalizedEventId === packet.interactionEventId
+            ? "interaction" : "supporting" })),
       interactionIds: interactionIds(events), status: "candidate"
     });
   }
@@ -254,17 +285,19 @@
         assignments.set(event.normalizedEventId, "supporting");
         continue;
       }
+      if (pending && sameRecordedInteraction(pending.events, event)) {
+        pending.events.push(event);
+        pending.reasons.push(isNoise(event) || isUnclassifiedMechanic(event)
+          ? "recorder-interaction-supporting-evidence"
+          : "recorder-interaction-id");
+        continue;
+      }
+      if (pending && conflictingRecordedInteraction(pending.events, event)) emit();
       if (isNoise(event)) { emit(); supportingEvents.push(freeze({ normalizedEventId: event.normalizedEventId, classification: "noise", reason: "non-step-mechanic" })); assignments.set(event.normalizedEventId, "supporting"); continue; }
       if (isUnclassifiedMechanic(event)) { emit(); supportingEvents.push(freeze({
         normalizedEventId: event.normalizedEventId, classification: "unclassified",
         reason: "no-documentable-interaction" }));
       assignments.set(event.normalizedEventId, "supporting"); continue; }
-      if (pending && sameRecordedInteraction(pending.events, event)) {
-        pending.events.push(event);
-        pending.reasons.push("recorder-interaction-id");
-        continue;
-      }
-      if (pending && conflictingRecordedInteraction(pending.events, event)) emit();
       if (isLookupOrigin(pending?.events[0])) {
         const lookupOrigin = pending.events[0];
         const sameLookupPage = pageKey(event) === pageKey(lookupOrigin) || event.pageIdentification?.modal;

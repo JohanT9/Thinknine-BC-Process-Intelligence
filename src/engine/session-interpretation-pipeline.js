@@ -56,6 +56,12 @@ function (semantic, knowledge, refs) {
     return { taskId: `${action.actionType || "Task"}:${refs.stableIdentity(trace)}`,
       taskNo: index + 1, taskType: action.actionType || "Unclassified",
       semanticAction: action.actionType || "", semanticActionModel: action,
+      capturePackets: (action.capturePackets || []).map(value => ({ ...value })),
+      ...(action.capturePacket ? { capturePacket: { ...action.capturePacket } } : {}),
+      ...(action.interactionIds?.length ? {
+        interactionIds: [...action.interactionIds],
+        interactionId: action.interactionId || null
+      } : {}),
       instruction: action.displayText || "", description: action.displayText || "",
       pageId: action.pageId || "", pageObjectId: action.pageObjectId || "",
       pageIdentity: action.pageIdentity || "",

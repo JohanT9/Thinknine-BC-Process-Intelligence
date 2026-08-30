@@ -45,6 +45,12 @@ assert.strictEqual(grouped.groups[0].capturePacket.preferredSourceEventId,
   "source:3");
 assert.strictEqual(grouped.groups[0].capturePacket.interactionId,
   "frame:interaction-1");
+assert.deepStrictEqual(grouped.groups[0].capturePacket.interactionEventIds,
+  ["normalized:1", "normalized:2"]);
+assert.deepStrictEqual(grouped.groups[0].capturePacket.resultEventIds,
+  ["normalized:3"]);
+assert.strictEqual(grouped.groups[0].capturePacket.preferredScreenshotRole,
+  "result");
 
 const interpreted = pipeline.interpret({
   session: { id: "capture-packet", name: "Packet test" },
@@ -66,6 +72,11 @@ assert.strictEqual(interpreted.businessTasks[0].taskType, "RunAction");
 assert.strictEqual(interpreted.businessTasks[0].instruction, "Välj **Släpp**.");
 assert.strictEqual(interpreted.businessTasks[0].screenshot,
   "screenshots/000003.png", "the observed result image should win");
+assert.strictEqual(interpreted.businessTasks[0].interactionId,
+  "frame:interaction-1");
+assert.strictEqual(interpreted.businessTasks[0].capturePacket
+  .preferredScreenshotRole, "result");
+assert.strictEqual(interpreted.businessTasks[0].capturePackets.length, 1);
 assert.ok(!interpreted.businessTasks.some(task =>
   String(task.instruction || "").includes("Utför uppgiften")));
 assert.deepStrictEqual(interpreted.businessTasks[0].sourceEventIds,

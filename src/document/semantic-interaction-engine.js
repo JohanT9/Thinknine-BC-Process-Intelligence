@@ -179,6 +179,11 @@
       value.resultVerification || value.capturePacket?.resultVerification ||
       value.stepGroups?.at(-1)?.capturePacket?.resultVerification
     ).filter(Boolean).at(-1);
+    const capturePackets = values.flatMap(value => value.capturePackets?.length
+      ? value.capturePackets : value.capturePacket ? [value.capturePacket]
+        : (value.stepGroups || []).map(group => group.capturePacket).filter(Boolean));
+    const packetInteractionIds = unique(capturePackets.flatMap(packet =>
+      packet.interactionIds || [packet.interactionId]));
     return deepFreeze({
       ...futureMetadata,
       actionId: stableId(rule.ruleId, values),
@@ -188,6 +193,13 @@
       selectedValue: properties.selectedValue || "",
       targetField: properties.targetField || "",
       captureGuidance,
+      ...(capturePackets.length ? { capturePackets: clone(capturePackets) } : {}),
+      ...(capturePackets.length === 1
+        ? { capturePacket: clone(capturePackets[0]) } : {}),
+      ...(packetInteractionIds.length
+        ? { interactionIds: packetInteractionIds,
+          interactionId: packetInteractionIds.length === 1
+            ? packetInteractionIds[0] : null } : {}),
       ...(resultVerification ? { resultVerification: clone(resultVerification) } : {}),
       ...(Object.keys(page).length ? { pageContext: page,
         pageIdentification: clone(page),

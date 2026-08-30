@@ -40,8 +40,8 @@ const grouped = grouping.group({ recordingId: "result-verification", events: [
   event("error", "error-outcome", { screenshotAssetId: "error.png" })
 ] });
 
-assert.strictEqual(grouping.GROUPING_VERSION, "1.3.0");
-assert.strictEqual(grouping.CAPTURE_PACKET_VERSION, "1.2.0");
+assert.strictEqual(grouping.GROUPING_VERSION, "1.4.0");
+assert.strictEqual(grouping.CAPTURE_PACKET_VERSION, "1.3.0");
 assert.strictEqual(grouping.RESULT_VERIFICATION_VERSION, "1.0.0");
 assert.strictEqual(grouped.groups.length, 1,
   "an action and all its immediate outcomes form one packet");

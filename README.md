@@ -263,6 +263,11 @@ Step Groups include an immutable capture packet that binds an observed control
 and user action to its verified immediate result and screenshot evidence. This
 reduces duplicate mechanics and prevents unknown framework events from becoming
 empty *Utför uppgiften* steps without discarding their traceability.
+Matching recorder identities now keep React/control-add-in support mechanics
+inside the same packet. Packet evidence is explicitly classified as interaction,
+result, or supporting, and a result-bearing screenshot is preferred over a later
+transient capture. The packet contract remains available on the Semantic Action
+and generated Review task.
 
 ## Event Normalization
 

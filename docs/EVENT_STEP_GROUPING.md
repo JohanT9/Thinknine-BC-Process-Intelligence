@@ -35,7 +35,7 @@ candidate status, and an additive immutable `capturePacket`. Unknown future
 fields survive normalization.
 
 The capture packet explicitly relates the observed interaction to its immediate
-verified result and captured screenshot evidence. Version `1.2.0` also carries
+verified result and captured screenshot evidence. Version `1.3.0` also carries
 the formal `resultVerification` contract described in
 [INTERACTION_RESULT_VERIFICATION.md](INTERACTION_RESULT_VERIFICATION.md). It records interaction and
 result event IDs separately, all screenshot asset IDs, the source event owning
@@ -46,7 +46,12 @@ identity; `compatibility-grouping` means historical evidence required the
 existing deterministic grouping rules. It is derived evidence: Canonical
 Recording and raw events remain unchanged.
 
-Algorithm version is `1.3.0`. IDs use the version plus collision-safe,
+Each packet classifies evidence as `interaction`, `result`, or `supporting` and
+exposes plural `interactionEventIds`, `resultEventIds`, and structured
+`screenshotEvidence`. A screenshot attached to verified result evidence is the
+packet preference; a later framework/supporting capture cannot displace it.
+
+Algorithm version is `1.4.0`. IDs use the version plus collision-safe,
 length-prefixed canonical source IDs. They do not use random values, execution
 time, Review order, export state, or captions.
 
@@ -70,6 +75,8 @@ Matching recorder interaction IDs take precedence over adjacency heuristics and
 allow an observable outcome to remain with its initiating action. Different
 recorder IDs are an explicit boundary. Events without IDs retain the established
 lookup, control-identity, value-match, and bounded timing compatibility path.
+Noise and unknown framework mechanics carrying the same recorder ID are retained
+as supporting packet evidence rather than closing the packet or becoming a Step.
 
 ## Field editing, dates, toggles, and selection
 
@@ -134,6 +141,11 @@ compatibility events/tasks. Semantic Interaction Rules provide a dedicated Step
 Group adapter and retain group/source identity. Legacy low-level task
 consolidation remains only for older Review input without groups. No persistence
 migration is required.
+
+Capture Packets and their recorder interaction IDs survive the Semantic Action
+handoff and are copied to generated Review tasks. This lets later diagnostics and
+repair workflows consume the established packet without rediscovering event
+boundaries.
 
 Grouping is a cached linear state machine with no DOM, pixel, AI, OCR, language,
 network, or all-pairs work. A 5,000-event regression guards performance and event

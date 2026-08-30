@@ -30,7 +30,7 @@ const quantity = run([
     value: { normalized: "500" }, screenshotAssetId: "shot-2" })
 ]);
 assert.strictEqual(quantity.schemaVersion, 1);
-assert.strictEqual(quantity.groupingVersion, "1.3.0");
+assert.strictEqual(quantity.groupingVersion, "1.4.0");
 assert.strictEqual(quantity.groups.length, 1);
 assert.strictEqual(quantity.groups[0].groupKind, "field-edit");
 assert.deepStrictEqual(quantity.groups[0].sourceEventIds,
@@ -42,7 +42,7 @@ assert.deepStrictEqual(quantity.groups[0].supportingNormalizedEventIds,
   ["normalized:q1", "normalized:q2"]);
 assert.deepStrictEqual(quantity.groups[0].screenshotAssetIds,
   ["shot-1", "shot-2"]);
-assert.strictEqual(quantity.groups[0].capturePacket.packetVersion, "1.2.0");
+assert.strictEqual(quantity.groups[0].capturePacket.packetVersion, "1.3.0");
 assert.strictEqual(quantity.groups[0].capturePacket.preferredScreenshotAssetId,
   "shot-2");
 assert.strictEqual(quantity.groups[0].capturePacket.completeness, "complete");
@@ -218,6 +218,36 @@ assert.strictEqual(recorderBound.groups[0].capturePacket.interactionIdentitySour
   "recorder");
 assert.ok(recorderBound.groups[0].groupingReason.includes(
   "recorder-interaction-id"));
+
+const recorderPacketWithFrameworkNoise = run([
+  event("ip1", "activation", { interactionId: "frame:interaction-packet",
+    interactionIds: ["frame:interaction-packet"],
+    actionIdentification: { caption: "Post" }, screenshotAssetId: "before" }),
+  event("ip2", "unknown", { interactionId: "frame:interaction-packet",
+    interactionIds: ["frame:interaction-packet"],
+    rawEventType: "react-state-transition", screenshotAssetId: "transient" }),
+  event("ip3", "navigation", { interactionId: "frame:interaction-packet",
+    interactionIds: ["frame:interaction-packet"],
+    pageIdentification: { id: "posted", caption: "Posted document" },
+    screenshotAssetId: "result" }),
+  event("ip4", "unknown", { interactionId: "frame:interaction-packet",
+    interactionIds: ["frame:interaction-packet"],
+    rawEventType: "react-render-complete", screenshotAssetId: "late-support" })
+]);
+assert.strictEqual(recorderPacketWithFrameworkNoise.groups.length, 1,
+  "same-interaction framework mechanics must not split a capture packet");
+const stablePacket = recorderPacketWithFrameworkNoise.groups[0].capturePacket;
+assert.deepStrictEqual(stablePacket.interactionEventIds,
+  ["normalized:ip1"]);
+assert.deepStrictEqual(stablePacket.resultEventIds,
+  ["normalized:ip3"]);
+assert.strictEqual(stablePacket.preferredScreenshotAssetId, "result",
+  "verified result evidence must win over a later supporting capture");
+assert.strictEqual(stablePacket.preferredScreenshotRole, "result");
+assert.deepStrictEqual(stablePacket.screenshotEvidence.map(item => item.role),
+  ["interaction", "supporting", "result", "supporting"]);
+assert.ok(recorderPacketWithFrameworkNoise.groups[0].groupingReason.includes(
+  "recorder-interaction-supporting-evidence"));
 
 const recorderSeparated = run([
   event("is1", "activation", { interactionId: "frame:interaction-1",

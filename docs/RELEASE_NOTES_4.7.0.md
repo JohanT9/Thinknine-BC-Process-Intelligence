@@ -9,6 +9,12 @@ their initiating action. Existing recordings without the field continue to use
 the established deterministic compatibility path; Canonical schema version 1
 is unchanged.
 
+Capture Packets now remain intact when React or control-add-in support mechanics
+occur between an action and its result. Evidence roles are explicit, verified
+result screenshots win over later transient captures, and the complete packet is
+available to Semantic Actions and Review tasks. This reduces duplicate or empty
+steps without changing historical recording behavior.
+
 ## Unified working experience
 
 BC Process Studio now uses one shared Fluent-compatible design system across the
