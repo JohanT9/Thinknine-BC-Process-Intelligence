@@ -33,10 +33,28 @@ IDs, canonical source IDs, primary event, mode, explicit reasons, rejected
 candidates, manual override, fallback state, and annotation-preservation flags.
 Unknown future fields survive normalization.
 
-Selection version is `1.2.0`. Identity fingerprints include the version, Step
+Selection version is `1.3.0`. Identity fingerprints include the version, Step
 Group, profile, previous-page continuity, manual state, candidate IDs, source and
-normalized event identities, kind, annotations, and relevant stability/context
-signals. Random values and array positions alone are never identities.
+normalized event identities, kind, Capture Packet evidence role and preference,
+annotations, and relevant stability/context signals. Random values and array
+positions alone are never identities.
+
+## Capture Packet evidence
+
+For modern Step Groups, the engine consumes the immutable `capturePacket`
+created by Event to Step Grouping. Candidate assets are enriched in memory with
+their packet evidence role: `interaction`, `result`, or `supporting`. The packet's
+preferred verified-result asset receives the strongest automatic evidence;
+later supporting captures are explicitly penalized. This solves the common case
+where the recorder captures both the invoked control and a later framework state
+after the useful result was already visible.
+
+Packet evidence does not alter the candidate's observable capture role, expand
+the Step Group boundary, or modify raw/canonical evidence. Results expose
+`selectedPacketEvidenceRole` and reasons such as `capture-packet-result` and
+`capture-packet-preferred`. Manual choices and annotation preservation are still
+evaluated before automatic ranking. Historical groups without a Capture Packet
+follow the previous selection policy unchanged.
 
 ## Capture roles
 

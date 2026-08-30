@@ -1,5 +1,15 @@
 # BC Process Studio 4.7
 
+## Capture Packet-aware screenshot selection
+
+- Screenshot Selection now uses the stable interaction/result/supporting image
+  evidence established by Capture Packets.
+- A verified result image is preferred over the initiating action or a later
+  transient/supporting capture.
+- Manual image choices and annotated screenshots remain authoritative.
+- Existing recordings without Capture Packet evidence retain their established
+  screenshot behavior and require no migration.
+
 The language architecture now uses one extensible registry. Swedish and English remain the selectable languages while the application is prepared for another fully translated language.
 
 Process recording now assigns an opaque interaction identity at the observable

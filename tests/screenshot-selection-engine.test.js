@@ -34,7 +34,7 @@ const quantityCandidates = Object.freeze([
 const quantity = engine.select({ stepGroup: quantityGroup,
   candidates: quantityCandidates });
 assert.strictEqual(quantity.schemaVersion, 1);
-assert.strictEqual(quantity.selectionVersion, "1.2.0");
+assert.strictEqual(quantity.selectionVersion, "1.3.0");
 assert.strictEqual(quantity.captureRoleVersion, "1.0.0");
 assert.strictEqual(quantity.selectedScreenshotAssetId, "shot-commit");
 assert.strictEqual(quantity.selectedCaptureRole, "result-visible");
@@ -94,6 +94,55 @@ const action = engine.select({ stepGroup: group({ groupKind: "action",
 ] });
 assert.strictEqual(action.selectedScreenshotAssetId, "post");
 assert.ok(action.selectionReasons.includes("role-action-visible"));
+
+const packetAwareGroup = group({ stepGroupId: "step-group:packet-aware-action",
+  groupKind: "action", primarySourceEventId: "event:action",
+  sourceEventIds: ["event:action", "event:result", "event:later"],
+  screenshotAssetIds: ["action-visible", "verified-result", "later-context"],
+  capturePacket: {
+    packetVersion: "1.3.0", preferredScreenshotAssetId: "verified-result",
+    preferredScreenshotRole: "result", screenshotEvidence: [
+      { assetId: "action-visible", sourceEventId: "event:action",
+        role: "interaction" },
+      { assetId: "verified-result", sourceEventId: "event:result",
+        role: "result" },
+      { assetId: "later-context", sourceEventId: "event:later",
+        role: "supporting" }
+    ]
+  }
+});
+const packetCandidates = Object.freeze([
+  candidate("action-visible", "event:action", "activation"),
+  candidate("verified-result", "event:result", "navigation", {
+    stability: { stable: true } }),
+  candidate("later-context", "event:later", "activation")
+]);
+const packetAware = engine.select({ stepGroup: packetAwareGroup,
+  candidates: packetCandidates });
+assert.strictEqual(packetAware.selectedScreenshotAssetId, "verified-result",
+  "verified packet result should win over the action and later context image");
+assert.strictEqual(packetAware.selectedPacketEvidenceRole, "result");
+assert.ok(packetAware.selectionReasons.includes("capture-packet-result"));
+assert.ok(packetAware.selectionReasons.includes("capture-packet-preferred"));
+assert.ok(packetAware.rejectedCandidates.find(item =>
+  item.screenshotAssetId === "later-context").reasons.includes(
+    "capture-packet-supporting"));
+assert.strictEqual(engine.select({ stepGroup: packetAwareGroup,
+  candidates: packetCandidates }), packetAware,
+"packet-aware selection should remain deterministic and cacheable");
+assert.strictEqual(packetCandidates[0].packetEvidenceRole, undefined,
+  "selection must not mutate candidate input");
+
+const packetManual = engine.select({ stepGroup: packetAwareGroup,
+  candidates: packetCandidates, manualOverride: "action-visible" });
+assert.strictEqual(packetManual.selectedScreenshotAssetId, "action-visible");
+assert.strictEqual(packetManual.selectionMode, "manual",
+  "capture packet evidence must not replace a manual image choice");
+
+const historicalAction = engine.select({ stepGroup: {
+  ...packetAwareGroup, capturePacket: undefined }, candidates: packetCandidates });
+assert.strictEqual(historicalAction.selectedScreenshotAssetId, "action-visible",
+  "historical groups without packet evidence keep established action selection");
 
 const captureRoles = [
   [{ normalizedKind: "lookup-open" }, "menu-open"],

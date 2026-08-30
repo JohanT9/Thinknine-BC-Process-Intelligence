@@ -248,6 +248,12 @@ menu open, selected option visible, committed result visible, and dialog before
 close. The selected role remains explainable while raw screenshots and
 Canonical Recording evidence stay unchanged.
 
+Modern Step Groups additionally pass their Capture Packet evidence roles to the
+selection engine. A packet's verified result screenshot is preferred over the
+initiating interaction and later supporting framework captures. This evidence
+never overrides a manual image choice or an annotated screenshot, and older
+recordings without Capture Packets keep their established selection behavior.
+
 Its reusable metadata-only validation corpus contains 20 sanitized, real-shaped
 Business Central cases. It distinguishes selection failures from missing
 captures and validates manual/annotated intent without inspecting image bytes.

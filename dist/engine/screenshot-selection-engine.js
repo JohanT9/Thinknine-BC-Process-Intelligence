@@ -5,7 +5,7 @@
 })(typeof globalThis !== "undefined" ? globalThis : this, function () {
   "use strict";
   const SCHEMA_VERSION = 1;
-  const SELECTION_VERSION = "1.2.0";
+  const SELECTION_VERSION = "1.3.0";
   const CAPTURE_ROLE_VERSION = "1.0.0";
   const CAPTURE_ROLES = Object.freeze(["menu-open", "selection-visible",
     "result-visible", "dialog-before-close", "dialog-closed", "action-visible",
@@ -64,6 +64,26 @@
     }
     return freeze(output);
   }
+  function applyCapturePacketEvidence(candidates, stepGroup) {
+    const packet = stepGroup?.capturePacket;
+    const evidence = Array.isArray(packet?.screenshotEvidence)
+      ? packet.screenshotEvidence : [];
+    if (!evidence.length && !packet?.preferredScreenshotAssetId) {
+      return candidates;
+    }
+    const byAsset = new Map(evidence.map(item => [text(item?.assetId), item]));
+    return freeze(candidates.map(candidate => {
+      const item = byAsset.get(candidateId(candidate));
+      const preferred = candidateId(candidate) ===
+        text(packet?.preferredScreenshotAssetId);
+      if (!item && !preferred) return candidate;
+      return freeze({ ...candidate,
+        packetEvidenceRole: text(item?.role) || null,
+        packetEvidencePreferred: preferred,
+        packetEvidenceVersion: text(packet?.packetVersion) || null
+      });
+    }));
+  }
   function profilePreference(profile = {}) {
     const id = text(profile.profileId); const tone = text(profile.language?.tone);
     if (id === "quick-reference" || tone === "concise") return "focused";
@@ -81,6 +101,16 @@
     const primary = stepGroup?.primaryNormalizedEvent || {};
     const role = candidate.captureRole;
     const sourceIds = new Set(stepGroup?.sourceEventIds || []);
+    if (candidate.packetEvidenceRole === "result") add(state, true, 50,
+      "capture-packet-result", null);
+    if (candidate.packetEvidenceRole === "interaction") add(state, true, 15,
+      "capture-packet-interaction", null);
+    if (candidate.packetEvidenceRole === "supporting") {
+      state.score -= 20; state.rejected.push("capture-packet-supporting");
+      state.informative = true;
+    }
+    if (candidate.packetEvidencePreferred === true) add(state, true, 140,
+      "capture-packet-preferred", null);
     add(state, candidate.sourceEventId && candidate.sourceEventId === stepGroup?.primarySourceEventId,
       70, "primary-event", "supporting-event");
     add(state, candidate.sourceEventId && sourceIds.has(candidate.sourceEventId),
@@ -166,6 +196,7 @@
         candidateId(candidate), candidate.sourceEventId,
         candidate.normalizedEventId, candidate.normalizedKind,
         candidate.captureRole,
+        candidate.packetEvidenceRole, candidate.packetEvidencePreferred,
         candidate.annotationRefs.map(item => item.annotationId || item.id || ""),
         candidate.stability.stable, candidate.uiState.context,
         candidate.uiState.loading, candidate.uiState.spinner
@@ -188,7 +219,9 @@
   function select(options = {}) {
     const stepGroup = options.stepGroup || null;
     const inputCandidates = options.candidates;
-    const candidates = normalizeCandidates(inputCandidates);
+    const candidates = applyCapturePacketEvidence(
+      normalizeCandidates(inputCandidates), stepGroup
+    );
     const allowed = new Set(stepGroup?.screenshotAssetIds || []);
     const sourceIds = new Set(stepGroup?.sourceEventIds || []);
     const scoped = stepGroup ? candidates.filter(candidate =>
@@ -276,6 +309,8 @@
       primaryEventId: stepGroup?.primaryEventId || "", selectionMode: mode,
       selectedCaptureRole: selected ? scoped.find(candidate =>
         candidateId(candidate) === selected)?.captureRole || null : null,
+      selectedPacketEvidenceRole: selected ? scoped.find(candidate =>
+        candidateId(candidate) === selected)?.packetEvidenceRole || null : null,
       selectionReasons: [...new Set(reasons)], rejectedCandidates,
       manualOverride: manual || null, fallbackUsed, preserveAllAnnotated,
       preserveExistingCandidates
@@ -292,5 +327,5 @@
   function normalizeSelection(value) { if (!value || Number(value.schemaVersion) !== SCHEMA_VERSION) throw new Error("Unsupported Screenshot Selection schema."); return freeze(clone(value)); }
   return { SCHEMA_VERSION, SELECTION_VERSION, CAPTURE_ROLE_VERSION,
     CAPTURE_ROLES, classifyCaptureRole, evaluate, normalizeCandidate,
-    normalizeCandidates, normalizeSelection, select };
+    normalizeCandidates, applyCapturePacketEvidence, normalizeSelection, select };
 });
