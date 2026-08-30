@@ -24,3 +24,9 @@ interface language. Settings define the default for new Reviews, and BC Review
 Studio provides a per-document choice. Review presentation, BC Document
 Generator and Word use the same localized document pipeline. Recorded Business
 Central labels, values and manual consultant text remain unchanged.
+
+When stopping a process or issue recording, the naming dialog now confirms the
+document language explicitly. BC Knowledge Base displays `SV`/`EN` badges and
+can filter by language. The same selection also controls generated Technical
+Bug Report headings and local text/Markdown export. No raw event is translated
+or rewritten.

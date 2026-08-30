@@ -28,7 +28,7 @@ table{width:100%;border-collapse:collapse}th,td{text-align:left;padding:9px;bord
 .library-group{grid-column:1/-1}.library-group>h3{margin:8px 0}.library-group-cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:12px}
 .library-card{border:1px solid #d8dee5;border-radius:8px;padding:14px;background:white;min-width:0}
 .library-card[data-selected="true"]{outline:3px solid #0f6cbd;outline-offset:1px}.library-card:focus-visible{outline:3px solid #0f6cbd}
-.library-card-heading{display:flex;gap:8px;justify-content:space-between;align-items:start}.library-card h4{margin:0}.library-favourite{font-size:20px;line-height:1;padding:3px 6px;margin:0;background:transparent;color:#7c5800}
+.library-card-heading{display:flex;gap:8px;align-items:start}.library-card h4{margin:0;flex:1}.library-language{background:#008b8b;color:#fff;border-radius:3px;font-size:11px;font-weight:700;padding:3px 5px}.library-favourite{font-size:20px;line-height:1;padding:3px 6px;margin:0;background:transparent;color:#7c5800}
 .library-profile{color:#0f4c81;font-weight:600}.library-tags{display:flex;gap:5px;flex-wrap:wrap;margin:8px 0}.library-tags span{background:#edf2f7;border-radius:99px;padding:3px 8px;font-size:12px}
 .library-confirmations{list-style:none;padding:0;margin:8px 0;color:#166534}.library-confirmations li::before{content:"✓ ";font-weight:700}
 .library-empty{grid-column:1/-1;padding:28px;text-align:center;background:#f8fafc;border-radius:8px}.library-status{min-height:20px}
@@ -358,6 +358,13 @@ table{width:100%;border-collapse:collapse}th,td{text-align:left;padding:9px;bord
     </label>
     <label for="libraryHealthFilter">Dokumenthälsa
       <select id="libraryHealthFilter"><option value="">All hälsa</option></select>
+    </label>
+    <label for="libraryLanguageFilter" data-i18n="library.documentLanguage">Dokumentspråk
+      <select id="libraryLanguageFilter">
+        <option value="" data-i18n="library.allLanguages">Alla språk</option>
+        <option value="sv-SE">Svenska</option>
+        <option value="en-US">English</option>
+      </select>
     </label>
     <label for="librarySort">Sortera
       <select id="librarySort">

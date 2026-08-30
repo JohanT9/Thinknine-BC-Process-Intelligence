@@ -544,6 +544,14 @@ consultant-authored text are preserved. Document Workspace and Word consume the
 same localized Document Plan. Older Reviews default to Swedish without a schema
 migration.
 
+The recorder naming dialog supplies an explicit `documentLanguage` only when a
+session is finalized. Canonical Recording stores it as additive compatibility
+metadata before the immutable completion boundary; raw events are untouched.
+Review projection and Bug Report projection consume that same value. BC
+Knowledge Base indexes the code as metadata and owns only filtering and display,
+not localization. Historical Bug Reports remain English; historical process
+documents remain Swedish.
+
 ```text
 Review → Review Projector → Semantic Document
   → Language Excellence → Document Profile → Theme → Document Planner

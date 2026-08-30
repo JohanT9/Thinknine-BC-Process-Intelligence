@@ -24,6 +24,29 @@
     clientActivityId: "Client Activity ID", userTelemetryId: "User Telemetry ID",
     serverInstanceId: "Server Instance", environment: "Environment",
     company: "Company" });
+  const SWEDISH_LABELS = Object.freeze({ timestamp: "Tidpunkt",
+    internalSessionId: "Internt sessions-ID",
+    applicationInsightsSessionId: "Application Insights sessions-ID",
+    clientActivityId: "Klientaktivitets-ID",
+    userTelemetryId: "Telemetri-ID för användare",
+    serverInstanceId: "Serverinstans", environment: "Miljö",
+    company: "Företag" });
+  const TITLES = Object.freeze({
+    "sv-SE": Object.freeze({ summary: "Sammanfattning", environment: "Miljö",
+      reproduction: "Steg för att återskapa", expected: "Förväntat resultat",
+      actual: "Faktiskt resultat", errors: "Business Central-fel",
+      diagnostics: "Teknisk diagnostik", objects: "Refererade AL-objekt",
+      telemetry: "Application Insights-telemetri", timeline: "Korrelerad tidslinje",
+      analysis: "AI-assisterad teknisk analys", evidence: "Skärmbilder och bevis",
+      notes: "Ytterligare anteckningar", traceability: "Teknisk spårbarhet" }),
+    "en-US": Object.freeze({ summary: "Summary", environment: "Environment",
+      reproduction: "Steps to Reproduce", expected: "Expected Result",
+      actual: "Actual Result", errors: "Business Central Error",
+      diagnostics: "Technical Diagnostics", objects: "Referenced AL Objects",
+      telemetry: "Application Insights Telemetry", timeline: "Correlated Timeline",
+      analysis: "AI-assisted Technical Analysis", evidence: "Screenshots and Evidence",
+      notes: "Additional Notes", traceability: "Technical Traceability" })
+  });
 
   function evidenceFor(report, evidence) {
     const wanted = new Set(report.businessCentralError?.errorEvidenceIds || []);
@@ -36,12 +59,16 @@
       text(step.instruction);
   }
   function project(report, context = {}) {
+    const documentLanguage = report.documentLanguage === "en-US" ? "en-US" : "sv-SE";
+    const titles = TITLES[documentLanguage];
+    const labels = documentLanguage === "sv-SE" ? SWEDISH_LABELS : LABELS;
     const errors = evidenceFor(report, context.errorEvidence);
     const onlyError = errors.length === 1 ? errors[0].errorEvidenceId : null;
     const primaryId = report.businessCentralError?.primaryErrorEvidenceId || onlyError;
     const primary = errors.find(item => item.errorEvidenceId === primaryId) || null;
-    const title = text(report.summary?.title).trim() ||
-      "Business Central error during recorded process";
+    const title = text(report.summary?.title).trim() || (documentLanguage === "sv-SE"
+      ? "Business Central-fel under inspelad process"
+      : "Business Central error during recorded process");
     const summaryText = text(report.summary?.summary).trim() ||
       text(primary?.rawMessage || errors[0]?.rawMessage);
     const reproduction = (report.reproduction?.steps || []).filter(step =>
@@ -50,9 +77,9 @@
       screenshotAssetIds: [...(step.source?.screenshotAssetIds || [])] }));
     const diagnostics = report.technicalDiagnostics || [];
     const diagnosticRows = errors.flatMap(item => Object.entries(
-      item.structuredDiagnostics || {}).filter(([key, value]) => LABELS[key] && value)
+      item.structuredDiagnostics || {}).filter(([key, value]) => labels[key] && value)
       .map(([key, value]) => ({ errorEvidenceId: item.errorEvidenceId,
-        label: LABELS[key], value: String(value), provenance: "captured" })));
+        label: labels[key], value: String(value), provenance: "captured" })));
     const callStacks = diagnostics.map(item => ({
       errorEvidenceId: item.errorEvidenceId,
       parseStatus: item.summary?.parseStatus || "not-available",
@@ -80,11 +107,13 @@
       queries: clone(value.queries || []),
       warnings: clone(value.warnings || []) }));
     const timeline = [...errors.map(item => ({ timestamp: item.capturedAt,
-      source: "captured-error", label: "Business Central error captured",
+      source: "captured-error", label: documentLanguage === "sv-SE"
+        ? "Business Central-fel registrerat" : "Business Central error captured",
       referenceId: item.errorEvidenceId, provenance: "captured-local-evidence" })),
     ...telemetryContexts.flatMap(context => context.events.map(event => ({
       timestamp: event.timestamp, source: "telemetry",
-      label: event.eventName || event.message || "Telemetry event observed",
+      label: event.eventName || event.message || (documentLanguage === "sv-SE"
+        ? "Telemetrihändelse observerad" : "Telemetry event observed"),
       referenceId: event.telemetryEventId,
       correlationReasons: clone(event.correlationReasons || []),
       provenance: "external-telemetry-evidence" })))]
@@ -95,49 +124,49 @@
       currentAiInput.sourceEvidenceFingerprint);
     const checks = completeness.evaluate(report, errors);
     const sections = [
-      { id: "summary", title: "Summary", kind: "summary", provenance: "manual",
+      { id: "summary", title: titles.summary, kind: "summary", provenance: "manual",
         content: { title, summary: summaryText, summaryFallback: !report.summary?.summary,
           status: report.status, severity: text(report.summary?.severity),
           category: text(report.summary?.category) } },
-      { id: "environment", title: "Environment", kind: "metadata",
+      { id: "environment", title: titles.environment, kind: "metadata",
         provenance: "captured", content: clone(report.environment || {}) },
-      { id: "reproduction", title: "Steps to Reproduce", kind: "reproduction",
+      { id: "reproduction", title: titles.reproduction, kind: "reproduction",
         provenance: "derived", content: reproduction },
-      { id: "expected-result", title: "Expected Result", kind: "text",
+      { id: "expected-result", title: titles.expected, kind: "text",
         provenance: "manual", content: text(report.expectedResult?.text) },
-      { id: "actual-result", title: "Actual Result", kind: "actual-result",
+      { id: "actual-result", title: titles.actual, kind: "actual-result",
         provenance: "mixed", content: { userDescription:
           text(report.actualResult?.human?.text), capturedErrors: errors.map(item => ({
           errorEvidenceId: item.errorEvidenceId, rawMessage: item.rawMessage })) } },
-      { id: "bc-errors", title: "Business Central Error", kind: "errors",
+      { id: "bc-errors", title: titles.errors, kind: "errors",
         provenance: "captured", content: { primaryErrorEvidenceId: primaryId,
           primary, additional: errors.filter(item => item.errorEvidenceId !== primaryId) } },
-      { id: "technical-diagnostics", title: "Technical Diagnostics",
+      { id: "technical-diagnostics", title: titles.diagnostics,
         kind: "diagnostics", provenance: "mixed", content: { rows: diagnosticRows,
           captureStatuses: errors.map(item => ({ errorEvidenceId: item.errorEvidenceId,
             diagnosticsStatus: item.diagnosticsStatus })) } },
       { id: "al-call-stack", title: "AL Call Stack", kind: "call-stack",
         provenance: "derived", content: callStacks },
-      { id: "affected-objects", title: "Referenced AL Objects",
+      { id: "affected-objects", title: titles.objects,
         kind: "objects", provenance: "derived",
         content: { objects: affectedObjects, apps: referencedApps } },
-      { id: "telemetry", title: "Application Insights Telemetry",
+      { id: "telemetry", title: titles.telemetry,
         kind: "telemetry", provenance: "external-telemetry",
         content: { configured: telemetryContexts.length > 0,
           contexts: telemetryContexts } },
-      { id: "correlated-timeline", title: "Correlated Timeline",
+      { id: "correlated-timeline", title: titles.timeline,
         kind: "timeline", provenance: "derived-correlation", content: timeline },
-      { id: "ai-analysis", title: "AI-assisted Technical Analysis",
+      { id: "ai-analysis", title: titles.analysis,
         kind: "ai-analysis", provenance: "ai-analysis", content: {
           available: Boolean(analysis), analysis,
           currentFingerprint: currentAiInput.sourceEvidenceFingerprint,
           disclosure: currentAiInput.disclosure } },
-      { id: "evidence", title: "Screenshots and Evidence", kind: "evidence",
+      { id: "evidence", title: titles.evidence, kind: "evidence",
         provenance: "mixed", content: { screenshots: clone(
           report.evidence?.screenshots || []), annotations: clone(report.annotations || []) } },
-      { id: "notes", title: "Additional Notes", kind: "notes",
+      { id: "notes", title: titles.notes, kind: "notes",
         provenance: "manual", content: clone(report.notes || []) },
-      { id: "traceability", title: "Technical Traceability", kind: "traceability",
+      { id: "traceability", title: titles.traceability, kind: "traceability",
         provenance: "mixed", content: { bugReportId: report.bugReportId,
           recordingId: report.recordingId, errorEvidenceIds:
           errors.map(item => item.errorEvidenceId), parserVersions:
@@ -146,9 +175,9 @@
     ];
     return Object.freeze({ schemaVersion: 1, reportDocumentId:
       `technical-report:${report.bugReportId}`, bugReportId: report.bugReportId,
-    title, sections, sectionOrder: [...SECTION_ORDER], completeness: checks,
+    title, documentLanguage, sections, sectionOrder: [...SECTION_ORDER], completeness: checks,
     exportPolicy: "full-technical-report-local", generatedFromUpdatedAt:
       report.updatedAt || null });
   }
-  return { LABELS, SECTION_ORDER, project };
+  return { LABELS, SECTION_ORDER, TITLES, project };
 });

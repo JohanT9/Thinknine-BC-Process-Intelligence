@@ -89,6 +89,17 @@ assert(markdown.includes("Codeunit 80"));
 assert.strictEqual(exporter.markdown(document), markdown);
 assert(exporter.plainText(document).includes("Steps to Reproduce"));
 assert(markdown.includes("productVersion: 4.6.0"));
+const swedishReport = model.normalize({ ...report, documentLanguage: "sv-SE" });
+const swedishDocument = generator.project(swedishReport, { errorEvidence: evidence });
+assert.strictEqual(swedishDocument.documentLanguage, "sv-SE");
+assert.strictEqual(swedishDocument.sections[0].title, "Sammanfattning");
+const swedishMarkdown = exporter.markdown(swedishDocument);
+assert(swedishMarkdown.includes("## Steg för att återskapa"));
+assert(swedishMarkdown.includes("## Application Insights-telemetri"));
+assert(swedishMarkdown.includes("Inte konfigurerad eller inte hämtad."));
+assert(swedishDocument.sections.find(section =>
+  section.id === "technical-diagnostics").content.rows.some(row =>
+  row.label === "Klientaktivitets-ID"));
 
 const memory = { saved: null };
 const controller = workspace.create({ report, errorEvidence: evidence,

@@ -71,6 +71,7 @@
       item.summary.callStackAvailable)?.callStack;
     return model.normalize({ bugReportId: context.bugReportId || stableId(recording.id),
       schemaVersion: model.SCHEMA_VERSION, recordingId: recording.id,
+      documentLanguage: context.documentLanguage === "sv-SE" ? "sv-SE" : "en-US",
       createdAt: now, updatedAt: now, status: "draft",
       summary: { title: context.title || "",
         summary: "", severity: "", category: "", authorship: "human" },

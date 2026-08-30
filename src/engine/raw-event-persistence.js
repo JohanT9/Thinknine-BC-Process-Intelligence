@@ -136,6 +136,12 @@
           return canonical.rename(current, title);
         }, "rename-recording");
       },
+      setDocumentLanguage(recordingId, language) {
+        return enqueue(recordingId, current => {
+          if (!current) throw new Error(`Recording not found: ${recordingId}`);
+          return canonical.setDocumentLanguage(current, language);
+        }, "set-document-language");
+      },
       finalize(recordingId, finishedAt) {
         if (failures.some(item => item.recordingId === recordingId &&
             ["load", "save"].includes(item.phase))) {

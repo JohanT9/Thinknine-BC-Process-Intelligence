@@ -40,6 +40,15 @@ assert.deepStrictEqual(library.query(index, { filters: {
   created: { from: "2026-07-01", to: "2026-07-31" },
   modified: { from: "2026-07-15", to: "2026-07-31" }
 } }).map(value => value.projectId), ["training-1"]);
+assert.strictEqual(index[0].record.documentLanguage, "sv-SE",
+  "Historical library records default compatibly to Swedish");
+const languageIndex = library.create([
+  { projectId: "sv", title: "Svenskt", documentLanguage: "sv-SE" },
+  { projectId: "en", title: "English", documentLanguage: "en-US" }
+]);
+assert.deepStrictEqual(library.query(languageIndex, { filters: {
+  documentLanguage: "en-US"
+} }).map(value => value.projectId), ["en"]);
 assert.deepStrictEqual(library.query(index, { sort: "alphabetical" })
   .map(value => value.projectId), ["quick-1", "sop-1", "training-1"]);
 assert.deepStrictEqual(library.query(index, { sort: "recent" })

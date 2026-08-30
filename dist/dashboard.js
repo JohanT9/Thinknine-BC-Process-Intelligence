@@ -3434,6 +3434,8 @@ function librarySessionRecord(session) {
     createdAt: session.startedAt,
     modifiedAt: session.updatedAt || session.completedAt || session.startedAt,
     workflowName: session.name,
+    documentLanguage: session.settings?.documentLanguage === "en-US"
+      ? "en-US" : "sv-SE",
     profile: bugReport ? {
       profileId: "bug-report", displayName: "Bug Report"
     } : undefined,
@@ -3468,6 +3470,7 @@ function libraryOptions() {
       profile: $("libraryProfileFilter").value,
       theme: $("libraryThemeFilter").value,
       health: $("libraryHealthFilter").value,
+      documentLanguage: $("libraryLanguageFilter").value,
       favourite: $("libraryFavouriteFilter").checked,
       recent: $("libraryRecentFilter").checked,
       created: { from: $("libraryCreatedFrom").value,
@@ -3564,11 +3567,15 @@ async function loadDocumentLibrary(sessions) {
   const stored = new Map((response?.records || []).map(record =>
     [record.projectId || record.sessionId, record]
   ));
-  documentLibraryRecords = sessions.map(session =>
-    globalThis.T9DocumentLibrary.merge(
-      stored.get(session.id) || {}, librarySessionRecord(session)
-    )
-  );
+  documentLibraryRecords = sessions.map(session => {
+    const storedRecord = stored.get(session.id) || {};
+    const sessionRecord = librarySessionRecord(session);
+    return globalThis.T9DocumentLibrary.merge(storedRecord, {
+      ...sessionRecord,
+      documentLanguage: storedRecord.documentLanguage ||
+        sessionRecord.documentLanguage
+    });
+  });
   documentLibrarySelection = globalThis.T9DocumentBatchOperations.reconcile(
     documentLibrarySelection,
     documentLibraryRecords.map(record => record.projectId)
@@ -6857,10 +6864,12 @@ $("expectedResultEditor").addEventListener("input", event => {
   applyReviewToolbarState();
 });
 $("reviewDocumentLanguage").addEventListener("change", event => {
+  const documentLanguage = event.currentTarget.value === "en-US"
+    ? "en-US" : "sv-SE";
   globalThis.T9Review.setDocumentField(
     activeReview,
     "documentLanguage",
-    event.currentTarget.value,
+    documentLanguage,
     { beforeSelection: activeReviewSelection,
       afterSelection: activeReviewSelection,
       groupKey: "document-field:documentLanguage" }
@@ -6869,6 +6878,11 @@ $("reviewDocumentLanguage").addEventListener("change", event => {
   invalidateDocumentWorkspace();
   renderReviewContent();
   applyReviewToolbarState();
+  if (activeReviewSession?.id) {
+    updateDocumentLibraryRecord(activeReviewSession.id, {
+      documentLanguage
+    }).catch(error => show(error.message, true));
+  }
 });
 $("resetExpectedResult").addEventListener("click", () => {
   globalThis.T9Review.setDocumentField(
@@ -7055,7 +7069,7 @@ $("sessionTools").addEventListener("toggle", () => {
   }
 });
 for (const id of ["librarySearch", "libraryProfileFilter",
-  "libraryThemeFilter", "libraryHealthFilter", "librarySort",
+  "libraryThemeFilter", "libraryHealthFilter", "libraryLanguageFilter", "librarySort",
   "libraryFavouriteFilter", "libraryRecentFilter", "libraryGroupProfiles",
   "libraryCreatedFrom", "libraryCreatedTo", "libraryModifiedFrom",
   "libraryModifiedTo"]) {

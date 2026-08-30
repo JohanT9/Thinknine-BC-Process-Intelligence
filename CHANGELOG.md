@@ -11,6 +11,15 @@
 
 ## Unreleased
 
+- Added an explicit Swedish/English document-language choice to the recording
+  naming dialog. The choice follows process Reviews and Technical Bug Reports,
+  while Canonical raw events remain unchanged.
+- Added `SV`/`EN` badges and a document-language filter to BC Knowledge Base.
+  Historical process documents remain Swedish and historical technical reports
+  retain their English compatibility behavior.
+- Localized generated Technical Bug Report section headings and local
+  text/Markdown export according to the selected report language.
+
 - Added an independent Swedish/English document-language setting with a
   per-Review override. Generated headings, standard text, statuses, instruction
   grammar, Document Generator output, and Word now use one shared localization

@@ -1265,7 +1265,7 @@ async function startSession(message, tabId) {
   return session;
 }
 
-async function stopSession(finalName = "") {
+async function stopSession(finalName = "", documentLanguage = "") {
   const state = await getState();
   if (!state.sessionId) return null;
   await settleBounded(errorEvidenceWrites, "BC error evidence writes");
@@ -1333,6 +1333,9 @@ async function stopSession(finalName = "") {
   const requestedName = String(finalName || "").trim();
   if (session && requestedName) session.name = requestedName;
   if (session) {
+    if (["sv-SE", "en-US"].includes(documentLanguage)) {
+      session.settings = { ...(session.settings || {}), documentLanguage };
+    }
     const legacyEvents = await getEvents(state.sessionId);
     const canonicalRecording = await getCanonicalRecording(state.sessionId);
     const rawRecording = await getRawRecording(state.sessionId);
@@ -1360,6 +1363,9 @@ async function stopSession(finalName = "") {
     session.completedAt = new Date().toISOString();
     session.updatedAt = session.completedAt;
     if (requestedName) await canonicalStore.rename(state.sessionId, requestedName);
+    if (["sv-SE", "en-US"].includes(documentLanguage)) {
+      await canonicalStore.setDocumentLanguage(state.sessionId, documentLanguage);
+    }
     await canonicalStore.finalize(state.sessionId, session.completedAt);
     await saveSession(session);
   }
@@ -1417,7 +1423,10 @@ async function createAndOpenBugReport(recordingId, reportTitle = "") {
   const errors = await getBcErrorEvidenceForRecording(recordingId);
   const report = globalThis.T9BugReportService.createBugReportFromRecording(
     recording, tasks, { extensionVersion: VERSION, productVersion: VERSION,
-      errorEvidence: errors, title: String(reportTitle || "").trim() ||
+      errorEvidence: errors,
+      documentLanguage: recording.metadata?.documentLanguage === "en-US"
+        ? "en-US" : "sv-SE",
+      title: String(reportTitle || "").trim() ||
         draftBugTitle(tasks, errors) });
   const saved = await bugReportStore.save(report);
   const workspaceUrl = chrome.runtime.getURL(
@@ -1602,7 +1611,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
       }
 
       case "T9_STOP": {
-        const session = await stopSession(message.name);
+        const session = await stopSession(message.name, message.documentLanguage);
         sendResponse({ ok: true, session });
         break;
       }
@@ -1619,7 +1628,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
         if (!active || active.recordingPurpose !== "bug-report") {
           throw new Error("Ingen aktiv felinspelning finns.");
         }
-        const session = await stopSession(message.name);
+        const session = await stopSession(message.name, message.documentLanguage);
         const created = await createAndOpenBugReport(session.id, message.name);
         sendResponse({ ok: true, session, report: created.report,
           workspaceUrl: created.workspaceUrl, tabId: created.tabId });

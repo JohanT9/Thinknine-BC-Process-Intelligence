@@ -66,6 +66,8 @@
       author: text(source.author),
       summary: text(source.summary),
       workflowName: text(source.workflowName),
+      documentLanguage: text(source.documentLanguage || metadata.documentLanguage) ===
+        "en-US" ? "en-US" : "sv-SE",
       sectionNames: list(source.sectionNames),
       tags: [...new Set([
         ...list(source.tags),
@@ -194,6 +196,8 @@
         (!filters.profile || record.profile.profileId === filters.profile) &&
         (!filters.theme || record.theme.themeId === filters.theme) &&
         (!filters.health || record.health.overall === filters.health) &&
+        (!filters.documentLanguage ||
+          record.documentLanguage === filters.documentLanguage) &&
         (!filters.favourite || record.favourite) &&
         (!filters.recent || (Date.parse(record.lastOpenedAt) || 0) >= recentAfter) &&
         includesDate(record.createdAt, filters.created) &&

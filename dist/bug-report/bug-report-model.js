@@ -37,6 +37,8 @@
     }
     result.bugReportId = String(result.bugReportId || "");
     result.recordingId = String(result.recordingId || "");
+    result.documentLanguage = result.documentLanguage === "sv-SE"
+      ? "sv-SE" : "en-US";
     if (!result.bugReportId || !result.recordingId) {
       throw new TypeError("Bug Report identity and recording reference are required.");
     }

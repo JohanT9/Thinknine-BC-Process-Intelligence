@@ -7,6 +7,7 @@ function updateText(element, value) {
 
 const withTimeout = globalThis.T9AsyncOperations.withTimeout;
 let currentUiLocale = globalThis.T9UiI18n.DEFAULT_LOCALE;
+let defaultDocumentLanguage = "sv-SE";
 const t = key => globalThis.T9UiI18n.translate(key, currentUiLocale);
 const tf = (key, values) => globalThis.T9UiI18n.format(key, values, currentUiLocale);
 
@@ -22,6 +23,8 @@ function updateLanguageSwitch() {
 async function loadUiLocale() {
   try {
     const response = await send({ type: "T9_GET_SETTINGS" }, 3000);
+    defaultDocumentLanguage = response?.settings?.documentLanguage === "en-US"
+      ? "en-US" : "sv-SE";
     currentUiLocale = globalThis.T9UiI18n.apply(response?.settings?.uiLocale);
     globalThis.T9UiI18n.observe(() => currentUiLocale);
     updateLanguageSwitch();
@@ -220,13 +223,14 @@ function openLibraryAfterRecording() {
   chrome.runtime.openOptionsPage();
 }
 
-async function finishRecording(name) {
+async function finishRecording(name, documentLanguage) {
   try {
     showMessage(pendingBugRecording
       ? t("recorder.creatingReport") : t("recorder.stopping"));
     const response = await send({
       type: pendingBugRecording ? "T9_FINISH_BUG_RECORDING" : "T9_STOP",
-      name
+      name,
+      documentLanguage: documentLanguage === "en-US" ? "en-US" : "sv-SE"
     }, pendingBugRecording ? 30000 : 5000);
     if (!response?.ok) {
       throw new Error(response?.error || t("recorder.stopFailed"));
@@ -292,6 +296,7 @@ function openNameDialog(bugRecording) {
   $("recordingName").value = "";
   $("recordingName").placeholder = pendingBugRecording
     ? t("recorder.nameBugPlaceholder") : t("recorder.nameProcessPlaceholder");
+  $("recordingDocumentLanguage").value = defaultDocumentLanguage;
   if (!$("nameDialog").open) $("nameDialog").showModal();
   $("recordingName").focus();
 }
@@ -317,7 +322,7 @@ $("nameForm").addEventListener("submit", event => {
     return;
   }
   $("nameDialog").close();
-  finishRecording(name);
+  finishRecording(name, $("recordingDocumentLanguage").value);
 });
 
 $("dashboard").addEventListener("click", () => chrome.runtime.openOptionsPage());

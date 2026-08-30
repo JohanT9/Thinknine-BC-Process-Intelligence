@@ -37,9 +37,13 @@ Current product areas:
   content. Swedish remains the backward-compatible default and English is
   available as the first additional UI locale.
 - **Document language** can independently be Swedish or English. Settings define
-  the default for new Reviews and each Review can override it; Review
+  the default offered when a recording is named, each recording confirms its
+  language before finalization, and each Review can override it; Review
   presentation, Document Generator and Word stay aligned while observed BC
   labels and manually edited text remain unchanged.
+- **BC Knowledge Base** shows `SV`/`EN` on every document and can filter by
+  document language. Technical issue reports use the same recording-level
+  choice for generated headings and local text/Markdown export.
 - **BC Knowledge Base** stores and helps retrieve reusable process documentation.
 
 **BC Process Maps** and broader **BC Process AI** capabilities are future product areas. They are not presented as available production functionality in 4.7. Existing optional AI technical analysis for Bug Reports remains explicitly user-triggered and evidence-bounded.
@@ -48,7 +52,9 @@ Current product areas:
 
 Open the extension while Business Central is active and choose **Report a Bug**. Reproduce the problem, then choose **Stop and open bug report**. BC Process Studio creates and opens a local draft with reproduction steps, screenshots, captured BC error evidence, and technical diagnostics when available. Add the expected result and any missing business context, then copy or export locally—or explicitly preview and submit to a configured issue destination. Telemetry, AI analysis, and external integrations are optional.
 
-Both process and bug recording start immediately. When you select Stop, enter the final process or report name in the naming dialog. Canceling the dialog continues the active recording.
+Both process and bug recording start immediately. When you select Stop, enter
+the final process or report name and confirm its document language in the naming
+dialog. Canceling the dialog continues the active recording.
 
 Edge is the production target. The architecture and build are Chromium-compatible,
 with modern Chrome and Edge bundle targets, but Chrome product support is not

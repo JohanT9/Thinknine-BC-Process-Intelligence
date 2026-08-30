@@ -80,6 +80,12 @@ dialog{width:calc(100% - 36px);box-sizing:border-box;border:1px solid #8392a5;bo
     <p id="nameDialogHelp" class="hint"></p>
     <label for="recordingName">Namn</label>
     <input id="recordingName" required maxlength="120" autocomplete="off">
+    <label for="recordingDocumentLanguage" data-i18n="settings.documentLanguage">Dokumentspråk</label>
+    <select id="recordingDocumentLanguage">
+      <option value="sv-SE">Svenska</option>
+      <option value="en-US">English</option>
+    </select>
+    <p class="hint" data-i18n="recorder.documentLanguageHelp">Välj språket för den dokumentation eller felrapport som skapas.</p>
     <menu>
       <button id="cancelName" type="button" class="debug"
         title="Avbryt stopp och fortsätt spela in"

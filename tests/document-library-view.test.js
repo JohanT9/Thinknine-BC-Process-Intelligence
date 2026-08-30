@@ -17,6 +17,7 @@ assert(container.innerHTML.includes('data-selected="true"'));
 assert(container.innerHTML.includes('type="checkbox"'));
 assert(container.innerHTML.includes('aria-pressed="true"'));
 assert(container.innerHTML.includes("Order &lt;test&gt;"));
+assert(container.innerHTML.includes(">SV</span>"));
 assert(container.innerHTML.includes("Arbetsflödet är dokumenterat"));
 assert.strictEqual(view.renderPreview, undefined);
 assert.strictEqual(view.renderGrouped(container, library.groupByProfile([record]), {
@@ -30,6 +31,10 @@ const bugRecord = library.normalize({ projectId: "bug-1", title: "Feltest",
 view.renderList(container, [bugRecord], {});
 assert(container.innerHTML.includes("Öppna felrapport"));
 assert(!container.innerHTML.includes("Öppna dokumentation"));
+const englishRecord = library.normalize({ projectId: "en-1", title: "English",
+  documentLanguage: "en-US" });
+view.renderList(container, [englishRecord], {});
+assert(container.innerHTML.includes('aria-label="English">EN</span>'));
 assert.strictEqual(view.renderList(container, [], {}), null);
 assert(container.innerHTML.includes("inga dokument i Dokumentbiblioteket"));
 

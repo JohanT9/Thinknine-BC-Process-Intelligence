@@ -54,6 +54,14 @@ assert.strictEqual(renamed.metadata.title, "Skapa försäljningsorder");
 assert.strictEqual(renamed.compatibility.session.name, "Skapa försäljningsorder");
 assert.strictEqual(JSON.stringify(finishedInput), finishedSnapshot,
   "Renaming must not mutate Canonical Recording input.");
+const englishRecording = recording.setDocumentLanguage(finishedInput, "en-US");
+assert.strictEqual(englishRecording.metadata.documentLanguage, "en-US");
+assert.strictEqual(englishRecording.compatibility.session.settings.documentLanguage,
+  "en-US");
+assert.strictEqual(recording.legacyView(englishRecording).session.settings
+  .documentLanguage, "en-US");
+assert.strictEqual(JSON.stringify(finishedInput), finishedSnapshot,
+  "Selecting document language must not mutate Canonical Recording input.");
 const finished = recording.finish(finishedInput, "2026-08-10T09:00:00.000Z");
 assert.strictEqual(JSON.stringify(finishedInput), finishedSnapshot);
 assert.strictEqual(finished.metadata.finishedAt, "2026-08-10T09:00:00.000Z");
@@ -61,6 +69,7 @@ assert.throws(() => recording.addEvent(finished, raw), /immutable/);
 assert.throws(() => recording.addScreenshot(finished, 1,
   "data:image/png;base64,late"), /immutable/);
 assert.throws(() => recording.rename(finished, "Too late"), /immutable/);
+assert.throws(() => recording.setDocumentLanguage(finished, "sv-SE"), /immutable/);
 const normalizedInput = deepFreeze({ ...JSON.parse(JSON.stringify(withAsset)),
   unknownTopLevel: { retained: true } });
 const normalizedSnapshot = JSON.stringify(normalizedInput);
