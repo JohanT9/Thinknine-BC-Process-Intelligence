@@ -239,7 +239,9 @@ process graph with neutral boundaries, traceable activities, phase/subprocess
 containers, explicit manual decisions, sparse overrides, and validation. It
 does not alter Workspace or Word output. Review Studio exposes a collapsible
 Process Overview of the resolved activity flow and evidence-backed state
-changes without replacing the detailed editing cards. See
+changes without replacing the detailed editing cards. Selecting an overview
+activity navigates to its stable Review step; current Review selection, hidden
+steps, merges, splits and ordering are reflected on the next render. See
 [docs/PROCESS_MODEL.md](docs/PROCESS_MODEL.md).
 
 ## Sections and Subtasks

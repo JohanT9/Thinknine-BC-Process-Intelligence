@@ -1,4 +1,5 @@
 const assert = require("assert");
+const fs = require("fs");
 const processModel = require("../src/document/process-model");
 const view = require("../src/ui/process-overview-view");
 
@@ -23,10 +24,31 @@ assert(container.innerHTML.includes("Välj Frisläpp."));
 assert(container.innerHTML.includes("Open"));
 assert(container.innerHTML.includes("Released"));
 assert(container.innerHTML.includes('aria-label="ändras till"'));
+assert(container.innerHTML.includes('data-process-task-id="customer"'));
+assert(container.innerHTML.includes('aria-pressed="false"'));
 assert(!container.innerHTML.includes("**"));
+const selectedAttributes = {};
+const selectedAction = { dataset: { processTaskId: "release" },
+  setAttribute(name, value) { selectedAttributes[name] = value; } };
+const unselectedAttributes = {};
+const unselectedAction = { dataset: { processTaskId: "customer" },
+  setAttribute(name, value) { unselectedAttributes[name] = value; } };
+assert.deepStrictEqual(view.updateSelection({ querySelectorAll() {
+  return [unselectedAction, selectedAction];
+} }, ["release"]), [selectedAction]);
+assert.strictEqual(selectedAttributes["aria-pressed"], "true");
+assert.strictEqual(unselectedAttributes["aria-pressed"], "false");
+assert.strictEqual(view.taskIdFor({ sourceStepIds: ["source-a", "source-b"] }, [{
+  taskId: "merged-task", sourceStepIds: ["source-a", "source-b"]
+}]), "merged-task", "merged activities must navigate to the current Review task");
 const empty = { innerHTML: "" };
 assert.deepStrictEqual(view.render(empty, processModel.project({
   recordingId: "empty", steps: []
 }), { locale: "en-US" }), { activityCount: 0, stateTransitionCount: 0 });
 assert(empty.innerHTML.includes("No process activities"));
+const dashboard = fs.readFileSync("src/ui/dashboard.js", "utf8");
+assert(dashboard.includes("function activateProcessOverviewTask(taskId"));
+assert(dashboard.includes('$("processOverview").addEventListener("click"'));
+assert(dashboard.includes('$("processOverview").addEventListener("keydown"'));
+assert(dashboard.includes("T9ProcessOverviewView.updateSelection"));
 console.log("Process Overview view tests passed.");

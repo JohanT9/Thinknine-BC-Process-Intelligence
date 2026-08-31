@@ -114,7 +114,9 @@ Planner stays responsible for presentation, so existing Workspace and Word plans
 and output remain unchanged. `outline()` exposes a renderer-neutral verification
 view. Review Studio's collapsible Process Overview is the first read-only UI
 adapter: it renders ordered activities and observed state changes directly from
-the model without adding layout data to the domain. Future Draw.io, BPMN,
+the model without adding layout data to the domain. Activities retain their
+stable source Step identity for bidirectional Review navigation and selection;
+keyboard navigation uses the rendered process order. Future Draw.io, BPMN,
 Mermaid, SVG, Word, PDF, or training adapters can map the same semantics.
 
 Projection is near-linear, performs no all-pairs inference, and has a 5,000-Step

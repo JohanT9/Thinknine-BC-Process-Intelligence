@@ -26,9 +26,19 @@
     return "";
   }
 
+  function taskIdFor(node, reviewTasks = []) {
+    const sourceIds = new Set(node?.sourceStepIds || []);
+    const exact = reviewTasks.find(task => sourceIds.has(task.taskId));
+    if (exact) return exact.taskId;
+    const traced = reviewTasks.find(task => (task.sourceStepIds || [])
+      .some(sourceId => sourceIds.has(sourceId)));
+    return traced?.taskId || node?.sourceStepIds?.[0] || "";
+  }
+
   function render(container, model, options = {}) {
     if (!container) return { activityCount: 0, stateTransitionCount: 0 };
     const english = String(options.locale || "").toLowerCase().startsWith("en");
+    const selectedTaskIds = new Set(options.selectedTaskIds || []);
     const activities = (model?.nodes || []).filter(node =>
       !["start", "end", "subprocess"].includes(node.nodeType)
     ).sort((left, right) => (left.processOrder ?? left.sequence ?? 0) -
@@ -51,18 +61,35 @@
         const stateChanges = changes.map(change => {
           const before = stateValue(change.before);
           const after = stateValue(change.after);
-          return `<li><strong>${escape(stateLabel(change))}:</strong> ` +
-            `${escape(before)} <span aria-label="${english ? "changes to" : "ändras till"}">→</span> ${escape(after)}</li>`;
+          return `<span class="process-overview-change"><strong>${escape(
+            stateLabel(change))}:</strong> ${escape(before)} ` +
+            `<span aria-label="${english ? "changes to" : "ändras till"}">→</span> ${escape(after)}</span>`;
         }).join("");
+        const taskId = taskIdFor(node, options.reviewTasks || []);
+        const selected = selectedTaskIds.has(taskId);
         return `<li class="process-overview-step" data-process-node-id="${escape(node.nodeId)}">
-          <span class="process-overview-number" aria-hidden="true">${index + 1}</span>
-          <div><strong>${escape(plain(node.title))}</strong>
-          ${stateChanges ? `<ul class="process-overview-state">${stateChanges}</ul>` : ""}</div>
+          <button type="button" class="process-overview-action"
+            data-process-task-id="${escape(taskId)}" aria-pressed="${selected}">
+            <span class="process-overview-number" aria-hidden="true">${index + 1}</span>
+            <span class="process-overview-content"><strong>${escape(plain(node.title))}</strong>
+            ${stateChanges ? `<span class="process-overview-state">${stateChanges}</span>` : ""}</span>
+          </button>
         </li>`;
       }).join("")}</ol>`;
     return { activityCount: activities.length,
       stateTransitionCount: [...transitions.values()].flat().length };
   }
 
-  return { render };
+  function updateSelection(container, selectedTaskIds = []) {
+    const selected = new Set(selectedTaskIds);
+    const actions = [...(container?.querySelectorAll?.(
+      "[data-process-task-id]"
+    ) || [])];
+    actions.forEach(action => action.setAttribute("aria-pressed", String(
+      selected.has(action.dataset.processTaskId)
+    )));
+    return actions.filter(action => selected.has(action.dataset.processTaskId));
+  }
+
+  return { render, taskIdFor, updateSelection };
 });

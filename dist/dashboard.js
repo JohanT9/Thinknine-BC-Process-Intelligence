@@ -4308,6 +4308,9 @@ function applyReviewSelection(focusActive = false, publish = true) {
   }
   applyReviewToolbarState();
   applyReviewStatus();
+  globalThis.T9ProcessOverviewView.updateSelection(
+    $("processOverview"), activeReviewSelection.selectedIds
+  );
   if (publish && activeReviewSelection.activeId) {
     publishWorkspaceContext({
       selectedStepId: activeReviewSelection.activeId,
@@ -4316,6 +4319,21 @@ function applyReviewSelection(focusActive = false, publish = true) {
       scrollAnchor: activeReviewSelection.activeId
     }, "review-selection", "review");
   }
+}
+
+function activateProcessOverviewTask(taskId, focusCard = false) {
+  if (!taskId || !reviewTaskIds().includes(taskId)) return false;
+  activeReviewSelection = globalThis.T9ReviewSelection.reduce(
+    activeReviewSelection,
+    { type: "select", id: taskId },
+    reviewTaskIds()
+  );
+  applyReviewSelection(focusCard);
+  const card = [...$("reviewList").querySelectorAll("[data-review-task-id]")]
+    .find(element => element.dataset.reviewTaskId === taskId);
+  card?.scrollIntoView({ block: "center" });
+  $("reviewFooterText").textContent = "Motsvarande granskningssteg visas.";
+  return true;
 }
 
 function dispatchReviewSelection(command, focusActive = false) {
@@ -6085,7 +6103,9 @@ function renderProcessOverview() {
       overrides: activeReview.processOverrides || []
     });
     globalThis.T9ProcessOverviewView.render(container, model, {
-      locale: activeReview.documentFields?.documentLanguage || "sv-SE"
+      locale: activeReview.documentFields?.documentLanguage || "sv-SE",
+      selectedTaskIds: activeReviewSelection.selectedIds,
+      reviewTasks: activeReview.tasks || []
     });
   } catch (error) {
     container.innerHTML = `<p class="muted">${escapeHtml(uiTf(
@@ -6402,6 +6422,25 @@ $("reviewWorkspaceTab").addEventListener("click", () => {
 });
 $("documentWorkspaceTab").addEventListener("click", () => {
   switchWorkspace("document");
+});
+$("processOverview").addEventListener("click", event => {
+  const action = event.target.closest?.("[data-process-task-id]");
+  if (action) activateProcessOverviewTask(action.dataset.processTaskId);
+});
+$("processOverview").addEventListener("keydown", event => {
+  const action = event.target.closest?.("[data-process-task-id]");
+  if (!action || !["ArrowUp", "ArrowDown", "Home", "End"].includes(event.key)) {
+    return;
+  }
+  const actions = [...$("processOverview").querySelectorAll(
+    "[data-process-task-id]"
+  )];
+  const current = actions.indexOf(action);
+  const next = event.key === "Home" ? 0 : event.key === "End"
+    ? actions.length - 1 : Math.max(0, Math.min(actions.length - 1,
+      current + (event.key === "ArrowUp" ? -1 : 1)));
+  event.preventDefault();
+  actions[next]?.focus();
 });
 $("workspaceTabs").addEventListener("keydown", event => {
   const workspace = globalThis.T9WorkspaceController.workspaceFromKey(

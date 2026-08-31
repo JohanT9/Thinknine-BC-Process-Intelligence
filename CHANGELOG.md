@@ -12,7 +12,9 @@
 ## Unreleased
 
 - Added a collapsible, accessible Process Overview to Review Studio, projected
-  directly from Process Model activities and observed state transitions.
+  directly from Process Model activities and observed state transitions. Its
+  activities navigate to stable Review steps, mirror current selection and
+  support arrow, Home and End keyboard navigation.
 
 - Promoted documentation hierarchy, structural overrides, Process Model,
   Process Versioning and recording regeneration tests into the mandatory CI
