@@ -11,6 +11,10 @@
 
 ## Unreleased
 
+- Added immutable State Observation 1.0.0 to Capture Packet 1.6.0. Directly
+  observed page, control-value, toggle, and dialog facts now form traceable
+  before/after snapshots and exact differences without inferring missing state
+  or business meaning. Capture Packet Integrity 1.1.0 validates their ownership.
 - Added an exact Interaction to Result correctness corpus covering ten causal
   scenarios and eleven packets. CI now rejects wrong result ownership, outcome
   order, verification status, primary-event selection, screenshot ownership,

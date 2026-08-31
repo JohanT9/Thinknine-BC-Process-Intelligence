@@ -1,7 +1,7 @@
 # Capture Packet Integrity
 
 Capture Packet Integrity is the validation boundary between Event-to-Step
-Grouping and downstream semantic interpretation. Version `1.0.0` validates
+Grouping and downstream semantic interpretation. Version `1.1.0` validates
 derived packet relationships without changing Canonical Recording, normalized
 events, packet contents, or document output.
 
@@ -12,6 +12,7 @@ The validator checks:
 - result evidence ordered after its initiating interaction;
 - supported screenshot evidence roles and owned preferred assets/sources;
 - Result Verification outcome and source traceability;
+- State Observation event/source ownership and change/status consistency;
 - agreement between evidence, `missing`, and `completeness`.
 
 Diagnostics contain stable codes, severity, a bounded message, and non-sensitive

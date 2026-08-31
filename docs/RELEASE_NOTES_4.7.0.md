@@ -1,5 +1,10 @@
 # BC Process Studio 4.7
 
+- Capture Packets now retain directly observed state before and after an
+  interaction. Page changes, committed field values, checkbox state, and dialog
+  visibility are represented as traceable facts; only exact comparable values
+  become changes, while missing evidence remains explicitly partial.
+
 - Interaction-to-result ownership now has an exact CI oracle across navigation,
   dialogs, errors, accessible status, self-result interactions, adjacent
   actions, React framework noise, and late or orphan outcomes. A late result

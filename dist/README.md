@@ -166,6 +166,11 @@ Recording. Review Studio shows the verified result without replacing the manual
 expected-result field. See
 [Interaction Result Verification](docs/INTERACTION_RESULT_VERIFICATION.md).
 
+[Observed before and after state](docs/OBSERVED_STATE.md) now gathers directly
+observed page, field, toggle, and dialog facts inside each Capture Packet. Exact
+differences are traceable to Canonical evidence; unknown values remain partial
+instead of being guessed or copied into expected-result text.
+
 The focused
 [Interaction to Result correctness corpus](docs/INTERACTION_RESULT_CORRECTNESS.md)
 uses exact causal oracles for verified, error, self-result, adjacent-action,

@@ -11,7 +11,7 @@ function event(id, kind, extra = {}) {
     controlIdentification: {}, frameContext: { frameId: "top" }, ...extra };
 }
 
-assert.strictEqual(integrity.VERSION, "1.0.0");
+assert.strictEqual(integrity.VERSION, "1.1.0");
 const events = [
   event("action", "activation", { interactionId: "interaction:release",
     interactionIds: ["interaction:release"], screenshotAssetId: "before" }),
@@ -41,14 +41,21 @@ const conflicting = { ...validPacket, interactionId: "interaction:c",
     primaryOutcomeEventId: "normalized:missing",
     sourceEventIds: ["source:missing"], outcomes: [{
       kind: "navigation", normalizedEventId: "normalized:missing",
-      sourceEventIds: ["source:missing"] }] } };
+      sourceEventIds: ["source:missing"] }] },
+  stateObservation: { version: "1.0.0", status: "changed",
+    before: { facts: [{ kind: "page", key: "page", value: {},
+      normalizedEventId: "normalized:missing",
+      sourceEventIds: ["source:missing"] }] }, after: { facts: [] },
+    changes: [], sourceEventIds: ["source:missing"] } };
 const invalid = integrity.validate(conflicting, { events });
 assert.strictEqual(invalid.valid, false);
 for (const code of ["conflicting-interaction-identities",
   "interaction-identity-mismatch", "unknown-interaction-event-reference",
   "unknown-preferred-screenshot", "unknown-preferred-source-event",
   "unknown-result-source-reference", "unknown-result-outcome-event",
-  "primary-outcome-mismatch", "primary-outcome-kind-mismatch"]) {
+  "primary-outcome-mismatch", "primary-outcome-kind-mismatch",
+  "unknown-state-observation-source", "unknown-state-observation-event",
+  "state-observation-change-missing"]) {
   assert(invalid.diagnostics.some(item => item.code === code),
     `expected diagnostic ${code}`);
 }

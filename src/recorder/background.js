@@ -8,6 +8,7 @@ importScripts("engine/raw-event-persistence.js");
 importScripts("engine/bc-ui-identification.js");
 importScripts("engine/event-normalization.js");
 importScripts("engine/capture-packet-integrity.js");
+importScripts("engine/observed-state.js");
 importScripts("engine/event-step-grouping.js");
 importScripts("engine/source-reference.js");
 importScripts("document/semantic-interaction-engine.js");

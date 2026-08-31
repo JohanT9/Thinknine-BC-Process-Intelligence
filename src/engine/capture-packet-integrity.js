@@ -4,7 +4,7 @@
   root.T9CapturePacketIntegrity = api;
 })(typeof globalThis !== "undefined" ? globalThis : this, function () {
   "use strict";
-  const VERSION = "1.0.0";
+  const VERSION = "1.1.0";
   const ROLES = new Set(["interaction", "result", "supporting"]);
   const clone = value => value == null ? value : JSON.parse(JSON.stringify(value));
   function freeze(value) {
@@ -178,6 +178,46 @@
       diagnostics.push(diagnostic("unverified-primary-outcome-event", "error",
         "Unverified Result Verification cannot reference a primary outcome event.",
         { primaryOutcomeEventId }));
+    }
+
+    const stateObservation = packet.stateObservation;
+    if (stateObservation) {
+      const observationSources = unique([
+        ...array(stateObservation.sourceEventIds),
+        ...array(stateObservation.before?.facts).flatMap(item =>
+          array(item?.sourceEventIds)),
+        ...array(stateObservation.after?.facts).flatMap(item =>
+          array(item?.sourceEventIds)),
+        ...array(stateObservation.changes).flatMap(item =>
+          array(item?.sourceEventIds))
+      ]);
+      const foreignSources = observationSources.filter(id =>
+        !knownSources.has(id));
+      if (foreignSources.length) diagnostics.push(diagnostic(
+        "unknown-state-observation-source", "error",
+        "State Observation references evidence outside the Capture Packet.",
+        { sourceEventIds: foreignSources }));
+      const observationEvents = unique([
+        ...array(stateObservation.before?.facts).map(item =>
+          item?.normalizedEventId),
+        ...array(stateObservation.after?.facts).map(item =>
+          item?.normalizedEventId)
+      ]);
+      const foreignEvents = observationEvents.filter(id =>
+        !knownEvents.has(id));
+      if (foreignEvents.length) diagnostics.push(diagnostic(
+        "unknown-state-observation-event", "error",
+        "State Observation references events outside the Capture Packet.",
+        { eventIds: foreignEvents }));
+      const changes = array(stateObservation.changes);
+      if (changes.length && stateObservation.status !== "changed") {
+        diagnostics.push(diagnostic("state-observation-status-mismatch", "error",
+          "State Observation changes require changed status."));
+      }
+      if (!changes.length && stateObservation.status === "changed") {
+        diagnostics.push(diagnostic("state-observation-change-missing", "error",
+          "Changed State Observation requires an observed difference."));
+      }
     }
 
     const expectedMissing = [];

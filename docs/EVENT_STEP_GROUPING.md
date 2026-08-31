@@ -35,7 +35,7 @@ candidate status, and an additive immutable `capturePacket`. Unknown future
 fields survive normalization.
 
 The capture packet explicitly relates the observed interaction to its immediate
-verified result and captured screenshot evidence. Version `1.5.0` also carries
+verified result and captured screenshot evidence. Version `1.6.0` also carries
 the formal `resultVerification` contract described in
 [INTERACTION_RESULT_VERIFICATION.md](INTERACTION_RESULT_VERIFICATION.md). It records interaction and
 result event IDs separately, all screenshot asset IDs, the source event owning
@@ -46,7 +46,12 @@ identity; `compatibility-grouping` means historical evidence required the
 existing deterministic grouping rules. It is derived evidence: Canonical
 Recording and raw events remain unchanged.
 
-Every generated packet passes through Capture Packet Integrity `1.0.0`. The
+Version `1.6.0` additionally contains State Observation `1.0.0`, which gathers
+directly observed page, control-value, toggle, and dialog facts before and after
+the interaction. Only exact comparable differences become changes; missing
+facts remain partial. See [OBSERVED_STATE.md](OBSERVED_STATE.md).
+
+Every generated packet passes through Capture Packet Integrity `1.1.0`. The
 validator checks recorder identity consistency, event ordering and ownership,
 result/source traceability, screenshot roles and preferred evidence, Result
 Verification consistency, and completeness. It returns immutable structured
@@ -60,7 +65,7 @@ exposes plural `interactionEventIds`, `resultEventIds`, and structured
 `screenshotEvidence`. A screenshot attached to verified result evidence is the
 packet preference; a later framework/supporting capture cannot displace it.
 
-Algorithm version is `1.7.0`. IDs use the version plus collision-safe,
+Algorithm version is `1.8.0`. IDs use the version plus collision-safe,
 length-prefixed canonical source IDs. They do not use random values, execution
 time, Review order, export state, or captions.
 

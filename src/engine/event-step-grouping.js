@@ -1,14 +1,18 @@
 (function (root, factory) {
   const integrity = typeof module === "object" && module.exports
     ? require("./capture-packet-integrity") : root.T9CapturePacketIntegrity;
-  const api = factory(integrity);
+  const observedState = typeof module === "object" && module.exports
+    ? require("./observed-state") : root.T9ObservedState;
+  const api = factory(integrity, observedState);
   if (typeof module === "object" && module.exports) module.exports = api;
   root.T9EventStepGrouping = api;
-})(typeof globalThis !== "undefined" ? globalThis : this, function (integrity) {
+})(typeof globalThis !== "undefined" ? globalThis : this, function (
+  integrity, observedState
+) {
   "use strict";
   const SCHEMA_VERSION = 1;
-  const GROUPING_VERSION = "1.7.0";
-  const CAPTURE_PACKET_VERSION = "1.5.0";
+  const GROUPING_VERSION = "1.8.0";
+  const CAPTURE_PACKET_VERSION = "1.6.0";
   const RESULT_VERIFICATION_VERSION = "1.2.0";
   const cache = new WeakMap();
   const clone = value => value == null ? value : JSON.parse(JSON.stringify(value));
@@ -189,6 +193,7 @@
         ? evidenceRole(preferredScreenshotEvent, interaction, outcomes) : null,
       preferredSourceEventId: preferredScreenshotEvent?.sourceEventId || null,
       resultVerification: resultVerification(outcomes),
+      stateObservation: observedState.capture(events, interaction, outcomes),
       completeness: missing.length ? "partial" : "complete",
       missing
     };
