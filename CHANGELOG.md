@@ -11,6 +11,8 @@
 
 ## Unreleased
 
+- Fixed the BC Knowledge Base document-language filter disappearing when UI localization replaced its containing label.
+
 - Fixed Review image replacement so the Review card immediately renders the
   same authoritative `selectedScreenshotAssetId` as Document Workspace and
   export. Original candidates are used only as a safe fallback when the selected

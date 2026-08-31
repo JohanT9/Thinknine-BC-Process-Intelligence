@@ -122,4 +122,5 @@ When stopping a process or issue recording, the naming dialog now confirms the
 document language explicitly. BC Knowledge Base displays `SV`/`EN` badges and
 can filter by language. The same selection also controls generated Technical
 Bug Report headings and local text/Markdown export. No raw event is translated
-or rewritten.
+or rewritten. The language selector remains available after either Swedish or
+English interface localization has been applied.
