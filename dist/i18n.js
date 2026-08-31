@@ -331,6 +331,8 @@
     ["Granska vad som ändras innan dokumentationen uppdateras.",
       "Review the changes before the documentation is updated."],
     ["Godkänn och regenerera", "Approve and regenerate"], ["Byt bild", "Change image"],
+    ["Granskningen ändrades efter förhandsgranskningen. Öppna en ny förhandsgranskning och kontrollera ändringarna igen.",
+      "The Review changed after the preview. Open a new preview and check the changes again."],
     ["Ta ny skärmbild", "Capture new screenshot"],
     ["Tillgängliga skärmbilder", "Available screenshots"],
     ["Använd vald bild", "Use selected image"], ["Instruktion", "Instruction"],

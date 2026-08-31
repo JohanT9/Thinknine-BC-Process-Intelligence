@@ -154,6 +154,12 @@ screenshot-changed Steps. The user must explicitly approve the preview; Cancel
 and Escape leave the Review unchanged. A blocked preview explains the safety
 reason and offers no apply action.
 
+Preview contract `1.1.0` stores a deterministic fingerprint of the complete
+Review state shown in the comparison. Apply recalculates that fingerprint and
+fails without mutation if another editor, window, or operation changed the
+Review while the preview was open. Object property insertion order does not
+affect the fingerprint.
+
 The preview reuses the already loaded current interpretation, replaces the
 generated Review baseline only after approval, and persists it before reporting
 success. It never changes Canonical Recording evidence and no new recording is

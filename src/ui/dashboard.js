@@ -7016,6 +7016,11 @@ $("regenerateReview").addEventListener("click", async () => {
     show(`Dokumentationen har regenererats fr\u00e5n inspelningen. ` +
       `${preview.previousStepCount} steg blev ${preview.nextStepCount}.`);
   } catch (error) {
+    if (error?.code === "STALE_REGENERATION_PREVIEW") {
+      show(uiT("Granskningen ändrades efter förhandsgranskningen. " +
+        "Öppna en ny förhandsgranskning och kontrollera ändringarna igen."), true);
+      return;
+    }
     show(`Dokumentationen kunde inte regenereras: ${error.message}`, true);
   }
 });

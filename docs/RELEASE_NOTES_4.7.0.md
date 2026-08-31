@@ -1,5 +1,9 @@
 # BC Process Studio 4.7
 
+- Regeneration previews now fingerprint the complete Review they describe. If
+  the Review changes before approval is applied, BC Review Studio safely aborts
+  instead of applying an outdated comparison over newer consultant work.
+
 - Accessible Business Central status and confirmation messages now count as an
   observed result for the initiating action. Their visible state is captured
   when screenshots are enabled, while message text remains only in immutable

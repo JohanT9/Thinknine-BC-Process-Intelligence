@@ -19,6 +19,9 @@ const freshTasks = [{ taskId: "manual-price-path",
   instruction: "VÃ¤lj Ã…tgÃ¤rder â†’ Funktion â†’ Manuellt pris.",
   sourceEventIds: ["event-1", "event-2", "event-3", "event-4"] }];
 const preview = regeneration.preview(oldReview, session, freshTasks);
+assert.strictEqual(regeneration.PREVIEW_VERSION, "1.1.0");
+assert.strictEqual(preview.previewVersion, "1.1.0");
+assert.match(preview.baseReviewFingerprint, /^review:1\.1\.0:[0-9a-f]{8}$/);
 assert.strictEqual(preview.blocked, false);
 assert.strictEqual(preview.previousStepCount, 4);
 assert.strictEqual(preview.nextStepCount, 1);
@@ -40,6 +43,20 @@ assert.deepStrictEqual(updated.tasks[0].sourceEventIds,
   ["event-1", "event-2", "event-3", "event-4"]);
 assert.strictEqual(updated.documentFields.expectedResult, "Priset har Ã¤ndrats.");
 assert.strictEqual(oldReview.tasks.length, 4, "Apply must not mutate input.");
+
+const reorderedReview = JSON.parse(JSON.stringify(oldReview));
+reorderedReview.documentFields = Object.fromEntries(
+  Object.entries(reorderedReview.documentFields).reverse());
+assert.strictEqual(regeneration.fingerprint(reorderedReview),
+  regeneration.fingerprint(oldReview),
+  "fingerprints must not depend on object property insertion order");
+const changedAfterPreview = JSON.parse(JSON.stringify(oldReview));
+changedAfterPreview.notes = "Changed while preview was open";
+assert.throws(() => regeneration.apply(changedAfterPreview, preview), error =>
+  error.code === "STALE_REGENERATION_PREVIEW" &&
+  /changed after the regeneration preview/.test(error.message),
+"a stale preview must never overwrite a newer Review");
+assert.strictEqual(oldReview.notes, "", "stale apply must not mutate its input");
 
 const edited = review.createReview(session, oldReview.tasks);
 edited.tasks[0].userComment = "BehÃ¥ll min kommentar";

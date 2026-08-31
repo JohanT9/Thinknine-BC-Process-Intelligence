@@ -11,6 +11,9 @@
 
 ## Unreleased
 
+- Protected regeneration against stale previews with a deterministic complete-
+  Review fingerprint. If the Review changes after comparison but before apply,
+  regeneration now aborts without mutating or overwriting the newer state.
 - Added privacy-bounded verification of accessible Business Central status and
   confirmation messages. They now complete the initiating Capture Packet and
   trigger a transient result screenshot without copying message text into the

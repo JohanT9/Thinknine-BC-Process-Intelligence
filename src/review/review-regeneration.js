@@ -12,12 +12,40 @@
   reviewEngine,
   regenerationEngine
 ) {
+  const PREVIEW_VERSION = "1.1.0";
+
   function clone(value) {
     return value === undefined ? undefined : JSON.parse(JSON.stringify(value));
   }
 
   function array(value) {
     return Array.isArray(value) ? value : [];
+  }
+
+  function canonicalValue(value) {
+    if (Array.isArray(value)) return value.map(canonicalValue);
+    if (!value || typeof value !== "object") return value;
+    return Object.keys(value).sort().reduce((result, key) => {
+      if (value[key] !== undefined) result[key] = canonicalValue(value[key]);
+      return result;
+    }, {});
+  }
+
+  function fingerprint(value) {
+    const source = JSON.stringify(canonicalValue(value));
+    let hash = 2166136261;
+    for (let index = 0; index < source.length; index += 1) {
+      hash ^= source.charCodeAt(index);
+      hash = Math.imul(hash, 16777619);
+    }
+    return `review:${PREVIEW_VERSION}:${(hash >>> 0).toString(16).padStart(8, "0")}`;
+  }
+
+  function stalePreviewError() {
+    const error = new Error(
+      "Review changed after the regeneration preview was created.");
+    error.code = "STALE_REGENERATION_PREVIEW";
+    return error;
   }
 
   function consultantState(review) {
@@ -111,6 +139,8 @@
     ).reduce((count, item) => count + Math.max(0, item.oldStepIds.length - 1), 0);
     const changes = changeSet(previousTasks, freshReview.generatedTasks, stepMap);
     return Object.freeze({
+      previewVersion: PREVIEW_VERSION,
+      baseReviewFingerprint: fingerprint(currentReview),
       blocked: reasons.length > 0,
       blockingReasons: Object.freeze(reasons),
       previousStepCount: previousTasks.length,
@@ -131,6 +161,10 @@
   function apply(currentReview, regenerationPreview, options = {}) {
     if (!regenerationPreview || regenerationPreview.blocked) {
       throw new Error("Review contains consultant-owned state and cannot be replaced safely.");
+    }
+    if (regenerationPreview.previewVersion !== PREVIEW_VERSION ||
+        regenerationPreview.baseReviewFingerprint !== fingerprint(currentReview)) {
+      throw stalePreviewError();
     }
     const now = options.now || new Date().toISOString();
     const fresh = clone(regenerationPreview.freshReview);
@@ -155,5 +189,5 @@
     });
   }
 
-  return { apply, consultantState, preview };
+  return { PREVIEW_VERSION, apply, consultantState, fingerprint, preview };
 });

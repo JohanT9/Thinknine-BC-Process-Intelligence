@@ -18,5 +18,7 @@ assert.ok(dashboard.includes("escapeHtml(item)"),
   "step descriptions must be escaped before preview rendering");
 assert.ok(css.includes(".regeneration-preview-dialog"));
 assert.ok(css.includes(".regeneration-preview-warning"));
+assert.ok(dashboard.includes('error?.code === "STALE_REGENERATION_PREVIEW"'),
+  "stale previews need a recoverable user-facing workflow");
 
 console.log("Safe regeneration preview tests passed.");
