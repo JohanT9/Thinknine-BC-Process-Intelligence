@@ -11,6 +11,12 @@
 
 ## Unreleased
 
+- Added Screenshot Role Intent 1.0.0 and Screenshot Selection 1.4.0. The
+  completed semantic action now determines whether the most useful evidence is
+  a visible selection, committed result, action, or pre-close dialog. Verified
+  actions prefer their result, lookup selections prefer the visible choice, and
+  manual/annotated evidence remains authoritative. Legacy groups retain their
+  existing non-strict ranking.
 - Projected directly observed Capture Packet differences into immutable Process
   Model state transitions. Each change is tied to the activity and exact Step/
   Event evidence that caused it; repeated evidence is deduplicated, while

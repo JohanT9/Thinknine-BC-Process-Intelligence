@@ -382,6 +382,8 @@
       candidates: semantic.deepFreeze(candidates),
       manualOverride: manualCandidate?.screenshotAssetId || manualRef,
       existingSelection: existingCandidate?.screenshotAssetId,
+      semanticAction: step.interaction?.semanticActionModel ||
+        step.interaction || {},
       profile: context.profile || {},
       previousPageId: context.previousPageId });
     const selectedCandidate = candidates.find(candidate =>

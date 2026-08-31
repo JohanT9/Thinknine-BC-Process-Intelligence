@@ -5,8 +5,9 @@
 })(typeof globalThis !== "undefined" ? globalThis : this, function () {
   "use strict";
   const SCHEMA_VERSION = 1;
-  const SELECTION_VERSION = "1.3.0";
+  const SELECTION_VERSION = "1.4.0";
   const CAPTURE_ROLE_VERSION = "1.0.0";
+  const ROLE_INTENT_VERSION = "1.0.0";
   const CAPTURE_ROLES = Object.freeze(["menu-open", "selection-visible",
     "result-visible", "dialog-before-close", "dialog-closed", "action-visible",
     "focus-only", "before-value", "context"]);
@@ -92,6 +93,46 @@
     if (id === "troubleshooting-guide" || tone === "diagnostic") return "diagnostic";
     return "overview";
   }
+  function semanticType(value = {}) {
+    return text(value.actionType || value.semanticAction || value.taskType);
+  }
+  function roleIntent(stepGroup, semanticAction = {}) {
+    const actionType = semanticType(semanticAction);
+    const result = semanticAction.resultVerification ||
+      semanticAction.capturePacket?.resultVerification || {};
+    const hasResult = ["verified", "error"].includes(text(result.status));
+    let preferredRoles = [];
+    if (["SelectCustomer", "SelectItem", "SelectVendor", "SelectRecord",
+      "SelectLookupValue"].includes(actionType)) preferredRoles = ["selection-visible"];
+    else if (["EnterFieldValue", "ChangeField", "SelectOption", "ToggleField",
+      "SearchAndOpenPage"].includes(actionType)) preferredRoles = ["result-visible"];
+    else if (["ConfirmDialog", "ChooseDialogAction"].includes(actionType)) {
+      preferredRoles = ["dialog-before-close"];
+    } else if (actionType === "RunAction") {
+      preferredRoles = [hasResult ? "result-visible" : "action-visible"];
+    }
+    if (!preferredRoles.length) {
+      const kind = text(stepGroup?.groupKind);
+      if (["field-edit", "toggle-interaction", "navigation"].includes(kind)) {
+        preferredRoles = ["result-visible"];
+      } else if (kind === "dialog-interaction") {
+        preferredRoles = ["dialog-before-close"];
+      } else if (kind === "lookup-interaction") {
+        preferredRoles = [stepGroup?.primaryNormalizedEvent?.kind === "row-selection"
+          ? "selection-visible" : "result-visible"];
+      } else if (kind === "action") preferredRoles = ["action-visible"];
+    }
+    return freeze({ version: ROLE_INTENT_VERSION,
+      source: actionType ? "semantic-action" : "step-group",
+      actionType: actionType || null, preferredRoles,
+      strict: Boolean(actionType && preferredRoles.length),
+      rejectedRoles: preferredRoles.includes("dialog-before-close")
+        ? ["dialog-closed"] : [] });
+  }
+  function satisfiesRole(candidate, role) {
+    if (candidate.captureRole === role) return true;
+    return role === "result-visible" && candidate.packetEvidenceRole === "result";
+  }
   function add(state, condition, points, reason, rejected) {
     if (condition === true) { state.score += points; state.reasons.push(reason); state.informative = true; }
     else if (condition === false && rejected) { state.score -= Math.abs(points); state.rejected.push(rejected); state.informative = true; }
@@ -100,6 +141,7 @@
     const state = { score: 0, reasons: [], rejected: [], informative: false };
     const primary = stepGroup?.primaryNormalizedEvent || {};
     const role = candidate.captureRole;
+    const intent = context.roleIntent || roleIntent(stepGroup);
     const sourceIds = new Set(stepGroup?.sourceEventIds || []);
     if (candidate.packetEvidenceRole === "result") add(state, true, 50,
       "capture-packet-result", null);
@@ -109,8 +151,22 @@
       state.score -= 20; state.rejected.push("capture-packet-supporting");
       state.informative = true;
     }
-    if (candidate.packetEvidencePreferred === true) add(state, true, 140,
-      "capture-packet-preferred", null);
+    if (candidate.packetEvidencePreferred === true) add(state, true,
+      intent.strict && intent.preferredRoles.length &&
+        !intent.preferredRoles.some(value => satisfiesRole(candidate, value))
+        ? 20 : 140, "capture-packet-preferred", null);
+    if (intent.strict && intent.preferredRoles.some(value =>
+      satisfiesRole(candidate, value))) {
+      add(state, true, 100, `role-intent:${intent.preferredRoles[0]}`, null);
+    } else if (intent.strict && intent.preferredRoles.length) {
+      state.score -= 100;
+      state.rejected.push(`role-intent-mismatch:${intent.preferredRoles[0]}`);
+      state.informative = true;
+    }
+    if (intent.strict && intent.rejectedRoles.includes(role)) {
+      state.score -= 150; state.rejected.push(`role-intent-rejected:${role}`);
+      state.informative = true;
+    }
     add(state, candidate.sourceEventId && candidate.sourceEventId === stepGroup?.primarySourceEventId,
       70, "primary-event", "supporting-event");
     add(state, candidate.sourceEventId && sourceIds.has(candidate.sourceEventId),
@@ -188,10 +244,12 @@
     }
     return freeze({ candidate, ...state });
   }
-  function fingerprint(stepGroup, candidates, manual, profile, previousPageId) {
+  function fingerprint(stepGroup, candidates, manual, profile, previousPageId,
+    intent) {
     const parts = [SELECTION_VERSION, stepGroup?.stepGroupId || "legacy",
       profile?.profileId || "business-process", manual || "automatic",
       previousPageId || "no-previous-page",
+      JSON.stringify(intent),
       ...candidates.map(candidate => JSON.stringify([
         candidateId(candidate), candidate.sourceEventId,
         candidate.normalizedEventId, candidate.normalizedKind,
@@ -231,8 +289,9 @@
       options.manualOverride?.screenshotRef || options.manualOverride);
     const existing = text(options.existingSelection);
     const profile = options.profile || {};
+    const intent = roleIntent(stepGroup, options.semanticAction || {});
     const idFingerprint = fingerprint(stepGroup, scoped, manual, profile,
-      options.previousPageId);
+      options.previousPageId, intent);
     if (stepGroup && Object.isFrozen(stepGroup) && inputCandidates &&
         Object.isFrozen(inputCandidates)) {
       const cached = cache.get(stepGroup)?.get(inputCandidates)?.get(idFingerprint);
@@ -264,7 +323,7 @@
     }
     const evaluations = scoped.map((candidate, index) => ({
       ...evaluate(candidate, stepGroup, profile, {
-        previousPageId: options.previousPageId
+        previousPageId: options.previousPageId, roleIntent: intent
       }), index
     }));
     if (!selected && !preserveAllAnnotated && !preserveExistingCandidates &&
@@ -304,6 +363,7 @@
       selectionId: `screenshot-selection:${idFingerprint}`,
       schemaVersion: SCHEMA_VERSION, selectionVersion: SELECTION_VERSION,
       captureRoleVersion: CAPTURE_ROLE_VERSION,
+      roleIntentVersion: ROLE_INTENT_VERSION, roleIntent: clone(intent),
       stepGroupId: stepGroup?.stepGroupId || "", selectedScreenshotAssetId: selected,
       candidateScreenshotAssetIds: ids, sourceEventIds: clone(stepGroup?.sourceEventIds || []),
       primaryEventId: stepGroup?.primaryEventId || "", selectionMode: mode,
@@ -326,6 +386,8 @@
   }
   function normalizeSelection(value) { if (!value || Number(value.schemaVersion) !== SCHEMA_VERSION) throw new Error("Unsupported Screenshot Selection schema."); return freeze(clone(value)); }
   return { SCHEMA_VERSION, SELECTION_VERSION, CAPTURE_ROLE_VERSION,
+    ROLE_INTENT_VERSION,
     CAPTURE_ROLES, classifyCaptureRole, evaluate, normalizeCandidate,
-    normalizeCandidates, applyCapturePacketEvidence, normalizeSelection, select };
+    normalizeCandidates, applyCapturePacketEvidence, roleIntent,
+    normalizeSelection, select };
 });

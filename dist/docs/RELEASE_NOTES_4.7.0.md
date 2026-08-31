@@ -1,5 +1,10 @@
 # BC Process Studio 4.7
 
+- Screenshot selection now understands the purpose of the completed semantic
+  action. Lookup instructions favor the image showing the choice, verified
+  actions favor the visible result, and dialog instructions retain the complete
+  dialog before it closes. Existing manual choices and annotations still win.
+
 - Process Model now exposes directly observed before/after differences as versioned,
   renderer-neutral state transitions attached to the responsible activity.
   This establishes the deterministic foundation for state-aware process views

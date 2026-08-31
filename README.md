@@ -289,6 +289,11 @@ menu open, selected option visible, committed result visible, and dialog before
 close. The selected role remains explainable while raw screenshots and
 Canonical Recording evidence stay unchanged.
 
+The completed semantic action now contributes a versioned role intent. Lookup
+instructions prefer the screenshot showing the selected choice; verified
+actions prefer their visible result; dialog choices prefer the complete dialog
+before close. Manual selections and annotated screenshots remain authoritative.
+
 Modern Step Groups additionally pass their Capture Packet evidence roles to the
 selection engine. A packet's verified result screenshot is preferred over the
 initiating interaction and later supporting framework captures. This evidence

@@ -34,11 +34,53 @@ const quantityCandidates = Object.freeze([
 const quantity = engine.select({ stepGroup: quantityGroup,
   candidates: quantityCandidates });
 assert.strictEqual(quantity.schemaVersion, 1);
-assert.strictEqual(quantity.selectionVersion, "1.3.0");
+assert.strictEqual(quantity.selectionVersion, "1.4.0");
 assert.strictEqual(quantity.captureRoleVersion, "1.0.0");
+assert.strictEqual(quantity.roleIntentVersion, "1.0.0");
 assert.strictEqual(quantity.selectedScreenshotAssetId, "shot-commit");
 assert.strictEqual(quantity.selectedCaptureRole, "result-visible");
 assert.ok(quantity.selectionReasons.includes("primary-event"));
+
+const semanticSelectionGroup = group({ stepGroupId: "semantic-customer",
+  groupKind: "lookup-interaction", primarySourceEventId: "event:result",
+  sourceEventIds: ["event:row", "event:result"],
+  screenshotAssetIds: ["customer-row", "customer-result"], capturePacket: {
+    packetVersion: "1.6.0", preferredScreenshotAssetId: "customer-result",
+    screenshotEvidence: [{ assetId: "customer-row", role: "interaction" },
+      { assetId: "customer-result", role: "result" }]
+  } });
+const semanticSelection = engine.select({ stepGroup: semanticSelectionGroup,
+  semanticAction: { actionType: "SelectCustomer" }, candidates: [
+    candidate("customer-row", "event:row", "row-selection", {
+      stability: { stable: true } }),
+    candidate("customer-result", "event:result", "value-change", {
+      stability: { stable: true } })
+  ] });
+assert.strictEqual(semanticSelection.selectedScreenshotAssetId, "customer-row",
+  "Semantic selection intent should prefer the visible choice over a generic result.");
+assert.deepStrictEqual(semanticSelection.roleIntent.preferredRoles,
+  ["selection-visible"]);
+assert.strictEqual(semanticSelection.roleIntent.source, "semantic-action");
+assert.ok(semanticSelection.selectionReasons.includes(
+  "role-intent:selection-visible"));
+
+const runActionResult = engine.select({ stepGroup: group({ stepGroupId: "posting",
+  groupKind: "action", primarySourceEventId: "event:post",
+  sourceEventIds: ["event:post", "event:posted"],
+  screenshotAssetIds: ["post-action", "post-result"], capturePacket: {
+    packetVersion: "1.6.0", preferredScreenshotAssetId: "post-result",
+    resultVerification: { status: "verified" },
+    screenshotEvidence: [{ assetId: "post-action", role: "interaction" },
+      { assetId: "post-result", role: "result" }]
+  } }), semanticAction: { actionType: "RunAction",
+    resultVerification: { status: "verified" } }, candidates: [
+      candidate("post-action", "event:post", "activation"),
+      candidate("post-result", "event:posted", "navigation", {
+        stability: { stable: true } })
+    ] });
+assert.strictEqual(runActionResult.selectedScreenshotAssetId, "post-result");
+assert.deepStrictEqual(runActionResult.roleIntent.preferredRoles,
+  ["result-visible"]);
 assert.ok(quantity.selectionReasons.includes("same-control"));
 assert.ok(quantity.selectionReasons.includes("role-result-visible"));
 assert.strictEqual(quantity.selectionMode, "automatic");

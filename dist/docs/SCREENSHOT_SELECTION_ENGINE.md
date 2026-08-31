@@ -33,11 +33,27 @@ IDs, canonical source IDs, primary event, mode, explicit reasons, rejected
 candidates, manual override, fallback state, and annotation-preservation flags.
 Unknown future fields survive normalization.
 
-Selection version is `1.3.0`. Identity fingerprints include the version, Step
+Selection version is `1.4.0`. Identity fingerprints include the version, Step
 Group, profile, previous-page continuity, manual state, candidate IDs, source and
 normalized event identities, kind, Capture Packet evidence role and preference,
-annotations, and relevant stability/context signals. Random values and array
-positions alone are never identities.
+annotations, semantic role intent, and relevant stability/context signals.
+Random values and array positions alone are never identities.
+
+## Semantic role intent
+
+Role Intent `1.0.0` connects the completed semantic action to screenshot
+selection. It states which observable image role best explains the instruction:
+selection actions prefer `selection-visible`, field/toggle/search actions prefer
+`result-visible`, dialog choices prefer `dialog-before-close`, and a plain action
+prefers `action-visible` unless it has a verified result. A verified action then
+prefers `result-visible`.
+
+Semantic intent is strict only when a recognized semantic action is available.
+It may reduce a packet preference that serves a different instructional purpose,
+but can never override a manual choice or annotation preservation. Historical
+Step Groups receive a non-strict intent derived from their existing group kind,
+so their ranking policy remains backward compatible. Selection results expose
+the complete intent and its version for diagnostics and deterministic replay.
 
 ## Capture Packet evidence
 
@@ -175,6 +191,10 @@ Results expose reasons such as `primary-event`, `same-control`,
 `committed-value`, `selected-row`, `confirmed-toggle-state`, and `stable-ui-state`.
 Rejected candidates contain explicit metadata reasons, not fake confidence
 percentages. Sensitive values are not copied into explanations.
+
+Semantic decisions add reasons such as `role-intent:selection-visible` or reject
+a candidate with `role-intent-mismatch:result-visible`, making the choice
+auditable without inspecting image pixels.
 
 Selection is linear in the bounded candidate set and cached for immutable Step
 Group/candidate/profile fingerprints. A 5,000-candidate regression guards cost.
