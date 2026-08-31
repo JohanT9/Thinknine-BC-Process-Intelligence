@@ -398,6 +398,47 @@
     return deepFreeze(rule);
   }
 
+  function fieldEntryWithRedundantRecordSelectionRule() {
+    const comparable = value => text(value).replace(/[.:]+$/gu, "")
+      .toLocaleLowerCase();
+    const rule = {
+      ruleId: "field-entry-with-redundant-record-selection",
+      priority: 96,
+      match(context) {
+        const current = context.interactions[context.index];
+        const selected = context.interactions[context.index + 1];
+        const enteredValue = meaningfulValue(current);
+        const selectedValue = selectedRecordValue(selected);
+        const field = comparable(businessField(controlCaption(current)));
+        const selectionText = comparable(interactionText(selected));
+        return ["EnterFieldValue", "ChangeField"].includes(current?.taskType) &&
+          ["RunAction", "Select"].includes(selected?.taskType) &&
+          Boolean(field && enteredValue && selectedValue) &&
+          enteredValue === selectedValue && selectionText.includes(field) &&
+          /sorterade|sorted/iu.test(selectionText);
+      },
+      consolidate(context) {
+        const values = context.interactions.slice(context.index,
+          context.index + 2);
+        const current = values[0];
+        const selected = values[1];
+        const selectedValue = selectedRecordValue(selected);
+        const targetField = businessField(controlCaption(current));
+        return { consumed: 2, action: action(rule, values, {
+          actionType: "EnterFieldValue",
+          displayText: `Ange __${selectedValue}__ i **${targetField}**.`,
+          selectedValue,
+          targetField,
+          preferredSourceEventId: selected.preferredSourceEventId ||
+            selected.sourceEventIds?.at(-1),
+          preferredScreenshotRef: selected.screenshot ||
+            selected.screenshots?.at(-1)
+        }) };
+      }
+    };
+    return deepFreeze(rule);
+  }
+
   function searchAndOpenWithRedundantFieldRule() {
     const searchField = value => text(value?.searchFieldCaption ||
       value?.fieldCaption).replace(/[.:]+$/u, "").toLocaleLowerCase();
@@ -579,6 +620,7 @@
       actionType: "SelectCustomer", fieldPattern: CUSTOMER,
       verb: "Välj kund", targetField: "Kund", requireValue: true }),
     itemNumberLookupEntryRule(),
+    fieldEntryWithRedundantRecordSelectionRule(),
     selectionRule({ ruleId: "item-selection", priority: 95,
       actionType: "SelectItem", fieldPattern: ITEM, verb: "Välj artikel",
       targetField: "Artikelnummer", consumeFocusAfter: true,

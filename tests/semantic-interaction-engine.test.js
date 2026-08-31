@@ -50,6 +50,22 @@ const itemNumberEntry = only([{
   instruction: 'Ange 30043 i "Sortera efter Nr".'
 }], "EnterItemNumber", "Ange __30043__ i **Artikel Nr**.");
 assert.strictEqual(itemNumberEntry.inputInteractionCount, 3);
+const redundantSortedSelection = engine.consolidateInteractions([{
+  taskId: "number-entry", taskType: "EnterFieldValue",
+  fieldCaption: "Nr", instructionValue: "30043",
+  screenshot: "number-entered.png", sourceEventIds: ["number-entered"]
+}, {
+  taskId: "number-result", taskType: "RunAction",
+  actionCaption: 'Nr, sorterade i Stigande order Välj posten "30043"',
+  screenshot: "selected-record.png", sourceEventIds: ["selected-record"]
+}]);
+assert.strictEqual(redundantSortedSelection.length, 1);
+assert.strictEqual(redundantSortedSelection[0].instruction,
+  "Ange __30043__ i **Nr**.");
+assert.strictEqual(redundantSortedSelection[0].screenshot,
+  "selected-record.png");
+assert.deepStrictEqual(redundantSortedSelection[0].sourceEventIds,
+  ["number-entered", "selected-record"]);
 const redundantSearchInput = engine.processInteractions([{
   taskId: "search-complete", taskType: "SearchAndOpenPage",
   searchCaption: "Search", searchFieldCaption: "Tell me what you want to do.",

@@ -131,3 +131,8 @@ BC Knowledge Base now keeps document cards focused on identity, language,
 profile, recency and direct access. The document-health filter and repeated
 health checklist have been removed from the library view; underlying quality
 metadata remains available to the document pipeline.
+
+Field entry followed immediately by a matching selection from a sorted record
+list is now represented as one step. The concise field-entry instruction is
+kept, while the later screenshot showing the completed selection becomes the
+step image.

@@ -11,6 +11,9 @@
 
 ## Unreleased
 
+- Consolidated a field entry followed by its redundant sorted-record selection
+  into one instruction while retaining the later, clearer result screenshot.
+
 - Improved the recorder naming dialog with a wider responsive layout, full-width
   language selection and clearer spacing between its form fields and actions.
 

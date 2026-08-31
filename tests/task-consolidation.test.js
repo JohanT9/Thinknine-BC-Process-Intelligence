@@ -70,6 +70,20 @@ assert.strictEqual(searchDuplicate[0].taskType, "SearchAndOpenPage");
 assert.strictEqual(searchDuplicate[0].screenshot, "result.png");
 assert.deepStrictEqual(searchDuplicate[0].sourceEventNos, [1, 2, 4, 3]);
 
+const sortedRecordSelection = consolidation.consolidate([{
+  taskId: "number-entry", taskType: "EnterFieldValue", fieldCaption: "Nr",
+  instructionValue: "30043", screenshot: "entry.png", sourceEventNos: [20]
+}, {
+  taskId: "number-selection", taskType: "RunAction",
+  actionCaption: 'Nr, sorterade i Stigande order Välj posten "30043"',
+  screenshot: "selection.png", sourceEventNos: [21]
+}]);
+assert.strictEqual(sortedRecordSelection.length, 1);
+assert.strictEqual(sortedRecordSelection[0].instruction,
+  "Ange __30043__ i **Nr**.");
+assert.strictEqual(sortedRecordSelection[0].screenshot, "selection.png");
+assert.deepStrictEqual(sortedRecordSelection[0].sourceEventNos, [20, 21]);
+
 const salesLineTasks = [{ taskId: "filter", taskType: "ChangeField",
   entity: "Item", fieldCaption: "Sortera efter Nr", value: "",
   inputSources: ["focusout"], sourceEventNos: [31]
