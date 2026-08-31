@@ -810,6 +810,18 @@
       .filter(task => taskVisibility.isVisible(task, review));
   }
 
+  function displayScreenshotAssetIds(task, availableAssetIds) {
+    const resolved = stepEditor.resolve(task || {});
+    const available = Array.isArray(availableAssetIds)
+      ? new Set(availableAssetIds.filter(Boolean).map(String)) : null;
+    const usable = value => value && (!available || available.has(String(value)));
+    if (usable(resolved.selectedScreenshotAssetId)) {
+      return [String(resolved.selectedScreenshotAssetId)];
+    }
+    return [...new Set((resolved.sourceScreenshotAssetIds || resolved.screenshots || [])
+      .filter(usable).map(String))];
+  }
+
   function visibleTaskNumber(review, taskId) {
     const index = activeTasks(review).findIndex(task => task.taskId === taskId);
     return index < 0 ? null : index + 1;
@@ -1278,6 +1290,7 @@
     deleteManualStep,
     setManualStepScreenshot,
     repairTaskScreenshot,
+    displayScreenshotAssetIds,
     addNote,
     updateNote,
     removeNote,

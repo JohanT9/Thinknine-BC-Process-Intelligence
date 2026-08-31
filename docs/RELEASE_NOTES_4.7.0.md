@@ -1,5 +1,9 @@
 # BC Process Studio 4.7
 
+- **Change image** now updates the screenshot in Review immediately as well as
+  in Document Workspace. Both views resolve the same selected asset; a missing
+  asset falls back safely instead of leaving an empty card.
+
 - Regeneration can now safely retain edited instructions, rich-text formatting,
   comments, and Step-owned Notes when the original and regenerated Step have an
   exact one-to-one evidence mapping. The preview shows how many edits are kept;

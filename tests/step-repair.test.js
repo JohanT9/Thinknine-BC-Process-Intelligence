@@ -32,6 +32,12 @@ const result = reviewStudio.repairTaskScreenshot(review, 0,
 assert.equal(result.ok, true);
 assert.equal(reviewStudio.resolveTask(review.tasks[0]).selectedScreenshotAssetId,
   "shot-from-recording");
+assert.deepEqual(reviewStudio.displayScreenshotAssetIds(review.tasks[0],
+  ["shot-a", "shot-from-recording"]), ["shot-from-recording"],
+"Review must render the repaired selection instead of the original candidate.");
+assert.deepEqual(reviewStudio.displayScreenshotAssetIds(review.tasks[0],
+  ["shot-a"]), ["shot-a"],
+"Review should fall back safely when a selected asset is unavailable.");
 assert(review.commandHistory.some(entry => entry.type === "step-screenshot-repair"),
   "step repair must be reversible through Review history");
 
@@ -55,6 +61,8 @@ assert.match(dashboard, /uiTf\("a11y\.changeImage"/);
 assert.match(i18n, /"a11y\.changeImage": "Byt bild för steg \{step\}"/);
 assert.match(i18n, /"a11y\.changeImage": "Change image for step \{step\}"/);
 assert.match(dashboard, /T9Review\.repairTaskScreenshot/);
+assert.match(dashboard, /T9Review\.displayScreenshotAssetIds/,
+  "Review rendering and document projection must share the selected asset.");
 assert.match(background, /case "T9_CAPTURE_STEP_REPAIR_SCREENSHOT"/);
 assert.match(background, /case "T9_SAVE_STEP_REPAIR_SCREENSHOT"/);
 assert.match(background, /screenshots\[assetKey\] = image/);

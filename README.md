@@ -289,6 +289,11 @@ and passes one selected reference to the shared Workspace/Word pipeline without
 reading or modifying image bytes. See
 [Screenshot Selection Engine](docs/SCREENSHOT_SELECTION_ENGINE.md).
 
+Review cards resolve the same selected asset ID as Document Workspace,
+including images chosen with **Change image**, so both views update together.
+Original candidates are retained only as a fallback when the selected asset is
+unavailable.
+
 Screenshot candidates also receive deterministic instructional roles such as
 menu open, selected option visible, committed result visible, and dialog before
 close. The selected role remains explainable while raw screenshots and

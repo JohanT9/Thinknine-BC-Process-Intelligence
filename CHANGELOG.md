@@ -11,6 +11,10 @@
 
 ## Unreleased
 
+- Fixed Review image replacement so the Review card immediately renders the
+  same authoritative `selectedScreenshotAssetId` as Document Workspace and
+  export. Original candidates are used only as a safe fallback when the selected
+  recording asset is unavailable.
 - Enabled safe Review regeneration with consultant-edited instructions,
   formatting, comments, and Step-owned Notes when canonical evidence provides a
   unique one-to-one Step mapping. Preview 1.2.0 shows the number of preserved

@@ -4713,14 +4713,11 @@ globalThis.T9ReviewEdit.bind($("reviewList"), {
 
 function reviewImages(task) {
   if (!activeReviewModel) return [];
-  const paths = task.sourceScreenshotAssetIds?.length
-    ? task.sourceScreenshotAssetIds
-    : task.screenshots?.length
-    ? task.screenshots
-    : task.screenshot
-      ? [task.screenshot]
-      : [];
-  return [...new Set(paths)]
+  const screenshotData = activeReviewModel.screenshotData || {};
+  const paths = globalThis.T9Review.displayScreenshotAssetIds(
+    task, Object.keys(screenshotData)
+  );
+  return paths
     .map(path => ({ path, imageUrl: activeReviewModel.screenshotData[path] }))
     .filter(image => Boolean(image.imageUrl));
 }
