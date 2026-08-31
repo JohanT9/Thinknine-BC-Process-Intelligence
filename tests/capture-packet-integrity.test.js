@@ -11,7 +11,7 @@ function event(id, kind, extra = {}) {
     controlIdentification: {}, frameContext: { frameId: "top" }, ...extra };
 }
 
-assert.strictEqual(integrity.VERSION, "1.1.0");
+assert.strictEqual(integrity.VERSION, "1.2.0");
 const events = [
   event("action", "activation", { interactionId: "interaction:release",
     interactionIds: ["interaction:release"], screenshotAssetId: "before" }),
@@ -30,6 +30,13 @@ assert.strictEqual(JSON.stringify(events).includes("capturePacketIntegrity"), fa
 
 const validPacket = grouped.groups[0].capturePacket;
 assert.strictEqual(integrity.assertValid(validPacket, { events }).valid, true);
+const invalidCoverage = integrity.validate({ ...validPacket,
+  stateObservation: { ...validPacket.stateObservation,
+    coverage: { ...validPacket.stateObservation.coverage,
+      afterFactCount: 999 } } }, { events });
+assert.strictEqual(invalidCoverage.valid, false);
+assert(invalidCoverage.diagnostics.some(item =>
+  item.code === "state-observation-coverage-mismatch"));
 
 const conflicting = { ...validPacket, interactionId: "interaction:c",
   interactionIds: ["interaction:a", "interaction:b"], completeness: "complete",

@@ -84,6 +84,16 @@ assert(detailTarget.outerHTML.includes("Valt beslut"));
 assert(detailTarget.outerHTML.includes("Vägar"));
 assert(detailTarget.outerHTML.includes("stock-available"));
 assert(detailTarget.outerHTML.includes("conditional"));
+assert(view.detailMarkup({ node: { nodeType: "activity", title: "VAT" },
+  containers: {}, outgoing: [], changes: [{ factKind: "toggle-state",
+    before: { control: { caption: "Moms" }, checked: false },
+    after: { control: { caption: "Moms" }, checked: true } }] }, false)
+  .includes("Av"));
+assert(view.detailMarkup({ node: { nodeType: "activity", title: "VAT" },
+  containers: {}, outgoing: [], changes: [{ factKind: "toggle-state",
+    before: { control: { caption: "VAT" }, checked: false },
+    after: { control: { caption: "VAT" }, checked: true } }] }, true)
+  .includes("On"));
 const selectedAttributes = {};
 const selectedAction = { dataset: { processTaskId: "release" },
   setAttribute(name, value) { selectedAttributes[name] = value; } };

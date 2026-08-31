@@ -4,7 +4,7 @@
   root.T9ObservedState = api;
 })(typeof globalThis !== "undefined" ? globalThis : this, function () {
   "use strict";
-  const VERSION = "1.0.0";
+  const VERSION = "1.1.0";
   const clone = value => value == null ? value : JSON.parse(JSON.stringify(value));
   function freeze(value) {
     if (!value || typeof value !== "object" || Object.isFrozen(value)) return value;
@@ -40,6 +40,10 @@
     if (index >= 0) target[index] = value;
     else target.push(value);
   }
+  function addFirst(target, value) {
+    if (!value || target.some(item => item.key === value.key)) return;
+    target.push(value);
+  }
   function valueOf(model) {
     return model && Object.prototype.hasOwnProperty.call(model, "normalized")
       ? clone(model.normalized) : undefined;
@@ -57,42 +61,41 @@
     if (afterPage) add(after, fact("page", "page", afterPage,
       pageOutcome || interaction || values.at(-1)));
 
-    const valueBeforeEvent = resultEvents.find(event =>
-      valueOf(event?.previousValue) !== undefined);
-    const valueAfterEvent = [...resultEvents].reverse().find(event =>
-      valueOf(event?.value) !== undefined || event?.selection?.value != null);
-    const valueControl = controlValue(valueAfterEvent || valueBeforeEvent);
-    const valueKey = valueControl ? `control:${valueControl.identity}:value` : null;
-    if (valueBeforeEvent && valueKey) add(before, fact("control-value", valueKey,
-      { control: valueControl, value: valueOf(valueBeforeEvent.previousValue) },
-      valueBeforeEvent));
-    if (valueAfterEvent && valueKey) {
-      const selected = valueAfterEvent.selection?.value ??
-        valueAfterEvent.selection?.key ?? valueAfterEvent.selection?.caption;
-      const afterValue = selected !== undefined ? clone(selected) :
-        valueOf(valueAfterEvent.value);
-      add(after, fact("control-value", valueKey,
-        { control: valueControl, value: afterValue }, valueAfterEvent));
-    }
-
-    const toggleAfterEvent = [...resultEvents].reverse().find(event =>
-      event?.kind === "toggle-change" && event?.state?.checked != null);
-    if (toggleAfterEvent) {
-      const control = controlValue(toggleAfterEvent);
-      const key = `control:${control?.identity || "unknown"}:checked`;
-      const prior = valueOf(toggleAfterEvent.previousValue);
-      if (typeof prior === "boolean") add(before, fact("toggle-state", key,
-        { control, checked: prior }, toggleAfterEvent));
-      add(after, fact("toggle-state", key,
-        { control, checked: Boolean(toggleAfterEvent.state.checked) },
-        toggleAfterEvent));
-    }
-
-    const dialogOutcome = [...resultEvents].reverse().find(event =>
-      ["dialog-open", "dialog-close"].includes(event?.kind));
-    if (dialogOutcome) add(after, fact("dialog-visibility", "dialog:visibility",
-      { page: pageValue(dialogOutcome), visible: dialogOutcome.kind === "dialog-open" },
-      dialogOutcome));
+    resultEvents.forEach(event => {
+      const control = controlValue(event);
+      const selected = event?.selection?.value ?? event?.selection?.key ??
+        event?.selection?.caption;
+      const currentValue = selected !== undefined ? clone(selected) :
+        valueOf(event?.value);
+      const previousValue = valueOf(event?.previousValue);
+      if (event?.kind !== "toggle-change" && control &&
+          (currentValue !== undefined || previousValue !== undefined)) {
+        const kind = selected !== undefined ? "control-selection" : "control-value";
+        const key = `control:${control.identity}:${selected !== undefined
+          ? "selection" : "value"}`;
+        if (previousValue !== undefined) addFirst(before, fact(kind, key,
+          { control, value: previousValue }, event));
+        if (currentValue !== undefined) add(after, fact(kind, key,
+          { control, value: currentValue }, event));
+      }
+      if (event?.kind === "toggle-change" && event?.state?.checked != null) {
+        const key = `control:${control?.identity || "unknown"}:checked`;
+        if (typeof previousValue === "boolean") addFirst(before,
+          fact("toggle-state", key, { control, checked: previousValue }, event));
+        add(after, fact("toggle-state", key,
+          { control, checked: Boolean(event.state.checked) }, event));
+      }
+      if (["dialog-open", "dialog-close"].includes(event?.kind)) {
+        const page = pageValue(event);
+        const identity = page?.identity || page?.caption || "unknown";
+        add(after, fact("dialog-visibility", `dialog:${identity}:visibility`,
+          { page, visible: event.kind === "dialog-open" }, event));
+      }
+      if (["status-message", "error-outcome"].includes(event?.kind)) {
+        add(after, fact("outcome", `outcome:${event.kind}`,
+          { outcome: event.kind, observed: true }, event));
+      }
+    });
 
     const beforeByKey = new Map(before.map(item => [item.key, item]));
     const changes = after.flatMap(afterFact => {
@@ -106,8 +109,14 @@
     });
     const status = changes.length ? "changed" : before.length && after.length
       ? "observed" : before.length || after.length ? "partial" : "unavailable";
+    const coverage = {
+      beforeFactCount: before.length, afterFactCount: after.length,
+      changedFactCount: changes.length,
+      observedKinds: unique([...before, ...after].map(item => item.kind))
+    };
     return freeze({ version: VERSION, status,
       before: { facts: before }, after: { facts: after }, changes,
+      coverage,
       sourceEventIds: unique([...before, ...after].flatMap(item =>
         item.sourceEventIds)) });
   }

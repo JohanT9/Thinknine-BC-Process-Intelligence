@@ -51,7 +51,7 @@ directly observed page, control-value, toggle, and dialog facts before and after
 the interaction. Only exact comparable differences become changes; missing
 facts remain partial. See [OBSERVED_STATE.md](OBSERVED_STATE.md).
 
-Every generated packet passes through Capture Packet Integrity `1.1.0`. The
+Every generated packet passes through Capture Packet Integrity `1.2.0`. The
 validator checks recorder identity consistency, event ordering and ownership,
 result/source traceability, screenshot roles and preferred evidence, Result
 Verification consistency, and completeness. It returns immutable structured

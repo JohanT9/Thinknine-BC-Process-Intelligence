@@ -251,6 +251,12 @@ conditional or alternate routes and destinations. Process Overview never turns
 ordinary Yes/No clicks, cancelled dialogs or revisited pages into invented
 business branches.
 
+State Observation retains all directly observed field, selection and toggle
+changes caused within one interaction packet. It preserves exact Canonical
+evidence, reports deterministic coverage and never fills in a missing before or
+after value. Process Overview presents each proven change, including localized
+boolean values.
+
 ## Sections and Subtasks
 
 Long workflows can be organized into a bounded Document → Section → Subtask →

@@ -155,3 +155,10 @@ Explicit consultant-defined decisions now appear as distinct selectable nodes.
 Their stored route labels and destinations are visible both on the node and in
 the detail panel, while the ordinary linear connector is suppressed at the
 decision. No branch is inferred from routine UI interactions.
+
+State Observation now retains multiple control changes from the same
+interaction, including field values, selected values and toggles. Bounded
+status/error outcome presence and deterministic coverage are retained without
+copying potentially sensitive messages. Capture Packet Integrity verifies the
+coverage, and Process Overview renders boolean transitions as readable On/Off
+or På/Av values.

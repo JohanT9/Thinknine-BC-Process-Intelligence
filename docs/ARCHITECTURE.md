@@ -249,9 +249,10 @@ without inferring process meaning. Semantic Actions and Review tasks preserve
 the packet metadata;
 renderers do not reconstruct it.
 
-Capture Packet Integrity 1.1.0 is the single validation owner for packet
+Capture Packet Integrity 1.2.0 is the single validation owner for packet
 identity, reference ownership, evidence ordering, screenshot roles, result
-traceability, observed-state ownership, and completeness. It detects and reports invalid derived
+traceability, observed-state ownership, state coverage, and completeness. It
+detects and reports invalid derived
 relationships without repairing or rewriting Canonical evidence. Runtime and CI
 consume the same immutable diagnostic contract.
 

@@ -20,8 +20,13 @@
       transition?.after?.control?.caption || transition?.factKey || "Status";
   }
 
-  function stateValue(value) {
+  function stateValue(value, english = false) {
     if (value?.value !== undefined && value?.value !== null) return String(value.value);
+    if (typeof value?.checked === "boolean") return value.checked
+      ? (english ? "On" : "På") : (english ? "Off" : "Av");
+    if (typeof value?.visible === "boolean") return value.visible
+      ? (english ? "Visible" : "Synlig") : (english ? "Closed" : "Stängd");
+    if (value?.outcome) return String(value.outcome);
     if (value?.page?.caption) return String(value.page.caption);
     return "";
   }
@@ -84,8 +89,8 @@
   function detailMarkup(detail, english) {
     if (!detail) return "";
     const changes = detail.changes.map(change => {
-      const before = stateValue(change.before);
-      const after = stateValue(change.after);
+      const before = stateValue(change.before, english);
+      const after = stateValue(change.after, english);
       return `<li><strong>${escape(stateLabel(change))}:</strong> ${escape(before)} ` +
         `<span aria-label="${english ? "changes to" : "ändras till"}">→</span> ` +
         `${escape(after)}</li>`;
@@ -136,8 +141,8 @@
       <ol class="process-overview-list">${details.map(detail => {
         const stateChanges = detail.changes.map(change =>
           `<span class="process-overview-change"><strong>${escape(stateLabel(change))}:</strong> ` +
-          `${escape(stateValue(change.before))} <span aria-hidden="true">→</span> ` +
-          `${escape(stateValue(change.after))}</span>`).join("");
+          `${escape(stateValue(change.before, english))} <span aria-hidden="true">→</span> ` +
+          `${escape(stateValue(change.after, english))}</span>`).join("");
         const selected = selectedTaskIds.has(detail.taskId);
         const phase = detail.containers.phase?.title;
         const subtask = detail.containers.subtask?.title;

@@ -11,6 +11,12 @@
 
 ## Unreleased
 
+- Expanded State Observation to retain every independently identified field,
+  selection and toggle change within one Capture Packet instead of only one
+  control pair. Added privacy-bounded status/error outcome facts, deterministic
+  coverage metadata, readable boolean state values and integrity validation for
+  the complete observation.
+
 - Added a collapsible, accessible Process Overview to Review Studio, projected
   directly from Process Model activities and observed state transitions. Its
   activities navigate to stable Review steps, mirror current selection and

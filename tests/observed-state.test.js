@@ -1,6 +1,7 @@
 const assert = require("assert");
 const state = require("../src/engine/observed-state");
 const grouping = require("../src/engine/event-step-grouping");
+const processModel = require("../src/document/process-model");
 
 function event(id, kind, extra = {}) {
   return { normalizedEventId: `normalized:${id}`,
@@ -12,7 +13,7 @@ function event(id, kind, extra = {}) {
     frameContext: { frameId: "top" }, ...extra };
 }
 
-assert.strictEqual(state.VERSION, "1.0.0");
+assert.strictEqual(state.VERSION, "1.1.0");
 const action = event("release", "activation", { interactionId: "release",
   interactionIds: ["release"], actionIdentification: { caption: "Release" } });
 const navigation = event("released", "navigation", { interactionId: "release",
@@ -46,6 +47,34 @@ assert.deepStrictEqual(fieldState.changes.find(item =>
   item.kind === "control-value").before.value, "5");
 assert.deepStrictEqual(fieldState.changes.find(item =>
   item.kind === "control-value").after.value, "500");
+assert.deepStrictEqual(fieldState.coverage, { beforeFactCount: 2,
+  afterFactCount: 2, changedFactCount: 1,
+  observedKinds: ["page", "control-value"] });
+
+const multiControlEvents = [event("quantity", "value-change", {
+  controlIdentification: { identity: { value: "Quantity" }, caption: "Quantity" },
+  previousValue: { normalized: "1" }, value: { normalized: "2" }
+}), event("status-field", "value-change", {
+  controlIdentification: { identity: { value: "Status" }, caption: "Status" },
+  previousValue: { normalized: "Open" }, value: { normalized: "Released" }
+}), event("location", "selection-change", {
+  controlIdentification: { identity: { value: "Location" }, caption: "Location" },
+  previousValue: { normalized: "BLUE" }, selection: { value: "RED" }
+})];
+const multiControlState = state.capture(multiControlEvents,
+  multiControlEvents[0], multiControlEvents);
+assert.strictEqual(multiControlState.changes.length, 3,
+  "all independently identified control changes must survive one packet");
+assert.deepStrictEqual(multiControlState.changes.map(item => item.key), [
+  "control:Quantity:value", "control:Status:value",
+  "control:Location:selection"
+]);
+assert.strictEqual(multiControlState.changes[2].kind, "control-selection");
+const multiControlModel = processModel.project({ recordingId: "multi-control",
+  steps: [{ taskId: "release", instruction: "Release order",
+    capturePacket: { stateObservation: multiControlState } }] });
+assert.strictEqual(multiControlModel.stateTransitions.length, 3,
+  "every proven control change must reach the Process Model");
 
 const toggle = event("toggle", "toggle-change", {
   controlIdentification: { identity: { value: "IncludeVAT" },
@@ -55,6 +84,15 @@ const toggleState = state.capture([toggle], toggle, [toggle]);
 assert.strictEqual(toggleState.status, "changed");
 assert.strictEqual(toggleState.changes.find(item =>
   item.kind === "toggle-state").after.checked, true);
+
+const outcomes = [event("notice", "status-message"),
+  event("failure", "error-outcome")];
+const outcomeState = state.capture([action, ...outcomes], action, outcomes);
+assert.deepStrictEqual(outcomeState.after.facts.filter(item =>
+  item.kind === "outcome").map(item => item.value.outcome),
+["status-message", "error-outcome"]);
+assert.strictEqual(JSON.stringify(outcomeState).includes("Sales order"), false,
+  "outcome state must not copy message or diagnostic text");
 
 const partial = state.capture([event("status", "status-message")], null, []);
 assert.strictEqual(partial.status, "observed",

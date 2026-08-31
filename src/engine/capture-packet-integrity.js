@@ -4,7 +4,7 @@
   root.T9CapturePacketIntegrity = api;
 })(typeof globalThis !== "undefined" ? globalThis : this, function () {
   "use strict";
-  const VERSION = "1.1.0";
+  const VERSION = "1.2.0";
   const ROLES = new Set(["interaction", "result", "supporting"]);
   const clone = value => value == null ? value : JSON.parse(JSON.stringify(value));
   function freeze(value) {
@@ -217,6 +217,27 @@
       if (!changes.length && stateObservation.status === "changed") {
         diagnostics.push(diagnostic("state-observation-change-missing", "error",
           "Changed State Observation requires an observed difference."));
+      }
+      if (stateObservation.coverage) {
+        const beforeFacts = array(stateObservation.before?.facts);
+        const afterFacts = array(stateObservation.after?.facts);
+        const observedKinds = unique([...beforeFacts, ...afterFacts].map(item =>
+          item?.kind)).sort();
+        const actualCoverage = stateObservation.coverage;
+        const expectedCoverage = { beforeFactCount: beforeFacts.length,
+          afterFactCount: afterFacts.length, changedFactCount: changes.length,
+          observedKinds };
+        const normalizedCoverage = {
+          beforeFactCount: Number(actualCoverage.beforeFactCount),
+          afterFactCount: Number(actualCoverage.afterFactCount),
+          changedFactCount: Number(actualCoverage.changedFactCount),
+          observedKinds: unique(actualCoverage.observedKinds).sort()
+        };
+        if (JSON.stringify(normalizedCoverage) !== JSON.stringify(expectedCoverage)) {
+          diagnostics.push(diagnostic("state-observation-coverage-mismatch", "error",
+            "State Observation coverage contradicts its observed facts.",
+            { expected: expectedCoverage, actual: normalizedCoverage }));
+        }
       }
     }
 
