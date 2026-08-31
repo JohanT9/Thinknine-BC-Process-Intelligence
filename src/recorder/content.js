@@ -55,6 +55,7 @@
   const elementInteractions = new WeakMap();
   const observedDialogs = new Set();
   const dialogInteractions = new WeakMap();
+  const observedStatusMessages = new WeakMap();
   let pendingPointerCapture = null;
   let activeInteraction = null;
   const INTERACTION_WINDOW_MS = 10000;
@@ -1074,6 +1075,24 @@
           dialogClosed: true } });
     });
 
+    document.querySelectorAll(
+      '[role="status"],[role="alert"],[aria-live="polite"],[aria-live="assertive"]'
+    ).forEach(status => {
+      if (status.closest('[role="dialog"],[aria-modal="true"]') ||
+          status.closest('#t9-recording-indicator-host') || status.hidden ||
+          status.getAttribute('aria-hidden') === 'true') return;
+      const message = textOf(status).slice(0, 300);
+      const previous = observedStatusMessages.get(status) || "";
+      observedStatusMessages.set(status, message);
+      if (!message || message === previous) return;
+      const interactionId = currentInteractionId();
+      const statusDescriptor = descriptor(status);
+      record({ type: "status-message", category: "result",
+        ...(interactionId ? { interactionId } : {}),
+        label: message, ...statusDescriptor,
+        uiState: { ...statusDescriptor.uiState, resultVisible: true } });
+    });
+
     const signature = `${getPageId()}|${getPageCaption()}|${location.href}`;
     if (signature !== lastPageSignature) {
       lastPageSignature = signature;
@@ -1093,6 +1112,10 @@
       return;
     }
 
+    document.querySelectorAll(
+      '[role="status"],[role="alert"],[aria-live="polite"],[aria-live="assertive"]'
+    ).forEach(status => observedStatusMessages.set(status,
+      textOf(status).slice(0, 300)));
     observer.observe(document.documentElement, {
       childList: true,
       subtree: true

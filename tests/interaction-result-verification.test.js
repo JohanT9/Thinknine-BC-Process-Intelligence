@@ -26,7 +26,7 @@ const sourceError = { id: "canonical:error", recordingId: "result-verification",
 const [errorKind, errorReason] = normalization.classify(sourceError);
 assert.strictEqual(errorKind, "error-outcome");
 assert.strictEqual(errorReason, "observed-business-central-error");
-assert.strictEqual(normalization.NORMALIZATION_VERSION, "2.4.0");
+assert.strictEqual(normalization.NORMALIZATION_VERSION, "2.5.0");
 assert.strictEqual(sourceError.raw.copiedDetails, "Sensitive diagnostic details");
 
 const grouped = grouping.group({ recordingId: "result-verification", events: [
@@ -40,9 +40,9 @@ const grouped = grouping.group({ recordingId: "result-verification", events: [
   event("error", "error-outcome", { screenshotAssetId: "error.png" })
 ] });
 
-assert.strictEqual(grouping.GROUPING_VERSION, "1.5.0");
-assert.strictEqual(grouping.CAPTURE_PACKET_VERSION, "1.3.0");
-assert.strictEqual(grouping.RESULT_VERIFICATION_VERSION, "1.0.0");
+assert.strictEqual(grouping.GROUPING_VERSION, "1.6.0");
+assert.strictEqual(grouping.CAPTURE_PACKET_VERSION, "1.4.0");
+assert.strictEqual(grouping.RESULT_VERIFICATION_VERSION, "1.1.0");
 assert.strictEqual(grouped.groups.length, 1,
   "an action and all its immediate outcomes form one packet");
 const verification = grouped.groups[0].capturePacket.resultVerification;
@@ -70,6 +70,31 @@ const unverified = grouping.group({ recordingId: "result-verification", events: 
 assert.strictEqual(unverified.status, "unverified");
 assert.strictEqual(unverified.expectedResultSuggestion, "");
 
+const sourceStatus = { id: "canonical:status", recordingId: "result-verification",
+  timestamp: "2026-08-28T10:00:04.000Z", sequence: 4,
+  raw: { type: "status-message", label: "Sales order 1001 was posted." } };
+assert.deepStrictEqual(normalization.classify(sourceStatus),
+  ["status-message", "observed-accessible-status-message"]);
+const statusResult = grouping.group({ recordingId: "result-verification", events: [
+  event("post", "activation", { interactionId: "interaction:post",
+    interactionIds: ["interaction:post"], actionIdentification: { caption: "Post" } }),
+  event("status", "status-message", { interactionId: "interaction:post",
+    interactionIds: ["interaction:post"], screenshotAssetId: "status.png" })
+] }).groups[0].capturePacket.resultVerification;
+assert.strictEqual(statusResult.status, "verified");
+assert.strictEqual(statusResult.primaryOutcome, "status-message");
+assert.strictEqual(statusResult.summary,
+  "Business Central visade ett statusmeddelande.");
+assert.ok(!JSON.stringify(statusResult).includes("Sales order 1001"),
+  "status text must remain in canonical evidence rather than the document model");
+const orphanStatus = grouping.group({ recordingId: "result-verification", events: [
+  event("orphan-status", "status-message")
+] });
+assert.strictEqual(orphanStatus.groups.length, 0,
+  "an unbound status message must not create an empty documentation step");
+assert.strictEqual(orphanStatus.supportingEvents[0].reason,
+  "orphan-status-message");
+
 const interpreted = pipeline.interpret({
   events: navigation.groups[0].sourceEventIds.map((id, index) => ({
     canonicalSourceEventId: id, eventNo: index + 1
@@ -88,7 +113,10 @@ assert.strictEqual(interpreted.businessTasks[0].expectedResult, undefined,
   "observations must not overwrite the editable expected-result field");
 
 const dashboard = fs.readFileSync("src/ui/dashboard.js", "utf8");
+const content = fs.readFileSync("src/recorder/content.js", "utf8");
 assert.ok(dashboard.includes("Observerat resultat:"));
 assert.ok(dashboard.includes("escapeHtml(task.observedResult)"));
+assert.ok(content.includes('type: "status-message"'));
+assert.ok(content.includes("observedStatusMessages"));
 
 console.log("Interaction result verification tests passed.");

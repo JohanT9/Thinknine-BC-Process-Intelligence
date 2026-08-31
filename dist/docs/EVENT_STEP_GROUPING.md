@@ -35,7 +35,7 @@ candidate status, and an additive immutable `capturePacket`. Unknown future
 fields survive normalization.
 
 The capture packet explicitly relates the observed interaction to its immediate
-verified result and captured screenshot evidence. Version `1.3.0` also carries
+verified result and captured screenshot evidence. Version `1.4.0` also carries
 the formal `resultVerification` contract described in
 [INTERACTION_RESULT_VERIFICATION.md](INTERACTION_RESULT_VERIFICATION.md). It records interaction and
 result event IDs separately, all screenshot asset IDs, the source event owning
@@ -51,7 +51,7 @@ exposes plural `interactionEventIds`, `resultEventIds`, and structured
 `screenshotEvidence`. A screenshot attached to verified result evidence is the
 packet preference; a later framework/supporting capture cannot displace it.
 
-Algorithm version is `1.5.0`. IDs use the version plus collision-safe,
+Algorithm version is `1.6.0`. IDs use the version plus collision-safe,
 length-prefixed canonical source IDs. They do not use random values, execution
 time, Review order, export state, or captions.
 

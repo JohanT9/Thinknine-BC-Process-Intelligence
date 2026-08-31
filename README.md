@@ -122,7 +122,7 @@ Aptean, AppSource, tenant, customer, and control-add-in pages remain recordable
 through Review, Workspace, and export without fabricated entity or table data.
 The Page Identification Engine owns resolution; dashboard only orchestrates.
 
-## Event Normalization 2.4.0
+## Event Normalization 2.5.0
 
 During recording, the in-page panel can optionally mark the latest captured
 interaction as important, choose its screenshot, start a new section, or ignore
@@ -160,7 +160,9 @@ Det kräver inga MUI-klasser eller leverantörsspecifika attribut.
 
 Capture packets retain deterministic observed outcomes after an action:
 navigation, dialogs, changed controls, selections, toggles, and Business Central
-errors. Review Studio shows the verified result without replacing the manual
+errors. Accessible confirmation and status messages are also retained as a
+privacy-bounded outcome fact, with their raw text kept only in Canonical
+Recording. Review Studio shows the verified result without replacing the manual
 expected-result field. See
 [Interaction Result Verification](docs/INTERACTION_RESULT_VERIFICATION.md).
 

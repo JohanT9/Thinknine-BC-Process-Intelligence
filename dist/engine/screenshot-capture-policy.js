@@ -28,6 +28,7 @@
     if (mode === "none") return false;
     const captureCategory = category(event);
     if (captureCategory === FIELD_INPUT) return true;
+    if (captureCategory === "result") return true;
     if (mode === "all") {
       return ["action", "dialog", "navigation"].includes(captureCategory);
     }

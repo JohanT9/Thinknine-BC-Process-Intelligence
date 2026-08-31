@@ -27,13 +27,17 @@ Each capture packet contains an additive immutable `resultVerification` object:
 - `sourceEventIds`: canonical traceability
 
 Supported outcomes are navigation, dialog open/close, value change, selection,
-toggle change, and Business Central error. An action may collect more than one
-immediate outcome, for example a dialog opening followed by an error.
+toggle change, accessible status message, and Business Central error. An action
+may collect more than one immediate outcome, for example a dialog opening
+followed by an error.
 
 The model stores only bounded outcome facts and captions already present in
-normalized context. It does not copy error details, call stacks, entered
-business values, URLs, or raw payloads. Full evidence remains in Canonical
-Recording.
+normalized context. Status-message text, error details, call stacks, entered
+business values, URLs, and raw payloads are not copied into the document model.
+Full evidence remains in Canonical Recording. Because status messages are
+transient, the screenshot policy captures their visible state when screenshots
+are enabled. A status message without a stable initiating interaction remains
+supporting evidence and cannot create a standalone documentation step.
 
 ## User experience and compatibility
 

@@ -1,5 +1,10 @@
 # BC Process Studio 4.7
 
+- Accessible Business Central status and confirmation messages now count as an
+  observed result for the initiating action. Their visible state is captured
+  when screenshots are enabled, while message text remains only in immutable
+  Canonical evidence rather than being copied into generated documents.
+
 - In-recording commands such as **Important step**, **Use this image**, **New
   section**, and **Ignore** now follow the complete stable interaction packet.
   React and Control Add-in support events can no longer redirect a marker to the

@@ -11,6 +11,10 @@
 
 ## Unreleased
 
+- Added privacy-bounded verification of accessible Business Central status and
+  confirmation messages. They now complete the initiating Capture Packet and
+  trigger a transient result screenshot without copying message text into the
+  generated document model.
 - Bound in-recording guidance commands to stable recorder interaction identity,
   preventing React and Control Add-in support events from moving an important,
   image, section, or ignore marker to the wrong Step Group. Canonical Event ID

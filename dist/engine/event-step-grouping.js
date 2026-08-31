@@ -5,9 +5,9 @@
 })(typeof globalThis !== "undefined" ? globalThis : this, function () {
   "use strict";
   const SCHEMA_VERSION = 1;
-  const GROUPING_VERSION = "1.5.0";
-  const CAPTURE_PACKET_VERSION = "1.3.0";
-  const RESULT_VERIFICATION_VERSION = "1.0.0";
+  const GROUPING_VERSION = "1.6.0";
+  const CAPTURE_PACKET_VERSION = "1.4.0";
+  const RESULT_VERIFICATION_VERSION = "1.1.0";
   const cache = new WeakMap();
   const clone = value => value == null ? value : JSON.parse(JSON.stringify(value));
   function freeze(value) { if (!value || typeof value !== "object" || Object.isFrozen(value)) return value; Object.values(value).forEach(freeze); return Object.freeze(value); }
@@ -60,7 +60,8 @@
   }
   function outcomeEvents(events) { return events.filter(event =>
     ["dialog-open", "dialog-close", "navigation", "value-change",
-      "selection-change", "toggle-change", "error-outcome"].includes(event.kind)); }
+      "selection-change", "toggle-change", "status-message",
+      "error-outcome"].includes(event.kind)); }
   function interactionEvents(events) { return events.filter(event =>
     ["activation", "key-command", "dialog-action"].includes(event.kind)); }
   function evidenceRole(event, interaction, outcomes) {
@@ -99,6 +100,7 @@
       case "toggle-change": return controlCaption
         ? `${controlCaption} ${event.state?.checked ? "aktiverades" : "inaktiverades"}.`
         : `Alternativet ${event.state?.checked ? "aktiverades" : "inaktiverades"}.`;
+      case "status-message": return "Business Central visade ett statusmeddelande.";
       case "error-outcome": return "Business Central visade ett fel.";
       default: return "";
     }
@@ -137,7 +139,8 @@
     const outcomes = observedOutcomes.length ? observedOutcomes :
       primary && primary !== interaction ? [primary] :
         primary && ["value-change", "selection-change", "toggle-change",
-          "navigation", "dialog-open", "dialog-close", "error-outcome"].includes(primary.kind)
+          "navigation", "dialog-open", "dialog-close", "status-message",
+          "error-outcome"].includes(primary.kind)
           ? [primary] : [];
     const screenshotEvents = events.filter(event =>
       event?.screenshotAssetId || event?.screenshotAssetIds?.length);
@@ -256,7 +259,8 @@
   function isActionOutcome(events, event) {
     const origin = events?.[0];
     if (origin?.kind !== "activation") return false;
-    if (["dialog-open", "dialog-close", "navigation", "error-outcome"].includes(event.kind)) return true;
+    if (["dialog-open", "dialog-close", "navigation", "status-message",
+      "error-outcome"].includes(event.kind)) return true;
     if (["value-change", "selection-change", "toggle-change"].includes(event.kind)) {
       return pageKey(origin) === pageKey(event) &&
         (controlKey(origin) === controlKey(event) || Boolean(
@@ -293,6 +297,12 @@
         continue;
       }
       if (pending && conflictingRecordedInteraction(pending.events, event)) emit();
+      if (!pending && event.kind === "status-message") {
+        supportingEvents.push(freeze({ normalizedEventId: event.normalizedEventId,
+          classification: "result", reason: "orphan-status-message" }));
+        assignments.set(event.normalizedEventId, "supporting");
+        continue;
+      }
       if (isNoise(event)) { emit(); supportingEvents.push(freeze({ normalizedEventId: event.normalizedEventId, classification: "noise", reason: "non-step-mechanic" })); assignments.set(event.normalizedEventId, "supporting"); continue; }
       if (isUnclassifiedMechanic(event)) { emit(); supportingEvents.push(freeze({
         normalizedEventId: event.normalizedEventId, classification: "unclassified",

@@ -222,13 +222,13 @@ manufacturing, and Aptean rules are not misrepresented as verified page records.
 
 ## Event Normalization boundary
 
-Event Normalization 2.4.0 is the sole owner of browser-mechanic coalescing. It
+Event Normalization 2.5.0 is the sole owner of browser-mechanic coalescing. It
 consumes durable Raw Events and BC UI Identification, emits immutable normalized
 interactions, and never groups them into Steps. React/MUI focus comparison is
 capture evidence; only normalization may classify a verified difference as a
 `value-change`.
 
-Step Grouping 1.5.0 attaches additive result verification and recorder-owned
+Step Grouping 1.6.0 attaches additive result verification and recorder-owned
 interaction identity to capture packets.
 Observed navigation, dialog, value, selection, toggle, and error outcomes flow
 to Semantic Actions and Review without modifying Canonical Recording or
@@ -241,7 +241,7 @@ Event Normalization propagates it, and Step Grouping uses matching IDs as an
 explicit boundary. Semantic rules consume the completed group and never create
 or reinterpret recorder interaction identity.
 
-Capture Packet 1.3.0 treats a matching recorder ID as authoritative across
+Capture Packet 1.4.0 treats a matching recorder ID as authoritative across
 framework noise and unknown supporting mechanics. It records plural interaction
 events, result events, screenshot evidence roles, and a result-oriented preferred
 screenshot. Semantic Actions and Review tasks preserve the packet metadata;
