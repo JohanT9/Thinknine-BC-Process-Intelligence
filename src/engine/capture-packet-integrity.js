@@ -88,7 +88,9 @@
     const positions = new Map(eventIds.map((id, index) => [id, index]));
     const lastInteraction = Math.max(-1, ...interactionEventIds
       .map(id => positions.get(id)).filter(Number.isInteger));
-    const earlyResults = resultEventIds.filter(id =>
+    const interactionAlsoRepresentsResult = resultEventIds.includes(
+      String(packet.interactionEventId || ""));
+    const earlyResults = interactionAlsoRepresentsResult ? [] : resultEventIds.filter(id =>
       Number.isInteger(positions.get(id)) && positions.get(id) < lastInteraction);
     if (earlyResults.length) diagnostics.push(diagnostic(
       "result-before-interaction", "error",

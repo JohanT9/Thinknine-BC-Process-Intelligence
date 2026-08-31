@@ -1,0 +1,59 @@
+{
+  "schemaVersion": 1,
+  "provenance": "Synthetic and sanitized metadata shaped like recorder-normalized Business Central evidence; no image bytes or customer values.",
+  "samples": [
+    {
+      "id": "standard-bc-action-result",
+      "surface": "standard-bc",
+      "expected": { "groupCount": 1, "groupKinds": ["action"], "completePackets": true },
+      "events": [
+        { "id": "release", "kind": "activation", "interactionId": "i-release", "control": "Release", "screenshot": "shot-release" },
+        { "id": "released-page", "kind": "navigation", "interactionId": "i-release", "page": "Released Sales Order", "screenshot": "shot-released" }
+      ]
+    },
+    {
+      "id": "standard-bc-field-commit",
+      "surface": "standard-bc",
+      "expected": { "groupCount": 1, "groupKinds": ["field-edit"], "completePackets": true },
+      "events": [
+        { "id": "quantity-input", "kind": "value-change", "interactionId": "i-quantity", "control": "Quantity", "value": "5", "screenshot": "shot-quantity-input" },
+        { "id": "quantity-commit", "kind": "value-change", "interactionId": "i-quantity", "control": "Quantity", "value": "50", "screenshot": "shot-quantity-commit" }
+      ]
+    },
+    {
+      "id": "react-control-addin-action",
+      "surface": "react-control-add-in",
+      "expected": { "groupCount": 1, "groupKinds": ["action"], "completePackets": true },
+      "events": [
+        { "id": "apply", "kind": "activation", "interactionId": "i-apply", "control": "Apply", "frame": "react-frame", "screenshot": "shot-apply" },
+        { "id": "confirmation", "kind": "dialog-open", "interactionId": "i-apply", "page": "Apply confirmation", "frame": "react-frame", "screenshot": "shot-confirmation" }
+      ]
+    },
+    {
+      "id": "multi-frame-navigation",
+      "surface": "multi-frame-control-add-in",
+      "expected": { "groupCount": 1, "groupKinds": ["action"], "completePackets": true },
+      "events": [
+        { "id": "open-details", "kind": "activation", "interactionId": "i-details", "control": "Details", "frame": "addin-frame", "screenshot": "shot-details" },
+        { "id": "details-page", "kind": "navigation", "interactionId": "i-details", "page": "Item Details", "frame": "top", "screenshot": "shot-details-page" }
+      ]
+    },
+    {
+      "id": "independent-actions",
+      "surface": "standard-bc",
+      "expected": { "groupCount": 2, "groupKinds": ["action", "action"], "completePackets": false },
+      "events": [
+        { "id": "previous", "kind": "activation", "interactionId": "i-previous", "control": "Previous", "screenshot": "shot-previous" },
+        { "id": "next", "kind": "activation", "interactionId": "i-next", "control": "Next", "screenshot": "shot-next" }
+      ]
+    },
+    {
+      "id": "legacy-compatibility",
+      "surface": "legacy-recording",
+      "expected": { "groupCount": 1, "groupKinds": ["field-edit"], "completePackets": true },
+      "events": [
+        { "id": "legacy-description", "kind": "value-change", "control": "Description", "value": "Sanitized value", "screenshot": "shot-legacy" }
+      ]
+    }
+  ]
+}

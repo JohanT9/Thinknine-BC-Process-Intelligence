@@ -64,4 +64,13 @@ assert.strictEqual(compatibility.valid, true,
 assert(compatibility.diagnostics.some(item =>
   item.code === "compatibility-interaction-identity" && item.severity === "info"));
 
+const progressiveFieldEvents = [event("field-1", "value-change", {
+  interactionId: "interaction:field", interactionIds: ["interaction:field"] }),
+event("field-2", "value-change", { interactionId: "interaction:field",
+  interactionIds: ["interaction:field"] })];
+const progressiveField = grouping.group({ schemaVersion: 1,
+  recordingId: "integrity", events: progressiveFieldEvents });
+assert.strictEqual(progressiveField.diagnostics.capturePacketValid, true,
+  "a committed field value may be both the interaction and observed result");
+
 console.log("Capture Packet integrity gate tests passed.");

@@ -173,6 +173,12 @@ and contradictory completeness without modifying recorded evidence. The same
 validator powers runtime diagnostics and fixture assertions. See
 [Capture Packet Integrity](docs/CAPTURE_PACKET_INTEGRITY.md).
 
+The versioned [Capture Validation Suite](docs/CAPTURE_VALIDATION_SUITE.md) runs
+sanitized standard BC, React/Control Add-in, iframe, multi-interaction, and
+legacy recording shapes through production grouping in CI. It measures packet
+coverage and canonical traceability while explicitly avoiding claims of
+customer-production validation.
+
 ## Canonical Recording Hardening
 
 Canonical Recording is the immutable evidence projection consumed by derived

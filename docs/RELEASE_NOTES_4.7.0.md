@@ -1,5 +1,11 @@
 # BC Process Studio 4.7
 
+- Process capture now has a shared, data-driven validation gate in CI. Six
+  sanitized recordings exercise seven packets across standard Business Central,
+  React Control Add-ins, iframe transitions, and legacy compatibility. The
+  report tracks surface coverage, packet completeness, integrity errors, and
+  canonical source traceability without modifying recorded evidence.
+
 - Every Capture Packet now passes a shared integrity contract covering recorder
   identity, owned and ordered evidence, screenshot roles, result traceability,
   and completeness. Invalid relationships produce structured diagnostics rather

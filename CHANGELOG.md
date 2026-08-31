@@ -11,6 +11,13 @@
 
 ## Unreleased
 
+- Added a versioned Capture Validation Suite that runs sanitized standard BC,
+  React/Control Add-in, iframe, multi-interaction, and legacy recordings through
+  production grouping and Capture Packet integrity contracts in CI. The gate
+  reports deterministic coverage and fails on lost or duplicated traceability.
+- Refined Capture Packet ordering validation so a committed field value may
+  legitimately represent both the interaction and its observed result, while
+  separate action/result evidence remains strictly ordered.
 - Added Capture Packet Integrity 1.0.0 as a shared runtime and CI validation
   boundary for interaction identity, event ownership/order, screenshot evidence,
   result traceability, and completeness. Validation reports immutable structured
