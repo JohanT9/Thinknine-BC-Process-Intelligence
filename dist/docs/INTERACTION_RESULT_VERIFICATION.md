@@ -21,6 +21,7 @@ Each capture packet contains an additive immutable `resultVerification` object:
 
 - `status`: `verified`, `error`, or `unverified`
 - `primaryOutcome`: the deterministic outcome kind
+- `primaryOutcomeEventId`: the single normalized event owning that outcome
 - `outcomes`: ordered normalized and canonical source references
 - `summary`: concise observed result for Review Studio
 - `expectedResultSuggestion`: a non-destructive suggestion

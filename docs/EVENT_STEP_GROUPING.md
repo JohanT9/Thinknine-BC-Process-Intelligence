@@ -35,7 +35,7 @@ candidate status, and an additive immutable `capturePacket`. Unknown future
 fields survive normalization.
 
 The capture packet explicitly relates the observed interaction to its immediate
-verified result and captured screenshot evidence. Version `1.4.0` also carries
+verified result and captured screenshot evidence. Version `1.5.0` also carries
 the formal `resultVerification` contract described in
 [INTERACTION_RESULT_VERIFICATION.md](INTERACTION_RESULT_VERIFICATION.md). It records interaction and
 result event IDs separately, all screenshot asset IDs, the source event owning
@@ -46,12 +46,21 @@ identity; `compatibility-grouping` means historical evidence required the
 existing deterministic grouping rules. It is derived evidence: Canonical
 Recording and raw events remain unchanged.
 
+Every generated packet passes through Capture Packet Integrity `1.0.0`. The
+validator checks recorder identity consistency, event ordering and ownership,
+result/source traceability, screenshot roles and preferred evidence, Result
+Verification consistency, and completeness. It returns immutable structured
+diagnostics and never repairs or mutates evidence. Runtime grouping exposes the
+diagnostics per Step Group and in the grouping summary; CI fixtures use the same
+contract as a hard assertion gate. Historical packets without recorder identity
+remain valid through an explicit informational compatibility diagnostic.
+
 Each packet classifies evidence as `interaction`, `result`, or `supporting` and
 exposes plural `interactionEventIds`, `resultEventIds`, and structured
 `screenshotEvidence`. A screenshot attached to verified result evidence is the
 packet preference; a later framework/supporting capture cannot displace it.
 
-Algorithm version is `1.6.0`. IDs use the version plus collision-safe,
+Algorithm version is `1.7.0`. IDs use the version plus collision-safe,
 length-prefixed canonical source IDs. They do not use random values, execution
 time, Review order, export state, or captions.
 
@@ -119,8 +128,8 @@ documentable interaction are classified as supporting/unclassified. They remain
 traceable but cannot create an `Unclassified` placeholder step. Every normalized
 event is assigned to a group or an explicit supporting classification.
 Diagnostics report input count, assignment count, supporting classification,
-and any unassigned meaningful IDs. Values are not duplicated in grouping
-explanations.
+any unassigned meaningful IDs, and Capture Packet integrity. Values are not
+duplicated in grouping explanations.
 
 ## Semantic integration, compatibility, and performance
 

@@ -11,6 +11,10 @@
 
 ## Unreleased
 
+- Added Capture Packet Integrity 1.0.0 as a shared runtime and CI validation
+  boundary for interaction identity, event ownership/order, screenshot evidence,
+  result traceability, and completeness. Validation reports immutable structured
+  diagnostics and never repairs Canonical evidence.
 - Protected regeneration against stale previews with a deterministic complete-
   Review fingerprint. If the Review changes after comparison but before apply,
   regeneration now aborts without mutating or overwriting the newer state.

@@ -166,6 +166,13 @@ Recording. Review Studio shows the verified result without replacing the manual
 expected-result field. See
 [Interaction Result Verification](docs/INTERACTION_RESULT_VERIFICATION.md).
 
+Capture Packet Integrity validates every derived packet before downstream use.
+It reports identity conflicts, foreign or duplicate evidence references,
+impossible result ordering, invalid screenshot roles, result-traceability gaps,
+and contradictory completeness without modifying recorded evidence. The same
+validator powers runtime diagnostics and fixture assertions. See
+[Capture Packet Integrity](docs/CAPTURE_PACKET_INTEGRITY.md).
+
 ## Canonical Recording Hardening
 
 Canonical Recording is the immutable evidence projection consumed by derived

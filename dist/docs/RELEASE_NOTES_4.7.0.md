@@ -1,5 +1,10 @@
 # BC Process Studio 4.7
 
+- Every Capture Packet now passes a shared integrity contract covering recorder
+  identity, owned and ordered evidence, screenshot roles, result traceability,
+  and completeness. Invalid relationships produce structured diagnostics rather
+  than silent repair; the same validator protects runtime and CI fixtures.
+
 - Regeneration previews now fingerprint the complete Review they describe. If
   the Review changes before approval is applied, BC Review Studio safely aborts
   instead of applying an outdated comparison over newer consultant work.

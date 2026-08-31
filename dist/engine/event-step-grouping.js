@@ -1,13 +1,15 @@
 (function (root, factory) {
-  const api = factory();
+  const integrity = typeof module === "object" && module.exports
+    ? require("./capture-packet-integrity") : root.T9CapturePacketIntegrity;
+  const api = factory(integrity);
   if (typeof module === "object" && module.exports) module.exports = api;
   root.T9EventStepGrouping = api;
-})(typeof globalThis !== "undefined" ? globalThis : this, function () {
+})(typeof globalThis !== "undefined" ? globalThis : this, function (integrity) {
   "use strict";
   const SCHEMA_VERSION = 1;
-  const GROUPING_VERSION = "1.6.0";
-  const CAPTURE_PACKET_VERSION = "1.4.0";
-  const RESULT_VERIFICATION_VERSION = "1.1.0";
+  const GROUPING_VERSION = "1.7.0";
+  const CAPTURE_PACKET_VERSION = "1.5.0";
+  const RESULT_VERIFICATION_VERSION = "1.2.0";
   const cache = new WeakMap();
   const clone = value => value == null ? value : JSON.parse(JSON.stringify(value));
   function freeze(value) { if (!value || typeof value !== "object" || Object.isFrozen(value)) return value; Object.values(value).forEach(freeze); return Object.freeze(value); }
@@ -124,6 +126,7 @@
       version: RESULT_VERIFICATION_VERSION,
       status: error ? "error" : primary ? "verified" : "unverified",
       primaryOutcome: primary?.kind || null,
+      primaryOutcomeEventId: primary?.normalizedEventId || null,
       outcomes: values,
       summary: primary?.description || "Resultatet kunde inte verifieras automatiskt.",
       expectedResultSuggestion: primary?.description || "",
@@ -197,6 +200,7 @@
       event.screenshotAssetIds || (event.screenshotAssetId
         ? [event.screenshotAssetId] : [])));
     const packet = capturePacket(events, primary, screenshotAssetIds);
+    const packetIntegrity = integrity.validate(packet, { events });
     const resultIds = new Set(packet.resultEventIds);
     return freeze({
       stepGroupId: groupId(sourceEventIds), schemaVersion: SCHEMA_VERSION,
@@ -212,6 +216,7 @@
       groupKind: groupKind(events), groupingReason: unique(reasons),
       screenshotAssetIds,
       capturePacket: packet,
+      capturePacketIntegrity: packetIntegrity,
       frameContexts: events.map(event => clone(event.frameContext || {})),
       primaryNormalizedEvent: clone(primary),
       supportingNormalizedEventIds: events.filter(event => event !== primary).map(event => event.normalizedEventId),
@@ -381,12 +386,18 @@
             event.sourceEventIds || [event.sourceEventId]))
         }, status: kinds.has("ignore") ? "ignored" : group.status });
     });
+    const capturePacketDiagnostics = resolvedGroups.flatMap(group =>
+      group.capturePacketIntegrity?.diagnostics?.map(item => ({ ...clone(item),
+        stepGroupId: group.stepGroupId })) || []);
     const result = freeze({ schemaVersion: SCHEMA_VERSION,
       groupingVersion: GROUPING_VERSION, recordingId: normalizedRecording.recordingId,
       groups: resolvedGroups, supportingEvents, diagnostics: {
         assignedEventCount: assignments.size,
         inputEventCount: normalizedRecording.events?.length || 0,
-        unassignedMeaningfulEventIds
+        unassignedMeaningfulEventIds,
+        capturePacketValid: !capturePacketDiagnostics.some(item =>
+          item.severity === "error"),
+        capturePacketDiagnostics
       } });
     if (normalizedRecording && typeof normalizedRecording === "object") cache.set(normalizedRecording, result);
     return result;

@@ -35,6 +35,8 @@ const grouped = grouping.group({ schemaVersion: 1, recordingId: "capture-packet"
 assert.strictEqual(JSON.stringify(normalizedEvents), before,
   "capture packet grouping must not mutate normalized or canonical evidence");
 assert.ok(Object.isFrozen(grouped.groups[0].capturePacket));
+assert.strictEqual(grouped.groups[0].capturePacketIntegrity.valid, true);
+assert.strictEqual(grouped.diagnostics.capturePacketValid, true);
 
 assert.strictEqual(grouped.groups.length, 1,
   "duplicate mechanics and their result should become one capture packet");
