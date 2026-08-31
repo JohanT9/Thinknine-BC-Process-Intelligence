@@ -273,6 +273,8 @@
     const calloutText = block.kind === "callout"
       ? block.blocks?.find(child => child.kind === "paragraph")?.text || ""
       : "";
+    const calloutLabel = block.kind === "callout"
+      ? block.label || commentLabel : commentLabel;
     const appearance = appearanceFor(block, theme, sectionKind);
     if (block.kind === "step") {
       let imageIndex = 0;
@@ -326,7 +328,7 @@
         accessibility: kind === "step"
           ? { label: `${stepLabel} ${block.stepNumber}` }
           : kind === "callout"
-            ? { label: commentLabel, description: calloutText }
+            ? { label: calloutLabel, description: calloutText }
           : kind === "screenshot"
             ? { label: block.altText || (english
               ? "Process screenshot" : "Processkärmbild") }
@@ -365,7 +367,7 @@
         } : {}),
         ...(block.calloutType ? { calloutType: block.calloutType } : {}),
         ...(block.kind === "callout" ? {
-          label: commentLabel,
+          label: calloutLabel,
           text: calloutText
         } : {}),
         ...(block.kind === "toc" ? {

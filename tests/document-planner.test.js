@@ -39,6 +39,7 @@ function documentFixture() {
           blockId: "callout-1",
           kind: "callout",
           calloutType: "note",
+          label: "Observerat resultat",
           blocks: [{
             blockId: "callout-paragraph-1",
             kind: "paragraph",
@@ -183,6 +184,10 @@ assert.strictEqual(
 assert.strictEqual(
   components.find(component => component.kind === "step").content.title,
   "Steg 1"
+);
+assert.strictEqual(
+  components.find(component => component.kind === "callout").content.label,
+  "Observerat resultat"
 );
 assert.strictEqual(
   components.find(component => component.kind === "screenshot")

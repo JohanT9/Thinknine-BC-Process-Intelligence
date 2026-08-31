@@ -32,6 +32,8 @@
       "Pågående": "In progress",
       "Slutförd": "Completed",
       "Kommentar": "Comment",
+      "Observerat resultat": "Observed result",
+      "Observerat fel": "Observed error",
       "Processkärmbild": "Process screenshot",
       "Utför uppgiften.": "Complete the task."
     })
@@ -69,6 +71,23 @@
       [/^Aktivera ([\s\S]+?)\.$/u, "Enable $1."],
       [/^Inaktivera ([\s\S]+?)\.$/u, "Disable $1."],
       [/^Verifiera att ([\s\S]+?)\.$/u, "Verify that $1."],
+      [/^Sidan ([\s\S]+?) öppnades\.$/u, "Page $1 opened."],
+      [/^En ny sida öppnades\.$/u, "A new page opened."],
+      [/^Dialogrutan ([\s\S]+?) öppnades\.$/u, "Dialog $1 opened."],
+      [/^En dialogruta öppnades\.$/u, "A dialog opened."],
+      [/^Dialogrutan stängdes\.$/u, "The dialog closed."],
+      [/^([\s\S]+?) uppdaterades\.$/u, "$1 was updated."],
+      [/^Ett val registrerades i ([\s\S]+?)\.$/u,
+        "A selection was registered in $1."],
+      [/^Ett val registrerades\.$/u, "A selection was registered."],
+      [/^Alternativet aktiverades\.$/u, "The option was enabled."],
+      [/^Alternativet inaktiverades\.$/u, "The option was disabled."],
+      [/^([\s\S]+?) aktiverades\.$/u, "$1 was enabled."],
+      [/^([\s\S]+?) inaktiverades\.$/u, "$1 was disabled."],
+      [/^Business Central visade ett statusmeddelande\.$/u,
+        "Business Central displayed a status message."],
+      [/^Business Central visade ett fel\.$/u,
+        "Business Central displayed an error."],
       [/^Sektion (\d+)$/u, "Section $1"]
     ];
     for (const [pattern, replacement] of rules) {

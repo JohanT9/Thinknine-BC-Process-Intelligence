@@ -163,7 +163,9 @@ navigation, dialogs, changed controls, selections, toggles, and Business Central
 errors. Accessible confirmation and status messages are also retained as a
 privacy-bounded outcome fact, with their raw text kept only in Canonical
 Recording. Review Studio shows the verified result without replacing the manual
-expected-result field. See
+expected-result field. The same traceable summary is shown under its owning Step
+in Document Workspace and Word, so Review and exported documentation no longer
+disagree about what Business Central observably did. See
 [Interaction Result Verification](docs/INTERACTION_RESULT_VERIFICATION.md).
 
 [Observed before and after state](docs/OBSERVED_STATE.md) now gathers directly
@@ -293,6 +295,8 @@ hide a step, undo/redo, and reset to generated content without changing evidence
 Review also owns the document-level expected result: consultants can edit it
 directly in Granskning, with autosave and undo/redo, and the same text is then
 used by Dokumentvy and Word export. An empty override retains the standard text.
+Observed results remain system-derived Step evidence beside this field and can
+never overwrite it.
 See [docs/STEP_EDITOR.md](docs/STEP_EDITOR.md).
 
 Ett modulärt Business Central-tillägg med Edge som produktionsmål och en

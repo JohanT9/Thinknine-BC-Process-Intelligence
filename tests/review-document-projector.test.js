@@ -22,7 +22,12 @@ function reviewFixture() {
     }, {
       taskId: "task-2",
       description: "Bokför ordern.",
-      screenshot: "screenshots/one.png"
+      screenshot: "screenshots/one.png",
+      resultVerified: true,
+      observedResult: "Sidan Bokförd försäljningsfaktura öppnades.",
+      resultVerification: { version: "1.2.0", status: "verified",
+        primaryOutcome: "navigation", primaryOutcomeEventId: "normalized:posted",
+        sourceEventIds: ["event:posted"], outcomes: [] }
     }, {
       taskId: "deleted-task",
       instruction: "Ska inte projiceras.",
@@ -133,6 +138,15 @@ assert.strictEqual(
   workflow.blocks[1].blocks[1].blocks[0].text,
   "Kontrollera kundnumret."
 );
+const observedResult = workflow.blocks[2].blocks.find(block =>
+  block.blockId.startsWith("block:observed-result:"));
+assert.strictEqual(observedResult.kind, "callout");
+assert.strictEqual(observedResult.calloutType, "information");
+assert.strictEqual(observedResult.label, "Observerat resultat");
+assert.strictEqual(observedResult.provenance, "system-derived");
+assert.strictEqual(observedResult.blocks[0].text,
+  "Sidan Bokförd försäljningsfaktura öppnades.");
+assert.strictEqual(observedResult.resultVerification.status, "verified");
 
 const imageBlocks = workflow.blocks.filter(block => block.kind === "step")
   .flatMap(step =>

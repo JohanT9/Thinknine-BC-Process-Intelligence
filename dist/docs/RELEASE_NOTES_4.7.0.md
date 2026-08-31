@@ -1,5 +1,10 @@
 # BC Process Studio 4.7
 
+- Verified observed results and observed errors now appear under their owning
+  Step in Review Studio, Document Workspace, and Word. They use one Semantic
+  Document callout contract and follow the selected language. The editable
+  expected result remains separate and is never overwritten by observations.
+
 - **Change image** now updates the screenshot in Review immediately as well as
   in Document Workspace. Both views resolve the same selected asset; a missing
   asset falls back safely instead of leaving an empty card.

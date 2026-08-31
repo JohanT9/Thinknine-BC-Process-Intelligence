@@ -256,6 +256,11 @@ detects and reports invalid derived
 relationships without repairing or rewriting Canonical evidence. Runtime and CI
 consume the same immutable diagnostic contract.
 
+Verified interaction results project through Review into a system-derived
+Semantic Document callout owned by the corresponding Step. Document Workspace
+and Word consume the same planned component. The editable document-level
+expected result remains human-owned and is never replaced by observed evidence.
+
 ### React and control-add-in capture reliability
 
 The recorder installs delegated capture-phase listeners at `window` level in

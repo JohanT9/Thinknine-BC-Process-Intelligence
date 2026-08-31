@@ -67,6 +67,11 @@ const model = {
         { text: " Tryck " },
         { text: "Ctrl+S", role: "shortcut", monospace: true }
       ] }
+    }, {
+      workspaceItemId: "observed-result",
+      kind: "callout",
+      appearance: {},
+      content: { label: "Observerat resultat", text: "Ordern bokfördes." }
     }]
   }]
 };
@@ -89,6 +94,11 @@ assert.strictEqual(workflow.children[1].children[1].style.fontSize, "12pt");
 assert.strictEqual(workflow.children[1].children[4].tagName, "code");
 assert.strictEqual(workflow.children[1].children.map(child => child.textContent)
   .join(""), 'Ange 400 i "Antal". Tryck Ctrl+S');
+assert.strictEqual(workflow.children[2].children[0].tagName, "strong");
+assert.strictEqual(workflow.children[2].children[0].textContent,
+  "Observerat resultat:");
+assert.strictEqual(workflow.children[2].children[1].children[0].textContent,
+  "Ordern bokfördes.");
 assert.strictEqual(workflow.dataset.workspaceContextTarget, "true");
 assert.strictEqual(workflow.children[0].dataset.workspaceContextTarget, "true");
 assert.strictEqual(workflow.children[0].tabIndex, 0);

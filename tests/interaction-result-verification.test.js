@@ -115,8 +115,11 @@ assert.strictEqual(interpreted.businessTasks[0].expectedResult, undefined,
 
 const dashboard = fs.readFileSync("src/ui/dashboard.js", "utf8");
 const content = fs.readFileSync("src/recorder/content.js", "utf8");
-assert.ok(dashboard.includes("Observerat resultat:"));
-assert.ok(dashboard.includes("escapeHtml(task.observedResult)"));
+assert.ok(dashboard.includes('"review.observedResult"'));
+assert.ok(dashboard.includes('"review.observedError"'));
+assert.ok(dashboard.includes("task.observedResult"));
+assert.ok(dashboard.includes("escapeHtml("));
+assert.ok(dashboard.includes("T9DocumentLanguage.translateInstruction"));
 assert.ok(content.includes('type: "status-message"'));
 assert.ok(content.includes("observedStatusMessages"));
 

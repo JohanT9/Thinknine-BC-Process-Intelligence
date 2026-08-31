@@ -317,6 +317,30 @@
           Boolean(task.structureProvenance) || task.provenance === "manual"
       }];
 
+      const resultVerification = object(task.resultVerification);
+      const observedResult = text(task.observedResult) ||
+        text(resultVerification.summary);
+      const observedStatus = text(resultVerification.status);
+      if (observedResult && ["verified", "error"].includes(observedStatus)) {
+        blocks.push({
+          blockId: `block:observed-result:${stepKey}`,
+          kind: "callout",
+          calloutType: "information",
+          label: observedStatus === "error" ? "Observerat fel" :
+            "Observerat resultat",
+          sourceRef,
+          provenance: "system-derived",
+          resultVerification: clone(resultVerification),
+          blocks: [{
+            blockId: `block:observed-result-text:${stepKey}`,
+            kind: "paragraph",
+            text: observedResult,
+            sourceRef,
+            provenance: "system-derived"
+          }]
+        });
+      }
+
       const ownedNotes = (review.stepNotes || []).filter(note => {
         const ownerIds = [task.stepId, task.taskId,
           ...(task.sourceStepIds || []), ...(task.manualStepIds || [])]

@@ -32,6 +32,9 @@ Language selectors, normalization, persistence, badges, and filtering are genera
   environment names are preserved in their original language.
 - User-edited instructions, comments, expected results, and manual steps are not
   translated automatically.
+- System-derived observed-result labels and bounded result sentences follow the
+  selected document language; observed Business Central captions inside them
+  remain unchanged.
 
 ## Ownership and flow
 

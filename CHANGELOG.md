@@ -11,6 +11,12 @@
 
 ## Unreleased
 
+- Projected verified observed results and observed errors as traceable,
+  system-derived Step callouts through Semantic Document, Document Workspace,
+  and Word. Expected results remain a separate human-owned document field;
+  generated result labels and sentences now follow the selected UI/document
+  language without translating observed Business Central captions.
+
 - Expanded State Observation to retain every independently identified field,
   selection and toggle change within one Capture Packet instead of only one
   control pair. Added privacy-bounded status/error outcome facts, deterministic

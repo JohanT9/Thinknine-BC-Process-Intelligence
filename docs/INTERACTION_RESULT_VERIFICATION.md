@@ -47,10 +47,15 @@ newer active step; it remains supporting evidence when causality is uncertain.
 
 ## User experience and compatibility
 
-Verified steps show a compact **Observerat resultat** line in Review Studio.
-The document-level expected-result field remains fully manual and is never
-overwritten. Historical recordings and Reviews without verification metadata
-continue unchanged.
+Verified steps show a distinct **Observerat resultat** or **Observerat fel**
+line in Review Studio. The same evidence-backed summary is projected as a
+system-derived information callout under its owning Step in Semantic Document,
+Document Workspace, and Word. Its label and generated sentence follow the UI or
+document language while observed Business Central captions remain unchanged.
+
+The document-level expected-result field remains fully manual, visually
+separate, and is never overwritten by an observation or suggestion. Historical
+recordings and Reviews without verification metadata continue unchanged.
 
 This is an additive schema-v1 projection. Canonical Recording schema version is
 unchanged, and raw events are neither modified nor rewritten.

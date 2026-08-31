@@ -90,10 +90,12 @@
       element = documentValue.createElement("aside");
       element.className = "document-workspace-callout";
       element.setAttribute("aria-label", item.content.label);
+      const label = textElement(documentValue, "strong",
+        `${item.content.label}:`, "document-workspace-callout-label");
       const paragraph = textElement(documentValue, "p", "", "");
       appendRuns(paragraph,
         item.content.runs || [{ text: item.content.text }], documentValue);
-      element.appendChild(paragraph);
+      element.append(label, paragraph);
     } else {
       element = documentValue.createElement("div");
     }

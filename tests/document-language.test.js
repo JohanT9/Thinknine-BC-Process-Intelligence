@@ -5,6 +5,12 @@ const pipeline = require("../src/exporters/word-export-pipeline");
 assert.strictEqual(language.normalize(), "sv-SE");
 assert.strictEqual(language.normalize("en-GB"), "en-US");
 assert.strictEqual(language.normalize("sv"), "sv-SE");
+assert.strictEqual(language.translateInstruction("Status uppdaterades.", "en-US"),
+  "Status was updated.");
+assert.strictEqual(language.translateInstruction("Spärrad aktiverades.", "en-US"),
+  "Spärrad was enabled.");
+assert.strictEqual(language.translateInstruction("En dialogruta öppnades.", "en-US"),
+  "A dialog opened.");
 
 const source = {
   schemaVersion: 1,
@@ -26,7 +32,12 @@ const source = {
       blocks: [{ blockId: "generated", kind: "paragraph",
         text: "Välj Sök." }, {
         blockId: "manual", kind: "paragraph", preserveUserText: true,
-        provenance: "manual", text: "Välj min egen formulering." }]
+        provenance: "manual", text: "Välj min egen formulering." }, {
+        blockId: "observed", kind: "callout", calloutType: "information",
+        label: "Observerat resultat", blocks: [{ blockId: "observed-text",
+          kind: "paragraph", text: "Sidan Förs.order öppnades.",
+          provenance: "system-derived" }]
+      }]
     }]
   }]
 };
@@ -42,6 +53,10 @@ assert.strictEqual(english.sections[0].blocks[1].blocks[0].text,
   "Choose Sök.");
 assert.strictEqual(english.sections[0].blocks[1].blocks[1].text,
   "Välj min egen formulering.");
+assert.strictEqual(english.sections[0].blocks[1].blocks[2].label,
+  "Observed result");
+assert.strictEqual(english.sections[0].blocks[1].blocks[2].blocks[0].text,
+  "Page Förs.order opened.");
 
 const session = {
   id: "language-session",
@@ -57,7 +72,10 @@ const review = {
   tasks: [{ taskId: "search", taskType: "SearchAndOpenPage",
     searchCaption: "Sök", searchFieldCaption: "Berätta vad du vill göra.",
     resultCaption: "Förs.order", value: "för ord",
-    instruction: "Äldre text." }]
+    instruction: "Äldre text.", resultVerified: true,
+    observedResult: "Sidan Förs.order öppnades.",
+    resultVerification: { status: "verified", summary:
+      "Sidan Förs.order öppnades." } }]
 };
 const prepared = pipeline.create({ session, review });
 assert.strictEqual(prepared.semanticDocument.metadata.documentLanguage, "en-US");
@@ -78,6 +96,10 @@ assert.ok(instruction.content.runs.some(run =>
   run.text === "Sök" && run.italic));
 assert.ok(instruction.content.runs.some(run =>
   run.text === "för ord" && run.bold));
+const observedResult = step.components.find(component =>
+  component.kind === "callout");
+assert.strictEqual(observedResult.content.label, "Observed result");
+assert.strictEqual(observedResult.content.text, "Page Förs.order opened.");
 const cover = prepared.plan.sections.find(section => section.kind === "cover")
   .components.find(component => component.kind === "cover");
 assert.strictEqual(cover.appearance.documentType, "Work instruction");

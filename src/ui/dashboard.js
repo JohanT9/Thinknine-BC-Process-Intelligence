@@ -5745,7 +5745,12 @@ function renderReviewContent() {
             : ""}
         </div>
         ${task.resultVerified && task.observedResult
-          ? `<p class="review-observed-result"><strong>Observerat resultat:</strong> ${escapeHtml(task.observedResult)}</p>`
+          ? `<p class="review-observed-result ${task.resultVerification?.status === "error"
+            ? "error" : "verified"}"><strong>${uiT(task.resultVerification?.status === "error"
+              ? "review.observedError" : "review.observedResult")}:</strong> ${escapeHtml(
+                globalThis.T9DocumentLanguage.translateInstruction(
+                  task.observedResult, applicationSettings.uiLocale
+                ))}</p>`
           : ""}
         ${images.map((image, imageIndex) =>
           `<div class="review-screenshot">

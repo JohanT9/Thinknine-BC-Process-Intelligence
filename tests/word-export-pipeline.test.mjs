@@ -80,7 +80,12 @@ const baseReview = review([{
   screenshots: ["one.png", "two.png"]
 }, {
   taskId: "task-b",
-  instruction: "Bokför ordern."
+  instruction: "Bokför ordern.",
+  resultVerified: true,
+  observedResult: "Sidan Bokförd försäljningsfaktura öppnades.",
+  resultVerification: { status: "verified", primaryOutcome: "navigation",
+    primaryOutcomeEventId: "normalized:posted", outcomes: [],
+    sourceEventIds: ["session-parity:event:posted"] }
 }, {
   taskId: "task-deleted",
   instruction: "Detta steg ska inte exporteras.",
@@ -237,6 +242,8 @@ assert.ok(position("Bokför ordern.") < position("Förväntat resultat"));
 assert.ok(position("Förväntat resultat") < position("Versionshistorik"));
 assert.ok(!output.documentXml.includes("Detta steg ska inte exporteras."));
 assert.ok(output.documentXml.includes("Kommentar: "));
+assert.ok(output.documentXml.includes("Observerat resultat: "));
+assert.ok(output.documentXml.includes("Sidan Bokförd försäljningsfaktura öppnades."));
 assert.ok(output.documentXml.includes("Kontrollera kundnumret."));
 assert.ok(output.documentXml.includes("Verifiera orderflödet."));
 assert.ok(output.documentXml.includes("Användaren har behörighet"));
