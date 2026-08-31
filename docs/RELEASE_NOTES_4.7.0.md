@@ -1,5 +1,12 @@
 # BC Process Studio 4.7
 
+- Semantic consolidation now removes a duplicate visible action when action
+  and result evidence carry the same explicit recorder interaction identity
+  and action caption. All Capture Packets, source references and screenshot
+  candidates remain traceable. Separate user gestures and different business
+  actions are never merged, and specific Business Central menu-path rules keep
+  priority.
+
 - Verified observed results and observed errors now appear under their owning
   Step in Review Studio, Document Workspace, and Word. They use one Semantic
   Document callout contract and follow the selected language. The editable

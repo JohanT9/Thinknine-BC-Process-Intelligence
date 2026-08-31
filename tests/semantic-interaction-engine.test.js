@@ -194,6 +194,48 @@ const unrelatedBetweenMenuActions = engine.processInteractions([{
 assert.strictEqual(unrelatedBetweenMenuActions.length, 3);
 assert.ok(!unrelatedBetweenMenuActions.some(value =>
   value.actionType === "RunActionPath"));
+const duplicatedActionObservation = only([{
+  taskId: "post-action", taskType: "RunAction", actionCaption: "Bokför",
+  interactionId: "interaction:post", sourceEventIds: ["post-click"],
+  screenshot: "post-click.png",
+  capturePacket: { interactionId: "interaction:post",
+    interactionIds: ["interaction:post"], packetId: "packet:post-click" }
+}, {
+  taskId: "post-result", taskType: "RunAction", actionCaption: "Bokför",
+  interactionId: "interaction:post", sourceEventIds: ["post-result"],
+  screenshot: "post-result.png",
+  capturePacket: { interactionId: "interaction:post",
+    interactionIds: ["interaction:post"], packetId: "packet:post-result" }
+}, {
+  taskId: "post-status", taskType: "RunAction", actionCaption: "Bokför",
+  interactionId: "interaction:post", sourceEventIds: ["post-status"],
+  screenshot: "post-status.png",
+  capturePacket: { interactionId: "interaction:post",
+    interactionIds: ["interaction:post"], packetId: "packet:post-status" }
+}], "RunAction", "Välj **Bokför**.");
+assert.strictEqual(duplicatedActionObservation.ruleId,
+  "duplicate-action-observation");
+assert.deepStrictEqual(duplicatedActionObservation.sourceEventIds,
+  ["post-click", "post-result", "post-status"]);
+assert.deepStrictEqual(duplicatedActionObservation.screenshotRefs,
+  ["post-click.png", "post-result.png", "post-status.png"]);
+assert.strictEqual(duplicatedActionObservation.capturePackets.length, 3);
+assert.strictEqual(duplicatedActionObservation.interactionId,
+  "interaction:post");
+assert.strictEqual(engine.processInteractions([{
+  taskType: "RunAction", actionCaption: "Bokför",
+  interactionId: "interaction:post-first"
+}, {
+  taskType: "RunAction", actionCaption: "Bokför",
+  interactionId: "interaction:post-second"
+}]).length, 2, "two deliberate actions must remain separate");
+assert.strictEqual(engine.processInteractions([{
+  taskType: "RunAction", actionCaption: "Bokför",
+  interactionId: "interaction:changed-caption"
+}, {
+  taskType: "RunAction", actionCaption: "Förhandsgranska",
+  interactionId: "interaction:changed-caption"
+}]).length, 2, "different business actions must remain separate");
 const closeDialog = engine.processInteractions([{
   taskId: "dialog", taskType: "RunAction", actionCaption: "Öppna information",
   sourceEventIds: ["event-dialog"], screenshot: "dialog-open.png"

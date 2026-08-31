@@ -95,6 +95,19 @@
     return text(value).replace(/^(?:sortera efter|sort by)\s+/iu, "");
   }
 
+  function recordedInteractionIds(value) {
+    return unique([
+      ...(value?.interactionIds || []),
+      value?.interactionId,
+      ...(value?.capturePackets || []).flatMap(packet =>
+        packet?.interactionIds || [packet?.interactionId]),
+      ...(value?.capturePacket?.interactionIds || []),
+      value?.capturePacket?.interactionId,
+      ...(value?.stepGroups || []).flatMap(group =>
+        group?.interactionIds || [group?.capturePacket?.interactionId])
+    ]);
+  }
+
   function checkboxEnabled(value, selectedValue) {
     if (typeof value?.value === "boolean") return value.value;
     return /true|ja|yes|1/iu.test(selectedValue);
@@ -605,6 +618,53 @@
     return deepFreeze(rule);
   }
 
+  function duplicateActionObservationRule() {
+    const caption = value => text(value?.actionCaption) ||
+      text(value?.selectedCaption);
+    const isAction = value => ["RunAction", "ClickAction"].includes(
+      value?.taskType
+    );
+    const menuParent = /^(?:åtgärder|actions|funktion|functions?|rad|row|relaterad information|related information)$/iu;
+    const sameRecordedInteraction = (left, right) => {
+      const leftIds = recordedInteractionIds(left);
+      const rightIds = recordedInteractionIds(right);
+      return leftIds.length === 1 && rightIds.length === 1 &&
+        leftIds[0] === rightIds[0];
+    };
+    const isDuplicateOf = (reference, candidate) => isAction(candidate) &&
+      caption(reference).toLocaleLowerCase() ===
+        caption(candidate).toLocaleLowerCase() &&
+      sameRecordedInteraction(reference, candidate);
+    const rule = {
+      ruleId: "duplicate-action-observation",
+      priority: 108,
+      match(context) {
+        const current = context.interactions[context.index];
+        const next = context.interactions[context.index + 1];
+        const currentCaption = caption(current);
+        return isAction(current) && isAction(next) && Boolean(currentCaption) &&
+          !menuParent.test(currentCaption) &&
+          isDuplicateOf(current, next);
+      },
+      consolidate(context) {
+        const values = [context.interactions[context.index]];
+        let cursor = context.index + 1;
+        while (cursor < context.interactions.length &&
+            isDuplicateOf(values[0], context.interactions[cursor])) {
+          values.push(context.interactions[cursor]);
+          cursor += 1;
+        }
+        const selectedValue = caption(values[0]);
+        return { consumed: values.length, action: action(rule, values, {
+          actionType: "RunAction",
+          displayText: `Välj **${selectedValue}**.`,
+          selectedValue
+        }) };
+      }
+    };
+    return deepFreeze(rule);
+  }
+
   const CUSTOMER = /kundens namn|kundnr|customer name|customer\s*no\.?/iu;
   const ITEM = /artikelnr|artikelnummer|item\s*no\.?/iu;
   const VENDOR = /leverantör(?:ens namn|snr|snummer)?|vendor(?:\s*name|\s*no\.?)?/iu;
@@ -614,6 +674,7 @@
   const BUILT_IN_RULES = deepFreeze([
     salesPriceDiscountMenuPathRule(),
     manualPriceMenuPathRule(),
+    duplicateActionObservationRule(),
     closeDialogRule(),
     searchAndOpenWithRedundantFieldRule(),
     selectionRule({ ruleId: "customer-selection", priority: 100,

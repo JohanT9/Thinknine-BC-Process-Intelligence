@@ -47,6 +47,15 @@ An immediately repeated `Manuellt pris` capture is retained as evidence on the
 same Semantic Action and suppressed as a duplicate visible step. The preferred
 image remains the first capture where the final menu choice is visibly focused.
 
+Two adjacent action observations with the same caption and the same explicit
+recorder `interactionId` are represented as one Semantic Action. This handles
+the case where one user gesture is delivered once as action evidence and once
+as result evidence. Both Capture Packets, source events and screenshots remain
+attached to the consolidated action. The rule does not use timing or caption
+similarity as a substitute for identity: repeated actions with different
+interaction identities, different captions, or menu-parent actions remain
+separate. Specific menu-path rules continue to have higher priority.
+
 Instructions with `user-edited` provenance pass through semantic rules unchanged.
 Reset restores the latest generated semantic instruction.
 
@@ -97,6 +106,10 @@ The built-in registry orders rules by descending priority:
 
 | Rule | Priority |
 | --- | ---: |
+| Sales price/discount menu path | 110 |
+| Manual price menu path | 110 |
+| Duplicate action observation | 108 |
+| Close dialog with visible control | 105 |
 | Customer selection | 100 |
 | Item selection | 95 |
 | Vendor selection | 90 |
