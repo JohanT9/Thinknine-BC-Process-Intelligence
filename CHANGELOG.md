@@ -11,6 +11,10 @@
 
 ## Unreleased
 
+- Promoted documentation hierarchy, structural overrides, Process Model,
+  Process Versioning and recording regeneration tests into the mandatory CI
+  release gate.
+
 - Consolidated a field entry followed by its redundant sorted-record selection
   into one instruction while retaining the later, clearer result screenshot.
 

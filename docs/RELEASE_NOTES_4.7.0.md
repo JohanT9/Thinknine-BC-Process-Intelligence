@@ -136,3 +136,8 @@ Field entry followed immediately by a matching selection from a sorted record
 list is now represented as one step. The concise field-entry instruction is
 kept, while the later screenshot showing the completed selection becomes the
 step image.
+
+The standard CI release gate now executes documentation hierarchy, structural
+override, Process Model, Process Versioning and regeneration coverage on every
+build. These central process-architecture contracts can no longer pass only in
+manually selected milestone test runs.
