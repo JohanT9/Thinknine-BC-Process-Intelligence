@@ -1,5 +1,11 @@
 # BC Process Studio 4.7
 
+- Interaction-to-result ownership now has an exact CI oracle across navigation,
+  dialogs, errors, accessible status, self-result interactions, adjacent
+  actions, React framework noise, and late or orphan outcomes. A late result
+  from an older action remains supporting evidence instead of being assigned to
+  the wrong newer step.
+
 - Process capture now has a shared, data-driven validation gate in CI. Six
   sanitized recordings exercise seven packets across standard Business Central,
   React Control Add-ins, iframe transitions, and legacy compatibility. The

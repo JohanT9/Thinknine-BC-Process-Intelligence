@@ -11,6 +11,10 @@
 
 ## Unreleased
 
+- Added an exact Interaction to Result correctness corpus covering ten causal
+  scenarios and eleven packets. CI now rejects wrong result ownership, outcome
+  order, verification status, primary-event selection, screenshot ownership,
+  and late outcomes incorrectly attached to a newer interaction.
 - Added a versioned Capture Validation Suite that runs sanitized standard BC,
   React/Control Add-in, iframe, multi-interaction, and legacy recordings through
   production grouping and Capture Packet integrity contracts in CI. The gate

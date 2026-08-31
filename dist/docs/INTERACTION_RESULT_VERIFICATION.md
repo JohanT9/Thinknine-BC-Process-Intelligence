@@ -40,6 +40,11 @@ transient, the screenshot policy captures their visible state when screenshots
 are enabled. A status message without a stable initiating interaction remains
 supporting evidence and cannot create a standalone documentation step.
 
+Exact causal ownership is protected by the versioned
+[Interaction to Result correctness corpus](INTERACTION_RESULT_CORRECTNESS.md).
+In particular, a late outcome from an older interaction must never attach to a
+newer active step; it remains supporting evidence when causality is uncertain.
+
 ## User experience and compatibility
 
 Verified steps show a compact **Observerat resultat** line in Review Studio.

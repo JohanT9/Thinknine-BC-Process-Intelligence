@@ -166,6 +166,12 @@ Recording. Review Studio shows the verified result without replacing the manual
 expected-result field. See
 [Interaction Result Verification](docs/INTERACTION_RESULT_VERIFICATION.md).
 
+The focused
+[Interaction to Result correctness corpus](docs/INTERACTION_RESULT_CORRECTNESS.md)
+uses exact causal oracles for verified, error, self-result, adjacent-action,
+React-noise, late-result, and orphan-result scenarios. It fails CI if a result
+or preferred screenshot moves to the wrong interaction.
+
 Capture Packet Integrity validates every derived packet before downstream use.
 It reports identity conflicts, foreign or duplicate evidence references,
 impossible result ordering, invalid screenshot roles, result-traceability gaps,

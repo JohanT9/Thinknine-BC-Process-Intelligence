@@ -1,0 +1,92 @@
+{
+  "schemaVersion": 1,
+  "provenance": "Synthetic and sanitized normalized evidence shaped like Business Central and control-add-in recordings; no customer values or screenshot bytes.",
+  "scenarios": [
+    {
+      "id": "action-navigation", "surface": "standard-bc",
+      "events": [
+        { "id": "open", "kind": "activation", "interaction": "open-order", "control": "Open", "screenshot": "before-open" },
+        { "id": "page", "kind": "navigation", "interaction": "open-order", "page": "Sales Order", "screenshot": "order-page" }
+      ],
+      "expected": { "groups": [{ "interaction": "open-order", "interactionEvents": ["open"], "results": ["page"], "status": "verified", "primaryOutcome": "navigation", "primaryEvent": "page", "outcomes": ["navigation"], "screenshot": "order-page", "screenshotRole": "result" }] }
+    },
+    {
+      "id": "action-dialog-error", "surface": "standard-bc",
+      "events": [
+        { "id": "post", "kind": "activation", "interaction": "post", "control": "Post", "screenshot": "post-action" },
+        { "id": "confirm", "kind": "dialog-open", "interaction": "post", "page": "Confirm" },
+        { "id": "error", "kind": "error-outcome", "interaction": "post", "screenshot": "post-error" }
+      ],
+      "expected": { "groups": [{ "interaction": "post", "interactionEvents": ["post"], "results": ["confirm", "error"], "status": "error", "primaryOutcome": "error-outcome", "primaryEvent": "error", "outcomes": ["dialog-open", "error-outcome"], "screenshot": "post-error", "screenshotRole": "result" }] }
+    },
+    {
+      "id": "action-status", "surface": "standard-bc",
+      "events": [
+        { "id": "release", "kind": "activation", "interaction": "release", "control": "Release" },
+        { "id": "status", "kind": "status-message", "interaction": "release", "screenshot": "released-status" }
+      ],
+      "expected": { "groups": [{ "interaction": "release", "interactionEvents": ["release"], "results": ["status"], "status": "verified", "primaryOutcome": "status-message", "primaryEvent": "status", "outcomes": ["status-message"], "screenshot": "released-status", "screenshotRole": "result" }] }
+    },
+    {
+      "id": "dialog-open-close", "surface": "standard-bc",
+      "events": [
+        { "id": "choose", "kind": "activation", "interaction": "choose", "control": "Choose" },
+        { "id": "opened", "kind": "dialog-open", "interaction": "choose", "page": "Customer List", "screenshot": "dialog-open" },
+        { "id": "closed", "kind": "dialog-close", "interaction": "choose", "screenshot": "dialog-closed" }
+      ],
+      "expected": { "groups": [{ "interaction": "choose", "interactionEvents": ["choose"], "results": ["opened", "closed"], "status": "verified", "primaryOutcome": "dialog-close", "primaryEvent": "closed", "outcomes": ["dialog-open", "dialog-close"], "screenshot": "dialog-closed", "screenshotRole": "result" }] }
+    },
+    {
+      "id": "toggle-self-result", "surface": "standard-bc",
+      "events": [{ "id": "toggle", "kind": "toggle-change", "interaction": "toggle-vat", "control": "Prices Including VAT", "checked": true, "screenshot": "vat-enabled" }],
+      "expected": { "groups": [{ "interaction": "toggle-vat", "interactionEvents": ["toggle"], "results": ["toggle"], "status": "verified", "primaryOutcome": "toggle-change", "primaryEvent": "toggle", "outcomes": ["toggle-change"], "screenshot": "vat-enabled", "screenshotRole": "result" }] }
+    },
+    {
+      "id": "progressive-field-result", "surface": "standard-bc",
+      "events": [
+        { "id": "typed", "kind": "value-change", "interaction": "quantity", "control": "Quantity", "value": "5", "screenshot": "quantity-typed" },
+        { "id": "committed", "kind": "value-change", "interaction": "quantity", "control": "Quantity", "value": "50", "screenshot": "quantity-committed" }
+      ],
+      "expected": { "groups": [{ "interaction": "quantity", "interactionEvents": ["committed"], "results": ["typed", "committed"], "status": "verified", "primaryOutcome": "value-change", "primaryEvent": "committed", "outcomes": ["value-change", "value-change"], "screenshot": "quantity-committed", "screenshotRole": "result" }] }
+    },
+    {
+      "id": "adjacent-action-ownership", "surface": "standard-bc",
+      "events": [
+        { "id": "first", "kind": "activation", "interaction": "first", "control": "Previous" },
+        { "id": "first-page", "kind": "navigation", "interaction": "first", "page": "Previous Entry", "screenshot": "previous-page" },
+        { "id": "second", "kind": "activation", "interaction": "second", "control": "Next" },
+        { "id": "second-error", "kind": "error-outcome", "interaction": "second", "screenshot": "next-error" }
+      ],
+      "expected": { "groups": [
+        { "interaction": "first", "interactionEvents": ["first"], "results": ["first-page"], "status": "verified", "primaryOutcome": "navigation", "primaryEvent": "first-page", "outcomes": ["navigation"], "screenshot": "previous-page", "screenshotRole": "result" },
+        { "interaction": "second", "interactionEvents": ["second"], "results": ["second-error"], "status": "error", "primaryOutcome": "error-outcome", "primaryEvent": "second-error", "outcomes": ["error-outcome"], "screenshot": "next-error", "screenshotRole": "result" }
+      ] }
+    },
+    {
+      "id": "react-framework-noise", "surface": "react-control-add-in",
+      "events": [
+        { "id": "apply", "kind": "activation", "interaction": "apply", "control": "Apply", "frame": "react-frame", "screenshot": "apply-action" },
+        { "id": "render", "kind": "unknown", "interaction": "apply", "frame": "react-frame", "screenshot": "transient-render" },
+        { "id": "result", "kind": "dialog-open", "interaction": "apply", "frame": "react-frame", "page": "Applied", "screenshot": "apply-result" }
+      ],
+      "expected": { "groups": [{ "interaction": "apply", "interactionEvents": ["apply"], "results": ["result"], "status": "verified", "primaryOutcome": "dialog-open", "primaryEvent": "result", "outcomes": ["dialog-open"], "screenshot": "apply-result", "screenshotRole": "result" }] }
+    },
+    {
+      "id": "late-foreign-result", "surface": "standard-bc",
+      "events": [
+        { "id": "first", "kind": "activation", "interaction": "first-late", "control": "First" },
+        { "id": "second", "kind": "activation", "interaction": "second-active", "control": "Second" },
+        { "id": "late-status", "kind": "status-message", "interaction": "first-late", "screenshot": "late-status" }
+      ],
+      "expected": { "groups": [
+        { "interaction": "first-late", "interactionEvents": ["first"], "results": [], "status": "unverified", "primaryOutcome": null, "primaryEvent": null, "outcomes": [], "screenshot": null, "screenshotRole": null },
+        { "interaction": "second-active", "interactionEvents": ["second"], "results": [], "status": "unverified", "primaryOutcome": null, "primaryEvent": null, "outcomes": [], "screenshot": null, "screenshotRole": null }
+      ], "supporting": ["late-status"] }
+    },
+    {
+      "id": "orphan-status", "surface": "standard-bc",
+      "events": [{ "id": "orphan", "kind": "status-message", "screenshot": "orphan-status" }],
+      "expected": { "groups": [], "supporting": ["orphan"] }
+    }
+  ]
+}
