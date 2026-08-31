@@ -241,7 +241,9 @@ does not alter Workspace or Word output. Review Studio exposes a collapsible
 Process Overview of the resolved activity flow and evidence-backed state
 changes without replacing the detailed editing cards. Selecting an overview
 activity navigates to its stable Review step; current Review selection, hidden
-steps, merges, splits and ordering are reflected on the next render. See
+steps, merges, splits and ordering are reflected on the next render. The
+overview uses a directed, horizontally scrollable diagram and exposes the
+resolved phase, subtask and observed changes in a selected-activity panel. See
 [docs/PROCESS_MODEL.md](docs/PROCESS_MODEL.md).
 
 ## Sections and Subtasks

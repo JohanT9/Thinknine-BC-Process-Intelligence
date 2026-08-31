@@ -6096,10 +6096,14 @@ function renderProcessOverview() {
   const container = $("processOverview");
   if (!container || !activeReview || !activeReviewSession) return;
   try {
+    const resolvedHierarchy = resolveReviewHierarchyForDisplay(
+      activeReview.tasks || [], activeReview.hierarchy
+    );
     const model = globalThis.T9ProcessModel.project({
       recordingId: activeReviewSession.id,
       title: activeReviewSession.name,
       steps: activeReview.tasks || [],
+      resolvedHierarchy,
       overrides: activeReview.processOverrides || []
     });
     globalThis.T9ProcessOverviewView.render(container, model, {
@@ -6429,7 +6433,8 @@ $("processOverview").addEventListener("click", event => {
 });
 $("processOverview").addEventListener("keydown", event => {
   const action = event.target.closest?.("[data-process-task-id]");
-  if (!action || !["ArrowUp", "ArrowDown", "Home", "End"].includes(event.key)) {
+  if (!action || !["ArrowLeft", "ArrowRight", "ArrowUp", "ArrowDown",
+    "Home", "End"].includes(event.key)) {
     return;
   }
   const actions = [...$("processOverview").querySelectorAll(
@@ -6438,7 +6443,7 @@ $("processOverview").addEventListener("keydown", event => {
   const current = actions.indexOf(action);
   const next = event.key === "Home" ? 0 : event.key === "End"
     ? actions.length - 1 : Math.max(0, Math.min(actions.length - 1,
-      current + (event.key === "ArrowUp" ? -1 : 1)));
+      current + (["ArrowLeft", "ArrowUp"].includes(event.key) ? -1 : 1)));
   event.preventDefault();
   actions[next]?.focus();
 });

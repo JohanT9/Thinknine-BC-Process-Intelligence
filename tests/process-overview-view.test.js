@@ -16,8 +16,16 @@ const model = processModel.project({ recordingId: "overview", steps: [{
   sourceEventIds: ["release", "released"],
   capturePacket: { packetId: "release-packet", stateObservation: changed }
 }] });
+const activityIds = model.nodes.filter(node => node.nodeType === "activity")
+  .map(node => node.nodeId);
+const groupedModel = { ...model, subprocesses: [{ subprocessId: "sales-phase",
+  title: "Försäljningsorder", nodeIds: activityIds,
+  metadata: { containerType: "phase" } }, { subprocessId: "release-subtask",
+  title: "Frisläpp order", nodeIds: [activityIds[1]],
+  metadata: { containerType: "subtask" } }] };
 const container = { innerHTML: "" };
-const result = view.render(container, model, { locale: "sv-SE" });
+const result = view.render(container, groupedModel, { locale: "sv-SE",
+  selectedTaskIds: ["release"] });
 assert.deepStrictEqual(result, { activityCount: 2, stateTransitionCount: 1 });
 assert(container.innerHTML.includes("Välj kund."));
 assert(container.innerHTML.includes("Välj Frisläpp."));
@@ -26,6 +34,14 @@ assert(container.innerHTML.includes("Released"));
 assert(container.innerHTML.includes('aria-label="ändras till"'));
 assert(container.innerHTML.includes('data-process-task-id="customer"'));
 assert(container.innerHTML.includes('aria-pressed="false"'));
+assert(container.innerHTML.includes('aria-pressed="true"'));
+assert(container.innerHTML.includes('class="process-diagram-scroll"'));
+assert(container.innerHTML.includes('class="process-overview-detail"'));
+assert(container.innerHTML.includes("Försäljningsorder"));
+assert(container.innerHTML.includes("Frisläpp order"));
+assert(container.innerHTML.includes("Vald aktivitet"));
+assert.strictEqual(view.containersFor(groupedModel, activityIds[1]).subtask.title,
+  "Frisläpp order");
 assert(!container.innerHTML.includes("**"));
 const selectedAttributes = {};
 const selectedAction = { dataset: { processTaskId: "release" },
@@ -51,4 +67,6 @@ assert(dashboard.includes("function activateProcessOverviewTask(taskId"));
 assert(dashboard.includes('$("processOverview").addEventListener("click"'));
 assert(dashboard.includes('$("processOverview").addEventListener("keydown"'));
 assert(dashboard.includes("T9ProcessOverviewView.updateSelection"));
+assert(dashboard.includes("resolvedHierarchy,"));
+assert(dashboard.includes('"ArrowLeft", "ArrowRight"'));
 console.log("Process Overview view tests passed.");

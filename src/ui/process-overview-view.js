@@ -3,6 +3,8 @@
   if (typeof module === "object" && module.exports) module.exports = api;
   root.T9ProcessOverviewView = api;
 })(typeof globalThis !== "undefined" ? globalThis : this, function () {
+  const renderedViews = new WeakMap();
+
   function escape(value) {
     return String(value ?? "").replace(/[&<>"']/g, character => ({
       "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"
@@ -19,9 +21,7 @@
   }
 
   function stateValue(value) {
-    if (value?.value !== undefined && value?.value !== null) {
-      return String(value.value);
-    }
+    if (value?.value !== undefined && value?.value !== null) return String(value.value);
     if (value?.page?.caption) return String(value.page.caption);
     return "";
   }
@@ -33,6 +33,45 @@
     const traced = reviewTasks.find(task => (task.sourceStepIds || [])
       .some(sourceId => sourceIds.has(sourceId)));
     return traced?.taskId || node?.sourceStepIds?.[0] || "";
+  }
+
+  function containersFor(model, nodeId) {
+    const containers = (model?.subprocesses || []).filter(container =>
+      (container.nodeIds || []).includes(nodeId));
+    return {
+      phase: containers.find(container => container.metadata?.containerType === "phase"),
+      subtask: containers.find(container => container.metadata?.containerType === "subtask")
+    };
+  }
+
+  function activityDetails(model, activities, transitions, options) {
+    return activities.map((node, index) => ({
+      node, index, taskId: taskIdFor(node, options.reviewTasks || []),
+      containers: containersFor(model, node.nodeId),
+      changes: transitions.get(node.nodeId) || []
+    }));
+  }
+
+  function detailMarkup(detail, english) {
+    if (!detail) return "";
+    const changes = detail.changes.map(change => {
+      const before = stateValue(change.before);
+      const after = stateValue(change.after);
+      return `<li><strong>${escape(stateLabel(change))}:</strong> ${escape(before)} ` +
+        `<span aria-label="${english ? "changes to" : "ändras till"}">→</span> ` +
+        `${escape(after)}</li>`;
+    }).join("");
+    const context = [detail.containers.phase?.title, detail.containers.subtask?.title]
+      .filter(Boolean).map(value => `<span>${escape(value)}</span>`).join("");
+    return `<aside class="process-overview-detail" data-process-overview-detail aria-live="polite">
+      <div><span class="process-overview-detail-label">${english ? "Selected activity" : "Vald aktivitet"}</span>
+      <strong>${escape(plain(detail.node.title))}</strong></div>
+      ${context ? `<div class="process-overview-detail-context">${context}</div>` : ""}
+      ${changes ? `<div><span class="process-overview-detail-label">${english ? "Observed changes" : "Observerade förändringar"}</span>
+        <ul>${changes}</ul></div>` : `<p class="muted">${english
+          ? "No observed state change is linked to this activity."
+          : "Ingen observerad statusförändring är kopplad till aktiviteten."}</p>`}
+    </aside>`;
   }
 
   function render(container, model, options = {}) {
@@ -50,46 +89,55 @@
       transitions.set(transition.activityNodeId, current);
     });
     if (!activities.length) {
+      renderedViews.delete(container);
       container.innerHTML = `<p class="muted">${english
         ? "No process activities are available."
         : "Det finns inga processaktiviteter att visa."}</p>`;
       return { activityCount: 0, stateTransitionCount: 0 };
     }
-    container.innerHTML = `<ol class="process-overview-list">${activities.map(
-      (node, index) => {
-        const changes = transitions.get(node.nodeId) || [];
-        const stateChanges = changes.map(change => {
-          const before = stateValue(change.before);
-          const after = stateValue(change.after);
-          return `<span class="process-overview-change"><strong>${escape(
-            stateLabel(change))}:</strong> ${escape(before)} ` +
-            `<span aria-label="${english ? "changes to" : "ändras till"}">→</span> ${escape(after)}</span>`;
-        }).join("");
-        const taskId = taskIdFor(node, options.reviewTasks || []);
-        const selected = selectedTaskIds.has(taskId);
-        return `<li class="process-overview-step" data-process-node-id="${escape(node.nodeId)}">
+    const details = activityDetails(model, activities, transitions, options);
+    const selectedDetail = details.find(detail => selectedTaskIds.has(detail.taskId)) || details[0];
+    renderedViews.set(container, { details, english });
+    container.innerHTML = `<div class="process-diagram-scroll" tabindex="0" role="group"
+      aria-label="${english ? "Process flow" : "Processflöde"}">
+      <ol class="process-overview-list">${details.map(detail => {
+        const stateChanges = detail.changes.map(change =>
+          `<span class="process-overview-change"><strong>${escape(stateLabel(change))}:</strong> ` +
+          `${escape(stateValue(change.before))} <span aria-hidden="true">→</span> ` +
+          `${escape(stateValue(change.after))}</span>`).join("");
+        const selected = selectedTaskIds.has(detail.taskId);
+        const phase = detail.containers.phase?.title;
+        const subtask = detail.containers.subtask?.title;
+        return `<li class="process-overview-step" data-process-node-id="${escape(detail.node.nodeId)}">
           <button type="button" class="process-overview-action"
-            data-process-task-id="${escape(taskId)}" aria-pressed="${selected}">
-            <span class="process-overview-number" aria-hidden="true">${index + 1}</span>
-            <span class="process-overview-content"><strong>${escape(plain(node.title))}</strong>
-            ${stateChanges ? `<span class="process-overview-state">${stateChanges}</span>` : ""}</span>
+            data-process-task-id="${escape(detail.taskId)}" aria-pressed="${selected}">
+            <span class="process-overview-number" aria-hidden="true">${detail.index + 1}</span>
+            <span class="process-overview-content">
+              ${phase ? `<span class="process-overview-phase">${escape(phase)}</span>` : ""}
+              ${subtask ? `<span class="process-overview-subtask">${escape(subtask)}</span>` : ""}
+              <strong>${escape(plain(detail.node.title))}</strong>
+              ${stateChanges ? `<span class="process-overview-state">${stateChanges}</span>` : ""}
+            </span>
           </button>
         </li>`;
-      }).join("")}</ol>`;
+      }).join("")}</ol></div>${detailMarkup(selectedDetail, english)}`;
     return { activityCount: activities.length,
       stateTransitionCount: [...transitions.values()].flat().length };
   }
 
   function updateSelection(container, selectedTaskIds = []) {
     const selected = new Set(selectedTaskIds);
-    const actions = [...(container?.querySelectorAll?.(
-      "[data-process-task-id]"
-    ) || [])];
+    const actions = [...(container?.querySelectorAll?.("[data-process-task-id]") || [])];
     actions.forEach(action => action.setAttribute("aria-pressed", String(
       selected.has(action.dataset.processTaskId)
     )));
-    return actions.filter(action => selected.has(action.dataset.processTaskId));
+    const selectedActions = actions.filter(action => selected.has(action.dataset.processTaskId));
+    const view = renderedViews.get(container);
+    const detail = view?.details.find(item => selected.has(item.taskId));
+    const detailContainer = container?.querySelector?.("[data-process-overview-detail]");
+    if (detail && detailContainer) detailContainer.outerHTML = detailMarkup(detail, view.english);
+    return selectedActions;
   }
 
-  return { render, taskIdFor, updateSelection };
+  return { containersFor, detailMarkup, render, taskIdFor, updateSelection };
 });

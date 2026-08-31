@@ -116,7 +116,11 @@ view. Review Studio's collapsible Process Overview is the first read-only UI
 adapter: it renders ordered activities and observed state changes directly from
 the model without adding layout data to the domain. Activities retain their
 stable source Step identity for bidirectional Review navigation and selection;
-keyboard navigation uses the rendered process order. Future Draw.io, BPMN,
+keyboard navigation uses the rendered process order. The current adapter shows
+the linear sequence as a directed horizontal diagram, reads phase and subtask
+containers from the model, and shows evidence-backed details for the selected
+activity. Large models scroll horizontally instead of compressing their
+content. Future Draw.io, BPMN,
 Mermaid, SVG, Word, PDF, or training adapters can map the same semantics.
 
 Projection is near-linear, performs no all-pairs inference, and has a 5,000-Step

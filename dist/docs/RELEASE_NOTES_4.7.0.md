@@ -147,4 +147,6 @@ resolved activity sequence and any evidence-backed before/after state changes
 directly from the immutable Process Model, while keeping the detailed step cards
 as the primary editing surface. Activities navigate to their corresponding
 Review steps, selected steps are highlighted in both representations, and the
-overview supports arrow, Home and End keyboard navigation.
+overview supports arrow, Home and End keyboard navigation. The sequence is
+visualized as a directed, horizontally scrollable diagram with phase and
+subtask labels plus a detail panel for the selected activity.
