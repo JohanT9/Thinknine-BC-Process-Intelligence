@@ -11,6 +11,11 @@
 
 ## Unreleased
 
+- Consolidated a complete Search/Tell Me flow with its immediately repeated
+  search-field entry. The redundant step is removed while its value and source
+  evidence enrich the retained search instruction; result screenshots remain
+  preferred. Untouched older Reviews refresh automatically, while consultant-
+  owned structure remains unchanged.
 - Added immutable State Observation 1.0.0 to Capture Packet 1.6.0. Directly
   observed page, control-value, toggle, and dialog facts now form traceable
   before/after snapshots and exact differences without inferring missing state

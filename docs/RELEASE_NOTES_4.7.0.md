@@ -1,5 +1,10 @@
 # BC Process Studio 4.7
 
+- Search/Tell Me recording no longer produces an extra field-entry step after
+  the complete search-and-open instruction. The retained step receives the
+  actual search phrase from that evidence and keeps the result screenshot.
+  Manually edited, approved, or annotated Reviews are never replaced.
+
 - Capture Packets now retain directly observed state before and after an
   interaction. Page changes, committed field values, checkbox state, and dialog
   visibility are represented as traceable facts; only exact comparable values

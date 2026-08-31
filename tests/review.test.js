@@ -195,6 +195,15 @@ assert.strictEqual(review.hasGeneratedSearchResultTypeLeak(searchResultTypeLeak)
   true);
 assert.strictEqual(review.hasGeneratedSearchResultTypeLeak({ tasks:
   searchResultTypeLeak.tasks.map(task => ({ ...task, approved: true })) }), false);
+const searchInputLeak = { tasks: [{ taskType: "SearchAndOpenPage",
+  resultCaption: "Sales Orders" }, {
+  taskType: "EnterFieldValue", fieldCaption: "Tell me what you want to do.",
+  value: "sales order" }] };
+assert.strictEqual(review.hasGeneratedSearchInputLeak(searchInputLeak), true);
+assert.strictEqual(review.hasGeneratedSearchInputLeak({ tasks:
+  searchInputLeak.tasks.map((task, index) => index
+    ? { ...task, userComment: "Keep separate" } : task) }), false,
+"consultant-owned review structure must never be refreshed automatically");
 const staleSearchEvidence = { tasks: [{ taskId: "search-1",
   taskType: "SearchAndOpenPage", screenshot: "loading.png" }] };
 const freshSearchEvidence = [{ taskId: "search-1",

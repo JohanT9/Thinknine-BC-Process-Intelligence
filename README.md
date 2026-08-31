@@ -177,6 +177,10 @@ uses exact causal oracles for verified, error, self-result, adjacent-action,
 React-noise, late-result, and orphan-result scenarios. It fails CI if a result
 or preferred screenshot moves to the wrong interaction.
 
+Search/Tell Me capture is consolidated as one consultant-facing action. An
+immediately repeated entry in the same search field enriches the search action
+with its observed phrase instead of creating an unnecessary second step.
+
 Capture Packet Integrity validates every derived packet before downstream use.
 It reports identity conflicts, foreign or duplicate evidence references,
 impossible result ordering, invalid screenshot roles, result-traceability gaps,

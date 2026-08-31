@@ -50,6 +50,42 @@ const itemNumberEntry = only([{
   instruction: 'Ange 30043 i "Sortera efter Nr".'
 }], "EnterItemNumber", "Ange __30043__ i **Artikel Nr**.");
 assert.strictEqual(itemNumberEntry.inputInteractionCount, 3);
+const redundantSearchInput = engine.processInteractions([{
+  taskId: "search-complete", taskType: "SearchAndOpenPage",
+  searchCaption: "Search", searchFieldCaption: "Tell me what you want to do.",
+  instructionValue: "sales order", resultCaption: "Sales Orders",
+  sourceEventIds: ["search-open", "search-result"],
+  screenshot: "search-result.png", preferredSourceEventId: "search-result"
+}, {
+  taskId: "search-input-duplicate", taskType: "EnterFieldValue",
+  fieldCaption: "Tell me what you want to do.", instructionValue: "sales order",
+  sourceEventIds: ["search-input"], screenshot: "search-input.png"
+}]);
+assert.strictEqual(redundantSearchInput.length, 1,
+  "a complete search flow must absorb its repeated field-entry step");
+assert.strictEqual(redundantSearchInput[0].actionType, "SearchAndOpenPage");
+assert.strictEqual(redundantSearchInput[0].inputInteractionCount, 2);
+assert.deepStrictEqual(redundantSearchInput[0].sourceEventIds,
+  ["search-open", "search-result", "search-input"]);
+assert.strictEqual(redundantSearchInput[0].preferredScreenshotRef,
+  "search-result.png");
+const genericSearchInput = engine.processInteractions([{
+  taskType: "SearchAndOpenPage", searchCaption: "Search",
+  resultCaption: "Sales Orders", screenshot: "result.png"
+}, { taskType: "EnterFieldValue",
+  fieldCaption: "Tell me what you want to do.", value: "sales order" }]);
+assert.strictEqual(genericSearchInput.length, 1);
+assert.strictEqual(genericSearchInput[0].selectedValue, "sales order");
+assert.strictEqual(genericSearchInput[0].targetField,
+  "Tell me what you want to do.");
+assert.strictEqual(engine.processInteractions([{
+  taskType: "SearchAndOpenPage", resultCaption: "Customers",
+  searchFieldCaption: "Tell me what you want to do.",
+  instructionValue: "customer", resultCaption: "Customers"
+}, { taskType: "EnterFieldValue",
+  fieldCaption: "Tell me what you want to do.",
+  instructionValue: "vendor" }]).length, 2,
+"different search values must remain separate interactions");
 const menuPath = only([{
   taskId: "row", taskType: "RunAction", actionCaption: "Välj rad",
   sourceEventIds: ["event-row"], screenshot: "row.png"

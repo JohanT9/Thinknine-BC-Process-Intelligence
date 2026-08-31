@@ -31,6 +31,12 @@ resulting values match, it becomes `Ange <value> i Artikel Nr`; the mechanical
 `Sortera efter Nr` controls are not exposed as separate steps. This compatibility
 rule does not replace or reinterpret structured modern `Select` interactions.
 
+A complete `SearchAndOpenPage` followed immediately by a repeated entry in the
+same Tell Me/search field is also one interaction. The search action absorbs
+the duplicate field step, retains all source evidence, keeps the result-oriented
+screenshot, and uses the later field evidence to replace a generic search-text
+placeholder. A different value or a non-search field remains a separate step.
+
 The Business Central manual-price menu path is documented as one action:
 `Åtgärder → Funktion → Manuellt pris`. Some React surfaces do not emit a
 separate interaction for the intermediate `Funktion` menu. The compatibility

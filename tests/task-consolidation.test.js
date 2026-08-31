@@ -57,6 +57,19 @@ assert.strictEqual(consolidation.consolidate(unrelated).length, 1);
 assert.strictEqual(consolidation.consolidate(unrelated)[0].selectedCaption,
   'Välj posten "136"');
 
+const searchDuplicate = consolidation.consolidate([{
+  taskId: "search", taskType: "SearchAndOpenPage", searchCaption: "Search",
+  searchFieldCaption: "Tell me what you want to do.", value: "sales order",
+  resultCaption: "Sales Orders", screenshot: "result.png",
+  sourceEventNos: [1, 2, 4]
+}, { taskId: "search-value", taskType: "EnterFieldValue",
+  fieldCaption: "Tell me what you want to do.", value: "sales order",
+  screenshot: "input.png", sourceEventNos: [3] }]);
+assert.strictEqual(searchDuplicate.length, 1);
+assert.strictEqual(searchDuplicate[0].taskType, "SearchAndOpenPage");
+assert.strictEqual(searchDuplicate[0].screenshot, "result.png");
+assert.deepStrictEqual(searchDuplicate[0].sourceEventNos, [1, 2, 4, 3]);
+
 const salesLineTasks = [{ taskId: "filter", taskType: "ChangeField",
   entity: "Item", fieldCaption: "Sortera efter Nr", value: "",
   inputSources: ["focusout"], sourceEventNos: [31]

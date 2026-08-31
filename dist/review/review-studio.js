@@ -1204,6 +1204,29 @@
       ].filter(Boolean).join(" ")));
   }
 
+  function hasGeneratedSearchInputLeak(review) {
+    const tasks = Array.isArray(review?.tasks) ? review.tasks : [];
+    const consultantOwned = tasks.some(task => task?.approved ||
+      task?.userComment || task?.stepOverride || task?.manualStepId ||
+      task?.provenance === "manual");
+    if (consultantOwned) return false;
+    const clean = value => String(value || "").trim().replace(/[.:]+$/u, "")
+      .toLocaleLowerCase();
+    const value = task => clean(task?.instructionValue ?? task?.value ??
+      task?.selectedCaption);
+    return tasks.some((task, index) => {
+      const next = tasks[index + 1];
+      const field = clean(task?.searchFieldCaption || task?.fieldCaption);
+      const nextField = clean(next?.fieldCaption);
+      const searchField = candidate => !candidate ||
+        /sökfält|search field|sök|search|berätta|tell me/iu.test(candidate);
+      return task?.taskType === "SearchAndOpenPage" &&
+        ["EnterFieldValue", "ChangeField"].includes(next?.taskType) &&
+        searchField(field) && searchField(nextField) && Boolean(value(next)) &&
+        (!value(task) || value(task) === value(next));
+    });
+  }
+
   function hasGeneratedSearchEvidenceDrift(review, generatedTasks = []) {
     const tasks = Array.isArray(review?.tasks) ? review.tasks : [];
     const consultantOwned = tasks.some(task => task?.approved ||
@@ -1284,6 +1307,7 @@
     hasGeneratedLookupSearchLeak,
     hasGeneratedMenuPathLeak,
     hasGeneratedCloseScreenshotLeak,
+    hasGeneratedSearchInputLeak,
     hasGeneratedSearchResultTypeLeak,
     hasGeneratedSearchEvidenceDrift
   };

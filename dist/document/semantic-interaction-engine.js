@@ -398,6 +398,56 @@
     return deepFreeze(rule);
   }
 
+  function searchAndOpenWithRedundantFieldRule() {
+    const searchField = value => text(value?.searchFieldCaption ||
+      value?.fieldCaption).replace(/[.:]+$/u, "").toLocaleLowerCase();
+    const isSearchField = value => !value ||
+      /sökfält|search field|sök|search|berätta|tell me/iu.test(value);
+    const rule = {
+      ruleId: "search-and-open-with-redundant-field",
+      priority: 98,
+      match(context) {
+        const current = context.interactions[context.index];
+        const next = context.interactions[context.index + 1];
+        if (current?.taskType !== "SearchAndOpenPage" ||
+            !["EnterFieldValue", "ChangeField"].includes(next?.taskType)) {
+          return false;
+        }
+        const currentValue = meaningfulValue(current);
+        const nextValue = meaningfulValue(next);
+        const currentField = searchField(current);
+        const nextField = searchField(next);
+        const hasResult = Boolean(text(current.resultCaption ||
+          current.selectedCaption || current.pageCaption));
+        return Boolean(nextValue && hasResult &&
+          (!currentValue || currentValue === nextValue) &&
+          isSearchField(currentField) && isSearchField(nextField));
+      },
+      consolidate(context) {
+        const values = context.interactions.slice(context.index,
+          context.index + 2);
+        const current = values[0];
+        const selectedValue = meaningfulValue(current) || meaningfulValue(values[1]);
+        const search = text(current.searchCaption || current.actionCaption || "Sök");
+        const field = text(current.searchFieldCaption || current.fieldCaption ||
+          values[1].fieldCaption || "sökfältet");
+        const result = text(current.resultCaption || current.selectedCaption ||
+          current.pageCaption);
+        return { consumed: 2, action: action(rule, values, {
+          actionType: "SearchAndOpenPage",
+          displayText: `Välj **${search}**, ange __${selectedValue}__ i ` +
+            `**${field}** och välj **${result}**.`,
+          selectedValue, targetField: field,
+          preferredSourceEventId: current.preferredSourceEventId ||
+            current.sourceEventIds?.at(-1),
+          preferredScreenshotRef: current.screenshot ||
+            current.screenshots?.[0]
+        }) };
+      }
+    };
+    return deepFreeze(rule);
+  }
+
   function salesPriceDiscountMenuPathRule() {
     const captions = [
       /^(?:välj\s+)?rad$/iu,
@@ -524,6 +574,7 @@
     salesPriceDiscountMenuPathRule(),
     manualPriceMenuPathRule(),
     closeDialogRule(),
+    searchAndOpenWithRedundantFieldRule(),
     selectionRule({ ruleId: "customer-selection", priority: 100,
       actionType: "SelectCustomer", fieldPattern: CUSTOMER,
       verb: "Välj kund", targetField: "Kund", requireValue: true }),
