@@ -35,6 +35,8 @@ assert.match(background, /case "T9_CANCEL_RECORDING"/);
 assert.match(background, /await cancelActiveSession\(\)/);
 assert.match(background, /BC_ERROR_EVIDENCE_PREFIX \+ id/);
 assert.match(popup, /id="recordingName" required/);
+assert.match(popup, /class="name-fields"[\s\S]*class="name-field"[\s\S]*id="recordingName"[\s\S]*class="name-field"[\s\S]*id="recordingDocumentLanguage"/);
+assert.match(popup, /input,textarea,select\{width:100%/);
 assert.match(popupLogic, /nameDialog.*showModal/);
 assert.match(popup, /id="recordingDocumentLanguage"[\s\S]*value="sv-SE"[\s\S]*value="en-US"/);
 assert.match(popupLogic, /finishRecording\(name, \$\("recordingDocumentLanguage"\)\.value\)/);

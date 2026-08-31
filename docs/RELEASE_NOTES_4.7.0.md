@@ -123,7 +123,9 @@ document language explicitly. BC Knowledge Base displays `SV`/`EN` badges and
 can filter by language. The same selection also controls generated Technical
 Bug Report headings and local text/Markdown export. No raw event is translated
 or rewritten. The language selector remains available after either Swedish or
-English interface localization has been applied.
+English interface localization has been applied. The compact recorder dialog
+uses full-width fields and clearer vertical spacing so naming and language
+selection remain comfortable within the browser popup.
 
 BC Knowledge Base now keeps document cards focused on identity, language,
 profile, recency and direct access. The document-health filter and repeated

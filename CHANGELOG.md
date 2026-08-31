@@ -11,6 +11,9 @@
 
 ## Unreleased
 
+- Improved the recorder naming dialog with a wider responsive layout, full-width
+  language selection and clearer spacing between its form fields and actions.
+
 - Simplified BC Knowledge Base by removing the low-value document-health filter,
   health summary and confirmation list from document cards. Health metadata is
   preserved internally for compatibility and diagnostics.

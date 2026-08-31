@@ -14,7 +14,7 @@ main{padding:16px 18px 18px}
 .status{padding:9px 11px;border-radius:6px;margin-bottom:14px;font-weight:600;background:#e5e7eb}
 .status.rec{background:#fee2e2;color:#991b1b}
 label{display:block;font-size:12px;font-weight:600;margin-bottom:12px}
-input,textarea{width:100%;box-sizing:border-box;margin-top:5px;padding:8px;border:1px solid #cbd2d9;border-radius:5px;font:inherit}
+input,textarea,select{width:100%;box-sizing:border-box;padding:9px 10px;border:1px solid #cbd2d9;border-radius:5px;background:#fff;font:inherit}
 button{width:100%;padding:10px 12px;border:0;border-radius:5px;font-weight:600;cursor:pointer;margin-bottom:8px}
 .primary{background:#0f6cbd;color:#fff}.danger{background:#b42318;color:#fff}.secondary{background:#dbeafe;color:#1e3a8a}.debug{background:#e5e7eb;color:#374151}
 dl{display:grid;grid-template-columns:90px 1fr;gap:5px;font-size:12px}dt{font-weight:600}dd{margin:0}
@@ -22,7 +22,7 @@ dl{display:grid;grid-template-columns:90px 1fr;gap:5px;font-size:12px}dt{font-we
 .technical-tools{margin-top:4px}.technical-tools summary{cursor:pointer;font-size:12px;font-weight:600;margin-bottom:8px}.technical-tools button{margin-top:4px}
 .mode-grid{display:grid;gap:10px}.mode-card{text-align:left;padding:13px}.mode-card strong,.mode-card span{display:block}.mode-card span{font-weight:400;font-size:12px;margin-top:4px}.hint{font-size:12px;color:#52606d}.captured{padding:8px;background:#ecfdf3;color:#166534;border-radius:5px;font-size:12px}
 .live-card{margin:12px 0;padding:10px;border:1px solid #cbd2d9;border-radius:7px;background:#fff}.live-card h2{font-size:14px;margin:0 0 8px}.live-grid{grid-template-columns:92px 1fr;margin:0}.live-ok{color:#166534}.live-warning{margin:8px 0 0;padding:8px;border-radius:5px;background:#fff7ed;color:#9a3412;font-size:12px}.live-warning[hidden]{display:none}
-dialog{width:calc(100% - 36px);box-sizing:border-box;border:1px solid #8392a5;border-radius:8px;padding:18px}dialog::backdrop{background:rgba(15,23,42,.55)}dialog form{margin:0}dialog menu{display:flex;flex-wrap:wrap;gap:8px;padding:12px 0 0;margin:0}dialog menu button{margin:0;flex:1}.discard-recording{flex-basis:100%}
+dialog{width:calc(100% - 20px);max-width:330px;box-sizing:border-box;border:1px solid #8392a5;border-radius:8px;padding:20px}dialog::backdrop{background:rgba(15,23,42,.55)}dialog form{margin:0}dialog h2{margin:0 0 10px}.name-fields{display:grid;gap:16px;margin-top:18px}.name-field label{margin:0 0 6px}.document-language-help{margin:9px 0 2px;line-height:1.45}dialog menu{display:flex;flex-wrap:wrap;gap:8px;padding:16px 0 0;margin:0}dialog menu button{margin:0;flex:1}.discard-recording{flex-basis:100%}
 </style>
 <link rel="stylesheet" href="design-system.css">
 </head>
@@ -78,14 +78,20 @@ dialog{width:calc(100% - 36px);box-sizing:border-box;border:1px solid #8392a5;bo
   <form id="nameForm" method="dialog">
     <h2 id="nameDialogTitle">Namnge inspelningen</h2>
     <p id="nameDialogHelp" class="hint"></p>
-    <label for="recordingName">Namn</label>
-    <input id="recordingName" required maxlength="120" autocomplete="off">
-    <label for="recordingDocumentLanguage" data-i18n="settings.documentLanguage">Dokumentspråk</label>
-    <select id="recordingDocumentLanguage" data-language-select="document">
-      <option value="sv-SE">Svenska</option>
-      <option value="en-US">English</option>
-    </select>
-    <p class="hint" data-i18n="recorder.documentLanguageHelp">Välj språket för den dokumentation eller felrapport som skapas.</p>
+    <div class="name-fields">
+      <div class="name-field">
+        <label for="recordingName">Namn</label>
+        <input id="recordingName" required maxlength="120" autocomplete="off">
+      </div>
+      <div class="name-field">
+        <label for="recordingDocumentLanguage" data-i18n="settings.documentLanguage">Dokumentspråk</label>
+        <select id="recordingDocumentLanguage" data-language-select="document">
+          <option value="sv-SE">Svenska</option>
+          <option value="en-US">English</option>
+        </select>
+      </div>
+    </div>
+    <p class="hint document-language-help" data-i18n="recorder.documentLanguageHelp">Välj språket för den dokumentation eller felrapport som skapas.</p>
     <menu>
       <button id="cancelName" type="button" class="debug"
         title="Avbryt stopp och fortsätt spela in"
