@@ -18,8 +18,6 @@
   function card(record, selected, active) {
     const bugReport = record.metadata?.recordingPurpose === "bug-report";
     const language = languages.get(record.documentLanguage);
-    const confirmations = record.health.confirmations.slice(0, 2).map(value =>
-      `<li>${escape(value)}</li>`).join("");
     return `<article class="library-card" role="listitem" tabindex="${active ? 0 : -1}"
       data-selected="${selected}" ${active ? 'aria-current="true"' : ""}
       data-library-project-id="${escape(record.projectId)}">
@@ -34,8 +32,6 @@
       ${record.archived ? '<p><strong>Arkiverad</strong></p>' : ""}
       ${record.author ? `<p class="muted">Av ${escape(record.author)}</p>` : ""}
       ${record.status ? `<p class="muted">Status: ${escape(record.status)}</p>` : ""}
-      <p><strong>${escape(record.health.overall)}</strong>${record.health.suggestionLabel ? ` · ${escape(record.health.suggestionLabel)}` : ""}</p>
-      ${confirmations ? `<ul class="library-confirmations">${confirmations}</ul>` : ""}
       <p class="muted">Ändrad ${date(record.modifiedAt)}${record.readingMinutes ? ` · ${record.readingMinutes} min läsning` : ""}</p>
       <div class="library-tags">${record.tags.map(tag => `<span>${escape(tag)}</span>`).join("")}</div>
       <button class="secondary" data-library-action="open">${bugReport

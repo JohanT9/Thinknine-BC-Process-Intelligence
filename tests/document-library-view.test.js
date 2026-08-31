@@ -18,7 +18,9 @@ assert(container.innerHTML.includes('type="checkbox"'));
 assert(container.innerHTML.includes('aria-pressed="true"'));
 assert(container.innerHTML.includes("Order &lt;test&gt;"));
 assert(container.innerHTML.includes(">SV</span>"));
-assert(container.innerHTML.includes("Arbetsflödet är dokumenterat"));
+assert(!container.innerHTML.includes("Redo för granskning"));
+assert(!container.innerHTML.includes("1 förslag"));
+assert(!container.innerHTML.includes("Arbetsflödet är dokumenterat"));
 assert.strictEqual(view.renderPreview, undefined);
 assert.strictEqual(view.renderGrouped(container, library.groupByProfile([record]), {
   selectedIds: ["doc-1"], activeId: "doc-1"

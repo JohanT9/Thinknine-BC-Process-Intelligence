@@ -3473,7 +3473,6 @@ function libraryOptions() {
     filters: {
       profile: value("libraryProfileFilter"),
       theme: value("libraryThemeFilter"),
-      health: value("libraryHealthFilter"),
       documentLanguage: value("libraryLanguageFilter"),
       favourite: checked("libraryFavouriteFilter"),
       recent: checked("libraryRecentFilter"),
@@ -3552,18 +3551,14 @@ function renderLibraryBatchToolbar(message = "") {
 function refreshLibraryFilters() {
   const profiles = new Map();
   const themes = new Map();
-  const health = new Set();
   documentLibraryRecords.forEach(record => {
     profiles.set(record.profile.profileId, record.profile.displayName);
     themes.set(record.theme.themeId, record.theme.displayName);
-    health.add(record.health.overall);
   });
   fillLibraryFilter("libraryProfileFilter", [...profiles],
     $("libraryProfileFilter")?.value || "");
   fillLibraryFilter("libraryThemeFilter", [...themes],
     $("libraryThemeFilter")?.value || "");
-  fillLibraryFilter("libraryHealthFilter", [...health].sort().map(value =>
-    [value, healthStatusLabel(value)]), $("libraryHealthFilter")?.value || "");
 }
 
 async function loadDocumentLibrary(sessions) {
@@ -7079,7 +7074,7 @@ $("sessionTools").addEventListener("toggle", () => {
   }
 });
 for (const id of ["librarySearch", "libraryProfileFilter",
-  "libraryThemeFilter", "libraryHealthFilter", "libraryLanguageFilter", "librarySort",
+  "libraryThemeFilter", "libraryLanguageFilter", "librarySort",
   "libraryFavouriteFilter", "libraryRecentFilter", "libraryGroupProfiles",
   "libraryCreatedFrom", "libraryCreatedTo", "libraryModifiedFrom",
   "libraryModifiedTo"]) {

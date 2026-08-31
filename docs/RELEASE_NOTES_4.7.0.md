@@ -124,3 +124,8 @@ can filter by language. The same selection also controls generated Technical
 Bug Report headings and local text/Markdown export. No raw event is translated
 or rewritten. The language selector remains available after either Swedish or
 English interface localization has been applied.
+
+BC Knowledge Base now keeps document cards focused on identity, language,
+profile, recency and direct access. The document-health filter and repeated
+health checklist have been removed from the library view; underlying quality
+metadata remains available to the document pipeline.

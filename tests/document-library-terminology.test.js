@@ -21,6 +21,8 @@ assert(dashboardHtml.includes(
 assert(dashboardHtml.includes('<h2 id="documentLibraryTitle">BC Knowledge Base</h2>'));
 assert(dashboardHtml.includes('aria-label="Filter för Dokumentbibliotek"'));
 assert(dashboardHtml.includes('aria-label="Dokument i Dokumentbiblioteket"'));
+assert(!dashboardHtml.includes('id="libraryHealthFilter"'));
+assert(!dashboardHtml.includes('<option value="health">'));
 assert(dashboardHtml.includes('<h2 id="reviewTitle">BC Review Studio</h2>'));
 assert(dashboardHtml.includes('aria-label="Stäng granskning"'));
 assert(!dashboardHtml.includes("Documentation Excellence"));

@@ -11,6 +11,10 @@
 
 ## Unreleased
 
+- Simplified BC Knowledge Base by removing the low-value document-health filter,
+  health summary and confirmation list from document cards. Health metadata is
+  preserved internally for compatibility and diagnostics.
+
 - Fixed the BC Knowledge Base document-language filter disappearing when UI localization replaced its containing label.
 
 - Fixed Review image replacement so the Review card immediately renders the
