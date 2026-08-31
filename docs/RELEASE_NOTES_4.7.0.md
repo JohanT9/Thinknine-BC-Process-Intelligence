@@ -141,3 +141,8 @@ The standard CI release gate now executes documentation hierarchy, structural
 override, Process Model, Process Versioning and regeneration coverage on every
 build. These central process-architecture contracts can no longer pass only in
 manually selected milestone test runs.
+
+Review Studio now includes a collapsible Process Overview. It presents the
+resolved activity sequence and any evidence-backed before/after state changes
+directly from the immutable Process Model, while keeping the detailed step cards
+as the primary editing surface.

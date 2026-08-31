@@ -150,6 +150,7 @@ for (const file of [
   "i18n.js",
   "async-operations.js",
   "document-library-view.js",
+  "process-overview-view.js",
   "document-workspace-experience.js",
   "document-workspace-view.js",
   "debug.html",

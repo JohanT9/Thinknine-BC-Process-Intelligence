@@ -138,6 +138,7 @@ table{width:100%;border-collapse:collapse}th,td{text-align:left;padding:9px;bord
 .review-document-fields textarea{box-sizing:border-box;width:100%;min-height:84px;resize:vertical}
 .review-document-fields-actions{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:8px}
 .review-document-fields-actions p{margin:0}
+.process-overview-card{margin:16px 0;border:1px solid #d8dee5;border-radius:7px;background:#fff}.process-overview-card>summary{cursor:pointer;padding:12px 14px;font-weight:600}.process-overview-help{margin:0;padding:0 14px 10px}.process-overview-list{list-style:none;margin:0;padding:0 14px 14px;display:grid;gap:0}.process-overview-step{position:relative;display:grid;grid-template-columns:34px minmax(0,1fr);gap:10px;padding:9px 0 14px}.process-overview-step:not(:last-child)::after{content:"";position:absolute;left:16px;top:38px;bottom:0;border-left:2px solid #9aa6b2}.process-overview-number{display:grid;place-items:center;width:32px;height:32px;border:1px solid #8392a5;border-radius:50%;background:#f3f6fa;font-weight:700}.process-overview-state{margin:6px 0 0;padding-left:20px;color:#52606d}
 .review-zoom-content{zoom:var(--review-zoom,1)}
 .review-shell>[role="tabpanel"][hidden]{display:none!important}
 .document-workspace-panel{--document-zoom:1;background:#e8edf1;padding:0;height:calc(100vh - 190px);min-height:500px;display:flex;flex-direction:column;overflow:hidden}
@@ -544,6 +545,11 @@ table{width:100%;border-collapse:collapse}th,td{text-align:left;padding:9px;bord
           <button id="resetExpectedResult" class="secondary" type="button">Återställ standardtext</button>
         </div>
       </section>
+      <details id="processOverviewDisclosure" class="process-overview-card">
+        <summary id="processOverviewTitle" data-i18n="process.overview">Processöversikt</summary>
+        <p class="muted process-overview-help" data-i18n="process.overviewHelp">Visar dokumenterade aktiviteter och observerade statusförändringar.</p>
+        <div id="processOverview" role="region" aria-labelledby="processOverviewTitle"></div>
+      </details>
       <nav id="reviewHierarchy" aria-label="Dokumenthierarki"></nav>
       <main
         id="reviewList"
@@ -750,6 +756,7 @@ table{width:100%;border-collapse:collapse}th,td{text-align:left;padding:9px;bord
 <script src="document/document-workspace.js"></script>
 <script src="document/document-profile.js"></script>
 <script src="document/documentation-intelligence.js"></script>
+<script src="document/process-model.js"></script>
 <script src="document/document-library.js"></script>
 <script src="document/document-batch-operations.js"></script>
 <script src="exporters/word-export-pipeline.js"></script>
@@ -776,6 +783,7 @@ table{width:100%;border-collapse:collapse}th,td{text-align:left;padding:9px;bord
 <script src="document-workspace-view.js"></script>
 <script src="document-workspace-experience.js"></script>
 <script src="document-library-view.js"></script>
+<script src="process-overview-view.js"></script>
 <script src="i18n.js"></script>
 <script src="dashboard.js"></script>
 </body>

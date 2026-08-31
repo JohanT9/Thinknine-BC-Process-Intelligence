@@ -237,7 +237,9 @@ renderer-neutral and does not change current Workspace or Word output. See
 Resolved documentation now projects into a deterministic, renderer-neutral
 process graph with neutral boundaries, traceable activities, phase/subprocess
 containers, explicit manual decisions, sparse overrides, and validation. It
-does not alter Workspace or Word output. See
+does not alter Workspace or Word output. Review Studio exposes a collapsible
+Process Overview of the resolved activity flow and evidence-backed state
+changes without replacing the detailed editing cards. See
 [docs/PROCESS_MODEL.md](docs/PROCESS_MODEL.md).
 
 ## Sections and Subtasks

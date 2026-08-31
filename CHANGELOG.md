@@ -11,6 +11,9 @@
 
 ## Unreleased
 
+- Added a collapsible, accessible Process Overview to Review Studio, projected
+  directly from Process Model activities and observed state transitions.
+
 - Promoted documentation hierarchy, structural overrides, Process Model,
   Process Versioning and recording regeneration tests into the mandatory CI
   release gate.

@@ -112,8 +112,10 @@ learning sequence; Quick Reference makes overview optional; Troubleshooting
 Guide emphasizes evidence-backed branching. Profiles never alter evidence.
 Planner stays responsible for presentation, so existing Workspace and Word plans
 and output remain unchanged. `outline()` exposes a renderer-neutral verification
-view. Future Draw.io, BPMN, Mermaid, SVG, HTML, Word, PDF, or training adapters
-can map the same semantics; none is implemented here.
+view. Review Studio's collapsible Process Overview is the first read-only UI
+adapter: it renders ordered activities and observed state changes directly from
+the model without adding layout data to the domain. Future Draw.io, BPMN,
+Mermaid, SVG, Word, PDF, or training adapters can map the same semantics.
 
 Projection is near-linear, performs no all-pairs inference, and has a 5,000-Step
 regression. It is local, uses no AI or external service, mutates no upstream

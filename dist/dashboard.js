@@ -6071,6 +6071,27 @@ function renderReview() {
   } catch (error) {
     renderStoredReviewFallback(error);
   }
+  renderProcessOverview();
+}
+
+function renderProcessOverview() {
+  const container = $("processOverview");
+  if (!container || !activeReview || !activeReviewSession) return;
+  try {
+    const model = globalThis.T9ProcessModel.project({
+      recordingId: activeReviewSession.id,
+      title: activeReviewSession.name,
+      steps: activeReview.tasks || [],
+      overrides: activeReview.processOverrides || []
+    });
+    globalThis.T9ProcessOverviewView.render(container, model, {
+      locale: activeReview.documentFields?.documentLanguage || "sv-SE"
+    });
+  } catch (error) {
+    container.innerHTML = `<p class="muted">${escapeHtml(uiTf(
+      "process.overviewError", { detail: error.message }
+    ))}</p>`;
+  }
 }
 
 async function saveActiveReview(options = {}) {
