@@ -120,7 +120,11 @@ keyboard navigation uses the rendered process order. The current adapter shows
 the linear sequence as a directed horizontal diagram, reads phase and subtask
 containers from the model, and shows evidence-backed details for the selected
 activity. Large models scroll horizontally instead of compressing their
-content. Future Draw.io, BPMN,
+content. Explicit decision nodes interrupt the linear connector and show every
+manual conditional, alternate, return, or unknown route with its stored label,
+condition, type, and destination. Decision details are keyboard-selectable even
+when the node has no corresponding recorded Review Step. The adapter does not
+infer branches from UI interactions. Future Draw.io, BPMN,
 Mermaid, SVG, Word, PDF, or training adapters can map the same semantics.
 
 Projection is near-linear, performs no all-pairs inference, and has a 5,000-Step

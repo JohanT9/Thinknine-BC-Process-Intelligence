@@ -246,6 +246,11 @@ overview uses a directed, horizontally scrollable diagram and exposes the
 resolved phase, subtask and observed changes in a selected-activity panel. See
 [docs/PROCESS_MODEL.md](docs/PROCESS_MODEL.md).
 
+Explicit consultant-defined decisions are rendered as decision nodes with their
+conditional or alternate routes and destinations. Process Overview never turns
+ordinary Yes/No clicks, cancelled dialogs or revisited pages into invented
+business branches.
+
 ## Sections and Subtasks
 
 Long workflows can be organized into a bounded Document → Section → Subtask →

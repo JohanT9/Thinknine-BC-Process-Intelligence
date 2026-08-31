@@ -44,12 +44,41 @@
     };
   }
 
-  function activityDetails(model, activities, transitions, options) {
+  function activityDetails(model, activities, stateTransitions, options) {
+    const nodeById = new Map((model?.nodes || []).map(node => [node.nodeId, node]));
+    const graphTransitions = new Map();
+    (model?.transitions || []).forEach(transition => {
+      if (!nodeById.has(transition.fromNodeId) || !nodeById.has(transition.toNodeId)) return;
+      const current = graphTransitions.get(transition.fromNodeId) || [];
+      current.push({ ...transition, target: nodeById.get(transition.toNodeId) });
+      graphTransitions.set(transition.fromNodeId, current);
+    });
     return activities.map((node, index) => ({
       node, index, taskId: taskIdFor(node, options.reviewTasks || []),
       containers: containersFor(model, node.nodeId),
-      changes: transitions.get(node.nodeId) || []
+      changes: stateTransitions.get(node.nodeId) || [],
+      outgoing: graphTransitions.get(node.nodeId) || []
     }));
+  }
+
+  function routeLabel(route, english) {
+    if (route.label) return route.label;
+    if (typeof route.condition === "string" && route.condition.trim()) return route.condition;
+    return english ? "Alternative route" : "Alternativ väg";
+  }
+
+  function routesMarkup(detail, english, compact = false) {
+    const routes = (detail?.outgoing || []).filter(route =>
+      route.transitionType !== "sequence" || detail.node.nodeType === "decision"
+    );
+    if (!routes.length) return "";
+    return `<${compact ? "span" : "ul"} class="process-overview-routes${compact ? " compact" : ""}">${routes.map(route =>
+      `<${compact ? "span" : "li"} class="process-overview-route" data-process-transition-type="${escape(route.transitionType)}">
+        <strong>${escape(routeLabel(route, english))}</strong><span aria-hidden="true">→</span>
+        <span>${escape(plain(route.target?.title))}</span>
+        ${compact ? "" : `<span class="process-overview-route-meta">${escape(route.transitionType)}${
+          route.condition && route.condition !== route.label ? ` · ${escape(route.condition)}` : ""}</span>`}
+      </${compact ? "span" : "li"}>`).join("")}</${compact ? "span" : "ul"}>`;
   }
 
   function detailMarkup(detail, english) {
@@ -63,14 +92,18 @@
     }).join("");
     const context = [detail.containers.phase?.title, detail.containers.subtask?.title]
       .filter(Boolean).map(value => `<span>${escape(value)}</span>`).join("");
+    const routes = routesMarkup(detail, english);
     return `<aside class="process-overview-detail" data-process-overview-detail aria-live="polite">
-      <div><span class="process-overview-detail-label">${english ? "Selected activity" : "Vald aktivitet"}</span>
+      <div><span class="process-overview-detail-label">${detail.node.nodeType === "decision"
+        ? (english ? "Selected decision" : "Valt beslut")
+        : (english ? "Selected activity" : "Vald aktivitet")}</span>
       <strong>${escape(plain(detail.node.title))}</strong></div>
       ${context ? `<div class="process-overview-detail-context">${context}</div>` : ""}
+      ${routes ? `<div><span class="process-overview-detail-label">${english ? "Routes" : "Vägar"}</span>${routes}</div>` : ""}
       ${changes ? `<div><span class="process-overview-detail-label">${english ? "Observed changes" : "Observerade förändringar"}</span>
-        <ul>${changes}</ul></div>` : `<p class="muted">${english
+        <ul>${changes}</ul></div>` : !routes ? `<p class="muted">${english
           ? "No observed state change is linked to this activity."
-          : "Ingen observerad statusförändring är kopplad till aktiviteten."}</p>`}
+          : "Ingen observerad statusförändring är kopplad till aktiviteten."}</p>` : ""}
     </aside>`;
   }
 
@@ -82,11 +115,11 @@
       !["start", "end", "subprocess"].includes(node.nodeType)
     ).sort((left, right) => (left.processOrder ?? left.sequence ?? 0) -
       (right.processOrder ?? right.sequence ?? 0));
-    const transitions = new Map();
+    const stateTransitions = new Map();
     (model?.stateTransitions || []).forEach(transition => {
-      const current = transitions.get(transition.activityNodeId) || [];
+      const current = stateTransitions.get(transition.activityNodeId) || [];
       current.push(transition);
-      transitions.set(transition.activityNodeId, current);
+      stateTransitions.set(transition.activityNodeId, current);
     });
     if (!activities.length) {
       renderedViews.delete(container);
@@ -95,7 +128,7 @@
         : "Det finns inga processaktiviteter att visa."}</p>`;
       return { activityCount: 0, stateTransitionCount: 0 };
     }
-    const details = activityDetails(model, activities, transitions, options);
+    const details = activityDetails(model, activities, stateTransitions, options);
     const selectedDetail = details.find(detail => selectedTaskIds.has(detail.taskId)) || details[0];
     renderedViews.set(container, { details, english });
     container.innerHTML = `<div class="process-diagram-scroll" tabindex="0" role="group"
@@ -108,30 +141,37 @@
         const selected = selectedTaskIds.has(detail.taskId);
         const phase = detail.containers.phase?.title;
         const subtask = detail.containers.subtask?.title;
-        return `<li class="process-overview-step" data-process-node-id="${escape(detail.node.nodeId)}">
+        const decision = detail.node.nodeType === "decision";
+        return `<li class="process-overview-step${decision ? " process-overview-decision" : ""}"
+          data-process-node-id="${escape(detail.node.nodeId)}" data-process-decision="${decision}">
           <button type="button" class="process-overview-action"
-            data-process-task-id="${escape(detail.taskId)}" aria-pressed="${selected}">
-            <span class="process-overview-number" aria-hidden="true">${detail.index + 1}</span>
+            data-process-node-action="${escape(detail.node.nodeId)}"
+            ${detail.taskId ? `data-process-task-id="${escape(detail.taskId)}"` : ""}
+            aria-pressed="${selected}">
+            <span class="process-overview-number" aria-hidden="true"><span>${decision ? "?" : detail.index + 1}</span></span>
             <span class="process-overview-content">
               ${phase ? `<span class="process-overview-phase">${escape(phase)}</span>` : ""}
               ${subtask ? `<span class="process-overview-subtask">${escape(subtask)}</span>` : ""}
+              ${decision ? `<span class="process-overview-node-type">${english ? "Decision" : "Beslut"}</span>` : ""}
               <strong>${escape(plain(detail.node.title))}</strong>
               ${stateChanges ? `<span class="process-overview-state">${stateChanges}</span>` : ""}
+              ${routesMarkup(detail, english, true)}
             </span>
           </button>
         </li>`;
       }).join("")}</ol></div>${detailMarkup(selectedDetail, english)}`;
     return { activityCount: activities.length,
-      stateTransitionCount: [...transitions.values()].flat().length };
+      stateTransitionCount: [...stateTransitions.values()].flat().length };
   }
 
   function updateSelection(container, selectedTaskIds = []) {
     const selected = new Set(selectedTaskIds);
-    const actions = [...(container?.querySelectorAll?.("[data-process-task-id]") || [])];
+    const actions = [...(container?.querySelectorAll?.("[data-process-node-action]") || [])];
     actions.forEach(action => action.setAttribute("aria-pressed", String(
-      selected.has(action.dataset.processTaskId)
+      Boolean(action.dataset.processTaskId && selected.has(action.dataset.processTaskId))
     )));
-    const selectedActions = actions.filter(action => selected.has(action.dataset.processTaskId));
+    const selectedActions = actions.filter(action => action.dataset.processTaskId &&
+      selected.has(action.dataset.processTaskId));
     const view = renderedViews.get(container);
     const detail = view?.details.find(item => selected.has(item.taskId));
     const detailContainer = container?.querySelector?.("[data-process-overview-detail]");
@@ -139,5 +179,19 @@
     return selectedActions;
   }
 
-  return { containersFor, detailMarkup, render, taskIdFor, updateSelection };
+  function selectNode(container, nodeId) {
+    const view = renderedViews.get(container);
+    const detail = view?.details.find(item => item.node.nodeId === nodeId);
+    if (!detail) return false;
+    const actions = [...(container?.querySelectorAll?.("[data-process-node-action]") || [])];
+    actions.forEach(action => action.setAttribute("aria-pressed", String(
+      action.dataset.processNodeAction === nodeId
+    )));
+    const detailContainer = container?.querySelector?.("[data-process-overview-detail]");
+    if (detailContainer) detailContainer.outerHTML = detailMarkup(detail, view.english);
+    return true;
+  }
+
+  return { containersFor, detailMarkup, render, routeLabel, routesMarkup, selectNode,
+    taskIdFor, updateSelection };
 });

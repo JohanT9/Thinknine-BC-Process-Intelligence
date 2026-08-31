@@ -6428,17 +6428,24 @@ $("documentWorkspaceTab").addEventListener("click", () => {
   switchWorkspace("document");
 });
 $("processOverview").addEventListener("click", event => {
-  const action = event.target.closest?.("[data-process-task-id]");
-  if (action) activateProcessOverviewTask(action.dataset.processTaskId);
+  const action = event.target.closest?.("[data-process-node-action]");
+  if (!action) return;
+  if (action.dataset.processTaskId) {
+    activateProcessOverviewTask(action.dataset.processTaskId);
+  } else {
+    globalThis.T9ProcessOverviewView.selectNode(
+      $("processOverview"), action.dataset.processNodeAction
+    );
+  }
 });
 $("processOverview").addEventListener("keydown", event => {
-  const action = event.target.closest?.("[data-process-task-id]");
+  const action = event.target.closest?.("[data-process-node-action]");
   if (!action || !["ArrowLeft", "ArrowRight", "ArrowUp", "ArrowDown",
     "Home", "End"].includes(event.key)) {
     return;
   }
   const actions = [...$("processOverview").querySelectorAll(
-    "[data-process-task-id]"
+    "[data-process-node-action]"
   )];
   const current = actions.indexOf(action);
   const next = event.key === "Home" ? 0 : event.key === "End"

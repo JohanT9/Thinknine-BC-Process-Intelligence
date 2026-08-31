@@ -150,3 +150,8 @@ Review steps, selected steps are highlighted in both representations, and the
 overview supports arrow, Home and End keyboard navigation. The sequence is
 visualized as a directed, horizontally scrollable diagram with phase and
 subtask labels plus a detail panel for the selected activity.
+
+Explicit consultant-defined decisions now appear as distinct selectable nodes.
+Their stored route labels and destinations are visible both on the node and in
+the detail panel, while the ordinary linear connector is suppressed at the
+decision. No branch is inferred from routine UI interactions.

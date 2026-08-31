@@ -40,9 +40,50 @@ assert(container.innerHTML.includes('class="process-overview-detail"'));
 assert(container.innerHTML.includes("Försäljningsorder"));
 assert(container.innerHTML.includes("Frisläpp order"));
 assert(container.innerHTML.includes("Vald aktivitet"));
+assert(!container.innerHTML.includes('class="process-overview-routes compact"'));
 assert.strictEqual(view.containersFor(groupedModel, activityIds[1]).subtask.title,
   "Frisläpp order");
 assert(!container.innerHTML.includes("**"));
+
+const decisionId = processModel.stableId("manual-process-node", ["branching", "stock"]);
+const shipId = processModel.stableId("process-node",
+  [processModel.MODEL_VERSION, "branching", "step", "ship"]);
+const replenishId = processModel.stableId("process-node",
+  [processModel.MODEL_VERSION, "branching", "step", "replenish"]);
+const branchingModel = processModel.project({ recordingId: "branching",
+  steps: [{ taskId: "ship", instruction: "Leverera" },
+    { taskId: "replenish", instruction: "Fyll på lager" }], overrides: [{
+    type: "create-decision", processOverrideId: "decision-stock",
+    manualNodeId: "stock", title: "Finns varan i lager?", processOrder: 1
+  }, { type: "create-transition", fromNodeId: decisionId, toNodeId: shipId,
+    transitionType: "conditional", label: "Ja", condition: "stock-available"
+  }, { type: "create-transition", fromNodeId: decisionId, toNodeId: replenishId,
+    transitionType: "alternate", label: "Nej", condition: "stock-unavailable"
+  }] });
+const decisionContainer = { innerHTML: "" };
+view.render(decisionContainer, branchingModel, { locale: "sv-SE" });
+assert(decisionContainer.innerHTML.includes('data-process-decision="true"'));
+assert(decisionContainer.innerHTML.includes("Finns varan i lager?"));
+assert(decisionContainer.innerHTML.includes("Beslut"));
+assert(decisionContainer.innerHTML.includes("Ja"));
+assert(decisionContainer.innerHTML.includes("Nej"));
+assert(decisionContainer.innerHTML.includes("Leverera"));
+assert(decisionContainer.innerHTML.includes("Fyll på lager"));
+assert(decisionContainer.innerHTML.includes('data-process-transition-type="conditional"'));
+assert(decisionContainer.innerHTML.includes('data-process-transition-type="alternate"'));
+assert(!decisionContainer.innerHTML.includes(`data-process-task-id=""`));
+const decisionActionAttributes = {};
+const decisionAction = { dataset: { processNodeAction: decisionId },
+  setAttribute(name, value) { decisionActionAttributes[name] = value; } };
+const detailTarget = { outerHTML: "" };
+decisionContainer.querySelectorAll = () => [decisionAction];
+decisionContainer.querySelector = () => detailTarget;
+assert.strictEqual(view.selectNode(decisionContainer, decisionId), true);
+assert.strictEqual(decisionActionAttributes["aria-pressed"], "true");
+assert(detailTarget.outerHTML.includes("Valt beslut"));
+assert(detailTarget.outerHTML.includes("Vägar"));
+assert(detailTarget.outerHTML.includes("stock-available"));
+assert(detailTarget.outerHTML.includes("conditional"));
 const selectedAttributes = {};
 const selectedAction = { dataset: { processTaskId: "release" },
   setAttribute(name, value) { selectedAttributes[name] = value; } };
@@ -67,6 +108,7 @@ assert(dashboard.includes("function activateProcessOverviewTask(taskId"));
 assert(dashboard.includes('$("processOverview").addEventListener("click"'));
 assert(dashboard.includes('$("processOverview").addEventListener("keydown"'));
 assert(dashboard.includes("T9ProcessOverviewView.updateSelection"));
+assert(dashboard.includes("T9ProcessOverviewView.selectNode"));
 assert(dashboard.includes("resolvedHierarchy,"));
 assert(dashboard.includes('"ArrowLeft", "ArrowRight"'));
 console.log("Process Overview view tests passed.");

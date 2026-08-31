@@ -19,6 +19,11 @@
   subtask context, scales through horizontal scrolling and shows details for
   the selected activity.
 
+- Added explicit decision and alternate-route visualization to Process Overview.
+  Consultant-defined decision nodes now use a distinct decision treatment,
+  break the misleading linear connector, and expose each recorded label,
+  condition, transition type and destination without inferring missing paths.
+
 - Promoted documentation hierarchy, structural overrides, Process Model,
   Process Versioning and recording regeneration tests into the mandatory CI
   release gate.
