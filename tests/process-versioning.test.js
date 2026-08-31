@@ -99,6 +99,28 @@ const transitionDiff = versions.compareProcessVersions(firstModel,
   modifiedTransition);
 assert.equal(transitionDiff.summary.modifiedTransitions, 1);
 
+const observedState = JSON.parse(JSON.stringify(firstModel));
+observedState.stateTransitions = [{ stateTransitionId: "state-status",
+  activityNodeId: aId, factKey: "control:Status:value",
+  factKind: "control-value", before: { value: "Open" },
+  after: { value: "Released" }, sourceStepIds: ["a"],
+  sourceEventIds: ["event-a", "event-status"], provenance: "observed",
+  confidence: "observed", metadata: {} }];
+const stateDiff = versions.compareProcessVersions(firstModel, observedState);
+assert.equal(stateDiff.diffVersion, "1.1.0");
+assert.equal(stateDiff.summary.addedStateTransitions, 1);
+assert.equal(stateDiff.summary.changed, true);
+assert.equal(stateDiff.stateTransitionChanges[0].changeType,
+  "state-transition-added");
+assert.notEqual(versions.semanticFingerprint(firstModel),
+  versions.semanticFingerprint(observedState));
+const changedObservedState = JSON.parse(JSON.stringify(observedState));
+changedObservedState.stateTransitions[0].after.value = "Pending Approval";
+const modifiedStateDiff = versions.compareProcessVersions(observedState,
+  changedObservedState);
+assert.equal(modifiedStateDiff.summary.modifiedStateTransitions, 1);
+assert(modifiedStateDiff.stateTransitionChanges[0].changedFields.includes("after"));
+
 const boundaryChanged = JSON.parse(JSON.stringify(firstModel));
 boundaryChanged.startNodeIds = [aId];
 assert.equal(versions.compareProcessVersions(firstModel, boundaryChanged)

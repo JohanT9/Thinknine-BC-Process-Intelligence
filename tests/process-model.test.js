@@ -54,6 +54,52 @@ assert.equal(JSON.stringify(input), before, "Projection must not mutate inputs."
 assert.deepEqual(processModel.project(input), model, "Projection must be deterministic.");
 assert.equal(processModel.validate(model).valid, true);
 assert.equal(processModel.outline(model).length, 10);
+assert.equal(model.stateTransitionVersion, "1.0.0");
+assert.deepEqual(model.stateTransitions, []);
+
+const observedChange = { version: "1.0.0", status: "changed",
+  before: { facts: [] }, after: { facts: [] },
+  changes: [{ key: "control:Status:value", kind: "control-value",
+    before: { control: { identity: "Status", caption: "Status" }, value: "Open" },
+    after: { control: { identity: "Status", caption: "Status" }, value: "Released" },
+    sourceEventIds: ["event-release", "event-released"] }],
+  sourceEventIds: ["event-release", "event-released"] };
+const stateModelInput = { recordingId: "state-transition", steps: [{
+  taskId: "release", instruction: "Release order",
+  sourceStepIds: ["release-click", "released-status"],
+  sourceEventIds: ["event-release", "event-released"],
+  capturePackets: [{ packetId: "packet-release",
+    stateObservation: observedChange }, { packetId: "packet-release-copy",
+    stateObservation: observedChange }]
+}] };
+const stateModel = processModel.project(stateModelInput);
+const releaseNode = stateModel.nodes.find(node => node.title === "Release order");
+assert.equal(stateModel.stateTransitions.length, 1,
+  "Repeated packet evidence must not duplicate the same state transition.");
+assert.deepEqual(stateModel.stateTransitions[0], {
+  stateTransitionId: stateModel.stateTransitions[0].stateTransitionId,
+  activityNodeId: releaseNode.nodeId,
+  factKey: "control:Status:value", factKind: "control-value",
+  before: { control: { identity: "Status", caption: "Status" }, value: "Open" },
+  after: { control: { identity: "Status", caption: "Status" }, value: "Released" },
+  sourceStepIds: ["release-click", "released-status"],
+  sourceEventIds: ["event-release", "event-released"],
+  provenance: "observed", confidence: "observed",
+  metadata: { observationVersion: "1.0.0" }, futureFields: {}
+});
+assert.ok(stateModel.stateTransitions[0].stateTransitionId.startsWith(
+  "process-state-transition:"));
+assert.ok(Object.isFrozen(stateModel.stateTransitions[0]));
+assert.deepEqual(processModel.project(stateModelInput), stateModel,
+  "Observed state projection must be deterministic.");
+assert.equal(processModel.validate(stateModel).valid, true);
+
+const unchangedStateModel = processModel.project({ recordingId: "no-state-change",
+  steps: [{ taskId: "inspect", instruction: "Inspect order", capturePacket: {
+    stateObservation: { ...observedChange, status: "observed", changes: [] }
+  } }] });
+assert.deepEqual(unchangedStateModel.stateTransitions, [],
+  "Observed context without a proven change must not invent a transition.");
 
 const manualSteps = [{ taskId: "pre", manualStepId: "pre", manuallyAdded: true,
   provenance: "manual", stepType: "prerequisite", instruction: "Setup complete" },
@@ -138,6 +184,13 @@ const broken = processModel.validate({ ...model,
     toNodeId: model.endNodeIds[0], transitionType: "unknown", provenance: "manual" }] });
 assert.equal(broken.valid, false);
 assert(broken.diagnostics.some(value => value.code === "orphan-transition"));
+
+const brokenState = processModel.validate({ ...stateModel,
+  stateTransitions: [{ ...stateModel.stateTransitions[0],
+    activityNodeId: "missing-node" }] });
+assert.equal(brokenState.valid, false);
+assert(brokenState.diagnostics.some(value => value.code ===
+  "orphan-state-transition"));
 
 const profile = profiles.get(profiles.BUILT_IN_REGISTRY, "business-process");
 assert.equal(profile.processExpectations.relevance, "high");

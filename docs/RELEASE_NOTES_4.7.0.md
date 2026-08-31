@@ -1,5 +1,10 @@
 # BC Process Studio 4.7
 
+- Process Model now exposes directly observed before/after differences as versioned,
+  renderer-neutral state transitions attached to the responsible activity.
+  This establishes the deterministic foundation for state-aware process views
+  without guessing business meaning from captions or button names.
+
 - Search/Tell Me recording no longer produces an extra field-entry step after
   the complete search-and-open instruction. The retained step receives the
   actual search phrase from that evidence and keeps the result screenshot.

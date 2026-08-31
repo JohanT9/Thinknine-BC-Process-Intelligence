@@ -171,6 +171,11 @@ observed page, field, toggle, and dialog facts inside each Capture Packet. Exact
 differences are traceable to Canonical evidence; unknown values remain partial
 instead of being guessed or copied into expected-result text.
 
+Process Model projects those exact differences as immutable state transitions
+owned by the responsible activity. They retain Step/Event evidence and are
+created only from proven changes, never from captions, heuristics, or AI
+inference. See [Process Model](docs/PROCESS_MODEL.md).
+
 The focused
 [Interaction to Result correctness corpus](docs/INTERACTION_RESULT_CORRECTNESS.md)
 uses exact causal oracles for verified, error, self-result, adjacent-action,

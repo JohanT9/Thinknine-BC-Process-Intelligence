@@ -40,11 +40,12 @@ status and provenance remain separate.
 
 ## Semantic fingerprint
 
-The deterministic fingerprint includes nodes, semantic node fields, transitions,
-containment, process order, boundaries, manual process content, provenance, and
-stable traceability. It excludes timestamps, screenshot/annotation state, themes,
-layout, renderer/UI fields, and generated documentation wording. Manual or
-user-adjusted semantic titles remain meaningful.
+The deterministic fingerprint includes nodes, semantic node fields, flow
+transitions, observed state transitions, containment, process order, boundaries,
+manual process content, provenance, and stable traceability. It excludes
+timestamps, screenshot/annotation state, themes, layout, renderer/UI fields,
+and generated documentation wording. Manual or user-adjusted semantic titles
+remain meaningful.
 
 An attempted snapshot equal to the latest semantic fingerprint returns
 `identical-semantic-snapshot` and a calm “No process changes” result. A caller may
@@ -52,9 +53,10 @@ explicitly allow a metadata-only snapshot. Cache state is never authoritative.
 
 ## Process Diff model
 
-Diff schema and algorithm versions are `1.0.0`. A deterministic diff contains
-from/to identities, node, transition, container and metadata changes, structured
-counts, a deterministic non-AI summary, and future fields.
+Diff schema is `1.0.0`; algorithm version `1.1.0` adds observed state-transition
+comparison. A deterministic diff contains from/to identities, node, flow
+transition, state-transition, container and metadata changes, structured counts,
+a deterministic non-AI summary, and future fields.
 
 Node changes use `added`, `removed`, `modified`, `moved`, and `unchanged`.
 Transition changes use `transition-added`, `transition-removed`,
@@ -67,6 +69,12 @@ may match conservatively through a unique exact combination of Step, Semantic
 Action, and canonical Event references. Titles are never fuzzy-matched. Movement
 means the stable node changed process order, container, Section, or Subtask; it is
 not represented as removal plus addition.
+
+State changes use `state-transition-added`, `state-transition-removed`,
+`state-transition-modified`, and `state-transition-unchanged`, with category
+`state`. Comparison includes the owning activity, exact fact, before/after
+values, confidence, and evidence references. Older snapshots without the
+collection behave as an empty state-transition set.
 
 Transitions first match by identity, then by uniquely mapped endpoints. Type,
 condition, label, provenance, or semantic metadata changes are explicit. Storage

@@ -21,8 +21,9 @@ fields. Future presentation adapters can consume it without changing semantics.
 
 Schema and projection model versions are `1.0.0`. The top level contains stable
 model/recording identity, title/description, start/end references, nodes,
-transitions, subprocesses, metadata, provenance, timestamps, sparse overrides,
-orphaned overrides, and future fields. Unknown fields are retained.
+flow transitions, observed state transitions, subprocesses, metadata,
+provenance, timestamps, sparse overrides, orphaned overrides, and future fields.
+Unknown fields are retained.
 
 Nodes contain stable identity and type, content, Step/Subtask/Section/Event/
 Semantic Action references, manual source references, provenance, separate
@@ -34,6 +35,16 @@ Transitions contain stable identity, endpoints, type, label/condition, Event
 references, provenance, order, metadata, and future fields. Supported types are
 `sequence`, `conditional`, `alternate`, `return`, and `unknown`. This deliberately
 small taxonomy is not BPMN.
+
+Observed state transitions use their own `stateTransitions` collection and
+version `1.0.0`; they are not graph edges. Each transition belongs to the
+activity that caused it and contains the exact fact key/kind, before and after
+values, Step/Event evidence, provenance, and observation confidence. Examples
+include a page identity change, `Status: Open -> Released`, or a checkbox
+changing from false to true. Only a Capture Packet observation explicitly
+marked `changed` is projected. Equal, missing, partial, or merely inferred
+states never create a process state transition. Repeated packets carrying the
+same evidence are deterministically deduplicated.
 
 Generated identity hashes stable source identity and model version; array
 position is never identity. Equal resolved inputs, model version, and overrides
@@ -89,9 +100,10 @@ no fabricated evidence.
 The non-mutating validator reports duplicate identities, orphan transitions,
 accidental generated self-loops, missing boundaries, unreachable nodes,
 duplicate transitions, unresolved subprocess ownership, broken optional Step
-references, and orphaned overrides. Explicit manual cycles are permitted;
-generated linear recordings never gain cycles. Documentation Intelligence may
-surface diagnostics as advice but does not repair the graph.
+references, orphaned overrides, and incomplete, duplicated, or orphaned state
+transitions. Explicit manual cycles are permitted; generated linear recordings
+never gain cycles. Documentation Intelligence may surface diagnostics as advice
+but does not repair the graph.
 
 ## Profiles, planning, and future renderers
 

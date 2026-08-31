@@ -5,6 +5,7 @@
 })(typeof globalThis !== "undefined" ? globalThis : this, function () {
   const SCHEMA_VERSION = "1.0.0";
   const MODEL_VERSION = "1.0.0";
+  const STATE_TRANSITION_VERSION = "1.0.0";
   const NODE_TYPES = Object.freeze([
     "start", "activity", "decision", "end", "subprocess", "information"
   ]);
@@ -127,6 +128,69 @@
         ? String(input.parentSubprocessId) : null,
       provenance: input.provenance || "generated", metadata: clone(object(input.metadata)),
       futureFields: clone(object(input.futureFields)) });
+  }
+
+  function normalizeStateTransition(value = {}) {
+    const input = clone(object(value));
+    return deepFreeze({ ...input,
+      stateTransitionId: String(input.stateTransitionId || ""),
+      activityNodeId: String(input.activityNodeId || ""),
+      factKey: String(input.factKey || ""),
+      factKind: String(input.factKind || "unknown"),
+      before: clone(input.before), after: clone(input.after),
+      sourceStepIds: unique(input.sourceStepIds),
+      sourceEventIds: unique(input.sourceEventIds),
+      provenance: "observed",
+      confidence: input.confidence === "verified" ? "verified" : "observed",
+      metadata: clone(object(input.metadata)),
+      futureFields: clone(object(input.futureFields))
+    });
+  }
+
+  function stateObservations(step) {
+    const packets = step?.capturePackets?.length ? step.capturePackets
+      : step?.capturePacket ? [step.capturePacket] : [];
+    return [step?.stateObservation, ...packets.map(packet =>
+      packet?.stateObservation)].filter(Boolean);
+  }
+
+  function projectStateTransitions(entries, nodes, recordingId) {
+    const nodesById = new Map(nodes.map(node => [node.nodeId, node]));
+    const projected = [];
+    const identities = new Set();
+    for (const entry of entries) {
+      const id = stepId(entry.step);
+      const node = nodesById.get(stableId("process-node", [
+        MODEL_VERSION, recordingId, "step", id
+      ]));
+      if (!node) continue;
+      for (const observation of stateObservations(entry.step)) {
+        if (observation.status !== "changed") continue;
+        for (const change of observation.changes || []) {
+          if (!change?.key || change.before === undefined || change.after === undefined ||
+              JSON.stringify(change.before) === JSON.stringify(change.after)) continue;
+          const evidence = unique(change.sourceEventIds || observation.sourceEventIds);
+          const identity = [node.nodeId, change.key, ...evidence].join("\u001f");
+          if (identities.has(identity)) continue;
+          identities.add(identity);
+          projected.push(normalizeStateTransition({
+            stateTransitionId: stableId("process-state-transition", [
+              STATE_TRANSITION_VERSION, recordingId, identity
+            ]),
+            activityNodeId: node.nodeId,
+            factKey: change.key,
+            factKind: change.kind,
+            before: change.before,
+            after: change.after,
+            sourceStepIds: node.sourceStepIds,
+            sourceEventIds: evidence,
+            confidence: "observed",
+            metadata: { observationVersion: observation.version || null }
+          }));
+        }
+      }
+    }
+    return projected;
   }
 
   function normalizeOverride(value = {}, index = 0) {
@@ -336,6 +400,7 @@
     sequence: applied.nodes.length, processOrder: applied.nodes.length,
     metadata: { boundary: "neutral" } });
     const nodes = [start, ...applied.nodes, end];
+    const stateTransitions = projectStateTransitions(entries, applied.nodes, recordingId);
     const generatedTransitions = [];
     const ordered = nodes;
     for (let index = 0; index < ordered.length - 1; index += 1) {
@@ -365,7 +430,9 @@
       description: String(input.description || ""),
       startNodeIds: applied.startNodeIds || [start.nodeId],
       endNodeIds: applied.endNodeIds || [end.nodeId],
-      nodes, transitions, subprocesses: containers.subprocesses,
+      nodes, transitions, stateTransitions,
+      stateTransitionVersion: STATE_TRANSITION_VERSION,
+      subprocesses: containers.subprocesses,
       metadata: { processOrderSource: overrides.some(item =>
         item.type === "set-process-order" || item.type === "move-node")
         ? "override" : "presentation-order", ...(input.metadata || {}) },
@@ -383,8 +450,10 @@
     const diagnostics = [];
     const nodes = model?.nodes || [];
     const transitions = model?.transitions || [];
+    const stateTransitions = model?.stateTransitions || [];
     const nodeIds = new Set();
     const transitionIds = new Set();
+    const stateTransitionIds = new Set();
     const add = (code, severity, details = {}) => diagnostics.push({ code, severity,
       ...details });
     nodes.forEach(node => {
@@ -408,6 +477,23 @@
       if (pairs.has(pair)) add("duplicate-transition", "warning",
         { transitionId: value.transitionId });
       pairs.add(pair);
+    });
+    stateTransitions.forEach(value => {
+      if (!value.stateTransitionId || stateTransitionIds.has(value.stateTransitionId)) {
+        add("duplicate-state-transition-id", "error",
+          { stateTransitionId: value.stateTransitionId });
+      }
+      stateTransitionIds.add(value.stateTransitionId);
+      if (!nodeIds.has(value.activityNodeId)) add("orphan-state-transition", "error",
+        { stateTransitionId: value.stateTransitionId,
+          activityNodeId: value.activityNodeId });
+      if (!value.factKey || value.before === undefined || value.after === undefined) {
+        add("incomplete-state-transition", "error",
+          { stateTransitionId: value.stateTransitionId });
+      } else if (JSON.stringify(value.before) === JSON.stringify(value.after)) {
+        add("unchanged-state-transition", "warning",
+          { stateTransitionId: value.stateTransitionId });
+      }
     });
     if (!(model?.startNodeIds || []).length || model.startNodeIds.some(id => !nodeIds.has(id))) {
       add("missing-start", "error");
@@ -466,6 +552,8 @@
   }
 
   return { MODEL_VERSION, NODE_TYPES, OVERRIDE_TYPES, SCHEMA_VERSION,
+    STATE_TRANSITION_VERSION,
     TRANSITION_TYPES, deepFreeze, normalizeNode, normalizeOverride,
-    normalizeSubprocess, normalizeTransition, outline, project, stableId, validate };
+    normalizeStateTransition, normalizeSubprocess, normalizeTransition,
+    outline, project, stableId, validate };
 });

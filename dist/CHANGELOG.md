@@ -11,6 +11,11 @@
 
 ## Unreleased
 
+- Projected directly observed Capture Packet differences into immutable Process
+  Model state transitions. Each change is tied to the activity and exact Step/
+  Event evidence that caused it; repeated evidence is deduplicated, while
+  partial, unchanged, or inferred state never becomes a transition. Process
+  Model validation rejects incomplete or orphaned state transitions.
 - Consolidated a complete Search/Tell Me flow with its immediately repeated
   search-field entry. The redundant step is removed while its value and source
   evidence enrich the retained search instruction; result screenshots remain

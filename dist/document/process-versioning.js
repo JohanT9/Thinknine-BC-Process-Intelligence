@@ -5,7 +5,7 @@
 })(typeof globalThis !== "undefined" ? globalThis : this, function () {
   const VERSION_SCHEMA_VERSION = "1.0.0";
   const DIFF_SCHEMA_VERSION = "1.0.0";
-  const DIFF_VERSION = "1.0.0";
+  const DIFF_VERSION = "1.1.0";
   const STATUSES = Object.freeze(["draft", "review", "approved", "superseded"]);
   const PROVENANCE = Object.freeze([
     "manual-snapshot", "generated-baseline", "imported", "regenerated"
@@ -81,6 +81,18 @@
       metadata: semanticMetadata(value.metadata) };
   }
 
+  function semanticStateTransition(value) {
+    return { stateTransitionId: String(value.stateTransitionId || ""),
+      activityNodeId: String(value.activityNodeId || ""),
+      factKey: String(value.factKey || ""), factKind: String(value.factKind || "unknown"),
+      before: clone(value.before), after: clone(value.after),
+      sourceStepIds: unique(value.sourceStepIds),
+      sourceEventIds: unique(value.sourceEventIds),
+      provenance: value.provenance || "observed",
+      confidence: value.confidence || "observed",
+      metadata: semanticMetadata(value.metadata) };
+  }
+
   function semanticContainer(value) {
     const authored = ["manual", "user-adjusted"].includes(value.provenance);
     return { subprocessId: String(value.subprocessId || ""),
@@ -101,6 +113,8 @@
         a.nodeId.localeCompare(b.nodeId)),
       transitions: (model.transitions || []).map(semanticTransition).sort((a, b) =>
         a.transitionId.localeCompare(b.transitionId)),
+      stateTransitions: (model.stateTransitions || []).map(semanticStateTransition)
+        .sort((a, b) => a.stateTransitionId.localeCompare(b.stateTransitionId)),
       subprocesses: (model.subprocesses || []).map(semanticContainer).sort((a, b) =>
         a.subprocessId.localeCompare(b.subprocessId)),
       metadata: semanticMetadata(model.metadata) });
@@ -297,6 +311,36 @@
     return changes;
   }
 
+  function stateTransitionChanges(fromModel, toModel) {
+    const from = new Map((fromModel.stateTransitions || []).map(value =>
+      [value.stateTransitionId, value]));
+    const to = new Map((toModel.stateTransitions || []).map(value =>
+      [value.stateTransitionId, value]));
+    const changes = [];
+    for (const [id, value] of from) {
+      if (!to.has(id)) changes.push({ changeType: "state-transition-removed",
+        stateTransitionId: id, before: clone(value), categories: ["state"] });
+    }
+    for (const [id, value] of to) {
+      if (!from.has(id)) {
+        changes.push({ changeType: "state-transition-added", stateTransitionId: id,
+          after: clone(value), categories: ["state"] });
+        continue;
+      }
+      const left = semanticStateTransition(from.get(id));
+      const right = semanticStateTransition(value);
+      const changedFields = differences(left, right, ["activityNodeId", "factKey",
+        "factKind", "before", "after", "sourceStepIds", "sourceEventIds",
+        "provenance", "confidence", "metadata"]);
+      changes.push({ changeType: changedFields.length
+        ? "state-transition-modified" : "state-transition-unchanged",
+      stateTransitionId: id, changedFields,
+      ...(changedFields.length ? { before: clone(from.get(id)), after: clone(value) } : {}),
+      categories: changedFields.length ? ["state"] : [] });
+    }
+    return changes;
+  }
+
   function containerChanges(fromModel, toModel) {
     const from = new Map((fromModel.subprocesses || []).map(value => [value.subprocessId, value]));
     const to = new Map((toModel.subprocesses || []).map(value => [value.subprocessId, value]));
@@ -332,6 +376,8 @@
     const nodeResult = nodeChanges(from.processSnapshot, to.processSnapshot);
     const transitions = transitionChanges(from.processSnapshot, to.processSnapshot,
       nodeResult.matches);
+    const stateTransitions = stateTransitionChanges(from.processSnapshot,
+      to.processSnapshot);
     const containers = containerChanges(from.processSnapshot, to.processSnapshot);
     const nodes = nodeResult.changes;
     const fromSemantic = semanticSnapshot(from.processSnapshot);
@@ -349,6 +395,9 @@
       addedTransitions: count(transitions, "transition-added"),
       removedTransitions: count(transitions, "transition-removed"),
       modifiedTransitions: count(transitions, "transition-modified"),
+      addedStateTransitions: count(stateTransitions, "state-transition-added"),
+      removedStateTransitions: count(stateTransitions, "state-transition-removed"),
+      modifiedStateTransitions: count(stateTransitions, "state-transition-modified"),
       changedContainers: containers.filter(value => value.changeType !== "unchanged").length,
       modifiedMetadata: metadataChanges.length };
     const changed = Object.values(summary).some(Boolean);
@@ -357,7 +406,8 @@
     ]), schemaVersion: DIFF_SCHEMA_VERSION, diffVersion: DIFF_VERSION,
     fromProcessVersionId: from.processVersionId,
     toProcessVersionId: to.processVersionId, nodeChanges: nodes,
-    transitionChanges: transitions, containerChanges: containers,
+    transitionChanges: transitions, stateTransitionChanges: stateTransitions,
+    containerChanges: containers,
     metadataChanges, summary: { ...summary, changed,
       text: changed ? `${Object.values(summary).reduce((sum, value) =>
         sum + (Number(value) || 0), 0)} semantic process changes detected.` :
