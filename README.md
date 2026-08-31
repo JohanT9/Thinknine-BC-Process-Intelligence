@@ -219,6 +219,11 @@ Review Studio presents the dry-run as a detailed comparison of added, removed,
 changed, merged, split, and screenshot-changed Steps. Nothing is applied until
 the consultant explicitly approves the preview.
 
+When evidence maps a Step uniquely one-to-one, regeneration also retains the
+consultant's edited instruction, formatting, comment, and Step-owned Notes. The
+preview reports these preserved edits, while approvals and ambiguous or
+structural ownership continue to block unsafe apply.
+
 ## Process Versioning
 
 Consultants can create intentional immutable Process Model snapshots, detect

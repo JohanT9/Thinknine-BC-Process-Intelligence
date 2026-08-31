@@ -154,19 +154,25 @@ screenshot-changed Steps. The user must explicitly approve the preview; Cancel
 and Escape leave the Review unchanged. A blocked preview explains the safety
 reason and offers no apply action.
 
-Preview contract `1.1.0` stores a deterministic fingerprint of the complete
+Preview contract `1.2.0` stores a deterministic fingerprint of the complete
 Review state shown in the comparison. Apply recalculates that fingerprint and
 fails without mutation if another editor, window, or operation changed the
 Review while the preview was open. Object property insertion order does not
 affect the fingerprint.
+
+One-to-one Step mappings now preserve sparse instruction/comment overrides,
+formatted text runs, and Step-owned Notes in the Review integration. Override
+ownership and Note ownership are retargeted to the new generated Step while the
+fresh generated wording remains a separate baseline. The preview reports the
+number of preserved edits before approval. This is deterministic evidence-based
+retargeting, not matching by position or text.
 
 The preview reuses the already loaded current interpretation, replaces the
 generated Review baseline only after approval, and persists it before reporting
 success. It never changes Canonical Recording evidence and no new recording is
 required.
 
-The first UI integration is deliberately conservative: when consultant-owned
-Step edits, approvals, manual Steps, structure overrides, Notes, Annotations or
-manual hierarchy are present, apply is blocked instead of risking data loss.
-The engine-level reconciliation contract remains the owner of future safe
-retargeting for those Reviews. Regeneration never runs automatically on startup.
+The UI integration remains deliberately conservative. Approval state, non-unique
+Step mappings, manual Steps, structure overrides, non-retargetable Notes,
+Annotations, and manual hierarchy still block apply instead of risking data
+loss. Regeneration never runs automatically on startup.

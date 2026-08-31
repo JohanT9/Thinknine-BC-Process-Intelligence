@@ -1,5 +1,10 @@
 # BC Process Studio 4.7
 
+- Regeneration can now safely retain edited instructions, rich-text formatting,
+  comments, and Step-owned Notes when the original and regenerated Step have an
+  exact one-to-one evidence mapping. The preview shows how many edits are kept;
+  unsafe ownership still blocks apply.
+
 - Screenshot selection now understands the purpose of the completed semantic
   action. Lookup instructions favor the image showing the choice, verified
   actions favor the visible result, and dialog instructions retain the complete

@@ -11,6 +11,12 @@
 
 ## Unreleased
 
+- Enabled safe Review regeneration with consultant-edited instructions,
+  formatting, comments, and Step-owned Notes when canonical evidence provides a
+  unique one-to-one Step mapping. Preview 1.2.0 shows the number of preserved
+  edits; generated wording remains a separate baseline. Approvals, ambiguous
+  mappings, structure, manual Steps, and Annotations remain conservatively
+  blocked.
 - Added Screenshot Role Intent 1.0.0 and Screenshot Selection 1.4.0. The
   completed semantic action now determines whether the most useful evidence is
   a visible selection, committed result, action, or pre-close dialog. Verified

@@ -5,14 +5,17 @@
   const regenerationEngine = typeof module === "object" && module.exports
     ? require("../document/regenerate-from-recording")
     : root.T9RegenerateFromRecording;
-  const api = factory(reviewEngine, regenerationEngine);
+  const stepEditor = typeof module === "object" && module.exports
+    ? require("./step-editor") : root.T9StepEditor;
+  const api = factory(reviewEngine, regenerationEngine, stepEditor);
   if (typeof module === "object" && module.exports) module.exports = api;
   root.T9ReviewRegeneration = api;
 })(typeof globalThis !== "undefined" ? globalThis : this, function (
   reviewEngine,
-  regenerationEngine
+  regenerationEngine,
+  stepEditor
 ) {
-  const PREVIEW_VERSION = "1.1.0";
+  const PREVIEW_VERSION = "1.2.0";
 
   function clone(value) {
     return value === undefined ? undefined : JSON.parse(JSON.stringify(value));
@@ -48,16 +51,35 @@
     return error;
   }
 
-  function consultantState(review) {
+  function oneToOneTarget(stepMap, oldId) {
+    return stepMap?.mappings?.find(item => item.mappingType === "one-to-one" &&
+      item.oldStepIds.includes(String(oldId)))?.newStepIds[0] || null;
+  }
+
+  function noteOwnerId(note) {
+    if (note?.ownerType && note.ownerType !== "step") return null;
+    return String(note?.ownerStepId || note?.stepId || note?.ownerId || "");
+  }
+
+  function consultantState(review, stepMap) {
     const reasons = [];
     const tasks = array(review?.tasks);
-    if (tasks.some(task => task?.stepOverride || task?.userComment ||
-        task?.approved || task?.manualStepId || task?.provenance === "manual")) {
+    const edited = tasks.filter(task => task?.stepOverride || task?.userComment);
+    if (edited.some(task => !oneToOneTarget(stepMap, stepId(task)))) {
       reasons.push("step-edits");
     }
+    if (tasks.some(task => task?.approved)) reasons.push("approvals");
+    if (tasks.some(task => task?.manualStepId || task?.provenance === "manual")) {
+      reasons.push("manual-steps");
+    }
     if (array(review?.structureOverrides).length) reasons.push("structure-overrides");
-    if (array(review?.manualSteps).length) reasons.push("manual-steps");
-    if (array(review?.stepNotes).length) reasons.push("notes");
+    if (array(review?.manualSteps).length && !reasons.includes("manual-steps")) {
+      reasons.push("manual-steps");
+    }
+    if (array(review?.stepNotes).some(note => {
+      const ownerId = noteOwnerId(note);
+      return ownerId && !oneToOneTarget(stepMap, ownerId);
+    })) reasons.push("notes");
     if (array(review?.annotations?.screenshotSets).some(set =>
       array(set?.items).length > 0)) reasons.push("annotations");
     const hierarchy = review?.hierarchy || {};
@@ -84,6 +106,38 @@
     return Object.freeze({ stepId: stepId(step),
       instruction: String(step?.instruction || step?.description || ""),
       screenshotIds: Object.freeze(screenshotIds(step)) });
+  }
+
+  function retargetOverride(value, targetStepId) {
+    if (!value) return null;
+    return { ...clone(value), stepId: targetStepId,
+      targetStepId: value.targetStepId !== undefined ? targetStepId : undefined };
+  }
+
+  function reconcileTaskEdits(currentReview, freshReview, stepMap) {
+    const oldById = new Map(array(currentReview?.tasks).map(task =>
+      [stepId(task), task]));
+    const oldByTarget = new Map(stepMap.mappings.filter(item =>
+      item.mappingType === "one-to-one").map(item =>
+      [item.newStepIds[0], oldById.get(item.oldStepIds[0])]));
+    const tasks = array(freshReview?.tasks).map(task => {
+      const old = oldByTarget.get(stepId(task));
+      if (!old || (!old.stepOverride && !old.userComment)) return clone(task);
+      return stepEditor.resolve({ ...clone(task),
+        stepOverride: retargetOverride(old.stepOverride, stepId(task)),
+        userComment: old.userComment || "",
+        approved: false,
+        reviewStatus: "unreviewed" });
+    });
+    const stepNotes = array(currentReview?.stepNotes).map(note => {
+      const ownerId = noteOwnerId(note);
+      const target = ownerId ? oneToOneTarget(stepMap, ownerId) : null;
+      if (!target) return clone(note);
+      const key = note.ownerStepId !== undefined ? "ownerStepId" :
+        note.stepId !== undefined ? "stepId" : "ownerId";
+      return { ...clone(note), [key]: target };
+    });
+    return { tasks, stepNotes };
   }
 
   function changeSet(previousTasks, nextTasks, stepMap) {
@@ -130,7 +184,7 @@
     const freshReview = reviewEngine.createReview(session, generatedTasks || []);
     const stepMap = regenerationEngine.mapSteps(previousTasks,
       freshReview.generatedTasks);
-    const reasons = consultantState(currentReview);
+    const reasons = consultantState(currentReview, stepMap);
     if (previousTasks.length > 0 && freshReview.generatedTasks.length === 0) {
       reasons.push("empty-generated-result");
     }
@@ -138,6 +192,7 @@
       item.mappingType === "many-to-one"
     ).reduce((count, item) => count + Math.max(0, item.oldStepIds.length - 1), 0);
     const changes = changeSet(previousTasks, freshReview.generatedTasks, stepMap);
+    const reconciled = reconcileTaskEdits(currentReview, freshReview, stepMap);
     return Object.freeze({
       previewVersion: PREVIEW_VERSION,
       baseReviewFingerprint: fingerprint(currentReview),
@@ -152,9 +207,13 @@
       screenshotChangeCount: changes.screenshotChanges.length,
       splitStepCount: changes.splits.length,
       mergeStepCount: changes.merges.length,
+      preservedStepEditCount: reconciled.tasks.filter(task =>
+        task.stepOverride || task.userComment).length,
       changeSet: changes,
       mappings: stepMap.mappings,
-      freshReview
+      freshReview: Object.freeze({ ...freshReview,
+        tasks: Object.freeze(reconciled.tasks),
+        stepNotes: Object.freeze(reconciled.stepNotes) })
     });
   }
 
@@ -189,5 +248,6 @@
     });
   }
 
-  return { PREVIEW_VERSION, apply, consultantState, fingerprint, preview };
+  return { PREVIEW_VERSION, apply, consultantState, fingerprint, preview,
+    reconcileTaskEdits };
 });

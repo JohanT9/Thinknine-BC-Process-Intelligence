@@ -1,4 +1,5 @@
 const assert = require("assert");
+const fs = require("fs");
 const review = require("../src/review/review-studio");
 const regeneration = require("../src/review/review-regeneration");
 
@@ -19,9 +20,9 @@ const freshTasks = [{ taskId: "manual-price-path",
   instruction: "VÃ¤lj Ã…tgÃ¤rder â†’ Funktion â†’ Manuellt pris.",
   sourceEventIds: ["event-1", "event-2", "event-3", "event-4"] }];
 const preview = regeneration.preview(oldReview, session, freshTasks);
-assert.strictEqual(regeneration.PREVIEW_VERSION, "1.1.0");
-assert.strictEqual(preview.previewVersion, "1.1.0");
-assert.match(preview.baseReviewFingerprint, /^review:1\.1\.0:[0-9a-f]{8}$/);
+assert.strictEqual(regeneration.PREVIEW_VERSION, "1.2.0");
+assert.strictEqual(preview.previewVersion, "1.2.0");
+assert.match(preview.baseReviewFingerprint, /^review:1\.2\.0:[0-9a-f]{8}$/);
 assert.strictEqual(preview.blocked, false);
 assert.strictEqual(preview.previousStepCount, 4);
 assert.strictEqual(preview.nextStepCount, 1);
@@ -64,6 +65,57 @@ const blocked = regeneration.preview(edited, session, freshTasks);
 assert.strictEqual(blocked.blocked, true);
 assert(blocked.blockingReasons.includes("step-edits"));
 assert.throws(() => regeneration.apply(edited, blocked), /consultant-owned state/);
+
+const preservedEdit = review.createReview(session, [{ taskId: "old-customer",
+  instruction: "Select customer.", sourceEventIds: ["event-customer"] }]);
+preservedEdit.tasks[0].stepOverride = {
+  overrideId: "override-customer", stepId: "old-customer",
+  schemaVersion: "1.0.0", fields: {
+    instruction: "Select the customer's account.",
+    instructionRuns: [{ text: "Select ", bold: false },
+      { text: "the customer's account", bold: true }, { text: "." }],
+    comment: "Customer-specific note",
+    commentRuns: [{ text: "Customer-specific note", italic: true }]
+  }
+};
+preservedEdit.tasks[0].userComment = "Customer-specific note";
+preservedEdit.stepNotes = [{ noteId: "note-customer", ownerType: "step",
+  ownerId: "old-customer", content: "Customer-specific note" }];
+const preservedPreview = regeneration.preview(preservedEdit, session, [{
+  taskId: "new-customer", instruction: "Choose customer.",
+  sourceEventIds: ["event-customer"]
+}]);
+assert.strictEqual(preservedPreview.blocked, false);
+assert.strictEqual(preservedPreview.preservedStepEditCount, 1);
+assert.strictEqual(preservedPreview.freshReview.tasks[0].stepOverride.stepId,
+  "new-customer");
+assert.strictEqual(preservedPreview.freshReview.stepNotes[0].ownerId,
+  "new-customer");
+const preservedResult = regeneration.apply(preservedEdit, preservedPreview,
+  { now: "2026-08-27T10:30:00.000Z" });
+assert.strictEqual(preservedResult.tasks[0].instruction,
+  "Select the customer's account.");
+assert.deepStrictEqual(preservedResult.tasks[0].instructionRuns,
+  preservedEdit.tasks[0].stepOverride.fields.instructionRuns);
+assert.strictEqual(preservedResult.tasks[0].userComment,
+  "Customer-specific note");
+assert.deepStrictEqual(preservedResult.tasks[0].commentRuns,
+  preservedEdit.tasks[0].stepOverride.fields.commentRuns);
+assert.strictEqual(preservedResult.generatedTasks[0].instruction,
+  "Choose customer.", "Fresh generated wording must remain separate.");
+assert.strictEqual(preservedResult.stepNotes[0].ownerId, "new-customer");
+
+const approved = review.createReview(session, [{ taskId: "approved-step",
+  instruction: "Approved", sourceEventIds: ["approved-event"], approved: true }]);
+const approvedPreview = regeneration.preview(approved, session, [{
+  taskId: "approved-next", instruction: "Updated",
+  sourceEventIds: ["approved-event"] }]);
+assert.strictEqual(approvedPreview.blocked, true,
+  "Approval must not silently carry across changed generated content.");
+assert(approvedPreview.blockingReasons.includes("approvals"));
+assert(fs.readFileSync("src/ui/dashboard.js", "utf8").includes(
+  '[preview.preservedStepEditCount, "Bevarade redigeringar"]'),
+"Preview should make preserved consultant work visible before apply.");
 
 const empty = regeneration.preview(oldReview, session, []);
 assert.strictEqual(empty.blocked, true,

@@ -6961,7 +6961,8 @@ function showRegenerationPreview(preview) {
     [preview.addedStepCount, "Tillagda"],
     [preview.removedStepCount, "Borttagna"],
     [preview.changedStepCount, "\u00c4ndrade"],
-    [preview.screenshotChangeCount, "Nya bilder"]
+    [preview.screenshotChangeCount, "Nya bilder"],
+    [preview.preservedStepEditCount, "Bevarade redigeringar"]
   ];
   $("regenerationPreviewSummary").innerHTML = stats.map(([value, label]) =>
     `<div class="regeneration-preview-stat"><strong>${Number(value) || 0}</strong>` +
