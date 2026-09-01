@@ -69,6 +69,12 @@ misleading. This plan, matrix, and formulas are the baseline instrument. The nex
 milestone should execute it and publish sanitized aggregate results plus defect
 references.
 
+The executable gate is now available in
+[Product pilot validation](PRODUCT_PILOT_VALIDATION.md). It validates the full
+coverage matrix, reconciles counts, blocks unsafe customer-data fields and
+calculates numerator/denominator-based KPIs. This does not replace the required
+real Business Central run.
+
 ## Freeze list
 
 The following mature foundations should receive no speculative refactoring

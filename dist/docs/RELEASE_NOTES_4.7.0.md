@@ -1,5 +1,13 @@
 # BC Process Studio 4.7
 
+- A deterministic pilot-validation gate now turns sanitized real Business
+  Central worksheets into transparent product KPIs. It requires at least 24
+  recordings and the complete standard BC, language, Aptean and React coverage
+  matrix; invalid counts and unsafe customer-data fields fail validation. The
+  synthetic automated test verifies the instrument and is explicitly not
+  presented as a real product baseline. See
+  [Product pilot validation](PRODUCT_PILOT_VALIDATION.md).
+
 - Review Studio can now save immutable process checkpoints and visually compare
   saved versions with each other or with the current Process Model. The
   read-only view highlights added, removed, modified and moved activities plus

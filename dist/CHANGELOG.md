@@ -11,6 +11,11 @@
 
 ## Unreleased
 
+- Added an executable privacy-bounded product pilot validation gate for 24–30
+  real Business Central recordings. It verifies coverage and reconciled counts,
+  rejects unsafe workbook fields, and reports transparent KPI numerators,
+  denominators and values without inventing a product baseline.
+
 - Added immutable Process Model checkpoints and a read-only visual comparison
   in Review Studio. Consultants can compare saved versions with each other or
   with the current process; duplicate semantic snapshots are ignored and the

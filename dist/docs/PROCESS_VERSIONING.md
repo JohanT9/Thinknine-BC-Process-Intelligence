@@ -123,9 +123,9 @@ title similarity, and have a 5,000-node regression. There is no DOM, image load,
 document generation, network, upload, AI interpretation, or snapshot logging.
 Unknown future fields are preserved through central normalization.
 
-No graphical or colour-based diff UI, approval workflow, branching version
-management, destructive restore, or visual renderer is implemented. The
-structured model is ready for an accessible future history or visual diff view.
+An accessible read-only visual diff is implemented in Review Studio. Approval
+workflow, branching version management and destructive restore remain outside
+the current scope.
 
 ## Regeneration interaction
 
