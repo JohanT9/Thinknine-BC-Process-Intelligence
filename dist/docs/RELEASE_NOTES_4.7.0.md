@@ -1,5 +1,12 @@
 # BC Process Studio 4.7
 
+- Process Overview now exports both a deterministic, machine-readable Process
+  Model JSON and a standalone accessible SVG diagram. Decisions, alternate
+  routes, route labels and observed state changes follow the same validated
+  model shown in Review. SVG output excludes raw evidence identifiers, while
+  invalid models fail safely before download. See
+  [Process and diagram export](PROCESS_EXPORT.md).
+
 - Consultants can now regenerate only selected Review Steps. A scoped preview
   shows instruction and screenshot changes before apply; unselected Steps stay
   byte-for-byte unchanged. Stable identity, safe consultant edits and undo/redo

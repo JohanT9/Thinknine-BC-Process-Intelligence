@@ -11,6 +11,11 @@
 
 ## Unreleased
 
+- Added local export of the validated Process Model as deterministic JSON and
+  of the visible process semantics as an accessible standalone SVG diagram.
+  Diagram export includes decisions, route labels and observed state changes
+  while excluding raw evidence identifiers.
+
 - Added safe selective regeneration for selected Review Steps with an explicit
   preview, exact one-to-one mapping requirement, stale-preview protection and
   reversible generated-state history. Unselected Steps are unchanged and

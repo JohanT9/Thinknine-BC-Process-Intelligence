@@ -3369,6 +3369,7 @@ async function exportActiveReviewToWord() {
 let activeReviewSession = null;
 let activeReview = null;
 let activeReviewModel = null;
+let activeProcessModel = null;
 let activeReviewSelection = globalThis.T9ReviewSelection.create();
 let activeReviewEdit = null;
 let reviewReturnFocus = null;
@@ -6150,7 +6151,12 @@ function renderReview() {
 
 function renderProcessOverview() {
   const container = $("processOverview");
-  if (!container || !activeReview || !activeReviewSession) return;
+  if (!container || !activeReview || !activeReviewSession) {
+    activeProcessModel = null;
+    if ($("exportProcessModel")) $("exportProcessModel").disabled = true;
+    if ($("exportProcessDiagram")) $("exportProcessDiagram").disabled = true;
+    return;
+  }
   try {
     const resolvedHierarchy = resolveReviewHierarchyForDisplay(
       activeReview.tasks || [], activeReview.hierarchy
@@ -6162,15 +6168,39 @@ function renderProcessOverview() {
       resolvedHierarchy,
       overrides: activeReview.processOverrides || []
     });
+    activeProcessModel = model;
+    $("exportProcessModel").disabled = false;
+    $("exportProcessDiagram").disabled = false;
     globalThis.T9ProcessOverviewView.render(container, model, {
       locale: activeReview.documentFields?.documentLanguage || "sv-SE",
       selectedTaskIds: activeReviewSelection.selectedIds,
       reviewTasks: activeReview.tasks || []
     });
   } catch (error) {
+    activeProcessModel = null;
+    $("exportProcessModel").disabled = true;
+    $("exportProcessDiagram").disabled = true;
     container.innerHTML = `<p class="muted">${escapeHtml(uiTf(
       "process.overviewError", { detail: error.message }
     ))}</p>`;
+  }
+}
+
+async function exportActiveProcess(kind) {
+  if (!activeProcessModel || !activeReviewSession) return;
+  try {
+    const exported = globalThis.T9ProcessExport.create(activeProcessModel, {
+      title: activeReviewSession.name,
+      language: activeReview.documentFields?.documentLanguage || "sv-SE"
+    });
+    const file = kind === "diagram" ? exported.diagram : exported.json;
+    await downloadBlob(new Blob([file.content], { type: file.mimeType }),
+      file.filename);
+    show(kind === "diagram"
+      ? uiT("Processdiagrammet har exporterats.")
+      : uiT("Processen har exporterats."));
+  } catch (error) {
+    show(uiTf("process.exportError", { detail: error.message }), true);
   }
 }
 
@@ -6340,6 +6370,7 @@ async function closeReview() {
   activeReviewSession = null;
   activeReview = null;
   activeReviewModel = null;
+  activeProcessModel = null;
   activeReviewSelection = globalThis.T9ReviewSelection.create();
   activeReviewEdit = null;
   activeDocumentPipelineCache.clear();
@@ -6495,6 +6526,10 @@ $("processOverview").addEventListener("click", event => {
     );
   }
 });
+$("exportProcessModel").addEventListener("click", () =>
+  exportActiveProcess("model"));
+$("exportProcessDiagram").addEventListener("click", () =>
+  exportActiveProcess("diagram"));
 $("processOverview").addEventListener("keydown", event => {
   const action = event.target.closest?.("[data-process-node-action]");
   if (!action || !["ArrowLeft", "ArrowRight", "ArrowUp", "ArrowDown",

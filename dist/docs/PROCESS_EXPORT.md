@@ -1,0 +1,34 @@
+# Process and diagram export
+
+The Process Overview can export the active validated Process Model in two
+complementary formats.
+
+## Process JSON
+
+**Export process** creates a deterministic UTF-8 JSON file containing the
+versioned Thinknine Process Model. It preserves activities, decisions,
+transitions, subprocess ownership, observed state transitions, provenance and
+traceability. This is the machine-readable source for integrations and future
+comparison workflows.
+
+Because the model can contain recorded captions and traceability identifiers,
+the JSON file must be handled with the same care as the process document. The
+file is created only after an explicit consultant action and is downloaded
+locally.
+
+## Process diagram SVG
+
+**Export diagram** creates a standalone, accessible SVG. It renders:
+
+- start, end, activity, information and decision nodes;
+- sequence, conditional and alternate transitions;
+- transition labels;
+- up to two observed state changes per activity.
+
+The SVG contains presentation content but deliberately excludes raw event and
+evidence identifiers. XML content is escaped and the output is deterministic,
+so equal Process Models produce equal files. The diagram can be opened in a
+browser, placed in a presentation, or converted by another graphics tool.
+
+Both exporters validate the Process Model before producing a file. Invalid
+models fail safely and show an error without downloading partial output.

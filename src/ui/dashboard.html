@@ -555,6 +555,10 @@ table{width:100%;border-collapse:collapse}th,td{text-align:left;padding:9px;bord
       <details id="processOverviewDisclosure" class="process-overview-card">
         <summary id="processOverviewTitle" data-i18n="process.overview">Processöversikt</summary>
         <p class="muted process-overview-help" data-i18n="process.overviewHelp">Visar dokumenterade aktiviteter och observerade statusförändringar.</p>
+        <div class="process-overview-export" role="group" aria-label="Exportera process">
+          <button id="exportProcessModel" type="button" class="secondary" disabled>Exportera process</button>
+          <button id="exportProcessDiagram" type="button" class="secondary" disabled>Exportera diagram</button>
+        </div>
         <div id="processOverview" role="region" aria-labelledby="processOverviewTitle"></div>
       </details>
       <nav id="reviewHierarchy" aria-label="Dokumenthierarki"></nav>
@@ -767,6 +771,7 @@ table{width:100%;border-collapse:collapse}th,td{text-align:left;padding:9px;bord
 <script src="document/document-library.js"></script>
 <script src="document/document-batch-operations.js"></script>
 <script src="exporters/word-export-pipeline.js"></script>
+<script src="exporters/process-export.js"></script>
 <script src="exporters/word-exporter-docx.bundle.js"></script>
 <script src="review/review-move.js"></script>
 <script src="review/review-merge.js"></script>

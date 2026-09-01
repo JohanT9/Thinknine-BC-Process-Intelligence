@@ -264,3 +264,4 @@ dialog::backdrop { background: rgb(0 0 0 / 40%) !important; }
   :root { --focusWidth: 3px; }
   .app-shell-nav a[aria-current="page"] { border-bottom-color: Highlight; }
 }
+.process-overview-export{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 12px}
