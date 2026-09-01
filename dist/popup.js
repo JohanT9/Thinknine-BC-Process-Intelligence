@@ -211,11 +211,14 @@ $("startBug").addEventListener("click", () => startRecording("bug-report"));
 $("languageSwitch").addEventListener("click", switchUiLocale);
 
 let pendingBugRecording = false;
+let completedRecordingId = null;
 
-function openCompletionDialog() {
+function openCompletionDialog(session) {
+  completedRecordingId = session?.id || null;
+  updateText($("completedRecordingName"), session?.name || "");
   const dialog = $("completionDialog");
   if (!dialog.open) dialog.showModal();
-  $("openLibraryAfterRecording").focus();
+  $("openDocumentationAfterRecording").focus();
 }
 
 function stayAfterRecording() {
@@ -223,9 +226,17 @@ function stayAfterRecording() {
   showMessage(t("recorder.savedLibrary"));
 }
 
-function openLibraryAfterRecording() {
+function openDocumentationAfterRecording() {
   $("completionDialog").close();
-  chrome.runtime.openOptionsPage();
+  if (!completedRecordingId) {
+    chrome.runtime.openOptionsPage();
+    return;
+  }
+  chrome.tabs.create({
+    url: chrome.runtime.getURL(
+      `dashboard.html?openReview=${encodeURIComponent(completedRecordingId)}`
+    )
+  });
 }
 
 async function finishRecording(name, documentLanguage) {
@@ -245,7 +256,7 @@ async function finishRecording(name, documentLanguage) {
     showMessage(pendingBugRecording
       ? t("recorder.reportOpened") : t("recorder.stopped"));
     await refresh();
-    if (!pendingBugRecording) openCompletionDialog();
+    if (!pendingBugRecording) openCompletionDialog(response.session);
   } catch (error) {
     showMessage(error.message, true);
   }
@@ -320,7 +331,8 @@ $("stop").addEventListener("click", async () => {
 $("cancelName").addEventListener("click", () => $("nameDialog").close());
 $("discardRecording").addEventListener("click", discardActiveRecording);
 $("stayAfterRecording").addEventListener("click", stayAfterRecording);
-$("openLibraryAfterRecording").addEventListener("click", openLibraryAfterRecording);
+$("openDocumentationAfterRecording").addEventListener("click",
+  openDocumentationAfterRecording);
 $("nameForm").addEventListener("submit", event => {
   event.preventDefault();
   const name = $("recordingName").value.trim();

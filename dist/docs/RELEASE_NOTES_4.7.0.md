@@ -269,3 +269,12 @@ or På/Av values.
   reset action without changing the current search or grouping preference.
 - Document cards use a compact metadata line, limit long tag collections and
   keep modification information beside the open action.
+
+# Faster recording completion
+
+- The recorder popup and naming dialog have more room for names, language help
+  and clear actions.
+- **Continue recording**, **Save and stop** and **Delete recording** replace
+  ambiguous cancel wording.
+- After saving a process recording, **Open documentation** deep-links to that
+  exact Review. **Not now** keeps the user in the recorder.

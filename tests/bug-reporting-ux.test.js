@@ -21,9 +21,10 @@ assert.match(popupLogic, /recorder\.errorDetailsCaptured/);
 assert.match(uiTranslations, /Business Central-felet.*fångats/);
 assert.match(popupLogic, /T9_FINISH_BUG_RECORDING/);
 assert.match(popup, /id="nameDialog"/);
-assert.match(popup, /id="cancelName"[^>]*>Avbryt<\/button>/);
-assert.doesNotMatch(popup, /id="cancelName"[^>]*>Fortsätt spela in<\/button>/);
-assert.match(popup, /id="discardRecording"[^>]*>Avbryt inspelning<\/button>/);
+assert.match(popup,
+  /id="cancelName"[^>]*[\s\S]*?>Fortsätt spela in<\/button>/);
+assert.match(popup,
+  /id="discardRecording"[^>]*[\s\S]*?>Ta bort inspelningen<\/button>/);
 assert.match(popupLogic, /type: "T9_CANCEL_RECORDING"/);
 assert.match(popupLogic, /okänt meddelande/);
 assert.match(popupLogic, /discardWithLegacyBackground\(\)/);

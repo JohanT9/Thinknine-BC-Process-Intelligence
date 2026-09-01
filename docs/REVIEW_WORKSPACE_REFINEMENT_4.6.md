@@ -109,3 +109,12 @@ theme, favourite, recent and date constraints use one progressive disclosure.
 An active count keeps hidden filter state visible, and Reset Filters clears
 constraints without clearing the search query or the user's grouping choice.
 Cards preserve all actionable metadata while using a compact reading order.
+
+## Recording completion handoff (4.7)
+
+The popup preserves the recording while the stop dialog is open and names each
+outcome explicitly. A successful process stop returns the stable session ID;
+the primary completion action opens `dashboard.html?openReview=<sessionId>`.
+Dashboard initialization resolves the ID only after its local session/library
+state is loaded, removes the one-time query parameter and opens the matching
+Review. Missing or active sessions fail safely without guessing another Review.

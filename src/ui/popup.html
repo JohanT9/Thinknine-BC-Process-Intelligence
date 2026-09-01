@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>BC Process Recorder — BC Process Studio</title>
 <style>
-body{margin:0;width:350px;font-family:"Segoe UI",Arial,sans-serif;background:#f7f8fa;color:#1f2933}
+body{margin:0;width:390px;font-family:"Segoe UI",Arial,sans-serif;background:#f7f8fa;color:#1f2933}
 header{position:relative;background:#111827;color:#fff;padding:16px 58px 12px 18px}
 .brand{font-size:11px;letter-spacing:.22em;opacity:.75}
 h1{font-size:19px;margin:4px 0 0}.version{font-size:11px;font-weight:400;opacity:.7}
@@ -22,7 +22,7 @@ dl{display:grid;grid-template-columns:90px 1fr;gap:5px;font-size:12px}dt{font-we
 .technical-tools{margin-top:4px}.technical-tools summary{cursor:pointer;font-size:12px;font-weight:600;margin-bottom:8px}.technical-tools button{margin-top:4px}
 .mode-grid{display:grid;gap:10px}.mode-card{text-align:left;padding:13px}.mode-card strong,.mode-card span{display:block}.mode-card span{font-weight:400;font-size:12px;margin-top:4px}.hint{font-size:12px;color:#52606d}.captured{padding:8px;background:#ecfdf3;color:#166534;border-radius:5px;font-size:12px}
 .live-card{margin:12px 0;padding:10px;border:1px solid #cbd2d9;border-radius:7px;background:#fff}.live-card h2{font-size:14px;margin:0 0 8px}.live-grid{grid-template-columns:92px 1fr;margin:0}.live-ok{color:#166534}.live-warning{margin:8px 0 0;padding:8px;border-radius:5px;background:#fff7ed;color:#9a3412;font-size:12px}.live-warning[hidden]{display:none}
-dialog{width:calc(100% - 20px);max-width:330px;box-sizing:border-box;border:1px solid #8392a5;border-radius:8px;padding:20px}dialog::backdrop{background:rgba(15,23,42,.55)}dialog form{margin:0}dialog h2{margin:0 0 10px}.name-fields{display:grid;gap:16px;margin-top:18px}.name-field label{margin:0 0 6px}.document-language-help{margin:9px 0 2px;line-height:1.45}dialog menu{display:flex;flex-wrap:wrap;gap:8px;padding:16px 0 0;margin:0}dialog menu button{margin:0;flex:1}.discard-recording{flex-basis:100%}
+dialog{width:calc(100% - 24px);max-width:366px;box-sizing:border-box;border:1px solid #8392a5;border-radius:8px;padding:22px}dialog::backdrop{background:rgba(15,23,42,.55)}dialog form{margin:0}dialog h2{margin:0 0 8px;font-size:20px}.name-fields{display:grid;gap:14px;margin-top:18px}.name-field label{margin:0 0 6px}.document-language-help{margin:10px 0 0;line-height:1.45}dialog menu{display:flex;flex-wrap:wrap;gap:8px;padding:18px 0 0;margin:0}dialog menu button{margin:0;flex:1}.discard-recording{flex-basis:100%}.completion-recording{margin:14px 0;padding:10px 12px;border-left:4px solid #008489;background:#eefafa}.completion-dialog menu{display:grid}.completion-dialog menu button{width:100%}
 </style>
 <link rel="stylesheet" href="design-system.css">
 </head>
@@ -95,20 +95,26 @@ dialog{width:calc(100% - 20px);max-width:330px;box-sizing:border-box;border:1px 
     <menu>
       <button id="cancelName" type="button" class="debug"
         title="Avbryt stopp och fortsätt spela in"
-        data-i18n-title="recorder.cancelStopTitle">Avbryt</button>
-      <button id="confirmName" type="submit" class="primary">Spara och stoppa</button>
-      <button id="discardRecording" type="button" class="danger discard-recording">Avbryt inspelning</button>
+        data-i18n-title="recorder.cancelStopTitle"
+        data-i18n="recorder.continueRecording">Fortsätt spela in</button>
+      <button id="confirmName" type="submit" class="primary"
+        data-i18n="recorder.saveAndStop">Spara och stoppa</button>
+      <button id="discardRecording" type="button" class="danger discard-recording"
+        data-i18n="recorder.discardRecording">Ta bort inspelningen</button>
     </menu>
   </form>
 </dialog>
-<dialog id="completionDialog" aria-labelledby="completionDialogTitle"
+<dialog id="completionDialog" class="completion-dialog" aria-labelledby="completionDialogTitle"
   aria-describedby="completionDialogHelp">
   <form method="dialog">
     <h2 id="completionDialogTitle">Inspelningen är klar</h2>
-    <p id="completionDialogHelp" class="hint" data-i18n="recorder.completionHelp">Vill du öppna Dokumentbiblioteket och fortsätta arbeta med dokumentationen?</p>
+    <p id="completionDialogHelp" class="hint" data-i18n="recorder.completionHelp">Vill du öppna dokumentationen och börja granska den?</p>
+    <p class="completion-recording"><strong id="completedRecordingName"></strong></p>
     <menu>
-      <button id="stayAfterRecording" type="button" class="debug">Inte nu</button>
-      <button id="openLibraryAfterRecording" type="button" class="primary">Öppna Dokumentbiblioteket</button>
+      <button id="openDocumentationAfterRecording" type="button" class="primary"
+        data-i18n="recorder.openDocumentation">Öppna dokumentationen</button>
+      <button id="stayAfterRecording" type="button" class="debug"
+        data-i18n="recorder.notNow">Inte nu</button>
     </menu>
   </form>
 </dialog>

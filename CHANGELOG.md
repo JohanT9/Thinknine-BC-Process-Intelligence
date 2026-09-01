@@ -11,6 +11,11 @@
 
 ## Unreleased
 
+- Improved the recorder popup and completion flow. The stop dialog has more
+  space and unambiguous continue/save/delete actions; completed process
+  recordings can now open their exact Review directly instead of requiring a
+  second lookup in the Document Library.
+
 - Simplified the Document Library around search and sort, moving secondary
   filters into one disclosure with an active-filter count and one-click reset.
   Cards now present metadata, tags, recency and the open action in a more

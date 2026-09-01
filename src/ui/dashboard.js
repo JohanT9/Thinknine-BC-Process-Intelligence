@@ -6645,6 +6645,21 @@ async function loadSessions() {
   }
 }
 
+async function openRequestedReview() {
+  const url = new URL(globalThis.location.href);
+  const projectId = url.searchParams.get("openReview");
+  if (!projectId) return false;
+  url.searchParams.delete("openReview");
+  globalThis.history.replaceState({}, "", url.pathname + url.search + url.hash);
+  const session = documentLibrarySessions.get(projectId);
+  if (!session || session.status === "recording") {
+    show(uiT("Den begärda dokumentationen kunde inte öppnas."), true);
+    return false;
+  }
+  await openReview(session);
+  return true;
+}
+
 $("documentationProfile").addEventListener("change", event => {
   applyProfile(event.target.value, true);
 });
@@ -7742,14 +7757,24 @@ async function initializeDashboard() {
     );
   }
 
+  let sessionsLoaded = false;
   try {
     await loadSessions();
+    sessionsLoaded = true;
   } catch (error) {
     console.error("T9 loadSessions failed", error);
     show(
       "Sessionerna kunde inte läsas. Öppna debugpanelen för mer information.",
       true
     );
+  }
+  if (sessionsLoaded) {
+    try {
+      await openRequestedReview();
+    } catch (error) {
+      console.error("T9 openRequestedReview failed", error);
+      show(uiT("Den begärda dokumentationen kunde inte öppnas."), true);
+    }
   }
 }
 
