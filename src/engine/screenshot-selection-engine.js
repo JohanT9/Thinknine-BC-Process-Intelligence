@@ -8,6 +8,7 @@
   const SELECTION_VERSION = "1.4.0";
   const CAPTURE_ROLE_VERSION = "1.0.0";
   const ROLE_INTENT_VERSION = "1.0.0";
+  const QUALITY_VERSION = "1.0.0";
   const CAPTURE_ROLES = Object.freeze(["menu-open", "selection-visible",
     "result-visible", "dialog-before-close", "dialog-closed", "action-visible",
     "focus-only", "before-value", "context"]);
@@ -274,6 +275,53 @@
     return value !== JSON.stringify(["", null, null, "", ""]) &&
       value === signature(right);
   }
+  function qualitySummary(evaluations, selected, mode, reasons) {
+    const ranked = [...evaluations].sort((left, right) =>
+      right.score - left.score || left.index - right.index);
+    const selectedEvaluation = evaluations.find(item =>
+      candidateId(item.candidate) === selected);
+    const runnerUp = ranked.find(item => item !== selectedEvaluation) || null;
+    const selectedScore = selectedEvaluation?.score ?? null;
+    const runnerUpScore = runnerUp?.score ?? null;
+    const scoreMargin = selectedScore === null || runnerUpScore === null
+      ? null : selectedScore - runnerUpScore;
+    let qualityLevel = "unresolved";
+    let reviewRecommended = true;
+    let qualityReason = "no-selected-candidate";
+    if (selected && mode === "manual") {
+      qualityLevel = "manual";
+      reviewRecommended = false;
+      qualityReason = "consultant-selected";
+    } else if (selected && mode === "annotation-safe") {
+      qualityLevel = "protected";
+      reviewRecommended = false;
+      qualityReason = "annotation-preserved";
+    } else if (selected && mode === "fallback") {
+      qualityLevel = "low";
+      qualityReason = "fallback-selection";
+    } else if (selected && selectedScore !== null &&
+        selectedScore >= 80 && (scoreMargin === null || scoreMargin >= 40)) {
+      qualityLevel = "high";
+      reviewRecommended = false;
+      qualityReason = "clear-evidence-margin";
+    } else if (selected && selectedScore !== null && selectedScore >= 20 &&
+        (scoreMargin === null || scoreMargin >= 10)) {
+      qualityLevel = "medium";
+      reviewRecommended = false;
+      qualityReason = "sufficient-evidence-margin";
+    } else if (selected) {
+      qualityLevel = "low";
+      qualityReason = "weak-or-close-evidence";
+    }
+    if (reasons.includes("near-duplicate-stable-order") && selected) {
+      qualityLevel = "medium";
+      reviewRecommended = false;
+      qualityReason = "equivalent-visual-evidence";
+    }
+    return freeze({ qualityVersion: QUALITY_VERSION, qualityLevel,
+      reviewRecommended, qualityReason, selectedScore, runnerUpScore,
+      scoreMargin });
+  }
   function select(options = {}) {
     const stepGroup = options.stepGroup || null;
     const inputCandidates = options.candidates;
@@ -359,6 +407,14 @@
         reasons: item.rejected.length ? [...item.rejected] : selected
           ? [`lower-priority-than:${selected}`] : ["not-selected"]
       }));
+    const quality = qualitySummary(evaluations, selected, mode, reasons);
+    const candidateEvaluations = evaluations.map(item => ({
+      screenshotAssetId: candidateId(item.candidate),
+      selected: candidateId(item.candidate) === selected,
+      score: item.score,
+      reasons: [...item.reasons],
+      rejectedReasons: [...item.rejected]
+    }));
     const result = freeze({
       selectionId: `screenshot-selection:${idFingerprint}`,
       schemaVersion: SCHEMA_VERSION, selectionVersion: SELECTION_VERSION,
@@ -372,6 +428,7 @@
       selectedPacketEvidenceRole: selected ? scoped.find(candidate =>
         candidateId(candidate) === selected)?.packetEvidenceRole || null : null,
       selectionReasons: [...new Set(reasons)], rejectedCandidates,
+      candidateEvaluations, ...quality,
       manualOverride: manual || null, fallbackUsed, preserveAllAnnotated,
       preserveExistingCandidates
     });
@@ -386,7 +443,7 @@
   }
   function normalizeSelection(value) { if (!value || Number(value.schemaVersion) !== SCHEMA_VERSION) throw new Error("Unsupported Screenshot Selection schema."); return freeze(clone(value)); }
   return { SCHEMA_VERSION, SELECTION_VERSION, CAPTURE_ROLE_VERSION,
-    ROLE_INTENT_VERSION,
+    ROLE_INTENT_VERSION, QUALITY_VERSION,
     CAPTURE_ROLES, classifyCaptureRole, evaluate, normalizeCandidate,
     normalizeCandidates, applyCapturePacketEvidence, roleIntent,
     normalizeSelection, select };

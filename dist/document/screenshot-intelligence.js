@@ -425,8 +425,23 @@
       selectionResult: result,
       candidateScreenshotAssetIds: result.candidateScreenshotAssetIds,
       sourceEventIds: result.sourceEventIds,
-      candidates: candidates.map(candidate => ({ screenshotRef: candidate.screenshotRef,
-        score: null, reasons: [], rejectedReasons: [], metadata: candidate })),
+      qualityVersion: result.qualityVersion,
+      qualityLevel: result.qualityLevel,
+      reviewRecommended: result.reviewRecommended,
+      qualityReason: result.qualityReason,
+      selectedScore: result.selectedScore,
+      runnerUpScore: result.runnerUpScore,
+      scoreMargin: result.scoreMargin,
+      candidates: candidates.map(candidate => {
+        const evaluation = result.candidateEvaluations.find(item =>
+          item.screenshotAssetId === candidate.screenshotAssetId);
+        return { screenshotRef: candidate.screenshotRef,
+          score: evaluation?.score ?? null,
+          selected: Boolean(evaluation?.selected),
+          reasons: [...(evaluation?.reasons || [])],
+          rejectedReasons: [...(evaluation?.rejectedReasons || [])],
+          metadata: candidate };
+      }),
       reasons,
       rejectedReasons: Object.fromEntries(result.rejectedCandidates.map(item => {
         const candidate = candidates.find(value =>

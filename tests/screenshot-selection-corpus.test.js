@@ -53,12 +53,23 @@ for (const { sample, selected } of manual) {
   assert.strictEqual(selected, sample.expected, sample.id);
 }
 assert(ambiguous.every(item => item.selected === null));
+assert(ambiguous.every(item => item.result.qualityLevel === "unresolved" &&
+  item.result.reviewRecommended));
+assert(results.every(item => item.result.qualityVersion === "1.0.0"));
+assert(results.every(item => item.result.candidateEvaluations.length ===
+  item.result.candidateScreenshotAssetIds.length));
+assert(results.filter(item => item.result.qualityLevel === "low")
+  .every(item => item.result.reviewRecommended));
+assert(results.filter(item => item.result.qualityLevel === "high")
+  .every(item => !item.result.reviewRecommended));
 assert.strictEqual(captureFailures.length, 1);
 assert.strictEqual(selectionFailures.length, 0);
 assert.strictEqual(baselineCorrect, 14);
 assert.strictEqual(afterCorrect, 17);
 assert.strictEqual(results.find(item => item.sample.id ===
   "annotated-consultant-choice").result.selectionMode, "annotation-safe");
+assert.strictEqual(results.find(item => item.sample.id ===
+  "annotated-consultant-choice").result.reviewRecommended, false);
 assert.strictEqual(results.find(item => item.sample.id ===
   "legacy-single-screenshot").selected, "legacy-only");
 
@@ -69,6 +80,11 @@ console.log(`After: ${afterCorrect} / ${eligible.length} automatically correct (
 console.log(`Capture failures: ${captureFailures.length}`);
 console.log(`Selection failures after correction: ${selectionFailures.length}`);
 console.log(`Ambiguous candidates: ${ambiguous.length}; manual override expected: ${manual.length}`);
+for (const qualityLevel of ["high", "medium", "low", "manual", "protected",
+  "unresolved"]) {
+  console.log(`Quality ${qualityLevel}: ${results.filter(item =>
+    item.result.qualityLevel === qualityLevel).length}`);
+}
 for (const reason of ["previous-step screenshot", "focus-only screenshot",
   "pre-value screenshot", "after-navigation screenshot", "wrong control",
   "wrong dialog state", "stale screenshot", "transient UI", "missing capture",

@@ -39,6 +39,30 @@ normalized event identities, kind, Capture Packet evidence role and preference,
 annotations, semantic role intent, and relevant stability/context signals.
 Random values and array positions alone are never identities.
 
+## Measurable selection quality
+
+Quality contract `1.0.0` makes the deterministic ranking measurable without
+presenting its score as a statistical probability. Every result exposes:
+
+- the selected candidate's raw evidence score;
+- the runner-up score and their score margin;
+- every candidate's positive and rejected reason codes;
+- a quality level: `high`, `medium`, `low`, `manual`, `protected`, or
+  `unresolved`; and
+- `reviewRecommended` plus one stable explanation reason.
+
+`high` requires both strong positive evidence and a clear margin. `medium`
+requires sufficient evidence and separation. A fallback, weak/close ranking or
+missing winner recommends review. Manual choices and annotation-protected images
+are identified explicitly instead of being described as automatic confidence.
+The thresholds are deterministic policy boundaries, not learned values.
+
+Review Studio shows this as a compact, expandable **Automatic image selection**
+status next to the screenshot. The explanation uses plain Swedish or English;
+the expandable metrics retain score and margin for diagnosis. This advisory
+presentation is computed from the cached Semantic Document presentation and
+does not run Theme, Planner, media decoding or Word export while Review opens.
+
 ## Semantic role intent
 
 Role Intent `1.0.0` connects the completed semantic action to screenshot
@@ -189,8 +213,9 @@ image is reused.
 
 Results expose reasons such as `primary-event`, `same-control`,
 `committed-value`, `selected-row`, `confirmed-toggle-state`, and `stable-ui-state`.
-Rejected candidates contain explicit metadata reasons, not fake confidence
-percentages. Sensitive values are not copied into explanations.
+Rejected candidates contain explicit metadata reasons and raw deterministic
+scores, not fake confidence percentages. Sensitive values are not copied into
+explanations.
 
 Semantic decisions add reasons such as `role-intent:selection-visible` or reject
 a candidate with `role-intent-mismatch:result-visible`, making the choice

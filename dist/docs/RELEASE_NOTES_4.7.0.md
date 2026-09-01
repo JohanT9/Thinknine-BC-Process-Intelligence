@@ -1,5 +1,13 @@
 # BC Process Studio 4.7
 
+- Screenshot selection is now measurable and explainable. The immutable result
+  includes candidate scores, runner-up margin, a versioned quality level and an
+  explicit review recommendation. Review Studio shows a compact localized
+  status with an expandable reason and metrics. Manual choices and annotated
+  images are identified separately, and scores are never presented as
+  statistical confidence. The Review calculation reuses the cached document
+  presentation without invoking Word or layout planning.
+
 - Control Add-in and React capture now has an executable real-browser
   validation scenario. Headless Edge runs the production recorder listeners
   against React-shaped controls, capture-phase events stopped by application

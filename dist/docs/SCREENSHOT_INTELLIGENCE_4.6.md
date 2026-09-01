@@ -76,9 +76,11 @@ steps or changes workflow semantics.
 Selection uses metadata only and executes before Planner. Immutable document and
 candidate identities cache results per profile; mutable inputs are not cached.
 Explanations expose candidate inputs, selection, internal reasons, rejection
-reasons and manual preservation to tests/development without normal-UI clutter.
-Their structured reason codes are suitable for a future plain-language,
-accessible presentation but are not currently shown to consultants.
+reasons and manual preservation. In 4.7 the adapter also carries the versioned
+quality level, selected score, runner-up score, score margin and review
+recommendation into Review Studio. Consultants see a compact localized summary
+and can expand it for the plain-language reason and metrics. The result remains
+renderer-neutral and advisory.
 
 ## Before-and-after assessment
 

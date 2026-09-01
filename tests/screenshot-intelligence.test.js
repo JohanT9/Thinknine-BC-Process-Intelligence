@@ -252,6 +252,13 @@ assert.strictEqual(pipeline.screenshotComponents(legacy.plan).length, 2);
 const prepared = pipeline.create({ review, session, screenshotCandidates: realShaped });
 assert.strictEqual(prepared.screenshotSelections[0].selectedScreenshotRef,
   "screenshots/000042.png");
+assert.strictEqual(prepared.screenshotSelections[0].qualityVersion, "1.0.0");
+assert.notStrictEqual(prepared.screenshotSelections[0].qualityLevel,
+  "unresolved");
+assert.strictEqual(typeof prepared.screenshotSelections[0].selectedScore,
+  "number");
+assert(prepared.screenshotSelections[0].candidates.every(candidate =>
+  typeof candidate.score === "number"));
 const assetById = new Map(prepared.semanticDocument.assets.map(asset =>
   [asset.assetId, asset]));
 const planRefs = pipeline.screenshotComponents(prepared.plan)

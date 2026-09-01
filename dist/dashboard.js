@@ -3404,6 +3404,8 @@ const activeDocumentPipelineCache = globalThis.T9WorkspaceController
   .createRevisionCache();
 const activeDocumentPresentationCache = globalThis.T9WorkspaceController
   .createRevisionCache();
+const activeScreenshotQualityCache = globalThis.T9WorkspaceController
+  .createRevisionCache();
 let documentViewState = globalThis.T9DocumentWorkspaceExperience.load(
   globalThis.localStorage
 );
@@ -5200,6 +5202,33 @@ function documentInstructionPresentationsByTask() {
   return result;
 }
 
+function screenshotQualityByTask() {
+  return activeScreenshotQualityCache.get([
+    activeReviewModel,
+    activeReview,
+    workspaceState.revision,
+    activeDocumentProfileId
+  ], () => {
+    const result = new Map();
+    try {
+      const presentation = createActiveDocumentPresentation();
+      const profile = documentProfiles().find(value =>
+        value.profileId === activeDocumentProfileId) || documentProfiles()[0];
+      const selection = globalThis.T9ScreenshotIntelligence.select(
+        presentation.presentationDocument,
+        { candidates: screenshotCandidatesFor(activeReviewModel, activeReview),
+          profile }
+      );
+      selection.selections.forEach(value => {
+        if (value.taskId) result.set(value.taskId, value);
+      });
+    } catch {
+      // Screenshot quality is advisory and must never block Review rendering.
+    }
+    return result;
+  });
+}
+
 function reviewInstructionPresentation(task, documentPresentations = null) {
   const sourceText = String(task?.instruction || "");
   try {
@@ -5560,6 +5589,7 @@ function renderReviewContent() {
   const displayTasks = reviewTasksForDisplay(activeReview);
   const tasks = displayTasks.tasks;
   const documentPresentations = documentInstructionPresentationsByTask();
+  const screenshotQualities = screenshotQualityByTask();
   const progress = globalThis.T9Review.progress(activeReview);
   const hierarchyState = resolveReviewHierarchyForDisplay(
     tasks, activeReview.hierarchy
@@ -5630,6 +5660,14 @@ function renderReviewContent() {
     const commentRuns = globalThis.T9TextFormat.normalizeInstructionRuns(
       task.commentRuns, task.userComment || ""
     );
+    const screenshotQuality = screenshotQualities.get(task.taskId);
+    const qualityLevel = screenshotQuality?.qualityLevel || "";
+    const qualityMetrics = screenshotQuality?.selectedScore === null ||
+      screenshotQuality?.selectedScore === undefined ? "" :
+      `${uiT("review.imageScore")}: ${screenshotQuality.selectedScore}` +
+      (screenshotQuality.scoreMargin === null ||
+        screenshotQuality.scoreMargin === undefined ? "" :
+        ` · ${uiT("review.imageMargin")}: ${screenshotQuality.scoreMargin}`);
 
     card.innerHTML = `
       <div class="review-number" role="gridcell">${visibleIndex + 1}</div>
@@ -5752,6 +5790,14 @@ function renderReviewContent() {
                   task.observedResult, applicationSettings.uiLocale
                 ))}</p>`
           : ""}
+        ${screenshotQuality ? `<details class="review-screenshot-quality"
+          data-quality="${escapeHtml(qualityLevel)}">
+          <summary>${uiT("review.imageSelection")}: ${uiT(
+            `review.imageQuality.${qualityLevel}`
+          )}</summary>
+          <p>${uiT(`review.imageReason.${screenshotQuality.qualityReason}`)}</p>
+          ${qualityMetrics ? `<p class="metrics">${escapeHtml(qualityMetrics)}</p>` : ""}
+        </details>` : ""}
         ${images.map((image, imageIndex) =>
           `<div class="review-screenshot">
             <div class="review-image-stage" data-review-image-index="${imageIndex}">
@@ -6293,6 +6339,7 @@ async function closeReview() {
   activeReviewEdit = null;
   activeDocumentPipelineCache.clear();
   activeDocumentPresentationCache.clear();
+  activeScreenshotQualityCache.clear();
   workspaceState = globalThis.T9WorkspaceController.create();
   documentWorkspaceSync = null;
   cancelAnimationFrame(documentViewFrame);

@@ -159,6 +159,14 @@ assert.ok(
   "Review and Document workspaces must reuse one revision-bound document pipeline."
 );
 assert.ok(
+  dashboard.includes("function screenshotQualityByTask()") &&
+    dashboard.includes("activeScreenshotQualityCache.get") &&
+    dashboard.includes("review.imageSelection") &&
+    dashboard.includes("screenshotQuality.qualityReason") &&
+    dashboardHtml.includes(".review-screenshot-quality"),
+  "Review must expose cached, explainable screenshot-selection quality."
+);
+assert.ok(
   dashboard.includes("businessSteps,\n    sessionGraph, confidenceResult } = model;") &&
     dashboard.includes("JSON.stringify(sessionGraph, null, 2)") &&
     dashboard.includes("response.session,\n          finalBusinessTasks,\n          knowledgeQuality"),

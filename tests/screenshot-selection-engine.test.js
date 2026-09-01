@@ -37,9 +37,18 @@ assert.strictEqual(quantity.schemaVersion, 1);
 assert.strictEqual(quantity.selectionVersion, "1.4.0");
 assert.strictEqual(quantity.captureRoleVersion, "1.0.0");
 assert.strictEqual(quantity.roleIntentVersion, "1.0.0");
+assert.strictEqual(quantity.qualityVersion, "1.0.0");
 assert.strictEqual(quantity.selectedScreenshotAssetId, "shot-commit");
 assert.strictEqual(quantity.selectedCaptureRole, "result-visible");
 assert.ok(quantity.selectionReasons.includes("primary-event"));
+assert.strictEqual(quantity.qualityLevel, "high");
+assert.strictEqual(quantity.reviewRecommended, false);
+assert(quantity.selectedScore > quantity.runnerUpScore);
+assert.strictEqual(quantity.scoreMargin,
+  quantity.selectedScore - quantity.runnerUpScore);
+assert.strictEqual(quantity.candidateEvaluations.length, 3);
+assert.strictEqual(quantity.candidateEvaluations.filter(item =>
+  item.selected).length, 1);
 
 const semanticSelectionGroup = group({ stepGroupId: "semantic-customer",
   groupKind: "lookup-interaction", primarySourceEventId: "event:result",
@@ -234,6 +243,8 @@ const manual = engine.select({ stepGroup: quantityGroup,
 assert.strictEqual(manual.selectedScreenshotAssetId, "shot-focus");
 assert.strictEqual(manual.selectionMode, "manual");
 assert.deepStrictEqual(manual.selectionReasons, ["manual-override"]);
+assert.strictEqual(manual.qualityLevel, "manual");
+assert.strictEqual(manual.reviewRecommended, false);
 
 const annotated = engine.select({ stepGroup: quantityGroup, candidates: [
   candidate("shot-item", "event:item", "row-selection"),
@@ -252,6 +263,8 @@ const multipleAnnotated = engine.select({ stepGroup: quantityGroup, candidates: 
 ] });
 assert.strictEqual(multipleAnnotated.selectedScreenshotAssetId, null);
 assert.strictEqual(multipleAnnotated.preserveAllAnnotated, true);
+assert.strictEqual(multipleAnnotated.qualityLevel, "unresolved");
+assert.strictEqual(multipleAnnotated.reviewRecommended, true);
 
 const duplicates = engine.select({ stepGroup: group({ screenshotAssetIds: ["same"] }),
   candidates: [candidate("same", "event:commit", "value-change"),
@@ -262,6 +275,8 @@ const none = engine.select({ stepGroup: group({ sourceEventIds: [],
   screenshotAssetIds: [] }), candidates: [] });
 assert.strictEqual(none.selectedScreenshotAssetId, null);
 assert.ok(none.selectionReasons.includes("no-valid-candidate"));
+assert.strictEqual(none.qualityLevel, "unresolved");
+assert.strictEqual(none.reviewRecommended, true);
 
 const legacy = engine.select({ candidates: [candidate("legacy", "", "")],
   existingSelection: "legacy" });
