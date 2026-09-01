@@ -101,3 +101,11 @@ editor. Compact nodes expose Step order, title and review state. Selecting a
 node activates its stable Review task identity; changing the Review selection
 updates and horizontally reveals the matching node. Detailed routes and
 observed state changes are rendered once in the selected-node detail panel.
+
+## Document Library scanning (4.7)
+
+The default library surface prioritizes search and sorting. Profile, language,
+theme, favourite, recent and date constraints use one progressive disclosure.
+An active count keeps hidden filter state visible, and Reset Filters clears
+constraints without clearing the search query or the user's grouping choice.
+Cards preserve all actionable metadata while using a compact reading order.

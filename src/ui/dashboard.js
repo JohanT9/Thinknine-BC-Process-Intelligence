@@ -3503,8 +3503,9 @@ function fillLibraryFilter(id, values, selected) {
 }
 
 function renderDocumentLibrary() {
+  const options = libraryOptions();
   const matches = globalThis.T9DocumentLibrary.query(
-    documentLibraryIndex, libraryOptions()
+    documentLibraryIndex, options
   );
   const records = matches.slice(0, DOCUMENT_LIBRARY_RENDER_LIMIT);
   visibleDocumentLibraryRecords = records;
@@ -3526,7 +3527,28 @@ function renderDocumentLibrary() {
     : records.length === 1
     ? uiT("library.oneShown")
     : uiTf("library.manyShown", { count: records.length });
+  const filterCount = view.activeFilterCount(options);
+  $("libraryFilterCount").hidden = filterCount === 0;
+  $("libraryFilterCount").textContent = String(filterCount);
+  $("libraryResetFilters").disabled = filterCount === 0;
+  $("libraryFilterDisclosure").querySelector("summary").setAttribute(
+    "aria-label", filterCount
+      ? uiTf("library.activeFilters", { count: filterCount })
+      : uiT("library.filters")
+  );
   renderLibraryBatchToolbar();
+}
+
+function resetDocumentLibraryFilters() {
+  for (const id of ["libraryProfileFilter", "libraryThemeFilter",
+    "libraryLanguageFilter", "libraryCreatedFrom", "libraryCreatedTo",
+    "libraryModifiedFrom", "libraryModifiedTo"]) {
+    $(id).value = "";
+  }
+  $("libraryFavouriteFilter").checked = false;
+  $("libraryRecentFilter").checked = false;
+  renderDocumentLibrary();
+  $("libraryFilterDisclosure").querySelector("summary").focus();
 }
 
 function rebuildDocumentLibraryIndex() {
@@ -7407,6 +7429,8 @@ for (const id of ["librarySearch", "libraryProfileFilter",
   $(id)?.addEventListener(id === "librarySearch" ? "input" : "change",
     renderDocumentLibrary);
 }
+$("libraryResetFilters").addEventListener("click",
+  resetDocumentLibraryFilters);
 $("librarySearch").addEventListener("keydown", event => {
   if (event.key !== "Escape" || !event.currentTarget.value) return;
   event.preventDefault();

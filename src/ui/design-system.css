@@ -163,6 +163,21 @@ tbody tr:hover { background: var(--colorBrandSubtle); }
   border-color: var(--colorBrandPrimary) !important;
   outline-color: rgb(0 132 137 / 22%) !important;
 }
+.library-primary-controls{display:grid;grid-template-columns:minmax(280px,1fr) minmax(170px,240px);gap:var(--space12);align-items:end;margin:var(--space12) 0}
+.library-primary-controls label{margin:0}.library-primary-controls input,.library-primary-controls select{width:100%}
+.library-filter-disclosure{margin:var(--space8) 0 var(--space12)}
+.library-filter-disclosure>summary{display:inline-flex;align-items:center;gap:var(--space8);padding:7px 10px;border:1px solid var(--colorBorderDefault);border-radius:var(--radiusMedium);background:var(--colorBackgroundSurface);font-weight:600;cursor:pointer}
+.library-filter-count{min-width:20px;padding:1px 6px;border-radius:999px;background:var(--colorBrandPrimary);color:#fff;font-size:12px;text-align:center}
+.library-filter-panel{display:grid;grid-template-columns:repeat(3,minmax(170px,1fr));gap:var(--space12);margin-top:var(--space8);padding:var(--space12);border:1px solid var(--colorBorderDefault);background:var(--colorBackgroundSubtle)}
+.library-filter-panel label{margin:0}.library-filter-panel input,.library-filter-panel select{width:100%}
+.library-filter-options{grid-column:1/-1;display:flex;flex-wrap:wrap;gap:var(--space16)}
+.library-filter-options label{display:inline-flex;align-items:center;gap:var(--space8)}
+.library-filter-options input{width:auto}.library-filter-actions{grid-column:1/-1;display:flex;justify-content:flex-end}
+.library-card{display:flex;flex-direction:column;gap:var(--space8)}
+.library-card-heading{min-height:30px}.library-card-meta{display:flex;flex-wrap:wrap;gap:4px 10px;color:var(--colorTextSecondary);font-size:12px}
+.library-card-meta .library-profile{font-size:12px}.library-card-status{font-weight:700;color:#6b4f00}
+.library-card .library-tags{margin:0}.library-card-footer{display:flex;align-items:center;justify-content:space-between;gap:var(--space8);margin-top:auto;padding-top:var(--space8);border-top:1px solid var(--colorBorderSubtle);font-size:12px}
+.library-card-footer button{flex:0 0 auto;margin:0}
 .review-progress { height: 4px !important; border-radius: 0 !important; }
 .review-progress-bar { background: var(--colorBrandPrimary) !important; }
 .review-next-action:not(:disabled) {
@@ -261,6 +276,9 @@ dialog::backdrop { background: rgb(0 0 0 / 40%) !important; }
   .app-shell-context { display: none; }
   .review-card { grid-template-columns: 36px minmax(0, 1fr) !important; }
   .review-actions { grid-column: 1 / -1; }
+  .library-primary-controls,.library-filter-panel{grid-template-columns:1fr}
+  .library-filter-options,.library-filter-actions{grid-column:1}
+  .library-card-footer{align-items:stretch;flex-direction:column}
 }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { scroll-behavior: auto !important; transition-duration: .01ms !important; animation-duration: .01ms !important; }

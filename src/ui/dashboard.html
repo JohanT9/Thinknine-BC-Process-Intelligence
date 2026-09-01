@@ -355,23 +355,11 @@ table{width:100%;border-collapse:collapse}th,td{text-align:left;padding:9px;bord
 <section class="document-library" aria-labelledby="documentLibraryTitle">
   <h2 id="documentLibraryTitle">BC Knowledge Base</h2>
   <p class="muted">Hitta tidigare dokumentation med hjälp av innehåll och dokumentinformation.</p>
-  <div class="library-controls" role="search">
+  <div class="library-primary-controls" role="search">
     <label for="librarySearch">Sök dokument
       <input id="librarySearch" type="search" autocomplete="off" aria-keyshortcuts="/ Escape"
         aria-describedby="libraryStatus" placeholder="Titel, profil, tagg eller arbetsflöde"
         data-i18n-placeholder="library.searchPlaceholder">
-    </label>
-    <label for="libraryProfileFilter">Dokumentprofil
-      <select id="libraryProfileFilter"><option value="">Alla profiler</option></select>
-    </label>
-    <label for="libraryLanguageFilter">
-      <span data-i18n="library.documentLanguage">Dokumentspråk</span>
-      <select id="libraryLanguageFilter" data-language-select="document"
-        data-language-all-label="library.allLanguages">
-        <option value="" data-i18n="library.allLanguages">Alla språk</option>
-        <option value="sv-SE">Svenska</option>
-        <option value="en-US">English</option>
-      </select>
     </label>
     <label for="librarySort">Sortera
       <select id="librarySort">
@@ -381,19 +369,38 @@ table{width:100%;border-collapse:collapse}th,td{text-align:left;padding:9px;bord
       </select>
     </label>
   </div>
-  <div class="library-toggle-row" role="group" aria-label="Filter för Dokumentbibliotek">
-    <label><input id="libraryFavouriteFilter" type="checkbox"> Endast favoriter</label>
-    <label><input id="libraryRecentFilter" type="checkbox"> Nyligen använda</label>
-    <label><input id="libraryGroupProfiles" type="checkbox"> Gruppera per profil</label>
-  </div>
-  <details class="library-date-filters"><summary>Fler filter</summary>
-    <div class="library-controls">
+  <details id="libraryFilterDisclosure" class="library-filter-disclosure">
+    <summary><span data-i18n="library.filters">Filter</span>
+      <span id="libraryFilterCount" class="library-filter-count" hidden></span>
+    </summary>
+    <div class="library-filter-panel" role="group" aria-label="Filter för Dokumentbibliotek">
+      <label for="libraryProfileFilter">Dokumentprofil
+        <select id="libraryProfileFilter"><option value="">Alla profiler</option></select>
+      </label>
+      <label for="libraryLanguageFilter">
+        <span data-i18n="library.documentLanguage">Dokumentspråk</span>
+        <select id="libraryLanguageFilter" data-language-select="document"
+          data-language-all-label="library.allLanguages">
+          <option value="" data-i18n="library.allLanguages">Alla språk</option>
+          <option value="sv-SE">Svenska</option>
+          <option value="en-US">English</option>
+        </select>
+      </label>
       <label for="libraryThemeFilter">Tema
         <select id="libraryThemeFilter"><option value="">Alla teman</option></select></label>
       <label for="libraryCreatedFrom">Skapad från<input id="libraryCreatedFrom" type="date"></label>
       <label for="libraryCreatedTo">Skapad till<input id="libraryCreatedTo" type="date"></label>
       <label for="libraryModifiedFrom">Ändrad från<input id="libraryModifiedFrom" type="date"></label>
       <label for="libraryModifiedTo">Ändrad till<input id="libraryModifiedTo" type="date"></label>
+      <div class="library-filter-options">
+        <label><input id="libraryFavouriteFilter" type="checkbox"> Endast favoriter</label>
+        <label><input id="libraryRecentFilter" type="checkbox"> Nyligen använda</label>
+        <label><input id="libraryGroupProfiles" type="checkbox"> Gruppera per profil</label>
+      </div>
+      <div class="library-filter-actions">
+        <button id="libraryResetFilters" type="button" class="secondary"
+          disabled data-i18n="library.resetFilters">Återställ filter</button>
+      </div>
     </div>
   </details>
   <div id="libraryBatchToolbar" class="library-batch-toolbar" role="toolbar"

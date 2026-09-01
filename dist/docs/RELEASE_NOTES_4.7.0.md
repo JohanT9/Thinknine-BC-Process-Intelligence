@@ -260,3 +260,12 @@ or På/Av values.
   continues to open the corresponding Review Step.
 - State transitions and route evidence remain available in the shared detail
   panel without being repeated inside every node.
+
+# Simpler Document Library
+
+- Search and sorting remain immediately available; secondary filters are
+  grouped under **Filters**.
+- The filter control reports the number of active filters and provides a single
+  reset action without changing the current search or grouping preference.
+- Document cards use a compact metadata line, limit long tag collections and
+  keep modification information beside the open action.

@@ -17,6 +17,8 @@ assert(container.innerHTML.includes('data-selected="true"'));
 assert(container.innerHTML.includes('type="checkbox"'));
 assert(container.innerHTML.includes('aria-pressed="true"'));
 assert(container.innerHTML.includes("Order &lt;test&gt;"));
+assert(container.innerHTML.includes('class="library-card-meta"'));
+assert(container.innerHTML.includes('class="library-card-footer"'));
 assert(container.innerHTML.includes(">SV</span>"));
 assert(!container.innerHTML.includes("Redo för granskning"));
 assert(!container.innerHTML.includes("1 förslag"));
@@ -37,6 +39,11 @@ const englishRecord = library.normalize({ projectId: "en-1", title: "English",
   documentLanguage: "en-US" });
 view.renderList(container, [englishRecord], {});
 assert(container.innerHTML.includes('aria-label="English">EN</span>'));
+assert.strictEqual(view.activeFilterCount({ filters: {
+  profile: "sop", documentLanguage: "en-US", favourite: true,
+  created: { from: "2026-01-01", to: "2026-02-01" }
+} }), 4);
+assert.strictEqual(view.activeFilterCount({ filters: {} }), 0);
 assert.strictEqual(view.renderList(container, [], {}), null);
 assert(container.innerHTML.includes("inga dokument i Dokumentbiblioteket"));
 

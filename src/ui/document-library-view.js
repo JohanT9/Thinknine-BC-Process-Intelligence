@@ -18,6 +18,8 @@
   function card(record, selected, active) {
     const bugReport = record.metadata?.recordingPurpose === "bug-report";
     const language = languages.get(record.documentLanguage);
+    const visibleTags = record.tags.slice(0, 3);
+    const hiddenTagCount = Math.max(0, record.tags.length - visibleTags.length);
     return `<article class="library-card" role="listitem" tabindex="${active ? 0 : -1}"
       data-selected="${selected}" ${active ? 'aria-current="true"' : ""}
       data-library-project-id="${escape(record.projectId)}">
@@ -28,15 +30,30 @@
         <span class="library-language" aria-label="${escape(language.nativeName)}">${escape(language.shortCode)}</span>
         <button class="library-favourite" data-library-action="favourite"
           aria-pressed="${record.favourite}" aria-label="${record.favourite ? "Ta bort från" : "Lägg till i"} favoriter">${record.favourite ? "★" : "☆"}</button></div>
-      <p class="library-profile">${escape(record.profile.displayName)} · ${escape(record.theme.displayName)}</p>
-      ${record.archived ? '<p><strong>Arkiverad</strong></p>' : ""}
-      ${record.author ? `<p class="muted">Av ${escape(record.author)}</p>` : ""}
-      ${record.status ? `<p class="muted">Status: ${escape(record.status)}</p>` : ""}
-      <p class="muted">Ändrad ${date(record.modifiedAt)}${record.readingMinutes ? ` · ${record.readingMinutes} min läsning` : ""}</p>
-      <div class="library-tags">${record.tags.map(tag => `<span>${escape(tag)}</span>`).join("")}</div>
-      <button class="secondary" data-library-action="open">${bugReport
-        ? "Öppna felrapport" : "Öppna dokumentation"}</button>
+      <div class="library-card-meta">
+        <span class="library-profile">${escape(record.profile.displayName)} · ${escape(record.theme.displayName)}</span>
+        ${record.archived ? '<span class="library-card-status">Arkiverad</span>' : ""}
+        ${record.status ? `<span>${escape(record.status)}</span>` : ""}
+        ${record.author ? `<span>Av ${escape(record.author)}</span>` : ""}
+      </div>
+      ${visibleTags.length ? `<div class="library-tags">${visibleTags.map(tag =>
+        `<span>${escape(tag)}</span>`).join("")}${hiddenTagCount
+        ? `<span aria-label="${hiddenTagCount} ytterligare taggar">+${hiddenTagCount}</span>` : ""}</div>` : ""}
+      <div class="library-card-footer">
+        <span class="muted">Ändrad ${date(record.modifiedAt)}${record.readingMinutes ? ` · ${record.readingMinutes} min` : ""}</span>
+        <button class="secondary" data-library-action="open">${bugReport
+          ? "Öppna felrapport" : "Öppna dokumentation"}</button>
+      </div>
     </article>`;
+  }
+
+  function activeFilterCount(options = {}) {
+    const filters = options.filters || {};
+    return [filters.profile, filters.theme, filters.documentLanguage,
+      filters.favourite, filters.recent,
+      filters.created?.from || filters.created?.to,
+      filters.modified?.from || filters.modified?.to]
+      .filter(Boolean).length;
   }
 
   function renderList(container, records, state = {}) {
@@ -87,5 +104,5 @@
     ) || null;
   }
 
-  return { applySelection, card, renderGrouped, renderList };
+  return { activeFilterCount, applySelection, card, renderGrouped, renderList };
 });

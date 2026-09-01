@@ -11,6 +11,11 @@
 
 ## Unreleased
 
+- Simplified the Document Library around search and sort, moving secondary
+  filters into one disclosure with an active-filter count and one-click reset.
+  Cards now present metadata, tags, recency and the open action in a more
+  compact, consistent reading order.
+
 - Made the Process Overview compact and review-aware. Nodes now show concise
   review status, keep state and route evidence in one shared detail panel, and
   automatically follow the active Review Step without changing process data.
