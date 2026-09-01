@@ -270,6 +270,17 @@ dialog::backdrop { background: rgb(0 0 0 / 40%) !important; }
   .app-shell-nav a[aria-current="page"] { border-bottom-color: Highlight; }
 }
 .process-overview-export{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 12px}
+.process-diagram-scroll{scroll-snap-type:x proximity}
+.process-overview-list{gap:30px!important;padding-bottom:8px!important}
+.process-overview-step{width:190px!important}
+.process-overview-step:not(:last-child)::after{right:-25px!important}
+.process-overview-action{min-height:78px!important;padding:9px!important;grid-template-columns:30px minmax(0,1fr)!important;gap:8px!important}
+.process-overview-number{width:28px!important;height:28px!important;font-size:12px}
+.process-overview-content>strong{display:block;line-height:1.35}
+.process-overview-review-state{display:inline-flex;margin-top:8px;padding:2px 7px;border-radius:999px;background:#eef1f4;color:#44546a;font-size:11px;font-weight:600}
+.process-overview-review-state.approved{background:#e7f4ea;color:#166534}
+.process-overview-review-state.attention{background:#fff4ce;color:#6b4f00}
+.process-overview-action[aria-current="step"]{outline:2px solid var(--colorBrandPrimary);outline-offset:1px}
 .process-version-dialog{width:min(960px,calc(100vw - 32px));max-height:calc(100vh - 32px)}
 .process-version-selectors{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin:16px 0}
 .process-version-selectors label{display:grid;gap:5px}.process-version-metrics{display:flex;flex-wrap:wrap;gap:8px;margin:12px 0}
@@ -277,4 +288,4 @@ dialog::backdrop { background: rgb(0 0 0 / 40%) !important; }
 .process-version-heading{display:flex;align-items:center;gap:10px}.process-version-flow{display:flex;gap:10px;overflow-x:auto;padding:12px 2px}
 .process-version-node{flex:0 0 150px;display:grid;gap:5px;padding:10px;border:2px solid #c9d4dc;border-radius:8px;background:#fff}.process-version-node>span{font-size:11px;min-height:14px;color:#52606d}
 .process-version-node.added{border-color:#15803d;background:#f0fdf4}.process-version-node.removed{border-color:#b91c1c;background:#fef2f2;text-decoration:line-through}.process-version-node.modified,.process-version-node.moved{border-color:#b7791f;background:#fffbeb}
-@media(max-width:620px){.process-version-selectors{grid-template-columns:1fr}}
+@media(max-width:620px){.process-version-selectors{grid-template-columns:1fr}.process-overview-step{width:170px!important}}

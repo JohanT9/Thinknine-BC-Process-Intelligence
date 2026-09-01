@@ -6208,7 +6208,7 @@ function renderProcessOverview() {
     $("exportProcessModel").disabled = false;
     $("exportProcessDiagram").disabled = false;
     globalThis.T9ProcessOverviewView.render(container, model, {
-      locale: activeReview.documentFields?.documentLanguage || "sv-SE",
+      locale: applicationSettings.uiLocale || "sv-SE",
       selectedTaskIds: activeReviewSelection.selectedIds,
       reviewTasks: activeReview.tasks || []
     });

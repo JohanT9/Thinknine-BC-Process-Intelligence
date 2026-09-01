@@ -93,3 +93,11 @@ starts after the active Step, skips approved Steps and wraps once through the
 visible review order. The target becomes the active selection, receives focus
 and is scrolled into view. `Alt+N` provides the same workflow from the keyboard;
 the control is disabled when every visible Step is approved.
+
+## Compact Process Overview (4.7)
+
+The Process Overview is a synchronized navigation aid rather than a second
+editor. Compact nodes expose Step order, title and review state. Selecting a
+node activates its stable Review task identity; changing the Review selection
+updates and horizontally reveals the matching node. Detailed routes and
+observed state changes are rendered once in the selected-node detail panel.

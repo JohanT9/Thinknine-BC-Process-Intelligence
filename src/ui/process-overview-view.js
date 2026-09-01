@@ -58,12 +58,28 @@
       current.push({ ...transition, target: nodeById.get(transition.toNodeId) });
       graphTransitions.set(transition.fromNodeId, current);
     });
-    return activities.map((node, index) => ({
-      node, index, taskId: taskIdFor(node, options.reviewTasks || []),
-      containers: containersFor(model, node.nodeId),
-      changes: stateTransitions.get(node.nodeId) || [],
-      outgoing: graphTransitions.get(node.nodeId) || []
-    }));
+    return activities.map((node, index) => {
+      const taskId = taskIdFor(node, options.reviewTasks || []);
+      return {
+        node, index, taskId,
+        reviewTask: (options.reviewTasks || []).find(task => task.taskId === taskId),
+        containers: containersFor(model, node.nodeId),
+        changes: stateTransitions.get(node.nodeId) || [],
+        outgoing: graphTransitions.get(node.nodeId) || []
+      };
+    });
+  }
+
+  function reviewState(detail, english) {
+    if (!detail?.reviewTask) return null;
+    if (detail.reviewTask.approved) return {
+      name: "approved", label: english ? "Reviewed" : "Granskad"
+    };
+    if (detail.reviewTask.reviewSuggested ||
+        Number(detail.reviewTask.confidenceScore) < 80) {
+      return { name: "attention", label: english ? "Review" : "Granska" };
+    }
+    return { name: "pending", label: english ? "Not reviewed" : "Ej granskad" };
   }
 
   function routeLabel(route, english) {
@@ -139,28 +155,26 @@
     container.innerHTML = `<div class="process-diagram-scroll" tabindex="0" role="group"
       aria-label="${english ? "Process flow" : "Processflöde"}">
       <ol class="process-overview-list">${details.map(detail => {
-        const stateChanges = detail.changes.map(change =>
-          `<span class="process-overview-change"><strong>${escape(stateLabel(change))}:</strong> ` +
-          `${escape(stateValue(change.before, english))} <span aria-hidden="true">→</span> ` +
-          `${escape(stateValue(change.after, english))}</span>`).join("");
         const selected = selectedTaskIds.has(detail.taskId);
         const phase = detail.containers.phase?.title;
         const subtask = detail.containers.subtask?.title;
         const decision = detail.node.nodeType === "decision";
+        const status = reviewState(detail, english);
+        const title = plain(detail.node.title);
         return `<li class="process-overview-step${decision ? " process-overview-decision" : ""}"
           data-process-node-id="${escape(detail.node.nodeId)}" data-process-decision="${decision}">
           <button type="button" class="process-overview-action"
             data-process-node-action="${escape(detail.node.nodeId)}"
             ${detail.taskId ? `data-process-task-id="${escape(detail.taskId)}"` : ""}
-            aria-pressed="${selected}">
+            aria-pressed="${selected}"${selected ? ' aria-current="step"' : ""}
+            aria-label="${escape(`${english ? "Step" : "Steg"} ${detail.index + 1}: ${title}${status ? `. ${status.label}` : ""}`)}">
             <span class="process-overview-number" aria-hidden="true"><span>${decision ? "?" : detail.index + 1}</span></span>
             <span class="process-overview-content">
               ${phase ? `<span class="process-overview-phase">${escape(phase)}</span>` : ""}
               ${subtask ? `<span class="process-overview-subtask">${escape(subtask)}</span>` : ""}
               ${decision ? `<span class="process-overview-node-type">${english ? "Decision" : "Beslut"}</span>` : ""}
-              <strong>${escape(plain(detail.node.title))}</strong>
-              ${stateChanges ? `<span class="process-overview-state">${stateChanges}</span>` : ""}
-              ${routesMarkup(detail, english, true)}
+              <strong>${escape(title)}</strong>
+              ${status ? `<span class="process-overview-review-state ${status.name}">${escape(status.label)}</span>` : ""}
             </span>
           </button>
         </li>`;
@@ -172,15 +186,20 @@
   function updateSelection(container, selectedTaskIds = []) {
     const selected = new Set(selectedTaskIds);
     const actions = [...(container?.querySelectorAll?.("[data-process-node-action]") || [])];
-    actions.forEach(action => action.setAttribute("aria-pressed", String(
-      Boolean(action.dataset.processTaskId && selected.has(action.dataset.processTaskId))
-    )));
+    actions.forEach(action => {
+      const active = Boolean(action.dataset.processTaskId &&
+        selected.has(action.dataset.processTaskId));
+      action.setAttribute("aria-pressed", String(active));
+      if (active) action.setAttribute("aria-current", "step");
+      else action.removeAttribute?.("aria-current");
+    });
     const selectedActions = actions.filter(action => action.dataset.processTaskId &&
       selected.has(action.dataset.processTaskId));
     const view = renderedViews.get(container);
     const detail = view?.details.find(item => selected.has(item.taskId));
     const detailContainer = container?.querySelector?.("[data-process-overview-detail]");
     if (detail && detailContainer) detailContainer.outerHTML = detailMarkup(detail, view.english);
+    selectedActions[0]?.scrollIntoView?.({ block: "nearest", inline: "center" });
     return selectedActions;
   }
 
@@ -189,14 +208,17 @@
     const detail = view?.details.find(item => item.node.nodeId === nodeId);
     if (!detail) return false;
     const actions = [...(container?.querySelectorAll?.("[data-process-node-action]") || [])];
-    actions.forEach(action => action.setAttribute("aria-pressed", String(
-      action.dataset.processNodeAction === nodeId
-    )));
+    actions.forEach(action => {
+      const active = action.dataset.processNodeAction === nodeId;
+      action.setAttribute("aria-pressed", String(active));
+      if (active) action.setAttribute("aria-current", "step");
+      else action.removeAttribute?.("aria-current");
+    });
     const detailContainer = container?.querySelector?.("[data-process-overview-detail]");
     if (detailContainer) detailContainer.outerHTML = detailMarkup(detail, view.english);
     return true;
   }
 
-  return { containersFor, detailMarkup, render, routeLabel, routesMarkup, selectNode,
-    taskIdFor, updateSelection };
+  return { containersFor, detailMarkup, render, reviewState, routeLabel,
+    routesMarkup, selectNode, taskIdFor, updateSelection };
 });

@@ -249,3 +249,14 @@ or På/Av values.
   view automatically.
 - The action reports how many Steps remain and becomes unavailable when the
   review is complete.
+
+# Compact Process Overview
+
+- Process nodes use less horizontal and vertical space while preserving the
+  complete process order.
+- Each linked node shows whether its Step is reviewed, needs attention or is
+  not yet reviewed.
+- Selecting a Review Step brings its process node into view; selecting a node
+  continues to open the corresponding Review Step.
+- State transitions and route evidence remain available in the shared detail
+  panel without being repeated inside every node.

@@ -11,6 +11,10 @@
 
 ## Unreleased
 
+- Made the Process Overview compact and review-aware. Nodes now show concise
+  review status, keep state and route evidence in one shared detail panel, and
+  automatically follow the active Review Step without changing process data.
+
 - Added a prominent Next unreviewed action to Review Studio. It follows the
   visible Step order, wraps deterministically, focuses the selected card and is
   available through Alt+N with accessible remaining-count feedback.
