@@ -1,5 +1,13 @@
 # BC Process Studio 4.7
 
+- Control Add-in and React capture now has an executable real-browser
+  validation scenario. Headless Edge runs the production recorder listeners
+  against React-shaped controls, capture-phase events stopped by application
+  handlers, a labelled checkbox, a changed date field and a nested same-origin
+  Control Add-in frame. The gate verifies that the result dialog retains the
+  initiating click identity. Customer-specific Business Central origins and
+  third-party add-ins remain explicit pilot validation items.
+
 - Semantic consolidation now removes a duplicate visible action when action
   and result evidence carry the same explicit recorder interaction identity
   and action caption. All Capture Packets, source references and screenshot

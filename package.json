@@ -27,6 +27,7 @@
     "test:screenshot-corpus": "node tests/screenshot-selection-corpus.test.js",
     "test:chrome-readiness": "node tests/chrome-readiness.test.js",
     "test:control-addin-capture": "node tests/control-addin-capture.test.js",
+    "test:control-addin-browser": "node tests/control-addin-browser-validation.test.js",
     "test:packaging": "node tests/packaging-update-architecture.test.js",
     "test:edge-distribution": "node tests/edge-distribution.test.js",
     "test:pilot-compatibility": "node tests/pilot-compatibility.test.js",

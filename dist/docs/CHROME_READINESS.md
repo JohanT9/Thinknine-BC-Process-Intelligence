@@ -24,7 +24,7 @@ milestone does not claim Chrome product support.
 | `chrome.downloads.download` | Verified compatible statically | Permission declared; Chrome filename/save-as behavior requires manual test. |
 | `chrome.tabs.captureVisibleTab` | Verified compatible statically | `activeTab` and tabs permissions declared; focus/window and multi-frame behavior require manual test. |
 | Host permissions and BC content matches | Verified compatible statically | HTTPS production BC hosts are explicitly listed. |
-| React/control-add-in frames | Unknown / needs manual test | Origin fallback registration exists, but real add-in origins, nested frames, and capture timing must be exercised. |
+| React/control-add-in frames | Local Edge browser scenario passed; customer pilot pending | Production listeners are exercised against React-shaped controls and a nested same-origin frame. Real third-party origins and customer add-ins still require pilot verification. |
 | Chrome Web Store packaging/policy | Unknown / separate release task | Current release ZIP and naming intentionally remain Edge-specific. |
 | Edge-specific runtime APIs | None found | “Edge” occurrences are wording, scripts, release packaging, and the production target—not `browser.*` or proprietary runtime calls. |
 

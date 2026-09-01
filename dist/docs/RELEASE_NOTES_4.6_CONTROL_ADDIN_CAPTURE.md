@@ -46,5 +46,30 @@ Shadow DOM cannot be inspected by an extension content script. This milestone
 was verified synthetically against a real-shaped Material UI date input; the
 actual affected customer view was not available for manual verification.
 
+## Executable browser validation in 4.7
+
+The previous synthetic-only limitation is now narrower. An executable local
+Edge scenario loads the production recorder scripts into a real browser DOM and
+verifies:
+
+- a React/MUI-shaped clickable row when the application stops event bubbling;
+- a changed date input and a checkbox named by its wrapping label;
+- delegated capture inside a nested same-origin Control Add-in iframe;
+- a result dialog retaining the initiating click's `interactionId`; and
+- stable source and frame identities on every recorded event.
+
+Run it on Windows with:
+
+```powershell
+npm.cmd run test:control-addin-browser
+```
+
+`T9_EDGE_PATH` may point to another Edge executable. If Edge is unavailable the
+portable test reports a skip; release verification on Windows must run it and
+receive a captured-event result. This proves the browser event and frame
+contract without broadening extension permissions. It is not evidence that
+every customer-specific external origin, closed Shadow DOM component or
+third-party add-in has been tested; those remain pilot validation items.
+
 The non-host `webNavigation` permission provides a browser-owned frame inventory
 for diagnostics. It does not permit capture on additional origins.

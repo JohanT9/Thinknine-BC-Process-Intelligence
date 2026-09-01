@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="en">
+<head><meta charset="utf-8"><title>Control add-in browser validation</title></head>
+<body>
+  <div id="react-root" data-reactroot>
+    <div id="react-row" class="MuiButtonBase-root MuiTableRow-root"
+      data-testid="production-row" style="cursor:pointer">Production order 1001</div>
+    <label>Posting date <input id="react-date" type="text" value="2026-09-01"></label>
+    <label><input id="react-checkbox" type="checkbox"> Print label</label>
+  </div>
+  <iframe id="addin-frame" src="/frame"></iframe>
+  <pre id="validation-report">pending</pre>
+  <script>
+    window.__capturedEvents = [];
+    window.chrome = {
+      runtime: {
+        lastError: null,
+        onMessage: { addListener() {} },
+        sendMessage(message, callback) {
+          if (message.type === "T9_RECORD_EVENT") {
+            top.__capturedEvents.push({ frame: "top", event: message.event });
+          }
+          const state = { recording: true, sessionId: "browser-validation",
+            recordingPurpose: "process" };
+          callback?.(message.type === "T9_GET_STATE"
+            ? { state, isRecordingTab: true, liveStatus: { connected: true } }
+            : message.type === "T9_PING"
+              ? { state, diagnosticsEnabled: false }
+              : { ok: true });
+        }
+      },
+      storage: { onChanged: { addListener() {} } }
+    };
+  </script>
+  <script src="/capture-focus-session.js"></script>
+  <script src="/capture-surface-mode.js"></script>
+  <script src="/bc-error-detector.js"></script>
+  <script src="/content.js"></script>
+  <script>
+    const firePointerClick = element => {
+      element.dispatchEvent(new PointerEvent("pointerdown", {
+        bubbles: true, composed: true, button: 0 }));
+      element.dispatchEvent(new MouseEvent("click", {
+        bubbles: true, composed: true, button: 0 }));
+    };
+    addEventListener("load", () => setTimeout(() => {
+      const row = document.getElementById("react-row");
+      row.addEventListener("click", event => event.stopPropagation());
+      firePointerClick(row);
+
+      const date = document.getElementById("react-date");
+      date.focus();
+      date.value = "2026-09-02";
+      date.dispatchEvent(new Event("change", { bubbles: true, composed: true }));
+
+      const checkbox = document.getElementById("react-checkbox");
+      checkbox.checked = true;
+      checkbox.dispatchEvent(new Event("change", { bubbles: true, composed: true }));
+
+      const frame = document.getElementById("addin-frame").contentWindow;
+      frame.runControlAddInScenario();
+      setTimeout(() => {
+        const bytes = new TextEncoder().encode(JSON.stringify(__capturedEvents));
+        let binary = "";
+        bytes.forEach(value => { binary += String.fromCharCode(value); });
+        document.getElementById("validation-report").textContent = btoa(binary);
+      }, 500);
+    }, 200));
+  </script>
+</body>
+</html>

@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="en">
+<head><meta charset="utf-8"><title>Nested control add-in</title></head>
+<body data-control-addin>
+  <div id="apply" role="button" tabindex="0" data-automation-id="apply-action">
+    Apply changes
+  </div>
+  <script>
+    window.chrome = {
+      runtime: {
+        lastError: null,
+        onMessage: { addListener() {} },
+        sendMessage(message, callback) {
+          if (message.type === "T9_RECORD_EVENT") {
+            top.__capturedEvents.push({ frame: "addin", event: message.event });
+          }
+          const state = { recording: true, sessionId: "browser-validation",
+            recordingPurpose: "process" };
+          callback?.(message.type === "T9_GET_STATE"
+            ? { state, isRecordingTab: true, liveStatus: { connected: true } }
+            : message.type === "T9_PING"
+              ? { state, diagnosticsEnabled: false }
+              : { ok: true });
+        }
+      },
+      storage: { onChanged: { addListener() {} } }
+    };
+  </script>
+  <script src="/capture-focus-session.js"></script>
+  <script src="/capture-surface-mode.js"></script>
+  <script src="/bc-error-detector.js"></script>
+  <script src="/content.js"></script>
+  <script>
+    window.runControlAddInScenario = () => {
+      const apply = document.getElementById("apply");
+      apply.addEventListener("click", event => event.stopPropagation());
+      apply.dispatchEvent(new PointerEvent("pointerdown", {
+        bubbles: true, composed: true, button: 0 }));
+      apply.dispatchEvent(new MouseEvent("click", {
+        bubbles: true, composed: true, button: 0 }));
+      const dialog = document.createElement("section");
+      dialog.setAttribute("role", "dialog");
+      dialog.setAttribute("aria-label", "Apply confirmation");
+      dialog.innerHTML = "<h2>Apply confirmation</h2><button>OK</button>";
+      document.body.append(dialog);
+    };
+  </script>
+</body>
+</html>
