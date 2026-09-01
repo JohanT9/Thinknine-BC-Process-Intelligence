@@ -5742,17 +5742,20 @@ function renderReviewContent() {
         <input id="review-callout-${visibleIndex}" data-edit-field="manualCallout"
           aria-label="Faktaruta för manuellt steg ${visibleIndex + 1}"
           value="${escapeHtml(task.callout?.text || "")}" readonly>` : ""}
-        <div class="review-meta">
-          ${escapeHtml(task.taskType || "Task")}
-          · Confidence ${task.confidenceScore ?? task.confidence ?? 0}%
-          ${task.stepOverride ? " · Redigerad" : " · Genererad"}
-          ${task.provenance === "manual"
-            ? ` · Manuellt ${escapeHtml(task.stepType || "information")}` : ""}
-          ${task.stepOverride?.screenshotOverride ? " · Manuell skärmbild" : ""}
-          ${task.knowledgeRule
-            ? ` · ${escapeHtml(task.knowledgeRule)}`
-            : ""}
-        </div>
+        <details class="review-technical-details">
+          <summary>${uiT("Teknisk information")}</summary>
+          <div class="review-meta">
+            ${escapeHtml(task.taskType || "Task")}
+            · Confidence ${task.confidenceScore ?? task.confidence ?? 0}%
+            ${task.stepOverride ? " · Redigerad" : " · Genererad"}
+            ${task.provenance === "manual"
+              ? ` · Manuellt ${escapeHtml(task.stepType || "information")}` : ""}
+            ${task.stepOverride?.screenshotOverride ? " · Manuell skärmbild" : ""}
+            ${task.knowledgeRule
+              ? ` · ${escapeHtml(task.knowledgeRule)}`
+              : ""}
+          </div>
+        </details>
         ${task.resultVerified && task.observedResult
           ? `<p class="review-observed-result ${task.resultVerification?.status === "error"
             ? "error" : "verified"}"><strong>${uiT(task.resultVerification?.status === "error"
@@ -5786,30 +5789,58 @@ function renderReviewContent() {
         ).join("")}
       </div>
       <div class="review-actions" role="gridcell">
-        <button data-drag-handle class="secondary" draggable="true"
-          aria-label="${uiTf("a11y.dragStep", { step: visibleIndex + 1 })}"
-          aria-keyshortcuts="Alt+ArrowUp Alt+ArrowDown">Flytta</button>
-        <label>
+        <label class="review-approve-action">
           <input data-action="approve" type="checkbox"
             aria-label="${uiTf("a11y.approveStep", { step: visibleIndex + 1 })}"
             ${task.approved ? "checked" : ""}>
           Godkänd
         </label>
-        <button data-action="add" class="secondary" aria-label="${uiTf("a11y.addAfter", { step: visibleIndex + 1 })}">Lägg till efter</button>
-        <button data-action="repair-step" class="secondary"
-          aria-label="${uiTf("a11y.changeImage", { step: visibleIndex + 1 })}">Byt bild</button>
-        <button data-action="reset-instruction" class="secondary"
-          ${task.fieldProvenance?.instruction === "user-edited" ? "" : "disabled"}
-          aria-label="${uiTf("a11y.resetInstruction", { step: visibleIndex + 1 })}">Återställ text</button>
-        <button data-action="remove" class="danger" aria-label="${uiTf("a11y.hideStep", { step: visibleIndex + 1 })}">Dölj</button>
-        ${task.manualStepId ? `<button data-action="delete-manual" class="danger"
-          aria-label="Ta bort manuellt steg ${visibleIndex + 1}">Ta bort manuellt steg</button>` : ""}
-        <button data-action="toggle-layout" class="secondary" aria-pressed="false">Komprimera</button>
+        <details class="review-step-actions-menu">
+          <summary aria-label="${uiT("Fler åtgärder")}">⋯</summary>
+          <div class="review-step-actions-panel" role="group"
+            aria-label="${uiTf("a11y.stepActions", { step: visibleIndex + 1 })}">
+            <button data-drag-handle class="secondary" draggable="true"
+              aria-label="${uiTf("a11y.dragStep", { step: visibleIndex + 1 })}"
+              aria-keyshortcuts="Alt+ArrowUp Alt+ArrowDown">Flytta</button>
+            <button data-action="add" class="secondary"
+              aria-label="${uiTf("a11y.addAfter", { step: visibleIndex + 1 })}">Lägg till efter</button>
+            <button data-action="repair-step" class="secondary"
+              aria-label="${uiTf("a11y.changeImage", { step: visibleIndex + 1 })}">Byt bild</button>
+            <button data-action="reset-instruction" class="secondary"
+              ${task.fieldProvenance?.instruction === "user-edited" ? "" : "disabled"}
+              aria-label="${uiTf("a11y.resetInstruction", { step: visibleIndex + 1 })}">Återställ text</button>
+            <button data-action="remove" class="danger"
+              aria-label="${uiTf("a11y.hideStep", { step: visibleIndex + 1 })}">Dölj</button>
+            ${task.manualStepId ? `<button data-action="delete-manual" class="danger"
+              aria-label="Ta bort manuellt steg ${visibleIndex + 1}">Ta bort manuellt steg</button>` : ""}
+            <button data-action="toggle-layout" class="secondary"
+              aria-pressed="false">Komprimera</button>
+          </div>
+        </details>
       </div>`;
 
     // Make the step visible before optional enhancements and event bindings.
     // A compatibility problem in one enhancement must never blank the Review.
     list.appendChild(card);
+
+    const stepActionsMenu = card.querySelector(".review-step-actions-menu");
+    stepActionsMenu.addEventListener("click", event => {
+      const button = event.target.closest("button");
+      if (button && !button.disabled) setTimeout(() => {
+        stepActionsMenu.open = false;
+      });
+    });
+    stepActionsMenu.addEventListener("keydown", event => {
+      if (event.key !== "Escape") return;
+      event.preventDefault();
+      stepActionsMenu.open = false;
+      stepActionsMenu.querySelector("summary").focus();
+    });
+    stepActionsMenu.addEventListener("focusout", event => {
+      if (!stepActionsMenu.contains(event.relatedTarget)) {
+        stepActionsMenu.open = false;
+      }
+    });
 
     initializeReviewScreenshots(card, task, images);
 

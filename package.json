@@ -58,6 +58,7 @@
     "test:process-version-workflow": "node tests/process-version-workflow.test.js",
     "test:regeneration": "node tests/regenerate-from-recording.test.js",
     "test:review-regeneration-ui": "node tests/review-regeneration-ui.test.js",
+    "test:review-step-actions-ux": "node tests/review-step-actions-ux.test.js",
     "test:selective-regeneration": "node tests/selective-regeneration.test.js",
     "test:safe-regeneration": "node tests/safe-regeneration-preview.test.js",
     "test:step-repair": "node tests/step-repair.test.js",
@@ -76,7 +77,7 @@
     "test:branding": "node tests/product-branding.test.js",
     "test:design-system": "node tests/design-system.test.js",
     "test:bc-url-context": "node tests/business-central-url-context.test.js",
-    "preci": "npm run test:branding && npm run test:design-system && npm run test:bc-url-context && npm run test:bug-reporting-ux && npm run test:recording-live-status && npm run test:recording-indicator && npm run test:recording-completion-navigation && npm run test:recording-guidance && npm run test:result-verification && npm run test:review-regeneration-ui && npm run test:selective-regeneration && npm run test:safe-regeneration && npm run test:step-repair && npm run test:correction-feedback && npm run test:process-export && npm run test:process-version-workflow && npm run test:product-validation && npm run test:language-registry && npm run test:ui-localization && npm run test:document-language",
+    "preci": "npm run test:branding && npm run test:design-system && npm run test:bc-url-context && npm run test:bug-reporting-ux && npm run test:recording-live-status && npm run test:recording-indicator && npm run test:recording-completion-navigation && npm run test:recording-guidance && npm run test:result-verification && npm run test:review-regeneration-ui && npm run test:review-step-actions-ux && npm run test:selective-regeneration && npm run test:safe-regeneration && npm run test:step-repair && npm run test:correction-feedback && npm run test:process-export && npm run test:process-version-workflow && npm run test:product-validation && npm run test:language-registry && npm run test:ui-localization && npm run test:document-language",
     "ci": "npm run lint && npm test && npm run build && npm run check",
     "dev:build": "node scripts/build.js",
     "dev:check": "npm run build && npm run check"

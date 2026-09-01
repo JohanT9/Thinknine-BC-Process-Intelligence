@@ -63,7 +63,7 @@ table{width:100%;border-collapse:collapse}th,td{text-align:left;padding:9px;bord
 .review-status dt{font-size:12px;color:#52606d}
 .review-status dd{margin:0;font-size:16px;font-weight:700;color:#1f2933}
 .review-list{padding:18px;width:min(100%,1400px);margin-inline:auto;box-sizing:border-box}
-.review-card{border:1px solid #d8dee5;border-radius:8px;margin-bottom:14px;padding:14px;display:grid;grid-template-columns:56px minmax(0,1fr) 210px;gap:14px}
+.review-card{border:1px solid #d8dee5;border-radius:8px;margin-bottom:14px;padding:14px;display:grid;grid-template-columns:56px minmax(0,1fr) 150px;gap:14px}
 .review-card.approved{border-color:#65a30d;background:#f7fee7}
 .review-card.needs-review{border-color:#f59e0b}
 .review-screenshot-quality{margin:10px 0 2px;padding:8px 10px;border-left:4px solid #64748b;background:#f3f6fa;color:#334155;font-size:13px}.review-screenshot-quality[data-quality="high"]{border-color:#107c10;background:#f0fdf4}.review-screenshot-quality[data-quality="medium"],.review-screenshot-quality[data-quality="protected"],.review-screenshot-quality[data-quality="manual"]{border-color:#0f6cbd;background:#eff6ff}.review-screenshot-quality[data-quality="low"],.review-screenshot-quality[data-quality="unresolved"]{border-color:#c35a00;background:#fff7ed}.review-screenshot-quality summary{cursor:pointer;font-weight:600}.review-screenshot-quality p{margin:6px 0 0}.review-screenshot-quality .metrics{color:#52606d}
@@ -117,19 +117,21 @@ table{width:100%;border-collapse:collapse}th,td{text-align:left;padding:9px;bord
 .review-add-comment{margin:9px 0}
 .review-fields [data-edit-field][readonly]{border-color:transparent;background:transparent;cursor:text}
 .review-fields [data-edit-field][data-editing=true]{border-color:#0f6cbd;background:white;outline:3px solid rgba(15,108,189,.22);box-shadow:0 4px 14px rgba(15,23,42,.08)}
-.review-meta{font-size:12px;color:#52606d;margin:8px 0}
-.review-actions{display:flex;flex-direction:column;gap:7px}
+.review-technical-details{margin:8px 0;color:#52606d;font-size:12px}.review-technical-details>summary{cursor:pointer;width:max-content}.review-meta{font-size:12px;color:#52606d;margin:6px 0}
+.review-actions{display:flex;align-items:flex-start;justify-content:flex-end;gap:8px;position:relative}
 .review-actions button{margin:0}
+.review-approve-action{display:flex;align-items:center;gap:5px;min-height:34px;margin:0;white-space:nowrap}
+.review-step-actions-menu{position:relative}.review-step-actions-menu>summary{display:grid;place-items:center;box-sizing:border-box;width:38px;height:34px;border:1px solid #b8c2cc;border-radius:4px;background:#fff;cursor:pointer;font-size:22px;line-height:1;list-style:none}.review-step-actions-menu>summary::-webkit-details-marker{display:none}.review-step-actions-menu>summary:hover,.review-step-actions-menu[open]>summary{background:#f3f6fa}.review-step-actions-menu>summary:focus-visible{outline:3px solid #0f6cbd;outline-offset:2px}.review-step-actions-panel{position:absolute;z-index:6;top:calc(100% + 5px);right:0;display:grid;gap:5px;width:190px;padding:8px;border:1px solid #c8d2dc;border-radius:7px;background:#fff;box-shadow:0 10px 30px rgba(15,23,42,.2)}.review-step-actions-panel button{width:100%;text-align:left}.review-step-actions-panel button.danger{background:#fff;color:#a4262c}
 .review-screenshot{margin-top:10px}
 .review-image-stage{position:relative;display:block;width:fit-content;max-width:100%;line-height:0}
 .review-image{display:block;max-width:100%;height:auto;border:1px solid #d8dee5;border-radius:5px;box-sizing:border-box;image-rendering:-webkit-optimize-contrast}
 .review-annotation-layer{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;overflow:visible}
 .review-annotate-button{margin-top:6px}
-.review-card.compact{grid-template-columns:44px minmax(0,1fr) 300px;gap:10px;margin-bottom:7px;padding:8px}
+.review-card.compact{grid-template-columns:44px minmax(0,1fr) 150px;gap:10px;margin-bottom:7px;padding:8px}
 .review-card.compact .review-number{font-size:18px}
-.review-card.compact .review-field-heading,.review-card.compact .review-comment-section,.review-card.compact .review-add-comment,.review-card.compact .review-meta,.review-card.compact .review-screenshot{display:none}
+.review-card.compact .review-field-heading,.review-card.compact .review-comment-section,.review-card.compact .review-add-comment,.review-card.compact .review-technical-details,.review-card.compact .review-screenshot{display:none}
 .review-card.compact textarea[data-edit-field="instruction"]{height:38px;min-height:38px;resize:none;overflow:hidden;white-space:nowrap}
-.review-card.compact .review-actions{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));align-content:start;gap:5px}
+.review-card.compact .review-actions{display:flex;align-content:start;gap:5px}
 .review-card.compact .review-actions label{margin:0;align-self:center}
 .review-footer{padding:16px max(16px,calc((100% - 1368px)/2));border-top:1px solid #d8dee5;display:flex;justify-content:space-between;background:#f8fafc}
 #reviewWorkspacePanel{min-height:0;flex:1;overflow:auto;overscroll-behavior:contain}

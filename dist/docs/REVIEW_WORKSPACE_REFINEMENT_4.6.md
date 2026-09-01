@@ -42,6 +42,18 @@ step selection retains its strong outline. Instruction text receives more space
 than technical metadata. Screenshots and annotations remain within their step,
 and status stays in the header without competing with primary commands.
 
+## Step action hierarchy
+
+The normal Step surface now keeps instruction editing and approval immediately
+visible. Move, Add after, Change image, Reset text, Hide, manual deletion and
+per-Step Compact/Expand are grouped under one native **More actions** disclosure.
+The disclosure closes after an action, on focus leaving the menu, or with Escape;
+Escape returns focus to the summary. Technical confidence, provenance and rule
+metadata are independently disclosed under **Technical information**.
+
+This changes presentation only. Command identity, Review history, autosave,
+keyboard movement and document output remain unchanged.
+
 ## Accessibility and responsive behavior
 
 - Native toolbar, group, details and summary semantics are retained.
@@ -49,8 +61,9 @@ and status stays in the header without competing with primary commands.
 - High-contrast mode reinforces cards, disclosure boundaries and selected/editing
   outlines with system colors.
 - Reduced-motion mode continues disabling transitions and animation.
-- On narrow viewports, More Actions becomes a bounded bottom panel and Review
-  cards use a single content column with wrapping actions.
+- On narrow viewports, toolbar More Actions becomes a bounded bottom panel and
+  Review cards use a single content column. Per-Step secondary actions remain in
+  their compact anchored disclosure.
 
 ## Performance
 

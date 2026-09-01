@@ -11,6 +11,11 @@
 
 ## Unreleased
 
+- Simplified every Review Step card to keep editing and approval prominent while
+  grouping move, add, image, reset, hide and compact actions under an accessible
+  More actions menu. Technical confidence and provenance are now progressively
+  disclosed instead of occupying the normal reading flow.
+
 - Simplified Review Studio by removing manual Section/Subtask creation, reset
   actions and the separate hierarchy editor. Missing content is added directly
   after the relevant Step; existing stored hierarchy remains compatible.

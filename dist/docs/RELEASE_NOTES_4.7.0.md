@@ -1,5 +1,10 @@
 # BC Process Studio 4.7
 
+- Review Step cards now prioritize content editing and approval. Secondary
+  actions are grouped in a keyboard-accessible menu that closes after use, on
+  focus leaving it, or with Escape. Technical confidence and provenance remain
+  available under a separate disclosure without cluttering normal review.
+
 - Review Studio no longer exposes manual Section/Subtask creation or a separate
   hierarchy editor. Consultants add missing content directly after the relevant
   Step, reducing structural choices in the normal workflow. Existing Reviews

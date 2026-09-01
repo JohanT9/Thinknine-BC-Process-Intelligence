@@ -88,7 +88,8 @@ assert(dashboard.includes("runs: paragraph.presentationRuns"));
 assert(dashboard.includes("instructionPresentation.runs"));
 assert(dashboard.includes("instructionPresentation.text"));
 assert(dashboard.includes("Instruction presentation fallback"));
-assert(dashboard.includes("list.appendChild(card);\n\n    initializeReviewScreenshots"));
+assert(dashboard.indexOf("list.appendChild(card);") <
+  dashboard.indexOf("initializeReviewScreenshots(card, task, images);"));
 assert(dashboard.includes("Review hierarchy display fallback"));
 assert(dashboard.includes("function reviewTasksForDisplay(review)"));
 assert(dashboard.includes("Review visibility fallback"));
