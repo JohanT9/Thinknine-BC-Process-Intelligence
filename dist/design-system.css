@@ -178,6 +178,7 @@ tbody tr:hover { background: var(--colorBrandSubtle); }
 .library-card-meta .library-profile{font-size:12px}.library-card-status{font-weight:700;color:#6b4f00}
 .library-card .library-tags{margin:0}.library-card-footer{display:flex;align-items:center;justify-content:space-between;gap:var(--space8);margin-top:auto;padding-top:var(--space8);border-top:1px solid var(--colorBorderSubtle);font-size:12px}
 .library-card-footer button{flex:0 0 auto;margin:0}
+.library-card h4,.review-title-row h2,.process-overview-content>strong{overflow-wrap:anywhere}
 .review-progress { height: 4px !important; border-radius: 0 !important; }
 .review-progress-bar { background: var(--colorBrandPrimary) !important; }
 .review-next-action:not(:disabled) {
@@ -279,6 +280,24 @@ dialog::backdrop { background: rgb(0 0 0 / 40%) !important; }
   .library-primary-controls,.library-filter-panel{grid-template-columns:1fr}
   .library-filter-options,.library-filter-actions{grid-column:1}
   .library-card-footer{align-items:stretch;flex-direction:column}
+  .review-title-row{align-items:flex-start}
+  .review-title-row h2{min-width:0}
+  .workspace-tabs{overflow-x:auto;scrollbar-gutter:stable}
+  .workspace-tabs button{flex:0 0 auto;white-space:nowrap}
+  .review-toolbar{align-items:stretch}
+  .review-toolbar>button,.review-toolbar>.review-toolbar-group{flex:1 1 auto}
+  .review-toolbar .review-toolbar-group button{flex:1}
+}
+@media (pointer: coarse) {
+  :root{--controlHeight:44px;--targetSize:44px}
+  input[type="checkbox"],input[type="radio"]{width:20px;height:20px}
+  .library-filter-options label,.library-toggle-row label,.library-select,
+  .review-approve-action{min-height:44px}
+  .review-step-actions-menu>summary,.library-filter-disclosure>summary{min-width:44px;min-height:44px}
+}
+@media (prefers-contrast: more) {
+  :root{--colorBorderDefault:#59636f;--colorBorderSubtle:#7b8490;--focusWidth:3px}
+  .muted,.hint,.review-meta{color:#3f4854!important}
 }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { scroll-behavior: auto !important; transition-duration: .01ms !important; animation-duration: .01ms !important; }
@@ -286,6 +305,9 @@ dialog::backdrop { background: rgb(0 0 0 / 40%) !important; }
 @media (forced-colors: active) {
   :root { --focusWidth: 3px; }
   .app-shell-nav a[aria-current="page"] { border-bottom-color: Highlight; }
+  .review-state-label,.process-overview-review-state,.library-filter-count,
+  .library-language{border:1px solid CanvasText;background:Canvas;color:CanvasText}
+  .process-overview-action[aria-current="step"]{outline:3px solid Highlight}
 }
 .process-overview-export{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 12px}
 .process-diagram-scroll{scroll-snap-type:x proximity}

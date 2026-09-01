@@ -278,3 +278,14 @@ or På/Av values.
   ambiguous cancel wording.
 - After saving a process recording, **Open documentation** deep-links to that
   exact Review. **Not now** keeps the user in the recorder.
+
+# Responsive and accessible operation
+
+- Dashboard now declares the viewport required for reliable reflow at narrow
+  widths and 200% browser zoom.
+- Review tabs and toolbars remain operable without clipping; long document and
+  process titles wrap instead of overflowing.
+- Coarse pointers receive 44-pixel controls, while reduced-motion, increased
+  contrast and Windows forced-colour preferences receive explicit treatment.
+- Recorder dialogs scroll in short popup windows and expose their help text to
+  assistive technology.

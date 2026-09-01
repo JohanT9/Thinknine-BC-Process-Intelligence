@@ -118,3 +118,12 @@ the primary completion action opens `dashboard.html?openReview=<sessionId>`.
 Dashboard initialization resolves the ID only after its local session/library
 state is loaded, removes the one-time query parameter and opens the matching
 Review. Missing or active sessions fail safely without guessing another Review.
+
+## Responsive and accessibility hardening (4.7)
+
+The Dashboard viewport, shared breakpoints and popup constraints are validated
+as release contracts. At narrow widths or 200% zoom, workspace tabs scroll,
+toolbars and cards reflow, and long user content wraps. Coarse-pointer devices
+receive 44-pixel controls. Reduced motion, increased contrast and forced-colour
+modes retain visible focus, selection and status. Native popup dialogs remain
+scrollable in short windows and reference all explanatory copy through ARIA.

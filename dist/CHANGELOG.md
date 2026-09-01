@@ -11,6 +11,11 @@
 
 ## Unreleased
 
+- Completed a responsive and accessibility hardening pass across Dashboard,
+  Review Studio, Document Library and recorder dialogs. Added correct viewport
+  scaling, reflowing navigation/toolbars, coarse-pointer targets, enhanced and
+  forced-colour support, long-text wrapping and short-window dialog scrolling.
+
 - Improved the recorder popup and completion flow. The stop dialog has more
   space and unambiguous continue/save/delete actions; completed process
   recordings can now open their exact Review directly instead of requiring a
