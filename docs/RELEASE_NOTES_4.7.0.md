@@ -1,5 +1,12 @@
 # BC Process Studio 4.7
 
+- Consultants can now regenerate only selected Review Steps. A scoped preview
+  shows instruction and screenshot changes before apply; unselected Steps stay
+  byte-for-byte unchanged. Stable identity, safe consultant edits and undo/redo
+  are preserved. Merges, splits, removals, approvals and annotated-image
+  replacement are blocked instead of crossing the selection boundary. See
+  [Selective regeneration](SELECTIVE_REGENERATION.md).
+
 - Review corrections now produce a privacy-safe local feedback signal. It
   records only correction category, affected field categories and count; it
   never contains instruction text, values, captions, identifiers, images,

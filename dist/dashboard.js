@@ -4280,6 +4280,8 @@ function applyReviewToolbarState() {
   $("resetReviewHierarchy").disabled = !activeReview?.hierarchy?.sections?.length;
   $("completeReview").disabled = !activeReview ||
     !globalThis.T9Review.canComplete(activeReview);
+  $("regenerateSelectedReview").disabled =
+    !activeReviewSelection.selectedIds.length;
 }
 
 function applyReviewStatus() {
@@ -7068,11 +7070,32 @@ function regenerationBlockingMessage(reasons = []) {
   if (reasons.includes("empty-generated-result")) {
     return "Den nya tolkningen gav inga steg. Den sparade granskningen kommer inte att \u00e4ndras.";
   }
+  if (reasons.includes("selection-structure-change")) {
+    return uiT("Urvalet inneh\u00e5ller steg som har slagits samman, delats eller tagits bort. Anv\u00e4nd full regenerering f\u00f6r att granska struktur\u00e4ndringen s\u00e4kert.");
+  }
+  if (reasons.includes("selection-annotated-image")) {
+    return uiT("En vald sk\u00e4rmbild har markeringar och skulle bytas. Byt bilden manuellt eller anv\u00e4nd full regenerering s\u00e5 att markeringarna inte tappas bort.");
+  }
+  if (reasons.includes("selection-approved")) {
+    return uiT("Ett valt steg \u00e4r godk\u00e4nt. Ta bort godk\u00e4nnandet innan steget regenereras.");
+  }
+  if (reasons.some(reason => reason.startsWith("selection-"))) {
+    return uiT("De valda stegen kan inte mappas exakt till den nya tolkningen. Ingen dokumentation har \u00e4ndrats.");
+  }
   return "Granskningen inneh\u00e5ller manuella \u00e4ndringar som inte kan flyttas s\u00e4kert. Regenereringen \u00e4r blockerad s\u00e5 att inget konsultarbete skrivs \u00f6ver.";
 }
 
 function showRegenerationPreview(preview) {
   const dialog = $("regenerationPreviewDialog");
+  const selective = preview.scope === "selected-steps";
+  $("regenerationPreviewTitle").textContent = selective
+    ? uiT("F\u00f6rhandsgranska valda steg")
+    : uiT("F\u00f6rhandsgranska regenerering");
+  $("regenerationPreviewDescription").textContent = selective
+    ? uiT("Endast de valda stegen uppdateras. Alla andra steg l\u00e4mnas of\u00f6r\u00e4ndrade.")
+    : uiT("Granska vad som \u00e4ndras innan dokumentationen uppdateras.");
+  $("applyRegenerationPreview").textContent = selective
+    ? uiT("Godk\u00e4nn valda steg") : uiT("Godk\u00e4nn och regenerera");
   const changes = preview.changeSet || {};
   const stats = [
     [preview.previousStepCount, "Nuvarande"],
@@ -7080,6 +7103,8 @@ function showRegenerationPreview(preview) {
     [preview.addedStepCount, "Tillagda"],
     [preview.removedStepCount, "Borttagna"],
     [preview.changedStepCount, "\u00c4ndrade"],
+    ...(preview.scope === "selected-steps"
+      ? [[preview.generatedBaselineChangeCount, uiT("Ny standardtext")]] : []),
     [preview.screenshotChangeCount, "Nya bilder"],
     [preview.preservedStepEditCount, "Bevarade redigeringar"]
   ];
@@ -7093,6 +7118,9 @@ function showRegenerationPreview(preview) {
       .map(regenerationStepLabel)),
     regenerationChangeGroup("\u00c4ndrad instruktion", (changes.changed || [])
       .map(item => `${regenerationStepLabel(item.before)} \u2192 ${regenerationStepLabel(item.after)}`)),
+    regenerationChangeGroup(uiT("Ny standardtext bakom redigering"),
+      (changes.generatedChanges || [])
+        .map(item => `${regenerationStepLabel(item.before)} \u2192 ${regenerationStepLabel(item.after)}`)),
     regenerationChangeGroup("Sammanslagna steg", (changes.merges || [])
       .map(item => `${item.before.map(regenerationStepLabel).join(" + ")} \u2192 ${item.after.map(regenerationStepLabel).join(" + ")}`)),
     regenerationChangeGroup("Delade steg", (changes.splits || [])
@@ -7115,27 +7143,36 @@ function showRegenerationPreview(preview) {
   }, { once: true }));
 }
 
-$("regenerateReview").addEventListener("click", async () => {
+async function runReviewRegeneration(selectedIds = null) {
   if (!activeReview || !activeReviewSession || !activeReviewModel) return;
   try {
-    const preview = globalThis.T9ReviewRegeneration.preview(
-      activeReview,
-      activeReviewSession,
-      activeReviewModel.businessTasks
-    );
+    const preview = selectedIds
+      ? globalThis.T9ReviewRegeneration.selectivePreview(
+        activeReview, activeReviewSession, activeReviewModel.businessTasks,
+        selectedIds
+      )
+      : globalThis.T9ReviewRegeneration.preview(
+        activeReview, activeReviewSession, activeReviewModel.businessTasks
+      );
     if (!await showRegenerationPreview(preview)) {
       if (preview.blocked) show(regenerationBlockingMessage(
         preview.blockingReasons), true);
       return;
     }
-    activeReview = globalThis.T9ReviewRegeneration.apply(activeReview, preview);
-    activeReviewSelection = globalThis.T9ReviewSelection.create();
+    activeReview = selectedIds
+      ? globalThis.T9ReviewRegeneration.applySelective(activeReview, preview)
+      : globalThis.T9ReviewRegeneration.apply(activeReview, preview);
+    if (!selectedIds) {
+      activeReviewSelection = globalThis.T9ReviewSelection.create();
+    }
     activeReviewEdit = null;
     invalidateDocumentWorkspace();
     await saveActiveReview({ announce: false, render: false });
     renderReview();
-    show(`Dokumentationen har regenererats fr\u00e5n inspelningen. ` +
-      `${preview.previousStepCount} steg blev ${preview.nextStepCount}.`);
+    show(selectedIds
+      ? uiTf("review.selectedRegenerated", { count: preview.nextStepCount })
+      : `Dokumentationen har regenererats fr\u00e5n inspelningen. ` +
+        `${preview.previousStepCount} steg blev ${preview.nextStepCount}.`);
   } catch (error) {
     if (error?.code === "STALE_REGENERATION_PREVIEW") {
       show(uiT("Granskningen ändrades efter förhandsgranskningen. " +
@@ -7144,7 +7181,12 @@ $("regenerateReview").addEventListener("click", async () => {
     }
     show(`Dokumentationen kunde inte regenereras: ${error.message}`, true);
   }
-});
+}
+
+$("regenerateReview").addEventListener("click", () =>
+  runReviewRegeneration());
+$("regenerateSelectedReview").addEventListener("click", () =>
+  runReviewRegeneration([...activeReviewSelection.selectedIds]));
 $("completeReview").addEventListener("click", async () => {
   globalThis.T9Review.complete(activeReview, {
     beforeSelection: activeReviewSelection,

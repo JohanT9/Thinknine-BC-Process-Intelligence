@@ -11,6 +11,11 @@
 
 ## Unreleased
 
+- Added safe selective regeneration for selected Review Steps with an explicit
+  preview, exact one-to-one mapping requirement, stale-preview protection and
+  reversible generated-state history. Unselected Steps are unchanged and
+  structural changes across the selection boundary are blocked.
+
 - Added versioned, local-only correction feedback derived from active Review
   history. The signal contains categories and counts only, excludes document
   content and customer data, respects undo/redo, and never applies automatic

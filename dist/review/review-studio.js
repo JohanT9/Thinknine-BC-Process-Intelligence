@@ -318,6 +318,9 @@
       afterStepNotes: review.stepNotes,
       beforeHierarchy: options.beforeHierarchy,
       afterHierarchy: review.hierarchy,
+      beforeGeneratedTasks: options.beforeGeneratedTasks,
+      afterGeneratedTasks: options.beforeGeneratedTasks === undefined
+        ? undefined : review.generatedTasks,
       beforeSelection: options.beforeSelection,
       afterSelection: options.afterSelection,
       metadata: feedback
@@ -869,6 +872,28 @@
     return { review, ok: true };
   }
 
+  function applySelectiveRegeneration(review, replacements, options = {}) {
+    const values = Array.isArray(replacements) ? replacements : [];
+    if (!values.length) return review;
+    const beforeTasks = historyEngine.snapshot(review.tasks);
+    const beforeGeneratedTasks = historyEngine.snapshot(review.generatedTasks || []);
+    const byTarget = new Map(values.map(item => [String(item.targetTaskId), item]));
+    review.tasks = review.tasks.map(task => {
+      const replacement = byTarget.get(String(task.taskId || task.stepId));
+      return replacement ? clone(replacement.task) : task;
+    });
+    review.generatedTasks = (review.generatedTasks || []).map(task => {
+      const replacement = byTarget.get(String(task.taskId || task.stepId));
+      return replacement ? clone(replacement.generatedTask) : task;
+    });
+    review.updatedAt = options.now || new Date().toISOString();
+    return record(review, "selective-regeneration", beforeTasks, {
+      ...options,
+      beforeGeneratedTasks,
+      metadata: { scope: "selected-steps", replacedStepCount: values.length }
+    });
+  }
+
   function setTaskHidden(review, index, hidden, options = {}) {
     if (!review.tasks[index]) return review;
     ensureGeneratedStructure(review);
@@ -1322,6 +1347,7 @@
     redo: historyEngine.redo,
     historyDirectionFromKey: historyEngine.directionFromKey,
     correctionFeedbackSummary: correctionFeedback.summary,
+    applySelectiveRegeneration,
     activeTasks,
     visibleTaskNumber,
     canComplete,

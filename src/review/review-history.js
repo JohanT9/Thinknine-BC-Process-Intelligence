@@ -76,6 +76,10 @@
       ? undefined : clone(command.beforeDocumentFields);
     const afterDocumentFields = command.afterDocumentFields === undefined
       ? undefined : clone(command.afterDocumentFields);
+    const beforeGeneratedTasks = command.beforeGeneratedTasks === undefined
+      ? undefined : clone(command.beforeGeneratedTasks);
+    const afterGeneratedTasks = command.afterGeneratedTasks === undefined
+      ? undefined : clone(command.afterGeneratedTasks);
     if (
       JSON.stringify(beforeTasks) === JSON.stringify(afterTasks) &&
       command.beforeStatus === command.afterStatus &&
@@ -85,7 +89,8 @@
       JSON.stringify(beforeManualSteps) === JSON.stringify(afterManualSteps) &&
       JSON.stringify(beforeStepNotes) === JSON.stringify(afterStepNotes) &&
       JSON.stringify(beforeHierarchy) === JSON.stringify(afterHierarchy) &&
-      JSON.stringify(beforeDocumentFields) === JSON.stringify(afterDocumentFields)
+      JSON.stringify(beforeDocumentFields) === JSON.stringify(afterDocumentFields) &&
+      JSON.stringify(beforeGeneratedTasks) === JSON.stringify(afterGeneratedTasks)
     ) {
       return review;
     }
@@ -106,6 +111,7 @@
         afterStepNotes,
         afterHierarchy,
         afterDocumentFields,
+        afterGeneratedTasks,
         afterSelection: command.afterSelection === undefined
           ? previous.afterSelection
           : clone(command.afterSelection),
@@ -136,6 +142,8 @@
         afterHierarchy,
         beforeDocumentFields,
         afterDocumentFields,
+        beforeGeneratedTasks,
+        afterGeneratedTasks,
         beforeSelection: clone(command.beforeSelection ?? null),
         afterSelection: clone(command.afterSelection ?? null),
         beforeAnnotationSelection: clone(
@@ -210,6 +218,9 @@
     const documentFields = direction === "undo"
       ? entry.beforeDocumentFields : entry.afterDocumentFields;
     if (documentFields !== undefined) review.documentFields = clone(documentFields);
+    const generatedTasks = direction === "undo"
+      ? entry.beforeGeneratedTasks : entry.afterGeneratedTasks;
+    if (generatedTasks !== undefined) review.generatedTasks = clone(generatedTasks);
     if (entry.beforeStatus !== undefined || entry.afterStatus !== undefined) {
       review.status = direction === "undo" ? entry.beforeStatus : entry.afterStatus;
     }
