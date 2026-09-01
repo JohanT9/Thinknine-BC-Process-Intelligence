@@ -10,7 +10,10 @@ assert(dashboard.includes(
 "Dashboard responsive breakpoints require an explicit viewport");
 assert(popup.includes("max-height:calc(100dvh - 16px);overflow:auto"),
   "popup dialogs must remain operable in short browser windows");
-assert(popup.includes("@media(max-width:420px)"));
+assert(popup.includes("html{width:390px;min-width:390px}"),
+  "the extension popup must establish its own stable viewport width");
+assert(!popup.includes("body{width:100vw}"),
+  "a viewport-relative body width collapses extension popups before layout");
 assert(popup.includes("@media(max-height:540px)"));
 assert(popup.includes(
   'aria-describedby="nameDialogHelp documentLanguageHelp"'));

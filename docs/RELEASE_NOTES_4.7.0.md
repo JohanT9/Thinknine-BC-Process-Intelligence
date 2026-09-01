@@ -289,3 +289,5 @@ or På/Av values.
   contrast and Windows forced-colour preferences receive explicit treatment.
 - Recorder dialogs scroll in short popup windows and expose their help text to
   assistive technology.
+- The extension popup keeps a stable 390-pixel working width; responsive rules
+  no longer allow the browser's provisional viewport to collapse the layout.

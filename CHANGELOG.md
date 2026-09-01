@@ -11,6 +11,10 @@
 
 ## Unreleased
 
+- Fixed the recorder popup collapsing to a narrow column after responsive
+  hardening. The extension surface now establishes a stable 390-pixel layout
+  width while retaining vertical reflow for short browser windows.
+
 - Completed a responsive and accessibility hardening pass across Dashboard,
   Review Studio, Document Library and recorder dialogs. Added correct viewport
   scaling, reflowing navigation/toolbars, coarse-pointer targets, enhanced and
