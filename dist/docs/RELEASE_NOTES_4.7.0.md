@@ -1,5 +1,10 @@
 # BC Process Studio 4.7
 
+- Review Studio no longer exposes manual Section/Subtask creation or a separate
+  hierarchy editor. Consultants add missing content directly after the relevant
+  Step, reducing structural choices in the normal workflow. Existing Reviews
+  with saved hierarchy retain their structure and export compatibility.
+
 - A deterministic pilot-validation gate now turns sanitized real Business
   Central worksheets into transparent product KPIs. It requires at least 24
   recordings and the complete standard BC, language, Aptean and React coverage

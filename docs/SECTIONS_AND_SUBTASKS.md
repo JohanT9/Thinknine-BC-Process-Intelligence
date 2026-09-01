@@ -33,12 +33,20 @@ invented event IDs.
 consultant's document organization. Moving hierarchy never claims to change
 recorded history.
 
-## Overrides and editing
+## Compatibility and current Review workflow
 
 Sparse Hierarchy Overrides record create-section, create-subtask, rename, move,
-reorder, and reset intent with stable targets. Review exposes selection-based
-Section/Subtask creation, hierarchy navigation summary, reset, and existing
-keyboard-capable step movement. Collapse state, when used, is UI state only.
+reorder, and reset intent with stable targets. These contracts preserve
+historical Review data and deterministic projection. Collapse state, when used,
+is UI state only.
+
+As of the streamlined 4.7 Review workflow, manual Section/Subtask creation,
+renaming and reset controls are no longer exposed in Review Studio. Consultants
+add missing content directly with **Add after**, which keeps the document flow
+visible and avoids a separate hierarchy editor. The hierarchy domain and stored
+overrides remain supported for recordings and Reviews created by earlier
+versions; existing documents therefore retain their structure and export
+compatibility.
 
 Empty hierarchy objects remain editable state but are omitted from resolved
 exports. Sections containing only hidden steps are also omitted.

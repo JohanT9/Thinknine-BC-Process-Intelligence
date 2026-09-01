@@ -11,6 +11,10 @@
 
 ## Unreleased
 
+- Simplified Review Studio by removing manual Section/Subtask creation, reset
+  actions and the separate hierarchy editor. Missing content is added directly
+  after the relevant Step; existing stored hierarchy remains compatible.
+
 - Added an executable privacy-bounded product pilot validation gate for 24–30
   real Business Central recordings. It verifies coverage and reconciled counts,
   rejects unsafe workbook fields, and reports transparent KPI numerators,

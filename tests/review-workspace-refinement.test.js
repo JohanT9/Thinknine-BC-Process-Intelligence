@@ -103,9 +103,12 @@ assert(dashboard.includes('$("reviewList").hidden = false;'));
 assert(dashboard.indexOf("resetReviewSurfaceForOpen();") <
   dashboard.indexOf('$("reviewTitle").textContent',
     dashboard.indexOf("async function openReview(session)")));
-assert(dashboard.indexOf('const hierarchyState = resolveReviewHierarchyForDisplay') <
-  dashboard.indexOf('list.innerHTML = "";',
-    dashboard.indexOf("function renderReviewContent()")));
+assert(!html.includes('id="createReviewSection"'));
+assert(!html.includes('id="createReviewSubtask"'));
+assert(!html.includes('id="resetReviewHierarchy"'));
+assert(!html.includes('id="reviewHierarchy"'));
+assert(!dashboard.includes('command === "create-section"'));
+assert(!dashboard.includes('command === "create-subtask"'));
 assert(dashboard.includes('data-action="reset-comment"'));
 assert(dashboard.includes("updateCommentResetState"));
 assert(dashboard.includes('data-original-value="${escapeHtml(generatedComment)}"'));
