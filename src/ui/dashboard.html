@@ -556,6 +556,8 @@ table{width:100%;border-collapse:collapse}th,td{text-align:left;padding:9px;bord
         <summary id="processOverviewTitle" data-i18n="process.overview">Processöversikt</summary>
         <p class="muted process-overview-help" data-i18n="process.overviewHelp">Visar dokumenterade aktiviteter och observerade statusförändringar.</p>
         <div class="process-overview-export" role="group" aria-label="Exportera process">
+          <button id="saveProcessVersion" type="button" class="secondary" disabled>Spara version</button>
+          <button id="compareProcessVersions" type="button" class="secondary" disabled>Jämför versioner</button>
           <button id="exportProcessModel" type="button" class="secondary" disabled>Exportera process</button>
           <button id="exportProcessDiagram" type="button" class="secondary" disabled>Exportera diagram</button>
         </div>
@@ -668,6 +670,22 @@ table{width:100%;border-collapse:collapse}th,td{text-align:left;padding:9px;bord
   <footer><button id="closeDocumentViewSettings" class="primary">Klar</button></footer>
 </dialog>
 
+<dialog id="processVersionDialog" class="process-version-dialog"
+  aria-labelledby="processVersionDialogTitle">
+  <form method="dialog">
+    <header>
+      <h3 id="processVersionDialogTitle">Jämför processversioner</h3>
+      <p class="muted">Jämförelsen är skrivskyddad och visar endast semantiska processändringar.</p>
+    </header>
+    <div class="process-version-selectors">
+      <label>Från version<select id="processVersionFrom"></select></label>
+      <label>Till version<select id="processVersionTo"></select></label>
+    </div>
+    <div id="processVersionComparison" aria-live="polite"></div>
+    <footer><button value="close" class="primary">Stäng</button></footer>
+  </form>
+</dialog>
+
 <dialog id="regenerationPreviewDialog" class="regeneration-preview-dialog"
   aria-labelledby="regenerationPreviewTitle"
   aria-describedby="regenerationPreviewDescription">
@@ -768,6 +786,8 @@ table{width:100%;border-collapse:collapse}th,td{text-align:left;padding:9px;bord
 <script src="document/document-profile.js"></script>
 <script src="document/documentation-intelligence.js"></script>
 <script src="document/process-model.js"></script>
+<script src="document/process-versioning.js"></script>
+<script src="document/process-version-workflow.js"></script>
 <script src="document/document-library.js"></script>
 <script src="document/document-batch-operations.js"></script>
 <script src="exporters/word-export-pipeline.js"></script>
@@ -797,6 +817,7 @@ table{width:100%;border-collapse:collapse}th,td{text-align:left;padding:9px;bord
 <script src="document-workspace-experience.js"></script>
 <script src="document-library-view.js"></script>
 <script src="process-overview-view.js"></script>
+<script src="process-version-comparison-view.js"></script>
 <script src="i18n.js"></script>
 <script src="dashboard.js"></script>
 </body>

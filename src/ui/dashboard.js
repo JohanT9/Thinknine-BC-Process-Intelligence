@@ -6153,6 +6153,8 @@ function renderProcessOverview() {
   const container = $("processOverview");
   if (!container || !activeReview || !activeReviewSession) {
     activeProcessModel = null;
+    if ($("saveProcessVersion")) $("saveProcessVersion").disabled = true;
+    if ($("compareProcessVersions")) $("compareProcessVersions").disabled = true;
     if ($("exportProcessModel")) $("exportProcessModel").disabled = true;
     if ($("exportProcessDiagram")) $("exportProcessDiagram").disabled = true;
     return;
@@ -6169,6 +6171,9 @@ function renderProcessOverview() {
       overrides: activeReview.processOverrides || []
     });
     activeProcessModel = model;
+    $("saveProcessVersion").disabled = false;
+    $("compareProcessVersions").disabled =
+      !(activeReview.processVersions || []).length;
     $("exportProcessModel").disabled = false;
     $("exportProcessDiagram").disabled = false;
     globalThis.T9ProcessOverviewView.render(container, model, {
@@ -6178,6 +6183,8 @@ function renderProcessOverview() {
     });
   } catch (error) {
     activeProcessModel = null;
+    $("saveProcessVersion").disabled = true;
+    $("compareProcessVersions").disabled = true;
     $("exportProcessModel").disabled = true;
     $("exportProcessDiagram").disabled = true;
     container.innerHTML = `<p class="muted">${escapeHtml(uiTf(
@@ -6201,6 +6208,96 @@ async function exportActiveProcess(kind) {
       : uiT("Processen har exporterats."));
   } catch (error) {
     show(uiTf("process.exportError", { detail: error.message }), true);
+  }
+}
+
+function processVersionOptionLabel(choice) {
+  if (!choice.version) return uiT("Aktuellt");
+  return `v${choice.version.versionNumber}${choice.version.baseline
+    ? ` · ${uiT("Baslinje")}` : ""}`;
+}
+
+function renderProcessVersionComparison() {
+  const fromId = $("processVersionFrom").value;
+  const toId = $("processVersionTo").value;
+  const container = $("processVersionComparison");
+  if (fromId === toId) {
+    container.innerHTML = `<p class="muted">${escapeHtml(uiT(
+      "Välj två olika processversioner."
+    ))}</p>`;
+    return;
+  }
+  try {
+    const comparison = globalThis.T9ProcessVersionWorkflow.compare(
+      activeReview.processVersions || [], fromId, toId, activeProcessModel
+    );
+    globalThis.T9ProcessVersionComparisonView.render(container, comparison, {
+      locale: applicationSettings.uiLocale
+    });
+  } catch (error) {
+    container.innerHTML = `<p class="regeneration-preview-warning">${escapeHtml(
+      error.message
+    )}</p>`;
+  }
+}
+
+function openProcessVersionComparison() {
+  if (!activeReview || !activeProcessModel) return;
+  const choices = globalThis.T9ProcessVersionWorkflow.choices(
+    activeReview.processVersions || [], activeProcessModel
+  );
+  const populate = select => {
+    select.replaceChildren(...choices.map(choice => {
+      const option = document.createElement("option");
+      option.value = choice.id;
+      option.textContent = processVersionOptionLabel(choice);
+      return option;
+    }));
+  };
+  populate($("processVersionFrom"));
+  populate($("processVersionTo"));
+  const saved = choices.filter(choice => choice.version);
+  $("processVersionFrom").value = saved.length > 1
+    ? saved.at(-2).id : saved.at(-1)?.id || choices[0]?.id || "";
+  $("processVersionTo").value = saved.length > 1
+    ? saved.at(-1).id : globalThis.T9ProcessVersionWorkflow.CURRENT_ID;
+  renderProcessVersionComparison();
+  $("processVersionDialog").showModal();
+}
+
+async function saveCurrentProcessVersion() {
+  if (!activeReview || !activeProcessModel || !activeReviewSession) return;
+  const previous = [...(activeReview.processVersions || [])];
+  try {
+    const result = globalThis.T9ProcessVersionWorkflow.save(
+      activeProcessModel, previous, {
+        title: activeReviewSession.name,
+        createdAt: new Date().toISOString(),
+        status: activeReview.status === "completed" ? "approved" : "review"
+      }
+    );
+    if (!result.created) {
+      show(uiT("Processen är identisk med den senaste sparade versionen."));
+      return;
+    }
+    activeReview.processVersions = [...previous, result.version];
+    activeReview.updatedAt = result.version.createdAt;
+    await saveActiveReview({ announce: false, render: false });
+    try {
+      await updateDocumentLibraryRecord(activeReviewSession.id, {
+        processVersion: globalThis.T9ProcessVersioning.libraryMetadata(
+          activeReview.processVersions
+        )
+      }, { render: false });
+    } catch (metadataError) {
+      console.warn("Process version library metadata could not be updated.",
+        metadataError);
+    }
+    $("compareProcessVersions").disabled = false;
+    show(uiTf("process.versionSaved", { version: result.version.versionNumber }));
+  } catch (error) {
+    activeReview.processVersions = previous;
+    show(uiTf("process.versionSaveError", { detail: error.message }), true);
   }
 }
 
@@ -6530,6 +6627,13 @@ $("exportProcessModel").addEventListener("click", () =>
   exportActiveProcess("model"));
 $("exportProcessDiagram").addEventListener("click", () =>
   exportActiveProcess("diagram"));
+$("saveProcessVersion").addEventListener("click", saveCurrentProcessVersion);
+$("compareProcessVersions").addEventListener("click",
+  openProcessVersionComparison);
+$("processVersionFrom").addEventListener("change",
+  renderProcessVersionComparison);
+$("processVersionTo").addEventListener("change",
+  renderProcessVersionComparison);
 $("processOverview").addEventListener("keydown", event => {
   const action = event.target.closest?.("[data-process-node-action]");
   if (!action || !["ArrowLeft", "ArrowRight", "ArrowUp", "ArrowDown",

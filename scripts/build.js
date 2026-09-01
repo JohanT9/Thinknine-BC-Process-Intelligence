@@ -151,6 +151,7 @@ for (const file of [
   "async-operations.js",
   "document-library-view.js",
   "process-overview-view.js",
+  "process-version-comparison-view.js",
   "document-workspace-experience.js",
   "document-workspace-view.js",
   "debug.html",

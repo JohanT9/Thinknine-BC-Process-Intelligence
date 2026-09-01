@@ -1,5 +1,12 @@
 # BC Process Studio 4.7
 
+- Review Studio can now save immutable process checkpoints and visually compare
+  saved versions with each other or with the current Process Model. The
+  read-only view highlights added, removed, modified and moved activities plus
+  route and observed-state changes. Identical snapshots are not duplicated;
+  existing Reviews remain compatible. See
+  [Process version comparison](PROCESS_VERSION_COMPARISON.md).
+
 - Process Overview now exports both a deterministic, machine-readable Process
   Model JSON and a standalone accessible SVG diagram. Decisions, alternate
   routes, route labels and observed state changes follow the same validated

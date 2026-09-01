@@ -11,6 +11,11 @@
 
 ## Unreleased
 
+- Added immutable Process Model checkpoints and a read-only visual comparison
+  in Review Studio. Consultants can compare saved versions with each other or
+  with the current process; duplicate semantic snapshots are ignored and the
+  Document Library receives summary metadata only.
+
 - Added local export of the validated Process Model as deterministic JSON and
   of the visible process semantics as an accessible standalone SVG diagram.
   Diagram export includes decisions, route labels and observed state changes
