@@ -4287,6 +4287,9 @@ function applyReviewStatus() {
     activeReview?.tasks || [],
     activeReviewSelection
   );
+  status.corrections = activeReview
+    ? globalThis.T9Review.correctionFeedbackSummary(activeReview).correctionCount
+    : 0;
   globalThis.T9ReviewStatus.apply($("reviewStatus"), status);
 }
 

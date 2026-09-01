@@ -37,6 +37,8 @@
     : root.T9ReviewTaskVisibility;
   const languages = typeof module === "object" && module.exports
     ? require("../engine/language-registry") : root.T9LanguageRegistry;
+  const correctionFeedback = typeof module === "object" && module.exports
+    ? require("./correction-feedback") : root.T9CorrectionFeedback;
   const api = factory(
     moveEngine,
     mergeEngine,
@@ -50,7 +52,8 @@
     notes,
     hierarchy,
     taskVisibility,
-    languages
+    languages,
+    correctionFeedback
   );
   if (typeof module === "object" && module.exports) module.exports = api;
   root.T9Review = api;
@@ -67,7 +70,8 @@
   notes,
   hierarchy,
   taskVisibility,
-  languages
+  languages,
+  correctionFeedback
 ) {
   function clone(value) {
     return JSON.parse(JSON.stringify(value));
@@ -296,6 +300,9 @@
 
   function record(review, type, beforeTasks, options = {}) {
     const createdAt = options.now || new Date().toISOString();
+    const feedback = correctionFeedback.create(
+      type, beforeTasks, review.tasks, options
+    );
     historyEngine.record(review, {
       historyId: options.commandHistoryId || `${type}-${createdAt}`,
       type,
@@ -313,7 +320,9 @@
       afterHierarchy: review.hierarchy,
       beforeSelection: options.beforeSelection,
       afterSelection: options.afterSelection,
-      metadata: options.metadata,
+      metadata: feedback
+        ? { ...(options.metadata || {}), correctionFeedback: feedback }
+        : options.metadata,
       beforeStatus: options.beforeStatus === undefined
         ? review.status
         : options.beforeStatus,
@@ -1312,6 +1321,7 @@
     undo: historyEngine.undo,
     redo: historyEngine.redo,
     historyDirectionFromKey: historyEngine.directionFromKey,
+    correctionFeedbackSummary: correctionFeedback.summary,
     activeTasks,
     visibleTaskNumber,
     canComplete,

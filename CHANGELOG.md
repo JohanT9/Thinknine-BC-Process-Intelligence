@@ -11,6 +11,11 @@
 
 ## Unreleased
 
+- Added versioned, local-only correction feedback derived from active Review
+  history. The signal contains categories and counts only, excludes document
+  content and customer data, respects undo/redo, and never applies automatic
+  learning or document changes.
+
 - Projected verified observed results and observed errors as traceable,
   system-derived Step callouts through Semantic Document, Document Workspace,
   and Word. Expected results remain a separate human-owned document field;

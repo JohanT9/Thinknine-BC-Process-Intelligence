@@ -1,5 +1,13 @@
 # BC Process Studio 4.7
 
+- Review corrections now produce a privacy-safe local feedback signal. It
+  records only correction category, affected field categories and count; it
+  never contains instruction text, values, captions, identifiers, images,
+  company/session data or URLs. Undone changes are excluded, and feedback does
+  not automatically alter recordings, existing documents or generation rules.
+  The complete boundary is documented in
+  [Privacy-safe correction feedback](CORRECTION_FEEDBACK.md).
+
 - Screenshot selection is now measurable and explainable. The immutable result
   includes candidate scores, runner-up margin, a versioned quality level and an
   explicit review recommendation. Review Studio shows a compact localized

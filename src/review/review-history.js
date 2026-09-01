@@ -25,6 +25,27 @@
     return clone(tasks || []);
   }
 
+  function groupedMetadata(previous, current) {
+    if (current === undefined) return previous;
+    const before = previous?.correctionFeedback;
+    const after = current?.correctionFeedback;
+    if (!before || !after) return clone(current);
+    return clone({
+      ...previous,
+      ...current,
+      correctionFeedback: {
+        ...before,
+        ...after,
+        affectedFields: [...new Set([
+          ...(before.affectedFields || []), ...(after.affectedFields || [])
+        ])].sort(),
+        affectedStepCount: Math.max(
+          before.affectedStepCount || 0, after.affectedStepCount || 0
+        )
+      }
+    });
+  }
+
   function record(review, command) {
     ensure(review);
     const beforeTasks = snapshot(command.beforeTasks);
@@ -91,7 +112,8 @@
         afterAnnotationSelection:
           command.afterAnnotationSelection === undefined
             ? previous.afterAnnotationSelection
-            : clone(command.afterAnnotationSelection)
+            : clone(command.afterAnnotationSelection),
+        metadata: groupedMetadata(previous.metadata, command.metadata)
       };
     } else {
       entries.push({
