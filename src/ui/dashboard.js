@@ -4260,6 +4260,13 @@ function reviewTaskIds() {
     .map(task => task.taskId);
 }
 
+function reviewNavigationState() {
+  return globalThis.T9ReviewNavigation.derive(
+    globalThis.T9Review.activeTasks(activeReview || { tasks: [] }),
+    activeReviewSelection.activeId
+  );
+}
+
 function applyReviewToolbarState() {
   const state = globalThis.T9ReviewToolbar.derive({
     taskIds: reviewTaskIds(),
@@ -4276,6 +4283,12 @@ function applyReviewToolbarState() {
     !globalThis.T9Review.canComplete(activeReview);
   $("regenerateSelectedReview").disabled =
     !activeReviewSelection.selectedIds.length;
+  const navigation = reviewNavigationState();
+  const nextButton = $("nextUnreviewedStep");
+  nextButton.disabled = !activeReview || navigation.complete;
+  nextButton.setAttribute("aria-label", navigation.complete
+    ? uiT("review.allStepsReviewed")
+    : uiTf("review.nextUnreviewedLabel", { count: navigation.count }));
 }
 
 function applyReviewStatus() {
@@ -4335,6 +4348,23 @@ function activateProcessOverviewTask(taskId, focusCard = false) {
   card?.scrollIntoView({ block: "center" });
   $("reviewFooterText").textContent = "Motsvarande granskningssteg visas.";
   return true;
+}
+
+function activateNextUnreviewedStep() {
+  const navigation = reviewNavigationState();
+  if (!navigation.nextTaskId) {
+    show(uiT("review.allStepsReviewed"));
+    return false;
+  }
+  const activated = activateProcessOverviewTask(
+    navigation.nextTaskId, true
+  );
+  if (activated) {
+    show(navigation.count === 1
+      ? uiT("review.lastUnreviewedShown")
+      : uiTf("review.nextUnreviewedShown", { count: navigation.count }));
+  }
+  return activated;
 }
 
 function dispatchReviewSelection(command, focusActive = false) {
@@ -7097,6 +7127,8 @@ async function saveReviewExplicitly() {
 }
 $("saveReview").addEventListener("click", saveReviewExplicitly);
 $("saveReviewBottom").addEventListener("click", saveReviewExplicitly);
+$("nextUnreviewedStep").addEventListener("click",
+  activateNextUnreviewedStep);
 $("expectedResultEditor").addEventListener("input", event => {
   globalThis.T9Review.setDocumentField(
     activeReview,
@@ -7338,6 +7370,12 @@ $("reviewOverlay").addEventListener("keydown", event => {
     return;
   }
   if (event.target.closest?.('[data-editing="true"]')) return;
+  if (event.altKey && !event.ctrlKey && !event.metaKey &&
+      event.key.toLowerCase() === "n") {
+    event.preventDefault();
+    activateNextUnreviewedStep();
+    return;
+  }
   const direction = globalThis.T9Review.historyDirectionFromKey(event);
   if (!direction) return;
   event.preventDefault();

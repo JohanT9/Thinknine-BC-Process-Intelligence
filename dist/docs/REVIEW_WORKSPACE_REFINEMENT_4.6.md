@@ -86,3 +86,10 @@ Editor scrolling occurs only when editing begins.
 - Clearer: writing, screenshots and current selection dominate the hierarchy.
 - Less distracting: rare structure, maintenance and numeric annotation controls
   no longer compete with everyday work.
+# Guided review navigation (4.7)
+
+Review Studio exposes **Next unreviewed** in the primary toolbar. The command
+starts after the active Step, skips approved Steps and wraps once through the
+visible review order. The target becomes the active selection, receives focus
+and is scrolled into view. `Alt+N` provides the same workflow from the keyboard;
+the control is disabled when every visible Step is approved.

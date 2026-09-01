@@ -242,3 +242,10 @@ status/error outcome presence and deterministic coverage are retained without
 copying potentially sensitive messages. Capture Packet Integrity verifies the
 coverage, and Process Overview renders boolean transitions as readable On/Off
 or På/Av values.
+# Guided review navigation
+
+- Use **Next unreviewed** or `Alt+N` to continue from the current position.
+- Approved Steps are skipped and the next target is focused and brought into
+  view automatically.
+- The action reports how many Steps remain and becomes unavailable when the
+  review is complete.

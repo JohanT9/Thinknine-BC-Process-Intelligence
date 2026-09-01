@@ -494,6 +494,10 @@ table{width:100%;border-collapse:collapse}th,td{text-align:left;padding:9px;bord
         </div>
         <button id="saveReview" data-review-toolbar-item class="primary" aria-keyshortcuts="Control+S Meta+S">Spara</button>
         <button id="exportWordReview" data-review-command="export" data-review-toolbar-item class="primary" disabled>Exportera Word</button>
+        <button id="nextUnreviewedStep" data-review-toolbar-item
+          class="secondary review-next-action" aria-keyshortcuts="Alt+N"
+          aria-describedby="reviewKeyboardHelp" data-i18n="review.nextUnreviewed"
+          disabled>N&auml;sta ogranskade</button>
         <details id="reviewMoreActions" class="review-toolbar-more">
           <summary data-review-toolbar-item aria-controls="reviewMoreActionsPanel" aria-expanded="false">Fler åtgärder</summary>
           <div id="reviewMoreActionsPanel" class="review-toolbar-more-panel">
@@ -519,7 +523,7 @@ table{width:100%;border-collapse:collapse}th,td{text-align:left;padding:9px;bord
       <div id="reviewProgress" class="review-progress" role="progressbar" aria-label="Granskningsförlopp" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
         <div id="reviewProgressBar" class="review-progress-bar"></div>
       </div>
-      <p id="reviewKeyboardHelp" class="sr-only">Välj steg med piltangenterna. Använd Ctrl för flerval och Shift för intervall. Tryck Enter för att redigera. I instruktionen skapar Enter en ny rad, Ctrl eller Cmd plus Enter sparar och Escape avbryter. Alt plus pil flyttar valda steg.</p>
+      <p id="reviewKeyboardHelp" class="sr-only" data-i18n="review.keyboardHelp">Välj steg med piltangenterna. Använd Ctrl för flerval och Shift för intervall. Alt plus N går till nästa ogranskade steg. Tryck Enter för att redigera. I instruktionen skapar Enter en ny rad, Ctrl eller Cmd plus Enter sparar och Escape avbryter. Alt plus pil flyttar valda steg.</p>
       <div id="reviewStatus" role="status" aria-live="polite" aria-atomic="true" aria-label="Dokumentstatus">
         <dl class="review-status">
           <div><dt>Steg</dt><dd data-review-stat="steps">0</dd></div>
@@ -809,6 +813,7 @@ table{width:100%;border-collapse:collapse}th,td{text-align:left;padding:9px;bord
 <script src="document/regenerate-from-recording.js"></script>
 <script src="review/review-regeneration.js"></script>
 <script src="review/review-selection.js"></script>
+<script src="review/review-navigation.js"></script>
 <script src="workspace-controller.js"></script>
 <script src="workspace-context.js"></script>
 <script src="document-workspace-view.js"></script>

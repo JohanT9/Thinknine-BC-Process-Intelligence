@@ -11,6 +11,10 @@
 
 ## Unreleased
 
+- Added a prominent Next unreviewed action to Review Studio. It follows the
+  visible Step order, wraps deterministically, focuses the selected card and is
+  available through Alt+N with accessible remaining-count feedback.
+
 - Harmonized Review Step spacing, typography and state colors. Review-needed
   and approved cards now use restrained edge accents plus visible text badges;
   selection uses the product focus color, and reversible Hide is no longer

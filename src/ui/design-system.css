@@ -165,6 +165,11 @@ tbody tr:hover { background: var(--colorBrandSubtle); }
 }
 .review-progress { height: 4px !important; border-radius: 0 !important; }
 .review-progress-bar { background: var(--colorBrandPrimary) !important; }
+.review-next-action:not(:disabled) {
+  border-color: var(--colorBrandPrimary) !important;
+  color: var(--colorBrandPrimary) !important;
+  font-weight: 600 !important;
+}
 .workspace-tabs button[aria-selected="true"] { color: var(--colorBrandPrimary) !important; border-bottom: 2px solid var(--colorBrandPrimary) !important; }
 .document-workspace-panel { background: #e6e8eb !important; }
 .document-workspace-page { box-shadow: var(--shadow8); }
