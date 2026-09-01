@@ -6,6 +6,14 @@ R4 applies Workflow Before Features, User Value First, Progressive Disclosure
 and Consistency Over Cleverness. It adds no document or Review capability. It
 reduces the attention required to operate existing capabilities.
 
+## Contextual tooltips (4.7)
+
+The shared tooltip layer gives buttons, icon actions and menu summaries concise
+context on pointer hover and keyboard focus. Text is resolved when the tooltip
+opens, so it follows the active interface language and reuses accessible labels
+instead of introducing a separate translation source. Tooltips remain inside
+the viewport and can be dismissed with Escape.
+
 ## Toolbar philosophy
 
 The visible toolbar contains the commands used repeatedly during normal review:

@@ -148,6 +148,7 @@ for (const file of [
   "design-system.css",
   "dashboard.js",
   "i18n.js",
+  "tooltips.js",
   "async-operations.js",
   "document-library-view.js",
   "process-overview-view.js",

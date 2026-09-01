@@ -11,6 +11,11 @@
 
 ## Unreleased
 
+- Added shared localized tooltips across Dashboard, Review Studio, recorder,
+  diagnostics and technical reports. Buttons and menu summaries now expose
+  concise help on hover and keyboard focus, with viewport-aware positioning,
+  Escape dismissal and forced-colour support.
+
 - Fixed the recorder popup collapsing to a narrow column after responsive
   hardening. The extension surface now establishes a stable 390-pixel layout
   width while retaining vertical reflow for short browser windows.

@@ -291,3 +291,12 @@ or På/Av values.
   assistive technology.
 - The extension popup keeps a stable 390-pixel working width; responsive rules
   no longer allow the browser's provisional viewport to collapse the layout.
+
+# Contextual tooltips
+
+- Buttons, icon actions and menu summaries show concise tooltips on hover and
+  keyboard focus across the primary product surfaces.
+- Tooltip text follows the active interface language and uses existing
+  accessible labels where available.
+- Tooltips stay inside the viewport and close on pointer exit, focus exit,
+  scrolling, resizing or Escape.

@@ -56,6 +56,7 @@
 
 *, *::before, *::after { box-sizing: border-box; }
 [hidden] { display: none !important; }
+.t9-tooltip{position:fixed;z-index:10000;max-width:min(280px,calc(100vw - 16px));padding:6px 9px;border:1px solid #515151;border-radius:var(--radiusMedium);background:#242424;color:#fff;font-size:12px;line-height:1.35;box-shadow:var(--shadow8);pointer-events:none;overflow-wrap:anywhere}
 html { background: var(--colorBackgroundCanvas); }
 body {
   font-family: var(--fontFamilyBase) !important;
@@ -308,6 +309,7 @@ dialog::backdrop { background: rgb(0 0 0 / 40%) !important; }
   .review-state-label,.process-overview-review-state,.library-filter-count,
   .library-language{border:1px solid CanvasText;background:Canvas;color:CanvasText}
   .process-overview-action[aria-current="step"]{outline:3px solid Highlight}
+  .t9-tooltip{border:1px solid CanvasText;background:Canvas;color:CanvasText}
 }
 .process-overview-export{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 12px}
 .process-diagram-scroll{scroll-snap-type:x proximity}
