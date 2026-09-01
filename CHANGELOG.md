@@ -11,6 +11,11 @@
 
 ## Unreleased
 
+- Harmonized Review Step spacing, typography and state colors. Review-needed
+  and approved cards now use restrained edge accents plus visible text badges;
+  selection uses the product focus color, and reversible Hide is no longer
+  presented as a destructive red action.
+
 - Simplified every Review Step card to keep editing and approval prominent while
   grouping move, add, image, reset, hide and compact actions under an accessible
   More actions menu. Technical confidence and provenance are now progressively

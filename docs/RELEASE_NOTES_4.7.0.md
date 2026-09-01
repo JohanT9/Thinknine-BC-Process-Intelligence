@@ -1,5 +1,10 @@
 # BC Process Studio 4.7
 
+- Review Step cards now use a quieter and accessible visual state system.
+  Approval and review attention have narrow green/amber accents plus text
+  badges, selection uses the product focus colour, and reversible Hide is
+  neutral. Updated spacing, numbering and typography improve scanability.
+
 - Review Step cards now prioritize content editing and approval. Secondary
   actions are grouped in a keyboard-accessible menu that closes after use, on
   focus leaving it, or with Escape. Technical confidence and provenance remain

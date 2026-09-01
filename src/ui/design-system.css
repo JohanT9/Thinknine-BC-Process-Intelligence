@@ -153,10 +153,10 @@ tbody tr:hover { background: var(--colorBrandSubtle); }
 .review-overlay { padding: 0 !important; }
 .review-shell { height: 100dvh !important; border-radius: 0 !important; box-shadow: none !important; }
 .review-header { padding: var(--space12) var(--space20) !important; }
-.review-card { border-radius: var(--radiusMedium) !important; }
-.review-card.selected { outline-width: var(--focusWidth) !important; background: var(--colorBrandSubtle); }
-.review-card.approved { border-color: var(--colorStatusSuccess) !important; background: #f1faf1 !important; }
-.review-card.needs-review { border-color: #f7630c !important; }
+.review-card { border-color: var(--colorBorderSubtle) !important; border-radius: var(--radiusLarge) !important; }
+.review-card.selected { outline-width: var(--focusWidth) !important; outline-offset: 2px; }
+.review-card.approved { border-color: var(--colorBorderSubtle) !important; border-left-color: var(--colorStatusSuccess) !important; background: #f7fbf7 !important; }
+.review-card.needs-review { border-color: var(--colorBorderSubtle) !important; border-left-color: #c58b00 !important; background: #fffdf5 !important; }
 .review-card.drop-before { box-shadow: inset 0 4px 0 var(--colorBrandPrimary) !important; }
 .review-card.drop-after { box-shadow: inset 0 -4px 0 var(--colorBrandPrimary) !important; }
 .review-fields [data-edit-field][data-editing="true"] {

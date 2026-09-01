@@ -5610,17 +5610,19 @@ function renderReviewContent() {
       candidate.taskId === task.taskId
     );
     const card = document.createElement("article");
+    const needsReview = !task.approved &&
+      (task.reviewSuggested || task.confidenceScore < 80);
+    const reviewState = task.approved ? "approved"
+      : needsReview ? "needs-review" : "pending";
+    const reviewStateLabel = task.approved ? uiT("Godkänt")
+      : needsReview ? uiT("Behöver granskas") : uiT("Ej granskat");
     card.dataset.reviewTaskId = task.taskId;
+    card.dataset.reviewState = reviewState;
     card.setAttribute("role", "row");
     card.setAttribute("aria-rowindex", String(visibleIndex + 1));
-    card.setAttribute("aria-label", `Steg ${visibleIndex + 1}`);
-    card.className =
-      "review-card " +
-      (task.approved
-        ? "approved"
-        : task.reviewSuggested || task.confidenceScore < 80
-          ? "needs-review"
-          : "");
+    card.setAttribute("aria-label",
+      `${uiT("Steg")} ${visibleIndex + 1}, ${reviewStateLabel}`);
+    card.className = `review-card ${reviewState}`;
 
     const images = reviewImages(task);
     const instructionPresentation = reviewInstructionPresentation(task,
@@ -5644,7 +5646,10 @@ function renderReviewContent() {
       <div class="review-number" role="gridcell">${visibleIndex + 1}</div>
       <div class="review-fields" role="gridcell">
         <div class="review-field-heading">
-          <label for="review-instruction-${visibleIndex}">Instruktion</label>
+          <span class="review-field-title">
+            <label for="review-instruction-${visibleIndex}">Instruktion</label>
+            <span class="review-state-label ${reviewState}">${reviewStateLabel}</span>
+          </span>
           <button data-action="edit-instruction" class="secondary"
             aria-label="${uiTf("a11y.editInstruction", { step: visibleIndex + 1 })}">Redigera</button>
         </div>
@@ -5809,7 +5814,7 @@ function renderReviewContent() {
             <button data-action="reset-instruction" class="secondary"
               ${task.fieldProvenance?.instruction === "user-edited" ? "" : "disabled"}
               aria-label="${uiTf("a11y.resetInstruction", { step: visibleIndex + 1 })}">Återställ text</button>
-            <button data-action="remove" class="danger"
+            <button data-action="remove" class="secondary review-hide-action"
               aria-label="${uiTf("a11y.hideStep", { step: visibleIndex + 1 })}">Dölj</button>
             ${task.manualStepId ? `<button data-action="delete-manual" class="danger"
               aria-label="Ta bort manuellt steg ${visibleIndex + 1}">Ta bort manuellt steg</button>` : ""}

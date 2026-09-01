@@ -375,6 +375,8 @@
     ["Exportera Word", "Export Word"], ["Favoritmarkera", "Mark as favourite"],
     ["Taggar", "Tags"], ["Profil", "Profile"], ["Fler åtgärder", "More actions"],
     ["Teknisk information", "Technical information"],
+    ["Godkänt", "Approved"], ["Behöver granskas", "Needs review"],
+    ["Ej granskat", "Not reviewed"],
     ["Redigera metadata", "Edit metadata"], ["Arkivera", "Archive"],
     ["Ta bort permanent", "Delete permanently"], ["Ändra taggar", "Change tags"],
     ["Ändra profil", "Change profile"], ["Ändra tema", "Change theme"],

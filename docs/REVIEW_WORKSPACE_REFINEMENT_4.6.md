@@ -42,6 +42,14 @@ step selection retains its strong outline. Instruction text receives more space
 than technical metadata. Screenshots and annotations remain within their step,
 and status stays in the header without competing with primary commands.
 
+Step states use a restrained, consistent grammar: neutral for not reviewed,
+amber as a narrow attention accent, green as a narrow approved accent, and teal
+focus/selection outlines. Every state is also written as a visible badge and in
+the card's accessible name, so colour is never the only signal. Reversible Hide
+is visually neutral; red remains reserved for errors and permanent destructive
+actions. Card spacing, numbering, labels and instruction typography follow the
+shared design-system scale.
+
 ## Step action hierarchy
 
 The normal Step surface now keeps instruction editing and approval immediately
