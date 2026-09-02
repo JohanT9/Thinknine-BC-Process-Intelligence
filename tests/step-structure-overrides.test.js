@@ -120,4 +120,18 @@ const steps = [{
   assert.equal(structure.resolve(many, [hidden]).steps.length, 4999);
 }
 
+{
+  const review = reviewStudio.createReview({ id: "legacy-recording", name: "BC" },
+    steps.map(step => ({ ...step, sourceEventNos: step.sourceEventIds })));
+  review.generatedTasks = [];
+  review.structureOverrides = [{ structureOverrideId: "legacy-override",
+    type: "hide", sourceStepIds: ["step-a"] }];
+  const tasksBeforeReset = JSON.stringify(review.tasks);
+  reviewStudio.resetStructure(review, { now: NOW });
+  assert.equal(JSON.stringify(review.tasks), tasksBeforeReset,
+    "an empty legacy baseline must never erase stored Review steps");
+  assert.equal(reviewStudio.activeTasks(review).length, 3);
+  assert.equal(review.structureOverrides.length, 0);
+}
+
 console.log("Step Structure Override tests passed.");

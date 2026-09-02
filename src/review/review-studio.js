@@ -1124,7 +1124,9 @@
       review.structureOverrides || []
     );
     review.structureOverrides = [];
-    if (Array.isArray(review.generatedTasks)) {
+    const hasGeneratedBaseline = Array.isArray(review.generatedTasks) &&
+      review.generatedTasks.length > 0;
+    if (hasGeneratedBaseline) {
       const contentOverrides = (review.tasks || []).filter(task => task.stepOverride)
         .map(task => ({ taskId: task.taskId, stepId: task.stepId,
           stepOverride: historyEngine.snapshot(task.stepOverride) }));

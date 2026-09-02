@@ -308,3 +308,10 @@ or På/Av values.
   closing no longer depend on Edge's native disclosure timing.
 - Selecting the ellipsis trigger no longer enters the command auto-close path;
   the menu remains visible until it is deliberately closed or a command runs.
+
+# Safe structure reset
+
+- Reset Structure no longer replaces existing Review steps with an empty
+  generated baseline from older or migrated stored reviews.
+- When no valid generated baseline exists, the current steps are retained and
+  only the structural overrides are cleared. The operation remains undoable.
