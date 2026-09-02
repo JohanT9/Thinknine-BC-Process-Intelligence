@@ -11,6 +11,11 @@
 
 ## Unreleased
 
+- Added a deterministic Business Central Process Recognition Engine with
+  metadata-first entity/action extraction, partial taxonomy sequence matching,
+  confidence scoring, explainable alternatives, variant recognition, and a
+  bounded future-AI extension contract.
+
 - Extended Canonical Recording with optional Business Central semantic
   classifications, multi-event Process Step mappings, document-state
   transitions, confidence/provenance metadata, and auditable manual overrides.

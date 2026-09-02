@@ -189,6 +189,7 @@
     ["variant:otc:ship-and-invoice", "bc-process:order-to-cash:standard-sales-order", "Ship and Invoice Together", { warehouseHandling: false }],
     ["variant:purchase:direct-receipt", "bc-process:source-to-pay:standard-purchase-order", "Direct Receipt and Invoice", { warehouseHandling: false }],
     ["variant:warehouse:bins-and-directed-put-away", "bc-process:warehouse:inbound-receipt-put-away", "Directed Put-away and Pick", { directedPutAwayAndPick: true }],
+    ["variant:warehouse:advanced-outbound", "bc-process:warehouse:outbound-pick-shipment", "Advanced Warehouse", { directedPutAwayAndPick: true }],
     ["variant:production:make-to-order", "bc-process:production:released-production-order", "Make-to-Order", { manufacturingPolicy: "make-to-order" }],
     ["variant:planning:requisition-worksheet", "bc-process:planning:planning-worksheet", "Requisition Worksheet", { worksheet: "requisition" }]
   ].map(([id, bcProcessId, name, conditions]) => ({ id, bcProcessId, name, conditions,

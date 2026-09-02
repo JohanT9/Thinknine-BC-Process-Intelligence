@@ -1,0 +1,245 @@
+(function (root, factory) {
+  const schema = typeof module === "object" && module.exports
+    ? require("./process-taxonomy-schema") : root.T9ProcessTaxonomySchema;
+  const seed = typeof module === "object" && module.exports
+    ? require("./business-central-process-taxonomy-seed").seed
+    : root.T9BusinessCentralProcessTaxonomySeed.seed;
+  const api = factory(schema, seed);
+  if (typeof module === "object" && module.exports) module.exports = api;
+  root.T9BCProcessRecognitionEngine = api;
+})(typeof globalThis !== "undefined" ? globalThis : this, function (schema, seed) {
+  "use strict";
+  const ENGINE_VERSION = "1.0.0";
+  const clone = value => value == null ? value : JSON.parse(JSON.stringify(value));
+  const text = value => value == null ? "" : String(value).trim();
+  const words = value => text(value).toLowerCase().replace(/[^a-z0-9åäöæø]+/g, " ").trim();
+  const unique = values => [...new Set(values.filter(Boolean))];
+  const key = value => text(value).replace(/[^a-z0-9]+/gi, " ").trim()
+    .split(/\s+/).map((part, index) => index ? part[0]?.toUpperCase() + part.slice(1) :
+      part[0]?.toUpperCase() + part.slice(1)).join("");
+
+  const ACTIONS = [
+    ["Release", /\b(release|released|släpp|frisläpp)\b/i],
+    ["Register", /\b(register|registered|registrera|registrerad)\b/i],
+    ["Receive", /\b(receive|receipt|mottag|inleverans)\b/i],
+    ["Invoice", /\b(invoice|faktur)\b/i], ["Ship", /\b(ship|shipment|leverans)\b/i],
+    ["Pick", /\b(pick|plock)\b/i], ["Consume", /\b(consum|förbruk)\b/i],
+    ["Output", /\b(output|utflöde)\b/i], ["Transfer", /\btransfer|överför\b/i],
+    ["Post", /\b(post|posting|bokför)\b/i], ["Create", /\b(create|new|ny|skapa)\b/i]
+  ];
+
+  function eventPage(event) {
+    return event.identification?.pageIdentity || event.page || event.businessCentral || {};
+  }
+
+  function eventTexts(event) {
+    const raw = event.raw || {};
+    return unique([event.page?.caption, event.page?.name, event.businessCentral?.pageCaption,
+      event.identification?.pageIdentity?.pageCaption,
+      event.identification?.pageIdentity?.documentType,
+      event.identification?.pageIdentity?.entity, event.action?.caption,
+      event.identification?.actionIdentity?.caption, event.control?.name,
+      event.accessibleTarget?.name, raw.actionCaption, raw.accessibleName, raw.label,
+      raw.fieldName, raw.pageCaption, raw.pageName, raw.documentTitle, raw.automationId,
+      raw.dataControlId, raw.dataControlName, raw.category, raw.type]);
+  }
+
+  function documentMatch(event, documents) {
+    const page = eventPage(event);
+    const pageId = text(page.pageObjectId || event.page?.pageObjectId ||
+      event.businessCentral?.pageObjectId);
+    const tableId = text(page.tableId || event.page?.tableId);
+    const semanticDocument = event.semantic?.businessDocument?.id ||
+      event.businessDocument?.id || null;
+    if (semanticDocument) {
+      const document = documents.find(item => item.id === semanticDocument);
+      if (document) return { document, strength: 1, signal: "semantic-document",
+        explanation: `Matched semantic document ${document.name}` };
+    }
+    if (pageId) {
+      const document = documents.find(item => item.pageIds.includes(pageId));
+      if (document) return { document, strength: 1, signal: "page-object-id",
+        explanation: `Matched ${document.name} page ${pageId}` };
+    }
+    if (tableId) {
+      const candidates = documents.filter(item => item.tableIds.includes(tableId));
+      if (candidates.length === 1) return { document: candidates[0], strength: 0.9,
+        signal: "source-table", explanation: `Matched ${candidates[0].name} table ${tableId}` };
+    }
+    const combined = words(eventTexts(event).join(" "));
+    const candidates = documents.filter(item => combined.includes(words(item.name)));
+    if (candidates.length === 1) return { document: candidates[0], strength: 0.32,
+      signal: "caption-text", explanation: `Caption suggests ${candidates[0].name}` };
+    return null;
+  }
+
+  function actionMatches(event) {
+    const raw = event.raw || {};
+    const identified = event.identification?.actionIdentity || {};
+    const technical = words([identified.actionType, raw.actionType, raw.automationId,
+      raw.dataControlId, raw.dataControlName].join(" "));
+    const captions = words(eventTexts(event).join(" "));
+    const results = [];
+    ACTIONS.forEach(([name, expression]) => {
+      const technicalCompact = technical.replace(/\s+/g, "");
+      if (technical && (technicalCompact.includes(name.toLowerCase()) ||
+        expression.test(technical))) results.push({ name, strength: 1,
+        signal: "technical-action", explanation: `Detected ${name} from BC action metadata` });
+      else if (expression.test(captions)) results.push({ name, strength: 0.38,
+        signal: "action-caption", explanation: `Action caption suggests ${name}` });
+    });
+    return results;
+  }
+
+  function extractEvidence(recording, taxonomy = seed, options = {}) {
+    const documents = taxonomy.documents || [];
+    const observations = [];
+    (recording?.events || []).forEach((event, index) => {
+      const document = documentMatch(event, documents);
+      const actions = actionMatches(event);
+      const screenshot = options.screenshotEvidence?.[event.id] || null;
+      observations.push({ eventId: event.id, sequence: event.sequence || index + 1,
+        document: document ? { id: document.document.id, name: document.document.name,
+          strength: document.strength, signal: document.signal } : null,
+        actions, page: clone(eventPage(event)), screenshot: screenshot ? {
+          interpretation: clone(screenshot), strength: 0.15, signal: "screenshot-interpretation"
+        } : null,
+        explanations: unique([document?.explanation, ...actions.map(item => item.explanation),
+          screenshot ? "Screenshot interpretation supplied weak supporting evidence" : null]) });
+    });
+    const transitions = [];
+    const semanticTransitions = recording?.semanticInterpretation?.documentStateTransitions || [];
+    semanticTransitions.forEach(item => transitions.push({ type: "state",
+      documentId: item.businessDocument?.id || null, fromState: clone(item.fromState),
+      toState: clone(item.toState), sourceEventIds: clone(item.sourceEventIds), strength: 1,
+      explanation: `Detected ${item.businessDocument?.name || "document"} state transition ${item.fromState?.name || item.fromState || "?"} → ${item.toState?.name || item.toState || "?"}` }));
+    const documentSequence = [];
+    observations.forEach(item => { if (item.document &&
+      documentSequence.at(-1)?.id !== item.document.id) documentSequence.push({
+      id: item.document.id, name: item.document.name, strength: item.document.strength,
+      eventId: item.eventId, signal: item.document.signal }); });
+    for (let index = 1; index < documentSequence.length; index += 1) transitions.push({
+      type: "navigation", fromDocumentId: documentSequence[index - 1].id,
+      toDocumentId: documentSequence[index].id,
+      sourceEventIds: [documentSequence[index - 1].eventId, documentSequence[index].eventId],
+      strength: Math.min(documentSequence[index - 1].strength, documentSequence[index].strength),
+      explanation: `Observed ${documentSequence[index - 1].name} → ${documentSequence[index].name}` });
+    return { observations, documentSequence, transitions };
+  }
+
+  function orderedMatches(observed, expected) {
+    let position = 0;
+    const matched = [];
+    observed.forEach(item => {
+      const next = expected.indexOf(item.id, position);
+      if (next >= 0) { matched.push(item); position = next + 1; }
+    });
+    return matched;
+  }
+
+  function candidateFor(process, taxonomy, evidence) {
+    const businessProcess = taxonomy.businessProcesses.find(item =>
+      item.id === process.businessProcessId);
+    const domain = taxonomy.domains.find(item => item.id === businessProcess?.domainId);
+    const expectedDocuments = process.documentIds || [];
+    const matchedDocuments = orderedMatches(evidence.documentSequence, expectedDocuments);
+    const processSteps = taxonomy.processSteps.filter(item => process.processStepIds.includes(item.id));
+    const expectedActions = taxonomy.actions.filter(item =>
+      processSteps.some(step => step.id === item.processStepId));
+    const observedActions = evidence.observations.flatMap(item => item.actions.map(action => ({
+      ...action, eventId: item.eventId })));
+    const actionHits = observedActions.filter(observed => expectedActions.some(expected =>
+      words(expected.name).includes(words(observed.name)) ||
+      words(expected.actionType).includes(words(observed.name))));
+    const documentStrength = matchedDocuments.reduce((sum, item) => sum + item.strength, 0);
+    const documentCoverage = expectedDocuments.length ? documentStrength / expectedDocuments.length : 0;
+    const observedCoverage = evidence.documentSequence.length ?
+      matchedDocuments.length / evidence.documentSequence.length : 0;
+    const sequenceStrength = matchedDocuments.length > 1 ?
+      Math.min(1, matchedDocuments.length / Math.min(3, expectedDocuments.length)) : 0;
+    const actionStrength = actionHits.reduce((sum, item) => sum + item.strength, 0) /
+      Math.max(1, Math.min(3, expectedActions.length));
+    const relevantTransitions = evidence.transitions.filter(transition =>
+      transition.type === "state" ? expectedDocuments.includes(transition.documentId) :
+        expectedDocuments.includes(transition.fromDocumentId) &&
+        expectedDocuments.includes(transition.toDocumentId));
+    const transitionStrength = Math.min(1, relevantTransitions.reduce((sum, item) =>
+      sum + item.strength, 0) / 2);
+    let confidence = Math.min(0.99, documentCoverage * 0.35 + observedCoverage * 0.15 +
+      sequenceStrength * 0.22 + Math.min(1, actionStrength) * 0.18 +
+      transitionStrength * 0.1);
+    const hasStrong = matchedDocuments.some(item => item.strength >= 0.8) ||
+      actionHits.some(item => item.strength >= 0.8) || relevantTransitions.some(item => item.strength >= 0.8);
+    if (!hasStrong) confidence = Math.min(confidence, 0.54);
+    const variant = selectVariant(process, taxonomy, evidence);
+    const reasons = unique([...matchedDocuments.map(item =>
+      `Matched ${item.name}${item.signal === "page-object-id" ? ` page` : ""}`),
+    ...actionHits.map(item => item.explanation), ...relevantTransitions.map(item => item.explanation),
+    matchedDocuments.length ? `Matched ${matchedDocuments.length} of ${expectedDocuments.length} process documents in sequence` : null,
+    matchedDocuments.length && matchedDocuments.length < expectedDocuments.length ?
+      "Partial process sequence recognized; later steps may not have been recorded" : null]);
+    return { domain: key(domain?.name), process: key(businessProcess?.name),
+      variant: variant ? key(variant.name) : null, confidence: Number(confidence.toFixed(3)),
+      taxonomyReferences: { domain: domain ? { id: domain.id, name: domain.name } : null,
+        businessProcess: businessProcess ? { id: businessProcess.id, name: businessProcess.name } : null,
+        bcProcess: { id: process.id, name: process.name },
+        variant: variant ? { id: variant.id, name: variant.name } : null },
+      matchedEventIds: unique([...matchedDocuments.map(item => item.eventId),
+        ...actionHits.map(item => item.eventId),
+        ...relevantTransitions.flatMap(item => item.sourceEventIds || [])]),
+      explanation: reasons, signals: { matchedDocuments: matchedDocuments.length,
+        expectedDocuments: expectedDocuments.length, matchedActions: actionHits.length,
+        matchedTransitions: relevantTransitions.length, strongMetadata: hasStrong } };
+  }
+
+  function selectVariant(process, taxonomy, evidence) {
+    const variants = (taxonomy.variants || []).filter(item => item.bcProcessId === process.id);
+    if (!variants.length) return null;
+    const ids = new Set(evidence.documentSequence.map(item => item.id));
+    return variants.find(item => item.conditions?.directedPutAwayAndPick &&
+      (ids.has("document:warehouse-pick") || ids.has("document:warehouse-put-away"))) ||
+      variants.find(item => item.conditions?.warehouseHandling === false &&
+        !ids.has("document:warehouse-pick") && !ids.has("document:warehouse-put-away")) || null;
+  }
+
+  function recognize(recording, options = {}) {
+    if (!recording || Number(recording.schemaVersion) !== 1 || !Array.isArray(recording.events))
+      throw new TypeError("A Canonical Recording schema-v1 value is required.");
+    const taxonomy = schema.normalize(options.taxonomy || seed);
+    const evidence = extractEvidence(recording, taxonomy, options);
+    const candidates = taxonomy.bcProcesses.map(process => candidateFor(process, taxonomy, evidence))
+      .filter(item => item.confidence >= (options.minimumConfidence ?? 0.12))
+      .sort((left, right) => right.confidence - left.confidence ||
+        left.taxonomyReferences.bcProcess.id.localeCompare(right.taxonomyReferences.bcProcess.id));
+    return { engineVersion: ENGINE_VERSION, classificationSource: "rule",
+      partial: candidates[0] ? candidates[0].signals.matchedDocuments <
+        candidates[0].signals.expectedDocuments : false,
+      classification: candidates[0] || null, alternatives: candidates.slice(1, 4),
+      evidence, diagnostics: candidates.length ? [] : [{ code: "process-not-recognized",
+        severity: "info", message: "Available evidence did not match a known BC process pattern." }],
+      aiComplement: { permitted: true, authoritativeMetadataPrecedence: true,
+        status: "not-invoked" } };
+  }
+
+  function toSemanticClassification(result, options = {}) {
+    const candidate = result?.classification;
+    if (!candidate) return null;
+    const references = candidate.taxonomyReferences;
+    return { classificationId: options.classificationId ||
+      `recognition:${references.bcProcess.id}`,
+    sourceEventIds: clone(options.sourceEventIds || candidate.matchedEventIds),
+    businessDomain: clone(references.domain),
+    businessProcess: clone(references.businessProcess),
+    bcProcess: clone(references.bcProcess), processStep: null,
+    businessDocument: null, businessAction: null, businessEntity: null,
+    processRole: null, confidence: candidate.confidence,
+    classificationSource: "rule", classificationMetadata: {
+      engine: "bc-process-recognition-engine", engineVersion: result.engineVersion,
+      partial: result.partial, explanation: clone(candidate.explanation),
+      signals: clone(candidate.signals), alternatives: clone(result.alternatives.map(item => ({
+        bcProcess: item.taxonomyReferences.bcProcess, confidence: item.confidence })))
+    } };
+  }
+
+  return { ENGINE_VERSION, extractEvidence, recognize, toSemanticClassification };
+});

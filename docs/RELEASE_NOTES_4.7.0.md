@@ -354,3 +354,17 @@ or På/Av values.
   history.
 - Existing unclassified recordings remain valid and receive an empty semantic
   layer during normalization; no destructive migration is required.
+
+# Business Central process recognition
+
+- Added deterministic recognition of Business Central documents, actions,
+  transitions, process sequences, partial processes, and taxonomy variants.
+- Recognition prioritizes verified page/table identity, technical actions and
+  state transitions. Caption and screenshot interpretation remain weak evidence
+  and cannot independently receive high confidence.
+- Every candidate includes confidence, contributing Event IDs, signal counts and
+  readable reasons; overlapping process candidates remain available as ranked
+  alternatives.
+- Recognition output can be stored in Canonical Semantic Recording with its
+  explanation and alternatives intact. Future AI remains optional and cannot
+  replace reliable Business Central metadata.

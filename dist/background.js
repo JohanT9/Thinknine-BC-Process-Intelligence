@@ -6,6 +6,8 @@ importScripts("engine/page-identification-engine.js");
 importScripts("engine/process-taxonomy-schema.js");
 importScripts("engine/canonical-semantic-model.js");
 importScripts("engine/canonical-recording.js");
+importScripts("engine/business-central-process-taxonomy-seed.js");
+importScripts("engine/bc-process-recognition-engine.js");
 importScripts("engine/raw-event-persistence.js");
 importScripts("engine/bc-ui-identification.js");
 importScripts("engine/event-normalization.js");

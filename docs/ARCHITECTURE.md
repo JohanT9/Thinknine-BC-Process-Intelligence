@@ -955,6 +955,17 @@ adds an empty container to historical schema-v1 recordings without modifying
 stored source data. See
 [CANONICAL_SEMANTIC_RECORDING.md](CANONICAL_SEMANTIC_RECORDING.md).
 
+## Business Central process recognition boundary (4.7)
+
+Process Recognition is a deterministic, renderer-neutral consumer of Canonical
+Recording, Canonical Semantic Recording and Process Taxonomy. It extracts
+document/action/transition evidence, performs partial ordered matching, and
+returns explained ranked candidates without mutating capture or Review. Strong
+Business Central metadata outranks caption and optional screenshot evidence.
+Future AI is a complement behind this result contract and cannot override
+reliable metadata. See
+[BC_PROCESS_RECOGNITION_ENGINE.md](BC_PROCESS_RECOGNITION_ENGINE.md).
+
 ## Application Insights enrichment boundary (4.6)
 
 Optional external telemetry is queried by one provider through versioned query
