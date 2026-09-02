@@ -9,7 +9,7 @@ assert(dashboard.includes('class="review-approve-action"'),
   "approval must remain directly visible on every Step");
 assert(dashboard.includes('class="review-step-actions-menu"'));
 assert(dashboard.includes('class="review-step-actions-panel"'));
-assert(dashboard.includes('<summary aria-label="${uiT("Fler åtgärder")}">⋯</summary>'));
+assert(dashboard.includes('aria-expanded="false">⋯</summary>'));
 for (const action of ["add", "repair-step", "reset-instruction", "remove",
   "toggle-layout"]) {
   const actionPosition = dashboard.indexOf(`data-action="${action}"`);
@@ -22,7 +22,13 @@ assert(dashboard.includes('class="review-technical-details"'));
 assert(dashboard.includes('uiT("Teknisk information")'));
 assert(dashboard.includes('event.key !== "Escape"'));
 assert(dashboard.includes("stepActionsMenu.open = false"));
-assert(dashboard.includes('stepActionsMenu.querySelector("summary").focus()'));
+assert(dashboard.includes("const shouldOpen = !stepActionsMenu.open"),
+  "the menu trigger must explicitly toggle an already open menu closed");
+assert(dashboard.includes('event.preventDefault();\n      const shouldOpen'),
+  "native details toggling must not compete with explicit menu state");
+assert(dashboard.includes('stepActionsSummary.setAttribute("aria-expanded"'),
+  "expanded accessibility state must follow the actual menu state");
+assert(dashboard.includes("stepActionsSummary.focus()"));
 assert(html.includes(".review-step-actions-panel{position:absolute"));
 assert(html.includes(".review-card.compact .review-technical-details"));
 assert(i18n.includes('"a11y.stepActions"'));

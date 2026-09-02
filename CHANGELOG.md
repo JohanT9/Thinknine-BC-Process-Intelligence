@@ -11,6 +11,10 @@
 
 ## Unreleased
 
+- Fixed Step action menus so clicking the ellipsis button a second time closes
+  the menu reliably. Only one Step menu remains open, and its expanded
+  accessibility state now follows the visible state.
+
 - Added shared localized tooltips across Dashboard, Review Studio, recorder,
   diagnostics and technical reports. Buttons and menu summaries now expose
   concise help on hover and keyboard focus, with viewport-aware positioning,

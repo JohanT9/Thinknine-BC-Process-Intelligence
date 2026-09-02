@@ -5853,7 +5853,7 @@ function renderReviewContent() {
           Godkänd
         </label>
         <details class="review-step-actions-menu">
-          <summary aria-label="${uiT("Fler åtgärder")}">⋯</summary>
+          <summary aria-label="${uiT("Fler åtgärder")}" aria-expanded="false">⋯</summary>
           <div class="review-step-actions-panel" role="group"
             aria-label="${uiTf("a11y.stepActions", { step: visibleIndex + 1 })}">
             <button data-drag-handle class="secondary" draggable="true"
@@ -5881,6 +5881,21 @@ function renderReviewContent() {
     list.appendChild(card);
 
     const stepActionsMenu = card.querySelector(".review-step-actions-menu");
+    const stepActionsSummary = stepActionsMenu.querySelector("summary");
+    stepActionsSummary.addEventListener("click", event => {
+      event.preventDefault();
+      const shouldOpen = !stepActionsMenu.open;
+      for (const menu of list.querySelectorAll(
+        ".review-step-actions-menu[open]"
+      )) {
+        if (menu !== stepActionsMenu) menu.open = false;
+      }
+      stepActionsMenu.open = shouldOpen;
+    });
+    stepActionsMenu.addEventListener("toggle", () => {
+      stepActionsSummary.setAttribute("aria-expanded",
+        String(stepActionsMenu.open));
+    });
     stepActionsMenu.addEventListener("click", event => {
       const button = event.target.closest("button");
       if (button && !button.disabled) setTimeout(() => {
@@ -5891,7 +5906,7 @@ function renderReviewContent() {
       if (event.key !== "Escape") return;
       event.preventDefault();
       stepActionsMenu.open = false;
-      stepActionsMenu.querySelector("summary").focus();
+      stepActionsSummary.focus();
     });
     stepActionsMenu.addEventListener("focusout", event => {
       if (!stepActionsMenu.contains(event.relatedTarget)) {

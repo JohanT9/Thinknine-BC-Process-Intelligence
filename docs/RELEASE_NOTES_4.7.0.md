@@ -300,3 +300,5 @@ or På/Av values.
   accessible labels where available.
 - Tooltips stay inside the viewport and close on pointer exit, focus exit,
   scrolling, resizing or Escape.
+- Step action menus now close reliably when their ellipsis button is selected
+  again, and opening a different Step menu closes the previous one.
