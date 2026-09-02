@@ -151,6 +151,7 @@ for (const file of [
   "tooltips.js",
   "async-operations.js",
   "document-library-view.js",
+  "process-analysis-view.js",
   "process-overview-view.js",
   "process-version-comparison-view.js",
   "document-workspace-experience.js",

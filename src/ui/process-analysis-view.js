@@ -1,0 +1,85 @@
+(function (root, factory) {
+  const api = factory();
+  if (typeof module === "object" && module.exports) module.exports = api;
+  root.T9ProcessAnalysisView = api;
+})(typeof globalThis !== "undefined" ? globalThis : this, function () {
+  "use strict";
+  const clone = value => value === undefined ? undefined : JSON.parse(JSON.stringify(value));
+  const array = value => Array.isArray(value) ? value : [];
+  const text = value => value == null ? "" : String(value).trim();
+  const escape = value => text(value).replace(/[&<>"']/g, character => ({
+    "&": "&amp;", "<": "&lt;", ">": "&gt;", "\"": "&quot;", "'": "&#39;"
+  })[character]);
+  function stepLabel(step) { return text(step?.title || step?.name || step?.id ||
+    step?.referenceProcess || "Unknown step"); }
+  function normalize(result = {}, decision = null) { let best = result.bestMatch || null;
+    if (decision?.confirmedReferenceId) { const selected = array(result.matches).find(item =>
+      item.referenceDiagramId === decision.confirmedReferenceId) ||
+      array(result.processLibraryMatch?.alternativeMatches).find(item =>
+        item.referenceId === decision.confirmedReferenceId);
+      if (selected) best = { ...selected, referenceProcessId: selected.referenceDiagramId ||
+        selected.referenceId, referenceProcess: selected.referenceProcess || selected.name,
+        additionalSteps: selected.additionalSteps || selected.unexpectedSteps }; }
+    const processMatch = result.processLibraryMatch || null; const matched = array(best?.matchedSteps ||
+      processMatch?.matchedSteps); const missing = array(best?.missingSteps || processMatch?.missingSteps);
+    const additional = array(best?.additionalSteps || processMatch?.unexpectedSteps);
+    const confidence = Math.max(0, Math.min(1, Number(best?.confidence || result.confidence || 0)));
+    const effectiveId = text(best?.referenceProcessId || best?.referenceDiagramId || best?.referenceId);
+    const alternatives = array(result.matches).filter(item => item.referenceDiagramId !==
+      effectiveId).map(item => ({ id: item.referenceDiagramId,
+        name: item.referenceProcess, confidence: item.confidence, domain: item.domain || "" }));
+    array(processMatch?.alternativeMatches).forEach(item => { if (!alternatives.some(candidate =>
+      candidate.id === item.referenceId) && item.referenceId !== effectiveId) alternatives.push({
+      id: item.referenceId, name: item.name,
+      confidence: item.confidence, domain: item.domain || "" }); });
+    return Object.freeze({ available: Boolean(best), referenceId: text(best?.referenceProcessId ||
+      best?.referenceDiagramId || best?.referenceId), name: text(best?.referenceProcess || best?.name),
+      domain: text(best?.domain), confidence, matched: clone(matched), missing: clone(missing),
+      additional: clone(additional), alternatives: clone(alternatives.slice(0, 5)),
+      confirmed: decision?.status === "confirmed", confirmedReferenceId:
+      text(decision?.confirmedReferenceId), confirmedAt: decision?.confirmedAt || null,
+      advisory: true }); }
+  function metric(label, value, tone) { return `<div class="process-analysis-metric ${tone}">
+    <strong>${escape(value)}</strong><span>${escape(label)}</span></div>`; }
+  function steps(title, values, tone, emptyLabel) { return `<section class="process-analysis-list ${tone}">
+    <h4>${escape(title)} <span>${values.length}</span></h4>${values.length ? `<ul>${values.map(item =>
+      `<li>${escape(stepLabel(item))}</li>`).join("")}</ul>` : `<p>${escape(emptyLabel)}</p>`}</section>`; }
+  function render(container, input, labels = {}) { const model = normalize(input.result, input.decision);
+    if (!model.available) { container.innerHTML = `<div class="process-analysis-empty" role="status">
+      <h4>${escape(labels.noMatchTitle || "No reliable process match")}</h4>
+      <p>${escape(labels.noMatchText || "The recording remains valid and can be classified manually later.")}</p>
+      </div>`; return model; }
+    const percent = Math.round(model.confidence * 100); container.innerHTML = `
+      <section class="process-analysis-summary" aria-labelledby="processAnalysisMatchName">
+        <div><span class="process-analysis-eyebrow">${escape(labels.detected || "Detected reference process")}</span>
+          <h4 id="processAnalysisMatchName">${escape(model.name)}</h4>
+          <p>${escape(model.domain || labels.unknownDomain || "Domain not identified")}</p></div>
+        <div class="process-analysis-confidence"><strong>${percent}%</strong>
+          <span>${escape(labels.match || "match")}</span></div>
+      </section>
+      <div class="process-analysis-meter" role="progressbar" aria-label="${escape(labels.matchDegree ||
+        "Match confidence")}" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${percent}">
+        <span style="width:${percent}%"></span></div>
+      ${model.confirmed ? `<p class="process-analysis-confirmed" role="status">✓ ${escape(
+        labels.confirmed || "Classification confirmed manually")}</p>` : ""}
+      <div class="process-analysis-metrics">${metric(labels.matched || "Matched", model.matched.length, "matched")}
+        ${metric(labels.missing || "Possible missing", model.missing.length, "missing")}
+        ${metric(labels.additional || "Customer-specific", model.additional.length, "additional")}</div>
+      <p class="process-analysis-advisory">${escape(labels.advisory ||
+        "Differences are guidance, not errors. The recorded process may be a valid customer variant.")}</p>
+      <div class="process-analysis-columns">${steps(labels.matchedSteps || "Matched steps", model.matched,
+        "matched", labels.none || "None")}${steps(labels.missingSteps || "Possible missing steps", model.missing,
+        "missing", labels.noMissing || "No expected steps are missing")}${steps(labels.additionalSteps ||
+        "Customer-specific steps", model.additional, "additional", labels.noAdditional || "No additional steps")}</div>
+      <fieldset class="process-analysis-alternatives"><legend>${escape(labels.alternatives ||
+        "Alternative reference processes")}</legend>${model.alternatives.length ? model.alternatives.map(item =>
+          `<label><input type="radio" name="processAnalysisReference" value="${escape(item.id)}"
+            data-reference-name="${escape(item.name)}"><span>${escape(item.name)}</span>
+            <strong>${Math.round(item.confidence * 100)}%</strong></label>`).join("") :
+          `<p>${escape(labels.noAlternatives || "No relevant alternatives")}</p>`}</fieldset>`;
+    return model; }
+  function selectedReference(container, model) { const selected = container.querySelector(
+    'input[name="processAnalysisReference"]:checked'); return selected ? { id: selected.value,
+    name: selected.dataset.referenceName || selected.value } : { id: model.referenceId, name: model.name }; }
+  return { normalize, render, selectedReference };
+});

@@ -291,7 +291,14 @@
       matchedNodes: item.comparison.matchedSteps.length,
       missingNodes: item.comparison.missingSteps.length,
       unexpectedNodes: item.comparison.additionalSteps.length, ...clone(item.comparison) }));
-    return freeze({ matches, bestMatch: matches[0] || processMatch?.bestMatch || null,
+    const graphBest = matches[0] || null; const libraryBest = processMatch?.bestMatch || null;
+    const bestMatch = libraryBest && (!graphBest || libraryBest.confidence > graphBest.confidence)
+      ? freeze({ referenceProcess: libraryBest.name, referenceProcessId: libraryBest.referenceId,
+        domain: libraryBest.domain, confidence: libraryBest.confidence,
+        matchedSteps: clone(libraryBest.matchedSteps), missingSteps: clone(libraryBest.missingSteps),
+        additionalSteps: clone(libraryBest.unexpectedSteps), source: "ReferenceProcessLibrary",
+        customizedBehaviorMayBeValid: true, deviationsAreErrors: false }) : graphBest;
+    return freeze({ matches, bestMatch,
       processLibraryMatch: processMatch, deviationsAreErrors: false }); }
   function exportDataset(input, options = {}) { const dataset = normalize(input); const includePartitions =
     options.partitions ? new Set(options.partitions) : null; return freeze({ schemaVersion: SCHEMA_VERSION,

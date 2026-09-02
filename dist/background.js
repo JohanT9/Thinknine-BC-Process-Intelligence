@@ -2075,6 +2075,26 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
         break;
       }
 
+      case "T9_MATCH_REFERENCE_PROCESS": {
+        const recording = await getCanonicalRecording(message.sessionId);
+        if (!recording) throw new Error("Inspelningen kunde inte hittas.");
+        const referenceProcesses = globalThis.T9ReferenceProcessLibrary.create(
+          globalThis.T9BusinessCentralReferenceProcessSeed.library
+        );
+        const result = globalThis.T9ReferenceDiagramDataset
+          .matchRecordingToReferences(
+            recording,
+            globalThis.T9BusinessCentralReferenceDiagramSeed.dataset,
+            {
+              referenceLibrary: referenceProcesses,
+              graphProjector: globalThis.T9MultiLevelProcessGraph,
+              limit: 5
+            }
+          );
+        sendResponse({ ok: true, result });
+        break;
+      }
+
       case "T9_CAPTURE_STEP_REPAIR_SCREENSHOT": {
         const result = await captureStepRepairScreenshot(message.sessionId,
           message.stepId, sender.tab?.id);

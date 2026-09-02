@@ -57,6 +57,7 @@ table{width:100%;border-collapse:collapse}th,td{text-align:left;padding:9px;bord
 .review-toolbar-more>summary::after{content:" ▾"}.review-toolbar-more[open]>summary::after{content:" ▴"}
 .review-toolbar-more-panel{position:absolute;right:0;top:calc(100% + 6px);z-index:4;width:310px;padding:12px;background:white;border:1px solid #cbd5df;border-radius:8px;box-shadow:0 12px 28px rgba(15,23,42,.2)}
 .review-toolbar-more-panel .review-toolbar-group{border:0;padding:0 0 10px;display:grid;grid-template-columns:1fr 1fr}.review-toolbar-more-panel .review-toolbar-group:last-child{padding-bottom:0}.review-toolbar-more-panel button{width:100%}
+.process-analysis-trigger{display:inline-flex;align-items:center;gap:7px}.process-analysis-trigger output{min-width:28px;padding:2px 6px;border-radius:999px;background:#d9f3f2;color:#075c5b;font-size:12px;font-weight:700}.process-analysis-dialog{width:min(1040px,calc(100vw - 32px));max-height:calc(100vh - 32px);border:0;border-radius:10px;box-shadow:0 18px 55px rgba(15,23,42,.3);padding:0}.process-analysis-dialog::backdrop{background:rgba(15,23,42,.45)}.process-analysis-dialog form{display:grid;grid-template-rows:auto minmax(0,1fr) auto;max-height:calc(100vh - 32px)}.process-analysis-dialog header,.process-analysis-dialog footer{padding:18px 22px;background:white}.process-analysis-dialog header{border-bottom:1px solid #d8dee5}.process-analysis-dialog header h3{margin:0 0 4px}.process-analysis-dialog footer{display:flex;justify-content:flex-end;gap:8px;border-top:1px solid #d8dee5}.process-analysis-dialog footer #processAnalysisStatus{margin-right:auto}.process-analysis-content{padding:20px 22px;overflow:auto;background:#f7f9fb}.process-analysis-loading{padding:40px;text-align:center}.process-analysis-summary{display:flex;justify-content:space-between;gap:20px;align-items:center;padding:18px;background:white;border:1px solid #ccd6df;border-radius:8px}.process-analysis-summary h4{font-size:20px;margin:4px 0}.process-analysis-summary p{margin:0;color:#526273}.process-analysis-eyebrow{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:#087f7e}.process-analysis-confidence{text-align:center}.process-analysis-confidence strong{display:block;font-size:26px;color:#087f7e}.process-analysis-confidence span{font-size:12px;color:#526273}.process-analysis-meter{height:7px;background:#dfe5ea;border-radius:999px;overflow:hidden;margin:10px 0 14px}.process-analysis-meter span{display:block;height:100%;background:#008c8c}.process-analysis-confirmed{padding:9px 12px;background:#e6f7ef;border-left:4px solid #15803d}.process-analysis-metrics{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:14px 0}.process-analysis-metric{padding:12px;background:white;border:1px solid #d8dee5;border-radius:7px}.process-analysis-metric strong{display:block;font-size:20px}.process-analysis-metric span{color:#526273}.process-analysis-metric.matched strong{color:#15803d}.process-analysis-metric.missing strong{color:#a16207}.process-analysis-metric.additional strong{color:#0369a1}.process-analysis-advisory{margin:12px 0;color:#526273}.process-analysis-columns{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}.process-analysis-list{padding:14px;background:white;border:1px solid #d8dee5;border-radius:7px}.process-analysis-list h4{display:flex;justify-content:space-between;margin:0 0 10px}.process-analysis-list h4 span{font-size:12px;border-radius:999px;background:#edf1f5;padding:2px 7px}.process-analysis-list ul{margin:0;padding-left:20px}.process-analysis-list li{margin:5px 0}.process-analysis-list p{color:#526273}.process-analysis-alternatives{margin-top:16px;padding:12px;background:white;border:1px solid #d8dee5}.process-analysis-alternatives label{display:grid;grid-template-columns:auto 1fr auto;gap:9px;align-items:center;padding:8px}.process-analysis-alternatives input{width:auto}.process-analysis-empty{padding:28px;text-align:center;background:white;border:1px solid #d8dee5;border-radius:8px}
 .review-progress{height:10px;background:#e5e7eb;border-radius:99px;overflow:hidden;margin-top:12px}
 .review-progress-bar{height:100%;background:#0f6cbd;width:0}
 .review-status{display:flex;flex-wrap:wrap;gap:18px;margin:12px 0 0;padding:10px 12px;background:#f3f6fa;border-radius:7px}
@@ -211,9 +212,9 @@ table{width:100%;border-collapse:collapse}th,td{text-align:left;padding:9px;bord
 .annotation-properties input{width:100%;box-sizing:border-box}
 .annotation-properties-actions{grid-column:1/-1}
 .review-shell.annotation-mode .review-toolbar,.review-shell.annotation-mode .review-toolbar-secondary,.review-shell.annotation-mode .review-progress,.review-shell.annotation-mode #reviewStatus{display:none}
-@media(max-width:800px){.review-card,.review-card.compact{grid-template-columns:44px 1fr}.review-actions{grid-column:1/-1;flex-direction:row;flex-wrap:wrap}.library-controls{grid-template-columns:1fr}.review-toolbar-more{margin-left:0}.review-toolbar-more-panel{position:fixed;left:24px;right:24px;bottom:24px;top:auto;width:auto;max-height:70vh;overflow:auto}.review-toolbar-group{padding-right:5px}.review-header{padding:14px}.review-list{padding:12px}.document-workspace-body{flex-direction:column}}
+@media(max-width:800px){.review-card,.review-card.compact{grid-template-columns:44px 1fr}.review-actions{grid-column:1/-1;flex-direction:row;flex-wrap:wrap}.library-controls{grid-template-columns:1fr}.review-toolbar-more{margin-left:0}.review-toolbar-more-panel{position:fixed;left:24px;right:24px;bottom:24px;top:auto;width:auto;max-height:70vh;overflow:auto}.review-toolbar-group{padding-right:5px}.review-header{padding:14px}.review-list{padding:12px}.document-workspace-body{flex-direction:column}.process-analysis-metrics,.process-analysis-columns{grid-template-columns:1fr}.process-analysis-dialog footer{flex-wrap:wrap}.process-analysis-dialog footer button{flex:1 1 auto}}
 @media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important;transition:none!important;animation:none!important}}
-@media(forced-colors:active){.document-workspace-page,.library-card,.review-card,.review-toolbar-more-panel{border:1px solid CanvasText}.document-toolbar,.review-header{border-color:CanvasText}.review-card.selected{outline:3px solid Highlight}.review-fields [data-edit-field][data-editing=true]{outline:3px solid Highlight}.annotation-toolbar button[aria-pressed="true"]{background:Highlight;color:HighlightText;box-shadow:inset 0 0 0 2px HighlightText}}
+@media(forced-colors:active){.document-workspace-page,.library-card,.review-card,.review-toolbar-more-panel,.process-analysis-summary,.process-analysis-list,.process-analysis-alternatives{border:1px solid CanvasText}.document-toolbar,.review-header{border-color:CanvasText}.review-card.selected{outline:3px solid Highlight}.review-fields [data-edit-field][data-editing=true]{outline:3px solid Highlight}.annotation-toolbar button[aria-pressed="true"]{background:Highlight;color:HighlightText;box-shadow:inset 0 0 0 2px HighlightText}.process-analysis-meter span{background:Highlight}}
 
 .summary strong{display:block;font-size:18px;margin-top:4px}
 .filename-variables{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0}
@@ -508,6 +509,10 @@ table{width:100%;border-collapse:collapse}th,td{text-align:left;padding:9px;bord
           disabled>N&auml;sta ogranskade</button>
         <button id="openReviewDocumentFields" data-review-toolbar-item
           class="secondary">Dokumentinformation</button>
+        <button id="openProcessAnalysis" data-review-toolbar-item
+          class="secondary process-analysis-trigger" aria-haspopup="dialog"
+          aria-controls="processAnalysisDialog">Processanalys
+          <output id="processAnalysisBadge" aria-label="Matchningsgrad" hidden></output></button>
         <details id="reviewMoreActions" class="review-toolbar-more">
           <summary data-review-toolbar-item aria-controls="reviewMoreActionsPanel" aria-expanded="false">Fler åtgärder</summary>
           <div id="reviewMoreActionsPanel" class="review-toolbar-more-panel">
@@ -662,6 +667,25 @@ table{width:100%;border-collapse:collapse}th,td{text-align:left;padding:9px;bord
     </select>
   </label>
   <footer><button id="closeDocumentViewSettings" class="primary">Klar</button></footer>
+</dialog>
+
+<dialog id="processAnalysisDialog" class="process-analysis-dialog"
+  aria-labelledby="processAnalysisTitle" aria-describedby="processAnalysisDescription">
+  <form method="dialog">
+    <header>
+      <h3 id="processAnalysisTitle">Processanalys</h3>
+      <p id="processAnalysisDescription" class="muted">Jämför den inspelade processen med verifierade Business Central-referenser.</p>
+    </header>
+    <div id="processAnalysisContent" class="process-analysis-content" aria-live="polite">
+      <p class="process-analysis-loading">Analyserar processen…</p>
+    </div>
+    <footer>
+      <span id="processAnalysisStatus" role="status" aria-live="polite"></span>
+      <button value="close" class="secondary">Stäng</button>
+      <button id="useSelectedReference" type="button" class="secondary">Använd vald process</button>
+      <button id="confirmProcessAnalysis" type="button" class="primary">Bekräfta klassificering</button>
+    </footer>
+  </form>
 </dialog>
 
 <dialog id="processVersionDialog" class="process-version-dialog"
@@ -839,6 +863,7 @@ table{width:100%;border-collapse:collapse}th,td{text-align:left;padding:9px;bord
 <script src="document-library-view.js"></script>
 <script src="process-overview-view.js"></script>
 <script src="process-version-comparison-view.js"></script>
+<script src="process-analysis-view.js"></script>
 <script src="i18n.js"></script>
 <script src="tooltips.js"></script>
 <script src="dashboard.js"></script>

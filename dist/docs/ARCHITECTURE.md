@@ -1000,6 +1000,11 @@ Pipeline stages and extension/query contracts are documented in
 `REFERENCE_DIAGRAM_DATASET_PIPELINE.md`. No renderer or AI provider owns domain
 meaning, and source images are never assumed redistributable.
 
+Review Studio exposes this semantic layer through the Process Analysis adapter.
+The extension background owns matching; `process-analysis-view.js` only renders
+the immutable result. Manual confirmation is stored as Review metadata and does
+not copy or mutate the reference dataset. See `PROCESS_ANALYSIS_UX.md`.
+
 ## Reference Process Library boundary (4.7)
 
 The Reference Process Library is an immutable semantic-example catalog above

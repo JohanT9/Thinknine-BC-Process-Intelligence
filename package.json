@@ -54,7 +54,7 @@
     "test:process-model": "node tests/process-model.test.js && node tests/multi-level-process-graph.test.js",
     "test:process-taxonomy": "node tests/process-taxonomy.test.js && node tests/document-lifecycle.test.js && node tests/reference-process-library.test.js && node tests/reference-diagram-dataset.test.js",
     "test:process-recognition": "node tests/bc-process-recognition-engine.test.js",
-    "test:process-overview": "node tests/process-overview-view.test.js",
+    "test:process-overview": "node tests/process-overview-view.test.js && node tests/process-analysis-view.test.js",
     "test:process-export": "node tests/process-export.test.js",
     "test:process-versioning": "node tests/process-versioning.test.js",
     "test:process-version-workflow": "node tests/process-version-workflow.test.js",

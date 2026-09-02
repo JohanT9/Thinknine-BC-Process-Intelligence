@@ -3370,6 +3370,8 @@ let activeReviewSession = null;
 let activeReview = null;
 let activeReviewModel = null;
 let activeProcessModel = null;
+let activeProcessAnalysis = null;
+let processAnalysisRequest = null;
 let activeReviewSelection = globalThis.T9ReviewSelection.create();
 let activeReviewEdit = null;
 let reviewReturnFocus = null;
@@ -3403,6 +3405,104 @@ let workspaceState = globalThis.T9WorkspaceController.create();
 let documentWorkspaceSync = null;
 const activeDocumentPipelineCache = globalThis.T9WorkspaceController
   .createRevisionCache();
+
+function processAnalysisLabels() {
+  const english = String(applicationSettings.uiLocale || "").startsWith("en");
+  return english ? {
+    detected: "Detected reference process", unknownDomain: "Domain not identified",
+    match: "match", matchDegree: "Match confidence", confirmed:
+      "Classification confirmed manually", matched: "Matched", missing: "Possible missing",
+    additional: "Customer-specific", advisory: "Differences are guidance, not errors. " +
+      "The recorded process may be a valid customer variant.", matchedSteps: "Matched steps",
+    missingSteps: "Possible missing steps", additionalSteps: "Customer-specific steps",
+    none: "None", noMissing: "No expected steps are missing", noAdditional: "No additional steps",
+    alternatives: "Alternative reference processes", noAlternatives: "No relevant alternatives",
+    noMatchTitle: "No reliable process match", noMatchText:
+      "The recording remains valid and can be classified manually later."
+  } : {
+    detected: "Identifierad referensprocess", unknownDomain: "Domän inte identifierad",
+    match: "matchning", matchDegree: "Matchningsgrad", confirmed:
+      "Klassificeringen är manuellt bekräftad", matched: "Matchade", missing: "Möjligen saknade",
+    additional: "Kundunika", advisory: "Skillnader är vägledning, inte fel. " +
+      "Den inspelade processen kan vara en giltig kundvariant.", matchedSteps: "Matchade steg",
+    missingSteps: "Möjligen saknade steg", additionalSteps: "Kundunika steg",
+    none: "Inga", noMissing: "Inga förväntade steg saknas", noAdditional: "Inga extra steg",
+    alternatives: "Alternativa referensprocesser", noAlternatives: "Inga relevanta alternativ",
+    noMatchTitle: "Ingen säker processmatchning", noMatchText:
+      "Inspelningen är fortfarande giltig och kan klassificeras manuellt senare."
+  };
+}
+
+function updateProcessAnalysisBadge() {
+  const badge = $("processAnalysisBadge");
+  const model = activeProcessAnalysis ? globalThis.T9ProcessAnalysisView.normalize(
+    activeProcessAnalysis, activeReview?.processAnalysis
+  ) : null;
+  badge.hidden = !model?.available;
+  badge.textContent = model?.available ? `${Math.round(model.confidence * 100)}%` : "";
+}
+
+async function loadProcessAnalysis(force = false) {
+  if (!activeReviewSession) return null;
+  if (activeProcessAnalysis && !force) return activeProcessAnalysis;
+  if (processAnalysisRequest && !force) return processAnalysisRequest;
+  const sessionId = activeReviewSession.id;
+  processAnalysisRequest = send({ type: "T9_MATCH_REFERENCE_PROCESS", sessionId })
+    .then(response => {
+      if (!response?.ok) throw new Error(response?.error ||
+        "Processanalysen kunde inte genomföras.");
+      if (activeReviewSession?.id !== sessionId) return null;
+      activeProcessAnalysis = response.result;
+      updateProcessAnalysisBadge();
+      return activeProcessAnalysis;
+    }).finally(() => { processAnalysisRequest = null; });
+  return processAnalysisRequest;
+}
+
+function renderProcessAnalysisDialog() {
+  const model = globalThis.T9ProcessAnalysisView.render(
+    $("processAnalysisContent"), { result: activeProcessAnalysis || {},
+      decision: activeReview?.processAnalysis }, processAnalysisLabels()
+  );
+  $("confirmProcessAnalysis").disabled = !model.available;
+  $("useSelectedReference").disabled = true;
+  $("processAnalysisStatus").textContent = "";
+  updateProcessAnalysisBadge();
+  return model;
+}
+
+function persistProcessAnalysisDecision(reference, status) {
+  if (!activeReview || !reference?.id) return;
+  activeReview.processAnalysis = {
+    confirmedReferenceId: reference.id,
+    confirmedName: reference.name,
+    confirmedAt: new Date().toISOString(),
+    classificationSource: "manual",
+    status
+  };
+  activeReview.updatedAt = activeReview.processAnalysis.confirmedAt;
+  reviewAutoSave.schedule();
+  renderProcessAnalysisDialog();
+  $("processAnalysisStatus").textContent = status === "confirmed"
+    ? uiT("Klassificeringen bekräftades.")
+    : uiT("Referensprocessen ändrades.");
+}
+
+async function openProcessAnalysisDialog() {
+  const dialog = $("processAnalysisDialog");
+  $("processAnalysisContent").innerHTML = `<p class="process-analysis-loading">${escapeHtml(
+    uiT("Analyserar processen…"))}</p>`;
+  $("confirmProcessAnalysis").disabled = true;
+  $("useSelectedReference").disabled = true;
+  dialog.showModal();
+  try {
+    await loadProcessAnalysis();
+    renderProcessAnalysisDialog();
+  } catch (error) {
+    $("processAnalysisContent").innerHTML = `<div class="process-analysis-empty" role="alert"><h4>${escapeHtml(
+      uiT("Processanalysen kunde inte visas"))}</h4><p>${escapeHtml(error.message)}</p></div>`;
+  }
+}
 const activeDocumentPresentationCache = globalThis.T9WorkspaceController
   .createRevisionCache();
 const activeScreenshotQualityCache = globalThis.T9WorkspaceController
@@ -4406,6 +4506,9 @@ function selectedReviewTaskIds(fallbackId) {
 
 function renderMovedReview(previousPositions, focusId) {
   renderReview();
+  loadProcessAnalysis().catch(error => {
+    console.warn("T9 process analysis preload failed", error);
+  });
   if (focusId) {
     activeReviewSelection = {
       ...activeReviewSelection,
@@ -6549,6 +6652,8 @@ async function closeReview() {
   activeReview = null;
   activeReviewModel = null;
   activeProcessModel = null;
+  activeProcessAnalysis = null;
+  processAnalysisRequest = null;
   activeReviewSelection = globalThis.T9ReviewSelection.create();
   activeReviewEdit = null;
   activeDocumentPipelineCache.clear();
@@ -7199,6 +7304,27 @@ $("openReviewDocumentFields").addEventListener("click", () => {
     $("reviewDocumentFieldsDialog").showModal();
     $("reviewDocumentLanguage").focus();
   });
+});
+$("openProcessAnalysis").addEventListener("click", openProcessAnalysisDialog);
+$("processAnalysisContent").addEventListener("change", event => {
+  if (event.target.matches('input[name="processAnalysisReference"]')) {
+    $("useSelectedReference").disabled = false;
+  }
+});
+$("confirmProcessAnalysis").addEventListener("click", () => {
+  const model = globalThis.T9ProcessAnalysisView.normalize(
+    activeProcessAnalysis || {}, activeReview?.processAnalysis
+  );
+  persistProcessAnalysisDecision({ id: model.referenceId, name: model.name }, "confirmed");
+});
+$("useSelectedReference").addEventListener("click", () => {
+  const model = globalThis.T9ProcessAnalysisView.normalize(
+    activeProcessAnalysis || {}, activeReview?.processAnalysis
+  );
+  const reference = globalThis.T9ProcessAnalysisView.selectedReference(
+    $("processAnalysisContent"), model
+  );
+  persistProcessAnalysisDecision(reference, "selected");
 });
 $("expectedResultEditor").addEventListener("input", event => {
   globalThis.T9Review.setDocumentField(

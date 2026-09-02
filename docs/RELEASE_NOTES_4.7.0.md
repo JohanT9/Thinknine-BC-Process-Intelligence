@@ -408,6 +408,17 @@ or På/Av values.
 - Added partition-safe JSON export and ten verified representative Business
   Central graphs without redistributable screenshots or fabricated metadata.
 
+# Process Analysis UX
+
+- Added Process Analysis as a visible Review Studio toolbar action beside
+  Document Information, with a compact confidence badge.
+- Added an accessible comparison dialog for matched, possible missing and
+  customer-specific steps plus alternative reference processes.
+- Added manual confirmation and reference selection using the existing Review
+  autosave workflow.
+- Added responsive Swedish and English presentation and advisory language that
+  treats customer deviations as valid possible variants rather than errors.
+
 # Reference Process Library
 
 - Added 35 renderer-free semantic references across Order to Cash, Source to

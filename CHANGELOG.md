@@ -11,6 +11,9 @@
 
 ## Unreleased
 
+- Exposed reference-process matching in Review Studio through a Process Analysis
+  toolbar action, confidence badge, semantic comparison and manual confirmation.
+
 - Added a Reference Diagram Dataset Pipeline for source-traceable Business
   Central semantic graphs, verification, comparison and future AI datasets.
 - Added Training, Validation, Evaluation and GeneralReference partitions,
