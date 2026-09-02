@@ -5,11 +5,13 @@
     ? require("./language-registry") : root.T9LanguageRegistry;
   const taxonomySchema = typeof module === "object" && module.exports
     ? require("./process-taxonomy-schema") : root.T9ProcessTaxonomySchema;
-  const api = factory(pageIdentity, languages, taxonomySchema);
+  const semanticModel = typeof module === "object" && module.exports
+    ? require("./canonical-semantic-model") : root.T9CanonicalSemanticModel;
+  const api = factory(pageIdentity, languages, taxonomySchema, semanticModel);
   if (typeof module === "object" && module.exports) module.exports = api;
   root.T9CanonicalRecording = api;
 })(typeof globalThis !== "undefined" ? globalThis : this,
-  function (pageIdentity, languages, taxonomySchema) {
+  function (pageIdentity, languages, taxonomySchema, semanticModel) {
   "use strict";
   const SCHEMA_VERSION = 1;
   const RECORDING_PURPOSES = Object.freeze({
@@ -107,7 +109,7 @@
   function create(options = {}) {
     const now = options.startedAt || new Date().toISOString();
     const session = options.legacySession || { id: options.id, name: options.title, recordingPurpose: normalizeRecordingPurpose(options.recordingPurpose), startedAt: now, completedAt: options.finishedAt, updatedAt: options.updatedAt || now, settings: clone(options.settings || {}) };
-    return { id: options.id, schemaVersion: SCHEMA_VERSION, metadata: metadataFromSession(session), events: [], assets: [], createdAt: now, updatedAt: options.updatedAt || now, compatibility: { session: clone(session) } };
+    return { id: options.id, schemaVersion: SCHEMA_VERSION, metadata: metadataFromSession(session), events: [], assets: [], semanticInterpretation: semanticModel.normalize(options.semanticInterpretation || session.semanticInterpretation), createdAt: now, updatedAt: options.updatedAt || now, compatibility: { session: clone(session) } };
   }
   function fromLegacy(session, events = [], screenshots = {}) {
     const result = create({ id: session.id, startedAt: session.startedAt, updatedAt: session.updatedAt, legacySession: session });
@@ -143,6 +145,14 @@
           screenshotAssetId: event.screenshotAssetId });
       }
     });
+    const semantic = semanticModel.normalize(input.semanticInterpretation);
+    [...semantic.classifications, ...semantic.documentStateTransitions].forEach(item => {
+      item.sourceEventIds.forEach(eventId => {
+        if (!eventIds.has(String(eventId))) diagnostics.push({
+          code: "missing-semantic-source-event", severity: "error",
+          semanticId: item.classificationId || item.transitionId, eventId });
+      });
+    });
     if (Number.isFinite(options.legacyEventCount) &&
         options.legacyEventCount !== events.length) diagnostics.push({
       code: "legacy-canonical-event-count-mismatch", severity: "error",
@@ -152,7 +162,7 @@
   function normalize(input, legacy = {}) {
     if (!input || input.schemaVersion == null) return (!legacy.session && !input) ? null : fromLegacy(legacy.session || input, legacy.events, legacy.screenshots);
     if (Number(input.schemaVersion) !== SCHEMA_VERSION) throw new Error(`Unsupported recording schema: ${input.schemaVersion}`);
-    const result = clone(input); result.events = Array.isArray(result.events) ? result.events : []; result.assets = Array.isArray(result.assets) ? result.assets : []; result.metadata ||= {}; result.metadata.recordingPurpose = normalizeRecordingPurpose(result.metadata.recordingPurpose); result.metadata.taxonomyReferences = taxonomySchema.normalizeRecordingReferences(result.metadata.taxonomyReferences); return result;
+    const result = clone(input); result.events = Array.isArray(result.events) ? result.events : []; result.assets = Array.isArray(result.assets) ? result.assets : []; result.metadata ||= {}; result.metadata.recordingPurpose = normalizeRecordingPurpose(result.metadata.recordingPurpose); result.metadata.taxonomyReferences = taxonomySchema.normalizeRecordingReferences(result.metadata.taxonomyReferences); result.semanticInterpretation = semanticModel.normalize(result.semanticInterpretation); return result;
   }
   function addEvent(recording, source, identification = null) {
     if (!source || typeof source !== "object" || Array.isArray(source) || !source.type) throw new TypeError("A raw event with a type is required.");
@@ -189,9 +199,14 @@
   function rename(recording, title) { const value = String(title || "").trim(); if (!value) return normalize(recording); if (recording.metadata?.finishedAt) throw new Error("Completed recording evidence is immutable."); const result = normalize(recording); result.metadata.title = value; if (result.compatibility?.session) result.compatibility.session.name = value; return result; }
   function setDocumentLanguage(recording, language) { if (recording.metadata?.finishedAt) throw new Error("Completed recording evidence is immutable."); const result = normalize(recording); const value = languages.normalize(language, "document"); result.metadata.documentLanguage = value; if (result.compatibility?.session) result.compatibility.session.settings = { ...(result.compatibility.session.settings || {}), documentLanguage: value }; return result; }
   function setTaxonomyReferences(recording, references) { if (recording.metadata?.finishedAt) throw new Error("Completed recording evidence is immutable."); const result = normalize(recording); const value = taxonomySchema.normalizeRecordingReferences(references); result.metadata.taxonomyReferences = value; if (result.compatibility?.session) result.compatibility.session.taxonomyReferences = clone(value); return result; }
+  function requireSemanticEvents(recording, item) { const ids = new Set(recording.events.map(event => String(event.id))); const missing = (item.sourceEventIds || []).filter(id => !ids.has(String(id))); if (missing.length) throw new Error(`Semantic source event not found: ${missing.join(", ")}`); if (!item.sourceEventIds?.length) throw new Error("At least one semantic source event is required."); }
+  function setSemanticClassification(recording, classification) { const result = normalize(recording); const value = semanticModel.normalizeClassification(classification); requireSemanticEvents(result, value); result.semanticInterpretation = semanticModel.upsertClassification(result.semanticInterpretation, value); return result; }
+  function setDocumentStateTransition(recording, transition) { const result = normalize(recording); const value = semanticModel.normalizeTransition(transition); requireSemanticEvents(result, value); result.semanticInterpretation = semanticModel.upsertDocumentStateTransition(result.semanticInterpretation, value); return result; }
+  function semanticForEvent(recording, eventId) { return semanticModel.forEvent(normalize(recording).semanticInterpretation, eventId); }
   function legacyView(recording) { const value = normalize(recording); const session = clone(value.compatibility?.session || {}); Object.assign(session, { id: value.id, name: session.name || value.metadata.title, purpose: session.purpose || "", recordingPurpose: value.metadata.recordingPurpose, taxonomyReferences: clone(value.metadata.taxonomyReferences), startedAt: session.startedAt || value.metadata.startedAt, completedAt: session.completedAt || value.metadata.finishedAt || null, updatedAt: value.updatedAt, eventCount: value.events.length }); return { session, events: value.events.map(event => ({ ...clone(event.raw || { id: event.id, timestamp: event.timestamp, type: event.type }), ...(event.identification ? { identification: clone(event.identification) } : {}) })) }; }
   return { RECORDING_PURPOSES, SCHEMA_VERSION, addEvent, addScreenshot, create,
     finish, fromLegacy, integrityDiagnostics, legacyView, normalize, rename,
-    setDocumentLanguage, setTaxonomyReferences,
+    semanticForEvent, setDocumentLanguage, setDocumentStateTransition,
+    setSemanticClassification, setTaxonomyReferences,
     normalizeRecordingPurpose };
 });

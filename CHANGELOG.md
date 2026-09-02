@@ -11,6 +11,11 @@
 
 ## Unreleased
 
+- Extended Canonical Recording with optional Business Central semantic
+  classifications, multi-event Process Step mappings, document-state
+  transitions, confidence/provenance metadata, and auditable manual overrides.
+  Existing recordings and immutable raw evidence remain compatible.
+
 - Added an extensible, renderer-neutral Business Central process taxonomy with
   five-level hierarchy, canonical relationships and variants, immutable lookup
   and traversal services, recording classification references, and seed data

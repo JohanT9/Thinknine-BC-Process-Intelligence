@@ -342,3 +342,15 @@ or På/Av values.
   instead of permanently occupying space above the Steps.
 - The menu item opens a focused dialog for document language and expected result;
   existing autosave and standard-text reset behaviour is unchanged.
+
+# Semantic Business Central recordings
+
+- Recordings now support an optional semantic interpretation beside unchanged
+  technical evidence.
+- Several raw UI actions can reference one Business Central Process Step, while
+  a single action can describe a document transition such as Open to Released.
+- Rule, metadata, AI, and manual classifications retain confidence and provider
+  provenance. Manual corrections preserve the previous interpretation in
+  history.
+- Existing unclassified recordings remain valid and receive an empty semantic
+  layer during normalization; no destructive migration is required.

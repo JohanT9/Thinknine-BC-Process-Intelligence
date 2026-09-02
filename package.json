@@ -5,7 +5,7 @@
   "description": "BC Process Studio — Business Process Intelligence for Microsoft Dynamics 365 Business Central.",
   "scripts": {
     "pretest": "node tests/presentation-grammar.test.js && node tests/privacy-mask.test.js && node tests/review-workspace-refinement.test.js && node tests/screenshot-capture-policy.test.js && node tests/semantic-interaction-engine.test.js && node tests/task-consolidation.test.js && node tests/document-library-terminology.test.js && node tests/language-excellence.test.js && node tests/screenshot-intelligence.test.js && node tests/async-operations.test.js && node tests/document-library.test.js && node tests/document-library-view.test.js && node tests/document-batch-operations.test.js && node tests/document-batch-export.test.js && node tests/document-batch-accessibility.test.js && node tests/workflow-polish.test.js && node tests/v45-production-readiness.test.js",
-    "test:canonical": "node tests/canonical-recording.test.js && node tests/raw-event-persistence.test.js && node tests/canonical-hardening.test.js",
+    "test:canonical": "node tests/canonical-recording.test.js && node tests/raw-event-persistence.test.js && node tests/canonical-hardening.test.js && node tests/canonical-semantic-recording.test.js",
     "test:raw-persistence": "node tests/raw-event-persistence.test.js",
     "test:bc-identification": "node tests/bc-ui-identification.test.js",
     "test:page-identity": "node tests/page-identity.test.js",

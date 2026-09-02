@@ -68,6 +68,13 @@ recording. Action mappings connect canonical recorded Event IDs to reusable
 `ProcessAction` and `ProcessStep` entities. See
 [BUSINESS_CENTRAL_PROCESS_TAXONOMY.md](BUSINESS_CENTRAL_PROCESS_TAXONOMY.md).
 
+The optional `semanticInterpretation` layer adds event-level Business Central
+meaning without changing raw evidence. It supports many Events per Process Step,
+single-event document state transitions, confidence and classification
+provenance, plus manual override history. Existing schema-v1 recordings normalize
+to an empty semantic layer and remain valid. See
+[CANONICAL_SEMANTIC_RECORDING.md](CANONICAL_SEMANTIC_RECORDING.md).
+
 ```text
 Capture -> Canonical Recording -> Future interpretation layer
         -> Process / Support / Training -> Exporters

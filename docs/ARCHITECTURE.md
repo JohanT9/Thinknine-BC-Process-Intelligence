@@ -943,6 +943,18 @@ Review Studio renders that dry-run as an inspectable change set and requires an
 explicit approval before replacement. A safety-blocked preview cannot apply.
 See [REGENERATE_FROM_RECORDING.md](REGENERATE_FROM_RECORDING.md).
 
+## Canonical semantic recording boundary (4.7)
+
+Canonical Event and asset evidence remains the immutable technical account of
+capture. A sibling `semanticInterpretation` projection references stable Event
+IDs and reusable Business Central taxonomy entities. It may group many raw UI
+actions into one Process Step or describe a document-state transition from one
+action. Classification source, confidence, AI provenance, and superseded manual
+override history remain explicit. Missing semantics is valid, and normalization
+adds an empty container to historical schema-v1 recordings without modifying
+stored source data. See
+[CANONICAL_SEMANTIC_RECORDING.md](CANONICAL_SEMANTIC_RECORDING.md).
+
 ## Application Insights enrichment boundary (4.6)
 
 Optional external telemetry is queried by one provider through versioned query
