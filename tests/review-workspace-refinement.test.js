@@ -12,13 +12,13 @@ const toolbar = html.slice(toolbarStart, toolbarEnd);
 const moreStart = toolbar.indexOf('id="reviewMoreActions"');
 assert(toolbarStart >= 0 && toolbarEnd > toolbarStart && moreStart > 0);
 for (const id of ["undoReview", "redoReview", "saveReview",
-  "exportWordReview"]) {
+  "exportWordReview", "openReviewDocumentFields"]) {
   assert(toolbar.indexOf(`id="${id}"`) < moreStart,
     `${id} must remain immediately visible`);
 }
 for (const id of ["mergeReviewSteps", "splitReviewStep",
   "moveUpReviewSteps", "moveDownReviewSteps", "compactReviewSteps",
-  "addReviewStep", "completeReview", "openReviewDocumentFields"]) {
+  "addReviewStep", "completeReview"]) {
   assert(toolbar.indexOf(`id="${id}"`) > moreStart,
     `${id} must use progressive disclosure`);
 }
@@ -30,6 +30,8 @@ assert(html.includes('.review-header>.review-title-row,.review-header>.workspace
 assert(html.includes("width:min(calc(100% - 40px),1360px)"));
 assert(html.includes('id="reviewDocumentFieldsDialog"'));
 assert(html.includes('id="openReviewDocumentFields"'));
+assert(toolbar.indexOf('id="openReviewDocumentFields"') < moreStart,
+  "Document information must be directly available in the main toolbar");
 assert(html.indexOf('id="reviewDocumentFieldsDialog"') >
   html.indexOf('id="reviewWorkspacePanel"'),
 "Document information must no longer occupy the top of the Review workspace");

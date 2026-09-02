@@ -11,6 +11,10 @@
 
 ## Unreleased
 
+- Promoted Document Information from `More actions` to the main Review toolbar,
+  keeping document language and expected result directly accessible while
+  reviewing steps.
+
 - Fixed screenshot queue coalescing so every captured event keeps an addressable
   image in Review. The Change Image gallery no longer loses later candidates
   when nearby interactions safely share one physical browser capture.
