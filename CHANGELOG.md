@@ -14,6 +14,9 @@
 - Prevented Reset Structure from erasing Review steps when an older or migrated
   review contains an empty generated-task baseline. Existing steps are now
   retained while the invalid structural overrides are cleared.
+- Reset Structure now removes structural visibility overrides separately from
+  content edits and enforces that a previously visible Review cannot resolve to
+  zero visible steps.
 
 - Fixed the Step action menu immediately closing after its ellipsis trigger was
   selected. Automatic closing now applies only to commands inside the menu.

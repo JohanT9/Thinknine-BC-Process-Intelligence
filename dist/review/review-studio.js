@@ -1120,17 +1120,29 @@
 
   function resetStructure(review, options = {}) {
     const beforeTasks = historyEngine.snapshot(review.tasks);
+    const visibleCountBefore = activeTasks(review).length;
     const beforeStructureOverrides = historyEngine.snapshot(
       review.structureOverrides || []
     );
     review.structureOverrides = [];
+    const restoreStructuralVisibility = task => ({
+      ...task,
+      deleted: false,
+      visibility: "visible",
+      derivedStep: task.derivedStep
+        ? { ...task.derivedStep, visibility: "visible" }
+        : task.derivedStep,
+      stepOverride: stepEditor.reset(task, "visibility", options)
+    });
     const hasGeneratedBaseline = Array.isArray(review.generatedTasks) &&
       review.generatedTasks.length > 0;
     if (hasGeneratedBaseline) {
       const contentOverrides = (review.tasks || []).filter(task => task.stepOverride)
         .map(task => ({ taskId: task.taskId, stepId: task.stepId,
-          stepOverride: historyEngine.snapshot(task.stepOverride) }));
-      review.tasks = historyEngine.snapshot(review.generatedTasks).map(task => {
+          stepOverride: stepEditor.reset(task, "visibility", options) }))
+        .filter(item => item.stepOverride);
+      review.tasks = historyEngine.snapshot(review.generatedTasks)
+        .map(restoreStructuralVisibility).map(task => {
         const match = contentOverrides.find(item => item.taskId === task.taskId ||
           item.stepId === task.stepId);
         return match ? { ...task, stepOverride: match.stepOverride } : task;
@@ -1143,6 +1155,11 @@
           !matched.has(override.overrideId)
         )
       ];
+    } else {
+      review.tasks = beforeTasks.map(restoreStructuralVisibility);
+    }
+    if (visibleCountBefore > 0 && activeTasks(review).length === 0) {
+      review.tasks = beforeTasks.map(restoreStructuralVisibility);
     }
     renumber(review);
     return record(review, "structure-reset", beforeTasks, {

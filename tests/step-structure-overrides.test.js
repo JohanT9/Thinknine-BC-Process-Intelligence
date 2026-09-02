@@ -1,5 +1,6 @@
 const assert = require("assert");
 const structure = require("../src/review/step-structure-overrides");
+const stepEditor = require("../src/review/step-editor");
 const reviewStudio = require("../src/review/review-studio");
 
 const NOW = "2026-08-10T12:00:00.000Z";
@@ -126,12 +127,36 @@ const steps = [{
   review.generatedTasks = [];
   review.structureOverrides = [{ structureOverrideId: "legacy-override",
     type: "hide", sourceStepIds: ["step-a"] }];
-  const tasksBeforeReset = JSON.stringify(review.tasks);
+  const tasksBeforeReset = review.tasks.map(task => ({
+    taskId: task.taskId,
+    instruction: task.instruction,
+    instructionOverride: task.stepOverride?.fields?.instruction || null
+  }));
   reviewStudio.resetStructure(review, { now: NOW });
-  assert.equal(JSON.stringify(review.tasks), tasksBeforeReset,
+  assert.deepEqual(review.tasks.map(task => ({
+    taskId: task.taskId,
+    instruction: task.instruction,
+    instructionOverride: task.stepOverride?.fields?.instruction || null
+  })), tasksBeforeReset,
     "an empty legacy baseline must never erase stored Review steps");
   assert.equal(reviewStudio.activeTasks(review).length, 3);
   assert.equal(review.structureOverrides.length, 0);
+}
+
+{
+  const review = reviewStudio.createReview({ id: "hidden-recording", name: "BC" },
+    steps.map(step => ({ ...step, sourceEventNos: step.sourceEventIds })));
+  review.tasks = review.tasks.map(task => ({ ...task,
+    stepOverride: stepEditor.setVisibility(task, true, { now: NOW })
+  }));
+  review.generatedTasks = review.generatedTasks.map(task => ({ ...task,
+    stepOverride: stepEditor.setVisibility(task, true, { now: NOW })
+  }));
+  reviewStudio.resetStructure(review, { now: NOW });
+  assert.equal(reviewStudio.activeTasks(review).length, 3,
+    "structure reset must remove structural visibility overrides");
+  assert(review.tasks.every(task => !task.deleted &&
+    task.stepOverride?.visibilityOverride !== "hidden"));
 }
 
 console.log("Step Structure Override tests passed.");

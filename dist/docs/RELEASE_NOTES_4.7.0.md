@@ -315,3 +315,6 @@ or På/Av values.
   generated baseline from older or migrated stored reviews.
 - When no valid generated baseline exists, the current steps are retained and
   only the structural overrides are cleared. The operation remains undoable.
+- Hidden-state overrides are removed during reset without discarding instruction,
+  comment or screenshot edits. A final safety check prevents a non-empty Review
+  from resolving to zero visible steps.
