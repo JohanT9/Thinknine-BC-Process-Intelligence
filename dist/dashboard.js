@@ -4820,7 +4820,9 @@ function openStepRepair(taskIndex) {
     capturedAssetId: null, capturedAssetKey: null, capturedImage: null,
     capturedAt: null };
   $("stepRepairTitle").textContent = uiTf("review.changeImageForStep", {
-    step: globalThis.T9Review.visibleTaskNumber(activeReview, taskIndex)
+    step: globalThis.T9Review.visibleTaskNumber(
+      activeReview, task.taskId || task.stepId
+    ) || taskIndex + 1
   });
   $("stepRepairStatus").textContent = "";
   renderStepRepairGallery();

@@ -56,6 +56,15 @@ const background = fs.readFileSync(path.join(__dirname,
 assert.match(html, /id="stepRepairDialog"[^>]*aria-labelledby="stepRepairTitle"/);
 assert.match(html, /id="stepRepairTitle">Byt bild</);
 assert.match(html, /id="captureStepRepairScreenshot"[\s\S]*Ta ny sk&auml;rmbild/);
+const actionBar = html.match(/<div id="stepRepairActionBar"[\s\S]*?<\/div>/)?.[0] || "";
+assert.match(actionBar, /id="captureStepRepairScreenshot"/);
+assert.match(actionBar, /value="cancel"/);
+assert.match(actionBar, /id="applyStepRepair"/);
+assert(html.indexOf("stepRepairActionBar") < html.indexOf("stepRepairGallery"),
+  "all image-replacement actions must remain above the scrolling gallery");
+assert.match(dashboard,
+  /visibleTaskNumber\(\s*activeReview, task\.taskId \|\| task\.stepId\s*\)/,
+  "the dialog heading must resolve a visible number from the task identity");
 assert.match(dashboard, /data-action="repair-step"/);
 assert.match(dashboard, /uiTf\("a11y\.changeImage"/);
 assert.match(i18n, /"a11y\.changeImage": "Byt bild för steg \{step\}"/);

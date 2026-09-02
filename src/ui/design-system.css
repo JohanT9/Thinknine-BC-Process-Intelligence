@@ -243,17 +243,24 @@ dialog::backdrop { background: rgb(0 0 0 / 40%) !important; }
 .step-repair-dialog {
   width: min(920px, calc(100vw - 32px));
   max-height: min(820px, calc(100dvh - 32px));
-  padding: var(--space20);
+  padding: var(--space20); overflow: hidden;
 }
-.step-repair-dialog form { display: grid; gap: var(--space16); }
+.step-repair-dialog form {
+  display: grid; grid-template-rows: auto auto minmax(0, 1fr);
+  gap: var(--space16); max-height: calc(100dvh - 72px); overflow: hidden;
+}
 .step-repair-dialog h3, .step-repair-dialog p { margin: 0; }
-.step-repair-toolbar, .step-repair-dialog footer {
-  display: flex; align-items: center; gap: var(--space12);
+.step-repair-toolbar {
+  display: flex; align-items: center; flex-wrap: wrap; gap: var(--space12);
 }
-.step-repair-dialog footer { justify-content: flex-end; }
+.step-repair-toolbar [role="status"] { flex: 1 1 240px; }
+.step-repair-dialog fieldset {
+  display: grid; grid-template-rows: auto minmax(0, 1fr);
+  min-height: 0; overflow: hidden;
+}
 .step-repair-gallery {
   display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
-  gap: var(--space12); max-height: 52vh; overflow: auto;
+  gap: var(--space12); min-height: 0; overflow: auto;
 }
 .step-repair-choice {
   display: grid; gap: var(--space8); padding: var(--space8);

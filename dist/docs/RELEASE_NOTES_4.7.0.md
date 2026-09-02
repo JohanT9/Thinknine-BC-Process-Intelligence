@@ -318,3 +318,10 @@ or På/Av values.
 - Hidden-state overrides are removed during reset without discarding instruction,
   comment or screenshot edits. A final safety check prevents a non-empty Review
   from resolving to zero visible steps.
+
+# Change Image dialog actions
+
+- Capture, Cancel and Apply are grouped directly below the dialog introduction
+  and remain visible while the screenshot gallery scrolls independently.
+- The dialog title now resolves the visible Step number from the Step identity,
+  preventing `step null` headings.

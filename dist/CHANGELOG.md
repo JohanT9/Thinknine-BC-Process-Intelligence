@@ -11,6 +11,10 @@
 
 ## Unreleased
 
+- Moved all Change Image dialog actions above the screenshot gallery. Only the
+  gallery now scrolls, keeping Capture, Cancel and Apply continuously available,
+  and corrected headings that could display `step null`.
+
 - Prevented Reset Structure from erasing Review steps when an older or migrated
   review contains an empty generated-task baseline. Existing steps are now
   retained while the invalid structural overrides are cleared.
