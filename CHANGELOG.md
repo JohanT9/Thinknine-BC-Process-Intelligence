@@ -11,6 +11,10 @@
 
 ## Unreleased
 
+- Fixed screenshot queue coalescing so every captured event keeps an addressable
+  image in Review. The Change Image gallery no longer loses later candidates
+  when nearby interactions safely share one physical browser capture.
+
 - Moved Document Information out of the permanent Review canvas and into a
   header `More actions` menu item. Document language and expected result now
   open in a focused dialog while retaining autosave and reset behaviour.

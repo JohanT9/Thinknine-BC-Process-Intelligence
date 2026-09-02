@@ -602,6 +602,11 @@ async function enqueueScreenshot({
   );
 
   if (existing) {
+    existing.targets ||= [{ eventNo: existing.eventNo,
+      eventId: existing.eventId }];
+    if (!existing.targets.some(target => target.eventNo === eventNo)) {
+      existing.targets.push({ eventNo, eventId });
+    }
     if (screenshotPriority(category) > screenshotPriority(existing.category)) {
       existing.category = category;
       existing.eventNo = eventNo;
@@ -623,6 +628,7 @@ async function enqueueScreenshot({
     tabId,
     category,
     captureKey,
+    targets: [{ eventNo, eventId }],
     queuedAt: Date.now()
   });
 
@@ -674,11 +680,17 @@ async function processScreenshotQueue() {
 
       const screenshots = await getScreenshots(item.sessionId);
 
-      // Reuse the same screenshot for nearby events instead of taking another one.
-      screenshots[item.eventNo] = image;
-      await canonicalStore.associateScreenshot(
-        item.sessionId, item.eventId, image, new Date().toISOString()
-      );
+      // One stable capture may represent nearby events, but every event must retain
+      // an addressable screenshot so the complete recording is available in Review.
+      const targets = item.targets?.length ? item.targets :
+        [{ eventNo: item.eventNo, eventId: item.eventId }];
+      const capturedAt = new Date().toISOString();
+      for (const target of targets) {
+        screenshots[target.eventNo] = image;
+        await canonicalStore.associateScreenshot(
+          item.sessionId, target.eventId, image, capturedAt
+        );
+      }
       await saveScreenshots(item.sessionId, screenshots);
 
       screenshotStats.captured += 1;

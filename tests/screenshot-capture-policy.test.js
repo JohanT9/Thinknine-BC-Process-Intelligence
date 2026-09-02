@@ -48,6 +48,12 @@ const background = fs.readFileSync(path.join(__dirname,
   "../src/recorder/background.js"), "utf8");
 assert(background.includes('importScripts("engine/screenshot-capture-policy.js")'));
 assert(background.includes("T9ScreenshotCapturePolicy.shouldCapture"));
+assert(background.includes("existing.targets.push({ eventNo, eventId })"),
+  "coalesced screenshot requests must retain every event association");
+assert(background.includes("for (const target of targets)"),
+  "one reused capture must be persisted for every associated event");
+assert(background.includes("screenshots[target.eventNo] = image"),
+  "all associated screenshots must remain selectable in Review");
 const content = fs.readFileSync(path.join(__dirname,
   "../src/recorder/content.js"), "utf8");
 assert(content.includes("dialogComplete: Boolean(dialog?.isConnected)"),
