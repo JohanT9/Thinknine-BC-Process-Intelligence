@@ -306,3 +306,5 @@ or På/Av values.
   again, and opening a different Step menu closes the previous one.
 - The ellipsis trigger uses an explicit button and menu state so opening and
   closing no longer depend on Edge's native disclosure timing.
+- Selecting the ellipsis trigger no longer enters the command auto-close path;
+  the menu remains visible until it is deliberately closed or a command runs.

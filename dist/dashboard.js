@@ -5909,9 +5909,9 @@ function renderReviewContent() {
     });
     stepActionsMenu.addEventListener("click", event => {
       const button = event.target.closest("button");
-      if (button && !button.disabled) setTimeout(() => {
-        setStepActionsOpen(false);
-      });
+      if (button && stepActionsPanel.contains(button) && !button.disabled) {
+        setTimeout(() => setStepActionsOpen(false));
+      }
     });
     stepActionsMenu.addEventListener("keydown", event => {
       if (event.key !== "Escape") return;

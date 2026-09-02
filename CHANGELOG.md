@@ -11,6 +11,9 @@
 
 ## Unreleased
 
+- Fixed the Step action menu immediately closing after its ellipsis trigger was
+  selected. Automatic closing now applies only to commands inside the menu.
+
 - Replaced the Step ellipsis disclosure's browser-dependent summary handling
   with an explicit button and menu state, restoring reliable opening and
   second-click closing in Edge.

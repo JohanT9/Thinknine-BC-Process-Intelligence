@@ -27,6 +27,8 @@ assert(dashboard.includes('event.key !== "Escape"'));
 assert(dashboard.includes("setStepActionsOpen(false)"));
 assert(dashboard.includes('getAttribute("aria-expanded") !== "true"'),
   "the menu trigger must explicitly toggle an already open menu closed");
+assert(dashboard.includes("button && stepActionsPanel.contains(button)"),
+  "only menu commands may auto-close the menu, never the ellipsis trigger");
 assert(dashboard.includes('stepActionsSummary.setAttribute("aria-expanded"'),
   "expanded accessibility state must follow the actual menu state");
 assert(dashboard.includes("stepActionsSummary.focus()"));
