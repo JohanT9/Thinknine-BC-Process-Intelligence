@@ -10,6 +10,8 @@ importScripts("engine/business-central-process-taxonomy-seed.js");
 importScripts("engine/business-central-document-lifecycle-seed.js");
 importScripts("engine/document-lifecycle.js");
 importScripts("engine/bc-process-recognition-engine.js");
+importScripts("engine/business-central-reference-process-seed.js");
+importScripts("engine/reference-process-library.js");
 importScripts("document/process-graph.js");
 importScripts("document/multi-level-process-graph.js");
 importScripts("engine/raw-event-persistence.js");

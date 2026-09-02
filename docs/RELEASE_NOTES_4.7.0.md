@@ -396,3 +396,16 @@ or På/Av values.
 - Process Recognition now uses matched lifecycle transitions as strong,
   explainable evidence and reports the selected lifecycle variant alongside its
   other signals.
+
+# Reference Process Library
+
+- Added 35 renderer-free semantic references across Order to Cash, Source to
+  Pay, Inventory, Production, Planning, Assembly, and Item Tracking.
+- Every reference describes its boundaries, expected and optional documents,
+  actions, transitions, variants, and configuration requirements without storing
+  screenshots or UI presentation data.
+- Recordings can be compared with references to obtain a best match, confidence,
+  matched, missing and unexpected steps, plus alternative matches. Differences
+  are advisory and may represent a valid customized customer process.
+- Namespaced immutable extension libraries allow later Aptean Food & Beverage
+  and customer references without changing the core architecture.

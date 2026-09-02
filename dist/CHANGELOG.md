@@ -11,6 +11,10 @@
 
 ## Unreleased
 
+- Added a 35-pattern Business Central Reference Process Library with immutable
+  extension support and advisory recording similarity results containing best,
+  alternative, matched, missing, and unexpected process steps.
+
 - Added configurable Business Central document lifecycle knowledge for Sales,
   Purchase, Production, and Transfer flows, including optional warehouse paths,
   lifecycle variants, document states, and recognition signal integration.

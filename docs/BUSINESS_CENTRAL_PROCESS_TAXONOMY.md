@@ -57,6 +57,11 @@ Document-to-document and document-state knowledge is maintained in the separate
 catalog. Taxonomy owns reusable document identity; Lifecycle owns configurable,
 optional paths between those documents.
 
+Canonical examples built from these identities live in the separate
+[Reference Process Library](REFERENCE_PROCESS_LIBRARY.md). Taxonomy defines what
+the entities are; references describe representative combinations that can be
+compared with a recording without declaring customer deviations invalid.
+
 ## Business Central seed
 
 The initial seed contains Order to Cash, Source to Pay, Forecast to Plan,

@@ -988,6 +988,17 @@ transitions as strong evidence but never treats a lifecycle as mandatory.
 Renderers and ProcessGraph do not interpret lifecycle configuration. See
 [BUSINESS_CENTRAL_DOCUMENT_LIFECYCLES.md](BUSINESS_CENTRAL_DOCUMENT_LIFECYCLES.md).
 
+## Reference Process Library boundary (4.7)
+
+The Reference Process Library is an immutable semantic-example catalog above
+Process Taxonomy and Document Lifecycle. It contains no recording evidence or
+rendering fields. Its comparison service consumes Canonical Recording plus
+Semantic Classification and returns advisory similarity, matched, missing, and
+unexpected steps with alternatives. It never mutates a recording or interprets
+deviation as failure. Namespaced extension libraries allow future Aptean and
+customer patterns without modifying the BC seed. See
+[REFERENCE_PROCESS_LIBRARY.md](REFERENCE_PROCESS_LIBRARY.md).
+
 ## Application Insights enrichment boundary (4.6)
 
 Optional external telemetry is queried by one provider through versioned query
