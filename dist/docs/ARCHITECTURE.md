@@ -1,5 +1,13 @@
 # BC Process Studio Architecture 4.7
 
+## Canonical Business Central process taxonomy
+
+The reusable Business Central classification catalog is defined by
+`engine/process-taxonomy-schema.js`, `engine/process-taxonomy.js`, and the
+representative BC seed. It is independent of individual recordings and of the
+renderer-neutral Process Model. Recordings contain only stable taxonomy entity
+references. See [BUSINESS_CENTRAL_PROCESS_TAXONOMY.md](BUSINESS_CENTRAL_PROCESS_TAXONOMY.md).
+
 ## Language ownership
 
 `src/engine/language-registry.js` owns active locales, aliases, short codes, native names, and UI/document capabilities. Recording, Canonical Recording, Review, the Knowledge Base, and UI selectors consume this registry rather than maintaining separate language allowlists. Translation catalogs and language-specific presentation rules remain in their presentation layers.

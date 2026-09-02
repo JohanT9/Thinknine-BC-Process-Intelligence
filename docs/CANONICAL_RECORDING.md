@@ -62,6 +62,12 @@ The Canonical Recording is the permanent source of truth for captured activity.
 Generated documentation, review edits, process models, and exports are derived
 data; they must not replace or rewrite the original events.
 
+Business-process classification is stored as stable IDs in
+`metadata.taxonomyReferences`; taxonomy definitions are never copied into a
+recording. Action mappings connect canonical recorded Event IDs to reusable
+`ProcessAction` and `ProcessStep` entities. See
+[BUSINESS_CENTRAL_PROCESS_TAXONOMY.md](BUSINESS_CENTRAL_PROCESS_TAXONOMY.md).
+
 ```text
 Capture -> Canonical Recording -> Future interpretation layer
         -> Process / Support / Training -> Exporters

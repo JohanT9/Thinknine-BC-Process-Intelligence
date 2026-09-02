@@ -3,6 +3,7 @@ importScripts("engine/storage-keys.js");
 importScripts("engine/business-central-url-context.js");
 importScripts("engine/page-identity.js");
 importScripts("engine/page-identification-engine.js");
+importScripts("engine/process-taxonomy-schema.js");
 importScripts("engine/canonical-recording.js");
 importScripts("engine/raw-event-persistence.js");
 importScripts("engine/bc-ui-identification.js");

@@ -1,5 +1,12 @@
 # BC Process Studio 4.7
 
+- Added a canonical Business Central process taxonomy inspired by Microsoft's
+  Dynamics 365 end-to-end process catalog and specialized for BC documents,
+  pages, actions, warehouse flows, manufacturing, assembly, transfers and
+  planning. The immutable registry supports five-level traversal, relationships,
+  variants, extensions, and stable recording-to-taxonomy references. See
+  [Business Central Process Taxonomy](BUSINESS_CENTRAL_PROCESS_TAXONOMY.md).
+
 - Review Step cards now use a quieter and accessible visual state system.
   Approval and review attention have narrow green/amber accents plus text
   badges, selection uses the product focus colour, and reversible Hide is

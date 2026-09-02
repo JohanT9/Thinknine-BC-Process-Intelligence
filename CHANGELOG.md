@@ -11,6 +11,11 @@
 
 ## Unreleased
 
+- Added an extensible, renderer-neutral Business Central process taxonomy with
+  five-level hierarchy, canonical relationships and variants, immutable lookup
+  and traversal services, recording classification references, and seed data
+  for eight representative BC process families across twelve core domains.
+
 - Fixed the Change Image dialog's screenshot scrollbar by bounding the complete
   dialog to the viewport and assigning all remaining height to one stable,
   vertically scrollable gallery.

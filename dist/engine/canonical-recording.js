@@ -3,10 +3,13 @@
     ? require("./page-identity") : root.T9PageIdentity;
   const languages = typeof module === "object" && module.exports
     ? require("./language-registry") : root.T9LanguageRegistry;
-  const api = factory(pageIdentity, languages);
+  const taxonomySchema = typeof module === "object" && module.exports
+    ? require("./process-taxonomy-schema") : root.T9ProcessTaxonomySchema;
+  const api = factory(pageIdentity, languages, taxonomySchema);
   if (typeof module === "object" && module.exports) module.exports = api;
   root.T9CanonicalRecording = api;
-})(typeof globalThis !== "undefined" ? globalThis : this, function (pageIdentity, languages) {
+})(typeof globalThis !== "undefined" ? globalThis : this,
+  function (pageIdentity, languages, taxonomySchema) {
   "use strict";
   const SCHEMA_VERSION = 1;
   const RECORDING_PURPOSES = Object.freeze({
@@ -96,7 +99,7 @@
     return event;
   }
   function metadataFromSession(session = {}) {
-    return { title: session.name || undefined, startedAt: session.startedAt || new Date(0).toISOString(), finishedAt: session.completedAt || session.finishedAt || undefined, sourceApplication: session.sourceApplication || "Microsoft Dynamics 365 Business Central", sourceUrl: session.sourceUrl || undefined, businessCentral: clone(session.businessCentral || { environment: session.settings?.environmentName || undefined }), recordingPurpose: normalizeRecordingPurpose(session.recordingPurpose) };
+    return { title: session.name || undefined, startedAt: session.startedAt || new Date(0).toISOString(), finishedAt: session.completedAt || session.finishedAt || undefined, sourceApplication: session.sourceApplication || "Microsoft Dynamics 365 Business Central", sourceUrl: session.sourceUrl || undefined, businessCentral: clone(session.businessCentral || { environment: session.settings?.environmentName || undefined }), recordingPurpose: normalizeRecordingPurpose(session.recordingPurpose), taxonomyReferences: taxonomySchema.normalizeRecordingReferences(session.taxonomyReferences) };
   }
   function assetFor(sessionId, eventNo, value) {
     return { id: `${sessionId}:screenshot:${eventNo}`, type: "screenshot", path: `screenshots/${String(eventNo).padStart(6, "0")}.png`, mimeType: /^data:([^;,]+)/.exec(String(value || ""))?.[1] || "image/png", metadata: { legacyEventNo: Number(eventNo) } };
@@ -149,7 +152,7 @@
   function normalize(input, legacy = {}) {
     if (!input || input.schemaVersion == null) return (!legacy.session && !input) ? null : fromLegacy(legacy.session || input, legacy.events, legacy.screenshots);
     if (Number(input.schemaVersion) !== SCHEMA_VERSION) throw new Error(`Unsupported recording schema: ${input.schemaVersion}`);
-    const result = clone(input); result.events = Array.isArray(result.events) ? result.events : []; result.assets = Array.isArray(result.assets) ? result.assets : []; result.metadata ||= {}; result.metadata.recordingPurpose = normalizeRecordingPurpose(result.metadata.recordingPurpose); return result;
+    const result = clone(input); result.events = Array.isArray(result.events) ? result.events : []; result.assets = Array.isArray(result.assets) ? result.assets : []; result.metadata ||= {}; result.metadata.recordingPurpose = normalizeRecordingPurpose(result.metadata.recordingPurpose); result.metadata.taxonomyReferences = taxonomySchema.normalizeRecordingReferences(result.metadata.taxonomyReferences); return result;
   }
   function addEvent(recording, source, identification = null) {
     if (!source || typeof source !== "object" || Array.isArray(source) || !source.type) throw new TypeError("A raw event with a type is required.");
@@ -185,9 +188,10 @@
   function finish(recording, finishedAt) { if (recording.metadata?.finishedAt) { if (recording.metadata.finishedAt === finishedAt) return recording; throw new Error("Completed recording evidence is immutable."); } const result = normalize(recording); result.metadata.finishedAt = finishedAt; result.updatedAt = finishedAt; if (result.compatibility?.session) Object.assign(result.compatibility.session, { completedAt: finishedAt, updatedAt: finishedAt, status: "completed" }); return result; }
   function rename(recording, title) { const value = String(title || "").trim(); if (!value) return normalize(recording); if (recording.metadata?.finishedAt) throw new Error("Completed recording evidence is immutable."); const result = normalize(recording); result.metadata.title = value; if (result.compatibility?.session) result.compatibility.session.name = value; return result; }
   function setDocumentLanguage(recording, language) { if (recording.metadata?.finishedAt) throw new Error("Completed recording evidence is immutable."); const result = normalize(recording); const value = languages.normalize(language, "document"); result.metadata.documentLanguage = value; if (result.compatibility?.session) result.compatibility.session.settings = { ...(result.compatibility.session.settings || {}), documentLanguage: value }; return result; }
-  function legacyView(recording) { const value = normalize(recording); const session = clone(value.compatibility?.session || {}); Object.assign(session, { id: value.id, name: session.name || value.metadata.title, purpose: session.purpose || "", recordingPurpose: value.metadata.recordingPurpose, startedAt: session.startedAt || value.metadata.startedAt, completedAt: session.completedAt || value.metadata.finishedAt || null, updatedAt: value.updatedAt, eventCount: value.events.length }); return { session, events: value.events.map(event => ({ ...clone(event.raw || { id: event.id, timestamp: event.timestamp, type: event.type }), ...(event.identification ? { identification: clone(event.identification) } : {}) })) }; }
+  function setTaxonomyReferences(recording, references) { if (recording.metadata?.finishedAt) throw new Error("Completed recording evidence is immutable."); const result = normalize(recording); const value = taxonomySchema.normalizeRecordingReferences(references); result.metadata.taxonomyReferences = value; if (result.compatibility?.session) result.compatibility.session.taxonomyReferences = clone(value); return result; }
+  function legacyView(recording) { const value = normalize(recording); const session = clone(value.compatibility?.session || {}); Object.assign(session, { id: value.id, name: session.name || value.metadata.title, purpose: session.purpose || "", recordingPurpose: value.metadata.recordingPurpose, taxonomyReferences: clone(value.metadata.taxonomyReferences), startedAt: session.startedAt || value.metadata.startedAt, completedAt: session.completedAt || value.metadata.finishedAt || null, updatedAt: value.updatedAt, eventCount: value.events.length }); return { session, events: value.events.map(event => ({ ...clone(event.raw || { id: event.id, timestamp: event.timestamp, type: event.type }), ...(event.identification ? { identification: clone(event.identification) } : {}) })) }; }
   return { RECORDING_PURPOSES, SCHEMA_VERSION, addEvent, addScreenshot, create,
     finish, fromLegacy, integrityDiagnostics, legacyView, normalize, rename,
-    setDocumentLanguage,
+    setDocumentLanguage, setTaxonomyReferences,
     normalizeRecordingPurpose };
 });
