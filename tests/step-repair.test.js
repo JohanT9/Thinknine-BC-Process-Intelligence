@@ -62,6 +62,15 @@ assert.match(actionBar, /value="cancel"/);
 assert.match(actionBar, /id="applyStepRepair"/);
 assert(html.indexOf("stepRepairActionBar") < html.indexOf("stepRepairGallery"),
   "all image-replacement actions must remain above the scrolling gallery");
+const designSystem = fs.readFileSync(path.join(__dirname,
+  "../src/ui/design-system.css"), "utf8");
+assert(designSystem.includes("height: min(900px, calc(100dvh - 32px)); box-sizing: border-box"),
+  "the complete dialog must remain inside the viewport");
+assert(designSystem.includes("gap: var(--space16); height: 100%; min-height: 0; overflow: hidden"),
+  "the dialog form must pass a bounded height to the gallery");
+assert(designSystem.includes("overflow-y: auto;"));
+assert(designSystem.includes("overscroll-behavior: contain; scrollbar-gutter: stable"),
+  "only the screenshot gallery should own stable scrolling");
 assert.match(dashboard,
   /visibleTaskNumber\(\s*activeReview, task\.taskId \|\| task\.stepId\s*\)/,
   "the dialog heading must resolve a visible number from the task identity");

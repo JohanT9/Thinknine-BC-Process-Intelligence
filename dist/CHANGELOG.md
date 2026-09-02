@@ -11,6 +11,10 @@
 
 ## Unreleased
 
+- Fixed the Change Image dialog's screenshot scrollbar by bounding the complete
+  dialog to the viewport and assigning all remaining height to one stable,
+  vertically scrollable gallery.
+
 - Aligned each Review Step's Edit, approval and overflow controls on one
   vertical center line. The approval checkbox and label now behave as a
   centered control group without drifting in tall cards. The overflow trigger
