@@ -185,7 +185,7 @@ tbody tr:hover { background: var(--colorBrandSubtle); }
 .library-filter-options label{display:inline-flex;align-items:center;gap:var(--space8)}
 .library-filter-options input{width:auto}.library-filter-actions{grid-column:1/-1;display:flex;justify-content:flex-end}
 .library-card{display:flex;flex-direction:column;gap:var(--space8)}
-.library-card-heading{min-height:30px}.library-card-heading h4{padding-top:4px}.library-card-heading .library-favourite{align-self:flex-start;transform:translateY(-4px)}.library-card-meta{display:flex;flex-wrap:wrap;gap:4px 10px;color:var(--colorTextSecondary);font-size:12px}
+.library-card-heading{min-height:30px}.library-card-heading h4{padding-top:1px}.library-card-heading .library-favourite{align-self:flex-start;transform:translateY(-6px)}.library-card-meta{display:flex;flex-wrap:wrap;gap:4px 10px;color:var(--colorTextSecondary);font-size:12px}
 .library-card-meta .library-profile{font-size:12px}.library-card-status{font-weight:700;color:#6b4f00}
 .library-card .library-tags{margin:0}.library-card-footer{display:flex;align-items:center;justify-content:space-between;gap:var(--space8);margin-top:auto;padding-top:var(--space8);border-top:1px solid var(--colorBorderSubtle);font-size:12px}
 .library-card-footer button{flex:0 0 auto;margin:0}
