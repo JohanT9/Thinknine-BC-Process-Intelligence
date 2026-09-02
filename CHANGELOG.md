@@ -11,6 +11,9 @@
 
 ## Unreleased
 
+- Refined Document Library card alignment by lowering the document title
+  slightly and raising the favourite control to the card's top edge.
+
 - Promoted Document Information from `More actions` to the main Review toolbar,
   keeping document language and expected result directly accessible while
   reviewing steps.
