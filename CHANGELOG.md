@@ -11,6 +11,10 @@
 
 ## Unreleased
 
+- Replaced the Step ellipsis disclosure's browser-dependent summary handling
+  with an explicit button and menu state, restoring reliable opening and
+  second-click closing in Edge.
+
 - Tooltips now append any declared keyboard shortcut after the action text,
   using compact key names and readable separators between alternatives.
 

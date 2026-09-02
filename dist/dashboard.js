@@ -5852,10 +5852,11 @@ function renderReviewContent() {
             ${task.approved ? "checked" : ""}>
           Godkänd
         </label>
-        <details class="review-step-actions-menu">
-          <summary aria-label="${uiT("Fler åtgärder")}" aria-expanded="false">⋯</summary>
+        <div class="review-step-actions-menu">
+          <button type="button" class="review-step-actions-trigger"
+            aria-label="${uiT("Fler åtgärder")}" aria-expanded="false">⋯</button>
           <div class="review-step-actions-panel" role="group"
-            aria-label="${uiTf("a11y.stepActions", { step: visibleIndex + 1 })}">
+            aria-label="${uiTf("a11y.stepActions", { step: visibleIndex + 1 })}" hidden>
             <button data-drag-handle class="secondary" draggable="true"
               aria-label="${uiTf("a11y.dragStep", { step: visibleIndex + 1 })}"
               aria-keyshortcuts="Alt+ArrowUp Alt+ArrowDown">Flytta</button>
@@ -5873,7 +5874,7 @@ function renderReviewContent() {
             <button data-action="toggle-layout" class="secondary"
               aria-pressed="false">Komprimera</button>
           </div>
-        </details>
+        </div>
       </div>`;
 
     // Make the step visible before optional enhancements and event bindings.
@@ -5881,36 +5882,46 @@ function renderReviewContent() {
     list.appendChild(card);
 
     const stepActionsMenu = card.querySelector(".review-step-actions-menu");
-    const stepActionsSummary = stepActionsMenu.querySelector("summary");
-    stepActionsSummary.addEventListener("click", event => {
-      event.preventDefault();
-      const shouldOpen = !stepActionsMenu.open;
+    const stepActionsSummary = stepActionsMenu.querySelector(
+      ".review-step-actions-trigger"
+    );
+    const stepActionsPanel = stepActionsMenu.querySelector(
+      ".review-step-actions-panel"
+    );
+    const setStepActionsOpen = open => {
+      stepActionsMenu.classList.toggle("is-open", open);
+      stepActionsSummary.setAttribute("aria-expanded", String(open));
+      stepActionsPanel.hidden = !open;
+    };
+    stepActionsSummary.addEventListener("click", () => {
+      const shouldOpen = stepActionsSummary.getAttribute("aria-expanded") !== "true";
       for (const menu of list.querySelectorAll(
-        ".review-step-actions-menu[open]"
+        ".review-step-actions-menu.is-open"
       )) {
-        if (menu !== stepActionsMenu) menu.open = false;
+        if (menu !== stepActionsMenu) {
+          menu.classList.remove("is-open");
+          menu.querySelector(".review-step-actions-trigger")
+            .setAttribute("aria-expanded", "false");
+          menu.querySelector(".review-step-actions-panel").hidden = true;
+        }
       }
-      stepActionsMenu.open = shouldOpen;
-    });
-    stepActionsMenu.addEventListener("toggle", () => {
-      stepActionsSummary.setAttribute("aria-expanded",
-        String(stepActionsMenu.open));
+      setStepActionsOpen(shouldOpen);
     });
     stepActionsMenu.addEventListener("click", event => {
       const button = event.target.closest("button");
       if (button && !button.disabled) setTimeout(() => {
-        stepActionsMenu.open = false;
+        setStepActionsOpen(false);
       });
     });
     stepActionsMenu.addEventListener("keydown", event => {
       if (event.key !== "Escape") return;
       event.preventDefault();
-      stepActionsMenu.open = false;
+      setStepActionsOpen(false);
       stepActionsSummary.focus();
     });
     stepActionsMenu.addEventListener("focusout", event => {
       if (!stepActionsMenu.contains(event.relatedTarget)) {
-        stepActionsMenu.open = false;
+        setStepActionsOpen(false);
       }
     });
 

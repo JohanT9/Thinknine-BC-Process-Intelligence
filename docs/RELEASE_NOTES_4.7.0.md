@@ -304,3 +304,5 @@ or På/Av values.
   scrolling, resizing or Escape.
 - Step action menus now close reliably when their ellipsis button is selected
   again, and opening a different Step menu closes the previous one.
+- The ellipsis trigger uses an explicit button and menu state so opening and
+  closing no longer depend on Edge's native disclosure timing.
