@@ -298,6 +298,8 @@ or På/Av values.
   keyboard focus across the primary product surfaces.
 - Tooltip text follows the active interface language and uses existing
   accessible labels where available.
+- When an action has a keyboard shortcut, the tooltip displays it after the
+  action text, for example `Spara (Ctrl+S / Cmd+S)`.
 - Tooltips stay inside the viewport and close on pointer exit, focus exit,
   scrolling, resizing or Escape.
 - Step action menus now close reliably when their ellipsis button is selected

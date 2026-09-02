@@ -23,6 +23,17 @@ assert.strictEqual(tooltips.tooltipText(target({}, "Long help", "Start recording
   "Start recording", "mode cards should use their concise heading");
 assert.strictEqual(tooltips.tooltipText(target({}, "  Save   document  ")),
   "Save document");
+assert.strictEqual(tooltips.tooltipText(target({
+  "aria-label": "Save", "aria-keyshortcuts": "Control+S Meta+S"
+})), "Save (Ctrl+S / Cmd+S)");
+assert.strictEqual(tooltips.tooltipText(target({
+  "data-tooltip": "Move", "aria-keyshortcuts": "Alt+ArrowUp Alt+ArrowDown"
+})), "Move (Alt+↑ / Alt+↓)");
+assert.strictEqual(tooltips.shortcutText(target({
+  "aria-keyshortcuts": "Enter Escape Delete"
+})), "Enter / Esc / Delete");
+assert(tooltips.TARGET_SELECTOR.includes("[aria-keyshortcuts]"),
+  "elements exposing shortcuts must participate in shared tooltips");
 
 for (const file of ["dashboard.html", "popup.html", "debug.html",
   "technical-report.html"]) {

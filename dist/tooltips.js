@@ -6,17 +6,31 @@
 })(typeof globalThis !== "undefined" ? globalThis : this, function (root) {
   "use strict";
 
-  const TARGET_SELECTOR = "button, summary, [data-tooltip]";
+  const TARGET_SELECTOR = "button, summary, [data-tooltip], [aria-keyshortcuts]";
   const TOOLTIP_ID = "t9GlobalTooltip";
   const bindings = new WeakMap();
+
+  const KEY_LABELS = Object.freeze({
+    Control: "Ctrl", Meta: "Cmd", Escape: "Esc", Space: "Space",
+    ArrowUp: "↑", ArrowDown: "↓", ArrowLeft: "←", ArrowRight: "→"
+  });
+
+  function shortcutText(target) {
+    const shortcuts = target?.getAttribute?.("aria-keyshortcuts")?.trim();
+    if (!shortcuts) return "";
+    return shortcuts.split(/\s+/u).map(shortcut => shortcut.split("+")
+      .map(key => KEY_LABELS[key] || key).join("+")).join(" / ");
+  }
 
   function tooltipText(target) {
     if (!target) return "";
     const explicit = target.getAttribute?.("data-tooltip") ||
       target.getAttribute?.("aria-label") || target.getAttribute?.("title");
-    if (explicit?.trim()) return explicit.trim();
     const heading = target.querySelector?.("strong")?.textContent?.trim();
-    return heading || String(target.textContent || "").replace(/\s+/gu, " ").trim();
+    const text = explicit?.trim() || heading || String(target.textContent || "")
+      .replace(/\s+/gu, " ").trim();
+    const shortcut = shortcutText(target);
+    return [text, shortcut ? `(${shortcut})` : ""].filter(Boolean).join(" ");
   }
 
   function bind(documentValue) {
@@ -130,5 +144,5 @@
     return unbind;
   }
 
-  return { TARGET_SELECTOR, TOOLTIP_ID, bind, tooltipText };
+  return { TARGET_SELECTOR, TOOLTIP_ID, bind, shortcutText, tooltipText };
 });

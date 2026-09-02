@@ -11,6 +11,9 @@
 
 ## Unreleased
 
+- Tooltips now append any declared keyboard shortcut after the action text,
+  using compact key names and readable separators between alternatives.
+
 - Fixed Step action menus so clicking the ellipsis button a second time closes
   the menu reliably. Only one Step menu remains open, and its expanded
   accessibility state now follows the visible state.
