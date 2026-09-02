@@ -143,4 +143,18 @@ assert(dashboard.includes('"ArrowLeft", "ArrowRight"'));
 assert(dashboard.includes('locale: applicationSettings.uiLocale || "sv-SE"'));
 assert.deepStrictEqual(view.reviewState({ reviewTask: { approved: false } }, true),
   { name: "pending", label: "Not reviewed" });
+assert.deepStrictEqual(view.semanticState({ node: { metadata: {
+  semanticStatus: "suggested" } } }, false),
+{ name: "suggested", label: "Referensförslag" });
+const semanticContainer = { innerHTML: "" };
+view.render(semanticContainer, { nodes: [{ nodeId: "suggestion", nodeType: "activity",
+  title: "Post Shipment", processOrder: 0, metadata: { semanticStatus: "suggested" } }],
+transitions: [], subprocesses: [], stateTransitions: [] }, { locale: "sv-SE" });
+assert(semanticContainer.innerHTML.includes("process-overview-semantic-suggested"));
+assert(semanticContainer.innerHTML.includes("Referensförslag"));
+const dashboardHtml = fs.readFileSync("src/ui/dashboard.html", "utf8");
+assert(dashboardHtml.includes('id="processMapLevels"'));
+assert(dashboardHtml.includes('data-process-map-level="businessCentral"'));
+assert(dashboardHtml.includes('src="document/semantic-process-map.js"'));
+assert(dashboard.includes('activeProcessMapLevel = button.dataset.processMapLevel'));
 console.log("Process Overview view tests passed.");

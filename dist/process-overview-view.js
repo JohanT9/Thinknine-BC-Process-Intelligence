@@ -82,6 +82,19 @@
     return { name: "pending", label: english ? "Not reviewed" : "Ej granskad" };
   }
 
+  function semanticState(detail, english) {
+    const status = detail?.node?.metadata?.semanticStatus;
+    if (status === "observed") return { name: status,
+      label: english ? "Observed" : "Observerat" };
+    if (status === "suggested") return { name: status,
+      label: english ? "Reference suggestion" : "Referensförslag" };
+    if (status === "customerSpecific") return { name: status,
+      label: english ? "Customer-specific" : "Kundunikt" };
+    if (status === "reference") return { name: status,
+      label: english ? "Reference" : "Referens" };
+    return null;
+  }
+
   function routeLabel(route, english) {
     if (route.label) return route.label;
     if (typeof route.condition === "string" && route.condition.trim()) return route.condition;
@@ -160,8 +173,10 @@
         const subtask = detail.containers.subtask?.title;
         const decision = detail.node.nodeType === "decision";
         const status = reviewState(detail, english);
+        const semantic = semanticState(detail, english);
         const title = plain(detail.node.title);
-        return `<li class="process-overview-step${decision ? " process-overview-decision" : ""}"
+        return `<li class="process-overview-step${decision ? " process-overview-decision" : ""}${
+          semantic ? ` process-overview-semantic-${semantic.name}` : ""}"
           data-process-node-id="${escape(detail.node.nodeId)}" data-process-decision="${decision}">
           <button type="button" class="process-overview-action"
             data-process-node-action="${escape(detail.node.nodeId)}"
@@ -175,6 +190,8 @@
               ${decision ? `<span class="process-overview-node-type">${english ? "Decision" : "Beslut"}</span>` : ""}
               <strong>${escape(title)}</strong>
               ${status ? `<span class="process-overview-review-state ${status.name}">${escape(status.label)}</span>` : ""}
+              ${semantic ? `<span class="process-overview-semantic-state ${semantic.name}">${escape(
+                semantic.label)}</span>` : ""}
             </span>
           </button>
         </li>`;
@@ -219,6 +236,6 @@
     return true;
   }
 
-  return { containersFor, detailMarkup, render, reviewState, routeLabel,
+  return { containersFor, detailMarkup, render, reviewState, routeLabel, semanticState,
     routesMarkup, selectNode, taskIdFor, updateSelection };
 });

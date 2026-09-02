@@ -146,6 +146,7 @@ table{width:100%;border-collapse:collapse}th,td{text-align:left;padding:9px;bord
 .process-overview-card{margin:16px 0;border:1px solid #d8dee5;border-radius:7px;background:#fff}.process-overview-card>summary{cursor:pointer;padding:12px 14px;font-weight:600}.process-overview-help{margin:0;padding:0 14px 10px}.process-diagram-scroll{overflow-x:auto;padding:2px 14px 12px;scrollbar-gutter:stable}.process-diagram-scroll:focus-visible{outline:2px solid #0f6cbd;outline-offset:-2px}.process-overview-list{list-style:none;margin:0;padding:4px 0 12px;display:flex;align-items:stretch;gap:42px;min-width:max-content}.process-overview-step{position:relative;display:flex;width:250px;scroll-snap-align:start}.process-overview-step:not(:last-child)::after{content:"→";position:absolute;right:-31px;top:50%;width:20px;color:#52606d;font-size:22px;font-weight:700;text-align:center;transform:translateY(-50%)}.process-overview-step[data-process-decision="true"]::after{content:""}.process-overview-action{display:grid;grid-template-columns:34px minmax(0,1fr);align-items:start;gap:10px;width:100%;min-height:112px;margin:0;padding:10px;border:1px solid #b8c2cc;border-radius:6px;background:#fff;color:inherit;text-align:left}.process-overview-action:hover{background:#f3f6fa}.process-overview-action[aria-pressed="true"]{border-color:#0f6cbd;background:#eef6fc;box-shadow:0 0 0 1px #0f6cbd}.process-overview-number{display:grid;place-items:center;width:32px;height:32px;border:1px solid #8392a5;border-radius:50%;background:#f3f6fa;font-weight:700}.process-overview-decision .process-overview-action{border-color:#8a6d1d;background:#fffaf0}.process-overview-decision .process-overview-number{border-color:#8a6d1d;border-radius:4px;background:#fff3cd;transform:rotate(45deg)}.process-overview-decision .process-overview-number::first-letter{transform:rotate(-45deg)}.process-overview-content,.process-overview-state,.process-overview-change,.process-overview-phase,.process-overview-subtask,.process-overview-node-type{display:block}.process-overview-node-type{margin-bottom:3px;color:#765b00;font-size:12px;font-weight:700;text-transform:uppercase}.process-overview-phase{margin-bottom:3px;color:#52606d;font-size:12px;font-weight:700;text-transform:uppercase}.process-overview-subtask{margin-bottom:5px;color:#52606d;font-size:12px}.process-overview-state{margin-top:8px;color:#52606d;font-size:12px}.process-overview-change+.process-overview-change{margin-top:3px}.process-overview-routes{margin:5px 0 0;padding-left:18px}.process-overview-routes.compact{display:grid;gap:4px;padding:0}.process-overview-route{display:flex;align-items:baseline;gap:5px}.process-overview-routes.compact .process-overview-route{padding:4px 6px;border-left:3px solid #8a6d1d;background:#fff}.process-overview-detail{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:18px;margin:0 14px 14px;padding:12px 14px;border:1px solid #d8dee5;border-radius:6px;background:#f7f9fb}.process-overview-detail-label{display:block;margin-bottom:4px;color:#52606d;font-size:12px}.process-overview-detail-context{display:flex;flex-wrap:wrap;align-items:start;gap:6px}.process-overview-detail-context span{padding:3px 8px;border-radius:999px;background:#e5edf5}.process-overview-detail ul{margin:0;padding-left:18px}.process-overview-detail p{margin:0}@media(max-width:760px){.process-overview-detail{grid-template-columns:1fr}.process-overview-step{width:220px}}
 .process-overview-decision .process-overview-number>span{transform:rotate(-45deg)}
 .process-overview-detail .process-overview-route{display:grid;grid-template-columns:auto auto 1fr;gap:5px}.process-overview-route-meta{grid-column:1/-1;color:#52606d;font-size:12px}
+.process-map-toolbar{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin:0 14px 12px}.process-map-levels{display:inline-flex;border:1px solid #aeb8c2;border-radius:6px;overflow:hidden}.process-map-levels button{margin:0;border:0;border-right:1px solid #aeb8c2;border-radius:0;background:#fff;min-height:34px}.process-map-levels button:last-child{border-right:0}.process-map-levels button[aria-pressed="true"]{background:#087f7e;color:#fff}.process-map-legend{display:flex;flex-wrap:wrap;gap:10px;margin-left:auto;font-size:12px;color:#526273}.process-map-legend span::before{content:"";display:inline-block;width:10px;height:10px;margin-right:4px;border-radius:2px;vertical-align:-1px}.process-map-legend .observed::before{background:#dff3e5;border:1px solid #15803d}.process-map-legend .suggested::before{background:#fff8e1;border:1px dashed #a16207}.process-map-legend .customerSpecific::before{background:#e0f2fe;border:1px solid #0369a1}.process-overview-semantic-state{display:inline-flex;margin-top:7px;padding:2px 7px;border-radius:999px;font-size:11px;font-weight:600}.process-overview-semantic-state.observed{background:#dff3e5;color:#166534}.process-overview-semantic-state.suggested{background:#fff8e1;color:#854d0e}.process-overview-semantic-state.customerSpecific{background:#e0f2fe;color:#075985}.process-overview-semantic-state.reference{background:#eef1f4;color:#44546a}.process-overview-semantic-suggested .process-overview-action{border-style:dashed;border-color:#a16207;background:#fffdf5}.process-overview-semantic-customerSpecific .process-overview-action{border-color:#0369a1;background:#f0f9ff}.process-overview-semantic-observed .process-overview-action{border-color:#4d9f63;background:#f7fcf8}@media(max-width:760px){.process-map-legend{width:100%;margin-left:0}.process-map-levels{width:100%}.process-map-levels button{flex:1}}
 .review-zoom-content{zoom:var(--review-zoom,1)}
 .review-shell>[role="tabpanel"][hidden]{display:none!important}
 .document-workspace-panel{--document-zoom:1;background:#e8edf1;padding:0;height:calc(100vh - 190px);min-height:500px;display:flex;flex-direction:column;overflow:hidden}
@@ -554,7 +555,19 @@ table{width:100%;border-collapse:collapse}th,td{text-align:left;padding:9px;bord
       <div id="reviewZoomContent" class="review-zoom-content">
       <details id="processOverviewDisclosure" class="process-overview-card">
         <summary id="processOverviewTitle" data-i18n="process.overview">Processöversikt</summary>
-        <p class="muted process-overview-help" data-i18n="process.overviewHelp">Välj en aktivitet för att gå direkt till motsvarande steg. Detaljer visas under kartan.</p>
+        <p id="processMapDescription" class="muted process-overview-help" data-i18n="process.overviewHelp">Välj en aktivitet för att gå direkt till motsvarande steg. Detaljer visas under kartan.</p>
+        <div class="process-map-toolbar">
+          <div id="processMapLevels" class="process-map-levels" role="group"
+            aria-label="Processkartans detaljnivå">
+            <button type="button" data-process-map-level="business" aria-pressed="false">Affärsprocess</button>
+            <button type="button" data-process-map-level="businessCentral" aria-pressed="true">BC-process</button>
+            <button type="button" data-process-map-level="procedure" aria-pressed="false">Användarprocedur</button>
+          </div>
+          <div id="processMapLegend" class="process-map-legend" aria-label="Förklaring">
+            <span class="observed">Observerat</span><span class="suggested">Referensförslag</span>
+            <span class="customerSpecific">Kundunikt</span>
+          </div>
+        </div>
         <div class="process-overview-export" role="group" aria-label="Exportera process">
           <button id="saveProcessVersion" type="button" class="secondary" disabled>Spara version</button>
           <button id="compareProcessVersions" type="button" class="secondary" disabled>Jämför versioner</button>
@@ -830,6 +843,7 @@ table{width:100%;border-collapse:collapse}th,td{text-align:left;padding:9px;bord
 <script src="document/document-profile.js"></script>
 <script src="document/documentation-intelligence.js"></script>
 <script src="document/process-model.js"></script>
+<script src="document/process-graph.js"></script>
 <script src="document/process-versioning.js"></script>
 <script src="document/process-version-workflow.js"></script>
 <script src="document/document-library.js"></script>
@@ -864,6 +878,7 @@ table{width:100%;border-collapse:collapse}th,td{text-align:left;padding:9px;bord
 <script src="process-overview-view.js"></script>
 <script src="process-version-comparison-view.js"></script>
 <script src="process-analysis-view.js"></script>
+<script src="document/semantic-process-map.js"></script>
 <script src="i18n.js"></script>
 <script src="tooltips.js"></script>
 <script src="dashboard.js"></script>

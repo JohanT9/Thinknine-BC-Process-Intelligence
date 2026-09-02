@@ -419,6 +419,17 @@ or På/Av values.
 - Added responsive Swedish and English presentation and advisory language that
   treats customer deviations as valid possible variants rather than errors.
 
+# Semantic Process Maps
+
+- Added Business Process, BC Process and User Procedure levels to Process
+  Overview, all derived from the same recording and semantic analysis.
+- BC Process maps now distinguish observed activities, non-blocking reference
+  suggestions and customer-specific recorded activities.
+- Semantic nodes retain source-event links so observed activities can navigate
+  back to corresponding Review steps.
+- Added responsive legends, level-specific guidance and keyboard navigation
+  without introducing a second diagram renderer.
+
 # Reference Process Library
 
 - Added 35 renderer-free semantic references across Order to Cash, Source to

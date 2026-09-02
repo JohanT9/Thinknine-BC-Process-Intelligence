@@ -102,6 +102,12 @@ const comparison = model.compareGraphs(graph.normalize(customizedGraph), advance
 assert.strictEqual(comparison.missingSteps.length, 0);
 assert(comparison.additionalSteps.some(item => item.title === "Customer Approval"));
 assert.strictEqual(comparison.deviationsAreErrors, false);
+const recordingMatch = model.matchRecordingToReferences({ schemaVersion: 1, id: "synthetic",
+  events: [] }, seed, { graphProjector: { generate() { return advanced.processGraph; } } });
+assert.strictEqual(recordingMatch.bestMatch.referenceProcess, "Advanced Warehouse Outbound");
+assert.strictEqual(recordingMatch.observedGraph.graphId, advanced.processGraph.graphId);
+assert.strictEqual(recordingMatch.bestReferenceGraph.graphId, advanced.processGraph.graphId);
+assert(recordingMatch.referenceGraphs[advanced.id]);
 
 const extended = JSON.parse(JSON.stringify(seed));
 extended.concepts.push({ id: "concept:aptean-quality-check", canonicalName: "Quality Check",

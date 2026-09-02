@@ -51,7 +51,7 @@
     "test:manual-steps": "node tests/manual-information-steps.test.js",
     "test:notes-annotations": "node tests/notes-and-annotations.test.js",
     "test:hierarchy": "node tests/sections-and-subtasks.test.js",
-    "test:process-model": "node tests/process-model.test.js && node tests/multi-level-process-graph.test.js",
+    "test:process-model": "node tests/process-model.test.js && node tests/multi-level-process-graph.test.js && node tests/semantic-process-map.test.js",
     "test:process-taxonomy": "node tests/process-taxonomy.test.js && node tests/document-lifecycle.test.js && node tests/reference-process-library.test.js && node tests/reference-diagram-dataset.test.js",
     "test:process-recognition": "node tests/bc-process-recognition-engine.test.js",
     "test:process-overview": "node tests/process-overview-view.test.js && node tests/process-analysis-view.test.js",

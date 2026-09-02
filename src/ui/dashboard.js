@@ -3372,6 +3372,7 @@ let activeReviewModel = null;
 let activeProcessModel = null;
 let activeProcessAnalysis = null;
 let processAnalysisRequest = null;
+let activeProcessMapLevel = "businessCentral";
 let activeReviewSelection = globalThis.T9ReviewSelection.create();
 let activeReviewEdit = null;
 let reviewReturnFocus = null;
@@ -3454,6 +3455,7 @@ async function loadProcessAnalysis(force = false) {
       if (activeReviewSession?.id !== sessionId) return null;
       activeProcessAnalysis = response.result;
       updateProcessAnalysisBadge();
+      renderProcessOverview();
       return activeProcessAnalysis;
     }).finally(() => { processAnalysisRequest = null; });
   return processAnalysisRequest;
@@ -3483,6 +3485,7 @@ function persistProcessAnalysisDecision(reference, status) {
   activeReview.updatedAt = activeReview.processAnalysis.confirmedAt;
   reviewAutoSave.schedule();
   renderProcessAnalysisDialog();
+  renderProcessOverview();
   $("processAnalysisStatus").textContent = status === "confirmed"
     ? uiT("Klassificeringen bekräftades.")
     : uiT("Referensprocessen ändrades.");
@@ -6347,14 +6350,46 @@ function renderProcessOverview() {
     const resolvedHierarchy = resolveReviewHierarchyForDisplay(
       activeReview.tasks || [], activeReview.hierarchy
     );
-    const model = globalThis.T9ProcessModel.project({
+    const procedureModel = globalThis.T9ProcessModel.project({
       recordingId: activeReviewSession.id,
       title: activeReviewSession.name,
       steps: activeReview.tasks || [],
       resolvedHierarchy,
       overrides: activeReview.processOverrides || []
     });
+    const hasSemanticAnalysis = Boolean(activeProcessAnalysis?.bestMatch);
+    const displayedLevel = hasSemanticAnalysis ? activeProcessMapLevel : "procedure";
+    const english = String(applicationSettings.uiLocale || "").startsWith("en");
+    const descriptions = english ? {
+      business: "High-level business flow derived from the confirmed process classification.",
+      businessCentral: "Business Central documents and actions compared with the reference process.",
+      procedure: "The actual recorded user procedure. Select an activity to open its Review step."
+    } : {
+      business: "Övergripande affärsflöde från den bekräftade processklassificeringen.",
+      businessCentral: "Business Central-dokument och åtgärder jämförda med referensprocessen.",
+      procedure: "Den faktiska inspelade användarproceduren. Välj en aktivitet för att öppna granskningssteget."
+    };
+    $("processMapDescription").textContent = descriptions[displayedLevel];
+    $("processMapLegend").hidden = displayedLevel === "procedure";
+    const model = displayedLevel === "procedure"
+      ? procedureModel : globalThis.T9SemanticProcessMap.project({
+        recordingId: activeReviewSession.id,
+        title: activeReviewSession.name,
+        analysis: activeProcessAnalysis,
+        decision: activeReview.processAnalysis,
+        reviewTasks: activeReview.tasks || [],
+        procedureModel
+      }, activeProcessMapLevel);
     activeProcessModel = model;
+    for (const button of $("processMapLevels").querySelectorAll(
+      "[data-process-map-level]"
+    )) {
+      const semantic = button.dataset.processMapLevel !== "procedure";
+      button.disabled = semantic && !hasSemanticAnalysis;
+      button.setAttribute("aria-pressed", String(
+        button.dataset.processMapLevel === displayedLevel
+      ));
+    }
     $("saveProcessVersion").disabled = false;
     $("compareProcessVersions").disabled =
       !(activeReview.processVersions || []).length;
@@ -6583,6 +6618,7 @@ async function openReview(session) {
     );
   activeReviewSelection = globalThis.T9ReviewSelection.create();
   activeReviewEdit = null;
+  activeProcessMapLevel = "businessCentral";
   workspaceContext = globalThis.T9WorkspaceContext.create();
   workspaceContextBinding = null;
   documentationIntelligenceModel = null;
@@ -6654,6 +6690,7 @@ async function closeReview() {
   activeProcessModel = null;
   activeProcessAnalysis = null;
   processAnalysisRequest = null;
+  activeProcessMapLevel = "businessCentral";
   activeReviewSelection = globalThis.T9ReviewSelection.create();
   activeReviewEdit = null;
   activeDocumentPipelineCache.clear();
@@ -6823,6 +6860,26 @@ $("processOverview").addEventListener("click", event => {
       $("processOverview"), action.dataset.processNodeAction
     );
   }
+});
+$("processMapLevels").addEventListener("click", event => {
+  const button = event.target.closest("[data-process-map-level]");
+  if (!button || button.disabled) return;
+  activeProcessMapLevel = button.dataset.processMapLevel;
+  renderProcessOverview();
+  $("processOverview").querySelector("[data-process-node-action]")?.focus();
+});
+$("processMapLevels").addEventListener("keydown", event => {
+  if (!["ArrowLeft", "ArrowRight", "Home", "End"].includes(event.key)) return;
+  const buttons = [...event.currentTarget.querySelectorAll(
+    "[data-process-map-level]:not(:disabled)"
+  )];
+  const current = buttons.indexOf(event.target);
+  if (current < 0) return;
+  const index = event.key === "Home" ? 0 : event.key === "End" ? buttons.length - 1 :
+    (current + (event.key === "ArrowLeft" ? -1 : 1) + buttons.length) % buttons.length;
+  event.preventDefault();
+  buttons[index].focus();
+  buttons[index].click();
 });
 $("exportProcessModel").addEventListener("click", () =>
   exportActiveProcess("model"));

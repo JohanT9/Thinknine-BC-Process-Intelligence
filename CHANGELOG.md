@@ -11,6 +11,10 @@
 
 ## Unreleased
 
+- Added multi-level semantic Process Overview maps for Business Process, BC
+  Process and User Procedure with observed, suggested and customer-specific
+  nodes.
+
 - Exposed reference-process matching in Review Studio through a Process Analysis
   toolbar action, confidence badge, semantic comparison and manual confirmation.
 

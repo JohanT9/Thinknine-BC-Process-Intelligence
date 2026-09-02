@@ -298,8 +298,15 @@
         matchedSteps: clone(libraryBest.matchedSteps), missingSteps: clone(libraryBest.missingSteps),
         additionalSteps: clone(libraryBest.unexpectedSteps), source: "ReferenceProcessLibrary",
         customizedBehaviorMayBeValid: true, deviationsAreErrors: false }) : graphBest;
+    const referenceGraphs = Object.fromEntries(graphMatches.map(item => [
+      item.diagram.id, clone(item.diagram.processGraph)
+    ]));
+    const matchingBestDiagram = registry.dataset.diagrams.find(item =>
+      item.id === bestMatch?.referenceDiagramId || item.name === bestMatch?.referenceProcess);
     return freeze({ matches, bestMatch,
-      processLibraryMatch: processMatch, deviationsAreErrors: false }); }
+      processLibraryMatch: processMatch, observedGraph: generated ? clone(generated) : null,
+      bestReferenceGraph: matchingBestDiagram ? clone(matchingBestDiagram.processGraph) : null,
+      referenceGraphs, deviationsAreErrors: false }); }
   function exportDataset(input, options = {}) { const dataset = normalize(input); const includePartitions =
     options.partitions ? new Set(options.partitions) : null; return freeze({ schemaVersion: SCHEMA_VERSION,
       exportedAt: options.exportedAt || null, dataset: { ...clone(dataset), diagrams: dataset.diagrams

@@ -1005,6 +1005,11 @@ The extension background owns matching; `process-analysis-view.js` only renders
 the immutable result. Manual confirmation is stored as Review metadata and does
 not copy or mutate the reference dataset. See `PROCESS_ANALYSIS_UX.md`.
 
+The Semantic Process Map projector combines the observed and reference
+ProcessGraphs into Business, BC Process and User Procedure views. It projects to
+the existing Process Model-compatible view contract, so Process Overview remains
+the single renderer and does not infer semantics. See `SEMANTIC_PROCESS_MAP_UX.md`.
+
 ## Reference Process Library boundary (4.7)
 
 The Reference Process Library is an immutable semantic-example catalog above
