@@ -13,7 +13,8 @@
 
 - Aligned each Review Step's Edit, approval and overflow controls on one
   vertical center line. The approval checkbox and label now behave as a
-  centered control group without drifting in tall cards.
+  centered control group without drifting in tall cards. The overflow trigger
+  now uses the same 32-pixel height as Edit.
 
 - Refined Document Library card alignment by matching the document title to
   the checkbox baseline and raising the favourite control to the card's top edge.
