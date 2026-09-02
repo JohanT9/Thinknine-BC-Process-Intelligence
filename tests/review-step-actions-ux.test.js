@@ -34,6 +34,14 @@ assert(dashboard.includes('stepActionsSummary.setAttribute("aria-expanded"'),
 assert(dashboard.includes("stepActionsSummary.focus()"));
 assert(html.includes(".review-step-actions-trigger"));
 assert(html.includes(".review-step-actions-panel{position:absolute"));
+assert(html.includes(".review-actions{display:flex;align-self:start;align-items:center"),
+  "Step approval and overflow actions must share one vertical center line");
+assert(html.includes("min-height:34px;margin-top:9px"),
+  "Step actions must align with the edit heading row");
+assert(html.includes(".review-approve-action{display:inline-flex;align-items:center;justify-content:center"),
+  "approval checkbox and label must be centered as one control");
+assert(html.includes(".review-card.compact .review-actions{display:flex;align-content:start;gap:5px;margin-top:0}"),
+  "compact cards must retain their top-aligned action row");
 assert(html.includes(".review-card.compact .review-technical-details"));
 assert(i18n.includes('"a11y.stepActions"'));
 assert(i18n.includes('["Teknisk information", "Technical information"]'));
