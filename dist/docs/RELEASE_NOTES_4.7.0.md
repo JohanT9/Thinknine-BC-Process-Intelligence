@@ -368,3 +368,17 @@ or På/Av values.
 - Recognition output can be stored in Canonical Semantic Recording with its
   explanation and alternatives intact. Future AI remains optional and cannot
   replace reliable Business Central metadata.
+
+# Multi-level process diagrams
+
+- The same recording can now produce Business Process, Business Central Process,
+  and User Procedure graphs from Canonical Recording, Process Taxonomy, and
+  Semantic Classification.
+- Semantic Process Steps retain every contributing raw Event and can expand into
+  the exact recorded actions. Business Process groups expand into their BC-level
+  nodes through stable cross-level identity.
+- Added a renderer-neutral ProcessGraph contract for process/document/action,
+  decision, system, posting, and manual nodes, plus sequence, branch, loop,
+  subprocess, creation, and posting relationships.
+- The graph contains no diagram-library or layout fields, enabling future web,
+  SVG, PNG, PDF, draw.io, BPMN, and Visio adapters to share one semantic source.

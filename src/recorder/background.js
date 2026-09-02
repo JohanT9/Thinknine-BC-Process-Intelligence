@@ -8,6 +8,8 @@ importScripts("engine/canonical-semantic-model.js");
 importScripts("engine/canonical-recording.js");
 importScripts("engine/business-central-process-taxonomy-seed.js");
 importScripts("engine/bc-process-recognition-engine.js");
+importScripts("document/process-graph.js");
+importScripts("document/multi-level-process-graph.js");
 importScripts("engine/raw-event-persistence.js");
 importScripts("engine/bc-ui-identification.js");
 importScripts("engine/event-normalization.js");

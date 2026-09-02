@@ -966,6 +966,18 @@ Future AI is a complement behind this result contract and cannot override
 reliable metadata. See
 [BC_PROCESS_RECOGNITION_ENGINE.md](BC_PROCESS_RECOGNITION_ENGINE.md).
 
+## Multi-level ProcessGraph boundary (4.7)
+
+`ProcessGraph` is the renderer-neutral diagram contract projected from Canonical
+Recording, Process Taxonomy, and Semantic Classification. One deterministic
+projection produces Business Process, Business Central Process, and User
+Procedure graphs with stable cross-level child references. Higher-level nodes
+retain every contributing Event ID and can expand into the lower level without
+copying evidence. The existing Review Process Model remains unchanged. Diagram
+adapters consume ProcessGraph and may not reconstruct semantics from raw Review
+or introduce process branches. See
+[MULTI_LEVEL_PROCESS_GRAPH.md](MULTI_LEVEL_PROCESS_GRAPH.md).
+
 ## Application Insights enrichment boundary (4.6)
 
 Optional external telemetry is queried by one provider through versioned query

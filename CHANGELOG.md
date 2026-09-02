@@ -11,6 +11,10 @@
 
 ## Unreleased
 
+- Added renderer-neutral multi-level ProcessGraph generation for Business
+  Process, Business Central Process, and recorded User Procedure views, with
+  stable cross-level expansion and full Canonical Event traceability.
+
 - Added a deterministic Business Central Process Recognition Engine with
   metadata-first entity/action extraction, partial taxonomy sequence matching,
   confidence scoring, explainable alternatives, variant recognition, and a
