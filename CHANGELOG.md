@@ -11,6 +11,10 @@
 
 ## Unreleased
 
+- Fixed Reset Structure treating two missing Step IDs as an identity match,
+  which could copy one instruction override onto every Step. Overrides now
+  require a real shared identity and must belong to the Step they modify.
+
 - Moved all Change Image dialog actions above the screenshot gallery. Only the
   gallery now scrolls, keeping Capture, Cancel and Apply continuously available,
   and corrected headings that could display `step null`.

@@ -318,6 +318,9 @@ or På/Av values.
 - Hidden-state overrides are removed during reset without discarding instruction,
   comment or screenshot edits. A final safety check prevents a non-empty Review
   from resolving to zero visible steps.
+- Missing Step IDs no longer match each other. Content overrides are restored
+  only when a real shared identity exists and the override belongs to that Step,
+  preventing one instruction from being duplicated across the Review.
 
 # Change Image dialog actions
 

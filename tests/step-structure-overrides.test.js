@@ -159,4 +159,33 @@ const steps = [{
     task.stepOverride?.visibilityOverride !== "hidden"));
 }
 
+{
+  const review = reviewStudio.createReview({ id: "identity-recording", name: "BC" },
+    steps.map(step => ({ ...step, sourceEventNos: step.sourceEventIds })));
+  const firstOverride = stepEditor.edit(review.tasks[0], "instruction",
+    "Duplicated text", { now: NOW });
+  review.tasks = review.tasks.map(task => ({ ...task,
+    stepOverride: { ...firstOverride }
+  }));
+  reviewStudio.resetStructure(review, { now: NOW });
+  assert.deepEqual(reviewStudio.activeTasks(review).map(task => task.instruction),
+    ["Duplicated text", "Enter quantity 500", "Post order"],
+    "an override belonging to the first Step must never be copied to later Steps");
+}
+
+{
+  const review = reviewStudio.createReview({ id: "missing-id-recording", name: "BC" },
+    steps.map(step => ({ ...step, sourceEventNos: step.sourceEventIds })));
+  review.tasks[0].taskId = "current-only-id";
+  review.tasks[0].stepId = undefined;
+  review.generatedTasks[0].taskId = "generated-only-id";
+  review.generatedTasks[0].stepId = undefined;
+  review.tasks[0].stepOverride = stepEditor.edit(review.tasks[0], "instruction",
+    "Unmatched edit", { now: NOW });
+  reviewStudio.resetStructure(review, { now: NOW });
+  assert.equal(review.tasks[0].instruction, "Select No. 136");
+  assert.equal(review.tasks[0].stepOverride, null,
+    "missing IDs must not compare equal and attach an unrelated override");
+}
+
 console.log("Step Structure Override tests passed.");

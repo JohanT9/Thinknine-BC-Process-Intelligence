@@ -1138,13 +1138,21 @@
       review.generatedTasks.length > 0;
     if (hasGeneratedBaseline) {
       const contentOverrides = (review.tasks || []).filter(task => task.stepOverride)
-        .map(task => ({ taskId: task.taskId, stepId: task.stepId,
-          stepOverride: stepEditor.reset(task, "visibility", options) }))
-        .filter(item => item.stepOverride);
+        .map(task => {
+          const identities = [task.taskId, task.stepId].filter(Boolean).map(String);
+          const stepOverride = stepEditor.reset(task, "visibility", options);
+          const overrideStepId = String(stepOverride?.stepId || "");
+          return { identities, stepOverride,
+            identityValid: !overrideStepId || identities.includes(overrideStepId) };
+        })
+        .filter(item => item.stepOverride && item.identityValid &&
+          item.identities.length);
       review.tasks = historyEngine.snapshot(review.generatedTasks)
         .map(restoreStructuralVisibility).map(task => {
-        const match = contentOverrides.find(item => item.taskId === task.taskId ||
-          item.stepId === task.stepId);
+        const identities = [task.taskId, task.stepId].filter(Boolean).map(String);
+        const match = contentOverrides.find(item => item.identities.some(
+          identity => identities.includes(identity)
+        ));
         return match ? { ...task, stepOverride: match.stepOverride } : task;
       });
       const matched = new Set(review.tasks.filter(task => task.stepOverride)
