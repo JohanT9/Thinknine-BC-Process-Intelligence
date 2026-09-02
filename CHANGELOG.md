@@ -11,6 +11,10 @@
 
 ## Unreleased
 
+- Moved Document Information out of the permanent Review canvas and into a
+  header `More actions` menu item. Document language and expected result now
+  open in a focused dialog while retaining autosave and reset behaviour.
+
 - Fixed Reset Structure treating two missing Step IDs as an identity match,
   which could copy one instruction override onto every Step. Overrides now
   require a real shared identity and must belong to the Step they modify.

@@ -519,6 +519,8 @@ table{width:100%;border-collapse:collapse}th,td{text-align:left;padding:9px;bord
               <button id="moveDownReviewSteps" data-review-command="move-down" data-review-toolbar-item class="secondary" disabled>Flytta ned</button>
             </div>
             <div class="review-toolbar-group" role="group" aria-label="Arbetsyta">
+              <button id="openReviewDocumentFields" data-review-toolbar-item
+                class="secondary">Dokumentinformation</button>
               <button id="regenerateReview" data-review-toolbar-item class="secondary">Regenerera fr&aring;n inspelning</button>
               <button id="regenerateSelectedReview" data-review-toolbar-item class="secondary" disabled>Regenerera valda steg</button>
               <button id="compactReviewSteps" data-review-toolbar-item class="secondary" aria-pressed="false">Komprimera alla</button>
@@ -545,24 +547,6 @@ table{width:100%;border-collapse:collapse}th,td{text-align:left;padding:9px;bord
     <section id="reviewWorkspacePanel" role="tabpanel"
       aria-labelledby="reviewWorkspaceTab">
       <div id="reviewZoomContent" class="review-zoom-content">
-      <section class="review-document-fields" aria-labelledby="reviewDocumentFieldsTitle">
-        <h3 id="reviewDocumentFieldsTitle">Dokumentinformation</h3>
-        <label for="reviewDocumentLanguage"
-          data-i18n="review.documentLanguage">Dokumentspråk</label>
-        <select id="reviewDocumentLanguage" data-language-select="document">
-          <option value="sv-SE">Svenska</option>
-          <option value="en-US">English</option>
-        </select>
-        <label for="expectedResultEditor">Förväntat resultat</label>
-        <textarea id="expectedResultEditor" rows="3"
-          aria-describedby="expectedResultHelp"
-          placeholder="Beskriv vad som ska vara uppnått när arbetsflödet är klart."
-          data-i18n-placeholder="review.expectedPlaceholder"></textarea>
-        <div class="review-document-fields-actions">
-          <p id="expectedResultHelp" class="muted">Texten visas i Dokumentvy och Word.</p>
-          <button id="resetExpectedResult" class="secondary" type="button">Återställ standardtext</button>
-        </div>
-      </section>
       <details id="processOverviewDisclosure" class="process-overview-card">
         <summary id="processOverviewTitle" data-i18n="process.overview">Processöversikt</summary>
         <p class="muted process-overview-help" data-i18n="process.overviewHelp">Välj en aktivitet för att gå direkt till motsvarande steg. Detaljer visas under kartan.</p>
@@ -716,6 +700,33 @@ table{width:100%;border-collapse:collapse}th,td{text-align:left;padding:9px;bord
       <button id="applyRegenerationPreview" value="apply" class="primary">
         Godk&auml;nn och regenerera
       </button>
+    </footer>
+  </form>
+</dialog>
+
+<dialog id="reviewDocumentFieldsDialog" class="review-document-fields-dialog"
+  aria-labelledby="reviewDocumentFieldsTitle">
+  <form method="dialog">
+    <section class="review-document-fields">
+      <h3 id="reviewDocumentFieldsTitle">Dokumentinformation</h3>
+      <label for="reviewDocumentLanguage"
+        data-i18n="review.documentLanguage">Dokumentspråk</label>
+      <select id="reviewDocumentLanguage" data-language-select="document">
+        <option value="sv-SE">Svenska</option>
+        <option value="en-US">English</option>
+      </select>
+      <label for="expectedResultEditor">Förväntat resultat</label>
+      <textarea id="expectedResultEditor" rows="3"
+        aria-describedby="expectedResultHelp"
+        placeholder="Beskriv vad som ska vara uppnått när arbetsflödet är klart."
+        data-i18n-placeholder="review.expectedPlaceholder"></textarea>
+      <div class="review-document-fields-actions">
+        <p id="expectedResultHelp" class="muted">Texten visas i Dokumentvy och Word.</p>
+        <button id="resetExpectedResult" class="secondary" type="button">Återställ standardtext</button>
+      </div>
+    </section>
+    <footer>
+      <button value="close" class="primary">Stäng</button>
     </footer>
   </form>
 </dialog>

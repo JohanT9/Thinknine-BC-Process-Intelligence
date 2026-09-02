@@ -328,3 +328,10 @@ or På/Av values.
   and remain visible while the screenshot gallery scrolls independently.
 - The dialog title now resolves the visible Step number from the Step identity,
   preventing `step null` headings.
+
+# Document Information placement
+
+- Document Information is available from `Fler åtgärder` in the Review header
+  instead of permanently occupying space above the Steps.
+- The menu item opens a focused dialog for document language and expected result;
+  existing autosave and standard-text reset behaviour is unchanged.

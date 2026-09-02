@@ -149,6 +149,16 @@ tbody tr:hover { background: var(--colorBrandSubtle); }
 .library-card[data-selected="true"], .library-card:focus-visible,
 .review-card.selected { outline-color: var(--colorFocusIndicator) !important; }
 .review-document-fields { border-radius: var(--radiusMedium) !important; box-shadow: none !important; }
+.review-document-fields-dialog {
+  width: min(760px, calc(100vw - 32px)); padding: var(--space20);
+}
+.review-document-fields-dialog form { display: grid; gap: var(--space16); }
+.review-document-fields-dialog .review-document-fields {
+  width: 100%; margin: 0; border: 0; padding: 0; background: transparent;
+}
+.review-document-fields-dialog footer {
+  display: flex; justify-content: flex-end; margin: 0;
+}
 .library-batch-toolbar, .review-toolbar, .document-toolbar { border-radius: 0 !important; background: var(--colorBackgroundSurface) !important; }
 
 .review-overlay { padding: 0 !important; }

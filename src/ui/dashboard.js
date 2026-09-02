@@ -7194,6 +7194,12 @@ $("saveReview").addEventListener("click", saveReviewExplicitly);
 $("saveReviewBottom").addEventListener("click", saveReviewExplicitly);
 $("nextUnreviewedStep").addEventListener("click",
   activateNextUnreviewedStep);
+$("openReviewDocumentFields").addEventListener("click", () => {
+  setTimeout(() => {
+    $("reviewDocumentFieldsDialog").showModal();
+    $("reviewDocumentLanguage").focus();
+  });
+});
 $("expectedResultEditor").addEventListener("input", event => {
   globalThis.T9Review.setDocumentField(
     activeReview,
