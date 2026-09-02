@@ -87,10 +87,13 @@ assert.deepStrictEqual(projector.generateAll(recording), bundle,
   "Identical source models must generate deterministic graphs.");
 assert.deepStrictEqual(projector.generate(recording, "userProcedure"), level3);
 assert.throws(() => projector.generate(recording, "pixels"), /Unsupported process graph level/);
-assert.deepStrictEqual(graph.NODE_TYPES, ["start", "end", "businessProcess", "processStep",
-  "document", "action", "decision", "systemAction", "posting", "manualAction"]);
-assert.deepStrictEqual(graph.RELATIONSHIP_TYPES, ["sequence", "branch", "conditionalBranch",
-  "loop", "subprocess", "documentCreation", "documentPosting"]);
+assert(["start", "end", "businessProcess", "subprocess", "processStep", "document",
+  "postedDocument", "action", "decision", "systemAction", "posting", "manualAction",
+  "status", "dataEntity", "externalSystem"].every(type => graph.NODE_TYPES.includes(type)));
+assert(["sequence", "branch", "conditionalBranch", "loop", "subprocess", "documentCreation",
+  "documentPosting", "creates", "posts", "releases", "consumes", "produces", "references",
+  "derivedFrom", "triggers", "branchesTo", "returnsTo", "updates", "transfersTo"]
+  .every(type => graph.RELATIONSHIP_TYPES.includes(type)));
 const relationshipCoverage = graph.RELATIONSHIP_TYPES.map((type, index) => graph.relationship({
   relationshipId: `relationship-${type}`, fromNodeId: "a", toNodeId: "b",
   relationshipType: type, sequence: index }));

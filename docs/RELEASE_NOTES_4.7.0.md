@@ -397,6 +397,17 @@ or På/Av values.
   explainable evidence and reports the selected lifecycle variant alongside its
   other signals.
 
+# Reference Diagram Dataset Pipeline
+
+- Added versioned semantic reference datasets with source, asset, concept,
+  document, graph, variant, confidence, provenance and verification contracts.
+- Added modular extraction/classification interfaces for structured data,
+  manual processes, recordings and future image or AI providers.
+- Added BC terminology normalization, validation diagnostics, manual override
+  history, semantic duplicate detection, graph similarity and reference search.
+- Added partition-safe JSON export and ten verified representative Business
+  Central graphs without redistributable screenshots or fabricated metadata.
+
 # Reference Process Library
 
 - Added 35 renderer-free semantic references across Order to Cash, Source to

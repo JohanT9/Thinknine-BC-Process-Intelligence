@@ -11,6 +11,11 @@
 
 ## Unreleased
 
+- Added a Reference Diagram Dataset Pipeline for source-traceable Business
+  Central semantic graphs, verification, comparison and future AI datasets.
+- Added Training, Validation, Evaluation and GeneralReference partitions,
+  provenance-aware curation, semantic duplicate detection and versioned export.
+
 - Added a 35-pattern Business Central Reference Process Library with immutable
   extension support and advisory recording similarity results containing best,
   alternative, matched, missing, and unexpected process steps.

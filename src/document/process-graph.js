@@ -6,10 +6,13 @@
   "use strict";
   const SCHEMA_VERSION = "1.0.0";
   const LEVELS = Object.freeze(["businessProcess", "businessCentralProcess", "userProcedure"]);
-  const NODE_TYPES = Object.freeze(["start", "end", "businessProcess", "processStep",
-    "document", "action", "decision", "systemAction", "posting", "manualAction"]);
+  const NODE_TYPES = Object.freeze(["start", "end", "businessProcess", "subprocess",
+    "processStep", "document", "postedDocument", "action", "decision", "systemAction",
+    "posting", "manualAction", "status", "dataEntity", "externalSystem"]);
   const RELATIONSHIP_TYPES = Object.freeze(["sequence", "branch", "conditionalBranch",
-    "loop", "subprocess", "documentCreation", "documentPosting"]);
+    "loop", "subprocess", "documentCreation", "documentPosting", "creates", "posts",
+    "releases", "consumes", "produces", "references", "derivedFrom", "triggers",
+    "branchesTo", "returnsTo", "updates", "transfersTo"]);
   const clone = value => value === undefined ? undefined : JSON.parse(JSON.stringify(value));
   const object = value => value && typeof value === "object" && !Array.isArray(value) ? value : {};
   const unique = values => [...new Set((values || []).map(String).filter(Boolean))];
@@ -38,6 +41,9 @@
     recordingId: String(value.recordingId || ""), level: LEVELS.includes(value.level)
       ? value.level : "userProcedure", title: String(value.title || ""),
     nodes: (value.nodes || []).map(node), relationships: (value.relationships || []).map(relationship),
+    groups: (value.groups || []).map(item => freeze({ ...clone(object(item)),
+      groupId: String(item.groupId || ""), title: String(item.title || ""),
+      nodeIds: unique(item.nodeIds), metadata: clone(object(item.metadata)) })),
     startNodeIds: unique(value.startNodeIds), endNodeIds: unique(value.endNodeIds),
     metadata: clone(object(value.metadata)), futureFields: clone(object(value.futureFields)) }); }
   function validate(input) { const graph = normalize(input); const diagnostics = [];

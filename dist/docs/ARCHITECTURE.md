@@ -988,6 +988,18 @@ transitions as strong evidence but never treats a lifecycle as mandatory.
 Renderers and ProcessGraph do not interpret lifecycle configuration. See
 [BUSINESS_CENTRAL_DOCUMENT_LIFECYCLES.md](BUSINESS_CENTRAL_DOCUMENT_LIFECYCLES.md).
 
+## Reference Diagram Dataset Pipeline boundary (4.7)
+
+The semantic reference dataset adds traceable sources, separately licensed
+assets, canonical terminology, renderer-neutral ProcessGraphs, fact-level
+confidence, verification history, curation and explicit training/evaluation
+partitions. It reuses the ProcessGraph and Reference Process Library rather than
+introducing competing models. Customer recordings remain separate.
+
+Pipeline stages and extension/query contracts are documented in
+`REFERENCE_DIAGRAM_DATASET_PIPELINE.md`. No renderer or AI provider owns domain
+meaning, and source images are never assumed redistributable.
+
 ## Reference Process Library boundary (4.7)
 
 The Reference Process Library is an immutable semantic-example catalog above

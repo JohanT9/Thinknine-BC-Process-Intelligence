@@ -13,6 +13,8 @@ importScripts("engine/bc-process-recognition-engine.js");
 importScripts("engine/business-central-reference-process-seed.js");
 importScripts("engine/reference-process-library.js");
 importScripts("document/process-graph.js");
+importScripts("engine/business-central-reference-diagram-seed.js");
+importScripts("engine/reference-diagram-dataset.js");
 importScripts("document/multi-level-process-graph.js");
 importScripts("engine/raw-event-persistence.js");
 importScripts("engine/bc-ui-identification.js");
