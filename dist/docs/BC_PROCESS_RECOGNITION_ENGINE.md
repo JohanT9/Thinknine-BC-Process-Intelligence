@@ -15,7 +15,9 @@ the canonical Business Central Process Taxonomy.
    transitions from Canonical Semantic Recording.
 4. Match ordered, potentially incomplete evidence against taxonomy document,
    Process Step, Process Action, relationship, and variant patterns.
-5. Return a ranked primary classification and up to three alternatives with
+5. Match applicable configurable Business Central Document Lifecycle variants;
+   typed document transitions contribute strong independent evidence.
+6. Return a ranked primary classification and up to three alternatives with
    confidence, matching Event IDs, signal counts, and human-readable reasons.
 
 Exact completion is not required. A recording ending at Warehouse Pick can be
@@ -46,3 +48,7 @@ Central metadata always takes precedence over AI or screenshot similarity.
 The recognizer accepts an injected normalized taxonomy, so future Microsoft,
 partner, and Aptean process packs can participate without UI-specific rules or
 changes to Canonical Recording.
+
+The recognizer also accepts an injected Document Lifecycle catalog. Its output
+reports the matched lifecycle, configuration variant, lifecycle confidence, and
+number of matched typed transitions for debugging and future training.

@@ -382,3 +382,17 @@ or På/Av values.
   subprocess, creation, and posting relationships.
 - The graph contains no diagram-library or layout fields, enabling future web,
   SVG, PNG, PDF, draw.io, BPMN, and Visio adapters to share one semantic source.
+
+# Business Central document lifecycles
+
+- Added configurable Sales, Purchase, Production, and Transfer document
+  lifecycles linked to stable Process Taxonomy document identities.
+- Lifecycles support optional stages and No Warehouse, Basic Warehouse,
+  Advanced Warehouse, Direct Shipment, Drop Shipment, Make to Stock, and Make to
+  Order variants. No warehouse document or activity is assumed universally.
+- Typed relationships cover creation, derivation, posting, fulfilment,
+  consumption, production, reversal, and return paths. Sales Order state
+  knowledge includes Open, Released, Reopened, and Posted transitions.
+- Process Recognition now uses matched lifecycle transitions as strong,
+  explainable evidence and reports the selected lifecycle variant alongside its
+  other signals.

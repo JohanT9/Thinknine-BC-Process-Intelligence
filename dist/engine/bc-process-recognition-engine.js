@@ -4,10 +4,17 @@
   const seed = typeof module === "object" && module.exports
     ? require("./business-central-process-taxonomy-seed").seed
     : root.T9BusinessCentralProcessTaxonomySeed.seed;
-  const api = factory(schema, seed);
+  const lifecycleModel = typeof module === "object" && module.exports
+    ? require("./document-lifecycle") : root.T9DocumentLifecycle;
+  const lifecycleSeed = typeof module === "object" && module.exports
+    ? require("./business-central-document-lifecycle-seed").catalog
+    : root.T9BusinessCentralDocumentLifecycleSeed.catalog;
+  const api = factory(schema, seed, lifecycleModel, lifecycleSeed);
   if (typeof module === "object" && module.exports) module.exports = api;
   root.T9BCProcessRecognitionEngine = api;
-})(typeof globalThis !== "undefined" ? globalThis : this, function (schema, seed) {
+})(typeof globalThis !== "undefined" ? globalThis : this, function (
+  schema, seed, lifecycleModel, lifecycleSeed
+) {
   "use strict";
   const ENGINE_VERSION = "1.0.0";
   const clone = value => value == null ? value : JSON.parse(JSON.stringify(value));
@@ -137,7 +144,7 @@
     return matched;
   }
 
-  function candidateFor(process, taxonomy, evidence) {
+  function candidateFor(process, taxonomy, evidence, lifecycleCatalog) {
     const businessProcess = taxonomy.businessProcesses.find(item =>
       item.id === process.businessProcessId);
     const domain = taxonomy.domains.find(item => item.id === businessProcess?.domainId);
@@ -165,9 +172,15 @@
         expectedDocuments.includes(transition.toDocumentId));
     const transitionStrength = Math.min(1, relevantTransitions.reduce((sum, item) =>
       sum + item.strength, 0) / 2);
-    let confidence = Math.min(0.99, documentCoverage * 0.35 + observedCoverage * 0.15 +
-      sequenceStrength * 0.22 + Math.min(1, actionStrength) * 0.18 +
-      transitionStrength * 0.1);
+    const lifecycleMatches = lifecycleModel.match(lifecycleCatalog,
+      evidence.documentSequence.map(item => item.id), { bcProcessId: process.id,
+        observedActions: observedActions.map(item => item.name) });
+    const lifecycleMatch = lifecycleMatches[0] || null;
+    const lifecycleStrength = lifecycleMatch && lifecycleMatch.matchedTransitions.length
+      ? lifecycleMatch.confidence : 0;
+    let confidence = Math.min(0.99, documentCoverage * 0.3 + observedCoverage * 0.14 +
+      sequenceStrength * 0.18 + Math.min(1, actionStrength) * 0.15 +
+      transitionStrength * 0.08 + lifecycleStrength * 0.15);
     const hasStrong = matchedDocuments.some(item => item.strength >= 0.8) ||
       actionHits.some(item => item.strength >= 0.8) || relevantTransitions.some(item => item.strength >= 0.8);
     if (!hasStrong) confidence = Math.min(confidence, 0.54);
@@ -175,6 +188,7 @@
     const reasons = unique([...matchedDocuments.map(item =>
       `Matched ${item.name}${item.signal === "page-object-id" ? ` page` : ""}`),
     ...actionHits.map(item => item.explanation), ...relevantTransitions.map(item => item.explanation),
+    ...(lifecycleMatch?.explanation || []),
     matchedDocuments.length ? `Matched ${matchedDocuments.length} of ${expectedDocuments.length} process documents in sequence` : null,
     matchedDocuments.length && matchedDocuments.length < expectedDocuments.length ?
       "Partial process sequence recognized; later steps may not have been recorded" : null]);
@@ -189,7 +203,11 @@
         ...relevantTransitions.flatMap(item => item.sourceEventIds || [])]),
       explanation: reasons, signals: { matchedDocuments: matchedDocuments.length,
         expectedDocuments: expectedDocuments.length, matchedActions: actionHits.length,
-        matchedTransitions: relevantTransitions.length, strongMetadata: hasStrong } };
+        matchedTransitions: relevantTransitions.length,
+        matchedLifecycleTransitions: lifecycleMatch?.matchedTransitions.length || 0,
+        lifecycle: lifecycleMatch ? { lifecycleId: lifecycleMatch.lifecycleId,
+          variantId: lifecycleMatch.variantId, confidence: lifecycleMatch.confidence } : null,
+        strongMetadata: hasStrong } };
   }
 
   function selectVariant(process, taxonomy, evidence) {
@@ -206,8 +224,10 @@
     if (!recording || Number(recording.schemaVersion) !== 1 || !Array.isArray(recording.events))
       throw new TypeError("A Canonical Recording schema-v1 value is required.");
     const taxonomy = schema.normalize(options.taxonomy || seed);
+    const lifecycleCatalog = lifecycleModel.normalize(options.lifecycleCatalog || lifecycleSeed);
     const evidence = extractEvidence(recording, taxonomy, options);
-    const candidates = taxonomy.bcProcesses.map(process => candidateFor(process, taxonomy, evidence))
+    const candidates = taxonomy.bcProcesses.map(process => candidateFor(process, taxonomy,
+      evidence, lifecycleCatalog))
       .filter(item => item.confidence >= (options.minimumConfidence ?? 0.12))
       .sort((left, right) => right.confidence - left.confidence ||
         left.taxonomyReferences.bcProcess.id.localeCompare(right.taxonomyReferences.bcProcess.id));

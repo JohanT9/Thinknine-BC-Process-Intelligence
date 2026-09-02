@@ -52,6 +52,11 @@ dependency. Recording analysis, AI classification, screenshot selection,
 documentation projection, diagram generation, comparisons, and recommendations
 can therefore consume the same semantic catalog.
 
+Document-to-document and document-state knowledge is maintained in the separate
+[Business Central Document Lifecycles](BUSINESS_CENTRAL_DOCUMENT_LIFECYCLES.md)
+catalog. Taxonomy owns reusable document identity; Lifecycle owns configurable,
+optional paths between those documents.
+
 ## Business Central seed
 
 The initial seed contains Order to Cash, Source to Pay, Forecast to Plan,

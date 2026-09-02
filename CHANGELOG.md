@@ -11,6 +11,10 @@
 
 ## Unreleased
 
+- Added configurable Business Central document lifecycle knowledge for Sales,
+  Purchase, Production, and Transfer flows, including optional warehouse paths,
+  lifecycle variants, document states, and recognition signal integration.
+
 - Added renderer-neutral multi-level ProcessGraph generation for Business
   Process, Business Central Process, and recorded User Procedure views, with
   stable cross-level expansion and full Canonical Event traceability.

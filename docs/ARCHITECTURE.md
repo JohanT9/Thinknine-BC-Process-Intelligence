@@ -978,6 +978,16 @@ adapters consume ProcessGraph and may not reconstruct semantics from raw Review
 or introduce process branches. See
 [MULTI_LEVEL_PROCESS_GRAPH.md](MULTI_LEVEL_PROCESS_GRAPH.md).
 
+## Business Central Document Lifecycle boundary (4.7)
+
+Document Lifecycle is configurable semantic knowledge between Process Taxonomy
+and Process Recognition. Taxonomy owns document identity; Lifecycle owns
+representative optional stages, alternative configuration variants, typed
+document relationships, and document-state models. Recognition consumes matched
+transitions as strong evidence but never treats a lifecycle as mandatory.
+Renderers and ProcessGraph do not interpret lifecycle configuration. See
+[BUSINESS_CENTRAL_DOCUMENT_LIFECYCLES.md](BUSINESS_CENTRAL_DOCUMENT_LIFECYCLES.md).
+
 ## Application Insights enrichment boundary (4.6)
 
 Optional external telemetry is queried by one provider through versioned query

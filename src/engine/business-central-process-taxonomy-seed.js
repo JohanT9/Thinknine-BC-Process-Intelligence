@@ -18,20 +18,27 @@
     description: `${name} processes in Microsoft Dynamics 365 Business Central.` }));
 
   const documents = [
+    ["document:sales-quote", "Sales Quote", "quote", ["41"], ["36", "37"]],
     ["document:sales-order", "Sales Order", "order", ["42"], ["36", "37"]],
     ["document:warehouse-shipment", "Warehouse Shipment", "warehouse-document", ["7335"], ["7320", "7321"]],
     ["document:warehouse-pick", "Warehouse Pick", "warehouse-activity", ["7345"], ["5766", "5767"]],
     ["document:posted-sales-shipment", "Posted Sales Shipment", "posted-document", ["130"], ["110", "111"]],
     ["document:sales-invoice", "Sales Invoice", "invoice", ["43"], ["36", "37"]],
+    ["document:posted-sales-invoice", "Posted Sales Invoice", "posted-document", ["132"], ["112", "113"]],
     ["document:purchase-order", "Purchase Order", "order", ["50"], ["38", "39"]],
     ["document:warehouse-receipt", "Warehouse Receipt", "warehouse-document", ["7332"], ["7316", "7317"]],
     ["document:warehouse-put-away", "Warehouse Put-away", "warehouse-activity", ["7340"], ["5766", "5767"]],
     ["document:posted-purchase-receipt", "Posted Purchase Receipt", "posted-document", ["136"], ["120", "121"]],
+    ["document:posted-warehouse-receipt", "Posted Warehouse Receipt", "posted-document", ["7333"], ["7318", "7319"]],
     ["document:purchase-invoice", "Purchase Invoice", "invoice", ["51"], ["38", "39"]],
+    ["document:posted-purchase-invoice", "Posted Purchase Invoice", "posted-document", ["138"], ["122", "123"]],
     ["document:transfer-order", "Transfer Order", "order", ["5740"], ["5740", "5741"]],
     ["document:transfer-shipment", "Posted Transfer Shipment", "posted-document", ["5742"], ["5744", "5745"]],
     ["document:transfer-receipt", "Posted Transfer Receipt", "posted-document", ["5746"], ["5746", "5747"]],
     ["document:production-order", "Production Order", "manufacturing-order", ["99000831"], ["5405", "5406", "5407"]],
+    ["document:planned-production-order", "Planned Production Order", "manufacturing-order", [], ["5405", "5406", "5407"]],
+    ["document:firm-planned-production-order", "Firm Planned Production Order", "manufacturing-order", [], ["5405", "5406", "5407"]],
+    ["document:finished-production-order", "Finished Production Order", "posted-document", [], ["5405", "5406", "5407"]],
     ["document:production-journal", "Production Journal", "journal", ["99000832"], ["83"]],
     ["document:assembly-order", "Assembly Order", "assembly-order", ["900"], ["900", "901"]],
     ["document:planning-worksheet", "Planning Worksheet", "worksheet", ["99000852"], ["246"]]
