@@ -445,6 +445,8 @@ or På/Av values.
   and backward return paths.
 - Process Overview now has its own zoom, reset, and fit-to-width controls, making
   large maps easier to inspect without scaling the surrounding Review content.
+- Exported SVG process diagrams now use the same multi-row visual grammar,
+  swimlanes, semantic shapes, and relationship styles as Process Overview.
 
 # Reference Process Library
 

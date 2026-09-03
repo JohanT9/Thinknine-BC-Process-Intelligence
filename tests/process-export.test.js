@@ -2,6 +2,7 @@ const assert = require("assert");
 const fs = require("fs");
 const processModel = require("../src/document/process-model");
 const exporter = require("../src/exporters/process-export");
+const svgExporter = require("../src/exporters/process-svg-export");
 
 const decisionId = processModel.stableId("manual-process-node",
   ["export", "stock"]);
@@ -48,6 +49,25 @@ assert(svg.includes("Frisläpp &lt;order&gt;"));
 assert(svg.includes("Status: Open → Released"));
 assert(!svg.includes("event-secret"),
   "the presentation diagram must not expose raw evidence identifiers");
+assert(svg.includes("map-node-decision"));
+assert(svg.includes("edge-conditional"));
+
+const richSvg = svgExporter.svg({ recordingId: "rich", title: "Rich process",
+  nodes: [{ nodeId: "document", nodeType: "document", title: "Sales Order", sequence: 0 },
+    { nodeId: "post", nodeType: "posting", title: "Post Shipment", sequence: 1 },
+    { nodeId: "posted", nodeType: "postedDocument", title: "Posted Shipment", sequence: 2 }],
+  transitions: [{ fromNodeId: "document", toNodeId: "post", transitionType: "sequence" },
+    { fromNodeId: "post", toNodeId: "posted", transitionType: "documentPosting" }],
+  subprocesses: [{ subprocessId: "outbound", title: "Warehouse Outbound",
+    nodeIds: ["document", "post", "posted"], metadata: { containerType: "phase" } }]
+}, { language: "en-US", columns: 2 });
+assert(richSvg.includes("Warehouse Outbound"));
+assert(richSvg.includes("map-node-document"));
+assert(richSvg.includes("map-node-posting"));
+assert(richSvg.includes("map-node-posted-document"));
+assert(richSvg.includes("edge-posts"));
+assert(/<path d="[^"]* V [^"]*"/u.test(richSvg),
+  "multi-row export must use orthogonal connectors");
 
 const broken = { ...model, startNodeIds: ["missing"] };
 assert.throws(() => exporter.create(broken), error =>

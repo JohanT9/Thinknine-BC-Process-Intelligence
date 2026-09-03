@@ -11,6 +11,10 @@
 
 ## Unreleased
 
+- Replaced the legacy single-row process SVG with a deterministic multi-row
+  exporter that preserves semantic node shapes, relationship styles,
+  swimlanes, route labels, and observed state changes.
+
 - Added independent Process Overview zoom, reset, and fit-to-width controls with
   local preference persistence, localized tooltips, bounded scaling, and
   connector realignment.

@@ -1000,6 +1000,11 @@ normalizes bounded zoom values and computes fit-to-width scale without mutating
 ProcessGraph or layout. Dashboard persists the user preference and requests a
 fresh render so connectors are measured after scaling.
 
+`exporters/process-svg-export.js` is the standalone SVG adapter. It consumes the
+same visual grammar, route grammar, and lane projection as Review Studio but
+owns deterministic export geometry independent of DOM measurements, viewport
+zoom, or screen size. `process-export.js` validates and delegates to it.
+
 `ProcessGraph` is the renderer-neutral diagram contract projected from Canonical
 Recording, Process Taxonomy, and Semantic Classification. One deterministic
 projection produces Business Process, Business Central Process, and User
