@@ -64,7 +64,8 @@
     return `<rect x="${x}" y="${y}" width="${width}" height="${height}" rx="${radius}"/>`; }
   function applyTheme(markup, theme) {
     const palette = theme.palette;
-    const colors = [["#f4f8fb", palette.lane], ["#c8d5df", palette.laneBorder],
+    const colors = [["#fefefe", palette.actionFill], ["#f4f8fb", palette.lane],
+      ["#c8d5df", palette.laneBorder],
       ["#213547", palette.text], ["#52606d", palette.edge], ["#172b3a", palette.text],
       ["#3f5668", palette.edge], ["#eaf3f8", palette.brandFill], ["#31566f", palette.brand],
       ["#eef8fd", palette.documentFill], ["#2878a5", palette.document],
@@ -73,9 +74,11 @@
       ["#f6f2ff", palette.systemFill], ["#66558f", palette.system],
       ["#fff8ef", palette.manualFill], ["#8a5a2b", palette.manual],
       ["#49657a", palette.edge], ["#8a6d1d", palette.decision],
-      ["#765b00", palette.decision], ["#5f4b16", palette.decision],
-      ["#fff", palette.background]];
-    const themed = colors.reduce((value, [from, to]) => value.split(from).join(to), markup);
+      ["#765b00", palette.decision], ["#5f4b16", palette.decision]];
+    const backgroundThemed = markup.replaceAll("fill:#fff}", `fill:${palette.background}}`)
+      .replaceAll("stroke:#fff;", `stroke:${palette.background};`);
+    const themed = colors.reduce((value, [from, to]) => value.split(from).join(to),
+      backgroundThemed);
     return themed.replace("<svg ", `<svg data-process-theme="${theme.id}" `);
   }
   function svg(model, options = {}) {
@@ -122,7 +125,7 @@
       width - 40}" height="${laneHeader - 6}" rx="4"/><text x="32" y="${lane.y + 19}">${
       escape(lane.title)}</text></g>`).join("");
     const title = options.title || model.title || "Process";
-    return applyTheme(`<?xml version="1.0" encoding="UTF-8"?>\n<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${width} ${height}" role="img" aria-labelledby="title description"><title id="title">${escape(title)}</title><desc id="description">${escape(english ? "Exported process diagram" : "Exporterat processdiagram")}</desc><defs><marker id="arrow" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#49657a"/></marker></defs><style>.background{fill:#fff}.lane rect{fill:#f4f8fb;stroke:#c8d5df}.lane text{font:700 13px Arial,sans-serif;fill:#213547}.map-node>*:first-child{fill:#fff;stroke:#52606d;stroke-width:2}.map-node text{font:600 14px Arial,sans-serif;fill:#172b3a}.map-node .state{font:11px Arial,sans-serif;fill:#3f5668}.map-node-business-process>*:first-child{fill:#eaf3f8;stroke:#31566f}.map-node-document>*:first-child{fill:#eef8fd;stroke:#2878a5}.map-node-posted-document>*:first-child{fill:#eef8f0;stroke:#347447}.map-node-posting>*:first-child,.map-node-decision>*:first-child{fill:#fff4ce;stroke:#7a5b00}.map-node-system-action>*:first-child{fill:#f6f2ff;stroke:#66558f;stroke-dasharray:6 4}.map-node-manual-action>*:first-child{fill:#fff8ef;stroke:#8a5a2b}.edge{fill:none;stroke:#49657a;stroke-width:2;stroke-linejoin:round}.edge-alternate,.edge-loop,.edge-return{stroke:#8a6d1d;stroke-dasharray:7 5}.edge-conditional,.edge-branch{stroke:#765b00;stroke-width:2.5}.edge-creates{stroke:#2878a5;stroke-dasharray:2 5}.edge-posts{stroke:#347447;stroke-width:3}.route-label{font:12px Arial,sans-serif;fill:#5f4b16;paint-order:stroke;stroke:#fff;stroke-width:4px;stroke-linejoin:round}</style><rect class="background" width="100%" height="100%"/><text x="${margin}" y="38" style="font:700 20px Arial,sans-serif;fill:#172b3a">${escape(title)}</text>${laneMarkup}<g class="edges">${edges}</g><g class="nodes">${nodeMarkup}</g></svg>\n`, theme);
+    return applyTheme(`<?xml version="1.0" encoding="UTF-8"?>\n<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${width} ${height}" role="img" aria-labelledby="title description"><title id="title">${escape(title)}</title><desc id="description">${escape(english ? "Exported process diagram" : "Exporterat processdiagram")}</desc><defs><marker id="arrow" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#49657a"/></marker></defs><style>.background{fill:#fff}.lane rect{fill:#f4f8fb;stroke:#c8d5df}.lane text{font:700 13px Arial,sans-serif;fill:#213547}.map-node>*:first-child{fill:#fefefe;stroke:#52606d;stroke-width:2}.map-node text{font:600 14px Arial,sans-serif;fill:#172b3a}.map-node .state{font:11px Arial,sans-serif;fill:#3f5668}.map-node-business-process>*:first-child{fill:#eaf3f8;stroke:#31566f}.map-node-document>*:first-child{fill:#eef8fd;stroke:#2878a5}.map-node-posted-document>*:first-child{fill:#eef8f0;stroke:#347447}.map-node-posting>*:first-child,.map-node-decision>*:first-child{fill:#fff4ce;stroke:#7a5b00}.map-node-system-action>*:first-child{fill:#f6f2ff;stroke:#66558f;stroke-dasharray:6 4}.map-node-manual-action>*:first-child{fill:#fff8ef;stroke:#8a5a2b}.edge{fill:none;stroke:#49657a;stroke-width:2;stroke-linejoin:round}.edge-alternate,.edge-loop,.edge-return{stroke:#8a6d1d;stroke-dasharray:7 5}.edge-conditional,.edge-branch{stroke:#765b00;stroke-width:2.5}.edge-creates{stroke:#2878a5;stroke-dasharray:2 5}.edge-posts{stroke:#347447;stroke-width:3}.route-label{font:12px Arial,sans-serif;fill:#5f4b16;paint-order:stroke;stroke:#fff;stroke-width:4px;stroke-linejoin:round}</style><rect class="background" width="100%" height="100%"/><text x="${margin}" y="38" style="font:700 20px Arial,sans-serif;fill:#172b3a">${escape(title)}</text>${laneMarkup}<g class="edges">${edges}</g><g class="nodes">${nodeMarkup}</g></svg>\n`, theme);
   }
   return { applyTheme, edgePath, rowsFor, svg };
 });

@@ -13,6 +13,8 @@
 
 - Added persistent Business Central, Neutral, and Monochrome process-map themes
   that apply consistently to Review Studio and exported SVG diagrams.
+- Made theme differences explicit for ordinary activity-only diagrams through
+  distinct node fills, backgrounds, borders, and connector contrast.
 
 - Added persistent Automatic and Vertical process-map directions, including
   direction-aware Review rendering, connectors, and SVG diagram export.

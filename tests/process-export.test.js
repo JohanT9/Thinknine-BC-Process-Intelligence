@@ -78,6 +78,18 @@ const monochromeSvg = svgExporter.svg(model, { theme: "monochrome" });
 assert(monochromeSvg.includes('data-process-theme="monochrome"'));
 assert(monochromeSvg.includes("stroke:#333333"));
 assert(!monochromeSvg.includes("#2878a5"));
+const activityOnlyModel = { recordingId: "activities", nodes: [{ nodeId: "one",
+  nodeType: "activity", title: "Create order", sequence: 0 }], transitions: [],
+subprocesses: [] };
+const businessCentralActivitySvg = svgExporter.svg(activityOnlyModel,
+  { theme: "business-central" });
+const neutralActivitySvg = svgExporter.svg(activityOnlyModel, { theme: "neutral" });
+const monochromeActivitySvg = svgExporter.svg(activityOnlyModel, { theme: "monochrome" });
+assert(businessCentralActivitySvg.includes("fill:#ffffff;stroke:#49657a"));
+assert(neutralActivitySvg.includes("fill:#eef1f3;stroke:#64717d"));
+assert(monochromeActivitySvg.includes("fill:#e2e2e2;stroke:#111111"));
+assert.notStrictEqual(businessCentralActivitySvg, neutralActivitySvg);
+assert.notStrictEqual(neutralActivitySvg, monochromeActivitySvg);
 
 const broken = { ...model, startNodeIds: ["missing"] };
 assert.throws(() => exporter.create(broken), error =>
