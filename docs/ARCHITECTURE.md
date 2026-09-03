@@ -1042,6 +1042,11 @@ navigation helpers. Dashboard applies results to the current rendered map;
 search never changes or filters ProcessGraph. See
 [PROCESS_MAP_SEARCH.md](PROCESS_MAP_SEARCH.md).
 
+`ui/process-map-minimap.js` projects the existing layout coordinates into a
+compact navigation model. It references the same stable node IDs and introduces
+no alternate graph or layout ownership. See
+[PROCESS_MAP_MINIMAP.md](PROCESS_MAP_MINIMAP.md).
+
 ## Business Central Document Lifecycle boundary (4.7)
 
 Document Lifecycle is configurable semantic knowledge between Process Taxonomy

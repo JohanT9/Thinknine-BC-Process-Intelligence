@@ -6982,6 +6982,16 @@ $("documentWorkspaceTab").addEventListener("click", () => {
   switchWorkspace("document");
 });
 $("processOverview").addEventListener("click", event => {
+  const minimapNode = event.target.closest?.("[data-process-minimap-node]");
+  if (minimapNode) {
+    const nodeId = minimapNode.dataset.processMinimapNode;
+    globalThis.T9ProcessOverviewView.selectNode($("processOverview"), nodeId);
+    const target = [...$("processOverview").querySelectorAll("[data-process-node-action]")]
+      .find(action => action.dataset.processNodeAction === nodeId);
+    target?.scrollIntoView?.({ block: "nearest", inline: "center" });
+    target?.focus?.();
+    return;
+  }
   const action = event.target.closest?.("[data-process-node-action]");
   if (!action) return;
   if (action.dataset.processTaskId) {

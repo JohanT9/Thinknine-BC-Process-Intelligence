@@ -11,6 +11,9 @@
 
 ## Unreleased
 
+- Added a keyboard-accessible Process Overview minimap that preserves layout
+  positions and jumps directly to nodes in large diagrams.
+
 - Added accent-insensitive Process Overview search with visible match counts,
   cyclic Enter/Next navigation, and automatic scrolling in large maps.
 

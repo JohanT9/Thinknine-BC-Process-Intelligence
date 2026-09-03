@@ -1,5 +1,8 @@
 # BC Process Studio 4.7
 
+- Large diagrams now include a compact map overview with numbered, clickable
+  nodes for direct navigation to any part of the process.
+
 - Large process maps can now be searched by step, document, or action, with
   highlighted results and keyboard-friendly cyclic navigation.
 

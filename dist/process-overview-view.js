@@ -11,13 +11,15 @@
     ? require("./process-connector-view") : root.T9ProcessConnectorView;
   const mapLegend = typeof module === "object" && module.exports
     ? require("../document/process-map-legend") : root.T9ProcessMapLegend;
+  const minimap = typeof module === "object" && module.exports
+    ? require("./process-map-minimap") : root.T9ProcessMapMinimap;
   const api = factory(layout, visualGrammar, routeGrammar, laneModel, connectorView,
-    mapLegend);
+    mapLegend, minimap);
   if (typeof module === "object" && module.exports) module.exports = api;
   root.T9ProcessOverviewView = api;
 })(typeof globalThis !== "undefined" ? globalThis : this,
   function (graphLayout, visualGrammar, routeGrammar, processLaneModel,
-    processConnectorView, processMapLegend) {
+    processConnectorView, processMapLegend, processMapMinimap) {
   const renderedViews = new WeakMap();
 
   function escape(value) {
@@ -181,6 +183,23 @@
       <span class="process-grammar-legend-title">${escape(legend.title)}</span>${nodes}${routes}</aside>`;
   }
 
+  function minimapMarkup(layout, details, selectedTaskIds, english) {
+    const selectedNodes = details.filter(detail => selectedTaskIds.has(detail.taskId))
+      .map(detail => detail.node.nodeId);
+    const map = processMapMinimap.create(layout, details.map(detail => ({
+      nodeId: detail.node.nodeId, title: plain(detail.node.title)
+    })), selectedNodes);
+    return `<nav class="process-map-minimap" aria-label="${english
+      ? "Process map overview" : "Översikt över processkartan"}">
+      <strong>${english ? "Map overview" : "Kartöversikt"}</strong>
+      <span class="process-map-minimap-grid" style="--minimap-columns:${map.columns};--minimap-rows:${map.rows}">${
+        map.items.map((item, index) => `<button type="button" data-process-minimap-node="${
+          escape(item.nodeId)}" style="--minimap-column:${item.column + 1};--minimap-row:${item.row + 1}"
+          aria-label="${escape(`${english ? "Go to step" : "Gå till steg"} ${index + 1}: ${item.title}`)}"
+          aria-current="${item.selected ? "step" : "false"}" title="${escape(item.title)}"><span>${
+          index + 1}</span></button>`).join("")}</span></nav>`;
+  }
+
   function render(container, model, options = {}) {
     if (!container) return { activityCount: 0, stateTransitionCount: 0 };
     const english = String(options.locale || "").toLowerCase().startsWith("en");
@@ -219,7 +238,7 @@
       .map(segment => segment.nodeIds.at(-1)) : [];
     const rowEndIds = new Set([...layout.rows.slice(0, -1).map(row => row.nodeIds.at(-1)),
       ...laneEndIds]);
-    container.innerHTML = `<div class="process-diagram-scroll" tabindex="0" role="group"
+    container.innerHTML = `${minimapMarkup(layout, details, selectedTaskIds, english)}<div class="process-diagram-scroll" tabindex="0" role="group"
       data-process-theme="${escape(options.theme || "business-central")}"
       data-process-density="${options.density === "compact" ? "compact" : "standard"}"
       aria-label="${english ? "Process flow" : "Processflöde"}">
@@ -310,6 +329,6 @@
     return true;
   }
 
-  return { containersFor, detailMarkup, legendMarkup, render, reviewState, routeLabel, semanticState,
+  return { containersFor, detailMarkup, legendMarkup, minimapMarkup, render, reviewState, routeLabel, semanticState,
     routeSummary, routesMarkup, selectNode, taskIdFor, updateSelection };
 });
