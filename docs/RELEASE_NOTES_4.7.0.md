@@ -1,5 +1,8 @@
 # BC Process Studio 4.7
 
+- Process Overview now offers Business Central, Neutral, and Monochrome visual
+  themes. The locally remembered choice is also used by SVG diagram export.
+
 - Added a canonical Business Central process taxonomy inspired by Microsoft's
   Dynamics 365 end-to-end process catalog and specialized for BC documents,
   pages, actions, warehouse flows, manufacturing, assembly, transfers and

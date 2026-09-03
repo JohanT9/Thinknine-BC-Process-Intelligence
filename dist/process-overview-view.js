@@ -205,6 +205,7 @@
     const rowEndIds = new Set([...layout.rows.slice(0, -1).map(row => row.nodeIds.at(-1)),
       ...laneEndIds]);
     container.innerHTML = `<div class="process-diagram-scroll" tabindex="0" role="group"
+      data-process-theme="${escape(options.theme || "business-central")}"
       aria-label="${english ? "Process flow" : "Processflöde"}">
       <ol class="process-overview-list" data-process-layout-version="${layout.layoutVersion}"
         data-process-direction="${layout.direction}"

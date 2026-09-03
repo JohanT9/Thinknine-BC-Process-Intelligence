@@ -1017,6 +1017,12 @@ adapters consume ProcessGraph and may not reconstruct semantics from raw Review
 or introduce process branches. See
 [MULTI_LEVEL_PROCESS_GRAPH.md](MULTI_LEVEL_PROCESS_GRAPH.md).
 
+Process-map theme selection remains outside `ProcessGraph`.
+`document/process-map-theme.js` supplies immutable named palettes to the Review
+and SVG renderers, ensuring that a presentation preference never alters process
+semantics, evidence, or stored recordings. See
+[PROCESS_MAP_THEMES.md](PROCESS_MAP_THEMES.md).
+
 ## Business Central Document Lifecycle boundary (4.7)
 
 Document Lifecycle is configurable semantic knowledge between Process Taxonomy

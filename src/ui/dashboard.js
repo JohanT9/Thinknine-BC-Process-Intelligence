@@ -3376,6 +3376,7 @@ let activeProcessMapLevel = "businessCentral";
 let processMapResizeFrame = null;
 const PROCESS_MAP_ZOOM_STORAGE_KEY = "t9.processMap.zoom";
 const PROCESS_MAP_DIRECTION_STORAGE_KEY = "t9.processMap.direction";
+const PROCESS_MAP_THEME_STORAGE_KEY = "t9.processMap.theme";
 function normalizedProcessMapDirection(value) {
   return value === "vertical" ? "vertical" : "adaptive";
 }
@@ -3399,6 +3400,16 @@ function loadProcessMapDirection() {
   }
 }
 let processMapDirection = loadProcessMapDirection();
+function loadProcessMapTheme() {
+  try {
+    return globalThis.T9ProcessMapTheme.normalize(
+      globalThis.localStorage?.getItem(PROCESS_MAP_THEME_STORAGE_KEY)
+    );
+  } catch {
+    return globalThis.T9ProcessMapTheme.DEFAULT_THEME_ID;
+  }
+}
+let processMapTheme = loadProcessMapTheme();
 let activeReviewSelection = globalThis.T9ReviewSelection.create();
 let activeReviewEdit = null;
 let reviewReturnFocus = null;
@@ -6401,6 +6412,15 @@ function renderProcessOverview() {
       "Välj processkartans riktning";
     document.querySelector('label[for="processMapDirection"]').textContent = english
       ? "Layout" : "Layout";
+    processMapTheme = globalThis.T9ProcessMapTheme.normalize(processMapTheme);
+    const themeSelect = $("processMapTheme");
+    themeSelect.innerHTML = globalThis.T9ProcessMapTheme.list(
+      applicationSettings.uiLocale || "sv-SE"
+    ).map(theme => `<option value="${theme.id}">${theme.label}</option>`).join("");
+    themeSelect.value = processMapTheme;
+    themeSelect.title = english ? "Choose the process map visual theme" :
+      "Välj processkartans visuella tema";
+    document.querySelector('label[for="processMapTheme"]').textContent = english ? "Theme" : "Tema";
     $("processMapFit").title = english ? "Fit the complete process map to the available width" :
       "Anpassa hela processkartan till tillgänglig bredd";
     $("processMapZoomOut").title = english ? "Zoom out the process map" :
@@ -6451,7 +6471,8 @@ function renderProcessOverview() {
       selectedTaskIds: activeReviewSelection.selectedIds,
       reviewTasks: activeReview.tasks || [],
       zoom: processMapZoom,
-      direction: processMapDirection
+      direction: processMapDirection,
+      theme: processMapTheme
     });
   } catch (error) {
     activeProcessModel = null;
@@ -6471,7 +6492,8 @@ async function exportActiveProcess(kind) {
     const exported = globalThis.T9ProcessExport.create(activeProcessModel, {
       title: activeReviewSession.name,
       language: activeReview.documentFields?.documentLanguage || "sv-SE",
-      columns: processMapDirection === "vertical" ? 1 : 4
+      columns: processMapDirection === "vertical" ? 1 : 4,
+      theme: processMapTheme
     });
     const file = kind === "diagram" ? exported.diagram : exported.json;
     await downloadBlob(new Blob([file.content], { type: file.mimeType }),
@@ -6949,6 +6971,15 @@ $("processMapDirection").addEventListener("change", event => {
       processMapDirection);
   } catch {
     // The selected direction remains active for the current dashboard session.
+  }
+  renderProcessOverview();
+});
+$("processMapTheme").addEventListener("change", event => {
+  processMapTheme = globalThis.T9ProcessMapTheme.normalize(event.currentTarget.value);
+  try {
+    globalThis.localStorage?.setItem(PROCESS_MAP_THEME_STORAGE_KEY, processMapTheme);
+  } catch {
+    // The selected theme remains active for the current dashboard session.
   }
   renderProcessOverview();
 });

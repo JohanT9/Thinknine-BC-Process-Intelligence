@@ -74,6 +74,10 @@ const verticalSvg = svgExporter.svg({ recordingId: "vertical", nodes: [
 ], transitions: [{ fromNodeId: "one", toNodeId: "two", transitionType: "sequence" }]
 }, { language: "en-US", columns: 1 });
 assert(/<path d="[^"]* V [^"]*"/u.test(verticalSvg));
+const monochromeSvg = svgExporter.svg(model, { theme: "monochrome" });
+assert(monochromeSvg.includes('data-process-theme="monochrome"'));
+assert(monochromeSvg.includes("stroke:#333333"));
+assert(!monochromeSvg.includes("#2878a5"));
 
 const broken = { ...model, startNodeIds: ["missing"] };
 assert.throws(() => exporter.create(broken), error =>

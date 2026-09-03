@@ -39,6 +39,8 @@ without reading the open browser DOM. Export therefore remains deterministic
 and does not depend on the user's current screen size or zoom level.
 The selected Automatic or Vertical map direction is respected by diagram
 export; viewport zoom is intentionally not exported.
+The selected Business Central, Neutral, or Monochrome theme is also applied to
+the SVG without changing the Process Model.
 
 Both exporters validate the Process Model before producing a file. Invalid
 models fail safely and show an error without downloading partial output.
