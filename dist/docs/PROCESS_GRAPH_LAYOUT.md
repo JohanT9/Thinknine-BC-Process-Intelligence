@@ -11,6 +11,9 @@ from presentation while avoiding a single, excessively wide horizontal flow.
 - horizontal, row-wrap, or orthogonal edge route intent;
 - a bounded column count based on available width.
 
+The layout supports `adaptive` left-to-right rows and `vertical` top-to-bottom
+flow. Direction changes presentation only; canonical node order is unchanged.
+
 The input graph is never mutated. Nodes keep their semantic identities, source
 references, ordering, selection behaviour, and abstraction level. Review Studio
 uses the placements to render up to five readable cards per row and a downward

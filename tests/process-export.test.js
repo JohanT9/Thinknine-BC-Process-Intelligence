@@ -68,6 +68,12 @@ assert(richSvg.includes("map-node-posted-document"));
 assert(richSvg.includes("edge-posts"));
 assert(/<path d="[^"]* V [^"]*"/u.test(richSvg),
   "multi-row export must use orthogonal connectors");
+const verticalSvg = svgExporter.svg({ recordingId: "vertical", nodes: [
+  { nodeId: "one", nodeType: "activity", title: "One", sequence: 0 },
+  { nodeId: "two", nodeType: "activity", title: "Two", sequence: 1 }
+], transitions: [{ fromNodeId: "one", toNodeId: "two", transitionType: "sequence" }]
+}, { language: "en-US", columns: 1 });
+assert(/<path d="[^"]* V [^"]*"/u.test(verticalSvg));
 
 const broken = { ...model, startNodeIds: ["missing"] };
 assert.throws(() => exporter.create(broken), error =>

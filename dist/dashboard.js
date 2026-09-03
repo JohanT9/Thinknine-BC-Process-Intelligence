@@ -3375,6 +3375,10 @@ let processAnalysisRequest = null;
 let activeProcessMapLevel = "businessCentral";
 let processMapResizeFrame = null;
 const PROCESS_MAP_ZOOM_STORAGE_KEY = "t9.processMap.zoom";
+const PROCESS_MAP_DIRECTION_STORAGE_KEY = "t9.processMap.direction";
+function normalizedProcessMapDirection(value) {
+  return value === "vertical" ? "vertical" : "adaptive";
+}
 function loadProcessMapZoom() {
   try {
     return globalThis.T9ProcessMapViewport.normalize(
@@ -3385,6 +3389,16 @@ function loadProcessMapZoom() {
   }
 }
 let processMapZoom = loadProcessMapZoom();
+function loadProcessMapDirection() {
+  try {
+    return normalizedProcessMapDirection(
+      globalThis.localStorage?.getItem(PROCESS_MAP_DIRECTION_STORAGE_KEY)
+    );
+  } catch {
+    return "adaptive";
+  }
+}
+let processMapDirection = loadProcessMapDirection();
 let activeReviewSelection = globalThis.T9ReviewSelection.create();
 let activeReviewEdit = null;
 let reviewReturnFocus = null;
@@ -6379,6 +6393,14 @@ function renderProcessOverview() {
     $("processMapZoomIn").disabled = processMapZoom >=
       globalThis.T9ProcessMapViewport.MAX_ZOOM;
     $("processMapFit").textContent = english ? "Fit" : "Anpassa";
+    processMapDirection = normalizedProcessMapDirection(processMapDirection);
+    $("processMapDirection").value = processMapDirection;
+    $("processMapDirection").options[0].textContent = english ? "Automatic" : "Automatisk";
+    $("processMapDirection").options[1].textContent = english ? "Vertical" : "Lodrät";
+    $("processMapDirection").title = english ? "Choose process map direction" :
+      "Välj processkartans riktning";
+    document.querySelector('label[for="processMapDirection"]').textContent = english
+      ? "Layout" : "Layout";
     $("processMapFit").title = english ? "Fit the complete process map to the available width" :
       "Anpassa hela processkartan till tillgänglig bredd";
     $("processMapZoomOut").title = english ? "Zoom out the process map" :
@@ -6428,7 +6450,8 @@ function renderProcessOverview() {
       locale: applicationSettings.uiLocale || "sv-SE",
       selectedTaskIds: activeReviewSelection.selectedIds,
       reviewTasks: activeReview.tasks || [],
-      zoom: processMapZoom
+      zoom: processMapZoom,
+      direction: processMapDirection
     });
   } catch (error) {
     activeProcessModel = null;
@@ -6447,7 +6470,8 @@ async function exportActiveProcess(kind) {
   try {
     const exported = globalThis.T9ProcessExport.create(activeProcessModel, {
       title: activeReviewSession.name,
-      language: activeReview.documentFields?.documentLanguage || "sv-SE"
+      language: activeReview.documentFields?.documentLanguage || "sv-SE",
+      columns: processMapDirection === "vertical" ? 1 : 4
     });
     const file = kind === "diagram" ? exported.diagram : exported.json;
     await downloadBlob(new Blob([file.content], { type: file.mimeType }),
@@ -6918,6 +6942,16 @@ $("processMapResetZoom").addEventListener("click", () => changeProcessMapZoom(10
 $("processMapFit").addEventListener("click", () => changeProcessMapZoom(
   globalThis.T9ProcessMapViewport.measureFit($("processOverview"), processMapZoom)
 ));
+$("processMapDirection").addEventListener("change", event => {
+  processMapDirection = normalizedProcessMapDirection(event.currentTarget.value);
+  try {
+    globalThis.localStorage?.setItem(PROCESS_MAP_DIRECTION_STORAGE_KEY,
+      processMapDirection);
+  } catch {
+    // The selected direction remains active for the current dashboard session.
+  }
+  renderProcessOverview();
+});
 function scheduleProcessMapLayout() {
   if (!activeReview || !$('processOverviewDisclosure')?.open || processMapResizeFrame) return;
   processMapResizeFrame = requestAnimationFrame(() => {

@@ -447,6 +447,8 @@ or På/Av values.
   large maps easier to inspect without scaling the surrounding Review content.
 - Exported SVG process diagrams now use the same multi-row visual grammar,
   swimlanes, semantic shapes, and relationship styles as Process Overview.
+- Users can switch between responsive Automatic layout and a top-to-bottom
+  Vertical process map; the selected direction also applies to SVG export.
 
 # Reference Process Library
 

@@ -191,7 +191,8 @@
     const selectedDetail = details.find(detail => selectedTaskIds.has(detail.taskId)) || details[0];
     renderedViews.set(container, { details, english });
     const layout = graphLayout.create(model, {
-      availableWidth: options.availableWidth || container.clientWidth || undefined
+      availableWidth: options.availableWidth || container.clientWidth || undefined,
+      direction: options.direction
     });
     const lanes = processLaneModel.create(model, { unassignedTitle: english
       ? "Other steps" : "Övriga steg" });
@@ -206,6 +207,7 @@
     container.innerHTML = `<div class="process-diagram-scroll" tabindex="0" role="group"
       aria-label="${english ? "Process flow" : "Processflöde"}">
       <ol class="process-overview-list" data-process-layout-version="${layout.layoutVersion}"
+        data-process-direction="${layout.direction}"
         style="--process-columns:${layout.columnCount};zoom:${Number(options.zoom) || 100}%">${details.map(detail => {
         const selected = selectedTaskIds.has(detail.taskId);
         const phase = detail.containers.phase?.title;

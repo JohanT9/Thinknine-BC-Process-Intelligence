@@ -177,6 +177,15 @@ view.render(wrappingContainer, { nodes: Array.from({ length: 5 }, (_, index) => 
 })), transitions: [], subprocesses: [], stateTransitions: [] }, { locale: "en-US" });
 assert(wrappingContainer.innerHTML.includes("--process-columns:2"));
 assert.strictEqual((wrappingContainer.innerHTML.match(/process-overview-row-end/g) || []).length, 2);
+const verticalContainer = { innerHTML: "", clientWidth: 1200 };
+view.render(verticalContainer, { nodes: Array.from({ length: 3 }, (_, index) => ({
+  nodeId: `vertical-${index}`, nodeType: "activity", title: `Vertical ${index}`,
+  processOrder: index
+})), transitions: [], subprocesses: [], stateTransitions: [] }, {
+  locale: "en-US", direction: "vertical"
+});
+assert(verticalContainer.innerHTML.includes('data-process-direction="vertical"'));
+assert(verticalContainer.innerHTML.includes("--process-columns:1"));
 const dashboardHtml = fs.readFileSync("src/ui/dashboard.html", "utf8");
 assert(dashboardHtml.includes('id="processMapLevels"'));
 assert(dashboardHtml.includes('data-process-map-level="businessCentral"'));
@@ -188,9 +197,12 @@ assert(dashboardHtml.includes('src="document/process-lane-model.js"'));
 assert(dashboardHtml.includes('src="process-connector-view.js"'));
 assert(dashboardHtml.includes('src="process-map-viewport.js"'));
 assert(dashboardHtml.includes('id="processMapViewportControls"'));
+assert(dashboardHtml.includes('id="processMapDirection"'));
 assert(dashboard.includes('activeProcessMapLevel = button.dataset.processMapLevel'));
 assert(dashboard.includes('window.addEventListener("resize", scheduleProcessMapLayout)'));
 assert(dashboard.includes('$("processOverviewDisclosure").addEventListener("toggle"'));
 assert(dashboard.includes("function changeProcessMapZoom(value)"));
 assert(dashboard.includes("T9ProcessMapViewport.measureFit"));
+assert(dashboard.includes("PROCESS_MAP_DIRECTION_STORAGE_KEY"));
+assert(dashboard.includes('columns: processMapDirection === "vertical" ? 1 : 4'));
 console.log("Process Overview view tests passed.");

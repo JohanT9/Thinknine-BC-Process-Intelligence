@@ -11,6 +11,9 @@
 
 ## Unreleased
 
+- Added persistent Automatic and Vertical process-map directions, including
+  direction-aware Review rendering, connectors, and SVG diagram export.
+
 - Replaced the legacy single-row process SVG with a deterministic multi-row
   exporter that preserves semantic node shapes, relationship styles,
   swimlanes, route labels, and observed state changes.

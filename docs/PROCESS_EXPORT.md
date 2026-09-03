@@ -37,6 +37,8 @@ SVG rendering is owned by `process-svg-export.js`. It consumes the same visual,
 route, and lane contracts as Process Overview but calculates export geometry
 without reading the open browser DOM. Export therefore remains deterministic
 and does not depend on the user's current screen size or zoom level.
+The selected Automatic or Vertical map direction is respected by diagram
+export; viewport zoom is intentionally not exported.
 
 Both exporters validate the Process Model before producing a file. Invalid
 models fail safely and show an error without downloading partial output.

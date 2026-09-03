@@ -973,6 +973,8 @@ ProcessGraph presentation passes through the immutable
 columns and describes connector route intent without adding layout information
 to the taxonomy, semantic recording, or ProcessGraph source model. HTML and
 future SVG/BPMN/Visio adapters may consume this contract independently.
+The contract supports adaptive row flow and vertical top-to-bottom flow as
+presentation preferences without changing canonical process order.
 
 Node appearance is resolved separately by
 `document/process-visual-grammar.js`. The contract translates canonical node

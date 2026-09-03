@@ -5,6 +5,7 @@
 })(typeof globalThis !== "undefined" ? globalThis : this, function () {
   "use strict";
   const LAYOUT_VERSION = "1.0.0";
+  const DIRECTIONS = Object.freeze(["adaptive", "vertical"]);
   const DEFAULTS = Object.freeze({ availableWidth: 1000, nodeWidth: 190,
     columnGap: 30, minColumns: 1, maxColumns: 5 });
   const positive = (value, fallback) => Number.isFinite(value) && value > 0
@@ -36,7 +37,9 @@
 
   function create(model, options = {}) {
     const sourceNodes = orderedNodes(model);
-    const columnCount = calculateColumnCount(sourceNodes.length, options);
+    const direction = DIRECTIONS.includes(options.direction) ? options.direction : "adaptive";
+    const columnCount = direction === "vertical" ? Math.min(1, sourceNodes.length) :
+      calculateColumnCount(sourceNodes.length, options);
     const rows = [];
     const nodes = sourceNodes.map((node, order) => {
       const row = Math.floor(order / columnCount);
@@ -58,12 +61,13 @@
         `${fromNodeId}:${toNodeId}`, fromNodeId, toNodeId, route,
       relationshipType: edge.transitionType || edge.relationshipType || "sequence" });
     }).filter(Boolean);
-    return Object.freeze({ layoutVersion: LAYOUT_VERSION,
-      direction: "leftToRightRows", columnCount, rowCount: rows.length,
+    return Object.freeze({ layoutVersion: LAYOUT_VERSION, direction,
+      flowDirection: direction === "vertical" ? "topToBottom" : "leftToRightRows",
+      columnCount, rowCount: rows.length,
       rows: Object.freeze(rows.map(row => Object.freeze({ row: row.row,
         nodeIds: Object.freeze([...row.nodeIds]) }))),
       nodes: Object.freeze(nodes), edges: Object.freeze(edges) });
   }
 
-  return { DEFAULTS, LAYOUT_VERSION, calculateColumnCount, create, orderedNodes };
+  return { DEFAULTS, DIRECTIONS, LAYOUT_VERSION, calculateColumnCount, create, orderedNodes };
 });
