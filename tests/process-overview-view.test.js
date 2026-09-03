@@ -74,6 +74,8 @@ const branchingModel = processModel.project({ recordingId: "branching",
 const decisionContainer = { innerHTML: "" };
 view.render(decisionContainer, branchingModel, { locale: "sv-SE" });
 assert(decisionContainer.innerHTML.includes('data-process-decision="true"'));
+assert(decisionContainer.innerHTML.includes('data-process-shape="diamond"'));
+assert(decisionContainer.innerHTML.includes("process-overview-kind-decision"));
 assert(decisionContainer.innerHTML.includes("Finns varan i lager?"));
 assert(decisionContainer.innerHTML.includes("Beslut"));
 assert(!decisionContainer.innerHTML.includes('class="process-overview-routes compact"'),
@@ -153,6 +155,15 @@ view.render(semanticContainer, { nodes: [{ nodeId: "suggestion", nodeType: "acti
 transitions: [], subprocesses: [], stateTransitions: [] }, { locale: "sv-SE" });
 assert(semanticContainer.innerHTML.includes("process-overview-semantic-suggested"));
 assert(semanticContainer.innerHTML.includes("Referensförslag"));
+const typedContainer = { innerHTML: "" };
+view.render(typedContainer, { nodes: [{ nodeId: "posted", nodeType: "activity",
+  title: "Posted Sales Invoice", processOrder: 0, metadata: {
+    originalNodeType: "postedDocument" } }, { nodeId: "post", nodeType: "activity",
+  title: "Post", processOrder: 1, metadata: { originalNodeType: "posting" } }],
+transitions: [], subprocesses: [], stateTransitions: [] }, { locale: "en-US" });
+assert(typedContainer.innerHTML.includes("process-overview-kind-posted-document"));
+assert(typedContainer.innerHTML.includes("Posted document"));
+assert(typedContainer.innerHTML.includes("process-overview-kind-posting"));
 const wrappingContainer = { innerHTML: "", clientWidth: 450 };
 view.render(wrappingContainer, { nodes: Array.from({ length: 5 }, (_, index) => ({
   nodeId: `wrap-${index}`, nodeType: "activity", title: `Step ${index}`,
@@ -165,6 +176,7 @@ assert(dashboardHtml.includes('id="processMapLevels"'));
 assert(dashboardHtml.includes('data-process-map-level="businessCentral"'));
 assert(dashboardHtml.includes('src="document/semantic-process-map.js"'));
 assert(dashboardHtml.includes('src="document/process-graph-layout.js"'));
+assert(dashboardHtml.includes('src="document/process-visual-grammar.js"'));
 assert(dashboard.includes('activeProcessMapLevel = button.dataset.processMapLevel'));
 assert(dashboard.includes('window.addEventListener("resize", scheduleProcessMapLayout)'));
 assert(dashboard.includes('$("processOverviewDisclosure").addEventListener("toggle"'));

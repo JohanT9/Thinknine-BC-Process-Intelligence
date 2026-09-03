@@ -11,6 +11,10 @@
 
 ## Unreleased
 
+- Added a renderer-neutral process-map visual grammar with localized semantic
+  labels and distinct treatments for business processes, documents, posted
+  documents, posting, decisions, system actions, manual actions, and states.
+
 - Added a renderer-neutral adaptive ProcessGraph layout that wraps long process
   maps into readable rows, emits edge route intent, and responds to available
   Review Studio width without changing process semantics.

@@ -431,6 +431,9 @@ or På/Av values.
   without introducing a second diagram renderer.
 - Long maps now use an adaptive multi-row layout with clear downward flow
   continuation instead of requiring one long horizontal scroll.
+- Process node types now have a consistent visual grammar, allowing consultants
+  to distinguish documents, posting, decisions, automated work, manual work,
+  and high-level business processes at a glance.
 
 # Reference Process Library
 

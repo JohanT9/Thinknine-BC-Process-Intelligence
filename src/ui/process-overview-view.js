@@ -1,10 +1,13 @@
 (function (root, factory) {
   const layout = typeof module === "object" && module.exports
     ? require("../document/process-graph-layout") : root.T9ProcessGraphLayout;
-  const api = factory(layout);
+  const visualGrammar = typeof module === "object" && module.exports
+    ? require("../document/process-visual-grammar") : root.T9ProcessVisualGrammar;
+  const api = factory(layout, visualGrammar);
   if (typeof module === "object" && module.exports) module.exports = api;
   root.T9ProcessOverviewView = api;
-})(typeof globalThis !== "undefined" ? globalThis : this, function (graphLayout) {
+})(typeof globalThis !== "undefined" ? globalThis : this,
+  function (graphLayout, visualGrammar) {
   const renderedViews = new WeakMap();
 
   function escape(value) {
@@ -184,11 +187,15 @@
         const semantic = semanticState(detail, english);
         const title = plain(detail.node.title);
         const placement = placementById.get(detail.node.nodeId);
+        const visual = visualGrammar.presentationFor(detail.node,
+          english ? "en-US" : "sv-SE");
         return `<li class="process-overview-step${decision ? " process-overview-decision" : ""}${
           rowEndIds.has(detail.node.nodeId) ? " process-overview-row-end" : ""}${
+          ` process-overview-kind-${visual.kind}`}${
           semantic ? ` process-overview-semantic-${semantic.name}` : ""}"
           data-process-row="${placement?.row ?? 0}" data-process-column="${placement?.column ?? 0}"
-          data-process-node-id="${escape(detail.node.nodeId)}" data-process-decision="${decision}">
+          data-process-node-id="${escape(detail.node.nodeId)}" data-process-decision="${decision}"
+          data-process-shape="${escape(visual.shape)}" data-process-tone="${escape(visual.tone)}">
           <button type="button" class="process-overview-action"
             data-process-node-action="${escape(detail.node.nodeId)}"
             ${detail.taskId ? `data-process-task-id="${escape(detail.taskId)}"` : ""}
@@ -198,7 +205,8 @@
             <span class="process-overview-content">
               ${phase ? `<span class="process-overview-phase">${escape(phase)}</span>` : ""}
               ${subtask ? `<span class="process-overview-subtask">${escape(subtask)}</span>` : ""}
-              ${decision ? `<span class="process-overview-node-type">${english ? "Decision" : "Beslut"}</span>` : ""}
+              ${!["action", "process-step"].includes(visual.kind)
+                ? `<span class="process-overview-node-type">${escape(visual.label)}</span>` : ""}
               <strong>${escape(title)}</strong>
               ${status ? `<span class="process-overview-review-state ${status.name}">${escape(status.label)}</span>` : ""}
               ${semantic ? `<span class="process-overview-semantic-state ${semantic.name}">${escape(

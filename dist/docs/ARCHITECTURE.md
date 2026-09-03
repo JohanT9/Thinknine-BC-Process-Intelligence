@@ -974,6 +974,12 @@ columns and describes connector route intent without adding layout information
 to the taxonomy, semantic recording, or ProcessGraph source model. HTML and
 future SVG/BPMN/Visio adapters may consume this contract independently.
 
+Node appearance is resolved separately by
+`document/process-visual-grammar.js`. The contract translates canonical node
+types into renderer-neutral kind, shape, tone, and localized-label intent.
+Renderers implement that intent; taxonomy and recording data never store CSS or
+library-specific drawing instructions.
+
 `ProcessGraph` is the renderer-neutral diagram contract projected from Canonical
 Recording, Process Taxonomy, and Semantic Classification. One deterministic
 projection produces Business Process, Business Central Process, and User
