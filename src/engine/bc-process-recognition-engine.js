@@ -102,6 +102,8 @@
       if (technical && (technicalCompact.includes(name.toLowerCase()) ||
         expression.test(technical))) results.push({ name, strength: 1,
         signal: "technical-action", explanation: `Detected ${name} from BC action metadata` });
+      else if (name === "Register" && expression.test(captions) &&
+        !/pick|put.?away|plock|inlagr/i.test(captions)) return;
       else if (expression.test(captions)) results.push({ name, strength: 0.38,
         signal: "action-caption", explanation: `Action caption suggests ${name}` });
     });
@@ -237,11 +239,14 @@
         ...relevantTransitions.flatMap(item => item.sourceEventIds || [])]),
       processEvidence: {
         matchedDocuments: matchedDocuments.map(item => ({ id: item.id, name: item.name,
-          eventId: item.eventId, strength: item.strength })),
+          eventId: item.eventId, sequence: evidence.observations.find(observation =>
+            observation.eventId === item.eventId)?.sequence || 0, strength: item.strength })),
         expectedDocuments: expectedDocuments.map(id => { const document = taxonomy.documents
           .find(item => item.id === id); return { id, name: document?.name || id }; }),
         matchedActions: actionHits.map(item => ({ name: item.name, eventId: item.eventId,
-          strength: item.strength }))
+          sequence: evidence.observations.find(observation =>
+            observation.eventId === item.eventId)?.sequence || 0, strength: item.strength,
+          nodeType: item.name === "Post" ? "posting" : "processStep" }))
       },
       explanation: reasons, signals: { matchedDocuments: matchedDocuments.length,
         expectedDocuments: expectedDocuments.length, matchedActions: actionHits.length,

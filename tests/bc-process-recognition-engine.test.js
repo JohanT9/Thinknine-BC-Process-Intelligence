@@ -112,6 +112,10 @@ assert(weak.classification.confidence <= 0.54);
 assert.strictEqual(weak.classification.signals.strongMetadata, false);
 assert(weak.evidence.observations.every(item => item.actions.length === 0),
   "page and document captions must not be interpreted as business actions");
+const unrelatedRegister = synthetic("unrelated-register", [{ label: "Registrera vikt",
+  identification: { actionIdentity: { caption: "Registrera vikt", source: "caption-fallback" } } }]);
+assert(!engine.extractEvidence(unrelatedRegister).observations[0].actions.some(item =>
+  item.name === "Register"), "A weight registration is not a warehouse Register action.");
 
 const repeatedRelease = synthetic("repeated-release", [
   { identification: page(42, 36, "order", "SalesOrder") },

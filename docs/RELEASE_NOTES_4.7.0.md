@@ -1,5 +1,10 @@
 # BC Process Studio 4.7
 
+- BC Process maps now interleave recognized actions with Business Central
+  documents and preserve distinct shapes for documents, process steps, and
+  posting actions. Generic registration captions no longer create false
+  warehouse actions without supporting context.
+
 - Semantic maps for older recordings now show the recognized domain and
   business process, observed Business Central documents, and visually distinct
   suggested lifecycle steps.

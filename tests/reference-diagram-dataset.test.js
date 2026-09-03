@@ -131,6 +131,8 @@ assert.strictEqual(misleadingGraphMatch.bestMatch.domain, "Source to Pay");
 assert.strictEqual(misleadingGraphMatch.bestMatch.businessProcess, "Purchase to Pay");
 assert(misleadingGraphMatch.bestMatch.matchedSteps.some(item =>
   item.id === "document:purchase-order"));
+assert(misleadingGraphMatch.bestMatch.matchedSteps.some(item =>
+  item.name === "Release" && item.nodeType === "processStep"));
 assert(misleadingGraphMatch.bestMatch.missingSteps.some(item =>
   item.id === "document:warehouse-receipt" && item.suggested));
 assert(misleadingGraphMatch.matches.every(item => item.matchedNodes > 0),

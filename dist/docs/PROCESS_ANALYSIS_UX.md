@@ -38,6 +38,11 @@ Process map shows observed canonical documents and unobserved reference
 documents as suggestions. Suggestions are guidance, not claims that the
 customer process is incomplete.
 
+Observed business actions are interleaved with documents according to recording
+order. The semantic map preserves document, process-step, and posting node types,
+so the visual grammar can use distinct shapes instead of rendering every item as
+the same activity card.
+
 The consultant can confirm the proposed classification or select another
 reference. The manual decision is stored in the Review project with timestamp,
 source and status and follows the existing autosave workflow.

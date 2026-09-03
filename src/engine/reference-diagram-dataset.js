@@ -314,16 +314,24 @@
       recognized.confidence >= selectedBest.confidence)) {
       const observedDocumentIds = new Set(array(recognized.processEvidence?.matchedDocuments)
         .map(item => item.id));
+      const observedNodes = [
+        ...array(recognized.processEvidence?.matchedDocuments).map(item => ({
+          type: "document", nodeType: "document", id: item.id, name: item.name,
+          sequence: item.sequence })),
+        ...array(recognized.processEvidence?.matchedActions).map((item, index) => ({
+          type: "action", nodeType: item.nodeType || "processStep",
+          id: `recognized-action:${item.name}:${index}`, name: item.name,
+          sequence: item.sequence }))
+      ].sort((left, right) => left.sequence - right.sequence || left.name.localeCompare(right.name));
       selectedBest = freeze({ referenceProcess:
         recognized.taxonomyReferences.bcProcess.name,
       referenceProcessId: recognized.taxonomyReferences.bcProcess.id,
       businessProcess: recognized.taxonomyReferences.businessProcess?.name || null,
       domain: recognized.taxonomyReferences.domain.name, confidence: recognized.confidence,
-      matchedSteps: array(recognized.processEvidence?.matchedDocuments).map(item => ({
-        type: "document", id: item.id, name: item.name })),
+      matchedSteps: observedNodes,
       missingSteps: array(recognized.processEvidence?.expectedDocuments)
         .filter(item => !observedDocumentIds.has(item.id)).map(item => ({
-          type: "document", id: item.id, name: item.name, suggested: true })),
+          type: "document", nodeType: "document", id: item.id, name: item.name, suggested: true })),
       additionalSteps: [], source: "BCProcessRecognitionEngine",
       customizedBehaviorMayBeValid: true, deviationsAreErrors: false });
     }

@@ -77,9 +77,11 @@
   }
   function fromComparison(input, model) { const values = [
     ...model.matched.map(item => ({ title: text(item.title || item.name || item.id),
-      metadata: { semanticStatus: "observed", semanticLevel: "businessCentral" } })),
+      metadata: { semanticStatus: "observed", semanticLevel: "businessCentral",
+        originalNodeType: item.nodeType || (item.type === "document" ? "document" : "processStep") } })),
     ...model.missing.map(item => ({ title: text(item.title || item.name || item.id),
-      metadata: { semanticStatus: "suggested", semanticLevel: "businessCentral" } })),
+      metadata: { semanticStatus: "suggested", semanticLevel: "businessCentral",
+        originalNodeType: item.nodeType || (item.type === "document" ? "document" : "processStep") } })),
     ...model.additional.map(item => ({ title: text(item.title || item.name || item.id),
       metadata: { semanticStatus: "customerSpecific", semanticLevel: "businessCentral" } }))
   ].filter(item => item.title); return processModel(input.recordingId, input.title, values); }

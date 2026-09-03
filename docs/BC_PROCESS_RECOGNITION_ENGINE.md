@@ -40,7 +40,13 @@ result exposes `auto-classifiable`, `review-required`, or
 `insufficient-evidence`, plus the candidate margin and score breakdown. Each
 candidate also exposes immutable `processEvidence` with matched documents,
 canonical expected documents, and matched actions, so consumers need not parse
-human-readable explanation text.
+human-readable explanation text. Evidence retains recording sequence and a
+renderer-neutral node type, allowing documents, process steps, and postings to
+be ordered and styled correctly downstream.
+
+Generic localized verbs are context guarded. For example, `Registrera vikt`
+does not count as the warehouse action Register; caption-based Register evidence
+requires Pick/Put-away context unless a technical BC action identity is present.
 
 Swedish Business Central document captions are canonical aliases, including
 Inköpsorder, Distributionslagerinleverans and Överföringsorder. This allows older

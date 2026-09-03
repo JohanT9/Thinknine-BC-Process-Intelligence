@@ -11,6 +11,10 @@
 
 ## Unreleased
 
+- Enriched recognized BC Process maps with sequence-aware document and action
+  nodes, renderer-neutral node types, and contextual protection against treating
+  unrelated captions such as `Registrera vikt` as warehouse registration.
+
 - Added useful semantic maps for legacy recordings: deterministic recognition
   now publishes matched and expected document evidence, allowing Business
   Process and BC Process views to distinguish observed documents from suggested
