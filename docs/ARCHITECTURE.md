@@ -995,6 +995,11 @@ It consumes final DOM bounds plus route grammar intent and draws a noninteractiv
 connector layer. It does not infer transitions, alter layout, or expose SVG
 details to the semantic model.
 
+`ui/process-map-viewport.js` owns renderer viewport calculations only. It
+normalizes bounded zoom values and computes fit-to-width scale without mutating
+ProcessGraph or layout. Dashboard persists the user preference and requests a
+fresh render so connectors are measured after scaling.
+
 `ProcessGraph` is the renderer-neutral diagram contract projected from Canonical
 Recording, Process Taxonomy, and Semantic Classification. One deterministic
 projection produces Business Process, Business Central Process, and User

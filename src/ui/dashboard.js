@@ -3374,6 +3374,17 @@ let activeProcessAnalysis = null;
 let processAnalysisRequest = null;
 let activeProcessMapLevel = "businessCentral";
 let processMapResizeFrame = null;
+const PROCESS_MAP_ZOOM_STORAGE_KEY = "t9.processMap.zoom";
+function loadProcessMapZoom() {
+  try {
+    return globalThis.T9ProcessMapViewport.normalize(
+      globalThis.localStorage?.getItem(PROCESS_MAP_ZOOM_STORAGE_KEY)
+    );
+  } catch {
+    return 100;
+  }
+}
+let processMapZoom = loadProcessMapZoom();
 let activeReviewSelection = globalThis.T9ReviewSelection.create();
 let activeReviewEdit = null;
 let reviewReturnFocus = null;
@@ -6361,6 +6372,23 @@ function renderProcessOverview() {
     const hasSemanticAnalysis = Boolean(activeProcessAnalysis?.bestMatch);
     const displayedLevel = hasSemanticAnalysis ? activeProcessMapLevel : "procedure";
     const english = String(applicationSettings.uiLocale || "").startsWith("en");
+    processMapZoom = globalThis.T9ProcessMapViewport.normalize(processMapZoom);
+    $("processMapZoomValue").textContent = `${processMapZoom}%`;
+    $("processMapZoomOut").disabled = processMapZoom <=
+      globalThis.T9ProcessMapViewport.MIN_ZOOM;
+    $("processMapZoomIn").disabled = processMapZoom >=
+      globalThis.T9ProcessMapViewport.MAX_ZOOM;
+    $("processMapFit").textContent = english ? "Fit" : "Anpassa";
+    $("processMapFit").title = english ? "Fit the complete process map to the available width" :
+      "Anpassa hela processkartan till tillgänglig bredd";
+    $("processMapZoomOut").title = english ? "Zoom out the process map" :
+      "Zooma ut processkartan";
+    $("processMapZoomIn").title = english ? "Zoom in the process map" :
+      "Zooma in processkartan";
+    $("processMapResetZoom").title = english ? "Reset the process map to 100%" :
+      "Återställ processkartan till 100 %";
+    $("processMapViewportControls").setAttribute("aria-label", english
+      ? "Process map size" : "Processkartans storlek");
     const descriptions = english ? {
       business: "High-level business flow derived from the confirmed process classification.",
       businessCentral: "Business Central documents and actions compared with the reference process.",
@@ -6399,7 +6427,8 @@ function renderProcessOverview() {
     globalThis.T9ProcessOverviewView.render(container, model, {
       locale: applicationSettings.uiLocale || "sv-SE",
       selectedTaskIds: activeReviewSelection.selectedIds,
-      reviewTasks: activeReview.tasks || []
+      reviewTasks: activeReview.tasks || [],
+      zoom: processMapZoom
     });
   } catch (error) {
     activeProcessModel = null;
@@ -6869,6 +6898,26 @@ $("processMapLevels").addEventListener("click", event => {
   renderProcessOverview();
   $("processOverview").querySelector("[data-process-node-action]")?.focus();
 });
+function changeProcessMapZoom(value) {
+  processMapZoom = globalThis.T9ProcessMapViewport.normalize(value);
+  try {
+    globalThis.localStorage?.setItem(PROCESS_MAP_ZOOM_STORAGE_KEY,
+      String(processMapZoom));
+  } catch {
+    // The selected zoom remains active for the current dashboard session.
+  }
+  renderProcessOverview();
+}
+$("processMapZoomOut").addEventListener("click", () => changeProcessMapZoom(
+  processMapZoom - globalThis.T9ProcessMapViewport.STEP
+));
+$("processMapZoomIn").addEventListener("click", () => changeProcessMapZoom(
+  processMapZoom + globalThis.T9ProcessMapViewport.STEP
+));
+$("processMapResetZoom").addEventListener("click", () => changeProcessMapZoom(100));
+$("processMapFit").addEventListener("click", () => changeProcessMapZoom(
+  globalThis.T9ProcessMapViewport.measureFit($("processOverview"), processMapZoom)
+));
 function scheduleProcessMapLayout() {
   if (!activeReview || !$('processOverviewDisclosure')?.open || processMapResizeFrame) return;
   processMapResizeFrame = requestAnimationFrame(() => {

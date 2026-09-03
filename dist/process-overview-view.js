@@ -206,7 +206,7 @@
     container.innerHTML = `<div class="process-diagram-scroll" tabindex="0" role="group"
       aria-label="${english ? "Process flow" : "Processflöde"}">
       <ol class="process-overview-list" data-process-layout-version="${layout.layoutVersion}"
-        style="--process-columns:${layout.columnCount}">${details.map(detail => {
+        style="--process-columns:${layout.columnCount};zoom:${Number(options.zoom) || 100}%">${details.map(detail => {
         const selected = selectedTaskIds.has(detail.taskId);
         const phase = detail.containers.phase?.title;
         const subtask = detail.containers.subtask?.title;

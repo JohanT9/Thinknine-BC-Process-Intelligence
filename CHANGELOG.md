@@ -11,6 +11,10 @@
 
 ## Unreleased
 
+- Added independent Process Overview zoom, reset, and fit-to-width controls with
+  local preference persistence, localized tooltips, bounded scaling, and
+  connector realignment.
+
 - Added an SVG process connector renderer with orthogonal row/swimlane paths,
   return paths, conditional and alternative line styles, arrow markers, and a
   safe CSS fallback when browser geometry is unavailable.
