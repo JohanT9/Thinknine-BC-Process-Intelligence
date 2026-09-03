@@ -1,5 +1,8 @@
 # BC Process Studio 4.7
 
+- Interactive and exported process maps now include a localized automatic
+  legend for the node shapes and relationship lines actually in use.
+
 - Process Overview now offers Business Central, Neutral, and Monochrome visual
   themes. The locally remembered choice is also used by SVG diagram export.
 - Theme styling includes ordinary activities, so procedure-only diagrams have

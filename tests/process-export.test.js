@@ -51,6 +51,10 @@ assert(!svg.includes("event-secret"),
   "the presentation diagram must not expose raw evidence identifiers");
 assert(svg.includes("map-node-decision"));
 assert(svg.includes("edge-conditional"));
+assert(svg.includes('class="diagram-legend"'));
+assert(svg.includes("Teckenförklaring"));
+assert(svg.includes("Beslut"));
+assert(svg.includes("Villkor"));
 
 const richSvg = svgExporter.svg({ recordingId: "rich", title: "Rich process",
   nodes: [{ nodeId: "document", nodeType: "document", title: "Sales Order", sequence: 0 },

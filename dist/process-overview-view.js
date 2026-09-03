@@ -9,12 +9,15 @@
     ? require("../document/process-lane-model") : root.T9ProcessLaneModel;
   const connectorView = typeof module === "object" && module.exports
     ? require("./process-connector-view") : root.T9ProcessConnectorView;
-  const api = factory(layout, visualGrammar, routeGrammar, laneModel, connectorView);
+  const mapLegend = typeof module === "object" && module.exports
+    ? require("../document/process-map-legend") : root.T9ProcessMapLegend;
+  const api = factory(layout, visualGrammar, routeGrammar, laneModel, connectorView,
+    mapLegend);
   if (typeof module === "object" && module.exports) module.exports = api;
   root.T9ProcessOverviewView = api;
 })(typeof globalThis !== "undefined" ? globalThis : this,
   function (graphLayout, visualGrammar, routeGrammar, processLaneModel,
-    processConnectorView) {
+    processConnectorView, processMapLegend) {
   const renderedViews = new WeakMap();
 
   function escape(value) {
@@ -166,6 +169,18 @@
     </aside>`;
   }
 
+  function legendMarkup(model, locale) {
+    const legend = processMapLegend.create(model, locale);
+    const nodes = legend.nodes.map(item => `<span class="process-grammar-legend-item">
+      <span class="process-grammar-node-symbol" data-shape="${escape(item.shape)}" aria-hidden="true"></span>
+      <span>${escape(item.label)}</span></span>`).join("");
+    const routes = legend.routes.map(item => `<span class="process-grammar-legend-item">
+      <span class="process-grammar-route-symbol" data-line="${escape(item.line)}" aria-hidden="true"></span>
+      <span>${escape(item.label)}</span></span>`).join("");
+    return `<aside class="process-grammar-legend" aria-label="${escape(legend.title)}">
+      <span class="process-grammar-legend-title">${escape(legend.title)}</span>${nodes}${routes}</aside>`;
+  }
+
   function render(container, model, options = {}) {
     if (!container) return { activityCount: 0, stateTransitionCount: 0 };
     const english = String(options.locale || "").toLowerCase().startsWith("en");
@@ -249,7 +264,8 @@
             </span>
           </button>
         </li>`;
-      }).join("")}</ol></div>${detailMarkup(selectedDetail, english)}`;
+      }).join("")}</ol></div>${legendMarkup(model, english ? "en-US" : "sv-SE")}${
+        detailMarkup(selectedDetail, english)}`;
     processConnectorView.render(container, model, {
       locale: english ? "en-US" : "sv-SE"
     });
@@ -293,6 +309,6 @@
     return true;
   }
 
-  return { containersFor, detailMarkup, render, reviewState, routeLabel, semanticState,
+  return { containersFor, detailMarkup, legendMarkup, render, reviewState, routeLabel, semanticState,
     routeSummary, routesMarkup, selectNode, taskIdFor, updateSelection };
 });

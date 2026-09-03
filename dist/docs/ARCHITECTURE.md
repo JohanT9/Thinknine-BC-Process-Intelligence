@@ -1023,6 +1023,11 @@ and SVG renderers, ensuring that a presentation preference never alters process
 semantics, evidence, or stored recordings. See
 [PROCESS_MAP_THEMES.md](PROCESS_MAP_THEMES.md).
 
+`document/process-map-legend.js` projects the node and route grammars used by a
+ProcessGraph into a renderer-neutral legend. Review and SVG adapters consume the
+same projection, ensuring standalone exports explain their notation without
+duplicating semantic inference. See [PROCESS_MAP_LEGEND.md](PROCESS_MAP_LEGEND.md).
+
 ## Business Central Document Lifecycle boundary (4.7)
 
 Document Lifecycle is configurable semantic knowledge between Process Taxonomy

@@ -11,6 +11,9 @@
 
 ## Unreleased
 
+- Added a localized, content-aware process-map legend shared by Review Studio
+  and SVG export, showing only node shapes and route styles used by the map.
+
 - Added persistent Business Central, Neutral, and Monochrome process-map themes
   that apply consistently to Review Studio and exported SVG diagrams.
 - Made theme differences explicit for ordinary activity-only diagrams through
