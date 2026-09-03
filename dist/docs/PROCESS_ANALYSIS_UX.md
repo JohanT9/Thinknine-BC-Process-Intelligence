@@ -9,12 +9,18 @@ secondary menu.
 
 The modal comparison shows:
 
+- an explicit evidence status: strong, needs confirmation, or insufficient;
 - identified reference process, domain and confidence;
 - matched recorded steps;
 - possible missing reference steps;
 - additional customer-specific steps;
 - alternative reference processes;
 - an advisory explaining that deviations are not automatically errors.
+
+A similarity percentage is never treated as sufficient proof by itself. The
+view combines deterministic Business Central recognition with graph matching.
+Weak metadata, close alternatives, or too little evidence are visibly flagged
+for confirmation instead of being presented as a confident automatic result.
 
 The consultant can confirm the proposed classification or select another
 reference. The manual decision is stored in the Review project with timestamp,

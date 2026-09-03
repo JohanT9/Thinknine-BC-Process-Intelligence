@@ -16,7 +16,7 @@
   schema, seed, lifecycleModel, lifecycleSeed
 ) {
   "use strict";
-  const ENGINE_VERSION = "1.0.0";
+  const ENGINE_VERSION = "1.1.0";
   const clone = value => value == null ? value : JSON.parse(JSON.stringify(value));
   const text = value => value == null ? "" : String(value).trim();
   const words = value => text(value).toLowerCase().replace(/[^a-z0-9åäöæø]+/g, " ").trim();
@@ -49,6 +49,15 @@
       event.accessibleTarget?.name, raw.actionCaption, raw.accessibleName, raw.label,
       raw.fieldName, raw.pageCaption, raw.pageName, raw.documentTitle, raw.automationId,
       raw.dataControlId, raw.dataControlName, raw.category, raw.type]);
+  }
+
+  function eventActionTexts(event) {
+    const raw = event.raw || {};
+    const identified = event.identification?.actionIdentity || {};
+    const controlCaption = /^(button|menuitem|option|tab)$/i.test(text(
+      event.control?.role || raw.role)) ? event.control?.name : null;
+    return unique([event.action?.caption, identified.caption, controlCaption,
+      raw.actionCaption, raw.dataControlName]);
   }
 
   function documentMatch(event, documents) {
@@ -85,7 +94,7 @@
     const identified = event.identification?.actionIdentity || {};
     const technical = words([identified.actionType, raw.actionType, raw.automationId,
       raw.dataControlId, raw.dataControlName].join(" "));
-    const captions = words(eventTexts(event).join(" "));
+    const captions = words(eventActionTexts(event).join(" "));
     const results = [];
     ACTIONS.forEach(([name, expression]) => {
       const technicalCompact = technical.replace(/\s+/g, "");
@@ -155,9 +164,14 @@
       processSteps.some(step => step.id === item.processStepId));
     const observedActions = evidence.observations.flatMap(item => item.actions.map(action => ({
       ...action, eventId: item.eventId })));
-    const actionHits = observedActions.filter(observed => expectedActions.some(expected =>
+    const matchingActions = observedActions.filter(observed => expectedActions.some(expected =>
       words(expected.name).includes(words(observed.name)) ||
       words(expected.actionType).includes(words(observed.name))));
+    const actionHits = [...matchingActions.reduce((hits, observed) => {
+      const current = hits.get(observed.name);
+      if (!current || observed.strength > current.strength) hits.set(observed.name, observed);
+      return hits;
+    }, new Map()).values()];
     const documentStrength = matchedDocuments.reduce((sum, item) => sum + item.strength, 0);
     const documentCoverage = expectedDocuments.length ? documentStrength / expectedDocuments.length : 0;
     const observedCoverage = evidence.documentSequence.length ?
@@ -178,12 +192,29 @@
     const lifecycleMatch = lifecycleMatches[0] || null;
     const lifecycleStrength = lifecycleMatch && lifecycleMatch.matchedTransitions.length
       ? lifecycleMatch.confidence : 0;
+    const expectedPositions = new Map(expectedDocuments.map((id, index) => [id, index]));
+    const relevantObserved = evidence.documentSequence.filter(item => expectedPositions.has(item.id));
+    let orderConflicts = 0;
+    for (let index = 1; index < relevantObserved.length; index += 1) {
+      if (expectedPositions.get(relevantObserved[index].id) <
+          expectedPositions.get(relevantObserved[index - 1].id)) orderConflicts += 1;
+    }
+    const unexpectedStrongDocuments = evidence.documentSequence.filter(item =>
+      item.strength >= 0.8 && !expectedDocuments.includes(item.id)).length;
     let confidence = Math.min(0.99, documentCoverage * 0.3 + observedCoverage * 0.14 +
       sequenceStrength * 0.18 + Math.min(1, actionStrength) * 0.15 +
       transitionStrength * 0.08 + lifecycleStrength * 0.15);
+    confidence = Math.max(0, confidence - Math.min(0.24, orderConflicts * 0.12) -
+      Math.min(0.2, unexpectedStrongDocuments * 0.05));
     const hasStrong = matchedDocuments.some(item => item.strength >= 0.8) ||
       actionHits.some(item => item.strength >= 0.8) || relevantTransitions.some(item => item.strength >= 0.8);
     if (!hasStrong) confidence = Math.min(confidence, 0.54);
+    const strongDocumentCount = matchedDocuments.filter(item => item.strength >= 0.8).length;
+    const strongActionCount = actionHits.filter(item => item.strength >= 0.8).length;
+    const evidenceQuality = strongDocumentCount >= 2 ||
+      (strongDocumentCount >= 1 && (strongActionCount || relevantTransitions.length))
+      ? "strong" : hasStrong ? "moderate" : "weak";
+    if (evidenceQuality === "moderate") confidence = Math.min(confidence, 0.68);
     const variant = selectVariant(process, taxonomy, evidence);
     const reasons = unique([...matchedDocuments.map(item =>
       `Matched ${item.name}${item.signal === "page-object-id" ? ` page` : ""}`),
@@ -191,7 +222,9 @@
     ...(lifecycleMatch?.explanation || []),
     matchedDocuments.length ? `Matched ${matchedDocuments.length} of ${expectedDocuments.length} process documents in sequence` : null,
     matchedDocuments.length && matchedDocuments.length < expectedDocuments.length ?
-      "Partial process sequence recognized; later steps may not have been recorded" : null]);
+      "Partial process sequence recognized; later steps may not have been recorded" : null,
+    orderConflicts ? `Detected ${orderConflicts} document order conflict${orderConflicts === 1 ? "" : "s"}` : null,
+    unexpectedStrongDocuments ? `${unexpectedStrongDocuments} strong document signal${unexpectedStrongDocuments === 1 ? " was" : "s were"} outside this process` : null]);
     return { domain: key(domain?.name), process: key(businessProcess?.name),
       variant: variant ? key(variant.name) : null, confidence: Number(confidence.toFixed(3)),
       taxonomyReferences: { domain: domain ? { id: domain.id, name: domain.name } : null,
@@ -205,6 +238,14 @@
         expectedDocuments: expectedDocuments.length, matchedActions: actionHits.length,
         matchedTransitions: relevantTransitions.length,
         matchedLifecycleTransitions: lifecycleMatch?.matchedTransitions.length || 0,
+        distinctMatchedActions: actionHits.length, orderConflicts,
+        unexpectedStrongDocuments, evidenceQuality,
+        scoreBreakdown: { documentCoverage: Number(documentCoverage.toFixed(3)),
+          observedCoverage: Number(observedCoverage.toFixed(3)),
+          sequenceStrength: Number(sequenceStrength.toFixed(3)),
+          actionStrength: Number(Math.min(1, actionStrength).toFixed(3)),
+          transitionStrength: Number(transitionStrength.toFixed(3)),
+          lifecycleStrength: Number(lifecycleStrength.toFixed(3)) },
         lifecycle: lifecycleMatch ? { lifecycleId: lifecycleMatch.lifecycleId,
           variantId: lifecycleMatch.variantId, confidence: lifecycleMatch.confidence } : null,
         strongMetadata: hasStrong } };
@@ -231,11 +272,31 @@
       .filter(item => item.confidence >= (options.minimumConfidence ?? 0.12))
       .sort((left, right) => right.confidence - left.confidence ||
         left.taxonomyReferences.bcProcess.id.localeCompare(right.taxonomyReferences.bcProcess.id));
+    const top = candidates[0] || null;
+    const runnerUp = candidates[1] || null;
+    const margin = top && runnerUp ? Number((top.confidence - runnerUp.confidence).toFixed(3)) :
+      top ? top.confidence : 0;
+    if (top) {
+      top.signals.candidateMargin = margin;
+      top.signals.ambiguous = Boolean(runnerUp && margin < 0.1);
+      if (top.signals.ambiguous) {
+        top.confidence = Number(Math.min(top.confidence, 0.64).toFixed(3));
+        top.explanation.push(`Classification is close to ${runnerUp.taxonomyReferences.bcProcess.name}; manual confirmation is recommended`);
+      }
+    }
+    const assessmentStatus = !top || top.confidence < 0.35 ? "insufficient-evidence" :
+      top.signals.ambiguous || top.confidence < 0.82 ? "review-required" : "auto-classifiable";
     return { engineVersion: ENGINE_VERSION, classificationSource: "rule",
+      assessment: { status: assessmentStatus, candidateMargin: margin,
+        evidenceQuality: top?.signals.evidenceQuality || "none",
+        manualConfirmationRecommended: assessmentStatus !== "auto-classifiable" },
       partial: candidates[0] ? candidates[0].signals.matchedDocuments <
         candidates[0].signals.expectedDocuments : false,
       classification: candidates[0] || null, alternatives: candidates.slice(1, 4),
-      evidence, diagnostics: candidates.length ? [] : [{ code: "process-not-recognized",
+      evidence, diagnostics: top?.signals.ambiguous ? [{ code: "ambiguous-process",
+        severity: "warning", message: "The leading process candidates are too close for a confident automatic decision.",
+        candidateIds: [top.taxonomyReferences.bcProcess.id,
+          runnerUp.taxonomyReferences.bcProcess.id], margin }] : candidates.length ? [] : [{ code: "process-not-recognized",
         severity: "info", message: "Available evidence did not match a known BC process pattern." }],
       aiComplement: { permitted: true, authoritativeMetadataPrecedence: true,
         status: "not-invoked" } };

@@ -32,13 +32,19 @@
       candidate.id === item.referenceId) && item.referenceId !== effectiveId) alternatives.push({
       id: item.referenceId, name: item.name,
       confidence: item.confidence, domain: item.domain || "" }); });
+    const assessment = result.assessment || result.recognition?.assessment || {};
+    const status = text(best?.assessmentStatus || assessment.status) || (confidence >= 0.82
+      ? "auto-classifiable" : confidence >= 0.35 ? "review-required" : "insufficient-evidence");
     return Object.freeze({ available: Boolean(best), referenceId: text(best?.referenceProcessId ||
       best?.referenceDiagramId || best?.referenceId), name: text(best?.referenceProcess || best?.name),
       domain: text(best?.domain), confidence, matched: clone(matched), missing: clone(missing),
       additional: clone(additional), alternatives: clone(alternatives.slice(0, 5)),
       confirmed: decision?.status === "confirmed", confirmedReferenceId:
       text(decision?.confirmedReferenceId), confirmedAt: decision?.confirmedAt || null,
-      advisory: true }); }
+      assessmentStatus: status, evidenceQuality: text(best?.evidenceQuality || assessment.evidenceQuality) || "weak",
+      candidateMargin: Number(best?.candidateMargin ?? assessment.candidateMargin ?? 0),
+      manualConfirmationRecommended: assessment.manualConfirmationRecommended === true ||
+        best?.manualConfirmationRecommended === true || status !== "auto-classifiable", advisory: true }); }
   function metric(label, value, tone) { return `<div class="process-analysis-metric ${tone}">
     <strong>${escape(value)}</strong><span>${escape(label)}</span></div>`; }
   function steps(title, values, tone, emptyLabel) { return `<section class="process-analysis-list ${tone}">
@@ -50,6 +56,12 @@
       <p>${escape(labels.noMatchText || "The recording remains valid and can be classified manually later.")}</p>
       </div>`; return model; }
     const percent = Math.round(model.confidence * 100); container.innerHTML = `
+      <p class="process-analysis-assessment ${escape(model.assessmentStatus)}" role="status">
+        <strong>${escape(labels[model.assessmentStatus] || model.assessmentStatus)}</strong>
+        <span>${escape(model.manualConfirmationRecommended ? labels.confirmationRecommended ||
+          "Confirm the classification before using it." : labels.strongEvidence ||
+          "The classification is supported by several independent signals.")}</span>
+      </p>
       <section class="process-analysis-summary" aria-labelledby="processAnalysisMatchName">
         <div><span class="process-analysis-eyebrow">${escape(labels.detected || "Detected reference process")}</span>
           <h4 id="processAnalysisMatchName">${escape(model.name)}</h4>

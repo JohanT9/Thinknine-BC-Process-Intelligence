@@ -1,5 +1,10 @@
 # BC Process Studio 4.7
 
+- Process Analysis now distinguishes strong evidence from classifications that
+  need confirmation or have insufficient evidence. Its confidence calculation
+  uses Business Central metadata, distinct actions, document order, transitions,
+  sequence quality, and separation from alternative candidates.
+
 - Large diagrams now include a compact map overview with numbered, clickable
   nodes for direct navigation to any part of the process.
 

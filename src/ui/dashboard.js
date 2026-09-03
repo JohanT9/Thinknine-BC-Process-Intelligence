@@ -3487,7 +3487,11 @@ function processAnalysisLabels() {
     none: "None", noMissing: "No expected steps are missing", noAdditional: "No additional steps",
     alternatives: "Alternative reference processes", noAlternatives: "No relevant alternatives",
     noMatchTitle: "No reliable process match", noMatchText:
-      "The recording remains valid and can be classified manually later."
+      "The recording remains valid and can be classified manually later.",
+    "auto-classifiable": "Strong process evidence", "review-required": "Needs confirmation",
+    "insufficient-evidence": "Insufficient process evidence", confirmationRecommended:
+      "Confirm the classification before using it.", strongEvidence:
+      "The classification is supported by several independent signals."
   } : {
     detected: "Identifierad referensprocess", unknownDomain: "Domän inte identifierad",
     match: "matchning", matchDegree: "Matchningsgrad", confirmed:
@@ -3498,7 +3502,11 @@ function processAnalysisLabels() {
     none: "Inga", noMissing: "Inga förväntade steg saknas", noAdditional: "Inga extra steg",
     alternatives: "Alternativa referensprocesser", noAlternatives: "Inga relevanta alternativ",
     noMatchTitle: "Ingen säker processmatchning", noMatchText:
-      "Inspelningen är fortfarande giltig och kan klassificeras manuellt senare."
+      "Inspelningen är fortfarande giltig och kan klassificeras manuellt senare.",
+    "auto-classifiable": "Starkt processunderlag", "review-required": "Behöver bekräftas",
+    "insufficient-evidence": "Otillräckligt processunderlag", confirmationRecommended:
+      "Bekräfta klassificeringen innan den används.", strongEvidence:
+      "Klassificeringen stöds av flera oberoende signaler."
   };
 }
 

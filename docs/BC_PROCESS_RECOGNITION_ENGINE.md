@@ -27,11 +27,17 @@ explanation make that limitation explicit.
 ## Confidence and precedence
 
 Confidence combines document coverage, observed-evidence coverage, ordered
-sequence, actions, and transitions. Verified page/table identity, technical BC
+sequence, distinct actions, transitions, and candidate separation. Verified page/table identity, technical BC
 actions, and explicit transitions are strong. Captions are weak. Optional
 external screenshot interpretation is recorded with very low strength and
 cannot classify a process by itself. Any candidate supported only by weak
 signals is capped below high confidence.
+
+Page and document captions are not reused as action evidence. Repeated identical
+actions count once, contradictory document order and unexpected strong documents
+reduce the score, and close leading candidates require manual confirmation. The
+result exposes `auto-classifiable`, `review-required`, or
+`insufficient-evidence`, plus the candidate margin and score breakdown.
 
 The engine returns `classificationSource: rule`. `toSemanticClassification`
 converts the selected candidate into the optional Canonical Semantic Recording

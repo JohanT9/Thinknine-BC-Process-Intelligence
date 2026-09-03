@@ -3,10 +3,12 @@
     ? require("../document/process-graph") : root.T9ProcessGraph;
   const referenceLibrary = typeof module === "object" && module.exports
     ? require("./reference-process-library") : root.T9ReferenceProcessLibrary;
-  const api = factory(graph, referenceLibrary);
+  const recognition = typeof module === "object" && module.exports
+    ? require("./bc-process-recognition-engine") : root.T9BCProcessRecognitionEngine;
+  const api = factory(graph, referenceLibrary, recognition);
   if (typeof module === "object" && module.exports) module.exports = api;
   root.T9ReferenceDiagramDataset = api;
-})(typeof globalThis !== "undefined" ? globalThis : this, function (graph, referenceLibrary) {
+})(typeof globalThis !== "undefined" ? globalThis : this, function (graph, referenceLibrary, recognition) {
   "use strict";
   const SCHEMA_VERSION = 1;
   const SOURCE_TYPES = Object.freeze(["MicrosoftDocumentation", "MicrosoftBusinessProcessCatalog",
@@ -283,6 +285,7 @@
   function matchRecordingToReferences(recording, input, options = {}) { const registry = create(input);
     const legacy = options.referenceLibrary; let processMatch = null;
     if (legacy) processMatch = referenceLibrary.matchRecordingToReference(recording, legacy, options);
+    const recognitionResult = recognition?.recognize ? recognition.recognize(recording, options) : null;
     const generated = options.processGraph || options.graphProjector?.generate(recording,
       "businessCentralProcess", options); const graphMatches = generated
       ? registry.findSimilarProcessGraphs(generated, options.limit || 5) : [];
@@ -292,18 +295,34 @@
       missingNodes: item.comparison.missingSteps.length,
       unexpectedNodes: item.comparison.additionalSteps.length, ...clone(item.comparison) }));
     const graphBest = matches[0] || null; const libraryBest = processMatch?.bestMatch || null;
-    const bestMatch = libraryBest && (!graphBest || libraryBest.confidence > graphBest.confidence)
+    const selectedBest = libraryBest && (!graphBest || libraryBest.confidence > graphBest.confidence)
       ? freeze({ referenceProcess: libraryBest.name, referenceProcessId: libraryBest.referenceId,
         domain: libraryBest.domain, confidence: libraryBest.confidence,
         matchedSteps: clone(libraryBest.matchedSteps), missingSteps: clone(libraryBest.missingSteps),
         additionalSteps: clone(libraryBest.unexpectedSteps), source: "ReferenceProcessLibrary",
         customizedBehaviorMayBeValid: true, deviationsAreErrors: false }) : graphBest;
+    const runnerUp = matches.find(item => item.referenceDiagramId !== selectedBest?.referenceDiagramId) || null;
+    const candidateMargin = selectedBest ? Number(Math.max(0, selectedBest.confidence -
+      (runnerUp?.confidence || 0)).toFixed(3)) : 0;
+    const graphEvidenceIsStrong = Boolean(graphBest && graphBest.matchedNodes >= 3 &&
+      graphBest.confidence >= 0.8 && candidateMargin >= 0.1);
+    const recognitionAssessment = recognitionResult?.assessment || null;
+    let status = recognitionAssessment?.status || "insufficient-evidence";
+    if (graphEvidenceIsStrong && status !== "auto-classifiable") status = "review-required";
+    const maximum = status === "insufficient-evidence" ? 0.34 :
+      status === "review-required" && !graphEvidenceIsStrong ? 0.69 : 1;
+    const bestMatch = selectedBest ? freeze({ ...clone(selectedBest), confidence:
+      Number(Math.min(selectedBest.confidence, maximum).toFixed(3)), assessmentStatus: status,
+      evidenceQuality: recognitionAssessment?.evidenceQuality || (graphEvidenceIsStrong ? "strong" : "weak"),
+      candidateMargin, manualConfirmationRecommended: status !== "auto-classifiable" }) : null;
     const referenceGraphs = Object.fromEntries(graphMatches.map(item => [
       item.diagram.id, clone(item.diagram.processGraph)
     ]));
     const matchingBestDiagram = registry.dataset.diagrams.find(item =>
       item.id === bestMatch?.referenceDiagramId || item.name === bestMatch?.referenceProcess);
-    return freeze({ matches, bestMatch,
+    return freeze({ matches, bestMatch, recognition: recognitionResult,
+      assessment: { status, evidenceQuality: bestMatch?.evidenceQuality || "weak", candidateMargin,
+        manualConfirmationRecommended: status !== "auto-classifiable", graphEvidenceIsStrong },
       processLibraryMatch: processMatch, observedGraph: generated ? clone(generated) : null,
       bestReferenceGraph: matchingBestDiagram ? clone(matchingBestDiagram.processGraph) : null,
       referenceGraphs, deviationsAreErrors: false }); }

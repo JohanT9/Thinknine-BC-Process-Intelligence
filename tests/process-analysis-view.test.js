@@ -25,6 +25,7 @@ assert.strictEqual(normalized.missing.length, 1);
 assert.strictEqual(normalized.additional.length, 1);
 assert.strictEqual(normalized.alternatives.length, 2);
 assert.strictEqual(normalized.advisory, true);
+assert.strictEqual(normalized.assessmentStatus, "auto-classifiable");
 
 const selected = view.normalize(result, { confirmedReferenceId: "diagram:basic",
   confirmedAt: "2026-09-02T15:00:00Z", status: "confirmed" });
@@ -41,6 +42,7 @@ assert(container.innerHTML.includes("91%"));
 assert(container.innerHTML.includes("Customer Approval"));
 assert(container.innerHTML.includes('role="progressbar"'));
 assert(container.innerHTML.includes('name="processAnalysisReference"'));
+assert(container.innerHTML.includes("auto-classifiable"));
 assert(!container.innerHTML.includes("undefined"));
 
 const malicious = { bestMatch: { referenceProcessId: "unsafe", referenceProcess:
@@ -49,6 +51,13 @@ const malicious = { bestMatch: { referenceProcessId: "unsafe", referenceProcess:
 view.render(container, { result: malicious });
 assert(!container.innerHTML.includes("<img"), "Reference labels must be escaped.");
 assert(container.innerHTML.includes("&lt;img"));
+
+const uncertain = { ...result, assessment: { status: "review-required", evidenceQuality: "weak",
+  candidateMargin: 0.03, manualConfirmationRecommended: true } };
+const uncertainModel = view.render(container, { result: uncertain }, {
+  "review-required": "Needs confirmation", confirmationRecommended: "Confirm first." });
+assert.strictEqual(uncertainModel.manualConfirmationRecommended, true);
+assert(container.innerHTML.includes("Needs confirmation"));
 
 const selectedContainer = { querySelector() { return { value: "diagram:basic",
   dataset: { referenceName: "Basic Warehouse Outbound" } }; } };

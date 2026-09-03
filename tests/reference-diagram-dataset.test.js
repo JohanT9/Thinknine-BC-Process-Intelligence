@@ -108,6 +108,9 @@ assert.strictEqual(recordingMatch.bestMatch.referenceProcess, "Advanced Warehous
 assert.strictEqual(recordingMatch.observedGraph.graphId, advanced.processGraph.graphId);
 assert.strictEqual(recordingMatch.bestReferenceGraph.graphId, advanced.processGraph.graphId);
 assert(recordingMatch.referenceGraphs[advanced.id]);
+assert.strictEqual(recordingMatch.assessment.status, "review-required");
+assert.strictEqual(recordingMatch.bestMatch.confidence, 1);
+assert(recordingMatch.recognition);
 
 const extended = JSON.parse(JSON.stringify(seed));
 extended.concepts.push({ id: "concept:aptean-quality-check", canonicalName: "Quality Check",

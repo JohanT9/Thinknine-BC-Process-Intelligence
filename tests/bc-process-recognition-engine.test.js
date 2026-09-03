@@ -97,12 +97,46 @@ const weak = engine.recognize(captionOnly);
 assert(weak.classification);
 assert(weak.classification.confidence <= 0.54);
 assert.strictEqual(weak.classification.signals.strongMetadata, false);
+assert(weak.evidence.observations.every(item => item.actions.length === 0),
+  "page and document captions must not be interpreted as business actions");
+
+const repeatedRelease = synthetic("repeated-release", [
+  { identification: page(42, 36, "order", "SalesOrder") },
+  { label: "Release", automationId: "Release", identification: action("ReleaseDocument", "Release") },
+  { label: "Release", automationId: "Release", identification: action("ReleaseDocument", "Release") },
+  { label: "Release", automationId: "Release", identification: action("ReleaseDocument", "Release") }
+]);
+const repeatedResult = engine.recognize(repeatedRelease);
+assert.strictEqual(repeatedResult.classification.signals.distinctMatchedActions, 1,
+  "repeated UI events must not inflate action evidence");
+assert.strictEqual(repeatedResult.classification.signals.evidenceQuality, "strong");
+
+const singleReceipt = synthetic("single-receipt", [
+  { identification: page(7332, 7316, "warehouse-document", "WarehouseReceipt") }
+]);
+const ambiguousReceipt = engine.recognize(singleReceipt);
+assert.strictEqual(ambiguousReceipt.assessment.status, "insufficient-evidence");
+assert.strictEqual(ambiguousReceipt.assessment.manualConfirmationRecommended, true);
+assert.strictEqual(ambiguousReceipt.classification.signals.ambiguous, true);
+assert(ambiguousReceipt.diagnostics.some(item => item.code === "ambiguous-process"));
+
+const reverseOutbound = synthetic("reverse-outbound", [
+  { identification: page(7345, 5766, "warehouse-activity", "WarehousePick") },
+  { identification: page(7335, 7320, "warehouse-document", "WarehouseShipment") }
+]);
+const reverseResult = engine.recognize(reverseOutbound, { minimumConfidence: 0.01 });
+const outboundCandidate = [reverseResult.classification, ...reverseResult.alternatives]
+  .filter(Boolean).find(item => item.taxonomyReferences.bcProcess.id ===
+    "bc-process:warehouse:outbound-pick-shipment");
+assert(outboundCandidate.signals.orderConflicts >= 1);
+assert(outboundCandidate.explanation.some(item => item.includes("order conflict")));
 
 const visualOnly = synthetic("visual-only", [{ label: "Unidentified page" }]);
 const visual = engine.recognize(visualOnly, { screenshotEvidence: {
   [visualOnly.events[0].id]: { possibleDocument: "Sales Order", confidence: 0.99 }
 } });
 assert.strictEqual(visual.classification, null);
+assert.strictEqual(visual.assessment.status, "insufficient-evidence");
 assert.strictEqual(visual.aiComplement.authoritativeMetadataPrecedence, true);
 const before = JSON.stringify(outbound);
 engine.recognize(outbound);
