@@ -32,6 +32,12 @@ then projects the available deterministic classification into the map. Their
 availability no longer depends on an asynchronous result having arrived during
 the first render.
 
+For a legacy recording without stored semantic classifications, the Business
+Process map projects domain, business process, and recognized BC flow. The BC
+Process map shows observed canonical documents and unobserved reference
+documents as suggestions. Suggestions are guidance, not claims that the
+customer process is incomplete.
+
 The consultant can confirm the proposed classification or select another
 reference. The manual decision is stored in the Review project with timestamp,
 source and status and follows the existing autosave workflow.

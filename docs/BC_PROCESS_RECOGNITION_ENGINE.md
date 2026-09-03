@@ -37,7 +37,10 @@ Page and document captions are not reused as action evidence. Repeated identical
 actions count once, contradictory document order and unexpected strong documents
 reduce the score, and close leading candidates require manual confirmation. The
 result exposes `auto-classifiable`, `review-required`, or
-`insufficient-evidence`, plus the candidate margin and score breakdown.
+`insufficient-evidence`, plus the candidate margin and score breakdown. Each
+candidate also exposes immutable `processEvidence` with matched documents,
+canonical expected documents, and matched actions, so consumers need not parse
+human-readable explanation text.
 
 Swedish Business Central document captions are canonical aliases, including
 Inköpsorder, Distributionslagerinleverans and Överföringsorder. This allows older

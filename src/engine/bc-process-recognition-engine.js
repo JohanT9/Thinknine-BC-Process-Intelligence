@@ -235,6 +235,14 @@
       matchedEventIds: unique([...matchedDocuments.map(item => item.eventId),
         ...actionHits.map(item => item.eventId),
         ...relevantTransitions.flatMap(item => item.sourceEventIds || [])]),
+      processEvidence: {
+        matchedDocuments: matchedDocuments.map(item => ({ id: item.id, name: item.name,
+          eventId: item.eventId, strength: item.strength })),
+        expectedDocuments: expectedDocuments.map(id => { const document = taxonomy.documents
+          .find(item => item.id === id); return { id, name: document?.name || id }; }),
+        matchedActions: actionHits.map(item => ({ name: item.name, eventId: item.eventId,
+          strength: item.strength }))
+      },
       explanation: reasons, signals: { matchedDocuments: matchedDocuments.length,
         expectedDocuments: expectedDocuments.length, matchedActions: actionHits.length,
         matchedTransitions: relevantTransitions.length,

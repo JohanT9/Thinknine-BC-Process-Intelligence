@@ -11,6 +11,11 @@
 
 ## Unreleased
 
+- Added useful semantic maps for legacy recordings: deterministic recognition
+  now publishes matched and expected document evidence, allowing Business
+  Process and BC Process views to distinguish observed documents from suggested
+  lifecycle steps.
+
 - Kept Business Process and BC Process map levels selectable for legacy
   recordings and load Process Analysis on demand instead of disabling the
   controls during asynchronous analysis.

@@ -66,6 +66,10 @@ const purchase = synthetic("purchase", [
 const recognizedPurchase = engine.recognize(purchase);
 assert.strictEqual(recognizedPurchase.classification.domain, "SourceToPay");
 assert.strictEqual(recognizedPurchase.classification.process, "PurchaseToPay");
+assert.deepStrictEqual(recognizedPurchase.classification.processEvidence.matchedDocuments
+  .map(item => item.id), ["document:purchase-order", "document:warehouse-receipt",
+  "document:warehouse-put-away", "document:posted-purchase-receipt"]);
+assert(recognizedPurchase.classification.processEvidence.expectedDocuments.length >= 5);
 assert(recognizedPurchase.alternatives.some(item => item.process === "WarehouseInbound"));
 
 const swedishPurchase = synthetic("swedish-purchase", [

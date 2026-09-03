@@ -312,12 +312,19 @@
       selectedDomain !== recognizedDomain && !selectedDomain.endsWith(recognizedDomain.split(":").at(-1));
     if (deterministicEntityMatch && (!selectedBest || conflictsWithRecognizedDomain ||
       recognized.confidence >= selectedBest.confidence)) {
+      const observedDocumentIds = new Set(array(recognized.processEvidence?.matchedDocuments)
+        .map(item => item.id));
       selectedBest = freeze({ referenceProcess:
         recognized.taxonomyReferences.bcProcess.name,
       referenceProcessId: recognized.taxonomyReferences.bcProcess.id,
+      businessProcess: recognized.taxonomyReferences.businessProcess?.name || null,
       domain: recognized.taxonomyReferences.domain.name, confidence: recognized.confidence,
-      matchedSteps: array(recognitionResult.evidence?.documentSequence).map(item => ({ name: item.name })),
-      missingSteps: [], additionalSteps: [], source: "BCProcessRecognitionEngine",
+      matchedSteps: array(recognized.processEvidence?.matchedDocuments).map(item => ({
+        type: "document", id: item.id, name: item.name })),
+      missingSteps: array(recognized.processEvidence?.expectedDocuments)
+        .filter(item => !observedDocumentIds.has(item.id)).map(item => ({
+          type: "document", id: item.id, name: item.name, suggested: true })),
+      additionalSteps: [], source: "BCProcessRecognitionEngine",
       customizedBehaviorMayBeValid: true, deviationsAreErrors: false });
     }
     const runnerUp = matches.find(item => item.referenceDiagramId !== selectedBest?.referenceDiagramId) || null;

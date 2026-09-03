@@ -1,5 +1,9 @@
 # BC Process Studio 4.7
 
+- Semantic maps for older recordings now show the recognized domain and
+  business process, observed Business Central documents, and visually distinct
+  suggested lifecycle steps.
+
 - Business Process and BC Process map levels are now selectable for older
   recordings; Process Analysis loads automatically when a semantic level is
   selected.

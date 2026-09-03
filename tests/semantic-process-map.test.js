@@ -48,6 +48,20 @@ assert.strictEqual(business.nodes.at(-1).metadata.semanticStatus, "observed");
 assert.strictEqual(semanticMap.project(input, "procedure"), procedureModel);
 assert.strictEqual(semanticMap.project({ recordingId: "empty", analysis: {} },
   "businessCentral").nodes.length, 0);
+const legacyAnalysis = { bestMatch: { referenceProcessId: "purchase", referenceProcess:
+  "Purchase Order Flow", domain: "Source to Pay", businessProcess: "Purchase to Pay",
+  confidence: 0.49, matchedSteps: [{ id: "document:purchase-order", name: "Purchase Order" }],
+  missingSteps: [{ id: "document:warehouse-receipt", name: "Warehouse Receipt",
+    suggested: true }], additionalSteps: [] } };
+const legacyBusiness = semanticMap.project({ recordingId: "legacy", title: "Legacy",
+  analysis: legacyAnalysis }, "business");
+assert.deepStrictEqual(legacyBusiness.nodes.map(node => node.title),
+  ["Source to Pay", "Purchase to Pay", "Purchase Order Flow"]);
+const legacyBc = semanticMap.project({ recordingId: "legacy", title: "Legacy",
+  analysis: legacyAnalysis }, "businessCentral");
+assert.deepStrictEqual(legacyBc.nodes.map(node => node.title),
+  ["Purchase Order", "Warehouse Receipt"]);
+assert.strictEqual(legacyBc.nodes[1].metadata.semanticStatus, "suggested");
 assert.throws(() => semanticMap.project(input, "pixels"), /Unsupported semantic process-map level/);
 
 const selectedAnalysis = { ...analysis, referenceGraphs: { alternative: { ...referenceGraph,
