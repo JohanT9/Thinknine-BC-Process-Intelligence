@@ -11,6 +11,10 @@
 
 ## Unreleased
 
+- Added a renderer-neutral adaptive ProcessGraph layout that wraps long process
+  maps into readable rows, emits edge route intent, and responds to available
+  Review Studio width without changing process semantics.
+
 - Added multi-level semantic Process Overview maps for Business Process, BC
   Process and User Procedure with observed, suggested and customer-specific
   nodes.

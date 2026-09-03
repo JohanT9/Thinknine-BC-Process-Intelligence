@@ -3373,6 +3373,7 @@ let activeProcessModel = null;
 let activeProcessAnalysis = null;
 let processAnalysisRequest = null;
 let activeProcessMapLevel = "businessCentral";
+let processMapResizeFrame = null;
 let activeReviewSelection = globalThis.T9ReviewSelection.create();
 let activeReviewEdit = null;
 let reviewReturnFocus = null;
@@ -6867,6 +6868,17 @@ $("processMapLevels").addEventListener("click", event => {
   activeProcessMapLevel = button.dataset.processMapLevel;
   renderProcessOverview();
   $("processOverview").querySelector("[data-process-node-action]")?.focus();
+});
+function scheduleProcessMapLayout() {
+  if (!activeReview || !$('processOverviewDisclosure')?.open || processMapResizeFrame) return;
+  processMapResizeFrame = requestAnimationFrame(() => {
+    processMapResizeFrame = null;
+    renderProcessOverview();
+  });
+}
+window.addEventListener("resize", scheduleProcessMapLayout);
+$("processOverviewDisclosure").addEventListener("toggle", event => {
+  if (event.currentTarget.open) scheduleProcessMapLayout();
 });
 $("processMapLevels").addEventListener("keydown", event => {
   if (!["ArrowLeft", "ArrowRight", "Home", "End"].includes(event.key)) return;

@@ -968,6 +968,12 @@ reliable metadata. See
 
 ## Multi-level ProcessGraph boundary (4.7)
 
+ProcessGraph presentation passes through the immutable
+`document/process-graph-layout.js` contract. It assigns deterministic rows and
+columns and describes connector route intent without adding layout information
+to the taxonomy, semantic recording, or ProcessGraph source model. HTML and
+future SVG/BPMN/Visio adapters may consume this contract independently.
+
 `ProcessGraph` is the renderer-neutral diagram contract projected from Canonical
 Recording, Process Taxonomy, and Semantic Classification. One deterministic
 projection produces Business Process, Business Central Process, and User

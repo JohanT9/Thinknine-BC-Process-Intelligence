@@ -44,6 +44,7 @@ assert(container.innerHTML.includes('class="process-overview-review-state attent
 assert(container.innerHTML.includes("Granskad"));
 assert(container.innerHTML.includes("Granska"));
 assert(container.innerHTML.includes('class="process-diagram-scroll"'));
+assert(container.innerHTML.includes('data-process-layout-version="1.0.0"'));
 assert(container.innerHTML.includes('class="process-overview-detail"'));
 assert(container.innerHTML.includes("Försäljningsorder"));
 assert(container.innerHTML.includes("Frisläpp order"));
@@ -152,9 +153,19 @@ view.render(semanticContainer, { nodes: [{ nodeId: "suggestion", nodeType: "acti
 transitions: [], subprocesses: [], stateTransitions: [] }, { locale: "sv-SE" });
 assert(semanticContainer.innerHTML.includes("process-overview-semantic-suggested"));
 assert(semanticContainer.innerHTML.includes("Referensförslag"));
+const wrappingContainer = { innerHTML: "", clientWidth: 450 };
+view.render(wrappingContainer, { nodes: Array.from({ length: 5 }, (_, index) => ({
+  nodeId: `wrap-${index}`, nodeType: "activity", title: `Step ${index}`,
+  processOrder: index
+})), transitions: [], subprocesses: [], stateTransitions: [] }, { locale: "en-US" });
+assert(wrappingContainer.innerHTML.includes("--process-columns:2"));
+assert.strictEqual((wrappingContainer.innerHTML.match(/process-overview-row-end/g) || []).length, 2);
 const dashboardHtml = fs.readFileSync("src/ui/dashboard.html", "utf8");
 assert(dashboardHtml.includes('id="processMapLevels"'));
 assert(dashboardHtml.includes('data-process-map-level="businessCentral"'));
 assert(dashboardHtml.includes('src="document/semantic-process-map.js"'));
+assert(dashboardHtml.includes('src="document/process-graph-layout.js"'));
 assert(dashboard.includes('activeProcessMapLevel = button.dataset.processMapLevel'));
+assert(dashboard.includes('window.addEventListener("resize", scheduleProcessMapLayout)'));
+assert(dashboard.includes('$("processOverviewDisclosure").addEventListener("toggle"'));
 console.log("Process Overview view tests passed.");

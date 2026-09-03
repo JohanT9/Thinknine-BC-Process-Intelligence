@@ -1,8 +1,10 @@
 (function (root, factory) {
-  const api = factory();
+  const layout = typeof module === "object" && module.exports
+    ? require("../document/process-graph-layout") : root.T9ProcessGraphLayout;
+  const api = factory(layout);
   if (typeof module === "object" && module.exports) module.exports = api;
   root.T9ProcessOverviewView = api;
-})(typeof globalThis !== "undefined" ? globalThis : this, function () {
+})(typeof globalThis !== "undefined" ? globalThis : this, function (graphLayout) {
   const renderedViews = new WeakMap();
 
   function escape(value) {
@@ -165,9 +167,15 @@
     const details = activityDetails(model, activities, stateTransitions, options);
     const selectedDetail = details.find(detail => selectedTaskIds.has(detail.taskId)) || details[0];
     renderedViews.set(container, { details, english });
+    const layout = graphLayout.create(model, {
+      availableWidth: options.availableWidth || container.clientWidth || undefined
+    });
+    const placementById = new Map(layout.nodes.map(item => [item.nodeId, item]));
+    const rowEndIds = new Set(layout.rows.slice(0, -1).map(row => row.nodeIds.at(-1)));
     container.innerHTML = `<div class="process-diagram-scroll" tabindex="0" role="group"
       aria-label="${english ? "Process flow" : "Processflöde"}">
-      <ol class="process-overview-list">${details.map(detail => {
+      <ol class="process-overview-list" data-process-layout-version="${layout.layoutVersion}"
+        style="--process-columns:${layout.columnCount}">${details.map(detail => {
         const selected = selectedTaskIds.has(detail.taskId);
         const phase = detail.containers.phase?.title;
         const subtask = detail.containers.subtask?.title;
@@ -175,8 +183,11 @@
         const status = reviewState(detail, english);
         const semantic = semanticState(detail, english);
         const title = plain(detail.node.title);
+        const placement = placementById.get(detail.node.nodeId);
         return `<li class="process-overview-step${decision ? " process-overview-decision" : ""}${
+          rowEndIds.has(detail.node.nodeId) ? " process-overview-row-end" : ""}${
           semantic ? ` process-overview-semantic-${semantic.name}` : ""}"
+          data-process-row="${placement?.row ?? 0}" data-process-column="${placement?.column ?? 0}"
           data-process-node-id="${escape(detail.node.nodeId)}" data-process-decision="${decision}">
           <button type="button" class="process-overview-action"
             data-process-node-action="${escape(detail.node.nodeId)}"

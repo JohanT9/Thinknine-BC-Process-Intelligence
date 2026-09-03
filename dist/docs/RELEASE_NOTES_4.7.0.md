@@ -429,6 +429,8 @@ or På/Av values.
   back to corresponding Review steps.
 - Added responsive legends, level-specific guidance and keyboard navigation
   without introducing a second diagram renderer.
+- Long maps now use an adaptive multi-row layout with clear downward flow
+  continuation instead of requiring one long horizontal scroll.
 
 # Reference Process Library
 
