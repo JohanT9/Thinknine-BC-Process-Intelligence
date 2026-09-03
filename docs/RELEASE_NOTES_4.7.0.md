@@ -437,6 +437,9 @@ or På/Av values.
 - Decisions and other non-sequential relationships now show their route labels
   and destinations directly in the map, with distinct treatments for
   alternatives, returns, document creation, and posting.
+- Existing process phases and semantic roles now appear as horizontal
+  swimlanes, reducing repeated labels and making responsibility or phase
+  boundaries easier to scan.
 
 # Reference Process Library
 

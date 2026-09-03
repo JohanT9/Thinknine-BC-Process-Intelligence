@@ -11,6 +11,10 @@
 
 ## Unreleased
 
+- Added renderer-neutral process swimlanes derived from existing phases and
+  semantic process roles, with uncluttered fallback behavior for recordings
+  that have no grouping metadata.
+
 - Added visible conditional, alternative, return, creation, and posting routes
   to process maps through a renderer-neutral route grammar, including localized
   route labels and screen-reader summaries.

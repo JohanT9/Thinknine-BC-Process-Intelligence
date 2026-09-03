@@ -985,6 +985,11 @@ Relationship appearance is resolved by
 into line, marker, tone, and localized-label intent. Explicit conditions remain
 semantic graph data; route styling remains a renderer concern.
 
+Process phase and role grouping is projected by
+`document/process-lane-model.js`. It consumes Process Model containers and
+semantic role metadata and returns immutable lane membership and segments.
+The projector does not reorder nodes and does not create business semantics.
+
 `ProcessGraph` is the renderer-neutral diagram contract projected from Canonical
 Recording, Process Taxonomy, and Semantic Classification. One deterministic
 projection produces Business Process, Business Central Process, and User

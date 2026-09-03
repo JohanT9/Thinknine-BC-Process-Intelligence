@@ -5,11 +5,13 @@
     ? require("../document/process-visual-grammar") : root.T9ProcessVisualGrammar;
   const routeGrammar = typeof module === "object" && module.exports
     ? require("../document/process-route-grammar") : root.T9ProcessRouteGrammar;
-  const api = factory(layout, visualGrammar, routeGrammar);
+  const laneModel = typeof module === "object" && module.exports
+    ? require("../document/process-lane-model") : root.T9ProcessLaneModel;
+  const api = factory(layout, visualGrammar, routeGrammar, laneModel);
   if (typeof module === "object" && module.exports) module.exports = api;
   root.T9ProcessOverviewView = api;
 })(typeof globalThis !== "undefined" ? globalThis : this,
-  function (graphLayout, visualGrammar, routeGrammar) {
+  function (graphLayout, visualGrammar, routeGrammar, processLaneModel) {
   const renderedViews = new WeakMap();
 
   function escape(value) {
@@ -188,8 +190,16 @@
     const layout = graphLayout.create(model, {
       availableWidth: options.availableWidth || container.clientWidth || undefined
     });
+    const lanes = processLaneModel.create(model, { unassignedTitle: english
+      ? "Other steps" : "Övriga steg" });
     const placementById = new Map(layout.nodes.map(item => [item.nodeId, item]));
-    const rowEndIds = new Set(layout.rows.slice(0, -1).map(row => row.nodeIds.at(-1)));
+    const laneById = new Map(lanes.lanes.map(lane => [lane.laneId, lane]));
+    const laneStartIds = new Map(lanes.segments.map(segment => [segment.nodeIds[0],
+      laneById.get(segment.laneId)]));
+    const laneEndIds = lanes.visible ? lanes.segments.slice(0, -1)
+      .map(segment => segment.nodeIds.at(-1)) : [];
+    const rowEndIds = new Set([...layout.rows.slice(0, -1).map(row => row.nodeIds.at(-1)),
+      ...laneEndIds]);
     container.innerHTML = `<div class="process-diagram-scroll" tabindex="0" role="group"
       aria-label="${english ? "Process flow" : "Processflöde"}">
       <ol class="process-overview-list" data-process-layout-version="${layout.layoutVersion}"
@@ -205,7 +215,9 @@
         const visual = visualGrammar.presentationFor(detail.node,
           english ? "en-US" : "sv-SE");
         const accessibleRoutes = routeSummary(detail, english);
-        return `<li class="process-overview-step${decision ? " process-overview-decision" : ""}${
+        const lane = laneStartIds.get(detail.node.nodeId);
+        return `${lanes.visible && lane ? `<li class="process-overview-lane" data-process-lane-id="${
+          escape(lane.laneId)}"><span>${escape(lane.title)}</span></li>` : ""}<li class="process-overview-step${decision ? " process-overview-decision" : ""}${
           rowEndIds.has(detail.node.nodeId) ? " process-overview-row-end" : ""}${
           ` process-overview-kind-${visual.kind}`}${
           semantic ? ` process-overview-semantic-${semantic.name}` : ""}"
@@ -219,7 +231,7 @@
             aria-label="${escape(`${english ? "Step" : "Steg"} ${detail.index + 1}: ${title}${status ? `. ${status.label}` : ""}${accessibleRoutes ? `. ${accessibleRoutes}` : ""}`)}">
             <span class="process-overview-number" aria-hidden="true"><span>${decision ? "?" : detail.index + 1}</span></span>
             <span class="process-overview-content">
-              ${phase ? `<span class="process-overview-phase">${escape(phase)}</span>` : ""}
+              ${phase && !lanes.visible ? `<span class="process-overview-phase">${escape(phase)}</span>` : ""}
               ${subtask ? `<span class="process-overview-subtask">${escape(subtask)}</span>` : ""}
               ${!["action", "process-step"].includes(visual.kind)
                 ? `<span class="process-overview-node-type">${escape(visual.label)}</span>` : ""}
