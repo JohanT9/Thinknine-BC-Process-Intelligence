@@ -11,6 +11,10 @@
 
 ## Unreleased
 
+- Fixed packaged Process Overview assets omitted from `dist`, including the
+  minimap and search runtimes; generated-build tests now verify every local
+  dashboard script dependency.
+
 - Strengthened Business Central process assessment with action-specific
   evidence, duplicate-signal suppression, document-order penalties, candidate
   margins, and explicit confidence states in Review Studio. Weak or ambiguous

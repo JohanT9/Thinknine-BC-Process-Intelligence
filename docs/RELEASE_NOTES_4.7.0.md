@@ -1,5 +1,9 @@
 # BC Process Studio 4.7
 
+- Fixed Process Overview in the installed Edge package by including its minimap
+  and search runtimes. The release check now detects any missing local dashboard
+  script.
+
 - Process Analysis now distinguishes strong evidence from classifications that
   need confirmation or have insufficient evidence. Its confidence calculation
   uses Business Central metadata, distinct actions, document order, transitions,

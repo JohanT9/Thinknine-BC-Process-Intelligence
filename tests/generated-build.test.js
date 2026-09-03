@@ -8,6 +8,7 @@ const packageJson = JSON.parse(read("package.json"));
 const dashboard = read("dist/dashboard.js");
 const content = read("dist/content.js");
 const background = read("dist/background.js");
+const dashboardHtml = read("dist/dashboard.html");
 
 assert.ok(!dashboard.includes("__APP_VERSION__"));
 assert.ok(!background.includes("__APP_VERSION__"));
@@ -41,5 +42,10 @@ assert.ok(fs.existsSync(path.join(root,
   "dist/bug-report/azure-devops-adapter.js")));
 assert.ok(fs.existsSync(path.join(root,
   "dist/bug-report/github-issue-adapter.js")));
+const localScripts = [...dashboardHtml.matchAll(/<script\s+src="([^"]+)"/g)]
+  .map(match => match[1]).filter(source => !/^https?:/i.test(source));
+assert(localScripts.length > 0);
+localScripts.forEach(source => assert.ok(fs.existsSync(path.join(root, "dist", source)),
+  `Built dashboard dependency is missing: ${source}`));
 
 console.log("Generated build version integrity tests passed.");
