@@ -17,6 +17,19 @@
   ].map(([id, name]) => ({ id, name, namespace: "bc",
     description: `${name} processes in Microsoft Dynamics 365 Business Central.` }));
 
+  const documentAliases = {
+    "document:sales-order": ["Försäljningsorder"],
+    "document:warehouse-shipment": ["Lagerutleverans", "Distributionslagerutleverans"],
+    "document:warehouse-pick": ["Lagerplockning", "Distributionslagerplockning"],
+    "document:purchase-order": ["Inköpsorder"],
+    "document:warehouse-receipt": ["Lagerinleverans", "Distributionslagerinleverans"],
+    "document:warehouse-put-away": ["Lagerinlagring", "Distributionslagerinlagring"],
+    "document:purchase-invoice": ["Inköpsfaktura"],
+    "document:transfer-order": ["Överföringsorder"],
+    "document:production-order": ["Produktionsorder"],
+    "document:assembly-order": ["Monteringsorder"],
+    "document:planning-worksheet": ["Planeringsförslag"]
+  };
   const documents = [
     ["document:sales-quote", "Sales Quote", "quote", ["41"], ["36", "37"]],
     ["document:sales-order", "Sales Order", "order", ["42"], ["36", "37"]],
@@ -43,7 +56,7 @@
     ["document:assembly-order", "Assembly Order", "assembly-order", ["900"], ["900", "901"]],
     ["document:planning-worksheet", "Planning Worksheet", "worksheet", ["99000852"], ["246"]]
   ].map(([id, name, documentType, pageIds, tableIds]) => ({
-    id, name, documentType, pageIds, tableIds
+    id, name, documentType, pageIds, tableIds, aliases: documentAliases[id] || []
   }));
 
   const definitions = [

@@ -83,7 +83,8 @@
         signal: "source-table", explanation: `Matched ${candidates[0].name} table ${tableId}` };
     }
     const combined = words(eventTexts(event).join(" "));
-    const candidates = documents.filter(item => combined.includes(words(item.name)));
+    const candidates = documents.filter(item => [item.name, ...(item.aliases || [])]
+      .some(name => combined.includes(words(name))));
     if (candidates.length === 1) return { document: candidates[0], strength: 0.32,
       signal: "caption-text", explanation: `Caption suggests ${candidates[0].name}` };
     return null;

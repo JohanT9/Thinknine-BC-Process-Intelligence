@@ -68,6 +68,15 @@ assert.strictEqual(recognizedPurchase.classification.domain, "SourceToPay");
 assert.strictEqual(recognizedPurchase.classification.process, "PurchaseToPay");
 assert(recognizedPurchase.alternatives.some(item => item.process === "WarehouseInbound"));
 
+const swedishPurchase = synthetic("swedish-purchase", [
+  { label: "Ny - Inköpsorder (UAT)" },
+  { label: "Distributionslagerinleverans - DIR100224 (UAT)" }
+]);
+assert.deepStrictEqual(swedishPurchase.events.length, 2);
+const swedishEvidence = engine.extractEvidence(swedishPurchase);
+assert.deepStrictEqual(swedishEvidence.documentSequence.map(item => item.id),
+  ["document:purchase-order", "document:warehouse-receipt"]);
+
 const transfer = synthetic("transfer", [
   { identification: page(5740, 5740, "order", "TransferOrder") },
   { label: "Post Shipment", automationId: "PostTransferShipment", identification: action("PostDocument", "Post Transfer Shipment") },

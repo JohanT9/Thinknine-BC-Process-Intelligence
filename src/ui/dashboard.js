@@ -3506,7 +3506,21 @@ function processAnalysisLabels() {
     "auto-classifiable": "Starkt processunderlag", "review-required": "Behöver bekräftas",
     "insufficient-evidence": "Otillräckligt processunderlag", confirmationRecommended:
       "Bekräfta klassificeringen innan den används.", strongEvidence:
-      "Klassificeringen stöds av flera oberoende signaler."
+      "Klassificeringen stöds av flera oberoende signaler.", processNames: {
+        "Source to Pay": "Inköp till betalning", "domain:source-to-pay": "Inköp till betalning",
+        "Purchase to Pay": "Inköp till betalning",
+        "Simple Purchase Order": "Enkel inköpsorder", "Warehouse Inbound": "Lagerinleverans",
+        "Transfer Order": "Överföringsorder", "Inventory Transfer": "Lageröverföring",
+        "Assembly Order": "Monteringsorder", "Production Order": "Produktionsorder",
+        "Planning Worksheet": "Planeringsförslag", "Warehouse Movement": "Lagerförflyttning",
+        "Sales Order": "Försäljningsorder", "Simple Sales Order": "Enkel försäljningsorder",
+        "Purchase Order": "Inköpsorder", "Warehouse Receipt": "Lagerinleverans",
+        "Warehouse Put-away": "Lagerinlagring",
+        "Purchase Order → Warehouse Receipt → Put-away → Posted Receipt → Purchase Invoice":
+          "Inköpsorder → Lagerinleverans → Inlagring → Bokförd inleverans → Inköpsfaktura",
+        "Transfer Order → Transfer Shipment → In-transit → Transfer Receipt":
+          "Överföringsorder → Överföringsutleverans → På väg → Överföringsinleverans"
+      }
   };
 }
 

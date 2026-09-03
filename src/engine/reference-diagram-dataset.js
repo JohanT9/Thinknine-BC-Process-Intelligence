@@ -291,19 +291,40 @@
       ? registry.findSimilarProcessGraphs(generated, options.limit || 5) : [];
     const matches = graphMatches.map(item => freeze({ referenceDiagramId: item.diagram.id,
       referenceProcess: item.diagram.bcProcess || item.diagram.name, confidence: item.confidence,
+      domain: item.diagram.domain, businessProcess: item.diagram.businessProcess,
       matchedNodes: item.comparison.matchedSteps.length,
       missingNodes: item.comparison.missingSteps.length,
-      unexpectedNodes: item.comparison.additionalSteps.length, ...clone(item.comparison) }));
+      unexpectedNodes: item.comparison.additionalSteps.length, ...clone(item.comparison) }))
+      .filter(item => item.matchedNodes > 0);
     const graphBest = matches[0] || null; const libraryBest = processMatch?.bestMatch || null;
-    const selectedBest = libraryBest && (!graphBest || libraryBest.confidence > graphBest.confidence)
+    let selectedBest = libraryBest && (!graphBest || libraryBest.confidence > graphBest.confidence)
       ? freeze({ referenceProcess: libraryBest.name, referenceProcessId: libraryBest.referenceId,
         domain: libraryBest.domain, confidence: libraryBest.confidence,
         matchedSteps: clone(libraryBest.matchedSteps), missingSteps: clone(libraryBest.missingSteps),
         additionalSteps: clone(libraryBest.unexpectedSteps), source: "ReferenceProcessLibrary",
         customizedBehaviorMayBeValid: true, deviationsAreErrors: false }) : graphBest;
+    const recognized = recognitionResult?.classification;
+    const deterministicEntityMatch = Boolean(recognized?.signals?.strongMetadata &&
+      recognized.signals.matchedDocuments > 0);
+    const selectedDomain = text(selectedBest?.domain).toLocaleLowerCase();
+    const recognizedDomain = text(recognized?.taxonomyReferences?.domain?.id).toLocaleLowerCase();
+    const conflictsWithRecognizedDomain = selectedDomain && recognizedDomain &&
+      selectedDomain !== recognizedDomain && !selectedDomain.endsWith(recognizedDomain.split(":").at(-1));
+    if (deterministicEntityMatch && (!selectedBest || conflictsWithRecognizedDomain ||
+      recognized.confidence >= selectedBest.confidence)) {
+      selectedBest = freeze({ referenceProcess:
+        recognized.taxonomyReferences.bcProcess.name,
+      referenceProcessId: recognized.taxonomyReferences.bcProcess.id,
+      domain: recognized.taxonomyReferences.domain.name, confidence: recognized.confidence,
+      matchedSteps: array(recognitionResult.evidence?.documentSequence).map(item => ({ name: item.name })),
+      missingSteps: [], additionalSteps: [], source: "BCProcessRecognitionEngine",
+      customizedBehaviorMayBeValid: true, deviationsAreErrors: false });
+    }
     const runnerUp = matches.find(item => item.referenceDiagramId !== selectedBest?.referenceDiagramId) || null;
-    const candidateMargin = selectedBest ? Number(Math.max(0, selectedBest.confidence -
-      (runnerUp?.confidence || 0)).toFixed(3)) : 0;
+    const candidateMargin = selectedBest?.source === "BCProcessRecognitionEngine"
+      ? Number(recognitionResult.assessment?.candidateMargin || 0)
+      : selectedBest ? Number(Math.max(0, selectedBest.confidence -
+        (runnerUp?.confidence || 0)).toFixed(3)) : 0;
     const graphEvidenceIsStrong = Boolean(graphBest && graphBest.matchedNodes >= 3 &&
       graphBest.confidence >= 0.8 && candidateMargin >= 0.1);
     const recognitionAssessment = recognitionResult?.assessment || null;

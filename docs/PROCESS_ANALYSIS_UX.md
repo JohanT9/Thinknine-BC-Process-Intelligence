@@ -21,6 +21,10 @@ A similarity percentage is never treated as sufficient proof by itself. The
 view combines deterministic Business Central recognition with graph matching.
 Weak metadata, close alternatives, or too little evidence are visibly flagged
 for confirmation instead of being presented as a confident automatic result.
+Reference candidates with zero matched process nodes are omitted. When a
+verified Business Central document contradicts a visual graph candidate, the
+deterministic document classification takes precedence. Process and document
+names are localized for Swedish presentation while stored IDs remain stable.
 
 The consultant can confirm the proposed classification or select another
 reference. The manual decision is stored in the Review project with timestamp,

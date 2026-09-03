@@ -39,6 +39,11 @@ reduce the score, and close leading candidates require manual confirmation. The
 result exposes `auto-classifiable`, `review-required`, or
 `insufficient-evidence`, plus the candidate margin and score breakdown.
 
+Swedish Business Central document captions are canonical aliases, including
+Inköpsorder, Distributionslagerinleverans and Överföringsorder. This allows older
+recordings without complete page-object metadata to contribute caption evidence
+without changing the canonical English taxonomy identifiers.
+
 The engine returns `classificationSource: rule`. `toSemanticClassification`
 converts the selected candidate into the optional Canonical Semantic Recording
 contract, preserving its explanation, signal summary, partial status, engine

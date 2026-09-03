@@ -12,6 +12,7 @@
   })[character]);
   function stepLabel(step) { return text(step?.title || step?.name || step?.id ||
     step?.referenceProcess || "Unknown step"); }
+  function localized(value, labels) { return labels.processNames?.[text(value)] || text(value); }
   function normalize(result = {}, decision = null) { let best = result.bestMatch || null;
     if (decision?.confirmedReferenceId) { const selected = array(result.matches).find(item =>
       item.referenceDiagramId === decision.confirmedReferenceId) ||
@@ -47,9 +48,9 @@
         best?.manualConfirmationRecommended === true || status !== "auto-classifiable", advisory: true }); }
   function metric(label, value, tone) { return `<div class="process-analysis-metric ${tone}">
     <strong>${escape(value)}</strong><span>${escape(label)}</span></div>`; }
-  function steps(title, values, tone, emptyLabel) { return `<section class="process-analysis-list ${tone}">
+  function steps(title, values, tone, emptyLabel, labels) { return `<section class="process-analysis-list ${tone}">
     <h4>${escape(title)} <span>${values.length}</span></h4>${values.length ? `<ul>${values.map(item =>
-      `<li>${escape(stepLabel(item))}</li>`).join("")}</ul>` : `<p>${escape(emptyLabel)}</p>`}</section>`; }
+      `<li>${escape(localized(stepLabel(item), labels))}</li>`).join("")}</ul>` : `<p>${escape(emptyLabel)}</p>`}</section>`; }
   function render(container, input, labels = {}) { const model = normalize(input.result, input.decision);
     if (!model.available) { container.innerHTML = `<div class="process-analysis-empty" role="status">
       <h4>${escape(labels.noMatchTitle || "No reliable process match")}</h4>
@@ -64,8 +65,8 @@
       </p>
       <section class="process-analysis-summary" aria-labelledby="processAnalysisMatchName">
         <div><span class="process-analysis-eyebrow">${escape(labels.detected || "Detected reference process")}</span>
-          <h4 id="processAnalysisMatchName">${escape(model.name)}</h4>
-          <p>${escape(model.domain || labels.unknownDomain || "Domain not identified")}</p></div>
+          <h4 id="processAnalysisMatchName">${escape(localized(model.name, labels))}</h4>
+          <p>${escape(localized(model.domain, labels) || labels.unknownDomain || "Domain not identified")}</p></div>
         <div class="process-analysis-confidence"><strong>${percent}%</strong>
           <span>${escape(labels.match || "match")}</span></div>
       </section>
@@ -80,13 +81,13 @@
       <p class="process-analysis-advisory">${escape(labels.advisory ||
         "Differences are guidance, not errors. The recorded process may be a valid customer variant.")}</p>
       <div class="process-analysis-columns">${steps(labels.matchedSteps || "Matched steps", model.matched,
-        "matched", labels.none || "None")}${steps(labels.missingSteps || "Possible missing steps", model.missing,
-        "missing", labels.noMissing || "No expected steps are missing")}${steps(labels.additionalSteps ||
-        "Customer-specific steps", model.additional, "additional", labels.noAdditional || "No additional steps")}</div>
+        "matched", labels.none || "None", labels)}${steps(labels.missingSteps || "Possible missing steps", model.missing,
+        "missing", labels.noMissing || "No expected steps are missing", labels)}${steps(labels.additionalSteps ||
+        "Customer-specific steps", model.additional, "additional", labels.noAdditional || "No additional steps", labels)}</div>
       <fieldset class="process-analysis-alternatives"><legend>${escape(labels.alternatives ||
         "Alternative reference processes")}</legend>${model.alternatives.length ? model.alternatives.map(item =>
           `<label><input type="radio" name="processAnalysisReference" value="${escape(item.id)}"
-            data-reference-name="${escape(item.name)}"><span>${escape(item.name)}</span>
+            data-reference-name="${escape(item.name)}"><span>${escape(localized(item.name, labels))}</span>
             <strong>${Math.round(item.confidence * 100)}%</strong></label>`).join("") :
           `<p>${escape(labels.noAlternatives || "No relevant alternatives")}</p>`}</fieldset>`;
     return model; }

@@ -15,6 +15,9 @@
   evidence, duplicate-signal suppression, document-order penalties, candidate
   margins, and explicit confidence states in Review Studio. Weak or ambiguous
   matches now request confirmation instead of presenting misleading certainty.
+- Fixed legacy purchase recordings being presented as Assembly, Production, or
+  Transfer processes. Verified BC documents now outrank unrelated graph matches,
+  zero-step alternatives are removed, and Swedish process names are displayed.
 
 - Added a keyboard-accessible Process Overview minimap that preserves layout
   positions and jumps directly to nodes in large diagrams.

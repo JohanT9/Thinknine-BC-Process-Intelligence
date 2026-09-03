@@ -59,6 +59,13 @@ const uncertainModel = view.render(container, { result: uncertain }, {
 assert.strictEqual(uncertainModel.manualConfirmationRecommended, true);
 assert(container.innerHTML.includes("Needs confirmation"));
 
+view.render(container, { result: { bestMatch: { referenceProcessId: "transfer",
+  referenceProcess: "Transfer Order", domain: "Inventory Transfer", confidence: 0.8,
+  matchedSteps: [], missingSteps: [], additionalSteps: [] } } }, { processNames: {
+    "Transfer Order": "Överföringsorder", "Inventory Transfer": "Lageröverföring" } });
+assert(container.innerHTML.includes("Överföringsorder"));
+assert(container.innerHTML.includes("Lageröverföring"));
+
 const selectedContainer = { querySelector() { return { value: "diagram:basic",
   dataset: { referenceName: "Basic Warehouse Outbound" } }; } };
 assert.deepStrictEqual(view.selectedReference(selectedContainer, normalized), {

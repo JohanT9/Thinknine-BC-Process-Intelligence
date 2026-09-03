@@ -112,6 +112,33 @@ assert.strictEqual(recordingMatch.assessment.status, "review-required");
 assert.strictEqual(recordingMatch.bestMatch.confidence, 1);
 assert(recordingMatch.recognition);
 
+const purchaseRecording = { schemaVersion: 1, id: "purchase-recording", events: [{
+  id: "purchase:1", identification: { pageIdentity: { pageObjectId: "50", tableId: "38",
+    entity: "PurchaseOrder", documentType: "purchase-order", pageType: "document",
+    source: "page-object-id", confidence: 1 } } }, { id: "purchase:2", identification: {
+      actionIdentity: { actionType: "ReleaseDocument", caption: "Release",
+        source: "technical-action-id" } } }] };
+const misleadingGraphMatch = model.matchRecordingToReferences(purchaseRecording, seed, {
+  graphProjector: { generate() { return { graphId: "generic", level: "businessCentralProcess",
+    title: "Generic", nodes: [{ nodeId: "start", nodeType: "start", title: "Start" },
+      { nodeId: "unknown", nodeType: "action", title: "Unrelated action" },
+      { nodeId: "end", nodeType: "end", title: "End" }], relationships: [],
+    startNodeIds: ["start"], endNodeIds: ["end"] }; } } });
+assert.strictEqual(misleadingGraphMatch.bestMatch.referenceProcessId,
+  "bc-process:source-to-pay:standard-purchase-order",
+  "Verified Purchase Order evidence must outrank unrelated graph similarity.");
+assert.strictEqual(misleadingGraphMatch.bestMatch.domain, "Source to Pay");
+assert(misleadingGraphMatch.matches.every(item => item.matchedNodes > 0),
+  "References without any matched node are not useful alternatives.");
+
+const closePurchaseReference = model.matchRecordingToReferences(purchaseRecording, seed, {
+  referenceLibrary: { matchRecordingToReference() { return { bestMatch: { referenceId: "stp-receipt",
+    name: "Warehouse Receipt", domain: "domain:source-to-pay", confidence: 0.2,
+    matchedSteps: [], missingSteps: [], unexpectedSteps: [] }, alternativeMatches: [] }; } } });
+assert.strictEqual(closePurchaseReference.bestMatch.referenceProcessId,
+  "bc-process:source-to-pay:standard-purchase-order",
+  "Stronger deterministic BC evidence must outrank a broader reference-library match.");
+
 const extended = JSON.parse(JSON.stringify(seed));
 extended.concepts.push({ id: "concept:aptean-quality-check", canonicalName: "Quality Check",
   aliases: [], domain: "Quality", entityType: "ProcessStep", namespace: "Aptean.FoodAndBeverage" });

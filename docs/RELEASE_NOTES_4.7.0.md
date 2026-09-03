@@ -4,6 +4,10 @@
   need confirmation or have insufficient evidence. Its confidence calculation
   uses Business Central metadata, distinct actions, document order, transitions,
   sequence quality, and separation from alternative candidates.
+- Older recordings with Swedish purchase captions now resolve to the purchasing
+  domain even when their semantic graph is incomplete. Irrelevant references
+  with no matching steps are no longer shown, and common process names are
+  localized in the Swedish interface.
 
 - Large diagrams now include a compact map overview with numbered, clickable
   nodes for direct navigation to any part of the process.
