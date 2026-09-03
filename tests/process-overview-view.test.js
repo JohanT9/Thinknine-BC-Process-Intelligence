@@ -185,6 +185,7 @@ assert(dashboardHtml.includes('src="document/process-graph-layout.js"'));
 assert(dashboardHtml.includes('src="document/process-visual-grammar.js"'));
 assert(dashboardHtml.includes('src="document/process-route-grammar.js"'));
 assert(dashboardHtml.includes('src="document/process-lane-model.js"'));
+assert(dashboardHtml.includes('src="process-connector-view.js"'));
 assert(dashboard.includes('activeProcessMapLevel = button.dataset.processMapLevel'));
 assert(dashboard.includes('window.addEventListener("resize", scheduleProcessMapLayout)'));
 assert(dashboard.includes('$("processOverviewDisclosure").addEventListener("toggle"'));

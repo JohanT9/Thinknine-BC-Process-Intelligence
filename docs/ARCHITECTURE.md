@@ -990,6 +990,11 @@ Process phase and role grouping is projected by
 semantic role metadata and returns immutable lane membership and segments.
 The projector does not reorder nodes and does not create business semantics.
 
+`ui/process-connector-view.js` is the HTML/SVG adapter for graph relationships.
+It consumes final DOM bounds plus route grammar intent and draws a noninteractive
+connector layer. It does not infer transitions, alter layout, or expose SVG
+details to the semantic model.
+
 `ProcessGraph` is the renderer-neutral diagram contract projected from Canonical
 Recording, Process Taxonomy, and Semantic Classification. One deterministic
 projection produces Business Process, Business Central Process, and User

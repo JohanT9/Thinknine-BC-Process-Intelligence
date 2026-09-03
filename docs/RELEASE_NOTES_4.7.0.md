@@ -440,6 +440,9 @@ or På/Av values.
 - Existing process phases and semantic roles now appear as horizontal
   swimlanes, reducing repeated labels and making responsibility or phase
   boundaries easier to scan.
+- Process relationships are now drawn as real SVG connectors between node
+  positions, including orthogonal row transitions, cross-lane flow, branches,
+  and backward return paths.
 
 # Reference Process Library
 

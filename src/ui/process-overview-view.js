@@ -7,11 +7,14 @@
     ? require("../document/process-route-grammar") : root.T9ProcessRouteGrammar;
   const laneModel = typeof module === "object" && module.exports
     ? require("../document/process-lane-model") : root.T9ProcessLaneModel;
-  const api = factory(layout, visualGrammar, routeGrammar, laneModel);
+  const connectorView = typeof module === "object" && module.exports
+    ? require("./process-connector-view") : root.T9ProcessConnectorView;
+  const api = factory(layout, visualGrammar, routeGrammar, laneModel, connectorView);
   if (typeof module === "object" && module.exports) module.exports = api;
   root.T9ProcessOverviewView = api;
 })(typeof globalThis !== "undefined" ? globalThis : this,
-  function (graphLayout, visualGrammar, routeGrammar, processLaneModel) {
+  function (graphLayout, visualGrammar, routeGrammar, processLaneModel,
+    processConnectorView) {
   const renderedViews = new WeakMap();
 
   function escape(value) {
@@ -244,6 +247,9 @@
           </button>
         </li>`;
       }).join("")}</ol></div>${detailMarkup(selectedDetail, english)}`;
+    processConnectorView.render(container, model, {
+      locale: english ? "en-US" : "sv-SE"
+    });
     return { activityCount: activities.length,
       stateTransitionCount: [...stateTransitions.values()].flat().length };
   }

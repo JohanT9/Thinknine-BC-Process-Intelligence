@@ -11,6 +11,10 @@
 
 ## Unreleased
 
+- Added an SVG process connector renderer with orthogonal row/swimlane paths,
+  return paths, conditional and alternative line styles, arrow markers, and a
+  safe CSS fallback when browser geometry is unavailable.
+
 - Added renderer-neutral process swimlanes derived from existing phases and
   semantic process roles, with uncluttered fallback behavior for recordings
   that have no grouping metadata.
