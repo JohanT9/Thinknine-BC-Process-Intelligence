@@ -78,8 +78,11 @@ assert(decisionContainer.innerHTML.includes('data-process-shape="diamond"'));
 assert(decisionContainer.innerHTML.includes("process-overview-kind-decision"));
 assert(decisionContainer.innerHTML.includes("Finns varan i lager?"));
 assert(decisionContainer.innerHTML.includes("Beslut"));
-assert(!decisionContainer.innerHTML.includes('class="process-overview-routes compact"'),
-  "decision routes must not clutter the compact flow node");
+assert(decisionContainer.innerHTML.includes('class="process-overview-routes compact"'),
+  "decision routes must be visible directly in the process map");
+assert(decisionContainer.innerHTML.includes("process-overview-route-conditional"));
+assert(decisionContainer.innerHTML.includes('data-process-line="solid"'));
+assert(decisionContainer.innerHTML.includes("Ja till Leverera; Nej till Fyll på lager"));
 assert(!decisionContainer.innerHTML.includes(`data-process-task-id=""`));
 const decisionActionAttributes = {};
 const decisionAction = { dataset: { processNodeAction: decisionId },
@@ -99,6 +102,7 @@ assert(detailTarget.outerHTML.includes('data-process-transition-type="conditiona
 assert(detailTarget.outerHTML.includes('data-process-transition-type="alternate"'));
 assert(detailTarget.outerHTML.includes("stock-available"));
 assert(detailTarget.outerHTML.includes("conditional"));
+assert.deepStrictEqual(view.routeLabel({ transitionType: "alternate" }, false), "Alternativ");
 assert(view.detailMarkup({ node: { nodeType: "activity", title: "VAT" },
   containers: {}, outgoing: [], changes: [{ factKind: "toggle-state",
     before: { control: { caption: "Moms" }, checked: false },
@@ -177,6 +181,7 @@ assert(dashboardHtml.includes('data-process-map-level="businessCentral"'));
 assert(dashboardHtml.includes('src="document/semantic-process-map.js"'));
 assert(dashboardHtml.includes('src="document/process-graph-layout.js"'));
 assert(dashboardHtml.includes('src="document/process-visual-grammar.js"'));
+assert(dashboardHtml.includes('src="document/process-route-grammar.js"'));
 assert(dashboard.includes('activeProcessMapLevel = button.dataset.processMapLevel'));
 assert(dashboard.includes('window.addEventListener("resize", scheduleProcessMapLayout)'));
 assert(dashboard.includes('$("processOverviewDisclosure").addEventListener("toggle"'));

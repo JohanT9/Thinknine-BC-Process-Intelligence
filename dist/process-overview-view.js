@@ -3,11 +3,13 @@
     ? require("../document/process-graph-layout") : root.T9ProcessGraphLayout;
   const visualGrammar = typeof module === "object" && module.exports
     ? require("../document/process-visual-grammar") : root.T9ProcessVisualGrammar;
-  const api = factory(layout, visualGrammar);
+  const routeGrammar = typeof module === "object" && module.exports
+    ? require("../document/process-route-grammar") : root.T9ProcessRouteGrammar;
+  const api = factory(layout, visualGrammar, routeGrammar);
   if (typeof module === "object" && module.exports) module.exports = api;
   root.T9ProcessOverviewView = api;
 })(typeof globalThis !== "undefined" ? globalThis : this,
-  function (graphLayout, visualGrammar) {
+  function (graphLayout, visualGrammar, routeGrammar) {
   const renderedViews = new WeakMap();
 
   function escape(value) {
@@ -101,23 +103,36 @@
   }
 
   function routeLabel(route, english) {
-    if (route.label) return route.label;
-    if (typeof route.condition === "string" && route.condition.trim()) return route.condition;
-    return english ? "Alternative route" : "Alternativ väg";
+    return routeGrammar.presentationFor(route, english ? "en-US" : "sv-SE").label;
   }
 
   function routesMarkup(detail, english, compact = false) {
+    const decision = detail?.node?.nodeType === "decision" ||
+      detail?.node?.metadata?.originalNodeType === "decision";
     const routes = (detail?.outgoing || []).filter(route =>
-      route.transitionType !== "sequence" || detail.node.nodeType === "decision"
+      route.transitionType !== "sequence" || decision
     );
     if (!routes.length) return "";
-    return `<${compact ? "span" : "ul"} class="process-overview-routes${compact ? " compact" : ""}">${routes.map(route =>
-      `<${compact ? "span" : "li"} class="process-overview-route" data-process-transition-type="${escape(route.transitionType)}">
+    return `<${compact ? "span" : "ul"} class="process-overview-routes${compact ? " compact" : ""}">${routes.map(route => {
+      const visual = routeGrammar.presentationFor(route, english ? "en-US" : "sv-SE");
+      return `<${compact ? "span" : "li"} class="process-overview-route process-overview-route-${visual.kind}"
+        data-process-transition-type="${escape(route.transitionType)}" data-process-line="${visual.line}">
         <strong>${escape(routeLabel(route, english))}</strong><span aria-hidden="true">→</span>
         <span>${escape(plain(route.target?.title))}</span>
         ${compact ? "" : `<span class="process-overview-route-meta">${escape(route.transitionType)}${
           route.condition && route.condition !== route.label ? ` · ${escape(route.condition)}` : ""}</span>`}
-      </${compact ? "span" : "li"}>`).join("")}</${compact ? "span" : "ul"}>`;
+      </${compact ? "span" : "li"}>`;
+    }).join("")}</${compact ? "span" : "ul"}>`;
+  }
+
+  function routeSummary(detail, english) {
+    const routes = (detail?.outgoing || []).filter(route =>
+      route.transitionType !== "sequence" || detail.node.nodeType === "decision" ||
+      detail.node.metadata?.originalNodeType === "decision");
+    if (!routes.length) return "";
+    const connector = english ? "to" : "till";
+    return routes.map(route => `${routeLabel(route, english)} ${connector} ${
+      plain(route.target?.title)}`).join("; ");
   }
 
   function detailMarkup(detail, english) {
@@ -189,6 +204,7 @@
         const placement = placementById.get(detail.node.nodeId);
         const visual = visualGrammar.presentationFor(detail.node,
           english ? "en-US" : "sv-SE");
+        const accessibleRoutes = routeSummary(detail, english);
         return `<li class="process-overview-step${decision ? " process-overview-decision" : ""}${
           rowEndIds.has(detail.node.nodeId) ? " process-overview-row-end" : ""}${
           ` process-overview-kind-${visual.kind}`}${
@@ -200,7 +216,7 @@
             data-process-node-action="${escape(detail.node.nodeId)}"
             ${detail.taskId ? `data-process-task-id="${escape(detail.taskId)}"` : ""}
             aria-pressed="${selected}"${selected ? ' aria-current="step"' : ""}
-            aria-label="${escape(`${english ? "Step" : "Steg"} ${detail.index + 1}: ${title}${status ? `. ${status.label}` : ""}`)}">
+            aria-label="${escape(`${english ? "Step" : "Steg"} ${detail.index + 1}: ${title}${status ? `. ${status.label}` : ""}${accessibleRoutes ? `. ${accessibleRoutes}` : ""}`)}">
             <span class="process-overview-number" aria-hidden="true"><span>${decision ? "?" : detail.index + 1}</span></span>
             <span class="process-overview-content">
               ${phase ? `<span class="process-overview-phase">${escape(phase)}</span>` : ""}
@@ -208,6 +224,7 @@
               ${!["action", "process-step"].includes(visual.kind)
                 ? `<span class="process-overview-node-type">${escape(visual.label)}</span>` : ""}
               <strong>${escape(title)}</strong>
+              ${routesMarkup(detail, english, true)}
               ${status ? `<span class="process-overview-review-state ${status.name}">${escape(status.label)}</span>` : ""}
               ${semantic ? `<span class="process-overview-semantic-state ${semantic.name}">${escape(
                 semantic.label)}</span>` : ""}
@@ -256,5 +273,5 @@
   }
 
   return { containersFor, detailMarkup, render, reviewState, routeLabel, semanticState,
-    routesMarkup, selectNode, taskIdFor, updateSelection };
+    routeSummary, routesMarkup, selectNode, taskIdFor, updateSelection };
 });

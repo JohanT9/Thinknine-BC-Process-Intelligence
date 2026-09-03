@@ -434,6 +434,9 @@ or På/Av values.
 - Process node types now have a consistent visual grammar, allowing consultants
   to distinguish documents, posting, decisions, automated work, manual work,
   and high-level business processes at a glance.
+- Decisions and other non-sequential relationships now show their route labels
+  and destinations directly in the map, with distinct treatments for
+  alternatives, returns, document creation, and posting.
 
 # Reference Process Library
 

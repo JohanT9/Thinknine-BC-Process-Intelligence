@@ -11,6 +11,10 @@
 
 ## Unreleased
 
+- Added visible conditional, alternative, return, creation, and posting routes
+  to process maps through a renderer-neutral route grammar, including localized
+  route labels and screen-reader summaries.
+
 - Added a renderer-neutral process-map visual grammar with localized semantic
   labels and distinct treatments for business processes, documents, posted
   documents, posting, decisions, system actions, manual actions, and states.

@@ -980,6 +980,11 @@ types into renderer-neutral kind, shape, tone, and localized-label intent.
 Renderers implement that intent; taxonomy and recording data never store CSS or
 library-specific drawing instructions.
 
+Relationship appearance is resolved by
+`document/process-route-grammar.js`. It translates canonical transition types
+into line, marker, tone, and localized-label intent. Explicit conditions remain
+semantic graph data; route styling remains a renderer concern.
+
 `ProcessGraph` is the renderer-neutral diagram contract projected from Canonical
 Recording, Process Taxonomy, and Semantic Classification. One deterministic
 projection produces Business Process, Business Central Process, and User
