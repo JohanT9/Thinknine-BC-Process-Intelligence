@@ -1,5 +1,8 @@
 # BC Process Studio 4.7
 
+- Process Overview can now open in a full-viewport focus mode and return to the
+  normal Review workspace with the same button or Escape.
+
 - Process maps now support Standard and Compact density. Compact maps fit more
   activities into Review Studio and exported SVG without changing semantics.
 

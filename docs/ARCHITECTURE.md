@@ -1033,6 +1033,10 @@ adapters. Standard and Compact modes adjust geometry and secondary presentation
 only; density is intentionally excluded from `ProcessGraph`. See
 [PROCESS_MAP_DENSITY.md](PROCESS_MAP_DENSITY.md).
 
+Process-map focus mode is UI orchestration only. It expands the existing Review
+renderer and preserves its active ProcessGraph, selection, viewport settings,
+and connector layer. See [PROCESS_MAP_FOCUS_MODE.md](PROCESS_MAP_FOCUS_MODE.md).
+
 ## Business Central Document Lifecycle boundary (4.7)
 
 Document Lifecycle is configurable semantic knowledge between Process Taxonomy

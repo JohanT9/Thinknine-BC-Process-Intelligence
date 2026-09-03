@@ -3424,6 +3424,22 @@ function loadProcessMapDensity() {
   }
 }
 let processMapDensity = loadProcessMapDensity();
+let processMapFocusReturn = null;
+function setProcessMapFocus(active) {
+  const disclosure = $("processOverviewDisclosure");
+  const button = $("processMapFocus");
+  const enabled = Boolean(active);
+  if (enabled) {
+    processMapFocusReturn = document.activeElement;
+    disclosure.open = true;
+  }
+  disclosure.classList.toggle("process-map-focus", enabled);
+  document.body.classList.toggle("process-map-focus-active", enabled);
+  button.setAttribute("aria-pressed", String(enabled));
+  renderProcessOverview();
+  if (enabled) $("processOverview").querySelector("[data-process-node-action]")?.focus();
+  else processMapFocusReturn?.focus?.();
+}
 let activeReviewSelection = globalThis.T9ReviewSelection.create();
 let activeReviewEdit = null;
 let reviewReturnFocus = null;
@@ -6443,6 +6459,14 @@ function renderProcessOverview() {
       "Välj processkartans täthet";
     document.querySelector('label[for="processMapDensity"]').textContent = english
       ? "Density" : "Täthet";
+    const focusActive = $("processOverviewDisclosure").classList.contains("process-map-focus");
+    $("processMapFocus").textContent = focusActive
+      ? (english ? "Close focus" : "Stäng fokus")
+      : (english ? "Focus mode" : "Fokusläge");
+    $("processMapFocus").title = focusActive
+      ? (english ? "Close process map focus mode (Esc)" : "Stäng processkartans fokusläge (Esc)")
+      : (english ? "Show the process map in focus mode" : "Visa processkartan i fokusläge");
+    $("processMapFocus").setAttribute("aria-pressed", String(focusActive));
     $("processMapFit").title = english ? "Fit the complete process map to the available width" :
       "Anpassa hela processkartan till tillgänglig bredd";
     $("processMapZoomOut").title = english ? "Zoom out the process map" :
@@ -7015,6 +7039,15 @@ $("processMapDensity").addEventListener("change", event => {
     // The selected density remains active for the current dashboard session.
   }
   renderProcessOverview();
+});
+$("processMapFocus").addEventListener("click", () => setProcessMapFocus(
+  !$("processOverviewDisclosure").classList.contains("process-map-focus")
+));
+document.addEventListener("keydown", event => {
+  if (event.key !== "Escape" ||
+      !$("processOverviewDisclosure").classList.contains("process-map-focus")) return;
+  event.preventDefault();
+  setProcessMapFocus(false);
 });
 function scheduleProcessMapLayout() {
   if (!activeReview || !$('processOverviewDisclosure')?.open || processMapResizeFrame) return;

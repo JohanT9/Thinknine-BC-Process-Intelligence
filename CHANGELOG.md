@@ -11,6 +11,9 @@
 
 ## Unreleased
 
+- Added an accessible Process Overview focus mode for inspecting large maps in
+  the full browser viewport, with Escape close and focus restoration.
+
 - Added persistent Standard and Compact process-map density modes for Review
   Studio and SVG export.
 
