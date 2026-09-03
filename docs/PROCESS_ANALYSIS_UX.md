@@ -26,6 +26,12 @@ verified Business Central document contradicts a visual graph candidate, the
 deterministic document classification takes precedence. Process and document
 names are localized for Swedish presentation while stored IDs remain stable.
 
+The Business Process and BC Process map levels remain selectable for legacy
+recordings. Selecting either level lazily loads Process Analysis when needed,
+then projects the available deterministic classification into the map. Their
+availability no longer depends on an asynchronous result having arrived during
+the first render.
+
 The consultant can confirm the proposed classification or select another
 reference. The manual decision is stored in the Review project with timestamp,
 source and status and follows the existing autosave workflow.

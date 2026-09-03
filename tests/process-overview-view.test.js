@@ -225,6 +225,8 @@ assert(dashboardHtml.includes('aria-pressed="false"'));
 assert(dashboardHtml.includes('src="document/process-map-theme.js"'));
 assert(dashboardHtml.includes('src="document/process-map-legend.js"'));
 assert(dashboard.includes('activeProcessMapLevel = button.dataset.processMapLevel'));
+assert(dashboard.includes('button.disabled = false'));
+assert(dashboard.includes('await loadProcessAnalysis()'));
 assert(dashboard.includes('window.addEventListener("resize", scheduleProcessMapLayout)'));
 assert(dashboard.includes('$("processOverviewDisclosure").addEventListener("toggle"'));
 assert(dashboard.includes("function changeProcessMapZoom(value)"));

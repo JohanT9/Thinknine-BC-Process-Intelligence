@@ -1,5 +1,9 @@
 # BC Process Studio 4.7
 
+- Business Process and BC Process map levels are now selectable for older
+  recordings; Process Analysis loads automatically when a semantic level is
+  selected.
+
 - Fixed Process Overview in the installed Edge package by including its minimap
   and search runtimes. The release check now detects any missing local dashboard
   script.

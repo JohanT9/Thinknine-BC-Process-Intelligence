@@ -11,6 +11,10 @@
 
 ## Unreleased
 
+- Kept Business Process and BC Process map levels selectable for legacy
+  recordings and load Process Analysis on demand instead of disabling the
+  controls during asynchronous analysis.
+
 - Fixed packaged Process Overview assets omitted from `dist`, including the
   minimap and search runtimes; generated-build tests now verify every local
   dashboard script dependency.

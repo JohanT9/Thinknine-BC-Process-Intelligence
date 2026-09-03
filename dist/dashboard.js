@@ -6529,8 +6529,7 @@ function renderProcessOverview() {
     for (const button of $("processMapLevels").querySelectorAll(
       "[data-process-map-level]"
     )) {
-      const semantic = button.dataset.processMapLevel !== "procedure";
-      button.disabled = semantic && !hasSemanticAnalysis;
+      button.disabled = false;
       button.setAttribute("aria-pressed", String(
         button.dataset.processMapLevel === displayedLevel
       ));
@@ -7024,9 +7023,19 @@ $("processOverview").addEventListener("click", event => {
     );
   }
 });
-$("processMapLevels").addEventListener("click", event => {
+$("processMapLevels").addEventListener("click", async event => {
   const button = event.target.closest("[data-process-map-level]");
   if (!button || button.disabled) return;
+  if (button.dataset.processMapLevel !== "procedure" && !activeProcessAnalysis) {
+    try {
+      await loadProcessAnalysis();
+    } catch (error) {
+      $("processOverview").innerHTML = `<p class="muted">${escapeHtml(uiTf(
+        "process.overviewError", { detail: error.message }
+      ))}</p>`;
+      return;
+    }
+  }
   activeProcessMapLevel = button.dataset.processMapLevel;
   renderProcessOverview();
   $("processOverview").querySelector("[data-process-node-action]")?.focus();
