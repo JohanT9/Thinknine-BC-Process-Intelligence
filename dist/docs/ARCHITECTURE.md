@@ -1028,6 +1028,11 @@ ProcessGraph into a renderer-neutral legend. Review and SVG adapters consume the
 same projection, ensuring standalone exports explain their notation without
 duplicating semantic inference. See [PROCESS_MAP_LEGEND.md](PROCESS_MAP_LEGEND.md).
 
+Map density is an ephemeral renderer preference shared by Review and SVG
+adapters. Standard and Compact modes adjust geometry and secondary presentation
+only; density is intentionally excluded from `ProcessGraph`. See
+[PROCESS_MAP_DENSITY.md](PROCESS_MAP_DENSITY.md).
+
 ## Business Central Document Lifecycle boundary (4.7)
 
 Document Lifecycle is configurable semantic knowledge between Process Taxonomy

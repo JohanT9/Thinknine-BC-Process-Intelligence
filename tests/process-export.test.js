@@ -94,6 +94,15 @@ assert(neutralActivitySvg.includes("fill:#eef1f3;stroke:#64717d"));
 assert(monochromeActivitySvg.includes("fill:#e2e2e2;stroke:#111111"));
 assert.notStrictEqual(businessCentralActivitySvg, neutralActivitySvg);
 assert.notStrictEqual(neutralActivitySvg, monochromeActivitySvg);
+const densityModel = { recordingId: "density", nodes: Array.from({ length: 6 },
+  (_, index) => ({ nodeId: `density-${index}`, nodeType: "activity",
+    title: `Recorded process action ${index}`, sequence: index })), transitions: [],
+subprocesses: [] };
+const standardDensitySvg = svgExporter.svg(densityModel, { columns: 2 });
+const compactDensitySvg = svgExporter.svg(densityModel, { columns: 2, density: "compact" });
+assert(standardDensitySvg.includes('width="190" height="104"'));
+assert(compactDensitySvg.includes('width="150" height="76"'));
+assert.notStrictEqual(standardDensitySvg, compactDensitySvg);
 
 const broken = { ...model, startNodeIds: ["missing"] };
 assert.throws(() => exporter.create(broken), error =>

@@ -1,5 +1,8 @@
 # BC Process Studio 4.7
 
+- Process maps now support Standard and Compact density. Compact maps fit more
+  activities into Review Studio and exported SVG without changing semantics.
+
 - Interactive and exported process maps now include a localized automatic
   legend for the node shapes and relationship lines actually in use.
 

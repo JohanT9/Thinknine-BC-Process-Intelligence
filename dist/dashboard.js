@@ -3377,6 +3377,10 @@ let processMapResizeFrame = null;
 const PROCESS_MAP_ZOOM_STORAGE_KEY = "t9.processMap.zoom";
 const PROCESS_MAP_DIRECTION_STORAGE_KEY = "t9.processMap.direction";
 const PROCESS_MAP_THEME_STORAGE_KEY = "t9.processMap.theme";
+const PROCESS_MAP_DENSITY_STORAGE_KEY = "t9.processMap.density";
+function normalizedProcessMapDensity(value) {
+  return value === "compact" ? "compact" : "standard";
+}
 function normalizedProcessMapDirection(value) {
   return value === "vertical" ? "vertical" : "adaptive";
 }
@@ -3410,6 +3414,16 @@ function loadProcessMapTheme() {
   }
 }
 let processMapTheme = loadProcessMapTheme();
+function loadProcessMapDensity() {
+  try {
+    return normalizedProcessMapDensity(
+      globalThis.localStorage?.getItem(PROCESS_MAP_DENSITY_STORAGE_KEY)
+    );
+  } catch {
+    return "standard";
+  }
+}
+let processMapDensity = loadProcessMapDensity();
 let activeReviewSelection = globalThis.T9ReviewSelection.create();
 let activeReviewEdit = null;
 let reviewReturnFocus = null;
@@ -6421,6 +6435,14 @@ function renderProcessOverview() {
     themeSelect.title = english ? "Choose the process map visual theme" :
       "Välj processkartans visuella tema";
     document.querySelector('label[for="processMapTheme"]').textContent = english ? "Theme" : "Tema";
+    processMapDensity = normalizedProcessMapDensity(processMapDensity);
+    $("processMapDensity").value = processMapDensity;
+    $("processMapDensity").options[0].textContent = "Standard";
+    $("processMapDensity").options[1].textContent = english ? "Compact" : "Kompakt";
+    $("processMapDensity").title = english ? "Choose process map density" :
+      "Välj processkartans täthet";
+    document.querySelector('label[for="processMapDensity"]').textContent = english
+      ? "Density" : "Täthet";
     $("processMapFit").title = english ? "Fit the complete process map to the available width" :
       "Anpassa hela processkartan till tillgänglig bredd";
     $("processMapZoomOut").title = english ? "Zoom out the process map" :
@@ -6472,7 +6494,8 @@ function renderProcessOverview() {
       reviewTasks: activeReview.tasks || [],
       zoom: processMapZoom,
       direction: processMapDirection,
-      theme: processMapTheme
+      theme: processMapTheme,
+      density: processMapDensity
     });
   } catch (error) {
     activeProcessModel = null;
@@ -6493,7 +6516,8 @@ async function exportActiveProcess(kind) {
       title: activeReviewSession.name,
       language: activeReview.documentFields?.documentLanguage || "sv-SE",
       columns: processMapDirection === "vertical" ? 1 : 4,
-      theme: processMapTheme
+      theme: processMapTheme,
+      density: processMapDensity
     });
     const file = kind === "diagram" ? exported.diagram : exported.json;
     await downloadBlob(new Blob([file.content], { type: file.mimeType }),
@@ -6980,6 +7004,15 @@ $("processMapTheme").addEventListener("change", event => {
     globalThis.localStorage?.setItem(PROCESS_MAP_THEME_STORAGE_KEY, processMapTheme);
   } catch {
     // The selected theme remains active for the current dashboard session.
+  }
+  renderProcessOverview();
+});
+$("processMapDensity").addEventListener("change", event => {
+  processMapDensity = normalizedProcessMapDensity(event.currentTarget.value);
+  try {
+    globalThis.localStorage?.setItem(PROCESS_MAP_DENSITY_STORAGE_KEY, processMapDensity);
+  } catch {
+    // The selected density remains active for the current dashboard session.
   }
   renderProcessOverview();
 });

@@ -221,6 +221,7 @@
       ...laneEndIds]);
     container.innerHTML = `<div class="process-diagram-scroll" tabindex="0" role="group"
       data-process-theme="${escape(options.theme || "business-central")}"
+      data-process-density="${options.density === "compact" ? "compact" : "standard"}"
       aria-label="${english ? "Process flow" : "Processflöde"}">
       <ol class="process-overview-list" data-process-layout-version="${layout.layoutVersion}"
         data-process-direction="${layout.direction}"

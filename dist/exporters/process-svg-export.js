@@ -106,8 +106,12 @@
   function svg(model, options = {}) {
     const english = String(options.language || "").toLowerCase().startsWith("en");
     const theme = processMapTheme.resolve(options.theme);
+    const density = options.density === "compact" ? "compact" : "standard";
     const nodes = ordered(model); const columns = Math.max(1, Math.min(5, Number(options.columns) || 4));
-    const nodeWidth = 190; const nodeHeight = 104; const gapX = 72; const gapY = 64;
+    const nodeWidth = density === "compact" ? 150 : 190;
+    const nodeHeight = density === "compact" ? 76 : 104;
+    const gapX = density === "compact" ? 52 : 72;
+    const gapY = density === "compact" ? 44 : 64;
     const margin = 54; const header = 74; const laneHeader = 34;
     const layout = rowsFor(model, nodes, columns, english); const boxes = {}; let cursorY = header;
     const laneBands = []; layout.rows.forEach(row => { if (layout.lanes.visible && row.firstInLane && row.lane) {
@@ -133,7 +137,9 @@
           path.labelY}" class="route-label" text-anchor="middle">${escape(explicit)}</text>` : ""}`; })
       .join("");
     const nodeMarkup = nodes.map(node => { const box = boxes[node.nodeId];
-      const visual = visualGrammar.presentationFor(node, options.language); const lines = wrap(node.title);
+      const visual = visualGrammar.presentationFor(node, options.language);
+      const lines = wrap(node.title, density === "compact" ? 18 : 22,
+        density === "compact" ? 2 : 3);
       const changes = stateByNode.get(node.nodeId) || [];
       const textY = box.y + box.height / 2 - (lines.length - 1) * 9 - (changes.length ? 10 : 0);
       const changeMarkup = changes.slice(0, 2).map((change, index) => { const label =

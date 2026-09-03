@@ -194,6 +194,11 @@ view.render(themedContainer, { nodes: [{ nodeId: "theme", nodeType: "activity",
   title: "Theme", processOrder: 0 }], transitions: [], subprocesses: [],
 stateTransitions: [] }, { locale: "en-US", theme: "monochrome" });
 assert(themedContainer.innerHTML.includes('data-process-theme="monochrome"'));
+const compactContainer = { innerHTML: "" };
+view.render(compactContainer, { nodes: [{ nodeId: "compact", nodeType: "activity",
+  title: "Compact", processOrder: 0 }], transitions: [], subprocesses: [],
+stateTransitions: [] }, { locale: "en-US", density: "compact" });
+assert(compactContainer.innerHTML.includes('data-process-density="compact"'));
 const dashboardHtml = fs.readFileSync("src/ui/dashboard.html", "utf8");
 assert(dashboardHtml.includes('id="processMapLevels"'));
 assert(dashboardHtml.includes('data-process-map-level="businessCentral"'));
@@ -207,6 +212,7 @@ assert(dashboardHtml.includes('src="process-map-viewport.js"'));
 assert(dashboardHtml.includes('id="processMapViewportControls"'));
 assert(dashboardHtml.includes('id="processMapDirection"'));
 assert(dashboardHtml.includes('id="processMapTheme"'));
+assert(dashboardHtml.includes('id="processMapDensity"'));
 assert(dashboardHtml.includes('src="document/process-map-theme.js"'));
 assert(dashboardHtml.includes('src="document/process-map-legend.js"'));
 assert(dashboard.includes('activeProcessMapLevel = button.dataset.processMapLevel'));
@@ -216,6 +222,7 @@ assert(dashboard.includes("function changeProcessMapZoom(value)"));
 assert(dashboard.includes("T9ProcessMapViewport.measureFit"));
 assert(dashboard.includes("PROCESS_MAP_DIRECTION_STORAGE_KEY"));
 assert(dashboard.includes("PROCESS_MAP_THEME_STORAGE_KEY"));
+assert(dashboard.includes("PROCESS_MAP_DENSITY_STORAGE_KEY"));
 assert(dashboard.includes("theme: processMapTheme"));
 assert(dashboard.includes('columns: processMapDirection === "vertical" ? 1 : 4'));
 console.log("Process Overview view tests passed.");

@@ -11,6 +11,9 @@
 
 ## Unreleased
 
+- Added persistent Standard and Compact process-map density modes for Review
+  Studio and SVG export.
+
 - Added a localized, content-aware process-map legend shared by Review Studio
   and SVG export, showing only node shapes and route styles used by the map.
 
