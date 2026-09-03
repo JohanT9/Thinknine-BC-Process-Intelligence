@@ -1,5 +1,8 @@
 # BC Process Studio 4.7
 
+- Large process maps can now be searched by step, document, or action, with
+  highlighted results and keyboard-friendly cyclic navigation.
+
 - Process Overview can now open in a full-viewport focus mode and return to the
   normal Review workspace with the same button or Escape.
 

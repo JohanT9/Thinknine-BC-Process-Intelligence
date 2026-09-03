@@ -11,6 +11,9 @@
 
 ## Unreleased
 
+- Added accent-insensitive Process Overview search with visible match counts,
+  cyclic Enter/Next navigation, and automatic scrolling in large maps.
+
 - Added an accessible Process Overview focus mode for inspecting large maps in
   the full browser viewport, with Escape close and focus restoration.
 

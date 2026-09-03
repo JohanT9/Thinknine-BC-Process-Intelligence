@@ -1037,6 +1037,11 @@ Process-map focus mode is UI orchestration only. It expands the existing Review
 renderer and preserves its active ProcessGraph, selection, viewport settings,
 and connector layer. See [PROCESS_MAP_FOCUS_MODE.md](PROCESS_MAP_FOCUS_MODE.md).
 
+`ui/process-map-search.js` provides pure normalization, matching, and cyclic
+navigation helpers. Dashboard applies results to the current rendered map;
+search never changes or filters ProcessGraph. See
+[PROCESS_MAP_SEARCH.md](PROCESS_MAP_SEARCH.md).
+
 ## Business Central Document Lifecycle boundary (4.7)
 
 Document Lifecycle is configurable semantic knowledge between Process Taxonomy

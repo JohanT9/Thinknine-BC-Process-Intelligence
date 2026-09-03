@@ -3425,6 +3425,7 @@ function loadProcessMapDensity() {
 }
 let processMapDensity = loadProcessMapDensity();
 let processMapFocusReturn = null;
+let processMapSearchCursor = -1;
 function setProcessMapFocus(active) {
   const disclosure = $("processOverviewDisclosure");
   const button = $("processMapFocus");
@@ -6467,6 +6468,11 @@ function renderProcessOverview() {
       ? (english ? "Close process map focus mode (Esc)" : "Stäng processkartans fokusläge (Esc)")
       : (english ? "Show the process map in focus mode" : "Visa processkartan i fokusläge");
     $("processMapFocus").setAttribute("aria-pressed", String(focusActive));
+    document.querySelector('label[for="processMapSearch"]').textContent = english
+      ? "Search map" : "Sök i kartan";
+    $("processMapSearch").placeholder = english
+      ? "Step, document or action" : "Steg, dokument eller åtgärd";
+    $("processMapSearchNext").textContent = english ? "Next match" : "Nästa träff";
     $("processMapFit").title = english ? "Fit the complete process map to the available width" :
       "Anpassa hela processkartan till tillgänglig bredd";
     $("processMapZoomOut").title = english ? "Zoom out the process map" :
@@ -6521,6 +6527,7 @@ function renderProcessOverview() {
       theme: processMapTheme,
       density: processMapDensity
     });
+    applyProcessMapSearch(false);
   } catch (error) {
     activeProcessModel = null;
     $("saveProcessVersion").disabled = true;
@@ -7043,6 +7050,46 @@ $("processMapDensity").addEventListener("change", event => {
 $("processMapFocus").addEventListener("click", () => setProcessMapFocus(
   !$("processOverviewDisclosure").classList.contains("process-map-focus")
 ));
+function applyProcessMapSearch(advance) {
+  const actions = [...$("processOverview").querySelectorAll("[data-process-node-action]")];
+  const matches = globalThis.T9ProcessMapSearch.find(
+    actions.map(action => action.textContent), $("processMapSearch").value
+  );
+  const matchIndexes = new Set(matches.map(match => match.index));
+  if (advance) processMapSearchCursor = globalThis.T9ProcessMapSearch.next(
+    matches, processMapSearchCursor
+  );
+  if (!matchIndexes.has(processMapSearchCursor)) processMapSearchCursor = -1;
+  actions.forEach((action, index) => {
+    action.classList.toggle("process-map-search-match", matchIndexes.has(index));
+    action.classList.toggle("process-map-search-current", index === processMapSearchCursor);
+  });
+  const english = String(applicationSettings.uiLocale || "").startsWith("en");
+  const hasQuery = Boolean($("processMapSearch").value.trim());
+  $("processMapSearchResult").textContent = hasQuery
+    ? `${matches.length} ${english ? (matches.length === 1 ? "match" : "matches") :
+      (matches.length === 1 ? "träff" : "träffar")}` : "";
+  $("processMapSearchNext").disabled = !matches.length;
+  if (processMapSearchCursor >= 0) {
+    actions[processMapSearchCursor]?.scrollIntoView?.({ block: "nearest", inline: "center" });
+  }
+}
+$("processMapSearch").addEventListener("input", () => {
+  processMapSearchCursor = -1;
+  applyProcessMapSearch(false);
+});
+$("processMapSearch").addEventListener("keydown", event => {
+  if (event.key === "Enter") {
+    event.preventDefault();
+    applyProcessMapSearch(true);
+  } else if (event.key === "Escape" && event.currentTarget.value) {
+    event.stopPropagation();
+    event.currentTarget.value = "";
+    processMapSearchCursor = -1;
+    applyProcessMapSearch(false);
+  }
+});
+$("processMapSearchNext").addEventListener("click", () => applyProcessMapSearch(true));
 document.addEventListener("keydown", event => {
   if (event.key !== "Escape" ||
       !$("processOverviewDisclosure").classList.contains("process-map-focus")) return;
