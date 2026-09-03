@@ -63,6 +63,15 @@ assert.deepStrictEqual(legacyBc.nodes.map(node => node.title),
   ["Purchase Order", "Warehouse Receipt"]);
 assert.strictEqual(legacyBc.nodes[1].metadata.semanticStatus, "suggested");
 assert.strictEqual(legacyBc.nodes[0].metadata.originalNodeType, "document");
+const conditionalBc = semanticMap.project({ recordingId: "conditional", analysis: {
+  bestMatch: { referenceProcess: "Purchase Order Flow", matchedSteps: [], additionalSteps: [],
+    missingSteps: [{ type: "document", id: "document:warehouse-receipt",
+      name: "Warehouse Receipt", applicability: "conditional",
+      variantIds: ["variant:basic-warehouse", "variant:advanced-warehouse"] }] }
+} }, "businessCentral");
+assert.strictEqual(conditionalBc.nodes[0].metadata.semanticStatus, "conditional");
+assert.deepStrictEqual(conditionalBc.nodes[0].metadata.variantIds,
+  ["variant:basic-warehouse", "variant:advanced-warehouse"]);
 assert.throws(() => semanticMap.project(input, "pixels"), /Unsupported semantic process-map level/);
 
 const selectedAnalysis = { ...analysis, referenceGraphs: { alternative: { ...referenceGraph,

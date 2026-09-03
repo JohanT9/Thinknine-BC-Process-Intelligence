@@ -11,6 +11,10 @@
 
 ## Unreleased
 
+- Made process assessment lifecycle-variant aware so configuration-dependent
+  Business Central document steps appear as conditional rather than mandatory
+  missing steps.
+
 - Enriched recognized BC Process maps with sequence-aware document and action
   nodes, renderer-neutral node types, and contextual protection against treating
   unrelated captions such as `Registrera vikt` as warehouse registration.

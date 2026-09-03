@@ -156,6 +156,36 @@
     return matched;
   }
 
+  function lifecycleEvidence(catalog, matches, observedDocumentIds) {
+    const best = matches[0] || null;
+    if (!best) return { documents: [], assessment: null };
+    const plausible = matches.filter(item => item.lifecycleId === best.lifecycleId &&
+      best.confidence - item.confidence <= 0.08);
+    const lifecycle = catalog.lifecycles.find(item => item.id === best.lifecycleId);
+    if (!lifecycle) return { documents: [], assessment: null };
+    const observed = new Set(observedDocumentIds);
+    const stages = new Map();
+    plausible.forEach(match => lifecycleModel.stageSequence(lifecycle, match.variantId)
+      .filter(stage => stage.documentId).forEach((stage, index) => {
+        const current = stages.get(stage.documentId) || { id: stage.documentId,
+          name: stage.name, optional: stage.optional, count: 0, order: index, variantIds: [] };
+        current.count += 1;
+        current.order = Math.min(current.order, index);
+        current.optional = current.optional && stage.optional;
+        current.variantIds.push(match.variantId);
+        stages.set(stage.documentId, current);
+      }));
+    const documents = [...stages.values()].sort((left, right) => left.order - right.order ||
+      left.id.localeCompare(right.id)).map(item => ({ id: item.id, name: item.name,
+        applicability: observed.has(item.id) ? "observed" :
+          item.count < plausible.length ? "conditional" : item.optional ? "optional" : "expected",
+        variantIds: unique(item.variantIds) }));
+    return { documents, assessment: { selectedVariantId: best.variantId,
+      alternativeVariantIds: plausible.slice(1).map(item => item.variantId),
+      ambiguous: plausible.length > 1,
+      candidateMargin: plausible[1] ? Number((best.confidence - plausible[1].confidence).toFixed(3)) : null } };
+  }
+
   function candidateFor(process, taxonomy, evidence, lifecycleCatalog) {
     const businessProcess = taxonomy.businessProcesses.find(item =>
       item.id === process.businessProcessId);
@@ -193,6 +223,8 @@
       evidence.documentSequence.map(item => item.id), { bcProcessId: process.id,
         observedActions: observedActions.map(item => item.name) });
     const lifecycleMatch = lifecycleMatches[0] || null;
+    const lifecycle = lifecycleEvidence(lifecycleCatalog, lifecycleMatches,
+      evidence.documentSequence.map(item => item.id));
     const lifecycleStrength = lifecycleMatch && lifecycleMatch.matchedTransitions.length
       ? lifecycleMatch.confidence : 0;
     const expectedPositions = new Map(expectedDocuments.map((id, index) => [id, index]));
@@ -243,6 +275,8 @@
             observation.eventId === item.eventId)?.sequence || 0, strength: item.strength })),
         expectedDocuments: expectedDocuments.map(id => { const document = taxonomy.documents
           .find(item => item.id === id); return { id, name: document?.name || id }; }),
+        lifecycleDocuments: lifecycle.documents,
+        variantAssessment: lifecycle.assessment,
         matchedActions: actionHits.map(item => ({ name: item.name, eventId: item.eventId,
           sequence: evidence.observations.find(observation =>
             observation.eventId === item.eventId)?.sequence || 0, strength: item.strength,
@@ -261,7 +295,9 @@
           transitionStrength: Number(transitionStrength.toFixed(3)),
           lifecycleStrength: Number(lifecycleStrength.toFixed(3)) },
         lifecycle: lifecycleMatch ? { lifecycleId: lifecycleMatch.lifecycleId,
-          variantId: lifecycleMatch.variantId, confidence: lifecycleMatch.confidence } : null,
+          variantId: lifecycleMatch.variantId, confidence: lifecycleMatch.confidence,
+          alternativeVariantIds: lifecycle.assessment?.alternativeVariantIds || [],
+          ambiguous: Boolean(lifecycle.assessment?.ambiguous) } : null,
         strongMetadata: hasStrong } };
   }
 

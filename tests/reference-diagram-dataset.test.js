@@ -135,6 +135,8 @@ assert(misleadingGraphMatch.bestMatch.matchedSteps.some(item =>
   item.name === "Release" && item.nodeType === "processStep"));
 assert(misleadingGraphMatch.bestMatch.missingSteps.some(item =>
   item.id === "document:warehouse-receipt" && item.suggested));
+assert.strictEqual(misleadingGraphMatch.bestMatch.missingSteps.find(item =>
+  item.id === "document:warehouse-receipt").applicability, "conditional");
 assert(misleadingGraphMatch.matches.every(item => item.matchedNodes > 0),
   "References without any matched node are not useful alternatives.");
 

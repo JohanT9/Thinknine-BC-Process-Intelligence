@@ -105,6 +105,8 @@
       label: english ? "Observed" : "Observerat" };
     if (status === "suggested") return { name: status,
       label: english ? "Reference suggestion" : "Referensförslag" };
+    if (status === "conditional") return { name: status,
+      label: english ? "Conditional step" : "Villkorligt steg" };
     if (status === "customerSpecific") return { name: status,
       label: english ? "Customer-specific" : "Kundunikt" };
     if (status === "reference") return { name: status,

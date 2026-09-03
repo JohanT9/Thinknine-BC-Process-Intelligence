@@ -329,9 +329,12 @@
       businessProcess: recognized.taxonomyReferences.businessProcess?.name || null,
       domain: recognized.taxonomyReferences.domain.name, confidence: recognized.confidence,
       matchedSteps: observedNodes,
-      missingSteps: array(recognized.processEvidence?.expectedDocuments)
+      missingSteps: (array(recognized.processEvidence?.lifecycleDocuments).length
+        ? array(recognized.processEvidence.lifecycleDocuments)
+        : array(recognized.processEvidence?.expectedDocuments))
         .filter(item => !observedDocumentIds.has(item.id)).map(item => ({
-          type: "document", nodeType: "document", id: item.id, name: item.name, suggested: true })),
+          type: "document", nodeType: "document", id: item.id, name: item.name, suggested: true,
+          applicability: item.applicability || "expected", variantIds: item.variantIds || [] })),
       additionalSteps: [], source: "BCProcessRecognitionEngine",
       customizedBehaviorMayBeValid: true, deviationsAreErrors: false });
     }

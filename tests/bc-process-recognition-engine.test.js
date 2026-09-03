@@ -71,6 +71,17 @@ assert.deepStrictEqual(recognizedPurchase.classification.processEvidence.matched
   "document:warehouse-put-away", "document:posted-purchase-receipt"]);
 assert(recognizedPurchase.classification.processEvidence.expectedDocuments.length >= 5);
 assert(recognizedPurchase.alternatives.some(item => item.process === "WarehouseInbound"));
+assert(recognizedPurchase.classification.processEvidence.variantAssessment,
+  "Lifecycle variant evidence should be available to downstream process maps.");
+
+const purchaseOrderOnly = engine.recognize(synthetic("purchase-order-only", [
+  { identification: page(50, 38, "purchase-order", "PurchaseOrder") },
+  { identification: page(7332, 7316, "warehouse-document", "WarehouseReceipt") }
+]));
+assert.strictEqual(purchaseOrderOnly.classification.processEvidence.variantAssessment.ambiguous, true);
+assert.strictEqual(purchaseOrderOnly.classification.processEvidence.lifecycleDocuments.find(item =>
+  item.id === "document:warehouse-put-away").applicability, "conditional",
+"Warehouse put-away must not be presented as mandatory before the warehouse variant is known.");
 
 const swedishPurchase = synthetic("swedish-purchase", [
   { label: "Ny - Inköpsorder (UAT)" },

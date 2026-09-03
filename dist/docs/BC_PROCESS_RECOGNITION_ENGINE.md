@@ -5,6 +5,14 @@ Central process represented by a Canonical Recording. It is a read-only
 interpretation layer over immutable evidence and matches observations against
 the canonical Business Central Process Taxonomy.
 
+## Lifecycle variant assessment
+
+The engine retains the leading document lifecycle variant and close alternatives
+within the same lifecycle. `processEvidence.variantAssessment` reports ambiguity,
+while `processEvidence.lifecycleDocuments` labels document steps as observed,
+expected, optional, or conditional. Downstream maps can therefore distinguish a
+configuration-dependent warehouse step from a genuinely missing process step.
+
 ## Recognition stages
 
 1. Extract Business Central documents and entities from semantic references,

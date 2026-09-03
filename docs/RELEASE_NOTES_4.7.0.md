@@ -1,5 +1,9 @@
 # BC Process Studio 4.7
 
+- Process maps now retain plausible Business Central lifecycle variants and
+  mark configuration-dependent documents, such as advanced warehouse put-away,
+  as conditional steps instead of definite omissions.
+
 - BC Process maps now interleave recognized actions with Business Central
   documents and preserve distinct shapes for documents, process steps, and
   posting actions. Generic registration captions no longer create false

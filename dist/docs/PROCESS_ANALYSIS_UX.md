@@ -1,5 +1,12 @@
 # Process Analysis in Review Studio
 
+## Conditional steps
+
+The BC Process map distinguishes observed steps, reference suggestions, and
+conditional steps. A conditional step belongs to only some plausible Business
+Central lifecycle variants. It uses a purple dashed treatment and the label
+`Villkorligt steg` / `Conditional step`, so it is guidance rather than an error.
+
 ## User workflow
 
 `Processanalys` is a first-class Review Studio toolbar action beside Document
