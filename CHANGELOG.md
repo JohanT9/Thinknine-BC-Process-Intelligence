@@ -20,6 +20,9 @@
 - Added compact type labels to exported process nodes so documents, process
   steps, postings, decisions, and actions remain immediately distinguishable
   alongside their semantic colors and shapes.
+- Routed reverse-row sequences directly between adjacent card edges, removing
+  connector detours through responsibility headers and keeping arrow direction
+  immediately readable across multi-row process maps.
 
 - Hid reference suggestions from Process Overview and process exports by
   default, while adding an explicit `Show reference suggestions` control that

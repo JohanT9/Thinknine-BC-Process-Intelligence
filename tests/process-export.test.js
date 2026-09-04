@@ -108,6 +108,10 @@ assert(splitLaneSvg.includes(">PROCESSSTEG<"));
 assert(!splitLaneSvg.includes('x="850"'),
   "short reversed rows must stay inside the calculated export canvas");
 assert(!splitLaneSvg.includes("document:purchase-orde"));
+assert(splitLaneSvg.includes('d="M 326 430 H 254"'),
+  "reverse rows must connect directly from the left edge to the preceding card");
+assert(!splitLaneSvg.includes("V 325.6"),
+  "reverse-row connectors must not detour through the responsibility header");
 const monochromeSvg = svgExporter.svg(model, { theme: "monochrome" });
 assert(monochromeSvg.includes('data-process-theme="monochrome"'));
 assert(monochromeSvg.includes("stroke:#333333"));

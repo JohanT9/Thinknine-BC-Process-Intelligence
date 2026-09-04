@@ -72,6 +72,9 @@
   function edgePath(from, to) { const sx = from.x + from.width; const sy = from.y + from.height / 2;
     const tx = to.x; const ty = to.y + to.height / 2; if (Math.abs(sy - ty) < 5 && tx >= sx)
       return { d: `M ${sx} ${sy} H ${tx}`, labelX: (sx + tx) / 2, labelY: sy - 8 };
+    if (Math.abs(sy - ty) < 5 && to.x < from.x) { const reverseStart = from.x;
+      const reverseTarget = to.x + to.width; return { d: `M ${reverseStart} ${sy} H ${reverseTarget}`,
+        labelX: (reverseStart + reverseTarget) / 2, labelY: sy - 8 }; }
     if (to.y > from.y) { const middle = sy + Math.max(24, (to.y - sy) / 2); return {
       d: `M ${from.x + from.width / 2} ${from.y + from.height} V ${middle} H ${
         to.x + to.width / 2} V ${to.y}`, labelX: (from.x + to.x + to.width) / 2,
