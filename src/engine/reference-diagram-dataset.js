@@ -336,6 +336,7 @@
           type: "document", nodeType: "document", id: item.id, name: item.name, suggested: true,
           applicability: item.applicability || "expected", variantIds: item.variantIds || [] })),
       additionalSteps: [], source: "BCProcessRecognitionEngine",
+      variantAssessment: clone(recognized.processEvidence?.variantAssessment),
       customizedBehaviorMayBeValid: true, deviationsAreErrors: false });
     }
     const runnerUp = matches.find(item => item.referenceDiagramId !== selectedBest?.referenceDiagramId) || null;

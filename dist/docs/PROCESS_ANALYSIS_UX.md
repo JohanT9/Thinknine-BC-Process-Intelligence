@@ -1,5 +1,13 @@
 # Process Analysis in Review Studio
 
+## Configuration explanation
+
+The analysis summary names the most likely Business Central configuration. If
+several lifecycle variants fit the same recording, it says that the assessment
+is uncertain and exposes the alternatives in a collapsed list. Swedish labels
+use consultant-facing terminology such as `Grundläggande lagerhantering` and
+`Avancerad lagerhantering`; internal taxonomy IDs are not shown.
+
 ## Conditional steps
 
 The BC Process map distinguishes observed steps, reference suggestions, and

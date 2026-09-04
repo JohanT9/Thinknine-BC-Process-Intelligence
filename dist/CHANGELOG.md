@@ -11,6 +11,9 @@
 
 ## Unreleased
 
+- Added an explainable lifecycle-variant panel to Process Analysis, including
+  localized Business Central configuration names and close alternatives.
+
 - Made process assessment lifecycle-variant aware so configuration-dependent
   Business Central document steps appear as conditional rather than mandatory
   missing steps.

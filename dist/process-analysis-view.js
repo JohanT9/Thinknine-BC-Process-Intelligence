@@ -13,6 +13,9 @@
   function stepLabel(step) { return text(step?.title || step?.name || step?.id ||
     step?.referenceProcess || "Unknown step"); }
   function localized(value, labels) { return labels.processNames?.[text(value)] || text(value); }
+  function variantLabel(value, labels) { const id = text(value?.id || value);
+    const name = text(value?.name || value); return labels.variantNames?.[id] ||
+      labels.variantNames?.[name] || name.replace(/^variant:/, "").replace(/-/g, " "); }
   function normalize(result = {}, decision = null) { let best = result.bestMatch || null;
     if (decision?.confirmedReferenceId) { const selected = array(result.matches).find(item =>
       item.referenceDiagramId === decision.confirmedReferenceId) ||
@@ -44,6 +47,8 @@
       text(decision?.confirmedReferenceId), confirmedAt: decision?.confirmedAt || null,
       assessmentStatus: status, evidenceQuality: text(best?.evidenceQuality || assessment.evidenceQuality) || "weak",
       candidateMargin: Number(best?.candidateMargin ?? assessment.candidateMargin ?? 0),
+      variantAssessment: clone(best?.variantAssessment || result.recognition?.classification
+        ?.processEvidence?.variantAssessment || null),
       manualConfirmationRecommended: assessment.manualConfirmationRecommended === true ||
         best?.manualConfirmationRecommended === true || status !== "auto-classifiable", advisory: true }); }
   function metric(label, value, tone) { return `<div class="process-analysis-metric ${tone}">
@@ -70,6 +75,18 @@
         <div class="process-analysis-confidence"><strong>${percent}%</strong>
           <span>${escape(labels.match || "match")}</span></div>
       </section>
+      ${model.variantAssessment ? `<section class="process-analysis-variant" aria-labelledby="processAnalysisVariantTitle">
+        <div><span>${escape(labels.configurationVariant || "Business Central configuration")}</span>
+          <h4 id="processAnalysisVariantTitle">${escape(variantLabel({ id:
+            model.variantAssessment.selectedVariantId, name:
+            model.variantAssessment.selectedVariantName }, labels))}</h4></div>
+        <p>${escape(model.variantAssessment.ambiguous ? labels.variantUncertain ||
+          "Several configurations fit the recording. Variant-specific steps are shown as conditional." :
+          labels.variantSupported || "The observed sequence supports this configuration variant.")}</p>
+        ${array(model.variantAssessment.alternativeVariants).length ? `<details><summary>${escape(
+          labels.variantAlternatives || "Other possible configurations")}</summary><ul>${array(
+            model.variantAssessment.alternativeVariants).map(item => `<li>${escape(variantLabel(item,
+              labels))}</li>`).join("")}</ul></details>` : ""}</section>` : ""}
       <div class="process-analysis-meter" role="progressbar" aria-label="${escape(labels.matchDegree ||
         "Match confidence")}" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${percent}">
         <span style="width:${percent}%"></span></div>

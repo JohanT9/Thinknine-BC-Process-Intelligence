@@ -180,8 +180,12 @@
         applicability: observed.has(item.id) ? "observed" :
           item.count < plausible.length ? "conditional" : item.optional ? "optional" : "expected",
         variantIds: unique(item.variantIds) }));
+    const variantName = id => catalog.variants.find(item => item.id === id)?.name || id;
     return { documents, assessment: { selectedVariantId: best.variantId,
+      selectedVariantName: variantName(best.variantId),
       alternativeVariantIds: plausible.slice(1).map(item => item.variantId),
+      alternativeVariants: plausible.slice(1).map(item => ({ id: item.variantId,
+        name: variantName(item.variantId), confidence: item.confidence })),
       ambiguous: plausible.length > 1,
       candidateMargin: plausible[1] ? Number((best.confidence - plausible[1].confidence).toFixed(3)) : null } };
   }

@@ -3491,7 +3491,11 @@ function processAnalysisLabels() {
     "auto-classifiable": "Strong process evidence", "review-required": "Needs confirmation",
     "insufficient-evidence": "Insufficient process evidence", confirmationRecommended:
       "Confirm the classification before using it.", strongEvidence:
-      "The classification is supported by several independent signals."
+      "The classification is supported by several independent signals.",
+    configurationVariant: "Business Central configuration", variantUncertain:
+      "Several configurations fit the recording. Variant-specific steps are shown as conditional.",
+    variantSupported: "The observed sequence supports this configuration variant.",
+    variantAlternatives: "Other possible configurations"
   } : {
     detected: "Identifierad referensprocess", unknownDomain: "Domän inte identifierad",
     match: "matchning", matchDegree: "Matchningsgrad", confirmed:
@@ -3506,7 +3510,19 @@ function processAnalysisLabels() {
     "auto-classifiable": "Starkt processunderlag", "review-required": "Behöver bekräftas",
     "insufficient-evidence": "Otillräckligt processunderlag", confirmationRecommended:
       "Bekräfta klassificeringen innan den används.", strongEvidence:
-      "Klassificeringen stöds av flera oberoende signaler.", processNames: {
+      "Klassificeringen stöds av flera oberoende signaler.",
+    configurationVariant: "Business Central-konfiguration", variantUncertain:
+      "Flera konfigurationer passar inspelningen. Variantberoende steg visas som villkorliga.",
+    variantSupported: "Den observerade sekvensen stöder denna konfigurationsvariant.",
+    variantAlternatives: "Andra möjliga konfigurationer", variantNames: {
+      "variant:no-warehouse": "Utan lagerhantering",
+      "variant:basic-warehouse": "Grundläggande lagerhantering",
+      "variant:advanced-warehouse": "Avancerad lagerhantering",
+      "variant:direct-shipment": "Direktleverans",
+      "variant:drop-shipment": "Direktleverans från leverantör",
+      "variant:make-to-stock": "Tillverkning mot lager",
+      "variant:make-to-order": "Tillverkning mot order"
+    }, processNames: {
         "Source to Pay": "Inköp till betalning", "domain:source-to-pay": "Inköp till betalning",
         "Purchase to Pay": "Inköp till betalning",
         "Simple Purchase Order": "Enkel inköpsorder", "Warehouse Inbound": "Lagerinleverans",

@@ -76,6 +76,22 @@ const empty = view.render(container, { result: {} }, { noMatchTitle: "Ingen säk
 assert.strictEqual(empty.available, false);
 assert(container.innerHTML.includes('role="status"'));
 
+const variantResult = { bestMatch: { referenceProcessId: "purchase", referenceProcess:
+  "Purchase to Pay", confidence: 0.63, matchedSteps: [], missingSteps: [], additionalSteps: [],
+  variantAssessment: { selectedVariantId: "variant:basic-warehouse",
+    selectedVariantName: "Basic Warehouse", ambiguous: true, alternativeVariants: [{
+      id: "variant:advanced-warehouse", name: "Advanced Warehouse", confidence: 0.63 }] } } };
+const variantModel = view.render(container, { result: variantResult }, {
+  configurationVariant: "Business Central-konfiguration",
+  variantUncertain: "Variantberoende steg visas som villkorliga.",
+  variantAlternatives: "Andra möjliga konfigurationer", variantNames: {
+    "variant:basic-warehouse": "Grundläggande lagerhantering",
+    "variant:advanced-warehouse": "Avancerad lagerhantering" } });
+assert.strictEqual(variantModel.variantAssessment.ambiguous, true);
+assert(container.innerHTML.includes("Grundläggande lagerhantering"));
+assert(container.innerHTML.includes("Avancerad lagerhantering"));
+assert(container.innerHTML.includes("Variantberoende steg visas som villkorliga."));
+
 const root = path.resolve(__dirname, "..");
 const html = fs.readFileSync(path.join(root, "src/ui/dashboard.html"), "utf8");
 const dashboard = fs.readFileSync(path.join(root, "src/ui/dashboard.js"), "utf8");
