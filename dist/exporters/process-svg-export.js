@@ -185,7 +185,12 @@
           english))} → ${escape(stateValue(change.after, english))}</text>`; }).join("");
       const semanticStatus = node?.metadata?.semanticStatus;
       const semanticClass = semanticStatus ? ` semantic-${escape(semanticStatus)}` : "";
-      const badge = `<circle class="step-badge" cx="${box.x + 1}" cy="${box.y + 1}" r="16"/><text class="step-number" x="${box.x + 1}" y="${box.y + 6}" text-anchor="middle">${nodeIndex + 1}</text>`;
+      const boundary = ["start", "end"].includes(visual.kind);
+      const stepNumber = nodes.slice(0, nodeIndex).filter(item => !["start", "end"].includes(
+        visualGrammar.presentationFor(item, options.language).kind)).length + 1;
+      const badge = boundary ? "" : `<circle class="step-badge" cx="${box.x + 1}" cy="${
+        box.y + 1}" r="16"/><text class="step-number" x="${box.x + 1}" y="${
+        box.y + 6}" text-anchor="middle">${stepNumber}</text>`;
       const statusMarker = semanticStatus ? `<circle class="status-dot" cx="${
         box.x + box.width - 13}" cy="${box.y + 14}" r="6"><title>${
         escape(processMapLabels.statusTitle(semanticStatus, options.language))}</title></circle>` : "";

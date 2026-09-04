@@ -124,6 +124,15 @@
   function observedOnly(model) { const values = array(model.nodes).filter(node =>
     ["observed", "customerSpecific"].includes(node.metadata?.semanticStatus));
     return processModel(model.recordingId, model.title, values); }
+  function withBoundaries(model, locale) { if (!model.nodes.length) return model;
+    const english = String(locale || "").toLowerCase().startsWith("en");
+    const boundary = (position, nodeType, title) => ({ nodeId: processGraph.stableId(
+      "semantic-map-boundary", [model.recordingId, model.title, position]), nodeType, title,
+      sourceStepIds: [], sourceEventIds: [], metadata: { structuralBoundary: true,
+        semanticLevel: "businessCentral" } });
+    return processModel(model.recordingId, model.title, [boundary("start", "start", "Start"),
+      ...model.nodes, boundary("end", "end", english ? "End" : "Slut")]);
+  }
   function project(input = {}, level = "businessCentral", options = {}) { if (!LEVELS.includes(level))
     throw new Error(`Unsupported semantic process-map level: ${level}`);
     if (level === "procedure") return input.procedureModel || processModel(input.recordingId,
@@ -132,6 +141,7 @@
     if (level === "business") return business(input, model); const reference = graphFor(input, model);
     const projected = reference ? fromReferenceGraph(input, model, reference) :
       fromComparison(input, model);
-    return options.includeReferences === true ? projected : observedOnly(projected); }
-  return { LEVELS, inheritProcessRoles, project, semanticStatus };
+    const visible = options.includeReferences === true ? projected : observedOnly(projected);
+    return options.includeBoundaries === true ? withBoundaries(visible, options.locale) : visible; }
+  return { LEVELS, inheritProcessRoles, project, semanticStatus, withBoundaries };
 });

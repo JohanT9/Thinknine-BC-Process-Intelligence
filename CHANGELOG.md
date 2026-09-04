@@ -41,6 +41,9 @@
 - Added true SVG shapes for documents, manual actions, data entities, and
   system actions, making node meaning distinguishable without relying on color
   and bringing exported maps closer to professional process-diagram notation.
+- Added model-level Start and End boundaries to classified process maps. The
+  boundaries frame the observed sequence without being counted as recorded
+  steps or treated as reference suggestions.
 
 - Hid reference suggestions from Process Overview and process exports by
   default, while adding an explicit `Show reference suggestions` control that

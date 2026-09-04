@@ -110,6 +110,14 @@ const advancedVariant = semanticMap.project({ recordingId: "advanced", analysis:
   decision: { confirmedVariantId: "variant:advanced-warehouse" } }, "businessCentral");
 assert(!advancedVariant.nodes.some(node => node.title === "Warehouse Put-away"));
 assert.throws(() => semanticMap.project(input, "pixels"), /Unsupported semantic process-map level/);
+const bounded = semanticMap.project(input, "businessCentral", { includeBoundaries: true,
+  locale: "sv-SE" });
+assert.deepStrictEqual(bounded.nodes.map(node => node.nodeType),
+  ["start", "activity", "activity", "activity", "activity", "end"]);
+assert.strictEqual(bounded.nodes[0].title, "Start");
+assert.strictEqual(bounded.nodes.at(-1).title, "Slut");
+assert.strictEqual(bounded.nodes[0].metadata.structuralBoundary, true);
+assert.strictEqual(bounded.transitions.length, bounded.nodes.length - 1);
 
 const selectedAnalysis = { ...analysis, referenceGraphs: { alternative: { ...referenceGraph,
   graphId: "alternative", nodes: referenceGraph.nodes.map(node => node.nodeId === "pick"

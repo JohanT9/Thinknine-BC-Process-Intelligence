@@ -249,6 +249,7 @@ assert(dashboardHtml.includes('src="document/process-map-theme.js"'));
 assert(dashboardHtml.includes('src="document/process-map-legend.js"'));
 assert(dashboard.includes('activeProcessMapLevel = button.dataset.processMapLevel'));
 assert(dashboard.includes("includeReferences: processMapIncludeReferences"));
+assert(dashboard.includes("includeBoundaries: true"));
 assert(dashboard.includes('$("processMapIncludeReferences").addEventListener("change"'));
 assert(dashboardHtml.includes('id="processMapIncludeReferences"'));
 assert(dashboard.includes('button.disabled = false'));

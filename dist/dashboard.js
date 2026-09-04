@@ -6585,7 +6585,8 @@ function renderProcessOverview() {
         decision: activeReview.processAnalysis,
         reviewTasks: activeReview.tasks || [],
         procedureModel
-      }, activeProcessMapLevel, { includeReferences: processMapIncludeReferences });
+      }, activeProcessMapLevel, { includeReferences: processMapIncludeReferences,
+        includeBoundaries: true, locale: english ? "en-US" : "sv-SE" });
     activeProcessBaseModel = model;
     activeProcessModel = displayedLevel === "procedure" ? model :
       globalThis.T9ProcessMapRelationshipOverrides.apply(

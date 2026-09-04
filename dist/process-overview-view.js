@@ -266,6 +266,10 @@
         const placement = placementById.get(detail.node.nodeId);
         const visual = visualGrammar.presentationFor(detail.node,
           english ? "en-US" : "sv-SE");
+        const boundary = ["start", "end"].includes(visual.kind);
+        const stepNumber = details.slice(0, detail.index).filter(item => !["start", "end"]
+          .includes(visualGrammar.presentationFor(item.node, english ? "en-US" : "sv-SE").kind))
+          .length + 1;
         const accessibleRoutes = routeSummary(detail, english);
         const lane = laneStartIds.get(detail.node.nodeId);
         const laneRole = String(lane?.laneId || "").replace(/^role:/u, "");
@@ -289,7 +293,8 @@
             <span class="process-map-drag-handle" data-process-drag-handle draggable="${
               options.reorderable === true}" title="${english ? "Drag to change position" :
                 "Dra för att ändra position"}" aria-hidden="true">⠿</span>
-            <span class="process-overview-number" aria-hidden="true"><span>${decision ? "?" : detail.index + 1}</span></span>
+            <span class="process-overview-number" aria-hidden="true"><span>${boundary ? "" :
+              decision ? "?" : stepNumber}</span></span>
             <span class="process-overview-content">
               ${phase && !lanes.visible ? `<span class="process-overview-phase">${escape(phase)}</span>` : ""}
               ${subtask ? `<span class="process-overview-subtask">${escape(subtask)}</span>` : ""}
