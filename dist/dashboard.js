@@ -6823,9 +6823,10 @@ async function openReview(session) {
         ...existing.review,
         tasks: globalThis.T9Review.normalizeTasks(existing.review.tasks)
       })
-    : globalThis.T9Review.createReview(
+    : globalThis.T9Review.replaceGeneratedReview(
       session,
-      activeReviewModel.businessTasks
+      activeReviewModel.businessTasks,
+      existing.review
     );
   activeReviewSelection = globalThis.T9ReviewSelection.create();
   activeReviewEdit = null;

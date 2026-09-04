@@ -23,6 +23,21 @@ assert.deepStrictEqual(normalizedLegacyReview.annotations, {
   schemaVersion: "1.0.0",
   screenshotSets: []
 });
+const previousClassifiedReview = {
+  processAnalysis: { confirmedReferenceId: "reference:simple-purchase-order",
+    confirmedName: "Simple Purchase Order", classificationSource: "manual",
+    status: "confirmed", confirmedAt: "2026-09-04T12:00:00.000Z" }
+};
+const manuallyClassified = review.replaceGeneratedReview(session, tasks,
+  previousClassifiedReview);
+assert.deepStrictEqual(manuallyClassified.processAnalysis, {
+  confirmedReferenceId: "reference:simple-purchase-order",
+  confirmedName: "Simple Purchase Order", classificationSource: "manual",
+  status: "confirmed", confirmedAt: "2026-09-04T12:00:00.000Z"
+});
+assert.notStrictEqual(manuallyClassified.processAnalysis,
+  previousClassifiedReview.processAnalysis,
+  "a replacement review must own its preserved classification data");
 
 const normalizedWithoutId = review.normalizeTasks([{ instruction: "Steg" }]);
 assert.strictEqual(normalizedWithoutId[0].taskId, "ReviewTask-1");

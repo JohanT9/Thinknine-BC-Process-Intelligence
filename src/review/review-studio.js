@@ -259,6 +259,15 @@
     return normalized;
   }
 
+  function replaceGeneratedReview(session, tasks, previousReview = null) {
+    const replacement = createReview(session, tasks);
+    if (previousReview?.processAnalysis &&
+        typeof previousReview.processAnalysis === "object") {
+      replacement.processAnalysis = clone(previousReview.processAnalysis);
+    }
+    return replacement;
+  }
+
   function setDocumentField(review, field, value, options = {}) {
     if (!["expectedResult", "documentLanguage"].includes(field)) {
       throw new TypeError(`Unsupported review document field: ${field}.`);
@@ -1331,6 +1340,7 @@
 
   return {
     createReview,
+    replaceGeneratedReview,
     normalizeReview,
     setDocumentField,
     addAnnotation,

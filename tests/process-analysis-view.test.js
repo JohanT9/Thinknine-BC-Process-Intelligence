@@ -163,6 +163,7 @@ assert(html.includes('src="process-analysis-view.js"'));
 assert(dashboard.includes('type: "T9_MATCH_REFERENCE_PROCESS"'));
 assert(dashboard.includes("persistProcessAnalysisDecision(reference, \"confirmed\", variant)"));
 assert(dashboard.includes("reference.id === model.referenceId"));
+assert(dashboard.includes("T9Review.replaceGeneratedReview"));
 assert(dashboard.includes("reviewAutoSave.schedule()"));
 assert(background.includes('case "T9_MATCH_REFERENCE_PROCESS"'));
 console.log("Process Analysis view tests passed.");

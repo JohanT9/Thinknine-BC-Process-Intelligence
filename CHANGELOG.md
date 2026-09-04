@@ -11,6 +11,10 @@
 
 ## Unreleased
 
+- Preserved manually confirmed process classifications when an older review is
+  automatically rebuilt to repair generated steps, so the selection survives
+  closing and reopening the document.
+
 - Made manually confirmed process classifications display as 100% confirmed,
   reset stale configuration variants when another reference process is chosen,
   and localized purchase documents, actions, and alternative process names in
