@@ -64,6 +64,11 @@
       text(decision?.confirmedReferenceId), confirmedAt: decision?.confirmedAt || null,
       assessmentStatus: status, evidenceQuality: text(best?.evidenceQuality || assessment.evidenceQuality) || "weak",
       candidateMargin: Number(best?.candidateMargin ?? assessment.candidateMargin ?? 0),
+      evidence: clone(best?.evidence || (result.recognition?.classification ? {
+        documents: result.recognition.classification.processEvidence?.matchedDocuments,
+        actions: result.recognition.classification.processEvidence?.matchedActions,
+        explanation: result.recognition.classification.explanation,
+        signals: result.recognition.classification.signals } : null)),
       variantAssessment, confirmedVariantId,
       manualConfirmationRecommended: assessment.manualConfirmationRecommended === true ||
         best?.manualConfirmationRecommended === true || status !== "auto-classifiable", advisory: true }); }
@@ -120,6 +125,19 @@
         ${metric(labels.additional || "Customer-specific", model.additional.length, "additional")}</div>
       <p class="process-analysis-advisory">${escape(labels.advisory ||
         "Differences are guidance, not errors. The recorded process may be a valid customer variant.")}</p>
+      ${model.evidence ? `<details class="process-analysis-evidence"><summary>${escape(
+        labels.evidenceTitle || "Why this assessment?")}</summary><dl>
+        <div><dt>${escape(labels.evidenceDocuments || "Business Central documents")}</dt><dd>${escape(
+          array(model.evidence.documents).length ? array(model.evidence.documents).map(item =>
+            localized(stepLabel(item), labels)).join(", ") : labels.evidenceNone || "None detected")}</dd></div>
+        <div><dt>${escape(labels.evidenceActions || "Business actions")}</dt><dd>${escape(
+          array(model.evidence.actions).length ? array(model.evidence.actions).map(item =>
+            localized(stepLabel(item), labels)).join(", ") : labels.evidenceNone || "None detected")}</dd></div>
+        <div><dt>${escape(labels.evidenceQuality || "Evidence quality")}</dt><dd>${escape(
+          labels[`quality-${model.evidenceQuality}`] || model.evidenceQuality)}</dd></div>
+        <div><dt>${escape(labels.candidateMargin || "Lead over next candidate")}</dt><dd>${escape(
+          `${Math.round(model.candidateMargin * 100)} ${labels.percentagePoints || "percentage points"}`)}</dd></div>
+      </dl></details>` : ""}
       <div class="process-analysis-columns">${steps(labels.matchedSteps || "Matched steps", model.matched,
         "matched", labels.none || "None", labels)}${steps(labels.missingSteps || "Possible missing steps", model.missing,
         "missing", labels.noMissing || "No expected steps are missing", labels)}${steps(labels.conditionalSteps ||

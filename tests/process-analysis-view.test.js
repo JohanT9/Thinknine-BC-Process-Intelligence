@@ -8,7 +8,9 @@ const result = {
     "Advanced Warehouse Outbound", domain: "Order to Cash", confidence: 0.91,
   matchedSteps: [{ type: "action", name: "Release" }, { type: "action", name: "Create Pick" }],
   missingSteps: [{ type: "action", name: "Post Shipment" }],
-  additionalSteps: [{ type: "action", name: "Customer Approval" }] },
+  additionalSteps: [{ type: "action", name: "Customer Approval" }], evidence: {
+    documents: [{ name: "Sales Order" }, { name: "Warehouse Shipment" }],
+    actions: [{ name: "Release" }, { name: "Create Pick" }], signals: {} } },
   matches: [{ referenceDiagramId: "diagram:basic", referenceProcess: "Basic Warehouse Outbound",
     confidence: 0.68, matchedSteps: [{ title: "Release" }], missingSteps: [], additionalSteps: [] }],
   processLibraryMatch: { alternativeMatches: [{ referenceId: "reference:simple", name:
@@ -26,6 +28,7 @@ assert.strictEqual(normalized.additional.length, 1);
 assert.strictEqual(normalized.alternatives.length, 2);
 assert.strictEqual(normalized.advisory, true);
 assert.strictEqual(normalized.assessmentStatus, "auto-classifiable");
+assert.strictEqual(normalized.evidence.documents.length, 2);
 
 const selected = view.normalize(result, { confirmedReferenceId: "diagram:basic",
   confirmedAt: "2026-09-02T15:00:00Z", status: "confirmed" });
@@ -40,6 +43,9 @@ view.render(container, { result }, { detected: "Identifierad referensprocess",
 assert(container.innerHTML.includes("Advanced Warehouse Outbound"));
 assert(container.innerHTML.includes("91%"));
 assert(container.innerHTML.includes("Customer Approval"));
+assert(container.innerHTML.includes("Why this assessment?"));
+assert(container.innerHTML.includes("Warehouse Shipment"));
+assert(container.innerHTML.includes("Release, Create Pick"));
 assert(container.innerHTML.includes('role="progressbar"'));
 assert(container.innerHTML.includes('name="processAnalysisReference"'));
 assert(container.innerHTML.includes("auto-classifiable"));

@@ -1,5 +1,9 @@
 # BC Process Studio 4.7
 
+- Process Analysis now provides a collapsible evidence explanation with the
+  detected Business Central documents and actions, evidence quality, and the
+  lead over the next process candidate.
+
 - Process Analysis no longer counts configuration-dependent steps as missing.
   They have a separate `Villkorliga` metric and list until a configuration is
   confirmed.

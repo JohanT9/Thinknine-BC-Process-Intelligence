@@ -11,6 +11,10 @@
 
 ## Unreleased
 
+- Added an explainable `Why this assessment?` section showing the Business
+  Central documents, business actions, evidence quality, and candidate margin
+  behind each deterministic process classification.
+
 - Separated conditional lifecycle steps from possibly missing steps in Process
   Analysis, with dedicated metrics, lists, labels, and visual treatment.
 

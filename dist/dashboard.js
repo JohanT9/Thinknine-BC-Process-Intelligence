@@ -3497,7 +3497,12 @@ function processAnalysisLabels() {
       "Several configurations fit the recording. Variant-specific steps are shown as conditional.",
     variantSupported: "The observed sequence supports this configuration variant.",
     variantConfirmed: "This configuration was selected manually and now controls the process map.",
-    variantAlternatives: "Other possible configurations", mostLikely: "Most likely"
+    variantAlternatives: "Other possible configurations", mostLikely: "Most likely",
+    evidenceTitle: "Why this assessment?", evidenceDocuments: "Business Central documents",
+    evidenceActions: "Business actions", evidenceQuality: "Evidence quality",
+    candidateMargin: "Lead over next candidate", percentagePoints: "percentage points",
+    evidenceNone: "None detected", "quality-strong": "Strong", "quality-moderate": "Moderate",
+    "quality-weak": "Weak"
   } : {
     detected: "Identifierad referensprocess", unknownDomain: "Domän inte identifierad",
     match: "matchning", matchDegree: "Matchningsgrad", confirmed:
@@ -3519,6 +3524,11 @@ function processAnalysisLabels() {
     variantSupported: "Den observerade sekvensen stöder denna konfigurationsvariant.",
     variantConfirmed: "Konfigurationen valdes manuellt och styr nu processkartan.",
     variantAlternatives: "Andra möjliga konfigurationer", mostLikely: "Mest sannolik",
+    evidenceTitle: "Varför denna bedömning?", evidenceDocuments: "Business Central-dokument",
+    evidenceActions: "Affärsåtgärder", evidenceQuality: "Underlagskvalitet",
+    candidateMargin: "Försprång till nästa kandidat", percentagePoints: "procentenheter",
+    evidenceNone: "Inget identifierat", "quality-strong": "Starkt",
+    "quality-moderate": "Måttligt", "quality-weak": "Svagt",
     variantNames: {
       "variant:no-warehouse": "Utan lagerhantering",
       "variant:basic-warehouse": "Grundläggande lagerhantering",

@@ -133,6 +133,9 @@ assert(misleadingGraphMatch.bestMatch.matchedSteps.some(item =>
   item.id === "document:purchase-order"));
 assert(misleadingGraphMatch.bestMatch.matchedSteps.some(item =>
   item.name === "Release" && item.nodeType === "processStep"));
+assert(misleadingGraphMatch.bestMatch.evidence.documents.some(item =>
+  item.id === "document:purchase-order"));
+assert(misleadingGraphMatch.bestMatch.evidence.actions.some(item => item.name === "Release"));
 assert(misleadingGraphMatch.bestMatch.missingSteps.some(item =>
   item.id === "document:warehouse-receipt" && item.suggested));
 assert.strictEqual(misleadingGraphMatch.bestMatch.missingSteps.find(item =>

@@ -13,6 +13,11 @@ while `processEvidence.lifecycleDocuments` labels document steps as observed,
 expected, optional, or conditional. Downstream maps can therefore distinguish a
 configuration-dependent warehouse step from a genuinely missing process step.
 
+The reference matching adapter preserves structured matched-document and
+matched-action evidence on the selected result. Process Analysis consumes these
+fields directly; it does not reconstruct recognition evidence from rendered
+labels or screenshots.
+
 ## Recognition stages
 
 1. Extract Business Central documents and entities from semantic references,

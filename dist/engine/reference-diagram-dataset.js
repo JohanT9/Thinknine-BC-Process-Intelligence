@@ -337,6 +337,9 @@
           applicability: item.applicability || "expected", variantIds: item.variantIds || [] })),
       additionalSteps: [], source: "BCProcessRecognitionEngine",
       variantAssessment: clone(recognized.processEvidence?.variantAssessment),
+      evidence: { documents: clone(recognized.processEvidence?.matchedDocuments || []),
+        actions: clone(recognized.processEvidence?.matchedActions || []),
+        explanation: clone(recognized.explanation || []), signals: clone(recognized.signals || {}) },
       customizedBehaviorMayBeValid: true, deviationsAreErrors: false });
     }
     const runnerUp = matches.find(item => item.referenceDiagramId !== selectedBest?.referenceDiagramId) || null;

@@ -1,5 +1,13 @@
 # Process Analysis in Review Studio
 
+## Explainable evidence
+
+`Varför denna bedömning?` / `Why this assessment?` exposes the deterministic
+evidence behind the score without overwhelming the primary result. It lists
+matched Business Central documents, recognized business actions, evidence
+quality, and the percentage-point margin to the next candidate. The section is
+collapsed by default and remains keyboard and screen-reader accessible.
+
 ## Missing versus conditional
 
 Before a configuration variant is confirmed, configuration-dependent documents
