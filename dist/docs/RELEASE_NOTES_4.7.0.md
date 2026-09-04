@@ -1,5 +1,9 @@
 # BC Process Studio 4.7
 
+- Exported SVG process diagrams now retain the same semantic status colors,
+  dashed treatments, and localized status legend shown in Process Overview,
+  alongside the selected theme, density, direction, swimlanes, and node edits.
+
 - Consultants can select a BC Process node and edit its name, type, swimlane,
   or position before export. These corrections are stored as reversible map
   overrides and never rewrite the original recording.

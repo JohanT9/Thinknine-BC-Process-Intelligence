@@ -104,6 +104,26 @@ assert(standardDensitySvg.includes('width="190" height="104"'));
 assert(compactDensitySvg.includes('width="150" height="76"'));
 assert.notStrictEqual(standardDensitySvg, compactDensitySvg);
 
+const semanticSvg = svgExporter.svg({ recordingId: "semantic-export", nodes: [
+  { nodeId: "observed", nodeType: "activity", title: "Release", sequence: 0,
+    metadata: { semanticStatus: "observed" } },
+  { nodeId: "suggested", nodeType: "posting", title: "Post shipment", sequence: 1,
+    metadata: { semanticStatus: "suggested" } },
+  { nodeId: "conditional", nodeType: "document", title: "Warehouse Pick", sequence: 2,
+    metadata: { semanticStatus: "conditional" } },
+  { nodeId: "custom", nodeType: "manualAction", title: "Customer approval", sequence: 3,
+    metadata: { semanticStatus: "customerSpecific" } }
+], transitions: [], subprocesses: [] }, { language: "sv-SE" });
+assert(semanticSvg.includes('class="map-node map-node-action semantic-observed"'));
+assert(semanticSvg.includes('class="map-node map-node-posting semantic-suggested"'));
+assert(semanticSvg.includes('class="map-node map-node-document semantic-conditional"'));
+assert(semanticSvg.includes("semantic-customerSpecific"));
+assert(semanticSvg.includes("Observerat"));
+assert(semanticSvg.includes("Föreslaget"));
+assert(semanticSvg.includes("Villkorligt"));
+assert(semanticSvg.includes("Kundunikt"));
+assert(semanticSvg.includes("stroke:#a16207;stroke-dasharray:6 4"));
+
 const broken = { ...model, startNodeIds: ["missing"] };
 assert.throws(() => exporter.create(broken), error =>
   error.code === "INVALID_PROCESS_MODEL" && error.diagnostics.length > 0);

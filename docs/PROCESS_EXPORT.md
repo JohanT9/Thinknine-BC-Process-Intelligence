@@ -26,7 +26,10 @@ locally.
 - process phase and semantic-role swimlanes;
 - sequence, conditional, alternate, return, creation and posting transitions;
 - transition labels;
-- up to two observed state changes per activity.
+- up to two observed state changes per activity;
+- the current map density and theme;
+- semantic status styling and legend entries for observed, suggested,
+  conditional, customer-specific, and reference steps.
 
 The SVG contains presentation content but deliberately excludes raw event and
 evidence identifiers. XML content is escaped and the output is deterministic,
@@ -41,6 +44,9 @@ The selected Automatic or Vertical map direction is respected by diagram
 export; viewport zoom is intentionally not exported.
 The selected Business Central, Neutral, or Monochrome theme is also applied to
 the SVG without changing the Process Model.
+Edits made in the process-map node editor are exported from the same active
+Process Model as the preview. A renamed, reordered, reshaped, or reassigned
+node therefore cannot silently revert to its original presentation in SVG.
 
 Both exporters validate the Process Model before producing a file. Invalid
 models fail safely and show an error without downloading partial output.

@@ -89,7 +89,8 @@
   function legendFor(model, locale, width, y) {
     const legend = processMapLegend.create(model, locale);
     const items = [...legend.nodes.map(item => ({ ...item, type: "node" })),
-      ...legend.routes.map(item => ({ ...item, type: "route" }))];
+      ...legend.routes.map(item => ({ ...item, type: "route" })),
+      ...(legend.statuses || []).map(item => ({ ...item, type: "status" }))];
     const columns = Math.max(1, Math.min(4, Math.floor((width - 80) / 210)));
     const rows = Math.max(1, Math.ceil(items.length / columns));
     const itemWidth = (width - 80) / columns;
@@ -97,6 +98,9 @@
       const itemY = y + 35 + Math.floor(index / columns) * 28;
       const symbol = item.type === "node"
         ? nodeShape({}, { x, y: itemY - 12, width: 22, height: 16 }, item)
+        : item.type === "status"
+          ? `<rect x="${x}" y="${itemY - 12}" width="22" height="16" rx="4"
+            class="legend-status semantic-${escape(item.status)}"/>`
         : `<line x1="${x}" y1="${itemY - 4}" x2="${x + 26}" y2="${itemY - 4}"
           class="legend-route legend-route-${escape(item.line)}"/>`;
       return `<g class="legend-item">${symbol}<text x="${x + 34}" y="${itemY}">${
@@ -149,7 +153,9 @@
         return `<text x="${box.x + box.width / 2}" y="${box.y + box.height - 12 + index * 13}"
           class="state" text-anchor="middle">${escape(label)}: ${escape(stateValue(change.before,
           english))} → ${escape(stateValue(change.after, english))}</text>`; }).join("");
-      return `<g class="map-node map-node-${escape(visual.kind)}" data-node-type="${
+      const semanticStatus = node?.metadata?.semanticStatus;
+      const semanticClass = semanticStatus ? ` semantic-${escape(semanticStatus)}` : "";
+      return `<g class="map-node map-node-${escape(visual.kind)}${semanticClass}" data-node-type="${
         escape(node.nodeType)}" data-node-id="${escape(node.nodeId)}">${nodeShape(node, box, visual)}<text x="${
         box.x + box.width / 2}" y="${textY}" text-anchor="middle">${lines.map((line, index) =>
         `<tspan x="${box.x + box.width / 2}" dy="${index ? 18 : 0}">${escape(line)}</tspan>`).join("")}</text>${changeMarkup}</g>`; }).join("");
@@ -157,7 +163,7 @@
       width - 40}" height="${laneHeader - 6}" rx="4"/><text x="32" y="${lane.y + 19}">${
       escape(lane.title)}</text></g>`).join("");
     const title = options.title || model.title || "Process";
-    return applyTheme(`<?xml version="1.0" encoding="UTF-8"?>\n<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${width} ${height}" role="img" aria-labelledby="title description"><title id="title">${escape(title)}</title><desc id="description">${escape(english ? "Exported process diagram" : "Exporterat processdiagram")}</desc><defs><marker id="arrow" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#49657a"/></marker></defs><style>.background{fill:#fff}.lane rect{fill:#f4f8fb;stroke:#c8d5df}.lane text{font:700 13px Arial,sans-serif;fill:#213547}.map-node>*:first-child{fill:#fefefe;stroke:#52606d;stroke-width:2}.map-node text{font:600 14px Arial,sans-serif;fill:#172b3a}.map-node .state{font:11px Arial,sans-serif;fill:#3f5668}.map-node-business-process>*:first-child{fill:#eaf3f8;stroke:#31566f}.map-node-document>*:first-child{fill:#eef8fd;stroke:#2878a5}.map-node-posted-document>*:first-child{fill:#eef8f0;stroke:#347447}.map-node-posting>*:first-child,.map-node-decision>*:first-child{fill:#fff4ce;stroke:#7a5b00}.map-node-system-action>*:first-child{fill:#f6f2ff;stroke:#66558f;stroke-dasharray:6 4}.map-node-manual-action>*:first-child{fill:#fff8ef;stroke:#8a5a2b}.edge{fill:none;stroke:#49657a;stroke-width:2;stroke-linejoin:round}.edge-alternate,.edge-loop,.edge-return{stroke:#8a6d1d;stroke-dasharray:7 5}.edge-conditional,.edge-branch{stroke:#765b00;stroke-width:2.5}.edge-creates{stroke:#2878a5;stroke-dasharray:2 5}.edge-posts{stroke:#347447;stroke-width:3}.route-label{font:12px Arial,sans-serif;fill:#5f4b16;paint-order:stroke;stroke:#fff;stroke-width:4px;stroke-linejoin:round}.diagram-legend>rect{fill:#f4f8fb;stroke:#c8d5df}.diagram-legend text{font:12px Arial,sans-serif;fill:#172b3a}.diagram-legend .legend-title{font-weight:700}.legend-item>*:first-child{fill:#fefefe;stroke:#52606d;stroke-width:2}.legend-route{fill:none!important;stroke:#49657a!important}.legend-route-dashed{stroke-dasharray:7 5}.legend-route-dotted{stroke-dasharray:2 5}.legend-route-double{stroke-width:4!important}</style><rect class="background" width="100%" height="100%"/><text x="${margin}" y="38" style="font:700 20px Arial,sans-serif;fill:#172b3a">${escape(title)}</text>${laneMarkup}<g class="edges">${edges}</g><g class="nodes">${nodeMarkup}</g>${legend.markup}</svg>\n`, theme);
+    return applyTheme(`<?xml version="1.0" encoding="UTF-8"?>\n<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${width} ${height}" role="img" aria-labelledby="title description"><title id="title">${escape(title)}</title><desc id="description">${escape(english ? "Exported process diagram" : "Exporterat processdiagram")}</desc><defs><marker id="arrow" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#49657a"/></marker></defs><style>.background{fill:#fff}.lane rect{fill:#f4f8fb;stroke:#c8d5df}.lane text{font:700 13px Arial,sans-serif;fill:#213547}.map-node>*:first-child{fill:#fefefe;stroke:#52606d;stroke-width:2}.map-node text{font:600 14px Arial,sans-serif;fill:#172b3a}.map-node .state{font:11px Arial,sans-serif;fill:#3f5668}.map-node-business-process>*:first-child{fill:#eaf3f8;stroke:#31566f}.map-node-document>*:first-child{fill:#eef8fd;stroke:#2878a5}.map-node-posted-document>*:first-child{fill:#eef8f0;stroke:#347447}.map-node-posting>*:first-child,.map-node-decision>*:first-child{fill:#fff4ce;stroke:#7a5b00}.map-node-system-action>*:first-child{fill:#f6f2ff;stroke:#66558f;stroke-dasharray:6 4}.map-node-manual-action>*:first-child{fill:#fff8ef;stroke:#8a5a2b}.semantic-observed>*:first-child,.legend-status.semantic-observed{fill:#dff3e5;stroke:#15803d}.semantic-suggested>*:first-child,.legend-status.semantic-suggested{fill:#fff8e1;stroke:#a16207;stroke-dasharray:6 4}.semantic-conditional>*:first-child,.legend-status.semantic-conditional{fill:#f5f3ff;stroke:#7c3aed;stroke-dasharray:6 4}.semantic-customerSpecific>*:first-child,.legend-status.semantic-customerSpecific{fill:#e0f2fe;stroke:#0369a1}.semantic-reference>*:first-child,.legend-status.semantic-reference{fill:#eef1f4;stroke:#64717d}.edge{fill:none;stroke:#49657a;stroke-width:2;stroke-linejoin:round}.edge-alternate,.edge-loop,.edge-return{stroke:#8a6d1d;stroke-dasharray:7 5}.edge-conditional,.edge-branch{stroke:#765b00;stroke-width:2.5}.edge-creates{stroke:#2878a5;stroke-dasharray:2 5}.edge-posts{stroke:#347447;stroke-width:3}.route-label{font:12px Arial,sans-serif;fill:#5f4b16;paint-order:stroke;stroke:#fff;stroke-width:4px;stroke-linejoin:round}.diagram-legend>rect{fill:#f4f8fb;stroke:#c8d5df}.diagram-legend text{font:12px Arial,sans-serif;fill:#172b3a}.diagram-legend .legend-title{font-weight:700}.legend-item>*:first-child{fill:#fefefe;stroke:#52606d;stroke-width:2}.legend-route{fill:none!important;stroke:#49657a!important}.legend-route-dashed{stroke-dasharray:7 5}.legend-route-dotted{stroke-dasharray:2 5}.legend-route-double{stroke-width:4!important}</style><rect class="background" width="100%" height="100%"/><text x="${margin}" y="38" style="font:700 20px Arial,sans-serif;fill:#172b3a">${escape(title)}</text>${laneMarkup}<g class="edges">${edges}</g><g class="nodes">${nodeMarkup}</g>${legend.markup}</svg>\n`, theme);
   }
   return { applyTheme, edgePath, legendFor, rowsFor, svg };
 });

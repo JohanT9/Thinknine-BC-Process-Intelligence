@@ -11,6 +11,10 @@
 
 ## Unreleased
 
+- Made SVG process-diagram export preserve the preview's semantic status
+  styling and localized legend for observed, suggested, conditional,
+  customer-specific, and reference steps, completing theme and layout parity.
+
 - Added reversible process-map node overrides for title, visual node type,
   swimlane role, and sequence, with a Review Studio editor that preserves the
   canonical recording and feeds the same model to preview and export.
