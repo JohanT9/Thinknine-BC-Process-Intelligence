@@ -6585,7 +6585,8 @@ function renderProcessOverview() {
       zoom: processMapZoom,
       direction: processMapDirection,
       theme: processMapTheme,
-      density: processMapDensity
+      density: processMapDensity,
+      reorderable: displayedLevel !== "procedure"
     });
     applyProcessMapSearch(false);
   } catch (error) {
@@ -7995,6 +7996,21 @@ globalThis.T9ReviewSelection.bind($("reviewList"), {
   dispatch: dispatchReviewSelection,
   move: moveReviewTasksByOffset
 });
+globalThis.T9ProcessMapDrag.bind($("processOverview"), {
+  move({ draggedId, targetId, position }) {
+    if (!activeReview || !activeProcessBaseModel || activeProcessMapLevel === "procedure") return;
+    activeReview.processMapOverrides = globalThis.T9ProcessMapOverrides.moveTo(
+      activeReview.processMapOverrides || [], activeProcessBaseModel,
+      draggedId, targetId, position
+    );
+    activeReview.updatedAt = new Date().toISOString();
+    reviewAutoSave.schedule();
+    selectedProcessMapNodeId = draggedId;
+    renderProcessOverview();
+    globalThis.T9ProcessOverviewView.selectNode($("processOverview"), draggedId);
+  }
+});
+
 globalThis.T9ReviewMove.bind($("reviewList"), {
   move: moveReviewTasksTo
 });

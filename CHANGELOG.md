@@ -11,6 +11,10 @@
 
 ## Unreleased
 
+- Added direct drag reordering to semantic process maps, with before/after drop
+  indicators, immediate autosaved preview, keyboard-equivalent editor actions,
+  and shared ordering across preview, versioning, JSON, and SVG export.
+
 - Improved automatic process-map composition with balanced serpentine rows that
   avoid isolated final nodes and long visual return jumps, while giving the
   interactive legend the same type-specific colors as its process nodes.

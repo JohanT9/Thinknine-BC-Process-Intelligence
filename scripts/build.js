@@ -157,6 +157,7 @@ for (const file of [
   "process-map-viewport.js",
   "process-map-search.js",
   "process-map-minimap.js",
+  "process-map-drag.js",
   "process-version-comparison-view.js",
   "document-workspace-experience.js",
   "document-workspace-view.js",

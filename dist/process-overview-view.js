@@ -276,6 +276,9 @@
             ${detail.taskId ? `data-process-task-id="${escape(detail.taskId)}"` : ""}
             aria-pressed="${selected}"${selected ? ' aria-current="step"' : ""}
             aria-label="${escape(`${english ? "Step" : "Steg"} ${detail.index + 1}: ${title}${status ? `. ${status.label}` : ""}${accessibleRoutes ? `. ${accessibleRoutes}` : ""}`)}">
+            <span class="process-map-drag-handle" data-process-drag-handle draggable="${
+              options.reorderable === true}" title="${english ? "Drag to change position" :
+                "Dra för att ändra position"}" aria-hidden="true">⠿</span>
             <span class="process-overview-number" aria-hidden="true"><span>${decision ? "?" : detail.index + 1}</span></span>
             <span class="process-overview-content">
               ${phase && !lanes.visible ? `<span class="process-overview-phase">${escape(phase)}</span>` : ""}

@@ -226,6 +226,8 @@ assert(dashboardHtml.includes('id="processMapSearch"'));
 assert(dashboardHtml.includes('id="processMapSearchNext"'));
 assert(dashboardHtml.includes('src="process-map-search.js"'));
 assert(dashboardHtml.includes('src="process-map-minimap.js"'));
+assert(dashboardHtml.includes('src="process-map-drag.js"'));
+assert(dashboard.includes("T9ProcessMapDrag.bind"));
 assert(dashboardHtml.includes('aria-pressed="false"'));
 assert(dashboardHtml.includes('src="document/process-map-theme.js"'));
 assert(dashboardHtml.includes('src="document/process-map-legend.js"'));

@@ -39,5 +39,16 @@
     if (index < 0 || index === target) return normalize(input);
     [nodes[index], nodes[target]] = [nodes[target], nodes[index]];
     return normalize(nodes.reduce((result, id, order) => upsert(result, { nodeId: id, order }), input)); }
-  return { apply, move, normalize, upsert };
+  function moveTo(input, model, nodeId, targetId, position = "before") {
+    const nodes = apply(model, input).nodes.map(node => node.nodeId);
+    if (!nodes.includes(nodeId) || !nodes.includes(targetId) || nodeId === targetId) {
+      return normalize(input);
+    }
+    const remaining = nodes.filter(id => id !== nodeId);
+    const target = remaining.indexOf(targetId);
+    remaining.splice(target + (position === "after" ? 1 : 0), 0, nodeId);
+    return normalize(remaining.reduce((result, id, order) =>
+      upsert(result, { nodeId: id, order }), input));
+  }
+  return { apply, move, moveTo, normalize, upsert };
 });

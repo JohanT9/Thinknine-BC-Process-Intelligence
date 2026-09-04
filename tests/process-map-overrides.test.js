@@ -13,5 +13,8 @@ const moved = overrides.move([], model, "b", -1);
 const reordered = overrides.apply(model, moved);
 assert.deepStrictEqual(reordered.nodes.map(node => node.nodeId), ["b", "a"]);
 assert.strictEqual(reordered.transitions[0].fromNodeId, "b");
+const movedTo = overrides.apply(model, overrides.moveTo([], model, "a", "b", "after"));
+assert.deepStrictEqual(movedTo.nodes.map(node => node.nodeId), ["b", "a"]);
+assert.deepStrictEqual(overrides.moveTo([], model, "a", "a", "after"), []);
 assert(Object.isFrozen(reordered));
 console.log("Process map override tests passed.");

@@ -1,5 +1,9 @@
 # BC Process Studio 4.7
 
+- Consultants can now drag semantic process nodes to a new position. Changes
+  are stored as reversible map overrides and immediately carried into versioning
+  and export; the factual User Procedure recording order remains protected.
+
 - Automatic process maps now use balanced serpentine rows, keeping consecutive
   steps close when a process wraps and avoiding a single orphan step on the
   final row where possible. Node-type colors are also reflected in the legend.
