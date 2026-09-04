@@ -1,5 +1,12 @@
 # Process Analysis in Review Studio
 
+## Synchronized confirmed analysis
+
+After a configuration is selected, the variant heading, explanatory message,
+possible-missing count, and possible-step list are derived from that saved
+choice. Controls remain visible so the consultant can revise the selection.
+This keeps the analysis dialog and BC Process map consistent.
+
 ## Confirming a configuration variant
 
 When lifecycle evidence is ambiguous, Process Analysis presents accessible

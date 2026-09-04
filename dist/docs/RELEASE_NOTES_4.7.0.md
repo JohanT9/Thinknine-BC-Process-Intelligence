@@ -1,5 +1,9 @@
 # BC Process Studio 4.7
 
+- A saved configuration choice now updates the full Process Analysis view, not
+  only the map. Counts and possible-step lists exclude other variants, and the
+  choice can still be changed later.
+
 - Consultants can now select and save the correct Business Central lifecycle
   variant. The BC Process map immediately follows that choice and no longer
   includes steps exclusive to rejected variants.

@@ -77,7 +77,10 @@ assert.strictEqual(empty.available, false);
 assert(container.innerHTML.includes('role="status"'));
 
 const variantResult = { bestMatch: { referenceProcessId: "purchase", referenceProcess:
-  "Purchase to Pay", confidence: 0.63, matchedSteps: [], missingSteps: [], additionalSteps: [],
+  "Purchase to Pay", confidence: 0.63, matchedSteps: [], missingSteps: [{
+    name: "Warehouse Put-away", variantIds: ["variant:advanced-warehouse"] }, {
+    name: "Purchase Invoice", variantIds: ["variant:basic-warehouse",
+      "variant:advanced-warehouse"] }], additionalSteps: [],
   variantAssessment: { selectedVariantId: "variant:basic-warehouse",
     selectedVariantName: "Basic Warehouse", ambiguous: true, alternativeVariants: [{
       id: "variant:advanced-warehouse", name: "Advanced Warehouse", confidence: 0.63 }] } } };
@@ -99,6 +102,18 @@ const variantContainer = { querySelector(selector) { return selector.includes(
     dataset: { variantName: "Advanced Warehouse" } } : null; } };
 assert.deepStrictEqual(view.selectedVariant(variantContainer, variantModel), {
   id: "variant:advanced-warehouse", name: "Advanced Warehouse" });
+const confirmedBasic = view.render(container, { result: variantResult, decision: {
+  confirmedVariantId: "variant:basic-warehouse", confirmedVariantName: "Basic Warehouse" } }, {
+  variantConfirmed: "Konfigurationen valdes manuellt och styr nu processkartan.",
+  variantNames: { "variant:basic-warehouse": "Grundläggande lagerhantering",
+    "variant:advanced-warehouse": "Avancerad lagerhantering" } });
+assert.strictEqual(confirmedBasic.missing.length, 1);
+assert.strictEqual(confirmedBasic.missing[0].name, "Purchase Invoice");
+assert.strictEqual(confirmedBasic.variantAssessment.selectedVariantId,
+  "variant:basic-warehouse");
+assert(container.innerHTML.includes("Konfigurationen valdes manuellt och styr nu processkartan."));
+assert(container.innerHTML.includes('value="variant:basic-warehouse"'));
+assert(container.innerHTML.includes('value="variant:advanced-warehouse"'));
 
 const root = path.resolve(__dirname, "..");
 const html = fs.readFileSync(path.join(root, "src/ui/dashboard.html"), "utf8");

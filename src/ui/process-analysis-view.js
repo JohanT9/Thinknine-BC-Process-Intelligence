@@ -25,7 +25,7 @@
         selected.referenceId, referenceProcess: selected.referenceProcess || selected.name,
         additionalSteps: selected.additionalSteps || selected.unexpectedSteps }; }
     const processMatch = result.processLibraryMatch || null; const matched = array(best?.matchedSteps ||
-      processMatch?.matchedSteps); const missing = array(best?.missingSteps || processMatch?.missingSteps);
+      processMatch?.matchedSteps); let missing = array(best?.missingSteps || processMatch?.missingSteps);
     const additional = array(best?.additionalSteps || processMatch?.unexpectedSteps);
     const confidence = Math.max(0, Math.min(1, Number(best?.confidence || result.confidence || 0)));
     const effectiveId = text(best?.referenceProcessId || best?.referenceDiagramId || best?.referenceId);
@@ -39,6 +39,18 @@
     const assessment = result.assessment || result.recognition?.assessment || {};
     const status = text(best?.assessmentStatus || assessment.status) || (confidence >= 0.82
       ? "auto-classifiable" : confidence >= 0.35 ? "review-required" : "insufficient-evidence");
+    const confirmedVariantId = text(decision?.confirmedVariantId);
+    const variantAssessment = clone(best?.variantAssessment || result.recognition?.classification
+      ?.processEvidence?.variantAssessment || null);
+    if (variantAssessment) { variantAssessment.choices = [{ id: variantAssessment.selectedVariantId,
+      name: variantAssessment.selectedVariantName }, ...array(variantAssessment.alternativeVariants)]
+      .filter((item, index, values) => item?.id && values.findIndex(candidate =>
+        candidate.id === item.id) === index);
+    if (confirmedVariantId) { const selected = variantAssessment.choices.find(item =>
+      item.id === confirmedVariantId); variantAssessment.selectedVariantId = confirmedVariantId;
+      variantAssessment.selectedVariantName = text(decision?.confirmedVariantName || selected?.name ||
+        confirmedVariantId); variantAssessment.manuallyConfirmed = true; missing = missing.filter(item =>
+        !array(item.variantIds).length || array(item.variantIds).includes(confirmedVariantId)); } }
     return Object.freeze({ available: Boolean(best), referenceId: text(best?.referenceProcessId ||
       best?.referenceDiagramId || best?.referenceId), name: text(best?.referenceProcess || best?.name),
       domain: text(best?.domain), confidence, matched: clone(matched), missing: clone(missing),
@@ -47,9 +59,7 @@
       text(decision?.confirmedReferenceId), confirmedAt: decision?.confirmedAt || null,
       assessmentStatus: status, evidenceQuality: text(best?.evidenceQuality || assessment.evidenceQuality) || "weak",
       candidateMargin: Number(best?.candidateMargin ?? assessment.candidateMargin ?? 0),
-      variantAssessment: clone(best?.variantAssessment || result.recognition?.classification
-        ?.processEvidence?.variantAssessment || null), confirmedVariantId:
-      text(decision?.confirmedVariantId),
+      variantAssessment, confirmedVariantId,
       manualConfirmationRecommended: assessment.manualConfirmationRecommended === true ||
         best?.manualConfirmationRecommended === true || status !== "auto-classifiable", advisory: true }); }
   function metric(label, value, tone) { return `<div class="process-analysis-metric ${tone}">
@@ -81,13 +91,13 @@
           <h4 id="processAnalysisVariantTitle">${escape(variantLabel({ id:
             model.variantAssessment.selectedVariantId, name:
             model.variantAssessment.selectedVariantName }, labels))}</h4></div>
-        <p>${escape(model.variantAssessment.ambiguous ? labels.variantUncertain ||
+        <p>${escape(model.variantAssessment.manuallyConfirmed ? labels.variantConfirmed ||
+          "This configuration was selected manually and now controls the process map." :
+          model.variantAssessment.ambiguous ? labels.variantUncertain ||
           "Several configurations fit the recording. Variant-specific steps are shown as conditional." :
           labels.variantSupported || "The observed sequence supports this configuration variant.")}</p>
-        ${model.variantAssessment.ambiguous ? `<div class="process-analysis-variant-options">
-          ${[{ id: model.variantAssessment.selectedVariantId,
-            name: model.variantAssessment.selectedVariantName }, ...array(
-            model.variantAssessment.alternativeVariants)].map((item, index) =>
+        ${array(model.variantAssessment.choices).length > 1 ? `<div class="process-analysis-variant-options">
+          ${array(model.variantAssessment.choices).map((item, index) =>
               `<label><input type="radio" name="processAnalysisVariant" value="${escape(item.id)}"
                 data-variant-name="${escape(item.name)}" ${text(model.confirmedVariantId ||
                   model.variantAssessment.selectedVariantId) === text(item.id) ? "checked" : ""}>

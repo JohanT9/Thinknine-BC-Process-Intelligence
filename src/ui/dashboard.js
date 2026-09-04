@@ -3495,6 +3495,7 @@ function processAnalysisLabels() {
     configurationVariant: "Business Central configuration", variantUncertain:
       "Several configurations fit the recording. Variant-specific steps are shown as conditional.",
     variantSupported: "The observed sequence supports this configuration variant.",
+    variantConfirmed: "This configuration was selected manually and now controls the process map.",
     variantAlternatives: "Other possible configurations", mostLikely: "Most likely"
   } : {
     detected: "Identifierad referensprocess", unknownDomain: "Domän inte identifierad",
@@ -3514,6 +3515,7 @@ function processAnalysisLabels() {
     configurationVariant: "Business Central-konfiguration", variantUncertain:
       "Flera konfigurationer passar inspelningen. Variantberoende steg visas som villkorliga.",
     variantSupported: "Den observerade sekvensen stöder denna konfigurationsvariant.",
+    variantConfirmed: "Konfigurationen valdes manuellt och styr nu processkartan.",
     variantAlternatives: "Andra möjliga konfigurationer", mostLikely: "Mest sannolik",
     variantNames: {
       "variant:no-warehouse": "Utan lagerhantering",

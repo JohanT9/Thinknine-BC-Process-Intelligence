@@ -11,6 +11,10 @@
 
 ## Unreleased
 
+- Kept Process Analysis synchronized with a manually confirmed lifecycle
+  variant: its heading, guidance, missing-step metric, and step list now reflect
+  the saved configuration while remaining editable.
+
 - Added manual Business Central lifecycle-variant confirmation in Process
   Analysis; the saved choice now removes steps belonging only to other variants
   from the BC Process map.
