@@ -43,6 +43,13 @@
     const title = String(node?.title || "");
     return english ? title : (SV_NODE_TITLES[title] || title);
   }
+  function statusTitle(status, english) { const labels = english ? {
+    observed: "Observed", suggested: "Reference suggestion", conditional: "Conditional",
+    customerSpecific: "Customer-specific", reference: "Reference"
+  } : { observed: "Observerat", suggested: "Referensförslag", conditional: "Villkorligt",
+    customerSpecific: "Kundunikt", reference: "Referens" };
+    return labels[status] || status;
+  }
   const ordered = model => [...(model.nodes || [])].sort((left, right) =>
     (left.processOrder ?? left.sequence ?? 0) - (right.processOrder ?? right.sequence ?? 0) ||
     left.nodeId.localeCompare(right.nodeId));
@@ -188,13 +195,17 @@
       const semanticStatus = node?.metadata?.semanticStatus;
       const semanticClass = semanticStatus ? ` semantic-${escape(semanticStatus)}` : "";
       const badge = `<circle class="step-badge" cx="${box.x + 1}" cy="${box.y + 1}" r="16"/><text class="step-number" x="${box.x + 1}" y="${box.y + 6}" text-anchor="middle">${nodeIndex + 1}</text>`;
+      const statusMarker = semanticStatus ? `<circle class="status-dot" cx="${
+        box.x + box.width - 13}" cy="${box.y + 14}" r="6"><title>${
+        escape(statusTitle(semanticStatus, english))}</title></circle>` : "";
       const kindLabel = visual.label ? `<text class="node-kind" x="${box.x + 24}" y="${box.y + 22}">${
         escape(String(visual.label).toLocaleUpperCase(english ? "en-US" : "sv-SE"))}</text>` : "";
       return `<g class="map-node map-node-${escape(visual.kind)}${semanticClass}" data-node-type="${
-        escape(node.nodeType)}" data-node-id="${escape(node.nodeId)}">${nodeShape(node, box, visual)}${badge}${kindLabel}<text class="node-title" x="${
+        escape(node.nodeType)}" data-node-id="${escape(node.nodeId)}">${nodeShape(node, box, visual)}${badge}${statusMarker}${kindLabel}<text class="node-title" x="${
         box.x + box.width / 2}" y="${textY}" text-anchor="middle">${lines.map((line, index) =>
         `<tspan x="${box.x + box.width / 2}" dy="${index ? 18 : 0}">${escape(line)}</tspan>`).join("")}</text>${changeMarkup}</g>`; }).join("");
-    const laneMarkup = laneBands.map(lane => `<g class="lane"><rect class="lane-panel" x="20" y="${lane.y}" width="${
+    const semanticMarkerStyles = `<style>.map-node-action>*:first-child,.map-node-process-step>*:first-child{fill:#fefefe;stroke:#52606d}.map-node-business-process>*:first-child{fill:#eaf3f8;stroke:#31566f}.map-node-document>*:first-child{fill:#eef8fd;stroke:#2878a5}.map-node-posted-document>*:first-child{fill:#eef8f0;stroke:#347447}.map-node-posting>*:first-child,.map-node-decision>*:first-child{fill:#fff4ce;stroke:#7a5b00}.map-node-system-action>*:first-child{fill:#f6f2ff;stroke:#66558f}.map-node-manual-action>*:first-child{fill:#fff8ef;stroke:#8a5a2b}.status-dot{stroke:#fff!important;stroke-width:2!important;filter:none!important}.semantic-observed .status-dot{fill:#15803d}.semantic-suggested .status-dot{fill:#a16207}.semantic-suggested>*:first-child{stroke-dasharray:6 4}.semantic-conditional .status-dot{fill:#7c3aed}.semantic-conditional>*:first-child{stroke-dasharray:6 4}.semantic-customerSpecific .status-dot{fill:#0369a1}.semantic-reference .status-dot{fill:#64717d}</style>`;
+    const laneMarkup = semanticMarkerStyles + laneBands.map(lane => `<g class="lane"><rect class="lane-panel" x="20" y="${lane.y}" width="${
       width - 40}" height="${Math.max(laneHeader, lane.bottom - lane.y)}" rx="12"/><path class="lane-accent" d="M 32 ${lane.y + laneHeader} H ${width - 32}"/><text x="38" y="${lane.y + 26}">${
       escape(english ? `OWNER: ${lane.title}` : `ANSVAR: ${lane.title}`)}</text></g>`).join("");
     const title = options.title || model.title || "Process";

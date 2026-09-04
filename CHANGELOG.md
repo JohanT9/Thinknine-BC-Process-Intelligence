@@ -23,6 +23,10 @@
 - Routed reverse-row sequences directly between adjacent card edges, removing
   connector detours through responsibility headers and keeping arrow direction
   immediately readable across multi-row process maps.
+- Separated semantic status from node-type styling in SVG exports: documents,
+  actions, postings, and decisions retain their own colors and shapes while a
+  compact accessible marker communicates observed, suggested, conditional,
+  reference, or customer-specific status.
 
 - Hid reference suggestions from Process Overview and process exports by
   default, while adding an explicit `Show reference suggestions` control that

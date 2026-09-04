@@ -158,11 +158,17 @@ assert(semanticSvg.includes('class="map-node map-node-action semantic-observed"'
 assert(semanticSvg.includes('class="map-node map-node-posting semantic-suggested"'));
 assert(semanticSvg.includes('class="map-node map-node-document semantic-conditional"'));
 assert(semanticSvg.includes("semantic-customerSpecific"));
+assert(semanticSvg.includes('class="status-dot"'));
+assert(semanticSvg.includes("<title>Observerat</title>"));
+assert(semanticSvg.includes(".semantic-observed .status-dot{fill:#15803d}"));
+assert(semanticSvg.includes(".map-node-document>*:first-child{fill:#eef8fd;stroke:#2878a5}"),
+  "node type colors must remain visible for observed semantic nodes");
 assert(semanticSvg.includes("Observerat"));
 assert(semanticSvg.includes("Föreslaget"));
 assert(semanticSvg.includes("Villkorligt"));
 assert(semanticSvg.includes("Kundunikt"));
-assert(semanticSvg.includes("stroke:#a16207;stroke-dasharray:6 4"));
+assert(semanticSvg.includes(".semantic-suggested .status-dot{fill:#a16207}"));
+assert(semanticSvg.includes(".semantic-suggested>*:first-child{stroke-dasharray:6 4}"));
 
 const broken = { ...model, startNodeIds: ["missing"] };
 assert.throws(() => exporter.create(broken), error =>
