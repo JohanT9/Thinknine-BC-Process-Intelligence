@@ -11,6 +11,10 @@
 
 ## Unreleased
 
+- Added a semantic process-map connection editor for creating, changing, and
+  removing sequence, conditional, alternative, loop, return, creation, and
+  posting relationships, with optional labels and non-destructive persistence.
+
 - Added direct drag reordering to semantic process maps, with before/after drop
   indicators, immediate autosaved preview, keyboard-equivalent editor actions,
   and shared ordering across preview, versioning, JSON, and SVG export.

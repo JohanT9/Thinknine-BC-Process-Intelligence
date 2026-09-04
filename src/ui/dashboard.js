@@ -6470,6 +6470,7 @@ function renderProcessOverview() {
     if ($("compareProcessVersions")) $("compareProcessVersions").disabled = true;
     if ($("exportProcessModel")) $("exportProcessModel").disabled = true;
     if ($("exportProcessDiagram")) $("exportProcessDiagram").disabled = true;
+    if ($("editProcessMapRelationship")) $("editProcessMapRelationship").disabled = true;
     return;
   }
   try {
@@ -6486,6 +6487,7 @@ function renderProcessOverview() {
     const hasSemanticAnalysis = Boolean(activeProcessAnalysis?.bestMatch);
     const displayedLevel = hasSemanticAnalysis ? activeProcessMapLevel : "procedure";
     $("editProcessMapNode").disabled = displayedLevel === "procedure" || !selectedProcessMapNodeId;
+    $("editProcessMapRelationship").disabled = displayedLevel === "procedure" || !selectedProcessMapNodeId;
     const english = String(applicationSettings.uiLocale || "").startsWith("en");
     processMapZoom = globalThis.T9ProcessMapViewport.normalize(processMapZoom);
     $("processMapZoomValue").textContent = `${processMapZoom}%`;
@@ -6564,7 +6566,9 @@ function renderProcessOverview() {
       }, activeProcessMapLevel);
     activeProcessBaseModel = model;
     activeProcessModel = displayedLevel === "procedure" ? model :
-      globalThis.T9ProcessMapOverrides.apply(model, activeReview.processMapOverrides || []);
+      globalThis.T9ProcessMapRelationshipOverrides.apply(
+        globalThis.T9ProcessMapOverrides.apply(model, activeReview.processMapOverrides || []),
+        activeReview.processMapRelationshipOverrides || []);
     for (const button of $("processMapLevels").querySelectorAll(
       "[data-process-map-level]"
     )) {
@@ -7058,6 +7062,7 @@ $("processOverview").addEventListener("click", event => {
   if (!action) return;
   selectedProcessMapNodeId = action.dataset.processNodeAction;
   $("editProcessMapNode").disabled = activeProcessMapLevel === "procedure";
+  $("editProcessMapRelationship").disabled = activeProcessMapLevel === "procedure";
   if (action.dataset.processTaskId) {
     activateProcessOverviewTask(action.dataset.processTaskId);
   } else {
@@ -7095,6 +7100,71 @@ $("saveProcessMapNode").addEventListener("click", () => {
   reviewAutoSave.schedule();
   $("processMapNodeDialog").close();
   renderProcessOverview();
+});
+function processRelationshipId(edge, index) {
+  return edge.transitionId || edge.relationshipId || `relationship:${index}`;
+}
+function populateProcessRelationshipEditor(relationshipId = "") {
+  const english = String(applicationSettings.uiLocale || "").startsWith("en");
+  const outgoing = (activeProcessModel?.transitions || []).map((edge, index) => ({
+    ...edge, editorId: processRelationshipId(edge, index)
+  })).filter(edge => edge.fromNodeId === selectedProcessMapNodeId);
+  const existing = $("processMapRelationshipExisting");
+  existing.replaceChildren(...[{ editorId: "", label: english ? "New connection" : "Ny koppling" },
+    ...outgoing.map(edge => ({ editorId: edge.editorId, label: edge.label ||
+      `${edge.transitionType}: ${activeProcessModel.nodes.find(node =>
+        node.nodeId === edge.toNodeId)?.title || edge.toNodeId}` }))].map(item => {
+      const option = document.createElement("option"); option.value = item.editorId;
+      option.textContent = item.label; return option;
+    }));
+  existing.value = outgoing.some(edge => edge.editorId === relationshipId) ? relationshipId : "";
+  const selected = outgoing.find(edge => edge.editorId === existing.value);
+  const targets = (activeProcessModel?.nodes || []).filter(node =>
+    node.nodeId !== selectedProcessMapNodeId);
+  $("processMapRelationshipTarget").replaceChildren(...targets.map(node => {
+    const option = document.createElement("option"); option.value = node.nodeId;
+    option.textContent = node.title; return option;
+  }));
+  if (selected) $("processMapRelationshipTarget").value = selected.toNodeId;
+  $("processMapRelationshipType").value = selected?.transitionType || "sequence";
+  $("processMapRelationshipLabel").value = selected?.label || selected?.condition || "";
+  $("deleteProcessMapRelationship").disabled = !selected;
+}
+$("editProcessMapRelationship").addEventListener("click", () => {
+  if (!selectedProcessMapNodeId || activeProcessMapLevel === "procedure") return;
+  populateProcessRelationshipEditor();
+  $("processMapRelationshipDialog").showModal();
+});
+$("processMapRelationshipExisting").addEventListener("change", event =>
+  populateProcessRelationshipEditor(event.currentTarget.value));
+$("saveProcessMapRelationship").addEventListener("click", () => {
+  const targetId = $("processMapRelationshipTarget").value;
+  if (!activeReview || !selectedProcessMapNodeId || !targetId) return;
+  const existingId = $("processMapRelationshipExisting").value;
+  const id = existingId || globalThis.T9ProcessMapRelationshipOverrides.createId(
+    selectedProcessMapNodeId, targetId,
+    (activeReview.processMapRelationshipOverrides || []).length + 1);
+  activeReview.processMapRelationshipOverrides =
+    globalThis.T9ProcessMapRelationshipOverrides.upsert(
+      activeReview.processMapRelationshipOverrides || [], { relationshipId: id,
+        fromNodeId: selectedProcessMapNodeId, toNodeId: targetId,
+        transitionType: $("processMapRelationshipType").value,
+        label: $("processMapRelationshipLabel").value, deleted: false });
+  activeReview.updatedAt = new Date().toISOString(); reviewAutoSave.schedule();
+  $("processMapRelationshipDialog").close(); renderProcessOverview();
+});
+$("deleteProcessMapRelationship").addEventListener("click", () => {
+  const id = $("processMapRelationshipExisting").value;
+  const edge = (activeProcessModel?.transitions || []).find((item, index) =>
+    processRelationshipId(item, index) === id);
+  if (!activeReview || !edge) return;
+  activeReview.processMapRelationshipOverrides =
+    globalThis.T9ProcessMapRelationshipOverrides.upsert(
+      activeReview.processMapRelationshipOverrides || [], { relationshipId: id,
+        fromNodeId: edge.fromNodeId, toNodeId: edge.toNodeId,
+        transitionType: edge.transitionType, label: edge.label || "", deleted: true });
+  activeReview.updatedAt = new Date().toISOString(); reviewAutoSave.schedule();
+  $("processMapRelationshipDialog").close(); renderProcessOverview();
 });
 $("processMapLevels").addEventListener("click", async event => {
   const button = event.target.closest("[data-process-map-level]");

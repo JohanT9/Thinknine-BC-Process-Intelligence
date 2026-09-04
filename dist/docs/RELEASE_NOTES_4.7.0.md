@@ -1,5 +1,9 @@
 # BC Process Studio 4.7
 
+- Process-map connections can now be created, edited, or removed from a selected
+  semantic node. Consultants can choose the target, relationship type, and an
+  optional label while keeping the original recording and taxonomy unchanged.
+
 - Consultants can now drag semantic process nodes to a new position. Changes
   are stored as reversible map overrides and immediately carried into versioning
   and export; the factual User Procedure recording order remains protected.

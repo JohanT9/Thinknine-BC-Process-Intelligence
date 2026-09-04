@@ -624,6 +624,7 @@ body.process-map-focus-active{overflow:hidden}.process-overview-card.process-map
           <button id="exportProcessModel" type="button" class="secondary" disabled>Exportera process</button>
           <button id="exportProcessDiagram" type="button" class="secondary" disabled>Exportera diagram</button>
           <button id="editProcessMapNode" type="button" class="secondary" disabled>Redigera vald nod</button>
+          <button id="editProcessMapRelationship" type="button" class="secondary" disabled>Redigera kopplingar</button>
         </div>
         <div id="processOverview" role="region" aria-labelledby="processOverviewTitle"></div>
       </details>
@@ -731,6 +732,27 @@ body.process-map-focus-active{overflow:hidden}.process-overview-card.process-map
     </select>
   </label>
   <footer><button id="closeDocumentViewSettings" class="primary">Klar</button></footer>
+</dialog>
+
+<dialog id="processMapRelationshipDialog" class="process-map-node-dialog" aria-labelledby="processMapRelationshipTitle">
+  <form method="dialog">
+    <h3 id="processMapRelationshipTitle">Redigera koppling</h3>
+    <label for="processMapRelationshipExisting">Koppling</label>
+    <select id="processMapRelationshipExisting"></select>
+    <label for="processMapRelationshipTarget">Till nod</label>
+    <select id="processMapRelationshipTarget"></select>
+    <label for="processMapRelationshipType">Typ</label>
+    <select id="processMapRelationshipType"><option value="sequence">Nästa</option>
+      <option value="conditional">Villkor</option><option value="alternate">Alternativ</option>
+      <option value="loop">Upprepa</option><option value="return">Tillbaka</option>
+      <option value="documentCreation">Skapar dokument</option>
+      <option value="documentPosting">Bokför som</option></select>
+    <label for="processMapRelationshipLabel">Etikett (valfri)</label>
+    <input id="processMapRelationshipLabel">
+    <footer><button value="cancel" class="secondary">Avbryt</button>
+      <button id="deleteProcessMapRelationship" type="button" class="danger">Ta bort</button>
+      <button id="saveProcessMapRelationship" type="button" class="primary">Spara</button></footer>
+  </form>
 </dialog>
 
 <dialog id="processMapNodeDialog" class="process-map-node-dialog" aria-labelledby="processMapNodeTitle">
@@ -951,6 +973,7 @@ body.process-map-focus-active{overflow:hidden}.process-overview-card.process-map
 <script src="document/process-route-grammar.js"></script>
 <script src="document/process-lane-model.js"></script>
 <script src="document/process-map-overrides.js"></script>
+<script src="document/process-map-relationship-overrides.js"></script>
 <script src="document/process-map-theme.js"></script>
 <script src="document/process-map-legend.js"></script>
 <script src="exporters/process-svg-export.js"></script>
