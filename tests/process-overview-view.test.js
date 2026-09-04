@@ -55,6 +55,7 @@ assert(container.innerHTML.includes('data-shape="rectangle"'));
 assert(container.innerHTML.includes("Försäljningsorder"));
 assert(container.innerHTML.includes('class="process-overview-lane"'));
 assert(container.innerHTML.includes('data-process-lane-id="sales-phase"'));
+assert(container.innerHTML.includes('style="background:#f4f8fb;border-left-color:#31566f"'));
 assert(container.innerHTML.includes("Frisläpp order"));
 assert(container.innerHTML.includes("Vald aktivitet"));
 assert(!container.innerHTML.includes('class="process-overview-routes compact"'));
@@ -63,6 +64,16 @@ assert(!container.innerHTML.includes('class="process-overview-state"'),
 assert.strictEqual(view.containersFor(groupedModel, activityIds[1]).subtask.title,
   "Frisläpp order");
 assert(!container.innerHTML.includes("**"));
+
+const responsibilityContainer = { innerHTML: "" };
+view.render(responsibilityContainer, { recordingId: "responsibility", nodes: [{
+  nodeId: "purchase", nodeType: "document", title: "Inköpsorder", sequence: 0,
+  metadata: { processRole: { id: "purchasing", name: "Purchasing" } }
+}], transitions: [], subprocesses: [], stateTransitions: [] }, { locale: "sv-SE",
+  theme: "business-central" });
+assert(responsibilityContainer.innerHTML.includes('data-process-lane-id="role:purchasing"'));
+assert(responsibilityContainer.innerHTML.includes(
+  'style="background:#eef5ff;border-left-color:#2563a6"'));
 
 const decisionId = processModel.stableId("manual-process-node", ["branching", "stock"]);
 const shipId = processModel.stableId("process-node",

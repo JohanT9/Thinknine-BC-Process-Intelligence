@@ -33,6 +33,8 @@
 - Added theme-owned responsibility colors for Purchasing, Warehouse, Sales,
   Production, Finance, and System lanes, making cross-functional process maps
   easier to scan without encoding business meaning in the renderer.
+- Applied the same theme-owned responsibility colors to the interactive Process
+  Overview, keeping the on-screen map visually consistent with its SVG export.
 
 - Hid reference suggestions from Process Overview and process exports by
   default, while adding an explicit `Show reference suggestions` control that

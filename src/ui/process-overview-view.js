@@ -13,13 +13,15 @@
     ? require("../document/process-map-legend") : root.T9ProcessMapLegend;
   const minimap = typeof module === "object" && module.exports
     ? require("./process-map-minimap") : root.T9ProcessMapMinimap;
+  const mapTheme = typeof module === "object" && module.exports
+    ? require("../document/process-map-theme") : root.T9ProcessMapTheme;
   const api = factory(layout, visualGrammar, routeGrammar, laneModel, connectorView,
-    mapLegend, minimap);
+    mapLegend, minimap, mapTheme);
   if (typeof module === "object" && module.exports) module.exports = api;
   root.T9ProcessOverviewView = api;
 })(typeof globalThis !== "undefined" ? globalThis : this,
   function (graphLayout, visualGrammar, routeGrammar, processLaneModel,
-    processConnectorView, processMapLegend, processMapMinimap) {
+    processConnectorView, processMapLegend, processMapMinimap, processMapTheme) {
   const renderedViews = new WeakMap();
 
   function escape(value) {
@@ -235,6 +237,7 @@
       ? "Other steps" : "Övriga steg", roleNames: english ? {} : {
         purchasing: "Inköp", warehouse: "Lager", sales: "Försäljning",
         production: "Produktion", finance: "Ekonomi", system: "System" } });
+    const theme = processMapTheme.resolve(options.theme);
     const placementById = new Map(layout.nodes.map(item => [item.nodeId, item]));
     const laneById = new Map(lanes.lanes.map(lane => [lane.laneId, lane]));
     const laneStartIds = new Map(lanes.segments.map(segment => [segment.nodeIds[0],
@@ -262,8 +265,12 @@
           english ? "en-US" : "sv-SE");
         const accessibleRoutes = routeSummary(detail, english);
         const lane = laneStartIds.get(detail.node.nodeId);
+        const laneRole = String(lane?.laneId || "").replace(/^role:/u, "");
+        const laneColors = theme.rolePalette?.[laneRole] || theme.rolePalette?.default ||
+          [theme.palette.lane, theme.palette.brand];
         return `${lanes.visible && lane ? `<li class="process-overview-lane" data-process-lane-id="${
-          escape(lane.laneId)}"><span>${escape(lane.title)}</span></li>` : ""}<li class="process-overview-step${decision ? " process-overview-decision" : ""}${
+          escape(lane.laneId)}" style="background:${escape(laneColors[0])};border-left-color:${
+            escape(laneColors[1])}"><span>${escape(lane.title)}</span></li>` : ""}<li class="process-overview-step${decision ? " process-overview-decision" : ""}${
           rowEndIds.has(detail.node.nodeId) ? " process-overview-row-end" : ""}${
           ` process-overview-kind-${visual.kind}`}${
           semantic ? ` process-overview-semantic-${semantic.name}` : ""}"
