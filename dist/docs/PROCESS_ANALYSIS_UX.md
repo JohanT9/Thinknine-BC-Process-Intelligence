@@ -1,5 +1,14 @@
 # Process Analysis in Review Studio
 
+## Process-map correction preview
+
+Selecting a semantic map node enables `Redigera vald nod` / `Edit selected
+node`. The editor can rename the node, change its renderer-neutral node type,
+assign a Business Central swimlane, and move it earlier or later. Changes are
+stored in `processMapOverrides`, leaving the Canonical Recording and recognized
+taxonomy references untouched. Preview, versioning, model export, and diagram
+export consume the same overridden `ProcessGraph`.
+
 ## Business Central swimlanes
 
 BC Process nodes receive renderer-neutral `processRole` metadata derived from

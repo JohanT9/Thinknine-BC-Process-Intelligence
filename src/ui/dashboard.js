@@ -3370,6 +3370,9 @@ let activeReviewSession = null;
 let activeReview = null;
 let activeReviewModel = null;
 let activeProcessModel = null;
+let activeProcessBaseModel = null;
+let selectedProcessMapNodeId = null;
+let processMapDraftOverrides = [];
 let activeProcessAnalysis = null;
 let processAnalysisRequest = null;
 let activeProcessMapLevel = "businessCentral";
@@ -6482,6 +6485,7 @@ function renderProcessOverview() {
     });
     const hasSemanticAnalysis = Boolean(activeProcessAnalysis?.bestMatch);
     const displayedLevel = hasSemanticAnalysis ? activeProcessMapLevel : "procedure";
+    $("editProcessMapNode").disabled = displayedLevel === "procedure" || !selectedProcessMapNodeId;
     const english = String(applicationSettings.uiLocale || "").startsWith("en");
     processMapZoom = globalThis.T9ProcessMapViewport.normalize(processMapZoom);
     $("processMapZoomValue").textContent = `${processMapZoom}%`;
@@ -6558,7 +6562,9 @@ function renderProcessOverview() {
         reviewTasks: activeReview.tasks || [],
         procedureModel
       }, activeProcessMapLevel);
-    activeProcessModel = model;
+    activeProcessBaseModel = model;
+    activeProcessModel = displayedLevel === "procedure" ? model :
+      globalThis.T9ProcessMapOverrides.apply(model, activeReview.processMapOverrides || []);
     for (const button of $("processMapLevels").querySelectorAll(
       "[data-process-map-level]"
     )) {
@@ -6572,7 +6578,7 @@ function renderProcessOverview() {
       !(activeReview.processVersions || []).length;
     $("exportProcessModel").disabled = false;
     $("exportProcessDiagram").disabled = false;
-    globalThis.T9ProcessOverviewView.render(container, model, {
+    globalThis.T9ProcessOverviewView.render(container, activeProcessModel, {
       locale: applicationSettings.uiLocale || "sv-SE",
       selectedTaskIds: activeReviewSelection.selectedIds,
       reviewTasks: activeReview.tasks || [],
@@ -6584,6 +6590,7 @@ function renderProcessOverview() {
     applyProcessMapSearch(false);
   } catch (error) {
     activeProcessModel = null;
+    activeProcessBaseModel = null;
     $("saveProcessVersion").disabled = true;
     $("compareProcessVersions").disabled = true;
     $("exportProcessModel").disabled = true;
@@ -7048,6 +7055,8 @@ $("processOverview").addEventListener("click", event => {
   }
   const action = event.target.closest?.("[data-process-node-action]");
   if (!action) return;
+  selectedProcessMapNodeId = action.dataset.processNodeAction;
+  $("editProcessMapNode").disabled = activeProcessMapLevel === "procedure";
   if (action.dataset.processTaskId) {
     activateProcessOverviewTask(action.dataset.processTaskId);
   } else {
@@ -7055,6 +7064,36 @@ $("processOverview").addEventListener("click", event => {
       $("processOverview"), action.dataset.processNodeAction
     );
   }
+});
+$('editProcessMapNode').addEventListener("click", () => {
+  const node = activeProcessModel?.nodes?.find(item => item.nodeId === selectedProcessMapNodeId);
+  if (!node) return;
+  $("processMapNodeName").value = node.title || "";
+  $("processMapNodeType").value = node.nodeType || "processStep";
+  $("processMapNodeRole").value = node.metadata?.processRole?.id || "system";
+  processMapDraftOverrides = JSON.parse(JSON.stringify(activeReview.processMapOverrides || []));
+  $("processMapNodeDialog").showModal();
+});
+function moveSelectedProcessNode(direction) {
+  if (!activeProcessBaseModel || !selectedProcessMapNodeId) return;
+  processMapDraftOverrides = globalThis.T9ProcessMapOverrides.move(
+    processMapDraftOverrides, activeProcessBaseModel, selectedProcessMapNodeId, direction);
+}
+$("moveProcessNodeEarlier").addEventListener("click", () => moveSelectedProcessNode(-1));
+$("moveProcessNodeLater").addEventListener("click", () => moveSelectedProcessNode(1));
+$("saveProcessMapNode").addEventListener("click", () => {
+  if (!activeReview || !selectedProcessMapNodeId) return;
+  const roles = { purchasing: "Purchasing", warehouse: "Warehouse", sales: "Sales",
+    production: "Production", finance: "Finance", system: "System" };
+  const roleId = $("processMapNodeRole").value;
+  activeReview.processMapOverrides = globalThis.T9ProcessMapOverrides.upsert(
+    processMapDraftOverrides, { nodeId: selectedProcessMapNodeId,
+      title: $("processMapNodeName").value, nodeType: $("processMapNodeType").value,
+      processRole: { id: roleId, name: roles[roleId] } });
+  activeReview.updatedAt = new Date().toISOString();
+  reviewAutoSave.schedule();
+  $("processMapNodeDialog").close();
+  renderProcessOverview();
 });
 $("processMapLevels").addEventListener("click", async event => {
   const button = event.target.closest("[data-process-map-level]");

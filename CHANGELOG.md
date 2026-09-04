@@ -11,6 +11,10 @@
 
 ## Unreleased
 
+- Added reversible process-map node overrides for title, visual node type,
+  swimlane role, and sequence, with a Review Studio editor that preserves the
+  canonical recording and feeds the same model to preview and export.
+
 - Added automatic Business Central swimlane assignment for Purchasing,
   Warehouse, Sales, Production, Finance, System, and unassigned customer steps,
   with localized lane names in interactive and SVG diagrams.

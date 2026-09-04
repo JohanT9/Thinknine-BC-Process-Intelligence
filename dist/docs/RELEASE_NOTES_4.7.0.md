@@ -1,5 +1,9 @@
 # BC Process Studio 4.7
 
+- Consultants can select a BC Process node and edit its name, type, swimlane,
+  or position before export. These corrections are stored as reversible map
+  overrides and never rewrite the original recording.
+
 - BC Process maps now organize recognized documents into localized swimlanes
   such as Inköp, Lager, Försäljning, Produktion, Ekonomi, and System. The same
   lane structure is preserved in SVG export.
