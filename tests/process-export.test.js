@@ -86,6 +86,21 @@ const verticalSvg = svgExporter.svg({ recordingId: "vertical", nodes: [
 ], transitions: [{ fromNodeId: "one", toNodeId: "two", transitionType: "sequence" }]
 }, { language: "en-US", columns: 1 });
 assert(/<path d="[^"]* V [^"]*"/u.test(verticalSvg));
+const splitLaneSvg = svgExporter.svg({ recordingId: "split-lanes", nodes: [
+  { nodeId: "purchase", nodeType: "activity", title: "document:purchase-order", sequence: 0,
+    metadata: { processRole: "purchasing" } },
+  { nodeId: "create", nodeType: "activity", title: "Create", sequence: 1 },
+  { nodeId: "release", nodeType: "activity", title: "Release", sequence: 2 }
+], transitions: [
+  { fromNodeId: "purchase", toNodeId: "create", transitionType: "sequence" },
+  { fromNodeId: "create", toNodeId: "release", transitionType: "sequence" }
+], subprocesses: [] }, { language: "sv-SE", columns: 4 });
+assert(splitLaneSvg.includes("Inköpsorder"));
+assert(splitLaneSvg.includes("Skapa"));
+assert(splitLaneSvg.includes("Frisläpp"));
+assert(!splitLaneSvg.includes('x="850"'),
+  "short reversed rows must stay inside the calculated export canvas");
+assert(!splitLaneSvg.includes("document:purchase-orde"));
 const monochromeSvg = svgExporter.svg(model, { theme: "monochrome" });
 assert(monochromeSvg.includes('data-process-theme="monochrome"'));
 assert(monochromeSvg.includes("stroke:#333333"));

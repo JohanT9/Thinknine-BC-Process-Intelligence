@@ -15,6 +15,8 @@
   rounded responsibility lanes, numbered cards, stronger connectors, subtle
   depth, and a clear recording-based footer while retaining semantic colors,
   shapes, themes, and the underlying observed process model.
+- Kept short reverse-flow rows within the SVG canvas and localized canonical
+  Business Central document and action identifiers in Swedish diagram exports.
 
 - Hid reference suggestions from Process Overview and process exports by
   default, while adding an explicit `Show reference suggestions` control that

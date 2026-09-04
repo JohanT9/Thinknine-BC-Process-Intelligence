@@ -25,6 +25,24 @@
       else if (lines.length < limit) lines.push(word.slice(0, width));
       else if (!lines.at(-1).endsWith("…")) lines[limit - 1] = `${lines.at(-1).slice(0, width - 1)}…`;
     }); return lines; }
+  const SV_NODE_TITLES = Object.freeze({
+    "document:purchase-order": "Inköpsorder",
+    "document:purchase-invoice": "Inköpsfaktura",
+    "document:posted-purchase-invoice": "Bokförd inköpsfaktura",
+    "document:sales-order": "Försäljningsorder",
+    "document:sales-invoice": "Försäljningsfaktura",
+    "document:warehouse-receipt": "Lagerinleverans",
+    "document:warehouse-shipment": "Lagerutleverans",
+    "document:warehouse-pick": "Lagerplockning",
+    "document:warehouse-put-away": "Lagerinlagring",
+    "document:transfer-order": "Överföringsorder",
+    "Create": "Skapa", "Release": "Frisläpp", "Receive": "Ta emot",
+    "Invoice": "Fakturera", "Post": "Bokför", "Unknown step": "Okänt steg"
+  });
+  function nodeTitle(node, english) {
+    const title = String(node?.title || "");
+    return english ? title : (SV_NODE_TITLES[title] || title);
+  }
   const ordered = model => [...(model.nodes || [])].sort((left, right) =>
     (left.processOrder ?? left.sequence ?? 0) - (right.processOrder ?? right.sequence ?? 0) ||
     left.nodeId.localeCompare(right.nodeId));
@@ -126,12 +144,13 @@
     const margin = 64; const header = 126; const laneHeader = 42;
     const layout = rowsFor(model, nodes, columns, english); const boxes = {}; let cursorY = header;
     const laneBands = []; let activeLaneBand;
-    layout.rows.forEach(row => { if (layout.lanes.visible && row.firstInLane && row.lane) {
-      activeLaneBand = { y: cursorY, title: row.lane.title, bottom: cursorY };
-      laneBands.push(activeLaneBand); cursorY += laneHeader; }
+    layout.rows.forEach(row => { if (row.firstInLane) activeLaneBand = null;
+      if (layout.lanes.visible && row.firstInLane && row.lane) {
+        activeLaneBand = { y: cursorY, title: row.lane.title, bottom: cursorY };
+        laneBands.push(activeLaneBand); cursorY += laneHeader; }
       const rowNumber = layout.rows.indexOf(row);
       row.nodes.forEach((node, column) => { const visualColumn = rowNumber % 2
-        ? columns - column - 1 : column; boxes[node.nodeId] = { x: margin + visualColumn *
+        ? row.nodes.length - column - 1 : column; boxes[node.nodeId] = { x: margin + visualColumn *
         (nodeWidth + gapX), y: cursorY, width: nodeWidth, height: nodeHeight }; });
       cursorY += nodeHeight + gapY;
       if (activeLaneBand) activeLaneBand.bottom = cursorY - Math.round(gapY / 2); });
@@ -154,7 +173,7 @@
       .join("");
     const nodeMarkup = nodes.map((node, nodeIndex) => { const box = boxes[node.nodeId];
       const visual = visualGrammar.presentationFor(node, options.language);
-      const lines = wrap(node.title, density === "compact" ? 18 : 22,
+      const lines = wrap(nodeTitle(node, english), density === "compact" ? 18 : 22,
         density === "compact" ? 2 : 3);
       const changes = stateByNode.get(node.nodeId) || [];
       const textY = box.y + box.height / 2 - (lines.length - 1) * 9 - (changes.length ? 10 : 0);
