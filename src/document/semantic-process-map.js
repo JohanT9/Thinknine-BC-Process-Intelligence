@@ -110,12 +110,17 @@
       metadata: { semanticStatus: "customerSpecific", semanticLevel: "businessCentral",
         processRole: processRoleFor(item) } }))
   ].filter(item => item.title); return processModel(input.recordingId, input.title, values); }
-  function project(input = {}, level = "businessCentral") { if (!LEVELS.includes(level))
+  function observedOnly(model) { const values = array(model.nodes).filter(node =>
+    ["observed", "customerSpecific"].includes(node.metadata?.semanticStatus));
+    return processModel(model.recordingId, model.title, values); }
+  function project(input = {}, level = "businessCentral", options = {}) { if (!LEVELS.includes(level))
     throw new Error(`Unsupported semantic process-map level: ${level}`);
     if (level === "procedure") return input.procedureModel || processModel(input.recordingId,
       input.title, []); const model = analysisView.normalize(input.analysis || {}, input.decision);
     if (!model.available) return processModel(input.recordingId, input.title, []);
     if (level === "business") return business(input, model); const reference = graphFor(input, model);
-    return reference ? fromReferenceGraph(input, model, reference) : fromComparison(input, model); }
+    const projected = reference ? fromReferenceGraph(input, model, reference) :
+      fromComparison(input, model);
+    return options.includeReferences === true ? projected : observedOnly(projected); }
   return { LEVELS, project, semanticStatus };
 });

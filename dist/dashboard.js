@@ -3376,6 +3376,7 @@ let processMapDraftOverrides = [];
 let activeProcessAnalysis = null;
 let processAnalysisRequest = null;
 let activeProcessMapLevel = "businessCentral";
+let processMapIncludeReferences = false;
 let processMapResizeFrame = null;
 const PROCESS_MAP_ZOOM_STORAGE_KEY = "t9.processMap.zoom";
 const PROCESS_MAP_DIRECTION_STORAGE_KEY = "t9.processMap.direction";
@@ -6533,6 +6534,10 @@ function renderProcessOverview() {
     $("processMapDensity").options[1].textContent = english ? "Compact" : "Kompakt";
     $("processMapDensity").title = english ? "Choose process map density" :
       "Välj processkartans täthet";
+    $("processMapIncludeReferences").checked = processMapIncludeReferences;
+    $("processMapIncludeReferences").parentElement.lastChild.textContent = english
+      ? " Show reference suggestions" : " Visa referensförslag";
+    $("processMapIncludeReferences").parentElement.hidden = displayedLevel === "procedure";
     document.querySelector('label[for="processMapDensity"]').textContent = english
       ? "Density" : "Täthet";
     const focusActive = $("processOverviewDisclosure").classList.contains("process-map-focus");
@@ -6569,6 +6574,9 @@ function renderProcessOverview() {
     };
     $("processMapDescription").textContent = descriptions[displayedLevel];
     $("processMapLegend").hidden = displayedLevel === "procedure";
+    for (const item of $("processMapLegend").querySelectorAll(
+      ".suggested,.conditional"
+    )) item.hidden = !processMapIncludeReferences;
     const model = displayedLevel === "procedure"
       ? procedureModel : globalThis.T9SemanticProcessMap.project({
         recordingId: activeReviewSession.id,
@@ -6577,7 +6585,7 @@ function renderProcessOverview() {
         decision: activeReview.processAnalysis,
         reviewTasks: activeReview.tasks || [],
         procedureModel
-      }, activeProcessMapLevel);
+      }, activeProcessMapLevel, { includeReferences: processMapIncludeReferences });
     activeProcessBaseModel = model;
     activeProcessModel = displayedLevel === "procedure" ? model :
       globalThis.T9ProcessMapRelationshipOverrides.apply(
@@ -6831,6 +6839,7 @@ async function openReview(session) {
   activeReviewSelection = globalThis.T9ReviewSelection.create();
   activeReviewEdit = null;
   activeProcessMapLevel = "businessCentral";
+  processMapIncludeReferences = false;
   workspaceContext = globalThis.T9WorkspaceContext.create();
   workspaceContextBinding = null;
   documentationIntelligenceModel = null;
@@ -6903,6 +6912,7 @@ async function closeReview() {
   activeProcessAnalysis = null;
   processAnalysisRequest = null;
   activeProcessMapLevel = "businessCentral";
+  processMapIncludeReferences = false;
   activeReviewSelection = globalThis.T9ReviewSelection.create();
   activeReviewEdit = null;
   activeDocumentPipelineCache.clear();
@@ -7244,6 +7254,10 @@ $("processMapDensity").addEventListener("change", event => {
   } catch {
     // The selected density remains active for the current dashboard session.
   }
+  renderProcessOverview();
+});
+$("processMapIncludeReferences").addEventListener("change", event => {
+  processMapIncludeReferences = event.currentTarget.checked;
   renderProcessOverview();
 });
 $("processMapFocus").addEventListener("click", () => setProcessMapFocus(

@@ -11,6 +11,10 @@
 
 ## Unreleased
 
+- Hid reference suggestions from Process Overview and process exports by
+  default, while adding an explicit `Show reference suggestions` control that
+  applies consistently to both the displayed and exported process model.
+
 - Preserved manually confirmed process classifications when an older review is
   automatically rebuilt to repair generated steps, so the selection survives
   closing and reopening the document.

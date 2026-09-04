@@ -32,18 +32,22 @@ const snapshot = JSON.stringify(input);
 const bc = semanticMap.project(input, "businessCentral");
 assert.strictEqual(JSON.stringify(input), snapshot, "Projection must not mutate its inputs.");
 assert.deepStrictEqual(bc.nodes.map(node => node.title), ["Sales Order", "Release", "Create Pick",
-  "Post Shipment", "Customer Approval"]);
+  "Customer Approval"]);
 assert(!bc.nodes.some(node => node.title === "Sales Invoice"),
   "optional reference nodes must not be shown as recorded process steps");
 assert.strictEqual(bc.nodes.find(node => node.title === "Release").metadata.semanticStatus, "observed");
 assert.deepStrictEqual(bc.nodes.find(node => node.title === "Release").sourceStepIds, ["task-release"]);
-assert.strictEqual(bc.nodes.find(node => node.title === "Post Shipment").metadata.semanticStatus,
-  "suggested");
 assert.strictEqual(bc.nodes.find(node => node.title === "Customer Approval").metadata.semanticStatus,
   "customerSpecific");
 assert.deepStrictEqual(bc.nodes.find(node => node.title === "Customer Approval").sourceStepIds,
   ["task-approval"]);
-assert.strictEqual(bc.transitions.length, 4);
+assert.strictEqual(bc.transitions.length, 3);
+const bcWithReferences = semanticMap.project(input, "businessCentral", {
+  includeReferences: true
+});
+assert.strictEqual(bcWithReferences.nodes.find(node => node.title === "Post Shipment")
+  .metadata.semanticStatus, "suggested");
+assert.strictEqual(bcWithReferences.transitions.length, 4);
 
 const business = semanticMap.project(input, "business");
 assert.deepStrictEqual(business.nodes.map(node => node.title), ["Order To Cash",
@@ -62,13 +66,17 @@ const legacyBusiness = semanticMap.project({ recordingId: "legacy", title: "Lega
 assert.deepStrictEqual(legacyBusiness.nodes.map(node => node.title),
   ["Source to Pay", "Purchase to Pay", "Purchase Order Flow"]);
 const legacyBc = semanticMap.project({ recordingId: "legacy", title: "Legacy",
-  analysis: legacyAnalysis }, "businessCentral");
+  analysis: legacyAnalysis }, "businessCentral", { includeReferences: true });
 assert.deepStrictEqual(legacyBc.nodes.map(node => node.title),
   ["Purchase Order", "Warehouse Receipt"]);
 assert.strictEqual(legacyBc.nodes[1].metadata.semanticStatus, "suggested");
 assert.strictEqual(legacyBc.nodes[0].metadata.originalNodeType, "document");
 assert.strictEqual(legacyBc.nodes[0].metadata.processRole.id, "purchasing");
 assert.strictEqual(legacyBc.nodes[1].metadata.processRole.id, "warehouse");
+const legacyObservedOnly = semanticMap.project({ recordingId: "legacy", title: "Legacy",
+  analysis: legacyAnalysis }, "businessCentral");
+assert.deepStrictEqual(legacyObservedOnly.nodes.map(node => node.title),
+  ["Purchase Order"]);
 const conditionalBc = semanticMap.project({ recordingId: "conditional", analysis: {
   bestMatch: { referenceProcess: "Purchase Order Flow", matchedSteps: [], additionalSteps: [],
     missingSteps: [{ type: "document", id: "document:warehouse-receipt",
@@ -97,7 +105,8 @@ const selectedAnalysis = { ...analysis, referenceGraphs: { alternative: { ...ref
   graphId: "alternative", nodes: referenceGraph.nodes.map(node => node.nodeId === "pick"
     ? { ...node, title: "Warehouse Pick" } : node) } } };
 const selected = semanticMap.project({ ...input, analysis: selectedAnalysis,
-  decision: { confirmedReferenceId: "alternative", status: "selected" } }, "businessCentral");
+  decision: { confirmedReferenceId: "alternative", status: "selected" } },
+"businessCentral", { includeReferences: true });
 assert(selected.nodes.some(node => node.title === "Warehouse Pick"));
 
 console.log("Semantic process map tests passed.");
