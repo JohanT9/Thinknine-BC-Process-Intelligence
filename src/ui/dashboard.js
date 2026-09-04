@@ -3482,7 +3482,8 @@ function processAnalysisLabels() {
   const english = String(applicationSettings.uiLocale || "").startsWith("en");
   return english ? {
     detected: "Detected reference process", unknownDomain: "Domain not identified",
-    match: "match", matchDegree: "Match confidence", confirmed:
+    match: "match", confirmedConfidence: "manually confirmed",
+    matchDegree: "Classification confidence", confirmed:
       "Classification confirmed manually", matched: "Matched", missing: "Possible missing",
     conditional: "Conditional", additional: "Customer-specific", advisory: "Differences are guidance, not errors. " +
       "The recorded process may be a valid customer variant.", matchedSteps: "Matched steps",
@@ -3511,7 +3512,8 @@ function processAnalysisLabels() {
     "quality-weak": "Weak"
   } : {
     detected: "Identifierad referensprocess", unknownDomain: "Domän inte identifierad",
-    match: "matchning", matchDegree: "Matchningsgrad", confirmed:
+    match: "matchning", confirmedConfidence: "manuellt bekräftad",
+    matchDegree: "Klassificeringssäkerhet", confirmed:
       "Klassificeringen är manuellt bekräftad", matched: "Matchade", missing: "Möjligen saknade",
     conditional: "Villkorliga", additional: "Kundunika", advisory: "Skillnader är vägledning, inte fel. " +
       "Den inspelade processen kan vara en giltig kundvariant.", matchedSteps: "Matchade steg",
@@ -3556,6 +3558,12 @@ function processAnalysisLabels() {
         "Sales Order": "Försäljningsorder", "Simple Sales Order": "Enkel försäljningsorder",
         "Purchase Order": "Inköpsorder", "Warehouse Receipt": "Lagerinleverans",
         "Warehouse Put-away": "Lagerinlagring",
+        "document:purchase-order": "Inköpsorder",
+        "document:purchase-invoice": "Inköpsfaktura",
+        "document:posted-purchase-invoice": "Bokförd inköpsfaktura",
+        "Create": "Skapa", "Release": "Frisläpp", "Receive": "Ta emot",
+        "Invoice": "Fakturera", "Post": "Bokför", "Unknown step": "Okänt steg",
+        "Inventory Movement": "Lagerflyttning", "Assembly to Stock": "Montering mot lager",
         "Purchase Order → Warehouse Receipt → Put-away → Posted Receipt → Purchase Invoice":
           "Inköpsorder → Lagerinleverans → Inlagring → Bokförd inleverans → Inköpsfaktura",
         "Transfer Order → Transfer Shipment → In-transit → Transfer Receipt":
@@ -7804,8 +7812,10 @@ $("confirmProcessAnalysis").addEventListener("click", () => {
   const reference = globalThis.T9ProcessAnalysisView.selectedReference(
     $("processAnalysisContent"), model
   );
-  const variant = globalThis.T9ProcessAnalysisView.selectedVariant(
-    $("processAnalysisContent"), model);
+  const variant = reference.id === model.referenceId
+    ? globalThis.T9ProcessAnalysisView.selectedVariant(
+      $("processAnalysisContent"), model)
+    : null;
   persistProcessAnalysisDecision(reference, "confirmed", variant);
 });
 $("useSelectedReference").addEventListener("click", () => {

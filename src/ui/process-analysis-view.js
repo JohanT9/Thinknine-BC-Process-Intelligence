@@ -27,7 +27,9 @@
     const processMatch = result.processLibraryMatch || null; const matched = array(best?.matchedSteps ||
       processMatch?.matchedSteps); let missing = array(best?.missingSteps || processMatch?.missingSteps);
     const additional = array(best?.additionalSteps || processMatch?.unexpectedSteps);
-    const confidence = Math.max(0, Math.min(1, Number(best?.confidence || result.confidence || 0)));
+    const matchConfidence = Math.max(0, Math.min(1,
+      Number(best?.confidence || result.confidence || 0)));
+    const confidence = decision?.status === "confirmed" ? 1 : matchConfidence;
     const effectiveId = text(best?.referenceProcessId || best?.referenceDiagramId || best?.referenceId);
     const alternatives = array(result.matches).filter(item => item.referenceDiagramId !==
       effectiveId).map(item => ({ id: item.referenceDiagramId,
@@ -64,6 +66,7 @@
       confirmed: decision?.status === "confirmed", confirmedReferenceId:
       text(decision?.confirmedReferenceId), confirmedAt: decision?.confirmedAt || null,
       assessmentStatus: status, evidenceQuality: text(best?.evidenceQuality || assessment.evidenceQuality) || "weak",
+      matchConfidence,
       candidateMargin: Number(best?.candidateMargin ?? assessment.candidateMargin ?? 0),
       evidence: clone(best?.evidence || (result.recognition?.classification ? {
         documents: result.recognition.classification.processEvidence?.matchedDocuments,
@@ -96,7 +99,8 @@
           <h4 id="processAnalysisMatchName">${escape(localized(model.name, labels))}</h4>
           <p>${escape(localized(model.domain, labels) || labels.unknownDomain || "Domain not identified")}</p></div>
         <div class="process-analysis-confidence"><strong>${percent}%</strong>
-          <span>${escape(labels.match || "match")}</span></div>
+          <span>${escape(model.confirmed ? labels.confirmedConfidence ||
+            "manually confirmed" : labels.match || "match")}</span></div>
       </section>
       ${model.variantAssessment ? `<fieldset class="process-analysis-variant" aria-labelledby="processAnalysisVariantTitle">
         <div><span>${escape(labels.configurationVariant || "Business Central configuration")}</span>

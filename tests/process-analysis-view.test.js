@@ -37,6 +37,8 @@ assert.strictEqual(selected.name, "Basic Warehouse Outbound");
 assert.strictEqual(selected.confirmed, true);
 assert.strictEqual(selected.assessmentStatus, "manual-confirmed");
 assert.strictEqual(selected.manualConfirmationRecommended, false);
+assert.strictEqual(selected.confidence, 1);
+assert.strictEqual(selected.matchConfidence, 0.68);
 
 const container = { innerHTML: "", querySelector() { return null; } };
 view.render(container, { result }, { detected: "Identifierad referensprocess",
@@ -83,6 +85,22 @@ view.render(confirmedContainer, { result, decision: {
   confirmedReferenceId: "diagram:basic", status: "confirmed" } });
 assert(confirmedContainer.innerHTML.includes("Basic Warehouse Outbound"));
 assert(confirmedContainer.innerHTML.includes("manual-confirmed"));
+assert(confirmedContainer.innerHTML.includes("100%"));
+assert(confirmedContainer.innerHTML.includes("manually confirmed"));
+const localizedPurchaseContainer = { innerHTML: "", querySelector() { return null; } };
+view.render(localizedPurchaseContainer, { result: { bestMatch: {
+  referenceProcessId: "simple-purchase", referenceProcess: "Simple Purchase Order",
+  confidence: 0.29, matchedSteps: [{ id: "document:purchase-order" },
+    { name: "Release" }], missingSteps: [{ id: "document:purchase-invoice" },
+    { name: "Post" }, { name: "Unknown step" }], additionalSteps: [] } } }, {
+  processNames: { "Simple Purchase Order": "Enkel inköpsorder",
+    "document:purchase-order": "Inköpsorder", "Release": "Frisläpp",
+    "document:purchase-invoice": "Inköpsfaktura", "Post": "Bokför",
+    "Unknown step": "Okänt steg" } });
+for (const label of ["Enkel inköpsorder", "Inköpsorder", "Frisläpp",
+  "Inköpsfaktura", "Bokför", "Okänt steg"]) {
+  assert(localizedPurchaseContainer.innerHTML.includes(label));
+}
 
 const empty = view.render(container, { result: {} }, { noMatchTitle: "Ingen säker matchning",
   noMatchText: "Klassificera senare." });
@@ -144,6 +162,7 @@ assert(html.includes('id="processAnalysisDialog"'));
 assert(html.includes('src="process-analysis-view.js"'));
 assert(dashboard.includes('type: "T9_MATCH_REFERENCE_PROCESS"'));
 assert(dashboard.includes("persistProcessAnalysisDecision(reference, \"confirmed\", variant)"));
+assert(dashboard.includes("reference.id === model.referenceId"));
 assert(dashboard.includes("reviewAutoSave.schedule()"));
 assert(background.includes('case "T9_MATCH_REFERENCE_PROCESS"'));
 console.log("Process Analysis view tests passed.");

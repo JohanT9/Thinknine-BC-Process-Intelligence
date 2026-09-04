@@ -11,6 +11,11 @@
 
 ## Unreleased
 
+- Made manually confirmed process classifications display as 100% confirmed,
+  reset stale configuration variants when another reference process is chosen,
+  and localized purchase documents, actions, and alternative process names in
+  the Swedish Process Analysis view.
+
 - Fixed manual process confirmation so `Confirm classification` applies the
   currently selected reference process directly, preserves its selected state,
   and reports it as manually selected after rerendering.
