@@ -11,6 +11,10 @@
 
 ## Unreleased
 
+- Fixed manual process confirmation so `Confirm classification` applies the
+  currently selected reference process directly, preserves its selected state,
+  and reports it as manually selected after rerendering.
+
 - Moved configuration-dependent reference steps out of the primary Process
   Analysis view into a collapsed comparison and excluded them from Process
   Overview maps, so diagrams describe the recorded work rather than possible

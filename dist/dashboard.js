@@ -3495,7 +3495,8 @@ function processAnalysisLabels() {
     noMatchTitle: "No reliable process match", noMatchText:
       "The recording remains valid and can be classified manually later.",
     "auto-classifiable": "Strong process evidence", "review-required": "Needs confirmation",
-    "insufficient-evidence": "Insufficient process evidence", confirmationRecommended:
+    "insufficient-evidence": "Insufficient process evidence", "manual-confirmed": "Manually selected process",
+    confirmationRecommended:
       "Confirm the classification before using it.", strongEvidence:
       "The classification is supported by several independent signals.",
     configurationVariant: "Business Central configuration", variantUncertain:
@@ -3523,7 +3524,8 @@ function processAnalysisLabels() {
     noMatchTitle: "Ingen säker processmatchning", noMatchText:
       "Inspelningen är fortfarande giltig och kan klassificeras manuellt senare.",
     "auto-classifiable": "Starkt processunderlag", "review-required": "Behöver bekräftas",
-    "insufficient-evidence": "Otillräckligt processunderlag", confirmationRecommended:
+    "insufficient-evidence": "Otillräckligt processunderlag", "manual-confirmed": "Manuellt vald process",
+    confirmationRecommended:
       "Bekräfta klassificeringen innan den används.", strongEvidence:
       "Klassificeringen stöds av flera oberoende signaler.",
     configurationVariant: "Business Central-konfiguration", variantUncertain:
@@ -7799,9 +7801,12 @@ $("confirmProcessAnalysis").addEventListener("click", () => {
   const model = globalThis.T9ProcessAnalysisView.normalize(
     activeProcessAnalysis || {}, activeReview?.processAnalysis
   );
+  const reference = globalThis.T9ProcessAnalysisView.selectedReference(
+    $("processAnalysisContent"), model
+  );
   const variant = globalThis.T9ProcessAnalysisView.selectedVariant(
     $("processAnalysisContent"), model);
-  persistProcessAnalysisDecision({ id: model.referenceId, name: model.name }, "confirmed", variant);
+  persistProcessAnalysisDecision(reference, "confirmed", variant);
 });
 $("useSelectedReference").addEventListener("click", () => {
   const model = globalThis.T9ProcessAnalysisView.normalize(

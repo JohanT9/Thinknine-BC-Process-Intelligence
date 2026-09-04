@@ -35,6 +35,8 @@ const selected = view.normalize(result, { confirmedReferenceId: "diagram:basic",
 assert.strictEqual(selected.referenceId, "diagram:basic");
 assert.strictEqual(selected.name, "Basic Warehouse Outbound");
 assert.strictEqual(selected.confirmed, true);
+assert.strictEqual(selected.assessmentStatus, "manual-confirmed");
+assert.strictEqual(selected.manualConfirmationRecommended, false);
 
 const container = { innerHTML: "", querySelector() { return null; } };
 view.render(container, { result }, { detected: "Identifierad referensprocess",
@@ -76,6 +78,11 @@ const selectedContainer = { querySelector() { return { value: "diagram:basic",
   dataset: { referenceName: "Basic Warehouse Outbound" } }; } };
 assert.deepStrictEqual(view.selectedReference(selectedContainer, normalized), {
   id: "diagram:basic", name: "Basic Warehouse Outbound" });
+const confirmedContainer = { innerHTML: "", querySelector() { return null; } };
+view.render(confirmedContainer, { result, decision: {
+  confirmedReferenceId: "diagram:basic", status: "confirmed" } });
+assert(confirmedContainer.innerHTML.includes("Basic Warehouse Outbound"));
+assert(confirmedContainer.innerHTML.includes("manual-confirmed"));
 
 const empty = view.render(container, { result: {} }, { noMatchTitle: "Ingen säker matchning",
   noMatchText: "Klassificera senare." });
@@ -136,6 +143,7 @@ assert(html.includes('id="openProcessAnalysis"'));
 assert(html.includes('id="processAnalysisDialog"'));
 assert(html.includes('src="process-analysis-view.js"'));
 assert(dashboard.includes('type: "T9_MATCH_REFERENCE_PROCESS"'));
+assert(dashboard.includes("persistProcessAnalysisDecision(reference, \"confirmed\", variant)"));
 assert(dashboard.includes("reviewAutoSave.schedule()"));
 assert(background.includes('case "T9_MATCH_REFERENCE_PROCESS"'));
 console.log("Process Analysis view tests passed.");

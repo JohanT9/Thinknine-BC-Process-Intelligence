@@ -37,8 +37,9 @@
       id: item.referenceId, name: item.name,
       confidence: item.confidence, domain: item.domain || "" }); });
     const assessment = result.assessment || result.recognition?.assessment || {};
-    const status = text(best?.assessmentStatus || assessment.status) || (confidence >= 0.82
+    const inferredStatus = text(best?.assessmentStatus || assessment.status) || (confidence >= 0.82
       ? "auto-classifiable" : confidence >= 0.35 ? "review-required" : "insufficient-evidence");
+    const status = decision?.status === "confirmed" ? "manual-confirmed" : inferredStatus;
     const confirmedVariantId = text(decision?.confirmedVariantId);
     const variantAssessment = clone(best?.variantAssessment || result.recognition?.classification
       ?.processEvidence?.variantAssessment || null);
@@ -70,8 +71,9 @@
         explanation: result.recognition.classification.explanation,
         signals: result.recognition.classification.signals } : null)),
       variantAssessment, confirmedVariantId,
-      manualConfirmationRecommended: assessment.manualConfirmationRecommended === true ||
-        best?.manualConfirmationRecommended === true || status !== "auto-classifiable", advisory: true }); }
+      manualConfirmationRecommended: decision?.status !== "confirmed" &&
+        (assessment.manualConfirmationRecommended === true ||
+        best?.manualConfirmationRecommended === true || status !== "auto-classifiable"), advisory: true }); }
   function metric(label, value, tone) { return `<div class="process-analysis-metric ${tone}">
     <strong>${escape(value)}</strong><span>${escape(label)}</span></div>`; }
   function steps(title, values, tone, emptyLabel, labels) { return `<section class="process-analysis-list ${tone}">
@@ -151,7 +153,7 @@
       <fieldset class="process-analysis-alternatives"><legend>${escape(labels.alternatives ||
         "Alternative reference processes")}</legend>${model.alternatives.length ? model.alternatives.map(item =>
           `<label><input type="radio" name="processAnalysisReference" value="${escape(item.id)}"
-            data-reference-name="${escape(item.name)}"><span>${escape(localized(item.name, labels))}</span>
+            data-reference-name="${escape(item.name)}" ${item.id === model.referenceId ? "checked" : ""}><span>${escape(localized(item.name, labels))}</span>
             <strong>${Math.round(item.confidence * 100)}%</strong></label>`).join("") :
           `<p>${escape(labels.noAlternatives || "No relevant alternatives")}</p>`}</fieldset>`;
     return model; }
