@@ -118,6 +118,36 @@ assert.deepStrictEqual(menuPath.sourceEventIds,
   ["event-row", "event-related", "event-discount"]);
 assert.strictEqual(menuPath.screenshotRefs.at(-1), "discount.png");
 assert.strictEqual(menuPath.inputInteractionCount, 3);
+const purchaseManualPriceResult = engine.processInteractions([{
+  taskId: "purchase-row", taskType: "RunAction", actionCaption: "Rad",
+  sourceEventIds: ["event-purchase-row"], screenshot: "row-menu.png"
+}, {
+  taskId: "purchase-price", taskType: "RunAction",
+  actionCaption: "Tillämpat inköpspris och rabatt",
+  sourceEventIds: ["event-purchase-price"], screenshot: "price-page.png"
+}, {
+  taskId: "purchase-manual-price", taskType: "RunAction",
+  actionCaption: "Manuellt pris...",
+  sourceEventIds: ["event-purchase-manual-price"]
+}, {
+  taskId: "direct-unit-cost", taskType: "EnterFieldValue",
+  fieldCaption: "Direkt styckkostnad", value: "15",
+  sourceEventIds: ["event-direct-unit-cost"],
+  screenshot: "manual-price-dialog.png"
+}]);
+assert.strictEqual(purchaseManualPriceResult.length, 2);
+const purchaseManualPricePath = purchaseManualPriceResult[0];
+assert.strictEqual(purchaseManualPricePath.actionType, "RunActionPath");
+assert.strictEqual(purchaseManualPricePath.displayText,
+  "Välj **Rad** → **Tillämpat inköpspris och rabatt** → **Manuellt pris**.");
+assert.deepStrictEqual(purchaseManualPricePath.sourceEventIds, [
+  "event-purchase-row", "event-purchase-price", "event-purchase-manual-price"
+]);
+assert.strictEqual(purchaseManualPricePath.inputInteractionCount, 3);
+assert.strictEqual(purchaseManualPricePath.preferredSourceEventId,
+  "event-purchase-manual-price");
+assert.strictEqual(purchaseManualPricePath.preferredScreenshotRef,
+  "manual-price-dialog.png");
 const manualPricePath = only([{
   taskId: "actions", taskType: "RunAction", actionCaption: "Åtgärder",
   sourceEventIds: ["event-actions"], screenshot: "actions.png"

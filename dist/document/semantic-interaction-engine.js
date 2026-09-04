@@ -588,6 +588,51 @@
     return deepFreeze(rule);
   }
 
+  function purchaseManualPriceMenuPathRule() {
+    const captions = [
+      /^(?:välj\s+)?(?:rad|row)$/iu,
+      /^(?:tillämpat inköpspris och rabatt|applied purchase price and discount)$/iu,
+      /^(?:manuellt pris|manual price)/iu
+    ];
+    const isAction = value => ["RunAction", "ClickAction"].includes(
+      value?.taskType
+    );
+    const caption = value => text(value?.actionCaption) ||
+      text(value?.selectedCaption);
+    const screenshots = value => value?.semanticActionModel?.screenshotRefs ||
+      value?.screenshots || (value?.screenshot ? [value.screenshot] : []);
+    const rule = {
+      ruleId: "purchase-manual-price-menu-path",
+      priority: 115,
+      match(context) {
+        return captions.every((pattern, offset) => {
+          const value = context.interactions[context.index + offset];
+          return isAction(value) && pattern.test(caption(value));
+        });
+      },
+      consolidate(context) {
+        const values = context.interactions.slice(context.index,
+          context.index + captions.length);
+        const nextInteraction = context.interactions[
+          context.index + captions.length
+        ];
+        const resultScreenshots = screenshots(nextInteraction);
+        const actionScreenshots = screenshots(values.at(-1));
+        const preferredScreenshotRef = resultScreenshots[0] ||
+          actionScreenshots.at(-1);
+        return { consumed: values.length, action: action(rule, values, {
+          actionType: "RunActionPath",
+          displayText: "Välj **Rad** → **Tillämpat inköpspris och rabatt** → " +
+            "**Manuellt pris**.",
+          selectedValue: caption(values.at(-1)),
+          preferredSourceEventId: values.at(-1)?.sourceEventIds?.at(-1),
+          preferredScreenshotRef
+        }) };
+      }
+    };
+    return deepFreeze(rule);
+  }
+
   function closeDialogRule() {
     const closeCaption = value => text(value?.actionCaption) ||
       text(value?.selectedCaption) || text(value?.instruction)
@@ -672,6 +717,7 @@
   const DIMENSION = /dimension|dimensionsvärde|dimension value/iu;
 
   const BUILT_IN_RULES = deepFreeze([
+    purchaseManualPriceMenuPathRule(),
     salesPriceDiscountMenuPathRule(),
     manualPriceMenuPathRule(),
     duplicateActionObservationRule(),

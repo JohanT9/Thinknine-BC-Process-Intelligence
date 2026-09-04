@@ -11,6 +11,10 @@
 
 ## Unreleased
 
+- Consolidated the Business Central purchase-line menu path `Rad` →
+  `Tillämpat inköpspris och rabatt` → `Manuellt pris` into one traceable
+  instruction and selected the resulting manual-price dialog as its screenshot.
+
 - Fixed a new recording inheriting the previous session's screenshot count and
   live-capture diagnostics by resetting the complete persisted status snapshot
   at the recording session boundary.
