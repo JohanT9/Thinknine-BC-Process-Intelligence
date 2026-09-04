@@ -11,4 +11,7 @@ assert.deepStrictEqual(theme.list("en-US").map(item => item.label),
   ["Business Central", "Neutral", "Monochrome"]);
 assert(Object.isFrozen(theme.THEMES));
 assert(Object.isFrozen(theme.resolve("business-central").palette));
+assert(Object.isFrozen(theme.resolve("business-central").rolePalette));
+assert.deepStrictEqual(theme.resolve("business-central").rolePalette.purchasing,
+  ["#eef5ff", "#2563a6"]);
 console.log("Process map theme tests passed.");

@@ -30,6 +30,9 @@
 - Assigned unambiguous generic actions such as Create and Release to their
   surrounding Business Central responsibility, preventing artificial
   `Other steps` lanes in both Process Overview and exported maps.
+- Added theme-owned responsibility colors for Purchasing, Warehouse, Sales,
+  Production, Finance, and System lanes, making cross-functional process maps
+  easier to scan without encoding business meaning in the renderer.
 
 - Hid reference suggestions from Process Overview and process exports by
   default, while adding an explicit `Show reference suggestions` control that

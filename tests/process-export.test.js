@@ -105,6 +105,8 @@ assert(splitLaneSvg.includes("Skapa"));
 assert(splitLaneSvg.includes("Frisläpp"));
 assert(splitLaneSvg.includes(">DOKUMENT<"));
 assert(splitLaneSvg.includes(">PROCESSSTEG<"));
+assert(splitLaneSvg.includes('class="lane lane-purchasing"'));
+assert(splitLaneSvg.includes('style="fill:#eef5ff;stroke:#2563a6"'));
 assert(!splitLaneSvg.includes('x="850"'),
   "short reversed rows must stay inside the calculated export canvas");
 assert(!splitLaneSvg.includes("document:purchase-orde"));

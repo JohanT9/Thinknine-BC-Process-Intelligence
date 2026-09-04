@@ -156,7 +156,8 @@
     const laneBands = []; let activeLaneBand;
     layout.rows.forEach(row => { if (row.firstInLane) activeLaneBand = null;
       if (layout.lanes.visible && row.firstInLane && row.lane) {
-        activeLaneBand = { y: cursorY, title: row.lane.title, bottom: cursorY };
+        activeLaneBand = { y: cursorY, title: row.lane.title, laneId: row.lane.laneId,
+          bottom: cursorY };
         laneBands.push(activeLaneBand); cursorY += laneHeader; }
       const rowNumber = layout.rows.indexOf(row);
       row.nodes.forEach((node, column) => { const visualColumn = rowNumber % 2
@@ -205,9 +206,14 @@
         box.x + box.width / 2}" y="${textY}" text-anchor="middle">${lines.map((line, index) =>
         `<tspan x="${box.x + box.width / 2}" dy="${index ? 18 : 0}">${escape(line)}</tspan>`).join("")}</text>${changeMarkup}</g>`; }).join("");
     const semanticMarkerStyles = `<style>.map-node-action>*:first-child,.map-node-process-step>*:first-child{fill:#fefefe;stroke:#52606d}.map-node-business-process>*:first-child{fill:#eaf3f8;stroke:#31566f}.map-node-document>*:first-child{fill:#eef8fd;stroke:#2878a5}.map-node-posted-document>*:first-child{fill:#eef8f0;stroke:#347447}.map-node-posting>*:first-child,.map-node-decision>*:first-child{fill:#fff4ce;stroke:#7a5b00}.map-node-system-action>*:first-child{fill:#f6f2ff;stroke:#66558f}.map-node-manual-action>*:first-child{fill:#fff8ef;stroke:#8a5a2b}.status-dot{stroke:#fff!important;stroke-width:2!important;filter:none!important}.semantic-observed .status-dot{fill:#15803d}.semantic-suggested .status-dot{fill:#a16207}.semantic-suggested>*:first-child{stroke-dasharray:6 4}.semantic-conditional .status-dot{fill:#7c3aed}.semantic-conditional>*:first-child{stroke-dasharray:6 4}.semantic-customerSpecific .status-dot{fill:#0369a1}.semantic-reference .status-dot{fill:#64717d}</style>`;
-    const laneMarkup = semanticMarkerStyles + laneBands.map(lane => `<g class="lane"><rect class="lane-panel" x="20" y="${lane.y}" width="${
-      width - 40}" height="${Math.max(laneHeader, lane.bottom - lane.y)}" rx="12"/><path class="lane-accent" d="M 32 ${lane.y + laneHeader} H ${width - 32}"/><text x="38" y="${lane.y + 26}">${
-      escape(english ? `OWNER: ${lane.title}` : `ANSVAR: ${lane.title}`)}</text></g>`).join("");
+    const laneMarkup = semanticMarkerStyles + laneBands.map(lane => { const roleId = String(
+      lane.laneId || "").replace(/^role:/u, ""); const colors = theme.rolePalette?.[roleId] ||
+        theme.rolePalette?.default || [theme.palette.lane, theme.palette.brand];
+      return `<g class="lane lane-${escape(roleId)}"><rect class="lane-panel" x="20" y="${lane.y}" width="${
+      width - 40}" height="${Math.max(laneHeader, lane.bottom - lane.y)}" rx="12" style="fill:${
+        escape(colors[0])};stroke:${escape(colors[1])}"/><path class="lane-accent" d="M 32 ${
+        lane.y + laneHeader} H ${width - 32}" style="stroke:${escape(colors[1])}"/><text x="38" y="${lane.y + 26}">${
+      escape(english ? `OWNER: ${lane.title}` : `ANSVAR: ${lane.title}`)}</text></g>`; }).join("");
     const title = options.title || model.title || "Process";
     const subtitle = options.subtitle || (english ? "Microsoft Dynamics 365 Business Central · Process map" : "Microsoft Dynamics 365 Business Central · Processkarta");
     const footer = options.footer || (english ? "Based on the recorded process in BC Process Studio" : "Baserad på den inspelade processen i BC Process Studio");
