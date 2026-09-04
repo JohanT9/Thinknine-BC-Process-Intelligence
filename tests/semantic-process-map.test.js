@@ -63,6 +63,8 @@ assert.deepStrictEqual(legacyBc.nodes.map(node => node.title),
   ["Purchase Order", "Warehouse Receipt"]);
 assert.strictEqual(legacyBc.nodes[1].metadata.semanticStatus, "suggested");
 assert.strictEqual(legacyBc.nodes[0].metadata.originalNodeType, "document");
+assert.strictEqual(legacyBc.nodes[0].metadata.processRole.id, "purchasing");
+assert.strictEqual(legacyBc.nodes[1].metadata.processRole.id, "warehouse");
 const conditionalBc = semanticMap.project({ recordingId: "conditional", analysis: {
   bestMatch: { referenceProcess: "Purchase Order Flow", matchedSteps: [], additionalSteps: [],
     missingSteps: [{ type: "document", id: "document:warehouse-receipt",
@@ -84,6 +86,8 @@ const basicVariant = semanticMap.project({ recordingId: "basic", analysis: varia
 assert(!basicVariant.nodes.some(node => node.title === "Warehouse Put-away"));
 assert.strictEqual(basicVariant.nodes.find(node => node.title === "Purchase Invoice")
   .metadata.semanticStatus, "suggested");
+assert.strictEqual(basicVariant.nodes.find(node => node.title === "Purchase Invoice")
+  .metadata.processRole.id, "finance");
 const advancedVariant = semanticMap.project({ recordingId: "advanced", analysis: variantAnalysis,
   decision: { confirmedVariantId: "variant:advanced-warehouse" } }, "businessCentral");
 assert(advancedVariant.nodes.some(node => node.title === "Warehouse Put-away"));

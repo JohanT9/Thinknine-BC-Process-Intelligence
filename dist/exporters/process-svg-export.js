@@ -36,7 +36,9 @@
     return String(value?.outcome || value?.page?.caption || ""); }
   function rowsFor(model, nodes, columns, english) {
     const lanes = processLaneModel.create(model, { unassignedTitle: english
-      ? "Other steps" : "Övriga steg" });
+      ? "Other steps" : "Övriga steg", roleNames: english ? {} : {
+        purchasing: "Inköp", warehouse: "Lager", sales: "Försäljning",
+        production: "Produktion", finance: "Ekonomi", system: "System" } });
     const laneById = new Map(lanes.lanes.map(lane => [lane.laneId, lane]));
     const assignment = node => lanes.assignments[node.nodeId] ||
       (node.nodeType === "start" ? "boundary:start" : "boundary:end");

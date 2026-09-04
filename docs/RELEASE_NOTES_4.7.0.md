@@ -1,5 +1,9 @@
 # BC Process Studio 4.7
 
+- BC Process maps now organize recognized documents into localized swimlanes
+  such as Inköp, Lager, Försäljning, Produktion, Ekonomi, and System. The same
+  lane structure is preserved in SVG export.
+
 - Process Analysis now provides a collapsible evidence explanation with the
   detected Business Central documents and actions, evidence quality, and the
   lead over the next process candidate.

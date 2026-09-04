@@ -21,4 +21,9 @@ const roleBased = lanes.create({ nodes: [{ nodeId: "role", nodeType: "activity",
   metadata: { processRole: { id: "warehouse", name: "Warehouse" } } }] });
 assert.strictEqual(roleBased.visible, true);
 assert.strictEqual(roleBased.lanes[0].source, "processRole");
+const localizedRoles = lanes.create({ nodes: [{ nodeId: "purchase", nodeType: "document",
+  metadata: { processRole: { id: "purchasing", name: "Purchasing" } } }, {
+  nodeId: "unknown", nodeType: "activity", metadata: {} }] }, { unassignedTitle: "Övriga steg",
+roleNames: { purchasing: "Inköp" } });
+assert.deepStrictEqual(localizedRoles.lanes.map(lane => lane.title), ["Inköp", "Övriga steg"]);
 console.log("Process lane model tests passed.");

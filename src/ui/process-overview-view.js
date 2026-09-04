@@ -231,7 +231,9 @@
       direction: options.direction
     });
     const lanes = processLaneModel.create(model, { unassignedTitle: english
-      ? "Other steps" : "Övriga steg" });
+      ? "Other steps" : "Övriga steg", roleNames: english ? {} : {
+        purchasing: "Inköp", warehouse: "Lager", sales: "Försäljning",
+        production: "Produktion", finance: "Ekonomi", system: "System" } });
     const placementById = new Map(layout.nodes.map(item => [item.nodeId, item]));
     const laneById = new Map(lanes.lanes.map(lane => [lane.laneId, lane]));
     const laneStartIds = new Map(lanes.segments.map(segment => [segment.nodeIds[0],

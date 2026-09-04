@@ -20,6 +20,7 @@
       container.metadata?.containerType === "phase" && (container.nodeIds || []).length
     );
     const phaseByNode = new Map();
+    const hasRoles = nodes.some(node => node.metadata?.processRole);
     phases.forEach(phase => (phase.nodeIds || []).forEach(nodeId => {
       if (!phaseByNode.has(nodeId)) phaseByNode.set(nodeId, phase);
     }));
@@ -32,8 +33,9 @@
       const roleId = typeof role === "object" ? role.id || role.name : role;
       const roleTitle = typeof role === "object" ? role.name || role.id : role;
       const laneId = phase?.subprocessId || (roleId ? `role:${roleId}` :
-        (phases.length ? "lane:unassigned" : "lane:implicit"));
-      const title = phase?.title || roleTitle || (phases.length ? unassignedTitle : "");
+        (phases.length || hasRoles ? "lane:unassigned" : "lane:implicit"));
+      const title = phase?.title || options.roleNames?.[roleId] || roleTitle ||
+        (phases.length || hasRoles ? unassignedTitle : "");
       const source = phase ? "phase" : roleId ? "processRole" : "implicit";
       if (!lanes.has(laneId)) lanes.set(laneId, { laneId, title: String(title || ""),
         source, nodeIds: [] });

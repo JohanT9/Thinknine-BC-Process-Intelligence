@@ -11,6 +11,10 @@
 
 ## Unreleased
 
+- Added automatic Business Central swimlane assignment for Purchasing,
+  Warehouse, Sales, Production, Finance, System, and unassigned customer steps,
+  with localized lane names in interactive and SVG diagrams.
+
 - Added an explainable `Why this assessment?` section showing the Business
   Central documents, business actions, evidence quality, and candidate margin
   behind each deterministic process classification.

@@ -1,5 +1,13 @@
 # Process Analysis in Review Studio
 
+## Business Central swimlanes
+
+BC Process nodes receive renderer-neutral `processRole` metadata derived from
+their canonical document or process identity. The lane model localizes these
+roles for the selected UI/document language and groups unclassified customer
+steps under `Övriga steg` / `Other steps`. Interactive maps and SVG export
+consume the same assignments.
+
 ## Explainable evidence
 
 `Varför denna bedömning?` / `Why this assessment?` exposes the deterministic

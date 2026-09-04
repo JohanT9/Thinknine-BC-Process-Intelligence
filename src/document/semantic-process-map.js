@@ -19,6 +19,20 @@
   function freeze(value) { if (!value || typeof value !== "object" || Object.isFrozen(value)) return value;
     Object.values(value).forEach(freeze); return Object.freeze(value); }
   function stepKey(step) { return key(step?.title || step?.name || step?.id); }
+  function processRoleFor(value = {}) { const identity = key([value.id, value.title,
+    value.name, value.nodeType, ...array(value.taxonomyEntityIds)].filter(Boolean).join(" "));
+    if (/warehouse|receipt|shipment|pick|put away|movement|lager|plock|inleverans|utleverans/.test(identity))
+      return { id: "warehouse", name: "Warehouse" };
+    if (/invoice|payment|ledger|finance|faktur|betal|redovis/.test(identity))
+      return { id: "finance", name: "Finance" };
+    if (/purchase|vendor|source to pay|inköp|leverantör/.test(identity))
+      return { id: "purchasing", name: "Purchasing" };
+    if (/sales|customer|order to cash|försälj|kund/.test(identity))
+      return { id: "sales", name: "Sales" };
+    if (/production|assembly|planning|consume|output|produktion|monter|planer/.test(identity))
+      return { id: "production", name: "Production" };
+    if (/system/.test(identity)) return { id: "system", name: "System" };
+    return null; }
   function semanticStatus(node, model) { const candidates = new Set([
     key(node.title), ...array(node.taxonomyEntityIds).map(key)
   ]); const includes = values => array(values).some(item => candidates.has(stepKey(item)) ||
@@ -62,6 +76,7 @@
       return { nodeId: `semantic:${node.nodeId}`, title: node.title, sourceEventIds:
         array(observed?.sourceEventIds), sourceStepIds: taskIdsForEvents(observed?.sourceEventIds,
         input.reviewTasks), metadata: { semanticStatus: semanticStatus(node, model),
+          processRole: processRoleFor(node),
           semanticLevel: "businessCentral", originalNodeType: node.nodeType } };
     });
     const existing = new Set(referenceNodes.map(node => key(node.title)));
@@ -82,14 +97,17 @@
       array(item.variantIds).includes(selectedVariantId)); const values = [
     ...model.matched.map(item => ({ title: text(item.title || item.name || item.id),
       metadata: { semanticStatus: "observed", semanticLevel: "businessCentral",
+        processRole: processRoleFor(item),
         originalNodeType: item.nodeType || (item.type === "document" ? "document" : "processStep") } })),
     ...missing.map(item => ({ title: text(item.title || item.name || item.id),
       metadata: { semanticStatus: !selectedVariantId && ["conditional", "optional"].includes(item.applicability)
         ? "conditional" : "suggested", semanticLevel: "businessCentral",
+        processRole: processRoleFor(item),
         applicability: item.applicability || "expected", variantIds: array(item.variantIds),
         originalNodeType: item.nodeType || (item.type === "document" ? "document" : "processStep") } })),
     ...model.additional.map(item => ({ title: text(item.title || item.name || item.id),
-      metadata: { semanticStatus: "customerSpecific", semanticLevel: "businessCentral" } }))
+      metadata: { semanticStatus: "customerSpecific", semanticLevel: "businessCentral",
+        processRole: processRoleFor(item) } }))
   ].filter(item => item.title); return processModel(input.recordingId, input.title, values); }
   function project(input = {}, level = "businessCentral") { if (!LEVELS.includes(level))
     throw new Error(`Unsupported semantic process-map level: ${level}`);
