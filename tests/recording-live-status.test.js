@@ -35,4 +35,12 @@ const safeLabel = live.latestAction({ actionCaption: "  Manuellt   pris  ",
 assert.equal(safeLabel.label, "Manuellt pris");
 assert.equal(Object.hasOwn(safeLabel, "value"), false);
 
+const fresh = live.freshSessionDebug("new-session");
+assert.deepEqual(fresh.screenshotStats, { requested: 0, captured: 0, reused: 0,
+  dropped: 0, errors: 0 });
+assert.equal(fresh.activeSessionId, "new-session");
+assert.equal(fresh.screenshotQueueLength, 0);
+assert.equal(fresh.lastScreenshotAt, null);
+assert.equal(fresh.lastEvent, null);
+
 console.log("Recording live status behaviour tests passed.");

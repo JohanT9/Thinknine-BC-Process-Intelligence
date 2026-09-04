@@ -11,6 +11,10 @@
 
 ## Unreleased
 
+- Fixed a new recording inheriting the previous session's screenshot count and
+  live-capture diagnostics by resetting the complete persisted status snapshot
+  at the recording session boundary.
+
 - Fixed Process Overview failing with `Cannot read properties of null (reading
   'id')` when an older semantic node contains an explicitly empty process role.
 

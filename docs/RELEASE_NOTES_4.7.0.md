@@ -1,5 +1,9 @@
 # BC Process Studio 4.7
 
+- Starting a new recording now resets the displayed screenshot count, pending
+  queue, last screenshot, error, and health diagnostics to the new session.
+  Previously captured screenshots remain safely attached to their old session.
+
 - Fixed a backward-compatibility error that could prevent Process Overview from
   rendering when an older recording contained a null semantic process role.
 

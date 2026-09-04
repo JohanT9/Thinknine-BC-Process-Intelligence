@@ -1252,12 +1252,7 @@ async function startSession(message, tabId) {
     startedAt: now,
     recordingPurpose: session.recordingPurpose
   });
-  await setDebug({
-    activeSessionId: id,
-    eventCount: 0,
-    lastEvent: null,
-    lastError: null
-  });
+  await setDebug(globalThis.T9RecordingLiveStatus.freshSessionDebug(id));
 
   try {
     await chrome.tabs.sendMessage(tabId, {

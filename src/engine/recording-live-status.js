@@ -27,6 +27,15 @@
     };
   }
 
+  function freshSessionDebug(activeSessionId) {
+    return {
+      activeSessionId: String(activeSessionId || ""), eventCount: 0, lastEvent: null,
+      lastError: null, screenshotStats: { requested: 0, captured: 0, reused: 0,
+        dropped: 0, errors: 0 }, screenshotQueueLength: 0, lastScreenshotAt: null,
+      lastScreenshotError: null, recordingHealth: null
+    };
+  }
+
   function derive({ session = null, debug = {}, connected = false } = {}) {
     const eventCount = nonNegative(session?.eventCount ?? debug.eventCount);
     const screenshotStats = debug.screenshotStats || {};
@@ -69,5 +78,5 @@
     };
   }
 
-  return { derive, latestAction };
+  return { derive, freshSessionDebug, latestAction };
 });
