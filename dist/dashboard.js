@@ -3486,7 +3486,9 @@ function processAnalysisLabels() {
       "Classification confirmed manually", matched: "Matched", missing: "Possible missing",
     conditional: "Conditional", additional: "Customer-specific", advisory: "Differences are guidance, not errors. " +
       "The recorded process may be a valid customer variant.", matchedSteps: "Matched steps",
-    missingSteps: "Possible missing steps", conditionalSteps: "Conditional steps",
+    missingSteps: "Possible missing steps", conditionalSteps: "Configuration-dependent reference steps",
+    referenceComparison: "Compare with other Business Central configurations",
+    referenceComparisonHelp: "These reference steps were not observed in the recording and are not included in the process map.",
     additionalSteps: "Customer-specific steps", noConditional: "No configuration-dependent steps",
     none: "None", noMissing: "No expected steps are missing", noAdditional: "No additional steps",
     alternatives: "Alternative reference processes", noAlternatives: "No relevant alternatives",
@@ -3497,7 +3499,7 @@ function processAnalysisLabels() {
       "Confirm the classification before using it.", strongEvidence:
       "The classification is supported by several independent signals.",
     configurationVariant: "Business Central configuration", variantUncertain:
-      "Several configurations fit the recording. Variant-specific steps are shown as conditional.",
+      "Several configurations fit the recording. Other configuration steps are available in the reference comparison.",
     variantSupported: "The observed sequence supports this configuration variant.",
     variantConfirmed: "This configuration was selected manually and now controls the process map.",
     variantAlternatives: "Other possible configurations", mostLikely: "Most likely",
@@ -3512,7 +3514,9 @@ function processAnalysisLabels() {
       "Klassificeringen är manuellt bekräftad", matched: "Matchade", missing: "Möjligen saknade",
     conditional: "Villkorliga", additional: "Kundunika", advisory: "Skillnader är vägledning, inte fel. " +
       "Den inspelade processen kan vara en giltig kundvariant.", matchedSteps: "Matchade steg",
-    missingSteps: "Möjligen saknade steg", conditionalSteps: "Villkorliga steg",
+    missingSteps: "Möjligen saknade steg", conditionalSteps: "Konfigurationsberoende referenssteg",
+    referenceComparison: "Jämför med andra Business Central-konfigurationer",
+    referenceComparisonHelp: "Dessa referenssteg observerades inte i inspelningen och tas inte med i processkartan.",
     additionalSteps: "Kundunika steg", noConditional: "Inga konfigurationsberoende steg",
     none: "Inga", noMissing: "Inga förväntade steg saknas", noAdditional: "Inga extra steg",
     alternatives: "Alternativa referensprocesser", noAlternatives: "Inga relevanta alternativ",
@@ -3523,7 +3527,7 @@ function processAnalysisLabels() {
       "Bekräfta klassificeringen innan den används.", strongEvidence:
       "Klassificeringen stöds av flera oberoende signaler.",
     configurationVariant: "Business Central-konfiguration", variantUncertain:
-      "Flera konfigurationer passar inspelningen. Variantberoende steg visas som villkorliga.",
+      "Flera konfigurationer passar inspelningen. Andra konfigurationssteg finns i referensjämförelsen.",
     variantSupported: "Den observerade sekvensen stöder denna konfigurationsvariant.",
     variantConfirmed: "Konfigurationen valdes manuellt och styr nu processkartan.",
     variantAlternatives: "Andra möjliga konfigurationer", mostLikely: "Mest sannolik",

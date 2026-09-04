@@ -44,6 +44,10 @@
     key(node.title), ...array(node.taxonomyEntityIds).map(key)
   ]); return array(observedGraph?.nodes).find(candidate => identities.has(key(candidate.title)) ||
     array(candidate.taxonomyEntityIds).some(id => identities.has(key(id)))); }
+  function matchesItems(node, items) { const identities = new Set([
+    key(node.title), ...array(node.taxonomyEntityIds).map(key)
+  ]); return array(items).some(item => identities.has(stepKey(item)) ||
+    array(node.taxonomyEntityIds).some(id => key(id) === key(item.id))); }
   function taskIdsForEvents(eventIds, reviewTasks) { const events = new Set(array(eventIds));
     return array(reviewTasks).filter(task => array(task.sourceEventIds).some(id => events.has(id)))
       .map(task => task.taskId); }
@@ -71,7 +75,8 @@
   function graphFor(input, model) { const confirmedId = input.decision?.confirmedReferenceId;
     return input.analysis?.referenceGraphs?.[confirmedId] || input.analysis?.bestReferenceGraph || null; }
   function fromReferenceGraph(input, model, graph) { const referenceNodes = array(graph.nodes)
-    .filter(node => !["start", "end"].includes(node.nodeType)).map(node => {
+    .filter(node => !["start", "end"].includes(node.nodeType) &&
+      !matchesItems(node, model.conditional)).map(node => {
       const observed = matchingObservedNode(node, input.analysis?.observedGraph);
       return { nodeId: `semantic:${node.nodeId}`, title: node.title, sourceEventIds:
         array(observed?.sourceEventIds), sourceStepIds: taskIdsForEvents(observed?.sourceEventIds,
@@ -90,18 +95,14 @@
             originalNodeType: observed?.nodeType || item.type || "processStep" } }); });
     return processModel(input.recordingId, input.title, referenceNodes);
   }
-  function fromComparison(input, model) { const selectedVariantId = text(
-    input.decision?.confirmedVariantId); const missing = [...array(model.missing),
-      ...array(model.conditional)].filter(item =>
-      !selectedVariantId || !array(item.variantIds).length ||
-      array(item.variantIds).includes(selectedVariantId)); const values = [
+  function fromComparison(input, model) { const missing = array(model.missing)
+    .filter(item => !["conditional", "optional"].includes(item.applicability)); const values = [
     ...model.matched.map(item => ({ title: text(item.title || item.name || item.id),
       metadata: { semanticStatus: "observed", semanticLevel: "businessCentral",
         processRole: processRoleFor(item),
         originalNodeType: item.nodeType || (item.type === "document" ? "document" : "processStep") } })),
     ...missing.map(item => ({ title: text(item.title || item.name || item.id),
-      metadata: { semanticStatus: !selectedVariantId && ["conditional", "optional"].includes(item.applicability)
-        ? "conditional" : "suggested", semanticLevel: "businessCentral",
+      metadata: { semanticStatus: "suggested", semanticLevel: "businessCentral",
         processRole: processRoleFor(item),
         applicability: item.applicability || "expected", variantIds: array(item.variantIds),
         originalNodeType: item.nodeType || (item.type === "document" ? "document" : "processStep") } })),

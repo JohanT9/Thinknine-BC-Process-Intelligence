@@ -104,7 +104,7 @@
         <p>${escape(model.variantAssessment.manuallyConfirmed ? labels.variantConfirmed ||
           "This configuration was selected manually and now controls the process map." :
           model.variantAssessment.ambiguous ? labels.variantUncertain ||
-          "Several configurations fit the recording. Variant-specific steps are shown as conditional." :
+          "Several configurations fit the recording. Other configuration steps are available in the reference comparison." :
           labels.variantSupported || "The observed sequence supports this configuration variant.")}</p>
         ${array(model.variantAssessment.choices).length > 1 ? `<div class="process-analysis-variant-options">
           ${array(model.variantAssessment.choices).map((item, index) =>
@@ -121,7 +121,6 @@
         labels.confirmed || "Classification confirmed manually")}</p>` : ""}
       <div class="process-analysis-metrics">${metric(labels.matched || "Matched", model.matched.length, "matched")}
         ${metric(labels.missing || "Possible missing", model.missing.length, "missing")}
-        ${metric(labels.conditional || "Conditional", model.conditional.length, "conditional")}
         ${metric(labels.additional || "Customer-specific", model.additional.length, "additional")}</div>
       <p class="process-analysis-advisory">${escape(labels.advisory ||
         "Differences are guidance, not errors. The recorded process may be a valid customer variant.")}</p>
@@ -140,10 +139,15 @@
       </dl></details>` : ""}
       <div class="process-analysis-columns">${steps(labels.matchedSteps || "Matched steps", model.matched,
         "matched", labels.none || "None", labels)}${steps(labels.missingSteps || "Possible missing steps", model.missing,
-        "missing", labels.noMissing || "No expected steps are missing", labels)}${steps(labels.conditionalSteps ||
-        "Conditional steps", model.conditional, "conditional", labels.noConditional ||
-        "No configuration-dependent steps", labels)}${steps(labels.additionalSteps ||
+        "missing", labels.noMissing || "No expected steps are missing", labels)}${steps(labels.additionalSteps ||
         "Customer-specific steps", model.additional, "additional", labels.noAdditional || "No additional steps", labels)}</div>
+      ${model.conditional.length ? `<details class="process-analysis-reference-comparison">
+        <summary>${escape(labels.referenceComparison || "Compare with other Business Central configurations")}</summary>
+        <p>${escape(labels.referenceComparisonHelp ||
+          "These reference steps were not observed in the recording and are not included in the process map.")}</p>
+        ${steps(labels.conditionalSteps || "Configuration-dependent reference steps",
+          model.conditional, "conditional", labels.noConditional ||
+          "No configuration-dependent reference steps", labels)}</details>` : ""}
       <fieldset class="process-analysis-alternatives"><legend>${escape(labels.alternatives ||
         "Alternative reference processes")}</legend>${model.alternatives.length ? model.alternatives.map(item =>
           `<label><input type="radio" name="processAnalysisReference" value="${escape(item.id)}"

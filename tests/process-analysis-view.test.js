@@ -104,6 +104,9 @@ assert(container.innerHTML.includes("Grundläggande lagerhantering"));
 assert(container.innerHTML.includes("Avancerad lagerhantering"));
 assert(container.innerHTML.includes("Variantberoende steg visas som villkorliga."));
 assert(container.innerHTML.includes('name="processAnalysisVariant"'));
+assert(!container.innerHTML.includes("process-analysis-metric conditional"));
+assert(container.innerHTML.includes("process-analysis-reference-comparison"));
+assert(container.innerHTML.includes("Configuration-dependent reference steps"));
 assert(container.innerHTML.includes("Mest sannolik") === false,
   "The optional localized badge is only shown when supplied.");
 const variantContainer = { querySelector(selector) { return selector.includes(

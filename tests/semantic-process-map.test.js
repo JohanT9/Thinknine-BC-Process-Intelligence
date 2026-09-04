@@ -9,12 +9,14 @@ const referenceGraph = { schemaVersion: "1.0.0", graphId: "advanced", level:
     { nodeId: "release", nodeType: "processStep", title: "Release" },
     { nodeId: "pick", nodeType: "processStep", title: "Create Pick" },
     { nodeId: "post", nodeType: "posting", title: "Post Shipment" },
+    { nodeId: "invoice", nodeType: "document", title: "Sales Invoice" },
     { nodeId: "end", nodeType: "end", title: "End" }
   ], relationships: [], groups: [], startNodeIds: ["start"], endNodeIds: ["end"] };
 const analysis = { bestMatch: { referenceDiagramId: "advanced", referenceProcess:
   "Advanced Warehouse Outbound", domain: "domain:order-to-cash", confidence: 0.9,
   matchedSteps: [{ title: "Sales Order" }, { title: "Release" }, { title: "Create Pick" }],
-  missingSteps: [{ title: "Post Shipment" }], additionalSteps: [{ title: "Customer Approval" }] },
+  missingSteps: [{ title: "Post Shipment" }, { title: "Sales Invoice",
+    applicability: "optional" }], additionalSteps: [{ title: "Customer Approval" }] },
 observedGraph: { nodes: [{ nodeId: "observed-release", title: "Release",
   sourceEventIds: ["event-release"] }, { nodeId: "approval", title: "Customer Approval",
   nodeType: "manualAction", sourceEventIds: ["event-approval"] }] },
@@ -31,6 +33,8 @@ const bc = semanticMap.project(input, "businessCentral");
 assert.strictEqual(JSON.stringify(input), snapshot, "Projection must not mutate its inputs.");
 assert.deepStrictEqual(bc.nodes.map(node => node.title), ["Sales Order", "Release", "Create Pick",
   "Post Shipment", "Customer Approval"]);
+assert(!bc.nodes.some(node => node.title === "Sales Invoice"),
+  "optional reference nodes must not be shown as recorded process steps");
 assert.strictEqual(bc.nodes.find(node => node.title === "Release").metadata.semanticStatus, "observed");
 assert.deepStrictEqual(bc.nodes.find(node => node.title === "Release").sourceStepIds, ["task-release"]);
 assert.strictEqual(bc.nodes.find(node => node.title === "Post Shipment").metadata.semanticStatus,
@@ -71,9 +75,8 @@ const conditionalBc = semanticMap.project({ recordingId: "conditional", analysis
       name: "Warehouse Receipt", applicability: "conditional",
       variantIds: ["variant:basic-warehouse", "variant:advanced-warehouse"] }] }
 } }, "businessCentral");
-assert.strictEqual(conditionalBc.nodes[0].metadata.semanticStatus, "conditional");
-assert.deepStrictEqual(conditionalBc.nodes[0].metadata.variantIds,
-  ["variant:basic-warehouse", "variant:advanced-warehouse"]);
+assert.strictEqual(conditionalBc.nodes.length, 0,
+  "configuration-dependent reference steps must not become process-map nodes");
 const variantAnalysis = { bestMatch: { referenceProcess: "Purchase Order Flow",
   matchedSteps: [{ type: "document", id: "document:purchase-order", name: "Purchase Order" }],
   additionalSteps: [], missingSteps: [{ type: "document", id: "document:warehouse-put-away",
@@ -84,13 +87,10 @@ const variantAnalysis = { bestMatch: { referenceProcess: "Purchase Order Flow",
 const basicVariant = semanticMap.project({ recordingId: "basic", analysis: variantAnalysis,
   decision: { confirmedVariantId: "variant:basic-warehouse" } }, "businessCentral");
 assert(!basicVariant.nodes.some(node => node.title === "Warehouse Put-away"));
-assert.strictEqual(basicVariant.nodes.find(node => node.title === "Purchase Invoice")
-  .metadata.semanticStatus, "suggested");
-assert.strictEqual(basicVariant.nodes.find(node => node.title === "Purchase Invoice")
-  .metadata.processRole.id, "finance");
+assert(!basicVariant.nodes.some(node => node.title === "Purchase Invoice"));
 const advancedVariant = semanticMap.project({ recordingId: "advanced", analysis: variantAnalysis,
   decision: { confirmedVariantId: "variant:advanced-warehouse" } }, "businessCentral");
-assert(advancedVariant.nodes.some(node => node.title === "Warehouse Put-away"));
+assert(!advancedVariant.nodes.some(node => node.title === "Warehouse Put-away"));
 assert.throws(() => semanticMap.project(input, "pixels"), /Unsupported semantic process-map level/);
 
 const selectedAnalysis = { ...analysis, referenceGraphs: { alternative: { ...referenceGraph,

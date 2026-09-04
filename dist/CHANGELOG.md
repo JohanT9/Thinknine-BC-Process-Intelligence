@@ -11,6 +11,11 @@
 
 ## Unreleased
 
+- Moved configuration-dependent reference steps out of the primary Process
+  Analysis view into a collapsed comparison and excluded them from Process
+  Overview maps, so diagrams describe the recorded work rather than possible
+  Business Central configuration paths.
+
 - Consolidated a partially typed Business Central list filter with its selected
   record, so entering `3004` and choosing item `30043` produces one step with
   the definitive item number and selection screenshot.
