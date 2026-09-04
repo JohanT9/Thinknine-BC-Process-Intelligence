@@ -54,7 +54,18 @@
   function transition(fromNodeId, toNodeId, index, type = "sequence") { return freeze({
     transitionId: `semantic-map-transition:${index}:${fromNodeId}:${toNodeId}`,
     fromNodeId, toNodeId, transitionType: type }); }
-  function processModel(recordingId, title, values) { const nodes = values.map((value, index) => freeze({
+  function inheritProcessRoles(values) { let activeRole = null;
+    const forward = values.map(value => { const explicit = value.metadata?.processRole || null;
+      if (explicit) activeRole = explicit; return { ...value, metadata: { ...(value.metadata || {}),
+        ...(explicit || !activeRole ? {} : { processRole: clone(activeRole) }) } }; });
+    let followingRole = null; for (let index = forward.length - 1; index >= 0; index -= 1) {
+      const role = forward[index].metadata?.processRole || null; if (role) followingRole = role;
+      else if (followingRole) forward[index] = { ...forward[index], metadata: {
+        ...(forward[index].metadata || {}), processRole: clone(followingRole) } }; }
+    return forward;
+  }
+  function processModel(recordingId, title, values) { const nodes = inheritProcessRoles(values)
+    .map((value, index) => freeze({
     nodeId: value.nodeId || processGraph.stableId("semantic-map-node",
       [recordingId, title, value.title, index]), nodeType: value.nodeType || "activity",
     title: text(value.title), processOrder: index, sourceStepIds: array(value.sourceStepIds),
@@ -122,5 +133,5 @@
     const projected = reference ? fromReferenceGraph(input, model, reference) :
       fromComparison(input, model);
     return options.includeReferences === true ? projected : observedOnly(projected); }
-  return { LEVELS, project, semanticStatus };
+  return { LEVELS, inheritProcessRoles, project, semanticStatus };
 });

@@ -36,6 +36,10 @@ assert.deepStrictEqual(bc.nodes.map(node => node.title), ["Sales Order", "Releas
 assert(!bc.nodes.some(node => node.title === "Sales Invoice"),
   "optional reference nodes must not be shown as recorded process steps");
 assert.strictEqual(bc.nodes.find(node => node.title === "Release").metadata.semanticStatus, "observed");
+assert.strictEqual(bc.nodes.find(node => node.title === "Release").metadata.processRole.id, "sales",
+  "generic actions must inherit the surrounding Business Central responsibility");
+assert.strictEqual(bc.nodes.find(node => node.title === "Create Pick").metadata.processRole.id,
+  "warehouse");
 assert.deepStrictEqual(bc.nodes.find(node => node.title === "Release").sourceStepIds, ["task-release"]);
 assert.strictEqual(bc.nodes.find(node => node.title === "Customer Approval").metadata.semanticStatus,
   "customerSpecific");
@@ -73,6 +77,12 @@ assert.strictEqual(legacyBc.nodes[1].metadata.semanticStatus, "suggested");
 assert.strictEqual(legacyBc.nodes[0].metadata.originalNodeType, "document");
 assert.strictEqual(legacyBc.nodes[0].metadata.processRole.id, "purchasing");
 assert.strictEqual(legacyBc.nodes[1].metadata.processRole.id, "warehouse");
+const inheritedPurchaseRoles = semanticMap.inheritProcessRoles([
+  { title: "Purchase Order", metadata: { processRole: { id: "purchasing", name: "Purchasing" } } },
+  { title: "Create", metadata: {} }, { title: "Release", metadata: {} }
+]);
+assert.deepStrictEqual(inheritedPurchaseRoles.map(node => node.metadata.processRole.id),
+  ["purchasing", "purchasing", "purchasing"]);
 const legacyObservedOnly = semanticMap.project({ recordingId: "legacy", title: "Legacy",
   analysis: legacyAnalysis }, "businessCentral");
 assert.deepStrictEqual(legacyObservedOnly.nodes.map(node => node.title),

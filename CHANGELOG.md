@@ -27,6 +27,9 @@
   actions, postings, and decisions retain their own colors and shapes while a
   compact accessible marker communicates observed, suggested, conditional,
   reference, or customer-specific status.
+- Assigned unambiguous generic actions such as Create and Release to their
+  surrounding Business Central responsibility, preventing artificial
+  `Other steps` lanes in both Process Overview and exported maps.
 
 - Hid reference suggestions from Process Overview and process exports by
   default, while adding an explicit `Show reference suggestions` control that
