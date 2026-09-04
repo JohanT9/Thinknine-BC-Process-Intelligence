@@ -1,5 +1,9 @@
 # BC Process Studio 4.7
 
+- Process Analysis no longer counts configuration-dependent steps as missing.
+  They have a separate `Villkorliga` metric and list until a configuration is
+  confirmed.
+
 - A saved configuration choice now updates the full Process Analysis view, not
   only the map. Counts and possible-step lists exclude other variants, and the
   choice can still be changed later.

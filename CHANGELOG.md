@@ -11,6 +11,9 @@
 
 ## Unreleased
 
+- Separated conditional lifecycle steps from possibly missing steps in Process
+  Analysis, with dedicated metrics, lists, labels, and visual treatment.
+
 - Kept Process Analysis synchronized with a manually confirmed lifecycle
   variant: its heading, guidance, missing-step metric, and step list now reflect
   the saved configuration while remaining editable.

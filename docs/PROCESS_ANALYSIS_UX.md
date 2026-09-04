@@ -1,5 +1,13 @@
 # Process Analysis in Review Studio
 
+## Missing versus conditional
+
+Before a configuration variant is confirmed, configuration-dependent documents
+are excluded from the possible-missing metric. They appear in a dedicated
+`Villkorliga steg` / `Conditional steps` column with purple dashed styling.
+After confirmation, applicable reference steps move into the possible-missing
+list and steps from other variants disappear.
+
 ## Synchronized confirmed analysis
 
 After a configuration is selected, the variant heading, explanatory message,

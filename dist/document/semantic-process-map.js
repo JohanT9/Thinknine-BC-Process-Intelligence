@@ -76,7 +76,8 @@
     return processModel(input.recordingId, input.title, referenceNodes);
   }
   function fromComparison(input, model) { const selectedVariantId = text(
-    input.decision?.confirmedVariantId); const missing = model.missing.filter(item =>
+    input.decision?.confirmedVariantId); const missing = [...array(model.missing),
+      ...array(model.conditional)].filter(item =>
       !selectedVariantId || !array(item.variantIds).length ||
       array(item.variantIds).includes(selectedVariantId)); const values = [
     ...model.matched.map(item => ({ title: text(item.title || item.name || item.id),

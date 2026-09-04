@@ -3481,9 +3481,10 @@ function processAnalysisLabels() {
     detected: "Detected reference process", unknownDomain: "Domain not identified",
     match: "match", matchDegree: "Match confidence", confirmed:
       "Classification confirmed manually", matched: "Matched", missing: "Possible missing",
-    additional: "Customer-specific", advisory: "Differences are guidance, not errors. " +
+    conditional: "Conditional", additional: "Customer-specific", advisory: "Differences are guidance, not errors. " +
       "The recorded process may be a valid customer variant.", matchedSteps: "Matched steps",
-    missingSteps: "Possible missing steps", additionalSteps: "Customer-specific steps",
+    missingSteps: "Possible missing steps", conditionalSteps: "Conditional steps",
+    additionalSteps: "Customer-specific steps", noConditional: "No configuration-dependent steps",
     none: "None", noMissing: "No expected steps are missing", noAdditional: "No additional steps",
     alternatives: "Alternative reference processes", noAlternatives: "No relevant alternatives",
     noMatchTitle: "No reliable process match", noMatchText:
@@ -3501,9 +3502,10 @@ function processAnalysisLabels() {
     detected: "Identifierad referensprocess", unknownDomain: "Domän inte identifierad",
     match: "matchning", matchDegree: "Matchningsgrad", confirmed:
       "Klassificeringen är manuellt bekräftad", matched: "Matchade", missing: "Möjligen saknade",
-    additional: "Kundunika", advisory: "Skillnader är vägledning, inte fel. " +
+    conditional: "Villkorliga", additional: "Kundunika", advisory: "Skillnader är vägledning, inte fel. " +
       "Den inspelade processen kan vara en giltig kundvariant.", matchedSteps: "Matchade steg",
-    missingSteps: "Möjligen saknade steg", additionalSteps: "Kundunika steg",
+    missingSteps: "Möjligen saknade steg", conditionalSteps: "Villkorliga steg",
+    additionalSteps: "Kundunika steg", noConditional: "Inga konfigurationsberoende steg",
     none: "Inga", noMissing: "Inga förväntade steg saknas", noAdditional: "Inga extra steg",
     alternatives: "Alternativa referensprocesser", noAlternatives: "Inga relevanta alternativ",
     noMatchTitle: "Ingen säker processmatchning", noMatchText:

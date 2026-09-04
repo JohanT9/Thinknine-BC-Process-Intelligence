@@ -78,8 +78,9 @@ assert(container.innerHTML.includes('role="status"'));
 
 const variantResult = { bestMatch: { referenceProcessId: "purchase", referenceProcess:
   "Purchase to Pay", confidence: 0.63, matchedSteps: [], missingSteps: [{
-    name: "Warehouse Put-away", variantIds: ["variant:advanced-warehouse"] }, {
-    name: "Purchase Invoice", variantIds: ["variant:basic-warehouse",
+    name: "Warehouse Put-away", applicability: "conditional",
+    variantIds: ["variant:advanced-warehouse"] }, {
+    name: "Purchase Invoice", applicability: "optional", variantIds: ["variant:basic-warehouse",
       "variant:advanced-warehouse"] }], additionalSteps: [],
   variantAssessment: { selectedVariantId: "variant:basic-warehouse",
     selectedVariantName: "Basic Warehouse", ambiguous: true, alternativeVariants: [{
@@ -91,6 +92,8 @@ const variantModel = view.render(container, { result: variantResult }, {
     "variant:basic-warehouse": "Grundläggande lagerhantering",
     "variant:advanced-warehouse": "Avancerad lagerhantering" } });
 assert.strictEqual(variantModel.variantAssessment.ambiguous, true);
+assert.strictEqual(variantModel.missing.length, 0);
+assert.strictEqual(variantModel.conditional.length, 2);
 assert(container.innerHTML.includes("Grundläggande lagerhantering"));
 assert(container.innerHTML.includes("Avancerad lagerhantering"));
 assert(container.innerHTML.includes("Variantberoende steg visas som villkorliga."));
@@ -108,6 +111,7 @@ const confirmedBasic = view.render(container, { result: variantResult, decision:
   variantNames: { "variant:basic-warehouse": "Grundläggande lagerhantering",
     "variant:advanced-warehouse": "Avancerad lagerhantering" } });
 assert.strictEqual(confirmedBasic.missing.length, 1);
+assert.strictEqual(confirmedBasic.conditional.length, 0);
 assert.strictEqual(confirmedBasic.missing[0].name, "Purchase Invoice");
 assert.strictEqual(confirmedBasic.variantAssessment.selectedVariantId,
   "variant:basic-warehouse");

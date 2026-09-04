@@ -51,9 +51,14 @@
       variantAssessment.selectedVariantName = text(decision?.confirmedVariantName || selected?.name ||
         confirmedVariantId); variantAssessment.manuallyConfirmed = true; missing = missing.filter(item =>
         !array(item.variantIds).length || array(item.variantIds).includes(confirmedVariantId)); } }
+    const conditional = confirmedVariantId ? [] : missing.filter(item =>
+      ["conditional", "optional"].includes(item.applicability));
+    if (!confirmedVariantId) missing = missing.filter(item =>
+      !["conditional", "optional"].includes(item.applicability));
     return Object.freeze({ available: Boolean(best), referenceId: text(best?.referenceProcessId ||
       best?.referenceDiagramId || best?.referenceId), name: text(best?.referenceProcess || best?.name),
       domain: text(best?.domain), confidence, matched: clone(matched), missing: clone(missing),
+      conditional: clone(conditional),
       additional: clone(additional), alternatives: clone(alternatives.slice(0, 5)),
       confirmed: decision?.status === "confirmed", confirmedReferenceId:
       text(decision?.confirmedReferenceId), confirmedAt: decision?.confirmedAt || null,
@@ -111,12 +116,15 @@
         labels.confirmed || "Classification confirmed manually")}</p>` : ""}
       <div class="process-analysis-metrics">${metric(labels.matched || "Matched", model.matched.length, "matched")}
         ${metric(labels.missing || "Possible missing", model.missing.length, "missing")}
+        ${metric(labels.conditional || "Conditional", model.conditional.length, "conditional")}
         ${metric(labels.additional || "Customer-specific", model.additional.length, "additional")}</div>
       <p class="process-analysis-advisory">${escape(labels.advisory ||
         "Differences are guidance, not errors. The recorded process may be a valid customer variant.")}</p>
       <div class="process-analysis-columns">${steps(labels.matchedSteps || "Matched steps", model.matched,
         "matched", labels.none || "None", labels)}${steps(labels.missingSteps || "Possible missing steps", model.missing,
-        "missing", labels.noMissing || "No expected steps are missing", labels)}${steps(labels.additionalSteps ||
+        "missing", labels.noMissing || "No expected steps are missing", labels)}${steps(labels.conditionalSteps ||
+        "Conditional steps", model.conditional, "conditional", labels.noConditional ||
+        "No configuration-dependent steps", labels)}${steps(labels.additionalSteps ||
         "Customer-specific steps", model.additional, "additional", labels.noAdditional || "No additional steps", labels)}</div>
       <fieldset class="process-analysis-alternatives"><legend>${escape(labels.alternatives ||
         "Alternative reference processes")}</legend>${model.alternatives.length ? model.alternatives.map(item =>
