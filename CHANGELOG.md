@@ -11,6 +11,9 @@
 
 ## Unreleased
 
+- Fixed Process Overview failing with `Cannot read properties of null (reading
+  'id')` when an older semantic node contains an explicitly empty process role.
+
 - Added a semantic process-map connection editor for creating, changing, and
   removing sequence, conditional, alternative, loop, return, creation, and
   posting relationships, with optional labels and non-destructive persistence.

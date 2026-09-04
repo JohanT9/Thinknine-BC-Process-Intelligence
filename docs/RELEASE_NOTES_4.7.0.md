@@ -1,5 +1,8 @@
 # BC Process Studio 4.7
 
+- Fixed a backward-compatibility error that could prevent Process Overview from
+  rendering when an older recording contained a null semantic process role.
+
 - Process-map connections can now be created, edited, or removed from a selected
   semantic node. Consultants can choose the target, relationship type, and an
   optional label while keeping the original recording and taxonomy unchanged.

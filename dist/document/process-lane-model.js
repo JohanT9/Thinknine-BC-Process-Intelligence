@@ -30,8 +30,9 @@
     nodes.forEach(node => {
       const phase = phaseByNode.get(node.nodeId);
       const role = node.metadata?.processRole;
-      const roleId = typeof role === "object" ? role.id || role.name : role;
-      const roleTitle = typeof role === "object" ? role.name || role.id : role;
+      const roleObject = role && typeof role === "object";
+      const roleId = roleObject ? role.id || role.name : role;
+      const roleTitle = roleObject ? role.name || role.id : role;
       const laneId = phase?.subprocessId || (roleId ? `role:${roleId}` :
         (phases.length || hasRoles ? "lane:unassigned" : "lane:implicit"));
       const title = phase?.title || options.roleNames?.[roleId] || roleTitle ||

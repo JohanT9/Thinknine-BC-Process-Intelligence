@@ -26,4 +26,8 @@ const localizedRoles = lanes.create({ nodes: [{ nodeId: "purchase", nodeType: "d
   nodeId: "unknown", nodeType: "activity", metadata: {} }] }, { unassignedTitle: "Övriga steg",
 roleNames: { purchasing: "Inköp" } });
 assert.deepStrictEqual(localizedRoles.lanes.map(lane => lane.title), ["Inköp", "Övriga steg"]);
+const legacyNullRole = lanes.create({ nodes: [{ nodeId: "legacy", nodeType: "activity",
+  metadata: { processRole: null } }], subprocesses: [] });
+assert.strictEqual(legacyNullRole.visible, false);
+assert.strictEqual(legacyNullRole.assignments.legacy, "lane:implicit");
 console.log("Process lane model tests passed.");
