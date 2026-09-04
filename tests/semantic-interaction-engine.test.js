@@ -66,6 +66,31 @@ assert.strictEqual(redundantSortedSelection[0].screenshot,
   "selected-record.png");
 assert.deepStrictEqual(redundantSortedSelection[0].sourceEventIds,
   ["number-entered", "selected-record"]);
+const partialItemNumberSelection = engine.consolidateInteractions([{
+  taskId: "partial-number-entry", taskType: "EnterFieldValue",
+  fieldCaption: "Nr", instructionValue: "3004",
+  screenshot: "partial-number.png", sourceEventIds: ["partial-number"]
+}, {
+  taskId: "complete-number-result", taskType: "RunAction",
+  actionCaption: 'Nr, sorterade i Stigande order Välj posten "30043"',
+  screenshot: "complete-number.png", sourceEventIds: ["complete-number"]
+}]);
+assert.strictEqual(partialItemNumberSelection.length, 1);
+assert.strictEqual(partialItemNumberSelection[0].instruction,
+  "Ange __30043__ i **Nr**.");
+assert.strictEqual(partialItemNumberSelection[0].instructionValue, "30043");
+assert.strictEqual(partialItemNumberSelection[0].screenshot,
+  "complete-number.png");
+assert.deepStrictEqual(partialItemNumberSelection[0].sourceEventIds,
+  ["partial-number", "complete-number"]);
+const differentSortedSelection = engine.consolidateInteractions([{
+  taskType: "EnterFieldValue", fieldCaption: "Nr", instructionValue: "3004"
+}, {
+  taskType: "RunAction",
+  actionCaption: 'Nr, sorterade i Stigande order Välj posten "40001"'
+}]);
+assert.strictEqual(differentSortedSelection.length, 2,
+  "an unrelated selected number must not replace the entered value");
 const redundantSearchInput = engine.processInteractions([{
   taskId: "search-complete", taskType: "SearchAndOpenPage",
   searchCaption: "Search", searchFieldCaption: "Tell me what you want to do.",

@@ -427,7 +427,9 @@
         return ["EnterFieldValue", "ChangeField"].includes(current?.taskType) &&
           ["RunAction", "Select"].includes(selected?.taskType) &&
           Boolean(field && enteredValue && selectedValue) &&
-          enteredValue === selectedValue && selectionText.includes(field) &&
+          selectedValue.toLocaleLowerCase().startsWith(
+            enteredValue.toLocaleLowerCase()
+          ) && selectionText.includes(field) &&
           /sorterade|sorted/iu.test(selectionText);
       },
       consolidate(context) {

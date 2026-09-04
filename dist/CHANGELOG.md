@@ -11,6 +11,10 @@
 
 ## Unreleased
 
+- Consolidated a partially typed Business Central list filter with its selected
+  record, so entering `3004` and choosing item `30043` produces one step with
+  the definitive item number and selection screenshot.
+
 - Consolidated the Business Central purchase-line menu path `Rad` →
   `Tillämpat inköpspris och rabatt` → `Manuellt pris` into one traceable
   instruction and selected the resulting manual-price dialog as its screenshot.

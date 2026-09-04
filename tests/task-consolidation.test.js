@@ -84,6 +84,22 @@ assert.strictEqual(sortedRecordSelection[0].instruction,
 assert.strictEqual(sortedRecordSelection[0].screenshot, "selection.png");
 assert.deepStrictEqual(sortedRecordSelection[0].sourceEventNos, [20, 21]);
 
+const partialSortedRecordSelection = consolidation.consolidate([{
+  taskId: "partial-number-entry", taskType: "EnterFieldValue",
+  fieldCaption: "Nr", instructionValue: "3004", screenshot: "partial.png",
+  sourceEventNos: [22]
+}, {
+  taskId: "complete-number-selection", taskType: "RunAction",
+  actionCaption: 'Nr, sorterade i Stigande order Välj posten "30043"',
+  screenshot: "complete.png", sourceEventNos: [23]
+}]);
+assert.strictEqual(partialSortedRecordSelection.length, 1);
+assert.strictEqual(partialSortedRecordSelection[0].instruction,
+  "Ange __30043__ i **Nr**.");
+assert.strictEqual(partialSortedRecordSelection[0].screenshot, "complete.png");
+assert.deepStrictEqual(partialSortedRecordSelection[0].sourceEventNos,
+  [22, 23]);
+
 const salesLineTasks = [{ taskId: "filter", taskType: "ChangeField",
   entity: "Item", fieldCaption: "Sortera efter Nr", value: "",
   inputSources: ["focusout"], sourceEventNos: [31]
