@@ -123,18 +123,21 @@
     const nodeHeight = density === "compact" ? 76 : 104;
     const gapX = density === "compact" ? 52 : 72;
     const gapY = density === "compact" ? 44 : 64;
-    const margin = 54; const header = 74; const laneHeader = 34;
+    const margin = 64; const header = 126; const laneHeader = 42;
     const layout = rowsFor(model, nodes, columns, english); const boxes = {}; let cursorY = header;
-    const laneBands = []; layout.rows.forEach(row => { if (layout.lanes.visible && row.firstInLane && row.lane) {
-      laneBands.push({ y: cursorY, title: row.lane.title }); cursorY += laneHeader; }
+    const laneBands = []; let activeLaneBand;
+    layout.rows.forEach(row => { if (layout.lanes.visible && row.firstInLane && row.lane) {
+      activeLaneBand = { y: cursorY, title: row.lane.title, bottom: cursorY };
+      laneBands.push(activeLaneBand); cursorY += laneHeader; }
       const rowNumber = layout.rows.indexOf(row);
       row.nodes.forEach((node, column) => { const visualColumn = rowNumber % 2
         ? columns - column - 1 : column; boxes[node.nodeId] = { x: margin + visualColumn *
         (nodeWidth + gapX), y: cursorY, width: nodeWidth, height: nodeHeight }; });
-      cursorY += nodeHeight + gapY; });
+      cursorY += nodeHeight + gapY;
+      if (activeLaneBand) activeLaneBand.bottom = cursorY - Math.round(gapY / 2); });
     const width = Math.max(560, margin * 2 + Math.min(columns, Math.max(1,
       ...layout.rows.map(row => row.nodes.length))) * nodeWidth + (columns - 1) * gapX);
-    const contentHeight = Math.max(300, cursorY - gapY + margin);
+    const contentHeight = Math.max(340, cursorY - gapY + margin);
     const legend = legendFor(model, options.language, width, contentHeight + 12);
     const height = contentHeight + legend.height + 24;
     const stateByNode = new Map(); (model.stateTransitions || []).forEach(change => {
@@ -149,7 +152,7 @@
           escape(route.kind)}" marker-end="url(#arrow)"/>${explicit ? `<text x="${path.labelX}" y="${
           path.labelY}" class="route-label" text-anchor="middle">${escape(explicit)}</text>` : ""}`; })
       .join("");
-    const nodeMarkup = nodes.map(node => { const box = boxes[node.nodeId];
+    const nodeMarkup = nodes.map((node, nodeIndex) => { const box = boxes[node.nodeId];
       const visual = visualGrammar.presentationFor(node, options.language);
       const lines = wrap(node.title, density === "compact" ? 18 : 22,
         density === "compact" ? 2 : 3);
@@ -162,15 +165,18 @@
           english))} → ${escape(stateValue(change.after, english))}</text>`; }).join("");
       const semanticStatus = node?.metadata?.semanticStatus;
       const semanticClass = semanticStatus ? ` semantic-${escape(semanticStatus)}` : "";
+      const badge = `<circle class="step-badge" cx="${box.x + 1}" cy="${box.y + 1}" r="16"/><text class="step-number" x="${box.x + 1}" y="${box.y + 6}" text-anchor="middle">${nodeIndex + 1}</text>`;
       return `<g class="map-node map-node-${escape(visual.kind)}${semanticClass}" data-node-type="${
-        escape(node.nodeType)}" data-node-id="${escape(node.nodeId)}">${nodeShape(node, box, visual)}<text x="${
+        escape(node.nodeType)}" data-node-id="${escape(node.nodeId)}">${nodeShape(node, box, visual)}${badge}<text x="${
         box.x + box.width / 2}" y="${textY}" text-anchor="middle">${lines.map((line, index) =>
         `<tspan x="${box.x + box.width / 2}" dy="${index ? 18 : 0}">${escape(line)}</tspan>`).join("")}</text>${changeMarkup}</g>`; }).join("");
-    const laneMarkup = laneBands.map(lane => `<g class="lane"><rect x="20" y="${lane.y}" width="${
-      width - 40}" height="${laneHeader - 6}" rx="4"/><text x="32" y="${lane.y + 19}">${
-      escape(lane.title)}</text></g>`).join("");
+    const laneMarkup = laneBands.map(lane => `<g class="lane"><rect class="lane-panel" x="20" y="${lane.y}" width="${
+      width - 40}" height="${Math.max(laneHeader, lane.bottom - lane.y)}" rx="12"/><path class="lane-accent" d="M 32 ${lane.y + laneHeader} H ${width - 32}"/><text x="38" y="${lane.y + 26}">${
+      escape(english ? `OWNER: ${lane.title}` : `ANSVAR: ${lane.title}`)}</text></g>`).join("");
     const title = options.title || model.title || "Process";
-    return applyTheme(`<?xml version="1.0" encoding="UTF-8"?>\n<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${width} ${height}" role="img" aria-labelledby="title description"><title id="title">${escape(title)}</title><desc id="description">${escape(english ? "Exported process diagram" : "Exporterat processdiagram")}</desc><defs><marker id="arrow" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#49657a"/></marker></defs><style>.background{fill:#fff}.lane rect{fill:#f4f8fb;stroke:#c8d5df}.lane text{font:700 13px Arial,sans-serif;fill:#213547}.map-node>*:first-child{fill:#fefefe;stroke:#52606d;stroke-width:2}.map-node text{font:600 14px Arial,sans-serif;fill:#172b3a}.map-node .state{font:11px Arial,sans-serif;fill:#3f5668}.map-node-business-process>*:first-child{fill:#eaf3f8;stroke:#31566f}.map-node-document>*:first-child{fill:#eef8fd;stroke:#2878a5}.map-node-posted-document>*:first-child{fill:#eef8f0;stroke:#347447}.map-node-posting>*:first-child,.map-node-decision>*:first-child{fill:#fff4ce;stroke:#7a5b00}.map-node-system-action>*:first-child{fill:#f6f2ff;stroke:#66558f;stroke-dasharray:6 4}.map-node-manual-action>*:first-child{fill:#fff8ef;stroke:#8a5a2b}.semantic-observed>*:first-child,.legend-status.semantic-observed{fill:#dff3e5;stroke:#15803d}.semantic-suggested>*:first-child,.legend-status.semantic-suggested{fill:#fff8e1;stroke:#a16207;stroke-dasharray:6 4}.semantic-conditional>*:first-child,.legend-status.semantic-conditional{fill:#f5f3ff;stroke:#7c3aed;stroke-dasharray:6 4}.semantic-customerSpecific>*:first-child,.legend-status.semantic-customerSpecific{fill:#e0f2fe;stroke:#0369a1}.semantic-reference>*:first-child,.legend-status.semantic-reference{fill:#eef1f4;stroke:#64717d}.edge{fill:none;stroke:#49657a;stroke-width:2;stroke-linejoin:round}.edge-alternate,.edge-loop,.edge-return{stroke:#8a6d1d;stroke-dasharray:7 5}.edge-conditional,.edge-branch{stroke:#765b00;stroke-width:2.5}.edge-creates{stroke:#2878a5;stroke-dasharray:2 5}.edge-posts{stroke:#347447;stroke-width:3}.route-label{font:12px Arial,sans-serif;fill:#5f4b16;paint-order:stroke;stroke:#fff;stroke-width:4px;stroke-linejoin:round}.diagram-legend>rect{fill:#f4f8fb;stroke:#c8d5df}.diagram-legend text{font:12px Arial,sans-serif;fill:#172b3a}.diagram-legend .legend-title{font-weight:700}.legend-item>*:first-child{fill:#fefefe;stroke:#52606d;stroke-width:2}.legend-route{fill:none!important;stroke:#49657a!important}.legend-route-dashed{stroke-dasharray:7 5}.legend-route-dotted{stroke-dasharray:2 5}.legend-route-double{stroke-width:4!important}</style><rect class="background" width="100%" height="100%"/><text x="${margin}" y="38" style="font:700 20px Arial,sans-serif;fill:#172b3a">${escape(title)}</text>${laneMarkup}<g class="edges">${edges}</g><g class="nodes">${nodeMarkup}</g>${legend.markup}</svg>\n`, theme);
+    const subtitle = options.subtitle || (english ? "Microsoft Dynamics 365 Business Central · Process map" : "Microsoft Dynamics 365 Business Central · Processkarta");
+    const footer = options.footer || (english ? "Based on the recorded process in BC Process Studio" : "Baserad på den inspelade processen i BC Process Studio");
+    return applyTheme(`<?xml version="1.0" encoding="UTF-8"?>\n<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${width} ${height}" role="img" aria-labelledby="title description"><title id="title">${escape(title)}</title><desc id="description">${escape(english ? "Exported process diagram" : "Exporterat processdiagram")}</desc><defs><filter id="card-shadow" x="-15%" y="-15%" width="140%" height="150%"><feDropShadow dx="0" dy="3" stdDeviation="4" flood-color="#172b3a" flood-opacity=".14"/></filter><marker id="arrow" markerWidth="10" markerHeight="10" refX="9" refY="5" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#49657a"/></marker></defs><style>.background{fill:#fff}.top-accent{fill:#31566f}.subtitle,.footer{font:12px 'Segoe UI',Arial,sans-serif;fill:#3f5668}.lane-panel{fill:#f4f8fb;stroke:#c8d5df;stroke-width:1.5}.lane-accent{fill:none;stroke:#31566f;stroke-width:2}.lane text{font:700 12px 'Segoe UI',Arial,sans-serif;letter-spacing:.7px;fill:#213547}.map-node>*:first-child{fill:#fefefe;stroke:#52606d;stroke-width:2;filter:url(#card-shadow)}.map-node text{font:600 14px 'Segoe UI',Arial,sans-serif;fill:#172b3a}.map-node .state{font:11px 'Segoe UI',Arial,sans-serif;fill:#3f5668}.map-node .step-badge{fill:#31566f;stroke:#fff;stroke-width:3;filter:none}.map-node .step-number{font:700 12px 'Segoe UI',Arial,sans-serif;fill:#fff}.map-node-business-process>*:first-child{fill:#eaf3f8;stroke:#31566f}.map-node-document>*:first-child{fill:#eef8fd;stroke:#2878a5}.map-node-posted-document>*:first-child{fill:#eef8f0;stroke:#347447}.map-node-posting>*:first-child,.map-node-decision>*:first-child{fill:#fff4ce;stroke:#7a5b00}.map-node-system-action>*:first-child{fill:#f6f2ff;stroke:#66558f;stroke-dasharray:6 4}.map-node-manual-action>*:first-child{fill:#fff8ef;stroke:#8a5a2b}.semantic-observed>*:first-child,.legend-status.semantic-observed{fill:#dff3e5;stroke:#15803d}.semantic-suggested>*:first-child,.legend-status.semantic-suggested{fill:#fff8e1;stroke:#a16207;stroke-dasharray:6 4}.semantic-conditional>*:first-child,.legend-status.semantic-conditional{fill:#f5f3ff;stroke:#7c3aed;stroke-dasharray:6 4}.semantic-customerSpecific>*:first-child,.legend-status.semantic-customerSpecific{fill:#e0f2fe;stroke:#0369a1}.semantic-reference>*:first-child,.legend-status.semantic-reference{fill:#eef1f4;stroke:#64717d}.edge{fill:none;stroke:#49657a;stroke-width:3;stroke-linejoin:round}.edge-alternate,.edge-loop,.edge-return{stroke:#8a6d1d;stroke-dasharray:7 5}.edge-conditional,.edge-branch{stroke:#765b00;stroke-width:3}.edge-creates{stroke:#2878a5;stroke-dasharray:2 5}.edge-posts{stroke:#347447;stroke-width:4}.route-label{font:12px 'Segoe UI',Arial,sans-serif;fill:#5f4b16;paint-order:stroke;stroke:#fff;stroke-width:4px;stroke-linejoin:round}.diagram-legend>rect{fill:#f4f8fb;stroke:#c8d5df}.diagram-legend text{font:12px 'Segoe UI',Arial,sans-serif;fill:#172b3a}.diagram-legend .legend-title{font-weight:700}.legend-item>*:first-child{fill:#fefefe;stroke:#52606d;stroke-width:2}.legend-route{fill:none!important;stroke:#49657a!important}.legend-route-dashed{stroke-dasharray:7 5}.legend-route-dotted{stroke-dasharray:2 5}.legend-route-double{stroke-width:4!important}</style><rect class="background" width="100%" height="100%"/><rect class="top-accent" width="100%" height="10"/><text x="${margin}" y="49" style="font:700 25px 'Segoe UI',Arial,sans-serif;fill:#172b3a">${escape(title)}</text><text class="subtitle" x="${margin}" y="74">${escape(subtitle)}</text>${laneMarkup}<g class="edges">${edges}</g><g class="nodes">${nodeMarkup}</g>${legend.markup}<text class="footer" x="${margin}" y="${height - 9}">${escape(footer)}</text></svg>\n`, theme);
   }
   return { applyTheme, edgePath, legendFor, rowsFor, svg };
 });

@@ -55,6 +55,12 @@ assert(svg.includes('class="diagram-legend"'));
 assert(svg.includes("Teckenförklaring"));
 assert(svg.includes("Beslut"));
 assert(svg.includes("Villkor"));
+assert(svg.includes('class="top-accent"'));
+assert(svg.includes("Microsoft Dynamics 365 Business Central · Processkarta"));
+assert(svg.includes('id="card-shadow"'));
+assert(svg.includes('class="step-badge"'));
+assert(svg.includes('class="step-number"'));
+assert(svg.includes("Baserad på den inspelade processen i BC Process Studio"));
 
 const richSvg = svgExporter.svg({ recordingId: "rich", title: "Rich process",
   nodes: [{ nodeId: "document", nodeType: "document", title: "Sales Order", sequence: 0 },
@@ -66,6 +72,8 @@ const richSvg = svgExporter.svg({ recordingId: "rich", title: "Rich process",
     nodeIds: ["document", "post", "posted"], metadata: { containerType: "phase" } }]
 }, { language: "en-US", columns: 2 });
 assert(richSvg.includes("Warehouse Outbound"));
+assert(richSvg.includes("OWNER: Warehouse Outbound"));
+assert(richSvg.includes('class="lane-panel"'));
 assert(richSvg.includes("map-node-document"));
 assert(richSvg.includes("map-node-posting"));
 assert(richSvg.includes("map-node-posted-document"));
@@ -107,7 +115,7 @@ const balancedSvg = svgExporter.svg({ recordingId: "balanced", nodes: Array.from
   length: 9 }, (_, index) => ({ nodeId: `balanced-${index}`, nodeType: "activity",
     title: `Step ${index}`, sequence: index })), transitions: [], subprocesses: [] },
 { columns: 4 });
-assert(balancedSvg.includes('viewBox="0 0 822 '),
+assert(balancedSvg.includes('viewBox="0 0 842 '),
   "nine nodes should use three balanced columns instead of a one-node final row");
 
 const semanticSvg = svgExporter.svg({ recordingId: "semantic-export", nodes: [

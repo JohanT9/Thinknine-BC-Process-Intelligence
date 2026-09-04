@@ -11,6 +11,11 @@
 
 ## Unreleased
 
+- Redesigned SVG process-map exports with a presentation-ready title area,
+  rounded responsibility lanes, numbered cards, stronger connectors, subtle
+  depth, and a clear recording-based footer while retaining semantic colors,
+  shapes, themes, and the underlying observed process model.
+
 - Hid reference suggestions from Process Overview and process exports by
   default, while adding an explicit `Show reference suggestions` control that
   applies consistently to both the displayed and exported process model.
