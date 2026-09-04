@@ -176,7 +176,8 @@
   function legendMarkup(model, locale) {
     const legend = processMapLegend.create(model, locale);
     const nodes = legend.nodes.map(item => `<span class="process-grammar-legend-item">
-      <span class="process-grammar-node-symbol" data-shape="${escape(item.shape)}" aria-hidden="true"></span>
+      <span class="process-grammar-node-symbol" data-kind="${escape(item.kind)}"
+        data-shape="${escape(item.shape)}" aria-hidden="true"></span>
       <span>${escape(item.label)}</span></span>`).join("");
     const routes = legend.routes.map(item => `<span class="process-grammar-legend-item">
       <span class="process-grammar-route-symbol" data-line="${escape(item.line)}" aria-hidden="true"></span>
@@ -267,6 +268,7 @@
           ` process-overview-kind-${visual.kind}`}${
           semantic ? ` process-overview-semantic-${semantic.name}` : ""}"
           data-process-row="${placement?.row ?? 0}" data-process-column="${placement?.column ?? 0}"
+          style="grid-column:${(placement?.column ?? 0) + 1}"
           data-process-node-id="${escape(detail.node.nodeId)}" data-process-decision="${decision}"
           data-process-shape="${escape(visual.shape)}" data-process-tone="${escape(visual.tone)}">
           <button type="button" class="process-overview-action"

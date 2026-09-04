@@ -1,5 +1,9 @@
 # BC Process Studio 4.7
 
+- Automatic process maps now use balanced serpentine rows, keeping consecutive
+  steps close when a process wraps and avoiding a single orphan step on the
+  final row where possible. Node-type colors are also reflected in the legend.
+
 - Exported SVG process diagrams now retain the same semantic status colors,
   dashed treatments, and localized status legend shown in Process Overview,
   alongside the selected theme, density, direction, swimlanes, and node edits.

@@ -11,6 +11,10 @@
 
 ## Unreleased
 
+- Improved automatic process-map composition with balanced serpentine rows that
+  avoid isolated final nodes and long visual return jumps, while giving the
+  interactive legend the same type-specific colors as its process nodes.
+
 - Made SVG process-diagram export preserve the preview's semantic status
   styling and localized legend for observed, suggested, conditional,
   customer-specific, and reference steps, completing theme and layout parity.

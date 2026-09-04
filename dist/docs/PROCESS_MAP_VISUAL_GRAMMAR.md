@@ -3,6 +3,12 @@
 BC Process Studio uses one renderer-neutral visual grammar to make semantic
 process maps easier to scan without changing their meaning.
 
+The interactive legend uses the same type-specific colors as the nodes. For
+example, Business Central documents are blue, posted documents green, posting
+and decisions amber, system actions purple, manual actions brown, and semantic
+process steps teal. Shape, border style, and a text label accompany every color
+so meaning does not depend on color perception alone.
+
 The grammar resolves a ProcessGraph node's canonical type and returns semantic
 presentation intent: `kind`, `shape`, `tone`, and a localized type label. It
 uses structured node metadata, including the preserved `originalNodeType`; it

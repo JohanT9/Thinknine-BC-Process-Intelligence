@@ -103,6 +103,12 @@ const compactDensitySvg = svgExporter.svg(densityModel, { columns: 2, density: "
 assert(standardDensitySvg.includes('width="190" height="104"'));
 assert(compactDensitySvg.includes('width="150" height="76"'));
 assert.notStrictEqual(standardDensitySvg, compactDensitySvg);
+const balancedSvg = svgExporter.svg({ recordingId: "balanced", nodes: Array.from({
+  length: 9 }, (_, index) => ({ nodeId: `balanced-${index}`, nodeType: "activity",
+    title: `Step ${index}`, sequence: index })), transitions: [], subprocesses: [] },
+{ columns: 4 });
+assert(balancedSvg.includes('viewBox="0 0 822 '),
+  "nine nodes should use three balanced columns instead of a one-node final row");
 
 const semanticSvg = svgExporter.svg({ recordingId: "semantic-export", nodes: [
   { nodeId: "observed", nodeType: "activity", title: "Release", sequence: 0,

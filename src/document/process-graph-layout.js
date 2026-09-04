@@ -32,7 +32,14 @@
     const maximum = Math.max(minimum, Math.floor(positive(options.maxColumns,
       DEFAULTS.maxColumns)));
     const fitting = Math.max(1, Math.floor((width + gap) / (nodeWidth + gap)));
-    return Math.min(nodeCount, Math.max(minimum, Math.min(maximum, fitting)));
+    let columns = Math.min(nodeCount, Math.max(minimum, Math.min(maximum, fitting)));
+    if (columns > 2 && nodeCount > columns && nodeCount % columns === 1) {
+      const balanced = columns - 1;
+      if (Math.ceil(nodeCount / balanced) === Math.ceil(nodeCount / columns)) {
+        columns = balanced;
+      }
+    }
+    return columns;
   }
 
   function create(model, options = {}) {
@@ -43,8 +50,11 @@
     const rows = [];
     const nodes = sourceNodes.map((node, order) => {
       const row = Math.floor(order / columnCount);
-      const column = order % columnCount;
-      if (!rows[row]) rows[row] = { row, nodeIds: [] };
+      const position = order % columnCount;
+      const reverse = direction === "adaptive" && row % 2 === 1;
+      const column = reverse ? columnCount - position - 1 : position;
+      if (!rows[row]) rows[row] = { row, direction: reverse ? "reverse" : "forward",
+        nodeIds: [] };
       rows[row].nodeIds.push(node.nodeId);
       return Object.freeze({ nodeId: node.nodeId, order, row, column });
     });
@@ -65,6 +75,7 @@
       flowDirection: direction === "vertical" ? "topToBottom" : "leftToRightRows",
       columnCount, rowCount: rows.length,
       rows: Object.freeze(rows.map(row => Object.freeze({ row: row.row,
+        direction: row.direction,
         nodeIds: Object.freeze([...row.nodeIds]) }))),
       nodes: Object.freeze(nodes), edges: Object.freeze(edges) });
   }

@@ -16,6 +16,8 @@ assert.strictEqual(wide.columnCount, 4);
 assert.strictEqual(wide.rowCount, 3);
 assert.deepStrictEqual(wide.rows.map(row => row.nodeIds.length), [4, 4, 2]);
 assert.strictEqual(wide.nodes.find(node => node.nodeId === "node-5").row, 1);
+assert.strictEqual(wide.nodes.find(node => node.nodeId === "node-5").column, 3);
+assert.strictEqual(wide.rows[1].direction, "reverse");
 assert.strictEqual(wide.edges.find(edge => edge.edgeId === "edge-4").route, "rowWrap");
 assert.strictEqual(wide.edges.find(edge => edge.edgeId === "edge-5").route, "horizontal");
 assert.strictEqual(JSON.stringify(model), before, "layout must not mutate the process model");
@@ -25,6 +27,8 @@ const narrow = layout.create(model, { availableWidth: 450 });
 assert.strictEqual(narrow.columnCount, 2);
 assert.strictEqual(narrow.rowCount, 5);
 assert.strictEqual(layout.calculateColumnCount(20, { availableWidth: 2000 }), 5);
+assert.strictEqual(layout.calculateColumnCount(9, { availableWidth: 1000 }), 3,
+  "adaptive layout should avoid a final row containing one orphan node");
 const vertical = layout.create(model, { availableWidth: 2000, direction: "vertical" });
 assert.strictEqual(vertical.columnCount, 1);
 assert.strictEqual(vertical.rowCount, 10);

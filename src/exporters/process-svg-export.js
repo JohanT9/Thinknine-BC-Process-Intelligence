@@ -113,7 +113,12 @@
     const english = String(options.language || "").toLowerCase().startsWith("en");
     const theme = processMapTheme.resolve(options.theme);
     const density = options.density === "compact" ? "compact" : "standard";
-    const nodes = ordered(model); const columns = Math.max(1, Math.min(5, Number(options.columns) || 4));
+    const nodes = ordered(model); let columns = Math.max(1, Math.min(5,
+      Number(options.columns) || 4));
+    if (columns > 2 && nodes.length > columns && nodes.length % columns === 1 &&
+        Math.ceil(nodes.length / (columns - 1)) === Math.ceil(nodes.length / columns)) {
+      columns -= 1;
+    }
     const nodeWidth = density === "compact" ? 150 : 190;
     const nodeHeight = density === "compact" ? 76 : 104;
     const gapX = density === "compact" ? 52 : 72;
@@ -122,7 +127,9 @@
     const layout = rowsFor(model, nodes, columns, english); const boxes = {}; let cursorY = header;
     const laneBands = []; layout.rows.forEach(row => { if (layout.lanes.visible && row.firstInLane && row.lane) {
       laneBands.push({ y: cursorY, title: row.lane.title }); cursorY += laneHeader; }
-      row.nodes.forEach((node, column) => { boxes[node.nodeId] = { x: margin + column *
+      const rowNumber = layout.rows.indexOf(row);
+      row.nodes.forEach((node, column) => { const visualColumn = rowNumber % 2
+        ? columns - column - 1 : column; boxes[node.nodeId] = { x: margin + visualColumn *
         (nodeWidth + gapX), y: cursorY, width: nodeWidth, height: nodeHeight }; });
       cursorY += nodeHeight + gapY; });
     const width = Math.max(560, margin * 2 + Math.min(columns, Math.max(1,

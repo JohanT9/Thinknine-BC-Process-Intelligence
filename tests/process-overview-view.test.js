@@ -182,6 +182,8 @@ view.render(wrappingContainer, { nodes: Array.from({ length: 5 }, (_, index) => 
   processOrder: index
 })), transitions: [], subprocesses: [], stateTransitions: [] }, { locale: "en-US" });
 assert(wrappingContainer.innerHTML.includes("--process-columns:2"));
+assert(wrappingContainer.innerHTML.includes('data-process-row="1" data-process-column="1"'));
+assert(wrappingContainer.innerHTML.includes('style="grid-column:2"'));
 assert.strictEqual((wrappingContainer.innerHTML.match(/process-overview-row-end/g) || []).length, 2);
 const verticalContainer = { innerHTML: "", clientWidth: 1200 };
 view.render(verticalContainer, { nodes: Array.from({ length: 3 }, (_, index) => ({
