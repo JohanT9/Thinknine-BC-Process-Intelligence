@@ -17,6 +17,9 @@
   shapes, themes, and the underlying observed process model.
 - Kept short reverse-flow rows within the SVG canvas and localized canonical
   Business Central document and action identifiers in Swedish diagram exports.
+- Added compact type labels to exported process nodes so documents, process
+  steps, postings, decisions, and actions remain immediately distinguishable
+  alongside their semantic colors and shapes.
 
 - Hid reference suggestions from Process Overview and process exports by
   default, while adding an explicit `Show reference suggestions` control that

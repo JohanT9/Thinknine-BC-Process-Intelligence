@@ -77,6 +77,9 @@ assert(richSvg.includes('class="lane-panel"'));
 assert(richSvg.includes("map-node-document"));
 assert(richSvg.includes("map-node-posting"));
 assert(richSvg.includes("map-node-posted-document"));
+assert(richSvg.includes('class="node-kind"'));
+assert(richSvg.includes(">DOCUMENT<"));
+assert(richSvg.includes(">POSTING<"));
 assert(richSvg.includes("edge-posts"));
 assert(/<path d="[^"]* V [^"]*"/u.test(richSvg),
   "multi-row export must use orthogonal connectors");
@@ -88,9 +91,11 @@ const verticalSvg = svgExporter.svg({ recordingId: "vertical", nodes: [
 assert(/<path d="[^"]* V [^"]*"/u.test(verticalSvg));
 const splitLaneSvg = svgExporter.svg({ recordingId: "split-lanes", nodes: [
   { nodeId: "purchase", nodeType: "activity", title: "document:purchase-order", sequence: 0,
-    metadata: { processRole: "purchasing" } },
-  { nodeId: "create", nodeType: "activity", title: "Create", sequence: 1 },
-  { nodeId: "release", nodeType: "activity", title: "Release", sequence: 2 }
+    metadata: { processRole: "purchasing", originalNodeType: "document" } },
+  { nodeId: "create", nodeType: "activity", title: "Create", sequence: 1,
+    metadata: { originalNodeType: "processStep" } },
+  { nodeId: "release", nodeType: "activity", title: "Release", sequence: 2,
+    metadata: { originalNodeType: "processStep" } }
 ], transitions: [
   { fromNodeId: "purchase", toNodeId: "create", transitionType: "sequence" },
   { fromNodeId: "create", toNodeId: "release", transitionType: "sequence" }
@@ -98,6 +103,8 @@ const splitLaneSvg = svgExporter.svg({ recordingId: "split-lanes", nodes: [
 assert(splitLaneSvg.includes("Inköpsorder"));
 assert(splitLaneSvg.includes("Skapa"));
 assert(splitLaneSvg.includes("Frisläpp"));
+assert(splitLaneSvg.includes(">DOKUMENT<"));
+assert(splitLaneSvg.includes(">PROCESSSTEG<"));
 assert(!splitLaneSvg.includes('x="850"'),
   "short reversed rows must stay inside the calculated export canvas");
 assert(!splitLaneSvg.includes("document:purchase-orde"));
