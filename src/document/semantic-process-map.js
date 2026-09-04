@@ -75,12 +75,15 @@
             originalNodeType: observed?.nodeType || item.type || "processStep" } }); });
     return processModel(input.recordingId, input.title, referenceNodes);
   }
-  function fromComparison(input, model) { const values = [
+  function fromComparison(input, model) { const selectedVariantId = text(
+    input.decision?.confirmedVariantId); const missing = model.missing.filter(item =>
+      !selectedVariantId || !array(item.variantIds).length ||
+      array(item.variantIds).includes(selectedVariantId)); const values = [
     ...model.matched.map(item => ({ title: text(item.title || item.name || item.id),
       metadata: { semanticStatus: "observed", semanticLevel: "businessCentral",
         originalNodeType: item.nodeType || (item.type === "document" ? "document" : "processStep") } })),
-    ...model.missing.map(item => ({ title: text(item.title || item.name || item.id),
-      metadata: { semanticStatus: ["conditional", "optional"].includes(item.applicability)
+    ...missing.map(item => ({ title: text(item.title || item.name || item.id),
+      metadata: { semanticStatus: !selectedVariantId && ["conditional", "optional"].includes(item.applicability)
         ? "conditional" : "suggested", semanticLevel: "businessCentral",
         applicability: item.applicability || "expected", variantIds: array(item.variantIds),
         originalNodeType: item.nodeType || (item.type === "document" ? "document" : "processStep") } })),

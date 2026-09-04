@@ -1,5 +1,13 @@
 # Process Analysis in Review Studio
 
+## Confirming a configuration variant
+
+When lifecycle evidence is ambiguous, Process Analysis presents accessible
+radio choices for the plausible Business Central configurations. `Använd val`
+saves both the reference process and selected configuration in the review. The
+BC Process map then filters out steps that belong exclusively to other variants;
+steps retained by the confirmed variant are presented as reference suggestions.
+
 ## Configuration explanation
 
 The analysis summary names the most likely Business Central configuration. If

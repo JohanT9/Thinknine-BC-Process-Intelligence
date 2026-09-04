@@ -91,6 +91,14 @@ assert.strictEqual(variantModel.variantAssessment.ambiguous, true);
 assert(container.innerHTML.includes("Grundläggande lagerhantering"));
 assert(container.innerHTML.includes("Avancerad lagerhantering"));
 assert(container.innerHTML.includes("Variantberoende steg visas som villkorliga."));
+assert(container.innerHTML.includes('name="processAnalysisVariant"'));
+assert(container.innerHTML.includes("Mest sannolik") === false,
+  "The optional localized badge is only shown when supplied.");
+const variantContainer = { querySelector(selector) { return selector.includes(
+  "processAnalysisVariant") ? { value: "variant:advanced-warehouse",
+    dataset: { variantName: "Advanced Warehouse" } } : null; } };
+assert.deepStrictEqual(view.selectedVariant(variantContainer, variantModel), {
+  id: "variant:advanced-warehouse", name: "Advanced Warehouse" });
 
 const root = path.resolve(__dirname, "..");
 const html = fs.readFileSync(path.join(root, "src/ui/dashboard.html"), "utf8");

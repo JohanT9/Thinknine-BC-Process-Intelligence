@@ -433,6 +433,8 @@
       "Compare the recorded process with verified Business Central references."],
     ["Analyserar processen…", "Analysing the process…"],
     ["Använd vald process", "Use selected process"],
+    ["Använd val", "Apply selection"],
+    ["Processvalet sparades.", "Process selection saved."],
     ["Bekräfta klassificering", "Confirm classification"],
     ["Klassificeringen bekräftades.", "The classification was confirmed."],
     ["Referensprocessen ändrades.", "The reference process was changed."],

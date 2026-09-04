@@ -48,7 +48,8 @@
       assessmentStatus: status, evidenceQuality: text(best?.evidenceQuality || assessment.evidenceQuality) || "weak",
       candidateMargin: Number(best?.candidateMargin ?? assessment.candidateMargin ?? 0),
       variantAssessment: clone(best?.variantAssessment || result.recognition?.classification
-        ?.processEvidence?.variantAssessment || null),
+        ?.processEvidence?.variantAssessment || null), confirmedVariantId:
+      text(decision?.confirmedVariantId),
       manualConfirmationRecommended: assessment.manualConfirmationRecommended === true ||
         best?.manualConfirmationRecommended === true || status !== "auto-classifiable", advisory: true }); }
   function metric(label, value, tone) { return `<div class="process-analysis-metric ${tone}">
@@ -75,7 +76,7 @@
         <div class="process-analysis-confidence"><strong>${percent}%</strong>
           <span>${escape(labels.match || "match")}</span></div>
       </section>
-      ${model.variantAssessment ? `<section class="process-analysis-variant" aria-labelledby="processAnalysisVariantTitle">
+      ${model.variantAssessment ? `<fieldset class="process-analysis-variant" aria-labelledby="processAnalysisVariantTitle">
         <div><span>${escape(labels.configurationVariant || "Business Central configuration")}</span>
           <h4 id="processAnalysisVariantTitle">${escape(variantLabel({ id:
             model.variantAssessment.selectedVariantId, name:
@@ -83,10 +84,16 @@
         <p>${escape(model.variantAssessment.ambiguous ? labels.variantUncertain ||
           "Several configurations fit the recording. Variant-specific steps are shown as conditional." :
           labels.variantSupported || "The observed sequence supports this configuration variant.")}</p>
-        ${array(model.variantAssessment.alternativeVariants).length ? `<details><summary>${escape(
-          labels.variantAlternatives || "Other possible configurations")}</summary><ul>${array(
-            model.variantAssessment.alternativeVariants).map(item => `<li>${escape(variantLabel(item,
-              labels))}</li>`).join("")}</ul></details>` : ""}</section>` : ""}
+        ${model.variantAssessment.ambiguous ? `<div class="process-analysis-variant-options">
+          ${[{ id: model.variantAssessment.selectedVariantId,
+            name: model.variantAssessment.selectedVariantName }, ...array(
+            model.variantAssessment.alternativeVariants)].map((item, index) =>
+              `<label><input type="radio" name="processAnalysisVariant" value="${escape(item.id)}"
+                data-variant-name="${escape(item.name)}" ${text(model.confirmedVariantId ||
+                  model.variantAssessment.selectedVariantId) === text(item.id) ? "checked" : ""}>
+                <span>${escape(variantLabel(item, labels))}</span>${index === 0 ? `<small>${escape(
+                  labels.mostLikely || "Most likely")}</small>` : ""}</label>`).join("")}</div>` : ""}
+        </fieldset>` : ""}
       <div class="process-analysis-meter" role="progressbar" aria-label="${escape(labels.matchDegree ||
         "Match confidence")}" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${percent}">
         <span style="width:${percent}%"></span></div>
@@ -111,5 +118,10 @@
   function selectedReference(container, model) { const selected = container.querySelector(
     'input[name="processAnalysisReference"]:checked'); return selected ? { id: selected.value,
     name: selected.dataset.referenceName || selected.value } : { id: model.referenceId, name: model.name }; }
-  return { normalize, render, selectedReference };
+  function selectedVariant(container, model) { const selected = container.querySelector(
+    'input[name="processAnalysisVariant"]:checked'); return selected ? { id: selected.value,
+    name: selected.dataset.variantName || selected.value } : model.variantAssessment ? {
+      id: model.variantAssessment.selectedVariantId,
+      name: model.variantAssessment.selectedVariantName } : null; }
+  return { normalize, render, selectedReference, selectedVariant };
 });

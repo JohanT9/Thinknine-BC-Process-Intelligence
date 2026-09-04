@@ -1,5 +1,9 @@
 # BC Process Studio 4.7
 
+- Consultants can now select and save the correct Business Central lifecycle
+  variant. The BC Process map immediately follows that choice and no longer
+  includes steps exclusive to rejected variants.
+
 - Process Analysis now explains the likely Business Central configuration and
   lists other plausible variants when the evidence does not distinguish them.
 

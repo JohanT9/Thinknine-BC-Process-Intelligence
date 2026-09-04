@@ -11,6 +11,10 @@
 
 ## Unreleased
 
+- Added manual Business Central lifecycle-variant confirmation in Process
+  Analysis; the saved choice now removes steps belonging only to other variants
+  from the BC Process map.
+
 - Added an explainable lifecycle-variant panel to Process Analysis, including
   localized Business Central configuration names and close alternatives.
 

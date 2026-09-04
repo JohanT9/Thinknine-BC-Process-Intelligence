@@ -3495,7 +3495,7 @@ function processAnalysisLabels() {
     configurationVariant: "Business Central configuration", variantUncertain:
       "Several configurations fit the recording. Variant-specific steps are shown as conditional.",
     variantSupported: "The observed sequence supports this configuration variant.",
-    variantAlternatives: "Other possible configurations"
+    variantAlternatives: "Other possible configurations", mostLikely: "Most likely"
   } : {
     detected: "Identifierad referensprocess", unknownDomain: "Domän inte identifierad",
     match: "matchning", matchDegree: "Matchningsgrad", confirmed:
@@ -3514,7 +3514,8 @@ function processAnalysisLabels() {
     configurationVariant: "Business Central-konfiguration", variantUncertain:
       "Flera konfigurationer passar inspelningen. Variantberoende steg visas som villkorliga.",
     variantSupported: "Den observerade sekvensen stöder denna konfigurationsvariant.",
-    variantAlternatives: "Andra möjliga konfigurationer", variantNames: {
+    variantAlternatives: "Andra möjliga konfigurationer", mostLikely: "Mest sannolik",
+    variantNames: {
       "variant:no-warehouse": "Utan lagerhantering",
       "variant:basic-warehouse": "Grundläggande lagerhantering",
       "variant:advanced-warehouse": "Avancerad lagerhantering",
@@ -3579,11 +3580,13 @@ function renderProcessAnalysisDialog() {
   return model;
 }
 
-function persistProcessAnalysisDecision(reference, status) {
+function persistProcessAnalysisDecision(reference, status, variant = null) {
   if (!activeReview || !reference?.id) return;
   activeReview.processAnalysis = {
     confirmedReferenceId: reference.id,
     confirmedName: reference.name,
+    confirmedVariantId: variant?.id || null,
+    confirmedVariantName: variant?.name || null,
     confirmedAt: new Date().toISOString(),
     classificationSource: "manual",
     status
@@ -3594,7 +3597,7 @@ function persistProcessAnalysisDecision(reference, status) {
   renderProcessOverview();
   $("processAnalysisStatus").textContent = status === "confirmed"
     ? uiT("Klassificeringen bekräftades.")
-    : uiT("Referensprocessen ändrades.");
+    : uiT("Processvalet sparades.");
 }
 
 async function openProcessAnalysisDialog() {
@@ -7660,7 +7663,7 @@ $("openReviewDocumentFields").addEventListener("click", () => {
 });
 $("openProcessAnalysis").addEventListener("click", openProcessAnalysisDialog);
 $("processAnalysisContent").addEventListener("change", event => {
-  if (event.target.matches('input[name="processAnalysisReference"]')) {
+  if (event.target.matches('input[name="processAnalysisReference"], input[name="processAnalysisVariant"]')) {
     $("useSelectedReference").disabled = false;
   }
 });
@@ -7668,7 +7671,9 @@ $("confirmProcessAnalysis").addEventListener("click", () => {
   const model = globalThis.T9ProcessAnalysisView.normalize(
     activeProcessAnalysis || {}, activeReview?.processAnalysis
   );
-  persistProcessAnalysisDecision({ id: model.referenceId, name: model.name }, "confirmed");
+  const variant = globalThis.T9ProcessAnalysisView.selectedVariant(
+    $("processAnalysisContent"), model);
+  persistProcessAnalysisDecision({ id: model.referenceId, name: model.name }, "confirmed", variant);
 });
 $("useSelectedReference").addEventListener("click", () => {
   const model = globalThis.T9ProcessAnalysisView.normalize(
@@ -7677,7 +7682,9 @@ $("useSelectedReference").addEventListener("click", () => {
   const reference = globalThis.T9ProcessAnalysisView.selectedReference(
     $("processAnalysisContent"), model
   );
-  persistProcessAnalysisDecision(reference, "selected");
+  const variant = globalThis.T9ProcessAnalysisView.selectedVariant(
+    $("processAnalysisContent"), model);
+  persistProcessAnalysisDecision(reference, "selected", variant);
 });
 $("expectedResultEditor").addEventListener("input", event => {
   globalThis.T9Review.setDocumentField(

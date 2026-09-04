@@ -72,6 +72,21 @@ const conditionalBc = semanticMap.project({ recordingId: "conditional", analysis
 assert.strictEqual(conditionalBc.nodes[0].metadata.semanticStatus, "conditional");
 assert.deepStrictEqual(conditionalBc.nodes[0].metadata.variantIds,
   ["variant:basic-warehouse", "variant:advanced-warehouse"]);
+const variantAnalysis = { bestMatch: { referenceProcess: "Purchase Order Flow",
+  matchedSteps: [{ type: "document", id: "document:purchase-order", name: "Purchase Order" }],
+  additionalSteps: [], missingSteps: [{ type: "document", id: "document:warehouse-put-away",
+    name: "Warehouse Put-away", applicability: "conditional",
+    variantIds: ["variant:advanced-warehouse"] }, { type: "document",
+    id: "document:purchase-invoice", name: "Purchase Invoice", applicability: "optional",
+    variantIds: ["variant:basic-warehouse", "variant:advanced-warehouse"] }] } };
+const basicVariant = semanticMap.project({ recordingId: "basic", analysis: variantAnalysis,
+  decision: { confirmedVariantId: "variant:basic-warehouse" } }, "businessCentral");
+assert(!basicVariant.nodes.some(node => node.title === "Warehouse Put-away"));
+assert.strictEqual(basicVariant.nodes.find(node => node.title === "Purchase Invoice")
+  .metadata.semanticStatus, "suggested");
+const advancedVariant = semanticMap.project({ recordingId: "advanced", analysis: variantAnalysis,
+  decision: { confirmedVariantId: "variant:advanced-warehouse" } }, "businessCentral");
+assert(advancedVariant.nodes.some(node => node.title === "Warehouse Put-away"));
 assert.throws(() => semanticMap.project(input, "pixels"), /Unsupported semantic process-map level/);
 
 const selectedAnalysis = { ...analysis, referenceGraphs: { alternative: { ...referenceGraph,
