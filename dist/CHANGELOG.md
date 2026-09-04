@@ -35,6 +35,9 @@
   easier to scan without encoding business meaning in the renderer.
 - Applied the same theme-owned responsibility colors to the interactive Process
   Overview, keeping the on-screen map visually consistent with its SVG export.
+- Centralized Business Central process-map labels so canonical document and
+  action identifiers use the same localized terminology in Process Overview
+  and SVG exports.
 
 - Hid reference suggestions from Process Overview and process exports by
   default, while adding an explicit `Show reference suggestions` control that

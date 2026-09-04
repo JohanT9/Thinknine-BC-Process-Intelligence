@@ -9,12 +9,14 @@
     ? require("../document/process-map-theme") : root.T9ProcessMapTheme;
   const mapLegend = typeof module === "object" && module.exports
     ? require("../document/process-map-legend") : root.T9ProcessMapLegend;
-  const api = factory(visualGrammar, routeGrammar, laneModel, mapTheme, mapLegend);
+  const mapLabels = typeof module === "object" && module.exports
+    ? require("../document/process-map-labels") : root.T9ProcessMapLabels;
+  const api = factory(visualGrammar, routeGrammar, laneModel, mapTheme, mapLegend, mapLabels);
   if (typeof module === "object" && module.exports) module.exports = api;
   root.T9ProcessSvgExport = api;
 })(typeof globalThis !== "undefined" ? globalThis : this,
   function (visualGrammar, routeGrammar, processLaneModel, processMapTheme,
-    processMapLegend) {
+    processMapLegend, processMapLabels) {
   "use strict";
   const escape = value => String(value ?? "").replace(/[&<>"']/g, character => ({
     "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&apos;"
@@ -25,31 +27,6 @@
       else if (lines.length < limit) lines.push(word.slice(0, width));
       else if (!lines.at(-1).endsWith("…")) lines[limit - 1] = `${lines.at(-1).slice(0, width - 1)}…`;
     }); return lines; }
-  const SV_NODE_TITLES = Object.freeze({
-    "document:purchase-order": "Inköpsorder",
-    "document:purchase-invoice": "Inköpsfaktura",
-    "document:posted-purchase-invoice": "Bokförd inköpsfaktura",
-    "document:sales-order": "Försäljningsorder",
-    "document:sales-invoice": "Försäljningsfaktura",
-    "document:warehouse-receipt": "Lagerinleverans",
-    "document:warehouse-shipment": "Lagerutleverans",
-    "document:warehouse-pick": "Lagerplockning",
-    "document:warehouse-put-away": "Lagerinlagring",
-    "document:transfer-order": "Överföringsorder",
-    "Create": "Skapa", "Release": "Frisläpp", "Receive": "Ta emot",
-    "Invoice": "Fakturera", "Post": "Bokför", "Unknown step": "Okänt steg"
-  });
-  function nodeTitle(node, english) {
-    const title = String(node?.title || "");
-    return english ? title : (SV_NODE_TITLES[title] || title);
-  }
-  function statusTitle(status, english) { const labels = english ? {
-    observed: "Observed", suggested: "Reference suggestion", conditional: "Conditional",
-    customerSpecific: "Customer-specific", reference: "Reference"
-  } : { observed: "Observerat", suggested: "Referensförslag", conditional: "Villkorligt",
-    customerSpecific: "Kundunikt", reference: "Referens" };
-    return labels[status] || status;
-  }
   const ordered = model => [...(model.nodes || [])].sort((left, right) =>
     (left.processOrder ?? left.sequence ?? 0) - (right.processOrder ?? right.sequence ?? 0) ||
     left.nodeId.localeCompare(right.nodeId));
@@ -184,7 +161,8 @@
       .join("");
     const nodeMarkup = nodes.map((node, nodeIndex) => { const box = boxes[node.nodeId];
       const visual = visualGrammar.presentationFor(node, options.language);
-      const lines = wrap(nodeTitle(node, english), density === "compact" ? 18 : 22,
+      const lines = wrap(processMapLabels.nodeTitle(node, options.language),
+        density === "compact" ? 18 : 22,
         density === "compact" ? 2 : 3);
       const changes = stateByNode.get(node.nodeId) || [];
       const textY = box.y + box.height / 2 - (lines.length - 1) * 9 - (changes.length ? 10 : 0);
@@ -198,7 +176,7 @@
       const badge = `<circle class="step-badge" cx="${box.x + 1}" cy="${box.y + 1}" r="16"/><text class="step-number" x="${box.x + 1}" y="${box.y + 6}" text-anchor="middle">${nodeIndex + 1}</text>`;
       const statusMarker = semanticStatus ? `<circle class="status-dot" cx="${
         box.x + box.width - 13}" cy="${box.y + 14}" r="6"><title>${
-        escape(statusTitle(semanticStatus, english))}</title></circle>` : "";
+        escape(processMapLabels.statusTitle(semanticStatus, options.language))}</title></circle>` : "";
       const kindLabel = visual.label ? `<text class="node-kind" x="${box.x + 24}" y="${box.y + 22}">${
         escape(String(visual.label).toLocaleUpperCase(english ? "en-US" : "sv-SE"))}</text>` : "";
       return `<g class="map-node map-node-${escape(visual.kind)}${semanticClass}" data-node-type="${

@@ -1,5 +1,6 @@
 const assert = require("assert");
 const theme = require("../src/document/process-map-theme");
+const labels = require("../src/document/process-map-labels");
 
 assert.strictEqual(theme.normalize("neutral"), "neutral");
 assert.strictEqual(theme.normalize("unknown"), theme.DEFAULT_THEME_ID);
@@ -14,4 +15,8 @@ assert(Object.isFrozen(theme.resolve("business-central").palette));
 assert(Object.isFrozen(theme.resolve("business-central").rolePalette));
 assert.deepStrictEqual(theme.resolve("business-central").rolePalette.purchasing,
   ["#eef5ff", "#2563a6"]);
+assert.strictEqual(labels.nodeTitle({ title: "document:purchase-order" }, "sv-SE"),
+  "Inköpsorder");
+assert.strictEqual(labels.nodeTitle({ title: "document:purchase-order" }, "en-US"),
+  "document:purchase-order");
 console.log("Process map theme tests passed.");

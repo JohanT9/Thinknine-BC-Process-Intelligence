@@ -74,6 +74,8 @@ view.render(responsibilityContainer, { recordingId: "responsibility", nodes: [{
 assert(responsibilityContainer.innerHTML.includes('data-process-lane-id="role:purchasing"'));
 assert(responsibilityContainer.innerHTML.includes(
   'style="background:#eef5ff;border-left-color:#2563a6"'));
+assert(responsibilityContainer.innerHTML.includes("Inköpsorder"));
+assert(!responsibilityContainer.innerHTML.includes("document:purchase-order"));
 
 const decisionId = processModel.stableId("manual-process-node", ["branching", "stock"]);
 const shipId = processModel.stableId("process-node",

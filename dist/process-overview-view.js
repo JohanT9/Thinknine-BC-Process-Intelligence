@@ -15,13 +15,16 @@
     ? require("./process-map-minimap") : root.T9ProcessMapMinimap;
   const mapTheme = typeof module === "object" && module.exports
     ? require("../document/process-map-theme") : root.T9ProcessMapTheme;
+  const mapLabels = typeof module === "object" && module.exports
+    ? require("../document/process-map-labels") : root.T9ProcessMapLabels;
   const api = factory(layout, visualGrammar, routeGrammar, laneModel, connectorView,
-    mapLegend, minimap, mapTheme);
+    mapLegend, minimap, mapTheme, mapLabels);
   if (typeof module === "object" && module.exports) module.exports = api;
   root.T9ProcessOverviewView = api;
 })(typeof globalThis !== "undefined" ? globalThis : this,
   function (graphLayout, visualGrammar, routeGrammar, processLaneModel,
-    processConnectorView, processMapLegend, processMapMinimap, processMapTheme) {
+    processConnectorView, processMapLegend, processMapMinimap, processMapTheme,
+    processMapLabels) {
   const renderedViews = new WeakMap();
 
   function escape(value) {
@@ -259,7 +262,7 @@
         const decision = detail.node.nodeType === "decision";
         const status = reviewState(detail, english);
         const semantic = semanticState(detail, english);
-        const title = plain(detail.node.title);
+        const title = plain(processMapLabels.nodeTitle(detail.node, options.locale));
         const placement = placementById.get(detail.node.nodeId);
         const visual = visualGrammar.presentationFor(detail.node,
           english ? "en-US" : "sv-SE");
