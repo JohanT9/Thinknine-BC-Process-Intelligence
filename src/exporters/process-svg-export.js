@@ -70,6 +70,18 @@
   function nodeShape(node, box, visual) { const { x, y, width, height } = box;
     if (visual.shape === "diamond") return `<polygon points="${x + width / 2},${y} ${x + width},${y + height / 2} ${x + width / 2},${y + height} ${x},${y + height / 2}"/>`;
     if (visual.shape === "hexagon") return `<polygon points="${x + 14},${y} ${x + width - 14},${y} ${x + width},${y + height / 2} ${x + width - 14},${y + height} ${x + 14},${y + height} ${x},${y + height / 2}"/>`;
+    if (visual.shape === "document") return `<path class="document-shape" d="M ${x} ${y} H ${
+      x + width} V ${y + height - 12} C ${x + width * 0.75} ${y + height + 2}, ${
+      x + width * 0.25} ${y + height - 24}, ${x} ${y + height - 12} Z"/>`;
+    if (visual.shape === "manual") return `<polygon class="manual-shape" points="${x + 14},${
+      y} ${x + width},${y} ${x + width - 14},${y + height} ${x},${y + height}"/>`;
+    if (visual.shape === "data") return `<path class="data-shape" d="M ${x} ${y + 10} C ${x} ${
+      y - 3}, ${x + width} ${y - 3}, ${x + width} ${y + 10} V ${y + height - 10} C ${
+      x + width} ${y + height + 3}, ${x} ${y + height + 3}, ${x} ${y + height - 10} Z"/>`;
+    if (["system", "external"].includes(visual.shape)) return `<path class="system-shape" d="M ${
+      x + 10} ${y} H ${x + width - 10} L ${x + width} ${y + 10} V ${
+      y + height - 10} L ${x + width - 10} ${y + height} H ${x + 10} L ${x} ${
+      y + height - 10} V ${y + 10} Z"/>`;
     const radius = visual.shape === "terminal" ? height / 2 : visual.shape === "rounded" ? 18 : 6;
     return `<rect x="${x}" y="${y}" width="${width}" height="${height}" rx="${radius}"/>`; }
   function applyTheme(markup, theme) {

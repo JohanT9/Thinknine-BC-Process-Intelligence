@@ -38,6 +38,9 @@
 - Centralized Business Central process-map labels so canonical document and
   action identifiers use the same localized terminology in Process Overview
   and SVG exports.
+- Added true SVG shapes for documents, manual actions, data entities, and
+  system actions, making node meaning distinguishable without relying on color
+  and bringing exported maps closer to professional process-diagram notation.
 
 - Hid reference suggestions from Process Overview and process exports by
   default, while adding an explicit `Show reference suggestions` control that

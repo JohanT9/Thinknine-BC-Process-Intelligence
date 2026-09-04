@@ -77,6 +77,7 @@ assert(richSvg.includes('class="lane-panel"'));
 assert(richSvg.includes("map-node-document"));
 assert(richSvg.includes("map-node-posting"));
 assert(richSvg.includes("map-node-posted-document"));
+assert(richSvg.includes('class="document-shape"'));
 assert(richSvg.includes('class="node-kind"'));
 assert(richSvg.includes(">DOCUMENT<"));
 assert(richSvg.includes(">POSTING<"));
@@ -114,6 +115,14 @@ assert(splitLaneSvg.includes('d="M 326 430 H 254"'),
   "reverse rows must connect directly from the left edge to the preceding card");
 assert(!splitLaneSvg.includes("V 325.6"),
   "reverse-row connectors must not detour through the responsibility header");
+const shapeSvg = svgExporter.svg({ recordingId: "shapes", nodes: [
+  { nodeId: "manual", nodeType: "manualAction", title: "Approve", sequence: 0 },
+  { nodeId: "data", nodeType: "dataEntity", title: "Item", sequence: 1 },
+  { nodeId: "system", nodeType: "systemAction", title: "Calculate", sequence: 2 }
+], transitions: [], subprocesses: [] }, { language: "en-US" });
+assert(shapeSvg.includes('class="manual-shape"'));
+assert(shapeSvg.includes('class="data-shape"'));
+assert(shapeSvg.includes('class="system-shape"'));
 const monochromeSvg = svgExporter.svg(model, { theme: "monochrome" });
 assert(monochromeSvg.includes('data-process-theme="monochrome"'));
 assert(monochromeSvg.includes("stroke:#333333"));
