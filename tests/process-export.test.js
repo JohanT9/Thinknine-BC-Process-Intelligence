@@ -83,6 +83,7 @@ assert(richSvg.includes(">DOCUMENT<"));
 assert(richSvg.includes(">POSTING<"));
 assert(richSvg.includes("edge-posts"));
 assert(richSvg.includes("edge-creates"));
+assert(richSvg.includes('data-process-layout="serpentine"'));
 assert(richSvg.includes('class="route-label" text-anchor="middle">Creates</text>'));
 assert(richSvg.includes('class="route-label" text-anchor="middle">Posts as</text>'));
 assert(/<path d="[^"]* V [^"]*"/u.test(richSvg),

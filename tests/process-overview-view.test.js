@@ -29,7 +29,8 @@ const result = view.render(container, groupedModel, { locale: "sv-SE",
     { taskId: "customer", approved: true },
     { taskId: "release", approved: false, reviewSuggested: true }
   ] });
-assert.deepStrictEqual(result, { activityCount: 2, stateTransitionCount: 1 });
+assert.deepStrictEqual(result, { activityCount: 2, layoutStrategy: "horizontal",
+  stateTransitionCount: 1 });
 assert(container.innerHTML.includes("Välj kund."));
 assert(container.innerHTML.includes("Välj Frisläpp."));
 assert(container.innerHTML.includes("Open"));
@@ -238,6 +239,8 @@ assert(dashboardHtml.includes('src="process-connector-view.js"'));
 assert(dashboardHtml.includes('src="process-map-viewport.js"'));
 assert(dashboardHtml.includes('id="processMapViewportControls"'));
 assert(dashboardHtml.includes('id="processMapDirection"'));
+assert(dashboardHtml.includes('id="processMapLayoutStatus"'));
+assert(dashboard.includes("processMapRender.layoutStrategy"));
 assert(dashboardHtml.includes('id="processMapTheme"'));
 assert(dashboardHtml.includes('id="processMapDensity"'));
 assert(dashboardHtml.includes('id="processMapFocus"'));

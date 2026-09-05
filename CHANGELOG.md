@@ -69,6 +69,9 @@
 - Added a deterministic layered layout for branched process graphs: decisions
   are centered above parallel outcomes and converged continuation steps are
   centered below them, while linear recordings retain the compact flow layout.
+- Made automatic layout decisions explicit and shared across interactive and
+  exported maps (`Horizontal`, `Multi-row`, `Branched`, or `Vertical`), with the
+  selected strategy shown beside the Layout control in Process Overview.
 
 - Hid reference suggestions from Process Overview and process exports by
   default, while adding an explicit `Show reference suggestions` control that

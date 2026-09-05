@@ -107,7 +107,10 @@
         `${fromNodeId}:${toNodeId}`, fromNodeId, toNodeId, route,
       relationshipType: edge.transitionType || edge.relationshipType || "sequence" });
     }).filter(Boolean);
+    const strategy = layers ? "branched" : direction === "vertical" ? "vertical" :
+      rows.length <= 1 ? "horizontal" : "serpentine";
     return Object.freeze({ layoutVersion: LAYOUT_VERSION, direction,
+      strategy,
       flowDirection: layers ? "topToBottomBranches" : direction === "vertical"
         ? "topToBottom" : "leftToRightRows",
       columnCount, rowCount: rows.length,

@@ -6605,7 +6605,7 @@ function renderProcessOverview() {
       !(activeReview.processVersions || []).length;
     $("exportProcessModel").disabled = false;
     $("exportProcessDiagram").disabled = false;
-    globalThis.T9ProcessOverviewView.render(container, activeProcessModel, {
+    const processMapRender = globalThis.T9ProcessOverviewView.render(container, activeProcessModel, {
       locale: applicationSettings.uiLocale || "sv-SE",
       selectedTaskIds: activeReviewSelection.selectedIds,
       reviewTasks: activeReview.tasks || [],
@@ -6615,6 +6615,10 @@ function renderProcessOverview() {
       density: processMapDensity,
       reorderable: displayedLevel !== "procedure"
     });
+    const layoutNames = english ? { horizontal: "Horizontal", serpentine: "Multi-row",
+      branched: "Branched", vertical: "Vertical" } : { horizontal: "Vågrät",
+      serpentine: "Flera rader", branched: "Förgrenad", vertical: "Lodrät" };
+    $("processMapLayoutStatus").textContent = layoutNames[processMapRender.layoutStrategy] || "";
     applyProcessMapSearch(false);
   } catch (error) {
     activeProcessModel = null;

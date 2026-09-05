@@ -13,6 +13,7 @@ const model = {
 const before = JSON.stringify(model);
 const wide = layout.create(model, { availableWidth: 1000 });
 assert.strictEqual(wide.columnCount, 4);
+assert.strictEqual(wide.strategy, "serpentine");
 assert.strictEqual(wide.rowCount, 3);
 assert.deepStrictEqual(wide.rows.map(row => row.nodeIds.length), [4, 4, 2]);
 assert.strictEqual(wide.nodes.find(node => node.nodeId === "node-5").row, 1);
@@ -33,6 +34,7 @@ const vertical = layout.create(model, { availableWidth: 2000, direction: "vertic
 assert.strictEqual(vertical.columnCount, 1);
 assert.strictEqual(vertical.rowCount, 10);
 assert.strictEqual(vertical.flowDirection, "topToBottom");
+assert.strictEqual(vertical.strategy, "vertical");
 assert(Object.isFrozen(wide));
 assert(Object.isFrozen(wide.rows));
 const branched = layout.create({ nodes: [
@@ -47,6 +49,7 @@ const branched = layout.create({ nodes: [
   { fromNodeId: "no", toNodeId: "join", transitionType: "sequence" }
 ] });
 assert.strictEqual(branched.flowDirection, "topToBottomBranches");
+assert.strictEqual(branched.strategy, "branched");
 assert.strictEqual(branched.columnCount, 3);
 assert.deepStrictEqual(branched.rows.map(row => row.nodeIds), [
   ["decision"], ["yes", "no"], ["join"]

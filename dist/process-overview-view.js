@@ -321,7 +321,7 @@
     processConnectorView.render(container, model, {
       locale: english ? "en-US" : "sv-SE"
     });
-    return { activityCount: activities.length,
+    return { activityCount: activities.length, layoutStrategy: layout.strategy,
       stateTransitionCount: [...stateTransitions.values()].flat().length };
   }
 
