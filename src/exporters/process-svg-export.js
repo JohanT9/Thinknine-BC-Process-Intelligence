@@ -180,9 +180,10 @@
           edge, options.language); const path = edgePath(boxes[fromId], boxes[toId]);
         const explicit = edge.label || edge.condition || processMapLabels.handoffTitle(
           edge.metadata?.responsibilityHandoff, options.language);
+        const routeLabel = explicit || (route.kind === "sequence" ? "" : route.label);
         return `<path d="${path.d}" class="edge edge-${
-          escape(route.kind)}" marker-end="url(#arrow)"/>${explicit ? `<text x="${path.labelX}" y="${
-          path.labelY}" class="route-label" text-anchor="middle">${escape(explicit)}</text>` : ""}`; })
+          escape(route.kind)}" marker-end="url(#arrow)"/>${routeLabel ? `<text x="${path.labelX}" y="${
+          path.labelY}" class="route-label" text-anchor="middle">${escape(routeLabel)}</text>` : ""}`; })
       .join("");
     const nodeMarkup = nodes.map((node, nodeIndex) => { const box = boxes[node.nodeId];
       const visual = visualGrammar.presentationFor(node, options.language);

@@ -57,6 +57,9 @@
   projecting the observed map, so verified document creation and posting paths
   retain dotted `creates` and emphasized `posts` connectors instead of being
   flattened into generic sequence arrows.
+- Added localized labels to non-sequential routes in SVG process exports, making
+  conditions, alternatives, returns, document creation, and posting relationships
+  understandable without relying on line style or the legend alone.
 
 - Hid reference suggestions from Process Overview and process exports by
   default, while adding an explicit `Show reference suggestions` control that
