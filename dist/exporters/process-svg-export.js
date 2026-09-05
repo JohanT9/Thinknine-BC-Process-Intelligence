@@ -163,8 +163,10 @@
         (nodeWidth + gapX), y: cursorY, width: nodeWidth, height: nodeHeight }; });
       cursorY += nodeHeight + gapY;
       if (activeLaneBand) activeLaneBand.bottom = cursorY - Math.round(gapY / 2); });
-    const width = Math.max(560, margin * 2 + Math.min(columns, Math.max(1,
-      ...layout.rows.map(row => row.nodes.length))) * nodeWidth + (columns - 1) * gapX);
+    const visibleColumns = Math.min(columns, Math.max(1,
+      ...layout.rows.map(row => row.nodes.length)));
+    const width = Math.max(560, margin * 2 + visibleColumns * nodeWidth +
+      Math.max(0, visibleColumns - 1) * gapX);
     const contentHeight = Math.max(340, cursorY - gapY + margin);
     const legend = legendFor(model, options.language, width, contentHeight + 12);
     const height = contentHeight + legend.height + 24;

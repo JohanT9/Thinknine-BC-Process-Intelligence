@@ -274,5 +274,5 @@ assert(dashboard.includes("T9ProcessMapOverrides.apply"));
 assert(dashboard.includes("T9ProcessMapOverrides.upsert"));
 assert(dashboard.includes("T9ProcessMapRelationshipOverrides.apply"));
 assert(dashboard.includes("T9ProcessMapRelationshipOverrides.upsert"));
-assert(dashboard.includes('columns: processMapDirection === "vertical" ? 1 : 4'));
+assert(dashboard.includes('processMapDirection === "vertical" ? { columns: 1 } : {}'));
 console.log("Process Overview view tests passed.");

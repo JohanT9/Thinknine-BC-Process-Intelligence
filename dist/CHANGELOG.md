@@ -47,6 +47,9 @@
 - Made standard SVG cards grow for titles of up to four lines, improved wrapping
   of long unbroken terms, and embedded each full localized title for accessible
   inspection instead of silently clipping important Business Central wording.
+- Sized adaptive SVG canvases from the columns actually used by the process and
+  stopped forcing four-column exports from the dashboard, removing large empty
+  areas around short lanes and structural boundaries.
 
 - Hid reference suggestions from Process Overview and process exports by
   default, while adding an explicit `Show reference suggestions` control that

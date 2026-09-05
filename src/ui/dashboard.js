@@ -6635,7 +6635,7 @@ async function exportActiveProcess(kind) {
     const exported = globalThis.T9ProcessExport.create(activeProcessModel, {
       title: activeReviewSession.name,
       language: activeReview.documentFields?.documentLanguage || "sv-SE",
-      columns: processMapDirection === "vertical" ? 1 : 4,
+      ...(processMapDirection === "vertical" ? { columns: 1 } : {}),
       theme: processMapTheme,
       density: processMapDensity
     });

@@ -113,6 +113,8 @@ assert(!splitLaneSvg.includes('x="850"'),
 assert(!splitLaneSvg.includes("document:purchase-orde"));
 assert(splitLaneSvg.includes('d="M 326 430 H 254"'),
   "reverse rows must connect directly from the left edge to the preceding card");
+assert(splitLaneSvg.includes('viewBox="0 0 580 '),
+  "the export canvas must fit the visible rows instead of reserving empty columns");
 assert(!splitLaneSvg.includes("V 325.6"),
   "reverse-row connectors must not detour through the responsibility header");
 const shapeSvg = svgExporter.svg({ recordingId: "shapes", nodes: [
@@ -200,6 +202,7 @@ assert(html.includes('id="exportProcessModel"'));
 assert(html.includes('id="exportProcessDiagram"'));
 assert(html.includes('src="exporters/process-export.js"'));
 assert(dashboard.includes("T9ProcessExport.create(activeProcessModel"));
+assert(dashboard.includes('processMapDirection === "vertical" ? { columns: 1 } : {}'));
 assert(dashboard.includes('exportActiveProcess("diagram")'));
 
 console.log("Process Model and diagram export tests passed.");
