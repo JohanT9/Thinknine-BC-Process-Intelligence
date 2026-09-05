@@ -44,6 +44,9 @@
 - Added model-level Start and End boundaries to classified process maps. The
   boundaries frame the observed sequence without being counted as recorded
   steps or treated as reference suggestions.
+- Made standard SVG cards grow for titles of up to four lines, improved wrapping
+  of long unbroken terms, and embedded each full localized title for accessible
+  inspection instead of silently clipping important Business Central wording.
 
 - Hid reference suggestions from Process Overview and process exports by
   default, while adding an explicit `Show reference suggestions` control that

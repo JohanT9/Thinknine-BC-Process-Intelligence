@@ -123,6 +123,15 @@ const shapeSvg = svgExporter.svg({ recordingId: "shapes", nodes: [
 assert(shapeSvg.includes('class="manual-shape"'));
 assert(shapeSvg.includes('class="data-shape"'));
 assert(shapeSvg.includes('class="system-shape"'));
+const longTitleSvg = svgExporter.svg({ recordingId: "long-title", nodes: [{
+  nodeId: "long", nodeType: "activity",
+  title: "Very Long Business Central Warehouse Activity Description", sequence: 0
+}], transitions: [], subprocesses: [] }, { language: "en-US" });
+assert(longTitleSvg.includes('width="190" height="122"'));
+assert(longTitleSvg.includes(
+  "<title>Very Long Business Central Warehouse Activity Description</title>"));
+assert(longTitleSvg.includes(">Activity Description</tspan>"),
+  "standard export must retain additional lines instead of truncating useful text");
 const monochromeSvg = svgExporter.svg(model, { theme: "monochrome" });
 assert(monochromeSvg.includes('data-process-theme="monochrome"'));
 assert(monochromeSvg.includes("stroke:#333333"));
