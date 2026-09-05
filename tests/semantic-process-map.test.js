@@ -132,6 +132,27 @@ assert.strictEqual(bounded.nodes.at(-1).title, "Slut");
 assert.strictEqual(bounded.nodes[0].metadata.structuralBoundary, true);
 assert.strictEqual(bounded.transitions.length, bounded.nodes.length - 1);
 
+const branchGraph = { nodes: [
+  { nodeId: "availability", nodeType: "decision", title: "Available?" },
+  { nodeId: "ship", nodeType: "processStep", title: "Ship" },
+  { nodeId: "replenish", nodeType: "processStep", title: "Replenish" }
+], relationships: [
+  { fromNodeId: "availability", toNodeId: "ship", relationshipType: "conditionalBranch",
+    label: "Yes", condition: "available" },
+  { fromNodeId: "availability", toNodeId: "replenish", relationshipType: "branchesTo",
+    label: "No", condition: "not-available" }
+] };
+const branched = semanticMap.project({ recordingId: "branch", title: "Branch",
+  analysis: { bestMatch: { referenceProcess: "Availability", matchedSteps: [
+    { title: "Available?" }, { title: "Ship" }, { title: "Replenish" }
+  ], missingSteps: [], additionalSteps: [] }, bestReferenceGraph: branchGraph }
+}, "businessCentral");
+assert.strictEqual(branched.transitions.length, 2);
+assert(branched.transitions.every(item => item.fromNodeId === "semantic:availability"));
+assert.deepStrictEqual(branched.transitions.map(item => item.label), ["Yes", "No"]);
+assert(!branched.transitions.some(item => item.fromNodeId === "semantic:ship" &&
+  item.toNodeId === "semantic:replenish"), "branches must not be flattened into list order");
+
 const selectedAnalysis = { ...analysis, referenceGraphs: { alternative: { ...referenceGraph,
   graphId: "alternative", nodes: referenceGraph.nodes.map(node => node.nodeId === "pick"
     ? { ...node, title: "Warehouse Pick" } : node) } } };

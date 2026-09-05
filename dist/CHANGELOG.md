@@ -60,6 +60,9 @@
 - Added localized labels to non-sequential routes in SVG process exports, making
   conditions, alternatives, returns, document creation, and posting relationships
   understandable without relying on line style or the legend alone.
+- Preserved the actual topology of semantic reference graphs in BC-process maps,
+  so observed decisions can branch to multiple outcomes without an invented
+  sequence connection between those outcomes.
 
 - Hid reference suggestions from Process Overview and process exports by
   default, while adding an explicit `Show reference suggestions` control that

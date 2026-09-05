@@ -51,9 +51,11 @@
   function taskIdsForEvents(eventIds, reviewTasks) { const events = new Set(array(eventIds));
     return array(reviewTasks).filter(task => array(task.sourceEventIds).some(id => events.has(id)))
       .map(task => task.taskId); }
-  function transition(fromNodeId, toNodeId, index, type = "sequence", metadata = {}) { return freeze({
-    transitionId: `semantic-map-transition:${index}:${fromNodeId}:${toNodeId}`,
-    fromNodeId, toNodeId, transitionType: type, metadata }); }
+  function transition(fromNodeId, toNodeId, index, type = "sequence", metadata = {},
+    details = {}) { return freeze({
+    transitionId: details.transitionId || `semantic-map-transition:${index}:${fromNodeId}:${toNodeId}`,
+    fromNodeId, toNodeId, transitionType: type, label: text(details.label),
+    condition: details.condition ?? null, sourceEventIds: array(details.sourceEventIds), metadata }); }
   function inheritProcessRoles(values) { let activeRole = null;
     const forward = values.map(value => { const explicit = value.metadata?.processRole || null;
       if (explicit) activeRole = explicit; return { ...value, metadata: { ...(value.metadata || {}),
@@ -64,21 +66,37 @@
         ...(forward[index].metadata || {}), processRole: clone(followingRole) } }; }
     return forward;
   }
-  function processModel(recordingId, title, values) { const nodes = inheritProcessRoles(values)
+  function processModel(recordingId, title, values, relationships = []) { const nodes = inheritProcessRoles(values)
     .map((value, index) => freeze({
     nodeId: value.nodeId || processGraph.stableId("semantic-map-node",
       [recordingId, title, value.title, index]), nodeType: value.nodeType || "activity",
     title: text(value.title), processOrder: index, sourceStepIds: array(value.sourceStepIds),
     sourceEventIds: array(value.sourceEventIds), metadata: clone(value.metadata || {}) }));
-    return freeze({ modelVersion: "semantic-reference-1.0.0", recordingId, title,
-      nodes, transitions: nodes.slice(1).map((node, index) => { const previous = nodes[index];
-        const fromRole = previous.metadata?.processRole; const toRole = node.metadata?.processRole;
+    const nodeById = new Map(nodes.map(node => [node.nodeId, node]));
+    const explicit = array(relationships).filter(item => nodeById.has(item.fromNodeId) &&
+      nodeById.has(item.toNodeId));
+    const connected = new Set(explicit.flatMap(item => [item.fromNodeId, item.toNodeId]));
+    const routes = explicit.length ? [...explicit] : nodes.slice(1).map((node, index) => ({
+      fromNodeId: nodes[index].nodeId, toNodeId: node.nodeId,
+      transitionType: node.metadata.relationshipType || "sequence"
+    }));
+    if (explicit.length) nodes.forEach((node, index) => { if (connected.has(node.nodeId) || !index) return;
+      routes.push({ fromNodeId: nodes[index - 1].nodeId, toNodeId: node.nodeId,
+        transitionType: node.metadata.relationshipType || "sequence" }); });
+    const transitions = routes.map((route, index) => { const previous = nodeById.get(route.fromNodeId);
+        const node = nodeById.get(route.toNodeId); const fromRole = previous.metadata?.processRole;
+        const toRole = node.metadata?.processRole;
         const handoff = fromRole?.id && toRole?.id && fromRole.id !== toRole.id ? {
           responsibilityHandoff: { from: clone(fromRole), to: clone(toRole) } } : {};
         return transition(previous.nodeId, node.nodeId, index + 1,
-          node.metadata.relationshipType || "sequence", handoff); }),
-      subprocesses: [], stateTransitions: [], startNodeIds: nodes[0] ? [nodes[0].nodeId] : [],
-      endNodeIds: nodes.at(-1) ? [nodes.at(-1).nodeId] : [], metadata: {
+          route.transitionType || route.relationshipType || "sequence",
+          { ...(route.metadata || {}), ...handoff }, route); });
+    const incoming = new Set(transitions.map(item => item.toNodeId));
+    const outgoing = new Set(transitions.map(item => item.fromNodeId));
+    return freeze({ modelVersion: "semantic-reference-1.0.0", recordingId, title,
+      nodes, transitions, subprocesses: [], stateTransitions: [],
+      startNodeIds: nodes.filter(node => !incoming.has(node.nodeId)).map(node => node.nodeId),
+      endNodeIds: nodes.filter(node => !outgoing.has(node.nodeId)).map(node => node.nodeId), metadata: {
         semanticReferenceProjection: true } }); }
   function business(input, model) { const best = input.analysis?.bestMatch || {};
     const titles = [display(model.domain), display(best.businessProcess), model.name].filter(Boolean)
@@ -112,7 +130,11 @@
           taskIdsForEvents(observed?.sourceEventIds, input.reviewTasks), metadata: {
             semanticStatus: "customerSpecific", semanticLevel: "businessCentral",
             originalNodeType: observed?.nodeType || item.type || "processStep" } }); });
-    return processModel(input.recordingId, input.title, referenceNodes);
+    const relationships = array(graph.relationships).map(item => ({ ...clone(item),
+      fromNodeId: `semantic:${item.fromNodeId || item.sourceNodeId}`,
+      toNodeId: `semantic:${item.toNodeId || item.targetNodeId}`,
+      transitionType: item.transitionType || item.relationshipType || "sequence" }));
+    return processModel(input.recordingId, input.title, referenceNodes, relationships);
   }
   function fromComparison(input, model) { const missing = array(model.missing)
     .filter(item => !["conditional", "optional"].includes(item.applicability)); const values = [
@@ -131,15 +153,21 @@
   ].filter(item => item.title); return processModel(input.recordingId, input.title, values); }
   function observedOnly(model) { const values = array(model.nodes).filter(node =>
     ["observed", "customerSpecific"].includes(node.metadata?.semanticStatus));
-    return processModel(model.recordingId, model.title, values); }
+    return processModel(model.recordingId, model.title, values, model.transitions); }
   function withBoundaries(model, locale) { if (!model.nodes.length) return model;
     const english = String(locale || "").toLowerCase().startsWith("en");
     const boundary = (position, nodeType, title) => ({ nodeId: processGraph.stableId(
       "semantic-map-boundary", [model.recordingId, model.title, position]), nodeType, title,
       sourceStepIds: [], sourceEventIds: [], metadata: { structuralBoundary: true,
         semanticLevel: "businessCentral" } });
-    return processModel(model.recordingId, model.title, [boundary("start", "start", "Start"),
-      ...model.nodes, boundary("end", "end", english ? "End" : "Slut")]);
+    const start = boundary("start", "start", "Start");
+    const end = boundary("end", "end", english ? "End" : "Slut");
+    const relationships = [...model.transitions,
+      ...model.startNodeIds.map(nodeId => ({ fromNodeId: start.nodeId, toNodeId: nodeId,
+        transitionType: "sequence" })),
+      ...model.endNodeIds.map(nodeId => ({ fromNodeId: nodeId, toNodeId: end.nodeId,
+        transitionType: "sequence" }))];
+    return processModel(model.recordingId, model.title, [start, ...model.nodes, end], relationships);
   }
   function project(input = {}, level = "businessCentral", options = {}) { if (!LEVELS.includes(level))
     throw new Error(`Unsupported semantic process-map level: ${level}`);
