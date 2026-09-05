@@ -63,6 +63,9 @@
 - Preserved the actual topology of semantic reference graphs in BC-process maps,
   so observed decisions can branch to multiple outcomes without an invented
   sequence connection between those outcomes.
+- Added labels directly to non-sequential connectors in the interactive Process
+  Overview, keeping conditions and alternative outcomes attached to the correct
+  branch while leaving ordinary sequence arrows uncluttered.
 
 - Hid reference suggestions from Process Overview and process exports by
   default, while adding an explicit `Show reference suggestions` control that

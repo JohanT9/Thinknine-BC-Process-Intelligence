@@ -34,7 +34,21 @@
     const endX = round(to.left + to.width / 2);
     const endY = round(to.top);
     const lift = round(Math.max(20, Math.abs(startX - endX) / 5));
-    return { route: "return", path: `M ${startX} ${startY} V ${round(startY - lift)} H ${endX} V ${endY}` };
+      return { route: "return", path: `M ${startX} ${startY} V ${round(startY - lift)} H ${endX} V ${endY}` };
+  }
+
+  function labelPosition(from, to, geometry) {
+    if (geometry.route === "horizontal") return {
+      x: round((from.left + from.width + to.left) / 2),
+      y: round(from.top + from.height / 2 - 8)
+    };
+    if (geometry.route === "orthogonal") return {
+      x: round((from.left + from.width / 2 + to.left + to.width / 2) / 2),
+      y: round(from.top + from.height + Math.max(14,
+        (to.top - from.top - from.height) / 2) - 7)
+    };
+    return { x: round((from.left + from.width / 2 + to.left + to.width / 2) / 2),
+      y: round(Math.min(from.top, to.top) - 9) };
   }
 
   function buildLayer(model, bounds, size, locale = "sv-SE") {
@@ -49,9 +63,14 @@
       if (!from || !to || fromId === toId) return "";
       const geometry = connectorPath(from, to);
       const visual = routeGrammar.presentationFor(edge, locale);
+      const label = edge.label || edge.condition ||
+        (visual.kind === "sequence" ? "" : visual.label);
+      const position = label ? labelPosition(from, to, geometry) : null;
       return `<path d="${geometry.path}" class="process-connector process-connector-${
         escape(visual.kind)}" data-process-route="${geometry.route}" data-process-line="${
-        escape(visual.line)}" marker-end="url(#${markerId})"/>`;
+        escape(visual.line)}" marker-end="url(#${markerId})"/>${position ? `<text x="${
+          position.x}" y="${position.y}" class="process-connector-label process-connector-label-${
+          escape(visual.kind)}" text-anchor="middle">${escape(label)}</text>` : ""}`;
     }).filter(Boolean);
     if (!paths.length) return { count: 0, markup: "" };
     return { count: paths.length, markup: `<svg class="process-connector-layer" width="${
@@ -82,5 +101,5 @@
     return layer.count;
   }
 
-  return { buildLayer, connectorPath, render };
+  return { buildLayer, connectorPath, labelPosition, render };
 });
