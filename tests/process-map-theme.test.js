@@ -19,4 +19,6 @@ assert.strictEqual(labels.nodeTitle({ title: "document:purchase-order" }, "sv-SE
   "Inköpsorder");
 assert.strictEqual(labels.nodeTitle({ title: "document:purchase-order" }, "en-US"),
   "document:purchase-order");
+assert.strictEqual(labels.handoffTitle({ from: { id: "purchasing" },
+  to: { id: "warehouse" } }, "sv-SE"), "Inköp → Lager");
 console.log("Process map theme tests passed.");

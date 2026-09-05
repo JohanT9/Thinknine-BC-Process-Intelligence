@@ -120,6 +120,9 @@
   }
 
   function routeLabel(route, english) {
+    const handoff = processMapLabels.handoffTitle(route.metadata?.responsibilityHandoff,
+      english ? "en-US" : "sv-SE");
+    if (handoff) return handoff;
     return routeGrammar.presentationFor(route, english ? "en-US" : "sv-SE").label;
   }
 
@@ -127,7 +130,7 @@
     const decision = detail?.node?.nodeType === "decision" ||
       detail?.node?.metadata?.originalNodeType === "decision";
     const routes = (detail?.outgoing || []).filter(route =>
-      route.transitionType !== "sequence" || decision
+      route.transitionType !== "sequence" || decision || route.metadata?.responsibilityHandoff
     );
     if (!routes.length) return "";
     return `<${compact ? "span" : "ul"} class="process-overview-routes${compact ? " compact" : ""}">${routes.map(route => {
@@ -135,7 +138,8 @@
       return `<${compact ? "span" : "li"} class="process-overview-route process-overview-route-${visual.kind}"
         data-process-transition-type="${escape(route.transitionType)}" data-process-line="${visual.line}">
         <strong>${escape(routeLabel(route, english))}</strong><span aria-hidden="true">→</span>
-        <span>${escape(plain(route.target?.title))}</span>
+        <span>${escape(plain(processMapLabels.nodeTitle(route.target,
+          english ? "en-US" : "sv-SE")))}</span>
         ${compact ? "" : `<span class="process-overview-route-meta">${escape(route.transitionType)}${
           route.condition && route.condition !== route.label ? ` · ${escape(route.condition)}` : ""}</span>`}
       </${compact ? "span" : "li"}>`;
@@ -145,11 +149,12 @@
   function routeSummary(detail, english) {
     const routes = (detail?.outgoing || []).filter(route =>
       route.transitionType !== "sequence" || detail.node.nodeType === "decision" ||
-      detail.node.metadata?.originalNodeType === "decision");
+      detail.node.metadata?.originalNodeType === "decision" ||
+      route.metadata?.responsibilityHandoff);
     if (!routes.length) return "";
     const connector = english ? "to" : "till";
     return routes.map(route => `${routeLabel(route, english)} ${connector} ${
-      plain(route.target?.title)}`).join("; ");
+      plain(processMapLabels.nodeTitle(route.target, english ? "en-US" : "sv-SE"))}`).join("; ");
   }
 
   function detailMarkup(detail, english) {

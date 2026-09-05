@@ -51,9 +51,9 @@
   function taskIdsForEvents(eventIds, reviewTasks) { const events = new Set(array(eventIds));
     return array(reviewTasks).filter(task => array(task.sourceEventIds).some(id => events.has(id)))
       .map(task => task.taskId); }
-  function transition(fromNodeId, toNodeId, index, type = "sequence") { return freeze({
+  function transition(fromNodeId, toNodeId, index, type = "sequence", metadata = {}) { return freeze({
     transitionId: `semantic-map-transition:${index}:${fromNodeId}:${toNodeId}`,
-    fromNodeId, toNodeId, transitionType: type }); }
+    fromNodeId, toNodeId, transitionType: type, metadata }); }
   function inheritProcessRoles(values) { let activeRole = null;
     const forward = values.map(value => { const explicit = value.metadata?.processRole || null;
       if (explicit) activeRole = explicit; return { ...value, metadata: { ...(value.metadata || {}),
@@ -71,8 +71,12 @@
     title: text(value.title), processOrder: index, sourceStepIds: array(value.sourceStepIds),
     sourceEventIds: array(value.sourceEventIds), metadata: clone(value.metadata || {}) }));
     return freeze({ modelVersion: "semantic-reference-1.0.0", recordingId, title,
-      nodes, transitions: nodes.slice(1).map((node, index) => transition(nodes[index].nodeId,
-        node.nodeId, index + 1, node.metadata.relationshipType || "sequence")),
+      nodes, transitions: nodes.slice(1).map((node, index) => { const previous = nodes[index];
+        const fromRole = previous.metadata?.processRole; const toRole = node.metadata?.processRole;
+        const handoff = fromRole?.id && toRole?.id && fromRole.id !== toRole.id ? {
+          responsibilityHandoff: { from: clone(fromRole), to: clone(toRole) } } : {};
+        return transition(previous.nodeId, node.nodeId, index + 1,
+          node.metadata.relationshipType || "sequence", handoff); }),
       subprocesses: [], stateTransitions: [], startNodeIds: nodes[0] ? [nodes[0].nodeId] : [],
       endNodeIds: nodes.at(-1) ? [nodes.at(-1).nodeId] : [], metadata: {
         semanticReferenceProjection: true } }); }

@@ -40,6 +40,9 @@ assert.strictEqual(bc.nodes.find(node => node.title === "Release").metadata.proc
   "generic actions must inherit the surrounding Business Central responsibility");
 assert.strictEqual(bc.nodes.find(node => node.title === "Create Pick").metadata.processRole.id,
   "warehouse");
+const salesToWarehouse = bc.transitions.find(item =>
+  item.metadata?.responsibilityHandoff?.to?.id === "warehouse");
+assert.strictEqual(salesToWarehouse.metadata.responsibilityHandoff.from.id, "sales");
 assert.deepStrictEqual(bc.nodes.find(node => node.title === "Release").sourceStepIds, ["task-release"]);
 assert.strictEqual(bc.nodes.find(node => node.title === "Customer Approval").metadata.semanticStatus,
   "customerSpecific");

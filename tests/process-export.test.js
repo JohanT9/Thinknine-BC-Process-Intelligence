@@ -117,6 +117,13 @@ assert(splitLaneSvg.includes('viewBox="0 0 580 '),
   "the export canvas must fit the visible rows instead of reserving empty columns");
 assert(!splitLaneSvg.includes("V 325.6"),
   "reverse-row connectors must not detour through the responsibility header");
+const handoffSvg = svgExporter.svg({ recordingId: "handoff", nodes: [
+  { nodeId: "purchase", nodeType: "document", title: "Purchase Order", sequence: 0 },
+  { nodeId: "receipt", nodeType: "document", title: "Warehouse Receipt", sequence: 1 }
+], transitions: [{ fromNodeId: "purchase", toNodeId: "receipt", transitionType: "sequence",
+  metadata: { responsibilityHandoff: { from: { id: "purchasing" },
+    to: { id: "warehouse" } } } }], subprocesses: [] }, { language: "sv-SE" });
+assert(handoffSvg.includes(">Inköp → Lager</text>"));
 const shapeSvg = svgExporter.svg({ recordingId: "shapes", nodes: [
   { nodeId: "manual", nodeType: "manualAction", title: "Approve", sequence: 0 },
   { nodeId: "data", nodeType: "dataEntity", title: "Item", sequence: 1 },

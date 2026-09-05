@@ -178,7 +178,9 @@
       .map(edge => { const fromId = edge.fromNodeId || edge.sourceNodeId;
         const toId = edge.toNodeId || edge.targetNodeId; const route = routeGrammar.presentationFor(
           edge, options.language); const path = edgePath(boxes[fromId], boxes[toId]);
-        const explicit = edge.label || edge.condition; return `<path d="${path.d}" class="edge edge-${
+        const explicit = edge.label || edge.condition || processMapLabels.handoffTitle(
+          edge.metadata?.responsibilityHandoff, options.language);
+        return `<path d="${path.d}" class="edge edge-${
           escape(route.kind)}" marker-end="url(#arrow)"/>${explicit ? `<text x="${path.labelX}" y="${
           path.labelY}" class="route-label" text-anchor="middle">${escape(explicit)}</text>` : ""}`; })
       .join("");

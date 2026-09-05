@@ -50,6 +50,9 @@
 - Sized adaptive SVG canvases from the columns actually used by the process and
   stopped forcing four-column exports from the dashboard, removing large empty
   areas around short lanes and structural boundaries.
+- Added semantic responsibility handoffs to transitions and localized labels
+  such as `Inköp → Lager` in both Process Overview and SVG exports, making
+  cross-functional ownership changes explicit instead of anonymous.
 
 - Hid reference suggestions from Process Overview and process exports by
   default, while adding an explicit `Show reference suggestions` control that
