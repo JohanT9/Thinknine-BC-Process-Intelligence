@@ -11,12 +11,15 @@
     ? require("../document/process-map-legend") : root.T9ProcessMapLegend;
   const mapLabels = typeof module === "object" && module.exports
     ? require("../document/process-map-labels") : root.T9ProcessMapLabels;
-  const api = factory(visualGrammar, routeGrammar, laneModel, mapTheme, mapLegend, mapLabels);
+  const graphLayout = typeof module === "object" && module.exports
+    ? require("../document/process-graph-layout") : root.T9ProcessGraphLayout;
+  const api = factory(visualGrammar, routeGrammar, laneModel, mapTheme, mapLegend, mapLabels,
+    graphLayout);
   if (typeof module === "object" && module.exports) module.exports = api;
   root.T9ProcessSvgExport = api;
 })(typeof globalThis !== "undefined" ? globalThis : this,
   function (visualGrammar, routeGrammar, processLaneModel, processMapTheme,
-    processMapLegend, processMapLabels) {
+    processMapLegend, processMapLabels, processGraphLayout) {
   "use strict";
   const escape = value => String(value ?? "").replace(/[&<>"']/g, character => ({
     "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&apos;"
@@ -40,7 +43,26 @@
     if (typeof value?.visible === "boolean") return value.visible
       ? (english ? "Visible" : "Synlig") : (english ? "Closed" : "Stängd");
     return String(value?.outcome || value?.page?.caption || ""); }
-  function rowsFor(model, nodes, columns, english) {
+  function rowsFor(model, nodes, columns, english, graph) {
+    if (graph?.flowDirection === "topToBottomBranches") {
+      const nodeById = new Map(nodes.map(node => [node.nodeId, node]));
+      const placements = new Map(graph.nodes.map(item => [item.nodeId, item]));
+      const centered = Math.floor(graph.columnCount / 2);
+      const boundaries = nodes.filter(node => ["start", "end"].includes(node.nodeType));
+      boundaries.forEach(node => placements.set(node.nodeId, { nodeId: node.nodeId,
+        column: centered }));
+      const rows = graph.rows.map(row => ({ laneId: null, lane: null,
+        nodes: row.nodeIds.map(nodeId => nodeById.get(nodeId)).filter(Boolean),
+        firstInLane: false }));
+      const starts = boundaries.filter(node => node.nodeType === "start");
+      const ends = boundaries.filter(node => node.nodeType === "end");
+      return { lanes: { visible: false }, placements, rows: [
+        ...(starts.length ? [{ laneId: null, lane: null, nodes: starts,
+          firstInLane: false }] : []), ...rows,
+        ...(ends.length ? [{ laneId: null, lane: null, nodes: ends,
+          firstInLane: false }] : [])
+      ] };
+    }
     const lanes = processLaneModel.create(model, { unassignedTitle: english
       ? "Other steps" : "Övriga steg", roleNames: english ? {} : {
         purchasing: "Inköp", warehouse: "Lager", sales: "Försäljning",
@@ -136,6 +158,9 @@
     const density = options.density === "compact" ? "compact" : "standard";
     const nodes = ordered(model); let columns = Math.max(1, Math.min(5,
       Number(options.columns) || 4));
+    const graph = processGraphLayout.create(model, { availableWidth: columns * 242,
+      maxColumns: columns });
+    if (graph.flowDirection === "topToBottomBranches") columns = graph.columnCount;
     if (columns > 2 && nodes.length > columns && nodes.length % columns === 1 &&
         Math.ceil(nodes.length / (columns - 1)) === Math.ceil(nodes.length / columns)) {
       columns -= 1;
@@ -150,7 +175,8 @@
     const gapX = density === "compact" ? 52 : 72;
     const gapY = density === "compact" ? 44 : 64;
     const margin = 64; const header = 126; const laneHeader = 42;
-    const layout = rowsFor(model, nodes, columns, english); const boxes = {}; let cursorY = header;
+    const layout = rowsFor(model, nodes, columns, english, graph); const boxes = {};
+    let cursorY = header;
     const laneBands = []; let activeLaneBand;
     layout.rows.forEach(row => { if (row.firstInLane) activeLaneBand = null;
       if (layout.lanes.visible && row.firstInLane && row.lane) {
@@ -158,8 +184,9 @@
           bottom: cursorY };
         laneBands.push(activeLaneBand); cursorY += laneHeader; }
       const rowNumber = layout.rows.indexOf(row);
-      row.nodes.forEach((node, column) => { const visualColumn = rowNumber % 2
-        ? row.nodes.length - column - 1 : column; boxes[node.nodeId] = { x: margin + visualColumn *
+      row.nodes.forEach((node, column) => { const visualColumn = layout.placements?.get(
+        node.nodeId)?.column ?? (rowNumber % 2 ? row.nodes.length - column - 1 : column);
+        boxes[node.nodeId] = { x: margin + visualColumn *
         (nodeWidth + gapX), y: cursorY, width: nodeWidth, height: nodeHeight }; });
       cursorY += nodeHeight + gapY;
       if (activeLaneBand) activeLaneBand.bottom = cursorY - Math.round(gapY / 2); });

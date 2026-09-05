@@ -35,4 +35,24 @@ assert.strictEqual(vertical.rowCount, 10);
 assert.strictEqual(vertical.flowDirection, "topToBottom");
 assert(Object.isFrozen(wide));
 assert(Object.isFrozen(wide.rows));
+const branched = layout.create({ nodes: [
+  { nodeId: "decision", nodeType: "decision", sequence: 0 },
+  { nodeId: "yes", nodeType: "action", sequence: 1 },
+  { nodeId: "no", nodeType: "action", sequence: 2 },
+  { nodeId: "join", nodeType: "action", sequence: 3 }
+], transitions: [
+  { fromNodeId: "decision", toNodeId: "yes", transitionType: "conditional" },
+  { fromNodeId: "decision", toNodeId: "no", transitionType: "alternate" },
+  { fromNodeId: "yes", toNodeId: "join", transitionType: "sequence" },
+  { fromNodeId: "no", toNodeId: "join", transitionType: "sequence" }
+] });
+assert.strictEqual(branched.flowDirection, "topToBottomBranches");
+assert.strictEqual(branched.columnCount, 3);
+assert.deepStrictEqual(branched.rows.map(row => row.nodeIds), [
+  ["decision"], ["yes", "no"], ["join"]
+]);
+assert.strictEqual(branched.nodes.find(node => node.nodeId === "decision").column, 1);
+assert.deepStrictEqual(branched.nodes.filter(node => ["yes", "no"].includes(node.nodeId))
+  .map(node => node.column), [0, 2]);
+assert.strictEqual(branched.nodes.find(node => node.nodeId === "join").column, 1);
 console.log("Process graph layout tests passed.");

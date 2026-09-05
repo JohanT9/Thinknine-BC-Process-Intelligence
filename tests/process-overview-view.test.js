@@ -97,6 +97,9 @@ view.render(decisionContainer, branchingModel, { locale: "sv-SE" });
 assert(decisionContainer.innerHTML.includes('data-process-decision="true"'));
 assert(decisionContainer.innerHTML.includes('data-process-shape="diamond"'));
 assert(decisionContainer.innerHTML.includes("process-overview-kind-decision"));
+assert(decisionContainer.innerHTML.includes('data-process-flow="topToBottomBranches"'));
+assert(/style="grid-column:2;grid-row:\d+"/u.test(decisionContainer.innerHTML),
+  "the decision must be centered on its own graph layer");
 assert(decisionContainer.innerHTML.includes("Finns varan i lager?"));
 assert(decisionContainer.innerHTML.includes("Beslut"));
 assert(decisionContainer.innerHTML.includes('class="process-overview-routes compact"'),

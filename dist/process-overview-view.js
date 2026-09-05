@@ -246,11 +246,13 @@
         purchasing: "Inköp", warehouse: "Lager", sales: "Försäljning",
         production: "Produktion", finance: "Ekonomi", system: "System" } });
     const theme = processMapTheme.resolve(options.theme);
+    const branchedLayout = layout.flowDirection === "topToBottomBranches";
+    const showLaneHeaders = lanes.visible && !branchedLayout;
     const placementById = new Map(layout.nodes.map(item => [item.nodeId, item]));
     const laneById = new Map(lanes.lanes.map(lane => [lane.laneId, lane]));
     const laneStartIds = new Map(lanes.segments.map(segment => [segment.nodeIds[0],
       laneById.get(segment.laneId)]));
-    const laneEndIds = lanes.visible ? lanes.segments.slice(0, -1)
+    const laneEndIds = showLaneHeaders ? lanes.segments.slice(0, -1)
       .map(segment => segment.nodeIds.at(-1)) : [];
     const rowEndIds = new Set([...layout.rows.slice(0, -1).map(row => row.nodeIds.at(-1)),
       ...laneEndIds]);
@@ -259,7 +261,7 @@
       data-process-density="${options.density === "compact" ? "compact" : "standard"}"
       aria-label="${english ? "Process flow" : "Processflöde"}">
       <ol class="process-overview-list" data-process-layout-version="${layout.layoutVersion}"
-        data-process-direction="${layout.direction}"
+        data-process-direction="${layout.direction}" data-process-flow="${layout.flowDirection}"
         style="--process-columns:${layout.columnCount};zoom:${Number(options.zoom) || 100}%">${details.map(detail => {
         const selected = selectedTaskIds.has(detail.taskId);
         const phase = detail.containers.phase?.title;
@@ -280,14 +282,15 @@
         const laneRole = String(lane?.laneId || "").replace(/^role:/u, "");
         const laneColors = theme.rolePalette?.[laneRole] || theme.rolePalette?.default ||
           [theme.palette.lane, theme.palette.brand];
-        return `${lanes.visible && lane ? `<li class="process-overview-lane" data-process-lane-id="${
+        return `${showLaneHeaders && lane ? `<li class="process-overview-lane" data-process-lane-id="${
           escape(lane.laneId)}" style="background:${escape(laneColors[0])};border-left-color:${
             escape(laneColors[1])}"><span>${escape(lane.title)}</span></li>` : ""}<li class="process-overview-step${decision ? " process-overview-decision" : ""}${
           rowEndIds.has(detail.node.nodeId) ? " process-overview-row-end" : ""}${
           ` process-overview-kind-${visual.kind}`}${
           semantic ? ` process-overview-semantic-${semantic.name}` : ""}"
           data-process-row="${placement?.row ?? 0}" data-process-column="${placement?.column ?? 0}"
-          style="grid-column:${(placement?.column ?? 0) + 1}"
+          style="grid-column:${(placement?.column ?? 0) + 1}${layout.flowDirection ===
+            "topToBottomBranches" ? `;grid-row:${(placement?.row ?? 0) + 1}` : ""}"
           data-process-node-id="${escape(detail.node.nodeId)}" data-process-decision="${decision}"
           data-process-shape="${escape(visual.shape)}" data-process-tone="${escape(visual.tone)}">
           <button type="button" class="process-overview-action"
@@ -301,7 +304,7 @@
             <span class="process-overview-number" aria-hidden="true"><span>${boundary ? "" :
               decision ? "?" : stepNumber}</span></span>
             <span class="process-overview-content">
-              ${phase && !lanes.visible ? `<span class="process-overview-phase">${escape(phase)}</span>` : ""}
+              ${phase && !showLaneHeaders ? `<span class="process-overview-phase">${escape(phase)}</span>` : ""}
               ${subtask ? `<span class="process-overview-subtask">${escape(subtask)}</span>` : ""}
               ${!["action", "process-step"].includes(visual.kind)
                 ? `<span class="process-overview-node-type">${escape(visual.label)}</span>` : ""}

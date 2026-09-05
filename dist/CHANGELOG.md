@@ -66,6 +66,9 @@
 - Added labels directly to non-sequential connectors in the interactive Process
   Overview, keeping conditions and alternative outcomes attached to the correct
   branch while leaving ordinary sequence arrows uncluttered.
+- Added a deterministic layered layout for branched process graphs: decisions
+  are centered above parallel outcomes and converged continuation steps are
+  centered below them, while linear recordings retain the compact flow layout.
 
 - Hid reference suggestions from Process Overview and process exports by
   default, while adding an explicit `Show reference suggestions` control that
