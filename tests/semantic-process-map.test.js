@@ -11,7 +11,12 @@ const referenceGraph = { schemaVersion: "1.0.0", graphId: "advanced", level:
     { nodeId: "post", nodeType: "posting", title: "Post Shipment" },
     { nodeId: "invoice", nodeType: "document", title: "Sales Invoice" },
     { nodeId: "end", nodeType: "end", title: "End" }
-  ], relationships: [], groups: [], startNodeIds: ["start"], endNodeIds: ["end"] };
+  ], relationships: [
+    { fromNodeId: "sales", toNodeId: "release", relationshipType: "sequence" },
+    { fromNodeId: "release", toNodeId: "pick", relationshipType: "creates" },
+    { fromNodeId: "pick", toNodeId: "post", relationshipType: "posts" },
+    { fromNodeId: "post", toNodeId: "invoice", relationshipType: "creates" }
+  ], groups: [], startNodeIds: ["start"], endNodeIds: ["end"] };
 const analysis = { bestMatch: { referenceDiagramId: "advanced", referenceProcess:
   "Advanced Warehouse Outbound", domain: "domain:order-to-cash", confidence: 0.9,
   matchedSteps: [{ title: "Sales Order" }, { title: "Release" }, { title: "Create Pick" }],
@@ -49,12 +54,17 @@ assert.strictEqual(bc.nodes.find(node => node.title === "Customer Approval").met
 assert.deepStrictEqual(bc.nodes.find(node => node.title === "Customer Approval").sourceStepIds,
   ["task-approval"]);
 assert.strictEqual(bc.transitions.length, 3);
+assert.strictEqual(bc.transitions.find(item => item.toNodeId === bc.nodes.find(node =>
+  node.title === "Create Pick").nodeId).transitionType, "creates");
 const bcWithReferences = semanticMap.project(input, "businessCentral", {
   includeReferences: true
 });
 assert.strictEqual(bcWithReferences.nodes.find(node => node.title === "Post Shipment")
   .metadata.semanticStatus, "suggested");
 assert.strictEqual(bcWithReferences.transitions.length, 4);
+assert.strictEqual(bcWithReferences.transitions.find(item => item.toNodeId ===
+  bcWithReferences.nodes.find(node => node.title === "Post Shipment").nodeId).transitionType,
+"posts");
 
 const business = semanticMap.project(input, "business");
 assert.deepStrictEqual(business.nodes.map(node => node.title), ["Order To Cash",

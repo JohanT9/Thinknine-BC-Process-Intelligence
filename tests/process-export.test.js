@@ -66,7 +66,7 @@ const richSvg = svgExporter.svg({ recordingId: "rich", title: "Rich process",
   nodes: [{ nodeId: "document", nodeType: "document", title: "Sales Order", sequence: 0 },
     { nodeId: "post", nodeType: "posting", title: "Post Shipment", sequence: 1 },
     { nodeId: "posted", nodeType: "postedDocument", title: "Posted Shipment", sequence: 2 }],
-  transitions: [{ fromNodeId: "document", toNodeId: "post", transitionType: "sequence" },
+  transitions: [{ fromNodeId: "document", toNodeId: "post", transitionType: "documentCreation" },
     { fromNodeId: "post", toNodeId: "posted", transitionType: "documentPosting" }],
   subprocesses: [{ subprocessId: "outbound", title: "Warehouse Outbound",
     nodeIds: ["document", "post", "posted"], metadata: { containerType: "phase" } }]
@@ -82,6 +82,7 @@ assert(richSvg.includes('class="node-kind"'));
 assert(richSvg.includes(">DOCUMENT<"));
 assert(richSvg.includes(">POSTING<"));
 assert(richSvg.includes("edge-posts"));
+assert(richSvg.includes("edge-creates"));
 assert(/<path d="[^"]* V [^"]*"/u.test(richSvg),
   "multi-row export must use orthogonal connectors");
 const verticalSvg = svgExporter.svg({ recordingId: "vertical", nodes: [

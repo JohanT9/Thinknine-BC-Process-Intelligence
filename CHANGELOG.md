@@ -53,6 +53,10 @@
 - Added semantic responsibility handoffs to transitions and localized labels
   such as `Inköp → Lager` in both Process Overview and SVG exports, making
   cross-functional ownership changes explicit instead of anonymous.
+- Preserved relationship types from Business Central reference graphs when
+  projecting the observed map, so verified document creation and posting paths
+  retain dotted `creates` and emphasized `posts` connectors instead of being
+  flattened into generic sequence arrows.
 
 - Hid reference suggestions from Process Overview and process exports by
   default, while adding an explicit `Show reference suggestions` control that

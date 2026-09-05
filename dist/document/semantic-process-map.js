@@ -89,7 +89,9 @@
   }
   function graphFor(input, model) { const confirmedId = input.decision?.confirmedReferenceId;
     return input.analysis?.referenceGraphs?.[confirmedId] || input.analysis?.bestReferenceGraph || null; }
-  function fromReferenceGraph(input, model, graph) { const referenceNodes = array(graph.nodes)
+  function fromReferenceGraph(input, model, graph) { const incomingByNode = new Map(array(
+    graph.relationships).map(relationship => [relationship.toNodeId || relationship.targetNodeId,
+      relationship])); const referenceNodes = array(graph.nodes)
     .filter(node => !["start", "end"].includes(node.nodeType) &&
       !matchesItems(node, model.conditional)).map(node => {
       const observed = matchingObservedNode(node, input.analysis?.observedGraph);
@@ -97,7 +99,9 @@
         array(observed?.sourceEventIds), sourceStepIds: taskIdsForEvents(observed?.sourceEventIds,
         input.reviewTasks), metadata: { semanticStatus: semanticStatus(node, model),
           processRole: processRoleFor(node),
-          semanticLevel: "businessCentral", originalNodeType: node.nodeType } };
+          semanticLevel: "businessCentral", originalNodeType: node.nodeType,
+          relationshipType: incomingByNode.get(node.nodeId)?.relationshipType ||
+            incomingByNode.get(node.nodeId)?.transitionType || "sequence" } };
     });
     const existing = new Set(referenceNodes.map(node => key(node.title)));
     array(model.additional).forEach((item, index) => { const title = text(item.title || item.name || item.id);
