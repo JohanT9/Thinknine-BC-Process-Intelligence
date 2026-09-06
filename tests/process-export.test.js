@@ -73,6 +73,12 @@ const richSvg = svgExporter.svg({ recordingId: "rich", title: "Rich process",
 }, { language: "en-US", columns: 2 });
 assert(richSvg.includes("Warehouse Outbound"));
 assert(richSvg.includes("OWNER: Warehouse Outbound"));
+const localizedLaneSvg = svgExporter.svg({ recordingId: "localized-lane",
+  nodes: [{ nodeId: "purchase", nodeType: "document", title: "Purchase Order", sequence: 0 }],
+  transitions: [], subprocesses: [{ subprocessId: "purchase-lane", title: "Purchase to Pay",
+    nodeIds: ["purchase"], metadata: { containerType: "phase" } }] }, { language: "sv-SE" });
+assert(localizedLaneSvg.includes("ANSVAR: Inköp till betalning"));
+assert(!localizedLaneSvg.includes("ANSVAR: Purchase to Pay"));
 assert(richSvg.includes('class="lane-panel"'));
 assert(richSvg.includes("map-node-document"));
 assert(richSvg.includes("map-node-posting"));

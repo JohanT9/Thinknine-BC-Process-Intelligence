@@ -1,5 +1,11 @@
 # Changelog
 
+## 4.7.0 - Localize process-map lanes
+
+- Applied canonical localization to swimlane headers, phase/subtask context, and selected-node details.
+- SVG exports now use the same localized lane owner names as the interactive map.
+- Removed remaining mixed-language `Purchase to Pay` labels from Swedish process diagrams.
+
 ## 4.7.0 - Localize Business Central process levels
 
 - Added Swedish map labels for the canonical sales, purchase, warehouse, transfer, production, assembly, and planning business processes.

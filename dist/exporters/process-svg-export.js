@@ -249,7 +249,8 @@
       width - 40}" height="${Math.max(laneHeader, lane.bottom - lane.y)}" rx="12" style="fill:${
         escape(colors[0])};stroke:${escape(colors[1])}"/><path class="lane-accent" d="M 32 ${
         lane.y + laneHeader} H ${width - 32}" style="stroke:${escape(colors[1])}"/><text x="38" y="${lane.y + 26}">${
-      escape(english ? `OWNER: ${lane.title}` : `ANSVAR: ${lane.title}`)}</text></g>`; }).join("");
+      escape(`${english ? "OWNER" : "ANSVAR"}: ${processMapLabels.nodeTitle({ title: lane.title },
+        options.language)}`)}</text></g>`; }).join("");
     const title = options.title || model.title || "Process";
     const subtitle = options.subtitle || (english ? "Microsoft Dynamics 365 Business Central · Process map" : "Microsoft Dynamics 365 Business Central · Processkarta");
     const footer = options.footer || (english ? "Based on the recorded process in BC Process Studio" : "Baserad på den inspelade processen i BC Process Studio");

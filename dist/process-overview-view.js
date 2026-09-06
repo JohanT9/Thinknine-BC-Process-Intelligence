@@ -166,8 +166,10 @@
         `<span aria-label="${english ? "changes to" : "ändras till"}">→</span> ` +
         `${escape(after)}</li>`;
     }).join("");
+    const locale = english ? "en-US" : "sv-SE";
     const context = [detail.containers.phase?.title, detail.containers.subtask?.title]
-      .filter(Boolean).map(value => `<span>${escape(value)}</span>`).join("");
+      .filter(Boolean).map(value => `<span>${escape(processMapLabels.nodeTitle({ title: value },
+        locale))}</span>`).join("");
     const routes = routesMarkup(detail, english);
     return `<aside class="process-overview-detail" data-process-overview-detail aria-live="polite">
       <div><span class="process-overview-detail-label">${detail.node.nodeType === "decision"
@@ -286,7 +288,8 @@
           [theme.palette.lane, theme.palette.brand];
         return `${showLaneHeaders && lane ? `<li class="process-overview-lane" data-process-lane-id="${
           escape(lane.laneId)}" style="background:${escape(laneColors[0])};border-left-color:${
-            escape(laneColors[1])}"><span>${escape(lane.title)}</span></li>` : ""}<li class="process-overview-step${decision ? " process-overview-decision" : ""}${
+            escape(laneColors[1])}"><span>${escape(processMapLabels.nodeTitle({ title: lane.title },
+              options.locale))}</span></li>` : ""}<li class="process-overview-step${decision ? " process-overview-decision" : ""}${
           rowEndIds.has(detail.node.nodeId) ? " process-overview-row-end" : ""}${
           ` process-overview-kind-${visual.kind}`}${
           semantic ? ` process-overview-semantic-${semantic.name}` : ""}"
@@ -306,8 +309,10 @@
             <span class="process-overview-number" aria-hidden="true"><span>${boundary ? "" :
               decision ? "?" : stepNumber}</span></span>
             <span class="process-overview-content">
-              ${phase && !showLaneHeaders ? `<span class="process-overview-phase">${escape(phase)}</span>` : ""}
-              ${subtask ? `<span class="process-overview-subtask">${escape(subtask)}</span>` : ""}
+              ${phase && !showLaneHeaders ? `<span class="process-overview-phase">${escape(
+                processMapLabels.nodeTitle({ title: phase }, options.locale))}</span>` : ""}
+              ${subtask ? `<span class="process-overview-subtask">${escape(
+                processMapLabels.nodeTitle({ title: subtask }, options.locale))}</span>` : ""}
               ${!["action", "process-step"].includes(visual.kind)
                 ? `<span class="process-overview-node-type">${escape(visual.label)}</span>` : ""}
               <strong>${escape(title)}</strong>

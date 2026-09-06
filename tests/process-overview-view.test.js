@@ -93,6 +93,14 @@ view.render(localizedBusinessContainer, { recordingId: "localized-business", nod
 }], transitions: [], subprocesses: [], stateTransitions: [] }, { locale: "sv-SE" });
 assert(localizedBusinessContainer.innerHTML.includes("Inköp till betalning"));
 assert(!localizedBusinessContainer.innerHTML.includes("Purchase to Pay"));
+const localizedLaneContainer = { innerHTML: "" };
+view.render(localizedLaneContainer, { recordingId: "localized-lane", nodes: [{
+  nodeId: "purchase-lane-node", nodeType: "document", title: "Purchase Order", sequence: 0
+}], transitions: [], subprocesses: [{ subprocessId: "purchase-lane",
+  title: "Purchase to Pay", nodeIds: ["purchase-lane-node"],
+  metadata: { containerType: "phase" } }], stateTransitions: [] }, { locale: "sv-SE" });
+assert(localizedLaneContainer.innerHTML.includes("Inköp till betalning"));
+assert(!localizedLaneContainer.innerHTML.includes("Purchase to Pay"));
 
 const decisionId = processModel.stableId("manual-process-node", ["branching", "stock"]);
 const shipId = processModel.stableId("process-node",
