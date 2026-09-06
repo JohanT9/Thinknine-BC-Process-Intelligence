@@ -1,5 +1,11 @@
 # Changelog
 
+## 4.7.0 - Relevant process alternatives
+
+- Removed cross-domain and negligible-confidence candidates from user-facing alternative process choices.
+- Preserved the number of suppressed candidates for internal diagnostics.
+- Hid the alternatives section entirely when no meaningful alternative remains.
+
 ## 4.7.0 - Explainable process match percentages
 
 - Added observed-step fit and reference-process coverage to the process-analysis evidence panel.

@@ -13,7 +13,10 @@ const result = {
     documents: [{ name: "Sales Order" }, { name: "Warehouse Shipment" }],
     actions: [{ name: "Release" }, { name: "Create Pick" }], signals: {} } },
   matches: [{ referenceDiagramId: "diagram:basic", referenceProcess: "Basic Warehouse Outbound",
-    confidence: 0.68, matchedSteps: [{ title: "Release" }], missingSteps: [], additionalSteps: [] }],
+    domain: "domain:order-to-cash", confidence: 0.68, matchedSteps: [{ title: "Release" }],
+    missingSteps: [], additionalSteps: [] }, { referenceDiagramId: "diagram:transfer",
+    referenceProcess: "Transfer Order", domain: "domain:transfers", confidence: 0.8,
+    matchedSteps: [], missingSteps: [], additionalSteps: [] }],
   processLibraryMatch: { alternativeMatches: [{ referenceId: "reference:simple", name:
     "Simple Sales Order", domain: "Order to Cash", confidence: 0.42 }] }
 };
@@ -27,6 +30,7 @@ assert.strictEqual(normalized.matched.length, 2);
 assert.strictEqual(normalized.missing.length, 1);
 assert.strictEqual(normalized.additional.length, 1);
 assert.strictEqual(normalized.alternatives.length, 2);
+assert(!normalized.alternatives.some(item => item.id === "diagram:transfer"));
 assert.strictEqual(normalized.advisory, true);
 assert.strictEqual(normalized.assessmentStatus, "auto-classifiable");
 assert.strictEqual(normalized.evidence.documents.length, 2);

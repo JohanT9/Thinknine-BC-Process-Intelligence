@@ -123,7 +123,7 @@
       Math.min(0.08, (unexpectedDocuments.length + unexpectedActions.length) * 0.01) -
       specificityPenalty)).toFixed(3));
     const domainConflict = Boolean(context.anchoredDomain && reference.domain !==
-      context.anchoredDomain && reference.domain !== "domain:warehouse-management");
+      context.anchoredDomain);
     if (domainConflict) confidence = Math.min(confidence, 0.11);
     const matchedSteps = [...matchedDocuments.map(id => ({ type: "document", id })),
       ...matchedActions.map(name => ({ type: "action", name })),
@@ -152,9 +152,12 @@
     const matches = registry.library.references.map(reference => compare(reference, observed,
       { anchoredDomain }))
       .sort((left, right) => right.confidence - left.confidence || left.referenceId.localeCompare(right.referenceId));
+    const alternativeMatches = matches.slice(1).filter(item => !item.domainConflict &&
+      item.confidence >= 0.12).slice(0, 5);
     return freeze({ bestMatch: matches[0] || null, confidence: matches[0]?.confidence || 0,
       matchedSteps: clone(matches[0]?.matchedSteps || []), missingSteps: clone(matches[0]?.missingSteps || []),
-      unexpectedSteps: clone(matches[0]?.unexpectedSteps || []), alternativeMatches: matches.slice(1, 6),
+      unexpectedSteps: clone(matches[0]?.unexpectedSteps || []), alternativeMatches,
+      suppressedAlternativeCount: Math.max(0, matches.length - 1 - alternativeMatches.length),
       observed, anchoredDomain, diagnostics: matches.length ? [] : [{ code: "no-reference-processes" }],
       advisory: true, customizedProcessMayBeValid: true }); }
   return { SCHEMA_VERSION, compare, create, matchRecordingToReference, normalize,

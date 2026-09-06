@@ -92,8 +92,11 @@ assert.strictEqual(purchaseOpeningMatch.anchoredDomain, "domain:source-to-pay");
 const conflictingPlanning = [purchaseOpeningMatch.bestMatch,
   ...purchaseOpeningMatch.alternativeMatches].find(item =>
   item.referenceId === "reference:bc:planning-create-purchase");
-assert(!conflictingPlanning || conflictingPlanning.confidence <= 0.11,
-  "Generic planning actions must not outrank verified purchase-document metadata.");
+assert.strictEqual(conflictingPlanning, undefined,
+  "Conflicting planning references must not be presented as useful alternatives.");
+assert(purchaseOpeningMatch.alternativeMatches.every(item =>
+  item.domain === "domain:source-to-pay" && item.confidence >= 0.12));
+assert(purchaseOpeningMatch.suppressedAlternativeCount > 0);
 const unsupportedAdvancedInbound = service.compare(
   registry.get("reference:bc:stp-advanced-inbound"), purchaseOpeningMatch.observed,
   { anchoredDomain: purchaseOpeningMatch.anchoredDomain });

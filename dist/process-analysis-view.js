@@ -13,6 +13,8 @@
   function stepLabel(step) { return text(step?.title || step?.name || step?.id ||
     step?.referenceProcess || "Unknown step"); }
   function localized(value, labels) { return labels.processNames?.[text(value)] || text(value); }
+  function domainKey(value) { return text(value).toLocaleLowerCase().replace(/^domain:/, "")
+    .replace(/[^a-z0-9]+/g, ""); }
   function variantLabel(value, labels) { const id = text(value?.id || value);
     const name = text(value?.name || value); return labels.variantNames?.[id] ||
       labels.variantNames?.[name] || name.replace(/^variant:/, "").replace(/-/g, " "); }
@@ -31,11 +33,14 @@
       Number(best?.confidence || result.confidence || 0)));
     const confidence = decision?.status === "confirmed" ? 1 : matchConfidence;
     const effectiveId = text(best?.referenceProcessId || best?.referenceDiagramId || best?.referenceId);
+    const bestDomainKey = domainKey(best?.domain); const relevant = item =>
+      Number(item.confidence || 0) >= 0.12 && (!bestDomainKey || !item.domain ||
+        domainKey(item.domain) === bestDomainKey);
     const alternatives = array(result.matches).filter(item => item.referenceDiagramId !==
-      effectiveId).map(item => ({ id: item.referenceDiagramId,
+      effectiveId && relevant(item)).map(item => ({ id: item.referenceDiagramId,
         name: item.referenceProcess, confidence: item.confidence, domain: item.domain || "" }));
     array(processMatch?.alternativeMatches).forEach(item => { if (!alternatives.some(candidate =>
-      candidate.id === item.referenceId) && item.referenceId !== effectiveId) alternatives.push({
+      candidate.id === item.referenceId) && item.referenceId !== effectiveId && relevant(item)) alternatives.push({
       id: item.referenceId, name: item.name,
       confidence: item.confidence, domain: item.domain || "" }); });
     const assessment = result.assessment || result.recognition?.assessment || {};
@@ -159,12 +164,12 @@
         ${steps(labels.conditionalSteps || "Configuration-dependent reference steps",
           model.conditional, "conditional", labels.noConditional ||
           "No configuration-dependent reference steps", labels)}</details>` : ""}
-      <fieldset class="process-analysis-alternatives"><legend>${escape(labels.alternatives ||
+      ${model.alternatives.length ? `<fieldset class="process-analysis-alternatives"><legend>${escape(labels.alternatives ||
         "Alternative reference processes")}</legend>${model.alternatives.length ? model.alternatives.map(item =>
           `<label><input type="radio" name="processAnalysisReference" value="${escape(item.id)}"
             data-reference-name="${escape(item.name)}" ${item.id === model.referenceId ? "checked" : ""}><span>${escape(localized(item.name, labels))}</span>
             <strong>${Math.round(item.confidence * 100)}%</strong></label>`).join("") :
-          `<p>${escape(labels.noAlternatives || "No relevant alternatives")}</p>`}</fieldset>`;
+          `<p>${escape(labels.noAlternatives || "No relevant alternatives")}</p>`}</fieldset>` : ""}`;
     return model; }
   function selectedReference(container, model) { const selected = container.querySelector(
     'input[name="processAnalysisReference"]:checked'); return selected ? { id: selected.value,
