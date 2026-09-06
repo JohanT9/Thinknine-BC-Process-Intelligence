@@ -101,6 +101,15 @@ const old = recording.normalize(null, { session, events: [raw], screenshots: { 1
 assert.strictEqual(old.schemaVersion, 1);
 assert.strictEqual(old.events[0].screenshotAssetId, old.assets[0].id);
 assert.deepStrictEqual(recording.legacyView(old).events, [raw]);
+const legacyIdentified = recording.fromLegacy(session, [{ ...raw, identification: {
+  pageIdentity: { pageObjectId: "50", tableId: "38", documentType: "purchase-order",
+    entity: "PurchaseOrder" },
+  actionIdentity: { actionType: "ReleaseDocument", caption: "Frisläpp" }
+} }]);
+assert.strictEqual(legacyIdentified.events[0].identification.pageIdentity.pageObjectId, "50",
+  "legacy recordings must restore captured page identity into canonical evidence");
+assert.strictEqual(legacyIdentified.events[0].identification.actionIdentity.actionType,
+  "ReleaseDocument", "legacy recordings must restore captured action identity");
 assert.deepStrictEqual(JSON.parse(JSON.stringify(withAsset)), withAsset,
   "Canonical Recording remains service-worker serializable.");
 console.log("Canonical recording tests passed.");

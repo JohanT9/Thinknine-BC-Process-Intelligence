@@ -1,5 +1,11 @@
 # Changelog
 
+## 4.7.0 - Restore semantic evidence from legacy recordings
+
+- Fixed legacy recording migration so captured Business Central page, table, document, and action identity remains active canonical evidence.
+- Older exported recordings now benefit from deterministic metadata-based process recognition instead of falling back mainly to captions.
+- Added an end-to-end regression proving a migrated purchase recording remains in the Source to Pay domain.
+
 ## 4.7.0 - Explain action context in process analysis
 
 - Process-recognition evidence now retains action qualifiers such as shipment, receipt, invoice, and pick.

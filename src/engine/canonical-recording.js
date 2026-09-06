@@ -52,8 +52,9 @@
     if (source.interactionId) event.interaction = {
       id: String(source.interactionId), source: "recorder"
     };
-    if (identification) event.identification = clone(identification);
-    const identifiedPage = identification?.pageIdentity || {};
+    const resolvedIdentification = identification || source.identification || null;
+    if (resolvedIdentification) event.identification = clone(resolvedIdentification);
+    const identifiedPage = resolvedIdentification?.pageIdentity || {};
     const pageObjectId = pageIdentity.observedPageObjectId(source);
     const pageCaption = source.pageCaption || source.pageName || undefined;
     if (source.pageId || pageObjectId || pageCaption || source.frameUrl) event.page = {

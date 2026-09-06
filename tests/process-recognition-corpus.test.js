@@ -1,5 +1,6 @@
 const assert = require("assert");
 const engine = require("../src/engine/bc-process-recognition-engine");
+const canonical = require("../src/engine/canonical-recording");
 
 function recording(id, evidence) {
   return {
@@ -73,6 +74,19 @@ const outboundPost = engine.recognize(recording("qualified-outbound", [
 ])).classification.processEvidence.matchedActions.find(item => item.name === "Post");
 assert.deepStrictEqual(outboundPost.qualifiers, ["shipment"],
   "matched actions must retain their Business Central context for explainability");
+
+const migratedLegacyPurchase = canonical.fromLegacy({ id: "legacy-purchase",
+  startedAt: "2026-09-04T11:00:00.000Z" }, [{ eventNo: 1, type: "click",
+  identification: { pageIdentity: { pageObjectId: "50", tableId: "38",
+    documentType: "purchase-order", entity: "PurchaseOrder" } } },
+{ eventNo: 2, type: "click", identification: { actionIdentity: {
+  actionType: "ReleaseDocument", caption: "Frisläpp" } } }]);
+const migratedLegacyResult = engine.recognize(migratedLegacyPurchase);
+assert.strictEqual(migratedLegacyResult.classification.taxonomyReferences.domain.id,
+  "domain:source-to-pay",
+"legacy exports must feed their stored Business Central identity into process recognition");
+assert(migratedLegacyResult.classification.processEvidence.matchedActions.some(item =>
+  item.name === "Release"));
 assert.notStrictEqual(partialPurchase.assessment.status, "auto-classifiable",
   "an incomplete process must not be presented as automatically recognized");
 assert(!partialPurchase.alternatives.some(candidate =>
