@@ -38,7 +38,7 @@
     ["document:posted-sales-shipment", "Posted Sales Shipment", "posted-document", ["130"], ["110", "111"]],
     ["document:sales-invoice", "Sales Invoice", "invoice", ["43"], ["36", "37"]],
     ["document:posted-sales-invoice", "Posted Sales Invoice", "posted-document", ["132"], ["112", "113"]],
-    ["document:purchase-order", "Purchase Order", "order", ["50"], ["38", "39"]],
+    ["document:purchase-order", "Purchase Order", "order", ["50", "9307"], ["38", "39"]],
     ["document:warehouse-receipt", "Warehouse Receipt", "warehouse-document", ["7332"], ["7316", "7317"]],
     ["document:warehouse-put-away", "Warehouse Put-away", "warehouse-activity", ["7340"], ["5766", "5767"]],
     ["document:posted-purchase-receipt", "Posted Purchase Receipt", "posted-document", ["136"], ["120", "121"]],

@@ -7,6 +7,8 @@ const canonical = require("../src/engine/canonical-recording");
 const validation = schema.validate(seed);
 assert.strictEqual(validation.valid, true, JSON.stringify(validation.errors, null, 2));
 const taxonomy = registry.create(seed);
+assert(seed.documents.find(item => item.id === "document:purchase-order")
+  .pageIds.includes("9307"), "the standard Purchase Orders list page must be recognized");
 
 const requiredDomains = ["Order to Cash", "Source to Pay", "Forecast to Plan",
   "Plan to Produce", "Inventory to Deliver", "Record to Report", "Returns",

@@ -93,6 +93,19 @@ const repairedStoredResult = engine.recognize(canonical.normalize(storedBeforeLe
 assert.strictEqual(repairedStoredResult.classification.taxonomyReferences.domain.id,
   "domain:source-to-pay",
 "already stored canonical recordings must recover legacy identity during normalization");
+const legacyPurchaseList = canonical.fromLegacy({ id: "legacy-purchase-list",
+  startedAt: "2026-09-03T06:57:36.000Z" }, [
+  { eventNo: 1, type: "click", identification: { pageIdentity: {
+    pageObjectId: "9307", pageType: "list", caption: "Inköpsorder" } } },
+  { eventNo: 2, type: "click", identification: { actionIdentity: {
+    actionType: "CreateNew", caption: "Ny" } } }
+]);
+const legacyPurchaseListResult = engine.recognize(legacyPurchaseList);
+assert.strictEqual(legacyPurchaseListResult.classification.taxonomyReferences.domain.id,
+  "domain:source-to-pay",
+"the standard Purchase Orders list page must identify a short legacy purchase recording");
+assert(!legacyPurchaseListResult.alternatives.some(item =>
+  item.taxonomyReferences.domain.id === "domain:transfers"));
 assert.strictEqual(partialPurchase.assessment.status, "review-required",
   "strong document and action identity should make a partial process reviewable");
 assert.notStrictEqual(partialPurchase.assessment.status, "auto-classifiable",

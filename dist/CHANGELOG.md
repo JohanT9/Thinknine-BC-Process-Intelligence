@@ -1,5 +1,11 @@
 # Changelog
 
+## 4.7.0 - Recognize the Purchase Orders list
+
+- Added the standard Business Central Purchase Orders list page (`9307`) to the canonical Purchase Order document identity.
+- Short legacy recordings can now be classified as Source to Pay before the Purchase Order card is opened.
+- Added regression protection preventing a list-only purchase recording from producing transfer alternatives.
+
 ## 4.7.0 - Mark evidence-derived process nodes as observed
 
 - Process nodes inferred from strong recorded Business Central metadata now carry the explicit `observed` semantic status.
