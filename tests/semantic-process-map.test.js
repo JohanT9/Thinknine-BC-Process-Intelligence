@@ -90,6 +90,17 @@ assert.strictEqual(legacyBc.nodes[1].metadata.semanticStatus, "suggested");
 assert.strictEqual(legacyBc.nodes[0].metadata.originalNodeType, "document");
 assert.strictEqual(legacyBc.nodes[0].metadata.processRole.id, "purchasing");
 assert.strictEqual(legacyBc.nodes[1].metadata.processRole.id, "warehouse");
+assert.strictEqual(semanticMap.semanticNodeType({ type: "document",
+  id: "document:posted-purchase-invoice" }), "postedDocument");
+assert.strictEqual(semanticMap.semanticNodeType({ type: "action", name: "Post Invoice" }),
+  "posting");
+const postedComparison = semanticMap.project({ recordingId: "posted", analysis: { bestMatch: {
+  referenceProcess: "Posted", matchedSteps: [
+    { type: "action", name: "Post Invoice" },
+    { type: "document", id: "document:posted-purchase-invoice" }
+  ], missingSteps: [], additionalSteps: [] } } }, "businessCentral");
+assert.deepStrictEqual(postedComparison.nodes.map(node => node.metadata.originalNodeType),
+  ["posting", "postedDocument"]);
 const inheritedPurchaseRoles = semanticMap.inheritProcessRoles([
   { title: "Purchase Order", metadata: { processRole: { id: "purchasing", name: "Purchasing" } } },
   { title: "Create", metadata: {} }, { title: "Release", metadata: {} }

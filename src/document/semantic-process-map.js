@@ -19,6 +19,14 @@
   function freeze(value) { if (!value || typeof value !== "object" || Object.isFrozen(value)) return value;
     Object.values(value).forEach(freeze); return Object.freeze(value); }
   function stepKey(step) { return key(step?.title || step?.name || step?.id); }
+  function semanticNodeType(item = {}) {
+    if (item.nodeType) return item.nodeType;
+    const identity = key([item.id, item.title, item.name].filter(Boolean).join(" "));
+    if (item.type === "document") return /document posted|posted document|bokförd/.test(identity)
+      ? "postedDocument" : "document";
+    if (item.type === "action" && /(^| )post( |$)|bokför/.test(identity)) return "posting";
+    return "processStep";
+  }
   function processRoleFor(value = {}) { const identity = key([value.id, value.title,
     value.name, value.nodeType, ...array(value.taxonomyEntityIds)].filter(Boolean).join(" "));
     if (/warehouse movement|warehouse|receipt|shipment|pick|put away|lagerförflytt|distributionslager|plock|inleverans|utleverans/.test(identity))
@@ -143,12 +151,12 @@
     ...model.matched.map(item => ({ title: text(item.title || item.name || item.id),
       metadata: { semanticStatus: "observed", semanticLevel: "businessCentral",
         processRole: processRoleFor(item),
-        originalNodeType: item.nodeType || (item.type === "document" ? "document" : "processStep") } })),
+        originalNodeType: semanticNodeType(item) } })),
     ...missing.map(item => ({ title: text(item.title || item.name || item.id),
       metadata: { semanticStatus: "suggested", semanticLevel: "businessCentral",
         processRole: processRoleFor(item),
         applicability: item.applicability || "expected", variantIds: array(item.variantIds),
-        originalNodeType: item.nodeType || (item.type === "document" ? "document" : "processStep") } })),
+        originalNodeType: semanticNodeType(item) } })),
     ...model.additional.map(item => ({ title: text(item.title || item.name || item.id),
       metadata: { semanticStatus: "customerSpecific", semanticLevel: "businessCentral",
         processRole: processRoleFor(item) } }))
@@ -181,5 +189,5 @@
       fromComparison(input, model);
     const visible = options.includeReferences === true ? projected : observedOnly(projected);
     return options.includeBoundaries === true ? withBoundaries(visible, options.locale) : visible; }
-  return { LEVELS, inheritProcessRoles, project, semanticStatus, withBoundaries };
+  return { LEVELS, inheritProcessRoles, project, semanticNodeType, semanticStatus, withBoundaries };
 });

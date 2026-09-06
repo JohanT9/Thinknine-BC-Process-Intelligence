@@ -1,5 +1,11 @@
 # Changelog
 
+## 4.7.0 - Preserve posting semantics in process maps
+
+- Comparison-based process maps now distinguish posted Business Central documents from editable documents.
+- Posting actions now use the dedicated posting node type instead of a generic process-step rectangle.
+- The semantic node classification is renderer-independent, so interactive maps and SVG exports consume the same shapes and tones.
+
 ## 4.7.0 - Add inventory responsibility to process maps
 
 - Added a distinct Inventory responsibility lane for item journals, item tracking, reclassification, physical inventory, and inventory movements.
