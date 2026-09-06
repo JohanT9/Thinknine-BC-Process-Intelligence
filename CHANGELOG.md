@@ -1,5 +1,11 @@
 # Changelog
 
+## 4.7.0 - Specific Business Central action matching
+
+- Stopped generic verbs such as Create, Post, and Register from matching more specific warehouse actions.
+- Specific actions such as Post Receipt and Register Put-away now require corresponding observed evidence.
+- Reduced false confidence within the correct domain without weakening exact action matches.
+
 ## 4.7.0 - Relevant process alternatives
 
 - Removed cross-domain and negligible-confidence candidates from user-facing alternative process choices.

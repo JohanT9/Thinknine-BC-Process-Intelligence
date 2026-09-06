@@ -74,8 +74,13 @@
         references: [...library.references, ...next.references], metadata: {
           ...library.metadata, extensions: [...(library.metadata.extensions || []), {
             libraryId: next.libraryId, namespace: next.namespace }] } }); } }); }
+  const GENERIC_ACTIONS = new Set(["create", "new", "release", "post", "register", "receive",
+    "ship", "invoice", "pick", "consume", "output", "transfer"]);
   function containsAction(expected, observed) { const left = words(expected); const right = words(observed);
-    return left === right || left.includes(right) || right.includes(left); }
+    if (!left || !right) return false;
+    if (left === right) return true;
+    if (GENERIC_ACTIONS.has(left) || GENERIC_ACTIONS.has(right)) return false;
+    return left.includes(right) || right.includes(left); }
   function orderedDocumentMatches(observed, expected) { let position = 0; const result = [];
     expected.forEach(documentId => { const index = observed.indexOf(documentId, position);
       if (index >= 0) { result.push(documentId); position = index + 1; } }); return result; }

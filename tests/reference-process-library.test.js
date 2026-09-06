@@ -103,6 +103,20 @@ const unsupportedAdvancedInbound = service.compare(
 assert.strictEqual(unsupportedAdvancedInbound.configurationEvidence, false);
 assert(unsupportedAdvancedInbound.specificityPenalty > 0,
   "Configuration-heavy references require observed configuration-specific evidence.");
+const genericWarehouseActions = service.compare(
+  registry.get("reference:bc:stp-advanced-inbound"), {
+    documents: ["document:purchase-order"], actions: ["Create", "Post", "Register"]
+  }, { anchoredDomain: "domain:source-to-pay" });
+assert(!genericWarehouseActions.matchedSteps.some(item => item.type === "action"),
+  "Generic verbs must not match specific warehouse actions.");
+const specificWarehouseActions = service.compare(
+  registry.get("reference:bc:stp-advanced-inbound"), {
+    documents: ["document:purchase-order"], actions: ["Post Receipt", "Register Put-away"]
+  }, { anchoredDomain: "domain:source-to-pay" });
+assert(specificWarehouseActions.matchedSteps.some(item =>
+  item.type === "action" && item.name === "Post Receipt"));
+assert(specificWarehouseActions.matchedSteps.some(item =>
+  item.type === "action" && item.name === "Register Put-away"));
 
 const warehouseInbound = classifiedRecording("warehouse-inbound-reference", [
   { document: "document:purchase-order", action: "Release" },
