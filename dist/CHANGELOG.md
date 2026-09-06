@@ -1,5 +1,11 @@
 # Changelog
 
+## 4.7.0 - Language-independent process graph matching
+
+- Process graphs now match nodes by stable taxonomy entity IDs before comparing visible labels.
+- Swedish, English, and manually adjusted node titles can represent the same Business Central process without reducing graph confidence.
+- Text matching remains available as a fallback for custom nodes that have not yet been semantically classified.
+
 ## 4.7.0 - Domain-safe graph matching
 
 - Applied verified Business Central document domains to process-graph matching.

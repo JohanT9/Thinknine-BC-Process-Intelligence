@@ -102,6 +102,19 @@ const comparison = model.compareGraphs(graph.normalize(customizedGraph), advance
 assert.strictEqual(comparison.missingSteps.length, 0);
 assert(comparison.additionalSteps.some(item => item.title === "Customer Approval"));
 assert.strictEqual(comparison.deviationsAreErrors, false);
+const simplePurchaseDiagram = seed.diagrams.find(item => item.name === "Simple Purchase Order");
+const localizedPurchaseGraph = JSON.parse(JSON.stringify(simplePurchaseDiagram.processGraph));
+const localizedTitles = ["Start", "InkÃ¶psorder", "Skapa inkÃ¶psorder", "FrislÃ¤pp", "Ta emot", "Slut"];
+localizedPurchaseGraph.nodes.forEach((node, index) => { node.title = localizedTitles[index]; });
+const localizedComparison = model.compareGraphs(graph.normalize(localizedPurchaseGraph),
+  simplePurchaseDiagram.processGraph);
+assert.strictEqual(localizedComparison.matchedSteps.length, 4);
+assert.strictEqual(localizedComparison.missingSteps.length, 0,
+  "Localized labels must match through stable taxonomy entity IDs.");
+assert.strictEqual(model.create(seed).findSimilarProcessGraphs(
+  graph.normalize(localizedPurchaseGraph), 1)[0].diagram.id, simplePurchaseDiagram.id);
+assert.strictEqual(model.create(seed).findSimilarProcessGraphs(
+  graph.normalize(localizedPurchaseGraph), 1)[0].confidence, 1);
 const recordingMatch = model.matchRecordingToReferences({ schemaVersion: 1, id: "synthetic",
   events: [] }, seed, { graphProjector: { generate() { return advanced.processGraph; } } });
 assert.strictEqual(recordingMatch.bestMatch.referenceProcess, "Advanced Warehouse Outbound");

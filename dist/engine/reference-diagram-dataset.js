@@ -221,24 +221,31 @@
     .map(node => `${node.nodeType}:${text(node.title).toLocaleLowerCase()}`).sort(); const edges =
     value.relationships.map(edge => `${edge.relationshipType}:${edge.fromNodeId}->${edge.toNodeId}`).sort();
     return JSON.stringify({ nodes, edges }); }
-  function semanticTokens(value) { return new Set([...value.nodes.map(node =>
-    `${node.nodeType}:${text(node.title).toLocaleLowerCase()}`), ...value.relationships.map(edge => edge.relationshipType)]); }
+  function nodeIdentityKeys(node) { if (["start", "end"].includes(node.nodeType))
+    return [`node-type:${node.nodeType}`]; const taxonomyIds = unique(array(node.taxonomyEntityIds)
+    .map(id => text(id).toLocaleLowerCase())); return taxonomyIds.length
+      ? taxonomyIds.map(id => `entity:${id}`)
+      : [`${node.nodeType}:${text(node.title).toLocaleLowerCase()}`]; }
+  function semanticTokens(value) { return new Set([...value.nodes.flatMap(node =>
+    nodeIdentityKeys(node)), ...value.relationships.map(edge => edge.relationshipType)]); }
   function similarity(left, right) { const a = semanticTokens(left); const b = semanticTokens(right);
     const intersection = [...a].filter(item => b.has(item)).length; const union = new Set([...a, ...b]).size;
     return union ? intersection / union : 1; }
   function compareGraphs(observedGraph, referenceGraph) { const observed = observedGraph.nodes
     .filter(node => !["start", "end"].includes(node.nodeType)); const expected = referenceGraph.nodes
-    .filter(node => !["start", "end"].includes(node.nodeType)); const key = node =>
-      `${node.nodeType}:${text(node.title).toLocaleLowerCase()}`; const observedKeys = new Set(observed.map(key));
-    const expectedKeys = new Set(expected.map(key)); const matchedSteps = expected.filter(node => observedKeys.has(key(node)))
+    .filter(node => !["start", "end"].includes(node.nodeType)); const observedKeys = new Set(
+      observed.flatMap(nodeIdentityKeys)); const expectedKeys = new Set(expected.flatMap(nodeIdentityKeys));
+    const matchesKeys = (node, keys) => nodeIdentityKeys(node).some(value => keys.has(value));
+    const primaryKey = node => nodeIdentityKeys(node)[0];
+    const matchedSteps = expected.filter(node => matchesKeys(node, observedKeys))
       .map(node => ({ nodeId: node.nodeId, title: node.title, nodeType: node.nodeType }));
-    const missingSteps = expected.filter(node => !observedKeys.has(key(node)))
+    const missingSteps = expected.filter(node => !matchesKeys(node, observedKeys))
       .map(node => ({ nodeId: node.nodeId, title: node.title, nodeType: node.nodeType }));
-    const additionalSteps = observed.filter(node => !expectedKeys.has(key(node)))
+    const additionalSteps = observed.filter(node => !matchesKeys(node, expectedKeys))
       .map(node => ({ nodeId: node.nodeId, title: node.title, nodeType: node.nodeType }));
     const unknownActions = additionalSteps.filter(node => /unknown/i.test(node.title));
-    const expectedMatchedSequence = expected.map(key).filter(value => observedKeys.has(value));
-    const observedMatchedSequence = observed.map(key).filter(value => expectedKeys.has(value));
+    const expectedMatchedSequence = expected.filter(node => matchesKeys(node, observedKeys)).map(primaryKey);
+    const observedMatchedSequence = observed.filter(node => matchesKeys(node, expectedKeys)).map(primaryKey);
     return freeze({ matchedSteps, missingSteps, additionalSteps, unknownActions,
       alternativeSequence: expectedMatchedSequence.some((item, index) =>
         item !== observedMatchedSequence[index]), customizedBehaviorMayBeValid: true,
