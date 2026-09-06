@@ -1,5 +1,11 @@
 # Changelog
 
+## 4.7.0 - Complete process-map terminology
+
+- Added Swedish and English display names for every seeded Business Central document used in process maps.
+- Added Swedish process-map labels for shipping, picking, registering, consumption, output, and transfer actions.
+- Prevented internal taxonomy identifiers such as `document:purchase-order` from leaking into either language's diagram presentation.
+
 ## 4.7.0 - Process recognition confusion corpus
 
 - Added deterministic cross-domain recognition coverage for sales, purchase, warehouse inbound/outbound, transfer, production, assembly, and planning recordings.

@@ -203,6 +203,18 @@ assert(semanticSvg.includes("Kundunikt"));
 assert(semanticSvg.includes(".semantic-suggested .status-dot{fill:#a16207}"));
 assert(semanticSvg.includes(".semantic-suggested>*:first-child{stroke-dasharray:6 4}"));
 
+const localizedTaxonomySvg = svgExporter.svg({ recordingId: "localized-taxonomy",
+  nodes: [
+    { nodeId: "purchase", nodeType: "document", title: "document:purchase-order", sequence: 0 },
+    { nodeId: "receive", nodeType: "action", title: "Receive", sequence: 1 },
+    { nodeId: "receipt", nodeType: "document",
+      title: "document:posted-purchase-receipt", sequence: 2 }
+  ], transitions: [], subprocesses: [] }, { language: "sv-SE" });
+assert(localizedTaxonomySvg.includes("Inköpsorder"));
+assert(localizedTaxonomySvg.includes("Ta emot"));
+assert(localizedTaxonomySvg.includes("Bokförd inköpsinleverans"));
+assert(!localizedTaxonomySvg.includes("document:purchase-order"));
+
 const broken = { ...model, startNodeIds: ["missing"] };
 assert.throws(() => exporter.create(broken), error =>
   error.code === "INVALID_PROCESS_MODEL" && error.diagnostics.length > 0);

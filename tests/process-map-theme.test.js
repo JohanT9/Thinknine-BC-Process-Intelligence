@@ -18,7 +18,20 @@ assert.deepStrictEqual(theme.resolve("business-central").rolePalette.purchasing,
 assert.strictEqual(labels.nodeTitle({ title: "document:purchase-order" }, "sv-SE"),
   "Inköpsorder");
 assert.strictEqual(labels.nodeTitle({ title: "document:purchase-order" }, "en-US"),
-  "document:purchase-order");
+  "Purchase Order");
+[
+  "document:sales-quote", "document:posted-sales-shipment",
+  "document:posted-purchase-receipt", "document:transfer-shipment",
+  "document:production-journal", "document:assembly-order",
+  "document:planning-worksheet"
+].forEach(id => {
+  assert(!labels.nodeTitle({ title: id }, "sv-SE").startsWith("document:"),
+    `${id} must have a Swedish display label`);
+  assert(!labels.nodeTitle({ title: id }, "en-US").startsWith("document:"),
+    `${id} must have an English display label`);
+});
+assert.strictEqual(labels.nodeTitle({ title: "Ship" }, "sv-SE"), "Leverera");
+assert.strictEqual(labels.nodeTitle({ title: "Register" }, "sv-SE"), "Registrera");
 assert.strictEqual(labels.handoffTitle({ from: { id: "purchasing" },
   to: { id: "warehouse" } }, "sv-SE"), "Inköp → Lager");
 console.log("Process map theme tests passed.");
