@@ -1,5 +1,11 @@
 # Changelog
 
+## 4.7.0 - Process variant evidence
+
+- Prevented a shared opening document, such as Purchase Order, from implying advanced warehouse handling.
+- Lifecycle matching now penalizes unobserved variant-specific stages until a warehouse document or transition is actually recorded.
+- Kept close warehouse configurations available as ambiguous alternatives when the recording contains only partial warehouse evidence.
+
 ## 4.7.0 - Recording guidance
 
 - Added accessible in-recording commands for important steps, explicit screenshot

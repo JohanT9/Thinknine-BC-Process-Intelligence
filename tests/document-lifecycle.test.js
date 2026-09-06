@@ -44,6 +44,14 @@ assert.strictEqual(partialAdvanced.partial, true,
 const purchaseNoWarehouse = best(["document:purchase-order", "document:purchase-invoice",
   "document:posted-purchase-invoice"], "bc-process:source-to-pay:standard-purchase-order");
 assert.strictEqual(purchaseNoWarehouse.variantId, "variant:no-warehouse");
+const purchaseOpeningOnly = best(["document:purchase-order"],
+  "bc-process:source-to-pay:standard-purchase-order");
+assert.strictEqual(purchaseOpeningOnly.variantId, "variant:no-warehouse",
+  "A purchase order alone must not imply configured warehouse handling.");
+assert(purchaseOpeningOnly.specificityPenalty < model.match(catalog,
+  ["document:purchase-order"], {
+    bcProcessId: "bc-process:source-to-pay:standard-purchase-order"
+  }).find(item => item.variantId === "variant:advanced-warehouse").specificityPenalty);
 const purchaseAdvanced = best(["document:purchase-order", "document:warehouse-receipt",
   "document:warehouse-put-away", "document:posted-warehouse-receipt"],
 "bc-process:warehouse:inbound-receipt-put-away");

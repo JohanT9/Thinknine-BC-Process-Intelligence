@@ -89,6 +89,16 @@ assert.strictEqual(purchaseOrderOnly.classification.processEvidence.lifecycleDoc
   item.id === "document:warehouse-put-away").applicability, "conditional",
 "Warehouse put-away must not be presented as mandatory before the warehouse variant is known.");
 
+const purchaseHeaderOnly = engine.recognize(synthetic("purchase-header-only", [
+  { identification: page(50, 38, "purchase-order", "PurchaseOrder") },
+  { label: "Release", automationId: "Release", identification: action("ReleaseDocument", "Release") }
+]));
+assert.strictEqual(purchaseHeaderOnly.classification.processEvidence.variantAssessment.selectedVariantId,
+  "variant:no-warehouse",
+  "Generic purchase-order activity must not select an advanced warehouse variant.");
+assert(purchaseHeaderOnly.classification.explanation.some(item =>
+  item.includes("Variant-specific stages were not observed")));
+
 const swedishPurchase = synthetic("swedish-purchase", [
   { label: "Ny - Inköpsorder (UAT)" },
   { label: "Distributionslagerinleverans - DIR100224 (UAT)" }

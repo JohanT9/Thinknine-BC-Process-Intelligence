@@ -83,15 +83,24 @@
     const stageCoverage = Math.min(1, matchedStages.length / Math.max(required, Math.min(3, expected.length)));
     const transitionCoverage = allowedTransitions.length ? Math.min(1,
       matchedTransitions.length / Math.min(3, allowedTransitions.length)) : 0;
-    const confidence = Number(Math.min(1, stageCoverage * 0.45 + transitionCoverage * 0.55).toFixed(3));
+    // A shared opening document (for example Purchase Order) is not evidence that
+    // warehouse handling is configured. Prefer the least-specific compatible
+    // lifecycle until variant-only stages or transitions are actually observed.
+    const unmatchedStageCount = Math.max(0, expected.length - matchedStages.length);
+    const specificityPenalty = matchedTransitions.length ? 0 :
+      Math.min(0.2, unmatchedStageCount * 0.04);
+    const confidence = Number(Math.max(0, Math.min(1,
+      stageCoverage * 0.45 + transitionCoverage * 0.55 - specificityPenalty)).toFixed(3));
     return freeze({ lifecycleId: lifecycle.id, variantId, confidence,
       matchedStageIds: matchedStages.map(item => item.id),
       matchedDocumentIds: matchedStages.map(item => item.documentId).filter(Boolean),
       matchedTransitions: clone(matchedTransitions), partial: matchedStages.length < expected.length,
+      specificityPenalty: Number(specificityPenalty.toFixed(3)),
       explanation: [...matchedStages.map(item => `Matched lifecycle stage ${item.name}`),
         ...matchedTransitions.map(item => `Matched lifecycle transition ${
           lifecycle.stages.find(stage => stage.id === item.fromStageId)?.name} ${item.relationshipType} ${
-          lifecycle.stages.find(stage => stage.id === item.toStageId)?.name}`)] }); }
+          lifecycle.stages.find(stage => stage.id === item.toStageId)?.name}`),
+        specificityPenalty ? "Variant-specific stages were not observed" : null].filter(Boolean) }); }
   function match(input, observedDocumentIds, options = {}) { const catalog = normalize(input);
     const processId = options.bcProcessId || null; const results = [];
     catalog.lifecycles.filter(item => !processId || item.bcProcessIds.includes(processId))
