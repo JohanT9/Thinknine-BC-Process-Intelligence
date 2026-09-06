@@ -131,9 +131,11 @@
   }
   function roleTitle(role, locale) { const id = String(role?.id || role || "");
     const labels = english(locale) ? { purchasing: "Purchasing", warehouse: "Warehouse",
-      sales: "Sales", production: "Production", finance: "Finance", system: "System" } : {
+      sales: "Sales", production: "Production", finance: "Finance", inventory: "Inventory",
+      system: "System" } : {
       purchasing: "Inköp", warehouse: "Lager", sales: "Försäljning",
-      production: "Produktion", finance: "Ekonomi", system: "System" };
+      production: "Produktion", finance: "Ekonomi", inventory: "Lagerstyrning",
+      system: "System" };
     return labels[id] || String(role?.name || id);
   }
   function handoffTitle(handoff, locale) { if (!handoff?.from || !handoff?.to) return "";

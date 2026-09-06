@@ -1,5 +1,11 @@
 # Changelog
 
+## 4.7.0 - Add inventory responsibility to process maps
+
+- Added a distinct Inventory responsibility lane for item journals, item tracking, reclassification, physical inventory, and inventory movements.
+- Added theme-aware inventory colours across Business Central, Neutral, and Monochrome process-map themes.
+- Kept warehouse documents in the Warehouse lane and added localized Inventory/Lagerstyrning lane labels for interactive and exported diagrams.
+
 ## 4.7.0 - Centralize canonical document domain ownership
 
 - Moved Business Central document-to-domain ownership into the Process Taxonomy instead of maintaining separate recognition and reference-matching tables.

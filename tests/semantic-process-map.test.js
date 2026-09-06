@@ -96,6 +96,13 @@ const inheritedPurchaseRoles = semanticMap.inheritProcessRoles([
 ]);
 assert.deepStrictEqual(inheritedPurchaseRoles.map(node => node.metadata.processRole.id),
   ["purchasing", "purchasing", "purchasing"]);
+const roleProjection = semanticMap.project({ recordingId: "roles", analysis: { bestMatch: {
+  referenceProcess: "Operational roles", matchedSteps: [
+    { type: "document", id: "document:item-journal" },
+    { type: "document", id: "document:warehouse-movement" }
+  ], missingSteps: [], additionalSteps: [] } } }, "businessCentral");
+assert.deepStrictEqual(roleProjection.nodes.map(node => node.metadata.processRole.id),
+  ["inventory", "warehouse"]);
 const legacyObservedOnly = semanticMap.project({ recordingId: "legacy", title: "Legacy",
   analysis: legacyAnalysis }, "businessCentral");
 assert.deepStrictEqual(legacyObservedOnly.nodes.map(node => node.title),

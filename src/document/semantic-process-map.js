@@ -21,7 +21,7 @@
   function stepKey(step) { return key(step?.title || step?.name || step?.id); }
   function processRoleFor(value = {}) { const identity = key([value.id, value.title,
     value.name, value.nodeType, ...array(value.taxonomyEntityIds)].filter(Boolean).join(" "));
-    if (/warehouse|receipt|shipment|pick|put away|movement|lager|plock|inleverans|utleverans/.test(identity))
+    if (/warehouse movement|warehouse|receipt|shipment|pick|put away|lagerförflytt|distributionslager|plock|inleverans|utleverans/.test(identity))
       return { id: "warehouse", name: "Warehouse" };
     if (/invoice|payment|ledger|finance|faktur|betal|redovis/.test(identity))
       return { id: "finance", name: "Finance" };
@@ -29,6 +29,8 @@
       return { id: "purchasing", name: "Purchasing" };
     if (/sales|customer|order to cash|försälj|kund/.test(identity))
       return { id: "sales", name: "Sales" };
+    if (/inventory|item journal|item tracking|reclass|physical count|physical inventory|artikeljournal|artikelspår|omklassific|inventering|lagerflytt/.test(identity))
+      return { id: "inventory", name: "Inventory" };
     if (/production|assembly|planning|consume|output|produktion|monter|planer/.test(identity))
       return { id: "production", name: "Production" };
     if (/system/.test(identity)) return { id: "system", name: "System" };

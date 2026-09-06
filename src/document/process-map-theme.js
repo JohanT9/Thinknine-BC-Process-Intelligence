@@ -17,6 +17,7 @@
       rolePalette: Object.freeze({ purchasing: ["#eef5ff", "#2563a6"],
         warehouse: ["#fff7ed", "#c26716"], sales: ["#ecfdf8", "#078375"],
         production: ["#f5f1ff", "#7256b2"], finance: ["#eef9f0", "#347447"],
+        inventory: ["#f0f9ff", "#0369a1"],
         system: ["#f3f4f6", "#64717d"], default: ["#f4f8fb", "#31566f"] }) }),
     neutral: Object.freeze({ id: "neutral", labels: Object.freeze({ sv: "Neutral", en: "Neutral" }),
       palette: Object.freeze({ background: "#fafafa", actionFill: "#eef1f3",
@@ -28,6 +29,7 @@
       rolePalette: Object.freeze({ purchasing: ["#f1f4f6", "#596b78"],
         warehouse: ["#f7f4ef", "#746657"], sales: ["#eff5f3", "#526f68"],
         production: ["#f4f2f6", "#6b6173"], finance: ["#f1f5f1", "#5d705f"],
+        inventory: ["#f0f4f6", "#536f7d"],
         system: ["#f3f4f5", "#69747d"], default: ["#f5f6f7", "#52606d"] }) }),
     monochrome: Object.freeze({ id: "monochrome",
       labels: Object.freeze({ sv: "Monokrom", en: "Monochrome" }),
@@ -40,6 +42,7 @@
       rolePalette: Object.freeze({ purchasing: ["#f2f2f2", "#111111"],
         warehouse: ["#e8e8e8", "#222222"], sales: ["#f7f7f7", "#111111"],
         production: ["#ededed", "#333333"], finance: ["#f4f4f4", "#222222"],
+        inventory: ["#eeeeee", "#2b2b2b"],
         system: ["#e5e5e5", "#444444"], default: ["#ededed", "#111111"] }) })
   });
   function normalize(value) { return Object.hasOwn(THEMES, value) ? value : DEFAULT_THEME_ID; }

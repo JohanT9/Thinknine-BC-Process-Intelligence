@@ -15,6 +15,8 @@ assert(Object.isFrozen(theme.resolve("business-central").palette));
 assert(Object.isFrozen(theme.resolve("business-central").rolePalette));
 assert.deepStrictEqual(theme.resolve("business-central").rolePalette.purchasing,
   ["#eef5ff", "#2563a6"]);
+assert.deepStrictEqual(theme.resolve("business-central").rolePalette.inventory,
+  ["#f0f9ff", "#0369a1"]);
 assert.strictEqual(labels.nodeTitle({ title: "document:purchase-order" }, "sv-SE"),
   "Inköpsorder");
 assert.strictEqual(labels.nodeTitle({ title: "document:purchase-order" }, "en-US"),
@@ -49,4 +51,5 @@ assert.strictEqual(labels.nodeTitle({ title: "Post Inventory Differences" }, "sv
   "Bokför inventeringsdifferenser");
 assert.strictEqual(labels.handoffTitle({ from: { id: "purchasing" },
   to: { id: "warehouse" } }, "sv-SE"), "Inköp → Lager");
+assert.strictEqual(labels.roleTitle({ id: "inventory" }, "sv-SE"), "Lagerstyrning");
 console.log("Process map theme tests passed.");
