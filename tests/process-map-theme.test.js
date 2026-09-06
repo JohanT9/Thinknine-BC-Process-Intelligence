@@ -23,7 +23,11 @@ assert.strictEqual(labels.nodeTitle({ title: "document:purchase-order" }, "en-US
   "document:sales-quote", "document:posted-sales-shipment",
   "document:posted-purchase-receipt", "document:transfer-shipment",
   "document:production-journal", "document:assembly-order",
-  "document:planning-worksheet"
+  "document:planning-worksheet", "document:sales-return-order",
+  "document:purchase-return-order", "document:inventory-movement",
+  "document:warehouse-movement", "document:item-tracking-lines",
+  "document:general-journal", "document:item-journal",
+  "document:item-reclassification-journal", "document:physical-inventory-journal"
 ].forEach(id => {
   assert(!labels.nodeTitle({ title: id }, "sv-SE").startsWith("document:"),
     `${id} must have a Swedish display label`);
@@ -39,6 +43,10 @@ assert.strictEqual(labels.nodeTitle({ title: "Purchase to Pay" }, "sv-SE"),
   "Inköp till betalning");
 assert.strictEqual(labels.nodeTitle({ title: "Warehouse Outbound" }, "sv-SE"),
   "Utleverans från lager");
+assert.strictEqual(labels.nodeTitle({ title: "General Journal Posting" }, "sv-SE"),
+  "Bokföring av redovisningsjournal");
+assert.strictEqual(labels.nodeTitle({ title: "Post Inventory Differences" }, "sv-SE"),
+  "Bokför inventeringsdifferenser");
 assert.strictEqual(labels.handoffTitle({ from: { id: "purchasing" },
   to: { id: "warehouse" } }, "sv-SE"), "Inköp → Lager");
 console.log("Process map theme tests passed.");

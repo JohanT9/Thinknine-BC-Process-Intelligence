@@ -1,5 +1,11 @@
 # Changelog
 
+## 4.7.0 - Localize expanded process-map taxonomy
+
+- Added Swedish process-map labels for returns, inventory and warehouse movements, item tracking, financial journals, and inventory journals.
+- Added localized step labels so interactive maps and SVG exports do not mix English actions into Swedish diagrams.
+- Kept canonical taxonomy IDs and English exports unchanged.
+
 ## 4.7.0 - Recognize financial and inventory journals
 
 - Added canonical page identities and process classifications for General Journals, Item Journals, Item Reclassification Journals, and Physical Inventory Journals.
