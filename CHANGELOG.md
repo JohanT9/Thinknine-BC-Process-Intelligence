@@ -1,5 +1,11 @@
 # Changelog
 
+## 4.7.0 - Context-aware Business Central actions
+
+- Added deterministic action qualifiers for shipment, receipt, invoice, pick, put-away, assembly, consumption, output, and transfer operations.
+- Prevented a specific action such as `Post Shipment` from matching an unrelated generic posting step such as purchase receipt or invoicing.
+- Preserved generic-action fallback where Business Central does not provide a more specific action identity.
+
 ## 4.7.0 - Complete process-map terminology
 
 - Added Swedish and English display names for every seeded Business Central document used in process maps.

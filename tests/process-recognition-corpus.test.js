@@ -65,6 +65,9 @@ const partialPurchase = engine.recognize(recording("partial-purchase", [
 ]));
 assert.strictEqual(partialPurchase.classification.taxonomyReferences.domain.id,
   "domain:source-to-pay", "a generic shipment verb must not override purchase metadata");
+assert(!partialPurchase.classification.processEvidence.matchedActions.some(item =>
+  item.name === "Post"),
+"Post Shipment must not count as a purchase receipt or purchase invoice posting action");
 assert.notStrictEqual(partialPurchase.assessment.status, "auto-classifiable",
   "an incomplete process must not be presented as automatically recognized");
 assert(!partialPurchase.alternatives.some(candidate =>

@@ -34,6 +34,14 @@
     ["Output", /\b(output|utflöde)\b/i], ["Transfer", /\btransfer|överför\b/i],
     ["Post", /\b(post|posting|bokför)\b/i], ["Create", /\b(create|new|ny|skapa)\b/i]
   ];
+  const ACTION_QUALIFIERS = [
+    ["shipment", /ship|shipment|utleverans|leverans/i],
+    ["receipt", /receipt|receive|inleverans|mottag/i],
+    ["invoice", /invoice|faktur/i], ["pick", /pick|plock/i],
+    ["put-away", /put.?away|inlagr/i], ["assembly", /assembl|monter/i],
+    ["consumption", /consum|förbruk/i], ["output", /output|utflöde/i],
+    ["transfer", /transfer|överför/i]
+  ];
   const DOCUMENT_DOMAIN_ANCHORS = Object.freeze({
     "document:purchase-order": "domain:source-to-pay",
     "document:purchase-invoice": "domain:source-to-pay",
@@ -110,18 +118,31 @@
     const technical = words([identified.actionType, raw.actionType, raw.automationId,
       raw.dataControlId, raw.dataControlName].join(" "));
     const captions = words(eventActionTexts(event).join(" "));
+    const qualifiers = ACTION_QUALIFIERS.filter(([, expression]) =>
+      expression.test(`${technical} ${captions}`)).map(([name]) => name);
     const results = [];
     ACTIONS.forEach(([name, expression]) => {
       const technicalCompact = technical.replace(/\s+/g, "");
       if (technical && (technicalCompact.includes(name.toLowerCase()) ||
-        expression.test(technical))) results.push({ name, strength: 1,
+        expression.test(technical))) results.push({ name, strength: 1, qualifiers,
         signal: "technical-action", explanation: `Detected ${name} from BC action metadata` });
       else if (name === "Register" && expression.test(captions) &&
         !/pick|put.?away|plock|inlagr/i.test(captions)) return;
-      else if (expression.test(captions)) results.push({ name, strength: 0.38,
+      else if (expression.test(captions)) results.push({ name, strength: 0.38, qualifiers,
         signal: "action-caption", explanation: `Action caption suggests ${name}` });
     });
     return results;
+  }
+
+  function actionCompatible(expected, observed) {
+    const actionMatchesName = words(expected.name).includes(words(observed.name)) ||
+      words(expected.actionType).includes(words(observed.name));
+    if (!actionMatchesName) return false;
+    const expectedText = `${words(expected.name)} ${words(expected.actionType)}`;
+    const expectedQualifiers = ACTION_QUALIFIERS.filter(([, expression]) =>
+      expression.test(expectedText)).map(([name]) => name);
+    return !observed.qualifiers?.length || !expectedQualifiers.length ||
+      observed.qualifiers.some(item => expectedQualifiers.includes(item));
   }
 
   function extractEvidence(recording, taxonomy = seed, options = {}) {
@@ -216,8 +237,7 @@
     const observedActions = evidence.observations.flatMap(item => item.actions.map(action => ({
       ...action, eventId: item.eventId })));
     const matchingActions = observedActions.filter(observed => expectedActions.some(expected =>
-      words(expected.name).includes(words(observed.name)) ||
-      words(expected.actionType).includes(words(observed.name))));
+      actionCompatible(expected, observed)));
     const actionHits = [...matchingActions.reduce((hits, observed) => {
       const current = hits.get(observed.name);
       if (!current || observed.strength > current.strength) hits.set(observed.name, observed);
