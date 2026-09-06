@@ -128,6 +128,20 @@ const reorderedMatch = model.create(seed).findSimilarProcessGraphs(reorderedPurc
   .find(item => item.diagram.id === simplePurchaseDiagram.id);
 assert(reorderedMatch.confidence < 1,
   "The same semantic nodes in a different route must not be treated as an exact process match.");
+const partialPurchaseGraph = JSON.parse(JSON.stringify(simplePurchaseDiagram.processGraph));
+const receiveNode = partialPurchaseGraph.nodes.find(node =>
+  node.taxonomyEntityIds?.includes("concept:receive"));
+partialPurchaseGraph.nodes = partialPurchaseGraph.nodes.filter(node => node.nodeId !== receiveNode.nodeId);
+partialPurchaseGraph.relationships = partialPurchaseGraph.relationships.filter(edge =>
+  edge.fromNodeId !== receiveNode.nodeId && edge.toNodeId !== receiveNode.nodeId);
+const partialGraphMatch = model.create(seed).findSimilarProcessGraphs(partialPurchaseGraph, 10)
+  .find(item => item.diagram.id === simplePurchaseDiagram.id);
+assert.strictEqual(partialGraphMatch.matchDetails.observedPrecision, 1,
+  "Every observed signal in a valid process prefix should remain explainable.");
+assert(partialGraphMatch.matchDetails.referenceCoverage < 1,
+  "A partial recording must not claim complete reference coverage.");
+assert(partialGraphMatch.confidence > partialGraphMatch.matchDetails.referenceCoverage,
+  "A precise partial recording should score higher than its completeness alone.");
 const recordingMatch = model.matchRecordingToReferences({ schemaVersion: 1, id: "synthetic",
   events: [] }, seed, { graphProjector: { generate() { return advanced.processGraph; } } });
 assert.strictEqual(recordingMatch.bestMatch.referenceProcess, "Advanced Warehouse Outbound");

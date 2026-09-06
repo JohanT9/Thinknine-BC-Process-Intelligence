@@ -1,5 +1,11 @@
 # Changelog
 
+## 4.7.0 - Partial process confidence calibration
+
+- Split graph matching into observed precision and reference-process coverage.
+- A correct partial recording can now be recognized strongly without being presented as a complete process.
+- Exposed both measures as structured match details for process-analysis UX and diagnostics.
+
 ## 4.7.0 - Topology-aware process matching
 
 - Process similarity now includes semantic edge endpoints, relationship types, and route direction.

@@ -230,9 +230,16 @@
     const edges = semanticEdgeTokens(value).sort(); return JSON.stringify({ nodes, edges }); }
   function semanticTokens(value) { return new Set([...value.nodes.flatMap(node =>
     nodeIdentityKeys(node)), ...semanticEdgeTokens(value)]); }
-  function similarity(left, right) { const a = semanticTokens(left); const b = semanticTokens(right);
+  function similarityDetails(left, right) { const a = semanticTokens(left); const b = semanticTokens(right);
     const intersection = [...a].filter(item => b.has(item)).length; const union = new Set([...a, ...b]).size;
-    return union ? intersection / union : 1; }
+    const precision = a.size ? intersection / a.size : b.size ? 0 : 1;
+    const coverage = b.size ? intersection / b.size : a.size ? 0 : 1;
+    const confidence = union ? precision * 0.65 + coverage * 0.35 : 1;
+    return freeze({ confidence: Number(confidence.toFixed(3)),
+      observedPrecision: Number(precision.toFixed(3)),
+      referenceCoverage: Number(coverage.toFixed(3)), matchedSignals: intersection,
+      observedSignals: a.size, referenceSignals: b.size }); }
+  function similarity(left, right) { return similarityDetails(left, right).confidence; }
   function compareGraphs(observedGraph, referenceGraph) { const observed = observedGraph.nodes
     .filter(node => !["start", "end"].includes(node.nodeType)); const expected = referenceGraph.nodes
     .filter(node => !["start", "end"].includes(node.nodeType)); const observedKeys = new Set(
@@ -285,9 +292,10 @@
           !["start", "end"].includes(node.nodeType)).sort((a, b) => a.sequence - b.sequence)
           .map(node => node.title).join("|").toLocaleLowerCase() })).filter(item => item.value.includes(wanted))
           .map(item => item.item); },
-      findSimilarProcessGraphs(processGraph, limit = 5) { return dataset.diagrams.map(item => ({
-        diagram: item, confidence: Number(similarity(processGraph, item.processGraph).toFixed(3)),
-        comparison: compareGraphs(processGraph, item.processGraph) }))
+      findSimilarProcessGraphs(processGraph, limit = 5) { return dataset.diagrams.map(item => { const details =
+        similarityDetails(processGraph, item.processGraph); return { diagram: item,
+        confidence: details.confidence, matchDetails: details,
+        comparison: compareGraphs(processGraph, item.processGraph) }; })
         .sort((a, b) => b.confidence - a.confidence).slice(0, limit); },
       detectDuplicates(id = null) { return detectDuplicates(dataset, id); },
       export(options = {}) { return exportDataset(dataset, options); } }); }
@@ -308,6 +316,7 @@
     const matches = eligibleGraphMatches.map(item => freeze({ referenceDiagramId: item.diagram.id,
       referenceProcess: item.diagram.bcProcess || item.diagram.name, confidence: item.confidence,
       domain: item.diagram.domain, businessProcess: item.diagram.businessProcess,
+      matchDetails: clone(item.matchDetails),
       matchedNodes: item.comparison.matchedSteps.length,
       missingNodes: item.comparison.missingSteps.length,
       unexpectedNodes: item.comparison.additionalSteps.length, ...clone(item.comparison) }))
