@@ -32,6 +32,9 @@ assert.strictEqual(labels.nodeTitle({ title: "document:purchase-order" }, "en-US
 });
 assert.strictEqual(labels.nodeTitle({ title: "Ship" }, "sv-SE"), "Leverera");
 assert.strictEqual(labels.nodeTitle({ title: "Register" }, "sv-SE"), "Registrera");
+assert.strictEqual(labels.nodeTitle({ title: "Purchase Order" }, "sv-SE"), "Inköpsorder");
+assert.strictEqual(labels.nodeTitle({ title: "Posted Transfer Shipment" }, "sv-SE"),
+  "Bokförd överföringsutleverans");
 assert.strictEqual(labels.handoffTitle({ from: { id: "purchasing" },
   to: { id: "warehouse" } }, "sv-SE"), "Inköp → Lager");
 console.log("Process map theme tests passed.");

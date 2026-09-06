@@ -214,6 +214,13 @@ assert(localizedTaxonomySvg.includes("Inköpsorder"));
 assert(localizedTaxonomySvg.includes("Ta emot"));
 assert(localizedTaxonomySvg.includes("Bokförd inköpsinleverans"));
 assert(!localizedTaxonomySvg.includes("document:purchase-order"));
+const localizedCanonicalSvg = svgExporter.svg({ recordingId: "localized-canonical",
+  nodes: [{ nodeId: "purchase", nodeType: "document", title: "Purchase Order", sequence: 0 },
+    { nodeId: "release", nodeType: "action", title: "Release", sequence: 1 }],
+  transitions: [], subprocesses: [] }, { language: "sv-SE" });
+assert(localizedCanonicalSvg.includes("Inköpsorder"));
+assert(localizedCanonicalSvg.includes("Frisläpp"));
+assert(!localizedCanonicalSvg.includes(">Purchase Order<"));
 
 const broken = { ...model, startNodeIds: ["missing"] };
 assert.throws(() => exporter.create(broken), error =>

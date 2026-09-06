@@ -1,5 +1,11 @@
 # Changelog
 
+## 4.7.0 - Localize canonical process-map names
+
+- Swedish process maps now translate canonical Business Central document names as well as taxonomy IDs.
+- Recognition-generated legacy maps therefore display `Inköpsorder → Frisläpp` instead of mixed English and Swedish terminology.
+- Applied the same localization path to interactive maps and SVG diagram exports.
+
 ## 4.7.0 - Build semantic maps from observed legacy evidence
 
 - Multi-level process graphs now fall back to strong observed Business Central metadata when explicit semantic classifications are absent.

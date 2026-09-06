@@ -59,9 +59,13 @@
     "Pick": "Plocka", "Register": "Registrera", "Consume": "Förbruka",
     "Output": "Utflöde", "Transfer": "Överför", "Unknown step": "Okänt steg"
   });
+  const EN_DOCUMENT_IDS_BY_TITLE = Object.freeze(Object.fromEntries(
+    Object.entries(EN_NODE_TITLES).map(([id, title]) => [title, id])));
   function english(locale) { return String(locale || "").toLowerCase().startsWith("en"); }
   function nodeTitle(node, locale) { const title = String(node?.title || "");
-    return english(locale) ? (EN_NODE_TITLES[title] || title) : (SV_NODE_TITLES[title] || title); }
+    if (english(locale)) return EN_NODE_TITLES[title] || title;
+    const taxonomyId = EN_DOCUMENT_IDS_BY_TITLE[title];
+    return SV_NODE_TITLES[title] || SV_NODE_TITLES[taxonomyId] || title; }
   function statusTitle(status, locale) { const labels = english(locale) ? {
     observed: "Observed", suggested: "Reference suggestion", conditional: "Conditional",
     customerSpecific: "Customer-specific", reference: "Reference"
@@ -78,5 +82,6 @@
   }
   function handoffTitle(handoff, locale) { if (!handoff?.from || !handoff?.to) return "";
     return `${roleTitle(handoff.from, locale)} → ${roleTitle(handoff.to, locale)}`; }
-  return { EN_NODE_TITLES, SV_NODE_TITLES, handoffTitle, nodeTitle, roleTitle, statusTitle };
+  return { EN_DOCUMENT_IDS_BY_TITLE, EN_NODE_TITLES, SV_NODE_TITLES,
+    handoffTitle, nodeTitle, roleTitle, statusTitle };
 });
