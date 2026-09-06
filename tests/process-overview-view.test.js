@@ -77,6 +77,15 @@ assert(responsibilityContainer.innerHTML.includes(
   'style="background:#eef5ff;border-left-color:#2563a6"'));
 assert(responsibilityContainer.innerHTML.includes("Inköpsorder"));
 assert(!responsibilityContainer.innerHTML.includes("document:purchase-order"));
+const localizedCanonicalContainer = { innerHTML: "" };
+view.render(localizedCanonicalContainer, { recordingId: "localized", nodes: [{
+  nodeId: "purchase-canonical", nodeType: "document", title: "Purchase Order", sequence: 0,
+  metadata: { taskId: "purchase-task" }
+}], transitions: [], subprocesses: [], stateTransitions: [] }, { locale: "sv-SE",
+  selectedTaskIds: ["purchase-task"] });
+assert(localizedCanonicalContainer.innerHTML.includes("Inköpsorder"));
+assert(!localizedCanonicalContainer.innerHTML.includes("Purchase Order"),
+  "node card, minimap, and selected-node detail must use the same localized title");
 
 const decisionId = processModel.stableId("manual-process-node", ["branching", "stock"]);
 const shipId = processModel.stableId("process-node",

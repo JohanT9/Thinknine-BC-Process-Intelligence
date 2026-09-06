@@ -173,7 +173,8 @@
       <div><span class="process-overview-detail-label">${detail.node.nodeType === "decision"
         ? (english ? "Selected decision" : "Valt beslut")
         : (english ? "Selected activity" : "Vald aktivitet")}</span>
-      <strong>${escape(plain(detail.node.title))}</strong></div>
+      <strong>${escape(plain(processMapLabels.nodeTitle(detail.node,
+        english ? "en-US" : "sv-SE")))}</strong></div>
       ${context ? `<div class="process-overview-detail-context">${context}</div>` : ""}
       ${routes ? `<div><span class="process-overview-detail-label">${english ? "Routes" : "Vägar"}</span>${routes}</div>` : ""}
       ${changes ? `<div><span class="process-overview-detail-label">${english ? "Observed changes" : "Observerade förändringar"}</span>
@@ -200,7 +201,8 @@
     const selectedNodes = details.filter(detail => selectedTaskIds.has(detail.taskId))
       .map(detail => detail.node.nodeId);
     const map = processMapMinimap.create(layout, details.map(detail => ({
-      nodeId: detail.node.nodeId, title: plain(detail.node.title)
+      nodeId: detail.node.nodeId, title: plain(processMapLabels.nodeTitle(detail.node,
+        english ? "en-US" : "sv-SE"))
     })), selectedNodes);
     return `<nav class="process-map-minimap" aria-label="${english
       ? "Process map overview" : "Översikt över processkartan"}">

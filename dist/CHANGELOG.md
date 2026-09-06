@@ -1,5 +1,11 @@
 # Changelog
 
+## 4.7.0 - Consistent process-map labels
+
+- Applied the shared localized node title to process cards, the minimap, and the selected-node detail panel.
+- Removed mixed-language titles when navigating recognition-generated Business Central maps.
+- Kept accessible minimap labels consistent with the visible process diagram.
+
 ## 4.7.0 - Localize canonical process-map names
 
 - Swedish process maps now translate canonical Business Central document names as well as taxonomy IDs.
