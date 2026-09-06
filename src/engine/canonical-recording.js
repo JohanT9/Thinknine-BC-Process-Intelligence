@@ -163,7 +163,10 @@
   function normalize(input, legacy = {}) {
     if (!input || input.schemaVersion == null) return (!legacy.session && !input) ? null : fromLegacy(legacy.session || input, legacy.events, legacy.screenshots);
     if (Number(input.schemaVersion) !== SCHEMA_VERSION) throw new Error(`Unsupported recording schema: ${input.schemaVersion}`);
-    const result = clone(input); result.events = Array.isArray(result.events) ? result.events : []; result.assets = Array.isArray(result.assets) ? result.assets : []; result.metadata ||= {}; result.metadata.recordingPurpose = normalizeRecordingPurpose(result.metadata.recordingPurpose); result.metadata.taxonomyReferences = taxonomySchema.normalizeRecordingReferences(result.metadata.taxonomyReferences); result.semanticInterpretation = semanticModel.normalize(result.semanticInterpretation); return result;
+    const result = clone(input); result.events = Array.isArray(result.events) ? result.events : [];
+    result.events = result.events.map(event => event?.identification || !event?.raw?.identification
+      ? event : { ...event, identification: clone(event.raw.identification) });
+    result.assets = Array.isArray(result.assets) ? result.assets : []; result.metadata ||= {}; result.metadata.recordingPurpose = normalizeRecordingPurpose(result.metadata.recordingPurpose); result.metadata.taxonomyReferences = taxonomySchema.normalizeRecordingReferences(result.metadata.taxonomyReferences); result.semanticInterpretation = semanticModel.normalize(result.semanticInterpretation); return result;
   }
   function addEvent(recording, source, identification = null) {
     if (!source || typeof source !== "object" || Array.isArray(source) || !source.type) throw new TypeError("A raw event with a type is required.");

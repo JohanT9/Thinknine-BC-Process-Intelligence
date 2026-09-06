@@ -1,5 +1,11 @@
 # Changelog
 
+## 4.7.0 - Repair previously canonicalized legacy evidence
+
+- Added a non-mutating read migration for schema-v1 recordings created before legacy identity restoration was fixed.
+- Recovers missing canonical identification from the preserved immutable raw event when documents are reopened.
+- Existing saved documents therefore receive improved process recognition without requiring a new recording.
+
 ## 4.7.0 - Restore semantic evidence from legacy recordings
 
 - Fixed legacy recording migration so captured Business Central page, table, document, and action identity remains active canonical evidence.

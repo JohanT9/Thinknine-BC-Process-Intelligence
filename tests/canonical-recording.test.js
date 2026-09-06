@@ -110,6 +110,13 @@ assert.strictEqual(legacyIdentified.events[0].identification.pageIdentity.pageOb
   "legacy recordings must restore captured page identity into canonical evidence");
 assert.strictEqual(legacyIdentified.events[0].identification.actionIdentity.actionType,
   "ReleaseDocument", "legacy recordings must restore captured action identity");
+const previouslyCanonicalized = JSON.parse(JSON.stringify(legacyIdentified));
+delete previouslyCanonicalized.events[0].identification;
+const repairedCanonical = recording.normalize(previouslyCanonicalized);
+assert.strictEqual(repairedCanonical.events[0].identification.pageIdentity.pageObjectId, "50",
+  "stored schema-v1 recordings must recover identity retained in their immutable raw event");
+assert.strictEqual(previouslyCanonicalized.events[0].identification, undefined,
+  "read migration must not mutate stored input");
 assert.deepStrictEqual(JSON.parse(JSON.stringify(withAsset)), withAsset,
   "Canonical Recording remains service-worker serializable.");
 console.log("Canonical recording tests passed.");

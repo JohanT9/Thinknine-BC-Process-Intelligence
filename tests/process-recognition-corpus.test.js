@@ -87,6 +87,12 @@ assert.strictEqual(migratedLegacyResult.classification.taxonomyReferences.domain
 "legacy exports must feed their stored Business Central identity into process recognition");
 assert(migratedLegacyResult.classification.processEvidence.matchedActions.some(item =>
   item.name === "Release"));
+const storedBeforeLegacyFix = JSON.parse(JSON.stringify(migratedLegacyPurchase));
+storedBeforeLegacyFix.events.forEach(event => { delete event.identification; });
+const repairedStoredResult = engine.recognize(canonical.normalize(storedBeforeLegacyFix));
+assert.strictEqual(repairedStoredResult.classification.taxonomyReferences.domain.id,
+  "domain:source-to-pay",
+"already stored canonical recordings must recover legacy identity during normalization");
 assert.notStrictEqual(partialPurchase.assessment.status, "auto-classifiable",
   "an incomplete process must not be presented as automatically recognized");
 assert(!partialPurchase.alternatives.some(candidate =>
