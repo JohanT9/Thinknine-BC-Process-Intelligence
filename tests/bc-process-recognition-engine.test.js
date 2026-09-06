@@ -84,6 +84,8 @@ const standardPageViews = [
   [9300, "document:sales-quote", "list"],
   [9305, "document:sales-order", "list"],
   [7339, "document:warehouse-shipment", "list"],
+  [5779, "document:warehouse-pick", "document"],
+  [9313, "document:warehouse-pick", "list"],
   [142, "document:posted-sales-shipment", "posted-list"],
   [9301, "document:sales-invoice", "list"],
   [143, "document:posted-sales-invoice", "posted-list"],
@@ -96,7 +98,12 @@ const standardPageViews = [
   [5753, "document:transfer-receipt", "posted-list"],
   [9326, "document:production-order", "list"],
   [9327, "document:finished-production-order", "posted-list"],
-  [902, "document:assembly-order", "list"]
+  [902, "document:assembly-order", "list"],
+  [9304, "document:sales-return-order", "list"],
+  [9311, "document:purchase-return-order", "list"],
+  [9330, "document:inventory-movement", "list"],
+  [9314, "document:warehouse-movement", "list"],
+  [6510, "document:item-tracking-lines", "worksheet"]
 ];
 standardPageViews.forEach(([pageObjectId, documentId, viewType]) => {
   const evidence = engine.extractEvidence(synthetic(`page-view-${pageObjectId}`, [
@@ -105,6 +112,24 @@ standardPageViews.forEach(([pageObjectId, documentId, viewType]) => {
   assert.strictEqual(evidence.observations[0].document.id, documentId,
     `BC page ${pageObjectId} should resolve to ${documentId}`);
   assert.strictEqual(evidence.observations[0].document.view.viewType, viewType);
+});
+
+[
+  ["sales-return-list", 9304, "SalesReturns", "domain:returns"],
+  ["purchase-return-list", 9311, "PurchaseReturns", "domain:returns"],
+  ["inventory-movement-list", 9330, "InventoryMovement", "domain:inventory-to-deliver"],
+  ["warehouse-movement-list", 9314, "WarehouseMovement", "domain:warehouse-management"],
+  ["item-tracking-lines", 6510, "ItemTracking", "domain:item-tracking"]
+].forEach(([id, pageObjectId, process, domainId]) => {
+  const result = engine.recognize(synthetic(id, [
+    { identification: page(pageObjectId, "", "", "") }
+  ]));
+  assert.strictEqual(result.classification.process, process);
+  assert.strictEqual(result.classification.taxonomyReferences.domain.id, domainId);
+  assert(engine.extractEvidence(synthetic(`${id}-evidence`, [
+    { identification: page(pageObjectId, "", "", "") }
+  ])).observations[0].explanations.some(item => item.includes(String(pageObjectId))),
+    `recognition for page ${pageObjectId} should explain its page evidence`);
 });
 
 const purchaseOrderOnly = engine.recognize(synthetic("purchase-order-only", [

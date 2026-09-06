@@ -31,6 +31,9 @@ const requiredDomains = ["Order to Cash", "Source to Pay", "Forecast to Plan",
   "Warehouse Management"];
 assert.deepStrictEqual(requiredDomains.filter(name =>
   !taxonomy.exactName(name, "ProcessDomain").length), []);
+assert.strictEqual(taxonomy.exactName("Sales Returns", "BusinessProcess").length, 1);
+assert.strictEqual(taxonomy.exactName("Inventory Movement", "BusinessProcess").length, 1);
+assert.strictEqual(taxonomy.exactName("Item Tracking", "BusinessProcess").length, 1);
 
 const actionId = "action:order-to-cash:standard-sales-order:select-customer";
 const hierarchy = taxonomy.hierarchy(actionId);

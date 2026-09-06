@@ -28,7 +28,12 @@
     "document:transfer-order": ["Överföringsorder"],
     "document:production-order": ["Produktionsorder"],
     "document:assembly-order": ["Monteringsorder"],
-    "document:planning-worksheet": ["Planeringsförslag"]
+    "document:planning-worksheet": ["Planeringsförslag"],
+    "document:sales-return-order": ["Försäljningsreturorder"],
+    "document:purchase-return-order": ["Inköpsreturorder"],
+    "document:inventory-movement": ["Lagerflyttning", "Inventeringsflyttning"],
+    "document:warehouse-movement": ["Distributionslagerflyttning"],
+    "document:item-tracking-lines": ["Artikelspårningsrader"]
   };
   const view = (pageObjectId, viewType, name) => ({
     pageObjectId: String(pageObjectId), viewType, name
@@ -37,7 +42,7 @@
     ["document:sales-quote", "Sales Quote", "quote", [view(41, "document", "Sales Quote"), view(9300, "list", "Sales Quotes")], ["36", "37"]],
     ["document:sales-order", "Sales Order", "order", [view(42, "document", "Sales Order"), view(9305, "list", "Sales Order List")], ["36", "37"]],
     ["document:warehouse-shipment", "Warehouse Shipment", "warehouse-document", [view(7335, "document", "Warehouse Shipment"), view(7339, "list", "Warehouse Shipment List")], ["7320", "7321"]],
-    ["document:warehouse-pick", "Warehouse Pick", "warehouse-activity", [view(7345, "worksheet", "Pick Worksheet")], ["5766", "5767"]],
+    ["document:warehouse-pick", "Warehouse Pick", "warehouse-activity", [view(5779, "document", "Warehouse Pick"), view(9313, "list", "Warehouse Picks"), view(7345, "worksheet", "Pick Worksheet")], ["5766", "5767"]],
     ["document:posted-sales-shipment", "Posted Sales Shipment", "posted-document", [view(130, "posted-card", "Posted Sales Shipment"), view(142, "posted-list", "Posted Sales Shipments")], ["110", "111"]],
     ["document:sales-invoice", "Sales Invoice", "invoice", [view(43, "document", "Sales Invoice"), view(9301, "list", "Sales Invoice List")], ["36", "37"]],
     ["document:posted-sales-invoice", "Posted Sales Invoice", "posted-document", [view(132, "posted-card", "Posted Sales Invoice"), view(143, "posted-list", "Posted Sales Invoices")], ["112", "113"]],
@@ -57,7 +62,12 @@
     ["document:finished-production-order", "Finished Production Order", "posted-document", [view(9327, "posted-list", "Finished Production Orders")], ["5405", "5406", "5407"]],
     ["document:production-journal", "Production Journal", "journal", [view(99000832, "journal", "Production Journal")], ["83"]],
     ["document:assembly-order", "Assembly Order", "assembly-order", [view(900, "document", "Assembly Order"), view(902, "list", "Assembly Orders")], ["900", "901"]],
-    ["document:planning-worksheet", "Planning Worksheet", "worksheet", [view(99000852, "worksheet", "Planning Worksheet")], ["246"]]
+    ["document:planning-worksheet", "Planning Worksheet", "worksheet", [view(99000852, "worksheet", "Planning Worksheet")], ["246"]],
+    ["document:sales-return-order", "Sales Return Order", "return-order", [view(6630, "document", "Sales Return Order"), view(9304, "list", "Sales Return Order List")], ["36", "37"]],
+    ["document:purchase-return-order", "Purchase Return Order", "return-order", [view(6640, "document", "Purchase Return Order"), view(9311, "list", "Purchase Return Order List")], ["38", "39"]],
+    ["document:inventory-movement", "Inventory Movement", "warehouse-activity", [view(7382, "document", "Inventory Movement"), view(9330, "list", "Inventory Movements")], ["5766", "5767"]],
+    ["document:warehouse-movement", "Warehouse Movement", "warehouse-activity", [view(7315, "document", "Warehouse Movement"), view(9314, "list", "Warehouse Movements")], ["5766", "5767"]],
+    ["document:item-tracking-lines", "Item Tracking Lines", "worksheet", [view(6510, "worksheet", "Item Tracking Lines")], []]
   ].map(([id, name, documentType, pageViews, tableIds]) => ({
     id, name, documentType, pageViews,
     pageIds: pageViews.map(item => item.pageObjectId), tableIds,
@@ -146,6 +156,48 @@
         ["calculate-plan", "Calculate Regenerative Plan", [["calculate-regenerative-plan", "Calculate Regenerative Plan", "invoke"], ["enter-planning-horizon", "Enter Planning Horizon", "enter"]]],
         ["review-action-messages", "Review Action Messages", [["review-action-message", "Review Action Message", "review"]]],
         ["carry-out-action-message", "Carry Out Action Message", [["carry-out-action-message", "Carry Out Action Message", "invoke"]]]
+      ] },
+    { domainId: "domain:returns", businessId: "business-process:sales-returns",
+      businessName: "Sales Returns", processId: "bc-process:returns:sales-return-order",
+      processName: "Sales Return Order → Receive Return → Post Credit",
+      documentIds: ["document:sales-return-order"],
+      steps: [
+        ["create-sales-return", "Create Sales Return Order", [["open-sales-returns", "Open Sales Return Orders", "open"], ["enter-return-lines", "Enter Return Lines", "enter"]]],
+        ["receive-sales-return", "Receive Sales Return", [["receive-return", "Receive Return", "invoke"]]],
+        ["post-sales-return", "Post Sales Return", [["post-sales-return", "Post Sales Return", "post"]]]
+      ] },
+    { domainId: "domain:returns", businessId: "business-process:purchase-returns",
+      businessName: "Purchase Returns", processId: "bc-process:returns:purchase-return-order",
+      processName: "Purchase Return Order → Ship Return → Post Credit",
+      documentIds: ["document:purchase-return-order"],
+      steps: [
+        ["create-purchase-return", "Create Purchase Return Order", [["open-purchase-returns", "Open Purchase Return Orders", "open"], ["enter-return-lines", "Enter Return Lines", "enter"]]],
+        ["ship-purchase-return", "Ship Purchase Return", [["ship-return", "Ship Return", "invoke"]]],
+        ["post-purchase-return", "Post Purchase Return", [["post-purchase-return", "Post Purchase Return", "post"]]]
+      ] },
+    { domainId: "domain:inventory-to-deliver", businessId: "business-process:inventory-movement",
+      businessName: "Inventory Movement", processId: "bc-process:inventory:inventory-movement",
+      processName: "Inventory Movement → Register Movement",
+      documentIds: ["document:inventory-movement"],
+      steps: [
+        ["create-inventory-movement", "Create Inventory Movement", [["open-inventory-movements", "Open Inventory Movements", "open"], ["enter-movement-lines", "Enter Movement Lines", "enter"]]],
+        ["register-inventory-movement", "Register Inventory Movement", [["register-movement", "Register Movement", "invoke"]]]
+      ] },
+    { domainId: "domain:warehouse-management", businessId: "business-process:warehouse-movement",
+      businessName: "Warehouse Movement", processId: "bc-process:warehouse:warehouse-movement",
+      processName: "Warehouse Movement → Register Movement",
+      documentIds: ["document:warehouse-movement"],
+      steps: [
+        ["create-warehouse-movement", "Create Warehouse Movement", [["open-warehouse-movements", "Open Warehouse Movements", "open"], ["enter-movement-lines", "Enter Movement Lines", "enter"]]],
+        ["register-warehouse-movement", "Register Warehouse Movement", [["register-movement", "Register Movement", "invoke"]]]
+      ] },
+    { domainId: "domain:item-tracking", businessId: "business-process:item-tracking",
+      businessName: "Item Tracking", processId: "bc-process:item-tracking:assign-tracking",
+      processName: "Item Tracking Lines → Assign Lot or Serial Number",
+      documentIds: ["document:item-tracking-lines"],
+      steps: [
+        ["open-item-tracking", "Open Item Tracking Lines", [["open-item-tracking", "Open Item Tracking Lines", "open"]]],
+        ["assign-item-tracking", "Assign Item Tracking", [["assign-lot-serial", "Assign Lot or Serial Number", "enter"]]]
       ] }
   ];
 

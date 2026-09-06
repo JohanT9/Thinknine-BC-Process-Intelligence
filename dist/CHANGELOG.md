@@ -1,5 +1,12 @@
 # Changelog
 
+## 4.7.0 - Recognize returns, movements, and item tracking
+
+- Added canonical document and list identities for sales returns, purchase returns, inventory movements, warehouse movements, and item tracking lines.
+- Added deterministic process classifications for those domains so recordings no longer fall back to unrelated sales, purchasing, or transfer processes.
+- Corrected warehouse pick identity: page `5779` is the document, `9313` is its list, and `7345` remains the separate Pick Worksheet view.
+- Added Swedish document aliases and cross-domain recognition regression coverage.
+
 ## 4.7.0 - Recognize canonical Business Central page families
 
 - Added reusable page-view identities so canonical documents can distinguish document, list, worksheet, activity, and posted views without coupling taxonomy data to the UI.

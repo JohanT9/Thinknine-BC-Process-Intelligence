@@ -54,7 +54,12 @@
     "document:transfer-receipt": "domain:transfers",
     "document:production-order": "domain:plan-to-produce",
     "document:assembly-order": "domain:assembly",
-    "document:planning-worksheet": "domain:forecast-to-plan"
+    "document:planning-worksheet": "domain:forecast-to-plan",
+    "document:sales-return-order": "domain:returns",
+    "document:purchase-return-order": "domain:returns",
+    "document:inventory-movement": "domain:inventory-to-deliver",
+    "document:warehouse-movement": "domain:warehouse-management",
+    "document:item-tracking-lines": "domain:item-tracking"
   });
 
   function eventPage(event) {
