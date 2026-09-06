@@ -1,5 +1,11 @@
 # Changelog
 
+## 4.7.0 - Centralize canonical document domain ownership
+
+- Moved Business Central document-to-domain ownership into the Process Taxonomy instead of maintaining separate recognition and reference-matching tables.
+- Process recognition and reference comparison now consume the same `primaryDomainId` semantic metadata.
+- Added validation for invalid domain references and regression coverage proving inventory recordings suppress unrelated reference alternatives.
+
 ## 4.7.0 - Localize expanded process-map taxonomy
 
 - Added Swedish process-map labels for returns, inventory and warehouse movements, item tracking, financial journals, and inventory journals.

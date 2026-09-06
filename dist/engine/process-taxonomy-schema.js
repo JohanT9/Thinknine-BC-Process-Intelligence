@@ -8,7 +8,7 @@
   /** @typedef {{id:string,name:string,businessProcessId:string,processStepIds:string[],documentIds:string[],variantIds:string[]}} BCProcess */
   /** @typedef {{id:string,name:string,bcProcessId:string,sequence:number,actionIds:string[],documentIds:string[]}} ProcessStep */
   /** @typedef {{pageObjectId:string,viewType:string,name?:string}} ProcessDocumentView */
-  /** @typedef {{id:string,name:string,documentType:string,pageIds:string[],pageViews:ProcessDocumentView[],tableIds:string[]}} ProcessDocument */
+  /** @typedef {{id:string,name:string,documentType:string,primaryDomainId?:string,pageIds:string[],pageViews:ProcessDocumentView[],tableIds:string[]}} ProcessDocument */
   /** @typedef {{id:string,name:string,processStepId:string,actionType:string,pageIds:string[],controlNames:string[],bcActionNames:string[]}} ProcessAction */
   /** @typedef {{id:string,name:string,relationshipType:string,fromEntityId:string,toEntityId:string}} ProcessRelationship */
   /** @typedef {{id:string,name:string,bcProcessId:string,processStepIds:string[],conditions:Object}} ProcessVariant */
@@ -87,6 +87,7 @@
       const views = pageViews(value.pageViews);
       return deepFreeze({ ...base,
         documentType: String(value.documentType || "record").trim(),
+        primaryDomainId: value.primaryDomainId ? String(value.primaryDomainId).trim() : null,
         pageIds: strings([...array(value.pageIds), ...views.map(item => item.pageObjectId)]),
         pageViews: views, tableIds: strings(value.tableIds) });
     }
@@ -173,6 +174,11 @@
           code: "invalid-reference", entityId: entity.id, field: "documentIds",
           referenceId, expectedEntityType: "ProcessDocument" });
       });
+    });
+    taxonomy.documents.forEach(entity => {
+      if (entity.primaryDomainId && ids.get(entity.primaryDomainId) !== "ProcessDomain") errors.push({
+        code: "invalid-reference", entityId: entity.id, field: "primaryDomainId",
+        referenceId: entity.primaryDomainId, expectedEntityType: "ProcessDomain" });
     });
     taxonomy.actions.forEach(entity =>
       requireReference(entity, "processStepId", "ProcessStep"));

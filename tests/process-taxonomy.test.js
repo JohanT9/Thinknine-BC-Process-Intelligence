@@ -15,6 +15,11 @@ assert.strictEqual(transferListOwner.id, "document:transfer-order",
   "Transfer Orders list page 5742 must not be treated as a posted shipment");
 const normalizedPurchaseOrder = validation.taxonomy.documents.find(item =>
   item.id === "document:purchase-order");
+assert(seed.documents.filter(item => item.primaryDomainId).length >= 20,
+  "documents with unambiguous ownership should declare their primary business domain");
+assert.strictEqual(seed.documents.find(item => item.id === "document:warehouse-receipt")
+  .primaryDomainId, null, "shared warehouse documents must remain cross-domain evidence");
+assert.strictEqual(normalizedPurchaseOrder.primaryDomainId, "domain:source-to-pay");
 assert.deepStrictEqual(normalizedPurchaseOrder.pageViews.map(item => item.viewType),
   ["document", "list"]);
 assert(normalizedPurchaseOrder.pageIds.includes("9307"),
@@ -24,6 +29,11 @@ assert.strictEqual(schema.validate({ ...seed, documents: seed.documents.map(docu
     ...document.pageViews, { pageObjectId: "9307", viewType: "list" }] } : document)
 }).errors.some(error => error.code === "duplicate-page-document"), true,
 "one BC page must not silently identify two canonical documents");
+assert.strictEqual(schema.validate({ ...seed, documents: seed.documents.map(document =>
+  document.id === "document:purchase-order" ? { ...document,
+    primaryDomainId: "domain:missing" } : document)
+}).errors.some(error => error.field === "primaryDomainId"), true,
+"document domain ownership must reference a canonical domain");
 
 const requiredDomains = ["Order to Cash", "Source to Pay", "Forecast to Plan",
   "Plan to Produce", "Inventory to Deliver", "Record to Report", "Returns",

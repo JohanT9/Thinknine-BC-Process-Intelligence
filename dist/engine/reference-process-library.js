@@ -15,20 +15,6 @@
   const object = value => value && typeof value === "object" && !Array.isArray(value) ? value : {};
   const strings = value => [...new Set(array(value).map(String).map(item => item.trim()).filter(Boolean))];
   const words = value => String(value || "").toLowerCase().replace(/[^a-z0-9åäöæø]+/g, " ").trim();
-  const DOCUMENT_DOMAIN_ANCHORS = Object.freeze({
-    "document:purchase-order": "domain:source-to-pay",
-    "document:purchase-invoice": "domain:source-to-pay",
-    "document:posted-purchase-invoice": "domain:source-to-pay",
-    "document:sales-order": "domain:order-to-cash",
-    "document:sales-invoice": "domain:order-to-cash",
-    "document:posted-sales-invoice": "domain:order-to-cash",
-    "document:transfer-order": "domain:transfers",
-    "document:transfer-shipment": "domain:transfers",
-    "document:transfer-receipt": "domain:transfers",
-    "document:production-order": "domain:plan-to-produce",
-    "document:assembly-order": "domain:assembly",
-    "document:planning-worksheet": "domain:forecast-to-plan"
-  });
   function freeze(value) { if (!value || typeof value !== "object" || Object.isFrozen(value)) return value;
     Object.values(value).forEach(freeze); return Object.freeze(value); }
   function normalizeTransition(value = {}) { return { ...clone(object(value)),
@@ -164,7 +150,10 @@
     const recognizedDomain = recognized.classification?.signals?.strongMetadata &&
       recognized.classification.signals.matchedDocuments > 0
       ? recognized.classification.taxonomyReferences.domain.id : null;
-    const observedDomains = strings(observed.documents.map(id => DOCUMENT_DOMAIN_ANCHORS[id]));
+    const activeTaxonomy = options.taxonomy || taxonomySeed;
+    const documentsById = new Map(array(activeTaxonomy.documents).map(item => [item.id, item]));
+    const observedDomains = strings(observed.documents.map(id =>
+      documentsById.get(id)?.primaryDomainId));
     const anchoredDomain = recognizedDomain || (observedDomains.length === 1 ? observedDomains[0] : null);
     const matches = registry.library.references.map(reference => compare(reference, observed,
       { anchoredDomain }))

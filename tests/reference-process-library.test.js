@@ -101,6 +101,17 @@ assert.strictEqual(conflictingPlanning, undefined,
 assert(purchaseOpeningMatch.alternativeMatches.every(item =>
   item.domain === "domain:source-to-pay" && item.confidence >= 0.12));
 assert(purchaseOpeningMatch.suppressedAlternativeCount > 0);
+const inventoryMovementOpening = classifiedRecording("inventory-movement-reference", [
+  { document: "document:inventory-movement", action: "Create Movement" },
+  { document: "document:inventory-movement", action: "Register Movement" }
+]);
+const inventoryMovementMatch = service.matchRecordingToReference(
+  inventoryMovementOpening, registry);
+assert.strictEqual(inventoryMovementMatch.anchoredDomain, "domain:inventory-to-deliver");
+assert.strictEqual(inventoryMovementMatch.bestMatch.referenceId,
+  "reference:bc:inventory-movement");
+assert(inventoryMovementMatch.alternativeMatches.every(item =>
+  item.domain === "domain:inventory-to-deliver"));
 const unsupportedAdvancedInbound = service.compare(
   registry.get("reference:bc:stp-advanced-inbound"), purchaseOpeningMatch.observed,
   { anchoredDomain: purchaseOpeningMatch.anchoredDomain });

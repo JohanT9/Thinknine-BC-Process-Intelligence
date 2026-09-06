@@ -42,30 +42,6 @@
     ["consumption", /consum|förbruk/i], ["output", /output|utflöde/i],
     ["transfer", /transfer|överför/i]
   ];
-  const DOCUMENT_DOMAIN_ANCHORS = Object.freeze({
-    "document:purchase-order": "domain:source-to-pay",
-    "document:purchase-invoice": "domain:source-to-pay",
-    "document:posted-purchase-invoice": "domain:source-to-pay",
-    "document:sales-order": "domain:order-to-cash",
-    "document:sales-invoice": "domain:order-to-cash",
-    "document:posted-sales-invoice": "domain:order-to-cash",
-    "document:transfer-order": "domain:transfers",
-    "document:transfer-shipment": "domain:transfers",
-    "document:transfer-receipt": "domain:transfers",
-    "document:production-order": "domain:plan-to-produce",
-    "document:assembly-order": "domain:assembly",
-    "document:planning-worksheet": "domain:forecast-to-plan",
-    "document:sales-return-order": "domain:returns",
-    "document:purchase-return-order": "domain:returns",
-    "document:inventory-movement": "domain:inventory-to-deliver",
-    "document:warehouse-movement": "domain:warehouse-management",
-    "document:item-tracking-lines": "domain:item-tracking",
-    "document:general-journal": "domain:record-to-report",
-    "document:item-journal": "domain:inventory-to-deliver",
-    "document:item-reclassification-journal": "domain:inventory-to-deliver",
-    "document:physical-inventory-journal": "domain:inventory-to-deliver"
-  });
-
   function eventPage(event) {
     return event.identification?.pageIdentity || event.page || event.businessCentral || {};
   }
@@ -289,8 +265,9 @@
     }
     const unexpectedStrongDocuments = evidence.documentSequence.filter(item =>
       item.strength >= 0.8 && !expectedDocuments.includes(item.id)).length;
+    const documentsById = new Map((taxonomy.documents || []).map(item => [item.id, item]));
     const anchoredDomains = unique(evidence.documentSequence.filter(item => item.strength >= 0.8)
-      .map(item => DOCUMENT_DOMAIN_ANCHORS[item.id]));
+      .map(item => documentsById.get(item.id)?.primaryDomainId));
     const domainAnchorConflict = anchoredDomains.length > 0 &&
       !anchoredDomains.includes(domain?.id) && domain?.id !== "domain:warehouse-management";
     let confidence = Math.min(0.99, documentCoverage * 0.3 + observedCoverage * 0.14 +

@@ -39,6 +39,24 @@
     "document:item-reclassification-journal": ["Artikelomklassificeringsjournal"],
     "document:physical-inventory-journal": ["Inventeringsjournal"]
   };
+  const primaryDomainByDocumentId = new Map([
+    ["domain:order-to-cash", ["sales-quote", "sales-order", "sales-invoice",
+      "posted-sales-invoice", "posted-sales-shipment"]],
+    ["domain:source-to-pay", ["purchase-order", "purchase-invoice",
+      "posted-purchase-invoice", "posted-purchase-receipt"]],
+    ["domain:warehouse-management", ["warehouse-movement"]],
+    ["domain:transfers", ["transfer-order", "transfer-shipment", "transfer-receipt"]],
+    ["domain:plan-to-produce", ["production-order", "planned-production-order",
+      "firm-planned-production-order", "finished-production-order", "production-journal"]],
+    ["domain:assembly", ["assembly-order"]],
+    ["domain:forecast-to-plan", ["planning-worksheet"]],
+    ["domain:returns", ["sales-return-order", "purchase-return-order"]],
+    ["domain:inventory-to-deliver", ["inventory-movement", "item-journal",
+      "item-reclassification-journal", "physical-inventory-journal"]],
+    ["domain:item-tracking", ["item-tracking-lines"]],
+    ["domain:record-to-report", ["general-journal"]]
+  ].flatMap(([domainId, documentIds]) => documentIds.map(documentId =>
+    [`document:${documentId}`, domainId])));
   const view = (pageObjectId, viewType, name) => ({
     pageObjectId: String(pageObjectId), viewType, name
   });
@@ -77,7 +95,7 @@
     ["document:item-reclassification-journal", "Item Reclassification Journal", "journal", [view(393, "worksheet", "Item Reclass. Journal")], ["83"]],
     ["document:physical-inventory-journal", "Physical Inventory Journal", "journal", [view(392, "worksheet", "Phys. Inventory Journal")], ["83"]]
   ].map(([id, name, documentType, pageViews, tableIds]) => ({
-    id, name, documentType, pageViews,
+    id, name, documentType, primaryDomainId: primaryDomainByDocumentId.get(id) || null, pageViews,
     pageIds: pageViews.map(item => item.pageObjectId), tableIds,
     aliases: documentAliases[id] || []
   }));
