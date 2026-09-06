@@ -217,17 +217,19 @@
       [...current.verificationHistory, { verificationId: `${entry.decisionId}:verification`, status,
         decidedAt: entry.decidedAt, decidedBy: entry.decidedBy, notes: entry.notes, source: "manual" }] });
     const diagrams = dataset.diagrams.slice(); diagrams[index] = updated; return normalize({ ...dataset, diagrams }); }
-  function graphSignature(value) { const nodes = value.nodes.filter(node => !["start", "end"].includes(node.nodeType))
-    .map(node => `${node.nodeType}:${text(node.title).toLocaleLowerCase()}`).sort(); const edges =
-    value.relationships.map(edge => `${edge.relationshipType}:${edge.fromNodeId}->${edge.toNodeId}`).sort();
-    return JSON.stringify({ nodes, edges }); }
   function nodeIdentityKeys(node) { if (["start", "end"].includes(node.nodeType))
     return [`node-type:${node.nodeType}`]; const taxonomyIds = unique(array(node.taxonomyEntityIds)
-    .map(id => text(id).toLocaleLowerCase())); return taxonomyIds.length
+    .map(id => text(id).toLocaleLowerCase())).sort(); return taxonomyIds.length
       ? taxonomyIds.map(id => `entity:${id}`)
       : [`${node.nodeType}:${text(node.title).toLocaleLowerCase()}`]; }
+  function semanticEdgeTokens(value) { const nodes = new Map(value.nodes.map(node => [node.nodeId, node]));
+    return value.relationships.map(edge => { const from = nodes.get(edge.fromNodeId);
+      const to = nodes.get(edge.toNodeId); return `edge:${from ? nodeIdentityKeys(from)[0] : edge.fromNodeId}:` +
+        `${edge.relationshipType}:${to ? nodeIdentityKeys(to)[0] : edge.toNodeId}`; }); }
+  function graphSignature(value) { const nodes = value.nodes.flatMap(nodeIdentityKeys).sort();
+    const edges = semanticEdgeTokens(value).sort(); return JSON.stringify({ nodes, edges }); }
   function semanticTokens(value) { return new Set([...value.nodes.flatMap(node =>
-    nodeIdentityKeys(node)), ...value.relationships.map(edge => edge.relationshipType)]); }
+    nodeIdentityKeys(node)), ...semanticEdgeTokens(value)]); }
   function similarity(left, right) { const a = semanticTokens(left); const b = semanticTokens(right);
     const intersection = [...a].filter(item => b.has(item)).length; const union = new Set([...a, ...b]).size;
     return union ? intersection / union : 1; }

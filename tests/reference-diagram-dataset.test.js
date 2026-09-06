@@ -115,6 +115,19 @@ assert.strictEqual(model.create(seed).findSimilarProcessGraphs(
   graph.normalize(localizedPurchaseGraph), 1)[0].diagram.id, simplePurchaseDiagram.id);
 assert.strictEqual(model.create(seed).findSimilarProcessGraphs(
   graph.normalize(localizedPurchaseGraph), 1)[0].confidence, 1);
+const reorderedPurchaseGraph = JSON.parse(JSON.stringify(simplePurchaseDiagram.processGraph));
+const createNode = reorderedPurchaseGraph.nodes.find(node =>
+  node.taxonomyEntityIds?.includes("concept:create-purchase-order"));
+const releaseNode = reorderedPurchaseGraph.nodes.find(node =>
+  node.taxonomyEntityIds?.includes("concept:release"));
+const connectingEdge = reorderedPurchaseGraph.relationships.find(edge =>
+  edge.fromNodeId === createNode.nodeId && edge.toNodeId === releaseNode.nodeId);
+connectingEdge.fromNodeId = releaseNode.nodeId;
+connectingEdge.toNodeId = createNode.nodeId;
+const reorderedMatch = model.create(seed).findSimilarProcessGraphs(reorderedPurchaseGraph, 10)
+  .find(item => item.diagram.id === simplePurchaseDiagram.id);
+assert(reorderedMatch.confidence < 1,
+  "The same semantic nodes in a different route must not be treated as an exact process match.");
 const recordingMatch = model.matchRecordingToReferences({ schemaVersion: 1, id: "synthetic",
   events: [] }, seed, { graphProjector: { generate() { return advanced.processGraph; } } });
 assert.strictEqual(recordingMatch.bestMatch.referenceProcess, "Advanced Warehouse Outbound");

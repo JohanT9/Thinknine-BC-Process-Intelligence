@@ -1,5 +1,11 @@
 # Changelog
 
+## 4.7.0 - Topology-aware process matching
+
+- Process similarity now includes semantic edge endpoints, relationship types, and route direction.
+- Diagrams containing the same nodes in a different order no longer receive an exact match.
+- Duplicate detection now compares semantic topology instead of renderer-specific node identifiers.
+
 ## 4.7.0 - Language-independent process graph matching
 
 - Process graphs now match nodes by stable taxonomy entity IDs before comparing visible labels.
