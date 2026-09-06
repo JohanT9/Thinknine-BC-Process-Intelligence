@@ -59,7 +59,11 @@
     "document:purchase-return-order": "domain:returns",
     "document:inventory-movement": "domain:inventory-to-deliver",
     "document:warehouse-movement": "domain:warehouse-management",
-    "document:item-tracking-lines": "domain:item-tracking"
+    "document:item-tracking-lines": "domain:item-tracking",
+    "document:general-journal": "domain:record-to-report",
+    "document:item-journal": "domain:inventory-to-deliver",
+    "document:item-reclassification-journal": "domain:inventory-to-deliver",
+    "document:physical-inventory-journal": "domain:inventory-to-deliver"
   });
 
   function eventPage(event) {

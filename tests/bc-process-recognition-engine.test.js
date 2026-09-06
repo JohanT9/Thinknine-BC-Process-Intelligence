@@ -103,7 +103,11 @@ const standardPageViews = [
   [9311, "document:purchase-return-order", "list"],
   [9330, "document:inventory-movement", "list"],
   [9314, "document:warehouse-movement", "list"],
-  [6510, "document:item-tracking-lines", "worksheet"]
+  [6510, "document:item-tracking-lines", "worksheet"],
+  [39, "document:general-journal", "worksheet"],
+  [40, "document:item-journal", "worksheet"],
+  [393, "document:item-reclassification-journal", "worksheet"],
+  [392, "document:physical-inventory-journal", "worksheet"]
 ];
 standardPageViews.forEach(([pageObjectId, documentId, viewType]) => {
   const evidence = engine.extractEvidence(synthetic(`page-view-${pageObjectId}`, [
@@ -119,7 +123,11 @@ standardPageViews.forEach(([pageObjectId, documentId, viewType]) => {
   ["purchase-return-list", 9311, "PurchaseReturns", "domain:returns"],
   ["inventory-movement-list", 9330, "InventoryMovement", "domain:inventory-to-deliver"],
   ["warehouse-movement-list", 9314, "WarehouseMovement", "domain:warehouse-management"],
-  ["item-tracking-lines", 6510, "ItemTracking", "domain:item-tracking"]
+  ["item-tracking-lines", 6510, "ItemTracking", "domain:item-tracking"],
+  ["general-journal", 39, "GeneralJournalPosting", "domain:record-to-report"],
+  ["item-journal", 40, "ItemAdjustment", "domain:inventory-to-deliver"],
+  ["item-reclassification", 393, "ItemReclassification", "domain:inventory-to-deliver"],
+  ["physical-inventory", 392, "PhysicalInventory", "domain:inventory-to-deliver"]
 ].forEach(([id, pageObjectId, process, domainId]) => {
   const result = engine.recognize(synthetic(id, [
     { identification: page(pageObjectId, "", "", "") }

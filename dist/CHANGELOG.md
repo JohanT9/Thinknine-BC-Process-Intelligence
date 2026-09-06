@@ -1,5 +1,11 @@
 # Changelog
 
+## 4.7.0 - Recognize financial and inventory journals
+
+- Added canonical page identities and process classifications for General Journals, Item Journals, Item Reclassification Journals, and Physical Inventory Journals.
+- Journal pages now anchor recordings to Record to Report or Inventory to Deliver before generic actions such as Post are evaluated.
+- Added Swedish aliases and regression coverage for page-, process-, and domain-level classification.
+
 ## 4.7.0 - Recognize returns, movements, and item tracking
 
 - Added canonical document and list identities for sales returns, purchase returns, inventory movements, warehouse movements, and item tracking lines.

@@ -34,6 +34,8 @@ assert.deepStrictEqual(requiredDomains.filter(name =>
 assert.strictEqual(taxonomy.exactName("Sales Returns", "BusinessProcess").length, 1);
 assert.strictEqual(taxonomy.exactName("Inventory Movement", "BusinessProcess").length, 1);
 assert.strictEqual(taxonomy.exactName("Item Tracking", "BusinessProcess").length, 1);
+assert.strictEqual(taxonomy.exactName("General Journal Posting", "BusinessProcess").length, 1);
+assert.strictEqual(taxonomy.exactName("Physical Inventory", "BusinessProcess").length, 1);
 
 const actionId = "action:order-to-cash:standard-sales-order:select-customer";
 const hierarchy = taxonomy.hierarchy(actionId);

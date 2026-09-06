@@ -33,7 +33,11 @@
     "document:purchase-return-order": ["Inköpsreturorder"],
     "document:inventory-movement": ["Lagerflyttning", "Inventeringsflyttning"],
     "document:warehouse-movement": ["Distributionslagerflyttning"],
-    "document:item-tracking-lines": ["Artikelspårningsrader"]
+    "document:item-tracking-lines": ["Artikelspårningsrader"],
+    "document:general-journal": ["Redovisningsjournal", "Redovisningsjournaler"],
+    "document:item-journal": ["Artikeljournal", "Artikeljournaler"],
+    "document:item-reclassification-journal": ["Artikelomklassificeringsjournal"],
+    "document:physical-inventory-journal": ["Inventeringsjournal"]
   };
   const view = (pageObjectId, viewType, name) => ({
     pageObjectId: String(pageObjectId), viewType, name
@@ -67,7 +71,11 @@
     ["document:purchase-return-order", "Purchase Return Order", "return-order", [view(6640, "document", "Purchase Return Order"), view(9311, "list", "Purchase Return Order List")], ["38", "39"]],
     ["document:inventory-movement", "Inventory Movement", "warehouse-activity", [view(7382, "document", "Inventory Movement"), view(9330, "list", "Inventory Movements")], ["5766", "5767"]],
     ["document:warehouse-movement", "Warehouse Movement", "warehouse-activity", [view(7315, "document", "Warehouse Movement"), view(9314, "list", "Warehouse Movements")], ["5766", "5767"]],
-    ["document:item-tracking-lines", "Item Tracking Lines", "worksheet", [view(6510, "worksheet", "Item Tracking Lines")], []]
+    ["document:item-tracking-lines", "Item Tracking Lines", "worksheet", [view(6510, "worksheet", "Item Tracking Lines")], []],
+    ["document:general-journal", "General Journal", "journal", [view(39, "worksheet", "General Journal")], ["81"]],
+    ["document:item-journal", "Item Journal", "journal", [view(40, "worksheet", "Item Journal")], ["83"]],
+    ["document:item-reclassification-journal", "Item Reclassification Journal", "journal", [view(393, "worksheet", "Item Reclass. Journal")], ["83"]],
+    ["document:physical-inventory-journal", "Physical Inventory Journal", "journal", [view(392, "worksheet", "Phys. Inventory Journal")], ["83"]]
   ].map(([id, name, documentType, pageViews, tableIds]) => ({
     id, name, documentType, pageViews,
     pageIds: pageViews.map(item => item.pageObjectId), tableIds,
@@ -198,6 +206,39 @@
       steps: [
         ["open-item-tracking", "Open Item Tracking Lines", [["open-item-tracking", "Open Item Tracking Lines", "open"]]],
         ["assign-item-tracking", "Assign Item Tracking", [["assign-lot-serial", "Assign Lot or Serial Number", "enter"]]]
+      ] },
+    { domainId: "domain:record-to-report", businessId: "business-process:general-journal",
+      businessName: "General Journal Posting", processId: "bc-process:record-to-report:general-journal",
+      processName: "General Journal → Validate Entries → Post Journal",
+      documentIds: ["document:general-journal"],
+      steps: [
+        ["enter-general-journal", "Enter General Journal", [["open-general-journal", "Open General Journal", "open"], ["enter-journal-lines", "Enter Journal Lines", "enter"]]],
+        ["post-general-journal", "Post General Journal", [["post-journal", "Post Journal", "post"]]]
+      ] },
+    { domainId: "domain:inventory-to-deliver", businessId: "business-process:item-adjustment",
+      businessName: "Item Adjustment", processId: "bc-process:inventory:item-journal",
+      processName: "Item Journal → Enter Adjustment → Post Journal",
+      documentIds: ["document:item-journal"],
+      steps: [
+        ["enter-item-journal", "Enter Item Journal", [["open-item-journal", "Open Item Journal", "open"], ["enter-adjustment", "Enter Item Adjustment", "enter"]]],
+        ["post-item-journal", "Post Item Journal", [["post-item-journal", "Post Item Journal", "post"]]]
+      ] },
+    { domainId: "domain:inventory-to-deliver", businessId: "business-process:item-reclassification",
+      businessName: "Item Reclassification", processId: "bc-process:inventory:item-reclassification",
+      processName: "Item Reclassification Journal → Enter Reclassification → Post",
+      documentIds: ["document:item-reclassification-journal"],
+      steps: [
+        ["enter-item-reclassification", "Enter Item Reclassification", [["open-item-reclassification", "Open Item Reclassification Journal", "open"], ["enter-reclassification", "Enter Reclassification", "enter"]]],
+        ["post-item-reclassification", "Post Reclassification", [["post-reclassification", "Post Reclassification", "post"]]]
+      ] },
+    { domainId: "domain:inventory-to-deliver", businessId: "business-process:physical-inventory",
+      businessName: "Physical Inventory", processId: "bc-process:inventory:physical-inventory",
+      processName: "Physical Inventory Journal → Record Count → Post Differences",
+      documentIds: ["document:physical-inventory-journal"],
+      steps: [
+        ["calculate-physical-inventory", "Calculate Physical Inventory", [["open-physical-inventory", "Open Physical Inventory Journal", "open"], ["calculate-inventory", "Calculate Inventory", "invoke"]]],
+        ["record-physical-count", "Record Physical Count", [["enter-physical-count", "Enter Physical Count", "enter"]]],
+        ["post-physical-inventory", "Post Inventory Differences", [["post-physical-inventory", "Post Inventory Differences", "post"]]]
       ] }
   ];
 
