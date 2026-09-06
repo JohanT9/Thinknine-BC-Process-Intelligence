@@ -1,5 +1,11 @@
 # Changelog
 
+## 4.7.0 - Ordered business action matching
+
+- Reference matching now evaluates Business Central actions in their observed order.
+- The same actions in a conflicting sequence no longer receive the same score as the canonical process route.
+- Added structured action-order conflict diagnostics while preserving customer-specific actions as valid deviations.
+
 ## 4.7.0 - Specific Business Central action matching
 
 - Stopped generic verbs such as Create, Post, and Register from matching more specific warehouse actions.

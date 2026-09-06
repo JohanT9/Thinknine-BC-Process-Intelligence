@@ -84,6 +84,10 @@
   function orderedDocumentMatches(observed, expected) { let position = 0; const result = [];
     expected.forEach(documentId => { const index = observed.indexOf(documentId, position);
       if (index >= 0) { result.push(documentId); position = index + 1; } }); return result; }
+  function orderedActionMatches(observed, expected) { let position = 0; const result = [];
+    expected.forEach(expectedAction => { const index = observed.findIndex((action, candidate) =>
+      candidate >= position && containsAction(expectedAction, action));
+    if (index >= 0) { result.push(expectedAction); position = index + 1; } }); return result; }
   function transitionMatches(observedDocuments, transition) { const from = observedDocuments.indexOf(
     transition.from); const to = observedDocuments.indexOf(transition.to, from + 1);
     return from >= 0 && to > from; }
@@ -103,11 +107,13 @@
     observed.documents, reference.expectedDocuments); const missingDocuments = reference.expectedDocuments
     .filter(item => !matchedDocuments.includes(item)); const optionalDocumentSet = new Set(reference.optionalDocuments);
     const unexpectedDocuments = observed.documents.filter(item => !reference.expectedDocuments.includes(item) &&
-      !optionalDocumentSet.has(item)); const matchedActions = reference.expectedActions.filter(expected =>
-      observed.actions.some(action => containsAction(expected, action))); const missingActions =
+      !optionalDocumentSet.has(item)); const unorderedMatchedActions = reference.expectedActions.filter(expected =>
+      observed.actions.some(action => containsAction(expected, action))); const matchedActions =
+      orderedActionMatches(observed.actions, reference.expectedActions); const missingActions =
       reference.expectedActions.filter(item => !matchedActions.includes(item)); const unexpectedActions =
       observed.actions.filter(action => !reference.expectedActions.some(expected => containsAction(expected, action)) &&
         !reference.optionalActions.some(optional => containsAction(optional, action)));
+    const actionOrderConflicts = unorderedMatchedActions.length - matchedActions.length;
     const matchedTransitions = reference.expectedTransitions.filter(item =>
       transitionMatches(observed.documents, item)); const missingTransitions = reference.expectedTransitions
       .filter(item => !matchedTransitions.includes(item)); const documentScore = reference.expectedDocuments.length
@@ -142,7 +148,7 @@
       confidence, matchedSteps, missingSteps, unexpectedSteps,
       configurationEvidence: hasConfigurationEvidence,
       specificityPenalty: Number(specificityPenalty.toFixed(3)),
-      domainConflict,
+      domainConflict, actionOrderConflicts,
       interpretation: "advisory", deviationIsError: false }); }
   function matchRecordingToReference(recording, libraryOrRegistry, options = {}) {
     if (!recording || Number(recording.schemaVersion) !== 1) throw new TypeError(

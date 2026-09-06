@@ -117,6 +117,15 @@ assert(specificWarehouseActions.matchedSteps.some(item =>
   item.type === "action" && item.name === "Post Receipt"));
 assert(specificWarehouseActions.matchedSteps.some(item =>
   item.type === "action" && item.name === "Register Put-away"));
+const reversedWarehouseActions = service.compare(
+  registry.get("reference:bc:stp-advanced-inbound"), {
+    documents: ["document:purchase-order"], actions: ["Register Put-away", "Post Receipt"]
+  }, { anchoredDomain: "domain:source-to-pay" });
+assert.strictEqual(reversedWarehouseActions.actionOrderConflicts, 1);
+assert(reversedWarehouseActions.confidence < specificWarehouseActions.confidence,
+  "Specific actions in the wrong order must reduce the reference-process match.");
+assert(!reversedWarehouseActions.matchedSteps.some(item =>
+  item.type === "action" && item.name === "Register Put-away"));
 
 const warehouseInbound = classifiedRecording("warehouse-inbound-reference", [
   { document: "document:purchase-order", action: "Release" },
