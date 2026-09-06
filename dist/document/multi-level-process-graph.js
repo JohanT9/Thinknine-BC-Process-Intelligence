@@ -100,7 +100,9 @@
           item.classificationId]), nodeType: "document", title: document.name || document.id,
         sequence: nodes.length + 1, sourceEventIds: item.sourceEventIds,
         semanticClassificationIds: [item.classificationId], taxonomyEntityIds: [document.id],
-        metadata: { relationshipType: item.metadata?.createsDocument ? "documentCreation" : "sequence" }
+        metadata: { relationshipType: item.metadata?.createsDocument ? "documentCreation" : "sequence",
+          semanticStatus: item.metadata?.inferredFromObservedEvidence ? "observed" :
+            item.metadata?.semanticStatus }
       })); previousDocument = document.id; }
       const step = item.processStep; const action = item.businessAction;
       if (item.metadata?.inferredFromObservedEvidence && !step?.id && !action?.id) return;
@@ -115,7 +117,9 @@
         graph.stableId("process-graph-node", [recording.id, "userProcedure", eventId])),
       metadata: { relationshipType: item.metadata?.relationshipType ||
         (nodeType === "posting" ? "documentPosting" : "sequence"),
-        condition: item.metadata?.condition || null } })); });
+        condition: item.metadata?.condition || null,
+        semanticStatus: item.metadata?.inferredFromObservedEvidence ? "observed" :
+          item.metadata?.semanticStatus } })); });
     return chain(recording.id, "businessCentralProcess", nodes,
       `${recording.metadata?.title || "Recording"} — Business Central`, { taxonomyId: taxonomy.taxonomyId }); }
   function business(recording, taxonomy, bcGraph) { const values = classifications(recording, taxonomy);
@@ -133,7 +137,10 @@
     sourceEventIds: unique(item.sourceEventIds), semanticClassificationIds:
       unique(item.classificationIds), taxonomyEntityIds: [item.id], childNodeIds:
       bcGraph.nodes.filter(node => node.semanticClassificationIds.some(id =>
-        item.classificationIds.includes(id))).map(node => node.nodeId) }));
+        item.classificationIds.includes(id))).map(node => node.nodeId), metadata: {
+        semanticStatus: values.filter(value => item.classificationIds.includes(
+          value.classificationId)).every(value => value.metadata?.inferredFromObservedEvidence)
+          ? "observed" : undefined } }));
     return chain(recording.id, "businessProcess", nodes,
       `${recording.metadata?.title || "Recording"} — Business process`, { taxonomyId: taxonomy.taxonomyId }); }
   function generateAll(recording, options = {}) { if (!recording || Number(recording.schemaVersion) !== 1)

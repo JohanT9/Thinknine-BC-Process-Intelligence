@@ -119,6 +119,11 @@ assert(observedBundle.businessProcess.nodes.some(node =>
 assert(observedBundle.businessCentralProcess.nodes.some(node =>
   node.title === "Purchase Order" && node.metadata.relationshipType === "sequence"));
 assert(observedBundle.businessCentralProcess.nodes.some(node => node.title === "Release"));
+assert(observedBundle.businessCentralProcess.nodes.filter(node =>
+  !["start", "end"].includes(node.nodeType)).every(node =>
+  node.metadata.semanticStatus === "observed"));
+assert(observedBundle.businessProcess.nodes.find(node =>
+  node.nodeType === "businessProcess").metadata.semanticStatus === "observed");
 assert(!observedBundle.businessCentralProcess.nodes.some(node =>
   /invoice|receipt|put-away/i.test(node.title)),
 "the observed map must not add unrecorded reference-process steps");

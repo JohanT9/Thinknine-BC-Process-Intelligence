@@ -1,5 +1,11 @@
 # Changelog
 
+## 4.7.0 - Mark evidence-derived process nodes as observed
+
+- Process nodes inferred from strong recorded Business Central metadata now carry the explicit `observed` semantic status.
+- Interactive maps and SVG exports can distinguish recorded evidence from suggestions while preserving node-type shapes and colours.
+- Boundary nodes and manually authored semantic classifications remain unaffected.
+
 ## 4.7.0 - Localize process-map lanes
 
 - Applied canonical localization to swimlane headers, phase/subtask context, and selected-node details.
