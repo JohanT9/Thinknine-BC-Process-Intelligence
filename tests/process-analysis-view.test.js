@@ -8,7 +8,8 @@ const result = {
     "Advanced Warehouse Outbound", domain: "Order to Cash", confidence: 0.91,
   matchedSteps: [{ type: "action", name: "Release" }, { type: "action", name: "Create Pick" }],
   missingSteps: [{ type: "action", name: "Post Shipment" }],
-  additionalSteps: [{ type: "action", name: "Customer Approval" }], evidence: {
+  additionalSteps: [{ type: "action", name: "Customer Approval" }],
+  matchDetails: { observedPrecision: 0.96, referenceCoverage: 0.74 }, evidence: {
     documents: [{ name: "Sales Order" }, { name: "Warehouse Shipment" }],
     actions: [{ name: "Release" }, { name: "Create Pick" }], signals: {} } },
   matches: [{ referenceDiagramId: "diagram:basic", referenceProcess: "Basic Warehouse Outbound",
@@ -29,6 +30,8 @@ assert.strictEqual(normalized.alternatives.length, 2);
 assert.strictEqual(normalized.advisory, true);
 assert.strictEqual(normalized.assessmentStatus, "auto-classifiable");
 assert.strictEqual(normalized.evidence.documents.length, 2);
+assert.strictEqual(normalized.matchDetails.observedPrecision, 0.96);
+assert.strictEqual(normalized.matchDetails.referenceCoverage, 0.74);
 
 const selected = view.normalize(result, { confirmedReferenceId: "diagram:basic",
   confirmedAt: "2026-09-02T15:00:00Z", status: "confirmed" });
@@ -50,6 +53,10 @@ assert(container.innerHTML.includes("Customer Approval"));
 assert(container.innerHTML.includes("Why this assessment?"));
 assert(container.innerHTML.includes("Warehouse Shipment"));
 assert(container.innerHTML.includes("Release, Create Pick"));
+assert(container.innerHTML.includes("Observed steps fit"));
+assert(container.innerHTML.includes("96%"));
+assert(container.innerHTML.includes("Reference process covered"));
+assert(container.innerHTML.includes("74%"));
 assert(container.innerHTML.includes('role="progressbar"'));
 assert(container.innerHTML.includes('name="processAnalysisReference"'));
 assert(container.innerHTML.includes("auto-classifiable"));

@@ -1,5 +1,11 @@
 # Changelog
 
+## 4.7.0 - Explainable process match percentages
+
+- Added observed-step fit and reference-process coverage to the process-analysis evidence panel.
+- Localized both measures in Swedish and English.
+- Kept the detailed measures progressively disclosed under "Why this assessment?" to avoid cluttering the primary workflow.
+
 ## 4.7.0 - Partial process confidence calibration
 
 - Split graph matching into observed precision and reference-process coverage.

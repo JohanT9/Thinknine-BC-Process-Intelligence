@@ -3508,6 +3508,7 @@ function processAnalysisLabels() {
     variantAlternatives: "Other possible configurations", mostLikely: "Most likely",
     evidenceTitle: "Why this assessment?", evidenceDocuments: "Business Central documents",
     evidenceActions: "Business actions", evidenceQuality: "Evidence quality",
+    observedPrecision: "Observed steps fit", referenceCoverage: "Reference process covered",
     candidateMargin: "Lead over next candidate", percentagePoints: "percentage points",
     evidenceNone: "None detected", "quality-strong": "Strong", "quality-moderate": "Moderate",
     "quality-weak": "Weak"
@@ -3538,6 +3539,7 @@ function processAnalysisLabels() {
     variantAlternatives: "Andra möjliga konfigurationer", mostLikely: "Mest sannolik",
     evidenceTitle: "Varför denna bedömning?", evidenceDocuments: "Business Central-dokument",
     evidenceActions: "Affärsåtgärder", evidenceQuality: "Underlagskvalitet",
+    observedPrecision: "Träff på observerade steg", referenceCoverage: "Täckning av referensprocess",
     candidateMargin: "Försprång till nästa kandidat", percentagePoints: "procentenheter",
     evidenceNone: "Inget identifierat", "quality-strong": "Starkt",
     "quality-moderate": "Måttligt", "quality-weak": "Svagt",

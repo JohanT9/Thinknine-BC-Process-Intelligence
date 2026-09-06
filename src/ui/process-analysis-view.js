@@ -67,6 +67,7 @@
       text(decision?.confirmedReferenceId), confirmedAt: decision?.confirmedAt || null,
       assessmentStatus: status, evidenceQuality: text(best?.evidenceQuality || assessment.evidenceQuality) || "weak",
       matchConfidence,
+      matchDetails: clone(best?.matchDetails || null),
       candidateMargin: Number(best?.candidateMargin ?? assessment.candidateMargin ?? 0),
       evidence: clone(best?.evidence || (result.recognition?.classification ? {
         documents: result.recognition.classification.processEvidence?.matchedDocuments,
@@ -140,6 +141,10 @@
             localized(stepLabel(item), labels)).join(", ") : labels.evidenceNone || "None detected")}</dd></div>
         <div><dt>${escape(labels.evidenceQuality || "Evidence quality")}</dt><dd>${escape(
           labels[`quality-${model.evidenceQuality}`] || model.evidenceQuality)}</dd></div>
+        ${model.matchDetails ? `<div><dt>${escape(labels.observedPrecision ||
+          "Observed steps fit")}</dt><dd>${Math.round(model.matchDetails.observedPrecision * 100)}%</dd></div>
+        <div><dt>${escape(labels.referenceCoverage || "Reference process covered")}</dt><dd>${Math.round(
+          model.matchDetails.referenceCoverage * 100)}%</dd></div>` : ""}
         <div><dt>${escape(labels.candidateMargin || "Lead over next candidate")}</dt><dd>${escape(
           `${Math.round(model.candidateMargin * 100)} ${labels.percentagePoints || "percentage points"}`)}</dd></div>
       </dl></details>` : ""}
