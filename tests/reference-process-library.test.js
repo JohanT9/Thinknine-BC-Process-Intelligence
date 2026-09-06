@@ -80,6 +80,39 @@ assert(partialMatch.unexpectedSteps.some(item =>
   item.id === "document:customer-extension-document" || item.name === "Customer Approval"));
 assert.strictEqual(partialMatch.bestMatch.interpretation, "advisory");
 
+const purchaseOpening = classifiedRecording("purchase-opening-reference", [
+  { document: "document:purchase-order", action: "Create" },
+  { document: "document:purchase-order", action: "Release" }
+]);
+const purchaseOpeningMatch = service.matchRecordingToReference(purchaseOpening, registry);
+assert.strictEqual(purchaseOpeningMatch.bestMatch.referenceId,
+  "reference:bc:stp-simple-purchase",
+  "An ordinary purchase-order opening must prefer the simple reference process.");
+assert.strictEqual(purchaseOpeningMatch.anchoredDomain, "domain:source-to-pay");
+const conflictingPlanning = [purchaseOpeningMatch.bestMatch,
+  ...purchaseOpeningMatch.alternativeMatches].find(item =>
+  item.referenceId === "reference:bc:planning-create-purchase");
+assert(!conflictingPlanning || conflictingPlanning.confidence <= 0.11,
+  "Generic planning actions must not outrank verified purchase-document metadata.");
+const unsupportedAdvancedInbound = service.compare(
+  registry.get("reference:bc:stp-advanced-inbound"), purchaseOpeningMatch.observed,
+  { anchoredDomain: purchaseOpeningMatch.anchoredDomain });
+assert.strictEqual(unsupportedAdvancedInbound.configurationEvidence, false);
+assert(unsupportedAdvancedInbound.specificityPenalty > 0,
+  "Configuration-heavy references require observed configuration-specific evidence.");
+
+const warehouseInbound = classifiedRecording("warehouse-inbound-reference", [
+  { document: "document:purchase-order", action: "Release" },
+  { document: "document:warehouse-receipt", action: "Receive" },
+  { document: "document:warehouse-put-away", action: "Register Put-away" }
+]);
+const warehouseInboundMatch = service.matchRecordingToReference(warehouseInbound, registry);
+const evidencedAdvancedInbound = service.compare(
+  registry.get("reference:bc:stp-advanced-inbound"), warehouseInboundMatch.observed,
+  { anchoredDomain: warehouseInboundMatch.anchoredDomain });
+assert.strictEqual(evidencedAdvancedInbound.configurationEvidence, true);
+assert.strictEqual(evidencedAdvancedInbound.specificityPenalty, 0);
+
 const before = JSON.stringify(advanced);
 service.matchRecordingToReference(advanced, registry);
 assert.strictEqual(JSON.stringify(advanced), before, "Reference comparison must be read-only.");

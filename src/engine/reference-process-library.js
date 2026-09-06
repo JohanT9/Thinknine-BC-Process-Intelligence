@@ -15,6 +15,20 @@
   const object = value => value && typeof value === "object" && !Array.isArray(value) ? value : {};
   const strings = value => [...new Set(array(value).map(String).map(item => item.trim()).filter(Boolean))];
   const words = value => String(value || "").toLowerCase().replace(/[^a-z0-9åäöæø]+/g, " ").trim();
+  const DOCUMENT_DOMAIN_ANCHORS = Object.freeze({
+    "document:purchase-order": "domain:source-to-pay",
+    "document:purchase-invoice": "domain:source-to-pay",
+    "document:posted-purchase-invoice": "domain:source-to-pay",
+    "document:sales-order": "domain:order-to-cash",
+    "document:sales-invoice": "domain:order-to-cash",
+    "document:posted-sales-invoice": "domain:order-to-cash",
+    "document:transfer-order": "domain:transfers",
+    "document:transfer-shipment": "domain:transfers",
+    "document:transfer-receipt": "domain:transfers",
+    "document:production-order": "domain:plan-to-produce",
+    "document:assembly-order": "domain:assembly",
+    "document:planning-worksheet": "domain:forecast-to-plan"
+  });
   function freeze(value) { if (!value || typeof value !== "object" || Object.isFrozen(value)) return value;
     Object.values(value).forEach(freeze); return Object.freeze(value); }
   function normalizeTransition(value = {}) { return { ...clone(object(value)),
@@ -80,7 +94,7 @@
       ...semantic.map(item => item.businessAction?.name).filter(Boolean)];
     return freeze({ documents: strings(documents), actions: strings(actions),
       sourceEventIds: strings(recording.events.map(event => event.id)), evidence }); }
-  function compare(reference, observed) { const matchedDocuments = orderedDocumentMatches(
+  function compare(reference, observed, context = {}) { const matchedDocuments = orderedDocumentMatches(
     observed.documents, reference.expectedDocuments); const missingDocuments = reference.expectedDocuments
     .filter(item => !matchedDocuments.includes(item)); const optionalDocumentSet = new Set(reference.optionalDocuments);
     const unexpectedDocuments = observed.documents.filter(item => !reference.expectedDocuments.includes(item) &&
@@ -92,12 +106,25 @@
     const matchedTransitions = reference.expectedTransitions.filter(item =>
       transitionMatches(observed.documents, item)); const missingTransitions = reference.expectedTransitions
       .filter(item => !matchedTransitions.includes(item)); const documentScore = reference.expectedDocuments.length
-      ? matchedDocuments.length / reference.expectedDocuments.length : 1; const actionScore =
-      reference.expectedActions.length ? matchedActions.length / reference.expectedActions.length : 1;
+      ? matchedDocuments.length / reference.expectedDocuments.length : 0; const actionScore =
+      reference.expectedActions.length ? matchedActions.length / reference.expectedActions.length : 0;
     const transitionScore = reference.expectedTransitions.length ? matchedTransitions.length /
-      reference.expectedTransitions.length : 1; const confidence = Number(Math.max(0, Math.min(1,
-        documentScore * 0.5 + actionScore * 0.3 + transitionScore * 0.2 -
-        Math.min(0.08, (unexpectedDocuments.length + unexpectedActions.length) * 0.01))).toFixed(3));
+      reference.expectedTransitions.length : 0;
+    const applicableWeight = (reference.expectedDocuments.length ? 0.5 : 0) +
+      (reference.expectedActions.length ? 0.3 : 0) +
+      (reference.expectedTransitions.length ? 0.2 : 0);
+    const hasConfigurationEvidence = matchedTransitions.length > 0 || matchedDocuments.length > 1;
+    const specificityPenalty = reference.configurationRequirements.length &&
+      !hasConfigurationEvidence ? Math.min(0.18,
+        0.06 + reference.configurationRequirements.length * 0.03) : 0;
+    let confidence = Number(Math.max(0, Math.min(1,
+      (documentScore * 0.5 + actionScore * 0.3 + transitionScore * 0.2) /
+      Math.max(0.01, applicableWeight) -
+      Math.min(0.08, (unexpectedDocuments.length + unexpectedActions.length) * 0.01) -
+      specificityPenalty)).toFixed(3));
+    const domainConflict = Boolean(context.anchoredDomain && reference.domain !==
+      context.anchoredDomain && reference.domain !== "domain:warehouse-management");
+    if (domainConflict) confidence = Math.min(confidence, 0.11);
     const matchedSteps = [...matchedDocuments.map(id => ({ type: "document", id })),
       ...matchedActions.map(name => ({ type: "action", name })),
       ...matchedTransitions.map(item => ({ type: "transition", ...clone(item) }))];
@@ -108,17 +135,27 @@
       ...unexpectedActions.map(name => ({ type: "action", name }))];
     return freeze({ referenceId: reference.id, name: reference.name, domain: reference.domain,
       confidence, matchedSteps, missingSteps, unexpectedSteps,
+      configurationEvidence: hasConfigurationEvidence,
+      specificityPenalty: Number(specificityPenalty.toFixed(3)),
+      domainConflict,
       interpretation: "advisory", deviationIsError: false }); }
   function matchRecordingToReference(recording, libraryOrRegistry, options = {}) {
     if (!recording || Number(recording.schemaVersion) !== 1) throw new TypeError(
       "A Canonical Recording schema-v1 value is required."); const registry = libraryOrRegistry?.library
       ? libraryOrRegistry : create(libraryOrRegistry); const observed = observedEvidence(recording, options);
-    const matches = registry.library.references.map(reference => compare(reference, observed))
+    const recognized = recognition.recognize(recording, options);
+    const recognizedDomain = recognized.classification?.signals?.strongMetadata &&
+      recognized.classification.signals.matchedDocuments > 0
+      ? recognized.classification.taxonomyReferences.domain.id : null;
+    const observedDomains = strings(observed.documents.map(id => DOCUMENT_DOMAIN_ANCHORS[id]));
+    const anchoredDomain = recognizedDomain || (observedDomains.length === 1 ? observedDomains[0] : null);
+    const matches = registry.library.references.map(reference => compare(reference, observed,
+      { anchoredDomain }))
       .sort((left, right) => right.confidence - left.confidence || left.referenceId.localeCompare(right.referenceId));
     return freeze({ bestMatch: matches[0] || null, confidence: matches[0]?.confidence || 0,
       matchedSteps: clone(matches[0]?.matchedSteps || []), missingSteps: clone(matches[0]?.missingSteps || []),
       unexpectedSteps: clone(matches[0]?.unexpectedSteps || []), alternativeMatches: matches.slice(1, 6),
-      observed, diagnostics: matches.length ? [] : [{ code: "no-reference-processes" }],
+      observed, anchoredDomain, diagnostics: matches.length ? [] : [{ code: "no-reference-processes" }],
       advisory: true, customizedProcessMayBeValid: true }); }
   return { SCHEMA_VERSION, compare, create, matchRecordingToReference, normalize,
     normalizeReference, observedEvidence, validate };

@@ -1,5 +1,11 @@
 # Changelog
 
+## 4.7.0 - Evidence-based reference matching
+
+- Reduced the score of configuration-heavy reference processes when the recording contains only a shared opening document or generic actions.
+- Advanced warehouse references now need an observed document sequence or transition before they can compete at full confidence.
+- Kept advanced references available as advisory alternatives instead of treating an unrecorded configuration as an error.
+
 ## 4.7.0 - Process variant evidence
 
 - Prevented a shared opening document, such as Purchase Order, from implying advanced warehouse handling.
