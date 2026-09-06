@@ -86,6 +86,13 @@ view.render(localizedCanonicalContainer, { recordingId: "localized", nodes: [{
 assert(localizedCanonicalContainer.innerHTML.includes("Inköpsorder"));
 assert(!localizedCanonicalContainer.innerHTML.includes("Purchase Order"),
   "node card, minimap, and selected-node detail must use the same localized title");
+const localizedBusinessContainer = { innerHTML: "" };
+view.render(localizedBusinessContainer, { recordingId: "localized-business", nodes: [{
+  nodeId: "purchase-process", nodeType: "businessProcess", title: "Purchase to Pay",
+  sequence: 0
+}], transitions: [], subprocesses: [], stateTransitions: [] }, { locale: "sv-SE" });
+assert(localizedBusinessContainer.innerHTML.includes("Inköp till betalning"));
+assert(!localizedBusinessContainer.innerHTML.includes("Purchase to Pay"));
 
 const decisionId = processModel.stableId("manual-process-node", ["branching", "stock"]);
 const shipId = processModel.stableId("process-node",

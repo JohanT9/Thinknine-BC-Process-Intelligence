@@ -30,6 +30,14 @@
     "document:planning-worksheet": "Planning Worksheet"
   });
   const SV_NODE_TITLES = Object.freeze({
+    "Sales Order Processing": "Försäljningsorderhantering",
+    "Purchase to Pay": "Inköp till betalning",
+    "Warehouse Inbound": "Inleverans till lager",
+    "Warehouse Outbound": "Utleverans från lager",
+    "Transfer Order": "Överföringsorder",
+    "Production": "Produktion",
+    "Assembly": "Montering",
+    "Planning": "Planering",
     "document:sales-quote": "Försäljningsoffert",
     "document:purchase-order": "Inköpsorder",
     "document:purchase-invoice": "Inköpsfaktura",

@@ -1,5 +1,11 @@
 # Changelog
 
+## 4.7.0 - Localize Business Central process levels
+
+- Added Swedish map labels for the canonical sales, purchase, warehouse, transfer, production, assembly, and planning business processes.
+- Recognition-generated business-level maps now show `Inköp till betalning` instead of `Purchase to Pay` in Swedish documents.
+- Kept the underlying taxonomy identifiers and canonical English names unchanged.
+
 ## 4.7.0 - Separate process identity from reference completion
 
 - Process matching now reports observed-evidence precision separately from reference-process coverage.
