@@ -72,6 +72,10 @@
 - Made automatic layout decisions explicit and shared across interactive and
   exported maps (`Horizontal`, `Multi-row`, `Branched`, or `Vertical`), with the
   selected strategy shown beside the Layout control in Process Overview.
+- Added strong Business Central document-domain anchors to process recognition,
+  preventing generic actions such as Create, Release, or Post from promoting
+  incompatible Transfer, Assembly, Production, or Planning classifications when
+  authoritative metadata identifies a purchase or sales recording.
 
 - Hid reference suggestions from Process Overview and process exports by
   default, while adding an explicit `Show reference suggestions` control that

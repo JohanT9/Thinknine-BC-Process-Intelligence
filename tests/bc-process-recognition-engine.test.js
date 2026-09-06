@@ -1,6 +1,7 @@
 const assert = require("assert");
 const canonical = require("../src/engine/canonical-recording");
 const engine = require("../src/engine/bc-process-recognition-engine");
+const taxonomySeed = require("../src/engine/business-central-process-taxonomy-seed").seed;
 
 function synthetic(id, events, transitions = []) {
   let value = canonical.create({ id, startedAt: "2026-09-02T08:00:00.000Z" });
@@ -71,6 +72,11 @@ assert.deepStrictEqual(recognizedPurchase.classification.processEvidence.matched
   "document:warehouse-put-away", "document:posted-purchase-receipt"]);
 assert(recognizedPurchase.classification.processEvidence.expectedDocuments.length >= 5);
 assert(recognizedPurchase.alternatives.some(item => item.process === "WarehouseInbound"));
+assert(!recognizedPurchase.alternatives.some(item => ["TransferOrder", "Assembly", "Planning"]
+  .includes(item.process)), "strong purchase metadata must exclude incompatible domains");
+const purchaseCandidates = [recognizedPurchase.classification, ...recognizedPurchase.alternatives];
+assert(purchaseCandidates.every(item => item.taxonomyReferences.domain.id ===
+  "domain:source-to-pay" || item.taxonomyReferences.domain.id === "domain:warehouse-management"));
 assert(recognizedPurchase.classification.processEvidence.variantAssessment,
   "Lifecycle variant evidence should be available to downstream process maps.");
 
@@ -100,6 +106,22 @@ const transfer = synthetic("transfer", [
   { identification: page(5746, 5746, "posted-document", "TransferReceipt") }
 ]);
 assert.strictEqual(engine.recognize(transfer).classification.process, "TransferOrder");
+const purchaseAgainstTransfer = engine.recognize(synthetic("purchase-not-transfer", [
+  { identification: page(50, 38, "purchase-order", "PurchaseOrder") },
+  { label: "Release", automationId: "Release", identification: action("ReleaseDocument", "Release") },
+  { label: "Post Receipt", automationId: "PostReceipt",
+    identification: action("PostDocument", "Post Receipt") }
+]), { minimumConfidence: 0, taxonomy: { ...taxonomySeed,
+  bcProcesses: taxonomySeed.bcProcesses.filter(item => [
+    "bc-process:source-to-pay:standard-purchase-order",
+    "bc-process:transfers:standard-transfer-order"
+  ].includes(item.id)) } });
+const incompatibleTransfer = [purchaseAgainstTransfer.classification,
+  ...purchaseAgainstTransfer.alternatives].filter(Boolean).find(item =>
+  item.taxonomyReferences.bcProcess.id === "bc-process:transfers:standard-transfer-order");
+assert(incompatibleTransfer && incompatibleTransfer.confidence <= 0.11);
+assert.strictEqual(incompatibleTransfer.signals.domainAnchorConflict, true);
+assert(incompatibleTransfer.explanation.some(item => item.includes("anchors the recording")));
 
 const production = synthetic("production", [
   { identification: page(99000831, 5405, "manufacturing-order", "ProductionOrder") },

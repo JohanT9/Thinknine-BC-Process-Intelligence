@@ -16,7 +16,7 @@
   schema, seed, lifecycleModel, lifecycleSeed
 ) {
   "use strict";
-  const ENGINE_VERSION = "1.1.0";
+  const ENGINE_VERSION = "1.2.0";
   const clone = value => value == null ? value : JSON.parse(JSON.stringify(value));
   const text = value => value == null ? "" : String(value).trim();
   const words = value => text(value).toLowerCase().replace(/[^a-z0-9åäöæø]+/g, " ").trim();
@@ -34,6 +34,20 @@
     ["Output", /\b(output|utflöde)\b/i], ["Transfer", /\btransfer|överför\b/i],
     ["Post", /\b(post|posting|bokför)\b/i], ["Create", /\b(create|new|ny|skapa)\b/i]
   ];
+  const DOCUMENT_DOMAIN_ANCHORS = Object.freeze({
+    "document:purchase-order": "domain:source-to-pay",
+    "document:purchase-invoice": "domain:source-to-pay",
+    "document:posted-purchase-invoice": "domain:source-to-pay",
+    "document:sales-order": "domain:order-to-cash",
+    "document:sales-invoice": "domain:order-to-cash",
+    "document:posted-sales-invoice": "domain:order-to-cash",
+    "document:transfer-order": "domain:transfers",
+    "document:transfer-shipment": "domain:transfers",
+    "document:transfer-receipt": "domain:transfers",
+    "document:production-order": "domain:plan-to-produce",
+    "document:assembly-order": "domain:assembly",
+    "document:planning-worksheet": "domain:forecast-to-plan"
+  });
 
   function eventPage(event) {
     return event.identification?.pageIdentity || event.page || event.businessCentral || {};
@@ -240,11 +254,16 @@
     }
     const unexpectedStrongDocuments = evidence.documentSequence.filter(item =>
       item.strength >= 0.8 && !expectedDocuments.includes(item.id)).length;
+    const anchoredDomains = unique(evidence.documentSequence.filter(item => item.strength >= 0.8)
+      .map(item => DOCUMENT_DOMAIN_ANCHORS[item.id]));
+    const domainAnchorConflict = anchoredDomains.length > 0 &&
+      !anchoredDomains.includes(domain?.id) && domain?.id !== "domain:warehouse-management";
     let confidence = Math.min(0.99, documentCoverage * 0.3 + observedCoverage * 0.14 +
       sequenceStrength * 0.18 + Math.min(1, actionStrength) * 0.15 +
       transitionStrength * 0.08 + lifecycleStrength * 0.15);
     confidence = Math.max(0, confidence - Math.min(0.24, orderConflicts * 0.12) -
       Math.min(0.2, unexpectedStrongDocuments * 0.05));
+    if (domainAnchorConflict) confidence = Math.min(confidence, 0.11);
     const hasStrong = matchedDocuments.some(item => item.strength >= 0.8) ||
       actionHits.some(item => item.strength >= 0.8) || relevantTransitions.some(item => item.strength >= 0.8);
     if (!hasStrong) confidence = Math.min(confidence, 0.54);
@@ -264,6 +283,8 @@
       "Partial process sequence recognized; later steps may not have been recorded" : null,
     orderConflicts ? `Detected ${orderConflicts} document order conflict${orderConflicts === 1 ? "" : "s"}` : null,
     unexpectedStrongDocuments ? `${unexpectedStrongDocuments} strong document signal${unexpectedStrongDocuments === 1 ? " was" : "s were"} outside this process` : null]);
+    if (domainAnchorConflict) reasons.push(`Strong Business Central document metadata anchors the recording to ${
+      anchoredDomains.join(", ")}, which conflicts with ${domain?.name || process.name}`);
     return { domain: key(domain?.name), process: key(businessProcess?.name),
       variant: variant ? key(variant.name) : null, confidence: Number(confidence.toFixed(3)),
       taxonomyReferences: { domain: domain ? { id: domain.id, name: domain.name } : null,
@@ -291,7 +312,7 @@
         matchedTransitions: relevantTransitions.length,
         matchedLifecycleTransitions: lifecycleMatch?.matchedTransitions.length || 0,
         distinctMatchedActions: actionHits.length, orderConflicts,
-        unexpectedStrongDocuments, evidenceQuality,
+        unexpectedStrongDocuments, anchoredDomains, domainAnchorConflict, evidenceQuality,
         scoreBreakdown: { documentCoverage: Number(documentCoverage.toFixed(3)),
           observedCoverage: Number(observedCoverage.toFixed(3)),
           sequenceStrength: Number(sequenceStrength.toFixed(3)),
