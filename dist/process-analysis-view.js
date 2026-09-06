@@ -13,6 +13,10 @@
   function stepLabel(step) { return text(step?.title || step?.name || step?.id ||
     step?.referenceProcess || "Unknown step"); }
   function localized(value, labels) { return labels.processNames?.[text(value)] || text(value); }
+  function actionEvidenceLabel(item, labels) { const name = localized(stepLabel(item), labels);
+    const qualifiers = array(item?.qualifiers).map(value =>
+      labels.actionQualifiers?.[value] || value).filter(Boolean);
+    return qualifiers.length ? `${name} (${qualifiers.join(", ")})` : name; }
   function domainKey(value) { return text(value).toLocaleLowerCase().replace(/^domain:/, "")
     .replace(/[^a-z0-9]+/g, ""); }
   function variantLabel(value, labels) { const id = text(value?.id || value);
@@ -143,7 +147,7 @@
             localized(stepLabel(item), labels)).join(", ") : labels.evidenceNone || "None detected")}</dd></div>
         <div><dt>${escape(labels.evidenceActions || "Business actions")}</dt><dd>${escape(
           array(model.evidence.actions).length ? array(model.evidence.actions).map(item =>
-            localized(stepLabel(item), labels)).join(", ") : labels.evidenceNone || "None detected")}</dd></div>
+            actionEvidenceLabel(item, labels)).join(", ") : labels.evidenceNone || "None detected")}</dd></div>
         <div><dt>${escape(labels.evidenceQuality || "Evidence quality")}</dt><dd>${escape(
           labels[`quality-${model.evidenceQuality}`] || model.evidenceQuality)}</dd></div>
         ${model.matchDetails ? `<div><dt>${escape(labels.observedPrecision ||

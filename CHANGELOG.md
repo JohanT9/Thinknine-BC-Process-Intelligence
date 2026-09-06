@@ -1,5 +1,11 @@
 # Changelog
 
+## 4.7.0 - Explain action context in process analysis
+
+- Process-recognition evidence now retains action qualifiers such as shipment, receipt, invoice, and pick.
+- The process-analysis explanation displays localized action context, making generic actions such as posting auditable by consultants.
+- Kept qualifiers in the semantic analysis layer without exposing technical identifiers in the process map.
+
 ## 4.7.0 - Context-aware Business Central actions
 
 - Added deterministic action qualifiers for shipment, receipt, invoice, pick, put-away, assembly, consumption, output, and transfer operations.

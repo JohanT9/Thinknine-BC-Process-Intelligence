@@ -11,7 +11,7 @@ const result = {
   additionalSteps: [{ type: "action", name: "Customer Approval" }],
   matchDetails: { observedPrecision: 0.96, referenceCoverage: 0.74 }, evidence: {
     documents: [{ name: "Sales Order" }, { name: "Warehouse Shipment" }],
-    actions: [{ name: "Release" }, { name: "Create Pick" }], signals: {} } },
+    actions: [{ name: "Release" }, { name: "Create Pick", qualifiers: ["pick"] }], signals: {} } },
   matches: [{ referenceDiagramId: "diagram:basic", referenceProcess: "Basic Warehouse Outbound",
     domain: "domain:order-to-cash", confidence: 0.68, matchedSteps: [{ title: "Release" }],
     missingSteps: [], additionalSteps: [] }, { referenceDiagramId: "diagram:transfer",
@@ -56,7 +56,7 @@ assert(container.innerHTML.includes("91%"));
 assert(container.innerHTML.includes("Customer Approval"));
 assert(container.innerHTML.includes("Why this assessment?"));
 assert(container.innerHTML.includes("Warehouse Shipment"));
-assert(container.innerHTML.includes("Release, Create Pick"));
+assert(container.innerHTML.includes("Release, Create Pick (pick)"));
 assert(container.innerHTML.includes("Observed steps fit"));
 assert(container.innerHTML.includes("96%"));
 assert(container.innerHTML.includes("Reference process covered"));

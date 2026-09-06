@@ -68,6 +68,11 @@ assert.strictEqual(partialPurchase.classification.taxonomyReferences.domain.id,
 assert(!partialPurchase.classification.processEvidence.matchedActions.some(item =>
   item.name === "Post"),
 "Post Shipment must not count as a purchase receipt or purchase invoice posting action");
+const outboundPost = engine.recognize(recording("qualified-outbound", [
+  "document:warehouse-shipment", "action:PostShipment"
+])).classification.processEvidence.matchedActions.find(item => item.name === "Post");
+assert.deepStrictEqual(outboundPost.qualifiers, ["shipment"],
+  "matched actions must retain their Business Central context for explainability");
 assert.notStrictEqual(partialPurchase.assessment.status, "auto-classifiable",
   "an incomplete process must not be presented as automatically recognized");
 assert(!partialPurchase.alternatives.some(candidate =>

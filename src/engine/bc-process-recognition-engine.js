@@ -325,6 +325,7 @@
         matchedActions: actionHits.map(item => ({ name: item.name, eventId: item.eventId,
           sequence: evidence.observations.find(observation =>
             observation.eventId === item.eventId)?.sequence || 0, strength: item.strength,
+          qualifiers: clone(item.qualifiers || []),
           nodeType: item.name === "Post" ? "posting" : "processStep" }))
       },
       explanation: reasons, signals: { matchedDocuments: matchedDocuments.length,
