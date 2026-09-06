@@ -93,6 +93,8 @@ const repairedStoredResult = engine.recognize(canonical.normalize(storedBeforeLe
 assert.strictEqual(repairedStoredResult.classification.taxonomyReferences.domain.id,
   "domain:source-to-pay",
 "already stored canonical recordings must recover legacy identity during normalization");
+assert.strictEqual(partialPurchase.assessment.status, "review-required",
+  "strong document and action identity should make a partial process reviewable");
 assert.notStrictEqual(partialPurchase.assessment.status, "auto-classifiable",
   "an incomplete process must not be presented as automatically recognized");
 assert(!partialPurchase.alternatives.some(candidate =>

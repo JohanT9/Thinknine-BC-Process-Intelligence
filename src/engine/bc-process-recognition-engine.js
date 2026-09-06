@@ -380,7 +380,12 @@
         top.explanation.push(`Classification is close to ${runnerUp.taxonomyReferences.bcProcess.name}; manual confirmation is recommended`);
       }
     }
-    const assessmentStatus = !top || top.confidence < 0.35 ? "insufficient-evidence" :
+    const identityEstablished = Boolean(top && top.signals.strongMetadata &&
+      top.signals.matchedDocuments >= 1 && top.signals.matchedActions >= 1 &&
+      top.signals.anchoredDomains.length === 1 && !top.signals.ambiguous);
+    if (top) top.signals.identityEstablished = identityEstablished;
+    const assessmentStatus = !top || (top.confidence < 0.35 && !identityEstablished)
+      ? "insufficient-evidence" :
       top.signals.ambiguous || top.confidence < 0.82 ? "review-required" : "auto-classifiable";
     return { engineVersion: ENGINE_VERSION, classificationSource: "rule",
       assessment: { status: assessmentStatus, candidateMargin: margin,

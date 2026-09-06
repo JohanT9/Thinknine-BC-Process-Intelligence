@@ -325,6 +325,7 @@
     let selectedBest = libraryBest && (!graphBest || libraryBest.confidence > graphBest.confidence)
       ? freeze({ referenceProcess: libraryBest.name, referenceProcessId: libraryBest.referenceId,
         domain: libraryBest.domain, confidence: libraryBest.confidence,
+        matchDetails: clone(libraryBest.matchDetails),
         matchedSteps: clone(libraryBest.matchedSteps), missingSteps: clone(libraryBest.missingSteps),
         additionalSteps: clone(libraryBest.unexpectedSteps), source: "ReferenceProcessLibrary",
         customizedBehaviorMayBeValid: true, deviationsAreErrors: false }) : graphBest;

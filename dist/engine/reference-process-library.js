@@ -128,9 +128,13 @@
     const specificityPenalty = reference.configurationRequirements.length &&
       !hasConfigurationEvidence ? Math.min(0.18,
         0.06 + reference.configurationRequirements.length * 0.03) : 0;
+    const referenceCoverage = (documentScore * 0.5 + actionScore * 0.3 +
+      transitionScore * 0.2) / Math.max(0.01, applicableWeight);
+    const observedEvidenceCount = observed.documents.length + observed.actions.length;
+    const observedPrecision = observedEvidenceCount ? (matchedDocuments.length +
+      matchedActions.length) / observedEvidenceCount : 0;
     let confidence = Number(Math.max(0, Math.min(1,
-      (documentScore * 0.5 + actionScore * 0.3 + transitionScore * 0.2) /
-      Math.max(0.01, applicableWeight) -
+      observedPrecision * 0.65 + referenceCoverage * 0.35 -
       Math.min(0.08, (unexpectedDocuments.length + unexpectedActions.length) * 0.01) -
       specificityPenalty)).toFixed(3));
     const domainConflict = Boolean(context.anchoredDomain && reference.domain !==
@@ -147,6 +151,8 @@
     return freeze({ referenceId: reference.id, name: reference.name, domain: reference.domain,
       confidence, matchedSteps, missingSteps, unexpectedSteps,
       configurationEvidence: hasConfigurationEvidence,
+      matchDetails: { observedPrecision: Number(observedPrecision.toFixed(3)),
+        referenceCoverage: Number(referenceCoverage.toFixed(3)) },
       specificityPenalty: Number(specificityPenalty.toFixed(3)),
       domainConflict, actionOrderConflicts,
       interpretation: "advisory", deviationIsError: false }); }

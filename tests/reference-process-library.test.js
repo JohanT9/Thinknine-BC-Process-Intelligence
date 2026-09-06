@@ -89,6 +89,10 @@ assert.strictEqual(purchaseOpeningMatch.bestMatch.referenceId,
   "reference:bc:stp-simple-purchase",
   "An ordinary purchase-order opening must prefer the simple reference process.");
 assert.strictEqual(purchaseOpeningMatch.anchoredDomain, "domain:source-to-pay");
+assert.strictEqual(purchaseOpeningMatch.bestMatch.matchDetails.observedPrecision, 1);
+assert(purchaseOpeningMatch.bestMatch.matchDetails.referenceCoverage < 0.5);
+assert(purchaseOpeningMatch.bestMatch.confidence >= 0.7,
+  "a partial recording with no contradictory evidence should be confidently identifiable");
 const conflictingPlanning = [purchaseOpeningMatch.bestMatch,
   ...purchaseOpeningMatch.alternativeMatches].find(item =>
   item.referenceId === "reference:bc:planning-create-purchase");

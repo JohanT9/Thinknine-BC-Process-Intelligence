@@ -1,5 +1,11 @@
 # Changelog
 
+## 4.7.0 - Separate process identity from reference completion
+
+- Process matching now reports observed-evidence precision separately from reference-process coverage.
+- A partial recording whose observed documents and actions all agree can be confidently identified while still showing low reference coverage.
+- Strong page and action identity now makes incomplete recordings reviewable, without marking them automatically complete.
+
 ## 4.7.0 - Consistent process-map labels
 
 - Applied the shared localized node title to process cards, the minimap, and the selected-node detail panel.
