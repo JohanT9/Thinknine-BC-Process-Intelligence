@@ -6,10 +6,12 @@
   const seed = typeof module === "object" && module.exports
     ? require("../engine/business-central-process-taxonomy-seed").seed
     : root.T9BusinessCentralProcessTaxonomySeed.seed;
-  const api = factory(graph, schema, seed);
+  const recognition = typeof module === "object" && module.exports
+    ? require("../engine/bc-process-recognition-engine") : root.T9BCProcessRecognitionEngine;
+  const api = factory(graph, schema, seed, recognition);
   if (typeof module === "object" && module.exports) module.exports = api;
   root.T9MultiLevelProcessGraph = api;
-})(typeof globalThis !== "undefined" ? globalThis : this, function (graph, schema, seed) {
+})(typeof globalThis !== "undefined" ? globalThis : this, function (graph, schema, seed, recognition) {
   "use strict";
   const PROJECTION_VERSION = "1.0.0";
   const clone = value => value == null ? value : JSON.parse(JSON.stringify(value));
@@ -52,9 +54,31 @@
       recordingId, level]), recordingId, level, title, nodes, relationships,
     startNodeIds: [start.nodeId], endNodeIds: [end.nodeId], metadata: {
       projectionVersion: PROJECTION_VERSION, ...metadata } }); }
-  function classifications(recording) { const order = new Map(recording.events.map((event,
-    index) => [event.id, event.sequence || index + 1])); return (recording.semanticInterpretation
-      ?.classifications || []).filter(item => item.sourceEventIds?.length).slice().sort((a, b) =>
+  function observedClassifications(recording, taxonomy) {
+    const result = recognition?.recognize?.(recording, { taxonomy });
+    const candidate = result?.classification;
+    if (!candidate?.signals?.strongMetadata || !candidate.signals.matchedDocuments) return [];
+    const shared = { businessDomain: candidate.taxonomyReferences.domain,
+      businessProcess: candidate.taxonomyReferences.businessProcess,
+      bcProcess: candidate.taxonomyReferences.bcProcess, classificationSource: "rule",
+      confidence: candidate.confidence, metadata: { inferredFromObservedEvidence: true } };
+    return [
+      ...(candidate.processEvidence?.matchedDocuments || []).map((item, index) => ({
+        ...shared, classificationId: `observed-document:${item.id}:${index}`,
+        sourceEventIds: [item.eventId], businessDocument: { id: item.id, name: item.name }
+      })),
+      ...(candidate.processEvidence?.matchedActions || []).map((item, index) => ({
+        ...shared, classificationId: `observed-action:${item.name}:${index}`,
+        sourceEventIds: [item.eventId], businessAction: { id: `action:${item.name.toLowerCase()}`,
+          name: item.name }, metadata: { ...shared.metadata,
+          nodeType: item.nodeType, qualifiers: clone(item.qualifiers || []) }
+      }))
+    ];
+  }
+  function classifications(recording, taxonomy = seed) { const order = new Map(recording.events.map((event,
+    index) => [event.id, event.sequence || index + 1])); const explicit = (recording.semanticInterpretation
+      ?.classifications || []).filter(item => item.sourceEventIds?.length); const values = explicit.length
+      ? explicit : observedClassifications(recording, taxonomy); return values.slice().sort((a, b) =>
       firstEventOrder(a, order) - firstEventOrder(b, order) ||
       a.classificationId.localeCompare(b.classificationId)); }
   function procedure(recording) { const byEvent = new Map(); classifications(recording)
@@ -69,7 +93,7 @@
       screenshotAssetId: event.screenshotAssetId || null } }));
     return chain(recording.id, "userProcedure", nodes,
       recording.metadata?.title || "User procedure"); }
-  function bcProcess(recording, taxonomy) { const values = classifications(recording); const nodes = [];
+  function bcProcess(recording, taxonomy) { const values = classifications(recording, taxonomy); const nodes = [];
     let previousDocument = null; values.forEach(item => { const document = item.businessDocument;
       if (document?.id && document.id !== previousDocument) { nodes.push(graph.node({
         nodeId: graph.stableId("process-graph-node", [recording.id, "document", document.id,
@@ -79,6 +103,7 @@
         metadata: { relationshipType: item.metadata?.createsDocument ? "documentCreation" : "sequence" }
       })); previousDocument = document.id; }
       const step = item.processStep; const action = item.businessAction;
+      if (item.metadata?.inferredFromObservedEvidence && !step?.id && !action?.id) return;
       const title = step?.name || action?.name || item.bcProcess?.name || "Classified BC step";
       const nodeType = /post|bokför/i.test(action?.name || title) ? "posting" :
         item.metadata?.nodeType === "decision" ? "decision" : "processStep";
@@ -93,7 +118,7 @@
         condition: item.metadata?.condition || null } })); });
     return chain(recording.id, "businessCentralProcess", nodes,
       `${recording.metadata?.title || "Recording"} — Business Central`, { taxonomyId: taxonomy.taxonomyId }); }
-  function business(recording, taxonomy, bcGraph) { const values = classifications(recording);
+  function business(recording, taxonomy, bcGraph) { const values = classifications(recording, taxonomy);
     const groups = []; values.forEach(item => { const reference = item.businessProcess ||
       (item.bcProcess?.id ? (() => { const process = taxonomy.bcProcesses.find(candidate =>
         candidate.id === item.bcProcess.id); return taxonomy.businessProcesses.find(candidate =>

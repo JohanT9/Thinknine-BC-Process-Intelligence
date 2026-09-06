@@ -1,5 +1,11 @@
 # Changelog
 
+## 4.7.0 - Build semantic maps from observed legacy evidence
+
+- Multi-level process graphs now fall back to strong observed Business Central metadata when explicit semantic classifications are absent.
+- Older recordings can immediately show useful Business Process and BC Process maps after reopening.
+- The fallback adds only documents and actions that were actually observed; missing or optional reference steps remain excluded.
+
 ## 4.7.0 - Repair previously canonicalized legacy evidence
 
 - Added a non-mutating read migration for schema-v1 recordings created before legacy identity restoration was fixed.

@@ -103,6 +103,25 @@ assert.deepStrictEqual(relationshipCoverage.map(item => item.relationshipType),
 const withoutSemantics = canonical.create({ id: "unclassified", startedAt: "2026-09-02T09:00:00Z" });
 const emptyBundle = projector.generateAll(withoutSemantics);
 assert.strictEqual(graph.validate(emptyBundle.businessProcess).valid, true);
+let observedOnly = canonical.create({ id: "observed-purchase",
+  startedAt: "2026-09-02T09:00:00Z" });
+observedOnly = canonical.addEvent(observedOnly, { eventNo: 1, type: "click" }, {
+  pageIdentity: { pageObjectId: "50", tableId: "38", documentType: "purchase-order",
+    entity: "PurchaseOrder" }
+});
+observedOnly = canonical.addEvent(observedOnly, { eventNo: 2, type: "click" }, {
+  actionIdentity: { actionType: "ReleaseDocument", caption: "Release" }
+});
+const observedBundle = projector.generateAll(observedOnly);
+assert(observedBundle.businessProcess.nodes.some(node =>
+  node.title === "Purchase to Pay"),
+"strong observed BC metadata should create a useful business map without manual classification");
+assert(observedBundle.businessCentralProcess.nodes.some(node =>
+  node.title === "Purchase Order" && node.metadata.relationshipType === "sequence"));
+assert(observedBundle.businessCentralProcess.nodes.some(node => node.title === "Release"));
+assert(!observedBundle.businessCentralProcess.nodes.some(node =>
+  /invoice|receipt|put-away/i.test(node.title)),
+"the observed map must not add unrecorded reference-process steps");
 assert.strictEqual(emptyBundle.businessProcess.nodes.length, 2,
   "Unclassified recordings remain valid and contain neutral boundaries.");
 
