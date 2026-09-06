@@ -1,5 +1,11 @@
 # Changelog
 
+## 4.7.0 - Process recognition confusion corpus
+
+- Added deterministic cross-domain recognition coverage for sales, purchase, warehouse inbound/outbound, transfer, production, assembly, and planning recordings.
+- Added regression protection ensuring strong purchase metadata cannot be displaced by generic shipment actions or leak transfer alternatives.
+- Added an explicit partial-recording assertion so incomplete processes remain reviewable rather than being presented as fully recognized.
+
 ## 4.7.0 - Ordered business action matching
 
 - Reference matching now evaluates Business Central actions in their observed order.
