@@ -80,6 +80,33 @@ assert(purchaseCandidates.every(item => item.taxonomyReferences.domain.id ===
 assert(recognizedPurchase.classification.processEvidence.variantAssessment,
   "Lifecycle variant evidence should be available to downstream process maps.");
 
+const standardPageViews = [
+  [9300, "document:sales-quote", "list"],
+  [9305, "document:sales-order", "list"],
+  [7339, "document:warehouse-shipment", "list"],
+  [142, "document:posted-sales-shipment", "posted-list"],
+  [9301, "document:sales-invoice", "list"],
+  [143, "document:posted-sales-invoice", "posted-list"],
+  [9307, "document:purchase-order", "list"],
+  [145, "document:posted-purchase-receipt", "posted-list"],
+  [9308, "document:purchase-invoice", "list"],
+  [146, "document:posted-purchase-invoice", "posted-list"],
+  [5742, "document:transfer-order", "list"],
+  [5752, "document:transfer-shipment", "posted-list"],
+  [5753, "document:transfer-receipt", "posted-list"],
+  [9326, "document:production-order", "list"],
+  [9327, "document:finished-production-order", "posted-list"],
+  [902, "document:assembly-order", "list"]
+];
+standardPageViews.forEach(([pageObjectId, documentId, viewType]) => {
+  const evidence = engine.extractEvidence(synthetic(`page-view-${pageObjectId}`, [
+    { identification: page(pageObjectId, "", "", "") }
+  ]));
+  assert.strictEqual(evidence.observations[0].document.id, documentId,
+    `BC page ${pageObjectId} should resolve to ${documentId}`);
+  assert.strictEqual(evidence.observations[0].document.view.viewType, viewType);
+});
+
 const purchaseOrderOnly = engine.recognize(synthetic("purchase-order-only", [
   { identification: page(50, 38, "purchase-order", "PurchaseOrder") },
   { identification: page(7332, 7316, "warehouse-document", "WarehouseReceipt") }
@@ -111,7 +138,7 @@ assert.deepStrictEqual(swedishEvidence.documentSequence.map(item => item.id),
 const transfer = synthetic("transfer", [
   { identification: page(5740, 5740, "order", "TransferOrder") },
   { label: "Post Shipment", automationId: "PostTransferShipment", identification: action("PostDocument", "Post Transfer Shipment") },
-  { identification: page(5742, 5744, "posted-document", "TransferShipment") },
+  { identification: page(5744, 5744, "posted-document", "TransferShipment") },
   { label: "Post Receipt", automationId: "PostTransferReceipt", identification: action("PostDocument", "Post Transfer Receipt") },
   { identification: page(5746, 5746, "posted-document", "TransferReceipt") }
 ]);

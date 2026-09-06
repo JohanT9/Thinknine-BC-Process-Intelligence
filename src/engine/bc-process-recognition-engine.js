@@ -96,8 +96,13 @@
     }
     if (pageId) {
       const document = documents.find(item => item.pageIds.includes(pageId));
-      if (document) return { document, strength: 1, signal: "page-object-id",
-        explanation: `Matched ${document.name} page ${pageId}` };
+      if (document) {
+        const view = (document.pageViews || []).find(item => item.pageObjectId === pageId);
+        const viewLabel = view?.viewType ? ` ${view.viewType}` : "";
+        return { document, view: view ? clone(view) : null, strength: 1,
+          signal: "page-object-id",
+          explanation: `Matched ${document.name}${viewLabel} page ${pageId}` };
+      }
     }
     if (tableId) {
       const candidates = documents.filter(item => item.tableIds.includes(tableId));
@@ -154,7 +159,8 @@
       const screenshot = options.screenshotEvidence?.[event.id] || null;
       observations.push({ eventId: event.id, sequence: event.sequence || index + 1,
         document: document ? { id: document.document.id, name: document.document.name,
-          strength: document.strength, signal: document.signal } : null,
+          strength: document.strength, signal: document.signal,
+          view: clone(document.view) } : null,
         actions, page: clone(eventPage(event)), screenshot: screenshot ? {
           interpretation: clone(screenshot), strength: 0.15, signal: "screenshot-interpretation"
         } : null,

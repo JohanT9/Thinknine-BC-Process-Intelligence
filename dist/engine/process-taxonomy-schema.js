@@ -7,7 +7,8 @@
   /** @typedef {{id:string,name:string,domainId:string}} BusinessProcess */
   /** @typedef {{id:string,name:string,businessProcessId:string,processStepIds:string[],documentIds:string[],variantIds:string[]}} BCProcess */
   /** @typedef {{id:string,name:string,bcProcessId:string,sequence:number,actionIds:string[],documentIds:string[]}} ProcessStep */
-  /** @typedef {{id:string,name:string,documentType:string,pageIds:string[],tableIds:string[]}} ProcessDocument */
+  /** @typedef {{pageObjectId:string,viewType:string,name?:string}} ProcessDocumentView */
+  /** @typedef {{id:string,name:string,documentType:string,pageIds:string[],pageViews:ProcessDocumentView[],tableIds:string[]}} ProcessDocument */
   /** @typedef {{id:string,name:string,processStepId:string,actionType:string,pageIds:string[],controlNames:string[],bcActionNames:string[]}} ProcessAction */
   /** @typedef {{id:string,name:string,relationshipType:string,fromEntityId:string,toEntityId:string}} ProcessRelationship */
   /** @typedef {{id:string,name:string,bcProcessId:string,processStepIds:string[],conditions:Object}} ProcessVariant */
@@ -19,6 +20,10 @@
   const RELATIONSHIP_TYPES = Object.freeze([
     "precedes", "follows", "creates", "posts", "releases", "consumes",
     "produces", "references", "branches_to", "returns_to"
+  ]);
+  const PAGE_VIEW_TYPES = Object.freeze([
+    "card", "list", "document", "worksheet", "journal", "activity",
+    "posted-card", "posted-list"
   ]);
 
   function clone(value) {
@@ -41,6 +46,18 @@
 
   function strings(value) {
     return [...new Set(array(value).map(String).map(item => item.trim()).filter(Boolean))];
+  }
+
+  function pageViews(value) {
+    const seen = new Set();
+    return array(value).map(item => {
+      const source = object(item);
+      const pageObjectId = String(source.pageObjectId || source.pageId || "").trim();
+      const viewType = String(source.viewType || "document").trim();
+      const name = String(source.name || "").trim();
+      return { ...clone(source), pageObjectId, viewType, ...(name ? { name } : {}) };
+    }).filter(item => item.pageObjectId && !seen.has(item.pageObjectId) &&
+      seen.add(item.pageObjectId));
   }
 
   function identity(value, entityType) {
@@ -66,9 +83,13 @@
       bcProcessId: String(value.bcProcessId || "").trim(),
       sequence: Number.isFinite(value.sequence) ? value.sequence : 0,
       actionIds: strings(value.actionIds), documentIds: strings(value.documentIds) });
-    if (type === "ProcessDocument") return deepFreeze({ ...base,
-      documentType: String(value.documentType || "record").trim(),
-      pageIds: strings(value.pageIds), tableIds: strings(value.tableIds) });
+    if (type === "ProcessDocument") {
+      const views = pageViews(value.pageViews);
+      return deepFreeze({ ...base,
+        documentType: String(value.documentType || "record").trim(),
+        pageIds: strings([...array(value.pageIds), ...views.map(item => item.pageObjectId)]),
+        pageViews: views, tableIds: strings(value.tableIds) });
+    }
     if (type === "ProcessAction") return deepFreeze({ ...base,
       processStepId: String(value.processStepId || "").trim(),
       actionType: String(value.actionType || "interaction").trim(),
@@ -172,6 +193,16 @@
         code: "invalid-relationship-endpoint", entityId: entity.id,
         fromEntityId: entity.fromEntityId, toEntityId: entity.toEntityId });
     });
+    const pages = new Map();
+    taxonomy.documents.forEach(entity => entity.pageViews.forEach(view => {
+      if (!PAGE_VIEW_TYPES.includes(view.viewType)) errors.push({
+        code: "invalid-page-view-type", entityId: entity.id,
+        pageObjectId: view.pageObjectId, viewType: view.viewType });
+      if (pages.has(view.pageObjectId) && pages.get(view.pageObjectId) !== entity.id) errors.push({
+        code: "duplicate-page-document", entityId: entity.id,
+        pageObjectId: view.pageObjectId, otherEntityId: pages.get(view.pageObjectId) });
+      pages.set(view.pageObjectId, entity.id);
+    }));
     return deepFreeze({ valid: errors.length === 0, errors, taxonomy });
   }
 
@@ -192,6 +223,6 @@
       confidence: Number.isFinite(value.confidence) ? value.confidence : null });
   }
 
-  return { ENTITY_TYPES, RELATIONSHIP_TYPES, SCHEMA_VERSION, normalize,
+  return { ENTITY_TYPES, RELATIONSHIP_TYPES, PAGE_VIEW_TYPES, SCHEMA_VERSION, normalize,
     normalizeEntity, normalizeRecordingReferences, validate };
 });

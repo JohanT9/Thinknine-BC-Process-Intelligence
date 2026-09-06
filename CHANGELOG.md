@@ -1,5 +1,12 @@
 # Changelog
 
+## 4.7.0 - Recognize canonical Business Central page families
+
+- Added reusable page-view identities so canonical documents can distinguish document, list, worksheet, activity, and posted views without coupling taxonomy data to the UI.
+- Added representative list and card mappings across sales, purchasing, warehouse outbound, transfers, production, assembly, and posted documents.
+- Corrected page `5742` to identify the Transfer Orders list instead of a posted transfer shipment, and retained legacy `pageIds` compatibility.
+- Recognition explanations now state which kind of Business Central view supplied the document evidence.
+
 ## 4.7.0 - Recognize the Purchase Orders list
 
 - Added the standard Business Central Purchase Orders list page (`9307`) to the canonical Purchase Order document identity.

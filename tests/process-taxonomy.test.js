@@ -9,6 +9,21 @@ assert.strictEqual(validation.valid, true, JSON.stringify(validation.errors, nul
 const taxonomy = registry.create(seed);
 assert(seed.documents.find(item => item.id === "document:purchase-order")
   .pageIds.includes("9307"), "the standard Purchase Orders list page must be recognized");
+assert.strictEqual(schema.PAGE_VIEW_TYPES.includes("list"), true);
+const transferListOwner = seed.documents.find(item => item.pageIds.includes("5742"));
+assert.strictEqual(transferListOwner.id, "document:transfer-order",
+  "Transfer Orders list page 5742 must not be treated as a posted shipment");
+const normalizedPurchaseOrder = validation.taxonomy.documents.find(item =>
+  item.id === "document:purchase-order");
+assert.deepStrictEqual(normalizedPurchaseOrder.pageViews.map(item => item.viewType),
+  ["document", "list"]);
+assert(normalizedPurchaseOrder.pageIds.includes("9307"),
+  "normalized pageIds must remain backward compatible");
+assert.strictEqual(schema.validate({ ...seed, documents: seed.documents.map(document =>
+  document.id === "document:sales-order" ? { ...document, pageViews: [
+    ...document.pageViews, { pageObjectId: "9307", viewType: "list" }] } : document)
+}).errors.some(error => error.code === "duplicate-page-document"), true,
+"one BC page must not silently identify two canonical documents");
 
 const requiredDomains = ["Order to Cash", "Source to Pay", "Forecast to Plan",
   "Plan to Produce", "Inventory to Deliver", "Record to Report", "Returns",

@@ -30,33 +30,38 @@
     "document:assembly-order": ["Monteringsorder"],
     "document:planning-worksheet": ["Planeringsförslag"]
   };
+  const view = (pageObjectId, viewType, name) => ({
+    pageObjectId: String(pageObjectId), viewType, name
+  });
   const documents = [
-    ["document:sales-quote", "Sales Quote", "quote", ["41"], ["36", "37"]],
-    ["document:sales-order", "Sales Order", "order", ["42"], ["36", "37"]],
-    ["document:warehouse-shipment", "Warehouse Shipment", "warehouse-document", ["7335"], ["7320", "7321"]],
-    ["document:warehouse-pick", "Warehouse Pick", "warehouse-activity", ["7345"], ["5766", "5767"]],
-    ["document:posted-sales-shipment", "Posted Sales Shipment", "posted-document", ["130"], ["110", "111"]],
-    ["document:sales-invoice", "Sales Invoice", "invoice", ["43"], ["36", "37"]],
-    ["document:posted-sales-invoice", "Posted Sales Invoice", "posted-document", ["132"], ["112", "113"]],
-    ["document:purchase-order", "Purchase Order", "order", ["50", "9307"], ["38", "39"]],
-    ["document:warehouse-receipt", "Warehouse Receipt", "warehouse-document", ["7332"], ["7316", "7317"]],
-    ["document:warehouse-put-away", "Warehouse Put-away", "warehouse-activity", ["7340"], ["5766", "5767"]],
-    ["document:posted-purchase-receipt", "Posted Purchase Receipt", "posted-document", ["136"], ["120", "121"]],
-    ["document:posted-warehouse-receipt", "Posted Warehouse Receipt", "posted-document", ["7333"], ["7318", "7319"]],
-    ["document:purchase-invoice", "Purchase Invoice", "invoice", ["51"], ["38", "39"]],
-    ["document:posted-purchase-invoice", "Posted Purchase Invoice", "posted-document", ["138"], ["122", "123"]],
-    ["document:transfer-order", "Transfer Order", "order", ["5740"], ["5740", "5741"]],
-    ["document:transfer-shipment", "Posted Transfer Shipment", "posted-document", ["5742"], ["5744", "5745"]],
-    ["document:transfer-receipt", "Posted Transfer Receipt", "posted-document", ["5746"], ["5746", "5747"]],
-    ["document:production-order", "Production Order", "manufacturing-order", ["99000831"], ["5405", "5406", "5407"]],
-    ["document:planned-production-order", "Planned Production Order", "manufacturing-order", [], ["5405", "5406", "5407"]],
-    ["document:firm-planned-production-order", "Firm Planned Production Order", "manufacturing-order", [], ["5405", "5406", "5407"]],
-    ["document:finished-production-order", "Finished Production Order", "posted-document", [], ["5405", "5406", "5407"]],
-    ["document:production-journal", "Production Journal", "journal", ["99000832"], ["83"]],
-    ["document:assembly-order", "Assembly Order", "assembly-order", ["900"], ["900", "901"]],
-    ["document:planning-worksheet", "Planning Worksheet", "worksheet", ["99000852"], ["246"]]
-  ].map(([id, name, documentType, pageIds, tableIds]) => ({
-    id, name, documentType, pageIds, tableIds, aliases: documentAliases[id] || []
+    ["document:sales-quote", "Sales Quote", "quote", [view(41, "document", "Sales Quote"), view(9300, "list", "Sales Quotes")], ["36", "37"]],
+    ["document:sales-order", "Sales Order", "order", [view(42, "document", "Sales Order"), view(9305, "list", "Sales Order List")], ["36", "37"]],
+    ["document:warehouse-shipment", "Warehouse Shipment", "warehouse-document", [view(7335, "document", "Warehouse Shipment"), view(7339, "list", "Warehouse Shipment List")], ["7320", "7321"]],
+    ["document:warehouse-pick", "Warehouse Pick", "warehouse-activity", [view(7345, "worksheet", "Pick Worksheet")], ["5766", "5767"]],
+    ["document:posted-sales-shipment", "Posted Sales Shipment", "posted-document", [view(130, "posted-card", "Posted Sales Shipment"), view(142, "posted-list", "Posted Sales Shipments")], ["110", "111"]],
+    ["document:sales-invoice", "Sales Invoice", "invoice", [view(43, "document", "Sales Invoice"), view(9301, "list", "Sales Invoice List")], ["36", "37"]],
+    ["document:posted-sales-invoice", "Posted Sales Invoice", "posted-document", [view(132, "posted-card", "Posted Sales Invoice"), view(143, "posted-list", "Posted Sales Invoices")], ["112", "113"]],
+    ["document:purchase-order", "Purchase Order", "order", [view(50, "document", "Purchase Order"), view(9307, "list", "Purchase Order List")], ["38", "39"]],
+    ["document:warehouse-receipt", "Warehouse Receipt", "warehouse-document", [view(7332, "list", "Warehouse Receipts")], ["7316", "7317"]],
+    ["document:warehouse-put-away", "Warehouse Put-away", "warehouse-activity", [view(7340, "activity", "Warehouse Put-away")], ["5766", "5767"]],
+    ["document:posted-purchase-receipt", "Posted Purchase Receipt", "posted-document", [view(136, "posted-card", "Posted Purchase Receipt"), view(145, "posted-list", "Posted Purchase Receipts")], ["120", "121"]],
+    ["document:posted-warehouse-receipt", "Posted Warehouse Receipt", "posted-document", [view(7333, "posted-card", "Posted Warehouse Receipt")], ["7318", "7319"]],
+    ["document:purchase-invoice", "Purchase Invoice", "invoice", [view(51, "document", "Purchase Invoice"), view(9308, "list", "Purchase Invoices")], ["38", "39"]],
+    ["document:posted-purchase-invoice", "Posted Purchase Invoice", "posted-document", [view(138, "posted-card", "Posted Purchase Invoice"), view(146, "posted-list", "Posted Purchase Invoices")], ["122", "123"]],
+    ["document:transfer-order", "Transfer Order", "order", [view(5740, "document", "Transfer Order"), view(5742, "list", "Transfer Orders")], ["5740", "5741"]],
+    ["document:transfer-shipment", "Posted Transfer Shipment", "posted-document", [view(5744, "posted-card", "Posted Transfer Shipment"), view(5752, "posted-list", "Posted Transfer Shipments")], ["5744", "5745"]],
+    ["document:transfer-receipt", "Posted Transfer Receipt", "posted-document", [view(5746, "posted-card", "Posted Transfer Receipt"), view(5753, "posted-list", "Posted Transfer Receipts")], ["5746", "5747"]],
+    ["document:production-order", "Production Order", "manufacturing-order", [view(99000831, "document", "Released Production Order"), view(9326, "list", "Released Production Orders")], ["5405", "5406", "5407"]],
+    ["document:planned-production-order", "Planned Production Order", "manufacturing-order", [view(99000813, "document", "Planned Production Order")], ["5405", "5406", "5407"]],
+    ["document:firm-planned-production-order", "Firm Planned Production Order", "manufacturing-order", [view(99000829, "document", "Firm Planned Production Order")], ["5405", "5406", "5407"]],
+    ["document:finished-production-order", "Finished Production Order", "posted-document", [view(9327, "posted-list", "Finished Production Orders")], ["5405", "5406", "5407"]],
+    ["document:production-journal", "Production Journal", "journal", [view(99000832, "journal", "Production Journal")], ["83"]],
+    ["document:assembly-order", "Assembly Order", "assembly-order", [view(900, "document", "Assembly Order"), view(902, "list", "Assembly Orders")], ["900", "901"]],
+    ["document:planning-worksheet", "Planning Worksheet", "worksheet", [view(99000852, "worksheet", "Planning Worksheet")], ["246"]]
+  ].map(([id, name, documentType, pageViews, tableIds]) => ({
+    id, name, documentType, pageViews,
+    pageIds: pageViews.map(item => item.pageObjectId), tableIds,
+    aliases: documentAliases[id] || []
   }));
 
   const definitions = [
