@@ -143,6 +143,17 @@ assert.strictEqual(misleadingGraphMatch.bestMatch.missingSteps.find(item =>
 assert(misleadingGraphMatch.matches.every(item => item.matchedNodes > 0),
   "References without any matched node are not useful alternatives.");
 
+const transferDiagram = seed.diagrams.find(item => item.name === "Transfer Order");
+const conflictingGraphMatch = model.matchRecordingToReferences(purchaseRecording, seed, {
+  processGraph: transferDiagram.processGraph
+});
+assert.strictEqual(conflictingGraphMatch.bestMatch.referenceProcessId,
+  "bc-process:source-to-pay:standard-purchase-order");
+assert(conflictingGraphMatch.matches.every(item => item.domain === "domain:source-to-pay"),
+  "Verified purchase metadata must remove cross-domain graph alternatives.");
+assert(!conflictingGraphMatch.referenceGraphs[transferDiagram.id],
+  "A transfer diagram must not remain selectable for a verified purchase recording.");
+
 const closePurchaseReference = model.matchRecordingToReferences(purchaseRecording, seed, {
   referenceLibrary: { matchRecordingToReference() { return { bestMatch: { referenceId: "stp-receipt",
     name: "Warehouse Receipt", domain: "domain:source-to-pay", confidence: 0.2,

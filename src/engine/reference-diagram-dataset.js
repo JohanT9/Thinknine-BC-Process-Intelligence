@@ -289,7 +289,14 @@
     const generated = options.processGraph || options.graphProjector?.generate(recording,
       "businessCentralProcess", options); const graphMatches = generated
       ? registry.findSimilarProcessGraphs(generated, options.limit || 5) : [];
-    const matches = graphMatches.map(item => freeze({ referenceDiagramId: item.diagram.id,
+    const recognized = recognitionResult?.classification;
+    const deterministicEntityMatch = Boolean(recognized?.signals?.strongMetadata &&
+      recognized.signals.matchedDocuments > 0);
+    const recognizedDomain = text(recognized?.taxonomyReferences?.domain?.id).toLocaleLowerCase();
+    const eligibleGraphMatches = deterministicEntityMatch && recognizedDomain
+      ? graphMatches.filter(item => text(item.diagram.domain).toLocaleLowerCase() === recognizedDomain)
+      : graphMatches;
+    const matches = eligibleGraphMatches.map(item => freeze({ referenceDiagramId: item.diagram.id,
       referenceProcess: item.diagram.bcProcess || item.diagram.name, confidence: item.confidence,
       domain: item.diagram.domain, businessProcess: item.diagram.businessProcess,
       matchedNodes: item.comparison.matchedSteps.length,
@@ -303,11 +310,7 @@
         matchedSteps: clone(libraryBest.matchedSteps), missingSteps: clone(libraryBest.missingSteps),
         additionalSteps: clone(libraryBest.unexpectedSteps), source: "ReferenceProcessLibrary",
         customizedBehaviorMayBeValid: true, deviationsAreErrors: false }) : graphBest;
-    const recognized = recognitionResult?.classification;
-    const deterministicEntityMatch = Boolean(recognized?.signals?.strongMetadata &&
-      recognized.signals.matchedDocuments > 0);
     const selectedDomain = text(selectedBest?.domain).toLocaleLowerCase();
-    const recognizedDomain = text(recognized?.taxonomyReferences?.domain?.id).toLocaleLowerCase();
     const conflictsWithRecognizedDomain = selectedDomain && recognizedDomain &&
       selectedDomain !== recognizedDomain && !selectedDomain.endsWith(recognizedDomain.split(":").at(-1));
     if (deterministicEntityMatch && (!selectedBest || conflictsWithRecognizedDomain ||
@@ -358,7 +361,7 @@
       Number(Math.min(selectedBest.confidence, maximum).toFixed(3)), assessmentStatus: status,
       evidenceQuality: recognitionAssessment?.evidenceQuality || (graphEvidenceIsStrong ? "strong" : "weak"),
       candidateMargin, manualConfirmationRecommended: status !== "auto-classifiable" }) : null;
-    const referenceGraphs = Object.fromEntries(graphMatches.map(item => [
+    const referenceGraphs = Object.fromEntries(eligibleGraphMatches.map(item => [
       item.diagram.id, clone(item.diagram.processGraph)
     ]));
     const matchingBestDiagram = registry.dataset.diagrams.find(item =>

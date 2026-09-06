@@ -1,5 +1,11 @@
 # Changelog
 
+## 4.7.0 - Domain-safe graph matching
+
+- Applied verified Business Central document domains to process-graph matching.
+- Removed cross-domain graph alternatives when strong page or document metadata identifies the recording domain.
+- Prevented visually or structurally similar transfer, planning, and assembly diagrams from remaining selectable for verified purchase recordings.
+
 ## 4.7.0 - Evidence-based reference matching
 
 - Reduced the score of configuration-heavy reference processes when the recording contains only a shared opening document or generic actions.
