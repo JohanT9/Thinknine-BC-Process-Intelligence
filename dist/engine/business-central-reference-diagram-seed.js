@@ -32,6 +32,7 @@
     ["document:production-journal", "Production Journal", { sv: "Produktionsjournal" }],
     ["document:assembly-order", "Assembly Order", { sv: "Monteringsorder" }],
     ["document:planning-worksheet", "Planning Worksheet", { sv: "Planeringsförslag" }],
+    ["document:demand-forecast", "Demand Forecast", { sv: "Efterfrågeprognos" }],
     ["document:sales-return-order", "Sales Return Order", { sv: "Försäljningsreturorder" }],
     ["document:return-receipt", "Posted Return Receipt", { sv: "Bokförd returinleverans" }],
     ["document:sales-credit-memo", "Sales Credit Memo", { sv: "Försäljningskreditnota" }],
@@ -204,6 +205,13 @@
         refs: ["document:planning-worksheet"] }, { title: "Calculate Plan", refs: ["concept:plan"] },
         { title: "Review Action Messages", type: "manualAction" },
         { title: "Carry Out Action Message", type: "systemAction", edge: "creates" }]),
+    reference("demand-forecast", "Demand Forecast", "domain:forecast-to-plan", "Planning",
+      "Demand Planning", [
+        { title: "Demand Forecast", type: "document", refs: ["document:demand-forecast"] },
+        { title: "Enter Forecast Quantity", type: "manualAction" },
+        { title: "Review Forecast by Period", type: "manualAction" },
+        { title: "Calculate Plan", refs: ["concept:plan"], edge: "references" }
+      ]),
     reference("planning-supply-options", "Planning Supply Options", "domain:forecast-to-plan",
       "Planning", "Regenerative Plan", [
         { title: "Planning Worksheet", type: "document", refs: ["document:planning-worksheet"] },

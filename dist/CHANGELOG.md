@@ -1,5 +1,11 @@
 # Changelog
 
+## Recognize and map Business Central demand forecasts
+
+- Add Demand Forecast Overview, Demand Forecasts, and Demand Forecast Entries using Microsoft page IDs 2901, 99000921, and 99000922.
+- Classify these views in Forecast to Plan and connect demand entry and review to planning calculation.
+- Add a localized reference diagram with document and manual-action shapes for GUI and export.
+
 ## Add a branched planning process map
 
 - Model the Planning Worksheet as a decision flow that branches to purchase, production, or transfer supply orders.
