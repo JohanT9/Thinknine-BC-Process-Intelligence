@@ -1,6 +1,7 @@
 const assert = require("assert");
 const theme = require("../src/document/process-map-theme");
 const labels = require("../src/document/process-map-labels");
+const referenceDiagrams = require("../src/engine/business-central-reference-diagram-seed").dataset;
 
 assert.strictEqual(theme.normalize("neutral"), "neutral");
 assert.strictEqual(theme.normalize("unknown"), theme.DEFAULT_THEME_ID);
@@ -58,4 +59,10 @@ assert.strictEqual(labels.nodeTitle({ title: "Post Inventory Differences" }, "sv
 assert.strictEqual(labels.handoffTitle({ from: { id: "purchasing" },
   to: { id: "warehouse" } }, "sv-SE"), "Inköp → Lager");
 assert.strictEqual(labels.roleTitle({ id: "inventory" }, "sv-SE"), "Lagerstyrning");
+const untranslatedReferenceTitles = [...new Set(referenceDiagrams.diagrams.flatMap(item =>
+  item.processGraph.nodes.map(node => node.title)).filter(title =>
+    title && !["Start", "End"].includes(title) &&
+    labels.nodeTitle({ title }, "sv-SE") === title))];
+assert.deepStrictEqual(untranslatedReferenceTitles, [],
+  "Every canonical reference-process node must have a Swedish map label.");
 console.log("Process map theme tests passed.");

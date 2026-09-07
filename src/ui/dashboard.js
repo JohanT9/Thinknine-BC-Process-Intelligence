@@ -3555,6 +3555,7 @@ function processAnalysisLabels() {
       "variant:advanced-warehouse": "Avancerad lagerhantering",
       "variant:direct-shipment": "Direktleverans",
       "variant:drop-shipment": "Direktleverans från leverantör",
+      "variant:standard-return": "Standardretur",
       "variant:make-to-stock": "Tillverkning mot lager",
       "variant:make-to-order": "Tillverkning mot order"
     }, processNames: {

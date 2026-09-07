@@ -1,5 +1,11 @@
 # Changelog
 
+## Complete Swedish labels for canonical process maps
+
+- Translate every action and document node currently used by the canonical reference-diagram library.
+- Cover planning, production, assembly, transfers, returns, warehouse picking, and put-away instead of falling back to English.
+- Add an automated completeness check so new reference nodes cannot silently appear untranslated in Swedish maps or exports.
+
 ## Recognize legacy Business Central views from recorded URLs
 
 - Recover the canonical Business Central page identity from `page=` in recorded frame and top URLs when an older recording lacks structured page metadata.
