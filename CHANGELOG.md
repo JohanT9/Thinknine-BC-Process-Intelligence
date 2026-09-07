@@ -1,5 +1,11 @@
 # Changelog
 
+## Add a production-order lifecycle map
+
+- Add a verified Make-to-Stock diagram from Planned through Firm Planned and Released to Finished Production Order.
+- Preserve production status changes as process steps and the finished order as a posted-document shape.
+- Add Swedish labels for every production status transition in interactive maps and exports.
+
 ## Expand canonical inventory reference diagrams
 
 - Add verified semantic diagrams for Inventory Movement, Warehouse Movement, Item Tracking, Item Reclassification, and Physical Inventory.
