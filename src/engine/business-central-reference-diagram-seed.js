@@ -34,6 +34,7 @@
     ["document:planning-worksheet", "Planning Worksheet", { sv: "Planeringsförslag" }],
     ["document:demand-forecast", "Demand Forecast", { sv: "Efterfrågeprognos" }],
     ["document:requisition-worksheet", "Requisition Worksheet", { sv: "Inköpsförslag" }],
+    ["document:order-planning", "Order Planning", { sv: "Orderplanering" }],
     ["document:sales-return-order", "Sales Return Order", { sv: "Försäljningsreturorder" }],
     ["document:return-receipt", "Posted Return Receipt", { sv: "Bokförd returinleverans" }],
     ["document:sales-credit-memo", "Sales Credit Memo", { sv: "Försäljningskreditnota" }],
@@ -220,6 +221,13 @@
         { title: "Calculate Plan", refs: ["concept:plan"] },
         { title: "Review Action Messages", type: "manualAction" },
         { title: "Carry Out Action Message", type: "systemAction", edge: "creates" }
+      ]),
+    reference("order-planning", "Order Planning", "domain:forecast-to-plan", "Planning",
+      "Order to Order", [
+        { title: "Order Planning", type: "document", refs: ["document:order-planning"] },
+        { title: "Calculate Unfulfilled Demand", type: "systemAction" },
+        { title: "Review Demand Order", type: "manualAction" },
+        { title: "Create Supply Order", type: "systemAction", edge: "creates" }
       ]),
     reference("planning-supply-options", "Planning Supply Options", "domain:forecast-to-plan",
       "Planning", "Regenerative Plan", [

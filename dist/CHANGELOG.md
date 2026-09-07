@@ -1,5 +1,11 @@
 # Changelog
 
+## Distinguish Business Central Order Planning
+
+- Add Microsoft page 5522 and source table 246 as the canonical Order Planning worksheet.
+- Keep Order Planning distinct from Planning Worksheet and Requisition Worksheet despite their shared requisition-line source.
+- Add a localized reference map from unfulfilled demand through review to creation of a supply order.
+
 ## Recognize and map the Business Central requisition worksheet
 
 - Add Microsoft page 291 and source table 246 as the canonical Requisition Worksheet used for purchase and transfer planning.
