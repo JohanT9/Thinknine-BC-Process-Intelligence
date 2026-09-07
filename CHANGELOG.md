@@ -1,5 +1,11 @@
 # Changelog
 
+## 2026-09-07 - Warehouse-pick sales process map
+
+- Added the missing Sales Order with Warehouse Pick reference map between basic shipment and advanced warehouse variants.
+- The map preserves the observed sales-order creation, release, shipment, pick, registration, and posting sequence.
+- Added dataset regression coverage for the warehouse-pick document mapping.
+
 ## 2026-09-07 - Dedicated item-tracking process maps
 
 - Added separate Business Central maps for lot tracking, serial tracking, and expiration-date handling.

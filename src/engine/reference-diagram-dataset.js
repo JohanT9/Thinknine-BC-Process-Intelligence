@@ -384,8 +384,11 @@
       ? Number(recognitionResult.assessment?.candidateMargin || 0)
       : selectedBest ? Number(Math.max(0, selectedBest.confidence -
         (runnerUp?.confidence || 0)).toFixed(3)) : 0;
+    const graphBestReference = graphBest ? registry.getDiagram(graphBest.referenceDiagramId) : null;
+    const exactGraphMatch = Boolean(generated && graphBestReference && graphSignature(generated) ===
+      graphSignature(graphBestReference.processGraph));
     const graphEvidenceIsStrong = Boolean(graphBest && graphBest.matchedNodes >= 3 &&
-      graphBest.confidence >= 0.8 && candidateMargin >= 0.1);
+      graphBest.confidence >= 0.8 && (candidateMargin >= 0.1 || exactGraphMatch));
     const recognitionAssessment = recognitionResult?.assessment || null;
     let status = recognitionAssessment?.status || "insufficient-evidence";
     if (graphEvidenceIsStrong && status !== "auto-classifiable") status = "review-required";

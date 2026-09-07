@@ -5,7 +5,7 @@ const graph = require("../src/document/process-graph");
 
 const checked = model.validate(seed);
 assert.strictEqual(checked.valid, true, JSON.stringify(checked.diagnostics));
-assert.strictEqual(checked.dataset.diagrams.length, 30);
+assert.strictEqual(checked.dataset.diagrams.length, 31);
 assert(checked.dataset.diagrams.every(item => item.sourceId && item.abstractionLevel === "BC_PROCESS"));
 assert(checked.dataset.diagrams.every(item => !item.originalImageAssetId));
 assert(checked.dataset.diagrams.every(item => item.facts.every(fact => fact.sourceId)));
@@ -77,8 +77,10 @@ assert(seed.diagrams.find(item => item.name === "Drop Shipment").processGraph.no
 const registry = model.create(seed);
 assert.strictEqual(registry.findCanonicalConcept("Generate Pick").canonicalName, "Create Warehouse Pick");
 assert.strictEqual(registry.findCanonicalDocument("Försäljningsorder").id, "document:sales-order");
-assert.strictEqual(registry.findProcessByDocuments(["document:warehouse-pick"])[0].name,
-  "Advanced Warehouse Outbound");
+assert(registry.findProcessByDocuments(["document:warehouse-pick"]).some(item =>
+  item.name === "Advanced Warehouse Outbound"));
+assert(registry.findProcessByDocuments(["document:warehouse-pick"]).some(item =>
+  item.name === "Sales Order with Warehouse Pick"));
 assert(registry.findProcessByActions(["register pick"]).some(item =>
   item.name === "Advanced Warehouse Outbound"));
 assert(registry.findProcessBySequence(["Sales Order", "Release"]).length >= 2);
@@ -94,7 +96,7 @@ assert.strictEqual(manual.publishable, true);
 assert.strictEqual(manual.normalized.labels[2].sourceLabel, "Generate Pick");
 assert.strictEqual(manual.normalized.labels[2].canonicalConceptId, "concept:create-warehouse-pick");
 const published = model.pipeline().publish(manual);
-assert.strictEqual(published.diagrams.length, 31);
+assert.strictEqual(published.diagrams.length, 32);
 const externalSource = { id: "source:partner:one", sourceType: "PartnerDocumentation",
   title: "Partner process", publisher: "Partner" };
 const sourced = model.pipeline().ingest({ inputType: "ManualProcess", source: externalSource,

@@ -161,6 +161,22 @@
         { title: "Release", refs: ["concept:release"], edge: "releases" },
         { title: "Warehouse Shipment", type: "document", refs: ["document:warehouse-shipment"], edge: "creates" },
         { title: "Post Shipment", type: "posting", refs: ["concept:post-shipment"], edge: "posts" }]),
+    reference("sales-with-warehouse-pick", "Sales Order with Warehouse Pick",
+      "domain:order-to-cash", "Warehouse Outbound", "Warehouse Pick", [
+        { title: "Sales Order", type: "document", refs: ["document:sales-order"] },
+        { title: "Create Sales Order", refs: ["concept:create-sales-order"] },
+        { title: "Release", refs: ["concept:release"], edge: "releases" },
+        { title: "Warehouse Shipment", type: "document",
+          refs: ["document:warehouse-shipment"], edge: "creates" },
+        { title: "Create Warehouse Pick", refs: ["concept:create-warehouse-pick"] },
+        { title: "Warehouse Pick", type: "document",
+          refs: ["document:warehouse-pick"], edge: "creates" },
+        { title: "Register Pick", refs: ["concept:register-pick"] },
+        { title: "Post Shipment", type: "posting",
+          refs: ["concept:post-shipment"], edge: "posts" },
+        { title: "Posted Warehouse Shipment", type: "postedDocument",
+          refs: ["document:posted-warehouse-shipment"], edge: "posts" }
+      ]),
     reference("advanced-warehouse-outbound", "Advanced Warehouse Outbound",
       "domain:order-to-cash", "Warehouse Outbound", "Advanced Warehouse", [
         { title: "Sales Order", type: "document", refs: ["document:sales-order"] },
