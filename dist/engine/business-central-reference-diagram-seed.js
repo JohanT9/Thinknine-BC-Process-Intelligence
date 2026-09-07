@@ -97,6 +97,11 @@
     ["concept:register-inventory-movement", "Register Inventory Movement", ["Register Movement"]],
     ["concept:register-warehouse-movement", "Register Warehouse Movement", ["Register Movement"]],
     ["concept:assign-item-tracking", "Assign Item Tracking", ["Assign Lot or Serial Number"]],
+    ["concept:assign-lot-number", "Assign Lot Number", ["Enter Lot Number"]],
+    ["concept:assign-serial-number", "Assign Serial Number", ["Enter Serial Number"]],
+    ["concept:enter-expiration-date", "Enter Expiration Date", ["Set Expiration Date"]],
+    ["concept:post-tracked-transaction", "Post Tracked Transaction",
+      ["Post Item Tracking Transaction"]],
     ["concept:post-reclassification", "Post Reclassification", ["Post Item Reclassification"]],
     ["concept:post-inventory-differences", "Post Inventory Differences", ["Post Physical Inventory"]]
   ].map(([id, canonicalName, aliases]) => ({ id, canonicalName, aliases,
@@ -328,6 +333,32 @@
       "Lot or Serial", [
         { title: "Item Tracking Lines", type: "document", refs: ["document:item-tracking-lines"] },
         { title: "Assign Item Tracking", refs: ["concept:assign-item-tracking"] }]),
+    reference("lot-tracking", "Lot Tracking", "domain:item-tracking", "Item Tracking",
+      "Lot Tracking", [
+        { title: "Item Tracking Lines", type: "document", refs: ["document:item-tracking-lines"] },
+        { title: "Assign Lot Number", type: "manualAction",
+          refs: ["concept:assign-lot-number"] },
+        { title: "Post Tracked Transaction", type: "posting",
+          refs: ["concept:post-tracked-transaction"], edge: "posts" }
+      ]),
+    reference("serial-tracking", "Serial Tracking", "domain:item-tracking", "Item Tracking",
+      "Serial Tracking", [
+        { title: "Item Tracking Lines", type: "document", refs: ["document:item-tracking-lines"] },
+        { title: "Assign Serial Number", type: "manualAction",
+          refs: ["concept:assign-serial-number"] },
+        { title: "Post Tracked Transaction", type: "posting",
+          refs: ["concept:post-tracked-transaction"], edge: "posts" }
+      ]),
+    reference("expiration-date-handling", "Expiration Date Handling", "domain:item-tracking",
+      "Item Tracking", "Expiration Date Handling", [
+        { title: "Item Tracking Lines", type: "document", refs: ["document:item-tracking-lines"] },
+        { title: "Assign Lot Number", type: "manualAction",
+          refs: ["concept:assign-lot-number"] },
+        { title: "Enter Expiration Date", type: "manualAction",
+          refs: ["concept:enter-expiration-date"] },
+        { title: "Post Tracked Transaction", type: "posting",
+          refs: ["concept:post-tracked-transaction"], edge: "posts" }
+      ]),
     reference("item-reclassification", "Item Reclassification", "domain:inventory-to-deliver",
       "Item Reclassification", "Standard", [
         { title: "Item Reclassification Journal", type: "document",

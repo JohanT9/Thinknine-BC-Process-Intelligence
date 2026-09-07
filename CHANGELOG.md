@@ -1,5 +1,11 @@
 # Changelog
 
+## 2026-09-07 - Dedicated item-tracking process maps
+
+- Added separate Business Central maps for lot tracking, serial tracking, and expiration-date handling.
+- Added stable semantic concepts for lot numbers, serial numbers, expiration dates, and posting tracked transactions.
+- Added Swedish process-map labels and dataset regression coverage for all three variants.
+
 ## 2026-09-07 - Conditional reference branches no longer count as missing
 
 - Process comparison now separates unchosen conditional routes from genuinely missing steps.
