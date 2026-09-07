@@ -168,6 +168,15 @@ taxonomyPageViews.forEach(({ document, view }) => {
 });
 taxonomySeed.documents.forEach(document => assert(document.pageViews.length > 0,
   `${document.id} must have at least one canonical Business Central view.`));
+taxonomySeed.documents.filter(document => document.primaryDomainId).forEach(document =>
+  document.pageViews.forEach(view => {
+    const result = engine.recognize(synthetic(`domain-owner-${view.pageObjectId}`, [
+      { identification: page(view.pageObjectId, "", "", "") }
+    ]));
+    assert.strictEqual(result.classification?.taxonomyReferences?.domain?.id,
+      document.primaryDomainId,
+      `${view.name} page ${view.pageObjectId} must classify to its canonical domain.`);
+  }));
 
 let legacyUrlOnly = canonical.create({ id: "legacy-url-only-purchase-list",
   startedAt: "2026-09-02T08:00:00.000Z" });

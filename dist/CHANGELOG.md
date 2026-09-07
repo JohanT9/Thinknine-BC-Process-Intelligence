@@ -1,5 +1,12 @@
 # Changelog
 
+## Close process-classification gaps for canonical BC views
+
+- Associate Sales Quotes and posted Sales Invoices with the Order-to-Cash process family.
+- Associate posted Purchase Invoices and posted Warehouse Receipts with their correct purchase and warehouse process families.
+- Associate planned, firm-planned, released, journal, and finished production views with the production process family.
+- Verify every canonically owned Business Central view selects its declared business domain from page identity alone.
+
 ## Complete Swedish labels for canonical process maps
 
 - Translate every action and document node currently used by the canonical reference-diagram library.

@@ -131,8 +131,9 @@
     { domainId: "domain:order-to-cash", businessId: "business-process:sales-order-processing",
       businessName: "Sales Order Processing", processId: "bc-process:order-to-cash:standard-sales-order",
       processName: "Sales Order → Warehouse Shipment → Warehouse Pick → Posted Shipment → Sales Invoice",
-      documentIds: ["document:sales-order", "document:warehouse-shipment",
-        "document:warehouse-pick", "document:posted-sales-shipment", "document:sales-invoice"],
+      documentIds: ["document:sales-quote", "document:sales-order", "document:warehouse-shipment",
+        "document:warehouse-pick", "document:posted-sales-shipment", "document:sales-invoice",
+        "document:posted-sales-invoice"],
       steps: [
         ["create-sales-order", "Create Sales Order", [["open-sales-orders", "Open Sales Orders", "open"], ["select-new", "Select New", "invoke"], ["select-customer", "Select Customer", "select"], ["add-item", "Add Item", "enter"], ["enter-quantity", "Enter Quantity", "enter"]]],
         ["release-sales-order", "Release Sales Order", [["select-release", "Select Release", "invoke"]]],
@@ -146,7 +147,8 @@
       businessName: "Purchase to Pay", processId: "bc-process:source-to-pay:standard-purchase-order",
       processName: "Purchase Order → Warehouse Receipt → Put-away → Posted Receipt → Purchase Invoice",
       documentIds: ["document:purchase-order", "document:warehouse-receipt",
-        "document:warehouse-put-away", "document:posted-purchase-receipt", "document:purchase-invoice"],
+        "document:warehouse-put-away", "document:posted-purchase-receipt", "document:purchase-invoice",
+        "document:posted-purchase-invoice"],
       steps: [
         ["create-purchase-order", "Create Purchase Order", [["open-purchase-orders", "Open Purchase Orders", "open"], ["select-vendor", "Select Vendor", "select"], ["add-purchase-line", "Add Item and Quantity", "enter"]]],
         ["release-purchase-order", "Release Purchase Order", [["release-purchase-order", "Select Release", "invoke"]]],
@@ -157,7 +159,8 @@
     { domainId: "domain:warehouse-management", businessId: "business-process:warehouse-inbound",
       businessName: "Warehouse Inbound", processId: "bc-process:warehouse:inbound-receipt-put-away",
       processName: "Warehouse Receipt → Warehouse Put-away → Registered Put-away",
-      documentIds: ["document:warehouse-receipt", "document:warehouse-put-away"],
+      documentIds: ["document:warehouse-receipt", "document:warehouse-put-away",
+        "document:posted-warehouse-receipt"],
       steps: [
         ["create-warehouse-receipt", "Create Warehouse Receipt", [["open-warehouse-receipts", "Open Warehouse Receipts", "open"], ["get-source-documents", "Get Source Documents", "invoke"]]],
         ["post-warehouse-receipt", "Post Warehouse Receipt", [["post-warehouse-receipt", "Post Receipt", "post"]]],
@@ -186,7 +189,9 @@
     { domainId: "domain:plan-to-produce", businessId: "business-process:production",
       businessName: "Production", processId: "bc-process:production:released-production-order",
       processName: "Production Order → Components → Output → Finished Production Order",
-      documentIds: ["document:production-order", "document:production-journal"],
+      documentIds: ["document:planned-production-order", "document:firm-planned-production-order",
+        "document:production-order", "document:production-journal",
+        "document:finished-production-order"],
       steps: [
         ["create-production-order", "Create Production Order", [["open-production-orders", "Open Released Production Orders", "open"], ["select-item", "Select Source Item", "select"], ["refresh-production-order", "Refresh Production Order", "invoke"]]],
         ["post-consumption", "Post Component Consumption", [["open-production-journal", "Open Production Journal", "open"], ["post-consumption", "Post Consumption", "post"]]],
