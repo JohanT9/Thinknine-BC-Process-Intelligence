@@ -37,7 +37,14 @@
     ["document:inventory-pick", "Inventory Pick", { sv: "Lagerplockning" }],
     ["document:posted-inventory-pick", "Posted Inventory Pick", { sv: "Bokförd lagerplockning" }],
     ["document:inventory-put-away", "Inventory Put-away", { sv: "Lagerinförsel" }],
-    ["document:posted-inventory-put-away", "Posted Inventory Put-away", { sv: "Bokförd lagerinförsel" }]
+    ["document:posted-inventory-put-away", "Posted Inventory Put-away", { sv: "Bokförd lagerinförsel" }],
+    ["document:inventory-movement", "Inventory Movement", { sv: "Lagerflyttning" }],
+    ["document:warehouse-movement", "Warehouse Movement", { sv: "Lagerförflyttning" }],
+    ["document:item-tracking-lines", "Item Tracking Lines", { sv: "Artikelspårningsrader" }],
+    ["document:item-reclassification-journal", "Item Reclassification Journal",
+      { sv: "Artikelomklassificeringsjournal" }],
+    ["document:physical-inventory-journal", "Physical Inventory Journal",
+      { sv: "Inventeringsjournal" }]
   ].map(([id, canonicalName, localizedCaptions, tableId, pageId]) => ({ id, canonicalName,
     localizedCaptions, namespace: "Microsoft.BusinessCentral", tableId: tableId ?? null,
     pageId: pageId ?? null, entityType: "Document", aliases: [] }));
@@ -61,7 +68,12 @@
     ["concept:ship-return", "Ship Return", ["Post Return Shipment"]],
     ["concept:post-credit", "Post Credit Memo", ["Post Credit"]],
     ["concept:post-inventory-pick", "Post Inventory Pick", ["Post Pick and Shipment"]],
-    ["concept:post-inventory-put-away", "Post Inventory Put-away", ["Post Receipt and Put-away"]]
+    ["concept:post-inventory-put-away", "Post Inventory Put-away", ["Post Receipt and Put-away"]],
+    ["concept:register-inventory-movement", "Register Inventory Movement", ["Register Movement"]],
+    ["concept:register-warehouse-movement", "Register Warehouse Movement", ["Register Movement"]],
+    ["concept:assign-item-tracking", "Assign Item Tracking", ["Assign Lot or Serial Number"]],
+    ["concept:post-reclassification", "Post Reclassification", ["Post Item Reclassification"]],
+    ["concept:post-inventory-differences", "Post Inventory Differences", ["Post Physical Inventory"]]
   ].map(([id, canonicalName, aliases]) => ({ id, canonicalName, aliases,
     namespace: "Microsoft.BusinessCentral", domain: "Business Central", entityType: "ProcessStep" }));
   function graph(diagramId, steps, edges = null) {
@@ -178,7 +190,36 @@
       "Basic Warehouse Inbound", "Basic Warehouse", [
         { title: "Inventory Put-away", type: "document", refs: ["document:inventory-put-away"] },
         { title: "Post Receipt and Put-away", type: "posting", refs: ["concept:post-inventory-put-away"], edge: "posts" },
-        { title: "Posted Inventory Put-away", type: "postedDocument", refs: ["document:posted-inventory-put-away"], edge: "posts" }])
+        { title: "Posted Inventory Put-away", type: "postedDocument", refs: ["document:posted-inventory-put-away"], edge: "posts" }]),
+    reference("inventory-movement", "Inventory Movement", "domain:inventory-to-deliver",
+      "Inventory Movement", "Standard", [
+        { title: "Inventory Movement", type: "document", refs: ["document:inventory-movement"] },
+        { title: "Create Inventory Movement" },
+        { title: "Register Inventory Movement", refs: ["concept:register-inventory-movement"] }]),
+    reference("warehouse-movement", "Warehouse Movement", "domain:warehouse-management",
+      "Warehouse Movement", "Advanced Warehouse", [
+        { title: "Warehouse Movement", type: "document", refs: ["document:warehouse-movement"] },
+        { title: "Create Warehouse Movement" },
+        { title: "Register Warehouse Movement", refs: ["concept:register-warehouse-movement"] }]),
+    reference("item-tracking", "Item Tracking", "domain:item-tracking", "Item Tracking",
+      "Lot or Serial", [
+        { title: "Item Tracking Lines", type: "document", refs: ["document:item-tracking-lines"] },
+        { title: "Assign Item Tracking", refs: ["concept:assign-item-tracking"] }]),
+    reference("item-reclassification", "Item Reclassification", "domain:inventory-to-deliver",
+      "Item Reclassification", "Standard", [
+        { title: "Item Reclassification Journal", type: "document",
+          refs: ["document:item-reclassification-journal"] },
+        { title: "Enter Item Reclassification" },
+        { title: "Post Reclassification", type: "posting",
+          refs: ["concept:post-reclassification"], edge: "posts" }]),
+    reference("physical-inventory", "Physical Inventory", "domain:inventory-to-deliver",
+      "Physical Inventory", "Standard", [
+        { title: "Physical Inventory Journal", type: "document",
+          refs: ["document:physical-inventory-journal"] },
+        { title: "Calculate Physical Inventory" },
+        { title: "Record Physical Count", type: "manualAction" },
+        { title: "Post Inventory Differences", type: "posting",
+          refs: ["concept:post-inventory-differences"], edge: "posts" }])
   ];
   const dataset = Object.freeze({ schemaVersion: 1, datasetId: "bc-reference-diagram-dataset",
     taxonomyVersion: "1.0.0", createdAt: "2026-09-02T00:00:00.000Z",

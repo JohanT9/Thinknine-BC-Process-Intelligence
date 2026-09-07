@@ -1,5 +1,11 @@
 # Changelog
 
+## Expand canonical inventory reference diagrams
+
+- Add verified semantic diagrams for Inventory Movement, Warehouse Movement, Item Tracking, Item Reclassification, and Physical Inventory.
+- Preserve document, posting, and manual-count node types so interactive maps and SVG exports use the intended shapes and colors.
+- Expand the reference dataset from 14 to 19 representative Business Central diagrams.
+
 ## Normalize customized Business Central list identities
 
 - Resolve plural and view-suffixed metadata such as `PurchaseOrders`, `SalesOrderList`, and `InventoryPicksPage` to their canonical documents.

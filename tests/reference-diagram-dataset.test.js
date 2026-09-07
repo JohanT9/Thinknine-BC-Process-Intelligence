@@ -5,7 +5,7 @@ const graph = require("../src/document/process-graph");
 
 const checked = model.validate(seed);
 assert.strictEqual(checked.valid, true, JSON.stringify(checked.diagnostics));
-assert.strictEqual(checked.dataset.diagrams.length, 14);
+assert.strictEqual(checked.dataset.diagrams.length, 19);
 assert(checked.dataset.diagrams.every(item => item.sourceId && item.abstractionLevel === "BC_PROCESS"));
 assert(checked.dataset.diagrams.every(item => !item.originalImageAssetId));
 assert(checked.dataset.diagrams.every(item => item.facts.every(fact => fact.sourceId)));
@@ -18,6 +18,11 @@ assert.deepStrictEqual(seed.diagrams.find(item => item.name === "Sales Return").
 assert.deepStrictEqual(seed.diagrams.find(item => item.name === "Inventory Pick").processGraph.nodes
   .filter(item => !["start", "end"].includes(item.nodeType)).map(item => item.nodeType),
   ["document", "posting", "postedDocument"]);
+assert.strictEqual(seed.diagrams.find(item => item.name === "Physical Inventory")
+  .processGraph.nodes.find(item => item.title === "Record Physical Count").nodeType,
+"manualAction");
+assert(seed.diagrams.find(item => item.name === "Item Tracking").processGraph.nodes.some(item =>
+  item.taxonomyEntityIds?.includes("document:item-tracking-lines")));
 
 const registry = model.create(seed);
 assert.strictEqual(registry.findCanonicalConcept("Generate Pick").canonicalName, "Create Warehouse Pick");
@@ -39,7 +44,7 @@ assert.strictEqual(manual.publishable, true);
 assert.strictEqual(manual.normalized.labels[2].sourceLabel, "Generate Pick");
 assert.strictEqual(manual.normalized.labels[2].canonicalConceptId, "concept:create-warehouse-pick");
 const published = model.pipeline().publish(manual);
-assert.strictEqual(published.diagrams.length, 15);
+assert.strictEqual(published.diagrams.length, 20);
 const externalSource = { id: "source:partner:one", sourceType: "PartnerDocumentation",
   title: "Partner process", publisher: "Partner" };
 const sourced = model.pipeline().ingest({ inputType: "ManualProcess", source: externalSource,
