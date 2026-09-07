@@ -5,7 +5,7 @@ const graph = require("../src/document/process-graph");
 
 const checked = model.validate(seed);
 assert.strictEqual(checked.valid, true, JSON.stringify(checked.diagnostics));
-assert.strictEqual(checked.dataset.diagrams.length, 33);
+assert.strictEqual(checked.dataset.diagrams.length, 37);
 assert(checked.dataset.diagrams.every(item => item.sourceId && item.abstractionLevel === "BC_PROCESS"));
 assert(checked.dataset.diagrams.every(item => !item.originalImageAssetId));
 assert(checked.dataset.diagrams.every(item => item.facts.every(fact => fact.sourceId)));
@@ -33,6 +33,13 @@ assert.deepStrictEqual(seed.diagrams.find(item => item.name === "Production Orde
   .map(item => item.nodeType),
 ["document", "processStep", "document", "processStep", "document", "processStep",
   "postedDocument"]);
+assert.deepStrictEqual(["Production Consumption", "Production Output",
+  "Production with Warehouse Picking", "Production with Warehouse Put-away"].map(name =>
+  seed.diagrams.some(item => item.name === name)), [true, true, true, true]);
+assert(seed.diagrams.find(item => item.name === "Production with Warehouse Picking")
+  .processGraph.nodes.some(node => node.taxonomyEntityIds?.includes("document:warehouse-pick")));
+assert(seed.diagrams.find(item => item.name === "Production with Warehouse Put-away")
+  .processGraph.nodes.some(node => node.taxonomyEntityIds?.includes("document:warehouse-put-away")));
 const planningBranches = seed.diagrams.find(item => item.name === "Planning Supply Options");
 assert.strictEqual(planningBranches.processGraph.nodes.find(item =>
   item.title === "Supply recommendation?").nodeType, "decision");
@@ -100,7 +107,7 @@ assert.strictEqual(manual.publishable, true);
 assert.strictEqual(manual.normalized.labels[2].sourceLabel, "Generate Pick");
 assert.strictEqual(manual.normalized.labels[2].canonicalConceptId, "concept:create-warehouse-pick");
 const published = model.pipeline().publish(manual);
-assert.strictEqual(published.diagrams.length, 34);
+assert.strictEqual(published.diagrams.length, 38);
 const externalSource = { id: "source:partner:one", sourceType: "PartnerDocumentation",
   title: "Partner process", publisher: "Partner" };
 const sourced = model.pipeline().ingest({ inputType: "ManualProcess", source: externalSource,

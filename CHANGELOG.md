@@ -1,5 +1,11 @@
 # Changelog
 
+## 2026-09-07 - Production execution variant maps
+
+- Added separate maps for production consumption and production output.
+- Added warehouse-pick and warehouse-put-away production variants with explicit document and action relationships.
+- Added Swedish analysis labels and regression coverage for all four production execution maps.
+
 ## 2026-09-07 - Distinct warehouse inbound process maps
 
 - Split inbound warehouse semantics into Warehouse Receipt, Warehouse Put-away, and Advanced Warehouse Inbound maps.

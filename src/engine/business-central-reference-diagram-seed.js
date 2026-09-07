@@ -257,6 +257,47 @@
         { title: "Production Journal", type: "document", refs: ["document:production-journal"], edge: "references" },
         { title: "Post Consumption", type: "posting", refs: ["concept:consume"], edge: "consumes" },
         { title: "Post Output", type: "posting", refs: ["concept:output"], edge: "produces" }]),
+    reference("production-consumption", "Production Consumption", "domain:plan-to-produce",
+      "Production Execution", "Consumption", [
+        { title: "Production Order", type: "document", refs: ["document:production-order"] },
+        { title: "Production Journal", type: "document",
+          refs: ["document:production-journal"], edge: "references" },
+        { title: "Post Consumption", type: "posting",
+          refs: ["concept:consume"], edge: "consumes" }
+      ]),
+    reference("production-output", "Production Output", "domain:plan-to-produce",
+      "Production Execution", "Output", [
+        { title: "Production Order", type: "document", refs: ["document:production-order"] },
+        { title: "Production Journal", type: "document",
+          refs: ["document:production-journal"], edge: "references" },
+        { title: "Post Output", type: "posting", refs: ["concept:output"], edge: "produces" },
+        { title: "Finish Production Order", refs: ["concept:finish-production"] },
+        { title: "Finished Production Order", type: "postedDocument",
+          refs: ["document:finished-production-order"] }
+      ]),
+    reference("production-warehouse-pick", "Production with Warehouse Picking",
+      "domain:plan-to-produce", "Production Execution", "Require Pick", [
+        { title: "Production Order", type: "document", refs: ["document:production-order"] },
+        { title: "Create Warehouse Pick", refs: ["concept:create-warehouse-pick"] },
+        { title: "Warehouse Pick", type: "document",
+          refs: ["document:warehouse-pick"], edge: "creates" },
+        { title: "Register Pick", refs: ["concept:register-pick"] },
+        { title: "Production Journal", type: "document",
+          refs: ["document:production-journal"], edge: "references" },
+        { title: "Post Consumption", type: "posting",
+          refs: ["concept:consume"], edge: "consumes" }
+      ]),
+    reference("production-warehouse-put-away", "Production with Warehouse Put-away",
+      "domain:plan-to-produce", "Production Execution", "Require Put-away", [
+        { title: "Production Order", type: "document", refs: ["document:production-order"] },
+        { title: "Production Journal", type: "document",
+          refs: ["document:production-journal"], edge: "references" },
+        { title: "Post Output", type: "posting", refs: ["concept:output"], edge: "produces" },
+        { title: "Create Warehouse Put-away", refs: ["concept:create-warehouse-put-away"] },
+        { title: "Warehouse Put-away", type: "document",
+          refs: ["document:warehouse-put-away"], edge: "creates" },
+        { title: "Register Put-away", refs: ["concept:put-away"] }
+      ]),
     reference("production-lifecycle", "Production Order Lifecycle", "domain:plan-to-produce",
       "Production", "Make to Stock", [
         { title: "Planned Production Order", type: "document",
