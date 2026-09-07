@@ -73,6 +73,9 @@
     ["concept:output", "Post Output", ["Output"]],
     ["concept:assemble", "Post Assembly", ["Assemble"]],
     ["concept:plan", "Calculate Plan", ["Calculate Regenerative Plan"]],
+    ["concept:create-purchase-orders", "Create Purchase Orders", ["Carry Out Purchase Actions"]],
+    ["concept:create-production-orders", "Create Production Orders", ["Carry Out Production Actions"]],
+    ["concept:create-transfer-orders", "Create Transfer Orders", ["Carry Out Transfer Actions"]],
     ["concept:receive-return", "Receive Return", ["Post Return Receipt"]],
     ["concept:ship-return", "Ship Return", ["Post Return Shipment"]],
     ["concept:post-credit", "Post Credit Memo", ["Post Credit"]],
@@ -92,7 +95,14 @@
         taxonomyEntityIds: step.refs || [], metadata: { optional: step.optional === true,
           namespace: step.namespace || "Microsoft.BusinessCentral" } })),
       { nodeId: `${diagramId}:end`, nodeType: "end", title: "End", sequence: steps.length + 1 }];
-    const relationships = edges || nodes.slice(1).map((node, index) => ({
+    const nodeId = reference => typeof reference === "number"
+      ? `${diagramId}:node:${reference}` : `${diagramId}:${reference}`;
+    const relationships = edges ? edges.map((edge, index) => ({
+      relationshipId: edge.relationshipId || `${diagramId}:edge:${index + 1}`,
+      fromNodeId: nodeId(edge.from), toNodeId: nodeId(edge.to),
+      relationshipType: edge.relationshipType || "sequence", label: edge.label || "",
+      condition: edge.condition || null
+    })) : nodes.slice(1).map((node, index) => ({
       relationshipId: `${diagramId}:edge:${index + 1}`, fromNodeId: nodes[index].nodeId,
       toNodeId: node.nodeId, relationshipType: index === 0 || index === nodes.length - 2
         ? "sequence" : (steps[index - 1]?.edge || "sequence") }));
@@ -100,7 +110,8 @@
       nodes, relationships, groups: [], startNodeIds: [nodes[0].nodeId], endNodeIds: [nodes.at(-1).nodeId] };
   }
   function reference(id, name, domain, process, variant, steps, options = {}) {
-    const diagramId = `reference-diagram:bc:${id}`; const processGraph = graph(diagramId, steps);
+    const diagramId = `reference-diagram:bc:${id}`;
+    const processGraph = graph(diagramId, steps, options.edges || null);
     return { id: diagramId, name, description: options.description || name, sourceId: SOURCE_ID,
       domain, businessProcess: process, bcProcess: options.bcProcess || name, processVariant: variant || null,
       abstractionLevel: "BC_PROCESS", product: "Microsoft Dynamics 365 Business Central",
@@ -193,6 +204,26 @@
         refs: ["document:planning-worksheet"] }, { title: "Calculate Plan", refs: ["concept:plan"] },
         { title: "Review Action Messages", type: "manualAction" },
         { title: "Carry Out Action Message", type: "systemAction", edge: "creates" }]),
+    reference("planning-supply-options", "Planning Supply Options", "domain:forecast-to-plan",
+      "Planning", "Regenerative Plan", [
+        { title: "Planning Worksheet", type: "document", refs: ["document:planning-worksheet"] },
+        { title: "Calculate Plan", refs: ["concept:plan"] },
+        { title: "Review Action Messages", type: "manualAction" },
+        { title: "Supply recommendation?", type: "decision" },
+        { title: "Create Purchase Orders", type: "systemAction",
+          refs: ["concept:create-purchase-orders"] },
+        { title: "Create Production Orders", type: "systemAction",
+          refs: ["concept:create-production-orders"] },
+        { title: "Create Transfer Orders", type: "systemAction",
+          refs: ["concept:create-transfer-orders"] }
+      ], { edges: [
+        { from: "start", to: 1 }, { from: 1, to: 2 }, { from: 2, to: 3 },
+        { from: 3, to: 4 },
+        { from: 4, to: 5, relationshipType: "conditionalBranch", label: "Purchase" },
+        { from: 4, to: 6, relationshipType: "conditionalBranch", label: "Production" },
+        { from: 4, to: 7, relationshipType: "conditionalBranch", label: "Transfer" },
+        { from: 5, to: "end" }, { from: 6, to: "end" }, { from: 7, to: "end" }
+      ] }),
     reference("sales-return", "Sales Return", "domain:returns", "Sales Returns", "Standard", [
       { title: "Sales Return Order", type: "document", refs: ["document:sales-return-order"] },
       { title: "Receive Return", type: "posting", refs: ["concept:receive-return"], edge: "posts" },

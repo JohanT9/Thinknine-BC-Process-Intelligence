@@ -1,5 +1,11 @@
 # Changelog
 
+## Add a branched planning process map
+
+- Model the Planning Worksheet as a decision flow that branches to purchase, production, or transfer supply orders.
+- Preserve the conditional-branch topology and labels in the renderer-neutral reference graph for both GUI and export.
+- Use distinct decision, manual-review, and system-action node types so themes can render different shapes and colors.
+
 ## Add a production-order lifecycle map
 
 - Add a verified Make-to-Stock diagram from Planned through Firm Planned and Released to Finished Production Order.
