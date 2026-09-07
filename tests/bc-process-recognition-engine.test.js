@@ -149,6 +149,26 @@ standardPageViews.forEach(([pageObjectId, documentId, viewType]) => {
   assert.strictEqual(evidence.observations[0].document.view.viewType, viewType);
 });
 
+const taxonomyPageViews = taxonomySeed.documents.flatMap(document =>
+  document.pageViews.map(view => ({ document, view })));
+assert(taxonomyPageViews.length >= 70,
+  "The canonical BC view registry should cover representative cards, lists, journals, and posted views.");
+const registeredPageIds = new Set();
+taxonomyPageViews.forEach(({ document, view }) => {
+  assert(!registeredPageIds.has(view.pageObjectId),
+    `BC page ${view.pageObjectId} must not be assigned to multiple semantic documents.`);
+  registeredPageIds.add(view.pageObjectId);
+  const evidence = engine.extractEvidence(synthetic(`canonical-view-${view.pageObjectId}`, [
+    { identification: page(view.pageObjectId, "", "", "") }
+  ]));
+  assert.strictEqual(evidence.observations[0].document?.id, document.id,
+    `Every registered BC view, including ${view.name}, must resolve by stable page ID.`);
+  assert.strictEqual(evidence.observations[0].document?.view?.viewType, view.viewType,
+    `BC page ${view.pageObjectId} must retain its card/list/worksheet semantics.`);
+});
+taxonomySeed.documents.forEach(document => assert(document.pageViews.length > 0,
+  `${document.id} must have at least one canonical Business Central view.`));
+
 [
   ["sales-return-list", 9304, "SalesReturns", "domain:returns"],
   ["purchase-return-list", 9311, "PurchaseReturns", "domain:returns"],

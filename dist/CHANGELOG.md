@@ -1,5 +1,11 @@
 # Changelog
 
+## Guarantee recognition for every canonical Business Central view
+
+- Exercise every registered Business Central card, list, worksheet, journal, and posted view through the recognition engine.
+- Prevent page IDs from silently being assigned to two different semantic documents.
+- Require every canonical document to retain at least one stable Business Central page identity, including legacy recordings that contain only a page ID.
+
 ## Recognize return and basic-warehouse document lifecycles
 
 - Model sales and purchase returns as related orders, receipts or shipments, credit memos, and posted credit memos.
