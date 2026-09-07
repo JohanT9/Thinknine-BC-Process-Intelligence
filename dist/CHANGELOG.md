@@ -1,5 +1,11 @@
 # Changelog
 
+## 2026-09-07 - Specific Business Central action evidence
+
+- Recorder identification now distinguishes creating and registering picks, registering put-aways, and posting shipments, receipts, invoices, consumption, and output.
+- Technical BC automation IDs remain the strongest signal, with localized captions used only as deterministic fallback evidence.
+- Added regression coverage for Swedish captions and all new action identities.
+
 ## 2026-09-07 - Stable Business Central field evidence
 
 - Recorded interactions now carry an optional, dedicated field identity alongside the existing control identity.

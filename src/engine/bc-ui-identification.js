@@ -12,6 +12,20 @@
   "use strict";
   const SCHEMA_VERSION = 1;
   const ACTION_RULES = {
+    createpick: { actionType: "CreatePick", captions: /^(skapa (lager)?plockning|create pick)$/i },
+    registerpick: { actionType: "RegisterPick", captions: /^(registrera plockning|register pick)$/i },
+    registerputaway: { actionType: "RegisterPutAway",
+      captions: /^(registrera (lager)?inlagring|register put-?away)$/i },
+    postshipment: { actionType: "PostShipment",
+      captions: /^(bokför (lager)?utleverans|post shipment|ship)$/i },
+    postreceipt: { actionType: "PostReceipt",
+      captions: /^(bokför (lager)?inleverans|post receipt|receive)$/i },
+    postinvoice: { actionType: "PostInvoice",
+      captions: /^(bokför faktura|post invoice|invoice)$/i },
+    postconsumption: { actionType: "PostConsumption",
+      captions: /^(bokför förbrukning|post consumption|consume)$/i },
+    postoutput: { actionType: "PostOutput",
+      captions: /^(bokför utflöde|post output|output)$/i },
     reopen: { actionType: "ReopenDocument", captions: /^(öppna igen|reopen|genåbn)$/i },
     release: { actionType: "ReleaseDocument", captions: /^(släpp|frisläpp|release|frigiv)$/i },
     post: { actionType: "PostDocument", captions: /^(bokför|post|bogfør)$/i },

@@ -98,6 +98,17 @@ assert.strictEqual(post.actionIdentity.actionType, "PostDocument");
 assert.strictEqual(post.actionIdentity.source, "technical-action-id");
 assert.strictEqual(post.fieldIdentity.fieldIdentity, null,
   "Action controls must not be classified as fields.");
+for (const [automationId, caption, actionType] of [
+  ["CreatePick", "Skapa plockning", "CreatePick"],
+  ["RegisterPick", "Registrera plockning", "RegisterPick"],
+  ["RegisterPutAway", "Registrera inlagring", "RegisterPutAway"],
+  ["PostShipment", "Bokför utleverans", "PostShipment"],
+  ["PostReceipt", "Bokför inleverans", "PostReceipt"],
+  ["PostInvoice", "Bokför faktura", "PostInvoice"],
+  ["PostConsumption", "Bokför förbrukning", "PostConsumption"],
+  ["PostOutput", "Bokför utflöde", "PostOutput"]
+]) assert.strictEqual(identify({ category: "action", role: "button", controlType: "button",
+  automationId, accessibleName: caption, label: caption }).actionIdentity.actionType, actionType);
 
 const fastTab = identify({ accessibleName: "Posting Date", label: "Posting Date",
   uiHierarchy: [{ type: "fastTab", caption: "General" }, { type: "group", caption: "Posting" }] });
