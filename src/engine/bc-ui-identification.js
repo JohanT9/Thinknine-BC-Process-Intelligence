@@ -30,7 +30,29 @@
     { hint: "Customer", ids: /customer(no|name)/i,
       captions: /^(kundnr\.?|kundens namn|customer no\.?|customer name|kundenr\.?)$/i },
     { hint: "Item", ids: /itemno/i,
-      captions: /^(artikelnr\.?|item no\.?|varenr\.?)$/i }
+      captions: /^(artikelnr\.?|item no\.?|varenr\.?)$/i },
+    { hint: "Vendor", ids: /vendor(no|name)/i,
+      captions: /^(leverantörsnr\.?|leverantörens namn|vendor no\.?|vendor name|leverandørnr\.?)$/i },
+    { hint: "Quantity", ids: /(^|[^a-z])(quantity|qty)([^a-z]|$)/i,
+      captions: /^(antal|quantity|qty\.?|mængde)$/i },
+    { hint: "Location", ids: /locationcode/i,
+      captions: /^(lagerställekod|location code|lokationskode)$/i },
+    { hint: "Bin", ids: /bincode/i,
+      captions: /^(lagerplatskod|bin code|placeringskode)$/i },
+    { hint: "PostingDate", ids: /postingdate/i,
+      captions: /^(bokföringsdatum|posting date|bogføringsdato)$/i },
+    { hint: "DocumentNo", ids: /document(no|number)/i,
+      captions: /^(dokumentnr\.?|document no\.?|bilagsnr\.?)$/i },
+    { hint: "UnitOfMeasure", ids: /unitofmeasure(code)?/i,
+      captions: /^(enhetskod|unit of measure code|måleenhedskode)$/i },
+    { hint: "Variant", ids: /variantcode/i,
+      captions: /^(variantkod|variant code|variantkode)$/i },
+    { hint: "LotNumber", ids: /lot(no|number)/i,
+      captions: /^(partinr\.?|lot no\.?|lot number|lotnr\.?)$/i },
+    { hint: "SerialNumber", ids: /serial(no|number)/i,
+      captions: /^(serienr\.?|serial no\.?|serial number)$/i },
+    { hint: "ExpirationDate", ids: /expirationdate/i,
+      captions: /^(utgångsdatum|expiration date|udløbsdato)$/i }
   ];
   const clone = value => value == null ? value : JSON.parse(JSON.stringify(value));
   function freeze(value) {
@@ -105,6 +127,25 @@
         evidence(raw.accessibleNameSource || "observed-caption", caption)].filter(Boolean)
     };
   }
+  function identifyField(raw = {}) {
+    const classified = controlType(raw); const technical = identity(raw);
+    const caption = text(raw.accessibleName || raw.fieldName || raw.label);
+    const stableField = text(raw.fieldId || raw.automationId || raw.dataControlId);
+    const rule = FIELD_RULES.find(item => item.ids.test(stableField)) ||
+      FIELD_RULES.find(item => item.captions.test(caption));
+    const fieldLike = ["field", "dateInput", "option", "checkbox", "lookup",
+      "repeaterCell"].includes(classified.value) || Boolean(text(raw.fieldId));
+    return {
+      fieldIdentity: fieldLike && technical ? `bc:field:${technical.value}` : null,
+      fieldId: text(raw.fieldId || raw.dataControlId) || null,
+      automationId: text(raw.automationId) || null,
+      semanticHint: rule?.hint || text(raw.fieldId) || null,
+      caption: caption || null,
+      source: fieldLike ? technical?.source || (rule ? "semantic-field-rule" : null) : null,
+      evidence: fieldLike ? [technical && evidence(technical.source, technical.value),
+        evidence("observed-field-caption", caption)].filter(Boolean) : []
+    };
+  }
   function technicalAction(raw) {
     const value = text(raw.automationId || raw.dataControlId || raw.dataControlName);
     if (!value) return null;
@@ -164,6 +205,7 @@
     const allEvidence = [];
     const pageIdentity = identifyPage(raw, options);
     const controlIdentity = identifyControl(raw);
+    const fieldIdentity = identifyField(raw);
     const actionIdentity = identifyAction(raw);
     const page = {};
     if (text(raw.pageId)) { page.id = text(raw.pageId); allEvidence.push(evidence("route-page-parameter", raw.pageId)); }
@@ -222,6 +264,7 @@
       action,
       pageIdentity,
       controlIdentity,
+      fieldIdentity,
       actionIdentity,
       entityContext: { entity: pageIdentity.entity,
         source: pageIdentity.source, evidence: clone(pageIdentity.evidence) },
@@ -243,6 +286,6 @@
     if (!value || Number(value.schemaVersion) !== SCHEMA_VERSION) throw new Error("Unsupported BC UI identification schema.");
     return freeze(clone(value));
   }
-  return { SCHEMA_VERSION, identify, identifyAction, identifyControl,
+  return { SCHEMA_VERSION, identify, identifyAction, identifyControl, identifyField,
     identifyPage, normalize };
 });

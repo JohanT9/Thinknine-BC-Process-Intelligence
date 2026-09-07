@@ -48,6 +48,24 @@ assert.strictEqual(standard.pageIdentity.confidence, 1);
 assert.strictEqual(standard.controlIdentity.controlIdentity,
   "bc:control:CustomerNo");
 assert.strictEqual(standard.controlIdentity.fieldSemanticHint, "Customer");
+assert.deepStrictEqual(standard.fieldIdentity, {
+  fieldIdentity: "bc:field:CustomerNo", fieldId: null, automationId: "CustomerNo",
+  semanticHint: "Customer", caption: "Customer No.", source: "data-automation-id",
+  evidence: [{ source: "data-automation-id", value: "CustomerNo" },
+    { source: "observed-field-caption", value: "Customer No." }]
+});
+
+for (const [automationId, caption, hint] of [
+  ["VendorNo", "Leverantörsnr.", "Vendor"],
+  ["Quantity", "Antal", "Quantity"],
+  ["LocationCode", "Lagerställekod", "Location"],
+  ["BinCode", "Lagerplatskod", "Bin"],
+  ["PostingDate", "Bokföringsdatum", "PostingDate"],
+  ["LotNo", "Partinr.", "LotNumber"],
+  ["SerialNo", "Serienr.", "SerialNumber"],
+  ["ExpirationDate", "Utgångsdatum", "ExpirationDate"]
+]) assert.strictEqual(identify({ automationId, accessibleName: caption,
+  label: caption }).fieldIdentity.semanticHint, hint);
 
 const captionOnly = identify({ pageId: "", automationId: "" });
 assert.strictEqual(captionOnly.page.id, undefined);
@@ -78,6 +96,8 @@ assert.deepStrictEqual(post.action.identity,
 assert.strictEqual(post.hierarchy[1].caption, "Posting");
 assert.strictEqual(post.actionIdentity.actionType, "PostDocument");
 assert.strictEqual(post.actionIdentity.source, "technical-action-id");
+assert.strictEqual(post.fieldIdentity.fieldIdentity, null,
+  "Action controls must not be classified as fields.");
 
 const fastTab = identify({ accessibleName: "Posting Date", label: "Posting Date",
   uiHierarchy: [{ type: "fastTab", caption: "General" }, { type: "group", caption: "Posting" }] });

@@ -28,6 +28,7 @@
         ...clone(existing.frameContext || {}) },
       control: clone(existing.control || derived.control),
       controlIdentity: clone(existing.controlIdentity || derived.controlIdentity),
+      fieldIdentity: clone(existing.fieldIdentity || derived.fieldIdentity),
       action: clone(existing.action || derived.action),
       actionIdentity: clone(existing.actionIdentity || derived.actionIdentity) };
   }
@@ -98,7 +99,7 @@
         frameDepth: raw.frameDepth ?? identified.frameContext?.depth ?? undefined,
         controlAddIn: raw.controlAddIn ?? identified.frameContext?.controlAddIn ?? undefined }),
       controlIdentification: clone({ ...(identified.control || {}),
-        ...(identified.controlIdentity || {}) }),
+        ...(identified.controlIdentity || {}), ...(identified.fieldIdentity || {}) }),
       actionIdentification: clone(identified.action || identified.actionIdentity
         ? { ...(identified.action || {}), ...(identified.actionIdentity || {}) }
         : null),

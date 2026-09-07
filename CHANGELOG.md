@@ -1,5 +1,11 @@
 # Changelog
 
+## 2026-09-07 - Stable Business Central field evidence
+
+- Recorded interactions now carry an optional, dedicated field identity alongside the existing control identity.
+- Added deterministic semantic recognition for vendor, quantity, location, bin, posting date, document number, unit of measure, variant, lot, serial, and expiration date fields.
+- Field evidence retains technical automation IDs and observed captions without replacing raw recording data.
+
 ## 2026-09-07 - Hard recording-session boundary
 
 - A new recording now waits for all previous persistence and screenshot work before initializing its stores.
