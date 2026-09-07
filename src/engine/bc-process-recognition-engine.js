@@ -87,15 +87,22 @@
 
   function semanticDocumentMatch(event, documents) {
     const page = eventPage(event);
+    const identityForms = value => {
+      const compact = words(value).replace(/\s+/g, "");
+      if (!compact) return [];
+      const withoutView = compact.replace(/(?:list|card|page|worksheet)$/i, "");
+      const singular = withoutView.length > 3 ? withoutView.replace(/s$/i, "") : withoutView;
+      return unique([compact, withoutView, singular]);
+    };
     const identities = unique([page.documentType, page.entity, page.recordType,
-      event.businessCentral?.documentType, event.businessCentral?.entity])
-      .map(value => words(value).replace(/\s+/g, ""))
+      event.businessCentral?.documentType, event.businessCentral?.entity]
+      .flatMap(identityForms))
       .filter(value => value && !["document", "list", "card", "record",
         "posteddocument", "warehousedocument"].includes(value));
     if (!identities.length) return null;
     const matches = documents.filter(document => {
       const aliases = [document.id.split(":").at(-1), document.name,
-        ...(document.aliases || [])].map(value => words(value).replace(/\s+/g, ""));
+        ...(document.aliases || [])].flatMap(identityForms);
       return identities.some(identity => aliases.includes(identity));
     });
     return matches.length === 1 ? matches[0] : null;

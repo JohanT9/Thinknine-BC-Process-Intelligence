@@ -208,6 +208,18 @@ assert.strictEqual(engine.extractEvidence(synthetic("generic-custom-document", [
   { identification: page(70000001, "", "document", "") }
 ])).observations[0].document, null,
 "Generic page types must not create false semantic document matches.");
+[
+  ["PurchaseOrders", "document:purchase-order"],
+  ["SalesOrderList", "document:sales-order"],
+  ["PostedPurchaseInvoices", "document:posted-purchase-invoice"],
+  ["InventoryPicksPage", "document:inventory-pick"]
+].forEach(([entity, documentId], index) => {
+  const evidence = engine.extractEvidence(synthetic(`custom-list-form-${index}`, [
+    { identification: page(71000000 + index, "", "custom-view", entity) }
+  ]));
+  assert.strictEqual(evidence.observations[0].document?.id, documentId,
+    `${entity} should normalize to its canonical document family.`);
+});
 
 [
   ["sales-return-list", 9304, "SalesReturns", "domain:returns"],

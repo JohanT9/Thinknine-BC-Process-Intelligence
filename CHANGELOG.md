@@ -1,5 +1,10 @@
 # Changelog
 
+## Normalize customized Business Central list identities
+
+- Resolve plural and view-suffixed metadata such as `PurchaseOrders`, `SalesOrderList`, and `InventoryPicksPage` to their canonical documents.
+- Keep matching deterministic and identity-based while supporting naming conventions commonly used by Business Central list extensions.
+
 ## Recognize customized Business Central document views
 
 - Match stable Business Central `entity`, `recordType`, and `documentType` identities when a customized card or list uses a page ID outside the canonical Microsoft registry.
