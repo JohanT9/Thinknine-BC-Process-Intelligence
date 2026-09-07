@@ -1,5 +1,11 @@
 # Changelog
 
+## 2026-09-07 - Make-to-stock and make-to-order maps
+
+- Added separate production maps for forecast/stock-driven and sales-order-driven demand.
+- Both variants retain their actual demand source before showing the shared consumption, output, and finishing lifecycle.
+- Added Swedish process names and regression coverage for the distinct starting documents.
+
 ## 2026-09-07 - Production execution variant maps
 
 - Added separate maps for production consumption and production output.

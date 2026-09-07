@@ -3571,6 +3571,7 @@ function processAnalysisLabels() {
         "Production Output": "Produktionsutflöde",
         "Production with Warehouse Picking": "Produktion med lagerplockning",
         "Production with Warehouse Put-away": "Produktion med lagerinlagring",
+        "Make to Stock": "Tillverkning mot lager", "Make to Order": "Tillverkning mot order",
         "Planning Worksheet": "Planeringsförslag", "Warehouse Movement": "Lagerförflyttning",
         "Sales Order": "Försäljningsorder", "Simple Sales Order": "Enkel försäljningsorder",
         "Purchase Order": "Inköpsorder", "Warehouse Receipt": "Lagerinleverans",
