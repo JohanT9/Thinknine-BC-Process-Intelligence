@@ -191,6 +191,25 @@ assert.strictEqual(engine.pageIdFromUrl("?company=CRONUS&page=9305"), "9305",
   "Relative legacy routes should also expose their Business Central page ID.");
 
 [
+  ["PurchaseOrder", "document:purchase-order", "PurchaseToPay"],
+  ["SalesOrder", "document:sales-order", "SalesOrderProcessing"],
+  ["InventoryPick", "document:inventory-pick", "BasicWarehouseOutbound"],
+  ["PostedPurchaseInvoice", "document:posted-purchase-invoice", "PurchaseToPay"]
+].forEach(([entity, documentId, process]) => {
+  const customView = synthetic(`custom-view-${entity}`, [{ identification: page(
+    70000000, "", "custom-view", entity) }]);
+  const evidence = engine.extractEvidence(customView);
+  assert.strictEqual(evidence.observations[0].document.id, documentId,
+    `Custom BC views should resolve the stable ${entity} document identity.`);
+  assert.strictEqual(evidence.observations[0].document.signal, "page-document-identity");
+  assert.strictEqual(engine.recognize(customView).classification.process, process);
+});
+assert.strictEqual(engine.extractEvidence(synthetic("generic-custom-document", [
+  { identification: page(70000001, "", "document", "") }
+])).observations[0].document, null,
+"Generic page types must not create false semantic document matches.");
+
+[
   ["sales-return-list", 9304, "SalesReturns", "domain:returns"],
   ["purchase-return-list", 9311, "PurchaseReturns", "domain:returns"],
   ["inventory-movement-list", 9330, "InventoryMovement", "domain:inventory-to-deliver"],

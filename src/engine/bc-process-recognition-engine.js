@@ -85,6 +85,22 @@
       raw.actionCaption, raw.dataControlName]);
   }
 
+  function semanticDocumentMatch(event, documents) {
+    const page = eventPage(event);
+    const identities = unique([page.documentType, page.entity, page.recordType,
+      event.businessCentral?.documentType, event.businessCentral?.entity])
+      .map(value => words(value).replace(/\s+/g, ""))
+      .filter(value => value && !["document", "list", "card", "record",
+        "posteddocument", "warehousedocument"].includes(value));
+    if (!identities.length) return null;
+    const matches = documents.filter(document => {
+      const aliases = [document.id.split(":").at(-1), document.name,
+        ...(document.aliases || [])].map(value => words(value).replace(/\s+/g, ""));
+      return identities.some(identity => aliases.includes(identity));
+    });
+    return matches.length === 1 ? matches[0] : null;
+  }
+
   function documentMatch(event, documents) {
     const page = eventPage(event);
     const pageIdentity = eventPageObjectId(event);
@@ -109,6 +125,10 @@
             pageIdentity.fromUrl ? " from recorded URL" : ""}` };
       }
     }
+    const matchedSemanticDocument = semanticDocumentMatch(event, documents);
+    if (matchedSemanticDocument) return { document: matchedSemanticDocument, strength: 0.88,
+      signal: "page-document-identity",
+      explanation: `Matched ${matchedSemanticDocument.name} from BC document identity` };
     if (tableId) {
       const candidates = documents.filter(item => item.tableIds.includes(tableId));
       if (candidates.length === 1) return { document: candidates[0], strength: 0.9,
@@ -436,5 +456,5 @@
   }
 
   return { ENGINE_VERSION, eventPageObjectId, extractEvidence, pageIdFromUrl,
-    recognize, toSemanticClassification };
+    recognize, semanticDocumentMatch, toSemanticClassification };
 });

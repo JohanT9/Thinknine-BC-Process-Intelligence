@@ -1,5 +1,11 @@
 # Changelog
 
+## Recognize customized Business Central document views
+
+- Match stable Business Central `entity`, `recordType`, and `documentType` identities when a customized card or list uses a page ID outside the canonical Microsoft registry.
+- Normalize compact identities such as `PurchaseOrder` against canonical names without relying on visible screen text.
+- Ignore generic page types such as `document` and require one unambiguous semantic document match.
+
 ## Close process-classification gaps for canonical BC views
 
 - Associate Sales Quotes and posted Sales Invoices with the Order-to-Cash process family.
