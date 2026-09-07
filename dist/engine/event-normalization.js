@@ -11,7 +11,7 @@
 ) {
   "use strict";
   const SCHEMA_VERSION = 1;
-  const NORMALIZATION_VERSION = "2.5.0";
+  const NORMALIZATION_VERSION = "2.6.0";
   const cache = new WeakMap();
   const clone = value => value == null ? value : JSON.parse(JSON.stringify(value));
   function freeze(value) { if (!value || typeof value !== "object" || Object.isFrozen(value)) return value; Object.values(value).forEach(freeze); return Object.freeze(value); }
@@ -33,6 +33,19 @@
       actionIdentity: clone(existing.actionIdentity || derived.actionIdentity) };
   }
   function controlKey(event) { const id = event.identification || {}; const raw = rawOf(event); return id.controlIdentity?.controlIdentity || id.control?.identity?.value || raw.automationId || raw.fieldName || raw.label || event.id; }
+  function pageKey(event) {
+    const raw = rawOf(event);
+    return raw.pageIdentity || raw.pageObjectId || raw.pageId ||
+      raw.pageCaption || "";
+  }
+  function frameKey(event) {
+    const raw = rawOf(event);
+    return raw.documentId || raw.browserFrameId || raw.frameId || "";
+  }
+  function sameKnownContext(left, right, key) {
+    const leftKey = key(left); const rightKey = key(right);
+    return !leftKey || !rightKey || String(leftKey) === String(rightKey);
+  }
   function mechanism(raw) { if (raw.inputSource === "keyboard" || /^(?:key|keydown)$/.test(raw.type)) return "keyboard"; if (raw.type === "click") return "pointer"; if (/pointer/.test(raw.type || "")) return "pointer"; if (/mouse/.test(raw.type || "")) return "mouse"; return "unknown"; }
   function valueModel(raw, identified) {
     if (!Object.prototype.hasOwnProperty.call(raw, "value")) return null;
@@ -140,6 +153,8 @@
     if (previousInteractionId && nextInteractionId &&
         String(previousInteractionId) !== String(nextInteractionId)) return false;
     return controlKey(pending.sources[0]) === controlKey(event) &&
+      sameKnownContext(pending.sources[0], event, pageKey) &&
+      sameKnownContext(pending.sources[0], event, frameKey) &&
       ["input", "change", "focusout"].includes(raw.inputSource || raw.type);
   }
   function normalizeRecording(recording, options = {}) {

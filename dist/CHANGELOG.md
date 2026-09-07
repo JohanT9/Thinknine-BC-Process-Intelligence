@@ -1,5 +1,11 @@
 # Changelog
 
+## 2026-09-07 - Field edits respect Business Central page boundaries
+
+- Consecutive field events with the same control ID are no longer merged when known Business Central page or frame identities differ.
+- Legacy recordings without interaction IDs therefore retain distinct edits across page navigation.
+- Same-field typing on one page is still consolidated to its final committed value.
+
 ## 2026-09-07 - Orphan keyboard mechanics no longer become steps
 
 - Unidentified standalone Enter, Escape, Space, and F4 mechanics are retained as technical supporting evidence instead of becoming unknown procedure steps.

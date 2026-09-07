@@ -37,8 +37,8 @@ model = append(model, raw("e4", "field-change", { fieldName: "Quantity",
 let result = normalization.normalizeRecording(model);
 assert.strictEqual(JSON.stringify(original), before);
 assert.strictEqual(result.schemaVersion, 1);
-assert.strictEqual(result.normalizationVersion, "2.5.0");
-assert.strictEqual(normalization.NORMALIZATION_VERSION, "2.5.0");
+assert.strictEqual(result.normalizationVersion, "2.6.0");
+assert.strictEqual(normalization.NORMALIZATION_VERSION, "2.6.0");
 assert.strictEqual(result.events.length, 1);
 assert.strictEqual(result.events[0].kind, "value-change");
 assert.deepStrictEqual(result.events[0].sourceEventIds,
@@ -162,6 +162,21 @@ assert.strictEqual(committedTyping.events.length, 1);
 assert.strictEqual(committedTyping.events[0].value.normalized, "500");
 assert.deepStrictEqual(committedTyping.events[0].sourceEventIds,
   ["typing:event:t1", "typing:event:t2", "typing:event:t3", "typing:event:t4"]);
+
+let pageBoundaryTyping = recording("page-boundary-typing");
+pageBoundaryTyping = append(pageBoundaryTyping, raw("page-a", "field-change", {
+  fieldName: "No.", automationId: "No", pageId: "42", value: "10000",
+  previousValue: "", inputSource: "input"
+}), { controlType: "input", automationId: "No" });
+pageBoundaryTyping = append(pageBoundaryTyping, raw("page-b", "field-change", {
+  fieldName: "No.", automationId: "No", pageId: "50", value: "30043",
+  previousValue: "", inputSource: "input"
+}), { controlType: "input", automationId: "No" });
+const separatePageEdits = normalization.normalizeRecording(pageBoundaryTyping);
+assert.strictEqual(separatePageEdits.events.length, 2,
+  "equal control IDs on different BC pages must remain separate edits");
+assert.deepStrictEqual(separatePageEdits.events.map(value =>
+  value.value.normalized), ["10000", "30043"]);
 
 let mechanics = recording("mechanics");
 mechanics = append(mechanics, raw("dialog-open", "dialog-open", {

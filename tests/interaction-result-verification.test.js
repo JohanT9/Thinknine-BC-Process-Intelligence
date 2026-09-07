@@ -26,7 +26,7 @@ const sourceError = { id: "canonical:error", recordingId: "result-verification",
 const [errorKind, errorReason] = normalization.classify(sourceError);
 assert.strictEqual(errorKind, "error-outcome");
 assert.strictEqual(errorReason, "observed-business-central-error");
-assert.strictEqual(normalization.NORMALIZATION_VERSION, "2.5.0");
+assert.strictEqual(normalization.NORMALIZATION_VERSION, "2.6.0");
 assert.strictEqual(sourceError.raw.copiedDetails, "Sensitive diagnostic details");
 
 const grouped = grouping.group({ recordingId: "result-verification", events: [
