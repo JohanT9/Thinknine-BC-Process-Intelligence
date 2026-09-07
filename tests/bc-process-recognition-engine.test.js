@@ -169,6 +169,18 @@ taxonomyPageViews.forEach(({ document, view }) => {
 taxonomySeed.documents.forEach(document => assert(document.pageViews.length > 0,
   `${document.id} must have at least one canonical Business Central view.`));
 
+let legacyUrlOnly = canonical.create({ id: "legacy-url-only-purchase-list",
+  startedAt: "2026-09-02T08:00:00.000Z" });
+legacyUrlOnly = canonical.addEvent(legacyUrlOnly, { eventNo: 1, type: "navigation",
+  frameUrl: "https://businesscentral.dynamics.com/tenant/environment?company=CRONUS&page=9307" });
+const legacyUrlEvidence = engine.extractEvidence(legacyUrlOnly);
+assert.strictEqual(legacyUrlEvidence.observations[0].document.id, "document:purchase-order");
+assert.strictEqual(legacyUrlEvidence.observations[0].document.view.viewType, "list");
+assert.strictEqual(legacyUrlEvidence.observations[0].document.signal, "url-page-object-id");
+assert.strictEqual(engine.recognize(legacyUrlOnly).classification.process, "PurchaseToPay");
+assert.strictEqual(engine.pageIdFromUrl("?company=CRONUS&page=9305"), "9305",
+  "Relative legacy routes should also expose their Business Central page ID.");
+
 [
   ["sales-return-list", 9304, "SalesReturns", "domain:returns"],
   ["purchase-return-list", 9311, "PurchaseReturns", "domain:returns"],

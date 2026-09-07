@@ -46,6 +46,24 @@
     return event.identification?.pageIdentity || event.page || event.businessCentral || {};
   }
 
+  function pageIdFromUrl(value) {
+    const candidate = text(value);
+    if (!candidate) return "";
+    try { return text(new URL(candidate).searchParams.get("page")); }
+    catch { return text(/[?&]page=([0-9]+)/i.exec(candidate)?.[1]); }
+  }
+
+  function eventPageObjectId(event) {
+    const page = eventPage(event); const raw = event.raw || {};
+    const explicit = text(page.pageObjectId || event.page?.pageObjectId ||
+      event.businessCentral?.pageObjectId);
+    if (explicit) return { pageObjectId: explicit, fromUrl: false };
+    const urls = [page.url, event.page?.url, event.frame?.url, event.frame?.topUrl,
+      raw.frameUrl, raw.topUrl, raw.url];
+    const pageObjectId = urls.map(pageIdFromUrl).find(Boolean) || "";
+    return { pageObjectId, fromUrl: Boolean(pageObjectId) };
+  }
+
   function eventTexts(event) {
     const raw = event.raw || {};
     return unique([event.page?.caption, event.page?.name, event.businessCentral?.pageCaption,
@@ -69,8 +87,8 @@
 
   function documentMatch(event, documents) {
     const page = eventPage(event);
-    const pageId = text(page.pageObjectId || event.page?.pageObjectId ||
-      event.businessCentral?.pageObjectId);
+    const pageIdentity = eventPageObjectId(event);
+    const pageId = pageIdentity.pageObjectId;
     const tableId = text(page.tableId || event.page?.tableId);
     const semanticDocument = event.semantic?.businessDocument?.id ||
       event.businessDocument?.id || null;
@@ -84,9 +102,11 @@
       if (document) {
         const view = (document.pageViews || []).find(item => item.pageObjectId === pageId);
         const viewLabel = view?.viewType ? ` ${view.viewType}` : "";
-        return { document, view: view ? clone(view) : null, strength: 1,
-          signal: "page-object-id",
-          explanation: `Matched ${document.name}${viewLabel} page ${pageId}` };
+        return { document, view: view ? clone(view) : null,
+          strength: pageIdentity.fromUrl ? 0.96 : 1,
+          signal: pageIdentity.fromUrl ? "url-page-object-id" : "page-object-id",
+          explanation: `Matched ${document.name}${viewLabel} page ${pageId}${
+            pageIdentity.fromUrl ? " from recorded URL" : ""}` };
       }
     }
     if (tableId) {
@@ -415,5 +435,6 @@
     } };
   }
 
-  return { ENGINE_VERSION, extractEvidence, recognize, toSemanticClassification };
+  return { ENGINE_VERSION, eventPageObjectId, extractEvidence, pageIdFromUrl,
+    recognize, toSemanticClassification };
 });

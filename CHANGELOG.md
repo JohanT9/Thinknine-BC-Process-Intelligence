@@ -1,5 +1,11 @@
 # Changelog
 
+## Recognize legacy Business Central views from recorded URLs
+
+- Recover the canonical Business Central page identity from `page=` in recorded frame and top URLs when an older recording lacks structured page metadata.
+- Apply the same page-to-document registry to every card, list, worksheet, journal, and posted view rather than special-casing Purchase Orders page 9307.
+- Preserve explainability by identifying URL-derived page evidence separately from directly captured page metadata.
+
 ## Guarantee recognition for every canonical Business Central view
 
 - Exercise every registered Business Central card, list, worksheet, journal, and posted view through the recognition engine.
