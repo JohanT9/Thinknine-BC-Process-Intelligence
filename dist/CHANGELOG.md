@@ -1,5 +1,11 @@
 # Changelog
 
+## 2026-09-07 - Distinct warehouse inbound process maps
+
+- Split inbound warehouse semantics into Warehouse Receipt, Warehouse Put-away, and Advanced Warehouse Inbound maps.
+- Added stable concepts for source-document retrieval, warehouse-receipt posting, and put-away creation.
+- Added the posted warehouse receipt to the reusable diagram document catalog and Swedish map labels.
+
 ## 2026-09-07 - Warehouse-pick sales process map
 
 - Added the missing Sales Order with Warehouse Pick reference map between basic shipment and advanced warehouse variants.

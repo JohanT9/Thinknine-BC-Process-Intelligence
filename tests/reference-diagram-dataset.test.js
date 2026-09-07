@@ -5,7 +5,7 @@ const graph = require("../src/document/process-graph");
 
 const checked = model.validate(seed);
 assert.strictEqual(checked.valid, true, JSON.stringify(checked.diagnostics));
-assert.strictEqual(checked.dataset.diagrams.length, 31);
+assert.strictEqual(checked.dataset.diagrams.length, 33);
 assert(checked.dataset.diagrams.every(item => item.sourceId && item.abstractionLevel === "BC_PROCESS"));
 assert(checked.dataset.diagrams.every(item => !item.originalImageAssetId));
 assert(checked.dataset.diagrams.every(item => item.facts.every(fact => fact.sourceId)));
@@ -73,6 +73,10 @@ assert(seed.diagrams.find(item => item.name === "Assembly to Order").processGrap
   item.taxonomyEntityIds?.includes("document:sales-order")));
 assert(seed.diagrams.find(item => item.name === "Drop Shipment").processGraph.nodes.some(item =>
   item.taxonomyEntityIds?.includes("document:purchase-order")));
+assert.deepStrictEqual(["Warehouse Receipt", "Warehouse Put-away", "Advanced Warehouse Inbound"]
+  .map(name => seed.diagrams.some(item => item.name === name)), [true, true, true]);
+assert(seed.diagrams.find(item => item.name === "Warehouse Receipt").processGraph.nodes.some(node =>
+  node.taxonomyEntityIds?.includes("document:posted-warehouse-receipt")));
 
 const registry = model.create(seed);
 assert.strictEqual(registry.findCanonicalConcept("Generate Pick").canonicalName, "Create Warehouse Pick");
@@ -96,7 +100,7 @@ assert.strictEqual(manual.publishable, true);
 assert.strictEqual(manual.normalized.labels[2].sourceLabel, "Generate Pick");
 assert.strictEqual(manual.normalized.labels[2].canonicalConceptId, "concept:create-warehouse-pick");
 const published = model.pipeline().publish(manual);
-assert.strictEqual(published.diagrams.length, 32);
+assert.strictEqual(published.diagrams.length, 34);
 const externalSource = { id: "source:partner:one", sourceType: "PartnerDocumentation",
   title: "Partner process", publisher: "Partner" };
 const sourced = model.pipeline().ingest({ inputType: "ManualProcess", source: externalSource,
