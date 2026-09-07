@@ -1174,6 +1174,10 @@ async function ensureContentScript(tabId) {
 }
 
 async function startSession(message, tabId) {
+  const previousState = await getState();
+  if (previousState.recording || previousState.sessionId) {
+    throw new Error("En inspelning är redan aktiv. Stoppa eller avbryt den innan en ny startas.");
+  }
   const connected = await ensureContentScript(tabId);
   if (!connected) {
     throw new Error(
@@ -1213,6 +1217,14 @@ async function startSession(message, tabId) {
   const id = sessionId(message.name);
   const now = new Date().toISOString();
 
+  await settleBounded(writeQueue, "previous session event writes");
+  await settleBounded(errorEvidenceWrites, "previous session error evidence writes");
+  await settleBounded(screenshotWorkerPromise, "previous session screenshots");
+  await settleBounded(rawEventStore.flush(), "previous raw event persistence queue");
+  await settleBounded(canonicalStore.flush(), "previous canonical persistence queue");
+  preActionCaptures.clear();
+  writeQueue = Promise.resolve();
+  errorEvidenceWrites = Promise.resolve();
   screenshotQueue = [];
   stoppingSessionId = null;
   canonicalPersistenceError = null;

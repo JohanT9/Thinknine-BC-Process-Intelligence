@@ -37,14 +37,18 @@
   }
 
   function derive({ session = null, debug = {}, connected = false } = {}) {
-    const eventCount = nonNegative(session?.eventCount ?? debug.eventCount);
-    const screenshotStats = debug.screenshotStats || {};
+    const sessionId = String(session?.id || "");
+    const debugBelongsToSession = !sessionId ||
+      String(debug.activeSessionId || "") === sessionId;
+    const sessionDebug = debugBelongsToSession ? debug : {};
+    const eventCount = nonNegative(session?.eventCount ?? sessionDebug.eventCount);
+    const screenshotStats = sessionDebug.screenshotStats || {};
     const screenshots = {
       requested: nonNegative(screenshotStats.requested),
       captured: nonNegative(screenshotStats.captured),
-      pending: nonNegative(debug.screenshotQueueLength),
+      pending: nonNegative(sessionDebug.screenshotQueueLength),
       errors: nonNegative(screenshotStats.errors),
-      lastCapturedAt: text(debug.lastScreenshotAt, 40)
+      lastCapturedAt: text(sessionDebug.lastScreenshotAt, 40)
     };
     const warnings = [];
 
@@ -52,7 +56,7 @@
       message: "Kontakten med Business Central är inte bekräftad." });
     if (eventCount === 0) warnings.push({ code: "no-events-yet",
       message: "Inga användarhändelser har registrerats ännu." });
-    if (screenshots.errors > 0 || debug.lastScreenshotError) {
+    if (screenshots.errors > 0 || sessionDebug.lastScreenshotError) {
       warnings.push({ code: "screenshot-error",
         message: "Minst en skärmbild kunde inte tas." });
     } else if (eventCount > 0 && session?.settings?.captureScreenshots !== false &&
@@ -60,7 +64,7 @@
       warnings.push({ code: "no-screenshots-yet",
         message: "Händelser registreras, men ingen skärmbild har sparats ännu." });
     }
-    if (debug.recordingHealth?.status === "truncated") {
+    if (sessionDebug.recordingHealth?.status === "truncated") {
       warnings.push({ code: "recording-truncated",
         message: "Maximalt antal händelser har uppnåtts." });
     }
@@ -72,7 +76,7 @@
         environmentName: text(session?.settings?.environmentName, 100),
         companyName: text(session?.settings?.companyName, 100)
       },
-      latestAction: latestAction(debug.lastEvent),
+      latestAction: latestAction(sessionDebug.lastEvent),
       screenshots,
       warnings
     };

@@ -1,5 +1,12 @@
 # Changelog
 
+## 2026-09-07 - Hard recording-session boundary
+
+- A new recording now waits for all previous persistence and screenshot work before initializing its stores.
+- Pending pre-action screenshots and in-memory queues are cleared explicitly at the session boundary.
+- Starting over an active session is rejected instead of risking an orphaned recording.
+- Live status ignores event and screenshot diagnostics belonging to another session, preventing inherited counters such as old saved-image totals.
+
 ## 2026-09-07 - Explicit transfer document lifecycle
 
 - Transfer maps now distinguish shipment posting from receipt posting with separate stable concepts.
