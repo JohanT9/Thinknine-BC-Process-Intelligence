@@ -1,5 +1,11 @@
 # Changelog
 
+## Add core Business Central variant maps
+
+- Add separate verified maps for Purchase Receipt and Invoice, Assembly to Order, and Drop Shipment.
+- Represent editable and posted purchase documents, cross-domain document creation, and posting actions with their semantic node types.
+- Prevent these variants from falling back to visually similar but semantically different standard-process diagrams.
+
 ## Distinguish Business Central Order Planning
 
 - Add Microsoft page 5522 and source table 246 as the canonical Order Planning worksheet.
