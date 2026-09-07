@@ -1,5 +1,11 @@
 # Changelog
 
+## Preserve semantic node shapes in generated maps
+
+- Recording-derived BC process maps now render posted documents as `postedDocument` nodes instead of ordinary documents.
+- Explicit manual actions, system actions, decisions, and posting actions retain their semantic node type through GUI and export projection.
+- Node typing is derived from the taxonomy and semantic metadata rather than display text alone.
+
 ## Reference maps for returns and basic warehousing
 
 - Added renderer-independent reference graphs for sales returns, purchase returns, inventory picks, and inventory put-aways.

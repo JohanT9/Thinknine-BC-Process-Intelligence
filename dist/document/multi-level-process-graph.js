@@ -31,6 +31,18 @@
     if (/system|background|automatic/i.test(action) || raw.inputSource === "system") return "systemAction";
     if (/decision/i.test(action) || raw.processNodeType === "decision") return "decision";
     return "action"; }
+  function documentNodeType(document, taxonomy) {
+    const definition = taxonomy.documents.find(item => item.id === document?.id);
+    return definition?.documentType === "posted-document" ||
+      /(^|:)posted-|bokförd/i.test(`${document?.id || ""} ${document?.name || ""}`)
+      ? "postedDocument" : "document";
+  }
+  function semanticStepNodeType(item, title) {
+    const requested = item.metadata?.nodeType;
+    if (["decision", "systemAction", "manualAction", "posting", "processStep"]
+      .includes(requested)) return requested;
+    return /post|bokför/i.test(item.businessAction?.name || title) ? "posting" : "processStep";
+  }
   function boundary(recordingId, level, type, sequence) { return graph.node({
     nodeId: graph.stableId("process-graph-node", [recordingId, level, type]),
     nodeType: type, title: type === "start" ? "Start" : "End", sequence,
@@ -97,7 +109,8 @@
     let previousDocument = null; values.forEach(item => { const document = item.businessDocument;
       if (document?.id && document.id !== previousDocument) { nodes.push(graph.node({
         nodeId: graph.stableId("process-graph-node", [recording.id, "document", document.id,
-          item.classificationId]), nodeType: "document", title: document.name || document.id,
+          item.classificationId]), nodeType: documentNodeType(document, taxonomy),
+        title: document.name || document.id,
         sequence: nodes.length + 1, sourceEventIds: item.sourceEventIds,
         semanticClassificationIds: [item.classificationId], taxonomyEntityIds: [document.id],
         metadata: { relationshipType: item.metadata?.createsDocument ? "documentCreation" : "sequence",
@@ -107,8 +120,7 @@
       const step = item.processStep; const action = item.businessAction;
       if (item.metadata?.inferredFromObservedEvidence && !step?.id && !action?.id) return;
       const title = step?.name || action?.name || item.bcProcess?.name || "Classified BC step";
-      const nodeType = /post|bokför/i.test(action?.name || title) ? "posting" :
-        item.metadata?.nodeType === "decision" ? "decision" : "processStep";
+      const nodeType = semanticStepNodeType(item, title);
       nodes.push(graph.node({ nodeId: graph.stableId("process-graph-node",
         [recording.id, "businessCentralProcess", item.classificationId]), nodeType, title,
       sequence: nodes.length + 1, sourceEventIds: item.sourceEventIds,
@@ -157,5 +169,6 @@
   function expand(bundle, nodeId) { const ids = bundle.expansionIndex?.[nodeId] || [];
     const candidates = [...bundle.businessCentralProcess.nodes, ...bundle.userProcedure.nodes];
     return Object.freeze(candidates.filter(node => ids.includes(node.nodeId))); }
-  return { PROJECTION_VERSION, expand, generate, generateAll };
+  return { PROJECTION_VERSION, documentNodeType, expand, generate, generateAll,
+    semanticStepNodeType };
 });

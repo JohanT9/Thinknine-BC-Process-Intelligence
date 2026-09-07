@@ -130,4 +130,22 @@ assert(!observedBundle.businessCentralProcess.nodes.some(node =>
 assert.strictEqual(emptyBundle.businessProcess.nodes.length, 2,
   "Unclassified recordings remain valid and contain neutral boundaries.");
 
+let postedReturn = canonical.create({ id: "posted-return",
+  startedAt: "2026-09-02T10:00:00Z" });
+postedReturn = canonical.addEvent(postedReturn, { eventNo: 1, type: "navigation" }, {
+  pageIdentity: { pageObjectId: "6660", tableId: "6660", documentType: "posted-document",
+    entity: "PostedReturnReceipt" }
+});
+const postedReturnBundle = projector.generateAll(postedReturn);
+assert(postedReturnBundle.businessCentralProcess.nodes.some(node =>
+  node.taxonomyEntityIds.includes("document:return-receipt") &&
+  node.nodeType === "postedDocument"),
+"Observed posted Business Central documents retain their posted-document shape and color.");
+assert.strictEqual(projector.semanticStepNodeType({ metadata: { nodeType: "manualAction" } },
+  "Review"), "manualAction");
+assert.strictEqual(projector.semanticStepNodeType({ metadata: { nodeType: "systemAction" } },
+  "Calculate"), "systemAction");
+assert.strictEqual(projector.semanticStepNodeType({ metadata: { nodeType: "decision" } },
+  "Approved?"), "decision");
+
 console.log("Multi-level ProcessGraph tests passed.");
