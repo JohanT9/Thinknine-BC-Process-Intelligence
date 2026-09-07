@@ -1,5 +1,11 @@
 # Changelog
 
+## Reference maps for returns and basic warehousing
+
+- Added renderer-independent reference graphs for sales returns, purchase returns, inventory picks, and inventory put-aways.
+- The new graphs preserve document, posting, and posted-document node types for clearer process-map shapes and colors.
+- Added stable bilingual document and action concepts so matching does not depend on displayed English text.
+
 ## Basic warehouse document recognition
 
 - Added distinct canonical documents for Business Central Inventory Picks and Inventory Put-aways, including their list, card, and posted views.

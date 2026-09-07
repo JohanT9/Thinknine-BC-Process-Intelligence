@@ -25,7 +25,19 @@
     ["document:production-order", "Production Order", { sv: "Produktionsorder" }],
     ["document:production-journal", "Production Journal", { sv: "Produktionsjournal" }],
     ["document:assembly-order", "Assembly Order", { sv: "Monteringsorder" }],
-    ["document:planning-worksheet", "Planning Worksheet", { sv: "Planeringsförslag" }]
+    ["document:planning-worksheet", "Planning Worksheet", { sv: "Planeringsförslag" }],
+    ["document:sales-return-order", "Sales Return Order", { sv: "Försäljningsreturorder" }],
+    ["document:return-receipt", "Posted Return Receipt", { sv: "Bokförd returinleverans" }],
+    ["document:sales-credit-memo", "Sales Credit Memo", { sv: "Försäljningskreditnota" }],
+    ["document:posted-sales-credit-memo", "Posted Sales Credit Memo", { sv: "Bokförd försäljningskreditnota" }],
+    ["document:purchase-return-order", "Purchase Return Order", { sv: "Inköpsreturorder" }],
+    ["document:return-shipment", "Posted Return Shipment", { sv: "Bokförd returleverans" }],
+    ["document:purchase-credit-memo", "Purchase Credit Memo", { sv: "Inköpskreditnota" }],
+    ["document:posted-purchase-credit-memo", "Posted Purchase Credit Memo", { sv: "Bokförd inköpskreditnota" }],
+    ["document:inventory-pick", "Inventory Pick", { sv: "Lagerplockning" }],
+    ["document:posted-inventory-pick", "Posted Inventory Pick", { sv: "Bokförd lagerplockning" }],
+    ["document:inventory-put-away", "Inventory Put-away", { sv: "Lagerinförsel" }],
+    ["document:posted-inventory-put-away", "Posted Inventory Put-away", { sv: "Bokförd lagerinförsel" }]
   ].map(([id, canonicalName, localizedCaptions, tableId, pageId]) => ({ id, canonicalName,
     localizedCaptions, namespace: "Microsoft.BusinessCentral", tableId: tableId ?? null,
     pageId: pageId ?? null, entityType: "Document", aliases: [] }));
@@ -44,7 +56,12 @@
     ["concept:consume", "Post Consumption", ["Consumption"]],
     ["concept:output", "Post Output", ["Output"]],
     ["concept:assemble", "Post Assembly", ["Assemble"]],
-    ["concept:plan", "Calculate Plan", ["Calculate Regenerative Plan"]]
+    ["concept:plan", "Calculate Plan", ["Calculate Regenerative Plan"]],
+    ["concept:receive-return", "Receive Return", ["Post Return Receipt"]],
+    ["concept:ship-return", "Ship Return", ["Post Return Shipment"]],
+    ["concept:post-credit", "Post Credit Memo", ["Post Credit"]],
+    ["concept:post-inventory-pick", "Post Inventory Pick", ["Post Pick and Shipment"]],
+    ["concept:post-inventory-put-away", "Post Inventory Put-away", ["Post Receipt and Put-away"]]
   ].map(([id, canonicalName, aliases]) => ({ id, canonicalName, aliases,
     namespace: "Microsoft.BusinessCentral", domain: "Business Central", entityType: "ProcessStep" }));
   function graph(diagramId, steps, edges = null) {
@@ -139,7 +156,29 @@
       "Regenerative Plan", [{ title: "Planning Worksheet", type: "document",
         refs: ["document:planning-worksheet"] }, { title: "Calculate Plan", refs: ["concept:plan"] },
         { title: "Review Action Messages", type: "manualAction" },
-        { title: "Carry Out Action Message", type: "systemAction", edge: "creates" }])
+        { title: "Carry Out Action Message", type: "systemAction", edge: "creates" }]),
+    reference("sales-return", "Sales Return", "domain:returns", "Sales Returns", "Standard", [
+      { title: "Sales Return Order", type: "document", refs: ["document:sales-return-order"] },
+      { title: "Receive Return", type: "posting", refs: ["concept:receive-return"], edge: "posts" },
+      { title: "Posted Return Receipt", type: "postedDocument", refs: ["document:return-receipt"], edge: "posts" },
+      { title: "Sales Credit Memo", type: "document", refs: ["document:sales-credit-memo"], edge: "creates" },
+      { title: "Posted Sales Credit Memo", type: "postedDocument", refs: ["document:posted-sales-credit-memo"], edge: "posts" }]),
+    reference("purchase-return", "Purchase Return", "domain:returns", "Purchase Returns", "Standard", [
+      { title: "Purchase Return Order", type: "document", refs: ["document:purchase-return-order"] },
+      { title: "Ship Return", type: "posting", refs: ["concept:ship-return"], edge: "posts" },
+      { title: "Posted Return Shipment", type: "postedDocument", refs: ["document:return-shipment"], edge: "posts" },
+      { title: "Purchase Credit Memo", type: "document", refs: ["document:purchase-credit-memo"], edge: "creates" },
+      { title: "Posted Purchase Credit Memo", type: "postedDocument", refs: ["document:posted-purchase-credit-memo"], edge: "posts" }]),
+    reference("inventory-pick", "Inventory Pick", "domain:warehouse-management",
+      "Basic Warehouse Outbound", "Basic Warehouse", [
+        { title: "Inventory Pick", type: "document", refs: ["document:inventory-pick"] },
+        { title: "Post Pick and Shipment", type: "posting", refs: ["concept:post-inventory-pick"], edge: "posts" },
+        { title: "Posted Inventory Pick", type: "postedDocument", refs: ["document:posted-inventory-pick"], edge: "posts" }]),
+    reference("inventory-put-away", "Inventory Put-away", "domain:warehouse-management",
+      "Basic Warehouse Inbound", "Basic Warehouse", [
+        { title: "Inventory Put-away", type: "document", refs: ["document:inventory-put-away"] },
+        { title: "Post Receipt and Put-away", type: "posting", refs: ["concept:post-inventory-put-away"], edge: "posts" },
+        { title: "Posted Inventory Put-away", type: "postedDocument", refs: ["document:posted-inventory-put-away"], edge: "posts" }])
   ];
   const dataset = Object.freeze({ schemaVersion: 1, datasetId: "bc-reference-diagram-dataset",
     taxonomyVersion: "1.0.0", createdAt: "2026-09-02T00:00:00.000Z",

@@ -5,13 +5,19 @@ const graph = require("../src/document/process-graph");
 
 const checked = model.validate(seed);
 assert.strictEqual(checked.valid, true, JSON.stringify(checked.diagnostics));
-assert.strictEqual(checked.dataset.diagrams.length, 10);
+assert.strictEqual(checked.dataset.diagrams.length, 14);
 assert(checked.dataset.diagrams.every(item => item.sourceId && item.abstractionLevel === "BC_PROCESS"));
 assert(checked.dataset.diagrams.every(item => !item.originalImageAssetId));
 assert(checked.dataset.diagrams.every(item => item.facts.every(fact => fact.sourceId)));
 assert.deepStrictEqual(model.PARTITIONS, ["Training", "Validation", "Evaluation", "GeneralReference"]);
 assert.strictEqual(seed.diagrams.find(item => item.name === "Advanced Warehouse Outbound")
   .datasetPartition, "Evaluation");
+assert.deepStrictEqual(seed.diagrams.find(item => item.name === "Sales Return").processGraph.nodes
+  .filter(item => !["start", "end"].includes(item.nodeType)).map(item => item.nodeType),
+  ["document", "posting", "postedDocument", "document", "postedDocument"]);
+assert.deepStrictEqual(seed.diagrams.find(item => item.name === "Inventory Pick").processGraph.nodes
+  .filter(item => !["start", "end"].includes(item.nodeType)).map(item => item.nodeType),
+  ["document", "posting", "postedDocument"]);
 
 const registry = model.create(seed);
 assert.strictEqual(registry.findCanonicalConcept("Generate Pick").canonicalName, "Create Warehouse Pick");
@@ -33,7 +39,7 @@ assert.strictEqual(manual.publishable, true);
 assert.strictEqual(manual.normalized.labels[2].sourceLabel, "Generate Pick");
 assert.strictEqual(manual.normalized.labels[2].canonicalConceptId, "concept:create-warehouse-pick");
 const published = model.pipeline().publish(manual);
-assert.strictEqual(published.diagrams.length, 11);
+assert.strictEqual(published.diagrams.length, 15);
 const externalSource = { id: "source:partner:one", sourceType: "PartnerDocumentation",
   title: "Partner process", publisher: "Partner" };
 const sourced = model.pipeline().ingest({ inputType: "ManualProcess", source: externalSource,
