@@ -175,6 +175,7 @@
     "Create Supply Order": "Skapa försörjningsorder",
     "Review Action Messages": "Granska åtgärdsmeddelanden",
     "Carry Out Action Message": "Verkställ åtgärdsmeddelande",
+    "Accept Action Message": "Acceptera åtgärdsmeddelande",
     "Supply recommendation?": "Vilken försörjning rekommenderas?",
     "Create Purchase Orders": "Skapa inköpsorder",
     "Create Production Orders": "Skapa produktionsorder",

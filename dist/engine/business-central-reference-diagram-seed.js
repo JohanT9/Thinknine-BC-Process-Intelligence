@@ -94,6 +94,7 @@
     ["concept:create-purchase-orders", "Create Purchase Orders", ["Carry Out Purchase Actions"]],
     ["concept:create-production-orders", "Create Production Orders", ["Carry Out Production Actions"]],
     ["concept:create-transfer-orders", "Create Transfer Orders", ["Carry Out Transfer Actions"]],
+    ["concept:accept-action-message", "Accept Action Message", ["Accept Action Messages"]],
     ["concept:receive-return", "Receive Return", ["Post Return Receipt"]],
     ["concept:ship-return", "Ship Return", ["Post Return Shipment"]],
     ["concept:post-credit", "Post Credit Memo", ["Post Credit"]],
@@ -397,6 +398,42 @@
         { from: 4, to: 7, relationshipType: "conditionalBranch", label: "Transfer" },
         { from: 5, to: "end" }, { from: 6, to: "end" }, { from: 7, to: "end" }
       ] }),
+    reference("planning-create-purchase-orders", "Create Purchase Orders",
+      "domain:forecast-to-plan", "Planning", "Purchase Supply", [
+        { title: "Planning Worksheet", type: "document",
+          refs: ["document:planning-worksheet"] },
+        { title: "Review Action Messages", type: "manualAction" },
+        { title: "Accept Action Message", type: "manualAction",
+          refs: ["concept:accept-action-message"] },
+        { title: "Create Purchase Orders", type: "systemAction",
+          refs: ["concept:create-purchase-orders"], edge: "creates" },
+        { title: "Purchase Order", type: "document",
+          refs: ["document:purchase-order"], edge: "creates" }
+      ]),
+    reference("planning-create-production-orders", "Create Production Orders",
+      "domain:forecast-to-plan", "Planning", "Production Supply", [
+        { title: "Planning Worksheet", type: "document",
+          refs: ["document:planning-worksheet"] },
+        { title: "Review Action Messages", type: "manualAction" },
+        { title: "Accept Action Message", type: "manualAction",
+          refs: ["concept:accept-action-message"] },
+        { title: "Create Production Orders", type: "systemAction",
+          refs: ["concept:create-production-orders"], edge: "creates" },
+        { title: "Production Order", type: "document",
+          refs: ["document:production-order"], edge: "creates" }
+      ]),
+    reference("planning-create-transfer-orders", "Create Transfer Orders",
+      "domain:forecast-to-plan", "Planning", "Transfer Supply", [
+        { title: "Planning Worksheet", type: "document",
+          refs: ["document:planning-worksheet"] },
+        { title: "Review Action Messages", type: "manualAction" },
+        { title: "Accept Action Message", type: "manualAction",
+          refs: ["concept:accept-action-message"] },
+        { title: "Create Transfer Orders", type: "systemAction",
+          refs: ["concept:create-transfer-orders"], edge: "creates" },
+        { title: "Transfer Order", type: "document",
+          refs: ["document:transfer-order"], edge: "creates" }
+      ]),
     reference("sales-return", "Sales Return", "domain:returns", "Sales Returns", "Standard", [
       { title: "Sales Return Order", type: "document", refs: ["document:sales-return-order"] },
       { title: "Receive Return", type: "posting", refs: ["concept:receive-return"], edge: "posts" },

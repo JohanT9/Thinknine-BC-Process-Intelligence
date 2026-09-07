@@ -1,5 +1,11 @@
 # Changelog
 
+## 2026-09-07 - Concrete planning outcome maps
+
+- Added dedicated process maps for planning actions that create purchase, production, or transfer orders.
+- Each map retains the planning worksheet, review, accepted action message, creation action, and resulting BC document.
+- Added a stable action-message concept, Swedish map label, and regression coverage for all three outcomes.
+
 ## 2026-09-07 - Make-to-stock and make-to-order maps
 
 - Added separate production maps for forecast/stock-driven and sales-order-driven demand.

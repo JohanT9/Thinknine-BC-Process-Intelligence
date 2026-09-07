@@ -5,7 +5,7 @@ const graph = require("../src/document/process-graph");
 
 const checked = model.validate(seed);
 assert.strictEqual(checked.valid, true, JSON.stringify(checked.diagnostics));
-assert.strictEqual(checked.dataset.diagrams.length, 39);
+assert.strictEqual(checked.dataset.diagrams.length, 42);
 assert(checked.dataset.diagrams.every(item => item.sourceId && item.abstractionLevel === "BC_PROCESS"));
 assert(checked.dataset.diagrams.every(item => !item.originalImageAssetId));
 assert(checked.dataset.diagrams.every(item => item.facts.every(fact => fact.sourceId)));
@@ -52,6 +52,9 @@ assert.strictEqual(planningBranches.processGraph.relationships.filter(item =>
 assert.deepStrictEqual(planningBranches.processGraph.relationships.filter(item =>
   item.relationshipType === "conditionalBranch").map(item => item.label),
 ["Purchase", "Production", "Transfer"]);
+assert.deepStrictEqual(["Create Purchase Orders", "Create Production Orders",
+  "Create Transfer Orders"].map(name => seed.diagrams.find(item => item.name === name)
+  ?.processGraph.nodes.at(-2).nodeType), ["document", "document", "document"]);
 const purchaseBranchGraph = JSON.parse(JSON.stringify(planningBranches.processGraph));
 const unobservedBranchIds = new Set(purchaseBranchGraph.nodes.filter(node =>
   ["Create Production Orders", "Create Transfer Orders"].includes(node.title))
@@ -111,7 +114,7 @@ assert.strictEqual(manual.publishable, true);
 assert.strictEqual(manual.normalized.labels[2].sourceLabel, "Generate Pick");
 assert.strictEqual(manual.normalized.labels[2].canonicalConceptId, "concept:create-warehouse-pick");
 const published = model.pipeline().publish(manual);
-assert.strictEqual(published.diagrams.length, 40);
+assert.strictEqual(published.diagrams.length, 43);
 const externalSource = { id: "source:partner:one", sourceType: "PartnerDocumentation",
   title: "Partner process", publisher: "Partner" };
 const sourced = model.pipeline().ingest({ inputType: "ManualProcess", source: externalSource,
