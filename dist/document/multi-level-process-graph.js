@@ -26,10 +26,11 @@
     event.page?.caption || event.page?.name || event.type || "Recorded action"); }
   function actionNodeType(event) { const raw = event.raw || {}; const action = text(
     event.identification?.actionIdentity?.actionType || raw.actionType || raw.automationId);
-    if (/post/i.test(action)) return "posting";
+    const meaning = `${action} ${eventTitle(event)}`;
+    if (/post|bokf(?:ö|Ã¶)r/i.test(meaning)) return "posting";
     if (raw.manual === true || raw.manuallyAdded === true) return "manualAction";
-    if (/system|background|automatic/i.test(action) || raw.inputSource === "system") return "systemAction";
-    if (/decision/i.test(action) || raw.processNodeType === "decision") return "decision";
+    if (/system|background|automatic/i.test(meaning) || raw.inputSource === "system") return "systemAction";
+    if (/decision|beslut/i.test(meaning) || raw.processNodeType === "decision") return "decision";
     return "action"; }
   function documentNodeType(document, taxonomy) {
     const definition = taxonomy.documents.find(item => item.id === document?.id);
@@ -54,7 +55,7 @@
       ...from.sourceEventIds, ...to.sourceEventIds]), metadata }); }
   function relationshipType(item) { const requested = item?.metadata?.relationshipType;
     return graph.RELATIONSHIP_TYPES.includes(requested) ? requested :
-      item?.nodeType === "posting" ? "documentPosting" : "sequence"; }
+      ["posting", "postedDocument"].includes(item?.nodeType) ? "documentPosting" : "sequence"; }
   function chain(recordingId, level, contentNodes, title, metadata = {}) {
     const start = boundary(recordingId, level, "start", 0);
     const end = boundary(recordingId, level, "end", contentNodes.length + 1);
@@ -169,6 +170,6 @@
   function expand(bundle, nodeId) { const ids = bundle.expansionIndex?.[nodeId] || [];
     const candidates = [...bundle.businessCentralProcess.nodes, ...bundle.userProcedure.nodes];
     return Object.freeze(candidates.filter(node => ids.includes(node.nodeId))); }
-  return { PROJECTION_VERSION, documentNodeType, expand, generate, generateAll,
-    semanticStepNodeType };
+  return { PROJECTION_VERSION, actionNodeType, documentNodeType, expand, generate, generateAll,
+    relationshipType, semanticStepNodeType };
 });

@@ -147,5 +147,9 @@ assert.strictEqual(projector.semanticStepNodeType({ metadata: { nodeType: "syste
   "Calculate"), "systemAction");
 assert.strictEqual(projector.semanticStepNodeType({ metadata: { nodeType: "decision" } },
   "Approved?"), "decision");
+assert.strictEqual(projector.actionNodeType({ raw: { actionCaption: "Bokför" } }), "posting",
+  "Swedish posting captions retain posting semantics in the user-procedure map.");
+assert.strictEqual(projector.relationshipType({ nodeType: "postedDocument", metadata: {} }),
+  "documentPosting", "Transitions into posted documents retain posting semantics.");
 
 console.log("Multi-level ProcessGraph tests passed.");

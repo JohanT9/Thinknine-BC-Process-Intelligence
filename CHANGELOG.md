@@ -1,5 +1,11 @@
 # Changelog
 
+## Preserve posting semantics across diagram levels
+
+- Recognize both English `Post` and Swedish `Bokför` captions as posting nodes in recorded user procedures.
+- Generate document-posting relationships when a process transitions into a posted Business Central document.
+- Keep manual, system, and decision recognition based on the combined technical identity and visible caption.
+
 ## Preserve semantic node shapes in generated maps
 
 - Recording-derived BC process maps now render posted documents as `postedDocument` nodes instead of ordinary documents.
