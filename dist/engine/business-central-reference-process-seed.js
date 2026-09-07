@@ -88,6 +88,19 @@
     reference("warehouse-movement", "Warehouse Movement", "domain:warehouse-management",
       "Move warehouse inventory between bins.", ["document:warehouse-movement"],
       ["Create Movement", "Register"]),
+    reference("warehouse-inventory-pick", "Inventory Pick", "domain:warehouse-management",
+      "Pick and ship source document quantities with basic warehouse handling.",
+      ["document:inventory-pick", "document:posted-inventory-pick"],
+      ["Create Inventory Pick", "Post Pick and Shipment"], {
+        variants: ["variant:basic-warehouse"], configurationRequirements:
+          ["Require Pick", "Require Shipment disabled"] }),
+    reference("warehouse-inventory-put-away", "Inventory Put-away",
+      "domain:warehouse-management",
+      "Receive and put away source document quantities with basic warehouse handling.",
+      ["document:inventory-put-away", "document:posted-inventory-put-away"],
+      ["Create Inventory Put-away", "Post Receipt and Put-away"], {
+        variants: ["variant:basic-warehouse"], configurationRequirements:
+          ["Require Put-away", "Require Receive disabled"] }),
     reference("item-reclassification", "Item Reclassification", "domain:inventory-to-deliver",
       "Reclassify location, bin, lot, serial, or dimensions through an item journal.",
       ["document:item-reclassification-journal"], ["Enter Reclassification", "Post"]),

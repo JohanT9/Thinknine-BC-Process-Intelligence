@@ -1,5 +1,11 @@
 # Changelog
 
+## Basic warehouse document recognition
+
+- Added distinct canonical documents for Business Central Inventory Picks and Inventory Put-aways, including their list, card, and posted views.
+- Added basic inbound and outbound warehouse processes so these documents no longer fall into advanced warehouse handling or generic movement flows.
+- Added Swedish process-map labels for active and posted basic warehouse documents.
+
 ## Complete return document recognition
 
 - Added canonical Business Central card and list identities for posted return receipts, posted return shipments, sales and purchase credit memos, and their posted documents.

@@ -59,7 +59,15 @@ const cases = [
     process: "bc-process:returns:purchase-return-order",
     evidence: ["document:purchase-return-order", "action:ShipReturn",
       "document:return-shipment", "document:purchase-credit-memo",
-      "document:posted-purchase-credit-memo"] }
+      "document:posted-purchase-credit-memo"] },
+  { id: "inventory-pick", domain: "domain:warehouse-management",
+    process: "bc-process:warehouse:inventory-pick",
+    evidence: ["document:inventory-pick", "action:PostInventoryPick",
+      "document:posted-inventory-pick"] },
+  { id: "inventory-put-away", domain: "domain:warehouse-management",
+    process: "bc-process:warehouse:inventory-put-away",
+    evidence: ["document:inventory-put-away", "action:PostInventoryPutAway",
+      "document:posted-inventory-put-away"] }
 ];
 
 cases.forEach(testCase => {

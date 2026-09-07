@@ -6,7 +6,7 @@ const seed = require("../src/engine/business-central-reference-process-seed").li
 const validation = service.validate(seed);
 assert.strictEqual(validation.valid, true, JSON.stringify(validation.diagnostics, null, 2));
 const registry = service.create(seed);
-assert.strictEqual(registry.library.references.length, 35);
+assert.strictEqual(registry.library.references.length, 37);
 const required = ["Simple Sales Order", "Advanced Warehouse Outbound", "Purchase Return",
   "Physical Inventory", "Production with Warehouse Picking", "Demand Forecast",
   "Assembly to Order", "Expiration Date Handling"];
@@ -16,6 +16,10 @@ assert.strictEqual(registry.list("domain:order-to-cash").length, 5);
 assert.strictEqual(registry.get("reference:bc:otc-advanced-outbound").startingDocument,
   "document:sales-order");
 assert(registry.context("reference:bc:production-mto").configurationRequirements.length >= 0);
+assert.deepStrictEqual(registry.get("reference:bc:warehouse-inventory-pick").expectedDocuments,
+  ["document:inventory-pick", "document:posted-inventory-pick"]);
+assert.deepStrictEqual(registry.get("reference:bc:warehouse-inventory-put-away").expectedDocuments,
+  ["document:inventory-put-away", "document:posted-inventory-put-away"]);
 const serialized = JSON.stringify(seed);
 assert(!/screenshot|coordinates|pixel|svg|canvas|html|css/i.test(serialized),
   "Reference semantics must not contain screenshots or rendering details.");
