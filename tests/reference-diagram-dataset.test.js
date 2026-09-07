@@ -36,6 +36,25 @@ assert.strictEqual(planningBranches.processGraph.relationships.filter(item =>
 assert.deepStrictEqual(planningBranches.processGraph.relationships.filter(item =>
   item.relationshipType === "conditionalBranch").map(item => item.label),
 ["Purchase", "Production", "Transfer"]);
+const purchaseBranchGraph = JSON.parse(JSON.stringify(planningBranches.processGraph));
+const unobservedBranchIds = new Set(purchaseBranchGraph.nodes.filter(node =>
+  ["Create Production Orders", "Create Transfer Orders"].includes(node.title))
+  .map(node => node.nodeId));
+purchaseBranchGraph.nodes = purchaseBranchGraph.nodes.filter(node =>
+  !unobservedBranchIds.has(node.nodeId));
+purchaseBranchGraph.relationships = purchaseBranchGraph.relationships.filter(edge =>
+  !unobservedBranchIds.has(edge.fromNodeId) && !unobservedBranchIds.has(edge.toNodeId));
+const branchComparison = model.compareGraphs(graph.normalize(purchaseBranchGraph),
+  planningBranches.processGraph);
+assert.strictEqual(branchComparison.missingSteps.length, 0,
+  "Unchosen conditional routes must not be reported as missing steps.");
+assert.deepStrictEqual(branchComparison.conditionalSteps.map(item => item.title),
+  ["Create Production Orders", "Create Transfer Orders"]);
+assert(branchComparison.conditionalSteps.every(item => item.applicability === "conditional"));
+const branchMatch = model.create(seed).findSimilarProcessGraphs(
+  graph.normalize(purchaseBranchGraph), 30).find(item => item.diagram.id === planningBranches.id);
+assert.strictEqual(branchMatch.matchDetails.referenceCoverage, 1,
+  "A complete chosen branch should cover the applicable reference route.");
 assert(seed.diagrams.find(item => item.name === "Demand Forecast").processGraph.nodes.some(item =>
   item.taxonomyEntityIds?.includes("document:demand-forecast")));
 assert(seed.diagrams.find(item => item.name === "Requisition Worksheet").processGraph.nodes.some(item =>

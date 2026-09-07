@@ -63,8 +63,10 @@
       variantAssessment.selectedVariantName = text(decision?.confirmedVariantName || selected?.name ||
         confirmedVariantId); variantAssessment.manuallyConfirmed = true; missing = missing.filter(item =>
         !array(item.variantIds).length || array(item.variantIds).includes(confirmedVariantId)); } }
-    const conditional = confirmedVariantId ? [] : missing.filter(item =>
-      ["conditional", "optional"].includes(item.applicability));
+    const conditional = confirmedVariantId ? [] : [...array(best?.conditionalSteps),
+      ...missing.filter(item => ["conditional", "optional"].includes(item.applicability))]
+      .filter((item, index, values) => values.findIndex(candidate => stepLabel(candidate) ===
+        stepLabel(item)) === index);
     if (!confirmedVariantId) missing = missing.filter(item =>
       !["conditional", "optional"].includes(item.applicability));
     return Object.freeze({ available: Boolean(best), referenceId: text(best?.referenceProcessId ||

@@ -230,7 +230,17 @@
     const edges = semanticEdgeTokens(value).sort(); return JSON.stringify({ nodes, edges }); }
   function semanticTokens(value) { return new Set([...value.nodes.flatMap(node =>
     nodeIdentityKeys(node)), ...semanticEdgeTokens(value)]); }
-  function similarityDetails(left, right) { const a = semanticTokens(left); const b = semanticTokens(right);
+  function conditionalNodeIds(value) { return new Set(value.relationships.filter(edge =>
+    edge.relationshipType === "conditionalBranch").map(edge => edge.toNodeId)); }
+  function comparableReference(value, observedKeys) { const conditional = conditionalNodeIds(value);
+    const omitted = new Set(value.nodes.filter(node => conditional.has(node.nodeId) &&
+      !nodeIdentityKeys(node).some(item => observedKeys.has(item))).map(node => node.nodeId));
+    if (!omitted.size) return value; return { ...value,
+      nodes: value.nodes.filter(node => !omitted.has(node.nodeId)),
+      relationships: value.relationships.filter(edge => !omitted.has(edge.fromNodeId) &&
+        !omitted.has(edge.toNodeId)) }; }
+  function similarityDetails(left, right) { const a = semanticTokens(left);
+    const comparable = comparableReference(right, a); const b = semanticTokens(comparable);
     const intersection = [...a].filter(item => b.has(item)).length; const union = new Set([...a, ...b]).size;
     const precision = a.size ? intersection / a.size : b.size ? 0 : 1;
     const coverage = b.size ? intersection / b.size : a.size ? 0 : 1;
@@ -244,18 +254,23 @@
     .filter(node => !["start", "end"].includes(node.nodeType)); const expected = referenceGraph.nodes
     .filter(node => !["start", "end"].includes(node.nodeType)); const observedKeys = new Set(
       observed.flatMap(nodeIdentityKeys)); const expectedKeys = new Set(expected.flatMap(nodeIdentityKeys));
+    const conditional = conditionalNodeIds(referenceGraph);
     const matchesKeys = (node, keys) => nodeIdentityKeys(node).some(value => keys.has(value));
     const primaryKey = node => nodeIdentityKeys(node)[0];
     const matchedSteps = expected.filter(node => matchesKeys(node, observedKeys))
       .map(node => ({ nodeId: node.nodeId, title: node.title, nodeType: node.nodeType }));
-    const missingSteps = expected.filter(node => !matchesKeys(node, observedKeys))
+    const conditionalSteps = expected.filter(node => conditional.has(node.nodeId) &&
+      !matchesKeys(node, observedKeys)).map(node => ({ nodeId: node.nodeId, title: node.title,
+        nodeType: node.nodeType, applicability: "conditional" }));
+    const missingSteps = expected.filter(node => !conditional.has(node.nodeId) &&
+      !matchesKeys(node, observedKeys))
       .map(node => ({ nodeId: node.nodeId, title: node.title, nodeType: node.nodeType }));
     const additionalSteps = observed.filter(node => !matchesKeys(node, expectedKeys))
       .map(node => ({ nodeId: node.nodeId, title: node.title, nodeType: node.nodeType }));
     const unknownActions = additionalSteps.filter(node => /unknown/i.test(node.title));
     const expectedMatchedSequence = expected.filter(node => matchesKeys(node, observedKeys)).map(primaryKey);
     const observedMatchedSequence = observed.filter(node => matchesKeys(node, expectedKeys)).map(primaryKey);
-    return freeze({ matchedSteps, missingSteps, additionalSteps, unknownActions,
+    return freeze({ matchedSteps, missingSteps, conditionalSteps, additionalSteps, unknownActions,
       alternativeSequence: expectedMatchedSequence.some((item, index) =>
         item !== observedMatchedSequence[index]), customizedBehaviorMayBeValid: true,
       deviationsAreErrors: false }); }

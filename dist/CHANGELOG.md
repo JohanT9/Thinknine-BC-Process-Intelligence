@@ -1,5 +1,11 @@
 # Changelog
 
+## 2026-09-07 - Conditional reference branches no longer count as missing
+
+- Process comparison now separates unchosen conditional routes from genuinely missing steps.
+- Similarity coverage is calculated against the applicable branch instead of penalizing a recording for alternatives it did not take.
+- Added regression coverage for planning recommendations that create purchase, production, or transfer orders.
+
 ## Add core Business Central variant maps
 
 - Add separate verified maps for Purchase Receipt and Invoice, Assembly to Order, and Drop Shipment.

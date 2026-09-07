@@ -8,6 +8,8 @@ const result = {
     "Advanced Warehouse Outbound", domain: "Order to Cash", confidence: 0.91,
   matchedSteps: [{ type: "action", name: "Release" }, { type: "action", name: "Create Pick" }],
   missingSteps: [{ type: "action", name: "Post Shipment" }],
+  conditionalSteps: [{ type: "action", name: "Create Production Orders",
+    applicability: "conditional" }],
   additionalSteps: [{ type: "action", name: "Customer Approval" }],
   matchDetails: { observedPrecision: 0.96, referenceCoverage: 0.74 }, evidence: {
     documents: [{ name: "Sales Order" }, { name: "Warehouse Shipment" }],
@@ -28,6 +30,8 @@ assert.strictEqual(normalized.name, "Advanced Warehouse Outbound");
 assert.strictEqual(normalized.confidence, 0.91);
 assert.strictEqual(normalized.matched.length, 2);
 assert.strictEqual(normalized.missing.length, 1);
+assert.strictEqual(normalized.conditional.length, 1);
+assert.strictEqual(normalized.conditional[0].name, "Create Production Orders");
 assert.strictEqual(normalized.additional.length, 1);
 assert.strictEqual(normalized.alternatives.length, 2);
 assert(!normalized.alternatives.some(item => item.id === "diagram:transfer"));
