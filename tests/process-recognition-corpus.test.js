@@ -49,7 +49,17 @@ const cases = [
   { id: "planning", domain: "domain:forecast-to-plan",
     process: "bc-process:planning:planning-worksheet",
     evidence: ["document:planning-worksheet", "action:CalculateRegenerativePlan",
-      "action:CarryOutActionMessage"] }
+      "action:CarryOutActionMessage"] },
+  { id: "sales-return", domain: "domain:returns",
+    process: "bc-process:returns:sales-return-order",
+    evidence: ["document:sales-return-order", "action:ReceiveReturn",
+      "document:return-receipt", "document:sales-credit-memo",
+      "document:posted-sales-credit-memo"] },
+  { id: "purchase-return", domain: "domain:returns",
+    process: "bc-process:returns:purchase-return-order",
+    evidence: ["document:purchase-return-order", "action:ShipReturn",
+      "document:return-shipment", "document:purchase-credit-memo",
+      "document:posted-purchase-credit-memo"] }
 ];
 
 cases.forEach(testCase => {
@@ -114,4 +124,4 @@ assert(!partialPurchase.alternatives.some(candidate =>
   candidate.taxonomyReferences.domain.id === "domain:transfers"),
 "strong purchase evidence must exclude transfer alternatives");
 
-console.log(`Process recognition corpus tests passed (${cases.length} domains).`);
+console.log(`Process recognition corpus tests passed (${cases.length} flows).`);

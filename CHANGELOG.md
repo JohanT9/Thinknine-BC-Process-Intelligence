@@ -1,5 +1,11 @@
 # Changelog
 
+## Complete return document recognition
+
+- Added canonical Business Central card and list identities for posted return receipts, posted return shipments, sales and purchase credit memos, and their posted documents.
+- Sales and purchase return processes now retain their full observed document chain after the return order instead of collapsing later pages into unknown steps.
+- Added Swedish process-map labels for all new return and credit-memo document types.
+
 ## Canonical warehouse and production views
 
 - Corrected Business Central page `7340`: it is the posted warehouse shipment list, not a warehouse put-away.

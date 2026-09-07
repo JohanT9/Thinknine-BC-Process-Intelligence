@@ -24,6 +24,9 @@ assert.strictEqual(labels.nodeTitle({ title: "document:purchase-order" }, "en-US
 [
   "document:sales-quote", "document:posted-sales-shipment",
   "document:posted-warehouse-shipment",
+  "document:return-receipt", "document:return-shipment",
+  "document:sales-credit-memo", "document:posted-sales-credit-memo",
+  "document:purchase-credit-memo", "document:posted-purchase-credit-memo",
   "document:posted-purchase-receipt", "document:transfer-shipment",
   "document:production-journal", "document:assembly-order",
   "document:planning-worksheet", "document:sales-return-order",
