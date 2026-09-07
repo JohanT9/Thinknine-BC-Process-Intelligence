@@ -11,7 +11,7 @@
 ) {
   "use strict";
   const SCHEMA_VERSION = 1;
-  const GROUPING_VERSION = "1.8.0";
+  const GROUPING_VERSION = "1.9.0";
   const CAPTURE_PACKET_VERSION = "1.6.0";
   const RESULT_VERIFICATION_VERSION = "1.2.0";
   const cache = new WeakMap();
@@ -58,9 +58,9 @@
     if (kinds.has("toggle-change")) return "toggle-interaction";
     if (kinds.has("selection-change")) return "selection";
     if (kinds.has("value-change")) return "field-edit";
-    if (kinds.has("dialog-action")) return "dialog-interaction";
     if (events.some(isRowSelection)) return "row-interaction";
     if (kinds.has("activation")) return "action";
+    if (kinds.has("dialog-action")) return "dialog-interaction";
     if (kinds.has("navigation")) return "navigation";
     return "unknown";
   }
@@ -278,6 +278,15 @@
     }
     return false;
   }
+  function isConfirmationContinuation(events, event) {
+    const origin = events?.[0];
+    if (origin?.kind !== "activation" || event.kind !== "dialog-action") return false;
+    const action = event.actionIdentification || {};
+    const identity = String(action.actionType || action.caption || "").trim();
+    return /^(ConfirmYes|ConfirmNo|Yes|No|Ja|Nej)$/i.test(identity) &&
+      (event.pageIdentification?.modal === true || events.some(item =>
+        item.kind === "dialog-open")) && elapsed(origin, event) <= 15000;
+  }
   function group(normalizedRecording) {
     if (cache.has(normalizedRecording)) return cache.get(normalizedRecording);
     const groups = []; const guidanceEvents = []; const supportingEvents = [];
@@ -345,6 +354,11 @@
       if (pending && isActionOutcome(pending.events, event)) {
         pending.events.push(event);
         pending.reasons.push("observed-action-result");
+        continue;
+      }
+      if (pending && isConfirmationContinuation(pending.events, event)) {
+        pending.events.push(event);
+        pending.reasons.push("confirmation-dialog", "confirmed-action");
         continue;
       }
       if (pending && canContinueField(pending.events, event)) {

@@ -1,5 +1,11 @@
 # Changelog
 
+## 2026-09-07 - Confirmation dialogs collapse into their action
+
+- A Business Central command followed by a clearly identified Yes/No confirmation is now one documentable step.
+- Dialog open, confirmation, close, and outcome events remain preserved inside the same capture packet for traceability.
+- Meaningful non-confirmation dialog commands remain separate steps.
+
 ## 2026-09-07 - Specific Business Central action evidence
 
 - Recorder identification now distinguishes creating and registering picks, registering put-aways, and posting shipments, receipts, invoices, consumption, and output.

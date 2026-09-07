@@ -30,7 +30,7 @@ const quantity = run([
     value: { normalized: "500" }, screenshotAssetId: "shot-2" })
 ]);
 assert.strictEqual(quantity.schemaVersion, 1);
-assert.strictEqual(quantity.groupingVersion, "1.8.0");
+assert.strictEqual(quantity.groupingVersion, "1.9.0");
 assert.strictEqual(quantity.groups.length, 1);
 assert.strictEqual(quantity.groups[0].groupKind, "field-edit");
 assert.deepStrictEqual(quantity.groups[0].sourceEventIds,
@@ -124,10 +124,23 @@ assert.strictEqual(toggle.groups[0].groupKind, "toggle-interaction");
 const actionDialog = run([
   event("a1", "activation", { actionIdentification: { caption: "Post" } }),
   event("a2", "dialog-action", { pageIdentification: { caption: "Confirm", modal: true },
-    actionIdentification: { caption: "Yes" } })
+    actionIdentification: { actionType: "ConfirmYes", caption: "Yes" } }),
+  event("a3", "dialog-close", { pageIdentification: { caption: "Confirm", modal: true } })
 ]);
-assert.deepStrictEqual(actionDialog.groups.map(group => group.groupKind),
-  ["action", "dialog-interaction"]);
+assert.deepStrictEqual(actionDialog.groups.map(group => group.groupKind), ["action"]);
+assert.deepStrictEqual(actionDialog.groups[0].sourceEventIds,
+  ["source:a1", "source:a2", "source:a3"]);
+assert(actionDialog.groups[0].groupingReason.includes("confirmation-dialog"));
+assert.deepStrictEqual(actionDialog.groups[0].capturePacket.interactionEventIds,
+  ["normalized:a1", "normalized:a2"]);
+
+const meaningfulDialogAction = run([
+  event("ma1", "activation", { actionIdentification: { caption: "Open options" } }),
+  event("ma2", "dialog-action", { pageIdentification: { caption: "Options", modal: true },
+    actionIdentification: { caption: "Calculate and replace" } })
+]);
+assert.strictEqual(meaningfulDialogAction.groups.length, 2,
+  "A meaningful dialog command must remain a separate documentable step.");
 
 const actionResult = run([
   event("ar1", "activation", { actionIdentification: { caption: "Open" },
