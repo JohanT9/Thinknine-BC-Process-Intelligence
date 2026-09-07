@@ -1,5 +1,11 @@
 # Changelog
 
+## 2026-09-07 - Generic Business Central menu paths
+
+- Consecutive Business Central menu parents and their concrete command now become one documented user step.
+- Consolidation is limited to known menu parents on the same identified page, so ordinary commands and real navigation remain separate.
+- Raw interactions, source-event references, and the screenshot showing the open menu remain attached for traceability.
+
 ## 2026-09-07 - Confirmation dialogs collapse into their action
 
 - A Business Central command followed by a clearly identified Yes/No confirmation is now one documentable step.

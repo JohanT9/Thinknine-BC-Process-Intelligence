@@ -246,8 +246,38 @@ const unrelatedBetweenMenuActions = engine.processInteractions([{
 }, {
   taskType: "RunAction", actionCaption: "Manuellt pris"
 }]);
-assert.strictEqual(unrelatedBetweenMenuActions.length, 3);
-assert.ok(!unrelatedBetweenMenuActions.some(value =>
+assert.strictEqual(unrelatedBetweenMenuActions.length, 2);
+assert.strictEqual(unrelatedBetweenMenuActions[0].displayText,
+  "V\u00e4lj **\u00c5tg\u00e4rder** \u2192 **Bokf\u00f6r**.");
+assert.strictEqual(unrelatedBetweenMenuActions[1].displayText,
+  "V\u00e4lj **Manuellt pris**.");
+const genericMenuPath = only([{
+  taskId: "actions-post", taskType: "RunAction", actionCaption: "\u00c5tg\u00e4rder",
+  pageContext: { pageIdentity: "bc:page:42" },
+  sourceEventIds: ["event-actions-post"], screenshot: "post-menu.png"
+}, {
+  taskId: "posting", taskType: "RunAction", actionCaption: "Bokf\u00f6ring",
+  pageContext: { pageIdentity: "bc:page:42" },
+  sourceEventIds: ["event-posting"], screenshot: "after-post.png"
+}], "RunActionPath", "V\u00e4lj **\u00c5tg\u00e4rder** \u2192 **Bokf\u00f6ring**.");
+assert.deepStrictEqual(genericMenuPath.sourceEventIds,
+  ["event-actions-post", "event-posting"]);
+assert.strictEqual(genericMenuPath.preferredScreenshotRef, "post-menu.png");
+assert.strictEqual(genericMenuPath.preferredSourceEventId, "event-posting");
+const ordinaryActionsRemainSeparate = engine.processInteractions([{
+  taskType: "RunAction", actionCaption: "Redigera"
+}, { taskType: "RunAction", actionCaption: "Ta bort" }]);
+assert.strictEqual(ordinaryActionsRemainSeparate.length, 2);
+assert.ok(!ordinaryActionsRemainSeparate.some(value =>
+  value.actionType === "RunActionPath"));
+const crossPageMenuActions = engine.processInteractions([{
+  taskType: "RunAction", actionCaption: "\u00c5tg\u00e4rder",
+  pageContext: { pageIdentity: "bc:page:42" }
+}, { taskType: "RunAction", actionCaption: "Bokf\u00f6ring",
+  pageContext: { pageIdentity: "bc:page:43" }
+}]);
+assert.strictEqual(crossPageMenuActions.length, 2);
+assert.ok(!crossPageMenuActions.some(value =>
   value.actionType === "RunActionPath"));
 const duplicatedActionObservation = only([{
   taskId: "post-action", taskType: "RunAction", actionCaption: "Bokför",

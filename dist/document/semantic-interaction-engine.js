@@ -712,6 +712,65 @@
     return deepFreeze(rule);
   }
 
+  function genericMenuPathRule() {
+    const menuParent = /^(?:v\u00e4lj\s+)?(?:\u00e5tg\u00e4rder|actions|funktion|functions?|rad|row|relaterad information|related information)$/iu;
+    const isAction = value => ["RunAction", "ClickAction"].includes(
+      value?.taskType
+    );
+    const caption = value => text(value?.actionCaption) ||
+      text(value?.selectedCaption);
+    const cleanCaption = value => caption(value)
+      .replace(/^(?:v\u00e4lj|select)\s+/iu, "")
+      .replace(/\.{2,}$/u, "");
+    const pageKey = value => {
+      const page = value?.pageContext || value?.pageIdentification || {};
+      return text(value?.pageIdentity) || text(page?.pageIdentity) ||
+        text(value?.pageObjectId) || text(page?.pageObjectId) ||
+        text(value?.pageId) || text(page?.legacyPageId) || text(page?.pageId);
+    };
+    const samePage = values => {
+      const keys = unique(values.map(pageKey));
+      return keys.length < 2;
+    };
+    const matchingValues = context => {
+      const values = [];
+      let cursor = context.index;
+      while (values.length < 3) {
+        const candidate = context.interactions[cursor];
+        if (!isAction(candidate) || !menuParent.test(caption(candidate))) break;
+        values.push(candidate);
+        cursor += 1;
+      }
+      const leaf = context.interactions[cursor];
+      if (!values.length || !isAction(leaf) || !cleanCaption(leaf) ||
+          menuParent.test(caption(leaf))) return [];
+      const result = [...values, leaf];
+      return samePage(result) ? result : [];
+    };
+    const screenshots = value => value?.semanticActionModel?.screenshotRefs ||
+      value?.screenshots || (value?.screenshot ? [value.screenshot] : []);
+    const rule = {
+      ruleId: "generic-menu-action-path",
+      priority: 107,
+      match(context) {
+        return matchingValues(context).length > 0;
+      },
+      consolidate(context) {
+        const values = matchingValues(context);
+        const captions = values.map(cleanCaption);
+        const menuScreenshots = screenshots(values.at(-2));
+        return { consumed: values.length, action: action(rule, values, {
+          actionType: "RunActionPath",
+          displayText: `V\u00e4lj ${captions.map(value => `**${value}**`).join(" \u2192 ")}.`,
+          selectedValue: captions.at(-1),
+          preferredSourceEventId: values.at(-1)?.sourceEventIds?.at(-1),
+          preferredScreenshotRef: menuScreenshots.at(-1)
+        }) };
+      }
+    };
+    return deepFreeze(rule);
+  }
+
   const CUSTOMER = /kundens namn|kundnr|customer name|customer\s*no\.?/iu;
   const ITEM = /artikelnr|artikelnummer|item\s*no\.?/iu;
   const VENDOR = /leverantör(?:ens namn|snr|snummer)?|vendor(?:\s*name|\s*no\.?)?/iu;
@@ -723,6 +782,7 @@
     salesPriceDiscountMenuPathRule(),
     manualPriceMenuPathRule(),
     duplicateActionObservationRule(),
+    genericMenuPathRule(),
     closeDialogRule(),
     searchAndOpenWithRedundantFieldRule(),
     selectionRule({ ruleId: "customer-selection", priority: 100,
