@@ -23,6 +23,7 @@ assert.strictEqual(labels.nodeTitle({ title: "document:purchase-order" }, "en-US
   "Purchase Order");
 [
   "document:sales-quote", "document:posted-sales-shipment",
+  "document:posted-warehouse-shipment",
   "document:posted-purchase-receipt", "document:transfer-shipment",
   "document:production-journal", "document:assembly-order",
   "document:planning-worksheet", "document:sales-return-order",

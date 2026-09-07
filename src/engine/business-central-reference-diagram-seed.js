@@ -17,6 +17,7 @@
     ["document:warehouse-shipment", "Warehouse Shipment", { sv: "Dist.lagerutleverans" }],
     ["document:warehouse-pick", "Warehouse Pick", { sv: "Dist.lagerplockning" }],
     ["document:posted-sales-shipment", "Posted Sales Shipment", { sv: "Bokförd försäljningsleverans" }],
+    ["document:posted-warehouse-shipment", "Posted Warehouse Shipment", { sv: "Bokförd lagerutleverans" }],
     ["document:purchase-order", "Purchase Order", { sv: "Inköpsorder" }],
     ["document:warehouse-receipt", "Warehouse Receipt", { sv: "Dist.lagerinleverans" }],
     ["document:warehouse-put-away", "Warehouse Put-away", { sv: "Dist.lagerinförsel" }],
@@ -102,8 +103,8 @@
         { title: "Warehouse Pick", type: "document", refs: ["document:warehouse-pick"], edge: "creates" },
         { title: "Register Pick", refs: ["concept:register-pick"] },
         { title: "Post Shipment", type: "posting", refs: ["concept:post-shipment"], edge: "posts" },
-        { title: "Posted Sales Shipment", type: "postedDocument",
-          refs: ["document:posted-sales-shipment"], edge: "posts" }], { partition: "Evaluation" }),
+        { title: "Posted Warehouse Shipment", type: "postedDocument",
+          refs: ["document:posted-warehouse-shipment"], edge: "posts" }], { partition: "Evaluation" }),
     reference("simple-purchase-order", "Simple Purchase Order", "domain:source-to-pay",
       "Purchase Order Processing", "No Warehouse Handling", [
         { title: "Purchase Order", type: "document", refs: ["document:purchase-order"] },

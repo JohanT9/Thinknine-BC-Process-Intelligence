@@ -28,7 +28,7 @@ const outbound = synthetic("outbound", [
   { identification: page(7345, 5766, "warehouse-activity", "WarehousePick") },
   { label: "Register Pick", automationId: "RegisterPick", identification: action("RegisterPick", "Register Pick") },
   { label: "Post Shipment", automationId: "PostShipment", identification: action("PostDocument", "Post Shipment") },
-  { identification: page(130, 110, "posted-document", "PostedSalesShipment") }
+  { identification: page(7337, 7322, "posted-document", "PostedWarehouseShipment") }
 ]);
 const recognizedOutbound = engine.recognize(outbound);
 assert.strictEqual(recognizedOutbound.classification.process, "WarehouseOutbound");
@@ -60,7 +60,7 @@ const purchase = synthetic("purchase", [
   { label: "Release", automationId: "Release", identification: action("ReleaseDocument", "Release") },
   { identification: page(7332, 7316, "warehouse-document", "WarehouseReceipt") },
   { label: "Post Receipt", automationId: "PostReceipt", identification: action("PostDocument", "Post Receipt") },
-  { identification: page(7340, 5766, "warehouse-activity", "WarehousePutAway") },
+  { identification: page(5770, 5766, "warehouse-activity", "WarehousePutAway") },
   { label: "Register Put-away", automationId: "RegisterPutAway", identification: action("RegisterPutAway", "Register Put-away") },
   { identification: page(136, 120, "posted-document", "PostedPurchaseReceipt") }
 ]);
@@ -87,6 +87,17 @@ const standardPageViews = [
   [5779, "document:warehouse-pick", "document"],
   [9313, "document:warehouse-pick", "list"],
   [142, "document:posted-sales-shipment", "posted-list"],
+  [5768, "document:warehouse-receipt", "document"],
+  [5770, "document:warehouse-put-away", "document"],
+  [9312, "document:warehouse-put-away", "list"],
+  [7352, "document:warehouse-put-away", "worksheet"],
+  [7330, "document:posted-warehouse-receipt", "posted-card"],
+  [7333, "document:posted-warehouse-receipt", "posted-list"],
+  [7337, "document:posted-warehouse-shipment", "posted-card"],
+  [7340, "document:posted-warehouse-shipment", "posted-list"],
+  [9324, "document:planned-production-order", "list"],
+  [9325, "document:firm-planned-production-order", "list"],
+  [99000867, "document:finished-production-order", "posted-card"],
   [9301, "document:sales-invoice", "list"],
   [143, "document:posted-sales-invoice", "posted-list"],
   [9307, "document:purchase-order", "list"],

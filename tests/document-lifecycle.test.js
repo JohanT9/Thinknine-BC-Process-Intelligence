@@ -23,13 +23,15 @@ assert(noWarehouse.matchedTransitions.some(item => item.relationshipType === "cr
 assert(noWarehouse.matchedTransitions.some(item => item.relationshipType === "postedAs"));
 
 const basicWarehouse = best(["document:sales-order", "document:warehouse-shipment",
-  "document:posted-sales-shipment", "document:sales-invoice"], salesProcess);
+  "document:posted-warehouse-shipment", "document:posted-sales-shipment",
+  "document:sales-invoice"], salesProcess);
 assert.strictEqual(basicWarehouse.variantId, "variant:basic-warehouse");
 assert(!basicWarehouse.matchedStageIds.includes("sales:pick"),
   "Basic Warehouse must not require a pick.");
 
 const advancedWarehouse = best(["document:sales-order", "document:warehouse-shipment",
-  "document:warehouse-pick", "document:posted-sales-shipment"], salesProcess);
+  "document:warehouse-pick", "document:posted-warehouse-shipment",
+  "document:posted-sales-shipment"], salesProcess);
 assert.strictEqual(advancedWarehouse.variantId, "variant:advanced-warehouse");
 assert(advancedWarehouse.matchedStageIds.includes("sales:pick"));
 assert(advancedWarehouse.matchedTransitions.some(item => item.fromStageId === "sales:shipment" &&

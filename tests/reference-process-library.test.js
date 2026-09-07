@@ -54,7 +54,7 @@ const advanced = classifiedRecording("advanced-reference", [
   { document: "document:sales-order", action: "Release" },
   { document: "document:warehouse-shipment", action: "Create Pick" },
   { document: "document:warehouse-pick", action: "Register Pick" },
-  { document: "document:posted-sales-shipment", action: "Post Shipment" },
+  { document: "document:posted-warehouse-shipment", action: "Post Shipment" },
   { document: "document:sales-invoice", action: "Post Invoice" },
   { document: "document:posted-sales-invoice", action: "Post" }
 ]);

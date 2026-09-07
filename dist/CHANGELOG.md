@@ -1,5 +1,11 @@
 # Changelog
 
+## Canonical warehouse and production views
+
+- Corrected Business Central page `7340`: it is the posted warehouse shipment list, not a warehouse put-away.
+- Added verified card/list/worksheet identities for warehouse receipts, warehouse put-aways, posted warehouse receipts, posted warehouse shipments, and planned, firm-planned, and finished production orders.
+- Separated posted warehouse shipments from posted sales shipments so recordings and process maps retain the document the user actually opened.
+
 ## 4.7.0 - Preserve posting semantics in process maps
 
 - Comparison-based process maps now distinguish posted Business Central documents from editable documents.

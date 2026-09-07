@@ -87,14 +87,17 @@
     // warehouse handling is configured. Prefer the least-specific compatible
     // lifecycle until variant-only stages or transitions are actually observed.
     const unmatchedStageCount = Math.max(0, expected.length - matchedStages.length);
-    const specificityPenalty = matchedTransitions.length ? 0 :
-      Math.min(0.2, unmatchedStageCount * 0.04);
+    const matchedDocumentIds = new Set(matchedStages.map(item => item.documentId).filter(Boolean));
+    const unexpectedDocumentCount = strings(observed).filter(id => !matchedDocumentIds.has(id)).length;
+    const specificityPenalty = Math.min(0.3,
+      unmatchedStageCount * 0.04 + unexpectedDocumentCount * 0.08);
     const confidence = Number(Math.max(0, Math.min(1,
       stageCoverage * 0.45 + transitionCoverage * 0.55 - specificityPenalty)).toFixed(3));
     return freeze({ lifecycleId: lifecycle.id, variantId, confidence,
       matchedStageIds: matchedStages.map(item => item.id),
-      matchedDocumentIds: matchedStages.map(item => item.documentId).filter(Boolean),
+      matchedDocumentIds: [...matchedDocumentIds],
       matchedTransitions: clone(matchedTransitions), partial: matchedStages.length < expected.length,
+      unexpectedDocumentCount,
       specificityPenalty: Number(specificityPenalty.toFixed(3)),
       explanation: [...matchedStages.map(item => `Matched lifecycle stage ${item.name}`),
         ...matchedTransitions.map(item => `Matched lifecycle transition ${

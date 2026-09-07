@@ -26,7 +26,7 @@ const cases = [
     process: "bc-process:warehouse:outbound-pick-shipment",
     evidence: ["document:warehouse-shipment", "action:CreatePick",
       "document:warehouse-pick", "action:RegisterPick", "action:PostShipment",
-      "document:posted-sales-shipment"] },
+      "document:posted-warehouse-shipment"] },
   { id: "purchase-order", domain: "domain:source-to-pay",
     process: "bc-process:source-to-pay:standard-purchase-order",
     evidence: ["document:purchase-order", "action:ReleaseDocument"] },
