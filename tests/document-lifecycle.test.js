@@ -72,6 +72,25 @@ const transferNoWarehouse = best(["document:transfer-order", "document:transfer-
   "document:transfer-receipt"], "bc-process:transfers:standard-transfer-order");
 assert.strictEqual(transferNoWarehouse.variantId, "variant:no-warehouse");
 
+const salesReturn = best(["document:sales-return-order", "document:return-receipt",
+  "document:sales-credit-memo", "document:posted-sales-credit-memo"],
+"bc-process:returns:sales-return-order");
+assert.strictEqual(salesReturn.lifecycleId, "lifecycle:sales-return");
+assert(salesReturn.matchedTransitions.some(item => item.relationshipType === "returns"));
+assert(salesReturn.matchedTransitions.some(item => item.relationshipType === "postedAs"));
+const purchaseReturn = best(["document:purchase-return-order", "document:return-shipment"],
+  "bc-process:returns:purchase-return-order");
+assert.strictEqual(purchaseReturn.lifecycleId, "lifecycle:purchase-return");
+assert.strictEqual(purchaseReturn.partial, true);
+
+const inventoryPick = best(["document:inventory-pick", "document:posted-inventory-pick"],
+  "bc-process:warehouse:inventory-pick");
+assert.strictEqual(inventoryPick.lifecycleId, "lifecycle:inventory-pick");
+assert(inventoryPick.matchedTransitions.some(item => item.relationshipType === "postedAs"));
+const inventoryPutAway = best(["document:inventory-put-away",
+  "document:posted-inventory-put-away"], "bc-process:warehouse:inventory-put-away");
+assert.strictEqual(inventoryPutAway.lifecycleId, "lifecycle:inventory-put-away");
+
 const states = model.stateTransitions(catalog, "document:sales-order")[0];
 assert.deepStrictEqual(states.transitions, [["Open", "Released"],
   ["Released", "Reopened"], ["Reopened", "Released"], ["Released", "Posted"]]);

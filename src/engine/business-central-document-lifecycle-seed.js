@@ -9,6 +9,7 @@
     ["variant:advanced-warehouse", "Advanced Warehouse"],
     ["variant:direct-shipment", "Direct Shipment"],
     ["variant:drop-shipment", "Drop Shipment"],
+    ["variant:standard-return", "Standard Return"],
     ["variant:make-to-stock", "Make to Stock"],
     ["variant:make-to-order", "Make to Order"]
   ].map(([id, name]) => ({ id, name }));
@@ -48,6 +49,30 @@
     stage("transfer:in-transit", "In-Transit", null, { stageType: "state" }),
     stage("transfer:receipt", "Warehouse Receipt", "document:warehouse-receipt", { optional: true }),
     stage("transfer:posted-receipt", "Posted Transfer Receipt", "document:transfer-receipt")];
+  const salesReturnStages = [
+    stage("sales-return:order", "Sales Return Order", "document:sales-return-order"),
+    stage("sales-return:receipt", "Return Receipt", "document:return-receipt"),
+    stage("sales-return:credit", "Sales Credit Memo", "document:sales-credit-memo", { optional: true }),
+    stage("sales-return:posted-credit", "Posted Sales Credit Memo",
+      "document:posted-sales-credit-memo", { optional: true })
+  ];
+  const purchaseReturnStages = [
+    stage("purchase-return:order", "Purchase Return Order", "document:purchase-return-order"),
+    stage("purchase-return:shipment", "Return Shipment", "document:return-shipment"),
+    stage("purchase-return:credit", "Purchase Credit Memo",
+      "document:purchase-credit-memo", { optional: true }),
+    stage("purchase-return:posted-credit", "Posted Purchase Credit Memo",
+      "document:posted-purchase-credit-memo", { optional: true })
+  ];
+  const inventoryPickStages = [
+    stage("inventory-pick:activity", "Inventory Pick", "document:inventory-pick"),
+    stage("inventory-pick:posted", "Posted Inventory Pick", "document:posted-inventory-pick")
+  ];
+  const inventoryPutAwayStages = [
+    stage("inventory-put-away:activity", "Inventory Put-away", "document:inventory-put-away"),
+    stage("inventory-put-away:posted", "Posted Inventory Put-away",
+      "document:posted-inventory-put-away")
+  ];
   const all = ids => ids;
   const lifecycle = (id, name, bcProcessIds, stages, transitions, lifecycleVariants,
     stateModels = []) => ({ id, name, bcProcessIds, stages, transitions,
@@ -108,7 +133,31 @@
           transition("transfer:receipt", "transfer:posted-receipt", "postedAs", { optional: true })],
         [{ variantId: "variant:no-warehouse", stageIds: ["transfer:order", "transfer:posted-shipment", "transfer:in-transit", "transfer:posted-receipt"] },
           { variantId: "variant:basic-warehouse", stageIds: transferStages.map(item => item.id) },
-          { variantId: "variant:advanced-warehouse", stageIds: transferStages.map(item => item.id) }])
+          { variantId: "variant:advanced-warehouse", stageIds: transferStages.map(item => item.id) }]),
+      lifecycle("lifecycle:sales-return", "Sales Return Document Lifecycle",
+        ["bc-process:returns:sales-return-order"], salesReturnStages,
+        [transition("sales-return:order", "sales-return:receipt", "returns"),
+          transition("sales-return:receipt", "sales-return:credit", "creates", { optional: true }),
+          transition("sales-return:credit", "sales-return:posted-credit", "postedAs",
+            { optional: true })],
+        [{ variantId: "variant:standard-return", stageIds: salesReturnStages.map(item => item.id) }]),
+      lifecycle("lifecycle:purchase-return", "Purchase Return Document Lifecycle",
+        ["bc-process:returns:purchase-return-order"], purchaseReturnStages,
+        [transition("purchase-return:order", "purchase-return:shipment", "returns"),
+          transition("purchase-return:shipment", "purchase-return:credit", "creates",
+            { optional: true }),
+          transition("purchase-return:credit", "purchase-return:posted-credit", "postedAs",
+            { optional: true })],
+        [{ variantId: "variant:standard-return", stageIds: purchaseReturnStages.map(item => item.id) }]),
+      lifecycle("lifecycle:inventory-pick", "Inventory Pick Lifecycle",
+        ["bc-process:warehouse:inventory-pick"], inventoryPickStages,
+        [transition("inventory-pick:activity", "inventory-pick:posted", "postedAs")],
+        [{ variantId: "variant:basic-warehouse", stageIds: inventoryPickStages.map(item => item.id) }]),
+      lifecycle("lifecycle:inventory-put-away", "Inventory Put-away Lifecycle",
+        ["bc-process:warehouse:inventory-put-away"], inventoryPutAwayStages,
+        [transition("inventory-put-away:activity", "inventory-put-away:posted", "postedAs")],
+        [{ variantId: "variant:basic-warehouse",
+          stageIds: inventoryPutAwayStages.map(item => item.id) }])
     ], metadata: { product: "Microsoft Dynamics 365 Business Central",
       representativeNotMandatory: true, configurable: true }
   };

@@ -1,5 +1,11 @@
 # Changelog
 
+## Recognize return and basic-warehouse document lifecycles
+
+- Model sales and purchase returns as related orders, receipts or shipments, credit memos, and posted credit memos.
+- Model Inventory Pick and Inventory Put-away as Business Central activities that produce their posted documents.
+- Make the lifecycle knowledge reusable by recognition and process-map generation without adding UI-specific rules.
+
 ## Preserve posting semantics across diagram levels
 
 - Recognize both English `Post` and Swedish `Bokför` captions as posting nodes in recorded user procedures.
