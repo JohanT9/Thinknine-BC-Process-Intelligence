@@ -1,5 +1,11 @@
 # Changelog
 
+## Recognize and map the Business Central requisition worksheet
+
+- Add Microsoft page 291 and source table 246 as the canonical Requisition Worksheet used for purchase and transfer planning.
+- Classify the worksheet in Forecast to Plan and distinguish it from page 293, which is only the worksheet-template list.
+- Add a Swedish `Inköpsförslag` reference map through calculation, review, and execution of action messages.
+
 ## Recognize and map Business Central demand forecasts
 
 - Add Demand Forecast Overview, Demand Forecasts, and Demand Forecast Entries using Microsoft page IDs 2901, 99000921, and 99000922.
