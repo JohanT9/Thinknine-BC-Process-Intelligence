@@ -160,6 +160,7 @@
     "Create Warehouse Put-away": "Skapa lagerinlagring",
     "Post Transfer Shipment": "Bokför överföringsutleverans",
     "Post Transfer Receipt": "Bokför överföringsinleverans",
+    "Create Transfer Order": "Skapa överföringsorder",
     "Create Production Order": "Skapa produktionsorder",
     "Change Status to Firm Planned": "Ändra status till fast planerad",
     "Change Status to Released": "Ändra status till släppt",

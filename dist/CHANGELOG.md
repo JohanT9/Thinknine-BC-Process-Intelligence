@@ -1,5 +1,11 @@
 # Changelog
 
+## 2026-09-07 - Explicit transfer document lifecycle
+
+- Transfer maps now distinguish shipment posting from receipt posting with separate stable concepts.
+- Added posted transfer shipment and receipt documents to the diagram lifecycle.
+- Added an Item Transfer map that includes transfer-order creation, plus Swedish labels and regression coverage.
+
 ## 2026-09-07 - Concrete planning outcome maps
 
 - Added dedicated process maps for planning actions that create purchase, production, or transfer orders.
