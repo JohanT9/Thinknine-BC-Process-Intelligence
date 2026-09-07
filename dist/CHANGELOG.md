@@ -1,5 +1,11 @@
 # Changelog
 
+## 2026-09-07 - Orphan keyboard mechanics no longer become steps
+
+- Unidentified standalone Enter, Escape, Space, and F4 mechanics are retained as technical supporting evidence instead of becoming unknown procedure steps.
+- Keyboard evidence that belongs to a recorded interaction or Business Central lookup remains attached to that interaction.
+- Identified Business Central keyboard actions continue to be recorded as real actions.
+
 ## 2026-09-07 - Generic Business Central menu paths
 
 - Consecutive Business Central menu parents and their concrete command now become one documented user step.

@@ -30,7 +30,7 @@ const quantity = run([
     value: { normalized: "500" }, screenshotAssetId: "shot-2" })
 ]);
 assert.strictEqual(quantity.schemaVersion, 1);
-assert.strictEqual(quantity.groupingVersion, "1.9.0");
+assert.strictEqual(quantity.groupingVersion, "1.10.0");
 assert.strictEqual(quantity.groups.length, 1);
 assert.strictEqual(quantity.groups[0].groupKind, "field-edit");
 assert.deepStrictEqual(quantity.groups[0].sourceEventIds,
@@ -191,11 +191,31 @@ assert.strictEqual(date.groups[0].groupKind, "lookup-interaction");
 
 const noise = run([
   event("n1", "focus-transition"),
-  event("n2", "unknown", { rawEventType: "scroll" })
+  event("n2", "unknown", { rawEventType: "scroll" }),
+  event("n3", "key-command", { interaction: { mechanism: "keyboard",
+    key: "Escape" } })
 ]);
 assert.strictEqual(noise.groups.length, 0);
-assert.strictEqual(noise.supportingEvents.length, 2);
-assert.strictEqual(noise.diagnostics.assignedEventCount, 2);
+assert.strictEqual(noise.supportingEvents.length, 3);
+assert.strictEqual(noise.diagnostics.assignedEventCount, 3);
+
+const lookupKeyboardMechanic = run([
+  event("lk1", "activation", {
+    controlIdentification: { identity: { value: "ItemNo" },
+      controlType: "lookup", caption: "Item No." } }),
+  event("lk2", "key-command", { interaction: { mechanism: "keyboard",
+    key: "Enter" }, pageIdentification: { caption: "Items", modal: true } }),
+  event("lk3", "selection-change", {
+    pageIdentification: { caption: "Items", modal: true },
+    controlIdentification: { controlType: "repeaterCell", caption: "No." },
+    selection: { value: "30043" } }),
+  event("lk4", "value-change", {
+    controlIdentification: { identity: { value: "ItemNo" },
+      caption: "Item No." }, value: { normalized: "30043" } })
+]);
+assert.strictEqual(lookupKeyboardMechanic.groups.length, 1);
+assert(lookupKeyboardMechanic.groups[0].normalizedEventIds.includes(
+  "normalized:lk2"), "lookup keyboard evidence must remain in its interaction");
 
 const repeated = run([
   event("r1", "value-change", { subtype: "focusout",

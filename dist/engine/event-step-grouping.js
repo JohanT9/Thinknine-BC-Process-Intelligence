@@ -11,7 +11,7 @@
 ) {
   "use strict";
   const SCHEMA_VERSION = 1;
-  const GROUPING_VERSION = "1.9.0";
+  const GROUPING_VERSION = "1.10.0";
   const CAPTURE_PACKET_VERSION = "1.6.0";
   const RESULT_VERIFICATION_VERSION = "1.2.0";
   const cache = new WeakMap();
@@ -233,7 +233,11 @@
       interactionIds: interactionIds(events), status: "candidate"
     });
   }
-  function isNoise(event) { return event.kind === "focus-transition" || ["scroll", "mousemove", "mouseover", "pointermove"].includes(event.rawEventType); }
+  function isNoise(event) { return ["focus-transition", "key-command"].includes(
+    event.kind
+  ) || ["scroll", "mousemove", "mouseover", "pointermove"].includes(
+    event.rawEventType
+  ); }
   function isUnclassifiedMechanic(event) { return event.kind === "unknown"; }
   function isCommit(kind) { return ["value-change", "selection-change", "toggle-change", "row-selection"].includes(kind); }
   function canContinueField(events, event) {
@@ -322,7 +326,9 @@
         assignments.set(event.normalizedEventId, "supporting");
         continue;
       }
-      if (isNoise(event)) { emit(); supportingEvents.push(freeze({ normalizedEventId: event.normalizedEventId, classification: "noise", reason: "non-step-mechanic" })); assignments.set(event.normalizedEventId, "supporting"); continue; }
+      const lookupKeyboardEvidence = event.kind === "key-command" &&
+        isLookupOrigin(pending?.events[0]);
+      if (isNoise(event) && !lookupKeyboardEvidence) { emit(); supportingEvents.push(freeze({ normalizedEventId: event.normalizedEventId, classification: "noise", reason: "non-step-mechanic" })); assignments.set(event.normalizedEventId, "supporting"); continue; }
       if (isUnclassifiedMechanic(event)) { emit(); supportingEvents.push(freeze({
         normalizedEventId: event.normalizedEventId, classification: "unclassified",
         reason: "no-documentable-interaction" }));
@@ -371,7 +377,8 @@
         event.kind === "activation" ? "committed-action" :
         isCommit(event.kind) ? "committed-interaction" : "conservative-single-event";
       pending = { events: [event], reasons: [reason] };
-      if (["navigation", "dialog-open", "dialog-close", "key-command"].includes(event.kind) && !isLookupOrigin(event)) emit();
+      if (["navigation", "dialog-open", "dialog-close"].includes(event.kind) &&
+          !isLookupOrigin(event)) emit();
     }
     emit();
     const unassignedMeaningfulEventIds = (normalizedRecording.events || [])
