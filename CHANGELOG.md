@@ -1,5 +1,12 @@
 # Changelog
 
+## 2026-09-08 - Bug reporting starts with a simpler report
+
+- The default bug-report view now focuses on saving, creating an issue, and closing the report.
+- Undo, redo, Markdown actions, telemetry, and optional AI configuration are grouped under one collapsed `More options` menu.
+- The main form asks only for the problem, expected result, and actual result; severity, category, and notes remain available under collapsed additional information.
+- Captured evidence and complete technical diagnostics are preserved unchanged.
+
 ## 2026-09-08 - Process analysis uses canonical document labels
 
 - Process-analysis lists now use the same centralized Business Central taxonomy labels as the interactive map and SVG export.

@@ -35,30 +35,37 @@
     const status = element(doc, "p", workspaceState.saveState, "save-state");
     status.setAttribute("role", "status"); container.appendChild(status);
     const editor = doc.createElement("fieldset");
-    editor.appendChild(element(doc, "legend", ui("Editable report fields", locale)));
+    editor.className = "report-core-fields";
+    editor.appendChild(element(doc, "legend", ui("Describe the problem", locale)));
     const fields = [{ name: "title", label: "Title",
       value: workspaceState.report.summary.title },
-    { name: "summary", label: "Summary",
+    { name: "summary", label: "What happened?",
       value: workspaceState.report.summary.summary },
-    { name: "severity", label: "Severity",
+    { name: "expectedResult", label: "What did you expect?",
+      value: workspaceState.report.expectedResult.text, multiline: true },
+    { name: "actualResult", label: "What happened instead?",
+      value: workspaceState.report.actualResult.human.text, multiline: true }];
+    const additionalFields = [{ name: "severity", label: "Severity",
       value: workspaceState.report.summary.severity },
     { name: "category", label: "Category",
       value: workspaceState.report.summary.category },
-    { name: "expectedResult", label: "Expected Result",
-      value: workspaceState.report.expectedResult.text, multiline: true },
-    { name: "actualResult", label: "Actual Result",
-      value: workspaceState.report.actualResult.human.text, multiline: true },
     { name: "notes", label: "Notes", value: (workspaceState.report.notes || [])
       .map(note => note.text || note.content || "").join("\n"), multiline: true }];
-    fields.forEach(field => {
+    const appendField = (parent, field) => {
       const id = `technical-report-${field.name}`;
       const label = element(doc, "label", ui(field.label, locale)); label.htmlFor = id;
       const input = doc.createElement(field.multiline ? "textarea" : "input");
       input.id = id; input.name = field.name; input.value = field.value || "";
       input.addEventListener("change", () => onEdit(field.name, input.value));
-      editor.append(label, input);
-    });
+      parent.append(label, input);
+    };
+    fields.forEach(field => appendField(editor, field));
     container.appendChild(editor);
+    const moreFields = doc.createElement("details");
+    moreFields.className = "report-more-fields";
+    moreFields.appendChild(element(doc, "summary", ui("More report information", locale)));
+    additionalFields.forEach(field => appendField(moreFields, field));
+    container.appendChild(moreFields);
     const technicalDetails = doc.createElement("details");
     technicalDetails.className = "technical-details";
     technicalDetails.appendChild(element(doc, "summary", ui("Technical details", locale)));

@@ -16,6 +16,13 @@
     dialog{width:min(960px,90vw);max-height:90vh;overflow:auto;border:1px solid #8392a5;border-radius:8px}
     dialog pre{max-height:320px;overflow:auto;background:#f5f7fa;padding:12px}
     input[type=checkbox]{width:auto}select{padding:8px}
+    .primary-actions{display:flex;gap:8px;align-items:center}.primary-actions button{margin:0}
+    .primary-actions #saveReport,.primary-actions #openIssuePreview{background:#008c95;color:white;border:1px solid #007078;border-radius:4px}
+    .report-options{margin-top:10px;max-width:760px}.report-options>summary{cursor:pointer;font-weight:600}
+    .report-options>details{margin:12px 0;padding:12px;border:1px solid #ccd5df;border-radius:6px}
+    .secondary-actions{display:flex;flex-wrap:wrap;gap:4px;margin:10px 0}
+    .report-core-fields,.report-more-fields{margin:20px 0;padding:16px;border:1px solid #ccd5df;border-radius:6px}
+    .report-more-fields>summary{cursor:pointer;font-weight:600}
     .technical-details{margin:20px 0;padding:16px;border:1px solid #8392a5;border-radius:6px}
     .technical-details>summary{cursor:pointer;font-size:1.25rem;font-weight:700}
     .report-ready{border-left:5px solid #16803c}.report-incomplete{border-left:5px solid #b76e00}
@@ -25,14 +32,20 @@
   <link rel="stylesheet" href="design-system.css">
 </head>
 <body>
-  <header><button id="saveReport" type="button">Save</button>
-    <button id="undoReport" type="button">Undo</button>
-    <button id="redoReport" type="button">Redo</button>
-    <button id="copyMarkdown" type="button">Copy full report</button>
-    <button id="downloadMarkdown" type="button">Export Markdown</button>
-    <button id="openIssuePreview" type="button">Create Issue</button>
-    <button id="closeReport" type="button">Close</button>
-    <label><input id="includeAiExport" type="checkbox"> Include AI analysis in copy/export</label>
+  <header>
+    <div class="primary-actions">
+      <button id="saveReport" type="button">Save</button>
+      <button id="openIssuePreview" type="button">Create Issue</button>
+      <button id="closeReport" type="button">Close</button>
+    </div>
+    <details class="report-options"><summary>More options</summary>
+      <div class="secondary-actions">
+        <button id="undoReport" type="button">Undo</button>
+        <button id="redoReport" type="button">Redo</button>
+        <button id="copyMarkdown" type="button">Copy full report</button>
+        <button id="downloadMarkdown" type="button">Export Markdown</button>
+      </div>
+      <label><input id="includeAiExport" type="checkbox"> Include AI analysis in copy/export</label>
     <details><summary>Application Insights (optional)</summary>
       <label>Tenant ID <input id="telemetryTenantId" autocomplete="off"></label>
       <label>Public client ID <input id="telemetryClientId" autocomplete="off"></label>
@@ -61,6 +74,7 @@
       <button id="saveAiConfig" type="button">Save public broker configuration</button>
       <button id="analyzeBugReport" type="button">Analyze technical evidence</button>
       <button id="removeAiAnalysis" type="button">Remove AI analysis</button>
+    </details>
     </details>
     <span id="workspaceMessage" role="status"></span></header>
   <main id="technicalReport" aria-live="polite"></main>
