@@ -126,6 +126,19 @@ const semanticShipmentPost = semanticShipmentEvidence.observations[1].actions
 assert.deepStrictEqual(semanticShipmentPost.qualifiers, ["shipment"],
   "semantic action IDs must retain their Business Central posting context");
 
+const sourceReferencedRecording = JSON.parse(JSON.stringify(
+  purchaseActionPathRecording));
+sourceReferencedRecording.events[1].source.eventId = "legacy-source-action";
+sourceReferencedRecording.events[1].raw.sourceEventId = "legacy-source-action";
+const sourceReferencedEvidence = engine.extractEvidence(sourceReferencedRecording,
+  taxonomySeed, { semanticActions: [{
+    sourceEventIds: ["legacy-source-action"],
+    actionType: "ReleaseDocument"
+  }] });
+assert(sourceReferencedEvidence.observations[1].actions.some(item =>
+  item.name === "Release" && item.signal === "semantic-action"),
+"legacy semantic actions should resolve recorder source-event IDs");
+
 const standardPageViews = [
   [9300, "document:sales-quote", "list"],
   [9305, "document:sales-order", "list"],

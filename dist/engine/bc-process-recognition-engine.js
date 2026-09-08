@@ -16,7 +16,7 @@
   schema, seed, lifecycleModel, lifecycleSeed
 ) {
   "use strict";
-  const ENGINE_VERSION = "1.7.0";
+  const ENGINE_VERSION = "1.8.0";
   const clone = value => value == null ? value : JSON.parse(JSON.stringify(value));
   const text = value => value == null ? "" : String(value).trim();
   const words = value => text(value).toLowerCase().replace(/[^a-z0-9åäöæø]+/g, " ").trim();
@@ -198,6 +198,12 @@
       observed.qualifiers.some(item => expectedQualifiers.includes(item));
   }
 
+  function eventReferences(event) {
+    return unique([event?.id, event?.source?.eventId,
+      event?.raw?.sourceEventId, event?.raw?.captureId,
+      event?.raw?.canonicalSourceEventId]);
+  }
+
   function extractEvidence(recording, taxonomy = seed, options = {}) {
     const documents = taxonomy.documents || [];
     const observations = [];
@@ -205,8 +211,9 @@
       ? options.semanticActions : [];
     (recording?.events || []).forEach((event, index) => {
       const document = documentMatch(event, documents);
+      const references = new Set(eventReferences(event));
       const eventSemanticActions = semanticActions.filter(action =>
-        (action?.sourceEventIds || []).includes(event.id));
+        (action?.sourceEventIds || []).some(id => references.has(id)));
       const semanticActionPaths = eventSemanticActions.filter(action =>
         Array.isArray(action.actionPath)).map(action => action.actionPath);
       const actions = actionMatches(event, eventSemanticActions);

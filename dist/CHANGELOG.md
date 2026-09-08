@@ -1,5 +1,11 @@
 # Changelog
 
+## 2026-09-08 - Legacy semantic evidence resolves across event IDs
+
+- Process recognition now associates semantic actions through canonical event IDs, recorder source-event IDs, capture IDs, and stored canonical-source references.
+- Older and imported recordings no longer lose semantic action evidence merely because their ID namespace differs from the current Canonical Recording ID.
+- The compatibility lookup only links exact stored identifiers and does not infer relationships from timing or captions.
+
 ## 2026-09-08 - Semantic actions retain Business Central qualifiers
 
 - Semantic action IDs such as `PostShipment` now preserve shipment, receipt, invoice, pick, put-away, assembly, consumption, output, and transfer context during recognition.
