@@ -252,21 +252,17 @@
       } else container.appendChild(node);
     }
     if (technicalSectionCount) container.appendChild(technicalDetails);
-    const guidance = doc.createElement("section");
-    guidance.className = report.completeness.ready ? "report-ready" : "report-incomplete";
-    guidance.appendChild(element(doc, "h2", ui(report.completeness.ready
-      ? "Ready to share" : "Complete the report", locale)));
-    guidance.appendChild(element(doc, "p", ui(report.completeness.ready
-      ? "The report contains enough information to be shared."
-      : "Complete the items below before sharing.", locale)));
     const requiredIssues = report.completeness.issues.filter(issue =>
       issue.level === "required");
     if (requiredIssues.length) {
+      const guidance = doc.createElement("section");
+      guidance.className = "report-incomplete";
+      guidance.appendChild(element(doc, "h2", ui("Needs attention", locale)));
       const list = doc.createElement("ul");
       requiredIssues.forEach(issue => list.appendChild(element(doc,
         "li", ui(issue.message, locale)))); guidance.appendChild(list);
+      container.appendChild(guidance);
     }
-    container.appendChild(guidance);
     return { sectionCount: report.sections.length,
       ready: report.completeness.ready };
   }

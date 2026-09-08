@@ -4,9 +4,9 @@ Bug Reporting is a first-class recording mode beside Process Documentation. From
 
 While recording, text—not color alone—identifies the active mode. Error detection is acknowledged without interrupting the Business Central dialog. Failure to collect diagnostics does not invalidate the recording.
 
-Stopping opens a focused naming dialog. Confirming finalizes the canonical recording, uses that name for the session and report, creates a local Bug Report draft, and opens its Technical Report Workspace automatically. Canceling continues recording. Legacy/programmatic flows without a supplied name retain deterministic evidence-based title fallback.
+Stopping finalizes the canonical recording, creates a local Bug Report draft with a deterministic evidence-based title, and opens its Technical Report Workspace directly. The title remains editable in the automatically saved report. Process-documentation recordings retain their separate naming and language flow.
 
-The workspace prioritizes editable human context, reproduction, expected result, actual-result context, captured errors, and screenshots. Exact BC error text is visible and copyable. Environment, diagnostics, structured/raw AL call stack, objects, telemetry, AI analysis, timeline, and traceability are progressively disclosed under **Technical details**.
+The workspace prioritizes editable human context, reproduction, expected result, actual-result context, captured errors, and screenshots. Exact BC error text is visible and copyable. The captured error screenshot is shown first and supporting screenshots are collapsed. Environment, diagnostics, structured/raw AL call stack, objects, telemetry, AI analysis, timeline, and traceability are progressively disclosed under **Technical details**. A readiness message is shown only when required information is missing.
 
 Telemetry, AI analysis, and issue destinations are optional and user-triggered. A useful Markdown/offline report can be created locally. External transmission always requires an explicit preview, destination, consent, and create action.
 

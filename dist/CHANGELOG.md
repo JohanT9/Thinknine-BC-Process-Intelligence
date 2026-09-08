@@ -1,5 +1,12 @@
 # Changelog
 
+## 2026-09-08 - Complete bug reports stay focused
+
+- A complete bug report no longer ends with a redundant `Ready to share` card.
+- The workspace shows guidance only when required information is missing.
+- Missing required information is presented in one compact, localized `Needs attention` panel.
+- Bug-report UX documentation now reflects direct report opening, automatic titles, autosave, and prioritized error screenshots.
+
 ## 2026-09-08 - Bug reports prioritize the error screenshot
 
 - The captured Business Central error screenshot is now the single primary image in the default report view.

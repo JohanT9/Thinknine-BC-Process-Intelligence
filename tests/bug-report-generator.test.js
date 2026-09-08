@@ -164,12 +164,17 @@ const additionalEvidence = allElements(container).find(item =>
 assert(additionalEvidence);
 assert.strictEqual(additionalEvidence.open, undefined,
   "supporting screenshots must be collapsed by default");
+assert(!allElements(container).some(item => item.className === "report-ready"),
+  "a complete report must not show a redundant readiness card");
 const incompleteContainer = new Element("main");
 view.render(incompleteContainer, { ...controller.state(), document: fallback },
   {}, fakeDocument);
 const incompleteText = allElements(incompleteContainer).map(item =>
   item.textContent);
 assert(incompleteText.includes("Add a report title."));
+assert(allElements(incompleteContainer).some(item =>
+  item.className === "report-incomplete"));
+assert(incompleteText.includes("Needs attention"));
 assert(!incompleteText.includes("Add the expected result."),
   "recommended technical and quality guidance stays out of the default view");
 assert(!fs.readFileSync("src/ui/technical-report-workspace-view.js", "utf8")
