@@ -11,7 +11,7 @@
 ) {
   "use strict";
   const SCHEMA_VERSION = 1;
-  const GROUPING_VERSION = "1.15.0";
+  const GROUPING_VERSION = "1.16.0";
   const CAPTURE_PACKET_VERSION = "1.6.0";
   const RESULT_VERIFICATION_VERSION = "1.2.0";
   const cache = new WeakMap();
@@ -347,7 +347,8 @@
         const candidateEvents = [...pending.events, event];
         const finalLookupValue = lookupCanClose(candidateEvents, event);
         const supportingLookupEvent = sameLookupPage &&
-          (["activation", "key-command", "selection-change"].includes(event.kind) ||
+          (["activation", "key-command", "selection-change", "dialog-open",
+            "dialog-close"].includes(event.kind) ||
             (event.kind === "value-change" &&
               (event.pageIdentification?.modal || finalLookupValue)));
         if (supportingLookupEvent) {

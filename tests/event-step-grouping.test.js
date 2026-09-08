@@ -30,7 +30,7 @@ const quantity = run([
     value: { normalized: "500" }, screenshotAssetId: "shot-2" })
 ]);
 assert.strictEqual(quantity.schemaVersion, 1);
-assert.strictEqual(quantity.groupingVersion, "1.15.0");
+assert.strictEqual(quantity.groupingVersion, "1.16.0");
 assert.strictEqual(quantity.groups.length, 1);
 assert.strictEqual(quantity.groups[0].groupKind, "field-edit");
 assert.deepStrictEqual(quantity.groups[0].sourceEventIds,
@@ -83,6 +83,24 @@ assert.strictEqual(customerAction.rawInteractions[0].targetControl.caption,
   "Customer No.");
 assert.deepStrictEqual(customerAction.sourceEventIds,
   ["source:l1", "source:l2", "source:l3", "source:l4"]);
+
+const legacyDialogLookup = run([
+  lookupEvents[0],
+  event("ld2", "dialog-open", { pageIdentification: {
+    caption: "Customers", modal: true }, frameContext: { frameId: "dialog" } }),
+  lookupEvents[1], lookupEvents[2],
+  event("ld5", "dialog-close", { pageIdentification: {
+    caption: "Customers", modal: true }, frameContext: { frameId: "dialog" } }),
+  lookupEvents[3]
+]);
+assert.strictEqual(legacyDialogLookup.groups.length, 1,
+  "legacy lookup dialog state must stay inside the lookup interaction");
+assert.strictEqual(legacyDialogLookup.groups[0].groupKind, "lookup-interaction");
+assert.deepStrictEqual(legacyDialogLookup.groups[0].normalizedEventIds,
+  ["normalized:l1", "normalized:ld2", "normalized:l2", "normalized:l3",
+    "normalized:ld5", "normalized:l4"]);
+assert.strictEqual(semantic.processStepGroups(
+  legacyDialogLookup.groups)[0].selectedValue, "1033");
 const numberPreferredToCaption = run(lookupEvents.map(item => {
   if (item.normalizedEventId === "normalized:l3") return { ...item,
     selection: { value: "905", caption: "Iberi AB" } };

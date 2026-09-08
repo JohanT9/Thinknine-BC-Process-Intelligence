@@ -1,5 +1,11 @@
 # Changelog
 
+## 2026-09-08 - Legacy lookup dialogs remain one user step
+
+- Dialog-open and dialog-close telemetry inside a legacy Business Central lookup now stays with the lookup interaction.
+- Searching, selecting a row, closing the dialog, and committing the selected value produces one semantic selection step.
+- Modern recordings continue to use recorder interaction IDs as their authoritative grouping signal.
+
 ## 2026-09-08 - Duplicate legacy page observations are consolidated
 
 - Repeated legacy navigation telemetry for the same identified Business Central page within a narrow capture window now remains supporting evidence.
