@@ -16,7 +16,7 @@
   schema, seed, lifecycleModel, lifecycleSeed
 ) {
   "use strict";
-  const ENGINE_VERSION = "1.5.0";
+  const ENGINE_VERSION = "1.6.0";
   const clone = value => value == null ? value : JSON.parse(JSON.stringify(value));
   const text = value => value == null ? "" : String(value).trim();
   const words = value => text(value).toLowerCase().replace(/[^a-z0-9åäöæø]+/g, " ").trim();
@@ -337,8 +337,10 @@
     const documentsById = new Map((taxonomy.documents || []).map(item => [item.id, item]));
     const anchoredDomains = unique(evidence.documentSequence.filter(item => item.strength >= 0.8)
       .map(item => documentsById.get(item.id)?.primaryDomainId));
+    const warehouseBridgeEstablished = domain?.id === "domain:warehouse-management" &&
+      matchedDocuments.some(item => item.strength >= 0.8);
     const domainAnchorConflict = anchoredDomains.length > 0 &&
-      !anchoredDomains.includes(domain?.id) && domain?.id !== "domain:warehouse-management";
+      !anchoredDomains.includes(domain?.id) && !warehouseBridgeEstablished;
     let confidence = Math.min(0.99, documentCoverage * 0.3 + observedCoverage * 0.14 +
       sequenceStrength * 0.18 + Math.min(1, actionStrength) * 0.15 +
       transitionStrength * 0.08 + lifecycleStrength * 0.15);
@@ -394,7 +396,8 @@
         matchedTransitions: relevantTransitions.length,
         matchedLifecycleTransitions: lifecycleMatch?.matchedTransitions.length || 0,
         distinctMatchedActions: actionHits.length, orderConflicts,
-        unexpectedStrongDocuments, anchoredDomains, domainAnchorConflict, evidenceQuality,
+        unexpectedStrongDocuments, anchoredDomains, domainAnchorConflict,
+        warehouseBridgeEstablished, evidenceQuality,
         scoreBreakdown: { documentCoverage: Number(documentCoverage.toFixed(3)),
           observedCoverage: Number(observedCoverage.toFixed(3)),
           sequenceStrength: Number(sequenceStrength.toFixed(3)),

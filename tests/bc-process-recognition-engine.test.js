@@ -72,6 +72,9 @@ assert.deepStrictEqual(recognizedPurchase.classification.processEvidence.matched
   "document:warehouse-put-away", "document:posted-purchase-receipt"]);
 assert(recognizedPurchase.classification.processEvidence.expectedDocuments.length >= 5);
 assert(recognizedPurchase.alternatives.some(item => item.process === "WarehouseInbound"));
+assert(recognizedPurchase.alternatives.find(item => item.process === "WarehouseInbound")
+  .signals.warehouseBridgeEstablished,
+"observed warehouse documents should allow a cross-domain warehouse candidate");
 assert(!recognizedPurchase.alternatives.some(item => ["TransferOrder", "Assembly", "Planning"]
   .includes(item.process)), "strong purchase metadata must exclude incompatible domains");
 const purchaseCandidates = [recognizedPurchase.classification, ...recognizedPurchase.alternatives];

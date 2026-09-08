@@ -1,5 +1,11 @@
 # Changelog
 
+## 2026-09-08 - Warehouse alternatives require warehouse evidence
+
+- A strongly identified purchase, sales, production, or transfer document no longer produces warehouse-process alternatives unless a matching warehouse document was actually observed.
+- Cross-domain warehouse recognition remains available when the recording contains strong warehouse page, table, or document metadata.
+- Candidate diagnostics now expose whether the warehouse bridge was established.
+
 ## 2026-09-08 - Semantic recorder actions support process recognition
 
 - Process recognition now consumes classified semantic action types in addition to structured action paths.

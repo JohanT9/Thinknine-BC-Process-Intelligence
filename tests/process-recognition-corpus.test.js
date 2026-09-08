@@ -124,6 +124,9 @@ assert.strictEqual(legacyPurchaseListResult.classification.taxonomyReferences.do
 "the standard Purchase Orders list page must identify a short legacy purchase recording");
 assert(!legacyPurchaseListResult.alternatives.some(item =>
   item.taxonomyReferences.domain.id === "domain:transfers"));
+assert(!legacyPurchaseListResult.alternatives.some(item =>
+  item.taxonomyReferences.domain.id === "domain:warehouse-management"),
+"a purchase-order-only recording must not suggest an unobserved warehouse process");
 assert.strictEqual(partialPurchase.assessment.status, "review-required",
   "strong document and action identity should make a partial process reviewable");
 assert.notStrictEqual(partialPurchase.assessment.status, "auto-classifiable",
