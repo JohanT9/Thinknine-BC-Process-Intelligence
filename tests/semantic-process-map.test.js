@@ -101,6 +101,9 @@ const postedComparison = semanticMap.project({ recordingId: "posted", analysis: 
   ], missingSteps: [], additionalSteps: [] } } }, "businessCentral");
 assert.deepStrictEqual(postedComparison.nodes.map(node => node.metadata.originalNodeType),
   ["posting", "postedDocument"]);
+assert.deepStrictEqual(postedComparison.nodes.map(node => node.nodeType),
+  ["posting", "postedDocument"],
+"the reusable ProcessGraph must carry semantic node types directly");
 const inheritedPurchaseRoles = semanticMap.inheritProcessRoles([
   { title: "Purchase Order", metadata: { processRole: { id: "purchasing", name: "Purchasing" } } },
   { title: "Create", metadata: {} }, { title: "Release", metadata: {} }
@@ -144,7 +147,7 @@ assert.throws(() => semanticMap.project(input, "pixels"), /Unsupported semantic 
 const bounded = semanticMap.project(input, "businessCentral", { includeBoundaries: true,
   locale: "sv-SE" });
 assert.deepStrictEqual(bounded.nodes.map(node => node.nodeType),
-  ["start", "activity", "activity", "activity", "activity", "end"]);
+  ["start", "document", "processStep", "processStep", "manualAction", "end"]);
 assert.strictEqual(bounded.nodes[0].title, "Start");
 assert.strictEqual(bounded.nodes.at(-1).title, "Slut");
 assert.strictEqual(bounded.nodes[0].metadata.structuralBoundary, true);

@@ -1,5 +1,11 @@
 # Changelog
 
+## 2026-09-08 - Semantic process graphs preserve real node types
+
+- Business Central process maps now store `document`, `postedDocument`, `posting`, `decision`, `manualAction`, `processStep`, and `businessProcess` directly on ProcessGraph nodes.
+- Shapes and colors no longer depend on renderer-specific fallback metadata.
+- The reusable semantic graph is now safer for future BPMN, Visio, draw.io, PDF, and interactive renderers.
+
 ## 2026-09-08 - Taxonomy-level process maps are fully localized
 
 - Every seeded Business Central domain, business process, and document now has a Swedish process-map presentation label.

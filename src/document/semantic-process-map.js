@@ -103,7 +103,7 @@
           { ...(route.metadata || {}), ...handoff }, route); });
     const incoming = new Set(transitions.map(item => item.toNodeId));
     const outgoing = new Set(transitions.map(item => item.fromNodeId));
-    return freeze({ modelVersion: "semantic-reference-1.0.0", recordingId, title,
+    return freeze({ modelVersion: "semantic-reference-1.1.0", recordingId, title,
       nodes, transitions, subprocesses: [], stateTransitions: [],
       startNodeIds: nodes.filter(node => !incoming.has(node.nodeId)).map(node => node.nodeId),
       endNodeIds: nodes.filter(node => !outgoing.has(node.nodeId)).map(node => node.nodeId), metadata: {
@@ -112,6 +112,7 @@
     const titles = [display(model.domain), display(best.businessProcess), model.name].filter(Boolean)
       .filter((value, index, values) => values.indexOf(value) === index);
     return processModel(input.recordingId, input.title, titles.map((title, index) => ({ title,
+      nodeType: "businessProcess",
       metadata: { semanticStatus: index === titles.length - 1 ? "observed" : "reference",
         semanticLevel: index === 0 ? "domain" : index === titles.length - 1 ? "process" : "businessProcess" } })));
   }
@@ -123,7 +124,8 @@
     .filter(node => !["start", "end"].includes(node.nodeType) &&
       !matchesItems(node, model.conditional)).map(node => {
       const observed = matchingObservedNode(node, input.analysis?.observedGraph);
-      return { nodeId: `semantic:${node.nodeId}`, title: node.title, sourceEventIds:
+      return { nodeId: `semantic:${node.nodeId}`, nodeType: semanticNodeType(node),
+        title: node.title, sourceEventIds:
         array(observed?.sourceEventIds), sourceStepIds: taskIdsForEvents(observed?.sourceEventIds,
         input.reviewTasks), metadata: { semanticStatus: semanticStatus(node, model),
           processRole: processRoleFor(node),
@@ -135,7 +137,8 @@
     array(model.additional).forEach((item, index) => { const title = text(item.title || item.name || item.id);
       if (!title || existing.has(key(title))) return; const observed = array(input.analysis?.observedGraph?.nodes)
         .find(node => key(node.title) === key(title)); referenceNodes.push({
-        nodeId: `semantic:additional:${index}:${key(title)}`, title,
+        nodeId: `semantic:additional:${index}:${key(title)}`,
+        nodeType: semanticNodeType(observed || item), title,
         sourceEventIds: array(observed?.sourceEventIds), sourceStepIds:
           taskIdsForEvents(observed?.sourceEventIds, input.reviewTasks), metadata: {
             semanticStatus: "customerSpecific", semanticLevel: "businessCentral",
@@ -149,15 +152,18 @@
   function fromComparison(input, model) { const missing = array(model.missing)
     .filter(item => !["conditional", "optional"].includes(item.applicability)); const values = [
     ...model.matched.map(item => ({ title: text(item.title || item.name || item.id),
+      nodeType: semanticNodeType(item),
       metadata: { semanticStatus: "observed", semanticLevel: "businessCentral",
         processRole: processRoleFor(item),
         originalNodeType: semanticNodeType(item) } })),
     ...missing.map(item => ({ title: text(item.title || item.name || item.id),
+      nodeType: semanticNodeType(item),
       metadata: { semanticStatus: "suggested", semanticLevel: "businessCentral",
         processRole: processRoleFor(item),
         applicability: item.applicability || "expected", variantIds: array(item.variantIds),
         originalNodeType: semanticNodeType(item) } })),
     ...model.additional.map(item => ({ title: text(item.title || item.name || item.id),
+      nodeType: semanticNodeType(item),
       metadata: { semanticStatus: "customerSpecific", semanticLevel: "businessCentral",
         processRole: processRoleFor(item) } }))
   ].filter(item => item.title); return processModel(input.recordingId, input.title, values); }
