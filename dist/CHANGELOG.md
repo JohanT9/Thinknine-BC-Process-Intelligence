@@ -1,5 +1,11 @@
 # Changelog
 
+## 2026-09-08 - Process-map routes retain document semantics
+
+- A posting action followed by a posted document now produces a `documentPosting` relationship.
+- Consecutive Business Central documents and create-actions leading to documents produce `documentCreation` relationships.
+- Other observed steps remain normal sequence routes, keeping inference conservative.
+
 ## 2026-09-08 - Semantic process graphs preserve real node types
 
 - Business Central process maps now store `document`, `postedDocument`, `posting`, `decision`, `manualAction`, `processStep`, and `businessProcess` directly on ProcessGraph nodes.

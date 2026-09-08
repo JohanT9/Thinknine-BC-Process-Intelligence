@@ -104,6 +104,12 @@ assert.deepStrictEqual(postedComparison.nodes.map(node => node.metadata.original
 assert.deepStrictEqual(postedComparison.nodes.map(node => node.nodeType),
   ["posting", "postedDocument"],
 "the reusable ProcessGraph must carry semantic node types directly");
+assert.strictEqual(postedComparison.transitions[0].transitionType,
+  "documentPosting",
+"posting followed by a posted document must retain lifecycle meaning");
+assert.strictEqual(semanticMap.inferredRelationship(
+  { nodeType: "document", title: "Purchase Order" },
+  { nodeType: "document", title: "Warehouse Receipt" }), "documentCreation");
 const inheritedPurchaseRoles = semanticMap.inheritProcessRoles([
   { title: "Purchase Order", metadata: { processRole: { id: "purchasing", name: "Purchasing" } } },
   { title: "Create", metadata: {} }, { title: "Release", metadata: {} }

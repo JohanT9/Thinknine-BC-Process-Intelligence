@@ -76,6 +76,20 @@
         ...(forward[index].metadata || {}), processRole: clone(followingRole) } }; }
     return forward;
   }
+  function inferredRelationship(previous, node) {
+    const previousType = previous?.nodeType || "activity";
+    const nextType = node?.nodeType || "activity";
+    if (nextType === "postedDocument" ||
+        (previousType === "posting" && nextType === "document")) {
+      return "documentPosting";
+    }
+    if ((previousType === "document" && nextType === "document") ||
+        (/\b(create|skapa)\b/iu.test(text(previous?.title)) &&
+          ["document", "postedDocument"].includes(nextType))) {
+      return "documentCreation";
+    }
+    return node?.metadata?.relationshipType || "sequence";
+  }
   function processModel(recordingId, title, values, relationships = []) { const nodes = inheritProcessRoles(values)
     .map((value, index) => freeze({
     nodeId: value.nodeId || processGraph.stableId("semantic-map-node",
@@ -88,7 +102,7 @@
     const connected = new Set(explicit.flatMap(item => [item.fromNodeId, item.toNodeId]));
     const routes = explicit.length ? [...explicit] : nodes.slice(1).map((node, index) => ({
       fromNodeId: nodes[index].nodeId, toNodeId: node.nodeId,
-      transitionType: node.metadata.relationshipType || "sequence"
+      transitionType: inferredRelationship(nodes[index], node)
     }));
     if (explicit.length) nodes.forEach((node, index) => { if (connected.has(node.nodeId) || !index) return;
       routes.push({ fromNodeId: nodes[index - 1].nodeId, toNodeId: node.nodeId,
@@ -103,7 +117,7 @@
           { ...(route.metadata || {}), ...handoff }, route); });
     const incoming = new Set(transitions.map(item => item.toNodeId));
     const outgoing = new Set(transitions.map(item => item.fromNodeId));
-    return freeze({ modelVersion: "semantic-reference-1.1.0", recordingId, title,
+    return freeze({ modelVersion: "semantic-reference-1.2.0", recordingId, title,
       nodes, transitions, subprocesses: [], stateTransitions: [],
       startNodeIds: nodes.filter(node => !incoming.has(node.nodeId)).map(node => node.nodeId),
       endNodeIds: nodes.filter(node => !outgoing.has(node.nodeId)).map(node => node.nodeId), metadata: {
@@ -195,5 +209,6 @@
       fromComparison(input, model);
     const visible = options.includeReferences === true ? projected : observedOnly(projected);
     return options.includeBoundaries === true ? withBoundaries(visible, options.locale) : visible; }
-  return { LEVELS, inheritProcessRoles, project, semanticNodeType, semanticStatus, withBoundaries };
+  return { LEVELS, inferredRelationship, inheritProcessRoles, project,
+    semanticNodeType, semanticStatus, withBoundaries };
 });
