@@ -271,6 +271,12 @@ assert.strictEqual(genericMenuPath.preferredScreenshotRef, "post-menu.png");
 assert.strictEqual(genericMenuPath.preferredSourceEventId, "event-posting");
 assert.deepStrictEqual(genericMenuPath.actionPath,
   ["Åtgärder", "Bokföring"]);
+const customerActionGroupCase = only([{
+  taskType: "RunAction", actionCaption: "Custom command",
+  uiHierarchy: [{ type: "ActionGroup", caption: "Customer actions" }]
+}], "RunActionPath", "V\u00e4lj **Customer actions** \u2192 **Custom command**.");
+assert.deepStrictEqual(customerActionGroupCase.actionPath,
+  ["Customer actions", "Custom command"]);
 const ordinaryActionsRemainSeparate = engine.processInteractions([{
   taskType: "RunAction", actionCaption: "Redigera"
 }, { taskType: "RunAction", actionCaption: "Ta bort" }]);

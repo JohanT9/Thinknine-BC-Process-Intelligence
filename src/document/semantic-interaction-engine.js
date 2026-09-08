@@ -723,7 +723,7 @@
     const caption = value => text(value?.actionCaption) ||
       text(value?.selectedCaption);
     const actionGroups = value => unique((value?.uiHierarchy || [])
-      .filter(item => item?.type === "actionGroup")
+      .filter(item => text(item?.type).toLocaleLowerCase() === "actiongroup")
       .map(item => text(item.caption)));
     const rule = {
       ruleId: "technical-action-hierarchy",

@@ -1,5 +1,10 @@
 # Changelog
 
+## 2026-09-08 - Resilient customer action-group detection
+
+- Technical Business Central action-group types are now matched case-insensitively.
+- Customer extensions and BC client variants can expose `ActionGroup` casing without losing structured menu paths.
+
 ## 2026-09-08 - Action paths feed process-recognition evidence
 
 - Interpreted business tasks now expose their structured Business Central `actionPath` directly.
