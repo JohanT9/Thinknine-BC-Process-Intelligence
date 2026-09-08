@@ -85,6 +85,7 @@
       "technical.aiConsent": "Uttryckligt samtycke krävs före AI-analys.",
       "technical.sendingAi": "Skickar minimerade bevis till den konfigurerade AI-brokern…",
       "technical.issueCopied": "Ärendebeskrivningen har kopierats.",
+      "technical.shareHelp": "Välj vart rapporten ska skickas. Inget skickas utan din bekräftelse.",
       "technical.packageExported": "Det lokala ärendepaketet har exporterats.",
       "technical.submissionConsent": "Granskning och uttryckligt samtycke krävs före överföring.",
       "technical.selectProvider": "Välj Azure DevOps eller GitHub före överföring.",
@@ -257,6 +258,7 @@
       "technical.aiConsent": "Explicit consent is required before AI analysis.",
       "technical.sendingAi": "Sending minimized evidence to the configured AI broker…",
       "technical.issueCopied": "Issue description copied.",
+      "technical.shareHelp": "Choose where the report should go. Nothing is sent without your confirmation.",
       "technical.packageExported": "Offline Issue Package exported.",
       "technical.submissionConsent": "Review and explicit submission consent are required.",
       "technical.selectProvider": "Select Azure DevOps or GitHub before submission.",
@@ -493,6 +495,11 @@
     ,["Rå diagnostik", "Raw diagnostics"], ["Teknisk felrapport", "Technical Bug Report"]
     ,["Kopiera hela rapporten", "Copy full report"], ["Exportera Markdown", "Export Markdown"]
     ,["Skapa ärende", "Create Issue"], ["Inkludera AI-analys i kopiering/export", "Include AI analysis in copy/export"]
+    ,["Dela rapport", "Share report"], ["Dela felrapport", "Share bug report"]
+    ,["Välj vart rapporten ska skickas. Inget skickas utan din bekräftelse.", "Choose where the report should go. Nothing is sent without your confirmation."]
+    ,["Innehåll och inställningar", "Content and settings"]
+    ,["Granska rapportens innehåll", "Review report content"]
+    ,["Hämta rapportpaket", "Download report package"]
     ,["Application Insights (valfritt)", "Application Insights (optional)"]
     ,["AI-teknisk analys (valfritt)", "AI technical analysis (optional)"]
     ,["Spara telemetriinställning", "Save telemetry configuration"]

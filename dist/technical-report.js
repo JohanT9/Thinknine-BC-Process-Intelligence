@@ -247,11 +247,27 @@
         issuePreviewState.existingReferences.length ?
           "Warning: this report already has an external issue reference." : "Package is current.";
     }
+    function updateShareUi() {
+      const external = Boolean(document.getElementById("issueProvider").value);
+      document.getElementById("issueConsentRow").hidden = !external;
+      document.getElementById("issueDuplicateRow").hidden = !external;
+      document.getElementById("shareReport").textContent = external
+        ? globalThis.T9UiI18n.translateStaticText("Create Issue", currentUiLocale)
+        : globalThis.T9UiI18n.translateStaticText("Download report package",
+          currentUiLocale);
+    }
     document.getElementById("openIssuePreview").addEventListener("click", action(async () => {
-      document.getElementById("issuePreview").showModal(); await generateIssuePreview();
+      updateShareUi(); document.getElementById("issuePreview").showModal();
+      await generateIssuePreview();
     }));
-    document.getElementById("refreshIssuePreview").addEventListener("click",
-      action(generateIssuePreview));
+    document.getElementById("issueProvider").addEventListener("change", action(async () => {
+      issuePreviewState = null; updateShareUi(); await generateIssuePreview();
+    }));
+    for (const id of ["issueIncludeTelemetry", "issueIncludeAi"]) {
+      document.getElementById(id).addEventListener("change", action(async () => {
+        issuePreviewState = null; await generateIssuePreview();
+      }));
+    }
     document.getElementById("saveIssueConfiguration").addEventListener("click", action(async () => {
       const configuration = issueConfigurationFromForm();
       await requestIssuePermission(configuration);
@@ -276,7 +292,7 @@
       document.getElementById("issueResult").textContent =
         t("technical.issueCopied");
     }));
-    document.getElementById("downloadIssuePackage").addEventListener("click", action(async () => {
+    async function downloadOfflinePackage() {
       if (!issuePreviewState) await generateIssuePreview();
       const offline = { manifest: { schemaVersion: 1,
         packageId: issuePreviewState.issuePackage.packageId,
@@ -288,14 +304,14 @@
       await download(JSON.stringify(offline, null, 2), `${bugReportId}-issue-package.json`);
       document.getElementById("issueResult").textContent =
         t("technical.packageExported");
-    }));
-    document.getElementById("submitExternalIssue").addEventListener("click", action(async () => {
+    }
+    async function submitExternalIssue() {
       if (!document.getElementById("issueConsent").checked) throw new Error(
         t("technical.submissionConsent"));
       const provider = document.getElementById("issueProvider").value;
       if (!provider) throw new Error(t("technical.selectProvider"));
       if (!issuePreviewState) await generateIssuePreview();
-      const button = document.getElementById("submitExternalIssue"); button.disabled = true;
+      const button = document.getElementById("shareReport"); button.disabled = true;
       try { const response = await send({ type: "T9_CREATE_EXTERNAL_ISSUE", bugReportId,
         provider, issuePackage: issuePreviewState.issuePackage,
         confirmDuplicate: document.getElementById("issueConfirmDuplicate").checked });
@@ -310,6 +326,10 @@
         link.target = "_blank"; link.rel = "noopener noreferrer";
         link.textContent = t("technical.openExternalIssue"); result.append(link);
       } finally { button.disabled = false; }
+    }
+    document.getElementById("shareReport").addEventListener("click", action(async () => {
+      if (document.getElementById("issueProvider").value) await submitExternalIssue();
+      else await downloadOfflinePackage();
     }));
   }
   async function initialize() {

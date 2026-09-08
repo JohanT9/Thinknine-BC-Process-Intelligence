@@ -1,5 +1,12 @@
 # Changelog
 
+## 2026-09-08 - Bug reports use one sharing flow
+
+- The report workspace now has one primary `Share report` action instead of separate create, copy, and export paths.
+- Users choose an offline package, Azure DevOps, or GitHub in the same dialog.
+- Offline sharing uses one `Download report package` action; selecting an external destination changes that action to `Create Issue`.
+- Optional content, destination configuration, and the full generated preview are collapsed by default, while preview regeneration happens automatically when sharing choices change.
+
 ## 2026-09-08 - Bug reports identify the failing step automatically
 
 - A captured Business Central error now marks the exact preceding recorded action as the failure point when their canonical event references match.

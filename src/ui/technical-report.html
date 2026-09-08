@@ -17,7 +17,7 @@
     dialog pre{max-height:320px;overflow:auto;background:#f5f7fa;padding:12px}
     input[type=checkbox]{width:auto}select{padding:8px}
     .primary-actions{display:flex;gap:8px;align-items:center}.primary-actions button{margin:0}
-    .primary-actions #saveReport,.primary-actions #openIssuePreview{background:#008c95;color:white;border:1px solid #007078;border-radius:4px}
+    .primary-actions #saveReport,.primary-actions #openIssuePreview,#shareReport{background:#008c95;color:white;border:1px solid #007078;border-radius:4px}
     .report-options{margin-top:10px;max-width:760px}.report-options>summary{cursor:pointer;font-weight:600}
     .report-options>details{margin:12px 0;padding:12px;border:1px solid #ccd5df;border-radius:6px}
     .secondary-actions{display:flex;flex-wrap:wrap;gap:4px;margin:10px 0}
@@ -37,7 +37,7 @@
   <header>
     <div class="primary-actions">
       <button id="saveReport" type="button">Save</button>
-      <button id="openIssuePreview" type="button">Create Issue</button>
+      <button id="openIssuePreview" type="button">Share report</button>
       <button id="closeReport" type="button">Close</button>
     </div>
     <details class="report-options"><summary>More options</summary>
@@ -81,14 +81,14 @@
     <span id="workspaceMessage" role="status"></span></header>
   <main id="technicalReport" aria-live="polite"></main>
   <dialog id="issuePreview" aria-labelledby="issuePreviewTitle">
-    <form method="dialog"><button value="cancel" aria-label="Close issue preview">Close</button></form>
-    <h2 id="issuePreviewTitle">Issue Package Preview</h2>
-    <p data-i18n="technical.issuePreviewHelp">The Bug Report remains local and authoritative. Nothing is submitted until
-      you review this package and select Create Issue.</p>
+    <form method="dialog"><button value="cancel" aria-label="Close report sharing">Close</button></form>
+    <h2 id="issuePreviewTitle">Share bug report</h2>
+    <p data-i18n="technical.shareHelp">Choose where the report should go. Nothing is sent without your confirmation.</p>
     <label>Destination <select id="issueProvider"><option value="">Offline package only</option>
       <option value="azure-devops">Azure DevOps</option><option value="github">GitHub</option></select></label>
-    <label><input id="issueIncludeTelemetry" type="checkbox"> Include telemetry summary</label>
-    <label><input id="issueIncludeAi" type="checkbox"> Include current AI-assisted analysis</label>
+    <details class="share-options"><summary>Content and settings</summary>
+      <label><input id="issueIncludeTelemetry" type="checkbox"> Include telemetry summary</label>
+      <label><input id="issueIncludeAi" type="checkbox"> Include current AI-assisted analysis</label>
     <details><summary>Azure DevOps configuration</summary>
       <label><input id="adoEnabled" type="checkbox"> Enabled</label>
       <label>Organization <input id="adoOrganization" autocomplete="off"></label>
@@ -113,17 +113,18 @@
       <button id="testGithubConnection" type="button">Test GitHub connection</button>
     </details>
     <button id="saveIssueConfiguration" type="button">Save public destination configuration</button>
-    <button id="refreshIssuePreview" type="button">Generate preview</button>
-    <h3>Transmission summary</h3><div id="issueTransmissionSummary"></div>
-    <h3>Title</h3><p id="issueTitle"></p>
-    <h3>Description</h3><pre id="issueDescription"></pre>
-    <h3>Attachments</h3><ul id="issueAttachments"></ul>
-    <label><input id="issueConsent" type="checkbox"> I reviewed the destination,
+    </details>
+    <p id="issueTransmissionSummary"></p>
+    <details class="share-preview"><summary>Review report content</summary>
+      <h3>Title</h3><p id="issueTitle"></p>
+      <h3>Description</h3><pre id="issueDescription"></pre>
+      <h3>Attachments</h3><ul id="issueAttachments"></ul>
+    </details>
+    <label id="issueConsentRow" hidden><input id="issueConsent" type="checkbox"> I reviewed the destination,
       description, attachments, telemetry/AI choices, and sensitive-data warning</label>
-    <label><input id="issueConfirmDuplicate" type="checkbox"> Create another issue even if this report already has an external reference</label>
+    <label id="issueDuplicateRow" hidden><input id="issueConfirmDuplicate" type="checkbox"> Create another issue even if this report already has an external reference</label>
     <button id="copyIssueDescription" type="button">Copy Issue Description</button>
-    <button id="downloadIssuePackage" type="button">Export Offline Issue Package</button>
-    <button id="submitExternalIssue" type="button">Create Issue</button>
+    <button id="shareReport" type="button">Download report package</button>
     <p id="issueResult" role="status"></p>
   </dialog>
   <script src="engine/language-registry.js"></script>
