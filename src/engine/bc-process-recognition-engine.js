@@ -16,7 +16,7 @@
   schema, seed, lifecycleModel, lifecycleSeed
 ) {
   "use strict";
-  const ENGINE_VERSION = "1.6.0";
+  const ENGINE_VERSION = "1.7.0";
   const clone = value => value == null ? value : JSON.parse(JSON.stringify(value));
   const text = value => value == null ? "" : String(value).trim();
   const words = value => text(value).toLowerCase().replace(/[^a-z0-9åäöæø]+/g, " ").trim();
@@ -164,7 +164,8 @@
     const pathLeaf = words(semanticActionPaths.map(path => path.at(-1))
       .filter(Boolean).join(" "));
     const qualifiers = ACTION_QUALIFIERS.filter(([, expression]) =>
-      expression.test(`${technical} ${captions} ${pathText}`)).map(([name]) => name);
+      expression.test(`${technical} ${captions} ${pathText} ${semanticTypes}`))
+      .map(([name]) => name);
     const results = [];
     ACTIONS.forEach(([name, expression]) => {
       const technicalCompact = technical.replace(/\s+/g, "");

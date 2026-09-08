@@ -1,5 +1,11 @@
 # Changelog
 
+## 2026-09-08 - Semantic actions retain Business Central qualifiers
+
+- Semantic action IDs such as `PostShipment` now preserve shipment, receipt, invoice, pick, put-away, assembly, consumption, output, and transfer context during recognition.
+- A semantically classified posting action can no longer degrade into an unqualified generic `Post` signal.
+- Qualified matching continues to prevent outbound actions from satisfying unrelated inbound or invoicing steps.
+
 ## 2026-09-08 - Warehouse alternatives require warehouse evidence
 
 - A strongly identified purchase, sales, production, or transfer document no longer produces warehouse-process alternatives unless a matching warehouse document was actually observed.

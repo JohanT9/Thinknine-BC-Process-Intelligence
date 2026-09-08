@@ -116,6 +116,16 @@ const neutralRecordSelection = engine.extractEvidence(purchaseActionPathRecordin
 assert.strictEqual(neutralRecordSelection.observations[1].actions.length, 0,
   "a generic record choice must not imply a business process action");
 
+const semanticShipmentEvidence = engine.extractEvidence(purchaseActionPathRecording,
+  taxonomySeed, { semanticActions: [{
+    sourceEventIds: [purchaseActionPathRecording.events[1].id],
+    actionType: "PostShipment"
+  }] });
+const semanticShipmentPost = semanticShipmentEvidence.observations[1].actions
+  .find(item => item.name === "Post");
+assert.deepStrictEqual(semanticShipmentPost.qualifiers, ["shipment"],
+  "semantic action IDs must retain their Business Central posting context");
+
 const standardPageViews = [
   [9300, "document:sales-quote", "list"],
   [9305, "document:sales-order", "list"],
