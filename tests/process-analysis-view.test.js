@@ -181,4 +181,8 @@ assert(dashboard.includes("reference.id === model.referenceId"));
 assert(dashboard.includes("T9Review.replaceGeneratedReview"));
 assert(dashboard.includes("reviewAutoSave.schedule()"));
 assert(background.includes('case "T9_MATCH_REFERENCE_PROCESS"'));
+assert(background.includes("T9SemanticInteractionEngine"));
+assert(background.includes("processStepGroups(grouped.groups)"));
+assert(background.includes("semanticActions,"),
+  "the product process-analysis route must pass semantic recorder actions to recognition");
 console.log("Process Analysis view tests passed.");

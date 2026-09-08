@@ -1,5 +1,11 @@
 # Changelog
 
+## 2026-09-08 - Product process analysis consumes semantic recording actions
+
+- The extension's real `T9_MATCH_REFERENCE_PROCESS` route now normalizes and groups the Canonical Recording before matching references.
+- Semantic actions from the same pipeline used by documentation are supplied to deterministic process recognition.
+- Process assessment can therefore use action paths, classified commands, and Business Central qualifiers in the shipped product rather than only in isolated engine calls.
+
 ## 2026-09-08 - Process-map routes retain document semantics
 
 - A posting action followed by a posted document now produces a `documentPosting` relationship.

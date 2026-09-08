@@ -2085,6 +2085,10 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
       case "T9_MATCH_REFERENCE_PROCESS": {
         const recording = await getCanonicalRecording(message.sessionId);
         if (!recording) throw new Error("Inspelningen kunde inte hittas.");
+        const normalized = globalThis.T9EventNormalization.normalizeRecording(recording);
+        const grouped = globalThis.T9EventStepGrouping.group(normalized);
+        const semanticActions = globalThis.T9SemanticInteractionEngine
+          .processStepGroups(grouped.groups);
         const referenceProcesses = globalThis.T9ReferenceProcessLibrary.create(
           globalThis.T9BusinessCentralReferenceProcessSeed.library
         );
@@ -2095,6 +2099,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
             {
               referenceLibrary: referenceProcesses,
               graphProjector: globalThis.T9MultiLevelProcessGraph,
+              semanticActions,
               limit: 5
             }
           );
