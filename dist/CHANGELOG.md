@@ -1,5 +1,10 @@
 # Changelog
 
+## 2026-09-08 - Meaningful dialog choices become explicit actions
+
+- A recorded button choice inside a Business Central dialog now becomes a localized `RunDialogAction` instead of an unclassified step.
+- Passive dialog-open and dialog-close state remains supporting evidence and is not shown as procedure work.
+
 ## 2026-09-08 - Dialog state no longer becomes a procedure step
 
 - Standalone dialog-open and dialog-close observations are retained as supporting state evidence instead of unknown user steps.

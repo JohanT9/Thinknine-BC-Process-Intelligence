@@ -283,6 +283,9 @@ const ordinaryActionsRemainSeparate = engine.processInteractions([{
 assert.strictEqual(ordinaryActionsRemainSeparate.length, 2);
 assert.ok(!ordinaryActionsRemainSeparate.some(value =>
   value.actionType === "RunActionPath"));
+only([{ taskType: "Dialog", actionCaption: "Calculate and replace" }],
+  "RunDialogAction",
+  "V\u00e4lj **Calculate and replace** i dialogrutan.");
 const crossPageMenuActions = engine.processInteractions([{
   taskType: "RunAction", actionCaption: "\u00c5tg\u00e4rder",
   pageContext: { pageIdentity: "bc:page:42" }

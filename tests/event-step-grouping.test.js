@@ -141,6 +141,11 @@ const meaningfulDialogAction = run([
 ]);
 assert.strictEqual(meaningfulDialogAction.groups.length, 2,
   "A meaningful dialog command must remain a separate documentable step.");
+const meaningfulDialogSemantic = semantic.processStepGroups(
+  meaningfulDialogAction.groups);
+assert.strictEqual(meaningfulDialogSemantic[1].actionType, "RunDialogAction");
+assert.strictEqual(meaningfulDialogSemantic[1].displayText,
+  "V\u00e4lj **Calculate and replace** i dialogrutan.");
 
 const orphanDialogState = run([
   event("od1", "dialog-open", {

@@ -857,6 +857,11 @@
           `${selected ? `__${selected}__` : "söktext"} i **${field}** och ` +
           `välj **${result}**.`;
       } }),
+    singleRule({ ruleId: "dialog-action", priority: 78,
+      match: value => value?.taskType === "Dialog" &&
+        Boolean(text(value?.actionCaption)),
+      actionType: () => "RunDialogAction",
+      display: value => `V\u00e4lj **${text(value.actionCaption)}** i dialogrutan.` }),
     singleRule({ ruleId: "quantity-entry", priority: 75,
       match: value => Boolean(meaningfulValue(value)) &&
         /^(?:sortera efter\s+)?(?:antal|quantity)$/iu
