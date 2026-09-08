@@ -73,6 +73,8 @@ assert.doesNotMatch(reportView, /moreFields\.open\s*=/);
 assert.match(reportView, /failurePoint/);
 assert.match(reportView, /editorDuplicateKinds/);
 assert.match(reportView, /"errors"/);
+assert.match(reportView, /const hasCapturedError = Boolean/);
+assert.match(reportView, /Additional description/);
 assert.match(reportView, /issue\.level === "required"/);
 assert.doesNotMatch(reportView, /Complete the required human context below/);
 assert.match(reportView, /Captured Business Central error/);

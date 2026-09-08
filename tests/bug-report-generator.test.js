@@ -142,6 +142,18 @@ assert.strictEqual(container.attributes["aria-label"],
 const allElements = node => [node, ...node.children.flatMap(allElements)];
 assert(allElements(container).some(item => item.tagName === "details"));
 assert(allElements(container).some(item => item.tagName === "table"));
+const coreFields = allElements(container).find(item =>
+  item.className === "report-core-fields");
+const moreFields = allElements(container).find(item =>
+  item.className === "report-more-fields");
+assert(!allElements(coreFields).some(item =>
+  item.id === "technical-report-summary"));
+assert(!allElements(coreFields).some(item =>
+  item.id === "technical-report-actualResult"));
+assert(allElements(moreFields).some(item =>
+  item.id === "technical-report-summary"));
+assert(allElements(moreFields).some(item =>
+  item.id === "technical-report-actualResult"));
 assert(allElements(container).some(item => item.className === "failure-point"));
 assert(allElements(container).some(item => item.textContent ===
   " — Error occurred here"));

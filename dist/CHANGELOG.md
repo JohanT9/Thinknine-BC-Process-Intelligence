@@ -1,5 +1,12 @@
 # Changelog
 
+## 2026-09-08 - Captured errors shorten the bug-report form
+
+- When Business Central error evidence exists, the primary form now asks only for the editable title and expected result.
+- The captured error already supplies the actual outcome, so additional summary and actual-result text move under optional report information.
+- Reports without a captured Business Central error continue to show the actual-result field prominently.
+- Existing report content, exports, and technical evidence remain unchanged.
+
 ## 2026-09-08 - Bug-report readiness shows only actionable work
 
 - The default readiness panel now shows only items the user must complete before sharing.

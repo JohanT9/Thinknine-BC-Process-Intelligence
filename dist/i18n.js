@@ -533,6 +533,7 @@
     ,["Redigerbara rapportfält", "Editable report fields"]
     ,["Beskriv felet", "Describe the problem"]
     ,["Vad hände?", "What happened?"]
+    ,["Kompletterande beskrivning", "Additional description"]
     ,["Vad förväntade du dig?", "What did you expect?"]
     ,["Vad hände i stället?", "What happened instead?"]
     ,["Något mer som hände? (valfritt)", "Anything else that happened? (optional)"]

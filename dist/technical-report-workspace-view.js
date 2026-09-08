@@ -40,17 +40,20 @@
     const editor = doc.createElement("fieldset");
     editor.className = "report-core-fields";
     editor.appendChild(element(doc, "legend", ui("Describe the problem", locale)));
+    const hasCapturedError = Boolean((workspaceState.report.businessCentralError
+      ?.errorEvidenceIds || []).length);
     const fields = [{ name: "title", label: "Title",
       value: workspaceState.report.summary.title },
-    { name: "summary", label: "What happened?",
-      value: workspaceState.report.summary.summary },
     { name: "expectedResult", label: "What did you expect?",
       value: workspaceState.report.expectedResult.text, multiline: true },
-    { name: "actualResult", label: (workspaceState.report.businessCentralError
-      ?.errorEvidenceIds || []).length
-      ? "Anything else that happened? (optional)" : "What happened instead?",
-      value: workspaceState.report.actualResult.human.text, multiline: true }];
-    const additionalFields = [{ name: "severity", label: "Severity",
+    ...(!hasCapturedError ? [{ name: "actualResult", label: "What happened instead?",
+      value: workspaceState.report.actualResult.human.text, multiline: true }] : [])];
+    const additionalFields = [{ name: "summary", label: "Additional description",
+      value: workspaceState.report.summary.summary, multiline: true },
+    ...(hasCapturedError ? [{ name: "actualResult",
+      label: "Anything else that happened? (optional)",
+      value: workspaceState.report.actualResult.human.text, multiline: true }] : []),
+    { name: "severity", label: "Severity",
       value: workspaceState.report.summary.severity },
     { name: "category", label: "Category",
       value: workspaceState.report.summary.category },
