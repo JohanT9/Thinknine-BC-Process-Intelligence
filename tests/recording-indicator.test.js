@@ -23,7 +23,8 @@ assert.match(background, /stopPromptRequested: true/);
 assert.match(background, /sender\.tab\?\.id === state\.tabId/);
 assert.match(background, /sender\.tab\?\.id === pingState\.tabId/);
 assert.match(content, /response\?\.state\?\.recording && response\.isRecordingTab/);
-assert.match(popup, /function openNameDialog\(bugRecording\)/);
+assert.match(popup, /function openProcessNameDialog\(\)/);
+assert.match(popup, /await finishOrNameRecording\(response\.state\)/);
 assert.match(popup, /T9_CLEAR_STOP_REQUEST/);
 assert.doesNotMatch(content, /T9_RECORD_EVENT[\s\S]{0,300}indicatorLatest/,
   "The recording indicator must not generate recorder events.");

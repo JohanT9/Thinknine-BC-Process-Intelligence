@@ -20,6 +20,9 @@ assert.match(uiTranslations, /"recorder\.bugActive": "Felrapportering pågår"/)
 assert.match(popupLogic, /recorder\.errorDetailsCaptured/);
 assert.match(uiTranslations, /Business Central-felet.*fångats/);
 assert.match(popupLogic, /T9_FINISH_BUG_RECORDING/);
+assert.match(popupLogic, /function finishOrNameRecording\(state\)/);
+assert.match(popupLogic, /recordingPurpose === "bug-report"[\s\S]*finishRecording\("", defaultDocumentLanguage\)/);
+assert.match(popupLogic, /else openProcessNameDialog\(\)/);
 assert.match(popup, /id="nameDialog"/);
 assert.match(popup,
   /id="cancelName"[^>]*[\s\S]*?>Fortsätt spela in<\/button>/);

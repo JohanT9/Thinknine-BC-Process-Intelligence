@@ -305,27 +305,32 @@ async function discardActiveRecording() {
   }
 }
 
-function openNameDialog(bugRecording) {
-  pendingBugRecording = bugRecording;
-  updateText($("nameDialogTitle"), pendingBugRecording
-    ? t("recorder.nameBug") : t("recorder.nameProcess"));
-  updateText($("nameDialogHelp"), pendingBugRecording
-    ? t("recorder.nameBugHelp") : t("recorder.nameProcessHelp"));
+function openProcessNameDialog() {
+  pendingBugRecording = false;
+  updateText($("nameDialogTitle"), t("recorder.nameProcess"));
+  updateText($("nameDialogHelp"), t("recorder.nameProcessHelp"));
   $("recordingName").value = "";
-  $("recordingName").placeholder = pendingBugRecording
-    ? t("recorder.nameBugPlaceholder") : t("recorder.nameProcessPlaceholder");
+  $("recordingName").placeholder = t("recorder.nameProcessPlaceholder");
   $("recordingDocumentLanguage").value = defaultDocumentLanguage;
   if (!$("nameDialog").open) $("nameDialog").showModal();
   $("recordingName").focus();
 }
 
+async function finishOrNameRecording(state) {
+  if (state?.recordingPurpose === "bug-report") {
+    pendingBugRecording = true;
+    await finishRecording("", defaultDocumentLanguage);
+  } else openProcessNameDialog();
+}
+
 $("stop").addEventListener("click", async () => {
   try {
+    $("stop").disabled = true;
     const state = await send({ type: "T9_GET_STATE" }, 3000);
-    openNameDialog(state?.state?.recordingPurpose === "bug-report");
+    await finishOrNameRecording(state?.state);
   } catch (error) {
     showMessage(error.message, true);
-  }
+  } finally { $("stop").disabled = false; }
 });
 
 $("cancelName").addEventListener("click", () => $("nameDialog").close());
@@ -353,7 +358,7 @@ loadUiLocale().then(refresh).then(async () => {
   try {
     const response = await send({ type: "T9_GET_STATE" }, 3000);
     if (!response?.state?.recording || !response.state.stopPromptRequested) return;
-    openNameDialog(response.state.recordingPurpose === "bug-report");
+    await finishOrNameRecording(response.state);
     await send({ type: "T9_CLEAR_STOP_REQUEST" }, 3000);
   } catch (error) {
     showMessage(error.message, true);

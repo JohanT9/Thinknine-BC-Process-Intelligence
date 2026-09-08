@@ -1,5 +1,12 @@
 # Changelog
 
+## 2026-09-08 - Issue recordings open the report directly
+
+- `Stop and open issue report` now completes a bug recording and opens its report without an intermediate naming and document-language dialog.
+- The report receives a deterministic draft title from the captured Business Central page, field, action, or error and remains editable in the report workspace.
+- Process-documentation recordings retain their existing naming and language workflow.
+- The stop action is guarded against repeated clicks while the report is being created.
+
 ## 2026-09-08 - Bug reports save automatically
 
 - Human report edits, undo, and redo now trigger a short delayed autosave, removing the separate `Save` decision from the primary workflow.
