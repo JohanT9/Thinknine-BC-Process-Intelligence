@@ -553,6 +553,7 @@
     ,["Kopiera Business Central-fel", "Copy Business Central error"]
     ,["Reproduktionsbevis", "Reproduction evidence"]
     ,["Felbild", "Error screenshot"], ["Reproduktionsbild", "Reproduction screenshot"]
+    ,["Fler skärmbilder", "Additional screenshots"]
     ,["Anslutning till BC", "BC connection"], ["Aktiv session", "Active session"]
     ,["Händelser", "Events"], ["Eventtyper", "Event types"]
     ,["Kategorier", "Categories"], ["Senaste event", "Latest event"]

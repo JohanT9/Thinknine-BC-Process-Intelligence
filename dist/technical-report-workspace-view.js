@@ -167,22 +167,40 @@
         });
       } else if (section.kind === "evidence") {
         const assets = options.mediaAssets || {};
-        [...section.content.screenshots].sort((a, b) =>
-          (a.role === "error" ? -1 : 0) - (b.role === "error" ? -1 : 0))
-          .forEach(screenshot => {
-            const figure = doc.createElement("figure");
-            const media = assets[screenshot.assetId];
-            if (media?.source) {
-              const image = doc.createElement("img"); image.src = media.source;
-              image.alt = screenshot.role === "error"
-                ? ui("Captured Business Central error", locale) :
-                  ui("Reproduction evidence", locale);
-              figure.appendChild(image);
-            }
-            figure.appendChild(element(doc, "figcaption",
-              screenshot.role === "error" ? ui("Error screenshot", locale) :
-                ui("Reproduction screenshot", locale))); node.appendChild(figure);
-          });
+        const byAsset = new Map();
+        section.content.screenshots.forEach(screenshot => {
+          const current = byAsset.get(screenshot.assetId);
+          if (!current || screenshot.role === "error") {
+            byAsset.set(screenshot.assetId, screenshot);
+          }
+        });
+        const screenshots = [...byAsset.values()];
+        const primary = screenshots.find(item => item.role === "error") ||
+          screenshots.at(-1);
+        const appendScreenshot = (parent, screenshot, className = "") => {
+          const figure = doc.createElement("figure"); figure.className = className;
+          const media = assets[screenshot.assetId];
+          if (media?.source) {
+            const image = doc.createElement("img"); image.src = media.source;
+            image.alt = screenshot.role === "error"
+              ? ui("Captured Business Central error", locale) :
+                ui("Reproduction evidence", locale);
+            figure.appendChild(image);
+          }
+          figure.appendChild(element(doc, "figcaption",
+            screenshot.role === "error" ? ui("Error screenshot", locale) :
+              ui("Reproduction screenshot", locale))); parent.appendChild(figure);
+        };
+        if (primary) appendScreenshot(node, primary, "primary-evidence");
+        const supporting = screenshots.filter(item => item !== primary);
+        if (supporting.length) {
+          const more = doc.createElement("details"); more.className = "additional-evidence";
+          const summary = element(doc, "summary", ui("Additional screenshots", locale));
+          summary.appendChild(element(doc, "span", ` (${supporting.length})`,
+            "evidence-count")); more.appendChild(summary);
+          supporting.forEach(item => appendScreenshot(more, item));
+          node.appendChild(more);
+        }
       } else if (section.kind === "notes") {
         section.content.forEach(note => node.appendChild(element(doc, "p",
           note.text || note.content || "")));

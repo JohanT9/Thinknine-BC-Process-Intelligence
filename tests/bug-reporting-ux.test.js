@@ -75,6 +75,8 @@ assert.match(reportView, /editorDuplicateKinds/);
 assert.match(reportView, /"errors"/);
 assert.match(reportView, /const hasCapturedError = Boolean/);
 assert.match(reportView, /Additional description/);
+assert.match(reportView, /appendScreenshot\(node, primary, "primary-evidence"\)/);
+assert.match(reportView, /className = "additional-evidence"/);
 assert.match(reportView, /issue\.level === "required"/);
 assert.doesNotMatch(reportView, /Complete the required human context below/);
 assert.match(reportView, /Captured Business Central error/);

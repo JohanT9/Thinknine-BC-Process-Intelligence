@@ -157,6 +157,13 @@ assert(allElements(moreFields).some(item =>
 assert(allElements(container).some(item => item.className === "failure-point"));
 assert(allElements(container).some(item => item.textContent ===
   " — Error occurred here"));
+assert.strictEqual(allElements(container).filter(item =>
+  item.className === "primary-evidence").length, 1);
+const additionalEvidence = allElements(container).find(item =>
+  item.className === "additional-evidence");
+assert(additionalEvidence);
+assert.strictEqual(additionalEvidence.open, undefined,
+  "supporting screenshots must be collapsed by default");
 const incompleteContainer = new Element("main");
 view.render(incompleteContainer, { ...controller.state(), document: fallback },
   {}, fakeDocument);

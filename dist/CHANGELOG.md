@@ -1,5 +1,12 @@
 # Changelog
 
+## 2026-09-08 - Bug reports prioritize the error screenshot
+
+- The captured Business Central error screenshot is now the single primary image in the default report view.
+- When no dedicated error screenshot exists, the latest reproduction screenshot becomes the primary evidence.
+- Remaining recording screenshots are preserved under a collapsed `Additional screenshots` section with a visible count.
+- Duplicate references to the same screenshot asset are shown only once, preferring its error-evidence role.
+
 ## 2026-09-08 - Captured errors shorten the bug-report form
 
 - When Business Central error evidence exists, the primary form now asks only for the editable title and expected result.
