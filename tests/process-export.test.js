@@ -3,6 +3,21 @@ const fs = require("fs");
 const processModel = require("../src/document/process-model");
 const exporter = require("../src/exporters/process-export");
 const svgExporter = require("../src/exporters/process-svg-export");
+const processMapLabels = require("../src/document/process-map-labels");
+const taxonomySeed = require("../src/engine/business-central-process-taxonomy-seed").seed;
+
+taxonomySeed.documents.forEach(document => {
+  assert(processMapLabels.EN_NODE_TITLES[document.id],
+    `missing English process-map document label for ${document.id}`);
+  assert(processMapLabels.SV_NODE_TITLES[document.id],
+    `missing Swedish process-map document label for ${document.id}`);
+});
+[...taxonomySeed.domains, ...taxonomySeed.businessProcesses].forEach(entity => {
+  assert(Object.hasOwn(processMapLabels.SV_NODE_TITLES, entity.name),
+    `missing Swedish process-map label for ${entity.name}`);
+});
+assert.strictEqual(processMapLabels.nodeTitle({ title: "Order To Cash" }, "sv-SE"),
+  "Order till betalning", "localized labels should be case-insensitive");
 
 const decisionId = processModel.stableId("manual-process-node",
   ["export", "stock"]);

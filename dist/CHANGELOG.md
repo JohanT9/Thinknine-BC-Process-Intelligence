@@ -1,5 +1,12 @@
 # Changelog
 
+## 2026-09-08 - Taxonomy-level process maps are fully localized
+
+- Every seeded Business Central domain, business process, and document now has a Swedish process-map presentation label.
+- Basic and advanced warehouse inbound/outbound process names are localized consistently in the UI and SVG export.
+- Case differences such as `Order To Cash` versus `Order to Cash` no longer bypass localization.
+- Export tests now fail when a new seeded taxonomy domain, business process, or document lacks a Swedish map label.
+
 ## 2026-09-08 - Legacy semantic evidence resolves across event IDs
 
 - Process recognition now associates semantic actions through canonical event IDs, recorder source-event IDs, capture IDs, and stored canonical-source references.

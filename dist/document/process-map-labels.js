@@ -53,10 +53,23 @@
     "document:physical-inventory-journal": "Physical Inventory Journal"
   });
   const SV_NODE_TITLES = Object.freeze({
+    "Order to Cash": "Order till betalning",
+    "Source to Pay": "Inköp till betalning",
+    "Forecast to Plan": "Prognos till plan",
+    "Plan to Produce": "Planering till produktion",
+    "Inventory to Deliver": "Lager till leverans",
+    "Record to Report": "Redovisning till rapportering",
+    "Returns": "Returer", "Transfers": "Överföringar",
+    "Quality Management": "Kvalitetshantering",
+    "Warehouse Management": "Lagerhantering",
     "Sales Order Processing": "Försäljningsorderhantering",
     "Purchase to Pay": "Inköp till betalning",
     "Warehouse Inbound": "Inleverans till lager",
     "Warehouse Outbound": "Utleverans från lager",
+    "Basic Warehouse Outbound": "Grundläggande lagerutleverans",
+    "Basic Warehouse Inbound": "Grundläggande lagerinleverans",
+    "Advanced Warehouse Outbound": "Avancerad lagerutleverans",
+    "Advanced Warehouse Inbound": "Avancerad lagerinleverans",
     "Transfer Order": "Överföringsorder",
     "Production": "Produktion",
     "Production Execution": "Produktionsutförande",
@@ -192,11 +205,15 @@
   });
   const EN_DOCUMENT_IDS_BY_TITLE = Object.freeze(Object.fromEntries(
     Object.entries(EN_NODE_TITLES).map(([id, title]) => [title, id])));
+  const SV_NODE_TITLES_BY_KEY = Object.freeze(Object.fromEntries(
+    Object.entries(SV_NODE_TITLES).map(([title, localized]) =>
+      [title.toLocaleLowerCase(), localized])));
   function english(locale) { return String(locale || "").toLowerCase().startsWith("en"); }
   function nodeTitle(node, locale) { const title = String(node?.title || "");
     if (english(locale)) return EN_NODE_TITLES[title] || title;
     const taxonomyId = EN_DOCUMENT_IDS_BY_TITLE[title];
-    return SV_NODE_TITLES[title] || SV_NODE_TITLES[taxonomyId] || title; }
+    return SV_NODE_TITLES[title] || SV_NODE_TITLES[taxonomyId] ||
+      SV_NODE_TITLES_BY_KEY[title.toLocaleLowerCase()] || title; }
   function statusTitle(status, locale) { const labels = english(locale) ? {
     observed: "Observed", suggested: "Reference suggestion", conditional: "Conditional",
     customerSpecific: "Customer-specific", reference: "Reference"
