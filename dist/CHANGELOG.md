@@ -1,5 +1,11 @@
 # Changelog
 
+## 2026-09-08 - Semantic recorder actions support process recognition
+
+- Process recognition now consumes classified semantic action types in addition to structured action paths.
+- Semantic actions are weighted below authoritative Business Central action metadata and cannot override it.
+- Generic record selections remain neutral and cannot independently suggest a business process.
+
 ## 2026-09-08 - Recorded list-row choices become usable instructions
 
 - A standalone Business Central list-row selection now becomes the semantic `SelectRecord` action.

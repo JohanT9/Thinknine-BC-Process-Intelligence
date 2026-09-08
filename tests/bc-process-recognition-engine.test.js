@@ -95,6 +95,24 @@ assert(purchasePathEvidence.observations[1].actions.some(item =>
   item.name === "Release" && item.signal === "semantic-action-path" &&
   item.strength === 0.7));
 
+const semanticReleaseEvidence = engine.extractEvidence(purchaseActionPathRecording,
+  taxonomySeed, { semanticActions: [{
+    sourceEventIds: [purchaseActionPathRecording.events[1].id],
+    actionType: "ReleaseDocument"
+  }] });
+assert(semanticReleaseEvidence.observations[1].actions.some(item =>
+  item.name === "Release" && item.signal === "semantic-action" &&
+  item.strength === 0.65),
+"a classified recorder action should support recognition without caption parsing");
+
+const neutralRecordSelection = engine.extractEvidence(purchaseActionPathRecording,
+  taxonomySeed, { semanticActions: [{
+    sourceEventIds: [purchaseActionPathRecording.events[1].id],
+    actionType: "SelectRecord", selectedValue: "30043"
+  }] });
+assert.strictEqual(neutralRecordSelection.observations[1].actions.length, 0,
+  "a generic record choice must not imply a business process action");
+
 const standardPageViews = [
   [9300, "document:sales-quote", "list"],
   [9305, "document:sales-order", "list"],

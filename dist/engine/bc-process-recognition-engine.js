@@ -16,7 +16,7 @@
   schema, seed, lifecycleModel, lifecycleSeed
 ) {
   "use strict";
-  const ENGINE_VERSION = "1.4.0";
+  const ENGINE_VERSION = "1.5.0";
   const clone = value => value == null ? value : JSON.parse(JSON.stringify(value));
   const text = value => value == null ? "" : String(value).trim();
   const words = value => text(value).toLowerCase().replace(/[^a-z0-9åäöæø]+/g, " ").trim();
@@ -149,12 +149,17 @@
     return null;
   }
 
-  function actionMatches(event, semanticActionPaths = []) {
+  function actionMatches(event, semanticActions = []) {
     const raw = event.raw || {};
     const identified = event.identification?.actionIdentity || {};
     const technical = words([identified.actionType, raw.actionType, raw.automationId,
       raw.dataControlId, raw.dataControlName].join(" "));
     const captions = words(eventActionTexts(event).join(" "));
+    const semanticActionPaths = semanticActions.filter(action =>
+      Array.isArray(action?.actionPath)).map(action => action.actionPath);
+    const semanticTypes = words(semanticActions.map(action =>
+      action?.actionType || action?.semanticAction).filter(Boolean).join(" "));
+    const semanticCompact = semanticTypes.replace(/\s+/g, "");
     const pathText = words(semanticActionPaths.flat().join(" "));
     const pathLeaf = words(semanticActionPaths.map(path => path.at(-1))
       .filter(Boolean).join(" "));
@@ -169,6 +174,10 @@
       else if (pathLeaf && expression.test(pathLeaf)) results.push({ name,
         strength: 0.7, qualifiers, signal: "semantic-action-path",
         explanation: `Detected ${name} from structured BC action path` });
+      else if (semanticTypes && (semanticCompact.includes(name.toLowerCase()) ||
+        expression.test(semanticTypes))) results.push({ name,
+        strength: 0.65, qualifiers, signal: "semantic-action",
+        explanation: `Detected ${name} from semantic recording action` });
       else if (name === "Register" && expression.test(captions) &&
         !/pick|put.?away|plock|inlagr/i.test(captions)) return;
       else if (expression.test(captions)) results.push({ name, strength: 0.38, qualifiers,
@@ -195,10 +204,11 @@
       ? options.semanticActions : [];
     (recording?.events || []).forEach((event, index) => {
       const document = documentMatch(event, documents);
-      const semanticActionPaths = semanticActions.filter(action =>
-        (action?.sourceEventIds || []).includes(event.id) &&
+      const eventSemanticActions = semanticActions.filter(action =>
+        (action?.sourceEventIds || []).includes(event.id));
+      const semanticActionPaths = eventSemanticActions.filter(action =>
         Array.isArray(action.actionPath)).map(action => action.actionPath);
-      const actions = actionMatches(event, semanticActionPaths);
+      const actions = actionMatches(event, eventSemanticActions);
       const screenshot = options.screenshotEvidence?.[event.id] || null;
       observations.push({ eventId: event.id, sequence: event.sequence || index + 1,
         document: document ? { id: document.document.id, name: document.document.name,
