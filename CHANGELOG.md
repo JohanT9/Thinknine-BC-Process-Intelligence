@@ -1,5 +1,11 @@
 # Changelog
 
+## 2026-09-08 - Dialog state no longer becomes a procedure step
+
+- Standalone dialog-open and dialog-close observations are retained as supporting state evidence instead of unknown user steps.
+- Dialog state associated with an actual command remains inside that command's capture packet.
+- Meaningful dialog buttons and confirmation choices continue to be recorded as user interactions.
+
 ## 2026-09-08 - Resilient customer action-group detection
 
 - Technical Business Central action-group types are now matched case-insensitively.

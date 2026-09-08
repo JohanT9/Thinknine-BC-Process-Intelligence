@@ -30,7 +30,7 @@ const quantity = run([
     value: { normalized: "500" }, screenshotAssetId: "shot-2" })
 ]);
 assert.strictEqual(quantity.schemaVersion, 1);
-assert.strictEqual(quantity.groupingVersion, "1.12.0");
+assert.strictEqual(quantity.groupingVersion, "1.13.0");
 assert.strictEqual(quantity.groups.length, 1);
 assert.strictEqual(quantity.groups[0].groupKind, "field-edit");
 assert.deepStrictEqual(quantity.groups[0].sourceEventIds,
@@ -141,6 +141,18 @@ const meaningfulDialogAction = run([
 ]);
 assert.strictEqual(meaningfulDialogAction.groups.length, 2,
   "A meaningful dialog command must remain a separate documentable step.");
+
+const orphanDialogState = run([
+  event("od1", "dialog-open", {
+    pageIdentification: { caption: "Information", modal: true } }),
+  event("od2", "dialog-close", {
+    pageIdentification: { caption: "Information", modal: true } })
+]);
+assert.strictEqual(orphanDialogState.groups.length, 0,
+  "dialog state without a recorded user action must not become a procedure step");
+assert.deepStrictEqual(orphanDialogState.supportingEvents.map(item =>
+  item.classification), ["dialog-state", "dialog-state"]);
+assert.strictEqual(orphanDialogState.diagnostics.assignedEventCount, 2);
 
 const actionResult = run([
   event("ar1", "activation", { actionIdentification: { caption: "Open" },

@@ -11,7 +11,7 @@
 ) {
   "use strict";
   const SCHEMA_VERSION = 1;
-  const GROUPING_VERSION = "1.12.0";
+  const GROUPING_VERSION = "1.13.0";
   const CAPTURE_PACKET_VERSION = "1.6.0";
   const RESULT_VERIFICATION_VERSION = "1.2.0";
   const cache = new WeakMap();
@@ -373,12 +373,21 @@
         continue;
       }
       emit();
+      if (["dialog-open", "dialog-close"].includes(event.kind)) {
+        supportingEvents.push(freeze({
+          normalizedEventId: event.normalizedEventId,
+          classification: "dialog-state",
+          reason: "no-recorded-dialog-action"
+        }));
+        assignments.set(event.normalizedEventId, "supporting");
+        continue;
+      }
       const reason = isLookupOrigin(event) ? "lookup-origin" :
         event.kind === "navigation" ? "page-boundary" :
         event.kind === "activation" ? "committed-action" :
         isCommit(event.kind) ? "committed-interaction" : "conservative-single-event";
       pending = { events: [event], reasons: [reason] };
-      if (["navigation", "dialog-open", "dialog-close"].includes(event.kind) &&
+      if (event.kind === "navigation" &&
           !isLookupOrigin(event)) emit();
     }
     emit();
