@@ -1,5 +1,11 @@
 # Changelog
 
+## 2026-09-08 - Anonymous page observations stay out of procedures
+
+- Navigation telemetry without a Business Central page identity or caption is retained as supporting evidence instead of becoming a false user step.
+- Identified page transitions continue to produce documentable navigation steps.
+- Navigation captured as the outcome of a real action remains attached to that action.
+
 ## 2026-09-08 - Meaningful dialog choices become explicit actions
 
 - A recorded button choice inside a Business Central dialog now becomes a localized `RunDialogAction` instead of an unclassified step.

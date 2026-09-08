@@ -30,7 +30,7 @@ const quantity = run([
     value: { normalized: "500" }, screenshotAssetId: "shot-2" })
 ]);
 assert.strictEqual(quantity.schemaVersion, 1);
-assert.strictEqual(quantity.groupingVersion, "1.13.0");
+assert.strictEqual(quantity.groupingVersion, "1.14.0");
 assert.strictEqual(quantity.groups.length, 1);
 assert.strictEqual(quantity.groups[0].groupKind, "field-edit");
 assert.deepStrictEqual(quantity.groups[0].sourceEventIds,
@@ -355,6 +355,23 @@ const pageBoundary = run([
     controlIdentification: { identity: { value: "Search" } }, value: { normalized: "y" } })
 ]);
 assert.strictEqual(pageBoundary.groups.length, 3);
+
+const anonymousNavigation = run([
+  event("pn1", "navigation", { pageIdentification: {} })
+]);
+assert.strictEqual(anonymousNavigation.groups.length, 0,
+  "a page observation without a stable identity must not become a user step");
+assert.strictEqual(anonymousNavigation.supportingEvents[0].classification,
+  "navigation-state");
+assert.strictEqual(anonymousNavigation.supportingEvents[0].reason,
+  "anonymous-page-observation");
+
+const identifiedNavigation = run([
+  event("pn2", "navigation", { pageIdentification: {
+    pageObjectId: "9307", caption: "Purchase Orders" } })
+]);
+assert.strictEqual(identifiedNavigation.groups.length, 1,
+  "an identified Business Central page remains a documentable navigation step");
 
 const ambiguous = run([
   event("x1", "activation", { controlIdentification: {

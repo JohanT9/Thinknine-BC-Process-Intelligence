@@ -11,7 +11,7 @@
 ) {
   "use strict";
   const SCHEMA_VERSION = 1;
-  const GROUPING_VERSION = "1.13.0";
+  const GROUPING_VERSION = "1.14.0";
   const CAPTURE_PACKET_VERSION = "1.6.0";
   const RESULT_VERIFICATION_VERSION = "1.2.0";
   const cache = new WeakMap();
@@ -23,6 +23,7 @@
     (page.pageObjectId ? `bc:page:${page.pageObjectId}` : "") ||
     page.id || page.pageId || page.legacyPageId || page.name ||
     page.pageCaption || page.caption || ""; }
+  function hasIdentifiedPage(event) { return Boolean(pageKey(event)); }
   function selectedValue(event) { return event.selection?.value ?? event.selection?.key ?? event.selection?.caption ?? event.value?.normalized; }
   function actionKey(event) { const action = event?.actionIdentification || {};
     return action.actionIdentity || action.identity?.value || action.actionId ||
@@ -373,6 +374,15 @@
         continue;
       }
       emit();
+      if (event.kind === "navigation" && !hasIdentifiedPage(event)) {
+        supportingEvents.push(freeze({
+          normalizedEventId: event.normalizedEventId,
+          classification: "navigation-state",
+          reason: "anonymous-page-observation"
+        }));
+        assignments.set(event.normalizedEventId, "supporting");
+        continue;
+      }
       if (["dialog-open", "dialog-close"].includes(event.kind)) {
         supportingEvents.push(freeze({
           normalizedEventId: event.normalizedEventId,
