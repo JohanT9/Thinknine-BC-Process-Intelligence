@@ -1,5 +1,11 @@
 # Changelog
 
+## 2026-09-08 - Duplicate legacy page observations are consolidated
+
+- Repeated legacy navigation telemetry for the same identified Business Central page within a narrow capture window now remains supporting evidence.
+- A deliberate later revisit to the same page still becomes a separate procedure step.
+- Recorder interaction IDs remain authoritative and are never collapsed by the legacy timing rule.
+
 ## 2026-09-08 - Anonymous page observations stay out of procedures
 
 - Navigation telemetry without a Business Central page identity or caption is retained as supporting evidence instead of becoming a false user step.

@@ -11,7 +11,7 @@
 ) {
   "use strict";
   const SCHEMA_VERSION = 1;
-  const GROUPING_VERSION = "1.14.0";
+  const GROUPING_VERSION = "1.15.0";
   const CAPTURE_PACKET_VERSION = "1.6.0";
   const RESULT_VERIFICATION_VERSION = "1.2.0";
   const cache = new WeakMap();
@@ -272,6 +272,12 @@
       pageKey(origin) === pageKey(event) && actionKey(origin) === actionKey(event) &&
       elapsed(origin, event) <= 350;
   }
+  function isDuplicateLegacyNavigation(previous, event) {
+    return previous?.kind === "navigation" && event?.kind === "navigation" &&
+      !interactionIds([previous]).length && !interactionIds([event]).length &&
+      hasIdentifiedPage(previous) && pageKey(previous) === pageKey(event) &&
+      elapsed(previous, event) <= 350;
+  }
   function isActionOutcome(events, event) {
     const origin = events?.[0];
     if (origin?.kind !== "activation") return false;
@@ -297,7 +303,7 @@
     if (cache.has(normalizedRecording)) return cache.get(normalizedRecording);
     const groups = []; const guidanceEvents = []; const supportingEvents = [];
     const assignments = new Map();
-    let pending = null;
+    let pending = null; let lastStandaloneNavigation = null;
     const emit = () => {
       if (!pending) return;
       const value = makeGroup(normalizedRecording.recordingId, pending.events,
@@ -383,6 +389,16 @@
         assignments.set(event.normalizedEventId, "supporting");
         continue;
       }
+      if (isDuplicateLegacyNavigation(lastStandaloneNavigation, event)) {
+        supportingEvents.push(freeze({
+          normalizedEventId: event.normalizedEventId,
+          classification: "navigation-state",
+          reason: "duplicate-page-observation"
+        }));
+        assignments.set(event.normalizedEventId, "supporting");
+        continue;
+      }
+      if (event.kind !== "navigation") lastStandaloneNavigation = null;
       if (["dialog-open", "dialog-close"].includes(event.kind)) {
         supportingEvents.push(freeze({
           normalizedEventId: event.normalizedEventId,
@@ -398,7 +414,10 @@
         isCommit(event.kind) ? "committed-interaction" : "conservative-single-event";
       pending = { events: [event], reasons: [reason] };
       if (event.kind === "navigation" &&
-          !isLookupOrigin(event)) emit();
+          !isLookupOrigin(event)) {
+        lastStandaloneNavigation = event;
+        emit();
+      }
     }
     emit();
     const unassignedMeaningfulEventIds = (normalizedRecording.events || [])

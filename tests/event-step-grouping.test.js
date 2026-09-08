@@ -30,7 +30,7 @@ const quantity = run([
     value: { normalized: "500" }, screenshotAssetId: "shot-2" })
 ]);
 assert.strictEqual(quantity.schemaVersion, 1);
-assert.strictEqual(quantity.groupingVersion, "1.14.0");
+assert.strictEqual(quantity.groupingVersion, "1.15.0");
 assert.strictEqual(quantity.groups.length, 1);
 assert.strictEqual(quantity.groups[0].groupKind, "field-edit");
 assert.deepStrictEqual(quantity.groups[0].sourceEventIds,
@@ -372,6 +372,26 @@ const identifiedNavigation = run([
 ]);
 assert.strictEqual(identifiedNavigation.groups.length, 1,
   "an identified Business Central page remains a documentable navigation step");
+
+const duplicateLegacyNavigation = run([
+  event("pd1", "navigation", { timestamp: "2026-08-10T10:00:00.000Z",
+    pageIdentification: { pageObjectId: "9307", caption: "Purchase Orders" } }),
+  event("pd2", "navigation", { timestamp: "2026-08-10T10:00:00.200Z",
+    pageIdentification: { pageObjectId: "9307", caption: "Purchase Orders" } })
+]);
+assert.strictEqual(duplicateLegacyNavigation.groups.length, 1,
+  "duplicate legacy page telemetry must not create a second procedure step");
+assert.strictEqual(duplicateLegacyNavigation.supportingEvents[0].reason,
+  "duplicate-page-observation");
+
+const laterPageRevisit = run([
+  event("pr1", "navigation", { timestamp: "2026-08-10T10:00:00.000Z",
+    pageIdentification: { pageObjectId: "9307", caption: "Purchase Orders" } }),
+  event("pr2", "navigation", { timestamp: "2026-08-10T10:00:01.000Z",
+    pageIdentification: { pageObjectId: "9307", caption: "Purchase Orders" } })
+]);
+assert.strictEqual(laterPageRevisit.groups.length, 2,
+  "a later deliberate revisit to the same page must remain visible");
 
 const ambiguous = run([
   event("x1", "activation", { controlIdentification: {
