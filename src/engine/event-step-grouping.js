@@ -11,7 +11,7 @@
 ) {
   "use strict";
   const SCHEMA_VERSION = 1;
-  const GROUPING_VERSION = "1.10.0";
+  const GROUPING_VERSION = "1.11.0";
   const CAPTURE_PACKET_VERSION = "1.6.0";
   const RESULT_VERIFICATION_VERSION = "1.2.0";
   const cache = new WeakMap();
@@ -268,7 +268,7 @@
     const origin = events?.[0];
     return origin?.kind === "activation" && event.kind === "activation" &&
       pageKey(origin) === pageKey(event) && actionKey(origin) === actionKey(event) &&
-      elapsed(origin, event) <= 1200;
+      elapsed(origin, event) <= 350;
   }
   function isActionOutcome(events, event) {
     const origin = events?.[0];

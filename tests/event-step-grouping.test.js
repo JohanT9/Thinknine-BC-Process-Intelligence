@@ -30,7 +30,7 @@ const quantity = run([
     value: { normalized: "500" }, screenshotAssetId: "shot-2" })
 ]);
 assert.strictEqual(quantity.schemaVersion, 1);
-assert.strictEqual(quantity.groupingVersion, "1.10.0");
+assert.strictEqual(quantity.groupingVersion, "1.11.0");
 assert.strictEqual(quantity.groups.length, 1);
 assert.strictEqual(quantity.groups[0].groupKind, "field-edit");
 assert.deepStrictEqual(quantity.groups[0].sourceEventIds,
@@ -175,6 +175,15 @@ assert.deepStrictEqual(duplicateActivation.groups[0].sourceEventIds,
   ["source:da1", "source:da2"]);
 assert.ok(duplicateActivation.groups[0].groupingReason.includes(
   "duplicate-activation"));
+
+const repeatedIntentionalActivation = run([
+  event("ra1", "activation", { timestamp: "2026-08-10T10:00:00.000Z",
+    actionIdentification: { caption: "New" } }),
+  event("ra2", "activation", { timestamp: "2026-08-10T10:00:00.600Z",
+    actionIdentification: { caption: "New" } })
+]);
+assert.strictEqual(repeatedIntentionalActivation.groups.length, 2,
+  "separate repeated commands must not be hidden as capture duplicates");
 
 const date = run([
   event("d1", "activation", { controlIdentification: {

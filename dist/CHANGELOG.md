@@ -1,5 +1,11 @@
 # Changelog
 
+## 2026-09-08 - Safer legacy duplicate-action grouping
+
+- Legacy recordings without recorder interaction IDs now use a narrow 350 ms window for duplicate action observations.
+- Intentional repeated Business Central commands outside that capture window remain separate procedure steps.
+- Modern recordings continue to use their authoritative interaction IDs rather than timing heuristics.
+
 ## 2026-09-07 - Field edits respect Business Central page boundaries
 
 - Consecutive field events with the same control ID are no longer merged when known Business Central page or frame identities differ.

@@ -101,7 +101,7 @@ assert.deepStrictEqual(partial.changes, []);
 
 const grouped = grouping.group({ schemaVersion: 1,
   recordingId: "observed-state", events: [action, navigation] });
-assert.strictEqual(grouping.GROUPING_VERSION, "1.10.0");
+assert.strictEqual(grouping.GROUPING_VERSION, "1.11.0");
 assert.strictEqual(grouping.CAPTURE_PACKET_VERSION, "1.6.0");
 assert.deepStrictEqual(grouped.groups[0].capturePacket.stateObservation,
   pageState);
