@@ -233,13 +233,19 @@
     if (technicalSectionCount) container.appendChild(technicalDetails);
     const guidance = doc.createElement("section");
     guidance.className = report.completeness.ready ? "report-ready" : "report-incomplete";
-    guidance.appendChild(element(doc, "h2", ui("Completeness", locale)));
-    guidance.appendChild(element(doc, "p", report.completeness.ready
-      ? "Ready to share. Review the preview before any external submission."
-      : "Complete the required human context below before sharing."));
-    const list = doc.createElement("ul");
-    report.completeness.issues.forEach(issue => list.appendChild(element(doc,
-      "li", issue.message))); guidance.appendChild(list); container.appendChild(guidance);
+    guidance.appendChild(element(doc, "h2", ui(report.completeness.ready
+      ? "Ready to share" : "Complete the report", locale)));
+    guidance.appendChild(element(doc, "p", ui(report.completeness.ready
+      ? "The report contains enough information to be shared."
+      : "Complete the items below before sharing.", locale)));
+    const requiredIssues = report.completeness.issues.filter(issue =>
+      issue.level === "required");
+    if (requiredIssues.length) {
+      const list = doc.createElement("ul");
+      requiredIssues.forEach(issue => list.appendChild(element(doc,
+        "li", ui(issue.message, locale)))); guidance.appendChild(list);
+    }
+    container.appendChild(guidance);
     return { sectionCount: report.sections.length,
       ready: report.completeness.ready };
   }

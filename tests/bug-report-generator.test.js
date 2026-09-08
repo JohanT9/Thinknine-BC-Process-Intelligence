@@ -145,6 +145,14 @@ assert(allElements(container).some(item => item.tagName === "table"));
 assert(allElements(container).some(item => item.className === "failure-point"));
 assert(allElements(container).some(item => item.textContent ===
   " — Error occurred here"));
+const incompleteContainer = new Element("main");
+view.render(incompleteContainer, { ...controller.state(), document: fallback },
+  {}, fakeDocument);
+const incompleteText = allElements(incompleteContainer).map(item =>
+  item.textContent);
+assert(incompleteText.includes("Add a report title."));
+assert(!incompleteText.includes("Add the expected result."),
+  "recommended technical and quality guidance stays out of the default view");
 assert(!fs.readFileSync("src/ui/technical-report-workspace-view.js", "utf8")
   .includes("innerHTML"));
 assert(fs.readFileSync("src/recorder/background.js", "utf8")

@@ -73,6 +73,8 @@ assert.doesNotMatch(reportView, /moreFields\.open\s*=/);
 assert.match(reportView, /failurePoint/);
 assert.match(reportView, /editorDuplicateKinds/);
 assert.match(reportView, /"errors"/);
+assert.match(reportView, /issue\.level === "required"/);
+assert.doesNotMatch(reportView, /Complete the required human context below/);
 assert.match(reportView, /Captured Business Central error/);
 assert.match(reportView, /Copy Business Central error/);
 assert.match(reportView, /Ready to share/);

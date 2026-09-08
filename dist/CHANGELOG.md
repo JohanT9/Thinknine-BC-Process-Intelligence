@@ -1,5 +1,12 @@
 # Changelog
 
+## 2026-09-08 - Bug-report readiness shows only actionable work
+
+- The default readiness panel now shows only items the user must complete before sharing.
+- Missing optional diagnostics, screenshots, AL call stacks, telemetry, and other technical recommendations no longer appear as user tasks.
+- Technical capture status remains available under the collapsed technical details section.
+- Completed reports receive one concise, localized `Ready to share` confirmation without an empty checklist.
+
 ## 2026-09-08 - Issue recordings open the report directly
 
 - `Stop and open issue report` now completes a bug recording and opens its report without an intermediate naming and document-language dialog.
