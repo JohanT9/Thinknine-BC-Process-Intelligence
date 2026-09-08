@@ -1,5 +1,11 @@
 # Changelog
 
+## 2026-09-08 - Process analysis uses canonical document labels
+
+- Process-analysis lists now use the same centralized Business Central taxonomy labels as the interactive map and SVG export.
+- Canonical IDs such as `document:warehouse-receipt` and `document:posted-warehouse-receipt` are presented as `Lagerinleverans` and `Bokförd lagerinleverans` in Swedish.
+- Explicit UI translations still take precedence, with taxonomy labels providing complete fallback coverage.
+
 ## 2026-09-08 - Process analysis hides technical unknown placeholders
 
 - `Unknown step`/`Okänt steg` placeholders are removed from matched, missing, customer-specific, and configuration-dependent business-step lists.

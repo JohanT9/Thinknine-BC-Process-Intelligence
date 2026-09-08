@@ -1,8 +1,10 @@
 (function (root, factory) {
-  const api = factory();
+  const processMapLabels = typeof module === "object" && module.exports
+    ? require("../document/process-map-labels") : root.T9ProcessMapLabels;
+  const api = factory(processMapLabels);
   if (typeof module === "object" && module.exports) module.exports = api;
   root.T9ProcessAnalysisView = api;
-})(typeof globalThis !== "undefined" ? globalThis : this, function () {
+})(typeof globalThis !== "undefined" ? globalThis : this, function (processMapLabels) {
   "use strict";
   const clone = value => value === undefined ? undefined : JSON.parse(JSON.stringify(value));
   const array = value => Array.isArray(value) ? value : [];
@@ -14,7 +16,9 @@
     step?.referenceProcess || "Unknown step"); }
   function isUnknownStep(step) { return /^(?:unknown step|okänt steg|unknown)$/iu
     .test(stepLabel(step).replace(/^\w+:/u, "").replace(/[-_]+/gu, " ").trim()); }
-  function localized(value, labels) { return labels.processNames?.[text(value)] || text(value); }
+  function localized(value, labels) { const source = text(value);
+    return labels.processNames?.[source] ||
+      processMapLabels?.nodeTitle({ title: source }, labels.locale || "en-US") || source; }
   function actionEvidenceLabel(item, labels) { const name = localized(stepLabel(item), labels);
     const qualifiers = array(item?.qualifiers).map(value =>
       labels.actionQualifiers?.[value] || value).filter(Boolean);

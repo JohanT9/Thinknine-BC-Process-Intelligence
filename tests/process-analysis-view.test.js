@@ -125,6 +125,15 @@ const filteredUnknownModel = view.normalize({ bestMatch: {
   additionalSteps: [{ name: "Unknown step" }] } });
 assert.deepStrictEqual([filteredUnknownModel.matched.length,
   filteredUnknownModel.missing.length, filteredUnknownModel.additional.length], [1, 0, 0]);
+const canonicalDocumentContainer = { innerHTML: "", querySelector() { return null; } };
+view.render(canonicalDocumentContainer, { result: { bestMatch: {
+  referenceProcessId: "warehouse", referenceProcess: "Warehouse Inbound",
+  matchedSteps: [{ id: "document:warehouse-receipt" }],
+  missingSteps: [{ id: "document:posted-warehouse-receipt" }],
+  additionalSteps: [] } } }, { locale: "sv-SE" });
+assert(canonicalDocumentContainer.innerHTML.includes("Lagerinleverans"));
+assert(canonicalDocumentContainer.innerHTML.includes("Bokförd lagerinleverans"));
+assert(!canonicalDocumentContainer.innerHTML.includes("document:warehouse"));
 
 const empty = view.render(container, { result: {} }, { noMatchTitle: "Ingen säker matchning",
   noMatchText: "Klassificera senare." });

@@ -3482,6 +3482,7 @@ const activeDocumentPipelineCache = globalThis.T9WorkspaceController
 function processAnalysisLabels() {
   const english = String(applicationSettings.uiLocale || "").startsWith("en");
   return english ? {
+    locale: "en-US",
     detected: "Detected reference process", unknownDomain: "Domain not identified",
     match: "match", confirmedConfidence: "manually confirmed",
     matchDegree: "Classification confidence", confirmed:
@@ -3516,6 +3517,7 @@ function processAnalysisLabels() {
     evidenceNone: "None detected", "quality-strong": "Strong", "quality-moderate": "Moderate",
     "quality-weak": "Weak"
   } : {
+    locale: "sv-SE",
     detected: "Identifierad referensprocess", unknownDomain: "Domän inte identifierad",
     match: "matchning", confirmedConfidence: "manuellt bekräftad",
     matchDegree: "Klassificeringssäkerhet", confirmed:
