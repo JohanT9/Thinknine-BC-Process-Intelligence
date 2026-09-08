@@ -1,5 +1,11 @@
 # Changelog
 
+## 2026-09-08 - Technical Business Central action hierarchy
+
+- Recorder UI ancestry now flows through normalization and step grouping into semantic interpretation.
+- A recorded command inside an identified Business Central action group can produce a complete menu path from one authoritative interaction.
+- Menu-path generation therefore works with localized or customer-specific action-group captions without adding caption-specific rules.
+
 ## 2026-09-08 - Safer legacy duplicate-action grouping
 
 - Legacy recordings without recorder interaction IDs now use a narrow 350 ms window for duplicate action observations.

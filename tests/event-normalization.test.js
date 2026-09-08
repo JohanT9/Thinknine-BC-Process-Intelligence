@@ -37,8 +37,8 @@ model = append(model, raw("e4", "field-change", { fieldName: "Quantity",
 let result = normalization.normalizeRecording(model);
 assert.strictEqual(JSON.stringify(original), before);
 assert.strictEqual(result.schemaVersion, 1);
-assert.strictEqual(result.normalizationVersion, "2.6.0");
-assert.strictEqual(normalization.NORMALIZATION_VERSION, "2.6.0");
+assert.strictEqual(result.normalizationVersion, "2.7.0");
+assert.strictEqual(normalization.NORMALIZATION_VERSION, "2.7.0");
 assert.strictEqual(result.events.length, 1);
 assert.strictEqual(result.events[0].kind, "value-change");
 assert.deepStrictEqual(result.events[0].sourceEventIds,
@@ -187,6 +187,16 @@ mechanics = append(mechanics, raw("key-command", "keydown", {
   key: "Escape", inputSource: "keyboard" }));
 assert.deepStrictEqual(normalization.normalizeRecording(mechanics).events
   .map(event => event.kind), ["dialog-open", "dialog-close", "key-command"]);
+
+let actionHierarchy = recording("action-hierarchy");
+actionHierarchy = append(actionHierarchy, raw("post", "click", {
+  category: "action", label: "Post", uiHierarchy: [
+    { type: "actionBar" }, { type: "actionGroup", caption: "Posting" }
+  ]
+}), { role: "button", controlType: "button" });
+assert.deepStrictEqual(normalization.normalizeRecording(actionHierarchy)
+  .events[0].uiHierarchy, [{ type: "actionBar" },
+    { type: "actionGroup", caption: "Posting" }]);
 
 let repeated = recording("repeat");
 for (const suffix of ["a", "b"]) {

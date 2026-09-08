@@ -11,7 +11,7 @@
 ) {
   "use strict";
   const SCHEMA_VERSION = 1;
-  const NORMALIZATION_VERSION = "2.6.0";
+  const NORMALIZATION_VERSION = "2.7.0";
   const cache = new WeakMap();
   const clone = value => value == null ? value : JSON.parse(JSON.stringify(value));
   function freeze(value) { if (!value || typeof value !== "object" || Object.isFrozen(value)) return value; Object.values(value).forEach(freeze); return Object.freeze(value); }
@@ -117,6 +117,7 @@
         ? { ...(identified.action || {}), ...(identified.actionIdentity || {}) }
         : null),
       containerIdentification: clone(identified.container),
+      uiHierarchy: clone(identified.hierarchy || []),
       interaction: { mechanism: mechanism(raw), key: raw.key || undefined, code: raw.code || undefined,
         altKey: raw.altKey || undefined, ctrlKey: raw.ctrlKey || undefined,
         metaKey: raw.metaKey || undefined, shiftKey: raw.shiftKey || undefined,

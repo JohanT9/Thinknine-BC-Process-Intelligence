@@ -712,6 +712,35 @@
     return deepFreeze(rule);
   }
 
+  function technicalActionHierarchyRule() {
+    const caption = value => text(value?.actionCaption) ||
+      text(value?.selectedCaption);
+    const actionGroups = value => unique((value?.uiHierarchy || [])
+      .filter(item => item?.type === "actionGroup")
+      .map(item => text(item.caption)));
+    const rule = {
+      ruleId: "technical-action-hierarchy",
+      priority: 109,
+      match(context) {
+        const value = context.interactions[context.index];
+        return ["RunAction", "ClickAction"].includes(value?.taskType) &&
+          Boolean(caption(value)) && actionGroups(value).length > 0;
+      },
+      consolidate(context) {
+        const value = context.interactions[context.index];
+        const leaf = caption(value).replace(/\.{2,}$/u, "");
+        const path = [...actionGroups(value).filter(item =>
+          item.toLocaleLowerCase() !== leaf.toLocaleLowerCase()), leaf];
+        return { consumed: 1, action: action(rule, [value], {
+          actionType: "RunActionPath",
+          displayText: `V\u00e4lj ${path.map(item => `**${item}**`).join(" \u2192 ")}.`,
+          selectedValue: leaf
+        }) };
+      }
+    };
+    return deepFreeze(rule);
+  }
+
   function genericMenuPathRule() {
     const menuParent = /^(?:v\u00e4lj\s+)?(?:\u00e5tg\u00e4rder|actions|funktion|functions?|rad|row|relaterad information|related information)$/iu;
     const isAction = value => ["RunAction", "ClickAction"].includes(
@@ -781,6 +810,7 @@
     purchaseManualPriceMenuPathRule(),
     salesPriceDiscountMenuPathRule(),
     manualPriceMenuPathRule(),
+    technicalActionHierarchyRule(),
     duplicateActionObservationRule(),
     genericMenuPathRule(),
     closeDialogRule(),
@@ -934,6 +964,7 @@
       actionCaption: action.caption || "",
       selectedCaption: selected ? String(selected) : "",
       selectedValue: selected,
+      uiHierarchy: clone(group?.uiHierarchy || primary.uiHierarchy || []),
       pageContext: clone(page), pageIdentification: clone(page),
       pageIdentity: page.pageIdentity || null,
       pageObjectId: page.pageObjectId || null,

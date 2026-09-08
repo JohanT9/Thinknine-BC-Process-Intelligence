@@ -30,7 +30,7 @@ const quantity = run([
     value: { normalized: "500" }, screenshotAssetId: "shot-2" })
 ]);
 assert.strictEqual(quantity.schemaVersion, 1);
-assert.strictEqual(quantity.groupingVersion, "1.11.0");
+assert.strictEqual(quantity.groupingVersion, "1.12.0");
 assert.strictEqual(quantity.groups.length, 1);
 assert.strictEqual(quantity.groups[0].groupKind, "field-edit");
 assert.deepStrictEqual(quantity.groups[0].sourceEventIds,
@@ -175,6 +175,19 @@ assert.deepStrictEqual(duplicateActivation.groups[0].sourceEventIds,
   ["source:da1", "source:da2"]);
 assert.ok(duplicateActivation.groups[0].groupingReason.includes(
   "duplicate-activation"));
+
+const technicalMenuHierarchy = run([event("mh1", "activation", {
+  actionIdentification: { caption: "Post" },
+  uiHierarchy: [{ type: "actionBar" },
+    { type: "actionGroup", caption: "Posting" }]
+})]);
+assert.deepStrictEqual(technicalMenuHierarchy.groups[0].uiHierarchy,
+  [{ type: "actionBar" }, { type: "actionGroup", caption: "Posting" }]);
+const technicalMenuAction = semantic.processStepGroups(
+  technicalMenuHierarchy.groups)[0];
+assert.strictEqual(technicalMenuAction.actionType, "RunActionPath");
+assert.strictEqual(technicalMenuAction.displayText,
+  "V\u00e4lj **Posting** \u2192 **Post**.");
 
 const repeatedIntentionalActivation = run([
   event("ra1", "activation", { timestamp: "2026-08-10T10:00:00.000Z",

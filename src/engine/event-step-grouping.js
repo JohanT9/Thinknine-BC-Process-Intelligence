@@ -11,7 +11,7 @@
 ) {
   "use strict";
   const SCHEMA_VERSION = 1;
-  const GROUPING_VERSION = "1.11.0";
+  const GROUPING_VERSION = "1.12.0";
   const CAPTURE_PACKET_VERSION = "1.6.0";
   const RESULT_VERIFICATION_VERSION = "1.2.0";
   const cache = new WeakMap();
@@ -218,6 +218,7 @@
       pageContext: clone(primary.pageIdentification || {}),
       controlContext: clone(primary.controlIdentification || {}),
       actionContext: clone(primary.actionIdentification),
+      uiHierarchy: clone(primary.uiHierarchy || []),
       groupKind: groupKind(events), groupingReason: unique(reasons),
       screenshotAssetIds,
       capturePacket: packet,
