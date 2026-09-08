@@ -195,7 +195,19 @@ assert(fs.readFileSync("src/recorder/background.js", "utf8")
   assert(!controller.state().document.sections.find(section =>
     section.kind === "reproduction").content.some(step =>
     step.reproductionStepId === stepId));
-  controller.undo();
+  const hiddenContainer = new Element("main");
+  view.render(hiddenContainer, controller.state(), {
+    onEditReproductionStep: () => {}
+  }, fakeDocument);
+  const allHiddenToggles = allElements(hiddenContainer).filter(item =>
+    item.type === "checkbox");
+  assert.strictEqual(allHiddenToggles.length, 1);
+  assert.strictEqual(allHiddenToggles[0].checked, false,
+    "a removed step must remain available for restoration");
+  controller.updateReproductionStep(stepId, { visibility: "visible" });
+  assert(controller.state().document.sections.find(section =>
+    section.kind === "reproduction").content.some(step =>
+    step.reproductionStepId === stepId));
   await controller.save();
   assert.strictEqual(memory.saved.summary.title, "Edited title");
   assert.strictEqual(controller.state().saveState, "saved");

@@ -101,12 +101,18 @@
           }
           list.appendChild(item);
         }); node.appendChild(list);
-        if (section.content.length && options.onEditReproductionStep) {
+        const editableSteps = (workspaceState.report.reproduction?.steps || [])
+          .map((step, index) => ({ ...step, number: index + 1,
+            instruction: Object.prototype.hasOwnProperty.call(
+              step.stepOverride?.fields || {}, "instruction")
+              ? step.stepOverride.fields.instruction : step.instruction,
+            included: step.visibility !== "hidden" }));
+        if (editableSteps.length && options.onEditReproductionStep) {
           const editor = doc.createElement("details");
           editor.className = "reproduction-editor";
           editor.appendChild(element(doc, "summary",
             ui("Edit reproduction steps", locale)));
-          section.content.forEach(step => {
+          editableSteps.forEach(step => {
             const row = doc.createElement("div"); row.className = "reproduction-editor-row";
             const label = element(doc, "label",
               `${ui("Step", locale)} ${step.number}`);
@@ -115,11 +121,18 @@
             input.setAttribute("aria-label", `${ui("Step", locale)} ${step.number}`);
             input.addEventListener("change", () => options.onEditReproductionStep(
               step.reproductionStepId, { instruction: input.value }));
-            const remove = element(doc, "button", ui("Remove from report", locale));
-            remove.type = "button";
-            remove.addEventListener("click", () => options.onEditReproductionStep(
-              step.reproductionStepId, { visibility: "hidden" }));
-            label.appendChild(input); row.append(label, remove); editor.appendChild(row);
+            const includeLabel = element(doc, "label", ui("Include in report", locale),
+              "reproduction-include");
+            const include = doc.createElement("input"); include.type = "checkbox";
+            include.checked = step.included;
+            include.setAttribute("aria-label",
+              `${ui("Include in report", locale)}: ${ui("Step", locale)} ${step.number}`);
+            include.addEventListener("change", () => options.onEditReproductionStep(
+              step.reproductionStepId, { visibility: include.checked
+                ? "visible" : "hidden" }));
+            includeLabel.appendChild(include);
+            label.appendChild(input); row.append(label, includeLabel);
+            editor.appendChild(row);
           });
           node.appendChild(editor);
         }

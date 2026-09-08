@@ -1,5 +1,12 @@
 # Changelog
 
+## 2026-09-09 - Reproduction-step removal is reversible
+
+- The inline reproduction editor now lists every captured step, including steps excluded from the report.
+- A clear `Include in report` checkbox replaces the one-way removal action.
+- Excluded steps can be restored after autosave or reopening without losing their wording or recording references.
+- Only included steps remain visible in the report, exports, and shared issue packages.
+
 ## 2026-09-08 - Bug reproduction steps can be corrected in place
 
 - A collapsed editor in the bug report now lets users correct generated reproduction wording.
