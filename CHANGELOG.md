@@ -1,5 +1,11 @@
 # Changelog
 
+## 2026-09-08 - Business Central row selections retain their meaning
+
+- Selecting a list or repeater row is now represented as a distinct `row-interaction` instead of a generic option selection.
+- Semantic interpretation receives an explicit selection task while lookup-contained row choices remain part of the lookup step.
+- Existing raw event evidence and selected values are preserved unchanged.
+
 ## 2026-09-08 - Legacy lookup dialogs remain one user step
 
 - Dialog-open and dialog-close telemetry inside a legacy Business Central lookup now stays with the lookup interaction.

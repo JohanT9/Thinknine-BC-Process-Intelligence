@@ -30,7 +30,7 @@ const quantity = run([
     value: { normalized: "500" }, screenshotAssetId: "shot-2" })
 ]);
 assert.strictEqual(quantity.schemaVersion, 1);
-assert.strictEqual(quantity.groupingVersion, "1.16.0");
+assert.strictEqual(quantity.groupingVersion, "1.17.0");
 assert.strictEqual(quantity.groups.length, 1);
 assert.strictEqual(quantity.groups[0].groupKind, "field-edit");
 assert.deepStrictEqual(quantity.groups[0].sourceEventIds,
@@ -133,6 +133,16 @@ const option = run([
 ]);
 assert.strictEqual(option.groups.length, 1);
 assert.strictEqual(option.groups[0].groupKind, "selection");
+
+const rowSelection = run([event("rs1", "selection-change", {
+  controlIdentification: { controlType: "listRow", caption: "30043" },
+  selection: { value: "30043", caption: "30043" }
+})]);
+assert.strictEqual(rowSelection.groups[0].groupKind, "row-interaction",
+  "a selected Business Central list row must retain its distinct interaction type");
+const rowSemanticInput = semantic.processStepGroups(rowSelection.groups)[0];
+assert.strictEqual(rowSemanticInput.passthrough, true);
+assert.strictEqual(rowSemanticInput.rawInteractions[0].taskType, "Select");
 
 const toggle = run([event("t1", "toggle-change", {
   controlIdentification: { identity: { value: "Blocked" }, type: "checkbox" },

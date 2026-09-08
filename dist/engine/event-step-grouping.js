@@ -11,7 +11,7 @@
 ) {
   "use strict";
   const SCHEMA_VERSION = 1;
-  const GROUPING_VERSION = "1.16.0";
+  const GROUPING_VERSION = "1.17.0";
   const CAPTURE_PACKET_VERSION = "1.6.0";
   const RESULT_VERIFICATION_VERSION = "1.2.0";
   const cache = new WeakMap();
@@ -57,9 +57,9 @@
     const kinds = new Set(events.map(event => event.kind));
     if (events.some(isLookupOrigin)) return "lookup-interaction";
     if (kinds.has("toggle-change")) return "toggle-interaction";
+    if (events.some(isRowSelection)) return "row-interaction";
     if (kinds.has("selection-change")) return "selection";
     if (kinds.has("value-change")) return "field-edit";
-    if (events.some(isRowSelection)) return "row-interaction";
     if (kinds.has("activation")) return "action";
     if (kinds.has("dialog-action")) return "dialog-interaction";
     if (kinds.has("navigation")) return "navigation";
