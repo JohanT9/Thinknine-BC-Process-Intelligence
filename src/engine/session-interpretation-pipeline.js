@@ -12,7 +12,7 @@
 })(typeof globalThis !== "undefined" ? globalThis : this,
 function (semantic, knowledge, refs) {
   "use strict";
-  const VERSION = "1.0.0";
+  const VERSION = "1.1.0";
   const unique = values => [...new Set((values || []).filter(Boolean))];
 
   function eventIndex(events = []) {
@@ -56,6 +56,8 @@ function (semantic, knowledge, refs) {
     return { taskId: `${action.actionType || "Task"}:${refs.stableIdentity(trace)}`,
       taskNo: index + 1, taskType: action.actionType || "Unclassified",
       semanticAction: action.actionType || "", semanticActionModel: action,
+      ...(Array.isArray(action.actionPath)
+        ? { actionPath: [...action.actionPath] } : {}),
       capturePackets: (action.capturePackets || []).map(value => ({ ...value })),
       ...(action.capturePacket ? { capturePacket: { ...action.capturePacket } } : {}),
       ...(action.interactionIds?.length ? {

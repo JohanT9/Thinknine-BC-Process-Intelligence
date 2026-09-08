@@ -16,7 +16,7 @@
   schema, seed, lifecycleModel, lifecycleSeed
 ) {
   "use strict";
-  const ENGINE_VERSION = "1.3.0";
+  const ENGINE_VERSION = "1.4.0";
   const clone = value => value == null ? value : JSON.parse(JSON.stringify(value));
   const text = value => value == null ? "" : String(value).trim();
   const words = value => text(value).toLowerCase().replace(/[^a-z0-9åäöæø]+/g, " ").trim();
@@ -149,20 +149,26 @@
     return null;
   }
 
-  function actionMatches(event) {
+  function actionMatches(event, semanticActionPaths = []) {
     const raw = event.raw || {};
     const identified = event.identification?.actionIdentity || {};
     const technical = words([identified.actionType, raw.actionType, raw.automationId,
       raw.dataControlId, raw.dataControlName].join(" "));
     const captions = words(eventActionTexts(event).join(" "));
+    const pathText = words(semanticActionPaths.flat().join(" "));
+    const pathLeaf = words(semanticActionPaths.map(path => path.at(-1))
+      .filter(Boolean).join(" "));
     const qualifiers = ACTION_QUALIFIERS.filter(([, expression]) =>
-      expression.test(`${technical} ${captions}`)).map(([name]) => name);
+      expression.test(`${technical} ${captions} ${pathText}`)).map(([name]) => name);
     const results = [];
     ACTIONS.forEach(([name, expression]) => {
       const technicalCompact = technical.replace(/\s+/g, "");
       if (technical && (technicalCompact.includes(name.toLowerCase()) ||
         expression.test(technical))) results.push({ name, strength: 1, qualifiers,
         signal: "technical-action", explanation: `Detected ${name} from BC action metadata` });
+      else if (pathLeaf && expression.test(pathLeaf)) results.push({ name,
+        strength: 0.7, qualifiers, signal: "semantic-action-path",
+        explanation: `Detected ${name} from structured BC action path` });
       else if (name === "Register" && expression.test(captions) &&
         !/pick|put.?away|plock|inlagr/i.test(captions)) return;
       else if (expression.test(captions)) results.push({ name, strength: 0.38, qualifiers,
@@ -185,15 +191,21 @@
   function extractEvidence(recording, taxonomy = seed, options = {}) {
     const documents = taxonomy.documents || [];
     const observations = [];
+    const semanticActions = Array.isArray(options.semanticActions)
+      ? options.semanticActions : [];
     (recording?.events || []).forEach((event, index) => {
       const document = documentMatch(event, documents);
-      const actions = actionMatches(event);
+      const semanticActionPaths = semanticActions.filter(action =>
+        (action?.sourceEventIds || []).includes(event.id) &&
+        Array.isArray(action.actionPath)).map(action => action.actionPath);
+      const actions = actionMatches(event, semanticActionPaths);
       const screenshot = options.screenshotEvidence?.[event.id] || null;
       observations.push({ eventId: event.id, sequence: event.sequence || index + 1,
         document: document ? { id: document.document.id, name: document.document.name,
           strength: document.strength, signal: document.signal,
           view: clone(document.view) } : null,
-        actions, page: clone(eventPage(event)), screenshot: screenshot ? {
+        actions, actionPaths: clone(semanticActionPaths),
+        page: clone(eventPage(event)), screenshot: screenshot ? {
           interpretation: clone(screenshot), strength: 0.15, signal: "screenshot-interpretation"
         } : null,
         explanations: unique([document?.explanation, ...actions.map(item => item.explanation),

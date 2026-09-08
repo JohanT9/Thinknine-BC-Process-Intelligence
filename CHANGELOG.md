@@ -1,5 +1,11 @@
 # Changelog
 
+## 2026-09-08 - Action paths feed process-recognition evidence
+
+- Interpreted business tasks now expose their structured Business Central `actionPath` directly.
+- The recognition engine accepts semantic actions as complementary evidence and uses the terminal menu command with stronger weight than caption-only matching.
+- Raw technical Business Central metadata still takes precedence over semantic menu-path evidence.
+
 ## 2026-09-08 - Structured semantic action paths
 
 - Semantic menu actions now expose an ordered `actionPath` in addition to localized presentation text.

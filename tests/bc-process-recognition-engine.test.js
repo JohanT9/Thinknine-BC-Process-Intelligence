@@ -80,6 +80,21 @@ assert(purchaseCandidates.every(item => item.taxonomyReferences.domain.id ===
 assert(recognizedPurchase.classification.processEvidence.variantAssessment,
   "Lifecycle variant evidence should be available to downstream process maps.");
 
+const purchaseActionPathRecording = synthetic("purchase-action-path", [
+  { identification: page(50, 38, "purchase-order", "PurchaseOrder") },
+  { label: "Actions" }
+]);
+const purchasePathEvidence = engine.extractEvidence(purchaseActionPathRecording,
+  taxonomySeed, { semanticActions: [{
+    sourceEventIds: [purchaseActionPathRecording.events[1].id],
+    actionPath: ["Actions", "Release"]
+  }] });
+assert.deepStrictEqual(purchasePathEvidence.observations[1].actionPaths,
+  [["Actions", "Release"]]);
+assert(purchasePathEvidence.observations[1].actions.some(item =>
+  item.name === "Release" && item.signal === "semantic-action-path" &&
+  item.strength === 0.7));
+
 const standardPageViews = [
   [9300, "document:sales-quote", "list"],
   [9305, "document:sales-order", "list"],

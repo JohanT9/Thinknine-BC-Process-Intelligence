@@ -114,6 +114,9 @@ const menuResult = pipeline.interpret({
 });
 assert.strictEqual(menuResult.businessTasks.length, 1);
 assert.strictEqual(menuResult.businessTasks[0].taskType, "RunActionPath");
+assert.deepStrictEqual(menuResult.businessTasks[0].actionPath,
+  ["Rad", "Relaterad information",
+    "Till\u00e4mpat f\u00f6rs\u00e4ljningspris och rabatt"]);
 assert.strictEqual(menuResult.businessTasks[0].screenshot,
   "screenshots/menu-discount.png");
 assert.deepStrictEqual(menuResult.businessTasks[0].sourceEventIds,
