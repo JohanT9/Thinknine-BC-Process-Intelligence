@@ -113,9 +113,18 @@ view.render(localizedPurchaseContainer, { result: { bestMatch: {
     "document:purchase-invoice": "Inköpsfaktura", "Post": "Bokför",
     "Unknown step": "Okänt steg" } });
 for (const label of ["Enkel inköpsorder", "Inköpsorder", "Frisläpp",
-  "Inköpsfaktura", "Bokför", "Okänt steg"]) {
+  "Inköpsfaktura", "Bokför"]) {
   assert(localizedPurchaseContainer.innerHTML.includes(label));
 }
+assert(!localizedPurchaseContainer.innerHTML.includes("Okänt steg"),
+  "technical unknown placeholders must not be presented as business steps");
+const filteredUnknownModel = view.normalize({ bestMatch: {
+  referenceProcessId: "unknown-filter", referenceProcess: "Purchase",
+  matchedSteps: [{ name: "Purchase Order" }, { name: "Unknown step" }],
+  missingSteps: [{ name: "Unknown step" }],
+  additionalSteps: [{ name: "Unknown step" }] } });
+assert.deepStrictEqual([filteredUnknownModel.matched.length,
+  filteredUnknownModel.missing.length, filteredUnknownModel.additional.length], [1, 0, 0]);
 
 const empty = view.render(container, { result: {} }, { noMatchTitle: "Ingen säker matchning",
   noMatchText: "Klassificera senare." });
@@ -185,4 +194,5 @@ assert(background.includes("T9SemanticInteractionEngine"));
 assert(background.includes("processStepGroups(grouped.groups)"));
 assert(background.includes("semanticActions,"),
   "the product process-analysis route must pass semantic recorder actions to recognition");
+assert(dashboard.includes('"Purchase Receipt and Invoice": "Inköpsinleverans och faktura"'));
 console.log("Process Analysis view tests passed.");

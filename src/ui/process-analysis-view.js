@@ -12,6 +12,8 @@
   })[character]);
   function stepLabel(step) { return text(step?.title || step?.name || step?.id ||
     step?.referenceProcess || "Unknown step"); }
+  function isUnknownStep(step) { return /^(?:unknown step|okänt steg|unknown)$/iu
+    .test(stepLabel(step).replace(/^\w+:/u, "").replace(/[-_]+/gu, " ").trim()); }
   function localized(value, labels) { return labels.processNames?.[text(value)] || text(value); }
   function actionEvidenceLabel(item, labels) { const name = localized(stepLabel(item), labels);
     const qualifiers = array(item?.qualifiers).map(value =>
@@ -31,8 +33,11 @@
         selected.referenceId, referenceProcess: selected.referenceProcess || selected.name,
         additionalSteps: selected.additionalSteps || selected.unexpectedSteps }; }
     const processMatch = result.processLibraryMatch || null; const matched = array(best?.matchedSteps ||
-      processMatch?.matchedSteps); let missing = array(best?.missingSteps || processMatch?.missingSteps);
-    const additional = array(best?.additionalSteps || processMatch?.unexpectedSteps);
+      processMatch?.matchedSteps).filter(item => !isUnknownStep(item));
+    let missing = array(best?.missingSteps || processMatch?.missingSteps)
+      .filter(item => !isUnknownStep(item));
+    const additional = array(best?.additionalSteps || processMatch?.unexpectedSteps)
+      .filter(item => !isUnknownStep(item));
     const matchConfidence = Math.max(0, Math.min(1,
       Number(best?.confidence || result.confidence || 0)));
     const confidence = decision?.status === "confirmed" ? 1 : matchConfidence;
@@ -185,5 +190,5 @@
     name: selected.dataset.variantName || selected.value } : model.variantAssessment ? {
       id: model.variantAssessment.selectedVariantId,
       name: model.variantAssessment.selectedVariantName } : null; }
-  return { normalize, render, selectedReference, selectedVariant };
+  return { isUnknownStep, normalize, render, selectedReference, selectedVariant };
 });

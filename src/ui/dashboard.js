@@ -3562,6 +3562,7 @@ function processAnalysisLabels() {
         "Source to Pay": "Inköp till betalning", "domain:source-to-pay": "Inköp till betalning",
         "Purchase to Pay": "Inköp till betalning",
         "Simple Purchase Order": "Enkel inköpsorder", "Warehouse Inbound": "Lagerinleverans",
+        "Purchase Receipt and Invoice": "Inköpsinleverans och faktura",
         "Advanced Warehouse Inbound": "Avancerad lagerinleverans",
         "Get Source Documents": "Hämta källdokument",
         "Post Warehouse Receipt": "Bokför lagerinleverans",

@@ -1,5 +1,11 @@
 # Changelog
 
+## 2026-09-08 - Process analysis hides technical unknown placeholders
+
+- `Unknown step`/`Okänt steg` placeholders are removed from matched, missing, customer-specific, and configuration-dependent business-step lists.
+- Placeholder nodes no longer inflate the process-analysis counters shown to users.
+- `Purchase Receipt and Invoice` is now presented as `Inköpsinleverans och faktura` in Swedish alternatives.
+
 ## 2026-09-08 - Product process analysis consumes semantic recording actions
 
 - The extension's real `T9_MATCH_REFERENCE_PROCESS` route now normalizes and groups the Canonical Recording before matching references.
