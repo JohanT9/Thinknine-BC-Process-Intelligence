@@ -1,5 +1,11 @@
 # Changelog
 
+## 2026-09-08 - Recorded list-row choices become usable instructions
+
+- A standalone Business Central list-row selection now becomes the semantic `SelectRecord` action.
+- Review and documentation can display the recorded value as `Välj posten <värde>` instead of passing through an unclassified mechanic.
+- Row choices inside a lookup continue to be consolidated into the surrounding business-field selection.
+
 ## 2026-09-08 - Business Central row selections retain their meaning
 
 - Selecting a list or repeater row is now represented as a distinct `row-interaction` instead of a generic option selection.

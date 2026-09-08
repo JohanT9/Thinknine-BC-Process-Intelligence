@@ -141,8 +141,8 @@ const rowSelection = run([event("rs1", "selection-change", {
 assert.strictEqual(rowSelection.groups[0].groupKind, "row-interaction",
   "a selected Business Central list row must retain its distinct interaction type");
 const rowSemanticInput = semantic.processStepGroups(rowSelection.groups)[0];
-assert.strictEqual(rowSemanticInput.passthrough, true);
-assert.strictEqual(rowSemanticInput.rawInteractions[0].taskType, "Select");
+assert.strictEqual(rowSemanticInput.actionType, "SelectRecord");
+assert.strictEqual(rowSemanticInput.displayText, "V\u00e4lj posten **30043**.");
 
 const toggle = run([event("t1", "toggle-change", {
   controlIdentification: { identity: { value: "Blocked" }, type: "checkbox" },

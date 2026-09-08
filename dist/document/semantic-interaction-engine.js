@@ -5,7 +5,7 @@
   if (typeof module === "object" && module.exports) module.exports = api;
   root.T9SemanticInteractionEngine = api;
 })(typeof globalThis !== "undefined" ? globalThis : this, function (sourceReference) {
-  const ENGINE_VERSION = "1.1.0";
+  const ENGINE_VERSION = "1.2.0";
   const documentCache = new WeakMap();
 
   function clone(value) {
@@ -890,6 +890,11 @@
         Boolean(text(value?.actionCaption)),
       actionType: () => "RunAction",
       display: value => `Välj **${text(value.actionCaption)}**.` }),
+    singleRule({ ruleId: "record-selection", priority: 52,
+      match: value => value?.taskType === "Select" &&
+        Boolean(meaningfulValue(value)),
+      actionType: () => "SelectRecord",
+      display: (_value, selected) => `Välj posten **${selected}**.` }),
     singleRule({ ruleId: "option-selection", priority: 50,
       match: value => /selectoption|option|dropdown|combobox/iu
         .test(text(value?.taskType)),

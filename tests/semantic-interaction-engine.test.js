@@ -368,6 +368,8 @@ only([{ taskId: "date", taskType: "ChangeField", fieldCaption: "Bokföringsdatum
 "Ange __2026-08-06__ i **Bokföringsdatum**.");
 only([{ taskId: "option", taskType: "SelectOption", fieldCaption: "Status",
   value: "Öppen" }], "SelectOption", "Välj **Öppen** i **Status**.");
+only([{ taskId: "record", taskType: "Select", selectedCaption: "30043" }],
+  "SelectRecord", "Välj posten **30043**.");
 only([{ taskId: "enable", taskType: "Checkbox", fieldCaption: "Spärrad",
   value: true }], "EnableCheckbox", "Aktivera **Spärrad**.");
 only([{ taskId: "disable", taskType: "Checkbox", fieldCaption: "Spärrad",
