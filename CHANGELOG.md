@@ -1,5 +1,12 @@
 # Changelog
 
+## 2026-09-08 - Bug reproduction steps can be corrected in place
+
+- A collapsed editor in the bug report now lets users correct generated reproduction wording.
+- Irrelevant reproduction steps can be removed from the report without opening Review.
+- Manual corrections are stored as overrides while original recording references and captured evidence remain intact.
+- Changes participate in the existing undo, redo, autosave, export, and issue-sharing flows.
+
 ## 2026-09-08 - Report sharing shows only relevant choices
 
 - The sharing dialog now shows Azure DevOps settings only when Azure DevOps is selected.

@@ -134,7 +134,7 @@ const copied = [];
 const rendered = view.render(container, controller.state(), {
   onCopy: value => copied.push(value), mediaAssets: {
     "asset-error": { source: "data:image/png;base64,AA==" }
-  }
+  }, onEditReproductionStep: () => {}
 }, fakeDocument);
 assert.strictEqual(rendered.sectionCount, generator.SECTION_ORDER.length);
 assert.strictEqual(container.attributes["aria-label"],
@@ -155,6 +155,7 @@ assert(allElements(moreFields).some(item =>
 assert(allElements(moreFields).some(item =>
   item.id === "technical-report-actualResult"));
 assert(allElements(container).some(item => item.className === "failure-point"));
+assert(allElements(container).some(item => item.className === "reproduction-editor"));
 assert(allElements(container).some(item => item.textContent ===
   " — Error occurred here"));
 assert.strictEqual(allElements(container).filter(item =>
@@ -183,6 +184,18 @@ assert(fs.readFileSync("src/recorder/background.js", "utf8")
   .includes("T9_OPEN_TECHNICAL_REPORT"));
 
 (async () => {
+  const stepId = controller.state().report.reproduction.steps[0].reproductionStepId;
+  controller.updateReproductionStep(stepId, { instruction: "Open the corrected page." });
+  assert.strictEqual(controller.state().document.sections.find(section =>
+    section.kind === "reproduction").content[0].instruction,
+  "Open the corrected page.");
+  assert.strictEqual(controller.state().report.reproduction.steps[0]
+    .source.sourceCanonicalEventIds[0], "event-1");
+  controller.updateReproductionStep(stepId, { visibility: "hidden" });
+  assert(!controller.state().document.sections.find(section =>
+    section.kind === "reproduction").content.some(step =>
+    step.reproductionStepId === stepId));
+  controller.undo();
   await controller.save();
   assert.strictEqual(memory.saved.summary.title, "Edited title");
   assert.strictEqual(controller.state().saveState, "saved");

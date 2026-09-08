@@ -555,6 +555,8 @@
     ,["Felbild", "Error screenshot"], ["Reproduktionsbild", "Reproduction screenshot"]
     ,["Fler skärmbilder", "Additional screenshots"]
     ,["Behöver åtgärdas", "Needs attention"]
+    ,["Redigera steg för att återskapa", "Edit reproduction steps"]
+    ,["Ta bort från rapporten", "Remove from report"]
     ,["Anslutning till BC", "BC connection"], ["Aktiv session", "Active session"]
     ,["Händelser", "Events"], ["Eventtyper", "Event types"]
     ,["Kategorier", "Categories"], ["Senaste event", "Latest event"]

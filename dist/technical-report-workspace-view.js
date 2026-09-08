@@ -101,6 +101,28 @@
           }
           list.appendChild(item);
         }); node.appendChild(list);
+        if (section.content.length && options.onEditReproductionStep) {
+          const editor = doc.createElement("details");
+          editor.className = "reproduction-editor";
+          editor.appendChild(element(doc, "summary",
+            ui("Edit reproduction steps", locale)));
+          section.content.forEach(step => {
+            const row = doc.createElement("div"); row.className = "reproduction-editor-row";
+            const label = element(doc, "label",
+              `${ui("Step", locale)} ${step.number}`);
+            const input = doc.createElement("input");
+            input.value = step.instruction;
+            input.setAttribute("aria-label", `${ui("Step", locale)} ${step.number}`);
+            input.addEventListener("change", () => options.onEditReproductionStep(
+              step.reproductionStepId, { instruction: input.value }));
+            const remove = element(doc, "button", ui("Remove from report", locale));
+            remove.type = "button";
+            remove.addEventListener("click", () => options.onEditReproductionStep(
+              step.reproductionStepId, { visibility: "hidden" }));
+            label.appendChild(input); row.append(label, remove); editor.appendChild(row);
+          });
+          node.appendChild(editor);
+        }
       } else if (section.kind === "actual-result") {
         section.content.capturedErrors.forEach(error => {
           const block = element(doc, "blockquote", error.rawMessage);

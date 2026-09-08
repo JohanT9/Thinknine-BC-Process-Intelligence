@@ -10,4 +10,4 @@ Existing domain suites continue to cover validation/runtime errors, multiple evi
 
 No live Business Central browser session is available in the automated workspace, so real click counts, error-dialog capture, React/control-add-in capture, and visual long-report behavior were not claimed as manually verified. Pilot verification should cover standard BC errors, a silent problem, an Aptean/control-add-in flow, local-only use, Issue Preview, keyboard navigation, narrow viewports, and long reports.
 
-The largest remaining usability limitation is that full reproduction-step editing remains in Review rather than being embedded in the Technical Report Workspace.
+The Technical Report Workspace now supports the two common reproduction corrections directly: wording changes and removing an irrelevant step from the report. Advanced merge, split, and screenshot replacement remain in Review by design.

@@ -128,6 +128,28 @@
     return normalize(result);
   }
 
+  function updateReproductionStep(report, reproductionStepId, patch = {}, updatedAt) {
+    const result = normalize(report);
+    const id = String(reproductionStepId || "");
+    const index = result.reproduction.steps.findIndex(step =>
+      step.reproductionStepId === id);
+    if (index < 0) throw new TypeError("Reproduction step was not found.");
+    const current = result.reproduction.steps[index];
+    const fields = { ...(current.stepOverride?.fields || {}) };
+    if (Object.prototype.hasOwnProperty.call(patch, "instruction")) {
+      const instruction = text(patch.instruction).trim();
+      if (!instruction) throw new TypeError("Reproduction step text is required.");
+      fields.instruction = instruction;
+    }
+    result.reproduction.steps[index] = { ...current,
+      visibility: patch.visibility === "hidden" || patch.visibility === "visible"
+        ? patch.visibility : current.visibility,
+      stepOverride: { ...(current.stepOverride || {}), fields,
+        authorship: "human", updatedAt: updatedAt || current.stepOverride?.updatedAt } };
+    result.updatedAt = updatedAt || result.updatedAt;
+    return normalize(result);
+  }
+
   function attachTelemetry(report, errorEvidenceId, enrichment, updatedAt) {
     const result = normalize(report);
     const current = result.enrichment.telemetry?.byErrorEvidenceId || {};
@@ -161,5 +183,5 @@
 
   return { CATEGORIES, SCHEMA_VERSION, STATUSES, normalize, normalizeStep,
     attachAiAnalysis, attachExternalIssue, attachTelemetry, removeAiAnalysis, selectPrimaryError,
-    updateHumanContent };
+    updateHumanContent, updateReproductionStep };
 });

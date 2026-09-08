@@ -152,6 +152,8 @@
           else workspace.edit({ [name]: value });
         },
         onSelectPrimaryError: id => workspace.selectPrimaryError(id)
+        ,onEditReproductionStep: (id, patch) =>
+          workspace.updateReproductionStep(id, patch)
       });
     let autosaveTimer = null;
     const renderAndAutosave = state => {
