@@ -256,9 +256,14 @@
           "Warning: this report already has an external issue reference." : "Package is current.";
     }
     function updateShareUi() {
-      const external = Boolean(document.getElementById("issueProvider").value);
+      const provider = document.getElementById("issueProvider").value;
+      const external = Boolean(provider);
       document.getElementById("issueConsentRow").hidden = !external;
       document.getElementById("issueDuplicateRow").hidden = !external;
+      document.getElementById("adoConfiguration").hidden =
+        provider !== "azure-devops";
+      document.getElementById("githubConfiguration").hidden =
+        provider !== "github";
       document.getElementById("shareReport").textContent = external
         ? globalThis.T9UiI18n.translateStaticText("Create Issue", currentUiLocale)
         : globalThis.T9UiI18n.translateStaticText("Download report package",

@@ -8,6 +8,6 @@ Stopping finalizes the canonical recording, creates a local Bug Report draft wit
 
 The workspace prioritizes editable human context, reproduction, expected result, actual-result context, captured errors, and screenshots. Exact BC error text is visible and copyable. The captured error screenshot is shown first and supporting screenshots are collapsed. Environment, diagnostics, structured/raw AL call stack, objects, telemetry, AI analysis, timeline, and traceability are progressively disclosed under **Technical details**. A readiness message is shown only when required information is missing.
 
-Telemetry, AI analysis, and issue destinations are optional and user-triggered. A useful Markdown/offline report can be created locally. External transmission always requires an explicit preview, destination, consent, and create action.
+Telemetry, AI analysis, and issue destinations are optional and user-triggered. A useful Markdown/offline report can be created locally. The sharing dialog shows configuration only for the selected destination; raw issue text remains under the optional content preview. External transmission always requires an explicit preview, destination, consent, and create action.
 
 Known limitation: reproduction steps are generated from the existing interpretation pipeline, but the full Review editor's merge/split/screenshot-change controls are not embedded in this workspace yet.

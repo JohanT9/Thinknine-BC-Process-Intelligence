@@ -1,5 +1,12 @@
 # Changelog
 
+## 2026-09-08 - Report sharing shows only relevant choices
+
+- The sharing dialog now shows Azure DevOps settings only when Azure DevOps is selected.
+- GitHub settings appear only for GitHub, while offline sharing hides both provider configurations.
+- `Copy Issue Description` now lives inside the optional report-content preview instead of competing with the primary sharing action.
+- The primary download or create action remains visible and adapts to the selected destination.
+
 ## 2026-09-08 - Complete bug reports stay focused
 
 - A complete bug report no longer ends with a redundant `Ready to share` card.

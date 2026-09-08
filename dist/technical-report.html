@@ -16,7 +16,7 @@
     dialog{width:min(960px,90vw);max-height:90vh;overflow:auto;border:1px solid #8392a5;border-radius:8px}
     dialog pre{max-height:320px;overflow:auto;background:#f5f7fa;padding:12px}
     input[type=checkbox]{width:auto}select{padding:8px}
-    .primary-actions{display:flex;gap:8px;align-items:center}.primary-actions button{margin:0}
+    .primary-actions,.share-actions{display:flex;gap:8px;align-items:center}.primary-actions button,.share-actions button{margin:0}
     .primary-actions #openIssuePreview,#shareReport{background:#008c95;color:white;border:1px solid #007078;border-radius:4px}
     .report-options{margin-top:10px;max-width:760px}.report-options>summary{cursor:pointer;font-weight:600}
     .report-options>details{margin:12px 0;padding:12px;border:1px solid #ccd5df;border-radius:6px}
@@ -90,7 +90,7 @@
     <details class="share-options"><summary>Content and settings</summary>
       <label><input id="issueIncludeTelemetry" type="checkbox"> Include telemetry summary</label>
       <label><input id="issueIncludeAi" type="checkbox"> Include current AI-assisted analysis</label>
-    <details><summary>Azure DevOps configuration</summary>
+    <details id="adoConfiguration"><summary>Azure DevOps configuration</summary>
       <label><input id="adoEnabled" type="checkbox"> Enabled</label>
       <label>Organization <input id="adoOrganization" autocomplete="off"></label>
       <label>Project <input id="adoProject" autocomplete="off"></label>
@@ -103,7 +103,7 @@
       <label>Entra scope <input id="adoScope" value="499b84ac-1321-427f-aa17-267ca6975798/.default" autocomplete="off"></label>
       <button id="testAdoConnection" type="button">Test Azure DevOps connection</button>
     </details>
-    <details><summary>GitHub configuration</summary>
+    <details id="githubConfiguration"><summary>GitHub configuration</summary>
       <label><input id="githubEnabled" type="checkbox"> Enabled</label>
       <label>Repository (owner/name) <input id="githubRepository" autocomplete="off"></label>
       <label>Labels, comma separated <input id="githubLabels" autocomplete="off"></label>
@@ -120,12 +120,14 @@
       <h3>Title</h3><p id="issueTitle"></p>
       <h3>Description</h3><pre id="issueDescription"></pre>
       <h3>Attachments</h3><ul id="issueAttachments"></ul>
+      <button id="copyIssueDescription" type="button">Copy Issue Description</button>
     </details>
     <label id="issueConsentRow" hidden><input id="issueConsent" type="checkbox"> I reviewed the destination,
       description, attachments, telemetry/AI choices, and sensitive-data warning</label>
     <label id="issueDuplicateRow" hidden><input id="issueConfirmDuplicate" type="checkbox"> Create another issue even if this report already has an external reference</label>
-    <button id="copyIssueDescription" type="button">Copy Issue Description</button>
-    <button id="shareReport" type="button">Download report package</button>
+    <div class="share-actions">
+      <button id="shareReport" type="button">Download report package</button>
+    </div>
     <p id="issueResult" role="status"></p>
   </dialog>
   <script src="engine/language-registry.js"></script>
