@@ -154,6 +154,18 @@ assert(fs.readFileSync("src/recorder/background.js", "utf8")
   await controller.save();
   assert.strictEqual(memory.saved.summary.title, "Edited title");
   assert.strictEqual(controller.state().saveState, "saved");
+  let releaseSave;
+  const concurrent = workspace.create({ report, errorEvidence: evidence,
+    store: { save(snapshot) { return new Promise(resolve => {
+      releaseSave = () => resolve(snapshot);
+    }); } } });
+  concurrent.edit({ summary: { title: "First edit" } });
+  const pendingSave = concurrent.save();
+  concurrent.edit({ summary: { title: "Newer edit" } });
+  releaseSave(); await pendingSave;
+  assert.strictEqual(concurrent.state().report.summary.title, "Newer edit",
+    "a completed autosave must not overwrite a newer edit");
+  assert.strictEqual(concurrent.state().saveState, "unsaved");
   assert((await controller.exportMarkdown()).includes("Edited title"));
   const source = ["bug-report-generator.js", "bug-report-text-export.js",
     "bug-report-completeness.js"].map(file => fs.readFileSync(

@@ -32,7 +32,10 @@
     container.replaceChildren();
     container.setAttribute("aria-label", `Technical Bug Report: ${report.title}`);
     container.appendChild(element(doc, "h1", report.title));
-    const status = element(doc, "p", workspaceState.saveState, "save-state");
+    const saveLabels = { saved: "Saved automatically", saving: "Saving…",
+      unsaved: "Changes waiting to be saved", failed: "Could not save changes" };
+    const status = element(doc, "p", ui(saveLabels[workspaceState.saveState] ||
+      workspaceState.saveState, locale), `save-state save-state-${workspaceState.saveState}`);
     status.setAttribute("role", "status"); container.appendChild(status);
     const editor = doc.createElement("fieldset");
     editor.className = "report-core-fields";

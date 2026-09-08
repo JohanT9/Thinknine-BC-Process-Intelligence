@@ -153,7 +153,16 @@
         },
         onSelectPrimaryError: id => workspace.selectPrimaryError(id)
       });
-    workspace.subscribe(render); render(workspace.state());
+    let autosaveTimer = null;
+    const renderAndAutosave = state => {
+      render(state);
+      if (state.saveState !== "unsaved") return;
+      clearTimeout(autosaveTimer);
+      autosaveTimer = setTimeout(() => workspace.save().catch(error => {
+        message.textContent = error.message;
+      }), 600);
+    };
+    workspace.subscribe(renderAndAutosave); renderAndAutosave(workspace.state());
     if (query.get("new") === "1") {
       const title = document.getElementById("technical-report-title");
       const expected = document.getElementById("technical-report-expectedResult");
@@ -161,10 +170,9 @@
         (!expected?.value.trim() ? expected : null);
       firstMissing?.focus();
     }
-    document.getElementById("saveReport").addEventListener("click", () =>
-      workspace.save().catch(error => { message.textContent = error.message; }));
-    document.getElementById("closeReport").addEventListener("click", () =>
-      window.close());
+    document.getElementById("closeReport").addEventListener("click", action(async () => {
+      clearTimeout(autosaveTimer); await workspace.flush(); window.close();
+    }));
     document.getElementById("undoReport").addEventListener("click", workspace.undo);
     document.getElementById("redoReport").addEventListener("click", workspace.redo);
     document.getElementById("copyMarkdown").addEventListener("click", async () => {

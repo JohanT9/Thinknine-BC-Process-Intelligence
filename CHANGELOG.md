@@ -1,5 +1,12 @@
 # Changelog
 
+## 2026-09-08 - Bug reports save automatically
+
+- Human report edits, undo, and redo now trigger a short delayed autosave, removing the separate `Save` decision from the primary workflow.
+- Closing or sharing a report flushes outstanding edits before continuing.
+- The report shows a localized, unobtrusive save status instead of a save button.
+- Revision-aware persistence prevents a slower save from overwriting edits made while that save was in progress.
+
 ## 2026-09-08 - Simplified bug reporting has end-to-end regression coverage
 
 - A permanent product test now runs representative Business Central validation-error and AL runtime-error recordings through evidence normalization, report generation, failure-point association, technical parsing, and issue-package export.

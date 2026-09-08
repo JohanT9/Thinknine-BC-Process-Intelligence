@@ -19,6 +19,7 @@
     const evidence = clone(options.errorEvidence || []);
     let saveState = "saved";
     let savePromise = Promise.resolve(report);
+    let revision = 0;
     const history = [clone(report)];
     let historyIndex = 0;
     const listeners = new Set();
@@ -28,6 +29,7 @@
       history.splice(historyIndex + 1);
       history.push(clone(report));
       historyIndex = history.length - 1;
+      revision += 1;
       saveState = "unsaved";
       notify();
       return report;
@@ -42,17 +44,24 @@
       selectPrimaryError(id, now) {
         return commit(model.selectPrimaryError(report, id, now));
       },
-      undo() { if (historyIndex > 0) { historyIndex -= 1;
+      undo() { if (historyIndex > 0) { historyIndex -= 1; revision += 1;
         report = model.normalize(history[historyIndex]); saveState = "unsaved";
         notify(); } return report; },
-      redo() { if (historyIndex < history.length - 1) { historyIndex += 1;
+      redo() { if (historyIndex < history.length - 1) { historyIndex += 1; revision += 1;
         report = model.normalize(history[historyIndex]); saveState = "unsaved";
         notify(); } return report; },
-      save() { saveState = "saving"; notify(); savePromise = options.store.save(report)
-        .then(saved => { report = model.normalize(saved); saveState = "saved";
+      save() {
+        if (saveState === "saving") return savePromise.then(() => api.flush());
+        const savingRevision = revision;
+        const snapshot = clone(report);
+        saveState = "saving"; notify(); savePromise = options.store.save(snapshot)
+        .then(saved => { if (revision === savingRevision) {
+          report = model.normalize(saved); saveState = "saved";
+        } else saveState = "unsaved";
           notify(); return report; })
         .catch(error => { saveState = "failed"; notify(); throw error; });
-      return savePromise; },
+        return savePromise;
+      },
       async flush() { if (saveState === "unsaved" || saveState === "failed") {
         await api.save();
       } else await savePromise; return report; },
