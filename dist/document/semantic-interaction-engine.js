@@ -5,7 +5,7 @@
   if (typeof module === "object" && module.exports) module.exports = api;
   root.T9SemanticInteractionEngine = api;
 })(typeof globalThis !== "undefined" ? globalThis : this, function (sourceReference) {
-  const ENGINE_VERSION = "1.0.0";
+  const ENGINE_VERSION = "1.1.0";
   const documentCache = new WeakMap();
 
   function clone(value) {
@@ -202,6 +202,8 @@
       actionId: stableId(rule.ruleId, values),
       actionType: properties.actionType,
       displayText: properties.displayText,
+      ...(Array.isArray(properties.actionPath)
+        ? { actionPath: clone(properties.actionPath) } : {}),
       ...(properties.hidden ? { hidden: true } : {}),
       selectedValue: properties.selectedValue || "",
       targetField: properties.targetField || "",
@@ -531,6 +533,8 @@
           actionType: "RunActionPath",
           displayText: "Välj **Rad** → **Relaterad information** → " +
             "**Tillämpat försäljningspris och rabatt**.",
+          actionPath: ["Rad", "Relaterad information",
+            "Tillämpat försäljningspris och rabatt"],
           selectedValue: caption(values.at(-1))
         }) };
       }
@@ -581,6 +585,7 @@
         return { consumed: values.length, action: action(rule, values, {
           actionType: "RunActionPath",
           displayText: "Välj **Åtgärder** → **Funktion** → **Manuellt pris**.",
+          actionPath: ["Åtgärder", "Funktion", "Manuellt pris"],
           selectedValue: caption(values.at(-1)),
           preferredSourceEventId: menuEvidence?.sourceEventIds?.at(-1),
           preferredScreenshotRef: preferredScreenshots.at(-1)
@@ -626,6 +631,8 @@
           actionType: "RunActionPath",
           displayText: "Välj **Rad** → **Tillämpat inköpspris och rabatt** → " +
             "**Manuellt pris**.",
+          actionPath: ["Rad", "Tillämpat inköpspris och rabatt",
+            "Manuellt pris"],
           selectedValue: caption(values.at(-1)),
           preferredSourceEventId: values.at(-1)?.sourceEventIds?.at(-1),
           preferredScreenshotRef
@@ -734,6 +741,7 @@
         return { consumed: 1, action: action(rule, [value], {
           actionType: "RunActionPath",
           displayText: `V\u00e4lj ${path.map(item => `**${item}**`).join(" \u2192 ")}.`,
+          actionPath: path,
           selectedValue: leaf
         }) };
       }
@@ -791,6 +799,7 @@
         return { consumed: values.length, action: action(rule, values, {
           actionType: "RunActionPath",
           displayText: `V\u00e4lj ${captions.map(value => `**${value}**`).join(" \u2192 ")}.`,
+          actionPath: captions,
           selectedValue: captions.at(-1),
           preferredSourceEventId: values.at(-1)?.sourceEventIds?.at(-1),
           preferredScreenshotRef: menuScreenshots.at(-1)

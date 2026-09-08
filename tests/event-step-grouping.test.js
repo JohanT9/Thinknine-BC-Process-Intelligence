@@ -188,6 +188,7 @@ const technicalMenuAction = semantic.processStepGroups(
 assert.strictEqual(technicalMenuAction.actionType, "RunActionPath");
 assert.strictEqual(technicalMenuAction.displayText,
   "V\u00e4lj **Posting** \u2192 **Post**.");
+assert.deepStrictEqual(technicalMenuAction.actionPath, ["Posting", "Post"]);
 
 const repeatedIntentionalActivation = run([
   event("ra1", "activation", { timestamp: "2026-08-10T10:00:00.000Z",

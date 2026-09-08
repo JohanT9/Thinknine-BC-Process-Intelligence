@@ -141,6 +141,9 @@ const menuPath = only([{
   "**Tillämpat försäljningspris och rabatt**.");
 assert.deepStrictEqual(menuPath.sourceEventIds,
   ["event-row", "event-related", "event-discount"]);
+assert.deepStrictEqual(menuPath.actionPath,
+  ["Rad", "Relaterad information",
+    "Tillämpat försäljningspris och rabatt"]);
 assert.strictEqual(menuPath.screenshotRefs.at(-1), "discount.png");
 assert.strictEqual(menuPath.inputInteractionCount, 3);
 const purchaseManualPriceResult = engine.processInteractions([{
@@ -186,6 +189,8 @@ const manualPricePath = only([{
 assert.strictEqual(manualPricePath.preferredSourceEventId, "event-function");
 assert.strictEqual(manualPricePath.preferredScreenshotRef,
   "manual-price-visible.png");
+assert.deepStrictEqual(manualPricePath.actionPath,
+  ["Åtgärder", "Funktion", "Manuellt pris"]);
 assert.strictEqual(engine.consolidateInteractions(
   manualPricePath.rawInteractions)[0].screenshot, "manual-price-visible.png");
 const manualPriceWithoutFunctionCapture = only([{
@@ -264,6 +269,8 @@ assert.deepStrictEqual(genericMenuPath.sourceEventIds,
   ["event-actions-post", "event-posting"]);
 assert.strictEqual(genericMenuPath.preferredScreenshotRef, "post-menu.png");
 assert.strictEqual(genericMenuPath.preferredSourceEventId, "event-posting");
+assert.deepStrictEqual(genericMenuPath.actionPath,
+  ["Åtgärder", "Bokföring"]);
 const ordinaryActionsRemainSeparate = engine.processInteractions([{
   taskType: "RunAction", actionCaption: "Redigera"
 }, { taskType: "RunAction", actionCaption: "Ta bort" }]);

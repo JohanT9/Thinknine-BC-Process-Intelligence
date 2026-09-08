@@ -1,5 +1,11 @@
 # Changelog
 
+## 2026-09-08 - Structured semantic action paths
+
+- Semantic menu actions now expose an ordered `actionPath` in addition to localized presentation text.
+- Process recognition, documentation, and diagram layers can consume authoritative menu segments without parsing Markdown instructions.
+- Existing specialized, technical-hierarchy, and generic menu consolidations all emit the same reusable structure.
+
 ## 2026-09-08 - Technical Business Central action hierarchy
 
 - Recorder UI ancestry now flows through normalization and step grouping into semantic interpretation.
