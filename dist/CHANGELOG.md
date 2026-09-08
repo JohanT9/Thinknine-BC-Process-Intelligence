@@ -1,5 +1,11 @@
 # Changelog
 
+## 2026-09-08 - Simplified bug reporting has end-to-end regression coverage
+
+- A permanent product test now runs representative Business Central validation-error and AL runtime-error recordings through evidence normalization, report generation, failure-point association, technical parsing, and issue-package export.
+- The validation flow verifies that a captured BC error is sufficient for the actual result and that the expected result remains the only required human outcome description.
+- The AL flow verifies that captured diagnostics and call-stack frames survive into the shareable package without changing the recorded reproduction steps.
+
 ## 2026-09-08 - Bug reports use one sharing flow
 
 - The report workspace now has one primary `Share report` action instead of separate create, copy, and export paths.
