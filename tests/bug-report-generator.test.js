@@ -29,7 +29,8 @@ const report = model.normalize({ schemaVersion: 1, bugReportId: "bug-report:1",
   environment: { businessCentral: { environment: "Sandbox" },
     browser: { name: "Edge", version: "test" }, productVersion: "4.6.0" },
   reproduction: { steps: [{ reproductionStepId: "step-1", order: 1,
-    instruction: "Select Post.", stepOverride: { fields: {
+    instruction: "Select Post.", failurePoint: true, outcome: "error",
+    stepOverride: { fields: {
       instruction: "Select Post and wait." } }, source: { recordingId: "recording-1",
       sourceCanonicalEventIds: ["event-1"], sourceStepId: "task-1",
       screenshotAssetIds: ["asset-step"] } }] },
@@ -141,6 +142,9 @@ assert.strictEqual(container.attributes["aria-label"],
 const allElements = node => [node, ...node.children.flatMap(allElements)];
 assert(allElements(container).some(item => item.tagName === "details"));
 assert(allElements(container).some(item => item.tagName === "table"));
+assert(allElements(container).some(item => item.className === "failure-point"));
+assert(allElements(container).some(item => item.textContent ===
+  " — Error occurred here"));
 assert(!fs.readFileSync("src/ui/technical-report-workspace-view.js", "utf8")
   .includes("innerHTML"));
 assert(fs.readFileSync("src/recorder/background.js", "utf8")

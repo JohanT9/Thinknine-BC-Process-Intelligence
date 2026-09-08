@@ -1,5 +1,12 @@
 # Changelog
 
+## 2026-09-08 - Bug reports identify the failing step automatically
+
+- A captured Business Central error now marks the exact preceding recorded action as the failure point when their canonical event references match.
+- The report highlights that reproduction step instead of asking the user to identify it again.
+- Captured errors remain visible as the actual outcome, while duplicate summary, expected-result, note, and error sections are removed from the default presentation.
+- When a Business Central error was captured, the optional actual-result field asks only for additional context not already present in the error.
+
 ## 2026-09-08 - Bug reporting starts with a simpler report
 
 - The default bug-report view now focuses on saving, creating an issue, and closing the report.

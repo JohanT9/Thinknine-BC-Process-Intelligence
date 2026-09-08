@@ -42,12 +42,19 @@ assert.deepStrictEqual(report.traceability.canonicalEventIds,
 assert.deepStrictEqual(report.traceability.screenshotAssetIds,
   [bugSource.assets[0].id]);
 assert.strictEqual(report.reproduction.steps[0].authorship, "derived");
+assert.strictEqual(report.reproduction.steps[0].failurePoint, undefined);
 assert.strictEqual(report.expectedResult.authorship, "human");
 assert.strictEqual(report.environment.authorship, "captured");
 assert.strictEqual(report.diagnostics.parsedAuthorship, "derived");
 assert.strictEqual(report.evidence.authorship, "captured");
 assert.strictEqual(report.businessCentralError, null);
 assert.strictEqual(report.callStack.parsed, false);
+const linkedFailure = service.createBugReportFromRecording(bugSource, steps, {
+  now: NOW, errorEvidence: [{ errorEvidenceId: "error-linked",
+    recordingId: bugSource.id, capturedAt: NOW,
+    precedingActionEventId: bugSource.events[0].id }] });
+assert.strictEqual(linkedFailure.reproduction.steps[0].failurePoint, true);
+assert.strictEqual(linkedFailure.reproduction.steps[0].outcome, "error");
 assert.throws(() => service.createBugReportFromRecording(documentation, []),
   /bug-report recording/u);
 assert.throws(() => model.normalize({ schemaVersion: 1 }),

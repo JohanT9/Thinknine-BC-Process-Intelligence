@@ -55,7 +55,7 @@
       throw new Error("Bug Reports require a completed recording.");
     }
     const now = context.now || recording.updatedAt || new Date().toISOString();
-    const steps = derivedSteps.map((step, index) =>
+    let steps = derivedSteps.map((step, index) =>
       reproductionStep(step, index, recording.id));
     const canonicalEventIds = unique(steps.flatMap(step =>
       step.source.sourceCanonicalEventIds));
@@ -63,6 +63,11 @@
       step.source.screenshotAssetIds));
     const errorEvidence = Array.isArray(context.errorEvidence)
       ? context.errorEvidence : [];
+    const failureEventIds = new Set(errorEvidence.map(item =>
+      String(item.precedingActionEventId || "")).filter(Boolean));
+    steps = steps.map(step => step.source.sourceCanonicalEventIds.some(id =>
+      failureEventIds.has(id)) ? { ...step, outcome: "error", failurePoint: true }
+      : step);
     const errorEvidenceIds = unique(errorEvidence.map(item =>
       item.errorEvidenceId));
     const errorScreenshotIds = unique(errorEvidence.map(item =>

@@ -43,7 +43,9 @@
       value: workspaceState.report.summary.summary },
     { name: "expectedResult", label: "What did you expect?",
       value: workspaceState.report.expectedResult.text, multiline: true },
-    { name: "actualResult", label: "What happened instead?",
+    { name: "actualResult", label: (workspaceState.report.businessCentralError
+      ?.errorEvidenceIds || []).length
+      ? "Anything else that happened? (optional)" : "What happened instead?",
       value: workspaceState.report.actualResult.human.text, multiline: true }];
     const additionalFields = [{ name: "severity", label: "Severity",
       value: workspaceState.report.summary.severity },
@@ -72,7 +74,9 @@
     technicalDetails.appendChild(element(doc, "p",
       "Diagnostics, AL call stack, referenced objects, telemetry, AI analysis and traceability."));
     const advancedKinds = new Set(["metadata", "diagnostics", "call-stack",
-      "objects", "telemetry", "timeline", "ai-analysis", "traceability"]);
+      "objects", "telemetry", "timeline", "ai-analysis", "traceability",
+      "errors"]);
+    const editorDuplicateKinds = new Set(["summary", "text", "notes"]);
     let technicalSectionCount = 0;
     for (const section of report.sections) {
       const node = doc.createElement("section");
@@ -82,11 +86,16 @@
         section.content || "Incomplete"));
       else if (section.kind === "reproduction") {
         const list = doc.createElement("ol");
-        section.content.forEach(step => list.appendChild(element(doc, "li",
-          step.instruction))); node.appendChild(list);
+        section.content.forEach(step => {
+          const item = element(doc, "li", step.instruction);
+          if (step.failurePoint) {
+            item.className = "failure-point";
+            item.appendChild(element(doc, "strong",
+              ` — ${ui("Error occurred here", locale)}`, "failure-point-label"));
+          }
+          list.appendChild(item);
+        }); node.appendChild(list);
       } else if (section.kind === "actual-result") {
-        if (section.content.userDescription) node.appendChild(element(doc, "p",
-          section.content.userDescription));
         section.content.capturedErrors.forEach(error => {
           const block = element(doc, "blockquote", error.rawMessage);
           block.setAttribute("aria-label", ui("Captured Business Central error", locale));
@@ -213,6 +222,7 @@
           addItems("Warnings and limitations", analysis.warnings || []);
         }
       }
+      if (editorDuplicateKinds.has(section.kind)) continue;
       if (advancedKinds.has(section.kind)) {
         technicalDetails.appendChild(node); technicalSectionCount += 1;
       } else container.appendChild(node);

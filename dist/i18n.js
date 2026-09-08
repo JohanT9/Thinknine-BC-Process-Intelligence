@@ -519,6 +519,8 @@
     ,["Vad hände?", "What happened?"]
     ,["Vad förväntade du dig?", "What did you expect?"]
     ,["Vad hände i stället?", "What happened instead?"]
+    ,["Något mer som hände? (valfritt)", "Anything else that happened? (optional)"]
+    ,["Felet uppstod här", "Error occurred here"]
     ,["Mer rapportinformation", "More report information"]
     ,["Fler alternativ", "More options"]
     ,["Sammanfattning", "Summary"], ["Allvarlighetsgrad", "Severity"]
