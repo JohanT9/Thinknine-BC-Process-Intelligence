@@ -140,8 +140,13 @@
         source: session.screenshots[event.raw.eventNo]
       };
     });
-    const render = state => globalThis.T9TechnicalReportWorkspaceView.render(
-      container, state, { mediaAssets, locale: currentUiLocale,
+    const persistentDisclosures = [".report-more-fields", ".reproduction-editor",
+      ".technical-details", ".additional-evidence"];
+    const render = state => {
+      const openDisclosures = persistentDisclosures.filter(selector =>
+        container.querySelector(selector)?.open);
+      const result = globalThis.T9TechnicalReportWorkspaceView.render(
+        container, state, { mediaAssets, locale: currentUiLocale,
         onCopy: value => navigator.clipboard.writeText(value),
         onEdit(name, value) {
           if (["title", "summary", "severity", "category"].includes(name)) {
@@ -154,7 +159,13 @@
         onSelectPrimaryError: id => workspace.selectPrimaryError(id)
         ,onEditReproductionStep: (id, patch) =>
           workspace.updateReproductionStep(id, patch)
+        });
+      openDisclosures.forEach(selector => {
+        const disclosure = container.querySelector(selector);
+        if (disclosure) disclosure.open = true;
       });
+      return result;
+    };
     let autosaveTimer = null;
     const renderAndAutosave = state => {
       render(state);

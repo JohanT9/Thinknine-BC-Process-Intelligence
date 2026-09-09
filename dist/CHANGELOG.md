@@ -1,5 +1,11 @@
 # Changelog
 
+## 2026-09-09 - Bug-report panels stay open while editing
+
+- Open reproduction, additional-information, screenshot, and technical-detail panels now remain open when the report re-renders.
+- Editing a step or triggering autosave no longer collapses the panel the user is working in.
+- Disclosure state remains local UI state and does not alter the report or exported content.
+
 ## 2026-09-09 - Reproduction-step removal is reversible
 
 - The inline reproduction editor now lists every captured step, including steps excluded from the report.
