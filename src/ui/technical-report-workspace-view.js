@@ -104,6 +104,8 @@
         }); node.appendChild(list);
         const editableSteps = (workspaceState.report.reproduction?.steps || [])
           .map((step, index) => ({ ...step, number: index + 1,
+            hasInstructionOverride: Object.prototype.hasOwnProperty.call(
+              step.stepOverride?.fields || {}, "instruction"),
             instruction: Object.prototype.hasOwnProperty.call(
               step.stepOverride?.fields || {}, "instruction")
               ? step.stepOverride.fields.instruction : step.instruction,
@@ -122,6 +124,9 @@
             input.setAttribute("aria-label", `${ui("Step", locale)} ${step.number}`);
             input.addEventListener("change", () => options.onEditReproductionStep(
               step.reproductionStepId, { instruction: input.value }));
+            input.addEventListener("keydown", event => {
+              if (event.key === "Enter") { event.preventDefault(); input.blur(); }
+            });
             const includeLabel = element(doc, "label", ui("Include in report", locale),
               "reproduction-include");
             const include = doc.createElement("input"); include.type = "checkbox";
@@ -133,6 +138,13 @@
                 ? "visible" : "hidden" }));
             includeLabel.appendChild(include);
             label.appendChild(input); row.append(label, includeLabel);
+            if (step.hasInstructionOverride) {
+              const reset = element(doc, "button", ui("Use generated text", locale));
+              reset.type = "button";
+              reset.addEventListener("click", () => options.onEditReproductionStep(
+                step.reproductionStepId, { resetInstruction: true }));
+              row.appendChild(reset);
+            }
             editor.appendChild(row);
           });
           node.appendChild(editor);

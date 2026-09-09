@@ -1,5 +1,12 @@
 # Changelog
 
+## 2026-09-09 - Reproduction wording can return to generated text
+
+- Manually edited reproduction steps now offer `Use generated text` directly in the inline editor.
+- Reset removes only the human wording override and preserves visibility, captured evidence, and source-event references.
+- Pressing Enter in a reproduction-step field commits the edit without inserting accidental line breaks.
+- Reset and keyboard edits participate in undo, redo, and autosave.
+
 ## 2026-09-09 - Bug reports use a calmer document layout
 
 - Reproduction, actual-result, and screenshot content now form one continuous report with subtle section dividers.

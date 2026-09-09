@@ -558,6 +558,7 @@
     ,["Redigera steg för att återskapa", "Edit reproduction steps"]
     ,["Ta bort från rapporten", "Remove from report"]
     ,["Ta med i rapporten", "Include in report"]
+    ,["Använd genererad text", "Use generated text"]
     ,["Anslutning till BC", "BC connection"], ["Aktiv session", "Active session"]
     ,["Händelser", "Events"], ["Eventtyper", "Event types"]
     ,["Kategorier", "Categories"], ["Senaste event", "Latest event"]

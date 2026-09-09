@@ -197,6 +197,11 @@ assert(fs.readFileSync("src/recorder/background.js", "utf8")
   "Open the corrected page.");
   assert.strictEqual(controller.state().report.reproduction.steps[0]
     .source.sourceCanonicalEventIds[0], "event-1");
+  controller.updateReproductionStep(stepId, { resetInstruction: true });
+  assert.strictEqual(controller.state().document.sections.find(section =>
+    section.kind === "reproduction").content[0].instruction, "Select Post.");
+  assert.strictEqual(controller.state().report.reproduction.steps[0].stepOverride, null);
+  controller.updateReproductionStep(stepId, { instruction: "Open the corrected page." });
   controller.updateReproductionStep(stepId, { visibility: "hidden" });
   assert(!controller.state().document.sections.find(section =>
     section.kind === "reproduction").content.some(step =>

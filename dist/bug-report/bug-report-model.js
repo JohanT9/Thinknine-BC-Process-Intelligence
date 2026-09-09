@@ -141,11 +141,16 @@
       if (!instruction) throw new TypeError("Reproduction step text is required.");
       fields.instruction = instruction;
     }
+    if (patch.resetInstruction) delete fields.instruction;
+    const previousOverride = current.stepOverride || {};
+    const { fields: ignoredFields, authorship: ignoredAuthorship,
+      updatedAt: ignoredUpdatedAt, ...otherOverride } = previousOverride;
+    const hasOverride = Object.keys(fields).length || Object.keys(otherOverride).length;
     result.reproduction.steps[index] = { ...current,
       visibility: patch.visibility === "hidden" || patch.visibility === "visible"
         ? patch.visibility : current.visibility,
-      stepOverride: { ...(current.stepOverride || {}), fields,
-        authorship: "human", updatedAt: updatedAt || current.stepOverride?.updatedAt } };
+      stepOverride: hasOverride ? { ...otherOverride, fields,
+        authorship: "human", updatedAt: updatedAt || previousOverride.updatedAt } : null };
     result.updatedAt = updatedAt || result.updatedAt;
     return normalize(result);
   }

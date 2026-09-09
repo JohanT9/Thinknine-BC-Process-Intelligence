@@ -10,6 +10,8 @@ The workspace prioritizes editable human context, reproduction, expected result,
 
 Open report-information, reproduction, screenshot, and technical-detail disclosures retain their open state while edits and autosaves re-render the report.
 
+Edited reproduction wording can be reset to its generated source text. Pressing Enter in a step field commits the change through the same reversible autosave history.
+
 The main report reads as one continuous document with subtle section dividers. Card borders are reserved for editable input, required attention, and collapsed technical content instead of surrounding every generated section.
 
 When the user adds context about what happened, that description appears before the exact captured Business Central error in the rendered report and remains present in exports and shared issue packages.
