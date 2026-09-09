@@ -217,6 +217,9 @@
         });
       } else if (section.kind === "evidence") {
         const assets = options.mediaAssets || {};
+        const stepByAsset = new Map(report.sections.find(item =>
+          item.kind === "reproduction")?.content.flatMap(step =>
+          (step.screenshotAssetIds || []).map(assetId => [assetId, step.number])) || []);
         const byAsset = new Map();
         section.content.screenshots.forEach(screenshot => {
           const current = byAsset.get(screenshot.assetId);
@@ -239,7 +242,9 @@
           }
           figure.appendChild(element(doc, "figcaption",
             screenshot.role === "error" ? ui("Error screenshot", locale) :
-              ui("Reproduction screenshot", locale))); parent.appendChild(figure);
+              stepByAsset.has(screenshot.assetId)
+                ? `${ui("Screenshot for step", locale)} ${stepByAsset.get(screenshot.assetId)}`
+                : ui("Reproduction screenshot", locale))); parent.appendChild(figure);
         };
         if (primary) appendScreenshot(node, primary, "primary-evidence");
         const supporting = screenshots.filter(item => item !== primary);

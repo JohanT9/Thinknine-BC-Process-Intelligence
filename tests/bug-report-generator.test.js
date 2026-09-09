@@ -166,6 +166,8 @@ assert(allElements(container).some(item => item.textContent ===
   " — Error occurred here"));
 assert.strictEqual(allElements(container).filter(item =>
   item.className === "primary-evidence").length, 1);
+assert(allElements(container).some(item =>
+  item.textContent === "Screenshot for step 1"));
 const additionalEvidence = allElements(container).find(item =>
   item.className === "additional-evidence");
 assert(additionalEvidence);

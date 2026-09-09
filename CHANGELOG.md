@@ -1,5 +1,11 @@
 # Changelog
 
+## 2026-09-09 - Bug screenshots identify their reproduction step
+
+- Reproduction screenshot captions now state the visible step number they support.
+- The mapping is derived from stable screenshot references already stored on reproduction steps.
+- Error screenshots retain their explicit error label and primary placement.
+
 ## 2026-09-09 - Reproduction wording can return to generated text
 
 - Manually edited reproduction steps now offer `Use generated text` directly in the inline editor.

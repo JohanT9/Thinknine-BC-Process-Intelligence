@@ -14,6 +14,8 @@ Edited reproduction wording can be reset to its generated source text. Pressing 
 
 The main report reads as one continuous document with subtle section dividers. Card borders are reserved for editable input, required attention, and collapsed technical content instead of surrounding every generated section.
 
+Reproduction screenshot captions identify the visible report step they support. Error screenshots keep their explicit error-evidence label.
+
 When the user adds context about what happened, that description appears before the exact captured Business Central error in the rendered report and remains present in exports and shared issue packages.
 
 Telemetry, AI analysis, and issue destinations are optional and user-triggered. A useful Markdown/offline report can be created locally. The sharing dialog shows configuration only for the selected destination; raw issue text remains under the optional content preview. External transmission always requires an explicit preview, destination, consent, and create action.
