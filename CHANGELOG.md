@@ -1,5 +1,11 @@
 # Changelog
 
+## 2026-09-09 - Human bug context is visible in the report
+
+- User-written actual-result context now appears in the rendered report before the captured Business Central error.
+- The exact captured error remains a separate, copyable evidence block and is not duplicated.
+- The workspace view now matches the content already preserved in Markdown and shared issue packages.
+
 ## 2026-09-09 - Bug-report panels stay open while editing
 
 - Open reproduction, additional-information, screenshot, and technical-detail panels now remain open when the report re-renders.

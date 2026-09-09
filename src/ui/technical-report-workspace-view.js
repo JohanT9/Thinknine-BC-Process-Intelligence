@@ -137,6 +137,8 @@
           node.appendChild(editor);
         }
       } else if (section.kind === "actual-result") {
+        if (section.content.userDescription) node.appendChild(element(doc, "p",
+          section.content.userDescription, "human-actual-result"));
         section.content.capturedErrors.forEach(error => {
           const block = element(doc, "blockquote", error.rawMessage);
           block.setAttribute("aria-label", ui("Captured Business Central error", locale));
