@@ -158,6 +158,10 @@ assert(allElements(container).some(item => item.className === "failure-point"));
 assert(allElements(container).some(item => item.className === "reproduction-editor"));
 assert(allElements(container).some(item => item.className === "human-actual-result" &&
   item.textContent === "Edited actual result"));
+assert(allElements(container).some(item =>
+  item.className === "report-section report-section-reproduction"));
+assert(allElements(container).some(item =>
+  item.className === "report-section report-section-evidence"));
 assert(allElements(container).some(item => item.textContent ===
   " — Error occurred here"));
 assert.strictEqual(allElements(container).filter(item =>

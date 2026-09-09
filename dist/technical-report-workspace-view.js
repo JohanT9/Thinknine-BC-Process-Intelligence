@@ -86,6 +86,7 @@
     let technicalSectionCount = 0;
     for (const section of report.sections) {
       const node = doc.createElement("section");
+      node.className = `report-section report-section-${section.kind}`;
       node.dataset.technicalReportSection = section.id;
       node.appendChild(element(doc, "h2", section.title));
       if (section.kind === "text") node.appendChild(element(doc, "p",

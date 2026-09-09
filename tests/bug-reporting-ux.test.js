@@ -69,6 +69,8 @@ assert.doesNotMatch(report, /id="downloadIssuePackage"/);
 assert.doesNotMatch(report, /id="submitExternalIssue"/);
 assert.match(reportView, /Technical details/);
 assert.match(reportView, /advancedKinds/);
+assert.match(reportView, /`report-section report-section-\$\{section\.kind\}`/);
+assert.match(report, /\.report-section\{[^}]*border-top:/);
 assert.match(reportView, /className = "report-core-fields"/);
 assert.match(reportView, /className = "report-more-fields"/);
 assert.match(reportView, /ui\("Describe the problem", locale\)/);

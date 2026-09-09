@@ -1,5 +1,12 @@
 # Changelog
 
+## 2026-09-09 - Bug reports use a calmer document layout
+
+- Reproduction, actual-result, and screenshot content now form one continuous report with subtle section dividers.
+- Repeated card borders and rounded containers were removed from generated report sections.
+- Strong containers remain reserved for editable fields, required attention, and collapsed technical details.
+- The responsive layout retains the same hierarchy with tighter spacing on narrow screens.
+
 ## 2026-09-09 - Human bug context is visible in the report
 
 - User-written actual-result context now appears in the rendered report before the captured Business Central error.
