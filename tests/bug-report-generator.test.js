@@ -134,7 +134,7 @@ const copied = [];
 const rendered = view.render(container, controller.state(), {
   onCopy: value => copied.push(value), mediaAssets: {
     "asset-error": { source: "data:image/png;base64,AA==" }
-  }, onEditReproductionStep: () => {}
+  }, onEditReproductionStep: () => {}, onSetScreenshotVisibility: () => {}
 }, fakeDocument);
 assert.strictEqual(rendered.sectionCount, generator.SECTION_ORDER.length);
 assert.strictEqual(container.attributes["aria-label"],
@@ -168,6 +168,7 @@ assert.strictEqual(allElements(container).filter(item =>
   item.className === "primary-evidence").length, 1);
 assert(allElements(container).some(item =>
   item.textContent === "Screenshot for step 1"));
+assert(allElements(container).some(item => item.className === "screenshot-editor"));
 const additionalEvidence = allElements(container).find(item =>
   item.className === "additional-evidence");
 assert(additionalEvidence);
@@ -192,6 +193,14 @@ assert(fs.readFileSync("src/recorder/background.js", "utf8")
   .includes("T9_OPEN_TECHNICAL_REPORT"));
 
 (async () => {
+  controller.updateScreenshotVisibility("asset-step", "hidden");
+  assert(!controller.state().document.sections.find(section =>
+    section.kind === "evidence").content.screenshots.some(item =>
+    item.assetId === "asset-step"));
+  controller.updateScreenshotVisibility("asset-step", "visible");
+  assert(controller.state().document.sections.find(section =>
+    section.kind === "evidence").content.screenshots.some(item =>
+    item.assetId === "asset-step"));
   const stepId = controller.state().report.reproduction.steps[0].reproductionStepId;
   controller.updateReproductionStep(stepId, { instruction: "Open the corrected page." });
   assert.strictEqual(controller.state().document.sections.find(section =>

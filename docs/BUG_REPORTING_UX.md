@@ -16,6 +16,8 @@ The main report reads as one continuous document with subtle section dividers. C
 
 Reproduction screenshot captions identify the visible report step they support. Error screenshots keep their explicit error-evidence label.
 
+A collapsed screenshot chooser lets users exclude irrelevant images and restore them later. The choice affects the report and shared package only; captured source assets remain unchanged.
+
 When the user adds context about what happened, that description appears before the exact captured Business Central error in the rendered report and remains present in exports and shared issue packages.
 
 Telemetry, AI analysis, and issue destinations are optional and user-triggered. A useful Markdown/offline report can be created locally. The sharing dialog shows configuration only for the selected destination; raw issue text remains under the optional content preview. External transmission always requires an explicit preview, destination, consent, and create action.

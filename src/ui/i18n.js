@@ -560,6 +560,7 @@
     ,["Ta med i rapporten", "Include in report"]
     ,["Använd genererad text", "Use generated text"]
     ,["Skärmbild för steg", "Screenshot for step"]
+    ,["Välj skärmbilder", "Choose screenshots"]
     ,["Anslutning till BC", "BC connection"], ["Aktiv session", "Active session"]
     ,["Händelser", "Events"], ["Eventtyper", "Event types"]
     ,["Kategorier", "Categories"], ["Senaste event", "Latest event"]

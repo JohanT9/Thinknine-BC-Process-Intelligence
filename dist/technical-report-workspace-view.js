@@ -220,6 +220,10 @@
         const stepByAsset = new Map(report.sections.find(item =>
           item.kind === "reproduction")?.content.flatMap(step =>
           (step.screenshotAssetIds || []).map(assetId => [assetId, step.number])) || []);
+        const screenshotLabel = screenshot => screenshot.role === "error"
+          ? ui("Error screenshot", locale) : stepByAsset.has(screenshot.assetId)
+            ? `${ui("Screenshot for step", locale)} ${stepByAsset.get(screenshot.assetId)}`
+            : ui("Reproduction screenshot", locale);
         const byAsset = new Map();
         section.content.screenshots.forEach(screenshot => {
           const current = byAsset.get(screenshot.assetId);
@@ -241,10 +245,7 @@
             figure.appendChild(image);
           }
           figure.appendChild(element(doc, "figcaption",
-            screenshot.role === "error" ? ui("Error screenshot", locale) :
-              stepByAsset.has(screenshot.assetId)
-                ? `${ui("Screenshot for step", locale)} ${stepByAsset.get(screenshot.assetId)}`
-                : ui("Reproduction screenshot", locale))); parent.appendChild(figure);
+            screenshotLabel(screenshot))); parent.appendChild(figure);
         };
         if (primary) appendScreenshot(node, primary, "primary-evidence");
         const supporting = screenshots.filter(item => item !== primary);
@@ -255,6 +256,23 @@
             "evidence-count")); more.appendChild(summary);
           supporting.forEach(item => appendScreenshot(more, item));
           node.appendChild(more);
+        }
+        const editableScreenshots = workspaceState.report.evidence?.screenshots || [];
+        if (editableScreenshots.length && options.onSetScreenshotVisibility) {
+          const editor = doc.createElement("details"); editor.className = "screenshot-editor";
+          editor.appendChild(element(doc, "summary", ui("Choose screenshots", locale)));
+          editableScreenshots.forEach((screenshot, index) => {
+            const label = element(doc, "label", screenshotLabel(screenshot),
+              "screenshot-include");
+            const include = doc.createElement("input"); include.type = "checkbox";
+            include.checked = screenshot.visibility !== "hidden";
+            include.setAttribute("aria-label", `${ui("Include in report", locale)}: ${
+              screenshotLabel(screenshot)} ${index + 1}`);
+            include.addEventListener("change", () => options.onSetScreenshotVisibility(
+              screenshot.assetId, include.checked ? "visible" : "hidden"));
+            label.appendChild(include); editor.appendChild(label);
+          });
+          node.appendChild(editor);
         }
       } else if (section.kind === "notes") {
         section.content.forEach(note => node.appendChild(element(doc, "p",

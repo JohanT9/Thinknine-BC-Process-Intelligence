@@ -47,6 +47,9 @@
       updateReproductionStep(id, patch, now) {
         return commit(model.updateReproductionStep(report, id, patch, now));
       },
+      updateScreenshotVisibility(assetId, visibility, now) {
+        return commit(model.updateScreenshotVisibility(report, assetId, visibility, now));
+      },
       undo() { if (historyIndex > 0) { historyIndex -= 1; revision += 1;
         report = model.normalize(history[historyIndex]); saveState = "unsaved";
         notify(); } return report; },

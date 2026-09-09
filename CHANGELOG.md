@@ -1,5 +1,12 @@
 # Changelog
 
+## 2026-09-09 - Bug-report screenshots are selectable
+
+- A collapsed screenshot chooser lets users include or exclude individual captured images.
+- Excluded screenshots disappear from the report, exports, and shared issue attachments.
+- Every captured image remains available for restoration and the original recording is never modified.
+- Screenshot choices use the existing undo, redo, autosave, and disclosure-state behavior.
+
 ## 2026-09-09 - Bug screenshots identify their reproduction step
 
 - Reproduction screenshot captions now state the visible step number they support.

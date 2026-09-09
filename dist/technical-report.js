@@ -141,7 +141,7 @@
       };
     });
     const persistentDisclosures = [".report-more-fields", ".reproduction-editor",
-      ".technical-details", ".additional-evidence"];
+      ".technical-details", ".additional-evidence", ".screenshot-editor"];
     const render = state => {
       const openDisclosures = persistentDisclosures.filter(selector =>
         container.querySelector(selector)?.open);
@@ -159,6 +159,8 @@
         onSelectPrimaryError: id => workspace.selectPrimaryError(id)
         ,onEditReproductionStep: (id, patch) =>
           workspace.updateReproductionStep(id, patch)
+        ,onSetScreenshotVisibility: (assetId, visibility) =>
+          workspace.updateScreenshotVisibility(assetId, visibility)
         });
       openDisclosures.forEach(selector => {
         const disclosure = container.querySelector(selector);

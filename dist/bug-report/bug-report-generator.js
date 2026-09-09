@@ -163,7 +163,8 @@
           disclosure: currentAiInput.disclosure } },
       { id: "evidence", title: titles.evidence, kind: "evidence",
         provenance: "mixed", content: { screenshots: clone(
-          report.evidence?.screenshots || []), annotations: clone(report.annotations || []) } },
+          (report.evidence?.screenshots || []).filter(item =>
+            item.visibility !== "hidden")), annotations: clone(report.annotations || []) } },
       { id: "notes", title: titles.notes, kind: "notes",
         provenance: "manual", content: clone(report.notes || []) },
       { id: "traceability", title: titles.traceability, kind: "traceability",

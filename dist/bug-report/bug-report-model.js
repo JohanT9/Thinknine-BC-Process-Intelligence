@@ -155,6 +155,21 @@
     return normalize(result);
   }
 
+  function updateScreenshotVisibility(report, assetId, visibility, updatedAt) {
+    const result = normalize(report);
+    const id = String(assetId || "");
+    const index = result.evidence.screenshots.findIndex(item => item.assetId === id);
+    if (index < 0) throw new TypeError("Screenshot was not found.");
+    if (visibility !== "visible" && visibility !== "hidden") {
+      throw new TypeError("Screenshot visibility must be visible or hidden.");
+    }
+    result.evidence.screenshots[index] = {
+      ...result.evidence.screenshots[index], visibility
+    };
+    result.updatedAt = updatedAt || result.updatedAt;
+    return normalize(result);
+  }
+
   function attachTelemetry(report, errorEvidenceId, enrichment, updatedAt) {
     const result = normalize(report);
     const current = result.enrichment.telemetry?.byErrorEvidenceId || {};
@@ -188,5 +203,5 @@
 
   return { CATEGORIES, SCHEMA_VERSION, STATUSES, normalize, normalizeStep,
     attachAiAnalysis, attachExternalIssue, attachTelemetry, removeAiAnalysis, selectPrimaryError,
-    updateHumanContent, updateReproductionStep };
+    updateHumanContent, updateReproductionStep, updateScreenshotVisibility };
 });
