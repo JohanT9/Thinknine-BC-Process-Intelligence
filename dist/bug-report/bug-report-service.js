@@ -46,6 +46,38 @@
       recordingSchemaVersion: recording.schemaVersion };
   }
 
+  function failureStepIds(recording, steps, errorEvidence) {
+    const eventIndexes = new Map((recording.events || []).map((event, index) =>
+      [String(event.id), index]));
+    const stepEvents = steps.map(step => ({
+      reproductionStepId: step.reproductionStepId,
+      sourceCanonicalEventIds: step.source.sourceCanonicalEventIds,
+      indexes: step.source.sourceCanonicalEventIds.map(id => eventIndexes.get(id))
+        .filter(index => Number.isInteger(index))
+    }));
+    const result = new Set();
+    for (const evidence of errorEvidence) {
+      const referenceIds = unique([evidence.precedingActionEventId,
+        evidence.canonicalEventId]);
+      const exact = stepEvents.find(step => referenceIds.some(id =>
+        step.sourceCanonicalEventIds.includes(id)));
+      if (exact) {
+        result.add(exact.reproductionStepId);
+        continue;
+      }
+      const referenceIndexes = referenceIds.map(id => eventIndexes.get(id))
+        .filter(index => Number.isInteger(index));
+      if (!referenceIndexes.length) continue;
+      const boundary = Math.min(...referenceIndexes);
+      const preceding = stepEvents.map(step => ({ ...step,
+        nearestIndex: Math.max(-1, ...step.indexes.filter(index => index < boundary)) }))
+        .filter(step => step.nearestIndex >= 0)
+        .sort((left, right) => right.nearestIndex - left.nearestIndex)[0];
+      if (preceding) result.add(preceding.reproductionStepId);
+    }
+    return result;
+  }
+
   function createBugReportFromRecording(recording, derivedSteps = [], context = {}) {
     if (!recording?.id) throw new TypeError("A Canonical Recording is required.");
     if (recording.metadata?.recordingPurpose !== "bug-report") {
@@ -63,11 +95,9 @@
       step.source.screenshotAssetIds));
     const errorEvidence = Array.isArray(context.errorEvidence)
       ? context.errorEvidence : [];
-    const failureEventIds = new Set(errorEvidence.map(item =>
-      String(item.precedingActionEventId || "")).filter(Boolean));
-    steps = steps.map(step => step.source.sourceCanonicalEventIds.some(id =>
-      failureEventIds.has(id)) ? { ...step, outcome: "error", failurePoint: true }
-      : step);
+    const failedSteps = failureStepIds(recording, steps, errorEvidence);
+    steps = steps.map(step => failedSteps.has(step.reproductionStepId)
+      ? { ...step, outcome: "error", failurePoint: true } : step);
     const errorEvidenceIds = unique(errorEvidence.map(item =>
       item.errorEvidenceId));
     const errorScreenshotIds = unique(errorEvidence.map(item =>

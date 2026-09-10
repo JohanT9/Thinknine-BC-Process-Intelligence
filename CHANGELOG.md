@@ -1,5 +1,12 @@
 # Changelog
 
+## 2026-09-10 - Bug reports locate the acted-on failure step
+
+- A Business Central error now marks the closest documented user action when an
+  unmapped technical event occurs between that action and the error.
+- Exact event-to-step links still take precedence over the ordered fallback.
+- Unknown or foreign evidence references do not guess a failure point.
+
 ## 2026-09-09 - Bug-report screenshots are selectable
 
 - A collapsed screenshot chooser lets users include or exclude individual captured images.

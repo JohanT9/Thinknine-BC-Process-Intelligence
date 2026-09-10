@@ -4,6 +4,12 @@
 
 Bug Reporting starts as a first-class popup action. Stop finalizes the existing recording, derives reproduction through the shared interpretation pipeline, creates the existing Bug Report model, and opens its workspace automatically. Silent problems remain valid reports. Error dialogs add evidence but are not required. Telemetry, AI, and issue submission remain optional explicit downstream actions.
 
+Captured Business Central errors identify the affected reproduction step through
+stable Canonical Event references. An exact step reference wins. When a technical
+event occurs after the acted-on step but before the error, the service follows the
+recording order back to the closest documented action. Evidence that cannot be
+found in the recording is left unresolved rather than guessed.
+
 ## Architectural position
 
 Bug Reporting reuses the existing recorder and evidence pipeline. There is no

@@ -48,6 +48,38 @@ validationReport = reportModel.updateHumanContent(validationReport, {
 assert.strictEqual(validationReport.reproduction.steps[0].failurePoint,
   undefined);
 assert.strictEqual(validationReport.reproduction.steps[1].failurePoint, true);
+
+let delayedRecording = canonical.create({ id: "delayed-validation-error",
+  startedAt: NOW, recordingPurpose: "bug-report", documentLanguage: "sv-SE" });
+delayedRecording = canonical.addEvent(delayedRecording, { id: "delayed:open",
+  type: "click", timestamp: NOW, label: "Open Sales Order" });
+delayedRecording = canonical.addEvent(delayedRecording, { id: "delayed:post",
+  type: "click", timestamp: "2026-09-08T08:00:01.000Z", label: "Post" });
+delayedRecording = canonical.addEvent(delayedRecording, { id: "technical-navigation",
+  type: "navigation", timestamp: "2026-09-08T08:00:01.250Z",
+  label: "Dialog navigation" });
+delayedRecording = canonical.finish(delayedRecording,
+  "2026-09-08T08:00:02.000Z");
+const delayedEvidence = evidenceModel.normalize({
+  errorEvidenceId: "delayed:evidence", recordingId: delayedRecording.id,
+  capturedAt: "2026-09-08T08:00:01.500Z",
+  precedingActionEventId: delayedRecording.events[2].id,
+  rawMessage: "Bokf\u00f6ringen kunde inte slutf\u00f6ras.",
+  diagnosticsAvailable: false, errorCategory: "validation"
+});
+const delayedReport = service.createBugReportFromRecording(delayedRecording,
+  steps(delayedRecording), { now: NOW, documentLanguage: "sv-SE",
+    errorEvidence: [delayedEvidence] });
+assert.strictEqual(delayedReport.reproduction.steps[0].failurePoint, undefined);
+assert.strictEqual(delayedReport.reproduction.steps[1].failurePoint, true,
+  "the closest documented action should remain the failure point");
+const foreignEvidenceReport = service.createBugReportFromRecording(
+  delayedRecording, steps(delayedRecording), { now: NOW,
+    errorEvidence: [{ errorEvidenceId: "foreign:evidence",
+      recordingId: delayedRecording.id, capturedAt: NOW,
+      precedingActionEventId: "event-from-another-recording" }] });
+assert(foreignEvidenceReport.reproduction.steps.every(step =>
+  !step.failurePoint), "foreign evidence must not guess a failure point");
 const validationDocument = generator.project(validationReport,
   { errorEvidence: [validationEvidence] });
 assert.strictEqual(validationDocument.completeness.ready, true);
