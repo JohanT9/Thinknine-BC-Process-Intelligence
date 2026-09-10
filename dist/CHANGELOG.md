@@ -1,5 +1,14 @@
 # Changelog
 
+## 2026-09-10 - Business Central bug scenarios are executable YAML
+
+- Bug-report scenarios now live as human-readable YAML files with BC page,
+  recording, expected report, and manual sandbox instructions.
+- `npm run scenarios:bug-report` runs every scenario through the production
+  recording, report, issue-package, and Markdown pipeline.
+- The runner validates stable event references and supports a single YAML file
+  or the complete scenario directory.
+
 ## 2026-09-10 - Captured errors are not repeated in shared reports
 
 - When an empty summary falls back to the exact captured Business Central error,

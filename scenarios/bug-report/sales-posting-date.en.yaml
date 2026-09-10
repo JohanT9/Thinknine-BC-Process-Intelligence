@@ -1,0 +1,51 @@
+schemaVersion: 1
+id: sales-posting-date-en
+name: Sales order missing posting date
+description: Posting a sales order is blocked by required field validation.
+businessCentral:
+  language: en-US
+  domain: OrderToCash
+  process: SimpleSalesOrder
+  page:
+    objectId: 42
+    caption: Sales Order
+recording:
+  events:
+    - id: open-order
+      type: navigation
+      pageObjectId: 42
+      pageCaption: Sales Order
+      label: Open Sales Order
+    - id: posting-date
+      type: change
+      pageObjectId: 42
+      pageCaption: Sales Order
+      fieldName: Posting Date
+      label: Posting Date
+  steps:
+    - id: open-order
+      instruction: Open the sales order.
+      sourceEvents: [open-order]
+    - id: posting-date
+      instruction: Clear Posting Date.
+      fieldCaption: Posting Date
+      sourceEvents: [posting-date]
+error:
+  afterEvent: posting-date
+  message: Posting Date must have a value in Sales Header.
+expected:
+  title: Validation error in “Posting Date”
+  failureStep: posting-date
+  descriptionContains:
+    - "## Steps to Reproduce"
+    - "## Business Central Error"
+  descriptionExcludes:
+    - "## Technical Details"
+live:
+  preconditions:
+    - Use a sandbox company and a sales order that may be changed.
+  actions:
+    - Open Sales Orders and select a test order.
+    - Clear Posting Date where the configuration permits it.
+    - Attempt to post the order.
+  expectedOutcome: Business Central blocks posting with required-field validation.

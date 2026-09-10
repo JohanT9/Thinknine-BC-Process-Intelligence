@@ -41,6 +41,7 @@
     "test:issue-package": "node tests/issue-package-integration.test.js",
     "test:bug-report-flow": "node tests/bug-report-end-to-end.test.js",
     "test:bug-report-corpus": "node tests/bug-report-scenario-corpus.test.js",
+    "scenarios:bug-report": "node scripts/run-bug-report-scenarios.js",
     "test:bug-reporting-ux": "node tests/bug-reporting-ux.test.js",
     "test:recording-live-status": "node tests/recording-live-status.test.js",
     "test:recording-indicator": "node tests/recording-indicator.test.js",
@@ -97,6 +98,7 @@
     "docx": "9.7.1"
   },
   "devDependencies": {
-    "esbuild": "0.25.8"
+    "esbuild": "0.25.8",
+    "yaml": "^2.9.0"
   }
 }

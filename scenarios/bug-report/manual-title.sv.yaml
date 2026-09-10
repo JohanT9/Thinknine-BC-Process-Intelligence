@@ -1,0 +1,41 @@
+schemaVersion: 1
+id: manual-title-sv
+name: Manuellt namngivet prisfel
+description: Användarens titel ska aldrig ersättas av den automatiska titeln.
+manualTitle: Fel pris efter rabattberäkning
+businessCentral:
+  language: sv-SE
+  domain: OrderToCash
+  process: SalesOrderProcessing
+  page:
+    objectId: 42
+    caption: Försäljningsorder
+recording:
+  events:
+    - id: calculate
+      type: click
+      pageObjectId: 42
+      pageCaption: Försäljningsorder
+      label: Beräkna rabatt
+  steps:
+    - id: calculate
+      instruction: Välj Beräkna rabatt.
+      actionCaption: Beräkna rabatt
+      sourceEvents: [calculate]
+error:
+  afterEvent: calculate
+  message: Priset kunde inte beräknas.
+expected:
+  title: Fel pris efter rabattberäkning
+  failureStep: calculate
+  descriptionContains:
+    - "# Fel pris efter rabattberäkning"
+    - "## Business Central-fel"
+  descriptionExcludes: ["## Tekniska detaljer"]
+live:
+  preconditions:
+    - Använd ett reproducerbart testfall för prisberäkning.
+  actions:
+    - Starta felinspelningen med den manuella titeln.
+    - Utför rabattberäkningen tills felet visas.
+  expectedOutcome: Den manuella titeln finns kvar efter sparande, stängning och export.

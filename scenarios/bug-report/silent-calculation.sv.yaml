@@ -1,0 +1,35 @@
+schemaVersion: 1
+id: silent-calculation-sv
+name: Tyst beräkningsfel
+description: Resultatet blir fel utan att Business Central visar ett felmeddelande.
+businessCentral:
+  language: sv-SE
+  domain: OrderToCash
+  process: SalesOrderProcessing
+  page:
+    objectId: 42
+    caption: Försäljningsorder
+recording:
+  events:
+    - id: calculate
+      type: click
+      pageObjectId: 42
+      pageCaption: Försäljningsorder
+      label: Beräkna rabatt
+  steps:
+    - id: calculate
+      instruction: Välj Beräkna rabatt.
+      sourceEvents: [calculate]
+expected:
+  title: Rapporterat problem i Business Central
+  descriptionContains: ["## Steg för att återskapa"]
+  descriptionExcludes:
+    - "## Business Central-fel"
+    - "## Tekniska detaljer"
+live:
+  preconditions:
+    - Använd testdata där förväntat pris eller rabatt är känt.
+  actions:
+    - Öppna testordern och välj Beräkna rabatt.
+    - Kontrollera att resultatet avviker utan att en feldialog visas.
+  expectedOutcome: Rapporten är giltig utan fångat BC-fel och användaren beskriver det faktiska resultatet.

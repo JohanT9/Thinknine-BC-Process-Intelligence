@@ -1,0 +1,51 @@
+schemaVersion: 1
+id: purchase-posting-date-sv
+name: Inköpsorder saknar bokföringsdatum
+description: Bokföring av en inköpsorder stoppas av ett obligatoriskt fält.
+businessCentral:
+  language: sv-SE
+  domain: SourceToPay
+  process: SimplePurchaseOrder
+  page:
+    objectId: 50
+    caption: Inköpsorder
+recording:
+  events:
+    - id: open-order
+      type: navigation
+      pageObjectId: 50
+      pageCaption: Inköpsorder
+      label: Öppna inköpsorder
+    - id: post
+      type: click
+      pageObjectId: 50
+      pageCaption: Inköpsorder
+      label: Bokför
+  steps:
+    - id: open-order
+      instruction: Öppna inköpsordern.
+      sourceEvents: [open-order]
+    - id: post
+      instruction: Välj Bokför.
+      actionCaption: Bokför
+      sourceEvents: [post]
+error:
+  afterEvent: post
+  message: Bokföringsdatum måste ha ett värde i Inköpshuvud.
+expected:
+  title: Fel vid ”Bokför”
+  failureStep: post
+  descriptionContains:
+    - "## Steg för att återskapa"
+    - "## Business Central-fel"
+  descriptionExcludes:
+    - "## Tekniska detaljer"
+live:
+  preconditions:
+    - Använd ett sandboxföretag och en inköpsorder som får ändras.
+    - Säkerställ att bokföringsdatum kan lämnas tomt i testdata.
+  actions:
+    - Öppna sidan Inköpsorder.
+    - Öppna eller skapa en testorder och lämna Bokföringsdatum tomt.
+    - Välj Bokför.
+  expectedOutcome: Business Central stoppar bokföringen och markerar Bokför som felsteg.

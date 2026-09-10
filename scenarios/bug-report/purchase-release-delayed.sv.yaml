@@ -1,0 +1,41 @@
+schemaVersion: 1
+id: purchase-release-delayed-sv
+name: Fel efter teknisk dialogövergång
+description: Ett tekniskt navigeringsögonblick får inte flytta felmarkeringen från användarens handling.
+businessCentral:
+  language: sv-SE
+  domain: SourceToPay
+  process: SimplePurchaseOrder
+  page:
+    objectId: 50
+    caption: Inköpsorder
+recording:
+  events:
+    - id: release
+      type: click
+      pageObjectId: 50
+      pageCaption: Inköpsorder
+      label: Frisläpp
+    - id: technical-transition
+      type: navigation
+      label: Dialogövergång
+  steps:
+    - id: release
+      instruction: Välj Frisläpp.
+      actionCaption: Frisläpp
+      sourceEvents: [release]
+error:
+  afterEvent: technical-transition
+  message: Inköpsordern kunde inte frisläppas.
+expected:
+  title: Fel vid ”Frisläpp”
+  failureStep: release
+  descriptionContains: ["## Steg för att återskapa"]
+  descriptionExcludes: ["## Tekniska detaljer"]
+live:
+  preconditions:
+    - Använd en inköpsorder som ger ett valideringsfel vid frisläppning.
+  actions:
+    - Öppna inköpsordern.
+    - Välj Frisläpp och invänta felmeddelandet.
+  expectedOutcome: Frisläpp markeras som felsteg även om en dialoghändelse fångas efter klicket.
