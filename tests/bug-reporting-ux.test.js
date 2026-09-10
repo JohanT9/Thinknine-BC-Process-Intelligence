@@ -6,6 +6,7 @@ const popup = read("src/ui/popup.html");
 const popupLogic = read("src/ui/popup.js");
 const uiTranslations = read("src/ui/i18n.js");
 const background = read("src/recorder/background.js");
+const reportService = read("src/bug-report/bug-report-service.js");
 const report = read("src/ui/technical-report.html");
 const reportLogic = read("src/ui/technical-report.js");
 const reportView = read("src/ui/technical-report-workspace-view.js");
@@ -49,7 +50,8 @@ assert.match(background, /setDocumentLanguage\(state\.sessionId,[\s\S]*T9Languag
 assert.match(background, /createAndOpenBugReport\(session\.id, message\.name\)/);
 assert.match(background, /createAndOpenBugReport\(session\.id, message\.name\)/);
 assert.match(background, /technical-report\.html\?bugReportId=.*new=1/);
-assert.match(background, /Reported Business Central problem/);
+assert.match(reportService, /Reported Business Central problem/);
+assert.match(reportService, /Rapporterat problem i Business Central/);
 assert.match(report, /Application Insights \(optional\)/);
 assert.match(report, /AI technical analysis \(optional\)/);
 assert.match(report, /class="primary-actions"[\s\S]*id="openIssuePreview"[\s\S]*id="closeReport"/);

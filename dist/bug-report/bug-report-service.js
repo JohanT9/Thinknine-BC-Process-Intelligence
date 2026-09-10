@@ -78,6 +78,28 @@
     return result;
   }
 
+  function draftTitle(derivedSteps, reproductionSteps, errorEvidence, language) {
+    const swedish = /^sv(?:-|$)/i.test(String(language || ""));
+    const failed = reproductionSteps.find(step => step.failurePoint);
+    const source = derivedSteps.find(step => String(step.taskId || step.stepId) ===
+      String(failed?.source?.sourceStepId)) || [...derivedSteps].reverse().find(step =>
+        String(step.instruction || step.displayText || "").trim());
+    const action = String(source?.actionCaption || "").trim();
+    const field = String(source?.fieldCaption || "").trim();
+    const page = String(source?.pageCaption || "").trim();
+    if (errorEvidence.length && action) return swedish
+      ? `Fel vid \u201d${action}\u201d` : `Error when selecting \u201c${action}\u201d`;
+    if (errorEvidence.length && field) return swedish
+      ? `Valideringsfel i \u201d${field}\u201d` : `Validation error in \u201c${field}\u201d`;
+    if (errorEvidence.length && page) return swedish
+      ? `Business Central-fel i \u201d${page}\u201d` : `Business Central error in \u201c${page}\u201d`;
+    if (errorEvidence.length) return swedish
+      ? "Business Central-fel i inspelad process"
+      : "Business Central error during recorded process";
+    return swedish ? "Rapporterat problem i Business Central"
+      : "Reported Business Central problem";
+  }
+
   function createBugReportFromRecording(recording, derivedSteps = [], context = {}) {
     if (!recording?.id) throw new TypeError("A Canonical Recording is required.");
     if (recording.metadata?.recordingPurpose !== "bug-report") {
@@ -107,12 +129,14 @@
       technical.safelyDerive(item));
     const primaryCallStack = technicalDiagnostics.find(item =>
       item.summary.callStackAvailable)?.callStack;
+    const documentLanguage = context.documentLanguage
+      ? languages.normalize(context.documentLanguage, "document") : "en-US";
     return model.normalize({ bugReportId: context.bugReportId || stableId(recording.id),
       schemaVersion: model.SCHEMA_VERSION, recordingId: recording.id,
-      documentLanguage: context.documentLanguage
-        ? languages.normalize(context.documentLanguage, "document") : "en-US",
+      documentLanguage,
       createdAt: now, updatedAt: now, status: "draft",
-      summary: { title: context.title || "",
+      summary: { title: String(context.title || "").trim() ||
+          draftTitle(derivedSteps, steps, errorEvidence, documentLanguage),
         summary: "", severity: "", category: "", authorship: "human" },
       environment: environment(recording, context),
       reproduction: { authorship: "derived", steps },

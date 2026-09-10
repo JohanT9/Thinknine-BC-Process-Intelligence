@@ -55,6 +55,12 @@ const linkedFailure = service.createBugReportFromRecording(bugSource, steps, {
     precedingActionEventId: bugSource.events[0].id }] });
 assert.strictEqual(linkedFailure.reproduction.steps[0].failurePoint, true);
 assert.strictEqual(linkedFailure.reproduction.steps[0].outcome, "error");
+const localizedTitle = service.createBugReportFromRecording(bugSource, [{
+  ...steps[0], actionCaption: "Bokf\u00f6r" }], { now: NOW,
+  documentLanguage: "sv-SE", errorEvidence: [{
+    errorEvidenceId: "error-title", recordingId: bugSource.id, capturedAt: NOW,
+    precedingActionEventId: bugSource.events[0].id }] });
+assert.strictEqual(localizedTitle.summary.title, "Fel vid \u201dBokf\u00f6r\u201d");
 assert.throws(() => service.createBugReportFromRecording(documentation, []),
   /bug-report recording/u);
 assert.throws(() => model.normalize({ schemaVersion: 1 }),

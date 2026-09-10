@@ -48,6 +48,8 @@ validationReport = reportModel.updateHumanContent(validationReport, {
 assert.strictEqual(validationReport.reproduction.steps[0].failurePoint,
   undefined);
 assert.strictEqual(validationReport.reproduction.steps[1].failurePoint, true);
+assert.strictEqual(validationReport.summary.title, "Bokf\u00f6ringen stoppas",
+  "an explicit user title must take precedence");
 
 let delayedRecording = canonical.create({ id: "delayed-validation-error",
   startedAt: NOW, recordingPurpose: "bug-report", documentLanguage: "sv-SE" });
@@ -73,6 +75,8 @@ const delayedReport = service.createBugReportFromRecording(delayedRecording,
 assert.strictEqual(delayedReport.reproduction.steps[0].failurePoint, undefined);
 assert.strictEqual(delayedReport.reproduction.steps[1].failurePoint, true,
   "the closest documented action should remain the failure point");
+assert.strictEqual(delayedReport.summary.title,
+  "Business Central-fel i inspelad process");
 const foreignEvidenceReport = service.createBugReportFromRecording(
   delayedRecording, steps(delayedRecording), { now: NOW,
     errorEvidence: [{ errorEvidenceId: "foreign:evidence",

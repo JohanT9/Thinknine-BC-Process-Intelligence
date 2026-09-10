@@ -1,5 +1,12 @@
 # Changelog
 
+## 2026-09-10 - Bug-report titles follow the actual failure
+
+- Automatic titles now use the reproduction step linked to the captured error
+  instead of assuming the final recorded step failed.
+- Swedish reports receive Swedish fallback, action, field, and page titles.
+- A title entered by the user remains unchanged and always takes precedence.
+
 ## 2026-09-10 - Bug reports locate the acted-on failure step
 
 - A Business Central error now marks the closest documented user action when an

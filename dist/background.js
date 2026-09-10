@@ -1430,19 +1430,6 @@ async function stopSession(finalName = "", documentLanguage = "") {
   return session;
 }
 
-function draftBugTitle(tasks, errors) {
-  const finalTask = [...(tasks || [])].reverse().find(item =>
-    String(item.instruction || "").trim());
-  const action = String(finalTask?.actionCaption || "").trim();
-  const field = String(finalTask?.fieldCaption || "").trim();
-  const page = String(finalTask?.pageCaption || "").trim();
-  if (errors.length && action) return `Error when selecting "${action}"`;
-  if (errors.length && field) return `Validation error in "${field}"`;
-  if (errors.length && page) return `Business Central error in "${page}"`;
-  return errors.length ? "Business Central error during recorded process" :
-    "Reported Business Central problem";
-}
-
 async function createAndOpenBugReport(recordingId, reportTitle = "") {
   const recording = await getCanonicalRecording(recordingId);
   const normalized = globalThis.T9EventNormalization.normalizeRecording(recording);
@@ -1468,8 +1455,7 @@ async function createAndOpenBugReport(recordingId, reportTitle = "") {
       documentLanguage: globalThis.T9LanguageRegistry.normalize(
         recording.metadata?.documentLanguage, "document"
       ),
-      title: String(reportTitle || "").trim() ||
-        draftBugTitle(tasks, errors) });
+      title: String(reportTitle || "").trim() });
   const saved = await bugReportStore.save(report);
   const workspaceUrl = chrome.runtime.getURL(
     `technical-report.html?bugReportId=${encodeURIComponent(saved.bugReportId)}&new=1`);

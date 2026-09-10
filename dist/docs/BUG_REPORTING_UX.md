@@ -12,6 +12,10 @@ Open report-information, reproduction, screenshot, and technical-detail disclosu
 
 Edited reproduction wording can be reset to its generated source text. Pressing Enter in a step field commits the change through the same reversible autosave history.
 
+New reports receive an editable title in the document language. When captured
+error evidence identifies a reproduction step, its Business Central action,
+field, or page supplies the title context. A user-entered title is never replaced.
+
 The main report reads as one continuous document with subtle section dividers. Card borders are reserved for editable input, required attention, and collapsed technical content instead of surrounding every generated section.
 
 Reproduction screenshot captions identify the visible report step they support. Error screenshots keep their explicit error-evidence label.
