@@ -1,5 +1,12 @@
 # Changelog
 
+## 2026-09-10 - Captured errors are not repeated in shared reports
+
+- When an empty summary falls back to the exact captured Business Central error,
+  the shared description now shows that evidence only in the error section.
+- A distinct human-written summary remains visible.
+- Captured error wording and structured report evidence remain unchanged.
+
 ## 2026-09-10 - Shared bug reports use the document language
 
 - Markdown and external issue descriptions now use Swedish section headings for

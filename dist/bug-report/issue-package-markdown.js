@@ -37,13 +37,16 @@
     ? SWEDISH : ENGLISH; const out = [`# ${inline(pkg.title)}`, ""];
     const add = (title, lines) => { const filtered = lines.filter(item => item !== "" &&
       item != null); if (filtered.length) out.push(`## ${title}`, "", ...filtered, ""); };
-    add(labels.summary, [inline(pkg.summary?.summary)]);
+    const errors = [pkg.errorEvidence?.primary, ...(pkg.errorEvidence?.additional || [])]
+      .filter(Boolean);
+    const summary = value(pkg.summary?.summary).trim();
+    const duplicatesCapturedError = errors.some(error =>
+      value(error.rawMessage).trim() === summary);
+    if (!duplicatesCapturedError) add(labels.summary, [inline(summary)]);
     add(labels.reproduction, pkg.reproduction.map((step, index) =>
       `${index + 1}. ${inline(step.instruction)}`));
     add(labels.expected, [inline(pkg.expectedResult)]);
     add(labels.actual, [inline(pkg.actualResult?.userDescription)]);
-    const errors = [pkg.errorEvidence?.primary, ...(pkg.errorEvidence?.additional || [])]
-      .filter(Boolean);
     add(labels.error, errors.flatMap((error, index) => [
       errors.length > 1 ? `### ${index === 0 ? labels.primaryError : labels.additionalError}` : null,
       code(error.rawMessage || "")]));

@@ -44,6 +44,9 @@ for (const scenario of scenarios) {
     `${scenario.id}: concise sharing default`);
   if (scenario.error) assert(description.includes(scenario.error.message),
     `${scenario.id}: captured error`);
+  if (scenario.error) assert.strictEqual(
+    description.split(scenario.error.message).length - 1, 1,
+    `${scenario.id}: captured error should not be repeated as a summary`);
   assert(description.includes(scenario.language === "sv-SE"
     ? "## Steg för att återskapa" : "## Steps to Reproduce"),
   `${scenario.id}: localized structure`);

@@ -20,6 +20,10 @@ The package carries the report's document language. Markdown headings and
 structural labels use that language; captured errors, user-authored text, and
 technical evidence are never translated or rewritten.
 
+If the generated summary is identical to a captured Business Central error, the
+Markdown description omits the duplicate summary section. A distinct human
+summary is always retained.
+
 ## Revision and inclusion
 
 The source revision fingerprints the Technical Report state. Editing or
