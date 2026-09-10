@@ -16,6 +16,10 @@ New reports receive an editable title in the document language. When captured
 error evidence identifies a reproduction step, its Business Central action,
 field, or page supplies the title context. A user-entered title is never replaced.
 
+At narrow widths and high zoom, header actions wrap, reproduction editing becomes
+single-column, and the sharing dialog is bounded by the visual viewport. Controls
+remain reachable without horizontal page scrolling.
+
 The main report reads as one continuous document with subtle section dividers. Card borders are reserved for editable input, required attention, and collapsed technical content instead of surrounding every generated section.
 
 Reproduction screenshot captions identify the visible report step they support. Error screenshots keep their explicit error-evidence label.

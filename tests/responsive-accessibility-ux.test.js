@@ -4,6 +4,7 @@ const fs = require("fs");
 const dashboard = fs.readFileSync("src/ui/dashboard.html", "utf8");
 const popup = fs.readFileSync("src/ui/popup.html", "utf8");
 const design = fs.readFileSync("src/ui/design-system.css", "utf8");
+const technicalReport = fs.readFileSync("src/ui/technical-report.html", "utf8");
 
 assert(dashboard.includes(
   '<meta name="viewport" content="width=device-width,initial-scale=1">'),
@@ -15,6 +16,13 @@ assert(popup.includes("html{width:390px;min-width:390px}"),
 assert(!popup.includes("body{width:100vw}"),
   "a viewport-relative body width collapses extension popups before layout");
 assert(popup.includes("@media(max-height:540px)"));
+assert(technicalReport.includes("max-height:calc(100dvh - 24px)"),
+  "bug-report sharing must remain operable in short browser windows");
+assert(technicalReport.includes("width:min(960px,calc(100vw - 24px))"),
+  "bug-report sharing must not overflow a narrow viewport");
+assert(technicalReport.includes(".reproduction-editor-row{grid-template-columns:1fr}"));
+assert(technicalReport.includes(".primary-actions{flex-wrap:wrap}"));
+assert(technicalReport.includes("dialog select{box-sizing:border-box;width:100%}"));
 assert(popup.includes(
   'aria-describedby="nameDialogHelp documentLanguageHelp"'));
 assert(popup.includes('id="documentLanguageHelp"'));

@@ -13,7 +13,7 @@
     textarea{min-height:80px}button{margin:4px;padding:8px 12px}pre{white-space:pre-wrap;overflow-wrap:anywhere}
     table{border-collapse:collapse;width:100%;display:block;overflow-x:auto}td,th{border:1px solid #ccd5df;padding:6px;text-align:left}
     img{max-width:100%;height:auto}@media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important}}
-    dialog{width:min(960px,90vw);max-height:90vh;overflow:auto;border:1px solid #8392a5;border-radius:8px}
+    dialog{box-sizing:border-box;width:min(960px,calc(100vw - 24px));max-height:calc(100dvh - 24px);overflow:auto;padding:20px;border:1px solid #8392a5;border-radius:8px}
     dialog pre{max-height:320px;overflow:auto;background:#f5f7fa;padding:12px}
     input[type=checkbox]{width:auto}select{padding:8px}
     .primary-actions,.share-actions{display:flex;gap:8px;align-items:center}.primary-actions button,.share-actions button{margin:0}
@@ -42,7 +42,8 @@
     .technical-details>summary{cursor:pointer;font-size:1.25rem;font-weight:700}
     .report-incomplete{margin:20px 0;padding:16px;border:1px solid #e2c384;border-left:5px solid #b76e00;border-radius:6px;background:#fffaf0}.report-incomplete h2{margin-top:0}
     blockquote{margin:12px 0;padding:12px 16px;border-left:5px solid #b42318;background:#fff4f2;white-space:pre-wrap}
-    @media(max-width:700px){header,main{padding:12px}header{position:static}button{min-height:44px}fieldset{padding:12px}.report-section{padding:18px 0}.reproduction-editor-row{grid-template-columns:1fr}}
+    @media(max-width:700px){header,main{padding:12px}header{position:static}button{min-height:44px}fieldset{padding:12px}.report-section{padding:18px 0}.reproduction-editor-row{grid-template-columns:1fr}.primary-actions{flex-wrap:wrap}.primary-actions button{flex:1 1 140px}dialog{padding:12px}dialog select{box-sizing:border-box;width:100%}.share-actions button{width:100%}}
+    @media(max-width:420px){header,main{padding:8px}.report-core-fields,.report-more-fields,.technical-details{padding:12px}.secondary-actions button{flex:1 1 130px}}
   </style>
   <link rel="stylesheet" href="design-system.css">
 </head>

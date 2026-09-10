@@ -1,5 +1,12 @@
 # Changelog
 
+## 2026-09-10 - Bug reports fit narrow and zoomed views
+
+- The sharing dialog now stays inside both the visual viewport width and height.
+- Header actions wrap into usable full-width targets instead of being clipped.
+- Reproduction editing, destination selection, and secondary actions collapse
+  cleanly for narrow Edge panels and high browser zoom.
+
 ## 2026-09-10 - Shared bug descriptions stay concise
 
 - Shared issue descriptions now focus on the problem, reproduction, expected
