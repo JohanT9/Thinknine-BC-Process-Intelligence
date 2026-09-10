@@ -250,7 +250,9 @@
       issuePreviewState = await send({ type: "T9_BUILD_ISSUE_PACKAGE", bugReportId,
         options: { includeTelemetry: document.getElementById(
           "issueIncludeTelemetry").checked, includeAiAnalysis:
-          document.getElementById("issueIncludeAi").checked } });
+          document.getElementById("issueIncludeAi").checked,
+          includeTechnicalDetails: document.getElementById(
+            "issueIncludeTechnical").checked } });
       document.getElementById("issueTitle").textContent = issuePreviewState.issuePackage.title;
       document.getElementById("issueDescription").textContent = issuePreviewState.markdown;
       const list = document.getElementById("issueAttachments"); list.replaceChildren();
@@ -263,6 +265,7 @@
         `Destination: ${document.getElementById("issueProvider").value || "offline only"}`,
         `Telemetry: ${pkg.inclusion.telemetry ? "included" : "excluded"}`,
         `AI analysis: ${pkg.inclusion.aiAnalysis ? "included and labelled" : "excluded"}`,
+        `Technical details: ${pkg.inclusion.technicalDetails ? "included" : "excluded"}`,
         `Attachments: ${pkg.attachments.length}`,
         `Potentially sensitive categories: ${pkg.privacy.categories.join(", ")}`
       ].join(" · ");
@@ -291,7 +294,8 @@
     document.getElementById("issueProvider").addEventListener("change", action(async () => {
       issuePreviewState = null; updateShareUi(); await generateIssuePreview();
     }));
-    for (const id of ["issueIncludeTelemetry", "issueIncludeAi"]) {
+    for (const id of ["issueIncludeTelemetry", "issueIncludeAi",
+      "issueIncludeTechnical"]) {
       document.getElementById(id).addEventListener("change", action(async () => {
         issuePreviewState = null; await generateIssuePreview();
       }));

@@ -26,13 +26,21 @@
     add("Business Central Error", errors.flatMap((error, index) => [
       errors.length > 1 ? `### ${index === 0 ? "Primary error" : "Additional error"}` : null,
       code(error.rawMessage || "")]));
-    add("Environment", Object.entries(pkg.environment || {}).filter(([, child]) =>
-      child != null && child !== "" && child !== "captured").map(([key, child]) =>
-      `- ${inline(key)}: ${inline(child)}`));
-    add("Technical Diagnostics", (pkg.diagnostics?.rows || []).map(row =>
-      `- ${inline(row.label)}: ${inline(row.value)}`));
-    add("AL Call Stack", pkg.callStack.flatMap(stack => [
-      ...stack.frames.map(frame), ...(stack.rawCallStack ? [code(stack.rawCallStack)] : [])]));
+    if (pkg.inclusion?.technicalDetails !== false) {
+      const environment = Object.entries(pkg.environment || {}).filter(([, child]) =>
+        child != null && child !== "" && child !== "captured").map(([key, child]) =>
+        `- ${inline(key)}: ${inline(child)}`);
+      const diagnostics = (pkg.diagnostics?.rows || []).map(row =>
+        `- ${inline(row.label)}: ${inline(row.value)}`);
+      const callStack = pkg.callStack.flatMap(stack => [
+        ...stack.frames.map(frame), ...(stack.rawCallStack
+          ? [code(stack.rawCallStack)] : [])]);
+      const technical = [];
+      if (environment.length) technical.push("### Environment", "", ...environment, "");
+      if (diagnostics.length) technical.push("### Diagnostics", "", ...diagnostics, "");
+      if (callStack.length) technical.push("### AL Call Stack", "", ...callStack, "");
+      add("Technical Details", technical);
+    }
     if (pkg.telemetry) add("Telemetry", pkg.telemetry.contexts.flatMap(context => [
       `- Status: ${inline(context.status)}; related events: ${context.eventCount}`,
       ...(context.events || []).map(event => `  - ${inline(event.timestamp)} ${
@@ -50,4 +58,3 @@
     .replace(/```+text\n|```+/gu, "").replace(/\\([*_\[\]<>\\])/gu, "$1"); }
   return { code, markdown, plainText };
 });
-

@@ -1,5 +1,13 @@
 # Changelog
 
+## 2026-09-10 - Shared bug descriptions stay concise
+
+- Shared issue descriptions now focus on the problem, reproduction, expected
+  result, actual result, and captured Business Central error by default.
+- Environment, diagnostics, and AL call stacks remain preserved in the offline
+  package and can be included in the description with one explicit checkbox.
+- Opted-in technical content is grouped under one `Technical Details` section.
+
 ## 2026-09-10 - Bug-report titles follow the actual failure
 
 - Automatic titles now use the reproduction step linked to the captured error

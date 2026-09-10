@@ -61,6 +61,8 @@ assert.doesNotMatch(report, /<details class="report-options" open/);
 assert.match(report, /Share bug report/);
 assert.match(report, /id="openIssuePreview"[^>]*>Share report<\/button>/);
 assert.match(report, /<details class="share-options"><summary>Content and settings<\/summary>/);
+assert.match(report, /id="issueIncludeTechnical"/);
+assert.doesNotMatch(report, /id="issueIncludeTechnical"[^>]*checked/);
 assert.match(report, /<details class="share-preview"><summary>Review report content<\/summary>/);
 assert.match(report, /class="share-preview"[\s\S]*id="copyIssueDescription"/);
 assert.match(report, /id="adoConfiguration"/);

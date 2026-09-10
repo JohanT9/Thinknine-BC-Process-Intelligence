@@ -1853,7 +1853,9 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
         const issuePackage = globalThis.T9IssuePackage.build(report,
           { errorEvidence: evidence }, { generatedAt: new Date().toISOString(),
             includeTelemetry: Boolean(message.options?.includeTelemetry),
-            includeAiAnalysis: Boolean(message.options?.includeAiAnalysis) });
+            includeAiAnalysis: Boolean(message.options?.includeAiAnalysis),
+            includeTechnicalDetails: Boolean(
+              message.options?.includeTechnicalDetails) });
         const screenshotValues = await getScreenshots(report.recordingId);
         const recording = await getCanonicalRecording(report.recordingId);
         const offlineAttachments = issuePackage.attachments.map(attachment => {

@@ -66,6 +66,7 @@
       telemetry: includeTelemetry ? clone(telemetry) : null,
       aiAnalysis: includeAi ? clone(ai) : null,
       inclusion: { telemetry: includeTelemetry, aiAnalysis: includeAi,
+        technicalDetails: Boolean(options.includeTechnicalDetails),
         rawTelemetry: false, rawCanonicalEvents: false, rawDiagnostics: false,
         screenshots: attachments(document).length > 0 },
       privacy: { requiresReview: true, categories: ["business-central-error",
@@ -84,4 +85,3 @@
   }
   return { SCHEMA_VERSION, build, currentRevision, hash, isStale };
 });
-

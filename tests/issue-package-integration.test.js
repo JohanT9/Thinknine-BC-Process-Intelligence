@@ -57,6 +57,12 @@ assert.strictEqual(pkg.telemetry, null); assert.strictEqual(pkg.aiAnalysis, null
 const markdown = formatter.markdown(pkg);
 assert(!markdown.includes("Obsolete event"));
 assert(markdown.includes(evidence[0].rawMessage));
+assert(!markdown.includes("Technical Details"));
+const technicalMarkdown = formatter.markdown(packages.build(report,
+  { errorEvidence: evidence }, { ...options, includeTechnicalDetails: true }));
+assert(technicalMarkdown.includes("## Technical Details"));
+assert(technicalMarkdown.includes("### Environment"));
+assert(technicalMarkdown.includes("### AL Call Stack"));
 assert(formatter.code(evidence[0].rawMessage).includes(evidence[0].rawMessage));
 const telemetryPkg = packages.build(report, { errorEvidence: evidence }, {
   ...options, includeTelemetry: true });

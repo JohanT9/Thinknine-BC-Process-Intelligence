@@ -27,6 +27,11 @@ Telemetry is excluded by default and, when selected, contains only the existing
 bounded normalized summary—not raw query results. AI is included only when
 selected and current, and remains labelled AI-assisted and not authoritative.
 
+The human-readable issue description excludes environment diagnostics and the
+AL call stack by default so the recorded problem remains easy to scan. Users can
+explicitly include those details under one technical section. The provider-neutral
+offline package still preserves the structured technical fields either way.
+
 ## Attachments and offline package
 
 Only the dedicated error screenshot and the first selected screenshot for each
@@ -44,4 +49,3 @@ utility exists; JSON avoids introducing a second ZIP implementation.
 The explicit future boundary is `Bug Report -> Issue Package -> Sanitization
 Policy -> Destination Adapter`. This milestone provides transparent review and
 category disclosure, not an elaborate DLP engine.
-
