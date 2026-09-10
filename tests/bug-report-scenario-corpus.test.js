@@ -44,6 +44,9 @@ for (const scenario of scenarios) {
     `${scenario.id}: concise sharing default`);
   if (scenario.error) assert(description.includes(scenario.error.message),
     `${scenario.id}: captured error`);
+  assert(description.includes(scenario.language === "sv-SE"
+    ? "## Steg för att återskapa" : "## Steps to Reproduce"),
+  `${scenario.id}: localized structure`);
 }
 
 console.log(`Bug-report scenario corpus passed (${scenarios.length} flows).`);

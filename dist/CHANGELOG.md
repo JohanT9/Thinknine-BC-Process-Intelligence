@@ -1,5 +1,12 @@
 # Changelog
 
+## 2026-09-10 - Shared bug reports use the document language
+
+- Markdown and external issue descriptions now use Swedish section headings for
+  Swedish reports and English headings for English reports.
+- Optional technical, telemetry, and AI sections follow the same language.
+- Captured Business Central errors and human-authored content remain verbatim.
+
 ## 2026-09-10 - Bug-report behavior has a scenario corpus
 
 - Five sanitized Swedish and English flows now exercise the production report

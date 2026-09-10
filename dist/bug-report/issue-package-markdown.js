@@ -4,6 +4,26 @@
 })(typeof globalThis !== "undefined" ? globalThis : this, function () {
   "use strict";
   const value = input => input == null ? "" : String(input);
+  const SWEDISH = Object.freeze({ summary: "Sammanfattning",
+    reproduction: "Steg för att återskapa", expected: "Förväntat resultat",
+    actual: "Faktiskt resultat", error: "Business Central-fel",
+    primaryError: "Primärt fel", additionalError: "Ytterligare fel",
+    technical: "Tekniska detaljer", environment: "Miljö",
+    diagnostics: "Diagnostik", callStack: "AL-anropsstack",
+    telemetry: "Telemetri", ai: "AI-assisterad analys (inte auktoritativ)",
+    status: "Status", relatedEvents: "relaterade händelser",
+    relatedBy: "kopplad genom", observation: "Observation",
+    hypothesis: "Möjlig rotorsak (inte verifierad)", notes: "Anteckningar" });
+  const ENGLISH = Object.freeze({ summary: "Summary",
+    reproduction: "Steps to Reproduce", expected: "Expected Result",
+    actual: "Actual Result", error: "Business Central Error",
+    primaryError: "Primary error", additionalError: "Additional error",
+    technical: "Technical Details", environment: "Environment",
+    diagnostics: "Diagnostics", callStack: "AL Call Stack",
+    telemetry: "Telemetry", ai: "AI-Assisted Analysis (not authoritative)",
+    status: "Status", relatedEvents: "related events", relatedBy: "related by",
+    observation: "Observation", hypothesis:
+      "Possible root-cause hypothesis (not verified)", notes: "Notes" });
   const inline = input => value(input).replace(/\\/gu, "\\\\")
     .replace(/([*_\[\]<>])/gu, "\\$1");
   function code(valueToRender) { const raw = value(valueToRender);
@@ -13,18 +33,19 @@
     item.objectType, item.objectId, item.objectName].filter(Boolean).join(" ")}${
     item.methodName ? ` — ${item.methodName}` : ""}${item.extensionName ?
     ` (${item.extensionName})` : ""}${item.sourceLine ? `, line ${item.sourceLine}` : ""}`; }
-  function markdown(pkg) { const out = [`# ${inline(pkg.title)}`, ""];
+  function markdown(pkg) { const labels = pkg.documentLanguage === "sv-SE"
+    ? SWEDISH : ENGLISH; const out = [`# ${inline(pkg.title)}`, ""];
     const add = (title, lines) => { const filtered = lines.filter(item => item !== "" &&
       item != null); if (filtered.length) out.push(`## ${title}`, "", ...filtered, ""); };
-    add("Summary", [inline(pkg.summary?.summary)]);
-    add("Steps to Reproduce", pkg.reproduction.map((step, index) =>
+    add(labels.summary, [inline(pkg.summary?.summary)]);
+    add(labels.reproduction, pkg.reproduction.map((step, index) =>
       `${index + 1}. ${inline(step.instruction)}`));
-    add("Expected Result", [inline(pkg.expectedResult)]);
-    add("Actual Result", [inline(pkg.actualResult?.userDescription)]);
+    add(labels.expected, [inline(pkg.expectedResult)]);
+    add(labels.actual, [inline(pkg.actualResult?.userDescription)]);
     const errors = [pkg.errorEvidence?.primary, ...(pkg.errorEvidence?.additional || [])]
       .filter(Boolean);
-    add("Business Central Error", errors.flatMap((error, index) => [
-      errors.length > 1 ? `### ${index === 0 ? "Primary error" : "Additional error"}` : null,
+    add(labels.error, errors.flatMap((error, index) => [
+      errors.length > 1 ? `### ${index === 0 ? labels.primaryError : labels.additionalError}` : null,
       code(error.rawMessage || "")]));
     if (pkg.inclusion?.technicalDetails !== false) {
       const environment = Object.entries(pkg.environment || {}).filter(([, child]) =>
@@ -36,22 +57,22 @@
         ...stack.frames.map(frame), ...(stack.rawCallStack
           ? [code(stack.rawCallStack)] : [])]);
       const technical = [];
-      if (environment.length) technical.push("### Environment", "", ...environment, "");
-      if (diagnostics.length) technical.push("### Diagnostics", "", ...diagnostics, "");
-      if (callStack.length) technical.push("### AL Call Stack", "", ...callStack, "");
-      add("Technical Details", technical);
+      if (environment.length) technical.push(`### ${labels.environment}`, "", ...environment, "");
+      if (diagnostics.length) technical.push(`### ${labels.diagnostics}`, "", ...diagnostics, "");
+      if (callStack.length) technical.push(`### ${labels.callStack}`, "", ...callStack, "");
+      add(labels.technical, technical);
     }
-    if (pkg.telemetry) add("Telemetry", pkg.telemetry.contexts.flatMap(context => [
-      `- Status: ${inline(context.status)}; related events: ${context.eventCount}`,
+    if (pkg.telemetry) add(labels.telemetry, pkg.telemetry.contexts.flatMap(context => [
+      `- ${labels.status}: ${inline(context.status)}; ${labels.relatedEvents}: ${context.eventCount}`,
       ...(context.events || []).map(event => `  - ${inline(event.timestamp)} ${
-        inline(event.eventName)} — related by ${inline((event.correlationReasons || []).join(", "))}`)]));
-    if (pkg.aiAnalysis) add("AI-Assisted Analysis (not authoritative)", [
-      `Status: ${inline(pkg.aiAnalysis.status)}`, inline(pkg.aiAnalysis.summary),
-      ...(pkg.aiAnalysis.observations || []).map(item => `- Observation: ${inline(item.text)} [${
+        inline(event.eventName)} — ${labels.relatedBy} ${inline((event.correlationReasons || []).join(", "))}`)]));
+    if (pkg.aiAnalysis) add(labels.ai, [
+      `${labels.status}: ${inline(pkg.aiAnalysis.status)}`, inline(pkg.aiAnalysis.summary),
+      ...(pkg.aiAnalysis.observations || []).map(item => `- ${labels.observation}: ${inline(item.text)} [${
         inline((item.citations || []).join(", "))}]`),
       ...(pkg.aiAnalysis.hypotheses || []).map(item =>
-        `- Possible root-cause hypothesis (not verified): ${inline(item.text)}`)]);
-    add("Notes", pkg.notes.map(item => `- ${inline(item.text || item.content)}`));
+        `- ${labels.hypothesis}: ${inline(item.text)}`)]);
+    add(labels.notes, pkg.notes.map(item => `- ${inline(item.text || item.content)}`));
     return `${out.join("\n").trim()}\n`;
   }
   function plainText(pkg) { return markdown(pkg).replace(/^#{1,6}\s+/gmu, "")

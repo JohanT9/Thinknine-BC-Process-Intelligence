@@ -53,6 +53,7 @@
       bugReportId: report.bugReportId, recordingId: report.recordingId,
       generatedAt: options.generatedAt || new Date().toISOString(), sourceRevision,
       sourceUpdatedAt: report.updatedAt || null, title: document.title,
+      documentLanguage: document.documentLanguage,
       summary: clone(section(document, "summary")),
       reproduction: clone(section(document, "reproduction") || []),
       expectedResult: section(document, "expected-result") || "",

@@ -16,6 +16,10 @@ current AI analysis, inclusion policy, privacy categories, and provenance.
 Exact BC error and raw call-stack content are preserved. Destination formatting
 escapes markup but does not rewrite evidence.
 
+The package carries the report's document language. Markdown headings and
+structural labels use that language; captured errors, user-authored text, and
+technical evidence are never translated or rewritten.
+
 ## Revision and inclusion
 
 The source revision fingerprints the Technical Report state. Editing or

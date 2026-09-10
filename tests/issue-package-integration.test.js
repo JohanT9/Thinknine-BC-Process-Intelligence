@@ -47,6 +47,7 @@ const options = { generatedAt: "2026-08-24T12:00:00Z",
 const pkg = packages.build(report, { errorEvidence: evidence }, options);
 assert.deepStrictEqual(pkg, packages.build(report, { errorEvidence: evidence }, options));
 assert.strictEqual(pkg.provenance.type, "derived-issue-package");
+assert.strictEqual(pkg.documentLanguage, "en-US");
 assert.deepStrictEqual(pkg.reproduction.map(item => item.instruction),
   ["Open order.", "Post order."]);
 assert.strictEqual(pkg.errorEvidence.primary.rawMessage, evidence[0].rawMessage);
