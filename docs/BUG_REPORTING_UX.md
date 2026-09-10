@@ -20,6 +20,9 @@ At narrow widths and high zoom, header actions wrap, reproduction editing become
 single-column, and the sharing dialog is bounded by the visual viewport. Controls
 remain reachable without horizontal page scrolling.
 
+Sharing choices, inclusion status, and accessible dialog labels follow the
+selected interface language. Captured Business Central evidence remains verbatim.
+
 The main report reads as one continuous document with subtle section dividers. Card borders are reserved for editable input, required attention, and collapsed technical content instead of surrounding every generated section.
 
 Reproduction screenshot captions identify the visible report step they support. Error screenshots keep their explicit error-evidence label.

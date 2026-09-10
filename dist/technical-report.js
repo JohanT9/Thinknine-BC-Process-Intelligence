@@ -261,13 +261,18 @@
         item.textContent = `${attachment.fileName} — ${attachment.role}`; list.append(item);
       }
       const pkg = issuePreviewState.issuePackage;
+      const included = t("technical.included");
+      const excluded = t("technical.excluded");
       document.getElementById("issueTransmissionSummary").textContent = [
-        `Destination: ${document.getElementById("issueProvider").value || "offline only"}`,
-        `Telemetry: ${pkg.inclusion.telemetry ? "included" : "excluded"}`,
-        `AI analysis: ${pkg.inclusion.aiAnalysis ? "included and labelled" : "excluded"}`,
-        `Technical details: ${pkg.inclusion.technicalDetails ? "included" : "excluded"}`,
-        `Attachments: ${pkg.attachments.length}`,
-        `Potentially sensitive categories: ${pkg.privacy.categories.join(", ")}`
+        `${t("technical.destination")}: ${document.getElementById(
+          "issueProvider").value || t("technical.offlineOnly")}`,
+        `${t("technical.telemetry")}: ${pkg.inclusion.telemetry ? included : excluded}`,
+        `${t("technical.aiAnalysis")}: ${pkg.inclusion.aiAnalysis
+          ? t("technical.includedLabelled") : excluded}`,
+        `${t("technical.technicalDetails")}: ${pkg.inclusion.technicalDetails
+          ? included : excluded}`,
+        `${t("technical.attachments")}: ${pkg.attachments.length}`,
+        `${t("technical.sensitiveCategories")}: ${pkg.privacy.categories.join(", ")}`
       ].join(" · ");
       document.getElementById("issueResult").textContent =
         issuePreviewState.existingReferences.length ?

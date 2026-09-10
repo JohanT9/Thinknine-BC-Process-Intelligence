@@ -24,6 +24,10 @@ assert.equal(i18n.format("library.manyShown", { count: 4 }, "en-US"),
   "4 documents shown.");
 assert.equal(i18n.translateStaticText("Spara", "en-US"), "Save");
 assert.equal(i18n.translateStaticText("Save", "sv-SE"), "Spara");
+assert.equal(i18n.translateStaticText(
+  "Include technical details in description", "sv-SE"),
+"Inkludera tekniska detaljer i beskrivningen");
+assert.equal(i18n.translate("technical.included", "sv-SE"), "inkluderat");
 
 const dashboardHtml = fs.readFileSync(path.join(root,
   "src/ui/dashboard.html"), "utf8");
@@ -81,6 +85,9 @@ assert.match(debugHtml, /<script src="i18n\.js"><\/script>/);
 assert.match(debug, /T9_GET_SETTINGS/);
 assert.match(technicalHtml, /<script src="i18n\.js"><\/script>/);
 assert.match(technical, /technical\.reportCopied/);
+assert.match(technical, /technical\.sensitiveCategories/);
+assert.match(technicalHtml, /data-i18n-aria-label="technical\.closeSharing"/);
+assert.match(source, /\[data-i18n-aria-label\]/);
 assert.match(dashboard, /uiTf\("a11y\.editInstruction"/);
 assert.equal(i18n.translateStaticText("Anslutning till BC", "en-US"),
   "BC connection");

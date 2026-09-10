@@ -1,5 +1,13 @@
 # Changelog
 
+## 2026-09-10 - Bug-report sharing follows the interface language
+
+- The new technical-details choice and the live transmission summary now render
+  in the selected Swedish or English interface language.
+- The sharing dialog close control has a localized accessible name.
+- The shared localization layer now supports `data-i18n-aria-label` for future
+  accessible controls without duplicating UI logic.
+
 ## 2026-09-10 - Bug reports fit narrow and zoomed views
 
 - The sharing dialog now stays inside both the visual viewport width and height.

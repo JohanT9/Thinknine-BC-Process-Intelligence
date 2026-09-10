@@ -90,6 +90,17 @@
       "technical.submissionConsent": "Granskning och uttryckligt samtycke krävs före överföring.",
       "technical.selectProvider": "Välj Azure DevOps eller GitHub före överföring.",
       "technical.openExternalIssue": "Öppna externt ärende",
+      "technical.closeSharing": "Stäng delning av felrapport",
+      "technical.destination": "Mål",
+      "technical.offlineOnly": "endast lokalt paket",
+      "technical.telemetry": "Telemetri",
+      "technical.aiAnalysis": "AI-analys",
+      "technical.technicalDetails": "Tekniska detaljer",
+      "technical.attachments": "Bilagor",
+      "technical.included": "inkluderat",
+      "technical.includedLabelled": "inkluderat och märkt",
+      "technical.excluded": "utelämnat",
+      "technical.sensitiveCategories": "Kategorier som kan vara känsliga",
       "debug.none": "Inget",
       "debug.noSession": "Ingen",
       "debug.active": "Pågår",
@@ -263,6 +274,17 @@
       "technical.submissionConsent": "Review and explicit submission consent are required.",
       "technical.selectProvider": "Select Azure DevOps or GitHub before submission.",
       "technical.openExternalIssue": "Open external issue",
+      "technical.closeSharing": "Close report sharing",
+      "technical.destination": "Destination",
+      "technical.offlineOnly": "offline only",
+      "technical.telemetry": "Telemetry",
+      "technical.aiAnalysis": "AI analysis",
+      "technical.technicalDetails": "Technical details",
+      "technical.attachments": "Attachments",
+      "technical.included": "included",
+      "technical.includedLabelled": "included and labelled",
+      "technical.excluded": "excluded",
+      "technical.sensitiveCategories": "Potentially sensitive categories",
       "debug.none": "None",
       "debug.noSession": "None",
       "debug.active": "In progress",
@@ -593,6 +615,7 @@
     ,["Jag förstår att valda bevis lämnar det här tillägget", "I understand that the selected evidence will leave this extension"]
     ,["Inkludera telemetrisammanfattning", "Include telemetry summary"]
     ,["Inkludera aktuell AI-stödd analys", "Include current AI-assisted analysis"]
+    ,["Inkludera tekniska detaljer i beskrivningen", "Include technical details in description"]
     ,["Databas (ägare/namn)", "Repository (owner/name)"]
     ,["Etiketter, kommaseparerade", "Labels, comma separated"]
     ,["Taggar, kommaseparerade", "Tags, comma separated"]
@@ -700,6 +723,10 @@
     });
     target.querySelectorAll("[data-i18n-title]").forEach(element => {
       element.title = translate(element.dataset.i18nTitle, normalized);
+    });
+    target.querySelectorAll("[data-i18n-aria-label]").forEach(element => {
+      element.setAttribute("aria-label", translate(
+        element.dataset.i18nAriaLabel, normalized));
     });
     applyStaticText(normalized, target);
     target.dispatchEvent?.(new CustomEvent("t9:locale-changed", {
