@@ -1,0 +1,48 @@
+schemaVersion: 1
+id: item-tracking-missing-lot-sv
+name: Partinummer saknas vid bokföring
+description: En spårningspliktig artikel kan inte bokföras utan partinummer.
+businessCentral:
+  language: sv-SE
+  domain: ItemTracking
+  process: LotTracking
+  page:
+    objectId: 42
+    caption: Försäljningsorder
+recording:
+  events:
+    - id: add-tracked-item
+      type: change
+      pageObjectId: 42
+      pageCaption: Försäljningsorder
+      fieldName: Nr.
+      label: Nr.
+    - id: post-shipment
+      type: click
+      pageObjectId: 42
+      pageCaption: Försäljningsorder
+      label: Bokför och leverera
+  steps:
+    - id: add-tracked-item
+      instruction: Lägg till en artikel som kräver partispårning.
+      fieldCaption: Nr.
+      sourceEvents: [add-tracked-item]
+    - id: post-shipment
+      instruction: Välj Bokför och leverera utan att ange partinummer.
+      actionCaption: Bokför och leverera
+      sourceEvents: [post-shipment]
+error:
+  afterEvent: post-shipment
+  message: Artikelspårning har inte definierats för hela antalet.
+expected:
+  title: Fel vid ”Bokför och leverera”
+  failureStep: post-shipment
+  descriptionContains: ["## Business Central-fel"]
+  descriptionExcludes: ["## Tekniska detaljer"]
+live:
+  preconditions:
+    - Använd en testartikel med obligatorisk partispårning och tillgängligt saldo.
+  actions:
+    - Lägg artikeln på en försäljningsorder.
+    - Försök bokföra leveransen utan att tilldela ett partinummer.
+  expectedOutcome: Bokföringshandlingen markeras som felsteg och artikelspårningsfelet fångas.

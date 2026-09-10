@@ -1,0 +1,48 @@
+schemaVersion: 1
+id: sales-credit-limit-sv
+name: Kreditgräns överskrids på försäljningsorder
+description: En kreditvarning visas när ordervärdet överskrider kundens kreditgräns.
+businessCentral:
+  language: sv-SE
+  domain: OrderToCash
+  process: SalesOrderProcessing
+  page:
+    objectId: 42
+    caption: Försäljningsorder
+recording:
+  events:
+    - id: enter-quantity
+      type: change
+      pageObjectId: 42
+      pageCaption: Försäljningsorder
+      fieldName: Antal
+      label: Antal
+    - id: confirm-line
+      type: click
+      pageObjectId: 42
+      pageCaption: Försäljningsorder
+      label: OK
+  steps:
+    - id: enter-quantity
+      instruction: Ange ett antal som gör att kundens kreditgräns överskrids.
+      fieldCaption: Antal
+      sourceEvents: [enter-quantity]
+    - id: confirm-line
+      instruction: Bekräfta försäljningsraden.
+      actionCaption: OK
+      sourceEvents: [confirm-line]
+error:
+  afterEvent: confirm-line
+  message: Kundens kreditgräns har överskridits.
+expected:
+  title: Fel vid ”OK”
+  failureStep: confirm-line
+  descriptionContains: ["## Business Central-fel"]
+  descriptionExcludes: ["## Tekniska detaljer"]
+live:
+  preconditions:
+    - Använd en testkund med låg kreditgräns och aktiverad kreditvarning.
+  actions:
+    - Skapa en försäljningsorder och lägg till en artikel.
+    - Ange ett tillräckligt högt antal och bekräfta raden.
+  expectedOutcome: Kreditvarningen kopplas till den handling som utlöste den.

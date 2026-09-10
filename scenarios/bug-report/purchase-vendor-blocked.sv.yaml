@@ -1,0 +1,47 @@
+schemaVersion: 1
+id: purchase-vendor-blocked-sv
+name: Spärrad leverantör på inköpsorder
+description: Leverantörsvalet stoppas av Business Central-validering.
+businessCentral:
+  language: sv-SE
+  domain: SourceToPay
+  process: SimplePurchaseOrder
+  page:
+    objectId: 50
+    caption: Inköpsorder
+recording:
+  events:
+    - id: new-order
+      type: click
+      pageObjectId: 50
+      pageCaption: Inköpsorder
+      label: Ny
+    - id: select-vendor
+      type: change
+      pageObjectId: 50
+      pageCaption: Inköpsorder
+      fieldName: Leverantörsnr.
+      label: Leverantörsnr.
+  steps:
+    - id: new-order
+      instruction: Skapa en ny inköpsorder.
+      sourceEvents: [new-order]
+    - id: select-vendor
+      instruction: Ange en spärrad leverantör.
+      fieldCaption: Leverantörsnr.
+      sourceEvents: [select-vendor]
+error:
+  afterEvent: select-vendor
+  message: Leverantören är spärrad och kan inte användas på dokumentet.
+expected:
+  title: Valideringsfel i ”Leverantörsnr.”
+  failureStep: select-vendor
+  descriptionContains: ["## Steg för att återskapa", "## Business Central-fel"]
+  descriptionExcludes: ["## Tekniska detaljer"]
+live:
+  preconditions:
+    - Använd en spärrad testleverantör i ett sandboxföretag.
+  actions:
+    - Skapa en ny inköpsorder.
+    - Ange den spärrade leverantören i Leverantörsnr.
+  expectedOutcome: Leverantörsfältet identifieras som felsteget.

@@ -1,0 +1,46 @@
+schemaVersion: 1
+id: production-consumption-shortage-sv
+name: Komponentbrist vid produktionsförbrukning
+description: Bokföring av förbrukning stoppas när komponentlagret inte räcker.
+businessCentral:
+  language: sv-SE
+  domain: PlanToProduce
+  process: ProductionConsumption
+  page:
+    objectId: 99000831
+    caption: Frisläppt produktionsorder
+recording:
+  events:
+    - id: open-consumption
+      type: click
+      pageObjectId: 99000831
+      pageCaption: Frisläppt produktionsorder
+      label: Förbrukningsjournal
+    - id: post-consumption
+      type: click
+      pageCaption: Förbrukningsjournal
+      label: Bokför
+  steps:
+    - id: open-consumption
+      instruction: Öppna förbrukningsjournalen från produktionsordern.
+      actionCaption: Förbrukningsjournal
+      sourceEvents: [open-consumption]
+    - id: post-consumption
+      instruction: Välj Bokför i förbrukningsjournalen.
+      actionCaption: Bokför
+      sourceEvents: [post-consumption]
+error:
+  afterEvent: post-consumption
+  message: Lagret räcker inte för att bokföra komponentförbrukningen.
+expected:
+  title: Fel vid ”Bokför”
+  failureStep: post-consumption
+  descriptionContains: ["## Steg för att återskapa", "## Business Central-fel"]
+  descriptionExcludes: ["## Tekniska detaljer"]
+live:
+  preconditions:
+    - Använd en frisläppt testproduktionsorder med komponentbrist i en sandbox.
+  actions:
+    - Öppna Förbrukningsjournal från produktionsordern.
+    - Beräkna förbrukning och välj Bokför.
+  expectedOutcome: Bokför markeras som felsteg och produktionskontexten behålls.

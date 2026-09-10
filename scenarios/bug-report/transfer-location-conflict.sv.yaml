@@ -1,0 +1,49 @@
+schemaVersion: 1
+id: transfer-location-conflict-sv
+name: Samma lagerställe på överföringsorder
+description: Från- och till-lagerställe får inte vara samma på en överföringsorder.
+businessCentral:
+  language: sv-SE
+  domain: Transfers
+  process: TransferOrder
+  page:
+    objectId: 5740
+    caption: Överföringsorder
+recording:
+  events:
+    - id: from-location
+      type: change
+      pageObjectId: 5740
+      pageCaption: Överföringsorder
+      fieldName: Från lagerställekod
+      label: Från lagerställekod
+    - id: to-location
+      type: change
+      pageObjectId: 5740
+      pageCaption: Överföringsorder
+      fieldName: Till lagerställekod
+      label: Till lagerställekod
+  steps:
+    - id: from-location
+      instruction: Ange lagerstället som varorna ska överföras från.
+      fieldCaption: Från lagerställekod
+      sourceEvents: [from-location]
+    - id: to-location
+      instruction: Ange samma lagerställe som destination.
+      fieldCaption: Till lagerställekod
+      sourceEvents: [to-location]
+error:
+  afterEvent: to-location
+  message: Från lagerställekod och Till lagerställekod får inte vara samma.
+expected:
+  title: Valideringsfel i ”Till lagerställekod”
+  failureStep: to-location
+  descriptionContains: ["## Steg för att återskapa", "## Business Central-fel"]
+  descriptionExcludes: ["## Tekniska detaljer"]
+live:
+  preconditions:
+    - Använd två testlagerställen i ett sandboxföretag.
+  actions:
+    - Skapa en överföringsorder.
+    - Ange samma kod i Från lagerställekod och Till lagerställekod.
+  expectedOutcome: Det andra lagerställesfältet markeras som felsteg.

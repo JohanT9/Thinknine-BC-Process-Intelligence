@@ -1,0 +1,47 @@
+schemaVersion: 1
+id: sales-customer-blocked-sv
+name: Spärrad kund på försäljningsorder
+description: Validering av kund stoppas eftersom kunden är spärrad.
+businessCentral:
+  language: sv-SE
+  domain: OrderToCash
+  process: SimpleSalesOrder
+  page:
+    objectId: 42
+    caption: Försäljningsorder
+recording:
+  events:
+    - id: new-order
+      type: click
+      pageObjectId: 42
+      pageCaption: Försäljningsorder
+      label: Ny
+    - id: select-customer
+      type: change
+      pageObjectId: 42
+      pageCaption: Försäljningsorder
+      fieldName: Kundnr.
+      label: Kundnr.
+  steps:
+    - id: new-order
+      instruction: Skapa en ny försäljningsorder.
+      sourceEvents: [new-order]
+    - id: select-customer
+      instruction: Ange en spärrad kund i Kundnr.
+      fieldCaption: Kundnr.
+      sourceEvents: [select-customer]
+error:
+  afterEvent: select-customer
+  message: Kunden är spärrad och kan inte användas på dokumentet.
+expected:
+  title: Valideringsfel i ”Kundnr.”
+  failureStep: select-customer
+  descriptionContains: ["## Steg för att återskapa", "## Business Central-fel"]
+  descriptionExcludes: ["## Tekniska detaljer"]
+live:
+  preconditions:
+    - Använd ett sandboxföretag och en testkund som är spärrad för alla transaktioner.
+  actions:
+    - Öppna Försäljningsorder och skapa en ny order.
+    - Ange den spärrade kunden i Kundnr.
+  expectedOutcome: Business Central stoppar valet och inspelningen markerar kundfältet som felsteg.

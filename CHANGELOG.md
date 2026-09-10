@@ -1,5 +1,14 @@
 # Changelog
 
+## 2026-09-10 - YAML bug scenarios cover core BC operations
+
+- Eight executable Swedish scenarios now cover blocked master data, credit
+  limits, warehouse picking and receiving, transfers, production consumption,
+  and item tracking.
+- Each scenario includes a safe manual sandbox recipe alongside deterministic
+  recording evidence and report expectations.
+- The standard YAML corpus now verifies thirteen representative flows.
+
 ## 2026-09-10 - Business Central bug scenarios are executable YAML
 
 - Bug-report scenarios now live as human-readable YAML files with BC page,

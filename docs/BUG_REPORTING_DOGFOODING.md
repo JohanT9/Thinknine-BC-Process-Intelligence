@@ -7,10 +7,12 @@ The UX regression checks cover mode discoverability, one-action bug start, disti
 Existing domain suites continue to cover validation/runtime errors, multiple evidence records, diagnostics and partial call stacks, telemetry states, stale AI analysis, local issue packages, provider consent, saves, and exports.
 
 The CI gate also runs a sanitized bug-report scenario corpus through the actual
-report service, issue-package projection, and Markdown formatter. Its initial five
-flows cover Swedish and English errors, an unmapped technical event after the
-acted-on step, a silent problem, and a manual title. New sanitized pilot defects
-should first be reduced to this metadata-only format before adding a regression.
+report service, issue-package projection, and Markdown formatter. Its thirteen
+flows cover Swedish and English errors, blocked customers and vendors, credit
+limits, warehouse picking and receiving, transfers, production consumption,
+item tracking, an unmapped technical event after the acted-on step, a silent
+problem, and a manual title. New sanitized pilot defects should first be reduced
+to this metadata-only format before adding a regression.
 
 ## Executable YAML scenarios
 

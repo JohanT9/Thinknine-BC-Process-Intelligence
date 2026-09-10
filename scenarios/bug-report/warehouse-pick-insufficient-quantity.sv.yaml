@@ -1,0 +1,46 @@
+schemaVersion: 1
+id: warehouse-pick-insufficient-quantity-sv
+name: Otillräckligt disponibelt antal vid lagerplockning
+description: Registrering av lagerplock stoppas när disponibelt antal saknas.
+businessCentral:
+  language: sv-SE
+  domain: WarehouseManagement
+  process: AdvancedWarehouseOutbound
+  page:
+    objectId: 7350
+    caption: Lagerplockning
+recording:
+  events:
+    - id: open-pick
+      type: navigation
+      pageObjectId: 7350
+      pageCaption: Lagerplockning
+      label: Öppna lagerplockning
+    - id: register-pick
+      type: click
+      pageObjectId: 7350
+      pageCaption: Lagerplockning
+      label: Registrera plockning
+  steps:
+    - id: open-pick
+      instruction: Öppna lagerplockningen.
+      sourceEvents: [open-pick]
+    - id: register-pick
+      instruction: Välj Registrera plockning.
+      actionCaption: Registrera plockning
+      sourceEvents: [register-pick]
+error:
+  afterEvent: register-pick
+  message: Det finns inte tillräckligt disponibelt antal på lagerstället.
+expected:
+  title: Fel vid ”Registrera plockning”
+  failureStep: register-pick
+  descriptionContains: ["## Steg för att återskapa", "## Business Central-fel"]
+  descriptionExcludes: ["## Tekniska detaljer"]
+live:
+  preconditions:
+    - Använd en sandbox med avancerad lagerhantering och ett plock med otillräckligt saldo.
+  actions:
+    - Öppna Lagerplockning för testdokumentet.
+    - Välj Registrera plockning.
+  expectedOutcome: Registrera plockning blir felsteg och lagerkontexten bevaras.

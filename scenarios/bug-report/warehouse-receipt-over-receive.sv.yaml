@@ -1,0 +1,48 @@
+schemaVersion: 1
+id: warehouse-receipt-over-receive-sv
+name: För stort antal vid lagerinleverans
+description: Mottaget antal överskrider kvarvarande antal på källdokumentet.
+businessCentral:
+  language: sv-SE
+  domain: WarehouseManagement
+  process: AdvancedWarehouseInbound
+  page:
+    objectId: 7332
+    caption: Lagerinleverans
+recording:
+  events:
+    - id: quantity-to-receive
+      type: change
+      pageObjectId: 7332
+      pageCaption: Lagerinleverans
+      fieldName: Antal att inleverera
+      label: Antal att inleverera
+    - id: post-receipt
+      type: click
+      pageObjectId: 7332
+      pageCaption: Lagerinleverans
+      label: Bokför inleverans
+  steps:
+    - id: quantity-to-receive
+      instruction: Ange ett för stort antal i Antal att inleverera.
+      fieldCaption: Antal att inleverera
+      sourceEvents: [quantity-to-receive]
+    - id: post-receipt
+      instruction: Välj Bokför inleverans.
+      actionCaption: Bokför inleverans
+      sourceEvents: [post-receipt]
+error:
+  afterEvent: post-receipt
+  message: Antal att inleverera får inte vara större än kvarvarande antal.
+expected:
+  title: Fel vid ”Bokför inleverans”
+  failureStep: post-receipt
+  descriptionContains: ["## Business Central-fel"]
+  descriptionExcludes: ["## Tekniska detaljer"]
+live:
+  preconditions:
+    - Använd en lagerinleverans i en sandbox där raden får ändras.
+  actions:
+    - Ange ett antal som överstiger det återstående antalet.
+    - Välj Bokför inleverans.
+  expectedOutcome: Bokföringshandlingen markeras som felsteg med rätt lagerdokument.
