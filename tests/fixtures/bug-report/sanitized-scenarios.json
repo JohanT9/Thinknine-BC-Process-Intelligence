@@ -1,0 +1,70 @@
+[
+  {
+    "id": "sv-action-error",
+    "language": "sv-SE",
+    "events": [
+      { "type": "click", "label": "Öppna inköpsorder" },
+      { "type": "click", "label": "Bokför" }
+    ],
+    "steps": [
+      { "instruction": "Öppna inköpsordern.", "sourceIndexes": [0] },
+      { "instruction": "Välj Bokför.", "actionCaption": "Bokför", "sourceIndexes": [1] }
+    ],
+    "error": { "precedingIndex": 1, "message": "Bokföringsdatum måste ha ett värde." },
+    "expectedTitle": "Fel vid ”Bokför”",
+    "failureStepIndex": 1
+  },
+  {
+    "id": "en-field-validation",
+    "language": "en-US",
+    "events": [
+      { "type": "change", "label": "Posting Date" }
+    ],
+    "steps": [
+      { "instruction": "Enter Posting Date.", "fieldCaption": "Posting Date", "sourceIndexes": [0] }
+    ],
+    "error": { "precedingIndex": 0, "message": "Posting Date must have a value." },
+    "expectedTitle": "Validation error in “Posting Date”",
+    "failureStepIndex": 0
+  },
+  {
+    "id": "technical-event-after-action",
+    "language": "sv-SE",
+    "events": [
+      { "type": "click", "label": "Frisläpp" },
+      { "type": "navigation", "label": "Teknisk dialogövergång" }
+    ],
+    "steps": [
+      { "instruction": "Välj Frisläpp.", "actionCaption": "Frisläpp", "sourceIndexes": [0] }
+    ],
+    "error": { "precedingIndex": 1, "message": "Inköpsordern kunde inte frisläppas." },
+    "expectedTitle": "Fel vid ”Frisläpp”",
+    "failureStepIndex": 0
+  },
+  {
+    "id": "silent-problem",
+    "language": "sv-SE",
+    "events": [
+      { "type": "click", "label": "Beräkna" }
+    ],
+    "steps": [
+      { "instruction": "Välj Beräkna.", "sourceIndexes": [0] }
+    ],
+    "expectedTitle": "Rapporterat problem i Business Central",
+    "failureStepIndex": null
+  },
+  {
+    "id": "manual-title-wins",
+    "language": "sv-SE",
+    "manualTitle": "Fel pris efter rabattberäkning",
+    "events": [
+      { "type": "click", "label": "Beräkna rabatt" }
+    ],
+    "steps": [
+      { "instruction": "Välj Beräkna rabatt.", "actionCaption": "Beräkna rabatt", "sourceIndexes": [0] }
+    ],
+    "error": { "precedingIndex": 0, "message": "Priset kunde inte beräknas." },
+    "expectedTitle": "Fel pris efter rabattberäkning",
+    "failureStepIndex": 0
+  }
+]

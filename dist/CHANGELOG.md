@@ -1,5 +1,13 @@
 # Changelog
 
+## 2026-09-10 - Bug-report behavior has a scenario corpus
+
+- Five sanitized Swedish and English flows now exercise the production report
+  and issue-description pipeline.
+- The corpus guards exact and delayed failure points, contextual titles, silent
+  problems, manual-title precedence, captured errors, and concise sharing.
+- The corpus runs in the standard CI gate and can grow with sanitized pilot cases.
+
 ## 2026-09-10 - Bug-report sharing follows the interface language
 
 - The new technical-details choice and the live transmission summary now render
