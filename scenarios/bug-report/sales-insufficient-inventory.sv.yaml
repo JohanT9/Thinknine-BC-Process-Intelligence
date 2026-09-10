@@ -1,0 +1,31 @@
+schemaVersion: 1
+id: sales-insufficient-inventory-sv
+name: Lagerbrist vid försäljningsleverans
+description: Leverans av en försäljningsorder stoppas när disponibelt saldo saknas.
+businessCentral:
+  language: sv-SE
+  domain: OrderToCash
+  process: SimpleSalesOrder
+  page: { objectId: 42, caption: Försäljningsorder }
+recording:
+  events:
+    - { id: enter-quantity, type: change, pageObjectId: 42, pageCaption: Försäljningsorder, fieldName: Antal, label: Antal }
+    - { id: post-shipment, type: click, pageObjectId: 42, pageCaption: Försäljningsorder, label: Bokför och leverera }
+  steps:
+    - { id: enter-quantity, instruction: Ange ett antal som överstiger disponibelt saldo., fieldCaption: Antal, sourceEvents: [enter-quantity] }
+    - { id: post-shipment, instruction: Välj Bokför och leverera., actionCaption: Bokför och leverera, sourceEvents: [post-shipment] }
+error:
+  afterEvent: post-shipment
+  message: Du har inte tillräckligt antal av artikeln i lager.
+expected:
+  title: Fel vid ”Bokför och leverera”
+  failureStep: post-shipment
+  descriptionContains: ["## Steg för att återskapa", "## Business Central-fel"]
+  descriptionExcludes: ["## Tekniska detaljer"]
+live:
+  preconditions:
+    - Använd en sandbox och en artikel med känt, otillräckligt disponibelt saldo.
+  actions:
+    - Skapa en försäljningsorder och ange ett antal över disponibelt saldo.
+    - Välj Bokför och leverera.
+  expectedOutcome: Bokföringshandlingen identifieras som felsteg och artikelkontexten bevaras.

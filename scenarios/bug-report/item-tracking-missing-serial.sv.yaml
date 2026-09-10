@@ -1,0 +1,31 @@
+schemaVersion: 1
+id: item-tracking-missing-serial-sv
+name: Serienummer saknas vid leverans
+description: Leverans av en serienummerspårad artikel stoppas när tilldelningen saknas.
+businessCentral:
+  language: sv-SE
+  domain: ItemTracking
+  process: SerialTracking
+  page: { objectId: 42, caption: Försäljningsorder }
+recording:
+  events:
+    - { id: add-item, type: change, pageObjectId: 42, pageCaption: Försäljningsorder, fieldName: Nr., label: Nr. }
+    - { id: post-shipment, type: click, pageObjectId: 42, pageCaption: Försäljningsorder, label: Bokför och leverera }
+  steps:
+    - { id: add-item, instruction: Lägg till en artikel som kräver serienummerspårning., fieldCaption: Nr., sourceEvents: [add-item] }
+    - { id: post-shipment, instruction: Välj Bokför och leverera utan serienummer., actionCaption: Bokför och leverera, sourceEvents: [post-shipment] }
+error:
+  afterEvent: post-shipment
+  message: Serienummer måste tilldelas för hela antalet innan leveransen bokförs.
+expected:
+  title: Fel vid ”Bokför och leverera”
+  failureStep: post-shipment
+  descriptionContains: ["## Business Central-fel"]
+  descriptionExcludes: ["## Tekniska detaljer"]
+live:
+  preconditions:
+    - Använd en testartikel med obligatorisk serienummerspårning.
+  actions:
+    - Lägg artikeln på en försäljningsorder utan att tilldela serienummer.
+    - Välj Bokför och leverera.
+  expectedOutcome: Bokföringen blir felsteg och serienummerkravet fångas ordagrant.

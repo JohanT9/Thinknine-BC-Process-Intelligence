@@ -1,0 +1,34 @@
+schemaVersion: 1
+id: aptean-catch-weight-mismatch-sv
+name: Fångstvikt stämmer inte med antal
+description: Ett Aptean Food & Beverage-flöde stoppas av en avvikande fångstvikt.
+businessCentral:
+  language: sv-SE
+  domain: ApteanFoodAndBeverage
+  process: CatchWeightHandling
+  page: { objectId: extension, caption: Försäljningsorder }
+recording:
+  events:
+    - { id: enter-quantity, type: change, pageCaption: Försäljningsorder, fieldName: Antal, label: Antal }
+    - { id: enter-catch-weight, type: change, pageCaption: Försäljningsorder, fieldName: Fångstvikt, label: Fångstvikt }
+    - { id: post-shipment, type: click, pageCaption: Försäljningsorder, label: Bokför och leverera }
+  steps:
+    - { id: enter-quantity, instruction: Ange antal för fångstviktsartikeln., fieldCaption: Antal, sourceEvents: [enter-quantity] }
+    - { id: enter-catch-weight, instruction: Ange en fångstvikt utanför tillåten tolerans., fieldCaption: Fångstvikt, sourceEvents: [enter-catch-weight] }
+    - { id: post-shipment, instruction: Välj Bokför och leverera., actionCaption: Bokför och leverera, sourceEvents: [post-shipment] }
+error:
+  afterEvent: post-shipment
+  message: Fångstvikten ligger utanför tillåten tolerans för artikelraden.
+expected:
+  title: Fel vid ”Bokför och leverera”
+  failureStep: post-shipment
+  descriptionContains: ["## Business Central-fel"]
+  descriptionExcludes: ["## Tekniska detaljer"]
+live:
+  preconditions:
+    - Kör endast i en sandbox där Aptean Food & Beverage och fångstvikt är konfigurerat.
+    - Använd en särskild fångstviktsartikel med känd tolerans.
+  actions:
+    - Skapa en orderrad och ange en fångstvikt utanför toleransen.
+    - Välj Bokför och leverera.
+  expectedOutcome: Tilläggsfältet och den utlösande bokföringshandlingen bevaras i rapporten.

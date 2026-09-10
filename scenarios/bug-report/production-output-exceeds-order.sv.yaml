@@ -1,0 +1,33 @@
+schemaVersion: 1
+id: production-output-exceeds-order-sv
+name: För stort utflöde på produktionsorder
+description: Utflödesjournalen innehåller ett antal som överskrider produktionsorderns återstående antal.
+businessCentral:
+  language: sv-SE
+  domain: PlanToProduce
+  process: ProductionOutput
+  page: { objectId: 99000831, caption: Frisläppt produktionsorder }
+recording:
+  events:
+    - { id: open-output, type: click, pageObjectId: 99000831, pageCaption: Frisläppt produktionsorder, label: Utflödesjournal }
+    - { id: enter-output, type: change, pageCaption: Utflödesjournal, fieldName: Utflödesantal, label: Utflödesantal }
+    - { id: post-output, type: click, pageCaption: Utflödesjournal, label: Bokför }
+  steps:
+    - { id: open-output, instruction: Öppna utflödesjournalen., actionCaption: Utflödesjournal, sourceEvents: [open-output] }
+    - { id: enter-output, instruction: Ange ett utflödesantal över återstående antal., fieldCaption: Utflödesantal, sourceEvents: [enter-output] }
+    - { id: post-output, instruction: Välj Bokför., actionCaption: Bokför, sourceEvents: [post-output] }
+error:
+  afterEvent: post-output
+  message: Utflödesantalet får inte överstiga återstående antal på produktionsorderraden.
+expected:
+  title: Fel vid ”Bokför”
+  failureStep: post-output
+  descriptionContains: ["## Steg för att återskapa", "## Business Central-fel"]
+  descriptionExcludes: ["## Tekniska detaljer"]
+live:
+  preconditions:
+    - Använd en frisläppt testproduktionsorder som får bokföras i en sandbox.
+  actions:
+    - Öppna Utflödesjournal och ange ett för stort utflödesantal.
+    - Välj Bokför.
+  expectedOutcome: Bara användarens bokföringshandling markeras som felsteg.

@@ -7,12 +7,12 @@ The UX regression checks cover mode discoverability, one-action bug start, disti
 Existing domain suites continue to cover validation/runtime errors, multiple evidence records, diagnostics and partial call stacks, telemetry states, stale AI analysis, local issue packages, provider consent, saves, and exports.
 
 The CI gate also runs a sanitized bug-report scenario corpus through the actual
-report service, issue-package projection, and Markdown formatter. Its thirteen
-flows cover Swedish and English errors, blocked customers and vendors, credit
-limits, warehouse picking and receiving, transfers, production consumption,
-item tracking, an unmapped technical event after the acted-on step, a silent
-problem, and a manual title. New sanitized pilot defects should first be reduced
-to this metadata-only format before adding a regression.
+report service, issue-package projection, and Markdown formatter. Its 24 flows
+cover Swedish and English errors, blocked customers and vendors, credit limits,
+warehouse picking and receiving, transfers, production, item tracking,
+concurrent updates, permissions, silent problems, and optional Aptean cases.
+New sanitized pilot defects should first be reduced to this metadata-only format
+before adding a regression.
 
 ## Executable YAML scenarios
 
@@ -31,7 +31,10 @@ node scripts/run-bug-report-scenarios.js scenarios/bug-report/purchase-posting-d
 Each YAML file contains both machine-executable recording evidence and a `live`
 section with sandbox preconditions, actions, and expected outcome. The automated
 runner does not log in to Business Central or claim that the manual path was
-executed; it verifies how BC Process Studio handles the declared evidence.
+executed; it verifies how BC Process Studio handles the declared evidence. Error
+messages in synthetic scenarios are representative test inputs. After a manual
+sandbox run, preserve the exact Business Central message captured by the recorder
+rather than changing production evidence to match the example text.
 
 ## Manual verification status
 

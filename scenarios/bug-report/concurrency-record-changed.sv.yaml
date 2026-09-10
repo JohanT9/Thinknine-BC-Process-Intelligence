@@ -1,0 +1,31 @@
+schemaVersion: 1
+id: concurrency-record-changed-sv
+name: Posten ändrades av en annan användare
+description: Sparande misslyckas eftersom samma affärspost har ändrats i en annan session.
+businessCentral:
+  language: sv-SE
+  domain: RecordToReport
+  process: ConcurrentRecordUpdate
+  page: { objectId: 42, caption: Försäljningsorder }
+recording:
+  events:
+    - { id: edit-description, type: change, pageObjectId: 42, pageCaption: Försäljningsorder, fieldName: Beskrivning, label: Beskrivning }
+    - { id: save-record, type: click, pageObjectId: 42, pageCaption: Försäljningsorder, label: Stäng }
+  steps:
+    - { id: edit-description, instruction: Ändra Beskrivning på orderraden., fieldCaption: Beskrivning, sourceEvents: [edit-description] }
+    - { id: save-record, instruction: Välj Stäng för att spara ändringen., actionCaption: Stäng, sourceEvents: [save-record] }
+error:
+  afterEvent: save-record
+  message: Posten har ändrats av en annan användare sedan du hämtade den.
+expected:
+  title: Fel vid ”Stäng”
+  failureStep: save-record
+  descriptionContains: ["## Business Central-fel"]
+  descriptionExcludes: ["## Tekniska detaljer"]
+live:
+  preconditions:
+    - Öppna samma testorder i två separata sandboxsessioner.
+  actions:
+    - Ändra och spara posten i den första sessionen.
+    - Ändra den äldre kopian i den andra sessionen och välj Stäng.
+  expectedOutcome: Konflikten kopplas till sparhandlingen och föregående användarsteg finns kvar.

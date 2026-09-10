@@ -1,0 +1,28 @@
+schemaVersion: 1
+id: purchase-over-receipt-sv
+name: För stort antal att inleverera på inköpsorder
+description: Inleveransförsöket överskrider beställt eller kvarvarande antal.
+businessCentral:
+  language: sv-SE
+  domain: SourceToPay
+  process: SimplePurchaseOrder
+  page: { objectId: 50, caption: Inköpsorder }
+recording:
+  events:
+    - { id: quantity-to-receive, type: change, pageObjectId: 50, pageCaption: Inköpsorder, fieldName: Antal att inleverera, label: Antal att inleverera }
+  steps:
+    - { id: quantity-to-receive, instruction: Ange ett antal att inleverera som överstiger kvarvarande antal., fieldCaption: Antal att inleverera, sourceEvents: [quantity-to-receive] }
+error:
+  afterEvent: quantity-to-receive
+  message: Antal att inleverera får inte vara större än kvarvarande antal.
+expected:
+  title: Valideringsfel i ”Antal att inleverera”
+  failureStep: quantity-to-receive
+  descriptionContains: ["## Steg för att återskapa", "## Business Central-fel"]
+  descriptionExcludes: ["## Tekniska detaljer"]
+live:
+  preconditions:
+    - Använd en ändringsbar testinköpsorder med känt kvarvarande antal.
+  actions:
+    - Ange ett större värde i Antal att inleverera än det kvarvarande antalet.
+  expectedOutcome: Fältändringen markeras som felsteg utan ett extra tekniskt steg.

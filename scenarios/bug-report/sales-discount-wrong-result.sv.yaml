@@ -1,0 +1,27 @@
+schemaVersion: 1
+id: sales-discount-wrong-result-sv
+name: Fel rabatt utan felmeddelande
+description: Orderrabatten räknas ut men resultatet avviker från det förväntade.
+businessCentral:
+  language: sv-SE
+  domain: OrderToCash
+  process: SalesOrderProcessing
+  page: { objectId: 42, caption: Försäljningsorder }
+recording:
+  events:
+    - { id: enter-quantity, type: change, pageObjectId: 42, pageCaption: Försäljningsorder, fieldName: Antal, label: Antal }
+    - { id: calculate-discount, type: click, pageObjectId: 42, pageCaption: Försäljningsorder, label: Beräkna fakturarabatt }
+  steps:
+    - { id: enter-quantity, instruction: Ange antal på försäljningsraden., fieldCaption: Antal, sourceEvents: [enter-quantity] }
+    - { id: calculate-discount, instruction: Välj Beräkna fakturarabatt., actionCaption: Beräkna fakturarabatt, sourceEvents: [calculate-discount] }
+expected:
+  title: Rapporterat problem i Business Central
+  descriptionContains: ["## Steg för att återskapa"]
+  descriptionExcludes: ["## Business Central-fel", "## Tekniska detaljer"]
+live:
+  preconditions:
+    - Konfigurera känd kundrabatt och testdata med ett på förhand beräknat facit.
+  actions:
+    - Skapa orderraden och välj Beräkna fakturarabatt.
+    - Jämför rabattbeloppet med facit utan att framkalla en feldialog.
+  expectedOutcome: Rapporten beskriver ett felaktigt observerat resultat utan påhittat BC-fel.

@@ -1,0 +1,32 @@
+schemaVersion: 1
+id: purchase-duplicate-invoice-number-sv
+name: Dubblett av leverantörens fakturanummer
+description: Bokföring stoppas när leverantörens fakturanummer redan har använts.
+businessCentral:
+  language: sv-SE
+  domain: SourceToPay
+  process: PurchaseReceiptAndInvoice
+  page: { objectId: 51, caption: Inköpsfaktura }
+recording:
+  events:
+    - { id: vendor-invoice-number, type: change, pageObjectId: 51, pageCaption: Inköpsfaktura, fieldName: Leverantörens fakturanr., label: Leverantörens fakturanr. }
+    - { id: post, type: click, pageObjectId: 51, pageCaption: Inköpsfaktura, label: Bokför }
+  steps:
+    - { id: vendor-invoice-number, instruction: Ange ett redan bokfört leverantörsfakturanummer., fieldCaption: Leverantörens fakturanr., sourceEvents: [vendor-invoice-number] }
+    - { id: post, instruction: Välj Bokför., actionCaption: Bokför, sourceEvents: [post] }
+error:
+  afterEvent: post
+  message: Leverantörens fakturanummer används redan på en bokförd inköpsfaktura.
+expected:
+  title: Fel vid ”Bokför”
+  failureStep: post
+  descriptionContains: ["## Business Central-fel"]
+  descriptionExcludes: ["## Tekniska detaljer"]
+live:
+  preconditions:
+    - Aktivera kontroll av externa dokumentnummer i en sandbox.
+    - Ha ett redan bokfört testnummer tillgängligt.
+  actions:
+    - Skapa en inköpsfaktura och återanvänd testnumret.
+    - Välj Bokför.
+  expectedOutcome: Bokför markeras som felsteg och fakturanumret maskeras enligt sekretessreglerna.

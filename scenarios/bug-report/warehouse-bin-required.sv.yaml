@@ -1,0 +1,31 @@
+schemaVersion: 1
+id: warehouse-bin-required-sv
+name: Fackkod saknas vid lagerregistrering
+description: Lagerregistreringen stoppas eftersom ett obligatoriskt fack saknas.
+businessCentral:
+  language: sv-SE
+  domain: WarehouseManagement
+  process: WarehouseMovement
+  page: { objectId: 7316, caption: Lagerförflyttning }
+recording:
+  events:
+    - { id: clear-bin, type: change, pageObjectId: 7316, pageCaption: Lagerförflyttning, fieldName: Till fackkod, label: Till fackkod }
+    - { id: register, type: click, pageObjectId: 7316, pageCaption: Lagerförflyttning, label: Registrera }
+  steps:
+    - { id: clear-bin, instruction: Lämna Till fackkod tomt., fieldCaption: Till fackkod, sourceEvents: [clear-bin] }
+    - { id: register, instruction: Välj Registrera., actionCaption: Registrera, sourceEvents: [register] }
+error:
+  afterEvent: register
+  message: Till fackkod måste ha ett värde på lageraktivitetsraden.
+expected:
+  title: Fel vid ”Registrera”
+  failureStep: register
+  descriptionContains: ["## Business Central-fel"]
+  descriptionExcludes: ["## Tekniska detaljer"]
+live:
+  preconditions:
+    - Använd en sandbox med obligatoriska fack och en redigerbar lagerförflyttning.
+  actions:
+    - Töm Till fackkod på en testlinje.
+    - Välj Registrera.
+  expectedOutcome: Registrera kopplas till fackfelet och rätt lagersida identifieras.

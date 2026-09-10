@@ -1,0 +1,31 @@
+schemaVersion: 1
+id: permission-post-sales-sv
+name: Behörighet saknas för bokföring av försäljning
+description: En användare får öppna ordern men saknar rättighet till bokföringsåtgärden.
+businessCentral:
+  language: sv-SE
+  domain: OrderToCash
+  process: SimpleSalesOrder
+  page: { objectId: 42, caption: Försäljningsorder }
+recording:
+  events:
+    - { id: open-order, type: navigation, pageObjectId: 42, pageCaption: Försäljningsorder, label: Öppna försäljningsorder }
+    - { id: post-order, type: click, pageObjectId: 42, pageCaption: Försäljningsorder, label: Bokför }
+  steps:
+    - { id: open-order, instruction: Öppna försäljningsordern., sourceEvents: [open-order] }
+    - { id: post-order, instruction: Välj Bokför., actionCaption: Bokför, sourceEvents: [post-order] }
+error:
+  afterEvent: post-order
+  message: "Du har inte följande behörigheter för TableData Försäljningsleverans: Infoga."
+expected:
+  title: Fel vid ”Bokför”
+  failureStep: post-order
+  descriptionContains: ["## Steg för att återskapa", "## Business Central-fel"]
+  descriptionExcludes: ["## Tekniska detaljer"]
+live:
+  preconditions:
+    - Använd en särskild sandboxanvändare som får läsa order men inte bokföra försäljning.
+  actions:
+    - Logga in som testanvändaren och öppna en bokföringsklar order.
+    - Välj Bokför.
+  expectedOutcome: Behörighetsfelet fångas utan att känsliga användaruppgifter läggs i titeln.

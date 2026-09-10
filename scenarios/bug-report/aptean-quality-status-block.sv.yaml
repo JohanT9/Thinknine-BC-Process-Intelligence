@@ -1,0 +1,32 @@
+schemaVersion: 1
+id: aptean-quality-status-block-sv
+name: Kvalitetsstatus blockerar disposition
+description: Ett parti med blockerad kvalitetsstatus får inte användas i leveransen.
+businessCentral:
+  language: sv-SE
+  domain: ApteanFoodAndBeverage
+  process: QualityStatusHandling
+  page: { objectId: extension, caption: Artikelspårningsrader }
+recording:
+  events:
+    - { id: select-lot, type: change, pageCaption: Artikelspårningsrader, fieldName: Partinr., label: Partinr. }
+    - { id: confirm-tracking, type: click, pageCaption: Artikelspårningsrader, label: OK }
+  steps:
+    - { id: select-lot, instruction: Välj ett parti med blockerad kvalitetsstatus., fieldCaption: Partinr., sourceEvents: [select-lot] }
+    - { id: confirm-tracking, instruction: Bekräfta artikelspårningen., actionCaption: OK, sourceEvents: [confirm-tracking] }
+error:
+  afterEvent: confirm-tracking
+  message: Partiets kvalitetsstatus tillåter inte att lagret disponeras.
+expected:
+  title: Fel vid ”OK”
+  failureStep: confirm-tracking
+  descriptionContains: ["## Steg för att återskapa", "## Business Central-fel"]
+  descriptionExcludes: ["## Tekniska detaljer"]
+live:
+  preconditions:
+    - Kör endast i en sandbox med Aptean-kvalitetsstatus aktiverad.
+    - Använd ett testparti som är blockerat för disposition.
+  actions:
+    - Öppna Artikelspårningsrader och välj det blockerade partiet.
+    - Välj OK.
+  expectedOutcome: Rapporten behåller partikontexten men sekretessmaskerar identifierare vid behov.

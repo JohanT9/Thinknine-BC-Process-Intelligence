@@ -1,5 +1,15 @@
 # Changelog
 
+## 2026-09-10 - Bug scenario pack covers operational edge cases
+
+- Eleven executable scenarios add sales availability and discount defects,
+  purchase over-receipt and duplicate invoices, bins, serial tracking,
+  production output, concurrency, permissions, and optional Aptean flows.
+- The YAML pack now contains 24 deterministic scenarios with corresponding
+  manual Business Central sandbox recipes.
+- Extension-dependent cases are explicitly identified by their Aptean domain
+  and guarded by installation requirements in their preconditions.
+
 ## 2026-09-10 - YAML bug scenarios cover core BC operations
 
 - Eight executable Swedish scenarios now cover blocked master data, credit
