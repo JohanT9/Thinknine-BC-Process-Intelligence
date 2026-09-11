@@ -67,4 +67,11 @@ so the saved link opens the same Business Central context. It is recipient-facin
 evidence and is included in the Markdown issue description. Users must still
 review the company/record context before sharing a report outside their organization.
 
+Set **Support email address for bug reports** in BC Process Studio settings to
+enable **Email error report**. The action creates an addressed `.eml` draft with
+the reviewed offline report package attached as JSON, then asks the operating
+system to open that draft in its associated mail application. This approach does
+not require mailbox credentials or grant the extension permission to send mail;
+the user reviews and sends the message in their own mail application.
+
 The Technical Report Workspace now supports the two common reproduction corrections directly: wording changes and removing an irrelevant step from the report. Advanced merge, split, and screenshot replacement remain in Review by design.

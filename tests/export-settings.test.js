@@ -279,6 +279,7 @@ assert.ok(manifest.permissions.includes("downloads"));
 assert.ok(html.includes('src="engine/export-settings.js"'));
 assert.ok(!html.includes('id="alwaysAskExportLocation"'));
 assert.ok(html.includes('id="exportFileNamePattern"'));
+assert.ok(html.includes('id="supportEmail"'));
 assert.ok(html.includes('id="filenamePreview"'));
 assert.ok(html.includes('id="filenameValidation"'));
 assert.ok(html.includes('id="filenameVariableHelp"'));
@@ -297,6 +298,7 @@ assert.ok(!html.includes('data-variable="{company}"'));
 assert.ok(!html.includes('data-variable="{user}"'));
 assert.ok(background.includes('case "T9_DOWNLOAD_FILE"'));
 assert.ok(background.includes("chrome.downloads.download"));
+assert.ok(background.includes("chrome.downloads.open"));
 assert.ok(!background.includes("saveAs:"));
 
 console.log("Export settings behaviour tests passed.");

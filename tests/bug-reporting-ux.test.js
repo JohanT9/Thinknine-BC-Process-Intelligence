@@ -60,6 +60,8 @@ assert.match(report, /<details class="report-options"><summary>More options<\/su
 assert.doesNotMatch(report, /<details class="report-options" open/);
 assert.match(report, /Share bug report/);
 assert.match(report, /id="openIssuePreview"[^>]*>Share report<\/button>/);
+assert.match(report, /id="emailReport"[^>]*>Email error report<\/button>/);
+assert.match(report, /src="bug-report\/email-draft\.js"/);
 assert.match(report, /<details class="share-options"><summary>Content and settings<\/summary>/);
 assert.match(report, /id="issueIncludeTechnical"/);
 assert.doesNotMatch(report, /id="issueIncludeTechnical"[^>]*checked/);
@@ -121,6 +123,9 @@ assert.match(reportLogic, /function updateShareUi\(\)/);
 assert.match(reportLogic, /provider !== "azure-devops"/);
 assert.match(reportLogic, /provider !== "github"/);
 assert.match(reportLogic, /function downloadOfflinePackage\(\)/);
+assert.match(reportLogic, /function emailReport\(\)/);
+assert.match(reportLogic, /T9BugReportEmailDraft\.build/);
+assert.match(reportLogic, /message\/rfc822/);
 assert.match(reportLogic, /function submitExternalIssue\(\)/);
 assert.match(reportLogic, /const renderAndAutosave = state =>/);
 assert.match(reportLogic, /setTimeout\(\(\) => workspace\.save\(\)/);

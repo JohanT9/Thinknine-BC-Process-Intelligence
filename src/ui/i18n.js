@@ -625,6 +625,13 @@
     ,["Business Central-företag", "Business Central company"]
     ,["Webbläsare", "Browser"], ["Webbläsarversion", "Browser version"]
     ,["Öppna i Business Central", "Open in Business Central"]
+    ,["E-posta felrapport", "Email error report"]
+    ,["Ange först en supportadress i inställningarna.", "Add a support email address in settings first."]
+    ,["E-postutkast skapat med felrapporten bifogad.", "Email draft created with the report attached."]
+    ,["E-postutkastet har sparats. Öppna den nedladdade .eml-filen för att fortsätta.",
+      "Email draft saved. Open the downloaded .eml file to continue."]
+    ,["Supportadress för felrapporter", "Support email address for bug reports"]
+    ,["Används när en felrapport skapas som adresserat e-postutkast.", "Used when a bug report is prepared as an addressed email draft."]
     ,["Inkludera tekniska detaljer i beskrivningen", "Include technical details in description"]
     ,["Databas (ägare/namn)", "Repository (owner/name)"]
     ,["Etiketter, kommaseparerade", "Labels, comma separated"]

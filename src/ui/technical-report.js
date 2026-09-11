@@ -5,6 +5,7 @@
   const container = document.getElementById("technicalReport");
   const message = document.getElementById("workspaceMessage");
   let currentUiLocale = globalThis.T9UiI18n.DEFAULT_LOCALE;
+  let supportEmail = "";
   const t = key => globalThis.T9UiI18n.translate(key, currentUiLocale);
   const tf = (key, values) => globalThis.T9UiI18n.format(
     key, values, currentUiLocale);
@@ -20,10 +21,10 @@
     try { await handler(); }
     catch (error) { message.textContent = error.message || String(error); }
   };
-  function download(text, filename) {
-    const blob = new Blob([text], { type: "text/markdown;charset=utf-8" });
+  function download(text, filename, type = "text/markdown;charset=utf-8", open = false) {
+    const blob = new Blob([text], { type });
     const url = URL.createObjectURL(blob);
-    return send({ type: "T9_DOWNLOAD_FILE", url, filename }).finally(() =>
+    return send({ type: "T9_DOWNLOAD_FILE", url, filename, open }).finally(() =>
       URL.revokeObjectURL(url));
   }
   async function start() {
@@ -351,6 +352,28 @@
       document.getElementById("issueResult").textContent =
         t("technical.packageExported");
     }
+    async function emailReport() {
+      if (!supportEmail) throw new Error(globalThis.T9UiI18n.translateStaticText(
+        "Add a support email address in settings first.", currentUiLocale));
+      if (!issuePreviewState) await generateIssuePreview();
+      const offline = { manifest: { schemaVersion: 1,
+        packageId: issuePreviewState.issuePackage.packageId,
+        sourceRevision: issuePreviewState.issuePackage.sourceRevision,
+        files: ["bug-report.md", ...issuePreviewState.offlineAttachments.map(item =>
+          item.fileName)] }, issuePackage: issuePreviewState.issuePackage,
+        bugReportMarkdown: issuePreviewState.markdown,
+        attachments: issuePreviewState.offlineAttachments };
+      const draft = globalThis.T9BugReportEmailDraft.build(
+        issuePreviewState.issuePackage, JSON.stringify(offline, null, 2), {
+          to: supportEmail, locale: currentUiLocale });
+      const result = await download(draft.content, draft.fileName,
+        "message/rfc822;charset=utf-8", true);
+      message.textContent = globalThis.T9UiI18n.translateStaticText(
+        result.opened
+          ? "Email draft created with the report attached."
+          : "Email draft saved. Open the downloaded .eml file to continue.",
+        currentUiLocale);
+    }
     async function submitExternalIssue() {
       if (!document.getElementById("issueConsent").checked) throw new Error(
         t("technical.submissionConsent"));
@@ -377,11 +400,13 @@
       if (document.getElementById("issueProvider").value) await submitExternalIssue();
       else await downloadOfflinePackage();
     }));
+    document.getElementById("emailReport").addEventListener("click", action(emailReport));
   }
   async function initialize() {
     try {
       const response = await send({ type: "T9_GET_SETTINGS" });
       currentUiLocale = globalThis.T9UiI18n.apply(response?.settings?.uiLocale);
+      supportEmail = String(response?.settings?.supportEmail || "").trim();
     } catch {
       currentUiLocale = globalThis.T9UiI18n.apply(currentUiLocale);
     }

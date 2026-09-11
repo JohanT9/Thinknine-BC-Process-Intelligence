@@ -1,5 +1,13 @@
 # Changelog
 
+## 2026-09-11 - Bug reports can be prepared as addressed email drafts
+
+- Settings now include a validated support email address for bug reports.
+- **Email error report** creates and opens an RFC 822 `.eml` draft addressed to
+  support, with the complete offline report package attached as JSON.
+- The draft contains no hidden recipients and reuses the existing explicit
+  report-content choices for telemetry, AI analysis, call stack, and diagnostics.
+
 ## 2026-09-11 - Document Library avoids per-report recovery work
 
 - Loading the library now reads stored bug-report summaries directly instead of

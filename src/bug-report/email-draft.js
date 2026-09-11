@@ -1,0 +1,46 @@
+(function (root, factory) {
+  const api = factory();
+  if (typeof module === "object" && module.exports) module.exports = api;
+  root.T9BugReportEmailDraft = api;
+})(typeof globalThis !== "undefined" ? globalThis : this, function () {
+  "use strict";
+  const cleanHeader = value => String(value || "").replace(/[\r\n]+/gu, " ").trim();
+  const safeName = value => cleanHeader(value).replace(/[^\p{L}\p{N}._-]+/gu, "-")
+    .replace(/^-+|-+$/gu, "").slice(0, 70) || "felrapport";
+  function validAddress(value) {
+    const address = cleanHeader(value);
+    return /^[^\s@<>]+@[^\s@<>]+\.[^\s@<>]+$/u.test(address) ? address : "";
+  }
+  function base64(value) {
+    if (typeof Buffer !== "undefined") return Buffer.from(value, "utf8").toString("base64");
+    const bytes = new TextEncoder().encode(value); let binary = "";
+    for (let index = 0; index < bytes.length; index += 8192) {
+      binary += String.fromCharCode(...bytes.subarray(index, index + 8192));
+    }
+    return btoa(binary);
+  }
+  const lines = value => String(value).match(/.{1,76}/gu)?.join("\r\n") || "";
+  function build(issuePackage, packageContent, options = {}) {
+    const to = validAddress(options.to);
+    if (!to) throw new Error("En giltig supportadress måste anges i inställningarna.");
+    const title = cleanHeader(issuePackage?.title || "Business Central-fel");
+    const swedish = /^sv(?:-|$)/iu.test(String(options.locale || "sv-SE"));
+    const attachmentName = `${safeName(title)}-felrapport.json`;
+    const boundary = `=_BC_Process_Studio_${safeName(issuePackage?.packageId)}`;
+    const body = swedish
+      ? "Hej,\r\n\r\nBifogat finns en felrapport från BC Process Studio.\r\n"
+      : "Hello,\r\n\r\nA BC Process Studio error report is attached.\r\n";
+    const content = ["MIME-Version: 1.0", `To: ${to}`,
+      `Subject: =?UTF-8?B?${base64(title)}?=`,
+      `Content-Type: multipart/mixed; boundary="${boundary}"`, "",
+      `--${boundary}`, "Content-Type: text/plain; charset=UTF-8",
+      "Content-Transfer-Encoding: base64", "", lines(base64(body)),
+      `--${boundary}`, `Content-Type: application/json; name="${attachmentName}"`,
+      "Content-Transfer-Encoding: base64",
+      `Content-Disposition: attachment; filename="${attachmentName}"`, "",
+      lines(base64(String(packageContent || ""))), `--${boundary}--`, ""].join("\r\n");
+    return { to, subject: title, attachmentName,
+      fileName: `${safeName(title)}.eml`, content };
+  }
+  return { build, validAddress };
+});

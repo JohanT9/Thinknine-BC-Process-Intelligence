@@ -82,6 +82,7 @@ const DEFAULT_SETTINGS = {
   maxEvents: 20000,
   environmentName: "ApteanAdvance",
   companyName: "",
+  supportEmail: "",
   advancedOverridesEnabled: false,
   maskSalesOrderNo: true,
   maskPurchaseOrderNo: true,
@@ -2177,10 +2178,20 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
           filename: message.filename,
           conflictAction: "uniquify"
         });
+        let opened = false;
+        if (message.open) {
+          try {
+            await chrome.downloads.open(downloadId);
+            opened = true;
+          } catch {
+            // The draft remains downloaded when Windows has no .eml association.
+          }
+        }
 
         sendResponse({
           ok: true,
-          downloadId
+          downloadId,
+          opened
         });
         break;
       }
@@ -2275,6 +2286,11 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
           settings.uiLocale, "ui");
         settings.documentLanguage = globalThis.T9LanguageRegistry.normalize(
           settings.documentLanguage, "document");
+        settings.supportEmail = String(settings.supportEmail || "").trim();
+        if (settings.supportEmail &&
+            !/^[^\s@<>]+@[^\s@<>]+\.[^\s@<>]+$/u.test(settings.supportEmail)) {
+          throw new Error("Supportadressen är inte en giltig e-postadress.");
+        }
         await chrome.storage.local.set({ [SETTINGS_KEY]: settings });
         sendResponse({ ok: true, settings });
         break;

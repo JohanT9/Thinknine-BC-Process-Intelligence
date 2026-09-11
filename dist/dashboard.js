@@ -12,6 +12,7 @@ const DEFAULTS = {
   maxEvents: 20000,
   environmentName: "ApteanAdvance",
   companyName: "",
+  supportEmail: "",
   advancedOverridesEnabled: false,
   maskSalesOrderNo: true,
   maskPurchaseOrderNo: true,
