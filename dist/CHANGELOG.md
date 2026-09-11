@@ -6,6 +6,8 @@
   recovering evidence and recordings separately for every report.
 - Session summaries, library metadata, and report titles now share one storage
   snapshot and one background request instead of performing duplicate full reads.
+- `npm run benchmark:library -- <recordings> <screenshots> <kilobytes>` provides
+  a repeatable scale simulation for separating storage and rendering costs.
 - Legacy title recovery remains available when an individual report is opened,
   eliminating the list-view N+1 performance regression.
 
