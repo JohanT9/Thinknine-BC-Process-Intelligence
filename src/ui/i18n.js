@@ -631,6 +631,9 @@
     ,["E-postutkastet har sparats. Öppna den nedladdade .eml-filen för att fortsätta.",
       "Email draft saved. Open the downloaded .eml file to continue."]
     ,["Supportadress för felrapporter", "Support email address for bug reports"]
+    ,["Spara supportadress", "Save support address"]
+    ,["Supportadressen har sparats.", "Support address saved."]
+    ,["Sparad", "Saved"]
     ,["Används när en felrapport skapas som adresserat e-postutkast.", "Used when a bug report is prepared as an addressed email draft."]
     ,["Inkludera tekniska detaljer i beskrivningen", "Include technical details in description"]
     ,["Databas (ägare/namn)", "Repository (owner/name)"]

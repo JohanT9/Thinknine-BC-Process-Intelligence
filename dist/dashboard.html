@@ -249,6 +249,7 @@ body.process-map-focus-active{overflow:hidden}.process-overview-card.process-map
 .filename-template-invalid{border-color:#b91c1c;outline:1px solid #b91c1c}
 .filename-validation{min-height:18px;margin-top:5px;color:#991b1b;font-size:13px}
 .settings-panel{margin:16px 0}.settings-panel>summary{cursor:pointer;font-weight:700;color:#17365d}.settings-panel-body{margin-top:12px}
+.settings-inline{display:flex;align-items:center;gap:8px;flex-wrap:wrap}.settings-inline input{flex:1 1 260px;max-width:380px}.settings-save-status{min-height:18px;margin:5px 0 0;color:#52606d;font-size:13px}.settings-save-status.saved{color:#107c10}
 </style>
 <link rel="stylesheet" href="design-system.css">
 </head>
@@ -294,9 +295,13 @@ body.process-map-focus-active{overflow:hidden}.process-overview-card.process-map
 <input id="companyName" type="text">
 
 <label for="supportEmail">Supportadress för felrapporter</label>
-<input id="supportEmail" type="email" autocomplete="email"
-  placeholder="support@example.com">
-<p class="muted">Används när en felrapport skapas som adresserat e-postutkast.</p>
+<div class="settings-inline">
+  <input id="supportEmail" type="email" autocomplete="email"
+    placeholder="support@example.com" aria-describedby="supportEmailHelp supportEmailStatus">
+  <button id="saveSupportEmail" type="button">Spara supportadress</button>
+</div>
+<p id="supportEmailStatus" class="settings-save-status" role="status" aria-live="polite"></p>
+<p id="supportEmailHelp" class="muted">Används när en felrapport skapas som adresserat e-postutkast.</p>
 
 <label for="defaultExpectedResult">Standardtext för förväntat resultat</label>
 <textarea id="defaultExpectedResult" rows="3"

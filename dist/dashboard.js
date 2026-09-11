@@ -2628,6 +2628,11 @@ async function loadSettings() {
       element.value = value;
     }
   }
+  if (settings.supportEmail && $("supportEmailStatus")) {
+    $("supportEmailStatus").textContent = globalThis.T9UiI18n.translateStaticText(
+      "Sparad", settings.uiLocale);
+    $("supportEmailStatus").classList.add("saved");
+  }
 
   const documentationProfile = $("documentationProfile");
   if (documentationProfile) {
@@ -2660,14 +2665,30 @@ async function saveSettings() {
           : element.value;
   }
 
-  await send({
+  const response = await send({
     type: "T9_SAVE_SETTINGS",
     settings
   });
 
-  applicationSettings = { ...settings };
+  applicationSettings = { ...settings, ...(response?.settings || {}) };
 
   show(globalThis.T9UiI18n.translate("settings.saved", settings.uiLocale));
+}
+
+async function saveSupportEmail() {
+  const input = $("supportEmail");
+  const status = $("supportEmailStatus");
+  input.value = input.value.trim();
+  status.classList.remove("saved");
+  if (!input.reportValidity()) return;
+  try {
+    await saveSettings();
+    status.textContent = globalThis.T9UiI18n.translateStaticText(
+      "Supportadressen har sparats.", applicationSettings.uiLocale);
+    status.classList.add("saved");
+  } catch (error) {
+    status.textContent = error.message || String(error);
+  }
 }
 
 async function changeUiLocale(event) {
@@ -8178,6 +8199,7 @@ globalThis.T9ReviewMove.bind($("reviewList"), {
 });
 
 $("save").addEventListener("click", saveSettings);
+$("saveSupportEmail").addEventListener("click", saveSupportEmail);
 $("uiLocale").addEventListener("change", changeUiLocale);
 $("refresh").addEventListener("click", loadSessions);
 $("sessionTools").addEventListener("toggle", () => {

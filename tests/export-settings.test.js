@@ -268,6 +268,7 @@ createdButtons[2].listeners.keydown({ key: "End", preventDefault() {} });
 assert.strictEqual(createdButtons.at(-1).focused, true);
 
 const html = fs.readFileSync(path.join(__dirname, "../src/ui/dashboard.html"), "utf8");
+const dashboard = fs.readFileSync(path.join(__dirname, "../src/ui/dashboard.js"), "utf8");
 const background = fs.readFileSync(
   path.join(__dirname, "../src/recorder/background.js"),
   "utf8"
@@ -280,6 +281,10 @@ assert.ok(html.includes('src="engine/export-settings.js"'));
 assert.ok(!html.includes('id="alwaysAskExportLocation"'));
 assert.ok(html.includes('id="exportFileNamePattern"'));
 assert.ok(html.includes('id="supportEmail"'));
+assert.ok(html.includes('id="saveSupportEmail"'));
+assert.ok(html.includes('id="supportEmailStatus"'));
+assert.ok(dashboard.includes("async function saveSupportEmail()"));
+assert.ok(dashboard.includes('$("saveSupportEmail").addEventListener'));
 assert.ok(html.includes('id="filenamePreview"'));
 assert.ok(html.includes('id="filenameValidation"'));
 assert.ok(html.includes('id="filenameVariableHelp"'));

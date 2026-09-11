@@ -1,5 +1,11 @@
 # Changelog
 
+## 2026-09-11 - Support address has an explicit save action
+
+- The bug-report support address can now be saved directly beside the field.
+- Inline status confirms that the address has been persisted, without requiring
+  users to find the general settings button farther down the page.
+
 ## 2026-09-11 - Bug reports can be prepared as addressed email drafts
 
 - Settings now include a validated support email address for bug reports.
