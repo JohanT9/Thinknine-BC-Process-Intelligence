@@ -6,6 +6,8 @@
   the failure point for their suggested title, such as **Fel vid Registrera vikt**.
 - Existing reports that still have a generic generated title are upgraded when
   reopened and matching recorded error evidence is available.
+- Legacy reports can derive the action from the documented failure step when
+  their older canonical event references no longer resolve.
 - Explicit titles entered by users continue to take precedence over suggestions.
 
 ## 2026-09-11 - Business Central deep links preserve their exact context

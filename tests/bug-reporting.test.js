@@ -85,6 +85,17 @@ const upgradedWeightTitle = service.refreshSuggestedTitle({ ...weightTitle,
   precedingActionEventId: weightSource.events[0].id }], NOW);
 assert.strictEqual(upgradedWeightTitle.summary.title, "Fel vid \u201dRegistrera vikt\u201d",
   "a previously generated generic title should be refreshed on load");
+const legacyWeightTitle = service.refreshSuggestedTitle({ ...weightTitle,
+  summary: { ...weightTitle.summary,
+    title: "Rapporterat problem i Business Central" },
+  reproduction: { ...weightTitle.reproduction, steps: [{
+    ...weightTitle.reproduction.steps[0], failurePoint: undefined,
+    instruction: "Välj **Registrera vikt**."
+  }] }
+}, { ...weightSource, events: [] }, [{ errorEvidenceId: "weight-evidence",
+  precedingActionEventId: weightSource.events[0].id }], NOW);
+assert.strictEqual(legacyWeightTitle.summary.title, "Fel vid \u201dRegistrera vikt\u201d",
+  "legacy reports must fall back to the documented failing instruction");
 const manualWeightTitle = service.refreshSuggestedTitle({ ...weightTitle,
   summary: { ...weightTitle.summary, title: "Mitt eget felnamn" }
 }, weightSource, [{ errorEvidenceId: "weight-evidence",

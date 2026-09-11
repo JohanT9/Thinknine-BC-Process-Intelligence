@@ -78,10 +78,23 @@
     return result;
   }
 
+  function actionFromInstruction(value, language) {
+    const text = String(value || "").replace(/\*\*/gu, "").trim();
+    const swedish = /^sv(?:-|$)/i.test(String(language || ""));
+    const match = text.match(swedish
+      ? /^(?:välj|klicka på|tryck på)\s+(.+?)[.!]?$/iu
+      : /^(?:select|choose|click on|click|press)\s+(.+?)[.!]?$/iu);
+    return String(match?.[1] || "").replace(/^[”“"']|[”“"']$/gu, "").trim();
+  }
+
   function draftTitle(recording, derivedSteps, reproductionSteps, errorEvidence,
     language) {
     const swedish = /^sv(?:-|$)/i.test(String(language || ""));
-    const failed = reproductionSteps.find(step => step.failurePoint);
+    const evidenceEventIds = new Set(errorEvidence.flatMap(item =>
+      [item.precedingActionEventId, item.canonicalEventId]).filter(Boolean));
+    const failed = reproductionSteps.find(step => step.failurePoint) ||
+      [...reproductionSteps].reverse().find(step =>
+        step.source?.sourceCanonicalEventIds?.some(id => evidenceEventIds.has(id)));
     const source = derivedSteps.find(step => String(step.taskId || step.stepId) ===
       String(failed?.source?.sourceStepId)) || [...derivedSteps].reverse().find(step =>
         String(step.instruction || step.displayText || "").trim());
@@ -90,7 +103,8 @@
       sourceEventIds.has(event.id) && ["click", "action", "submit"].includes(
         String(event.raw?.type || event.type || "").toLowerCase()));
     const action = String(source?.actionCaption || sourceEvent?.raw?.actionCaption ||
-      sourceEvent?.raw?.label || sourceEvent?.presentation?.label || "").trim();
+      sourceEvent?.raw?.label || sourceEvent?.presentation?.label ||
+      actionFromInstruction(failed?.instruction, language) || "").trim();
     const field = String(source?.fieldCaption || "").trim();
     const page = String(source?.pageCaption || "").trim();
     if (errorEvidence.length && action) return swedish
