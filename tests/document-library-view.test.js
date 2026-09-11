@@ -17,6 +17,7 @@ assert(container.innerHTML.includes('data-selected="true"'));
 assert(container.innerHTML.includes('type="checkbox"'));
 assert(container.innerHTML.includes('aria-pressed="true"'));
 assert(container.innerHTML.includes("Order &lt;test&gt;"));
+assert(container.innerHTML.includes('title="Order &lt;test&gt;"'));
 assert(container.innerHTML.includes('class="library-card-meta"'));
 assert(container.innerHTML.includes('class="library-card-footer"'));
 assert(container.innerHTML.includes(">SV</span>"));

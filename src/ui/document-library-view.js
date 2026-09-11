@@ -26,7 +26,7 @@
       <div class="library-card-heading"><label class="library-select">
         <input type="checkbox" data-library-action="select"
           ${selected ? "checked" : ""} aria-label="Välj ${escape(record.title)}">
-        <span class="sr-only">Välj dokument</span></label><h4>${escape(record.title)}</h4>
+        <span class="sr-only">Välj dokument</span></label><h4 title="${escape(record.title)}">${escape(record.title)}</h4>
         <span class="library-language" aria-label="${escape(language.nativeName)}">${escape(language.shortCode)}</span>
         <button class="library-favourite" data-library-action="favourite"
           aria-pressed="${record.favourite}" aria-label="${record.favourite ? "Ta bort från" : "Lägg till i"} favoriter">${record.favourite ? "★" : "☆"}</button></div>

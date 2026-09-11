@@ -67,6 +67,8 @@ assert.ok(
 assert.ok(
   dashboard.includes("function loadDocumentLibrary(sessions)") &&
     dashboard.includes("T9_GET_DOCUMENT_LIBRARY") &&
+    dashboard.includes("T9_LIST_BUG_REPORTS") &&
+    dashboard.includes("reportTitle || sessionRecord.title") &&
     dashboard.includes("DOCUMENT_LIBRARY_RENDER_LIMIT") &&
     background.includes("T9_SAVE_DOCUMENT_LIBRARY"),
   "Document Library must use lightweight metadata storage and bounded rendering."

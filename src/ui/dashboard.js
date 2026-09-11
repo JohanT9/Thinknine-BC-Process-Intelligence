@@ -3881,15 +3881,22 @@ function refreshLibraryFilters() {
 
 async function loadDocumentLibrary(sessions) {
   documentLibrarySessions = new Map(sessions.map(session => [session.id, session]));
-  const response = await send({ type: "T9_GET_DOCUMENT_LIBRARY" });
+  const [response, reportResponse] = await Promise.all([
+    send({ type: "T9_GET_DOCUMENT_LIBRARY" }),
+    send({ type: "T9_LIST_BUG_REPORTS" })
+  ]);
   const stored = new Map((response?.records || []).map(record =>
     [record.projectId || record.sessionId, record]
   ));
+  const bugReports = new Map((reportResponse?.reports || []).map(report =>
+    [report.recordingId, report]));
   documentLibraryRecords = sessions.map(session => {
     const storedRecord = stored.get(session.id) || {};
     const sessionRecord = librarySessionRecord(session);
+    const reportTitle = bugReports.get(session.id)?.summary?.title;
     return globalThis.T9DocumentLibrary.merge(storedRecord, {
       ...sessionRecord,
+      title: reportTitle || sessionRecord.title,
       documentLanguage: storedRecord.documentLanguage ||
         sessionRecord.documentLanguage
     });

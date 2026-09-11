@@ -1,5 +1,12 @@
 # Changelog
 
+## 2026-09-11 - Document Library shows specific bug report titles
+
+- Bug-report cards now use the saved or recovered report title instead of the
+  generic recording name, keeping the library aligned with the report workspace.
+- Longer report titles use a compact two-line heading with the complete title
+  available on hover.
+
 ## 2026-09-11 - Bug report titles identify the failing action
 
 - Reports with captured Business Central errors now use the recorded action at

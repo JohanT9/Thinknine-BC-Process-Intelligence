@@ -48,7 +48,8 @@ assert.ok(css.includes(":focus-visible"));
 assert.ok(css.includes("[hidden] { display: none !important; }"));
 assert.ok(css.includes("header:not(.app-shell-bar) h1"));
 assert.ok(css.includes("button.library-favourite"));
-assert.ok(css.includes(".library-card-heading h4{padding-top:1px}"));
+assert.ok(css.includes(".library-card-heading h4{display:-webkit-box") &&
+  css.includes("-webkit-line-clamp:2") && css.includes("padding-top:1px"));
 assert.ok(css.includes(".library-card-heading .library-favourite{align-self:flex-start;transform:translateY(-6px)}"));
 assert.ok(css.includes("border-color: transparent !important"));
 assert.ok(css.includes('input:not([type="checkbox"]):not([type="radio"])'));

@@ -1485,6 +1485,23 @@ async function createAndOpenBugReport(recordingId, reportTitle = "") {
   return { report: saved, workspaceUrl, tabId: tab.id };
 }
 
+async function refreshStoredBugReport(report) {
+  if (!report) return report;
+  const recovered = await getBcErrorEvidenceForRecording(report.recordingId);
+  if (!recovered.length) return report;
+  const now = new Date().toISOString();
+  let refreshed = report;
+  if (!refreshed.businessCentralError?.errorEvidenceIds?.length) {
+    refreshed = globalThis.T9BugReportService.attachRecoveredErrorEvidence(
+      refreshed, recovered, now);
+  }
+  const recording = await getCanonicalRecording(refreshed.recordingId);
+  refreshed = globalThis.T9BugReportService.refreshSuggestedTitle(
+    refreshed, recording, recovered, now);
+  return JSON.stringify(refreshed) === JSON.stringify(report)
+    ? report : bugReportStore.save(refreshed);
+}
+
 async function listSessions() {
   const all = await chrome.storage.local.get(null);
   return Object.entries(all)
@@ -1732,27 +1749,18 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
       }
 
       case "T9_LOAD_BUG_REPORT": {
-        let report = await bugReportStore.load(message.bugReportId);
-        if (report) {
-          const recovered = await getBcErrorEvidenceForRecording(report.recordingId);
-          if (recovered.length) {
-            const now = new Date().toISOString();
-            if (!report.businessCentralError?.errorEvidenceIds?.length) {
-              report = globalThis.T9BugReportService.attachRecoveredErrorEvidence(
-                report, recovered, now);
-            }
-            const recording = await getCanonicalRecording(report.recordingId);
-            report = await bugReportStore.save(globalThis.T9BugReportService
-              .refreshSuggestedTitle(report, recording, recovered, now));
-          }
-        }
+        const report = await refreshStoredBugReport(
+          await bugReportStore.load(message.bugReportId));
         sendResponse({ ok: true, report });
         break;
       }
 
-      case "T9_LIST_BUG_REPORTS":
-        sendResponse({ ok: true, reports: await bugReportStore.list() });
+      case "T9_LIST_BUG_REPORTS": {
+        const reports = await Promise.all((await bugReportStore.list())
+          .map(refreshStoredBugReport));
+        sendResponse({ ok: true, reports });
         break;
+      }
 
       case "T9_UPDATE_BUG_REPORT": {
         const current = await bugReportStore.load(message.bugReportId);
