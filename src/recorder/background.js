@@ -1756,9 +1756,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
       }
 
       case "T9_LIST_BUG_REPORTS": {
-        const reports = await Promise.all((await bugReportStore.list())
-          .map(refreshStoredBugReport));
-        sendResponse({ ok: true, reports });
+        sendResponse({ ok: true, reports: await bugReportStore.list() });
         break;
       }
 

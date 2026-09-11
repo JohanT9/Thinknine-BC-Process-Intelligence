@@ -1,5 +1,12 @@
 # Changelog
 
+## 2026-09-11 - Document Library avoids per-report recovery work
+
+- Loading the library now reads stored bug-report summaries directly instead of
+  recovering evidence and recordings separately for every report.
+- Legacy title recovery remains available when an individual report is opened,
+  eliminating the list-view N+1 performance regression.
+
 ## 2026-09-11 - Document Library shows specific bug report titles
 
 - Bug-report cards now use the saved or recovered report title instead of the

@@ -74,6 +74,12 @@ assert.ok(
   "Document Library must use lightweight metadata storage and bounded rendering."
 );
 assert.ok(
+  background.includes('case "T9_LIST_BUG_REPORTS"') &&
+    background.includes("reports: await bugReportStore.list()") &&
+    !background.includes(".map(refreshStoredBugReport)"),
+  "Listing the Document Library must not refresh every report individually."
+);
+assert.ok(
   dashboard.includes('const value = (id, fallback = "") => $(id)?.value ?? fallback;') &&
     dashboard.includes('$(id)?.addEventListener(id === "librarySearch"') &&
     dashboard.includes("if (!select) return;"),
