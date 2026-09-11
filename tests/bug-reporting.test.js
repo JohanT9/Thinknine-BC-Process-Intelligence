@@ -61,6 +61,36 @@ const localizedTitle = service.createBugReportFromRecording(bugSource, [{
     errorEvidenceId: "error-title", recordingId: bugSource.id, capturedAt: NOW,
     precedingActionEventId: bugSource.events[0].id }] });
 assert.strictEqual(localizedTitle.summary.title, "Fel vid \u201dBokf\u00f6r\u201d");
+const capturedActionTitle = service.createBugReportFromRecording(bugSource, steps, {
+  now: NOW, documentLanguage: "sv-SE", errorEvidence: [{
+    errorEvidenceId: "error-raw-action", recordingId: bugSource.id, capturedAt: NOW,
+    precedingActionEventId: bugSource.events[0].id }] });
+assert.strictEqual(capturedActionTitle.summary.title, "Fel vid \u201dPost\u201d",
+  "the captured action must provide the title when derived metadata lacks a caption");
+const weightSource = canonical.finish(canonical.addEvent(canonical.create({
+  id: "weight-error", startedAt: NOW, recordingPurpose: "bug-report" }), {
+  id: "weight-action", type: "click", timestamp: NOW, label: "Registrera vikt"
+}), NOW);
+const weightTitle = service.createBugReportFromRecording(weightSource, [{
+  taskId: "weight-step", instruction: "Registrera vikten.",
+  sourceEventIds: [weightSource.events[0].id]
+}], { now: NOW, documentLanguage: "sv-SE", errorEvidence: [{
+  errorEvidenceId: "weight-evidence", recordingId: weightSource.id, capturedAt: NOW,
+  precedingActionEventId: weightSource.events[0].id }] });
+assert.strictEqual(weightTitle.summary.title, "Fel vid \u201dRegistrera vikt\u201d");
+const upgradedWeightTitle = service.refreshSuggestedTitle({ ...weightTitle,
+  summary: { ...weightTitle.summary,
+    title: "Rapporterat problem i Business Central" }
+}, weightSource, [{ errorEvidenceId: "weight-evidence",
+  precedingActionEventId: weightSource.events[0].id }], NOW);
+assert.strictEqual(upgradedWeightTitle.summary.title, "Fel vid \u201dRegistrera vikt\u201d",
+  "a previously generated generic title should be refreshed on load");
+const manualWeightTitle = service.refreshSuggestedTitle({ ...weightTitle,
+  summary: { ...weightTitle.summary, title: "Mitt eget felnamn" }
+}, weightSource, [{ errorEvidenceId: "weight-evidence",
+  precedingActionEventId: weightSource.events[0].id }], NOW);
+assert.strictEqual(manualWeightTitle.summary.title, "Mitt eget felnamn",
+  "a user-provided title must not be overwritten");
 assert.throws(() => service.createBugReportFromRecording(documentation, []),
   /bug-report recording/u);
 assert.throws(() => model.normalize({ schemaVersion: 1 }),

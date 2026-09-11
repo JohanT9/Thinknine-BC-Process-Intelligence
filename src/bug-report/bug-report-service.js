@@ -78,13 +78,19 @@
     return result;
   }
 
-  function draftTitle(derivedSteps, reproductionSteps, errorEvidence, language) {
+  function draftTitle(recording, derivedSteps, reproductionSteps, errorEvidence,
+    language) {
     const swedish = /^sv(?:-|$)/i.test(String(language || ""));
     const failed = reproductionSteps.find(step => step.failurePoint);
     const source = derivedSteps.find(step => String(step.taskId || step.stepId) ===
       String(failed?.source?.sourceStepId)) || [...derivedSteps].reverse().find(step =>
         String(step.instruction || step.displayText || "").trim());
-    const action = String(source?.actionCaption || "").trim();
+    const sourceEventIds = new Set(failed?.source?.sourceCanonicalEventIds || []);
+    const sourceEvent = [...(recording.events || [])].reverse().find(event =>
+      sourceEventIds.has(event.id) && ["click", "action", "submit"].includes(
+        String(event.raw?.type || event.type || "").toLowerCase()));
+    const action = String(source?.actionCaption || sourceEvent?.raw?.actionCaption ||
+      sourceEvent?.raw?.label || sourceEvent?.presentation?.label || "").trim();
     const field = String(source?.fieldCaption || "").trim();
     const page = String(source?.pageCaption || "").trim();
     if (errorEvidence.length && action) return swedish
@@ -136,7 +142,7 @@
       documentLanguage,
       createdAt: now, updatedAt: now, status: "draft",
       summary: { title: String(context.title || "").trim() ||
-          draftTitle(derivedSteps, steps, errorEvidence, documentLanguage),
+          draftTitle(recording, derivedSteps, steps, errorEvidence, documentLanguage),
         summary: "", severity: "", category: "", authorship: "human" },
       environment: environment(recording, context),
       reproduction: { authorship: "derived", steps },
@@ -239,6 +245,24 @@
           .map(item => JSON.parse(item)), diagnosticRefs: ids } });
   }
 
+  function refreshSuggestedTitle(report, recording, errorEvidence = [], updatedAt) {
+    const current = model.normalize(report);
+    const genericTitles = new Set(["Rapporterat problem i Business Central",
+      "Reported Business Central problem",
+      "Business Central-fel i inspelad process",
+      "Business Central error during recorded process"]);
+    if (!genericTitles.has(current.summary.title) || !errorEvidence.length) {
+      return current;
+    }
+    const title = draftTitle(recording || {}, [], current.reproduction.steps,
+      errorEvidence, current.documentLanguage);
+    if (!title || genericTitles.has(title)) return current;
+    return model.normalize({ ...clone(current),
+      updatedAt: updatedAt || current.updatedAt,
+      summary: { ...clone(current.summary), title } });
+  }
+
   return { createBugReportFromRecording, regenerate,
-    reparseTechnicalDiagnostics, attachRecoveredErrorEvidence, stableId };
+    reparseTechnicalDiagnostics, attachRecoveredErrorEvidence,
+    refreshSuggestedTitle, stableId };
 });

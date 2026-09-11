@@ -76,7 +76,7 @@ assert.strictEqual(delayedReport.reproduction.steps[0].failurePoint, undefined);
 assert.strictEqual(delayedReport.reproduction.steps[1].failurePoint, true,
   "the closest documented action should remain the failure point");
 assert.strictEqual(delayedReport.summary.title,
-  "Business Central-fel i inspelad process");
+  "Fel vid \u201dPost\u201d");
 const foreignEvidenceReport = service.createBugReportFromRecording(
   delayedRecording, steps(delayedRecording), { now: NOW,
     errorEvidence: [{ errorEvidenceId: "foreign:evidence",

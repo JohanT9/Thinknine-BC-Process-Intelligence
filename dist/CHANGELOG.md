@@ -1,5 +1,13 @@
 # Changelog
 
+## 2026-09-11 - Bug report titles identify the failing action
+
+- Reports with captured Business Central errors now use the recorded action at
+  the failure point for their suggested title, such as **Fel vid Registrera vikt**.
+- Existing reports that still have a generic generated title are upgraded when
+  reopened and matching recorded error evidence is available.
+- Explicit titles entered by users continue to take precedence over suggestions.
+
 ## 2026-09-11 - Business Central deep links preserve their exact context
 
 - Direct report links now retain the original query parameter order and encoding,

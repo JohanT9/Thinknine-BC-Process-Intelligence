@@ -1733,11 +1733,18 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
 
       case "T9_LOAD_BUG_REPORT": {
         let report = await bugReportStore.load(message.bugReportId);
-        if (report && !report.businessCentralError?.errorEvidenceIds?.length) {
+        if (report) {
           const recovered = await getBcErrorEvidenceForRecording(report.recordingId);
-          if (recovered.length) report = await bugReportStore.save(
-            globalThis.T9BugReportService.attachRecoveredErrorEvidence(
-              report, recovered, new Date().toISOString()));
+          if (recovered.length) {
+            const now = new Date().toISOString();
+            if (!report.businessCentralError?.errorEvidenceIds?.length) {
+              report = globalThis.T9BugReportService.attachRecoveredErrorEvidence(
+                report, recovered, now);
+            }
+            const recording = await getCanonicalRecording(report.recordingId);
+            report = await bugReportStore.save(globalThis.T9BugReportService
+              .refreshSuggestedTitle(report, recording, recovered, now));
+          }
         }
         sendResponse({ ok: true, report });
         break;
