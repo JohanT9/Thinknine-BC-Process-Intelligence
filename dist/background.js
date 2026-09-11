@@ -939,7 +939,6 @@ async function getBcErrorEvidenceForRecording(recordingId) {
     .map(([, value]) => globalThis.T9BcDiagnosticEvidence.normalize(value))
     .sort((a, b) => String(a.capturedAt).localeCompare(String(b.capturedAt)));
   if (stored.length) {
-    if (stored.every(item => item.supportUrl)) return stored;
     const recording = await getCanonicalRecording(recordingId);
     const candidates = globalThis.T9BcDiagnosticEvidence.recoverFromRecording(
       recording || {});
@@ -947,7 +946,7 @@ async function getBcErrorEvidenceForRecording(recordingId) {
     for (const item of stored) {
       const candidate = candidates.find(value =>
         value.rawMessage === item.rawMessage && value.supportUrl);
-      const next = candidate && !item.supportUrl
+      const next = candidate && candidate.supportUrl !== item.supportUrl
         ? globalThis.T9BcDiagnosticEvidence.normalize({ ...item,
           supportUrl: candidate.supportUrl }) : item;
       if (next !== item) await saveBcErrorEvidence(next);

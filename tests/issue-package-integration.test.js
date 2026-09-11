@@ -61,7 +61,7 @@ assert.strictEqual(pkg.telemetry, null); assert.strictEqual(pkg.aiAnalysis, null
 const markdown = formatter.markdown(pkg);
 assert(!markdown.includes("Obsolete event"));
 assert(markdown.includes(evidence[0].rawMessage));
-assert(markdown.includes(`[Open location in Business Central](${evidence[0].supportUrl})`));
+assert(markdown.includes(`[Open in Business Central](${evidence[0].supportUrl})`));
 assert(markdown.includes("## Summary"),
   "a distinct human summary must remain visible");
 assert(!markdown.includes("Technical Details"));

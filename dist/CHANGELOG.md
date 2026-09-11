@@ -1,5 +1,14 @@
 # Changelog
 
+## 2026-09-11 - Business Central deep links preserve their exact context
+
+- Direct report links now retain the original query parameter order and encoding,
+  including `%20` in company names, while still removing unsupported parameters.
+- Previously saved report links are refreshed from their canonical recording when
+  the report is reopened, correcting links produced by the earlier normalization.
+- The recipient-facing action is now named **Open in Business Central** / **Öppna i
+  Business Central**.
+
 ## 2026-09-11 - Bug reports link directly to the failing BC location
 
 - Captured and recovered errors now retain a strict Business Central support

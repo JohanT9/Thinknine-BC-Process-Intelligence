@@ -254,7 +254,7 @@
           }
           node.appendChild(element(doc, "p", error.rawMessage));
           if (error.supportUrl) {
-            const link = element(doc, "a", ui("Open location in Business Central", locale));
+            const link = element(doc, "a", ui("Open in Business Central", locale));
             link.href = error.supportUrl; link.target = "_blank";
             link.rel = "noopener noreferrer"; node.appendChild(link);
           }

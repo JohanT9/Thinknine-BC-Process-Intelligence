@@ -624,7 +624,7 @@
     ,["Business Central-miljö", "Business Central environment"]
     ,["Business Central-företag", "Business Central company"]
     ,["Webbläsare", "Browser"], ["Webbläsarversion", "Browser version"]
-    ,["Öppna platsen i Business Central", "Open location in Business Central"]
+    ,["Öppna i Business Central", "Open in Business Central"]
     ,["Inkludera tekniska detaljer i beskrivningen", "Include technical details in description"]
     ,["Databas (ägare/namn)", "Repository (owner/name)"]
     ,["Etiketter, kommaseparerade", "Labels, comma separated"]

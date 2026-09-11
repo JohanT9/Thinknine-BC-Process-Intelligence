@@ -24,7 +24,7 @@ recoveredRecording = canonical.addEvent(recoveredRecording, { type: "click",
   timestamp: "2026-09-11T08:57:59.950Z", label: "Registrera vikt" });
 recoveredRecording = canonical.addEvent(recoveredRecording, { type: "dialog-open",
   timestamp: "2026-09-11T08:58:00.100Z",
-  topUrl: "https://businesscentral.dynamics.com/tenant/Sandbox?company=CRONUS&page=5768&bookmark=abc&tid=secret",
+  topUrl: "https://businesscentral.dynamics.com/tenant/Sandbox?company=Salico%20UAT&page=5768&dc=0&bookmark=abc&tid=secret",
   label: "Spill inträffade under konverteringen av Decimal18 till System.Int32. OK" });
 const recovered = evidence.recoverFromRecording(recoveredRecording);
 assert.strictEqual(recovered.length, 1);
@@ -33,7 +33,11 @@ assert.strictEqual(recovered[0].rawMessage,
 assert.strictEqual(recovered[0].precedingActionEventId,
   recoveredRecording.events[0].id);
 assert.strictEqual(recovered[0].supportUrl,
-  "https://businesscentral.dynamics.com/tenant/Sandbox?company=CRONUS&page=5768&bookmark=abc");
+  "https://businesscentral.dynamics.com/tenant/Sandbox?company=Salico%20UAT&page=5768&dc=0&bookmark=abc");
+const reportedLocation =
+  "https://businesscentral.dynamics.com/20afb97e-bbca-4f0d-a72b-e4cbbcdd57fb/Salico_Sandbox_SE?company=Salico%20UAT&page=5768&dc=0&bookmark=1D_lBwAAAJ7_0QASQBSADEAMAAwADIAMwAx";
+assert.strictEqual(evidence.supportUrl(reportedLocation), reportedLocation,
+  "BC deep links must retain their exact parameter encoding and order");
 assert.strictEqual(evidence.supportUrl("https://evil.example/?page=42"), "");
 let informationRecording = canonical.create({ id: "information",
   startedAt: "2026-09-11T08:57:47.016Z", recordingPurpose: "bug-report" });

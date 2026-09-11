@@ -148,7 +148,7 @@ assert(allElements(container).some(item => item.tagName === "dd" &&
 assert(!allElements(container).some(item =>
   item.className === "report-section report-section-traceability"));
 assert(allElements(container).some(item => item.tagName === "a" &&
-  item.textContent === "Open location in Business Central"));
+  item.textContent === "Open in Business Central"));
 const coreFields = allElements(container).find(item =>
   item.className === "report-core-fields");
 const moreFields = allElements(container).find(item =>

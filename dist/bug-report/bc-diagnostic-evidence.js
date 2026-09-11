@@ -22,15 +22,21 @@
     labels.map(label => [cleanLabel(label), field])));
   function supportUrl(value) {
     try {
-      const source = new URL(String(value || ""));
+      const raw = String(value || "");
+      const source = new URL(raw);
       if (source.protocol !== "https:" ||
           source.hostname.toLowerCase() !== "businesscentral.dynamics.com") return "";
-      const result = new URL(`${source.origin}${source.pathname}`);
-      for (const key of ["company", "page", "bookmark", "dc"]) {
-        if (source.searchParams.has(key)) result.searchParams.set(key,
-          source.searchParams.get(key));
-      }
-      return result.toString();
+      const allowed = new Set(["company", "page", "bookmark", "dc"]);
+      const rawQuery = (raw.split("?")[1] || "").split("#")[0];
+      const query = rawQuery.split("&").filter(Boolean).filter(part => {
+        try {
+          return allowed.has(decodeURIComponent(part.split("=")[0]).toLowerCase());
+        } catch {
+          return false;
+        }
+      });
+      return `${source.origin}${source.pathname}${query.length
+        ? `?${query.join("&")}` : ""}`;
     } catch { return ""; }
   }
 
