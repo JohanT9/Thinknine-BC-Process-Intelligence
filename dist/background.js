@@ -1510,6 +1510,20 @@ async function listSessions() {
     .sort((a, b) => String(b.startedAt).localeCompare(String(a.startedAt)));
 }
 
+async function getDocumentLibraryBootstrap() {
+  const all = await chrome.storage.local.get(null);
+  const sessions = Object.entries(all)
+    .filter(([key]) => key.startsWith(SESSION_PREFIX))
+    .map(([, value]) => value)
+    .sort((a, b) => String(b.startedAt).localeCompare(String(a.startedAt)));
+  const reports = Object.entries(all)
+    .filter(([key]) => key.startsWith(BUG_REPORT_PREFIX))
+    .map(([, value]) => globalThis.T9BugReportModel.normalize(value))
+    .sort((a, b) => String(b.updatedAt).localeCompare(String(a.updatedAt)));
+  const records = all[globalThis.T9StorageKeys.DOCUMENT_LIBRARY_KEY];
+  return { sessions, reports, records: Array.isArray(records) ? records : [] };
+}
+
 async function getDocumentLibrary() {
   const data = await chrome.storage.local.get(
     globalThis.T9StorageKeys.DOCUMENT_LIBRARY_KEY
@@ -2050,6 +2064,11 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
           ok: true,
           sessions: Array.isArray(sessions) ? sessions : []
         });
+        break;
+      }
+
+      case "T9_GET_DOCUMENT_LIBRARY_BOOTSTRAP": {
+        sendResponse({ ok: true, ...(await getDocumentLibraryBootstrap()) });
         break;
       }
 

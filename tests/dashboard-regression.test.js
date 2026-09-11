@@ -65,13 +65,17 @@ assert.ok(
   "The assigned profile must use one cached presentation variant."
 );
 assert.ok(
-  dashboard.includes("function loadDocumentLibrary(sessions)") &&
-    dashboard.includes("T9_GET_DOCUMENT_LIBRARY") &&
-    dashboard.includes("T9_LIST_BUG_REPORTS") &&
+  dashboard.includes("function loadDocumentLibrary(sessions, bootstrap = {})") &&
+    dashboard.includes("T9_GET_DOCUMENT_LIBRARY_BOOTSTRAP") &&
     dashboard.includes("reportTitle || sessionRecord.title") &&
     dashboard.includes("DOCUMENT_LIBRARY_RENDER_LIMIT") &&
     background.includes("T9_SAVE_DOCUMENT_LIBRARY"),
   "Document Library must use lightweight metadata storage and bounded rendering."
+);
+assert.ok(
+  background.includes("async function getDocumentLibraryBootstrap()") &&
+    background.includes('case "T9_GET_DOCUMENT_LIBRARY_BOOTSTRAP"'),
+  "Document Library bootstrap must share one storage snapshot."
 );
 assert.ok(
   background.includes('case "T9_LIST_BUG_REPORTS"') &&

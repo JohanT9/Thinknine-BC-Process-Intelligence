@@ -4,6 +4,8 @@
 
 - Loading the library now reads stored bug-report summaries directly instead of
   recovering evidence and recordings separately for every report.
+- Session summaries, library metadata, and report titles now share one storage
+  snapshot and one background request instead of performing duplicate full reads.
 - Legacy title recovery remains available when an individual report is opened,
   eliminating the list-view N+1 performance regression.
 

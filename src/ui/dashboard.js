@@ -3879,16 +3879,12 @@ function refreshLibraryFilters() {
     $("libraryThemeFilter")?.value || "");
 }
 
-async function loadDocumentLibrary(sessions) {
+async function loadDocumentLibrary(sessions, bootstrap = {}) {
   documentLibrarySessions = new Map(sessions.map(session => [session.id, session]));
-  const [response, reportResponse] = await Promise.all([
-    send({ type: "T9_GET_DOCUMENT_LIBRARY" }),
-    send({ type: "T9_LIST_BUG_REPORTS" })
-  ]);
-  const stored = new Map((response?.records || []).map(record =>
+  const stored = new Map((bootstrap.records || []).map(record =>
     [record.projectId || record.sessionId, record]
   ));
-  const bugReports = new Map((reportResponse?.reports || []).map(report =>
+  const bugReports = new Map((bootstrap.reports || []).map(report =>
     [report.recordingId, report]));
   documentLibraryRecords = sessions.map(session => {
     const storedRecord = stored.get(session.id) || {};
@@ -7010,13 +7006,13 @@ async function closeReview() {
 }
 
 async function loadSessions() {
-  const response = await send({ type: "T9_LIST_SESSIONS" });
+  const response = await send({ type: "T9_GET_DOCUMENT_LIBRARY_BOOTSTRAP" });
   const sessions = Array.isArray(response?.sessions)
     ? response.sessions
     : [];
   const body = $("sessions");
   body.innerHTML = "";
-  await loadDocumentLibrary(sessions);
+  await loadDocumentLibrary(sessions, response || {});
   if (!$("sessionTools").open) return;
 
   if (!sessions.length) {
