@@ -1,5 +1,12 @@
 # Changelog
 
+## 2026-09-11 - Email package generation loads its background dependencies
+
+- The extension background now loads the report completeness and projection
+  modules before the issue-package builder.
+- Emailing a report no longer fails with `Cannot read properties of undefined
+  (reading 'project')` when no external issue integration is configured.
+
 ## 2026-09-11 - Support address has an explicit save action
 
 - The bug-report support address can now be saved directly beside the field.

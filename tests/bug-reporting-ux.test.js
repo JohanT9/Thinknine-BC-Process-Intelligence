@@ -11,6 +11,16 @@ const report = read("src/ui/technical-report.html");
 const reportLogic = read("src/ui/technical-report.js");
 const reportView = read("src/ui/technical-report-workspace-view.js");
 
+const completenessImport = background.indexOf(
+  'importScripts("bug-report/bug-report-completeness.js")');
+const generatorImport = background.indexOf(
+  'importScripts("bug-report/bug-report-generator.js")');
+const issuePackageImport = background.indexOf(
+  'importScripts("bug-report/issue-package.js")');
+assert.ok(completenessImport >= 0);
+assert.ok(generatorImport > completenessImport);
+assert.ok(issuePackageImport > generatorImport);
+
 assert.match(popup, /id="startProcess"/);
 assert.match(popup, /id="startBug"/);
 assert.match(popup, /Dokumentera en process/);
