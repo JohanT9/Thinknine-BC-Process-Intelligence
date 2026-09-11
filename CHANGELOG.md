@@ -1,5 +1,14 @@
 # Changelog
 
+## 2026-09-11 - AL call stacks can be shared without other enrichment
+
+- Report sharing now has a dedicated, default-selected AL call-stack option,
+  independent from technical details, Application Insights, and AI analysis.
+- The call stack receives its own localized report section and is not duplicated
+  when technical details are also selected.
+- When the Business Central error did not contain a captured call stack, the
+  option is disabled with an explicit explanation instead of implying success.
+
 ## 2026-09-10 - Bug scenario pack covers operational edge cases
 
 - Eleven executable scenarios add sales availability and discount defects,

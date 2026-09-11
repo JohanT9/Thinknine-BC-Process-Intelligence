@@ -56,14 +56,16 @@
         `- ${inline(key)}: ${inline(child)}`);
       const diagnostics = (pkg.diagnostics?.rows || []).map(row =>
         `- ${inline(row.label)}: ${inline(row.value)}`);
-      const callStack = pkg.callStack.flatMap(stack => [
-        ...stack.frames.map(frame), ...(stack.rawCallStack
-          ? [code(stack.rawCallStack)] : [])]);
       const technical = [];
       if (environment.length) technical.push(`### ${labels.environment}`, "", ...environment, "");
       if (diagnostics.length) technical.push(`### ${labels.diagnostics}`, "", ...diagnostics, "");
-      if (callStack.length) technical.push(`### ${labels.callStack}`, "", ...callStack, "");
       add(labels.technical, technical);
+    }
+    if (pkg.inclusion?.callStack) {
+      const callStack = pkg.callStack.flatMap(stack => [
+        ...stack.frames.map(frame), ...(stack.rawCallStack
+          ? [code(stack.rawCallStack)] : [])]);
+      add(labels.callStack, callStack);
     }
     if (pkg.telemetry) add(labels.telemetry, pkg.telemetry.contexts.flatMap(context => [
       `- ${labels.status}: ${inline(context.status)}; ${labels.relatedEvents}: ${context.eventCount}`,

@@ -1854,6 +1854,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
           { errorEvidence: evidence }, { generatedAt: new Date().toISOString(),
             includeTelemetry: Boolean(message.options?.includeTelemetry),
             includeAiAnalysis: Boolean(message.options?.includeAiAnalysis),
+            includeCallStack: Boolean(message.options?.includeCallStack),
             includeTechnicalDetails: Boolean(
               message.options?.includeTechnicalDetails) });
         const screenshotValues = await getScreenshots(report.recordingId);

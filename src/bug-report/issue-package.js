@@ -48,6 +48,10 @@
     const telemetry = section(document, "telemetry");
     const includeAi = options.includeAiAnalysis !== false && ai?.status === "current";
     const includeTelemetry = Boolean(options.includeTelemetry && telemetry?.configured);
+    const callStack = clone(section(document, "al-call-stack") || []);
+    const includeCallStack = Boolean((options.includeCallStack ||
+      options.includeTechnicalDetails) && callStack.some(stack =>
+      stack.rawCallStack || stack.frames?.length));
     const result = { schemaVersion: SCHEMA_VERSION,
       packageId: `issue-package:${report.bugReportId}:${sourceRevision.split(":").pop()}`,
       bugReportId: report.bugReportId, recordingId: report.recordingId,
@@ -61,12 +65,13 @@
       errorEvidence: clone(section(document, "bc-errors")),
       environment: clone(section(document, "environment")),
       diagnostics: clone(section(document, "technical-diagnostics")),
-      callStack: clone(section(document, "al-call-stack") || []),
+      callStack,
       affectedObjects: clone(section(document, "affected-objects")),
       notes: clone(section(document, "notes") || []), attachments: attachments(document),
       telemetry: includeTelemetry ? clone(telemetry) : null,
       aiAnalysis: includeAi ? clone(ai) : null,
       inclusion: { telemetry: includeTelemetry, aiAnalysis: includeAi,
+        callStack: includeCallStack,
         technicalDetails: Boolean(options.includeTechnicalDetails),
         rawTelemetry: false, rawCanonicalEvents: false, rawDiagnostics: false,
         screenshots: attachments(document).length > 0 },

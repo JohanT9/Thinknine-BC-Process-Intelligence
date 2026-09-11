@@ -61,11 +61,17 @@ assert(markdown.includes(evidence[0].rawMessage));
 assert(markdown.includes("## Summary"),
   "a distinct human summary must remain visible");
 assert(!markdown.includes("Technical Details"));
+assert(!markdown.includes("## AL Call Stack"));
+const callStackMarkdown = formatter.markdown(packages.build(report,
+  { errorEvidence: evidence }, { ...options, includeCallStack: true }));
+assert(callStackMarkdown.includes("## AL Call Stack"));
+assert(!callStackMarkdown.includes("## Technical Details"));
+assert(!callStackMarkdown.includes("## Telemetry"));
 const technicalMarkdown = formatter.markdown(packages.build(report,
   { errorEvidence: evidence }, { ...options, includeTechnicalDetails: true }));
 assert(technicalMarkdown.includes("## Technical Details"));
 assert(technicalMarkdown.includes("### Environment"));
-assert(technicalMarkdown.includes("### AL Call Stack"));
+assert(technicalMarkdown.includes("## AL Call Stack"));
 assert(formatter.code(evidence[0].rawMessage).includes(evidence[0].rawMessage));
 const telemetryPkg = packages.build(report, { errorEvidence: evidence }, {
   ...options, includeTelemetry: true });

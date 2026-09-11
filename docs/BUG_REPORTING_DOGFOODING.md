@@ -40,4 +40,10 @@ rather than changing production evidence to match the example text.
 
 No live Business Central browser session is available in the automated workspace, so real click counts, error-dialog capture, React/control-add-in capture, and visual long-report behavior were not claimed as manually verified. Pilot verification should cover standard BC errors, a silent problem, an Aptean/control-add-in flow, local-only use, Issue Preview, keyboard navigation, narrow viewports, and long reports.
 
+In report sharing, **Include AL call stack when available** is independent from
+technical details, telemetry, and AI. It is selected automatically when the
+recorded Business Central error contains a call stack. If Business Central did
+not expose or the recorder did not capture one, the disabled choice explains
+that no call stack is available; the export never invents one.
+
 The Technical Report Workspace now supports the two common reproduction corrections directly: wording changes and removing an irrelevant step from the report. Advanced merge, split, and screenshot replacement remain in Review by design.

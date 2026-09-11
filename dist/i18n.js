@@ -95,6 +95,8 @@
       "technical.offlineOnly": "endast lokalt paket",
       "technical.telemetry": "Telemetri",
       "technical.aiAnalysis": "AI-analys",
+      "technical.callStack": "AL-anropsstack",
+      "technical.callStackUnavailable": "ingen anropsstack fångades i BC-felet",
       "technical.technicalDetails": "Tekniska detaljer",
       "technical.attachments": "Bilagor",
       "technical.included": "inkluderat",
@@ -279,6 +281,8 @@
       "technical.offlineOnly": "offline only",
       "technical.telemetry": "Telemetry",
       "technical.aiAnalysis": "AI analysis",
+      "technical.callStack": "AL call stack",
+      "technical.callStackUnavailable": "no call stack was captured with the BC error",
       "technical.technicalDetails": "Technical details",
       "technical.attachments": "Attachments",
       "technical.included": "included",
@@ -615,6 +619,7 @@
     ,["Jag förstår att valda bevis lämnar det här tillägget", "I understand that the selected evidence will leave this extension"]
     ,["Inkludera telemetrisammanfattning", "Include telemetry summary"]
     ,["Inkludera aktuell AI-stödd analys", "Include current AI-assisted analysis"]
+    ,["Inkludera AL-anropsstack när den finns", "Include AL call stack when available"]
     ,["Inkludera tekniska detaljer i beskrivningen", "Include technical details in description"]
     ,["Databas (ägare/namn)", "Repository (owner/name)"]
     ,["Etiketter, kommaseparerade", "Labels, comma separated"]

@@ -32,6 +32,13 @@
     if (!loaded.report) throw new Error(t("technical.reportNotFound"));
     const session = await send({ type: "T9_GET_SESSION_DATA",
       sessionId: loaded.report.recordingId, includeScreenshots: true });
+    const callStackInput = document.getElementById("issueIncludeCallStack");
+    const hasCallStack = (session.bcErrorEvidence || []).some(item =>
+      String(item.rawCallStack || "").trim());
+    callStackInput.checked = hasCallStack;
+    callStackInput.disabled = !hasCallStack;
+    document.getElementById("issueCallStackAvailability").textContent = hasCallStack
+      ? "" : `— ${t("technical.callStackUnavailable")}`;
     const store = { save: report => send({ type: "T9_SAVE_BUG_REPORT", report })
       .then(response => response.report) };
     const workspace = globalThis.T9TechnicalReportWorkspace.create({
@@ -251,6 +258,7 @@
         options: { includeTelemetry: document.getElementById(
           "issueIncludeTelemetry").checked, includeAiAnalysis:
           document.getElementById("issueIncludeAi").checked,
+          includeCallStack: document.getElementById("issueIncludeCallStack").checked,
           includeTechnicalDetails: document.getElementById(
             "issueIncludeTechnical").checked } });
       document.getElementById("issueTitle").textContent = issuePreviewState.issuePackage.title;
@@ -269,6 +277,7 @@
         `${t("technical.telemetry")}: ${pkg.inclusion.telemetry ? included : excluded}`,
         `${t("technical.aiAnalysis")}: ${pkg.inclusion.aiAnalysis
           ? t("technical.includedLabelled") : excluded}`,
+        `${t("technical.callStack")}: ${pkg.inclusion.callStack ? included : excluded}`,
         `${t("technical.technicalDetails")}: ${pkg.inclusion.technicalDetails
           ? included : excluded}`,
         `${t("technical.attachments")}: ${pkg.attachments.length}`,
@@ -299,7 +308,7 @@
     document.getElementById("issueProvider").addEventListener("change", action(async () => {
       issuePreviewState = null; updateShareUi(); await generateIssuePreview();
     }));
-    for (const id of ["issueIncludeTelemetry", "issueIncludeAi",
+    for (const id of ["issueIncludeTelemetry", "issueIncludeAi", "issueIncludeCallStack",
       "issueIncludeTechnical"]) {
       document.getElementById(id).addEventListener("change", action(async () => {
         issuePreviewState = null; await generateIssuePreview();
