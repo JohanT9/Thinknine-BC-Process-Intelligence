@@ -9,6 +9,7 @@ const submissions = require("../src/bug-report/issue-submission-service");
 
 const evidence = [{ errorEvidenceId: "error-1", capturedAt: "2026-08-24T10:00:00Z",
   rawMessage: "Posting **failed** <script>alert(1)</script>\nDo not alter this error.",
+  supportUrl: "https://businesscentral.dynamics.com/tenant/Sandbox?page=42",
   rawCallStack: "Codeunit 80 Sales-Post.Run line 42",
   structuredDiagnostics: { internalSessionId: "session-1", environment: "Sandbox" } },
 { errorEvidenceId: "error-2", capturedAt: "2026-08-24T10:01:00Z",
@@ -60,6 +61,7 @@ assert.strictEqual(pkg.telemetry, null); assert.strictEqual(pkg.aiAnalysis, null
 const markdown = formatter.markdown(pkg);
 assert(!markdown.includes("Obsolete event"));
 assert(markdown.includes(evidence[0].rawMessage));
+assert(markdown.includes(`[Open location in Business Central](${evidence[0].supportUrl})`));
 assert(markdown.includes("## Summary"),
   "a distinct human summary must remain visible");
 assert(!markdown.includes("Technical Details"));
@@ -74,6 +76,7 @@ const technicalMarkdown = formatter.markdown(packages.build(report,
 assert(technicalMarkdown.includes("## Technical Details"));
 assert(technicalMarkdown.includes("### Environment"));
 assert(technicalMarkdown.includes("businessCentral.environment: BC-Sandbox"));
+assert(!technicalMarkdown.includes("recordingSchemaVersion"));
 assert(technicalMarkdown.includes("## AL Call Stack"));
 assert(formatter.code(evidence[0].rawMessage).includes(evidence[0].rawMessage));
 const telemetryPkg = packages.build(report, { errorEvidence: evidence }, {

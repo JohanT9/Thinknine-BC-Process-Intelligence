@@ -8,6 +8,7 @@
     reproduction: "Steg för att återskapa", expected: "Förväntat resultat",
     actual: "Faktiskt resultat", error: "Business Central-fel",
     primaryError: "Primärt fel", additionalError: "Ytterligare fel",
+    directLink: "Öppna platsen i Business Central",
     technical: "Tekniska detaljer", environment: "Miljö",
     diagnostics: "Diagnostik", callStack: "AL-anropsstack",
     telemetry: "Telemetri", ai: "AI-assisterad analys (inte auktoritativ)",
@@ -18,6 +19,7 @@
     reproduction: "Steps to Reproduce", expected: "Expected Result",
     actual: "Actual Result", error: "Business Central Error",
     primaryError: "Primary error", additionalError: "Additional error",
+    directLink: "Open location in Business Central",
     technical: "Technical Details", environment: "Environment",
     diagnostics: "Diagnostics", callStack: "AL Call Stack",
     telemetry: "Telemetry", ai: "AI-Assisted Analysis (not authoritative)",
@@ -58,9 +60,11 @@
     add(labels.actual, [inline(pkg.actualResult?.userDescription)]);
     add(labels.error, errors.flatMap((error, index) => [
       errors.length > 1 ? `### ${index === 0 ? labels.primaryError : labels.additionalError}` : null,
-      code(error.rawMessage || "")]));
+      code(error.rawMessage || ""), error.supportUrl
+        ? `[${labels.directLink}](${error.supportUrl})` : null]));
     if (pkg.inclusion?.technicalDetails !== false) {
-      const environment = metadata(pkg.environment);
+      const environment = metadata({ businessCentral: pkg.environment?.businessCentral,
+        browser: pkg.environment?.browser });
       const diagnostics = (pkg.diagnostics?.rows || []).map(row =>
         `- ${inline(row.label)}: ${inline(row.value)}`);
       const technical = [];

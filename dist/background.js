@@ -938,7 +938,23 @@ async function getBcErrorEvidenceForRecording(recordingId) {
     key.startsWith(BC_ERROR_EVIDENCE_PREFIX) && value?.recordingId === recordingId)
     .map(([, value]) => globalThis.T9BcDiagnosticEvidence.normalize(value))
     .sort((a, b) => String(a.capturedAt).localeCompare(String(b.capturedAt)));
-  if (stored.length) return stored;
+  if (stored.length) {
+    if (stored.every(item => item.supportUrl)) return stored;
+    const recording = await getCanonicalRecording(recordingId);
+    const candidates = globalThis.T9BcDiagnosticEvidence.recoverFromRecording(
+      recording || {});
+    const enriched = [];
+    for (const item of stored) {
+      const candidate = candidates.find(value =>
+        value.rawMessage === item.rawMessage && value.supportUrl);
+      const next = candidate && !item.supportUrl
+        ? globalThis.T9BcDiagnosticEvidence.normalize({ ...item,
+          supportUrl: candidate.supportUrl }) : item;
+      if (next !== item) await saveBcErrorEvidence(next);
+      enriched.push(next);
+    }
+    return enriched;
+  }
   const recording = await getCanonicalRecording(recordingId);
   const recovered = globalThis.T9BcDiagnosticEvidence.recoverFromRecording(recording || {});
   for (const item of recovered) await saveBcErrorEvidence(item);
@@ -954,6 +970,8 @@ async function captureBcErrorEvidence(input, sender) {
     !["focus", "page-state", "dialog-open", "bc-error"].includes(item.raw?.type));
   let evidence = await saveBcErrorEvidence({ ...input,
     recordingId: state.sessionId,
+    supportUrl: globalThis.T9BcDiagnosticEvidence.supportUrl(
+      input.supportUrl || input.frameContext?.topUrl),
     precedingActionEventId: preceding?.id || null,
     triggerRelationship: preceding ? "preceding-interaction-candidate" : "none",
     frameContext: { ...(input.frameContext || {}), tabId: sender.tab?.id,

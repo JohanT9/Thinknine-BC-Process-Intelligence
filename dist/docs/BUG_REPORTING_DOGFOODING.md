@@ -59,4 +59,11 @@ and canonical trace references stay in the stored report for product support but
 are not rendered to ordinary report recipients. A correlation timeline is shown
 only when it adds more than the already visible captured error.
 
+Each captured error may include an **Open location in Business Central** link
+derived from the URL attached to the error screenshot. The link is restricted to
+the official Business Central host and retains only company, page, bookmark, and
+dc navigation parameters. It is recipient-facing evidence and is included in the
+Markdown issue description. Users must still review the company/record context
+before sharing a report outside their organization.
+
 The Technical Report Workspace now supports the two common reproduction corrections directly: wording changes and removing an irrelevant step from the report. Advanced merge, split, and screenshot replacement remain in Review by design.

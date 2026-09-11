@@ -20,6 +20,19 @@
   });
   const LOOKUP = new Map(Object.entries(LABELS).flatMap(([field, labels]) =>
     labels.map(label => [cleanLabel(label), field])));
+  function supportUrl(value) {
+    try {
+      const source = new URL(String(value || ""));
+      if (source.protocol !== "https:" ||
+          source.hostname.toLowerCase() !== "businesscentral.dynamics.com") return "";
+      const result = new URL(`${source.origin}${source.pathname}`);
+      for (const key of ["company", "page", "bookmark", "dc"]) {
+        if (source.searchParams.has(key)) result.searchParams.set(key,
+          source.searchParams.get(key));
+      }
+      return result.toString();
+    } catch { return ""; }
+  }
 
   function parseRawDiagnostics(rawDiagnostics) {
     const raw = typeof rawDiagnostics === "string" ? rawDiagnostics : "";
@@ -72,6 +85,7 @@
       result.diagnosticsStatus, result.screenshotStatus
     ]));
     result.frameContext = clone(result.frameContext || {});
+    result.supportUrl = supportUrl(result.supportUrl || result.frameContext.topUrl);
     return result;
   }
 
@@ -93,11 +107,12 @@
       diagnosticsStatus: "diagnostics-unavailable",
       precedingActionEventId: preceding?.id || null,
       triggerRelationship: preceding ? "preceding-interaction-recovered" : "none",
+      supportUrl: event.raw?.topUrl || event.raw?.frameUrl || "",
       errorScreenshotAssetId: event.screenshotAssetId || null,
       screenshotStatus: event.screenshotAssetId ? "screenshot-captured" : "screenshot-unavailable",
       source: { kind: "canonical-dialog-recovery", confidence: 0.7 } })];
     });
   }
 
-  return { LABELS, normalize, parseRawDiagnostics, recoverFromRecording };
+  return { LABELS, normalize, parseRawDiagnostics, recoverFromRecording, supportUrl };
 });

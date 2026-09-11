@@ -1,5 +1,16 @@
 # Changelog
 
+## 2026-09-11 - Bug reports link directly to the failing BC location
+
+- Captured and recovered errors now retain a strict Business Central support
+  deep link to the page and record where the error screenshot was taken.
+- Only HTTPS `businesscentral.dynamics.com` links are accepted, and only the
+  navigation parameters company, page, bookmark, and dc are retained.
+- The report UI and Markdown issue description expose a localized direct link;
+  previously recovered errors are enriched when their report is reopened.
+- Recipient environment details are limited to Business Central environment,
+  company, and browser; Recorder versions and schema metadata remain internal.
+
 ## 2026-09-11 - Recipient reports show BC environment, not recorder internals
 
 - The technical report now renders captured Business Central environment and

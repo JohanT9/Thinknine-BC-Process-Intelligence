@@ -26,8 +26,9 @@
   }
   function hasSectionContent(section) {
     const content = section.content;
-    if (section.kind === "metadata") return Object.entries(content || {}).some(
-      ([key, value]) => key !== "authorship" && value != null && value !== "");
+    if (section.kind === "metadata") return [content?.businessCentral,
+      content?.browser].some(value => value && Object.values(value).some(child =>
+      child != null && child !== ""));
     if (section.kind === "errors") return Boolean(content?.primary ||
       content?.additional?.length);
     if (section.kind === "diagnostics") return Boolean(content?.rows?.length ||
@@ -45,6 +46,9 @@
     return true;
   }
   function appendMetadata(doc, parent, input, locale, prefix = "") {
+    const labels = { "businessCentral.environment": "Business Central environment",
+      "businessCentral.company": "Business Central company",
+      "browser.name": "Browser", "browser.version": "Browser version" };
     Object.entries(input || {}).forEach(([key, value]) => {
       if (key === "authorship" || value == null || value === "") return;
       const label = prefix ? `${prefix}.${key}` : key;
@@ -52,7 +56,7 @@
         appendMetadata(doc, parent, value, locale, label);
         return;
       }
-      parent.append(element(doc, "dt", ui(label, locale)), element(doc, "dd",
+      parent.append(element(doc, "dt", ui(labels[label] || label, locale)), element(doc, "dd",
         Array.isArray(value) ? value.join(", ") : String(value)));
     });
   }
@@ -124,7 +128,8 @@
       node.appendChild(element(doc, "h2", section.title));
       if (section.kind === "metadata") {
         const list = doc.createElement("dl");
-        appendMetadata(doc, list, section.content, locale);
+        appendMetadata(doc, list, { businessCentral: section.content.businessCentral,
+          browser: section.content.browser }, locale);
         node.appendChild(list);
       } else if (section.kind === "text") node.appendChild(element(doc, "p",
         section.content || "Incomplete"));
@@ -248,6 +253,11 @@
               error.errorEvidenceId)); node.appendChild(choose);
           }
           node.appendChild(element(doc, "p", error.rawMessage));
+          if (error.supportUrl) {
+            const link = element(doc, "a", ui("Open location in Business Central", locale));
+            link.href = error.supportUrl; link.target = "_blank";
+            link.rel = "noopener noreferrer"; node.appendChild(link);
+          }
           if (error.rawDiagnostics) node.appendChild(details(doc,
             "Raw Business Central diagnostics", error.rawDiagnostics, onCopy,
             locale));

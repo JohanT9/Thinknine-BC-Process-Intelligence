@@ -15,6 +15,7 @@ const evidence = [{ errorEvidenceId: "error-1", recordingId: "recording-1",
   rawDiagnostics: "Client Activity ID: activity-sanitized",
   rawCallStack: stacks.standard, diagnosticsStatus: "diagnostics-captured",
   structuredDiagnostics: { clientActivityId: "activity-sanitized" },
+  supportUrl: "https://businesscentral.dynamics.com/tenant/Sandbox?page=42",
   errorScreenshotAssetId: "asset-error" },
 { errorEvidenceId: "error-2", recordingId: "recording-1",
   capturedAt: "2026-08-24T10:00:02Z", rawMessage: "Second exact error.",
@@ -146,6 +147,8 @@ assert(allElements(container).some(item => item.tagName === "dd" &&
   item.textContent === "Sandbox"));
 assert(!allElements(container).some(item =>
   item.className === "report-section report-section-traceability"));
+assert(allElements(container).some(item => item.tagName === "a" &&
+  item.textContent === "Open location in Business Central"));
 const coreFields = allElements(container).find(item =>
   item.className === "report-core-fields");
 const moreFields = allElements(container).find(item =>

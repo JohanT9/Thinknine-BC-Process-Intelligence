@@ -24,6 +24,7 @@ recoveredRecording = canonical.addEvent(recoveredRecording, { type: "click",
   timestamp: "2026-09-11T08:57:59.950Z", label: "Registrera vikt" });
 recoveredRecording = canonical.addEvent(recoveredRecording, { type: "dialog-open",
   timestamp: "2026-09-11T08:58:00.100Z",
+  topUrl: "https://businesscentral.dynamics.com/tenant/Sandbox?company=CRONUS&page=5768&bookmark=abc&tid=secret",
   label: "Spill inträffade under konverteringen av Decimal18 till System.Int32. OK" });
 const recovered = evidence.recoverFromRecording(recoveredRecording);
 assert.strictEqual(recovered.length, 1);
@@ -31,6 +32,9 @@ assert.strictEqual(recovered[0].rawMessage,
   "Spill inträffade under konverteringen av Decimal18 till System.Int32.");
 assert.strictEqual(recovered[0].precedingActionEventId,
   recoveredRecording.events[0].id);
+assert.strictEqual(recovered[0].supportUrl,
+  "https://businesscentral.dynamics.com/tenant/Sandbox?company=CRONUS&page=5768&bookmark=abc");
+assert.strictEqual(evidence.supportUrl("https://evil.example/?page=42"), "");
 let informationRecording = canonical.create({ id: "information",
   startedAt: "2026-09-11T08:57:47.016Z", recordingPurpose: "bug-report" });
 informationRecording = canonical.addEvent(informationRecording, {
@@ -41,7 +45,8 @@ assert.deepStrictEqual(evidence.recoverFromRecording(informationRecording), []);
 const source = { errorEvidenceId: "error-1", recordingId: "bug-1",
   capturedAt: "2026-08-24T10:00:01Z", rawMessage: "Exact BC punctuation!",
   rawDiagnostics: fixtures.fullEnglish, diagnosticsAvailable: true,
-  frameContext: { tabId: 1, frameId: 2, documentId: "doc" },
+  frameContext: { tabId: 1, frameId: 2, documentId: "doc",
+    topUrl: "https://businesscentral.dynamics.com/tenant/Sandbox?company=CRONUS&page=42&bookmark=abc&tid=secret" },
   screenshotStatus: "screenshot-captured", errorScreenshotAssetId: "asset:error" };
 const snapshot = JSON.stringify(source);
 const full = evidence.normalize(source);
@@ -50,6 +55,8 @@ assert.strictEqual(full.rawMessage, "Exact BC punctuation!");
 assert.strictEqual(full.structuredDiagnostics.clientActivityId, "activity-sanitized");
 assert.strictEqual(full.callStackAvailable, true);
 assert.strictEqual(full.callStackParsed, false);
+assert.strictEqual(full.supportUrl,
+  "https://businesscentral.dynamics.com/tenant/Sandbox?company=CRONUS&page=42&bookmark=abc");
 assert(full.rawCallStack.includes("Sample.Codeunit line 10"));
 const localized = evidence.normalize({ ...source, errorEvidenceId: "error-2",
   rawDiagnostics: fixtures.swedish });
