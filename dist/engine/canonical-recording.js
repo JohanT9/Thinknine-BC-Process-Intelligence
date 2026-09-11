@@ -102,7 +102,13 @@
     return event;
   }
   function metadataFromSession(session = {}) {
-    return { title: session.name || undefined, startedAt: session.startedAt || new Date(0).toISOString(), finishedAt: session.completedAt || session.finishedAt || undefined, sourceApplication: session.sourceApplication || "Microsoft Dynamics 365 Business Central", sourceUrl: session.sourceUrl || undefined, businessCentral: clone(session.businessCentral || { environment: session.settings?.environmentName || undefined }), recordingPurpose: normalizeRecordingPurpose(session.recordingPurpose), taxonomyReferences: taxonomySchema.normalizeRecordingReferences(session.taxonomyReferences) };
+    const configured = session.settings || {};
+    const businessCentral = clone(session.businessCentral || {});
+    businessCentral.environment = businessCentral.environment ||
+      configured.businessCentralEnvironment || configured.environmentName || undefined;
+    businessCentral.company = businessCentral.company ||
+      configured.businessCentralCompany || configured.companyName || undefined;
+    return { title: session.name || undefined, startedAt: session.startedAt || new Date(0).toISOString(), finishedAt: session.completedAt || session.finishedAt || undefined, sourceApplication: session.sourceApplication || "Microsoft Dynamics 365 Business Central", sourceUrl: session.sourceUrl || undefined, businessCentral, recordingPurpose: normalizeRecordingPurpose(session.recordingPurpose), taxonomyReferences: taxonomySchema.normalizeRecordingReferences(session.taxonomyReferences) };
   }
   function assetFor(sessionId, eventNo, value) {
     return { id: `${sessionId}:screenshot:${eventNo}`, type: "screenshot", path: `screenshots/${String(eventNo).padStart(6, "0")}.png`, mimeType: /^data:([^;,]+)/.exec(String(value || ""))?.[1] || "image/png", metadata: { legacyEventNo: Number(eventNo) } };

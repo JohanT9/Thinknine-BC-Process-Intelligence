@@ -16,12 +16,14 @@ const evidence = [{ errorEvidenceId: "error-1", capturedAt: "2026-08-24T10:00:00
 let report = model.normalize({ schemaVersion: 1, bugReportId: "bug-report:issue",
   recordingId: "recording-1", updatedAt: "2026-08-24T11:00:00Z", status: "ready",
   summary: { title: "Posting failure", summary: "Posting cannot complete.",
-    severity: "High" }, environment: { name: "Sandbox" }, reproduction: { steps: [
+    severity: "High" }, reproduction: { steps: [
     { reproductionStepId: "step-a", instruction: "Open order.",
       source: { screenshotAssetIds: ["shot-1"] } },
     { reproductionStepId: "hidden", instruction: "Obsolete event.", visibility: "hidden" },
     { reproductionStepId: "step-b", instruction: "Post order.",
       source: { screenshotAssetIds: ["shot-2", "unused"] } }] },
+  environment: { name: "Sandbox", businessCentral: {
+    environment: "BC-Sandbox" } },
   expectedResult: { text: "Order is posted." }, actualResult: { human: {
     text: "Posting stops." }, capturedErrorRefs: ["error-1", "error-2"] },
   businessCentralError: { primaryErrorEvidenceId: "error-1",
@@ -71,6 +73,7 @@ const technicalMarkdown = formatter.markdown(packages.build(report,
   { errorEvidence: evidence }, { ...options, includeTechnicalDetails: true }));
 assert(technicalMarkdown.includes("## Technical Details"));
 assert(technicalMarkdown.includes("### Environment"));
+assert(technicalMarkdown.includes("businessCentral.environment: BC-Sandbox"));
 assert(technicalMarkdown.includes("## AL Call Stack"));
 assert(formatter.code(evidence[0].rawMessage).includes(evidence[0].rawMessage));
 const telemetryPkg = packages.build(report, { errorEvidence: evidence }, {

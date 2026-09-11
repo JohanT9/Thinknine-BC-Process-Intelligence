@@ -26,6 +26,15 @@
       "Possible root-cause hypothesis (not verified)", notes: "Notes" });
   const inline = input => value(input).replace(/\\/gu, "\\\\")
     .replace(/([*_\[\]<>])/gu, "\\$1");
+  function metadata(input, prefix = "") {
+    return Object.entries(input || {}).flatMap(([key, child]) => {
+      if (key === "authorship" || child == null || child === "") return [];
+      const label = prefix ? `${prefix}.${key}` : key;
+      return child && typeof child === "object" && !Array.isArray(child)
+        ? metadata(child, label) : [`- ${inline(label)}: ${inline(
+          Array.isArray(child) ? child.join(", ") : child)}`];
+    });
+  }
   function code(valueToRender) { const raw = value(valueToRender);
     const longest = Math.max(2, ...((raw.match(/`+/gu) || []).map(item => item.length)));
     const fence = "`".repeat(longest + 1); return `${fence}text\n${raw}\n${fence}`; }
@@ -51,9 +60,7 @@
       errors.length > 1 ? `### ${index === 0 ? labels.primaryError : labels.additionalError}` : null,
       code(error.rawMessage || "")]));
     if (pkg.inclusion?.technicalDetails !== false) {
-      const environment = Object.entries(pkg.environment || {}).filter(([, child]) =>
-        child != null && child !== "" && child !== "captured").map(([key, child]) =>
-        `- ${inline(key)}: ${inline(child)}`);
+      const environment = metadata(pkg.environment);
       const diagnostics = (pkg.diagnostics?.rows || []).map(row =>
         `- ${inline(row.label)}: ${inline(row.value)}`);
       const technical = [];

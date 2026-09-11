@@ -142,6 +142,10 @@ assert.strictEqual(container.attributes["aria-label"],
 const allElements = node => [node, ...node.children.flatMap(allElements)];
 assert(allElements(container).some(item => item.tagName === "details"));
 assert(allElements(container).some(item => item.tagName === "table"));
+assert(allElements(container).some(item => item.tagName === "dd" &&
+  item.textContent === "Sandbox"));
+assert(!allElements(container).some(item =>
+  item.className === "report-section report-section-traceability"));
 const coreFields = allElements(container).find(item =>
   item.className === "report-core-fields");
 const moreFields = allElements(container).find(item =>

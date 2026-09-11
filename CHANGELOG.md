@@ -1,5 +1,16 @@
 # Changelog
 
+## 2026-09-11 - Recipient reports show BC environment, not recorder internals
+
+- The technical report now renders captured Business Central environment and
+  company metadata instead of an empty Environment section.
+- New canonical recordings preserve configured BC environment and company from
+  the recording session for downstream reports.
+- Internal bug-report, recording, parser, and canonical-event identifiers remain
+  available in the model but are hidden from the standard recipient view.
+- A single captured-error timeline entry is suppressed because it duplicates the
+  visible error; meaningful multi-event correlation timelines remain available.
+
 ## 2026-09-11 - Bug reports recover explicit BC errors from recordings
 
 - Bug recordings now recover strongly identified Business Central error dialogs

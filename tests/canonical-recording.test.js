@@ -5,10 +5,11 @@ function deepFreeze(value) {
   Object.values(value).forEach(deepFreeze);
   return Object.freeze(value);
 }
-const session = { id: "recording-1", name: "Create order", purpose: "process", startedAt: "2026-08-10T08:00:00.000Z", completedAt: null, updatedAt: "2026-08-10T08:00:00.000Z", status: "recording", settings: { environmentName: "Sandbox" } };
+const session = { id: "recording-1", name: "Create order", purpose: "process", startedAt: "2026-08-10T08:00:00.000Z", completedAt: null, updatedAt: "2026-08-10T08:00:00.000Z", status: "recording", settings: { environmentName: "Sandbox", companyName: "CRONUS" } };
 const created = recording.create({ id: session.id, legacySession: session });
 assert.strictEqual(created.schemaVersion, 1);
 assert.strictEqual(created.metadata.businessCentral.environment, "Sandbox");
+assert.strictEqual(created.metadata.businessCentral.company, "CRONUS");
 const raw = { eventNo: 1, timestamp: "2026-08-10T08:01:00.000Z", type: "field-change", fieldName: "Customer No.", value: "10000", futureCaptureProperty: { retained: true } };
 const createdSnapshot = JSON.stringify(created);
 const rawSnapshot = JSON.stringify(raw);

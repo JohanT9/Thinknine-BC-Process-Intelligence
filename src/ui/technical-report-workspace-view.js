@@ -39,11 +39,22 @@
     if (section.kind === "telemetry") return Boolean(content?.configured &&
       content?.contexts?.length);
     if (section.kind === "ai-analysis") return Boolean(content?.available);
-    if (["timeline", "traceability"].includes(section.kind)) return Boolean(
-      Array.isArray(content) ? content.length : Object.entries(content || {}).some(
-        ([key, value]) => key !== "authorship" && (Array.isArray(value)
-          ? value.length : value != null && value !== "")));
+    if (section.kind === "timeline") return Boolean(Array.isArray(content) &&
+      content.length > 1);
+    if (section.kind === "traceability") return false;
     return true;
+  }
+  function appendMetadata(doc, parent, input, locale, prefix = "") {
+    Object.entries(input || {}).forEach(([key, value]) => {
+      if (key === "authorship" || value == null || value === "") return;
+      const label = prefix ? `${prefix}.${key}` : key;
+      if (value && typeof value === "object" && !Array.isArray(value)) {
+        appendMetadata(doc, parent, value, locale, label);
+        return;
+      }
+      parent.append(element(doc, "dt", ui(label, locale)), element(doc, "dd",
+        Array.isArray(value) ? value.join(", ") : String(value)));
+    });
   }
   function render(container, workspaceState, options = {}, doc = document) {
     const onCopy = options.onCopy || (() => {});
@@ -111,7 +122,11 @@
       node.className = `report-section report-section-${section.kind}`;
       node.dataset.technicalReportSection = section.id;
       node.appendChild(element(doc, "h2", section.title));
-      if (section.kind === "text") node.appendChild(element(doc, "p",
+      if (section.kind === "metadata") {
+        const list = doc.createElement("dl");
+        appendMetadata(doc, list, section.content, locale);
+        node.appendChild(list);
+      } else if (section.kind === "text") node.appendChild(element(doc, "p",
         section.content || "Incomplete"));
       else if (section.kind === "reproduction") {
         const list = doc.createElement("ol");
@@ -316,15 +331,6 @@
         const list = doc.createElement("ol");
         section.content.forEach(item => list.appendChild(element(doc, "li",
           `${item.timestamp} [${item.source}] ${item.label}`)));
-        node.appendChild(list);
-      } else if (section.kind === "traceability") {
-        const list = doc.createElement("dl");
-        Object.entries(section.content || {}).filter(([key, value]) =>
-          key !== "authorship" && value != null && value !== "" &&
-          (!Array.isArray(value) || value.length)).forEach(([key, value]) => {
-          list.append(element(doc, "dt", key), element(doc, "dd",
-            Array.isArray(value) ? value.join(", ") : String(value)));
-        });
         node.appendChild(list);
       } else if (section.kind === "ai-analysis") {
         if (!section.content.available) node.appendChild(element(doc, "p",

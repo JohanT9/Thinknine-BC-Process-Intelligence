@@ -53,4 +53,10 @@ user action and its screenshot. Recovery requires strong error wording and does
 not convert ordinary informational dialogs into errors. Empty technical sections
 are not displayed.
 
+The recipient-facing technical view includes useful captured Business Central
+environment metadata. Recorder-internal report IDs, event IDs, parser versions,
+and canonical trace references stay in the stored report for product support but
+are not rendered to ordinary report recipients. A correlation timeline is shown
+only when it adds more than the already visible captured error.
+
 The Technical Report Workspace now supports the two common reproduction corrections directly: wording changes and removing an irrelevant step from the report. Advanced merge, split, and screenshot replacement remain in Review by design.
