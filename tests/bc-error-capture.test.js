@@ -18,6 +18,26 @@ assert.notStrictEqual(detector.lifecycleKey({ frameInstanceId: "f",
   elementIdentity: "d", openedAt: "t" }), detector.lifecycleKey({
   frameInstanceId: "f", elementIdentity: "d", openedAt: "t2" }));
 
+let recoveredRecording = canonical.create({ id: "recovered-bug",
+  startedAt: "2026-09-11T08:57:47.016Z", recordingPurpose: "bug-report" });
+recoveredRecording = canonical.addEvent(recoveredRecording, { type: "click",
+  timestamp: "2026-09-11T08:57:59.950Z", label: "Registrera vikt" });
+recoveredRecording = canonical.addEvent(recoveredRecording, { type: "dialog-open",
+  timestamp: "2026-09-11T08:58:00.100Z",
+  label: "Spill inträffade under konverteringen av Decimal18 till System.Int32. OK" });
+const recovered = evidence.recoverFromRecording(recoveredRecording);
+assert.strictEqual(recovered.length, 1);
+assert.strictEqual(recovered[0].rawMessage,
+  "Spill inträffade under konverteringen av Decimal18 till System.Int32.");
+assert.strictEqual(recovered[0].precedingActionEventId,
+  recoveredRecording.events[0].id);
+let informationRecording = canonical.create({ id: "information",
+  startedAt: "2026-09-11T08:57:47.016Z", recordingPurpose: "bug-report" });
+informationRecording = canonical.addEvent(informationRecording, {
+  type: "dialog-open", timestamp: "2026-09-11T08:58:00.100Z",
+  label: "Det finns inga nya inleveransrader att skapa. Visa öppna rader" });
+assert.deepStrictEqual(evidence.recoverFromRecording(informationRecording), []);
+
 const source = { errorEvidenceId: "error-1", recordingId: "bug-1",
   capturedAt: "2026-08-24T10:00:01Z", rawMessage: "Exact BC punctuation!",
   rawDiagnostics: fixtures.fullEnglish, diagnosticsAvailable: true,
@@ -65,6 +85,14 @@ assert(report.evidence.screenshots.some(item => item.assetId === "asset:error" &
   item.role === "error"));
 assert.deepStrictEqual(report.actualResult.capturedErrorRefs,
 ["error-1", "error-2"]);
+const reportWithoutEvidence = service.createBugReportFromRecording(recording, [], {
+  now: source.capturedAt, errorEvidence: [] });
+const attached = service.attachRecoveredErrorEvidence(reportWithoutEvidence,
+  [recovered[0]], source.capturedAt);
+assert.deepStrictEqual(attached.businessCentralError.errorEvidenceIds,
+  [recovered[0].errorEvidenceId]);
+assert.deepStrictEqual(attached.actualResult.capturedErrorRefs,
+  [recovered[0].errorEvidenceId]);
 assert.deepStrictEqual(service.regenerate(report, recording, [], {
   updatedAt: source.capturedAt }).businessCentralError.errorEvidenceIds,
 ["error-1", "error-2"]);

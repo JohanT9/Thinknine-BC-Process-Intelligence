@@ -934,10 +934,15 @@ async function saveBcErrorEvidence(evidence) {
 
 async function getBcErrorEvidenceForRecording(recordingId) {
   const all = await chrome.storage.local.get(null);
-  return Object.entries(all).filter(([key, value]) =>
+  const stored = Object.entries(all).filter(([key, value]) =>
     key.startsWith(BC_ERROR_EVIDENCE_PREFIX) && value?.recordingId === recordingId)
     .map(([, value]) => globalThis.T9BcDiagnosticEvidence.normalize(value))
     .sort((a, b) => String(a.capturedAt).localeCompare(String(b.capturedAt)));
+  if (stored.length) return stored;
+  const recording = await getCanonicalRecording(recordingId);
+  const recovered = globalThis.T9BcDiagnosticEvidence.recoverFromRecording(recording || {});
+  for (const item of recovered) await saveBcErrorEvidence(item);
+  return recovered;
 }
 
 async function captureBcErrorEvidence(input, sender) {
@@ -1709,10 +1714,17 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
         break;
       }
 
-      case "T9_LOAD_BUG_REPORT":
-        sendResponse({ ok: true,
-          report: await bugReportStore.load(message.bugReportId) });
+      case "T9_LOAD_BUG_REPORT": {
+        let report = await bugReportStore.load(message.bugReportId);
+        if (report && !report.businessCentralError?.errorEvidenceIds?.length) {
+          const recovered = await getBcErrorEvidenceForRecording(report.recordingId);
+          if (recovered.length) report = await bugReportStore.save(
+            globalThis.T9BugReportService.attachRecoveredErrorEvidence(
+              report, recovered, new Date().toISOString()));
+        }
+        sendResponse({ ok: true, report });
         break;
+      }
 
       case "T9_LIST_BUG_REPORTS":
         sendResponse({ ok: true, reports: await bugReportStore.list() });

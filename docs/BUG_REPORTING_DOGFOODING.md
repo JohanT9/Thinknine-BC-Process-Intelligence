@@ -46,4 +46,11 @@ recorded Business Central error contains a call stack. If Business Central did
 not expose or the recorder did not capture one, the disabled choice explains
 that no call stack is available; the export never invents one.
 
+If a clear Business Central error dialog was retained as a canonical dialog event
+but the dedicated error-evidence message was missed, reopening the report performs
+a conservative local recovery. The recovered error is linked to the preceding
+user action and its screenshot. Recovery requires strong error wording and does
+not convert ordinary informational dialogs into errors. Empty technical sections
+are not displayed.
+
 The Technical Report Workspace now supports the two common reproduction corrections directly: wording changes and removing an irrelevant step from the report. Advanced merge, split, and screenshot replacement remain in Review by design.

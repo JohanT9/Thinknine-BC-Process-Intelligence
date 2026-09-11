@@ -75,5 +75,29 @@
     return result;
   }
 
-  return { LABELS, normalize, parseRawDiagnostics };
+  const ERROR_TEXT = /(?:spill inträffade|ett fel uppstod|something went wrong|an error occurred|exception|stack overflow|måste ha ett värde|must have a value|du har inte följande behörigheter|you do not have the following permissions|kunde inte (?:bokföras|registreras|slutföras)|could not be (?:posted|registered|completed))/iu;
+  function recoverFromRecording(recording = {}) {
+    const events = Array.isArray(recording.events) ? recording.events : [];
+    return events.flatMap((event, index) => {
+      if (event.raw?.type !== "dialog-open") return [];
+      const message = String(event.raw?.label || event.raw?.accessibleName || "")
+        .replace(/\s+OK\s*$/iu, "").trim();
+      if (!message || !ERROR_TEXT.test(message)) return [];
+      const preceding = events.slice(0, index).reverse().find(candidate =>
+        !["focus", "page-state", "dialog-open", "dialog-close",
+          "status-message", "bc-error"].includes(candidate.raw?.type));
+      return [normalize({ errorEvidenceId: `bc-error:${recording.id}:recovered:${
+        event.raw?.eventNo || index + 1}`, recordingId: recording.id,
+      capturedAt: event.timestamp || event.raw?.timestamp || new Date(0).toISOString(),
+      rawMessage: message, rawDiagnostics: "", diagnosticsAvailable: false,
+      diagnosticsStatus: "diagnostics-unavailable",
+      precedingActionEventId: preceding?.id || null,
+      triggerRelationship: preceding ? "preceding-interaction-recovered" : "none",
+      errorScreenshotAssetId: event.screenshotAssetId || null,
+      screenshotStatus: event.screenshotAssetId ? "screenshot-captured" : "screenshot-unavailable",
+      source: { kind: "canonical-dialog-recovery", confidence: 0.7 } })];
+    });
+  }
+
+  return { LABELS, normalize, parseRawDiagnostics, recoverFromRecording };
 });

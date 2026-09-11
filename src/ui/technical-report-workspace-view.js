@@ -24,6 +24,27 @@
       locale)}`, text, onCopy, locale));
     return wrapper;
   }
+  function hasSectionContent(section) {
+    const content = section.content;
+    if (section.kind === "metadata") return Object.entries(content || {}).some(
+      ([key, value]) => key !== "authorship" && value != null && value !== "");
+    if (section.kind === "errors") return Boolean(content?.primary ||
+      content?.additional?.length);
+    if (section.kind === "diagnostics") return Boolean(content?.rows?.length ||
+      content?.captureStatuses?.length);
+    if (section.kind === "call-stack") return (content || []).some(stack =>
+      stack.rawCallStack || stack.frames?.length);
+    if (section.kind === "objects") return Boolean(content?.objects?.length ||
+      content?.apps?.length);
+    if (section.kind === "telemetry") return Boolean(content?.configured &&
+      content?.contexts?.length);
+    if (section.kind === "ai-analysis") return Boolean(content?.available);
+    if (["timeline", "traceability"].includes(section.kind)) return Boolean(
+      Array.isArray(content) ? content.length : Object.entries(content || {}).some(
+        ([key, value]) => key !== "authorship" && (Array.isArray(value)
+          ? value.length : value != null && value !== "")));
+    return true;
+  }
   function render(container, workspaceState, options = {}, doc = document) {
     const onCopy = options.onCopy || (() => {});
     const onEdit = options.onEdit || (() => {});
@@ -78,13 +99,14 @@
     technicalDetails.className = "technical-details";
     technicalDetails.appendChild(element(doc, "summary", ui("Technical details", locale)));
     technicalDetails.appendChild(element(doc, "p",
-      "Diagnostics, AL call stack, referenced objects, telemetry, AI analysis and traceability."));
+      ui("Only technical information captured for this error is shown.", locale)));
     const advancedKinds = new Set(["metadata", "diagnostics", "call-stack",
       "objects", "telemetry", "timeline", "ai-analysis", "traceability",
       "errors"]);
     const editorDuplicateKinds = new Set(["summary", "text", "notes"]);
     let technicalSectionCount = 0;
     for (const section of report.sections) {
+      if (advancedKinds.has(section.kind) && !hasSectionContent(section)) continue;
       const node = doc.createElement("section");
       node.className = `report-section report-section-${section.kind}`;
       node.dataset.technicalReportSection = section.id;
@@ -294,6 +316,15 @@
         const list = doc.createElement("ol");
         section.content.forEach(item => list.appendChild(element(doc, "li",
           `${item.timestamp} [${item.source}] ${item.label}`)));
+        node.appendChild(list);
+      } else if (section.kind === "traceability") {
+        const list = doc.createElement("dl");
+        Object.entries(section.content || {}).filter(([key, value]) =>
+          key !== "authorship" && value != null && value !== "" &&
+          (!Array.isArray(value) || value.length)).forEach(([key, value]) => {
+          list.append(element(doc, "dt", key), element(doc, "dd",
+            Array.isArray(value) ? value.join(", ") : String(value)));
+        });
         node.appendChild(list);
       } else if (section.kind === "ai-analysis") {
         if (!section.content.available) node.appendChild(element(doc, "p",

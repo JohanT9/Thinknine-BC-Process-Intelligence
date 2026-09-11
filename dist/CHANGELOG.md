@@ -1,5 +1,17 @@
 # Changelog
 
+## 2026-09-11 - Bug reports recover explicit BC errors from recordings
+
+- Bug recordings now recover strongly identified Business Central error dialogs
+  from canonical `dialog-open` evidence when the dedicated error message was
+  missed, including the observed Decimal18-to-Int32 conversion failure.
+- Recovered errors retain their preceding user action and error screenshot, and
+  existing reports are repaired safely when reopened.
+- The technical workspace hides empty sections and unavailable telemetry/AI
+  placeholders while rendering available traceability instead of blank panels.
+- Informational dialogs such as an empty warehouse-receipt result are explicitly
+  guarded from recovery as errors.
+
 ## 2026-09-11 - AL call stacks can be shared without other enrichment
 
 - Report sharing now has a dedicated, default-selected AL call-stack option,

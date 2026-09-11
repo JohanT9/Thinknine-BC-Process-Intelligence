@@ -209,6 +209,36 @@
         parsed: ["parsed", "partially-parsed"].includes(primary?.status) } });
   }
 
+  function attachRecoveredErrorEvidence(report, errorEvidence = [], updatedAt) {
+    const current = model.normalize(report);
+    if (!errorEvidence.length || current.businessCentralError?.errorEvidenceIds?.length) {
+      return current;
+    }
+    const ids = unique(errorEvidence.map(item => item.errorEvidenceId));
+    const diagnostics = errorEvidence.map(item => technical.safelyDerive(item));
+    const stackEvidence = errorEvidence.find(item => item.callStackAvailable);
+    const stack = diagnostics.find(item =>
+      item.errorEvidenceId === stackEvidence?.errorEvidenceId)?.callStack;
+    const screenshots = errorEvidence.filter(item => item.errorScreenshotAssetId)
+      .map(item => ({ assetId: item.errorScreenshotAssetId, role: "error",
+        errorEvidenceId: item.errorEvidenceId, visibility: "visible" }));
+    return model.normalize({ ...clone(current), updatedAt: updatedAt || current.updatedAt,
+      actualResult: { ...clone(current.actualResult), capturedErrorRefs: ids },
+      businessCentralError: { primaryErrorEvidenceId: ids.length === 1 ? ids[0] : null,
+        errorEvidenceIds: ids },
+      diagnostics: { ...clone(current.diagnostics), rawEvidenceRefs: ids },
+      callStack: { ...clone(current.callStack),
+        rawEvidenceRef: stackEvidence?.errorEvidenceId || null,
+        frames: clone(stack?.frames || []), parserVersion: stack?.parserVersion,
+        parseStatus: stack?.status, parsed: ["parsed", "partially-parsed"].includes(
+          stack?.status) },
+      technicalDiagnostics: diagnostics,
+      evidence: { ...clone(current.evidence),
+        screenshots: unique([...(current.evidence?.screenshots || []).map(item =>
+          JSON.stringify(item)), ...screenshots.map(item => JSON.stringify(item))])
+          .map(item => JSON.parse(item)), diagnosticRefs: ids } });
+  }
+
   return { createBugReportFromRecording, regenerate,
-    reparseTechnicalDiagnostics, stableId };
+    reparseTechnicalDiagnostics, attachRecoveredErrorEvidence, stableId };
 });

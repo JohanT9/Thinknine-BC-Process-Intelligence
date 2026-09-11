@@ -620,6 +620,7 @@
     ,["Inkludera telemetrisammanfattning", "Include telemetry summary"]
     ,["Inkludera aktuell AI-stödd analys", "Include current AI-assisted analysis"]
     ,["Inkludera AL-anropsstack när den finns", "Include AL call stack when available"]
+    ,["Endast teknisk information som fångats för detta fel visas.", "Only technical information captured for this error is shown."]
     ,["Inkludera tekniska detaljer i beskrivningen", "Include technical details in description"]
     ,["Databas (ägare/namn)", "Repository (owner/name)"]
     ,["Etiketter, kommaseparerade", "Labels, comma separated"]
