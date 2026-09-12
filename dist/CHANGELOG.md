@@ -1,5 +1,16 @@
 # Changelog
 
+## 2026-09-12 - Windows report sharing helper pilot
+
+- Added a self-contained Windows native-messaging helper which shares a ZIP
+  containing the offline bug report, Markdown, and embedded screenshot data.
+- Windows sharing is an opt-in delivery setting; existing `.eml` behavior remains
+  unchanged until the helper is installed and Windows sharing is selected.
+- Support address and title have copy controls because Windows sharing cannot
+  guarantee that Outlook fills recipient/subject fields.
+- Registration is per-user and extension-ID-specific, and is never automatic.
+- Helper-to-Outlook GUI verification remains a manual release gate.
+
 ## 2026-09-11 - Email package generation loads its background dependencies
 
 - The extension background now loads the report completeness and projection

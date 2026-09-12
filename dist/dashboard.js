@@ -13,6 +13,7 @@ const DEFAULTS = {
   environmentName: "ApteanAdvance",
   companyName: "",
   supportEmail: "",
+  bugReportEmailMode: "eml",
   advancedOverridesEnabled: false,
   maskSalesOrderNo: true,
   maskPurchaseOrderNo: true,

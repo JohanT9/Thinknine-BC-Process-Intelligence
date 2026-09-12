@@ -634,6 +634,13 @@
     ,["Spara supportadress", "Save support address"]
     ,["Supportadressen har sparats.", "Support address saved."]
     ,["Sparad", "Saved"]
+    ,["Öppna felrapport i e-post", "Open bug report in email"]
+    ,["Windows-delning (kräver Windows-hjälpare)", "Windows sharing (requires Windows helper)"]
+    ,["Ladda ned .eml-fil", "Download .eml file"]
+    ,["Välj Outlook i delningsdialogen. Supportadress och ämne kan behöva klistras in.",
+      "Choose Outlook in the share dialog. You may need to paste the support address and subject."]
+    ,["Windows-hjälparen är öppnad. Välj Dela bifogad rapport och sedan Outlook.",
+      "Windows helper is open. Choose Share attached report and then Outlook."]
     ,["Används när en felrapport skapas som adresserat e-postutkast.", "Used when a bug report is prepared as an addressed email draft."]
     ,["Inkludera tekniska detaljer i beskrivningen", "Include technical details in description"]
     ,["Databas (ägare/namn)", "Repository (owner/name)"]

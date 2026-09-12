@@ -41,7 +41,7 @@
     "test:ai-analysis": "node tests/ai-technical-analysis.test.js",
     "test:issue-package": "node tests/issue-package-integration.test.js",
     "test:bug-report-flow": "node tests/bug-report-end-to-end.test.js",
-    "test:bug-report-email": "node tests/bug-report-email-draft.test.js",
+    "test:bug-report-email": "node tests/bug-report-email-draft.test.js && node tests/windows-share-helper.test.js",
     "test:bug-report-corpus": "node tests/bug-report-scenario-corpus.test.js",
     "scenarios:bug-report": "node scripts/run-bug-report-scenarios.js",
     "test:bug-reporting-ux": "node tests/bug-reporting-ux.test.js",

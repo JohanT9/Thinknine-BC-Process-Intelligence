@@ -59,6 +59,7 @@ importScripts("bug-report/github-issue-adapter.js");
 importScripts("document/document-library.js");
 
 const VERSION = "4.7.0";
+const windowsSharePorts = new Set();
 const pageKnowledgePacksReady = globalThis.T9PageIdentificationEngine
   .loadKnowledgePacks({
     indexUrl: chrome.runtime.getURL("knowledge-packs/index.json"),
@@ -85,6 +86,7 @@ const DEFAULT_SETTINGS = {
   environmentName: "ApteanAdvance",
   companyName: "",
   supportEmail: "",
+  bugReportEmailMode: "eml",
   advancedOverridesEnabled: false,
   maskSalesOrderNo: true,
   maskPurchaseOrderNo: true,
@@ -2171,6 +2173,53 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
         const result = await saveStepRepairScreenshot(message.sessionId,
           message.assetKey, message.image);
         sendResponse({ ok: true, ...result });
+        break;
+      }
+
+      case "T9_SHARE_BUG_REPORT_WINDOWS": {
+        if (sender.id !== chrome.runtime.id || !sender.url?.startsWith(
+          chrome.runtime.getURL("technical-report.html") + "?")) {
+          throw new Error("Windows-delning får bara startas från felrapportvyn.");
+        }
+        const payload = message.payload;
+        if (!payload || payload.action !== "shareBugReport" || payload.schemaVersion !== 1 ||
+            typeof payload.reportJson !== "string" || typeof payload.markdown !== "string" ||
+            new TextEncoder().encode(JSON.stringify(payload)).length > 24 * 1024 * 1024) {
+          throw new Error("Felrapporten är ogiltig eller för stor för Windows-delning (max 24 MB).");
+        }
+        const result = await new Promise((resolve, reject) => {
+          const port = chrome.runtime.connectNative("com.thinknine.bcprocessstudio.share");
+          windowsSharePorts.add(port);
+          let replied = false;
+          const timer = setTimeout(() => {
+            if (!replied) {
+              replied = true;
+              reject(new Error("Windows-hjälparen svarade inte. Ingen rapport har skickats."));
+              port.disconnect();
+              windowsSharePorts.delete(port);
+            }
+          }, 30000);
+          port.onMessage.addListener(response => {
+            if (replied) return;
+            replied = true;
+            clearTimeout(timer);
+            if (!response?.ok) {
+              reject(new Error(response?.error || "Windows-delning kunde inte startas."));
+              port.disconnect();
+              windowsSharePorts.delete(port);
+            } else resolve(response);
+          });
+          port.onDisconnect.addListener(() => {
+            const error = chrome.runtime.lastError;
+            clearTimeout(timer);
+            windowsSharePorts.delete(port);
+            if (!replied) reject(new Error(error
+              ? "Windows-hjälparen kunde inte anslutas. Installera och registrera hjälparen för detta tillägg."
+              : "Windows-hjälparen stängdes innan rapporten kunde förberedas."));
+          });
+          port.postMessage(payload);
+        });
+        sendResponse(result);
         break;
       }
 
