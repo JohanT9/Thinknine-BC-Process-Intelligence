@@ -25,7 +25,12 @@ const long = await create({ ...pkg, actualResult: { userDescription: "Ett långt
 assert.ok(long.pageCount > 2);
 const png = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+a0WQAAAAASUVORK5CYII=";
 const withImage = await create(pkg, [{ role: "error-evidence", dataUrl: png }]);
-assert.equal(withImage.pageCount, 2);
+assert.equal(withImage.pageCount, 1);
+const imagePdf = await PDFDocument.load(withImage.bytes);
+assert.ok(imagePdf.getPage(0).node.Resources().toString().includes("/Image"), "Error image on first page");
+const multipleImages = await create(pkg, [{ role: "reproduction-evidence", dataUrl: png },
+  { role: "error-evidence", dataUrl: png }]);
+assert.equal(multipleImages.pageCount, 2, "Lead image is not repeated in appendix");
 const zipBytes = await technicalZip({ bugReportMarkdown: "Report", attachments: [{ dataUrl: png }] });
 const zip = await JSZip.loadAsync(zipBytes);
 assert.ok(zip.file("bilder/bild-1.png"));

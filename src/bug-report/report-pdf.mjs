@@ -85,8 +85,28 @@ export async function create(pkg, attachments = []) {
     y -= 7;
   }
   function heading(title) { ensure(48); text(title, 15, bold, teal); }
+  async function screenshot(attachment, maxHeight) {
+    try {
+      const png = /^data:image\/png;base64,/u.test(attachment.dataUrl);
+      const jpg = /^data:image\/jpe?g;base64,/u.test(attachment.dataUrl);
+      if (!png && !jpg) throw new Error("Unsupported image");
+      const image = png ? await doc.embedPng(attachment.dataUrl) : await doc.embedJpg(attachment.dataUrl);
+      const factor = Math.min(usable / image.width, maxHeight / image.height);
+      page.drawImage(image, { x: margin, y: y - image.height * factor,
+        width: image.width * factor, height: image.height * factor });
+      y -= image.height * factor + 20;
+    } catch {
+      text(model.sv ? "Skärmbilden kunde inte inkluderas." : "The screenshot could not be included.");
+    }
+  }
+  // The final captured error image is the lead evidence, not an appendix.
+  const leadImage = attachments.findLast(image => image.role === "error-evidence" && image.dataUrl);
   newPage(); text(model.title, 22, bold);
   text([model.company, model.date ? String(model.date).slice(0, 10) : ""].filter(Boolean).join(" · "), 10, regular, muted);
+  if (leadImage) {
+    heading(model.sv ? "Felbild" : "Error screenshot");
+    await screenshot(leadImage, Math.min(300, y - 110));
+  }
   for (const section of model.sections) {
     heading(section.title);
     for (const row of section.rows) text(row, 11, regular, section.id === "actual" ? rgb(.65, .12, .10) : ink);
@@ -102,22 +122,12 @@ export async function create(pkg, attachments = []) {
       page.node.addAnnot(annotation);
     }
   }
-  const images = [...attachments].sort((a, b) => Number(b.role === "error-evidence") - Number(a.role === "error-evidence"));
+  const images = attachments.filter(image => image !== leadImage);
   for (const [index, attachment] of images.entries()) {
     if (!attachment.dataUrl) continue;
     newPage(); heading(index === 0 && attachment.role === "error-evidence"
       ? (model.sv ? "Felbild" : "Error screenshot") : `${model.sv ? "Skärmbild" : "Screenshot"} ${index + 1}`);
-    try {
-      const png = /^data:image\/png;base64,/u.test(attachment.dataUrl);
-      const jpg = /^data:image\/jpe?g;base64,/u.test(attachment.dataUrl);
-      if (!png && !jpg) throw new Error("Unsupported image");
-      const image = png ? await doc.embedPng(attachment.dataUrl) : await doc.embedJpg(attachment.dataUrl);
-      const factor = Math.min(usable / image.width, (y - 65) / image.height);
-      page.drawImage(image, { x: margin, y: y - image.height * factor,
-        width: image.width * factor, height: image.height * factor });
-    } catch {
-      text(model.sv ? "Skärmbilden kunde inte inkluderas." : "The screenshot could not be included.");
-    }
+    await screenshot(attachment, y - 65);
   }
   for (const [index, p] of doc.getPages().entries()) p.drawText(
     `${model.sv ? "Sida" : "Page"} ${index + 1} / ${doc.getPageCount()}`,
