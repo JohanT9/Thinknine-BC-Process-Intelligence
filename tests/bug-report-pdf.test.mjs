@@ -11,6 +11,13 @@ const pkg = { title: "Fel vid Registrera vikt", documentLanguage: "sv-SE", gener
   errorEvidence: { primary: { rawMessage: "Ett fel inträffade.", supportUrl: url } },
   reproduction: [{ instruction: "Välj **Registrera vikt**." }], callStack: [], diagnostics: { rows: [] } };
 const model = project(pkg);
+const legacy = { ...pkg, environment: { businessCentral: { environment: "Sandbox" } } };
+assert.equal(project(legacy).company, "Demo Company", "Recover company from captured error deep link");
+assert.equal(project({ ...legacy, errorEvidence: { primary: { supportUrl: url.replace("%20", "+") } } }).company, "Demo Company");
+assert.equal(project({ ...legacy, errorEvidence: { primary: { supportUrl: "https://example.com/?company=Wrong" } } }).company, "");
+assert.equal(project({ ...legacy, errorEvidence: { primary: { structuredDiagnostics: { company: "Captured Company" }, supportUrl: url } } }).company, "Captured Company");
+assert.equal(project(pkg).company, "Demoföretag", "Recorded metadata takes precedence over URL fallback");
+assert.ok(!legacy.environment.businessCentral.company, "Do not mutate the original package");
 const captured = diagnostics.normalize({ errorEvidenceId: "error-1", recordingId: "recording-1",
   capturedAt: "2026-09-13T10:15:00Z", rawMessage: "Ett BC-fel.", rawDiagnostics:
     'Internal session ID:\n\nsession-123\nClient activity ID:\nactivity-456\nTimestamp:\n2026-09-13T10:15:00Z\nAL call stack:\n"Demo"(CodeUnit 50000).RegisterWeight line 12' });

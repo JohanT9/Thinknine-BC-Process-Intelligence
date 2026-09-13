@@ -22014,7 +22014,18 @@
   function project(pkg) {
     const sv = pkg.documentLanguage !== "en-US";
     const errors = [pkg.errorEvidence?.primary, ...pkg.errorEvidence?.additional || []].filter(Boolean);
-    const bc = pkg.environment?.businessCentral || {};
+    const bc = { ...pkg.environment?.businessCentral || {} };
+    if (!plain(bc.company)) {
+      const primary = pkg.errorEvidence?.primary;
+      bc.company = plain(primary?.structuredDiagnostics?.company);
+      if (!bc.company && primary?.supportUrl) {
+        try {
+          const url = new URL(primary.supportUrl);
+          if (url.protocol === "https:" && url.hostname === "businesscentral.dynamics.com" && !url.username && !url.password) bc.company = plain(url.searchParams.get("company"));
+        } catch {
+        }
+      }
+    }
     const steps = (pkg.reproduction || []).filter((step) => plain(step.instruction));
     const triggerId = pkg.errorEvidence?.primary?.precedingActionEventId;
     const triggerIndex = steps.findIndex((step) => triggerId ? step.source?.sourceCanonicalEventIds?.includes(triggerId) : step.failurePoint);
