@@ -28,8 +28,8 @@
     const attachmentName = `${safeName(title)}-felrapport.json`;
     const boundary = `=_BC_Process_Studio_${safeName(issuePackage?.packageId)}`;
     const body = swedish
-      ? "Hej,\r\n\r\nBifogat finns en felrapport från BC Process Studio.\r\n"
-      : "Hello,\r\n\r\nA BC Process Studio error report is attached.\r\n";
+      ? "\r\n\r\nHej,\r\n\r\nBifogat finns en felrapport från BC Process Studio.\r\n\r\n"
+      : "\r\n\r\nHello,\r\n\r\nA BC Process Studio error report is attached.\r\n\r\n";
     const attachments = options.attachments || [{ fileName: attachmentName,
       mediaType: "application/json", base64: base64(String(packageContent || "")) }];
     const parts = attachments.flatMap(item => {

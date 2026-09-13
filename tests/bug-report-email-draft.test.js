@@ -11,6 +11,11 @@ assert(draft.content.includes("To: support@example.com"));
 assert(draft.content.includes("Content-Type: multipart/mixed"));
 assert(draft.content.includes("Content-Disposition: attachment"));
 assert(draft.content.includes("application/json"));
+const encodedBody = draft.content.split("Content-Type: text/plain; charset=UTF-8\r\nContent-Transfer-Encoding: base64\r\n\r\n")[1]
+  .split("\r\n--")[0].replace(/\s/g, "");
+const body = Buffer.from(encodedBody, "base64").toString("utf8");
+assert(body.startsWith("\r\n\r\nHej,"), "Separate an Outlook-prepended signature from greeting");
+assert(body.endsWith("\r\n\r\n"), "Separate an appended signature from report text");
 assert(!draft.content.includes("\nBcc:"), "header injection must be removed");
 assert.throws(() => email.build({ title: "Fel" }, "{}", {
   to: "invalid address" }), /giltig supportadress/u);
