@@ -353,19 +353,57 @@
       document.getElementById("issueResult").textContent =
         t("technical.packageExported");
     }
+    async function reviewPdfImages() {
+      const dialog = document.getElementById("pdfImagePreview");
+      const list = document.getElementById("pdfImageChoices");
+      list.replaceChildren();
+      const choices = issuePreviewState.offlineAttachments.map((attachment, index) => {
+        const figure = document.createElement("figure");
+        const label = document.createElement("label");
+        const check = document.createElement("input"); check.type = "checkbox"; check.checked = true;
+        label.className = "screenshot-include";
+        const step = issuePreviewState.issuePackage.reproduction.find(item =>
+          item.reproductionStepId === attachment.sourceRef ||
+          (item.screenshotAssetIds || []).includes(attachment.assetId));
+        const caption = attachment.role === "error-evidence"
+          ? (currentUiLocale === "sv-SE" ? "Felbild" : "Error screenshot")
+          : step ? `${currentUiLocale === "sv-SE" ? "Steg" : "Step"} ${step.number}: ${step.instruction.replace(/\*\*/gu, "")}`
+            : `${currentUiLocale === "sv-SE" ? "Bild" : "Image"} ${index + 1}`;
+        label.append(check, document.createTextNode(caption)); figure.append(label);
+        if (/^data:image\/(?:png|jpe?g);base64,/u.test(attachment.dataUrl || "")) {
+          const image = document.createElement("img"); image.src = attachment.dataUrl;
+          image.alt = caption; image.style.maxHeight = "240px"; figure.append(image);
+        }
+        list.append(figure); return { attachment, check };
+      });
+      if (!choices.length) {
+        const empty = document.createElement("p");
+        empty.textContent = currentUiLocale === "sv-SE" ? "Inga bilder finns i rapporten." : "No screenshots in this report.";
+        list.append(empty);
+      }
+      dialog.returnValue = "";
+      document.getElementById("confirmPdfImages").onclick = () => dialog.close("confirm");
+      document.getElementById("cancelPdfImages").onclick = () => dialog.close("cancel");
+      const closed = new Promise(resolve => dialog.addEventListener("close", resolve, { once: true }));
+      dialog.showModal(); await closed;
+      return dialog.returnValue === "confirm" ? choices.filter(item => item.check.checked)
+        .map(item => item.attachment) : null;
+    }
     async function emailReport() {
       if (!supportEmail) throw new Error(globalThis.T9UiI18n.translateStaticText(
         "Add a support email address in settings first.", currentUiLocale));
       await generateIssuePreview();
+      const selectedImages = await reviewPdfImages();
+      if (selectedImages === null) return;
       const offline = { manifest: { schemaVersion: 1,
         packageId: issuePreviewState.issuePackage.packageId,
         sourceRevision: issuePreviewState.issuePackage.sourceRevision,
-        files: ["bug-report.md", ...issuePreviewState.offlineAttachments.map(item =>
+        files: ["bug-report.md", ...selectedImages.map(item =>
           item.fileName)] }, issuePackage: issuePreviewState.issuePackage,
         bugReportMarkdown: issuePreviewState.markdown,
-        attachments: issuePreviewState.offlineAttachments };
+        attachments: selectedImages };
       const pdf = await globalThis.T9BugReportPdf.create(issuePreviewState.issuePackage,
-        issuePreviewState.offlineAttachments);
+        selectedImages);
       const pdfBase64 = globalThis.T9BugReportPdf.base64(pdf.bytes);
       const includeTechnicalPackage = document.getElementById("includeTechnicalZip").checked;
       if (bugReportEmailMode === "windowsShare") {
@@ -422,8 +460,10 @@
     document.getElementById("emailReport").addEventListener("click", action(emailReport));
     document.getElementById("exportPdf").addEventListener("click", action(async () => {
       await generateIssuePreview();
+      const selectedImages = await reviewPdfImages();
+      if (selectedImages === null) return;
       const pdf = await globalThis.T9BugReportPdf.create(issuePreviewState.issuePackage,
-        issuePreviewState.offlineAttachments);
+        selectedImages);
       const name = issuePreviewState.issuePackage.title.replace(/[^\p{L}\p{N}._-]+/gu, "-").slice(0, 70) || "felrapport";
       await download(pdf.bytes, `${name}.pdf`, "application/pdf");
       message.textContent = globalThis.T9UiI18n.translateStaticText("PDF-rapporten har sparats.", currentUiLocale);
