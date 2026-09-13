@@ -24,10 +24,19 @@ const technicalModel = project(technicalPkg);
 assert.match(technicalModel.sections.find(s => s.id === "diagnostics").rows.join("\n"), /BC:s interna sessions-ID: session-123/);
 assert.match(technicalModel.sections.find(s => s.id === "callStack").rows[0], /RegisterWeight/);
 assert.ok(!project({ ...technicalPkg, inclusion: { callStack: false } }).sections.some(s => s.id === "callStack"));
+assert.ok(!project({ ...technicalPkg, callStack: [{ rawCallStack: "PRIVATE_STACK" }],
+  inclusion: { callStack: false } }).sections.some(s => s.id === "callStack"),
+  "Explicit exclusion must suppress stored package stacks, not only evidence fallback");
+assert.ok(!project({ ...pkg, diagnostics: { rows: [{ label: "", value: "" },
+  { label: "Sessions-ID", value: null }] } }).sections.some(s => s.id === "diagnostics"));
 const technicalPdf = await create(technicalPkg);
 const technicalDraft = email.build(technicalPkg, "", { to: "support@example.com", attachments: [{
   fileName: "report.pdf", mediaType: "application/pdf", base64: base64(technicalPdf.bytes) }] });
 assert.match(technicalDraft.content, /application\/pdf/);
+const attachmentPart = technicalDraft.content.split("Content-Disposition: attachment;")[1];
+const encodedPdf = attachmentPart.split("\r\n\r\n")[1].split("\r\n--")[0].replace(/\s/gu, "");
+assert.deepEqual(Buffer.from(encodedPdf, "base64"), Buffer.from(technicalPdf.bytes),
+  "Email must attach the exact generated PDF bytes");
 assert.equal((await PDFDocument.load(technicalPdf.bytes)).getPageCount(), technicalPdf.pageCount);
 assert.deepEqual(model.links, [url]);
 assert.deepEqual(model.sections.map(s => s.id), ["actual", "reproduction", "environment"]);

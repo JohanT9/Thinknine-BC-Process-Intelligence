@@ -22056,7 +22056,7 @@
       sv ? "Teknisk diagnostik" : "Technical diagnostics",
       [...new Set(capturedRows.length ? capturedRows : existingRows)]
     );
-    const stacks = (pkg.callStack || []).map((stack) => stack.rawCallStack || (stack.frames || []).map((frame) => [
+    const stacks = (pkg.inclusion?.callStack === false ? [] : pkg.callStack || []).map((stack) => stack.rawCallStack || (stack.frames || []).map((frame) => [
       frame.objectType,
       frame.objectId,
       frame.objectName,

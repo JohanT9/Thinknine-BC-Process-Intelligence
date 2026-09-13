@@ -41,7 +41,7 @@ export function project(pkg) {
     .map(row => `${row.label}: ${plain(row.value)}`);
   add("diagnostics", sv ? "Teknisk diagnostik" : "Technical diagnostics",
     [...new Set(capturedRows.length ? capturedRows : existingRows)]);
-  const stacks = (pkg.callStack || []).map(stack => stack.rawCallStack ||
+  const stacks = (pkg.inclusion?.callStack === false ? [] : pkg.callStack || []).map(stack => stack.rawCallStack ||
     (stack.frames || []).map(frame => [frame.objectType, frame.objectId, frame.objectName,
       frame.methodName, frame.sourceLine].filter(Boolean).join(" ")).join("\n"));
   // Respect an explicit export exclusion; older packages can use captured evidence.
