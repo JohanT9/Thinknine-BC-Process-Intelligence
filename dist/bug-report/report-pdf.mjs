@@ -27,11 +27,27 @@ export function project(pkg) {
     bc.company && `${sv ? "Företag" : "Company"}: ${bc.company}`,
     bc.pageId && `${sv ? "BC-sida" : "BC page"}: ${bc.pageId}`
   ]);
+  const diagnosticLabels = {
+    timestamp: sv ? "Tidpunkt" : "Timestamp",
+    internalSessionId: sv ? "BC:s interna sessions-ID" : "BC internal session ID",
+    applicationInsightsSessionId: sv ? "Application Insights sessions-ID" : "Application Insights session ID",
+    clientActivityId: sv ? "Klientaktivitets-ID" : "Client activity ID",
+    serverInstanceId: sv ? "Serverinstans-ID" : "Server instance ID"
+  };
+  const capturedRows = errors.flatMap(error => Object.entries(error.structuredDiagnostics || {})
+    .filter(([key, value]) => diagnosticLabels[key] && plain(value))
+    .map(([key, value]) => `${diagnosticLabels[key]}: ${plain(value)}`));
+  const existingRows = (pkg.diagnostics?.rows || []).filter(row => plain(row.label) && plain(row.value))
+    .map(row => `${row.label}: ${plain(row.value)}`);
   add("diagnostics", sv ? "Teknisk diagnostik" : "Technical diagnostics",
-    (pkg.diagnostics?.rows || []).map(row => `${row.label}: ${row.value}`));
-  add("callStack", "AL Call Stack", (pkg.callStack || []).map(stack => stack.rawCallStack ||
+    [...new Set(capturedRows.length ? capturedRows : existingRows)]);
+  const stacks = (pkg.callStack || []).map(stack => stack.rawCallStack ||
     (stack.frames || []).map(frame => [frame.objectType, frame.objectId, frame.objectName,
-      frame.methodName, frame.sourceLine].filter(Boolean).join(" ")).join("\n")));
+      frame.methodName, frame.sourceLine].filter(Boolean).join(" ")).join("\n"));
+  // Respect an explicit export exclusion; older packages can use captured evidence.
+  if (pkg.inclusion?.callStack !== false) stacks.push(...errors.map(error => error.rawCallStack));
+  add("callStack", sv ? "AL-anropsstack (AL Call Stack)" : "AL Call Stack",
+    [...new Set(stacks.filter(value => plain(value)))]);
   const links = [...new Set(errors.map(error => error.supportUrl).filter(url => {
     try { const parsed = new URL(url); return parsed.protocol === "https:" && !parsed.username &&
       !parsed.password && (parsed.hostname === "businesscentral.dynamics.com" ||

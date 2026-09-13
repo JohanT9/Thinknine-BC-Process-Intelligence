@@ -3,6 +3,7 @@ import { PDFDocument } from "pdf-lib";
 import JSZip from "jszip";
 import { create, project, base64, technicalZip } from "../src/bug-report/report-pdf.mjs";
 import email from "../src/bug-report/email-draft.js";
+import diagnostics from "../src/bug-report/bc-diagnostic-evidence.js";
 
 const url = "https://businesscentral.dynamics.com/demo/Sandbox?company=Demo%20Company&page=5768&dc=0&bookmark=example";
 const pkg = { title: "Fel vid Registrera vikt", documentLanguage: "sv-SE", generatedAt: "2026-09-13",
@@ -10,6 +11,24 @@ const pkg = { title: "Fel vid Registrera vikt", documentLanguage: "sv-SE", gener
   errorEvidence: { primary: { rawMessage: "Ett fel inträffade.", supportUrl: url } },
   reproduction: [{ instruction: "Välj **Registrera vikt**." }], callStack: [], diagnostics: { rows: [] } };
 const model = project(pkg);
+const captured = diagnostics.normalize({ errorEvidenceId: "error-1", recordingId: "recording-1",
+  capturedAt: "2026-09-13T10:15:00Z", rawMessage: "Ett BC-fel.", rawDiagnostics:
+    'Internal session ID:\n\nsession-123\nClient activity ID:\nactivity-456\nTimestamp:\n2026-09-13T10:15:00Z\nAL call stack:\n"Demo"(CodeUnit 50000).RegisterWeight line 12' });
+assert.equal(captured.structuredDiagnostics.internalSessionId, "session-123");
+assert.equal(captured.structuredDiagnostics.clientActivityId, "activity-456");
+assert.equal(captured.structuredDiagnostics.timestamp, "2026-09-13T10:15:00Z");
+assert.deepEqual(diagnostics.parseRawDiagnostics("Internal session ID:\nClient activity ID:\nactivity-456")
+  .structuredDiagnostics, { clientActivityId: "activity-456" });
+const technicalPkg = { ...pkg, errorEvidence: { primary: captured } };
+const technicalModel = project(technicalPkg);
+assert.match(technicalModel.sections.find(s => s.id === "diagnostics").rows.join("\n"), /BC:s interna sessions-ID: session-123/);
+assert.match(technicalModel.sections.find(s => s.id === "callStack").rows[0], /RegisterWeight/);
+assert.ok(!project({ ...technicalPkg, inclusion: { callStack: false } }).sections.some(s => s.id === "callStack"));
+const technicalPdf = await create(technicalPkg);
+const technicalDraft = email.build(technicalPkg, "", { to: "support@example.com", attachments: [{
+  fileName: "report.pdf", mediaType: "application/pdf", base64: base64(technicalPdf.bytes) }] });
+assert.match(technicalDraft.content, /application\/pdf/);
+assert.equal((await PDFDocument.load(technicalPdf.bytes)).getPageCount(), technicalPdf.pageCount);
 assert.deepEqual(model.links, [url]);
 assert.deepEqual(model.sections.map(s => s.id), ["actual", "reproduction", "environment"]);
 assert.ok(!JSON.stringify(model).includes("SECRET"));

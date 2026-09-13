@@ -25,7 +25,7 @@
     serverInstanceId: "Server Instance", environment: "Environment",
     company: "Company" });
   const SWEDISH_LABELS = Object.freeze({ timestamp: "Tidpunkt",
-    internalSessionId: "Internt sessions-ID",
+    internalSessionId: "BC:s interna sessions-ID",
     applicationInsightsSessionId: "Application Insights sessions-ID",
     clientActivityId: "Klientaktivitets-ID",
     userTelemetryId: "Telemetri-ID för användare",
@@ -145,7 +145,7 @@
         kind: "diagnostics", provenance: "mixed", content: { rows: diagnosticRows,
           captureStatuses: errors.map(item => ({ errorEvidenceId: item.errorEvidenceId,
             diagnosticsStatus: item.diagnosticsStatus })) } },
-      { id: "al-call-stack", title: "AL Call Stack", kind: "call-stack",
+      { id: "al-call-stack", title: documentLanguage === "sv-SE" ? "AL-anropsstack (AL Call Stack)" : "AL Call Stack", kind: "call-stack",
         provenance: "derived", content: callStacks },
       { id: "affected-objects", title: titles.objects,
         kind: "objects", provenance: "derived",

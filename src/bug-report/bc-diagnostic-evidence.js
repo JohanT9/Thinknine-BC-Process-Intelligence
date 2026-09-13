@@ -55,7 +55,15 @@
         return;
       }
       if (field === "rawCallStack") callStackStart = index;
-      else if (match[2] !== "") structured[field] = match[2];
+      else if (match[2].trim() !== "") structured[field] = match[2].trim();
+      else {
+        const following = lines.slice(index + 1).find(value => value.trim());
+        // BC's Copy details format puts scalar values on the next line.
+        // Never consume another field header as a value.
+        const nextHeader = following?.match(/^\s*([^:=]{2,80})\s*[:=]\s*(.*)$/u);
+        if (following && !(nextHeader && (LOOKUP.has(cleanLabel(nextHeader[1])) || !nextHeader[2].trim())))
+          structured[field] = following.trim();
+      }
     });
     const rawCallStack = callStackStart >= 0
       ? lines.slice(callStackStart).join("\n").replace(/^.*?[:=]\s*/u, "") : "";
