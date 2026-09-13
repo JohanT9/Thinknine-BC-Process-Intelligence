@@ -30,15 +30,22 @@
     const body = swedish
       ? "Hej,\r\n\r\nBifogat finns en felrapport från BC Process Studio.\r\n"
       : "Hello,\r\n\r\nA BC Process Studio error report is attached.\r\n";
-    const content = ["MIME-Version: 1.0", `To: ${to}`,
+    const attachments = options.attachments || [{ fileName: attachmentName,
+      mediaType: "application/json", base64: base64(String(packageContent || "")) }];
+    const parts = attachments.flatMap(item => {
+      if (!["application/pdf", "application/zip", "application/json"].includes(item.mediaType) ||
+          !/^[A-Za-z0-9+/]*={0,2}$/u.test(item.base64)) throw new Error("Invalid email attachment.");
+      const name = safeName(item.fileName);
+      return [`--${boundary}`, `Content-Type: ${item.mediaType}; name="${name}"`,
+        "Content-Transfer-Encoding: base64", `Content-Disposition: attachment; filename="${name}"`,
+        "", lines(item.base64)];
+    });
+    const content = ["MIME-Version: 1.0", "X-Unsent: 1", `To: ${to}`,
       `Subject: =?UTF-8?B?${base64(title)}?=`,
       `Content-Type: multipart/mixed; boundary="${boundary}"`, "",
       `--${boundary}`, "Content-Type: text/plain; charset=UTF-8",
       "Content-Transfer-Encoding: base64", "", lines(base64(body)),
-      `--${boundary}`, `Content-Type: application/json; name="${attachmentName}"`,
-      "Content-Transfer-Encoding: base64",
-      `Content-Disposition: attachment; filename="${attachmentName}"`, "",
-      lines(base64(String(packageContent || ""))), `--${boundary}--`, ""].join("\r\n");
+      ...parts, `--${boundary}--`, ""].join("\r\n");
     return { to, subject: title, attachmentName,
       fileName: `${safeName(title)}.eml`, content };
   }

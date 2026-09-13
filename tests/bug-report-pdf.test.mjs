@@ -1,0 +1,36 @@
+import assert from "node:assert/strict";
+import { PDFDocument } from "pdf-lib";
+import JSZip from "jszip";
+import { create, project, base64, technicalZip } from "../src/bug-report/report-pdf.mjs";
+import email from "../src/bug-report/email-draft.js";
+
+const url = "https://businesscentral.dynamics.com/demo/Sandbox?company=Demo%20Company&page=5768&dc=0&bookmark=example";
+const pkg = { title: "Fel vid Registrera vikt", documentLanguage: "sv-SE", generatedAt: "2026-09-13",
+  environment: { businessCentral: { company: "Demoföretag", environment: "Sandbox", pageId: 5768 }, extensionVersion: "SECRET" },
+  errorEvidence: { primary: { rawMessage: "Ett fel inträffade.", supportUrl: url } },
+  reproduction: [{ instruction: "Välj **Registrera vikt**." }], callStack: [], diagnostics: { rows: [] } };
+const model = project(pkg);
+assert.deepEqual(model.links, [url]);
+assert.deepEqual(model.sections.map(s => s.id), ["actual", "reproduction", "environment"]);
+assert.ok(!JSON.stringify(model).includes("SECRET"));
+assert.ok(!JSON.stringify(model).includes("**"));
+assert.ok(!project({ ...pkg, reproduction: [{}] }).sections.some(s => s.id === "reproduction"));
+assert.deepEqual(project({ ...pkg, errorEvidence: { primary: { supportUrl: "javascript:alert(1)" } } }).links, []);
+const result = await create(pkg);
+const pdf = await PDFDocument.load(result.bytes);
+assert.equal(pdf.getPageCount(), 1);
+const annotation = pdf.context.lookup(pdf.getPage(0).node.Annots().get(0));
+assert.ok(annotation.toString().includes(url), "Exact original URL including %20 and query order");
+const long = await create({ ...pkg, actualResult: { userDescription: "Ett långt felmeddelande. ".repeat(2000) } });
+assert.ok(long.pageCount > 2);
+const png = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+a0WQAAAAASUVORK5CYII=";
+const withImage = await create(pkg, [{ role: "error-evidence", dataUrl: png }]);
+assert.equal(withImage.pageCount, 2);
+const zipBytes = await technicalZip({ bugReportMarkdown: "Report", attachments: [{ dataUrl: png }] });
+const zip = await JSZip.loadAsync(zipBytes);
+assert.ok(zip.file("bilder/bild-1.png"));
+const draft = email.build(pkg, "", { to: "support@example.com", attachments: [{ fileName: "report.pdf", mediaType: "application/pdf", base64: base64(result.bytes) }] });
+assert.match(draft.content, /application\/pdf/);
+assert.ok(!draft.content.includes("application/json"));
+assert.match(draft.content, /X-Unsent: 1/);
+console.log("Bug report PDF content, pagination, exact links, screenshots, ZIP and email tests passed.");

@@ -177,6 +177,11 @@ for (const file of [
 }
 
 bundleWordExporter();
+require("esbuild").buildSync({
+  entryPoints: [path.join(src, "bug-report", "report-pdf.mjs")],
+  outfile: path.join(dist, "bug-report", "report-pdf.bundle.js"),
+  bundle: true, format: "iife", platform: "browser", target: ["chrome120", "edge120"]
+});
 
 syncManifest();
 

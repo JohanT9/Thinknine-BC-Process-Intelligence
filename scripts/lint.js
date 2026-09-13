@@ -11,6 +11,9 @@ function walk(directory) {
   const files = [];
   for (const entry of fs.readdirSync(directory, { withFileTypes: true })) {
     const full = path.join(directory, entry.name);
+    // PDF visual-QA tool produces SDK artifacts, not authored source.
+    if (directory === path.join(root, "tests", "tools", "pdf-renderer") &&
+        entry.isDirectory() && ["bin", "obj"].includes(entry.name)) continue;
     if (entry.isDirectory()) files.push(...walk(full));
     else files.push(full);
   }

@@ -2182,7 +2182,10 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
           throw new Error("Windows-delning får bara startas från felrapportvyn.");
         }
         const payload = message.payload;
-        if (!payload || payload.action !== "shareBugReport" || payload.schemaVersion !== 1 ||
+        const legacy = payload?.action === "shareBugReport" && payload?.schemaVersion === 1;
+        const pdf = payload?.action === "shareBugReportPdf" && payload?.schemaVersion === 2 &&
+          typeof payload?.pdfBase64 === "string" && typeof payload?.includeTechnicalPackage === "boolean";
+        if (!payload || (!legacy && !pdf) ||
             typeof payload.reportJson !== "string" || typeof payload.markdown !== "string" ||
             new TextEncoder().encode(JSON.stringify(payload)).length > 24 * 1024 * 1024) {
           throw new Error("Felrapporten är ogiltig eller för stor för Windows-delning (max 24 MB).");

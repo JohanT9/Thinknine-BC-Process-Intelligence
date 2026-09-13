@@ -16,13 +16,13 @@ internal interface IDataTransferManagerInterop
 internal sealed class ShareForm : Form
 {
     private readonly ShareRequest request;
-    private readonly string path;
+    private readonly string[] paths;
     private readonly Label status = new() { AutoSize = true, MaximumSize = new Size(600, 0) };
     private DataTransferManager? manager;
     private IDataTransferManagerInterop? interop;
-    internal ShareForm(ShareRequest request, string path, bool test)
+    internal ShareForm(ShareRequest request, string[] paths, bool test)
     {
-        this.request = request; this.path = path;
+        this.request = request; this.paths = paths;
         Text = "BC Process Studio – dela felrapport";
         Width = 680; Height = 360; StartPosition = FormStartPosition.CenterScreen;
         var panel = new FlowLayoutPanel { Dock = DockStyle.Fill, Padding = new Padding(20),
@@ -35,7 +35,9 @@ internal sealed class ShareForm : Form
         share.Click += (_, _) => ShowShare(); panel.Controls.Add(share);
         panel.Controls.Add(status);
         panel.Controls.Add(new Label { AutoSize = true, MaximumSize = new Size(600, 0),
-            Text = "Mottagare och ämne kan behöva klistras in i Outlook. ZIP-filen innehåller rapport och bilddata.\nLokala rapportkopior finns i: " + Path.GetDirectoryName(path) });
+            Text = "Mottagare och ämne kan behöva klistras in i Outlook. Bifogas: " +
+                string.Join(", ", paths.Select(Path.GetFileName)) +
+                "\nLokala rapportkopior finns i: " + Path.GetDirectoryName(paths[0]) });
         Shown += (_, _) =>
         {
             try
@@ -77,10 +79,11 @@ internal sealed class ShareForm : Form
         var deferral = args.Request.GetDeferral();
         try
         {
-            var file = await StorageFile.GetFileFromPathAsync(path);
+            var files = new List<IStorageItem>();
+            foreach (string path in paths) files.Add(await StorageFile.GetFileFromPathAsync(path));
             args.Request.Data.Properties.Title = request.title;
             args.Request.Data.Properties.Description = "Felrapport från BC Process Studio";
-            args.Request.Data.SetStorageItems(new IStorageItem[] { file });
+            args.Request.Data.SetStorageItems(files);
         }
         catch { args.Request.FailWithDisplayText("Rapportfilen kunde inte läsas."); }
         finally { deferral.Complete(); }

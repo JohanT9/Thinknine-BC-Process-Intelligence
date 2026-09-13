@@ -83,3 +83,20 @@ Close the helper. Remove only the two native-host registry entries named
 paths listed in Register-Helper.ps1, after checking that their default values
 point to this installation. The helper directory and retained reports can then
 be removed manually. No registry removal is performed automatically.
+# PDF-first error reports
+
+The report header offers **E-posta PDF**, **Exportera PDF**, and **Stäng**.
+The PDF contains the actual captured error, recorded reproduction steps,
+available screenshots (error evidence first), BC environment and the exact
+captured deep link. Captured diagnostics and AL call stack are included when
+available. Empty sections and internal Recorder trace identifiers are omitted.
+No reference-process suggestions are inserted.
+
+**Bifoga även tekniskt ZIP-paket** is unchecked by default under More options.
+Schema 2 of the native protocol shares the PDF, plus a technical ZIP only when
+selected. Existing schema 1 clients remain supported. The helper must be
+updated and registered before Windows sharing can be used; no installation or
+policy bypass is performed automatically. The `.eml` fallback now attaches the
+PDF instead of raw JSON, but opening/editing EML varies by email client.
+Windows sharing does not guarantee automatic recipient/subject population;
+the helper supplies copy controls. Neither mode sends email automatically.

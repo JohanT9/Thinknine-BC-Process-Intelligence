@@ -17,7 +17,7 @@
     dialog pre{max-height:320px;overflow:auto;background:#f5f7fa;padding:12px}
     input[type=checkbox]{width:auto}select{padding:8px}
     .primary-actions,.share-actions{display:flex;gap:8px;align-items:center}.primary-actions button,.share-actions button{margin:0}
-    .primary-actions #openIssuePreview,#shareReport{background:#008c95;color:white;border:1px solid #007078;border-radius:4px}
+    .primary-actions #emailReport,#shareReport{background:#008c95;color:white;border:1px solid #007078;border-radius:4px}
     .report-options{margin-top:10px;max-width:760px}.report-options>summary{cursor:pointer;font-weight:600}
     .report-options>details{margin:12px 0;padding:12px;border:1px solid #ccd5df;border-radius:6px}
     .secondary-actions{display:flex;flex-wrap:wrap;gap:4px;margin:10px 0}
@@ -50,18 +50,20 @@
 <body>
   <header>
     <div class="primary-actions">
-      <button id="openIssuePreview" type="button">Share report</button>
-      <button id="emailReport" type="button">Email error report</button>
+      <button id="emailReport" type="button">E-posta PDF</button>
+      <button id="exportPdf" type="button">Exportera PDF</button>
       <button id="closeReport" type="button">Close</button>
     </div>
     <details class="report-options"><summary>More options</summary>
       <div class="secondary-actions">
+        <button id="openIssuePreview" type="button">Share report</button>
         <button id="undoReport" type="button">Undo</button>
         <button id="redoReport" type="button">Redo</button>
         <button id="copyMarkdown" type="button">Copy full report</button>
         <button id="downloadMarkdown" type="button">Export Markdown</button>
       </div>
       <label><input id="includeAiExport" type="checkbox"> Include AI analysis in copy/export</label>
+      <label><input id="includeTechnicalZip" type="checkbox"> Bifoga även tekniskt ZIP-paket</label>
     <details><summary>Application Insights (optional)</summary>
       <label>Tenant ID <input id="telemetryTenantId" autocomplete="off"></label>
       <label>Public client ID <input id="telemetryClientId" autocomplete="off"></label>
@@ -158,6 +160,7 @@
   <script src="bug-report/bug-report-text-export.js"></script>
   <script src="bug-report/technical-report-workspace.js"></script>
   <script src="bug-report/email-draft.js"></script>
+  <script src="bug-report/report-pdf.bundle.js"></script>
   <script src="technical-report-workspace-view.js"></script>
 <script src="tooltips.js"></script>
 <script src="technical-report.js"></script>

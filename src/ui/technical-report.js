@@ -356,7 +356,7 @@
     async function emailReport() {
       if (!supportEmail) throw new Error(globalThis.T9UiI18n.translateStaticText(
         "Add a support email address in settings first.", currentUiLocale));
-      if (!issuePreviewState) await generateIssuePreview();
+      await generateIssuePreview();
       const offline = { manifest: { schemaVersion: 1,
         packageId: issuePreviewState.issuePackage.packageId,
         sourceRevision: issuePreviewState.issuePackage.sourceRevision,
@@ -364,19 +364,27 @@
           item.fileName)] }, issuePackage: issuePreviewState.issuePackage,
         bugReportMarkdown: issuePreviewState.markdown,
         attachments: issuePreviewState.offlineAttachments };
+      const pdf = await globalThis.T9BugReportPdf.create(issuePreviewState.issuePackage,
+        issuePreviewState.offlineAttachments);
+      const pdfBase64 = globalThis.T9BugReportPdf.base64(pdf.bytes);
+      const includeTechnicalPackage = document.getElementById("includeTechnicalZip").checked;
       if (bugReportEmailMode === "windowsShare") {
         await send({ type: "T9_SHARE_BUG_REPORT_WINDOWS", payload: {
-          schemaVersion: 1, action: "shareBugReport",
+          schemaVersion: 2, action: "shareBugReportPdf",
           title: issuePreviewState.issuePackage.title,
-          supportEmail, reportJson: JSON.stringify(offline),
-          markdown: issuePreviewState.markdown } });
+          supportEmail, pdfBase64, includeTechnicalPackage,
+          reportJson: includeTechnicalPackage ? JSON.stringify(offline) : "",
+          markdown: includeTechnicalPackage ? issuePreviewState.markdown : "" } });
         message.textContent = globalThis.T9UiI18n.translateStaticText(
           "Windows-hjälparen är öppnad. Välj Dela bifogad rapport och sedan Outlook.", currentUiLocale);
         return;
       }
+      const attachments = [{ fileName: "felrapport.pdf", mediaType: "application/pdf", base64: pdfBase64 }];
+      if (includeTechnicalPackage) attachments.push({ fileName: "tekniskt-paket.zip", mediaType: "application/zip",
+        base64: globalThis.T9BugReportPdf.base64(await globalThis.T9BugReportPdf.technicalZip(offline)) });
       const draft = globalThis.T9BugReportEmailDraft.build(
         issuePreviewState.issuePackage, JSON.stringify(offline, null, 2), {
-          to: supportEmail, locale: currentUiLocale });
+          to: supportEmail, locale: currentUiLocale, attachments });
       const result = await download(draft.content, draft.fileName,
         "message/rfc822;charset=utf-8", true);
       message.textContent = globalThis.T9UiI18n.translateStaticText(
@@ -412,6 +420,14 @@
       else await downloadOfflinePackage();
     }));
     document.getElementById("emailReport").addEventListener("click", action(emailReport));
+    document.getElementById("exportPdf").addEventListener("click", action(async () => {
+      await generateIssuePreview();
+      const pdf = await globalThis.T9BugReportPdf.create(issuePreviewState.issuePackage,
+        issuePreviewState.offlineAttachments);
+      const name = issuePreviewState.issuePackage.title.replace(/[^\p{L}\p{N}._-]+/gu, "-").slice(0, 70) || "felrapport";
+      await download(pdf.bytes, `${name}.pdf`, "application/pdf");
+      message.textContent = globalThis.T9UiI18n.translateStaticText("PDF-rapporten har sparats.", currentUiLocale);
+    }));
   }
   async function initialize() {
     try {

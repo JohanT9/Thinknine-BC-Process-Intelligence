@@ -1,5 +1,15 @@
 # Changelog
 
+## 2026-09-13 - PDF-first bug report delivery
+
+- Added Email PDF and Export PDF actions with a paginated support report:
+  actual error, recorded steps, available screenshots, BC context and exact deep link.
+- Omitted empty sections, reference suggestions and internal Recorder identifiers.
+- Technical ZIP is an unchecked option; EML and Windows sharing carry the PDF.
+- Native helper supports PDF protocol v2 and retains legacy ZIP v1 compatibility.
+- Added PDF content/pagination/link/image/email tests and Windows PDF visual-QA tool.
+- Helper installation and real Outlook handoff remain a manual deployment gate.
+
 ## 2026-09-12 - Windows report sharing helper pilot
 
 - Added a self-contained Windows native-messaging helper which shares a ZIP

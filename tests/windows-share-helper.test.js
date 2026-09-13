@@ -18,7 +18,7 @@ if (process.env.T9_DOTNET) {
   const result = spawnSync(process.env.T9_DOTNET, [dll, "--self-test"], { timeout: 20000 });
   assert.strictEqual(result.status, 0, result.stderr?.toString());
   assert.strictEqual(result.stdout.readUInt32LE(0), result.stdout.length - 4);
-  assert.deepStrictEqual(JSON.parse(result.stdout.subarray(4).toString()), { ok: true, tests: 7 });
+  assert.deepStrictEqual(JSON.parse(result.stdout.subarray(4).toString()), { ok: true, tests: 12 });
 }
 async function testBridge() {
   const background = read("src/recorder/background.js");
@@ -47,6 +47,10 @@ async function testBridge() {
   assert.strictEqual(ports.size, 1, "Keep helper alive while the sharing UI is used");
   assert.strictEqual(disconnected, false);
   port.disconnect(); assert.strictEqual(ports.size, 0);
+  await invoke({ ...message, payload: { schemaVersion: 2, action: "shareBugReportPdf",
+    pdfBase64: "JVBERi0=", includeTechnicalPackage: false, reportJson: "", markdown: "" } });
+  assert.deepStrictEqual(result, { ok: true, status: "helperReady" });
+  port.disconnect();
   await assert.rejects(invoke(message, { id: "studio", url: "https://businesscentral.dynamics.com/" }));
   await assert.rejects(invoke({ ...message, payload: { ...message.payload, schemaVersion: 2 } }));
   await assert.rejects(invoke({ ...message, payload: { ...message.payload,

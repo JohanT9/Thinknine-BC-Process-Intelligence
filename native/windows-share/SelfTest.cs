@@ -22,7 +22,14 @@ internal static class SelfTest
         using var invalid = new MemoryStream(new byte[] { 255, 255, 255, 127 });
         try { Protocol.Read(invalid); throw new Exception("Size limit failed."); }
         catch (InvalidDataException) { }
-        Protocol.Reply(new { ok = true, tests = 7 });
+        var pdf = request with { schemaVersion = 2, action = "shareBugReportPdf",
+            reportJson = "", markdown = "", pdfBase64 = Convert.ToBase64String("%PDF-1.7\n"u8.ToArray()) };
+        Protocol.Validate(pdf);
+        Reject(pdf with { pdfBase64 = "not base64" });
+        Reject(pdf with { pdfBase64 = Convert.ToBase64String("not PDF"u8.ToArray()) });
+        Reject(pdf with { includeTechnicalPackage = true, reportJson = "not JSON" });
+        Protocol.Validate(pdf with { includeTechnicalPackage = true, reportJson = "{}" });
+        Protocol.Reply(new { ok = true, tests = 12 });
     }
     private static void Reject(ShareRequest request)
     {
