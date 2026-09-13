@@ -22134,12 +22134,12 @@
     const ensure = (space) => {
       if (!page || y - space < 56) newPage();
     };
-    function wrapped(text2, size, font) {
+    function wrapped(text2, size, font, maxWidth = usable) {
       const result = [];
       for (const paragraph of safe(text2).replace(/\r/gu, "").split("\n")) {
         let line = "";
         for (const char of paragraph) {
-          if (font.widthOfTextAtSize(line + char, size) > usable) {
+          if (font.widthOfTextAtSize(line + char, size) > maxWidth) {
             const space = line.lastIndexOf(" ");
             if (space > 0) {
               result.push(line.slice(0, space));
@@ -22170,6 +22170,67 @@
       page.drawRectangle({ x: margin - 8, y: y - 9, width: 3, height: 29, color: teal });
       text(title, 13, bold, teal);
       y -= 4;
+    }
+    const measure = (value, size = 11, font = regular, maxWidth = usable) => wrapped(value, size, font, maxWidth).length * (size + 5) + 7;
+    function informationCard() {
+      const fields = [
+        [model.sv ? "F\xD6RETAG" : "COMPANY", model.company],
+        [model.sv ? "MILJ\xD6" : "ENVIRONMENT", model.environment],
+        [model.sv ? "TIDPUNKT" : "TIMESTAMP", model.date && String(model.date).replace("T", " ").replace(/Z$/u, " UTC")]
+      ].filter(([, value]) => value);
+      if (!fields.length) return;
+      const column = usable / fields.length;
+      const lines = fields.map(([, value]) => wrapped(value, 9, regular, column - 24));
+      const cardHeight = Math.max(...lines.map((value) => value.length)) * 14 + 34;
+      ensure(cardHeight + 12);
+      page.drawRectangle({
+        x: margin,
+        y: y - cardHeight + 10,
+        width: usable,
+        height: cardHeight,
+        color: surface,
+        borderColor: lineColor,
+        borderWidth: 0.6
+      });
+      fields.forEach(([label], index) => {
+        const x = margin + index * column + 12;
+        page.drawText(label, { x, y: y - 5, size: 8, font: bold, color: teal });
+        lines[index].forEach((line, lineIndex) => page.drawText(
+          line,
+          { x, y: y - 23 - lineIndex * 14, size: 9, font: regular, color: ink }
+        ));
+      });
+      y -= cardHeight + 8;
+    }
+    function processStep(step) {
+      const failed = step.number === model.trigger?.number;
+      const color = failed ? rgb(0.68, 0.13, 0.11) : teal;
+      const content = step.instruction + (failed ? model.sv ? " - Felet intr\xE4ffade h\xE4r" : " - Error occurred here" : "");
+      const lines = wrapped(content, 11, regular, usable - 34);
+      const blockHeight = lines.length * 16 + 12;
+      ensure(Math.min(blockHeight, height - 132));
+      page.drawCircle({ x: margin + 10, y: y + 3, size: 10, color });
+      const number = String(step.number);
+      const numberSize = number.length > 2 ? 7 : 9;
+      page.drawText(number, {
+        x: margin + 10 - bold.widthOfTextAtSize(number, numberSize) / 2,
+        y,
+        size: numberSize,
+        font: bold,
+        color: rgb(1, 1, 1)
+      });
+      for (const line of lines) {
+        ensure(17);
+        page.drawText(line, { x: margin + 32, y, size: 11, font: regular, color: failed ? color : ink });
+        y -= 16;
+      }
+      y -= 12;
+    }
+    function imageCaption(attachment, lead = false) {
+      const equivalents = attachments.filter((image) => image.dataUrl === attachment.dataUrl);
+      const refs = model.steps.filter((step) => equivalents.some((image) => step.id && step.id === image.sourceRef || image.assetId && step.assets.includes(image.assetId)));
+      if (lead && model.trigger && !refs.some((step) => step.number === model.trigger.number)) refs.push(model.trigger);
+      return refs.length ? refs.map((step) => `${model.sv ? "Steg" : "Step"} ${step.number}: ${step.instruction}`).join("\n") : lead ? model.sv ? "Slutlig felbild fr\xE5n inspelningen." : "Final captured error screenshot." : model.sv ? "Sk\xE4rmbild fr\xE5n inspelningen." : "Recorded screenshot.";
     }
     function directLinks() {
       for (const url of model.links) {
@@ -22216,16 +22277,27 @@
     const leadImage = attachments.findLast((image) => image.role === "error-evidence" && image.dataUrl);
     newPage();
     text(model.title, 20, bold);
-    text([model.company, model.environment, model.date].filter(Boolean).join(" \xB7 "), 10, regular, muted);
+    informationCard();
     directLinks();
     if (leadImage) {
       heading(model.sv ? "Felbild" : "Error screenshot");
-      await screenshot(leadImage, Math.min(300, y - 110));
+      const caption = imageCaption(leadImage, true);
+      await screenshot(leadImage, Math.max(20, Math.min(300, y - 80 - measure(caption, 9))));
+      text(caption, 9, regular, muted);
     }
     if (model.trigger) text(`${model.sv ? "Felet intr\xE4ffade vid steg" : "Error occurred at step"} ${model.trigger.number}: ${model.trigger.instruction}`, 11, bold);
-    for (const section of model.sections) {
+    const displayedSections = model.sections.map((section) => section.id === "environment" ? { ...section, rows: section.rows.filter((row) => /^(?:BC-sida|BC page):/u.test(row)) } : section).filter((section) => section.rows.length);
+    const sectionHeight = (section) => 34 + (section.id === "reproduction" ? model.steps.reduce((total, step) => total + measure(step.instruction + (step.number === model.trigger?.number ? " - Felet intr\xE4ffade h\xE4r" : ""), 11, regular, usable - 34) + 5, 0) : section.rows.reduce((total, row) => total + measure(row), 0));
+    for (const section of displayedSections) {
+      if (section.id === "diagnostics") {
+        const technicalHeight = displayedSections.filter((item) => ["diagnostics", "callStack"].includes(item.id)).reduce((total, item) => total + sectionHeight(item), 0);
+        if (technicalHeight <= height - 132) ensure(technicalHeight);
+      }
+      const blockHeight = sectionHeight(section);
+      if (blockHeight <= height - 132) ensure(blockHeight);
       heading(section.title);
-      for (const row of section.rows) text(row, 11, regular, section.id === "actual" ? rgb(0.65, 0.12, 0.1) : ink);
+      if (section.id === "reproduction") model.steps.forEach(processStep);
+      else for (const row of section.rows) text(row, 11, regular, section.id === "actual" ? rgb(0.65, 0.12, 0.1) : ink);
     }
     const seen = new Set(leadImage ? [leadImage.dataUrl] : []);
     const images = attachments.filter((image) => {
@@ -22237,10 +22309,9 @@
       if (!attachment.dataUrl) continue;
       newPage();
       heading(index === 0 && attachment.role === "error-evidence" ? model.sv ? "Felbild" : "Error screenshot" : `${model.sv ? "Sk\xE4rmbild" : "Screenshot"} ${index + 1}`);
-      const equivalentImages = attachments.filter((image) => image.dataUrl === attachment.dataUrl);
-      const refs = model.steps.filter((step) => equivalentImages.some((image) => step.id && step.id === image.sourceRef || image.assetId && step.assets.includes(image.assetId)));
-      for (const step of refs) text(`${model.sv ? "Steg" : "Step"} ${step.number}: ${step.instruction}`, 11, bold);
-      await screenshot(attachment, y - 65);
+      const caption = imageCaption(attachment);
+      await screenshot(attachment, Math.max(20, y - 65 - measure(caption, 9)));
+      text(caption, 9, regular, muted);
     }
     for (const [index, p] of doc.getPages().entries()) {
       p.drawLine({ start: { x: margin, y: 43 }, end: { x: width - margin, y: 43 }, color: lineColor, thickness: 0.6 });
