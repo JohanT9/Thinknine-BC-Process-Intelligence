@@ -22109,6 +22109,7 @@
     const bold = await doc.embedFont(StandardFonts.HelveticaBold);
     const width = 595.28, height = 841.89, margin = 44, usable = width - 2 * margin;
     const ink = rgb(0.09, 0.17, 0.27), teal = rgb(0, 0.48, 0.51), muted = rgb(0.35, 0.4, 0.45);
+    const surface = rgb(0.94, 0.97, 0.97), lineColor = rgb(0.8, 0.87, 0.88);
     let page, y;
     const safe = (text2) => Array.from(String(text2)).map((char) => {
       if (char === "	") return "  ";
@@ -22123,8 +22124,12 @@
     function newPage() {
       page = doc.addPage([width, height]);
       y = height - 76;
-      page.drawText("BC PROCESS STUDIO", { x: margin, y: height - 35, size: 9, font: bold, color: teal });
-      page.drawLine({ start: { x: margin, y: height - 46 }, end: { x: width - margin, y: height - 46 }, color: teal, thickness: 1 });
+      page.drawRectangle({ x: 0, y: height - 49, width, height: 49, color: rgb(0.02, 0.28, 0.31) });
+      page.drawText("BC Process Studio", { x: margin, y: height - 30, size: 12, font: bold, color: rgb(1, 1, 1) });
+      page.drawText(
+        model.sv ? "Business Central | Felrapport" : "Business Central | Error report",
+        { x: width - margin - 175, y: height - 29, size: 9, font: regular, color: rgb(0.79, 0.94, 0.94) }
+      );
     }
     const ensure = (space) => {
       if (!page || y - space < 56) newPage();
@@ -22159,8 +22164,12 @@
       y -= 7;
     }
     function heading(title) {
-      ensure(48);
-      text(title, 15, bold, teal);
+      ensure(58);
+      y -= 5;
+      page.drawRectangle({ x: margin - 8, y: y - 9, width: usable + 16, height: 29, color: surface });
+      page.drawRectangle({ x: margin - 8, y: y - 9, width: 3, height: 29, color: teal });
+      text(title, 13, bold, teal);
+      y -= 4;
     }
     function directLinks() {
       for (const url of model.links) {
@@ -22185,6 +22194,14 @@
         if (!png && !jpg) throw new Error("Unsupported image");
         const image = png ? await doc.embedPng(attachment.dataUrl) : await doc.embedJpg(attachment.dataUrl);
         const factor = Math.min(usable / image.width, maxHeight / image.height);
+        page.drawRectangle({
+          x: margin - 1,
+          y: y - image.height * factor - 1,
+          width: image.width * factor + 2,
+          height: image.height * factor + 2,
+          borderColor: lineColor,
+          borderWidth: 0.6
+        });
         page.drawImage(image, {
           x: margin,
           y: y - image.height * factor,
@@ -22198,7 +22215,7 @@
     }
     const leadImage = attachments.findLast((image) => image.role === "error-evidence" && image.dataUrl);
     newPage();
-    text(model.title, 22, bold);
+    text(model.title, 20, bold);
     text([model.company, model.environment, model.date].filter(Boolean).join(" \xB7 "), 10, regular, muted);
     directLinks();
     if (leadImage) {
@@ -22225,10 +22242,14 @@
       for (const step of refs) text(`${model.sv ? "Steg" : "Step"} ${step.number}: ${step.instruction}`, 11, bold);
       await screenshot(attachment, y - 65);
     }
-    for (const [index, p] of doc.getPages().entries()) p.drawText(
-      `${model.sv ? "Sida" : "Page"} ${index + 1} / ${doc.getPageCount()}`,
-      { x: margin, y: 28, size: 9, font: regular, color: muted }
-    );
+    for (const [index, p] of doc.getPages().entries()) {
+      p.drawLine({ start: { x: margin, y: 43 }, end: { x: width - margin, y: 43 }, color: lineColor, thickness: 0.6 });
+      p.drawText("BC Process Studio", { x: margin, y: 28, size: 8, font: regular, color: muted });
+      p.drawText(
+        `${model.sv ? "Sida" : "Page"} ${index + 1} / ${doc.getPageCount()}`,
+        { x: width - margin - 65, y: 28, size: 8, font: regular, color: muted }
+      );
+    }
     return { bytes: await doc.save(), model, pageCount: doc.getPageCount() };
   }
   async function technicalZip(offline) {
