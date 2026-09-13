@@ -30,7 +30,15 @@ const imagePdf = await PDFDocument.load(withImage.bytes);
 assert.ok(imagePdf.getPage(0).node.Resources().toString().includes("/Image"), "Error image on first page");
 const multipleImages = await create(pkg, [{ role: "reproduction-evidence", dataUrl: png },
   { role: "error-evidence", dataUrl: png }]);
-assert.equal(multipleImages.pageCount, 2, "Lead image is not repeated in appendix");
+assert.equal(multipleImages.pageCount, 1, "Identical screenshots are not repeated");
+assert.equal(model.trigger, null, "Do not infer failure from last step alone");
+const classified = project({ ...pkg, errorEvidence: { primary: { capturedAt: "2026-09-13T10:00:00Z", precedingActionEventId: "event-1" } },
+  reproduction: [{ instruction: "Välj Registrera vikt.", source: { sourceCanonicalEventIds: ["event-1"] } }] });
+assert.equal(classified.trigger.number, 1);
+assert.equal(classified.date, "2026-09-13T10:00:00Z");
+assert.match(classified.sections.find(s => s.id === "reproduction").rows[0], /Felet inträffade här/);
+assert.equal(project({ ...pkg, reproduction: [{ reproductionStepId: "s1", instruction: "Öppna order.",
+  screenshotAssetIds: ["a1"] }] }).steps[0].assets[0], "a1");
 const zipBytes = await technicalZip({ bugReportMarkdown: "Report", attachments: [{ dataUrl: png }] });
 const zip = await JSZip.loadAsync(zipBytes);
 assert.ok(zip.file("bilder/bild-1.png"));
