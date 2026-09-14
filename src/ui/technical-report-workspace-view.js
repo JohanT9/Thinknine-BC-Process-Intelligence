@@ -80,15 +80,12 @@
     const severityValues = ["", "Low", "Medium", "High", "Critical"];
     const savedSeverity = workspaceState.report.summary.severity || "";
     severityValues.forEach(value => {
-      const option = element(doc, "option", value || "Blank"); option.value = value;
+      const option = element(doc, "option", value); option.value = value;
       severity.appendChild(option);
     });
-    // Preserve legacy free-text classifications without silently translating numeric values.
-    if (savedSeverity && !severityValues.includes(savedSeverity)) {
-      const legacy = element(doc, "option", savedSeverity); legacy.value = savedSeverity;
-      severity.appendChild(legacy);
-    }
-    severity.value = savedSeverity;
+    // Unknown legacy values are not selectable; known values retain their classification.
+    severity.value = severityValues.find(value =>
+      value.toLowerCase() === String(savedSeverity).toLowerCase()) || "";
     severity.addEventListener("change", () => onEdit("severity", severity.value));
     const severityHeader = element(doc, "div", "", "report-severity-header");
     severityHeader.append(severityLabel, severity); container.appendChild(severityHeader);

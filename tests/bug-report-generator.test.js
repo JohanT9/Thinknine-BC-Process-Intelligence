@@ -161,9 +161,19 @@ assert.strictEqual(moreFields, undefined);
 const severitySelect = allElements(container).find(item =>
   item.id === "technical-report-severity");
 assert.strictEqual(severitySelect.tagName, "select");
-assert.deepStrictEqual(severitySelect.children.slice(0, 5).map(item => item.textContent),
-  ["Blank", "Low", "Medium", "High", "Critical"]);
-assert.strictEqual(severitySelect.value, controller.state().report.summary.severity);
+assert.deepStrictEqual(severitySelect.children.map(item => item.textContent),
+  ["", "Low", "Medium", "High", "Critical"]);
+assert.strictEqual(severitySelect.value, "High");
+for (const savedValue of ["", "1", "Blank"]) {
+  const state = controller.state();
+  state.report.summary.severity = savedValue;
+  view.render(container, state, {}, fakeDocument);
+  const select = allElements(container).find(item => item.id === "technical-report-severity");
+  assert.strictEqual(select.value, "");
+  assert.strictEqual(select.children.length, 5);
+  assert.strictEqual(select.children[0].textContent, "");
+  assert.strictEqual(select.children[0].value, "");
+}
 const severityEdits = [];
 view.render(container, controller.state(), {
   onEdit: (name, value) => severityEdits.push([name, value])
