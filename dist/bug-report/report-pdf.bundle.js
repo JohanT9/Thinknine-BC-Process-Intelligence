@@ -22093,6 +22093,7 @@
       date: pkg.errorEvidence?.primary?.capturedAt || pkg.sourceUpdatedAt || pkg.generatedAt,
       company: bc.company || "",
       environment: bc.environment || "",
+      severity: plain(pkg.summary?.severity),
       sections,
       links,
       sv,
@@ -22290,6 +22291,7 @@
     text(model.title, 20, bold);
     y -= 10;
     informationCard();
+    if (model.severity) text(`${model.sv ? "Allvarlighetsgrad" : "Severity"}: ${model.severity}`, 11, bold, teal);
     y -= 6;
     directLinks();
     y -= 10;

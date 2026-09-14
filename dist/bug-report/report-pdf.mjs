@@ -65,7 +65,7 @@ export function project(pkg) {
       parsed.hostname.endsWith(".businesscentral.dynamics.com")); } catch { return false; }
   }))];
   return { title: plain(pkg.title), date: pkg.errorEvidence?.primary?.capturedAt || pkg.sourceUpdatedAt || pkg.generatedAt,
-    company: bc.company || "", environment: bc.environment || "", sections, links, sv, trigger,
+    company: bc.company || "", environment: bc.environment || "", severity: plain(pkg.summary?.severity), sections, links, sv, trigger,
     steps: steps.map((step, index) => ({ number: index + 1, instruction: plain(step.instruction),
       id: step.reproductionStepId, assets: step.screenshotAssetIds || step.source?.screenshotAssetIds || [] })) };
 }
@@ -209,6 +209,7 @@ export async function create(pkg, attachments = []) {
   newPage(); text(model.title, 20, bold);
   y -= 10;
   informationCard();
+  if (model.severity) text(`${model.sv ? "Allvarlighetsgrad" : "Severity"}: ${model.severity}`, 11, bold, teal);
   y -= 6;
   directLinks();
   y -= 10;

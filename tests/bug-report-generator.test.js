@@ -157,10 +157,27 @@ assert(!allElements(coreFields).some(item =>
   item.id === "technical-report-summary"));
 assert(!allElements(coreFields).some(item =>
   item.id === "technical-report-actualResult"));
-assert(allElements(moreFields).some(item =>
-  item.id === "technical-report-summary"));
-assert(allElements(moreFields).some(item =>
-  item.id === "technical-report-actualResult"));
+assert.strictEqual(moreFields, undefined);
+const severitySelect = allElements(container).find(item =>
+  item.id === "technical-report-severity");
+assert.strictEqual(severitySelect.tagName, "select");
+assert.deepStrictEqual(severitySelect.children.slice(0, 5).map(item => item.textContent),
+  ["Blank", "Low", "Medium", "High", "Critical"]);
+assert.strictEqual(severitySelect.value, controller.state().report.summary.severity);
+const severityEdits = [];
+view.render(container, controller.state(), {
+  onEdit: (name, value) => severityEdits.push([name, value])
+}, fakeDocument);
+const editableSeverity = allElements(container).find(item =>
+  item.id === "technical-report-severity");
+editableSeverity.value = "Critical";
+editableSeverity.listeners.change();
+assert.deepStrictEqual(severityEdits, [["severity", "Critical"]]);
+view.render(container, controller.state(), {
+  onCopy: value => copied.push(value), mediaAssets: {
+    "asset-error": { source: "data:image/png;base64,AA==" }
+  }, onEditReproductionStep: () => {}, onSetScreenshotVisibility: () => {}
+}, fakeDocument);
 assert(allElements(container).some(item => item.className === "failure-point"));
 assert(allElements(container).some(item => item.className === "reproduction-editor"));
 assert(allElements(container).some(item => item.className === "human-actual-result" &&

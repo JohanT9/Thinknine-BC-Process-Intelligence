@@ -73,6 +73,25 @@
     const status = element(doc, "p", ui(saveLabels[workspaceState.saveState] ||
       workspaceState.saveState, locale), `save-state save-state-${workspaceState.saveState}`);
     status.setAttribute("role", "status"); container.appendChild(status);
+    const severityLabel = element(doc, "label", ui("Severity", locale));
+    severityLabel.htmlFor = "technical-report-severity";
+    const severity = doc.createElement("select");
+    severity.id = "technical-report-severity"; severity.name = "severity";
+    const severityValues = ["", "Low", "Medium", "High", "Critical"];
+    const savedSeverity = workspaceState.report.summary.severity || "";
+    severityValues.forEach(value => {
+      const option = element(doc, "option", value || "Blank"); option.value = value;
+      severity.appendChild(option);
+    });
+    // Preserve legacy free-text classifications without silently translating numeric values.
+    if (savedSeverity && !severityValues.includes(savedSeverity)) {
+      const legacy = element(doc, "option", savedSeverity); legacy.value = savedSeverity;
+      severity.appendChild(legacy);
+    }
+    severity.value = savedSeverity;
+    severity.addEventListener("change", () => onEdit("severity", severity.value));
+    const severityHeader = element(doc, "div", "", "report-severity-header");
+    severityHeader.append(severityLabel, severity); container.appendChild(severityHeader);
     const editor = doc.createElement("fieldset");
     editor.className = "report-core-fields";
     editor.appendChild(element(doc, "legend", ui("Describe the problem", locale)));
@@ -84,17 +103,6 @@
       value: workspaceState.report.expectedResult.text, multiline: true },
     ...(!hasCapturedError ? [{ name: "actualResult", label: "What happened instead?",
       value: workspaceState.report.actualResult.human.text, multiline: true }] : [])];
-    const additionalFields = [{ name: "summary", label: "Additional description",
-      value: workspaceState.report.summary.summary, multiline: true },
-    ...(hasCapturedError ? [{ name: "actualResult",
-      label: "Anything else that happened? (optional)",
-      value: workspaceState.report.actualResult.human.text, multiline: true }] : []),
-    { name: "severity", label: "Severity",
-      value: workspaceState.report.summary.severity },
-    { name: "category", label: "Category",
-      value: workspaceState.report.summary.category },
-    { name: "notes", label: "Notes", value: (workspaceState.report.notes || [])
-      .map(note => note.text || note.content || "").join("\n"), multiline: true }];
     const appendField = (parent, field) => {
       const id = `technical-report-${field.name}`;
       const label = element(doc, "label", ui(field.label, locale)); label.htmlFor = id;
@@ -105,11 +113,6 @@
     };
     fields.forEach(field => appendField(editor, field));
     container.appendChild(editor);
-    const moreFields = doc.createElement("details");
-    moreFields.className = "report-more-fields";
-    moreFields.appendChild(element(doc, "summary", ui("More report information", locale)));
-    additionalFields.forEach(field => appendField(moreFields, field));
-    container.appendChild(moreFields);
     const technicalDetails = doc.createElement("details");
     technicalDetails.className = "technical-details";
     technicalDetails.appendChild(element(doc, "summary", ui("Technical details", locale)));

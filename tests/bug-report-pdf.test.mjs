@@ -11,6 +11,8 @@ const pkg = { title: "Fel vid Registrera vikt", documentLanguage: "sv-SE", gener
   errorEvidence: { primary: { rawMessage: "Ett fel inträffade.", supportUrl: url } },
   reproduction: [{ instruction: "Välj **Registrera vikt**." }], callStack: [], diagnostics: { rows: [] } };
 const model = project(pkg);
+assert.equal(model.severity, "");
+assert.equal(project({ ...pkg, summary: { severity: "High" } }).severity, "High");
 const legacy = { ...pkg, environment: { businessCentral: { environment: "Sandbox" } } };
 assert.equal(project(legacy).company, "Demo Company", "Recover company from captured error deep link");
 assert.equal(project({ ...legacy, errorEvidence: { primary: { supportUrl: url.replace("%20", "+") } } }).company, "Demo Company");
