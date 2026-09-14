@@ -53,7 +53,7 @@ assert.ok(!project({ ...pkg, reproduction: [{}] }).sections.some(s => s.id === "
 assert.deepEqual(project({ ...pkg, errorEvidence: { primary: { supportUrl: "javascript:alert(1)" } } }).links, []);
 const result = await create(pkg);
 const pdf = await PDFDocument.load(result.bytes);
-assert.equal(pdf.getPageCount(), 1);
+assert.equal(pdf.getPageCount(), 2, "Reproduction starts on its own second page");
 const annotation = pdf.context.lookup(pdf.getPage(0).node.Annots().get(0));
 assert.ok(annotation.toString().includes(url), "Exact original URL including %20 and query order");
 const long = await create({ ...pkg, actualResult: { userDescription: "Ett långt felmeddelande. ".repeat(2000) } });

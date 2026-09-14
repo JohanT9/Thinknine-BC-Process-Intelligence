@@ -22245,7 +22245,7 @@
     }
     function directLinks() {
       for (const url of model.links) {
-        const label = model.sv ? "\xD6ppna i Business Central" : "Open in Business Central";
+        const label = model.sv ? "\xD6ppna i Business Central (l\xE4nk)" : "Open in Business Central (link)";
         ensure(32);
         const linkY = y;
         text(label, 11, bold, teal);
@@ -22288,18 +22288,23 @@
     const leadImage = attachments.findLast((image) => image.role === "error-evidence" && image.dataUrl);
     newPage();
     text(model.title, 20, bold);
+    y -= 10;
     informationCard();
+    y -= 6;
     directLinks();
+    y -= 10;
     if (leadImage) {
       heading(model.sv ? "Felbild" : "Error screenshot");
       const caption = imageCaption(leadImage, true);
       await screenshot(leadImage, Math.max(20, Math.min(300, y - 80 - measure(caption, 9))));
       text(caption, 9, regular, muted);
+      y -= 8;
     }
     if (model.trigger) text(`${model.sv ? "Felet intr\xE4ffade vid steg" : "Error occurred at step"} ${model.trigger.number}: ${model.trigger.instruction}`, 11, bold);
     const displayedSections = model.sections.map((section) => section.id === "environment" ? { ...section, rows: section.rows.filter((row) => /^(?:BC-sida|BC page):/u.test(row)) } : section).filter((section) => section.rows.length);
     const sectionHeight = (section) => 34 + (section.id === "reproduction" ? model.steps.reduce((total, step) => total + measure(step.instruction + (step.number === model.trigger?.number ? " - Felet intr\xE4ffade h\xE4r" : ""), 11, regular, usable - 34) + 5, 0) : section.rows.reduce((total, row) => total + measure(row), 0));
     for (const section of displayedSections) {
+      if (section.id === "reproduction") newPage();
       if (section.id === "diagnostics") {
         const technicalHeight = displayedSections.filter((item) => ["diagnostics", "callStack"].includes(item.id)).reduce((total, item) => total + sectionHeight(item), 0);
         if (technicalHeight <= height - 132) ensure(technicalHeight);
@@ -22308,7 +22313,10 @@
       if (blockHeight <= height - 132) ensure(blockHeight);
       heading(section.title);
       if (section.id === "reproduction") model.steps.forEach(processStep);
-      else for (const row of section.rows) text(row, 11, regular, section.id === "actual" ? rgb(0.65, 0.12, 0.1) : ink);
+      else for (const row of section.rows) {
+        text(row, section.id === "actual" ? 12 : 11, regular, section.id === "actual" ? rgb(0.65, 0.12, 0.1) : ink);
+        if (section.id === "actual") y -= 8;
+      }
     }
     const seen = new Set(leadImage ? [leadImage.dataUrl] : []);
     const images = attachments.filter((image) => {

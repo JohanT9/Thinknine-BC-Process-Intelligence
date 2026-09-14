@@ -179,7 +179,7 @@ export async function create(pkg, attachments = []) {
   }
   function directLinks() {
     for (const url of model.links) {
-      const label = model.sv ? "Öppna i Business Central" : "Open in Business Central";
+      const label = model.sv ? "Öppna i Business Central (länk)" : "Open in Business Central (link)";
       ensure(32); const linkY = y; text(label, 11, bold, teal);
       const annotation = doc.context.register(doc.context.obj({ Type: "Annot", Subtype: "Link",
         Rect: [margin, linkY - 3, margin + bold.widthOfTextAtSize(label, 11), linkY + 13],
@@ -207,13 +207,17 @@ export async function create(pkg, attachments = []) {
   // The final captured error image is the lead evidence, not an appendix.
   const leadImage = attachments.findLast(image => image.role === "error-evidence" && image.dataUrl);
   newPage(); text(model.title, 20, bold);
+  y -= 10;
   informationCard();
+  y -= 6;
   directLinks();
+  y -= 10;
   if (leadImage) {
     heading(model.sv ? "Felbild" : "Error screenshot");
     const caption = imageCaption(leadImage, true);
     await screenshot(leadImage, Math.max(20, Math.min(300, y - 80 - measure(caption, 9))));
     text(caption, 9, regular, muted);
+    y -= 8;
   }
   if (model.trigger) text(`${model.sv ? "Felet inträffade vid steg" : "Error occurred at step"} ${model.trigger.number}: ${model.trigger.instruction}`, 11, bold);
   // Company/environment are already shown in the summary card; retain only page context here.
@@ -225,6 +229,8 @@ export async function create(pkg, attachments = []) {
       (step.number === model.trigger?.number ? " - Felet inträffade här" : ""), 11, regular, usable - 34) + 5, 0)
     : section.rows.reduce((total, row) => total + measure(row), 0));
   for (const section of displayedSections) {
+    // Reproduction is a separate chapter, never squeezed onto the cover page.
+    if (section.id === "reproduction") newPage();
     if (section.id === "diagnostics") {
       const technicalHeight = displayedSections.filter(item => ["diagnostics", "callStack"].includes(item.id))
         .reduce((total, item) => total + sectionHeight(item), 0);
@@ -234,7 +240,10 @@ export async function create(pkg, attachments = []) {
     if (blockHeight <= height - 132) ensure(blockHeight);
     heading(section.title);
     if (section.id === "reproduction") model.steps.forEach(processStep);
-    else for (const row of section.rows) text(row, 11, regular, section.id === "actual" ? rgb(.65, .12, .10) : ink);
+    else for (const row of section.rows) {
+      text(row, section.id === "actual" ? 12 : 11, regular, section.id === "actual" ? rgb(.65, .12, .10) : ink);
+      if (section.id === "actual") y -= 8;
+    }
   }
   const seen = new Set(leadImage ? [leadImage.dataUrl] : []);
   const images = attachments.filter(image => {
