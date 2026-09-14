@@ -6,6 +6,15 @@ const draft = email.build({ packageId: "issue-package:test:123",
   to: "support@example.com", locale: "sv-SE"
 });
 assert.strictEqual(draft.to, "support@example.com");
+for (const severity of ["", "1", "Low", "Medium", "High", "Critical"]) {
+  const result = email.build({ title: "Fel vid registrering", summary: { severity } }, "{}",
+    { to: "support@example.com", locale: "sv-SE" });
+  const expected = severity && severity !== "1"
+    ? `Fel vid registrering - Nivå ${severity}` : "Fel vid registrering";
+  assert.strictEqual(result.subject, expected);
+  const encodedSubject = result.content.match(/Subject: =\?UTF-8\?B\?([^?]+)\?=/)[1];
+  assert.strictEqual(Buffer.from(encodedSubject, "base64").toString("utf8"), expected);
+}
 assert(draft.fileName.endsWith(".eml"));
 assert(draft.content.includes("To: support@example.com"));
 assert(draft.content.includes("Content-Type: multipart/mixed"));

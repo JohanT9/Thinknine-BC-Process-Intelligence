@@ -25,6 +25,9 @@
     if (!to) throw new Error("En giltig supportadress måste anges i inställningarna.");
     const title = cleanHeader(issuePackage?.title || "Business Central-fel");
     const swedish = /^sv(?:-|$)/iu.test(String(options.locale || "sv-SE"));
+    const severity = ["Low", "Medium", "High", "Critical"].find(value =>
+      value.toLowerCase() === cleanHeader(issuePackage?.summary?.severity).toLowerCase());
+    const subject = severity ? `${title} - ${swedish ? "Nivå" : "Severity"} ${severity}` : title;
     const attachmentName = `${safeName(title)}-felrapport.json`;
     const boundary = `=_BC_Process_Studio_${safeName(issuePackage?.packageId)}`;
     const body = swedish
@@ -41,12 +44,12 @@
         "", lines(item.base64)];
     });
     const content = ["MIME-Version: 1.0", "X-Unsent: 1", `To: ${to}`,
-      `Subject: =?UTF-8?B?${base64(title)}?=`,
+      `Subject: =?UTF-8?B?${base64(subject)}?=`,
       `Content-Type: multipart/mixed; boundary="${boundary}"`, "",
       `--${boundary}`, "Content-Type: text/plain; charset=UTF-8",
       "Content-Transfer-Encoding: base64", "", lines(base64(body)),
       ...parts, `--${boundary}--`, ""].join("\r\n");
-    return { to, subject: title, attachmentName,
+    return { to, subject, attachmentName,
       fileName: `${safeName(title)}.eml`, content };
   }
   return { build, validAddress };

@@ -6,7 +6,6 @@
   const message = document.getElementById("workspaceMessage");
   let currentUiLocale = globalThis.T9UiI18n.DEFAULT_LOCALE;
   let supportEmail = "";
-  let bugReportEmailMode = "eml";
   const t = key => globalThis.T9UiI18n.translate(key, currentUiLocale);
   const tf = (key, values) => globalThis.T9UiI18n.format(
     key, values, currentUiLocale);
@@ -406,17 +405,6 @@
         selectedImages);
       const pdfBase64 = globalThis.T9BugReportPdf.base64(pdf.bytes);
       const includeTechnicalPackage = document.getElementById("includeTechnicalZip").checked;
-      if (bugReportEmailMode === "windowsShare") {
-        await send({ type: "T9_SHARE_BUG_REPORT_WINDOWS", payload: {
-          schemaVersion: 2, action: "shareBugReportPdf",
-          title: issuePreviewState.issuePackage.title,
-          supportEmail, pdfBase64, includeTechnicalPackage,
-          reportJson: includeTechnicalPackage ? JSON.stringify(offline) : "",
-          markdown: includeTechnicalPackage ? issuePreviewState.markdown : "" } });
-        message.textContent = globalThis.T9UiI18n.translateStaticText(
-          "Windows-hjälparen är öppnad. Välj Dela bifogad rapport och sedan Outlook.", currentUiLocale);
-        return;
-      }
       const attachments = [{ fileName: "felrapport.pdf", mediaType: "application/pdf", base64: pdfBase64 }];
       if (includeTechnicalPackage) attachments.push({ fileName: "tekniskt-paket.zip", mediaType: "application/zip",
         base64: globalThis.T9BugReportPdf.base64(await globalThis.T9BugReportPdf.technicalZip(offline)) });
@@ -474,7 +462,6 @@
       const response = await send({ type: "T9_GET_SETTINGS" });
       currentUiLocale = globalThis.T9UiI18n.apply(response?.settings?.uiLocale);
       supportEmail = String(response?.settings?.supportEmail || "").trim();
-      bugReportEmailMode = response?.settings?.bugReportEmailMode || "eml";
     } catch {
       currentUiLocale = globalThis.T9UiI18n.apply(currentUiLocale);
     }
