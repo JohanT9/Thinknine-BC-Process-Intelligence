@@ -219,7 +219,10 @@ export async function create(pkg, attachments = []) {
     text(caption, 9, regular, muted);
     y -= 8;
   }
-  if (model.trigger) text(`${model.sv ? "Felet inträffade vid steg" : "Error occurred at step"} ${model.trigger.number}: ${model.trigger.instruction}`, 11, bold);
+  if (model.trigger) {
+    text(`${model.sv ? "Felet inträffade vid steg" : "Error occurred at step"} ${model.trigger.number}: ${model.trigger.instruction}`, 11, bold);
+    y -= 16;
+  }
   // Company/environment are already shown in the summary card; retain only page context here.
   const displayedSections = model.sections.map(section => section.id === "environment"
     ? { ...section, rows: section.rows.filter(row => /^(?:BC-sida|BC page):/u.test(row)) } : section)

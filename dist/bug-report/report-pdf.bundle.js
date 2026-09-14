@@ -22300,7 +22300,10 @@
       text(caption, 9, regular, muted);
       y -= 8;
     }
-    if (model.trigger) text(`${model.sv ? "Felet intr\xE4ffade vid steg" : "Error occurred at step"} ${model.trigger.number}: ${model.trigger.instruction}`, 11, bold);
+    if (model.trigger) {
+      text(`${model.sv ? "Felet intr\xE4ffade vid steg" : "Error occurred at step"} ${model.trigger.number}: ${model.trigger.instruction}`, 11, bold);
+      y -= 16;
+    }
     const displayedSections = model.sections.map((section) => section.id === "environment" ? { ...section, rows: section.rows.filter((row) => /^(?:BC-sida|BC page):/u.test(row)) } : section).filter((section) => section.rows.length);
     const sectionHeight = (section) => 34 + (section.id === "reproduction" ? model.steps.reduce((total, step) => total + measure(step.instruction + (step.number === model.trigger?.number ? " - Felet intr\xE4ffade h\xE4r" : ""), 11, regular, usable - 34) + 5, 0) : section.rows.reduce((total, row) => total + measure(row), 0));
     for (const section of displayedSections) {
