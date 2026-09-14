@@ -30,7 +30,12 @@ const quantity = run([
     value: { normalized: "500" }, screenshotAssetId: "shot-2" })
 ]);
 assert.strictEqual(quantity.schemaVersion, 1);
-assert.strictEqual(quantity.groupingVersion, "1.17.0");
+assert.strictEqual(quantity.groupingVersion, "1.18.0");
+const scrollOnly = run([event("scroll1", "action-invocation", {
+  actionIdentification: { caption: "Rulla åt höger" }
+})]);
+assert.strictEqual(scrollOnly.groups.length, 0);
+assert.strictEqual(scrollOnly.supportingEvents.length, 1);
 assert.strictEqual(quantity.groups.length, 1);
 assert.strictEqual(quantity.groups[0].groupKind, "field-edit");
 assert.deepStrictEqual(quantity.groups[0].sourceEventIds,

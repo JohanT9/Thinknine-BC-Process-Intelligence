@@ -16,6 +16,11 @@ const events = [
 ];
 
 const filtered = noise.filter(events);
+for (const label of ["Rulla åt höger", "Rad → Rulla åt vänster.", "Scroll right", "Scroll down", "Rulla upp"]) {
+  assert.strictEqual(noise.isNoise({ type: "click", label }), true, label);
+}
+assert.strictEqual(noise.isNoise({ type: "click", label: "Registrera vikt" }), false);
+assert.strictEqual(noise.isNoise({ type: "field-change", fieldName: "Rulla åt höger", value: "10" }), false);
 assert.strictEqual(filtered.length, 2, "Noise filter should remove page-state and empty customer name.");
 
 const entities = memory.build(filtered);

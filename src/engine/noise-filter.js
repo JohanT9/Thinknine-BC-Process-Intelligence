@@ -6,6 +6,7 @@
 })(typeof globalThis !== "undefined" ? globalThis : this, function () {
   const ignoredTypes = new Set(["pointer", "page-state", "hover", "scroll"]);
   const ignoredCaptions = [
+    /^(?:rulla|scroll)(?:\s+(?:åt|to\s+the))?\s+(?:höger|vänster|upp|ned|ner|right|left|up|down)\.?$/i,
     /^bakåt$/i,
     /^tillbaka$/i,
     /^back$/i,
@@ -23,7 +24,7 @@
     if (!event) return true;
     if (ignoredTypes.has(event.type)) return true;
 
-    const caption = clean(event.fieldName || event.label);
+    const caption = clean(event.fieldName || event.label).split(/\s*(?:→|->)\s*/).at(-1);
     if (ignoredCaptions.some(pattern => pattern.test(caption))) {
       return event.type !== "field-change" || !String(event.value || "").trim();
     }
