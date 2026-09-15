@@ -28,6 +28,11 @@
         event.controlKind === "sectionToggle") return true;
 
     const caption = clean(event.fieldName || event.label).split(/\s*(?:→|->)\s*/).at(-1);
+    // Legacy recordings may lack section metadata. Only suppress a bare section click,
+    // never a field interaction or a recorded value.
+    if (event.type === "click" && /^(?:vikt|weight)\.?$/iu.test(caption) &&
+        !event.fieldId && !event.inputType && event.value == null &&
+        !["input", "textarea"].includes(event.controlType) && event.role !== "textbox") return true;
     if (ignoredCaptions.some(pattern => pattern.test(caption))) {
       return event.type !== "field-change" || !String(event.value || "").trim();
     }

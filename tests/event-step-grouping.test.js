@@ -30,7 +30,11 @@ const quantity = run([
     value: { normalized: "500" }, screenshotAssetId: "shot-2" })
 ]);
 assert.strictEqual(quantity.schemaVersion, 1);
-assert.strictEqual(quantity.groupingVersion, "1.20.0");
+assert.strictEqual(quantity.groupingVersion, "1.21.0");
+assert.strictEqual(run([event("legacy-section1", "action-invocation", {
+  rawEventType: "click",
+  controlIdentification: { controlType: "unknownInteractiveControl", caption: "Vikt" }
+})]).groups.length, 0);
 assert.strictEqual(run([event("section1", "action-invocation", {
   controlIdentification: { controlType: "sectionToggle", caption: "Vikt" }
 })]).groups.length, 0);
