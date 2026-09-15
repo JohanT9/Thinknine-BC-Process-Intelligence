@@ -30,7 +30,14 @@ const quantity = run([
     value: { normalized: "500" }, screenshotAssetId: "shot-2" })
 ]);
 assert.strictEqual(quantity.schemaVersion, 1);
-assert.strictEqual(quantity.groupingVersion, "1.19.0");
+assert.strictEqual(quantity.groupingVersion, "1.20.0");
+assert.strictEqual(run([event("section1", "action-invocation", {
+  controlIdentification: { controlType: "sectionToggle", caption: "Vikt" }
+})]).groups.length, 0);
+assert.strictEqual(run([event("weight1", "value-change", {
+  controlIdentification: { controlType: "field", caption: "Vikt" },
+  value: { normalized: "10" }
+})]).groups.length, 1);
 for (const caption of ["Visa resten", "Show more", "Visa mindre", "Show less"]) {
   const result = run([event("display1", "action-invocation", {
     actionIdentification: { caption }

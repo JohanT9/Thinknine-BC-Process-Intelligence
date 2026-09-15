@@ -24,6 +24,8 @@
   function isNoise(event) {
     if (!event) return true;
     if (ignoredTypes.has(event.type)) return true;
+    if (["click", "action", "navigation"].includes(event.type) &&
+        event.controlKind === "sectionToggle") return true;
 
     const caption = clean(event.fieldName || event.label).split(/\s*(?:→|->)\s*/).at(-1);
     if (ignoredCaptions.some(pattern => pattern.test(caption))) {

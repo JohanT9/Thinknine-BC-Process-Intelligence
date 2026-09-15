@@ -726,6 +726,10 @@
     return {
       role: role || element?.tagName?.toLowerCase() || "",
       controlType: element?.tagName?.toLowerCase() || "",
+      controlKind: element?.getAttribute?.("aria-expanded") != null &&
+        !element?.getAttribute?.("aria-haspopup") &&
+        (role === "heading" || /fasttab|section-header/i.test(String(element?.className || "")))
+        ? "sectionToggle" : undefined,
       automationId:
         element?.getAttribute?.("data-automation-id") ||
         element?.getAttribute?.("data-control-id") ||

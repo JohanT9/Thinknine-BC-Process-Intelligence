@@ -16,6 +16,8 @@ const events = [
 ];
 
 const filtered = noise.filter(events);
+assert.strictEqual(noise.isNoise({ type: "click", label: "Vikt", controlKind: "sectionToggle" }), true);
+assert.strictEqual(noise.isNoise({ type: "field-change", fieldName: "Vikt", value: "10" }), false);
 for (const label of ["Visa resten", "Visa resten.", "Show more", "Visa mindre", "Show less"]) {
   assert.strictEqual(noise.isNoise({ type: "click", label }), true, label);
 }
