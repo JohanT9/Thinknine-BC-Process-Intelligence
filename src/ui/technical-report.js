@@ -165,6 +165,18 @@
     }));
     document.getElementById("undoReport").addEventListener("click", workspace.undo);
     document.getElementById("redoReport").addEventListener("click", workspace.redo);
+    document.getElementById("regenerateReport").addEventListener("click", action(async () => {
+      const confirmation = currentUiLocale === "sv-SE"
+        ? "Generera om hela rapporten från inspelningen? Manuella stegändringar och bildval ersätts. Titel, allvarlighetsgrad och förväntat resultat behålls."
+        : "Regenerate the report from the recording? Manual step edits and image selections will be replaced. Title, severity and expected result are retained.";
+      if (!window.confirm(confirmation)) return;
+      const button = document.getElementById("regenerateReport"); button.disabled = true;
+      try {
+        await workspace.flush();
+        await send({ type: "T9_REGENERATE_BUG_REPORT", bugReportId });
+        location.reload();
+      } finally { button.disabled = false; }
+    }));
     document.getElementById("downloadMarkdown").addEventListener("click", async () => {
       await download(await workspace.exportMarkdown({ includeAiAnalysis:
         false }), `${bugReportId}.md`);

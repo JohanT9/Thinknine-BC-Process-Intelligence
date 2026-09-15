@@ -70,6 +70,9 @@ assert.match(report, /<details class="report-options"><summary>More options<\/su
 assert.doesNotMatch(report, /<details class="report-options" open/);
 assert.match(report, /Share bug report/);
 assert.doesNotMatch(report, /id="openIssuePreview"/);
+assert.match(report, /id="regenerateReport"/);
+assert.match(reportLogic, /if \(!window\.confirm\(confirmation\)\) return/);
+assert.match(reportLogic, /await workspace\.flush\(\);\s+await send\(\{ type: "T9_REGENERATE_BUG_REPORT"/);
 assert.doesNotMatch(report, /id="includeAiExport"|id="includeTechnicalZip"/);
 assert.match(report, /id="emailReport"[^>]*>E-posta PDF<\/button>/);
 assert.match(report, /src="bug-report\/email-draft\.js"/);

@@ -1457,7 +1457,7 @@ async function stopSession(finalName = "", documentLanguage = "") {
   return session;
 }
 
-async function createAndOpenBugReport(recordingId, reportTitle = "") {
+async function createAndOpenBugReport(recordingId, reportTitle = "", regenerateCurrent = null) {
   const recording = await getCanonicalRecording(recordingId);
   const normalized = globalThis.T9EventNormalization.normalizeRecording(recording);
   const grouped = globalThis.T9EventStepGrouping.group(normalized);
@@ -1476,14 +1476,22 @@ async function createAndOpenBugReport(recordingId, reportTitle = "") {
     screenshotAssetIds: [...new Set((task.sourceEventIds || []).map(id =>
       byCanonicalId.get(id)?.screenshotAssetId).filter(Boolean))] }));
   const errors = await getBcErrorEvidenceForRecording(recordingId);
-  const report = globalThis.T9BugReportService.createBugReportFromRecording(
+  let report = globalThis.T9BugReportService.createBugReportFromRecording(
     recording, tasks, { extensionVersion: VERSION, productVersion: VERSION,
       errorEvidence: errors,
       documentLanguage: globalThis.T9LanguageRegistry.normalize(
         recording.metadata?.documentLanguage, "document"
       ),
       title: String(reportTitle || "").trim() });
+  if (regenerateCurrent) {
+    if (!tasks.length) throw new Error("Inga rapportsteg kunde återskapas. Befintlig rapport har inte ändrats.");
+    report = globalThis.T9BugReportService.regenerate({ ...regenerateCurrent,
+      evidence: { ...regenerateCurrent.evidence, screenshots: [] } }, recording, tasks, {
+      extensionVersion: VERSION, productVersion: VERSION, errorEvidence: errors,
+      updatedAt: new Date().toISOString() });
+  }
   const saved = await bugReportStore.save(report);
+  if (regenerateCurrent) return { report: saved };
   const workspaceUrl = chrome.runtime.getURL(
     `technical-report.html?bugReportId=${encodeURIComponent(saved.bugReportId)}&new=1`);
   const tab = await chrome.tabs.create({ url: workspaceUrl });
@@ -1743,6 +1751,14 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
         sendResponse({ ok: true, report: saved, workspaceUrl:
           chrome.runtime.getURL(`technical-report.html?bugReportId=${encodeURIComponent(
             saved.bugReportId)}`) });
+        break;
+      }
+
+      case "T9_REGENERATE_BUG_REPORT": {
+        const current = await bugReportStore.load(message.bugReportId);
+        if (!current) throw new Error("Felrapporten kunde inte hittas.");
+        const result = await createAndOpenBugReport(current.recordingId, "", current);
+        sendResponse({ ok: true, ...result });
         break;
       }
 
