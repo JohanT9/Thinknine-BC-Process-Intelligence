@@ -92,14 +92,11 @@
     const editor = doc.createElement("fieldset");
     editor.className = "report-core-fields";
     editor.appendChild(element(doc, "legend", ui("Describe the problem", locale)));
-    const hasCapturedError = Boolean((workspaceState.report.businessCentralError
-      ?.errorEvidenceIds || []).length);
     const fields = [{ name: "title", label: "Title",
       value: workspaceState.report.summary.title },
     { name: "expectedResult", label: "What did you expect?",
       value: workspaceState.report.expectedResult.text, multiline: true },
-    ...(!hasCapturedError ? [{ name: "actualResult", label: "What happened instead?",
-      value: workspaceState.report.actualResult.human.text, multiline: true }] : [])];
+    ];
     const appendField = (parent, field) => {
       const id = `technical-report-${field.name}`;
       const label = element(doc, "label", ui(field.label, locale)); label.htmlFor = id;
@@ -192,8 +189,8 @@
           node.appendChild(editor);
         }
       } else if (section.kind === "actual-result") {
-        if (section.content.userDescription) node.appendChild(element(doc, "p",
-          section.content.userDescription, "human-actual-result"));
+        appendField(node, { name: "actualResult", label: "What happened instead?",
+          value: workspaceState.report.actualResult.human.text, multiline: true });
         section.content.capturedErrors.forEach(error => {
           const block = element(doc, "blockquote", error.rawMessage);
           block.setAttribute("aria-label", ui("Captured Business Central error", locale));

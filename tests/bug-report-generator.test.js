@@ -190,8 +190,9 @@ view.render(container, controller.state(), {
 }, fakeDocument);
 assert(allElements(container).some(item => item.className === "failure-point"));
 assert(allElements(container).some(item => item.className === "reproduction-editor"));
-assert(allElements(container).some(item => item.className === "human-actual-result" &&
-  item.textContent === "Edited actual result"));
+const actualEditor = allElements(container).find(item => item.id === "technical-report-actualResult");
+assert.strictEqual(actualEditor.tagName, "textarea");
+assert.strictEqual(actualEditor.value, "Edited actual result");
 assert(allElements(container).some(item =>
   item.className === "report-section report-section-reproduction"));
 assert(allElements(container).some(item =>
