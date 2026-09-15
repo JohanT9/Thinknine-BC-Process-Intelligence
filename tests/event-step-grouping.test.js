@@ -30,7 +30,18 @@ const quantity = run([
     value: { normalized: "500" }, screenshotAssetId: "shot-2" })
 ]);
 assert.strictEqual(quantity.schemaVersion, 1);
-assert.strictEqual(quantity.groupingVersion, "1.21.0");
+assert.strictEqual(quantity.groupingVersion, "1.22.0");
+const secondaryMenu = run([
+  event("menu1", "action-invocation", {
+    actionIdentification: { caption: "Visa sekundära åtgärder" }
+  }),
+  event("menu2", "action-invocation", {
+    actionIdentification: { caption: "Manuell vikt" }
+  })
+]);
+assert.strictEqual(secondaryMenu.groups.length, 1);
+assert.deepStrictEqual(secondaryMenu.groups[0].sourceEventIds, ["source:menu2"]);
+assert.strictEqual(secondaryMenu.supportingEvents.length, 1);
 assert.strictEqual(run([event("legacy-section1", "action-invocation", {
   rawEventType: "click",
   controlIdentification: { controlType: "unknownInteractiveControl", caption: "Vikt" }
