@@ -11,7 +11,7 @@
 ) {
   "use strict";
   const SCHEMA_VERSION = 1;
-  const GROUPING_VERSION = "1.23.0";
+  const GROUPING_VERSION = "1.24.0";
   const CAPTURE_PACKET_VERSION = "1.6.0";
   const RESULT_VERIFICATION_VERSION = "1.2.0";
   const cache = new WeakMap();
@@ -243,7 +243,8 @@
     const displayCommand = /^(?:visa resten|show more|show less|visa mindre|visa sekundära åtgärder|show secondary actions)\.?$/iu.test(caption);
     const control = event.controlIdentification || {};
     const closeCommand = event.rawEventType === "dialog-close" ||
-      control.controlType === "dialogClose" || /^(?:stäng|close|dismiss)\.?$/iu.test(caption);
+      control.controlType === "dialogClose" || /^(?:stäng|close|dismiss)\.?$/iu.test(caption) ||
+      (event.rawEventType === "click" && caption === "\uE72B");
     const sectionToggle = control.controlType === "sectionToggle" ||
       (event.rawEventType === "click" && /^(?:vikt|weight)\.?$/iu.test(caption) &&
         !control.fieldId && !event.value?.normalized &&

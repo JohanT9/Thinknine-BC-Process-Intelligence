@@ -30,7 +30,14 @@ const quantity = run([
     value: { normalized: "500" }, screenshotAssetId: "shot-2" })
 ]);
 assert.strictEqual(quantity.schemaVersion, 1);
-assert.strictEqual(quantity.groupingVersion, "1.23.0");
+assert.strictEqual(quantity.groupingVersion, "1.24.0");
+// Regression: event 125 from the user's September 7 recording. No usable name or identity.
+const legacyBack = run([event("legacy125", "activation", {
+  rawEventType: "click", actionIdentification: { caption: "\uE72B" },
+  controlIdentification: { type: "button", role: "button", caption: "\uE72B" }
+})]);
+assert.strictEqual(legacyBack.groups.length, 0);
+assert.strictEqual(legacyBack.supportingEvents.length, 1);
 assert.strictEqual(run([event("close1", "action-invocation", {
   actionIdentification: { caption: "Stäng" }
 })]).groups.length, 0);

@@ -6,6 +6,7 @@
 })(typeof globalThis !== "undefined" ? globalThis : this, function () {
   const ignoredTypes = new Set(["pointer", "page-state", "hover", "scroll"]);
   const ignoredCaptions = [
+    /^\uE72B$/i, // Legacy BC back/dismiss navigation icon.
     /^(?:stäng|close|dismiss)\.?$/i,
     /^(?:visa resten|show more|show less|visa mindre|visa sekundära åtgärder|show secondary actions)\.?$/i,
     /^(?:rulla|scroll)(?:\s+(?:åt|to\s+the))?\s+(?:höger|vänster|upp|ned|ner|right|left|up|down)\.?$/i,
