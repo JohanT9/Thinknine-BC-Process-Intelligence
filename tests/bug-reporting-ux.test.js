@@ -125,7 +125,7 @@ assert.match(reportView, /issue\.level === "required"/);
 assert.doesNotMatch(reportView, /Complete the required human context below/);
 assert.match(reportView, /Captured Business Central error/);
 assert.match(reportView, /Copy Business Central error/);
-assert.match(reportView, /appendField\(node, \{ name: "actualResult"/);
+assert.doesNotMatch(reportView, /appendField\(node, \{ name: "actualResult"/);
 assert.match(reportView, /Needs attention/);
 assert.doesNotMatch(reportView, /Ready to share/);
 assert.match(reportLogic, /technical-report-expectedResult/);

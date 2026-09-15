@@ -191,8 +191,7 @@ view.render(container, controller.state(), {
 assert(allElements(container).some(item => item.className === "failure-point"));
 assert(allElements(container).some(item => item.className === "reproduction-editor"));
 const actualEditor = allElements(container).find(item => item.id === "technical-report-actualResult");
-assert.strictEqual(actualEditor.tagName, "textarea");
-assert.strictEqual(actualEditor.value, "Edited actual result");
+assert.strictEqual(actualEditor, undefined);
 assert(allElements(container).some(item =>
   item.className === "report-section report-section-reproduction"));
 assert(allElements(container).some(item =>
