@@ -16,6 +16,10 @@ const events = [
 ];
 
 const filtered = noise.filter(events);
+for (const label of ["Visa resten", "Visa resten.", "Show more", "Visa mindre", "Show less"]) {
+  assert.strictEqual(noise.isNoise({ type: "click", label }), true, label);
+}
+assert.strictEqual(noise.isNoise({ type: "click", label: "Visa dokument" }), false);
 for (const label of ["Rulla åt höger", "Rad → Rulla åt vänster.", "Scroll right", "Scroll down", "Rulla upp"]) {
   assert.strictEqual(noise.isNoise({ type: "click", label }), true, label);
 }

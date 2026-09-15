@@ -11,7 +11,7 @@
 ) {
   "use strict";
   const SCHEMA_VERSION = 1;
-  const GROUPING_VERSION = "1.18.0";
+  const GROUPING_VERSION = "1.19.0";
   const CAPTURE_PACKET_VERSION = "1.6.0";
   const RESULT_VERIFICATION_VERSION = "1.2.0";
   const cache = new WeakMap();
@@ -240,7 +240,8 @@
       event.controlIdentification?.caption || event.rawEvent?.label || "")
       .trim().split(/\s*(?:→|->)\s*/).at(-1);
     const scrollCommand = /^(?:rulla|scroll)(?:\s+(?:åt|to\s+the))?\s+(?:höger|vänster|upp|ned|ner|right|left|up|down)\.?$/iu.test(caption);
-    return scrollCommand || ["focus-transition", "key-command"].includes(
+    const displayCommand = /^(?:visa resten|show more|show less|visa mindre)\.?$/iu.test(caption);
+    return scrollCommand || (displayCommand && !isCommit(event.kind)) || ["focus-transition", "key-command"].includes(
     event.kind
   ) || ["scroll", "mousemove", "mouseover", "pointermove"].includes(
     event.rawEventType

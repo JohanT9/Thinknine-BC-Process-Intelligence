@@ -30,7 +30,14 @@ const quantity = run([
     value: { normalized: "500" }, screenshotAssetId: "shot-2" })
 ]);
 assert.strictEqual(quantity.schemaVersion, 1);
-assert.strictEqual(quantity.groupingVersion, "1.18.0");
+assert.strictEqual(quantity.groupingVersion, "1.19.0");
+for (const caption of ["Visa resten", "Show more", "Visa mindre", "Show less"]) {
+  const result = run([event("display1", "action-invocation", {
+    actionIdentification: { caption }
+  })]);
+  assert.strictEqual(result.groups.length, 0, caption);
+  assert.strictEqual(result.supportingEvents.length, 1);
+}
 const scrollOnly = run([event("scroll1", "action-invocation", {
   actionIdentification: { caption: "Rulla åt höger" }
 })]);

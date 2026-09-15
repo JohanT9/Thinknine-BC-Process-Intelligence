@@ -6,6 +6,7 @@
 })(typeof globalThis !== "undefined" ? globalThis : this, function () {
   const ignoredTypes = new Set(["pointer", "page-state", "hover", "scroll"]);
   const ignoredCaptions = [
+    /^(?:visa resten|show more|show less|visa mindre)\.?$/i,
     /^(?:rulla|scroll)(?:\s+(?:åt|to\s+the))?\s+(?:höger|vänster|upp|ned|ner|right|left|up|down)\.?$/i,
     /^bakåt$/i,
     /^tillbaka$/i,
