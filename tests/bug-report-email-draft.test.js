@@ -23,6 +23,13 @@ for (const severity of ["", "1", "Low", "Medium", "High", "Critical"]) {
 assert(draft.fileName.endsWith(".eml"));
 assert(draft.content.includes("To: support@example.com"));
 assert(draft.content.includes("Content-Type: multipart/mixed"));
+assert(draft.content.includes("Content-Type: multipart/alternative"));
+const encodedHtml = draft.content.split("Content-Type: text/html; charset=UTF-8\r\nContent-Transfer-Encoding: base64\r\n\r\n")[1]
+  .split("\r\n--")[0].replace(/\s/g, "");
+const html = Buffer.from(encodedHtml, "base64").toString("utf8");
+assert(html.includes("<p>Hej,</p><p>Bifogat finns en felrapport från BC Process Studio.</p>"));
+assert(!html.includes("Mvh Johan"), "Do not hard-code a user signature");
+assert(html.endsWith("</body></html>"));
 assert(draft.content.includes("Content-Disposition: attachment"));
 assert(draft.content.includes("application/json"));
 const encodedBody = draft.content.split("Content-Type: text/plain; charset=UTF-8\r\nContent-Transfer-Encoding: base64\r\n\r\n")[1]
