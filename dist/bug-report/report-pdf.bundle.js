@@ -22039,7 +22039,6 @@
       if (rows.length) sections.push({ id, title, rows });
     };
     add("actual", sv ? "Faktiskt resultat" : "Actual result", [...new Set([
-      pkg.actualResult?.userDescription,
       ...errors.map((error2) => error2.rawMessage)
     ].filter(Boolean))]);
     add("expected", sv ? "F\xF6rv\xE4ntat resultat" : "Expected result", [pkg.expectedResult]);

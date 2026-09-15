@@ -33,7 +33,7 @@
     add(byId.get("expected-result").title,
       [byId.get("expected-result").content].filter(Boolean));
     const actual = byId.get("actual-result").content;
-    add(byId.get("actual-result").title, [actual.userDescription,
+    add(byId.get("actual-result").title, [
       ...actual.capturedErrors.map(item => `${swedish
         ? "Registrerat BC-fel" : "Captured BC error"}: ${item.rawMessage}`)]
       .filter(Boolean));

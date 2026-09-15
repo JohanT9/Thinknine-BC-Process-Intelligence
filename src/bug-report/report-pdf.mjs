@@ -27,7 +27,7 @@ export function project(pkg) {
   const add = (id, title, rows) => { rows = rows.map(plain).filter(Boolean);
     if (rows.length) sections.push({ id, title, rows }); };
   add("actual", sv ? "Faktiskt resultat" : "Actual result", [...new Set([
-    pkg.actualResult?.userDescription, ...errors.map(error => error.rawMessage)
+    ...errors.map(error => error.rawMessage)
   ].filter(Boolean))]);
   add("expected", sv ? "Förväntat resultat" : "Expected result", [pkg.expectedResult]);
   add("reproduction", sv ? "Steg för att återskapa" : "Steps to reproduce",

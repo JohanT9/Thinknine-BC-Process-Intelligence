@@ -11,6 +11,9 @@ const pkg = { title: "Fel vid Registrera vikt", documentLanguage: "sv-SE", gener
   errorEvidence: { primary: { rawMessage: "Ett fel inträffade.", supportUrl: url } },
   reproduction: [{ instruction: "Välj **Registrera vikt**." }], callStack: [], diagnostics: { rows: [] } };
 const model = project(pkg);
+const staleDescription = project({ ...pkg, actualResult: { userDescription: "REMOVED_LEGACY_TEXT" } });
+assert.ok(!JSON.stringify(staleDescription).includes("REMOVED_LEGACY_TEXT"));
+assert.ok(JSON.stringify(staleDescription).includes(pkg.errorEvidence.primary.rawMessage));
 assert.equal(model.severity, "");
 assert.equal(project({ ...pkg, summary: { severity: "High" } }).severity, "High");
 const legacy = { ...pkg, environment: { businessCentral: { environment: "Sandbox" } } };
@@ -58,7 +61,7 @@ const pdf = await PDFDocument.load(result.bytes);
 assert.equal(pdf.getPageCount(), 2, "Reproduction starts on its own second page");
 const annotation = pdf.context.lookup(pdf.getPage(0).node.Annots().get(0));
 assert.ok(annotation.toString().includes(url), "Exact original URL including %20 and query order");
-const long = await create({ ...pkg, actualResult: { userDescription: "Ett långt felmeddelande. ".repeat(2000) } });
+const long = await create({ ...pkg, errorEvidence: { primary: { rawMessage: "Ett långt felmeddelande. ".repeat(2000) } } });
 assert.ok(long.pageCount > 2);
 const png = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+a0WQAAAAASUVORK5CYII=";
 const withImage = await create(pkg, [{ role: "error-evidence", dataUrl: png }]);
