@@ -165,11 +165,6 @@
     }));
     document.getElementById("undoReport").addEventListener("click", workspace.undo);
     document.getElementById("redoReport").addEventListener("click", workspace.redo);
-    document.getElementById("copyMarkdown").addEventListener("click", async () => {
-      await navigator.clipboard.writeText(await workspace.exportMarkdown({
-        includeAiAnalysis: false }));
-      message.textContent = t("technical.reportCopied");
-    });
     document.getElementById("downloadMarkdown").addEventListener("click", async () => {
       await download(await workspace.exportMarkdown({ includeAiAnalysis:
         false }), `${bugReportId}.md`);
