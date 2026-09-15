@@ -58,43 +58,11 @@
     </div>
     <details class="report-options"><summary>More options</summary>
       <div class="secondary-actions">
-        <button id="openIssuePreview" type="button">Share report</button>
         <button id="undoReport" type="button">Undo</button>
         <button id="redoReport" type="button">Redo</button>
         <button id="copyMarkdown" type="button">Copy full report</button>
         <button id="downloadMarkdown" type="button">Export Markdown</button>
       </div>
-      <label><input id="includeAiExport" type="checkbox"> Include AI analysis in copy/export</label>
-      <label><input id="includeTechnicalZip" type="checkbox"> Bifoga även tekniskt ZIP-paket</label>
-    <details><summary>Application Insights (optional)</summary>
-      <label>Tenant ID <input id="telemetryTenantId" autocomplete="off"></label>
-      <label>Public client ID <input id="telemetryClientId" autocomplete="off"></label>
-      <label>Application Insights App ID <input id="telemetryApplicationId" autocomplete="off"></label>
-      <label>Expected environment <input id="telemetryEnvironment" autocomplete="off"></label>
-      <label><input id="telemetryEnabled" type="checkbox"> Enable optional enrichment</label>
-      <label>Window (minutes) <input id="telemetryWindow" type="number" min="1" max="30" value="5"></label>
-      <button id="saveTelemetryConfig" type="button">Save telemetry configuration</button>
-      <button id="testTelemetry" type="button">Test telemetry connection</button>
-      <button id="refreshTelemetry" type="button">Refresh telemetry for selected error</button>
-    </details>
-    <details><summary>AI technical analysis (optional)</summary>
-      <p data-i18n="technical.aiDisclosure">Explicit analysis sends a minimized, redacted technical evidence package
-        to your configured Entra-protected broker. Screenshots, raw events, raw
-        diagnostics, tenant/company/user/session IDs and raw telemetry are excluded.</p>
-      <label>Tenant ID <input id="aiTenantId" autocomplete="off"></label>
-      <label>Public client ID <input id="aiClientId" autocomplete="off"></label>
-      <label>Broker OAuth scope <input id="aiScope" autocomplete="off"></label>
-      <label>HTTPS broker URL <input id="aiBrokerUrl" type="url" autocomplete="off"></label>
-      <label>Provider model <input id="aiModel" autocomplete="off"></label>
-      <label><input id="aiEnabled" type="checkbox"> Organization policy enables AI analysis</label>
-      <label><input id="aiIncludeTelemetry" type="checkbox"> Include filtered telemetry events</label>
-      <label><input id="aiIncludeTelemetryMessages" type="checkbox"> Include redacted telemetry messages</label>
-      <label><input id="aiIncludeNotes" type="checkbox"> Include redacted human notes</label>
-      <label><input id="aiConsent" type="checkbox"> I understand that the selected evidence will leave this extension</label>
-      <button id="saveAiConfig" type="button">Save public broker configuration</button>
-      <button id="analyzeBugReport" type="button">Analyze technical evidence</button>
-      <button id="removeAiAnalysis" type="button">Remove AI analysis</button>
-    </details>
     </details>
     <span id="workspaceMessage" role="status"></span></header>
   <main id="technicalReport" aria-live="polite"></main>

@@ -45,39 +45,6 @@
     const workspace = globalThis.T9TechnicalReportWorkspace.create({
       report: loaded.report, errorEvidence: session.bcErrorEvidence, store
     });
-    const telemetryConfiguration = (await send({
-      type: "T9_GET_TELEMETRY_CONFIGURATION" })).configuration;
-    document.getElementById("telemetryTenantId").value = telemetryConfiguration.tenantId || "";
-    document.getElementById("telemetryClientId").value = telemetryConfiguration.clientId || "";
-    document.getElementById("telemetryApplicationId").value = telemetryConfiguration.applicationId || "";
-    document.getElementById("telemetryEnvironment").value = telemetryConfiguration.environmentName || "";
-    document.getElementById("telemetryEnabled").checked = Boolean(telemetryConfiguration.enabled);
-    const configurationFromForm = () => ({
-      enabled: document.getElementById("telemetryEnabled").checked,
-      tenantId: document.getElementById("telemetryTenantId").value,
-      clientId: document.getElementById("telemetryClientId").value,
-      applicationId: document.getElementById("telemetryApplicationId").value,
-      environmentName: document.getElementById("telemetryEnvironment").value
-    });
-    const aiConfiguration = (await send({ type: "T9_GET_AI_CONFIGURATION" })).configuration;
-    for (const [id, field] of [["aiTenantId", "tenantId"], ["aiClientId", "clientId"],
-      ["aiScope", "scope"], ["aiBrokerUrl", "brokerUrl"], ["aiModel", "model"]]) {
-      document.getElementById(id).value = aiConfiguration[field] || "";
-    }
-    document.getElementById("aiEnabled").checked = Boolean(aiConfiguration.enabled);
-    const aiConfigurationFromForm = () => ({
-      enabled: document.getElementById("aiEnabled").checked,
-      tenantId: document.getElementById("aiTenantId").value,
-      clientId: document.getElementById("aiClientId").value,
-      scope: document.getElementById("aiScope").value,
-      brokerUrl: document.getElementById("aiBrokerUrl").value,
-      model: document.getElementById("aiModel").value,
-      maxInputTokens: 12000 });
-    const aiPolicyFromForm = () => ({
-      includeTelemetry: document.getElementById("aiIncludeTelemetry").checked,
-      includeTelemetryMessages: document.getElementById(
-        "aiIncludeTelemetryMessages").checked,
-      includeHumanNotes: document.getElementById("aiIncludeNotes").checked });
     const issueConfiguration = (await send({
       type: "T9_GET_ISSUE_CONFIGURATION" })).configuration;
     const setValue = (id, value) => { const element = document.getElementById(id);
@@ -200,58 +167,14 @@
     document.getElementById("redoReport").addEventListener("click", workspace.redo);
     document.getElementById("copyMarkdown").addEventListener("click", async () => {
       await navigator.clipboard.writeText(await workspace.exportMarkdown({
-        includeAiAnalysis: document.getElementById("includeAiExport").checked }));
+        includeAiAnalysis: false }));
       message.textContent = t("technical.reportCopied");
     });
     document.getElementById("downloadMarkdown").addEventListener("click", async () => {
       await download(await workspace.exportMarkdown({ includeAiAnalysis:
-        document.getElementById("includeAiExport").checked }), `${bugReportId}.md`);
+        false }), `${bugReportId}.md`);
       message.textContent = t("technical.markdownExported");
     });
-    document.getElementById("saveTelemetryConfig").addEventListener("click", action(async () => {
-      await send({ type: "T9_SAVE_TELEMETRY_CONFIGURATION",
-        configuration: configurationFromForm() });
-      message.textContent = t("technical.telemetrySaved");
-    }));
-    document.getElementById("testTelemetry").addEventListener("click", action(async () => {
-      await send({ type: "T9_SAVE_TELEMETRY_CONFIGURATION",
-        configuration: configurationFromForm() });
-      const response = await send({ type: "T9_TEST_TELEMETRY_CONNECTION" });
-      message.textContent = tf("technical.telemetryConnection",
-        { status: response.result.status });
-    }));
-    document.getElementById("refreshTelemetry").addEventListener("click", action(async () => {
-      await workspace.flush();
-      const state = workspace.state().report;
-      const ids = state.businessCentralError?.errorEvidenceIds || [];
-      const errorEvidenceId = state.businessCentralError?.primaryErrorEvidenceId ||
-        (ids.length === 1 ? ids[0] : "");
-      if (!errorEvidenceId) throw new Error(t("technical.selectPrimaryError"));
-      message.textContent = t("technical.fetchingTelemetry");
-      await send({ type: "T9_REFRESH_BUG_REPORT_TELEMETRY", bugReportId,
-        errorEvidenceId, windowMinutes: Number(
-          document.getElementById("telemetryWindow").value) });
-      location.reload();
-    }));
-    document.getElementById("saveAiConfig").addEventListener("click", action(async () => {
-      const configuration = aiConfigurationFromForm();
-      if (configuration.enabled) await requestBrokerPermission(configuration);
-      await send({ type: "T9_SAVE_AI_CONFIGURATION", configuration });
-      message.textContent = t("technical.aiSaved");
-    }));
-    document.getElementById("analyzeBugReport").addEventListener("click", action(async () => {
-      if (!document.getElementById("aiConsent").checked) {
-        throw new Error(t("technical.aiConsent"));
-      }
-      await workspace.flush();
-      message.textContent = t("technical.sendingAi");
-      await send({ type: "T9_ANALYZE_BUG_REPORT", bugReportId,
-        policy: aiPolicyFromForm() }); location.reload();
-    }));
-    document.getElementById("removeAiAnalysis").addEventListener("click", action(async () => {
-      await send({ type: "T9_REMOVE_BUG_REPORT_AI_ANALYSIS", bugReportId });
-      location.reload();
-    }));
     let issuePreviewState = null;
     async function generateIssuePreview() {
       await workspace.flush();
@@ -302,10 +225,6 @@
         : globalThis.T9UiI18n.translateStaticText("Download report package",
           currentUiLocale);
     }
-    document.getElementById("openIssuePreview").addEventListener("click", action(async () => {
-      updateShareUi(); document.getElementById("issuePreview").showModal();
-      await generateIssuePreview();
-    }));
     document.getElementById("issueProvider").addEventListener("change", action(async () => {
       issuePreviewState = null; updateShareUi(); await generateIssuePreview();
     }));
@@ -367,7 +286,7 @@
       const pdf = await globalThis.T9BugReportPdf.create(issuePreviewState.issuePackage,
         selectedImages);
       const pdfBase64 = globalThis.T9BugReportPdf.base64(pdf.bytes);
-      const includeTechnicalPackage = document.getElementById("includeTechnicalZip").checked;
+      const includeTechnicalPackage = false;
       const attachments = [{ fileName: "felrapport.pdf", mediaType: "application/pdf", base64: pdfBase64 }];
       if (includeTechnicalPackage) attachments.push({ fileName: "tekniskt-paket.zip", mediaType: "application/zip",
         base64: globalThis.T9BugReportPdf.base64(await globalThis.T9BugReportPdf.technicalZip(offline)) });

@@ -62,14 +62,15 @@ assert.match(background, /createAndOpenBugReport\(session\.id, message\.name\)/)
 assert.match(background, /technical-report\.html\?bugReportId=.*new=1/);
 assert.match(reportService, /Reported Business Central problem/);
 assert.match(reportService, /Rapporterat problem i Business Central/);
-assert.match(report, /Application Insights \(optional\)/);
-assert.match(report, /AI technical analysis \(optional\)/);
+assert.doesNotMatch(report, /Application Insights \(optional\)/);
+assert.doesNotMatch(report, /AI technical analysis \(optional\)/);
 assert.match(report, /class="primary-actions"[\s\S]*id="emailReport"[\s\S]*id="exportPdf"[\s\S]*id="closeReport"/);
 assert.doesNotMatch(report, /id="saveReport"/);
 assert.match(report, /<details class="report-options"><summary>More options<\/summary>/);
 assert.doesNotMatch(report, /<details class="report-options" open/);
 assert.match(report, /Share bug report/);
-assert.match(report, /id="openIssuePreview"[^>]*>Share report<\/button>/);
+assert.doesNotMatch(report, /id="openIssuePreview"/);
+assert.doesNotMatch(report, /id="includeAiExport"|id="includeTechnicalZip"/);
 assert.match(report, /id="emailReport"[^>]*>E-posta PDF<\/button>/);
 assert.match(report, /src="bug-report\/email-draft\.js"/);
 assert.match(report, /<details class="share-options"><summary>Content and settings<\/summary>/);
