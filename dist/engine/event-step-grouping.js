@@ -11,7 +11,7 @@
 ) {
   "use strict";
   const SCHEMA_VERSION = 1;
-  const GROUPING_VERSION = "1.22.0";
+  const GROUPING_VERSION = "1.23.0";
   const CAPTURE_PACKET_VERSION = "1.6.0";
   const RESULT_VERIFICATION_VERSION = "1.2.0";
   const cache = new WeakMap();
@@ -242,6 +242,8 @@
     const scrollCommand = /^(?:rulla|scroll)(?:\s+(?:åt|to\s+the))?\s+(?:höger|vänster|upp|ned|ner|right|left|up|down)\.?$/iu.test(caption);
     const displayCommand = /^(?:visa resten|show more|show less|visa mindre|visa sekundära åtgärder|show secondary actions)\.?$/iu.test(caption);
     const control = event.controlIdentification || {};
+    const closeCommand = event.rawEventType === "dialog-close" ||
+      control.controlType === "dialogClose" || /^(?:stäng|close|dismiss)\.?$/iu.test(caption);
     const sectionToggle = control.controlType === "sectionToggle" ||
       (event.rawEventType === "click" && /^(?:vikt|weight)\.?$/iu.test(caption) &&
         !control.fieldId && !event.value?.normalized &&
@@ -249,7 +251,7 @@
       ((event.uiHierarchy || []).some(item => item.type === "fastTab" &&
         item.caption && item.caption === caption) &&
         ["button", "unknownInteractiveControl", "interactiveSurface"].includes(control.controlType));
-    return scrollCommand || ((displayCommand || sectionToggle) && !isCommit(event.kind)) || ["focus-transition", "key-command"].includes(
+    return scrollCommand || ((displayCommand || sectionToggle || closeCommand) && !isCommit(event.kind)) || ["focus-transition", "key-command"].includes(
     event.kind
   ) || ["scroll", "mousemove", "mouseover", "pointermove"].includes(
     event.rawEventType

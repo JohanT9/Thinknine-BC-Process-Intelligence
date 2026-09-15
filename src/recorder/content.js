@@ -726,7 +726,10 @@
     return {
       role: role || element?.tagName?.toLowerCase() || "",
       controlType: element?.tagName?.toLowerCase() || "",
-      controlKind: element?.getAttribute?.("aria-expanded") != null &&
+      controlKind: dialog &&
+        ( /^(?:stäng|close|dismiss)$/iu.test(String(ariaLabel || title || "").trim()) ||
+          /(?:^|\s)(?:dialog-close|close-button|close-icon)(?:\s|$)/i.test(String(element?.className || "")) )
+        ? "dialogClose" : element?.getAttribute?.("aria-expanded") != null &&
         !element?.getAttribute?.("aria-haspopup") &&
         (role === "heading" || /fasttab|section-header/i.test(String(element?.className || "")))
         ? "sectionToggle" : undefined,

@@ -16,6 +16,8 @@ const events = [
 ];
 
 const filtered = noise.filter(events);
+assert.strictEqual(noise.isNoise({ type: "click", label: "Stäng" }), true);
+assert.strictEqual(noise.isNoise({ type: "click", label: "Spara och stäng" }), false);
 assert.strictEqual(noise.isNoise({ type: "click", label: "Visa sekundära åtgärder" }), true);
 assert.strictEqual(noise.isNoise({ type: "click", label: "Show secondary actions" }), true);
 assert.strictEqual(noise.isNoise({ type: "click", label: "Manuell vikt" }), false);

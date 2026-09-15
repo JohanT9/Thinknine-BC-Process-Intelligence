@@ -30,7 +30,13 @@ const quantity = run([
     value: { normalized: "500" }, screenshotAssetId: "shot-2" })
 ]);
 assert.strictEqual(quantity.schemaVersion, 1);
-assert.strictEqual(quantity.groupingVersion, "1.22.0");
+assert.strictEqual(quantity.groupingVersion, "1.23.0");
+assert.strictEqual(run([event("close1", "action-invocation", {
+  actionIdentification: { caption: "Stäng" }
+})]).groups.length, 0);
+assert.strictEqual(run([event("saveclose1", "action-invocation", {
+  actionIdentification: { caption: "Spara och stäng" }
+})]).groups.length, 1);
 const secondaryMenu = run([
   event("menu1", "action-invocation", {
     actionIdentification: { caption: "Visa sekundära åtgärder" }

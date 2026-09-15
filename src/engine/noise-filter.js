@@ -6,6 +6,7 @@
 })(typeof globalThis !== "undefined" ? globalThis : this, function () {
   const ignoredTypes = new Set(["pointer", "page-state", "hover", "scroll"]);
   const ignoredCaptions = [
+    /^(?:stäng|close|dismiss)\.?$/i,
     /^(?:visa resten|show more|show less|visa mindre|visa sekundära åtgärder|show secondary actions)\.?$/i,
     /^(?:rulla|scroll)(?:\s+(?:åt|to\s+the))?\s+(?:höger|vänster|upp|ned|ner|right|left|up|down)\.?$/i,
     /^bakåt$/i,
@@ -23,7 +24,8 @@
 
   function isNoise(event) {
     if (!event) return true;
-    if (ignoredTypes.has(event.type)) return true;
+    if (ignoredTypes.has(event.type) || event.type === "dialog-close") return true;
+    if (event.type === "click" && event.controlKind === "dialogClose") return true;
     if (["click", "action", "navigation"].includes(event.type) &&
         event.controlKind === "sectionToggle") return true;
 
