@@ -12,6 +12,11 @@ for (const severity of ["", "1", "Low", "Medium", "High", "Critical"]) {
   const expected = severity && severity !== "1"
     ? `Fel vid registrering - Nivå ${severity}` : "Fel vid registrering";
   assert.strictEqual(result.subject, expected);
+  const importance = severity === "Critical" ? "high" : severity === "Low" ? "low" : "normal";
+  const priority = severity === "Critical" ? "1" : severity === "Low" ? "5" : "3";
+  assert(result.content.includes(`\r\nImportance: ${importance}\r\n`));
+  assert(result.content.includes(`\r\nX-Priority: ${priority}\r\n`));
+  assert(result.content.includes(`\r\nX-MSMail-Priority: ${importance[0].toUpperCase()}${importance.slice(1)}\r\n`));
   const encodedSubject = result.content.match(/Subject: =\?UTF-8\?B\?([^?]+)\?=/)[1];
   assert.strictEqual(Buffer.from(encodedSubject, "base64").toString("utf8"), expected);
 }

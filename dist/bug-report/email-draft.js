@@ -28,6 +28,8 @@
     const severity = ["Low", "Medium", "High", "Critical"].find(value =>
       value.toLowerCase() === cleanHeader(issuePackage?.summary?.severity).toLowerCase());
     const subject = severity ? `${title} - ${swedish ? "Nivå" : "Severity"} ${severity}` : title;
+    const importance = severity === "Critical" ? "high" : severity === "Low" ? "low" : "normal";
+    const priority = importance === "high" ? "1" : importance === "low" ? "5" : "3";
     const attachmentName = `${safeName(title)}-felrapport.json`;
     const boundary = `=_BC_Process_Studio_${safeName(issuePackage?.packageId)}`;
     const body = swedish
@@ -45,6 +47,7 @@
     });
     const content = ["MIME-Version: 1.0", "X-Unsent: 1", `To: ${to}`,
       `Subject: =?UTF-8?B?${base64(subject)}?=`,
+      `Importance: ${importance}`, `X-Priority: ${priority}`, `X-MSMail-Priority: ${importance[0].toUpperCase()}${importance.slice(1)}`,
       `Content-Type: multipart/mixed; boundary="${boundary}"`, "",
       `--${boundary}`, "Content-Type: text/plain; charset=UTF-8",
       "Content-Transfer-Encoding: base64", "", lines(base64(body)),
