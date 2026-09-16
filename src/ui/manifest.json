@@ -15,6 +15,7 @@
     "webNavigation"
   ],
   "host_permissions": [
+    "https://thinknine-bc-license-gparapcbbzgkgfha.swedencentral-01.azurewebsites.net/*",
     "https://businesscentral.dynamics.com/*",
     "https://*.businesscentral.dynamics.com/*",
     "https://login.microsoftonline.com/*",

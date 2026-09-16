@@ -114,14 +114,17 @@ const styles = await archive.file("word/styles.xml").async("string");
 
 for (const marker of [
   'w:w="86%"',
-  'w:color="38A3D1"',
-  'w:fill="EAF2F8"',
-  'w:fill="F7FAFC"',
+  'w:color="007A82"',
+  'w:fill="F0F7F7"',
+  'w:fill="FFFFFF"',
   'w:fill="EDF6FB"',
   'w:sz="12"',
   '<w:cantSplit/>'
 ]) assert.ok(xml.includes(marker), marker);
-assert.ok(styles.includes("Aptos"));
+assert.ok(styles.includes("Segoe UI"));
+const header = await archive.file("word/header1.xml").async("string");
+assert.ok(header.includes('w:fill="05474F"'));
+assert.ok(header.includes("BC Process Studio  |  Business Central"));
 assert.ok(xml.includes("Kommentar: "));
 assert.ok(xml.includes("Kontrollera att leveransdatumet är rimligt."));
 assert.strictEqual(JSON.stringify(prepared.semanticDocument), documentBefore);

@@ -74,6 +74,18 @@ dialog{width:calc(100% - 24px);max-width:366px;max-height:calc(100dvh - 16px);ov
 </details>
 <p id="message" class="message" role="status" aria-live="polite"
   aria-atomic="true"></p>
+<dialog id="trialDialog" aria-labelledby="trialDialogTitle" aria-describedby="trialDialogHelp">
+  <form id="trialForm">
+    <h2 id="trialDialogTitle">Begär 30 dagars testlicens</h2>
+    <p id="trialDialogHelp" class="hint">Testperioden kan bara användas en gång per tenant. E-postadressen visas för Thinknine i licensadministrationen och används för kontakt om licensen. Adressen är inte verifierad.</p>
+    <label for="trialEmail">E-postadress</label>
+    <input id="trialEmail" type="email" required maxlength="254" autocomplete="email">
+    <menu>
+      <button id="cancelTrial" type="button" class="debug">Avbryt</button>
+      <button type="submit" class="primary">Starta testperiod</button>
+    </menu>
+  </form>
+</dialog>
 <dialog id="nameDialog" aria-labelledby="nameDialogTitle"
   aria-describedby="nameDialogHelp documentLanguageHelp">
   <form id="nameForm" method="dialog">

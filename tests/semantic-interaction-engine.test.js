@@ -39,6 +39,29 @@ const embeddedCustomerNumber = only([{
   instruction: 'Välj "Nr, sorterade i Stigande order Välj posten "905"".'
 }], "SelectCustomer", "Välj kund **905**.");
 assert.strictEqual(embeddedCustomerNumber.selectedValue, "905");
+const englishSortedRecord = only([{
+  taskId: "sales-order-row", taskType: "RunAction",
+  pageCaption: "Sales Orders",
+  actionCaption: 'No., sorted in Ascending order Open record "SO100049".',
+  instruction: 'Välj No., sorted in Ascending order Open record "SO100049".'
+}], "SelectRecord", "Välj försäljningsordern **SO100049**.");
+assert.strictEqual(englishSortedRecord.selectedValue, "SO100049");
+assert.strictEqual(englishSortedRecord.rawInteractions[0].actionCaption,
+  'No., sorted in Ascending order Open record "SO100049".');
+const swedishSortedRecord = only([{
+  taskId: "sales-order-row-sv", taskType: "Select",
+  actionCaption: 'Nr, sorterade i Stigande ordning Öppna posten "SO100050".'
+}], "SelectRecord", "Välj försäljningsordern **SO100050**.");
+const unknownSortedRecord = only([{
+  taskId: "unknown-row", taskType: "RunAction",
+  actionCaption: 'No., sorted in Ascending order Open record "X100050".'
+}], "SelectRecord", "Välj posten **X100050**.");
+assert.strictEqual(unknownSortedRecord.selectedValue, "X100050");
+const purchaseOrderContext = only([{
+  taskId: "purchase-order-row", taskType: "RunAction",
+  identifications: [{ page: { caption: "Purchase Orders" } }],
+  actionCaption: 'No., sorted in Descending order Open record "PO100004".'
+}], "SelectRecord", "Välj inköpsordern **PO100004**.");
 const itemNumberEntry = only([{
   taskId: "item-search", taskType: "EnterFieldValue",
   fieldCaption: "Sortera efter Nr", instructionValue: "30043",

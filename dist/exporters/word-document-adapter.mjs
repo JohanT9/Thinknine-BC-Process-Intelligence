@@ -553,15 +553,20 @@ function renderComponent(component, mediaAssets, context = {}) {
 
 function wordHeader(component) {
   if (!component) return undefined;
+  const branded = Boolean(component.appearance.fillColor);
   return new Header({ children: [new Paragraph({
-    alignment: AlignmentType.RIGHT,
+    alignment: branded ? AlignmentType.LEFT : AlignmentType.RIGHT,
+    spacing: branded ? { before: 160, after: 200 } : undefined,
+    shading: branded ? { type: ShadingType.CLEAR,
+      fill: color(component.appearance.fillColor) } : undefined,
     border: { bottom: {
       style: BorderStyle.SINGLE,
       size: 6,
       color: color(component.appearance.borderColor, "0F4C81"),
     } },
     children: [new TextRun({
-      text: component.content.text,
+      text: branded ? `BC Process Studio  |  Business Central  |  ${component.content.text}` : component.content.text,
+      bold: branded,
       color: color(component.appearance.textColor, "5F6B76"),
       size: halfPoints(component.appearance.fontSize, 9),
     })],

@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="sv">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>BC Process Studio licensadministration</title>
+  <link rel="stylesheet" href="/admin/admin.css">
+  <script src="/admin/admin.js" defer></script>
+</head>
+<body>
+  <header><strong>BC Process Studio</strong><span>Licensadministration</span></header>
+  <main>
+    <h1>Tenantlicenser</h1>
+    <p id="message" role="status" aria-live="polite"></p>
+    <section id="login">
+      <h2>Administratörsåtkomst</h2>
+      <p>Ange din separata adminnyckel. Den sparas inte i webbläsaren. Använd endast HTTPS.</p>
+      <form id="loginForm">
+        <label for="adminKey">Adminnyckel</label>
+        <input id="adminKey" type="password" autocomplete="off" required maxlength="64">
+        <button type="submit">Logga in</button>
+      </form>
+    </section>
+    <div id="workspace" hidden>
+      <div class="toolbar"><button id="refresh" type="button">Uppdatera</button><button id="logout" class="secondary" type="button">Logga ut</button></div>
+      <p>Spärrar och ändringar börjar gälla vid nästa licenskontroll. Godkännanden kan vara cachade i högst en timme.</p>
+      <section>
+        <h2>Licenser</h2>
+        <div class="table-scroll"><table><thead><tr><th>Namn</th><th>Tenant-ID</th><th>Typ</th><th>E-post (ej verifierad)</th><th>Status</th><th>Slutdatum UTC</th><th>Åtgärd</th></tr></thead><tbody id="tenants"></tbody></table></div>
+        <p id="empty" hidden>Inga tenantlicenser finns ännu.</p>
+      </section>
+      <section>
+        <h2 id="editorTitle">Lägg till eller ändra tenant</h2>
+        <form id="tenantForm">
+          <label for="tenantId">Tenant-ID</label><input id="tenantId" required maxlength="36" spellcheck="false">
+          <label for="tenantName">Namn för administrationen</label><input id="tenantName" maxlength="100">
+          <label for="contactEmail">Kontaktadress</label><input id="contactEmail" type="email" maxlength="254" autocomplete="off">
+          <label for="expiresAt">Slutdatum och tid i UTC</label><input id="expiresAt" type="datetime-local" step="1" required>
+          <label class="check"><input id="enabled" type="checkbox"> Licensen är aktiverad</label>
+          <div class="toolbar"><button id="save" type="submit">Spara licens</button><button id="newTenant" type="button" class="secondary">Ny tenant</button></div>
+        </form>
+      </section>
+      <section>
+        <h2>Registrerade installationer</h2>
+        <p id="registrationCount"></p>
+        <div class="table-scroll"><table><thead><tr><th>Registrerad UTC</th><th>Tenant-ID</th><th>Installations-ID</th><th>Version</th></tr></thead><tbody id="registrations"></tbody></table></div>
+      </section>
+    </div>
+  </main>
+</body>
+</html>

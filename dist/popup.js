@@ -182,6 +182,36 @@ async function startRecording(recordingPurpose) {
     if (!tab?.url?.includes("businesscentral.dynamics.com")) {
       throw new Error(t("recorder.openBcFirst"));
     }
+    const licenseInfo = await send({ type: "T9_LICENSE_INFORMATION" });
+    if (!licenseInfo?.ok) throw new Error(licenseInfo?.error || "License configuration unavailable");
+    if (licenseInfo.information.requiresAcceptance) {
+      const sv = currentUiLocale === "sv-SE";
+      const notice = sv
+        ? "Tenantlicens för BC Process Studio\n\nVid licenskontroll skickas ett slumpmässigt installations-ID, tenant-ID och tilläggsversion till Thinknines licenstjänst. Första registreringen sparas med tidpunkt tills Thinknine raderar den. Om du själv begär en testlicens skickas även den e-postadress du anger och den visas i licensadministrationen. Inga inspelningar, bilder, företagsnamn eller affärsdata skickas. Azure kan även logga tekniska anslutningsuppgifter.\n\nKontroll sker vid inspelning och godkänt besked cachas i högst en timme. Utan aktiv licens eller kontakt efter cacheutgång kan nya inspelningar inte startas. Befintliga dokument finns kvar.\n\nTjänst: "
+        : "BC Process Studio tenant licensing\n\nLicense checks send a random installation ID, tenant ID and extension version to Thinknine. First registration is retained with its timestamp until Thinknine deletes it. If you request a trial, the email address you enter is also sent and shown in license administration. No recordings, images, company names or business data are sent. Azure may also log technical connection information.\n\nChecks occur during recording; approvals are cached for at most one hour. Without an active license or contact after cache expiry, new recordings cannot start. Existing documents remain available.\n\nService: ";
+      if (!globalThis.confirm(notice + licenseInfo.information.endpoint +
+          (sv ? "\n\nGodkänn registreringen och fortsätt?" : "\n\nAccept registration and continue?"))) {
+        throw new Error(sv ? "Licensregistreringen avbröts. Inga uppgifter skickades." : "Registration cancelled. No data was sent.");
+      }
+      const accepted = await send({ type: "T9_ACCEPT_LICENSE_NOTICE" });
+      if (!accepted?.ok) throw new Error(accepted?.error || "License registration failed");
+    }
+    const check = await send({ type: "T9_LICENSE_CHECK", tabId: tab.id }, 10000);
+    if (!check?.ok) throw new Error(check?.error || "License check failed");
+    if (!check.license.allowed && check.license.trialAvailable) {
+      const email = await requestTrialEmail();
+      if (!email) throw new Error(currentUiLocale === "sv-SE"
+        ? "Begäran om testlicens avbröts." : "Trial request cancelled.");
+      const trial = await send({ type: "T9_REQUEST_TRIAL", tabId: tab.id, email }, 10000);
+      if (!trial?.ok || !trial.license?.allowed) {
+        throw new Error(trial?.error || (currentUiLocale === "sv-SE"
+          ? "Testlicensen kunde inte skapas." : "The trial could not be created."));
+      }
+    } else if (!check.license.allowed) {
+      throw new Error(currentUiLocale === "sv-SE"
+        ? "Denna tenant saknar en aktiv licens och kan inte starta en ny testperiod."
+        : "This tenant has no active license and cannot start a new trial.");
+    }
     await ensureContentScript(tab);
     showMessage(t("recorder.connectionWorks"));
 
@@ -192,7 +222,7 @@ async function startRecording(recordingPurpose) {
         ? "Business Central-fel"
         : "Business Central-process",
       purpose: ""
-    }, 6000);
+    }, 15000);
     if (!response?.ok) {
       throw new Error(response?.error || t("recorder.startFailed"));
     }
@@ -204,6 +234,30 @@ async function startRecording(recordingPurpose) {
   } finally {
     setStarting(false);
   }
+}
+
+function requestTrialEmail() {
+  const dialog = $("trialDialog");
+  const form = $("trialForm");
+  const email = $("trialEmail");
+  email.value = "";
+  dialog.showModal();
+  setTimeout(() => email.focus(), 0);
+  return new Promise(resolve => {
+    const finish = value => {
+      form.removeEventListener("submit", submit);
+      $("cancelTrial").removeEventListener("click", cancel);
+      dialog.removeEventListener("cancel", cancel);
+      if (dialog.open) dialog.close();
+      resolve(value);
+    };
+    const submit = event => { event.preventDefault();
+      if (form.reportValidity()) finish(email.value.trim()); };
+    const cancel = event => { event.preventDefault(); finish(""); };
+    form.addEventListener("submit", submit);
+    $("cancelTrial").addEventListener("click", cancel);
+    dialog.addEventListener("cancel", cancel);
+  });
 }
 
 $("startProcess").addEventListener("click", () => startRecording("documentation"));

@@ -1,6 +1,8 @@
 importScripts("engine/language-registry.js");
 importScripts("engine/storage-keys.js");
 importScripts("engine/business-central-url-context.js");
+importScripts("engine/tenant-license.js");
+importScripts("engine/tenant-license-config.js");
 importScripts("engine/page-identity.js");
 importScripts("engine/page-identification-engine.js");
 importScripts("engine/process-taxonomy-schema.js");
@@ -59,6 +61,10 @@ importScripts("bug-report/github-issue-adapter.js");
 importScripts("document/document-library.js");
 
 const VERSION = "4.7.0";
+const tenantLicense = globalThis.T9TenantLicense.create({
+  storage: chrome.storage.local, fetcher: (...args) => fetch(...args),
+  config: globalThis.T9TenantLicenseConfig, version: VERSION
+});
 const windowsSharePorts = new Set();
 const pageKnowledgePacksReady = globalThis.T9PageIdentificationEngine
   .loadKnowledgePacks({
@@ -739,6 +745,7 @@ async function recordEvent(rawEvent, captureContext = {}) {
   const acceptedState = await getState();
   if (!acceptedState.recording || !acceptedState.sessionId ||
       stoppingSessionId === acceptedState.sessionId) return;
+  await requireActiveTenantLicense(acceptedState);
 
   const operation = writeQueue.then(async () => {
     const recordingId = acceptedState.sessionId;
@@ -967,6 +974,7 @@ async function getBcErrorEvidenceForRecording(recordingId) {
 
 async function captureBcErrorEvidence(input, sender) {
   const state = await getState();
+  if (state.recording) await requireActiveTenantLicense(state);
   const session = state.sessionId ? await getSession(state.sessionId) : null;
   if (!state.recording || session?.recordingPurpose !== "bug-report") return null;
   const recording = await getCanonicalRecording(state.sessionId);
@@ -1200,7 +1208,19 @@ async function ensureContentScript(tabId) {
   return connected;
 }
 
+async function requireActiveTenantLicense(state) {
+  if (!globalThis.T9TenantLicenseConfig.enabled || !state.recording) return;
+  const session = await getSession(state.sessionId);
+  const tab = await chrome.tabs.get(state.tabId);
+  const currentTenant = globalThis.T9TenantLicense.tenantFromUrl(tab.url);
+  if (!currentTenant || currentTenant !== session?.licenseTenantId) {
+    throw new Error("Tenant har ändrats. Stoppa inspelningen och starta en ny i rätt tenant.");
+  }
+  await tenantLicense.requireLicense(tab.url);
+}
+
 async function startSession(message, tabId) {
+  await tenantLicense.requireLicense((await chrome.tabs.get(tabId)).url);
   const previousState = await getState();
   if (previousState.recording || previousState.sessionId) {
     throw new Error("En inspelning är redan aktiv. Stoppa eller avbryt den innan en ny startas.");
@@ -1264,6 +1284,7 @@ async function startSession(message, tabId) {
 
   const session = {
     id,
+    licenseTenantId: globalThis.T9TenantLicense.tenantFromUrl(recordingTab.url),
     name: message.name || "Business Central-process",
     purpose: message.purpose || "",
     recordingPurpose: globalThis.T9CanonicalRecording
@@ -1627,6 +1648,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
 
       case "T9_CAPTURE_BEFORE_ACTION": {
         const preActionState = await getState();
+        if (preActionState.recording) await requireActiveTenantLicense(preActionState);
         const preActionTabId = sender.tab?.id;
         const preActionSession = preActionState.sessionId
           ? await getSession(preActionState.sessionId) : null;
@@ -1687,6 +1709,35 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
         break;
       }
 
+      case "T9_LICENSE_INFORMATION": {
+        sendResponse({ ok: true, information: await tenantLicense.information() });
+        break;
+      }
+      case "T9_ACCEPT_LICENSE_NOTICE": {
+        if (sender.url !== chrome.runtime.getURL("popup.html")) {
+          throw new Error("Licensregistrering måste bekräftas i tilläggets popup.");
+        }
+        await tenantLicense.acceptNotice();
+        sendResponse({ ok: true });
+        break;
+      }
+      case "T9_LICENSE_CHECK": {
+        if (sender.url !== chrome.runtime.getURL("popup.html")) {
+          throw new Error("Licenskontroll får bara startas från tilläggets popup.");
+        }
+        const tab = await chrome.tabs.get(message.tabId);
+        sendResponse({ ok: true, license: await tenantLicense.check(tab.url) });
+        break;
+      }
+      case "T9_REQUEST_TRIAL": {
+        if (sender.url !== chrome.runtime.getURL("popup.html")) {
+          throw new Error("Testlicens får bara begäras från tilläggets popup.");
+        }
+        const tab = await chrome.tabs.get(message.tabId);
+        sendResponse({ ok: true,
+          license: await tenantLicense.requestTrial(tab.url, message.email) });
+        break;
+      }
       case "T9_START": {
         const tabId = message.tabId || sender.tab?.id;
         if (!tabId) throw new Error("Ingen Business Central-flik angavs.");

@@ -228,39 +228,40 @@
     description: "BC Process Studio document appearance.",
     extends: "base",
     colors: {
-      primary: "#0f4c81",
-      secondary: "#5f6b76",
-      note: "#dbeafe"
+      primary: "#007a82",
+      secondary: "#596673",
+      text: "#172b45",
+      note: "#f0f7f7"
     },
     spacing: { page: 10, section: 9, paragraph: 5, component: 7 },
     typography: {
-      title: { family: "Aptos", size: 26, weight: 700, color: "{colors.primary}" },
-      heading1: { family: "Aptos", size: 16, weight: 700, color: "{colors.primary}" },
-      heading2: { family: "Aptos", size: 13, weight: 700, color: "#1e5e8c" },
-      body: { family: "Aptos", size: 11, weight: 400, color: "{colors.text}" },
-      caption: { family: "Aptos", size: 9, weight: 400, color: "{colors.muted}" }
+      title: { family: "Segoe UI", size: 26, weight: 700, color: "#172b45" },
+      heading1: { family: "Segoe UI", size: 16, weight: 700, color: "{colors.primary}" },
+      heading2: { family: "Segoe UI", size: 13, weight: 700, color: "{colors.primary}" },
+      body: { family: "Segoe UI", size: 11, weight: 400, color: "{colors.text}" },
+      caption: { family: "Segoe UI", size: 9, weight: 400, color: "{colors.muted}" }
     },
     components: {
       document: {
-        fontFamily: "Aptos", fontSize: 10.5, lineHeight: 1.22,
+        fontFamily: "Segoe UI", fontSize: 11, lineHeight: 1.22,
         paragraphAfter: 6,
         margins: { top: 18, right: 18, bottom: 18, left: 20,
           header: 9, footer: 9, unit: "mm" }
       },
       header: {
-        textColor: "#5f6b76", borderColor: "#0f4c81", fontSize: 8.5
+        textColor: "#ffffff", borderColor: "#05474f", fillColor: "#05474f", fontSize: 9
       },
       footer: {
-        textColor: "#5f6b76", borderColor: "#b8c2cc", fontSize: 8.5
+        textColor: "#596673", borderColor: "#ccdee0", fontSize: 9
       },
       cover: {
-        brandText: "BC PROCESS STUDIO",
+        brandText: "BC Process Studio",
         documentType: "Arbetsinstruktion",
         subtitle: "Business Central Process Documentation",
-        accentColor: "#0f4c81",
+        accentColor: "#172b45",
         mutedColor: "#5f6b76",
-        dividerColor: "#38a3d1",
-        dividerSize: 2,
+        dividerColor: "#007a82",
+        dividerSize: 0,
         brandSize: 11,
         documentTypeSize: 14,
         titleSize: 30,
@@ -272,7 +273,7 @@
       metadataTable: {
         width: 86,
         labelWidth: 34,
-        labelFill: "#eaf2f8",
+        labelFill: "#f0f7f7",
         valueFill: "#ffffff",
         borderColor: "#b8c2cc",
         insideBorderColor: "#d5dce3",
@@ -281,15 +282,15 @@
         style: "compact"
       },
       heading: {
-        dividerColor: "#38a3d1",
+        dividerColor: "#007a82",
         dividerSize: 8,
         before: 14,
         after: 7
       },
       step: {
-        headingColor: "#0f4c81",
-        headingFill: "#eaf2f8",
-        headingBorderColor: "#38a3d1",
+        headingColor: "#007a82",
+        headingFill: "#f0f7f7",
+        headingBorderColor: "#007a82",
         headingStyle: "band",
         instructionSize: 11,
         before: 10,
@@ -300,8 +301,8 @@
         maxHeight: 455,
         supportingMaxWidth: 600,
         presentationStyle: "framed",
-        borderColor: "#c8d5df",
-        backgroundColor: "#f7fafc",
+        borderColor: "#ccdee0",
+        backgroundColor: "#ffffff",
         borderSize: 4,
         cellPadding: 5,
         before: 7,

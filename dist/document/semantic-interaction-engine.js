@@ -5,7 +5,7 @@
   if (typeof module === "object" && module.exports) module.exports = api;
   root.T9SemanticInteractionEngine = api;
 })(typeof globalThis !== "undefined" ? globalThis : this, function (sourceReference) {
-  const ENGINE_VERSION = "1.2.0";
+  const ENGINE_VERSION = "1.3.0";
   const documentCache = new WeakMap();
 
   function clone(value) {
@@ -47,8 +47,8 @@
       value !== null && value !== ""))];
   }
 
-  const RECORD_SELECTION = /^(?:välj posten|select record)\s+["“]?(.+?)["”]?\.?$/iu;
-  const EMBEDDED_RECORD_SELECTION = /(?:välj posten|select record)\s+["“]([^"”]+)["”]/iu;
+  const RECORD_SELECTION = /^(?:välj posten|select record|open record|öppna posten?)\s+["“]?(.+?)["”]?\.?$/iu;
+  const EMBEDDED_RECORD_SELECTION = /(?:välj posten|select record|open record|öppna posten?)\s+(?:["“]([^"”]+)["”]|([^"“”]+?)(?:\.|$))/iu;
   const LOOKUP = /(?:välj|select)(?: ett)? värde för|select a value for/iu;
 
   function selectedRecordValue(value) {
@@ -58,7 +58,7 @@
       if (match) return match[1].replace(/["“”]+$/gu, "").trim();
       const embedded = text(candidate).replace(/\*\*/gu, "")
         .match(EMBEDDED_RECORD_SELECTION);
-      if (embedded) return embedded[1].trim();
+      if (embedded) return (embedded[1] || embedded[2]).replace(/["“”]+$/gu, "").trim();
     }
     return "";
   }
@@ -407,6 +407,62 @@
           actionType: "EnterItemNumber",
           displayText: `Ange __${selectedValue}__ i **Artikel Nr**.`,
           selectedValue, targetField: "Artikel Nr"
+        }) };
+      }
+    };
+    return deepFreeze(rule);
+  }
+
+  function selectedRecordNoun(value, selectedValue) {
+    const pageContext = [value?.pageCaption, value?.pageContext?.pageCaption,
+      value?.pageContext?.caption, value?.pageIdentification?.pageCaption,
+      value?.pageIdentification?.caption, value?.capturePacket?.pageCaption,
+      value?.capturePacket?.pageContext?.pageCaption,
+      value?.semanticActionModel?.pageCaption,
+      value?.semanticActionModel?.pageContext?.pageCaption,
+      ...(value?.identifications || []).map(item => item?.page?.caption),
+      ...(value?.semanticActionModel?.rawInteractions || [])
+        .flatMap(item => [item?.pageCaption, item?.pageContext?.pageCaption])]
+      .map(text).filter(Boolean).join(" ");
+    const types = [
+      [/^(?:sales orders?|försäljningsordrar|försäljningsorder)(?:\s+list)?$/iu,
+        "försäljningsordern"],
+      [/^(?:purchase orders?|inköpsordrar|inköpsorder)(?:\s+list)?$/iu,
+        "inköpsordern"],
+      [/^(?:sales invoices?|försäljningsfakturor|försäljningsfaktura)(?:\s+list)?$/iu,
+        "försäljningsfakturan"],
+      [/^(?:purchase invoices?|inköpsfakturor|inköpsfaktura)(?:\s+list)?$/iu,
+        "inköpsfakturan"]
+    ];
+    const contextual = types.find(([pattern]) => pattern.test(pageContext))?.[1];
+    if (contextual) return contextual;
+    // Standard document-number prefixes are a fallback only when page metadata
+    // was lost between capture and semantic regeneration.
+    if (/^SO\d+$/iu.test(text(selectedValue))) return "försäljningsordern";
+    if (/^PO\d+$/iu.test(text(selectedValue))) return "inköpsordern";
+    return "posten";
+  }
+
+  function sortedRecordSelectionRule() {
+    const sortingDescription = value =>
+      /(?:sorterade?\s+i|sorted\s+in)\s+(?:stigande|fallande|ascending|descending)(?:\s+order|\s+ordning)?/iu
+        .test(interactionText(value));
+    const rule = {
+      ruleId: "sorted-record-selection",
+      priority: 111,
+      match(context) {
+        const value = context.interactions[context.index];
+        return ["RunAction", "ClickAction", "Select"].includes(value?.taskType) &&
+          sortingDescription(value) && Boolean(selectedRecordValue(value));
+      },
+      consolidate(context) {
+        const value = context.interactions[context.index];
+        const selectedValue = selectedRecordValue(value);
+        const noun = selectedRecordNoun(value, selectedValue);
+        return { consumed: 1, action: action(rule, [value], {
+          actionType: "SelectRecord",
+          displayText: `Välj ${noun} **${selectedValue}**.`,
+          selectedValue
         }) };
       }
     };
@@ -816,6 +872,7 @@
   const DIMENSION = /dimension|dimensionsvärde|dimension value/iu;
 
   const BUILT_IN_RULES = deepFreeze([
+    sortedRecordSelectionRule(),
     purchaseManualPriceMenuPathRule(),
     salesPriceDiscountMenuPathRule(),
     manualPriceMenuPathRule(),
