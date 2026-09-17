@@ -5,6 +5,7 @@ const path = require("node:path");
 const { createService } = require("../services/licensing/server.js");
 const tenant = "20afb97e-bbca-4f0d-a72b-e4cbbcdd57fb";
 const unknown = "aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee";
+const otherInstallation = "bbbbbbbb-cccc-dddd-eeee-ffffffffffff";
 async function main() {
   const directory = await fs.mkdtemp(path.join(os.tmpdir(), "t9-license-service-"));
   const registry = path.join(directory, "tenants.json");
@@ -22,8 +23,10 @@ async function main() {
   try {
     assert.equal((await (await post(value)).json()).allowed, true);
     await Promise.all([post(value), post(value), post(value)]);
+    assert.equal((await (await post({ ...value,
+      installationId: otherInstallation })).json()).allowed, true);
     const records = await fs.readFile(path.join(directory, "registrations.jsonl"), "utf8");
-    assert.equal(records.trim().split("\n").length, 1);
+    assert.equal(records.trim().split("\n").length, 2);
     const unknownCheck = await (await post({ ...value, tenantId: unknown })).json();
     assert.equal(unknownCheck.allowed, false);
     assert.equal(unknownCheck.trialAvailable, true);

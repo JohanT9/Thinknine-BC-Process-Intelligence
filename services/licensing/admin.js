@@ -4,7 +4,8 @@ const crypto = require("node:crypto");
 const GUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/;
 const hash = value => crypto.createHash("sha256").update(value).digest();
 
-function createAdmin({ dataDirectory, registry, mutateRegistry, now, adminKey = "" }) {
+function createAdmin({ dataDirectory, registry, mutateRegistry, deleteTrialClaim,
+  now, adminKey = "" }) {
   if (adminKey && !/^[0-9a-f]{64}$/i.test(adminKey)) {
     throw new Error("LICENSE_ADMIN_KEY must be a random 64-character hexadecimal key.");
   }
@@ -67,7 +68,8 @@ function createAdmin({ dataDirectory, registry, mutateRegistry, now, adminKey = 
       }
       const saveTenant = request.url === "/admin/api/tenant" && request.method === "POST";
       const deleteTenant = request.url === "/admin/api/tenant" && request.method === "DELETE";
-      if (!saveTenant && !deleteTenant) {
+      const resetTenant = request.url === "/admin/api/tenant/reset" && request.method === "POST";
+      if (!saveTenant && !deleteTenant && !resetTenant) {
         return reply(405, { error: "method-not-allowed" });
       }
       if (request.headers["content-type"]?.split(";")[0].trim() !== "application/json") {
@@ -83,7 +85,7 @@ function createAdmin({ dataDirectory, registry, mutateRegistry, now, adminKey = 
       let value;
       try { value = JSON.parse(Buffer.concat(chunks).toString("utf8")); }
       catch { return reply(400, { error: "invalid-json" }); }
-      if (deleteTenant) {
+      if (deleteTenant || resetTenant) {
         if (!value || Array.isArray(value) ||
             Object.keys(value).sort().join(",") !== "revision,tenantId" ||
             !GUID.test(value.tenantId) || typeof value.revision !== "string" ||
@@ -97,15 +99,17 @@ function createAdmin({ dataDirectory, registry, mutateRegistry, now, adminKey = 
         });
         if (result.conflict) return reply(409, { error: "registry-changed" });
         if (result.missing) return reply(404, { error: "not-found" });
+        if (resetTenant) await deleteTrialClaim(value.tenantId);
         return reply(200, await snapshot());
       }
       if (!value || Array.isArray(value) ||
-          Object.keys(value).sort().join(",") !== "contactEmail,enabled,expiresAt,name,revision,tenantId" ||
+          Object.keys(value).sort().join(",") !== "contactEmail,enabled,expiresAt,licenseType,name,revision,tenantId" ||
           !GUID.test(value.tenantId) || typeof value.enabled !== "boolean" ||
           typeof value.name !== "string" || value.name.length > 100 ||
           /[\u0000-\u001f]/.test(value.name) ||
           typeof value.contactEmail !== "string" || value.contactEmail.length > 254 ||
           (value.contactEmail && !/^[^\s@<>]+@[^\s@<>]+\.[^\s@<>]+$/u.test(value.contactEmail)) ||
+          !["standard", "trial"].includes(value.licenseType) ||
           typeof value.revision !== "string" || !/^[0-9a-f]{64}$/.test(value.revision) ||
           typeof value.expiresAt !== "string" ||
           !/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d{3})?Z$/.test(value.expiresAt) ||
@@ -119,6 +123,7 @@ function createAdmin({ dataDirectory, registry, mutateRegistry, now, adminKey = 
         return { updated: { ...tenants, [value.tenantId]: {
           ...tenants[value.tenantId], name: value.name.trim(),
           contactEmail: value.contactEmail.trim().toLowerCase(),
+          licenseType: value.licenseType,
           enabled: value.enabled, expiresAt: new Date(value.expiresAt).toISOString()
         } }, value: {} };
       });

@@ -28,7 +28,7 @@
       await storage.set({ [CONSENT_KEY]: { endpoint: config.endpoint,
         acceptedAt: new Date(now()).toISOString() } });
     }
-    async function check(url) {
+    async function check(url, options = {}) {
       if (!config.enabled) return { allowed: true, mode: "disabled" };
       if ((await information()).requiresAcceptance) {
         throw new Error("Bekräfta licensregistreringen i tilläggets popup innan du startar inspelningen.");
@@ -36,7 +36,7 @@
       const tenantId = tenantFromUrl(url);
       if (!tenantId) throw new Error("Licensen kräver en Business Central-adress med tenant-ID.");
       if (pending.has(tenantId)) return pending.get(tenantId);
-      const operation = queue.then(() => verify(tenantId));
+      const operation = queue.then(() => verify(tenantId, options.force === true));
       queue = operation.catch(() => {});
       pending.set(tenantId, operation);
       try { return await operation; } finally { pending.delete(tenantId); }
@@ -52,11 +52,11 @@
       return { stored, installationId: GUID.test(stored.installationId || "")
         ? stored.installationId : uuid() };
     }
-    async function verify(tenantId) {
+    async function verify(tenantId, force = false) {
       const endpoint = checkedEndpoint(config.endpoint);
       const { stored, installationId } = await identity();
       const cached = stored.tenants?.[tenantId];
-      if (cached && cached.checkedAt <= now() && cached.refreshAt > now() &&
+      if (!force && cached && cached.checkedAt <= now() && cached.refreshAt > now() &&
           cached.expiresAt > now() && cached.endpoint === endpoint.href &&
           cached.allowed === true) return cached;
       // Never include URL, company, user identity, screenshots or recording data.
@@ -74,6 +74,10 @@
       const timestamp = now();
       const entry = { allowed: result.allowed && expiresAt > timestamp,
         trialAvailable: result.trialAvailable === true,
+        licenseStatus: ["active", "expired", "blocked", "unregistered"].includes(result.licenseStatus)
+          ? result.licenseStatus : result.allowed ? "active" : "unregistered",
+        licenseType: ["standard", "trial"].includes(result.licenseType)
+          ? result.licenseType : "",
         checkedAt: timestamp, expiresAt, endpoint: endpoint.href,
         refreshAt: Math.min(expiresAt, timestamp + 60 * 60 * 1000) };
       // Re-read so concurrent checks for different tenants do not overwrite each other.
@@ -107,7 +111,8 @@
       }
       const timestamp = now();
       const entry = { allowed: expiresAt > timestamp, trialAvailable: false, checkedAt: timestamp,
-        expiresAt, endpoint: config.endpoint, refreshAt: Math.min(expiresAt, timestamp + 3600000) };
+        licenseStatus: "active", licenseType: "trial", expiresAt, endpoint: config.endpoint,
+        refreshAt: Math.min(expiresAt, timestamp + 3600000) };
       await storage.set({ [KEY]: { installationId,
         tenants: { ...stored.tenants, [tenantId]: entry } } });
       return entry;

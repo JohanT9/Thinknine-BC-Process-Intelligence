@@ -34,11 +34,20 @@ the tenant removes that address, while `trial-claims.json` retains a one-way
 email hash and trial metadata so the same tenant cannot request another trial.
 Back up both registry files.
 
+The admin editor exposes the license type (`standard` or `trial`). Changing the
+type does not reset trial eligibility. The separate full-reset action removes
+both the tenant license and its trial claim and is intended for controlled test
+use only.
+
 `registrations.jsonl` records each installation/tenant pair once, including
 version and registration time. Existing records are loaded at startup so a
 restart does not produce duplicate registrations. No email is sent yet. The log
 is the basis for a later notification worker; SMTP/provider credentials would
 live only on the server, never in the extension.
+
+Authorization is tenant-wide. Multiple users and extension installations in
+the same Business Central tenant receive the same license decision. The
+installation ID is observational only and never grants or consumes a license.
 
 ## Before deployment
 

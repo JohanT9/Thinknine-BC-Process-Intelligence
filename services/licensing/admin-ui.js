@@ -3,6 +3,7 @@ const $ = id => document.getElementById(id);
 let key = "";
 let state = null;
 let busy = false;
+let selectedTenantId = "";
 let logoutTimer;
 const errors = {
   unauthorized: "Fel adminnyckel, eller nyckeln har ändrats. Logga in igen.",
@@ -54,7 +55,10 @@ function cell(row, text) {
 }
 function resetForm() {
   $("tenantForm").reset();
+  selectedTenantId = "";
   $("tenantId").readOnly = false;
+  $("licenseType").value = "standard";
+  $("resetTrial").hidden = true;
   $("expiresAt").value = new Date(Date.now() + 30 * 86400000).toISOString().slice(0, 19);
   $("editorTitle").textContent = "Lägg till tenant";
 }
@@ -67,7 +71,7 @@ function render() {
     const row = document.createElement("tr");
     cell(row, license.name || "—");
     cell(row, id);
-    cell(row, license.licenseType === "trial" ? "Testlicens" : "Ordinarie");
+    cell(row, license.licenseType === "trial" ? "Testlicens" : "Ordinarie licens");
     cell(row, license.contactEmail || "—");
     cell(row, !license.enabled ? "Spärrad" : Date.parse(license.expiresAt) <= Date.now() ? "Utgången" : "Aktiv");
     cell(row, license.expiresAt.replace("T", " ").replace(/\.\d{3}Z$|Z$/, ""));
@@ -78,13 +82,16 @@ function render() {
     edit.textContent = "Redigera";
     edit.setAttribute("aria-label", "Redigera " + (license.name || id));
     edit.addEventListener("click", () => {
+      selectedTenantId = id;
       $("tenantId").value = id;
       $("tenantId").readOnly = true;
       $("tenantName").value = license.name || "";
       $("contactEmail").value = license.contactEmail || "";
+      $("licenseType").value = license.licenseType === "trial" ? "trial" : "standard";
       $("expiresAt").value = new Date(license.expiresAt).toISOString().slice(0, 19);
       $("enabled").checked = license.enabled;
       $("editorTitle").textContent = "Ändra tenant";
+      $("resetTrial").hidden = false;
       $("tenantName").focus();
     });
     const remove = document.createElement("button");
@@ -148,11 +155,24 @@ $("refresh").addEventListener("click", () => run(async () => {
 }));
 $("logout").addEventListener("click", logout);
 $("newTenant").addEventListener("click", resetForm);
+$("resetTrial").addEventListener("click", () => run(async () => {
+  const id = selectedTenantId;
+  if (!id) return;
+  const confirmation = prompt(
+    `Detta raderar licensen och tidigare testanspråk. Tenant kan därefter begära en ny testlicens.\n\nSkriv tenant-ID för att bekräfta:\n${id}`);
+  if (confirmation?.trim().toLowerCase() !== id) {
+    message("Återställningen avbröts."); return;
+  }
+  state = await api("tenant/reset", { tenantId: id, revision: state.revision });
+  render(); resetForm();
+  message("Tenanten är helt återställd och kan begära en ny testlicens.");
+}));
 $("tenantForm").addEventListener("submit", event => {
   event.preventDefault();
   run(async () => {
     const value = { tenantId: $("tenantId").value.trim().toLowerCase(),
       name: $("tenantName").value.trim(), contactEmail: $("contactEmail").value.trim(),
+      licenseType: $("licenseType").value,
       enabled: $("enabled").checked,
       expiresAt: new Date($("expiresAt").value + "Z").toISOString(), revision: state.revision };
     if (!value.enabled && !confirm("Spärra denna tenant? Befintliga godkännanden kan gälla i upp till en timme.")) {

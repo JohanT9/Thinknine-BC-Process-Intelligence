@@ -263,6 +263,16 @@ function requestTrialEmail() {
 $("startProcess").addEventListener("click", () => startRecording("documentation"));
 $("startBug").addEventListener("click", () => startRecording("bug-report"));
 $("languageSwitch").addEventListener("click", switchUiLocale);
+$("licenseStatus").addEventListener("click", async () => {
+  try {
+    const tab = await currentTab();
+    if (!tab?.id || !tab.url?.includes("businesscentral.dynamics.com")) {
+      throw new Error(t("recorder.openBcFirst"));
+    }
+    await chrome.tabs.create({ url: chrome.runtime.getURL(
+      `license-status.html?tabId=${encodeURIComponent(tab.id)}`) });
+  } catch (error) { showMessage(error.message, true); }
+});
 
 let pendingBugRecording = false;
 let completedRecordingId = null;

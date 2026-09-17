@@ -165,6 +165,8 @@ for (const file of [
   "debug.js",
   "popup.html",
   "popup.js",
+  "license-status.html",
+  "license-status.js",
   "workspace-controller.js",
   "workspace-context.js",
   "technical-report.html", "technical-report.js",

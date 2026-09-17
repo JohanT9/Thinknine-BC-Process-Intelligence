@@ -29,6 +29,10 @@ Approved responses are cached locally until the earlier of one hour or license
 expiry. After cache expiry an unavailable service blocks new recordings; there
 is no indefinite offline allowance. Local history remains accessible.
 
+Licensing is evaluated per Business Central tenant, not per user or browser.
+Every installation in the same tenant receives the same license result. The
+random installation ID is used only for registration statistics.
+
 ## Activation checklist
 
 1. Choose hosting and implement the endpoint and an administrator license store.

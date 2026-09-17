@@ -1722,11 +1722,13 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
         break;
       }
       case "T9_LICENSE_CHECK": {
-        if (sender.url !== chrome.runtime.getURL("popup.html")) {
-          throw new Error("Licenskontroll får bara startas från tilläggets popup.");
+        if (sender.url !== chrome.runtime.getURL("popup.html") &&
+            !sender.url?.startsWith(chrome.runtime.getURL("license-status.html"))) {
+          throw new Error("Licenskontroll får bara startas från tilläggets licensvyer.");
         }
         const tab = await chrome.tabs.get(message.tabId);
-        sendResponse({ ok: true, license: await tenantLicense.check(tab.url) });
+        sendResponse({ ok: true, tenantId: globalThis.T9TenantLicense.tenantFromUrl(tab.url),
+          license: await tenantLicense.check(tab.url, { force: message.force === true }) });
         break;
       }
       case "T9_REQUEST_TRIAL": {

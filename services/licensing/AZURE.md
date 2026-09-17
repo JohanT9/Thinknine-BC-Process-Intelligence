@@ -67,6 +67,9 @@ records with the total count. Deleting a tenant removes its raw contact address
 but retains its one-way trial claim in `trial-claims.json`. Counts are
 installation/tenant pairs, not verified people or machines. It does not send
 email. Manually created entries are denied until intentionally enabled.
+The administrator can change the displayed license type manually. A separate
+destructive reset removes both the license and trial claim so a tenant can test
+the trial flow again; it requires typing the full tenant ID.
 
 Edits use a revision check and serialized atomic replacement to prevent lost
 updates within this single process. The immediately previous registry is saved

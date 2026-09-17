@@ -35,9 +35,11 @@
           <label for="tenantId">Tenant-ID</label><input id="tenantId" required maxlength="36" spellcheck="false">
           <label for="tenantName">Namn för administrationen</label><input id="tenantName" maxlength="100">
           <label for="contactEmail">Kontaktadress</label><input id="contactEmail" type="email" maxlength="254" autocomplete="off">
+          <label for="licenseType">Licenstyp</label>
+          <select id="licenseType"><option value="standard">Ordinarie licens</option><option value="trial">Testlicens</option></select>
           <label for="expiresAt">Slutdatum och tid i UTC</label><input id="expiresAt" type="datetime-local" step="1" required>
           <label class="check"><input id="enabled" type="checkbox"> Licensen är aktiverad</label>
-          <div class="toolbar"><button id="save" type="submit">Spara licens</button><button id="newTenant" type="button" class="secondary">Ny tenant</button></div>
+          <div class="toolbar"><button id="save" type="submit">Spara licens</button><button id="newTenant" type="button" class="secondary">Ny tenant</button><button id="resetTrial" type="button" class="danger" hidden>Återställ helt för ny testlicens</button></div>
         </form>
       </section>
       <section>

@@ -82,6 +82,17 @@ async function createService({ dataDirectory, now = Date.now, rateLimit = 120,
     registrationWrites = operation.catch(() => {}); return operation;
   }
   let trialWrites = Promise.resolve();
+  function deleteTrialClaim(tenantId) {
+    const operation = trialWrites.then(async () => {
+      const allClaims = await claims();
+      if (!allClaims[tenantId]) return;
+      const updated = { ...allClaims };
+      delete updated[tenantId];
+      await atomicWrite(claimsFile, updated, true);
+    });
+    trialWrites = operation.catch(() => {});
+    return operation;
+  }
   function requestTrial(v) {
     const operation = trialWrites.then(async () => {
       const normalizedEmail = email(v.email);
@@ -112,7 +123,8 @@ async function createService({ dataDirectory, now = Date.now, rateLimit = 120,
     const bucket = buckets.get(address) || { minute, count: 0 }; bucket.count++;
     buckets.set(address, bucket); return bucket.count > rateLimit;
   }
-  const admin = createAdmin({ dataDirectory, registry, mutateRegistry, now, adminKey });
+  const admin = createAdmin({ dataDirectory, registry, mutateRegistry,
+    deleteTrialClaim, now, adminKey });
   const server = http.createServer(async (request, response) => {
     if (request.url === "/admin" || request.url.startsWith("/admin/")) return admin(request, response);
     const reply = (status, value) => { response.writeHead(status, { "Content-Type": "application/json",
@@ -139,10 +151,13 @@ async function createService({ dataDirectory, now = Date.now, rateLimit = 120,
       if (!validRequest(value)) return reply(400, { error: "invalid-request" });
       const tenants = await registry(), entry = tenants[value.tenantId];
       const allowed = Boolean(entry?.enabled && Date.parse(entry.expiresAt) > now());
+      const licenseStatus = !entry ? "unregistered" : !entry.enabled ? "blocked"
+        : Date.parse(entry.expiresAt) <= now() ? "expired" : "active";
       const trialAvailable = !entry && !(await claims())[value.tenantId];
       await register(value);
       return reply(200, { tenantId: value.tenantId, allowed, trialAvailable,
-        expiresAt: allowed ? entry.expiresAt : new Date(now() + 60000).toISOString() });
+        licenseStatus, licenseType: entry ? (entry.licenseType || "standard") : null,
+        expiresAt: entry ? entry.expiresAt : new Date(now() + 60000).toISOString() });
     } catch { return reply(503, { error: "service-unavailable" }); }
   });
   server.requestTimeout = 10000; server.headersTimeout = 10000; return server;

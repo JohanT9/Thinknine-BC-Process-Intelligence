@@ -6,6 +6,7 @@ const crypto = require("node:crypto");
 const { createService } = require("../services/licensing/server.js");
 const tenant = "20afb97e-bbca-4f0d-a72b-e4cbbcdd57fb";
 const second = "aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee";
+const trialTenant = "bbbbbbbb-cccc-dddd-eeee-ffffffffffff";
 async function main() {
   const directory = await fs.mkdtemp(path.join(os.tmpdir(), "t9-license-admin-"));
   const file = path.join(directory, "tenants.json");
@@ -32,7 +33,8 @@ async function main() {
     assert.equal((await get("/admin/admin.js", "")).status, 200);
     let state = await (await get("/admin/api/state")).json();
     assert.deepEqual(state.tenants, original);
-    const edit = { tenantId: tenant, name: "Salico UAT", contactEmail: "admin@example.com", enabled: false,
+    const edit = { tenantId: tenant, name: "Salico UAT", contactEmail: "admin@example.com",
+      licenseType: "standard", enabled: false,
       expiresAt: "2026-12-31T23:59:59Z", revision: state.revision };
     assert.equal((await save({ ...edit, tenantId: "__proto__" })).status, 400);
     assert.equal((await save({ ...edit, expiresAt: "2026-02-30T12:00:00Z" })).status, 400);
@@ -44,6 +46,9 @@ async function main() {
     assert.equal(state.tenants[tenant].enabled, false);
     assert.equal(state.tenants[tenant].name, "Salico UAT");
     assert.equal(state.tenants[tenant].contactEmail, "admin@example.com");
+    assert.equal(state.tenants[tenant].licenseType, "standard");
+    assert.equal((await save({ ...edit, revision: state.revision,
+      licenseType: "unsupported" })).status, 400);
     assert.deepEqual(JSON.parse(await fs.readFile(file + ".backup", "utf8")), original);
     assert.equal((await save(edit)).status, 409);
     const responses = await Promise.all([
@@ -59,6 +64,25 @@ async function main() {
     state = await (await get("/admin/api/state")).json();
     assert.equal(state.registrations.length, 1);
     assert.equal(state.installationCount, 1);
+    const trialResponse = await fetch(base + "/v1/license/trial", { method: "POST",
+      headers: { "Content-Type": "application/json" }, body: JSON.stringify({
+        tenantId: trialTenant, installationId: second, version: "4.7.0",
+        email: "trial@example.com"
+      }) });
+    assert.equal(trialResponse.status, 200);
+    state = await (await get("/admin/api/state")).json();
+    assert.equal(state.tenants[trialTenant].licenseType, "trial");
+    const reset = await fetch(base + "/admin/api/tenant/reset", { method: "POST",
+      headers: { Authorization: "Bearer " + key, "Content-Type": "application/json" },
+      body: JSON.stringify({ tenantId: trialTenant, revision: state.revision }) });
+    assert.equal(reset.status, 200);
+    state = await reset.json();
+    assert.equal(state.tenants[trialTenant], undefined);
+    const checkAfterReset = await fetch(base + "/v1/license/check", { method: "POST",
+      headers: { "Content-Type": "application/json" }, body: JSON.stringify({
+        tenantId: trialTenant, installationId: second, version: "4.7.0"
+      }) });
+    assert.equal((await checkAfterReset.json()).trialAvailable, true);
     const deletion = await fetch(base + "/admin/api/tenant", { method: "DELETE",
       headers: { Authorization: "Bearer " + key, "Content-Type": "application/json" },
       body: JSON.stringify({ tenantId: tenant, revision: state.revision }) });

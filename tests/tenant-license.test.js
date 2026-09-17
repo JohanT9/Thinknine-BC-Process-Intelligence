@@ -31,6 +31,8 @@ async function main() {
       if (offline) throw new Error("offline");
       return { ok: true, json: async () => ({ allowed, tenantId: tenant,
         trialAvailable: !allowed,
+        licenseStatus: allowed ? "active" : "unregistered",
+        licenseType: allowed ? "standard" : null,
         expiresAt: new Date(time + 86400000).toISOString() }) };
     }
   };
@@ -42,9 +44,12 @@ async function main() {
   assert.equal((await client.information()).requiresAcceptance, false);
   await Promise.all([client.requireLicense(url), client.requireLicense(url)]);
   assert.equal(calls, 1);
+  assert.equal((await client.check(url)).licenseType, "standard");
+  await client.check(url, { force: true });
+  assert.equal(calls, 2);
   offline = true;
   await client.requireLicense(url);
-  assert.equal(calls, 1);
+  assert.equal(calls, 2);
   time += 3600001;
   await assert.rejects(client.requireLicense(url), /offline/);
   offline = false;
