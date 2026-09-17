@@ -54,6 +54,8 @@ exports remain available. Approval expiry is checked during active captures.
 URL-based tenant identification is a convenience license barrier, not verified
 identity. Modified extension code or a forged client request can bypass it.
 Authenticated token validation/server-dependent features are needed for stronger
-protection. This version intentionally adds no Entra sign-in.
+protection. Named consultant licenses use a separate Entra authorization-code
+flow with PKCE. The server, not the extension, validates API access tokens and
+keys licenses by the consultant's home `tid` and `oid`.
 
 Run `node tests/tenant-license.test.js` for the isolated client tests.

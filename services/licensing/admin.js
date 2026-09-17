@@ -5,7 +5,7 @@ const GUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/;
 const hash = value => crypto.createHash("sha256").update(value).digest();
 
 function createAdmin({ dataDirectory, registry, mutateRegistry, deleteTrialClaim,
-  now, adminKey = "" }) {
+  consultants, mutateConsultants, now, adminKey = "" }) {
   if (adminKey && !/^[0-9a-f]{64}$/i.test(adminKey)) {
     throw new Error("LICENSE_ADMIN_KEY must be a random 64-character hexadecimal key.");
   }
@@ -29,12 +29,15 @@ function createAdmin({ dataDirectory, registry, mutateRegistry, deleteTrialClaim
   async function snapshot() {
     const tenants = await registry();
     const revision = hash(JSON.stringify(tenants)).toString("hex");
+    const consultantLicenses = await consultants();
+    const consultantRevision = hash(JSON.stringify(consultantLicenses)).toString("hex");
     let registrations = [];
     try {
       registrations = (await fs.readFile(registrationsFile, "utf8"))
         .split("\n").filter(Boolean).map(line => JSON.parse(line));
     } catch (error) { if (error.code !== "ENOENT") throw error; }
-    return { revision, tenants, installationCount: registrations.length,
+    return { revision, tenants, consultants: consultantLicenses, consultantRevision,
+      installationCount: registrations.length,
       registrations: registrations.slice(-500).reverse() };
   }
   async function handle(request, response) {
@@ -66,10 +69,12 @@ function createAdmin({ dataDirectory, registry, mutateRegistry, deleteTrialClaim
       if (request.url === "/admin/api/state" && request.method === "GET") {
         return reply(200, await snapshot());
       }
+      const saveConsultant = request.url === "/admin/api/consultant" && request.method === "POST";
+      const deleteConsultant = request.url === "/admin/api/consultant" && request.method === "DELETE";
       const saveTenant = request.url === "/admin/api/tenant" && request.method === "POST";
       const deleteTenant = request.url === "/admin/api/tenant" && request.method === "DELETE";
       const resetTenant = request.url === "/admin/api/tenant/reset" && request.method === "POST";
-      if (!saveTenant && !deleteTenant && !resetTenant) {
+      if (!saveTenant && !deleteTenant && !resetTenant && !saveConsultant && !deleteConsultant) {
         return reply(405, { error: "method-not-allowed" });
       }
       if (request.headers["content-type"]?.split(";")[0].trim() !== "application/json") {
@@ -85,6 +90,30 @@ function createAdmin({ dataDirectory, registry, mutateRegistry, deleteTrialClaim
       let value;
       try { value = JSON.parse(Buffer.concat(chunks).toString("utf8")); }
       catch { return reply(400, { error: "invalid-json" }); }
+      if (saveConsultant || deleteConsultant) {
+        const baseValid = value && !Array.isArray(value) && GUID.test(value.entraTenantId || "") &&
+          GUID.test(value.objectId || "") && /^[0-9a-f]{64}$/.test(value.revision || "");
+        const expected = deleteConsultant ? "entraTenantId,objectId,revision"
+          : "email,enabled,entraTenantId,expiresAt,name,objectId,revision";
+        if (!baseValid || Object.keys(value).sort().join(",") !== expected ||
+            (!deleteConsultant && (typeof value.name !== "string" || value.name.length > 100 ||
+              typeof value.email !== "string" || value.email.length > 254 ||
+              typeof value.enabled !== "boolean" || !Number.isFinite(Date.parse(value.expiresAt))))) {
+          return reply(400, { error: "invalid-request" });
+        }
+        const id = `${value.entraTenantId}:${value.objectId}`;
+        const result = await mutateConsultants(current => {
+          const currentRevision = hash(JSON.stringify(current)).toString("hex");
+          if (currentRevision !== value.revision) return { value: { conflict: true } };
+          const updated = { ...current };
+          if (deleteConsultant) delete updated[id];
+          else updated[id] = { name: value.name.trim(), email: value.email.trim().toLowerCase(),
+            enabled: value.enabled, expiresAt: new Date(value.expiresAt).toISOString() };
+          return { updated, value: {} };
+        });
+        if (result.conflict) return reply(409, { error: "registry-changed" });
+        return reply(200, await snapshot());
+      }
       if (deleteTenant || resetTenant) {
         if (!value || Array.isArray(value) ||
             Object.keys(value).sort().join(",") !== "revision,tenantId" ||

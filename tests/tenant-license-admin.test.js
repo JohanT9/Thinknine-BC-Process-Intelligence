@@ -22,6 +22,9 @@ async function main() {
   const save = value => fetch(base + "/admin/api/tenant", { method: "POST",
     headers: { Authorization: "Bearer " + key, "Content-Type": "application/json" },
     body: JSON.stringify(value) });
+  const saveConsultant = value => fetch(base + "/admin/api/consultant", { method: "POST",
+    headers: { Authorization: "Bearer " + key, "Content-Type": "application/json" },
+    body: JSON.stringify(value) });
   try {
     assert.equal((await get("/admin/api/state", "")).status, 401);
     assert.equal((await get("/admin/api/state", "0".repeat(64))).status, 401);
@@ -89,6 +92,13 @@ async function main() {
     assert.equal(deletion.status, 200);
     state = await deletion.json();
     assert.equal(state.tenants[tenant], undefined);
+    const consultant = { entraTenantId: tenant, objectId: second,
+      name: "Consultant One", email: "consultant@example.com", enabled: true,
+      expiresAt: "2027-12-31T23:59:59Z", revision: state.consultantRevision };
+    const consultantSaved = await saveConsultant(consultant);
+    assert.equal(consultantSaved.status, 200);
+    state = await consultantSaved.json();
+    assert.equal(state.consultants[`${tenant}:${second}`].name, "Consultant One");
     await assert.rejects(createService({ dataDirectory: directory, adminKey: "weak" }), /64-character/);
     console.log("Tenant license admin protection, editing and conflict tests passed.");
   } finally { await new Promise(resolve => server.close(resolve)); }

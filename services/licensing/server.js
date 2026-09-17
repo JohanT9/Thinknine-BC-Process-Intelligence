@@ -3,6 +3,7 @@ const fs = require("node:fs/promises");
 const path = require("node:path");
 const crypto = require("node:crypto");
 const { createAdmin } = require("./admin.js");
+const { createEntraValidator } = require("./entra-validator.js");
 
 const GUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/;
 const EMAIL = /^[^\s@<>]+@[^\s@<>]+\.[^\s@<>]+$/u;
@@ -22,12 +23,15 @@ function validTrialRequest(v) {
 }
 
 async function createService({ dataDirectory, now = Date.now, rateLimit = 120,
-  initializeRegistry = false, adminKey = "" }) {
+  initializeRegistry = false, adminKey = "", entraAudience = "",
+  entraScope = "License.Check", fetcher = fetch }) {
   await fs.mkdir(dataDirectory, { recursive: true, mode: 0o700 });
   const registryFile = path.join(dataDirectory, "tenants.json");
   const claimsFile = path.join(dataDirectory, "trial-claims.json");
   const registrationsFile = path.join(dataDirectory, "registrations.jsonl");
-  for (const file of initializeRegistry ? [registryFile, claimsFile] : [claimsFile]) {
+  const consultantsFile = path.join(dataDirectory, "consultants.json");
+  for (const file of initializeRegistry ? [registryFile, claimsFile, consultantsFile]
+    : [claimsFile, consultantsFile]) {
     try { await fs.writeFile(file, "{}\n", { flag: "wx", mode: 0o600 }); }
     catch (error) { if (error.code !== "EEXIST") throw error; }
   }
@@ -46,13 +50,24 @@ async function createService({ dataDirectory, now = Date.now, rateLimit = 120,
       !Number.isFinite(Date.parse(claim.requestedAt)) || !Number.isFinite(Date.parse(claim.expiresAt))) throw new Error("Invalid trial claim");
     return value;
   }
+  async function consultants() {
+    const value = JSON.parse(await fs.readFile(consultantsFile, "utf8"));
+    if (!value || Array.isArray(value) || typeof value !== "object") throw new Error("Invalid consultant registry");
+    for (const [id, entry] of Object.entries(value)) if (!/^[0-9a-f-]{36}:[0-9a-f-]{36}$/.test(id) ||
+      !entry || typeof entry.enabled !== "boolean" || !Number.isFinite(Date.parse(entry.expiresAt))) {
+      throw new Error("Invalid consultant license entry");
+    }
+    return value;
+  }
   async function atomicWrite(file, value, backup = false) {
     if (backup) await fs.copyFile(file, file + ".backup");
     const temporary = `${file}.${crypto.randomUUID()}.tmp`;
     await fs.writeFile(temporary, JSON.stringify(value, null, 2) + "\n", { flag: "wx", mode: 0o600 });
     await fs.rename(temporary, file);
   }
-  await registry(); await claims();
+  await registry(); await claims(); await consultants();
+  const validateEntra = createEntraValidator({ audience: entraAudience,
+    requiredScope: entraScope, fetcher, now });
   let registryWrites = Promise.resolve();
   function mutateRegistry(action) {
     const operation = registryWrites.then(async () => {
@@ -61,6 +76,15 @@ async function createService({ dataDirectory, now = Date.now, rateLimit = 120,
       return result?.value;
     });
     registryWrites = operation.catch(() => {}); return operation;
+  }
+  let consultantWrites = Promise.resolve();
+  function mutateConsultants(action) {
+    const operation = consultantWrites.then(async () => {
+      const result = await action(await consultants());
+      if (result?.updated) await atomicWrite(consultantsFile, result.updated, true);
+      return result?.value;
+    });
+    consultantWrites = operation.catch(() => {}); return operation;
   }
   const seen = new Set();
   try {
@@ -124,6 +148,7 @@ async function createService({ dataDirectory, now = Date.now, rateLimit = 120,
     buckets.set(address, bucket); return bucket.count > rateLimit;
   }
   const admin = createAdmin({ dataDirectory, registry, mutateRegistry,
+    consultants, mutateConsultants,
     deleteTrialClaim, now, adminKey });
   const server = http.createServer(async (request, response) => {
     if (request.url === "/admin" || request.url.startsWith("/admin/")) return admin(request, response);
@@ -133,7 +158,7 @@ async function createService({ dataDirectory, now = Date.now, rateLimit = 120,
       try { await registry(); await claims(); return reply(200, { status: "ok" }); }
       catch { return reply(503, { status: "unavailable" }); }
     }
-    if (!["/v1/license/check", "/v1/license/trial"].includes(request.url)) return reply(404, { error: "not-found" });
+    if (!["/v1/license/check", "/v1/license/trial", "/v1/license/consultant/check"].includes(request.url)) return reply(404, { error: "not-found" });
     if (request.method !== "POST") return reply(405, { error: "method-not-allowed" });
     if (throttled(request.socket.remoteAddress)) return reply(429, { error: "rate-limit" });
     if (request.headers["content-type"]?.split(";")[0].trim() !== "application/json") return reply(415, { error: "json-required" });
@@ -142,6 +167,17 @@ async function createService({ dataDirectory, now = Date.now, rateLimit = 120,
       for await (const chunk of request) { size += chunk.length; if (size > MAX_BODY) {
         reply(413, { error: "body-too-large" }); request.resume(); return; } body += chunk.toString("utf8"); }
       let value; try { value = JSON.parse(body); } catch { return reply(400, { error: "invalid-json" }); }
+      if (request.url === "/v1/license/consultant/check") {
+        if (!validRequest(value)) return reply(400, { error: "invalid-request" });
+        try {
+          const identity = await validateEntra(request.headers.authorization || "");
+          const entry = (await consultants())[`${identity.tid}:${identity.oid}`];
+          const allowed = Boolean(entry?.enabled && Date.parse(entry.expiresAt) > now());
+          return reply(200, { allowed, expiresAt: entry?.expiresAt || new Date(now() + 60000).toISOString(),
+            licenseType: "consultant", consultantName: entry?.name || identity.name,
+            targetTenantId: value.tenantId });
+        } catch (error) { return reply(error.status || 503, { error: error.message }); }
+      }
       if (request.url.endsWith("/trial")) {
         if (!validTrialRequest(value)) return reply(400, { error: "invalid-request" });
         try { const license = await requestTrial({ ...value, email: email(value.email) });
@@ -168,7 +204,9 @@ if (require.main === module) {
   if (!dataDirectory || !path.isAbsolute(dataDirectory)) {
     console.error("Set LICENSE_DATA_DIRECTORY to an absolute private data directory."); process.exitCode = 1;
   } else createService({ dataDirectory, initializeRegistry: true,
-    adminKey: process.env.LICENSE_ADMIN_KEY || "" }).then(server => {
+    adminKey: process.env.LICENSE_ADMIN_KEY || "",
+    entraAudience: process.env.LICENSE_ENTRA_AUDIENCE || "",
+    entraScope: process.env.LICENSE_ENTRA_SCOPE || "License.Check" }).then(server => {
     const cloud = Boolean(process.env.WEBSITE_SITE_NAME);
     server.listen(Number(process.env.PORT || process.env.LICENSE_PORT) || 8787,
       cloud ? "0.0.0.0" : "127.0.0.1", () => console.log("License service started (HTTPS provided by deployment gateway)."));

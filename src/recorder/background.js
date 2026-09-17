@@ -3,6 +3,7 @@ importScripts("engine/storage-keys.js");
 importScripts("engine/business-central-url-context.js");
 importScripts("engine/tenant-license.js");
 importScripts("engine/tenant-license-config.js");
+importScripts("engine/consultant-license.js");
 importScripts("engine/page-identity.js");
 importScripts("engine/page-identification-engine.js");
 importScripts("engine/process-taxonomy-schema.js");
@@ -65,6 +66,23 @@ const tenantLicense = globalThis.T9TenantLicense.create({
   storage: chrome.storage.local, fetcher: (...args) => fetch(...args),
   config: globalThis.T9TenantLicenseConfig, version: VERSION
 });
+const consultantLicense = globalThis.T9ConsultantLicense.create({
+  storage: chrome.storage.local, fetcher: (...args) => fetch(...args),
+  identity: chrome.identity, config: globalThis.T9TenantLicenseConfig.consultant,
+  version: VERSION
+});
+
+async function requireRecordingLicense(url) {
+  try { return { source: "tenant", ...(await tenantLicense.requireLicense(url)) }; }
+  catch (tenantError) {
+    if (!consultantLicense.configured()) throw tenantError;
+    const tenantId = globalThis.T9TenantLicense.tenantFromUrl(url);
+    const result = await consultantLicense.check(tenantId,
+      await tenantLicense.installationId());
+    if (!result.allowed) throw tenantError;
+    return { source: "consultant", ...result };
+  }
+}
 const windowsSharePorts = new Set();
 const pageKnowledgePacksReady = globalThis.T9PageIdentificationEngine
   .loadKnowledgePacks({
@@ -1216,11 +1234,11 @@ async function requireActiveTenantLicense(state) {
   if (!currentTenant || currentTenant !== session?.licenseTenantId) {
     throw new Error("Tenant har ändrats. Stoppa inspelningen och starta en ny i rätt tenant.");
   }
-  await tenantLicense.requireLicense(tab.url);
+  await requireRecordingLicense(tab.url);
 }
 
 async function startSession(message, tabId) {
-  await tenantLicense.requireLicense((await chrome.tabs.get(tabId)).url);
+  await requireRecordingLicense((await chrome.tabs.get(tabId)).url);
   const previousState = await getState();
   if (previousState.recording || previousState.sessionId) {
     throw new Error("En inspelning är redan aktiv. Stoppa eller avbryt den innan en ny startas.");
@@ -1738,6 +1756,43 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
         const tab = await chrome.tabs.get(message.tabId);
         sendResponse({ ok: true,
           license: await tenantLicense.requestTrial(tab.url, message.email) });
+        break;
+      }
+      case "T9_LICENSE_SUMMARY": {
+        if (sender.url !== chrome.runtime.getURL("popup.html") &&
+            !sender.url?.startsWith(chrome.runtime.getURL("license-status.html"))) {
+          throw new Error("Licensöversikten får bara öppnas från tilläggets licensvyer.");
+        }
+        sendResponse({ ok: true, licenses: await tenantLicense.summaries() });
+        break;
+      }
+      case "T9_CONSULTANT_LICENSE_STATUS": {
+        const value = await consultantLicense.state();
+        sendResponse({ ok: true, configured: consultantLicense.configured(),
+          signedIn: Boolean(value.refreshToken), expiresAt: value.expiresAt || 0,
+          profile: value.profile || {} });
+        break;
+      }
+      case "T9_CONSULTANT_LICENSE_CHECK": {
+        const tab = await chrome.tabs.get(message.tabId);
+        const tenantId = globalThis.T9TenantLicense.tenantFromUrl(tab.url);
+        const license = consultantLicense.configured()
+          ? await consultantLicense.check(tenantId, await tenantLicense.installationId())
+          : { allowed: false, configured: false };
+        sendResponse({ ok: true, license });
+        break;
+      }
+      case "T9_CONSULTANT_LICENSE_SIGN_IN": {
+        if (!sender.url?.startsWith(chrome.runtime.getURL("license-status.html"))) {
+          throw new Error("Konsultinloggning får bara startas från licenssidan.");
+        }
+        await consultantLicense.signIn();
+        sendResponse({ ok: true });
+        break;
+      }
+      case "T9_CONSULTANT_LICENSE_SIGN_OUT": {
+        await consultantLicense.signOut();
+        sendResponse({ ok: true });
         break;
       }
       case "T9_START": {

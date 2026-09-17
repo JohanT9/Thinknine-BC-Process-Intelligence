@@ -25,6 +25,7 @@ function logout() {
   $("adminKey").value = "";
   $("tenants").replaceChildren();
   $("registrations").replaceChildren();
+  $("consultants").replaceChildren();
   message("Utloggad.");
 }
 function touch() {
@@ -121,6 +122,38 @@ function render() {
     cell(row, entry.version);
     $("registrations").append(row);
   }
+  $("consultants").replaceChildren();
+  const consultantEntries = Object.entries(state.consultants || {});
+  $("consultantEmpty").hidden = consultantEntries.length !== 0;
+  for (const [id, license] of consultantEntries) {
+    const [entraTenantId, objectId] = id.split(":");
+    const row = document.createElement("tr");
+    cell(row, license.name || "—"); cell(row, license.email || "—");
+    cell(row, entraTenantId); cell(row, objectId);
+    cell(row, !license.enabled ? "Spärrad" : Date.parse(license.expiresAt) <= Date.now() ? "Utgången" : "Aktiv");
+    cell(row, license.expiresAt.replace("T", " ").replace(/\.\d{3}Z$|Z$/, ""));
+    const action = cell(row, ""); action.className = "actions";
+    const edit = document.createElement("button"); edit.type = "button"; edit.textContent = "Redigera";
+    edit.addEventListener("click", () => {
+      $("consultantTenantId").value = entraTenantId; $("consultantTenantId").readOnly = true;
+      $("consultantObjectId").value = objectId; $("consultantObjectId").readOnly = true;
+      $("consultantName").value = license.name || ""; $("consultantEmail").value = license.email || "";
+      $("consultantExpiresAt").value = new Date(license.expiresAt).toISOString().slice(0, 19);
+      $("consultantEnabled").checked = license.enabled;
+    });
+    const remove = document.createElement("button"); remove.type = "button"; remove.className = "secondary"; remove.textContent = "Radera";
+    remove.addEventListener("click", () => run(async () => {
+      if (!confirm(`Radera konsultlicensen för ${license.name || license.email || objectId}?`)) return;
+      state = await api("consultant", { entraTenantId, objectId,
+        revision: state.consultantRevision }, "DELETE"); render(); resetConsultantForm();
+    }));
+    action.append(edit, remove); $("consultants").append(row);
+  }
+}
+function resetConsultantForm() {
+  $("consultantForm").reset();
+  $("consultantTenantId").readOnly = false; $("consultantObjectId").readOnly = false;
+  $("consultantExpiresAt").value = new Date(Date.now() + 365 * 86400000).toISOString().slice(0, 19);
 }
 async function run(action) {
   if (busy) return;
@@ -146,6 +179,7 @@ $("loginForm").addEventListener("submit", event => {
     $("login").hidden = true;
     $("workspace").hidden = false;
     resetForm();
+    resetConsultantForm();
     render();
     message("Inloggad.");
   });
@@ -155,6 +189,18 @@ $("refresh").addEventListener("click", () => run(async () => {
 }));
 $("logout").addEventListener("click", logout);
 $("newTenant").addEventListener("click", resetForm);
+$("newConsultant").addEventListener("click", resetConsultantForm);
+$("consultantForm").addEventListener("submit", event => {
+  event.preventDefault(); run(async () => {
+    const value = { entraTenantId: $("consultantTenantId").value.trim().toLowerCase(),
+      objectId: $("consultantObjectId").value.trim().toLowerCase(),
+      name: $("consultantName").value.trim(), email: $("consultantEmail").value.trim(),
+      expiresAt: new Date($("consultantExpiresAt").value + "Z").toISOString(),
+      enabled: $("consultantEnabled").checked, revision: state.consultantRevision };
+    state = await api("consultant", value); render(); resetConsultantForm();
+    message("Konsultlicensen är sparad.");
+  });
+});
 $("resetTrial").addEventListener("click", () => run(async () => {
   const id = selectedTenantId;
   if (!id) return;

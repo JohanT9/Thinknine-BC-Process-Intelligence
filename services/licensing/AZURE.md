@@ -71,6 +71,26 @@ The administrator can change the displayed license type manually. A separate
 destructive reset removes both the license and trial claim so a tenant can test
 the trial flow again; it requires typing the full tenant ID.
 
+## Consultant licenses (Microsoft Entra)
+
+Consultant licenses are named-user licenses keyed by the consultant's home
+Entra `tid` and `oid`. Configure the API app registration to expose delegated
+scope `License.Check`, then add App Service settings:
+
+- `LICENSE_ENTRA_AUDIENCE`: the API application's expected access-token audience
+- `LICENSE_ENTRA_SCOPE`: `License.Check`
+
+The API validates RS256 signature, key id, audience, expiry, scope, issuer,
+tenant id and object id. The extension's app registration must be multitenant
+for organizational accounts and use its `chrome.identity.getRedirectURL("entra")`
+URL as a SPA redirect URI. Put its client id and full delegated scope in
+`src/engine/tenant-license-config.js`, enable consultant auth, and rebuild.
+
+After the consultant signs in, the license page displays the Entra tenant and
+object ids needed to create the named license in admin. Tenant licensing is
+checked first; the consultant license is only a fallback for customer tenants
+without an active tenant license.
+
 Edits use a revision check and serialized atomic replacement to prevent lost
 updates within this single process. The immediately previous registry is saved
 as tenants.json.backup. This is not a replacement for scheduled backups. Do not

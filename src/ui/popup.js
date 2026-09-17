@@ -198,7 +198,14 @@ async function startRecording(recordingPurpose) {
     }
     const check = await send({ type: "T9_LICENSE_CHECK", tabId: tab.id }, 10000);
     if (!check?.ok) throw new Error(check?.error || "License check failed");
-    if (!check.license.allowed && check.license.trialAvailable) {
+    let consultantAllowed = false;
+    if (!check.license.allowed) {
+      try {
+        const consultant = await send({ type: "T9_CONSULTANT_LICENSE_CHECK", tabId: tab.id }, 10000);
+        consultantAllowed = consultant?.license?.allowed === true;
+      } catch { /* Tenant trial flow remains available when no consultant is signed in. */ }
+    }
+    if (!check.license.allowed && !consultantAllowed && check.license.trialAvailable) {
       const email = await requestTrialEmail();
       if (!email) throw new Error(currentUiLocale === "sv-SE"
         ? "Begäran om testlicens avbröts." : "Trial request cancelled.");
@@ -207,7 +214,7 @@ async function startRecording(recordingPurpose) {
         throw new Error(trial?.error || (currentUiLocale === "sv-SE"
           ? "Testlicensen kunde inte skapas." : "The trial could not be created."));
       }
-    } else if (!check.license.allowed) {
+    } else if (!check.license.allowed && !consultantAllowed) {
       throw new Error(currentUiLocale === "sv-SE"
         ? "Denna tenant saknar en aktiv licens och kan inte starta en ny testperiod."
         : "This tenant has no active license and cannot start a new trial.");
@@ -266,11 +273,9 @@ $("languageSwitch").addEventListener("click", switchUiLocale);
 $("licenseStatus").addEventListener("click", async () => {
   try {
     const tab = await currentTab();
-    if (!tab?.id || !tab.url?.includes("businesscentral.dynamics.com")) {
-      throw new Error(t("recorder.openBcFirst"));
-    }
-    await chrome.tabs.create({ url: chrome.runtime.getURL(
-      `license-status.html?tabId=${encodeURIComponent(tab.id)}`) });
+    const query = tab?.id && tab.url?.includes("businesscentral.dynamics.com")
+      ? `?tabId=${encodeURIComponent(tab.id)}` : "";
+    await chrome.tabs.create({ url: chrome.runtime.getURL(`license-status.html${query}`) });
   } catch (error) { showMessage(error.message, true); }
 });
 

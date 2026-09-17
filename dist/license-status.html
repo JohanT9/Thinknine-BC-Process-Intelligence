@@ -11,7 +11,7 @@
     section{background:#fff;border:1px solid #ccdee0;border-radius:7px;padding:24px}h1{font-size:25px;margin:0 0 20px}h2{font-size:19px;color:#007a82;margin:0 0 18px}
     dl{display:grid;grid-template-columns:180px 1fr;gap:0;margin:0}dt,dd{padding:12px;border-bottom:1px solid #e1eaeb;margin:0}dt{font-weight:650}dd{overflow-wrap:anywhere}
     .status{display:inline-block;padding:4px 10px;border-radius:999px;font-weight:700}.active{background:#e5f4ea;color:#176b38}.inactive{background:#fde7e9;color:#a4262c}.unknown{background:#fff4ce;color:#6d5700}
-    .toolbar{display:flex;gap:10px;margin-top:20px}button{padding:9px 16px;border:1px solid #007a82;border-radius:3px;background:#007a82;color:#fff;font:inherit;cursor:pointer}button:disabled{opacity:.6;cursor:wait}
+    label{display:block;font-weight:650;margin-bottom:6px}select{width:100%;padding:10px;border:1px solid #8b9fa8;border-radius:3px;background:#fff;font:inherit;margin-bottom:18px}.toolbar{display:flex;gap:10px;margin-top:20px}button{padding:9px 16px;border:1px solid #007a82;border-radius:3px;background:#007a82;color:#fff;font:inherit;cursor:pointer}button:disabled{opacity:.6;cursor:wait}
     #message{min-height:24px;margin-top:14px}.error{color:#a4262c}@media(max-width:560px){dl{grid-template-columns:1fr}dt{padding-bottom:2px;border:0}dd{padding-top:2px}}
   </style>
 </head>
@@ -20,7 +20,9 @@
   <main>
     <h1>Licensinformation</h1>
     <section aria-labelledby="detailsTitle">
-      <h2 id="detailsTitle">Aktuell Business Central-tenant</h2>
+      <h2 id="detailsTitle">Känd Business Central-tenant</h2>
+      <label for="tenantSelect">Tenant</label>
+      <select id="tenantSelect"></select>
       <dl>
         <dt>Status</dt><dd><span id="status" class="status unknown">Kontrollerar…</span></dd>
         <dt>Licenstyp</dt><dd id="licenseType">—</dd>
@@ -28,8 +30,16 @@
         <dt>Tenant-ID</dt><dd id="tenantId">—</dd>
         <dt>Senast kontrollerad</dt><dd id="checkedAt">—</dd>
       </dl>
-      <div class="toolbar"><button id="refresh" type="button">Kontrollera igen</button></div>
+      <div class="toolbar"><button id="refresh" type="button">Kontrollera aktuell BC-flik igen</button></div>
       <p id="message" role="status" aria-live="polite"></p>
+    </section>
+    <section aria-labelledby="consultantTitle">
+      <h2 id="consultantTitle">Konsultlicens</h2>
+      <p id="consultantStatus">Kontrollerar…</p>
+      <div class="toolbar">
+        <button id="consultantSignIn" type="button">Logga in med Microsoft</button>
+        <button id="consultantSignOut" type="button" hidden>Logga ut</button>
+      </div>
     </section>
   </main>
   <script src="license-status.js"></script>

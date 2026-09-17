@@ -45,12 +45,15 @@ async function main() {
   await Promise.all([client.requireLicense(url), client.requireLicense(url)]);
   assert.equal(calls, 1);
   assert.equal((await client.check(url)).licenseType, "standard");
+  assert.deepEqual((await client.summaries()).map(item => item.tenantId), [tenant]);
+  assert.equal((await client.summaries())[0].licenseStatus, "active");
   await client.check(url, { force: true });
   assert.equal(calls, 2);
   offline = true;
   await client.requireLicense(url);
   assert.equal(calls, 2);
   time += 3600001;
+  assert.equal((await client.summaries())[0].licenseStatus, "active");
   await assert.rejects(client.requireLicense(url), /offline/);
   offline = false;
   allowed = false;

@@ -24,6 +24,18 @@
       return { enabled: config.enabled, endpoint: config.endpoint,
         requiresAcceptance: Boolean(config.enabled && accepted?.endpoint !== config.endpoint) };
     }
+    async function summaries() {
+      const stored = (await storage.get(KEY))[KEY] || {};
+      return Object.entries(stored.tenants || {}).map(([tenantId, entry]) => {
+        const expired = Number(entry.expiresAt) <= now();
+        return { tenantId, allowed: entry.allowed === true && !expired,
+          trialAvailable: entry.trialAvailable === true,
+          licenseStatus: expired && entry.licenseStatus === "active"
+            ? "expired" : entry.licenseStatus || (entry.allowed ? "active" : "unregistered"),
+          licenseType: entry.licenseType || "", expiresAt: Number(entry.expiresAt) || 0,
+          checkedAt: Number(entry.checkedAt) || 0 };
+      }).sort((a, b) => b.checkedAt - a.checkedAt);
+    }
     async function acceptNotice() {
       await storage.set({ [CONSENT_KEY]: { endpoint: config.endpoint,
         acceptedAt: new Date(now()).toISOString() } });
@@ -52,6 +64,7 @@
       return { stored, installationId: GUID.test(stored.installationId || "")
         ? stored.installationId : uuid() };
     }
+    async function installationId() { return (await identity()).installationId; }
     async function verify(tenantId, force = false) {
       const endpoint = checkedEndpoint(config.endpoint);
       const { stored, installationId } = await identity();
@@ -122,7 +135,8 @@
       if (!result.allowed) throw new Error("Denna Business Central-tenant saknar en aktiv BC Process Studio-licens.");
       return result;
     }
-    return Object.freeze({ check, requestTrial, requireLicense, information, acceptNotice });
+    return Object.freeze({ check, requestTrial, requireLicense, information,
+      summaries, installationId, acceptNotice });
   }
   return Object.freeze({ create, tenantFromUrl });
 });

@@ -30,6 +30,20 @@
         <p id="empty" hidden>Inga tenantlicenser finns ännu.</p>
       </section>
       <section>
+        <h2>Konsultlicenser</h2>
+        <div class="table-scroll"><table><thead><tr><th>Namn</th><th>E-post</th><th>Entra tenant-ID</th><th>Objekt-ID</th><th>Status</th><th>Slutdatum UTC</th><th>Åtgärd</th></tr></thead><tbody id="consultants"></tbody></table></div>
+        <p id="consultantEmpty">Inga konsultlicenser finns ännu.</p>
+        <form id="consultantForm">
+          <label for="consultantTenantId">Entra tenant-ID</label><input id="consultantTenantId" required maxlength="36">
+          <label for="consultantObjectId">Användarens objekt-ID (oid)</label><input id="consultantObjectId" required maxlength="36">
+          <label for="consultantName">Namn</label><input id="consultantName" maxlength="100">
+          <label for="consultantEmail">E-post för administration</label><input id="consultantEmail" type="email" maxlength="254">
+          <label for="consultantExpiresAt">Slutdatum och tid i UTC</label><input id="consultantExpiresAt" type="datetime-local" step="1" required>
+          <label class="check"><input id="consultantEnabled" type="checkbox"> Konsultlicensen är aktiverad</label>
+          <div class="toolbar"><button type="submit">Spara konsultlicens</button><button id="newConsultant" type="button" class="secondary">Ny konsult</button></div>
+        </form>
+      </section>
+      <section>
         <h2 id="editorTitle">Lägg till eller ändra tenant</h2>
         <form id="tenantForm">
           <label for="tenantId">Tenant-ID</label><input id="tenantId" required maxlength="36" spellcheck="false">
