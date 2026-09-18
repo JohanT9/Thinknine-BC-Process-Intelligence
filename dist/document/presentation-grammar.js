@@ -6,7 +6,7 @@
   if (typeof module === "object" && module.exports) module.exports = api;
   root.T9PresentationGrammar = api;
 })(typeof globalThis !== "undefined" ? globalThis : this, function (semantic) {
-  const GRAMMAR_VERSION = "1.0.0";
+  const GRAMMAR_VERSION = "1.1.0";
   const cache = new WeakMap();
 
   function clone(value) {
@@ -109,6 +109,16 @@
       return sentence(run(actionType === "EnableCheckbox"
         ? words.enable : words.disable, "action"), quoted(field), run("."));
     }
+    if (actionType === "RunActionPath" && Array.isArray(action?.actionPath) &&
+        action.actionPath.length && action.actionPath.every(item =>
+          typeof item === "string" && item.trim())) {
+      const pathRuns = [];
+      action.actionPath.forEach((caption, index) => {
+        if (index) pathRuns.push(run(" → "));
+        pathRuns.push(quoted(caption.trim()));
+      });
+      return sentence(run(words.choose, "action"), pathRuns, run("."));
+    }
     const runs = legacyRuns(fallbackText);
     return sentence(runs);
   }
@@ -119,7 +129,12 @@
       ? result.semanticAction || result.interaction || action
       : action;
     if (result.kind === "paragraph" && typeof result.text === "string") {
-      if (!(result.preserveUserText && Array.isArray(result.presentationRuns))) {
+      if (result.preserveUserText || result.provenance === "user-edited") {
+        // Preserve literal authored text even when no rich-text runs were stored.
+        if (!Array.isArray(result.presentationRuns)) {
+          result.presentationRuns = [run(result.text)];
+        }
+      } else {
         const presentation = presentationFor(blockAction, result.text,
           documentLanguage);
         result.text = presentation.text;

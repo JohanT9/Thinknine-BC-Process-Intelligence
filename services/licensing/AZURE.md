@@ -99,3 +99,31 @@ still require a database. Rotating LICENSE_ADMIN_KEY invalidates the old key
 after the service restart. This pilot uses a shared administrator key, not named
 users, MFA or an administrator audit trail. Use Entra admin authentication for
 broader administrative access; extension users need no new sign-in.
+
+## Azure Table Storage migration
+
+Production deployments can replace the file registries with Azure Table
+Storage. The service uses its App Service managed identity and does not require
+an account key or connection string. Configure:
+
+- `LICENSE_TABLE_ACCOUNT_URL`: for example
+  `https://<account>.table.core.windows.net`
+- `LICENSE_MANAGED_IDENTITY_CLIENT_ID`: only for a user-assigned identity;
+  leave empty for the App Service system-assigned identity
+- `LICENSE_STORAGE_MIGRATE_FROM_FILES=true`: only for the initial import
+
+Grant the identity **Storage Table Data Contributor** on the storage account.
+At startup the service creates the required tables, imports the existing files,
+then verifies the record count and SHA-256 checksum of every dataset. The
+original files are not deleted or modified. A verified migration marker is
+written to `LicenseMetadata`, which prevents a repeated import.
+
+The health endpoint reports `"storage":"azure-table"` after a successful
+switch. After verifying the admin counts, audit history and a license check,
+change `LICENSE_STORAGE_MIGRATE_FROM_FILES` to `false`. Do not switch back to
+file mode after new Table Storage writes without first exporting the newer data.
+
+The tables are `LicenseTenants`, `LicenseConsultantCompanies`, `LicenseUsers`,
+`LicenseTrialClaims`, `LicenseInstallations`, `LicenseAuditEvents`,
+`LicenseNotifications`, and `LicenseMetadata`. Entity writes use ETags and
+retry optimistic concurrency conflicts.

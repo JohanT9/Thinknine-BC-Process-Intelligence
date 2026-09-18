@@ -8,8 +8,38 @@ This configuration is for the publisher's pilot; store privacy disclosures and
 an agreed retention policy must be completed before distributing to customers.
 
 A local endpoint prototype and private file-based tenant registry are now
-available in `services/licensing/`. See its README for setup and deployment
-limitations. It does not send email or host anything externally.
+available in `services/licensing/`. The admin center includes an action queue
+for pending, expired and soon-to-expire licenses. Optional email delivery uses
+an administrator-provided HTTPS webhook; no email provider is built in.
+The service also keeps an append-only `audit.jsonl` history in the private data
+directory. The admin center displays the latest 500 license, user and
+notification events without exposing credentials or webhook URLs.
+The admin dashboard summarizes active, trial, pending, expiring and inactive
+licenses, connected users and failed notifications. Administrators can filter
+the license and audit tables, export both datasets as CSV and send an explicit
+test notification through the configured webhook.
+
+For production, the service can store all license registries, trial claims,
+users, installations, audit events and notification deduplication records in
+Azure Table Storage. It authenticates with the App Service managed identity,
+uses entity ETags for optimistic concurrency, and can import the existing file
+data with record-count and SHA-256 verification while leaving the source files
+unchanged. See `services/licensing/AZURE.md` for the migration sequence.
+
+The admin center supports Microsoft Entra authorization-code sign-in with PKCE.
+The API access token must contain the delegated `License.Check` scope and the
+`License.Administrator` app role. Configure `LICENSE_ENTRA_CLIENT_ID` for the
+browser client ID and optionally override the role through
+`LICENSE_ENTRA_ADMIN_ROLE`. Register the exact SPA redirect URI
+`https://<license-host>/admin`. The legacy `LICENSE_ADMIN_KEY` can remain as a
+temporary emergency fallback and should be removed after Entra access is
+verified.
+
+Set `LICENSE_NOTIFICATION_WEBHOOK_URL` and `LICENSE_NOTIFICATION_RECIPIENT` to
+enable email notifications. `LICENSE_NOTIFICATION_WEBHOOK_TOKEN` is optional
+and is sent as a Bearer token. The webhook receives JSON with `to`, `subject`,
+`text`, `eventType`, `entityId` and `occurredAt`. Delivery is deduplicated in
+the private license data directory and failures never block license requests.
 
 ## Service contract
 

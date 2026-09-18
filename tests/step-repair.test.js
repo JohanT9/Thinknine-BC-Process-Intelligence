@@ -91,3 +91,16 @@ assert.doesNotMatch(background,
   "supplementary screenshots must not change original raw event meaning");
 
 console.log("Single-step repair behaviour tests passed.");
+
+const gallery = require("../src/review/screenshot-gallery");
+const galleryAssets = { other: "a", related: "b", current: "c", captured: "d" };
+const galleryTask = { selectedScreenshotAssetId: "current", sourceScreenshotAssetIds: ["related", "current"] };
+const galleryBefore = JSON.stringify([galleryAssets, galleryTask]);
+assert.deepStrictEqual(gallery.derive(galleryAssets, galleryTask, "captured").map(x => x.id),
+  ["current", "captured", "related", "other"]);
+assert.deepStrictEqual(gallery.derive(galleryAssets, galleryTask, "captured").map(x => x.number), [3, 4, 2, 1]);
+assert.strictEqual(JSON.stringify([galleryAssets, galleryTask]), galleryBefore);
+assert.deepStrictEqual(gallery.derive(null), []);
+assert.strictEqual(gallery.derive({ a: "a" }, { selectedScreenshotAssetId: "missing" })[0].role, "other");
+assert(html.includes('id="stepImagePreviewDialog"'));
+assert(html.includes('aria-pressed="false"'));

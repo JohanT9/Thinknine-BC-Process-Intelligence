@@ -9,7 +9,7 @@ const pkg = JSON.parse(read("package.json"));
 
 assert.deepStrictEqual(brand, {
   productName: "BC Process Studio",
-  companyAttribution: "by Thinknine",
+  companyAttribution: "",
   descriptor: "Business Process Intelligence for Microsoft Dynamics 365 Business Central",
   primaryTagline: "Turn Business Central processes into knowledge.",
   supportingMessage: "Capture. Document. Improve.",
@@ -45,3 +45,10 @@ assert(!primarySurfaces.includes("BC Process Maps"),
 assert(!primarySurfaces.includes("BC Process AI"),
   "Future Process AI must not appear as available navigation.");
 console.log("BC Process Studio branding and compatibility tests passed.");
+
+const visibleBrandSurfaces = ["src/ui/popup.html", "src/ui/dashboard.html",
+  "src/engine/product-brand.js", "src/engine/documentation-engine.js",
+  "src/exporters/word-exporter.js", "src/document/document-planner.js"];
+for (const file of visibleBrandSurfaces) {
+  assert(!/thinknine|\bT9\b/i.test(read(file)), `Removed branding remains in ${file}`);
+}

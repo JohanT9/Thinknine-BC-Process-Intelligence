@@ -1,6 +1,6 @@
 # BC Process Studio 4.7
 
-**by Thinknine**
+
 
 **Business Process Intelligence for Microsoft Dynamics 365 Business Central**
 

@@ -250,7 +250,7 @@ assert.ok(output.documentXml.includes("Användaren har behörighet"));
 assert.ok(output.documentXml.includes("Slutförd"));
 assert.ok(output.documentXml.includes("Första version"));
 assert.ok(output.headerXml.includes("Orderprocess"));
-assert.ok(output.footerXml.includes("BC Process Studio by Thinknine"));
+assert.ok(output.footerXml.includes("BC Process Studio"));
 assert.ok(output.footerXml.includes("PAGE"));
 assert.ok(output.footerXml.includes("NUMPAGES"));
 assert.match(output.relationships, /relationships\/image/);

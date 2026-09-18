@@ -42,6 +42,12 @@ const technicalHtml = fs.readFileSync(path.join(root,
   "src/ui/technical-report.html"), "utf8");
 const technical = fs.readFileSync(path.join(root,
   "src/ui/technical-report.js"), "utf8");
+const licenseHtml = fs.readFileSync(path.join(root,
+  "src/ui/license-status.html"), "utf8");
+const license = fs.readFileSync(path.join(root,
+  "src/ui/license-status.js"), "utf8");
+const content = fs.readFileSync(path.join(root,
+  "src/recorder/content.js"), "utf8");
 const build = fs.readFileSync(path.join(root, "scripts/build.js"), "utf8");
 
 assert.match(dashboardHtml, /id="uiLocale"[\s\S]*value="sv-SE"[\s\S]*value="en-US"/);
@@ -84,12 +90,35 @@ assert.match(build, /"i18n\.js"/);
 assert.match(debugHtml, /<script src="i18n\.js"><\/script>/);
 assert.match(debug, /T9_GET_SETTINGS/);
 assert.match(technicalHtml, /<script src="i18n\.js"><\/script>/);
-assert.match(technical, /technical\.reportCopied/);
+assert.match(technical, /technical\.issueCopied/);
 assert.match(technical, /technical\.sensitiveCategories/);
 assert.match(technicalHtml, /data-i18n-aria-label="technical\.closeSharing"/);
+assert.match(licenseHtml, /<script src="i18n\.js"><\/script>/);
+assert.match(licenseHtml, /data-i18n="license\.pageTitle"/);
+assert.equal(i18n.translate("license.pageTitle", "en-US"), "License information");
+assert.match(license, /T9_GET_SETTINGS/);
+assert.match(license, /Intl\.DateTimeFormat\(currentUiLocale/);
+assert.match(content, /uiText\("Inspelning pågår", "Recording in progress"\)/);
+assert.match(content, /changes\.t9_settings/);
 assert.match(source, /\[data-i18n-aria-label\]/);
 assert.match(dashboard, /uiTf\("a11y\.editInstruction"/);
 assert.equal(i18n.translateStaticText("Anslutning till BC", "en-US"),
   "BC connection");
+
+const decode = value => value.replaceAll("&aring;", "å").replaceAll("&auml;", "ä")
+  .replaceAll("&ouml;", "ö").replaceAll("&Aring;", "Å")
+  .replaceAll("&Auml;", "Ä").replaceAll("&Ouml;", "Ö");
+for (const file of ["dashboard.html", "popup.html", "debug.html",
+  "technical-report.html", "license-status.html"]) {
+  const html = fs.readFileSync(path.join(root, "src/ui", file), "utf8");
+  const visible = /<(button|summary|legend|option|th|dt|label|h2|h3|h4)(?:\s[^>]*)?>([^<]+)<\/\1>/gsi;
+  for (const match of html.matchAll(visible)) {
+    if (match[0].includes("data-i18n")) continue;
+    const value = decode(match[2].replace(/\s+/g, " ").trim());
+    if (!/[åäöÅÄÖ]|\b(?:Visa|Öppna|Spara|Välj|Använd|Nästa|Tillbaka|Ta bort|Inköp|Lager|Försäljning|Dokument|Licensinformation|Stoppa)\b/u.test(value)) continue;
+    assert.notEqual(i18n.translateStaticText(value, "en-US"), value,
+      `${file} contains untranslated interface text: ${value}`);
+  }
+}
 
 console.log("UI localization foundation tests passed.");

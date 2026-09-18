@@ -212,8 +212,8 @@ assert.ok(
   "Dashboard feedback and disclosure state must be available to assistive technology."
 );
 assert.ok(
-  js.includes('button.setAttribute("aria-busy", "true")') &&
-    js.includes('button.removeAttribute("aria-busy")'),
+  js.includes('control.setAttribute("aria-busy", "true")') &&
+    js.includes('control.removeAttribute("aria-busy")'),
   "Word export must expose and clear its busy state."
 );
 assert.ok(

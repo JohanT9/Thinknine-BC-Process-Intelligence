@@ -291,7 +291,7 @@ focus, status treatments, reduced-motion support and narrower-window layouts.
 This is an independent Thinknine design. It uses no Microsoft logo or Dynamics
 product icon and does not imply Microsoft ownership or endorsement.
 
-Version 4.7 introduces the new product identity **BC Process Studio by Thinknine** and positions the application as Business Process Intelligence for Microsoft Dynamics 365 Business Central.
+Version 4.7 introduces the new product identity **BC Process Studio** and positions the application as Business Process Intelligence for Microsoft Dynamics 365 Business Central.
 
 The current journey is expressed through **BC Process Recorder**, **BC Review Studio**, **BC Document Generator**, and **BC Knowledge Base**. Existing recording, review, documentation, Word export, Bug Reporting and local data remain compatible. **BC Process Maps** and broader **BC Process AI** capabilities are named future areas and are not exposed as completed functionality.
 

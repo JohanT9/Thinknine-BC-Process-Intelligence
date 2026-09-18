@@ -171,3 +171,29 @@ for (const forbidden of ["../review/", "../ui/", "../exporters/", "document-plan
 }
 
 console.log("Presentation Grammar behaviour tests passed.");
+
+const menuAction = { actionType: "RunActionPath",
+  actionPath: ["Actions", "Posting", "Post"] };
+assert.strictEqual(grammar.presentationFor(menuAction, "Old text", "en-US").text,
+  "Choose Actions → Posting → Post.");
+assert.strictEqual(grammar.presentationFor(menuAction, "Old text", "sv-SE").text,
+  "Välj Actions → Posting → Post.", "Observed interface captions remain unchanged");
+assert.strictEqual(grammar.presentationFor({ actionType: "RunActionPath",
+  actionPath: ["Actions", null] }, "Fallback").text, "Fallback");
+assert.strictEqual(grammar.presentationFor(menuAction, "Old text", "en-US")
+  .runs.filter(value => value.role === "interface").length, 3);
+for (const protection of [{ preserveUserText: true }, { provenance: "user-edited" }]) {
+  const authored = { schemaVersion: 1, documentId: "authored", metadata: {},
+    sections: [{ sectionId: "workflow", kind: "workflow", blocks: [{
+      blockId: "step", kind: "step", semanticAction: menuAction, blocks: [{
+        blockId: "instruction", kind: "paragraph",
+        text: 'Min instruktion med "egna ord" och **bokstavliga tecken**.',
+        ...protection
+      }]
+    }] }], provenance: {} };
+  const original = JSON.stringify(authored);
+  const result = grammar.process(authored).sections[0].blocks[0].blocks[0];
+  assert.strictEqual(result.text, authored.sections[0].blocks[0].blocks[0].text);
+  assert.strictEqual(result.presentationRuns.map(value => value.text).join(""), result.text);
+  assert.strictEqual(JSON.stringify(authored), original);
+}

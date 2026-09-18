@@ -575,7 +575,9 @@
         },
         content: {
           title: document.metadata.title,
-          text: kind === "footer" ? branding.footer : document.metadata.title,
+          text: kind === "footer"
+            ? String(branding.footer || "").trim() || document.metadata.title
+            : document.metadata.title,
           brandingReference: supports(theme, "supportsBranding")
             ? "theme.branding"
             : "",
@@ -610,7 +612,7 @@
       spacing: clone(resolvedTheme.spacing),
       content: {
         title: document.metadata.title,
-        creator: "BC Process Studio by Thinknine",
+        creator: "BC Process Studio",
         subject: "Business Central arbetsinstruktion",
         description: "Genererad från en granskad Business Central-process.",
         documentAppearance: clone(resolvedTheme.components.document || {}),

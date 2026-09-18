@@ -13,7 +13,10 @@ async function main() {
   const original = { [tenant]: { enabled: true, expiresAt: "2026-12-31T23:59:59Z" } };
   await fs.writeFile(file, JSON.stringify(original));
   const key = crypto.randomBytes(32).toString("hex");
-  const server = await createService({ dataDirectory: directory, adminKey: key });
+  const notificationEvents = [];
+  const notifier = { configured: true, scan: async () => {},
+    send: async event => { notificationEvents.push(event); return { sent: true }; } };
+  const server = await createService({ dataDirectory: directory, adminKey: key, notifier });
   await new Promise(resolve => server.listen(0, "127.0.0.1", resolve));
   const base = `http://127.0.0.1:${server.address().port}`;
   const get = (route, secret = key) => fetch(base + route, {
@@ -32,10 +35,18 @@ async function main() {
     assert.equal(page.status, 200);
     assert.ok(page.headers.get("content-security-policy").includes("frame-ancestors 'none'"));
     assert.ok(!(await page.text()).includes(key));
+    const oauthReturnPage = await get("/admin?code=test&state=test", "");
+    assert.equal(oauthReturnPage.status, 200);
+    assert.match(await oauthReturnPage.text(), /Administratörsåtkomst/);
     assert.equal((await get("/admin/../tenants.json", "")).status, 404);
     assert.equal((await get("/admin/admin.js", "")).status, 200);
     let state = await (await get("/admin/api/state")).json();
     assert.deepEqual(state.tenants, original);
+    assert.equal(state.notificationConfigured, true);
+    const testNotification = await fetch(base + "/admin/api/notification/test", { method: "POST",
+      headers: { Authorization: "Bearer " + key, "Content-Type": "application/json" }, body: "{}" });
+    assert.equal(testNotification.status, 200);
+    assert.equal(notificationEvents[0].type, "notification-test");
     const edit = { tenantId: tenant, name: "Salico UAT", contactEmail: "admin@example.com",
       licenseType: "standard", enabled: false,
       expiresAt: "2026-12-31T23:59:59Z", revision: state.revision };
@@ -98,7 +109,11 @@ async function main() {
     const consultantSaved = await saveConsultant(consultant);
     assert.equal(consultantSaved.status, 200);
     state = await consultantSaved.json();
-    assert.equal(state.consultants[`${tenant}:${second}`].name, "Consultant One");
+    assert.equal(state.consultants[`${tenant}:00000000-0000-0000-0000-000000000000`].name,
+      "Consultant One");
+    assert.ok(state.auditEvents.some(event => event.action === "tenant-saved"));
+    assert.ok(state.auditEvents.some(event => event.action === "tenant-trial-reset"));
+    assert.ok(state.auditEvents.some(event => event.action === "consultant-saved"));
     await assert.rejects(createService({ dataDirectory: directory, adminKey: "weak" }), /64-character/);
     console.log("Tenant license admin protection, editing and conflict tests passed.");
   } finally { await new Promise(resolve => server.close(resolve)); }
@@ -108,5 +123,23 @@ async function main() {
     const response = await fetch(`http://127.0.0.1:${disabled.address().port}/admin/api/state`);
     assert.equal(response.status, 503);
   } finally { await new Promise(resolve => disabled.close(resolve)); }
+  const entraAdmin = await createService({ dataDirectory: directory,
+    entraAudience: tenant, entraClientId: tenant,
+    entraValidator: async () => ({ tid: tenant, oid: second, name: "User", preferredUsername: "user@example.com" }),
+    adminEntraValidator: async authorization => {
+      if (authorization !== "Bearer entra-token") { const error = new Error("unauthorized"); error.status = 401; throw error; }
+      return { tid: tenant, oid: second, name: "Admin User", preferredUsername: "admin@example.com" };
+    } });
+  await new Promise(resolve => entraAdmin.listen(0, "127.0.0.1", resolve));
+  try {
+    const entraBase = `http://127.0.0.1:${entraAdmin.address().port}`;
+    const config = await (await fetch(entraBase + "/admin/api/auth/config")).json();
+    assert.equal(config.enabled, true);
+    assert.equal(config.clientId, tenant);
+    assert.equal(config.requiredRole, "License.Administrator");
+    assert.equal((await fetch(entraBase + "/admin/api/state")).status, 401);
+    assert.equal((await fetch(entraBase + "/admin/api/state", {
+      headers: { Authorization: "Bearer entra-token" } })).status, 200);
+  } finally { await new Promise(resolve => entraAdmin.close(resolve)); }
 }
 main().catch(error => { console.error(error); process.exitCode = 1; });

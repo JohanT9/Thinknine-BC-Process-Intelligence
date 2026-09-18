@@ -346,8 +346,8 @@
       toc: { textColor: "{colors.text}", title: "Innehåll" }
     },
     branding: {
-      organizationName: "Thinknine AB",
-      footer: "BC Process Studio by Thinknine"
+      organizationName: "BC Process Studio",
+      footer: "BC Process Studio"
     },
     metadata: { builtIn: true },
     origin: { provider: "built-in", package: "thinknine", id: "thinknine" }

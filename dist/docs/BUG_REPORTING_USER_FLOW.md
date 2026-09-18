@@ -1,6 +1,6 @@
 # Bug Reporting User Flow
 
-1. Open Business Central and the Thinknine extension.
+1. Open Business Central and the BC Process Studio extension.
 2. Choose **Report a Bug**. Recording begins in one action.
 3. Reproduce the problem. If BC shows an error, its observable text, details, and screenshot are captured when available. Silent functional problems are also supported.
 4. Choose **Stop and open bug report**. The local draft opens directly with an automatically generated, editable title.

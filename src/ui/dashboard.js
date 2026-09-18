@@ -2476,7 +2476,7 @@ Processen är genomförd enligt arbetsgången.
 Dokumentationskvalitet: **${quality} %**
 
 ---
-Genererad av BC Process Studio by Thinknine __APP_VERSION__.
+Genererad av BC Process Studio __APP_VERSION__.
 `;
 }
 
@@ -2516,7 +2516,7 @@ ${rendered || "Inga meningsfulla arbetssteg kunde identifieras."}
 Processen är genomförd och de registrerade ändringarna har sparats i Business Central.
 
 ---
-Automatiskt tolkat av BC Process Studio by Thinknine __APP_VERSION__.
+Automatiskt tolkat av BC Process Studio __APP_VERSION__.
 `;
 }
 
@@ -3179,6 +3179,7 @@ function createActiveDocumentPipeline() {
     activeReview,
     workspaceState.revision,
     activeDocumentProfileId,
+    activeDocumentThemeId(),
     expectedResult,
     documentLanguage
   ], () => globalThis.T9WordExportPipeline.create({
@@ -3189,7 +3190,7 @@ function createActiveDocumentPipeline() {
       preparedPresentation,
       screenshotCandidates: screenshotCandidatesFor(activeReviewModel, activeReview),
       profileId: activeDocumentProfileId,
-      themeId: "thinknine"
+      themeId: activeDocumentThemeId()
     }));
 }
 
@@ -4039,6 +4040,25 @@ function batchMetadataOperation() {
   };
 }
 
+function activeDocumentThemeId() {
+  const assigned = documentLibraryRecords.find(record =>
+    record.projectId === activeReviewSession?.id)?.theme?.themeId;
+  const themes = globalThis.T9DocumentThemeRegistry.list(
+    globalThis.T9DocumentThemeRegistry.BUILT_IN_REGISTRY);
+  return themes.some(theme => theme.themeId === assigned) ? assigned
+    : documentProfiles().find(profile => profile.profileId === activeDocumentProfileId)
+      ?.theme.themeId || "thinknine";
+}
+
+function renderDocumentProfileChoice() {
+  const select = $("reviewDocumentProfile");
+  select.innerHTML = documentProfiles().map(profile =>
+    '<option value="' + escapeHtml(profile.profileId) + '">' +
+    escapeHtml(uiT("review.profile." + profile.profileId)) + '</option>').join("");
+  select.value = activeDocumentProfileId;
+  $("reviewDocumentProfileHelp").textContent = uiT("review.profileHelp." + activeDocumentProfileId);
+}
+
 function documentProfiles() {
   return globalThis.T9DocumentProfile.list(
     globalThis.T9DocumentProfile.BUILT_IN_REGISTRY
@@ -4099,6 +4119,7 @@ function buildDocumentProfileVariants(pipeline) {
 }
 
 function applyDocumentProfileVariant(options = {}) {
+  renderDocumentExportCheck();
   const variant = documentProfileVariants.get(activeDocumentProfileId);
   if (!variant) return null;
   const viewport = $("documentWorkspaceViewport");
@@ -4632,6 +4653,82 @@ function applyReviewToolbarState() {
     : uiTf("review.nextUnreviewedLabel", { count: navigation.count }));
 }
 
+function activeExportCheck() {
+  return globalThis.T9ReviewNavigation.exportCheck(
+    reviewTasksForDisplay(activeReview).tasks, screenshotQualityByTask());
+}
+
+function renderDocumentExportCheck() {
+  const check = activeExportCheck();
+  $("documentExportCheckStatus").textContent = check.total
+    ? uiTf("review.exportCheck", check) : uiT("review.exportEmpty");
+  $("documentCheckNext").disabled = !check.nextTaskId;
+  if (!$("documentExportWord").hasAttribute("aria-busy")) {
+    $("documentExportWord").disabled = !check.total;
+  }
+}
+
+$("documentCheckNext").addEventListener("click", async () => {
+  const review = activeReview;
+  const check = activeExportCheck();
+  if (!check.nextTaskId) return;
+  await switchWorkspace("review");
+  if (activeReview !== review) return;
+  $("reviewAttention").open = true;
+  activateProcessOverviewTask(check.nextTaskId, true);
+});
+
+$("documentExportWord").addEventListener("click", event => {
+  exportReviewFromToolbar(event.currentTarget);
+});
+
+function renderReviewAttention(tasks, imageQualities) {
+  renderDocumentExportCheck();
+  const guidance = globalThis.T9ReviewNavigation.attention(tasks, imageQualities);
+  $("reviewOutcomeSummary").textContent = uiTf("review.outcomeSummary",
+    globalThis.T9ReviewNavigation.outcomes(tasks));
+  $("reviewSummary").textContent = uiTf("review.readiness", {
+    total: guidance.total, remaining: guidance.remaining
+  });
+  $("reviewAttentionSummary").textContent = guidance.items.length
+    ? uiTf("review.attentionCount", { count: guidance.items.length })
+    : uiT("review.attentionNone");
+  $("reviewAttentionHelp").textContent = uiT("review.attentionHelp");
+  const list = $("reviewAttentionList");
+  list.replaceChildren();
+  guidance.items.forEach(item => {
+    const row = document.createElement("li");
+    const button = document.createElement("button");
+    button.type = "button";
+    button.className = "secondary";
+    button.textContent = uiTf("review.attentionStep", { step: item.step }) +
+      " · " + item.reasons.map(reason => uiT("review.attention." + reason)).join(" · ");
+    button.addEventListener("click", () => {
+      activateProcessOverviewTask(item.taskId, true);
+    });
+    row.append(button);
+    const action = item.reasons.includes("instruction") ? "edit-instruction"
+      : item.reasons.includes("image") ? "repair-step" : null;
+    if (action) {
+      const fix = document.createElement("button");
+      fix.type = "button";
+      fix.className = "secondary review-attention-fix";
+      fix.textContent = uiT(action === "edit-instruction"
+        ? "review.attentionEdit" : "review.attentionImage");
+      fix.setAttribute("aria-label", uiTf(action === "edit-instruction"
+        ? "a11y.editInstruction" : "a11y.changeImage", { step: item.step }));
+      fix.addEventListener("click", () => {
+        if (!activateProcessOverviewTask(item.taskId, true)) return;
+        const card = [...$("reviewList").querySelectorAll("[data-review-task-id]")]
+          .find(value => value.dataset.reviewTaskId === item.taskId);
+        card?.querySelector('[data-action="' + action + '"]')?.click();
+      });
+      row.append(fix);
+    }
+    list.append(row);
+  });
+}
+
 function applyReviewStatus() {
   const status = globalThis.T9ReviewStatus.derive(
     activeReview?.tasks || [],
@@ -4726,7 +4823,7 @@ function selectedReviewTaskIds(fallbackId) {
 function renderMovedReview(previousPositions, focusId) {
   renderReview();
   loadProcessAnalysis().catch(error => {
-    console.warn("T9 process analysis preload failed", error);
+    console.warn("BC Process Studio process analysis preload failed", error);
   });
   if (focusId) {
     activeReviewSelection = {
@@ -5112,33 +5209,72 @@ function reviewImages(task) {
 
 let stepRepairState = null;
 
+function stepRepairContext() {
+  const state = stepRepairState;
+  const review = activeReview;
+  const session = activeReviewSession;
+  const model = activeReviewModel;
+  return { state, review, session, model, current: () =>
+    Boolean(state && state === stepRepairState && review === activeReview &&
+      session === activeReviewSession && model === activeReviewModel &&
+      $("stepRepairDialog").open &&
+      (review?.tasks?.[state.taskIndex]?.taskId ||
+        review?.tasks?.[state.taskIndex]?.stepId) === state.taskId) };
+}
+
 function renderStepRepairGallery() {
   const gallery = $("stepRepairGallery");
-  const assets = Object.entries(activeReviewModel?.screenshotData || {});
-  gallery.innerHTML = assets.length ? assets.map(([path, imageUrl], index) =>
-    `<label class="step-repair-choice">
-      <input type="radio" name="stepRepairScreenshot"
-        value="${escapeHtml(path)}"
-        ${stepRepairState?.selectedAssetId === path ? "checked" : ""}>
-      <img src="${imageUrl}" alt="Skärmbild ${index + 1} från inspelningen">
-      <span>${stepRepairState?.capturedAssetId === path
-        ? "Ny kompletterande bild" : `Bild ${index + 1}`}</span>
-    </label>`).join("") :
-    `<p class="muted">Inga skärmbilder finns i inspelningen.</p>`;
+  const task = activeReview?.tasks?.[stepRepairState?.taskIndex];
+  const resolved = task ? globalThis.T9Review.resolveTask(task) : {};
+  const assets = globalThis.T9ScreenshotGallery.derive(
+    activeReviewModel?.screenshotData, resolved, stepRepairState?.capturedAssetId);
+  gallery.innerHTML = assets.length ? assets.map(asset =>
+    '<div class="step-repair-choice"><label>' +
+    '<input type="radio" name="stepRepairScreenshot" value="' + escapeHtml(asset.id) + '" ' +
+    (stepRepairState?.selectedAssetId === asset.id ? 'checked' : '') + '>' +
+    '<img loading="lazy" src="' + escapeHtml(asset.imageUrl) + '" alt="' +
+    escapeHtml(uiTf("review.imageNumber", { number: asset.number })) + '">' +
+    '<span>' + escapeHtml(uiTf("review.imageNumber", { number: asset.number })) +
+    ' · ' + escapeHtml(uiT("review.imageRole." + asset.role)) + '</span></label>' +
+    '<button type="button" class="secondary" data-preview-asset="' + escapeHtml(asset.id) +
+    '" aria-label="' + escapeHtml(uiTf("review.previewImageNumber", { number: asset.number })) +
+    '">' + escapeHtml(uiT("review.previewImage")) + '</button></div>'
+  ).join("") : '<p class="muted">' + uiT("review.noImages") + '</p>';
   for (const radio of gallery.querySelectorAll("input[type=radio]")) {
     radio.addEventListener("change", () => {
+      if (!stepRepairState) return;
       stepRepairState.selectedAssetId = radio.value;
       $("applyStepRepair").disabled = false;
     });
   }
-  $("applyStepRepair").disabled = !stepRepairState?.selectedAssetId;
+  for (const button of gallery.querySelectorAll("[data-preview-asset]")) {
+    button.addEventListener("click", () => {
+      const asset = assets.find(value => value.id === button.dataset.previewAsset);
+      if (!asset) return;
+      $("stepImagePreviewTitle").textContent = uiTf("review.previewImageNumber", { number: asset.number });
+      $("stepImagePreviewImage").src = asset.imageUrl;
+      $("stepImagePreviewImage").alt = uiTf("review.imageNumber", { number: asset.number });
+      $("stepImagePreviewViewport").classList.remove("actual-size");
+      $("stepImageActualSize").setAttribute("aria-pressed", "false");
+      $("stepImagePreviewDialog").showModal();
+    });
+  }
+  $("applyStepRepair").disabled = !assets.some(asset => asset.id === stepRepairState?.selectedAssetId);
 }
+
+$("stepImageActualSize").addEventListener("click", () => {
+  const actual = $("stepImagePreviewViewport").classList.toggle("actual-size");
+  $("stepImageActualSize").setAttribute("aria-pressed", String(actual));
+});
+$("stepImagePreviewDialog").addEventListener("close", () => {
+  $("stepImagePreviewImage").removeAttribute("src");
+});
 
 function openStepRepair(taskIndex) {
   const task = activeReview?.tasks?.[taskIndex];
   if (!task || !activeReviewModel) return;
   stepRepairState = { taskIndex, taskId: task.taskId || task.stepId,
-    selectedAssetId: task.selectedScreenshotAssetId || task.screenshot || null,
+    selectedAssetId: globalThis.T9Review.resolveTask(task).selectedScreenshotAssetId || null,
     capturedAssetId: null, capturedAssetKey: null, capturedImage: null,
     capturedAt: null };
   $("stepRepairTitle").textContent = uiTf("review.changeImageForStep", {
@@ -5147,19 +5283,24 @@ function openStepRepair(taskIndex) {
     ) || taskIndex + 1
   });
   $("stepRepairStatus").textContent = "";
+  $("captureStepRepairScreenshot").disabled = false;
   renderStepRepairGallery();
   $("stepRepairDialog").showModal();
 }
 
 $("captureStepRepairScreenshot").addEventListener("click", async () => {
   if (!stepRepairState || !activeReviewSession) return;
+  const operation = stepRepairContext();
+  if (!operation.current()) return;
   const button = $("captureStepRepairScreenshot");
+  if (button.disabled) return;
   button.disabled = true;
   $("stepRepairStatus").textContent =
     "Tar en bild från den senast använda Business Central-fliken...";
   try {
     const response = await send({ type: "T9_CAPTURE_STEP_REPAIR_SCREENSHOT",
       sessionId: activeReviewSession.id, stepId: stepRepairState.taskId });
+    if (!operation.current()) return;
     if (!response.ok) throw new Error(response.error ||
       "Skärmbilden kunde inte tas.");
     activeReviewModel.screenshotData[response.assetId] = response.image;
@@ -5172,15 +5313,20 @@ $("captureStepRepairScreenshot").addEventListener("click", async () => {
     $("stepRepairStatus").textContent =
       "Den nya bilden är vald. Bekräfta för att uppdatera steget.";
   } catch (error) {
+    if (!operation.current()) return;
     $("stepRepairStatus").textContent = error.message;
   } finally {
-    button.disabled = false;
+    if (operation.current()) button.disabled = false;
   }
 });
 
 $("applyStepRepair").addEventListener("click", async () => {
   if (!stepRepairState?.selectedAssetId) return;
+  const operation = stepRepairContext();
+  if (!operation.current()) return;
+  const selectedAssetId = operation.state.selectedAssetId;
   const button = $("applyStepRepair");
+  if (button.disabled) return;
   button.disabled = true;
   const currentTask = activeReview?.tasks?.[stepRepairState.taskIndex];
   const currentAssetId = currentTask
@@ -5199,8 +5345,14 @@ $("applyStepRepair").addEventListener("click", async () => {
         sessionId: activeReviewSession.id,
         assetKey: stepRepairState.capturedAssetKey,
         image: stepRepairState.capturedImage });
+      if (!operation.current()) return;
+      if (stepRepairState.selectedAssetId !== selectedAssetId) {
+        button.disabled = false;
+        return;
+      }
       if (!saved.ok) throw new Error(saved.error || "Bilden kunde inte sparas.");
     } catch (error) {
+      if (!operation.current()) return;
       $("stepRepairStatus").textContent = error.message;
       button.disabled = false;
       return;
@@ -5611,7 +5763,7 @@ function reviewInstructionPresentation(task, documentPresentations = null) {
     const documentPresentation = documentPresentations?.get(task?.taskId);
     const automatic = globalThis.T9PresentationGrammar.presentationFor(
       task?.semanticActionModel || task,
-      sourceText
+      sourceText, activeDocumentLanguage()
     ).runs.map(run => ({
       text: run.text,
       ...(run.bold ? { bold: true } : {}),
@@ -5960,6 +6112,7 @@ function renderReviewContent() {
     expectedResultEditor.value = displayedExpectedResult();
   }
   $("reviewDocumentLanguage").value = activeDocumentLanguage();
+  renderDocumentProfileChoice();
 
   const displayTasks = reviewTasksForDisplay(activeReview);
   const tasks = displayTasks.tasks;
@@ -5971,9 +6124,7 @@ function renderReviewContent() {
   $("reviewProgressBar").style.width = `${progress}%`;
   $("reviewProgress").setAttribute("aria-valuenow", String(progress));
   list.setAttribute("aria-rowcount", String(tasks.length));
-  $("reviewSummary").textContent =
-    `${progress}% godkända · ` +
-    `Session confidence ${activeReviewModel.confidenceResult.sessionConfidence}%`;
+  renderReviewAttention(tasks, screenshotQualities);
   $("reviewFooterText").textContent =
     annotationChangesPending
       ? "Annoteringar har ändrats. Välj Spara för att lagra dem."
@@ -7825,27 +7976,54 @@ $("annotationSurface").addEventListener("keydown", event => {
     $("annotationStatus").textContent = "Pågående markering avbröts.";
   }
 });
+let reviewWordExportPending = false;
+
+function setReviewExportStatus(message, error = false) {
+  const status = $("reviewExportStatus");
+  status.hidden = false;
+  status.textContent = message;
+  status.classList.toggle("export-error", error);
+}
+
 async function exportReviewFromToolbar(button) {
-  button.disabled = true;
-  button.setAttribute("aria-busy", "true");
-  button.textContent = "Skapar Word...";
+  // DOM attributes are presentation state, not the export operation lock.
+  if (reviewWordExportPending) return;
+  reviewWordExportPending = true;
+  const buttons = [$("exportWordReview"), $("documentExportWord")].filter(Boolean);
+  buttons.forEach(control => {
+    control.disabled = true;
+    control.setAttribute("aria-busy", "true");
+  });
+  button.textContent = uiT("review.exportWorking");
+  setReviewExportStatus(uiT("review.exportWorking"));
   let persistenceWarning = "";
   try {
-    await reviewPersistence.saveExplicitly({ render: false });
-  } catch (error) {
-    persistenceWarning =
-      `Word skapades från aktuella ändringar, men de kunde inte sparas: ` +
-      error.message;
-  }
-  try {
+    try {
+      await reviewPersistence.saveExplicitly({ render: false });
+    } catch (error) {
+      persistenceWarning = error.message;
+    }
     await exportActiveReviewToWord();
-    if (persistenceWarning) show(persistenceWarning, true);
+    setReviewExportStatus(persistenceWarning
+      ? uiT("review.exportUnsaved") + " " + persistenceWarning
+      : uiT("review.exportDownloaded"), Boolean(persistenceWarning));
   } catch (error) {
-    show(error.message, true);
+    const message = uiT("review.exportFailed") + " " + (error?.message || String(error));
+    setReviewExportStatus(message, true);
+    show(message, true);
   } finally {
-    button.removeAttribute("aria-busy");
-    button.textContent = "Exportera Word";
-    applyReviewToolbarState();
+    reviewWordExportPending = false;
+    buttons.forEach(control => {
+      control.removeAttribute("aria-busy");
+      control.textContent = uiT("Exportera Word");
+      control.disabled = false;
+    });
+    try {
+      applyReviewToolbarState();
+      if (activeReview) renderDocumentExportCheck();
+    } catch (error) {
+      console.warn("Export controls could not be refreshed", error);
+    }
   }
 }
 
@@ -7936,6 +8114,37 @@ $("expectedResultEditor").addEventListener("input", event => {
   invalidateDocumentWorkspace();
   applyReviewToolbarState();
 });
+$("reviewDocumentProfile").addEventListener("change", async event => {
+  const profile = documentProfiles().find(value => value.profileId === event.currentTarget.value);
+  if (!profile || !activeReviewSession || !activeReview) return;
+  const session = activeReviewSession;
+  const review = activeReview;
+  const select = event.currentTarget;
+  select.disabled = true;
+  $("reviewDocumentProfileStatus").textContent = uiT("review.profileSaving");
+  try {
+    await updateDocumentLibraryRecord(session.id, {
+      profile: { profileId: profile.profileId, displayName: profile.displayName },
+      theme: { themeId: profile.theme.themeId, displayName: profile.theme.themeId }
+    });
+    if (activeReview !== review || activeReviewSession !== session) return;
+    activeDocumentProfileId = profile.profileId;
+    invalidateDocumentWorkspace();
+    renderReviewContent();
+    await synchronizeDocumentWorkspace();
+    if (activeReview === review && activeReviewSession === session) {
+      $("reviewDocumentProfileStatus").textContent = uiT("review.profileSaved");
+    }
+  } catch (error) {
+    if (activeReview === review && activeReviewSession === session) {
+      renderDocumentProfileChoice();
+      $("reviewDocumentProfileStatus").textContent = error.message;
+    }
+  } finally {
+    select.disabled = false;
+  }
+});
+
 $("reviewDocumentLanguage").addEventListener("change", event => {
   const documentLanguage = globalThis.T9LanguageRegistry.normalize(
     event.currentTarget.value, "document"
@@ -8504,7 +8713,7 @@ async function initializeDashboard() {
   try {
     await loadSettings();
   } catch (error) {
-    console.error("T9 loadSettings failed", error);
+    console.error("BC Process Studio loadSettings failed", error);
 
     // Keep the UI usable even if stored settings cannot be read.
     for (const [key, value] of Object.entries(DEFAULTS)) {
@@ -8536,7 +8745,7 @@ async function initializeDashboard() {
     await loadSessions();
     sessionsLoaded = true;
   } catch (error) {
-    console.error("T9 loadSessions failed", error);
+    console.error("BC Process Studio loadSessions failed", error);
     show(
       "Sessionerna kunde inte läsas. Öppna debugpanelen för mer information.",
       true
@@ -8546,7 +8755,7 @@ async function initializeDashboard() {
     try {
       await openRequestedReview();
     } catch (error) {
-      console.error("T9 openRequestedReview failed", error);
+      console.error("BC Process Studio openRequestedReview failed", error);
       show(uiT("Den begärda dokumentationen kunde inte öppnas."), true);
     }
   }

@@ -1767,10 +1767,38 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
         break;
       }
       case "T9_CONSULTANT_LICENSE_STATUS": {
-        const value = await consultantLicense.state();
+        let value = await consultantLicense.state();
+        if (value.refreshToken && value.license && consultantLicense.configured()) {
+          try {
+            await consultantLicense.register(await tenantLicense.installationId());
+            value = await consultantLicense.state();
+          } catch { /* Status still shows the authenticated account and can retry later. */ }
+        }
         sendResponse({ ok: true, configured: consultantLicense.configured(),
           signedIn: Boolean(value.refreshToken), expiresAt: value.expiresAt || 0,
-          profile: value.profile || {} });
+          profile: value.profile || {}, license: value.license || null });
+        break;
+      }
+      case "T9_MICROSOFT_SIGN_IN": {
+        if (sender.url !== chrome.runtime.getURL("popup.html") &&
+            !sender.url?.startsWith(chrome.runtime.getURL("license-status.html"))) {
+          throw new Error("Microsoft-inloggning får bara startas från tilläggets licensvyer.");
+        }
+        const account = await consultantLicense.signIn();
+        sendResponse({ ok: true, profile: account.profile || {} });
+        break;
+      }
+      case "T9_TENANT_USER_REGISTER": {
+        if (sender.url !== chrome.runtime.getURL("popup.html") &&
+            !sender.url?.startsWith(chrome.runtime.getURL("license-status.html"))) {
+          throw new Error("Användarregistrering får bara startas från tilläggets licensvyer.");
+        }
+        const tab = await chrome.tabs.get(message.tabId);
+        const tenantId = globalThis.T9TenantLicense.tenantFromUrl(tab.url);
+        if (!tenantId) throw new Error("Ingen Business Central-tenant kunde identifieras.");
+        const registration = await consultantLicense.registerTenantUser(tenantId,
+          await tenantLicense.installationId());
+        sendResponse({ ok: true, registration });
         break;
       }
       case "T9_CONSULTANT_LICENSE_CHECK": {
@@ -1787,7 +1815,8 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
           throw new Error("Konsultinloggning får bara startas från licenssidan.");
         }
         await consultantLicense.signIn();
-        sendResponse({ ok: true });
+        const license = await consultantLicense.register(await tenantLicense.installationId());
+        sendResponse({ ok: true, license });
         break;
       }
       case "T9_CONSULTANT_LICENSE_SIGN_OUT": {

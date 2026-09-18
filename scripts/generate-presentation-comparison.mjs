@@ -180,12 +180,12 @@ const metadataRows = [
   ["Granskad av", review.reviewer]
 ].map(([key, value]) => `<tr><td>${escapeHtml(key)}</td><td>${escapeHtml(value)}</td></tr>`).join("");
 const coverHtml = `<!doctype html><meta charset="utf-8"><style>${commonStyles}</style>
-  <main class="page"><div class="brand">BC PROCESS STUDIO · BY THINKNINE</div>
+  <main class="page"><div class="brand">BC PROCESS STUDIO</div>
   <h1 style="font-size:${professional ? "38px" : "30px"};margin-top:${professional ? "145px" : "70px"}">
     ${escapeHtml(session.name)}</h1>
   <p class="subtitle" style="font-size:${professional ? "18px" : "14px"}">${escapeHtml(session.purpose)}</p>
   ${professional ? '<div style="width:90px;border-top:4px solid #38a3d1;margin:28px 0"></div>' : ""}
-  <table class="meta">${metadataRows}</table><div class="footer">BC Process Studio by Thinknine</div></main>`;
+  <table class="meta">${metadataRows}</table><div class="footer">BC Process Studio</div></main>`;
 const workflowHtml = `<!doctype html><meta charset="utf-8"><style>${commonStyles}</style>
   <main class="page"><h1 class="section-title">Arbetsgång</h1>
   <h2 class="step-title">Steg 1</h2><p>${escapeHtml(review.tasks[0].instruction)}</p>

@@ -1,6 +1,6 @@
 # BC Process Studio 4.7 product identity
 
-BC Process Studio **by Thinknine** is Business Process Intelligence for Microsoft Dynamics 365 Business Central.
+BC Process Studio  is Business Process Intelligence for Microsoft Dynamics 365 Business Central.
 
 **Turn Business Central processes into knowledge.**
 
@@ -21,4 +21,4 @@ User-facing `Thinknine BC Process Intelligence`, `Thinknine BC Recorder`, and cu
 
 The npm package name, extension ID/listing identity, storage prefixes, global `T9*` namespaces, URLs, environment variables, schema versions, fixture filenames and built-in theme ID `thinknine` remain unchanged. They are technical compatibility contracts, not current product branding.
 
-Newly generated Word files use restrained `BC Process Studio by Thinknine` generator metadata and footer attribution. Existing documents and persisted data are not rewritten.
+Newly generated Word files use restrained `BC Process Studio` generator metadata and footer attribution. Existing documents and persisted data are not rewritten.

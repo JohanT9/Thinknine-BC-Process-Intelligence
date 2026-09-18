@@ -7,6 +7,49 @@
     .map(language => language.locale));
   const messages = Object.freeze({
     "sv-SE": Object.freeze({
+      "review.exportWorking": "Skapar Word…",
+      "review.exportDownloaded": "Word-filen har skickats till webbläsarens nedladdningar.",
+      "review.exportFailed": "Word-exporten misslyckades:",
+      "review.exportUnsaved": "Word-filen skapades, men ändringarna kunde inte sparas:",
+      "review.checkNext": "Kontrollera nästa steg",
+      "review.exportCheck": "{remaining} steg kvar att godkänna · {questions} steg med kvalitetsfrågor · {unverified} ej verifierade utfall · {unknown} utan bedömningsunderlag.",
+      "review.exportEmpty": "Dokumentet har inga steg att exportera.",
+      "review.profilePurpose": "Vad ska dokumentet användas till?",
+      "review.profile.business-process": "Beskriva och överlämna en process",
+      "review.profile.sop": "Dokumentera en arbetsrutin (SOP)",
+      "review.profile.training-guide": "Utbilda en användare",
+      "review.profile.quick-reference": "Ge en snabb referens",
+      "review.profile.troubleshooting-guide": "Beskriva felsökning",
+      "review.profileHelp.business-process": "Balanserad processdokumentation. Kvalitetsstödet fokuserar på arbetsgång, bilder och dokumentinformation.",
+      "review.profileHelp.sop": "Precist språk och Corporate-tema. Kvalitetsstödet lyfter versionsinformation och granskare.",
+      "review.profileHelp.training-guide": "Utbildningsprofil med fokus på bildstöd och tillgänglighet. Lägg själv till förklaringar som saknas i inspelningen.",
+      "review.profileHelp.quick-reference": "Kortfattad språkprofil och Minimal-tema. Kvalitetsstödet kräver inte en bild för varje steg. Steg raderas inte automatiskt.",
+      "review.profileHelp.troubleshooting-guide": "Diagnostisk språkprofil och Corporate-tema. Kvalitetsstödet fokuserar på arbetsgång, bilder och revisionsinformation.",
+      "review.profileSaved": "Dokumenttypen är sparad. Dokumentvyn och Word använder samma val.",
+      "review.profileSaving": "Sparar dokumenttyp…",
+      "review.outcomeSummary": "Utfall: {verified} steg med observerad reaktion · {error} med observerat fel · {unverified} utan verifierat utfall · {unknown} utan bedömningsunderlag · {manual} manuella informationssteg.",
+      "review.outcomeHelp": "En observerad reaktion kan vara en öppnad sida eller dialog och är inte i sig ett bevis på att affärsprocessen lyckades. Saknat utfall betyder inte att ett fel inträffade.",
+      "review.imageNumber": "Bild {number}",
+      "review.previewImageNumber": "Förhandsvisa bild {number}",
+      "review.previewImage": "Förhandsvisa",
+      "review.noImages": "Inga skärmbilder finns i inspelningen.",
+      "review.imageRole.current": "Aktuell bild",
+      "review.imageRole.captured": "Ny kompletterande bild",
+      "review.imageRole.related": "Från detta steg",
+      "review.imageRole.other": "Övrig bild i inspelningen",
+      "review.previewImageHelp": "Kontrollera att rätt fält eller åtgärd syns och att texten går att läsa. 100 % visar bildens pixlar i webbläsaren, inte dess storlek i Word. Förhandsvisningen ändrar inte vald bild.",
+      "review.imageActualSize": "Visa i 100 %",
+      "review.closeImagePreview": "Tillbaka till bildval",
+      "review.attentionEdit": "Redigera instruktion",
+      "review.attentionImage": "Byt bild",
+      "review.readiness": "{total} steg · {remaining} återstår att godkänna",
+      "review.attentionCount": "{count} steg behöver kontrolleras – visa prioriterad lista",
+      "review.attentionNone": "Inga särskilda kvalitetsfrågor identifierade",
+      "review.attentionHelp": "Kontrollera instruktionen, bilden eller det observerade felet. Ett godkännande bekräftar din granskning; det verifierar inte att processen lyckades. Listan ersätter inte granskning av hela dokumentet.",
+      "review.attentionStep": "Gå till steg {step}",
+      "review.attention.observedError": "Ett fel observerades – kontrollera resultatet",
+      "review.attention.instruction": "Osäker tolkning – kontrollera instruktionen",
+      "review.attention.image": "Svagt eller obestämt bildstöd – kontrollera bilden",
       "app.tagline": "Business Process Intelligence för Microsoft Dynamics 365 Business Central.",
       "app.promise": "Gör Business Central-processer till kunskap.",
       "app.promiseDetail": "Spela in. Dokumentera. Förbättra.",
@@ -33,6 +76,20 @@
       "language.switchToLanguage": "Byt språk till {language}",
       "settings.save": "Spara inställningar",
       "settings.saved": "Inställningarna har sparats.",
+      "license.pageTitle": "Licensinformation",
+      "license.header": "Tenantlicens",
+      "license.knownTenant": "Känd Business Central-tenant",
+      "license.tenant": "Tenant",
+      "license.status": "Status",
+      "license.type": "Licenstyp",
+      "license.validUntil": "Giltig till",
+      "license.tenantId": "Tenant-ID",
+      "license.lastChecked": "Senast kontrollerad",
+      "license.checking": "Kontrollerar…",
+      "license.refresh": "Kontrollera aktuell BC-flik igen",
+      "license.consultant": "Microsoft-konto och konsultlicens",
+      "license.signIn": "Logga in med Microsoft",
+      "license.signOut": "Logga ut",
       "library.searchPlaceholder": "Titel, profil, tagg eller arbetsflöde",
       "library.documentLanguage": "Dokumentspråk",
       "library.allLanguages": "Alla språk",
@@ -193,6 +250,49 @@
       ,"recorder.cancelFailed": "Kunde inte avbryta inspelningen."
     }),
     "en-US": Object.freeze({
+      "review.exportWorking": "Creating Word…",
+      "review.exportDownloaded": "The Word file has been sent to the browser downloads.",
+      "review.exportFailed": "Word export failed:",
+      "review.exportUnsaved": "The Word file was created, but changes could not be saved:",
+      "review.checkNext": "Check next step",
+      "review.exportCheck": "{remaining} steps awaiting approval · {questions} steps with quality questions · {unverified} unverified outcomes · {unknown} without assessment data.",
+      "review.exportEmpty": "The document has no steps to export.",
+      "review.profilePurpose": "What is this document for?",
+      "review.profile.business-process": "Describe and hand over a process",
+      "review.profile.sop": "Document an operating procedure (SOP)",
+      "review.profile.training-guide": "Train a user",
+      "review.profile.quick-reference": "Provide a quick reference",
+      "review.profile.troubleshooting-guide": "Describe troubleshooting",
+      "review.profileHelp.business-process": "Balanced process documentation. Quality guidance focuses on workflow, screenshots and document information.",
+      "review.profileHelp.sop": "Precise wording and the Corporate theme. Quality guidance highlights version information and reviewers.",
+      "review.profileHelp.training-guide": "Training profile focused on visual support and accessibility. Add explanations that are missing from the recording.",
+      "review.profileHelp.quick-reference": "Concise language profile and the Minimal theme. Quality guidance does not require an image for every step. Steps are not deleted automatically.",
+      "review.profileHelp.troubleshooting-guide": "Diagnostic language profile and the Corporate theme. Quality guidance focuses on workflow, screenshots and revision information.",
+      "review.profileSaved": "Document type saved. The document view and Word use the same choice.",
+      "review.profileSaving": "Saving document type…",
+      "review.outcomeSummary": "Outcomes: {verified} steps with an observed response · {error} with an observed error · {unverified} without a verified outcome · {unknown} without assessment data · {manual} manual information steps.",
+      "review.outcomeHelp": "An observed response can be a page or dialog opening; it does not itself prove the business process succeeded. A missing outcome does not mean an error occurred.",
+      "review.imageNumber": "Image {number}",
+      "review.previewImageNumber": "Preview image {number}",
+      "review.previewImage": "Preview",
+      "review.noImages": "No screenshots are available in this recording.",
+      "review.imageRole.current": "Current image",
+      "review.imageRole.captured": "New supplementary image",
+      "review.imageRole.related": "From this step",
+      "review.imageRole.other": "Other recording image",
+      "review.previewImageHelp": "Check that the relevant field or action is visible and the text is readable. 100% shows image pixels in the browser, not its size in Word. Previewing does not change the selected image.",
+      "review.imageActualSize": "Show at 100%",
+      "review.closeImagePreview": "Back to image selection",
+      "review.attentionEdit": "Edit instruction",
+      "review.attentionImage": "Change image",
+      "review.readiness": "{total} steps · {remaining} awaiting approval",
+      "review.attentionCount": "{count} steps need checking – show priority list",
+      "review.attentionNone": "No specific quality issues identified",
+      "review.attentionHelp": "Check the instruction, image or observed error. Approval confirms your review; it does not verify that the process succeeded. This list does not replace reviewing the whole document.",
+      "review.attentionStep": "Go to step {step}",
+      "review.attention.observedError": "An error was observed – check the result",
+      "review.attention.instruction": "Uncertain interpretation – check the instruction",
+      "review.attention.image": "Weak or undetermined image evidence – check the image",
       "app.tagline": "Business Process Intelligence for Microsoft Dynamics 365 Business Central.",
       "app.promise": "Turn Business Central processes into knowledge.",
       "app.promiseDetail": "Capture. Document. Improve.",
@@ -219,6 +319,20 @@
       "language.switchToLanguage": "Switch language to {language}",
       "settings.save": "Save settings",
       "settings.saved": "Settings saved.",
+      "license.pageTitle": "License information",
+      "license.header": "Tenant license",
+      "license.knownTenant": "Known Business Central tenant",
+      "license.tenant": "Tenant",
+      "license.status": "Status",
+      "license.type": "License type",
+      "license.validUntil": "Valid until",
+      "license.tenantId": "Tenant ID",
+      "license.lastChecked": "Last checked",
+      "license.checking": "Checking…",
+      "license.refresh": "Check the current BC tab again",
+      "license.consultant": "Microsoft account and consultant license",
+      "license.signIn": "Sign in with Microsoft",
+      "license.signOut": "Sign out",
       "library.searchPlaceholder": "Title, profile, tag or workflow",
       "library.documentLanguage": "Document language",
       "library.allLanguages": "All languages",
@@ -661,6 +775,31 @@
     ,["Testa GitHub-anslutning", "Test GitHub connection"]
     ,["Jag har granskat mål, beskrivning, bilagor, telemetri-/AI-val och varningen om känsliga data", "I reviewed the destination, description, attachments, telemetry/AI choices, and sensitive-data warning"]
     ,["Skapa ett nytt ärende även om rapporten redan har en extern referens", "Create another issue even if this report already has an external reference"]
+    ,["Visa avancerade dataskyddsinställningar", "Show advanced privacy settings"]
+    ,["Dataskydd", "Privacy"]
+    ,["Masterdata och testdata", "Master data and test data"]
+    ,["Öppna debugpanel", "Open debug panel"]
+    ,["Regenerera från inspelning", "Regenerate from recording"]
+    ,["Automatisk", "Automatic"], ["Lodrät", "Vertical"], ["Täthet", "Density"]
+    ,["Fokusläge", "Focus mode"], ["Anpassa", "Customize"]
+    ,["Sök i kartan", "Search the map"], ["Nästa träff", "Next match"]
+    ,["Typ", "Type"], ["Villkor", "Condition"], ["Alternativ", "Alternative"]
+    ,["Upprepa", "Repeat"], ["Tillbaka", "Back"], ["Ta bort", "Remove"]
+    ,["Åtgärd", "Action"], ["Processsteg", "Process step"]
+    ,["Dokument", "Document"], ["Bokföring", "Posting"], ["Beslut", "Decision"]
+    ,["Manuell åtgärd", "Manual action"], ["Systemåtgärd", "System action"]
+    ,["Inköp", "Purchasing"], ["Lager", "Warehouse"], ["Försäljning", "Sales"]
+    ,["Produktion", "Manufacturing"], ["Ekonomi", "Finance"], ["System", "System"]
+    ,["Förhandsgranska regenerering", "Preview regeneration"]
+    ,["Godkänn och regenerera", "Approve and regenerate"]
+    ,["Ta ny skärmbild", "Capture new screenshot"]
+    ,["Använd vald bild", "Use selected screenshot"]
+    ,["Tillgängliga skärmbilder", "Available screenshots"]
+    ,["Session", "Session"], ["Stoppa inspelning", "Stop recording"]
+    ,["Licensinformation", "License information"]
+    ,["Begär 30 dagars testlicens", "Request a 30-day trial"]
+    ,["E-postadress", "Email address"], ["Starta testperiod", "Start trial"]
+    ,["Generera om från inspelningen", "Regenerate from the recording"]
   ]);
 
   const staticLookup = new Map();

@@ -175,7 +175,7 @@ for (const kind of [
 assert.strictEqual(
   components.find(component => component.kind === "heading")
     .appearance.typography.color,
-  "#0f4c81"
+  resolvedTheme.typography.title.color
 );
 assert.strictEqual(
   components.find(component => component.kind === "step").keepTogether,

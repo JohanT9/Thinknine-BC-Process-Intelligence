@@ -14,7 +14,7 @@
 - Privacy-policy URL/status: **HUMAN INPUT AND LEGAL APPROVAL REQUIRED**.
 - Product website: **HUMAN INPUT REQUIRED**.
 
-Long description: BC Process Studio by Thinknine captures authorized user
+Long description: BC Process Studio captures authorized user
 interactions in Microsoft Dynamics 365 Business Central, preserves traceable
 source events and screenshots locally, and creates editable professional
 process knowledge and documentation. Users review generated steps, correct wording and structure,

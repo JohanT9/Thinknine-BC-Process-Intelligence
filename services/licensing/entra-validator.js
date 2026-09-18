@@ -5,7 +5,7 @@ function decode(value) {
   return JSON.parse(Buffer.from(value, "base64url").toString("utf8"));
 }
 function createEntraValidator({ audience, requiredScope = "License.Check",
-  fetcher = fetch, now = Date.now }) {
+  requiredRole = "", fetcher = fetch, now = Date.now }) {
   if (!audience) return async () => { const error = new Error("consultant-auth-not-configured"); error.status = 503; throw error; };
   let keys = null, refreshAt = 0;
   async function jwks() {
@@ -25,11 +25,17 @@ function createEntraValidator({ audience, requiredScope = "License.Check",
     let header, claims;
     try { header = decode(parts[0]); claims = decode(parts[1]); }
     catch { const error = new Error("unauthorized"); error.status = 401; throw error; }
-    if (header.alg !== "RS256" || !header.kid || claims.aud !== audience ||
+    const acceptedAudiences = new Set([audience,
+      audience.startsWith("api://") ? audience.slice(6) : `api://${audience}`]);
+    const issuer = String(claims.iss || "");
+    const acceptedIssuer = issuer === `https://login.microsoftonline.com/${claims.tid}/v2.0` ||
+      issuer === `https://sts.windows.net/${claims.tid}/`;
+    if (header.alg !== "RS256" || !header.kid || !acceptedAudiences.has(claims.aud) ||
         !GUID.test(claims.tid || "") || !GUID.test(claims.oid || "") ||
-        claims.iss !== `https://login.microsoftonline.com/${claims.tid}/v2.0` ||
+        !acceptedIssuer ||
         Number(claims.exp) * 1000 <= now() || Number(claims.nbf || 0) * 1000 > now() + 60000 ||
-        !String(claims.scp || "").split(" ").includes(requiredScope)) {
+        (requiredScope && !String(claims.scp || "").split(" ").includes(requiredScope)) ||
+        (requiredRole && !(Array.isArray(claims.roles) && claims.roles.includes(requiredRole)))) {
       const error = new Error("unauthorized"); error.status = 401; throw error;
     }
     const key = (await jwks()).find(item => item.kid === header.kid && item.kty === "RSA");
@@ -38,7 +44,8 @@ function createEntraValidator({ audience, requiredScope = "License.Check",
       const error = new Error("unauthorized"); error.status = 401; throw error;
     }
     return { tid: claims.tid.toLowerCase(), oid: claims.oid.toLowerCase(),
-      name: String(claims.name || ""), preferredUsername: String(claims.preferred_username || "") };
+      name: String(claims.name || ""), preferredUsername: String(claims.preferred_username ||
+        claims.email || claims.upn || claims.unique_name || "") };
   };
 }
 module.exports = { createEntraValidator };

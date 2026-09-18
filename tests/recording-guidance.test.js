@@ -102,7 +102,7 @@ const content = read("src/recorder/content.js");
 const background = read("src/recorder/background.js");
 for (const id of ["indicatorImportant", "indicatorUseImage", "indicatorSection",
   "indicatorIgnore"]) assert.match(content, new RegExp(id));
-assert.match(content, /aria-label="Markera senaste steget"/);
+assert.ok(content.includes('aria-label="${uiText("Markera senaste steget", "Mark the latest step")}"'));
 assert.match(content, /T9_CAPTURE_GUIDANCE/);
 assert.match(background, /case "T9_CAPTURE_GUIDANCE"/);
 assert.match(background, /targetSourceEventId: target\.id/);

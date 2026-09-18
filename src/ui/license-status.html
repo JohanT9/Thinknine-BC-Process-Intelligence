@@ -11,37 +11,39 @@
     section{background:#fff;border:1px solid #ccdee0;border-radius:7px;padding:24px}h1{font-size:25px;margin:0 0 20px}h2{font-size:19px;color:#007a82;margin:0 0 18px}
     dl{display:grid;grid-template-columns:180px 1fr;gap:0;margin:0}dt,dd{padding:12px;border-bottom:1px solid #e1eaeb;margin:0}dt{font-weight:650}dd{overflow-wrap:anywhere}
     .status{display:inline-block;padding:4px 10px;border-radius:999px;font-weight:700}.active{background:#e5f4ea;color:#176b38}.inactive{background:#fde7e9;color:#a4262c}.unknown{background:#fff4ce;color:#6d5700}
-    label{display:block;font-weight:650;margin-bottom:6px}select{width:100%;padding:10px;border:1px solid #8b9fa8;border-radius:3px;background:#fff;font:inherit;margin-bottom:18px}.toolbar{display:flex;gap:10px;margin-top:20px}button{padding:9px 16px;border:1px solid #007a82;border-radius:3px;background:#007a82;color:#fff;font:inherit;cursor:pointer}button:disabled{opacity:.6;cursor:wait}
-    #message{min-height:24px;margin-top:14px}.error{color:#a4262c}@media(max-width:560px){dl{grid-template-columns:1fr}dt{padding-bottom:2px;border:0}dd{padding-top:2px}}
+    label{display:block;font-weight:650;margin-bottom:6px}select{width:100%;padding:10px;border:1px solid #8b9fa8;border-radius:3px;background:#fff;font:inherit;margin-bottom:18px}.toolbar{display:flex;gap:10px;margin-top:20px}.toolbar button{width:230px;min-height:40px;padding:9px 16px;border:1px solid #007a82;border-radius:3px;background:#007a82;color:#fff;font:inherit;cursor:pointer}.toolbar button:disabled{opacity:.6;cursor:wait}
+    #message{min-height:24px;margin-top:14px}.error{color:#a4262c}@media(max-width:560px){dl{grid-template-columns:1fr}dt{padding-bottom:2px;border:0}dd{padding-top:2px}.toolbar button{width:100%}}
   </style>
 </head>
 <body>
-  <header><strong>BC Process Studio</strong><span>Tenantlicens</span></header>
+  <header><strong>BC Process Studio</strong><span data-i18n="license.header">Tenantlicens</span></header>
   <main>
-    <h1>Licensinformation</h1>
+    <h1 data-i18n="license.pageTitle">Licensinformation</h1>
     <section aria-labelledby="detailsTitle">
-      <h2 id="detailsTitle">Känd Business Central-tenant</h2>
-      <label for="tenantSelect">Tenant</label>
+      <h2 id="detailsTitle" data-i18n="license.knownTenant">Känd Business Central-tenant</h2>
+      <label for="tenantSelect" data-i18n="license.tenant">Tenant</label>
       <select id="tenantSelect"></select>
       <dl>
-        <dt>Status</dt><dd><span id="status" class="status unknown">Kontrollerar…</span></dd>
-        <dt>Licenstyp</dt><dd id="licenseType">—</dd>
-        <dt>Giltig till</dt><dd id="expiresAt">—</dd>
-        <dt>Tenant-ID</dt><dd id="tenantId">—</dd>
-        <dt>Senast kontrollerad</dt><dd id="checkedAt">—</dd>
+        <dt data-i18n="license.status">Status</dt><dd><span id="status" class="status unknown" data-i18n="license.checking">Kontrollerar…</span></dd>
+        <dt data-i18n="license.type">Licenstyp</dt><dd id="licenseType">—</dd>
+        <dt data-i18n="license.validUntil">Giltig till</dt><dd id="expiresAt">—</dd>
+        <dt data-i18n="license.tenantId">Tenant-ID</dt><dd id="tenantId">—</dd>
+        <dt data-i18n="license.lastChecked">Senast kontrollerad</dt><dd id="checkedAt">—</dd>
       </dl>
-      <div class="toolbar"><button id="refresh" type="button">Kontrollera aktuell BC-flik igen</button></div>
+      <div class="toolbar"><button id="refresh" type="button" data-i18n="license.refresh">Kontrollera aktuell BC-flik igen</button></div>
       <p id="message" role="status" aria-live="polite"></p>
     </section>
     <section aria-labelledby="consultantTitle">
-      <h2 id="consultantTitle">Konsultlicens</h2>
-      <p id="consultantStatus">Kontrollerar…</p>
+      <h2 id="consultantTitle" data-i18n="license.consultant">Microsoft-konto och konsultlicens</h2>
+      <p id="consultantStatus" data-i18n="license.checking">Kontrollerar…</p>
       <div class="toolbar">
-        <button id="consultantSignIn" type="button">Logga in med Microsoft</button>
-        <button id="consultantSignOut" type="button" hidden>Logga ut</button>
+        <button id="consultantSignIn" type="button" data-i18n="license.signIn">Logga in med Microsoft</button>
+        <button id="consultantSignOut" type="button" hidden data-i18n="license.signOut">Logga ut</button>
       </div>
     </section>
   </main>
+  <script src="engine/language-registry.js"></script>
+  <script src="i18n.js"></script>
   <script src="license-status.js"></script>
 </body>
 </html>

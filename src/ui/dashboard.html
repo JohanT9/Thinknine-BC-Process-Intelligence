@@ -254,7 +254,7 @@ body.process-map-focus-active{overflow:hidden}.process-overview-card.process-map
 <link rel="stylesheet" href="design-system.css">
 </head>
 <body>
-<h1>BC Process Studio <small>by Thinknine · v__APP_VERSION__</small></h1>
+<h1>BC Process Studio <small>v__APP_VERSION__</small></h1>
 <p class="muted" data-i18n="app.tagline">Business Process Intelligence för Microsoft Dynamics 365 Business Central.</p>
 <p><strong data-i18n="app.promise">Gör Business Central-processer till kunskap.</strong>
   <span data-i18n="app.promiseDetail">Spela in. Dokumentera. Förbättra.</span></p>
@@ -516,6 +516,7 @@ body.process-map-focus-active{overflow:hidden}.process-overview-card.process-map
         <button id="closeReview" class="debug"
           aria-label="Stäng granskning">Stäng</button>
       </div>
+      <p id="reviewExportStatus" role="status" aria-live="polite" hidden></p>
       <div id="workspaceTabs" class="workspace-tabs" role="tablist"
         aria-label="Dokumentationsarbetsyta">
         <button id="reviewWorkspaceTab" role="tab" aria-selected="true"
@@ -537,6 +538,7 @@ body.process-map-focus-active{overflow:hidden}.process-overview-card.process-map
           <button id="redoReview" data-review-command="redo" data-review-toolbar-item class="secondary" aria-keyshortcuts="Control+Y Meta+Shift+Z" disabled>Gör om</button>
         </div>
         <button id="saveReview" data-review-toolbar-item class="primary" aria-keyshortcuts="Control+S Meta+S">Spara</button>
+        <button id="completeReview" class="primary" disabled data-review-toolbar-item>Slutför granskning</button>
         <button id="exportWordReview" data-review-command="export" data-review-toolbar-item class="primary" disabled>Exportera Word</button>
         <button id="nextUnreviewedStep" data-review-toolbar-item
           class="secondary review-next-action" aria-keyshortcuts="Alt+N"
@@ -565,11 +567,18 @@ body.process-map-focus-active{overflow:hidden}.process-overview-card.process-map
               <button id="regenerateSelectedReview" data-review-toolbar-item class="secondary" disabled>Regenerera valda steg</button>
               <button id="compactReviewSteps" data-review-toolbar-item class="secondary" aria-pressed="false">Komprimera alla</button>
               <button id="addReviewStep" data-review-toolbar-item class="secondary">Lägg till steg</button>
-              <button id="completeReview" class="primary" disabled data-review-toolbar-item>Slutför granskning</button>
+
             </div>
           </div>
         </details>
       </div>
+      <details id="reviewAttention" class="review-attention">
+        <summary id="reviewAttentionSummary"></summary>
+        <p id="reviewAttentionHelp"></p>
+        <p id="reviewOutcomeSummary"></p>
+        <p data-i18n="review.outcomeHelp"></p>
+        <ol id="reviewAttentionList"></ol>
+      </details>
       <div id="reviewProgress" class="review-progress" role="progressbar" aria-label="Granskningsförlopp" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
         <div id="reviewProgressBar" class="review-progress-bar"></div>
       </div>
@@ -717,6 +726,12 @@ body.process-map-focus-active{overflow:hidden}.process-overview-card.process-map
           <output id="documentPageIndicator" class="document-page-indicator" aria-live="polite" aria-label="Aktuell sida">Sida 1 av 1</output>
           <button id="documentNextPage" class="secondary" aria-label="Nästa sida">Nästa</button>
         </div>
+        <div class="document-export-check">
+          <span id="documentExportCheckStatus" role="status" aria-live="polite"></span>
+          <button id="documentCheckNext" type="button" class="secondary"
+            data-i18n="review.checkNext">Kontrollera nästa steg</button>
+          <button id="documentExportWord" type="button" class="primary">Exportera Word</button>
+        </div>
         <button id="openDocumentViewSettings" class="debug" aria-haspopup="dialog">Vyinställningar</button>
       </div>
       <div class="document-workspace-body">
@@ -857,6 +872,10 @@ body.process-map-focus-active{overflow:hidden}.process-overview-card.process-map
   <form method="dialog">
     <section class="review-document-fields">
       <h3 id="reviewDocumentFieldsTitle">Dokumentinformation</h3>
+      <label for="reviewDocumentProfile" data-i18n="review.profilePurpose">Vad ska dokumentet användas till?</label>
+      <select id="reviewDocumentProfile" aria-describedby="reviewDocumentProfileHelp"></select>
+      <p id="reviewDocumentProfileHelp" class="muted"></p>
+      <p id="reviewDocumentProfileStatus" role="status" aria-live="polite"></p>
       <label for="reviewDocumentLanguage"
         data-i18n="review.documentLanguage">Dokumentspråk</label>
       <select id="reviewDocumentLanguage" data-language-select="document">
@@ -876,6 +895,23 @@ body.process-map-focus-active{overflow:hidden}.process-overview-card.process-map
     <footer>
       <button value="close" class="primary">Stäng</button>
     </footer>
+  </form>
+</dialog>
+
+<dialog id="stepImagePreviewDialog" class="step-image-preview-dialog"
+  aria-labelledby="stepImagePreviewTitle" aria-describedby="stepImagePreviewHelp">
+  <form method="dialog">
+    <h3 id="stepImagePreviewTitle"></h3>
+    <p id="stepImagePreviewHelp" data-i18n="review.previewImageHelp"></p>
+    <div class="step-repair-toolbar">
+      <button id="stepImageActualSize" type="button" class="secondary" aria-pressed="false"
+        data-i18n="review.imageActualSize"></button>
+      <button value="close" class="primary" data-i18n="review.closeImagePreview"></button>
+    </div>
+    <div id="stepImagePreviewViewport" class="step-image-preview-viewport" tabindex="0"
+      role="region" aria-labelledby="stepImagePreviewTitle">
+      <img id="stepImagePreviewImage" alt="">
+    </div>
   </form>
 </dialog>
 
@@ -980,6 +1016,7 @@ body.process-map-focus-active{overflow:hidden}.process-overview-card.process-map
 <script src="review/review-regeneration.js"></script>
 <script src="review/review-selection.js"></script>
 <script src="review/review-navigation.js"></script>
+<script src="review/screenshot-gallery.js"></script>
 <script src="workspace-controller.js"></script>
 <script src="workspace-context.js"></script>
 <script src="document-workspace-view.js"></script>

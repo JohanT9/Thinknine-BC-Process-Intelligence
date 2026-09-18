@@ -349,3 +349,24 @@ dialog::backdrop { background: rgb(0 0 0 / 40%) !important; }
 .process-version-node{flex:0 0 150px;display:grid;gap:5px;padding:10px;border:2px solid #c9d4dc;border-radius:8px;background:#fff}.process-version-node>span{font-size:11px;min-height:14px;color:#52606d}
 .process-version-node.added{border-color:#15803d;background:#f0fdf4}.process-version-node.removed{border-color:#b91c1c;background:#fef2f2;text-decoration:line-through}.process-version-node.modified,.process-version-node.moved{border-color:#b7791f;background:#fffbeb}
 @media(max-width:620px){.process-version-selectors{grid-template-columns:1fr}.process-overview-step{width:auto!important}}
+
+.review-attention { margin: 8px 0; padding: 8px 12px; border: 1px solid var(--colorBorderDefault); border-radius: var(--radiusMedium); }
+.review-attention summary { cursor: pointer; font-weight: 600; }
+.review-attention ol { max-height: 180px; overflow: auto; padding-left: 24px; }
+.review-attention button { text-align: left; white-space: normal; margin-bottom: 6px; }
+
+.review-attention-fix { margin-inline-start: 8px; }
+
+.step-repair-choice label { display: grid; gap: var(--space8); cursor: pointer; }
+.step-image-preview-dialog { width: min(1200px, calc(100vw - 32px)); height: calc(100dvh - 32px); box-sizing: border-box; overflow: hidden; }
+.step-image-preview-dialog form { display: flex; flex-direction: column; height: 100%; gap: var(--space8); }
+.step-image-preview-dialog h3, .step-image-preview-dialog p { margin: 0; }
+.step-image-preview-viewport { min-height: 0; flex: 1; overflow: auto; }
+.step-image-preview-viewport img { display: block; max-width: 100%; height: auto; margin: auto; }
+.step-image-preview-viewport.actual-size img { max-width: none; width: auto; margin: 0; }
+
+.document-export-check { display: flex; align-items: center; flex-wrap: wrap; gap: var(--space8); }
+.document-export-check [role="status"] { flex-basis: 100%; font-size: 12px; }
+
+#reviewExportStatus { margin: 4px 0; overflow-wrap: anywhere; }
+#reviewExportStatus.export-error { color: var(--colorStatusDanger, #b42318); }

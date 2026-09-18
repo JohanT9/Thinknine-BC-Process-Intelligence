@@ -13,15 +13,28 @@ async function main() {
   await fs.writeFile(registry, JSON.stringify({ [tenant]: {
     enabled: true, expiresAt: "2026-12-31T23:59:59Z"
   } }));
-  const server = await createService({ dataDirectory: directory, now: () => timestamp });
+  const server = await createService({ dataDirectory: directory, now: () => timestamp,
+    entraValidator: async () => ({ tid: unknown, oid: otherInstallation,
+      name: "Tenant User", preferredUsername: "user@example.com" }) });
   await new Promise(resolve => server.listen(0, "127.0.0.1", resolve));
   const endpoint = `http://127.0.0.1:${server.address().port}/v1/license/check`;
   const trialEndpoint = `http://127.0.0.1:${server.address().port}/v1/license/trial`;
+  const userEndpoint = `http://127.0.0.1:${server.address().port}/v1/license/user/register`;
   const value = { tenantId: tenant, installationId: unknown, version: "4.7.0" };
   const post = body => fetch(endpoint, { method: "POST",
     headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) });
   try {
     assert.equal((await (await post(value)).json()).allowed, true);
+    const userRegistration = await fetch(userEndpoint, { method: "POST",
+      headers: { "Content-Type": "application/json", Authorization: "Bearer test" },
+      body: JSON.stringify(value) });
+    assert.equal(userRegistration.status, 200);
+    assert.equal((await userRegistration.json()).email, "user@example.com");
+    const tenantUsers = JSON.parse(await fs.readFile(path.join(directory, "tenant-users.json"), "utf8"));
+    const registeredUser = Object.values(tenantUsers)[0];
+    assert.equal(registeredUser.tenantId, tenant);
+    assert.equal(registeredUser.name, "Tenant User");
+    assert.equal(registeredUser.firstSeenAt, registeredUser.lastSeenAt);
     await Promise.all([post(value), post(value), post(value)]);
     assert.equal((await (await post({ ...value,
       installationId: otherInstallation })).json()).allowed, true);

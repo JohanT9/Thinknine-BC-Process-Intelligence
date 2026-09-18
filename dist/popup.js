@@ -187,8 +187,8 @@ async function startRecording(recordingPurpose) {
     if (licenseInfo.information.requiresAcceptance) {
       const sv = currentUiLocale === "sv-SE";
       const notice = sv
-        ? "Tenantlicens för BC Process Studio\n\nVid licenskontroll skickas ett slumpmässigt installations-ID, tenant-ID och tilläggsversion till Thinknines licenstjänst. Första registreringen sparas med tidpunkt tills Thinknine raderar den. Om du själv begär en testlicens skickas även den e-postadress du anger och den visas i licensadministrationen. Inga inspelningar, bilder, företagsnamn eller affärsdata skickas. Azure kan även logga tekniska anslutningsuppgifter.\n\nKontroll sker vid inspelning och godkänt besked cachas i högst en timme. Utan aktiv licens eller kontakt efter cacheutgång kan nya inspelningar inte startas. Befintliga dokument finns kvar.\n\nTjänst: "
-        : "BC Process Studio tenant licensing\n\nLicense checks send a random installation ID, tenant ID and extension version to Thinknine. First registration is retained with its timestamp until Thinknine deletes it. If you request a trial, the email address you enter is also sent and shown in license administration. No recordings, images, company names or business data are sent. Azure may also log technical connection information.\n\nChecks occur during recording; approvals are cached for at most one hour. Without an active license or contact after cache expiry, new recordings cannot start. Existing documents remain available.\n\nService: ";
+        ? "Tenantlicens för BC Process Studio\n\nVid licenskontroll skickas installations-ID, tenant-ID och tilläggsversion till licenstjänsten för BC Process Studio. För att använda en aktiv tenantlicens loggar användaren även in med Microsoft. Namn, e-post/UPN, Entra tenant-ID och objekt-ID registreras för administration tillsammans med första och senaste användning. Inga inspelningar, bilder, företagsnamn eller affärsdata skickas. Azure kan även logga tekniska anslutningsuppgifter.\n\nKontroll sker vid inspelning och godkänt besked cachas i högst en timme. Utan aktiv licens eller kontakt efter cacheutgång kan nya inspelningar inte startas. Befintliga dokument finns kvar.\n\nTjänst: "
+        : "BC Process Studio tenant licensing\n\nLicense checks send the installation ID, tenant ID and extension version to the BC Process Studio licensing service. To use an active tenant license, the user also signs in with Microsoft. Name, email/UPN, Entra tenant ID and object ID are registered for administration together with first and latest use. No recordings, images, company names or business data are sent. Azure may also log technical connection information.\n\nChecks occur during recording; approvals are cached for at most one hour. Without an active license or contact after cache expiry, new recordings cannot start. Existing documents remain available.\n\nService: ";
       if (!globalThis.confirm(notice + licenseInfo.information.endpoint +
           (sv ? "\n\nGodkänn registreringen och fortsätt?" : "\n\nAccept registration and continue?"))) {
         throw new Error(sv ? "Licensregistreringen avbröts. Inga uppgifter skickades." : "Registration cancelled. No data was sent.");
@@ -198,6 +198,18 @@ async function startRecording(recordingPurpose) {
     }
     const check = await send({ type: "T9_LICENSE_CHECK", tabId: tab.id }, 10000);
     if (!check?.ok) throw new Error(check?.error || "License check failed");
+    if (check.license.allowed) {
+      let account = await send({ type: "T9_CONSULTANT_LICENSE_STATUS" });
+      if (!account?.signedIn) {
+        const signedIn = await send({ type: "T9_MICROSOFT_SIGN_IN" }, 120000);
+        if (!signedIn?.ok) throw new Error(signedIn?.error || (currentUiLocale === "sv-SE"
+          ? "Microsoft-inloggningen kunde inte slutföras." : "Microsoft sign-in could not be completed."));
+        account = signedIn;
+      }
+      const registered = await send({ type: "T9_TENANT_USER_REGISTER", tabId: tab.id }, 10000);
+      if (!registered?.ok) throw new Error(registered?.error || (currentUiLocale === "sv-SE"
+        ? "Användaren kunde inte registreras för tenantlicensen." : "The user could not be registered for the tenant license."));
+    }
     let consultantAllowed = false;
     if (!check.license.allowed) {
       try {

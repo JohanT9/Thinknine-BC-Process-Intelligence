@@ -12,13 +12,13 @@ const toolbar = html.slice(toolbarStart, toolbarEnd);
 const moreStart = toolbar.indexOf('id="reviewMoreActions"');
 assert(toolbarStart >= 0 && toolbarEnd > toolbarStart && moreStart > 0);
 for (const id of ["undoReview", "redoReview", "saveReview",
-  "exportWordReview", "openReviewDocumentFields"]) {
+  "exportWordReview", "openReviewDocumentFields", "completeReview"]) {
   assert(toolbar.indexOf(`id="${id}"`) < moreStart,
     `${id} must remain immediately visible`);
 }
 for (const id of ["mergeReviewSteps", "splitReviewStep",
   "moveUpReviewSteps", "moveDownReviewSteps", "compactReviewSteps",
-  "addReviewStep", "completeReview"]) {
+  "addReviewStep"]) {
   assert(toolbar.indexOf(`id="${id}"`) > moreStart,
     `${id} must use progressive disclosure`);
 }

@@ -8,9 +8,9 @@
   const source = { id: SOURCE_ID, sourceType: "InternalReference",
     title: "BC Process Studio Business Central Process Taxonomy",
     description: "Manually curated semantic reference based on the product taxonomy and lifecycle models.",
-    publisher: "Thinknine", product: "Microsoft Dynamics 365 Business Central",
+    publisher: "BC Process Studio", product: "Microsoft Dynamics 365 Business Central",
     productVersion: "", retrievedAt: null, verifiedAt: "2026-09-02T00:00:00.000Z",
-    verifiedBy: "Thinknine", licenseNotes: "Semantic internal reference; no external source asset included.",
+    verifiedBy: "BC Process Studio", licenseNotes: "Semantic internal reference; no external source asset included.",
     notes: "Representative patterns, not mandatory customer behaviour." };
   const documents = [
     ["document:sales-order", "Sales Order", { sv: "Försäljningsorder" }, 36, 42],
@@ -153,11 +153,11 @@
       updatedAt: "2026-09-02T00:00:00.000Z", processGraph, sourceLabels: {}, canonicalMappings: {},
       variants: options.variants || [], proposals: [], manualDecisions: [],
       verificationHistory: [{ verificationId: `${diagramId}:verification:1`, status: "Verified",
-        decidedAt: "2026-09-02T00:00:00.000Z", decidedBy: "Thinknine",
+        decidedAt: "2026-09-02T00:00:00.000Z", decidedBy: "BC Process Studio",
         notes: "Verified against the existing internal taxonomy and lifecycle seed.", source: "manual" }],
       facts: processGraph.relationships.map(edge => ({ subjectId: edge.fromNodeId,
         predicate: edge.relationshipType, objectId: edge.toNodeId, sourceId: SOURCE_ID,
-        extraction: "manual", confidence: 1, verifiedBy: "Thinknine",
+        extraction: "manual", confidence: 1, verifiedBy: "BC Process Studio",
         verifiedAt: "2026-09-02T00:00:00.000Z" })), metadata: {
         representativeNotMandatory: true, sourceAssetRequired: false } };
   }

@@ -19,7 +19,7 @@ assert.strictEqual(thinknine.colors.text, "#172b45");
 assert.strictEqual(thinknine.typography.title.color, "#172b45");
 assert.strictEqual(thinknine.page.background, "#ffffff");
 assert.strictEqual(thinknine.components.cover.accentColor, "#172b45");
-assert.strictEqual(thinknine.branding.organizationName, "Thinknine AB");
+assert.strictEqual(thinknine.branding.organizationName, "BC Process Studio");
 assert.ok(thinknine.capabilities.includes("supportsBranding"));
 
 const overrides = {

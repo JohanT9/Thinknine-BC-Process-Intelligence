@@ -11,7 +11,8 @@
     try {
       const claims = JSON.parse(atob(token.split(".")[1].replace(/-/g, "+").replace(/_/g, "/")));
       return { tenantId: String(claims.tid || ""), objectId: String(claims.oid || ""),
-        name: String(claims.name || ""), email: String(claims.preferred_username || claims.email || "") };
+        name: String(claims.name || ""), email: String(claims.preferred_username || claims.email ||
+          claims.upn || claims.unique_name || "") };
     } catch { return {}; }
   }
   function create({ storage, fetcher, identity, config, version, now = Date.now }) {
@@ -66,9 +67,41 @@
         body: JSON.stringify({ installationId, tenantId, version }) });
       if (response.status === 401) { await signOut(); throw new Error("Konsultinloggningen behöver förnyas."); }
       if (!response.ok) throw new Error("Konsultlicensen kunde inte kontrolleras.");
+      const license = await response.json();
+      const value = await state(); await storage.set({ [KEY]: { ...value, license } });
+      return license;
+    }
+    async function register(installationId) {
+      const token = await accessToken();
+      const response = await fetcher(config.endpoint.replace(/\/check$/, "/register"), {
+        method: "POST", credentials: "omit",
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+        body: JSON.stringify({ installationId, version }) });
+      if (!response.ok) {
+        let detail = "";
+        try { detail = String((await response.json())?.error || ""); } catch { /* Ignore non-JSON errors. */ }
+        if (response.status === 404) throw new Error("Licenstjänsten saknar stöd för konsultregistrering. Distribuera den senaste tjänste-ZIP-filen.");
+        if (response.status === 401) throw new Error("Licenstjänsten avvisade Microsoft-inloggningen. Kontrollera LICENSE_ENTRA_AUDIENCE och LICENSE_ENTRA_SCOPE i Azure.");
+        if (response.status === 503 && detail === "consultant-auth-not-configured") {
+          throw new Error("Microsoft-autentisering är inte konfigurerad i licenstjänsten.");
+        }
+        throw new Error(`Konsultregistreringen kunde inte skapas (HTTP ${response.status}${detail ? `: ${detail}` : ""}).`);
+      }
+      const license = await response.json();
+      const value = await state(); await storage.set({ [KEY]: { ...value, license } });
+      return license;
+    }
+    async function registerTenantUser(tenantId, installationId) {
+      const token = await accessToken();
+      const response = await fetcher(config.endpoint.replace(/\/consultant\/check$/, "/user/register"), {
+        method: "POST", credentials: "omit",
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+        body: JSON.stringify({ installationId, tenantId, version }) });
+      if (response.status === 401) throw new Error("Microsoft-inloggningen avvisades av licenstjänsten.");
+      if (!response.ok) throw new Error(`Användaren kunde inte registreras (HTTP ${response.status}).`);
       return response.json();
     }
-    return Object.freeze({ signIn, signOut, check, state,
+    return Object.freeze({ signIn, signOut, check, register, registerTenantUser, state,
       configured: () => Boolean(config?.enabled && config.clientId && config.scope) });
   }
   return Object.freeze({ create });

@@ -47,6 +47,8 @@
   let sessionId = null;
   let diagnosticsEnabled = false;
   let recordingPurpose = null;
+  let uiLocale = "sv-SE";
+  const uiText = (swedish, english) => uiLocale.startsWith("en") ? english : swedish;
   let lastUrl = location.href;
   let lastPageSignature = "";
   const sourceFrameId = crypto.randomUUID();
@@ -126,13 +128,14 @@
     recordingIndicator.host.dataset.tone = tone;
     const action = liveStatus?.latestAction;
     shadow.getElementById("indicatorState").textContent = tone === "error"
-      ? "Inspelningen behöver kontrolleras" : "Inspelning pågår";
+      ? uiText("Inspelningen behöver kontrolleras", "Recording needs attention")
+      : uiText("Inspelning pågår", "Recording in progress");
     shadow.getElementById("indicatorLatest").textContent = action
-      ? (action.label || action.category || action.type || "Händelse registrerad")
-      : "Väntar på första händelsen";
+      ? (action.label || action.category || action.type || uiText("Händelse registrerad", "Event captured"))
+      : uiText("Väntar på första händelsen", "Waiting for the first event");
     shadow.getElementById("indicatorCounts").textContent =
-      `${liveStatus?.eventCount || 0} händelser · ` +
-      `${liveStatus?.screenshots?.captured || 0} bilder`;
+      `${liveStatus?.eventCount || 0} ${uiText("händelser", "events")} · ` +
+      `${liveStatus?.screenshots?.captured || 0} ${uiText("bilder", "screenshots")}`;
     const warning = shadow.getElementById("indicatorWarning");
     const messages = (liveStatus?.warnings || []).map(item => item.message);
     warning.hidden = messages.length === 0;
@@ -187,18 +190,18 @@
       :host([data-minimized="true"]) .actions{display:none}
       :host([data-minimized="true"]) .panel{width:190px}
     </style><aside class="panel" role="status" aria-live="polite">
-      <div class="head"><span class="dot"></span><strong id="indicatorState">Inspelning pågår</strong>
-        <button id="indicatorMinimize" type="button" title="Minimera">−</button></div>
-      <div class="body"><p id="indicatorLatest" class="latest">Väntar på första händelsen</p>
-        <p id="indicatorCounts" class="counts">0 händelser · 0 bilder</p>
+      <div class="head"><span class="dot"></span><strong id="indicatorState">${uiText("Inspelning pågår", "Recording in progress")}</strong>
+        <button id="indicatorMinimize" type="button" title="${uiText("Minimera", "Minimize")}">−</button></div>
+      <div class="body"><p id="indicatorLatest" class="latest">${uiText("Väntar på första händelsen", "Waiting for the first event")}</p>
+        <p id="indicatorCounts" class="counts">0 ${uiText("händelser", "events")} · 0 ${uiText("bilder", "screenshots")}</p>
         <p id="indicatorWarning" class="warning" hidden></p></div>
-      <div class="guidance" aria-label="Markera senaste steget">
-        <button id="indicatorImportant" type="button" title="Markera senaste steget som viktigt">Viktigt steg</button>
-        <button id="indicatorUseImage" type="button" title="Anv\u00e4nd senaste stegets bild">Anv\u00e4nd denna bild</button>
-        <button id="indicatorSection" type="button" title="Skapa en ny sektion efter senaste steget">Ny sektion</button>
-        <button id="indicatorIgnore" type="button" title="Ignorera senaste steget i dokumentet">Ignorera</button>
+      <div class="guidance" aria-label="${uiText("Markera senaste steget", "Mark the latest step")}">
+        <button id="indicatorImportant" type="button" title="${uiText("Markera senaste steget som viktigt", "Mark the latest step as important")}">${uiText("Viktigt steg", "Important step")}</button>
+        <button id="indicatorUseImage" type="button" title="${uiText("Använd senaste stegets bild", "Use the latest step screenshot")}">${uiText("Använd denna bild", "Use this screenshot")}</button>
+        <button id="indicatorSection" type="button" title="${uiText("Skapa en ny sektion efter senaste steget", "Create a new section after the latest step")}">${uiText("Ny sektion", "New section")}</button>
+        <button id="indicatorIgnore" type="button" title="${uiText("Ignorera senaste steget i dokumentet", "Ignore the latest step in the document")}">${uiText("Ignorera", "Ignore")}</button>
       </div>
-      <div class="actions"><button id="indicatorStop" class="stop" type="button">Stoppa</button></div>
+      <div class="actions"><button id="indicatorStop" class="stop" type="button">${uiText("Stoppa", "Stop")}</button></div>
     </aside>`;
     recordingIndicator.host = host;
     recordingIndicator.shadow = shadow;
@@ -207,7 +210,8 @@
       recordingIndicator.minimized = !recordingIndicator.minimized;
       host.dataset.minimized = String(recordingIndicator.minimized);
       event.currentTarget.textContent = recordingIndicator.minimized ? "+" : "−";
-      event.currentTarget.title = recordingIndicator.minimized ? "Visa" : "Minimera";
+      event.currentTarget.title = recordingIndicator.minimized
+        ? uiText("Visa", "Show") : uiText("Minimera", "Minimize");
     });
     shadow.getElementById("indicatorStop").addEventListener("click", event => {
       event.stopPropagation();
@@ -215,7 +219,7 @@
         if (chrome.runtime.lastError || response?.ok) return;
         shadow.getElementById("indicatorWarning").hidden = false;
         shadow.getElementById("indicatorWarning").textContent =
-          response?.error || "Öppna tillägget för att stoppa inspelningen.";
+          response?.error || uiText("Öppna tillägget för att stoppa inspelningen.", "Open the extension to stop the recording.");
       });
     });
     const sendGuidance = (kind, confirmation) => event => {
@@ -224,8 +228,9 @@
         const warning = shadow.getElementById("indicatorWarning");
         if (chrome.runtime.lastError || !response?.ok) {
           warning.hidden = false;
-          warning.textContent = response?.error ||
-            "Markeringen kunde inte sparas. F\u00f6rs\u00f6k igen efter n\u00e4sta h\u00e4ndelse.";
+          warning.textContent = response?.error || uiText(
+            "Markeringen kunde inte sparas. Försök igen efter nästa händelse.",
+            "The marker could not be saved. Try again after the next event.");
           return;
         }
         warning.hidden = true;
@@ -233,13 +238,13 @@
       });
     };
     shadow.getElementById("indicatorImportant").addEventListener("click",
-      sendGuidance("important", "Senaste steget markerades som viktigt"));
+      sendGuidance("important", uiText("Senaste steget markerades som viktigt", "The latest step was marked as important")));
     shadow.getElementById("indicatorUseImage").addEventListener("click",
-      sendGuidance("use-image", "Senaste bilden har valts"));
+      sendGuidance("use-image", uiText("Senaste bilden har valts", "The latest screenshot was selected")));
     shadow.getElementById("indicatorSection").addEventListener("click",
-      sendGuidance("new-section", "Ny sektion skapas efter senaste steget"));
+      sendGuidance("new-section", uiText("Ny sektion skapas efter senaste steget", "A new section will be created after the latest step")));
     shadow.getElementById("indicatorIgnore").addEventListener("click",
-      sendGuidance("ignore", "Senaste steget ignoreras i dokumentet"));
+      sendGuidance("ignore", uiText("Senaste steget ignoreras i dokumentet", "The latest step will be ignored in the document")));
     document.documentElement.append(host);
     refreshRecordingIndicator();
     recordingIndicator.refreshTimer = setInterval(refreshRecordingIndicator, 1000);
@@ -249,6 +254,11 @@
     if (recording) showRecordingIndicator();
     else removeRecordingIndicator();
   }
+
+  chrome.storage.local.get("t9_settings").then(data => {
+    uiLocale = String(data.t9_settings?.uiLocale || "sv-SE");
+    if (recordingIndicator.host) { removeRecordingIndicator(); syncRecordingIndicator(); }
+  }).catch(() => {});
 
   function diagnostic(stage, details = {}) {
     if (!diagnosticsEnabled) return;
@@ -348,7 +358,12 @@
   // Storage state changes reach every already-injected frame and keep control
   // add-ins synchronized across service-worker restarts and frame remounts.
   chrome.storage.onChanged.addListener((changes, areaName) => {
-    if (areaName !== "local" || !changes.t9_state?.newValue) return;
+    if (areaName !== "local") return;
+    if (changes.t9_settings?.newValue) {
+      uiLocale = String(changes.t9_settings.newValue.uiLocale || "sv-SE");
+      if (recordingIndicator.host) { removeRecordingIndicator(); syncRecordingIndicator(); }
+    }
+    if (!changes.t9_state?.newValue) return;
     if (!changes.t9_state.newValue.recording) {
       recording = false;
       sessionId = null;

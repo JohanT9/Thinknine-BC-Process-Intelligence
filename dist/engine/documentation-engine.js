@@ -31,7 +31,7 @@ Processen är genomförd enligt arbetsgången.
 Session confidence: **${confidence?.sessionConfidence || 0} %**
 
 ---
-Genererad av BC Process Studio by Thinknine.
+Genererad av BC Process Studio.
 `;
   }
 

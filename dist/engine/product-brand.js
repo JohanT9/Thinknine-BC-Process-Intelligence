@@ -6,7 +6,7 @@
   "use strict";
   return Object.freeze({
     productName: "BC Process Studio",
-    companyAttribution: "by Thinknine",
+    companyAttribution: "",
     descriptor: "Business Process Intelligence for Microsoft Dynamics 365 Business Central",
     primaryTagline: "Turn Business Central processes into knowledge.",
     supportingMessage: "Capture. Document. Improve.",
