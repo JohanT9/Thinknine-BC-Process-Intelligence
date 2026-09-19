@@ -170,7 +170,7 @@
     const titleLineLimit = density === "compact" ? 2 : 4;
     const titleLinesByNode = new Map(nodes.map(node => [node.nodeId, wrap(
       processMapLabels.nodeTitle(node, options.language), titleWidth, titleLineLimit)]));
-    const maximumTitleLines = Math.max(1, ...titleLinesByNode.values().map(lines => lines.length));
+    const maximumTitleLines = Math.max(1, ...Array.from(titleLinesByNode.values(), lines => lines.length));
     const nodeHeight = density === "compact" ? 76 : Math.max(104, 68 + maximumTitleLines * 18);
     const gapX = density === "compact" ? 52 : 72;
     const gapY = density === "compact" ? 44 : 64;

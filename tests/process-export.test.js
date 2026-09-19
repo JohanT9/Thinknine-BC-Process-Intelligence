@@ -257,3 +257,22 @@ assert(dashboard.includes('processMapDirection === "vertical" ? { columns: 1 } :
 assert(dashboard.includes('exportActiveProcess("diagram")'));
 
 console.log("Process Model and diagram export tests passed.");
+
+// Exercise the exporter with the iterator contract available in Node 20.
+const vm = require("vm");
+const { createRequire } = require("module");
+const svgModulePath = require.resolve("../src/exporters/process-svg-export");
+class LegacyIteratorMap extends Map {
+  values() {
+    const iterator = super.values();
+    return { next: () => iterator.next(), [Symbol.iterator]() { return this; } };
+  }
+}
+const compatibilityModule = { exports: {} };
+vm.runInNewContext(fs.readFileSync(svgModulePath, "utf8"), {
+  module: compatibilityModule, require: createRequire(svgModulePath),
+  Map: LegacyIteratorMap
+}, { filename: svgModulePath });
+assert.strictEqual(compatibilityModule.exports.svg(model, { language: "sv-SE" }),
+  svgExporter.svg(model, { language: "sv-SE" }),
+  "SVG export must work without iterator helpers and preserve its output");
