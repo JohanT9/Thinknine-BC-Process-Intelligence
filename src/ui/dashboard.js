@@ -1,6 +1,6 @@
 const DEFAULTS = {
-  uiLocale: "sv-SE",
-  documentLanguage: "sv-SE",
+  uiLocale: "en-US",
+  documentLanguage: "en-US",
   exportFileNamePattern: "{process} - {environment} - {date}",
   documentationProfile: "generic",
   defaultExpectedResult:

@@ -14,8 +14,10 @@
   const componentRegistry = typeof module === "object" && module.exports
     ? require("./document-component-registry")
     : root.T9DocumentComponentRegistry;
+  const languages = typeof module === "object" && module.exports
+    ? require("../engine/language-registry") : root.T9LanguageRegistry;
   const api = factory(
-    semantic, themeValidation, themeModel, planModel, componentRegistry
+    semantic, themeValidation, themeModel, planModel, componentRegistry, languages
   );
   if (typeof module === "object" && module.exports) module.exports = api;
   root.T9DocumentPlanner = api;
@@ -24,7 +26,8 @@
   themeValidation,
   themeModel,
   planModel,
-  componentRegistry
+  componentRegistry,
+  languages
 ) {
   const PLANNER_VERSION = "1.0.0";
 
@@ -263,10 +266,10 @@
     const kind = componentKind(block.kind);
     const components = nestedComponents(block, sectionKind, theme,
       documentLanguage);
-    const english = documentLanguage === "en-US";
-    const stepLabel = english ? "Step" : "Steg";
-    const commentLabel = english ? "Comment" : "Kommentar";
-    const screenshotLabel = english ? "Screenshot" : "Skärmbild";
+    const label = (en, sv) => languages.translate(en, documentLanguage, sv);
+    const stepLabel = label("Step", "Steg");
+    const commentLabel = label("Comment", "Kommentar");
+    const screenshotLabel = label("Screenshot", "Skärmbild");
     const stepInstruction = block.kind === "step"
       ? block.blocks?.find(child => child.kind === "paragraph")?.text || ""
       : "";
@@ -330,8 +333,7 @@
           : kind === "callout"
             ? { label: calloutLabel, description: calloutText }
           : kind === "screenshot"
-            ? { label: block.altText || (english
-              ? "Process screenshot" : "Processkärmbild") }
+            ? { label: block.altText || (label("Process screenshot", "Processkärmbild")) }
             : {},
         presentationIntent: presentationIntentFor(block, components)
       }),
@@ -381,10 +383,10 @@
         } : {}),
         ...(block.kind === "revisionHistory" ? {
           columns: [
-            { key: "version", label: "Version" },
-            { key: "createdAt", label: english ? "Date" : "Datum" },
-            { key: "change", label: english ? "Change" : "Ändring" },
-            { key: "reviewer", label: english ? "Reviewed by" : "Granskad av" }
+            { key: "version", label: label("Version", "Version") },
+            { key: "createdAt", label: label("Date", "Datum") },
+            { key: "change", label: label("Change", "Ändring") },
+            { key: "reviewer", label: label("Reviewed by", "Granskad av") }
           ]
         } : {}),
         ...(block.kind === "table" ? {
@@ -412,7 +414,8 @@
   }
 
   function planSection(section, document, theme) {
-    const english = document.metadata?.documentLanguage === "en-US";
+    const localizedLanguage = languages.normalize(document.metadata?.documentLanguage) !== "sv-SE";
+    const label = (en, sv) => languages.translate(en, document.metadata?.documentLanguage, sv);
     const capability = sectionCapability(section.kind);
     const wrapperKind = ["cover", "workflow", "revisionHistory"].includes(
       section.kind
@@ -448,23 +451,20 @@
         },
         appearance: clone(theme.components.metadataTable || {}),
         content: {
-          accessibilityLabel: english ? "Document metadata" : "Dokumentmetadata",
+          accessibilityLabel: label("Document metadata", "Dokumentmetadata"),
           rows: [
             { key: "version", group: "identity", label: "Version",
               value: document.metadata.documentVersion },
-            { key: "date", group: "identity", label: english ? "Date" : "Datum",
+            { key: "date", group: "identity", label: label("Date", "Datum"),
               value: document.metadata.updatedAt || document.metadata.createdAt },
-            { key: "environment", group: "context", label: english
-              ? "Environment" : "Miljö",
+            { key: "environment", group: "context", label: label("Environment", "Miljö"),
               value: document.metadata.environment },
             { key: "documentationProfile", group: "context",
-              label: english ? "Documentation type" : "Dokumentationstyp",
+              label: label("Documentation type", "Dokumentationstyp"),
               value: document.metadata.documentationProfile },
-            { key: "reviewStatus", group: "review", label: english
-              ? "Review status" : "Granskningsstatus",
+            { key: "reviewStatus", group: "review", label: label("Review status", "Granskningsstatus"),
               value: document.metadata.statusLabel },
-            { key: "reviewer", group: "review", label: english
-              ? "Reviewed by" : "Granskad av",
+            { key: "reviewer", group: "review", label: label("Reviewed by", "Granskad av"),
               value: document.metadata.reviewer }
           ]
         },
@@ -513,10 +513,10 @@
         spacingIntent: spacingIntent(theme, "section"),
         appearance: {
           ...clone(theme.components[section.kind] || {}),
-          ...(english && section.kind === "cover"
-            ? { documentType: "Work instruction" } : {}),
-          ...(english && section.kind === "toc"
-            ? { title: "Contents" } : {})
+          ...(localizedLanguage && section.kind === "cover"
+            ? { documentType: label("Work instruction", "Arbetsinstruktion") } : {}),
+          ...(localizedLanguage && section.kind === "toc"
+            ? { title: label("Contents", "Innehåll") } : {})
         },
         content: {
           sectionKind: section.kind,
@@ -539,7 +539,8 @@
   }
 
   function globalComponents(document, theme) {
-    const english = document.metadata?.documentLanguage === "en-US";
+    const localizedLanguage = languages.normalize(document.metadata?.documentLanguage) !== "sv-SE";
+    const label = (en, sv) => languages.translate(en, document.metadata?.documentLanguage, sv);
     const branding = supports(theme, "supportsBranding")
       ? clone(theme.branding)
       : {};
@@ -550,8 +551,8 @@
       .map(([kind]) => ({
         ...componentContract(kind, {
           accessibility: { label: kind === "header"
-            ? english ? "Document header" : "Dokumenthuvud"
-            : english ? "Document footer" : "Dokumentsidfot" },
+            ? label("Document header", "Dokumenthuvud")
+            : label("Document footer", "Dokumentsidfot") },
           presentationIntent: {
             placement: kind,
             repetition: "everyPage",
@@ -582,8 +583,8 @@
             ? "theme.branding"
             : "",
           ...(kind === "footer" ? {
-            pageLabel: english ? "Page" : "Sida",
-            totalSeparator: english ? " of " : " av ",
+            pageLabel: label("Page", "Sida"),
+            totalSeparator: label(" of ", " av "),
             pageFieldIntent: { current: true, total: true }
           } : {})
         },

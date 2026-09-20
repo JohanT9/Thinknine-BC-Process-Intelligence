@@ -1,17 +1,30 @@
 (function (root, factory) {
-  const api = factory();
+  const catalogs = typeof module === "object" && module.exports
+    ? require("./locale-catalogs") : root.T9LocaleCatalogs || {};
+  const api = factory(catalogs);
   if (typeof module === "object" && module.exports) module.exports = api;
   root.T9LanguageRegistry = api;
-})(typeof globalThis !== "undefined" ? globalThis : this, function () {
+})(typeof globalThis !== "undefined" ? globalThis : this, function (catalogs) {
   "use strict";
 
+  const foldedCatalogs = Object.fromEntries(Object.entries(catalogs).map(([locale, values]) =>
+    [locale, Object.fromEntries(Object.entries(values).map(([text, value]) => [text.toLowerCase(), value]))]));
+  // Preserve legacy document fallbacks; new installations use English in their saved settings.
   const DEFAULT_LANGUAGE = "sv-SE";
+  const DEFAULT_UI_LANGUAGE = "en-US";
   const DEFAULT_DEFINITIONS = Object.freeze([
     Object.freeze({ locale: "sv-SE", shortCode: "SV", nativeName: "Svenska",
       aliases: Object.freeze(["sv", "sv-se"]), ui: true, document: true }),
     Object.freeze({ locale: "en-US", shortCode: "EN", nativeName: "English",
       aliases: Object.freeze(["en", "en-us", "en-gb"]), ui: true,
-      document: true })
+      document: true }),
+    ...[
+      ["fr-FR", "FR", "Français", "fr"],
+      ["de-DE", "DE", "Deutsch", "de"],
+      ["es-ES", "ES", "Español", "es"]
+    ].map(([locale, shortCode, nativeName, alias]) => Object.freeze({
+      locale, shortCode, nativeName, aliases: Object.freeze([alias]),
+      ui: true, document: true }))
   ]);
 
   function validateDefinition(value) {
@@ -79,11 +92,15 @@
       const index = choices.findIndex(language => language.locale === current);
       return choices[(index + 1) % choices.length]?.locale || defaultLanguage;
     };
+    const translate = (english, locale, swedish = english) => {
+      const normalized = normalize(locale, "all");
+      return normalized === "sv-SE" ? swedish : catalogs[normalized]?.[english] ?? foldedCatalogs[normalized]?.[english.toLowerCase()] ?? english;
+    };
     return Object.freeze({ defaultLanguage, languages, supported, normalize,
-      get, next });
+      get, next, translate });
   }
 
   const registry = createRegistry();
-  return Object.freeze({ DEFAULT_LANGUAGE, DEFAULT_DEFINITIONS,
+  return Object.freeze({ DEFAULT_LANGUAGE, DEFAULT_UI_LANGUAGE, DEFAULT_DEFINITIONS,
     createRegistry, validateDefinition, ...registry });
 });

@@ -6,10 +6,10 @@
 <title>BC Process Recorder — BC Process Studio</title>
 <style>
 html{width:390px;min-width:390px}body{margin:0;width:390px;min-width:390px;font-family:"Segoe UI",Arial,sans-serif;background:#f7f8fa;color:#1f2933}
-header{position:relative;background:#111827;color:#fff;padding:16px 58px 12px 18px}
+header{position:relative;background:#111827;color:#fff;padding:16px 18px 12px}
 .brand{font-size:11px;letter-spacing:.22em;opacity:.75}
 h1{font-size:19px;margin:4px 0 0}.version{font-size:11px;font-weight:400;opacity:.7}
-header .language-switch{position:absolute;top:12px;right:12px;width:auto;min-width:34px;margin:0;padding:7px 8px;border:1px solid rgba(255,255,255,.35);background:transparent;color:#fff;font-size:12px;line-height:1}header .language-switch:hover{background:rgba(255,255,255,.12)}header .language-switch:focus-visible{outline:2px solid #fff;outline-offset:2px}
+.brand-row{display:flex;align-items:center;justify-content:space-between;gap:12px}.brand-row .brand{letter-spacing:.16em}header .language-button{display:inline-flex;align-items:center;gap:6px;width:auto;min-height:32px;margin:0;padding:5px 9px;border:1px solid #64748b;border-radius:7px;background:#1e293b;color:#fff;font-size:12px}header .language-button:hover{background:#334155}header .language-button:focus-visible{outline:2px solid #fff;outline-offset:3px}.language-button svg{width:16px;height:16px}.language-panel h2{margin-bottom:18px}.language-panel .language-field{margin:18px 0}.language-panel label{margin-bottom:7px;color:#172b45}.language-panel .hint{margin:7px 0 0;line-height:1.5}.language-panel select{min-height:42px}.language-panel menu{justify-content:flex-end}.language-panel menu button{flex:0 1 auto;width:auto;min-width:100px}
 main{padding:16px 18px 18px}
 .status{padding:9px 11px;border-radius:6px;margin-bottom:14px;font-weight:600;background:#e5e7eb}
 .status.rec{background:#fee2e2;color:#991b1b}
@@ -28,12 +28,30 @@ dialog{width:calc(100% - 24px);max-width:366px;max-height:calc(100dvh - 16px);ov
 </head>
 <body>
 <header>
+<div class="brand-row">
 <div class="brand">BC PROCESS STUDIO</div>
-<h1>BC Process Recorder <span class="version">v__APP_VERSION__</span></h1>
-<button id="languageSwitch" class="language-switch" type="button">
-  <span id="languageCode" aria-hidden="true">SV</span>
+<button id="languageSettingsButton" class="language-button" type="button" aria-haspopup="dialog" aria-controls="languageSettingsDialog" data-i18n-title="settings.languages" data-i18n-aria-label="settings.languages">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><circle cx="12" cy="12" r="9"/><ellipse cx="12" cy="12" rx="4" ry="9"/><path d="M3 12h18"/></svg>
+  <span id="languageCode" aria-hidden="true">EN</span><span aria-hidden="true">⌄</span>
 </button>
+</div>
+<h1>BC Process Recorder <span class="version">v__APP_VERSION__</span></h1>
 </header>
+<dialog id="languageSettingsDialog" class="language-panel" aria-labelledby="languageSettingsTitle">
+  <h2 id="languageSettingsTitle" data-i18n="settings.languages">Language settings</h2>
+  <div class="language-field">
+    <label for="languageSwitch" data-i18n="settings.language">Interface language</label>
+    <select id="languageSwitch" data-language-select="ui" aria-describedby="interfaceLanguageHelp" disabled></select>
+    <p id="interfaceLanguageHelp" class="hint" data-i18n="settings.languageHelp"></p>
+  </div>
+  <div class="language-field">
+    <label for="defaultDocumentLanguage" data-i18n="settings.documentLanguage">Document language</label>
+    <select id="defaultDocumentLanguage" data-language-select="document" aria-describedby="defaultLanguageHelp" disabled></select>
+    <p id="defaultLanguageHelp" class="hint" data-i18n="settings.documentLanguageHelp"></p>
+  </div>
+  <p id="languageSettingsStatus" class="hint" role="status" aria-live="polite" data-i18n="settings.autoSave">Changes are saved automatically.</p>
+  <form method="dialog"><menu><button value="close" class="primary" data-i18n="settings.done">Done</button></menu></form>
+</dialog>
 <main>
 <div id="status" class="status" role="status" aria-live="polite"
   aria-atomic="true" data-i18n="recorder.inactive">Inte aktiv</div>
@@ -134,7 +152,8 @@ dialog{width:calc(100% - 24px);max-width:366px;max-height:calc(100dvh - 16px);ov
 </dialog>
 </main>
 <script src="async-operations.js"></script>
-<script src="engine/language-registry.js"></script>
+<script src="engine/locale-catalogs.js"></script>
+  <script src="engine/language-registry.js"></script>
 <script src="i18n.js"></script>
 <script src="tooltips.js"></script>
 <script src="popup.js"></script>

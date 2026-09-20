@@ -26,7 +26,8 @@ async function main() {
     path.join(outputDirectory, `bc-license-service-${version}-audit-log.zip`),
     path.join(outputDirectory, `bc-license-service-${version}-admin-dashboard.zip`),
     path.join(outputDirectory, `bc-license-service-${version}-entra-admin.zip`),
-    path.join(outputDirectory, `bc-license-service-${version}-table-storage.zip`)];
+    path.join(outputDirectory, `bc-license-service-${version}-table-storage.zip`),
+    path.join(outputDirectory, `bc-license-service-${version}-document-usage.zip`)];
   await fs.mkdir(outputDirectory, { recursive: true });
   for (const output of outputs) {
     await fs.writeFile(output, bytes);

@@ -217,6 +217,7 @@ function csvDownload(filename, rows) {
   setTimeout(() => URL.revokeObjectURL(url), 1000);
 }
 function render() {
+  renderDocumentUsage();
   const groups = consultantGroups();
   const organizationLicenses = [
     ...Object.entries(state.tenants).map(([id, license]) => ({ id, license })),
@@ -500,3 +501,30 @@ async function initializeAuthentication() {
   } catch (error) { message(error.message, true); }
 }
 initializeAuthentication();
+
+function renderDocumentUsage() {
+  const body = $("documentUsage"); body.replaceChildren();
+  const users = new Map();
+  for (const user of state?.tenantUsers || []) users.set(user.entraTenantId + ":" + user.objectId, user);
+  for (const [id, user] of Object.entries(state?.consultants || {})) {
+    const [entraTenantId, objectId] = id.split(":");
+    if (objectId && objectId !== "00000000-0000-0000-0000-000000000000") users.set(id, { ...user, entraTenantId, objectId });
+  }
+  for (const user of state?.documentUsage || []) users.set(user.entraTenantId + ":" + user.objectId,
+    { ...users.get(user.entraTenantId + ":" + user.objectId), ...user });
+  const search = $("usageSearch").value.trim().toLocaleLowerCase();
+  let visible = 0;
+  for (const user of users.values()) {
+    if (search && ![user.name, user.email, user.entraTenantId, user.objectId].join(" ").toLocaleLowerCase().includes(search)) continue;
+    visible++;
+    const count = user.periods?.[$("usagePeriod").value] || { documents: 0, reports: 0 };
+    const row = document.createElement("tr");
+    for (const value of [user.name || "—", user.email || "—", user.entraTenantId,
+      user.objectId, String(count.documents), String(count.reports), user.lastCreatedAt || "—"]) cell(row, value);
+    body.append(row);
+  }
+  $("usageEmpty").hidden = Boolean(visible);
+  $("usageEmpty").textContent = search ? "Ingen användare matchar sökningen." : "Ingen användare har registrerats ännu.";
+}
+$("usagePeriod").addEventListener("change", renderDocumentUsage);
+$("usageSearch").addEventListener("input", renderDocumentUsage);

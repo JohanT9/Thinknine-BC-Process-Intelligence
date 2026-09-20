@@ -7,21 +7,18 @@ function updateText(element, value) {
 
 const withTimeout = globalThis.T9AsyncOperations.withTimeout;
 let currentUiLocale = globalThis.T9UiI18n.DEFAULT_LOCALE;
-let defaultDocumentLanguage = "sv-SE";
+let defaultDocumentLanguage = "en-US";
 const t = key => globalThis.T9UiI18n.translate(key, currentUiLocale);
 const tf = (key, values) => globalThis.T9UiI18n.format(key, values, currentUiLocale);
 
 function updateLanguageSwitch() {
-  const current = globalThis.T9LanguageRegistry.get(currentUiLocale);
-  const next = globalThis.T9LanguageRegistry.get(
-    globalThis.T9LanguageRegistry.next(currentUiLocale, "ui")
-  );
-  updateText($("languageCode"), current.shortCode);
-  const label = tf("language.switchToLanguage", {
-    language: next.nativeName
-  });
-  $("languageSwitch").setAttribute("aria-label", label);
-  $("languageSwitch").title = label;
+  $("languageSwitch").value = currentUiLocale;
+  $("defaultDocumentLanguage").value = defaultDocumentLanguage;
+  const language = globalThis.T9LanguageRegistry.get(currentUiLocale);
+  updateText($("languageCode"), language.shortCode);
+  $("languageSettingsButton").setAttribute("aria-label", t("settings.languages") + ": " + language.nativeName);
+  $("languageSwitch").setAttribute("aria-label", t("settings.language"));
+  $("languageSwitch").title = t("settings.language");
 }
 
 async function loadUiLocale() {
@@ -38,13 +35,18 @@ async function loadUiLocale() {
       globalThis.T9UiI18n.DEFAULT_LOCALE);
     globalThis.T9UiI18n.observe(() => currentUiLocale);
     updateLanguageSwitch();
+  } finally {
+    $("languageSwitch").disabled = false;
+    $("defaultDocumentLanguage").disabled = false;
   }
 }
 
-async function switchUiLocale() {
+async function switchUiLocale(event) {
   const previousLocale = currentUiLocale;
-  const uiLocale = globalThis.T9LanguageRegistry.next(previousLocale, "ui");
+  const uiLocale = globalThis.T9LanguageRegistry.normalize(event.currentTarget.value, "ui");
+  if (uiLocale === previousLocale) return;
   $("languageSwitch").disabled = true;
+  $("defaultDocumentLanguage").disabled = true;
   try {
     currentUiLocale = globalThis.T9UiI18n.apply(uiLocale);
     updateLanguageSwitch();
@@ -56,7 +58,7 @@ async function switchUiLocale() {
   } catch (error) {
     currentUiLocale = globalThis.T9UiI18n.apply(previousLocale);
     updateLanguageSwitch();
-    showMessage(error.message, true);
+    $("languageSettingsStatus").textContent = error.message;
   } finally {
     $("languageSwitch").disabled = false;
   }
@@ -187,8 +189,8 @@ async function startRecording(recordingPurpose) {
     if (licenseInfo.information.requiresAcceptance) {
       const sv = currentUiLocale === "sv-SE";
       const notice = sv
-        ? "Tenantlicens för BC Process Studio\n\nVid licenskontroll skickas installations-ID, tenant-ID och tilläggsversion till licenstjänsten för BC Process Studio. För att använda en aktiv tenantlicens loggar användaren även in med Microsoft. Namn, e-post/UPN, Entra tenant-ID och objekt-ID registreras för administration tillsammans med första och senaste användning. Inga inspelningar, bilder, företagsnamn eller affärsdata skickas. Azure kan även logga tekniska anslutningsuppgifter.\n\nKontroll sker vid inspelning och godkänt besked cachas i högst en timme. Utan aktiv licens eller kontakt efter cacheutgång kan nya inspelningar inte startas. Befintliga dokument finns kvar.\n\nTjänst: "
-        : "BC Process Studio tenant licensing\n\nLicense checks send the installation ID, tenant ID and extension version to the BC Process Studio licensing service. To use an active tenant license, the user also signs in with Microsoft. Name, email/UPN, Entra tenant ID and object ID are registered for administration together with first and latest use. No recordings, images, company names or business data are sent. Azure may also log technical connection information.\n\nChecks occur during recording; approvals are cached for at most one hour. Without an active license or contact after cache expiry, new recordings cannot start. Existing documents remain available.\n\nService: ";
+        ? "Tenantlicens för BC Process Studio\n\nVid licenskontroll skickas installations-ID, tenant-ID och tilläggsversion till licenstjänsten för BC Process Studio. För att använda en aktiv tenantlicens loggar användaren även in med Microsoft. Namn, e-post/UPN, Entra tenant-ID och objekt-ID registreras för administration tillsammans med första och senaste användning. För nya sparade processdokument och felrapporter skickas dokumenttyp, skapandetid och ett hashat tekniskt ID för statistik per användare. Dokumentinnehåll, inspelningar, bilder, företagsnamn och affärsdata skickas inte. Azure kan även logga tekniska anslutningsuppgifter.\n\nKontroll sker vid inspelning och godkänt besked cachas i högst en timme. Utan aktiv licens eller kontakt efter cacheutgång kan nya inspelningar inte startas. Befintliga dokument finns kvar.\n\nTjänst: "
+        : "BC Process Studio tenant licensing\n\nLicense checks send the installation ID, tenant ID and extension version to the BC Process Studio licensing service. To use an active tenant license, the user also signs in with Microsoft. Name, email/UPN, Entra tenant ID and object ID are registered for administration together with first and latest use. For newly saved process documents and bug reports, document type, creation time and a hashed technical ID are sent for per-user statistics. Document content, recordings, images, company names and business data are not sent. Azure may also log technical connection information.\n\nChecks occur during recording; approvals are cached for at most one hour. Without an active license or contact after cache expiry, new recordings cannot start. Existing documents remain available.\n\nService: ";
       if (!globalThis.confirm(notice + licenseInfo.information.endpoint +
           (sv ? "\n\nGodkänn registreringen och fortsätt?" : "\n\nAccept registration and continue?"))) {
         throw new Error(sv ? "Licensregistreringen avbröts. Inga uppgifter skickades." : "Registration cancelled. No data was sent.");
@@ -281,7 +283,37 @@ function requestTrialEmail() {
 
 $("startProcess").addEventListener("click", () => startRecording("documentation"));
 $("startBug").addEventListener("click", () => startRecording("bug-report"));
-$("languageSwitch").addEventListener("click", switchUiLocale);
+$("languageSwitch").addEventListener("change", switchUiLocale);
+$("languageSettingsButton").addEventListener("click", () => {
+  $("languageSettingsStatus").textContent = t("settings.autoSave");
+  $("languageSettingsDialog").showModal();
+});
+$("languageSettingsDialog").addEventListener("click", event => {
+  const bounds = event.currentTarget.getBoundingClientRect();
+  if (event.target === event.currentTarget && (event.clientX < bounds.left ||
+      event.clientX > bounds.right || event.clientY < bounds.top || event.clientY > bounds.bottom)) {
+    event.currentTarget.close();
+  }
+});
+$("defaultDocumentLanguage").addEventListener("change", async event => {
+  const previous = defaultDocumentLanguage;
+  const documentLanguage = event.currentTarget.value;
+  $("defaultDocumentLanguage").disabled = true;
+  $("languageSwitch").disabled = true;
+  try {
+    const response = await send({ type: "T9_SAVE_DOCUMENT_LANGUAGE", documentLanguage }, 3000);
+    if (!response?.ok) throw new Error(t("technical.requestFailed"));
+    defaultDocumentLanguage = response.documentLanguage;
+    $("languageSettingsStatus").textContent = t("settings.saved");
+  } catch (error) {
+    defaultDocumentLanguage = previous;
+    $("languageSettingsStatus").textContent = error.message;
+  } finally {
+    updateLanguageSwitch();
+    $("defaultDocumentLanguage").disabled = false;
+    $("languageSwitch").disabled = false;
+  }
+});
 $("licenseStatus").addEventListener("click", async () => {
   try {
     const tab = await currentTab();

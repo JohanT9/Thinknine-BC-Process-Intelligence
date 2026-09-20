@@ -1,7 +1,10 @@
-(function (root, factory) { const api = factory();
+(function (root, factory) {
+  const languages = typeof module === "object" && module.exports
+    ? require("../engine/language-registry") : root.T9LanguageRegistry;
+  const api = factory(languages);
   if (typeof module === "object" && module.exports) module.exports = api;
   root.T9IssuePackageMarkdown = api;
-})(typeof globalThis !== "undefined" ? globalThis : this, function () {
+})(typeof globalThis !== "undefined" ? globalThis : this, function (languages) {
   "use strict";
   const value = input => input == null ? "" : String(input);
   const SWEDISH = Object.freeze({ summary: "Sammanfattning",
@@ -44,8 +47,8 @@
     item.objectType, item.objectId, item.objectName].filter(Boolean).join(" ")}${
     item.methodName ? ` — ${item.methodName}` : ""}${item.extensionName ?
     ` (${item.extensionName})` : ""}${item.sourceLine ? `, line ${item.sourceLine}` : ""}`; }
-  function markdown(pkg) { const labels = pkg.documentLanguage === "sv-SE"
-    ? SWEDISH : ENGLISH; const out = [`# ${inline(pkg.title)}`, ""];
+  function markdown(pkg) { const labels = Object.fromEntries(Object.entries(ENGLISH).map(([key, text]) =>
+    [key, languages.translate(text, pkg.documentLanguage || "en-US", SWEDISH[key])])); const out = [`# ${inline(pkg.title)}`, ""];
     const add = (title, lines) => { const filtered = lines.filter(item => item !== "" &&
       item != null); if (filtered.length) out.push(`## ${title}`, "", ...filtered, ""); };
     const errors = [pkg.errorEvidence?.primary, ...(pkg.errorEvidence?.additional || [])]

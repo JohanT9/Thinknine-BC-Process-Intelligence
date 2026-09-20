@@ -2,8 +2,8 @@
 const $ = id => document.getElementById(id);
 const tabId = Number(new URLSearchParams(location.search).get("tabId"));
 let licenses = [];
-let currentUiLocale = "sv-SE";
-const text = (swedish, english) => currentUiLocale.startsWith("en") ? english : swedish;
+let currentUiLocale = globalThis.T9UiI18n.DEFAULT_LOCALE;
+const text = (swedish, english) => globalThis.T9LanguageRegistry.translate(english, currentUiLocale, swedish);
 
 function dateTime(value) {
   if (!Number.isFinite(value) || value <= 0) return "—";

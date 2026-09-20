@@ -5,6 +5,7 @@
   "description": "Business Process Intelligence for Microsoft Dynamics 365 Business Central. Capture, review and document real processes.",
   "permissions": [
     "activeTab",
+    "alarms",
     "downloads",
     "identity",
     "nativeMessaging",

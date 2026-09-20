@@ -3,6 +3,7 @@ const { TableClient } = require("@azure/data-tables");
 const { ManagedIdentityCredential } = require("@azure/identity");
 
 const TABLES = Object.freeze({
+  documentUsage: "LicenseDocumentUsage",
   tenants: "LicenseTenants",
   claims: "LicenseTrialClaims",
   consultants: "LicenseConsultantCompanies",

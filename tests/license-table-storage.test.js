@@ -46,7 +46,19 @@ async function main() {
   assert.deepEqual(await storage.readList("audit", 10), [event]);
   await assert.rejects(storage.importMap("tenants", {}), /not empty/);
   await assert.rejects(createTableStorage({ accountUrl: "http://invalid.example" }), /HTTPS endpoint/);
-  console.log("License Azure Table Storage tests passed.");
+  const { createDocumentUsage } = require("../services/licensing/document-usage.js");
+  const usage = createDocumentUsage({ dataDirectory: ".", storage,
+    now: () => Date.parse("2026-10-20T12:00:00.000Z") });
+  const identity = { tid: "tenant", oid: "user" };
+  const document = { kind: "process-document", documentId: "a".repeat(64),
+    createdAt: "2026-10-20T12:00:00.000Z" };
+  const results = await Promise.all([usage.record(identity, document), usage.record(identity, document)]);
+  assert.equal(results.filter(result => !result.duplicate).length, 1);
+  await Promise.all([usage.record(identity, { ...document, documentId: "b".repeat(64) }),
+    usage.record(identity, { ...document, kind: "bug-report" })]);
+  assert.deepEqual((await usage.summary())[0].periods.all, { documents: 2, reports: 1 });
+  assert.equal(Object.keys(await storage.readMap("documentUsage")).length, 3);
+  console.log("License Azure Table Storage and concurrent document usage tests passed.");
 }
 
 main().catch(error => { console.error(error); process.exitCode = 1; });

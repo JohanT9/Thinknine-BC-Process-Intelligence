@@ -1,9 +1,11 @@
+importScripts("engine/locale-catalogs.js");
 importScripts("engine/language-registry.js");
 importScripts("engine/storage-keys.js");
 importScripts("engine/business-central-url-context.js");
 importScripts("engine/tenant-license.js");
 importScripts("engine/tenant-license-config.js");
 importScripts("engine/consultant-license.js");
+importScripts("engine/document-usage.js");
 importScripts("engine/page-identity.js");
 importScripts("engine/page-identification-engine.js");
 importScripts("engine/process-taxonomy-schema.js");
@@ -72,6 +74,26 @@ const consultantLicense = globalThis.T9ConsultantLicense.create({
   version: VERSION
 });
 
+const documentUsage = globalThis.T9DocumentUsage.create({
+  storage: chrome.storage.local,
+  account: async () => (await consultantLicense.state()).profile,
+  send: (event, owner) => consultantLicense.recordUsage(event, owner),
+  digest: async value => Array.from(new Uint8Array(await crypto.subtle.digest("SHA-256",
+    new TextEncoder().encode(value))), byte => byte.toString(16).padStart(2, "0")).join("")
+});
+async function recordDocumentUsage(kind, id, created) {
+  try {
+    if (created) await documentUsage.enqueue(kind, id);
+    void documentUsage.flush().catch(() => {});
+  } catch (error) { console.warn("Usage statistics pending", error.message); }
+}
+void documentUsage.flush().catch(() => {});
+// Persistent retries also wake the service worker after an offline save.
+chrome.alarms?.create("document-usage-sync", { periodInMinutes: 5 });
+chrome.alarms?.onAlarm.addListener(alarm => {
+  if (alarm.name === "document-usage-sync") void documentUsage.flush().catch(() => {});
+});
+
 async function requireRecordingLicense(url) {
   try { return { source: "tenant", ...(await tenantLicense.requireLicense(url)) }; }
   catch (tenantError) {
@@ -127,6 +149,12 @@ const DEFAULT_SETTINGS = {
   maskLocationCode: false,
   maskLotBatchNo: false
 };
+
+const INITIAL_SETTINGS = { ...DEFAULT_SETTINGS, uiLocale: "en-US", documentLanguage: "en-US" };
+function resolveSettings(stored) {
+  // Existing installations without language fields keep their historical Swedish defaults.
+  return stored ? { ...DEFAULT_SETTINGS, ...stored } : { ...INITIAL_SETTINGS };
+}
 
 const STATE_KEY = "t9_state";
 const SETTINGS_KEY = "t9_settings";
@@ -196,7 +224,7 @@ function sessionId(name) {
 
 async function getSettings() {
   const data = await chrome.storage.local.get(SETTINGS_KEY);
-  return { ...DEFAULT_SETTINGS, ...(data[SETTINGS_KEY] || {}) };
+  return resolveSettings(data[SETTINGS_KEY]);
 }
 
 async function getState() {
@@ -372,7 +400,11 @@ const bugReportStore = globalThis.T9BugReportStore.createStore({
     const data = await chrome.storage.local.get(key);
     return data[key] || null;
   },
-  async set(key, value) { await chrome.storage.local.set({ [key]: value }); },
+  async set(key, value) {
+    const existing = (await chrome.storage.local.get(key))[key];
+    await chrome.storage.local.set({ [key]: value });
+    await recordDocumentUsage("bug-report", value.bugReportId, !existing);
+  },
   async remove(key) { await chrome.storage.local.remove(key); },
   async all() { return chrome.storage.local.get(null); }
 }, BUG_REPORT_PREFIX);
@@ -1614,7 +1646,7 @@ async function cancelActiveSession() {
 chrome.runtime.onInstalled.addListener(async () => {
   const current = await chrome.storage.local.get(SETTINGS_KEY);
   if (!current[SETTINGS_KEY]) {
-    await chrome.storage.local.set({ [SETTINGS_KEY]: DEFAULT_SETTINGS });
+    await chrome.storage.local.set({ [SETTINGS_KEY]: INITIAL_SETTINGS });
   }
   await setState(await getState());
   await registerRecorderContentScript();
@@ -2417,6 +2449,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
       }
 
       case "T9_SAVE_REVIEW": {
+        const existing = (await chrome.storage.local.get(REVIEW_PREFIX + message.sessionId))[REVIEW_PREFIX + message.sessionId];
         const review = {
           ...(message.review || {}),
           sessionId: message.sessionId,
@@ -2425,6 +2458,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
         await chrome.storage.local.set({
           [REVIEW_PREFIX + message.sessionId]: review
         });
+        await recordDocumentUsage("process-document", message.sessionId, !existing?.tasks?.length && Boolean(review.tasks?.length));
         sendResponse({ ok: true, review });
         break;
       }
@@ -2471,7 +2505,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
 
       case "T9_GET_SETTINGS": {
         const data = await chrome.storage.local.get(SETTINGS_KEY);
-        const storedSettings = data[SETTINGS_KEY] || {};
+        const storedSettings = resolveSettings(data[SETTINGS_KEY]);
 
         sendResponse({
           ok: true,
@@ -2488,7 +2522,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
       }
 
       case "T9_SAVE_SETTINGS": {
-        const settings = { ...DEFAULT_SETTINGS, ...(message.settings || {}) };
+        const settings = { ...(await getSettings()), ...(message.settings || {}) };
         settings.uiLocale = globalThis.T9LanguageRegistry.normalize(
           settings.uiLocale, "ui");
         settings.documentLanguage = globalThis.T9LanguageRegistry.normalize(
@@ -2503,9 +2537,17 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
         break;
       }
 
+      case "T9_SAVE_DOCUMENT_LANGUAGE": {
+        const settings = { ...(await getSettings()), documentLanguage:
+          globalThis.T9LanguageRegistry.normalize(message.documentLanguage, "document") };
+        await chrome.storage.local.set({ [SETTINGS_KEY]: settings });
+        sendResponse({ ok: true, documentLanguage: settings.documentLanguage });
+        break;
+      }
+
       case "T9_SAVE_UI_LOCALE": {
         const data = await chrome.storage.local.get(SETTINGS_KEY);
-        const settings = { ...DEFAULT_SETTINGS, ...(data[SETTINGS_KEY] || {}),
+        const settings = { ...resolveSettings(data[SETTINGS_KEY]),
           uiLocale: globalThis.T9LanguageRegistry.normalize(
             message.uiLocale, "ui") };
         await chrome.storage.local.set({ [SETTINGS_KEY]: settings });

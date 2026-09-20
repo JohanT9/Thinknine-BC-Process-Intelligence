@@ -5,6 +5,7 @@ const crypto = require("node:crypto");
 const { createAdmin } = require("./admin.js");
 const { createEntraValidator } = require("./entra-validator.js");
 const { createNotifier } = require("./notifications.js");
+const { createDocumentUsage, validUsage } = require("./document-usage.js");
 const { createAuditLog } = require("./audit-log.js");
 const { createTableStorage } = require("./table-storage.js");
 
@@ -65,6 +66,7 @@ async function createService({ dataDirectory, now = Date.now, rateLimit = 120,
       verification.tenants = await storage.importMap("tenants", await optionalJson(registryFile));
       verification.claims = await storage.importMap("claims", await optionalJson(claimsFile));
       verification.consultants = await storage.importMap("consultants", await optionalJson(consultantsFile));
+      verification.documentUsage = await storage.importMap("documentUsage", await optionalJson(path.join(dataDirectory, "document-usage.json")));
       verification.tenantUsers = await storage.importMap("tenantUsers", await optionalJson(tenantUsersFile));
       const registrations = await optionalLines(registrationsFile);
       verification.registrations = await storage.importMap("registrations", Object.fromEntries(registrations.map(value =>
@@ -241,11 +243,12 @@ async function createService({ dataDirectory, now = Date.now, rateLimit = 120,
     const bucket = buckets.get(address) || { minute, count: 0 }; bucket.count++;
     buckets.set(address, bucket); return bucket.count > rateLimit;
   }
+  const usage = createDocumentUsage({ dataDirectory, storage, now });
   const admin = createAdmin({ dataDirectory, registry, mutateRegistry,
     consultants, mutateConsultants,
     tenantUsers, mutateTenantUsers, registrations: registrationEntries,
     deleteTrialClaim, now, adminKey, notificationConfigured: notifications.configured,
-    auditEvents: audit.read, recordAudit,
+    auditEvents: audit.read, recordAudit, usageSummary: usage.summary,
     validateAdminEntra, entraClientId: entraClientId || entraAudience.replace(/^api:\/\//, ""),
     entraScope: entraAudience ? `${entraAudience.startsWith("api://") ? entraAudience : `api://${entraAudience}`}/${entraScope}` : "",
     entraAdminRole,
@@ -265,7 +268,7 @@ async function createService({ dataDirectory, now = Date.now, rateLimit = 120,
         storage: storage ? "azure-table" : "file" }); }
       catch { return reply(503, { status: "unavailable" }); }
     }
-    if (!["/v1/license/check", "/v1/license/trial", "/v1/license/user/register", "/v1/license/consultant/check",
+    if (!["/v1/license/usage", "/v1/license/check", "/v1/license/trial", "/v1/license/user/register", "/v1/license/consultant/check",
       "/v1/license/consultant/register"].includes(request.url)) return reply(404, { error: "not-found" });
     if (request.method !== "POST") return reply(405, { error: "method-not-allowed" });
     if (throttled(request.socket.remoteAddress)) return reply(429, { error: "rate-limit" });
@@ -275,6 +278,21 @@ async function createService({ dataDirectory, now = Date.now, rateLimit = 120,
       for await (const chunk of request) { size += chunk.length; if (size > MAX_BODY) {
         reply(413, { error: "body-too-large" }); request.resume(); return; } body += chunk.toString("utf8"); }
       let value; try { value = JSON.parse(body); } catch { return reply(400, { error: "invalid-json" }); }
+      if (request.url === "/v1/license/usage") {
+        if (!validUsage(value, now())) return reply(400, { error: "invalid-request" });
+        try {
+          const identity = await validateEntra(request.headers.authorization || "");
+          const licenses = await consultants();
+          const consultant = licenses[identity.tid + ":" + ORGANIZATION_OBJECT_ID] ||
+            licenses[identity.tid + ":" + identity.oid];
+          const active = license => license?.enabled && Date.parse(license.expiresAt) > now();
+          const tenants = await registry();
+          const registered = Object.values(await tenantUsers()).some(user =>
+            user.entraTenantId === identity.tid && user.objectId === identity.oid && active(tenants[user.tenantId]));
+          if (!active(consultant) && !registered) return reply(403, { error: "license-inactive" });
+          return reply(200, await usage.record(identity, value));
+        } catch (error) { return reply(error.status || 503, { error: error.message }); }
+      }
       if (request.url === "/v1/license/user/register") {
         if (!validRequest(value)) return reply(400, { error: "invalid-request" });
         try {

@@ -5,11 +5,13 @@
     ? require("./ai-analysis-input") : root.T9AiAnalysisInput;
   const aiModel = typeof module === "object" && module.exports
     ? require("./ai-analysis-model") : root.T9AiAnalysisModel;
-  const api = factory(completeness, aiInput, aiModel);
+  const languages = typeof module === "object" && module.exports
+    ? require("../engine/language-registry") : root.T9LanguageRegistry;
+  const api = factory(completeness, aiInput, aiModel, languages);
   if (typeof module === "object" && module.exports) module.exports = api;
   root.T9BugReportGenerator = api;
 })(typeof globalThis !== "undefined" ? globalThis : this, function (
-  completeness, aiInput, aiModel
+  completeness, aiInput, aiModel, languages
 ) {
   "use strict";
   const clone = value => value == null ? value : JSON.parse(JSON.stringify(value));
@@ -59,16 +61,17 @@
       text(step.instruction);
   }
   function project(report, context = {}) {
-    const documentLanguage = report.documentLanguage === "en-US" ? "en-US" : "sv-SE";
-    const titles = TITLES[documentLanguage];
-    const labels = documentLanguage === "sv-SE" ? SWEDISH_LABELS : LABELS;
+    const documentLanguage = languages.normalize(report.documentLanguage);
+    const localized = (en, sv) => languages.translate(en, documentLanguage, sv);
+    const titles = Object.fromEntries(Object.entries(TITLES["en-US"]).map(([key, value]) =>
+      [key, localized(value, TITLES["sv-SE"][key])]));
+    const labels = Object.fromEntries(Object.entries(LABELS).map(([key, value]) =>
+      [key, localized(value, SWEDISH_LABELS[key])]));
     const errors = evidenceFor(report, context.errorEvidence);
     const onlyError = errors.length === 1 ? errors[0].errorEvidenceId : null;
     const primaryId = report.businessCentralError?.primaryErrorEvidenceId || onlyError;
     const primary = errors.find(item => item.errorEvidenceId === primaryId) || null;
-    const title = text(report.summary?.title).trim() || (documentLanguage === "sv-SE"
-      ? "Business Central-fel under inspelad process"
-      : "Business Central error during recorded process");
+    const title = text(report.summary?.title).trim() || (localized("Business Central error during recorded process", "Business Central-fel under inspelad process"));
     const summaryText = text(report.summary?.summary).trim() ||
       text(primary?.rawMessage || errors[0]?.rawMessage);
     const reproduction = (report.reproduction?.steps || []).filter(step =>
@@ -107,13 +110,11 @@
       queries: clone(value.queries || []),
       warnings: clone(value.warnings || []) }));
     const timeline = [...errors.map(item => ({ timestamp: item.capturedAt,
-      source: "captured-error", label: documentLanguage === "sv-SE"
-        ? "Business Central-fel registrerat" : "Business Central error captured",
+      source: "captured-error", label: localized("Business Central error captured", "Business Central-fel registrerat"),
       referenceId: item.errorEvidenceId, provenance: "captured-local-evidence" })),
     ...telemetryContexts.flatMap(context => context.events.map(event => ({
       timestamp: event.timestamp, source: "telemetry",
-      label: event.eventName || event.message || (documentLanguage === "sv-SE"
-        ? "Telemetrihändelse observerad" : "Telemetry event observed"),
+      label: event.eventName || event.message || (localized("Telemetry event observed", "Telemetrihändelse observerad")),
       referenceId: event.telemetryEventId,
       correlationReasons: clone(event.correlationReasons || []),
       provenance: "external-telemetry-evidence" })))]
@@ -145,7 +146,7 @@
         kind: "diagnostics", provenance: "mixed", content: { rows: diagnosticRows,
           captureStatuses: errors.map(item => ({ errorEvidenceId: item.errorEvidenceId,
             diagnosticsStatus: item.diagnosticsStatus })) } },
-      { id: "al-call-stack", title: documentLanguage === "sv-SE" ? "AL-anropsstack (AL Call Stack)" : "AL Call Stack", kind: "call-stack",
+      { id: "al-call-stack", title: localized("AL Call Stack", "AL-anropsstack (AL Call Stack)"), kind: "call-stack",
         provenance: "derived", content: callStacks },
       { id: "affected-objects", title: titles.objects,
         kind: "objects", provenance: "derived",

@@ -8,12 +8,13 @@ const registrySource = fs.readFileSync(path.join(root,
   "src/engine/language-registry.js"), "utf8");
 const source = fs.readFileSync(path.join(root, "src/ui/i18n.js"), "utf8");
 const context = { globalThis: {}, CustomEvent: class CustomEvent {} };
+vm.runInNewContext(fs.readFileSync(path.join(root, "src/engine/locale-catalogs.js"), "utf8"), context);
 vm.runInNewContext(registrySource, context);
 vm.runInNewContext(source, context);
 const i18n = context.globalThis.T9UiI18n;
 
-assert.deepStrictEqual([...i18n.SUPPORTED_LOCALES], ["sv-SE", "en-US"]);
-assert.equal(i18n.normalizeLocale(), "sv-SE");
+assert.deepStrictEqual([...i18n.SUPPORTED_LOCALES], ["sv-SE", "en-US", "fr-FR", "de-DE", "es-ES"]);
+assert.equal(i18n.normalizeLocale(), "en-US");
 assert.equal(i18n.normalizeLocale("en-GB"), "en-US");
 assert.equal(i18n.normalizeLocale("sv"), "sv-SE");
 assert.equal(i18n.normalizeLocale("da-DK"), "sv-SE");
@@ -56,8 +57,8 @@ assert.match(dashboardHtml, /id="reviewDocumentLanguage"/);
 assert.match(dashboardHtml, /document\/document-language\.js/);
 assert.match(dashboardHtml, /<script src="i18n\.js"><\/script>/);
 assert.match(popupHtml, /<script src="i18n\.js"><\/script>/);
-assert.match(dashboard, /uiLocale: "sv-SE"/);
-assert.match(dashboard, /documentLanguage: "sv-SE"/);
+assert.match(dashboard, /uiLocale: "en-US"/);
+assert.match(dashboard, /documentLanguage: "en-US"/);
 assert.match(dashboard, /activeDocumentLanguage/);
 assert.match(dashboard, /T9UiI18n\.apply\(settings\.uiLocale\)/);
 assert.match(dashboard, /T9UiI18n\.observe/);
@@ -77,7 +78,7 @@ assert.match(dashboard, /storedRecord\.documentLanguage/);
 assert.match(dashboard, /updateDocumentLibraryRecord\(activeReviewSession\.id/);
 assert.doesNotMatch(popupHtml, /id="languageFlag"/);
 assert.match(popup, /T9_SAVE_UI_LOCALE/);
-assert.match(popup, /function switchUiLocale\(\)/);
+assert.match(popup, /function switchUiLocale\(event\)/);
 assert.equal(i18n.translate("language.switchToEnglish", "sv-SE"),
   "Byt språk till engelska");
 assert.equal(i18n.translate("language.switchToSwedish", "en-US"),

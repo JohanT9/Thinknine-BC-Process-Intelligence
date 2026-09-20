@@ -2,11 +2,14 @@
   "use strict";
 
   const languageRegistry = root.T9LanguageRegistry;
-  const DEFAULT_LOCALE = languageRegistry.DEFAULT_LANGUAGE;
+  const DEFAULT_LOCALE = languageRegistry.DEFAULT_UI_LANGUAGE;
   const SUPPORTED_LOCALES = Object.freeze(languageRegistry.supported("ui")
     .map(language => language.locale));
   const messages = Object.freeze({
     "sv-SE": Object.freeze({
+      "settings.languages": "Språkinställningar",
+      "settings.autoSave": "Ändringar sparas automatiskt.",
+      "settings.done": "Klar",
       "review.exportWorking": "Skapar Word…",
       "review.exportDownloaded": "Word-filen har skickats till webbläsarens nedladdningar.",
       "review.exportFailed": "Word-exporten misslyckades:",
@@ -250,6 +253,9 @@
       ,"recorder.cancelFailed": "Kunde inte avbryta inspelningen."
     }),
     "en-US": Object.freeze({
+      "settings.languages": "Language settings",
+      "settings.autoSave": "Changes are saved automatically.",
+      "settings.done": "Done",
       "review.exportWorking": "Creating Word…",
       "review.exportDownloaded": "The Word file has been sent to the browser downloads.",
       "review.exportFailed": "Word export failed:",
@@ -803,9 +809,11 @@
   ]);
 
   const staticLookup = new Map();
+  const staticSources = new WeakMap();
   STATIC_TEXT.forEach(([sv, en]) => {
-    staticLookup.set(sv, { "sv-SE": sv, "en-US": en });
-    staticLookup.set(en, { "sv-SE": sv, "en-US": en });
+    const variants = { "sv-SE": sv, "en-US": en };
+    for (const locale of SUPPORTED_LOCALES) variants[locale] = languageRegistry.translate(en, locale, sv);
+    for (const value of Object.values(variants)) staticLookup.set(value, variants);
   });
   const safeTextTags = new Set(["BUTTON", "SUMMARY", "LEGEND", "OPTION", "TH",
     "DT", "LABEL", "H2", "H3", "H4"]);
@@ -832,7 +840,10 @@
       if (parent && safeTextTags.has(parent.tagName) &&
           !excludedFromInterfaceTranslation(node)) {
         const trimmed = node.nodeValue.trim();
-        const translated = translateStaticText(trimmed, locale);
+        const previous = staticSources.get(node);
+        const source = previous?.rendered === trimmed ? previous.source : trimmed;
+        const translated = translateStaticText(source, locale);
+        staticSources.set(node, { source, rendered: translated });
         if (translated !== trimmed) {
           const leading = node.nodeValue.match(/^\s*/)?.[0] || "";
           const trailing = node.nodeValue.match(/\s*$/)?.[0] || "";
@@ -844,7 +855,7 @@
   }
 
   function normalizeLocale(value) {
-    return languageRegistry.normalize(value, "ui");
+    return languageRegistry.normalize(value || DEFAULT_LOCALE, "ui");
   }
 
   function populateLanguageSelects(target = root.document) {
@@ -876,7 +887,10 @@
 
   function translate(key, locale = DEFAULT_LOCALE) {
     const normalized = normalizeLocale(locale);
-    return messages[normalized]?.[key] ?? messages[DEFAULT_LOCALE]?.[key] ?? key;
+    if (messages[normalized]?.[key] !== undefined) return messages[normalized][key];
+    if (messages["en-US"]?.[key] !== undefined) return languageRegistry.translate(
+      messages["en-US"][key], normalized, messages[DEFAULT_LOCALE]?.[key]);
+    return messages[DEFAULT_LOCALE]?.[key] ?? key;
   }
 
   function format(key, values, locale = DEFAULT_LOCALE) {

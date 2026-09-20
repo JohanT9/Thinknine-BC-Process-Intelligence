@@ -2,9 +2,9 @@ const assert = require("assert");
 const registry = require("../src/engine/language-registry");
 
 assert.deepStrictEqual(registry.supported("ui").map(item => item.locale),
-  ["sv-SE", "en-US"]);
+  ["sv-SE", "en-US", "fr-FR", "de-DE", "es-ES"]);
 assert.deepStrictEqual(registry.supported("document").map(item => item.locale),
-  ["sv-SE", "en-US"]);
+  ["sv-SE", "en-US", "fr-FR", "de-DE", "es-ES"]);
 assert.strictEqual(registry.normalize("en-GB", "ui"), "en-US");
 assert.strictEqual(registry.get("sv").shortCode, "SV");
 assert.strictEqual(registry.next("sv-SE", "ui"), "en-US");
@@ -17,9 +17,9 @@ const withDanish = registry.createRegistry([
 assert.strictEqual(withDanish.normalize("da", "ui"), "da-DK");
 assert.strictEqual(withDanish.normalize("da-GL", "document"), "da-DK");
 assert.strictEqual(withDanish.get("da-DK").shortCode, "DA");
-assert.strictEqual(withDanish.next("en-US", "ui"), "da-DK");
+assert.strictEqual(withDanish.next("es-ES", "ui"), "da-DK");
 assert.deepStrictEqual(withDanish.supported("document").map(item => item.locale),
-  ["sv-SE", "en-US", "da-DK"]);
+  ["sv-SE", "en-US", "fr-FR", "de-DE", "es-ES", "da-DK"]);
 
 assert.throws(() => registry.createRegistry([
   ...registry.DEFAULT_DEFINITIONS,

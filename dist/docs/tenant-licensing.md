@@ -89,3 +89,32 @@ flow with PKCE. The server, not the extension, validates API access tokens and
 keys licenses by the consultant's home `tid` and `oid`.
 
 Run `node tests/tenant-license.test.js` for the isolated client tests.
+
+## Dokumentstatistik per användare
+
+Admin visar antal unika sparade processdokument och felrapporter per Microsoft-användare,
+totalt eller för de senaste 7, 30 eller 90 dagarna, samt senaste skapandet i UTC.
+Det går att söka på namn, e-post och identitets-ID. Samma användare i flera BC-tenanter
+sammanförs via Entra tenant-ID och objekt-ID. Totalsiffrorna avser skapade dokument,
+inte antal kvarvarande filer: redigering, export, arkivering och borttagning ändrar inte antalet.
+Felrapporter räknas vid första sparandet, även om de ännu är utkast.
+
+Statistiken börjar med nya dokument som sparas av en inloggad användare efter uppdateringen.
+Befintliga dokument och tidigare användning fylls inte på i efterhand. En tom granskning
+räknas inte. Tillägget skickar endast dokumenttyp, ISO-skapandetid och SHA-256 av dokumentets
+tekniska ID till POST /v1/license/usage. Servern kopplar identiteten från verifierad Entra-token
+och kräver aktiv konsultlicens eller registrerad användare av en aktiv tenantlicens.
+Inga dokumenttitlar, steg, bilder eller rapportinnehåll skickas.
+
+En beständig lokal kö gör nya försök var femte minut, vid start av bakgrundsarbetaren
+och vid sparande. Köade händelser skickas bara när samma Microsoft-användare är inloggad.
+Servern deduplicerar dokumenttyp och ID, även om svaret tappas bort. Skapandetiden avser
+första lokala sparandet, inte nätverksleveransen. Rensning av tilläggets lokala data kan
+förlora ännu oskickade händelser. Statistiken är användningsuppföljning, inte ett revisionsunderlag.
+
+Distribuera både den nya licenstjänsten och tillägget. Inga nya Entra-behörigheter behövs.
+Tillägget behöver Chrome-behörigheten alarms för återförsök. Tjänsten lagrar metadata i
+document-usage.json i fil-läge eller Azure-tabellen LicenseDocumentUsage. Azure-identiteten
+behöver kunna skapa tabellen, som för övriga licenstabeller. Fil-till-Table-migreringen tar
+med statistiken vid en ny migrering. Säkerhetskopiera även dessa data; de behålls för
+totalsiffror och deduplicering tills administratören raderar dem enligt sin lagringspolicy.

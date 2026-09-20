@@ -1,9 +1,12 @@
+import languages from "../engine/language-registry.js";
 import { PDFDocument, StandardFonts, rgb, PDFString } from "pdf-lib";
 import JSZip from "jszip";
 
 const plain = value => String(value || "").replace(/\*\*/gu, "").trim();
 export function project(pkg) {
-  const sv = pkg.documentLanguage !== "en-US";
+  const locale = languages.normalize(pkg.documentLanguage);
+  const sv = locale === "sv-SE";
+  const label = (en, swedish) => languages.translate(en, locale, swedish);
   const errors = [pkg.errorEvidence?.primary, ...(pkg.errorEvidence?.additional || [])].filter(Boolean);
   const bc = { ...(pkg.environment?.businessCentral || {}) };
   if (!plain(bc.company)) {
@@ -26,38 +29,38 @@ export function project(pkg) {
   const sections = [];
   const add = (id, title, rows) => { rows = rows.map(plain).filter(Boolean);
     if (rows.length) sections.push({ id, title, rows }); };
-  add("actual", sv ? "Faktiskt resultat" : "Actual result", [...new Set([
+  add("actual", label("Actual result", "Faktiskt resultat"), [...new Set([
     ...errors.map(error => error.rawMessage)
   ].filter(Boolean))]);
-  add("expected", sv ? "Förväntat resultat" : "Expected result", [pkg.expectedResult]);
-  add("reproduction", sv ? "Steg för att återskapa" : "Steps to reproduce",
+  add("expected", label("Expected result", "Förväntat resultat"), [pkg.expectedResult]);
+  add("reproduction", label("Steps to reproduce", "Steg för att återskapa"),
     steps.map((step, index) => `${index + 1}. ${plain(step.instruction)}${index === triggerIndex
-      ? (sv ? " - Felet inträffade här" : " - Error occurred here") : ""}`));
-  add("environment", sv ? "Miljö" : "Environment", [
-    bc.environment && `${sv ? "Miljö" : "Environment"}: ${bc.environment}`,
-    bc.company && `${sv ? "Företag" : "Company"}: ${bc.company}`,
-    bc.pageId && `${sv ? "BC-sida" : "BC page"}: ${bc.pageId}`
+      ? (label(" - Error occurred here", " - Felet inträffade här")) : ""}`));
+  add("environment", label("Environment", "Miljö"), [
+    bc.environment && `${label("Environment", "Miljö")}: ${bc.environment}`,
+    bc.company && `${label("Company", "Företag")}: ${bc.company}`,
+    bc.pageId && `${label("BC page", "BC-sida")}: ${bc.pageId}`
   ]);
   const diagnosticLabels = {
-    timestamp: sv ? "Tidpunkt" : "Timestamp",
-    internalSessionId: sv ? "BC:s interna sessions-ID" : "BC internal session ID",
-    applicationInsightsSessionId: sv ? "Application Insights sessions-ID" : "Application Insights session ID",
-    clientActivityId: sv ? "Klientaktivitets-ID" : "Client activity ID",
-    serverInstanceId: sv ? "Serverinstans-ID" : "Server instance ID"
+    timestamp: label("Timestamp", "Tidpunkt"),
+    internalSessionId: label("BC internal session ID", "BC:s interna sessions-ID"),
+    applicationInsightsSessionId: label("Application Insights session ID", "Application Insights sessions-ID"),
+    clientActivityId: label("Client activity ID", "Klientaktivitets-ID"),
+    serverInstanceId: label("Server instance ID", "Serverinstans-ID")
   };
   const capturedRows = errors.flatMap(error => Object.entries(error.structuredDiagnostics || {})
     .filter(([key, value]) => diagnosticLabels[key] && plain(value))
     .map(([key, value]) => `${diagnosticLabels[key]}: ${plain(value)}`));
   const existingRows = (pkg.diagnostics?.rows || []).filter(row => plain(row.label) && plain(row.value))
     .map(row => `${row.label}: ${plain(row.value)}`);
-  add("diagnostics", sv ? "Teknisk diagnostik" : "Technical diagnostics",
+  add("diagnostics", label("Technical diagnostics", "Teknisk diagnostik"),
     [...new Set(capturedRows.length ? capturedRows : existingRows)]);
   const stacks = (pkg.inclusion?.callStack === false ? [] : pkg.callStack || []).map(stack => stack.rawCallStack ||
     (stack.frames || []).map(frame => [frame.objectType, frame.objectId, frame.objectName,
       frame.methodName, frame.sourceLine].filter(Boolean).join(" ")).join("\n"));
   // Respect an explicit export exclusion; older packages can use captured evidence.
   if (pkg.inclusion?.callStack !== false) stacks.push(...errors.map(error => error.rawCallStack));
-  add("callStack", sv ? "AL-anropsstack (AL Call Stack)" : "AL Call Stack",
+  add("callStack", label("AL Call Stack", "AL-anropsstack (AL Call Stack)"),
     [...new Set(stacks.filter(value => plain(value)))]);
   const links = [...new Set(errors.map(error => error.supportUrl).filter(url => {
     try { const parsed = new URL(url); return parsed.protocol === "https:" && !parsed.username &&
@@ -65,7 +68,7 @@ export function project(pkg) {
       parsed.hostname.endsWith(".businesscentral.dynamics.com")); } catch { return false; }
   }))];
   return { title: plain(pkg.title), date: pkg.errorEvidence?.primary?.capturedAt || pkg.sourceUpdatedAt || pkg.generatedAt,
-    company: bc.company || "", environment: bc.environment || "", severity: plain(pkg.summary?.severity), sections, links, sv, trigger,
+    company: bc.company || "", environment: bc.environment || "", severity: plain(pkg.summary?.severity), sections, links, sv, locale, trigger,
     steps: steps.map((step, index) => ({ number: index + 1, instruction: plain(step.instruction),
       id: step.reproductionStepId, assets: step.screenshotAssetIds || step.source?.screenshotAssetIds || [] })) };
 }
@@ -79,6 +82,7 @@ export function base64(bytes) {
 
 export async function create(pkg, attachments = []) {
   const model = project(pkg);
+  const label = (en, swedish) => languages.translate(en, model.locale, swedish);
   const doc = await PDFDocument.create();
   doc.setTitle(model.title); doc.setProducer("BC Process Studio");
   const regular = await doc.embedFont(StandardFonts.Helvetica);
@@ -96,7 +100,7 @@ export async function create(pkg, attachments = []) {
     page = doc.addPage([width, height]); y = height - 76;
     page.drawRectangle({ x: 0, y: height - 49, width, height: 49, color: rgb(.02, .28, .31) });
     page.drawText("BC Process Studio", { x: margin, y: height - 30, size: 12, font: bold, color: rgb(1, 1, 1) });
-    page.drawText(model.sv ? "Business Central | Felrapport" : "Business Central | Error report",
+    page.drawText(label("Business Central | Error report", "Business Central | Felrapport"),
       { x: width - margin - 175, y: height - 29, size: 9, font: regular, color: rgb(.79, .94, .94) });
   }
   const ensure = space => { if (!page || y - space < 56) newPage(); };
@@ -131,9 +135,9 @@ export async function create(pkg, attachments = []) {
   const measure = (value, size = 11, font = regular, maxWidth = usable) =>
     wrapped(value, size, font, maxWidth).length * (size + 5) + 7;
   function informationCard() {
-    const fields = [[model.sv ? "FÖRETAG" : "COMPANY", model.company],
-      [model.sv ? "MILJÖ" : "ENVIRONMENT", model.environment],
-      [model.sv ? "TIDPUNKT" : "TIMESTAMP", model.date && String(model.date).replace("T", " ").replace(/Z$/u, " UTC")]]
+    const fields = [[label("COMPANY", "FÖRETAG"), model.company],
+      [label("ENVIRONMENT", "MILJÖ"), model.environment],
+      [label("TIMESTAMP", "TIDPUNKT"), model.date && String(model.date).replace("T", " ").replace(/Z$/u, " UTC")]]
       .filter(([, value]) => value);
     if (!fields.length) return;
     const column = usable / fields.length;
@@ -153,7 +157,7 @@ export async function create(pkg, attachments = []) {
   function processStep(step) {
     const failed = step.number === model.trigger?.number;
     const color = failed ? rgb(.68, .13, .11) : teal;
-    const content = step.instruction + (failed ? (model.sv ? " - Felet inträffade här" : " - Error occurred here") : "");
+    const content = step.instruction + (failed ? (label(" - Error occurred here", " - Felet inträffade här")) : "");
     const lines = wrapped(content, 11, regular, usable - 34);
     const blockHeight = lines.length * 16 + 12;
     ensure(Math.min(blockHeight, height - 132));
@@ -173,16 +177,16 @@ export async function create(pkg, attachments = []) {
     const refs = model.steps.filter(step => equivalents.some(image =>
       (step.id && step.id === image.sourceRef) || (image.assetId && step.assets.includes(image.assetId))));
     if (lead && model.trigger && !refs.some(step => step.number === model.trigger.number)) refs.push(model.trigger);
-    return refs.length ? refs.map(step => `${model.sv ? "Steg" : "Step"} ${step.number}: ${step.instruction}`).join("\n")
-      : lead ? (model.sv ? "Slutlig felbild från inspelningen." : "Final captured error screenshot.")
-        : (model.sv ? "Skärmbild från inspelningen." : "Recorded screenshot.");
+    return refs.length ? refs.map(step => `${label("Step", "Steg")} ${step.number}: ${step.instruction}`).join("\n")
+      : lead ? (label("Final captured error screenshot.", "Slutlig felbild från inspelningen."))
+        : (label("Recorded screenshot.", "Skärmbild från inspelningen."));
   }
   function directLinks() {
     for (const url of model.links) {
-      const label = model.sv ? "Öppna i Business Central (länk)" : "Open in Business Central (link)";
-      ensure(32); const linkY = y; text(label, 11, bold, teal);
+      const linkLabel = label("Open in Business Central (link)", "Öppna i Business Central (länk)");
+      ensure(32); const linkY = y; text(linkLabel, 11, bold, teal);
       const annotation = doc.context.register(doc.context.obj({ Type: "Annot", Subtype: "Link",
-        Rect: [margin, linkY - 3, margin + bold.widthOfTextAtSize(label, 11), linkY + 13],
+        Rect: [margin, linkY - 3, margin + bold.widthOfTextAtSize(linkLabel, 11), linkY + 13],
         Border: [0, 0, 0], A: { Type: "Action", S: "URI", URI: PDFString.of(url) } }));
       page.node.addAnnot(annotation);
     }
@@ -201,7 +205,7 @@ export async function create(pkg, attachments = []) {
         width: image.width * factor, height: image.height * factor });
       y -= image.height * factor + 20;
     } catch {
-      text(model.sv ? "Skärmbilden kunde inte inkluderas." : "The screenshot could not be included.");
+      text(label("The screenshot could not be included.", "Skärmbilden kunde inte inkluderas."));
     }
   }
   // The final captured error image is the lead evidence, not an appendix.
@@ -209,19 +213,19 @@ export async function create(pkg, attachments = []) {
   newPage(); text(model.title, 20, bold);
   y -= 10;
   informationCard();
-  if (model.severity) text(`${model.sv ? "Allvarlighetsgrad" : "Severity"}: ${model.severity}`, 11, bold, teal);
+  if (model.severity) text(`${label("Severity", "Allvarlighetsgrad")}: ${model.severity}`, 11, bold, teal);
   y -= 6;
   directLinks();
   y -= 10;
   if (leadImage) {
-    heading(model.sv ? "Felbild" : "Error screenshot");
+    heading(label("Error screenshot", "Felbild"));
     const caption = imageCaption(leadImage, true);
     await screenshot(leadImage, Math.max(20, Math.min(300, y - 80 - measure(caption, 9))));
     text(caption, 9, regular, muted);
     y -= 8;
   }
   if (model.trigger) {
-    text(`${model.sv ? "Felet inträffade vid steg" : "Error occurred at step"} ${model.trigger.number}: ${model.trigger.instruction}`, 11, bold);
+    text(`${label("Error occurred at step", "Felet inträffade vid steg")} ${model.trigger.number}: ${model.trigger.instruction}`, 11, bold);
     y -= 16;
   }
   // Company/environment are already shown in the summary card; retain only page context here.
@@ -257,7 +261,7 @@ export async function create(pkg, attachments = []) {
   for (const [index, attachment] of images.entries()) {
     if (!attachment.dataUrl) continue;
     newPage(); heading(index === 0 && attachment.role === "error-evidence"
-      ? (model.sv ? "Felbild" : "Error screenshot") : `${model.sv ? "Skärmbild" : "Screenshot"} ${index + 1}`);
+      ? (label("Error screenshot", "Felbild")) : `${label("Screenshot", "Skärmbild")} ${index + 1}`);
     const caption = imageCaption(attachment);
     await screenshot(attachment, Math.max(20, y - 65 - measure(caption, 9)));
     text(caption, 9, regular, muted);
@@ -265,7 +269,7 @@ export async function create(pkg, attachments = []) {
   for (const [index, p] of doc.getPages().entries()) {
     p.drawLine({ start: { x: margin, y: 43 }, end: { x: width - margin, y: 43 }, color: lineColor, thickness: .6 });
     p.drawText("BC Process Studio", { x: margin, y: 28, size: 8, font: regular, color: muted });
-    p.drawText(`${model.sv ? "Sida" : "Page"} ${index + 1} / ${doc.getPageCount()}`,
+    p.drawText(`${label("Page", "Sida")} ${index + 1} / ${doc.getPageCount()}`,
       { x: width - margin - 65, y: 28, size: 8, font: regular, color: muted });
   }
   return { bytes: await doc.save(), model, pageCount: doc.getPageCount() };

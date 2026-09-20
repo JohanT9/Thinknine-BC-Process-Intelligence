@@ -35,7 +35,7 @@ function buildActions(tenants, consultants, timestamp) {
 
 function createAdmin({ dataDirectory, registry, mutateRegistry, deleteTrialClaim,
   consultants, mutateConsultants, tenantUsers, mutateTenantUsers, registrations = null, now, adminKey = "",
-  notificationConfigured = false, auditEvents = async () => [], recordAudit = async () => {},
+  usageSummary = async () => [], notificationConfigured = false, auditEvents = async () => [], recordAudit = async () => {},
   sendTestNotification = async () => ({ sent: false, configured: false }),
   validateAdminEntra = null, entraClientId = "", entraScope = "", entraAdminRole = "License.Administrator" }) {
   if (adminKey && !/^[0-9a-f]{64}$/i.test(adminKey)) {
@@ -73,7 +73,7 @@ function createAdmin({ dataDirectory, registry, mutateRegistry, deleteTrialClaim
     } catch (error) { if (error.code !== "ENOENT") throw error; }
     return { revision, tenants, consultants: consultantLicenses, consultantRevision,
       actions: buildActions(tenants, consultantLicenses, now()), notificationConfigured,
-      auditEvents: events,
+      auditEvents: events, documentUsage: await usageSummary(),
       tenantUsers: Object.values(users).sort((a, b) => b.lastSeenAt.localeCompare(a.lastSeenAt)).slice(0, 1000),
       installationCount: registrationItems.length,
       registrations: registrationItems.slice(-500).reverse() };

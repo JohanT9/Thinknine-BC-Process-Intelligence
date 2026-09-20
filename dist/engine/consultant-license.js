@@ -43,8 +43,10 @@
       await storage.set({ [KEY]: value }); return value;
     }
     async function signOut() { await storage.remove(KEY); }
-    async function accessToken() {
+    const ownerOf = profile => profile?.tenantId + ":" + profile?.objectId;
+    async function accessToken(expectedOwner) {
       const value = await state();
+      if (expectedOwner && ownerOf(value.profile) !== expectedOwner) throw new Error("Account changed");
       if (value.accessToken && value.expiresAt > now() + 60000) return value.accessToken;
       if (!value.refreshToken) throw new Error("Logga in med din konsultlicens.");
       const response = await fetcher("https://login.microsoftonline.com/organizations/oauth2/v2.0/token", {
@@ -57,6 +59,7 @@
         refreshToken: tokens.refresh_token || value.refreshToken,
         expiresAt: now() + Number(tokens.expires_in || 0) * 1000,
         profile: value.profile || tokenProfile(tokens.id_token || "") };
+      if (ownerOf((await state()).profile) !== ownerOf(value.profile)) throw new Error("Account changed");
       await storage.set({ [KEY]: updated }); return updated.accessToken;
     }
     async function check(tenantId, installationId) {
@@ -101,7 +104,19 @@
       if (!response.ok) throw new Error(`Användaren kunde inte registreras (HTTP ${response.status}).`);
       return response.json();
     }
-    return Object.freeze({ signIn, signOut, check, register, registerTenantUser, state,
+    async function recordUsage(event, owner) {
+      const token = await accessToken(owner);
+      const profile = (await state()).profile;
+      if (profile?.tenantId + ":" + profile?.objectId !== owner) throw new Error("Account changed");
+      const response = await fetcher(config.endpoint.replace(/\/consultant\/check$/, "/usage"), {
+        method: "POST", credentials: "omit", signal: AbortSignal.timeout(10000),
+        headers: { "Content-Type": "application/json", Authorization: "Bearer " + token },
+        body: JSON.stringify(event) });
+      if (!response.ok) throw new Error("Usage statistics could not be synchronized");
+      const result = await response.json();
+      if (!result.accepted) throw new Error("Usage statistics were not accepted");
+    }
+    return Object.freeze({ signIn, signOut, check, register, registerTenantUser, recordUsage, state,
       configured: () => Boolean(config?.enabled && config.clientId && config.scope) });
   }
   return Object.freeze({ create });

@@ -1,8 +1,10 @@
 (function (root, factory) {
-  const api = factory();
+  const languages = typeof module === "object" && module.exports
+    ? require("../engine/language-registry") : root.T9LanguageRegistry;
+  const api = factory(languages);
   if (typeof module === "object" && module.exports) module.exports = api;
   root.T9BugReportEmailDraft = api;
-})(typeof globalThis !== "undefined" ? globalThis : this, function () {
+})(typeof globalThis !== "undefined" ? globalThis : this, function (languages) {
   "use strict";
   const cleanHeader = value => String(value || "").replace(/[\r\n]+/gu, " ").trim();
   const safeName = value => cleanHeader(value).replace(/[^\p{L}\p{N}._-]+/gu, "-")
@@ -24,25 +26,22 @@
     const to = validAddress(options.to);
     if (!to) throw new Error("En giltig supportadress måste anges i inställningarna.");
     const title = cleanHeader(issuePackage?.title || "Business Central-fel");
-    const swedish = /^sv(?:-|$)/iu.test(String(options.locale || "sv-SE"));
+    const localized = (en, sv) => languages.translate(en, options.locale || "sv-SE", sv);
     const severity = ["Low", "Medium", "High", "Critical"].find(value =>
       value.toLowerCase() === cleanHeader(issuePackage?.summary?.severity).toLowerCase());
-    const subject = severity ? `${title} - ${swedish ? "Nivå" : "Severity"} ${severity}` : title;
+    const subject = severity ? `${title} - ${localized("Severity", "Nivå")} ${severity}` : title;
     const importance = severity === "Critical" ? "high" : severity === "Low" ? "low" : "normal";
     const priority = importance === "high" ? "1" : importance === "low" ? "5" : "3";
     const attachmentName = `${safeName(title)}-felrapport.json`;
     const boundary = `=_BC_Process_Studio_${safeName(issuePackage?.packageId)}`;
     const bodyBoundary = `${boundary}_body`;
-    const body = swedish
-      ? "\r\n\r\nHej,\r\n\r\nBifogat finns en felrapport från BC Process Studio.\r\n\r\n"
-      : "\r\n\r\nHello,\r\n\r\nA BC Process Studio error report is attached.\r\n\r\n";
+    const body = "\r\n\r\n" + localized("Hello,", "Hej,") + "\r\n\r\n" +
+      localized("A BC Process Studio error report is attached.", "Bifogat finns en felrapport från BC Process Studio.") + "\r\n\r\n";
     // A complete HTML body gives Outlook a formatted compose surface. Keep a
     // plain-text alternative for other clients; neither part contains a signature.
     const htmlBody = `<!DOCTYPE html><html><head><meta charset="utf-8"></head><body>` +
       `<div style="font-family:Segoe UI,Arial,sans-serif;font-size:11pt">` +
-      `<p>${swedish ? "Hej," : "Hello,"}</p><p>${swedish
-        ? "Bifogat finns en felrapport från BC Process Studio."
-        : "A BC Process Studio error report is attached."}</p></div></body></html>`;
+      `<p>${localized("Hello,", "Hej,")}</p><p>${localized("A BC Process Studio error report is attached.", "Bifogat finns en felrapport från BC Process Studio.")}</p></div></body></html>`;
     const attachments = options.attachments || [{ fileName: attachmentName,
       mediaType: "application/json", base64: base64(String(packageContent || "")) }];
     const parts = attachments.flatMap(item => {

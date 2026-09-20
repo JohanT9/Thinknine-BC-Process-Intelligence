@@ -88,6 +88,14 @@
         <p id="auditEmpty">Inga händelser har registrerats ännu.</p>
       </section>
       <section>
+          <h2>Dokumentstatistik per användare</h2>
+          <p>Unika sparade processdokument och felrapporter från införandet. Redigeringar och exporter räknas inte igen. Äldre dokument ingår inte. Offlinehändelser visas efter synkronisering. Datum anges i UTC.</p>
+          <label for="usageSearch">Sök användare</label><input id="usageSearch" type="search" placeholder="Namn, e-post eller ID">
+          <label for="usagePeriod">Period</label><select id="usagePeriod"><option value="all">Totalt</option><option value="7">Senaste 7 dagarna</option><option value="30">Senaste 30 dagarna</option><option value="90">Senaste 90 dagarna</option></select>
+          <div class="table-scroll"><table><thead><tr><th>Namn</th><th>E-post</th><th>Entra tenant-ID</th><th>Objekt-ID</th><th>Processdokument</th><th>Felrapporter</th><th>Senast skapad (totalt)</th></tr></thead><tbody id="documentUsage"></tbody></table></div>
+          <p id="usageEmpty">Ingen dokumentstatistik har registrerats ännu.</p>
+        </section>
+        <section>
         <h2>Registrerade installationer</h2>
         <p id="registrationCount"></p>
         <div class="table-scroll"><table><thead><tr><th>Registrerad UTC</th><th>Tenant-ID</th><th>Installations-ID</th><th>Version</th></tr></thead><tbody id="registrations"></tbody></table></div>

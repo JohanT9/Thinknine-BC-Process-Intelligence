@@ -49,12 +49,14 @@
 
   function systemText(value, language) {
     const text = String(value ?? "");
-    return SYSTEM_TEXT[normalize(language)]?.[text] || text;
+    if (normalize(language) === "sv-SE") return text;
+    const english = SYSTEM_TEXT["en-US"][text];
+    return english ? languages.translate(english, language) : text;
   }
 
   function translateInstruction(value, language) {
     const source = String(value ?? "");
-    if (normalize(language) !== "en-US") return source;
+    if (normalize(language) === "sv-SE") return source;
     const exact = systemText(source, language);
     if (exact !== source) return exact;
     const rules = [
@@ -91,7 +93,7 @@
       [/^Sektion (\d+)$/u, "Section $1"]
     ];
     for (const [pattern, replacement] of rules) {
-      if (pattern.test(source)) return source.replace(pattern, replacement);
+      if (pattern.test(source)) return source.replace(pattern, languages.translate(replacement, language));
     }
     return source;
   }
