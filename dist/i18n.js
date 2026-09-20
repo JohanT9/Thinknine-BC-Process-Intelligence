@@ -861,8 +861,9 @@
   function populateLanguageSelects(target = root.document) {
     if (!target?.querySelectorAll) return;
     target.querySelectorAll("[data-language-select]").forEach(select => {
-      const current = select.value || select.dataset.selectedLanguage ||
-        DEFAULT_LOCALE;
+      // An empty filter value means all languages, not a missing preference.
+      const current = select.dataset.languageAllLabel ? select.value :
+        select.value || select.dataset.selectedLanguage || DEFAULT_LOCALE;
       const capability = select.dataset.languageSelect || "document";
       const allLabel = select.dataset.languageAllLabel;
       select.replaceChildren();

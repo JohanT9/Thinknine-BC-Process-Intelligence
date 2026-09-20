@@ -13,11 +13,11 @@ vm.runInNewContext(registrySource, context);
 vm.runInNewContext(source, context);
 const i18n = context.globalThis.T9UiI18n;
 
-assert.deepStrictEqual([...i18n.SUPPORTED_LOCALES], ["sv-SE", "en-US", "fr-FR", "de-DE", "es-ES"]);
+assert.deepStrictEqual([...i18n.SUPPORTED_LOCALES], ["sv-SE", "en-US", "fr-FR", "de-DE", "es-ES", "da-DK", "fi-FI", "nb-NO"]);
 assert.equal(i18n.normalizeLocale(), "en-US");
 assert.equal(i18n.normalizeLocale("en-GB"), "en-US");
 assert.equal(i18n.normalizeLocale("sv"), "sv-SE");
-assert.equal(i18n.normalizeLocale("da-DK"), "sv-SE");
+assert.equal(i18n.normalizeLocale("da-DK"), "da-DK");
 assert.equal(i18n.translate("settings.language", "sv-SE"), "Gränssnittsspråk");
 assert.equal(i18n.translate("settings.language", "en-US"), "Interface language");
 assert.equal(i18n.translate("missing.key", "en-US"), "missing.key");
@@ -123,3 +123,65 @@ for (const file of ["dashboard.html", "popup.html", "debug.html",
 }
 
 console.log("UI localization foundation tests passed.");
+
+// Empty language filters must survive initialization and locale reapplication.
+for (const locale of i18n.SUPPORTED_LOCALES) {
+  const filter = {
+    value: "", options: [],
+    dataset: { languageSelect: "document", languageAllLabel: "library.allLanguages" },
+    replaceChildren() { this.options = []; },
+    appendChild(option) { this.options.push(option); }
+  };
+  const preference = { ...filter, dataset: { languageSelect: "document" } };
+  const target = {
+    documentElement: { lang: locale, setAttribute() {} },
+    querySelectorAll(selector) {
+      return selector === "[data-language-select]" ? [filter, preference] : [];
+    },
+    createElement() { return {}; }
+  };
+  i18n.apply(locale, target);
+  assert.equal(filter.value, "", `${locale}: opening must show all languages`);
+  assert.equal(preference.value, "en-US", "New preferences still default to English");
+  assert.equal(filter.options[0].textContent, i18n.translate("library.allLanguages", locale));
+  for (const selected of i18n.SUPPORTED_LOCALES) {
+    filter.value = selected;
+    i18n.apply(locale, target);
+    assert.equal(filter.value, selected, "Explicit language filter must survive refresh");
+  }
+  filter.value = "";
+  i18n.apply(locale, target);
+  i18n.apply(locale, target);
+  assert.equal(filter.value, "", "Reset must remain all languages after refresh");
+}
+
+// Exercise the real asynchronous popup handler, including failed saves.
+(async () => {
+  const handler = popup.slice(popup.indexOf("async function switchUiLocale("),
+    popup.indexOf("async function send("));
+  for (const locale of i18n.SUPPORTED_LOCALES.filter(value => value !== "en-US")) {
+    for (const fails of [false, true]) {
+      const controls = { languageSwitch: { disabled: false },
+        defaultDocumentLanguage: { disabled: false }, languageSettingsStatus: {} };
+      const sandbox = {
+        currentUiLocale: "en-US", $: id => controls[id],
+        T9LanguageRegistry: context.globalThis.T9LanguageRegistry,
+        T9UiI18n: { apply: value => value }, updateLanguageSwitch() {},
+        t: key => key, refresh: async () => {},
+        send: async message => {
+          assert.equal(controls.languageSwitch.disabled, true);
+          assert.equal(controls.defaultDocumentLanguage.disabled, true);
+          if (fails) throw Error("Save failed");
+          return { ok: true, uiLocale: message.uiLocale };
+        }
+      };
+      vm.runInNewContext(handler, sandbox);
+      await sandbox.switchUiLocale({ currentTarget: { value: locale } });
+      assert.equal(sandbox.currentUiLocale, fails ? "en-US" : locale);
+      assert.equal(controls.languageSwitch.disabled, false);
+      assert.equal(controls.defaultDocumentLanguage.disabled, false);
+      if (fails) assert.equal(controls.languageSettingsStatus.textContent, "Save failed");
+    }
+  }
+  console.log("Popup language changes restore both selectors after success and failure.");
+})().catch(error => { console.error(error); process.exitCode = 1; });

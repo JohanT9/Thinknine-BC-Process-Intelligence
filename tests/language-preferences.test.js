@@ -28,6 +28,12 @@ async function verify(stored) {
   assert.equal(existing.resolved.uiLocale, "fr-FR");
   assert.equal(existing.resolved.documentLanguage, "de-DE");
   assert.equal(existing.resolved.companyName, "Original company");
+  for (const locale of ["da-DK", "fi-FI", "nb-NO"]) {
+    const saved = await verify({ uiLocale: locale, documentLanguage: locale });
+    assert.equal(saved.writes.length, 0);
+    assert.equal(saved.resolved.uiLocale, locale);
+    assert.equal(saved.resolved.documentLanguage, locale);
+  }
   const legacy = await verify({ companyName: "Legacy company" });
   assert.equal(legacy.writes.length, 0);
   assert.equal(legacy.resolved.uiLocale, "sv-SE");

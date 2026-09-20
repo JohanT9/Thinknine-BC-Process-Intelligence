@@ -61,6 +61,7 @@ async function switchUiLocale(event) {
     $("languageSettingsStatus").textContent = error.message;
   } finally {
     $("languageSwitch").disabled = false;
+    $("defaultDocumentLanguage").disabled = false;
   }
 }
 

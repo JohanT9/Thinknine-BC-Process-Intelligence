@@ -21,9 +21,12 @@
     ...[
       ["fr-FR", "FR", "Français", "fr"],
       ["de-DE", "DE", "Deutsch", "de"],
-      ["es-ES", "ES", "Español", "es"]
-    ].map(([locale, shortCode, nativeName, alias]) => Object.freeze({
-      locale, shortCode, nativeName, aliases: Object.freeze([alias]),
+      ["es-ES", "ES", "Español", "es"],
+      ["da-DK", "DA", "Dansk", "da"],
+      ["fi-FI", "FI", "Suomi", "fi"],
+      ["nb-NO", "NB", "Norsk (bokmål)", "nb", "no", "no-no"]
+    ].map(([locale, shortCode, nativeName, ...aliases]) => Object.freeze({
+      locale, shortCode, nativeName, aliases: Object.freeze(aliases),
       ui: true, document: true }))
   ]);
 

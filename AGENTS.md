@@ -66,7 +66,7 @@ These instructions apply to the entire repository. The architecture and product 
 
 Every new feature, improvement, bug fix and other change must support **all registered application languages** before it is considered complete. This is a release requirement, not optional follow-up work.
 
-- Use the language registry in `src/engine/language-registry.js` as the source of truth. Currently the supported languages are Swedish, English, French, German and Spanish. Any subsequently registered language is automatically covered by this rule.
+- Use the language registry in `src/engine/language-registry.js` as the source of truth. Currently the supported languages are Swedish, English, French, German, Spanish, Danish, Finnish and Norwegian Bokmål. Any subsequently registered language is automatically covered by this rule.
 - Add or update translations for every affected user-facing string in every supported language. This includes labels, settings, help, placeholders, tooltips, accessible names, status messages, validation and error messages, confirmations, generated document text, report headings and export text.
 - Use the shared localization mechanisms and catalogs. Do not introduce language-specific hardcoded UI text or Swedish-versus-English branches that exclude other languages. Falling back to English or Swedish does not count as completed language support for a new or changed system text.
 - Keep interface language and document language independent. Preserve existing saved preferences and existing documents. New installations default to English for both language settings.

@@ -19,14 +19,22 @@ vm.runInNewContext(read("src/engine/language-registry.js"), context);
 vm.runInNewContext(read("src/ui/i18n.js").replace("  const staticLookup = new Map();",
   "  globalThis.sourceVocabulary = { messages, STATIC_TEXT };\n  const staticLookup = new Map();"), context);
 const placeholders = text => [...text.matchAll(/\{\w+\}|\$\d+/g)].map(match => match[0]).sort();
-const locales = ["fr-FR", "de-DE", "es-ES"];
+const locales = Object.keys(catalogs);
 const expected = {
+  "da-DK": { save: "Gem", workflow: "Arbejdsgang", step: "Trin", choose: "Vælg", page: "Side", expected: "Forventet resultat" },
+  "fi-FI": { save: "Tallenna", workflow: "Työnkulku", step: "Vaihe", choose: "Valitse", page: "Sivu", expected: "Odotettu tulos" },
+  "nb-NO": { save: "Lagre", workflow: "Arbeidsflyt", step: "Trinn", choose: "Velg", page: "Side", expected: "Forventet resultat" },
   "fr-FR": { save: "Enregistrer", workflow: "Déroulement", step: "Étape", choose: "Sélectionnez", page: "Page", expected: "Résultat attendu" },
   "de-DE": { save: "Speichern", workflow: "Ablauf", step: "Schritt", choose: "Wählen Sie", page: "Seite", expected: "Erwartetes Ergebnis" },
   "es-ES": { save: "Guardar", workflow: "Flujo de trabajo", step: "Paso", choose: "Seleccione", page: "Página", expected: "Resultado esperado" }
 };
 for (const locale of locales) {
   const catalog = catalogs[locale];
+  assert.deepEqual(Object.keys(catalog).sort(), Object.keys(catalogs["fr-FR"]).sort(), locale + " complete shared vocabulary");
+  for (const [source, value] of Object.entries(catalog)) {
+    assert.ok(value.trim(), locale + ": empty " + source);
+    assert.deepEqual(placeholders(value), placeholders(source), locale + ": placeholders " + source);
+  }
   for (const source of [...Object.values(context.sourceVocabulary.messages["en-US"]),
     ...context.sourceVocabulary.STATIC_TEXT.map(pair => pair[1])]) {
     assert.ok(catalog[source], `${locale}: missing ${source}`);
@@ -79,4 +87,4 @@ for (const file of ["dashboard", "popup", "debug", "technical-report", "license-
   const html = read(`src/ui/${file}.html`);
   assert.ok(html.indexOf('src="engine/locale-catalogs.js"') < html.indexOf('src="engine/language-registry.js"'));
 }
-console.log("French, German and Spanish: complete UI vocabulary, placeholders, preserved content, Word, reports and PDF passed.");
+console.log("All additional languages: complete UI vocabulary, placeholders, preserved content, Word, reports and PDF passed.");
