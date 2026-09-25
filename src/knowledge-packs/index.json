@@ -27,6 +27,11 @@
       "enabled": true
     },
     {
+      "file": "knowledge-packs/projects.json",
+      "packId": "bc-projects",
+      "enabled": true
+    },
+    {
       "file": "knowledge-packs/aptean-fb.json",
       "packId": "aptean-fb",
       "enabled": true

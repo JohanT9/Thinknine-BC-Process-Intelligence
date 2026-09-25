@@ -1,0 +1,217 @@
+{
+  "packId": "bc-projects",
+  "name": "Business Central Projects",
+  "version": "1.0.0",
+  "priority": 200,
+  "rules": [
+    {
+      "ruleId": "Projects.SetQtyToTransferToJournal",
+      "taskType": "TransferProjectUsageToJournal",
+      "semanticAction": "EnterQuantity",
+      "entity": "ProjectPlanningLine",
+      "priority": 1280,
+      "confidence": 0.97,
+      "match": {
+        "pagePatterns": [
+          "^Project Planning Lines$",
+          "^Projektplaneringsrader$",
+          "^Lignes planning projet$",
+          "^Projektplanungszeilen$",
+          "^Líneas de planificación de proyecto$",
+          "^Projektplanlægningslinjer$",
+          "^Projektin suunnittelurivit$",
+          "^Prosjektplanleggingslinjer$"
+        ],
+        "actionPatterns": [],
+        "fieldPatterns": [
+          "^Qty\\. To Transfer to Journal$",
+          "^Antal att överföra till journal$",
+          "^Qté à transférer sur la feuille$",
+          "^In das Journal zu übertragende Menge$",
+          "^Cdad\\. a transferir al diario$",
+          "^Antal, der skal overføres til kladde$",
+          "^Päiväkirjaan siirrettävä määrä$",
+          "^Ant\\. som skal overføres til kladd$"
+        ],
+        "automationIdPatterns": []
+      },
+      "instructionTemplate": "",
+      "languages": ["en-US", "sv-SE", "fr-FR", "de-DE", "es-ES", "da-DK", "fi-FI", "nb-NO"],
+      "aliases": [],
+      "sourceIds": [
+        "microsoft-learn-project-usage",
+        "microsoft-learn-project-usage-sv",
+        "microsoft-learn-project-usage-fr",
+        "microsoft-learn-project-usage-de",
+        "microsoft-learn-project-usage-es",
+        "microsoft-learn-project-usage-da",
+        "microsoft-learn-project-usage-fi",
+        "microsoft-learn-project-usage-nb"
+      ]
+    },
+    {
+      "ruleId": "Projects.CreateProjectJournalLines",
+      "taskType": "CreateProjectJournalLines",
+      "semanticAction": "CreateJournalLines",
+      "entity": "ProjectJournal",
+      "priority": 1280,
+      "confidence": 0.97,
+      "match": {
+        "pagePatterns": [
+          "^Project Planning Lines$",
+          "^Projektplaneringsrader$",
+          "^Lignes planning projet$",
+          "^Projektplanungszeilen$",
+          "^Líneas de planificación de proyecto$",
+          "^Projektplanlægningslinjer$",
+          "^Projektin suunnittelurivit$",
+          "^Prosjektplanleggingslinjer$"
+        ],
+        "actionPatterns": [
+          "^Create Project Journal Lines$",
+          "^Skapa projektjournalrader$",
+          "^Créer des lignes feuille projet$",
+          "^Projekt-Buch\\.-Blattzeilen erstellen$",
+          "^Crear líneas de diario de proyectos$",
+          "^Opret projektkladdelinjer$",
+          "^Luo projektipäiväkirjan rivit$",
+          "^Opprett prosjektkladdelinjer$"
+        ],
+        "fieldPatterns": [],
+        "automationIdPatterns": []
+      },
+      "instructionTemplate": "",
+      "languages": ["en-US", "sv-SE", "fr-FR", "de-DE", "es-ES", "da-DK", "fi-FI", "nb-NO"],
+      "aliases": [],
+      "sourceIds": [
+        "microsoft-learn-project-usage",
+        "microsoft-learn-project-usage-sv",
+        "microsoft-learn-project-usage-fr",
+        "microsoft-learn-project-usage-de",
+        "microsoft-learn-project-usage-es",
+        "microsoft-learn-project-usage-da",
+        "microsoft-learn-project-usage-fi",
+        "microsoft-learn-project-usage-nb"
+      ]
+    },
+    {
+      "ruleId": "Projects.PostProjectJournal",
+      "taskType": "PostProjectJournal",
+      "semanticAction": "PostJournal",
+      "entity": "ProjectJournal",
+      "priority": 1280,
+      "confidence": 0.97,
+      "match": {
+        "pagePatterns": [
+          "^Project Journal$",
+          "^Projektjournal$",
+          "^Feuille projet$",
+          "^Projekterfassung$",
+          "^Diario de proyectos$",
+          "^Projektkladde$",
+          "^Projektipäiväkirja$",
+          "^Prosjektkladd$"
+        ],
+        "actionPatterns": [
+          "^Post$",
+          "^Bokför$",
+          "^Valider$",
+          "^Buchen$",
+          "^Registrar$",
+          "^Bogfør$",
+          "^Kirjaa$",
+          "^Bokfør$"
+        ],
+        "fieldPatterns": [],
+        "automationIdPatterns": []
+      },
+      "instructionTemplate": "",
+      "languages": ["en-US", "sv-SE", "fr-FR", "de-DE", "es-ES", "da-DK", "fi-FI", "nb-NO"],
+      "aliases": [],
+      "sourceIds": [
+        "microsoft-learn-project-usage",
+        "microsoft-learn-project-usage-sv",
+        "microsoft-learn-project-usage-fr",
+        "microsoft-learn-project-usage-de",
+        "microsoft-learn-project-usage-es",
+        "microsoft-learn-project-usage-da",
+        "microsoft-learn-project-usage-fi",
+        "microsoft-learn-project-usage-nb"
+      ]
+    }
+  ],
+  "sources": [
+    {
+      "sourceId": "microsoft-learn-project-usage",
+      "title": "Record consumption or usage for projects",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/en-us/dynamics365/business-central/projects-how-record-job-usage",
+      "appliesTo": "Current English Business Central online documentation; inspected 2026-09-25",
+      "accessedDate": "2026-09-25",
+      "fields": ["Qty. To Transfer to Journal", "Create Project Journal Lines", "Open Project Journal", "Post"]
+    },
+    {
+      "sourceId": "microsoft-learn-project-usage-sv",
+      "title": "Registrera förbrukning eller användning för projekt",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/sv-se/dynamics365/business-central/projects-how-record-job-usage",
+      "appliesTo": "Current Swedish Business Central online documentation; inspected 2026-09-25",
+      "accessedDate": "2026-09-25",
+      "fields": ["Antal att överföra till journal", "Skapa projektjournalrader", "Öppna projektjournal", "Bokför"]
+    },
+    {
+      "sourceId": "microsoft-learn-project-usage-fr",
+      "title": "Enregistrer la consommation ou l’utilisation des articles et des ressources du projet",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/fr-fr/dynamics365/business-central/projects-how-record-job-usage",
+      "appliesTo": "Current French Business Central online documentation; inspected 2026-09-25",
+      "accessedDate": "2026-09-25",
+      "fields": ["Qté à transférer sur la feuille", "Créer des lignes feuille projet", "Ouvrir la feuille projet", "Valider"]
+    },
+    {
+      "sourceId": "microsoft-learn-project-usage-de",
+      "title": "Datensatz-Verbrauch oder -Verwendung von Projektressourcen und -artikeln",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/de-de/dynamics365/business-central/projects-how-record-job-usage",
+      "appliesTo": "Current German Business Central online documentation; inspected 2026-09-25",
+      "accessedDate": "2026-09-25",
+      "fields": ["In das Journal zu übertragende Menge", "Projekt-Buch.-Blattzeilen erstellen", "Projekterfassung öffnen", "Buchen"]
+    },
+    {
+      "sourceId": "microsoft-learn-project-usage-es",
+      "title": "Registrar el consumo o uso de recursos y artículos de proyectos",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/es-es/dynamics365/business-central/projects-how-record-job-usage",
+      "appliesTo": "Current Spanish Business Central online documentation; inspected 2026-09-25",
+      "accessedDate": "2026-09-25",
+      "fields": ["Cdad. a transferir al diario", "Crear líneas de diario de proyectos", "Diario de proyectos pendientes", "Registrar"]
+    },
+    {
+      "sourceId": "microsoft-learn-project-usage-da",
+      "title": "Registrere forbrug eller brug af projektressourcer og varer",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/da-dk/dynamics365/business-central/projects-how-record-job-usage",
+      "appliesTo": "Current Danish Business Central online documentation; inspected 2026-09-25",
+      "accessedDate": "2026-09-25",
+      "fields": ["Antal, der skal overføres til kladde", "Opret projektkladdelinjer", "Åbn projektkladde", "Bogfør"]
+    },
+    {
+      "sourceId": "microsoft-learn-project-usage-fi",
+      "title": "Projektiresurssien ja -nimikkeiden kulutuksen tai käytön tallentaminen",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/fi-fi/dynamics365/business-central/projects-how-record-job-usage",
+      "appliesTo": "Current Finnish Business Central online documentation; inspected 2026-09-25",
+      "accessedDate": "2026-09-25",
+      "fields": ["Päiväkirjaan siirrettävä määrä", "Luo projektipäiväkirjan rivit", "Avaa projektipäiväkirja", "Kirjaa"]
+    },
+    {
+      "sourceId": "microsoft-learn-project-usage-nb",
+      "title": "Registrere forbruk eller forbruk av prosjektressurser og -varer",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/nb-no/dynamics365/business-central/projects-how-record-job-usage",
+      "appliesTo": "Current Norwegian Bokmål Business Central online documentation; inspected 2026-09-25",
+      "accessedDate": "2026-09-25",
+      "fields": ["Ant. som skal overføres til kladd", "Opprett prosjektkladdelinjer", "Åpne prosjektkladd", "Bokfør"]
+    }
+  ]
+}

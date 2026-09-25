@@ -8,7 +8,7 @@
 - Added Microsoft Learn page references for BC 28 sales and purchase credit memos;
   process packs now cover 202. unique page identities and 78 sourced action rules.
 - Added cash receipt, payment journal, vendor payment suggestion, and payment-reconciliation
-  actions; the catalog now has 88 sourced actions and 203 distinct documented page IDs.
+  actions; the catalog then had 88 sourced actions and 203 distinct documented page IDs.
 - Localized return/correction and cash/payment matching metadata for the eight supported
   UI languages, with Microsoft Learn provenance per locale where localized coverage is
   published.
@@ -22,6 +22,9 @@
   UI languages, with localized Microsoft Learn references and runtime tests. Manufacturing
   consumption-quantity caption matching now also covers all eight UI languages with localized
   Microsoft Learn references and runtime tests. Other manufacturing actions remain narrower.
+- Added a Business Central Projects (Jobs) knowledge pack for transferring project usage to journals,
+  creating journal lines, and posting usage. Captions and Microsoft Learn provenance are covered by
+  runtime localization tests in all eight supported UI languages.
 - Added a runtime catalog test that resolves the localized sales-return action in all eight
   locales instead of checking language declarations alone.
 - Kept BC 21 and BC 28 compatibility as separate ranges so undocumented versions
