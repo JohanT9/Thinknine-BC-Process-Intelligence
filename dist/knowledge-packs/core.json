@@ -1,7 +1,7 @@
 {
   "packId": "bc-core",
   "name": "Business Central Core",
-  "version": "2.2.0",
+  "version": "2.3.0",
   "priority": 100,
   "pageDefinitions": [
     {
@@ -164,7 +164,11 @@
         "actionPatterns": [
           "^Ny$",
           "^New$",
-          "^Skapa ny$"
+          "^Skapa ny$",
+          "^Nouveau$",
+          "^Neu$",
+          "^Nuevo$",
+          "^Uusi$"
         ],
         "fieldPatterns": [],
         "automationIdPatterns": []
@@ -172,9 +176,35 @@
       "instructionTemplate": "",
       "languages": [
         "sv-SE",
-        "en-US"
+        "en-US",
+        "fr-FR",
+        "de-DE",
+        "es-ES",
+        "da-DK",
+        "fi-FI",
+        "nb-NO"
       ],
-      "aliases": []
+      "aliases": [],
+      "sourceIds": [
+        "microsoft-learn-keyboard-shortcuts-sv",
+        "microsoft-learn-keyboard-shortcuts",
+        "microsoft-learn-keyboard-shortcuts-fr",
+        "microsoft-learn-keyboard-shortcuts-de",
+        "microsoft-learn-keyboard-shortcuts-es",
+        "microsoft-learn-keyboard-shortcuts-da",
+        "microsoft-learn-keyboard-shortcuts-fi",
+        "microsoft-learn-keyboard-shortcuts-nb"
+      ],
+      "localizedInstructions": {
+        "sv-SE": "Välj Ny för att öppna sidan där du kan skapa en post. Kontrollera sidans innehåll och sammanhang innan du fortsätter.",
+        "en-US": "Choose New to open the page where you can create a record. Check the page and its context before continuing.",
+        "fr-FR": "Sélectionnez Nouveau pour ouvrir la page où vous pouvez créer un enregistrement. Vérifiez la page et son contexte avant de continuer.",
+        "de-DE": "Wählen Sie Neu aus, um die Seite zum Erstellen eines Datensatzes zu öffnen. Prüfen Sie die Seite und ihren Kontext, bevor Sie fortfahren.",
+        "es-ES": "Seleccione Nuevo para abrir la página donde puede crear un registro. Compruebe la página y su contexto antes de continuar.",
+        "da-DK": "Vælg Ny for at åbne siden, hvor du kan oprette en post. Kontrollér siden og dens kontekst, før du fortsætter.",
+        "fi-FI": "Avaa tietueen luontisivu valitsemalla Uusi. Tarkista sivu ja sen asiayhteys ennen jatkamista.",
+        "nb-NO": "Velg Ny for å åpne siden der du kan opprette en post. Kontroller siden og sammenhengen før du fortsetter."
+      }
     },
     {
       "ruleId": "Core.EditRecord",
@@ -233,7 +263,11 @@
         "pagePatterns": [],
         "actionPatterns": [
           "^Ja$",
-          "^Yes$"
+          "^Yes$",
+          "^Oui$",
+          "^Ja$",
+          "^Sí$",
+          "^Kyllä$"
         ],
         "fieldPatterns": [],
         "automationIdPatterns": []
@@ -241,9 +275,25 @@
       "instructionTemplate": "",
       "languages": [
         "sv-SE",
-        "en-US"
+        "en-US",
+        "fr-FR",
+        "de-DE",
+        "es-ES",
+        "da-DK",
+        "fi-FI",
+        "nb-NO"
       ],
-      "aliases": []
+      "aliases": [],
+      "sourceIds": [
+        "microsoft-learn-keyboard-shortcuts-sv",
+        "microsoft-learn-keyboard-shortcuts",
+        "microsoft-learn-keyboard-shortcuts-fr",
+        "microsoft-learn-keyboard-shortcuts-de",
+        "microsoft-learn-keyboard-shortcuts-es",
+        "microsoft-learn-keyboard-shortcuts-da",
+        "microsoft-learn-keyboard-shortcuts-fi",
+        "microsoft-learn-keyboard-shortcuts-nb"
+      ]
     },
     {
       "ruleId": "Core.ConfirmNo",
@@ -256,7 +306,11 @@
         "pagePatterns": [],
         "actionPatterns": [
           "^Nej$",
-          "^No$"
+          "^No$",
+          "^Non$",
+          "^Nein$",
+          "^Ei$",
+          "^Nei$"
         ],
         "fieldPatterns": [],
         "automationIdPatterns": []
@@ -264,9 +318,25 @@
       "instructionTemplate": "",
       "languages": [
         "sv-SE",
-        "en-US"
+        "en-US",
+        "fr-FR",
+        "de-DE",
+        "es-ES",
+        "da-DK",
+        "fi-FI",
+        "nb-NO"
       ],
-      "aliases": []
+      "aliases": [],
+      "sourceIds": [
+        "microsoft-learn-keyboard-shortcuts-sv",
+        "microsoft-learn-keyboard-shortcuts",
+        "microsoft-learn-keyboard-shortcuts-fr",
+        "microsoft-learn-keyboard-shortcuts-de",
+        "microsoft-learn-keyboard-shortcuts-es",
+        "microsoft-learn-keyboard-shortcuts-da",
+        "microsoft-learn-keyboard-shortcuts-fi",
+        "microsoft-learn-keyboard-shortcuts-nb"
+      ]
     },
     {
       "ruleId": "Core.Lookup",
@@ -434,6 +504,78 @@
         "Search and navigation to pages, tasks, actions, and reports",
         "Role- and experience-dependent result availability"
       ]
+    },
+    {
+      "sourceId": "microsoft-learn-keyboard-shortcuts-sv",
+      "title": "Kortkommandon",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/sv-se/dynamics365/business-central/keyboard-shortcuts",
+      "appliesTo": "Current sv-SE localized Business Central online documentation; inspected 2026-09-25",
+      "accessedDate": "2026-09-25",
+      "fields": ["Alt+N opens a page to create a record", "Yes/No dialog keys vary by language", "Localized labels: Ny, Ja, Nej"]
+    },
+    {
+      "sourceId": "microsoft-learn-keyboard-shortcuts",
+      "title": "Keyboard Shortcuts",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/en-us/dynamics365/business-central/keyboard-shortcuts",
+      "appliesTo": "Current en-US localized Business Central online documentation; inspected 2026-09-25",
+      "accessedDate": "2026-09-25",
+      "fields": ["Alt+N opens a page to create a record", "Y/N activate Yes/No dialog buttons", "Localized labels: New, Yes, No"]
+    },
+    {
+      "sourceId": "microsoft-learn-keyboard-shortcuts-fr",
+      "title": "Raccourcis clavier",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/fr-fr/dynamics365/business-central/keyboard-shortcuts",
+      "appliesTo": "Current fr-FR localized Business Central online documentation; inspected 2026-09-25",
+      "accessedDate": "2026-09-25",
+      "fields": ["Alt+N opens a page to create a record", "Localized labels: Nouveau, Oui, Non"]
+    },
+    {
+      "sourceId": "microsoft-learn-keyboard-shortcuts-de",
+      "title": "Tastenkombinationen",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/de-de/dynamics365/business-central/keyboard-shortcuts",
+      "appliesTo": "Current de-DE localized Business Central online documentation; inspected 2026-09-25",
+      "accessedDate": "2026-09-25",
+      "fields": ["Alt+N opens a page to create a record", "German Yes/No dialog labels: Ja, Nein", "New action label: Neu"]
+    },
+    {
+      "sourceId": "microsoft-learn-keyboard-shortcuts-es",
+      "title": "Métodos abreviados de teclado",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/es-es/dynamics365/business-central/keyboard-shortcuts",
+      "appliesTo": "Current es-ES localized Business Central online documentation; inspected 2026-09-25",
+      "accessedDate": "2026-09-25",
+      "fields": ["Alt+N opens a page to create a record", "Spanish Yes/No dialog labels: Sí, No", "New action label: Nuevo"]
+    },
+    {
+      "sourceId": "microsoft-learn-keyboard-shortcuts-da",
+      "title": "Tastaturgenveje",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/da-dk/dynamics365/business-central/keyboard-shortcuts",
+      "appliesTo": "Current da-DK localized Business Central online documentation; inspected 2026-09-25",
+      "accessedDate": "2026-09-25",
+      "fields": ["Alt+N opens a page to create a record", "Danish Yes/No dialog labels: Ja, Nej", "New action label: Ny"]
+    },
+    {
+      "sourceId": "microsoft-learn-keyboard-shortcuts-fi",
+      "title": "Pikanäppäimet",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/fi-fi/dynamics365/business-central/keyboard-shortcuts",
+      "appliesTo": "Current fi-FI localized Business Central online documentation; inspected 2026-09-25",
+      "accessedDate": "2026-09-25",
+      "fields": ["Alt+N opens a page to create a record", "Finnish Yes/No dialog labels: Kyllä, Ei", "New action label: Uusi"]
+    },
+    {
+      "sourceId": "microsoft-learn-keyboard-shortcuts-nb",
+      "title": "Hurtigtaster",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/nb-no/dynamics365/business-central/keyboard-shortcuts",
+      "appliesTo": "Current nb-NO localized Business Central online documentation; inspected 2026-09-25",
+      "accessedDate": "2026-09-25",
+      "fields": ["Alt+N opens a page to create a record", "Norwegian Yes/No dialog labels: Ja, Nei", "New action label: Ny"]
     }
   ]
 }

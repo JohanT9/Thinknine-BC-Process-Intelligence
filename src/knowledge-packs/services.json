@@ -1,7 +1,7 @@
 {
   "packId": "bc-services",
   "name": "Business Central Service Management",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "priority": 200,
   "rules": [
     {
@@ -138,6 +138,106 @@
         "microsoft-learn-service-posting-fi",
         "microsoft-learn-service-posting-nb"
       ]
+    },
+    {
+      "ruleId": "Services.CreateServiceOrder",
+      "taskType": "CreateServiceOrder",
+      "semanticAction": "CreateNew",
+      "entity": "ServiceOrder",
+      "priority": 1380,
+      "confidence": 0.97,
+      "match": {
+        "pagePatterns": [
+          "^Service Orders$",
+          "^Tjänstbeställningar$",
+          "^Commandes de service$",
+          "^Serviceaufträge$",
+          "^Pedidos de servicio$",
+          "^(?:Serviceordre|Serviceordrer)$",
+          "^Huoltotilaukset$",
+          "^(?:Serviceordre|Serviceordrer)$"
+        ],
+        "actionPatterns": [
+          "^New$",
+          "^Ny$",
+          "^Nouveau$",
+          "^Neu$",
+          "^Nuevo$",
+          "^Ny$",
+          "^Uusi$",
+          "^Ny$"
+        ],
+        "fieldPatterns": [],
+        "automationIdPatterns": []
+      },
+      "instructionTemplate": "",
+      "languages": ["en-US", "sv-SE", "fr-FR", "de-DE", "es-ES", "da-DK", "fi-FI", "nb-NO"],
+      "aliases": [],
+      "sourceIds": [
+        "microsoft-learn-service-create-order",
+        "microsoft-learn-service-create-order-sv",
+        "microsoft-learn-service-create-order-fr",
+        "microsoft-learn-service-create-order-de",
+        "microsoft-learn-service-create-order-es",
+        "microsoft-learn-service-create-order-da",
+        "microsoft-learn-service-create-order-fi",
+        "microsoft-learn-service-create-order-nb"
+      ]
+    },
+    {
+      "ruleId": "Services.SelectServiceOrderCustomer",
+      "taskType": "SelectServiceOrderCustomer",
+      "semanticAction": "SelectCustomer",
+      "entity": "ServiceOrderHeader",
+      "priority": 1390,
+      "confidence": 0.97,
+      "match": {
+        "pagePatterns": [
+          "^(?:Service Order|Service Orders)$",
+          "^Tjänstbeställningar$",
+          "^(?:Commande service|Commandes de service)$",
+          "^(?:Serviceauftrag|Serviceaufträge)$",
+          "^(?:Pedido servicio|Pedidos de servicio)$",
+          "^(?:Serviceordre|Serviceordrer)$",
+          "^(?:Huoltotilaus|Huoltotilaukset)$",
+          "^(?:Serviceordre|Serviceordrer)$"
+        ],
+        "actionPatterns": [],
+        "fieldPatterns": [
+          "^Customer No\\.?$",
+          "^Kundnr\\.?$",
+          "^N° client$",
+          "^Debitorennr\\.?$",
+          "^N\\.?[º°]? cliente$",
+          "^Debitornr\\.?$",
+          "^Asiakasnro$",
+          "^Kundenr\\.?$"
+        ],
+        "automationIdPatterns": []
+      },
+      "instructionTemplate": "",
+      "languages": ["en-US", "sv-SE", "fr-FR", "de-DE", "es-ES", "da-DK", "fi-FI", "nb-NO"],
+      "aliases": [],
+      "sourceIds": [
+        "microsoft-learn-service-create-order",
+        "microsoft-learn-service-create-order-sv",
+        "microsoft-learn-service-create-order-fr",
+        "microsoft-learn-service-create-order-de",
+        "microsoft-learn-service-create-order-es",
+        "microsoft-learn-service-create-order-da",
+        "microsoft-learn-service-create-order-fi",
+        "microsoft-learn-service-create-order-nb"
+      ],
+      "localizedInstructions": {
+        "en-US": "Select the customer who requested the service. Business Central fills related customer fields from that customer record; verify the customer before adding service item lines.",
+        "sv-SE": "Välj kunden som har begärt servicen. Business Central fyller i relaterade kundfält från kundposten. Kontrollera kunden innan du lägger till serviceartiklar.",
+        "fr-FR": "Sélectionnez le client qui a demandé le service. Business Central renseigne les champs client associés à partir de sa fiche. Vérifiez le client avant d’ajouter les lignes d’articles de service.",
+        "de-DE": "Wählen Sie den Kunden aus, der den Service angefordert hat. Business Central füllt zugehörige Kundenfelder aus dem Kundendatensatz aus. Prüfen Sie den Kunden, bevor Sie Serviceartikelzeilen hinzufügen.",
+        "es-ES": "Seleccione el cliente que solicitó el servicio. Business Central completa los campos relacionados con los datos del cliente. Compruebe el cliente antes de agregar líneas de producto de servicio.",
+        "da-DK": "Vælg den kunde, der har anmodet om servicen. Business Central udfylder relaterede kundefelter fra kundeposten. Kontrollér kunden, før du tilføjer servicelinjer.",
+        "fi-FI": "Valitse palvelua pyytänyt asiakas. Business Central täyttää asiakkaaseen liittyvät kentät asiakastiedoista. Tarkista asiakas ennen huoltonimikerivien lisäämistä.",
+        "nb-NO": "Velg kunden som har bedt om servicen. Business Central fyller ut relaterte kundefelt fra kundeposten. Kontroller kunden før du legger til servicevarelinjer."
+      }
     }
   ],
   "sources": [
@@ -156,6 +256,14 @@
     {"sourceId":"microsoft-learn-service-posting-es","title":"Registrar pedidos de servicio","sourceType":"microsoft-learn","sourceUri":"https://learn.microsoft.com/es-es/dynamics365/business-central/service-how-to-post-service-orders","appliesTo":"Current Spanish Business Central online documentation; inspected 2026-09-25","accessedDate":"2026-09-25","fields":["Pedido servicio","Registrar"]},
     {"sourceId":"microsoft-learn-service-posting-da","title":"Bogføre serviceordrer og kreditnotaer","sourceType":"microsoft-learn","sourceUri":"https://learn.microsoft.com/da-dk/dynamics365/business-central/service-how-to-post-service-orders","appliesTo":"Current Danish Business Central online documentation; inspected 2026-09-25","accessedDate":"2026-09-25","fields":["Serviceordre","Indlæg"]},
     {"sourceId":"microsoft-learn-service-posting-fi","title":"Huoltotilausten ja hyvityslaskujen kirjaaminen","sourceType":"microsoft-learn","sourceUri":"https://learn.microsoft.com/fi-fi/dynamics365/business-central/service-how-to-post-service-orders","appliesTo":"Current Finnish Business Central online documentation; inspected 2026-09-25","accessedDate":"2026-09-25","fields":["Huoltotilaus","Julkaisu"]},
-    {"sourceId":"microsoft-learn-service-posting-nb","title":"Bokfør serviceordrer og kreditnotaer","sourceType":"microsoft-learn","sourceUri":"https://learn.microsoft.com/nb-no/dynamics365/business-central/service-how-to-post-service-orders","appliesTo":"Current Norwegian Bokmål Business Central online documentation; inspected 2026-09-25","accessedDate":"2026-09-25","fields":["Serviceordre","Publiser"]}
+    {"sourceId":"microsoft-learn-service-posting-nb","title":"Bokfør serviceordrer og kreditnotaer","sourceType":"microsoft-learn","sourceUri":"https://learn.microsoft.com/nb-no/dynamics365/business-central/service-how-to-post-service-orders","appliesTo":"Current Norwegian Bokmål Business Central online documentation; inspected 2026-09-25","accessedDate":"2026-09-25","fields":["Serviceordre","Publiser"]},
+    {"sourceId":"microsoft-learn-service-create-order","title":"Create service orders","sourceType":"microsoft-learn","sourceUri":"https://learn.microsoft.com/en-us/dynamics365/business-central/service-how-to-create-service-orders","appliesTo":"Current English Business Central online documentation; inspected 2026-09-25","accessedDate":"2026-09-25","fields":["Service Orders page","New service order action","Customer No. selects customer and fills related fields"]},
+    {"sourceId":"microsoft-learn-service-create-order-sv","title":"Så här skapar du tjänstbeställningar","sourceType":"microsoft-learn","sourceUri":"https://learn.microsoft.com/sv-se/dynamics365/business-central/service-how-to-create-service-orders","appliesTo":"Current Swedish Business Central online documentation; inspected 2026-09-25","accessedDate":"2026-09-25","fields":["Tjänstbeställningar page","New service order action","Kundnr selects customer and fills related fields"]},
+    {"sourceId":"microsoft-learn-service-create-order-fr","title":"Guide pratique pour créer des commandes de service","sourceType":"microsoft-learn","sourceUri":"https://learn.microsoft.com/fr-fr/dynamics365/business-central/service-how-to-create-service-orders","appliesTo":"Current French Business Central online documentation; inspected 2026-09-25","accessedDate":"2026-09-25","fields":["Commandes de service page","New service order action","N° client selects customer and fills related fields"]},
+    {"sourceId":"microsoft-learn-service-create-order-de","title":"Erstellen von Serviceaufträgen","sourceType":"microsoft-learn","sourceUri":"https://learn.microsoft.com/de-de/dynamics365/business-central/service-how-to-create-service-orders","appliesTo":"Current German Business Central online documentation; inspected 2026-09-25","accessedDate":"2026-09-25","fields":["Serviceaufträge page","New service order action","Debitorennr. selects customer and fills related fields"]},
+    {"sourceId":"microsoft-learn-service-create-order-es","title":"Creación de pedidos de servicio","sourceType":"microsoft-learn","sourceUri":"https://learn.microsoft.com/es-es/dynamics365/business-central/service-how-to-create-service-orders","appliesTo":"Current Spanish Business Central online documentation; inspected 2026-09-25","accessedDate":"2026-09-25","fields":["Pedidos de servicio page","New service order action","N.º cliente selects customer and fills related fields"]},
+    {"sourceId":"microsoft-learn-service-create-order-da","title":"Sådan opretter du serviceordrer","sourceType":"microsoft-learn","sourceUri":"https://learn.microsoft.com/da-dk/dynamics365/business-central/service-how-to-create-service-orders","appliesTo":"Current Danish Business Central online documentation; inspected 2026-09-25","accessedDate":"2026-09-25","fields":["Serviceordrer page","New service order action","Debitornr. selects customer and fills related fields"]},
+    {"sourceId":"microsoft-learn-service-create-order-fi","title":"Huoltotilausten luominen","sourceType":"microsoft-learn","sourceUri":"https://learn.microsoft.com/fi-fi/dynamics365/business-central/service-how-to-create-service-orders","appliesTo":"Current Finnish Business Central online documentation; inspected 2026-09-25","accessedDate":"2026-09-25","fields":["Huoltotilaukset page","New service order action","Asiakasnro selects customer and fills related fields"]},
+    {"sourceId":"microsoft-learn-service-create-order-nb","title":"Slik oppretter du serviceordrer","sourceType":"microsoft-learn","sourceUri":"https://learn.microsoft.com/nb-no/dynamics365/business-central/service-how-to-create-service-orders","appliesTo":"Current Norwegian Bokmål Business Central online documentation; inspected 2026-09-25","accessedDate":"2026-09-25","fields":["Serviceordrer page","New service order action","Kundenr. selects customer and fills related fields"]}
   ]
 }
