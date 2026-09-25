@@ -1,7 +1,7 @@
 {
   "packId": "bc-warehouse",
   "name": "Business Central Warehouse",
-  "version": "2.3.0",
+  "version": "2.4.0",
   "priority": 200,
   "rules": [
     {
@@ -117,10 +117,25 @@
       "priority": 1000,
       "confidence": 0.96,
       "match": {
-        "pagePatterns": [],
+        "pagePatterns": [
+          "^Warehouse Picks?$",
+          "^Lagerval$",
+          "^Les sélections de l’entrepôt$",
+          "^Lagerauswahl$",
+          "^Selecciones de Almacén$",
+          "^Lagerpluk$",
+          "^Varaston valinnat$",
+          "^Lagervalg$"
+        ],
         "actionPatterns": [
-          "registrera.*plock",
-          "register.*pick"
+          "^Register Pick$",
+          "^Registrera plock(?:ning)?$",
+          "^Enregistrer prélèvement$",
+          "^Kommissionierung registrieren$",
+          "^Registrar picking$",
+          "^Registrer pluk$",
+          "^Rekisteröi poiminta$",
+          "^Registrer plukk$"
         ],
         "fieldPatterns": [],
         "automationIdPatterns": []
@@ -128,9 +143,25 @@
       "instructionTemplate": "",
       "languages": [
         "sv-SE",
-        "en-US"
+        "en-US",
+        "fr-FR",
+        "de-DE",
+        "es-ES",
+        "da-DK",
+        "fi-FI",
+        "nb-NO"
       ],
-      "aliases": []
+      "aliases": [],
+      "sourceIds": [
+        "microsoft-learn-warehouse-pick-shipment",
+        "microsoft-learn-warehouse-pick-shipment-sv",
+        "microsoft-learn-warehouse-pick-shipment-fr",
+        "microsoft-learn-warehouse-pick-shipment-de",
+        "microsoft-learn-warehouse-pick-shipment-es",
+        "microsoft-learn-warehouse-pick-shipment-da",
+        "microsoft-learn-warehouse-pick-shipment-fi",
+        "microsoft-learn-warehouse-pick-shipment-nb"
+      ]
     },
     {
       "ruleId": "Warehouse.PostReceipt",
@@ -1195,6 +1226,78 @@
         "quantity to handle",
         "register/post put-away"
       ]
+    },
+    {
+      "sourceId": "microsoft-learn-warehouse-pick-shipment",
+      "title": "Pick items for warehouse shipment",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/en-us/dynamics365/business-central/warehouse-how-to-pick-items-for-warehouse-shipment",
+      "appliesTo": "Current en-US Business Central online documentation; inspected 2026-09-25",
+      "accessedDate": "2026-09-25",
+      "fields": ["Warehouse Picks page", "Register Pick action", "warehouse shipment follow-up"]
+    },
+    {
+      "sourceId": "microsoft-learn-warehouse-pick-shipment-sv",
+      "title": "Plocka artiklar för distributionslagerutleverans",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/sv-se/dynamics365/business-central/warehouse-how-to-pick-items-for-warehouse-shipment",
+      "appliesTo": "Current sv-SE Business Central online documentation; inspected 2026-09-25",
+      "accessedDate": "2026-09-25",
+      "fields": ["warehouse pick page", "Registrera plockning action", "warehouse shipment follow-up"]
+    },
+    {
+      "sourceId": "microsoft-learn-warehouse-pick-shipment-fr",
+      "title": "Prélèvement des articles pour l’expédition entrepôt",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/fr-fr/dynamics365/business-central/warehouse-how-to-pick-items-for-warehouse-shipment",
+      "appliesTo": "Current fr-FR Business Central online documentation; inspected 2026-09-25",
+      "accessedDate": "2026-09-25",
+      "fields": ["warehouse pick page", "Enregistrer prélèvement action", "warehouse shipment follow-up"]
+    },
+    {
+      "sourceId": "microsoft-learn-warehouse-pick-shipment-de",
+      "title": "Artikel für den Warenausgang kommissionieren",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/de-de/dynamics365/business-central/warehouse-how-to-pick-items-for-warehouse-shipment",
+      "appliesTo": "Current de-DE Business Central online documentation; inspected 2026-09-25",
+      "accessedDate": "2026-09-25",
+      "fields": ["warehouse pick page", "Kommissionierung registrieren action", "warehouse shipment follow-up"]
+    },
+    {
+      "sourceId": "microsoft-learn-warehouse-pick-shipment-es",
+      "title": "Elegir productos para el envío de almacén",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/es-es/dynamics365/business-central/warehouse-how-to-pick-items-for-warehouse-shipment",
+      "appliesTo": "Current es-ES Business Central online documentation; inspected 2026-09-25",
+      "accessedDate": "2026-09-25",
+      "fields": ["warehouse pick page", "Registrar picking action", "warehouse shipment follow-up"]
+    },
+    {
+      "sourceId": "microsoft-learn-warehouse-pick-shipment-da",
+      "title": "Plukke varer til lagerstedsforsendelse",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/da-dk/dynamics365/business-central/warehouse-how-to-pick-items-for-warehouse-shipment",
+      "appliesTo": "Current da-DK Business Central online documentation; inspected 2026-09-25",
+      "accessedDate": "2026-09-25",
+      "fields": ["warehouse pick page", "Registrer pluk action", "warehouse shipment follow-up"]
+    },
+    {
+      "sourceId": "microsoft-learn-warehouse-pick-shipment-fi",
+      "title": "Nimikkeiden poiminta fyysisen varaston toimitusta varten",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/fi-fi/dynamics365/business-central/warehouse-how-to-pick-items-for-warehouse-shipment",
+      "appliesTo": "Current fi-FI Business Central online documentation; inspected 2026-09-25",
+      "accessedDate": "2026-09-25",
+      "fields": ["warehouse pick page", "Rekisteröi poiminta action", "warehouse shipment follow-up"]
+    },
+    {
+      "sourceId": "microsoft-learn-warehouse-pick-shipment-nb",
+      "title": "Plukk varer for lagerlevering",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/nb-no/dynamics365/business-central/warehouse-how-to-pick-items-for-warehouse-shipment",
+      "appliesTo": "Current nb-NO Business Central online documentation; inspected 2026-09-25",
+      "accessedDate": "2026-09-25",
+      "fields": ["warehouse pick page", "Registrer plukk action", "warehouse shipment follow-up"]
     },
     {
       "sourceId": "microsoft-learn-item-availability",

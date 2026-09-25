@@ -123,7 +123,26 @@ for(const [locale,actionCaption,sourceId] of createPickSamples){
  assert.equal(found.candidates[0].provenance.language,locale);
  assert.ok(found.candidates[0].provenance.sourceRefs.some(x=>x.sourceId===sourceId),`${locale} create pick should cite localized Microsoft Learn evidence`);
 }
-for (const ruleId of [...availabilityRules,'Warehouse.SetQtyToHandlePick','Warehouse.PostInventoryPick','Warehouse.SetQtyToReceive','Warehouse.PostReceiptAction','Warehouse.RegisterPutAway']) {
+const registerPickSamples=[
+ ['en-US','Warehouse Picks','Register Pick','microsoft-learn-warehouse-pick-shipment'],
+ ['sv-SE','Lagerval','Registrera plockning','microsoft-learn-warehouse-pick-shipment-sv'],
+ ['fr-FR','Les sélections de l’entrepôt','Enregistrer prélèvement','microsoft-learn-warehouse-pick-shipment-fr'],
+ ['de-DE','Lagerauswahl','Kommissionierung registrieren','microsoft-learn-warehouse-pick-shipment-de'],
+ ['es-ES','Selecciones de Almacén','Registrar picking','microsoft-learn-warehouse-pick-shipment-es'],
+ ['da-DK','Lagerpluk','Registrer pluk','microsoft-learn-warehouse-pick-shipment-da'],
+ ['fi-FI','Varaston valinnat','Rekisteröi poiminta','microsoft-learn-warehouse-pick-shipment-fi'],
+ ['nb-NO','Lagervalg','Registrer plukk','microsoft-learn-warehouse-pick-shipment-nb']
+];
+for(const [locale,pageCaption,actionCaption,sourceId] of registerPickSamples){
+ const found=repository.resolveAction({language:locale,context:{pageCaption,actionCaption}});
+ assert.equal(found.status,'resolved',`${locale} warehouse Register Pick should resolve`);
+ assert.equal(found.candidates[0].provenance.ruleId,'Warehouse.RegisterPick');
+ assert.equal(found.candidates[0].provenance.language,locale);
+ assert.ok(found.candidates[0].provenance.sourceRefs.some(x=>x.sourceId===sourceId),`${locale} Register Pick should cite localized source`);
+ const wrongPage=repository.resolveAction({language:locale,context:{pageCaption:'Sales Order',actionCaption}});
+ assert.notEqual(wrongPage.status,'resolved',`${locale} warehouse Register Pick must require warehouse-pick context`);
+}
+for (const ruleId of [...availabilityRules,'Warehouse.SetQtyToHandlePick','Warehouse.PostInventoryPick','Warehouse.SetQtyToReceive','Warehouse.PostReceiptAction','Warehouse.RegisterPutAway','Warehouse.RegisterPick']) {
  const rule=imported.snapshot.packs.find(x=>x.packId==='bc-warehouse').rules.find(x=>x.ruleId===ruleId);
  for(const locale of ['sv-SE','en-US','fr-FR','de-DE','es-ES','da-DK','fi-FI','nb-NO']) assert.ok(rule.languages.includes(locale),`${ruleId} should declare ${locale}`);
 }

@@ -1,7 +1,7 @@
 {
   "packId": "bc-manufacturing",
   "name": "Business Central Manufacturing",
-  "version": "2.1.0",
+  "version": "2.2.0",
   "priority": 200,
   "rules": [
     {
@@ -109,52 +109,6 @@
         "microsoft-learn-production-orders-fi",
         "microsoft-learn-production-orders-nb"
       ]
-    },
-    {
-      "ruleId": "Manufacturing.PostConsumption",
-      "taskType": "PostConsumption",
-      "semanticAction": "PostDocument",
-      "entity": "Consumption",
-      "priority": 1000,
-      "confidence": 0.96,
-      "match": {
-        "pagePatterns": [],
-        "actionPatterns": [
-          "bokför.*förbrukning",
-          "post.*consumption"
-        ],
-        "fieldPatterns": [],
-        "automationIdPatterns": []
-      },
-      "instructionTemplate": "",
-      "languages": [
-        "sv-SE",
-        "en-US"
-      ],
-      "aliases": []
-    },
-    {
-      "ruleId": "Manufacturing.PostOutput",
-      "taskType": "PostOutput",
-      "semanticAction": "PostDocument",
-      "entity": "Output",
-      "priority": 1000,
-      "confidence": 0.96,
-      "match": {
-        "pagePatterns": [],
-        "actionPatterns": [
-          "bokför.*utflöde",
-          "post.*output"
-        ],
-        "fieldPatterns": [],
-        "automationIdPatterns": []
-      },
-      "instructionTemplate": "",
-      "languages": [
-        "sv-SE",
-        "en-US"
-      ],
-      "aliases": []
     },
     {
       "ruleId": "Manufacturing.SelectItem",
@@ -466,7 +420,7 @@
     },
     {
       "sourceId": "microsoft-learn-production-journal-de",
-      "title": "Verbrauch und Output für einen freigegebenen Fertigungsauftrag registrieren",
+      "title": "Verbrauchsistmeldung für einen Fertigungsauftrag registrieren",
       "sourceType": "microsoft-learn",
       "sourceUri": "https://learn.microsoft.com/de-de/dynamics365/business-central/production-how-to-register-consumption-and-output",
       "appliesTo": "Current German Business Central online documentation; inspected 2026-09-25",
