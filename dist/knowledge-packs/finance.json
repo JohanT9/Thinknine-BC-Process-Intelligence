@@ -1,0 +1,73 @@
+{
+  "packId": "bc-finance",
+  "name": "Business Central Finance",
+  "version": "1.0.0",
+  "priority": 210,
+  "rules": [
+    {
+      "ruleId": "Finance.PostGeneralJournal",
+      "taskType": "PostGeneralJournal",
+      "semanticAction": "PostJournal",
+      "entity": "GeneralJournal",
+      "priority": 1450,
+      "confidence": 0.98,
+      "match": {
+        "pagePatterns": [
+          "^General Journals$",
+          "^Redovisningsjournaler$",
+          "^Feuilles comptabilité$",
+          "^Fibu Buch\\.-Blätter$",
+          "^Diarios generales$",
+          "^Finanskladder$",
+          "^Yleinen päiväkirja$",
+          "^Generelle journaler$"
+        ],
+        "actionPatterns": [
+          "^Post$",
+          "^Bokföra$",
+          "^Valider$",
+          "^Buchen$",
+          "^Registrar$",
+          "^Bogfør$",
+          "^Kirjaa$",
+          "^Bokfør$"
+        ],
+        "fieldPatterns": [],
+        "automationIdPatterns": []
+      },
+      "instructionTemplate": "",
+      "languages": ["en-US", "sv-SE", "fr-FR", "de-DE", "es-ES", "da-DK", "fi-FI", "nb-NO"],
+      "aliases": [],
+      "sourceIds": [
+        "microsoft-learn-general-journals",
+        "microsoft-learn-general-journals-sv",
+        "microsoft-learn-general-journals-fr",
+        "microsoft-learn-general-journals-de",
+        "microsoft-learn-general-journals-es",
+        "microsoft-learn-general-journals-da",
+        "microsoft-learn-general-journals-fi",
+        "microsoft-learn-general-journals-nb"
+      ],
+      "localizedInstructions": {
+        "en-US": "Before posting, review the journal lines, posting dates, document numbers, accounts and balancing accounts, amounts, and any required VAT or dimensions. Posting transfers temporary journal data to ledger entries; corrections require reversal or correcting entries.",
+        "sv-SE": "Kontrollera journalrader, bokföringsdatum, verifikationsnummer, konton och motkonton, belopp samt eventuell moms och dimensioner. Bokföringen överför journalens tillfälliga uppgifter till huvudboksposter; rättelser kräver återföring eller korrigerande poster.",
+        "fr-FR": "Avant de valider, vérifiez les lignes du journal, les dates comptables, les numéros de document, les comptes et comptes de contrepartie, les montants, ainsi que la TVA et les dimensions requises. La validation transfère les données temporaires vers les écritures comptables ; les corrections nécessitent une contrepassation ou une écriture corrective.",
+        "de-DE": "Prüfen Sie vor dem Buchen die Buch.-Blattzeilen, Buchungsdaten, Belegnummern, Konten und Gegenkonten, Beträge sowie erforderliche Umsatzsteuer und Dimensionen. Beim Buchen werden die temporären Buch.-Blattdaten in Sachposten übertragen; Korrekturen erfordern Storno- oder Korrekturposten.",
+        "es-ES": "Antes de registrar, revise las líneas del diario, las fechas de registro, los números de documento, las cuentas y contrapartidas, los importes y el IVA o las dimensiones que correspondan. Al registrar, los datos temporales del diario se transfieren a movimientos contables; las correcciones requieren movimientos de reversión o correctores.",
+        "da-DK": "Gennemgå kladdelinjer, bogføringsdatoer, bilagsnumre, konti og modkonti, beløb samt eventuel moms og dimensioner, før du bogfører. Bogføringen overfører de midlertidige kladdedata til finansposter; rettelser kræver tilbageførings- eller korrektionsposter.",
+        "fi-FI": "Tarkista ennen kirjaamista päiväkirjarivit, kirjauspäivät, asiakirjanumerot, tilit ja vastatilit, summat sekä tarvittava arvonlisävero ja dimensiot. Kirjaaminen siirtää päiväkirjan väliaikaiset tiedot tilitapahtumiksi; korjaukset edellyttävät peruutus- tai korjaustapahtumia.",
+        "nb-NO": "Kontroller kladdelinjene, bokføringsdatoer, bilagsnumre, kontoer og motkontoer, beløp samt eventuell merverdiavgift og dimensjoner før du bokfører. Bokføringen overfører de midlertidige kladdedataene til finansposter; korrigeringer krever tilbakeførings- eller korrigeringsposter."
+      }
+    }
+  ],
+  "sources": [
+    {"sourceId":"microsoft-learn-general-journals","title":"Working with general journals to post directly to G/L","sourceType":"microsoft-learn","sourceUri":"https://learn.microsoft.com/en-us/dynamics365/business-central/ui-work-general-journals","appliesTo":"Current English Business Central online documentation; inspected 2026-09-25","accessedDate":"2026-09-25","fields":["General Journals page","Post action","General journal lines and balancing accounts","Posting transfers temporary journal data to ledger entries","Correction and reversal options","VAT and dimensions"]},
+    {"sourceId":"microsoft-learn-general-journals-sv","title":"Använda redovisningsjournaler för att bokföra direkt i redovisningen","sourceType":"microsoft-learn","sourceUri":"https://learn.microsoft.com/sv-se/dynamics365/business-central/ui-work-general-journals","appliesTo":"Current Swedish Business Central online documentation; inspected 2026-09-25","accessedDate":"2026-09-25","fields":["Redovisningsjournaler page","Bokföra action","Posting transfers temporary journal data to ledger entries","Correction and reversal options","VAT and dimensions"]},
+    {"sourceId":"microsoft-learn-general-journals-fr","title":"Utilisation de feuilles comptabilité pour valider directement dans la comptabilité","sourceType":"microsoft-learn","sourceUri":"https://learn.microsoft.com/fr-fr/dynamics365/business-central/ui-work-general-journals","appliesTo":"Current French Business Central online documentation; inspected 2026-09-25","accessedDate":"2026-09-25","fields":["Feuilles comptabilité page","Valider action","Posting transfers temporary journal data to ledger entries","Correction and reversal options","VAT and dimensions"]},
+    {"sourceId":"microsoft-learn-general-journals-de","title":"Mithilfe von Fibu Buch.-Blättern direkt in die Finanzbuchhaltung buchen","sourceType":"microsoft-learn","sourceUri":"https://learn.microsoft.com/de-de/dynamics365/business-central/ui-work-general-journals","appliesTo":"Current German Business Central online documentation; inspected 2026-09-25","accessedDate":"2026-09-25","fields":["Fibu Buch.-Blätter page","Buchen action","Posting transfers temporary journal data to ledger entries","Correction and reversal options","VAT and dimensions"]},
+    {"sourceId":"microsoft-learn-general-journals-es","title":"Trabajar con diarios generales para registrar directamente en G/L","sourceType":"microsoft-learn","sourceUri":"https://learn.microsoft.com/es-es/dynamics365/business-central/ui-work-general-journals","appliesTo":"Current Spanish Business Central online documentation; inspected 2026-09-25","accessedDate":"2026-09-25","fields":["Diarios generales page","Registrar action","Posting transfers temporary journal data to ledger entries","Correction and reversal options","VAT and dimensions"]},
+    {"sourceId":"microsoft-learn-general-journals-da","title":"Arbejde med finanskladder, der skal bogføres direkte til Finans","sourceType":"microsoft-learn","sourceUri":"https://learn.microsoft.com/da-dk/dynamics365/business-central/ui-work-general-journals","appliesTo":"Current Danish Business Central online documentation; inspected 2026-09-25","accessedDate":"2026-09-25","fields":["Finanskladder page","Bogfør action","Posting transfers temporary journal data to ledger entries","Correction and reversal options","VAT and dimensions"]},
+    {"sourceId":"microsoft-learn-general-journals-fi","title":"Kirjaaminen suoraan pääkirjanpitoon yleisten päiväkirjojen avulla","sourceType":"microsoft-learn","sourceUri":"https://learn.microsoft.com/fi-fi/dynamics365/business-central/ui-work-general-journals","appliesTo":"Current Finnish Business Central online documentation; inspected 2026-09-25","accessedDate":"2026-09-25","fields":["Yleinen päiväkirja page","Kirjaa action","Posting transfers temporary journal data to ledger entries","Correction and reversal options","VAT and dimensions"]},
+    {"sourceId":"microsoft-learn-general-journals-nb","title":"Arbeid med finanskladder for å bokføre direkte i Finans","sourceType":"microsoft-learn","sourceUri":"https://learn.microsoft.com/nb-no/dynamics365/business-central/ui-work-general-journals","appliesTo":"Current Norwegian Bokmål Business Central online documentation; inspected 2026-09-25","accessedDate":"2026-09-25","fields":["Generelle journaler page","Bokfør action","Posting transfers temporary journal data to ledger entries","Correction and reversal options","VAT and dimensions"]}
+  ]
+}

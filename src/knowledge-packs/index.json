@@ -55,6 +55,11 @@
       "packId": "bc-cash-management",
       "file": "knowledge-packs/cash-management.json",
       "enabled": true
+    },
+    {
+      "packId": "bc-finance",
+      "file": "knowledge-packs/finance.json",
+      "enabled": true
     }
   ]
 }
