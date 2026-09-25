@@ -236,9 +236,24 @@
     });
   }
   function isNoise(event) {
+    // Clicking an empty editable surface only focuses it. Its accessible name
+    // can be a required-field hint rather than a field caption, in any locale.
+    // Keep lookup controls and committed values as documentable interactions.
+    if (event.rawEventType === "click" &&
+        ["activation", "toggle-change"].includes(event.kind) &&
+        ["textbox", "combobox"].includes(event.controlIdentification?.role) &&
+        event.controlIdentification?.controlType === "interactiveSurface" &&
+        event.value?.normalized == null && !event.selection) return true;
+    // A page landmark is layout, not an actionable control. Keep the raw
+    // event as supporting evidence without inventing a Choose instruction.
+    if (event.rawEventType === "click" && event.kind === "activation" &&
+        event.controlIdentification?.role === "main" &&
+        !event.controlIdentification?.fieldId && !event.value?.normalized) return true;
     const caption = String(event.actionIdentification?.caption ||
       event.controlIdentification?.caption || event.rawEvent?.label || "")
       .trim().split(/\s*(?:→|->)\s*/).at(-1);
+    if (["textbox", "searchbox"].includes(event.controlIdentification?.role) &&
+        /^(?:tell me what you want to do|berätta vad du vill göra)\.?$/iu.test(caption)) return true;
     const scrollCommand = /^(?:rulla|scroll)(?:\s+(?:åt|to\s+the))?\s+(?:höger|vänster|upp|ned|ner|right|left|up|down)\.?$/iu.test(caption);
     const displayCommand = /^(?:visa resten|show more|show less|visa mindre|visa sekundära åtgärder|show secondary actions)\.?$/iu.test(caption);
     const control = event.controlIdentification || {};
@@ -398,11 +413,13 @@
         continue;
       }
       emit();
-      if (event.kind === "navigation" && !hasIdentifiedPage(event)) {
+      if (event.kind === "navigation") {
         supportingEvents.push(freeze({
           normalizedEventId: event.normalizedEventId,
           classification: "navigation-state",
-          reason: "anonymous-page-observation"
+          reason: hasIdentifiedPage(event)
+            ? "orphan-page-observation"
+            : "anonymous-page-observation"
         }));
         assignments.set(event.normalizedEventId, "supporting");
         continue;

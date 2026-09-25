@@ -1,5 +1,41 @@
 # Changelog
 
+## 2026-09-25 - Expanded source-backed Business Central process knowledge
+
+- Added English and Swedish recognition for sales and purchase return orders,
+  posted-line reversal, return reasons, corrective credit memos, entry application,
+  credit-memo posting, and invoice cancellation commands.
+- Added Microsoft Learn page references for BC 28 sales and purchase credit memos;
+  process packs now cover 202. unique page identities and 78 sourced action rules.
+- Added cash receipt, payment journal, vendor payment suggestion, and payment-reconciliation
+  actions; the catalog now has 88 sourced actions and 203 distinct documented page IDs.
+- Localized return/correction and cash/payment matching metadata for the eight supported
+  UI languages, with Microsoft Learn provenance per locale where localized coverage is
+  published.
+- Added localized warehouse inventory-pick quantity/posting, warehouse-receipt quantity/posting,
+  and put-away registration matches across all eight UI languages, with localized Microsoft Learn
+  sources and runtime tests.
+- Extended sales/purchase order-line matching to all eight UI languages for item/vendor fields,
+  quantities, partial shipment/receipt, release, and posting, with localized Learn sources and
+  runtime tests. Other warehouse, inventory, manufacturing, and core rules remain narrower.
+- Added production-journal posting and documented output-quantity caption matching across all eight
+  UI languages, with localized Microsoft Learn references and runtime tests. Manufacturing
+  consumption-quantity fields and other manufacturing actions remain English/Swedish.
+- Added a runtime catalog test that resolves the localized sales-return action in all eight
+  locales instead of checking language declarations alone.
+- Kept BC 21 and BC 28 compatibility as separate ranges so undocumented versions
+  remain unresolved. Action matches remain observational and do not claim transfer or posting success.
+
+## 2026-09-24 - Opt-in local knowledge MCP bridge
+
+- Added an off-by-default MCP consent setting and a local connection check.
+- Added an Edge Native Messaging proxy path to the read-only knowledge server;
+  only the two closed-schema knowledge tools are allowed.
+- Connection checks send no Business Central context. Lookup calls require the
+  enabled setting and remain review-only suggestions.
+- Added translations for all eight supported UI languages.
+- Native host compilation and per-user Edge registration remain manual setup steps.
+
 ## 2026-09-13 - PDF-first bug report delivery
 
 - Added Email PDF and Export PDF actions with a paginated support report:

@@ -63,3 +63,18 @@ const report = confidence.evaluate(tasks, sessionGraph);
 assert.ok(report.sessionConfidence >= 80, "Known task should have high session confidence.");
 
 console.log("All engine tests passed.");
+
+const landmark = { type: 'click', category: 'interaction', role: 'main', controlType: 'main', label: 'Actions Product A Product B' };
+assert.equal(noise.isNoise(landmark), true);
+assert.equal(noise.isNoise({ ...landmark, role: 'button', category: 'action' }), false);
+assert.equal(noise.isNoise({ ...landmark, type: 'field-change', value: 'Customer text' }), false);
+assert.equal(noise.isNoise({ ...landmark, reactInteractive: true }), false);
+
+assert.equal(noise.isNoise({type:'field-change',role:'textbox',label:'Tell me what you want to do.',value:'sales ord'}),true);
+
+const emptyFieldFocus = {type:'click',category:'interaction',controlType:'input',inputType:'text',role:'combobox',label:'The value for this field is required.'};
+assert.equal(noise.isNoise(emptyFieldFocus),true);
+assert.equal(noise.isNoise({...emptyFieldFocus,type:'field-change',value:'500'}),false);
+assert.equal(noise.isNoise({...emptyFieldFocus,ariaHasPopup:'listbox'}),false);
+assert.equal(noise.isNoise({...emptyFieldFocus,selectedCaption:'ITEM-1'}),false);
+assert.equal(noise.isNoise({...emptyFieldFocus,type:'error'}),false);

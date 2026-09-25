@@ -25,12 +25,21 @@
 
   function isNoise(event) {
     if (!event) return true;
+    if (event.type === "click" && event.controlType === "input" &&
+        event.inputType === "text" && ["textbox", "combobox"].includes(event.role) &&
+        event.value == null && !event.ariaHasPopup && !event.reactInteractive &&
+        !event.selectedCaption && event.category === "interaction") return true;
+    if (event.type === "click" && event.category === "interaction" &&
+        event.role === "main" && !event.reactInteractive &&
+        !event.fieldId && !event.inputType && event.value == null) return true;
     if (ignoredTypes.has(event.type) || event.type === "dialog-close") return true;
     if (event.type === "click" && event.controlKind === "dialogClose") return true;
     if (["click", "action", "navigation"].includes(event.type) &&
         event.controlKind === "sectionToggle") return true;
 
     const caption = clean(event.fieldName || event.label).split(/\s*(?:→|->)\s*/).at(-1);
+    if (["textbox", "searchbox"].includes(event.role) &&
+        /^(?:tell me what you want to do|berätta vad du vill göra)\.?$/iu.test(caption)) return true;
     // Legacy recordings may lack section metadata. Only suppress a bare section click,
     // never a field interaction or a recorded value.
     if (event.type === "click" && /^(?:vikt|weight)\.?$/iu.test(caption) &&

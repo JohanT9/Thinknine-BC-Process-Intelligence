@@ -39,6 +39,11 @@
         affectedFields: [...new Set([
           ...(before.affectedFields || []), ...(after.affectedFields || [])
         ])].sort(),
+        engineAttributed: Boolean(before.engineAttributed || after.engineAttributed),
+        processFindingCodes: [...new Set([
+          ...(before.processFindingCodes || []),
+          ...(after.processFindingCodes || [])
+        ])].sort(),
         affectedStepCount: Math.max(
           before.affectedStepCount || 0, after.affectedStepCount || 0
         )

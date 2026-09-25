@@ -1,7 +1,7 @@
 {
   "packId": "bc-purchase",
   "name": "Business Central Purchase",
-  "version": "2.0.0",
+  "version": "2.3.0",
   "priority": 200,
   "pageDefinitions": [
     {
@@ -12,14 +12,229 @@
       "recordType": "PurchaseOrder",
       "documentType": "purchase-order",
       "localizedCaptions": {
-        "en-US": ["Purchase Order"],
-        "sv-SE": ["Inköpsorder"],
-        "da-DK": ["Købsordre"]
+        "en-US": [
+          "Purchase Order"
+        ],
+        "sv-SE": [
+          "Inköpsorder"
+        ],
+        "da-DK": [
+          "Købsordre"
+        ]
       },
       "captionRules": [
-        { "locale": "sv-SE", "pattern": "^Inköpsorder$" },
-        { "locale": "en-US", "pattern": "^Purchase Order$" },
-        { "locale": "da-DK", "pattern": "^Købsordre$" }
+        {
+          "locale": "sv-SE",
+          "pattern": "^Inköpsorder$"
+        },
+        {
+          "locale": "en-US",
+          "pattern": "^Purchase Order$"
+        },
+        {
+          "locale": "da-DK",
+          "pattern": "^Købsordre$"
+        }
+      ],
+      "compatibility": {
+        "minAppVersion": "21.0.0",
+        "maxAppVersion": "21.99.99"
+      },
+      "sourceIds": [
+        "microsoft-learn-bc21-actionbar-pages"
+      ]
+    },
+    {
+      "ruleId": "Purchase.PurchaseReturnOrder",
+      "pageObjectId": "6640",
+      "entity": "PurchaseReturnOrder",
+      "pageType": "document",
+      "localizedCaptions": {
+        "en-US": [
+          "Purchase Return Order"
+        ],
+        "sv-SE": [
+          "Inköpsreturorder"
+        ]
+      },
+      "captionRules": [
+        {
+          "locale": "en-US",
+          "pattern": "^Purchase Return Order$"
+        },
+        {
+          "locale": "sv-SE",
+          "pattern": "^Inköpsreturorder$"
+        }
+      ],
+      "compatibility": {
+        "appVersionRanges": [
+          {
+            "minAppVersion": "21.0.0",
+            "maxAppVersion": "21.99.99"
+          }
+        ]
+      },
+      "sourceIds": [
+        "microsoft-learn-bc21-actionbar-pages",
+        "microsoft-learn-purchase-returns",
+        "microsoft-learn-purchase-returns-sv"
+      ]
+    },
+    {
+      "ruleId": "Purchase.PurchaseReturnOrderList",
+      "pageObjectId": "9311",
+      "entity": "PurchaseReturnOrder",
+      "pageType": "list",
+      "localizedCaptions": {
+        "en-US": [
+          "Purchase Return Orders"
+        ],
+        "sv-SE": [
+          "Inköpsreturbeställningar"
+        ]
+      },
+      "captionRules": [
+        {
+          "locale": "en-US",
+          "pattern": "^Purchase Return Orders$"
+        },
+        {
+          "locale": "sv-SE",
+          "pattern": "^Inköpsreturbeställningar$"
+        }
+      ],
+      "compatibility": {
+        "appVersionRanges": [
+          {
+            "minAppVersion": "28.0.0",
+            "maxAppVersion": "28.99.99"
+          }
+        ]
+      },
+      "sourceIds": [
+        "microsoft-learn-bc28-9311",
+        "microsoft-learn-purchase-returns",
+        "microsoft-learn-purchase-returns-sv"
+      ]
+    },
+    {
+      "ruleId": "Purchase.PostedPurchaseInvoices",
+      "pageObjectId": "146",
+      "entity": "PostedPurchaseInvoice",
+      "pageType": "list",
+      "localizedCaptions": {
+        "en-US": [
+          "Posted Purchase Invoices"
+        ],
+        "sv-SE": [
+          "Bokförda inköpsfakturor"
+        ]
+      },
+      "captionRules": [
+        {
+          "locale": "en-US",
+          "pattern": "^Posted Purchase Invoices$"
+        },
+        {
+          "locale": "sv-SE",
+          "pattern": "^Bokförda inköpsfakturor$"
+        }
+      ],
+      "compatibility": {
+        "appVersionRanges": [
+          {
+            "minAppVersion": "21.0.0",
+            "maxAppVersion": "21.99.99"
+          },
+          {
+            "minAppVersion": "28.0.0",
+            "maxAppVersion": "28.99.99"
+          }
+        ]
+      },
+      "sourceIds": [
+        "microsoft-learn-bc21-actionbar-pages",
+        "microsoft-learn-bc28-146",
+        "microsoft-learn-purchase-returns",
+        "microsoft-learn-purchase-returns-sv"
+      ]
+    },
+    {
+      "ruleId": "Purchase.PurchaseCreditMemo",
+      "pageObjectId": "52",
+      "entity": "PurchaseCreditMemo",
+      "pageType": "document",
+      "localizedCaptions": {
+        "en-US": [
+          "Purchase Credit Memo"
+        ],
+        "sv-SE": [
+          "Inköpskreditnota"
+        ]
+      },
+      "captionRules": [
+        {
+          "locale": "en-US",
+          "pattern": "^Purchase Credit Memo$"
+        },
+        {
+          "locale": "sv-SE",
+          "pattern": "^Inköpskreditnota$"
+        }
+      ],
+      "compatibility": {
+        "appVersionRanges": [
+          {
+            "minAppVersion": "21.0.0",
+            "maxAppVersion": "21.99.99"
+          },
+          {
+            "minAppVersion": "28.0.0",
+            "maxAppVersion": "28.99.99"
+          }
+        ]
+      },
+      "sourceIds": [
+        "microsoft-learn-bc21-actionbar-pages",
+        "microsoft-learn-purchase-returns",
+        "microsoft-learn-purchase-returns-sv",
+        "microsoft-learn-bc28-52"
+      ],
+      "technicalName": "PurchaseCreditMemo"
+    },
+    {
+      "ruleId": "Purchase.PurchaseCreditMemos",
+      "pageObjectId": "9309",
+      "entity": "PurchaseCreditMemo",
+      "technicalName": "PurchaseCreditMemos",
+      "pageType": "list",
+      "localizedCaptions": {
+        "en-US": [
+          "Purchase Credit Memos"
+        ],
+        "sv-SE": [
+          "Inköpskreditnotor"
+        ]
+      },
+      "captionRules": [
+        {
+          "locale": "en-US",
+          "pattern": "^Purchase Credit Memos$"
+        }
+      ],
+      "compatibility": {
+        "appVersionRanges": [
+          {
+            "minAppVersion": "28.0.0",
+            "maxAppVersion": "28.99.99"
+          }
+        ]
+      },
+      "sourceIds": [
+        "microsoft-learn-bc28-9309",
+        "microsoft-learn-purchase-returns",
+        "microsoft-learn-purchase-returns-sv"
       ]
     }
   ],
@@ -60,12 +275,49 @@
       "match": {
         "pagePatterns": [
           "inköpsorder",
-          "purchase order"
+          "purchase order",
+          "^Inköpsorder$",
+          "^Inköpsordrar$",
+          "^Inköpsfaktura$",
+          "^Purchase Order$",
+          "^Purchase Orders$",
+          "^Purchase Invoice$",
+          "^Purchase Invoices$",
+          "^Commande achat$",
+          "^Commandes achat$",
+          "^Commandes d’achat$",
+          "^Facture achat$",
+          "^Bestellung$",
+          "^Bestellungen$",
+          "^Einkaufsbestellung$",
+          "^Einkaufsrechnung$",
+          "^Pedido de compra$",
+          "^Pedidos de compra$",
+          "^Factura de compra$",
+          "^Indkøbsordre$",
+          "^Indkøbsordrer$",
+          "^Købsfaktura$",
+          "^Ostotilaus$",
+          "^Ostotilaukset$",
+          "^Ostolasku$",
+          "^Bestilling$",
+          "^Bestillinger$",
+          "^Kjøpsfaktura$"
         ],
         "actionPatterns": [
           "^Släpp$",
           "^Frisläpp$",
-          "^Release$"
+          "^Release$",
+          "^Lancer$",
+          "^Freigabe$",
+          "^Liberar$",
+          "^Lanzar$",
+          "^Frigiv$",
+          "^Frigivelse$",
+          "^Vapauta$",
+          "^Julkaisu$",
+          "^Frigi$",
+          "^Utgivelse$"
         ],
         "fieldPatterns": [],
         "automationIdPatterns": []
@@ -73,9 +325,25 @@
       "instructionTemplate": "",
       "languages": [
         "sv-SE",
-        "en-US"
+        "en-US",
+        "fr-FR",
+        "de-DE",
+        "es-ES",
+        "da-DK",
+        "fi-FI",
+        "nb-NO"
       ],
-      "aliases": []
+      "aliases": [],
+      "sourceIds": [
+        "microsoft-learn-purchase-recording-sv",
+        "microsoft-learn-purchase-recording",
+        "microsoft-learn-purchase-recording-fr",
+        "microsoft-learn-purchase-recording-de",
+        "microsoft-learn-purchase-recording-es",
+        "microsoft-learn-purchase-recording-da",
+        "microsoft-learn-purchase-recording-fi",
+        "microsoft-learn-purchase-recording-nb"
+      ]
     },
     {
       "ruleId": "Purchase.Reopen",
@@ -114,11 +382,45 @@
         "pagePatterns": [
           "inköpsorder",
           "purchase order",
-          "inköpsfaktura"
+          "inköpsfaktura",
+          "^Inköpsorder$",
+          "^Inköpsordrar$",
+          "^Inköpsfaktura$",
+          "^Purchase Order$",
+          "^Purchase Orders$",
+          "^Purchase Invoice$",
+          "^Purchase Invoices$",
+          "^Commande achat$",
+          "^Commandes achat$",
+          "^Commandes d’achat$",
+          "^Facture achat$",
+          "^Bestellung$",
+          "^Bestellungen$",
+          "^Einkaufsbestellung$",
+          "^Einkaufsrechnung$",
+          "^Pedido de compra$",
+          "^Pedidos de compra$",
+          "^Factura de compra$",
+          "^Indkøbsordre$",
+          "^Indkøbsordrer$",
+          "^Købsfaktura$",
+          "^Ostotilaus$",
+          "^Ostotilaukset$",
+          "^Ostolasku$",
+          "^Bestilling$",
+          "^Bestillinger$",
+          "^Kjøpsfaktura$"
         ],
         "actionPatterns": [
           "^Bokför$",
-          "^Post$"
+          "^Post$",
+          "^Valider$",
+          "^Buchen$",
+          "^Posten$",
+          "^Registrar$",
+          "^Bogfør$",
+          "^Kirjaa$",
+          "^Bokfør$"
         ],
         "fieldPatterns": [],
         "automationIdPatterns": []
@@ -126,9 +428,25 @@
       "instructionTemplate": "",
       "languages": [
         "sv-SE",
-        "en-US"
+        "en-US",
+        "fr-FR",
+        "de-DE",
+        "es-ES",
+        "da-DK",
+        "fi-FI",
+        "nb-NO"
       ],
-      "aliases": []
+      "aliases": [],
+      "sourceIds": [
+        "microsoft-learn-purchase-recording-sv",
+        "microsoft-learn-purchase-recording",
+        "microsoft-learn-purchase-recording-fr",
+        "microsoft-learn-purchase-recording-de",
+        "microsoft-learn-purchase-recording-es",
+        "microsoft-learn-purchase-recording-da",
+        "microsoft-learn-purchase-recording-fi",
+        "microsoft-learn-purchase-recording-nb"
+      ]
     },
     {
       "ruleId": "Purchase.SelectVendor",
@@ -138,20 +456,72 @@
       "priority": 900,
       "confidence": 0.95,
       "match": {
-        "pagePatterns": [],
+        "pagePatterns": [
+          "^Inköpsorder$",
+          "^Inköpsordrar$",
+          "^Inköpsfaktura$",
+          "^Purchase Order$",
+          "^Purchase Orders$",
+          "^Purchase Invoice$",
+          "^Purchase Invoices$",
+          "^Commande achat$",
+          "^Commandes achat$",
+          "^Commandes d’achat$",
+          "^Facture achat$",
+          "^Bestellung$",
+          "^Bestellungen$",
+          "^Einkaufsbestellung$",
+          "^Einkaufsrechnung$",
+          "^Pedido de compra$",
+          "^Pedidos de compra$",
+          "^Factura de compra$",
+          "^Indkøbsordre$",
+          "^Indkøbsordrer$",
+          "^Købsfaktura$",
+          "^Ostotilaus$",
+          "^Ostotilaukset$",
+          "^Ostolasku$",
+          "^Bestilling$",
+          "^Bestillinger$",
+          "^Kjøpsfaktura$"
+        ],
         "actionPatterns": [],
         "fieldPatterns": [
-          "leverantörsnr",
-          "vendor no"
+          "^leverantörsnr$",
+          "^vendor no$",
+          "^Leverantörsnamn$",
+          "^Vendor Name$",
+          "^Nom fournisseur$",
+          "^Kreditorenname$",
+          "^Nombre del proveedor$",
+          "^Kreditornavn$",
+          "^Toimittajan nimi$",
+          "^Leverandørnavn$"
         ],
         "automationIdPatterns": []
       },
       "instructionTemplate": "",
       "languages": [
         "sv-SE",
-        "en-US"
+        "en-US",
+        "fr-FR",
+        "de-DE",
+        "es-ES",
+        "da-DK",
+        "fi-FI",
+        "nb-NO"
       ],
-      "aliases": []
+      "aliases": [],
+      "sourceIds": [
+        "microsoft-learn-purchase-recording-sv",
+        "microsoft-learn-purchase-recording",
+        "microsoft-learn-purchase-recording-fr",
+        "microsoft-learn-purchase-recording-de",
+        "microsoft-learn-purchase-recording-es",
+        "microsoft-learn-purchase-recording-da",
+        "microsoft-learn-purchase-recording-fi",
+        "microsoft-learn-purchase-recording-nb"
+      ]
     },
     {
       "ruleId": "Purchase.ChangeExpectedReceiptDate",
@@ -175,6 +545,1048 @@
         "en-US"
       ],
       "aliases": []
+    },
+    {
+      "ruleId": "Purchase.SetQtyToReceive",
+      "taskType": "SetPurchaseQtyToReceive",
+      "semanticAction": "EnterQuantity",
+      "entity": "PurchaseOrderLine",
+      "priority": 1300,
+      "confidence": 0.98,
+      "match": {
+        "pagePatterns": [
+          "purchase order",
+          "inköpsorder",
+          "Inköpsorder",
+          "^Inköpsordrar$",
+          "^Inköpsfaktura$",
+          "^Purchase Order$",
+          "^Purchase Orders$",
+          "^Purchase Invoice$",
+          "^Purchase Invoices$",
+          "^Commande achat$",
+          "^Commandes achat$",
+          "^Commandes d’achat$",
+          "^Facture achat$",
+          "^Bestellung$",
+          "^Bestellungen$",
+          "^Einkaufsbestellung$",
+          "^Einkaufsrechnung$",
+          "^Pedido de compra$",
+          "^Pedidos de compra$",
+          "^Factura de compra$",
+          "^Indkøbsordre$",
+          "^Indkøbsordrer$",
+          "^Købsfaktura$",
+          "^Ostotilaus$",
+          "^Ostotilaukset$",
+          "^Ostolasku$",
+          "^Bestilling$",
+          "^Bestillinger$",
+          "^Kjøpsfaktura$"
+        ],
+        "actionPatterns": [],
+        "fieldPatterns": [
+          "^Qty\\. to Receive$",
+          "^Quantity to Receive$",
+          "^Inlevereras antal$",
+          "^Inlevereras antal$",
+          "^Qty\\. to Receive$",
+          "^Qté à recevoir$",
+          "^Menge akt\\. Lieferung$",
+          "^Cantidad a recibir$",
+          "^Modtag \\(antal\\)$",
+          "^Vastaanotettava määrä$",
+          "^Motta \\(antall\\)$"
+        ],
+        "automationIdPatterns": []
+      },
+      "instructionTemplate": "",
+      "languages": [
+        "sv-SE",
+        "en-US",
+        "fr-FR",
+        "de-DE",
+        "es-ES",
+        "da-DK",
+        "fi-FI",
+        "nb-NO"
+      ],
+      "aliases": [],
+      "sourceIds": [
+        "microsoft-learn-purchase-recording",
+        "microsoft-learn-purchase-recording-sv",
+        "microsoft-learn-purchase-recording-fr",
+        "microsoft-learn-purchase-recording-de",
+        "microsoft-learn-purchase-recording-es",
+        "microsoft-learn-purchase-recording-da",
+        "microsoft-learn-purchase-recording-fi",
+        "microsoft-learn-purchase-recording-nb"
+      ]
+    },
+    {
+      "ruleId": "Purchase.SelectPurchaseLineItem",
+      "taskType": "SelectPurchaseLineItem",
+      "semanticAction": "SelectItem",
+      "entity": "PurchaseOrderLine",
+      "priority": 1280,
+      "confidence": 0.97,
+      "match": {
+        "pagePatterns": [
+          "purchase order",
+          "inköpsorder",
+          "^Inköpsorder$",
+          "^Inköpsordrar$",
+          "^Inköpsfaktura$",
+          "^Purchase Order$",
+          "^Purchase Orders$",
+          "^Purchase Invoice$",
+          "^Purchase Invoices$",
+          "^Commande achat$",
+          "^Commandes achat$",
+          "^Commandes d’achat$",
+          "^Facture achat$",
+          "^Bestellung$",
+          "^Bestellungen$",
+          "^Einkaufsbestellung$",
+          "^Einkaufsrechnung$",
+          "^Pedido de compra$",
+          "^Pedidos de compra$",
+          "^Factura de compra$",
+          "^Indkøbsordre$",
+          "^Indkøbsordrer$",
+          "^Købsfaktura$",
+          "^Ostotilaus$",
+          "^Ostotilaukset$",
+          "^Ostolasku$",
+          "^Bestilling$",
+          "^Bestillinger$",
+          "^Kjøpsfaktura$"
+        ],
+        "actionPatterns": [],
+        "fieldPatterns": [
+          "^Item No\\.?$",
+          "^No\\.?$",
+          "^Artikelnr$",
+          "^Artikelnr$",
+          "^Item No\\.$",
+          "^N° article$",
+          "^Positionsnummer$",
+          "^N\\.º producto$",
+          "^Varenr\\.$",
+          "^Nimikkeen nro$"
+        ],
+        "automationIdPatterns": []
+      },
+      "instructionTemplate": "",
+      "languages": [
+        "sv-SE",
+        "en-US",
+        "fr-FR",
+        "de-DE",
+        "es-ES",
+        "da-DK",
+        "fi-FI",
+        "nb-NO"
+      ],
+      "aliases": [],
+      "sourceIds": [
+        "microsoft-learn-purchase-recording",
+        "microsoft-learn-purchase-recording-sv",
+        "microsoft-learn-purchase-recording-fr",
+        "microsoft-learn-purchase-recording-de",
+        "microsoft-learn-purchase-recording-es",
+        "microsoft-learn-purchase-recording-da",
+        "microsoft-learn-purchase-recording-fi",
+        "microsoft-learn-purchase-recording-nb"
+      ]
+    },
+    {
+      "ruleId": "Purchase.SetPurchaseLineQuantity",
+      "taskType": "SetPurchaseLineQuantity",
+      "semanticAction": "EnterQuantity",
+      "entity": "PurchaseOrderLine",
+      "priority": 1280,
+      "confidence": 0.97,
+      "match": {
+        "pagePatterns": [
+          "purchase order",
+          "inköpsorder",
+          "^Inköpsorder$",
+          "^Inköpsordrar$",
+          "^Inköpsfaktura$",
+          "^Purchase Order$",
+          "^Purchase Orders$",
+          "^Purchase Invoice$",
+          "^Purchase Invoices$",
+          "^Commande achat$",
+          "^Commandes achat$",
+          "^Commandes d’achat$",
+          "^Facture achat$",
+          "^Bestellung$",
+          "^Bestellungen$",
+          "^Einkaufsbestellung$",
+          "^Einkaufsrechnung$",
+          "^Pedido de compra$",
+          "^Pedidos de compra$",
+          "^Factura de compra$",
+          "^Indkøbsordre$",
+          "^Indkøbsordrer$",
+          "^Købsfaktura$",
+          "^Ostotilaus$",
+          "^Ostotilaukset$",
+          "^Ostolasku$",
+          "^Bestilling$",
+          "^Bestillinger$",
+          "^Kjøpsfaktura$"
+        ],
+        "actionPatterns": [],
+        "fieldPatterns": [
+          "^Quantity$",
+          "^Kvantitet$",
+          "^Kvantitet$",
+          "^Quantity$",
+          "^Quantité$",
+          "^Menge$",
+          "^Cantidad$",
+          "^Antal$",
+          "^Määrä$",
+          "^Antall$"
+        ],
+        "automationIdPatterns": []
+      },
+      "instructionTemplate": "",
+      "languages": [
+        "sv-SE",
+        "en-US",
+        "fr-FR",
+        "de-DE",
+        "es-ES",
+        "da-DK",
+        "fi-FI",
+        "nb-NO"
+      ],
+      "aliases": [],
+      "sourceIds": [
+        "microsoft-learn-purchase-recording",
+        "microsoft-learn-purchase-recording-sv",
+        "microsoft-learn-purchase-recording-fr",
+        "microsoft-learn-purchase-recording-de",
+        "microsoft-learn-purchase-recording-es",
+        "microsoft-learn-purchase-recording-da",
+        "microsoft-learn-purchase-recording-fi",
+        "microsoft-learn-purchase-recording-nb"
+      ]
+    },
+    {
+      "ruleId": "Purchase.OpenPurchaseReturnOrder",
+      "taskType": "OpenPurchaseReturnOrder",
+      "semanticAction": "OpenRecord",
+      "entity": "PurchaseReturnOrder",
+      "priority": 1310,
+      "confidence": 0.97,
+      "match": {
+        "pagePatterns": [
+          "purchase return order",
+          "purchase return orders",
+          "inköpsreturorder",
+          "inköpsreturbeställningar",
+          "commandes de retour d'achat",
+          "rückkauf-aufträge",
+          "pedidos de devolución de compra",
+          "købsreturvareordrer",
+          "ostopalautustilaukset",
+          "kjøpsreturordrer"
+        ],
+        "actionPatterns": [
+          "^open record$",
+          "^öppna post$",
+          "^ouvrir la fiche$",
+          "^datensatz öffnen$",
+          "^abrir registro$",
+          "^åbn post$",
+          "^avaa tietue$",
+          "^åpne post$"
+        ],
+        "fieldPatterns": [],
+        "automationIdPatterns": []
+      },
+      "instructionTemplate": "",
+      "languages": [
+        "sv-SE",
+        "en-US",
+        "fr-FR",
+        "de-DE",
+        "es-ES",
+        "da-DK",
+        "fi-FI",
+        "nb-NO"
+      ],
+      "aliases": [],
+      "sourceIds": [
+        "microsoft-learn-purchase-returns",
+        "microsoft-learn-purchase-returns-sv",
+        "microsoft-learn-purchase-returns-fr",
+        "microsoft-learn-purchase-returns-de",
+        "microsoft-learn-purchase-returns-es",
+        "microsoft-learn-purchase-returns-da",
+        "microsoft-learn-purchase-returns-fi",
+        "microsoft-learn-purchase-returns-nb"
+      ]
+    },
+    {
+      "ruleId": "Purchase.GetPostedLinesToReverse",
+      "taskType": "GetPostedPurchaseLinesToReverse",
+      "semanticAction": "SelectSourceDocumentLines",
+      "entity": "PurchaseReturnOrder",
+      "priority": 1320,
+      "confidence": 0.97,
+      "match": {
+        "pagePatterns": [
+          "purchase return order",
+          "purchase return orders",
+          "inköpsreturorder",
+          "inköpsreturbeställningar",
+          "commandes de retour d'achat",
+          "rückkauf-aufträge",
+          "pedidos de devolución de compra",
+          "købsreturvareordrer",
+          "ostopalautustilaukset",
+          "kjøpsreturordrer"
+        ],
+        "actionPatterns": [
+          "^get posted document lines to reverse$",
+          "^hämta bokförda dokumentrader (?:för reversering|som ska återföras)$",
+          "^afficher des lignes document validées à contrepasser$",
+          "^zu stornierende gebuchte belegzeilen abrufen$",
+          "^revertir líneas documentos registrados$",
+          "^hent bogførte bilagslinjer, der skal tilbageføres$",
+          "^hae peruutettavat kirjatut asiakirjarivit$",
+          "^hent bokførte dokumentlinjer som skal tilbakeføres$"
+        ],
+        "fieldPatterns": [],
+        "automationIdPatterns": []
+      },
+      "instructionTemplate": "",
+      "languages": [
+        "sv-SE",
+        "en-US",
+        "fr-FR",
+        "de-DE",
+        "es-ES",
+        "da-DK",
+        "fi-FI",
+        "nb-NO"
+      ],
+      "aliases": [],
+      "sourceIds": [
+        "microsoft-learn-purchase-returns",
+        "microsoft-learn-purchase-returns-sv",
+        "microsoft-learn-purchase-returns-fr",
+        "microsoft-learn-purchase-returns-de",
+        "microsoft-learn-purchase-returns-es",
+        "microsoft-learn-purchase-returns-da",
+        "microsoft-learn-purchase-returns-fi",
+        "microsoft-learn-purchase-returns-nb"
+      ]
+    },
+    {
+      "ruleId": "Purchase.SetReturnReasonCode",
+      "taskType": "SetPurchaseReturnReasonCode",
+      "semanticAction": "SetReturnReason",
+      "entity": "PurchaseReturnLine",
+      "priority": 1320,
+      "confidence": 0.97,
+      "match": {
+        "pagePatterns": [
+          "purchase return order",
+          "purchase return orders",
+          "inköpsreturorder",
+          "inköpsreturbeställningar",
+          "commandes de retour d'achat",
+          "rückkauf-aufträge",
+          "pedidos de devolución de compra",
+          "købsreturvareordrer",
+          "ostopalautustilaukset",
+          "kjøpsreturordrer"
+        ],
+        "actionPatterns": [],
+        "fieldPatterns": [
+          "^return reason code$",
+          "^returorsakskod$",
+          "^code motif retour$",
+          "^reklamationsgrundcode$",
+          "^cód\\. motivo devolución$",
+          "^returårsagskode$",
+          "^palautuksen syykoodi$",
+          "^returårsakskode$"
+        ],
+        "automationIdPatterns": []
+      },
+      "instructionTemplate": "",
+      "languages": [
+        "sv-SE",
+        "en-US",
+        "fr-FR",
+        "de-DE",
+        "es-ES",
+        "da-DK",
+        "fi-FI",
+        "nb-NO"
+      ],
+      "aliases": [],
+      "sourceIds": [
+        "microsoft-learn-purchase-returns",
+        "microsoft-learn-purchase-returns-sv",
+        "microsoft-learn-purchase-returns-fr",
+        "microsoft-learn-purchase-returns-de",
+        "microsoft-learn-purchase-returns-es",
+        "microsoft-learn-purchase-returns-da",
+        "microsoft-learn-purchase-returns-fi",
+        "microsoft-learn-purchase-returns-nb"
+      ]
+    },
+    {
+      "ruleId": "Purchase.PostPurchaseReturnOrder",
+      "taskType": "PostPurchaseReturnOrder",
+      "semanticAction": "PostDocument",
+      "entity": "PurchaseReturnOrder",
+      "priority": 1320,
+      "confidence": 0.97,
+      "match": {
+        "pagePatterns": [
+          "purchase return order",
+          "purchase return orders",
+          "inköpsreturorder",
+          "inköpsreturbeställningar",
+          "commandes de retour d'achat",
+          "rückkauf-aufträge",
+          "pedidos de devolución de compra",
+          "købsreturvareordrer",
+          "ostopalautustilaukset",
+          "kjøpsreturordrer"
+        ],
+        "actionPatterns": [
+          "^post$",
+          "^bokföra$",
+          "^valider$",
+          "^buchen$",
+          "^registrar$",
+          "^bogfør$",
+          "^kirjaa$",
+          "^bokfør$"
+        ],
+        "fieldPatterns": [],
+        "automationIdPatterns": []
+      },
+      "instructionTemplate": "",
+      "languages": [
+        "sv-SE",
+        "en-US",
+        "fr-FR",
+        "de-DE",
+        "es-ES",
+        "da-DK",
+        "fi-FI",
+        "nb-NO"
+      ],
+      "aliases": [],
+      "sourceIds": [
+        "microsoft-learn-purchase-returns",
+        "microsoft-learn-purchase-returns-sv",
+        "microsoft-learn-purchase-returns-fr",
+        "microsoft-learn-purchase-returns-de",
+        "microsoft-learn-purchase-returns-es",
+        "microsoft-learn-purchase-returns-da",
+        "microsoft-learn-purchase-returns-fi",
+        "microsoft-learn-purchase-returns-nb"
+      ]
+    },
+    {
+      "ruleId": "Purchase.CreateCorrectiveCreditMemo",
+      "taskType": "CreatePurchaseCorrectiveCreditMemo",
+      "semanticAction": "CreateCreditMemo",
+      "entity": "PostedPurchaseInvoice",
+      "priority": 1320,
+      "confidence": 0.97,
+      "match": {
+        "pagePatterns": [
+          "posted purchase invoices",
+          "bokförda inköpsfakturor",
+          "factures achat validées",
+          "gebuchte einkaufsrechnungen",
+          "facturas de compra registradas",
+          "bogførte købsfakturaer",
+          "kirjatut ostolaskut",
+          "bokførte kjøpsfakturaer"
+        ],
+        "actionPatterns": [
+          "^create corrective credit memo$",
+          "^skapa korrigerande kreditnota$",
+          "^créer un avoir correctif$",
+          "^korrekturgutschrift erstellen$",
+          "^crear un abono correctivo$",
+          "^opret rettelseskreditnota$",
+          "^luo korjaava hyvityslasku$",
+          "^opprett korrigerende kreditnota$"
+        ],
+        "fieldPatterns": [],
+        "automationIdPatterns": []
+      },
+      "instructionTemplate": "",
+      "languages": [
+        "sv-SE",
+        "en-US",
+        "fr-FR",
+        "de-DE",
+        "es-ES",
+        "da-DK",
+        "fi-FI",
+        "nb-NO"
+      ],
+      "aliases": [],
+      "sourceIds": [
+        "microsoft-learn-purchase-returns",
+        "microsoft-learn-purchase-returns-sv",
+        "microsoft-learn-purchase-returns-fr",
+        "microsoft-learn-purchase-returns-de",
+        "microsoft-learn-purchase-returns-es",
+        "microsoft-learn-purchase-returns-da",
+        "microsoft-learn-purchase-returns-fi",
+        "microsoft-learn-purchase-returns-nb"
+      ]
+    },
+    {
+      "ruleId": "Purchase.CancelUnpaidPostedInvoice",
+      "taskType": "CancelPurchaseInvoice",
+      "semanticAction": "CancelInvoice",
+      "entity": "PostedPurchaseInvoice",
+      "priority": 1320,
+      "confidence": 0.97,
+      "match": {
+        "pagePatterns": [
+          "posted purchase invoices",
+          "bokförda inköpsfakturor",
+          "factures achat validées",
+          "gebuchte einkaufsrechnungen",
+          "facturas de compra registradas",
+          "bogførte købsfakturaer",
+          "kirjatut ostolaskut",
+          "bokførte kjøpsfakturaer"
+        ],
+        "actionPatterns": [
+          "^cancel$",
+          "^avbryt$",
+          "^annuler$",
+          "^stornieren$",
+          "^cancelar$",
+          "^annuller$",
+          "^peruuta$",
+          "^avbryt$"
+        ],
+        "fieldPatterns": [],
+        "automationIdPatterns": []
+      },
+      "instructionTemplate": "",
+      "languages": [
+        "sv-SE",
+        "en-US",
+        "fr-FR",
+        "de-DE",
+        "es-ES",
+        "da-DK",
+        "fi-FI",
+        "nb-NO"
+      ],
+      "aliases": [],
+      "sourceIds": [
+        "microsoft-learn-purchase-returns",
+        "microsoft-learn-purchase-returns-sv",
+        "microsoft-learn-purchase-returns-fr",
+        "microsoft-learn-purchase-returns-de",
+        "microsoft-learn-purchase-returns-es",
+        "microsoft-learn-purchase-returns-da",
+        "microsoft-learn-purchase-returns-fi",
+        "microsoft-learn-purchase-returns-nb"
+      ]
+    },
+    {
+      "ruleId": "Purchase.CopyToCreditMemo",
+      "taskType": "CopyToPurchaseCreditMemo",
+      "semanticAction": "CopyDocument",
+      "entity": "PurchaseCreditMemo",
+      "priority": 1320,
+      "confidence": 0.97,
+      "match": {
+        "pagePatterns": [
+          "purchase credit memo",
+          "inköpskreditnota",
+          "avoir achat",
+          "einkaufsgutschrift",
+          "abono de compra",
+          "købskreditnota",
+          "ostohyvityslasku",
+          "kjøpskreditnota"
+        ],
+        "actionPatterns": [
+          "^copy from document$",
+          "^kopiera från dokument$",
+          "^copier à partir du document$",
+          "^aus dokument kopieren$",
+          "^copiar de documento$",
+          "^kopiér fra dokument$",
+          "^kopioi asiakirjasta$",
+          "^kopier fra dokument$"
+        ],
+        "fieldPatterns": [],
+        "automationIdPatterns": []
+      },
+      "instructionTemplate": "",
+      "languages": [
+        "sv-SE",
+        "en-US",
+        "fr-FR",
+        "de-DE",
+        "es-ES",
+        "da-DK",
+        "fi-FI",
+        "nb-NO"
+      ],
+      "aliases": [],
+      "sourceIds": [
+        "microsoft-learn-purchase-returns",
+        "microsoft-learn-purchase-returns-sv",
+        "microsoft-learn-purchase-returns-fr",
+        "microsoft-learn-purchase-returns-de",
+        "microsoft-learn-purchase-returns-es",
+        "microsoft-learn-purchase-returns-da",
+        "microsoft-learn-purchase-returns-fi",
+        "microsoft-learn-purchase-returns-nb"
+      ]
+    },
+    {
+      "ruleId": "Purchase.PostPurchaseCreditMemo",
+      "taskType": "PostPurchaseCreditMemo",
+      "semanticAction": "PostDocument",
+      "entity": "PurchaseCreditMemo",
+      "priority": 1320,
+      "confidence": 0.97,
+      "match": {
+        "pagePatterns": [
+          "purchase credit memo",
+          "inköpskreditnota",
+          "avoir achat",
+          "einkaufsgutschrift",
+          "abono de compra",
+          "købskreditnota",
+          "ostohyvityslasku",
+          "kjøpskreditnota"
+        ],
+        "actionPatterns": [
+          "^post$",
+          "^bokföra$",
+          "^valider$",
+          "^buchen$",
+          "^registrar$",
+          "^bogfør$",
+          "^kirjaa$",
+          "^bokfør$"
+        ],
+        "fieldPatterns": [],
+        "automationIdPatterns": []
+      },
+      "instructionTemplate": "",
+      "languages": [
+        "sv-SE",
+        "en-US",
+        "fr-FR",
+        "de-DE",
+        "es-ES",
+        "da-DK",
+        "fi-FI",
+        "nb-NO"
+      ],
+      "aliases": [],
+      "sourceIds": [
+        "microsoft-learn-purchase-returns",
+        "microsoft-learn-purchase-returns-sv",
+        "microsoft-learn-purchase-returns-fr",
+        "microsoft-learn-purchase-returns-de",
+        "microsoft-learn-purchase-returns-es",
+        "microsoft-learn-purchase-returns-da",
+        "microsoft-learn-purchase-returns-fi",
+        "microsoft-learn-purchase-returns-nb"
+      ]
+    },
+    {
+      "ruleId": "Purchase.ApplyCreditMemoEntries",
+      "taskType": "ApplyPurchaseCreditMemoEntries",
+      "semanticAction": "ApplyEntries",
+      "entity": "PurchaseCreditMemo",
+      "priority": 1320,
+      "confidence": 0.97,
+      "match": {
+        "pagePatterns": [
+          "purchase credit memo",
+          "inköpskreditnota",
+          "avoir achat",
+          "einkaufsgutschrift",
+          "abono de compra",
+          "købskreditnota",
+          "ostohyvityslasku",
+          "kjøpskreditnota"
+        ],
+        "actionPatterns": [
+          "^apply entries$",
+          "^koppla transaktioner$",
+          "^lettrer écritures$",
+          "^posten ausgleichen$",
+          "^liquidar movimientos$",
+          "^udlign poster$",
+          "^kohdista tapahtumat$",
+          "^utligne poster$"
+        ],
+        "fieldPatterns": [],
+        "automationIdPatterns": []
+      },
+      "instructionTemplate": "",
+      "languages": [
+        "sv-SE",
+        "en-US",
+        "fr-FR",
+        "de-DE",
+        "es-ES",
+        "da-DK",
+        "fi-FI",
+        "nb-NO"
+      ],
+      "aliases": [],
+      "sourceIds": [
+        "microsoft-learn-purchase-returns",
+        "microsoft-learn-purchase-returns-sv",
+        "microsoft-learn-purchase-returns-fr",
+        "microsoft-learn-purchase-returns-de",
+        "microsoft-learn-purchase-returns-es",
+        "microsoft-learn-purchase-returns-da",
+        "microsoft-learn-purchase-returns-fi",
+        "microsoft-learn-purchase-returns-nb"
+      ]
+    }
+  ],
+  "sources": [
+    {
+      "sourceId": "microsoft-learn-bc21-actionbar-pages",
+      "title": "Pages with Action Bar Improvements",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/en-us/dynamics365/business-central/dev-itpro/developer/devenv-pages-action-bar-improvements",
+      "appliesTo": "Business Central 2022 release wave 2 (version 21.0)",
+      "publishedDate": "2022-11-09",
+      "accessedDate": "2026-09-25",
+      "fields": [
+        "pageObjectId",
+        "caption",
+        "pageType"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-purchase-recording",
+      "title": "Record purchases with purchase invoices and orders",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/en-us/dynamics365/business-central/purchasing-how-record-purchases",
+      "appliesTo": "Current Business Central online documentation; inspected 2026-09-25",
+      "accessedDate": "2026-09-25",
+      "fields": [
+        "vendor",
+        "item and quantity",
+        "purchase receipt",
+        "invoice and posting",
+        "warehouse handling caveat"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-purchase-recording-sv",
+      "title": "Registrera inköp med inköpsfakturor och order",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/sv-se/dynamics365/business-central/purchasing-how-record-purchases",
+      "appliesTo": "Current Swedish Business Central online documentation; inspected 2026-09-25",
+      "accessedDate": "2026-09-25",
+      "fields": [
+        "vendor and purchase lines",
+        "item number",
+        "quantity",
+        "quantity to receive",
+        "purchase receipt"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-purchase-returns",
+      "title": "Process purchase returns and cancellations",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/en-us/dynamics365/business-central/purchasing-how-process-purchase-returns-cancellations",
+      "appliesTo": "Current Business Central online documentation; inspected 2026-09-25",
+      "accessedDate": "2026-09-25",
+      "fields": [
+        "purchase credit memos",
+        "purchase return orders",
+        "get posted document lines to reverse",
+        "return reason code",
+        "posting"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-purchase-returns-sv",
+      "title": "Hantera inköpsreturer och annulleringar",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/sv-se/dynamics365/business-central/purchasing-how-process-purchase-returns-cancellations",
+      "appliesTo": "Current Business Central online documentation; inspected 2026-09-25",
+      "accessedDate": "2026-09-25",
+      "fields": [
+        "inköpskreditnotor",
+        "inköpsreturorder",
+        "Hämta bokförda dokumentrader för reversering",
+        "Returorsakskod",
+        "Bokföra"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-bc28-9311",
+      "title": "Page 9311 Purchase Return Order List",
+      "sourceType": "microsoft-learn-application-reference",
+      "sourceUri": "https://learn.microsoft.com/en-us/dynamics365/business-central/application/base-application/page/microsoft.purchases.document.purchase-return-order-list",
+      "appliesTo": "Business Central 2026 release wave 1 (version 28.x)",
+      "accessedDate": "2026-09-25",
+      "fields": [
+        "pageObjectId",
+        "caption",
+        "pageType",
+        "sourceTable",
+        "description"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-bc28-146",
+      "title": "Page 146 Posted Purchase Invoices",
+      "sourceType": "microsoft-learn-application-reference",
+      "sourceUri": "https://learn.microsoft.com/en-us/dynamics365/business-central/application/base-application/page/microsoft.purchases.history.posted-purchase-invoices",
+      "appliesTo": "Business Central 2026 release wave 1 (version 28.x)",
+      "accessedDate": "2026-09-25",
+      "fields": [
+        "pageObjectId",
+        "caption",
+        "pageType",
+        "sourceTable",
+        "description"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-bc28-52",
+      "title": "Page 52 Purchase Credit Memo",
+      "sourceType": "microsoft-learn-application-reference",
+      "sourceUri": "https://learn.microsoft.com/en-us/dynamics365/business-central/application/base-application/page/microsoft.purchases.document.purchase-credit-memo",
+      "appliesTo": "Business Central 2026 release wave 1 (version 28.x)",
+      "accessedDate": "2026-09-25",
+      "fields": [
+        "pageObjectId",
+        "caption",
+        "pageType",
+        "sourceTable",
+        "description"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-bc28-9309",
+      "title": "Page 9309 Purchase Credit Memos",
+      "sourceType": "microsoft-learn-application-reference",
+      "sourceUri": "https://learn.microsoft.com/en-us/dynamics365/business-central/application/base-application/page/microsoft.purchases.document.purchase-credit-memos",
+      "appliesTo": "Business Central 2026 release wave 1 (version 28.x)",
+      "accessedDate": "2026-09-25",
+      "fields": [
+        "pageObjectId",
+        "caption",
+        "pageType",
+        "sourceTable",
+        "description"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-purchase-returns-fr",
+      "title": "Traiter les retours ou annulations d’achats",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/fr-fr/dynamics365/business-central/purchasing-how-process-purchase-returns-cancellations",
+      "appliesTo": "Localized current Business Central online documentation (fr-FR); inspected 2026-09-25",
+      "accessedDate": "2026-09-25",
+      "fields": [
+        "commande de retour achat",
+        "factures achat validées",
+        "avoir achat",
+        "annuler",
+        "créer un avoir correctif",
+        "copier document",
+        "lettrer écritures",
+        "valider",
+        "code motif retour"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-purchase-returns-de",
+      "title": "Rücklieferungen oder Stornierungen verarbeiten",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/de-de/dynamics365/business-central/purchasing-how-process-purchase-returns-cancellations",
+      "appliesTo": "Localized current Business Central online documentation (de-DE); inspected 2026-09-25",
+      "accessedDate": "2026-09-25",
+      "fields": [
+        "einkaufsrückgabeauftrag",
+        "gebuchte einkaufsrechnungen",
+        "einkaufsgutschrift",
+        "stornieren",
+        "korrekturgutschrift erstellen",
+        "dokument kopieren",
+        "posten ausgleichen",
+        "buchen",
+        "rückgabegrundcode"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-purchase-returns-es",
+      "title": "Procesamiento de devoluciones o cancelaciones",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/es-es/dynamics365/business-central/purchasing-how-process-purchase-returns-cancellations",
+      "appliesTo": "Localized current Business Central online documentation (es-ES); inspected 2026-09-25",
+      "accessedDate": "2026-09-25",
+      "fields": [
+        "pedido de devolución de compra",
+        "facturas de compra registradas",
+        "abono de compra",
+        "cancelar",
+        "crear abono correctivo",
+        "copiar documento",
+        "liquidar movimientos",
+        "registrar",
+        "código motivo devolución"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-purchase-returns-da",
+      "title": "Behandle returvarer eller annulleringer",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/da-dk/dynamics365/business-central/purchasing-how-process-purchase-returns-cancellations",
+      "appliesTo": "Localized current Business Central online documentation (da-DK); inspected 2026-09-25",
+      "accessedDate": "2026-09-25",
+      "fields": [
+        "købsreturordre",
+        "bogførte købsfakturaer",
+        "købskreditnota",
+        "annuller",
+        "opret rettelseskreditnota",
+        "kopiér dokument",
+        "udlign poster",
+        "bogfør",
+        "returårsagskode"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-purchase-returns-fi",
+      "title": "Palautusten tai peruutusten käsittely",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/fi-fi/dynamics365/business-central/purchasing-how-process-purchase-returns-cancellations",
+      "appliesTo": "Localized current Business Central online documentation (fi-FI); inspected 2026-09-25",
+      "accessedDate": "2026-09-25",
+      "fields": [
+        "ostopalautustilaus",
+        "kirjatut ostolaskut",
+        "ostohyvityslasku",
+        "peruuta",
+        "luo korjaava hyvityslasku",
+        "kopioi asiakirja",
+        "kohdista tapahtumat",
+        "kirjaa",
+        "palautuksen syykoodi"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-purchase-returns-nb",
+      "title": "Behandle returer eller annulleringer",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/nb-no/dynamics365/business-central/purchasing-how-process-purchase-returns-cancellations",
+      "appliesTo": "Localized current Business Central online documentation (nb-NO); inspected 2026-09-25",
+      "accessedDate": "2026-09-25",
+      "fields": [
+        "kjøpsreturordre",
+        "bokførte kjøpsfakturaer",
+        "kjøpskreditnota",
+        "avbryt",
+        "opprett korrigerende kreditnota",
+        "kopier dokument",
+        "utligne poster",
+        "bokfør",
+        "returårsakskode"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-purchase-recording-fr",
+      "title": "Enregistrer les achats avec les factures achat",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/fr-fr/dynamics365/business-central/purchasing-how-record-purchases",
+      "appliesTo": "Current fr-FR localized Business Central online documentation; inspected 2026-09-25",
+      "accessedDate": "2026-09-25",
+      "fields": [
+        "purchase-order quantity to receive and purchase line/posting terms"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-purchase-recording-de",
+      "title": "Einkäufe mit Einkaufsrechnungen erfassen",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/de-de/dynamics365/business-central/purchasing-how-record-purchases",
+      "appliesTo": "Current de-DE localized Business Central online documentation; inspected 2026-09-25",
+      "accessedDate": "2026-09-25",
+      "fields": [
+        "purchase-order quantity to receive and purchase line/posting terms"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-purchase-recording-es",
+      "title": "Registrar compras con facturas de compra",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/es-es/dynamics365/business-central/purchasing-how-record-purchases",
+      "appliesTo": "Current es-ES localized Business Central online documentation; inspected 2026-09-25",
+      "accessedDate": "2026-09-25",
+      "fields": [
+        "purchase-order quantity to receive and purchase line/posting terms"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-purchase-recording-da",
+      "title": "Registrere køb med købsfakturaer",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/da-dk/dynamics365/business-central/purchasing-how-record-purchases",
+      "appliesTo": "Current da-DK localized Business Central online documentation; inspected 2026-09-25",
+      "accessedDate": "2026-09-25",
+      "fields": [
+        "purchase-order quantity to receive and purchase line/posting terms"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-purchase-recording-fi",
+      "title": "Ostojen kirjaaminen ostolaskujen avulla",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/fi-fi/dynamics365/business-central/purchasing-how-record-purchases",
+      "appliesTo": "Current fi-FI localized Business Central online documentation; inspected 2026-09-25",
+      "accessedDate": "2026-09-25",
+      "fields": [
+        "purchase-order quantity to receive and purchase line/posting terms"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-purchase-recording-nb",
+      "title": "Registrere kjøp med kjøpsfakturaer",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/nb-no/dynamics365/business-central/purchasing-how-record-purchases",
+      "appliesTo": "Current nb-NO localized Business Central online documentation; inspected 2026-09-25",
+      "accessedDate": "2026-09-25",
+      "fields": [
+        "purchase-order quantity to receive and purchase line/posting terms"
+      ]
     }
   ]
 }

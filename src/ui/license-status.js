@@ -2,6 +2,11 @@
 const $ = id => document.getElementById(id);
 const tabId = Number(new URLSearchParams(location.search).get("tabId"));
 let licenses = [];
+let accountStatus = null;
+function activeTenantLicense() {
+  const license = licenses.find(item => item.tenantId === $("tenantSelect").value);
+  return Boolean(license?.allowed && license.expiresAt > Date.now());
+}
 let currentUiLocale = globalThis.T9UiI18n.DEFAULT_LOCALE;
 const text = (swedish, english) => globalThis.T9LanguageRegistry.translate(english, currentUiLocale, swedish);
 
@@ -17,6 +22,7 @@ function send(message) {
   }));
 }
 function render(license) {
+  renderAccountStatus();
   const registered = license?.licenseStatus !== "unregistered";
   $("tenantId").textContent = license?.tenantId || "—";
   $("licenseType").textContent = license && registered
@@ -92,6 +98,16 @@ async function load(force = false) {
 async function consultantStatus() {
   const result = await send({ type: "T9_CONSULTANT_LICENSE_STATUS" });
   if (!result?.ok) throw new Error(result?.error || text("Konsultstatus kunde inte läsas.", "Consultant status could not be loaded."));
+  accountStatus = result;
+  renderAccountStatus();
+}
+function renderAccountStatus() {
+  const result = accountStatus;
+  if (!result) return;
+  const tenantActive = activeTenantLicense();
+  $("consultantTitle").textContent = tenantActive ? text("Microsoft-konto", "Microsoft account") : globalThis.T9UiI18n.translate("license.consultant", currentUiLocale);
+  $("tenantAccountHelp").hidden = !tenantActive;
+  $("tenantAccountHelp").textContent = text("Tenantlicensen är aktiv. Logga in med Microsoft för användarregistrering och statistik. Ingen konsultlicens behövs.", "The tenant license is active. Sign in with Microsoft for user registration and statistics. No consultant license is needed.");
   $("consultantSignIn").hidden = result.signedIn || !result.configured;
   $("consultantSignOut").hidden = !result.signedIn;
   const licenseLabels = { active: text("Konsultlicensen är aktiv.", "The consultant license is active."),
@@ -100,6 +116,7 @@ async function consultantStatus() {
     blocked: text("Konsultlicensen är spärrad.", "The consultant license is blocked.") };
   $("consultantStatus").textContent = !result.configured
     ? text("Konsultinloggning väntar på Entra-konfiguration.", "Consultant sign-in is waiting for Entra configuration.")
+    : result.signedIn && tenantActive ? text("Microsoft-inloggningen är klar.", "Microsoft sign-in is complete.")
     : result.signedIn ? `${text("Microsoft-inloggningen är klar.", "Microsoft sign-in is complete.")} ${licenseLabels[result.license?.status] || text("Ingen konsultlicens har begärts.", "No consultant license has been requested.")}`
       : text("Inte inloggad.", "Not signed in.");
   if (result.signedIn && result.profile) {
@@ -112,7 +129,7 @@ $("tenantSelect").addEventListener("change", event => {
 $("refresh").addEventListener("click", () => load(true));
 $("consultantSignIn").addEventListener("click", async () => {
   $("consultantSignIn").disabled = true;
-  try { const result = await send({ type: "T9_CONSULTANT_LICENSE_SIGN_IN" });
+  try { const result = await send({ type: activeTenantLicense() ? "T9_MICROSOFT_SIGN_IN" : "T9_CONSULTANT_LICENSE_SIGN_IN" });
     if (!result?.ok) throw new Error(result?.error || text("Inloggningen misslyckades.", "Sign-in failed."));
     await consultantStatus();
   } catch (error) {

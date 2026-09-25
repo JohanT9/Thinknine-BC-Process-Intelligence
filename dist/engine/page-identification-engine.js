@@ -60,6 +60,31 @@
       definition.tableId || null, definition.recordType || null,
       definition.documentType || null]);
   }
+  function compareVersion(left, right) {
+    const a = text(left).split(/[.+-]/).slice(0, 3).map(Number);
+    const b = text(right).split(/[.+-]/).slice(0, 3).map(Number);
+    for (let index = 0; index < 3; index += 1) {
+      if ((a[index] || 0) !== (b[index] || 0)) return (a[index] || 0) - (b[index] || 0);
+    }
+    return 0;
+  }
+  function versionRangesOverlap(left = {}, right = {}) {
+    const ranges = definition => {
+      const compatibility = definition.compatibility;
+      const configured = compatibility?.appVersionRanges;
+      const values = Array.isArray(configured) && configured.length ? configured :
+        [compatibility || {}];
+      return values.filter(value => value && typeof value === "object" && !Array.isArray(value));
+    };
+    const overlaps = (a, b) => {
+      const aMin = a.minAppVersion || "0.0.0";
+      const aMax = a.maxAppVersion || "999999.999999.999999";
+      const bMin = b.minAppVersion || "0.0.0";
+      const bMax = b.maxAppVersion || "999999.999999.999999";
+      return compareVersion(aMin, bMax) <= 0 && compareVersion(bMin, aMax) <= 0;
+    };
+    return ranges(left).some(a => ranges(right).some(b => overlaps(a, b)));
+  }
   function normalizeCaption(value) {
     return text(value).normalize("NFKC").toLocaleLowerCase()
       .replace(/[."'“”‘’!?,:;]/g, "").replace(/\s+/g, " ").trim();
@@ -183,8 +208,10 @@
       values.push(item); byId.set(item.pageObjectId, values);
     });
     for (const [id, values] of byId) {
-      const shapes = new Set(values.map(semanticShape));
-      if (values.length > 1 && shapes.size > 1) diagnostics.push(diagnostic(
+      const conflictingPairs = values.some((left, index) => values.slice(index + 1)
+        .some(right => semanticShape(left) !== semanticShape(right) &&
+          versionRangesOverlap(left, right)));
+      if (values.length > 1 && conflictingPairs) diagnostics.push(diagnostic(
         "conflicting-page-definitions", "Packs define conflicting page metadata.",
         { pageObjectId: id, ruleIds: values.map(item => item.ruleId) }));
     }

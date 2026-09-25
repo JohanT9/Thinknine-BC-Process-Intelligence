@@ -91,7 +91,10 @@
         reviewSuggested: (rule.confidence || 0.8) < 0.85,
         ...(rule.instructionTemplate ? { instruction: rule.instructionTemplate } : {}) };
     });
-    return { tasks: consolidation.consolidate(enriched), unmatched, rules: availableRules };
+    const consolidated = consolidation.consolidateWithAnalysis(enriched);
+    return { tasks: consolidated.tasks,
+      consolidationDecisions: consolidated.decisions,
+      unmatched, rules: availableRules };
   }
   return { VERSION, apply, match, patternsMatch, rules, score };
 });

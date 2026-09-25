@@ -34,7 +34,7 @@ const before = JSON.stringify(tasks);
 const result = consolidation.consolidate(tasks);
 assert.strictEqual(result.length, 2);
 assert.strictEqual(result[0].taskType, "SelectCustomer");
-assert.strictEqual(result[0].instruction, "Välj kund **1033**.");
+assert.strictEqual(result[0].instruction, "Välj **1033** i **Kundens namn**.");
 assert.strictEqual(result[0].instructionValue, "1033");
 assert.deepStrictEqual(result[0].sourceEventNos, [21, 22, 23, 24, 25]);
 assert.strictEqual(result[0].screenshot, "screenshots/000025.png");
@@ -44,6 +44,16 @@ assert.deepStrictEqual(result[0].semanticActionModel.screenshotRefs, [
   "screenshots/000024.png", "screenshots/000025.png"
 ]);
 assert.strictEqual(result[0].consolidation.sourceTaskCount, 5);
+const explained = consolidation.consolidateWithAnalysis(tasks);
+assert.strictEqual(explained.decisions[0].outcome, "merged");
+assert.strictEqual(explained.decisions[0].decisionCode,
+  "BCPS-PROCESS-MERGE-001");
+assert.strictEqual(explained.decisions[0].ruleId,
+  explained.tasks[0].consolidation.type);
+assert.deepStrictEqual(explained.decisions[0].inputTaskIds,
+  tasks.slice(0, 5).map(task => task.taskId));
+assert.deepStrictEqual(explained.decisions[0].sourceEventIds, []);
+assert.strictEqual(explained.decisions[0].confidence, "medium");
 assert.strictEqual(result[1].taskType, "ChangeField");
 assert.strictEqual(JSON.stringify(tasks), before, "input tasks must not mutate");
 

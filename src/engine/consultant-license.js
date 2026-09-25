@@ -116,7 +116,18 @@
       const result = await response.json();
       if (!result.accepted) throw new Error("Usage statistics were not accepted");
     }
-    return Object.freeze({ signIn, signOut, check, register, registerTenantUser, recordUsage, state,
+    async function hasApplicationAdminRole() {
+      if (!config?.adminAccessEndpoint) return false;
+      try {
+        const token = await accessToken();
+        const response = await fetcher(config.adminAccessEndpoint, { method: "GET",
+          credentials: "omit", headers: { Authorization: `Bearer ${token}` } });
+        if (!response.ok) return false;
+        return (await response.json()).authorized === true;
+      } catch { return false; }
+    }
+    return Object.freeze({ signIn, signOut, check, register, registerTenantUser, recordUsage,
+      hasApplicationAdminRole, state,
       configured: () => Boolean(config?.enabled && config.clientId && config.scope) });
   }
   return Object.freeze({ create });

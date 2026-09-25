@@ -21,14 +21,14 @@ function only(values, expectedType, expectedText) {
 }
 
 const customer = only(select("Kundnr", "1033"), "SelectCustomer",
-  "Välj kund **1033**.");
+  "Välj **1033** i **Kundnr**.");
 const customerSearchThenNumber = only([{
   taskId: "customer-search", taskType: "SelectCustomer",
   fieldCaption: "Kundnr", instructionValue: "iberi",
   instruction: "Välj kunden iberi."
 }, { taskId: "customer-number", taskType: "Select",
   selectedCaption: "905", instruction: "Välj 905."
-}], "SelectCustomer", "Välj kund **905**.");
+}], "SelectCustomer", "Välj **905** i **Kundnr**.");
 assert.strictEqual(customerSearchThenNumber.selectedValue, "905");
 const embeddedCustomerNumber = only([{
   taskId: "customer-search-embedded", taskType: "SelectCustomer",
@@ -37,7 +37,7 @@ const embeddedCustomerNumber = only([{
 }, { taskId: "customer-number-embedded", taskType: "RunAction",
   actionCaption: 'Nr, sorterade i Stigande order Välj posten "905"',
   instruction: 'Välj "Nr, sorterade i Stigande order Välj posten "905"".'
-}], "SelectCustomer", "Välj kund **905**.");
+}], "SelectCustomer", "Välj **905** i **Kundnr**.");
 assert.strictEqual(embeddedCustomerNumber.selectedValue, "905");
 const englishSortedRecord = only([{
   taskId: "sales-order-row", taskType: "RunAction",
@@ -160,12 +160,12 @@ const menuPath = only([{
   taskId: "discount", taskType: "RunAction",
   actionCaption: "Tillämpat försäljningspris och rabatt",
   sourceEventIds: ["event-discount"], screenshot: "discount.png"
-}], "RunActionPath", "Välj **Rad** → **Relaterad information** → " +
+}], "RunActionPath", "Välj **rad** → **Relaterad information** → " +
   "**Tillämpat försäljningspris och rabatt**.");
 assert.deepStrictEqual(menuPath.sourceEventIds,
   ["event-row", "event-related", "event-discount"]);
 assert.deepStrictEqual(menuPath.actionPath,
-  ["Rad", "Relaterad information",
+  ["rad", "Relaterad information",
     "Tillämpat försäljningspris och rabatt"]);
 assert.strictEqual(menuPath.screenshotRefs.at(-1), "discount.png");
 assert.strictEqual(menuPath.inputInteractionCount, 3);
@@ -224,7 +224,7 @@ const manualPriceWithoutFunctionCapture = only([{
   actionCaption: "Manuellt pris...",
   sourceEventIds: ["event-manual-price-short"],
   screenshot: "manual-price-focused.png"
-}], "RunActionPath", "Välj **Åtgärder** → **Funktion** → **Manuellt pris**.");
+}], "RunActionPath", "Välj **Åtgärder** → **Manuellt pris**.");
 assert.deepStrictEqual(manualPriceWithoutFunctionCapture.sourceEventIds,
   ["event-actions-short", "event-manual-price-short"]);
 assert.strictEqual(manualPriceWithoutFunctionCapture.preferredSourceEventId,
@@ -512,7 +512,7 @@ assert.strictEqual(JSON.stringify(projected), projectedBefore);
 const step = document.sections.find(value => value.kind === "workflow")
   .blocks.find(value => value.kind === "step");
 assert.strictEqual(step.blocks.find(value => value.kind === "paragraph").text,
-  "Välj kund **1033**.");
+  "Välj **1033** i **Kundnr**.");
 assert.strictEqual(step.semanticAction.futureSchemaField, "preserved");
 assert.deepStrictEqual(step.semanticAction.sourceEventNos, ["7"]);
 assert.deepStrictEqual(step.blocks.find(value => value.kind === "image")
@@ -522,3 +522,106 @@ assert.ok(document.provenance.transformations.includes(
   "semantic-interaction-rules"));
 
 console.log("Semantic Interaction Rules Engine behaviour tests passed.");
+
+const pageSelection = {taskId:'tell-me-result',taskType:'Select',selectedCaption:'Sales Orders Lists \uEDFF',targetControl:{role:'gridcell'},sourceEventIds:['search-result']};
+only([pageSelection], 'OpenPage', 'Välj **Sales Orders**.');
+only([{...pageSelection,selectedCaption:'Customer Lists'}], 'SelectRecord', 'Välj posten **Customer Lists**.');
+assert.equal(pageSelection.selectedCaption,'Sales Orders Lists \uEDFF');
+
+const recordedCustomer = only([{taskId:'customer-lookup',taskType:'RunAction',actionCaption:'Choose a value for Customer Name'},
+  {taskId:'customer-choice',taskType:'Select',selectedCaption:'No., sorted in Ascending order Select record "C0011"'}],
+  'SelectCustomer','Välj **C0011** i **Customer Name**.');
+assert.equal(recordedCustomer.targetField,'Customer Name');
+const language = require('../src/document/document-language');
+const registry = require('../src/engine/language-registry');
+for(const locale of registry.supported('document').map(item=>item.locale)) {
+  const translated=language.translateInstruction(recordedCustomer.displayText,locale);
+  assert.ok(translated.includes('Customer Name'),locale+' preserves captured field');
+  assert.ok(translated.includes('C0011'),locale+' preserves selected customer');
+}
+
+for (const fieldCaption of ["Sort on 'Quantity'", 'Sort by "Quantity"', 'Quantity']) {
+  const input = {taskId:'quantity-caption',taskType:'EnterFieldValue',fieldCaption,value:'500',inputSources:['input']};
+  const before = JSON.stringify(input);
+  const output = only([input], 'EnterQuantity', 'Ange __500__ i **Quantity**.');
+  assert.equal(output.targetField, 'Quantity');
+  assert.equal(JSON.stringify(input), before);
+  for (const locale of registry.supported('document').map(item=>item.locale)) {
+    const translated = language.translateInstruction(output.displayText, locale);
+    assert.ok(translated.includes('Quantity') && translated.includes('500'));
+    assert.ok(!translated.includes('Sort on'));
+  }
+}
+only([{taskId:'literal-caption',taskType:'EnterFieldValue',fieldCaption:"Customer's reference",value:'ABC'}],
+  'EnterFieldValue', "Ange __ABC__ i **Customer's reference**.");
+
+const lookupPair = [{taskId:'lookup-open',taskType:'RunAction',fieldCaption:'Choose a value for No.',screenshot:'open.png',sourceEventNos:[57]},
+  {taskId:'lookup-selected',taskType:'SelectRecord',selectedCaption:'0015',screenshot:'selected.png',sourceEventNos:[60]}];
+const lookupBefore=JSON.stringify(lookupPair);
+const lookupMerged=only(lookupPair,'SelectLookupValue','Välj **0015** i **No.**.');
+assert.equal(lookupMerged.preferredScreenshotRef,'selected.png');
+assert.deepEqual(lookupMerged.sourceEventNos,[57,60]);
+assert.equal(JSON.stringify(lookupPair),lookupBefore);
+assert.equal(engine.processInteractions(lookupPair.map((item,index)=>({...item,pageId:String(index)}))).length,2);
+for(const locale of registry.supported('document').map(item=>item.locale)) {
+  const translated=language.translateInstruction(lookupMerged.displayText,locale);
+  assert.ok(translated.includes('0015') && translated.includes('No.'));
+}
+
+for (const type of ['Item','Resource','G/L Account','Fixed Asset','Custom Type']) {
+  const pair=lookupPair.map(item=>({...item}));
+  pair[0].rowTypeContext={schemaVersion:1,source:'same-row-type',caption:'Type',value:type};
+  const output=only(pair,'SelectLookupValue',`Välj **0015** i **No.** (**${type}**).`);
+  assert.equal(output.rowTypeContext.value,type);
+  if(type==='Item') assert.equal(output.selectedEntity,'Item');
+  for(const locale of registry.supported('document').map(item=>item.locale))
+    assert.ok(language.translateInstruction(output.displayText,locale).includes(type));
+}
+
+const separateSelections=[
+  {taskId:'customer-start',taskType:'RunAction',fieldCaption:'Choose a value for Customer Name'},
+  {taskId:'customer-selected',taskType:'Select',selectedCaption:'Select record "C0011"',screenshot:'customer.png'},
+  {taskId:'item-selected',taskType:'Select',selectedCaption:'Select record "0011"',screenshot:'item-one.png'},
+  ...lookupPair
+];
+const selectionsBefore=JSON.stringify(separateSelections);
+const separated=engine.processInteractions(separateSelections);
+assert.equal(separated[0].selectedValue,'C0011');
+assert.ok(!separated[0].screenshotRefs.includes('item-one.png'));
+assert.ok(!separated[0].screenshotRefs.includes('selected.png'));
+assert.ok(separated.some(action=>action.selectedValue==='0015' && action.targetField==='No.'));
+assert.equal(JSON.stringify(separateSelections),selectionsBefore);
+const missingCustomer=engine.processInteractions([separateSelections[0],...lookupPair]);
+assert.ok(!missingCustomer.some(action=>action.actionType==='SelectCustomer' && action.selectedValue==='0015'));
+
+const lineMenu=['Line','Related Information','Applied Sales Price and Discount'].map((actionCaption,index)=>({
+  taskId:'line-menu-'+index,taskType:'RunAction',actionCaption,pageId:'42',screenshot:'menu-'+index+'.png',sourceEventNos:[index+1]}));
+const linePath=only(lineMenu,'RunActionPath','Välj **Line** → **Related Information** → **Applied Sales Price and Discount**.');
+assert.deepEqual(linePath.actionPath,lineMenu.map(item=>item.actionCaption));
+assert.deepEqual(linePath.sourceEventNos,[1,2,3]);
+assert.equal(linePath.preferredScreenshotRef,'menu-1.png');
+assert.ok(engine.processInteractions(lineMenu.map((item,index)=>({...item,pageId:String(index)}))).length>1);
+for(const locale of registry.supported('document').map(item=>item.locale)) {
+  const translated=language.translateInstruction(linePath.displayText,locale);
+  for(const item of lineMenu) assert.ok(translated.includes(item.actionCaption));
+}
+
+const englishManual=['Actions','Functions','Manual Price...'].map((actionCaption,index)=>({taskId:'manual-en-'+index,taskType:'RunAction',actionCaption}));
+const manualEnglish=only(englishManual,'RunActionPath','Välj **Actions** → **Functions** → **Manual Price**.');
+for(const locale of registry.supported('document').map(item=>item.locale)) {
+  const translated=language.translateInstruction(manualEnglish.displayText,locale);
+  for(const caption of ['Actions','Functions','Manual Price']) assert.ok(translated.includes(caption));
+}
+
+const confirmedField=[{taskId:'price-input',taskType:'EnterFieldValue',fieldCaption:'Unit Price',value:'[belopp]',screenshot:'price-dialog.png'},
+  {taskId:'dialog-surface',taskType:'RunAction',actionCaption:'Change Applied Unit Price',targetControl:{role:'dialog'}},
+  {taskId:'dialog-ok',taskType:'RunAction',actionCaption:'OK',uiHierarchy:[{type:'dialog'}],screenshot:'after-dialog.png'}];
+const confirmed=only(confirmedField,'EnterFieldValue','Ange **Unit Price**. Välj **OK**.');
+assert.equal(confirmed.preferredScreenshotRef,'price-dialog.png');
+assert.equal(confirmed.selectedValue,'');
+assert.ok(engine.processInteractions(confirmedField.map((item,index)=>index===2?{...item,actionCaption:'Cancel'}:item)).length>1);
+for(const locale of registry.supported('document').map(item=>item.locale)) {
+  const translated=language.translateInstruction(confirmed.displayText,locale);
+  assert.ok(translated.includes('Unit Price') && translated.includes('OK'));
+  if(locale!=='sv-SE') assert.ok(!translated.includes('Ange ') && !translated.includes('Välj '));
+}

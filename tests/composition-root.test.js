@@ -34,6 +34,35 @@ assert.deepStrictEqual(result.businessTasks[0].stepGroupIds,
 assert.ok(result.businessTasks[0].semanticActionIds.length);
 assert.strictEqual(result.businessTasks[0].screenshot,
   "screenshots/000001.png");
+assert.strictEqual(result.processAnalysis.schemaVersion, 1);
+assert.strictEqual(result.processAnalysis.pipelineVersion, "1.3.0");
+assert.strictEqual(result.processAnalysis.output.taskCount, 1);
+assert.strictEqual(result.processAnalysis.decisions.stepGroups[0].outcome,
+  "included");
+assert.deepStrictEqual(result.processAnalysis.decisions.events[0].sourceEventIds,
+  [recording.events[0].id]);
+assert.strictEqual(result.processAnalysis.decisions.consolidations.length, 1);
+assert.strictEqual(result.processAnalysis.decisions.consolidations[0].outputTaskId,
+  result.businessTasks[0].taskId);
+
+const flagged = pipeline.applyReleaseFindings({ normalizedEvents: [{
+  normalizedEventId: "n:flag", sourceEventIds: ["e:flag"]
+}], stepGroups: [{ stepGroupId: "g:flag", sourceEventIds: ["e:flag"],
+  normalizedEventIds: ["n:flag"], normalizedEvents: [{ kind: "activation" }],
+  interactionIds: ["interaction:a", "interaction:b"],
+  groupingReason: ["same-control"] }], semanticActions: [],
+businessTasks: [{ taskId: "t:flag", stepGroupIds: ["g:flag"],
+  sourceEventIds: ["e:flag"] }], consolidationDecisions: [] }, {
+  session: { id: "release-findings" }
+});
+assert.strictEqual(flagged.processAnalysis.releaseGate.status,
+  "review-required");
+assert.strictEqual(flagged.businessTasks[0].reviewSuggested, true);
+assert.strictEqual(flagged.businessTasks[0].reviewStatus, "review-suggested");
+assert.deepStrictEqual(flagged.businessTasks[0].processValidation, {
+  status: "review-required", codes: ["BCPS-PROCESS-GUARD-MERGE-001"],
+  findingCount: 1
+});
 
 const reactSurfaceRaw = {
   sourceEventId: "react-surface", type: "click", category: "interaction",
@@ -115,7 +144,7 @@ const menuResult = pipeline.interpret({
 assert.strictEqual(menuResult.businessTasks.length, 1);
 assert.strictEqual(menuResult.businessTasks[0].taskType, "RunActionPath");
 assert.deepStrictEqual(menuResult.businessTasks[0].actionPath,
-  ["Rad", "Relaterad information",
+  ["rad", "Relaterad information",
     "Till\u00e4mpat f\u00f6rs\u00e4ljningspris och rabatt"]);
 assert.strictEqual(menuResult.businessTasks[0].screenshot,
   "screenshots/menu-discount.png");

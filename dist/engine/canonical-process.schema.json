@@ -1,0 +1,979 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "BC Process Studio Canonical Process v1",
+  "description": "Structural contract. validateProcess additionally checks semantic and source integrity.",
+  "type": "object",
+  "properties": {
+    "schemaVersion": {
+      "const": 1
+    },
+    "processId": {
+      "type": "string",
+      "minLength": 1,
+      "pattern": "\\S"
+    },
+    "revisionId": {
+      "type": "string",
+      "minLength": 1,
+      "pattern": "\\S"
+    },
+    "recordingRef": {
+      "type": "object",
+      "properties": {
+        "recordingId": {
+          "type": "string",
+          "minLength": 1,
+          "pattern": "\\S"
+        },
+        "revisionId": {
+          "type": "string",
+          "minLength": 1,
+          "pattern": "\\S"
+        }
+      },
+      "required": [
+        "recordingId",
+        "revisionId"
+      ],
+      "additionalProperties": true
+    },
+    "derivation": {
+      "type": "object",
+      "properties": {
+        "normalizerVersion": {
+          "type": "string",
+          "minLength": 1,
+          "pattern": "\\S"
+        },
+        "adapterVersion": {
+          "type": "string",
+          "minLength": 1,
+          "pattern": "\\S"
+        },
+        "knowledgeReleaseId": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1,
+              "pattern": "\\S"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "inputDigest": {
+          "type": "string",
+          "minLength": 1,
+          "pattern": "\\S"
+        }
+      },
+      "required": [
+        "normalizerVersion",
+        "adapterVersion",
+        "knowledgeReleaseId",
+        "inputDigest"
+      ],
+      "additionalProperties": true
+    },
+    "context": {
+      "type": "object",
+      "properties": {
+        "sourceLanguage": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1,
+              "pattern": "\\S"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "bcVersion": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1,
+              "pattern": "\\S"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "installedApps": {
+          "anyOf": [
+            {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "appId": {
+                    "type": "string",
+                    "minLength": 1,
+                    "pattern": "\\S"
+                  },
+                  "publisher": {
+                    "anyOf": [
+                      {
+                        "type": "string",
+                        "minLength": 1,
+                        "pattern": "\\S"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  },
+                  "appVersion": {
+                    "anyOf": [
+                      {
+                        "type": "string",
+                        "minLength": 1,
+                        "pattern": "\\S"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  }
+                },
+                "required": [
+                  "appId",
+                  "publisher",
+                  "appVersion"
+                ],
+                "additionalProperties": true
+              }
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "sourceLanguage",
+        "bcVersion",
+        "installedApps"
+      ],
+      "additionalProperties": true
+    },
+    "steps": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "stepId": {
+            "type": "string",
+            "minLength": 1,
+            "pattern": "\\S"
+          },
+          "sequence": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "origin": {
+            "enum": [
+              "observed",
+              "manual"
+            ]
+          },
+          "kind": {
+            "enum": [
+              "navigation",
+              "field-change",
+              "selection",
+              "action",
+              "dialog",
+              "information",
+              "unknown"
+            ]
+          },
+          "sourceRefs": {
+            "type": "object",
+            "properties": {
+              "eventIds": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "minLength": 1,
+                  "pattern": "\\S"
+                },
+                "uniqueItems": true
+              },
+              "normalizedEventIds": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "minLength": 1,
+                  "pattern": "\\S"
+                },
+                "uniqueItems": true
+              },
+              "stepGroupIds": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "minLength": 1,
+                  "pattern": "\\S"
+                },
+                "uniqueItems": true
+              },
+              "semanticActionIds": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "minLength": 1,
+                  "pattern": "\\S"
+                },
+                "uniqueItems": true
+              },
+              "assetIds": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "minLength": 1,
+                  "pattern": "\\S"
+                },
+                "uniqueItems": true
+              }
+            },
+            "required": [
+              "eventIds",
+              "normalizedEventIds",
+              "stepGroupIds",
+              "semanticActionIds",
+              "assetIds"
+            ],
+            "additionalProperties": true
+          },
+          "target": {
+            "type": "object",
+            "properties": {
+              "objectRef": {
+                "anyOf": [
+                  {
+                    "type": "object",
+                    "properties": {
+                      "appId": {
+                        "anyOf": [
+                          {
+                            "type": "string",
+                            "minLength": 1,
+                            "pattern": "\\S"
+                          },
+                          {
+                            "type": "null"
+                          }
+                        ]
+                      },
+                      "publisher": {
+                        "anyOf": [
+                          {
+                            "type": "string",
+                            "minLength": 1,
+                            "pattern": "\\S"
+                          },
+                          {
+                            "type": "null"
+                          }
+                        ]
+                      },
+                      "objectType": {
+                        "anyOf": [
+                          {
+                            "type": "string",
+                            "minLength": 1,
+                            "pattern": "\\S"
+                          },
+                          {
+                            "type": "null"
+                          }
+                        ]
+                      },
+                      "objectId": {
+                        "anyOf": [
+                          {
+                            "type": "string",
+                            "pattern": "^[0-9]+$"
+                          },
+                          {
+                            "type": "null"
+                          }
+                        ]
+                      },
+                      "appVersion": {
+                        "anyOf": [
+                          {
+                            "type": "string",
+                            "minLength": 1,
+                            "pattern": "\\S"
+                          },
+                          {
+                            "type": "null"
+                          }
+                        ]
+                      }
+                    },
+                    "required": [
+                      "appId",
+                      "publisher",
+                      "objectType",
+                      "objectId",
+                      "appVersion"
+                    ],
+                    "additionalProperties": true
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "controlRef": {
+                "anyOf": [
+                  {
+                    "type": "object",
+                    "properties": {
+                      "controlId": {
+                        "anyOf": [
+                          {
+                            "type": "string",
+                            "minLength": 1,
+                            "pattern": "\\S"
+                          },
+                          {
+                            "type": "null"
+                          }
+                        ]
+                      },
+                      "automationId": {
+                        "anyOf": [
+                          {
+                            "type": "string",
+                            "minLength": 1,
+                            "pattern": "\\S"
+                          },
+                          {
+                            "type": "null"
+                          }
+                        ]
+                      },
+                      "fieldId": {
+                        "anyOf": [
+                          {
+                            "type": "string",
+                            "pattern": "^[0-9]+$"
+                          },
+                          {
+                            "type": "null"
+                          }
+                        ]
+                      }
+                    },
+                    "required": [
+                      "controlId",
+                      "automationId",
+                      "fieldId"
+                    ],
+                    "additionalProperties": true
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "capturedCaption": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              }
+            },
+            "required": [
+              "objectRef",
+              "controlRef",
+              "capturedCaption"
+            ],
+            "additionalProperties": true
+          },
+          "observation": {
+            "type": "object",
+            "properties": {
+              "operation": {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "minLength": 1,
+                    "pattern": "\\S"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "valueRef": {
+                "anyOf": [
+                  {
+                    "type": "object",
+                    "properties": {
+                      "eventId": {
+                        "type": "string",
+                        "minLength": 1,
+                        "pattern": "\\S"
+                      },
+                      "pointer": {
+                        "type": "string",
+                        "pattern": "^(?:/(?:[^~/]|~[01])*)*$"
+                      }
+                    },
+                    "required": [
+                      "eventId",
+                      "pointer"
+                    ],
+                    "additionalProperties": true
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "previousValueRef": {
+                "anyOf": [
+                  {
+                    "type": "object",
+                    "properties": {
+                      "eventId": {
+                        "type": "string",
+                        "minLength": 1,
+                        "pattern": "\\S"
+                      },
+                      "pointer": {
+                        "type": "string",
+                        "pattern": "^(?:/(?:[^~/]|~[01])*)*$"
+                      }
+                    },
+                    "required": [
+                      "eventId",
+                      "pointer"
+                    ],
+                    "additionalProperties": true
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "result": {
+                "type": "object",
+                "properties": {
+                  "status": {
+                    "enum": [
+                      "unknown",
+                      "observed-success",
+                      "observed-error"
+                    ]
+                  },
+                  "evidenceEventIds": {
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "minLength": 1,
+                      "pattern": "\\S"
+                    },
+                    "uniqueItems": true
+                  },
+                  "messageRef": {
+                    "anyOf": [
+                      {
+                        "type": "object",
+                        "properties": {
+                          "eventId": {
+                            "type": "string",
+                            "minLength": 1,
+                            "pattern": "\\S"
+                          },
+                          "pointer": {
+                            "type": "string",
+                            "pattern": "^(?:/(?:[^~/]|~[01])*)*$"
+                          }
+                        },
+                        "required": [
+                          "eventId",
+                          "pointer"
+                        ],
+                        "additionalProperties": true
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  }
+                },
+                "required": [
+                  "status",
+                  "evidenceEventIds",
+                  "messageRef"
+                ],
+                "additionalProperties": true
+              }
+            },
+            "required": [
+              "operation",
+              "valueRef",
+              "previousValueRef",
+              "result"
+            ],
+            "additionalProperties": true
+          },
+          "interpretation": {
+            "type": "object",
+            "properties": {
+              "status": {
+                "enum": [
+                  "resolved",
+                  "ambiguous",
+                  "unresolved"
+                ]
+              },
+              "selectedCandidateId": {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "minLength": 1,
+                    "pattern": "\\S"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "candidates": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "candidateId": {
+                      "type": "string",
+                      "minLength": 1,
+                      "pattern": "\\S"
+                    },
+                    "businessDomainId": {
+                      "anyOf": [
+                        {
+                          "type": "string",
+                          "minLength": 1,
+                          "pattern": "\\S"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "businessProcessId": {
+                      "anyOf": [
+                        {
+                          "type": "string",
+                          "minLength": 1,
+                          "pattern": "\\S"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "bcProcessId": {
+                      "anyOf": [
+                        {
+                          "type": "string",
+                          "minLength": 1,
+                          "pattern": "\\S"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "processStepId": {
+                      "anyOf": [
+                        {
+                          "type": "string",
+                          "minLength": 1,
+                          "pattern": "\\S"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "businessActionId": {
+                      "anyOf": [
+                        {
+                          "type": "string",
+                          "minLength": 1,
+                          "pattern": "\\S"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "businessEntityId": {
+                      "anyOf": [
+                        {
+                          "type": "string",
+                          "minLength": 1,
+                          "pattern": "\\S"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "provenance": {
+                      "type": "object",
+                      "properties": {
+                        "method": {
+                          "enum": [
+                            "metadata",
+                            "rule",
+                            "manual",
+                            "ai"
+                          ]
+                        },
+                        "sourceEventIds": {
+                          "type": "array",
+                          "items": {
+                            "type": "string",
+                            "minLength": 1,
+                            "pattern": "\\S"
+                          },
+                          "uniqueItems": true
+                        },
+                        "knowledgeEntryId": {
+                          "anyOf": [
+                            {
+                              "type": "string",
+                              "minLength": 1,
+                              "pattern": "\\S"
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
+                        },
+                        "knowledgeReleaseId": {
+                          "anyOf": [
+                            {
+                              "type": "string",
+                              "minLength": 1,
+                              "pattern": "\\S"
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
+                        },
+                        "ruleVersion": {
+                          "anyOf": [
+                            {
+                              "type": "string",
+                              "minLength": 1,
+                              "pattern": "\\S"
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
+                        }
+                      },
+                      "required": [
+                        "method",
+                        "sourceEventIds",
+                        "knowledgeEntryId",
+                        "knowledgeReleaseId",
+                        "ruleVersion"
+                      ],
+                      "additionalProperties": true
+                    },
+                    "confidence": {
+                      "type": "object",
+                      "properties": {
+                        "score": {
+                          "anyOf": [
+                            {
+                              "type": "number",
+                              "minimum": 0,
+                              "maximum": 1
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
+                        },
+                        "method": {
+                          "type": "string",
+                          "minLength": 1,
+                          "pattern": "\\S"
+                        },
+                        "calibrationVersion": {
+                          "anyOf": [
+                            {
+                              "type": "string",
+                              "minLength": 1,
+                              "pattern": "\\S"
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
+                        }
+                      },
+                      "required": [
+                        "score",
+                        "method",
+                        "calibrationVersion"
+                      ],
+                      "additionalProperties": true
+                    }
+                  },
+                  "required": [
+                    "candidateId",
+                    "businessDomainId",
+                    "businessProcessId",
+                    "bcProcessId",
+                    "processStepId",
+                    "businessActionId",
+                    "businessEntityId",
+                    "provenance",
+                    "confidence"
+                  ],
+                  "additionalProperties": true
+                }
+              }
+            },
+            "required": [
+              "status",
+              "selectedCandidateId",
+              "candidates"
+            ],
+            "additionalProperties": true
+          },
+          "extensions": {
+            "type": "object",
+            "properties": {
+              "bc-process-studio": {
+                "type": "object",
+                "properties": {
+                  "manualChangeRef": {
+                    "type": "object",
+                    "properties": {
+                      "changeId": {
+                        "type": "string",
+                        "minLength": 1,
+                        "pattern": "\\S"
+                      },
+                      "revisionId": {
+                        "type": "string",
+                        "minLength": 1,
+                        "pattern": "\\S"
+                      }
+                    },
+                    "required": [
+                      "changeId",
+                      "revisionId"
+                    ],
+                    "additionalProperties": true
+                  }
+                }
+              }
+            }
+          }
+        },
+        "required": [
+          "stepId",
+          "sequence",
+          "origin",
+          "kind",
+          "sourceRefs",
+          "target",
+          "observation",
+          "interpretation",
+          "extensions"
+        ],
+        "additionalProperties": true
+      }
+    },
+    "relations": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "relationId": {
+            "type": "string",
+            "minLength": 1,
+            "pattern": "\\S"
+          },
+          "fromStepId": {
+            "type": "string",
+            "minLength": 1,
+            "pattern": "\\S"
+          },
+          "toStepId": {
+            "type": "string",
+            "minLength": 1,
+            "pattern": "\\S"
+          },
+          "type": {
+            "enum": [
+              "sequence",
+              "conditional",
+              "return",
+              "unknown"
+            ]
+          },
+          "basis": {
+            "enum": [
+              "observed",
+              "inferred",
+              "manual"
+            ]
+          },
+          "sourceEventIds": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1,
+              "pattern": "\\S"
+            },
+            "uniqueItems": true
+          },
+          "conditionRef": {
+            "anyOf": [
+              {
+                "anyOf": [
+                  {
+                    "type": "object",
+                    "properties": {
+                      "eventId": {
+                        "type": "string",
+                        "minLength": 1,
+                        "pattern": "\\S"
+                      },
+                      "pointer": {
+                        "type": "string",
+                        "pattern": "^(?:/(?:[^~/]|~[01])*)*$"
+                      }
+                    },
+                    "required": [
+                      "eventId",
+                      "pointer"
+                    ],
+                    "additionalProperties": true
+                  },
+                  {
+                    "type": "object",
+                    "properties": {
+                      "changeId": {
+                        "type": "string",
+                        "minLength": 1,
+                        "pattern": "\\S"
+                      },
+                      "revisionId": {
+                        "type": "string",
+                        "minLength": 1,
+                        "pattern": "\\S"
+                      }
+                    },
+                    "required": [
+                      "changeId",
+                      "revisionId"
+                    ],
+                    "additionalProperties": true
+                  }
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "required": [
+          "relationId",
+          "fromStepId",
+          "toStepId",
+          "type",
+          "basis",
+          "sourceEventIds",
+          "conditionRef"
+        ],
+        "additionalProperties": true
+      }
+    },
+    "diagnostics": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string",
+            "minLength": 1,
+            "pattern": "\\S"
+          },
+          "severity": {
+            "enum": [
+              "info",
+              "warning",
+              "error"
+            ]
+          },
+          "subjectRef": {
+            "anyOf": [
+              {
+                "type": "string",
+                "minLength": 1,
+                "pattern": "\\S"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "details": {
+            "type": "object"
+          }
+        },
+        "required": [
+          "code",
+          "severity",
+          "subjectRef",
+          "details"
+        ],
+        "additionalProperties": true
+      }
+    },
+    "extensions": {
+      "type": "object"
+    }
+  },
+  "required": [
+    "schemaVersion",
+    "processId",
+    "revisionId",
+    "recordingRef",
+    "derivation",
+    "context",
+    "steps",
+    "relations",
+    "diagnostics",
+    "extensions"
+  ],
+  "additionalProperties": true
+}

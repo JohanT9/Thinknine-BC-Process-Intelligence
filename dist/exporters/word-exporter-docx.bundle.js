@@ -19503,8 +19503,22 @@
   }
   function fittedImageSize(bytes, limits = {}) {
     const size = pngSize(bytes) || jpegSize(bytes) || { width: 1200, height: 700 };
-    const maxWidth = Number(limits.maxWidth) || 590;
-    const maxHeight = Number(limits.maxHeight) || 390;
+    const aspectRatio = size.width / Math.max(1, size.height);
+    let maxWidth = Number(limits.maxWidth) || 590;
+    let maxHeight = Number(limits.maxHeight) || 390;
+    if (limits.adaptiveFit) {
+      if (aspectRatio >= 2) {
+        maxHeight = Math.min(
+          maxHeight,
+          Number(limits.panoramicMaxHeight) || maxHeight
+        );
+      } else if (aspectRatio <= 0.9) {
+        maxWidth = Math.min(
+          maxWidth,
+          Number(limits.portraitMaxWidth) || maxWidth
+        );
+      }
+    }
     const factor = Math.min(1, maxWidth / size.width, maxHeight / size.height);
     return {
       width: Math.max(1, Math.round(size.width * factor)),
@@ -19677,6 +19691,74 @@
       })] })]
     });
   }
+  function inlineCallout(component) {
+    return new Paragraph({
+      spacing: componentSpacing(component, { before: 3, after: 6 }),
+      keepNext: true,
+      keepLines: true,
+      children: [
+        new TextRun({
+          text: `${component.content.label}: `,
+          bold: true,
+          color: color(
+            component.appearance.labelColor,
+            component.appearance.borderColor || "0F4C81"
+          )
+        }),
+        new TextRun({ text: plainText(component.content.text) })
+      ]
+    });
+  }
+  function stepLeadBlock(component, instruction) {
+    const border = color(component.appearance.headingBorderColor, "007A82");
+    const fill = color(component.appearance.headingFill, "F0F7F7");
+    const padding = component.appearance.contentPadding || 6;
+    const noBorder = { style: BorderStyle.NONE, size: 0, color: border };
+    return new Table({
+      width: { size: 100, type: WidthType.PERCENTAGE },
+      borders: {
+        top: noBorder,
+        bottom: noBorder,
+        right: noBorder,
+        insideHorizontal: noBorder,
+        insideVertical: noBorder,
+        left: { style: BorderStyle.SINGLE, size: 18, color: border }
+      },
+      rows: [new TableRow({
+        cantSplit: true,
+        children: [new TableCell({
+          margins: cellMargins(padding),
+          shading: { type: ShadingType.CLEAR, fill },
+          children: [
+            new Paragraph({
+              heading: HeadingLevel.HEADING_2,
+              keepNext: true,
+              keepLines: true,
+              spacing: { before: 0, after: instruction ? 60 : 0 },
+              children: [new TextRun({
+                text: plainText(component.content.title),
+                bold: true,
+                color: color(component.appearance.headingColor, "007A82"),
+                size: halfPoints(component.appearance.typography?.size, 13),
+                font: component.appearance.typography?.family
+              })]
+            }),
+            ...instruction ? [new Paragraph({
+              keepNext: true,
+              keepLines: true,
+              spacing: { before: 0, after: 0 },
+              children: formattedTextRuns(instruction.content.text, {
+                runs: instruction.content.runs,
+                color: color(component.appearance.instructionColor, "172B45"),
+                size: halfPoints(component.appearance.instructionSize, 11),
+                font: component.appearance.typography?.family
+              })
+            })] : []
+          ]
+        })]
+      })]
+    });
+  }
   function revisionTable(component) {
     const columns = component.content.columns || [];
     const headers = columns.map((column) => column.label);
@@ -19819,24 +19901,18 @@
       return [screenshotBlock(component, mediaAssets)];
     }
     if (component.kind === "callout") {
+      if (component.appearance.presentationStyle === "inline") {
+        return [inlineCallout(component)];
+      }
       return component.presentationIntent.semanticRole ? [commentBox(component)] : [new Paragraph({ children: [] }), commentBox(component)];
     }
     if (component.kind === "step") {
-      const heading = {
-        content: { text: component.content.title, level: 2 },
-        keepWithNext: true,
-        spacingIntent: component.spacingIntent,
-        appearance: {
-          ...component.appearance,
-          typography: {
-            ...component.appearance.typography,
-            color: component.appearance.headingColor || "#1e5e8c"
-          }
-        }
-      };
+      const instructionIndex = component.components.findIndex((child) => child.kind === "paragraph");
+      const instruction = instructionIndex >= 0 ? component.components[instructionIndex] : null;
+      const supportingComponents = component.components.filter((child, index) => index !== instructionIndex);
       return [
-        headingComponent(heading, HeadingLevel.HEADING_2),
-        ...component.components.flatMap((child) => renderComponent(child, mediaAssets, { step: true }))
+        stepLeadBlock(component, instruction),
+        ...supportingComponents.flatMap((child) => renderComponent(child, mediaAssets, { step: true }))
       ];
     }
     if (component.kind === "list") {

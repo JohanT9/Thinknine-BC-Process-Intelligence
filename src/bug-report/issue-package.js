@@ -1,10 +1,12 @@
 (function (root, factory) {
   const generator = typeof module === "object" && module.exports
     ? require("./bug-report-generator") : root.T9BugReportGenerator;
-  const api = factory(generator);
+  const privacyClassifier = typeof module === "object" && module.exports
+    ? require("./error-privacy-classifier") : root.T9ErrorPrivacyClassifier;
+  const api = factory(generator, privacyClassifier);
   if (typeof module === "object" && module.exports) module.exports = api;
   root.T9IssuePackage = api;
-})(typeof globalThis !== "undefined" ? globalThis : this, function (generator) {
+})(typeof globalThis !== "undefined" ? globalThis : this, function (generator, privacyClassifier) {
   "use strict";
   const SCHEMA_VERSION = 1;
   const clone = value => value == null ? value : JSON.parse(JSON.stringify(value));
@@ -65,6 +67,7 @@
       errorEvidence: clone(section(document, "bc-errors")),
       environment: clone(section(document, "environment")),
       diagnostics: clone(section(document, "technical-diagnostics")),
+      errorAnalysis: privacyClassifier.safeProjection(report.errorAnalysis || null),
       callStack,
       affectedObjects: clone(section(document, "affected-objects")),
       notes: clone(section(document, "notes") || []), attachments: attachments(document),
@@ -75,14 +78,17 @@
         technicalDetails: Boolean(options.includeTechnicalDetails),
         rawTelemetry: false, rawCanonicalEvents: false, rawDiagnostics: false,
         screenshots: attachments(document).length > 0 },
-      privacy: { requiresReview: true, categories: ["business-central-error",
+      privacy: { requiresReview: true,
+        classifierVersion: privacyClassifier.CLASSIFIER_VERSION,
+        analysis: clone(report.errorAnalysis?.privacySummary || null),
+        categories: ["business-central-error",
         "environment", "technical-identifiers", "human-notes",
         ...(attachments(document).length ? ["screenshots"] : []),
         ...(includeTelemetry ? ["telemetry-summary"] : []),
         ...(includeAi ? ["ai-analysis"] : [])] },
       provenance: { type: "derived-issue-package",
         technicalReportId: document.reportDocumentId } };
-    return Object.freeze(result);
+    return Object.freeze(privacyClassifier.safeProjection(result));
   }
   function currentRevision(report, context = {}) { const document = generator.project(report,
     { errorEvidence: context.errorEvidence || [] }); return revision(report, document); }

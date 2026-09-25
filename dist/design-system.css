@@ -167,7 +167,7 @@ tbody tr:hover { background: var(--colorBrandSubtle); }
 .review-card { border-color: var(--colorBorderSubtle) !important; border-radius: var(--radiusLarge) !important; }
 .review-card.selected { outline-width: var(--focusWidth) !important; outline-offset: 2px; }
 .review-card.approved { border-color: var(--colorBorderSubtle) !important; border-left-color: var(--colorStatusSuccess) !important; background: #f7fbf7 !important; }
-.review-card.needs-review { border-color: var(--colorBorderSubtle) !important; border-left-color: #c58b00 !important; background: #fffdf5 !important; }
+.review-card.edited { border-color: var(--colorBorderSubtle) !important; border-left-color: var(--colorBrandStroke1Rest) !important; background: #f7fbff !important; }
 .review-card.drop-before { box-shadow: inset 0 4px 0 var(--colorBrandPrimary) !important; }
 .review-card.drop-after { box-shadow: inset 0 -4px 0 var(--colorBrandPrimary) !important; }
 .review-fields [data-edit-field][data-editing="true"] {
@@ -350,12 +350,7 @@ dialog::backdrop { background: rgb(0 0 0 / 40%) !important; }
 .process-version-node.added{border-color:#15803d;background:#f0fdf4}.process-version-node.removed{border-color:#b91c1c;background:#fef2f2;text-decoration:line-through}.process-version-node.modified,.process-version-node.moved{border-color:#b7791f;background:#fffbeb}
 @media(max-width:620px){.process-version-selectors{grid-template-columns:1fr}.process-overview-step{width:auto!important}}
 
-.review-attention { margin: 8px 0; padding: 8px 12px; border: 1px solid var(--colorBorderDefault); border-radius: var(--radiusMedium); }
-.review-attention summary { cursor: pointer; font-weight: 600; }
-.review-attention ol { max-height: 180px; overflow: auto; padding-left: 24px; }
-.review-attention button { text-align: left; white-space: normal; margin-bottom: 6px; }
 
-.review-attention-fix { margin-inline-start: 8px; }
 
 .step-repair-choice label { display: grid; gap: var(--space8); cursor: pointer; }
 .step-image-preview-dialog { width: min(1200px, calc(100vw - 32px)); height: calc(100dvh - 32px); box-sizing: border-box; overflow: hidden; }

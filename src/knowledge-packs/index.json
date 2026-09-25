@@ -30,6 +30,21 @@
       "file": "knowledge-packs/aptean-fb.json",
       "packId": "aptean-fb",
       "enabled": true
+    },
+    {
+      "packId": "bc-standard-pages",
+      "file": "knowledge-packs/bc-standard-pages.json",
+      "enabled": true
+    },
+    {
+      "packId": "bc-application-reference-28",
+      "file": "knowledge-packs/bc-application-reference-28.json",
+      "enabled": true
+    },
+    {
+      "packId": "bc-cash-management",
+      "file": "knowledge-packs/cash-management.json",
+      "enabled": true
     }
   ]
 }

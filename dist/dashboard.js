@@ -7,6 +7,7 @@ const DEFAULTS = {
     "Processen är genomförd enligt arbetsgången och de registrerade " +
     "ändringarna har sparats i Business Central.",
   captureScreenshots: true,
+  showClickHighlights: true,
   screenshotMode: "important",
   maskValues: true,
   maxEvents: 20000,
@@ -14,6 +15,7 @@ const DEFAULTS = {
   companyName: "",
   supportEmail: "",
   bugReportEmailMode: "eml",
+  knowledgeMcpEnabled: false,
   advancedOverridesEnabled: false,
   maskSalesOrderNo: true,
   maskPurchaseOrderNo: true,
@@ -42,6 +44,9 @@ const uiTf = (key, values) => globalThis.T9UiI18n.format(
 
 const $ = id => document.getElementById(id);
 const send = message => chrome.runtime.sendMessage(message);
+const processIntelligenceEnabled = () =>
+  globalThis.T9FeatureFlags?.isEnabled("processIntelligence") === true;
+globalThis.T9FeatureFlags?.apply(document);
 
 
 const CONTEXT_BUILDER_VERSION = "1.0.0";
@@ -303,19 +308,29 @@ function createContextCandidates(contextEvents) {
 
 const KNOWLEDGE_PACK_FRAMEWORK_VERSION = "2.0.0";
 let loadedKnowledgePacks = [];
+let loadedKnowledgeRelease = null;
+let loadedKnowledgeRepository = null;
 let loadedKnowledgeRules = [];
 let unmatchedKnowledgeItems = [];
 
 async function loadKnowledgePacks() {
   const indexUrl = chrome.runtime.getURL("knowledge-packs/index.json");
-  const loaded = await globalThis.T9PageIdentificationEngine.loadKnowledgePacks({
+  const loaded = await globalThis.BCKnowledgeRepository.load({
     indexUrl,
     resolveUrl: file => chrome.runtime.getURL(file)
   });
-  loadedKnowledgePacks = [...loaded.packs];
+  if (!loaded.ok) throw new Error(loaded.diagnostics.map(item => item.code).join(", "));
+  const repository = globalThis.BCKnowledgeRepository.createRepository(loaded.snapshot);
+  const snapshot = repository.getRelease();
+  const pageValidation = globalThis.T9PageIdentificationEngine.configureKnowledgePacks(
+    snapshot.packs
+  );
+  loadedKnowledgePacks = [...snapshot.packs];
+  loadedKnowledgeRelease = snapshot.release;
+  loadedKnowledgeRepository = repository;
   loadedKnowledgeRules = globalThis.T9KnowledgeDomain.rules(loadedKnowledgePacks);
-
-  return loadedKnowledgePacks;
+  return { packs: loadedKnowledgePacks, snapshot, repository,
+    pageValidation };
 }
 
 function applyKnowledgePackFramework(tasks) {
@@ -2676,6 +2691,77 @@ async function saveSettings() {
   show(globalThis.T9UiI18n.translate("settings.saved", settings.uiLocale));
 }
 
+async function testKnowledgeMcpConnection() {
+  const button = $("testKnowledgeMcp");
+  const status = $("knowledgeMcpStatus");
+  button.disabled = true;
+  status.textContent = uiT("settings.knowledgeMcpChecking");
+  try {
+    if ($("knowledgeMcpEnabled").checked !== applicationSettings.knowledgeMcpEnabled) {
+      await saveSettings();
+    }
+    if (!applicationSettings.knowledgeMcpEnabled) {
+      status.textContent = uiT("settings.knowledgeMcpConsentRequired");
+      return;
+    }
+    const response = await send({ type: "T9_TEST_KNOWLEDGE_MCP_CONNECTION" });
+    if (response?.ok) {
+      status.textContent = uiTf("settings.knowledgeMcpConnected", { count: response.toolCount });
+    } else {
+      const detail = String(response?.detail || "").replace(/[\u0000-\u001f]+/gu, " ").trim().slice(0, 240);
+      status.textContent = `${uiT("settings.knowledgeMcpUnavailable")}${detail
+        ? ` ${uiTf("settings.knowledgeMcpFailureDetail", { detail })}` : ""}`;
+    }
+  } catch (error) {
+    const detail = String(error?.message || error || "").replace(/[\u0000-\u001f]+/gu, " ").trim().slice(0, 240);
+    status.textContent = `${uiT("settings.knowledgeMcpUnavailable")}${detail
+      ? ` ${uiTf("settings.knowledgeMcpFailureDetail", { detail })}` : ""}`;
+  } finally {
+    button.disabled = false;
+  }
+}
+
+async function testKnowledgeMcpSampleLookup() {
+  const button = $("testKnowledgeMcpSampleLookup");
+  const status = $("knowledgeMcpSampleLookupStatus");
+  button.disabled = true;
+  status.textContent = uiT("settings.knowledgeMcpSampleChecking");
+  try {
+    if ($("knowledgeMcpEnabled").checked !== applicationSettings.knowledgeMcpEnabled) {
+      await saveSettings();
+    }
+    if (!applicationSettings.knowledgeMcpEnabled) {
+      status.textContent = uiT("settings.knowledgeMcpSampleConsentRequired");
+      return;
+    }
+    const response = await send({ type: "T9_TEST_KNOWLEDGE_MCP_SAMPLE_LOOKUP" });
+    if (!response?.ok) {
+      const detail = String(response?.detail || "").replace(/[\u0000-\u001f]+/gu, " ").trim().slice(0, 240);
+      status.textContent = uiT("settings.knowledgeMcpUnavailable") + (detail
+        ? " " + uiTf("settings.knowledgeMcpFailureDetail", { detail }) : "");
+      return;
+    }
+    const result = response.result;
+    const candidate = result?.candidates?.[0];
+    if (result?.status === "suggested" && candidate?.objectRef) {
+      const source = (candidate.provenance?.sourceId || "unknown") + "@" + (candidate.provenance?.sourceVersion || "unknown");
+      status.textContent = uiTf("settings.knowledgeMcpSampleFound", {
+        count: result.candidates.length,
+        objectId: candidate.objectRef.objectId,
+        source,
+        confidence: Math.round(Number(candidate.confidence || 0) * 100)
+      });
+    } else {
+      status.textContent = uiTf("settings.knowledgeMcpSampleUnresolved", { objectId: "22" });
+    }
+  } catch (error) {
+    const detail = String(error?.message || error || "").replace(/[\u0000-\u001f]+/gu, " ").trim().slice(0, 240);
+    status.textContent = uiT("settings.knowledgeMcpUnavailable") + (detail
+      ? " " + uiTf("settings.knowledgeMcpFailureDetail", { detail }) : "");
+  } finally {
+    button.disabled = false;
+  }
+}
 async function saveSupportEmail() {
   const input = $("supportEmail");
   const status = $("supportEmailStatus");
@@ -2747,7 +2833,31 @@ function interpretLegacyCompatibility(input) {
     unmatchedKnowledgeItems: [] };
 }
 
-async function prepareSessionModel(session) {
+async function fetchExternalKnowledgeSuggestions(tasks) {
+  if (!applicationSettings.knowledgeMcpEnabled ||
+      !globalThis.T9KnowledgeMcpWorkflow) return { enabled: false,
+        status: "disabled", requestCount: 0, suggestions: [] };
+  const requests = globalThis.T9KnowledgeMcpWorkflow.buildRequests(
+    tasks, applicationSettings.uiLocale, 40);
+  if (!requests.length) return { enabled: true, status: "no-unresolved",
+    requestCount: 0, suggestions: [] };
+  try {
+    const response = await send({ type: "T9_LOOKUP_KNOWLEDGE_MCP_BATCH",
+      lookups: requests.map(({ key, kind, request }) => ({ key, kind, request })) });
+    if (!response?.ok) return { enabled: true, status: "unavailable",
+      requestCount: requests.length, suggestions: [] };
+    const suggestions = globalThis.T9KnowledgeMcpWorkflow.collectSuggestions(
+      requests, response.results);
+    return { enabled: true,
+      status: suggestions.length ? "suggestions" : "no-suggestions",
+      requestCount: requests.length, suggestions };
+  } catch {
+    return { enabled: true, status: "unavailable",
+      requestCount: requests.length, suggestions: [] };
+  }
+}
+
+async function prepareSessionModel(session, options = {}) {
   const response = await send({
     type: "T9_GET_SESSION_DATA",
     sessionId: session.id,
@@ -2770,17 +2880,66 @@ async function prepareSessionModel(session) {
   const model = globalThis.T9SessionInterpretationPipeline.interpret({
     session: response.session, events: response.events,
     normalizedEvents: response.normalizedEvents, stepGroups: response.stepGroups,
-    imagePaths, knowledgePacks: loadedKnowledgePacks
+    supportingEvents: response.supportingEvents,
+    groupingDiagnostics: response.groupingDiagnostics,
+    imagePaths, knowledgePacks: loadedKnowledgePacks,
+    knowledgeRepository: loadedKnowledgeRepository,
+    knowledgeReleaseId: loadedKnowledgeRelease?.releaseId || null
   }, { entityMemory: globalThis.T9Engine?.entityMemory,
     sessionGraph: globalThis.T9Engine?.sessionGraph,
     confidence: globalThis.T9Engine?.confidence,
     compatibilityInterpret: interpretLegacyCompatibility });
+  const canonicalProcess = response.recording
+    ? globalThis.BCProcessAdapter.normalizeProcess({
+      recording: response.recording,
+      interpretation: model,
+      normalizedEvents: response.normalizedEvents,
+      stepGroups: response.stepGroups,
+      normalizerVersion: response.normalizedEvents?.[0]?.normalizationVersion ||
+        globalThis.T9EventNormalization.NORMALIZATION_VERSION,
+      knowledgeReleaseId: loadedKnowledgeRelease?.releaseId || null
+    }) : null;
+  const canonicalKnowledgeResolutions = canonicalProcess?.ok && loadedKnowledgeRepository
+    ? canonicalProcess.process.steps.map(step => ({ stepId: step.stepId,
+      object: loadedKnowledgeRepository.lookupObject(step.target.objectRef || {},
+        loadedKnowledgeRelease?.releaseId),
+      control: loadedKnowledgeRepository.resolveControl({
+        objectRef: step.target.objectRef || {}, controlRef: step.target.controlRef || {},
+        releaseId: loadedKnowledgeRelease?.releaseId }),
+      action: loadedKnowledgeRepository.resolveAction({
+        objectRef: step.target.objectRef || {}, controlRef: step.target.controlRef || {},
+        context: { pageCaption: step.target.capturedCaption || "",
+          actionCaption: step.observation.operation || "" }
+      }, loadedKnowledgeRelease?.releaseId) })) : [];
   unmatchedKnowledgeItems = model.unmatchedKnowledgeItems;
+  const externalKnowledgeTasks = model.businessTasks.map((task, index) => {
+    const step = canonicalProcess?.process.steps[index];
+    const localResolution = canonicalKnowledgeResolutions[index];
+    return { ...task,
+      knowledgeObjectRef: task.knowledgeObjectRef?.objectId
+        ? task.knowledgeObjectRef : step?.target.objectRef || {},
+      knowledgeControlRef: task.knowledgeControlRef?.controlId ||
+        task.knowledgeControlRef?.automationId ? task.knowledgeControlRef
+        : step?.target.controlRef || {},
+      knowledgeResolution: task.knowledgeResolution || {
+        object: localResolution?.object || { status: "unresolved" },
+        action: localResolution?.action || { status: "unresolved" }
+      },
+      pageCaption: task.pageCaption || step?.target.capturedCaption || "",
+      actionCaption: task.actionCaption || step?.observation.operation || ""
+    };
+  });
+  const externalKnowledgeLookup = options.includeExternalKnowledge
+    ? await fetchExternalKnowledgeSuggestions(externalKnowledgeTasks)
+    : { enabled: false, status: "disabled", requestCount: 0, suggestions: [] };
 
   return {
     response,
     imagePaths,
     screenshotData,
+    canonicalProcess,
+    canonicalKnowledgeResolutions,
+    externalKnowledgeLookup,
     ...model
   };
 }
@@ -2813,6 +2972,8 @@ async function exportSession(session) {
   const model = globalThis.T9SessionInterpretationPipeline.interpret({
     session: response.session, events: response.events,
     normalizedEvents: response.normalizedEvents, stepGroups: response.stepGroups,
+    supportingEvents: response.supportingEvents,
+    groupingDiagnostics: response.groupingDiagnostics,
     imagePaths, knowledgePacks: loadedKnowledgePacks
   }, { entityMemory: globalThis.T9Engine?.entityMemory,
     sessionGraph: globalThis.T9Engine?.sessionGraph,
@@ -3706,6 +3867,7 @@ function persistProcessAnalysisDecision(reference, status, variant = null) {
 }
 
 async function openProcessAnalysisDialog() {
+  if (!processIntelligenceEnabled()) return;
   const dialog = $("processAnalysisDialog");
   $("processAnalysisContent").innerHTML = `<p class="process-analysis-loading">${escapeHtml(
     uiT("Analyserar processen…"))}</p>`;
@@ -4639,6 +4801,13 @@ function applyReviewToolbarState() {
     canExport: activeReview && activeReviewSession && activeReviewModel
   });
   globalThis.T9ReviewToolbar.apply($("reviewToolbar"), state);
+  const selectionBar = $("reviewSelectionActions");
+  const selectedCount = activeReviewSelection.selectedIds.filter(id => reviewTaskIds().includes(id)).length;
+  if (!selectedCount && selectionBar.contains(document.activeElement)) {
+    $("reviewMoreActions").querySelector("summary").focus();
+  }
+  selectionBar.hidden = selectedCount === 0;
+  $("reviewSelectionCount").textContent = String(selectedCount);
   $("resetReviewStructure").disabled =
     !activeReview?.structureOverrides?.length;
   $("completeReview").disabled = !activeReview ||
@@ -4654,14 +4823,18 @@ function applyReviewToolbarState() {
 }
 
 function activeExportCheck() {
-  return globalThis.T9ReviewNavigation.exportCheck(
-    reviewTasksForDisplay(activeReview).tasks, screenshotQualityByTask());
+  const tasks = reviewTasksForDisplay(activeReview).tasks;
+  const navigation = globalThis.T9ReviewNavigation.derive(
+    tasks, activeReviewSelection.activeId
+  );
+  return { total: tasks.length, remaining: navigation.count,
+    nextTaskId: navigation.nextTaskId };
 }
 
 function renderDocumentExportCheck() {
   const check = activeExportCheck();
   $("documentExportCheckStatus").textContent = check.total
-    ? uiTf("review.exportCheck", check) : uiT("review.exportEmpty");
+    ? uiTf("review.readiness", check) : uiT("review.exportEmpty");
   $("documentCheckNext").disabled = !check.nextTaskId;
   if (!$("documentExportWord").hasAttribute("aria-busy")) {
     $("documentExportWord").disabled = !check.total;
@@ -4674,7 +4847,6 @@ $("documentCheckNext").addEventListener("click", async () => {
   if (!check.nextTaskId) return;
   await switchWorkspace("review");
   if (activeReview !== review) return;
-  $("reviewAttention").open = true;
   activateProcessOverviewTask(check.nextTaskId, true);
 });
 
@@ -4682,53 +4854,13 @@ $("documentExportWord").addEventListener("click", event => {
   exportReviewFromToolbar(event.currentTarget);
 });
 
-function renderReviewAttention(tasks, imageQualities) {
+function renderReviewAttention(tasks) {
   renderDocumentExportCheck();
-  const guidance = globalThis.T9ReviewNavigation.attention(tasks, imageQualities);
-  $("reviewOutcomeSummary").textContent = uiTf("review.outcomeSummary",
-    globalThis.T9ReviewNavigation.outcomes(tasks));
+  const remaining = tasks.filter(task => !task.approved).length;
   $("reviewSummary").textContent = uiTf("review.readiness", {
-    total: guidance.total, remaining: guidance.remaining
-  });
-  $("reviewAttentionSummary").textContent = guidance.items.length
-    ? uiTf("review.attentionCount", { count: guidance.items.length })
-    : uiT("review.attentionNone");
-  $("reviewAttentionHelp").textContent = uiT("review.attentionHelp");
-  const list = $("reviewAttentionList");
-  list.replaceChildren();
-  guidance.items.forEach(item => {
-    const row = document.createElement("li");
-    const button = document.createElement("button");
-    button.type = "button";
-    button.className = "secondary";
-    button.textContent = uiTf("review.attentionStep", { step: item.step }) +
-      " · " + item.reasons.map(reason => uiT("review.attention." + reason)).join(" · ");
-    button.addEventListener("click", () => {
-      activateProcessOverviewTask(item.taskId, true);
-    });
-    row.append(button);
-    const action = item.reasons.includes("instruction") ? "edit-instruction"
-      : item.reasons.includes("image") ? "repair-step" : null;
-    if (action) {
-      const fix = document.createElement("button");
-      fix.type = "button";
-      fix.className = "secondary review-attention-fix";
-      fix.textContent = uiT(action === "edit-instruction"
-        ? "review.attentionEdit" : "review.attentionImage");
-      fix.setAttribute("aria-label", uiTf(action === "edit-instruction"
-        ? "a11y.editInstruction" : "a11y.changeImage", { step: item.step }));
-      fix.addEventListener("click", () => {
-        if (!activateProcessOverviewTask(item.taskId, true)) return;
-        const card = [...$("reviewList").querySelectorAll("[data-review-task-id]")]
-          .find(value => value.dataset.reviewTaskId === item.taskId);
-        card?.querySelector('[data-action="' + action + '"]')?.click();
-      });
-      row.append(fix);
-    }
-    list.append(row);
+    total: tasks.length, remaining
   });
 }
-
 function applyReviewStatus() {
   const status = globalThis.T9ReviewStatus.derive(
     activeReview?.tasks || [],
@@ -5862,7 +5994,7 @@ function renderStoredReviewFallback(error) {
     let task = storedTask;
     try { task = globalThis.T9StepEditor.resolve(storedTask); } catch {}
     const card = document.createElement("article");
-    card.className = "review-card needs-review";
+    card.className = "review-card pending";
     card.dataset.reviewTaskId = task?.taskId || `stored-task-${index + 1}`;
     const instruction = String(task?.instruction || task?.description ||
       "Steget saknar instruktion.");
@@ -6104,6 +6236,51 @@ function applyInstructionFormatting(control, editor, patch) {
   updateInstructionToolbar(editor.closest("[data-review-task-id]"), editor);
 }
 
+function renderExternalKnowledgeSuggestions() {
+  const section = $("reviewExternalKnowledgeSuggestions");
+  const list = $("reviewExternalKnowledgeSuggestionList");
+  if (!section || !list) return;
+  list.replaceChildren();
+  const lookup = activeReviewModel?.externalKnowledgeLookup;
+  const suggestions = lookup?.suggestions || [];
+  section.hidden = !lookup?.enabled;
+  const status = $("reviewExternalKnowledgeStatus");
+  if (status) {
+    status.textContent = lookup?.status === "no-unresolved"
+      ? uiT("review.externalKnowledgeNoUnresolved")
+      : lookup?.status === "no-suggestions"
+        ? uiTf("review.externalKnowledgeNoSuggestions", {
+          count: lookup.requestCount
+        })
+        : lookup?.status === "unavailable"
+          ? uiT("review.externalKnowledgeUnavailable") : "";
+    status.hidden = !status.textContent;
+  }
+  for (const suggestion of suggestions) {
+    const item = document.createElement("li");
+    const task = activeReviewModel.businessTasks.find(candidate =>
+      candidate.taskId === suggestion.taskId);
+    const candidate = suggestion.candidate || {};
+    const value = suggestion.kind === "object"
+      ? `${candidate.objectRef?.objectType || ""} ${candidate.objectRef?.objectId || ""}`.trim()
+      : `${candidate.action?.semanticAction || ""} — ${candidate.action?.entity || ""}`.trim();
+    const heading = document.createElement("strong");
+    heading.textContent = `${suggestion.kind === "object"
+      ? uiT("review.externalKnowledgeObject")
+      : uiT("review.externalKnowledgeAction")}: ${value || uiT("Okänt förslag")}`;
+    const details = document.createElement("p");
+    const source = candidate.provenance?.sourceId || "MCP";
+    const version = candidate.provenance?.sourceVersion || "";
+    details.textContent = uiTf("review.externalKnowledgeMeta", {
+      step: task ? String(activeReviewModel.businessTasks.indexOf(task) + 1) : "?",
+      confidence: Math.round(Math.min(0.69, Number(candidate.confidence) || 0) * 100),
+      source: `${source}${version ? `@${version}` : ""}`
+    });
+    item.append(heading, details);
+    list.append(item);
+  }
+}
+
 function renderReviewContent() {
   invalidateDocumentWorkspace();
   const list = $("reviewList");
@@ -6120,11 +6297,12 @@ function renderReviewContent() {
   const screenshotQualities = screenshotQualityByTask();
   const progress = globalThis.T9Review.progress(activeReview);
   list.innerHTML = "";
+  renderExternalKnowledgeSuggestions();
 
   $("reviewProgressBar").style.width = `${progress}%`;
   $("reviewProgress").setAttribute("aria-valuenow", String(progress));
   list.setAttribute("aria-rowcount", String(tasks.length));
-  renderReviewAttention(tasks, screenshotQualities);
+  renderReviewAttention(tasks);
   $("reviewFooterText").textContent =
     annotationChangesPending
       ? "Annoteringar har ändrats. Välj Spara för att lagra dem."
@@ -6137,12 +6315,13 @@ function renderReviewContent() {
       candidate.taskId === task.taskId
     );
     const card = document.createElement("article");
-    const needsReview = !task.approved &&
-      (task.reviewSuggested || task.confidenceScore < 80);
+    const userEdited = !task.approved && (task.reviewStatus === "edited" ||
+      Boolean(task.stepOverride) || Boolean(task.userComment) ||
+      Boolean(task.manualStepId) || task.provenance === "manual");
     const reviewState = task.approved ? "approved"
-      : needsReview ? "needs-review" : "pending";
+      : userEdited ? "edited" : "pending";
     const reviewStateLabel = task.approved ? uiT("Godkänt")
-      : needsReview ? uiT("Behöver granskas") : uiT("Ej granskat");
+      : userEdited ? uiT("Ändrad") : uiT("Ej granskat");
     card.dataset.reviewTaskId = task.taskId;
     card.dataset.reviewState = reviewState;
     card.setAttribute("role", "row");
@@ -6287,6 +6466,12 @@ function renderReviewContent() {
               ? ` · ${escapeHtml(task.knowledgeRule)}`
               : ""}
           </div>
+          ${screenshotQuality ? `<details class="review-screenshot-quality"
+            data-quality="${escapeHtml(qualityLevel)}">
+            <summary>${uiT("review.imageSelection")}</summary>
+            <p>${uiT(`review.imageReason.${screenshotQuality.qualityReason}`)}</p>
+            ${qualityMetrics ? `<p class="metrics">${escapeHtml(qualityMetrics)}</p>` : ""}
+          </details>` : ""}
         </details>
         ${task.resultVerified && task.observedResult
           ? `<p class="review-observed-result ${task.resultVerification?.status === "error"
@@ -6296,14 +6481,7 @@ function renderReviewContent() {
                   task.observedResult, applicationSettings.uiLocale
                 ))}</p>`
           : ""}
-        ${screenshotQuality ? `<details class="review-screenshot-quality"
-          data-quality="${escapeHtml(qualityLevel)}">
-          <summary>${uiT("review.imageSelection")}: ${uiT(
-            `review.imageQuality.${qualityLevel}`
-          )}</summary>
-          <p>${uiT(`review.imageReason.${screenshotQuality.qualityReason}`)}</p>
-          ${qualityMetrics ? `<p class="metrics">${escapeHtml(qualityMetrics)}</p>` : ""}
-        </details>` : ""}
+
         ${images.map((image, imageIndex) =>
           `<div class="review-screenshot">
             <div class="review-image-stage" data-review-image-index="${imageIndex}">
@@ -6704,6 +6882,7 @@ function renderReview() {
 }
 
 function renderProcessOverview() {
+  if (!processIntelligenceEnabled()) return;
   const container = $("processOverview");
   if (!container || !activeReview || !activeReviewSession) {
     activeProcessModel = null;
@@ -7035,7 +7214,7 @@ async function openReview(session) {
   activeReviewSession = session;
   annotationChangesPending = false;
   updateFilenamePreview();
-  activeReviewModel = await prepareSessionModel(session);
+  activeReviewModel = await prepareSessionModel(session, { includeExternalKnowledge: true });
 
   const existing = await send({
     type: "T9_GET_REVIEW",
@@ -8409,6 +8588,8 @@ globalThis.T9ReviewMove.bind($("reviewList"), {
 });
 
 $("save").addEventListener("click", saveSettings);
+$("testKnowledgeMcp").addEventListener("click", testKnowledgeMcpConnection);
+$("testKnowledgeMcpSampleLookup").addEventListener("click", testKnowledgeMcpSampleLookup);
 $("saveSupportEmail").addEventListener("click", saveSupportEmail);
 $("uiLocale").addEventListener("change", changeUiLocale);
 $("refresh").addEventListener("click", loadSessions);
@@ -8689,11 +8870,6 @@ $("libraryBatchDelete").addEventListener("click", async () => {
 $("exportFileNamePattern").addEventListener("input", updateFilenamePreview);
 $("environmentName").addEventListener("input", updateFilenamePreview);
 $("companyName").addEventListener("input", updateFilenamePreview);
-$("debug").addEventListener("click", () => {
-  chrome.tabs.create({
-    url: chrome.runtime.getURL("debug.html")
-  });
-});
 document.addEventListener("keydown", event => {
   if (event.key !== "/" || event.ctrlKey || event.metaKey || event.altKey ||
       $("reviewOverlay").classList.contains("open") ||
@@ -8747,7 +8923,7 @@ async function initializeDashboard() {
   } catch (error) {
     console.error("BC Process Studio loadSessions failed", error);
     show(
-      "Sessionerna kunde inte läsas. Öppna debugpanelen för mer information.",
+      uiT("Saved recordings could not be loaded. Reload the page and try again."),
       true
     );
   }

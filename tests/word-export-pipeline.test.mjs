@@ -143,9 +143,9 @@ const semanticInteractionOutput = await exportReview(review([{
   sourceEventNos: [41], screenshot: "customer-row.png"
 }]));
 assert.ok(semanticInteractionOutput.documentXml.includes("Välj "));
-assert.ok(semanticInteractionOutput.documentXml.includes(">Kund</w:t>"));
+assert.ok(semanticInteractionOutput.documentXml.includes(">Kundnr</w:t>"));
 assert.match(semanticInteractionOutput.documentXml,
-  /<w:i(?: [^>]*)?\/>[\s\S]{0,500}<w:t[^>]*>Kund<\/w:t>/);
+  /<w:i(?: [^>]*)?\/>[\s\S]{0,500}<w:t[^>]*>Kundnr<\/w:t>/);
 assert.ok(semanticInteractionOutput.documentXml.includes("1033"));
 assert.match(semanticInteractionOutput.documentXml,
   /<w:b(?: [^>]*)?\/>[\s\S]{0,500}<w:t[^>]*>1033<\/w:t>/);
@@ -157,7 +157,7 @@ const customerInstruction = semanticInteractionOutput.plan.sections
 assert.ok(customerInstruction.content.runs.find(run =>
   run.text === "1033" && run.bold && run.role === "value"));
 assert.ok(customerInstruction.content.runs.find(run =>
-  run.text === "Kund" && run.italic && run.role === "interface"));
+  run.text === "Kundnr" && run.italic && run.role === "interface"));
 assert.strictEqual(semanticInteractionOutput.semanticActionsDocument.sections
   .find(section => section.kind === "workflow").blocks
   .filter(block => block.kind === "step").length, 1);

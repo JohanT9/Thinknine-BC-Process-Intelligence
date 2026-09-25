@@ -26,7 +26,9 @@ const packs = [...productionPacks, verifiedApteanFixture];
 const validationStarted = performance.now();
 const validation = pageEngine.configureKnowledgePacks(packs);
 const loadMilliseconds = performance.now() - validationStarted;
-assert.equal(validation.definitionCount, 5);
+const expectedDefinitionCount = packs.reduce((count, pack) =>
+  count + (pack.pageDefinitions || []).length, 0);
+assert.equal(validation.definitionCount, expectedDefinitionCount);
 assert.ok(!validation.diagnostics.some(item => item.code.startsWith("invalid-") ||
   item.code.startsWith("unverified-")));
 

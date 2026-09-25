@@ -3,13 +3,15 @@
     ? require("./bug-report-model") : root.T9BugReportModel;
   const technical = typeof module === "object" && module.exports
     ? require("./technical-diagnostics") : root.T9TechnicalDiagnostics;
+  const errorAnalysis = typeof module === "object" && module.exports
+    ? require("./error-analysis-engine") : root.T9ErrorAnalysisEngine;
   const languages = typeof module === "object" && module.exports
     ? require("../engine/language-registry") : root.T9LanguageRegistry;
-  const api = factory(model, technical, languages);
+  const api = factory(model, technical, errorAnalysis, languages);
   if (typeof module === "object" && module.exports) module.exports = api;
   root.T9BugReportService = api;
 })(typeof globalThis !== "undefined" ? globalThis : this, function (model, technical,
-  languages) {
+  errorAnalysis, languages) {
   "use strict";
   const clone = value => value == null ? value : JSON.parse(JSON.stringify(value));
   const unique = values => [...new Set((values || []).filter(Boolean).map(String))];
@@ -149,6 +151,8 @@
       technical.safelyDerive(item));
     const primaryCallStack = technicalDiagnostics.find(item =>
       item.summary.callStackAvailable)?.callStack;
+    const analyzedErrors = errorAnalysis.analyze(errorEvidence, technicalDiagnostics,
+      { recordingId: recording.id });
     const documentLanguage = context.documentLanguage
       ? languages.normalize(context.documentLanguage, "document") : "en-US";
     return model.normalize({ bugReportId: context.bugReportId || stableId(recording.id),
@@ -164,8 +168,10 @@
       actualResult: { human: { text: "", authorship: "human" },
         capturedErrorRef: null, capturedErrorRefs: errorEvidenceIds },
       businessCentralError: errorEvidenceIds.length ? {
-        primaryErrorEvidenceId: null, errorEvidenceIds
+        primaryErrorEvidenceId: errorEvidenceIds.length === 1 ? errorEvidenceIds[0] : null,
+        errorEvidenceIds
       } : null,
+      errorAnalysis: analyzedErrors,
       diagnostics: { rawEvidenceRefs: errorEvidenceIds, parsed: null },
       callStack: { rawEvidenceRef: callStackEvidence?.errorEvidenceId || null,
         frames: clone(primaryCallStack?.frames || []),
@@ -222,7 +228,10 @@
     const current = model.normalize(report);
     const derived = errorEvidence.map(item => technical.safelyDerive(item));
     const primary = derived.find(item => item.summary.callStackAvailable)?.callStack;
+    const analyzedErrors = errorAnalysis.analyze(errorEvidence, derived,
+      { recordingId: current.recordingId });
     return model.normalize({ ...clone(current), technicalDiagnostics: derived,
+      errorAnalysis: analyzedErrors,
       callStack: { ...clone(current.callStack),
         frames: clone(primary?.frames || []), parserVersion: primary?.parserVersion,
         parseStatus: primary?.status,
@@ -239,6 +248,8 @@
     const stackEvidence = errorEvidence.find(item => item.callStackAvailable);
     const stack = diagnostics.find(item =>
       item.errorEvidenceId === stackEvidence?.errorEvidenceId)?.callStack;
+    const analyzedErrors = errorAnalysis.analyze(errorEvidence, diagnostics,
+      { recordingId: current.recordingId });
     const screenshots = errorEvidence.filter(item => item.errorScreenshotAssetId)
       .map(item => ({ assetId: item.errorScreenshotAssetId, role: "error",
         errorEvidenceId: item.errorEvidenceId, visibility: "visible" }));
@@ -246,6 +257,7 @@
       actualResult: { ...clone(current.actualResult), capturedErrorRefs: ids },
       businessCentralError: { primaryErrorEvidenceId: ids.length === 1 ? ids[0] : null,
         errorEvidenceIds: ids },
+      errorAnalysis: analyzedErrors,
       diagnostics: { ...clone(current.diagnostics), rawEvidenceRefs: ids },
       callStack: { ...clone(current.callStack),
         rawEvidenceRef: stackEvidence?.errorEvidenceId || null,

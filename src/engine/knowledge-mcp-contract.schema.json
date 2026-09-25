@@ -1,0 +1,142 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "BC Process Studio Knowledge MCP Contract",
+  "description": "Read-only, tenant-independent MCP lookup contract for knowledge metadata suggestions.",
+  "$defs": {
+    "id": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 160,
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]*$"
+    },
+    "objectType": {
+      "type": "string",
+      "enum": ["page", "table", "report", "codeunit", "enum", "unknown"]
+    },
+    "locale": {
+      "type": "string",
+      "maxLength": 8,
+      "pattern": "^[a-z]{2,3}-[A-Z]{2}$"
+    },
+    "objectRef": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["objectType", "objectId"],
+      "properties": {
+        "objectType": { "$ref": "#/$defs/objectType" },
+        "objectId": { "$ref": "#/$defs/id" },
+        "appId": { "$ref": "#/$defs/id" },
+        "appVersion": { "type": "string", "maxLength": 160 }
+      }
+    },
+    "objectInput": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["objectType", "objectId", "productFamily"],
+      "properties": {
+        "objectType": { "$ref": "#/$defs/objectType" },
+        "objectId": { "$ref": "#/$defs/id" },
+        "appId": { "$ref": "#/$defs/id" },
+        "appVersion": { "type": "string", "maxLength": 160 },
+        "productFamily": {
+          "type": "string",
+          "enum": ["business-central", "aptean-food-and-beverage", "unknown"]
+        },
+        "locale": { "$ref": "#/$defs/locale" }
+      }
+    },
+    "actionInput": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["objectRef", "controlRef", "context"],
+      "properties": {
+        "objectRef": { "$ref": "#/$defs/objectRef" },
+        "controlRef": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "controlId": { "$ref": "#/$defs/id" },
+            "automationId": { "type": "string", "maxLength": 160 }
+          }
+        },
+        "context": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "pageCaption": { "type": "string", "maxLength": 160 },
+            "actionCaption": { "type": "string", "maxLength": 160 },
+            "fieldCaption": { "type": "string", "maxLength": 160 }
+          }
+        },
+        "locale": { "$ref": "#/$defs/locale" }
+      }
+    },
+    "provenance": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["sourceId", "sourceVersion"],
+      "properties": {
+        "sourceId": { "type": "string", "minLength": 1, "maxLength": 160 },
+        "sourceVersion": { "type": "string", "minLength": 1, "maxLength": 160 },
+        "sourceUri": { "type": "string", "format": "uri", "maxLength": 160 }
+      }
+    },
+    "objectCandidate": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["candidateId", "objectRef", "confidence", "provenance"],
+      "properties": {
+        "candidateId": { "$ref": "#/$defs/id" },
+        "objectRef": { "$ref": "#/$defs/objectRef" },
+        "confidence": { "type": "number", "minimum": 0, "maximum": 1 },
+        "provenance": { "$ref": "#/$defs/provenance" }
+      }
+    },
+    "actionCandidate": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["candidateId", "action", "confidence", "provenance"],
+      "properties": {
+        "candidateId": { "$ref": "#/$defs/id" },
+        "action": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["taskType", "semanticAction", "entity"],
+          "properties": {
+            "taskType": { "$ref": "#/$defs/id" },
+            "semanticAction": { "$ref": "#/$defs/id" },
+            "entity": { "type": "string", "maxLength": 120 }
+          }
+        },
+        "confidence": { "type": "number", "minimum": 0, "maximum": 1 },
+        "provenance": { "$ref": "#/$defs/provenance" }
+      }
+    },
+    "objectResult": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["status", "candidates"],
+      "properties": {
+        "status": { "type": "string", "enum": ["resolved", "ambiguous", "unresolved"] },
+        "candidates": { "type": "array", "maxItems": 10,
+          "items": { "$ref": "#/$defs/objectCandidate" } }
+      }
+    },
+    "actionResult": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["status", "candidates"],
+      "properties": {
+        "status": { "type": "string", "enum": ["resolved", "ambiguous", "unresolved"] },
+        "candidates": { "type": "array", "maxItems": 10,
+          "items": { "$ref": "#/$defs/actionCandidate" } }
+      }
+    }
+  },
+  "oneOf": [
+    { "$ref": "#/$defs/objectInput" },
+    { "$ref": "#/$defs/actionInput" },
+    { "$ref": "#/$defs/objectResult" },
+    { "$ref": "#/$defs/actionResult" }
+  ]
+}

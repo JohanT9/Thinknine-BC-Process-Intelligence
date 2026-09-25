@@ -2,21 +2,21 @@
   "document": {
     "profile": "professional",
     "margins": {
-      "top": 18,
-      "right": 18,
-      "bottom": 18,
-      "left": 20,
+      "top": 17,
+      "right": 16,
+      "bottom": 17,
+      "left": 18,
       "header": 9,
       "footer": 9,
       "unit": "mm"
     },
-    "lineHeight": 1.22
+    "lineHeight": 1.18
   },
   "cover": {
     "composition": "balancedCover",
     "hierarchy": "brandTypeTitleSubtitleMetadata",
-    "titleSize": 30,
-    "metadataWidth": 86,
+    "titleSize": 28,
+    "metadataWidth": 90,
     "metadataGrouping": [
       "identity",
       "identity",
@@ -38,7 +38,8 @@
       "emphasis": "primary",
       "widthIntent": "fullContent",
       "grouping": "screenshotSequence",
-      "maxWidth": 640,
+      "maxWidth": 620,
+      "adaptiveFit": true,
       "frame": "framed",
       "preserveAspectRatio": true,
       "preserveQuality": true
@@ -47,7 +48,8 @@
       "emphasis": "supporting",
       "widthIntent": "consistentSupporting",
       "grouping": "screenshotSequence",
-      "maxWidth": 600,
+      "maxWidth": 570,
+      "adaptiveFit": true,
       "frame": "framed",
       "preserveAspectRatio": true,
       "preserveQuality": true
@@ -57,7 +59,8 @@
     "role": "note",
     "grouping": "stepSupport",
     "borderColor": "#2673a8",
-    "fillColor": "#edf6fb"
+    "fillColor": "#edf6fb",
+    "presentationStyle": "inline"
   },
   "revision": {
     "rowIntegrity": true,

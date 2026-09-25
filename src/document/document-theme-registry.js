@@ -243,9 +243,9 @@
     },
     components: {
       document: {
-        fontFamily: "Segoe UI", fontSize: 11, lineHeight: 1.22,
-        paragraphAfter: 6,
-        margins: { top: 18, right: 18, bottom: 18, left: 20,
+        fontFamily: "Segoe UI", fontSize: 11, lineHeight: 1.18,
+        paragraphAfter: 5,
+        margins: { top: 17, right: 16, bottom: 17, left: 18,
           header: 9, footer: 9, unit: "mm" }
       },
       header: {
@@ -264,14 +264,14 @@
         dividerSize: 0,
         brandSize: 11,
         documentTypeSize: 14,
-        titleSize: 30,
+        titleSize: 28,
         subtitleSize: 12,
-        metadataWidth: 86,
-        spacing: { brandAfter: 10, typeAfter: 16, titleAfter: 10,
-          subtitleAfter: 24 }
+        metadataWidth: 90,
+        spacing: { brandAfter: 8, typeAfter: 12, titleAfter: 8,
+          subtitleAfter: 18 }
       },
       metadataTable: {
-        width: 86,
+        width: 90,
         labelWidth: 34,
         labelFill: "#f0f7f7",
         valueFill: "#ffffff",
@@ -293,22 +293,28 @@
         headingBorderColor: "#007a82",
         headingStyle: "band",
         instructionSize: 11,
-        before: 10,
+        instructionColor: "#172b45",
+        contentPadding: 6,
+        before: 9,
         after: 5
       },
       screenshot: {
-        maxWidth: 640,
-        maxHeight: 455,
-        supportingMaxWidth: 600,
+        maxWidth: 620,
+        maxHeight: 385,
+        supportingMaxWidth: 570,
+        adaptiveFit: true,
+        panoramicMaxHeight: 330,
+        portraitMaxWidth: 480,
         presentationStyle: "framed",
         borderColor: "#ccdee0",
         backgroundColor: "#ffffff",
         borderSize: 4,
-        cellPadding: 5,
-        before: 7,
-        after: 12
+        cellPadding: 4,
+        before: 5,
+        after: 9
       },
       callout: {
+        presentationStyle: "inline",
         borderColor: "#2673a8",
         fillColor: "#edf6fb",
         labelColor: "#0f4c81",
@@ -321,8 +327,8 @@
           decision: { borderColor: "#6b46a1", fillColor: "#f4effb" },
           example: { borderColor: "#5f6b76", fillColor: "#f3f5f7" }
         },
-        before: 6,
-        after: 9
+        before: 3,
+        after: 6
       },
       table: {
         borderColor: "#b8c2cc",

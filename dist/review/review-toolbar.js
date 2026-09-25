@@ -53,6 +53,16 @@
         }
         return;
       }
+      const openPanel = event.target.closest?.("details[open]");
+      if (openPanel && ["ArrowDown", "ArrowUp"].includes(event.key)) {
+        const items = [...openPanel.querySelectorAll("summary,button:not(:disabled)")];
+        const index = items.indexOf(event.target);
+        if (index >= 0) {
+          event.preventDefault();
+          items[(index + (event.key === "ArrowDown" ? 1 : items.length - 1)) % items.length].focus();
+        }
+        return;
+      }
       if (!["ArrowLeft", "ArrowRight", "Home", "End"].includes(event.key)) return;
       const current = event.target.closest?.("[data-review-toolbar-item]");
       if (!current) return;
@@ -60,7 +70,7 @@
         "summary[data-review-toolbar-item], " +
         "[data-review-toolbar-item]:not(:disabled):not(summary):not(" +
         "details:not([open]) [data-review-toolbar-item])"
-      )];
+      )].filter(item => !item.closest?.("[hidden]"));
       const index = buttons.indexOf(current);
       if (index < 0 || !buttons.length) return;
       let nextIndex;
@@ -74,9 +84,18 @@
       event.preventDefault();
       buttons[nextIndex].focus();
     }
+    function dismissOutside(event) {
+      const disclosure = container.querySelector("details[open]");
+      if (disclosure && !disclosure.contains(event.target)) disclosure.open = false;
+    }
+    const owner = container.ownerDocument;
+    owner?.addEventListener("pointerdown", dismissOutside);
+    owner?.addEventListener("focusin", dismissOutside);
     container.addEventListener("click", handleClick);
     container.addEventListener("keydown", handleKeydown);
     return () => {
+      owner?.removeEventListener("pointerdown", dismissOutside);
+      owner?.removeEventListener("focusin", dismissOutside);
       container.removeEventListener("click", handleClick);
       container.removeEventListener("keydown", handleKeydown);
     };

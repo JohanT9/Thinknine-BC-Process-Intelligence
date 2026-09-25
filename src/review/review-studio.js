@@ -39,6 +39,8 @@
     ? require("../engine/language-registry") : root.T9LanguageRegistry;
   const correctionFeedback = typeof module === "object" && module.exports
     ? require("./correction-feedback") : root.T9CorrectionFeedback;
+  const improvementDataset = typeof module === "object" && module.exports
+    ? require("./process-improvement-dataset") : root.T9ProcessImprovementDataset;
   const api = factory(
     moveEngine,
     mergeEngine,
@@ -53,7 +55,8 @@
     hierarchy,
     taskVisibility,
     languages,
-    correctionFeedback
+    correctionFeedback,
+    improvementDataset
   );
   if (typeof module === "object" && module.exports) module.exports = api;
   root.T9Review = api;
@@ -71,7 +74,8 @@
   hierarchy,
   taskVisibility,
   languages,
-  correctionFeedback
+  correctionFeedback,
+  improvementDataset
 ) {
   function clone(value) {
     return JSON.parse(JSON.stringify(value));
@@ -1384,6 +1388,7 @@
     redo: historyEngine.redo,
     historyDirectionFromKey: historyEngine.directionFromKey,
     correctionFeedbackSummary: correctionFeedback.summary,
+    processImprovementDataset: improvementDataset.create,
     applySelectiveRegeneration,
     activeTasks,
     visibleTaskNumber,

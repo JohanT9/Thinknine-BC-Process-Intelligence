@@ -1,0 +1,2279 @@
+{
+  "packId": "bc-application-reference-28",
+  "name": "Business Central Base Application reference (version 28)",
+  "version": "1.0.0",
+  "priority": 250,
+  "sources": [
+    {
+      "sourceId": "microsoft-learn-bc28-21",
+      "title": "Page 21 Customer Card",
+      "sourceType": "microsoft-learn-application-reference",
+      "sourceUri": "https://learn.microsoft.com/en-us/dynamics365/business-central/application/base-application/page/microsoft.sales.customer.customer-card",
+      "appliesTo": "Business Central 2026 release wave 1 (version 28.x)",
+      "accessedDate": "2026-09-25",
+      "fields": [
+        "pageObjectId",
+        "caption",
+        "pageType",
+        "sourceTable",
+        "description"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-bc28-22",
+      "title": "Page 22 Customer List",
+      "sourceType": "microsoft-learn-application-reference",
+      "sourceUri": "https://learn.microsoft.com/en-us/dynamics365/business-central/application/base-application/page/microsoft.sales.customer.customer-list",
+      "appliesTo": "Business Central 2026 release wave 1 (version 28.x)",
+      "accessedDate": "2026-09-25",
+      "fields": [
+        "pageObjectId",
+        "caption",
+        "pageType",
+        "sourceTable",
+        "description"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-bc28-26",
+      "title": "Page 26 Vendor Card",
+      "sourceType": "microsoft-learn-application-reference",
+      "sourceUri": "https://learn.microsoft.com/en-us/dynamics365/business-central/application/base-application/page/microsoft.purchases.vendor.vendor-card",
+      "appliesTo": "Business Central 2026 release wave 1 (version 28.x)",
+      "accessedDate": "2026-09-25",
+      "fields": [
+        "pageObjectId",
+        "caption",
+        "pageType",
+        "sourceTable",
+        "description"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-bc28-27",
+      "title": "Page 27 Vendor List",
+      "sourceType": "microsoft-learn-application-reference",
+      "sourceUri": "https://learn.microsoft.com/en-us/dynamics365/business-central/application/base-application/page/microsoft.purchases.vendor.vendor-list",
+      "appliesTo": "Business Central 2026 release wave 1 (version 28.x)",
+      "accessedDate": "2026-09-25",
+      "fields": [
+        "pageObjectId",
+        "caption",
+        "pageType",
+        "sourceTable",
+        "description"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-bc28-30",
+      "title": "Page 30 Item Card",
+      "sourceType": "microsoft-learn-application-reference",
+      "sourceUri": "https://learn.microsoft.com/en-us/dynamics365/business-central/application/base-application/page/microsoft.inventory.item.item-card",
+      "appliesTo": "Business Central 2026 release wave 1 (version 28.x)",
+      "accessedDate": "2026-09-25",
+      "fields": [
+        "pageObjectId",
+        "caption",
+        "pageType",
+        "sourceTable",
+        "description"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-bc28-31",
+      "title": "Page 31 Item List",
+      "sourceType": "microsoft-learn-application-reference",
+      "sourceUri": "https://learn.microsoft.com/en-us/dynamics365/business-central/application/base-application/page/microsoft.inventory.item.item-list",
+      "appliesTo": "Business Central 2026 release wave 1 (version 28.x)",
+      "accessedDate": "2026-09-25",
+      "fields": [
+        "pageObjectId",
+        "caption",
+        "pageType",
+        "sourceTable",
+        "description"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-bc28-42",
+      "title": "Page 42 Sales Order",
+      "sourceType": "microsoft-learn-application-reference",
+      "sourceUri": "https://learn.microsoft.com/en-us/dynamics365/business-central/application/base-application/page/microsoft.sales.document.sales-order",
+      "appliesTo": "Business Central 2026 release wave 1 (version 28.x)",
+      "accessedDate": "2026-09-25",
+      "fields": [
+        "pageObjectId",
+        "caption",
+        "pageType",
+        "sourceTable",
+        "description"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-bc28-43",
+      "title": "Page 43 Sales Invoice",
+      "sourceType": "microsoft-learn-application-reference",
+      "sourceUri": "https://learn.microsoft.com/en-us/dynamics365/business-central/application/base-application/page/microsoft.sales.document.sales-invoice",
+      "appliesTo": "Business Central 2026 release wave 1 (version 28.x)",
+      "accessedDate": "2026-09-25",
+      "fields": [
+        "pageObjectId",
+        "caption",
+        "pageType",
+        "sourceTable",
+        "description"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-bc28-50",
+      "title": "Page 50 Purchase Order",
+      "sourceType": "microsoft-learn-application-reference",
+      "sourceUri": "https://learn.microsoft.com/en-us/dynamics365/business-central/application/base-application/page/microsoft.purchases.document.purchase-order",
+      "appliesTo": "Business Central 2026 release wave 1 (version 28.x)",
+      "accessedDate": "2026-09-25",
+      "fields": [
+        "pageObjectId",
+        "caption",
+        "pageType",
+        "sourceTable",
+        "description"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-bc28-51",
+      "title": "Page 51 Purchase Invoice",
+      "sourceType": "microsoft-learn-application-reference",
+      "sourceUri": "https://learn.microsoft.com/en-us/dynamics365/business-central/application/base-application/page/microsoft.purchases.document.purchase-invoice",
+      "appliesTo": "Business Central 2026 release wave 1 (version 28.x)",
+      "accessedDate": "2026-09-25",
+      "fields": [
+        "pageObjectId",
+        "caption",
+        "pageType",
+        "sourceTable",
+        "description"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-bc28-9301",
+      "title": "Page 9301 Sales Invoice List",
+      "sourceType": "microsoft-learn-application-reference",
+      "sourceUri": "https://learn.microsoft.com/en-us/dynamics365/business-central/application/base-application/page/microsoft.sales.document.sales-invoice-list",
+      "appliesTo": "Business Central 2026 release wave 1 (version 28.x)",
+      "accessedDate": "2026-09-25",
+      "fields": [
+        "pageObjectId",
+        "caption",
+        "pageType",
+        "sourceTable",
+        "description"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-bc28-9305",
+      "title": "Page 9305 Sales Order List",
+      "sourceType": "microsoft-learn-application-reference",
+      "sourceUri": "https://learn.microsoft.com/en-us/dynamics365/business-central/application/base-application/page/microsoft.sales.document.sales-order-list",
+      "appliesTo": "Business Central 2026 release wave 1 (version 28.x)",
+      "accessedDate": "2026-09-25",
+      "fields": [
+        "pageObjectId",
+        "caption",
+        "pageType",
+        "sourceTable",
+        "description"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-bc28-9307",
+      "title": "Page 9307 Purchase Order List",
+      "sourceType": "microsoft-learn-application-reference",
+      "sourceUri": "https://learn.microsoft.com/en-us/dynamics365/business-central/application/base-application/page/microsoft.purchases.document.purchase-order-list",
+      "appliesTo": "Business Central 2026 release wave 1 (version 28.x)",
+      "accessedDate": "2026-09-25",
+      "fields": [
+        "pageObjectId",
+        "caption",
+        "pageType",
+        "sourceTable",
+        "description"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-bc28-9308",
+      "title": "Page 9308 Purchase Invoices",
+      "sourceType": "microsoft-learn-application-reference",
+      "sourceUri": "https://learn.microsoft.com/en-us/dynamics365/business-central/application/base-application/page/microsoft.purchases.document.purchase-invoices",
+      "appliesTo": "Business Central 2026 release wave 1 (version 28.x)",
+      "accessedDate": "2026-09-25",
+      "fields": [
+        "pageObjectId",
+        "caption",
+        "pageType",
+        "sourceTable",
+        "description"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-bc28-9300",
+      "title": "Page 9300 Sales Quotes",
+      "sourceType": "microsoft-learn-application-reference",
+      "sourceUri": "https://learn.microsoft.com/en-us/dynamics365/business-central/application/base-application/page/microsoft.sales.document.sales-quotes",
+      "appliesTo": "Business Central 2026 release wave 1 (version 28.x)",
+      "accessedDate": "2026-09-25",
+      "fields": [
+        "pageObjectId",
+        "caption",
+        "pageType",
+        "sourceTable",
+        "description"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-bc28-41",
+      "title": "Page 41 Sales Quote",
+      "sourceType": "microsoft-learn-application-reference",
+      "sourceUri": "https://learn.microsoft.com/en-us/dynamics365/business-central/application/base-application/page/microsoft.sales.document.sales-quote",
+      "appliesTo": "Business Central 2026 release wave 1 (version 28.x)",
+      "accessedDate": "2026-09-25",
+      "fields": [
+        "pageObjectId",
+        "caption",
+        "pageType",
+        "sourceTable",
+        "description"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-bc28-9302",
+      "title": "Page 9302 Sales Credit Memos",
+      "sourceType": "microsoft-learn-application-reference",
+      "sourceUri": "https://learn.microsoft.com/en-us/dynamics365/business-central/application/base-application/page/microsoft.sales.document.sales-credit-memos",
+      "appliesTo": "Business Central 2026 release wave 1 (version 28.x)",
+      "accessedDate": "2026-09-25",
+      "fields": [
+        "pageObjectId",
+        "caption",
+        "pageType",
+        "sourceTable",
+        "description"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-bc28-9304",
+      "title": "Page 9304 Sales Return Order List",
+      "sourceType": "microsoft-learn-application-reference",
+      "sourceUri": "https://learn.microsoft.com/en-us/dynamics365/business-central/application/base-application/page/microsoft.sales.document.sales-return-order-list",
+      "appliesTo": "Business Central 2026 release wave 1 (version 28.x)",
+      "accessedDate": "2026-09-25",
+      "fields": [
+        "pageObjectId",
+        "caption",
+        "pageType",
+        "sourceTable",
+        "description"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-bc28-143",
+      "title": "Page 143 Posted Sales Invoices",
+      "sourceType": "microsoft-learn-application-reference",
+      "sourceUri": "https://learn.microsoft.com/en-us/dynamics365/business-central/application/base-application/page/microsoft.sales.history.posted-sales-invoices",
+      "appliesTo": "Business Central 2026 release wave 1 (version 28.x)",
+      "accessedDate": "2026-09-25",
+      "fields": [
+        "pageObjectId",
+        "caption",
+        "pageType",
+        "sourceTable",
+        "description"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-bc28-142",
+      "title": "Page 142 Posted Sales Shipments",
+      "sourceType": "microsoft-learn-application-reference",
+      "sourceUri": "https://learn.microsoft.com/en-us/dynamics365/business-central/application/base-application/page/microsoft.sales.history.posted-sales-shipments",
+      "appliesTo": "Business Central 2026 release wave 1 (version 28.x)",
+      "accessedDate": "2026-09-25",
+      "fields": [
+        "pageObjectId",
+        "caption",
+        "pageType",
+        "sourceTable",
+        "description"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-bc28-144",
+      "title": "Page 144 Posted Sales Credit Memos",
+      "sourceType": "microsoft-learn-application-reference",
+      "sourceUri": "https://learn.microsoft.com/en-us/dynamics365/business-central/application/base-application/page/microsoft.sales.history.posted-sales-credit-memos",
+      "appliesTo": "Business Central 2026 release wave 1 (version 28.x)",
+      "accessedDate": "2026-09-25",
+      "fields": [
+        "pageObjectId",
+        "caption",
+        "pageType",
+        "sourceTable",
+        "description"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-bc28-9306",
+      "title": "Page 9306 Purchase Quotes",
+      "sourceType": "microsoft-learn-application-reference",
+      "sourceUri": "https://learn.microsoft.com/en-us/dynamics365/business-central/application/base-application/page/microsoft.purchases.document.purchase-quotes",
+      "appliesTo": "Business Central 2026 release wave 1 (version 28.x)",
+      "accessedDate": "2026-09-25",
+      "fields": [
+        "pageObjectId",
+        "caption",
+        "pageType",
+        "sourceTable",
+        "description"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-bc28-9311",
+      "title": "Page 9311 Purchase Return Order List",
+      "sourceType": "microsoft-learn-application-reference",
+      "sourceUri": "https://learn.microsoft.com/en-us/dynamics365/business-central/application/base-application/page/microsoft.purchases.document.purchase-return-order-list",
+      "appliesTo": "Business Central 2026 release wave 1 (version 28.x)",
+      "accessedDate": "2026-09-25",
+      "fields": [
+        "pageObjectId",
+        "caption",
+        "pageType",
+        "sourceTable",
+        "description"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-bc28-146",
+      "title": "Page 146 Posted Purchase Invoices",
+      "sourceType": "microsoft-learn-application-reference",
+      "sourceUri": "https://learn.microsoft.com/en-us/dynamics365/business-central/application/base-application/page/microsoft.purchases.history.posted-purchase-invoices",
+      "appliesTo": "Business Central 2026 release wave 1 (version 28.x)",
+      "accessedDate": "2026-09-25",
+      "fields": [
+        "pageObjectId",
+        "caption",
+        "pageType",
+        "sourceTable",
+        "description"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-bc28-145",
+      "title": "Page 145 Posted Purchase Receipts",
+      "sourceType": "microsoft-learn-application-reference",
+      "sourceUri": "https://learn.microsoft.com/en-us/dynamics365/business-central/application/base-application/page/microsoft.purchases.history.posted-purchase-receipts",
+      "appliesTo": "Business Central 2026 release wave 1 (version 28.x)",
+      "accessedDate": "2026-09-25",
+      "fields": [
+        "pageObjectId",
+        "caption",
+        "pageType",
+        "sourceTable",
+        "description"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-bc28-33",
+      "title": "Page 33 Customer Lookup",
+      "sourceType": "microsoft-learn-application-reference",
+      "sourceUri": "https://learn.microsoft.com/en-us/dynamics365/business-central/application/base-application/page/microsoft.sales.customer.customer-lookup",
+      "appliesTo": "Business Central 2026 release wave 1 (version 28.x)",
+      "accessedDate": "2026-09-25",
+      "fields": [
+        "pageObjectId",
+        "caption",
+        "pageType",
+        "sourceTable",
+        "description"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-bc28-34",
+      "title": "Page 34 Vendor Lookup",
+      "sourceType": "microsoft-learn-application-reference",
+      "sourceUri": "https://learn.microsoft.com/en-us/dynamics365/business-central/application/base-application/page/microsoft.purchases.vendor.vendor-lookup",
+      "appliesTo": "Business Central 2026 release wave 1 (version 28.x)",
+      "accessedDate": "2026-09-25",
+      "fields": [
+        "pageObjectId",
+        "caption",
+        "pageType",
+        "sourceTable",
+        "description"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-bc28-5401",
+      "title": "Page 5401 Item Variants",
+      "sourceType": "microsoft-learn-application-reference",
+      "sourceUri": "https://learn.microsoft.com/en-us/dynamics365/business-central/application/base-application/page/microsoft.inventory.item.item-variants",
+      "appliesTo": "Business Central 2026 release wave 1 (version 28.x)",
+      "accessedDate": "2026-09-25",
+      "fields": [
+        "pageObjectId",
+        "caption",
+        "pageType",
+        "sourceTable",
+        "description"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-bc28-5730",
+      "title": "Page 5730 Item Categories",
+      "sourceType": "microsoft-learn-application-reference",
+      "sourceUri": "https://learn.microsoft.com/en-us/dynamics365/business-central/application/base-application/page/microsoft.inventory.item.item-categories",
+      "appliesTo": "Business Central 2026 release wave 1 (version 28.x)",
+      "accessedDate": "2026-09-25",
+      "fields": [
+        "pageObjectId",
+        "caption",
+        "pageType",
+        "sourceTable",
+        "description"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-bc28-7332",
+      "title": "Page 7332 Warehouse Receipts",
+      "sourceType": "microsoft-learn-application-reference",
+      "sourceUri": "https://learn.microsoft.com/en-us/dynamics365/business-central/application/base-application/page/microsoft.warehouse.document.warehouse-receipts",
+      "appliesTo": "Business Central 2026 release wave 1 (version 28.x)",
+      "accessedDate": "2026-09-25",
+      "fields": [
+        "pageObjectId",
+        "caption",
+        "pageType",
+        "sourceTable",
+        "description"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-bc28-5768",
+      "title": "Page 5768 Warehouse Receipt",
+      "sourceType": "microsoft-learn-application-reference",
+      "sourceUri": "https://learn.microsoft.com/en-us/dynamics365/business-central/application/base-application/page/microsoft.warehouse.document.warehouse-receipt",
+      "appliesTo": "Business Central 2026 release wave 1 (version 28.x)",
+      "accessedDate": "2026-09-25",
+      "fields": [
+        "pageObjectId",
+        "caption",
+        "pageType",
+        "sourceTable",
+        "description"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-bc28-7335",
+      "title": "Page 7335 Warehouse Shipment",
+      "sourceType": "microsoft-learn-application-reference",
+      "sourceUri": "https://learn.microsoft.com/en-us/dynamics365/business-central/application/base-application/page/microsoft.warehouse.document.warehouse-shipment",
+      "appliesTo": "Business Central 2026 release wave 1 (version 28.x)",
+      "accessedDate": "2026-09-25",
+      "fields": [
+        "pageObjectId",
+        "caption",
+        "pageType",
+        "sourceTable",
+        "description"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-bc28-7339",
+      "title": "Page 7339 Warehouse Shipment List",
+      "sourceType": "microsoft-learn-application-reference",
+      "sourceUri": "https://learn.microsoft.com/en-us/dynamics365/business-central/application/base-application/page/microsoft.warehouse.document.warehouse-shipment-list",
+      "appliesTo": "Business Central 2026 release wave 1 (version 28.x)",
+      "accessedDate": "2026-09-25",
+      "fields": [
+        "pageObjectId",
+        "caption",
+        "pageType",
+        "sourceTable",
+        "description"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-bc28-5774",
+      "title": "Page 5774 Warehouse Activity List",
+      "sourceType": "microsoft-learn-application-reference",
+      "sourceUri": "https://learn.microsoft.com/en-us/dynamics365/business-central/application/base-application/page/microsoft.warehouse.activity.warehouse-activity-list",
+      "appliesTo": "Business Central 2026 release wave 1 (version 28.x)",
+      "accessedDate": "2026-09-25",
+      "fields": [
+        "pageObjectId",
+        "caption",
+        "pageType",
+        "sourceTable",
+        "description"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-bc28-9312",
+      "title": "Page 9312 Warehouse Put-aways",
+      "sourceType": "microsoft-learn-application-reference",
+      "sourceUri": "https://learn.microsoft.com/en-us/dynamics365/business-central/application/base-application/page/microsoft.warehouse.activity.warehouse-put-aways",
+      "appliesTo": "Business Central 2026 release wave 1 (version 28.x)",
+      "accessedDate": "2026-09-25",
+      "fields": [
+        "pageObjectId",
+        "caption",
+        "pageType",
+        "sourceTable",
+        "description"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-bc28-9313",
+      "title": "Page 9313 Warehouse Picks",
+      "sourceType": "microsoft-learn-application-reference",
+      "sourceUri": "https://learn.microsoft.com/en-us/dynamics365/business-central/application/base-application/page/microsoft.warehouse.activity.warehouse-picks",
+      "appliesTo": "Business Central 2026 release wave 1 (version 28.x)",
+      "accessedDate": "2026-09-25",
+      "fields": [
+        "pageObjectId",
+        "caption",
+        "pageType",
+        "sourceTable",
+        "description"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-bc28-9316",
+      "title": "Page 9316 Inventory Picks",
+      "sourceType": "microsoft-learn-application-reference",
+      "sourceUri": "https://learn.microsoft.com/en-us/dynamics365/business-central/application/base-application/page/microsoft.warehouse.activity.inventory-picks",
+      "appliesTo": "Business Central 2026 release wave 1 (version 28.x)",
+      "accessedDate": "2026-09-25",
+      "fields": [
+        "pageObjectId",
+        "caption",
+        "pageType",
+        "sourceTable",
+        "description"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-bc28-99000815",
+      "title": "Page 99000815 Production Order List",
+      "sourceType": "microsoft-learn-application-reference",
+      "sourceUri": "https://learn.microsoft.com/en-us/dynamics365/business-central/application/base-application/page/microsoft.manufacturing.document.production-order-list",
+      "appliesTo": "Business Central 2026 release wave 1 (version 28.x)",
+      "accessedDate": "2026-09-25",
+      "fields": [
+        "pageObjectId",
+        "caption",
+        "pageType",
+        "sourceTable",
+        "description"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-bc28-9326",
+      "title": "Page 9326 Released Production Orders",
+      "sourceType": "microsoft-learn-application-reference",
+      "sourceUri": "https://learn.microsoft.com/en-us/dynamics365/business-central/application/base-application/page/microsoft.manufacturing.document.released-production-orders",
+      "appliesTo": "Business Central 2026 release wave 1 (version 28.x)",
+      "accessedDate": "2026-09-25",
+      "fields": [
+        "pageObjectId",
+        "caption",
+        "pageType",
+        "sourceTable",
+        "description"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-bc28-99000831",
+      "title": "Page 99000831 Released Production Order",
+      "sourceType": "microsoft-learn-application-reference",
+      "sourceUri": "https://learn.microsoft.com/en-us/dynamics365/business-central/application/base-application/page/microsoft.manufacturing.document.released-production-order",
+      "appliesTo": "Business Central 2026 release wave 1 (version 28.x)",
+      "accessedDate": "2026-09-25",
+      "fields": [
+        "pageObjectId",
+        "caption",
+        "pageType",
+        "sourceTable",
+        "description"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-bc28-16",
+      "title": "Page 16 Chart of Accounts",
+      "sourceType": "microsoft-learn-application-reference",
+      "sourceUri": "https://learn.microsoft.com/en-us/dynamics365/business-central/application/base-application/page/microsoft.finance.generalledger.account.chart-of-accounts",
+      "appliesTo": "Business Central 2026 release wave 1 (version 28.x)",
+      "accessedDate": "2026-09-25",
+      "fields": [
+        "pageObjectId",
+        "caption",
+        "pageType",
+        "sourceTable",
+        "description"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-bc28-20",
+      "title": "Page 20 General Ledger Entries",
+      "sourceType": "microsoft-learn-application-reference",
+      "sourceUri": "https://learn.microsoft.com/en-us/dynamics365/business-central/application/base-application/page/microsoft.finance.generalledger.ledger.general-ledger-entries",
+      "appliesTo": "Business Central 2026 release wave 1 (version 28.x)",
+      "accessedDate": "2026-09-25",
+      "fields": [
+        "pageObjectId",
+        "caption",
+        "pageType",
+        "sourceTable",
+        "description"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-bc28-39",
+      "title": "Page 39 General Journal",
+      "sourceType": "microsoft-learn-application-reference",
+      "sourceUri": "https://learn.microsoft.com/en-us/dynamics365/business-central/application/base-application/page/microsoft.finance.generalledger.journal.general-journal",
+      "appliesTo": "Business Central 2026 release wave 1 (version 28.x)",
+      "accessedDate": "2026-09-25",
+      "fields": [
+        "pageObjectId",
+        "caption",
+        "pageType",
+        "sourceTable",
+        "description"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-bc28-118",
+      "title": "Page 118 General Ledger Setup",
+      "sourceType": "microsoft-learn-application-reference",
+      "sourceUri": "https://learn.microsoft.com/en-us/dynamics365/business-central/application/base-application/page/microsoft.finance.generalledger.setup.general-ledger-setup",
+      "appliesTo": "Business Central 2026 release wave 1 (version 28.x)",
+      "accessedDate": "2026-09-25",
+      "fields": [
+        "pageObjectId",
+        "caption",
+        "pageType",
+        "sourceTable",
+        "description"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-bc28-256",
+      "title": "Page 256 Payment Journal",
+      "sourceType": "microsoft-learn-application-reference",
+      "sourceUri": "https://learn.microsoft.com/en-us/dynamics365/business-central/application/base-application/page/microsoft.finance.generalledger.journal.payment-journal",
+      "appliesTo": "Business Central 2026 release wave 1 (version 28.x)",
+      "accessedDate": "2026-09-25",
+      "fields": [
+        "pageObjectId",
+        "caption",
+        "pageType",
+        "sourceTable",
+        "description"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-bc28-370",
+      "title": "Page 370 Bank Account Card",
+      "sourceType": "microsoft-learn-application-reference",
+      "sourceUri": "https://learn.microsoft.com/en-us/dynamics365/business-central/application/base-application/page/microsoft.bank.bankaccount.bank-account-card",
+      "appliesTo": "Business Central 2026 release wave 1 (version 28.x)",
+      "accessedDate": "2026-09-25",
+      "fields": [
+        "pageObjectId",
+        "caption",
+        "pageType",
+        "sourceTable",
+        "description"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-bc28-371",
+      "title": "Page 371 Bank Account List",
+      "sourceType": "microsoft-learn-application-reference",
+      "sourceUri": "https://learn.microsoft.com/en-us/dynamics365/business-central/application/base-application/page/microsoft.bank.bankaccount.bank-account-list",
+      "appliesTo": "Business Central 2026 release wave 1 (version 28.x)",
+      "accessedDate": "2026-09-25",
+      "fields": [
+        "pageObjectId",
+        "caption",
+        "pageType",
+        "sourceTable",
+        "description"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-bc28-372",
+      "title": "Page 372 Bank Account Ledger Entries",
+      "sourceType": "microsoft-learn-application-reference",
+      "sourceUri": "https://learn.microsoft.com/en-us/dynamics365/business-central/application/base-application/page/microsoft.bank.ledger.bank-account-ledger-entries",
+      "appliesTo": "Business Central 2026 release wave 1 (version 28.x)",
+      "accessedDate": "2026-09-25",
+      "fields": [
+        "pageObjectId",
+        "caption",
+        "pageType",
+        "sourceTable",
+        "description"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-bc28-388",
+      "title": "Page 388 Bank Acc. Reconciliation List",
+      "sourceType": "microsoft-learn-application-reference",
+      "sourceUri": "https://learn.microsoft.com/en-us/dynamics365/business-central/application/base-application/page/microsoft.bank.reconciliation.bank-acc.-reconciliation-list",
+      "appliesTo": "Business Central 2026 release wave 1 (version 28.x)",
+      "accessedDate": "2026-09-25",
+      "fields": [
+        "pageObjectId",
+        "caption",
+        "pageType",
+        "sourceTable",
+        "description"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-bc28-44",
+      "title": "Page 44 Sales Credit Memo",
+      "sourceType": "microsoft-learn-application-reference",
+      "sourceUri": "https://learn.microsoft.com/en-us/dynamics365/business-central/application/base-application/page/microsoft.sales.document.sales-credit-memo",
+      "appliesTo": "Business Central 2026 release wave 1 (version 28.x)",
+      "accessedDate": "2026-09-25",
+      "fields": [
+        "pageObjectId",
+        "caption",
+        "pageType",
+        "sourceTable",
+        "description"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-bc28-52",
+      "title": "Page 52 Purchase Credit Memo",
+      "sourceType": "microsoft-learn-application-reference",
+      "sourceUri": "https://learn.microsoft.com/en-us/dynamics365/business-central/application/base-application/page/microsoft.purchases.document.purchase-credit-memo",
+      "appliesTo": "Business Central 2026 release wave 1 (version 28.x)",
+      "accessedDate": "2026-09-25",
+      "fields": [
+        "pageObjectId",
+        "caption",
+        "pageType",
+        "sourceTable",
+        "description"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-bc28-9309",
+      "title": "Page 9309 Purchase Credit Memos",
+      "sourceType": "microsoft-learn-application-reference",
+      "sourceUri": "https://learn.microsoft.com/en-us/dynamics365/business-central/application/base-application/page/microsoft.purchases.document.purchase-credit-memos",
+      "appliesTo": "Business Central 2026 release wave 1 (version 28.x)",
+      "accessedDate": "2026-09-25",
+      "fields": [
+        "pageObjectId",
+        "caption",
+        "pageType",
+        "sourceTable",
+        "description"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-bc28-255",
+      "title": "Page 255 Cash Receipt Journals",
+      "sourceType": "microsoft-learn-application-reference",
+      "sourceUri": "https://learn.microsoft.com/en-us/dynamics365/business-central/application/base-application/page/microsoft.finance.generalledger.journal.cash-receipt-journal",
+      "appliesTo": "Business Central 2026 release wave 1 (version 28.x)",
+      "accessedDate": "2026-09-25",
+      "fields": [
+        "pageObjectId",
+        "caption",
+        "pageType",
+        "sourceTable",
+        "description"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-bc28-1290",
+      "title": "Page 1290 Payment Reconciliation Journal",
+      "sourceType": "microsoft-learn-application-reference",
+      "sourceUri": "https://learn.microsoft.com/en-us/dynamics365/business-central/application/base-application/page/microsoft.bank.reconciliation.payment-reconciliation-journal",
+      "appliesTo": "Business Central 2026 release wave 1 (version 28.x)",
+      "accessedDate": "2026-09-25",
+      "fields": [
+        "pageObjectId",
+        "caption",
+        "pageType",
+        "sourceTable",
+        "description"
+      ]
+    }
+  ],
+  "pageDefinitions": [
+    {
+      "ruleId": "MicrosoftBC28.Page21",
+      "pageObjectId": "21",
+      "entity": "Customer",
+      "pageType": "card",
+      "sourceTable": "Microsoft.Sales.Customer.Customer",
+      "description": "Provides detailed view and management of an individual customer's master data.",
+      "localizedCaptions": {
+        "en-US": [
+          "Customer Card"
+        ]
+      },
+      "captionRules": [
+        {
+          "locale": "en-US",
+          "pattern": "^Customer Card$"
+        }
+      ],
+      "objectVerification": "declared",
+      "compatibility": {
+        "minAppVersion": "28.0.0",
+        "maxAppVersion": "28.99.99"
+      },
+      "sourceIds": [
+        "microsoft-learn-bc28-21"
+      ]
+    },
+    {
+      "ruleId": "MicrosoftBC28.Page22",
+      "pageObjectId": "22",
+      "entity": "Customer",
+      "pageType": "list",
+      "sourceTable": "Microsoft.Sales.Customer.Customer",
+      "description": "Overview of registered customers, their balances, and sales statistics.",
+      "localizedCaptions": {
+        "en-US": [
+          "Customers"
+        ]
+      },
+      "captionRules": [
+        {
+          "locale": "en-US",
+          "pattern": "^Customers$"
+        }
+      ],
+      "objectVerification": "declared",
+      "compatibility": {
+        "minAppVersion": "28.0.0",
+        "maxAppVersion": "28.99.99"
+      },
+      "sourceIds": [
+        "microsoft-learn-bc28-22"
+      ]
+    },
+    {
+      "ruleId": "MicrosoftBC28.Page26",
+      "pageObjectId": "26",
+      "entity": "Vendor",
+      "pageType": "card",
+      "sourceTable": "Microsoft.Purchases.Vendor.Vendor",
+      "description": "Manage vendor information and agreed business terms, including payment terms, prices, and discounts.",
+      "localizedCaptions": {
+        "en-US": [
+          "Vendor Card"
+        ]
+      },
+      "captionRules": [
+        {
+          "locale": "en-US",
+          "pattern": "^Vendor Card$"
+        }
+      ],
+      "objectVerification": "declared",
+      "compatibility": {
+        "minAppVersion": "28.0.0",
+        "maxAppVersion": "28.99.99"
+      },
+      "sourceIds": [
+        "microsoft-learn-bc28-26"
+      ]
+    },
+    {
+      "ruleId": "MicrosoftBC28.Page27",
+      "pageObjectId": "27",
+      "entity": "Vendor",
+      "pageType": "list",
+      "sourceTable": "Microsoft.Purchases.Vendor.Vendor",
+      "description": "Overview of registered vendors that goods and services are purchased from.",
+      "localizedCaptions": {
+        "en-US": [
+          "Vendors"
+        ]
+      },
+      "captionRules": [
+        {
+          "locale": "en-US",
+          "pattern": "^Vendors$"
+        }
+      ],
+      "objectVerification": "declared",
+      "compatibility": {
+        "minAppVersion": "28.0.0",
+        "maxAppVersion": "28.99.99"
+      },
+      "sourceIds": [
+        "microsoft-learn-bc28-27"
+      ]
+    },
+    {
+      "ruleId": "MicrosoftBC28.Page30",
+      "pageObjectId": "30",
+      "entity": "Item",
+      "pageType": "card",
+      "sourceTable": "Microsoft.Inventory.Item.Item",
+      "description": "Manage item information, pricing, replenishment, inventory, costing, and posting settings.",
+      "localizedCaptions": {
+        "en-US": [
+          "Item Card"
+        ]
+      },
+      "captionRules": [
+        {
+          "locale": "en-US",
+          "pattern": "^Item Card$"
+        }
+      ],
+      "objectVerification": "declared",
+      "compatibility": {
+        "minAppVersion": "28.0.0",
+        "maxAppVersion": "28.99.99"
+      },
+      "sourceIds": [
+        "microsoft-learn-bc28-30"
+      ]
+    },
+    {
+      "ruleId": "MicrosoftBC28.Page31",
+      "pageObjectId": "31",
+      "entity": "Item",
+      "pageType": "list",
+      "sourceTable": "Microsoft.Inventory.Item.Item",
+      "description": "Overview of products and services bought and sold, including default prices and inventory tracking.",
+      "localizedCaptions": {
+        "en-US": [
+          "Items"
+        ]
+      },
+      "captionRules": [
+        {
+          "locale": "en-US",
+          "pattern": "^Items$"
+        }
+      ],
+      "objectVerification": "declared",
+      "compatibility": {
+        "minAppVersion": "28.0.0",
+        "maxAppVersion": "28.99.99"
+      },
+      "sourceIds": [
+        "microsoft-learn-bc28-31"
+      ]
+    },
+    {
+      "ruleId": "MicrosoftBC28.Page42",
+      "pageObjectId": "42",
+      "entity": "SalesOrder",
+      "pageType": "document",
+      "sourceTable": "Microsoft.Sales.Document.\"Sales Header\"",
+      "description": "Create an order with sales lines, then ship or invoice it when ready.",
+      "localizedCaptions": {
+        "en-US": [
+          "Sales Order"
+        ]
+      },
+      "captionRules": [
+        {
+          "locale": "en-US",
+          "pattern": "^Sales Order$"
+        }
+      ],
+      "objectVerification": "declared",
+      "compatibility": {
+        "minAppVersion": "28.0.0",
+        "maxAppVersion": "28.99.99"
+      },
+      "sourceIds": [
+        "microsoft-learn-bc28-42"
+      ]
+    },
+    {
+      "ruleId": "MicrosoftBC28.Page43",
+      "pageObjectId": "43",
+      "entity": "SalesInvoice",
+      "pageType": "document",
+      "sourceTable": "Microsoft.Sales.Document.\"Sales Header\"",
+      "description": "Manage a sales invoice before posting; an unposted invoice can be reopened from the ongoing invoices list.",
+      "localizedCaptions": {
+        "en-US": [
+          "Sales Invoice"
+        ]
+      },
+      "captionRules": [
+        {
+          "locale": "en-US",
+          "pattern": "^Sales Invoice$"
+        }
+      ],
+      "objectVerification": "declared",
+      "compatibility": {
+        "minAppVersion": "28.0.0",
+        "maxAppVersion": "28.99.99"
+      },
+      "sourceIds": [
+        "microsoft-learn-bc28-43"
+      ]
+    },
+    {
+      "ruleId": "MicrosoftBC28.Page50",
+      "pageObjectId": "50",
+      "entity": "PurchaseOrder",
+      "pageType": "document",
+      "sourceTable": "Microsoft.Purchases.Document.\"Purchase Header\"",
+      "description": "Create and manage a purchase order for goods and services.",
+      "localizedCaptions": {
+        "en-US": [
+          "Purchase Order"
+        ]
+      },
+      "captionRules": [
+        {
+          "locale": "en-US",
+          "pattern": "^Purchase Order$"
+        }
+      ],
+      "objectVerification": "declared",
+      "compatibility": {
+        "minAppVersion": "28.0.0",
+        "maxAppVersion": "28.99.99"
+      },
+      "sourceIds": [
+        "microsoft-learn-bc28-50"
+      ]
+    },
+    {
+      "ruleId": "MicrosoftBC28.Page51",
+      "pageObjectId": "51",
+      "entity": "PurchaseInvoice",
+      "pageType": "document",
+      "sourceTable": "Microsoft.Purchases.Document.\"Purchase Header\"",
+      "description": "Manage a purchase invoice before posting vendor bills and payable entries.",
+      "localizedCaptions": {
+        "en-US": [
+          "Purchase Invoice"
+        ]
+      },
+      "captionRules": [
+        {
+          "locale": "en-US",
+          "pattern": "^Purchase Invoice$"
+        }
+      ],
+      "objectVerification": "declared",
+      "compatibility": {
+        "minAppVersion": "28.0.0",
+        "maxAppVersion": "28.99.99"
+      },
+      "sourceIds": [
+        "microsoft-learn-bc28-51"
+      ]
+    },
+    {
+      "ruleId": "MicrosoftBC28.Page9301",
+      "pageObjectId": "9301",
+      "entity": "SalesInvoice",
+      "pageType": "list",
+      "sourceTable": "Microsoft.Sales.Document.\"Sales Header\"",
+      "description": "Sales invoices remain in this list until finalized and posted.",
+      "localizedCaptions": {
+        "en-US": [
+          "Sales Invoices"
+        ]
+      },
+      "captionRules": [
+        {
+          "locale": "en-US",
+          "pattern": "^Sales Invoices$"
+        }
+      ],
+      "objectVerification": "declared",
+      "compatibility": {
+        "minAppVersion": "28.0.0",
+        "maxAppVersion": "28.99.99"
+      },
+      "sourceIds": [
+        "microsoft-learn-bc28-9301"
+      ]
+    },
+    {
+      "ruleId": "MicrosoftBC28.Page9305",
+      "pageObjectId": "9305",
+      "entity": "SalesOrder",
+      "pageType": "list",
+      "sourceTable": "Microsoft.Sales.Document.\"Sales Header\"",
+      "description": "Manage sales orders used for partial shipments, drop shipments, or prepayments.",
+      "localizedCaptions": {
+        "en-US": [
+          "Sales Orders"
+        ]
+      },
+      "captionRules": [
+        {
+          "locale": "en-US",
+          "pattern": "^Sales Orders$"
+        }
+      ],
+      "objectVerification": "declared",
+      "compatibility": {
+        "minAppVersion": "28.0.0",
+        "maxAppVersion": "28.99.99"
+      },
+      "sourceIds": [
+        "microsoft-learn-bc28-9305"
+      ]
+    },
+    {
+      "ruleId": "MicrosoftBC28.Page9307",
+      "pageObjectId": "9307",
+      "entity": "PurchaseOrder",
+      "pageType": "list",
+      "sourceTable": "Microsoft.Purchases.Document.\"Purchase Header\"",
+      "description": "Track purchase orders through ordering, receipt, and posting.",
+      "localizedCaptions": {
+        "en-US": [
+          "Purchase Orders"
+        ]
+      },
+      "captionRules": [
+        {
+          "locale": "en-US",
+          "pattern": "^Purchase Orders$"
+        }
+      ],
+      "objectVerification": "declared",
+      "compatibility": {
+        "minAppVersion": "28.0.0",
+        "maxAppVersion": "28.99.99"
+      },
+      "sourceIds": [
+        "microsoft-learn-bc28-9307"
+      ]
+    },
+    {
+      "ruleId": "MicrosoftBC28.Page9308",
+      "pageObjectId": "9308",
+      "entity": "PurchaseInvoice",
+      "pageType": "list",
+      "sourceTable": "Microsoft.Purchases.Document.\"Purchase Header\"",
+      "description": "Create, manage, and post purchase invoices to record vendor bills and update payable, inventory, and financial records.",
+      "localizedCaptions": {
+        "en-US": [
+          "Purchase Invoices"
+        ]
+      },
+      "captionRules": [
+        {
+          "locale": "en-US",
+          "pattern": "^Purchase Invoices$"
+        }
+      ],
+      "objectVerification": "declared",
+      "compatibility": {
+        "minAppVersion": "28.0.0",
+        "maxAppVersion": "28.99.99"
+      },
+      "sourceIds": [
+        "microsoft-learn-bc28-9308"
+      ]
+    },
+    {
+      "ruleId": "MicrosoftBC28.Page9300",
+      "pageObjectId": "9300",
+      "entity": "SalesQuote",
+      "pageType": "list",
+      "sourceTable": "Microsoft.Sales.Document.\"Sales Header\"",
+      "description": "Offer customers pricing and terms for what you sell. Quotes stay in this list until they're converted to an order or invoice, or deleted.",
+      "localizedCaptions": {
+        "en-US": [
+          "Sales Quotes"
+        ]
+      },
+      "captionRules": [
+        {
+          "locale": "en-US",
+          "pattern": "^Sales Quotes$"
+        }
+      ],
+      "objectVerification": "declared",
+      "compatibility": {
+        "minAppVersion": "28.0.0",
+        "maxAppVersion": "28.99.99"
+      },
+      "sourceIds": [
+        "microsoft-learn-bc28-9300"
+      ]
+    },
+    {
+      "ruleId": "MicrosoftBC28.Page41",
+      "pageObjectId": "41",
+      "entity": "SalesQuote",
+      "pageType": "document",
+      "sourceTable": "Microsoft.Sales.Document.\"Sales Header\"",
+      "description": "You can update, send, and resend a quote as needed. If the quote is accepted, the details will transfer to the sales order or invoice you create from it.",
+      "localizedCaptions": {
+        "en-US": [
+          "Sales Quote"
+        ]
+      },
+      "captionRules": [
+        {
+          "locale": "en-US",
+          "pattern": "^Sales Quote$"
+        }
+      ],
+      "objectVerification": "declared",
+      "compatibility": {
+        "minAppVersion": "28.0.0",
+        "maxAppVersion": "28.99.99"
+      },
+      "sourceIds": [
+        "microsoft-learn-bc28-41"
+      ]
+    },
+    {
+      "ruleId": "MicrosoftBC28.Page9302",
+      "pageObjectId": "9302",
+      "entity": "SalesCreditMemo",
+      "pageType": "list",
+      "sourceTable": "Microsoft.Sales.Document.\"Sales Header\"",
+      "description": "Create, manage, and post sales credit memos to process customer refunds, returns, cancellations, and allowances.",
+      "localizedCaptions": {
+        "en-US": [
+          "Sales Credit Memos"
+        ]
+      },
+      "captionRules": [
+        {
+          "locale": "en-US",
+          "pattern": "^Sales Credit Memos$"
+        }
+      ],
+      "objectVerification": "declared",
+      "compatibility": {
+        "minAppVersion": "28.0.0",
+        "maxAppVersion": "28.99.99"
+      },
+      "sourceIds": [
+        "microsoft-learn-bc28-9302"
+      ]
+    },
+    {
+      "ruleId": "MicrosoftBC28.Page9304",
+      "pageObjectId": "9304",
+      "entity": "SalesReturnOrder",
+      "pageType": "list",
+      "sourceTable": "Microsoft.Sales.Document.\"Sales Header\"",
+      "description": "Use a sales return order to track receipt and potential refund of items returned by a customer.",
+      "localizedCaptions": {
+        "en-US": [
+          "Sales Return Orders"
+        ]
+      },
+      "captionRules": [
+        {
+          "locale": "en-US",
+          "pattern": "^Sales Return Orders$"
+        }
+      ],
+      "objectVerification": "declared",
+      "compatibility": {
+        "minAppVersion": "28.0.0",
+        "maxAppVersion": "28.99.99"
+      },
+      "sourceIds": [
+        "microsoft-learn-bc28-9304"
+      ]
+    },
+    {
+      "ruleId": "MicrosoftBC28.Page143",
+      "pageObjectId": "143",
+      "entity": "PostedSalesInvoice",
+      "pageType": "list",
+      "sourceTable": "Microsoft.Sales.History.\"Sales Invoice Header\"",
+      "description": "Lists posted sales invoices for viewing, printing, and navigation.",
+      "localizedCaptions": {
+        "en-US": [
+          "Posted Sales Invoices"
+        ]
+      },
+      "captionRules": [
+        {
+          "locale": "en-US",
+          "pattern": "^Posted Sales Invoices$"
+        }
+      ],
+      "objectVerification": "declared",
+      "compatibility": {
+        "minAppVersion": "28.0.0",
+        "maxAppVersion": "28.99.99"
+      },
+      "sourceIds": [
+        "microsoft-learn-bc28-143"
+      ]
+    },
+    {
+      "ruleId": "MicrosoftBC28.Page142",
+      "pageObjectId": "142",
+      "entity": "PostedSalesShipment",
+      "pageType": "list",
+      "sourceTable": "Microsoft.Sales.History.\"Sales Shipment Header\"",
+      "description": "Review posted sales shipments and their customer and shipping details.",
+      "localizedCaptions": {
+        "en-US": [
+          "Posted Sales Shipments"
+        ]
+      },
+      "captionRules": [
+        {
+          "locale": "en-US",
+          "pattern": "^Posted Sales Shipments$"
+        }
+      ],
+      "objectVerification": "declared",
+      "compatibility": {
+        "minAppVersion": "28.0.0",
+        "maxAppVersion": "28.99.99"
+      },
+      "sourceIds": [
+        "microsoft-learn-bc28-142"
+      ]
+    },
+    {
+      "ruleId": "MicrosoftBC28.Page144",
+      "pageObjectId": "144",
+      "entity": "PostedSalesCreditMemo",
+      "pageType": "list",
+      "sourceTable": "Microsoft.Sales.History.\"Sales Cr.Memo Header\"",
+      "description": "Review posted sales credit memos and related customer transactions.",
+      "localizedCaptions": {
+        "en-US": [
+          "Posted Sales Credit Memos"
+        ]
+      },
+      "captionRules": [
+        {
+          "locale": "en-US",
+          "pattern": "^Posted Sales Credit Memos$"
+        }
+      ],
+      "objectVerification": "declared",
+      "compatibility": {
+        "minAppVersion": "28.0.0",
+        "maxAppVersion": "28.99.99"
+      },
+      "sourceIds": [
+        "microsoft-learn-bc28-144"
+      ]
+    },
+    {
+      "ruleId": "MicrosoftBC28.Page9306",
+      "pageObjectId": "9306",
+      "entity": "PurchaseQuote",
+      "pageType": "list",
+      "sourceTable": "Microsoft.Purchases.Document.\"Purchase Header\"",
+      "description": "Create, manage, and track vendor purchase quotes before converting accepted quotes into purchase orders.",
+      "localizedCaptions": {
+        "en-US": [
+          "Purchase Quotes"
+        ]
+      },
+      "captionRules": [
+        {
+          "locale": "en-US",
+          "pattern": "^Purchase Quotes$"
+        }
+      ],
+      "objectVerification": "declared",
+      "compatibility": {
+        "minAppVersion": "28.0.0",
+        "maxAppVersion": "28.99.99"
+      },
+      "sourceIds": [
+        "microsoft-learn-bc28-9306"
+      ]
+    },
+    {
+      "ruleId": "MicrosoftBC28.Page9311",
+      "pageObjectId": "9311",
+      "entity": "PurchaseReturnOrder",
+      "pageType": "list",
+      "sourceTable": "Microsoft.Purchases.Document.\"Purchase Header\"",
+      "description": "Create and manage purchase return orders to process returns to vendors and reverse posted costs.",
+      "localizedCaptions": {
+        "en-US": [
+          "Purchase Return Orders"
+        ]
+      },
+      "captionRules": [
+        {
+          "locale": "en-US",
+          "pattern": "^Purchase Return Orders$"
+        }
+      ],
+      "objectVerification": "declared",
+      "compatibility": {
+        "minAppVersion": "28.0.0",
+        "maxAppVersion": "28.99.99"
+      },
+      "sourceIds": [
+        "microsoft-learn-bc28-9311"
+      ]
+    },
+    {
+      "ruleId": "MicrosoftBC28.Page146",
+      "pageObjectId": "146",
+      "entity": "PostedPurchaseInvoice",
+      "pageType": "list",
+      "sourceTable": "Microsoft.Purchases.History.\"Purch. Inv. Header\"",
+      "description": "Review posted purchase invoices and recorded vendor bills.",
+      "localizedCaptions": {
+        "en-US": [
+          "Posted Purchase Invoices"
+        ]
+      },
+      "captionRules": [
+        {
+          "locale": "en-US",
+          "pattern": "^Posted Purchase Invoices$"
+        }
+      ],
+      "objectVerification": "declared",
+      "compatibility": {
+        "minAppVersion": "28.0.0",
+        "maxAppVersion": "28.99.99"
+      },
+      "sourceIds": [
+        "microsoft-learn-bc28-146"
+      ]
+    },
+    {
+      "ruleId": "MicrosoftBC28.Page145",
+      "pageObjectId": "145",
+      "entity": "PostedPurchaseReceipt",
+      "pageType": "list",
+      "sourceTable": "Microsoft.Purchases.History.\"Purch. Rcpt. Header\"",
+      "description": "Review posted purchase receipts and completed purchase deliveries.",
+      "localizedCaptions": {
+        "en-US": [
+          "Posted Purchase Receipts"
+        ]
+      },
+      "captionRules": [
+        {
+          "locale": "en-US",
+          "pattern": "^Posted Purchase Receipts$"
+        }
+      ],
+      "objectVerification": "declared",
+      "compatibility": {
+        "minAppVersion": "28.0.0",
+        "maxAppVersion": "28.99.99"
+      },
+      "sourceIds": [
+        "microsoft-learn-bc28-145"
+      ]
+    },
+    {
+      "ruleId": "MicrosoftBC28.Page33",
+      "pageObjectId": "33",
+      "entity": "Customer",
+      "pageType": "list",
+      "sourceTable": "Microsoft.Sales.Customer.Customer",
+      "description": "Provides a simplified lookup page for selecting customers.",
+      "localizedCaptions": {
+        "en-US": [
+          "Customers"
+        ]
+      },
+      "captionRules": [
+        {
+          "locale": "en-US",
+          "pattern": "^Customers$"
+        }
+      ],
+      "objectVerification": "declared",
+      "compatibility": {
+        "minAppVersion": "28.0.0",
+        "maxAppVersion": "28.99.99"
+      },
+      "sourceIds": [
+        "microsoft-learn-bc28-33"
+      ]
+    },
+    {
+      "ruleId": "MicrosoftBC28.Page34",
+      "pageObjectId": "34",
+      "entity": "Vendor",
+      "pageType": "list",
+      "sourceTable": "Microsoft.Purchases.Vendor.Vendor",
+      "description": "Provides a simplified lookup page for selecting vendors.",
+      "localizedCaptions": {
+        "en-US": [
+          "Vendors"
+        ]
+      },
+      "captionRules": [
+        {
+          "locale": "en-US",
+          "pattern": "^Vendors$"
+        }
+      ],
+      "objectVerification": "declared",
+      "compatibility": {
+        "minAppVersion": "28.0.0",
+        "maxAppVersion": "28.99.99"
+      },
+      "sourceIds": [
+        "microsoft-learn-bc28-34"
+      ]
+    },
+    {
+      "ruleId": "MicrosoftBC28.Page5401",
+      "pageObjectId": "5401",
+      "entity": "ItemVariant",
+      "pageType": "list",
+      "sourceTable": "Microsoft.Inventory.Item.\"Item Variant\"",
+      "description": "View and select item variants defined for inventory items.",
+      "localizedCaptions": {
+        "en-US": [
+          "Item Variants"
+        ]
+      },
+      "captionRules": [
+        {
+          "locale": "en-US",
+          "pattern": "^Item Variants$"
+        }
+      ],
+      "objectVerification": "declared",
+      "compatibility": {
+        "minAppVersion": "28.0.0",
+        "maxAppVersion": "28.99.99"
+      },
+      "sourceIds": [
+        "microsoft-learn-bc28-5401"
+      ]
+    },
+    {
+      "ruleId": "MicrosoftBC28.Page5730",
+      "pageObjectId": "5730",
+      "entity": "ItemCategory",
+      "pageType": "list",
+      "sourceTable": "Microsoft.Inventory.Item.\"Item Category\"",
+      "description": "Organize item categories and classify inventory consistently.",
+      "localizedCaptions": {
+        "en-US": [
+          "Item Categories"
+        ]
+      },
+      "captionRules": [
+        {
+          "locale": "en-US",
+          "pattern": "^Item Categories$"
+        }
+      ],
+      "objectVerification": "declared",
+      "compatibility": {
+        "minAppVersion": "28.0.0",
+        "maxAppVersion": "28.99.99"
+      },
+      "sourceIds": [
+        "microsoft-learn-bc28-5730"
+      ]
+    },
+    {
+      "ruleId": "MicrosoftBC28.Page7332",
+      "pageObjectId": "7332",
+      "entity": "WarehouseReceipt",
+      "pageType": "list",
+      "sourceTable": "Microsoft.Warehouse.Document.\"Warehouse Receipt Header\"",
+      "description": "Manage and post receipts from purchase orders and other source documents, adjust quantities, and assign bins and locations.",
+      "localizedCaptions": {
+        "en-US": [
+          "Warehouse Receipts"
+        ]
+      },
+      "captionRules": [
+        {
+          "locale": "en-US",
+          "pattern": "^Warehouse Receipts$"
+        }
+      ],
+      "objectVerification": "declared",
+      "compatibility": {
+        "minAppVersion": "28.0.0",
+        "maxAppVersion": "28.99.99"
+      },
+      "sourceIds": [
+        "microsoft-learn-bc28-7332"
+      ]
+    },
+    {
+      "ruleId": "MicrosoftBC28.Page5768",
+      "pageObjectId": "5768",
+      "entity": "WarehouseReceipt",
+      "pageType": "document",
+      "sourceTable": "Microsoft.Warehouse.Document.\"Warehouse Receipt Header\"",
+      "description": "Manage a warehouse receipt document for receiving items.",
+      "localizedCaptions": {
+        "en-US": [
+          "Warehouse Receipt"
+        ]
+      },
+      "captionRules": [
+        {
+          "locale": "en-US",
+          "pattern": "^Warehouse Receipt$"
+        }
+      ],
+      "objectVerification": "declared",
+      "compatibility": {
+        "minAppVersion": "28.0.0",
+        "maxAppVersion": "28.99.99"
+      },
+      "sourceIds": [
+        "microsoft-learn-bc28-5768"
+      ]
+    },
+    {
+      "ruleId": "MicrosoftBC28.Page7335",
+      "pageObjectId": "7335",
+      "entity": "WarehouseShipment",
+      "pageType": "document",
+      "sourceTable": "Microsoft.Warehouse.Document.\"Warehouse Shipment Header\"",
+      "description": "Manage a warehouse shipment document for outbound goods.",
+      "localizedCaptions": {
+        "en-US": [
+          "Warehouse Shipment"
+        ]
+      },
+      "captionRules": [
+        {
+          "locale": "en-US",
+          "pattern": "^Warehouse Shipment$"
+        }
+      ],
+      "objectVerification": "declared",
+      "compatibility": {
+        "minAppVersion": "28.0.0",
+        "maxAppVersion": "28.99.99"
+      },
+      "sourceIds": [
+        "microsoft-learn-bc28-7335"
+      ]
+    },
+    {
+      "ruleId": "MicrosoftBC28.Page7339",
+      "pageObjectId": "7339",
+      "entity": "WarehouseShipment",
+      "pageType": "list",
+      "sourceTable": "Microsoft.Warehouse.Document.\"Warehouse Shipment Header\"",
+      "description": "View warehouse shipments prepared for outbound processing.",
+      "localizedCaptions": {
+        "en-US": [
+          "Warehouse Shipments"
+        ]
+      },
+      "captionRules": [
+        {
+          "locale": "en-US",
+          "pattern": "^Warehouse Shipments$"
+        }
+      ],
+      "objectVerification": "declared",
+      "compatibility": {
+        "minAppVersion": "28.0.0",
+        "maxAppVersion": "28.99.99"
+      },
+      "sourceIds": [
+        "microsoft-learn-bc28-7339"
+      ]
+    },
+    {
+      "ruleId": "MicrosoftBC28.Page5774",
+      "pageObjectId": "5774",
+      "entity": "WarehouseActivity",
+      "pageType": "list",
+      "sourceTable": "Microsoft.Warehouse.Activity.\"Warehouse Activity Header\"",
+      "description": "View warehouse activity documents and their status.",
+      "localizedCaptions": {
+        "en-US": [
+          "Warehouse Activity List"
+        ]
+      },
+      "captionRules": [
+        {
+          "locale": "en-US",
+          "pattern": "^Warehouse Activity List$"
+        }
+      ],
+      "objectVerification": "declared",
+      "compatibility": {
+        "minAppVersion": "28.0.0",
+        "maxAppVersion": "28.99.99"
+      },
+      "sourceIds": [
+        "microsoft-learn-bc28-5774"
+      ]
+    },
+    {
+      "ruleId": "MicrosoftBC28.Page9312",
+      "pageObjectId": "9312",
+      "entity": "WarehousePutAway",
+      "pageType": "list",
+      "sourceTable": "Microsoft.Warehouse.Activity.\"Warehouse Activity Header\"",
+      "description": "View warehouse put-away activities for placing received items into storage.",
+      "localizedCaptions": {
+        "en-US": [
+          "Warehouse Put-aways"
+        ]
+      },
+      "captionRules": [
+        {
+          "locale": "en-US",
+          "pattern": "^Warehouse Put-aways$"
+        }
+      ],
+      "objectVerification": "declared",
+      "compatibility": {
+        "minAppVersion": "28.0.0",
+        "maxAppVersion": "28.99.99"
+      },
+      "sourceIds": [
+        "microsoft-learn-bc28-9312"
+      ]
+    },
+    {
+      "ruleId": "MicrosoftBC28.Page9313",
+      "pageObjectId": "9313",
+      "entity": "WarehousePick",
+      "pageType": "list",
+      "sourceTable": "Microsoft.Warehouse.Activity.\"Warehouse Activity Header\"",
+      "description": "Manage item picking for warehouse shipments using assigned pick instructions.",
+      "localizedCaptions": {
+        "en-US": [
+          "Warehouse Picks"
+        ]
+      },
+      "captionRules": [
+        {
+          "locale": "en-US",
+          "pattern": "^Warehouse Picks$"
+        }
+      ],
+      "objectVerification": "declared",
+      "compatibility": {
+        "minAppVersion": "28.0.0",
+        "maxAppVersion": "28.99.99"
+      },
+      "sourceIds": [
+        "microsoft-learn-bc28-9313"
+      ]
+    },
+    {
+      "ruleId": "MicrosoftBC28.Page9316",
+      "pageObjectId": "9316",
+      "entity": "InventoryPick",
+      "pageType": "list",
+      "sourceTable": "Microsoft.Warehouse.Activity.\"Warehouse Activity Header\"",
+      "description": "Create and manage inventory picks for outbound source documents.",
+      "localizedCaptions": {
+        "en-US": [
+          "Inventory Picks"
+        ]
+      },
+      "captionRules": [
+        {
+          "locale": "en-US",
+          "pattern": "^Inventory Picks$"
+        }
+      ],
+      "objectVerification": "declared",
+      "compatibility": {
+        "minAppVersion": "28.0.0",
+        "maxAppVersion": "28.99.99"
+      },
+      "sourceIds": [
+        "microsoft-learn-bc28-9316"
+      ]
+    },
+    {
+      "ruleId": "MicrosoftBC28.Page99000815",
+      "pageObjectId": "99000815",
+      "entity": "ProductionOrder",
+      "pageType": "list",
+      "sourceTable": "Microsoft.Manufacturing.Document.\"Production Order\"",
+      "description": "View production orders in the system.",
+      "localizedCaptions": {
+        "en-US": [
+          "Production Order List"
+        ]
+      },
+      "captionRules": [
+        {
+          "locale": "en-US",
+          "pattern": "^Production Order List$"
+        }
+      ],
+      "objectVerification": "declared",
+      "compatibility": {
+        "minAppVersion": "28.0.0",
+        "maxAppVersion": "28.99.99"
+      },
+      "sourceIds": [
+        "microsoft-learn-bc28-99000815"
+      ]
+    },
+    {
+      "ruleId": "MicrosoftBC28.Page9326",
+      "pageObjectId": "9326",
+      "entity": "ProductionOrder",
+      "pageType": "list",
+      "sourceTable": "Microsoft.Manufacturing.Document.\"Production Order\"",
+      "description": "Track and monitor released production orders and their progress.",
+      "localizedCaptions": {
+        "en-US": [
+          "Released Production Orders"
+        ]
+      },
+      "captionRules": [
+        {
+          "locale": "en-US",
+          "pattern": "^Released Production Orders$"
+        }
+      ],
+      "objectVerification": "declared",
+      "compatibility": {
+        "minAppVersion": "28.0.0",
+        "maxAppVersion": "28.99.99"
+      },
+      "sourceIds": [
+        "microsoft-learn-bc28-9326"
+      ]
+    },
+    {
+      "ruleId": "MicrosoftBC28.Page99000831",
+      "pageObjectId": "99000831",
+      "entity": "ProductionOrder",
+      "pageType": "document",
+      "sourceTable": "Microsoft.Manufacturing.Document.\"Production Order\"",
+      "description": "Manage a released production order.",
+      "localizedCaptions": {
+        "en-US": [
+          "Released Production Order"
+        ]
+      },
+      "captionRules": [
+        {
+          "locale": "en-US",
+          "pattern": "^Released Production Order$"
+        }
+      ],
+      "objectVerification": "declared",
+      "compatibility": {
+        "minAppVersion": "28.0.0",
+        "maxAppVersion": "28.99.99"
+      },
+      "sourceIds": [
+        "microsoft-learn-bc28-99000831"
+      ]
+    },
+    {
+      "ruleId": "MicrosoftBC28.Page16",
+      "pageObjectId": "16",
+      "entity": "GLAccount",
+      "pageType": "list",
+      "sourceTable": "Microsoft.Finance.GeneralLedger.Account.\"G/L Account\"",
+      "description": "The chart of accounts is the core of the financials. It's used to group income and expenses in the income statement and balance sheet.",
+      "localizedCaptions": {
+        "en-US": [
+          "Chart of Accounts"
+        ]
+      },
+      "captionRules": [
+        {
+          "locale": "en-US",
+          "pattern": "^Chart of Accounts$"
+        }
+      ],
+      "objectVerification": "declared",
+      "compatibility": {
+        "minAppVersion": "28.0.0",
+        "maxAppVersion": "28.99.99"
+      },
+      "sourceIds": [
+        "microsoft-learn-bc28-16"
+      ]
+    },
+    {
+      "ruleId": "MicrosoftBC28.Page20",
+      "pageObjectId": "20",
+      "entity": "GLEntry",
+      "pageType": "list",
+      "sourceTable": "Microsoft.Finance.GeneralLedger.Ledger.\"G/L Entry\"",
+      "description": "View posted general ledger transactions and accounting entries.",
+      "localizedCaptions": {
+        "en-US": [
+          "General Ledger Entries"
+        ]
+      },
+      "captionRules": [
+        {
+          "locale": "en-US",
+          "pattern": "^General Ledger Entries$"
+        }
+      ],
+      "objectVerification": "declared",
+      "compatibility": {
+        "minAppVersion": "28.0.0",
+        "maxAppVersion": "28.99.99"
+      },
+      "sourceIds": [
+        "microsoft-learn-bc28-20"
+      ]
+    },
+    {
+      "ruleId": "MicrosoftBC28.Page39",
+      "pageObjectId": "39",
+      "entity": "GeneralJournal",
+      "pageType": "worksheet",
+      "sourceTable": "Microsoft.Finance.GeneralLedger.Journal.\"Gen. Journal Line\"",
+      "description": "Enter and post general journal transactions.",
+      "localizedCaptions": {
+        "en-US": [
+          "General Journals"
+        ]
+      },
+      "captionRules": [
+        {
+          "locale": "en-US",
+          "pattern": "^General Journals$"
+        }
+      ],
+      "objectVerification": "declared",
+      "compatibility": {
+        "minAppVersion": "28.0.0",
+        "maxAppVersion": "28.99.99"
+      },
+      "sourceIds": [
+        "microsoft-learn-bc28-39"
+      ]
+    },
+    {
+      "ruleId": "MicrosoftBC28.Page118",
+      "pageObjectId": "118",
+      "entity": "GeneralLedgerSetup",
+      "pageType": "card",
+      "sourceTable": "Microsoft.Finance.GeneralLedger.Setup.\"General Ledger Setup\"",
+      "description": "Configure core general ledger parameters, posting controls, currency, VAT, and dimensions.",
+      "localizedCaptions": {
+        "en-US": [
+          "General Ledger Setup"
+        ]
+      },
+      "captionRules": [
+        {
+          "locale": "en-US",
+          "pattern": "^General Ledger Setup$"
+        }
+      ],
+      "objectVerification": "declared",
+      "compatibility": {
+        "minAppVersion": "28.0.0",
+        "maxAppVersion": "28.99.99"
+      },
+      "sourceIds": [
+        "microsoft-learn-bc28-118"
+      ]
+    },
+    {
+      "ruleId": "MicrosoftBC28.Page256",
+      "pageObjectId": "256",
+      "entity": "PaymentJournal",
+      "pageType": "worksheet",
+      "sourceTable": "Microsoft.Finance.GeneralLedger.Journal.\"Gen. Journal Line\"",
+      "description": "Prepare and post payments, including payment file export and check processing.",
+      "localizedCaptions": {
+        "en-US": [
+          "Payment Journals"
+        ]
+      },
+      "captionRules": [
+        {
+          "locale": "en-US",
+          "pattern": "^Payment Journals$"
+        }
+      ],
+      "objectVerification": "declared",
+      "compatibility": {
+        "minAppVersion": "28.0.0",
+        "maxAppVersion": "28.99.99"
+      },
+      "sourceIds": [
+        "microsoft-learn-bc28-256"
+      ]
+    },
+    {
+      "ruleId": "MicrosoftBC28.Page370",
+      "pageObjectId": "370",
+      "entity": "BankAccount",
+      "pageType": "card",
+      "sourceTable": "Microsoft.Bank.BankAccount.\"Bank Account\"",
+      "description": "Manage bank account master data and payment configuration.",
+      "localizedCaptions": {
+        "en-US": [
+          "Bank Account Card"
+        ]
+      },
+      "captionRules": [
+        {
+          "locale": "en-US",
+          "pattern": "^Bank Account Card$"
+        }
+      ],
+      "objectVerification": "declared",
+      "compatibility": {
+        "minAppVersion": "28.0.0",
+        "maxAppVersion": "28.99.99"
+      },
+      "sourceIds": [
+        "microsoft-learn-bc28-370"
+      ]
+    },
+    {
+      "ruleId": "MicrosoftBC28.Page371",
+      "pageObjectId": "371",
+      "entity": "BankAccount",
+      "pageType": "list",
+      "sourceTable": "Microsoft.Bank.BankAccount.\"Bank Account\"",
+      "description": "View and manage bank accounts, their balances, reconciliations, and statement imports.",
+      "localizedCaptions": {
+        "en-US": [
+          "Bank Accounts"
+        ]
+      },
+      "captionRules": [
+        {
+          "locale": "en-US",
+          "pattern": "^Bank Accounts$"
+        }
+      ],
+      "objectVerification": "declared",
+      "compatibility": {
+        "minAppVersion": "28.0.0",
+        "maxAppVersion": "28.99.99"
+      },
+      "sourceIds": [
+        "microsoft-learn-bc28-371"
+      ]
+    },
+    {
+      "ruleId": "MicrosoftBC28.Page372",
+      "pageObjectId": "372",
+      "entity": "BankAccountLedgerEntry",
+      "pageType": "list",
+      "sourceTable": "Microsoft.Bank.Ledger.\"Bank Account Ledger Entry\"",
+      "description": "View posted bank transactions and navigate to related documents and reconciliation details.",
+      "localizedCaptions": {
+        "en-US": [
+          "Bank Account Ledger Entries"
+        ]
+      },
+      "captionRules": [
+        {
+          "locale": "en-US",
+          "pattern": "^Bank Account Ledger Entries$"
+        }
+      ],
+      "objectVerification": "declared",
+      "compatibility": {
+        "minAppVersion": "28.0.0",
+        "maxAppVersion": "28.99.99"
+      },
+      "sourceIds": [
+        "microsoft-learn-bc28-372"
+      ]
+    },
+    {
+      "ruleId": "MicrosoftBC28.Page388",
+      "pageObjectId": "388",
+      "entity": "BankAccountReconciliation",
+      "pageType": "list",
+      "sourceTable": "Microsoft.Bank.Reconciliation.\"Bank Acc. Reconciliation\"",
+      "description": "Reconcile imported bank statement lines with internal ledger entries using automated suggestions and manual review.",
+      "localizedCaptions": {
+        "en-US": [
+          "Bank Account Reconciliations"
+        ]
+      },
+      "captionRules": [
+        {
+          "locale": "en-US",
+          "pattern": "^Bank Account Reconciliations$"
+        }
+      ],
+      "objectVerification": "declared",
+      "compatibility": {
+        "minAppVersion": "28.0.0",
+        "maxAppVersion": "28.99.99"
+      },
+      "sourceIds": [
+        "microsoft-learn-bc28-388"
+      ]
+    },
+    {
+      "ruleId": "MicrosoftBC28.Page44",
+      "pageObjectId": "44",
+      "entity": "SalesCreditMemo",
+      "pageType": "document",
+      "technicalName": "SalesCreditMemo",
+      "sourceTable": "Microsoft.Sales.Document.\"Sales Header\"",
+      "description": "Manage and post a sales credit memo to process customer returns, refunds, and corrections.",
+      "localizedCaptions": {
+        "en-US": [
+          "Sales Credit Memo"
+        ]
+      },
+      "captionRules": [
+        {
+          "locale": "en-US",
+          "pattern": "^Sales Credit Memo$"
+        }
+      ],
+      "compatibility": {
+        "minAppVersion": "28.0.0",
+        "maxAppVersion": "28.99.99"
+      },
+      "sourceIds": [
+        "microsoft-learn-bc28-44"
+      ]
+    },
+    {
+      "ruleId": "MicrosoftBC28.Page52",
+      "pageObjectId": "52",
+      "entity": "PurchaseCreditMemo",
+      "pageType": "document",
+      "technicalName": "PurchaseCreditMemo",
+      "sourceTable": "Microsoft.Purchases.Document.\"Purchase Header\"",
+      "description": "Manage and post a purchase credit memo for vendor returns, allowances, and corrections.",
+      "localizedCaptions": {
+        "en-US": [
+          "Purchase Credit Memo"
+        ]
+      },
+      "captionRules": [
+        {
+          "locale": "en-US",
+          "pattern": "^Purchase Credit Memo$"
+        }
+      ],
+      "compatibility": {
+        "minAppVersion": "28.0.0",
+        "maxAppVersion": "28.99.99"
+      },
+      "sourceIds": [
+        "microsoft-learn-bc28-52"
+      ]
+    },
+    {
+      "ruleId": "MicrosoftBC28.Page9309",
+      "pageObjectId": "9309",
+      "entity": "PurchaseCreditMemo",
+      "pageType": "list",
+      "technicalName": "PurchaseCreditMemos",
+      "sourceTable": "Microsoft.Purchases.Document.\"Purchase Header\"",
+      "description": "List purchase credit memos used to manage vendor refunds, returns, and corrections.",
+      "localizedCaptions": {
+        "en-US": [
+          "Purchase Credit Memos"
+        ]
+      },
+      "captionRules": [
+        {
+          "locale": "en-US",
+          "pattern": "^Purchase Credit Memos$"
+        }
+      ],
+      "compatibility": {
+        "minAppVersion": "28.0.0",
+        "maxAppVersion": "28.99.99"
+      },
+      "sourceIds": [
+        "microsoft-learn-bc28-9309"
+      ]
+    },
+    {
+      "ruleId": "MicrosoftBC28.Page255",
+      "pageObjectId": "255",
+      "entity": "CashReceiptJournal",
+      "technicalName": "CashReceiptJournal",
+      "sourceTable": "Microsoft.Finance.GeneralLedger.Journal.\"Gen. Journal Line\"",
+      "description": "Record and post incoming customer payments in a cash receipt journal.",
+      "pageType": "worksheet",
+      "localizedCaptions": {
+        "en-US": [
+          "Cash Receipt Journals"
+        ]
+      },
+      "captionRules": [
+        {
+          "locale": "en-US",
+          "pattern": "^Cash Receipt Journals$"
+        }
+      ],
+      "compatibility": {
+        "minAppVersion": "28.0.0",
+        "maxAppVersion": "28.99.99"
+      },
+      "sourceIds": [
+        "microsoft-learn-bc28-255"
+      ]
+    },
+    {
+      "ruleId": "MicrosoftBC28.Page1290",
+      "pageObjectId": "1290",
+      "entity": "PaymentReconciliationJournal",
+      "technicalName": "PaymentReconciliationJournal",
+      "sourceTable": "Microsoft.Bank.Reconciliation.\"Bank Acc. Reconciliation Line\"",
+      "description": "Import, match, review, and post payment reconciliation lines.",
+      "pageType": "worksheet",
+      "localizedCaptions": {
+        "en-US": [
+          "Payment Reconciliation Journal"
+        ]
+      },
+      "captionRules": [
+        {
+          "locale": "en-US",
+          "pattern": "^Payment Reconciliation Journal$"
+        }
+      ],
+      "compatibility": {
+        "minAppVersion": "28.0.0",
+        "maxAppVersion": "28.99.99"
+      },
+      "sourceIds": [
+        "microsoft-learn-bc28-1290"
+      ]
+    }
+  ],
+  "rules": []
+}

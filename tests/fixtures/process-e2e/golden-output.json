@@ -1,0 +1,498 @@
+{
+  "schemaVersion": 1,
+  "corpusVersion": "1.0.0",
+  "scenarios": [
+    {
+      "id": "quantity-typing-coalesces",
+      "tasks": [
+        {
+          "taskType": "EnterQuantity",
+          "kind": "field-edit",
+          "instruction": "Ange __500__ i **Quantity**.",
+          "actionCaption": "Quantity",
+          "fieldCaption": "Quantity",
+          "selectedCaption": "500",
+          "screenshot": "quantity.png",
+          "resultStatus": "verified",
+          "observedResult": "Quantity uppdaterades.",
+          "expectedResultSuggestion": "Quantity uppdaterades.",
+          "important": false,
+          "sectionBoundaryAfter": false
+        }
+      ],
+      "projectedSteps": [
+        {
+          "stepNumber": 1,
+          "instruction": "Ange __500__ i **Quantity**.",
+          "observedResult": "Quantity uppdaterades.",
+          "screenshot": "quantity.png"
+        }
+      ]
+    },
+    {
+      "id": "unchanged-focusout-is-noise",
+      "tasks": [],
+      "projectedSteps": []
+    },
+    {
+      "id": "action-keeps-observed-navigation-result",
+      "tasks": [
+        {
+          "taskType": "RunAction",
+          "kind": "action",
+          "instruction": "Välj **Open**.",
+          "actionCaption": "Open",
+          "fieldCaption": "Open",
+          "selectedCaption": "",
+          "screenshot": "sales-order.png",
+          "resultStatus": "verified",
+          "observedResult": "Sidan Sales Order öppnades.",
+          "expectedResultSuggestion": "Sidan Sales Order öppnades.",
+          "important": false,
+          "sectionBoundaryAfter": false
+        }
+      ],
+      "projectedSteps": [
+        {
+          "stepNumber": 1,
+          "instruction": "Välj **Open**.",
+          "observedResult": "Sidan Sales Order öppnades.",
+          "screenshot": "sales-order.png"
+        }
+      ]
+    },
+    {
+      "id": "record-selection-preserves-number",
+      "tasks": [
+        {
+          "taskType": "SelectRecord",
+          "kind": null,
+          "instruction": "Välj posten **30043**.",
+          "actionCaption": "No.",
+          "fieldCaption": "No.",
+          "selectedCaption": "30043",
+          "screenshot": "record.png",
+          "resultStatus": "verified",
+          "observedResult": "Ett val registrerades i No..",
+          "expectedResultSuggestion": "Ett val registrerades i No..",
+          "important": false,
+          "sectionBoundaryAfter": false
+        }
+      ],
+      "projectedSteps": [
+        {
+          "stepNumber": 1,
+          "instruction": "Välj posten **30043**.",
+          "observedResult": "Ett val registrerades i No..",
+          "screenshot": "record.png"
+        }
+      ]
+    },
+    {
+      "id": "checkbox-state-is-preserved",
+      "tasks": [
+        {
+          "taskType": "EnableCheckbox",
+          "kind": "toggle-interaction",
+          "instruction": "Aktivera **Blocked**.",
+          "actionCaption": "Blocked",
+          "fieldCaption": "Blocked",
+          "selectedCaption": "",
+          "screenshot": "blocked.png",
+          "resultStatus": "verified",
+          "observedResult": "Blocked aktiverades.",
+          "expectedResultSuggestion": "Blocked aktiverades.",
+          "important": false,
+          "sectionBoundaryAfter": false
+        }
+      ],
+      "projectedSteps": [
+        {
+          "stepNumber": 1,
+          "instruction": "Aktivera **Blocked**.",
+          "observedResult": "Blocked aktiverades.",
+          "screenshot": "blocked.png"
+        }
+      ]
+    },
+    {
+      "id": "option-selection-preserves-value",
+      "tasks": [
+        {
+          "taskType": "SelectOption",
+          "kind": "selection",
+          "instruction": "Välj **Open** i **Status**.",
+          "actionCaption": "Status",
+          "fieldCaption": "Status",
+          "selectedCaption": "Open",
+          "screenshot": "status.png",
+          "resultStatus": "verified",
+          "observedResult": "Ett val registrerades i Status.",
+          "expectedResultSuggestion": "Ett val registrerades i Status.",
+          "important": false,
+          "sectionBoundaryAfter": false
+        }
+      ],
+      "projectedSteps": [
+        {
+          "stepNumber": 1,
+          "instruction": "Välj **Open** i **Status**.",
+          "observedResult": "Ett val registrerades i Status.",
+          "screenshot": "status.png"
+        }
+      ]
+    },
+    {
+      "id": "dialog-state-without-action-is-filtered",
+      "tasks": [],
+      "projectedSteps": []
+    },
+    {
+      "id": "same-field-on-two-pages-stays-separate",
+      "tasks": [
+        {
+          "taskType": "EnterFieldValue",
+          "kind": "field-edit",
+          "instruction": "Ange __10000__ i **No.**.",
+          "actionCaption": "No.",
+          "fieldCaption": "No.",
+          "selectedCaption": "10000",
+          "screenshot": null,
+          "resultStatus": "verified",
+          "observedResult": "No. uppdaterades.",
+          "expectedResultSuggestion": "No. uppdaterades.",
+          "important": false,
+          "sectionBoundaryAfter": false
+        },
+        {
+          "taskType": "EnterFieldValue",
+          "kind": "field-edit",
+          "instruction": "Ange __30043__ i **No.**.",
+          "actionCaption": "No.",
+          "fieldCaption": "No.",
+          "selectedCaption": "30043",
+          "screenshot": null,
+          "resultStatus": "verified",
+          "observedResult": "No. uppdaterades.",
+          "expectedResultSuggestion": "No. uppdaterades.",
+          "important": false,
+          "sectionBoundaryAfter": false
+        }
+      ],
+      "projectedSteps": [
+        {
+          "stepNumber": 1,
+          "instruction": "Ange __10000__ i **No.**.",
+          "observedResult": "No. uppdaterades.",
+          "screenshot": null
+        },
+        {
+          "stepNumber": 2,
+          "instruction": "Ange __30043__ i **No.**.",
+          "observedResult": "No. uppdaterades.",
+          "screenshot": null
+        }
+      ]
+    },
+    {
+      "id": "business-central-error-attaches-to-action",
+      "tasks": [
+        {
+          "taskType": "RunAction",
+          "kind": "action",
+          "instruction": "Välj **Post**.",
+          "actionCaption": "Post",
+          "fieldCaption": "Post",
+          "selectedCaption": "",
+          "screenshot": "posting-error.png",
+          "resultStatus": "error",
+          "observedResult": "Business Central visade ett fel.",
+          "expectedResultSuggestion": "Business Central visade ett fel.",
+          "important": false,
+          "sectionBoundaryAfter": false
+        }
+      ],
+      "projectedSteps": [
+        {
+          "stepNumber": 1,
+          "instruction": "Välj **Post**.",
+          "observedResult": "Business Central visade ett fel.",
+          "screenshot": "posting-error.png"
+        }
+      ]
+    },
+    {
+      "id": "english-label-remains-observed",
+      "tasks": [
+        {
+          "taskType": "RunAction",
+          "kind": "action",
+          "instruction": "Välj **Sales Order**.",
+          "actionCaption": "Sales Order",
+          "fieldCaption": "Sales Order",
+          "selectedCaption": "",
+          "screenshot": "sales-order-action.png",
+          "resultStatus": "unverified",
+          "observedResult": "Resultatet kunde inte verifieras automatiskt.",
+          "expectedResultSuggestion": "",
+          "important": false,
+          "sectionBoundaryAfter": false
+        }
+      ],
+      "projectedSteps": [
+        {
+          "stepNumber": 1,
+          "instruction": "Välj **Sales Order**.",
+          "observedResult": null,
+          "screenshot": "sales-order-action.png"
+        }
+      ]
+    },
+    {
+      "id": "posting-date-entry",
+      "tasks": [
+        {
+          "taskType": "SelectDate",
+          "kind": null,
+          "instruction": "Ange __2026-09-23__ i **Posting Date**.",
+          "actionCaption": "Posting Date",
+          "fieldCaption": "Posting Date",
+          "selectedCaption": "2026-09-23",
+          "screenshot": "posting-date.png",
+          "resultStatus": "verified",
+          "observedResult": "Posting Date uppdaterades.",
+          "expectedResultSuggestion": "Posting Date uppdaterades.",
+          "important": false,
+          "sectionBoundaryAfter": false
+        }
+      ],
+      "projectedSteps": [
+        {
+          "stepNumber": 1,
+          "instruction": "Ange __2026-09-23__ i **Posting Date**.",
+          "observedResult": "Posting Date uppdaterades.",
+          "screenshot": "posting-date.png"
+        }
+      ]
+    },
+    {
+      "id": "description-field-entry",
+      "tasks": [
+        {
+          "taskType": "EnterFieldValue",
+          "kind": "field-edit",
+          "instruction": "Ange __Synthetic description__ i **Description**.",
+          "actionCaption": "Description",
+          "fieldCaption": "Description",
+          "selectedCaption": "Synthetic description",
+          "screenshot": "description.png",
+          "resultStatus": "verified",
+          "observedResult": "Description uppdaterades.",
+          "expectedResultSuggestion": "Description uppdaterades.",
+          "important": false,
+          "sectionBoundaryAfter": false
+        }
+      ],
+      "projectedSteps": [
+        {
+          "stepNumber": 1,
+          "instruction": "Ange __Synthetic description__ i **Description**.",
+          "observedResult": "Description uppdaterades.",
+          "screenshot": "description.png"
+        }
+      ]
+    },
+    {
+      "id": "action-status-result",
+      "tasks": [
+        {
+          "taskType": "RunAction",
+          "kind": "action",
+          "instruction": "Välj **Release**.",
+          "actionCaption": "Release",
+          "fieldCaption": "Release",
+          "selectedCaption": "",
+          "screenshot": "released.png",
+          "resultStatus": "verified",
+          "observedResult": "Business Central visade ett statusmeddelande.",
+          "expectedResultSuggestion": "Business Central visade ett statusmeddelande.",
+          "important": false,
+          "sectionBoundaryAfter": false
+        }
+      ],
+      "projectedSteps": [
+        {
+          "stepNumber": 1,
+          "instruction": "Välj **Release**.",
+          "observedResult": "Business Central visade ett statusmeddelande.",
+          "screenshot": "released.png"
+        }
+      ]
+    },
+    {
+      "id": "orphan-navigation-is-filtered",
+      "tasks": [],
+      "projectedSteps": []
+    },
+    {
+      "id": "show-more-is-filtered",
+      "tasks": [],
+      "projectedSteps": []
+    },
+    {
+      "id": "menu-path-consolidates",
+      "tasks": [
+        {
+          "taskType": "RunActionPath",
+          "kind": null,
+          "instruction": "Välj **Actions** → **Functions** → **Manual Price**.",
+          "actionCaption": "Manual Price...",
+          "fieldCaption": "",
+          "selectedCaption": "Manual Price...",
+          "screenshot": "functions.png",
+          "resultStatus": "unverified",
+          "observedResult": "Resultatet kunde inte verifieras automatiskt.",
+          "expectedResultSuggestion": "",
+          "important": false,
+          "sectionBoundaryAfter": false
+        }
+      ],
+      "projectedSteps": [
+        {
+          "stepNumber": 1,
+          "instruction": "Välj **Actions** → **Functions** → **Manual Price**.",
+          "observedResult": null,
+          "screenshot": "functions.png"
+        }
+      ]
+    },
+    {
+      "id": "separate-field-interactions-remain-separate",
+      "tasks": [
+        {
+          "taskType": "EnterQuantity",
+          "kind": "field-edit",
+          "instruction": "Ange __5__ i **Quantity**.",
+          "actionCaption": "Quantity",
+          "fieldCaption": "Quantity",
+          "selectedCaption": "5",
+          "screenshot": null,
+          "resultStatus": "verified",
+          "observedResult": "Quantity uppdaterades.",
+          "expectedResultSuggestion": "Quantity uppdaterades.",
+          "important": false,
+          "sectionBoundaryAfter": false
+        },
+        {
+          "taskType": "EnterQuantity",
+          "kind": "field-edit",
+          "instruction": "Ange __50__ i **Quantity**.",
+          "actionCaption": "Quantity",
+          "fieldCaption": "Quantity",
+          "selectedCaption": "50",
+          "screenshot": null,
+          "resultStatus": "verified",
+          "observedResult": "Quantity uppdaterades.",
+          "expectedResultSuggestion": "Quantity uppdaterades.",
+          "important": false,
+          "sectionBoundaryAfter": false
+        }
+      ],
+      "projectedSteps": [
+        {
+          "stepNumber": 1,
+          "instruction": "Ange __5__ i **Quantity**.",
+          "observedResult": "Quantity uppdaterades.",
+          "screenshot": null
+        },
+        {
+          "stepNumber": 2,
+          "instruction": "Ange __50__ i **Quantity**.",
+          "observedResult": "Quantity uppdaterades.",
+          "screenshot": null
+        }
+      ]
+    },
+    {
+      "id": "control-addin-action",
+      "tasks": [
+        {
+          "taskType": "RunAction",
+          "kind": "action",
+          "instruction": "Välj **Synthetic surface action**.",
+          "actionCaption": "Synthetic surface action",
+          "fieldCaption": "Synthetic surface action",
+          "selectedCaption": "",
+          "screenshot": "control-addin.png",
+          "resultStatus": "unverified",
+          "observedResult": "Resultatet kunde inte verifieras automatiskt.",
+          "expectedResultSuggestion": "",
+          "important": false,
+          "sectionBoundaryAfter": false
+        }
+      ],
+      "projectedSteps": [
+        {
+          "stepNumber": 1,
+          "instruction": "Välj **Synthetic surface action**.",
+          "observedResult": null,
+          "screenshot": "control-addin.png"
+        }
+      ]
+    },
+    {
+      "id": "unchecked-toggle-is-preserved",
+      "tasks": [
+        {
+          "taskType": "DisableCheckbox",
+          "kind": "toggle-interaction",
+          "instruction": "Inaktivera **Backorder**.",
+          "actionCaption": "Backorder",
+          "fieldCaption": "Backorder",
+          "selectedCaption": "",
+          "screenshot": "backorder-off.png",
+          "resultStatus": "verified",
+          "observedResult": "Backorder inaktiverades.",
+          "expectedResultSuggestion": "Backorder inaktiverades.",
+          "important": false,
+          "sectionBoundaryAfter": false
+        }
+      ],
+      "projectedSteps": [
+        {
+          "stepNumber": 1,
+          "instruction": "Inaktivera **Backorder**.",
+          "observedResult": "Backorder inaktiverades.",
+          "screenshot": "backorder-off.png"
+        }
+      ]
+    },
+    {
+      "id": "save-and-close-remains-action",
+      "tasks": [
+        {
+          "taskType": "RunAction",
+          "kind": "action",
+          "instruction": "Välj **Save and close**.",
+          "actionCaption": "Save and close",
+          "fieldCaption": "Save and close",
+          "selectedCaption": "",
+          "screenshot": "save-close.png",
+          "resultStatus": "unverified",
+          "observedResult": "Resultatet kunde inte verifieras automatiskt.",
+          "expectedResultSuggestion": "",
+          "important": false,
+          "sectionBoundaryAfter": false
+        }
+      ],
+      "projectedSteps": [
+        {
+          "stepNumber": 1,
+          "instruction": "Välj **Save and close**.",
+          "observedResult": null,
+          "screenshot": "save-close.png"
+        }
+      ]
+    }
+  ]
+}

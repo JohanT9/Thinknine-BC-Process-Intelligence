@@ -11,6 +11,8 @@ importScripts("engine/page-identification-engine.js");
 importScripts("engine/process-taxonomy-schema.js");
 importScripts("engine/canonical-semantic-model.js");
 importScripts("engine/canonical-recording.js");
+importScripts("engine/canonical-process-schema.js");
+importScripts("engine/canonical-process-adapter.js");
 importScripts("engine/business-central-process-taxonomy-seed.js");
 importScripts("engine/business-central-document-lifecycle-seed.js");
 importScripts("engine/document-lifecycle.js");
@@ -31,6 +33,13 @@ importScripts("engine/source-reference.js");
 importScripts("document/semantic-interaction-engine.js");
 importScripts("engine/task-consolidation.js");
 importScripts("engine/knowledge-domain.js");
+importScripts("engine/knowledge-repository.js");
+importScripts("engine/knowledge-native-mcp-client.js");
+importScripts("engine/knowledge-mcp-adapter.js");
+importScripts("engine/process-decision-code-registry.js");
+importScripts("engine/process-quality-guard.js");
+importScripts("engine/process-contradiction-engine.js");
+importScripts("engine/process-analysis-model.js");
 importScripts("engine/session-interpretation-pipeline.js");
 importScripts("engine/privacy-mask.js");
 importScripts("engine/screenshot-capture-policy.js");
@@ -38,6 +47,13 @@ importScripts("engine/recording-live-status.js");
 importScripts("bug-report/bc-diagnostic-evidence.js");
 importScripts("bug-report/al-call-stack-parser.js");
 importScripts("bug-report/technical-diagnostics.js");
+importScripts("bug-report/error-evidence-model.js");
+importScripts("bug-report/error-analysis-rules.js");
+importScripts("bug-report/error-code-registry.js");
+importScripts("bug-report/error-diagnosis-engine.js");
+importScripts("bug-report/error-incident-correlator.js");
+importScripts("bug-report/error-privacy-classifier.js");
+importScripts("bug-report/error-analysis-engine.js");
 importScripts("bug-report/bug-report-model.js");
 importScripts("bug-report/bug-report-completeness.js");
 importScripts("bug-report/bug-report-service.js");
@@ -62,6 +78,9 @@ importScripts("bug-report/external-issue-auth.js");
 importScripts("bug-report/azure-devops-adapter.js");
 importScripts("bug-report/github-issue-adapter.js");
 importScripts("document/document-library.js");
+importScripts("review/process-improvement-dataset.js");
+importScripts("review/knowledge-feedback-learning.js");
+importScripts("review/process-improvement-service.js");
 
 const VERSION = "__APP_VERSION__";
 const tenantLicense = globalThis.T9TenantLicense.create({
@@ -106,17 +125,63 @@ async function requireRecordingLicense(url) {
   }
 }
 const windowsSharePorts = new Set();
-const pageKnowledgePacksReady = globalThis.T9PageIdentificationEngine
-  .loadKnowledgePacks({
-    indexUrl: chrome.runtime.getURL("knowledge-packs/index.json"),
-    resolveUrl: file => chrome.runtime.getURL(file)
-  }).catch(error => {
-    console.warn("Page identification Knowledge Packs could not be loaded.", error);
-    return { packs: [], validation: { diagnostics: [{
-      code: "page-knowledge-pack-load-failed", message: String(error)
-    }] } };
-  });
-
+let knowledgeMcpClient = null;
+function getKnowledgeMcpClient() {
+  if (!knowledgeMcpClient) knowledgeMcpClient =
+    globalThis.BCKnowledgeNativeMcpClient.create({
+      connectNative: host => chrome.runtime.connectNative(host)
+    });
+  return knowledgeMcpClient;
+}
+function isKnowledgeMcpSettingsSender(sender) {
+  return sender.id === chrome.runtime.id &&
+    sender.url === chrome.runtime.getURL("dashboard.html");
+}
+const pageKnowledgePacksReady = globalThis.BCKnowledgeRepository.load({
+  indexUrl: chrome.runtime.getURL("knowledge-packs/index.json"),
+  resolveUrl: file => chrome.runtime.getURL(file)
+}).then(result => {
+  if (!result.ok) throw new Error(result.diagnostics.map(item => item.code).join(", "));
+  const repository = globalThis.BCKnowledgeRepository.createRepository(result.snapshot);
+  const snapshot = repository.getRelease();
+  const validation = globalThis.T9PageIdentificationEngine.configureKnowledgePacks(
+    snapshot.packs
+  );
+  return { packs: snapshot.packs, snapshot, repository, validation };
+}).catch(error => {
+  console.warn("Knowledge repository could not be loaded.", error);
+  return { packs: [], snapshot: null, validation: { diagnostics: [{
+    code: "knowledge-release-load-failed"
+  }] } };
+});
+async function validateKnowledgeDraft(draft) {
+  const { snapshot } = await pageKnowledgePacksReady;
+  if (!snapshot) return { status: "unavailable", releaseId: null,
+    diagnostics: [{ code: "knowledge-release-unavailable", severity: "error" }] };
+  try {
+  if (typeof draft?.targetPackId !== "string" ||
+      !/^[a-z0-9][a-z0-9._-]*$/.test(draft.targetPackId)) {
+    return { status: "blocked", releaseId: snapshot.release.releaseId,
+      diagnostics: [{ code: "knowledge-target-pack-required", severity: "error" }] };
+  }
+  const packs = snapshot.packs.map(pack => JSON.parse(JSON.stringify(pack)));
+  const target = packs.find(pack => pack.packId === draft.targetPackId);
+  if (!target) return { status: "blocked", releaseId: snapshot.release.releaseId,
+    diagnostics: [{ code: "knowledge-target-pack-unavailable", severity: "error" }] };
+  target.rules.push(JSON.parse(JSON.stringify(draft.rule)));
+  const result = globalThis.BCKnowledgeRepository.importRelease(snapshot.manifest,
+    packs.map(pack => ({ packId: pack.packId, pack })));
+  const diagnostics = result.diagnostics.map(item => ({ code: item.code,
+    severity: item.severity, subjectRef: item.subjectRef }));
+  const hasErrors = diagnostics.some(item => item.severity === "error");
+  const hasWarnings = diagnostics.some(item => item.severity === "warning");
+  return { status: hasErrors ? "blocked" : hasWarnings ? "warnings" : "valid",
+    releaseId: snapshot.release.releaseId, diagnostics };
+  } catch {
+    return { status: "blocked", releaseId: snapshot.release.releaseId,
+      diagnostics: [{ code: "knowledge-candidate-invalid", severity: "error" }] };
+  }
+}
 const DEFAULT_SETTINGS = {
   uiLocale: "sv-SE",
   documentLanguage: "sv-SE",
@@ -126,6 +191,7 @@ const DEFAULT_SETTINGS = {
     "Processen är genomförd enligt arbetsgången och de registrerade " +
     "ändringarna har sparats i Business Central.",
   captureScreenshots: true,
+  showClickHighlights: true,
   screenshotMode: "important",
   maskValues: true,
   maxEvents: 20000,
@@ -133,6 +199,7 @@ const DEFAULT_SETTINGS = {
   companyName: "",
   supportEmail: "",
   bugReportEmailMode: "eml",
+  knowledgeMcpEnabled: false,
   advancedOverridesEnabled: false,
   maskSalesOrderNo: true,
   maskPurchaseOrderNo: true,
@@ -168,6 +235,10 @@ const {
   SCREENSHOT_PREFIX,
   SESSION_PREFIX
 } = globalThis.T9StorageKeys;
+const processImprovement = globalThis.T9ProcessImprovementService.create({
+  storage: chrome.storage.local, reviewPrefix: REVIEW_PREFIX,
+  validateDraft: validateKnowledgeDraft
+});
 const DEBUG_KEY = "t9_debug";
 const TELEMETRY_CONFIG_KEY = "t9_application_insights_configuration";
 const AI_CONFIG_KEY = "t9_ai_analysis_configuration";
@@ -449,6 +520,15 @@ async function saveAiConfiguration(value = {}) {
   globalThis.T9AiBrokerAuth.clear(); return configuration;
 }
 
+async function technicalDiagnosticsPolicyEnabled() {
+  try {
+    const policy = await chrome.storage.managed.get("technicalDiagnosticsEnabled");
+    return policy?.technicalDiagnosticsEnabled === true;
+  } catch {
+    return false;
+  }
+}
+
 function createAiProvider(configuration) {
   return globalThis.T9TechnicalAnalysisProvider.create({ async invoke(request) {
     const token = await globalThis.T9AiBrokerAuth.authenticate(configuration);
@@ -561,17 +641,19 @@ function createGitHubProvider(configuration) {
 }
 
 async function capture(tabId) {
-  let indicatorHidden = false;
+  const captureId = crypto.randomUUID();
+  let captureFrames = [0];
   try {
     const tab = await chrome.tabs.get(tabId);
     if (!tab.active) return null;
 
     try {
-      await chrome.tabs.sendMessage(tabId, {
-        type: "T9_SET_INDICATOR_CAPTURE_VISIBILITY", hidden: true
-      }, { frameId: 0 });
-      indicatorHidden = true;
+      const frames = await chrome.webNavigation.getAllFrames({ tabId });
+      captureFrames = [...new Set([0, ...(frames || []).map(frame => frame.frameId)])];
     } catch {}
+    await Promise.allSettled(captureFrames.map(frameId => chrome.tabs.sendMessage(tabId, {
+      type: "T9_SET_INDICATOR_CAPTURE_VISIBILITY", captureId, hidden: true
+    }, { frameId })));
 
     return await chrome.tabs.captureVisibleTab(tab.windowId, {
       format: "png"
@@ -584,13 +666,9 @@ async function capture(tabId) {
     });
     return null;
   } finally {
-    if (indicatorHidden) {
-      try {
-        await chrome.tabs.sendMessage(tabId, {
-          type: "T9_SET_INDICATOR_CAPTURE_VISIBILITY", hidden: false
-        }, { frameId: 0 });
-      } catch {}
-    }
+    await Promise.allSettled(captureFrames.map(frameId => chrome.tabs.sendMessage(tabId, {
+      type: "T9_SET_INDICATOR_CAPTURE_VISIBILITY", captureId, hidden: false
+    }, { frameId })));
   }
 }
 
@@ -1541,6 +1619,8 @@ async function createAndOpenBugReport(recordingId, reportTitle = "", regenerateC
   const interpretation = globalThis.T9SessionInterpretationPipeline.interpret({
     session: legacy.session, events: projectedEvents,
     normalizedEvents: normalized.events, stepGroups: grouped.groups,
+    supportingEvents: grouped.supportingEvents,
+    groupingDiagnostics: grouped.diagnostics,
     imagePaths: screenshots, knowledgePacks: packResult.packs || [] });
   const byCanonicalId = new Map(recording.events.map(event => [event.id, event]));
   const tasks = (interpretation.businessTasks || []).map(task => ({ ...task,
@@ -1727,6 +1807,11 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
       }
 
       case "T9_SET_CAPTURE_DIAGNOSTICS":
+        if (sender.url !== chrome.runtime.getURL("debug.html") ||
+            !(await technicalDiagnosticsPolicyEnabled())) {
+          sendResponse({ ok: false, reason: "technical-diagnostics-policy-required" });
+          break;
+        }
         await setDebug(message.enabled
           ? { captureDiagnosticsEnabled: true, captureDiagnostics: [],
             captureStageCounts: {}, lastCaptureDiagnostic: null }
@@ -2313,6 +2398,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
           events: projectedEvents,
           normalizedEvents: normalized.events,
           stepGroups: grouped.groups,
+          supportingEvents: grouped.supportingEvents,
           groupingDiagnostics: grouped.diagnostics,
           screenshots: message.includeScreenshots === false
             ? {}
@@ -2475,10 +2561,74 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
         sendResponse({ ok: true });
         break;
 
+      case "T9_GET_PROCESS_IMPROVEMENT_DATASET": {
+        if (sender.url !== chrome.runtime.getURL("debug.html") ||
+            !(await technicalDiagnosticsPolicyEnabled())) {
+          sendResponse({ ok: false, reason: "technical-diagnostics-policy-required" });
+          break;
+        }
+        const result = await processImprovement.read();
+        sendResponse({ ok: true, ...result });
+        break;
+      }
+
+      case "T9_GET_KNOWLEDGE_ADMIN_ACCESS": {
+        if (sender.url !== chrome.runtime.getURL("popup.html")) {
+          sendResponse({ ok: false, reason: "invalid-admin-access-check-origin" });
+          break;
+        }
+        const authorized = await consultantLicense.hasApplicationAdminRole();
+        sendResponse({ ok: true, authorized });
+        break;
+      }
+
+      case "T9_GET_KNOWLEDGE_ADMIN_DATA": {
+        if (sender.url !== chrome.runtime.getURL("knowledge-admin.html") ||
+            !(await consultantLicense.hasApplicationAdminRole())) {
+          sendResponse({ ok: false, reason: "application-admin-role-required" });
+          break;
+        }
+        const knowledgeReady = await pageKnowledgePacksReady;
+        const result = await processImprovement.read({ includeKnowledgeFeedback: true,
+          knowledgePacks: knowledgeReady.packs });
+        sendResponse({ ok: true, ...result });
+        break;
+      }
+
+      case "T9_CREATE_KNOWLEDGE_RULE_DRAFT": {
+        if (sender.url !== chrome.runtime.getURL("knowledge-admin.html") ||
+            !(await consultantLicense.hasApplicationAdminRole())) {
+          sendResponse({ ok: false, reason: "application-admin-role-required" });
+          break;
+        }
+        const result = await processImprovement.createDraft(message.proposalId,
+          message.targetPackId);
+        sendResponse(result);
+        break;
+      }
+
+      case "T9_SET_KNOWLEDGE_DRAFT_TARGET": {
+        if (sender.url !== chrome.runtime.getURL("knowledge-admin.html") ||
+            !(await consultantLicense.hasApplicationAdminRole())) {
+          sendResponse({ ok: false, reason: "application-admin-role-required" });
+          break;
+        }
+        const result = await processImprovement.setDraftTarget(message.draftId,
+          message.targetPackId);
+        sendResponse(result);
+        break;
+      }
+
       case "T9_GET_DEBUG": {
+        if (sender.url !== chrome.runtime.getURL("debug.html") ||
+            !(await technicalDiagnosticsPolicyEnabled())) {
+          sendResponse({ ok: false, reason: "technical-diagnostics-policy-required" });
+          break;
+        }
         const data = await chrome.storage.local.get(DEBUG_KEY);
         const state = await getState();
         const registration = await getRecorderRegistrationStatus();
+        const improvement = await processImprovement.read();
         let browserFrames = [];
         try {
           browserFrames = state.tabId
@@ -2492,6 +2642,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
           debug: data[DEBUG_KEY] || {},
           state,
           registration,
+          processImprovement: improvement,
           browserFrames: browserFrames.map(frame => frame.error ? frame : {
             frameId: frame.frameId, parentFrameId: frame.parentFrameId,
             documentId: frame.documentId || "",
@@ -2521,8 +2672,141 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
         break;
       }
 
+      case "T9_TEST_KNOWLEDGE_MCP_CONNECTION": {
+        if (!isKnowledgeMcpSettingsSender(sender)) {
+          sendResponse({ ok: false, reason: "dashboard-only" });
+          break;
+        }
+        if (!(await getSettings()).knowledgeMcpEnabled) {
+          sendResponse({ ok: false, reason: "knowledge-mcp-consent-required" });
+          break;
+        }
+        try {
+          const client = getKnowledgeMcpClient();
+          const tools = await client.listTools();
+          sendResponse({ ok: true, toolCount: tools.length });
+        } catch (error) {
+          const detail = String(error?.message || error || "").replace(/[\u0000-\u001f]+/gu, " ").trim().slice(0, 240);
+          sendResponse({ ok: false, reason: "knowledge-mcp-unavailable",
+            ...(detail ? { detail } : {}) });
+        } finally {
+          knowledgeMcpClient?.close();
+          knowledgeMcpClient = null;
+        }
+        break;
+      }
+
+      case "T9_TEST_KNOWLEDGE_MCP_SAMPLE_LOOKUP": {
+        if (!isKnowledgeMcpSettingsSender(sender)) {
+          sendResponse({ ok: false, reason: "dashboard-only" });
+          break;
+        }
+        const settings = await getSettings();
+        if (!settings.knowledgeMcpEnabled) {
+          sendResponse({ ok: false, reason: "knowledge-mcp-consent-required" });
+          break;
+        }
+        try {
+          const client = getKnowledgeMcpClient();
+          const response = await client.callTool({
+            name: globalThis.BCKnowledgeMcpAdapter.TOOL_OBJECT,
+            arguments: { objectType: "page", objectId: "22",
+              productFamily: "business-central",
+              ...(settings.uiLocale ? { locale: settings.uiLocale } : {}) }
+          });
+          const result = globalThis.BCKnowledgeMcpAdapter.parseToolResult("object", response);
+          sendResponse({ ok: true, result });
+        } catch (error) {
+          const detail = String(error?.message || error || "").replace(/[\\u0000-\\u001f]+/gu, " ").trim().slice(0, 240);
+          sendResponse({ ok: false, reason: "knowledge-mcp-unavailable",
+            ...(detail ? { detail } : {}) });
+        } finally {
+          knowledgeMcpClient?.close();
+          knowledgeMcpClient = null;
+        }
+        break;
+      }
+      case "T9_LOOKUP_KNOWLEDGE_MCP_BATCH": {
+        if (!isKnowledgeMcpSettingsSender(sender)) {
+          sendResponse({ ok: false, reason: "dashboard-only" });
+          break;
+        }
+        const settings = await getSettings();
+        if (!settings.knowledgeMcpEnabled) {
+          sendResponse({ ok: false, reason: "knowledge-mcp-consent-required" });
+          break;
+        }
+        const repositoryState = await pageKnowledgePacksReady;
+        if (!repositoryState.repository) {
+          sendResponse({ ok: false, reason: "knowledge-repository-unavailable" });
+          break;
+        }
+        const lookups = Array.isArray(message.lookups) ? message.lookups.slice(0, 40) : [];
+        const results = [];
+        try {
+          const adapter = globalThis.BCKnowledgeMcpAdapter.createMcpKnowledgeAdapter({
+            client: getKnowledgeMcpClient(), repository: repositoryState.repository, consent: true
+          });
+          for (const [index, lookup] of lookups.entries()) {
+            const kind = lookup?.kind;
+            const request = lookup?.request || {};
+            const result = kind === "object" ? await adapter.resolveObject(request)
+              : kind === "action" ? await adapter.resolveAction(request)
+                : { status: "unresolved", candidates: [], reason: "invalid-lookup-kind" };
+            results.push({ key: typeof lookup?.key === "string"
+              ? lookup.key.slice(0, 160) : "lookup-" + index, kind, result });
+          }
+          sendResponse({ ok: true, results });
+        } catch (error) {
+          const detail = String(error?.message || error || "").replace(/[\\u0000-\\u001f]+/gu, " ").trim().slice(0, 240);
+          sendResponse({ ok: false, reason: "knowledge-mcp-unavailable",
+            ...(detail ? { detail } : {}) });
+        } finally {
+          knowledgeMcpClient?.close();
+          knowledgeMcpClient = null;
+        }
+        break;
+      }
+      case "T9_LOOKUP_KNOWLEDGE_MCP": {
+        if (!isKnowledgeMcpSettingsSender(sender)) {
+          sendResponse({ ok: false, reason: "dashboard-only" });
+          break;
+        }
+        if (!(await getSettings()).knowledgeMcpEnabled) {
+          sendResponse({ ok: false, reason: "knowledge-mcp-consent-required" });
+          break;
+        }
+        const repositoryState = await pageKnowledgePacksReady;
+        if (!repositoryState.repository) {
+          sendResponse({ ok: false, reason: "knowledge-repository-unavailable" });
+          break;
+        }
+        try {
+          const adapter = globalThis.BCKnowledgeMcpAdapter.createMcpKnowledgeAdapter({
+            client: getKnowledgeMcpClient(), repository: repositoryState.repository,
+            consent: true
+          });
+          const request = message.request || {};
+          const result = message.kind === "object"
+            ? await adapter.resolveObject(request)
+            : message.kind === "action"
+              ? await adapter.resolveAction(request)
+              : { status: "unresolved", candidates: [], reason: "invalid-lookup-kind" };
+          sendResponse({ ok: true, result });
+        } catch (error) {
+          const detail = String(error?.message || error || "").replace(/[\u0000-\u001f]+/gu, " ").trim().slice(0, 240);
+          sendResponse({ ok: false, reason: "knowledge-mcp-unavailable",
+            ...(detail ? { detail } : {}) });
+        } finally {
+          knowledgeMcpClient?.close();
+          knowledgeMcpClient = null;
+        }
+        break;
+      }
+
       case "T9_SAVE_SETTINGS": {
         const settings = { ...(await getSettings()), ...(message.settings || {}) };
+        settings.knowledgeMcpEnabled = settings.knowledgeMcpEnabled === true;
         settings.uiLocale = globalThis.T9LanguageRegistry.normalize(
           settings.uiLocale, "ui");
         settings.documentLanguage = globalThis.T9LanguageRegistry.normalize(

@@ -120,6 +120,9 @@ function createAdmin({ dataDirectory, registry, mutateRegistry, deleteTrialClaim
         return reply(401, { error: "unauthorized" });
       }
       // No cookies, no CORS and no key in URL or browser persistent storage.
+      if (pathname === "/admin/api/knowledge-access" && request.method === "GET") {
+        return reply(200, { authorized: adminActor.startsWith("entra:") });
+      }
       if (pathname === "/admin/api/state" && request.method === "GET") {
         return reply(200, await snapshot());
       }

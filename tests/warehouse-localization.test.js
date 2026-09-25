@@ -1,0 +1,81 @@
+const assert = require('node:assert/strict');
+const fs = require('node:fs');
+const path = require('node:path');
+const repositoryApi = require('../src/engine/knowledge-repository');
+const root = path.resolve(__dirname, '..');
+const manifest = JSON.parse(fs.readFileSync(path.join(root, 'src/knowledge-packs/index.json'), 'utf8'));
+const packs = manifest.packs.filter(x => x.enabled).map(x => ({packId:x.packId,pack:JSON.parse(fs.readFileSync(path.join(root,'src',x.file),'utf8'))}));
+const imported = repositoryApi.importRelease(manifest,packs);
+assert.equal(imported.ok,true,JSON.stringify(imported.diagnostics));
+const repository = repositoryApi.createRepository(imported.snapshot);
+const samples = [
+  ['sv-SE','Lagerplockning','Ant. att hantera','Warehouse.SetQtyToHandlePick','microsoft-learn-inventory-picks-sv'],
+  ['en-US','Inventory Pick','Qty. to Handle','Warehouse.SetQtyToHandlePick','microsoft-learn-inventory-picks'],
+  ['fr-FR','Prélèvement stock','Quantité à traiter','Warehouse.SetQtyToHandlePick','microsoft-learn-inventory-picks-fr'],
+  ['de-DE','Lagerkommissionierung','Zu verarbeitende Menge','Warehouse.SetQtyToHandlePick','microsoft-learn-inventory-picks-de'],
+  ['es-ES','Selector de inventario','Cdad. a manipular','Warehouse.SetQtyToHandlePick','microsoft-learn-inventory-picks-es'],
+  ['da-DK','Pluk (lager)','Håndteringsantal','Warehouse.SetQtyToHandlePick','microsoft-learn-inventory-picks-da'],
+  ['fi-FI','Varaston poiminta','Käsiteltävä määrä','Warehouse.SetQtyToHandlePick','microsoft-learn-inventory-picks-fi'],
+  ['nb-NO','Lagerplukking','Ant. som skal håndt','Warehouse.SetQtyToHandlePick','microsoft-learn-inventory-picks-nb']
+];
+for (const [locale,pageCaption,fieldCaption,ruleId,sourceId] of samples) {
+  const found=repository.resolveAction({language:locale,context:{pageCaption,fieldCaption}});
+  assert.equal(found.status,'resolved',`${locale} inventory-pick quantity should resolve`);
+  assert.equal(found.candidates[0].provenance.ruleId,ruleId);
+  assert.equal(found.candidates[0].provenance.language,locale);
+  assert.ok(found.candidates[0].provenance.sourceRefs.some(x=>x.sourceId===sourceId),`${locale} should cite localized Microsoft Learn evidence`);
+}
+const pickPostSamples=[
+ ['sv-SE','Lagerplockning','Bokför'],['en-US','Inventory Pick','Post'],
+ ['fr-FR','Prélèvement stock','Valider'],['de-DE','Lagerkommissionierung','Posten'],
+ ['es-ES','Selector de inventario','Registrar'],['da-DK','Pluk (lager)','Bogfør'],
+ ['fi-FI','Varaston poiminta','Kirjaa'],['nb-NO','Lagerplukking','Bokfør']
+];
+for(const [locale,pageCaption,actionCaption] of pickPostSamples){
+ const found=repository.resolveAction({language:locale,context:{pageCaption,actionCaption}});
+ assert.equal(found.status,'resolved',locale+' inventory-pick posting should resolve');
+ assert.equal(found.candidates[0].provenance.ruleId,'Warehouse.PostInventoryPick');
+ assert.equal(found.candidates[0].provenance.language,locale);
+}
+const receiveQuantitySamples=[
+ ['sv-SE','Dist.lager inleverans','Ant. att inlevereras'],['en-US','Warehouse Receipt','Qty. to Receive'],
+ ['fr-FR','Réception entrepôt','Quantité à recevoir'],['de-DE','Lagerort-Eingang','Zu empfangende Menge'],
+ ['es-ES','Recep. almacén','Cdad. a recibir'],['da-DK','Lagermodtagelse','Modtag (antal)'],
+ ['fi-FI','F. varastoinnin vastaanotto','Vastaanotettava määrä'],['nb-NO','Lagermottak','Antall som skal mottas']
+];
+for(const [locale,pageCaption,fieldCaption] of receiveQuantitySamples){
+ const found=repository.resolveAction({language:locale,context:{pageCaption,fieldCaption}});
+ assert.equal(found.status,'resolved',locale+' warehouse-receipt quantity should resolve');
+ assert.equal(found.candidates[0].provenance.ruleId,'Warehouse.SetQtyToReceive');
+ assert.equal(found.candidates[0].provenance.language,locale);
+}
+const operational = [
+  ['sv-SE','Dist.lager inleverans','Bokför inleverans','Warehouse.PostReceiptAction','microsoft-learn-advanced-receiving-putaway-sv'],
+  ['en-US','Warehouse Receipt','Post Receipt','Warehouse.PostReceiptAction','microsoft-learn-advanced-receiving-putaway'],
+  ['fr-FR','Réception entrepôt','Valider réception','Warehouse.PostReceiptAction','microsoft-learn-advanced-receiving-putaway-fr'],
+  ['de-DE','Lagerort-Eingang','Wareneingang buchen','Warehouse.PostReceiptAction','microsoft-learn-advanced-receiving-putaway-de'],
+  ['es-ES','Recep. almacén','Registrar recepción','Warehouse.PostReceiptAction','microsoft-learn-advanced-receiving-putaway-es'],
+  ['da-DK','Lagermodtagelse','Bogfør modtagelse','Warehouse.PostReceiptAction','microsoft-learn-advanced-receiving-putaway-da'],
+  ['fi-FI','F. varastoinnin vastaanotto','Kirjaa vastaanotto','Warehouse.PostReceiptAction','microsoft-learn-advanced-receiving-putaway-fi'],
+  ['nb-NO','Lagermottak','Bokfør mottak','Warehouse.PostReceiptAction','microsoft-learn-advanced-receiving-putaway-nb'],
+  ['sv-SE','Dist.lager artikelinförsel','Registrera artikelinförsel','Warehouse.RegisterPutAway','microsoft-learn-warehouse-putaways-sv'],
+  ['en-US','Warehouse Put-away','Register Put-Away','Warehouse.RegisterPutAway','microsoft-learn-advanced-receiving-putaway'],
+  ['fr-FR','Rangement entrepôt','Valider rangement','Warehouse.RegisterPutAway','microsoft-learn-warehouse-putaways-fr'],
+  ['de-DE','Lagereinlagerung','Einlagerung registrieren','Warehouse.RegisterPutAway','microsoft-learn-warehouse-putaways-de'],
+  ['es-ES','Almacenamiento de almacén','Registrar ubicación','Warehouse.RegisterPutAway','microsoft-learn-warehouse-putaways-es'],
+  ['da-DK','Læg-på-lager (lager)','Registrer læg-på-lager','Warehouse.RegisterPutAway','microsoft-learn-warehouse-putaways-da'],
+  ['fi-FI','Varaston hyllytys','Rekisteröi hyllytys','Warehouse.RegisterPutAway','microsoft-learn-warehouse-putaways-fi'],
+  ['nb-NO','Lagerplassering','Registrer plassering','Warehouse.RegisterPutAway','microsoft-learn-warehouse-putaways-nb']
+];
+for (const [locale,pageCaption,actionCaption,ruleId,sourceId] of operational) {
+  const found=repository.resolveAction({language:locale,context:{pageCaption,actionCaption}});
+  assert.equal(found.status,'resolved',`${locale} ${ruleId} should resolve`);
+  assert.equal(found.candidates[0].provenance.ruleId,ruleId);
+  assert.equal(found.candidates[0].provenance.language,locale);
+  assert.ok(found.candidates[0].provenance.sourceRefs.some(x=>x.sourceId===sourceId),`${locale} should cite a localized source`);
+}
+for (const ruleId of ['Warehouse.SetQtyToHandlePick','Warehouse.PostInventoryPick','Warehouse.SetQtyToReceive','Warehouse.PostReceiptAction','Warehouse.RegisterPutAway']) {
+ const rule=imported.snapshot.packs.find(x=>x.packId==='bc-warehouse').rules.find(x=>x.ruleId===ruleId);
+ for(const locale of ['sv-SE','en-US','fr-FR','de-DE','es-ES','da-DK','fi-FI','nb-NO']) assert.ok(rule.languages.includes(locale),`${ruleId} should declare ${locale}`);
+}
+console.log('Warehouse pick, receipt and put-away matching passes across all eight supported locales.');

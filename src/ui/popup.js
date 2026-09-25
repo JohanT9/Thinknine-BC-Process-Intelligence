@@ -464,11 +464,16 @@ $("nameForm").addEventListener("submit", event => {
 });
 
 $("dashboard").addEventListener("click", () => chrome.runtime.openOptionsPage());
-$("debug").addEventListener("click", () => {
-  chrome.tabs.create({ url: chrome.runtime.getURL("debug.html") });
+$("knowledgeAdmin").addEventListener("click", () => {
+  chrome.tabs.create({ url: chrome.runtime.getURL("knowledge-admin.html") });
 });
-
 loadUiLocale().then(refresh).then(async () => {
+  try {
+    const access = await send({ type: "T9_GET_KNOWLEDGE_ADMIN_ACCESS" }, 3000);
+    $("knowledgeAdmin").hidden = access?.authorized !== true;
+  } catch {
+    $("knowledgeAdmin").hidden = true;
+  }
   try {
     const response = await send({ type: "T9_GET_STATE" }, 3000);
     if (!response?.state?.recording || !response.state.stopPromptRequested) return;

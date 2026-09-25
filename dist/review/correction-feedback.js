@@ -3,7 +3,7 @@
   if (typeof module === "object" && module.exports) module.exports = api;
   root.T9CorrectionFeedback = api;
 })(typeof globalThis !== "undefined" ? globalThis : this, function () {
-  const VERSION = "1.0.0";
+  const VERSION = "1.1.0";
   const CORRECTION_TYPES = new Set([
     "edit", "step-reset", "step-screenshot", "step-screenshot-repair",
     "manual-step-screenshot", "step-visibility", "manual-step-visibility",
@@ -40,12 +40,15 @@
     const after = Array.isArray(afterTasks) ? afterTasks : [];
     const afterById = new Map(after.map(task => [task?.taskId, task]));
     const affectedFields = new Set();
+    const processFindingCodes = new Set();
     let affectedStepCount = 0;
 
     for (const task of before) {
       const next = afterById.get(task?.taskId);
       if (!next) {
         affectedFields.add("structure");
+        (task?.processValidation?.codes || []).forEach(code =>
+          processFindingCodes.add(String(code)));
         affectedStepCount += 1;
         continue;
       }
@@ -54,7 +57,11 @@
       const fields = CONTENT_FIELDS.filter(field => changed(left, right, field));
       if (changed(left, right, "screenshot")) fields.push("screenshot");
       if (changed(left, right, "hidden")) fields.push("visibility");
-      if (fields.length) affectedStepCount += 1;
+      if (fields.length) {
+        affectedStepCount += 1;
+        (task?.processValidation?.codes || []).forEach(code =>
+          processFindingCodes.add(String(code)));
+      }
       fields.forEach(field => affectedFields.add(field));
       afterById.delete(task?.taskId);
     }
@@ -74,7 +81,9 @@
       contentIncluded: false,
       commandType,
       affectedFields: Object.freeze([...affectedFields].sort()),
-      affectedStepCount
+      affectedStepCount,
+      engineAttributed: processFindingCodes.size > 0,
+      processFindingCodes: Object.freeze([...processFindingCodes].sort())
     });
   }
 
@@ -88,15 +97,22 @@
   function summary(review) {
     const applied = entries(review);
     const byField = {};
+    const byProcessCode = {};
     applied.forEach(entry => entry.affectedFields.forEach(field => {
       byField[field] = (byField[field] || 0) + 1;
+    }));
+    applied.forEach(entry => (entry.processFindingCodes || []).forEach(code => {
+      byProcessCode[code] = (byProcessCode[code] || 0) + 1;
     }));
     return Object.freeze({
       version: VERSION,
       scope: "local-review",
       contentIncluded: false,
       correctionCount: applied.length,
-      byField: Object.freeze(byField)
+      engineAttributedCorrectionCount: applied.filter(entry =>
+        entry.engineAttributed).length,
+      byField: Object.freeze(byField),
+      byProcessCode: Object.freeze(byProcessCode)
     });
   }
 

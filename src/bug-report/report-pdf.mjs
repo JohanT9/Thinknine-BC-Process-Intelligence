@@ -90,6 +90,7 @@ export async function create(pkg, attachments = []) {
   const width = 595.28, height = 841.89, margin = 44, usable = width - 2 * margin;
   const ink = rgb(.09, .17, .27), teal = rgb(0, .48, .51), muted = rgb(.35, .40, .45);
   const surface = rgb(.94, .97, .97), lineColor = rgb(.80, .87, .88);
+  const screenshotLayout = [];
   let page, y;
   const safe = text => Array.from(String(text)).map(char => {
     if (char === "\t") return "  ";
@@ -203,6 +204,9 @@ export async function create(pkg, attachments = []) {
         borderColor: lineColor, borderWidth: .6 });
       page.drawImage(image, { x: margin, y: y - image.height * factor,
         width: image.width * factor, height: image.height * factor });
+      screenshotLayout.push(Object.freeze({ page: doc.getPageCount(),
+        width: image.width * factor, height: image.height * factor,
+        top: y, bottom: y - image.height * factor }));
       y -= image.height * factor + 20;
     } catch {
       text(label("The screenshot could not be included.", "Skärmbilden kunde inte inkluderas."));
@@ -237,8 +241,6 @@ export async function create(pkg, attachments = []) {
       (step.number === model.trigger?.number ? " - Felet inträffade här" : ""), 11, regular, usable - 34) + 5, 0)
     : section.rows.reduce((total, row) => total + measure(row), 0));
   for (const section of displayedSections) {
-    // Reproduction is a separate chapter, never squeezed onto the cover page.
-    if (section.id === "reproduction") newPage();
     if (section.id === "diagnostics") {
       const technicalHeight = displayedSections.filter(item => ["diagnostics", "callStack"].includes(item.id))
         .reduce((total, item) => total + sectionHeight(item), 0);
@@ -260,10 +262,15 @@ export async function create(pkg, attachments = []) {
   });
   for (const [index, attachment] of images.entries()) {
     if (!attachment.dataUrl) continue;
-    newPage(); heading(index === 0 && attachment.role === "error-evidence"
+    // A normal 16:9 screenshot plus heading and caption fits twice on A4.
+    // Continue on the current page when there is enough room instead of
+    // forcing every image onto an otherwise mostly empty page.
+    if (!page || y < 340) newPage();
+    heading(index === 0 && attachment.role === "error-evidence"
       ? (label("Error screenshot", "Felbild")) : `${label("Screenshot", "Skärmbild")} ${index + 1}`);
     const caption = imageCaption(attachment);
-    await screenshot(attachment, Math.max(20, y - 65 - measure(caption, 9)));
+    await screenshot(attachment, Math.max(20,
+      Math.min(235, y - 65 - measure(caption, 9))));
     text(caption, 9, regular, muted);
   }
   for (const [index, p] of doc.getPages().entries()) {
@@ -272,7 +279,8 @@ export async function create(pkg, attachments = []) {
     p.drawText(`${label("Page", "Sida")} ${index + 1} / ${doc.getPageCount()}`,
       { x: width - margin - 65, y: 28, size: 8, font: regular, color: muted });
   }
-  return { bytes: await doc.save(), model, pageCount: doc.getPageCount() };
+  return { bytes: await doc.save(), model, pageCount: doc.getPageCount(),
+    layout: Object.freeze({ screenshots: Object.freeze(screenshotLayout) }) };
 }
 
 export async function technicalZip(offline) {

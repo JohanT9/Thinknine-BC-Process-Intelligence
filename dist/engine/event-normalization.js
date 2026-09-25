@@ -60,13 +60,13 @@
     if (type === "capture-guidance") return ["capture-guidance", "explicit-recording-guidance"];
     if (type === "bc-error") return ["error-outcome", "observed-business-central-error"];
     if (type === "status-message") return ["status-message", "observed-accessible-status-message"];
-    if (type === "click" && (control === "checkbox" || raw.checked != null)) return ["toggle-change", "verified-checked-state"];
+    if (type === "click" && (control === "checkbox" || (raw.checked != null && !["text", "search", "email", "number", "password", "tel", "url"].includes(raw.inputType) && !["textbox", "searchbox", "combobox"].includes(raw.role)))) return ["toggle-change", "verified-checked-state"];
     if (["dialog", "dialog-open"].includes(type)) return ["dialog-open", "observed-dialog-open"];
     if (type === "dialog-close") return ["dialog-close", "observed-dialog-close"];
     if ((type === "click" || /pointer|mouse/.test(type)) && control === "lookup") return ["activation", "identified-lookup-trigger"];
     if (["click", "key", "keydown"].includes(type) && identified.action && (type === "click" || ["Enter", " ", "Space"].includes(raw.key))) return ["activation", "identified-action-activation"];
     if (type === "click" && ["listRow", "repeaterCell"].includes(control)) return ["selection-change", "identified-row-selection"];
-    if (["field-change", "change", "input"].includes(type) && (control === "checkbox" || typeof raw.value === "boolean" || raw.checked != null)) return ["toggle-change", "verified-checked-state"];
+    if (["field-change", "change", "input"].includes(type) && (control === "checkbox" || typeof raw.value === "boolean" || (raw.checked != null && !["text", "search", "email", "number", "password", "tel", "url"].includes(raw.inputType) && !["textbox", "searchbox", "combobox"].includes(raw.role)))) return ["toggle-change", "verified-checked-state"];
     if (["field-change", "change"].includes(type) && control === "option") return ["selection-change", "identified-option-change"];
     if (["field-change", "input", "change"].includes(type)) {
       if (raw.inputSource === "focusout" && raw.previousValue === raw.value) return [null, "unchanged-focusout"];
@@ -116,6 +116,7 @@
       actionIdentification: clone(identified.action || identified.actionIdentity
         ? { ...(identified.action || {}), ...(identified.actionIdentity || {}) }
         : null),
+      rowTypeContext: clone(raw.rowTypeContext),
       containerIdentification: clone(identified.container),
       uiHierarchy: clone(identified.hierarchy || []),
       interaction: { mechanism: mechanism(raw), key: raw.key || undefined, code: raw.code || undefined,
@@ -124,7 +125,7 @@
         repeat: raw.repeat || undefined },
       value: valueModel(raw, identified),
       previousValue: Object.prototype.hasOwnProperty.call(raw, "previousValue") ? { raw: clone(raw.previousValue), normalized: clone(raw.previousValue) } : null,
-      selection, state: raw.checked != null || typeof raw.value === "boolean" ? { checked: raw.checked ?? raw.value } : null,
+      selection, state: kind === "toggle-change" ? { checked: raw.checked ?? raw.value } : null,
       coordinates: { pointer: event.coordinates ? clone(event.coordinates) :
           raw.clientX != null ? { x: raw.clientX, y: raw.clientY } : undefined,
         localBounds: clone(raw.localBounds), topViewportBounds: clone(raw.topViewportBounds),

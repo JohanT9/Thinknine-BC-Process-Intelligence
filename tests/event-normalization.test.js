@@ -246,3 +246,14 @@ assert.ok(contentSource.includes("event.composedPath?.()"));
 assert.ok(contentSource.includes('type: "dialog-close"'));
 
 console.log("Event normalization tests passed.");
+
+const searchInput = append(recording('search-text-regression'), raw('search-text', 'field-change', {
+  label: 'Tell me what you want to do.', inputType: 'text', role: 'textbox', checked: false, value: 'sales ord'
+}), { controlType: 'input', role: 'textbox', inputType: 'text', accessibleName: 'Tell me what you want to do.' });
+assert.equal(normalization.normalizeRecording(searchInput).events[0].kind, 'value-change');
+const normalTextInput = append(recording('ordinary-text-regression'), raw('ordinary-text', 'field-change', {
+  label: 'Description', inputType: 'text', role: 'textbox', checked: false, value: 'Customer text'
+}), { controlType: 'input', role: 'textbox', inputType: 'text', accessibleName: 'Description' });
+assert.equal(normalization.normalizeRecording(normalTextInput).events[0].kind, 'value-change');
+
+assert.equal(normalization.normalizeRecording(normalTextInput).events[0].state, null);

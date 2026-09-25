@@ -57,6 +57,9 @@
   function translateInstruction(value, language) {
     const source = String(value ?? "");
     if (normalize(language) === "sv-SE") return source;
+    const confirmation = source.match(/^(Ange [\s\S]+\.) (Välj \*\*OK\*\*\.)$/u);
+    if (confirmation) return translateInstruction(confirmation[1], language) + ' ' +
+      translateInstruction(confirmation[2], language);
     const exact = systemText(source, language);
     if (exact !== source) return exact;
     const rules = [

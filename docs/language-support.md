@@ -28,3 +28,23 @@ som reservspråk; detta får inte ersätta en översättning i den gemensamma or
 
 Efter uppdateringen: bygg med `npm run build`, ladda om tillägget i Edge och
 öppna dess vyer på nytt. Språkstödet kräver ingen ändring av Azure-tjänsten.
+
+## När ett nytt språk läggs till
+
+Ett språk är inte färdigt bara för att gränssnittet har översatts. Vid varje
+ny registrering i `src/engine/language-registry.js` ska hela kunskapsbanken
+gås igenom samtidigt. Jämför alla aktiverade kunskapspaket och processområden
+med de redan stödda språken: försäljning, inköp, betalningar, lager, inventering,
+tillverkning och gemensamma BC-sidor. Kontrollera lokaliserade sidnamn,
+fält- och åtgärdsalias, begrepp, regelns språkmetadata, Microsoft Learn-källor
+och tester som faktiskt löser representativa handlingar och fält på språket.
+
+Målet är jämn, jämförbar processtäckning mellan samtliga registrerade språk.
+Uppdatera täckningsmatrisen i `docs/BC_PUBLIC_PROCESS_KNOWLEDGE.md` och
+`docs/BC_PUBLIC_KNOWLEDGE_CATALOG.md` när täckningen ändras. Använd verifierade
+Microsoft-termer och lokaliserade officiella källor där de finns. Om en term
+eller källa inte går att verifiera ska den konkreta luckan dokumenteras; hitta
+inte på en översättning och beskriv inte språkstödet som likvärdigt förrän
+luckan är åtgärdad. Kör `npm run knowledge:validate` och
+`npm run test:knowledge-mcp` samt relevanta språk- och gränssnittstester innan
+det nya språket betraktas som klart.

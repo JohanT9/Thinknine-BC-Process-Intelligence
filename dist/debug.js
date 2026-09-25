@@ -23,8 +23,26 @@ function objectSummary(value) {
   return entries.map(([key, count]) => `${key}: ${count}`).join(", ");
 }
 
+async function downloadBlob(contents, type, filename) {
+  const url = URL.createObjectURL(new Blob([contents], { type }));
+  try {
+    await chrome.downloads.download({ url, filename,
+      conflictAction: "uniquify" });
+  } finally {
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+  }
+}
+
 async function load() {
   const response = await send({ type: "T9_GET_DEBUG" });
+  if (!response?.ok) {
+    document.getElementById("diagnostics").hidden = true;
+    document.getElementById("accessStatus").textContent =
+      t("Technical diagnostics are not enabled by browser policy.");
+    return;
+  }
+  document.getElementById("diagnostics").hidden = false;
+  document.getElementById("accessStatus").textContent = "";
   const grid = document.getElementById("grid");
   grid.innerHTML = "";
 
@@ -68,6 +86,19 @@ async function load() {
     grid.append(...row(...item));
   }
 
+  const improvement = response.processImprovement || {};
+  const improvementDataset = improvement.dataset || {};
+  const improvementGrid = document.getElementById("improvementGrid");
+  improvementGrid.innerHTML = "";
+  [
+    [t("debug.reviewsAnalysed"), String(improvement.reviewCount || 0)],
+    [t("debug.corrections"), String(improvementDataset.correctionCount || 0)],
+    [t("debug.engineCorrections"), String(
+      improvementDataset.engineAttributedCorrectionCount || 0)],
+    [t("debug.prioritizedRules"), objectSummary(
+      improvementDataset.byProcessCode)]
+  ].forEach(item => improvementGrid.append(...row(...item)));
+
   document.getElementById("raw").textContent =
     JSON.stringify(response, null, 2);
   const toggle = document.getElementById("toggleCaptureDiagnostics");
@@ -77,6 +108,25 @@ async function load() {
 }
 
 document.getElementById("refresh").addEventListener("click", load);
+document.getElementById("downloadImprovement").addEventListener(
+  "click", async () => {
+    const status = document.getElementById("improvementStatus");
+    try {
+      const response = await send({ type: "T9_GET_PROCESS_IMPROVEMENT_DATASET" });
+      if (!response?.ok) throw new Error(response?.error ||
+        t("debug.exportFailed"));
+      const analysis = globalThis.BCProcessImprovementAnalysis;
+      const report = analysis.markdown(analysis.analyze(response.dataset));
+      await downloadBlob(JSON.stringify(response.dataset, null, 2),
+        "application/json", "bc-process-improvement-data.json");
+      await downloadBlob(report, "text/markdown;charset=utf-8",
+        "bc-process-improvement-report.md");
+      status.textContent = t("debug.improvementDownloaded");
+    } catch {
+      status.textContent = t("debug.exportFailed");
+    }
+  }
+);
 document.getElementById("toggleCaptureDiagnostics").addEventListener(
   "click", async event => {
     await send({ type: "T9_SET_CAPTURE_DIAGNOSTICS",

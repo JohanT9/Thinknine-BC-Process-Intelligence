@@ -1,7 +1,7 @@
 {
   "packId": "bc-warehouse",
   "name": "Business Central Warehouse",
-  "version": "2.0.0",
+  "version": "2.1.0",
   "priority": 200,
   "rules": [
     {
@@ -199,6 +199,647 @@
         "en-US"
       ],
       "aliases": []
+    },
+    {
+      "ruleId": "Warehouse.SetQtyToHandlePick",
+      "taskType": "SetPickQtyToHandle",
+      "semanticAction": "EnterQuantity",
+      "entity": "WarehousePickLine",
+      "priority": 1300,
+      "confidence": 0.98,
+      "match": {
+        "pagePatterns": [
+          "inventory pick",
+          "lagerplockning",
+          "inventeringsval",
+          "^Lagerplockning$",
+          "^Dist\\.lager plock$",
+          "^Inventory Pick$",
+          "^Inventory Picks$",
+          "^Prélèvement stock$",
+          "^Prélèvements stock$",
+          "^Lagerkommissionierung$",
+          "^Lagerkommissionierungen$",
+          "^Selector de inventario$",
+          "^Selección de inventario$",
+          "^Picking de inventario$",
+          "^Pluk \\(lager\\)$",
+          "^Lagerpluk$",
+          "^Varaston poiminta$",
+          "^Varaston poiminnat$",
+          "^Lagerplukk$",
+          "^Lagerplukking$"
+        ],
+        "actionPatterns": [],
+        "fieldPatterns": [
+          "^Qty\\. to Handle$",
+          "^Quantity to Handle$",
+          "^Ant\\. att hantera$",
+          "^Ant\\. att hantera$",
+          "^Qty\\. to Handle$",
+          "^Quantité à traiter$",
+          "^Zu verarbeitende Menge$",
+          "^Cdad\\. a manipular$",
+          "^Håndteringsantal$",
+          "^Käsiteltävä määrä$",
+          "^Ant\\. som skal håndt$"
+        ],
+        "automationIdPatterns": []
+      },
+      "instructionTemplate": "",
+      "languages": [
+        "sv-SE",
+        "en-US",
+        "fr-FR",
+        "de-DE",
+        "es-ES",
+        "da-DK",
+        "fi-FI",
+        "nb-NO"
+      ],
+      "aliases": [],
+      "sourceIds": [
+        "microsoft-learn-inventory-picks",
+        "microsoft-learn-inventory-picks-sv",
+        "microsoft-learn-inventory-picks-fr",
+        "microsoft-learn-inventory-picks-de",
+        "microsoft-learn-inventory-picks-es",
+        "microsoft-learn-inventory-picks-da",
+        "microsoft-learn-inventory-picks-fi",
+        "microsoft-learn-inventory-picks-nb"
+      ]
+    },
+    {
+      "ruleId": "Warehouse.PostInventoryPick",
+      "taskType": "PostInventoryPick",
+      "semanticAction": "PostDocument",
+      "entity": "InventoryPick",
+      "priority": 1250,
+      "confidence": 0.98,
+      "match": {
+        "pagePatterns": [
+          "inventory pick",
+          "lagerplockning",
+          "inventeringsval",
+          "^Lagerplockning$",
+          "^Dist\\.lager plock$",
+          "^Inventory Pick$",
+          "^Inventory Picks$",
+          "^Prélèvement stock$",
+          "^Prélèvements stock$",
+          "^Lagerkommissionierung$",
+          "^Lagerkommissionierungen$",
+          "^Selector de inventario$",
+          "^Selección de inventario$",
+          "^Picking de inventario$",
+          "^Pluk \\(lager\\)$",
+          "^Lagerpluk$",
+          "^Varaston poiminta$",
+          "^Varaston poiminnat$",
+          "^Lagerplukk$",
+          "^Lagerplukking$"
+        ],
+        "actionPatterns": [
+          "^Post$",
+          "^Bokför$",
+          "^Bokföra$",
+          "^Valider$",
+          "^Posten$",
+          "^Registrar$",
+          "^Bogfør$",
+          "^Kirjaa$",
+          "^Bokfør$"
+        ],
+        "fieldPatterns": [],
+        "automationIdPatterns": []
+      },
+      "instructionTemplate": "",
+      "languages": [
+        "sv-SE",
+        "en-US",
+        "fr-FR",
+        "de-DE",
+        "es-ES",
+        "da-DK",
+        "fi-FI",
+        "nb-NO"
+      ],
+      "aliases": [],
+      "sourceIds": [
+        "microsoft-learn-inventory-picks",
+        "microsoft-learn-inventory-picks-sv",
+        "microsoft-learn-inventory-picks-fr",
+        "microsoft-learn-inventory-picks-de",
+        "microsoft-learn-inventory-picks-es",
+        "microsoft-learn-inventory-picks-da",
+        "microsoft-learn-inventory-picks-fi",
+        "microsoft-learn-inventory-picks-nb"
+      ]
+    },
+    {
+      "ruleId": "Warehouse.RegisterPutAway",
+      "taskType": "RegisterWarehousePutAway",
+      "semanticAction": "RunAction",
+      "entity": "WarehousePutAway",
+      "priority": 1250,
+      "confidence": 0.98,
+      "match": {
+        "pagePatterns": [
+          "warehouse put-away",
+          "put-away",
+          "dist\\.lager artikelinförsel",
+          "^Dist\\.lager artikelinförsel$",
+          "^Lagerinlagring$",
+          "^Warehouse Put-away$",
+          "^Warehouse Put-aways$",
+          "^Rangement entrepôt$",
+          "^Rangements entrepôt$",
+          "^Lagereinlagerung$",
+          "^Lagereinlagerungen$",
+          "^Almacenamiento de almacén$",
+          "^Ubicación de almacén$",
+          "^Læg-på-lager \\(lager\\)$",
+          "^Læg-på-lager$",
+          "^Varaston hyllytys$",
+          "^Varaston hyllytykset$",
+          "^Lagerplassering$",
+          "^Lagerplasseringer$"
+        ],
+        "actionPatterns": [
+          "^Register Put-Away$",
+          "^Registrera lagerinlagring$",
+          "^Registrera artikelinförsel$",
+          "^Valider rangement$",
+          "^Einlagerung registrieren$",
+          "^Registrar ubicación$",
+          "^Registrer læg-på-lager$",
+          "^Rekisteröi hyllytys$",
+          "^Registrer plassering$"
+        ],
+        "fieldPatterns": [],
+        "automationIdPatterns": []
+      },
+      "instructionTemplate": "",
+      "languages": [
+        "sv-SE",
+        "en-US",
+        "fr-FR",
+        "de-DE",
+        "es-ES",
+        "da-DK",
+        "fi-FI",
+        "nb-NO"
+      ],
+      "aliases": [],
+      "sourceIds": [
+        "microsoft-learn-advanced-receiving-putaway",
+        "microsoft-learn-warehouse-putaways-sv",
+        "microsoft-learn-advanced-receiving-putaway-sv",
+        "microsoft-learn-warehouse-putaways-fr",
+        "microsoft-learn-warehouse-putaways-de",
+        "microsoft-learn-warehouse-putaways-es",
+        "microsoft-learn-warehouse-putaways-da",
+        "microsoft-learn-warehouse-putaways-fi",
+        "microsoft-learn-warehouse-putaways-nb"
+      ]
+    },
+    {
+      "ruleId": "Warehouse.SetQtyToReceive",
+      "taskType": "SetWarehouseQtyToReceive",
+      "semanticAction": "EnterQuantity",
+      "entity": "WarehouseReceiptLine",
+      "priority": 1280,
+      "confidence": 0.97,
+      "match": {
+        "pagePatterns": [
+          "warehouse receipt",
+          "distlagerinleverans",
+          "dist\\.lager inleverans",
+          "lagerkvitton",
+          "^Dist\\.lager inleverans$",
+          "^Lagerkvitton$",
+          "^Warehouse Receipt$",
+          "^Warehouse Receipts$",
+          "^Réception entrepôt$",
+          "^Réceptions entrepôt$",
+          "^Lagerort-Eingang$",
+          "^Wareneingang$",
+          "^Recep\\. almacén$",
+          "^Recepción de almacén$",
+          "^Lagermodtagelse$",
+          "^Lagermodtagelser$",
+          "^F\\. varastoinnin vastaanotto$",
+          "^Varastokuittaukset$",
+          "^Lagermottak$"
+        ],
+        "actionPatterns": [],
+        "fieldPatterns": [
+          "^Qty\\. to Receive$",
+          "^Quantity to Receive$",
+          "^Ant\\. att inlevereras$",
+          "^Ant\\. att inlevereras$",
+          "^Qty\\. to Receive$",
+          "^Quantité à recevoir$",
+          "^Zu empfangende Menge$",
+          "^Cdad\\. a recibir$",
+          "^Modtag \\(antal\\)$",
+          "^Vastaanotettava määrä$",
+          "^Antall som skal mottas$"
+        ],
+        "automationIdPatterns": []
+      },
+      "instructionTemplate": "",
+      "languages": [
+        "sv-SE",
+        "en-US",
+        "fr-FR",
+        "de-DE",
+        "es-ES",
+        "da-DK",
+        "fi-FI",
+        "nb-NO"
+      ],
+      "aliases": [],
+      "sourceIds": [
+        "microsoft-learn-advanced-receiving-putaway",
+        "microsoft-learn-advanced-receiving-putaway-sv",
+        "microsoft-learn-advanced-receiving-putaway-fr",
+        "microsoft-learn-advanced-receiving-putaway-de",
+        "microsoft-learn-advanced-receiving-putaway-es",
+        "microsoft-learn-advanced-receiving-putaway-da",
+        "microsoft-learn-advanced-receiving-putaway-fi",
+        "microsoft-learn-advanced-receiving-putaway-nb"
+      ]
+    },
+    {
+      "ruleId": "Warehouse.PostReceiptAction",
+      "taskType": "PostAdvancedWarehouseReceipt",
+      "semanticAction": "PostDocument",
+      "entity": "WarehouseReceipt",
+      "priority": 1280,
+      "confidence": 0.97,
+      "match": {
+        "pagePatterns": [
+          "warehouse receipt",
+          "distlagerinleverans",
+          "dist\\.lager inleverans",
+          "lagerkvitton",
+          "^Dist\\.lager inleverans$",
+          "^Lagerkvitton$",
+          "^Warehouse Receipt$",
+          "^Warehouse Receipts$",
+          "^Réception entrepôt$",
+          "^Réceptions entrepôt$",
+          "^Lagerort-Eingang$",
+          "^Wareneingang$",
+          "^Recep\\. almacén$",
+          "^Recepción de almacén$",
+          "^Lagermodtagelse$",
+          "^Lagermodtagelser$",
+          "^F\\. varastoinnin vastaanotto$",
+          "^Varastokuittaukset$",
+          "^Lagermottak$"
+        ],
+        "actionPatterns": [
+          "^Post Receipt$",
+          "^Bokför inleverans$",
+          "^Bokföra inleverans$",
+          "^Valider réception$",
+          "^Wareneingang buchen$",
+          "^Registrar recepción$",
+          "^Bogfør modtagelse$",
+          "^Kirjaa vastaanotto$",
+          "^Bokfør mottak$"
+        ],
+        "fieldPatterns": [],
+        "automationIdPatterns": []
+      },
+      "instructionTemplate": "",
+      "languages": [
+        "sv-SE",
+        "en-US",
+        "fr-FR",
+        "de-DE",
+        "es-ES",
+        "da-DK",
+        "fi-FI",
+        "nb-NO"
+      ],
+      "aliases": [],
+      "sourceIds": [
+        "microsoft-learn-advanced-receiving-putaway",
+        "microsoft-learn-advanced-receiving-putaway-sv",
+        "microsoft-learn-advanced-receiving-putaway-fr",
+        "microsoft-learn-advanced-receiving-putaway-de",
+        "microsoft-learn-advanced-receiving-putaway-es",
+        "microsoft-learn-advanced-receiving-putaway-da",
+        "microsoft-learn-advanced-receiving-putaway-fi",
+        "microsoft-learn-advanced-receiving-putaway-nb"
+      ]
+    }
+  ],
+  "sources": [
+    {
+      "sourceId": "microsoft-learn-inventory-picks",
+      "title": "Pick items with inventory picks",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/en-us/dynamics365/business-central/warehouse-how-to-pick-items-with-inventory-picks",
+      "appliesTo": "Current Business Central online documentation; inspected 2026-09-25",
+      "accessedDate": "2026-09-25",
+      "fields": [
+        "outbound warehouse methods",
+        "release and pick creation",
+        "quantity to handle",
+        "post pick and shipment"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-advanced-receiving-putaway",
+      "title": "Receiving and putting away in advanced warehouse configurations",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/en-us/dynamics365/business-central/walkthrough-receiving-and-putting-away-in-advanced-warehousing",
+      "appliesTo": "Current Business Central online documentation; inspected 2026-09-25",
+      "accessedDate": "2026-09-25",
+      "fields": [
+        "warehouse configuration variants",
+        "warehouse receipt",
+        "post receipt",
+        "register put-away"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-inventory-picks-sv",
+      "title": "Plocka artiklar med lagerplockningar",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/sv-se/dynamics365/business-central/warehouse-how-to-pick-items-with-inventory-picks",
+      "appliesTo": "Current Swedish Business Central online documentation; inspected 2026-09-25",
+      "accessedDate": "2026-09-25",
+      "fields": [
+        "warehouse pick page",
+        "pick quantity to handle",
+        "post pick and shipment"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-advanced-receiving-putaway-sv",
+      "title": "Inleverera och införa i avancerad lagerstyrning",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/sv-se/dynamics365/business-central/walkthrough-receiving-and-putting-away-in-advanced-warehousing",
+      "appliesTo": "Current Swedish Business Central online documentation; inspected 2026-09-25",
+      "accessedDate": "2026-09-25",
+      "fields": [
+        "warehouse receipt",
+        "quantity to receive",
+        "post receipt",
+        "warehouse put-away registration"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-warehouse-putaways-sv",
+      "title": "Föra in artiklar med distributionslagerartikelinförslar",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/sv-se/dynamics365/business-central/warehouse-how-to-put-items-away-with-warehouse-put-aways",
+      "appliesTo": "Current Swedish Business Central online documentation; inspected 2026-09-25",
+      "accessedDate": "2026-09-25",
+      "fields": [
+        "warehouse put-away page",
+        "quantity to handle",
+        "register put-away"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-inventory-picks-fr",
+      "title": "Prélèvement des articles avec les prélèvements stock",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/fr-fr/dynamics365/business-central/warehouse-how-to-pick-items-with-inventory-picks",
+      "appliesTo": "Current FR localized Business Central online documentation; inspected 2026-09-25",
+      "accessedDate": "2026-09-25",
+      "fields": [
+        "localized inventory pick page and workflow terms",
+        "quantity to handle",
+        "record/post inventory pick"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-inventory-picks-de",
+      "title": "So kommissionieren Sie Artikel mit Lagerkommissionierungen",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/de-de/dynamics365/business-central/warehouse-how-to-pick-items-with-inventory-picks",
+      "appliesTo": "Current DE localized Business Central online documentation; inspected 2026-09-25",
+      "accessedDate": "2026-09-25",
+      "fields": [
+        "localized inventory pick page and workflow terms",
+        "quantity to handle",
+        "record/post inventory pick"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-inventory-picks-es",
+      "title": "Realizar selección de productos con picking de inventario",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/es-es/dynamics365/business-central/warehouse-how-to-pick-items-with-inventory-picks",
+      "appliesTo": "Current ES localized Business Central online documentation; inspected 2026-09-25",
+      "accessedDate": "2026-09-25",
+      "fields": [
+        "localized inventory pick page and workflow terms",
+        "quantity to handle",
+        "record/post inventory pick"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-inventory-picks-da",
+      "title": "Plukke varer med Pluk fra lager",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/da-dk/dynamics365/business-central/warehouse-how-to-pick-items-with-inventory-picks",
+      "appliesTo": "Current DA localized Business Central online documentation; inspected 2026-09-25",
+      "accessedDate": "2026-09-25",
+      "fields": [
+        "localized inventory pick page and workflow terms",
+        "quantity to handle",
+        "record/post inventory pick"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-inventory-picks-fi",
+      "title": "Nimikkeiden poiminta varaston poimintojen avulla",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/fi-fi/dynamics365/business-central/warehouse-how-to-pick-items-with-inventory-picks",
+      "appliesTo": "Current FI localized Business Central online documentation; inspected 2026-09-25",
+      "accessedDate": "2026-09-25",
+      "fields": [
+        "localized inventory pick page and workflow terms",
+        "quantity to handle",
+        "record/post inventory pick"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-inventory-picks-nb",
+      "title": "Plukk varer med lagerplukk",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/nb-no/dynamics365/business-central/warehouse-how-to-pick-items-with-inventory-picks",
+      "appliesTo": "Current NB localized Business Central online documentation; inspected 2026-09-25",
+      "accessedDate": "2026-09-25",
+      "fields": [
+        "localized inventory pick page and workflow terms",
+        "quantity to handle",
+        "record/post inventory pick"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-advanced-receiving-putaway-fr",
+      "title": "Réception et entreposage dans le stockage avancé",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/fr-fr/dynamics365/business-central/walkthrough-receiving-and-putting-away-in-advanced-warehousing",
+      "appliesTo": "Current FR localized Business Central online documentation; inspected 2026-09-25",
+      "accessedDate": "2026-09-25",
+      "fields": [
+        "localized warehouse receipt page and advanced inbound flow",
+        "quantity to receive",
+        "post warehouse receipt"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-advanced-receiving-putaway-de",
+      "title": "Wareneingang und Einlagerung in der erweiterten Lagerhaltung",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/de-de/dynamics365/business-central/walkthrough-receiving-and-putting-away-in-advanced-warehousing",
+      "appliesTo": "Current DE localized Business Central online documentation; inspected 2026-09-25",
+      "accessedDate": "2026-09-25",
+      "fields": [
+        "localized warehouse receipt page and advanced inbound flow",
+        "quantity to receive",
+        "post warehouse receipt"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-advanced-receiving-putaway-es",
+      "title": "Recepción y ubicación en el almacenamiento avanzado",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/es-es/dynamics365/business-central/walkthrough-receiving-and-putting-away-in-advanced-warehousing",
+      "appliesTo": "Current ES localized Business Central online documentation; inspected 2026-09-25",
+      "accessedDate": "2026-09-25",
+      "fields": [
+        "localized warehouse receipt page and advanced inbound flow",
+        "quantity to receive",
+        "post warehouse receipt"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-advanced-receiving-putaway-da",
+      "title": "Modtagelse og placering på lager i avanceret logistik",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/da-dk/dynamics365/business-central/walkthrough-receiving-and-putting-away-in-advanced-warehousing",
+      "appliesTo": "Current DA localized Business Central online documentation; inspected 2026-09-25",
+      "accessedDate": "2026-09-25",
+      "fields": [
+        "localized warehouse receipt page and advanced inbound flow",
+        "quantity to receive",
+        "post warehouse receipt"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-advanced-receiving-putaway-fi",
+      "title": "Vastaanotto ja hyllytys laajennetussa varastoinnissa",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/fi-fi/dynamics365/business-central/walkthrough-receiving-and-putting-away-in-advanced-warehousing",
+      "appliesTo": "Current FI localized Business Central online documentation; inspected 2026-09-25",
+      "accessedDate": "2026-09-25",
+      "fields": [
+        "localized warehouse receipt page and advanced inbound flow",
+        "quantity to receive",
+        "post warehouse receipt"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-advanced-receiving-putaway-nb",
+      "title": "Mottak og plassering i avansert lagerstyring",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/nb-no/dynamics365/business-central/walkthrough-receiving-and-putting-away-in-advanced-warehousing",
+      "appliesTo": "Current NB localized Business Central online documentation; inspected 2026-09-25",
+      "accessedDate": "2026-09-25",
+      "fields": [
+        "localized warehouse receipt page and advanced inbound flow",
+        "quantity to receive",
+        "post warehouse receipt"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-warehouse-putaways-fr",
+      "title": "Rangement des articles avec les rangement entrepôt",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/fr-fr/dynamics365/business-central/warehouse-how-to-put-items-away-with-warehouse-put-aways",
+      "appliesTo": "Current FR localized Business Central online documentation; inspected 2026-09-25",
+      "accessedDate": "2026-09-25",
+      "fields": [
+        "localized warehouse put-away page and workflow terms",
+        "quantity to handle",
+        "register/post put-away"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-warehouse-putaways-de",
+      "title": "Artikel mit Lagereinlagerungen einlagern",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/de-de/dynamics365/business-central/warehouse-how-to-put-items-away-with-warehouse-put-aways",
+      "appliesTo": "Current DE localized Business Central online documentation; inspected 2026-09-25",
+      "accessedDate": "2026-09-25",
+      "fields": [
+        "localized warehouse put-away page and workflow terms",
+        "quantity to handle",
+        "register/post put-away"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-warehouse-putaways-es",
+      "title": "Ubicar productos con ubicación de almacén",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/es-es/dynamics365/business-central/warehouse-how-to-put-items-away-with-warehouse-put-aways",
+      "appliesTo": "Current ES localized Business Central online documentation; inspected 2026-09-25",
+      "accessedDate": "2026-09-25",
+      "fields": [
+        "localized warehouse put-away page and workflow terms",
+        "quantity to handle",
+        "register/post put-away"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-warehouse-putaways-da",
+      "title": "Lægge varer på lager med Læg-på-lager (lager)",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/da-dk/dynamics365/business-central/warehouse-how-to-put-items-away-with-warehouse-put-aways",
+      "appliesTo": "Current DA localized Business Central online documentation; inspected 2026-09-25",
+      "accessedDate": "2026-09-25",
+      "fields": [
+        "localized warehouse put-away page and workflow terms",
+        "quantity to handle",
+        "register/post put-away"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-warehouse-putaways-fi",
+      "title": "Nimikkeiden hyllytys fyysisen varaston hyllytykset",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/fi-fi/dynamics365/business-central/warehouse-how-to-put-items-away-with-warehouse-put-aways",
+      "appliesTo": "Current FI localized Business Central online documentation; inspected 2026-09-25",
+      "accessedDate": "2026-09-25",
+      "fields": [
+        "localized warehouse put-away page and workflow terms",
+        "quantity to handle",
+        "register/post put-away"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-warehouse-putaways-nb",
+      "title": "Plassere varer med lagerplasseringer",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/nb-no/dynamics365/business-central/warehouse-how-to-put-items-away-with-warehouse-put-aways",
+      "appliesTo": "Current NB localized Business Central online documentation; inspected 2026-09-25",
+      "accessedDate": "2026-09-25",
+      "fields": [
+        "localized warehouse put-away page and workflow terms",
+        "quantity to handle",
+        "register/post put-away"
+      ]
     }
   ]
 }

@@ -87,6 +87,29 @@ assert.strictEqual(conflicted.entity, undefined);
 assert.ok(conflicted.diagnostics.some(item =>
   item.code === "ambiguous-page-identification"));
 
+const versionScoped = engine.validateKnowledgePacks([{ ...salesPack,
+  pageDefinitions: salesPack.pageDefinitions.map(definition => ({ ...definition,
+    compatibility: { minAppVersion: "21.0.0", maxAppVersion: "21.99.99" } })) }, {
+  packId: "sales-v28", priority: 200, pageDefinitions: [{ ...baseDefinition,
+    ruleId: "Sales.Order.v28", entity: "UpdatedSalesOrder",
+    compatibility: { minAppVersion: "28.0.0", maxAppVersion: "28.99.99" } }]
+}]);
+assert.equal(versionScoped.diagnostics.some(item =>
+  item.code === "conflicting-page-definitions"), false,
+"definitions with non-overlapping product-version ranges should not be flagged as conflicting");
+const nonContiguousRanges = engine.validateKnowledgePacks([{ packId: "range-one", priority: 100,
+  pageDefinitions: [{ ...baseDefinition, pageObjectId: "4242", ruleId: "Range.One",
+    compatibility: { appVersionRanges: [
+      { minAppVersion: "21.0.0", maxAppVersion: "21.99.99" },
+      { minAppVersion: "28.0.0", maxAppVersion: "28.99.99" }
+    ] } }] }, { packId: "range-two", priority: 100, pageDefinitions: [{
+  ...baseDefinition, pageObjectId: "4242", ruleId: "Range.Two", entity: "OtherEntity",
+  compatibility: { minAppVersion: "22.0.0", maxAppVersion: "27.99.99" }
+}] }]);
+assert.equal(nonContiguousRanges.diagnostics.some(item =>
+  item.code === "conflicting-page-definitions"), false,
+"a documented 21/28 version range must not be treated as spanning undocumented versions 22-27");
+
 const ambiguousCaption = engine.resolvePageIdentity({ pageCaption: "Shared",
   locale: "en-US" }, [{ packId: "one", priority: 100, pageDefinitions: [{
   ruleId: "One.Shared", entity: "One", pageType: "card",

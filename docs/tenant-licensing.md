@@ -35,6 +35,13 @@ browser client ID and optionally override the role through
 temporary emergency fallback and should be removed after Entra access is
 verified.
 
+The extension uses this same verified app role to expose local knowledge-rule
+proposals. Its background worker sends the current Entra access token to
+`/admin/api/knowledge-access` for a role-only check on popup access and again before
+each proposal read or draft creation. The endpoint returns only an authorization
+boolean; it does not return licensing records. Review history, proposal patterns and
+drafts remain in extension-local storage and are not included in this request.
+
 Set `LICENSE_NOTIFICATION_WEBHOOK_URL` and `LICENSE_NOTIFICATION_RECIPIENT` to
 enable email notifications. `LICENSE_NOTIFICATION_WEBHOOK_TOKEN` is optional
 and is sent as a Bearer token. The webhook receives JSON with `to`, `subject`,

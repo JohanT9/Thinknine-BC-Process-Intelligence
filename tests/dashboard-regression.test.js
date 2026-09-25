@@ -176,7 +176,7 @@ assert.ok(
     dashboard.includes("review.imageSelection") &&
     dashboard.includes("screenshotQuality.qualityReason") &&
     dashboardHtml.includes(".review-screenshot-quality"),
-  "Review must expose cached, explainable screenshot-selection quality."
+  "Review must retain cached screenshot diagnostics under technical information."
 );
 assert.ok(
   dashboard.includes("businessSteps,\n    sessionGraph, confidenceResult } = model;") &&

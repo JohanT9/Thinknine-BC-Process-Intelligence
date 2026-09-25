@@ -3,6 +3,7 @@ const engine = require("../src/engine/page-identification-engine");
 const memory = require("../src/engine/entity-memory");
 const sales = require("../src/knowledge-packs/sales.json");
 const apteanRules = require("../src/knowledge-packs/aptean-fb.json");
+const cashManagement = require("../src/knowledge-packs/cash-management.json");
 
 const localized = [sales, apteanRules];
 for (const [locale, caption, alias] of [
@@ -20,6 +21,39 @@ for (const [locale, caption, alias] of [
   assert.equal(result.tableId, undefined);
   assert.equal(result.recordType, undefined);
   assert.equal(result.pageCaption, caption.trim(), "observed caption must be preserved");
+}
+
+for (const [locale, caption, entity] of [
+  ["sv-SE", "Kassakvittojournaler", "CashReceiptJournal"],
+  ["en-US", "Cash Receipt Journals", "CashReceiptJournal"],
+  ["fr-FR", "Feuille règlement", "CashReceiptJournal"],
+  ["de-DE", "Zahlungseingangs Buch.-Blatt", "CashReceiptJournal"],
+  ["es-ES", "Diario de recibos de efectivo", "CashReceiptJournal"],
+  ["da-DK", "Indbetalingskladde", "CashReceiptJournal"],
+  ["fi-FI", "Kassapäiväkirjat", "CashReceiptJournal"],
+  ["nb-NO", "Innbetalingskladder", "CashReceiptJournal"],
+  ["sv-SE", "Betalningsjournaler", "PaymentJournal"],
+  ["en-US", "Payment Journals", "PaymentJournal"],
+  ["fr-FR", "Feuilles paiement", "PaymentJournal"],
+  ["de-DE", "Zahlungsausgangs Buch.-Blatt", "PaymentJournal"],
+  ["es-ES", "Diario de pagos", "PaymentJournal"],
+  ["da-DK", "Betalingskladder", "PaymentJournal"],
+  ["fi-FI", "Maksupäiväkirja", "PaymentJournal"],
+  ["nb-NO", "Utbetalingskladd", "PaymentJournal"],
+  ["sv-SE", "Betalningsavstämningsjournal", "PaymentReconciliationJournal"],
+  ["en-US", "Payment Reconciliation Journal", "PaymentReconciliationJournal"],
+  ["fr-FR", "Feuille rapprochement bancaire", "PaymentReconciliationJournal"],
+  ["de-DE", "Zahlungs-Abstimmungs-Buch.-Blatt", "PaymentReconciliationJournal"],
+  ["es-ES", "Diario de conciliación de pagos", "PaymentReconciliationJournal"],
+  ["da-DK", "Betalingsudligningskladde", "PaymentReconciliationJournal"],
+  ["fi-FI", "Maksujen täsmäytyskirjauskansio", "PaymentReconciliationJournal"],
+  ["nb-NO", "Betalingsavstemmingskladd", "PaymentReconciliationJournal"]
+]) {
+  const result = engine.resolvePageIdentity({ pageCaption: caption, locale },
+    [cashManagement]);
+  assert.equal(result.entity, entity, `${caption} should resolve as ${entity}`);
+  assert.equal(result.source, "caption-rule");
+  assert.equal(result.matchedLocale, locale);
 }
 
 for (const caption of ["Tenant Sales Order", "Sales Order - Customer A"]) {

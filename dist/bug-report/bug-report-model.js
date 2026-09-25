@@ -76,6 +76,7 @@
       rawAuthorship: "captured", framesAuthorship: "derived" };
     result.technicalDiagnostics = (result.technicalDiagnostics || []).map(item =>
       ({ ...clone(item), authorship: "derived" }));
+    result.errorAnalysis = result.errorAnalysis ? clone(result.errorAnalysis) : null;
     result.evidence = { ...(result.evidence || {}),
       screenshots: (result.evidence?.screenshots || []).map(item => ({
         ...clone(item), assetId: String(item.assetId),

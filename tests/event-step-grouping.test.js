@@ -405,10 +405,12 @@ const recorderSeparated = run([
     interactionIds: ["frame:interaction-2"],
     pageIdentification: { id: "99", caption: "Other result" } })
 ]);
-assert.strictEqual(recorderSeparated.groups.length, 2,
-  "different recorder interaction IDs are an authoritative boundary");
+assert.strictEqual(recorderSeparated.groups.length, 1,
+  "a separate navigation observation must not become a user step");
 assert.strictEqual(recorderSeparated.groups[0].capturePacket.interactionIdentitySource,
   "recorder");
+assert.strictEqual(recorderSeparated.supportingEvents[0].reason,
+  "orphan-page-observation");
 
 assert.strictEqual(actionResult.groups[0].capturePacket.interactionId, null);
 assert.strictEqual(actionResult.groups[0].capturePacket.interactionIdentitySource,
@@ -429,7 +431,9 @@ const pageBoundary = run([
   event("p3", "value-change", { pageIdentification: { id: "31", caption: "Item List" },
     controlIdentification: { identity: { value: "Search" } }, value: { normalized: "y" } })
 ]);
-assert.strictEqual(pageBoundary.groups.length, 3);
+assert.strictEqual(pageBoundary.groups.length, 2);
+assert.strictEqual(pageBoundary.supportingEvents[0].reason,
+  "orphan-page-observation");
 
 const anonymousNavigation = run([
   event("pn1", "navigation", { pageIdentification: {} })
@@ -445,8 +449,10 @@ const identifiedNavigation = run([
   event("pn2", "navigation", { pageIdentification: {
     pageObjectId: "9307", caption: "Purchase Orders" } })
 ]);
-assert.strictEqual(identifiedNavigation.groups.length, 1,
-  "an identified Business Central page remains a documentable navigation step");
+assert.strictEqual(identifiedNavigation.groups.length, 0,
+  "an observed page without a user interaction must not become a procedure step");
+assert.strictEqual(identifiedNavigation.supportingEvents[0].reason,
+  "orphan-page-observation");
 
 const duplicateLegacyNavigation = run([
   event("pd1", "navigation", { timestamp: "2026-08-10T10:00:00.000Z",
@@ -454,10 +460,10 @@ const duplicateLegacyNavigation = run([
   event("pd2", "navigation", { timestamp: "2026-08-10T10:00:00.200Z",
     pageIdentification: { pageObjectId: "9307", caption: "Purchase Orders" } })
 ]);
-assert.strictEqual(duplicateLegacyNavigation.groups.length, 1,
-  "duplicate legacy page telemetry must not create a second procedure step");
-assert.strictEqual(duplicateLegacyNavigation.supportingEvents[0].reason,
-  "duplicate-page-observation");
+assert.strictEqual(duplicateLegacyNavigation.groups.length, 0,
+  "legacy page telemetry without a user interaction must not create procedure steps");
+assert.ok(duplicateLegacyNavigation.supportingEvents.every(item =>
+  item.reason === "orphan-page-observation"));
 
 const laterPageRevisit = run([
   event("pr1", "navigation", { timestamp: "2026-08-10T10:00:00.000Z",
@@ -465,8 +471,8 @@ const laterPageRevisit = run([
   event("pr2", "navigation", { timestamp: "2026-08-10T10:00:01.000Z",
     pageIdentification: { pageObjectId: "9307", caption: "Purchase Orders" } })
 ]);
-assert.strictEqual(laterPageRevisit.groups.length, 2,
-  "a later deliberate revisit to the same page must remain visible");
+assert.strictEqual(laterPageRevisit.groups.length, 0,
+  "page observations alone cannot prove a deliberate user revisit");
 
 const ambiguous = run([
   event("x1", "activation", { controlIdentification: {
@@ -508,3 +514,42 @@ assert.strictEqual(large.groups.length, 5000);
 assert.ok(Date.now() - started < 5000, "large grouping regression");
 
 console.log("Event Step Grouping tests passed.");
+
+// Regression: a Role Center main landmark must not become a Choose step.
+for (const caption of ['Actions Product A Product B', 'Åtgärder', 'Toiminnot', 'Aktionen']) {
+  const backgroundClick = event('landmark', 'activation', {
+    rawEventType: 'click', subtype: 'interaction',
+    controlIdentification: { role: 'main', controlType: 'interactiveSurface', caption }
+  });
+  const actualButton = event('button', 'action-invocation', {
+    rawEventType: 'click', controlIdentification: { role: 'button', caption }
+  });
+  const result = run([backgroundClick, actualButton]);
+  assert.equal(result.groups.length, 1);
+  assert.ok(result.groups[0].sourceEventIds.includes(actualButton.sourceEventId));
+  assert.ok(!result.groups[0].sourceEventIds.includes(backgroundClick.sourceEventId));
+  assert.ok(result.supportingEvents.some(item => item.normalizedEventId === backgroundClick.normalizedEventId));
+}
+
+for (const kind of ['value-change', 'toggle-change']) {
+  const searchField = event('search-field', kind, { rawEventType: 'field-change',
+    controlIdentification: {role:'textbox',caption:'Tell me what you want to do.'}, value:{normalized:'sales ord'} });
+  assert.equal(run([searchField]).groups.length, 0);
+  assert.equal(run([{...searchField,controlIdentification:{role:'textbox',caption:'Description'}}]).groups.length, 1);
+}
+
+// Empty field focus is supporting evidence, independent of the captured language.
+for (const caption of ['The value for this field is required.', 'Värde krävs', 'Valeur requise', 'Wert erforderlich', 'Valor obligatorio', 'Værdi kræves', 'Arvo vaaditaan', 'Verdi kreves']) {
+  for (const kind of ['activation', 'toggle-change']) {
+    const focus = event('empty-field', kind, {rawEventType:'click',
+      controlIdentification:{role:'combobox',controlType:'interactiveSurface',caption}});
+    const snapshot = JSON.stringify(focus);
+    const result = run([focus]);
+    assert.equal(result.groups.length, 0);
+    assert.ok(result.supportingEvents.some(item => item.normalizedEventId === focus.normalizedEventId));
+    assert.equal(JSON.stringify(focus), snapshot);
+    assert.equal(run([{...focus,kind:'value-change',rawEventType:'field-change',value:{normalized:'500'}}]).groups.length,1);
+    assert.equal(run([{...focus,kind:'activation',controlIdentification:{role:'combobox',controlType:'lookup',caption}}]).groups.length,1);
+    assert.equal(run([{...focus,kind:'selection-change',value:{normalized:'ITEM-1'}}]).groups.length,1);
+  }
+}

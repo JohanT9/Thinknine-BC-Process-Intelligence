@@ -4,6 +4,25 @@ import JSZip from "jszip";
 import pipeline from "../src/exporters/word-export-pipeline.js";
 import "../src/exporters/word-exporter-docx.mjs";
 
+function pngHeader(width, height) {
+  const bytes = new Uint8Array(24);
+  bytes.set([137, 80, 78, 71, 13, 10, 26, 10]);
+  new DataView(bytes.buffer).setUint32(16, width);
+  new DataView(bytes.buffer).setUint32(20, height);
+  return bytes;
+}
+
+assert.deepStrictEqual(globalThis.T9Export.word.fittedImageSize(
+  pngHeader(2400, 900),
+  { maxWidth: 620, maxHeight: 385, adaptiveFit: true,
+    panoramicMaxHeight: 330, portraitMaxWidth: 480 }
+), { width: 620, height: 233 });
+assert.deepStrictEqual(globalThis.T9Export.word.fittedImageSize(
+  pngHeader(900, 1600),
+  { maxWidth: 620, maxHeight: 900, adaptiveFit: true,
+    panoramicMaxHeight: 330, portraitMaxWidth: 480 }
+), { width: 480, height: 853 });
+
 const png = new Uint8Array(Buffer.from(
   "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAusB9Wl8lJ0AAAAASUVORK5CYII=",
   "base64"
@@ -75,6 +94,7 @@ const snapshot = {
     widthIntent: component.presentationIntent.widthIntent,
     grouping: component.grouping,
     maxWidth: component.appearance.maxWidth,
+    adaptiveFit: component.appearance.adaptiveFit,
     frame: component.appearance.presentationStyle,
     preserveAspectRatio: component.presentationIntent.preserveAspectRatio,
     preserveQuality: component.presentationIntent.preserveQuality
@@ -83,7 +103,8 @@ const snapshot = {
     role: byKind("callout").presentationIntent.semanticRole,
     grouping: byKind("callout").grouping,
     borderColor: byKind("callout").appearance.borderColor,
-    fillColor: byKind("callout").appearance.fillColor
+    fillColor: byKind("callout").appearance.fillColor,
+    presentationStyle: byKind("callout").appearance.presentationStyle
   },
   revision: {
     rowIntegrity: components.find(component =>
@@ -113,14 +134,18 @@ const xml = await archive.file("word/document.xml").async("string");
 const styles = await archive.file("word/styles.xml").async("string");
 
 for (const marker of [
-  'w:w="86%"',
+  'w:w="90%"',
   'w:color="007A82"',
   'w:fill="F0F7F7"',
   'w:fill="FFFFFF"',
-  'w:fill="EDF6FB"',
-  'w:sz="12"',
   '<w:cantSplit/>'
 ]) assert.ok(xml.includes(marker), marker);
+assert.ok(xml.includes('w:sz w:val="22"'),
+  "step instructions use the compact eleven-point hierarchy");
+assert.ok(xml.includes('<w:tbl>') && xml.includes('<w:keepNext/>'),
+  "step lead panels keep their instruction with following evidence");
+assert.ok(!xml.includes('w:fill="EDF6FB"'),
+  "observed results use a compact inline treatment");
 assert.ok(styles.includes("Segoe UI"));
 const header = await archive.file("word/header1.xml").async("string");
 assert.ok(header.includes('w:fill="05474F"'));

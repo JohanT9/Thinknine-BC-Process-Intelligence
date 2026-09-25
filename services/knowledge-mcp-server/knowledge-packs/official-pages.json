@@ -1,0 +1,15 @@
+{
+  "packId": "bc-mcp-official-pages",
+  "name": "Business Central public page supplement (MCP only)",
+  "version": "1.0.0",
+  "priority": 150,
+  "pageDefinitions": [
+    { "ruleId": "McpOfficial.CustomerList", "pageObjectId": "22", "entity": "Customer", "pageType": "list", "objectVerification": "declared", "localizedCaptions": { "en-US": ["Customer List"] }, "captionRules": [{ "locale": "en-US", "pattern": "^Customer List$" }] },
+    { "ruleId": "McpOfficial.VendorList", "pageObjectId": "27", "entity": "Vendor", "pageType": "list", "objectVerification": "declared", "localizedCaptions": { "en-US": ["Vendor List"] }, "captionRules": [{ "locale": "en-US", "pattern": "^Vendor List$" }] },
+    { "ruleId": "McpOfficial.ItemList", "pageObjectId": "31", "entity": "Item", "pageType": "list", "objectVerification": "declared", "localizedCaptions": { "en-US": ["Item List"] }, "captionRules": [{ "locale": "en-US", "pattern": "^Item List$" }] },
+    { "ruleId": "McpOfficial.SalesOrderList", "pageObjectId": "9305", "entity": "SalesOrder", "pageType": "list", "objectVerification": "declared", "localizedCaptions": { "en-US": ["Sales Order List"] }, "captionRules": [{ "locale": "en-US", "pattern": "^Sales Order List$" }] },
+    { "ruleId": "McpOfficial.PurchaseOrderList", "pageObjectId": "9307", "entity": "PurchaseOrder", "pageType": "list", "objectVerification": "declared", "localizedCaptions": { "en-US": ["Purchase Order List"] }, "captionRules": [{ "locale": "en-US", "pattern": "^Purchase Order List$" }] },
+    { "ruleId": "McpOfficial.PurchaseInvoiceList", "pageObjectId": "9308", "entity": "PurchaseInvoice", "pageType": "list", "objectVerification": "declared", "localizedCaptions": { "en-US": ["Purchase Invoices"] }, "captionRules": [{ "locale": "en-US", "pattern": "^Purchase Invoices$" }] }
+  ],
+  "rules": []
+}

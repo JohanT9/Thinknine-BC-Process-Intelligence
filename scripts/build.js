@@ -170,7 +170,8 @@ for (const file of [
   "workspace-controller.js",
   "workspace-context.js",
   "technical-report.html", "technical-report.js",
-  "technical-report-workspace-view.js"
+  "technical-report-workspace-view.js", "knowledge-admin.html",
+  "knowledge-admin.js", "knowledge-admin-policy.schema.json"
 ]) {
   copyFile(
     path.join(src, "ui", file),

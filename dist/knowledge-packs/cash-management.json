@@ -1,0 +1,1360 @@
+{
+  "packId": "bc-cash-management",
+  "name": "Business Central Cash Management",
+  "version": "1.0.0",
+  "priority": 200,
+  "pageDefinitions": [
+    {
+      "ruleId": "CashManagement.CashReceiptJournal",
+      "pageObjectId": "255",
+      "entity": "CashReceiptJournal",
+      "pageType": "worksheet",
+      "technicalName": "CashReceiptJournal",
+      "localizedCaptions": {
+        "en-US": [
+          "Cash Receipt Journal",
+          "Cash Receipt Journals"
+        ],
+        "sv-SE": [
+          "Kassakvittojournaler",
+          "Inbetalningsjournaler"
+        ],
+        "fr-FR": [
+          "Feuille règlement",
+          "Journaux de trésorerie"
+        ],
+        "de-DE": [
+          "Zahlungseingangs Buch.-Blatt"
+        ],
+        "es-ES": [
+          "Diario de recibos de efectivo"
+        ],
+        "da-DK": [
+          "Indbetalingskladde",
+          "Kassekvitteringskladde"
+        ],
+        "fi-FI": [
+          "Kassapäiväkirjat"
+        ],
+        "nb-NO": [
+          "Innbetalingskladder",
+          "Kontantkvitteringsjournalen"
+        ]
+      },
+      "captionRules": [
+        {
+          "locale": "en-US",
+          "pattern": "^(?:Cash Receipt Journal|Cash Receipt Journals)$"
+        },
+        {
+          "locale": "sv-SE",
+          "pattern": "^(?:Kassakvittojournaler|Inbetalningsjournaler)$"
+        },
+        {
+          "locale": "fr-FR",
+          "pattern": "^(?:Feuille règlement|Journal des encaissements)$"
+        },
+        {
+          "locale": "de-DE",
+          "pattern": "^Zahlungseingangs Buch\\.?-Blatt$"
+        },
+        {
+          "locale": "es-ES",
+          "pattern": "^Diario de cobros$"
+        },
+        {
+          "locale": "da-DK",
+          "pattern": "^Indbetalingskladde$"
+        },
+        {
+          "locale": "nb-NO",
+          "pattern": "^Innbetalingskladd$"
+        },
+        {
+          "locale": "fr-FR",
+          "pattern": "^Feuille règlement$"
+        },
+        {
+          "locale": "fr-FR",
+          "pattern": "^Journal des encaissements$"
+        },
+        {
+          "locale": "de-DE",
+          "pattern": "^Zahlungseingangs Buch\\.-Blatt$"
+        },
+        {
+          "locale": "fr-FR",
+          "pattern": "^Journaux de trésorerie$"
+        },
+        {
+          "locale": "es-ES",
+          "pattern": "^Diario de recibos de efectivo$"
+        },
+        {
+          "locale": "da-DK",
+          "pattern": "^Kassekvitteringskladde$"
+        },
+        {
+          "locale": "fi-FI",
+          "pattern": "^Kassapäiväkirjat$"
+        },
+        {
+          "locale": "nb-NO",
+          "pattern": "^Innbetalingskladder$"
+        },
+        {
+          "locale": "nb-NO",
+          "pattern": "^Kontantkvitteringsjournalen$"
+        }
+      ],
+      "compatibility": {
+        "appVersionRanges": [
+          {
+            "minAppVersion": "21.0.0",
+            "maxAppVersion": "21.99.99"
+          },
+          {
+            "minAppVersion": "28.0.0",
+            "maxAppVersion": "28.99.99"
+          }
+        ]
+      },
+      "sourceIds": [
+        "microsoft-learn-bc21-actionbar-pages",
+        "microsoft-learn-bc28-255",
+        "microsoft-learn-customer-payments",
+        "microsoft-learn-customer-payments-sv",
+        "microsoft-learn-customer-payments-fr",
+        "microsoft-learn-customer-payments-de",
+        "microsoft-learn-customer-payments-es",
+        "microsoft-learn-customer-payments-da",
+        "microsoft-learn-customer-payments-fi",
+        "microsoft-learn-customer-payments-nb"
+      ]
+    },
+    {
+      "ruleId": "CashManagement.PaymentJournal",
+      "pageObjectId": "256",
+      "entity": "PaymentJournal",
+      "pageType": "worksheet",
+      "technicalName": "PaymentJournal",
+      "localizedCaptions": {
+        "en-US": [
+          "Payment Journal",
+          "Payment Journals"
+        ],
+        "sv-SE": [
+          "Betalningsjournaler"
+        ],
+        "fr-FR": [
+          "Feuilles paiement"
+        ],
+        "de-DE": [
+          "Zahlungsausgangs Buch.-Blatt"
+        ],
+        "es-ES": [
+          "Diario de pagos"
+        ],
+        "da-DK": [
+          "Betalingskladder",
+          "Udbetalingskladde"
+        ],
+        "fi-FI": [
+          "Maksupäiväkirja"
+        ],
+        "nb-NO": [
+          "Utbetalingskladd",
+          "Betalingskladd"
+        ]
+      },
+      "captionRules": [
+        {
+          "locale": "en-US",
+          "pattern": "^(?:Payment Journal|Payment Journals)$"
+        },
+        {
+          "locale": "sv-SE",
+          "pattern": "^(?:Betalningsjournaler)$"
+        },
+        {
+          "locale": "fr-FR",
+          "pattern": "^Feuille paiement$"
+        },
+        {
+          "locale": "de-DE",
+          "pattern": "^Zahlungs Buch\\.?-Blatt$"
+        },
+        {
+          "locale": "es-ES",
+          "pattern": "^Diario de pagos$"
+        },
+        {
+          "locale": "da-DK",
+          "pattern": "^Betalingskladde$"
+        },
+        {
+          "locale": "fi-FI",
+          "pattern": "^Maksupäiväkirja$"
+        },
+        {
+          "locale": "nb-NO",
+          "pattern": "^Betalingskladd$"
+        },
+        {
+          "locale": "de-DE",
+          "pattern": "^Zahlungs Buch\\.-Blatt$"
+        },
+        {
+          "locale": "fr-FR",
+          "pattern": "^Feuilles paiement$"
+        },
+        {
+          "locale": "de-DE",
+          "pattern": "^Zahlungsausgangs Buch\\.-Blatt$"
+        },
+        {
+          "locale": "da-DK",
+          "pattern": "^Betalingskladder$"
+        },
+        {
+          "locale": "da-DK",
+          "pattern": "^Udbetalingskladde$"
+        },
+        {
+          "locale": "nb-NO",
+          "pattern": "^Utbetalingskladd$"
+        }
+      ],
+      "compatibility": {
+        "appVersionRanges": [
+          {
+            "minAppVersion": "21.0.0",
+            "maxAppVersion": "21.99.99"
+          },
+          {
+            "minAppVersion": "28.0.0",
+            "maxAppVersion": "28.99.99"
+          }
+        ]
+      },
+      "sourceIds": [
+        "microsoft-learn-bc21-actionbar-pages",
+        "microsoft-learn-bc28-256",
+        "microsoft-learn-payment-journal",
+        "microsoft-learn-payment-journal-sv",
+        "microsoft-learn-vendor-payments",
+        "microsoft-learn-vendor-payments-sv",
+        "microsoft-learn-payment-journal-fr",
+        "microsoft-learn-payment-journal-de",
+        "microsoft-learn-payment-journal-es",
+        "microsoft-learn-payment-journal-da",
+        "microsoft-learn-payment-journal-fi",
+        "microsoft-learn-payment-journal-nb"
+      ]
+    },
+    {
+      "ruleId": "CashManagement.PaymentReconciliationJournal",
+      "pageObjectId": "1290",
+      "entity": "PaymentReconciliationJournal",
+      "pageType": "worksheet",
+      "technicalName": "PaymentReconciliationJournal",
+      "localizedCaptions": {
+        "en-US": [
+          "Payment Reconciliation Journal"
+        ],
+        "sv-SE": [
+          "Betalningsavstämningsjournal",
+          "Betalningsavstämningsjournaler"
+        ],
+        "fr-FR": [
+          "Feuille rapprochement bancaire",
+          "Journaux de rapprochement des paiements"
+        ],
+        "de-DE": [
+          "Zahlungs-Abstimmungs-Buch.-Blatt"
+        ],
+        "es-ES": [
+          "Diario de conciliación de pagos"
+        ],
+        "da-DK": [
+          "Betalingsudligningskladde"
+        ],
+        "fi-FI": [
+          "Maksujen täsmäytyskirjauskansio"
+        ],
+        "nb-NO": [
+          "Betalingsavstemmingskladd"
+        ]
+      },
+      "captionRules": [
+        {
+          "locale": "en-US",
+          "pattern": "^(?:Payment Reconciliation Journal)$"
+        },
+        {
+          "locale": "sv-SE",
+          "pattern": "^(?:Betalningsavstämningsjournal|Betalningsavstämningsjournaler)$"
+        },
+        {
+          "locale": "fr-FR",
+          "pattern": "^Feuille rapprochement bancaire$"
+        },
+        {
+          "locale": "fr-FR",
+          "pattern": "^Journaux de rapprochement des paiements$"
+        },
+        {
+          "locale": "de-DE",
+          "pattern": "^Zahlungs-Abstimmungs-Buch\\.-Blatt$"
+        },
+        {
+          "locale": "es-ES",
+          "pattern": "^Diario de conciliación de pagos$"
+        },
+        {
+          "locale": "da-DK",
+          "pattern": "^Betalingsudligningskladde$"
+        },
+        {
+          "locale": "fi-FI",
+          "pattern": "^Maksujen täsmäytyskirjauskansio$"
+        },
+        {
+          "locale": "nb-NO",
+          "pattern": "^Betalingsavstemmingskladd$"
+        }
+      ],
+      "compatibility": {
+        "appVersionRanges": [
+          {
+            "minAppVersion": "28.0.0",
+            "maxAppVersion": "28.99.99"
+          }
+        ]
+      },
+      "sourceIds": [
+        "microsoft-learn-bc28-1290",
+        "microsoft-learn-payment-reconciliation",
+        "microsoft-learn-payment-reconciliation-sv",
+        "microsoft-learn-payment-reconciliation-review",
+        "microsoft-learn-payment-reconciliation-fr",
+        "microsoft-learn-payment-reconciliation-de",
+        "microsoft-learn-payment-reconciliation-es",
+        "microsoft-learn-payment-reconciliation-da",
+        "microsoft-learn-payment-reconciliation-fi",
+        "microsoft-learn-payment-reconciliation-nb"
+      ]
+    }
+  ],
+  "rules": [
+    {
+      "ruleId": "CashManagement.OpenCashReceiptJournal",
+      "taskType": "OpenCashReceiptJournal",
+      "semanticAction": "OpenRecord",
+      "entity": "CashReceiptJournal",
+      "priority": 1310,
+      "confidence": 0.97,
+      "match": {
+        "pagePatterns": [
+          "cash receipt journal",
+          "cash receipt journals",
+          "kassakvittojournal",
+          "inbetalningsjournal",
+          "feuille règlement",
+          "journaux de trésorerie",
+          "zahlungseingangs buch.-blatt",
+          "diario de recibos de efectivo",
+          "indbetalingskladde",
+          "kassekvitteringskladde",
+          "maksupäiväkirja",
+          "kassapäiväkirjat",
+          "innbetalingskladder",
+          "kontantkvitteringsjournalen"
+        ],
+        "actionPatterns": [
+          "^open record$",
+          "^öppna post$",
+          "^ouvrir la fiche$",
+          "^datensatz öffnen$",
+          "^abrir registro$",
+          "^åbn post$",
+          "^avaa tietue$",
+          "^åpne post$"
+        ],
+        "fieldPatterns": [],
+        "automationIdPatterns": []
+      },
+      "instructionTemplate": "",
+      "languages": [
+        "sv-SE",
+        "en-US",
+        "fr-FR",
+        "de-DE",
+        "es-ES",
+        "da-DK",
+        "fi-FI",
+        "nb-NO"
+      ],
+      "aliases": [],
+      "sourceIds": [
+        "microsoft-learn-customer-payments",
+        "microsoft-learn-customer-payments-sv",
+        "microsoft-learn-customer-payments-fr",
+        "microsoft-learn-customer-payments-de",
+        "microsoft-learn-customer-payments-es",
+        "microsoft-learn-customer-payments-da",
+        "microsoft-learn-customer-payments-fi",
+        "microsoft-learn-customer-payments-nb"
+      ]
+    },
+    {
+      "ruleId": "CashManagement.ApplyCustomerEntries",
+      "taskType": "ApplyCustomerPaymentEntries",
+      "semanticAction": "ApplyEntries",
+      "entity": "CustomerLedgerEntry",
+      "priority": 1320,
+      "confidence": 0.97,
+      "match": {
+        "pagePatterns": [
+          "cash receipt journal",
+          "cash receipt journals",
+          "kassakvittojournal",
+          "inbetalningsjournal",
+          "feuille règlement",
+          "journaux de trésorerie",
+          "zahlungseingangs buch.-blatt",
+          "diario de recibos de efectivo",
+          "indbetalingskladde",
+          "kassekvitteringskladde",
+          "maksupäiväkirja",
+          "kassapäiväkirjat",
+          "innbetalingskladder",
+          "kontantkvitteringsjournalen"
+        ],
+        "actionPatterns": [
+          "^apply entries$",
+          "^koppla transaktioner$",
+          "^lettrer écritures$",
+          "^posten ausgleichen$",
+          "^liquidar movimientos$",
+          "^udlign poster$",
+          "^kohdista tapahtumat$",
+          "^utligne poster$"
+        ],
+        "fieldPatterns": [],
+        "automationIdPatterns": []
+      },
+      "instructionTemplate": "",
+      "languages": [
+        "sv-SE",
+        "en-US",
+        "fr-FR",
+        "de-DE",
+        "es-ES",
+        "da-DK",
+        "fi-FI",
+        "nb-NO"
+      ],
+      "aliases": [],
+      "sourceIds": [
+        "microsoft-learn-customer-payments",
+        "microsoft-learn-customer-payments-sv",
+        "microsoft-learn-customer-payments-fr",
+        "microsoft-learn-customer-payments-de",
+        "microsoft-learn-customer-payments-es",
+        "microsoft-learn-customer-payments-da",
+        "microsoft-learn-customer-payments-fi",
+        "microsoft-learn-customer-payments-nb"
+      ]
+    },
+    {
+      "ruleId": "CashManagement.PostCashReceiptJournal",
+      "taskType": "PostCashReceiptJournal",
+      "semanticAction": "PostDocument",
+      "entity": "CashReceiptJournal",
+      "priority": 1320,
+      "confidence": 0.97,
+      "match": {
+        "pagePatterns": [
+          "cash receipt journal",
+          "cash receipt journals",
+          "kassakvittojournal",
+          "inbetalningsjournal",
+          "feuille règlement",
+          "journaux de trésorerie",
+          "zahlungseingangs buch.-blatt",
+          "diario de recibos de efectivo",
+          "indbetalingskladde",
+          "kassekvitteringskladde",
+          "maksupäiväkirja",
+          "kassapäiväkirjat",
+          "innbetalingskladder",
+          "kontantkvitteringsjournalen"
+        ],
+        "actionPatterns": [
+          "^post$",
+          "^bokför$",
+          "^bokföra$",
+          "^valider$",
+          "^buchen$",
+          "^registrar$",
+          "^bogfør$",
+          "^kirjaa$",
+          "^bokfør$"
+        ],
+        "fieldPatterns": [],
+        "automationIdPatterns": []
+      },
+      "instructionTemplate": "",
+      "languages": [
+        "sv-SE",
+        "en-US",
+        "fr-FR",
+        "de-DE",
+        "es-ES",
+        "da-DK",
+        "fi-FI",
+        "nb-NO"
+      ],
+      "aliases": [],
+      "sourceIds": [
+        "microsoft-learn-customer-payments",
+        "microsoft-learn-customer-payments-sv",
+        "microsoft-learn-customer-payments-fr",
+        "microsoft-learn-customer-payments-de",
+        "microsoft-learn-customer-payments-es",
+        "microsoft-learn-customer-payments-da",
+        "microsoft-learn-customer-payments-fi",
+        "microsoft-learn-customer-payments-nb"
+      ]
+    },
+    {
+      "ruleId": "CashManagement.OpenPaymentJournal",
+      "taskType": "OpenPaymentJournal",
+      "semanticAction": "OpenRecord",
+      "entity": "PaymentJournal",
+      "priority": 1310,
+      "confidence": 0.97,
+      "match": {
+        "pagePatterns": [
+          "payment journal",
+          "payment journals",
+          "betalningsjournal",
+          "feuilles paiement",
+          "zahlungsausgangs buch.-blatt",
+          "diario de pagos",
+          "betalingskladder",
+          "udbetalingskladde",
+          "maksupäiväkirjat",
+          "utbetalingskladd",
+          "betalingskladd"
+        ],
+        "actionPatterns": [
+          "^open record$",
+          "^öppna post$",
+          "^ouvrir la feuille$",
+          "^buch.-blatt öffnen$",
+          "^abrir diario$",
+          "^åbn kladde$",
+          "^avaa päiväkirja$",
+          "^åpne kladd$"
+        ],
+        "fieldPatterns": [],
+        "automationIdPatterns": []
+      },
+      "instructionTemplate": "",
+      "languages": [
+        "sv-SE",
+        "en-US",
+        "fr-FR",
+        "de-DE",
+        "es-ES",
+        "da-DK",
+        "fi-FI",
+        "nb-NO"
+      ],
+      "aliases": [],
+      "sourceIds": [
+        "microsoft-learn-payment-journal",
+        "microsoft-learn-payment-journal-sv",
+        "microsoft-learn-payment-journal-fr",
+        "microsoft-learn-payment-journal-de",
+        "microsoft-learn-payment-journal-es",
+        "microsoft-learn-payment-journal-da",
+        "microsoft-learn-payment-journal-fi",
+        "microsoft-learn-payment-journal-nb"
+      ]
+    },
+    {
+      "ruleId": "CashManagement.SuggestVendorPayments",
+      "taskType": "SuggestVendorPayments",
+      "semanticAction": "SuggestPayments",
+      "entity": "PaymentJournal",
+      "priority": 1320,
+      "confidence": 0.97,
+      "match": {
+        "pagePatterns": [
+          "payment journal",
+          "payment journals",
+          "betalningsjournal",
+          "feuilles paiement",
+          "zahlungsausgangs buch.-blatt",
+          "diario de pagos",
+          "betalingskladder",
+          "udbetalingskladde",
+          "maksupäiväkirjat",
+          "utbetalingskladd",
+          "betalingskladd"
+        ],
+        "actionPatterns": [
+          "^suggest vendor payments$",
+          "^föreslå leverantörsbetalningar$",
+          "^proposer paiements fournisseur$",
+          "^lieferantenzahlung vorschlagen$",
+          "^proponer pagos a proveedor$",
+          "^lav kreditorbetalingsforslag$",
+          "^ehdota toimittajamaksuja$",
+          "^betalingsforslag – leverandør$"
+        ],
+        "fieldPatterns": [],
+        "automationIdPatterns": []
+      },
+      "instructionTemplate": "",
+      "languages": [
+        "sv-SE",
+        "en-US",
+        "fr-FR",
+        "de-DE",
+        "es-ES",
+        "da-DK",
+        "fi-FI",
+        "nb-NO"
+      ],
+      "aliases": [],
+      "sourceIds": [
+        "microsoft-learn-vendor-payments",
+        "microsoft-learn-vendor-payments-sv",
+        "microsoft-learn-vendor-payments-fr",
+        "microsoft-learn-vendor-payments-de",
+        "microsoft-learn-vendor-payments-es",
+        "microsoft-learn-vendor-payments-da",
+        "microsoft-learn-vendor-payments-nb",
+        "microsoft-learn-payment-journal-fi"
+      ]
+    },
+    {
+      "ruleId": "CashManagement.PostPaymentJournal",
+      "taskType": "PostPaymentJournal",
+      "semanticAction": "PostDocument",
+      "entity": "PaymentJournal",
+      "priority": 1320,
+      "confidence": 0.97,
+      "match": {
+        "pagePatterns": [
+          "payment journal",
+          "payment journals",
+          "betalningsjournal",
+          "feuilles paiement",
+          "zahlungsausgangs buch.-blatt",
+          "diario de pagos",
+          "betalingskladder",
+          "udbetalingskladde",
+          "maksupäiväkirjat",
+          "utbetalingskladd",
+          "betalingskladd"
+        ],
+        "actionPatterns": [
+          "^post$",
+          "^bokför$",
+          "^bokföra$",
+          "^valider$",
+          "^buchen$",
+          "^registrar$",
+          "^bogfør$",
+          "^kirjaa$",
+          "^bokfør$"
+        ],
+        "fieldPatterns": [],
+        "automationIdPatterns": []
+      },
+      "instructionTemplate": "",
+      "languages": [
+        "sv-SE",
+        "en-US",
+        "fr-FR",
+        "de-DE",
+        "es-ES",
+        "da-DK",
+        "fi-FI",
+        "nb-NO"
+      ],
+      "aliases": [],
+      "sourceIds": [
+        "microsoft-learn-payment-journal",
+        "microsoft-learn-payment-journal-sv",
+        "microsoft-learn-payment-journal-fr",
+        "microsoft-learn-payment-journal-de",
+        "microsoft-learn-payment-journal-es",
+        "microsoft-learn-payment-journal-da",
+        "microsoft-learn-payment-journal-fi",
+        "microsoft-learn-payment-journal-nb"
+      ]
+    },
+    {
+      "ruleId": "CashManagement.OpenPaymentReconciliationJournal",
+      "taskType": "OpenPaymentReconciliationJournal",
+      "semanticAction": "OpenRecord",
+      "entity": "PaymentReconciliationJournal",
+      "priority": 1310,
+      "confidence": 0.97,
+      "match": {
+        "pagePatterns": [
+          "payment reconciliation journal",
+          "betalningsavstämningsjournal",
+          "feuille rapprochement bancaire",
+          "journaux de rapprochement des paiements",
+          "zahlungs-abstimmungs-buch.-blatt",
+          "diario de conciliación de pagos",
+          "betalingsudligningskladde",
+          "maksujen täsmäytyskirjauskansio",
+          "betalingsavstemmingskladd"
+        ],
+        "actionPatterns": [
+          "^open record$",
+          "^öppna post$"
+        ],
+        "fieldPatterns": [],
+        "automationIdPatterns": []
+      },
+      "instructionTemplate": "",
+      "languages": [
+        "sv-SE",
+        "en-US",
+        "fr-FR",
+        "de-DE",
+        "es-ES",
+        "da-DK",
+        "fi-FI",
+        "nb-NO"
+      ],
+      "aliases": [],
+      "sourceIds": [
+        "microsoft-learn-payment-reconciliation",
+        "microsoft-learn-payment-reconciliation-sv",
+        "microsoft-learn-payment-reconciliation-fr",
+        "microsoft-learn-payment-reconciliation-de",
+        "microsoft-learn-payment-reconciliation-es",
+        "microsoft-learn-payment-reconciliation-da",
+        "microsoft-learn-payment-reconciliation-fi",
+        "microsoft-learn-payment-reconciliation-nb"
+      ]
+    },
+    {
+      "ruleId": "CashManagement.ApplyPaymentsAutomatically",
+      "taskType": "ApplyPaymentsAutomatically",
+      "semanticAction": "ApplyPayments",
+      "entity": "PaymentReconciliationJournal",
+      "priority": 1320,
+      "confidence": 0.97,
+      "match": {
+        "pagePatterns": [
+          "payment reconciliation journal",
+          "betalningsavstämningsjournal",
+          "feuille rapprochement bancaire",
+          "journaux de rapprochement des paiements",
+          "zahlungs-abstimmungs-buch.-blatt",
+          "diario de conciliación de pagos",
+          "betalingsudligningskladde",
+          "maksujen täsmäytyskirjauskansio",
+          "betalingsavstemmingskladd"
+        ],
+        "actionPatterns": [
+          "^apply automatically$",
+          "^koppla automatiskt$",
+          "^lettrage automatique$",
+          "^automatisch ausgleichen$",
+          "^liquidar automáticamente$",
+          "^udligne automatisk$",
+          "^kohdista automaattisesti$",
+          "^utligne automatisk$"
+        ],
+        "fieldPatterns": [],
+        "automationIdPatterns": []
+      },
+      "instructionTemplate": "",
+      "languages": [
+        "sv-SE",
+        "en-US",
+        "fr-FR",
+        "de-DE",
+        "es-ES",
+        "da-DK",
+        "fi-FI",
+        "nb-NO"
+      ],
+      "aliases": [],
+      "sourceIds": [
+        "microsoft-learn-payment-reconciliation",
+        "microsoft-learn-payment-reconciliation-sv",
+        "microsoft-learn-payment-reconciliation-fr",
+        "microsoft-learn-payment-reconciliation-de",
+        "microsoft-learn-payment-reconciliation-es",
+        "microsoft-learn-payment-reconciliation-da",
+        "microsoft-learn-payment-reconciliation-fi",
+        "microsoft-learn-payment-reconciliation-nb"
+      ]
+    },
+    {
+      "ruleId": "CashManagement.ApplyPaymentsManually",
+      "taskType": "ApplyPaymentsManually",
+      "semanticAction": "ReviewPaymentApplication",
+      "entity": "PaymentReconciliationJournal",
+      "priority": 1320,
+      "confidence": 0.97,
+      "match": {
+        "pagePatterns": [
+          "payment reconciliation journal",
+          "betalningsavstämningsjournal",
+          "feuille rapprochement bancaire",
+          "journaux de rapprochement des paiements",
+          "zahlungs-abstimmungs-buch.-blatt",
+          "diario de conciliación de pagos",
+          "betalingsudligningskladde",
+          "maksujen täsmäytyskirjauskansio",
+          "betalingsavstemmingskladd"
+        ],
+        "actionPatterns": [
+          "^apply manually$",
+          "^koppla manuellt$",
+          "^lettrer manuellement$",
+          "^manuell ausgleichen$",
+          "^liquidar manualmente$",
+          "^udligne manuelt$",
+          "^kohdista manuaalisesti$",
+          "^utligne manuelt$"
+        ],
+        "fieldPatterns": [],
+        "automationIdPatterns": []
+      },
+      "instructionTemplate": "",
+      "languages": [
+        "sv-SE",
+        "en-US",
+        "fr-FR",
+        "de-DE",
+        "es-ES",
+        "da-DK",
+        "fi-FI",
+        "nb-NO"
+      ],
+      "aliases": [],
+      "sourceIds": [
+        "microsoft-learn-payment-reconciliation-review",
+        "microsoft-learn-payment-reconciliation-sv",
+        "microsoft-learn-payment-reconciliation-fr",
+        "microsoft-learn-payment-reconciliation-de",
+        "microsoft-learn-payment-reconciliation-es",
+        "microsoft-learn-payment-reconciliation-da",
+        "microsoft-learn-payment-reconciliation-fi",
+        "microsoft-learn-payment-reconciliation-nb"
+      ]
+    },
+    {
+      "ruleId": "CashManagement.PostPaymentReconciliationJournal",
+      "taskType": "PostPaymentReconciliationJournal",
+      "semanticAction": "PostDocument",
+      "entity": "PaymentReconciliationJournal",
+      "priority": 1320,
+      "confidence": 0.97,
+      "match": {
+        "pagePatterns": [
+          "payment reconciliation journal",
+          "betalningsavstämningsjournal",
+          "feuille rapprochement bancaire",
+          "journaux de rapprochement des paiements",
+          "zahlungs-abstimmungs-buch.-blatt",
+          "diario de conciliación de pagos",
+          "betalingsudligningskladde",
+          "maksujen täsmäytyskirjauskansio",
+          "betalingsavstemmingskladd"
+        ],
+        "actionPatterns": [
+          "^post$",
+          "^bokför$",
+          "^bokföra$",
+          "^valider$",
+          "^buchen$",
+          "^registrar$",
+          "^bogfør$",
+          "^kirjaa$",
+          "^bokfør$"
+        ],
+        "fieldPatterns": [],
+        "automationIdPatterns": []
+      },
+      "instructionTemplate": "",
+      "languages": [
+        "sv-SE",
+        "en-US",
+        "fr-FR",
+        "de-DE",
+        "es-ES",
+        "da-DK",
+        "fi-FI",
+        "nb-NO"
+      ],
+      "aliases": [],
+      "sourceIds": [
+        "microsoft-learn-payment-reconciliation",
+        "microsoft-learn-payment-reconciliation-sv",
+        "microsoft-learn-payment-reconciliation-fr",
+        "microsoft-learn-payment-reconciliation-de",
+        "microsoft-learn-payment-reconciliation-es",
+        "microsoft-learn-payment-reconciliation-da",
+        "microsoft-learn-payment-reconciliation-fi",
+        "microsoft-learn-payment-reconciliation-nb"
+      ]
+    }
+  ],
+  "sources": [
+    {
+      "sourceId": "microsoft-learn-customer-payments-fr",
+      "title": "Appliquer des transactions de vente manuellement",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/fr-fr/dynamics365/business-central/receivables-how-apply-sales-transactions-manually",
+      "appliesTo": "Current Business Central online documentation; inspected 2026-09-25",
+      "accessedDate": "2026-09-25",
+      "fields": [
+        "journal des encaissements",
+        "appliquer des écritures",
+        "valider"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-customer-payments-de",
+      "title": "Verkaufsposten manuell ausgleichen",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/de-de/dynamics365/business-central/receivables-how-apply-sales-transactions-manually",
+      "appliesTo": "Current Business Central online documentation; inspected 2026-09-25",
+      "accessedDate": "2026-09-25",
+      "fields": [
+        "Zahlungseingangs Buch.-Blatt",
+        "Posten ausgleichen",
+        "Buchen"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-customer-payments-es",
+      "title": "Aplicar transacciones de ventas manualmente",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/es-es/dynamics365/business-central/receivables-how-apply-sales-transactions-manually",
+      "appliesTo": "Current Business Central online documentation; inspected 2026-09-25",
+      "accessedDate": "2026-09-25",
+      "fields": [
+        "diario de cobros",
+        "liquidar movimientos",
+        "registrar"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-customer-payments-da",
+      "title": "Anvend salgsposter manuelt",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/da-dk/dynamics365/business-central/receivables-how-apply-sales-transactions-manually",
+      "appliesTo": "Current Business Central online documentation; inspected 2026-09-25",
+      "accessedDate": "2026-09-25",
+      "fields": [
+        "indbetalingskladde",
+        "udlign poster",
+        "bogfør"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-customer-payments-fi",
+      "title": "Kohdista myyntitapahtumat manuaalisesti",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/fi-fi/dynamics365/business-central/receivables-how-apply-sales-transactions-manually",
+      "appliesTo": "Current Business Central online documentation; inspected 2026-09-25",
+      "accessedDate": "2026-09-25",
+      "fields": [
+        "Kassapäiväkirjat",
+        "Kohdista tapahtumat",
+        "Kirjaa"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-customer-payments-nb",
+      "title": "Bruk salgstransaksjoner manuelt",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/nb-no/dynamics365/business-central/receivables-how-apply-sales-transactions-manually",
+      "appliesTo": "Current Business Central online documentation; inspected 2026-09-25",
+      "accessedDate": "2026-09-25",
+      "fields": [
+        "innbetalingskladd",
+        "utligne poster",
+        "bokfør"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-payment-journal-fr",
+      "title": "Enregistrer des paiements et des remboursements dans la feuille paiement",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/fr-fr/dynamics365/business-central/payables-how-post-payments-refunds",
+      "appliesTo": "Current Business Central online documentation; inspected 2026-09-25",
+      "accessedDate": "2026-09-25",
+      "fields": [
+        "feuille paiement",
+        "appliquer les paiements",
+        "valider"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-payment-journal-de",
+      "title": "Zahlungen und Erstattungen im Zahlungsausgleich erfassen",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/de-de/dynamics365/business-central/payables-how-post-payments-refunds",
+      "appliesTo": "Current Business Central online documentation; inspected 2026-09-25",
+      "accessedDate": "2026-09-25",
+      "fields": [
+        "Zahlungsausgleich",
+        "Zahlungen ausgleichen",
+        "Buchen"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-payment-journal-es",
+      "title": "Registrar pagos y reembolsos en el diario de pagos",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/es-es/dynamics365/business-central/payables-how-post-payments-refunds",
+      "appliesTo": "Current Business Central online documentation; inspected 2026-09-25",
+      "accessedDate": "2026-09-25",
+      "fields": [
+        "diario de pagos",
+        "liquidar pagos",
+        "registrar"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-payment-journal-da",
+      "title": "Registrere betalinger og tilbagebetalinger i betalingskladden",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/da-dk/dynamics365/business-central/payables-how-post-payments-refunds",
+      "appliesTo": "Current Business Central online documentation; inspected 2026-09-25",
+      "accessedDate": "2026-09-25",
+      "fields": [
+        "betalingskladde",
+        "udlign betalinger",
+        "bogfør"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-payment-journal-fi",
+      "title": "Maksujen ja hyvitysten tallentaminen maksupäiväkirjaan",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/fi-fi/dynamics365/business-central/payables-how-post-payments-refunds",
+      "appliesTo": "Current Business Central online documentation; inspected 2026-09-25",
+      "accessedDate": "2026-09-25",
+      "fields": [
+        "Maksupäiväkirjat",
+        "Ehdota toimittajamaksuja",
+        "Kohdista toimittajatapahtumat",
+        "Kirjaa"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-payment-journal-nb",
+      "title": "Registrere betalinger og refusjoner i betalingskladden",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/nb-no/dynamics365/business-central/payables-how-post-payments-refunds",
+      "appliesTo": "Current Business Central online documentation; inspected 2026-09-25",
+      "accessedDate": "2026-09-25",
+      "fields": [
+        "betalingskladd",
+        "utligne betalinger",
+        "bokfør"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-customer-payments",
+      "title": "Reconcile customer payments with a cash receipt journal or from customer ledger entries",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/en-us/dynamics365/business-central/receivables-how-apply-sales-transactions-manually",
+      "appliesTo": "Current Business Central online documentation; inspected 2026-09-25",
+      "accessedDate": "2026-09-25",
+      "fields": [
+        "cash receipt journals",
+        "apply customer entries",
+        "partial payment",
+        "posting a cash receipt journal"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-customer-payments-sv",
+      "title": "Stämma av kundbetalningar med inbetalningsjournalen eller från kundreskontratransaktioner",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/sv-se/dynamics365/business-central/receivables-how-apply-sales-transactions-manually",
+      "appliesTo": "Current Business Central online documentation; inspected 2026-09-25",
+      "accessedDate": "2026-09-25",
+      "fields": [
+        "Kassakvittojournaler",
+        "Koppla transaktioner",
+        "Koppla till ID",
+        "Bokför"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-payment-journal",
+      "title": "Record payments and refunds in the payment journal",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/en-us/dynamics365/business-central/payables-how-post-payments-refunds",
+      "appliesTo": "Current Business Central online documentation; inspected 2026-09-25",
+      "accessedDate": "2026-09-25",
+      "fields": [
+        "payment journals",
+        "apply payments",
+        "refunds",
+        "post action records payment; transfer is separate"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-payment-journal-sv",
+      "title": "Registrera betalningar och återbetalningar i betalningsjournalen",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/sv-se/dynamics365/business-central/payables-how-post-payments-refunds",
+      "appliesTo": "Current Business Central online documentation; inspected 2026-09-25",
+      "accessedDate": "2026-09-25",
+      "fields": [
+        "Betalningsjournaler",
+        "Koppla leverantörstransaktioner",
+        "Bokför",
+        "banköverföring sker separat"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-vendor-payments",
+      "title": "Suggest vendor payments",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/en-us/dynamics365/business-central/payables-how-suggest-vendor-payments",
+      "appliesTo": "Current Business Central online documentation; inspected 2026-09-25",
+      "accessedDate": "2026-09-25",
+      "fields": [
+        "Payment Journal",
+        "Suggest Vendor Payments",
+        "due dates and payment discounts"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-vendor-payments-sv",
+      "title": "Föreslå leverantörsbetalningar",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/sv-se/dynamics365/business-central/payables-how-suggest-vendor-payments",
+      "appliesTo": "Current Business Central online documentation; inspected 2026-09-25",
+      "accessedDate": "2026-09-25",
+      "fields": [
+        "Betalningsjournaler",
+        "Föreslå leverantörsbetalningar",
+        "förfallodatum"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-payment-reconciliation",
+      "title": "Apply payments automatically and reconciling bank accounts",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/en-us/dynamics365/business-central/receivables-apply-payments-auto-reconcile-bank-accounts",
+      "appliesTo": "Current Business Central online documentation; inspected 2026-09-25",
+      "accessedDate": "2026-09-25",
+      "fields": [
+        "Payment Reconciliation Journal",
+        "review applications",
+        "post journal",
+        "Bank Acc. Reconciliation is a separate workflow"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-payment-reconciliation-sv",
+      "title": "Koppla betalningar automatiskt och stämma av bankkonton",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/sv-se/dynamics365/business-central/receivables-apply-payments-auto-reconcile-bank-accounts",
+      "appliesTo": "Current Business Central online documentation; inspected 2026-09-25",
+      "accessedDate": "2026-09-25",
+      "fields": [
+        "Betalningsavstämningsjournal",
+        "Koppla automatiskt",
+        "manuell granskning",
+        "bokföra journal"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-payment-reconciliation-review",
+      "title": "Review and apply payments manually after automatic application",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/en-us/dynamics365/business-central/receivables-how-review-apply-payments-auto-application",
+      "appliesTo": "Current Business Central online documentation; inspected 2026-09-25",
+      "accessedDate": "2026-09-25",
+      "fields": [
+        "Apply Manually",
+        "Accept Application",
+        "review before posting"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-bc28-255",
+      "title": "Page 255 Cash Receipt Journals",
+      "sourceType": "microsoft-learn-application-reference",
+      "sourceUri": "https://learn.microsoft.com/en-us/dynamics365/business-central/application/base-application/page/microsoft.finance.generalledger.journal.cash-receipt-journal",
+      "appliesTo": "Business Central 2026 release wave 1 (version 28.x)",
+      "accessedDate": "2026-09-25",
+      "fields": [
+        "pageObjectId",
+        "caption",
+        "pageType",
+        "sourceTable",
+        "description"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-bc28-1290",
+      "title": "Page 1290 Payment Reconciliation Journal",
+      "sourceType": "microsoft-learn-application-reference",
+      "sourceUri": "https://learn.microsoft.com/en-us/dynamics365/business-central/application/base-application/page/microsoft.bank.reconciliation.payment-reconciliation-journal",
+      "appliesTo": "Business Central 2026 release wave 1 (version 28.x)",
+      "accessedDate": "2026-09-25",
+      "fields": [
+        "pageObjectId",
+        "caption",
+        "pageType",
+        "sourceTable",
+        "description"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-bc21-actionbar-pages",
+      "title": "Pages with Action Bar Improvements",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/en-us/dynamics365/business-central/dev-itpro/developer/devenv-pages-action-bar-improvements",
+      "appliesTo": "Business Central 2022 release wave 2 (version 21.0)",
+      "publishedDate": "2022-11-09",
+      "accessedDate": "2026-09-25",
+      "fields": [
+        "pageObjectId",
+        "caption",
+        "pageType"
+      ],
+      "notes": "This documents a version-scoped set of pages, not the complete current page catalog."
+    },
+    {
+      "sourceId": "microsoft-learn-bc28-256",
+      "title": "Page 256 Payment Journal",
+      "sourceType": "microsoft-learn-application-reference",
+      "sourceUri": "https://learn.microsoft.com/en-us/dynamics365/business-central/application/base-application/page/microsoft.finance.generalledger.journal.payment-journal",
+      "appliesTo": "Business Central 2026 release wave 1 (version 28.x)",
+      "accessedDate": "2026-09-25",
+      "fields": [
+        "pageObjectId",
+        "caption",
+        "pageType",
+        "sourceTable",
+        "description"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-vendor-payments-fr",
+      "title": "Suggérer des paiements aux fournisseurs",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/fr-fr/dynamics365/business-central/receivables-apply-payments-auto-reconcile-bank-accounts",
+      "appliesTo": "Localized current Business Central online documentation; inspected 2026-09-25",
+      "accessedDate": "2026-09-25",
+      "fields": []
+    },
+    {
+      "sourceId": "microsoft-learn-payment-reconciliation-fr",
+      "title": "Rapprochement des comptes bancaires et lettrage des paiements",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/fr-fr/dynamics365/business-central/receivables-apply-payments-auto-reconcile-bank-accounts",
+      "appliesTo": "Localized current Business Central online documentation; inspected 2026-09-25",
+      "accessedDate": "2026-09-25",
+      "fields": []
+    },
+    {
+      "sourceId": "microsoft-learn-vendor-payments-de",
+      "title": "Lieferantenzahlungen vorschlagen",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/de-de/dynamics365/business-central/receivables-apply-payments-auto-reconcile-bank-accounts",
+      "appliesTo": "Localized current Business Central online documentation; inspected 2026-09-25",
+      "accessedDate": "2026-09-25",
+      "fields": []
+    },
+    {
+      "sourceId": "microsoft-learn-payment-reconciliation-de",
+      "title": "Bankkonten abstimmen und Zahlungen zuweisen",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/de-de/dynamics365/business-central/receivables-apply-payments-auto-reconcile-bank-accounts",
+      "appliesTo": "Localized current Business Central online documentation; inspected 2026-09-25",
+      "accessedDate": "2026-09-25",
+      "fields": []
+    },
+    {
+      "sourceId": "microsoft-learn-vendor-payments-es",
+      "title": "Proponer pagos a proveedores",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/es-es/dynamics365/business-central/receivables-apply-payments-auto-reconcile-bank-accounts",
+      "appliesTo": "Localized current Business Central online documentation; inspected 2026-09-25",
+      "accessedDate": "2026-09-25",
+      "fields": []
+    },
+    {
+      "sourceId": "microsoft-learn-payment-reconciliation-es",
+      "title": "Conciliar cuentas bancarias y aplicar pagos",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/es-es/dynamics365/business-central/receivables-apply-payments-auto-reconcile-bank-accounts",
+      "appliesTo": "Localized current Business Central online documentation; inspected 2026-09-25",
+      "accessedDate": "2026-09-25",
+      "fields": []
+    },
+    {
+      "sourceId": "microsoft-learn-vendor-payments-da",
+      "title": "Foreslå kreditorbetalinger",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/da-dk/dynamics365/business-central/receivables-apply-payments-auto-reconcile-bank-accounts",
+      "appliesTo": "Localized current Business Central online documentation; inspected 2026-09-25",
+      "accessedDate": "2026-09-25",
+      "fields": []
+    },
+    {
+      "sourceId": "microsoft-learn-payment-reconciliation-da",
+      "title": "Afstemme bankkonti og udligne betalinger",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/da-dk/dynamics365/business-central/receivables-apply-payments-auto-reconcile-bank-accounts",
+      "appliesTo": "Localized current Business Central online documentation; inspected 2026-09-25",
+      "accessedDate": "2026-09-25",
+      "fields": []
+    },
+    {
+      "sourceId": "microsoft-learn-payment-reconciliation-fi",
+      "title": "Maksujen kohdistaminen automaattisesti ja pankkitilien täsmäyttäminen",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/fi-fi/dynamics365/business-central/receivables-apply-payments-auto-reconcile-bank-accounts",
+      "appliesTo": "Localized current Business Central online documentation; inspected 2026-09-25",
+      "accessedDate": "2026-09-25",
+      "fields": []
+    },
+    {
+      "sourceId": "microsoft-learn-vendor-payments-nb",
+      "title": "Betalingsforslag – leverandør",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/nb-no/dynamics365/business-central/receivables-apply-payments-auto-reconcile-bank-accounts",
+      "appliesTo": "Localized current Business Central online documentation; inspected 2026-09-25",
+      "accessedDate": "2026-09-25",
+      "fields": []
+    },
+    {
+      "sourceId": "microsoft-learn-payment-reconciliation-nb",
+      "title": "Avstem bankkontoer og utlign betalinger",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/nb-no/dynamics365/business-central/receivables-apply-payments-auto-reconcile-bank-accounts",
+      "appliesTo": "Localized current Business Central online documentation; inspected 2026-09-25",
+      "accessedDate": "2026-09-25",
+      "fields": []
+    }
+  ]
+}

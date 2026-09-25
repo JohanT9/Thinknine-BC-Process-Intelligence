@@ -14,14 +14,13 @@ assert(dashboard.includes('${uiT("Steg")} ${visibleIndex + 1}, ${reviewStateLabe
 assert(dashboard.includes('class="secondary review-hide-action"'),
   "reversible Hide must not look like a permanent destructive error");
 assert(html.includes("border-left:4px solid transparent"));
-assert(html.includes(".review-state-label.needs-review"));
+assert(html.includes(".review-state-label.edited"));
 assert(html.includes(".review-state-label.approved"));
 assert(design.includes("border-left-color: var(--colorStatusSuccess)"));
-assert(design.includes("border-left-color: #c58b00"));
-assert(!design.includes(".review-card.needs-review { border-color: #f7630c"),
-  "review attention must not use an aggressive full orange border");
+assert(design.includes(".review-card.edited"));
+assert(!dashboard.includes('uiT("Behöver granskas")'));
 for (const pair of [["Godkänt", "Approved"],
-  ["Behöver granskas", "Needs review"], ["Ej granskat", "Not reviewed"]]) {
+  ["Ändrad", "Edited"], ["Ej granskat", "Not reviewed"]]) {
   assert(i18n.includes(`["${pair[0]}", "${pair[1]}"]`));
 }
 console.log("Review visual hierarchy UX tests passed.");

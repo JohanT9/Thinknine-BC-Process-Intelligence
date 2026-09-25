@@ -19,7 +19,7 @@ assert(dashboard.includes('event.key !== "/"') &&
 assert(dashboard.includes('event.key.toLowerCase() === "s"') &&
   html.includes('aria-keyshortcuts="Control+S Meta+S"'));
 assert(html.includes('aria-keyshortcuts="/ Escape"'));
-assert(html.includes("Inspelningar och tekniska verktyg") &&
+assert(html.includes('data-i18n="Saved recordings">Saved recordings</summary>') &&
   html.includes('id="sessionTools" class="session-tools"'));
 assert(html.includes(">BC Review Studio</button>") &&
   html.includes(">BC Document Generator</button>"));

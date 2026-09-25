@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Knowledge administration</title>
+  <link rel="stylesheet" href="design-system.css">
+  <style>
+    body{font-family:"Segoe UI",Arial,sans-serif;max-width:900px;margin:32px auto;padding:0 20px;color:#1f2933}
+    .proposal{border:1px solid #d8dee5;border-radius:8px;padding:16px;margin:14px 0;background:#fff}
+    .proposal pre{white-space:pre-wrap;overflow-wrap:anywhere;background:#f3f4f6;padding:12px;border-radius:6px}
+    button{border:0;border-radius:5px;padding:9px 13px;font-weight:600;cursor:pointer;background:#0f6cbd;color:#fff}
+    button:disabled{cursor:default;opacity:.65}
+    [role=status]{display:block;margin:12px 0;min-height:1.5em}
+    .muted{color:#52606d}
+  </style>
+</head>
+<body>
+  <main>
+    <h1 data-i18n="Knowledge administration">Knowledge administration</h1>
+    <p id="accessStatus" role="status" aria-live="polite"></p>
+    <section id="knowledgeAdmin" hidden aria-labelledby="suggestionsHeading">
+      <p class="muted" data-i18n="Knowledge suggestions remain local and never change active rules. Review-ready proposals can be saved as drafts.">Knowledge suggestions remain local and never change active rules. Review-ready proposals can be saved as drafts.</p>
+      <h2 id="suggestionsHeading" data-i18n="Knowledge rule suggestions">Knowledge rule suggestions</h2>
+      <p id="feedbackCounts"></p>
+      <div id="suggestions"></div>
+      <span id="draftStatus" role="status" aria-live="polite"></span>
+      <section aria-labelledby="savedDraftsHeading">
+        <h2 id="savedDraftsHeading" data-i18n="Saved knowledge drafts">Saved knowledge drafts</h2>
+        <p id="draftSummary"></p>
+        <div id="savedDrafts"></div>
+        <button id="downloadDrafts" type="button" data-i18n="Download drafts as JSON" hidden>Download drafts as JSON</button>
+        <span id="draftDownloadStatus" role="status" aria-live="polite"></span>
+      </section>
+    </section>
+  </main>
+  <script src="engine/locale-catalogs.js"></script>
+  <script src="engine/language-registry.js"></script>
+  <script src="i18n.js"></script>
+  <script src="knowledge-admin.js"></script>
+</body>
+</html>

@@ -1,7 +1,7 @@
 {
   "packId": "bc-sales",
   "name": "Business Central Sales",
-  "version": "2.0.0",
+  "version": "2.3.0",
   "priority": 200,
   "pageDefinitions": [
     {
@@ -12,14 +12,238 @@
       "recordType": "SalesOrder",
       "documentType": "sales-order",
       "localizedCaptions": {
-        "en-US": ["Sales Order"],
-        "sv-SE": ["Förs.order", "Försäljningsorder"],
-        "da-DK": ["Salgsordre"]
+        "en-US": [
+          "Sales Order"
+        ],
+        "sv-SE": [
+          "Förs.order",
+          "Försäljningsorder"
+        ],
+        "da-DK": [
+          "Salgsordre"
+        ]
       },
       "captionRules": [
-        { "locale": "sv-SE", "pattern": "^(?:Förs\\.?\\s*order|F\\u00f6rs\\u00e4ljningsorder)$" },
-        { "locale": "en-US", "pattern": "^Sales Order$" },
-        { "locale": "da-DK", "pattern": "^Salgsordre$" }
+        {
+          "locale": "sv-SE",
+          "pattern": "^(?:Förs\\.?\\s*order|F\\u00f6rs\\u00e4ljningsorder)$"
+        },
+        {
+          "locale": "en-US",
+          "pattern": "^Sales Order$"
+        },
+        {
+          "locale": "da-DK",
+          "pattern": "^Salgsordre$"
+        }
+      ],
+      "compatibility": {
+        "minAppVersion": "21.0.0",
+        "maxAppVersion": "21.99.99"
+      },
+      "sourceIds": [
+        "microsoft-learn-bc21-actionbar-pages"
+      ]
+    },
+    {
+      "ruleId": "Sales.SalesReturnOrder",
+      "pageObjectId": "6630",
+      "entity": "SalesReturnOrder",
+      "pageType": "document",
+      "localizedCaptions": {
+        "en-US": [
+          "Sales Return Order"
+        ],
+        "sv-SE": [
+          "Förs.ret.order"
+        ]
+      },
+      "captionRules": [
+        {
+          "locale": "en-US",
+          "pattern": "^Sales Return Order$"
+        },
+        {
+          "locale": "sv-SE",
+          "pattern": "^Förs.ret.order$"
+        }
+      ],
+      "compatibility": {
+        "appVersionRanges": [
+          {
+            "minAppVersion": "21.0.0",
+            "maxAppVersion": "21.99.99"
+          }
+        ]
+      },
+      "sourceIds": [
+        "microsoft-learn-bc21-actionbar-pages",
+        "microsoft-learn-sales-return-orders",
+        "microsoft-learn-sales-return-orders-sv"
+      ]
+    },
+    {
+      "ruleId": "Sales.SalesReturnOrderList",
+      "pageObjectId": "9304",
+      "entity": "SalesReturnOrder",
+      "pageType": "list",
+      "localizedCaptions": {
+        "en-US": [
+          "Sales Return Orders"
+        ],
+        "sv-SE": [
+          "Försäljningsreturorder"
+        ]
+      },
+      "captionRules": [
+        {
+          "locale": "en-US",
+          "pattern": "^Sales Return Orders$"
+        },
+        {
+          "locale": "sv-SE",
+          "pattern": "^Försäljningsreturorder$"
+        }
+      ],
+      "compatibility": {
+        "appVersionRanges": [
+          {
+            "minAppVersion": "28.0.0",
+            "maxAppVersion": "28.99.99"
+          }
+        ]
+      },
+      "sourceIds": [
+        "microsoft-learn-bc28-9304",
+        "microsoft-learn-sales-return-orders",
+        "microsoft-learn-sales-return-orders-sv"
+      ]
+    },
+    {
+      "ruleId": "Sales.PostedSalesInvoices",
+      "pageObjectId": "143",
+      "entity": "PostedSalesInvoice",
+      "pageType": "list",
+      "localizedCaptions": {
+        "en-US": [
+          "Posted Sales Invoices"
+        ],
+        "sv-SE": [
+          "Bokförda försäljningsfakturor"
+        ]
+      },
+      "captionRules": [
+        {
+          "locale": "en-US",
+          "pattern": "^Posted Sales Invoices$"
+        },
+        {
+          "locale": "sv-SE",
+          "pattern": "^Bokförda försäljningsfakturor$"
+        }
+      ],
+      "compatibility": {
+        "appVersionRanges": [
+          {
+            "minAppVersion": "21.0.0",
+            "maxAppVersion": "21.99.99"
+          },
+          {
+            "minAppVersion": "28.0.0",
+            "maxAppVersion": "28.99.99"
+          }
+        ]
+      },
+      "sourceIds": [
+        "microsoft-learn-bc21-actionbar-pages",
+        "microsoft-learn-bc28-143",
+        "microsoft-learn-sales-returns",
+        "microsoft-learn-sales-returns-sv"
+      ]
+    },
+    {
+      "ruleId": "Sales.SalesCreditMemo",
+      "pageObjectId": "44",
+      "entity": "SalesCreditMemo",
+      "pageType": "document",
+      "localizedCaptions": {
+        "en-US": [
+          "Sales Credit Memo"
+        ],
+        "sv-SE": [
+          "Försäljningskreditnota"
+        ]
+      },
+      "captionRules": [
+        {
+          "locale": "en-US",
+          "pattern": "^Sales Credit Memo$"
+        },
+        {
+          "locale": "sv-SE",
+          "pattern": "^Försäljningskreditnota$"
+        }
+      ],
+      "compatibility": {
+        "appVersionRanges": [
+          {
+            "minAppVersion": "21.0.0",
+            "maxAppVersion": "21.99.99"
+          },
+          {
+            "minAppVersion": "28.0.0",
+            "maxAppVersion": "28.99.99"
+          }
+        ]
+      },
+      "sourceIds": [
+        "microsoft-learn-bc21-actionbar-pages",
+        "microsoft-learn-sales-returns",
+        "microsoft-learn-sales-returns-sv",
+        "microsoft-learn-bc28-44"
+      ],
+      "technicalName": "SalesCreditMemo"
+    },
+    {
+      "ruleId": "Sales.SalesCreditMemos",
+      "pageObjectId": "9302",
+      "entity": "SalesCreditMemo",
+      "pageType": "list",
+      "localizedCaptions": {
+        "en-US": [
+          "Sales Credit Memos"
+        ],
+        "sv-SE": [
+          "Försäljningskreditnotor"
+        ]
+      },
+      "captionRules": [
+        {
+          "locale": "en-US",
+          "pattern": "^Sales Credit Memos$"
+        },
+        {
+          "locale": "sv-SE",
+          "pattern": "^Försäljningskreditnotor$"
+        }
+      ],
+      "compatibility": {
+        "appVersionRanges": [
+          {
+            "minAppVersion": "21.0.0",
+            "maxAppVersion": "21.99.99"
+          },
+          {
+            "minAppVersion": "28.0.0",
+            "maxAppVersion": "28.99.99"
+          }
+        ]
+      },
+      "sourceIds": [
+        "microsoft-learn-bc21-actionbar-pages",
+        "microsoft-learn-bc28-9302",
+        "microsoft-learn-sales-returns",
+        "microsoft-learn-sales-returns-sv"
       ]
     }
   ],
@@ -61,12 +285,36 @@
       "match": {
         "pagePatterns": [
           "förs\\.?\\s*order",
-          "sales order"
+          "sales order",
+          "^Förs\\.order$",
+          "^Försäljningsorder$",
+          "^Sales Order$",
+          "^Commande vente$",
+          "^Commandes client$",
+          "^Verkaufsauftrag$",
+          "^Verkaufsaufträge$",
+          "^Pedido de venta$",
+          "^Pedidos de venta$",
+          "^Salgsordre$",
+          "^Salgsordrer$",
+          "^Myyntitilaus$",
+          "^Myyntitilaukset$",
+          "^Ordre$"
         ],
         "actionPatterns": [
           "^Släpp$",
           "^Frisläpp$",
-          "^Release$"
+          "^Release$",
+          "^Lancer$",
+          "^Freigabe$",
+          "^Liberar$",
+          "^Lanzar$",
+          "^Frigiv$",
+          "^Frigivelse$",
+          "^Vapauta$",
+          "^Julkaisu$",
+          "^Frigi$",
+          "^Utgivelse$"
         ],
         "fieldPatterns": [],
         "automationIdPatterns": []
@@ -74,9 +322,25 @@
       "instructionTemplate": "",
       "languages": [
         "sv-SE",
-        "en-US"
+        "en-US",
+        "fr-FR",
+        "de-DE",
+        "es-ES",
+        "da-DK",
+        "fi-FI",
+        "nb-NO"
       ],
-      "aliases": []
+      "aliases": [],
+      "sourceIds": [
+        "microsoft-learn-sales-order-process-sv",
+        "microsoft-learn-sales-order-process",
+        "microsoft-learn-sales-order-process-fr",
+        "microsoft-learn-sales-order-process-de",
+        "microsoft-learn-sales-order-process-es",
+        "microsoft-learn-sales-order-process-da",
+        "microsoft-learn-sales-order-process-fi",
+        "microsoft-learn-sales-order-process-nb"
+      ]
     },
     {
       "ruleId": "Sales.Reopen",
@@ -115,11 +379,39 @@
         "pagePatterns": [
           "förs\\.?\\s*order",
           "sales order",
-          "försäljningsfaktura"
+          "försäljningsfaktura",
+          "^Förs\\.order$",
+          "^Försäljningsorder$",
+          "^Sales Order$",
+          "^Commande vente$",
+          "^Commandes client$",
+          "^Verkaufsauftrag$",
+          "^Verkaufsaufträge$",
+          "^Pedido de venta$",
+          "^Pedidos de venta$",
+          "^Salgsordre$",
+          "^Salgsordrer$",
+          "^Myyntitilaus$",
+          "^Myyntitilaukset$",
+          "^Ordre$"
         ],
         "actionPatterns": [
           "^Bokför$",
-          "^Post$"
+          "^Post$",
+          "^Bokför och skicka$",
+          "^Post and Send$",
+          "^Valider$",
+          "^Valider et envoyer$",
+          "^Buchen$",
+          "^Buchen und Senden$",
+          "^Registrar$",
+          "^Registrar y enviar$",
+          "^Bogfør$",
+          "^Bogfør og send$",
+          "^Kirjaa$",
+          "^Kirjaa ja lähetä$",
+          "^Bokfør$",
+          "^Bokfør og send$"
         ],
         "fieldPatterns": [],
         "automationIdPatterns": []
@@ -127,9 +419,25 @@
       "instructionTemplate": "",
       "languages": [
         "sv-SE",
-        "en-US"
+        "en-US",
+        "fr-FR",
+        "de-DE",
+        "es-ES",
+        "da-DK",
+        "fi-FI",
+        "nb-NO"
       ],
-      "aliases": []
+      "aliases": [],
+      "sourceIds": [
+        "microsoft-learn-sales-order-process-sv",
+        "microsoft-learn-sales-order-process",
+        "microsoft-learn-sales-order-process-fr",
+        "microsoft-learn-sales-order-process-de",
+        "microsoft-learn-sales-order-process-es",
+        "microsoft-learn-sales-order-process-da",
+        "microsoft-learn-sales-order-process-fi",
+        "microsoft-learn-sales-order-process-nb"
+      ]
     },
     {
       "ruleId": "Sales.ChangeShipmentDate",
@@ -167,23 +475,60 @@
       "match": {
         "pagePatterns": [
           "förs\\.?\\s*order",
-          "sales order"
+          "sales order",
+          "^Förs\\.order$",
+          "^Försäljningsorder$",
+          "^Sales Order$",
+          "^Commande vente$",
+          "^Commandes client$",
+          "^Verkaufsauftrag$",
+          "^Verkaufsaufträge$",
+          "^Pedido de venta$",
+          "^Pedidos de venta$",
+          "^Salgsordre$",
+          "^Salgsordrer$",
+          "^Myyntitilaus$",
+          "^Myyntitilaukset$",
+          "^Ordre$"
         ],
         "actionPatterns": [],
         "fieldPatterns": [
           "^Kundnr$",
           "^Kundens namn$",
           "^Customer No\\.?$",
-          "^Customer Name$"
+          "^Customer Name$",
+          "^Kundens namn$",
+          "^Customer Name$",
+          "^Nom client$",
+          "^Kundenname$",
+          "^Nombre del cliente$",
+          "^Kundenavn$",
+          "^Asiakkaan nimi$"
         ],
         "automationIdPatterns": []
       },
       "instructionTemplate": "",
       "languages": [
         "sv-SE",
-        "en-US"
+        "en-US",
+        "fr-FR",
+        "de-DE",
+        "es-ES",
+        "da-DK",
+        "fi-FI",
+        "nb-NO"
       ],
-      "aliases": []
+      "aliases": [],
+      "sourceIds": [
+        "microsoft-learn-sales-order-process-sv",
+        "microsoft-learn-sales-order-process",
+        "microsoft-learn-sales-order-process-fr",
+        "microsoft-learn-sales-order-process-de",
+        "microsoft-learn-sales-order-process-es",
+        "microsoft-learn-sales-order-process-da",
+        "microsoft-learn-sales-order-process-fi",
+        "microsoft-learn-sales-order-process-nb"
+      ]
     },
     {
       "ruleId": "Sales.OpenPostedInvoice",
@@ -195,7 +540,24 @@
       "match": {
         "pagePatterns": [
           "bokförda försäljningsfakturor",
-          "posted sales invoices"
+          "posted sales invoices",
+          "commande de retour vente",
+          "factures vente validées",
+          "avoir vente",
+          "verkaufsrückgabeauftrag",
+          "gebuchte verkaufsrechnungen",
+          "verkaufsgutschrift",
+          "pedido de devolución de ventas",
+          "facturas de venta registradas",
+          "abono de venta",
+          "salgsreturvareordre",
+          "bogførte salgsfakturaer",
+          "salgskreditnota",
+          "myyntipalautustilaus",
+          "kirjatut myyntilaskut",
+          "myyntihyvityslasku",
+          "salgsreturordre",
+          "bokførte salgsfakturaer"
         ],
         "actionPatterns": [
           "open record",
@@ -207,9 +569,1212 @@
       "instructionTemplate": "",
       "languages": [
         "sv-SE",
-        "en-US"
+        "en-US",
+        "fr-FR",
+        "de-DE",
+        "es-ES",
+        "da-DK",
+        "fi-FI",
+        "nb-NO"
       ],
-      "aliases": []
+      "aliases": [],
+      "sourceIds": [
+        "microsoft-learn-sales-returns",
+        "microsoft-learn-sales-returns-sv",
+        "microsoft-learn-sales-returns-fr",
+        "microsoft-learn-sales-returns-de",
+        "microsoft-learn-sales-returns-es",
+        "microsoft-learn-sales-returns-da",
+        "microsoft-learn-sales-returns-fi",
+        "microsoft-learn-sales-returns-nb"
+      ]
+    },
+    {
+      "ruleId": "Sales.SetQtyToShip",
+      "taskType": "SetSalesQtyToShip",
+      "semanticAction": "EnterQuantity",
+      "entity": "SalesOrderLine",
+      "priority": 1300,
+      "confidence": 0.98,
+      "match": {
+        "pagePatterns": [
+          "sales order",
+          "förs\\.?\\s*order",
+          "^Förs\\.order$",
+          "^Försäljningsorder$",
+          "^Sales Order$",
+          "^Commande vente$",
+          "^Commandes client$",
+          "^Verkaufsauftrag$",
+          "^Verkaufsaufträge$",
+          "^Pedido de venta$",
+          "^Pedidos de venta$",
+          "^Salgsordre$",
+          "^Salgsordrer$",
+          "^Myyntitilaus$",
+          "^Myyntitilaukset$",
+          "^Ordre$"
+        ],
+        "actionPatterns": [],
+        "fieldPatterns": [
+          "^Qty\\. to Ship$",
+          "^Quantity to Ship$",
+          "^Ant\\. att utleverera$",
+          "^Ant\\. att utleverera$",
+          "^Qty\\. to Ship$",
+          "^Qté à expédier$",
+          "^Menge für Versand$",
+          "^Cantidad a enviar$",
+          "^Lever antal$",
+          "^Toimitettava määrä$",
+          "^Levere \\(antall\\)$"
+        ],
+        "automationIdPatterns": []
+      },
+      "instructionTemplate": "",
+      "languages": [
+        "sv-SE",
+        "en-US",
+        "fr-FR",
+        "de-DE",
+        "es-ES",
+        "da-DK",
+        "fi-FI",
+        "nb-NO"
+      ],
+      "aliases": [],
+      "sourceIds": [
+        "microsoft-learn-sales-order-process",
+        "microsoft-learn-sales-posting",
+        "microsoft-learn-sales-order-process-sv",
+        "microsoft-learn-sales-order-process-fr",
+        "microsoft-learn-sales-order-process-de",
+        "microsoft-learn-sales-order-process-es",
+        "microsoft-learn-sales-order-process-da",
+        "microsoft-learn-sales-order-process-fi",
+        "microsoft-learn-sales-order-process-nb"
+      ]
+    },
+    {
+      "ruleId": "Sales.SelectSalesLineItem",
+      "taskType": "SelectSalesLineItem",
+      "semanticAction": "SelectItem",
+      "entity": "SalesOrderLine",
+      "priority": 1280,
+      "confidence": 0.97,
+      "match": {
+        "pagePatterns": [
+          "sales order",
+          "förs\\.?\\s*order",
+          "^Förs\\.order$",
+          "^Försäljningsorder$",
+          "^Sales Order$",
+          "^Commande vente$",
+          "^Commandes client$",
+          "^Verkaufsauftrag$",
+          "^Verkaufsaufträge$",
+          "^Pedido de venta$",
+          "^Pedidos de venta$",
+          "^Salgsordre$",
+          "^Salgsordrer$",
+          "^Myyntitilaus$",
+          "^Myyntitilaukset$",
+          "^Ordre$"
+        ],
+        "actionPatterns": [],
+        "fieldPatterns": [
+          "^No\\.?$",
+          "^Item No\\.?$",
+          "^Nr\\.?$",
+          "^Nr\\.$",
+          "^No\\.$",
+          "^N°$",
+          "^N\\.º$",
+          "^Nro\\.$"
+        ],
+        "automationIdPatterns": []
+      },
+      "instructionTemplate": "",
+      "languages": [
+        "sv-SE",
+        "en-US",
+        "fr-FR",
+        "de-DE",
+        "es-ES",
+        "da-DK",
+        "fi-FI",
+        "nb-NO"
+      ],
+      "aliases": [],
+      "sourceIds": [
+        "microsoft-learn-sales-order-process",
+        "microsoft-learn-sales-order-process-sv",
+        "microsoft-learn-sales-order-process-fr",
+        "microsoft-learn-sales-order-process-de",
+        "microsoft-learn-sales-order-process-es",
+        "microsoft-learn-sales-order-process-da",
+        "microsoft-learn-sales-order-process-fi",
+        "microsoft-learn-sales-order-process-nb"
+      ]
+    },
+    {
+      "ruleId": "Sales.SetSalesLineQuantity",
+      "taskType": "SetSalesLineQuantity",
+      "semanticAction": "EnterQuantity",
+      "entity": "SalesOrderLine",
+      "priority": 1280,
+      "confidence": 0.97,
+      "match": {
+        "pagePatterns": [
+          "sales order",
+          "förs\\.?\\s*order",
+          "^Förs\\.order$",
+          "^Försäljningsorder$",
+          "^Sales Order$",
+          "^Commande vente$",
+          "^Commandes client$",
+          "^Verkaufsauftrag$",
+          "^Verkaufsaufträge$",
+          "^Pedido de venta$",
+          "^Pedidos de venta$",
+          "^Salgsordre$",
+          "^Salgsordrer$",
+          "^Myyntitilaus$",
+          "^Myyntitilaukset$",
+          "^Ordre$"
+        ],
+        "actionPatterns": [],
+        "fieldPatterns": [
+          "^Quantity$",
+          "^Kvantitet$",
+          "^Kvantitet$",
+          "^Quantity$",
+          "^Quantité$",
+          "^Menge$",
+          "^Cantidad$",
+          "^Antal$",
+          "^Määrä$",
+          "^Antall$"
+        ],
+        "automationIdPatterns": []
+      },
+      "instructionTemplate": "",
+      "languages": [
+        "sv-SE",
+        "en-US",
+        "fr-FR",
+        "de-DE",
+        "es-ES",
+        "da-DK",
+        "fi-FI",
+        "nb-NO"
+      ],
+      "aliases": [],
+      "sourceIds": [
+        "microsoft-learn-sales-order-process",
+        "microsoft-learn-sales-order-process-sv",
+        "microsoft-learn-sales-order-process-fr",
+        "microsoft-learn-sales-order-process-de",
+        "microsoft-learn-sales-order-process-es",
+        "microsoft-learn-sales-order-process-da",
+        "microsoft-learn-sales-order-process-fi",
+        "microsoft-learn-sales-order-process-nb"
+      ]
+    },
+    {
+      "ruleId": "Sales.OpenSalesReturnOrder",
+      "taskType": "OpenSalesReturnOrder",
+      "semanticAction": "OpenRecord",
+      "entity": "SalesReturnOrder",
+      "priority": 1310,
+      "confidence": 0.97,
+      "match": {
+        "pagePatterns": [
+          "sales return order",
+          "sales return orders",
+          "förs\\.?\\s*ret\\.?\\s*order",
+          "försäljningsreturorder",
+          "commande de retour vente",
+          "retour vente",
+          "verkaufsrückgabeauftrag",
+          "retourauftrag",
+          "pedido de devolución de ventas",
+          "orden de devolución de venta",
+          "salgsreturvareordre",
+          "myyntipalautustilaus",
+          "salgsreturordre",
+          "factures vente validées",
+          "avoir vente",
+          "gebuchte verkaufsrechnungen",
+          "verkaufsgutschrift",
+          "facturas de venta registradas",
+          "abono de venta",
+          "bogførte salgsfakturaer",
+          "salgskreditnota",
+          "kirjatut myyntilaskut",
+          "myyntihyvityslasku",
+          "bokførte salgsfakturaer"
+        ],
+        "actionPatterns": [
+          "^open record$",
+          "^öppna post$"
+        ],
+        "fieldPatterns": [],
+        "automationIdPatterns": []
+      },
+      "instructionTemplate": "",
+      "languages": [
+        "sv-SE",
+        "en-US",
+        "fr-FR",
+        "de-DE",
+        "es-ES",
+        "da-DK",
+        "fi-FI",
+        "nb-NO"
+      ],
+      "aliases": [],
+      "sourceIds": [
+        "microsoft-learn-sales-return-orders",
+        "microsoft-learn-sales-return-orders-sv",
+        "microsoft-learn-sales-returns",
+        "microsoft-learn-sales-returns-sv",
+        "microsoft-learn-sales-returns-fr",
+        "microsoft-learn-sales-returns-de",
+        "microsoft-learn-sales-returns-es",
+        "microsoft-learn-sales-returns-da",
+        "microsoft-learn-sales-returns-fi",
+        "microsoft-learn-sales-returns-nb"
+      ]
+    },
+    {
+      "ruleId": "Sales.GetPostedLinesToReverse",
+      "taskType": "GetPostedSalesLinesToReverse",
+      "semanticAction": "SelectSourceDocumentLines",
+      "entity": "SalesReturnOrder",
+      "priority": 1320,
+      "confidence": 0.97,
+      "match": {
+        "pagePatterns": [
+          "sales return order",
+          "sales return orders",
+          "förs\\.?\\s*ret\\.?\\s*order",
+          "försäljningsreturorder",
+          "commandes de retour des ventes",
+          "verkaufsrücklaufaufträge",
+          "pedidos de devolución de ventas",
+          "salgsreturvareordrer",
+          "myyntipalautustilaus",
+          "ordreretur for salg"
+        ],
+        "actionPatterns": [
+          "^get posted document lines to reverse$",
+          "^hämta bokförda dokumentrader (?:som ska återföras|för reversering)$",
+          "^afficher des lignes document validées à contrepasser$",
+          "^zu stornierende gebuchte belegzeilen abrufen$",
+          "^revertir líneas documentos registrados$",
+          "^hent bogførte bilagslinjer, der skal tilbageføres$",
+          "^hae peruutettavat kirjatut asiakirjarivit$",
+          "^hent bokførte dokumentlinjer som skal tilbakeføres$"
+        ],
+        "fieldPatterns": [],
+        "automationIdPatterns": []
+      },
+      "instructionTemplate": "",
+      "languages": [
+        "sv-SE",
+        "en-US",
+        "fr-FR",
+        "de-DE",
+        "es-ES",
+        "da-DK",
+        "fi-FI",
+        "nb-NO"
+      ],
+      "aliases": [],
+      "sourceIds": [
+        "microsoft-learn-sales-return-orders",
+        "microsoft-learn-sales-return-orders-sv",
+        "microsoft-learn-sales-returns-fr",
+        "microsoft-learn-sales-returns-de",
+        "microsoft-learn-sales-returns-es",
+        "microsoft-learn-sales-returns-da",
+        "microsoft-learn-sales-returns-fi",
+        "microsoft-learn-sales-returns-nb",
+        "microsoft-learn-sales-return-orders-fr",
+        "microsoft-learn-sales-return-orders-de",
+        "microsoft-learn-sales-return-orders-es",
+        "microsoft-learn-sales-return-orders-da",
+        "microsoft-learn-sales-return-orders-fi",
+        "microsoft-learn-sales-return-orders-nb"
+      ]
+    },
+    {
+      "ruleId": "Sales.SetReturnReasonCode",
+      "taskType": "SetSalesReturnReasonCode",
+      "semanticAction": "SetReturnReason",
+      "entity": "SalesReturnLine",
+      "priority": 1320,
+      "confidence": 0.97,
+      "match": {
+        "pagePatterns": [
+          "sales return order",
+          "sales return orders",
+          "förs\\.?\\s*ret\\.?\\s*order",
+          "försäljningsreturorder",
+          "commandes de retour des ventes",
+          "verkaufsrücklaufaufträge",
+          "pedidos de devolución de ventas",
+          "salgsreturvareordrer",
+          "myyntipalautustilaus",
+          "ordreretur for salg"
+        ],
+        "actionPatterns": [],
+        "fieldPatterns": [
+          "^return reason code$",
+          "^returorsakskod$",
+          "^code motif retour$",
+          "^reklamationsgrundcode$",
+          "^cód\\. auditoría dev\\.$",
+          "^returårsagskode$",
+          "^palautuksen syykoodi$",
+          "^returårsakskode$"
+        ],
+        "automationIdPatterns": []
+      },
+      "instructionTemplate": "",
+      "languages": [
+        "sv-SE",
+        "en-US",
+        "fr-FR",
+        "de-DE",
+        "es-ES",
+        "da-DK",
+        "fi-FI",
+        "nb-NO"
+      ],
+      "aliases": [],
+      "sourceIds": [
+        "microsoft-learn-sales-return-orders",
+        "microsoft-learn-sales-return-orders-sv",
+        "microsoft-learn-sales-returns",
+        "microsoft-learn-sales-returns-sv",
+        "microsoft-learn-sales-returns-fr",
+        "microsoft-learn-sales-returns-de",
+        "microsoft-learn-sales-returns-es",
+        "microsoft-learn-sales-returns-da",
+        "microsoft-learn-sales-returns-fi",
+        "microsoft-learn-sales-returns-nb",
+        "microsoft-learn-sales-return-orders-fr",
+        "microsoft-learn-sales-return-orders-de",
+        "microsoft-learn-sales-return-orders-es",
+        "microsoft-learn-sales-return-orders-da",
+        "microsoft-learn-sales-return-orders-fi",
+        "microsoft-learn-sales-return-orders-nb"
+      ]
+    },
+    {
+      "ruleId": "Sales.PostSalesReturnOrder",
+      "taskType": "PostSalesReturnOrder",
+      "semanticAction": "PostDocument",
+      "entity": "SalesReturnOrder",
+      "priority": 1320,
+      "confidence": 0.97,
+      "match": {
+        "pagePatterns": [
+          "sales return order",
+          "sales return orders",
+          "förs\\.?\\s*ret\\.?\\s*order",
+          "försäljningsreturorder",
+          "commandes de retour des ventes",
+          "verkaufsrücklaufaufträge",
+          "pedidos de devolución de ventas",
+          "salgsreturvareordrer",
+          "myyntipalautustilaus",
+          "ordreretur for salg"
+        ],
+        "actionPatterns": [
+          "^post$",
+          "^bokföra$",
+          "^valider$",
+          "^buchen$",
+          "^registrar$",
+          "^bogfør$",
+          "^kirjaa$",
+          "^bokfør$"
+        ],
+        "fieldPatterns": [],
+        "automationIdPatterns": []
+      },
+      "instructionTemplate": "",
+      "languages": [
+        "sv-SE",
+        "en-US",
+        "fr-FR",
+        "de-DE",
+        "es-ES",
+        "da-DK",
+        "fi-FI",
+        "nb-NO"
+      ],
+      "aliases": [],
+      "sourceIds": [
+        "microsoft-learn-sales-return-orders",
+        "microsoft-learn-sales-return-orders-sv",
+        "microsoft-learn-sales-returns",
+        "microsoft-learn-sales-returns-sv",
+        "microsoft-learn-sales-returns-fr",
+        "microsoft-learn-sales-returns-de",
+        "microsoft-learn-sales-returns-es",
+        "microsoft-learn-sales-returns-da",
+        "microsoft-learn-sales-returns-fi",
+        "microsoft-learn-sales-returns-nb",
+        "microsoft-learn-sales-return-orders-fr",
+        "microsoft-learn-sales-return-orders-de",
+        "microsoft-learn-sales-return-orders-es",
+        "microsoft-learn-sales-return-orders-da",
+        "microsoft-learn-sales-return-orders-fi",
+        "microsoft-learn-sales-return-orders-nb"
+      ]
+    },
+    {
+      "ruleId": "Sales.CreateCorrectiveCreditMemo",
+      "taskType": "CreateSalesCorrectiveCreditMemo",
+      "semanticAction": "CreateCreditMemo",
+      "entity": "PostedSalesInvoice",
+      "priority": 1320,
+      "confidence": 0.97,
+      "match": {
+        "pagePatterns": [
+          "posted sales invoices",
+          "bokförda försäljningsfakturor",
+          "factures vente validées",
+          "gebuchte verkaufsrechnungen",
+          "facturas de venta registradas",
+          "bogførte salgsfakturaer",
+          "kirjatut myyntilaskut",
+          "bokførte salgsfakturaer"
+        ],
+        "actionPatterns": [
+          "^create corrective credit memo$",
+          "^skapa korrigerande kreditnota$",
+          "^créer un avoir correctif$",
+          "^korrekturgutschrift erstellen$",
+          "^crear un abono correctivo$",
+          "^opret rettelseskreditnota$",
+          "^luo korjaava hyvityslasku$",
+          "^opprett korrigerende kreditnota$"
+        ],
+        "fieldPatterns": [],
+        "automationIdPatterns": []
+      },
+      "instructionTemplate": "",
+      "languages": [
+        "sv-SE",
+        "en-US",
+        "fr-FR",
+        "de-DE",
+        "es-ES",
+        "da-DK",
+        "fi-FI",
+        "nb-NO"
+      ],
+      "aliases": [],
+      "sourceIds": [
+        "microsoft-learn-sales-returns",
+        "microsoft-learn-sales-returns-sv",
+        "microsoft-learn-sales-returns-fr",
+        "microsoft-learn-sales-returns-de",
+        "microsoft-learn-sales-returns-es",
+        "microsoft-learn-sales-returns-da",
+        "microsoft-learn-sales-returns-fi",
+        "microsoft-learn-sales-returns-nb",
+        "microsoft-learn-sales-return-orders",
+        "microsoft-learn-sales-return-orders-sv",
+        "microsoft-learn-sales-return-orders-fr",
+        "microsoft-learn-sales-return-orders-de",
+        "microsoft-learn-sales-return-orders-es",
+        "microsoft-learn-sales-return-orders-da",
+        "microsoft-learn-sales-return-orders-fi",
+        "microsoft-learn-sales-return-orders-nb"
+      ]
+    },
+    {
+      "ruleId": "Sales.CancelUnpaidPostedInvoice",
+      "taskType": "CancelSalesInvoice",
+      "semanticAction": "CancelInvoice",
+      "entity": "PostedSalesInvoice",
+      "priority": 1320,
+      "confidence": 0.97,
+      "match": {
+        "pagePatterns": [
+          "posted sales invoices",
+          "bokförda försäljningsfakturor",
+          "factures vente validées",
+          "gebuchte verkaufsrechnungen",
+          "facturas de venta registradas",
+          "bogførte salgsfakturaer",
+          "kirjatut myyntilaskut",
+          "bokførte salgsfakturaer"
+        ],
+        "actionPatterns": [
+          "^cancel$",
+          "^avbryt$",
+          "^annuler$",
+          "^stornieren$",
+          "^cancelar$",
+          "^annuller$",
+          "^peruuta$",
+          "^avbryt$"
+        ],
+        "fieldPatterns": [],
+        "automationIdPatterns": []
+      },
+      "instructionTemplate": "",
+      "languages": [
+        "sv-SE",
+        "en-US",
+        "fr-FR",
+        "de-DE",
+        "es-ES",
+        "da-DK",
+        "fi-FI",
+        "nb-NO"
+      ],
+      "aliases": [],
+      "sourceIds": [
+        "microsoft-learn-sales-returns",
+        "microsoft-learn-sales-returns-sv",
+        "microsoft-learn-sales-returns-fr",
+        "microsoft-learn-sales-returns-de",
+        "microsoft-learn-sales-returns-es",
+        "microsoft-learn-sales-returns-da",
+        "microsoft-learn-sales-returns-fi",
+        "microsoft-learn-sales-returns-nb",
+        "microsoft-learn-sales-return-orders",
+        "microsoft-learn-sales-return-orders-sv",
+        "microsoft-learn-sales-return-orders-fr",
+        "microsoft-learn-sales-return-orders-de",
+        "microsoft-learn-sales-return-orders-es",
+        "microsoft-learn-sales-return-orders-da",
+        "microsoft-learn-sales-return-orders-fi",
+        "microsoft-learn-sales-return-orders-nb"
+      ]
+    },
+    {
+      "ruleId": "Sales.CopyToCreditMemo",
+      "taskType": "CopyToSalesCreditMemo",
+      "semanticAction": "CopyDocument",
+      "entity": "SalesCreditMemo",
+      "priority": 1320,
+      "confidence": 0.97,
+      "match": {
+        "pagePatterns": [
+          "sales credit memo",
+          "försäljningskreditnota",
+          "avoir vente",
+          "verkaufsgutschrift",
+          "abono de venta",
+          "salgskreditnota",
+          "myyntihyvityslasku"
+        ],
+        "actionPatterns": [
+          "^copy from document$",
+          "^kopiera dokument$",
+          "^copier à partir du document$",
+          "^aus dokument kopieren$",
+          "^copiar de documento$",
+          "^kopiér fra dokument$",
+          "^kopioi asiakirjasta$",
+          "^kopier fra dokument$"
+        ],
+        "fieldPatterns": [],
+        "automationIdPatterns": []
+      },
+      "instructionTemplate": "",
+      "languages": [
+        "sv-SE",
+        "en-US",
+        "fr-FR",
+        "de-DE",
+        "es-ES",
+        "da-DK",
+        "fi-FI",
+        "nb-NO"
+      ],
+      "aliases": [],
+      "sourceIds": [
+        "microsoft-learn-sales-returns",
+        "microsoft-learn-sales-returns-sv",
+        "microsoft-learn-sales-returns-fr",
+        "microsoft-learn-sales-returns-de",
+        "microsoft-learn-sales-returns-es",
+        "microsoft-learn-sales-returns-da",
+        "microsoft-learn-sales-returns-fi",
+        "microsoft-learn-sales-returns-nb",
+        "microsoft-learn-sales-return-orders",
+        "microsoft-learn-sales-return-orders-sv",
+        "microsoft-learn-sales-return-orders-fr",
+        "microsoft-learn-sales-return-orders-de",
+        "microsoft-learn-sales-return-orders-es",
+        "microsoft-learn-sales-return-orders-da",
+        "microsoft-learn-sales-return-orders-fi",
+        "microsoft-learn-sales-return-orders-nb"
+      ]
+    },
+    {
+      "ruleId": "Sales.ApplyCreditMemoEntries",
+      "taskType": "ApplySalesCreditMemoEntries",
+      "semanticAction": "ApplyEntries",
+      "entity": "SalesCreditMemo",
+      "priority": 1320,
+      "confidence": 0.97,
+      "match": {
+        "pagePatterns": [
+          "sales credit memo",
+          "försäljningskreditnota",
+          "avoir vente",
+          "verkaufsgutschrift",
+          "abono de venta",
+          "salgskreditnota",
+          "myyntihyvityslasku"
+        ],
+        "actionPatterns": [
+          "^apply entries$",
+          "^koppla transaktioner$",
+          "^lettrer écritures$",
+          "^posten ausgleichen$",
+          "^liquidar movimientos$",
+          "^udlign poster$",
+          "^kohdista tapahtumat$",
+          "^utligne poster$"
+        ],
+        "fieldPatterns": [],
+        "automationIdPatterns": []
+      },
+      "instructionTemplate": "",
+      "languages": [
+        "sv-SE",
+        "en-US",
+        "fr-FR",
+        "de-DE",
+        "es-ES",
+        "da-DK",
+        "fi-FI",
+        "nb-NO"
+      ],
+      "aliases": [],
+      "sourceIds": [
+        "microsoft-learn-sales-returns",
+        "microsoft-learn-sales-returns-sv",
+        "microsoft-learn-sales-returns-fr",
+        "microsoft-learn-sales-returns-de",
+        "microsoft-learn-sales-returns-es",
+        "microsoft-learn-sales-returns-da",
+        "microsoft-learn-sales-returns-fi",
+        "microsoft-learn-sales-returns-nb",
+        "microsoft-learn-sales-return-orders",
+        "microsoft-learn-sales-return-orders-sv",
+        "microsoft-learn-sales-return-orders-fr",
+        "microsoft-learn-sales-return-orders-de",
+        "microsoft-learn-sales-return-orders-es",
+        "microsoft-learn-sales-return-orders-da",
+        "microsoft-learn-sales-return-orders-fi",
+        "microsoft-learn-sales-return-orders-nb"
+      ]
+    },
+    {
+      "ruleId": "Sales.PostSalesCreditMemo",
+      "taskType": "PostSalesCreditMemo",
+      "semanticAction": "PostDocument",
+      "entity": "SalesCreditMemo",
+      "priority": 1320,
+      "confidence": 0.97,
+      "match": {
+        "pagePatterns": [
+          "sales credit memo",
+          "försäljningskreditnota",
+          "avoir vente",
+          "verkaufsgutschrift",
+          "abono de venta",
+          "salgskreditnota",
+          "myyntihyvityslasku"
+        ],
+        "actionPatterns": [
+          "^post$",
+          "^bokföra$",
+          "^valider$",
+          "^buchen$",
+          "^registrar$",
+          "^bogfør$",
+          "^kirjaa$",
+          "^bokfør$"
+        ],
+        "fieldPatterns": [],
+        "automationIdPatterns": []
+      },
+      "instructionTemplate": "",
+      "languages": [
+        "sv-SE",
+        "en-US",
+        "fr-FR",
+        "de-DE",
+        "es-ES",
+        "da-DK",
+        "fi-FI",
+        "nb-NO"
+      ],
+      "aliases": [],
+      "sourceIds": [
+        "microsoft-learn-sales-returns",
+        "microsoft-learn-sales-returns-sv",
+        "microsoft-learn-sales-returns-fr",
+        "microsoft-learn-sales-returns-de",
+        "microsoft-learn-sales-returns-es",
+        "microsoft-learn-sales-returns-da",
+        "microsoft-learn-sales-returns-fi",
+        "microsoft-learn-sales-returns-nb",
+        "microsoft-learn-sales-return-orders",
+        "microsoft-learn-sales-return-orders-sv",
+        "microsoft-learn-sales-return-orders-fr",
+        "microsoft-learn-sales-return-orders-de",
+        "microsoft-learn-sales-return-orders-es",
+        "microsoft-learn-sales-return-orders-da",
+        "microsoft-learn-sales-return-orders-fi",
+        "microsoft-learn-sales-return-orders-nb"
+      ]
+    }
+  ],
+  "sources": [
+    {
+      "sourceId": "microsoft-learn-bc21-actionbar-pages",
+      "title": "Pages with Action Bar Improvements",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/en-us/dynamics365/business-central/dev-itpro/developer/devenv-pages-action-bar-improvements",
+      "appliesTo": "Business Central 2022 release wave 2 (version 21.0)",
+      "publishedDate": "2022-11-09",
+      "accessedDate": "2026-09-25",
+      "fields": [
+        "pageObjectId",
+        "caption",
+        "pageType"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-sales-order-process",
+      "title": "Create a sales order and sell products",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/en-us/dynamics365/business-central/sales-how-sell-products",
+      "appliesTo": "Current Business Central online documentation; inspected 2026-09-25",
+      "accessedDate": "2026-09-25",
+      "fields": [
+        "sales order creation",
+        "customer",
+        "item and quantity",
+        "partial shipment and invoicing"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-sales-posting",
+      "title": "Posting sales documents",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/en-us/dynamics365/business-central/ui-post-sales",
+      "appliesTo": "Current Business Central online documentation; inspected 2026-09-25",
+      "accessedDate": "2026-09-25",
+      "fields": [
+        "sales posting actions",
+        "shipment and invoice posting",
+        "partial quantities"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-sales-order-process-sv",
+      "title": "Skapa en kundförsäljningsorder och sälja produkter",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/sv-se/dynamics365/business-central/sales-how-sell-products",
+      "appliesTo": "Current Swedish Business Central online documentation; inspected 2026-09-25",
+      "accessedDate": "2026-09-25",
+      "fields": [
+        "sales order page",
+        "customer and sales lines",
+        "item number",
+        "quantity",
+        "quantity to ship",
+        "partial shipment"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-sales-returns",
+      "title": "Process sales returns and cancellations",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/en-us/dynamics365/business-central/sales-how-process-sales-returns-cancellations",
+      "appliesTo": "Current Business Central online documentation; inspected 2026-09-25",
+      "accessedDate": "2026-09-25",
+      "fields": [
+        "cancel unpaid posted invoices",
+        "corrective sales credit memos",
+        "apply credit memo entries",
+        "copy document"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-sales-returns-sv",
+      "title": "Hantera försäljningsreturer och annulleringar",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/sv-se/dynamics365/business-central/sales-how-process-sales-returns-cancellations",
+      "appliesTo": "Current Business Central online documentation; inspected 2026-09-25",
+      "accessedDate": "2026-09-25",
+      "fields": [
+        "Avbryt",
+        "Skapa korrigerande kreditnota",
+        "Kopiera dokument",
+        "Koppla transaktioner",
+        "Bokföra"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-sales-return-orders",
+      "title": "Process sales returns with return orders",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/en-us/dynamics365/business-central/sales-how-process-sales-returns-orders",
+      "appliesTo": "Current Business Central online documentation; inspected 2026-09-25",
+      "accessedDate": "2026-09-25",
+      "fields": [
+        "get posted document lines to reverse",
+        "return reason code",
+        "post sales return order"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-sales-return-orders-sv",
+      "title": "Hantera försäljningsreturer med returorder",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/sv-se/dynamics365/business-central/sales-how-process-sales-returns-orders",
+      "appliesTo": "Current Business Central online documentation; inspected 2026-09-25",
+      "accessedDate": "2026-09-25",
+      "fields": [
+        "Hämta bokförda dokumentrader som ska återföras",
+        "Returorsakskod",
+        "Bokföra"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-bc28-9304",
+      "title": "Page 9304 Sales Return Order List",
+      "sourceType": "microsoft-learn-application-reference",
+      "sourceUri": "https://learn.microsoft.com/en-us/dynamics365/business-central/application/base-application/page/microsoft.sales.document.sales-return-order-list",
+      "appliesTo": "Business Central 2026 release wave 1 (version 28.x)",
+      "accessedDate": "2026-09-25",
+      "fields": [
+        "pageObjectId",
+        "caption",
+        "pageType",
+        "sourceTable",
+        "description"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-bc28-143",
+      "title": "Page 143 Posted Sales Invoices",
+      "sourceType": "microsoft-learn-application-reference",
+      "sourceUri": "https://learn.microsoft.com/en-us/dynamics365/business-central/application/base-application/page/microsoft.sales.history.posted-sales-invoices",
+      "appliesTo": "Business Central 2026 release wave 1 (version 28.x)",
+      "accessedDate": "2026-09-25",
+      "fields": [
+        "pageObjectId",
+        "caption",
+        "pageType",
+        "sourceTable",
+        "description"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-bc28-9302",
+      "title": "Page 9302 Sales Credit Memos",
+      "sourceType": "microsoft-learn-application-reference",
+      "sourceUri": "https://learn.microsoft.com/en-us/dynamics365/business-central/application/base-application/page/microsoft.sales.document.sales-credit-memos",
+      "appliesTo": "Business Central 2026 release wave 1 (version 28.x)",
+      "accessedDate": "2026-09-25",
+      "fields": [
+        "pageObjectId",
+        "caption",
+        "pageType",
+        "sourceTable",
+        "description"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-bc28-44",
+      "title": "Page 44 Sales Credit Memo",
+      "sourceType": "microsoft-learn-application-reference",
+      "sourceUri": "https://learn.microsoft.com/en-us/dynamics365/business-central/application/base-application/page/microsoft.sales.document.sales-credit-memo",
+      "appliesTo": "Business Central 2026 release wave 1 (version 28.x)",
+      "accessedDate": "2026-09-25",
+      "fields": [
+        "pageObjectId",
+        "caption",
+        "pageType",
+        "sourceTable",
+        "description"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-sales-returns-fr",
+      "title": "Traitement des retours ou annulations de ventes",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/fr-fr/dynamics365/business-central/sales-how-process-sales-returns-cancellations",
+      "appliesTo": "Localized current Business Central online documentation (fr-FR); inspected 2026-09-25",
+      "accessedDate": "2026-09-25",
+      "fields": [
+        "commande de retour vente",
+        "factures vente validées",
+        "avoir vente",
+        "annuler",
+        "créer un avoir correctif",
+        "copier document",
+        "lettrer écritures",
+        "valider",
+        "code motif retour"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-sales-returns-de",
+      "title": "Rückgaben oder Stornierungen von Verkäufen verarbeiten",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/de-de/dynamics365/business-central/sales-how-process-sales-returns-cancellations",
+      "appliesTo": "Localized current Business Central online documentation (de-DE); inspected 2026-09-25",
+      "accessedDate": "2026-09-25",
+      "fields": [
+        "verkaufsrückgabeauftrag",
+        "gebuchte verkaufsrechnungen",
+        "verkaufsgutschrift",
+        "stornieren",
+        "korrekturgutschrift erstellen",
+        "dokument kopieren",
+        "posten ausgleichen",
+        "buchen",
+        "rückgabegrundcode"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-sales-returns-es",
+      "title": "Procesar devoluciones de ventas o cancelaciones",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/es-es/dynamics365/business-central/sales-how-process-sales-returns-cancellations",
+      "appliesTo": "Localized current Business Central online documentation (es-ES); inspected 2026-09-25",
+      "accessedDate": "2026-09-25",
+      "fields": [
+        "pedido de devolución de ventas",
+        "facturas de venta registradas",
+        "abono de venta",
+        "cancelar",
+        "crear abono correctivo",
+        "copiar documento",
+        "liquidar movimientos",
+        "registrar",
+        "código motivo devolución"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-sales-returns-da",
+      "title": "Behandle salgsreturvarer eller annulleringer",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/da-dk/dynamics365/business-central/sales-how-process-sales-returns-cancellations",
+      "appliesTo": "Localized current Business Central online documentation (da-DK); inspected 2026-09-25",
+      "accessedDate": "2026-09-25",
+      "fields": [
+        "salgsreturvareordre",
+        "bogførte salgsfakturaer",
+        "salgskreditnota",
+        "annuller",
+        "opret rettelseskreditnota",
+        "kopiér dokument",
+        "udlign poster",
+        "bogfør",
+        "returårsagskode"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-sales-returns-fi",
+      "title": "Myyntipalautusten tai -peruutusten käsittely",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/fi-fi/dynamics365/business-central/sales-how-process-sales-returns-cancellations",
+      "appliesTo": "Localized current Business Central online documentation (fi-FI); inspected 2026-09-25",
+      "accessedDate": "2026-09-25",
+      "fields": [
+        "myyntipalautustilaus",
+        "kirjatut myyntilaskut",
+        "myyntihyvityslasku",
+        "peruuta",
+        "luo korjaava hyvityslasku",
+        "kopioi asiakirja",
+        "kohdista tapahtumat",
+        "kirjaa",
+        "palautuksen syykoodi"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-sales-returns-nb",
+      "title": "Behandle ordrereturer eller annulleringer",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/nb-no/dynamics365/business-central/sales-how-process-sales-returns-cancellations",
+      "appliesTo": "Localized current Business Central online documentation (nb-NO); inspected 2026-09-25",
+      "accessedDate": "2026-09-25",
+      "fields": [
+        "salgsreturordre",
+        "bokførte salgsfakturaer",
+        "salgskreditnota",
+        "avbryt",
+        "opprett korrigerende kreditnota",
+        "kopier dokument",
+        "utligne poster",
+        "bokfør",
+        "returårsakskode"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-sales-return-orders-fr",
+      "title": "Commandes de retour des ventes",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/fr-fr/dynamics365/business-central/sales-how-process-sales-returns-orders",
+      "appliesTo": "Localized current Business Central return-order documentation (fr-FR); inspected 2026-09-25",
+      "accessedDate": "2026-09-25",
+      "fields": [
+        "Commandes de retour des ventes",
+        "Afficher des lignes document validées à contrepasser",
+        "Code motif retour"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-sales-return-orders-de",
+      "title": "Verkaufsrücklaufaufträge",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/de-de/dynamics365/business-central/sales-how-process-sales-returns-orders",
+      "appliesTo": "Localized current Business Central return-order documentation (de-DE); inspected 2026-09-25",
+      "accessedDate": "2026-09-25",
+      "fields": [
+        "Verkaufsrücklaufaufträge",
+        "Zu stornierende gebuchte Belegzeilen abrufen",
+        "Reklamationsgrundcode"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-sales-return-orders-es",
+      "title": "Pedidos de devolución de ventas",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/es-es/dynamics365/business-central/sales-how-process-sales-returns-orders",
+      "appliesTo": "Localized current Business Central return-order documentation (es-ES); inspected 2026-09-25",
+      "accessedDate": "2026-09-25",
+      "fields": [
+        "Pedidos de devolución de ventas",
+        "Revertir líneas documentos registrados",
+        "Cód. auditoría dev."
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-sales-return-orders-da",
+      "title": "Salgsreturvareordrer",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/da-dk/dynamics365/business-central/sales-how-process-sales-returns-orders",
+      "appliesTo": "Localized current Business Central return-order documentation (da-DK); inspected 2026-09-25",
+      "accessedDate": "2026-09-25",
+      "fields": [
+        "Salgsreturvareordrer",
+        "Hent bogførte bilagslinjer, der skal tilbageføres",
+        "Returårsagskode"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-sales-return-orders-fi",
+      "title": "Myyntipalautustilaus",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/fi-fi/dynamics365/business-central/sales-how-process-sales-returns-orders",
+      "appliesTo": "Localized current Business Central return-order documentation (fi-FI); inspected 2026-09-25",
+      "accessedDate": "2026-09-25",
+      "fields": [
+        "Myyntipalautustilaus",
+        "Hae peruutettavat kirjatut asiakirjarivit",
+        "Palautuksen syykoodi"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-sales-return-orders-nb",
+      "title": "Ordreretur for salg",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/nb-no/dynamics365/business-central/sales-how-process-sales-returns-orders",
+      "appliesTo": "Localized current Business Central return-order documentation (nb-NO); inspected 2026-09-25",
+      "accessedDate": "2026-09-25",
+      "fields": [
+        "Ordreretur for salg",
+        "Hent bokførte dokumentlinjer som skal tilbakeføres",
+        "Returårsakskode"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-sales-order-process-fr",
+      "title": "Créer une commande de vente client et vendre des produits",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/fr-fr/dynamics365/business-central/sales-how-sell-products",
+      "appliesTo": "Current fr-FR localized Business Central online documentation; inspected 2026-09-25",
+      "accessedDate": "2026-09-25",
+      "fields": [
+        "sales-order page, line quantity, quantity to ship, and posting terms"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-sales-order-process-de",
+      "title": "Einen Kundenauftrag erstellen und Produkte verkaufen",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/de-de/dynamics365/business-central/sales-how-sell-products",
+      "appliesTo": "Current de-DE localized Business Central online documentation; inspected 2026-09-25",
+      "accessedDate": "2026-09-25",
+      "fields": [
+        "sales-order page, line quantity, quantity to ship, and posting terms"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-sales-order-process-es",
+      "title": "Realizar un pedido de venta de cliente y vender productos",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/es-es/dynamics365/business-central/sales-how-sell-products",
+      "appliesTo": "Current es-ES localized Business Central online documentation; inspected 2026-09-25",
+      "accessedDate": "2026-09-25",
+      "fields": [
+        "sales-order page, line quantity, quantity to ship, and posting terms"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-sales-order-process-da",
+      "title": "Oprette en kundesalgsordre og sælge produkter",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/da-dk/dynamics365/business-central/sales-how-sell-products",
+      "appliesTo": "Current da-DK localized Business Central online documentation; inspected 2026-09-25",
+      "accessedDate": "2026-09-25",
+      "fields": [
+        "sales-order page, line quantity, quantity to ship, and posting terms"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-sales-order-process-fi",
+      "title": "Asiakkaan myyntitilauksen luominen ja tuotteiden myyminen",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/fi-fi/dynamics365/business-central/sales-how-sell-products",
+      "appliesTo": "Current fi-FI localized Business Central online documentation; inspected 2026-09-25",
+      "accessedDate": "2026-09-25",
+      "fields": [
+        "sales-order page, line quantity, quantity to ship, and posting terms"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-sales-order-process-nb",
+      "title": "Opprett en kundeordre og selg produkter",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/nb-no/dynamics365/business-central/sales-how-sell-products",
+      "appliesTo": "Current nb-NO localized Business Central online documentation; inspected 2026-09-25",
+      "accessedDate": "2026-09-25",
+      "fields": [
+        "sales-order page, line quantity, quantity to ship, and posting terms"
+      ]
     }
   ]
 }

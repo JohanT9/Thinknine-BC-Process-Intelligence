@@ -64,6 +64,90 @@
   const recordingIndicator = { host: null, shadow: null, minimized: false,
     refreshTimer: null };
 
+  // Visual feedback is separate from recorded evidence and never handles input.
+  let showClickHighlights = true;
+  let captureUiHidden = false;
+  const captureUiTokens = new Set();
+  let clickHighlightHost = null;
+  let clickHighlightTimer = null;
+  let clickHighlightFrame = null;
+
+  function clearClickHighlight() {
+    clearTimeout(clickHighlightTimer);
+    if (clickHighlightFrame !== null) cancelAnimationFrame(clickHighlightFrame);
+    clickHighlightFrame = null;
+    clickHighlightTimer = null;
+    clickHighlightHost?.remove();
+    clickHighlightHost = null;
+  }
+
+  function showClickHighlight(target, event) {
+    clearClickHighlight();
+    if (!recording || !sessionId || !showClickHighlights) return;
+    const rect = target?.getBoundingClientRect?.();
+    const bounded = rect && rect.width > 0 && rect.height > 0 &&
+      rect.width < innerWidth * 0.9 && rect.height < innerHeight * 0.6;
+    if (!bounded && !(event.detail > 0 && Number.isFinite(event.clientX) &&
+        Number.isFinite(event.clientY))) return;
+    const left = bounded ? Math.max(0, rect.left - 3) : event.clientX - 14;
+    const top = bounded ? Math.max(0, rect.top - 3) : event.clientY - 14;
+    const width = bounded ? Math.min(innerWidth, rect.right + 3) - left : 28;
+    const height = bounded ? Math.min(innerHeight, rect.bottom + 3) - top : 28;
+    if (width <= 0 || height <= 0) return;
+    const host = document.createElement("div");
+    host.id = "t9-click-highlight-host";
+    host.setAttribute("aria-hidden", "true");
+    for (const [name, value] of Object.entries({ all: "initial", position: "fixed",
+      left: `${left}px`, top: `${top}px`, width: `${width}px`, height: `${height}px`,
+      "z-index": "2147483647", "pointer-events": "none", display: captureUiHidden ? "none" : "block" })) {
+      host.style.setProperty(name, value, "important");
+    }
+    const shadow = host.attachShadow({ mode: "closed" });
+    shadow.innerHTML = `<style>
+      div{box-sizing:border-box;width:100%;height:100%;border:2px solid #00858a;
+        border-radius:${bounded ? "5px" : "50%"};box-shadow:0 0 0 1px #fff;
+        pointer-events:none;animation:fade 1s ease-out forwards}
+      @keyframes fade{0%,70%{opacity:1}100%{opacity:0}}
+      @media(prefers-reduced-motion:reduce){div{animation:none}}
+    </style><div></div>`;
+    // Native modal dialogs live above the document's normal stacking context.
+    (target?.closest?.("dialog[open]") || document.documentElement).appendChild(host);
+    clickHighlightHost = host;
+    clickHighlightTimer = setTimeout(clearClickHighlight, 1000);
+    const initialUrl = location.href;
+    const updatePosition = () => {
+      if (clickHighlightHost !== host) return;
+      if (location.href !== initialUrl || document.hidden ||
+          (target && !target.isConnected)) { clearClickHighlight(); return; }
+      if (bounded) {
+        const current = target.getBoundingClientRect();
+        const style = getComputedStyle(target);
+        const x = Math.max(0, current.left - 3);
+        const y = Math.max(0, current.top - 3);
+        const w = Math.min(innerWidth, current.right + 3) - x;
+        const h = Math.min(innerHeight, current.bottom + 3) - y;
+        if (!target.getClientRects().length || style.visibility === "hidden" ||
+            style.visibility === "collapse" || Number(style.opacity) === 0 ||
+            current.width <= 0 || current.height <= 0 || w <= 0 || h <= 0) {
+          clearClickHighlight(); return;
+        }
+        for (const [name, value] of Object.entries({left:x,top:y,width:w,height:h})) {
+          const pixels = value + "px";
+          if (host.style.getPropertyValue(name) !== pixels) host.style.setProperty(name,pixels,"important");
+        }
+      }
+      clickHighlightFrame = requestAnimationFrame(updatePosition);
+    };
+    clickHighlightFrame = requestAnimationFrame(updatePosition);
+  }
+
+  window.addEventListener("scroll", clearClickHighlight, true);
+  window.addEventListener("resize", clearClickHighlight);
+  window.addEventListener("pagehide", clearClickHighlight);
+  window.addEventListener("popstate", clearClickHighlight);
+  window.addEventListener("hashchange", clearClickHighlight);
+
+
   function isTopDocument() {
     try { return window === window.top; } catch { return false; }
   }
@@ -251,11 +335,14 @@
   }
 
   function syncRecordingIndicator() {
+    if (!recording) clearClickHighlight();
     if (recording) showRecordingIndicator();
     else removeRecordingIndicator();
   }
 
   chrome.storage.local.get("t9_settings").then(data => {
+    showClickHighlights = data.t9_settings?.showClickHighlights !== false;
+    if (!showClickHighlights) clearClickHighlight();
     uiLocale = String(data.t9_settings?.uiLocale || "sv-SE");
     if (recordingIndicator.host) { removeRecordingIndicator(); syncRecordingIndicator(); }
   }).catch(() => {});
@@ -339,15 +426,28 @@
     }
 
     if (message.type === "T9_SET_INDICATOR_CAPTURE_VISIBILITY") {
+      const captureToken = message.captureId || "legacy";
+      if (message.hidden) captureUiTokens.add(captureToken);
+      else captureUiTokens.delete(captureToken);
+      captureUiHidden = captureUiTokens.size > 0;
+      if (clickHighlightHost) clickHighlightHost.style.setProperty("display", captureUiHidden ? "none" : "block", "important");
       if (recordingIndicator.host) {
-        recordingIndicator.host.style.display = message.hidden ? "none" : "";
+        recordingIndicator.host.style.display = captureUiHidden ? "none" : "";
       }
       if (!message.hidden) {
         sendResponse({ ok: true });
         return false;
       }
-      requestAnimationFrame(() => requestAnimationFrame(() =>
-        sendResponse({ ok: true })));
+      // Hidden iframes may suspend animation frames; never stall capture.
+      let acknowledged = false;
+      const acknowledge = () => {
+        if (acknowledged) return;
+        acknowledged = true;
+        clearTimeout(fallback);
+        sendResponse({ ok: true });
+      };
+      const fallback = setTimeout(acknowledge, 100);
+      requestAnimationFrame(() => requestAnimationFrame(acknowledge));
       return true;
     }
 
@@ -360,6 +460,8 @@
   chrome.storage.onChanged.addListener((changes, areaName) => {
     if (areaName !== "local") return;
     if (changes.t9_settings?.newValue) {
+      showClickHighlights = changes.t9_settings.newValue.showClickHighlights !== false;
+      if (!showClickHighlights) clearClickHighlight();
       uiLocale = String(changes.t9_settings.newValue.uiLocale || "sv-SE");
       if (recordingIndicator.host) { removeRecordingIndicator(); syncRecordingIndicator(); }
     }
@@ -687,6 +789,38 @@
     return "interaction";
   }
 
+  // Read only the discriminator on the current row, never neighbouring rows.
+  function rowTypeContext(element) {
+    const row = element?.closest?.('[role="row"],tr');
+    const grid = row?.closest?.('[role="grid"],[role="treegrid"],table');
+    if (!row || !grid) return undefined;
+    const isType = caption => /^(?:type|typ|tipo|tyyppi)$/iu.test(String(caption || '').trim());
+    const captionOf = node => {
+      const ids = (node.getAttribute('aria-labelledby') || node.getAttribute('headers') || '').split(/\s+/).filter(Boolean);
+      return ids.map(id => document.getElementById(id)?.textContent || '').join(' ').trim() ||
+        node.getAttribute('data-caption') || node.getAttribute('aria-label') || '';
+    };
+    const found = [];
+    for (const cell of row.querySelectorAll('[role="gridcell"],td')) {
+      if (cell.closest('[role="row"],tr') !== row) continue;
+      const input = cell.querySelector('input:not([type="password"]),select,[role="combobox"],[role="textbox"]');
+      if (cell.querySelector('input[type="password"],[data-private],[data-sensitive]')) continue;
+      let caption = captionOf(input || cell) || captionOf(cell);
+      if (!isType(caption)) {
+        const index = cell.getAttribute('aria-colindex');
+        const headers = [...grid.querySelectorAll('[role="columnheader"],th')]
+          .filter(header => header.closest('[role="grid"],[role="treegrid"],table') === grid &&
+            (index ? header.getAttribute('aria-colindex') === index : Number.isInteger(cell.cellIndex) && header.cellIndex === cell.cellIndex));
+        if (headers.length === 1) caption = headers[0].textContent.trim();
+      }
+      if (!isType(caption)) continue;
+      const value = String(input?.selectedOptions?.[0]?.textContent ?? input?.value ?? input?.textContent ?? cell.textContent ?? '').trim();
+      if (value && value.length <= 80) found.push({caption, value});
+    }
+    return found.length === 1 ? {schemaVersion:1, source:'same-row-type',
+      rowId:row.id || row.getAttribute('aria-rowindex') || '', ...found[0]} : undefined;
+  }
+
   function descriptor(element) {
     const bounds = element?.getBoundingClientRect?.();
     const labelledBy = element?.getAttribute?.("aria-labelledby") || "";
@@ -773,6 +907,7 @@
       controlAddIn: uiHierarchy.some(item => item.type === "controlAddIn") || /Mui[A-Z]/.test(String(element?.className || "")),
       captureSurface,
       uiHierarchy,
+      rowTypeContext: rowTypeContext(element),
       localBounds: bounds ? { x: bounds.x, y: bounds.y,
         width: bounds.width, height: bounds.height } : undefined,
       devicePixelRatio: window.devicePixelRatio || 1,
@@ -924,6 +1059,7 @@
       role: eventElement(event)?.getAttribute?.("role") || "",
       accepted: Boolean(target),
       rejectionReason: target ? "" : "no-interactive-target" });
+    showClickHighlight(target, event);
     if (!target) return;
     const category = categoryOf(target);
     const role = target.getAttribute?.("role") || "";

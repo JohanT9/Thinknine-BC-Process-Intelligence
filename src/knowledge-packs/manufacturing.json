@@ -1,7 +1,7 @@
 {
   "packId": "bc-manufacturing",
   "name": "Business Central Manufacturing",
-  "version": "2.0.0",
+  "version": "2.1.0",
   "priority": 200,
   "rules": [
     {
@@ -144,6 +144,274 @@
         "en-US"
       ],
       "aliases": []
+    },
+    {
+      "ruleId": "Manufacturing.PostProductionJournal",
+      "taskType": "PostProductionJournal",
+      "semanticAction": "PostDocument",
+      "entity": "ProductionJournal",
+      "priority": 1250,
+      "confidence": 0.98,
+      "match": {
+        "pagePatterns": [
+          "^Production Journal$",
+          "^Produktionsjournal$",
+          "^Journal de production$",
+          "^Produktions-Buch\\.-Blatt$",
+          "^Diario de producción$",
+          "^Produktionskladde$",
+          "^Tuotantopäiväkirja$",
+          "^Produksjonsjournal$"
+        ],
+        "actionPatterns": [
+          "^Post$",
+          "^Bokför$",
+          "^Bokföra$",
+          "^Publier$",
+          "^Buchen$",
+          "^Publicar$",
+          "^Bogfør$",
+          "^Kirjaa$",
+          "^Bokfør$"
+        ],
+        "fieldPatterns": [],
+        "automationIdPatterns": []
+      },
+      "instructionTemplate": "",
+      "languages": [
+        "sv-SE",
+        "en-US",
+        "fr-FR",
+        "de-DE",
+        "es-ES",
+        "da-DK",
+        "fi-FI",
+        "nb-NO"
+      ],
+      "aliases": [],
+      "sourceIds": [
+        "microsoft-learn-production-journal",
+        "microsoft-learn-production-orders",
+        "microsoft-learn-production-orders-sv",
+        "microsoft-learn-production-journal-sv",
+        "microsoft-learn-production-journal-fr",
+        "microsoft-learn-production-journal-de",
+        "microsoft-learn-production-journal-es",
+        "microsoft-learn-production-journal-da",
+        "microsoft-learn-production-journal-fi",
+        "microsoft-learn-production-journal-nb"
+      ]
+    },
+    {
+      "ruleId": "Manufacturing.EnterConsumptionQuantity",
+      "taskType": "EnterProductionConsumption",
+      "semanticAction": "EnterQuantity",
+      "entity": "ProductionConsumption",
+      "priority": 1280,
+      "confidence": 0.97,
+      "match": {
+        "pagePatterns": [
+          "^Production Journal$",
+          "^Produktionsjournal$",
+          "^Journal de production$",
+          "^Produktions-Buch\\.-Blatt$",
+          "^Diario de producción$",
+          "^Produktionskladde$",
+          "^Tuotantopäiväkirja$",
+          "^Produksjonsjournal$"
+        ],
+        "actionPatterns": [],
+        "fieldPatterns": [
+          "^Consumption Quantity$",
+          "^Förbrukningskvantitet$"
+        ],
+        "automationIdPatterns": []
+      },
+      "instructionTemplate": "",
+      "languages": [
+        "sv-SE",
+        "en-US"
+      ],
+      "aliases": [],
+      "sourceIds": [
+        "microsoft-learn-production-journal",
+        "microsoft-learn-production-orders",
+        "microsoft-learn-production-orders-sv",
+        "microsoft-learn-production-journal-sv",
+        "microsoft-learn-production-journal-fr",
+        "microsoft-learn-production-journal-de",
+        "microsoft-learn-production-journal-es",
+        "microsoft-learn-production-journal-da",
+        "microsoft-learn-production-journal-fi",
+        "microsoft-learn-production-journal-nb"
+      ]
+    },
+    {
+      "ruleId": "Manufacturing.EnterOutputQuantity",
+      "taskType": "EnterProductionOutput",
+      "semanticAction": "EnterQuantity",
+      "entity": "ProductionOutput",
+      "priority": 1280,
+      "confidence": 0.97,
+      "match": {
+        "pagePatterns": [
+          "^Production Journal$",
+          "^Produktionsjournal$",
+          "^Journal de production$",
+          "^Produktions-Buch\\.-Blatt$",
+          "^Diario de producción$",
+          "^Produktionskladde$",
+          "^Tuotantopäiväkirja$",
+          "^Produksjonsjournal$"
+        ],
+        "actionPatterns": [],
+        "fieldPatterns": [
+          "^Output Quantity$",
+          "^Utflöde antal$",
+          "^Utflödeskvantitet$",
+          "^Quantité produite$",
+          "^Ausgabemenge$",
+          "^Cantidad salida$",
+          "^Output Mængde$",
+          "^Tuotoksen määrä$",
+          "^Avgangsantall$"
+        ],
+        "automationIdPatterns": []
+      },
+      "instructionTemplate": "",
+      "languages": [
+        "sv-SE",
+        "en-US",
+        "fr-FR",
+        "de-DE",
+        "es-ES",
+        "da-DK",
+        "fi-FI",
+        "nb-NO"
+      ],
+      "aliases": [],
+      "sourceIds": [
+        "microsoft-learn-production-journal",
+        "microsoft-learn-production-orders",
+        "microsoft-learn-production-orders-sv",
+        "microsoft-learn-production-journal-sv",
+        "microsoft-learn-production-journal-fr",
+        "microsoft-learn-production-journal-de",
+        "microsoft-learn-production-journal-es",
+        "microsoft-learn-production-journal-da",
+        "microsoft-learn-production-journal-fi",
+        "microsoft-learn-production-journal-nb"
+      ]
+    }
+  ],
+  "sources": [
+    {
+      "sourceId": "microsoft-learn-production-orders",
+      "title": "About production orders",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/en-us/dynamics365/business-central/production-about-production-orders",
+      "appliesTo": "Current Business Central online documentation; inspected 2026-09-25",
+      "accessedDate": "2026-09-25",
+      "fields": [
+        "production order statuses",
+        "release",
+        "consumption and output methods",
+        "production journal"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-production-journal",
+      "title": "Register consumption and output for a released production order",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/en-us/dynamics365/business-central/production-how-to-register-consumption-and-output",
+      "appliesTo": "Current Business Central online documentation; inspected 2026-09-25",
+      "accessedDate": "2026-09-25",
+      "fields": [
+        "production journal entry",
+        "consumption and output quantities",
+        "post journal"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-production-orders-sv",
+      "title": "Om produktionsorder",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/sv-se/dynamics365/business-central/production-about-production-orders",
+      "appliesTo": "Current Swedish Business Central online documentation; inspected 2026-09-25",
+      "accessedDate": "2026-09-25",
+      "fields": [
+        "production order lifecycle",
+        "statuses",
+        "production journal",
+        "consumption and output"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-production-journal-sv",
+      "title": "Registrera förbrukning och utflöde för en utsläppt produktionsorderrad",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/sv-se/dynamics365/business-central/production-how-to-register-consumption-and-output",
+      "appliesTo": "Current Swedish Business Central online documentation; inspected 2026-09-25",
+      "accessedDate": "2026-09-25",
+      "fields": [
+        "production journal",
+        "consumption and output quantities",
+        "post journal"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-production-journal-fr",
+      "title": "Enregistrer la consommation et la production pour un ordre de fabrication lancé",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/fr-fr/dynamics365/business-central/production-how-to-register-consumption-and-output",
+      "appliesTo": "Current French Business Central online documentation; inspected 2026-09-25",
+      "accessedDate": "2026-09-25",
+      "fields": ["Journal de production", "Quantité produite", "Publier"]
+    },
+    {
+      "sourceId": "microsoft-learn-production-journal-de",
+      "title": "Verbrauch und Output für einen freigegebenen Fertigungsauftrag registrieren",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/de-de/dynamics365/business-central/production-how-to-register-consumption-and-output",
+      "appliesTo": "Current German Business Central online documentation; inspected 2026-09-25",
+      "accessedDate": "2026-09-25",
+      "fields": ["Produktions-Buch.-Blatt", "Ausgabemenge", "Buchen"]
+    },
+    {
+      "sourceId": "microsoft-learn-production-journal-es",
+      "title": "Registrar el consumo y la producción de una orden de producción liberada",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/es-es/dynamics365/business-central/production-how-to-register-consumption-and-output",
+      "appliesTo": "Current Spanish Business Central online documentation; inspected 2026-09-25",
+      "accessedDate": "2026-09-25",
+      "fields": ["Diario de producción", "Cantidad salida", "Publicar"]
+    },
+    {
+      "sourceId": "microsoft-learn-production-journal-da",
+      "title": "Registrer forbrug og output for en frigivet produktionsordre",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/da-dk/dynamics365/business-central/production-how-to-register-consumption-and-output",
+      "appliesTo": "Current Danish Business Central online documentation; inspected 2026-09-25",
+      "accessedDate": "2026-09-25",
+      "fields": ["Produktionskladde", "Output Mængde", "Bogfør"]
+    },
+    {
+      "sourceId": "microsoft-learn-production-journal-fi",
+      "title": "Vapautetun tuotantotilauksen kulutuksen ja tuotoksen rekisteröiminen",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/fi-fi/dynamics365/business-central/production-how-to-register-consumption-and-output",
+      "appliesTo": "Current Finnish Business Central online documentation; inspected 2026-09-25",
+      "accessedDate": "2026-09-25",
+      "fields": ["Tuotantopäiväkirja", "Tuotoksen määrä", "Kirjaa"]
+    },
+    {
+      "sourceId": "microsoft-learn-production-journal-nb",
+      "title": "Registrer forbruk og avgang for en frigitt produksjonsordrelinje",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/nb-no/dynamics365/business-central/production-how-to-register-consumption-and-output",
+      "appliesTo": "Current Norwegian Bokmål Business Central online documentation; inspected 2026-09-25",
+      "accessedDate": "2026-09-25",
+      "fields": ["Produksjonsjournal", "Avgangsantall", "Bokfør"]
     }
   ]
 }

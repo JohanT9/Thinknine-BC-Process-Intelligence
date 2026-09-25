@@ -1,0 +1,27 @@
+{
+  "schemaVersion": 1,
+  "processId": "process-1",
+  "revisionId": "process-revision-1",
+  "recordingRef": { "recordingId": "recording-1", "revisionId": "recording-revision-1" },
+  "derivation": { "normalizerVersion": "1", "adapterVersion": "1", "knowledgeReleaseId": null, "inputDigest": "fixture-digest" },
+  "context": { "sourceLanguage": null, "bcVersion": null, "installedApps": null },
+  "steps": [{
+    "stepId": "step-1",
+    "sequence": 1,
+    "origin": "observed",
+    "kind": "field-change",
+    "sourceRefs": { "eventIds": ["event-1"], "normalizedEventIds": [], "stepGroupIds": [], "semanticActionIds": [], "assetIds": ["asset-1"] },
+    "target": { "objectRef": null, "controlRef": null, "capturedCaption": null },
+    "observation": {
+      "operation": "field-change",
+      "valueRef": { "eventId": "event-1", "pointer": "/raw/value" },
+      "previousValueRef": { "eventId": "event-1", "pointer": "/raw/previousValue" },
+      "result": { "status": "unknown", "evidenceEventIds": [], "messageRef": null }
+    },
+    "interpretation": { "status": "unresolved", "selectedCandidateId": null, "candidates": [] },
+    "extensions": {}
+  }],
+  "relations": [],
+  "diagnostics": [],
+  "extensions": {}
+}

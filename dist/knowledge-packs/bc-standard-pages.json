@@ -1,0 +1,4633 @@
+{
+  "packId": "bc-standard-pages",
+  "name": "Business Central standard pages (BC 21 snapshot)",
+  "version": "1.0.0",
+  "priority": 110,
+  "sources": [
+    {
+      "sourceId": "microsoft-learn-bc21-actionbar-pages",
+      "title": "Pages with Action Bar Improvements",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/en-us/dynamics365/business-central/dev-itpro/developer/devenv-pages-action-bar-improvements",
+      "appliesTo": "Business Central 2022 release wave 2 (version 21.0)",
+      "publishedDate": "2022-11-09",
+      "accessedDate": "2026-09-25",
+      "fields": [
+        "pageObjectId",
+        "caption",
+        "pageType"
+      ],
+      "notes": "This documents a version-scoped set of pages, not the complete current page catalog."
+    }
+  ],
+  "pageDefinitions": [
+    {
+      "ruleId": "MicrosoftBC21.Page4",
+      "pageObjectId": "4",
+      "entity": "",
+      "pageType": "list",
+      "localizedCaptions": {
+        "en-US": [
+          "Payment Terms"
+        ]
+      },
+      "captionRules": [
+        {
+          "locale": "en-US",
+          "pattern": "^Payment Terms$"
+        }
+      ],
+      "objectVerification": "declared",
+      "compatibility": {
+        "minAppVersion": "21.0.0",
+        "maxAppVersion": "21.99.99"
+      },
+      "sourceIds": [
+        "microsoft-learn-bc21-actionbar-pages"
+      ]
+    },
+    {
+      "ruleId": "MicrosoftBC21.Page5",
+      "pageObjectId": "5",
+      "entity": "",
+      "pageType": "list",
+      "localizedCaptions": {
+        "en-US": [
+          "Currencies"
+        ]
+      },
+      "captionRules": [
+        {
+          "locale": "en-US",
+          "pattern": "^Currencies$"
+        }
+      ],
+      "objectVerification": "declared",
+      "compatibility": {
+        "minAppVersion": "21.0.0",
+        "maxAppVersion": "21.99.99"
+      },
+      "sourceIds": [
+        "microsoft-learn-bc21-actionbar-pages"
+      ]
+    },
+    {
+      "ruleId": "MicrosoftBC21.Page7",
+      "pageObjectId": "7",
+      "entity": "",
+      "pageType": "list",
+      "localizedCaptions": {
+        "en-US": [
+          "Customer Price Groups"
+        ]
+      },
+      "captionRules": [
+        {
+          "locale": "en-US",
+          "pattern": "^Customer Price Groups$"
+        }
+      ],
+      "objectVerification": "declared",
+      "compatibility": {
+        "minAppVersion": "21.0.0",
+        "maxAppVersion": "21.99.99"
+      },
+      "sourceIds": [
+        "microsoft-learn-bc21-actionbar-pages"
+      ]
+    },
+    {
+      "ruleId": "MicrosoftBC21.Page11",
+      "pageObjectId": "11",
+      "entity": "",
+      "pageType": "list",
+      "localizedCaptions": {
+        "en-US": [
+          "Shipment methods"
+        ]
+      },
+      "captionRules": [
+        {
+          "locale": "en-US",
+          "pattern": "^Shipment methods$"
+        }
+      ],
+      "objectVerification": "declared",
+      "compatibility": {
+        "minAppVersion": "21.0.0",
+        "maxAppVersion": "21.99.99"
+      },
+      "sourceIds": [
+        "microsoft-learn-bc21-actionbar-pages"
+      ]
+    },
+    {
+      "ruleId": "MicrosoftBC21.Page14",
+      "pageObjectId": "14",
+      "entity": "",
+      "pageType": "list",
+      "localizedCaptions": {
+        "en-US": [
+          "Salespersons/Purchasers"
+        ]
+      },
+      "captionRules": [
+        {
+          "locale": "en-US",
+          "pattern": "^Salespersons/Purchasers$"
+        }
+      ],
+      "objectVerification": "declared",
+      "compatibility": {
+        "minAppVersion": "21.0.0",
+        "maxAppVersion": "21.99.99"
+      },
+      "sourceIds": [
+        "microsoft-learn-bc21-actionbar-pages"
+      ]
+    },
+    {
+      "ruleId": "MicrosoftBC21.Page20",
+      "pageObjectId": "20",
+      "entity": "GLEntry",
+      "pageType": "list",
+      "localizedCaptions": {
+        "en-US": [
+          "General Ledger Entries"
+        ]
+      },
+      "captionRules": [
+        {
+          "locale": "en-US",
+          "pattern": "^General Ledger Entries$"
+        }
+      ],
+      "objectVerification": "declared",
+      "compatibility": {
+        "minAppVersion": "21.0.0",
+        "maxAppVersion": "21.99.99"
+      },
+      "sourceIds": [
+        "microsoft-learn-bc21-actionbar-pages"
+      ]
+    },
+    {
+      "ruleId": "MicrosoftBC21.Page21",
+      "pageObjectId": "21",
+      "entity": "Customer",
+      "pageType": "card",
+      "localizedCaptions": {
+        "en-US": [
+          "Customer Card"
+        ],
+        "sv-SE": [
+          "Kundkort"
+        ],
+        "da-DK": [
+          "Debitorkort"
+        ]
+      },
+      "captionRules": [
+        {
+          "locale": "sv-SE",
+          "pattern": "^Kundkort$"
+        },
+        {
+          "locale": "en-US",
+          "pattern": "^Customer Card$"
+        }
+      ],
+      "compatibility": {
+        "minAppVersion": "21.0.0",
+        "maxAppVersion": "21.99.99"
+      },
+      "sourceIds": [
+        "microsoft-learn-bc21-actionbar-pages"
+      ],
+      "sourceTable": "Microsoft.Sales.Customer.Customer",
+      "description": "Provides detailed view and management of an individual customer's master data."
+    },
+    {
+      "ruleId": "MicrosoftBC21.Page22",
+      "pageObjectId": "22",
+      "entity": "Customer",
+      "pageType": "list",
+      "localizedCaptions": {
+        "en-US": [
+          "Customer List"
+        ]
+      },
+      "captionRules": [
+        {
+          "locale": "en-US",
+          "pattern": "^Customer List$"
+        }
+      ],
+      "objectVerification": "declared",
+      "compatibility": {
+        "minAppVersion": "21.0.0",
+        "maxAppVersion": "21.99.99"
+      },
+      "sourceIds": [
+        "microsoft-learn-bc21-actionbar-pages"
+      ]
+    },
+    {
+      "ruleId": "MicrosoftBC21.Page25",
+      "pageObjectId": "25",
+      "entity": "",
+      "pageType": "list",
+      "localizedCaptions": {
+        "en-US": [
+          "Customer Ledger Entries"
+        ]
+      },
+      "captionRules": [
+        {
+          "locale": "en-US",
+          "pattern": "^Customer Ledger Entries$"
+        }
+      ],
+      "objectVerification": "declared",
+      "compatibility": {
+        "minAppVersion": "21.0.0",
+        "maxAppVersion": "21.99.99"
+      },
+      "sourceIds": [
+        "microsoft-learn-bc21-actionbar-pages"
+      ]
+    },
+    {
+      "ruleId": "MicrosoftBC21.Page26",
+      "pageObjectId": "26",
+      "entity": "Vendor",
+      "pageType": "card",
+      "localizedCaptions": {
+        "en-US": [
+          "Vendor Card"
+        ]
+      },
+      "captionRules": [
+        {
+          "locale": "en-US",
+          "pattern": "^Vendor Card$"
+        }
+      ],
+      "objectVerification": "declared",
+      "compatibility": {
+        "minAppVersion": "21.0.0",
+        "maxAppVersion": "21.99.99"
+      },
+      "sourceIds": [
+        "microsoft-learn-bc21-actionbar-pages"
+      ]
+    },
+    {
+      "ruleId": "MicrosoftBC21.Page27",
+      "pageObjectId": "27",
+      "entity": "Vendor",
+      "pageType": "list",
+      "localizedCaptions": {
+        "en-US": [
+          "Vendor List"
+        ]
+      },
+      "captionRules": [
+        {
+          "locale": "en-US",
+          "pattern": "^Vendor List$"
+        }
+      ],
+      "objectVerification": "declared",
+      "compatibility": {
+        "minAppVersion": "21.0.0",
+        "maxAppVersion": "21.99.99"
+      },
+      "sourceIds": [
+        "microsoft-learn-bc21-actionbar-pages"
+      ]
+    },
+    {
+      "ruleId": "MicrosoftBC21.Page29",
+      "pageObjectId": "29",
+      "entity": "",
+      "pageType": "list",
+      "localizedCaptions": {
+        "en-US": [
+          "Vendor Ledger Entries"
+        ]
+      },
+      "captionRules": [
+        {
+          "locale": "en-US",
+          "pattern": "^Vendor Ledger Entries$"
+        }
+      ],
+      "objectVerification": "declared",
+      "compatibility": {
+        "minAppVersion": "21.0.0",
+        "maxAppVersion": "21.99.99"
+      },
+      "sourceIds": [
+        "microsoft-learn-bc21-actionbar-pages"
+      ]
+    },
+    {
+      "ruleId": "MicrosoftBC21.Page30",
+      "pageObjectId": "30",
+      "entity": "Item",
+      "pageType": "card",
+      "localizedCaptions": {
+        "en-US": [
+          "Item Card"
+        ],
+        "sv-SE": [
+          "Artikelkort"
+        ],
+        "da-DK": [
+          "Varekort"
+        ]
+      },
+      "captionRules": [
+        {
+          "locale": "sv-SE",
+          "pattern": "^Artikelkort$"
+        },
+        {
+          "locale": "en-US",
+          "pattern": "^Item Card$"
+        }
+      ],
+      "compatibility": {
+        "minAppVersion": "21.0.0",
+        "maxAppVersion": "21.99.99"
+      },
+      "sourceIds": [
+        "microsoft-learn-bc21-actionbar-pages"
+      ],
+      "sourceTable": "Microsoft.Inventory.Item.Item",
+      "description": "Manage item information, pricing, replenishment, inventory, costing, and posting settings."
+    },
+    {
+      "ruleId": "MicrosoftBC21.Page31",
+      "pageObjectId": "31",
+      "entity": "Item",
+      "pageType": "list",
+      "localizedCaptions": {
+        "en-US": [
+          "Item List"
+        ]
+      },
+      "captionRules": [
+        {
+          "locale": "en-US",
+          "pattern": "^Item List$"
+        }
+      ],
+      "objectVerification": "declared",
+      "compatibility": {
+        "minAppVersion": "21.0.0",
+        "maxAppVersion": "21.99.99"
+      },
+      "sourceIds": [
+        "microsoft-learn-bc21-actionbar-pages"
+      ]
+    },
+    {
+      "ruleId": "MicrosoftBC21.Page36",
+      "pageObjectId": "36",
+      "entity": "",
+      "pageType": "list",
+      "localizedCaptions": {
+        "en-US": [
+          "Assembly BOM"
+        ]
+      },
+      "captionRules": [
+        {
+          "locale": "en-US",
+          "pattern": "^Assembly BOM$"
+        }
+      ],
+      "objectVerification": "declared",
+      "compatibility": {
+        "minAppVersion": "21.0.0",
+        "maxAppVersion": "21.99.99"
+      },
+      "sourceIds": [
+        "microsoft-learn-bc21-actionbar-pages"
+      ]
+    },
+    {
+      "ruleId": "MicrosoftBC21.Page38",
+      "pageObjectId": "38",
+      "entity": "",
+      "pageType": "list",
+      "localizedCaptions": {
+        "en-US": [
+          "Item Ledger Entries"
+        ]
+      },
+      "captionRules": [
+        {
+          "locale": "en-US",
+          "pattern": "^Item Ledger Entries$"
+        }
+      ],
+      "objectVerification": "declared",
+      "compatibility": {
+        "minAppVersion": "21.0.0",
+        "maxAppVersion": "21.99.99"
+      },
+      "sourceIds": [
+        "microsoft-learn-bc21-actionbar-pages"
+      ]
+    },
+    {
+      "ruleId": "MicrosoftBC21.Page39",
+      "pageObjectId": "39",
+      "entity": "GeneralJournal",
+      "pageType": "worksheet",
+      "localizedCaptions": {
+        "en-US": [
+          "General Journal"
+        ]
+      },
+      "captionRules": [
+        {
+          "locale": "en-US",
+          "pattern": "^General Journal$"
+        }
+      ],
+      "objectVerification": "declared",
+      "compatibility": {
+        "minAppVersion": "21.0.0",
+        "maxAppVersion": "21.99.99"
+      },
+      "sourceIds": [
+        "microsoft-learn-bc21-actionbar-pages"
+      ]
+    },
+    {
+      "ruleId": "MicrosoftBC21.Page40",
+      "pageObjectId": "40",
+      "entity": "",
+      "pageType": "worksheet",
+      "localizedCaptions": {
+        "en-US": [
+          "Item Journal"
+        ]
+      },
+      "captionRules": [
+        {
+          "locale": "en-US",
+          "pattern": "^Item Journal$"
+        }
+      ],
+      "objectVerification": "declared",
+      "compatibility": {
+        "minAppVersion": "21.0.0",
+        "maxAppVersion": "21.99.99"
+      },
+      "sourceIds": [
+        "microsoft-learn-bc21-actionbar-pages"
+      ]
+    },
+    {
+      "ruleId": "MicrosoftBC21.Page41",
+      "pageObjectId": "41",
+      "entity": "SalesQuote",
+      "pageType": "document",
+      "localizedCaptions": {
+        "en-US": [
+          "Sales Quote"
+        ]
+      },
+      "captionRules": [
+        {
+          "locale": "en-US",
+          "pattern": "^Sales Quote$"
+        }
+      ],
+      "objectVerification": "declared",
+      "compatibility": {
+        "minAppVersion": "21.0.0",
+        "maxAppVersion": "21.99.99"
+      },
+      "sourceIds": [
+        "microsoft-learn-bc21-actionbar-pages"
+      ]
+    },
+    {
+      "ruleId": "MicrosoftBC21.Page42",
+      "pageObjectId": "42",
+      "entity": "SalesOrder",
+      "pageType": "document",
+      "recordType": "SalesOrder",
+      "documentType": "sales-order",
+      "localizedCaptions": {
+        "en-US": [
+          "Sales Order"
+        ],
+        "sv-SE": [
+          "Förs.order",
+          "Försäljningsorder"
+        ],
+        "da-DK": [
+          "Salgsordre"
+        ]
+      },
+      "captionRules": [
+        {
+          "locale": "sv-SE",
+          "pattern": "^(?:Förs\\.?\\s*order|F\\u00f6rs\\u00e4ljningsorder)$"
+        },
+        {
+          "locale": "en-US",
+          "pattern": "^Sales Order$"
+        },
+        {
+          "locale": "da-DK",
+          "pattern": "^Salgsordre$"
+        }
+      ],
+      "compatibility": {
+        "minAppVersion": "21.0.0",
+        "maxAppVersion": "21.99.99"
+      },
+      "sourceIds": [
+        "microsoft-learn-bc21-actionbar-pages"
+      ],
+      "sourceTable": "Microsoft.Sales.Document.\"Sales Header\"",
+      "description": "Create an order with sales lines, then ship or invoice it when ready."
+    },
+    {
+      "ruleId": "MicrosoftBC21.Page43",
+      "pageObjectId": "43",
+      "entity": "SalesInvoice",
+      "pageType": "document",
+      "localizedCaptions": {
+        "en-US": [
+          "Sales Invoice"
+        ]
+      },
+      "captionRules": [
+        {
+          "locale": "en-US",
+          "pattern": "^Sales Invoice$"
+        }
+      ],
+      "objectVerification": "declared",
+      "compatibility": {
+        "minAppVersion": "21.0.0",
+        "maxAppVersion": "21.99.99"
+      },
+      "sourceIds": [
+        "microsoft-learn-bc21-actionbar-pages"
+      ]
+    },
+    {
+      "ruleId": "MicrosoftBC21.Page44",
+      "pageObjectId": "44",
+      "entity": "SalesCreditMemo",
+      "pageType": "document",
+      "localizedCaptions": {
+        "en-US": [
+          "Sales Credit Memo"
+        ]
+      },
+      "captionRules": [
+        {
+          "locale": "en-US",
+          "pattern": "^Sales Credit Memo$"
+        }
+      ],
+      "objectVerification": "declared",
+      "compatibility": {
+        "minAppVersion": "21.0.0",
+        "maxAppVersion": "21.99.99"
+      },
+      "sourceIds": [
+        "microsoft-learn-bc21-actionbar-pages"
+      ]
+    },
+    {
+      "ruleId": "MicrosoftBC21.Page49",
+      "pageObjectId": "49",
+      "entity": "",
+      "pageType": "document",
+      "localizedCaptions": {
+        "en-US": [
+          "Purchase Quote"
+        ]
+      },
+      "captionRules": [
+        {
+          "locale": "en-US",
+          "pattern": "^Purchase Quote$"
+        }
+      ],
+      "objectVerification": "declared",
+      "compatibility": {
+        "minAppVersion": "21.0.0",
+        "maxAppVersion": "21.99.99"
+      },
+      "sourceIds": [
+        "microsoft-learn-bc21-actionbar-pages"
+      ]
+    },
+    {
+      "ruleId": "MicrosoftBC21.Page50",
+      "pageObjectId": "50",
+      "entity": "PurchaseOrder",
+      "pageType": "document",
+      "recordType": "PurchaseOrder",
+      "documentType": "purchase-order",
+      "localizedCaptions": {
+        "en-US": [
+          "Purchase Order"
+        ],
+        "sv-SE": [
+          "Inköpsorder"
+        ],
+        "da-DK": [
+          "Købsordre"
+        ]
+      },
+      "captionRules": [
+        {
+          "locale": "sv-SE",
+          "pattern": "^Inköpsorder$"
+        },
+        {
+          "locale": "en-US",
+          "pattern": "^Purchase Order$"
+        },
+        {
+          "locale": "da-DK",
+          "pattern": "^Købsordre$"
+        }
+      ],
+      "compatibility": {
+        "minAppVersion": "21.0.0",
+        "maxAppVersion": "21.99.99"
+      },
+      "sourceIds": [
+        "microsoft-learn-bc21-actionbar-pages"
+      ],
+      "sourceTable": "Microsoft.Purchases.Document.\"Purchase Header\"",
+      "description": "Create and manage a purchase order for goods and services."
+    },
+    {
+      "ruleId": "MicrosoftBC21.Page51",
+      "pageObjectId": "51",
+      "entity": "PurchaseInvoice",
+      "pageType": "document",
+      "localizedCaptions": {
+        "en-US": [
+          "Purchase Invoice"
+        ]
+      },
+      "captionRules": [
+        {
+          "locale": "en-US",
+          "pattern": "^Purchase Invoice$"
+        }
+      ],
+      "objectVerification": "declared",
+      "compatibility": {
+        "minAppVersion": "21.0.0",
+        "maxAppVersion": "21.99.99"
+      },
+      "sourceIds": [
+        "microsoft-learn-bc21-actionbar-pages"
+      ]
+    },
+    {
+      "ruleId": "MicrosoftBC21.Page52",
+      "pageObjectId": "52",
+      "entity": "PurchaseCreditMemo",
+      "pageType": "document",
+      "localizedCaptions": {
+        "en-US": [
+          "Purchase Credit Memo"
+        ]
+      },
+      "captionRules": [
+        {
+          "locale": "en-US",
+          "pattern": "^Purchase Credit Memo$"
+        }
+      ],
+      "objectVerification": "declared",
+      "compatibility": {
+        "minAppVersion": "21.0.0",
+        "maxAppVersion": "21.99.99"
+      },
+      "sourceIds": [
+        "microsoft-learn-bc21-actionbar-pages"
+      ]
+    },
+    {
+      "ruleId": "MicrosoftBC21.Page76",
+      "pageObjectId": "76",
+      "entity": "",
+      "pageType": "card",
+      "localizedCaptions": {
+        "en-US": [
+          "Resource Card"
+        ]
+      },
+      "captionRules": [
+        {
+          "locale": "en-US",
+          "pattern": "^Resource Card$"
+        }
+      ],
+      "objectVerification": "declared",
+      "compatibility": {
+        "minAppVersion": "21.0.0",
+        "maxAppVersion": "21.99.99"
+      },
+      "sourceIds": [
+        "microsoft-learn-bc21-actionbar-pages"
+      ]
+    },
+    {
+      "ruleId": "MicrosoftBC21.Page77",
+      "pageObjectId": "77",
+      "entity": "",
+      "pageType": "list",
+      "localizedCaptions": {
+        "en-US": [
+          "Resource List"
+        ]
+      },
+      "captionRules": [
+        {
+          "locale": "en-US",
+          "pattern": "^Resource List$"
+        }
+      ],
+      "objectVerification": "declared",
+      "compatibility": {
+        "minAppVersion": "21.0.0",
+        "maxAppVersion": "21.99.99"
+      },
+      "sourceIds": [
+        "microsoft-learn-bc21-actionbar-pages"
+      ]
+    },
+    {
+      "ruleId": "MicrosoftBC21.Page88",
+      "pageObjectId": "88",
+      "entity": "",
+      "pageType": "document",
+      "localizedCaptions": {
+        "en-US": [
+          "Job Card"
+        ]
+      },
+      "captionRules": [
+        {
+          "locale": "en-US",
+          "pattern": "^Job Card$"
+        }
+      ],
+      "objectVerification": "declared",
+      "compatibility": {
+        "minAppVersion": "21.0.0",
+        "maxAppVersion": "21.99.99"
+      },
+      "sourceIds": [
+        "microsoft-learn-bc21-actionbar-pages"
+      ]
+    },
+    {
+      "ruleId": "MicrosoftBC21.Page92",
+      "pageObjectId": "92",
+      "entity": "",
+      "pageType": "list",
+      "localizedCaptions": {
+        "en-US": [
+          "Job Ledger Entries"
+        ]
+      },
+      "captionRules": [
+        {
+          "locale": "en-US",
+          "pattern": "^Job Ledger Entries$"
+        }
+      ],
+      "objectVerification": "declared",
+      "compatibility": {
+        "minAppVersion": "21.0.0",
+        "maxAppVersion": "21.99.99"
+      },
+      "sourceIds": [
+        "microsoft-learn-bc21-actionbar-pages"
+      ]
+    },
+    {
+      "ruleId": "MicrosoftBC21.Page103",
+      "pageObjectId": "103",
+      "entity": "",
+      "pageType": "list",
+      "localizedCaptions": {
+        "en-US": [
+          "Account Schedule Names"
+        ]
+      },
+      "captionRules": [
+        {
+          "locale": "en-US",
+          "pattern": "^Account Schedule Names$"
+        }
+      ],
+      "objectVerification": "declared",
+      "compatibility": {
+        "minAppVersion": "21.0.0",
+        "maxAppVersion": "21.99.99"
+      },
+      "sourceIds": [
+        "microsoft-learn-bc21-actionbar-pages"
+      ]
+    },
+    {
+      "ruleId": "MicrosoftBC21.Page104",
+      "pageObjectId": "104",
+      "entity": "",
+      "pageType": "worksheet",
+      "localizedCaptions": {
+        "en-US": [
+          "Account Schedule"
+        ]
+      },
+      "captionRules": [
+        {
+          "locale": "en-US",
+          "pattern": "^Account Schedule$"
+        }
+      ],
+      "objectVerification": "declared",
+      "compatibility": {
+        "minAppVersion": "21.0.0",
+        "maxAppVersion": "21.99.99"
+      },
+      "sourceIds": [
+        "microsoft-learn-bc21-actionbar-pages"
+      ]
+    },
+    {
+      "ruleId": "MicrosoftBC21.Page113",
+      "pageObjectId": "113",
+      "entity": "",
+      "pageType": "listPlus",
+      "localizedCaptions": {
+        "en-US": [
+          "Budget"
+        ]
+      },
+      "captionRules": [
+        {
+          "locale": "en-US",
+          "pattern": "^Budget$"
+        }
+      ],
+      "objectVerification": "declared",
+      "compatibility": {
+        "minAppVersion": "21.0.0",
+        "maxAppVersion": "21.99.99"
+      },
+      "sourceIds": [
+        "microsoft-learn-bc21-actionbar-pages"
+      ]
+    },
+    {
+      "ruleId": "MicrosoftBC21.Page121",
+      "pageObjectId": "121",
+      "entity": "",
+      "pageType": "list",
+      "localizedCaptions": {
+        "en-US": [
+          "G/L Budget Names"
+        ]
+      },
+      "captionRules": [
+        {
+          "locale": "en-US",
+          "pattern": "^G/L Budget Names$"
+        }
+      ],
+      "objectVerification": "declared",
+      "compatibility": {
+        "minAppVersion": "21.0.0",
+        "maxAppVersion": "21.99.99"
+      },
+      "sourceIds": [
+        "microsoft-learn-bc21-actionbar-pages"
+      ]
+    },
+    {
+      "ruleId": "MicrosoftBC21.Page130",
+      "pageObjectId": "130",
+      "entity": "",
+      "pageType": "document",
+      "localizedCaptions": {
+        "en-US": [
+          "Posted Sales Shipment"
+        ]
+      },
+      "captionRules": [
+        {
+          "locale": "en-US",
+          "pattern": "^Posted Sales Shipment$"
+        }
+      ],
+      "objectVerification": "declared",
+      "compatibility": {
+        "minAppVersion": "21.0.0",
+        "maxAppVersion": "21.99.99"
+      },
+      "sourceIds": [
+        "microsoft-learn-bc21-actionbar-pages"
+      ]
+    },
+    {
+      "ruleId": "MicrosoftBC21.Page132",
+      "pageObjectId": "132",
+      "entity": "",
+      "pageType": "document",
+      "localizedCaptions": {
+        "en-US": [
+          "Posted Sales Invoice"
+        ]
+      },
+      "captionRules": [
+        {
+          "locale": "en-US",
+          "pattern": "^Posted Sales Invoice$"
+        }
+      ],
+      "objectVerification": "declared",
+      "compatibility": {
+        "minAppVersion": "21.0.0",
+        "maxAppVersion": "21.99.99"
+      },
+      "sourceIds": [
+        "microsoft-learn-bc21-actionbar-pages"
+      ]
+    },
+    {
+      "ruleId": "MicrosoftBC21.Page134",
+      "pageObjectId": "134",
+      "entity": "",
+      "pageType": "document",
+      "localizedCaptions": {
+        "en-US": [
+          "Posted Sales Credit Memo"
+        ]
+      },
+      "captionRules": [
+        {
+          "locale": "en-US",
+          "pattern": "^Posted Sales Credit Memo$"
+        }
+      ],
+      "objectVerification": "declared",
+      "compatibility": {
+        "minAppVersion": "21.0.0",
+        "maxAppVersion": "21.99.99"
+      },
+      "sourceIds": [
+        "microsoft-learn-bc21-actionbar-pages"
+      ]
+    },
+    {
+      "ruleId": "MicrosoftBC21.Page136",
+      "pageObjectId": "136",
+      "entity": "",
+      "pageType": "document",
+      "localizedCaptions": {
+        "en-US": [
+          "Posted Purchase Receipt"
+        ]
+      },
+      "captionRules": [
+        {
+          "locale": "en-US",
+          "pattern": "^Posted Purchase Receipt$"
+        }
+      ],
+      "objectVerification": "declared",
+      "compatibility": {
+        "minAppVersion": "21.0.0",
+        "maxAppVersion": "21.99.99"
+      },
+      "sourceIds": [
+        "microsoft-learn-bc21-actionbar-pages"
+      ]
+    },
+    {
+      "ruleId": "MicrosoftBC21.Page138",
+      "pageObjectId": "138",
+      "entity": "",
+      "pageType": "document",
+      "localizedCaptions": {
+        "en-US": [
+          "Posted Purchase Invoice"
+        ]
+      },
+      "captionRules": [
+        {
+          "locale": "en-US",
+          "pattern": "^Posted Purchase Invoice$"
+        }
+      ],
+      "objectVerification": "declared",
+      "compatibility": {
+        "minAppVersion": "21.0.0",
+        "maxAppVersion": "21.99.99"
+      },
+      "sourceIds": [
+        "microsoft-learn-bc21-actionbar-pages"
+      ]
+    },
+    {
+      "ruleId": "MicrosoftBC21.Page142",
+      "pageObjectId": "142",
+      "entity": "PostedSalesShipment",
+      "pageType": "list",
+      "localizedCaptions": {
+        "en-US": [
+          "Posted Sales Shipments"
+        ]
+      },
+      "captionRules": [
+        {
+          "locale": "en-US",
+          "pattern": "^Posted Sales Shipments$"
+        }
+      ],
+      "objectVerification": "declared",
+      "compatibility": {
+        "minAppVersion": "21.0.0",
+        "maxAppVersion": "21.99.99"
+      },
+      "sourceIds": [
+        "microsoft-learn-bc21-actionbar-pages"
+      ]
+    },
+    {
+      "ruleId": "MicrosoftBC21.Page143",
+      "pageObjectId": "143",
+      "entity": "PostedSalesInvoice",
+      "pageType": "list",
+      "localizedCaptions": {
+        "en-US": [
+          "Posted Sales Invoices"
+        ]
+      },
+      "captionRules": [
+        {
+          "locale": "en-US",
+          "pattern": "^Posted Sales Invoices$"
+        }
+      ],
+      "objectVerification": "declared",
+      "compatibility": {
+        "minAppVersion": "21.0.0",
+        "maxAppVersion": "21.99.99"
+      },
+      "sourceIds": [
+        "microsoft-learn-bc21-actionbar-pages"
+      ]
+    },
+    {
+      "ruleId": "MicrosoftBC21.Page144",
+      "pageObjectId": "144",
+      "entity": "PostedSalesCreditMemo",
+      "pageType": "list",
+      "localizedCaptions": {
+        "en-US": [
+          "Posted Sales Credit Memos"
+        ]
+      },
+      "captionRules": [
+        {
+          "locale": "en-US",
+          "pattern": "^Posted Sales Credit Memos$"
+        }
+      ],
+      "objectVerification": "declared",
+      "compatibility": {
+        "minAppVersion": "21.0.0",
+        "maxAppVersion": "21.99.99"
+      },
+      "sourceIds": [
+        "microsoft-learn-bc21-actionbar-pages"
+      ]
+    },
+    {
+      "ruleId": "MicrosoftBC21.Page145",
+      "pageObjectId": "145",
+      "entity": "PostedPurchaseReceipt",
+      "pageType": "list",
+      "localizedCaptions": {
+        "en-US": [
+          "Posted Purchase Receipts"
+        ]
+      },
+      "captionRules": [
+        {
+          "locale": "en-US",
+          "pattern": "^Posted Purchase Receipts$"
+        }
+      ],
+      "objectVerification": "declared",
+      "compatibility": {
+        "minAppVersion": "21.0.0",
+        "maxAppVersion": "21.99.99"
+      },
+      "sourceIds": [
+        "microsoft-learn-bc21-actionbar-pages"
+      ]
+    },
+    {
+      "ruleId": "MicrosoftBC21.Page146",
+      "pageObjectId": "146",
+      "entity": "PostedPurchaseInvoice",
+      "pageType": "list",
+      "localizedCaptions": {
+        "en-US": [
+          "Posted Purchase Invoices"
+        ]
+      },
+      "captionRules": [
+        {
+          "locale": "en-US",
+          "pattern": "^Posted Purchase Invoices$"
+        }
+      ],
+      "objectVerification": "declared",
+      "compatibility": {
+        "minAppVersion": "21.0.0",
+        "maxAppVersion": "21.99.99"
+      },
+      "sourceIds": [
+        "microsoft-learn-bc21-actionbar-pages"
+      ]
+    },
+    {
+      "ruleId": "MicrosoftBC21.Page179",
+      "pageObjectId": "179",
+      "entity": "",
+      "pageType": "list",
+      "localizedCaptions": {
+        "en-US": [
+          "Reverse Entries"
+        ]
+      },
+      "captionRules": [
+        {
+          "locale": "en-US",
+          "pattern": "^Reverse Entries$"
+        }
+      ],
+      "objectVerification": "declared",
+      "compatibility": {
+        "minAppVersion": "21.0.0",
+        "maxAppVersion": "21.99.99"
+      },
+      "sourceIds": [
+        "microsoft-learn-bc21-actionbar-pages"
+      ]
+    },
+    {
+      "ruleId": "MicrosoftBC21.Page189",
+      "pageObjectId": "189",
+      "entity": "",
+      "pageType": "document",
+      "localizedCaptions": {
+        "en-US": [
+          "Incoming Document"
+        ]
+      },
+      "captionRules": [
+        {
+          "locale": "en-US",
+          "pattern": "^Incoming Document$"
+        }
+      ],
+      "objectVerification": "declared",
+      "compatibility": {
+        "minAppVersion": "21.0.0",
+        "maxAppVersion": "21.99.99"
+      },
+      "sourceIds": [
+        "microsoft-learn-bc21-actionbar-pages"
+      ]
+    },
+    {
+      "ruleId": "MicrosoftBC21.Page190",
+      "pageObjectId": "190",
+      "entity": "",
+      "pageType": "list",
+      "localizedCaptions": {
+        "en-US": [
+          "Incoming Documents"
+        ]
+      },
+      "captionRules": [
+        {
+          "locale": "en-US",
+          "pattern": "^Incoming Documents$"
+        }
+      ],
+      "objectVerification": "declared",
+      "compatibility": {
+        "minAppVersion": "21.0.0",
+        "maxAppVersion": "21.99.99"
+      },
+      "sourceIds": [
+        "microsoft-learn-bc21-actionbar-pages"
+      ]
+    },
+    {
+      "ruleId": "MicrosoftBC21.Page201",
+      "pageObjectId": "201",
+      "entity": "",
+      "pageType": "worksheet",
+      "localizedCaptions": {
+        "en-US": [
+          "Job Journal"
+        ]
+      },
+      "captionRules": [
+        {
+          "locale": "en-US",
+          "pattern": "^Job Journal$"
+        }
+      ],
+      "objectVerification": "declared",
+      "compatibility": {
+        "minAppVersion": "21.0.0",
+        "maxAppVersion": "21.99.99"
+      },
+      "sourceIds": [
+        "microsoft-learn-bc21-actionbar-pages"
+      ]
+    },
+    {
+      "ruleId": "MicrosoftBC21.Page232",
+      "pageObjectId": "232",
+      "entity": "",
+      "pageType": "worksheet",
+      "localizedCaptions": {
+        "en-US": [
+          "Apply Customer Entries"
+        ]
+      },
+      "captionRules": [
+        {
+          "locale": "en-US",
+          "pattern": "^Apply Customer Entries$"
+        }
+      ],
+      "objectVerification": "declared",
+      "compatibility": {
+        "minAppVersion": "21.0.0",
+        "maxAppVersion": "21.99.99"
+      },
+      "sourceIds": [
+        "microsoft-learn-bc21-actionbar-pages"
+      ]
+    },
+    {
+      "ruleId": "MicrosoftBC21.Page233",
+      "pageObjectId": "233",
+      "entity": "",
+      "pageType": "worksheet",
+      "localizedCaptions": {
+        "en-US": [
+          "Apply Vendor Entries"
+        ]
+      },
+      "captionRules": [
+        {
+          "locale": "en-US",
+          "pattern": "^Apply Vendor Entries$"
+        }
+      ],
+      "objectVerification": "declared",
+      "compatibility": {
+        "minAppVersion": "21.0.0",
+        "maxAppVersion": "21.99.99"
+      },
+      "sourceIds": [
+        "microsoft-learn-bc21-actionbar-pages"
+      ]
+    },
+    {
+      "ruleId": "MicrosoftBC21.Page251",
+      "pageObjectId": "251",
+      "entity": "",
+      "pageType": "list",
+      "localizedCaptions": {
+        "en-US": [
+          "General Journal Batches"
+        ]
+      },
+      "captionRules": [
+        {
+          "locale": "en-US",
+          "pattern": "^General Journal Batches$"
+        }
+      ],
+      "objectVerification": "declared",
+      "compatibility": {
+        "minAppVersion": "21.0.0",
+        "maxAppVersion": "21.99.99"
+      },
+      "sourceIds": [
+        "microsoft-learn-bc21-actionbar-pages"
+      ]
+    },
+    {
+      "ruleId": "MicrosoftBC21.Page253",
+      "pageObjectId": "253",
+      "entity": "",
+      "pageType": "worksheet",
+      "localizedCaptions": {
+        "en-US": [
+          "Sales Journal"
+        ]
+      },
+      "captionRules": [
+        {
+          "locale": "en-US",
+          "pattern": "^Sales Journal$"
+        }
+      ],
+      "objectVerification": "declared",
+      "compatibility": {
+        "minAppVersion": "21.0.0",
+        "maxAppVersion": "21.99.99"
+      },
+      "sourceIds": [
+        "microsoft-learn-bc21-actionbar-pages"
+      ]
+    },
+    {
+      "ruleId": "MicrosoftBC21.Page254",
+      "pageObjectId": "254",
+      "entity": "",
+      "pageType": "worksheet",
+      "localizedCaptions": {
+        "en-US": [
+          "Purchase Journal"
+        ]
+      },
+      "captionRules": [
+        {
+          "locale": "en-US",
+          "pattern": "^Purchase Journal$"
+        }
+      ],
+      "objectVerification": "declared",
+      "compatibility": {
+        "minAppVersion": "21.0.0",
+        "maxAppVersion": "21.99.99"
+      },
+      "sourceIds": [
+        "microsoft-learn-bc21-actionbar-pages"
+      ]
+    },
+    {
+      "ruleId": "MicrosoftBC21.Page255",
+      "pageObjectId": "255",
+      "entity": "CashReceiptJournal",
+      "pageType": "worksheet",
+      "localizedCaptions": {
+        "en-US": [
+          "Cash Receipt Journal"
+        ]
+      },
+      "captionRules": [
+        {
+          "locale": "en-US",
+          "pattern": "^Cash Receipt Journal$"
+        }
+      ],
+      "objectVerification": "declared",
+      "compatibility": {
+        "minAppVersion": "21.0.0",
+        "maxAppVersion": "21.99.99"
+      },
+      "sourceIds": [
+        "microsoft-learn-bc21-actionbar-pages"
+      ]
+    },
+    {
+      "ruleId": "MicrosoftBC21.Page256",
+      "pageObjectId": "256",
+      "entity": "PaymentJournal",
+      "pageType": "worksheet",
+      "localizedCaptions": {
+        "en-US": [
+          "Payment Journal"
+        ]
+      },
+      "captionRules": [
+        {
+          "locale": "en-US",
+          "pattern": "^Payment Journal$"
+        }
+      ],
+      "objectVerification": "declared",
+      "compatibility": {
+        "minAppVersion": "21.0.0",
+        "maxAppVersion": "21.99.99"
+      },
+      "sourceIds": [
+        "microsoft-learn-bc21-actionbar-pages"
+      ]
+    },
+    {
+      "ruleId": "MicrosoftBC21.Page262",
+      "pageObjectId": "262",
+      "entity": "",
+      "pageType": "list",
+      "localizedCaptions": {
+        "en-US": [
+          "Item Journal Batches"
+        ]
+      },
+      "captionRules": [
+        {
+          "locale": "en-US",
+          "pattern": "^Item Journal Batches$"
+        }
+      ],
+      "objectVerification": "declared",
+      "compatibility": {
+        "minAppVersion": "21.0.0",
+        "maxAppVersion": "21.99.99"
+      },
+      "sourceIds": [
+        "microsoft-learn-bc21-actionbar-pages"
+      ]
+    },
+    {
+      "ruleId": "MicrosoftBC21.Page283",
+      "pageObjectId": "283",
+      "entity": "",
+      "pageType": "worksheet",
+      "localizedCaptions": {
+        "en-US": [
+          "Recurring General Journal"
+        ]
+      },
+      "captionRules": [
+        {
+          "locale": "en-US",
+          "pattern": "^Recurring General Journal$"
+        }
+      ],
+      "objectVerification": "declared",
+      "compatibility": {
+        "minAppVersion": "21.0.0",
+        "maxAppVersion": "21.99.99"
+      },
+      "sourceIds": [
+        "microsoft-learn-bc21-actionbar-pages"
+      ]
+    },
+    {
+      "ruleId": "MicrosoftBC21.Page291",
+      "pageObjectId": "291",
+      "entity": "",
+      "pageType": "worksheet",
+      "localizedCaptions": {
+        "en-US": [
+          "Req. Worksheet"
+        ]
+      },
+      "captionRules": [
+        {
+          "locale": "en-US",
+          "pattern": "^Req. Worksheet$"
+        }
+      ],
+      "objectVerification": "declared",
+      "compatibility": {
+        "minAppVersion": "21.0.0",
+        "maxAppVersion": "21.99.99"
+      },
+      "sourceIds": [
+        "microsoft-learn-bc21-actionbar-pages"
+      ]
+    },
+    {
+      "ruleId": "MicrosoftBC21.Page344",
+      "pageObjectId": "344",
+      "entity": "",
+      "pageType": "worksheet",
+      "localizedCaptions": {
+        "en-US": [
+          "Navigate"
+        ]
+      },
+      "captionRules": [
+        {
+          "locale": "en-US",
+          "pattern": "^Navigate$"
+        }
+      ],
+      "objectVerification": "declared",
+      "compatibility": {
+        "minAppVersion": "21.0.0",
+        "maxAppVersion": "21.99.99"
+      },
+      "sourceIds": [
+        "microsoft-learn-bc21-actionbar-pages"
+      ]
+    },
+    {
+      "ruleId": "MicrosoftBC21.Page372",
+      "pageObjectId": "372",
+      "entity": "BankAccountLedgerEntry",
+      "pageType": "list",
+      "localizedCaptions": {
+        "en-US": [
+          "Bank Account Ledger Entries"
+        ]
+      },
+      "captionRules": [
+        {
+          "locale": "en-US",
+          "pattern": "^Bank Account Ledger Entries$"
+        }
+      ],
+      "objectVerification": "declared",
+      "compatibility": {
+        "minAppVersion": "21.0.0",
+        "maxAppVersion": "21.99.99"
+      },
+      "sourceIds": [
+        "microsoft-learn-bc21-actionbar-pages"
+      ]
+    },
+    {
+      "ruleId": "MicrosoftBC21.Page379",
+      "pageObjectId": "379",
+      "entity": "",
+      "pageType": "listPlus",
+      "localizedCaptions": {
+        "en-US": [
+          "Bank Acc. Reconciliation"
+        ]
+      },
+      "captionRules": [
+        {
+          "locale": "en-US",
+          "pattern": "^Bank Acc. Reconciliation$"
+        }
+      ],
+      "objectVerification": "declared",
+      "compatibility": {
+        "minAppVersion": "21.0.0",
+        "maxAppVersion": "21.99.99"
+      },
+      "sourceIds": [
+        "microsoft-learn-bc21-actionbar-pages"
+      ]
+    },
+    {
+      "ruleId": "MicrosoftBC21.Page392",
+      "pageObjectId": "392",
+      "entity": "",
+      "pageType": "worksheet",
+      "localizedCaptions": {
+        "en-US": [
+          "Phys. Inventory Journal"
+        ]
+      },
+      "captionRules": [
+        {
+          "locale": "en-US",
+          "pattern": "^Phys. Inventory Journal$"
+        }
+      ],
+      "objectVerification": "declared",
+      "compatibility": {
+        "minAppVersion": "21.0.0",
+        "maxAppVersion": "21.99.99"
+      },
+      "sourceIds": [
+        "microsoft-learn-bc21-actionbar-pages"
+      ]
+    },
+    {
+      "ruleId": "MicrosoftBC21.Page393",
+      "pageObjectId": "393",
+      "entity": "",
+      "pageType": "worksheet",
+      "localizedCaptions": {
+        "en-US": [
+          "Item Reclass. Journal"
+        ]
+      },
+      "captionRules": [
+        {
+          "locale": "en-US",
+          "pattern": "^Item Reclass. Journal$"
+        }
+      ],
+      "objectVerification": "declared",
+      "compatibility": {
+        "minAppVersion": "21.0.0",
+        "maxAppVersion": "21.99.99"
+      },
+      "sourceIds": [
+        "microsoft-learn-bc21-actionbar-pages"
+      ]
+    },
+    {
+      "ruleId": "MicrosoftBC21.Page408",
+      "pageObjectId": "408",
+      "entity": "",
+      "pageType": "card",
+      "localizedCaptions": {
+        "en-US": [
+          "G/L Balance by Dimension"
+        ]
+      },
+      "captionRules": [
+        {
+          "locale": "en-US",
+          "pattern": "^G/L Balance by Dimension$"
+        }
+      ],
+      "objectVerification": "declared",
+      "compatibility": {
+        "minAppVersion": "21.0.0",
+        "maxAppVersion": "21.99.99"
+      },
+      "sourceIds": [
+        "microsoft-learn-bc21-actionbar-pages"
+      ]
+    },
+    {
+      "ruleId": "MicrosoftBC21.Page428",
+      "pageObjectId": "428",
+      "entity": "",
+      "pageType": "list",
+      "localizedCaptions": {
+        "en-US": [
+          "Shipping Agents"
+        ]
+      },
+      "captionRules": [
+        {
+          "locale": "en-US",
+          "pattern": "^Shipping Agents$"
+        }
+      ],
+      "objectVerification": "declared",
+      "compatibility": {
+        "minAppVersion": "21.0.0",
+        "maxAppVersion": "21.99.99"
+      },
+      "sourceIds": [
+        "microsoft-learn-bc21-actionbar-pages"
+      ]
+    },
+    {
+      "ruleId": "MicrosoftBC21.Page434",
+      "pageObjectId": "434",
+      "entity": "",
+      "pageType": "document",
+      "localizedCaptions": {
+        "en-US": [
+          "Reminder"
+        ]
+      },
+      "captionRules": [
+        {
+          "locale": "en-US",
+          "pattern": "^Reminder$"
+        }
+      ],
+      "objectVerification": "declared",
+      "compatibility": {
+        "minAppVersion": "21.0.0",
+        "maxAppVersion": "21.99.99"
+      },
+      "sourceIds": [
+        "microsoft-learn-bc21-actionbar-pages"
+      ]
+    },
+    {
+      "ruleId": "MicrosoftBC21.Page436",
+      "pageObjectId": "436",
+      "entity": "",
+      "pageType": "list",
+      "localizedCaptions": {
+        "en-US": [
+          "Reminder List"
+        ]
+      },
+      "captionRules": [
+        {
+          "locale": "en-US",
+          "pattern": "^Reminder List$"
+        }
+      ],
+      "objectVerification": "declared",
+      "compatibility": {
+        "minAppVersion": "21.0.0",
+        "maxAppVersion": "21.99.99"
+      },
+      "sourceIds": [
+        "microsoft-learn-bc21-actionbar-pages"
+      ]
+    },
+    {
+      "ruleId": "MicrosoftBC21.Page490",
+      "pageObjectId": "490",
+      "entity": "",
+      "pageType": "list",
+      "localizedCaptions": {
+        "en-US": [
+          "Acc. Schedule Overview"
+        ]
+      },
+      "captionRules": [
+        {
+          "locale": "en-US",
+          "pattern": "^Acc. Schedule Overview$"
+        }
+      ],
+      "objectVerification": "declared",
+      "compatibility": {
+        "minAppVersion": "21.0.0",
+        "maxAppVersion": "21.99.99"
+      },
+      "sourceIds": [
+        "microsoft-learn-bc21-actionbar-pages"
+      ]
+    },
+    {
+      "ruleId": "MicrosoftBC21.Page498",
+      "pageObjectId": "498",
+      "entity": "",
+      "pageType": "worksheet",
+      "localizedCaptions": {
+        "en-US": [
+          "Reservation"
+        ]
+      },
+      "captionRules": [
+        {
+          "locale": "en-US",
+          "pattern": "^Reservation$"
+        }
+      ],
+      "objectVerification": "declared",
+      "compatibility": {
+        "minAppVersion": "21.0.0",
+        "maxAppVersion": "21.99.99"
+      },
+      "sourceIds": [
+        "microsoft-learn-bc21-actionbar-pages"
+      ]
+    },
+    {
+      "ruleId": "MicrosoftBC21.Page507",
+      "pageObjectId": "507",
+      "entity": "",
+      "pageType": "document",
+      "localizedCaptions": {
+        "en-US": [
+          "Blanket Sales Order"
+        ]
+      },
+      "captionRules": [
+        {
+          "locale": "en-US",
+          "pattern": "^Blanket Sales Order$"
+        }
+      ],
+      "objectVerification": "declared",
+      "compatibility": {
+        "minAppVersion": "21.0.0",
+        "maxAppVersion": "21.99.99"
+      },
+      "sourceIds": [
+        "microsoft-learn-bc21-actionbar-pages"
+      ]
+    },
+    {
+      "ruleId": "MicrosoftBC21.Page509",
+      "pageObjectId": "509",
+      "entity": "",
+      "pageType": "document",
+      "localizedCaptions": {
+        "en-US": [
+          "Blanket Purchase Order"
+        ]
+      },
+      "captionRules": [
+        {
+          "locale": "en-US",
+          "pattern": "^Blanket Purchase Order$"
+        }
+      ],
+      "objectVerification": "declared",
+      "compatibility": {
+        "minAppVersion": "21.0.0",
+        "maxAppVersion": "21.99.99"
+      },
+      "sourceIds": [
+        "microsoft-learn-bc21-actionbar-pages"
+      ]
+    },
+    {
+      "ruleId": "MicrosoftBC21.Page516",
+      "pageObjectId": "516",
+      "entity": "",
+      "pageType": "list",
+      "localizedCaptions": {
+        "en-US": [
+          "Sales Lines"
+        ]
+      },
+      "captionRules": [
+        {
+          "locale": "en-US",
+          "pattern": "^Sales Lines$"
+        }
+      ],
+      "objectVerification": "declared",
+      "compatibility": {
+        "minAppVersion": "21.0.0",
+        "maxAppVersion": "21.99.99"
+      },
+      "sourceIds": [
+        "microsoft-learn-bc21-actionbar-pages"
+      ]
+    },
+    {
+      "ruleId": "MicrosoftBC21.Page518",
+      "pageObjectId": "518",
+      "entity": "",
+      "pageType": "list",
+      "localizedCaptions": {
+        "en-US": [
+          "Purchase Lines"
+        ]
+      },
+      "captionRules": [
+        {
+          "locale": "en-US",
+          "pattern": "^Purchase Lines$"
+        }
+      ],
+      "objectVerification": "declared",
+      "compatibility": {
+        "minAppVersion": "21.0.0",
+        "maxAppVersion": "21.99.99"
+      },
+      "sourceIds": [
+        "microsoft-learn-bc21-actionbar-pages"
+      ]
+    },
+    {
+      "ruleId": "MicrosoftBC21.Page521",
+      "pageObjectId": "521",
+      "entity": "",
+      "pageType": "worksheet",
+      "localizedCaptions": {
+        "en-US": [
+          "Application Worksheet"
+        ]
+      },
+      "captionRules": [
+        {
+          "locale": "en-US",
+          "pattern": "^Application Worksheet$"
+        }
+      ],
+      "objectVerification": "declared",
+      "compatibility": {
+        "minAppVersion": "21.0.0",
+        "maxAppVersion": "21.99.99"
+      },
+      "sourceIds": [
+        "microsoft-learn-bc21-actionbar-pages"
+      ]
+    },
+    {
+      "ruleId": "MicrosoftBC21.Page554",
+      "pageObjectId": "554",
+      "entity": "",
+      "pageType": "card",
+      "localizedCaptions": {
+        "en-US": [
+          "Analysis by Dimensions"
+        ]
+      },
+      "captionRules": [
+        {
+          "locale": "en-US",
+          "pattern": "^Analysis by Dimensions$"
+        }
+      ],
+      "objectVerification": "declared",
+      "compatibility": {
+        "minAppVersion": "21.0.0",
+        "maxAppVersion": "21.99.99"
+      },
+      "sourceIds": [
+        "microsoft-learn-bc21-actionbar-pages"
+      ]
+    },
+    {
+      "ruleId": "MicrosoftBC21.Page556",
+      "pageObjectId": "556",
+      "entity": "",
+      "pageType": "list",
+      "localizedCaptions": {
+        "en-US": [
+          "Analysis View List"
+        ]
+      },
+      "captionRules": [
+        {
+          "locale": "en-US",
+          "pattern": "^Analysis View List$"
+        }
+      ],
+      "objectVerification": "declared",
+      "compatibility": {
+        "minAppVersion": "21.0.0",
+        "maxAppVersion": "21.99.99"
+      },
+      "sourceIds": [
+        "microsoft-learn-bc21-actionbar-pages"
+      ]
+    },
+    {
+      "ruleId": "MicrosoftBC21.Page573",
+      "pageObjectId": "573",
+      "entity": "",
+      "pageType": "list",
+      "localizedCaptions": {
+        "en-US": [
+          "Detailed Cust. Ledg. Entries"
+        ]
+      },
+      "captionRules": [
+        {
+          "locale": "en-US",
+          "pattern": "^Detailed Cust. Ledg. Entries$"
+        }
+      ],
+      "objectVerification": "declared",
+      "compatibility": {
+        "minAppVersion": "21.0.0",
+        "maxAppVersion": "21.99.99"
+      },
+      "sourceIds": [
+        "microsoft-learn-bc21-actionbar-pages"
+      ]
+    },
+    {
+      "ruleId": "MicrosoftBC21.Page574",
+      "pageObjectId": "574",
+      "entity": "",
+      "pageType": "list",
+      "localizedCaptions": {
+        "en-US": [
+          "Detailed Vendor Ledg. Entries"
+        ]
+      },
+      "captionRules": [
+        {
+          "locale": "en-US",
+          "pattern": "^Detailed Vendor Ledg. Entries$"
+        }
+      ],
+      "objectVerification": "declared",
+      "compatibility": {
+        "minAppVersion": "21.0.0",
+        "maxAppVersion": "21.99.99"
+      },
+      "sourceIds": [
+        "microsoft-learn-bc21-actionbar-pages"
+      ]
+    },
+    {
+      "ruleId": "MicrosoftBC21.Page610",
+      "pageObjectId": "610",
+      "entity": "",
+      "pageType": "worksheet",
+      "localizedCaptions": {
+        "en-US": [
+          "IC General Journal"
+        ]
+      },
+      "captionRules": [
+        {
+          "locale": "en-US",
+          "pattern": "^IC General Journal$"
+        }
+      ],
+      "objectVerification": "declared",
+      "compatibility": {
+        "minAppVersion": "21.0.0",
+        "maxAppVersion": "21.99.99"
+      },
+      "sourceIds": [
+        "microsoft-learn-bc21-actionbar-pages"
+      ]
+    },
+    {
+      "ruleId": "MicrosoftBC21.Page615",
+      "pageObjectId": "615",
+      "entity": "",
+      "pageType": "worksheet",
+      "localizedCaptions": {
+        "en-US": [
+          "IC Inbox Transactions"
+        ]
+      },
+      "captionRules": [
+        {
+          "locale": "en-US",
+          "pattern": "^IC Inbox Transactions$"
+        }
+      ],
+      "objectVerification": "declared",
+      "compatibility": {
+        "minAppVersion": "21.0.0",
+        "maxAppVersion": "21.99.99"
+      },
+      "sourceIds": [
+        "microsoft-learn-bc21-actionbar-pages"
+      ]
+    },
+    {
+      "ruleId": "MicrosoftBC21.Page623",
+      "pageObjectId": "623",
+      "entity": "",
+      "pageType": "worksheet",
+      "localizedCaptions": {
+        "en-US": [
+          "Unapply Customer Entries"
+        ]
+      },
+      "captionRules": [
+        {
+          "locale": "en-US",
+          "pattern": "^Unapply Customer Entries$"
+        }
+      ],
+      "objectVerification": "declared",
+      "compatibility": {
+        "minAppVersion": "21.0.0",
+        "maxAppVersion": "21.99.99"
+      },
+      "sourceIds": [
+        "microsoft-learn-bc21-actionbar-pages"
+      ]
+    },
+    {
+      "ruleId": "MicrosoftBC21.Page624",
+      "pageObjectId": "624",
+      "entity": "",
+      "pageType": "worksheet",
+      "localizedCaptions": {
+        "en-US": [
+          "Unapply Vendor Entries"
+        ]
+      },
+      "captionRules": [
+        {
+          "locale": "en-US",
+          "pattern": "^Unapply Vendor Entries$"
+        }
+      ],
+      "objectVerification": "declared",
+      "compatibility": {
+        "minAppVersion": "21.0.0",
+        "maxAppVersion": "21.99.99"
+      },
+      "sourceIds": [
+        "microsoft-learn-bc21-actionbar-pages"
+      ]
+    },
+    {
+      "ruleId": "MicrosoftBC21.Page654",
+      "pageObjectId": "654",
+      "entity": "",
+      "pageType": "list",
+      "localizedCaptions": {
+        "en-US": [
+          "Requests to Approve"
+        ]
+      },
+      "captionRules": [
+        {
+          "locale": "en-US",
+          "pattern": "^Requests to Approve$"
+        }
+      ],
+      "objectVerification": "declared",
+      "compatibility": {
+        "minAppVersion": "21.0.0",
+        "maxAppVersion": "21.99.99"
+      },
+      "sourceIds": [
+        "microsoft-learn-bc21-actionbar-pages"
+      ]
+    },
+    {
+      "ruleId": "MicrosoftBC21.Page658",
+      "pageObjectId": "658",
+      "entity": "",
+      "pageType": "list",
+      "localizedCaptions": {
+        "en-US": [
+          "Approval Entries"
+        ]
+      },
+      "captionRules": [
+        {
+          "locale": "en-US",
+          "pattern": "^Approval Entries$"
+        }
+      ],
+      "objectVerification": "declared",
+      "compatibility": {
+        "minAppVersion": "21.0.0",
+        "maxAppVersion": "21.99.99"
+      },
+      "sourceIds": [
+        "microsoft-learn-bc21-actionbar-pages"
+      ]
+    },
+    {
+      "ruleId": "MicrosoftBC21.Page672",
+      "pageObjectId": "672",
+      "entity": "",
+      "pageType": "list",
+      "localizedCaptions": {
+        "en-US": [
+          "Job Queue Entries"
+        ]
+      },
+      "captionRules": [
+        {
+          "locale": "en-US",
+          "pattern": "^Job Queue Entries$"
+        }
+      ],
+      "objectVerification": "declared",
+      "compatibility": {
+        "minAppVersion": "21.0.0",
+        "maxAppVersion": "21.99.99"
+      },
+      "sourceIds": [
+        "microsoft-learn-bc21-actionbar-pages"
+      ]
+    },
+    {
+      "ruleId": "MicrosoftBC21.Page673",
+      "pageObjectId": "673",
+      "entity": "",
+      "pageType": "card",
+      "localizedCaptions": {
+        "en-US": [
+          "Job Queue Entry Card"
+        ]
+      },
+      "captionRules": [
+        {
+          "locale": "en-US",
+          "pattern": "^Job Queue Entry Card$"
+        }
+      ],
+      "objectVerification": "declared",
+      "compatibility": {
+        "minAppVersion": "21.0.0",
+        "maxAppVersion": "21.99.99"
+      },
+      "sourceIds": [
+        "microsoft-learn-bc21-actionbar-pages"
+      ]
+    },
+    {
+      "ruleId": "MicrosoftBC21.Page790",
+      "pageObjectId": "790",
+      "entity": "",
+      "pageType": "list",
+      "localizedCaptions": {
+        "en-US": [
+          "G/L Account Categories"
+        ]
+      },
+      "captionRules": [
+        {
+          "locale": "en-US",
+          "pattern": "^G/L Account Categories$"
+        }
+      ],
+      "objectVerification": "declared",
+      "compatibility": {
+        "minAppVersion": "21.0.0",
+        "maxAppVersion": "21.99.99"
+      },
+      "sourceIds": [
+        "microsoft-learn-bc21-actionbar-pages"
+      ]
+    },
+    {
+      "ruleId": "MicrosoftBC21.Page900",
+      "pageObjectId": "900",
+      "entity": "",
+      "pageType": "document",
+      "localizedCaptions": {
+        "en-US": [
+          "Assembly Order"
+        ]
+      },
+      "captionRules": [
+        {
+          "locale": "en-US",
+          "pattern": "^Assembly Order$"
+        }
+      ],
+      "objectVerification": "declared",
+      "compatibility": {
+        "minAppVersion": "21.0.0",
+        "maxAppVersion": "21.99.99"
+      },
+      "sourceIds": [
+        "microsoft-learn-bc21-actionbar-pages"
+      ]
+    },
+    {
+      "ruleId": "MicrosoftBC21.Page902",
+      "pageObjectId": "902",
+      "entity": "",
+      "pageType": "list",
+      "localizedCaptions": {
+        "en-US": [
+          "Assembly Orders"
+        ]
+      },
+      "captionRules": [
+        {
+          "locale": "en-US",
+          "pattern": "^Assembly Orders$"
+        }
+      ],
+      "objectVerification": "declared",
+      "compatibility": {
+        "minAppVersion": "21.0.0",
+        "maxAppVersion": "21.99.99"
+      },
+      "sourceIds": [
+        "microsoft-learn-bc21-actionbar-pages"
+      ]
+    },
+    {
+      "ruleId": "MicrosoftBC21.Page914",
+      "pageObjectId": "914",
+      "entity": "",
+      "pageType": "worksheet",
+      "localizedCaptions": {
+        "en-US": [
+          "Assemble-to-Order Lines"
+        ]
+      },
+      "captionRules": [
+        {
+          "locale": "en-US",
+          "pattern": "^Assemble-to-Order Lines$"
+        }
+      ],
+      "objectVerification": "declared",
+      "compatibility": {
+        "minAppVersion": "21.0.0",
+        "maxAppVersion": "21.99.99"
+      },
+      "sourceIds": [
+        "microsoft-learn-bc21-actionbar-pages"
+      ]
+    },
+    {
+      "ruleId": "MicrosoftBC21.Page950",
+      "pageObjectId": "950",
+      "entity": "",
+      "pageType": "worksheet",
+      "localizedCaptions": {
+        "en-US": [
+          "Time Sheet"
+        ]
+      },
+      "captionRules": [
+        {
+          "locale": "en-US",
+          "pattern": "^Time Sheet$"
+        }
+      ],
+      "objectVerification": "declared",
+      "compatibility": {
+        "minAppVersion": "21.0.0",
+        "maxAppVersion": "21.99.99"
+      },
+      "sourceIds": [
+        "microsoft-learn-bc21-actionbar-pages"
+      ]
+    },
+    {
+      "ruleId": "MicrosoftBC21.Page951",
+      "pageObjectId": "951",
+      "entity": "",
+      "pageType": "list",
+      "localizedCaptions": {
+        "en-US": [
+          "Time Sheet List"
+        ]
+      },
+      "captionRules": [
+        {
+          "locale": "en-US",
+          "pattern": "^Time Sheet List$"
+        }
+      ],
+      "objectVerification": "declared",
+      "compatibility": {
+        "minAppVersion": "21.0.0",
+        "maxAppVersion": "21.99.99"
+      },
+      "sourceIds": [
+        "microsoft-learn-bc21-actionbar-pages"
+      ]
+    },
+    {
+      "ruleId": "MicrosoftBC21.Page952",
+      "pageObjectId": "952",
+      "entity": "",
+      "pageType": "worksheet",
+      "localizedCaptions": {
+        "en-US": [
+          "Manager Time Sheet"
+        ]
+      },
+      "captionRules": [
+        {
+          "locale": "en-US",
+          "pattern": "^Manager Time Sheet$"
+        }
+      ],
+      "objectVerification": "declared",
+      "compatibility": {
+        "minAppVersion": "21.0.0",
+        "maxAppVersion": "21.99.99"
+      },
+      "sourceIds": [
+        "microsoft-learn-bc21-actionbar-pages"
+      ]
+    },
+    {
+      "ruleId": "MicrosoftBC21.Page953",
+      "pageObjectId": "953",
+      "entity": "",
+      "pageType": "list",
+      "localizedCaptions": {
+        "en-US": [
+          "Manager Time Sheet List"
+        ]
+      },
+      "captionRules": [
+        {
+          "locale": "en-US",
+          "pattern": "^Manager Time Sheet List$"
+        }
+      ],
+      "objectVerification": "declared",
+      "compatibility": {
+        "minAppVersion": "21.0.0",
+        "maxAppVersion": "21.99.99"
+      },
+      "sourceIds": [
+        "microsoft-learn-bc21-actionbar-pages"
+      ]
+    },
+    {
+      "ruleId": "MicrosoftBC21.Page954",
+      "pageObjectId": "954",
+      "entity": "",
+      "pageType": "worksheet",
+      "localizedCaptions": {
+        "en-US": [
+          "Manager Time Sheet by Job"
+        ]
+      },
+      "captionRules": [
+        {
+          "locale": "en-US",
+          "pattern": "^Manager Time Sheet by Job$"
+        }
+      ],
+      "objectVerification": "declared",
+      "compatibility": {
+        "minAppVersion": "21.0.0",
+        "maxAppVersion": "21.99.99"
+      },
+      "sourceIds": [
+        "microsoft-learn-bc21-actionbar-pages"
+      ]
+    },
+    {
+      "ruleId": "MicrosoftBC21.Page973",
+      "pageObjectId": "973",
+      "entity": "",
+      "pageType": "document",
+      "localizedCaptions": {
+        "en-US": [
+          "Time Sheet Card"
+        ]
+      },
+      "captionRules": [
+        {
+          "locale": "en-US",
+          "pattern": "^Time Sheet Card$"
+        }
+      ],
+      "objectVerification": "declared",
+      "compatibility": {
+        "minAppVersion": "21.0.0",
+        "maxAppVersion": "21.99.99"
+      },
+      "sourceIds": [
+        "microsoft-learn-bc21-actionbar-pages"
+      ]
+    },
+    {
+      "ruleId": "MicrosoftBC21.Page981",
+      "pageObjectId": "981",
+      "entity": "",
+      "pageType": "worksheet",
+      "localizedCaptions": {
+        "en-US": [
+          "Payment Registration"
+        ]
+      },
+      "captionRules": [
+        {
+          "locale": "en-US",
+          "pattern": "^Payment Registration$"
+        }
+      ],
+      "objectVerification": "declared",
+      "compatibility": {
+        "minAppVersion": "21.0.0",
+        "maxAppVersion": "21.99.99"
+      },
+      "sourceIds": [
+        "microsoft-learn-bc21-actionbar-pages"
+      ]
+    },
+    {
+      "ruleId": "MicrosoftBC21.Page1007",
+      "pageObjectId": "1007",
+      "entity": "",
+      "pageType": "list",
+      "localizedCaptions": {
+        "en-US": [
+          "Job Planning Lines"
+        ]
+      },
+      "captionRules": [
+        {
+          "locale": "en-US",
+          "pattern": "^Job Planning Lines$"
+        }
+      ],
+      "objectVerification": "declared",
+      "compatibility": {
+        "minAppVersion": "21.0.0",
+        "maxAppVersion": "21.99.99"
+      },
+      "sourceIds": [
+        "microsoft-learn-bc21-actionbar-pages"
+      ]
+    },
+    {
+      "ruleId": "MicrosoftBC21.Page1020",
+      "pageObjectId": "1020",
+      "entity": "",
+      "pageType": "worksheet",
+      "localizedCaptions": {
+        "en-US": [
+          "Job G/L Journal"
+        ]
+      },
+      "captionRules": [
+        {
+          "locale": "en-US",
+          "pattern": "^Job G/L Journal$"
+        }
+      ],
+      "objectVerification": "declared",
+      "compatibility": {
+        "minAppVersion": "21.0.0",
+        "maxAppVersion": "21.99.99"
+      },
+      "sourceIds": [
+        "microsoft-learn-bc21-actionbar-pages"
+      ]
+    },
+    {
+      "ruleId": "MicrosoftBC21.Page1173",
+      "pageObjectId": "1173",
+      "entity": "",
+      "pageType": "list",
+      "localizedCaptions": {
+        "en-US": [
+          "Document Attachment Details"
+        ]
+      },
+      "captionRules": [
+        {
+          "locale": "en-US",
+          "pattern": "^Document Attachment Details$"
+        }
+      ],
+      "objectVerification": "declared",
+      "compatibility": {
+        "minAppVersion": "21.0.0",
+        "maxAppVersion": "21.99.99"
+      },
+      "sourceIds": [
+        "microsoft-learn-bc21-actionbar-pages"
+      ]
+    },
+    {
+      "ruleId": "MicrosoftBC21.Page1290",
+      "pageObjectId": "1290",
+      "entity": "",
+      "pageType": "worksheet",
+      "localizedCaptions": {
+        "en-US": [
+          "Payment Reconciliation Journal"
+        ]
+      },
+      "captionRules": [
+        {
+          "locale": "en-US",
+          "pattern": "^Payment Reconciliation Journal$"
+        }
+      ],
+      "objectVerification": "declared",
+      "compatibility": {
+        "minAppVersion": "21.0.0",
+        "maxAppVersion": "21.99.99"
+      },
+      "sourceIds": [
+        "microsoft-learn-bc21-actionbar-pages"
+      ]
+    },
+    {
+      "ruleId": "MicrosoftBC21.Page1292",
+      "pageObjectId": "1292",
+      "entity": "",
+      "pageType": "worksheet",
+      "localizedCaptions": {
+        "en-US": [
+          "Payment Application"
+        ]
+      },
+      "captionRules": [
+        {
+          "locale": "en-US",
+          "pattern": "^Payment Application$"
+        }
+      ],
+      "objectVerification": "declared",
+      "compatibility": {
+        "minAppVersion": "21.0.0",
+        "maxAppVersion": "21.99.99"
+      },
+      "sourceIds": [
+        "microsoft-learn-bc21-actionbar-pages"
+      ]
+    },
+    {
+      "ruleId": "MicrosoftBC21.Page1294",
+      "pageObjectId": "1294",
+      "entity": "",
+      "pageType": "list",
+      "localizedCaptions": {
+        "en-US": [
+          "Pmt. Reconciliation Journals"
+        ]
+      },
+      "captionRules": [
+        {
+          "locale": "en-US",
+          "pattern": "^Pmt. Reconciliation Journals$"
+        }
+      ],
+      "objectVerification": "declared",
+      "compatibility": {
+        "minAppVersion": "21.0.0",
+        "maxAppVersion": "21.99.99"
+      },
+      "sourceIds": [
+        "microsoft-learn-bc21-actionbar-pages"
+      ]
+    },
+    {
+      "ruleId": "MicrosoftBC21.Page1345",
+      "pageObjectId": "1345",
+      "entity": "",
+      "pageType": "list",
+      "localizedCaptions": {
+        "en-US": [
+          "Sales Price and Line Discounts"
+        ]
+      },
+      "captionRules": [
+        {
+          "locale": "en-US",
+          "pattern": "^Sales Price and Line Discounts$"
+        }
+      ],
+      "objectVerification": "declared",
+      "compatibility": {
+        "minAppVersion": "21.0.0",
+        "maxAppVersion": "21.99.99"
+      },
+      "sourceIds": [
+        "microsoft-learn-bc21-actionbar-pages"
+      ]
+    },
+    {
+      "ruleId": "MicrosoftBC21.Page1500",
+      "pageObjectId": "1500",
+      "entity": "",
+      "pageType": "list",
+      "localizedCaptions": {
+        "en-US": [
+          "Workflows"
+        ]
+      },
+      "captionRules": [
+        {
+          "locale": "en-US",
+          "pattern": "^Workflows$"
+        }
+      ],
+      "objectVerification": "declared",
+      "compatibility": {
+        "minAppVersion": "21.0.0",
+        "maxAppVersion": "21.99.99"
+      },
+      "sourceIds": [
+        "microsoft-learn-bc21-actionbar-pages"
+      ]
+    },
+    {
+      "ruleId": "MicrosoftBC21.Page1801",
+      "pageObjectId": "1801",
+      "entity": "",
+      "pageType": "list",
+      "localizedCaptions": {
+        "en-US": [
+          "Assisted Setup"
+        ]
+      },
+      "captionRules": [
+        {
+          "locale": "en-US",
+          "pattern": "^Assisted Setup$"
+        }
+      ],
+      "objectVerification": "declared",
+      "compatibility": {
+        "minAppVersion": "21.0.0",
+        "maxAppVersion": "21.99.99"
+      },
+      "sourceIds": [
+        "microsoft-learn-bc21-actionbar-pages"
+      ]
+    },
+    {
+      "ruleId": "MicrosoftBC21.Page5050",
+      "pageObjectId": "5050",
+      "entity": "",
+      "pageType": "listPlus",
+      "localizedCaptions": {
+        "en-US": [
+          "Contact Card"
+        ]
+      },
+      "captionRules": [
+        {
+          "locale": "en-US",
+          "pattern": "^Contact Card$"
+        }
+      ],
+      "objectVerification": "declared",
+      "compatibility": {
+        "minAppVersion": "21.0.0",
+        "maxAppVersion": "21.99.99"
+      },
+      "sourceIds": [
+        "microsoft-learn-bc21-actionbar-pages"
+      ]
+    },
+    {
+      "ruleId": "MicrosoftBC21.Page5052",
+      "pageObjectId": "5052",
+      "entity": "",
+      "pageType": "list",
+      "localizedCaptions": {
+        "en-US": [
+          "Contact List"
+        ]
+      },
+      "captionRules": [
+        {
+          "locale": "en-US",
+          "pattern": "^Contact List$"
+        }
+      ],
+      "objectVerification": "declared",
+      "compatibility": {
+        "minAppVersion": "21.0.0",
+        "maxAppVersion": "21.99.99"
+      },
+      "sourceIds": [
+        "microsoft-learn-bc21-actionbar-pages"
+      ]
+    },
+    {
+      "ruleId": "MicrosoftBC21.Page5116",
+      "pageObjectId": "5116",
+      "entity": "",
+      "pageType": "card",
+      "localizedCaptions": {
+        "en-US": [
+          "Salespersons/Purchasers Card"
+        ]
+      },
+      "captionRules": [
+        {
+          "locale": "en-US",
+          "pattern": "^Salespersons/Purchasers Card$"
+        }
+      ],
+      "objectVerification": "declared",
+      "compatibility": {
+        "minAppVersion": "21.0.0",
+        "maxAppVersion": "21.99.99"
+      },
+      "sourceIds": [
+        "microsoft-learn-bc21-actionbar-pages"
+      ]
+    },
+    {
+      "ruleId": "MicrosoftBC21.Page5123",
+      "pageObjectId": "5123",
+      "entity": "",
+      "pageType": "list",
+      "localizedCaptions": {
+        "en-US": [
+          "Opportunity List"
+        ]
+      },
+      "captionRules": [
+        {
+          "locale": "en-US",
+          "pattern": "^Opportunity List$"
+        }
+      ],
+      "objectVerification": "declared",
+      "compatibility": {
+        "minAppVersion": "21.0.0",
+        "maxAppVersion": "21.99.99"
+      },
+      "sourceIds": [
+        "microsoft-learn-bc21-actionbar-pages"
+      ]
+    },
+    {
+      "ruleId": "MicrosoftBC21.Page5124",
+      "pageObjectId": "5124",
+      "entity": "",
+      "pageType": "card",
+      "localizedCaptions": {
+        "en-US": [
+          "Opportunity Card"
+        ]
+      },
+      "captionRules": [
+        {
+          "locale": "en-US",
+          "pattern": "^Opportunity Card$"
+        }
+      ],
+      "objectVerification": "declared",
+      "compatibility": {
+        "minAppVersion": "21.0.0",
+        "maxAppVersion": "21.99.99"
+      },
+      "sourceIds": [
+        "microsoft-learn-bc21-actionbar-pages"
+      ]
+    },
+    {
+      "ruleId": "MicrosoftBC21.Page5335",
+      "pageObjectId": "5335",
+      "entity": "",
+      "pageType": "list",
+      "localizedCaptions": {
+        "en-US": [
+          "Integration Table Mapping List"
+        ]
+      },
+      "captionRules": [
+        {
+          "locale": "en-US",
+          "pattern": "^Integration Table Mapping List$"
+        }
+      ],
+      "objectVerification": "declared",
+      "compatibility": {
+        "minAppVersion": "21.0.0",
+        "maxAppVersion": "21.99.99"
+      },
+      "sourceIds": [
+        "microsoft-learn-bc21-actionbar-pages"
+      ]
+    },
+    {
+      "ruleId": "MicrosoftBC21.Page5400",
+      "pageObjectId": "5400",
+      "entity": "",
+      "pageType": "list",
+      "localizedCaptions": {
+        "en-US": [
+          "Item Unit Group List"
+        ]
+      },
+      "captionRules": [
+        {
+          "locale": "en-US",
+          "pattern": "^Item Unit Group List$"
+        }
+      ],
+      "objectVerification": "declared",
+      "compatibility": {
+        "minAppVersion": "21.0.0",
+        "maxAppVersion": "21.99.99"
+      },
+      "sourceIds": [
+        "microsoft-learn-bc21-actionbar-pages"
+      ]
+    },
+    {
+      "ruleId": "MicrosoftBC21.Page5404",
+      "pageObjectId": "5404",
+      "entity": "",
+      "pageType": "list",
+      "localizedCaptions": {
+        "en-US": [
+          "Item Unit of Measure"
+        ]
+      },
+      "captionRules": [
+        {
+          "locale": "en-US",
+          "pattern": "^Item Unit of Measure$"
+        }
+      ],
+      "objectVerification": "declared",
+      "compatibility": {
+        "minAppVersion": "21.0.0",
+        "maxAppVersion": "21.99.99"
+      },
+      "sourceIds": [
+        "microsoft-learn-bc21-actionbar-pages"
+      ]
+    },
+    {
+      "ruleId": "MicrosoftBC21.Page5406",
+      "pageObjectId": "5406",
+      "entity": "",
+      "pageType": "list",
+      "localizedCaptions": {
+        "en-US": [
+          "Prod. Order Line List"
+        ]
+      },
+      "captionRules": [
+        {
+          "locale": "en-US",
+          "pattern": "^Prod. Order Line List$"
+        }
+      ],
+      "objectVerification": "declared",
+      "compatibility": {
+        "minAppVersion": "21.0.0",
+        "maxAppVersion": "21.99.99"
+      },
+      "sourceIds": [
+        "microsoft-learn-bc21-actionbar-pages"
+      ]
+    },
+    {
+      "ruleId": "MicrosoftBC21.Page5510",
+      "pageObjectId": "5510",
+      "entity": "",
+      "pageType": "worksheet",
+      "localizedCaptions": {
+        "en-US": [
+          "Production Journal"
+        ]
+      },
+      "captionRules": [
+        {
+          "locale": "en-US",
+          "pattern": "^Production Journal$"
+        }
+      ],
+      "objectVerification": "declared",
+      "compatibility": {
+        "minAppVersion": "21.0.0",
+        "maxAppVersion": "21.99.99"
+      },
+      "sourceIds": [
+        "microsoft-learn-bc21-actionbar-pages"
+      ]
+    },
+    {
+      "ruleId": "MicrosoftBC21.Page5522",
+      "pageObjectId": "5522",
+      "entity": "",
+      "pageType": "worksheet",
+      "localizedCaptions": {
+        "en-US": [
+          "Order Planning"
+        ]
+      },
+      "captionRules": [
+        {
+          "locale": "en-US",
+          "pattern": "^Order Planning$"
+        }
+      ],
+      "objectVerification": "declared",
+      "compatibility": {
+        "minAppVersion": "21.0.0",
+        "maxAppVersion": "21.99.99"
+      },
+      "sourceIds": [
+        "microsoft-learn-bc21-actionbar-pages"
+      ]
+    },
+    {
+      "ruleId": "MicrosoftBC21.Page5601",
+      "pageObjectId": "5601",
+      "entity": "",
+      "pageType": "list",
+      "localizedCaptions": {
+        "en-US": [
+          "Fixed Asset List"
+        ]
+      },
+      "captionRules": [
+        {
+          "locale": "en-US",
+          "pattern": "^Fixed Asset List$"
+        }
+      ],
+      "objectVerification": "declared",
+      "compatibility": {
+        "minAppVersion": "21.0.0",
+        "maxAppVersion": "21.99.99"
+      },
+      "sourceIds": [
+        "microsoft-learn-bc21-actionbar-pages"
+      ]
+    },
+    {
+      "ruleId": "MicrosoftBC21.Page5604",
+      "pageObjectId": "5604",
+      "entity": "",
+      "pageType": "list",
+      "localizedCaptions": {
+        "en-US": [
+          "FA Ledger Entries"
+        ]
+      },
+      "captionRules": [
+        {
+          "locale": "en-US",
+          "pattern": "^FA Ledger Entries$"
+        }
+      ],
+      "objectVerification": "declared",
+      "compatibility": {
+        "minAppVersion": "21.0.0",
+        "maxAppVersion": "21.99.99"
+      },
+      "sourceIds": [
+        "microsoft-learn-bc21-actionbar-pages"
+      ]
+    },
+    {
+      "ruleId": "MicrosoftBC21.Page5628",
+      "pageObjectId": "5628",
+      "entity": "",
+      "pageType": "worksheet",
+      "localizedCaptions": {
+        "en-US": [
+          "Fixed Asset G/L Journal"
+        ]
+      },
+      "captionRules": [
+        {
+          "locale": "en-US",
+          "pattern": "^Fixed Asset G/L Journal$"
+        }
+      ],
+      "objectVerification": "declared",
+      "compatibility": {
+        "minAppVersion": "21.0.0",
+        "maxAppVersion": "21.99.99"
+      },
+      "sourceIds": [
+        "microsoft-learn-bc21-actionbar-pages"
+      ]
+    },
+    {
+      "ruleId": "MicrosoftBC21.Page5629",
+      "pageObjectId": "5629",
+      "entity": "",
+      "pageType": "worksheet",
+      "localizedCaptions": {
+        "en-US": [
+          "Fixed Asset Journal"
+        ]
+      },
+      "captionRules": [
+        {
+          "locale": "en-US",
+          "pattern": "^Fixed Asset Journal$"
+        }
+      ],
+      "objectVerification": "declared",
+      "compatibility": {
+        "minAppVersion": "21.0.0",
+        "maxAppVersion": "21.99.99"
+      },
+      "sourceIds": [
+        "microsoft-learn-bc21-actionbar-pages"
+      ]
+    },
+    {
+      "ruleId": "MicrosoftBC21.Page5740",
+      "pageObjectId": "5740",
+      "entity": "",
+      "pageType": "document",
+      "localizedCaptions": {
+        "en-US": [
+          "Transfer Order"
+        ]
+      },
+      "captionRules": [
+        {
+          "locale": "en-US",
+          "pattern": "^Transfer Order$"
+        }
+      ],
+      "objectVerification": "declared",
+      "compatibility": {
+        "minAppVersion": "21.0.0",
+        "maxAppVersion": "21.99.99"
+      },
+      "sourceIds": [
+        "microsoft-learn-bc21-actionbar-pages"
+      ]
+    },
+    {
+      "ruleId": "MicrosoftBC21.Page5742",
+      "pageObjectId": "5742",
+      "entity": "",
+      "pageType": "list",
+      "localizedCaptions": {
+        "en-US": [
+          "Transfer Orders"
+        ]
+      },
+      "captionRules": [
+        {
+          "locale": "en-US",
+          "pattern": "^Transfer Orders$"
+        }
+      ],
+      "objectVerification": "declared",
+      "compatibility": {
+        "minAppVersion": "21.0.0",
+        "maxAppVersion": "21.99.99"
+      },
+      "sourceIds": [
+        "microsoft-learn-bc21-actionbar-pages"
+      ]
+    },
+    {
+      "ruleId": "MicrosoftBC21.Page5768",
+      "pageObjectId": "5768",
+      "entity": "WarehouseReceipt",
+      "pageType": "document",
+      "localizedCaptions": {
+        "en-US": [
+          "Warehouse Receipt"
+        ]
+      },
+      "captionRules": [
+        {
+          "locale": "en-US",
+          "pattern": "^Warehouse Receipt$"
+        }
+      ],
+      "objectVerification": "declared",
+      "compatibility": {
+        "minAppVersion": "21.0.0",
+        "maxAppVersion": "21.99.99"
+      },
+      "sourceIds": [
+        "microsoft-learn-bc21-actionbar-pages"
+      ]
+    },
+    {
+      "ruleId": "MicrosoftBC21.Page5770",
+      "pageObjectId": "5770",
+      "entity": "",
+      "pageType": "document",
+      "localizedCaptions": {
+        "en-US": [
+          "Warehouse Put-away"
+        ]
+      },
+      "captionRules": [
+        {
+          "locale": "en-US",
+          "pattern": "^Warehouse Put-away$"
+        }
+      ],
+      "objectVerification": "declared",
+      "compatibility": {
+        "minAppVersion": "21.0.0",
+        "maxAppVersion": "21.99.99"
+      },
+      "sourceIds": [
+        "microsoft-learn-bc21-actionbar-pages"
+      ]
+    },
+    {
+      "ruleId": "MicrosoftBC21.Page5774",
+      "pageObjectId": "5774",
+      "entity": "WarehouseActivity",
+      "pageType": "list",
+      "localizedCaptions": {
+        "en-US": [
+          "Warehouse Activity List"
+        ]
+      },
+      "captionRules": [
+        {
+          "locale": "en-US",
+          "pattern": "^Warehouse Activity List$"
+        }
+      ],
+      "objectVerification": "declared",
+      "compatibility": {
+        "minAppVersion": "21.0.0",
+        "maxAppVersion": "21.99.99"
+      },
+      "sourceIds": [
+        "microsoft-learn-bc21-actionbar-pages"
+      ]
+    },
+    {
+      "ruleId": "MicrosoftBC21.Page5779",
+      "pageObjectId": "5779",
+      "entity": "",
+      "pageType": "document",
+      "localizedCaptions": {
+        "en-US": [
+          "Warehouse Pick"
+        ]
+      },
+      "captionRules": [
+        {
+          "locale": "en-US",
+          "pattern": "^Warehouse Pick$"
+        }
+      ],
+      "objectVerification": "declared",
+      "compatibility": {
+        "minAppVersion": "21.0.0",
+        "maxAppVersion": "21.99.99"
+      },
+      "sourceIds": [
+        "microsoft-learn-bc21-actionbar-pages"
+      ]
+    },
+    {
+      "ruleId": "MicrosoftBC21.Page5785",
+      "pageObjectId": "5785",
+      "entity": "",
+      "pageType": "list",
+      "localizedCaptions": {
+        "en-US": [
+          "Warehouse Activity Lines"
+        ]
+      },
+      "captionRules": [
+        {
+          "locale": "en-US",
+          "pattern": "^Warehouse Activity Lines$"
+        }
+      ],
+      "objectVerification": "declared",
+      "compatibility": {
+        "minAppVersion": "21.0.0",
+        "maxAppVersion": "21.99.99"
+      },
+      "sourceIds": [
+        "microsoft-learn-bc21-actionbar-pages"
+      ]
+    },
+    {
+      "ruleId": "MicrosoftBC21.Page5802",
+      "pageObjectId": "5802",
+      "entity": "",
+      "pageType": "list",
+      "localizedCaptions": {
+        "en-US": [
+          "Value Entries"
+        ]
+      },
+      "captionRules": [
+        {
+          "locale": "en-US",
+          "pattern": "^Value Entries$"
+        }
+      ],
+      "objectVerification": "declared",
+      "compatibility": {
+        "minAppVersion": "21.0.0",
+        "maxAppVersion": "21.99.99"
+      },
+      "sourceIds": [
+        "microsoft-learn-bc21-actionbar-pages"
+      ]
+    },
+    {
+      "ruleId": "MicrosoftBC21.Page5803",
+      "pageObjectId": "5803",
+      "entity": "",
+      "pageType": "worksheet",
+      "localizedCaptions": {
+        "en-US": [
+          "Revaluation Journal"
+        ]
+      },
+      "captionRules": [
+        {
+          "locale": "en-US",
+          "pattern": "^Revaluation Journal$"
+        }
+      ],
+      "objectVerification": "declared",
+      "compatibility": {
+        "minAppVersion": "21.0.0",
+        "maxAppVersion": "21.99.99"
+      },
+      "sourceIds": [
+        "microsoft-learn-bc21-actionbar-pages"
+      ]
+    },
+    {
+      "ruleId": "MicrosoftBC21.Page5805",
+      "pageObjectId": "5805",
+      "entity": "",
+      "pageType": "worksheet",
+      "localizedCaptions": {
+        "en-US": [
+          "Item Charge Assignment (Purch)"
+        ]
+      },
+      "captionRules": [
+        {
+          "locale": "en-US",
+          "pattern": "^Item Charge Assignment (Purch)$"
+        }
+      ],
+      "objectVerification": "declared",
+      "compatibility": {
+        "minAppVersion": "21.0.0",
+        "maxAppVersion": "21.99.99"
+      },
+      "sourceIds": [
+        "microsoft-learn-bc21-actionbar-pages"
+      ]
+    },
+    {
+      "ruleId": "MicrosoftBC21.Page5875",
+      "pageObjectId": "5875",
+      "entity": "",
+      "pageType": "document",
+      "localizedCaptions": {
+        "en-US": [
+          "Physical Inventory Order"
+        ]
+      },
+      "captionRules": [
+        {
+          "locale": "en-US",
+          "pattern": "^Physical Inventory Order$"
+        }
+      ],
+      "objectVerification": "declared",
+      "compatibility": {
+        "minAppVersion": "21.0.0",
+        "maxAppVersion": "21.99.99"
+      },
+      "sourceIds": [
+        "microsoft-learn-bc21-actionbar-pages"
+      ]
+    },
+    {
+      "ruleId": "MicrosoftBC21.Page5900",
+      "pageObjectId": "5900",
+      "entity": "",
+      "pageType": "document",
+      "localizedCaptions": {
+        "en-US": [
+          "Service Order"
+        ]
+      },
+      "captionRules": [
+        {
+          "locale": "en-US",
+          "pattern": "^Service Order$"
+        }
+      ],
+      "objectVerification": "declared",
+      "compatibility": {
+        "minAppVersion": "21.0.0",
+        "maxAppVersion": "21.99.99"
+      },
+      "sourceIds": [
+        "microsoft-learn-bc21-actionbar-pages"
+      ]
+    },
+    {
+      "ruleId": "MicrosoftBC21.Page5933",
+      "pageObjectId": "5933",
+      "entity": "",
+      "pageType": "document",
+      "localizedCaptions": {
+        "en-US": [
+          "Service Invoice"
+        ]
+      },
+      "captionRules": [
+        {
+          "locale": "en-US",
+          "pattern": "^Service Invoice$"
+        }
+      ],
+      "objectVerification": "declared",
+      "compatibility": {
+        "minAppVersion": "21.0.0",
+        "maxAppVersion": "21.99.99"
+      },
+      "sourceIds": [
+        "microsoft-learn-bc21-actionbar-pages"
+      ]
+    },
+    {
+      "ruleId": "MicrosoftBC21.Page5978",
+      "pageObjectId": "5978",
+      "entity": "",
+      "pageType": "document",
+      "localizedCaptions": {
+        "en-US": [
+          "Posted Service Invoice"
+        ]
+      },
+      "captionRules": [
+        {
+          "locale": "en-US",
+          "pattern": "^Posted Service Invoice$"
+        }
+      ],
+      "objectVerification": "declared",
+      "compatibility": {
+        "minAppVersion": "21.0.0",
+        "maxAppVersion": "21.99.99"
+      },
+      "sourceIds": [
+        "microsoft-learn-bc21-actionbar-pages"
+      ]
+    },
+    {
+      "ruleId": "MicrosoftBC21.Page6050",
+      "pageObjectId": "6050",
+      "entity": "",
+      "pageType": "document",
+      "localizedCaptions": {
+        "en-US": [
+          "Service Contract"
+        ]
+      },
+      "captionRules": [
+        {
+          "locale": "en-US",
+          "pattern": "^Service Contract$"
+        }
+      ],
+      "objectVerification": "declared",
+      "compatibility": {
+        "minAppVersion": "21.0.0",
+        "maxAppVersion": "21.99.99"
+      },
+      "sourceIds": [
+        "microsoft-learn-bc21-actionbar-pages"
+      ]
+    },
+    {
+      "ruleId": "MicrosoftBC21.Page6510",
+      "pageObjectId": "6510",
+      "entity": "",
+      "pageType": "worksheet",
+      "localizedCaptions": {
+        "en-US": [
+          "Item Tracking Lines"
+        ]
+      },
+      "captionRules": [
+        {
+          "locale": "en-US",
+          "pattern": "^Item Tracking Lines$"
+        }
+      ],
+      "objectVerification": "declared",
+      "compatibility": {
+        "minAppVersion": "21.0.0",
+        "maxAppVersion": "21.99.99"
+      },
+      "sourceIds": [
+        "microsoft-learn-bc21-actionbar-pages"
+      ]
+    },
+    {
+      "ruleId": "MicrosoftBC21.Page6520",
+      "pageObjectId": "6520",
+      "entity": "",
+      "pageType": "worksheet",
+      "localizedCaptions": {
+        "en-US": [
+          "Item Tracing"
+        ]
+      },
+      "captionRules": [
+        {
+          "locale": "en-US",
+          "pattern": "^Item Tracing$"
+        }
+      ],
+      "objectVerification": "declared",
+      "compatibility": {
+        "minAppVersion": "21.0.0",
+        "maxAppVersion": "21.99.99"
+      },
+      "sourceIds": [
+        "microsoft-learn-bc21-actionbar-pages"
+      ]
+    },
+    {
+      "ruleId": "MicrosoftBC21.Page6630",
+      "pageObjectId": "6630",
+      "entity": "SalesReturnOrder",
+      "pageType": "document",
+      "localizedCaptions": {
+        "en-US": [
+          "Sales Return Order"
+        ]
+      },
+      "captionRules": [
+        {
+          "locale": "en-US",
+          "pattern": "^Sales Return Order$"
+        }
+      ],
+      "objectVerification": "declared",
+      "compatibility": {
+        "minAppVersion": "21.0.0",
+        "maxAppVersion": "21.99.99"
+      },
+      "sourceIds": [
+        "microsoft-learn-bc21-actionbar-pages"
+      ]
+    },
+    {
+      "ruleId": "MicrosoftBC21.Page6640",
+      "pageObjectId": "6640",
+      "entity": "PurchaseReturnOrder",
+      "pageType": "document",
+      "localizedCaptions": {
+        "en-US": [
+          "Purchase Return Order"
+        ]
+      },
+      "captionRules": [
+        {
+          "locale": "en-US",
+          "pattern": "^Purchase Return Order$"
+        }
+      ],
+      "objectVerification": "declared",
+      "compatibility": {
+        "minAppVersion": "21.0.0",
+        "maxAppVersion": "21.99.99"
+      },
+      "sourceIds": [
+        "microsoft-learn-bc21-actionbar-pages"
+      ]
+    },
+    {
+      "ruleId": "MicrosoftBC21.Page7016",
+      "pageObjectId": "7016",
+      "entity": "",
+      "pageType": "listPlus",
+      "localizedCaptions": {
+        "en-US": [
+          "Sales Price List"
+        ]
+      },
+      "captionRules": [
+        {
+          "locale": "en-US",
+          "pattern": "^Sales Price List$"
+        }
+      ],
+      "objectVerification": "declared",
+      "compatibility": {
+        "minAppVersion": "21.0.0",
+        "maxAppVersion": "21.99.99"
+      },
+      "sourceIds": [
+        "microsoft-learn-bc21-actionbar-pages"
+      ]
+    },
+    {
+      "ruleId": "MicrosoftBC21.Page7315",
+      "pageObjectId": "7315",
+      "entity": "",
+      "pageType": "document",
+      "localizedCaptions": {
+        "en-US": [
+          "Warehouse Movement"
+        ]
+      },
+      "captionRules": [
+        {
+          "locale": "en-US",
+          "pattern": "^Warehouse Movement$"
+        }
+      ],
+      "objectVerification": "declared",
+      "compatibility": {
+        "minAppVersion": "21.0.0",
+        "maxAppVersion": "21.99.99"
+      },
+      "sourceIds": [
+        "microsoft-learn-bc21-actionbar-pages"
+      ]
+    },
+    {
+      "ruleId": "MicrosoftBC21.Page7324",
+      "pageObjectId": "7324",
+      "entity": "",
+      "pageType": "worksheet",
+      "localizedCaptions": {
+        "en-US": [
+          "Whse. Item Journal"
+        ]
+      },
+      "captionRules": [
+        {
+          "locale": "en-US",
+          "pattern": "^Whse. Item Journal$"
+        }
+      ],
+      "objectVerification": "declared",
+      "compatibility": {
+        "minAppVersion": "21.0.0",
+        "maxAppVersion": "21.99.99"
+      },
+      "sourceIds": [
+        "microsoft-learn-bc21-actionbar-pages"
+      ]
+    },
+    {
+      "ruleId": "MicrosoftBC21.Page7326",
+      "pageObjectId": "7326",
+      "entity": "",
+      "pageType": "worksheet",
+      "localizedCaptions": {
+        "en-US": [
+          "Whse. Phys. Invt. Journal"
+        ]
+      },
+      "captionRules": [
+        {
+          "locale": "en-US",
+          "pattern": "^Whse. Phys. Invt. Journal$"
+        }
+      ],
+      "objectVerification": "declared",
+      "compatibility": {
+        "minAppVersion": "21.0.0",
+        "maxAppVersion": "21.99.99"
+      },
+      "sourceIds": [
+        "microsoft-learn-bc21-actionbar-pages"
+      ]
+    },
+    {
+      "ruleId": "MicrosoftBC21.Page7330",
+      "pageObjectId": "7330",
+      "entity": "",
+      "pageType": "document",
+      "localizedCaptions": {
+        "en-US": [
+          "Posted Whse. Receipt"
+        ]
+      },
+      "captionRules": [
+        {
+          "locale": "en-US",
+          "pattern": "^Posted Whse. Receipt$"
+        }
+      ],
+      "objectVerification": "declared",
+      "compatibility": {
+        "minAppVersion": "21.0.0",
+        "maxAppVersion": "21.99.99"
+      },
+      "sourceIds": [
+        "microsoft-learn-bc21-actionbar-pages"
+      ]
+    },
+    {
+      "ruleId": "MicrosoftBC21.Page7335",
+      "pageObjectId": "7335",
+      "entity": "WarehouseShipment",
+      "pageType": "document",
+      "localizedCaptions": {
+        "en-US": [
+          "Warehouse Shipment"
+        ]
+      },
+      "captionRules": [
+        {
+          "locale": "en-US",
+          "pattern": "^Warehouse Shipment$"
+        }
+      ],
+      "objectVerification": "declared",
+      "compatibility": {
+        "minAppVersion": "21.0.0",
+        "maxAppVersion": "21.99.99"
+      },
+      "sourceIds": [
+        "microsoft-learn-bc21-actionbar-pages"
+      ]
+    },
+    {
+      "ruleId": "MicrosoftBC21.Page7337",
+      "pageObjectId": "7337",
+      "entity": "",
+      "pageType": "document",
+      "localizedCaptions": {
+        "en-US": [
+          "Posted Whse. Shipment"
+        ]
+      },
+      "captionRules": [
+        {
+          "locale": "en-US",
+          "pattern": "^Posted Whse. Shipment$"
+        }
+      ],
+      "objectVerification": "declared",
+      "compatibility": {
+        "minAppVersion": "21.0.0",
+        "maxAppVersion": "21.99.99"
+      },
+      "sourceIds": [
+        "microsoft-learn-bc21-actionbar-pages"
+      ]
+    },
+    {
+      "ruleId": "MicrosoftBC21.Page7341",
+      "pageObjectId": "7341",
+      "entity": "",
+      "pageType": "list",
+      "localizedCaptions": {
+        "en-US": [
+          "Whse. Shipment Lines"
+        ]
+      },
+      "captionRules": [
+        {
+          "locale": "en-US",
+          "pattern": "^Whse. Shipment Lines$"
+        }
+      ],
+      "objectVerification": "declared",
+      "compatibility": {
+        "minAppVersion": "21.0.0",
+        "maxAppVersion": "21.99.99"
+      },
+      "sourceIds": [
+        "microsoft-learn-bc21-actionbar-pages"
+      ]
+    },
+    {
+      "ruleId": "MicrosoftBC21.Page7342",
+      "pageObjectId": "7342",
+      "entity": "",
+      "pageType": "list",
+      "localizedCaptions": {
+        "en-US": [
+          "Whse. Receipt Lines"
+        ]
+      },
+      "captionRules": [
+        {
+          "locale": "en-US",
+          "pattern": "^Whse. Receipt Lines$"
+        }
+      ],
+      "objectVerification": "declared",
+      "compatibility": {
+        "minAppVersion": "21.0.0",
+        "maxAppVersion": "21.99.99"
+      },
+      "sourceIds": [
+        "microsoft-learn-bc21-actionbar-pages"
+      ]
+    },
+    {
+      "ruleId": "MicrosoftBC21.Page7345",
+      "pageObjectId": "7345",
+      "entity": "",
+      "pageType": "worksheet",
+      "localizedCaptions": {
+        "en-US": [
+          "Pick Worksheet"
+        ]
+      },
+      "captionRules": [
+        {
+          "locale": "en-US",
+          "pattern": "^Pick Worksheet$"
+        }
+      ],
+      "objectVerification": "declared",
+      "compatibility": {
+        "minAppVersion": "21.0.0",
+        "maxAppVersion": "21.99.99"
+      },
+      "sourceIds": [
+        "microsoft-learn-bc21-actionbar-pages"
+      ]
+    },
+    {
+      "ruleId": "MicrosoftBC21.Page7351",
+      "pageObjectId": "7351",
+      "entity": "",
+      "pageType": "worksheet",
+      "localizedCaptions": {
+        "en-US": [
+          "Movement Worksheet"
+        ]
+      },
+      "captionRules": [
+        {
+          "locale": "en-US",
+          "pattern": "^Movement Worksheet$"
+        }
+      ],
+      "objectVerification": "declared",
+      "compatibility": {
+        "minAppVersion": "21.0.0",
+        "maxAppVersion": "21.99.99"
+      },
+      "sourceIds": [
+        "microsoft-learn-bc21-actionbar-pages"
+      ]
+    },
+    {
+      "ruleId": "MicrosoftBC21.Page7365",
+      "pageObjectId": "7365",
+      "entity": "",
+      "pageType": "worksheet",
+      "localizedCaptions": {
+        "en-US": [
+          "Whse. Reclassification Journal"
+        ]
+      },
+      "captionRules": [
+        {
+          "locale": "en-US",
+          "pattern": "^Whse. Reclassification Journal$"
+        }
+      ],
+      "objectVerification": "declared",
+      "compatibility": {
+        "minAppVersion": "21.0.0",
+        "maxAppVersion": "21.99.99"
+      },
+      "sourceIds": [
+        "microsoft-learn-bc21-actionbar-pages"
+      ]
+    },
+    {
+      "ruleId": "MicrosoftBC21.Page7375",
+      "pageObjectId": "7375",
+      "entity": "",
+      "pageType": "document",
+      "localizedCaptions": {
+        "en-US": [
+          "Inventory Put-away"
+        ]
+      },
+      "captionRules": [
+        {
+          "locale": "en-US",
+          "pattern": "^Inventory Put-away$"
+        }
+      ],
+      "objectVerification": "declared",
+      "compatibility": {
+        "minAppVersion": "21.0.0",
+        "maxAppVersion": "21.99.99"
+      },
+      "sourceIds": [
+        "microsoft-learn-bc21-actionbar-pages"
+      ]
+    },
+    {
+      "ruleId": "MicrosoftBC21.Page7377",
+      "pageObjectId": "7377",
+      "entity": "",
+      "pageType": "document",
+      "localizedCaptions": {
+        "en-US": [
+          "Inventory Pick"
+        ]
+      },
+      "captionRules": [
+        {
+          "locale": "en-US",
+          "pattern": "^Inventory Pick$"
+        }
+      ],
+      "objectVerification": "declared",
+      "compatibility": {
+        "minAppVersion": "21.0.0",
+        "maxAppVersion": "21.99.99"
+      },
+      "sourceIds": [
+        "microsoft-learn-bc21-actionbar-pages"
+      ]
+    },
+    {
+      "ruleId": "MicrosoftBC21.Page7382",
+      "pageObjectId": "7382",
+      "entity": "",
+      "pageType": "document",
+      "localizedCaptions": {
+        "en-US": [
+          "Inventory Movement"
+        ]
+      },
+      "captionRules": [
+        {
+          "locale": "en-US",
+          "pattern": "^Inventory Movement$"
+        }
+      ],
+      "objectVerification": "declared",
+      "compatibility": {
+        "minAppVersion": "21.0.0",
+        "maxAppVersion": "21.99.99"
+      },
+      "sourceIds": [
+        "microsoft-learn-bc21-actionbar-pages"
+      ]
+    },
+    {
+      "ruleId": "MicrosoftBC21.Page8614",
+      "pageObjectId": "8614",
+      "entity": "",
+      "pageType": "document",
+      "localizedCaptions": {
+        "en-US": [
+          "Config. Package Card"
+        ]
+      },
+      "captionRules": [
+        {
+          "locale": "en-US",
+          "pattern": "^Config. Package Card$"
+        }
+      ],
+      "objectVerification": "declared",
+      "compatibility": {
+        "minAppVersion": "21.0.0",
+        "maxAppVersion": "21.99.99"
+      },
+      "sourceIds": [
+        "microsoft-learn-bc21-actionbar-pages"
+      ]
+    },
+    {
+      "ruleId": "MicrosoftBC21.Page8615",
+      "pageObjectId": "8615",
+      "entity": "",
+      "pageType": "list",
+      "localizedCaptions": {
+        "en-US": [
+          "Config. Packages"
+        ]
+      },
+      "captionRules": [
+        {
+          "locale": "en-US",
+          "pattern": "^Config. Packages$"
+        }
+      ],
+      "objectVerification": "declared",
+      "compatibility": {
+        "minAppVersion": "21.0.0",
+        "maxAppVersion": "21.99.99"
+      },
+      "sourceIds": [
+        "microsoft-learn-bc21-actionbar-pages"
+      ]
+    },
+    {
+      "ruleId": "MicrosoftBC21.Page8624",
+      "pageObjectId": "8624",
+      "entity": "",
+      "pageType": "list",
+      "localizedCaptions": {
+        "en-US": [
+          "Config. Package Fields"
+        ]
+      },
+      "captionRules": [
+        {
+          "locale": "en-US",
+          "pattern": "^Config. Package Fields$"
+        }
+      ],
+      "objectVerification": "declared",
+      "compatibility": {
+        "minAppVersion": "21.0.0",
+        "maxAppVersion": "21.99.99"
+      },
+      "sourceIds": [
+        "microsoft-learn-bc21-actionbar-pages"
+      ]
+    },
+    {
+      "ruleId": "MicrosoftBC21.Page8626",
+      "pageObjectId": "8626",
+      "entity": "",
+      "pageType": "worksheet",
+      "localizedCaptions": {
+        "en-US": [
+          "Config. Package Records"
+        ]
+      },
+      "captionRules": [
+        {
+          "locale": "en-US",
+          "pattern": "^Config. Package Records$"
+        }
+      ],
+      "objectVerification": "declared",
+      "compatibility": {
+        "minAppVersion": "21.0.0",
+        "maxAppVersion": "21.99.99"
+      },
+      "sourceIds": [
+        "microsoft-learn-bc21-actionbar-pages"
+      ]
+    },
+    {
+      "ruleId": "MicrosoftBC21.Page8632",
+      "pageObjectId": "8632",
+      "entity": "",
+      "pageType": "list",
+      "localizedCaptions": {
+        "en-US": [
+          "Config. Worksheet"
+        ]
+      },
+      "captionRules": [
+        {
+          "locale": "en-US",
+          "pattern": "^Config. Worksheet$"
+        }
+      ],
+      "objectVerification": "declared",
+      "compatibility": {
+        "minAppVersion": "21.0.0",
+        "maxAppVersion": "21.99.99"
+      },
+      "sourceIds": [
+        "microsoft-learn-bc21-actionbar-pages"
+      ]
+    },
+    {
+      "ruleId": "MicrosoftBC21.Page9170",
+      "pageObjectId": "9170",
+      "entity": "",
+      "pageType": "card",
+      "localizedCaptions": {
+        "en-US": [
+          "Profile Card"
+        ]
+      },
+      "captionRules": [
+        {
+          "locale": "en-US",
+          "pattern": "^Profile Card$"
+        }
+      ],
+      "objectVerification": "declared",
+      "compatibility": {
+        "minAppVersion": "21.0.0",
+        "maxAppVersion": "21.99.99"
+      },
+      "sourceIds": [
+        "microsoft-learn-bc21-actionbar-pages"
+      ]
+    },
+    {
+      "ruleId": "MicrosoftBC21.Page9300",
+      "pageObjectId": "9300",
+      "entity": "SalesQuote",
+      "pageType": "list",
+      "localizedCaptions": {
+        "en-US": [
+          "Sales Quotes"
+        ]
+      },
+      "captionRules": [
+        {
+          "locale": "en-US",
+          "pattern": "^Sales Quotes$"
+        }
+      ],
+      "objectVerification": "declared",
+      "compatibility": {
+        "minAppVersion": "21.0.0",
+        "maxAppVersion": "21.99.99"
+      },
+      "sourceIds": [
+        "microsoft-learn-bc21-actionbar-pages"
+      ]
+    },
+    {
+      "ruleId": "MicrosoftBC21.Page9301",
+      "pageObjectId": "9301",
+      "entity": "SalesInvoice",
+      "pageType": "list",
+      "localizedCaptions": {
+        "en-US": [
+          "Sales Invoice List"
+        ]
+      },
+      "captionRules": [
+        {
+          "locale": "en-US",
+          "pattern": "^Sales Invoice List$"
+        }
+      ],
+      "objectVerification": "declared",
+      "compatibility": {
+        "minAppVersion": "21.0.0",
+        "maxAppVersion": "21.99.99"
+      },
+      "sourceIds": [
+        "microsoft-learn-bc21-actionbar-pages"
+      ]
+    },
+    {
+      "ruleId": "MicrosoftBC21.Page9302",
+      "pageObjectId": "9302",
+      "entity": "SalesCreditMemo",
+      "pageType": "list",
+      "localizedCaptions": {
+        "en-US": [
+          "Sales Credit Memos"
+        ]
+      },
+      "captionRules": [
+        {
+          "locale": "en-US",
+          "pattern": "^Sales Credit Memos$"
+        }
+      ],
+      "objectVerification": "declared",
+      "compatibility": {
+        "minAppVersion": "21.0.0",
+        "maxAppVersion": "21.99.99"
+      },
+      "sourceIds": [
+        "microsoft-learn-bc21-actionbar-pages"
+      ]
+    },
+    {
+      "ruleId": "MicrosoftBC21.Page9305",
+      "pageObjectId": "9305",
+      "entity": "SalesOrder",
+      "pageType": "list",
+      "localizedCaptions": {
+        "en-US": [
+          "Sales Order List"
+        ]
+      },
+      "captionRules": [
+        {
+          "locale": "en-US",
+          "pattern": "^Sales Order List$"
+        }
+      ],
+      "objectVerification": "declared",
+      "compatibility": {
+        "minAppVersion": "21.0.0",
+        "maxAppVersion": "21.99.99"
+      },
+      "sourceIds": [
+        "microsoft-learn-bc21-actionbar-pages"
+      ]
+    },
+    {
+      "ruleId": "MicrosoftBC21.Page9307",
+      "pageObjectId": "9307",
+      "entity": "PurchaseOrder",
+      "pageType": "list",
+      "localizedCaptions": {
+        "en-US": [
+          "Purchase Order List"
+        ]
+      },
+      "captionRules": [
+        {
+          "locale": "en-US",
+          "pattern": "^Purchase Order List$"
+        }
+      ],
+      "objectVerification": "declared",
+      "compatibility": {
+        "minAppVersion": "21.0.0",
+        "maxAppVersion": "21.99.99"
+      },
+      "sourceIds": [
+        "microsoft-learn-bc21-actionbar-pages"
+      ]
+    },
+    {
+      "ruleId": "MicrosoftBC21.Page9308",
+      "pageObjectId": "9308",
+      "entity": "PurchaseInvoice",
+      "pageType": "list",
+      "localizedCaptions": {
+        "en-US": [
+          "Purchase Invoices"
+        ]
+      },
+      "captionRules": [
+        {
+          "locale": "en-US",
+          "pattern": "^Purchase Invoices$"
+        }
+      ],
+      "objectVerification": "declared",
+      "compatibility": {
+        "minAppVersion": "21.0.0",
+        "maxAppVersion": "21.99.99"
+      },
+      "sourceIds": [
+        "microsoft-learn-bc21-actionbar-pages"
+      ]
+    },
+    {
+      "ruleId": "MicrosoftBC21.Page9620",
+      "pageObjectId": "9620",
+      "entity": "",
+      "pageType": "list",
+      "localizedCaptions": {
+        "en-US": [
+          "Page Fields"
+        ]
+      },
+      "captionRules": [
+        {
+          "locale": "en-US",
+          "pattern": "^Page Fields$"
+        }
+      ],
+      "objectVerification": "declared",
+      "compatibility": {
+        "minAppVersion": "21.0.0",
+        "maxAppVersion": "21.99.99"
+      },
+      "sourceIds": [
+        "microsoft-learn-bc21-actionbar-pages"
+      ]
+    },
+    {
+      "ruleId": "MicrosoftBC21.Page9650",
+      "pageObjectId": "9650",
+      "entity": "",
+      "pageType": "list",
+      "localizedCaptions": {
+        "en-US": [
+          "Custom Report Layouts"
+        ]
+      },
+      "captionRules": [
+        {
+          "locale": "en-US",
+          "pattern": "^Custom Report Layouts$"
+        }
+      ],
+      "objectVerification": "declared",
+      "compatibility": {
+        "minAppVersion": "21.0.0",
+        "maxAppVersion": "21.99.99"
+      },
+      "sourceIds": [
+        "microsoft-learn-bc21-actionbar-pages"
+      ]
+    },
+    {
+      "ruleId": "MicrosoftBC21.Page9652",
+      "pageObjectId": "9652",
+      "entity": "",
+      "pageType": "list",
+      "localizedCaptions": {
+        "en-US": [
+          "Report Layout Selection"
+        ]
+      },
+      "captionRules": [
+        {
+          "locale": "en-US",
+          "pattern": "^Report Layout Selection$"
+        }
+      ],
+      "objectVerification": "declared",
+      "compatibility": {
+        "minAppVersion": "21.0.0",
+        "maxAppVersion": "21.99.99"
+      },
+      "sourceIds": [
+        "microsoft-learn-bc21-actionbar-pages"
+      ]
+    },
+    {
+      "ruleId": "MicrosoftBC21.Page9802",
+      "pageObjectId": "9802",
+      "entity": "",
+      "pageType": "list",
+      "localizedCaptions": {
+        "en-US": [
+          "Permission Sets"
+        ]
+      },
+      "captionRules": [
+        {
+          "locale": "en-US",
+          "pattern": "^Permission Sets$"
+        }
+      ],
+      "objectVerification": "declared",
+      "compatibility": {
+        "minAppVersion": "21.0.0",
+        "maxAppVersion": "21.99.99"
+      },
+      "sourceIds": [
+        "microsoft-learn-bc21-actionbar-pages"
+      ]
+    },
+    {
+      "ruleId": "MicrosoftBC21.Page9807",
+      "pageObjectId": "9807",
+      "entity": "",
+      "pageType": "card",
+      "localizedCaptions": {
+        "en-US": [
+          "User Card"
+        ]
+      },
+      "captionRules": [
+        {
+          "locale": "en-US",
+          "pattern": "^User Card$"
+        }
+      ],
+      "objectVerification": "declared",
+      "compatibility": {
+        "minAppVersion": "21.0.0",
+        "maxAppVersion": "21.99.99"
+      },
+      "sourceIds": [
+        "microsoft-learn-bc21-actionbar-pages"
+      ]
+    },
+    {
+      "ruleId": "MicrosoftBC21.Page99000813",
+      "pageObjectId": "99000813",
+      "entity": "",
+      "pageType": "document",
+      "localizedCaptions": {
+        "en-US": [
+          "Planned Production Order"
+        ]
+      },
+      "captionRules": [
+        {
+          "locale": "en-US",
+          "pattern": "^Planned Production Order$"
+        }
+      ],
+      "objectVerification": "declared",
+      "compatibility": {
+        "minAppVersion": "21.0.0",
+        "maxAppVersion": "21.99.99"
+      },
+      "sourceIds": [
+        "microsoft-learn-bc21-actionbar-pages"
+      ]
+    },
+    {
+      "ruleId": "MicrosoftBC21.Page99000818",
+      "pageObjectId": "99000818",
+      "entity": "",
+      "pageType": "list",
+      "localizedCaptions": {
+        "en-US": [
+          "Prod. Order Components"
+        ]
+      },
+      "captionRules": [
+        {
+          "locale": "en-US",
+          "pattern": "^Prod. Order Components$"
+        }
+      ],
+      "objectVerification": "declared",
+      "compatibility": {
+        "minAppVersion": "21.0.0",
+        "maxAppVersion": "21.99.99"
+      },
+      "sourceIds": [
+        "microsoft-learn-bc21-actionbar-pages"
+      ]
+    },
+    {
+      "ruleId": "MicrosoftBC21.Page99000822",
+      "pageObjectId": "99000822",
+      "entity": "",
+      "pageType": "worksheet",
+      "localizedCaptions": {
+        "en-US": [
+          "Order Tracking"
+        ]
+      },
+      "captionRules": [
+        {
+          "locale": "en-US",
+          "pattern": "^Order Tracking$"
+        }
+      ],
+      "objectVerification": "declared",
+      "compatibility": {
+        "minAppVersion": "21.0.0",
+        "maxAppVersion": "21.99.99"
+      },
+      "sourceIds": [
+        "microsoft-learn-bc21-actionbar-pages"
+      ]
+    },
+    {
+      "ruleId": "MicrosoftBC21.Page99000823",
+      "pageObjectId": "99000823",
+      "entity": "",
+      "pageType": "worksheet",
+      "localizedCaptions": {
+        "en-US": [
+          "Output Journal"
+        ]
+      },
+      "captionRules": [
+        {
+          "locale": "en-US",
+          "pattern": "^Output Journal$"
+        }
+      ],
+      "objectVerification": "declared",
+      "compatibility": {
+        "minAppVersion": "21.0.0",
+        "maxAppVersion": "21.99.99"
+      },
+      "sourceIds": [
+        "microsoft-learn-bc21-actionbar-pages"
+      ]
+    },
+    {
+      "ruleId": "MicrosoftBC21.Page99000829",
+      "pageObjectId": "99000829",
+      "entity": "",
+      "pageType": "document",
+      "localizedCaptions": {
+        "en-US": [
+          "Firm Planned Prod. Order"
+        ]
+      },
+      "captionRules": [
+        {
+          "locale": "en-US",
+          "pattern": "^Firm Planned Prod. Order$"
+        }
+      ],
+      "objectVerification": "declared",
+      "compatibility": {
+        "minAppVersion": "21.0.0",
+        "maxAppVersion": "21.99.99"
+      },
+      "sourceIds": [
+        "microsoft-learn-bc21-actionbar-pages"
+      ]
+    },
+    {
+      "ruleId": "MicrosoftBC21.Page99000831",
+      "pageObjectId": "99000831",
+      "entity": "ProductionOrder",
+      "pageType": "document",
+      "localizedCaptions": {
+        "en-US": [
+          "Released Production Order"
+        ]
+      },
+      "captionRules": [
+        {
+          "locale": "en-US",
+          "pattern": "^Released Production Order$"
+        }
+      ],
+      "objectVerification": "declared",
+      "compatibility": {
+        "minAppVersion": "21.0.0",
+        "maxAppVersion": "21.99.99"
+      },
+      "sourceIds": [
+        "microsoft-learn-bc21-actionbar-pages"
+      ]
+    },
+    {
+      "ruleId": "MicrosoftBC21.Page99000846",
+      "pageObjectId": "99000846",
+      "entity": "",
+      "pageType": "worksheet",
+      "localizedCaptions": {
+        "en-US": [
+          "Consumption Journal"
+        ]
+      },
+      "captionRules": [
+        {
+          "locale": "en-US",
+          "pattern": "^Consumption Journal$"
+        }
+      ],
+      "objectVerification": "declared",
+      "compatibility": {
+        "minAppVersion": "21.0.0",
+        "maxAppVersion": "21.99.99"
+      },
+      "sourceIds": [
+        "microsoft-learn-bc21-actionbar-pages"
+      ]
+    },
+    {
+      "ruleId": "MicrosoftBC21.Page99000852",
+      "pageObjectId": "99000852",
+      "entity": "",
+      "pageType": "worksheet",
+      "localizedCaptions": {
+        "en-US": [
+          "Planning Worksheet"
+        ]
+      },
+      "captionRules": [
+        {
+          "locale": "en-US",
+          "pattern": "^Planning Worksheet$"
+        }
+      ],
+      "objectVerification": "declared",
+      "compatibility": {
+        "minAppVersion": "21.0.0",
+        "maxAppVersion": "21.99.99"
+      },
+      "sourceIds": [
+        "microsoft-learn-bc21-actionbar-pages"
+      ]
+    },
+    {
+      "ruleId": "MicrosoftBC21.Page99000883",
+      "pageObjectId": "99000883",
+      "entity": "",
+      "pageType": "list",
+      "localizedCaptions": {
+        "en-US": [
+          "Sales Order Planning"
+        ]
+      },
+      "captionRules": [
+        {
+          "locale": "en-US",
+          "pattern": "^Sales Order Planning$"
+        }
+      ],
+      "objectVerification": "declared",
+      "compatibility": {
+        "minAppVersion": "21.0.0",
+        "maxAppVersion": "21.99.99"
+      },
+      "sourceIds": [
+        "microsoft-learn-bc21-actionbar-pages"
+      ]
+    },
+    {
+      "ruleId": "MicrosoftBC21.Page99000886",
+      "pageObjectId": "99000886",
+      "entity": "",
+      "pageType": "worksheet",
+      "localizedCaptions": {
+        "en-US": [
+          "Subcontracting Worksheet"
+        ]
+      },
+      "captionRules": [
+        {
+          "locale": "en-US",
+          "pattern": "^Subcontracting Worksheet$"
+        }
+      ],
+      "objectVerification": "declared",
+      "compatibility": {
+        "minAppVersion": "21.0.0",
+        "maxAppVersion": "21.99.99"
+      },
+      "sourceIds": [
+        "microsoft-learn-bc21-actionbar-pages"
+      ]
+    }
+  ],
+  "rules": []
+}

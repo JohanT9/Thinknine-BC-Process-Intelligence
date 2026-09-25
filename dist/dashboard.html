@@ -56,13 +56,27 @@ table{width:100%;border-collapse:collapse}th,td{text-align:left;padding:9px;bord
 .review-toolbar-more>summary::-webkit-details-marker{display:none}
 .review-toolbar-more>summary::after{content:" ▾"}.review-toolbar-more[open]>summary::after{content:" ▴"}
 .review-toolbar-more-panel{position:absolute;right:0;top:calc(100% + 6px);z-index:4;width:310px;padding:12px;background:white;border:1px solid #cbd5df;border-radius:8px;box-shadow:0 12px 28px rgba(15,23,42,.2)}
-.review-toolbar-more-panel .review-toolbar-group{border:0;padding:0 0 10px;display:grid;grid-template-columns:1fr 1fr}.review-toolbar-more-panel .review-toolbar-group:last-child{padding-bottom:0}.review-toolbar-more-panel button{width:100%}
-.process-analysis-trigger{display:inline-flex;align-items:center;gap:7px}.process-analysis-trigger output{min-width:28px;padding:2px 6px;border-radius:999px;background:#d9f3f2;color:#075c5b;font-size:12px;font-weight:700}.process-analysis-dialog{width:min(1040px,calc(100vw - 32px));max-height:calc(100vh - 32px);border:0;border-radius:10px;box-shadow:0 18px 55px rgba(15,23,42,.3);padding:0}.process-analysis-dialog::backdrop{background:rgba(15,23,42,.45)}.process-analysis-dialog form{display:grid;grid-template-rows:auto minmax(0,1fr) auto;max-height:calc(100vh - 32px)}.process-analysis-dialog header,.process-analysis-dialog footer{padding:18px 22px;background:white}.process-analysis-dialog header{border-bottom:1px solid #d8dee5}.process-analysis-dialog header h3{margin:0 0 4px}.process-analysis-dialog footer{display:flex;justify-content:flex-end;gap:8px;border-top:1px solid #d8dee5}.process-analysis-dialog footer #processAnalysisStatus{margin-right:auto}.process-analysis-content{padding:20px 22px;overflow:auto;background:#f7f9fb}.process-analysis-loading{padding:40px;text-align:center}.process-analysis-summary{display:flex;justify-content:space-between;gap:20px;align-items:center;padding:18px;background:white;border:1px solid #ccd6df;border-radius:8px}.process-analysis-summary h4{font-size:20px;margin:4px 0}.process-analysis-summary p{margin:0;color:#526273}.process-analysis-eyebrow{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:#087f7e}.process-analysis-confidence{text-align:center}.process-analysis-confidence strong{display:block;font-size:26px;color:#087f7e}.process-analysis-confidence span{font-size:12px;color:#526273}.process-analysis-meter{height:7px;background:#dfe5ea;border-radius:999px;overflow:hidden;margin:10px 0 14px}.process-analysis-meter span{display:block;height:100%;background:#008c8c}.process-analysis-confirmed{padding:9px 12px;background:#e6f7ef;border-left:4px solid #15803d}.process-analysis-metrics{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:14px 0}.process-analysis-metric{padding:12px;background:white;border:1px solid #d8dee5;border-radius:7px}.process-analysis-metric strong{display:block;font-size:20px}.process-analysis-metric span{color:#526273}.process-analysis-metric.matched strong{color:#15803d}.process-analysis-metric.missing strong{color:#a16207}.process-analysis-metric.conditional strong{color:#6d28d9}.process-analysis-metric.additional strong{color:#0369a1}.process-analysis-advisory{margin:12px 0;color:#526273}.process-analysis-columns{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}.process-analysis-list{padding:14px;background:white;border:1px solid #d8dee5;border-radius:7px}.process-analysis-list.conditional{border-style:dashed;border-color:#7c3aed}.process-analysis-list h4{display:flex;justify-content:space-between;margin:0 0 10px}.process-analysis-list h4 span{font-size:12px;border-radius:999px;background:#edf1f5;padding:2px 7px}.process-analysis-list ul{margin:0;padding-left:20px}.process-analysis-list li{margin:5px 0}.process-analysis-list p{color:#526273}.process-analysis-alternatives{margin-top:16px;padding:12px;background:white;border:1px solid #d8dee5}.process-analysis-alternatives label{display:grid;grid-template-columns:auto 1fr auto;gap:9px;align-items:center;padding:8px}.process-analysis-alternatives input{width:auto}.process-analysis-empty{padding:28px;text-align:center;background:white;border:1px solid #d8dee5;border-radius:8px}
+.review-toolbar-more-panel{box-sizing:border-box;width:280px;padding:6px}
+.review-toolbar-more-panel button.secondary{display:block;width:100%;margin:0;padding:12px 14px;text-align:left;border:0!important;background:transparent!important;box-shadow:none;white-space:normal;line-height:1.4}
+.review-toolbar-more-panel button.secondary:not(:disabled):hover{background:#edf6f7!important;color:#005f65!important}
+.review-toolbar-more-panel hr{border:0;border-top:1px solid #e2e8ee;margin:5px 8px}
+.review-toolbar-more-panel button:focus-visible,.review-selection-actions button:focus-visible{outline:2px solid #00838a;outline-offset:-2px}
+.review-selection-actions{flex:1 0 100%;display:flex;align-items:center;flex-wrap:wrap;gap:6px;padding:10px 12px;background:#edf6f7;border:1px solid #c3dfe1;border-radius:7px;box-sizing:border-box}
+.review-selection-actions[hidden]{display:none}
+.review-selection-count{display:inline-flex;align-items:center;gap:8px;margin-right:8px;font-size:13px;font-weight:600}
+.review-selection-count dd{margin:0;padding:2px 7px;border-radius:12px;background:#007e87;color:white}
+.review-selection-actions button{margin:0}
+[data-feature][hidden]{display:none!important}.process-analysis-trigger{display:inline-flex;align-items:center;gap:7px}.process-analysis-trigger output{min-width:28px;padding:2px 6px;border-radius:999px;background:#d9f3f2;color:#075c5b;font-size:12px;font-weight:700}.process-analysis-dialog{width:min(1040px,calc(100vw - 32px));max-height:calc(100vh - 32px);border:0;border-radius:10px;box-shadow:0 18px 55px rgba(15,23,42,.3);padding:0}.process-analysis-dialog::backdrop{background:rgba(15,23,42,.45)}.process-analysis-dialog form{display:grid;grid-template-rows:auto minmax(0,1fr) auto;max-height:calc(100vh - 32px)}.process-analysis-dialog header,.process-analysis-dialog footer{padding:18px 22px;background:white}.process-analysis-dialog header{border-bottom:1px solid #d8dee5}.process-analysis-dialog header h3{margin:0 0 4px}.process-analysis-dialog footer{display:flex;justify-content:flex-end;gap:8px;border-top:1px solid #d8dee5}.process-analysis-dialog footer #processAnalysisStatus{margin-right:auto}.process-analysis-content{padding:20px 22px;overflow:auto;background:#f7f9fb}.process-analysis-loading{padding:40px;text-align:center}.process-analysis-summary{display:flex;justify-content:space-between;gap:20px;align-items:center;padding:18px;background:white;border:1px solid #ccd6df;border-radius:8px}.process-analysis-summary h4{font-size:20px;margin:4px 0}.process-analysis-summary p{margin:0;color:#526273}.process-analysis-eyebrow{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:#087f7e}.process-analysis-confidence{text-align:center}.process-analysis-confidence strong{display:block;font-size:26px;color:#087f7e}.process-analysis-confidence span{font-size:12px;color:#526273}.process-analysis-meter{height:7px;background:#dfe5ea;border-radius:999px;overflow:hidden;margin:10px 0 14px}.process-analysis-meter span{display:block;height:100%;background:#008c8c}.process-analysis-confirmed{padding:9px 12px;background:#e6f7ef;border-left:4px solid #15803d}.process-analysis-metrics{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:14px 0}.process-analysis-metric{padding:12px;background:white;border:1px solid #d8dee5;border-radius:7px}.process-analysis-metric strong{display:block;font-size:20px}.process-analysis-metric span{color:#526273}.process-analysis-metric.matched strong{color:#15803d}.process-analysis-metric.missing strong{color:#a16207}.process-analysis-metric.conditional strong{color:#6d28d9}.process-analysis-metric.additional strong{color:#0369a1}.process-analysis-advisory{margin:12px 0;color:#526273}.process-analysis-columns{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}.process-analysis-list{padding:14px;background:white;border:1px solid #d8dee5;border-radius:7px}.process-analysis-list.conditional{border-style:dashed;border-color:#7c3aed}.process-analysis-list h4{display:flex;justify-content:space-between;margin:0 0 10px}.process-analysis-list h4 span{font-size:12px;border-radius:999px;background:#edf1f5;padding:2px 7px}.process-analysis-list ul{margin:0;padding-left:20px}.process-analysis-list li{margin:5px 0}.process-analysis-list p{color:#526273}.process-analysis-alternatives{margin-top:16px;padding:12px;background:white;border:1px solid #d8dee5}.process-analysis-alternatives label{display:grid;grid-template-columns:auto 1fr auto;gap:9px;align-items:center;padding:8px}.process-analysis-alternatives input{width:auto}.process-analysis-empty{padding:28px;text-align:center;background:white;border:1px solid #d8dee5;border-radius:8px}
 .process-analysis-assessment{display:flex;justify-content:space-between;gap:12px;margin:0 0 12px;padding:10px 12px;border-left:4px solid #a16207;background:#fff7df}.process-analysis-assessment span{color:#526273}.process-analysis-assessment.auto-classifiable{border-color:#15803d;background:#e6f7ef}.process-analysis-assessment.insufficient-evidence{border-color:#b42318;background:#fff0ee}
 .process-analysis-variant{display:grid;grid-template-columns:minmax(180px,auto) 1fr;gap:8px 20px;align-items:center;margin:10px 0 0;padding:12px 16px;border:1px solid #d8dee5;border-radius:8px;background:#fff}.process-analysis-variant span{font-size:12px;color:#526273}.process-analysis-variant h4{margin:2px 0 0}.process-analysis-variant p{margin:0;color:#526273}.process-analysis-variant details{grid-column:1/-1}.process-analysis-variant details ul{margin:7px 0 0}
 .process-analysis-variant-options{grid-column:1/-1;display:flex;flex-wrap:wrap;gap:8px}.process-analysis-variant-options label{display:inline-flex;align-items:center;gap:7px;padding:8px 10px;border:1px solid #b9c4ce;border-radius:6px;background:#fff}.process-analysis-variant-options input{width:auto;margin:0}.process-analysis-variant-options small{padding:2px 6px;border-radius:999px;background:#e6f7ef;color:#166534}
 .process-analysis-evidence{margin:12px 0;padding:10px 12px;border:1px solid #d8dee5;border-radius:7px;background:#fff}.process-analysis-evidence summary{cursor:pointer;font-weight:700}.process-analysis-evidence dl{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin:12px 0 0}.process-analysis-evidence dl div{min-width:0}.process-analysis-evidence dt{font-size:12px;color:#526273}.process-analysis-evidence dd{margin:3px 0 0;font-weight:600}
 .process-map-node-dialog{width:min(520px,calc(100vw - 32px));border:0;border-radius:9px;box-shadow:0 18px 55px rgba(15,23,42,.3)}.process-map-node-dialog::backdrop{background:rgba(15,23,42,.45)}.process-map-node-dialog form{display:grid;gap:8px}.process-map-node-dialog h3{margin:0 0 8px}.process-map-node-dialog input,.process-map-node-dialog select{margin:0 0 8px}.process-map-node-dialog form>div,.process-map-node-dialog footer{display:flex;flex-wrap:wrap;gap:8px}.process-map-node-dialog footer{justify-content:flex-end;margin-top:10px}
+.review-external-knowledge{width:min(100%,1364px);box-sizing:border-box;margin:12px auto;padding:12px 16px;border:1px solid #e8c77a;border-left:4px solid #b7791f;border-radius:7px;background:#fff9e9;color:#44330c}
+.review-external-knowledge h3{margin:0 0 8px;font-size:15px}
+.review-external-knowledge ul{margin:0;padding-left:22px}
+.review-external-knowledge li+li{margin-top:8px}
+.review-external-knowledge li p{margin:3px 0 0;color:#65552f;font-size:13px}
 .review-progress{height:10px;background:#e5e7eb;border-radius:99px;overflow:hidden;margin-top:12px}
 .review-progress-bar{height:100%;background:#0f6cbd;width:0}
 .review-status{display:flex;flex-wrap:wrap;gap:18px;margin:12px 0 0;padding:10px 12px;background:#f3f6fa;border-radius:7px}
@@ -72,7 +86,7 @@ table{width:100%;border-collapse:collapse}th,td{text-align:left;padding:9px;bord
 .review-list{padding:18px;width:min(100%,1400px);margin-inline:auto;box-sizing:border-box}
 .review-card{border:1px solid #d8dee5;border-left:4px solid transparent;border-radius:8px;margin-bottom:16px;padding:16px;display:grid;grid-template-columns:48px minmax(0,1fr) 150px;gap:16px;background:#fff}
 .review-card.approved{border-color:#d8dee5;border-left-color:#5a9f5a;background:#f7fbf7}
-.review-card.needs-review{border-color:#d8dee5;border-left-color:#c58b00;background:#fffdf5}
+.review-card.edited{border-color:#d8dee5;border-left-color:#0f6cbd;background:#f7fbff}
 .review-screenshot-quality{margin:10px 0 2px;padding:8px 10px;border-left:4px solid #64748b;background:#f3f6fa;color:#334155;font-size:13px}.review-screenshot-quality[data-quality="high"]{border-color:#107c10;background:#f0fdf4}.review-screenshot-quality[data-quality="medium"],.review-screenshot-quality[data-quality="protected"],.review-screenshot-quality[data-quality="manual"]{border-color:#0f6cbd;background:#eff6ff}.review-screenshot-quality[data-quality="low"],.review-screenshot-quality[data-quality="unresolved"]{border-color:#c35a00;background:#fff7ed}.review-screenshot-quality summary{cursor:pointer;font-weight:600}.review-screenshot-quality p{margin:6px 0 0}.review-screenshot-quality .metrics{color:#52606d}
 .review-card.selected{outline:3px solid #008489;outline-offset:2px}
 .review-card.dragging{opacity:.55}
@@ -119,7 +133,7 @@ table{width:100%;border-collapse:collapse}th,td{text-align:left;padding:9px;bord
 .instruction-format-toolbar button{min-width:40px;margin:0}.instruction-format-toolbar label{display:grid;gap:3px;margin:0;font-size:12px}.instruction-format-toolbar select{width:auto;min-width:120px}
 .review-fields input[type=text]{width:100%}
 .review-field-heading{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:9px 0}
-.review-field-heading label{margin:0;font-weight:600}.review-field-title{display:flex;align-items:center;gap:8px}.review-state-label{display:inline-flex;align-items:center;min-height:22px;padding:2px 8px;border-radius:999px;background:#eef1f3;color:#52606d;font-size:12px;font-weight:600}.review-state-label.approved{background:#e6f4e6;color:#0b6a0b}.review-state-label.needs-review{background:#fff1c7;color:#6f4e00}
+.review-field-heading label{margin:0;font-weight:600}.review-field-title{display:flex;align-items:center;gap:8px}.review-state-label{display:inline-flex;align-items:center;min-height:22px;padding:2px 8px;border-radius:999px;background:#eef1f3;color:#52606d;font-size:12px;font-weight:600}.review-state-label.approved{background:#e6f4e6;color:#0b6a0b}.review-state-label.edited{background:#e8f3fc;color:#064f85}
 .review-field-heading button{padding:5px 8px;margin:0;font-size:12px}
 .review-add-comment{margin:9px 0}
 .review-fields [data-edit-field][readonly]{border-color:transparent;background:transparent;cursor:text}
@@ -369,8 +383,25 @@ body.process-map-focus-active{overflow:hidden}.process-overview-card.process-map
 ></div>
 </fieldset>
 
+<fieldset aria-labelledby="knowledgeMcpLegend">
+<legend id="knowledgeMcpLegend" data-i18n="settings.knowledgeMcpLegend">External knowledge suggestions</legend>
+<label for="knowledgeMcpEnabled">
+  <input id="knowledgeMcpEnabled" type="checkbox" aria-describedby="knowledgeMcpHelp">
+  <span data-i18n="settings.knowledgeMcpEnable">Allow read-only MCP knowledge lookups</span>
+</label>
+<p id="knowledgeMcpHelp" class="hint" data-i18n="settings.knowledgeMcpHelp">
+  Off by default. When enabled, only unresolved object/action IDs, app identity and version, visible page/control captions and the interface language may be sent to the local read-only knowledge service. Recordings, screenshots, entered values and tenant, environment or company details are not sent. Results are unverified suggestions for review.
+</p>
+<button id="testKnowledgeMcp" class="secondary" type="button" data-i18n="settings.knowledgeMcpTest">Test local connection</button>
+<p id="knowledgeMcpStatus" class="settings-save-status" role="status" aria-live="polite"></p>
+<button id="testKnowledgeMcpSampleLookup" class="secondary" type="button" data-i18n="settings.knowledgeMcpSampleLookup">Test sample lookup (sends BC page 22 only)</button>
+<p id="knowledgeMcpSampleLookupStatus" class="settings-save-status" role="status" aria-live="polite"></p>
+</fieldset>
+
 <fieldset>
 <legend>Inspelning</legend>
+<label><input id="showClickHighlights" type="checkbox" aria-describedby="clickHighlightHelp"> <span data-i18n="settings.clickHighlights">Show click highlights while recording</span></label>
+<p id="clickHighlightHelp" class="hint" data-i18n="settings.clickHighlightsHelp">Briefly outlines the clicked control. Highlights are excluded from captured screenshots.</p>
 <label><input id="captureScreenshots" type="checkbox"> Ta skärmbilder</label>
 
 <label for="screenshotMode">Skärmbilder</label>
@@ -492,11 +523,10 @@ body.process-map-focus-active{overflow:hidden}.process-overview-card.process-map
 </dialog>
 
 <details id="sessionTools" class="session-tools">
-  <summary>Inspelningar och tekniska verktyg</summary>
+  <summary data-i18n="Saved recordings">Saved recordings</summary>
   <div class="session-tools-body">
-    <p class="muted">Hantera råinspelningar, ZIP-export och felsökning.</p>
+    <p class="muted" data-i18n="Manage saved recordings and ZIP exports.">Manage saved recordings and ZIP exports.</p>
     <button id="refresh" class="secondary">Uppdatera inspelningar</button>
-    <button id="debug" class="debug">Öppna debugpanel</button>
     <table>
     <thead><tr><th>Namn</th><th>Startad</th><th>Händelser</th><th>Status</th><th>Åtgärder</th></tr></thead>
     <tbody id="sessions"></tbody>
@@ -546,39 +576,30 @@ body.process-map-focus-active{overflow:hidden}.process-overview-card.process-map
           disabled>N&auml;sta ogranskade</button>
         <button id="openReviewDocumentFields" data-review-toolbar-item
           class="secondary">Dokumentinformation</button>
-        <button id="openProcessAnalysis" data-review-toolbar-item
+        <button id="openProcessAnalysis" data-review-toolbar-item data-feature="processIntelligence" hidden
           class="secondary process-analysis-trigger" aria-haspopup="dialog"
           aria-controls="processAnalysisDialog">Processanalys
           <output id="processAnalysisBadge" aria-label="Matchningsgrad" hidden></output></button>
         <details id="reviewMoreActions" class="review-toolbar-more">
           <summary data-review-toolbar-item aria-controls="reviewMoreActionsPanel" aria-expanded="false">Fler åtgärder</summary>
           <div id="reviewMoreActionsPanel" class="review-toolbar-more-panel">
-            <div class="review-toolbar-group" role="group" aria-label="Struktur">
-              <button id="mergeReviewSteps" data-review-command="merge" data-review-toolbar-item class="secondary" disabled>Slå samman</button>
-              <button id="splitReviewStep" data-review-command="split" data-review-toolbar-item class="secondary" disabled>Dela</button>
-              <button id="resetReviewStructure" data-review-command="reset-structure" data-review-toolbar-item class="secondary" disabled>Återställ struktur</button>
-            </div>
-            <div class="review-toolbar-group" role="group" aria-label="Ordning">
-              <button id="moveUpReviewSteps" data-review-command="move-up" data-review-toolbar-item class="secondary" disabled>Flytta upp</button>
-              <button id="moveDownReviewSteps" data-review-command="move-down" data-review-toolbar-item class="secondary" disabled>Flytta ned</button>
-            </div>
-            <div class="review-toolbar-group" role="group" aria-label="Arbetsyta">
-              <button id="regenerateReview" data-review-toolbar-item class="secondary">Regenerera fr&aring;n inspelning</button>
-              <button id="regenerateSelectedReview" data-review-toolbar-item class="secondary" disabled>Regenerera valda steg</button>
-              <button id="compactReviewSteps" data-review-toolbar-item class="secondary" aria-pressed="false">Komprimera alla</button>
-              <button id="addReviewStep" data-review-toolbar-item class="secondary">Lägg till steg</button>
-
-            </div>
+            <button id="addReviewStep" data-review-toolbar-item class="secondary">Lägg till steg</button>
+            <button id="compactReviewSteps" data-review-toolbar-item class="secondary" aria-pressed="false">Komprimera alla</button>
+            <hr>
+            <button id="regenerateReview" data-review-toolbar-item class="secondary">Regenerera fr&aring;n inspelning</button>
+            <hr>
+            <button id="resetReviewStructure" data-review-command="reset-structure" data-review-toolbar-item class="secondary" disabled>Återställ struktur</button>
           </div>
         </details>
+        <div id="reviewSelectionActions" class="review-selection-actions" role="group" aria-label="Valda" hidden>
+          <dl class="review-selection-count"><dt>Valda</dt><dd id="reviewSelectionCount">0</dd></dl>
+          <button id="mergeReviewSteps" data-review-command="merge" data-review-toolbar-item class="secondary" disabled>Slå samman</button>
+          <button id="splitReviewStep" data-review-command="split" data-review-toolbar-item class="secondary" disabled>Dela</button>
+          <button id="moveUpReviewSteps" data-review-command="move-up" data-review-toolbar-item class="secondary" disabled>Flytta upp</button>
+          <button id="moveDownReviewSteps" data-review-command="move-down" data-review-toolbar-item class="secondary" disabled>Flytta ned</button>
+          <button id="regenerateSelectedReview" data-review-toolbar-item class="secondary" disabled>Regenerera valda steg</button>
+        </div>
       </div>
-      <details id="reviewAttention" class="review-attention">
-        <summary id="reviewAttentionSummary"></summary>
-        <p id="reviewAttentionHelp"></p>
-        <p id="reviewOutcomeSummary"></p>
-        <p data-i18n="review.outcomeHelp"></p>
-        <ol id="reviewAttentionList"></ol>
-      </details>
       <div id="reviewProgress" class="review-progress" role="progressbar" aria-label="Granskningsförlopp" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
         <div id="reviewProgressBar" class="review-progress-bar"></div>
       </div>
@@ -596,7 +617,7 @@ body.process-map-focus-active{overflow:hidden}.process-overview-card.process-map
     <section id="reviewWorkspacePanel" role="tabpanel"
       aria-labelledby="reviewWorkspaceTab">
       <div id="reviewZoomContent" class="review-zoom-content">
-      <details id="processOverviewDisclosure" class="process-overview-card">
+      <details id="processOverviewDisclosure" class="process-overview-card" data-feature="processIntelligence" hidden>
         <summary id="processOverviewTitle" data-i18n="process.overview">Processöversikt</summary>
         <p id="processMapDescription" class="muted process-overview-help" data-i18n="process.overviewHelp">Välj en aktivitet för att gå direkt till motsvarande steg. Detaljer visas under kartan.</p>
         <div class="process-map-toolbar">
@@ -654,6 +675,12 @@ body.process-map-focus-active{overflow:hidden}.process-overview-card.process-map
         </div>
         <div id="processOverview" role="region" aria-labelledby="processOverviewTitle"></div>
       </details>
+      <section id="reviewExternalKnowledgeSuggestions" class="review-external-knowledge" hidden
+        aria-labelledby="reviewExternalKnowledgeTitle">
+        <h3 id="reviewExternalKnowledgeTitle" data-i18n="review.externalKnowledgeTitle">External knowledge suggestions</h3>
+        <p id="reviewExternalKnowledgeStatus" hidden></p>
+        <ul id="reviewExternalKnowledgeSuggestionList"></ul>
+      </section>
       <main
         id="reviewList"
         class="review-list"
@@ -729,7 +756,7 @@ body.process-map-focus-active{overflow:hidden}.process-overview-card.process-map
         <div class="document-export-check">
           <span id="documentExportCheckStatus" role="status" aria-live="polite"></span>
           <button id="documentCheckNext" type="button" class="secondary"
-            data-i18n="review.checkNext">Kontrollera nästa steg</button>
+            data-i18n="review.nextUnreviewed">Nästa ogranskade</button>
           <button id="documentExportWord" type="button" class="primary">Exportera Word</button>
         </div>
         <button id="openDocumentViewSettings" class="debug" aria-haspopup="dialog">Vyinställningar</button>
@@ -958,7 +985,19 @@ body.process-map-focus-active{overflow:hidden}.process-overview-card.process-map
 <script src="document/semantic-interaction-engine.js"></script>
 <script src="engine/task-consolidation.js"></script>
 <script src="engine/knowledge-domain.js"></script>
+<script src="engine/process-decision-code-registry.js"></script>
+<script src="engine/process-quality-guard.js"></script>
+<script src="engine/process-contradiction-engine.js"></script>
+<script src="engine/process-analysis-model.js"></script>
 <script src="engine/session-interpretation-pipeline.js"></script>
+<script src="engine/canonical-process-schema.js"></script>
+<script src="engine/canonical-process-adapter.js"></script>
+<script src="engine/knowledge-repository.js"></script>
+<script src="engine/knowledge-mcp-adapter.js"></script>
+<script src="engine/knowledge-ai-fallback.js"></script>
+<script src="engine/knowledge-resolution.js"></script>
+<script src="engine/knowledge-mcp-workflow.js"></script>
+<script src="engine/feature-flags.js"></script>
 <script src="engine/screenshot-selection-engine.js"></script>
 <script src="engine/search-interaction-presentation.js"></script>
 
@@ -1003,6 +1042,7 @@ body.process-map-focus-active{overflow:hidden}.process-overview-card.process-map
 <script src="review/review-split.js"></script>
 <script src="review/review-history.js"></script>
 <script src="review/correction-feedback.js"></script>
+<script src="review/process-improvement-dataset.js"></script>
 <script src="review/review-edit.js"></script>
 <script src="review/review-toolbar.js"></script>
 <script src="review/review-status.js"></script>

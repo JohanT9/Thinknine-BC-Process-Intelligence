@@ -92,7 +92,9 @@
   }
 
   function businessField(value) {
-    return text(value).replace(/^(?:sortera efter|sort by)\s+/iu, "");
+    const caption = text(value);
+    const field = caption.replace(/^(?:sortera efter|sort by|sort on)\s+/iu, "");
+    return field === caption ? caption : field.replace(/^(['"“‘])(.*)['"”’]$/u, "$2");
   }
 
   function recordedInteractionIds(value) {
@@ -202,9 +204,12 @@
       actionId: stableId(rule.ruleId, values),
       actionType: properties.actionType,
       displayText: properties.displayText,
+      ...(properties.rowTypeContext ? {rowTypeContext: clone(properties.rowTypeContext), selectedEntity: properties.selectedEntity} : {}),
       ...(Array.isArray(properties.actionPath)
         ? { actionPath: clone(properties.actionPath) } : {}),
       ...(properties.hidden ? { hidden: true } : {}),
+      ...(typeof properties.checked === "boolean"
+        ? { checked: properties.checked } : {}),
       selectedValue: properties.selectedValue || "",
       targetField: properties.targetField || "",
       captureGuidance,
@@ -253,6 +258,16 @@
         let cursor = context.index + 1;
         while (cursor < context.interactions.length) {
           const candidate = context.interactions[cursor];
+          const lookupField = text(candidate.fieldCaption || candidate.actionCaption)
+            .match(/^(?:(?:choose|select) a value for|välj (?:ett )?värde för)\s+(.+)$/iu)?.[1];
+          if (lookupField && !fieldPattern.test(lookupField)) break;
+          const selectedSoFar = values.map(value => selectedRecordValue(value) ||
+            (["Select", "SelectRecord", "SelectOption", "SelectLookupValue"].includes(value.taskType)
+              ? meaningfulValue(value) : "")).find(Boolean);
+          const nextSelection = selectedRecordValue(candidate) ||
+            (["Select", "SelectRecord", "SelectOption", "SelectLookupValue"].includes(candidate.taskType)
+              ? meaningfulValue(candidate) : "");
+          if (selectedSoFar && nextSelection && nextSelection !== selectedSoFar) break;
           const isRelated = fieldMatches(candidate, fieldPattern) ||
             Boolean(config.extraMatch?.(candidate)) ||
             ["Select", "SelectOption", "SelectLookupValue"].includes(
@@ -275,6 +290,10 @@
             value?.taskType || value?.semanticAction) &&
           meaningfulValue({ selectedCaption: value?.selectedCaption })
         );
+        const observedField = config.preserveFieldCaption ? values.map(value =>
+          text(value.fieldCaption || value.targetControl?.caption || value.actionCaption)
+            .replace(/^(?:choose|select) a value for\s+|^välj (?:ett )?värde för\s+/iu, ""))
+          .find(caption => caption && fieldPattern.test(caption) && !selectedRecordValue({actionCaption:caption})) : "";
         const selectedValue = values.map(selectedRecordValue).find(Boolean) ||
           meaningfulValue({ selectedCaption: explicitSelection?.selectedCaption }) ||
           [...values].reverse().map(meaningfulValue).find(Boolean) || "";
@@ -282,10 +301,12 @@
           consumed: values.length,
           action: action(rule, values, {
             actionType: config.actionType,
-            displayText: selectedValue
+            displayText: observedField && selectedValue
+              ? `Välj **${selectedValue}** i **${observedField}**.`
+              : selectedValue
               ? `${config.verb} **${selectedValue}**.` : `${config.verb}.`,
             selectedValue,
-            targetField: config.targetField,
+            targetField: observedField || config.targetField,
             hidden: config.requireValue && !selectedValue
           })
         };
@@ -309,7 +330,47 @@
           actionType: config.actionType(value, selectedValue),
           displayText: config.display(value, selectedValue),
           selectedValue,
+          ...(config.checked
+            ? { checked: config.checked(value, selectedValue) } : {}),
           targetField
+        }) };
+      }
+    };
+    return deepFreeze(rule);
+  }
+
+  function explicitLookupSelectionRule() {
+    const trigger = value => text(value?.fieldCaption || value?.actionCaption)
+      .match(/^(?:choose|select) a value for (.+)$/iu);
+    const selected = value => selectedRecordValue(value) ||
+      (["Select", "SelectRecord"].includes(value?.taskType) ? meaningfulValue(value) : "");
+    const rule = {
+      ruleId: "explicit-lookup-selection", priority: 96,
+      match(context) {
+        const first = context.interactions[context.index];
+        const next = context.interactions[context.index + 1];
+        return Boolean(trigger(first) && selected(next)) &&
+          !(first.pageId && next.pageId && first.pageId !== next.pageId);
+      },
+      consolidate(context) {
+        const values = context.interactions.slice(context.index, context.index + 2);
+        const targetField = trigger(values[0])[1];
+        const rowContext = values[0].rowTypeContext;
+        const rowType = rowContext?.source === 'same-row-type' && rowContext.schemaVersion === 1 &&
+          /^(?:no\.?|nr\.?|n°|nummer|number)$/iu.test(targetField) &&
+          typeof rowContext.value === 'string' && rowContext.value.length <= 80 ? rowContext.value : '';
+        const entities = {item:'Item',artikel:'Item',article:'Item',artículo:'Item',tuote:'Item',vare:'Item',
+          resource:'Resource',resurs:'Resource',ressource:'Resource',recurso:'Resource',resurssi:'Resource',ressurs:'Resource',
+          'g/l account':'GLAccount',redovisningskonto:'GLAccount',sachkonto:'GLAccount'};
+        const entity = entities[rowType.toLocaleLowerCase()] || '';
+        const selectedValue = selected(values[1]);
+        return { consumed: 2, action: action(rule, values, {
+          actionType: "SelectLookupValue", targetField, selectedValue,
+          selectedEntity: entity || undefined, rowTypeContext: rowType ? clone(rowContext) : undefined,
+          displayText: rowType
+            ? `Välj **${selectedValue}** i **${targetField}** (**${rowType}**).`
+            : `Välj **${selectedValue}** i **${targetField}**.`,
+          preferredScreenshotRef: values[1].screenshot || values[1].screenshots?.at(-1)
         }) };
       }
     };
@@ -333,7 +394,13 @@
         while (cursor < context.interactions.length &&
             (LOOKUP.test(interactionText(context.interactions[cursor])) ||
              Boolean(selectedRecordValue(context.interactions[cursor])))) {
-          values.push(context.interactions[cursor]);
+          const candidate = context.interactions[cursor];
+          if (LOOKUP.test(interactionText(candidate)) &&
+              controlCaption(candidate) !== controlCaption(first)) break;
+          const previousSelection = values.map(selectedRecordValue).find(Boolean);
+          const nextSelection = selectedRecordValue(candidate);
+          if (previousSelection && nextSelection && previousSelection !== nextSelection) break;
+          values.push(candidate);
           cursor += 1;
         }
         const selectedValue = values.map(selectedRecordValue).find(Boolean) || "";
@@ -562,6 +629,11 @@
     return deepFreeze(rule);
   }
 
+  function observedMenuPath(values) {
+    return unique(values.map(value => text(value.actionCaption || value.selectedCaption)
+      .replace(/^(?:välj|select)\s+/iu, "").replace(/(?:\.{2,}|…)+$/u, "")));
+  }
+
   function salesPriceDiscountMenuPathRule() {
     const captions = [
       /^(?:välj\s+)?rad$/iu,
@@ -587,10 +659,8 @@
           context.index + captions.length);
         return { consumed: values.length, action: action(rule, values, {
           actionType: "RunActionPath",
-          displayText: "Välj **Rad** → **Relaterad information** → " +
-            "**Tillämpat försäljningspris och rabatt**.",
-          actionPath: ["Rad", "Relaterad information",
-            "Tillämpat försäljningspris och rabatt"],
+          displayText: `Välj ${observedMenuPath(values).map(label => `**${label}**`).join(" → ")}.`,
+          actionPath: observedMenuPath(values),
           selectedValue: caption(values.at(-1))
         }) };
       }
@@ -640,8 +710,8 @@
           (menuEvidence?.screenshot ? [menuEvidence.screenshot] : []);
         return { consumed: values.length, action: action(rule, values, {
           actionType: "RunActionPath",
-          displayText: "Välj **Åtgärder** → **Funktion** → **Manuellt pris**.",
-          actionPath: ["Åtgärder", "Funktion", "Manuellt pris"],
+          displayText: `Välj ${observedMenuPath(values).map(label => `**${label}**`).join(" → ")}.`,
+          actionPath: observedMenuPath(values),
           selectedValue: caption(values.at(-1)),
           preferredSourceEventId: menuEvidence?.sourceEventIds?.at(-1),
           preferredScreenshotRef: preferredScreenshots.at(-1)
@@ -685,14 +755,38 @@
           actionScreenshots.at(-1);
         return { consumed: values.length, action: action(rule, values, {
           actionType: "RunActionPath",
-          displayText: "Välj **Rad** → **Tillämpat inköpspris och rabatt** → " +
-            "**Manuellt pris**.",
-          actionPath: ["Rad", "Tillämpat inköpspris och rabatt",
-            "Manuellt pris"],
+          displayText: `Välj ${observedMenuPath(values).map(label => `**${label}**`).join(" → ")}.`,
+          actionPath: observedMenuPath(values),
           selectedValue: caption(values.at(-1)),
           preferredSourceEventId: values.at(-1)?.sourceEventIds?.at(-1),
           preferredScreenshotRef
         }) };
+      }
+    };
+    return deepFreeze(rule);
+  }
+
+  function fieldDialogConfirmationRule() {
+    const rule = {ruleId:'field-dialog-confirmation',priority:116,
+      match(context) {
+        const [field,dialog,confirm] = context.interactions.slice(context.index,context.index+3);
+        const page = value => value?.pageId || value?.pageIdentity;
+        return ['EnterFieldValue','ChangeField'].includes(field?.taskType) &&
+          Boolean(field.fieldCaption) && dialog?.targetControl?.role === 'dialog' &&
+          ['RunAction','ClickAction'].includes(confirm?.taskType) &&
+          text(confirm.actionCaption || confirm.fieldCaption) === 'OK' &&
+          (confirm.uiHierarchy || []).some(item=>item.type==='dialog') &&
+          unique([field,dialog,confirm].map(page)).length <= 1;
+      },
+      consolidate(context) {
+        const values=context.interactions.slice(context.index,context.index+3);
+        const field=businessField(values[0].fieldCaption), selected=meaningfulValue(values[0]);
+        return {consumed:3,action:action(rule,values,{
+          actionType:'EnterFieldValue',targetField:field,selectedValue:selected,
+          displayText:(selected ? `Ange __${selected}__ i **${field}**.` : `Ange **${field}**.`)+' Välj **OK**.',
+          preferredScreenshotRef:values[0].screenshot || values[0].screenshots?.at(-1),
+          preferredSourceEventId:values[0].sourceEventIds?.at(-1)
+        })};
       }
     };
     return deepFreeze(rule);
@@ -734,7 +828,7 @@
     const isAction = value => ["RunAction", "ClickAction"].includes(
       value?.taskType
     );
-    const menuParent = /^(?:åtgärder|actions|funktion|functions?|rad|row|relaterad information|related information)$/iu;
+    const menuParent = /^(?:åtgärder|actions|funktion|functions?|rad|row|line|relaterad information|related information)$/iu;
     const sameRecordedInteraction = (left, right) => {
       const leftIds = recordedInteractionIds(left);
       const rightIds = recordedInteractionIds(right);
@@ -806,7 +900,7 @@
   }
 
   function genericMenuPathRule() {
-    const menuParent = /^(?:v\u00e4lj\s+)?(?:\u00e5tg\u00e4rder|actions|funktion|functions?|rad|row|relaterad information|related information)$/iu;
+    const menuParent = /^(?:v\u00e4lj\s+)?(?:\u00e5tg\u00e4rder|actions|funktion|functions?|rad|row|line|relaterad information|related information)$/iu;
     const isAction = value => ["RunAction", "ClickAction"].includes(
       value?.taskType
     );
@@ -872,6 +966,7 @@
   const DIMENSION = /dimension|dimensionsvärde|dimension value/iu;
 
   const BUILT_IN_RULES = deepFreeze([
+    fieldDialogConfirmationRule(),
     sortedRecordSelectionRule(),
     purchaseManualPriceMenuPathRule(),
     salesPriceDiscountMenuPathRule(),
@@ -882,7 +977,7 @@
     closeDialogRule(),
     searchAndOpenWithRedundantFieldRule(),
     selectionRule({ ruleId: "customer-selection", priority: 100,
-      actionType: "SelectCustomer", fieldPattern: CUSTOMER,
+      actionType: "SelectCustomer", fieldPattern: CUSTOMER, preserveFieldCaption: true,
       verb: "Välj kund", targetField: "Kund", requireValue: true }),
     itemNumberLookupEntryRule(),
     fieldEntryWithRedundantRecordSelectionRule(),
@@ -921,12 +1016,12 @@
       display: value => `V\u00e4lj **${text(value.actionCaption)}** i dialogrutan.` }),
     singleRule({ ruleId: "quantity-entry", priority: 75,
       match: value => Boolean(meaningfulValue(value)) &&
-        /^(?:sortera efter\s+)?(?:antal|quantity)$/iu
-          .test(controlCaption(value)),
+        /^(?:antal|quantity)$/iu
+          .test(businessField(controlCaption(value))),
       actionType: () => "EnterQuantity",
-      targetField: "Antal",
-      display: (_value, selected) => selected
-        ? `Ange __${selected}__ i **Antal**.` : "Ange Antal." }),
+      display: (value, selected) => selected
+        ? `Ange __${selected}__ i **${businessField(controlCaption(value))}**.`
+        : `Ange ${businessField(controlCaption(value))}.` }),
     singleRule({ ruleId: "date-selection", priority: 70,
       match: value => typed(value) && /datum|date/iu.test(text(value?.fieldCaption)),
       actionType: () => "SelectDate",
@@ -938,6 +1033,7 @@
         typeof value?.value === "boolean",
       actionType: (value, selected) => checkboxEnabled(value, selected)
         ? "EnableCheckbox" : "DisableCheckbox",
+      checked: (value, selected) => checkboxEnabled(value, selected),
       display: (value, selected) =>
         `${checkboxEnabled(value, selected) ? "Aktivera" : "Inaktivera"} ` +
         `**${text(value.fieldCaption)}**.` }),
@@ -947,6 +1043,12 @@
         Boolean(text(value?.actionCaption)),
       actionType: () => "RunAction",
       display: value => `Välj **${text(value.actionCaption)}**.` }),
+    singleRule({ ruleId: "tell-me-page-selection", priority: 53,
+      match: value => value?.taskType === "Select" &&
+        value?.targetControl?.role === "gridcell" &&
+        /^.+\s+Lists\s+[\uE000-\uF8FF]+$/u.test(text(value.selectedCaption)),
+      actionType: () => "OpenPage",
+      display: value => `Välj **${text(value.selectedCaption).replace(/\s+Lists\s+[\uE000-\uF8FF]+$/u, "")}**.` }),
     singleRule({ ruleId: "record-selection", priority: 52,
       match: value => value?.taskType === "Select" &&
         Boolean(meaningfulValue(value)),
@@ -959,6 +1061,7 @@
       display: (value, selected) => selected
         ? `Välj **${selected}** i **${text(value.fieldCaption)}**.`
         : `Välj ett alternativ i **${text(value.fieldCaption)}**.` }),
+    explicitLookupSelectionRule(),
     genericLookupRule(),
     singleRule({ ruleId: "generic-field-entry", priority: 10,
       match: value => value?.taskType === "EnterFieldValue" ||
@@ -1033,6 +1136,7 @@
       selectedMechanic?.selection?.caption ?? primary.selection?.value ??
       primary.selection?.caption ?? primary.value?.normalized ?? "";
     return {
+      rowTypeContext: clone(primary.rowTypeContext),
       kind: group.groupKind,
       taskId: group.stepGroupId,
       taskType: types[group.groupKind] || "Unclassified",
@@ -1079,9 +1183,32 @@
       semanticActionModel: clone(value),
       instruction: value.displayText,
       description: value.displayText,
+      ...(value.resultVerification
+        ? { resultVerification: clone(value.resultVerification),
+          observedResult: value.resultVerification.summary || "",
+          expectedResultSuggestion:
+            value.resultVerification.expectedResultSuggestion || "",
+          resultVerified: ["verified", "error"].includes(
+            value.resultVerification.status) } : {}),
+      ...(value.capturePacket
+        ? { capturePacket: clone(value.capturePacket) } : {}),
+      ...(value.capturePackets?.length
+        ? { capturePackets: clone(value.capturePackets) } : {}),
+      ...(value.interactionIds?.length
+        ? { interactionIds: clone(value.interactionIds),
+          interactionId: value.interactionId ||
+            (value.interactionIds.length === 1 ? value.interactionIds[0] : null) }
+        : {}),
+      captureGuidance: clone(value.captureGuidance || first.captureGuidance || {}),
+      important: Boolean(value.captureGuidance?.important || first.important),
+      sectionBoundaryAfter: Boolean(value.captureGuidance?.sectionBoundaryAfter ||
+        first.sectionBoundaryAfter),
       fieldCaption: value.targetField || first.fieldCaption,
       selectedCaption: value.selectedValue,
-      value: value.selectedValue,
+      value: typeof value.checked === "boolean"
+        ? value.checked : value.selectedValue,
+      ...(typeof value.checked === "boolean"
+        ? { checked: value.checked } : {}),
       instructionValue: value.selectedValue,
       screenshot,
       screenshots: screenshot ? [screenshot] : [],

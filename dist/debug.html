@@ -15,17 +15,25 @@ pre{white-space:pre-wrap;background:#f3f4f6;padding:12px;border-radius:6px}
 <link rel="stylesheet" href="design-system.css">
 </head>
 <body>
+<p id="accessStatus" role="status" aria-live="polite"></p>
+<main id="diagnostics" hidden>
 <h1 data-i18n="debug.title">BC Process Recorder — Teknisk diagnostik</h1>
 <p class="muted" data-i18n="debug.help">Här ser vi vad tillägget faktiskt gör, i stället för att tolka tystnad som ett användargränssnitt.</p>
 <div id="grid" class="grid"></div>
 <button id="refresh">Uppdatera</button>
 <button id="toggleCaptureDiagnostics">Aktivera fångstdiagnostik</button>
-<h2>Rå diagnostik</h2>
+<h2 data-i18n="debug.improvementTitle">Processförbättring</h2>
+<div id="improvementGrid" class="grid"></div>
+<button id="downloadImprovement" data-i18n="debug.downloadImprovement">Ladda ned förbättringsdata</button>
+<span id="improvementStatus" role="status" aria-live="polite"></span>
+<h2 data-i18n="debug.rawDiagnostics">Rå diagnostik</h2>
 <pre id="raw"></pre>
+</main>
 <script src="engine/locale-catalogs.js"></script>
   <script src="engine/language-registry.js"></script>
 <script src="i18n.js"></script>
 <script src="tooltips.js"></script>
+<script src="review/process-improvement-analysis.js"></script>
 <script src="debug.js"></script>
 </body>
 </html>

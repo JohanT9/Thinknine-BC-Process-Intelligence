@@ -1,7 +1,7 @@
 {
   "packId": "bc-core",
   "name": "Business Central Core",
-  "version": "2.0.0",
+  "version": "2.1.0",
   "priority": 100,
   "pageDefinitions": [
     {
@@ -10,13 +10,32 @@
       "entity": "Customer",
       "pageType": "card",
       "localizedCaptions": {
-        "en-US": ["Customer Card"],
-        "sv-SE": ["Kundkort"],
-        "da-DK": ["Debitorkort"]
+        "en-US": [
+          "Customer Card"
+        ],
+        "sv-SE": [
+          "Kundkort"
+        ],
+        "da-DK": [
+          "Debitorkort"
+        ]
       },
       "captionRules": [
-        { "locale": "sv-SE", "pattern": "^Kundkort$" },
-        { "locale": "en-US", "pattern": "^Customer Card$" }
+        {
+          "locale": "sv-SE",
+          "pattern": "^Kundkort$"
+        },
+        {
+          "locale": "en-US",
+          "pattern": "^Customer Card$"
+        }
+      ],
+      "compatibility": {
+        "minAppVersion": "21.0.0",
+        "maxAppVersion": "21.99.99"
+      },
+      "sourceIds": [
+        "microsoft-learn-bc21-actionbar-pages"
       ]
     },
     {
@@ -25,13 +44,32 @@
       "entity": "Item",
       "pageType": "card",
       "localizedCaptions": {
-        "en-US": ["Item Card"],
-        "sv-SE": ["Artikelkort"],
-        "da-DK": ["Varekort"]
+        "en-US": [
+          "Item Card"
+        ],
+        "sv-SE": [
+          "Artikelkort"
+        ],
+        "da-DK": [
+          "Varekort"
+        ]
       },
       "captionRules": [
-        { "locale": "sv-SE", "pattern": "^Artikelkort$" },
-        { "locale": "en-US", "pattern": "^Item Card$" }
+        {
+          "locale": "sv-SE",
+          "pattern": "^Artikelkort$"
+        },
+        {
+          "locale": "en-US",
+          "pattern": "^Item Card$"
+        }
+      ],
+      "compatibility": {
+        "minAppVersion": "21.0.0",
+        "maxAppVersion": "21.99.99"
+      },
+      "sourceIds": [
+        "microsoft-learn-bc21-actionbar-pages"
       ]
     }
   ],
@@ -244,6 +282,22 @@
         "en-US"
       ],
       "aliases": []
+    }
+  ],
+  "sources": [
+    {
+      "sourceId": "microsoft-learn-bc21-actionbar-pages",
+      "title": "Pages with Action Bar Improvements",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/en-us/dynamics365/business-central/dev-itpro/developer/devenv-pages-action-bar-improvements",
+      "appliesTo": "Business Central 2022 release wave 2 (version 21.0)",
+      "publishedDate": "2022-11-09",
+      "accessedDate": "2026-09-25",
+      "fields": [
+        "pageObjectId",
+        "caption",
+        "pageType"
+      ]
     }
   ]
 }

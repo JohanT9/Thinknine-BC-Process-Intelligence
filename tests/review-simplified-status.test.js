@@ -1,0 +1,13 @@
+const assert=require('node:assert/strict');const fs=require('node:fs');
+const html=fs.readFileSync('src/ui/dashboard.html','utf8');const js=fs.readFileSync('src/ui/dashboard.js','utf8');
+assert.ok(!html.includes('id="reviewAttention"'));
+assert.ok(js.includes('userEdited ? "edited" : "pending"'));
+assert.ok(js.includes('userEdited ? uiT("Ändrad") : uiT("Ej granskat")'));
+assert.ok(!js.includes('uiT("Behöver granskas")'));
+assert.ok(!js.includes('uiTf("review.exportCheck", check)'));
+assert.ok(js.includes('uiTf("review.readiness", check)'));
+const technical=js.indexOf('<details class="review-technical-details">');
+const diagnostic=js.indexOf('<details class="review-screenshot-quality"');
+const screenshot=js.indexOf('<div class="review-screenshot">');
+assert.ok(technical>=0&&diagnostic>technical&&screenshot>diagnostic);
+console.log('Simplified user-owned Review status tests passed.');
