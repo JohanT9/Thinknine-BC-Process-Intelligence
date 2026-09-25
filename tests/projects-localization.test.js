@@ -13,49 +13,49 @@ assert.equal(imported.ok, true, JSON.stringify(imported.diagnostics));
 const repository = api.createRepository(imported.snapshot);
 const samples = [
   {
-    locale: 'en-US', page: 'Project Planning Lines', field: 'Qty. To Transfer to Journal', timeSheet: 'Time Sheets', createTimeLines: 'Create lines from project planning', projectJournals: 'Project Journals', suggestTimeLines: 'Suggest Lines from Time Sheets', timeSheetSource: 'microsoft-learn-project-timesheets',
+    locale: 'en-US', page: 'Project Planning Lines', field: 'Qty. To Transfer to Journal', timeSheet: 'Time Sheets', createTimeLines: 'Create lines from project planning', projectJournals: 'Project Journals', suggestTimeLines: 'Suggest Lines from Time Sheets', timeSheetSource: 'microsoft-learn-project-timesheets', resourceCard: 'Resource Card', resourceCapacity: 'Resource Capacity', capacitySettings: 'Resource Capacity Settings', updateCapacity: 'Update Capacity', capacitySource: 'microsoft-learn-project-resource-capacity',
     create: 'Create Project Journal Lines', journal: 'Project Journal', post: 'Post',
     source: 'microsoft-learn-project-usage', invoiceSource: 'microsoft-learn-project-invoice', walkthroughSource: 'microsoft-learn-project-walkthrough', taskLines: 'Project Task Lines', planningLines: 'Project Planning Lines', invoiceQty: 'Qty. To Transfer to Invoice', projectInvoice: 'Create Project Sales Invoice'
   },
   {
-    locale: 'sv-SE', page: 'Projektplaneringsrader', field: 'Antal att överföra till journal', timeSheet: 'Tidrapporter', createTimeLines: 'Skapa rader från projektplanering', projectJournals: 'Projektjournaler', suggestTimeLines: 'Föreslå rader från tidrapporter', timeSheetSource: 'microsoft-learn-project-timesheets-sv',
+    locale: 'sv-SE', page: 'Projektplaneringsrader', field: 'Antal att överföra till journal', timeSheet: 'Tidrapporter', createTimeLines: 'Skapa rader från projektplanering', projectJournals: 'Projektjournaler', suggestTimeLines: 'Föreslå rader från tidrapporter', timeSheetSource: 'microsoft-learn-project-timesheets-sv', resourceCard: 'Resurskort', resourceCapacity: 'Resurskapacitet', capacitySettings: 'Inställningar för resurskapacitet', updateCapacity: 'Uppdatera kapacitet', capacitySource: 'microsoft-learn-project-resource-capacity-sv',
     create: 'Skapa projektjournalrader', journal: 'Projektjournal', post: 'Bokför',
     source: 'microsoft-learn-project-usage-sv', invoiceSource: 'microsoft-learn-project-invoice-sv', walkthroughSource: 'microsoft-learn-project-walkthrough-sv', taskLines: 'Projektaktivitetsrader', planningLines: 'Projektplaneringsrader', invoiceQty: 'Antal att överföra till faktura', projectInvoice: 'Skapa försäljningsfaktura för projekt'
   },
   {
-    locale: 'fr-FR', page: 'Lignes planning projet', field: 'Qté à transférer sur la feuille', timeSheet: 'Feuilles de temps', createTimeLines: 'Créer des lignes à partir du planning projet', projectJournals: 'Journaux projet', suggestTimeLines: 'Proposer des lignes à partir des feuilles de temps', timeSheetSource: 'microsoft-learn-project-timesheets-fr',
+    locale: 'fr-FR', page: 'Lignes planning projet', field: 'Qté à transférer sur la feuille', timeSheet: 'Feuilles de temps', createTimeLines: 'Créer des lignes à partir du planning projet', projectJournals: 'Journaux projet', suggestTimeLines: 'Proposer des lignes à partir des feuilles de temps', timeSheetSource: 'microsoft-learn-project-timesheets-fr', resourceCard: 'Fiche ressource', resourceCapacity: 'Capacité ressource', capacitySettings: 'Paramétrage capacité ressource', updateCapacity: 'Mettre à jour la capacité', capacitySource: 'microsoft-learn-project-resource-capacity-fr',
     create: 'Créer des lignes feuille projet', journal: 'Feuille projet', post: 'Valider',
     source: 'microsoft-learn-project-usage-fr', invoiceSource: 'microsoft-learn-project-invoice-fr', walkthroughSource: 'microsoft-learn-project-walkthrough-fr', taskLines: 'Lignes de tâches du projet', planningLines: 'Project Planning Lines', invoiceQty: 'Qté à transférer à facturer', projectInvoice: 'Créer une facture vente projet'
   },
   {
-    locale: 'de-DE', page: 'Projektplanungszeilen', field: 'In das Journal zu übertragende Menge', timeSheet: 'Arbeitszeittabellen', createTimeLines: 'Zeilen anhand der Projektplanung erstellen', projectJournals: 'Project Journals', suggestTimeLines: 'Zeilen von Arbeitszeittabellen vorschlagen', timeSheetSource: 'microsoft-learn-project-timesheets-de',
+    locale: 'de-DE', page: 'Projektplanungszeilen', field: 'In das Journal zu übertragende Menge', timeSheet: 'Arbeitszeittabellen', createTimeLines: 'Zeilen anhand der Projektplanung erstellen', projectJournals: 'Project Journals', suggestTimeLines: 'Zeilen von Arbeitszeittabellen vorschlagen', timeSheetSource: 'microsoft-learn-project-timesheets-de', resourceCard: 'Ressourcenkarte', resourceCapacity: 'Ressourcenkapazität', capacitySettings: 'Res.-Kapazität Einstellungen', updateCapacity: 'Kapazität aktualisieren', capacitySource: 'microsoft-learn-project-resource-capacity-de',
     create: 'Projekt-Buch.-Blattzeilen erstellen', journal: 'Projekterfassung', post: 'Buchen',
     source: 'microsoft-learn-project-usage-de', invoiceSource: 'microsoft-learn-project-invoice-de', walkthroughSource: 'microsoft-learn-project-walkthrough-de', taskLines: 'Projektaufgabenzeilen', planningLines: 'Projektplanungszeilen', invoiceQty: 'In Rechnung zu übertragende Menge', projectInvoice: 'Projektverkaufsrechnung erstellen'
   },
   {
-    locale: 'es-ES', page: 'Líneas de planificación de proyecto', field: 'Cdad. a transferir al diario', timeSheet: 'Hojas de tiempo', createTimeLines: 'Crear líneas de planificación de proyecto', projectJournals: 'Project Journals', suggestTimeLines: 'Sugerir líneas de hojas de horas', timeSheetSource: 'microsoft-learn-project-timesheets-es',
+    locale: 'es-ES', page: 'Líneas de planificación de proyecto', field: 'Cdad. a transferir al diario', timeSheet: 'Hojas de tiempo', createTimeLines: 'Crear líneas de planificación de proyecto', projectJournals: 'Project Journals', suggestTimeLines: 'Sugerir líneas de hojas de horas', timeSheetSource: 'microsoft-learn-project-timesheets-es', resourceCard: 'Ficha recurso', resourceCapacity: 'Capacidad recurso', capacitySettings: 'Config. capacidad recurso', updateCapacity: 'Actualizar capacidad', capacitySource: 'microsoft-learn-project-resource-capacity-es',
     create: 'Crear líneas de diario de proyectos', journal: 'Diario de proyectos', post: 'Registrar',
     source: 'microsoft-learn-project-usage-es', invoiceSource: 'microsoft-learn-project-invoice-es', walkthroughSource: 'microsoft-learn-project-walkthrough-es', taskLines: 'Líneas de tareas del proyecto', planningLines: 'Líneas planificación proyecto', invoiceQty: 'Cdad. para transferir a factura', projectInvoice: 'Crear factura de venta de proyecto'
   },
   {
-    locale: 'da-DK', page: 'Projektplanlægningslinjer', field: 'Antal, der skal overføres til kladde', timeSheet: 'Timesedler', createTimeLines: 'Opret linjer fra projektplanlægning', projectJournals: 'Project Journals', suggestTimeLines: 'Foreslå linjer fra timesedler', timeSheetSource: 'microsoft-learn-project-timesheets-da',
+    locale: 'da-DK', page: 'Projektplanlægningslinjer', field: 'Antal, der skal overføres til kladde', timeSheet: 'Timesedler', createTimeLines: 'Opret linjer fra projektplanlægning', projectJournals: 'Project Journals', suggestTimeLines: 'Foreslå linjer fra timesedler', timeSheetSource: 'microsoft-learn-project-timesheets-da', resourceCard: 'Ressourcekort', resourceCapacity: 'Ressourcekapacitet', capacitySettings: 'Ressourcekap.indstillinger', updateCapacity: 'Opdater kapacitet', capacitySource: 'microsoft-learn-project-resource-capacity-da',
     create: 'Opret projektkladdelinjer', journal: 'Projektkladde', post: 'Bogfør',
     source: 'microsoft-learn-project-usage-da', invoiceSource: 'microsoft-learn-project-invoice-da', walkthroughSource: 'microsoft-learn-project-walkthrough-da', taskLines: 'Project Opgavelinjer', planningLines: 'Projektplanlægningslinjer', invoiceQty: 'Antal til overførsel til faktura', projectInvoice: 'Opret projektsalgsfaktura'
   },
   {
-    locale: 'fi-FI', page: 'Projektin suunnittelurivit', field: 'Päiväkirjaan siirrettävä määrä', timeSheet: 'Aikaraportit', createTimeLines: 'Luo rivejä projektin suunnittelusta', projectJournals: 'Projektipäiväkirjat', suggestTimeLines: 'Ehdota rivejä aikaraporteista', timeSheetSource: 'microsoft-learn-project-timesheets-fi',
+    locale: 'fi-FI', page: 'Projektin suunnittelurivit', field: 'Päiväkirjaan siirrettävä määrä', timeSheet: 'Aikaraportit', createTimeLines: 'Luo rivejä projektin suunnittelusta', projectJournals: 'Projektipäiväkirjat', suggestTimeLines: 'Ehdota rivejä aikaraporteista', timeSheetSource: 'microsoft-learn-project-timesheets-fi', resourceCard: 'Resurssikortti', resourceCapacity: 'Resurssikapasiteetti', capacitySettings: 'Resurssin kapasiteetti asetuk.', updateCapacity: 'Päivitä kapasiteetti', capacitySource: 'microsoft-learn-project-resource-capacity-fi',
     create: 'Luo projektipäiväkirjan rivit', journal: 'Projektipäiväkirja', post: 'Kirjaa',
     source: 'microsoft-learn-project-usage-fi', invoiceSource: 'microsoft-learn-project-invoice-fi', walkthroughSource: 'microsoft-learn-project-walkthrough-fi', taskLines: 'Project Task Lines', planningLines: 'Project Suunnittelurivit', invoiceQty: 'Laskuun siirrettävä määrä', projectInvoice: 'Luo projektin myyntilasku'
   },
   {
-    locale: 'nb-NO', page: 'Prosjektplanleggingslinjer', field: 'Ant. som skal overføres til kladd', timeSheet: 'Timelister', createTimeLines: 'Opprett linjer fra prosjektplanlegging', projectJournals: 'Prosjektjournaler', suggestTimeLines: 'Foreslå linjer fra timelister', timeSheetSource: 'microsoft-learn-project-timesheets-nb',
+    locale: 'nb-NO', page: 'Prosjektplanleggingslinjer', field: 'Ant. som skal overføres til kladd', timeSheet: 'Timelister', createTimeLines: 'Opprett linjer fra prosjektplanlegging', projectJournals: 'Prosjektjournaler', suggestTimeLines: 'Foreslå linjer fra timelister', timeSheetSource: 'microsoft-learn-project-timesheets-nb', resourceCard: 'Ressurskort', resourceCapacity: 'Ressurskapasitet', capacitySettings: 'Innstillinger for ressurskapasitet', updateCapacity: 'Oppdater kapasitet', capacitySource: 'microsoft-learn-project-resource-capacity-nb',
     create: 'Opprett prosjektkladdelinjer', journal: 'Prosjektkladd', post: 'Bokfør',
     source: 'microsoft-learn-project-usage-nb', invoiceSource: 'microsoft-learn-project-invoice-nb', walkthroughSource: 'microsoft-learn-project-walkthrough-nb', taskLines: 'Prosjektoppgavelinjer', planningLines: 'Project Planning Lines', invoiceQty: 'Ant. som skal overføres til faktura', projectInvoice: 'Opprett salgsfaktura for prosjekt'
   }
 ];
 
 for (const sample of samples) {
-  const { locale, page, field, create, journal, post, source, invoiceSource, walkthroughSource, taskLines, planningLines, invoiceQty, projectInvoice, timeSheet, createTimeLines, projectJournals, suggestTimeLines, timeSheetSource } = sample;
+  const { locale, page, field, create, journal, post, source, invoiceSource, walkthroughSource, taskLines, planningLines, invoiceQty, projectInvoice, timeSheet, createTimeLines, projectJournals, suggestTimeLines, timeSheetSource, resourceCard, resourceCapacity, capacitySettings, updateCapacity, capacitySource } = sample;
   const quantity = repository.resolveAction({ language: locale, context: { pageCaption: page, fieldCaption: field } });
   assert.equal(quantity.status, 'resolved', `${locale} project transfer quantity`);
   assert.equal(quantity.candidates[0].provenance.ruleId, 'Projects.SetQtyToTransferToJournal');
@@ -104,6 +104,18 @@ for (const sample of samples) {
   assert.equal(suggestedTimeLines.candidates[0].provenance.ruleId, 'Projects.SuggestApprovedTimeSheetLinesToProjectJournal');
   assert.equal(suggestedTimeLines.candidates[0].provenance.language, locale);
   assert.ok(suggestedTimeLines.candidates[0].provenance.sourceRefs.some(x => x.sourceId === timeSheetSource), `${locale} time sheet journal source`);
+
+  const openedCapacity = repository.resolveAction({ language: locale, context: { pageCaption: resourceCard, actionCaption: resourceCapacity } });
+  assert.equal(openedCapacity.status, 'resolved', `${locale} open resource capacity`);
+  assert.equal(openedCapacity.candidates[0].provenance.ruleId, 'Projects.OpenResourceCapacity');
+  assert.equal(openedCapacity.candidates[0].provenance.language, locale);
+  assert.ok(openedCapacity.candidates[0].provenance.sourceRefs.some(x => x.sourceId === capacitySource), `${locale} resource capacity source`);
+
+  const updatedCapacity = repository.resolveAction({ language: locale, context: { pageCaption: capacitySettings, actionCaption: updateCapacity } });
+  assert.equal(updatedCapacity.status, 'resolved', `${locale} update resource capacity`);
+  assert.equal(updatedCapacity.candidates[0].provenance.ruleId, 'Projects.UpdateResourceCapacity');
+  assert.equal(updatedCapacity.candidates[0].provenance.language, locale);
+  assert.ok(updatedCapacity.candidates[0].provenance.sourceRefs.some(x => x.sourceId === capacitySource), `${locale} update capacity source`);
 }
 
-console.log('Project usage, planning, invoicing, and time-sheet actions match in all eight supported UI locales.');
+console.log('Project planning, usage, invoicing, time-sheet, and resource-capacity actions match in all eight supported UI locales.');

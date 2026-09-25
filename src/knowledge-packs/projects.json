@@ -349,8 +349,157 @@
         "microsoft-learn-project-timesheets-nb"
       ]
     }
+    ,
+    {
+      "ruleId": "Projects.OpenResourceCapacity",
+      "taskType": "OpenResourceCapacity",
+      "semanticAction": "OpenRelatedLines",
+      "entity": "Resource",
+      "priority": 1280,
+      "confidence": 0.97,
+      "match": {
+        "pagePatterns": [
+          "^(Resource Card|Resurskort|Fiche ressource|Ressourcenkarte|Ficha recurso|Ressourcekort|Resurssikortti|Ressurskort)$"
+        ],
+        "actionPatterns": [
+          "^Resource Capacity$",
+          "^Resurskapacitet$",
+          "^Capacité ressource$",
+          "^Ressourcenkapazität$",
+          "^Capacidad recurso$",
+          "^Ressourcekapacitet$",
+          "^Resurssikapasiteetti$",
+          "^Ressurskapasitet$"
+        ],
+        "fieldPatterns": [],
+        "automationIdPatterns": []
+      },
+      "instructionTemplate": "",
+      "languages": ["en-US", "sv-SE", "fr-FR", "de-DE", "es-ES", "da-DK", "fi-FI", "nb-NO"],
+      "aliases": [],
+      "sourceIds": [
+        "microsoft-learn-project-resource-capacity",
+        "microsoft-learn-project-resource-capacity-sv",
+        "microsoft-learn-project-resource-capacity-fr",
+        "microsoft-learn-project-resource-capacity-de",
+        "microsoft-learn-project-resource-capacity-es",
+        "microsoft-learn-project-resource-capacity-da",
+        "microsoft-learn-project-resource-capacity-fi",
+        "microsoft-learn-project-resource-capacity-nb"
+      ]
+    },
+    {
+      "ruleId": "Projects.UpdateResourceCapacity",
+      "taskType": "UpdateResourceCapacity",
+      "semanticAction": "UpdateCapacity",
+      "entity": "ResourceCapacity",
+      "priority": 1280,
+      "confidence": 0.97,
+      "match": {
+        "pagePatterns": [
+          "^(Resource Capacity Settings|Inställningar för resurskapacitet|Paramétrage capacité ressource|Res\\.-Kapazität Einstellungen|Config\\. capacidad recurso|Ressourcekap\\.indstillinger|Resurssin kapasiteetti asetuk\\.|Innstillinger for ressurskapasitet)$"
+        ],
+        "actionPatterns": [
+          "^Update Capacity$",
+          "^Uppdatera kapacitet$",
+          "^Mettre à jour la capacité$",
+          "^Kapazität aktualisieren$",
+          "^Actualizar capacidad$",
+          "^Opdater kapacitet$",
+          "^Päivitä kapasiteetti$",
+          "^Oppdater kapasitet$"
+        ],
+        "fieldPatterns": [],
+        "automationIdPatterns": []
+      },
+      "instructionTemplate": "",
+      "languages": ["en-US", "sv-SE", "fr-FR", "de-DE", "es-ES", "da-DK", "fi-FI", "nb-NO"],
+      "aliases": [],
+      "sourceIds": [
+        "microsoft-learn-project-resource-capacity",
+        "microsoft-learn-project-resource-capacity-sv",
+        "microsoft-learn-project-resource-capacity-fr",
+        "microsoft-learn-project-resource-capacity-de",
+        "microsoft-learn-project-resource-capacity-es",
+        "microsoft-learn-project-resource-capacity-da",
+        "microsoft-learn-project-resource-capacity-fi",
+        "microsoft-learn-project-resource-capacity-nb"
+      ]
+    }
   ],
   "sources": [
+    {
+      "sourceId": "microsoft-learn-project-resource-capacity",
+      "title": "Set up project resource costs, prices, and capacity",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/en-us/dynamics365/business-central/projects-how-setup-resources",
+      "appliesTo": "Current English Business Central online documentation; inspected 2026-09-25",
+      "accessedDate": "2026-09-25",
+      "fields": ["Resource Capacity", "Set Capacity", "Resource Capacity Settings", "Update Capacity"]
+    },
+    {
+      "sourceId": "microsoft-learn-project-resource-capacity-sv",
+      "title": "Ange projektresurskostnader, priser och kapacitet",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/sv-se/dynamics365/business-central/projects-how-setup-resources",
+      "appliesTo": "Current Swedish Business Central online documentation; inspected 2026-09-25",
+      "accessedDate": "2026-09-25",
+      "fields": ["Resurskapacitet", "Ställ in kapacitet", "Inställningar för resurskapacitet", "Uppdatera kapacitet"]
+    },
+    {
+      "sourceId": "microsoft-learn-project-resource-capacity-fr",
+      "title": "Paramétrer les coûts, prix, et capacité des projets",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/fr-fr/dynamics365/business-central/projects-how-setup-resources",
+      "appliesTo": "Current French Business Central online documentation; inspected 2026-09-25",
+      "accessedDate": "2026-09-25",
+      "fields": ["Capacité ressource", "Paramétrage capacité ressource", "Mettre à jour la capacité"]
+    },
+    {
+      "sourceId": "microsoft-learn-project-resource-capacity-de",
+      "title": "Kosten, Preise und Kapazität für Projektressourcen einrichten",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/de-de/dynamics365/business-central/projects-how-setup-resources",
+      "appliesTo": "Current German Business Central online documentation; inspected 2026-09-25",
+      "accessedDate": "2026-09-25",
+      "fields": ["Ressourcenkapazität", "Kapazität festlegen", "Res.-Kapazität Einstellungen", "Kapazität aktualisieren"]
+    },
+    {
+      "sourceId": "microsoft-learn-project-resource-capacity-es",
+      "title": "Configurar costes de recurso, precios y capacidad",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/es-es/dynamics365/business-central/projects-how-setup-resources",
+      "appliesTo": "Current Spanish Business Central online documentation; inspected 2026-09-25",
+      "accessedDate": "2026-09-25",
+      "fields": ["Capacidad recurso", "Establecer capacidad", "Config. capacidad recurso", "Actualizar capacidad"]
+    },
+    {
+      "sourceId": "microsoft-learn-project-resource-capacity-da",
+      "title": "Konfigurere projektressourcekostpriser, priser og kapacitet",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/da-dk/dynamics365/business-central/projects-how-setup-resources",
+      "appliesTo": "Current Danish Business Central online documentation; inspected 2026-09-25",
+      "accessedDate": "2026-09-25",
+      "fields": ["Ressourcekapacitet", "Angiv kapacitet", "Ressourcekap.indstillinger", "Opdater kapacitet"]
+    },
+    {
+      "sourceId": "microsoft-learn-project-resource-capacity-fi",
+      "title": "Projektin resurssin kustannusten, hintojen ja kapasiteetin määrittäminen",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/fi-fi/dynamics365/business-central/projects-how-setup-resources",
+      "appliesTo": "Current Finnish Business Central online documentation; inspected 2026-09-25",
+      "accessedDate": "2026-09-25",
+      "fields": ["Resurssikapasiteetti", "Aseta kapasiteetti", "Resurssin kapasiteetti asetuk.", "Päivitä kapasiteetti"]
+    },
+    {
+      "sourceId": "microsoft-learn-project-resource-capacity-nb",
+      "title": "Definer prosjektressurskostpriser, priser og kapasitet",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/nb-no/dynamics365/business-central/projects-how-setup-resources",
+      "appliesTo": "Current Norwegian Bokmål Business Central online documentation; inspected 2026-09-25",
+      "accessedDate": "2026-09-25",
+      "fields": ["Ressurskapasitet", "Angi kapasitet", "Innstillinger for ressurskapasitet", "Oppdater kapasitet"]
+    },
     {
       "sourceId": "microsoft-learn-project-timesheets",
       "title": "Use time sheets",
