@@ -146,8 +146,36 @@ const wrongCreatePeriodsAction = repository.resolveAction({language:'en-US',
 assert.ok(!wrongCreatePeriodsAction.candidates.some(x => x.provenance.ruleId === 'Finance.CreateAccountingPeriods'),
   'closing the year must not match period creation');
 
+const budgetSamples = [
+  {locale:'en-US',page:'G/L Budgets',action:'Edit Budget'},
+  {locale:'sv-SE',page:'G/L-budgetar',action:'Redigera budget'},
+  {locale:'fr-FR',page:'G/L Budgets',action:'Modifier budget'},
+  {locale:'de-DE',page:'Sachkontenbudgets',action:'Buch.-Blatt bearbeiten'},
+  {locale:'es-ES',page:'Presupuestos de G/L',action:'Editar presupuesto'},
+  {locale:'da-DK',page:'Finansbudgetter',action:'Rediger budget'},
+  {locale:'fi-FI',page:'KP-budjetit',action:'Muokkaa budjettia'},
+  {locale:'nb-NO',page:'G/L-budsjetter',action:'Rediger budsjett'}
+];
+const budgetRule = financePack.rules.find(x => x.ruleId === 'Finance.EditGeneralLedgerBudget');
+for (const {locale,page,action} of budgetSamples) {
+  const result = repository.resolveAction({language:locale,context:{pageCaption:page,actionCaption:action}});
+  assert.equal(result.status,'resolved',`${locale} edit G/L budget`);
+  assert.equal(result.candidates[0].provenance.ruleId,'Finance.EditGeneralLedgerBudget',locale);
+  assert.equal(result.candidates[0].provenance.language,locale);
+  assert.ok(result.candidates[0].provenance.sourceRefs.some(x =>
+    x.sourceId === `microsoft-learn-finance-budgets-${locale.toLowerCase()}`),locale);
+  const instruction = knowledge.localizedInstruction(budgetRule,locale);
+  assert.ok(instruction,`localized budget directive for ${locale}`);
+  assert.match(instruction,/overwrite|skriver över|écrase|überschreibt|sobrescribe|overskriver|päälle|overskriver/i,
+    `budget import replacement risk disclosed for ${locale}`);
+}
+const wrongBudgetAction = repository.resolveAction({language:'en-US',
+  context:{pageCaption:'G/L Budgets',actionCaption:'Close Year'}});
+assert.ok(!wrongBudgetAction.candidates.some(x => x.provenance.ruleId === 'Finance.EditGeneralLedgerBudget'),
+  'closing a fiscal year must not match budget editing');
+
 const sourceTopics = [
-  'chart-accounts', 'dimensions', 'vat-setup', 'finance-reports', 'accounting-periods',
+  'chart-accounts', 'dimensions', 'vat-setup', 'finance-reports', 'accounting-periods', 'budgets',
   'year-close', 'fixed-assets', 'depreciation', 'cost-accounting', 'currencies', 'consolidation'
 ];
 for (const topic of sourceTopics) {
@@ -165,4 +193,4 @@ const unrelated = repository.resolveAction({language:'en-US',context:{pageCaptio
 assert.ok(!unrelated.candidates.some(x=>x.provenance.ruleId==='Finance.PostGeneralJournal'),
   'general journal posting rule must not match the specialized payment journal');
 
-console.log('Finance chart, posting, dimension-change, accounting-period creation, and year-end directives resolve in all eight supported UI locales.');
+console.log('Finance chart, posting, dimension-change, accounting-period creation, G/L budget, and year-end directives resolve in all eight supported UI locales.');

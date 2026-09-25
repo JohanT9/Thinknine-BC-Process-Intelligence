@@ -1,9 +1,48 @@
 {
   "packId": "bc-finance",
   "name": "Business Central Finance",
-  "version": "1.5.0",
+  "version": "1.6.0",
   "priority": 210,
   "rules": [
+    {
+      "ruleId": "Finance.EditGeneralLedgerBudget",
+      "taskType": "EditGeneralLedgerBudget",
+      "semanticAction": "EditBudget",
+      "entity": "GeneralLedgerBudget",
+      "priority": 1540,
+      "confidence": 0.99,
+      "match": {
+        "pagePatterns": [
+          "^G/L Budgets$", "^G/L-budgetar$", "^G/L Budgets$", "^Sachkontenbudgets$",
+          "^Presupuestos de G/L$", "^Finansbudgetter$", "^KP-budjetit$", "^G/L-budsjetter$"
+        ],
+        "actionPatterns": [
+          "^Edit Budget$", "^Redigera budget$", "^Modifier budget$", "^Buch\\.-Blatt bearbeiten$",
+          "^Editar presupuesto$", "^Rediger budget$", "^Muokkaa budjettia$", "^Rediger budsjett$"
+        ],
+        "fieldPatterns": [],
+        "automationIdPatterns": []
+      },
+      "instructionTemplate": "",
+      "languages": ["en-US", "sv-SE", "fr-FR", "de-DE", "es-ES", "da-DK", "fi-FI", "nb-NO"],
+      "aliases": [],
+      "sourceIds": [
+        "microsoft-learn-finance-budgets-en-us", "microsoft-learn-finance-budgets-sv-se",
+        "microsoft-learn-finance-budgets-fr-fr", "microsoft-learn-finance-budgets-de-de",
+        "microsoft-learn-finance-budgets-es-es", "microsoft-learn-finance-budgets-da-dk",
+        "microsoft-learn-finance-budgets-fi-fi", "microsoft-learn-finance-budgets-nb-no"
+      ],
+      "localizedInstructions": {
+        "en-US": "Before editing, verify the budget name, period, and dimension filters; separate budget names can preserve versions or scenarios. When importing from Excel, confirm Add versus Replace: Replace overwrites existing budget entries. Imported values on Heading accounts are deleted, so enter amounts on Posting accounts and review the result. This match records the selected action only.",
+        "sv-SE": "Kontrollera budgetnamn, period och dimensionsfilter innan du redigerar; separata budgetnamn kan bevara versioner och scenarier. Kontrollera valet Lägg till eller Ersätt vid import från Excel: Ersätt skriver över befintliga budgettransaktioner. Importerade värden på rubrikrader tas bort, så lägg belopp på bokföringskonton och granska resultatet. Träffen visar endast att åtgärden valdes.",
+        "fr-FR": "Avant de modifier le budget, vérifiez son nom, la période et les filtres de dimension ; des noms distincts permettent de conserver des versions ou scénarios. Lors d’une importation Excel, vérifiez le choix Ajouter ou Remplacer : Remplacer écrase les écritures existantes. Les valeurs importées sur les lignes d’en-tête sont supprimées ; saisissez les montants sur les comptes de comptabilisation et contrôlez le résultat. Cette correspondance indique uniquement que l’action a été sélectionnée.",
+        "de-DE": "Prüfen Sie vor der Bearbeitung Budgetname, Zeitraum und Dimensionsfilter; getrennte Budgetnamen können Versionen und Szenarien erhalten. Prüfen Sie beim Excel-Import die Auswahl Hinzufügen oder Ersetzen: Ersetzen überschreibt vorhandene Budgetposten. Importierte Werte auf Überschriftszeilen werden gelöscht; erfassen Sie Beträge auf Buchungszeilen und prüfen Sie das Ergebnis. Der Treffer zeigt nur die Auswahl der Aktion.",
+        "es-ES": "Antes de editar, compruebe el nombre del presupuesto, el periodo y los filtros de dimensión; los nombres separados permiten conservar versiones o escenarios. Al importar desde Excel, confirme Agregar o Reemplazar: Reemplazar sobrescribe los movimientos existentes. Se eliminan los valores importados en líneas de encabezado; introduzca los importes en cuentas de contabilización y revise el resultado. Esta coincidencia solo indica que se seleccionó la acción.",
+        "da-DK": "Kontrollér budgetnavn, periode og dimensionsfiltre før redigering; separate budgetnavne kan bevare versioner og scenarier. Ved import fra Excel skal du kontrollere valget Tilføj eller Erstat: Erstat overskriver eksisterende budgetposter. Importerede værdier på overskriftslinjer slettes; angiv beløb på bogføringskonti, og kontrollér resultatet. Matchningen viser kun, at handlingen blev valgt.",
+        "fi-FI": "Tarkista ennen muokkausta budjetin nimi, kausi ja dimensiot suodattavat tekijät; erilliset budjettien nimet voivat säilyttää versiot ja skenaariot. Varmista Excel-tuonnissa valinta Lisää tai Korvaa: Korvaa kirjoittaa aiemmat budjettitapahtumat päälle. Otsikkotilien tuodut arvot poistetaan, joten syötä summat kirjaustileille ja tarkista tulos. Osuma osoittaa vain, että toiminto valittiin.",
+        "nb-NO": "Kontroller budsjettnavn, periode og dimensjonsfiltre før redigering; separate budsjettnavn kan bevare versjoner og scenarioer. Ved import fra Excel må du kontrollere valget Legg til eller Erstatt: Erstatt overskriver eksisterende budsjettposter. Importerte verdier på overskriftslinjer slettes; før beløp på bokføringskontoer og kontroller resultatet. Treffet viser bare at handlingen ble valgt."
+      }
+    },
     {
       "ruleId": "Finance.PostGeneralJournal",
       "taskType": "PostGeneralJournal",
@@ -358,6 +397,14 @@
   {"sourceId":"microsoft-learn-finance-consolidation-es-es","title":"Set up company consolidation (es-ES)","sourceType":"microsoft-learn","sourceUri":"https://learn.microsoft.com/es-es/dynamics365/business-central/finance-consolidated-company-reporting-setup","appliesTo":"Business Central finance documentation, es-ES; checked 2026-09-25","accessedDate":"2026-09-25","fields":["Prepare charts of accounts and business units","Account mapping and exchange-rate translation","Dimension consolidation choices"]},
   {"sourceId":"microsoft-learn-finance-consolidation-da-dk","title":"Set up company consolidation (da-DK)","sourceType":"microsoft-learn","sourceUri":"https://learn.microsoft.com/da-dk/dynamics365/business-central/finance-consolidated-company-reporting-setup","appliesTo":"Business Central finance documentation, da-DK; checked 2026-09-25","accessedDate":"2026-09-25","fields":["Prepare charts of accounts and business units","Account mapping and exchange-rate translation","Dimension consolidation choices"]},
   {"sourceId":"microsoft-learn-finance-consolidation-fi-fi","title":"Set up company consolidation (fi-FI)","sourceType":"microsoft-learn","sourceUri":"https://learn.microsoft.com/fi-fi/dynamics365/business-central/finance-consolidated-company-reporting-setup","appliesTo":"Business Central finance documentation, fi-FI; checked 2026-09-25","accessedDate":"2026-09-25","fields":["Prepare charts of accounts and business units","Account mapping and exchange-rate translation","Dimension consolidation choices"]},
-  {"sourceId":"microsoft-learn-finance-consolidation-nb-no","title":"Set up company consolidation (nb-NO)","sourceType":"microsoft-learn","sourceUri":"https://learn.microsoft.com/nb-no/dynamics365/business-central/finance-consolidated-company-reporting-setup","appliesTo":"Business Central finance documentation, nb-NO; checked 2026-09-25","accessedDate":"2026-09-25","fields":["Prepare charts of accounts and business units","Account mapping and exchange-rate translation","Dimension consolidation choices"]}
+  {"sourceId":"microsoft-learn-finance-consolidation-nb-no","title":"Set up company consolidation (nb-NO)","sourceType":"microsoft-learn","sourceUri":"https://learn.microsoft.com/nb-no/dynamics365/business-central/finance-consolidated-company-reporting-setup","appliesTo":"Business Central finance documentation, nb-NO; checked 2026-09-25","accessedDate":"2026-09-25","fields":["Prepare charts of accounts and business units","Account mapping and exchange-rate translation","Dimension consolidation choices"]},
+  {"sourceId":"microsoft-learn-finance-budgets-en-us","title":"Create G/L budgets","sourceType":"microsoft-learn","sourceUri":"https://learn.microsoft.com/en-us/dynamics365/business-central/finance-how-create-budgets","appliesTo":"Business Central finance documentation, en-US; checked 2026-09-25","accessedDate":"2026-09-25","fields":["Create and edit G/L budgets","Budget names, periods and dimensions","Excel budget import Add or Replace behavior","Imported heading-line values are deleted"]},
+  {"sourceId":"microsoft-learn-finance-budgets-sv-se","title":"Skapa redovisningsbudgetar (sv-SE)","sourceType":"microsoft-learn","sourceUri":"https://learn.microsoft.com/sv-se/dynamics365/business-central/finance-how-create-budgets","appliesTo":"Business Central finance documentation, sv-SE; checked 2026-09-25","accessedDate":"2026-09-25","fields":["Create and edit G/L budgets","Budget names, periods and dimensions","Excel budget import Add or Replace behavior","Imported heading-line values are deleted"]},
+  {"sourceId":"microsoft-learn-finance-budgets-fr-fr","title":"Création de budgets comptables (fr-FR)","sourceType":"microsoft-learn","sourceUri":"https://learn.microsoft.com/fr-fr/dynamics365/business-central/finance-how-create-budgets","appliesTo":"Business Central finance documentation, fr-FR; checked 2026-09-25","accessedDate":"2026-09-25","fields":["Create and edit G/L budgets","Budget names, periods and dimensions","Excel budget import Add or Replace behavior","Imported heading-line values are deleted"]},
+  {"sourceId":"microsoft-learn-finance-budgets-de-de","title":"Sachkontenbudgets erstellen (de-DE)","sourceType":"microsoft-learn","sourceUri":"https://learn.microsoft.com/de-de/dynamics365/business-central/finance-how-create-budgets","appliesTo":"Business Central finance documentation, de-DE; checked 2026-09-25","accessedDate":"2026-09-25","fields":["Create and edit G/L budgets","Budget names, periods and dimensions","Excel budget import Add or Replace behavior","Imported heading-line values are deleted"]},
+  {"sourceId":"microsoft-learn-finance-budgets-es-es","title":"Crear presupuestos contables (es-ES)","sourceType":"microsoft-learn","sourceUri":"https://learn.microsoft.com/es-es/dynamics365/business-central/finance-how-create-budgets","appliesTo":"Business Central finance documentation, es-ES; checked 2026-09-25","accessedDate":"2026-09-25","fields":["Create and edit G/L budgets","Budget names, periods and dimensions","Excel budget import Add or Replace behavior","Imported heading-line values are deleted"]},
+  {"sourceId":"microsoft-learn-finance-budgets-da-dk","title":"Oprette finansbudgetter (da-DK)","sourceType":"microsoft-learn","sourceUri":"https://learn.microsoft.com/da-dk/dynamics365/business-central/finance-how-create-budgets","appliesTo":"Business Central finance documentation, da-DK; checked 2026-09-25","accessedDate":"2026-09-25","fields":["Create and edit G/L budgets","Budget names, periods and dimensions","Excel budget import Add or Replace behavior","Imported heading-line values are deleted"]},
+  {"sourceId":"microsoft-learn-finance-budgets-fi-fi","title":"KP-budjettien luominen (fi-FI)","sourceType":"microsoft-learn","sourceUri":"https://learn.microsoft.com/fi-fi/dynamics365/business-central/finance-how-create-budgets","appliesTo":"Business Central finance documentation, fi-FI; checked 2026-09-25","accessedDate":"2026-09-25","fields":["Create and edit G/L budgets","Budget names, periods and dimensions","Excel budget import Add or Replace behavior","Imported heading-line values are deleted"]},
+  {"sourceId":"microsoft-learn-finance-budgets-nb-no","title":"Opprett finansbudsjetter (nb-NO)","sourceType":"microsoft-learn","sourceUri":"https://learn.microsoft.com/nb-no/dynamics365/business-central/finance-how-create-budgets","appliesTo":"Business Central finance documentation, nb-NO; checked 2026-09-25","accessedDate":"2026-09-25","fields":["Create and edit G/L budgets","Budget names, periods and dimensions","Excel budget import Add or Replace behavior","Imported heading-line values are deleted"]}
   ]
 }
