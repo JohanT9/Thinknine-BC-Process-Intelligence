@@ -138,6 +138,140 @@
         "microsoft-learn-project-usage-fi",
         "microsoft-learn-project-usage-nb"
       ]
+    },
+    {
+      "ruleId": "Projects.OpenProjectPlanningLines",
+      "taskType": "OpenProjectPlanningLines",
+      "semanticAction": "OpenRelatedLines",
+      "entity": "ProjectTask",
+      "priority": 1280,
+      "confidence": 0.97,
+      "match": {
+        "pagePatterns": [
+          "^Project Task Lines$",
+          "^Projektaktivitetsrader$",
+          "^Lignes de tâches du projet$",
+          "^Projektaufgabenzeilen$",
+          "^Líneas de tareas del proyecto$",
+          "^Project Opgavelinjer$",
+          "^Project Task Lines$",
+          "^Prosjektoppgavelinjer$"
+        ],
+        "actionPatterns": [
+          "^Project Planning Lines$",
+          "^Projektplaneringsrader$",
+          "^Lignes planning projet$",
+          "^Projektplanungszeilen$",
+          "^Líneas planificación proyecto$",
+          "^Projektplanlægningslinjer$",
+          "^Project Suunnittelurivit$",
+          "^Prosjektplanleggingslinjer$"
+        ],
+        "fieldPatterns": [],
+        "automationIdPatterns": []
+      },
+      "instructionTemplate": "",
+      "languages": ["en-US", "sv-SE", "fr-FR", "de-DE", "es-ES", "da-DK", "fi-FI", "nb-NO"],
+      "aliases": [],
+      "sourceIds": [
+        "microsoft-learn-project-walkthrough",
+        "microsoft-learn-project-walkthrough-sv",
+        "microsoft-learn-project-walkthrough-fr",
+        "microsoft-learn-project-walkthrough-de",
+        "microsoft-learn-project-walkthrough-es",
+        "microsoft-learn-project-walkthrough-da",
+        "microsoft-learn-project-walkthrough-fi",
+        "microsoft-learn-project-walkthrough-nb"
+      ]
+    },
+    {
+      "ruleId": "Projects.SetQtyToTransferToInvoice",
+      "taskType": "SetProjectQtyToInvoice",
+      "semanticAction": "EnterQuantity",
+      "entity": "ProjectPlanningLine",
+      "priority": 1280,
+      "confidence": 0.97,
+      "match": {
+        "pagePatterns": [
+          "^Project Planning Lines$",
+          "^Projektplaneringsrader$",
+          "^Lignes planning projet$",
+          "^Projektplanungszeilen$",
+          "^Líneas planificación proyecto$",
+          "^Projektplanlægningslinjer$",
+          "^Projektin suunnittelurivit$",
+          "^Prosjektplanleggingslinjer$"
+        ],
+        "actionPatterns": [],
+        "fieldPatterns": [
+          "^Qty\\. To Transfer to Invoice$",
+          "^Antal att överföra till faktura$",
+          "^Qté à transférer à facturer$",
+          "^In Rechnung zu übertragende Menge$",
+          "^Cdad\\. para transferir a factura$",
+          "^Antal til overførsel til faktura$",
+          "^Laskuun siirrettävä määrä$",
+          "^Ant\\. som skal overføres til faktura$"
+        ],
+        "automationIdPatterns": []
+      },
+      "instructionTemplate": "",
+      "languages": ["en-US", "sv-SE", "fr-FR", "de-DE", "es-ES", "da-DK", "fi-FI", "nb-NO"],
+      "aliases": [],
+      "sourceIds": [
+        "microsoft-learn-project-invoice",
+        "microsoft-learn-project-invoice-sv",
+        "microsoft-learn-project-invoice-fr",
+        "microsoft-learn-project-invoice-de",
+        "microsoft-learn-project-invoice-es",
+        "microsoft-learn-project-invoice-da",
+        "microsoft-learn-project-invoice-fi",
+        "microsoft-learn-project-invoice-nb"
+      ]
+    },
+    {
+      "ruleId": "Projects.CreateProjectSalesInvoice",
+      "taskType": "CreateProjectSalesInvoice",
+      "semanticAction": "CreateSalesInvoice",
+      "entity": "Project",
+      "priority": 1280,
+      "confidence": 0.97,
+      "match": {
+        "pagePatterns": [
+          "^Projects$",
+          "^Projets$",
+          "^Projekt$",
+          "^Proyectos$",
+          "^Projekter$",
+          "^Projektit$",
+          "^Prosjekter$"
+        ],
+        "actionPatterns": [
+          "^Create Project Sales Invoice$",
+          "^Skapa försäljningsfaktura för projekt$",
+          "^Créer une facture vente projet$",
+          "^Projektverkaufsrechnung erstellen$",
+          "^Crear factura de venta de proyecto$",
+          "^Opret projektsalgsfaktura$",
+          "^Luo projektin myyntilasku$",
+          "^Opprett salgsfaktura for prosjekt$"
+        ],
+        "fieldPatterns": [],
+        "automationIdPatterns": []
+      },
+      "instructionTemplate": "",
+      "languages": ["en-US", "sv-SE", "fr-FR", "de-DE", "es-ES", "da-DK", "fi-FI", "nb-NO"],
+      "aliases": [],
+      "sourceIds": [
+        "microsoft-learn-project-invoice",
+        "microsoft-learn-project-invoice-sv",
+        "microsoft-learn-project-invoice-fr",
+        "microsoft-learn-project-invoice-de",
+        "microsoft-learn-project-invoice-es",
+        "microsoft-learn-project-invoice-da",
+        "microsoft-learn-project-invoice-fi",
+        "microsoft-learn-project-invoice-nb"
+      ]
     }
   ],
   "sources": [
@@ -212,6 +346,150 @@
       "appliesTo": "Current Norwegian Bokmål Business Central online documentation; inspected 2026-09-25",
       "accessedDate": "2026-09-25",
       "fields": ["Ant. som skal overføres til kladd", "Opprett prosjektkladdelinjer", "Åpne prosjektkladd", "Bokfør"]
+    },
+    {
+      "sourceId": "microsoft-learn-project-walkthrough",
+      "title": "Walkthrough: managing projects",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/en-us/dynamics365/business-central/walkthrough-managing-projects-with-jobs",
+      "appliesTo": "Current English Business Central online documentation; inspected 2026-09-25",
+      "accessedDate": "2026-09-25",
+      "fields": ["Project Task Lines", "Project Planning Lines", "Create project Sales Invoice"]
+    },
+    {
+      "sourceId": "microsoft-learn-project-walkthrough-sv",
+      "title": "Genomgång: Hantera projekt",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/sv-se/dynamics365/business-central/walkthrough-managing-projects-with-jobs",
+      "appliesTo": "Current Swedish Business Central online documentation; inspected 2026-09-25",
+      "accessedDate": "2026-09-25",
+      "fields": ["Projektaktivitetsrader", "Projektplaneringsrader", "Skapa projektförsäljningsfaktura"]
+    },
+    {
+      "sourceId": "microsoft-learn-project-walkthrough-fr",
+      "title": "Procédure pas à pas : gestion des projets",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/fr-fr/dynamics365/business-central/walkthrough-managing-projects-with-jobs",
+      "appliesTo": "Current French Business Central online documentation; inspected 2026-09-25",
+      "accessedDate": "2026-09-25",
+      "fields": ["Project Lignes de tâches", "Lignes planning projet", "Créer une facture vente projet"]
+    },
+    {
+      "sourceId": "microsoft-learn-project-walkthrough-de",
+      "title": "Anleitung: Projektverwaltung",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/de-de/dynamics365/business-central/walkthrough-managing-projects-with-jobs",
+      "appliesTo": "Current German Business Central online documentation; inspected 2026-09-25",
+      "accessedDate": "2026-09-25",
+      "fields": ["Projektaufgabenzeilen", "Projektplanungszeilen", "Projektverkaufsrechnung erstellen"]
+    },
+    {
+      "sourceId": "microsoft-learn-project-walkthrough-es",
+      "title": "Tutorial: Administración de proyectos",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/es-es/dynamics365/business-central/walkthrough-managing-projects-with-jobs",
+      "appliesTo": "Current Spanish Business Central online documentation; inspected 2026-09-25",
+      "accessedDate": "2026-09-25",
+      "fields": ["Líneas de tareas del proyecto", "Líneas de planificación de proyecto", "Crear factura de venta de proyecto"]
+    },
+    {
+      "sourceId": "microsoft-learn-project-walkthrough-da",
+      "title": "Gennemgang: administration af projekter",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/da-dk/dynamics365/business-central/walkthrough-managing-projects-with-jobs",
+      "appliesTo": "Current Danish Business Central online documentation; inspected 2026-09-25",
+      "accessedDate": "2026-09-25",
+      "fields": ["Projektopgavelinjer", "Projektplanlægningslinjer", "Opret projektsalgsfaktura"]
+    },
+    {
+      "sourceId": "microsoft-learn-project-walkthrough-fi",
+      "title": "Vaihe vaiheelta: projektien hallinta",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/fi-fi/dynamics365/business-central/walkthrough-managing-projects-with-jobs",
+      "appliesTo": "Current Finnish Business Central online documentation; inspected 2026-09-25",
+      "accessedDate": "2026-09-25",
+      "fields": ["Projektitehtävärivit", "Projektin suunnittelurivit", "Luo projektin myyntilasku"]
+    },
+    {
+      "sourceId": "microsoft-learn-project-walkthrough-nb",
+      "title": "Gjennomgang: administrering av prosjekter",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/nb-no/dynamics365/business-central/walkthrough-managing-projects-with-jobs",
+      "appliesTo": "Current Norwegian Bokmål Business Central online documentation; inspected 2026-09-25",
+      "accessedDate": "2026-09-25",
+      "fields": ["Prosjektoppgavelinjer", "Prosjektplanleggingslinjer", "Opprett salgsfaktura for prosjekt"]
+    },
+    {
+      "sourceId": "microsoft-learn-project-invoice",
+      "title": "Create a project sales invoice to invoice a project",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/en-us/dynamics365/business-central/projects-how-invoice-jobs",
+      "appliesTo": "Current English Business Central online documentation; inspected 2026-09-25",
+      "accessedDate": "2026-09-25",
+      "fields": ["Qty. To Transfer to Invoice", "Create Sales Invoice", "Post"]
+    },
+    {
+      "sourceId": "microsoft-learn-project-invoice-sv",
+      "title": "Skapa en försäljningsfaktura för projekt för att fakturera ett projekt",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/sv-se/dynamics365/business-central/projects-how-invoice-jobs",
+      "appliesTo": "Current Swedish Business Central online documentation; inspected 2026-09-25",
+      "accessedDate": "2026-09-25",
+      "fields": ["Antal att överföra till faktura", "Skapa försäljningsfaktura", "Bokför"]
+    },
+    {
+      "sourceId": "microsoft-learn-project-invoice-fr",
+      "title": "Créer une facture vente projet pour facturer un projet",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/fr-fr/dynamics365/business-central/projects-how-invoice-jobs",
+      "appliesTo": "Current French Business Central online documentation; inspected 2026-09-25",
+      "accessedDate": "2026-09-25",
+      "fields": ["Qté à transférer à facturer", "Créer facture vente", "Valider"]
+    },
+    {
+      "sourceId": "microsoft-learn-project-invoice-de",
+      "title": "Projektverkaufsrechnungen erstellen, um ein Projekt zu fakturieren",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/de-de/dynamics365/business-central/projects-how-invoice-jobs",
+      "appliesTo": "Current German Business Central online documentation; inspected 2026-09-25",
+      "accessedDate": "2026-09-25",
+      "fields": ["In Rechnung zu übertragende Menge", "Verkaufsrechnung erstellen", "Buchen"]
+    },
+    {
+      "sourceId": "microsoft-learn-project-invoice-es",
+      "title": "Crear una factura de ventas de proyecto para facturar un proyecto",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/es-es/dynamics365/business-central/projects-how-invoice-jobs",
+      "appliesTo": "Current Spanish Business Central online documentation; inspected 2026-09-25",
+      "accessedDate": "2026-09-25",
+      "fields": ["Cdad. para transferir a factura", "Crear factura venta", "Registrar"]
+    },
+    {
+      "sourceId": "microsoft-learn-project-invoice-da",
+      "title": "Oprette en projektsalgsfaktura for at fakturere for et projekt",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/da-dk/dynamics365/business-central/projects-how-invoice-jobs",
+      "appliesTo": "Current Danish Business Central online documentation; inspected 2026-09-25",
+      "accessedDate": "2026-09-25",
+      "fields": ["Antal til overførsel til faktura", "Opret salgsfaktura", "Bogfør"]
+    },
+    {
+      "sourceId": "microsoft-learn-project-invoice-fi",
+      "title": "Projektin laskuttaminen luomalla projektin myyntilasku",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/fi-fi/dynamics365/business-central/projects-how-invoice-jobs",
+      "appliesTo": "Current Finnish Business Central online documentation; inspected 2026-09-25",
+      "accessedDate": "2026-09-25",
+      "fields": ["Laskuun siirrettävä määrä", "Luo myyntilasku", "Kirjaa"]
+    },
+    {
+      "sourceId": "microsoft-learn-project-invoice-nb",
+      "title": "Opprett en prosjektsalgsfaktura for å fakturere et prosjekt",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/nb-no/dynamics365/business-central/projects-how-invoice-jobs",
+      "appliesTo": "Current Norwegian Bokmål Business Central online documentation; inspected 2026-09-25",
+      "accessedDate": "2026-09-25",
+      "fields": ["Ant. som skal overføres til faktura", "Opprett salgsfaktura", "Bokfør"]
     }
   ]
 }
