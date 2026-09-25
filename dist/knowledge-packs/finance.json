@@ -1,7 +1,7 @@
 {
   "packId": "bc-finance",
   "name": "Business Central Finance",
-  "version": "1.4.0",
+  "version": "1.5.0",
   "priority": 210,
   "rules": [
     {
@@ -165,6 +165,45 @@
         "da-DK": "Kontrollér, hvilke dimensioner der skal erstatte de nuværende, og planlæg et passende tidspunkt, før du ændrer globale dimensioner. Business Central opdaterer bogførte poster, der bruger dimensionerne; jobbet kan tage tid, påvirke ydeevnen og låse tabeller. Brugere kan også blive logget af, mens dimensionerne klargøres. Matchningen viser kun, at handlingen blev valgt, ikke at opdateringen blev fuldført.",
         "fi-FI": "Tarkista ennen yleisten dimensioiden muuttamista, mitkä dimensiot korvaavat nykyiset, ja suunnittele päivitykselle sopiva ajankohta. Business Central päivittää näitä dimensioita käyttävät kirjatut tapahtumat; työ voi kestää, vaikuttaa suorituskykyyn ja lukita tauluja. Käyttäjät voidaan myös kirjata ulos dimensioiden valmistelun ajaksi. Osuma osoittaa vain, että toiminto valittiin, ei sitä, että päivitys valmistui.",
         "nb-NO": "Kontroller hvilke dimensjoner som skal erstatte de gjeldende, og planlegg et egnet tidspunkt før du endrer globale dimensjoner. Business Central oppdaterer poster som er bokført med dimensjonene; jobben kan ta tid, påvirke ytelsen og låse tabeller. Brukere kan også bli logget av mens dimensjonene klargjøres. Treffet viser bare at handlingen ble valgt, ikke at oppdateringen er fullført."
+      }
+    },
+    {
+      "ruleId": "Finance.CreateAccountingPeriods",
+      "taskType": "CreateAccountingPeriods",
+      "semanticAction": "CreateAccountingPeriods",
+      "entity": "AccountingPeriod",
+      "priority": 1530,
+      "confidence": 0.99,
+      "match": {
+        "pagePatterns": [
+          "^Accounting Periods$", "^Redovisningsperioder$", "^Périodes comptables$", "^Buchhaltungsperioden$",
+          "^Periodos contables$", "^Regnskabsperioder$", "^Kirjanpitojaksot$", "^Regnskapsperioder$"
+        ],
+        "actionPatterns": [
+          "^Create Year$", "^Skapa år$", "^Créer exercice$", "^Jahr erstellen$",
+          "^Crear ejercicio$", "^Opret år$", "^Luo vuosi$", "^Opprett år$"
+        ],
+        "fieldPatterns": [],
+        "automationIdPatterns": []
+      },
+      "instructionTemplate": "",
+      "languages": ["en-US", "sv-SE", "fr-FR", "de-DE", "es-ES", "da-DK", "fi-FI", "nb-NO"],
+      "aliases": [],
+      "sourceIds": [
+        "microsoft-learn-finance-accounting-periods-en-us", "microsoft-learn-finance-accounting-periods-sv-se",
+        "microsoft-learn-finance-accounting-periods-fr-fr", "microsoft-learn-finance-accounting-periods-de-de",
+        "microsoft-learn-finance-accounting-periods-es-es", "microsoft-learn-finance-accounting-periods-da-dk",
+        "microsoft-learn-finance-accounting-periods-fi-fi", "microsoft-learn-finance-accounting-periods-nb-no"
+      ],
+      "localizedInstructions": {
+        "en-US": "Before creating periods, confirm the fiscal-year start date, number of periods, and period length. Create Year makes equal-length periods; set up calendars with varying lengths, such as 4-4-5, manually. Verify the New Fiscal Year marker is on the first period only. This match records the selected action, not that periods were created.",
+        "sv-SE": "Kontrollera räkenskapsårets startdatum, antal perioder och periodlängd innan du skapar perioder. Skapa år skapar perioder med samma längd; lägg upp kalendrar med varierande längd, till exempel 4-4-5, manuellt. Kontrollera att markeringen Nytt räkenskapsår endast finns på den första perioden. Träffen visar att åtgärden valdes, inte att perioderna skapades.",
+        "fr-FR": "Avant de créer les périodes, vérifiez la date de début de l’exercice, le nombre de périodes et leur durée. Créer exercice génère des périodes de même durée ; configurez manuellement les calendriers de durées variables, tels que 4-4-5. Vérifiez que l’indicateur Nouvel exercice ne concerne que la première période. Cette correspondance indique que l’action a été sélectionnée, pas que les périodes ont été créées.",
+        "de-DE": "Prüfen Sie vor dem Erstellen der Perioden den Starttermin des Geschäftsjahres, die Anzahl der Perioden und deren Länge. Jahr erstellen erzeugt gleich lange Perioden; Kalender mit unterschiedlichen Längen, etwa 4-4-5, müssen manuell eingerichtet werden. Prüfen Sie, dass Neues Geschäftsjahr nur für die erste Periode markiert ist. Der Treffer zeigt die Auswahl der Aktion, nicht die Erstellung der Perioden.",
+        "es-ES": "Antes de crear los periodos, compruebe la fecha inicial del ejercicio, el número de periodos y su duración. Crear ejercicio genera periodos de igual duración; configure manualmente los calendarios con duraciones variables, como 4-4-5. Compruebe que la marca Nuevo ejercicio solo esté en el primer periodo. Esta coincidencia indica que se seleccionó la acción, no que se crearan los periodos.",
+        "da-DK": "Kontrollér regnskabsårets startdato, antal perioder og periodelængde, før du opretter perioder. Opret år opretter perioder med samme længde; kalendere med varierende længder, f.eks. 4-4-5, skal konfigureres manuelt. Kontrollér, at markeringen Nyt regnskabsår kun gælder den første periode. Matchningen viser, at handlingen blev valgt, ikke at perioderne blev oprettet.",
+        "fi-FI": "Tarkista ennen jaksojen luomista tilikauden alkamispäivä, jaksojen määrä ja pituus. Luo vuosi luo samanpituisia jaksoja; määritä vaihtelevan pituiset kalenterit, kuten 4-4-5, manuaalisesti. Varmista, että Uusi tilikausi -merkintä on vain ensimmäisellä jaksolla. Osuma osoittaa toiminnon valinnan, ei jaksojen luontia.",
+        "nb-NO": "Kontroller regnskapsårets startdato, antall perioder og periodelengde før du oppretter perioder. Opprett år lager perioder med lik lengde; kalendere med varierende lengder, for eksempel 4-4-5, må konfigureres manuelt. Kontroller at markeringen Nytt regnskapsår bare gjelder den første perioden. Treffet viser at handlingen ble valgt, ikke at periodene ble opprettet."
       }
     },
     {

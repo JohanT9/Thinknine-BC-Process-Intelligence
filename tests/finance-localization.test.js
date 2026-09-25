@@ -119,6 +119,33 @@ const wrongYearEnd = repository.resolveAction({language:'en-US',
 assert.ok(!wrongYearEnd.candidates.some(x => x.provenance.ruleId === 'Finance.CloseFiscalYear'),
   'creating accounting periods must not match close fiscal year');
 
+const createPeriodsSamples = [
+  {locale:'en-US',page:'Accounting Periods',action:'Create Year'},
+  {locale:'sv-SE',page:'Redovisningsperioder',action:'Skapa år'},
+  {locale:'fr-FR',page:'Périodes comptables',action:'Créer exercice'},
+  {locale:'de-DE',page:'Buchhaltungsperioden',action:'Jahr erstellen'},
+  {locale:'es-ES',page:'Periodos contables',action:'Crear ejercicio'},
+  {locale:'da-DK',page:'Regnskabsperioder',action:'Opret år'},
+  {locale:'fi-FI',page:'Kirjanpitojaksot',action:'Luo vuosi'},
+  {locale:'nb-NO',page:'Regnskapsperioder',action:'Opprett år'}
+];
+const createPeriodsRule = financePack.rules.find(x => x.ruleId === 'Finance.CreateAccountingPeriods');
+for (const {locale,page,action} of createPeriodsSamples) {
+  const result = repository.resolveAction({language:locale,context:{pageCaption:page,actionCaption:action}});
+  assert.equal(result.status,'resolved',`${locale} create accounting periods`);
+  assert.equal(result.candidates[0].provenance.ruleId,'Finance.CreateAccountingPeriods',locale);
+  assert.equal(result.candidates[0].provenance.language,locale);
+  assert.ok(result.candidates[0].provenance.sourceRefs.some(x =>
+    x.sourceId === `microsoft-learn-finance-accounting-periods-${locale.toLowerCase()}`),locale);
+  const instruction = knowledge.localizedInstruction(createPeriodsRule,locale);
+  assert.ok(instruction,`localized accounting periods directive for ${locale}`);
+  assert.match(instruction,/4-4-5/,`manual variable-length calendar warning for ${locale}`);
+}
+const wrongCreatePeriodsAction = repository.resolveAction({language:'en-US',
+  context:{pageCaption:'Accounting Periods',actionCaption:'Close Year'}});
+assert.ok(!wrongCreatePeriodsAction.candidates.some(x => x.provenance.ruleId === 'Finance.CreateAccountingPeriods'),
+  'closing the year must not match period creation');
+
 const sourceTopics = [
   'chart-accounts', 'dimensions', 'vat-setup', 'finance-reports', 'accounting-periods',
   'year-close', 'fixed-assets', 'depreciation', 'cost-accounting', 'currencies', 'consolidation'
@@ -138,4 +165,4 @@ const unrelated = repository.resolveAction({language:'en-US',context:{pageCaptio
 assert.ok(!unrelated.candidates.some(x=>x.provenance.ruleId==='Finance.PostGeneralJournal'),
   'general journal posting rule must not match the specialized payment journal');
 
-console.log('Finance chart, posting, dimension-change, and year-end directives resolve in all eight supported UI locales.');
+console.log('Finance chart, posting, dimension-change, accounting-period creation, and year-end directives resolve in all eight supported UI locales.');
