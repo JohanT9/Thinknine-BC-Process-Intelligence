@@ -25,6 +25,9 @@
 - Added a Business Central Projects (Jobs) knowledge pack for transferring project usage to journals,
   creating journal lines, and posting usage. Captions and Microsoft Learn provenance are covered by
   runtime localization tests in all eight supported UI languages.
+- Added initial Service Management coverage for service-task worksheets, service-item quantities,
+  and service-order posting, with locale-specific Microsoft Learn sources and tests in all eight
+  supported UI languages. Other service actions remain to be expanded.
 - Added a runtime catalog test that resolves the localized sales-return action in all eight
   locales instead of checking language declarations alone.
 - Kept BC 21 and BC 28 compatibility as separate ranges so undocumented versions

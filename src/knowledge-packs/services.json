@@ -1,0 +1,161 @@
+{
+  "packId": "bc-services",
+  "name": "Business Central Service Management",
+  "version": "1.0.0",
+  "priority": 200,
+  "rules": [
+    {
+      "ruleId": "Services.OpenServiceItemWorksheet",
+      "taskType": "OpenServiceItemWorksheet",
+      "semanticAction": "OpenWorksheet",
+      "entity": "ServiceItemWorksheet",
+      "priority": 1280,
+      "confidence": 0.96,
+      "match": {
+        "pagePatterns": [
+          "^Service Tasks$",
+          "^Tjänstuppgifter$",
+          "^Tâches de service$",
+          "^Dienstaufgaben$",
+          "^Tareas de servicio$",
+          "^Serviceopgaver$",
+          "^Palvelutehtävät$",
+          "^Tjenesteoppgaver$"
+        ],
+        "actionPatterns": [
+          "^Item Worksheet$",
+          "^Artikelkalkylark$",
+          "^Feuille activité article$",
+          "^Artikel-Arbeitsblatt$",
+          "^Hoja de producto$",
+          "^Varekladde$",
+          "^Nimikkeen työkirja$",
+          "^Arbeidsordre$"
+        ],
+        "fieldPatterns": [],
+        "automationIdPatterns": []
+      },
+      "instructionTemplate": "",
+      "languages": ["en-US", "sv-SE", "fr-FR", "de-DE", "es-ES", "da-DK", "fi-FI", "nb-NO"],
+      "aliases": [],
+      "sourceIds": [
+        "microsoft-learn-service-tasks",
+        "microsoft-learn-service-tasks-sv",
+        "microsoft-learn-service-tasks-fr",
+        "microsoft-learn-service-tasks-de",
+        "microsoft-learn-service-tasks-es",
+        "microsoft-learn-service-tasks-da",
+        "microsoft-learn-service-tasks-fi",
+        "microsoft-learn-service-tasks-nb"
+      ]
+    },
+    {
+      "ruleId": "Services.SetServiceItemWorksheetQuantity",
+      "taskType": "EnterServiceItemQuantity",
+      "semanticAction": "EnterQuantity",
+      "entity": "ServiceItemWorksheetLine",
+      "priority": 1280,
+      "confidence": 0.96,
+      "match": {
+        "pagePatterns": [
+          "^Service Item Worksheet$",
+          "^Serviceartikeldokument$",
+          "^Feuille de calcul des articles de service$",
+          "^Servicearbeitsblatt$",
+          "^Hoja de trabajo de artículo de servicio$",
+          "^Serviceartikelkladde$",
+          "^Huoltonimikkeen työkirja$",
+          "^Servicevareskjema$"
+        ],
+        "actionPatterns": [],
+        "fieldPatterns": [
+          "^Quantity$",
+          "^Antal$",
+          "^Quantité$",
+          "^Menge$",
+          "^Cantidad$",
+          "^Antal$",
+          "^Määrä$",
+          "^Antall$"
+        ],
+        "automationIdPatterns": []
+      },
+      "instructionTemplate": "",
+      "languages": ["en-US", "sv-SE", "fr-FR", "de-DE", "es-ES", "da-DK", "fi-FI", "nb-NO"],
+      "aliases": [],
+      "sourceIds": [
+        "microsoft-learn-service-tasks",
+        "microsoft-learn-service-tasks-sv",
+        "microsoft-learn-service-tasks-fr",
+        "microsoft-learn-service-tasks-de",
+        "microsoft-learn-service-tasks-es",
+        "microsoft-learn-service-tasks-da",
+        "microsoft-learn-service-tasks-fi",
+        "microsoft-learn-service-tasks-nb"
+      ]
+    },
+    {
+      "ruleId": "Services.PostServiceOrder",
+      "taskType": "PostServiceOrder",
+      "semanticAction": "PostServiceDocument",
+      "entity": "ServiceOrder",
+      "priority": 1280,
+      "confidence": 0.97,
+      "match": {
+        "pagePatterns": [
+          "^Service Order$",
+          "^Tjänstbeställningar$",
+          "^Commande service$",
+          "^Serviceauftrag$",
+          "^Pedido servicio$",
+          "^Serviceordre$",
+          "^Huoltotilaus$",
+          "^Serviceordre$"
+        ],
+        "actionPatterns": [
+          "^Post$",
+          "^Inlägg$",
+          "^Valider$",
+          "^Post$",
+          "^Registrar$",
+          "^Indlæg$",
+          "^Julkaisu$",
+          "^Publiser$"
+        ],
+        "fieldPatterns": [],
+        "automationIdPatterns": []
+      },
+      "instructionTemplate": "",
+      "languages": ["en-US", "sv-SE", "fr-FR", "de-DE", "es-ES", "da-DK", "fi-FI", "nb-NO"],
+      "aliases": [],
+      "sourceIds": [
+        "microsoft-learn-service-posting",
+        "microsoft-learn-service-posting-sv",
+        "microsoft-learn-service-posting-fr",
+        "microsoft-learn-service-posting-de",
+        "microsoft-learn-service-posting-es",
+        "microsoft-learn-service-posting-da",
+        "microsoft-learn-service-posting-fi",
+        "microsoft-learn-service-posting-nb"
+      ]
+    }
+  ],
+  "sources": [
+    {"sourceId":"microsoft-learn-service-tasks","title":"Work on service tasks","sourceType":"microsoft-learn","sourceUri":"https://learn.microsoft.com/en-us/dynamics365/business-central/service-how-to-work-on-service-tasks","appliesTo":"Current English Business Central online documentation; inspected 2026-09-25","accessedDate":"2026-09-25","fields":["Service Tasks","Item Worksheet","Service Item Worksheet","Quantity"]},
+    {"sourceId":"microsoft-learn-service-tasks-sv","title":"Så här arbetar du med tjänstuppgifter","sourceType":"microsoft-learn","sourceUri":"https://learn.microsoft.com/sv-se/dynamics365/business-central/service-how-to-work-on-service-tasks","appliesTo":"Current Swedish Business Central online documentation; inspected 2026-09-25","accessedDate":"2026-09-25","fields":["Tjänstuppgifter","Artikelkalkylark","Serviceartikeldokument","Antal"]},
+    {"sourceId":"microsoft-learn-service-tasks-fr","title":"Travail sur des tâches de service","sourceType":"microsoft-learn","sourceUri":"https://learn.microsoft.com/fr-fr/dynamics365/business-central/service-how-to-work-on-service-tasks","appliesTo":"Current French Business Central online documentation; inspected 2026-09-25","accessedDate":"2026-09-25","fields":["Tâches de service","Feuille activité article","Feuille de calcul des articles de service","Quantité"]},
+    {"sourceId":"microsoft-learn-service-tasks-de","title":"Serviceaufgaben bearbeiten","sourceType":"microsoft-learn","sourceUri":"https://learn.microsoft.com/de-de/dynamics365/business-central/service-how-to-work-on-service-tasks","appliesTo":"Current German Business Central online documentation; inspected 2026-09-25","accessedDate":"2026-09-25","fields":["Dienstaufgaben","Artikel-Arbeitsblatt","Servicearbeitsblatt","Menge"]},
+    {"sourceId":"microsoft-learn-service-tasks-es","title":"Cómo trabajar en tareas de servicio","sourceType":"microsoft-learn","sourceUri":"https://learn.microsoft.com/es-es/dynamics365/business-central/service-how-to-work-on-service-tasks","appliesTo":"Current Spanish Business Central online documentation; inspected 2026-09-25","accessedDate":"2026-09-25","fields":["Tareas de servicio","Hoja de producto","Hoja de trabajo de artículo de servicio","Cantidad"]},
+    {"sourceId":"microsoft-learn-service-tasks-da","title":"Sådan arbejder du på serviceopgaver","sourceType":"microsoft-learn","sourceUri":"https://learn.microsoft.com/da-dk/dynamics365/business-central/service-how-to-work-on-service-tasks","appliesTo":"Current Danish Business Central online documentation; inspected 2026-09-25","accessedDate":"2026-09-25","fields":["Serviceopgaver","Varekladde","Serviceartikelkladde","Antal"]},
+    {"sourceId":"microsoft-learn-service-tasks-fi","title":"Palvelutehtävien käsitteleminen","sourceType":"microsoft-learn","sourceUri":"https://learn.microsoft.com/fi-fi/dynamics365/business-central/service-how-to-work-on-service-tasks","appliesTo":"Current Finnish Business Central online documentation; inspected 2026-09-25","accessedDate":"2026-09-25","fields":["Palvelutehtävät","Nimikkeen työkirja","Huoltonimikkeen työkirja","Määrä"]},
+    {"sourceId":"microsoft-learn-service-tasks-nb","title":"Slik arbeider du med tjenesteoppgaver","sourceType":"microsoft-learn","sourceUri":"https://learn.microsoft.com/nb-no/dynamics365/business-central/service-how-to-work-on-service-tasks","appliesTo":"Current Norwegian Bokmål Business Central online documentation; inspected 2026-09-25","accessedDate":"2026-09-25","fields":["Tjenesteoppgaver","Arbeidsordre","Servicevareskjema","Antall"]},
+    {"sourceId":"microsoft-learn-service-posting","title":"Post service orders and credit memos","sourceType":"microsoft-learn","sourceUri":"https://learn.microsoft.com/en-us/dynamics365/business-central/service-how-to-post-service-orders","appliesTo":"Current English Business Central online documentation; inspected 2026-09-25","accessedDate":"2026-09-25","fields":["Service Order","Post"]},
+    {"sourceId":"microsoft-learn-service-posting-sv","title":"Så här bokför du serviceorder","sourceType":"microsoft-learn","sourceUri":"https://learn.microsoft.com/sv-se/dynamics365/business-central/service-how-to-post-service-orders","appliesTo":"Current Swedish Business Central online documentation; inspected 2026-09-25","accessedDate":"2026-09-25","fields":["Tjänstbeställningar","Inlägg"]},
+    {"sourceId":"microsoft-learn-service-posting-fr","title":"Validation des commandes et des avoirs service","sourceType":"microsoft-learn","sourceUri":"https://learn.microsoft.com/fr-fr/dynamics365/business-central/service-how-to-post-service-orders","appliesTo":"Current French Business Central online documentation; inspected 2026-09-25","accessedDate":"2026-09-25","fields":["Commande service","Valider"]},
+    {"sourceId":"microsoft-learn-service-posting-de","title":"Serviceaufträge und Gutschriften buchen","sourceType":"microsoft-learn","sourceUri":"https://learn.microsoft.com/de-de/dynamics365/business-central/service-how-to-post-service-orders","appliesTo":"Current German Business Central online documentation; inspected 2026-09-25","accessedDate":"2026-09-25","fields":["Serviceauftrag","Post"]},
+    {"sourceId":"microsoft-learn-service-posting-es","title":"Registrar pedidos de servicio","sourceType":"microsoft-learn","sourceUri":"https://learn.microsoft.com/es-es/dynamics365/business-central/service-how-to-post-service-orders","appliesTo":"Current Spanish Business Central online documentation; inspected 2026-09-25","accessedDate":"2026-09-25","fields":["Pedido servicio","Registrar"]},
+    {"sourceId":"microsoft-learn-service-posting-da","title":"Bogføre serviceordrer og kreditnotaer","sourceType":"microsoft-learn","sourceUri":"https://learn.microsoft.com/da-dk/dynamics365/business-central/service-how-to-post-service-orders","appliesTo":"Current Danish Business Central online documentation; inspected 2026-09-25","accessedDate":"2026-09-25","fields":["Serviceordre","Indlæg"]},
+    {"sourceId":"microsoft-learn-service-posting-fi","title":"Huoltotilausten ja hyvityslaskujen kirjaaminen","sourceType":"microsoft-learn","sourceUri":"https://learn.microsoft.com/fi-fi/dynamics365/business-central/service-how-to-post-service-orders","appliesTo":"Current Finnish Business Central online documentation; inspected 2026-09-25","accessedDate":"2026-09-25","fields":["Huoltotilaus","Julkaisu"]},
+    {"sourceId":"microsoft-learn-service-posting-nb","title":"Bokfør serviceordrer og kreditnotaer","sourceType":"microsoft-learn","sourceUri":"https://learn.microsoft.com/nb-no/dynamics365/business-central/service-how-to-post-service-orders","appliesTo":"Current Norwegian Bokmål Business Central online documentation; inspected 2026-09-25","accessedDate":"2026-09-25","fields":["Serviceordre","Publiser"]}
+  ]
+}

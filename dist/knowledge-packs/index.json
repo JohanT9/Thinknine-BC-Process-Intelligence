@@ -32,6 +32,11 @@
       "enabled": true
     },
     {
+      "file": "knowledge-packs/services.json",
+      "packId": "bc-services",
+      "enabled": true
+    },
+    {
       "file": "knowledge-packs/aptean-fb.json",
       "packId": "aptean-fb",
       "enabled": true
