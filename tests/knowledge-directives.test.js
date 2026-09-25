@@ -9,6 +9,16 @@ const cases=[
  ['sv-SE','Sök'],['en-US','Search'],['fr-FR','Rechercher'],['de-DE','Suchen'],
  ['es-ES','Buscar'],['da-DK','Søg'],['fi-FI','Haku'],['nb-NO','Søk']
 ];
+const createCases=[
+ ['sv-SE','Ny','microsoft-learn-keyboard-shortcuts-sv'],
+ ['en-US','New','microsoft-learn-keyboard-shortcuts'],
+ ['fr-FR','Nouveau','microsoft-learn-keyboard-shortcuts-fr'],
+ ['de-DE','Neu','microsoft-learn-keyboard-shortcuts-de'],
+ ['es-ES','Nuevo','microsoft-learn-keyboard-shortcuts-es'],
+ ['da-DK','Ny','microsoft-learn-keyboard-shortcuts-da'],
+ ['fi-FI','Uusi','microsoft-learn-keyboard-shortcuts-fi'],
+ ['nb-NO','Ny','microsoft-learn-keyboard-shortcuts-nb']
+];
 for(const [language,caption] of cases){
  const result=knowledge.apply([{taskId:language,taskType:'RunAction',actionCaption:caption,language}], [pack]);
  const task=result.tasks[0];
@@ -16,6 +26,26 @@ for(const [language,caption] of cases){
  assert.ok(task.userDirective,language+' should produce a directive');
  assert.equal(task.userDirective,pack.rules.find(x=>x.ruleId==='Core.SearchAndOpenPage').localizedInstructions[language]);
  assert.ok(task.userDirectiveSourceIds.some(sourceId=>pack.sources.some(source=>source.sourceId===sourceId)));
+}
+for(const [language,caption,sourceId] of createCases){
+ const result=knowledge.apply([{taskId:'create-'+language,taskType:'RunAction',actionCaption:caption,language}], [pack]);
+ const task=result.tasks[0];
+ const rule=pack.rules.find(x=>x.ruleId==='Core.CreateNew');
+ assert.equal(task.knowledgeRule,'Core.CreateNew',language);
+ assert.equal(task.userDirective,rule.localizedInstructions[language]);
+ assert.ok(task.userDirectiveSourceIds.includes(sourceId),language);
+}
+for(const [language,yes,no] of [
+ ['sv-SE','Ja','Nej'],['en-US','Yes','No'],['fr-FR','Oui','Non'],
+ ['de-DE','Ja','Nein'],['es-ES','Sí','No'],['da-DK','Ja','Nej'],
+ ['fi-FI','Kyllä','Ei'],['nb-NO','Ja','Nei']
+]){
+ for(const [caption,ruleId] of [[yes,'Core.ConfirmYes'],[no,'Core.ConfirmNo']]){
+  const task=knowledge.apply([{taskId:ruleId+language,taskType:'RunAction',actionCaption:caption,language}], [pack]).tasks[0];
+  assert.equal(task.knowledgeRule,ruleId,language+' '+caption);
+  assert.equal(task.userDirective,undefined,'confirmation must not be advised generically');
+  assert.ok(task.userDirectiveSourceIds===undefined);
+ }
 }
 const rule=pack.rules.find(x=>x.ruleId==='Core.SearchAndOpenPage');
 assert.deepEqual(Object.keys(rule.localizedInstructions).sort(),cases.map(x=>x[0]).sort());
