@@ -1,7 +1,7 @@
 {
   "packId": "bc-warehouse",
   "name": "Business Central Warehouse",
-  "version": "2.1.0",
+  "version": "2.3.0",
   "priority": 200,
   "rules": [
     {
@@ -62,12 +62,26 @@
       "semanticAction": "RunAction",
       "entity": "WarehousePick",
       "priority": 1000,
-      "confidence": 0.96,
+      "confidence": 0.97,
       "match": {
         "pagePatterns": [],
         "actionPatterns": [
-          "skapa.*plock",
-          "create.*pick"
+          "^Create Inventory Put-away/Pick$",
+          "^Create Invt\\. Pick$",
+          "^Skapa lagerartikelinförsel/plocka$",
+          "^Skapa lagerplockning$",
+          "^Créer prélèv\\./rangement stock$",
+          "^Créer prélèvement stock$",
+          "^Lagereinlagerung/Kommissionierung erstellen$",
+          "^Lagerkomm\\. erst\\.$",
+          "^Crear ubicac\\. invent\\./picking$",
+          "^Crear picking de inventario$",
+          "^Opret læg-på-lager/pluk \\(lager\\)$",
+          "^Opret pluk \\(lager\\)$",
+          "^Luo varaston hyllytys tai poiminta$",
+          "^Luo varaston poiminta$",
+          "^Opprett lagerplassering/-plukking$",
+          "^Opprett lagerplukking$"
         ],
         "fieldPatterns": [],
         "automationIdPatterns": []
@@ -75,9 +89,25 @@
       "instructionTemplate": "",
       "languages": [
         "sv-SE",
-        "en-US"
+        "en-US",
+        "fr-FR",
+        "de-DE",
+        "es-ES",
+        "da-DK",
+        "fi-FI",
+        "nb-NO"
       ],
-      "aliases": []
+      "aliases": [],
+      "sourceIds": [
+        "microsoft-learn-inventory-picks",
+        "microsoft-learn-inventory-picks-sv",
+        "microsoft-learn-inventory-picks-fr",
+        "microsoft-learn-inventory-picks-de",
+        "microsoft-learn-inventory-picks-es",
+        "microsoft-learn-inventory-picks-da",
+        "microsoft-learn-inventory-picks-fi",
+        "microsoft-learn-inventory-picks-nb"
+      ]
     },
     {
       "ruleId": "Warehouse.RegisterPick",
@@ -536,6 +566,331 @@
         "microsoft-learn-advanced-receiving-putaway-fi",
         "microsoft-learn-advanced-receiving-putaway-nb"
       ]
+    },
+    {
+      "ruleId": "Warehouse.ViewAvailabilityByEvent",
+      "taskType": "ViewItemAvailabilityByEvent",
+      "semanticAction": "ViewAvailability",
+      "entity": "ItemAvailability",
+      "priority": 1080,
+      "confidence": 0.97,
+      "match": {
+        "pagePatterns": [
+          "^Item Card$",
+          "^Artikelkort$",
+          "^Fiche article$",
+          "^Artikelkarte$",
+          "^Ficha de producto$",
+          "^Varekort$",
+          "^Nimikkeen kortti$",
+          "^Varekort$"
+        ],
+        "actionPatterns": [
+          "^Event$",
+          "^Händelse$",
+          "^Événement$",
+          "^Ereignis$",
+          "^Evento$",
+          "^Hændelse$",
+          "^Tapahtuma$",
+          "^Hendelse$"
+        ],
+        "fieldPatterns": [],
+        "automationIdPatterns": []
+      },
+      "instructionTemplate": "",
+      "languages": [
+        "en-US",
+        "sv-SE",
+        "fr-FR",
+        "de-DE",
+        "es-ES",
+        "da-DK",
+        "fi-FI",
+        "nb-NO"
+      ],
+      "aliases": [],
+      "sourceIds": [
+        "microsoft-learn-item-availability",
+        "microsoft-learn-item-availability-sv",
+        "microsoft-learn-item-availability-fr",
+        "microsoft-learn-item-availability-de",
+        "microsoft-learn-item-availability-es",
+        "microsoft-learn-item-availability-da",
+        "microsoft-learn-item-availability-fi",
+        "microsoft-learn-item-availability-nb"
+      ]
+    },
+    {
+      "ruleId": "Warehouse.ViewAvailabilityByPeriod",
+      "taskType": "ViewItemAvailabilityByPeriod",
+      "semanticAction": "ViewAvailability",
+      "entity": "ItemAvailability",
+      "priority": 1080,
+      "confidence": 0.97,
+      "match": {
+        "pagePatterns": [
+          "^Item Card$",
+          "^Artikelkort$",
+          "^Fiche article$",
+          "^Artikelkarte$",
+          "^Ficha de producto$",
+          "^Varekort$",
+          "^Nimikkeen kortti$",
+          "^Varekort$"
+        ],
+        "actionPatterns": [
+          "^Period$",
+          "^Period$",
+          "^Période$",
+          "^Periode$",
+          "^Periodo$",
+          "^Periode$",
+          "^Jakso$",
+          "^Periode$"
+        ],
+        "fieldPatterns": [],
+        "automationIdPatterns": []
+      },
+      "instructionTemplate": "",
+      "languages": [
+        "en-US",
+        "sv-SE",
+        "fr-FR",
+        "de-DE",
+        "es-ES",
+        "da-DK",
+        "fi-FI",
+        "nb-NO"
+      ],
+      "aliases": [],
+      "sourceIds": [
+        "microsoft-learn-item-availability",
+        "microsoft-learn-item-availability-sv",
+        "microsoft-learn-item-availability-fr",
+        "microsoft-learn-item-availability-de",
+        "microsoft-learn-item-availability-es",
+        "microsoft-learn-item-availability-da",
+        "microsoft-learn-item-availability-fi",
+        "microsoft-learn-item-availability-nb"
+      ]
+    },
+    {
+      "ruleId": "Warehouse.ViewAvailabilityByLocation",
+      "taskType": "ViewItemAvailabilityByLocation",
+      "semanticAction": "ViewAvailability",
+      "entity": "ItemAvailability",
+      "priority": 1080,
+      "confidence": 0.97,
+      "match": {
+        "pagePatterns": [
+          "^Item Card$",
+          "^Artikelkort$",
+          "^Fiche article$",
+          "^Artikelkarte$",
+          "^Ficha de producto$",
+          "^Varekort$",
+          "^Nimikkeen kortti$",
+          "^Varekort$"
+        ],
+        "actionPatterns": [
+          "^Location$",
+          "^Lagerställe$",
+          "^Magasin$",
+          "^Lagerplatz$",
+          "^Almacén$",
+          "^Lokation$",
+          "^Sijainti$",
+          "^Lokasjon$"
+        ],
+        "fieldPatterns": [],
+        "automationIdPatterns": []
+      },
+      "instructionTemplate": "",
+      "languages": [
+        "en-US",
+        "sv-SE",
+        "fr-FR",
+        "de-DE",
+        "es-ES",
+        "da-DK",
+        "fi-FI",
+        "nb-NO"
+      ],
+      "aliases": [],
+      "sourceIds": [
+        "microsoft-learn-item-availability",
+        "microsoft-learn-item-availability-sv",
+        "microsoft-learn-item-availability-fr",
+        "microsoft-learn-item-availability-de",
+        "microsoft-learn-item-availability-es",
+        "microsoft-learn-item-availability-da",
+        "microsoft-learn-item-availability-fi",
+        "microsoft-learn-item-availability-nb"
+      ]
+    },
+    {
+      "ruleId": "Warehouse.ViewItemsByLocation",
+      "taskType": "ViewItemsByLocation",
+      "semanticAction": "ViewList",
+      "entity": "ItemAvailability",
+      "priority": 1080,
+      "confidence": 0.97,
+      "match": {
+        "pagePatterns": [],
+        "actionPatterns": [
+          "^Items by Location$",
+          "^Artiklar per lagerställe$",
+          "^Articles par magasin$",
+          "^Artikel nach Lagerort$",
+          "^Productos por almacén$",
+          "^Varer pr\\. lokation$",
+          "^Nimikkeet sijainneittain$",
+          "^Varer per lokasjon$"
+        ],
+        "fieldPatterns": [],
+        "automationIdPatterns": []
+      },
+      "instructionTemplate": "",
+      "languages": [
+        "en-US",
+        "sv-SE",
+        "fr-FR",
+        "de-DE",
+        "es-ES",
+        "da-DK",
+        "fi-FI",
+        "nb-NO"
+      ],
+      "aliases": [],
+      "sourceIds": [
+        "microsoft-learn-item-availability",
+        "microsoft-learn-item-availability-sv",
+        "microsoft-learn-item-availability-fr",
+        "microsoft-learn-item-availability-de",
+        "microsoft-learn-item-availability-es",
+        "microsoft-learn-item-availability-da",
+        "microsoft-learn-item-availability-fi",
+        "microsoft-learn-item-availability-nb"
+      ]
+    },
+    {
+      "ruleId": "Warehouse.ViewAvailabilityByBOMLevel",
+      "taskType": "ViewItemAvailabilityByBOMLevel",
+      "semanticAction": "ViewAvailability",
+      "entity": "ItemAvailability",
+      "priority": 1070,
+      "confidence": 0.96,
+      "match": {
+        "pagePatterns": [
+          "^Item Card$",
+          "^Artikelkort$",
+          "^Fiche article$",
+          "^Artikelkarte$",
+          "^Ficha de producto$",
+          "^Varekort$",
+          "^Nimikkeen kortti$",
+          "^Varekort$"
+        ],
+        "actionPatterns": [
+          "^Item Availability by BOM Level$",
+          "^Artikeldisposition per strukturnivå$",
+          "^Disponibilité article par niveau de nomenclature$",
+          "^Artikelverfügbarkeit nach Stücklistenebene$",
+          "^Disponibilidad producto por nivel L\\.M\\.$",
+          "^Varedisponering pr\\. styklisteniveau$",
+          "^Nimikkeen saatavuus tuoterakennetason mukaan$",
+          "^Varetilgjengelighet etter stykklistenivå$"
+        ],
+        "fieldPatterns": [],
+        "automationIdPatterns": []
+      },
+      "instructionTemplate": "",
+      "languages": [
+        "en-US",
+        "sv-SE",
+        "fr-FR",
+        "de-DE",
+        "es-ES",
+        "da-DK",
+        "fi-FI",
+        "nb-NO"
+      ],
+      "aliases": [],
+      "sourceIds": [
+        "microsoft-learn-item-availability",
+        "microsoft-learn-item-availability-sv",
+        "microsoft-learn-item-availability-fr",
+        "microsoft-learn-item-availability-de",
+        "microsoft-learn-item-availability-es",
+        "microsoft-learn-item-availability-da",
+        "microsoft-learn-item-availability-fi",
+        "microsoft-learn-item-availability-nb"
+      ]
+    },
+    {
+      "ruleId": "Warehouse.ViewAvailabilityByVariant",
+      "taskType": "ViewItemAvailabilityByVariant",
+      "semanticAction": "ViewAvailability",
+      "entity": "ItemAvailability",
+      "priority": 1070,
+      "confidence": 0.96,
+      "match": {
+        "pagePatterns": [
+          "^Item Card$",
+          "^Artikelkort$",
+          "^Fiche article$",
+          "^Artikelkarte$",
+          "^Ficha de producto$",
+          "^Varekort$",
+          "^Nimikkeen kortti$",
+          "^Varekort$"
+        ],
+        "actionPatterns": [
+          "^Item Availability by Variant$",
+          "^Variant$",
+          "^Artikeldisposition efter variant$",
+          "^Artikeldisposition per variant$",
+          "^Variant$",
+          "^Dispo\\. article par variante$",
+          "^Disponibilité de l’article par variante$",
+          "^Variante$",
+          "^Artikelverfügbarkeit nach Variante$",
+          "^Variante$",
+          "^Disponibilidad producto por variante$",
+          "^Variante$",
+          "^Varedisponering pr\\. variant$",
+          "^Variant$",
+          "^Nimikkeen saatavuus variantin mukaan$",
+          "^Variantti$",
+          "^Disponibelt per variant$",
+          "^Variant$"
+        ],
+        "fieldPatterns": [],
+        "automationIdPatterns": []
+      },
+      "instructionTemplate": "",
+      "languages": [
+        "en-US",
+        "sv-SE",
+        "fr-FR",
+        "de-DE",
+        "es-ES",
+        "da-DK",
+        "fi-FI",
+        "nb-NO"
+      ],
+      "aliases": [],
+      "sourceIds": [
+        "microsoft-learn-item-availability",
+        "microsoft-learn-item-availability-sv",
+        "microsoft-learn-item-availability-fr",
+        "microsoft-learn-item-availability-de",
+        "microsoft-learn-item-availability-es",
+        "microsoft-learn-item-availability-da",
+        "microsoft-learn-item-availability-fi",
+        "microsoft-learn-item-availability-nb"
+      ]
     }
   ],
   "sources": [
@@ -839,6 +1194,118 @@
         "localized warehouse put-away page and workflow terms",
         "quantity to handle",
         "register/post put-away"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-item-availability",
+      "title": "View the availability of items",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/en-us/dynamics365/business-central/inventory-how-availability-overview",
+      "appliesTo": "Current en-US Business Central online documentation; inspected 2026-09-25",
+      "accessedDate": "2026-09-25",
+      "fields": [
+        "availability by event, period, location, BOM level, unit of measure and variant",
+        "items by location",
+        "on-hand versus projected available balance",
+        "warehouse bin and reservation constraints"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-item-availability-sv",
+      "title": "Få en dispositionsöversikt",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/sv-se/dynamics365/business-central/inventory-how-availability-overview",
+      "appliesTo": "Current sv-SE Business Central online documentation; inspected 2026-09-25",
+      "accessedDate": "2026-09-25",
+      "fields": [
+        "availability by event, period, location, BOM level, unit of measure and variant",
+        "items by location",
+        "on-hand versus projected available balance",
+        "warehouse bin and reservation constraints"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-item-availability-fr",
+      "title": "Obtenir un aperçu des disponibilités",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/fr-fr/dynamics365/business-central/inventory-how-availability-overview",
+      "appliesTo": "Current fr-FR Business Central online documentation; inspected 2026-09-25",
+      "accessedDate": "2026-09-25",
+      "fields": [
+        "availability by event, period, location, BOM level, unit of measure and variant",
+        "items by location",
+        "on-hand versus projected available balance",
+        "warehouse bin and reservation constraints"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-item-availability-de",
+      "title": "Eine Verfügbarkeitsübersicht erhalten",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/de-de/dynamics365/business-central/inventory-how-availability-overview",
+      "appliesTo": "Current de-DE Business Central online documentation; inspected 2026-09-25",
+      "accessedDate": "2026-09-25",
+      "fields": [
+        "availability by event, period, location, BOM level, unit of measure and variant",
+        "items by location",
+        "on-hand versus projected available balance",
+        "warehouse bin and reservation constraints"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-item-availability-es",
+      "title": "Obtener un resumen de disponibilidad",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/es-es/dynamics365/business-central/inventory-how-availability-overview",
+      "appliesTo": "Current es-ES Business Central online documentation; inspected 2026-09-25",
+      "accessedDate": "2026-09-25",
+      "fields": [
+        "availability by event, period, location, BOM level, unit of measure and variant",
+        "items by location",
+        "on-hand versus projected available balance",
+        "warehouse bin and reservation constraints"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-item-availability-da",
+      "title": "Hente en disponeringsoversigt",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/da-dk/dynamics365/business-central/inventory-how-availability-overview",
+      "appliesTo": "Current da-DK Business Central online documentation; inspected 2026-09-25",
+      "accessedDate": "2026-09-25",
+      "fields": [
+        "availability by event, period, location, BOM level, unit of measure and variant",
+        "items by location",
+        "on-hand versus projected available balance",
+        "warehouse bin and reservation constraints"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-item-availability-fi",
+      "title": "Saatavuuden yleiskatsaus",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/fi-fi/dynamics365/business-central/inventory-how-availability-overview",
+      "appliesTo": "Current fi-FI Business Central online documentation; inspected 2026-09-25",
+      "accessedDate": "2026-09-25",
+      "fields": [
+        "availability by event, period, location, BOM level, unit of measure and variant",
+        "items by location",
+        "on-hand versus projected available balance",
+        "warehouse bin and reservation constraints"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-item-availability-nb",
+      "title": "Få en oversikt over tilgjengelighet",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/nb-no/dynamics365/business-central/inventory-how-availability-overview",
+      "appliesTo": "Current nb-NO Business Central online documentation; inspected 2026-09-25",
+      "accessedDate": "2026-09-25",
+      "fields": [
+        "availability by event, period, location, BOM level, unit of measure and variant",
+        "items by location",
+        "on-hand versus projected available balance",
+        "warehouse bin and reservation constraints"
       ]
     }
   ]

@@ -78,4 +78,55 @@ for (const ruleId of ['Warehouse.SetQtyToHandlePick','Warehouse.PostInventoryPic
  const rule=imported.snapshot.packs.find(x=>x.packId==='bc-warehouse').rules.find(x=>x.ruleId===ruleId);
  for(const locale of ['sv-SE','en-US','fr-FR','de-DE','es-ES','da-DK','fi-FI','nb-NO']) assert.ok(rule.languages.includes(locale),`${ruleId} should declare ${locale}`);
 }
-console.log('Warehouse pick, receipt and put-away matching passes across all eight supported locales.');
+const availabilitySamples = [
+  ['sv-SE','Artikelkort','Händelse','Period','Lagerställe','Artiklar per lagerställe','Artikeldisposition per strukturnivå','Variant','sv'],
+  ['en-US','Item Card','Event','Period','Location','Items by Location','Item Availability by BOM Level','Variant',''],
+  ['fr-FR','Fiche article','Événement','Période','Magasin','Articles par magasin','Disponibilité article par niveau de nomenclature','Variante','fr'],
+  ['de-DE','Artikelkarte','Ereignis','Periode','Lagerplatz','Artikel nach Lagerort','Artikelverfügbarkeit nach Stücklistenebene','Variante','de'],
+  ['es-ES','Ficha de producto','Evento','Periodo','Almacén','Productos por almacén','Disponibilidad producto por nivel L.M.','Variante','es'],
+  ['da-DK','Varekort','Hændelse','Periode','Lokation','Varer pr. lokation','Varedisponering pr. styklisteniveau','Variant','da'],
+  ['fi-FI','Nimikkeen kortti','Tapahtuma','Jakso','Sijainti','Nimikkeet sijainneittain','Nimikkeen saatavuus tuoterakennetason mukaan','Variantti','fi'],
+  ['nb-NO','Varekort','Hendelse','Periode','Lokasjon','Varer per lokasjon','Varetilgjengelighet etter stykklistenivå','Variant','nb']
+];
+const availabilityRules = [
+  'Warehouse.ViewAvailabilityByEvent','Warehouse.ViewAvailabilityByPeriod','Warehouse.ViewAvailabilityByLocation',
+  'Warehouse.ViewItemsByLocation','Warehouse.ViewAvailabilityByBOMLevel','Warehouse.ViewAvailabilityByVariant'
+];
+for (const [locale,pageCaption,event,period,location,items,bom,variant,sourceSuffix] of availabilitySamples) {
+  const sourceId = `microsoft-learn-item-availability${sourceSuffix ? `-${sourceSuffix}` : ''}`;
+  for (const [actionCaption,ruleId] of [
+    [event,'Warehouse.ViewAvailabilityByEvent'],[period,'Warehouse.ViewAvailabilityByPeriod'],
+    [location,'Warehouse.ViewAvailabilityByLocation'],[items,'Warehouse.ViewItemsByLocation'],
+    [bom,'Warehouse.ViewAvailabilityByBOMLevel'],[variant,'Warehouse.ViewAvailabilityByVariant']
+  ]) {
+    const found=repository.resolveAction({language:locale,context:{pageCaption,actionCaption}});
+    assert.equal(found.status,'resolved',`${locale} ${actionCaption} should resolve`);
+    assert.equal(found.candidates[0].provenance.ruleId,ruleId,`${locale} ${actionCaption} should map to ${ruleId}`);
+    assert.equal(found.candidates[0].provenance.language,locale);
+    assert.ok(found.candidates[0].provenance.sourceRefs.some(x=>x.sourceId===sourceId),`${locale} should cite its localized Microsoft Learn source`);
+  }
+}
+const createPickSamples=[
+ ['sv-SE','Skapa lagerartikelinförsel/plocka','microsoft-learn-inventory-picks-sv'],
+ ['en-US','Create Inventory Put-away/Pick','microsoft-learn-inventory-picks'],
+ ['fr-FR','Créer prélèv./rangement stock','microsoft-learn-inventory-picks-fr'],
+ ['de-DE','Lagereinlagerung/Kommissionierung erstellen','microsoft-learn-inventory-picks-de'],
+ ['es-ES','Crear ubicac. invent./picking','microsoft-learn-inventory-picks-es'],
+ ['da-DK','Opret læg-på-lager/pluk (lager)','microsoft-learn-inventory-picks-da'],
+ ['fi-FI','Luo varaston hyllytys tai poiminta','microsoft-learn-inventory-picks-fi'],
+ ['nb-NO','Opprett lagerplassering/-plukking','microsoft-learn-inventory-picks-nb']
+];
+for(const [locale,actionCaption,sourceId] of createPickSamples){
+ const found=repository.resolveAction({language:locale,context:{actionCaption}});
+ assert.equal(found.status,'resolved',`${locale} create pick should resolve`);
+ assert.equal(found.candidates[0].provenance.ruleId,'Warehouse.CreatePick');
+ assert.equal(found.candidates[0].provenance.language,locale);
+ assert.ok(found.candidates[0].provenance.sourceRefs.some(x=>x.sourceId===sourceId),`${locale} create pick should cite localized Microsoft Learn evidence`);
+}
+for (const ruleId of [...availabilityRules,'Warehouse.SetQtyToHandlePick','Warehouse.PostInventoryPick','Warehouse.SetQtyToReceive','Warehouse.PostReceiptAction','Warehouse.RegisterPutAway']) {
+ const rule=imported.snapshot.packs.find(x=>x.packId==='bc-warehouse').rules.find(x=>x.ruleId===ruleId);
+ for(const locale of ['sv-SE','en-US','fr-FR','de-DE','es-ES','da-DK','fi-FI','nb-NO']) assert.ok(rule.languages.includes(locale),`${ruleId} should declare ${locale}`);
+}
+const createPickRule=imported.snapshot.packs.find(x=>x.packId==='bc-warehouse').rules.find(x=>x.ruleId==='Warehouse.CreatePick');
+for(const locale of ['sv-SE','en-US','fr-FR','de-DE','es-ES','da-DK','fi-FI','nb-NO']) assert.ok(createPickRule.languages.includes(locale),`Warehouse.CreatePick should declare ${locale}`);
+console.log('Warehouse pick creation, receiving, put-away and documented item-availability matching passes across all eight supported locales.');
