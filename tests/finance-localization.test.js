@@ -35,6 +35,21 @@ for (const {locale,page,post,source} of samples) {
   assert.ok(rule.sourceIds.includes(source),locale);
 }
 
+const sourceTopics = [
+  'chart-accounts', 'dimensions', 'vat-setup', 'finance-reports', 'accounting-periods',
+  'year-close', 'fixed-assets', 'depreciation', 'cost-accounting', 'currencies', 'consolidation'
+];
+for (const topic of sourceTopics) {
+  for (const locale of samples.map(sample => sample.locale)) {
+    const source = financePack.sources.find(item => item.sourceId ===
+      `microsoft-learn-finance-${topic}-${locale.toLowerCase()}`);
+    assert.ok(source, `finance source ${topic} for ${locale}`);
+    assert.ok(source.sourceUri.startsWith(`https://learn.microsoft.com/${locale.toLowerCase()}/`),
+      `localized official source URL for ${topic}/${locale}`);
+    assert.ok(source.fields.length > 0, `indexed scope for ${topic}/${locale}`);
+  }
+}
+
 const unrelated = repository.resolveAction({language:'en-US',context:{pageCaption:'Payment Journal',actionCaption:'Post'}});
 assert.ok(!unrelated.candidates.some(x=>x.provenance.ruleId==='Finance.PostGeneralJournal'),
   'general journal posting rule must not match the specialized payment journal');
