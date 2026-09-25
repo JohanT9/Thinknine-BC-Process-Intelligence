@@ -118,4 +118,38 @@ for (const sample of samples) {
   assert.ok(updatedCapacity.candidates[0].provenance.sourceRefs.some(x => x.sourceId === capacitySource), `${locale} update capacity source`);
 }
 
-console.log('Project planning, usage, invoicing, time-sheet, and resource-capacity actions match in all eight supported UI locales.');
+const expandedActions = [
+  { locale: 'en-US', resource: 'Resource Card', costs: 'Costs', prices: 'Prices', journals: 'Project Journals', remaining: 'Calc. Remaining Usage', project: 'Project Card', inventoryPick: 'Create Inventory Pick', warehousePick: 'Create Warehouse Pick', purchaseOrders: 'Create Purchase Orders', invoice: 'Sales Invoice', planningLines: 'Get Project Planning Lines' },
+  { locale: 'sv-SE', resource: 'Resurskort', costs: 'Kostnader', prices: 'Priser', journals: 'Projektjournaler', remaining: 'Ber. återstående förbrukning', project: 'Projektkort', inventoryPick: 'Skapa lagerplockning', warehousePick: 'Skapa distributionslagerplockning', purchaseOrders: 'Skapa inköpsorder', invoice: 'Försäljningsfaktura', planningLines: 'Hämta projektplaneringsrader' },
+  { locale: 'fr-FR', resource: 'Fiche ressource', costs: 'Coûts', prices: 'Prix', journals: 'Journaux projet', remaining: 'Calc. utilisation restante', project: 'Fiche projet', inventoryPick: 'Créer un prélèvement stock', warehousePick: 'Créer un prélèvement entrepôt', purchaseOrders: 'Créer des commandes achat', invoice: 'Facture vente', planningLines: 'Extraire lignes Planning projet' },
+  { locale: 'de-DE', resource: 'Ressourcenkarte', costs: 'Kosten', prices: 'Preise', journals: 'Projekterfassung', remaining: 'Verbleibender Verbrauch berechnen', project: 'Projektkarte', inventoryPick: 'Lagerkommissionierung erstellen', warehousePick: 'Lagerkommissionierungen erstellen', purchaseOrders: 'Einkaufsbestellung erstellen', invoice: 'Verkaufsrechnung', planningLines: 'Projektplanzeilen abrufen' },
+  { locale: 'es-ES', resource: 'Ficha recurso', costs: 'Costes', prices: 'Precios', journals: 'Diario de proyectos', remaining: 'Cálc. uso restante', project: 'Ficha de proyecto', inventoryPick: 'Crear picking inventario', warehousePick: 'Crear picking almacén', purchaseOrders: 'Crear pedidos de compra', invoice: 'Factura venta', planningLines: 'Obtener líneas de planificación de proyecto' },
+  { locale: 'da-DK', resource: 'Ressourcekort', costs: 'Kostpriser', prices: 'Priser', journals: 'Projektkladde', remaining: 'Beregn resterede forbrug', project: 'Projektkort', inventoryPick: 'Opret pluk (lager)', warehousePick: 'Opret lager (logistik)', purchaseOrders: 'Opret købsordrer', invoice: 'Salgsfaktura', planningLines: 'Hent projektplanlægningslinjer' },
+  { locale: 'fi-FI', resource: 'Resurssikortti', costs: 'Kustannukset', prices: 'Hinnat', journals: 'Projektipäiväkirjat', remaining: 'Laske jäljellä oleva käyttö', project: 'Projektikortti', inventoryPick: 'Luo varastopoiminta', warehousePick: 'Luo fyysisen varaston poiminta', purchaseOrders: 'Luo ostotilaukset', invoice: 'Myyntilasku', planningLines: 'Hae projektin suunnittelurivit' },
+  { locale: 'nb-NO', resource: 'Ressurskort', costs: 'Kostpriser', prices: 'Priser', journals: 'Prosjektjournaler', remaining: 'Beregn gjenstående forbruk', project: 'Prosjektkort', inventoryPick: 'Opprett beholdningsplukk', warehousePick: 'Opprett lagerplukk', purchaseOrders: 'Opprett bestillinger', invoice: 'Salgsfaktura', planningLines: 'Hent prosjektplanleggingslinjer' }
+];
+const localizedSource = (base, locale) => `${base}${locale === 'en-US' ? '' : `-${locale.split('-')[0]}`}`;
+for (const sample of expandedActions) {
+  const { locale } = sample;
+  const resourceSource = localizedSource('microsoft-learn-project-resource-capacity', locale);
+  const usageSource = localizedSource('microsoft-learn-project-usage', locale);
+  const suppliesSource = localizedSource('microsoft-learn-project-supplies', locale);
+  const invoiceSource = localizedSource('microsoft-learn-project-invoice', locale);
+  for (const [ruleId, pageCaption, actionCaption, sourceId] of [
+    ['Projects.OpenResourceCosts', sample.resource, sample.costs, resourceSource],
+    ['Projects.OpenResourcePrices', sample.resource, sample.prices, resourceSource],
+    ['Projects.CalculateRemainingUsage', sample.journals, sample.remaining, usageSource],
+    ['Projects.CreateProjectInventoryPick', sample.project, sample.inventoryPick, usageSource],
+    ['Projects.CreateProjectWarehousePick', sample.project, sample.warehousePick, usageSource],
+    ['Projects.CreatePurchaseOrders', sample.project, sample.purchaseOrders, suppliesSource],
+    ['Projects.GetProjectPlanningLinesForInvoice', sample.invoice, sample.planningLines, invoiceSource]
+  ]) {
+    const result = repository.resolveAction({ language: locale, context: { pageCaption, actionCaption } });
+    assert.equal(result.status, 'resolved', `${locale} ${ruleId}`);
+    assert.equal(result.candidates[0].provenance.ruleId, ruleId);
+    assert.equal(result.candidates[0].provenance.language, locale);
+    assert.ok(result.candidates[0].provenance.sourceRefs.some(x => x.sourceId === sourceId), `${locale} ${ruleId} source`);
+  }
+}
+
+console.log('Project planning, usage, invoicing, time-sheet, resource capacity/costs/prices, and project warehouse actions match in all eight supported UI locales.');

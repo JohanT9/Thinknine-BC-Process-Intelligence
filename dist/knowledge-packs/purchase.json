@@ -1271,6 +1271,86 @@
         "microsoft-learn-purchase-returns-fi",
         "microsoft-learn-purchase-returns-nb"
       ]
+    },
+    {
+      "ruleId": "Purchase.GetReceiptLines",
+      "taskType": "GetPurchaseReceiptLines",
+      "semanticAction": "GetReceiptLines",
+      "entity": "PurchaseInvoice",
+      "priority": 1290,
+      "confidence": 0.97,
+      "match": {
+        "pagePatterns": [
+          "^(Purchase Invoices?|Inköpsfaktur(?:a|or)|Factures? d’achat|Factures? achat|Einkaufsrechnung(?:en)?|Factura(?:s)? de compra|Købsfaktura(?:er)?|Ostolasku(?:t)?|Kjøpsfaktura(?:er)?)$"
+        ],
+        "actionPatterns": [
+          "^(Get Receipt Lines|Hämta inleveransrader|Obtenir les lignes de réception|Wareneingangszeilen holen|Traer líns\\. recep\\.|Hent købsleverancelinjer|Hae vast\\.oton rivit|Hent mottakslinjer)$"
+        ],
+        "fieldPatterns": [],
+        "automationIdPatterns": []
+      },
+      "instructionTemplate": "",
+      "languages": [
+        "en-US",
+        "sv-SE",
+        "fr-FR",
+        "de-DE",
+        "es-ES",
+        "da-DK",
+        "fi-FI",
+        "nb-NO"
+      ],
+      "aliases": [],
+      "sourceIds": [
+        "microsoft-learn-purchase-combine-invoice",
+        "microsoft-learn-purchase-combine-invoice-sv",
+        "microsoft-learn-purchase-combine-invoice-fr",
+        "microsoft-learn-purchase-combine-invoice-de",
+        "microsoft-learn-purchase-combine-invoice-es",
+        "microsoft-learn-purchase-combine-invoice-da",
+        "microsoft-learn-purchase-combine-invoice-fi",
+        "microsoft-learn-purchase-combine-invoice-nb"
+      ]
+    },
+    {
+      "ruleId": "Purchase.GetOrderLines",
+      "taskType": "GetPurchaseOrderLines",
+      "semanticAction": "GetOrderLines",
+      "entity": "PurchaseInvoice",
+      "priority": 1290,
+      "confidence": 0.97,
+      "match": {
+        "pagePatterns": [
+          "^(Purchase Invoices?|Inköpsfaktur(?:a|or)|Factures? d’achat|Factures? achat|Einkaufsrechnung(?:en)?|Factura(?:s)? de compra|Købsfaktura(?:er)?|Ostolasku(?:t)?|Kjøpsfaktura(?:er)?)$"
+        ],
+        "actionPatterns": [
+          "^(Get Order Lines|Hämta orderrader|Récupérer les lignes de commande|Bestellzeilen abrufen|Obtener líneas de pedido|Hent ordrelinjer|Hae tilausrivit|Hent ordrelinjer)$"
+        ],
+        "fieldPatterns": [],
+        "automationIdPatterns": []
+      },
+      "instructionTemplate": "",
+      "languages": [
+        "en-US",
+        "sv-SE",
+        "fr-FR",
+        "de-DE",
+        "es-ES",
+        "da-DK",
+        "fi-FI",
+        "nb-NO"
+      ],
+      "aliases": [],
+      "sourceIds": [
+        "microsoft-learn-purchase-combine-invoice",
+        "microsoft-learn-purchase-combine-invoice-sv",
+        "microsoft-learn-purchase-combine-invoice-fr",
+        "microsoft-learn-purchase-combine-invoice-de",
+        "microsoft-learn-purchase-combine-invoice-es",
+        "microsoft-learn-purchase-combine-invoice-da",
+        "microsoft-learn-purchase-combine-invoice-fi",
+        "microsoft-learn-purchase-combine-invoice-nb"
+      ]
     }
   ],
   "sources": [
@@ -1586,6 +1666,110 @@
       "accessedDate": "2026-09-25",
       "fields": [
         "purchase-order quantity to receive and purchase line/posting terms"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-purchase-combine-invoice",
+      "title": "Combine receipts or purchase order lines on a single invoice",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/en-us/dynamics365/business-central/purchasing-how-to-combine-receipts",
+      "appliesTo": "Current en-US localized Business Central online documentation; inspected 2026-09-25",
+      "accessedDate": "2026-09-25",
+      "fields": [
+        "Get Receipt Lines and Get Order Lines actions",
+        "Invoice matching and posting conditions",
+        "Limitations for projects, prepayments and advanced warehouse operations"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-purchase-combine-invoice-sv",
+      "title": "Kombinera kvitton eller IO-rader på en enda faktura",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/sv-se/dynamics365/business-central/purchasing-how-to-combine-receipts",
+      "appliesTo": "Current sv-SE localized Business Central online documentation; inspected 2026-09-25",
+      "accessedDate": "2026-09-25",
+      "fields": [
+        "Get Receipt Lines and Get Order Lines actions",
+        "Invoice matching and posting conditions",
+        "Limitations for projects, prepayments and advanced warehouse operations"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-purchase-combine-invoice-fr",
+      "title": "Regrouper les réceptions ou lignes du bon de commande sur une seule facture",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/fr-fr/dynamics365/business-central/purchasing-how-to-combine-receipts",
+      "appliesTo": "Current fr-FR localized Business Central online documentation; inspected 2026-09-25",
+      "accessedDate": "2026-09-25",
+      "fields": [
+        "Get Receipt Lines and Get Order Lines actions",
+        "Invoice matching and posting conditions",
+        "Limitations for projects, prepayments and advanced warehouse operations"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-purchase-combine-invoice-de",
+      "title": "Quittungen oder Auftragspositionen auf einer einzelnen Rechnung kombinieren",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/de-de/dynamics365/business-central/purchasing-how-to-combine-receipts",
+      "appliesTo": "Current de-DE localized Business Central online documentation; inspected 2026-09-25",
+      "accessedDate": "2026-09-25",
+      "fields": [
+        "Get Receipt Lines and Get Order Lines actions",
+        "Invoice matching and posting conditions",
+        "Limitations for projects, prepayments and advanced warehouse operations"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-purchase-combine-invoice-es",
+      "title": "Combinar recibos o líneas de órdenes de compra en una sola factura",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/es-es/dynamics365/business-central/purchasing-how-to-combine-receipts",
+      "appliesTo": "Current es-ES localized Business Central online documentation; inspected 2026-09-25",
+      "accessedDate": "2026-09-25",
+      "fields": [
+        "Get Receipt Lines and Get Order Lines actions",
+        "Invoice matching and posting conditions",
+        "Limitations for projects, prepayments and advanced warehouse operations"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-purchase-combine-invoice-da",
+      "title": "Kombiner modtagelser eller indkøbsordrelinjer på en enkelt faktura",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/da-dk/dynamics365/business-central/purchasing-how-to-combine-receipts",
+      "appliesTo": "Current da-DK localized Business Central online documentation; inspected 2026-09-25",
+      "accessedDate": "2026-09-25",
+      "fields": [
+        "Get Receipt Lines and Get Order Lines actions",
+        "Invoice matching and posting conditions",
+        "Limitations for projects, prepayments and advanced warehouse operations"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-purchase-combine-invoice-fi",
+      "title": "Yhdistä kuitit tai ostotilausrivit yhteen laskuun",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/fi-fi/dynamics365/business-central/purchasing-how-to-combine-receipts",
+      "appliesTo": "Current fi-FI localized Business Central online documentation; inspected 2026-09-25",
+      "accessedDate": "2026-09-25",
+      "fields": [
+        "Get Receipt Lines and Get Order Lines actions",
+        "Invoice matching and posting conditions",
+        "Limitations for projects, prepayments and advanced warehouse operations"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-purchase-combine-invoice-nb",
+      "title": "Kombinere kvitteringer eller bestillingslinjer på én enkelt faktura",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/nb-no/dynamics365/business-central/purchasing-how-to-combine-receipts",
+      "appliesTo": "Current nb-NO localized Business Central online documentation; inspected 2026-09-25",
+      "accessedDate": "2026-09-25",
+      "fields": [
+        "Get Receipt Lines and Get Order Lines actions",
+        "Invoice matching and posting conditions",
+        "Limitations for projects, prepayments and advanced warehouse operations"
       ]
     }
   ]

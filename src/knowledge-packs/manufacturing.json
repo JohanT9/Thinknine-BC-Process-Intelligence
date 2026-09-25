@@ -36,22 +36,39 @@
       "semanticAction": "RunAction",
       "entity": "ProductionOrder",
       "priority": 900,
-      "confidence": 0.95,
+      "confidence": 0.97,
       "match": {
-        "pagePatterns": [],
+        "pagePatterns": [
+          "^(Production Orders?|Produktionsorder|Produktionsordrar|Ordres? de fabrication|Fertigungsauftrag(?:e)?|Orden de producción|Órdenes de producción|Produktionsordrer?|Tuotantotilaus|Tuotantotilaukset|Produksjonsordre(?:r)?)$"
+        ],
         "actionPatterns": [
-          "uppdatera.*produktionsorder",
-          "refresh.*production order"
+          "^(Refresh|Uppdatera|Actualiser|Aktualisieren|Actualizar|Forny|Päivitä|Oppdater)$"
         ],
         "fieldPatterns": [],
         "automationIdPatterns": []
       },
       "instructionTemplate": "",
       "languages": [
+        "en-US",
         "sv-SE",
-        "en-US"
+        "fr-FR",
+        "de-DE",
+        "es-ES",
+        "da-DK",
+        "fi-FI",
+        "nb-NO"
       ],
-      "aliases": []
+      "aliases": [],
+      "sourceIds": [
+        "microsoft-learn-production-replan-refresh",
+        "microsoft-learn-production-replan-refresh-sv",
+        "microsoft-learn-production-replan-refresh-fr",
+        "microsoft-learn-production-replan-refresh-de",
+        "microsoft-learn-production-replan-refresh-es",
+        "microsoft-learn-production-replan-refresh-da",
+        "microsoft-learn-production-replan-refresh-fi",
+        "microsoft-learn-production-replan-refresh-nb"
+      ]
     },
     {
       "ruleId": "Manufacturing.ChangeStatus",
@@ -61,10 +78,11 @@
       "priority": 1000,
       "confidence": 0.97,
       "match": {
-        "pagePatterns": [],
+        "pagePatterns": [
+          "^(Production Orders?|Produktionsorder|Produktionsordrar|Ordres? de fabrication|Fertigungsauftrag(?:e)?|Orden de producción|Órdenes de producción|Produktionsordrer?|Tuotantotilaus|Tuotantotilaukset|Produksjonsordre(?:r)?)$"
+        ],
         "actionPatterns": [
-          "ändra status",
-          "change status"
+          "^(Change Status|Ändra status|Modifier statut|Status ändern|Cambiar estado|Skift status|Muuta tilaa|Endre status)$"
         ],
         "fieldPatterns": [],
         "automationIdPatterns": []
@@ -72,9 +90,25 @@
       "instructionTemplate": "",
       "languages": [
         "sv-SE",
-        "en-US"
+        "en-US",
+        "fr-FR",
+        "de-DE",
+        "es-ES",
+        "da-DK",
+        "fi-FI",
+        "nb-NO"
       ],
-      "aliases": []
+      "aliases": [],
+      "sourceIds": [
+        "microsoft-learn-production-orders",
+        "microsoft-learn-production-orders-sv",
+        "microsoft-learn-production-orders-fr",
+        "microsoft-learn-production-orders-de",
+        "microsoft-learn-production-orders-es",
+        "microsoft-learn-production-orders-da",
+        "microsoft-learn-production-orders-fi",
+        "microsoft-learn-production-orders-nb"
+      ]
     },
     {
       "ruleId": "Manufacturing.PostConsumption",
@@ -320,6 +354,46 @@
         "microsoft-learn-production-journal-fi",
         "microsoft-learn-production-journal-nb"
       ]
+    },
+    {
+      "ruleId": "Manufacturing.ReplanProductionOrder",
+      "taskType": "ReplanProductionOrder",
+      "semanticAction": "ReplanProductionOrder",
+      "entity": "ProductionOrder",
+      "priority": 1290,
+      "confidence": 0.97,
+      "match": {
+        "pagePatterns": [
+          "^(Production Orders?|Produktionsorder|Produktionsordrar|Ordres? de fabrication|Fertigungsauftrag(?:e)?|Orden de producción|Órdenes de producción|Produktionsordrer?|Tuotantotilaus|Tuotantotilaukset|Produksjonsordre(?:r)?)$"
+        ],
+        "actionPatterns": [
+          "^(Replan|Omplanera|Replanifier|Neu planen|Replanificar|Omplanlæg|Uudelleensuunnittele|Planlegg på nytt)$"
+        ],
+        "fieldPatterns": [],
+        "automationIdPatterns": []
+      },
+      "instructionTemplate": "",
+      "languages": [
+        "en-US",
+        "sv-SE",
+        "fr-FR",
+        "de-DE",
+        "es-ES",
+        "da-DK",
+        "fi-FI",
+        "nb-NO"
+      ],
+      "aliases": [],
+      "sourceIds": [
+        "microsoft-learn-production-replan-refresh",
+        "microsoft-learn-production-replan-refresh-sv",
+        "microsoft-learn-production-replan-refresh-fr",
+        "microsoft-learn-production-replan-refresh-de",
+        "microsoft-learn-production-replan-refresh-es",
+        "microsoft-learn-production-replan-refresh-da",
+        "microsoft-learn-production-replan-refresh-fi",
+        "microsoft-learn-production-replan-refresh-nb"
+      ]
     }
   ],
   "sources": [
@@ -384,7 +458,11 @@
       "sourceUri": "https://learn.microsoft.com/fr-fr/dynamics365/business-central/production-how-to-register-consumption-and-output",
       "appliesTo": "Current French Business Central online documentation; inspected 2026-09-25",
       "accessedDate": "2026-09-25",
-      "fields": ["Journal de production", "Quantité produite", "Publier"]
+      "fields": [
+        "Journal de production",
+        "Quantité produite",
+        "Publier"
+      ]
     },
     {
       "sourceId": "microsoft-learn-production-journal-de",
@@ -393,7 +471,11 @@
       "sourceUri": "https://learn.microsoft.com/de-de/dynamics365/business-central/production-how-to-register-consumption-and-output",
       "appliesTo": "Current German Business Central online documentation; inspected 2026-09-25",
       "accessedDate": "2026-09-25",
-      "fields": ["Produktions-Buch.-Blatt", "Ausgabemenge", "Buchen"]
+      "fields": [
+        "Produktions-Buch.-Blatt",
+        "Ausgabemenge",
+        "Buchen"
+      ]
     },
     {
       "sourceId": "microsoft-learn-production-journal-es",
@@ -402,7 +484,11 @@
       "sourceUri": "https://learn.microsoft.com/es-es/dynamics365/business-central/production-how-to-register-consumption-and-output",
       "appliesTo": "Current Spanish Business Central online documentation; inspected 2026-09-25",
       "accessedDate": "2026-09-25",
-      "fields": ["Diario de producción", "Cantidad salida", "Publicar"]
+      "fields": [
+        "Diario de producción",
+        "Cantidad salida",
+        "Publicar"
+      ]
     },
     {
       "sourceId": "microsoft-learn-production-journal-da",
@@ -411,7 +497,11 @@
       "sourceUri": "https://learn.microsoft.com/da-dk/dynamics365/business-central/production-how-to-register-consumption-and-output",
       "appliesTo": "Current Danish Business Central online documentation; inspected 2026-09-25",
       "accessedDate": "2026-09-25",
-      "fields": ["Produktionskladde", "Output Mængde", "Bogfør"]
+      "fields": [
+        "Produktionskladde",
+        "Output Mængde",
+        "Bogfør"
+      ]
     },
     {
       "sourceId": "microsoft-learn-production-journal-fi",
@@ -420,7 +510,11 @@
       "sourceUri": "https://learn.microsoft.com/fi-fi/dynamics365/business-central/production-how-to-register-consumption-and-output",
       "appliesTo": "Current Finnish Business Central online documentation; inspected 2026-09-25",
       "accessedDate": "2026-09-25",
-      "fields": ["Tuotantopäiväkirja", "Tuotoksen määrä", "Kirjaa"]
+      "fields": [
+        "Tuotantopäiväkirja",
+        "Tuotoksen määrä",
+        "Kirjaa"
+      ]
     },
     {
       "sourceId": "microsoft-learn-production-journal-nb",
@@ -429,7 +523,11 @@
       "sourceUri": "https://learn.microsoft.com/nb-no/dynamics365/business-central/production-how-to-register-consumption-and-output",
       "appliesTo": "Current Norwegian Bokmål Business Central online documentation; inspected 2026-09-25",
       "accessedDate": "2026-09-25",
-      "fields": ["Produksjonsjournal", "Avgangsantall", "Bokfør"]
+      "fields": [
+        "Produksjonsjournal",
+        "Avgangsantall",
+        "Bokfør"
+      ]
     },
     {
       "sourceId": "microsoft-learn-production-bom-fr",
@@ -438,7 +536,9 @@
       "sourceUri": "https://learn.microsoft.com/fr-fr/dynamics365/business-central/production-how-to-create-production-boms",
       "appliesTo": "Current French Business Central online documentation; inspected 2026-09-25",
       "accessedDate": "2026-09-25",
-      "fields": ["Production journal consumption-quantity caption: Quantité consommée"]
+      "fields": [
+        "Production journal consumption-quantity caption: Quantité consommée"
+      ]
     },
     {
       "sourceId": "microsoft-learn-production-bom-de",
@@ -447,7 +547,9 @@
       "sourceUri": "https://learn.microsoft.com/de-de/dynamics365/business-central/production-how-to-create-production-boms",
       "appliesTo": "Current German Business Central online documentation; inspected 2026-09-25",
       "accessedDate": "2026-09-25",
-      "fields": ["Production journal consumption-quantity caption: Verbrauchsmenge"]
+      "fields": [
+        "Production journal consumption-quantity caption: Verbrauchsmenge"
+      ]
     },
     {
       "sourceId": "microsoft-learn-production-bom-es",
@@ -456,7 +558,9 @@
       "sourceUri": "https://learn.microsoft.com/es-es/dynamics365/business-central/production-how-to-create-production-boms",
       "appliesTo": "Current Spanish Business Central online documentation; inspected 2026-09-25",
       "accessedDate": "2026-09-25",
-      "fields": ["Production journal consumption-quantity caption: Consumo (cantidad)"]
+      "fields": [
+        "Production journal consumption-quantity caption: Consumo (cantidad)"
+      ]
     },
     {
       "sourceId": "microsoft-learn-production-bom-da",
@@ -465,7 +569,9 @@
       "sourceUri": "https://learn.microsoft.com/da-dk/dynamics365/business-central/production-how-to-create-production-boms",
       "appliesTo": "Current Danish Business Central online documentation; inspected 2026-09-25",
       "accessedDate": "2026-09-25",
-      "fields": ["Production journal consumption-quantity caption: Forbrugsantal"]
+      "fields": [
+        "Production journal consumption-quantity caption: Forbrugsantal"
+      ]
     },
     {
       "sourceId": "microsoft-learn-production-bom-fi",
@@ -474,7 +580,9 @@
       "sourceUri": "https://learn.microsoft.com/fi-fi/dynamics365/business-central/production-how-to-create-production-boms",
       "appliesTo": "Current Finnish Business Central online documentation; inspected 2026-09-25",
       "accessedDate": "2026-09-25",
-      "fields": ["Production journal consumption-quantity caption: Kulutusmäärä"]
+      "fields": [
+        "Production journal consumption-quantity caption: Kulutusmäärä"
+      ]
     },
     {
       "sourceId": "microsoft-learn-production-bom-nb",
@@ -483,7 +591,199 @@
       "sourceUri": "https://learn.microsoft.com/nb-no/dynamics365/business-central/production-how-to-create-production-boms",
       "appliesTo": "Current Norwegian Bokmål Business Central online documentation; inspected 2026-09-25",
       "accessedDate": "2026-09-25",
-      "fields": ["Production journal consumption-quantity caption: Forbruksantall"]
+      "fields": [
+        "Production journal consumption-quantity caption: Forbruksantall"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-production-replan-refresh",
+      "title": "Replan or refresh production orders directly",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/en-us/dynamics365/business-central/production-how-to-replan-refresh-production-orders",
+      "appliesTo": "Current en-US localized Business Central online documentation; inspected 2026-09-25",
+      "accessedDate": "2026-09-25",
+      "fields": [
+        "Replan versus Refresh distinction",
+        "Production order BOM and routing recalculation",
+        "Refresh can delete and recreate production order lines",
+        "Lower-level production demand and scheduling"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-production-replan-refresh-sv",
+      "title": "Omplanera eller uppdatera produktionsorder direkt",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/sv-se/dynamics365/business-central/production-how-to-replan-refresh-production-orders",
+      "appliesTo": "Current sv-SE localized Business Central online documentation; inspected 2026-09-25",
+      "accessedDate": "2026-09-25",
+      "fields": [
+        "Replan versus Refresh distinction",
+        "Production order BOM and routing recalculation",
+        "Refresh can delete and recreate production order lines",
+        "Lower-level production demand and scheduling"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-production-replan-refresh-fr",
+      "title": "Replanification ou actualisation directes des ordres de fabrication",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/fr-fr/dynamics365/business-central/production-how-to-replan-refresh-production-orders",
+      "appliesTo": "Current fr-FR localized Business Central online documentation; inspected 2026-09-25",
+      "accessedDate": "2026-09-25",
+      "fields": [
+        "Replan versus Refresh distinction",
+        "Production order BOM and routing recalculation",
+        "Refresh can delete and recreate production order lines",
+        "Lower-level production demand and scheduling"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-production-replan-refresh-de",
+      "title": "Fertigungsaufträge direkt neu planen oder aktualisieren",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/de-de/dynamics365/business-central/production-how-to-replan-refresh-production-orders",
+      "appliesTo": "Current de-DE localized Business Central online documentation; inspected 2026-09-25",
+      "accessedDate": "2026-09-25",
+      "fields": [
+        "Replan versus Refresh distinction",
+        "Production order BOM and routing recalculation",
+        "Refresh can delete and recreate production order lines",
+        "Lower-level production demand and scheduling"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-production-replan-refresh-es",
+      "title": "Replanificar o actualizar órdenes de producción directamente",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/es-es/dynamics365/business-central/production-how-to-replan-refresh-production-orders",
+      "appliesTo": "Current es-ES localized Business Central online documentation; inspected 2026-09-25",
+      "accessedDate": "2026-09-25",
+      "fields": [
+        "Replan versus Refresh distinction",
+        "Production order BOM and routing recalculation",
+        "Refresh can delete and recreate production order lines",
+        "Lower-level production demand and scheduling"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-production-replan-refresh-da",
+      "title": "Omplanlægge eller forny produktionsordrer direkte",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/da-dk/dynamics365/business-central/production-how-to-replan-refresh-production-orders",
+      "appliesTo": "Current da-DK localized Business Central online documentation; inspected 2026-09-25",
+      "accessedDate": "2026-09-25",
+      "fields": [
+        "Replan versus Refresh distinction",
+        "Production order BOM and routing recalculation",
+        "Refresh can delete and recreate production order lines",
+        "Lower-level production demand and scheduling"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-production-replan-refresh-fi",
+      "title": "Tuotantotilausten suora uudelleensuunnittelu tai päivittäminen",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/fi-fi/dynamics365/business-central/production-how-to-replan-refresh-production-orders",
+      "appliesTo": "Current fi-FI localized Business Central online documentation; inspected 2026-09-25",
+      "accessedDate": "2026-09-25",
+      "fields": [
+        "Replan versus Refresh distinction",
+        "Production order BOM and routing recalculation",
+        "Refresh can delete and recreate production order lines",
+        "Lower-level production demand and scheduling"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-production-replan-refresh-nb",
+      "title": "Planlegg på nytt eller oppdater produksjonsordrer direkte",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/nb-no/dynamics365/business-central/production-how-to-replan-refresh-production-orders",
+      "appliesTo": "Current nb-NO localized Business Central online documentation; inspected 2026-09-25",
+      "accessedDate": "2026-09-25",
+      "fields": [
+        "Replan versus Refresh distinction",
+        "Production order BOM and routing recalculation",
+        "Refresh can delete and recreate production order lines",
+        "Lower-level production demand and scheduling"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-production-orders-fr",
+      "title": "À propos des ordres de fabrication",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/fr-fr/dynamics365/business-central/production-about-production-orders",
+      "appliesTo": "Current fr-FR localized Business Central online documentation; inspected 2026-09-25",
+      "accessedDate": "2026-09-25",
+      "fields": [
+        "production-order statuses and lifecycle",
+        "Change Status action",
+        "eligible order status types"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-production-orders-de",
+      "title": "Informationen zu Fertigungsaufträgen",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/de-de/dynamics365/business-central/production-about-production-orders",
+      "appliesTo": "Current de-DE localized Business Central online documentation; inspected 2026-09-25",
+      "accessedDate": "2026-09-25",
+      "fields": [
+        "production-order statuses and lifecycle",
+        "Change Status action",
+        "eligible order status types"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-production-orders-es",
+      "title": "Acerca de las órdenes de producción",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/es-es/dynamics365/business-central/production-about-production-orders",
+      "appliesTo": "Current es-ES localized Business Central online documentation; inspected 2026-09-25",
+      "accessedDate": "2026-09-25",
+      "fields": [
+        "production-order statuses and lifecycle",
+        "Change Status action",
+        "eligible order status types"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-production-orders-da",
+      "title": "Om produktionsordrer",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/da-dk/dynamics365/business-central/production-about-production-orders",
+      "appliesTo": "Current da-DK localized Business Central online documentation; inspected 2026-09-25",
+      "accessedDate": "2026-09-25",
+      "fields": [
+        "production-order statuses and lifecycle",
+        "Change Status action",
+        "eligible order status types"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-production-orders-fi",
+      "title": "Tietoja tuotantotilauksista",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/fi-fi/dynamics365/business-central/production-about-production-orders",
+      "appliesTo": "Current fi-FI localized Business Central online documentation; inspected 2026-09-25",
+      "accessedDate": "2026-09-25",
+      "fields": [
+        "production-order statuses and lifecycle",
+        "Change Status action",
+        "eligible order status types"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-production-orders-nb",
+      "title": "Om produksjonsordrer",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/nb-no/dynamics365/business-central/production-about-production-orders",
+      "appliesTo": "Current nb-NO localized Business Central online documentation; inspected 2026-09-25",
+      "accessedDate": "2026-09-25",
+      "fields": [
+        "production-order statuses and lifecycle",
+        "Change Status action",
+        "eligible order status types"
+      ]
     }
   ]
 }

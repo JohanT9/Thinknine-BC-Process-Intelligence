@@ -1343,6 +1343,46 @@
         "microsoft-learn-sales-return-orders-fi",
         "microsoft-learn-sales-return-orders-nb"
       ]
+    },
+    {
+      "ruleId": "Sales.GetShipmentLines",
+      "taskType": "GetSalesShipmentLines",
+      "semanticAction": "GetShipmentLines",
+      "entity": "SalesInvoice",
+      "priority": 1290,
+      "confidence": 0.97,
+      "match": {
+        "pagePatterns": [
+          "^(Sales Invoices?|Försäljningsfaktur(?:a|or)|Factures? des ventes|Factures? vente|Verkaufsrechnung(?:en)?|Facturas? de venta|Salgsfaktura(?:er)?|Myyntilasku(?:t)?|Salgsfaktura(?:er)?)$"
+        ],
+        "actionPatterns": [
+          "^(Get Shipment Lines|Hämta utleveransrader|Obtenir lignes d’expédition|Obtenir lignes d\\x27expédition|Warenversandzeilen holen|Obtener líneas de envío|Hent salgsleverancelinjer|Hae toimitusrivit|Hent leveringslinjer)$"
+        ],
+        "fieldPatterns": [],
+        "automationIdPatterns": []
+      },
+      "instructionTemplate": "",
+      "languages": [
+        "en-US",
+        "sv-SE",
+        "fr-FR",
+        "de-DE",
+        "es-ES",
+        "da-DK",
+        "fi-FI",
+        "nb-NO"
+      ],
+      "aliases": [],
+      "sourceIds": [
+        "microsoft-learn-sales-combine-shipments",
+        "microsoft-learn-sales-combine-shipments-sv",
+        "microsoft-learn-sales-combine-shipments-fr",
+        "microsoft-learn-sales-combine-shipments-de",
+        "microsoft-learn-sales-combine-shipments-es",
+        "microsoft-learn-sales-combine-shipments-da",
+        "microsoft-learn-sales-combine-shipments-fi",
+        "microsoft-learn-sales-combine-shipments-nb"
+      ]
     }
   ],
   "sources": [
@@ -1774,6 +1814,110 @@
       "accessedDate": "2026-09-25",
       "fields": [
         "sales-order page, line quantity, quantity to ship, and posting terms"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-sales-combine-shipments",
+      "title": "How to combine shipments on a single invoice",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/en-us/dynamics365/business-central/sales-how-to-combine-shipments-on-a-single-invoice",
+      "appliesTo": "Current en-US localized Business Central online documentation; inspected 2026-09-25",
+      "accessedDate": "2026-09-25",
+      "fields": [
+        "Get Shipment Lines action",
+        "Manual and automatic invoice combination",
+        "Same-customer and same-currency prerequisites"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-sales-combine-shipments-sv",
+      "title": "Så här kombinerar du leveranser på en enda faktura",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/sv-se/dynamics365/business-central/sales-how-to-combine-shipments-on-a-single-invoice",
+      "appliesTo": "Current sv-SE localized Business Central online documentation; inspected 2026-09-25",
+      "accessedDate": "2026-09-25",
+      "fields": [
+        "Get Shipment Lines action",
+        "Manual and automatic invoice combination",
+        "Same-customer and same-currency prerequisites"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-sales-combine-shipments-fr",
+      "title": "Comment regrouper des expéditions sur une seule facture",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/fr-fr/dynamics365/business-central/sales-how-to-combine-shipments-on-a-single-invoice",
+      "appliesTo": "Current fr-FR localized Business Central online documentation; inspected 2026-09-25",
+      "accessedDate": "2026-09-25",
+      "fields": [
+        "Get Shipment Lines action",
+        "Manual and automatic invoice combination",
+        "Same-customer and same-currency prerequisites"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-sales-combine-shipments-de",
+      "title": "Wie man Lieferungen in einer einzigen Rechnung zusammenfasst",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/de-de/dynamics365/business-central/sales-how-to-combine-shipments-on-a-single-invoice",
+      "appliesTo": "Current de-DE localized Business Central online documentation; inspected 2026-09-25",
+      "accessedDate": "2026-09-25",
+      "fields": [
+        "Get Shipment Lines action",
+        "Manual and automatic invoice combination",
+        "Same-customer and same-currency prerequisites"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-sales-combine-shipments-es",
+      "title": "Procedimiento: Agrupamiento de envíos en una factura única",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/es-es/dynamics365/business-central/sales-how-to-combine-shipments-on-a-single-invoice",
+      "appliesTo": "Current es-ES localized Business Central online documentation; inspected 2026-09-25",
+      "accessedDate": "2026-09-25",
+      "fields": [
+        "Get Shipment Lines action",
+        "Manual and automatic invoice combination",
+        "Same-customer and same-currency prerequisites"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-sales-combine-shipments-da",
+      "title": "Sådan kombineres leverancer på én enkelt faktura",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/da-dk/dynamics365/business-central/sales-how-to-combine-shipments-on-a-single-invoice",
+      "appliesTo": "Current da-DK localized Business Central online documentation; inspected 2026-09-25",
+      "accessedDate": "2026-09-25",
+      "fields": [
+        "Get Shipment Lines action",
+        "Manual and automatic invoice combination",
+        "Same-customer and same-currency prerequisites"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-sales-combine-shipments-fi",
+      "title": "Toimitusten yhdistäminen yhteen laskuun",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/fi-fi/dynamics365/business-central/sales-how-to-combine-shipments-on-a-single-invoice",
+      "appliesTo": "Current fi-FI localized Business Central online documentation; inspected 2026-09-25",
+      "accessedDate": "2026-09-25",
+      "fields": [
+        "Get Shipment Lines action",
+        "Manual and automatic invoice combination",
+        "Same-customer and same-currency prerequisites"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-sales-combine-shipments-nb",
+      "title": "Slik kombinerer du leveringer på én faktura",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/nb-no/dynamics365/business-central/sales-how-to-combine-shipments-on-a-single-invoice",
+      "appliesTo": "Current nb-NO localized Business Central online documentation; inspected 2026-09-25",
+      "accessedDate": "2026-09-25",
+      "fields": [
+        "Get Shipment Lines action",
+        "Manual and automatic invoice combination",
+        "Same-customer and same-currency prerequisites"
       ]
     }
   ]

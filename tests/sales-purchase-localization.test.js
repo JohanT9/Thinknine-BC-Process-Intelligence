@@ -86,3 +86,19 @@ for(const [locale,page,receive,quantity,post,source] of purchase){
 }
 for(const packId of ['bc-sales','bc-purchase'])for(const rule of imported.snapshot.packs.find(x=>x.packId===packId).rules.filter(x=>x.languages?.includes('fr-FR')||x.sourceIds?.some(id=>/order-process-|purchase-recording-/.test(id))))for(const locale of locales)assert.ok(rule.languages.includes(locale),`${rule.ruleId} ${locale}`);
 console.log('Sales and purchase line, shipment/receipt quantity, and posting rules resolve in all eight supported locales.');
+const invoiceCases=[
+ ['en-US','Purchase Invoice','Get Receipt Lines','Get Order Lines','Sales Invoice','Get Shipment Lines'],
+ ['sv-SE','Inköpsfaktura','Hämta inleveransrader','Hämta orderrader','Försäljningsfaktura','Hämta utleveransrader'],
+ ['fr-FR','Facture achat','Obtenir les lignes de réception','Récupérer les lignes de commande','Factures des ventes',"Obtenir lignes d’expédition"],
+ ['de-DE','Einkaufsrechnung','Wareneingangszeilen holen','Bestellzeilen abrufen','Verkaufsrechnungen','Warenversandzeilen holen'],
+ ['es-ES','Factura de compra','Traer líns. recep.','Obtener líneas de pedido','Facturas de venta','Obtener líneas de envío'],
+ ['da-DK','Købsfaktura','Hent købsleverancelinjer','Hent ordrelinjer','Salgsfakturaer','Hent salgsleverancelinjer'],
+ ['fi-FI','Ostolasku','Hae vast.oton rivit','Hae tilausrivit','Myyntilaskut','Hae toimitusrivit'],
+ ['nb-NO','Kjøpsfaktura','Hent mottakslinjer','Hent ordrelinjer','Salgsfakturaer','Hent leveringslinjer']
+];
+for(const [locale,purchasePage,receipt,order,salesPage,shipment] of invoiceCases){
+ for(const [packId,page,action,ruleId,sourcePrefix] of [['bc-purchase',purchasePage,receipt,'Purchase.GetReceiptLines','microsoft-learn-purchase-combine-invoice'],['bc-purchase',purchasePage,order,'Purchase.GetOrderLines','microsoft-learn-purchase-combine-invoice'],['bc-sales',salesPage,shipment,'Sales.GetShipmentLines','microsoft-learn-sales-combine-shipments']]){
+  const result=repo.resolveAction({language:locale,context:{pageCaption:page,actionCaption:action}});
+  assert.equal(result.status,'resolved',`${locale} ${ruleId}`);assert.equal(result.candidates[0].provenance.ruleId,ruleId);assert.equal(result.candidates[0].provenance.language,locale);assert.ok(result.candidates[0].provenance.sourceRefs.some(x=>x.sourceId.startsWith(sourcePrefix)&&x.sourceId.endsWith(locale==='en-US'?'':`-${locale.slice(0,2).toLowerCase()}`)),`${locale} ${ruleId} source`);
+ }
+}

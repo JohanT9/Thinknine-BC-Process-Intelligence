@@ -138,9 +138,638 @@
         "microsoft-learn-project-usage-fi",
         "microsoft-learn-project-usage-nb"
       ]
+    },
+    {
+      "ruleId": "Projects.OpenProjectPlanningLines",
+      "taskType": "OpenProjectPlanningLines",
+      "semanticAction": "OpenRelatedLines",
+      "entity": "ProjectTask",
+      "priority": 1280,
+      "confidence": 0.97,
+      "match": {
+        "pagePatterns": [
+          "^Project Task Lines$",
+          "^Projektaktivitetsrader$",
+          "^Lignes de tâches du projet$",
+          "^Projektaufgabenzeilen$",
+          "^Líneas de tareas del proyecto$",
+          "^Project Opgavelinjer$",
+          "^Project Task Lines$",
+          "^Prosjektoppgavelinjer$"
+        ],
+        "actionPatterns": [
+          "^Project Planning Lines$",
+          "^Projektplaneringsrader$",
+          "^Lignes planning projet$",
+          "^Projektplanungszeilen$",
+          "^Líneas planificación proyecto$",
+          "^Projektplanlægningslinjer$",
+          "^Project Suunnittelurivit$",
+          "^Prosjektplanleggingslinjer$"
+        ],
+        "fieldPatterns": [],
+        "automationIdPatterns": []
+      },
+      "instructionTemplate": "",
+      "languages": ["en-US", "sv-SE", "fr-FR", "de-DE", "es-ES", "da-DK", "fi-FI", "nb-NO"],
+      "aliases": [],
+      "sourceIds": [
+        "microsoft-learn-project-walkthrough",
+        "microsoft-learn-project-walkthrough-sv",
+        "microsoft-learn-project-walkthrough-fr",
+        "microsoft-learn-project-walkthrough-de",
+        "microsoft-learn-project-walkthrough-es",
+        "microsoft-learn-project-walkthrough-da",
+        "microsoft-learn-project-walkthrough-fi",
+        "microsoft-learn-project-walkthrough-nb"
+      ]
+    },
+    {
+      "ruleId": "Projects.SetQtyToTransferToInvoice",
+      "taskType": "SetProjectQtyToInvoice",
+      "semanticAction": "EnterQuantity",
+      "entity": "ProjectPlanningLine",
+      "priority": 1280,
+      "confidence": 0.97,
+      "match": {
+        "pagePatterns": [
+          "^Project Planning Lines$",
+          "^Projektplaneringsrader$",
+          "^Lignes planning projet$",
+          "^Projektplanungszeilen$",
+          "^Líneas planificación proyecto$",
+          "^Projektplanlægningslinjer$",
+          "^Projektin suunnittelurivit$",
+          "^Prosjektplanleggingslinjer$"
+        ],
+        "actionPatterns": [],
+        "fieldPatterns": [
+          "^Qty\\. To Transfer to Invoice$",
+          "^Antal att överföra till faktura$",
+          "^Qté à transférer à facturer$",
+          "^In Rechnung zu übertragende Menge$",
+          "^Cdad\\. para transferir a factura$",
+          "^Antal til overførsel til faktura$",
+          "^Laskuun siirrettävä määrä$",
+          "^Ant\\. som skal overføres til faktura$"
+        ],
+        "automationIdPatterns": []
+      },
+      "instructionTemplate": "",
+      "languages": ["en-US", "sv-SE", "fr-FR", "de-DE", "es-ES", "da-DK", "fi-FI", "nb-NO"],
+      "aliases": [],
+      "sourceIds": [
+        "microsoft-learn-project-invoice",
+        "microsoft-learn-project-invoice-sv",
+        "microsoft-learn-project-invoice-fr",
+        "microsoft-learn-project-invoice-de",
+        "microsoft-learn-project-invoice-es",
+        "microsoft-learn-project-invoice-da",
+        "microsoft-learn-project-invoice-fi",
+        "microsoft-learn-project-invoice-nb"
+      ]
+    },
+    {
+      "ruleId": "Projects.CreateProjectSalesInvoice",
+      "taskType": "CreateProjectSalesInvoice",
+      "semanticAction": "CreateSalesInvoice",
+      "entity": "Project",
+      "priority": 1280,
+      "confidence": 0.97,
+      "match": {
+        "pagePatterns": [
+          "^Projects$",
+          "^Projets$",
+          "^Projekt$",
+          "^Proyectos$",
+          "^Projekter$",
+          "^Projektit$",
+          "^Prosjekter$"
+        ],
+        "actionPatterns": [
+          "^Create Project Sales Invoice$",
+          "^Skapa försäljningsfaktura för projekt$",
+          "^Créer une facture vente projet$",
+          "^Projektverkaufsrechnung erstellen$",
+          "^Crear factura de venta de proyecto$",
+          "^Opret projektsalgsfaktura$",
+          "^Luo projektin myyntilasku$",
+          "^Opprett salgsfaktura for prosjekt$"
+        ],
+        "fieldPatterns": [],
+        "automationIdPatterns": []
+      },
+      "instructionTemplate": "",
+      "languages": ["en-US", "sv-SE", "fr-FR", "de-DE", "es-ES", "da-DK", "fi-FI", "nb-NO"],
+      "aliases": [],
+      "sourceIds": [
+        "microsoft-learn-project-invoice",
+        "microsoft-learn-project-invoice-sv",
+        "microsoft-learn-project-invoice-fr",
+        "microsoft-learn-project-invoice-de",
+        "microsoft-learn-project-invoice-es",
+        "microsoft-learn-project-invoice-da",
+        "microsoft-learn-project-invoice-fi",
+        "microsoft-learn-project-invoice-nb"
+      ]
+    },
+    {
+      "ruleId": "Projects.CreateTimeSheetLinesFromPlanning",
+      "taskType": "CreateProjectTimeSheetLines",
+      "semanticAction": "CreateTimeSheetLines",
+      "entity": "ProjectTimeSheet",
+      "priority": 1280,
+      "confidence": 0.97,
+      "match": {
+        "pagePatterns": [
+          "^(Time Sheets|Tidrapporter|Feuilles de temps|Arbeitszeittabellen|Hojas de tiempo|Timesedler|Aikaraportit|Timelister)$"
+        ],
+        "actionPatterns": [
+          "^Create lines from project planning$",
+          "^Skapa rader från projektplanering$",
+          "^Créer des lignes à partir du planning projet$",
+          "^(Zeilen anhand der Projektplanung erstellen|Zeilen aus Projektplanung erstellen)$",
+          "^Crear líneas de planificación de proyecto$",
+          "^Opret linjer fra projektplanlægning$",
+          "^Luo rivejä projektin suunnittelusta$",
+          "^Opprett linjer fra prosjektplanlegging$"
+        ],
+        "fieldPatterns": [],
+        "automationIdPatterns": []
+      },
+      "instructionTemplate": "",
+      "languages": ["en-US", "sv-SE", "fr-FR", "de-DE", "es-ES", "da-DK", "fi-FI", "nb-NO"],
+      "aliases": [],
+      "sourceIds": [
+        "microsoft-learn-project-timesheets",
+        "microsoft-learn-project-timesheets-sv",
+        "microsoft-learn-project-timesheets-fr",
+        "microsoft-learn-project-timesheets-de",
+        "microsoft-learn-project-timesheets-es",
+        "microsoft-learn-project-timesheets-da",
+        "microsoft-learn-project-timesheets-fi",
+        "microsoft-learn-project-timesheets-nb"
+      ]
+    },
+    {
+      "ruleId": "Projects.SuggestApprovedTimeSheetLinesToProjectJournal",
+      "taskType": "SuggestProjectJournalLinesFromTimeSheets",
+      "semanticAction": "SuggestJournalLines",
+      "entity": "ProjectJournal",
+      "priority": 1280,
+      "confidence": 0.97,
+      "match": {
+        "pagePatterns": [
+          "^(Project Journals|Projektjournaler|Journaux projet|Projekterfassung|Diario de proyectos|Projektkladde|Projektipäiväkirjat?|Prosjektjournaler|Prosjektkladd)$"
+        ],
+        "actionPatterns": [
+          "^Suggest Lines from Time Sheets$",
+          "^Föreslå rader från tidrapporter$",
+          "^Proposer des lignes à partir des feuilles de temps$",
+          "^Zeilen von Arbeitszeittabellen vorschlagen$",
+          "^Sugerir líneas de hojas de horas$",
+          "^Foreslå linjer fra timesedler$",
+          "^Ehdota rivejä aikaraporteista$",
+          "^Foreslå linjer fra timelister$"
+        ],
+        "fieldPatterns": [],
+        "automationIdPatterns": []
+      },
+      "instructionTemplate": "",
+      "languages": ["en-US", "sv-SE", "fr-FR", "de-DE", "es-ES", "da-DK", "fi-FI", "nb-NO"],
+      "aliases": [],
+      "sourceIds": [
+        "microsoft-learn-project-timesheets",
+        "microsoft-learn-project-timesheets-sv",
+        "microsoft-learn-project-timesheets-fr",
+        "microsoft-learn-project-timesheets-de",
+        "microsoft-learn-project-timesheets-es",
+        "microsoft-learn-project-timesheets-da",
+        "microsoft-learn-project-timesheets-fi",
+        "microsoft-learn-project-timesheets-nb"
+      ]
+    }
+    ,
+    {
+      "ruleId": "Projects.OpenResourceCapacity",
+      "taskType": "OpenResourceCapacity",
+      "semanticAction": "OpenRelatedLines",
+      "entity": "Resource",
+      "priority": 1280,
+      "confidence": 0.97,
+      "match": {
+        "pagePatterns": [
+          "^(Resource Card|Resurskort|Fiche ressource|Ressourcenkarte|Ficha recurso|Ressourcekort|Resurssikortti|Ressurskort)$"
+        ],
+        "actionPatterns": [
+          "^Resource Capacity$",
+          "^Resurskapacitet$",
+          "^Capacité ressource$",
+          "^Ressourcenkapazität$",
+          "^Capacidad recurso$",
+          "^Ressourcekapacitet$",
+          "^Resurssikapasiteetti$",
+          "^Ressurskapasitet$"
+        ],
+        "fieldPatterns": [],
+        "automationIdPatterns": []
+      },
+      "instructionTemplate": "",
+      "languages": ["en-US", "sv-SE", "fr-FR", "de-DE", "es-ES", "da-DK", "fi-FI", "nb-NO"],
+      "aliases": [],
+      "sourceIds": [
+        "microsoft-learn-project-resource-capacity",
+        "microsoft-learn-project-resource-capacity-sv",
+        "microsoft-learn-project-resource-capacity-fr",
+        "microsoft-learn-project-resource-capacity-de",
+        "microsoft-learn-project-resource-capacity-es",
+        "microsoft-learn-project-resource-capacity-da",
+        "microsoft-learn-project-resource-capacity-fi",
+        "microsoft-learn-project-resource-capacity-nb"
+      ]
+    },
+    {
+      "ruleId": "Projects.UpdateResourceCapacity",
+      "taskType": "UpdateResourceCapacity",
+      "semanticAction": "UpdateCapacity",
+      "entity": "ResourceCapacity",
+      "priority": 1280,
+      "confidence": 0.97,
+      "match": {
+        "pagePatterns": [
+          "^(Resource Capacity Settings|Inställningar för resurskapacitet|Paramétrage capacité ressource|Res\\.-Kapazität Einstellungen|Config\\. capacidad recurso|Ressourcekap\\.indstillinger|Resurssin kapasiteetti asetuk\\.|Innstillinger for ressurskapasitet)$"
+        ],
+        "actionPatterns": [
+          "^Update Capacity$",
+          "^Uppdatera kapacitet$",
+          "^Mettre à jour la capacité$",
+          "^Kapazität aktualisieren$",
+          "^Actualizar capacidad$",
+          "^Opdater kapacitet$",
+          "^Päivitä kapasiteetti$",
+          "^Oppdater kapasitet$"
+        ],
+        "fieldPatterns": [],
+        "automationIdPatterns": []
+      },
+      "instructionTemplate": "",
+      "languages": ["en-US", "sv-SE", "fr-FR", "de-DE", "es-ES", "da-DK", "fi-FI", "nb-NO"],
+      "aliases": [],
+      "sourceIds": [
+        "microsoft-learn-project-resource-capacity",
+        "microsoft-learn-project-resource-capacity-sv",
+        "microsoft-learn-project-resource-capacity-fr",
+        "microsoft-learn-project-resource-capacity-de",
+        "microsoft-learn-project-resource-capacity-es",
+        "microsoft-learn-project-resource-capacity-da",
+        "microsoft-learn-project-resource-capacity-fi",
+        "microsoft-learn-project-resource-capacity-nb"
+      ]
+    },
+    {
+      "ruleId": "Projects.OpenResourceCosts",
+      "taskType": "OpenResourceCosts",
+      "semanticAction": "OpenRelatedLines",
+      "entity": "Resource",
+      "priority": 1280,
+      "confidence": 0.97,
+      "match": {
+        "pagePatterns": ["^(Resource Card|Resurskort|Fiche ressource|Ressourcenkarte|Ficha recurso|Ressourcekort|Resurssikortti|Ressurskort)$"],
+        "actionPatterns": ["^(Costs|Kostnader|Coûts|Kosten|Costes|Kostpriser|Kustannukset)$"],
+        "fieldPatterns": [],
+        "automationIdPatterns": []
+      },
+      "instructionTemplate": "",
+      "languages": ["en-US", "sv-SE", "fr-FR", "de-DE", "es-ES", "da-DK", "fi-FI", "nb-NO"],
+      "aliases": [],
+      "sourceIds": ["microsoft-learn-project-resource-capacity", "microsoft-learn-project-resource-capacity-sv", "microsoft-learn-project-resource-capacity-fr", "microsoft-learn-project-resource-capacity-de", "microsoft-learn-project-resource-capacity-es", "microsoft-learn-project-resource-capacity-da", "microsoft-learn-project-resource-capacity-fi", "microsoft-learn-project-resource-capacity-nb"]
+    },
+    {
+      "ruleId": "Projects.OpenResourcePrices",
+      "taskType": "OpenResourcePrices",
+      "semanticAction": "OpenRelatedLines",
+      "entity": "Resource",
+      "priority": 1280,
+      "confidence": 0.97,
+      "match": {
+        "pagePatterns": ["^(Resource Card|Resurskort|Fiche ressource|Ressourcenkarte|Ficha recurso|Ressourcekort|Resurssikortti|Ressurskort)$"],
+        "actionPatterns": ["^(Prices|Priser|Prix|Preise|Precios|Hinnat)$"],
+        "fieldPatterns": [],
+        "automationIdPatterns": []
+      },
+      "instructionTemplate": "",
+      "languages": ["en-US", "sv-SE", "fr-FR", "de-DE", "es-ES", "da-DK", "fi-FI", "nb-NO"],
+      "aliases": [],
+      "sourceIds": ["microsoft-learn-project-resource-capacity", "microsoft-learn-project-resource-capacity-sv", "microsoft-learn-project-resource-capacity-fr", "microsoft-learn-project-resource-capacity-de", "microsoft-learn-project-resource-capacity-es", "microsoft-learn-project-resource-capacity-da", "microsoft-learn-project-resource-capacity-fi", "microsoft-learn-project-resource-capacity-nb"]
+    },
+    {
+      "ruleId": "Projects.CalculateRemainingUsage",
+      "taskType": "CalculateProjectRemainingUsage",
+      "semanticAction": "RunBatchJob",
+      "entity": "ProjectJournal",
+      "priority": 1280,
+      "confidence": 0.97,
+      "match": {
+        "pagePatterns": ["^(Project Journals|Projektjournaler|Journaux projet|Projekterfassung|Diario de proyectos|Projektkladde|Projektipäiväkirjat?|Prosjektjournaler|Prosjektkladd)$"],
+        "actionPatterns": ["^(Calc\\. Remaining Usage|Ber\\. återstående förbrukning|Calc\\. utilisation restante|Verbleibender Verbrauch berechnen|Cálc\\. uso restante|Beregn resterede forbrug|Laske jäljellä oleva käyttö|Beregn gjenstående forbruk)$"],
+        "fieldPatterns": [],
+        "automationIdPatterns": []
+      },
+      "instructionTemplate": "",
+      "languages": ["en-US", "sv-SE", "fr-FR", "de-DE", "es-ES", "da-DK", "fi-FI", "nb-NO"],
+      "aliases": [],
+      "sourceIds": ["microsoft-learn-project-usage", "microsoft-learn-project-usage-sv", "microsoft-learn-project-usage-fr", "microsoft-learn-project-usage-de", "microsoft-learn-project-usage-es", "microsoft-learn-project-usage-da", "microsoft-learn-project-usage-fi", "microsoft-learn-project-usage-nb"]
+    },
+    {
+      "ruleId": "Projects.CreateProjectInventoryPick",
+      "taskType": "CreateProjectInventoryPick",
+      "semanticAction": "CreatePick",
+      "entity": "ProjectPlanningLine",
+      "priority": 1280,
+      "confidence": 0.97,
+      "match": {
+        "pagePatterns": ["^(Project Card|Projects|Projektkort|Projekt|Fiche projet|Fiche de projet|Projektkarte|Ficha proyecto|Ficha de proyecto|Projektikortti|Prosjektkort)$"],
+        "actionPatterns": ["^(Create Inventory Pick|Skapa lagerplockning|Créer un prélèvement stock|Lagerkommissionierung erstellen|Crear picking inventario|Opret pluk \\(lager\\)|Luo varastopoiminta|Opprett beholdningsplukk)$"],
+        "fieldPatterns": [],
+        "automationIdPatterns": []
+      },
+      "instructionTemplate": "",
+      "languages": ["en-US", "sv-SE", "fr-FR", "de-DE", "es-ES", "da-DK", "fi-FI", "nb-NO"],
+      "aliases": [],
+      "sourceIds": ["microsoft-learn-project-usage", "microsoft-learn-project-usage-sv", "microsoft-learn-project-usage-fr", "microsoft-learn-project-usage-de", "microsoft-learn-project-usage-es", "microsoft-learn-project-usage-da", "microsoft-learn-project-usage-fi", "microsoft-learn-project-usage-nb"]
+    },
+    {
+      "ruleId": "Projects.CreateProjectWarehousePick",
+      "taskType": "CreateProjectWarehousePick",
+      "semanticAction": "CreateWarehousePick",
+      "entity": "ProjectPlanningLine",
+      "priority": 1280,
+      "confidence": 0.97,
+      "match": {
+        "pagePatterns": ["^(Project Card|Projects|Projektkort|Projekt|Fiche projet|Fiche de projet|Projektkarte|Ficha proyecto|Ficha de proyecto|Projektikortti|Prosjektkort)$"],
+        "actionPatterns": ["^(Create Warehouse Pick|Skapa distributionslagerplockning|Créer un prélèvement entrepôt|Lagerkommissionierungen erstellen|Crear picking almacén|Opret lager \\(logistik\\)|Luo fyysisen varaston poiminta|Opprett lagerplukk)$"],
+        "fieldPatterns": [],
+        "automationIdPatterns": []
+      },
+      "instructionTemplate": "",
+      "languages": ["en-US", "sv-SE", "fr-FR", "de-DE", "es-ES", "da-DK", "fi-FI", "nb-NO"],
+      "aliases": [],
+      "sourceIds": ["microsoft-learn-project-usage", "microsoft-learn-project-usage-sv", "microsoft-learn-project-usage-fr", "microsoft-learn-project-usage-de", "microsoft-learn-project-usage-es", "microsoft-learn-project-usage-da", "microsoft-learn-project-usage-fi", "microsoft-learn-project-usage-nb"]
+    },
+    {
+      "ruleId": "Projects.GetProjectPlanningLinesForInvoice",
+      "taskType": "GetProjectPlanningLinesForInvoice",
+      "semanticAction": "GetRelatedPlanningLines",
+      "entity": "SalesInvoice",
+      "priority": 1280,
+      "confidence": 0.97,
+      "match": {
+        "pagePatterns": ["^(Sales Invoice|Försäljningsfaktura|Facture vente|Verkaufsrechnung|Factura venta|Salgsfaktura|Myyntilasku)$"],
+        "actionPatterns": ["^(Get Project Planning Lines|Hämta projektplaneringsrader|Extraire lignes Planning projet|Projektplanzeilen abrufen|Obtener líneas de planificación de proyecto|Hent projektplanlægningslinjer|Hae projektin suunnittelurivit|Hent prosjektplanleggingslinjer)$"],
+        "fieldPatterns": [],
+        "automationIdPatterns": []
+      },
+      "instructionTemplate": "",
+      "languages": ["en-US", "sv-SE", "fr-FR", "de-DE", "es-ES", "da-DK", "fi-FI", "nb-NO"],
+      "aliases": [],
+      "sourceIds": ["microsoft-learn-project-invoice", "microsoft-learn-project-invoice-sv", "microsoft-learn-project-invoice-fr", "microsoft-learn-project-invoice-de", "microsoft-learn-project-invoice-es", "microsoft-learn-project-invoice-da", "microsoft-learn-project-invoice-fi", "microsoft-learn-project-invoice-nb"]
+    },
+    {
+      "ruleId": "Projects.CreatePurchaseOrders",
+      "taskType": "CreateProjectPurchaseOrders",
+      "semanticAction": "CreatePurchaseOrders",
+      "entity": "Project",
+      "priority": 1280,
+      "confidence": 0.97,
+      "match": {
+        "pagePatterns": ["^(Project Card|Projects|Projektkort|Projekt|Fiche projet|Fiche de projet|Projektkarte|Ficha proyecto|Ficha de proyecto|Projektikortti|Prosjektkort)$"],
+        "actionPatterns": ["^(Create Purchase Orders|Skapa inköpsorder|Créer des commandes achat|Einkaufsbestellung erstellen|Crear pedidos de compra|Opret købsordrer|Luo ostotilaukset|Opprett bestillinger)$"],
+        "fieldPatterns": [],
+        "automationIdPatterns": []
+      },
+      "instructionTemplate": "",
+      "languages": ["en-US", "sv-SE", "fr-FR", "de-DE", "es-ES", "da-DK", "fi-FI", "nb-NO"],
+      "aliases": [],
+      "sourceIds": ["microsoft-learn-project-supplies", "microsoft-learn-project-supplies-sv", "microsoft-learn-project-supplies-fr", "microsoft-learn-project-supplies-de", "microsoft-learn-project-supplies-es", "microsoft-learn-project-supplies-da", "microsoft-learn-project-supplies-fi", "microsoft-learn-project-supplies-nb"]
     }
   ],
   "sources": [
+    {
+      "sourceId": "microsoft-learn-project-supplies",
+      "title": "Manage project supplies",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/en-us/dynamics365/business-central/projects-how-manage-project-supplies",
+      "appliesTo": "Current English Business Central online documentation; inspected 2026-09-25",
+      "accessedDate": "2026-09-25",
+      "fields": ["Create Purchase Orders action", "semi-automated replenishment", "open project and Apply Usage Link requirement"]
+    },
+    {
+      "sourceId": "microsoft-learn-project-supplies-sv",
+      "title": "Hantera projektleveranser",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/sv-se/dynamics365/business-central/projects-how-manage-project-supplies",
+      "appliesTo": "Current Swedish Business Central online documentation; inspected 2026-09-25",
+      "accessedDate": "2026-09-25",
+      "fields": ["Skapa inköpsorder action", "semi-automated replenishment", "open project and Apply Usage Link requirement"]
+    },
+    {
+      "sourceId": "microsoft-learn-project-supplies-fr",
+      "title": "Gestion des fournitures d’un projet",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/fr-fr/dynamics365/business-central/projects-how-manage-project-supplies",
+      "appliesTo": "Current French Business Central online documentation; inspected 2026-09-25",
+      "accessedDate": "2026-09-25",
+      "fields": ["Créer des commandes achat action", "semi-automated replenishment", "open project and Apply Usage Link requirement"]
+    },
+    {
+      "sourceId": "microsoft-learn-project-supplies-de",
+      "title": "Projektmittel verwalten",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/de-de/dynamics365/business-central/projects-how-manage-project-supplies",
+      "appliesTo": "Current German Business Central online documentation; inspected 2026-09-25",
+      "accessedDate": "2026-09-25",
+      "fields": ["Einkaufsbestellung erstellen action", "semi-automated replenishment", "open project and Apply Usage Link requirement"]
+    },
+    {
+      "sourceId": "microsoft-learn-project-supplies-es",
+      "title": "Gestionar ofertas de programa",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/es-es/dynamics365/business-central/projects-how-manage-project-supplies",
+      "appliesTo": "Current Spanish Business Central online documentation; inspected 2026-09-25",
+      "accessedDate": "2026-09-25",
+      "fields": ["Crear pedidos de compra action", "semi-automated replenishment", "open project and Apply Usage Link requirement"]
+    },
+    {
+      "sourceId": "microsoft-learn-project-supplies-da",
+      "title": "Administrere projektforsyninger",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/da-dk/dynamics365/business-central/projects-how-manage-project-supplies",
+      "appliesTo": "Current Danish Business Central online documentation; inspected 2026-09-25",
+      "accessedDate": "2026-09-25",
+      "fields": ["Opret købsordrer action", "semi-automated replenishment", "open project and Apply Usage Link requirement"]
+    },
+    {
+      "sourceId": "microsoft-learn-project-supplies-fi",
+      "title": "Projektin tarvikkeiden hallinta",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/fi-fi/dynamics365/business-central/projects-how-manage-project-supplies",
+      "appliesTo": "Current Finnish Business Central online documentation; inspected 2026-09-25",
+      "accessedDate": "2026-09-25",
+      "fields": ["Luo ostotilaukset action", "semi-automated replenishment", "open project and Apply Usage Link requirement"]
+    },
+    {
+      "sourceId": "microsoft-learn-project-supplies-nb",
+      "title": "Administrer prosjektforsyninger",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/nb-no/dynamics365/business-central/projects-how-manage-project-supplies",
+      "appliesTo": "Current Norwegian Bokmål Business Central online documentation; inspected 2026-09-25",
+      "accessedDate": "2026-09-25",
+      "fields": ["Opprett bestillinger action", "semi-automated replenishment", "open project and Apply Usage Link requirement"]
+    },
+    {
+      "sourceId": "microsoft-learn-project-resource-capacity",
+      "title": "Set up project resource costs, prices, and capacity",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/en-us/dynamics365/business-central/projects-how-setup-resources",
+      "appliesTo": "Current English Business Central online documentation; inspected 2026-09-25",
+      "accessedDate": "2026-09-25",
+      "fields": ["Resource Capacity", "Set Capacity", "Resource Capacity Settings", "Update Capacity", "alternate resource Costs action", "alternate resource Prices action"]
+    },
+    {
+      "sourceId": "microsoft-learn-project-resource-capacity-sv",
+      "title": "Ange projektresurskostnader, priser och kapacitet",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/sv-se/dynamics365/business-central/projects-how-setup-resources",
+      "appliesTo": "Current Swedish Business Central online documentation; inspected 2026-09-25",
+      "accessedDate": "2026-09-25",
+      "fields": ["Resurskapacitet", "Ställ in kapacitet", "Inställningar för resurskapacitet", "Uppdatera kapacitet", "Kostnader action for alternate resource costs", "Priser action for conditional alternate resource prices"]
+    },
+    {
+      "sourceId": "microsoft-learn-project-resource-capacity-fr",
+      "title": "Paramétrer les coûts, prix, et capacité des projets",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/fr-fr/dynamics365/business-central/projects-how-setup-resources",
+      "appliesTo": "Current French Business Central online documentation; inspected 2026-09-25",
+      "accessedDate": "2026-09-25",
+      "fields": ["Capacité ressource", "Paramétrage capacité ressource", "Mettre à jour la capacité", "Coûts action for alternate resource costs", "Prix action for conditional alternate resource prices"]
+    },
+    {
+      "sourceId": "microsoft-learn-project-resource-capacity-de",
+      "title": "Kosten, Preise und Kapazität für Projektressourcen einrichten",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/de-de/dynamics365/business-central/projects-how-setup-resources",
+      "appliesTo": "Current German Business Central online documentation; inspected 2026-09-25",
+      "accessedDate": "2026-09-25",
+      "fields": ["Ressourcenkapazität", "Kapazität festlegen", "Res.-Kapazität Einstellungen", "Kapazität aktualisieren", "Kosten action for alternate resource costs", "Preise action for conditional alternate resource prices"]
+    },
+    {
+      "sourceId": "microsoft-learn-project-resource-capacity-es",
+      "title": "Configurar costes de recurso, precios y capacidad",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/es-es/dynamics365/business-central/projects-how-setup-resources",
+      "appliesTo": "Current Spanish Business Central online documentation; inspected 2026-09-25",
+      "accessedDate": "2026-09-25",
+      "fields": ["Capacidad recurso", "Establecer capacidad", "Config. capacidad recurso", "Actualizar capacidad", "Costes action for alternate resource costs", "Precios action for conditional alternate resource prices"]
+    },
+    {
+      "sourceId": "microsoft-learn-project-resource-capacity-da",
+      "title": "Konfigurere projektressourcekostpriser, priser og kapacitet",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/da-dk/dynamics365/business-central/projects-how-setup-resources",
+      "appliesTo": "Current Danish Business Central online documentation; inspected 2026-09-25",
+      "accessedDate": "2026-09-25",
+      "fields": ["Ressourcekapacitet", "Angiv kapacitet", "Ressourcekap.indstillinger", "Opdater kapacitet", "Kostpriser action for alternate resource costs", "Priser action for conditional alternate resource prices"]
+    },
+    {
+      "sourceId": "microsoft-learn-project-resource-capacity-fi",
+      "title": "Projektin resurssin kustannusten, hintojen ja kapasiteetin määrittäminen",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/fi-fi/dynamics365/business-central/projects-how-setup-resources",
+      "appliesTo": "Current Finnish Business Central online documentation; inspected 2026-09-25",
+      "accessedDate": "2026-09-25",
+      "fields": ["Resurssikapasiteetti", "Aseta kapasiteetti", "Resurssin kapasiteetti asetuk.", "Päivitä kapasiteetti", "Kustannukset action for alternate resource costs", "Hinnat action for conditional alternate resource prices"]
+    },
+    {
+      "sourceId": "microsoft-learn-project-resource-capacity-nb",
+      "title": "Definer prosjektressurskostpriser, priser og kapasitet",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/nb-no/dynamics365/business-central/projects-how-setup-resources",
+      "appliesTo": "Current Norwegian Bokmål Business Central online documentation; inspected 2026-09-25",
+      "accessedDate": "2026-09-25",
+      "fields": ["Ressurskapasitet", "Angi kapasitet", "Innstillinger for ressurskapasitet", "Oppdater kapasitet", "Kostpriser action for alternate resource costs", "Priser action for conditional alternate resource prices"]
+    },
+    {
+      "sourceId": "microsoft-learn-project-timesheets",
+      "title": "Use time sheets",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/en-us/dynamics365/business-central/projects-how-use-time-sheets",
+      "appliesTo": "Current English Business Central online documentation; inspected 2026-09-25",
+      "accessedDate": "2026-09-25",
+      "fields": ["Time Sheets", "Create lines from project planning", "Submit", "Approve", "Suggest Lines from Time Sheets", "Project Journals", "Post"]
+    },
+    {
+      "sourceId": "microsoft-learn-project-timesheets-sv",
+      "title": "Använd tidrapporter",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/sv-se/dynamics365/business-central/projects-how-use-time-sheets",
+      "appliesTo": "Current Swedish Business Central online documentation; inspected 2026-09-25",
+      "accessedDate": "2026-09-25",
+      "fields": ["Tidrapporter", "Skapa rader från projektplanering", "Skicka", "Godkänn", "Föreslå rader från tidrapporter", "Projektjournaler", "Bokföra"]
+    },
+    {
+      "sourceId": "microsoft-learn-project-timesheets-fr",
+      "title": "Utilisation de feuilles de temps",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/fr-fr/dynamics365/business-central/projects-how-use-time-sheets",
+      "appliesTo": "Current French Business Central online documentation; inspected 2026-09-25",
+      "accessedDate": "2026-09-25",
+      "fields": ["Feuilles de temps", "Créer des lignes à partir du planning projet", "Soumettre", "Approuver", "Proposer des lignes à partir des feuilles de temps", "Journaux projet", "Valider"]
+    },
+    {
+      "sourceId": "microsoft-learn-project-timesheets-de",
+      "title": "Arbeitszeittabellen verwenden",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/de-de/dynamics365/business-central/projects-how-use-time-sheets",
+      "appliesTo": "Current German Business Central online documentation; inspected 2026-09-25",
+      "accessedDate": "2026-09-25",
+      "fields": ["Arbeitszeittabellen", "Zeilen anhand der Projektplanung erstellen", "Übermitteln", "Genehmigen", "Zeilen von Arbeitszeittabellen vorschlagen", "Project Journals", "Posten"]
+    },
+    {
+      "sourceId": "microsoft-learn-project-timesheets-es",
+      "title": "Usar partes de horas",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/es-es/dynamics365/business-central/projects-how-use-time-sheets",
+      "appliesTo": "Current Spanish Business Central online documentation; inspected 2026-09-25",
+      "accessedDate": "2026-09-25",
+      "fields": ["Hojas de tiempo", "Crear líneas de planificación de proyecto", "Enviar", "Aprobar", "Sugerir líneas de hojas de horas", "Project Journals", "Registrar"]
+    },
+    {
+      "sourceId": "microsoft-learn-project-timesheets-da",
+      "title": "Brug timesedler",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/da-dk/dynamics365/business-central/projects-how-use-time-sheets",
+      "appliesTo": "Current Danish Business Central online documentation; inspected 2026-09-25",
+      "accessedDate": "2026-09-25",
+      "fields": ["Timesedler", "Opret linjer fra projektplanlægning", "Send", "Godkend", "Foreslå linjer fra timesedler", "Project Journals", "Bogfør"]
+    },
+    {
+      "sourceId": "microsoft-learn-project-timesheets-fi",
+      "title": "Käytä aikaraportteja",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/fi-fi/dynamics365/business-central/projects-how-use-time-sheets",
+      "appliesTo": "Current Finnish Business Central online documentation; inspected 2026-09-25",
+      "accessedDate": "2026-09-25",
+      "fields": ["Aikaraportit", "Luo rivejä projektin suunnittelusta", "Lähetä", "Hyväksy", "Ehdota rivejä aikaraporteista", "Projektipäiväkirjat", "Kirjaa"]
+    },
+    {
+      "sourceId": "microsoft-learn-project-timesheets-nb",
+      "title": "Bruk timelister",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/nb-no/dynamics365/business-central/projects-how-use-time-sheets",
+      "appliesTo": "Current Norwegian Bokmål Business Central online documentation; inspected 2026-09-25",
+      "accessedDate": "2026-09-25",
+      "fields": ["Timelister", "Opprett linjer fra prosjektplanlegging", "Send", "Godkjenn", "Foreslå linjer fra timelister", "Prosjektjournaler", "Bokfør"]
+    },
     {
       "sourceId": "microsoft-learn-project-usage",
       "title": "Record consumption or usage for projects",
@@ -148,7 +777,7 @@
       "sourceUri": "https://learn.microsoft.com/en-us/dynamics365/business-central/projects-how-record-job-usage",
       "appliesTo": "Current English Business Central online documentation; inspected 2026-09-25",
       "accessedDate": "2026-09-25",
-      "fields": ["Qty. To Transfer to Journal", "Create Project Journal Lines", "Open Project Journal", "Post"]
+      "fields": ["Qty. To Transfer to Journal", "Create Project Journal Lines", "Open Project Journal", "Post", "Calc. Remaining Usage", "Create Inventory Pick", "Create Warehouse Pick"]
     },
     {
       "sourceId": "microsoft-learn-project-usage-sv",
@@ -157,7 +786,7 @@
       "sourceUri": "https://learn.microsoft.com/sv-se/dynamics365/business-central/projects-how-record-job-usage",
       "appliesTo": "Current Swedish Business Central online documentation; inspected 2026-09-25",
       "accessedDate": "2026-09-25",
-      "fields": ["Antal att överföra till journal", "Skapa projektjournalrader", "Öppna projektjournal", "Bokför"]
+      "fields": ["Antal att överföra till journal", "Skapa projektjournalrader", "Öppna projektjournal", "Bokför", "Ber. återstående förbrukning", "Skapa lagerplockning", "Skapa distributionslagerplockning"]
     },
     {
       "sourceId": "microsoft-learn-project-usage-fr",
@@ -166,7 +795,7 @@
       "sourceUri": "https://learn.microsoft.com/fr-fr/dynamics365/business-central/projects-how-record-job-usage",
       "appliesTo": "Current French Business Central online documentation; inspected 2026-09-25",
       "accessedDate": "2026-09-25",
-      "fields": ["Qté à transférer sur la feuille", "Créer des lignes feuille projet", "Ouvrir la feuille projet", "Valider"]
+      "fields": ["Qté à transférer sur la feuille", "Créer des lignes feuille projet", "Ouvrir la feuille projet", "Valider", "Calc. utilisation restante", "Créer un prélèvement stock", "Créer un prélèvement entrepôt"]
     },
     {
       "sourceId": "microsoft-learn-project-usage-de",
@@ -175,7 +804,7 @@
       "sourceUri": "https://learn.microsoft.com/de-de/dynamics365/business-central/projects-how-record-job-usage",
       "appliesTo": "Current German Business Central online documentation; inspected 2026-09-25",
       "accessedDate": "2026-09-25",
-      "fields": ["In das Journal zu übertragende Menge", "Projekt-Buch.-Blattzeilen erstellen", "Projekterfassung öffnen", "Buchen"]
+      "fields": ["In das Journal zu übertragende Menge", "Projekt-Buch.-Blattzeilen erstellen", "Projekterfassung öffnen", "Buchen", "Verbleibender Verbrauch berechnen", "Lagerkommissionierung erstellen", "Lagerkommissionierungen erstellen"]
     },
     {
       "sourceId": "microsoft-learn-project-usage-es",
@@ -184,7 +813,7 @@
       "sourceUri": "https://learn.microsoft.com/es-es/dynamics365/business-central/projects-how-record-job-usage",
       "appliesTo": "Current Spanish Business Central online documentation; inspected 2026-09-25",
       "accessedDate": "2026-09-25",
-      "fields": ["Cdad. a transferir al diario", "Crear líneas de diario de proyectos", "Diario de proyectos pendientes", "Registrar"]
+      "fields": ["Cdad. a transferir al diario", "Crear líneas de diario de proyectos", "Diario de proyectos pendientes", "Registrar", "Cálc. uso restante", "Crear picking inventario", "Crear picking almacén"]
     },
     {
       "sourceId": "microsoft-learn-project-usage-da",
@@ -193,7 +822,7 @@
       "sourceUri": "https://learn.microsoft.com/da-dk/dynamics365/business-central/projects-how-record-job-usage",
       "appliesTo": "Current Danish Business Central online documentation; inspected 2026-09-25",
       "accessedDate": "2026-09-25",
-      "fields": ["Antal, der skal overføres til kladde", "Opret projektkladdelinjer", "Åbn projektkladde", "Bogfør"]
+      "fields": ["Antal, der skal overføres til kladde", "Opret projektkladdelinjer", "Åbn projektkladde", "Bogfør", "Beregn resterede forbrug", "Opret pluk (lager)", "Opret lager (logistik)"]
     },
     {
       "sourceId": "microsoft-learn-project-usage-fi",
@@ -202,7 +831,7 @@
       "sourceUri": "https://learn.microsoft.com/fi-fi/dynamics365/business-central/projects-how-record-job-usage",
       "appliesTo": "Current Finnish Business Central online documentation; inspected 2026-09-25",
       "accessedDate": "2026-09-25",
-      "fields": ["Päiväkirjaan siirrettävä määrä", "Luo projektipäiväkirjan rivit", "Avaa projektipäiväkirja", "Kirjaa"]
+      "fields": ["Päiväkirjaan siirrettävä määrä", "Luo projektipäiväkirjan rivit", "Avaa projektipäiväkirja", "Kirjaa", "Laske jäljellä oleva käyttö", "Luo varastopoiminta", "Luo fyysisen varaston poiminta"]
     },
     {
       "sourceId": "microsoft-learn-project-usage-nb",
@@ -211,7 +840,151 @@
       "sourceUri": "https://learn.microsoft.com/nb-no/dynamics365/business-central/projects-how-record-job-usage",
       "appliesTo": "Current Norwegian Bokmål Business Central online documentation; inspected 2026-09-25",
       "accessedDate": "2026-09-25",
-      "fields": ["Ant. som skal overføres til kladd", "Opprett prosjektkladdelinjer", "Åpne prosjektkladd", "Bokfør"]
+      "fields": ["Ant. som skal overføres til kladd", "Opprett prosjektkladdelinjer", "Åpne prosjektkladd", "Bokfør", "Beregn gjenstående forbruk", "Opprett beholdningsplukk", "Opprett lagerplukk"]
+    },
+    {
+      "sourceId": "microsoft-learn-project-walkthrough",
+      "title": "Walkthrough: managing projects",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/en-us/dynamics365/business-central/walkthrough-managing-projects-with-jobs",
+      "appliesTo": "Current English Business Central online documentation; inspected 2026-09-25",
+      "accessedDate": "2026-09-25",
+      "fields": ["Project Task Lines", "Project Planning Lines", "Create project Sales Invoice"]
+    },
+    {
+      "sourceId": "microsoft-learn-project-walkthrough-sv",
+      "title": "Genomgång: Hantera projekt",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/sv-se/dynamics365/business-central/walkthrough-managing-projects-with-jobs",
+      "appliesTo": "Current Swedish Business Central online documentation; inspected 2026-09-25",
+      "accessedDate": "2026-09-25",
+      "fields": ["Projektaktivitetsrader", "Projektplaneringsrader", "Skapa projektförsäljningsfaktura"]
+    },
+    {
+      "sourceId": "microsoft-learn-project-walkthrough-fr",
+      "title": "Procédure pas à pas : gestion des projets",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/fr-fr/dynamics365/business-central/walkthrough-managing-projects-with-jobs",
+      "appliesTo": "Current French Business Central online documentation; inspected 2026-09-25",
+      "accessedDate": "2026-09-25",
+      "fields": ["Project Lignes de tâches", "Lignes planning projet", "Créer une facture vente projet"]
+    },
+    {
+      "sourceId": "microsoft-learn-project-walkthrough-de",
+      "title": "Anleitung: Projektverwaltung",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/de-de/dynamics365/business-central/walkthrough-managing-projects-with-jobs",
+      "appliesTo": "Current German Business Central online documentation; inspected 2026-09-25",
+      "accessedDate": "2026-09-25",
+      "fields": ["Projektaufgabenzeilen", "Projektplanungszeilen", "Projektverkaufsrechnung erstellen"]
+    },
+    {
+      "sourceId": "microsoft-learn-project-walkthrough-es",
+      "title": "Tutorial: Administración de proyectos",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/es-es/dynamics365/business-central/walkthrough-managing-projects-with-jobs",
+      "appliesTo": "Current Spanish Business Central online documentation; inspected 2026-09-25",
+      "accessedDate": "2026-09-25",
+      "fields": ["Líneas de tareas del proyecto", "Líneas de planificación de proyecto", "Crear factura de venta de proyecto"]
+    },
+    {
+      "sourceId": "microsoft-learn-project-walkthrough-da",
+      "title": "Gennemgang: administration af projekter",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/da-dk/dynamics365/business-central/walkthrough-managing-projects-with-jobs",
+      "appliesTo": "Current Danish Business Central online documentation; inspected 2026-09-25",
+      "accessedDate": "2026-09-25",
+      "fields": ["Projektopgavelinjer", "Projektplanlægningslinjer", "Opret projektsalgsfaktura"]
+    },
+    {
+      "sourceId": "microsoft-learn-project-walkthrough-fi",
+      "title": "Vaihe vaiheelta: projektien hallinta",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/fi-fi/dynamics365/business-central/walkthrough-managing-projects-with-jobs",
+      "appliesTo": "Current Finnish Business Central online documentation; inspected 2026-09-25",
+      "accessedDate": "2026-09-25",
+      "fields": ["Projektitehtävärivit", "Projektin suunnittelurivit", "Luo projektin myyntilasku"]
+    },
+    {
+      "sourceId": "microsoft-learn-project-walkthrough-nb",
+      "title": "Gjennomgang: administrering av prosjekter",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/nb-no/dynamics365/business-central/walkthrough-managing-projects-with-jobs",
+      "appliesTo": "Current Norwegian Bokmål Business Central online documentation; inspected 2026-09-25",
+      "accessedDate": "2026-09-25",
+      "fields": ["Prosjektoppgavelinjer", "Prosjektplanleggingslinjer", "Opprett salgsfaktura for prosjekt"]
+    },
+    {
+      "sourceId": "microsoft-learn-project-invoice",
+      "title": "Create a project sales invoice to invoice a project",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/en-us/dynamics365/business-central/projects-how-invoice-jobs",
+      "appliesTo": "Current English Business Central online documentation; inspected 2026-09-25",
+      "accessedDate": "2026-09-25",
+      "fields": ["Qty. To Transfer to Invoice", "Create Sales Invoice", "Get Project Planning Lines on Sales Invoice", "Post"]
+    },
+    {
+      "sourceId": "microsoft-learn-project-invoice-sv",
+      "title": "Skapa en försäljningsfaktura för projekt för att fakturera ett projekt",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/sv-se/dynamics365/business-central/projects-how-invoice-jobs",
+      "appliesTo": "Current Swedish Business Central online documentation; inspected 2026-09-25",
+      "accessedDate": "2026-09-25",
+      "fields": ["Antal att överföra till faktura", "Skapa försäljningsfaktura", "Hämta projektplaneringsrader on Sales Invoice", "Bokför"]
+    },
+    {
+      "sourceId": "microsoft-learn-project-invoice-fr",
+      "title": "Créer une facture vente projet pour facturer un projet",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/fr-fr/dynamics365/business-central/projects-how-invoice-jobs",
+      "appliesTo": "Current French Business Central online documentation; inspected 2026-09-25",
+      "accessedDate": "2026-09-25",
+      "fields": ["Qté à transférer à facturer", "Créer facture vente", "Extraire lignes Planning projet on Sales Invoice", "Valider"]
+    },
+    {
+      "sourceId": "microsoft-learn-project-invoice-de",
+      "title": "Projektverkaufsrechnungen erstellen, um ein Projekt zu fakturieren",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/de-de/dynamics365/business-central/projects-how-invoice-jobs",
+      "appliesTo": "Current German Business Central online documentation; inspected 2026-09-25",
+      "accessedDate": "2026-09-25",
+      "fields": ["In Rechnung zu übertragende Menge", "Verkaufsrechnung erstellen", "Projektplanzeilen abrufen on Sales Invoice", "Buchen"]
+    },
+    {
+      "sourceId": "microsoft-learn-project-invoice-es",
+      "title": "Crear una factura de ventas de proyecto para facturar un proyecto",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/es-es/dynamics365/business-central/projects-how-invoice-jobs",
+      "appliesTo": "Current Spanish Business Central online documentation; inspected 2026-09-25",
+      "accessedDate": "2026-09-25",
+      "fields": ["Cdad. para transferir a factura", "Crear factura venta", "Obtener líneas de planificación de proyecto on Sales Invoice", "Registrar"]
+    },
+    {
+      "sourceId": "microsoft-learn-project-invoice-da",
+      "title": "Oprette en projektsalgsfaktura for at fakturere for et projekt",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/da-dk/dynamics365/business-central/projects-how-invoice-jobs",
+      "appliesTo": "Current Danish Business Central online documentation; inspected 2026-09-25",
+      "accessedDate": "2026-09-25",
+      "fields": ["Antal til overførsel til faktura", "Opret salgsfaktura", "Hent projektplanlægningslinjer on Sales Invoice", "Bogfør"]
+    },
+    {
+      "sourceId": "microsoft-learn-project-invoice-fi",
+      "title": "Projektin laskuttaminen luomalla projektin myyntilasku",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/fi-fi/dynamics365/business-central/projects-how-invoice-jobs",
+      "appliesTo": "Current Finnish Business Central online documentation; inspected 2026-09-25",
+      "accessedDate": "2026-09-25",
+      "fields": ["Laskuun siirrettävä määrä", "Luo myyntilasku", "Hae projektin suunnittelurivit on Sales Invoice", "Kirjaa"]
+    },
+    {
+      "sourceId": "microsoft-learn-project-invoice-nb",
+      "title": "Opprett en prosjektsalgsfaktura for å fakturere et prosjekt",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/nb-no/dynamics365/business-central/projects-how-invoice-jobs",
+      "appliesTo": "Current Norwegian Bokmål Business Central online documentation; inspected 2026-09-25",
+      "accessedDate": "2026-09-25",
+      "fields": ["Ant. som skal overføres til faktura", "Opprett salgsfaktura", "Hent prosjektplanleggingslinjer on Sales Invoice", "Bokfør"]
     }
   ]
 }

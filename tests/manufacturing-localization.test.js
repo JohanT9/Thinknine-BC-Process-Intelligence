@@ -54,3 +54,23 @@ for (const ruleId of ['Manufacturing.PostProductionJournal', 'Manufacturing.Ente
   for (const [locale] of samples) assert.ok(rule.languages.includes(locale), `${ruleId} declares ${locale}`);
 }
 console.log('Production journal posting, output quantity, and consumption quantity matching passes in all eight supported UI locales.');
+const replanningCases=[
+ ['sv-SE','Produktionsorder','Omplanera','Uppdatera'],
+ ['en-US','Production Order','Replan','Refresh'],
+ ['fr-FR','Ordre de fabrication','Replanifier','Actualiser'],
+ ['de-DE','Fertigungsauftrag','Neu planen','Aktualisieren'],
+ ['es-ES','Orden de producción','Replanificar','Actualizar'],
+ ['da-DK','Produktionsordre','Omplanlæg','Forny'],
+ ['fi-FI','Tuotantotilaus','Uudelleensuunnittele','Päivitä'],
+ ['nb-NO','Produksjonsordre','Planlegg på nytt','Oppdater']
+];
+for(const [locale,page,replan,refresh] of replanningCases){
+ for(const [action,ruleId] of [[replan,'Manufacturing.ReplanProductionOrder'],[refresh,'Manufacturing.RefreshProductionOrder']]){
+  const result=repository.resolveAction({language:locale,context:{pageCaption:page,actionCaption:action}});
+  assert.equal(result.status,'resolved',`${locale} ${action}`);assert.equal(result.candidates[0].provenance.ruleId,ruleId);assert.equal(result.candidates[0].provenance.language,locale);assert.ok(result.candidates[0].provenance.sourceRefs.some(x=>x.sourceId.startsWith('microsoft-learn-production-replan-refresh')&&(locale==='en-US'?x.sourceId==='microsoft-learn-production-replan-refresh':x.sourceId.endsWith(`-${locale.slice(0,2).toLowerCase()}`))),`${locale} ${action} source`);
+ }
+}
+const statusCases=[
+ ['sv-SE','Produktionsorder','Ändra status'],['en-US','Production Order','Change Status'],['fr-FR','Ordre de fabrication','Modifier statut'],['de-DE','Fertigungsauftrag','Status ändern'],['es-ES','Orden de producción','Cambiar estado'],['da-DK','Produktionsordre','Skift status'],['fi-FI','Tuotantotilaus','Muuta tilaa'],['nb-NO','Produksjonsordre','Endre status']
+];
+for(const [locale,page,action] of statusCases){const result=repository.resolveAction({language:locale,context:{pageCaption:page,actionCaption:action}});assert.equal(result.status,'resolved',`${locale} status change`);assert.equal(result.candidates[0].provenance.ruleId,'Manufacturing.ChangeStatus');assert.equal(result.candidates[0].provenance.language,locale);assert.ok(result.candidates[0].provenance.sourceRefs.some(x=>x.sourceId==='microsoft-learn-production-orders'+(locale==='en-US'?'':`-${locale.slice(0,2)}`)),`${locale} status source`)}
