@@ -1,7 +1,7 @@
 {
   "packId": "bc-core",
   "name": "Business Central Core",
-  "version": "2.1.0",
+  "version": "2.2.0",
   "priority": 100,
   "pageDefinitions": [
     {
@@ -85,7 +85,13 @@
         "pagePatterns": [],
         "actionPatterns": [
           "^Sök$",
-          "^Search$"
+          "^Search$",
+          "^Rechercher$",
+          "^Suchen$",
+          "^Buscar$",
+          "^Søg$",
+          "^Haku$",
+          "^Søk$"
         ],
         "fieldPatterns": [],
         "automationIdPatterns": []
@@ -93,9 +99,35 @@
       "instructionTemplate": "",
       "languages": [
         "sv-SE",
-        "en-US"
+        "en-US",
+        "fr-FR",
+        "de-DE",
+        "es-ES",
+        "da-DK",
+        "fi-FI",
+        "nb-NO"
       ],
-      "aliases": []
+      "aliases": [],
+      "sourceIds": [
+        "microsoft-learn-ui-search-sv",
+        "microsoft-learn-ui-search",
+        "microsoft-learn-ui-search-fr",
+        "microsoft-learn-ui-search-de",
+        "microsoft-learn-ui-search-es",
+        "microsoft-learn-ui-search-da",
+        "microsoft-learn-ui-search-fi",
+        "microsoft-learn-ui-search-nb"
+      ],
+      "localizedInstructions": {
+        "sv-SE": "Använd Sök (Alt+Q) för att hitta sidan eller åtgärden. Skriv ett kort sid- eller åtgärdsnamn och välj resultatet som passar din roll och uppgift. Vilka resultat som visas beror på din roll och företagets Essentials- eller Premium-upplevelse.",
+        "en-US": "Use Search (Alt+Q) to find the page or action. Enter a short page or action name, then choose the result that fits your role and task. Available results depend on your role and your company’s Essentials or Premium experience.",
+        "fr-FR": "Utilisez Rechercher (Alt+Q) pour trouver la page ou l’action. Saisissez un nom de page ou d’action court, puis choisissez le résultat adapté à votre rôle et à votre tâche. Les résultats disponibles dépendent de votre rôle et de l’expérience Essentials ou Premium de votre entreprise.",
+        "de-DE": "Verwenden Sie Suchen (Alt+Q), um die Seite oder Aktion zu finden. Geben Sie einen kurzen Seiten- oder Aktionsnamen ein und wählen Sie das Ergebnis aus, das zu Ihrer Rolle und Aufgabe passt. Die verfügbaren Ergebnisse hängen von Ihrer Rolle und der Essentials- oder Premium-Erfahrung Ihres Unternehmens ab.",
+        "es-ES": "Use Buscar (Alt+Q) para encontrar la página o acción. Escriba un nombre breve de página o acción y elija el resultado que corresponda a su rol y tarea. Los resultados disponibles dependen de su rol y de si su empresa usa la experiencia Essentials o Premium.",
+        "da-DK": "Brug Søg (Alt+Q) til at finde siden eller handlingen. Skriv et kort sidenavn eller handlingsnavn, og vælg det resultat, der passer til din rolle og opgave. De tilgængelige resultater afhænger af din rolle og virksomhedens Essentials- eller Premium-oplevelse.",
+        "fi-FI": "Etsi sivu tai toiminto valitsemalla Haku (Alt+Q). Kirjoita lyhyt sivun tai toiminnon nimi ja valitse rooliisi ja tehtävääsi sopiva tulos. Käytettävissä olevat tulokset määräytyvät roolisi ja yrityksesi Essentials- tai Premium-käyttökokemuksen mukaan.",
+        "nb-NO": "Bruk Søk (Alt+Q) for å finne siden eller handlingen. Skriv inn et kort side- eller handlingsnavn, og velg resultatet som passer til rollen og oppgaven din. Hvilke resultater som er tilgjengelige, avhenger av rollen din og om selskapet bruker Essentials- eller Premium-opplevelsen."
+      }
     },
     {
       "ruleId": "Core.NavigateBack",
@@ -297,6 +329,110 @@
         "pageObjectId",
         "caption",
         "pageType"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-ui-search-sv",
+      "title": "Hitta sidor och information med Tell Me",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/sv-se/dynamics365/business-central/ui-search",
+      "appliesTo": "Current sv-SE localized Business Central online documentation; inspected 2026-09-25",
+      "accessedDate": "2026-09-25",
+      "fields": [
+        "Localized Search action (Sök) and Alt+Q shortcut",
+        "Search and navigation to pages, tasks, actions, and reports",
+        "Role- and experience-dependent result availability"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-ui-search",
+      "title": "Finding Pages and Information with Tell Me",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/en-us/dynamics365/business-central/ui-search",
+      "appliesTo": "Current en-US localized Business Central online documentation; inspected 2026-09-25",
+      "accessedDate": "2026-09-25",
+      "fields": [
+        "Localized Search action (Search) and Alt+Q shortcut",
+        "Search and navigation to pages, tasks, actions, and reports",
+        "Role- and experience-dependent result availability"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-ui-search-fr",
+      "title": "Recherche de pages et d’informations avec Tell Me",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/fr-fr/dynamics365/business-central/ui-search",
+      "appliesTo": "Current fr-FR localized Business Central online documentation; inspected 2026-09-25",
+      "accessedDate": "2026-09-25",
+      "fields": [
+        "Localized Search action (Rechercher) and Alt+Q shortcut",
+        "Search and navigation to pages, tasks, actions, and reports",
+        "Role- and experience-dependent result availability"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-ui-search-de",
+      "title": "Suchen von Seiten und Informationen mit Tell Me",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/de-de/dynamics365/business-central/ui-search",
+      "appliesTo": "Current de-DE localized Business Central online documentation; inspected 2026-09-25",
+      "accessedDate": "2026-09-25",
+      "fields": [
+        "Localized Search action (Suchen) and Alt+Q shortcut",
+        "Search and navigation to pages, tasks, actions, and reports",
+        "Role- and experience-dependent result availability"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-ui-search-es",
+      "title": "Buscar páginas e información con Tell Me",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/es-es/dynamics365/business-central/ui-search",
+      "appliesTo": "Current es-ES localized Business Central online documentation; inspected 2026-09-25",
+      "accessedDate": "2026-09-25",
+      "fields": [
+        "Localized Search action (Buscar) and Alt+Q shortcut",
+        "Search and navigation to pages, tasks, actions, and reports",
+        "Role- and experience-dependent result availability"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-ui-search-da",
+      "title": "Søge efter sider og oplysninger med Fortæl mig",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/da-dk/dynamics365/business-central/ui-search",
+      "appliesTo": "Current da-DK localized Business Central online documentation; inspected 2026-09-25",
+      "accessedDate": "2026-09-25",
+      "fields": [
+        "Localized Search action (Søg) and Alt+Q shortcut",
+        "Search and navigation to pages, tasks, actions, and reports",
+        "Role- and experience-dependent result availability"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-ui-search-fi",
+      "title": "Sivujen ja tietojen etsiminen Tell Me -parametrin avulla",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/fi-fi/dynamics365/business-central/ui-search",
+      "appliesTo": "Current fi-FI localized Business Central online documentation; inspected 2026-09-25",
+      "accessedDate": "2026-09-25",
+      "fields": [
+        "Localized Search action (Haku) and Alt+Q shortcut",
+        "Search and navigation to pages, tasks, actions, and reports",
+        "Role- and experience-dependent result availability"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-ui-search-nb",
+      "title": "Finn sider og informasjon med Fortell meg",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/nb-no/dynamics365/business-central/ui-search",
+      "appliesTo": "Current nb-NO localized Business Central online documentation; inspected 2026-09-25",
+      "accessedDate": "2026-09-25",
+      "fields": [
+        "Localized Search action (Søk) and Alt+Q shortcut",
+        "Search and navigation to pages, tasks, actions, and reports",
+        "Role- and experience-dependent result availability"
       ]
     }
   ]

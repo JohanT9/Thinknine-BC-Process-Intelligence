@@ -108,7 +108,7 @@
     "test:click-highlight": "node tests/click-highlight.test.js",
     "test:row-type": "node tests/row-type-context.test.js",
     "test:feature-flags": "node tests/feature-flags.test.js",
-    "test:knowledge-mcp": "node tests/knowledge-native-mcp-client.test.js && node tests/knowledge-mcp-background-bridge.test.js && node tests/knowledge-mcp-localization.test.js && node tests/knowledge-mcp-workflow.test.js && node tests/knowledge-catalog.test.js && node tests/warehouse-localization.test.js && node tests/sales-purchase-localization.test.js && node tests/manufacturing-localization.test.js && node tests/projects-localization.test.js && node tests/services-localization.test.js",
+    "test:knowledge-mcp": "node tests/knowledge-native-mcp-client.test.js && node tests/knowledge-mcp-background-bridge.test.js && node tests/knowledge-mcp-localization.test.js && node tests/knowledge-directives.test.js && node tests/knowledge-mcp-workflow.test.js && node tests/knowledge-catalog.test.js && node tests/warehouse-localization.test.js && node tests/sales-purchase-localization.test.js && node tests/manufacturing-localization.test.js && node tests/projects-localization.test.js && node tests/services-localization.test.js",
     "test:review-simplified-status": "node tests/review-simplified-status.test.js",
     "test:error-analysis-engine": "node tests/error-analysis-engine.test.js",
     "test:error-analysis-rules": "node tests/error-analysis-rules.test.js",

@@ -1,0 +1,35 @@
+const assert=require('node:assert/strict');
+const fs=require('fs');
+const pack=JSON.parse(fs.readFileSync('src/knowledge-packs/core.json','utf8'));
+const knowledge=require('../src/engine/knowledge-domain');
+const pipeline=require('../src/engine/session-interpretation-pipeline');
+const manifest=JSON.parse(fs.readFileSync('src/knowledge-packs/index.json','utf8'));
+const all=manifest.packs.filter(x=>x.enabled).map(x=>JSON.parse(fs.readFileSync('src/'+x.file,'utf8')));
+const cases=[
+ ['sv-SE','Sök'],['en-US','Search'],['fr-FR','Rechercher'],['de-DE','Suchen'],
+ ['es-ES','Buscar'],['da-DK','Søg'],['fi-FI','Haku'],['nb-NO','Søk']
+];
+for(const [language,caption] of cases){
+ const result=knowledge.apply([{taskId:language,taskType:'RunAction',actionCaption:caption,language}], [pack]);
+ const task=result.tasks[0];
+ assert.equal(task.knowledgeRule,'Core.SearchAndOpenPage',language);
+ assert.ok(task.userDirective,language+' should produce a directive');
+ assert.equal(task.userDirective,pack.rules.find(x=>x.ruleId==='Core.SearchAndOpenPage').localizedInstructions[language]);
+ assert.ok(task.userDirectiveSourceIds.some(sourceId=>pack.sources.some(source=>source.sourceId===sourceId)));
+}
+const rule=pack.rules.find(x=>x.ruleId==='Core.SearchAndOpenPage');
+assert.deepEqual(Object.keys(rule.localizedInstructions).sort(),cases.map(x=>x[0]).sort());
+assert.equal(new Set(rule.sourceIds).size,8);
+for(const sourceId of rule.sourceIds)assert.ok(pack.sources.some(source=>source.sourceId===sourceId),sourceId);
+const fiGroup={stepGroupId:'directive-fi',recordingId:'directive-test',groupKind:'action',
+ primaryNormalizedEvent:{pageIdentification:{pageCaption:'Roolikeskus'},actionIdentification:{caption:'Haku'},controlIdentification:{}},
+ pageContext:{pageCaption:'Roolikeskus'},actionContext:{caption:'Haku'},controlContext:{},
+ sourceEventIds:[],normalizedEventIds:[],evidence:[],guidance:{}};
+const interpreted=pipeline.interpret({language:'fi-FI',session:{id:'directive-test'},events:[],stepGroups:[fiGroup],knowledgePacks:all});
+const directive=interpreted.businessTasks.find(task=>task.userDirective?.includes('Valitse Haku') || task.userDirective?.includes('Haku (Alt+Q)'));
+assert.ok(directive,'the recording pipeline should apply the localized core search directive');
+assert.equal(directive.userDirective,rule.localizedInstructions['fi-FI']);
+assert.ok(directive.userDirectiveSourceIds.includes('microsoft-learn-ui-search-fi'));
+assert.ok(directive.instruction.startsWith('Välj **Haku**'),'the recorded-step instruction should stay intact');
+assert.notEqual(directive.instruction,directive.userDirective,'the directive must remain separate from the observed-step instruction');
+console.log('Core search user directives resolve and stay localized across all eight UI languages, including session interpretation.');

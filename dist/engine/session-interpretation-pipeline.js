@@ -55,7 +55,7 @@ function (semantic, knowledge, refs, processAnalysis) {
       sourceEventIds: action.sourceEventIds,
       normalizedEventIds: action.normalizedEventIds,
       stepGroupIds: action.stepGroupIds, semanticActionIds: [action.actionId] });
-    const actionTask = /Action|Dialog/u.test(String(action.actionType || ""));
+    const actionTask = /Action|Dialog|SearchAndOpenPage/u.test(String(action.actionType || ""));
     const observedActionCaption = action.actionCaption ||
       [...(action.rawInteractions || [])].reverse()
         .map(interaction => interaction.actionCaption).find(Boolean) ||
@@ -76,6 +76,7 @@ function (semantic, knowledge, refs, processAnalysis) {
         interactionId: action.interactionId || null
       } : {}),
       instruction: action.displayText || "", description: action.displayText || "",
+      actionCaption: observedActionCaption || "",
       pageId: action.pageId || "", pageObjectId: action.pageObjectId || "",
       pageIdentity: action.pageIdentity || "",
       pageCaption: action.pageCaption || "",
@@ -115,7 +116,7 @@ function (semantic, knowledge, refs, processAnalysis) {
       confidence: action.confidence || 0.55 };
   }
 
-  function applyRepositoryResolutions(tasks, repository, releaseId) {
+  function applyRepositoryResolutions(tasks, repository, releaseId, inputLanguage = "") {
     if (!repository?.resolveAction) return tasks;
     const resolutions = tasks.map(task => {
       const objectRef = task.knowledgeObjectRef || {};
@@ -124,6 +125,7 @@ function (semantic, knowledge, refs, processAnalysis) {
       const control = repository.resolveControl({ objectRef, controlRef, releaseId });
       const action = objectRef.objectId && object.status === "resolved"
         ? repository.resolveAction({ objectRef, controlRef,
+        language: task.language || task.context?.language || inputLanguage || "en-US",
         context: { pageCaption: task.pageCaption || task.context?.currentPageCaption || "",
           actionCaption: task.actionCaption || "", fieldCaption: task.fieldCaption || "",
           currentEntity: task.context?.currentEntity || "",
@@ -160,8 +162,12 @@ function (semantic, knowledge, refs, processAnalysis) {
         reviewSuggested: Number.isFinite(selected.confidence)
           ? selected.confidence < 0.85 : task.reviewSuggested,
         knowledgeResolution: resolution,
-        ...(rule?.instructionTemplate ? { instruction: rule.instructionTemplate,
-          description: rule.instructionTemplate } : {}) };
+        ...(() => {
+          const instruction = knowledge.localizedInstruction(rule,
+            selected.provenance?.language || task.language || task.context?.language || "en-US");
+          return instruction ? { userDirective: instruction,
+            userDirectiveSourceIds: [...(rule.sourceIds || [])] } : {};
+        })() };
     });
   }
 
@@ -216,10 +222,12 @@ function (semantic, knowledge, refs, processAnalysis) {
     const actions = semantic.processStepGroups(activeGroups);
     const byId = eventIndex(input.events);
     const baseTasks = actions.filter(action => !action.hidden)
-      .map((action, index) => task(action, index, byId, input.imagePaths));
+      .map((action, index) => ({ ...task(action, index, byId, input.imagePaths),
+        language: input.language || input.session?.language || "en-US" }));
     const knowledgeResult = knowledge.apply(baseTasks, input.knowledgePacks || []);
     const repositoryTasks = applyRepositoryResolutions(knowledgeResult.tasks,
-      input.knowledgeRepository, input.knowledgeReleaseId);
+      input.knowledgeRepository, input.knowledgeReleaseId, input.language ||
+        input.session?.language || "en-US");
     const tasks = repositoryTasks.map((value, index) => ({
       ...value, taskNo: index + 1,
       taskId: `${value.taskType || "Task"}:${refs.stableIdentity(value)}`,

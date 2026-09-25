@@ -67,6 +67,13 @@
         automationIdPatterns: exact(task.automationId) } };
   }
 
+  function localizedInstruction(rule, language) {
+    const localized = rule?.localizedInstructions || {};
+    const tag = text(language).trim();
+    const base = tag.split("-")[0];
+    return localized[tag] || localized[base] || rule?.instructionTemplate || "";
+  }
+
   function apply(tasks = [], packs = []) {
     const availableRules = rules(packs); const unmatched = [];
     const enriched = tasks.map(task => {
@@ -81,6 +88,8 @@
           reviewSuggested: true };
       }
       const rule = found.rule;
+      const instruction = localizedInstruction(rule, task.language || task.locale ||
+        task.context?.language || task.context?.locale || "en-US");
       return { ...task, taskType: rule.taskType || task.taskType,
         semanticAction: rule.semanticAction || task.semanticAction,
         entity: rule.entity || task.entity || "", knowledgeFrameworkVersion: VERSION,
@@ -89,12 +98,32 @@
         knowledgePackVersion: rule.packVersion,
         confidence: rule.confidence || task.confidence || 0.8,
         reviewSuggested: (rule.confidence || 0.8) < 0.85,
-        ...(rule.instructionTemplate ? { instruction: rule.instructionTemplate } : {}) };
+        ...(instruction ? { userDirective: instruction,
+          userDirectiveSourceIds: [...(rule.sourceIds || [])] } : {}) };
     });
     const consolidated = consolidation.consolidateWithAnalysis(enriched);
-    return { tasks: consolidated.tasks,
+    const tasksWithKnowledge = consolidated.tasks.map(task => {
+      const sourceTaskIds = new Set(task.sourceTaskIds || [task.taskId]);
+      const matches = enriched.filter(item => sourceTaskIds.has(item.taskId) ||
+        (item.stepGroupIds || []).some(id => sourceTaskIds.has(id)));
+      const rules = [...new Set(matches.map(item => item.knowledgeRule).filter(Boolean))];
+      const directives = [...new Set(matches.map(item => item.userDirective).filter(Boolean))];
+      const sourceIds = [...new Set(matches.flatMap(item =>
+        item.userDirectiveSourceIds || []))];
+      if (rules.length !== 1) return task;
+      const matched = matches.find(item => item.knowledgeRule === rules[0]);
+      return { ...task, knowledgeMatched: true,
+        knowledgeRule: matched.knowledgeRule,
+        knowledgePackId: matched.knowledgePackId,
+        knowledgePackName: matched.knowledgePackName,
+        knowledgePackVersion: matched.knowledgePackVersion,
+        knowledgeFrameworkVersion: matched.knowledgeFrameworkVersion,
+        ...(directives.length === 1 ? { userDirective: directives[0],
+          userDirectiveSourceIds: sourceIds } : {}) };
+    });
+    return { tasks: tasksWithKnowledge,
       consolidationDecisions: consolidated.decisions,
       unmatched, rules: availableRules };
   }
-  return { VERSION, apply, match, patternsMatch, rules, score };
+  return { VERSION, apply, match, patternsMatch, rules, score, localizedInstruction };
 });
