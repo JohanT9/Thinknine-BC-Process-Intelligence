@@ -66,6 +66,25 @@ const purchaseAux=[
  ['fi-FI','Ostotilaus','Nimikkeen nro','Toimittajan nimi','Vapauta','microsoft-learn-purchase-recording-fi'],
  ['nb-NO','Bestilling','Varenr.','Leverandørnavn','Frigi','microsoft-learn-purchase-recording-nb']
 ];
+const reopenCases=[
+ ['sv-SE','Förs.order','Inköpsorder','Öppna igen','microsoft-learn-release-reopen-documents-sv'],
+ ['en-US','Sales Order','Purchase Order','Reopen','microsoft-learn-release-reopen-documents'],
+ ['fr-FR','Commande vente','Commande achat','Rouvrir','microsoft-learn-release-reopen-documents-fr'],
+ ['de-DE','Verkaufsauftrag','Bestellung','Erneut öffnen','microsoft-learn-release-reopen-documents-de'],
+ ['es-ES','Pedido de venta','Pedido de compra','Reabrir','microsoft-learn-release-reopen-documents-es'],
+ ['da-DK','Salgsordre','Indkøbsordre','Genåbne','microsoft-learn-release-reopen-documents-da'],
+ ['fi-FI','Myyntitilaus','Ostotilaus','Avaa uudelleen','microsoft-learn-sales-prepayments-fi'],
+ ['nb-NO','Ordre','Bestilling','Åpne på nytt','microsoft-learn-release-reopen-documents-nb']
+];
+for(const [locale,salesPage,purchasePage,reopen,source] of reopenCases){
+ for(const [page,ruleId] of [[salesPage,'Sales.Reopen'],[purchasePage,'Purchase.Reopen']]){
+  const result=repo.resolveAction({language:locale,context:{pageCaption:page,actionCaption:reopen}});
+  assert.equal(result.status,'resolved',`${locale} ${ruleId}`);assert.equal(result.candidates[0].provenance.ruleId,ruleId);
+  assert.equal(result.candidates[0].provenance.language,locale);const sourceId=locale==='fi-FI'&&ruleId==='Purchase.Reopen'?'microsoft-learn-purchase-recording-fi':source;assert.ok(result.candidates[0].provenance.sourceRefs.some(x=>x.sourceId===sourceId),`${locale} ${ruleId} source`);
+ }
+ const wrongPage=repo.resolveAction({language:locale,context:{pageCaption:'Item Card',actionCaption:reopen}});
+ assert.notEqual(wrongPage.status,'resolved',`${locale} reopen must require sales/purchase document context`);
+}
 for(const [locale,page,itemField,vendorField,release,source] of purchaseAux){
  for(const [field,ruleId] of [[itemField,'Purchase.SelectPurchaseLineItem'],[vendorField,'Purchase.SelectVendor']]){
   const result=repo.resolveAction({language:locale,context:{pageCaption:page,fieldCaption:field}});
@@ -84,8 +103,29 @@ for(const [locale,page,receive,quantity,post,source] of purchase){
  const posted=repo.resolveAction({language:locale,context:{pageCaption:page,actionCaption:post}});
  assert.equal(posted.status,'resolved',`${locale} purchase post`);assert.equal(posted.candidates[0].provenance.ruleId,'Purchase.Post');
 }
-for(const packId of ['bc-sales','bc-purchase'])for(const rule of imported.snapshot.packs.find(x=>x.packId===packId).rules.filter(x=>x.languages?.includes('fr-FR')||x.sourceIds?.some(id=>/order-process-|purchase-recording-/.test(id))))for(const locale of locales)assert.ok(rule.languages.includes(locale),`${rule.ruleId} ${locale}`);
-console.log('Sales and purchase line, shipment/receipt quantity, and posting rules resolve in all eight supported locales.');
+for(const packId of ['bc-sales','bc-purchase'])for(const rule of imported.snapshot.packs.find(x=>x.packId===packId).rules.filter(x=>x.languages?.includes('fr-FR')||x.sourceIds?.some(id=>/order-process-|purchase-recording-|release-reopen-documents|purchase-date-calculation|sales-date-calculation/.test(id))))for(const locale of locales)assert.ok(rule.languages.includes(locale),`${rule.ruleId} ${locale}`);
+console.log('Sales and purchase line, release/reopen, date fields, shipment/receipt quantity, and posting rules resolve in all eight supported locales.');
+const dateFieldCases=[
+ ['sv-SE','Inköpsorder','Förväntat kvittodatum','Försäljningsorder','Utleveransdatum','microsoft-learn-purchase-date-calculation-sv','microsoft-learn-sales-date-calculation-sv'],
+ ['en-US','Purchase Order','Expected Receipt Date','Sales Order','Shipment Date','microsoft-learn-purchase-date-calculation','microsoft-learn-sales-date-calculation'],
+ ['fr-FR','Commande achat','Date de réception attendue','Commande vente','Date d’expédition','microsoft-learn-purchase-date-calculation-fr','microsoft-learn-sales-date-calculation-fr'],
+ ['de-DE','Bestellung','Erwartetes Wareneingangsdatum','Verkaufsauftrag','Versanddatum','microsoft-learn-purchase-date-calculation-de','microsoft-learn-sales-date-calculation-de'],
+ ['es-ES','Pedido de compra','Fecha de recepción esperada','Pedido de venta','Fecha envío','microsoft-learn-purchase-date-calculation-es','microsoft-learn-sales-date-calculation-es'],
+ ['da-DK','Indkøbsordre','Forventet modtagelsesdato','Salgsordre','Afsendelsesdato','microsoft-learn-purchase-date-calculation-da','microsoft-learn-sales-date-calculation-da'],
+ ['fi-FI','Ostotilaus','Odotettu vastaanottopäivä','Myyntitilaus','Toimituspäivä','microsoft-learn-purchase-recording-fi','microsoft-learn-sales-order-process-fi'],
+ ['nb-NO','Bestilling','Forventet mottaksdato','Ordre','Forsendelsesdato','microsoft-learn-purchase-date-calculation-nb','microsoft-learn-sales-date-calculation-nb']
+];
+for(const [locale,purchasePage,receipt,salesPage,shipment,purchaseSource,salesSource] of dateFieldCases){
+ for(const [page,field,ruleId,sourceId] of [[purchasePage,receipt,'Purchase.ChangeExpectedReceiptDate',purchaseSource],[salesPage,shipment,'Sales.ChangeShipmentDate',salesSource]]){
+  const result=repo.resolveAction({language:locale,context:{pageCaption:page,fieldCaption:field}});
+  assert.equal(result.status,'resolved',locale+' '+ruleId);assert.equal(result.candidates[0].provenance.ruleId,ruleId);assert.equal(result.candidates[0].provenance.language,locale);assert.ok(result.candidates[0].provenance.sourceRefs.some(x=>x.sourceId===sourceId),locale+' '+ruleId+' source');
+ }
+}
+for(const [locale,field] of [['sv-SE','Förväntat kvittodatum'],['en-US','Expected Receipt Date']]){
+ const wrong=repo.resolveAction({language:locale,context:{pageCaption:'Item Card',fieldCaption:field}});
+ assert.ok(!wrong.candidates.some(x=>x.provenance.ruleId==='Purchase.ChangeExpectedReceiptDate'),locale+' receipt-date rule must require purchase-order context');
+}
+
 const invoiceCases=[
  ['en-US','Purchase Invoice','Get Receipt Lines','Get Order Lines','Sales Invoice','Get Shipment Lines'],
  ['sv-SE','Inköpsfaktura','Hämta inleveransrader','Hämta orderrader','Försäljningsfaktura','Hämta utleveransrader'],
@@ -99,6 +139,6 @@ const invoiceCases=[
 for(const [locale,purchasePage,receipt,order,salesPage,shipment] of invoiceCases){
  for(const [packId,page,action,ruleId,sourcePrefix] of [['bc-purchase',purchasePage,receipt,'Purchase.GetReceiptLines','microsoft-learn-purchase-combine-invoice'],['bc-purchase',purchasePage,order,'Purchase.GetOrderLines','microsoft-learn-purchase-combine-invoice'],['bc-sales',salesPage,shipment,'Sales.GetShipmentLines','microsoft-learn-sales-combine-shipments']]){
   const result=repo.resolveAction({language:locale,context:{pageCaption:page,actionCaption:action}});
-  assert.equal(result.status,'resolved',`${locale} ${ruleId}`);assert.equal(result.candidates[0].provenance.ruleId,ruleId);assert.equal(result.candidates[0].provenance.language,locale);assert.ok(result.candidates[0].provenance.sourceRefs.some(x=>x.sourceId.startsWith(sourcePrefix)&&x.sourceId.endsWith(locale==='en-US'?'':`-${locale.slice(0,2).toLowerCase()}`)),`${locale} ${ruleId} source`);
+  assert.equal(result.status,'resolved',locale+' '+ruleId);assert.equal(result.candidates[0].provenance.ruleId,ruleId);assert.equal(result.candidates[0].provenance.language,locale);assert.ok(result.candidates[0].provenance.sourceRefs.some(x=>x.sourceId.startsWith(sourcePrefix)&&x.sourceId.endsWith(locale==='en-US'?'':`-${locale.slice(0,2).toLowerCase()}`)),locale+' '+ruleId+' source');
  }
 }

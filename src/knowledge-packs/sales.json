@@ -1,7 +1,7 @@
 {
   "packId": "bc-sales",
   "name": "Business Central Sales",
-  "version": "2.3.0",
+  "version": "2.5.0",
   "priority": 200,
   "pageDefinitions": [
     {
@@ -351,12 +351,30 @@
       "confidence": 0.99,
       "match": {
         "pagePatterns": [
-          "förs\\.?\\s*order",
-          "sales order"
+          "^Förs\\.order$",
+          "^Försäljningsorder$",
+          "^Sales Order$",
+          "^Commande vente$",
+          "^Commandes client$",
+          "^Verkaufsauftrag$",
+          "^Verkaufsaufträge$",
+          "^Pedido de venta$",
+          "^Pedidos de venta$",
+          "^Salgsordre$",
+          "^Salgsordrer$",
+          "^Myyntitilaus$",
+          "^Myyntitilaukset$",
+          "^Ordre$"
         ],
         "actionPatterns": [
+          "^Reopen$",
           "^Öppna igen$",
-          "^Reopen$"
+          "^Rouvrir$",
+          "^Erneut öffnen$",
+          "^Reabrir$",
+          "^Genåbne$",
+          "^Avaa uudelleen$",
+          "^Åpne på nytt$"
         ],
         "fieldPatterns": [],
         "automationIdPatterns": []
@@ -364,9 +382,25 @@
       "instructionTemplate": "",
       "languages": [
         "sv-SE",
-        "en-US"
+        "en-US",
+        "fr-FR",
+        "de-DE",
+        "es-ES",
+        "da-DK",
+        "fi-FI",
+        "nb-NO"
       ],
-      "aliases": []
+      "aliases": [],
+      "sourceIds": [
+        "microsoft-learn-release-reopen-documents",
+        "microsoft-learn-release-reopen-documents-sv",
+        "microsoft-learn-release-reopen-documents-fr",
+        "microsoft-learn-release-reopen-documents-de",
+        "microsoft-learn-release-reopen-documents-es",
+        "microsoft-learn-release-reopen-documents-da",
+        "microsoft-learn-sales-prepayments-fi",
+        "microsoft-learn-release-reopen-documents-nb"
+      ]
     },
     {
       "ruleId": "Sales.Post",
@@ -448,22 +482,50 @@
       "confidence": 0.99,
       "match": {
         "pagePatterns": [
-          "förs\\.?\\s*order",
-          "sales order"
+          "^Försäljningsorder$",
+          "^Sales Order$",
+          "^Commande vente$",
+          "^Verkaufsauftrag$",
+          "^Pedido de venta$",
+          "^Salgsordre$",
+          "^Myyntitilaus$",
+          "^Ordre$"
         ],
         "actionPatterns": [],
         "fieldPatterns": [
           "^Utleveransdatum$",
-          "^Shipment Date$"
+          "^Shipment Date$",
+          "^Date d’expédition$",
+          "^Versanddatum$",
+          "^Fecha envío$",
+          "^Afsendelsesdato$",
+          "^Toimituspäivä$",
+          "^Forsendelsesdato$"
         ],
         "automationIdPatterns": []
       },
       "instructionTemplate": "",
       "languages": [
         "sv-SE",
-        "en-US"
+        "en-US",
+        "fr-FR",
+        "de-DE",
+        "es-ES",
+        "da-DK",
+        "fi-FI",
+        "nb-NO"
       ],
-      "aliases": []
+      "aliases": [],
+      "sourceIds": [
+        "microsoft-learn-sales-date-calculation-sv",
+        "microsoft-learn-sales-date-calculation",
+        "microsoft-learn-sales-date-calculation-fr",
+        "microsoft-learn-sales-date-calculation-de",
+        "microsoft-learn-sales-date-calculation-es",
+        "microsoft-learn-sales-date-calculation-da",
+        "microsoft-learn-sales-order-process-fi",
+        "microsoft-learn-sales-date-calculation-nb"
+      ]
     },
     {
       "ruleId": "Sales.SelectCustomer",
@@ -1918,6 +1980,186 @@
         "Get Shipment Lines action",
         "Manual and automatic invoice combination",
         "Same-customer and same-currency prerequisites"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-release-reopen-documents",
+      "title": "Release and reopen sales and purchase documents",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/en-us/dynamics365/business-central/release-reopen-documents",
+      "appliesTo": "Current en-US Business Central online documentation; inspected 2026-09-25",
+      "accessedDate": "2026-09-25",
+      "fields": [
+        "Reopen action",
+        "Sales orders and sales documents",
+        "Released to open status"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-release-reopen-documents-sv",
+      "title": "Släppa och öppna försäljnings- och inköpsdokument igen",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/sv-se/dynamics365/business-central/release-reopen-documents",
+      "appliesTo": "Current sv-SE Business Central online documentation; inspected 2026-09-25",
+      "accessedDate": "2026-09-25",
+      "fields": [
+        "Öppna igen action",
+        "Försäljningsorder",
+        "Släppt till öppet status"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-release-reopen-documents-fr",
+      "title": "Libérer et rouvrir les documents de vente et d’achat",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/fr-fr/dynamics365/business-central/release-reopen-documents",
+      "appliesTo": "Current fr-FR Business Central online documentation; inspected 2026-09-25",
+      "accessedDate": "2026-09-25",
+      "fields": [
+        "Rouvrir action",
+        "Commandes clients",
+        "Released to open status"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-release-reopen-documents-de",
+      "title": "Verkaufs- und Einkaufsbelege freigeben und erneut öffnen",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/de-de/dynamics365/business-central/release-reopen-documents",
+      "appliesTo": "Current de-DE Business Central online documentation; inspected 2026-09-25",
+      "accessedDate": "2026-09-25",
+      "fields": [
+        "Erneut öffnen action",
+        "Verkaufsaufträge",
+        "Freigegeben zu offenem Status"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-release-reopen-documents-es",
+      "title": "Liberar y reabrir documentos de compras y ventas",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/es-es/dynamics365/business-central/release-reopen-documents",
+      "appliesTo": "Current es-ES Business Central online documentation; inspected 2026-09-25",
+      "accessedDate": "2026-09-25",
+      "fields": [
+        "Reabrir action",
+        "Pedidos de venta",
+        "Released to open status"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-release-reopen-documents-da",
+      "title": "Frigive og genåbne salgs- og købsdokumenter",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/da-dk/dynamics365/business-central/release-reopen-documents",
+      "appliesTo": "Current da-DK Business Central online documentation; inspected 2026-09-25",
+      "accessedDate": "2026-09-25",
+      "fields": [
+        "Genåbne action",
+        "Salgsordrer",
+        "Released to open status"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-sales-prepayments-fi",
+      "title": "Myynnin ennakkomaksujen määrittäminen ja laskuttaminen",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/fi-fi/dynamics365/business-central/walkthrough-setting-up-and-invoicing-sales-prepayments",
+      "appliesTo": "Current fi-FI Business Central online documentation; inspected 2026-09-25",
+      "accessedDate": "2026-09-25",
+      "fields": [
+        "Avaa uudelleen action on a sales order",
+        "Reopen order to make changes"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-release-reopen-documents-nb",
+      "title": "Frigi og åpne salgs- og kjøpsdokumenter på nytt",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/nb-no/dynamics365/business-central/release-reopen-documents",
+      "appliesTo": "Current nb-NO Business Central online documentation; inspected 2026-09-25",
+      "accessedDate": "2026-09-25",
+      "fields": [
+        "Åpne på nytt action",
+        "Salgsordrer",
+        "Released to open status"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-sales-date-calculation-sv",
+      "title": "Beräkning av leveransdatum för försäljning",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/sv-se/dynamics365/business-central/sales-date-calculation-for-sales",
+      "appliesTo": "Current sv-SE localized Business Central online documentation; inspected 2026-09-25",
+      "accessedDate": "2026-09-25",
+      "fields": [
+        "Utleveransdatum field on sales order lines"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-sales-date-calculation",
+      "title": "Delivery date calculation for sales",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/en-us/dynamics365/business-central/sales-date-calculation-for-sales",
+      "appliesTo": "Current en-US localized Business Central online documentation; inspected 2026-09-25",
+      "accessedDate": "2026-09-25",
+      "fields": [
+        "Shipment Date field on sales order lines"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-sales-date-calculation-fr",
+      "title": "Calcul de la date de livraison des ventes",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/fr-fr/dynamics365/business-central/sales-date-calculation-for-sales",
+      "appliesTo": "Current fr-FR localized Business Central online documentation; inspected 2026-09-25",
+      "accessedDate": "2026-09-25",
+      "fields": [
+        "Date d’expédition field on sales order lines"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-sales-date-calculation-de",
+      "title": "Lieferdatumsberechnung für Verkäufe",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/de-de/dynamics365/business-central/sales-date-calculation-for-sales",
+      "appliesTo": "Current de-DE localized Business Central online documentation; inspected 2026-09-25",
+      "accessedDate": "2026-09-25",
+      "fields": [
+        "Versanddatum field on sales order lines"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-sales-date-calculation-es",
+      "title": "Cálculo de la fecha de entrega de las ventas",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/es-es/dynamics365/business-central/sales-date-calculation-for-sales",
+      "appliesTo": "Current es-ES localized Business Central online documentation; inspected 2026-09-25",
+      "accessedDate": "2026-09-25",
+      "fields": [
+        "Fecha envío field on sales order lines"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-sales-date-calculation-da",
+      "title": "Beregne leveringsdato for salg",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/da-dk/dynamics365/business-central/sales-date-calculation-for-sales",
+      "appliesTo": "Current da-DK localized Business Central online documentation; inspected 2026-09-25",
+      "accessedDate": "2026-09-25",
+      "fields": [
+        "Afsendelsesdato field on sales order lines"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-sales-date-calculation-nb",
+      "title": "Beregn leveringsdato for salg",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/nb-no/dynamics365/business-central/sales-date-calculation-for-sales",
+      "appliesTo": "Current nb-NO localized Business Central online documentation; inspected 2026-09-25",
+      "accessedDate": "2026-09-25",
+      "fields": [
+        "Forsendelsesdato field on sales order lines"
       ]
     }
   ]

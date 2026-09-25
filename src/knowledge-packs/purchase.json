@@ -1,7 +1,7 @@
 {
   "packId": "bc-purchase",
   "name": "Business Central Purchase",
-  "version": "2.3.0",
+  "version": "2.5.0",
   "priority": 200,
   "pageDefinitions": [
     {
@@ -354,12 +354,34 @@
       "confidence": 0.99,
       "match": {
         "pagePatterns": [
-          "inköpsorder",
-          "purchase order"
+          "^Inköpsorder$",
+          "^Inköpsordrar$",
+          "^Purchase Order$",
+          "^Purchase Orders$",
+          "^Commande achat$",
+          "^Commandes achat$",
+          "^Commandes d’achat$",
+          "^Bestellung$",
+          "^Bestellungen$",
+          "^Einkaufsbestellung$",
+          "^Pedido de compra$",
+          "^Pedidos de compra$",
+          "^Indkøbsordre$",
+          "^Indkøbsordrer$",
+          "^Ostotilaus$",
+          "^Ostotilaukset$",
+          "^Bestilling$",
+          "^Bestillinger$"
         ],
         "actionPatterns": [
+          "^Reopen$",
           "^Öppna igen$",
-          "^Reopen$"
+          "^Rouvrir$",
+          "^Erneut öffnen$",
+          "^Reabrir$",
+          "^Genåbne$",
+          "^Avaa uudelleen$",
+          "^Åpne på nytt$"
         ],
         "fieldPatterns": [],
         "automationIdPatterns": []
@@ -367,9 +389,25 @@
       "instructionTemplate": "",
       "languages": [
         "sv-SE",
-        "en-US"
+        "en-US",
+        "fr-FR",
+        "de-DE",
+        "es-ES",
+        "da-DK",
+        "fi-FI",
+        "nb-NO"
       ],
-      "aliases": []
+      "aliases": [],
+      "sourceIds": [
+        "microsoft-learn-release-reopen-documents",
+        "microsoft-learn-release-reopen-documents-sv",
+        "microsoft-learn-release-reopen-documents-fr",
+        "microsoft-learn-release-reopen-documents-de",
+        "microsoft-learn-release-reopen-documents-es",
+        "microsoft-learn-release-reopen-documents-da",
+        "microsoft-learn-purchase-recording-fi",
+        "microsoft-learn-release-reopen-documents-nb"
+      ]
     },
     {
       "ruleId": "Purchase.Post",
@@ -531,20 +569,51 @@
       "priority": 1000,
       "confidence": 0.98,
       "match": {
-        "pagePatterns": [],
+        "pagePatterns": [
+          "^Inköpsorder$",
+          "^Purchase Order$",
+          "^Commande achat$",
+          "^Bestellung$",
+          "^Pedido de compra$",
+          "^Indkøbsordre$",
+          "^Ostotilaus$",
+          "^Bestilling$"
+        ],
         "actionPatterns": [],
         "fieldPatterns": [
-          "förväntat inleveransdatum",
-          "expected receipt date"
+          "^Förväntat kvittodatum$",
+          "^Expected Receipt Date$",
+          "^Date de réception attendue$",
+          "^Erwartetes Wareneingangsdatum$",
+          "^Fecha de recepción esperada$",
+          "^Forventet modtagelsesdato$",
+          "^Odotettu vastaanottopäivä$",
+          "^Forventet mottaksdato$"
         ],
         "automationIdPatterns": []
       },
       "instructionTemplate": "",
       "languages": [
         "sv-SE",
-        "en-US"
+        "en-US",
+        "fr-FR",
+        "de-DE",
+        "es-ES",
+        "da-DK",
+        "fi-FI",
+        "nb-NO"
       ],
-      "aliases": []
+      "aliases": [],
+      "sourceIds": [
+        "microsoft-learn-purchase-date-calculation-sv",
+        "microsoft-learn-purchase-date-calculation",
+        "microsoft-learn-purchase-date-calculation-fr",
+        "microsoft-learn-purchase-date-calculation-de",
+        "microsoft-learn-purchase-date-calculation-es",
+        "microsoft-learn-purchase-date-calculation-da",
+        "microsoft-learn-purchase-recording-fi",
+        "microsoft-learn-purchase-date-calculation-nb"
+      ]
     },
     {
       "ruleId": "Purchase.SetQtyToReceive",
@@ -1770,6 +1839,174 @@
         "Get Receipt Lines and Get Order Lines actions",
         "Invoice matching and posting conditions",
         "Limitations for projects, prepayments and advanced warehouse operations"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-release-reopen-documents",
+      "title": "Release and reopen sales and purchase documents",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/en-us/dynamics365/business-central/release-reopen-documents",
+      "appliesTo": "Current en-US Business Central online documentation; inspected 2026-09-25",
+      "accessedDate": "2026-09-25",
+      "fields": [
+        "Reopen action",
+        "Purchase orders and purchase documents",
+        "Released to open status"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-release-reopen-documents-sv",
+      "title": "Släppa och öppna försäljnings- och inköpsdokument igen",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/sv-se/dynamics365/business-central/release-reopen-documents",
+      "appliesTo": "Current sv-SE Business Central online documentation; inspected 2026-09-25",
+      "accessedDate": "2026-09-25",
+      "fields": [
+        "Öppna igen action",
+        "Inköpsorder",
+        "Släppt till öppet status"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-release-reopen-documents-fr",
+      "title": "Libérer et rouvrir les documents de vente et d’achat",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/fr-fr/dynamics365/business-central/release-reopen-documents",
+      "appliesTo": "Current fr-FR Business Central online documentation; inspected 2026-09-25",
+      "accessedDate": "2026-09-25",
+      "fields": [
+        "Rouvrir action",
+        "Commandes d’achat",
+        "Released to open status"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-release-reopen-documents-de",
+      "title": "Verkaufs- und Einkaufsbelege freigeben und erneut öffnen",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/de-de/dynamics365/business-central/release-reopen-documents",
+      "appliesTo": "Current de-DE Business Central online documentation; inspected 2026-09-25",
+      "accessedDate": "2026-09-25",
+      "fields": [
+        "Erneut öffnen action",
+        "Einkaufsaufträge",
+        "Freigegeben zu offenem Status"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-release-reopen-documents-es",
+      "title": "Liberar y reabrir documentos de compras y ventas",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/es-es/dynamics365/business-central/release-reopen-documents",
+      "appliesTo": "Current es-ES Business Central online documentation; inspected 2026-09-25",
+      "accessedDate": "2026-09-25",
+      "fields": [
+        "Reabrir action",
+        "Pedidos de compra",
+        "Released to open status"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-release-reopen-documents-da",
+      "title": "Frigive og genåbne salgs- og købsdokumenter",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/da-dk/dynamics365/business-central/release-reopen-documents",
+      "appliesTo": "Current da-DK Business Central online documentation; inspected 2026-09-25",
+      "accessedDate": "2026-09-25",
+      "fields": [
+        "Genåbne action",
+        "Købsordrer",
+        "Released to open status"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-release-reopen-documents-nb",
+      "title": "Frigi og åpne salgs- og kjøpsdokumenter på nytt",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/nb-no/dynamics365/business-central/release-reopen-documents",
+      "appliesTo": "Current nb-NO Business Central online documentation; inspected 2026-09-25",
+      "accessedDate": "2026-09-25",
+      "fields": [
+        "Åpne på nytt action",
+        "Bestillinger",
+        "Released to open status"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-purchase-date-calculation-sv",
+      "title": "Beräkna datum för inköp",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/sv-se/dynamics365/business-central/purchasing-date-calculation-for-purchases",
+      "appliesTo": "Current sv-SE localized Business Central online documentation; inspected 2026-09-25",
+      "accessedDate": "2026-09-25",
+      "fields": [
+        "Förväntat kvittodatum field on purchase order lines"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-purchase-date-calculation",
+      "title": "Calculate dates for purchases",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/en-us/dynamics365/business-central/purchasing-date-calculation-for-purchases",
+      "appliesTo": "Current en-US localized Business Central online documentation; inspected 2026-09-25",
+      "accessedDate": "2026-09-25",
+      "fields": [
+        "Expected Receipt Date field on purchase order lines"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-purchase-date-calculation-fr",
+      "title": "Calculer les dates des achats",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/fr-fr/dynamics365/business-central/purchasing-date-calculation-for-purchases",
+      "appliesTo": "Current fr-FR localized Business Central online documentation; inspected 2026-09-25",
+      "accessedDate": "2026-09-25",
+      "fields": [
+        "Date de réception attendue field on purchase order lines"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-purchase-date-calculation-de",
+      "title": "Berechnen von Datumsangaben für Einkäufe",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/de-de/dynamics365/business-central/purchasing-date-calculation-for-purchases",
+      "appliesTo": "Current de-DE localized Business Central online documentation; inspected 2026-09-25",
+      "accessedDate": "2026-09-25",
+      "fields": [
+        "Erwartetes Wareneingangsdatum field on purchase order lines"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-purchase-date-calculation-es",
+      "title": "Cálculo de fechas de compras",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/es-es/dynamics365/business-central/purchasing-date-calculation-for-purchases",
+      "appliesTo": "Current es-ES localized Business Central online documentation; inspected 2026-09-25",
+      "accessedDate": "2026-09-25",
+      "fields": [
+        "Fecha de recepción esperada field on purchase order lines"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-purchase-date-calculation-da",
+      "title": "Beregn datoer for køb",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/da-dk/dynamics365/business-central/purchasing-date-calculation-for-purchases",
+      "appliesTo": "Current da-DK localized Business Central online documentation; inspected 2026-09-25",
+      "accessedDate": "2026-09-25",
+      "fields": [
+        "Forventet modtagelsesdato field on purchase order lines"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-purchase-date-calculation-nb",
+      "title": "Beregne datoer for kjøp",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/nb-no/dynamics365/business-central/purchasing-date-calculation-for-purchases",
+      "appliesTo": "Current nb-NO localized Business Central online documentation; inspected 2026-09-25",
+      "accessedDate": "2026-09-25",
+      "fields": [
+        "Forventet mottaksdato field on purchase order lines"
       ]
     }
   ]
