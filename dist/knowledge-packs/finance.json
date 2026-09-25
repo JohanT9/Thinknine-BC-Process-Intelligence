@@ -1,7 +1,7 @@
 {
   "packId": "bc-finance",
   "name": "Business Central Finance",
-  "version": "1.1.0",
+  "version": "1.4.0",
   "priority": 210,
   "rules": [
     {
@@ -57,6 +57,169 @@
         "da-DK": "Gennemgå kladdelinjer, bogføringsdatoer, bilagsnumre, konti og modkonti, beløb samt eventuel moms og dimensioner, før du bogfører. Bogføringen overfører de midlertidige kladdedata til finansposter; rettelser kræver tilbageførings- eller korrektionsposter.",
         "fi-FI": "Tarkista ennen kirjaamista päiväkirjarivit, kirjauspäivät, asiakirjanumerot, tilit ja vastatilit, summat sekä tarvittava arvonlisävero ja dimensiot. Kirjaaminen siirtää päiväkirjan väliaikaiset tiedot tilitapahtumiksi; korjaukset edellyttävät peruutus- tai korjaustapahtumia.",
         "nb-NO": "Kontroller kladdelinjene, bokføringsdatoer, bilagsnumre, kontoer og motkontoer, beløp samt eventuell merverdiavgift og dimensjoner før du bokfører. Bokføringen overfører de midlertidige kladdedataene til finansposter; korrigeringer krever tilbakeførings- eller korrigeringsposter."
+      }
+    },
+    {
+      "ruleId": "Finance.IndentChartOfAccounts",
+      "taskType": "IndentChartOfAccounts",
+      "semanticAction": "IndentChartOfAccounts",
+      "entity": "ChartOfAccounts",
+      "priority": 1490,
+      "confidence": 0.99,
+      "match": {
+        "pagePatterns": [
+          "^Chart of Accounts$",
+          "^Kontoplan$",
+          "^Plan comptable$",
+          "^Kontenplan$",
+          "^Plan de cuentas$",
+          "^Tilikartta$"
+        ],
+        "actionPatterns": [
+          "^Indent Chart of Accounts$",
+          "^Indrag av kontoplan$",
+          "^Indenter plan comptable$",
+          "^Kontenplan einrücken$",
+          "^Test plan de cuentas$",
+          "^Indryk kontoplan$",
+          "^Sisennä tilikartta$",
+          "^Innrykk kontoplan$"
+        ],
+        "fieldPatterns": [],
+        "automationIdPatterns": []
+      },
+      "instructionTemplate": "",
+      "languages": ["en-US", "sv-SE", "fr-FR", "de-DE", "es-ES", "da-DK", "fi-FI", "nb-NO"],
+      "aliases": [],
+      "sourceIds": [
+        "microsoft-learn-finance-chart-accounts-en-us",
+        "microsoft-learn-finance-chart-accounts-sv-se",
+        "microsoft-learn-finance-chart-accounts-fr-fr",
+        "microsoft-learn-finance-chart-accounts-de-de",
+        "microsoft-learn-finance-chart-accounts-es-es",
+        "microsoft-learn-finance-chart-accounts-da-dk",
+        "microsoft-learn-finance-chart-accounts-fi-fi",
+        "microsoft-learn-finance-chart-accounts-nb-no"
+      ],
+      "localizedInstructions": {
+        "en-US": "Before indenting the chart, review the account hierarchy and any Totaling definitions on End-Total accounts. Indent fills End-Total totaling values automatically and overwrites existing definitions in those fields, which must then be entered again. This match records the selected action only; it does not confirm that the chart was updated.",
+        "sv-SE": "Kontrollera kontohierarkin och eventuella summeringsdefinitioner på konton av typen Till-summa innan du gör indrag. Åtgärden fyller automatiskt i summeringsvärden för Till-summa och skriver över befintliga definitioner i dessa fält, som då måste anges igen. Träffen visar endast att åtgärden valdes, inte att kontoplanen uppdaterades.",
+        "fr-FR": "Avant d’indenter le plan comptable, vérifiez la hiérarchie des comptes et les définitions de totalisation des comptes de type End-Total. L’indentation renseigne automatiquement ces valeurs et remplace les définitions existantes dans ces champs, qui devront alors être saisies à nouveau. Cette correspondance indique uniquement que l’action a été sélectionnée, pas que le plan a été mis à jour.",
+        "de-DE": "Prüfen Sie vor dem Einrücken des Kontenplans die Kontenhierarchie und vorhandene Summenformeln für Konten des Typs Endsumme. Das Einrücken füllt die Summenwerte für Endsumme automatisch aus und überschreibt vorhandene Definitionen in diesen Feldern; diese müssen anschließend erneut eingegeben werden. Der Treffer zeigt nur, dass die Aktion ausgewählt wurde, nicht dass der Kontenplan aktualisiert wurde.",
+        "es-ES": "Antes de aplicar sangría al plan de cuentas, revise la jerarquía y las definiciones de Sumatorio de las cuentas Fin Total. La acción rellena automáticamente los valores de estas cuentas y sobrescribe las definiciones existentes, que después deberán volver a introducirse. Esta coincidencia solo indica que se seleccionó la acción, no que se actualizara el plan.",
+        "da-DK": "Kontrollér kontohierarkiet og eventuelle Sammentælling-definitioner på konti af typen Til-sum, før du indrykker kontoplanen. Indryk udfylder automatisk sammentællingsværdierne for Til-sum og overskriver eksisterende definitioner i disse felter, som derefter skal indtastes igen. Matchningen viser kun, at handlingen blev valgt, ikke at kontoplanen blev opdateret.",
+        "fi-FI": "Tarkista ennen tilikartan sisentämistä tilihierarkia ja Loppusumma-tilien mahdolliset summausvälimäärittelyt. Sisennys täyttää Loppusumma-tilien arvot automaattisesti ja korvaa näiden kenttien aiemmat määrittelyt, jotka on syötettävä uudelleen. Osuma osoittaa vain, että toiminto valittiin, ei sitä, että tilikartta päivitettiin.",
+        "nb-NO": "Kontroller kontohierarkiet og eventuelle summeringsdefinisjoner for kontoer av typen Til-sum før du rykker inn kontoplanen. Innrykk fyller ut summeringsverdiene for Til-sum automatisk og overskriver eksisterende definisjoner i disse feltene, som deretter må legges inn på nytt. Treffet viser bare at handlingen ble valgt, ikke at kontoplanen ble oppdatert."
+      }
+    },
+    {
+      "ruleId": "Finance.ChangeGlobalDimensions",
+      "taskType": "ChangeGlobalDimensions",
+      "semanticAction": "ChangeGlobalDimensions",
+      "entity": "GeneralLedgerSetup",
+      "priority": 1510,
+      "confidence": 0.99,
+      "match": {
+        "pagePatterns": [
+          "^General Ledger Setup$",
+          "^Redovisningsinställningar$",
+          "^Paramètres comptabilité$",
+          "^Einrichtung der Finanzbuchhaltung$",
+          "^Configuración de contabilidad$",
+          "^Regnskabsopsætning$",
+          "^Pääkirjanpidon asetukset$",
+          "^Finansoppsett$"
+        ],
+        "actionPatterns": [
+          "^Change Global Dimensions$",
+          "^Ändra globala dimensioner$",
+          "^Modifier les dimensions globales$",
+          "^Globale Dimensionen ändern$",
+          "^Cambiar dimensiones globales$",
+          "^Rediger globale dimensioner$",
+          "^Muuta globaali dimensio$",
+          "^Endre globale dimensjoner$"
+        ],
+        "fieldPatterns": [],
+        "automationIdPatterns": []
+      },
+      "instructionTemplate": "",
+      "languages": ["en-US", "sv-SE", "fr-FR", "de-DE", "es-ES", "da-DK", "fi-FI", "nb-NO"],
+      "aliases": [],
+      "sourceIds": [
+        "microsoft-learn-finance-dimensions-en-us",
+        "microsoft-learn-finance-dimensions-sv-se",
+        "microsoft-learn-finance-dimensions-fr-fr",
+        "microsoft-learn-finance-dimensions-de-de",
+        "microsoft-learn-finance-dimensions-es-es",
+        "microsoft-learn-finance-dimensions-da-dk",
+        "microsoft-learn-finance-dimensions-fi-fi",
+        "microsoft-learn-finance-dimensions-nb-no"
+      ],
+      "localizedInstructions": {
+        "en-US": "Before changing global dimensions, review which dimensions will replace the current ones and plan the update window. Business Central updates posted entries using these dimensions; the job can take time, affect performance, and lock tables. The change may also sign users out while the dimensions are prepared. This match records the selected action only; it does not confirm that the update completed.",
+        "sv-SE": "Kontrollera vilka dimensioner som ska ersätta de nuvarande och planera när uppdateringen kan köras. Business Central uppdaterar bokförda poster som använder dimensionerna; jobbet kan ta tid, påverka prestanda och låsa tabeller. Användare kan också loggas ut medan dimensionerna förbereds. Träffen visar endast att åtgärden valdes, inte att uppdateringen slutfördes.",
+        "fr-FR": "Avant de modifier les dimensions globales, vérifiez celles qui remplaceront les dimensions actuelles et planifiez la fenêtre d’exécution. Business Central met à jour les écritures comptabilisées qui utilisent ces dimensions ; le traitement peut prendre du temps, affecter les performances et verrouiller des tables. Les utilisateurs peuvent aussi être déconnectés pendant la préparation des dimensions. Cette correspondance indique uniquement que l’action a été sélectionnée, pas que la mise à jour est terminée.",
+        "de-DE": "Prüfen Sie vor dem Ändern globaler Dimensionen, welche Dimensionen die aktuellen ersetzen, und planen Sie ein geeignetes Zeitfenster. Business Central aktualisiert gebuchte Posten mit diesen Dimensionen; der Vorgang kann Zeit beanspruchen, die Leistung beeinträchtigen und Tabellen sperren. Während der Vorbereitung der Dimensionen können Benutzer außerdem abgemeldet werden. Der Treffer zeigt nur, dass die Aktion ausgewählt wurde, nicht dass die Aktualisierung abgeschlossen ist.",
+        "es-ES": "Antes de cambiar las dimensiones globales, revise cuáles sustituirán a las actuales y planifique una ventana de ejecución. Business Central actualiza los movimientos registrados que usan esas dimensiones; el proceso puede tardar, afectar al rendimiento y bloquear tablas. También puede cerrar la sesión de los usuarios mientras prepara las dimensiones. Esta coincidencia solo indica que se seleccionó la acción, no que la actualización haya terminado.",
+        "da-DK": "Kontrollér, hvilke dimensioner der skal erstatte de nuværende, og planlæg et passende tidspunkt, før du ændrer globale dimensioner. Business Central opdaterer bogførte poster, der bruger dimensionerne; jobbet kan tage tid, påvirke ydeevnen og låse tabeller. Brugere kan også blive logget af, mens dimensionerne klargøres. Matchningen viser kun, at handlingen blev valgt, ikke at opdateringen blev fuldført.",
+        "fi-FI": "Tarkista ennen yleisten dimensioiden muuttamista, mitkä dimensiot korvaavat nykyiset, ja suunnittele päivitykselle sopiva ajankohta. Business Central päivittää näitä dimensioita käyttävät kirjatut tapahtumat; työ voi kestää, vaikuttaa suorituskykyyn ja lukita tauluja. Käyttäjät voidaan myös kirjata ulos dimensioiden valmistelun ajaksi. Osuma osoittaa vain, että toiminto valittiin, ei sitä, että päivitys valmistui.",
+        "nb-NO": "Kontroller hvilke dimensjoner som skal erstatte de gjeldende, og planlegg et egnet tidspunkt før du endrer globale dimensjoner. Business Central oppdaterer poster som er bokført med dimensjonene; jobben kan ta tid, påvirke ytelsen og låse tabeller. Brukere kan også bli logget av mens dimensjonene klargjøres. Treffet viser bare at handlingen ble valgt, ikke at oppdateringen er fullført."
+      }
+    },
+    {
+      "ruleId": "Finance.CloseFiscalYear",
+      "taskType": "CloseFiscalYear",
+      "semanticAction": "CloseFiscalYear",
+      "entity": "AccountingPeriod",
+      "priority": 1520,
+      "confidence": 0.99,
+      "match": {
+        "pagePatterns": [
+          "^Accounting Periods$",
+          "^Redovisningsperioder$",
+          "^Périodes comptables$",
+          "^Buchhaltungsperioden$",
+          "^Periodos contables$",
+          "^Regnskabsperioder$",
+          "^Kirjanpitojaksot$",
+          "^Regnskapsperioder$"
+        ],
+        "actionPatterns": [
+          "^Close Year$",
+          "^Stäng år$",
+          "^Clôturer exercice$",
+          "^Jahr beenden$",
+          "^Cerrar ejercicio$",
+          "^Afslut år$",
+          "^Sulje vuosi$",
+          "^Lukk år$"
+        ],
+        "fieldPatterns": [],
+        "automationIdPatterns": []
+      },
+      "instructionTemplate": "",
+      "languages": ["en-US", "sv-SE", "fr-FR", "de-DE", "es-ES", "da-DK", "fi-FI", "nb-NO"],
+      "aliases": [],
+      "sourceIds": [
+        "microsoft-learn-finance-accounting-periods-en-us",
+        "microsoft-learn-finance-accounting-periods-sv-se",
+        "microsoft-learn-finance-accounting-periods-fr-fr",
+        "microsoft-learn-finance-accounting-periods-de-de",
+        "microsoft-learn-finance-accounting-periods-es-es",
+        "microsoft-learn-finance-accounting-periods-da-dk",
+        "microsoft-learn-finance-accounting-periods-fi-fi",
+        "microsoft-learn-finance-accounting-periods-nb-no"
+      ],
+      "localizedInstructions": {
+        "en-US": "Before closing the fiscal year, verify the selected year and all of its accounting periods, and make sure the next fiscal year has already been created. Business Central marks the year's periods closed and date-locked; you can't reopen the year or clear those marks, and at least one fiscal year must remain open. This match records the action only; it does not confirm the year was closed.",
+        "sv-SE": "Kontrollera valt räkenskapsår och alla dess bokföringsperioder, och säkerställ att nästa räkenskapsår redan har skapats innan du stänger året. Business Central markerar årets perioder som stängda och datumlåsta; året kan inte öppnas igen och markeringarna kan inte tas bort. Minst ett räkenskapsår måste vara öppet. Träffen visar endast att åtgärden valdes, inte att året stängdes.",
+        "fr-FR": "Avant de clôturer l’exercice, vérifiez l’exercice sélectionné et toutes ses périodes comptables, et assurez-vous que l’exercice suivant a déjà été créé. Business Central marque les périodes de l’année comme clôturées et verrouillées par date ; vous ne pouvez pas rouvrir l’exercice ni supprimer ces marques, et au moins un exercice doit rester ouvert. Cette correspondance indique uniquement que l’action a été sélectionnée, pas que l’exercice est clôturé.",
+        "de-DE": "Prüfen Sie vor dem Abschließen des Geschäftsjahres das ausgewählte Jahr und alle Buchhaltungsperioden und stellen Sie sicher, dass das nächste Geschäftsjahr bereits erstellt wurde. Business Central kennzeichnet die Perioden des Jahres als abgeschlossen und datumsgesperrt; das Jahr kann nicht erneut geöffnet und die Kennzeichnungen können nicht entfernt werden. Mindestens ein Geschäftsjahr muss offen bleiben. Der Treffer zeigt nur, dass die Aktion ausgewählt wurde, nicht dass das Jahr abgeschlossen ist.",
+        "es-ES": "Antes de cerrar el ejercicio, compruebe el ejercicio seleccionado y todos sus periodos contables, y asegúrese de que ya se ha creado el ejercicio siguiente. Business Central marca los periodos del año como cerrados y bloqueados por fecha; no se puede volver a abrir el ejercicio ni quitar esas marcas, y debe quedar abierto al menos un ejercicio. Esta coincidencia solo indica que se seleccionó la acción, no que el ejercicio se haya cerrado.",
+        "da-DK": "Kontrollér det valgte regnskabsår og alle dets regnskabsperioder, og sørg for, at det næste regnskabsår allerede er oprettet, før du afslutter året. Business Central markerer årets perioder som afsluttet og datolåst; året kan ikke åbnes igen, og markeringerne kan ikke fjernes. Mindst ét regnskabsår skal forblive åbent. Matchningen viser kun, at handlingen blev valgt, ikke at året blev afsluttet.",
+        "fi-FI": "Tarkista ennen tilikauden sulkemista valittu tilikausi ja kaikki sen kirjanpitojaksot sekä varmista, että seuraava tilikausi on jo luotu. Business Central merkitsee vuoden jaksot suljetuiksi ja päivämäärälukituiksi; tilikautta ei voi avata uudelleen eikä merkintöjä poistaa, ja vähintään yhden tilikauden on jäätävä avoimeksi. Osuma osoittaa vain, että toiminto valittiin, ei sitä, että tilikausi suljettiin.",
+        "nb-NO": "Kontroller det valgte regnskapsåret og alle regnskapsperiodene, og sørg for at det neste regnskapsåret allerede er opprettet før du lukker året. Business Central merker periodene i året som lukket og datolåst; året kan ikke åpnes på nytt, og merkene kan ikke fjernes. Minst ett regnskapsår må være åpent. Treffet viser bare at handlingen ble valgt, ikke at året ble lukket."
       }
     }
   ],
