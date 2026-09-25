@@ -18,6 +18,16 @@ const samples = [
   ['fi-FI', 'Tuotantopäiväkirja', 'Tuotoksen määrä', 'Kirjaa', 'microsoft-learn-production-journal-fi'],
   ['nb-NO', 'Produksjonsjournal', 'Avgangsantall', 'Bokfør', 'microsoft-learn-production-journal-nb']
 ];
+const consumptionCaptions = [
+  ['sv-SE', 'Produktionsjournal', 'Förbrukningskvantitet', 'microsoft-learn-production-journal-sv'],
+  ['en-US', 'Production Journal', 'Consumption Quantity', 'microsoft-learn-production-journal'],
+  ['fr-FR', 'Journal de production', 'Quantité consommée', 'microsoft-learn-production-bom-fr'],
+  ['de-DE', 'Produktions-Buch.-Blatt', 'Verbrauchsmenge', 'microsoft-learn-production-bom-de'],
+  ['es-ES', 'Diario de producción', 'Consumo (cantidad)', 'microsoft-learn-production-bom-es'],
+  ['da-DK', 'Produktionskladde', 'Forbrugsantal', 'microsoft-learn-production-bom-da'],
+  ['fi-FI', 'Tuotantopäiväkirja', 'Kulutusmäärä', 'microsoft-learn-production-bom-fi'],
+  ['nb-NO', 'Produksjonsjournal', 'Forbruksantall', 'microsoft-learn-production-bom-nb']
+];
 for (const [locale, pageCaption, outputCaption, postCaption, sourceId] of samples) {
   const output = repository.resolveAction({ language: locale, context: { pageCaption, fieldCaption: outputCaption } });
   assert.equal(output.status, 'resolved', `${locale} output quantity`);
@@ -31,9 +41,16 @@ for (const [locale, pageCaption, outputCaption, postCaption, sourceId] of sample
   assert.equal(posted.candidates[0].provenance.language, locale);
   assert.ok(posted.candidates[0].provenance.sourceRefs.some(x => x.sourceId === sourceId), `${locale} journal source`);
 }
+for (const [locale, pageCaption, fieldCaption, sourceId] of consumptionCaptions) {
+  const consumption = repository.resolveAction({ language: locale, context: { pageCaption, fieldCaption } });
+  assert.equal(consumption.status, 'resolved', `${locale} consumption quantity`);
+  assert.equal(consumption.candidates[0].provenance.ruleId, 'Manufacturing.EnterConsumptionQuantity');
+  assert.equal(consumption.candidates[0].provenance.language, locale);
+  assert.ok(consumption.candidates[0].provenance.sourceRefs.some(x => x.sourceId === sourceId), `${locale} consumption source`);
+}
 const manufacturing = imported.snapshot.packs.find(x => x.packId === 'bc-manufacturing');
-for (const ruleId of ['Manufacturing.PostProductionJournal', 'Manufacturing.EnterOutputQuantity']) {
+for (const ruleId of ['Manufacturing.PostProductionJournal', 'Manufacturing.EnterOutputQuantity', 'Manufacturing.EnterConsumptionQuantity']) {
   const rule = manufacturing.rules.find(x => x.ruleId === ruleId);
   for (const [locale] of samples) assert.ok(rule.languages.includes(locale), `${ruleId} declares ${locale}`);
 }
-console.log('Production journal posting and output-quantity matching passes in all eight supported UI locales.');
+console.log('Production journal posting, output quantity, and consumption quantity matching passes in all eight supported UI locales.');

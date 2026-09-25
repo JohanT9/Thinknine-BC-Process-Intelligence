@@ -20,7 +20,8 @@
   runtime tests. Other warehouse, inventory, manufacturing, and core rules remain narrower.
 - Added production-journal posting and documented output-quantity caption matching across all eight
   UI languages, with localized Microsoft Learn references and runtime tests. Manufacturing
-  consumption-quantity fields and other manufacturing actions remain English/Swedish.
+  consumption-quantity caption matching now also covers all eight UI languages with localized
+  Microsoft Learn references and runtime tests. Other manufacturing actions remain narrower.
 - Added a runtime catalog test that resolves the localized sales-return action in all eight
   locales instead of checking language declarations alone.
 - Kept BC 21 and BC 28 compatibility as separate ranges so undocumented versions

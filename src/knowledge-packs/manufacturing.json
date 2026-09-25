@@ -223,14 +223,26 @@
         "actionPatterns": [],
         "fieldPatterns": [
           "^Consumption Quantity$",
-          "^Förbrukningskvantitet$"
+          "^Förbrukningskvantitet$",
+          "^Quantité consommée$",
+          "^Verbrauchsmenge$",
+          "^Consumo \\(cantidad\\)$",
+          "^Forbrugsantal$",
+          "^Kulutusmäärä$",
+          "^Forbruksantall$"
         ],
         "automationIdPatterns": []
       },
       "instructionTemplate": "",
       "languages": [
         "sv-SE",
-        "en-US"
+        "en-US",
+        "fr-FR",
+        "de-DE",
+        "es-ES",
+        "da-DK",
+        "fi-FI",
+        "nb-NO"
       ],
       "aliases": [],
       "sourceIds": [
@@ -243,7 +255,13 @@
         "microsoft-learn-production-journal-es",
         "microsoft-learn-production-journal-da",
         "microsoft-learn-production-journal-fi",
-        "microsoft-learn-production-journal-nb"
+        "microsoft-learn-production-journal-nb",
+        "microsoft-learn-production-bom-fr",
+        "microsoft-learn-production-bom-de",
+        "microsoft-learn-production-bom-es",
+        "microsoft-learn-production-bom-da",
+        "microsoft-learn-production-bom-fi",
+        "microsoft-learn-production-bom-nb"
       ]
     },
     {
@@ -412,6 +430,60 @@
       "appliesTo": "Current Norwegian Bokmål Business Central online documentation; inspected 2026-09-25",
       "accessedDate": "2026-09-25",
       "fields": ["Produksjonsjournal", "Avgangsantall", "Bokfør"]
+    },
+    {
+      "sourceId": "microsoft-learn-production-bom-fr",
+      "title": "Créer des nomenclatures de production",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/fr-fr/dynamics365/business-central/production-how-to-create-production-boms",
+      "appliesTo": "Current French Business Central online documentation; inspected 2026-09-25",
+      "accessedDate": "2026-09-25",
+      "fields": ["Production journal consumption-quantity caption: Quantité consommée"]
+    },
+    {
+      "sourceId": "microsoft-learn-production-bom-de",
+      "title": "Produktionsstücklisten erstellen",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/de-de/dynamics365/business-central/production-how-to-create-production-boms",
+      "appliesTo": "Current German Business Central online documentation; inspected 2026-09-25",
+      "accessedDate": "2026-09-25",
+      "fields": ["Production journal consumption-quantity caption: Verbrauchsmenge"]
+    },
+    {
+      "sourceId": "microsoft-learn-production-bom-es",
+      "title": "Crear L.M. de producción",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/es-es/dynamics365/business-central/production-how-to-create-production-boms",
+      "appliesTo": "Current Spanish Business Central online documentation; inspected 2026-09-25",
+      "accessedDate": "2026-09-25",
+      "fields": ["Production journal consumption-quantity caption: Consumo (cantidad)"]
+    },
+    {
+      "sourceId": "microsoft-learn-production-bom-da",
+      "title": "Oprette produktionsstyklister",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/da-dk/dynamics365/business-central/production-how-to-create-production-boms",
+      "appliesTo": "Current Danish Business Central online documentation; inspected 2026-09-25",
+      "accessedDate": "2026-09-25",
+      "fields": ["Production journal consumption-quantity caption: Forbrugsantal"]
+    },
+    {
+      "sourceId": "microsoft-learn-production-bom-fi",
+      "title": "Tuotannon tuoterakenteiden luominen",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/fi-fi/dynamics365/business-central/production-how-to-create-production-boms",
+      "appliesTo": "Current Finnish Business Central online documentation; inspected 2026-09-25",
+      "accessedDate": "2026-09-25",
+      "fields": ["Production journal consumption-quantity caption: Kulutusmäärä"]
+    },
+    {
+      "sourceId": "microsoft-learn-production-bom-nb",
+      "title": "Opprett produksjonsstykklister",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/nb-no/dynamics365/business-central/production-how-to-create-production-boms",
+      "appliesTo": "Current Norwegian Bokmål Business Central online documentation; inspected 2026-09-25",
+      "accessedDate": "2026-09-25",
+      "fields": ["Production journal consumption-quantity caption: Forbruksantall"]
     }
   ]
 }
