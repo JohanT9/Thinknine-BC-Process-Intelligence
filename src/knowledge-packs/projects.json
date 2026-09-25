@@ -272,9 +272,157 @@
         "microsoft-learn-project-invoice-fi",
         "microsoft-learn-project-invoice-nb"
       ]
+    },
+    {
+      "ruleId": "Projects.CreateTimeSheetLinesFromPlanning",
+      "taskType": "CreateProjectTimeSheetLines",
+      "semanticAction": "CreateTimeSheetLines",
+      "entity": "ProjectTimeSheet",
+      "priority": 1280,
+      "confidence": 0.97,
+      "match": {
+        "pagePatterns": [
+          "^(Time Sheets|Tidrapporter|Feuilles de temps|Arbeitszeittabellen|Hojas de tiempo|Timesedler|Aikaraportit|Timelister)$"
+        ],
+        "actionPatterns": [
+          "^Create lines from project planning$",
+          "^Skapa rader från projektplanering$",
+          "^Créer des lignes à partir du planning projet$",
+          "^(Zeilen anhand der Projektplanung erstellen|Zeilen aus Projektplanung erstellen)$",
+          "^Crear líneas de planificación de proyecto$",
+          "^Opret linjer fra projektplanlægning$",
+          "^Luo rivejä projektin suunnittelusta$",
+          "^Opprett linjer fra prosjektplanlegging$"
+        ],
+        "fieldPatterns": [],
+        "automationIdPatterns": []
+      },
+      "instructionTemplate": "",
+      "languages": ["en-US", "sv-SE", "fr-FR", "de-DE", "es-ES", "da-DK", "fi-FI", "nb-NO"],
+      "aliases": [],
+      "sourceIds": [
+        "microsoft-learn-project-timesheets",
+        "microsoft-learn-project-timesheets-sv",
+        "microsoft-learn-project-timesheets-fr",
+        "microsoft-learn-project-timesheets-de",
+        "microsoft-learn-project-timesheets-es",
+        "microsoft-learn-project-timesheets-da",
+        "microsoft-learn-project-timesheets-fi",
+        "microsoft-learn-project-timesheets-nb"
+      ]
+    },
+    {
+      "ruleId": "Projects.SuggestApprovedTimeSheetLinesToProjectJournal",
+      "taskType": "SuggestProjectJournalLinesFromTimeSheets",
+      "semanticAction": "SuggestJournalLines",
+      "entity": "ProjectJournal",
+      "priority": 1280,
+      "confidence": 0.97,
+      "match": {
+        "pagePatterns": [
+          "^(Project Journals|Projektjournaler|Journaux projet|Projekterfassung|Diario de proyectos|Projektkladde|Projektipäiväkirjat?|Prosjektjournaler|Prosjektkladd)$"
+        ],
+        "actionPatterns": [
+          "^Suggest Lines from Time Sheets$",
+          "^Föreslå rader från tidrapporter$",
+          "^Proposer des lignes à partir des feuilles de temps$",
+          "^Zeilen von Arbeitszeittabellen vorschlagen$",
+          "^Sugerir líneas de hojas de horas$",
+          "^Foreslå linjer fra timesedler$",
+          "^Ehdota rivejä aikaraporteista$",
+          "^Foreslå linjer fra timelister$"
+        ],
+        "fieldPatterns": [],
+        "automationIdPatterns": []
+      },
+      "instructionTemplate": "",
+      "languages": ["en-US", "sv-SE", "fr-FR", "de-DE", "es-ES", "da-DK", "fi-FI", "nb-NO"],
+      "aliases": [],
+      "sourceIds": [
+        "microsoft-learn-project-timesheets",
+        "microsoft-learn-project-timesheets-sv",
+        "microsoft-learn-project-timesheets-fr",
+        "microsoft-learn-project-timesheets-de",
+        "microsoft-learn-project-timesheets-es",
+        "microsoft-learn-project-timesheets-da",
+        "microsoft-learn-project-timesheets-fi",
+        "microsoft-learn-project-timesheets-nb"
+      ]
     }
   ],
   "sources": [
+    {
+      "sourceId": "microsoft-learn-project-timesheets",
+      "title": "Use time sheets",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/en-us/dynamics365/business-central/projects-how-use-time-sheets",
+      "appliesTo": "Current English Business Central online documentation; inspected 2026-09-25",
+      "accessedDate": "2026-09-25",
+      "fields": ["Time Sheets", "Create lines from project planning", "Submit", "Approve", "Suggest Lines from Time Sheets", "Project Journals", "Post"]
+    },
+    {
+      "sourceId": "microsoft-learn-project-timesheets-sv",
+      "title": "Använd tidrapporter",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/sv-se/dynamics365/business-central/projects-how-use-time-sheets",
+      "appliesTo": "Current Swedish Business Central online documentation; inspected 2026-09-25",
+      "accessedDate": "2026-09-25",
+      "fields": ["Tidrapporter", "Skapa rader från projektplanering", "Skicka", "Godkänn", "Föreslå rader från tidrapporter", "Projektjournaler", "Bokföra"]
+    },
+    {
+      "sourceId": "microsoft-learn-project-timesheets-fr",
+      "title": "Utilisation de feuilles de temps",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/fr-fr/dynamics365/business-central/projects-how-use-time-sheets",
+      "appliesTo": "Current French Business Central online documentation; inspected 2026-09-25",
+      "accessedDate": "2026-09-25",
+      "fields": ["Feuilles de temps", "Créer des lignes à partir du planning projet", "Soumettre", "Approuver", "Proposer des lignes à partir des feuilles de temps", "Journaux projet", "Valider"]
+    },
+    {
+      "sourceId": "microsoft-learn-project-timesheets-de",
+      "title": "Arbeitszeittabellen verwenden",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/de-de/dynamics365/business-central/projects-how-use-time-sheets",
+      "appliesTo": "Current German Business Central online documentation; inspected 2026-09-25",
+      "accessedDate": "2026-09-25",
+      "fields": ["Arbeitszeittabellen", "Zeilen anhand der Projektplanung erstellen", "Übermitteln", "Genehmigen", "Zeilen von Arbeitszeittabellen vorschlagen", "Project Journals", "Posten"]
+    },
+    {
+      "sourceId": "microsoft-learn-project-timesheets-es",
+      "title": "Usar partes de horas",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/es-es/dynamics365/business-central/projects-how-use-time-sheets",
+      "appliesTo": "Current Spanish Business Central online documentation; inspected 2026-09-25",
+      "accessedDate": "2026-09-25",
+      "fields": ["Hojas de tiempo", "Crear líneas de planificación de proyecto", "Enviar", "Aprobar", "Sugerir líneas de hojas de horas", "Project Journals", "Registrar"]
+    },
+    {
+      "sourceId": "microsoft-learn-project-timesheets-da",
+      "title": "Brug timesedler",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/da-dk/dynamics365/business-central/projects-how-use-time-sheets",
+      "appliesTo": "Current Danish Business Central online documentation; inspected 2026-09-25",
+      "accessedDate": "2026-09-25",
+      "fields": ["Timesedler", "Opret linjer fra projektplanlægning", "Send", "Godkend", "Foreslå linjer fra timesedler", "Project Journals", "Bogfør"]
+    },
+    {
+      "sourceId": "microsoft-learn-project-timesheets-fi",
+      "title": "Käytä aikaraportteja",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/fi-fi/dynamics365/business-central/projects-how-use-time-sheets",
+      "appliesTo": "Current Finnish Business Central online documentation; inspected 2026-09-25",
+      "accessedDate": "2026-09-25",
+      "fields": ["Aikaraportit", "Luo rivejä projektin suunnittelusta", "Lähetä", "Hyväksy", "Ehdota rivejä aikaraporteista", "Projektipäiväkirjat", "Kirjaa"]
+    },
+    {
+      "sourceId": "microsoft-learn-project-timesheets-nb",
+      "title": "Bruk timelister",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/nb-no/dynamics365/business-central/projects-how-use-time-sheets",
+      "appliesTo": "Current Norwegian Bokmål Business Central online documentation; inspected 2026-09-25",
+      "accessedDate": "2026-09-25",
+      "fields": ["Timelister", "Opprett linjer fra prosjektplanlegging", "Send", "Godkjenn", "Foreslå linjer fra timelister", "Prosjektjournaler", "Bokfør"]
+    },
     {
       "sourceId": "microsoft-learn-project-usage",
       "title": "Record consumption or usage for projects",
