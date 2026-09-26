@@ -262,6 +262,38 @@ assert.ok(!wrongColumnDefinitionAction.candidates.some(x =>
   x.provenance.ruleId === 'Finance.EditFinancialReportColumnDefinition'),
   'deleting a definition must not resolve as editing it');
 
+const rowDefinitionSamples = [
+  {locale:'en-US',page:'(Financial Report) Row Definitions',action:'Edit Row Definition'},
+  {locale:'sv-SE',page:'(Ekonomiska rapporter) Raddefinitioner',action:'Redigera raddefinition'},
+  {locale:'fr-FR',page:'États financiers définitions de ligne',action:'Modifier la définition de ligne'},
+  {locale:'de-DE',page:'(Finanzberichte) Zeilendefinition',action:'Zeilendefinition bearbeiten'},
+  {locale:'es-ES',page:'Definiciones de fila (informe financiero)',action:'Editar definición de fila'},
+  {locale:'da-DK',page:'(Finansiel rapport) Rækkedefinitioner',action:'Rediger rækkedefinition'},
+  {locale:'fi-FI',page:'(Talousraportit) rivimääritykset',action:'Muokkaa rivimääritystä'},
+  {locale:'nb-NO',page:'(Finansrapporter) Raddefinisjon',action:'Rediger raddefinisjon'}
+];
+const rowDefinitionRule = financePack.rules.find(x =>
+  x.ruleId === 'Finance.EditFinancialReportRowDefinition');
+for (const {locale,page,action} of rowDefinitionSamples) {
+  const result = repository.resolveAction({language:locale,context:{pageCaption:page,actionCaption:action}});
+  assert.equal(result.status,'resolved',`${locale} edit financial report row definition`);
+  assert.equal(result.candidates[0].provenance.ruleId,'Finance.EditFinancialReportRowDefinition',locale);
+  assert.equal(result.candidates[0].provenance.language,locale);
+  assert.ok(result.candidates[0].provenance.sourceRefs.some(x =>
+    x.sourceId === `microsoft-learn-finance-row-definitions-${locale.toLowerCase()}`),locale);
+  const instruction = knowledge.localizedInstruction(rowDefinitionRule,locale);
+  assert.ok(instruction,`localized financial report row definition directive for ${locale}`);
+  assert.match(instruction,/version|versions|versionn|versioniert|versiones|versio|versjons/i,
+    `lack of versioning is disclosed for ${locale}`);
+  assert.match(instruction,/reports|états|Berichte|informes|rapporter|raportit/i,
+    `affected financial reports are mentioned for ${locale}`);
+}
+const wrongRowDefinitionAction = repository.resolveAction({language:'en-US',
+  context:{pageCaption:'(Financial Report) Row Definitions',actionCaption:'Delete'}});
+assert.ok(!wrongRowDefinitionAction.candidates.some(x =>
+  x.provenance.ruleId === 'Finance.EditFinancialReportRowDefinition'),
+  'deleting a definition must not resolve as editing it');
+
 const depreciationCalculationSamples = [
   {locale:'en-US',page:'Calculate Depreciation',action:'OK'},
   {locale:'sv-SE',page:'Beräkna avskrivning',action:'OK'},
@@ -377,7 +409,7 @@ assert.ok(!wrongIndexationAction.candidates.some(x =>
 const sourceTopics = [
   'chart-accounts', 'dimensions', 'vat-setup', 'vat-submission', 'finance-reports', 'accounting-periods', 'budgets',
   'year-close', 'fixed-assets', 'depreciation', 'cost-accounting', 'currencies', 'currency-adjustment', 'consolidation',
-  'column-definitions', 'disposal', 'acquisitions', 'revaluation', 'maintenance', 'insurance'
+  'column-definitions', 'row-definitions', 'disposal', 'acquisitions', 'revaluation', 'maintenance', 'insurance'
 ];
 for (const topic of sourceTopics) {
   for (const locale of samples.map(sample => sample.locale)) {
@@ -400,4 +432,4 @@ const unrelated = repository.resolveAction({language:'en-US',context:{pageCaptio
 assert.ok(!unrelated.candidates.some(x=>x.provenance.ruleId==='Finance.PostGeneralJournal'),
   'general journal posting rule must not match the specialized payment journal');
 
-console.log('Finance directives for chart, posting, dimensions, accounting periods, budgets, currency adjustment, VAT report lines, financial report columns, fixed-asset depreciation/correction/indexation, and year-end resolve in all eight supported UI locales.');
+console.log('Finance directives for chart, posting, dimensions, accounting periods, budgets, currency adjustment, VAT report lines, financial report rows and columns, fixed-asset depreciation/correction/indexation, and year-end resolve in all eight supported UI locales.');
