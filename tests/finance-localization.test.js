@@ -315,6 +315,36 @@ assert.ok(!wrongDepreciationAction.candidates.some(x =>
   x.provenance.ruleId === 'Finance.PostFixedAssetDepreciation'),
   'calculation command must not resolve as depreciation posting');
 
+const depreciationCancellationSamples = [
+  {locale:'en-US',page:'Cancel FA Ledger Entries',action:'OK'},
+  {locale:'sv-SE',page:'Rätta anl.transaktioner',action:'OK'},
+  {locale:'fr-FR',page:'Annuler écriture comptable immo.',action:'OK'},
+  {locale:'de-DE',page:'Anlagenposten stornieren',action:'OK'},
+  {locale:'es-ES',page:'A/F Anular movs',action:'Aceptar'},
+  {locale:'da-DK',page:'Annuller anlægsfinansposter',action:'OK'},
+  {locale:'fi-FI',page:'Peruuta KO-tapahtumat',action:'OK'},
+  {locale:'nb-NO',page:'Kanseller aktivaposter',action:'OK'}
+];
+const depreciationCancellationRule = financePack.rules.find(x =>
+  x.ruleId === 'Finance.CancelFixedAssetDepreciation');
+for (const {locale,page,action} of depreciationCancellationSamples) {
+  const result = repository.resolveAction({language:locale,context:{pageCaption:page,actionCaption:action}});
+  assert.equal(result.status,'resolved',`${locale} cancel incorrect depreciation entries`);
+  assert.equal(result.candidates[0].provenance.ruleId,'Finance.CancelFixedAssetDepreciation',locale);
+  assert.equal(result.candidates[0].provenance.language,locale);
+  assert.ok(result.candidates[0].provenance.sourceRefs.some(x =>
+    x.sourceId === `microsoft-learn-finance-depreciation-${locale.toLowerCase()}`),locale);
+  const instruction = knowledge.localizedInstruction(depreciationCancellationRule,locale);
+  assert.ok(instruction,`localized depreciation correction directive for ${locale}`);
+  assert.match(instruction,/does not erase|raderar inte|ne supprime pas|löscht den gebuchten Verlauf nicht|no elimina|sletter ikke|ei poista/i,
+    `correction does not silently erase posted history for ${locale}`);
+}
+const wrongDepreciationCorrection = repository.resolveAction({language:'en-US',
+  context:{pageCaption:'Cancel FA Ledger Entries',actionCaption:'Post'}});
+assert.ok(!wrongDepreciationCorrection.candidates.some(x =>
+  x.provenance.ruleId === 'Finance.CancelFixedAssetDepreciation'),
+  'posting must not resolve as cancellation of depreciation entries');
+
 const sourceTopics = [
   'chart-accounts', 'dimensions', 'vat-setup', 'vat-submission', 'finance-reports', 'accounting-periods', 'budgets',
   'year-close', 'fixed-assets', 'depreciation', 'cost-accounting', 'currencies', 'currency-adjustment', 'consolidation',
@@ -335,4 +365,4 @@ const unrelated = repository.resolveAction({language:'en-US',context:{pageCaptio
 assert.ok(!unrelated.candidates.some(x=>x.provenance.ruleId==='Finance.PostGeneralJournal'),
   'general journal posting rule must not match the specialized payment journal');
 
-console.log('Finance directives for chart, posting, dimensions, accounting periods, budgets, currency adjustment, VAT report lines, financial report columns, fixed-asset depreciation, and year-end resolve in all eight supported UI locales.');
+console.log('Finance directives for chart, posting, dimensions, accounting periods, budgets, currency adjustment, VAT report lines, financial report columns, fixed-asset depreciation/correction, and year-end resolve in all eight supported UI locales.');

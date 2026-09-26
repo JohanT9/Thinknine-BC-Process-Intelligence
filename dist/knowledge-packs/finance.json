@@ -1,7 +1,7 @@
 {
   "packId": "bc-finance",
   "name": "Business Central Finance",
-  "version": "1.10.0",
+  "version": "1.11.0",
   "priority": 210,
   "rules": [
     {
@@ -193,6 +193,43 @@
         "da-DK": "Kontrollér afskrivningsbog og integration, bogføringsdato, anlæg, afskrivningstype, beregnede afskrivningsdage, modkonto, beløb og dimensioner, før du bogfører. Sørg for, at eventuelle ekstra afskrivningsbøger har deres egne gennemgåede linjer, og hold finansiel og skattemæssig behandling adskilt efter behov. Bogføringen opdaterer anlægsposterne og, for integrerede bøger, finansposterne. Forkerte poster kræver anlæggenes annullerings-/korrektionsproces og kontrol af de nye poster. Matchningen viser kun handlingen Bogfør, ikke at bogføringen lykkedes eller saldiene er korrekte.",
         "fi-FI": "Tarkista ennen poistojen kirjaamista poistokirja ja sen integrointi, kirjauspäivä, käyttöomaisuuserä, poistokirjaustyyppi, lasketut poistopäivät, vastatili, summa ja dimensiot. Varmista, että lisäpoistokirjoilla on omat tarkistetut rivinsä, ja pidä talous- ja verokäsittely tarvittaessa erillään. Kirjaus päivittää käyttöomaisuuden tapahtuma-arvot ja integroiduissa kirjoissa myös pääkirjan. Virheelliset tapahtumat edellyttävät käyttöomaisuuden peruutus-/korjausprosessia ja uusien tapahtumien tarkistamista. Osuma kertoo vain Kirjaa-toiminnon valinnasta; se ei vahvista kirjauksen onnistumista tai saldojen oikeellisuutta.",
         "nb-NO": "Kontroller avskrivningstabell og integrasjon, bokføringsdato, aktiva, avskrivningstype, beregnede avskrivningsdager, motkonto, beløp og dimensjoner før du bokfører. Kontroller at eventuelle ekstra avskrivningstabeller har egne gjennomgåtte linjer, og hold finans- og skattebehandling atskilt ved behov. Bokføringen oppdaterer aktivapostverdier og, for integrerte tabeller, finansposter. Feilaktige poster krever aktivumets korrigerings-/kanselleringsprosess og gjennomgang av de nye postene. Treffet viser bare handlingen Bokfør; det bekrefter ikke at bokføringen lyktes eller at saldoene er riktige."
+      }
+    },
+    {
+      "ruleId": "Finance.CancelFixedAssetDepreciation",
+      "taskType": "CancelFixedAssetDepreciation",
+      "semanticAction": "CancelDepreciationEntries",
+      "entity": "FixedAssetDepreciationEntries",
+      "priority": 1590,
+      "confidence": 0.98,
+      "match": {
+        "pagePatterns": [
+          "^Cancel FA Ledger Entries$", "^Rätta anl\\.transaktioner$", "^Annuler écriture comptable immo\\.$",
+          "^Anlagenposten stornieren$", "^A/F Anular movs$", "^Annuller anlægsfinansposter$",
+          "^Peruuta KO-tapahtumat$", "^Kanseller aktivaposter$"
+        ],
+        "actionPatterns": ["^OK$", "^OK$", "^OK$", "^OK$", "^Aceptar$", "^OK$", "^OK$", "^OK$"],
+        "fieldPatterns": [],
+        "automationIdPatterns": []
+      },
+      "instructionTemplate": "",
+      "languages": ["en-US", "sv-SE", "fr-FR", "de-DE", "es-ES", "da-DK", "fi-FI", "nb-NO"],
+      "aliases": [],
+      "sourceIds": [
+        "microsoft-learn-finance-depreciation-en-us", "microsoft-learn-finance-depreciation-sv-se",
+        "microsoft-learn-finance-depreciation-fr-fr", "microsoft-learn-finance-depreciation-de-de",
+        "microsoft-learn-finance-depreciation-es-es", "microsoft-learn-finance-depreciation-da-dk",
+        "microsoft-learn-finance-depreciation-fi-fi", "microsoft-learn-finance-depreciation-nb-no"
+      ],
+      "localizedInstructions": {
+        "en-US": "Before running Cancel FA Ledger Entries, verify the depreciation book and narrow the fixed-asset, entry-type and date filters to the incorrect depreciation entries. The process creates cancellation/correction entries; it does not erase the posted history. Review the resulting entries and ledger impact before calculating and posting the corrected depreciation. Use the correction procedure approved for your accounting policy and reporting book. This match records only the selected batch action; it does not confirm that the right entries were selected or corrected.",
+        "sv-SE": "Kontrollera avskrivningsregel och begränsa urvalet för anläggningstillgång, transaktionstyp och datum till de felaktiga avskrivningstransaktionerna innan du kör Rätta anl.transaktioner. Processen skapar rättelse-/annulleringstransaktioner; den raderar inte den bokförda historiken. Granska de nya transaktionerna och redovisningseffekten innan du beräknar och bokför rätt avskrivning. Följ rättelseförfarandet som gäller för redovisningsprincipen och avskrivningsregeln. Träffen visar endast att batchåtgärden valdes; den bekräftar inte att rätt transaktioner valdes eller rättades.",
+        "fr-FR": "Avant d’exécuter Annuler écriture comptable immo., vérifiez le registre d’amortissement et limitez les filtres d’immobilisation, de type d’écriture et de date aux écritures d’amortissement incorrectes. Le traitement crée des écritures d’annulation/correction ; il ne supprime pas l’historique comptabilisé. Examinez les écritures résultantes et leur impact comptable avant de recalculer et comptabiliser l’amortissement corrigé. Suivez la procédure de correction approuvée pour votre stratégie comptable et votre registre. Cette correspondance indique uniquement le choix du traitement ; elle ne confirme pas que les bonnes écritures ont été sélectionnées ou corrigées.",
+        "de-DE": "Prüfen Sie vor dem Ausführen von Anlagenposten stornieren das AfA-Buch und begrenzen Sie Anlagen-, Postenart- und Datumsfilter auf die falschen AfA-Posten. Der Prozess erstellt Storno-/Korrekturposten; er löscht den gebuchten Verlauf nicht. Prüfen Sie die resultierenden Posten und die Auswirkung auf die Sachkonten, bevor Sie die korrigierte AfA berechnen und buchen. Folgen Sie dem für Ihre Rechnungslegung und Ihr AfA-Buch genehmigten Korrekturverfahren. Der Treffer zeigt nur die ausgewählte Stapelverarbeitung, nicht dass die richtigen Posten ausgewählt oder korrigiert wurden.",
+        "es-ES": "Antes de ejecutar A/F Anular movs, compruebe el libro de amortización y limite los filtros de activo, tipo de movimiento y fecha a los movimientos de amortización incorrectos. El proceso crea movimientos de anulación/corrección; no elimina el historial registrado. Revise los movimientos resultantes y su impacto contable antes de calcular y registrar la amortización corregida. Siga el procedimiento de corrección aprobado para su política contable y libro. Esta coincidencia solo indica que se eligió el proceso; no confirma que se seleccionaran o corrigieran los movimientos correctos.",
+        "da-DK": "Kontrollér afskrivningsbogen, og afgræns filtrene for anlæg, posttype og dato til de forkerte afskrivningsposter, før du kører Annuller anlægsfinansposter. Kørslen opretter annullerings-/korrektionsposter; den sletter ikke den bogførte historik. Gennemgå de resulterende poster og finanspåvirkningen, før du beregner og bogfører den korrigerede afskrivning. Følg den korrektionsprocedure, der er godkendt for regnskabspraksis og afskrivningsbog. Matchningen viser kun, at kørslen blev valgt; den bekræfter ikke, at de rigtige poster blev valgt eller korrigeret.",
+        "fi-FI": "Tarkista poistokirja ja rajaa käyttöomaisuus-, tapahtumatyyppi- ja päivämääräsuodattimet virheellisiin poistotapahtumiin ennen Peruuta KO-tapahtumat -ajoa. Ajo luo peruutus-/korjaustapahtumat; se ei poista kirjattua historiaa. Tarkista syntyneet tapahtumat ja niiden kirjanpitovaikutukset ennen korjatun poiston laskemista ja kirjaamista. Noudata kirjanpitoperiaatteeseen ja poistokirjaan hyväksyttyä korjausmenettelyä. Osuma kertoo vain eräajon valinnasta; se ei vahvista oikeiden tapahtumien valintaa tai korjausta.",
+        "nb-NO": "Kontroller avskrivningstabellen og avgrens filtrene for aktiva, posttype og dato til de feilaktige avskrivningspostene før du kjører Kanseller aktivaposter. Kjøringen oppretter kansellerings-/korreksjonsposter; den sletter ikke den bokførte historikken. Gå gjennom de nye postene og regnskapseffekten før du beregner og bokfører korrigert avskrivning. Følg korrigeringsprosedyren som er godkjent for regnskapsprinsippet og avskrivningstabellen. Treffet viser bare at kjøringen ble valgt; det bekrefter ikke at riktige poster ble valgt eller korrigert."
       }
     },
     {
