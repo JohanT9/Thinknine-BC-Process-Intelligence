@@ -439,6 +439,7 @@ const sourceTopics = [
   'year-close', 'fixed-assets', 'depreciation', 'cost-accounting', 'currencies', 'currency-adjustment', 'consolidation',
   'column-definitions', 'row-definitions', 'cash-flow-overview', 'cash-flow-setup',
   'gl-revaluation', 'close-income-statement', 'accounting-periods', 'preclose-reports',
+  'close-statement-reports', 'period-end-activities', 'prepayments',
   'disposal', 'acquisitions', 'revaluation', 'maintenance', 'insurance'
 ];
 for (const topic of sourceTopics) {
@@ -492,6 +493,14 @@ for (const locale of samples.map(sample => sample.locale)) {
     `microsoft-learn-finance-preclose-reports-${locale.toLowerCase()}`);
   assert.ok(preclose.fields.some(x => /posting-group totals with corresponding G\/L accounts/.test(x)),
     `subledger-to-G/L verification guidance is indexed for ${locale}`);
+  const closeReports = financePack.sources.find(item => item.sourceId ===
+    `microsoft-learn-finance-close-statement-reports-${locale.toLowerCase()}`);
+  assert.ok(closeReports.fields.some(x => /Reconcile Cust\. and Vend\. Accs/.test(x)),
+    `close statement and subledger reconciliation report guidance is indexed for ${locale}`);
+  const periodEnd = financePack.sources.find(item => item.sourceId ===
+    `microsoft-learn-finance-period-end-activities-${locale.toLowerCase()}`);
+  assert.ok(periodEnd.fields.some(x => /month-end activities are optional/.test(x)),
+    `period-end process optionality is indexed for ${locale}`);
 }
 
 const unrelated = repository.resolveAction({language:'en-US',context:{pageCaption:'Payment Journal',actionCaption:'Post'}});

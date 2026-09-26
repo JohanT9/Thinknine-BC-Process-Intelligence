@@ -1,7 +1,7 @@
 {
   "packId": "bc-services",
   "name": "Business Central Service Management",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "priority": 200,
   "rules": [
     {
@@ -36,7 +36,16 @@
         "automationIdPatterns": []
       },
       "instructionTemplate": "",
-      "languages": ["en-US", "sv-SE", "fr-FR", "de-DE", "es-ES", "da-DK", "fi-FI", "nb-NO"],
+      "languages": [
+        "en-US",
+        "sv-SE",
+        "fr-FR",
+        "de-DE",
+        "es-ES",
+        "da-DK",
+        "fi-FI",
+        "nb-NO"
+      ],
       "aliases": [],
       "sourceIds": [
         "microsoft-learn-service-tasks",
@@ -81,7 +90,16 @@
         "automationIdPatterns": []
       },
       "instructionTemplate": "",
-      "languages": ["en-US", "sv-SE", "fr-FR", "de-DE", "es-ES", "da-DK", "fi-FI", "nb-NO"],
+      "languages": [
+        "en-US",
+        "sv-SE",
+        "fr-FR",
+        "de-DE",
+        "es-ES",
+        "da-DK",
+        "fi-FI",
+        "nb-NO"
+      ],
       "aliases": [],
       "sourceIds": [
         "microsoft-learn-service-tasks",
@@ -126,7 +144,16 @@
         "automationIdPatterns": []
       },
       "instructionTemplate": "",
-      "languages": ["en-US", "sv-SE", "fr-FR", "de-DE", "es-ES", "da-DK", "fi-FI", "nb-NO"],
+      "languages": [
+        "en-US",
+        "sv-SE",
+        "fr-FR",
+        "de-DE",
+        "es-ES",
+        "da-DK",
+        "fi-FI",
+        "nb-NO"
+      ],
       "aliases": [],
       "sourceIds": [
         "microsoft-learn-service-posting",
@@ -171,7 +198,16 @@
         "automationIdPatterns": []
       },
       "instructionTemplate": "",
-      "languages": ["en-US", "sv-SE", "fr-FR", "de-DE", "es-ES", "da-DK", "fi-FI", "nb-NO"],
+      "languages": [
+        "en-US",
+        "sv-SE",
+        "fr-FR",
+        "de-DE",
+        "es-ES",
+        "da-DK",
+        "fi-FI",
+        "nb-NO"
+      ],
       "aliases": [],
       "sourceIds": [
         "microsoft-learn-service-create-order",
@@ -216,7 +252,16 @@
         "automationIdPatterns": []
       },
       "instructionTemplate": "",
-      "languages": ["en-US", "sv-SE", "fr-FR", "de-DE", "es-ES", "da-DK", "fi-FI", "nb-NO"],
+      "languages": [
+        "en-US",
+        "sv-SE",
+        "fr-FR",
+        "de-DE",
+        "es-ES",
+        "da-DK",
+        "fi-FI",
+        "nb-NO"
+      ],
       "aliases": [],
       "sourceIds": [
         "microsoft-learn-service-create-order",
@@ -241,29 +286,437 @@
     }
   ],
   "sources": [
-    {"sourceId":"microsoft-learn-service-tasks","title":"Work on service tasks","sourceType":"microsoft-learn","sourceUri":"https://learn.microsoft.com/en-us/dynamics365/business-central/service-how-to-work-on-service-tasks","appliesTo":"Current English Business Central online documentation; inspected 2026-09-25","accessedDate":"2026-09-25","fields":["Service Tasks","Item Worksheet","Service Item Worksheet","Quantity"]},
-    {"sourceId":"microsoft-learn-service-tasks-sv","title":"Så här arbetar du med tjänstuppgifter","sourceType":"microsoft-learn","sourceUri":"https://learn.microsoft.com/sv-se/dynamics365/business-central/service-how-to-work-on-service-tasks","appliesTo":"Current Swedish Business Central online documentation; inspected 2026-09-25","accessedDate":"2026-09-25","fields":["Tjänstuppgifter","Artikelkalkylark","Serviceartikeldokument","Antal"]},
-    {"sourceId":"microsoft-learn-service-tasks-fr","title":"Travail sur des tâches de service","sourceType":"microsoft-learn","sourceUri":"https://learn.microsoft.com/fr-fr/dynamics365/business-central/service-how-to-work-on-service-tasks","appliesTo":"Current French Business Central online documentation; inspected 2026-09-25","accessedDate":"2026-09-25","fields":["Tâches de service","Feuille activité article","Feuille de calcul des articles de service","Quantité"]},
-    {"sourceId":"microsoft-learn-service-tasks-de","title":"Serviceaufgaben bearbeiten","sourceType":"microsoft-learn","sourceUri":"https://learn.microsoft.com/de-de/dynamics365/business-central/service-how-to-work-on-service-tasks","appliesTo":"Current German Business Central online documentation; inspected 2026-09-25","accessedDate":"2026-09-25","fields":["Dienstaufgaben","Artikel-Arbeitsblatt","Servicearbeitsblatt","Menge"]},
-    {"sourceId":"microsoft-learn-service-tasks-es","title":"Cómo trabajar en tareas de servicio","sourceType":"microsoft-learn","sourceUri":"https://learn.microsoft.com/es-es/dynamics365/business-central/service-how-to-work-on-service-tasks","appliesTo":"Current Spanish Business Central online documentation; inspected 2026-09-25","accessedDate":"2026-09-25","fields":["Tareas de servicio","Hoja de producto","Hoja de trabajo de artículo de servicio","Cantidad"]},
-    {"sourceId":"microsoft-learn-service-tasks-da","title":"Sådan arbejder du på serviceopgaver","sourceType":"microsoft-learn","sourceUri":"https://learn.microsoft.com/da-dk/dynamics365/business-central/service-how-to-work-on-service-tasks","appliesTo":"Current Danish Business Central online documentation; inspected 2026-09-25","accessedDate":"2026-09-25","fields":["Serviceopgaver","Varekladde","Serviceartikelkladde","Antal"]},
-    {"sourceId":"microsoft-learn-service-tasks-fi","title":"Palvelutehtävien käsitteleminen","sourceType":"microsoft-learn","sourceUri":"https://learn.microsoft.com/fi-fi/dynamics365/business-central/service-how-to-work-on-service-tasks","appliesTo":"Current Finnish Business Central online documentation; inspected 2026-09-25","accessedDate":"2026-09-25","fields":["Palvelutehtävät","Nimikkeen työkirja","Huoltonimikkeen työkirja","Määrä"]},
-    {"sourceId":"microsoft-learn-service-tasks-nb","title":"Slik arbeider du med tjenesteoppgaver","sourceType":"microsoft-learn","sourceUri":"https://learn.microsoft.com/nb-no/dynamics365/business-central/service-how-to-work-on-service-tasks","appliesTo":"Current Norwegian Bokmål Business Central online documentation; inspected 2026-09-25","accessedDate":"2026-09-25","fields":["Tjenesteoppgaver","Arbeidsordre","Servicevareskjema","Antall"]},
-    {"sourceId":"microsoft-learn-service-posting","title":"Post service orders and credit memos","sourceType":"microsoft-learn","sourceUri":"https://learn.microsoft.com/en-us/dynamics365/business-central/service-how-to-post-service-orders","appliesTo":"Current English Business Central online documentation; inspected 2026-09-25","accessedDate":"2026-09-25","fields":["Service Order","Post"]},
-    {"sourceId":"microsoft-learn-service-posting-sv","title":"Så här bokför du serviceorder","sourceType":"microsoft-learn","sourceUri":"https://learn.microsoft.com/sv-se/dynamics365/business-central/service-how-to-post-service-orders","appliesTo":"Current Swedish Business Central online documentation; inspected 2026-09-25","accessedDate":"2026-09-25","fields":["Tjänstbeställningar","Inlägg"]},
-    {"sourceId":"microsoft-learn-service-posting-fr","title":"Validation des commandes et des avoirs service","sourceType":"microsoft-learn","sourceUri":"https://learn.microsoft.com/fr-fr/dynamics365/business-central/service-how-to-post-service-orders","appliesTo":"Current French Business Central online documentation; inspected 2026-09-25","accessedDate":"2026-09-25","fields":["Commande service","Valider"]},
-    {"sourceId":"microsoft-learn-service-posting-de","title":"Serviceaufträge und Gutschriften buchen","sourceType":"microsoft-learn","sourceUri":"https://learn.microsoft.com/de-de/dynamics365/business-central/service-how-to-post-service-orders","appliesTo":"Current German Business Central online documentation; inspected 2026-09-25","accessedDate":"2026-09-25","fields":["Serviceauftrag","Post"]},
-    {"sourceId":"microsoft-learn-service-posting-es","title":"Registrar pedidos de servicio","sourceType":"microsoft-learn","sourceUri":"https://learn.microsoft.com/es-es/dynamics365/business-central/service-how-to-post-service-orders","appliesTo":"Current Spanish Business Central online documentation; inspected 2026-09-25","accessedDate":"2026-09-25","fields":["Pedido servicio","Registrar"]},
-    {"sourceId":"microsoft-learn-service-posting-da","title":"Bogføre serviceordrer og kreditnotaer","sourceType":"microsoft-learn","sourceUri":"https://learn.microsoft.com/da-dk/dynamics365/business-central/service-how-to-post-service-orders","appliesTo":"Current Danish Business Central online documentation; inspected 2026-09-25","accessedDate":"2026-09-25","fields":["Serviceordre","Indlæg"]},
-    {"sourceId":"microsoft-learn-service-posting-fi","title":"Huoltotilausten ja hyvityslaskujen kirjaaminen","sourceType":"microsoft-learn","sourceUri":"https://learn.microsoft.com/fi-fi/dynamics365/business-central/service-how-to-post-service-orders","appliesTo":"Current Finnish Business Central online documentation; inspected 2026-09-25","accessedDate":"2026-09-25","fields":["Huoltotilaus","Julkaisu"]},
-    {"sourceId":"microsoft-learn-service-posting-nb","title":"Bokfør serviceordrer og kreditnotaer","sourceType":"microsoft-learn","sourceUri":"https://learn.microsoft.com/nb-no/dynamics365/business-central/service-how-to-post-service-orders","appliesTo":"Current Norwegian Bokmål Business Central online documentation; inspected 2026-09-25","accessedDate":"2026-09-25","fields":["Serviceordre","Publiser"]},
-    {"sourceId":"microsoft-learn-service-create-order","title":"Create service orders","sourceType":"microsoft-learn","sourceUri":"https://learn.microsoft.com/en-us/dynamics365/business-central/service-how-to-create-service-orders","appliesTo":"Current English Business Central online documentation; inspected 2026-09-25","accessedDate":"2026-09-25","fields":["Service Orders page","New service order action","Customer No. selects customer and fills related fields"]},
-    {"sourceId":"microsoft-learn-service-create-order-sv","title":"Så här skapar du tjänstbeställningar","sourceType":"microsoft-learn","sourceUri":"https://learn.microsoft.com/sv-se/dynamics365/business-central/service-how-to-create-service-orders","appliesTo":"Current Swedish Business Central online documentation; inspected 2026-09-25","accessedDate":"2026-09-25","fields":["Tjänstbeställningar page","New service order action","Kundnr selects customer and fills related fields"]},
-    {"sourceId":"microsoft-learn-service-create-order-fr","title":"Guide pratique pour créer des commandes de service","sourceType":"microsoft-learn","sourceUri":"https://learn.microsoft.com/fr-fr/dynamics365/business-central/service-how-to-create-service-orders","appliesTo":"Current French Business Central online documentation; inspected 2026-09-25","accessedDate":"2026-09-25","fields":["Commandes de service page","New service order action","N° client selects customer and fills related fields"]},
-    {"sourceId":"microsoft-learn-service-create-order-de","title":"Erstellen von Serviceaufträgen","sourceType":"microsoft-learn","sourceUri":"https://learn.microsoft.com/de-de/dynamics365/business-central/service-how-to-create-service-orders","appliesTo":"Current German Business Central online documentation; inspected 2026-09-25","accessedDate":"2026-09-25","fields":["Serviceaufträge page","New service order action","Debitorennr. selects customer and fills related fields"]},
-    {"sourceId":"microsoft-learn-service-create-order-es","title":"Creación de pedidos de servicio","sourceType":"microsoft-learn","sourceUri":"https://learn.microsoft.com/es-es/dynamics365/business-central/service-how-to-create-service-orders","appliesTo":"Current Spanish Business Central online documentation; inspected 2026-09-25","accessedDate":"2026-09-25","fields":["Pedidos de servicio page","New service order action","N.º cliente selects customer and fills related fields"]},
-    {"sourceId":"microsoft-learn-service-create-order-da","title":"Sådan opretter du serviceordrer","sourceType":"microsoft-learn","sourceUri":"https://learn.microsoft.com/da-dk/dynamics365/business-central/service-how-to-create-service-orders","appliesTo":"Current Danish Business Central online documentation; inspected 2026-09-25","accessedDate":"2026-09-25","fields":["Serviceordrer page","New service order action","Debitornr. selects customer and fills related fields"]},
-    {"sourceId":"microsoft-learn-service-create-order-fi","title":"Huoltotilausten luominen","sourceType":"microsoft-learn","sourceUri":"https://learn.microsoft.com/fi-fi/dynamics365/business-central/service-how-to-create-service-orders","appliesTo":"Current Finnish Business Central online documentation; inspected 2026-09-25","accessedDate":"2026-09-25","fields":["Huoltotilaukset page","New service order action","Asiakasnro selects customer and fills related fields"]},
-    {"sourceId":"microsoft-learn-service-create-order-nb","title":"Slik oppretter du serviceordrer","sourceType":"microsoft-learn","sourceUri":"https://learn.microsoft.com/nb-no/dynamics365/business-central/service-how-to-create-service-orders","appliesTo":"Current Norwegian Bokmål Business Central online documentation; inspected 2026-09-25","accessedDate":"2026-09-25","fields":["Serviceordrer page","New service order action","Kundenr. selects customer and fills related fields"]}
+    {
+      "sourceId": "microsoft-learn-service-tasks",
+      "title": "Work on service tasks",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/en-us/dynamics365/business-central/service-how-to-work-on-service-tasks",
+      "appliesTo": "Current English Business Central online documentation; inspected 2026-09-25",
+      "accessedDate": "2026-09-25",
+      "fields": [
+        "Service Tasks",
+        "Item Worksheet",
+        "Service Item Worksheet",
+        "Quantity"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-service-tasks-sv",
+      "title": "Så här arbetar du med tjänstuppgifter",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/sv-se/dynamics365/business-central/service-how-to-work-on-service-tasks",
+      "appliesTo": "Current Swedish Business Central online documentation; inspected 2026-09-25",
+      "accessedDate": "2026-09-25",
+      "fields": [
+        "Tjänstuppgifter",
+        "Artikelkalkylark",
+        "Serviceartikeldokument",
+        "Antal"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-service-tasks-fr",
+      "title": "Travail sur des tâches de service",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/fr-fr/dynamics365/business-central/service-how-to-work-on-service-tasks",
+      "appliesTo": "Current French Business Central online documentation; inspected 2026-09-25",
+      "accessedDate": "2026-09-25",
+      "fields": [
+        "Tâches de service",
+        "Feuille activité article",
+        "Feuille de calcul des articles de service",
+        "Quantité"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-service-tasks-de",
+      "title": "Serviceaufgaben bearbeiten",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/de-de/dynamics365/business-central/service-how-to-work-on-service-tasks",
+      "appliesTo": "Current German Business Central online documentation; inspected 2026-09-25",
+      "accessedDate": "2026-09-25",
+      "fields": [
+        "Dienstaufgaben",
+        "Artikel-Arbeitsblatt",
+        "Servicearbeitsblatt",
+        "Menge"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-service-tasks-es",
+      "title": "Cómo trabajar en tareas de servicio",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/es-es/dynamics365/business-central/service-how-to-work-on-service-tasks",
+      "appliesTo": "Current Spanish Business Central online documentation; inspected 2026-09-25",
+      "accessedDate": "2026-09-25",
+      "fields": [
+        "Tareas de servicio",
+        "Hoja de producto",
+        "Hoja de trabajo de artículo de servicio",
+        "Cantidad"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-service-tasks-da",
+      "title": "Sådan arbejder du på serviceopgaver",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/da-dk/dynamics365/business-central/service-how-to-work-on-service-tasks",
+      "appliesTo": "Current Danish Business Central online documentation; inspected 2026-09-25",
+      "accessedDate": "2026-09-25",
+      "fields": [
+        "Serviceopgaver",
+        "Varekladde",
+        "Serviceartikelkladde",
+        "Antal"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-service-tasks-fi",
+      "title": "Palvelutehtävien käsitteleminen",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/fi-fi/dynamics365/business-central/service-how-to-work-on-service-tasks",
+      "appliesTo": "Current Finnish Business Central online documentation; inspected 2026-09-25",
+      "accessedDate": "2026-09-25",
+      "fields": [
+        "Palvelutehtävät",
+        "Nimikkeen työkirja",
+        "Huoltonimikkeen työkirja",
+        "Määrä"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-service-tasks-nb",
+      "title": "Slik arbeider du med tjenesteoppgaver",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/nb-no/dynamics365/business-central/service-how-to-work-on-service-tasks",
+      "appliesTo": "Current Norwegian Bokmål Business Central online documentation; inspected 2026-09-25",
+      "accessedDate": "2026-09-25",
+      "fields": [
+        "Tjenesteoppgaver",
+        "Arbeidsordre",
+        "Servicevareskjema",
+        "Antall"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-service-posting",
+      "title": "Post service orders and credit memos",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/en-us/dynamics365/business-central/service-how-to-post-service-orders",
+      "appliesTo": "Current English Business Central online documentation; inspected 2026-09-25",
+      "accessedDate": "2026-09-25",
+      "fields": [
+        "Service Order",
+        "Post"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-service-posting-sv",
+      "title": "Så här bokför du serviceorder",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/sv-se/dynamics365/business-central/service-how-to-post-service-orders",
+      "appliesTo": "Current Swedish Business Central online documentation; inspected 2026-09-25",
+      "accessedDate": "2026-09-25",
+      "fields": [
+        "Tjänstbeställningar",
+        "Inlägg"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-service-posting-fr",
+      "title": "Validation des commandes et des avoirs service",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/fr-fr/dynamics365/business-central/service-how-to-post-service-orders",
+      "appliesTo": "Current French Business Central online documentation; inspected 2026-09-25",
+      "accessedDate": "2026-09-25",
+      "fields": [
+        "Commande service",
+        "Valider"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-service-posting-de",
+      "title": "Serviceaufträge und Gutschriften buchen",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/de-de/dynamics365/business-central/service-how-to-post-service-orders",
+      "appliesTo": "Current German Business Central online documentation; inspected 2026-09-25",
+      "accessedDate": "2026-09-25",
+      "fields": [
+        "Serviceauftrag",
+        "Post"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-service-posting-es",
+      "title": "Registrar pedidos de servicio",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/es-es/dynamics365/business-central/service-how-to-post-service-orders",
+      "appliesTo": "Current Spanish Business Central online documentation; inspected 2026-09-25",
+      "accessedDate": "2026-09-25",
+      "fields": [
+        "Pedido servicio",
+        "Registrar"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-service-posting-da",
+      "title": "Bogføre serviceordrer og kreditnotaer",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/da-dk/dynamics365/business-central/service-how-to-post-service-orders",
+      "appliesTo": "Current Danish Business Central online documentation; inspected 2026-09-25",
+      "accessedDate": "2026-09-25",
+      "fields": [
+        "Serviceordre",
+        "Indlæg"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-service-posting-fi",
+      "title": "Huoltotilausten ja hyvityslaskujen kirjaaminen",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/fi-fi/dynamics365/business-central/service-how-to-post-service-orders",
+      "appliesTo": "Current Finnish Business Central online documentation; inspected 2026-09-25",
+      "accessedDate": "2026-09-25",
+      "fields": [
+        "Huoltotilaus",
+        "Julkaisu"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-service-posting-nb",
+      "title": "Bokfør serviceordrer og kreditnotaer",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/nb-no/dynamics365/business-central/service-how-to-post-service-orders",
+      "appliesTo": "Current Norwegian Bokmål Business Central online documentation; inspected 2026-09-25",
+      "accessedDate": "2026-09-25",
+      "fields": [
+        "Serviceordre",
+        "Publiser"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-service-create-order",
+      "title": "Create service orders",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/en-us/dynamics365/business-central/service-how-to-create-service-orders",
+      "appliesTo": "Current English Business Central online documentation; inspected 2026-09-25",
+      "accessedDate": "2026-09-25",
+      "fields": [
+        "Service Orders page",
+        "New service order action",
+        "Customer No. selects customer and fills related fields"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-service-create-order-sv",
+      "title": "Så här skapar du tjänstbeställningar",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/sv-se/dynamics365/business-central/service-how-to-create-service-orders",
+      "appliesTo": "Current Swedish Business Central online documentation; inspected 2026-09-25",
+      "accessedDate": "2026-09-25",
+      "fields": [
+        "Tjänstbeställningar page",
+        "New service order action",
+        "Kundnr selects customer and fills related fields"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-service-create-order-fr",
+      "title": "Guide pratique pour créer des commandes de service",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/fr-fr/dynamics365/business-central/service-how-to-create-service-orders",
+      "appliesTo": "Current French Business Central online documentation; inspected 2026-09-25",
+      "accessedDate": "2026-09-25",
+      "fields": [
+        "Commandes de service page",
+        "New service order action",
+        "N° client selects customer and fills related fields"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-service-create-order-de",
+      "title": "Erstellen von Serviceaufträgen",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/de-de/dynamics365/business-central/service-how-to-create-service-orders",
+      "appliesTo": "Current German Business Central online documentation; inspected 2026-09-25",
+      "accessedDate": "2026-09-25",
+      "fields": [
+        "Serviceaufträge page",
+        "New service order action",
+        "Debitorennr. selects customer and fills related fields"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-service-create-order-es",
+      "title": "Creación de pedidos de servicio",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/es-es/dynamics365/business-central/service-how-to-create-service-orders",
+      "appliesTo": "Current Spanish Business Central online documentation; inspected 2026-09-25",
+      "accessedDate": "2026-09-25",
+      "fields": [
+        "Pedidos de servicio page",
+        "New service order action",
+        "N.º cliente selects customer and fills related fields"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-service-create-order-da",
+      "title": "Sådan opretter du serviceordrer",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/da-dk/dynamics365/business-central/service-how-to-create-service-orders",
+      "appliesTo": "Current Danish Business Central online documentation; inspected 2026-09-25",
+      "accessedDate": "2026-09-25",
+      "fields": [
+        "Serviceordrer page",
+        "New service order action",
+        "Debitornr. selects customer and fills related fields"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-service-create-order-fi",
+      "title": "Huoltotilausten luominen",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/fi-fi/dynamics365/business-central/service-how-to-create-service-orders",
+      "appliesTo": "Current Finnish Business Central online documentation; inspected 2026-09-25",
+      "accessedDate": "2026-09-25",
+      "fields": [
+        "Huoltotilaukset page",
+        "New service order action",
+        "Asiakasnro selects customer and fills related fields"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-service-create-order-nb",
+      "title": "Slik oppretter du serviceordrer",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/nb-no/dynamics365/business-central/service-how-to-create-service-orders",
+      "appliesTo": "Current Norwegian Bokmål Business Central online documentation; inspected 2026-09-25",
+      "accessedDate": "2026-09-25",
+      "fields": [
+        "Serviceordrer page",
+        "New service order action",
+        "Kundenr. selects customer and fills related fields"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-service-contracts-en-us",
+      "title": "Overview of tasks to fulfill service contracts (en-US)",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/en-us/dynamics365/business-central/service-fulfill-service-contracts",
+      "appliesTo": "Business Central documentation, en-US; checked 2026-09-26",
+      "accessedDate": "2026-09-26",
+      "fields": [
+        "Service contracts describe service level and expectations; templates can include customer, start date and invoice period",
+        "Customize contract details for customer-specific service hours, covered items and discounts; contracts can be created manually or from a quote",
+        "A service item can belong to multiple active contracts; assign the appropriate contract to each service order line",
+        "Review contract signing, expiry, covered service item, annual amount and invoice period before billing",
+        "Contract coverage and a service order do not themselves prove that service work was completed or posted"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-service-contracts-sv-se",
+      "title": "Översikt över uppgifter för att uppfylla tjänstkontrakt (sv-SE)",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/sv-se/dynamics365/business-central/service-fulfill-service-contracts",
+      "appliesTo": "Business Central documentation, sv-SE; checked 2026-09-26",
+      "accessedDate": "2026-09-26",
+      "fields": [
+        "Service contracts describe service level and expectations; templates can include customer, start date and invoice period",
+        "Customize contract details for customer-specific service hours, covered items and discounts; contracts can be created manually or from a quote",
+        "A service item can belong to multiple active contracts; assign the appropriate contract to each service order line",
+        "Review contract signing, expiry, covered service item, annual amount and invoice period before billing",
+        "Contract coverage and a service order do not themselves prove that service work was completed or posted"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-service-contracts-fr-fr",
+      "title": "Vue d’ensemble des tâches permettant de remplir des contrats de service (fr-FR)",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/fr-fr/dynamics365/business-central/service-fulfill-service-contracts",
+      "appliesTo": "Business Central documentation, fr-FR; checked 2026-09-26",
+      "accessedDate": "2026-09-26",
+      "fields": [
+        "Service contracts describe service level and expectations; templates can include customer, start date and invoice period",
+        "Customize contract details for customer-specific service hours, covered items and discounts; contracts can be created manually or from a quote",
+        "A service item can belong to multiple active contracts; assign the appropriate contract to each service order line",
+        "Review contract signing, expiry, covered service item, annual amount and invoice period before billing",
+        "Contract coverage and a service order do not themselves prove that service work was completed or posted"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-service-contracts-de-de",
+      "title": "Übersicht über Aufgaben zur Erfüllung von Serviceverträgen (de-DE)",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/de-de/dynamics365/business-central/service-fulfill-service-contracts",
+      "appliesTo": "Business Central documentation, de-DE; checked 2026-09-26",
+      "accessedDate": "2026-09-26",
+      "fields": [
+        "Service contracts describe service level and expectations; templates can include customer, start date and invoice period",
+        "Customize contract details for customer-specific service hours, covered items and discounts; contracts can be created manually or from a quote",
+        "A service item can belong to multiple active contracts; assign the appropriate contract to each service order line",
+        "Review contract signing, expiry, covered service item, annual amount and invoice period before billing",
+        "Contract coverage and a service order do not themselves prove that service work was completed or posted"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-service-contracts-es-es",
+      "title": "Información general sobre las tareas para cumplir los contratos de servicio (es-ES)",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/es-es/dynamics365/business-central/service-fulfill-service-contracts",
+      "appliesTo": "Business Central documentation, es-ES; checked 2026-09-26",
+      "accessedDate": "2026-09-26",
+      "fields": [
+        "Service contracts describe service level and expectations; templates can include customer, start date and invoice period",
+        "Customize contract details for customer-specific service hours, covered items and discounts; contracts can be created manually or from a quote",
+        "A service item can belong to multiple active contracts; assign the appropriate contract to each service order line",
+        "Review contract signing, expiry, covered service item, annual amount and invoice period before billing",
+        "Contract coverage and a service order do not themselves prove that service work was completed or posted"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-service-contracts-da-dk",
+      "title": "Overview of tasks to fulfill service contracts (da-DK)",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/en-us/dynamics365/business-central/service-fulfill-service-contracts",
+      "appliesTo": "Business Central documentation, da-DK; checked 2026-09-26 (English source fallback; localized page could not be verified)",
+      "accessedDate": "2026-09-26",
+      "fields": [
+        "Service contracts describe service level and expectations; templates can include customer, start date and invoice period",
+        "Customize contract details for customer-specific service hours, covered items and discounts; contracts can be created manually or from a quote",
+        "A service item can belong to multiple active contracts; assign the appropriate contract to each service order line",
+        "Review contract signing, expiry, covered service item, annual amount and invoice period before billing",
+        "Contract coverage and a service order do not themselves prove that service work was completed or posted"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-service-contracts-fi-fi",
+      "title": "Yleiskatsaus tehtävistä, jotka täyttävät palvelusopimukset (fi-FI)",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/fi-fi/dynamics365/business-central/service-fulfill-service-contracts",
+      "appliesTo": "Business Central documentation, fi-FI; checked 2026-09-26",
+      "accessedDate": "2026-09-26",
+      "fields": [
+        "Service contracts describe service level and expectations; templates can include customer, start date and invoice period",
+        "Customize contract details for customer-specific service hours, covered items and discounts; contracts can be created manually or from a quote",
+        "A service item can belong to multiple active contracts; assign the appropriate contract to each service order line",
+        "Review contract signing, expiry, covered service item, annual amount and invoice period before billing",
+        "Contract coverage and a service order do not themselves prove that service work was completed or posted"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-service-contracts-nb-no",
+      "title": "Oversikt over oppgaver for å oppfylle servicekontrakter (nb-NO)",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/nb-no/dynamics365/business-central/service-fulfill-service-contracts",
+      "appliesTo": "Business Central documentation, nb-NO; checked 2026-09-26",
+      "accessedDate": "2026-09-26",
+      "fields": [
+        "Service contracts describe service level and expectations; templates can include customer, start date and invoice period",
+        "Customize contract details for customer-specific service hours, covered items and discounts; contracts can be created manually or from a quote",
+        "A service item can belong to multiple active contracts; assign the appropriate contract to each service order line",
+        "Review contract signing, expiry, covered service item, annual amount and invoice period before billing",
+        "Contract coverage and a service order do not themselves prove that service work was completed or posted"
+      ]
+    }
   ]
 }

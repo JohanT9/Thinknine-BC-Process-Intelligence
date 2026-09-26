@@ -1,7 +1,7 @@
 {
   "packId": "bc-warehouse",
   "name": "Business Central Warehouse",
-  "version": "2.4.0",
+  "version": "2.5.0",
   "priority": 200,
   "rules": [
     {
@@ -1234,7 +1234,11 @@
       "sourceUri": "https://learn.microsoft.com/en-us/dynamics365/business-central/warehouse-how-to-pick-items-for-warehouse-shipment",
       "appliesTo": "Current en-US Business Central online documentation; inspected 2026-09-25",
       "accessedDate": "2026-09-25",
-      "fields": ["Warehouse Picks page", "Register Pick action", "warehouse shipment follow-up"]
+      "fields": [
+        "Warehouse Picks page",
+        "Register Pick action",
+        "warehouse shipment follow-up"
+      ]
     },
     {
       "sourceId": "microsoft-learn-warehouse-pick-shipment-sv",
@@ -1243,7 +1247,11 @@
       "sourceUri": "https://learn.microsoft.com/sv-se/dynamics365/business-central/warehouse-how-to-pick-items-for-warehouse-shipment",
       "appliesTo": "Current sv-SE Business Central online documentation; inspected 2026-09-25",
       "accessedDate": "2026-09-25",
-      "fields": ["warehouse pick page", "Registrera plockning action", "warehouse shipment follow-up"]
+      "fields": [
+        "warehouse pick page",
+        "Registrera plockning action",
+        "warehouse shipment follow-up"
+      ]
     },
     {
       "sourceId": "microsoft-learn-warehouse-pick-shipment-fr",
@@ -1252,7 +1260,11 @@
       "sourceUri": "https://learn.microsoft.com/fr-fr/dynamics365/business-central/warehouse-how-to-pick-items-for-warehouse-shipment",
       "appliesTo": "Current fr-FR Business Central online documentation; inspected 2026-09-25",
       "accessedDate": "2026-09-25",
-      "fields": ["warehouse pick page", "Enregistrer prélèvement action", "warehouse shipment follow-up"]
+      "fields": [
+        "warehouse pick page",
+        "Enregistrer prélèvement action",
+        "warehouse shipment follow-up"
+      ]
     },
     {
       "sourceId": "microsoft-learn-warehouse-pick-shipment-de",
@@ -1261,7 +1273,11 @@
       "sourceUri": "https://learn.microsoft.com/de-de/dynamics365/business-central/warehouse-how-to-pick-items-for-warehouse-shipment",
       "appliesTo": "Current de-DE Business Central online documentation; inspected 2026-09-25",
       "accessedDate": "2026-09-25",
-      "fields": ["warehouse pick page", "Kommissionierung registrieren action", "warehouse shipment follow-up"]
+      "fields": [
+        "warehouse pick page",
+        "Kommissionierung registrieren action",
+        "warehouse shipment follow-up"
+      ]
     },
     {
       "sourceId": "microsoft-learn-warehouse-pick-shipment-es",
@@ -1270,7 +1286,11 @@
       "sourceUri": "https://learn.microsoft.com/es-es/dynamics365/business-central/warehouse-how-to-pick-items-for-warehouse-shipment",
       "appliesTo": "Current es-ES Business Central online documentation; inspected 2026-09-25",
       "accessedDate": "2026-09-25",
-      "fields": ["warehouse pick page", "Registrar picking action", "warehouse shipment follow-up"]
+      "fields": [
+        "warehouse pick page",
+        "Registrar picking action",
+        "warehouse shipment follow-up"
+      ]
     },
     {
       "sourceId": "microsoft-learn-warehouse-pick-shipment-da",
@@ -1279,7 +1299,11 @@
       "sourceUri": "https://learn.microsoft.com/da-dk/dynamics365/business-central/warehouse-how-to-pick-items-for-warehouse-shipment",
       "appliesTo": "Current da-DK Business Central online documentation; inspected 2026-09-25",
       "accessedDate": "2026-09-25",
-      "fields": ["warehouse pick page", "Registrer pluk action", "warehouse shipment follow-up"]
+      "fields": [
+        "warehouse pick page",
+        "Registrer pluk action",
+        "warehouse shipment follow-up"
+      ]
     },
     {
       "sourceId": "microsoft-learn-warehouse-pick-shipment-fi",
@@ -1288,7 +1312,11 @@
       "sourceUri": "https://learn.microsoft.com/fi-fi/dynamics365/business-central/warehouse-how-to-pick-items-for-warehouse-shipment",
       "appliesTo": "Current fi-FI Business Central online documentation; inspected 2026-09-25",
       "accessedDate": "2026-09-25",
-      "fields": ["warehouse pick page", "Rekisteröi poiminta action", "warehouse shipment follow-up"]
+      "fields": [
+        "warehouse pick page",
+        "Rekisteröi poiminta action",
+        "warehouse shipment follow-up"
+      ]
     },
     {
       "sourceId": "microsoft-learn-warehouse-pick-shipment-nb",
@@ -1297,7 +1325,11 @@
       "sourceUri": "https://learn.microsoft.com/nb-no/dynamics365/business-central/warehouse-how-to-pick-items-for-warehouse-shipment",
       "appliesTo": "Current nb-NO Business Central online documentation; inspected 2026-09-25",
       "accessedDate": "2026-09-25",
-      "fields": ["warehouse pick page", "Registrer plukk action", "warehouse shipment follow-up"]
+      "fields": [
+        "warehouse pick page",
+        "Registrer plukk action",
+        "warehouse shipment follow-up"
+      ]
     },
     {
       "sourceId": "microsoft-learn-item-availability",
@@ -1409,6 +1441,134 @@
         "items by location",
         "on-hand versus projected available balance",
         "warehouse bin and reservation constraints"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-warehouse-physical-inventory-en-us",
+      "title": "Invoice prepayments (en-US)",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/en-us/dynamics365/business-central/inventory-how-count-adjust-reclassify",
+      "appliesTo": "Business Central sales documentation, en-US; checked 2026-09-26",
+      "accessedDate": "2026-09-26",
+      "fields": [
+        "Choose physical inventory journal versus warehouse physical inventory journal based on directed put-away and pick setup",
+        "Calculate expected inventory with deliberate item, location, bin, and dimension filters; preserve original calculated lines while counts are performed",
+        "Basic warehouse count: enter actual quantity and post differences; use reclassification or transfer order for wrong-location stock rather than forcing a count adjustment",
+        "Advanced warehouse count: synchronize item ledger and warehouse data first; count all bins for an item to post a complete physical count",
+        "Registering warehouse physical counts creates warehouse entries but does not itself post item, physical inventory, or value ledger entries; calculate warehouse adjustment and post to synchronize",
+        "Cycle counting frequency is set per item; choose the appropriate journal path for the warehouse setup"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-warehouse-physical-inventory-sv-se",
+      "title": "Fakturera förskottsbetalningar (sv-SE)",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/sv-se/dynamics365/business-central/inventory-how-count-adjust-reclassify",
+      "appliesTo": "Business Central sales documentation, sv-SE; checked 2026-09-26",
+      "accessedDate": "2026-09-26",
+      "fields": [
+        "Choose physical inventory journal versus warehouse physical inventory journal based on directed put-away and pick setup",
+        "Calculate expected inventory with deliberate item, location, bin, and dimension filters; preserve original calculated lines while counts are performed",
+        "Basic warehouse count: enter actual quantity and post differences; use reclassification or transfer order for wrong-location stock rather than forcing a count adjustment",
+        "Advanced warehouse count: synchronize item ledger and warehouse data first; count all bins for an item to post a complete physical count",
+        "Registering warehouse physical counts creates warehouse entries but does not itself post item, physical inventory, or value ledger entries; calculate warehouse adjustment and post to synchronize",
+        "Cycle counting frequency is set per item; choose the appropriate journal path for the warehouse setup"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-warehouse-physical-inventory-fr-fr",
+      "title": "Facturation des acomptes (fr-FR)",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/fr-fr/dynamics365/business-central/inventory-how-count-adjust-reclassify",
+      "appliesTo": "Business Central sales documentation, fr-FR; checked 2026-09-26",
+      "accessedDate": "2026-09-26",
+      "fields": [
+        "Choose physical inventory journal versus warehouse physical inventory journal based on directed put-away and pick setup",
+        "Calculate expected inventory with deliberate item, location, bin, and dimension filters; preserve original calculated lines while counts are performed",
+        "Basic warehouse count: enter actual quantity and post differences; use reclassification or transfer order for wrong-location stock rather than forcing a count adjustment",
+        "Advanced warehouse count: synchronize item ledger and warehouse data first; count all bins for an item to post a complete physical count",
+        "Registering warehouse physical counts creates warehouse entries but does not itself post item, physical inventory, or value ledger entries; calculate warehouse adjustment and post to synchronize",
+        "Cycle counting frequency is set per item; choose the appropriate journal path for the warehouse setup"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-warehouse-physical-inventory-de-de",
+      "title": "Vorauszahlungen fakturieren (de-DE)",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/de-de/dynamics365/business-central/inventory-how-count-adjust-reclassify",
+      "appliesTo": "Business Central sales documentation, de-DE; checked 2026-09-26",
+      "accessedDate": "2026-09-26",
+      "fields": [
+        "Choose physical inventory journal versus warehouse physical inventory journal based on directed put-away and pick setup",
+        "Calculate expected inventory with deliberate item, location, bin, and dimension filters; preserve original calculated lines while counts are performed",
+        "Basic warehouse count: enter actual quantity and post differences; use reclassification or transfer order for wrong-location stock rather than forcing a count adjustment",
+        "Advanced warehouse count: synchronize item ledger and warehouse data first; count all bins for an item to post a complete physical count",
+        "Registering warehouse physical counts creates warehouse entries but does not itself post item, physical inventory, or value ledger entries; calculate warehouse adjustment and post to synchronize",
+        "Cycle counting frequency is set per item; choose the appropriate journal path for the warehouse setup"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-warehouse-physical-inventory-es-es",
+      "title": "Facturar prepagos (es-ES)",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/es-es/dynamics365/business-central/inventory-how-count-adjust-reclassify",
+      "appliesTo": "Business Central sales documentation, es-ES; checked 2026-09-26",
+      "accessedDate": "2026-09-26",
+      "fields": [
+        "Choose physical inventory journal versus warehouse physical inventory journal based on directed put-away and pick setup",
+        "Calculate expected inventory with deliberate item, location, bin, and dimension filters; preserve original calculated lines while counts are performed",
+        "Basic warehouse count: enter actual quantity and post differences; use reclassification or transfer order for wrong-location stock rather than forcing a count adjustment",
+        "Advanced warehouse count: synchronize item ledger and warehouse data first; count all bins for an item to post a complete physical count",
+        "Registering warehouse physical counts creates warehouse entries but does not itself post item, physical inventory, or value ledger entries; calculate warehouse adjustment and post to synchronize",
+        "Cycle counting frequency is set per item; choose the appropriate journal path for the warehouse setup"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-warehouse-physical-inventory-da-dk",
+      "title": "Fakturere forudbetalinger (da-DK)",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/da-dk/dynamics365/business-central/inventory-how-count-adjust-reclassify",
+      "appliesTo": "Business Central sales documentation, da-DK; checked 2026-09-26",
+      "accessedDate": "2026-09-26",
+      "fields": [
+        "Choose physical inventory journal versus warehouse physical inventory journal based on directed put-away and pick setup",
+        "Calculate expected inventory with deliberate item, location, bin, and dimension filters; preserve original calculated lines while counts are performed",
+        "Basic warehouse count: enter actual quantity and post differences; use reclassification or transfer order for wrong-location stock rather than forcing a count adjustment",
+        "Advanced warehouse count: synchronize item ledger and warehouse data first; count all bins for an item to post a complete physical count",
+        "Registering warehouse physical counts creates warehouse entries but does not itself post item, physical inventory, or value ledger entries; calculate warehouse adjustment and post to synchronize",
+        "Cycle counting frequency is set per item; choose the appropriate journal path for the warehouse setup"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-warehouse-physical-inventory-fi-fi",
+      "title": "Ennakkomaksujen laskutus (fi-FI)",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/fi-fi/dynamics365/business-central/inventory-how-count-adjust-reclassify",
+      "appliesTo": "Business Central sales documentation, fi-FI; checked 2026-09-26",
+      "accessedDate": "2026-09-26",
+      "fields": [
+        "Choose physical inventory journal versus warehouse physical inventory journal based on directed put-away and pick setup",
+        "Calculate expected inventory with deliberate item, location, bin, and dimension filters; preserve original calculated lines while counts are performed",
+        "Basic warehouse count: enter actual quantity and post differences; use reclassification or transfer order for wrong-location stock rather than forcing a count adjustment",
+        "Advanced warehouse count: synchronize item ledger and warehouse data first; count all bins for an item to post a complete physical count",
+        "Registering warehouse physical counts creates warehouse entries but does not itself post item, physical inventory, or value ledger entries; calculate warehouse adjustment and post to synchronize",
+        "Cycle counting frequency is set per item; choose the appropriate journal path for the warehouse setup"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-warehouse-physical-inventory-nb-no",
+      "title": "Fakturer forskudd (nb-NO)",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/nb-no/dynamics365/business-central/inventory-how-count-adjust-reclassify",
+      "appliesTo": "Business Central sales documentation, nb-NO; checked 2026-09-26",
+      "accessedDate": "2026-09-26",
+      "fields": [
+        "Choose physical inventory journal versus warehouse physical inventory journal based on directed put-away and pick setup",
+        "Calculate expected inventory with deliberate item, location, bin, and dimension filters; preserve original calculated lines while counts are performed",
+        "Basic warehouse count: enter actual quantity and post differences; use reclassification or transfer order for wrong-location stock rather than forcing a count adjustment",
+        "Advanced warehouse count: synchronize item ledger and warehouse data first; count all bins for an item to post a complete physical count",
+        "Registering warehouse physical counts creates warehouse entries but does not itself post item, physical inventory, or value ledger entries; calculate warehouse adjustment and post to synchronize",
+        "Cycle counting frequency is set per item; choose the appropriate journal path for the warehouse setup"
       ]
     }
   ]

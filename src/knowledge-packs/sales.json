@@ -1,7 +1,7 @@
 {
   "packId": "bc-sales",
   "name": "Business Central Sales",
-  "version": "2.5.0",
+  "version": "2.6.0",
   "priority": 200,
   "pageDefinitions": [
     {
@@ -2160,6 +2160,126 @@
       "accessedDate": "2026-09-25",
       "fields": [
         "Forsendelsesdato field on sales order lines"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-sales-prepayments-en-us",
+      "title": "Invoice prepayments (en-US)",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/en-us/dynamics365/business-central/finance-invoice-prepayments",
+      "appliesTo": "Business Central sales documentation, en-US; checked 2026-09-26",
+      "accessedDate": "2026-09-26",
+      "fields": [
+        "Customer prepayments are invoiced and posted on sales orders before the final invoice; the advance invoice is not proof that payment was received",
+        "Configure prepayment posting accounts, number series, and default percentages for customers and items before invoicing",
+        "Set an advance amount for the order or distribute it across lines; order changes can require an additional advance invoice",
+        "A sales line with an invoiced prepayment requires a prepayment credit memo before deletion",
+        "Review tax, posting groups, rounding, and final invoice application under local setup"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-sales-prepayments-sv-se",
+      "title": "Fakturera förskottsbetalningar (sv-SE)",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/sv-se/dynamics365/business-central/finance-invoice-prepayments",
+      "appliesTo": "Business Central sales documentation, sv-SE; checked 2026-09-26",
+      "accessedDate": "2026-09-26",
+      "fields": [
+        "Customer prepayments are invoiced and posted on sales orders before the final invoice; the advance invoice is not proof that payment was received",
+        "Configure prepayment posting accounts, number series, and default percentages for customers and items before invoicing",
+        "Set an advance amount for the order or distribute it across lines; order changes can require an additional advance invoice",
+        "A sales line with an invoiced prepayment requires a prepayment credit memo before deletion",
+        "Review tax, posting groups, rounding, and final invoice application under local setup"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-sales-prepayments-fr-fr",
+      "title": "Facturation des acomptes (fr-FR)",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/fr-fr/dynamics365/business-central/finance-invoice-prepayments",
+      "appliesTo": "Business Central sales documentation, fr-FR; checked 2026-09-26",
+      "accessedDate": "2026-09-26",
+      "fields": [
+        "Customer prepayments are invoiced and posted on sales orders before the final invoice; the advance invoice is not proof that payment was received",
+        "Configure prepayment posting accounts, number series, and default percentages for customers and items before invoicing",
+        "Set an advance amount for the order or distribute it across lines; order changes can require an additional advance invoice",
+        "A sales line with an invoiced prepayment requires a prepayment credit memo before deletion",
+        "Review tax, posting groups, rounding, and final invoice application under local setup"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-sales-prepayments-de-de",
+      "title": "Vorauszahlungen fakturieren (de-DE)",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/de-de/dynamics365/business-central/finance-invoice-prepayments",
+      "appliesTo": "Business Central sales documentation, de-DE; checked 2026-09-26",
+      "accessedDate": "2026-09-26",
+      "fields": [
+        "Customer prepayments are invoiced and posted on sales orders before the final invoice; the advance invoice is not proof that payment was received",
+        "Configure prepayment posting accounts, number series, and default percentages for customers and items before invoicing",
+        "Set an advance amount for the order or distribute it across lines; order changes can require an additional advance invoice",
+        "A sales line with an invoiced prepayment requires a prepayment credit memo before deletion",
+        "Review tax, posting groups, rounding, and final invoice application under local setup"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-sales-prepayments-es-es",
+      "title": "Facturar prepagos (es-ES)",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/es-es/dynamics365/business-central/finance-invoice-prepayments",
+      "appliesTo": "Business Central sales documentation, es-ES; checked 2026-09-26",
+      "accessedDate": "2026-09-26",
+      "fields": [
+        "Customer prepayments are invoiced and posted on sales orders before the final invoice; the advance invoice is not proof that payment was received",
+        "Configure prepayment posting accounts, number series, and default percentages for customers and items before invoicing",
+        "Set an advance amount for the order or distribute it across lines; order changes can require an additional advance invoice",
+        "A sales line with an invoiced prepayment requires a prepayment credit memo before deletion",
+        "Review tax, posting groups, rounding, and final invoice application under local setup"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-sales-prepayments-da-dk",
+      "title": "Fakturere forudbetalinger (da-DK)",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/da-dk/dynamics365/business-central/finance-invoice-prepayments",
+      "appliesTo": "Business Central sales documentation, da-DK; checked 2026-09-26",
+      "accessedDate": "2026-09-26",
+      "fields": [
+        "Customer prepayments are invoiced and posted on sales orders before the final invoice; the advance invoice is not proof that payment was received",
+        "Configure prepayment posting accounts, number series, and default percentages for customers and items before invoicing",
+        "Set an advance amount for the order or distribute it across lines; order changes can require an additional advance invoice",
+        "A sales line with an invoiced prepayment requires a prepayment credit memo before deletion",
+        "Review tax, posting groups, rounding, and final invoice application under local setup"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-sales-prepayments-fi-fi",
+      "title": "Ennakkomaksujen laskutus (fi-FI)",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/fi-fi/dynamics365/business-central/finance-invoice-prepayments",
+      "appliesTo": "Business Central sales documentation, fi-FI; checked 2026-09-26",
+      "accessedDate": "2026-09-26",
+      "fields": [
+        "Customer prepayments are invoiced and posted on sales orders before the final invoice; the advance invoice is not proof that payment was received",
+        "Configure prepayment posting accounts, number series, and default percentages for customers and items before invoicing",
+        "Set an advance amount for the order or distribute it across lines; order changes can require an additional advance invoice",
+        "A sales line with an invoiced prepayment requires a prepayment credit memo before deletion",
+        "Review tax, posting groups, rounding, and final invoice application under local setup"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-sales-prepayments-nb-no",
+      "title": "Fakturer forskudd (nb-NO)",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/nb-no/dynamics365/business-central/finance-invoice-prepayments",
+      "appliesTo": "Business Central sales documentation, nb-NO; checked 2026-09-26",
+      "accessedDate": "2026-09-26",
+      "fields": [
+        "Customer prepayments are invoiced and posted on sales orders before the final invoice; the advance invoice is not proof that payment was received",
+        "Configure prepayment posting accounts, number series, and default percentages for customers and items before invoicing",
+        "Set an advance amount for the order or distribute it across lines; order changes can require an additional advance invoice",
+        "A sales line with an invoiced prepayment requires a prepayment credit memo before deletion",
+        "Review tax, posting groups, rounding, and final invoice application under local setup"
       ]
     }
   ]

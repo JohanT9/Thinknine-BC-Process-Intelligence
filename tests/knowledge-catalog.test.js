@@ -186,4 +186,25 @@ for(const [locale,pageCaption,actionCaption] of multilingualPaymentSamples){
 for(const pack of imported.snapshot.packs.filter(item=>["bc-sales","bc-purchase"].includes(item.packId)))for(const rule of pack.rules.filter(item=>/(Return|GetPosted|CreditMemo|Corrective|UnpaidPostedInvoice)/.test(item.ruleId)))
   for(const locale of ["sv-SE","en-US","fr-FR","de-DE","es-ES","da-DK","fi-FI","nb-NO"])
     assert.equal(rule.languages.includes(locale),true,`${rule.ruleId} should declare ${locale} coverage`);
+const localizedSourceTopics=[
+  ["bc-finance","microsoft-learn-finance-prepayments-","finance-invoice-prepayments",[]],
+  ["bc-sales","microsoft-learn-sales-prepayments-","finance-invoice-prepayments",[]],
+  ["bc-purchase","microsoft-learn-purchase-prepayments-","finance-invoice-prepayments",[]],
+  ["bc-manufacturing","microsoft-learn-production-capacity-","production-how-to-set-up-work-and-machine-centers",[]],
+  ["bc-services","microsoft-learn-service-contracts-","service-fulfill-service-contracts",["da-DK"]],
+  ["bc-warehouse","microsoft-learn-warehouse-physical-inventory-","inventory-how-count-adjust-reclassify",[]]
+];
+for(const [packId,idPrefix,slug,fallbackLocales] of localizedSourceTopics){
+  const pack=packs.find(item=>item.packId===packId).pack;
+  for(const locale of ["en-US","sv-SE","fr-FR","de-DE","es-ES","da-DK","fi-FI","nb-NO"]){
+    const source=pack.sources.find(item=>item.sourceId===idPrefix+locale.toLowerCase());
+    assert.ok(source,`${packId} ${slug} source exists for ${locale}`);
+    const sourceLocale=fallbackLocales.includes(locale)?"en-us":locale.toLowerCase();
+    assert.ok(source.sourceUri.startsWith(`https://learn.microsoft.com/${sourceLocale}/dynamics365/business-central/${slug}`),
+      `${packId} official localized source URI for ${locale}`);
+    assert.ok(source.fields.length>=4,`${packId} source scope is useful for ${locale}`);
+    if(fallbackLocales.includes(locale))assert.match(source.appliesTo,/English source fallback/,
+      `${packId} fallback is explicit for ${locale}`);
+  }
+}
 console.log("BC catalog count, source traceability, return and cash-management rules, and version gates passed.");

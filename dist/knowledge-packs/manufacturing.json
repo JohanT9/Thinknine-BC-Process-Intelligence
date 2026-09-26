@@ -1,7 +1,7 @@
 {
   "packId": "bc-manufacturing",
   "name": "Business Central Manufacturing",
-  "version": "2.2.0",
+  "version": "2.3.0",
   "priority": 200,
   "rules": [
     {
@@ -737,6 +737,134 @@
         "production-order statuses and lifecycle",
         "Change Status action",
         "eligible order status types"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-production-capacity-en-us",
+      "title": "Set up work centers and machine centers (en-US)",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/en-us/dynamics365/business-central/production-how-to-set-up-work-and-machine-centers",
+      "appliesTo": "Business Central documentation, en-US; checked 2026-09-26",
+      "accessedDate": "2026-09-26",
+      "fields": [
+        "Set up shop calendars before work or machine centers; capacity availability is based on calendars and hierarchy",
+        "Work center and machine center capacity, efficiency, routing concurrent capacity, setup/run/wait/move times affect operation duration and lead time",
+        "Costing can combine direct unit cost, indirect cost percentage and overhead; verify unit cost calculation basis and resource rates",
+        "Alternate work center is informational and is not automatically used by planning; consolidated calendar rolls machine center calendars into work center load",
+        "Infinite-capacity scheduling is the default and may overload resources; finite capacity constraints only the configured bottleneck resources and do not provide detailed shop-floor optimization",
+        "Flushing settings affect when output is posted; check center defaults and routing-line overrides before processing"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-production-capacity-sv-se",
+      "title": "Konfigurera produktionsgrupper och maskingrupper (sv-SE)",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/sv-se/dynamics365/business-central/production-how-to-set-up-work-and-machine-centers",
+      "appliesTo": "Business Central documentation, sv-SE; checked 2026-09-26",
+      "accessedDate": "2026-09-26",
+      "fields": [
+        "Set up shop calendars before work or machine centers; capacity availability is based on calendars and hierarchy",
+        "Work center and machine center capacity, efficiency, routing concurrent capacity, setup/run/wait/move times affect operation duration and lead time",
+        "Costing can combine direct unit cost, indirect cost percentage and overhead; verify unit cost calculation basis and resource rates",
+        "Alternate work center is informational and is not automatically used by planning; consolidated calendar rolls machine center calendars into work center load",
+        "Infinite-capacity scheduling is the default and may overload resources; finite capacity constraints only the configured bottleneck resources and do not provide detailed shop-floor optimization",
+        "Flushing settings affect when output is posted; check center defaults and routing-line overrides before processing"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-production-capacity-fr-fr",
+      "title": "Configuration des centres de charge et des postes de charge (fr-FR)",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/fr-fr/dynamics365/business-central/production-how-to-set-up-work-and-machine-centers",
+      "appliesTo": "Business Central documentation, fr-FR; checked 2026-09-26",
+      "accessedDate": "2026-09-26",
+      "fields": [
+        "Set up shop calendars before work or machine centers; capacity availability is based on calendars and hierarchy",
+        "Work center and machine center capacity, efficiency, routing concurrent capacity, setup/run/wait/move times affect operation duration and lead time",
+        "Costing can combine direct unit cost, indirect cost percentage and overhead; verify unit cost calculation basis and resource rates",
+        "Alternate work center is informational and is not automatically used by planning; consolidated calendar rolls machine center calendars into work center load",
+        "Infinite-capacity scheduling is the default and may overload resources; finite capacity constraints only the configured bottleneck resources and do not provide detailed shop-floor optimization",
+        "Flushing settings affect when output is posted; check center defaults and routing-line overrides before processing"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-production-capacity-de-de",
+      "title": "Arbeitsplätze und Arbeitsplatzgruppen einrichten (de-DE)",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/de-de/dynamics365/business-central/production-how-to-set-up-work-and-machine-centers",
+      "appliesTo": "Business Central documentation, de-DE; checked 2026-09-26",
+      "accessedDate": "2026-09-26",
+      "fields": [
+        "Set up shop calendars before work or machine centers; capacity availability is based on calendars and hierarchy",
+        "Work center and machine center capacity, efficiency, routing concurrent capacity, setup/run/wait/move times affect operation duration and lead time",
+        "Costing can combine direct unit cost, indirect cost percentage and overhead; verify unit cost calculation basis and resource rates",
+        "Alternate work center is informational and is not automatically used by planning; consolidated calendar rolls machine center calendars into work center load",
+        "Infinite-capacity scheduling is the default and may overload resources; finite capacity constraints only the configured bottleneck resources and do not provide detailed shop-floor optimization",
+        "Flushing settings affect when output is posted; check center defaults and routing-line overrides before processing"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-production-capacity-es-es",
+      "title": "Configurar centros de trabajo y centros de máquinas (es-ES)",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/es-es/dynamics365/business-central/production-how-to-set-up-work-and-machine-centers",
+      "appliesTo": "Business Central documentation, es-ES; checked 2026-09-26",
+      "accessedDate": "2026-09-26",
+      "fields": [
+        "Set up shop calendars before work or machine centers; capacity availability is based on calendars and hierarchy",
+        "Work center and machine center capacity, efficiency, routing concurrent capacity, setup/run/wait/move times affect operation duration and lead time",
+        "Costing can combine direct unit cost, indirect cost percentage and overhead; verify unit cost calculation basis and resource rates",
+        "Alternate work center is informational and is not automatically used by planning; consolidated calendar rolls machine center calendars into work center load",
+        "Infinite-capacity scheduling is the default and may overload resources; finite capacity constraints only the configured bottleneck resources and do not provide detailed shop-floor optimization",
+        "Flushing settings affect when output is posted; check center defaults and routing-line overrides before processing"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-production-capacity-da-dk",
+      "title": "Opsætte arbejdscentre og produktionsressourcer (da-DK)",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/da-dk/dynamics365/business-central/production-how-to-set-up-work-and-machine-centers",
+      "appliesTo": "Business Central documentation, da-DK; checked 2026-09-26",
+      "accessedDate": "2026-09-26",
+      "fields": [
+        "Set up shop calendars before work or machine centers; capacity availability is based on calendars and hierarchy",
+        "Work center and machine center capacity, efficiency, routing concurrent capacity, setup/run/wait/move times affect operation duration and lead time",
+        "Costing can combine direct unit cost, indirect cost percentage and overhead; verify unit cost calculation basis and resource rates",
+        "Alternate work center is informational and is not automatically used by planning; consolidated calendar rolls machine center calendars into work center load",
+        "Infinite-capacity scheduling is the default and may overload resources; finite capacity constraints only the configured bottleneck resources and do not provide detailed shop-floor optimization",
+        "Flushing settings affect when output is posted; check center defaults and routing-line overrides before processing"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-production-capacity-fi-fi",
+      "title": "Tuotantosolujen ja koneasemien määrittäminen (fi-FI)",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/fi-fi/dynamics365/business-central/production-how-to-set-up-work-and-machine-centers",
+      "appliesTo": "Business Central documentation, fi-FI; checked 2026-09-26",
+      "accessedDate": "2026-09-26",
+      "fields": [
+        "Set up shop calendars before work or machine centers; capacity availability is based on calendars and hierarchy",
+        "Work center and machine center capacity, efficiency, routing concurrent capacity, setup/run/wait/move times affect operation duration and lead time",
+        "Costing can combine direct unit cost, indirect cost percentage and overhead; verify unit cost calculation basis and resource rates",
+        "Alternate work center is informational and is not automatically used by planning; consolidated calendar rolls machine center calendars into work center load",
+        "Infinite-capacity scheduling is the default and may overload resources; finite capacity constraints only the configured bottleneck resources and do not provide detailed shop-floor optimization",
+        "Flushing settings affect when output is posted; check center defaults and routing-line overrides before processing"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-production-capacity-nb-no",
+      "title": "Konfigurer arbeidssentre og maskinsentre (nb-NO)",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/nb-no/dynamics365/business-central/production-how-to-set-up-work-and-machine-centers",
+      "appliesTo": "Business Central documentation, nb-NO; checked 2026-09-26",
+      "accessedDate": "2026-09-26",
+      "fields": [
+        "Set up shop calendars before work or machine centers; capacity availability is based on calendars and hierarchy",
+        "Work center and machine center capacity, efficiency, routing concurrent capacity, setup/run/wait/move times affect operation duration and lead time",
+        "Costing can combine direct unit cost, indirect cost percentage and overhead; verify unit cost calculation basis and resource rates",
+        "Alternate work center is informational and is not automatically used by planning; consolidated calendar rolls machine center calendars into work center load",
+        "Infinite-capacity scheduling is the default and may overload resources; finite capacity constraints only the configured bottleneck resources and do not provide detailed shop-floor optimization",
+        "Flushing settings affect when output is posted; check center defaults and routing-line overrides before processing"
       ]
     }
   ]

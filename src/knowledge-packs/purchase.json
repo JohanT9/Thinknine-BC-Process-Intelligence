@@ -1,7 +1,7 @@
 {
   "packId": "bc-purchase",
   "name": "Business Central Purchase",
-  "version": "2.5.0",
+  "version": "2.6.0",
   "priority": 200,
   "pageDefinitions": [
     {
@@ -2007,6 +2007,126 @@
       "accessedDate": "2026-09-25",
       "fields": [
         "Forventet mottaksdato field on purchase order lines"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-purchase-prepayments-en-us",
+      "title": "Invoice prepayments (en-US)",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/en-us/dynamics365/business-central/finance-invoice-prepayments",
+      "appliesTo": "Business Central documentation, en-US; checked 2026-09-26",
+      "accessedDate": "2026-09-26",
+      "fields": [
+        "Vendor prepayments are invoiced and posted on purchase orders before the final invoice; distinguish the advance invoice from payment settlement",
+        "Configure prepayment posting accounts, number series, and default percentages for vendors and items; verify the purchase posting setup",
+        "Adjust order-level or line-level prepayment amounts and review additional prepayment invoices after quantity or line changes",
+        "A purchase line with an invoiced prepayment requires a prepayment credit memo before deletion",
+        "Review prepayment application and final invoice balances; invoice posting does not prove vendor payment"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-purchase-prepayments-sv-se",
+      "title": "Fakturera förskottsbetalningar (sv-SE)",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/sv-se/dynamics365/business-central/finance-invoice-prepayments",
+      "appliesTo": "Business Central documentation, sv-SE; checked 2026-09-26",
+      "accessedDate": "2026-09-26",
+      "fields": [
+        "Vendor prepayments are invoiced and posted on purchase orders before the final invoice; distinguish the advance invoice from payment settlement",
+        "Configure prepayment posting accounts, number series, and default percentages for vendors and items; verify the purchase posting setup",
+        "Adjust order-level or line-level prepayment amounts and review additional prepayment invoices after quantity or line changes",
+        "A purchase line with an invoiced prepayment requires a prepayment credit memo before deletion",
+        "Review prepayment application and final invoice balances; invoice posting does not prove vendor payment"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-purchase-prepayments-fr-fr",
+      "title": "Facturation des acomptes (fr-FR)",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/fr-fr/dynamics365/business-central/finance-invoice-prepayments",
+      "appliesTo": "Business Central documentation, fr-FR; checked 2026-09-26",
+      "accessedDate": "2026-09-26",
+      "fields": [
+        "Vendor prepayments are invoiced and posted on purchase orders before the final invoice; distinguish the advance invoice from payment settlement",
+        "Configure prepayment posting accounts, number series, and default percentages for vendors and items; verify the purchase posting setup",
+        "Adjust order-level or line-level prepayment amounts and review additional prepayment invoices after quantity or line changes",
+        "A purchase line with an invoiced prepayment requires a prepayment credit memo before deletion",
+        "Review prepayment application and final invoice balances; invoice posting does not prove vendor payment"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-purchase-prepayments-de-de",
+      "title": "Vorauszahlungen fakturieren (de-DE)",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/de-de/dynamics365/business-central/finance-invoice-prepayments",
+      "appliesTo": "Business Central documentation, de-DE; checked 2026-09-26",
+      "accessedDate": "2026-09-26",
+      "fields": [
+        "Vendor prepayments are invoiced and posted on purchase orders before the final invoice; distinguish the advance invoice from payment settlement",
+        "Configure prepayment posting accounts, number series, and default percentages for vendors and items; verify the purchase posting setup",
+        "Adjust order-level or line-level prepayment amounts and review additional prepayment invoices after quantity or line changes",
+        "A purchase line with an invoiced prepayment requires a prepayment credit memo before deletion",
+        "Review prepayment application and final invoice balances; invoice posting does not prove vendor payment"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-purchase-prepayments-es-es",
+      "title": "Facturar prepagos (es-ES)",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/es-es/dynamics365/business-central/finance-invoice-prepayments",
+      "appliesTo": "Business Central documentation, es-ES; checked 2026-09-26",
+      "accessedDate": "2026-09-26",
+      "fields": [
+        "Vendor prepayments are invoiced and posted on purchase orders before the final invoice; distinguish the advance invoice from payment settlement",
+        "Configure prepayment posting accounts, number series, and default percentages for vendors and items; verify the purchase posting setup",
+        "Adjust order-level or line-level prepayment amounts and review additional prepayment invoices after quantity or line changes",
+        "A purchase line with an invoiced prepayment requires a prepayment credit memo before deletion",
+        "Review prepayment application and final invoice balances; invoice posting does not prove vendor payment"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-purchase-prepayments-da-dk",
+      "title": "Fakturere forudbetalinger (da-DK)",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/da-dk/dynamics365/business-central/finance-invoice-prepayments",
+      "appliesTo": "Business Central documentation, da-DK; checked 2026-09-26",
+      "accessedDate": "2026-09-26",
+      "fields": [
+        "Vendor prepayments are invoiced and posted on purchase orders before the final invoice; distinguish the advance invoice from payment settlement",
+        "Configure prepayment posting accounts, number series, and default percentages for vendors and items; verify the purchase posting setup",
+        "Adjust order-level or line-level prepayment amounts and review additional prepayment invoices after quantity or line changes",
+        "A purchase line with an invoiced prepayment requires a prepayment credit memo before deletion",
+        "Review prepayment application and final invoice balances; invoice posting does not prove vendor payment"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-purchase-prepayments-fi-fi",
+      "title": "Ennakkomaksujen laskutus (fi-FI)",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/fi-fi/dynamics365/business-central/finance-invoice-prepayments",
+      "appliesTo": "Business Central documentation, fi-FI; checked 2026-09-26",
+      "accessedDate": "2026-09-26",
+      "fields": [
+        "Vendor prepayments are invoiced and posted on purchase orders before the final invoice; distinguish the advance invoice from payment settlement",
+        "Configure prepayment posting accounts, number series, and default percentages for vendors and items; verify the purchase posting setup",
+        "Adjust order-level or line-level prepayment amounts and review additional prepayment invoices after quantity or line changes",
+        "A purchase line with an invoiced prepayment requires a prepayment credit memo before deletion",
+        "Review prepayment application and final invoice balances; invoice posting does not prove vendor payment"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-purchase-prepayments-nb-no",
+      "title": "Fakturer forskudd (nb-NO)",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/nb-no/dynamics365/business-central/finance-invoice-prepayments",
+      "appliesTo": "Business Central documentation, nb-NO; checked 2026-09-26",
+      "accessedDate": "2026-09-26",
+      "fields": [
+        "Vendor prepayments are invoiced and posted on purchase orders before the final invoice; distinguish the advance invoice from payment settlement",
+        "Configure prepayment posting accounts, number series, and default percentages for vendors and items; verify the purchase posting setup",
+        "Adjust order-level or line-level prepayment amounts and review additional prepayment invoices after quantity or line changes",
+        "A purchase line with an invoiced prepayment requires a prepayment credit memo before deletion",
+        "Review prepayment application and final invoice balances; invoice posting does not prove vendor payment"
       ]
     }
   ]

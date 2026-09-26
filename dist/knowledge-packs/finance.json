@@ -1,7 +1,7 @@
 {
   "packId": "bc-finance",
   "name": "Business Central Finance",
-  "version": "1.20.0",
+  "version": "1.23.0",
   "priority": 210,
   "rules": [
     {
@@ -4079,6 +4079,374 @@
         "Use bank-account detail trial balance and detailed customer/vendor reports to inspect individual entries and periods",
         "Use Closing Trial Balance for current and previous year; Trial Balance or Detail Trial Balance for G/L; Consolidated Trial Balance for consolidated entities",
         "Reports are verification aids; investigate differences and do not treat report generation as approval of the balances"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-finance-close-statement-reports-en-us",
+      "title": "Overview of reports to help prepare closing statements (en-US)",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/en-us/dynamics365/business-central/year-prepare-close-statement",
+      "appliesTo": "Business Central finance documentation, en-US; checked 2026-09-26",
+      "accessedDate": "2026-09-26",
+      "fields": [
+        "Trial Balance summarizes G/L balances and net changes; Trial Balance by Period compares balances and net changes across periods",
+        "Aged Accounts Receivable and Aged Accounts Payable calculate aging from due date, posting date, or document date; confirm the selected aging basis",
+        "Trial Balance/Budget compares actual balances with budget; Financial Report supports analysis of G/L and budget entries",
+        "Reconcile Cust. and Vend. Accs checks customer and vendor ledger balances against corresponding G/L entries",
+        "These reports support close preparation and discrepancy investigation; output is not approval or certification"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-finance-close-statement-reports-sv-se",
+      "title": "Översikt över rapporter för att förbereda årsbokslutsrapporter (sv-SE)",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/sv-se/dynamics365/business-central/year-prepare-close-statement",
+      "appliesTo": "Business Central finance documentation, sv-SE; checked 2026-09-26",
+      "accessedDate": "2026-09-26",
+      "fields": [
+        "Trial Balance summarizes G/L balances and net changes; Trial Balance by Period compares balances and net changes across periods",
+        "Aged Accounts Receivable and Aged Accounts Payable calculate aging from due date, posting date, or document date; confirm the selected aging basis",
+        "Trial Balance/Budget compares actual balances with budget; Financial Report supports analysis of G/L and budget entries",
+        "Reconcile Cust. and Vend. Accs checks customer and vendor ledger balances against corresponding G/L entries",
+        "These reports support close preparation and discrepancy investigation; output is not approval or certification"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-finance-close-statement-reports-fr-fr",
+      "title": "Aperçu des états permettant de préparer les états de clôture (fr-FR)",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/fr-fr/dynamics365/business-central/year-prepare-close-statement",
+      "appliesTo": "Business Central finance documentation, fr-FR; checked 2026-09-26",
+      "accessedDate": "2026-09-26",
+      "fields": [
+        "Trial Balance summarizes G/L balances and net changes; Trial Balance by Period compares balances and net changes across periods",
+        "Aged Accounts Receivable and Aged Accounts Payable calculate aging from due date, posting date, or document date; confirm the selected aging basis",
+        "Trial Balance/Budget compares actual balances with budget; Financial Report supports analysis of G/L and budget entries",
+        "Reconcile Cust. and Vend. Accs checks customer and vendor ledger balances against corresponding G/L entries",
+        "These reports support close preparation and discrepancy investigation; output is not approval or certification"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-finance-close-statement-reports-de-de",
+      "title": "Übersicht über die Berichte zum Vorbereiten von Abschlussabrechnungen (de-DE)",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/de-de/dynamics365/business-central/year-prepare-close-statement",
+      "appliesTo": "Business Central finance documentation, de-DE; checked 2026-09-26",
+      "accessedDate": "2026-09-26",
+      "fields": [
+        "Trial Balance summarizes G/L balances and net changes; Trial Balance by Period compares balances and net changes across periods",
+        "Aged Accounts Receivable and Aged Accounts Payable calculate aging from due date, posting date, or document date; confirm the selected aging basis",
+        "Trial Balance/Budget compares actual balances with budget; Financial Report supports analysis of G/L and budget entries",
+        "Reconcile Cust. and Vend. Accs checks customer and vendor ledger balances against corresponding G/L entries",
+        "These reports support close preparation and discrepancy investigation; output is not approval or certification"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-finance-close-statement-reports-es-es",
+      "title": "Resumen de informes para preparar los extractos de cierre (es-ES)",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/es-es/dynamics365/business-central/year-prepare-close-statement",
+      "appliesTo": "Business Central finance documentation, es-ES; checked 2026-09-26",
+      "accessedDate": "2026-09-26",
+      "fields": [
+        "Trial Balance summarizes G/L balances and net changes; Trial Balance by Period compares balances and net changes across periods",
+        "Aged Accounts Receivable and Aged Accounts Payable calculate aging from due date, posting date, or document date; confirm the selected aging basis",
+        "Trial Balance/Budget compares actual balances with budget; Financial Report supports analysis of G/L and budget entries",
+        "Reconcile Cust. and Vend. Accs checks customer and vendor ledger balances against corresponding G/L entries",
+        "These reports support close preparation and discrepancy investigation; output is not approval or certification"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-finance-close-statement-reports-da-dk",
+      "title": "Oversigt over rapporter som hjælp til forberedelsen af regnskabsafslutning (da-DK)",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/da-dk/dynamics365/business-central/year-prepare-close-statement",
+      "appliesTo": "Business Central finance documentation, da-DK; checked 2026-09-26",
+      "accessedDate": "2026-09-26",
+      "fields": [
+        "Trial Balance summarizes G/L balances and net changes; Trial Balance by Period compares balances and net changes across periods",
+        "Aged Accounts Receivable and Aged Accounts Payable calculate aging from due date, posting date, or document date; confirm the selected aging basis",
+        "Trial Balance/Budget compares actual balances with budget; Financial Report supports analysis of G/L and budget entries",
+        "Reconcile Cust. and Vend. Accs checks customer and vendor ledger balances against corresponding G/L entries",
+        "These reports support close preparation and discrepancy investigation; output is not approval or certification"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-finance-close-statement-reports-fi-fi",
+      "title": "Tilinpäätöslaskelmien valmistelua helpottavien raporttien yleiskatsaus (fi-FI)",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/fi-fi/dynamics365/business-central/year-prepare-close-statement",
+      "appliesTo": "Business Central finance documentation, fi-FI; checked 2026-09-26",
+      "accessedDate": "2026-09-26",
+      "fields": [
+        "Trial Balance summarizes G/L balances and net changes; Trial Balance by Period compares balances and net changes across periods",
+        "Aged Accounts Receivable and Aged Accounts Payable calculate aging from due date, posting date, or document date; confirm the selected aging basis",
+        "Trial Balance/Budget compares actual balances with budget; Financial Report supports analysis of G/L and budget entries",
+        "Reconcile Cust. and Vend. Accs checks customer and vendor ledger balances against corresponding G/L entries",
+        "These reports support close preparation and discrepancy investigation; output is not approval or certification"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-finance-close-statement-reports-nb-no",
+      "title": "Overview of reports to help prepare closing statements (nb-NO)",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/en-us/dynamics365/business-central/year-prepare-close-statement",
+      "appliesTo": "Business Central finance documentation, nb-NO; checked 2026-09-26 (English source fallback; localized URL could not be verified)",
+      "accessedDate": "2026-09-26",
+      "fields": [
+        "Trial Balance summarizes G/L balances and net changes; Trial Balance by Period compares balances and net changes across periods",
+        "Aged Accounts Receivable and Aged Accounts Payable calculate aging from due date, posting date, or document date; confirm the selected aging basis",
+        "Trial Balance/Budget compares actual balances with budget; Financial Report supports analysis of G/L and budget entries",
+        "Reconcile Cust. and Vend. Accs checks customer and vendor ledger balances against corresponding G/L entries",
+        "These reports support close preparation and discrepancy investigation; output is not approval or certification"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-finance-period-end-activities-en-us",
+      "title": "Optional activities for closing periods (en-US)",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/en-us/dynamics365/business-central/year-how-complete-period-end-processes",
+      "appliesTo": "Business Central finance documentation, en-US; checked 2026-09-26",
+      "accessedDate": "2026-09-26",
+      "fields": [
+        "Business Central does not require period close; month-end activities are optional and organization-specific",
+        "G/L: define system and user posting-date windows, make adjustments, process recurring journals, and produce finance reports",
+        "Sales/receivables: finish relevant sales documents and cash receipts, reconcile receivables to G/L, and review aged receivables",
+        "Purchases/payables: finish relevant purchase documents and payment journals, review aged payables, and reconcile payables to G/L",
+        "Fixed assets: process maintenance, adjustments, appreciation and depreciation; also consider intercompany and tax work",
+        "Delete invoiced sales or purchase order batch jobs are listed as optional cleanup tasks; confirm local retention and workflow before use"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-finance-period-end-activities-sv-se",
+      "title": "Valfria aktiviteter för att avsluta perioder (sv-SE)",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/sv-se/dynamics365/business-central/year-how-complete-period-end-processes",
+      "appliesTo": "Business Central finance documentation, sv-SE; checked 2026-09-26",
+      "accessedDate": "2026-09-26",
+      "fields": [
+        "Business Central does not require period close; month-end activities are optional and organization-specific",
+        "G/L: define system and user posting-date windows, make adjustments, process recurring journals, and produce finance reports",
+        "Sales/receivables: finish relevant sales documents and cash receipts, reconcile receivables to G/L, and review aged receivables",
+        "Purchases/payables: finish relevant purchase documents and payment journals, review aged payables, and reconcile payables to G/L",
+        "Fixed assets: process maintenance, adjustments, appreciation and depreciation; also consider intercompany and tax work",
+        "Delete invoiced sales or purchase order batch jobs are listed as optional cleanup tasks; confirm local retention and workflow before use"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-finance-period-end-activities-fr-fr",
+      "title": "Activités facultatives pour les périodes de clôture (fr-FR)",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/fr-fr/dynamics365/business-central/year-how-complete-period-end-processes",
+      "appliesTo": "Business Central finance documentation, fr-FR; checked 2026-09-26",
+      "accessedDate": "2026-09-26",
+      "fields": [
+        "Business Central does not require period close; month-end activities are optional and organization-specific",
+        "G/L: define system and user posting-date windows, make adjustments, process recurring journals, and produce finance reports",
+        "Sales/receivables: finish relevant sales documents and cash receipts, reconcile receivables to G/L, and review aged receivables",
+        "Purchases/payables: finish relevant purchase documents and payment journals, review aged payables, and reconcile payables to G/L",
+        "Fixed assets: process maintenance, adjustments, appreciation and depreciation; also consider intercompany and tax work",
+        "Delete invoiced sales or purchase order batch jobs are listed as optional cleanup tasks; confirm local retention and workflow before use"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-finance-period-end-activities-de-de",
+      "title": "Optionale Aktivitäten für Abschlussperioden (de-DE)",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/de-de/dynamics365/business-central/year-how-complete-period-end-processes",
+      "appliesTo": "Business Central finance documentation, de-DE; checked 2026-09-26",
+      "accessedDate": "2026-09-26",
+      "fields": [
+        "Business Central does not require period close; month-end activities are optional and organization-specific",
+        "G/L: define system and user posting-date windows, make adjustments, process recurring journals, and produce finance reports",
+        "Sales/receivables: finish relevant sales documents and cash receipts, reconcile receivables to G/L, and review aged receivables",
+        "Purchases/payables: finish relevant purchase documents and payment journals, review aged payables, and reconcile payables to G/L",
+        "Fixed assets: process maintenance, adjustments, appreciation and depreciation; also consider intercompany and tax work",
+        "Delete invoiced sales or purchase order batch jobs are listed as optional cleanup tasks; confirm local retention and workflow before use"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-finance-period-end-activities-es-es",
+      "title": "Actividades opcionales para periodos de cierre (es-ES)",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/es-es/dynamics365/business-central/year-how-complete-period-end-processes",
+      "appliesTo": "Business Central finance documentation, es-ES; checked 2026-09-26",
+      "accessedDate": "2026-09-26",
+      "fields": [
+        "Business Central does not require period close; month-end activities are optional and organization-specific",
+        "G/L: define system and user posting-date windows, make adjustments, process recurring journals, and produce finance reports",
+        "Sales/receivables: finish relevant sales documents and cash receipts, reconcile receivables to G/L, and review aged receivables",
+        "Purchases/payables: finish relevant purchase documents and payment journals, review aged payables, and reconcile payables to G/L",
+        "Fixed assets: process maintenance, adjustments, appreciation and depreciation; also consider intercompany and tax work",
+        "Delete invoiced sales or purchase order batch jobs are listed as optional cleanup tasks; confirm local retention and workflow before use"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-finance-period-end-activities-da-dk",
+      "title": "Valgfrie aktiviteter til afslutning af perioder (da-DK)",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/da-dk/dynamics365/business-central/year-how-complete-period-end-processes",
+      "appliesTo": "Business Central finance documentation, da-DK; checked 2026-09-26",
+      "accessedDate": "2026-09-26",
+      "fields": [
+        "Business Central does not require period close; month-end activities are optional and organization-specific",
+        "G/L: define system and user posting-date windows, make adjustments, process recurring journals, and produce finance reports",
+        "Sales/receivables: finish relevant sales documents and cash receipts, reconcile receivables to G/L, and review aged receivables",
+        "Purchases/payables: finish relevant purchase documents and payment journals, review aged payables, and reconcile payables to G/L",
+        "Fixed assets: process maintenance, adjustments, appreciation and depreciation; also consider intercompany and tax work",
+        "Delete invoiced sales or purchase order batch jobs are listed as optional cleanup tasks; confirm local retention and workflow before use"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-finance-period-end-activities-fi-fi",
+      "title": "Optional activities for closing periods (fi-FI)",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/en-us/dynamics365/business-central/year-how-complete-period-end-processes",
+      "appliesTo": "Business Central finance documentation, fi-FI; checked 2026-09-26 (English source fallback; localized URL could not be verified)",
+      "accessedDate": "2026-09-26",
+      "fields": [
+        "Business Central does not require period close; month-end activities are optional and organization-specific",
+        "G/L: define system and user posting-date windows, make adjustments, process recurring journals, and produce finance reports",
+        "Sales/receivables: finish relevant sales documents and cash receipts, reconcile receivables to G/L, and review aged receivables",
+        "Purchases/payables: finish relevant purchase documents and payment journals, review aged payables, and reconcile payables to G/L",
+        "Fixed assets: process maintenance, adjustments, appreciation and depreciation; also consider intercompany and tax work",
+        "Delete invoiced sales or purchase order batch jobs are listed as optional cleanup tasks; confirm local retention and workflow before use"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-finance-period-end-activities-nb-no",
+      "title": "Valgfrie aktiviteter for lukking av perioder (nb-NO)",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/nb-no/dynamics365/business-central/year-how-complete-period-end-processes",
+      "appliesTo": "Business Central finance documentation, nb-NO; checked 2026-09-26",
+      "accessedDate": "2026-09-26",
+      "fields": [
+        "Business Central does not require period close; month-end activities are optional and organization-specific",
+        "G/L: define system and user posting-date windows, make adjustments, process recurring journals, and produce finance reports",
+        "Sales/receivables: finish relevant sales documents and cash receipts, reconcile receivables to G/L, and review aged receivables",
+        "Purchases/payables: finish relevant purchase documents and payment journals, review aged payables, and reconcile payables to G/L",
+        "Fixed assets: process maintenance, adjustments, appreciation and depreciation; also consider intercompany and tax work",
+        "Delete invoiced sales or purchase order batch jobs are listed as optional cleanup tasks; confirm local retention and workflow before use"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-finance-prepayments-en-us",
+      "title": "Invoice prepayments (en-US)",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/en-us/dynamics365/business-central/finance-invoice-prepayments",
+      "appliesTo": "Business Central documentation, en-US; checked 2026-09-26",
+      "accessedDate": "2026-09-26",
+      "fields": [
+        "Prepayments are invoiced and posted on sales or purchase orders before the final invoice; they are deposits, not final settlement",
+        "Configure prepayment posting accounts, number series, and default percentages for customers, vendors, and items before invoicing",
+        "Amounts can be set for the whole order or distributed by line; additional invoices can be needed after order changes",
+        "A line with an invoiced prepayment cannot be deleted until its prepayment credit memo is issued",
+        "Review tax, posting groups, rounding and final-invoice application according to local setup; do not infer payment receipt from invoice posting"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-finance-prepayments-sv-se",
+      "title": "Fakturera förskottsbetalningar (sv-SE)",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/sv-se/dynamics365/business-central/finance-invoice-prepayments",
+      "appliesTo": "Business Central documentation, sv-SE; checked 2026-09-26",
+      "accessedDate": "2026-09-26",
+      "fields": [
+        "Prepayments are invoiced and posted on sales or purchase orders before the final invoice; they are deposits, not final settlement",
+        "Configure prepayment posting accounts, number series, and default percentages for customers, vendors, and items before invoicing",
+        "Amounts can be set for the whole order or distributed by line; additional invoices can be needed after order changes",
+        "A line with an invoiced prepayment cannot be deleted until its prepayment credit memo is issued",
+        "Review tax, posting groups, rounding and final-invoice application according to local setup; do not infer payment receipt from invoice posting"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-finance-prepayments-fr-fr",
+      "title": "Facturation des acomptes (fr-FR)",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/fr-fr/dynamics365/business-central/finance-invoice-prepayments",
+      "appliesTo": "Business Central documentation, fr-FR; checked 2026-09-26",
+      "accessedDate": "2026-09-26",
+      "fields": [
+        "Prepayments are invoiced and posted on sales or purchase orders before the final invoice; they are deposits, not final settlement",
+        "Configure prepayment posting accounts, number series, and default percentages for customers, vendors, and items before invoicing",
+        "Amounts can be set for the whole order or distributed by line; additional invoices can be needed after order changes",
+        "A line with an invoiced prepayment cannot be deleted until its prepayment credit memo is issued",
+        "Review tax, posting groups, rounding and final-invoice application according to local setup; do not infer payment receipt from invoice posting"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-finance-prepayments-de-de",
+      "title": "Vorauszahlungen fakturieren (de-DE)",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/de-de/dynamics365/business-central/finance-invoice-prepayments",
+      "appliesTo": "Business Central documentation, de-DE; checked 2026-09-26",
+      "accessedDate": "2026-09-26",
+      "fields": [
+        "Prepayments are invoiced and posted on sales or purchase orders before the final invoice; they are deposits, not final settlement",
+        "Configure prepayment posting accounts, number series, and default percentages for customers, vendors, and items before invoicing",
+        "Amounts can be set for the whole order or distributed by line; additional invoices can be needed after order changes",
+        "A line with an invoiced prepayment cannot be deleted until its prepayment credit memo is issued",
+        "Review tax, posting groups, rounding and final-invoice application according to local setup; do not infer payment receipt from invoice posting"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-finance-prepayments-es-es",
+      "title": "Facturar prepagos (es-ES)",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/es-es/dynamics365/business-central/finance-invoice-prepayments",
+      "appliesTo": "Business Central documentation, es-ES; checked 2026-09-26",
+      "accessedDate": "2026-09-26",
+      "fields": [
+        "Prepayments are invoiced and posted on sales or purchase orders before the final invoice; they are deposits, not final settlement",
+        "Configure prepayment posting accounts, number series, and default percentages for customers, vendors, and items before invoicing",
+        "Amounts can be set for the whole order or distributed by line; additional invoices can be needed after order changes",
+        "A line with an invoiced prepayment cannot be deleted until its prepayment credit memo is issued",
+        "Review tax, posting groups, rounding and final-invoice application according to local setup; do not infer payment receipt from invoice posting"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-finance-prepayments-da-dk",
+      "title": "Fakturere forudbetalinger (da-DK)",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/da-dk/dynamics365/business-central/finance-invoice-prepayments",
+      "appliesTo": "Business Central documentation, da-DK; checked 2026-09-26",
+      "accessedDate": "2026-09-26",
+      "fields": [
+        "Prepayments are invoiced and posted on sales or purchase orders before the final invoice; they are deposits, not final settlement",
+        "Configure prepayment posting accounts, number series, and default percentages for customers, vendors, and items before invoicing",
+        "Amounts can be set for the whole order or distributed by line; additional invoices can be needed after order changes",
+        "A line with an invoiced prepayment cannot be deleted until its prepayment credit memo is issued",
+        "Review tax, posting groups, rounding and final-invoice application according to local setup; do not infer payment receipt from invoice posting"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-finance-prepayments-fi-fi",
+      "title": "Ennakkomaksujen laskutus (fi-FI)",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/fi-fi/dynamics365/business-central/finance-invoice-prepayments",
+      "appliesTo": "Business Central documentation, fi-FI; checked 2026-09-26",
+      "accessedDate": "2026-09-26",
+      "fields": [
+        "Prepayments are invoiced and posted on sales or purchase orders before the final invoice; they are deposits, not final settlement",
+        "Configure prepayment posting accounts, number series, and default percentages for customers, vendors, and items before invoicing",
+        "Amounts can be set for the whole order or distributed by line; additional invoices can be needed after order changes",
+        "A line with an invoiced prepayment cannot be deleted until its prepayment credit memo is issued",
+        "Review tax, posting groups, rounding and final-invoice application according to local setup; do not infer payment receipt from invoice posting"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-finance-prepayments-nb-no",
+      "title": "Fakturer forskudd (nb-NO)",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/nb-no/dynamics365/business-central/finance-invoice-prepayments",
+      "appliesTo": "Business Central documentation, nb-NO; checked 2026-09-26",
+      "accessedDate": "2026-09-26",
+      "fields": [
+        "Prepayments are invoiced and posted on sales or purchase orders before the final invoice; they are deposits, not final settlement",
+        "Configure prepayment posting accounts, number series, and default percentages for customers, vendors, and items before invoicing",
+        "Amounts can be set for the whole order or distributed by line; additional invoices can be needed after order changes",
+        "A line with an invoiced prepayment cannot be deleted until its prepayment credit memo is issued",
+        "Review tax, posting groups, rounding and final-invoice application according to local setup; do not infer payment receipt from invoice posting"
       ]
     }
   ]
