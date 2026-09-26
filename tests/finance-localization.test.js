@@ -438,7 +438,8 @@ const sourceTopics = [
   'chart-accounts', 'dimensions', 'vat-setup', 'vat-submission', 'finance-reports', 'accounting-periods', 'budgets',
   'year-close', 'fixed-assets', 'depreciation', 'cost-accounting', 'currencies', 'currency-adjustment', 'consolidation',
   'column-definitions', 'row-definitions', 'cash-flow-overview', 'cash-flow-setup',
-  'gl-revaluation', 'disposal', 'acquisitions', 'revaluation', 'maintenance', 'insurance'
+  'gl-revaluation', 'close-income-statement', 'accounting-periods',
+  'disposal', 'acquisitions', 'revaluation', 'maintenance', 'insurance'
 ];
 for (const topic of sourceTopics) {
   for (const locale of samples.map(sample => sample.locale)) {
@@ -457,6 +458,14 @@ for (const topic of sourceTopics) {
   }
 }
 
+for (const locale of ['en-US','sv-SE']) {
+  const source = financePack.sources.find(item => item.sourceId ===
+    `microsoft-learn-finance-post-year-end-close-${locale.toLowerCase()}`);
+  assert.ok(source, `localized year-end journal posting source for ${locale}`);
+  assert.ok(source.fields.some(x => /review the entries|granska transaktionerna/.test(x)),
+    `year-end journal review is indexed for ${locale}`);
+}
+
 for (const locale of samples.map(sample => sample.locale)) {
   const currency = financePack.sources.find(item => item.sourceId ===
     `microsoft-learn-finance-currencies-${locale.toLowerCase()}`);
@@ -471,6 +480,14 @@ for (const locale of samples.map(sample => sample.locale)) {
     `duplicate revaluation risk is indexed for ${locale}`);
   assert.ok(revaluation.fields.some(x => /document-level rolling rounding; general journals round per line/.test(x)),
     `document and journal rounding behavior is indexed for ${locale}`);
+  const yearClose = financePack.sources.find(item => item.sourceId ===
+    `microsoft-learn-finance-close-income-statement-${locale.toLowerCase()}`);
+  assert.ok(yearClose.fields.some(x => /additional reporting currency|rapporteringsvaluta|devise report|Berichtswährung|divisa adicional|rapporteringsvaluta|Lisäraportointivaluutta|tilleggsrapporteringsvaluta/i.test(x)),
+    `direct-posting exception for additional reporting currency is indexed for ${locale}`);
+  const periods = financePack.sources.find(item => item.sourceId ===
+    `microsoft-learn-finance-accounting-periods-${locale.toLowerCase()}`);
+  assert.ok(periods.fields.some(x => /posting dates are governed|Bokföringsdatum styrs/.test(x)),
+    `posting-date versus accounting-period behavior is indexed for ${locale}`);
 }
 
 const unrelated = repository.resolveAction({language:'en-US',context:{pageCaption:'Payment Journal',actionCaption:'Post'}});
