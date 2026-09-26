@@ -230,9 +230,42 @@ const wrongVATAction = repository.resolveAction({language:'en-US',
 assert.ok(!wrongVATAction.candidates.some(x => x.provenance.ruleId === 'Finance.SuggestVATReportLines'),
   'submitting a VAT report must not resolve as suggesting lines');
 
+const columnDefinitionSamples = [
+  {locale:'en-US',page:'Column Definitions',action:'Edit Column Definition'},
+  {locale:'sv-SE',page:'Kolumndefinitioner',action:'Redigera kolumndefinition'},
+  {locale:'fr-FR',page:'D\u00e9finitions de colonne',action:'Modifier la d\u00e9finition de colonne'},
+  {locale:'de-DE',page:'Spaltendefinitionen',action:'Spaltendefinition bearbeiten'},
+  {locale:'es-ES',page:'Definiciones de columna',action:'Editar definici\u00f3n de columna'},
+  {locale:'da-DK',page:'Kolonnedefinitioner',action:'Rediger kolonnedefinition'},
+  {locale:'fi-FI',page:'Sarakem\u00e4\u00e4ritykset',action:'Muokkaa sarakem\u00e4\u00e4rityst\u00e4'},
+  {locale:'nb-NO',page:'Kolonnedefinisjoner',action:'Rediger kolonnedefinisjon'}
+];
+const columnDefinitionRule = financePack.rules.find(x =>
+  x.ruleId === 'Finance.EditFinancialReportColumnDefinition');
+for (const {locale,page,action} of columnDefinitionSamples) {
+  const result = repository.resolveAction({language:locale,context:{pageCaption:page,actionCaption:action}});
+  assert.equal(result.status,'resolved',`${locale} edit financial report column definition`);
+  assert.equal(result.candidates[0].provenance.ruleId,'Finance.EditFinancialReportColumnDefinition',locale);
+  assert.equal(result.candidates[0].provenance.language,locale);
+  assert.ok(result.candidates[0].provenance.sourceRefs.some(x =>
+    x.sourceId === `microsoft-learn-finance-column-definitions-${locale.toLowerCase()}`),locale);
+  const instruction = knowledge.localizedInstruction(columnDefinitionRule,locale);
+  assert.ok(instruction,`localized financial report column definition directive for ${locale}`);
+  assert.match(instruction,/version|versions|versionn|versioniert|versiones|versio|versjons/i,
+    `lack of versioning is disclosed for ${locale}`);
+  assert.match(instruction,/reports|\u00e9tats|Berichte|informes|rapporter|raportit/i,
+    `affected financial reports are mentioned for ${locale}`);
+}
+const wrongColumnDefinitionAction = repository.resolveAction({language:'en-US',
+  context:{pageCaption:'Column Definitions',actionCaption:'Delete'}});
+assert.ok(!wrongColumnDefinitionAction.candidates.some(x =>
+  x.provenance.ruleId === 'Finance.EditFinancialReportColumnDefinition'),
+  'deleting a definition must not resolve as editing it');
+
 const sourceTopics = [
   'chart-accounts', 'dimensions', 'vat-setup', 'vat-submission', 'finance-reports', 'accounting-periods', 'budgets',
-  'year-close', 'fixed-assets', 'depreciation', 'cost-accounting', 'currencies', 'currency-adjustment', 'consolidation'
+  'year-close', 'fixed-assets', 'depreciation', 'cost-accounting', 'currencies', 'currency-adjustment', 'consolidation',
+  'column-definitions'
 ];
 for (const topic of sourceTopics) {
   for (const locale of samples.map(sample => sample.locale)) {
@@ -249,4 +282,4 @@ const unrelated = repository.resolveAction({language:'en-US',context:{pageCaptio
 assert.ok(!unrelated.candidates.some(x=>x.provenance.ruleId==='Finance.PostGeneralJournal'),
   'general journal posting rule must not match the specialized payment journal');
 
-console.log('Finance chart, posting, dimension-change, accounting periods, G/L budgets, currency-adjustment preview, VAT report generation, and year-end directives resolve in all eight supported UI locales.');
+console.log('Finance directives for chart, posting, dimensions, accounting periods, budgets, currency adjustment, VAT report lines, financial report columns, and year-end resolve in all eight supported UI locales.');
