@@ -1,7 +1,7 @@
 {
   "packId": "bc-finance",
   "name": "Business Central Finance",
-  "version": "1.6.0",
+  "version": "1.7.0",
   "priority": 210,
   "rules": [
     {
@@ -41,6 +41,46 @@
         "da-DK": "Kontrollér budgetnavn, periode og dimensionsfiltre før redigering; separate budgetnavne kan bevare versioner og scenarier. Ved import fra Excel skal du kontrollere valget Tilføj eller Erstat: Erstat overskriver eksisterende budgetposter. Importerede værdier på overskriftslinjer slettes; angiv beløb på bogføringskonti, og kontrollér resultatet. Matchningen viser kun, at handlingen blev valgt.",
         "fi-FI": "Tarkista ennen muokkausta budjetin nimi, kausi ja dimensiot suodattavat tekijät; erilliset budjettien nimet voivat säilyttää versiot ja skenaariot. Varmista Excel-tuonnissa valinta Lisää tai Korvaa: Korvaa kirjoittaa aiemmat budjettitapahtumat päälle. Otsikkotilien tuodut arvot poistetaan, joten syötä summat kirjaustileille ja tarkista tulos. Osuma osoittaa vain, että toiminto valittiin.",
         "nb-NO": "Kontroller budsjettnavn, periode og dimensjonsfiltre før redigering; separate budsjettnavn kan bevare versjoner og scenarioer. Ved import fra Excel må du kontrollere valget Legg til eller Erstatt: Erstatt overskriver eksisterende budsjettposter. Importerte verdier på overskriftslinjer slettes; før beløp på bokføringskontoer og kontroller resultatet. Treffet viser bare at handlingen ble valgt."
+      }
+    },
+    {
+      "ruleId": "Finance.PreviewExchangeRateAdjustment",
+      "taskType": "PreviewExchangeRateAdjustment",
+      "semanticAction": "PreviewExchangeRateAdjustment",
+      "entity": "ExchangeRateAdjustment",
+      "priority": 1550,
+      "confidence": 0.99,
+      "match": {
+        "pagePatterns": [
+          "^Exch\\. Rates Adjustment$", "^Justera valutakurser$", "^Ajustement des taux de change$",
+          "^Wechselkursregulierung$", "^Ajustar tipos de cambio$", "^Justering af kursvalutaer$",
+          "^Vaihtokurssien muutos$", "^Valutakursjustering$"
+        ],
+        "actionPatterns": [
+          "^Preview Posting$", "^Förhandsgranska bokföring$", "^Aperçu validation$", "^Buchungsvorschau$",
+          "^Vista previa de registro$", "^Forhåndsversion$", "^Esikatsele kirjausta$", "^Forhåndsvis bokføring$"
+        ],
+        "fieldPatterns": [],
+        "automationIdPatterns": []
+      },
+      "instructionTemplate": "",
+      "languages": ["en-US", "sv-SE", "fr-FR", "de-DE", "es-ES", "da-DK", "fi-FI", "nb-NO"],
+      "aliases": [],
+      "sourceIds": [
+        "microsoft-learn-finance-currency-adjustment-en-us", "microsoft-learn-finance-currency-adjustment-sv-se",
+        "microsoft-learn-finance-currency-adjustment-fr-fr", "microsoft-learn-finance-currency-adjustment-de-de",
+        "microsoft-learn-finance-currency-adjustment-es-es", "microsoft-learn-finance-currency-adjustment-da-dk",
+        "microsoft-learn-finance-currency-adjustment-fi-fi", "microsoft-learn-finance-currency-adjustment-nb-no"
+      ],
+      "localizedInstructions": {
+        "en-US": "Before running the exchange-rate adjustment, verify the adjustment rates, posting date, included currencies and ledgers, dimension settings, and unrealized gain/loss accounts. Preview the entries first: the batch job can update posted customer, vendor, bank, and additional-reporting-currency G/L amounts. Local valuation requirements can differ. This action previews the effects only; it does not post them.",
+        "sv-SE": "Kontrollera justeringskurser, bokföringsdatum, valutor och reskontror som ingår, dimensionsinställningar samt konton för orealiserade vinster och förluster innan du kör valutajusteringen. Förhandsgranska posterna först: batchjobbet kan uppdatera bokförda kund-, leverantörs- och banktransaktioner samt belopp i alternativ rapporteringsvaluta. Lokala värderingskrav kan skilja sig. Den här åtgärden visar endast effekten; den bokför inte posterna.",
+        "fr-FR": "Avant d’exécuter l’ajustement des taux de change, vérifiez les taux d’ajustement, la date de validation, les devises et registres inclus, les paramètres d’axe analytique et les comptes de gains/pertes non réalisés. Prévisualisez d’abord les écritures : le traitement peut mettre à jour les écritures client, fournisseur et bancaires validées ainsi que les montants en devise de reporting supplémentaire. Les exigences d’évaluation locales peuvent différer. Cette action prévisualise uniquement les effets ; elle ne valide pas les écritures.",
+        "de-DE": "Prüfen Sie vor der Wechselkursregulierung die Anpassungskurse, das Buchungsdatum, einbezogene Währungen und Nebenbücher, Dimensionseinstellungen sowie die Konten für nicht realisierte Gewinne und Verluste. Zeigen Sie zuerst die Buchungsvorschau an: Der Batchauftrag kann gebuchte Debitoren-, Kreditoren- und Bankposten sowie Beträge in zusätzlicher Berichtswährung aktualisieren. Lokale Bewertungsvorschriften können abweichen. Diese Aktion zeigt nur die Auswirkungen in der Vorschau; sie bucht nichts.",
+        "es-ES": "Antes de ejecutar el ajuste de tipos de cambio, compruebe los tipos de ajuste, la fecha de registro, las divisas y libros incluidos, la configuración de dimensiones y las cuentas de ganancias o pérdidas no realizadas. Obtenga primero la vista previa de los movimientos: el proceso puede actualizar movimientos registrados de clientes, proveedores y bancos, además de importes en divisa adicional de informe. Los requisitos de valoración locales pueden variar. Esta acción solo previsualiza los efectos; no registra los movimientos.",
+        "da-DK": "Kontrollér reguleringskurser, bogføringsdato, inkluderede valutaer og regnskaber, dimensionsopsætning samt konti for urealiserede gevinster og tab, før du kører valutakursreguleringen. Forhåndsvis posterne først: jobbet kan opdatere bogførte debitor-, kreditor- og bankposter samt beløb i ekstra rapporteringsvaluta. Lokale værdiansættelseskrav kan variere. Denne handling viser kun effekten; den bogfører ikke posterne.",
+        "fi-FI": "Tarkista ennen valuuttakurssien muutosta muutoskurssit, kirjauspäivä, mukaan otettavat valuutat ja tapahtumalajit, dimensioasetukset sekä realisoitumattomien voittojen ja tappioiden tilit. Esikatsele tapahtumat ensin: eräajo voi päivittää kirjattuja asiakas-, toimittaja- ja pankkitapahtumia sekä lisäraportointivaluutan pääkirja-arvoja. Paikalliset arvostusvaatimukset voivat poiketa toisistaan. Tämä toiminto esikatselee vaikutukset eikä kirjaa niitä.",
+        "nb-NO": "Kontroller justeringskurser, bokføringsdato, inkluderte valutaer og reskontroer, dimensjonsinnstillinger og kontoer for urealisert agio og disagio før du kjører valutakursjusteringen. Forhåndsvis postene først: satsjobben kan oppdatere bokførte kunde-, leverandør- og bankposter samt hovedbokbeløp i en ekstra rapporteringsvaluta. Lokale verdsettingskrav kan variere. Denne handlingen forhåndsviser bare effekten; den bokfører ikke postene."
       }
     },
     {
@@ -405,6 +445,14 @@
   {"sourceId":"microsoft-learn-finance-budgets-es-es","title":"Crear presupuestos contables (es-ES)","sourceType":"microsoft-learn","sourceUri":"https://learn.microsoft.com/es-es/dynamics365/business-central/finance-how-create-budgets","appliesTo":"Business Central finance documentation, es-ES; checked 2026-09-25","accessedDate":"2026-09-25","fields":["Create and edit G/L budgets","Budget names, periods and dimensions","Excel budget import Add or Replace behavior","Imported heading-line values are deleted"]},
   {"sourceId":"microsoft-learn-finance-budgets-da-dk","title":"Oprette finansbudgetter (da-DK)","sourceType":"microsoft-learn","sourceUri":"https://learn.microsoft.com/da-dk/dynamics365/business-central/finance-how-create-budgets","appliesTo":"Business Central finance documentation, da-DK; checked 2026-09-25","accessedDate":"2026-09-25","fields":["Create and edit G/L budgets","Budget names, periods and dimensions","Excel budget import Add or Replace behavior","Imported heading-line values are deleted"]},
   {"sourceId":"microsoft-learn-finance-budgets-fi-fi","title":"KP-budjettien luominen (fi-FI)","sourceType":"microsoft-learn","sourceUri":"https://learn.microsoft.com/fi-fi/dynamics365/business-central/finance-how-create-budgets","appliesTo":"Business Central finance documentation, fi-FI; checked 2026-09-25","accessedDate":"2026-09-25","fields":["Create and edit G/L budgets","Budget names, periods and dimensions","Excel budget import Add or Replace behavior","Imported heading-line values are deleted"]},
-  {"sourceId":"microsoft-learn-finance-budgets-nb-no","title":"Opprett finansbudsjetter (nb-NO)","sourceType":"microsoft-learn","sourceUri":"https://learn.microsoft.com/nb-no/dynamics365/business-central/finance-how-create-budgets","appliesTo":"Business Central finance documentation, nb-NO; checked 2026-09-25","accessedDate":"2026-09-25","fields":["Create and edit G/L budgets","Budget names, periods and dimensions","Excel budget import Add or Replace behavior","Imported heading-line values are deleted"]}
+  {"sourceId":"microsoft-learn-finance-budgets-nb-no","title":"Opprett finansbudsjetter (nb-NO)","sourceType":"microsoft-learn","sourceUri":"https://learn.microsoft.com/nb-no/dynamics365/business-central/finance-how-create-budgets","appliesTo":"Business Central finance documentation, nb-NO; checked 2026-09-25","accessedDate":"2026-09-25","fields":["Create and edit G/L budgets","Budget names, periods and dimensions","Excel budget import Add or Replace behavior","Imported heading-line values are deleted"]},
+  {"sourceId":"microsoft-learn-finance-currency-adjustment-en-us","title":"Update currency exchange rates","sourceType":"microsoft-learn","sourceUri":"https://learn.microsoft.com/en-us/dynamics365/business-central/finance-how-update-currencies","appliesTo":"Business Central finance documentation, en-US; checked 2026-09-26","accessedDate":"2026-09-26","fields":["Adjust posted customer, vendor and bank entries","Exchange rate adjustment preview before posting","Adjustment rates and posting date affect ledger updates","Dimension behavior for additional reporting currency"]},
+  {"sourceId":"microsoft-learn-finance-currency-adjustment-sv-se","title":"Uppdatera valutakurser (sv-SE)","sourceType":"microsoft-learn","sourceUri":"https://learn.microsoft.com/sv-se/dynamics365/business-central/finance-how-update-currencies","appliesTo":"Business Central finance documentation, sv-SE; checked 2026-09-26","accessedDate":"2026-09-26","fields":["Adjust posted customer, vendor and bank entries","Exchange rate adjustment preview before posting","Adjustment rates and posting date affect ledger updates","Dimension behavior for additional reporting currency"]},
+  {"sourceId":"microsoft-learn-finance-currency-adjustment-fr-fr","title":"Mise à jour des taux de change devise (fr-FR)","sourceType":"microsoft-learn","sourceUri":"https://learn.microsoft.com/fr-fr/dynamics365/business-central/finance-how-update-currencies","appliesTo":"Business Central finance documentation, fr-FR; checked 2026-09-26","accessedDate":"2026-09-26","fields":["Adjust posted customer, vendor and bank entries","Exchange rate adjustment preview before posting","Adjustment rates and posting date affect ledger updates","Dimension behavior for additional reporting currency"]},
+  {"sourceId":"microsoft-learn-finance-currency-adjustment-de-de","title":"Währungswechselkurse aktualisieren (de-DE)","sourceType":"microsoft-learn","sourceUri":"https://learn.microsoft.com/de-de/dynamics365/business-central/finance-how-update-currencies","appliesTo":"Business Central finance documentation, de-DE; checked 2026-09-26","accessedDate":"2026-09-26","fields":["Adjust posted customer, vendor and bank entries","Exchange rate adjustment preview before posting","Adjustment rates and posting date affect ledger updates","Dimension behavior for additional reporting currency"]},
+  {"sourceId":"microsoft-learn-finance-currency-adjustment-es-es","title":"Actualizar tipos de cambio de divisa (es-ES)","sourceType":"microsoft-learn","sourceUri":"https://learn.microsoft.com/es-es/dynamics365/business-central/finance-how-update-currencies","appliesTo":"Business Central finance documentation, es-ES; checked 2026-09-26","accessedDate":"2026-09-26","fields":["Adjust posted customer, vendor and bank entries","Exchange rate adjustment preview before posting","Adjustment rates and posting date affect ledger updates","Dimension behavior for additional reporting currency"]},
+  {"sourceId":"microsoft-learn-finance-currency-adjustment-da-dk","title":"Opdatere valutakurser (da-DK)","sourceType":"microsoft-learn","sourceUri":"https://learn.microsoft.com/da-dk/dynamics365/business-central/finance-how-update-currencies","appliesTo":"Business Central finance documentation, da-DK; checked 2026-09-26","accessedDate":"2026-09-26","fields":["Adjust posted customer, vendor and bank entries","Exchange rate adjustment preview before posting","Adjustment rates and posting date affect ledger updates","Dimension behavior for additional reporting currency"]},
+  {"sourceId":"microsoft-learn-finance-currency-adjustment-fi-fi","title":"Valuutan vaihtokurssien päivittäminen (fi-FI)","sourceType":"microsoft-learn","sourceUri":"https://learn.microsoft.com/fi-fi/dynamics365/business-central/finance-how-update-currencies","appliesTo":"Business Central finance documentation, fi-FI; checked 2026-09-26","accessedDate":"2026-09-26","fields":["Adjust posted customer, vendor and bank entries","Exchange rate adjustment preview before posting","Adjustment rates and posting date affect ledger updates","Dimension behavior for additional reporting currency"]},
+  {"sourceId":"microsoft-learn-finance-currency-adjustment-nb-no","title":"Oppdater valutakurser (nb-NO)","sourceType":"microsoft-learn","sourceUri":"https://learn.microsoft.com/nb-no/dynamics365/business-central/finance-how-update-currencies","appliesTo":"Business Central finance documentation, nb-NO; checked 2026-09-26","accessedDate":"2026-09-26","fields":["Adjust posted customer, vendor and bank entries","Exchange rate adjustment preview before posting","Adjustment rates and posting date affect ledger updates","Dimension behavior for additional reporting currency"]}
   ]
 }

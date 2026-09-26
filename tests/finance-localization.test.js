@@ -174,9 +174,37 @@ const wrongBudgetAction = repository.resolveAction({language:'en-US',
 assert.ok(!wrongBudgetAction.candidates.some(x => x.provenance.ruleId === 'Finance.EditGeneralLedgerBudget'),
   'closing a fiscal year must not match budget editing');
 
+const currencyAdjustmentSamples = [
+  {locale:'en-US',page:'Exch. Rates Adjustment',action:'Preview Posting'},
+  {locale:'sv-SE',page:'Justera valutakurser',action:'Förhandsgranska bokföring'},
+  {locale:'fr-FR',page:'Ajustement des taux de change',action:'Aperçu validation'},
+  {locale:'de-DE',page:'Wechselkursregulierung',action:'Buchungsvorschau'},
+  {locale:'es-ES',page:'Ajustar tipos de cambio',action:'Vista previa de registro'},
+  {locale:'da-DK',page:'Justering af kursvalutaer',action:'Forhåndsversion'},
+  {locale:'fi-FI',page:'Vaihtokurssien muutos',action:'Esikatsele kirjausta'},
+  {locale:'nb-NO',page:'Valutakursjustering',action:'Forhåndsvis bokføring'}
+];
+const currencyAdjustmentRule = financePack.rules.find(x => x.ruleId === 'Finance.PreviewExchangeRateAdjustment');
+for (const {locale,page,action} of currencyAdjustmentSamples) {
+  const result = repository.resolveAction({language:locale,context:{pageCaption:page,actionCaption:action}});
+  assert.equal(result.status,'resolved',`${locale} preview currency adjustment`);
+  assert.equal(result.candidates[0].provenance.ruleId,'Finance.PreviewExchangeRateAdjustment',locale);
+  assert.equal(result.candidates[0].provenance.language,locale);
+  assert.ok(result.candidates[0].provenance.sourceRefs.some(x =>
+    x.sourceId === `microsoft-learn-finance-currency-adjustment-${locale.toLowerCase()}`),locale);
+  const instruction = knowledge.localizedInstruction(currencyAdjustmentRule,locale);
+  assert.ok(instruction,`localized currency adjustment directive for ${locale}`);
+  assert.match(instruction,/preview|förhandsgranska|prévisual|vorschau|vista previa|forhåndsvis|esikatsele/i,
+    `preview before posting is explicit for ${locale}`);
+}
+const wrongCurrencyAction = repository.resolveAction({language:'en-US',
+  context:{pageCaption:'Exch. Rates Adjustment',actionCaption:'OK'}});
+assert.ok(!wrongCurrencyAction.candidates.some(x => x.provenance.ruleId === 'Finance.PreviewExchangeRateAdjustment'),
+  'running the exchange adjustment must not resolve as preview');
+
 const sourceTopics = [
   'chart-accounts', 'dimensions', 'vat-setup', 'finance-reports', 'accounting-periods', 'budgets',
-  'year-close', 'fixed-assets', 'depreciation', 'cost-accounting', 'currencies', 'consolidation'
+  'year-close', 'fixed-assets', 'depreciation', 'cost-accounting', 'currencies', 'currency-adjustment', 'consolidation'
 ];
 for (const topic of sourceTopics) {
   for (const locale of samples.map(sample => sample.locale)) {
@@ -193,4 +221,4 @@ const unrelated = repository.resolveAction({language:'en-US',context:{pageCaptio
 assert.ok(!unrelated.candidates.some(x=>x.provenance.ruleId==='Finance.PostGeneralJournal'),
   'general journal posting rule must not match the specialized payment journal');
 
-console.log('Finance chart, posting, dimension-change, accounting-period creation, G/L budget, and year-end directives resolve in all eight supported UI locales.');
+console.log('Finance chart, posting, dimension-change, accounting-period creation, G/L budget, currency-adjustment preview, and year-end directives resolve in all eight supported UI locales.');
