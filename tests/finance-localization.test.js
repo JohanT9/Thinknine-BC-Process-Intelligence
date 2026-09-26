@@ -438,7 +438,7 @@ const sourceTopics = [
   'chart-accounts', 'dimensions', 'vat-setup', 'vat-submission', 'finance-reports', 'accounting-periods', 'budgets',
   'year-close', 'fixed-assets', 'depreciation', 'cost-accounting', 'currencies', 'currency-adjustment', 'consolidation',
   'column-definitions', 'row-definitions', 'cash-flow-overview', 'cash-flow-setup',
-  'disposal', 'acquisitions', 'revaluation', 'maintenance', 'insurance'
+  'gl-revaluation', 'disposal', 'acquisitions', 'revaluation', 'maintenance', 'insurance'
 ];
 for (const topic of sourceTopics) {
   for (const locale of samples.map(sample => sample.locale)) {
@@ -455,6 +455,22 @@ for (const topic of sourceTopics) {
     }
     assert.ok(source.fields.length > 0, `indexed scope for ${topic}/${locale}`);
   }
+}
+
+for (const locale of samples.map(sample => sample.locale)) {
+  const currency = financePack.sources.find(item => item.sourceId ===
+    `microsoft-learn-finance-currencies-${locale.toLowerCase()}`);
+  assert.ok(currency.fields.some(x => /rounding precision and invoice rounding type/.test(x)),
+    `currency rounding precision is indexed for ${locale}`);
+  assert.ok(currency.fields.some(x => /Residual gain and loss posting accounts/.test(x)),
+    `ACY residual accounts are indexed for ${locale}`);
+  const revaluation = financePack.sources.find(item => item.sourceId ===
+    `microsoft-learn-finance-gl-revaluation-${locale.toLowerCase()}`);
+  assert.ok(revaluation,`G/L account currency revaluation source for ${locale}`);
+  assert.ok(revaluation.fields.some(x => /Do not revalue balances already managed/.test(x)),
+    `duplicate revaluation risk is indexed for ${locale}`);
+  assert.ok(revaluation.fields.some(x => /document-level rolling rounding; general journals round per line/.test(x)),
+    `document and journal rounding behavior is indexed for ${locale}`);
 }
 
 const unrelated = repository.resolveAction({language:'en-US',context:{pageCaption:'Payment Journal',actionCaption:'Post'}});
