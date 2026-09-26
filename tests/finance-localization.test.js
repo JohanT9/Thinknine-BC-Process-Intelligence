@@ -202,8 +202,36 @@ const wrongCurrencyAction = repository.resolveAction({language:'en-US',
 assert.ok(!wrongCurrencyAction.candidates.some(x => x.provenance.ruleId === 'Finance.PreviewExchangeRateAdjustment'),
   'running the exchange adjustment must not resolve as preview');
 
+const vatReportSamples = [
+  {locale:'en-US',page:'VAT Returns',action:'Suggest Lines'},
+  {locale:'sv-SE',page:'Momsreturer',action:'Föreslå rader'},
+  {locale:'fr-FR',page:'Retours TVA',action:'Proposer lignes'},
+  {locale:'de-DE',page:'Mehrwertsteuererklärungen',action:'Vorschlagszeilen'},
+  {locale:'es-ES',page:'Devolución de IVA',action:'Proponer líneas'},
+  {locale:'da-DK',page:'Momsangivelser',action:'Foreslå linjer'},
+  {locale:'fi-FI',page:'ALV-palautukset',action:'Ehdota rivejä'},
+  {locale:'nb-NO',page:'Mva-returer',action:'Foreslå linjer'}
+];
+const vatReportRule = financePack.rules.find(x => x.ruleId === 'Finance.SuggestVATReportLines');
+for (const {locale,page,action} of vatReportSamples) {
+  const result = repository.resolveAction({language:locale,context:{pageCaption:page,actionCaption:action}});
+  assert.equal(result.status,'resolved',`${locale} suggest VAT report lines`);
+  assert.equal(result.candidates[0].provenance.ruleId,'Finance.SuggestVATReportLines',locale);
+  assert.equal(result.candidates[0].provenance.language,locale);
+  assert.ok(result.candidates[0].provenance.sourceRefs.some(x =>
+    x.sourceId === `microsoft-learn-finance-vat-submission-${locale.toLowerCase()}`),locale);
+  const instruction = knowledge.localizedInstruction(vatReportRule,locale);
+  assert.ok(instruction,`localized VAT report directive for ${locale}`);
+  assert.match(instruction,/country|land|pays|Land|país|landsspecifikke|maakohtainen|landsspesifikke/i,
+    `country-specific compliance boundary is disclosed for ${locale}`);
+}
+const wrongVATAction = repository.resolveAction({language:'en-US',
+  context:{pageCaption:'VAT Returns',actionCaption:'Submit'}});
+assert.ok(!wrongVATAction.candidates.some(x => x.provenance.ruleId === 'Finance.SuggestVATReportLines'),
+  'submitting a VAT report must not resolve as suggesting lines');
+
 const sourceTopics = [
-  'chart-accounts', 'dimensions', 'vat-setup', 'finance-reports', 'accounting-periods', 'budgets',
+  'chart-accounts', 'dimensions', 'vat-setup', 'vat-submission', 'finance-reports', 'accounting-periods', 'budgets',
   'year-close', 'fixed-assets', 'depreciation', 'cost-accounting', 'currencies', 'currency-adjustment', 'consolidation'
 ];
 for (const topic of sourceTopics) {
@@ -221,4 +249,4 @@ const unrelated = repository.resolveAction({language:'en-US',context:{pageCaptio
 assert.ok(!unrelated.candidates.some(x=>x.provenance.ruleId==='Finance.PostGeneralJournal'),
   'general journal posting rule must not match the specialized payment journal');
 
-console.log('Finance chart, posting, dimension-change, accounting-period creation, G/L budget, currency-adjustment preview, and year-end directives resolve in all eight supported UI locales.');
+console.log('Finance chart, posting, dimension-change, accounting periods, G/L budgets, currency-adjustment preview, VAT report generation, and year-end directives resolve in all eight supported UI locales.');
