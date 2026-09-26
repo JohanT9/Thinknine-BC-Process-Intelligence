@@ -298,11 +298,11 @@ const depreciationPostingSamples = [
   {locale:'nb-NO',page:'AKTIVA-finansjournaler',action:'Bokfør'}
 ];
 const depreciationPostingRule = financePack.rules.find(x =>
-  x.ruleId === 'Finance.PostFixedAssetDepreciation');
+  x.ruleId === 'Finance.PostFixedAssetJournal');
 for (const {locale,page,action} of depreciationPostingSamples) {
   const result = repository.resolveAction({language:locale,context:{pageCaption:page,actionCaption:action}});
   assert.equal(result.status,'resolved',`${locale} post fixed-asset depreciation`);
-  assert.equal(result.candidates[0].provenance.ruleId,'Finance.PostFixedAssetDepreciation',locale);
+  assert.equal(result.candidates[0].provenance.ruleId,'Finance.PostFixedAssetJournal',locale);
   assert.equal(result.candidates[0].provenance.language,locale);
   assert.ok(result.candidates[0].provenance.sourceRefs.some(x =>
     x.sourceId === `microsoft-learn-finance-depreciation-${locale.toLowerCase()}`),locale);
@@ -312,8 +312,8 @@ for (const {locale,page,action} of depreciationPostingSamples) {
 const wrongDepreciationAction = repository.resolveAction({language:'en-US',
   context:{pageCaption:'Fixed Asset G/L Journals',actionCaption:'Calculate Depreciation'}});
 assert.ok(!wrongDepreciationAction.candidates.some(x =>
-  x.provenance.ruleId === 'Finance.PostFixedAssetDepreciation'),
-  'calculation command must not resolve as depreciation posting');
+  x.provenance.ruleId === 'Finance.PostFixedAssetJournal'),
+  'calculation command must not resolve as fixed-asset journal posting');
 
 const depreciationCancellationSamples = [
   {locale:'en-US',page:'Cancel FA Ledger Entries',action:'OK'},
