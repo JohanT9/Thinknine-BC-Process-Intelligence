@@ -13,6 +13,34 @@ const imported = repositoryApi.importRelease(manifest, packs);
 assert.equal(imported.ok, true, JSON.stringify(imported.diagnostics));
 const repository = repositoryApi.createRepository(imported.snapshot);
 const financePack = packs.find(x => x.packId === 'bc-finance').pack;
+const cashFlowSamples = [
+  {locale:'en-US',page:'Cash Flow Forecast',action:'Recalculate Forecast'},
+  {locale:'sv-SE',page:'Kassaflödesprognos',action:'Omberäkna prognos'},
+  {locale:'fr-FR',page:'Prévisions de la trésorerie',action:'Recalculer la prévision'},
+  {locale:'de-DE',page:'Cashflowplanungen',action:'Planung neu berechnen'},
+  {locale:'es-ES',page:'Previsión de flujo de efectivo',action:'Recalcular previsión'},
+  {locale:'da-DK',page:'Pengestrømsprognose',action:'Genberegn prognose'},
+  {locale:'fi-FI',page:'Kassavirtaennuste',action:'Laske ennuste uudelleen'},
+  {locale:'nb-NO',page:'Kontantstrømprognose',action:'Omberegn prognose'}
+];
+const cashFlowRule = financePack.rules.find(x => x.ruleId === 'Finance.RecalculateCashFlowForecast');
+for (const {locale,page,action} of cashFlowSamples) {
+  const result = repository.resolveAction({language:locale,context:{pageCaption:page,actionCaption:action}});
+  assert.equal(result.status,'resolved',`${locale} recalculate cash flow forecast`);
+  assert.equal(result.candidates[0].provenance.ruleId,'Finance.RecalculateCashFlowForecast',locale);
+  assert.equal(result.candidates[0].provenance.language,locale);
+  assert.ok(result.candidates[0].provenance.sourceRefs.some(x =>
+    x.sourceId === `microsoft-learn-finance-cash-flow-setup-${locale.toLowerCase()}`),locale);
+  const instruction = knowledge.localizedInstruction(cashFlowRule,locale);
+  assert.ok(instruction,`localized cash flow forecast directive for ${locale}`);
+  assert.match(instruction,/cash flow|kassaflöde|trésorerie|Cashflow|flujo de efectivo|pengestrøm|kassavirta|kontantstrøm/i,
+    `forecast context is mentioned for ${locale}`);
+}
+const wrongCashFlowAction = repository.resolveAction({language:'en-US',
+  context:{pageCaption:'Cash Flow Forecast',actionCaption:'Post'}});
+assert.ok(!wrongCashFlowAction.candidates.some(x =>
+  x.provenance.ruleId === 'Finance.RecalculateCashFlowForecast'),
+  'posting must not resolve as recalculating a forecast');
 const rule = financePack.rules.find(x => x.ruleId === 'Finance.PostGeneralJournal');
 const samples = [
   {locale:'en-US',page:'General Journals',post:'Post',source:'microsoft-learn-general-journals'},
@@ -409,7 +437,8 @@ assert.ok(!wrongIndexationAction.candidates.some(x =>
 const sourceTopics = [
   'chart-accounts', 'dimensions', 'vat-setup', 'vat-submission', 'finance-reports', 'accounting-periods', 'budgets',
   'year-close', 'fixed-assets', 'depreciation', 'cost-accounting', 'currencies', 'currency-adjustment', 'consolidation',
-  'column-definitions', 'row-definitions', 'disposal', 'acquisitions', 'revaluation', 'maintenance', 'insurance'
+  'column-definitions', 'row-definitions', 'cash-flow-overview', 'cash-flow-setup',
+  'disposal', 'acquisitions', 'revaluation', 'maintenance', 'insurance'
 ];
 for (const topic of sourceTopics) {
   for (const locale of samples.map(sample => sample.locale)) {
@@ -432,4 +461,4 @@ const unrelated = repository.resolveAction({language:'en-US',context:{pageCaptio
 assert.ok(!unrelated.candidates.some(x=>x.provenance.ruleId==='Finance.PostGeneralJournal'),
   'general journal posting rule must not match the specialized payment journal');
 
-console.log('Finance directives for chart, posting, dimensions, accounting periods, budgets, currency adjustment, VAT report lines, financial report rows and columns, fixed-asset depreciation/correction/indexation, and year-end resolve in all eight supported UI locales.');
+console.log('Finance directives for chart, posting, dimensions, accounting periods, budgets, currency adjustment, cash flow, VAT report lines, financial report rows and columns, fixed-asset depreciation/correction/indexation, and year-end resolve in all eight supported UI locales.');
