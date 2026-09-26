@@ -345,10 +345,39 @@ assert.ok(!wrongDepreciationCorrection.candidates.some(x =>
   x.provenance.ruleId === 'Finance.CancelFixedAssetDepreciation'),
   'posting must not resolve as cancellation of depreciation entries');
 
+const indexationSamples = [
+  {locale:'en-US',page:'Index Fixed Assets',action:'OK'},
+  {locale:'sv-SE',page:'Index Fixed Assets',action:'OK'},
+  {locale:'fr-FR',page:'Ressources fixes d’index',action:'OK'},
+  {locale:'de-DE',page:'Index Anlagengüter',action:'OK'},
+  {locale:'es-ES',page:'Index Fixed Assets',action:'Aceptar'},
+  {locale:'da-DK',page:'Indeksér anlægsaktiver',action:'OK'},
+  {locale:'fi-FI',page:'Tee indeksimuutos KO:teen',action:'OK'},
+  {locale:'nb-NO',page:'Indeksrekkede aktiva',action:'OK'}
+];
+const indexationRule = financePack.rules.find(x => x.ruleId === 'Finance.RunFixedAssetIndexation');
+for (const {locale,page,action} of indexationSamples) {
+  const result = repository.resolveAction({language:locale,context:{pageCaption:page,actionCaption:action}});
+  assert.equal(result.status,'resolved',`${locale} run fixed-asset indexation`);
+  assert.equal(result.candidates[0].provenance.ruleId,'Finance.RunFixedAssetIndexation',locale);
+  assert.equal(result.candidates[0].provenance.language,locale);
+  assert.ok(result.candidates[0].provenance.sourceRefs.some(x =>
+    x.sourceId === `microsoft-learn-finance-revaluation-${locale.toLowerCase()}`),locale);
+  const instruction = knowledge.localizedInstruction(indexationRule,locale);
+  assert.ok(instruction,`localized fixed-asset indexation directive for ${locale}`);
+  assert.match(instruction,/does not post|bokför dem inte|ne les comptabilise pas|bucht sie.*nicht|no las registra|bogfører dem ikke|bokfører dem ikke|ei kirjaa/i,
+    `indexation and posting are distinguished for ${locale}`);
+}
+const wrongIndexationAction = repository.resolveAction({language:'en-US',
+  context:{pageCaption:'Index Fixed Assets',actionCaption:'Post'}});
+assert.ok(!wrongIndexationAction.candidates.some(x =>
+  x.provenance.ruleId === 'Finance.RunFixedAssetIndexation'),
+  'indexation batch confirmation must not resolve as posting');
+
 const sourceTopics = [
   'chart-accounts', 'dimensions', 'vat-setup', 'vat-submission', 'finance-reports', 'accounting-periods', 'budgets',
   'year-close', 'fixed-assets', 'depreciation', 'cost-accounting', 'currencies', 'currency-adjustment', 'consolidation',
-  'column-definitions', 'disposal', 'acquisitions'
+  'column-definitions', 'disposal', 'acquisitions', 'revaluation'
 ];
 for (const topic of sourceTopics) {
   for (const locale of samples.map(sample => sample.locale)) {
@@ -370,4 +399,4 @@ const unrelated = repository.resolveAction({language:'en-US',context:{pageCaptio
 assert.ok(!unrelated.candidates.some(x=>x.provenance.ruleId==='Finance.PostGeneralJournal'),
   'general journal posting rule must not match the specialized payment journal');
 
-console.log('Finance directives for chart, posting, dimensions, accounting periods, budgets, currency adjustment, VAT report lines, financial report columns, fixed-asset depreciation/correction, and year-end resolve in all eight supported UI locales.');
+console.log('Finance directives for chart, posting, dimensions, accounting periods, budgets, currency adjustment, VAT report lines, financial report columns, fixed-asset depreciation/correction/indexation, and year-end resolve in all eight supported UI locales.');
