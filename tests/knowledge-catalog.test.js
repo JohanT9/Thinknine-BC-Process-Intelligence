@@ -191,7 +191,7 @@ const localizedSourceTopics=[
   ["bc-sales","microsoft-learn-sales-prepayments-","finance-invoice-prepayments",[]],
   ["bc-purchase","microsoft-learn-purchase-prepayments-","finance-invoice-prepayments",[]],
   ["bc-manufacturing","microsoft-learn-production-capacity-","production-how-to-set-up-work-and-machine-centers",[]],
-  ["bc-services","microsoft-learn-service-contracts-","service-fulfill-service-contracts",["da-DK"]],
+  ["bc-services","microsoft-learn-service-contracts-","service-fulfill-service-contracts",[]],
   ["bc-warehouse","microsoft-learn-warehouse-physical-inventory-","inventory-how-count-adjust-reclassify",[]]
 ];
 for(const [packId,idPrefix,slug,fallbackLocales] of localizedSourceTopics){
@@ -200,7 +200,8 @@ for(const [packId,idPrefix,slug,fallbackLocales] of localizedSourceTopics){
     const source=pack.sources.find(item=>item.sourceId===idPrefix+locale.toLowerCase());
     assert.ok(source,`${packId} ${slug} source exists for ${locale}`);
     const sourceLocale=fallbackLocales.includes(locale)?"en-us":locale.toLowerCase();
-    assert.ok(source.sourceUri.startsWith(`https://learn.microsoft.com/${sourceLocale}/dynamics365/business-central/${slug}`),
+    const sourceSlug=packId==="bc-services"&&locale==="da-DK"?"service-how-to-create-service-contracts-and-service-contract-quotes":slug;
+    assert.ok(source.sourceUri.startsWith(`https://learn.microsoft.com/${sourceLocale}/dynamics365/business-central/${sourceSlug}`),
       `${packId} official localized source URI for ${locale}`);
     assert.ok(source.fields.length>=4,`${packId} source scope is useful for ${locale}`);
     if(fallbackLocales.includes(locale))assert.match(source.appliesTo,/English source fallback/,

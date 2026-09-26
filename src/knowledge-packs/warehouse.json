@@ -1,7 +1,7 @@
 {
   "packId": "bc-warehouse",
   "name": "Business Central Warehouse",
-  "version": "2.5.0",
+  "version": "2.6.0",
   "priority": 200,
   "rules": [
     {
@@ -1445,10 +1445,10 @@
     },
     {
       "sourceId": "microsoft-learn-warehouse-physical-inventory-en-us",
-      "title": "Invoice prepayments (en-US)",
+      "title": "Count, adjust, and reclassify inventory using journals",
       "sourceType": "microsoft-learn",
       "sourceUri": "https://learn.microsoft.com/en-us/dynamics365/business-central/inventory-how-count-adjust-reclassify",
-      "appliesTo": "Business Central sales documentation, en-US; checked 2026-09-26",
+      "appliesTo": "Business Central inventory documentation, en-us; checked 2026-09-26",
       "accessedDate": "2026-09-26",
       "fields": [
         "Choose physical inventory journal versus warehouse physical inventory journal based on directed put-away and pick setup",
@@ -1461,10 +1461,10 @@
     },
     {
       "sourceId": "microsoft-learn-warehouse-physical-inventory-sv-se",
-      "title": "Fakturera förskottsbetalningar (sv-SE)",
+      "title": "Inventera, justera och gruppera lager med hj?lp av journaler",
       "sourceType": "microsoft-learn",
       "sourceUri": "https://learn.microsoft.com/sv-se/dynamics365/business-central/inventory-how-count-adjust-reclassify",
-      "appliesTo": "Business Central sales documentation, sv-SE; checked 2026-09-26",
+      "appliesTo": "Business Central inventory documentation, sv-se; checked 2026-09-26",
       "accessedDate": "2026-09-26",
       "fields": [
         "Choose physical inventory journal versus warehouse physical inventory journal based on directed put-away and pick setup",
@@ -1477,10 +1477,10 @@
     },
     {
       "sourceId": "microsoft-learn-warehouse-physical-inventory-fr-fr",
-      "title": "Facturation des acomptes (fr-FR)",
+      "title": "Inventaire, ajustement et reclassement du stock",
       "sourceType": "microsoft-learn",
       "sourceUri": "https://learn.microsoft.com/fr-fr/dynamics365/business-central/inventory-how-count-adjust-reclassify",
-      "appliesTo": "Business Central sales documentation, fr-FR; checked 2026-09-26",
+      "appliesTo": "Business Central inventory documentation, fr-fr; checked 2026-09-26",
       "accessedDate": "2026-09-26",
       "fields": [
         "Choose physical inventory journal versus warehouse physical inventory journal based on directed put-away and pick setup",
@@ -1493,10 +1493,10 @@
     },
     {
       "sourceId": "microsoft-learn-warehouse-physical-inventory-de-de",
-      "title": "Vorauszahlungen fakturieren (de-DE)",
+      "title": "Lagerbestand erfassen, regulieren und umbuchen",
       "sourceType": "microsoft-learn",
       "sourceUri": "https://learn.microsoft.com/de-de/dynamics365/business-central/inventory-how-count-adjust-reclassify",
-      "appliesTo": "Business Central sales documentation, de-DE; checked 2026-09-26",
+      "appliesTo": "Business Central inventory documentation, de-de; checked 2026-09-26",
       "accessedDate": "2026-09-26",
       "fields": [
         "Choose physical inventory journal versus warehouse physical inventory journal based on directed put-away and pick setup",
@@ -1509,10 +1509,10 @@
     },
     {
       "sourceId": "microsoft-learn-warehouse-physical-inventory-es-es",
-      "title": "Facturar prepagos (es-ES)",
+      "title": "Recontar, ajustar y reclasificar inventario",
       "sourceType": "microsoft-learn",
       "sourceUri": "https://learn.microsoft.com/es-es/dynamics365/business-central/inventory-how-count-adjust-reclassify",
-      "appliesTo": "Business Central sales documentation, es-ES; checked 2026-09-26",
+      "appliesTo": "Business Central inventory documentation, es-es; checked 2026-09-26",
       "accessedDate": "2026-09-26",
       "fields": [
         "Choose physical inventory journal versus warehouse physical inventory journal based on directed put-away and pick setup",
@@ -1525,10 +1525,10 @@
     },
     {
       "sourceId": "microsoft-learn-warehouse-physical-inventory-da-dk",
-      "title": "Fakturere forudbetalinger (da-DK)",
+      "title": "T?lle, regulere og ompostere lager",
       "sourceType": "microsoft-learn",
       "sourceUri": "https://learn.microsoft.com/da-dk/dynamics365/business-central/inventory-how-count-adjust-reclassify",
-      "appliesTo": "Business Central sales documentation, da-DK; checked 2026-09-26",
+      "appliesTo": "Business Central inventory documentation, da-dk; checked 2026-09-26",
       "accessedDate": "2026-09-26",
       "fields": [
         "Choose physical inventory journal versus warehouse physical inventory journal based on directed put-away and pick setup",
@@ -1541,10 +1541,10 @@
     },
     {
       "sourceId": "microsoft-learn-warehouse-physical-inventory-fi-fi",
-      "title": "Ennakkomaksujen laskutus (fi-FI)",
+      "title": "Varaston laskeminen, muuttaminen ja uudelleenluokitteleminen",
       "sourceType": "microsoft-learn",
       "sourceUri": "https://learn.microsoft.com/fi-fi/dynamics365/business-central/inventory-how-count-adjust-reclassify",
-      "appliesTo": "Business Central sales documentation, fi-FI; checked 2026-09-26",
+      "appliesTo": "Business Central inventory documentation, fi-fi; checked 2026-09-26",
       "accessedDate": "2026-09-26",
       "fields": [
         "Choose physical inventory journal versus warehouse physical inventory journal based on directed put-away and pick setup",
@@ -1557,10 +1557,10 @@
     },
     {
       "sourceId": "microsoft-learn-warehouse-physical-inventory-nb-no",
-      "title": "Fakturer forskudd (nb-NO)",
+      "title": "Tell, juster og klassifiser lagerbeholdning p? nytt",
       "sourceType": "microsoft-learn",
       "sourceUri": "https://learn.microsoft.com/nb-no/dynamics365/business-central/inventory-how-count-adjust-reclassify",
-      "appliesTo": "Business Central sales documentation, nb-NO; checked 2026-09-26",
+      "appliesTo": "Business Central inventory documentation, nb-no; checked 2026-09-26",
       "accessedDate": "2026-09-26",
       "fields": [
         "Choose physical inventory journal versus warehouse physical inventory journal based on directed put-away and pick setup",

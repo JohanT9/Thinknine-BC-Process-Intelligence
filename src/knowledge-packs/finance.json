@@ -1,7 +1,7 @@
 {
   "packId": "bc-finance",
   "name": "Business Central Finance",
-  "version": "1.24.0",
+  "version": "1.25.0",
   "priority": 210,
   "rules": [
     {
@@ -2540,7 +2540,11 @@
         "Test Mode checks the service connection but does not submit a real VAT return; clear Test Mode and repeat only when an actual submission is intended",
         "Suggest Lines creates proposed report lines from VAT entries; review VAT dates, period, included open or closed entries, and report lines before release",
         "Release validates and locks the report for editing; reopen to make changes, then submit using the configured country or region service, or mark submitted after an external/manual filing",
-        "Tax report forms, service connections and legal filing obligations vary by country or region; verify current local functionality and tax-authority requirements"
+        "Tax report forms, service connections and legal filing obligations vary by country or region; verify current local functionality and tax-authority requirements",
+        "Calculate and Post VAT Settlement transfers the net amount from posted VAT entries to the configured VAT settlement account and closes the included entries",
+        "Review filters and the generated settlement journal; run a test report before posting when you need to verify the amounts",
+        "If VAT business and product posting group filters are left blank, entries for all such posting groups are included",
+        "VAT settlement is an accounting step distinct from filing a VAT return with the tax authority or transferring the net payment"
       ]
     },
     {
@@ -2558,7 +2562,11 @@
         "Test Mode checks the service connection but does not submit a real VAT return; clear Test Mode and repeat only when an actual submission is intended",
         "Suggest Lines creates proposed report lines from VAT entries; review VAT dates, period, included open or closed entries, and report lines before release",
         "Release validates and locks the report for editing; reopen to make changes, then submit using the configured country or region service, or mark submitted after an external/manual filing",
-        "Tax report forms, service connections and legal filing obligations vary by country or region; verify current local functionality and tax-authority requirements"
+        "Tax report forms, service connections and legal filing obligations vary by country or region; verify current local functionality and tax-authority requirements",
+        "Calculate and Post VAT Settlement transfers the net amount from posted VAT entries to the configured VAT settlement account and closes the included entries",
+        "Review filters and the generated settlement journal; run a test report before posting when you need to verify the amounts",
+        "If VAT business and product posting group filters are left blank, entries for all such posting groups are included",
+        "VAT settlement is an accounting step distinct from filing a VAT return with the tax authority or transferring the net payment"
       ]
     },
     {
@@ -2576,7 +2584,11 @@
         "Test Mode checks the service connection but does not submit a real VAT return; clear Test Mode and repeat only when an actual submission is intended",
         "Suggest Lines creates proposed report lines from VAT entries; review VAT dates, period, included open or closed entries, and report lines before release",
         "Release validates and locks the report for editing; reopen to make changes, then submit using the configured country or region service, or mark submitted after an external/manual filing",
-        "Tax report forms, service connections and legal filing obligations vary by country or region; verify current local functionality and tax-authority requirements"
+        "Tax report forms, service connections and legal filing obligations vary by country or region; verify current local functionality and tax-authority requirements",
+        "Calculate and Post VAT Settlement transfers the net amount from posted VAT entries to the configured VAT settlement account and closes the included entries",
+        "Review filters and the generated settlement journal; run a test report before posting when you need to verify the amounts",
+        "If VAT business and product posting group filters are left blank, entries for all such posting groups are included",
+        "VAT settlement is an accounting step distinct from filing a VAT return with the tax authority or transferring the net payment"
       ]
     },
     {
@@ -2594,7 +2606,11 @@
         "Test Mode checks the service connection but does not submit a real VAT return; clear Test Mode and repeat only when an actual submission is intended",
         "Suggest Lines creates proposed report lines from VAT entries; review VAT dates, period, included open or closed entries, and report lines before release",
         "Release validates and locks the report for editing; reopen to make changes, then submit using the configured country or region service, or mark submitted after an external/manual filing",
-        "Tax report forms, service connections and legal filing obligations vary by country or region; verify current local functionality and tax-authority requirements"
+        "Tax report forms, service connections and legal filing obligations vary by country or region; verify current local functionality and tax-authority requirements",
+        "Calculate and Post VAT Settlement transfers the net amount from posted VAT entries to the configured VAT settlement account and closes the included entries",
+        "Review filters and the generated settlement journal; run a test report before posting when you need to verify the amounts",
+        "If VAT business and product posting group filters are left blank, entries for all such posting groups are included",
+        "VAT settlement is an accounting step distinct from filing a VAT return with the tax authority or transferring the net payment"
       ]
     },
     {
@@ -2612,7 +2628,11 @@
         "Test Mode checks the service connection but does not submit a real VAT return; clear Test Mode and repeat only when an actual submission is intended",
         "Suggest Lines creates proposed report lines from VAT entries; review VAT dates, period, included open or closed entries, and report lines before release",
         "Release validates and locks the report for editing; reopen to make changes, then submit using the configured country or region service, or mark submitted after an external/manual filing",
-        "Tax report forms, service connections and legal filing obligations vary by country or region; verify current local functionality and tax-authority requirements"
+        "Tax report forms, service connections and legal filing obligations vary by country or region; verify current local functionality and tax-authority requirements",
+        "Calculate and Post VAT Settlement transfers the net amount from posted VAT entries to the configured VAT settlement account and closes the included entries",
+        "Review filters and the generated settlement journal; run a test report before posting when you need to verify the amounts",
+        "If VAT business and product posting group filters are left blank, entries for all such posting groups are included",
+        "VAT settlement is an accounting step distinct from filing a VAT return with the tax authority or transferring the net payment"
       ]
     },
     {
@@ -2630,7 +2650,11 @@
         "Test Mode checks the service connection but does not submit a real VAT return; clear Test Mode and repeat only when an actual submission is intended",
         "Suggest Lines creates proposed report lines from VAT entries; review VAT dates, period, included open or closed entries, and report lines before release",
         "Release validates and locks the report for editing; reopen to make changes, then submit using the configured country or region service, or mark submitted after an external/manual filing",
-        "Tax report forms, service connections and legal filing obligations vary by country or region; verify current local functionality and tax-authority requirements"
+        "Tax report forms, service connections and legal filing obligations vary by country or region; verify current local functionality and tax-authority requirements",
+        "Calculate and Post VAT Settlement transfers the net amount from posted VAT entries to the configured VAT settlement account and closes the included entries",
+        "Review filters and the generated settlement journal; run a test report before posting when you need to verify the amounts",
+        "If VAT business and product posting group filters are left blank, entries for all such posting groups are included",
+        "VAT settlement is an accounting step distinct from filing a VAT return with the tax authority or transferring the net payment"
       ]
     },
     {
@@ -2648,7 +2672,11 @@
         "Test Mode checks the service connection but does not submit a real VAT return; clear Test Mode and repeat only when an actual submission is intended",
         "Suggest Lines creates proposed report lines from VAT entries; review VAT dates, period, included open or closed entries, and report lines before release",
         "Release validates and locks the report for editing; reopen to make changes, then submit using the configured country or region service, or mark submitted after an external/manual filing",
-        "Tax report forms, service connections and legal filing obligations vary by country or region; verify current local functionality and tax-authority requirements"
+        "Tax report forms, service connections and legal filing obligations vary by country or region; verify current local functionality and tax-authority requirements",
+        "Calculate and Post VAT Settlement transfers the net amount from posted VAT entries to the configured VAT settlement account and closes the included entries",
+        "Review filters and the generated settlement journal; run a test report before posting when you need to verify the amounts",
+        "If VAT business and product posting group filters are left blank, entries for all such posting groups are included",
+        "VAT settlement is an accounting step distinct from filing a VAT return with the tax authority or transferring the net payment"
       ]
     },
     {
@@ -2666,7 +2694,11 @@
         "Test Mode checks the service connection but does not submit a real VAT return; clear Test Mode and repeat only when an actual submission is intended",
         "Suggest Lines creates proposed report lines from VAT entries; review VAT dates, period, included open or closed entries, and report lines before release",
         "Release validates and locks the report for editing; reopen to make changes, then submit using the configured country or region service, or mark submitted after an external/manual filing",
-        "Tax report forms, service connections and legal filing obligations vary by country or region; verify current local functionality and tax-authority requirements"
+        "Tax report forms, service connections and legal filing obligations vary by country or region; verify current local functionality and tax-authority requirements",
+        "Calculate and Post VAT Settlement transfers the net amount from posted VAT entries to the configured VAT settlement account and closes the included entries",
+        "Review filters and the generated settlement journal; run a test report before posting when you need to verify the amounts",
+        "If VAT business and product posting group filters are left blank, entries for all such posting groups are included",
+        "VAT settlement is an accounting step distinct from filing a VAT return with the tax authority or transferring the net payment"
       ]
     },
     {
@@ -3249,10 +3281,10 @@
     },
     {
       "sourceId": "microsoft-learn-finance-maintenance-nb-no",
-      "title": "Set Up FA Maintenance (nb-NO UI; English source)",
+      "title": "Vedlikehold aktiva (nb-NO)",
       "sourceType": "microsoft-learn",
-      "sourceUri": "https://learn.microsoft.com/en-us/dynamics365/business-central/fa-how-setup-maintenance",
-      "appliesTo": "Business Central nb-NO UI locale; official English source used because a localized Norwegian page could not be verified on 2026-09-26",
+      "sourceUri": "https://learn.microsoft.com/nb-no/dynamics365/business-central/fa-how-maintain",
+      "appliesTo": "Business Central fixed-asset documentation, nb-NO; checked 2026-09-26",
       "accessedDate": "2026-09-26",
       "fields": [
         "Set up general maintenance information and maintenance codes for work types",
@@ -3293,10 +3325,10 @@
     },
     {
       "sourceId": "microsoft-learn-finance-insurance-fr-fr",
-      "title": "Insure fixed assets (fr-FR UI; English source)",
+      "title": "Assurance des immobilisations (fr-FR)",
       "sourceType": "microsoft-learn",
-      "sourceUri": "https://learn.microsoft.com/en-us/dynamics365/business-central/fa-how-insure",
-      "appliesTo": "Business Central fr-FR UI locale; official English source used because a localized French page could not be verified on 2026-09-26",
+      "sourceUri": "https://learn.microsoft.com/fr-fr/dynamics365/business-central/fa-how-insure",
+      "appliesTo": "Business Central fixed-asset documentation, fr-FR; checked 2026-09-26",
       "accessedDate": "2026-09-26",
       "fields": [
         "An insurance policy can cover one or more fixed assets; insurance journal posts to insurance coverage ledger",

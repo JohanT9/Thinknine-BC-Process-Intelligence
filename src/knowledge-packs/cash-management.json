@@ -1,7 +1,7 @@
 {
   "packId": "bc-cash-management",
   "name": "Business Central Cash Management",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "priority": 200,
   "pageDefinitions": [
     {
@@ -1135,25 +1135,29 @@
       "title": "Suggest vendor payments",
       "sourceType": "microsoft-learn",
       "sourceUri": "https://learn.microsoft.com/en-us/dynamics365/business-central/payables-how-suggest-vendor-payments",
-      "appliesTo": "Current Business Central online documentation; inspected 2026-09-25",
-      "accessedDate": "2026-09-25",
+      "appliesTo": "Business Central payables documentation, en-us; checked 2026-09-26",
+      "accessedDate": "2026-09-26",
       "fields": [
-        "Payment Journal",
-        "Suggest Vendor Payments",
-        "due dates and payment discounts"
+        "Suggest Vendor Payments creates proposed payment journal lines for entries due soon or eligible for payment discounts, according to the request-page settings",
+        "The batch excludes vendor ledger entries on hold and entries already applied with an Applies-to ID; vendor priority affects proposal order and available-amount allocation",
+        "Due dates can be used to calculate payment posting dates, but this option is incompatible with Find Payment Discounts and Summarize per Vendor; past calculated dates move to the work date with a warning",
+        "Review and apply the proposed lines before posting; generating a payment proposal does not confirm that a bank transfer occurred",
+        "The Payment Journal batch job is separate from the Payment Reconciliation Journal used to apply statement receipts to customer or vendor entries"
       ]
     },
     {
       "sourceId": "microsoft-learn-vendor-payments-sv",
-      "title": "Föreslå leverantörsbetalningar",
+      "title": "F?resl? leverant?rsbetalningar",
       "sourceType": "microsoft-learn",
       "sourceUri": "https://learn.microsoft.com/sv-se/dynamics365/business-central/payables-how-suggest-vendor-payments",
-      "appliesTo": "Current Business Central online documentation; inspected 2026-09-25",
-      "accessedDate": "2026-09-25",
+      "appliesTo": "Business Central payables documentation, sv-se; checked 2026-09-26",
+      "accessedDate": "2026-09-26",
       "fields": [
-        "Betalningsjournaler",
-        "Föreslå leverantörsbetalningar",
-        "förfallodatum"
+        "Suggest Vendor Payments creates proposed payment journal lines for entries due soon or eligible for payment discounts, according to the request-page settings",
+        "The batch excludes vendor ledger entries on hold and entries already applied with an Applies-to ID; vendor priority affects proposal order and available-amount allocation",
+        "Due dates can be used to calculate payment posting dates, but this option is incompatible with Find Payment Discounts and Summarize per Vendor; past calculated dates move to the work date with a warning",
+        "Review and apply the proposed lines before posting; generating a payment proposal does not confirm that a bank transfer occurred",
+        "The Payment Journal batch job is separate from the Payment Reconciliation Journal used to apply statement receipts to customer or vendor entries"
       ]
     },
     {
@@ -1161,13 +1165,14 @@
       "title": "Apply payments automatically and reconciling bank accounts",
       "sourceType": "microsoft-learn",
       "sourceUri": "https://learn.microsoft.com/en-us/dynamics365/business-central/receivables-apply-payments-auto-reconcile-bank-accounts",
-      "appliesTo": "Current Business Central online documentation; inspected 2026-09-25",
-      "accessedDate": "2026-09-25",
+      "appliesTo": "Business Central cash-management documentation, en-us; checked 2026-09-26",
+      "accessedDate": "2026-09-26",
       "fields": [
-        "Payment Reconciliation Journal",
-        "review applications",
-        "post journal",
-        "Bank Acc. Reconciliation is a separate workflow"
+        "The Payment Reconciliation Journal can import bank statement lines and propose applications to open customer or vendor ledger entries using payment text and entry details",
+        "Review and change automatic payment applications before posting; application rules control prioritized text matching",
+        "Posting the journal records the payment applications and can close related open bank account ledger entries when selected",
+        "Unmatched statement items and payment entries require investigation or manual application; a suggested match is not itself proof of settlement",
+        "Bank Account Reconciliation is a separate workflow for reconciling statements without applying customer or vendor payments at the same time"
       ]
     },
     {
@@ -1175,13 +1180,14 @@
       "title": "Koppla betalningar automatiskt och stämma av bankkonton",
       "sourceType": "microsoft-learn",
       "sourceUri": "https://learn.microsoft.com/sv-se/dynamics365/business-central/receivables-apply-payments-auto-reconcile-bank-accounts",
-      "appliesTo": "Current Business Central online documentation; inspected 2026-09-25",
-      "accessedDate": "2026-09-25",
+      "appliesTo": "Business Central cash-management documentation, sv-se; checked 2026-09-26",
+      "accessedDate": "2026-09-26",
       "fields": [
-        "Betalningsavstämningsjournal",
-        "Koppla automatiskt",
-        "manuell granskning",
-        "bokföra journal"
+        "The Payment Reconciliation Journal can import bank statement lines and propose applications to open customer or vendor ledger entries using payment text and entry details",
+        "Review and change automatic payment applications before posting; application rules control prioritized text matching",
+        "Posting the journal records the payment applications and can close related open bank account ledger entries when selected",
+        "Unmatched statement items and payment entries require investigation or manual application; a suggested match is not itself proof of settlement",
+        "Bank Account Reconciliation is a separate workflow for reconciling statements without applying customer or vendor payments at the same time"
       ]
     },
     {
@@ -1259,102 +1265,168 @@
     },
     {
       "sourceId": "microsoft-learn-vendor-payments-fr",
-      "title": "Suggérer des paiements aux fournisseurs",
+      "title": "Sugg?rer des paiements aux fournisseurs",
       "sourceType": "microsoft-learn",
-      "sourceUri": "https://learn.microsoft.com/fr-fr/dynamics365/business-central/receivables-apply-payments-auto-reconcile-bank-accounts",
-      "appliesTo": "Localized current Business Central online documentation; inspected 2026-09-25",
-      "accessedDate": "2026-09-25",
-      "fields": []
+      "sourceUri": "https://learn.microsoft.com/fr-fr/dynamics365/business-central/payables-how-suggest-vendor-payments",
+      "appliesTo": "Business Central payables documentation, fr-fr; checked 2026-09-26",
+      "accessedDate": "2026-09-26",
+      "fields": [
+        "Suggest Vendor Payments creates proposed payment journal lines for entries due soon or eligible for payment discounts, according to the request-page settings",
+        "The batch excludes vendor ledger entries on hold and entries already applied with an Applies-to ID; vendor priority affects proposal order and available-amount allocation",
+        "Due dates can be used to calculate payment posting dates, but this option is incompatible with Find Payment Discounts and Summarize per Vendor; past calculated dates move to the work date with a warning",
+        "Review and apply the proposed lines before posting; generating a payment proposal does not confirm that a bank transfer occurred",
+        "The Payment Journal batch job is separate from the Payment Reconciliation Journal used to apply statement receipts to customer or vendor entries"
+      ]
     },
     {
       "sourceId": "microsoft-learn-payment-reconciliation-fr",
       "title": "Rapprochement des comptes bancaires et lettrage des paiements",
       "sourceType": "microsoft-learn",
       "sourceUri": "https://learn.microsoft.com/fr-fr/dynamics365/business-central/receivables-apply-payments-auto-reconcile-bank-accounts",
-      "appliesTo": "Localized current Business Central online documentation; inspected 2026-09-25",
-      "accessedDate": "2026-09-25",
-      "fields": []
+      "appliesTo": "Business Central cash-management documentation, fr-fr; checked 2026-09-26",
+      "accessedDate": "2026-09-26",
+      "fields": [
+        "The Payment Reconciliation Journal can import bank statement lines and propose applications to open customer or vendor ledger entries using payment text and entry details",
+        "Review and change automatic payment applications before posting; application rules control prioritized text matching",
+        "Posting the journal records the payment applications and can close related open bank account ledger entries when selected",
+        "Unmatched statement items and payment entries require investigation or manual application; a suggested match is not itself proof of settlement",
+        "Bank Account Reconciliation is a separate workflow for reconciling statements without applying customer or vendor payments at the same time"
+      ]
     },
     {
       "sourceId": "microsoft-learn-vendor-payments-de",
       "title": "Lieferantenzahlungen vorschlagen",
       "sourceType": "microsoft-learn",
-      "sourceUri": "https://learn.microsoft.com/de-de/dynamics365/business-central/receivables-apply-payments-auto-reconcile-bank-accounts",
-      "appliesTo": "Localized current Business Central online documentation; inspected 2026-09-25",
-      "accessedDate": "2026-09-25",
-      "fields": []
+      "sourceUri": "https://learn.microsoft.com/de-de/dynamics365/business-central/payables-how-suggest-vendor-payments",
+      "appliesTo": "Business Central payables documentation, de-de; checked 2026-09-26",
+      "accessedDate": "2026-09-26",
+      "fields": [
+        "Suggest Vendor Payments creates proposed payment journal lines for entries due soon or eligible for payment discounts, according to the request-page settings",
+        "The batch excludes vendor ledger entries on hold and entries already applied with an Applies-to ID; vendor priority affects proposal order and available-amount allocation",
+        "Due dates can be used to calculate payment posting dates, but this option is incompatible with Find Payment Discounts and Summarize per Vendor; past calculated dates move to the work date with a warning",
+        "Review and apply the proposed lines before posting; generating a payment proposal does not confirm that a bank transfer occurred",
+        "The Payment Journal batch job is separate from the Payment Reconciliation Journal used to apply statement receipts to customer or vendor entries"
+      ]
     },
     {
       "sourceId": "microsoft-learn-payment-reconciliation-de",
       "title": "Bankkonten abstimmen und Zahlungen zuweisen",
       "sourceType": "microsoft-learn",
       "sourceUri": "https://learn.microsoft.com/de-de/dynamics365/business-central/receivables-apply-payments-auto-reconcile-bank-accounts",
-      "appliesTo": "Localized current Business Central online documentation; inspected 2026-09-25",
-      "accessedDate": "2026-09-25",
-      "fields": []
+      "appliesTo": "Business Central cash-management documentation, de-de; checked 2026-09-26",
+      "accessedDate": "2026-09-26",
+      "fields": [
+        "The Payment Reconciliation Journal can import bank statement lines and propose applications to open customer or vendor ledger entries using payment text and entry details",
+        "Review and change automatic payment applications before posting; application rules control prioritized text matching",
+        "Posting the journal records the payment applications and can close related open bank account ledger entries when selected",
+        "Unmatched statement items and payment entries require investigation or manual application; a suggested match is not itself proof of settlement",
+        "Bank Account Reconciliation is a separate workflow for reconciling statements without applying customer or vendor payments at the same time"
+      ]
     },
     {
       "sourceId": "microsoft-learn-vendor-payments-es",
       "title": "Proponer pagos a proveedores",
       "sourceType": "microsoft-learn",
-      "sourceUri": "https://learn.microsoft.com/es-es/dynamics365/business-central/receivables-apply-payments-auto-reconcile-bank-accounts",
-      "appliesTo": "Localized current Business Central online documentation; inspected 2026-09-25",
-      "accessedDate": "2026-09-25",
-      "fields": []
+      "sourceUri": "https://learn.microsoft.com/es-es/dynamics365/business-central/payables-how-suggest-vendor-payments",
+      "appliesTo": "Business Central payables documentation, es-es; checked 2026-09-26",
+      "accessedDate": "2026-09-26",
+      "fields": [
+        "Suggest Vendor Payments creates proposed payment journal lines for entries due soon or eligible for payment discounts, according to the request-page settings",
+        "The batch excludes vendor ledger entries on hold and entries already applied with an Applies-to ID; vendor priority affects proposal order and available-amount allocation",
+        "Due dates can be used to calculate payment posting dates, but this option is incompatible with Find Payment Discounts and Summarize per Vendor; past calculated dates move to the work date with a warning",
+        "Review and apply the proposed lines before posting; generating a payment proposal does not confirm that a bank transfer occurred",
+        "The Payment Journal batch job is separate from the Payment Reconciliation Journal used to apply statement receipts to customer or vendor entries"
+      ]
     },
     {
       "sourceId": "microsoft-learn-payment-reconciliation-es",
       "title": "Conciliar cuentas bancarias y aplicar pagos",
       "sourceType": "microsoft-learn",
       "sourceUri": "https://learn.microsoft.com/es-es/dynamics365/business-central/receivables-apply-payments-auto-reconcile-bank-accounts",
-      "appliesTo": "Localized current Business Central online documentation; inspected 2026-09-25",
-      "accessedDate": "2026-09-25",
-      "fields": []
+      "appliesTo": "Business Central cash-management documentation, es-es; checked 2026-09-26",
+      "accessedDate": "2026-09-26",
+      "fields": [
+        "The Payment Reconciliation Journal can import bank statement lines and propose applications to open customer or vendor ledger entries using payment text and entry details",
+        "Review and change automatic payment applications before posting; application rules control prioritized text matching",
+        "Posting the journal records the payment applications and can close related open bank account ledger entries when selected",
+        "Unmatched statement items and payment entries require investigation or manual application; a suggested match is not itself proof of settlement",
+        "Bank Account Reconciliation is a separate workflow for reconciling statements without applying customer or vendor payments at the same time"
+      ]
     },
     {
       "sourceId": "microsoft-learn-vendor-payments-da",
-      "title": "Foreslå kreditorbetalinger",
+      "title": "Foresl? kreditorbetalinger",
       "sourceType": "microsoft-learn",
-      "sourceUri": "https://learn.microsoft.com/da-dk/dynamics365/business-central/receivables-apply-payments-auto-reconcile-bank-accounts",
-      "appliesTo": "Localized current Business Central online documentation; inspected 2026-09-25",
-      "accessedDate": "2026-09-25",
-      "fields": []
+      "sourceUri": "https://learn.microsoft.com/da-dk/dynamics365/business-central/payables-how-suggest-vendor-payments",
+      "appliesTo": "Business Central payables documentation, da-dk; checked 2026-09-26",
+      "accessedDate": "2026-09-26",
+      "fields": [
+        "Suggest Vendor Payments creates proposed payment journal lines for entries due soon or eligible for payment discounts, according to the request-page settings",
+        "The batch excludes vendor ledger entries on hold and entries already applied with an Applies-to ID; vendor priority affects proposal order and available-amount allocation",
+        "Due dates can be used to calculate payment posting dates, but this option is incompatible with Find Payment Discounts and Summarize per Vendor; past calculated dates move to the work date with a warning",
+        "Review and apply the proposed lines before posting; generating a payment proposal does not confirm that a bank transfer occurred",
+        "The Payment Journal batch job is separate from the Payment Reconciliation Journal used to apply statement receipts to customer or vendor entries"
+      ]
     },
     {
       "sourceId": "microsoft-learn-payment-reconciliation-da",
       "title": "Afstemme bankkonti og udligne betalinger",
       "sourceType": "microsoft-learn",
       "sourceUri": "https://learn.microsoft.com/da-dk/dynamics365/business-central/receivables-apply-payments-auto-reconcile-bank-accounts",
-      "appliesTo": "Localized current Business Central online documentation; inspected 2026-09-25",
-      "accessedDate": "2026-09-25",
-      "fields": []
+      "appliesTo": "Business Central cash-management documentation, da-dk; checked 2026-09-26",
+      "accessedDate": "2026-09-26",
+      "fields": [
+        "The Payment Reconciliation Journal can import bank statement lines and propose applications to open customer or vendor ledger entries using payment text and entry details",
+        "Review and change automatic payment applications before posting; application rules control prioritized text matching",
+        "Posting the journal records the payment applications and can close related open bank account ledger entries when selected",
+        "Unmatched statement items and payment entries require investigation or manual application; a suggested match is not itself proof of settlement",
+        "Bank Account Reconciliation is a separate workflow for reconciling statements without applying customer or vendor payments at the same time"
+      ]
     },
     {
       "sourceId": "microsoft-learn-payment-reconciliation-fi",
       "title": "Maksujen kohdistaminen automaattisesti ja pankkitilien täsmäyttäminen",
       "sourceType": "microsoft-learn",
       "sourceUri": "https://learn.microsoft.com/fi-fi/dynamics365/business-central/receivables-apply-payments-auto-reconcile-bank-accounts",
-      "appliesTo": "Localized current Business Central online documentation; inspected 2026-09-25",
-      "accessedDate": "2026-09-25",
-      "fields": []
+      "appliesTo": "Business Central cash-management documentation, fi-fi; checked 2026-09-26",
+      "accessedDate": "2026-09-26",
+      "fields": [
+        "The Payment Reconciliation Journal can import bank statement lines and propose applications to open customer or vendor ledger entries using payment text and entry details",
+        "Review and change automatic payment applications before posting; application rules control prioritized text matching",
+        "Posting the journal records the payment applications and can close related open bank account ledger entries when selected",
+        "Unmatched statement items and payment entries require investigation or manual application; a suggested match is not itself proof of settlement",
+        "Bank Account Reconciliation is a separate workflow for reconciling statements without applying customer or vendor payments at the same time"
+      ]
     },
     {
       "sourceId": "microsoft-learn-vendor-payments-nb",
-      "title": "Betalingsforslag – leverandør",
+      "title": "Betalingsforslag ? leverand?r",
       "sourceType": "microsoft-learn",
-      "sourceUri": "https://learn.microsoft.com/nb-no/dynamics365/business-central/receivables-apply-payments-auto-reconcile-bank-accounts",
-      "appliesTo": "Localized current Business Central online documentation; inspected 2026-09-25",
-      "accessedDate": "2026-09-25",
-      "fields": []
+      "sourceUri": "https://learn.microsoft.com/nb-no/dynamics365/business-central/payables-how-suggest-vendor-payments",
+      "appliesTo": "Business Central payables documentation, nb-no; checked 2026-09-26",
+      "accessedDate": "2026-09-26",
+      "fields": [
+        "Suggest Vendor Payments creates proposed payment journal lines for entries due soon or eligible for payment discounts, according to the request-page settings",
+        "The batch excludes vendor ledger entries on hold and entries already applied with an Applies-to ID; vendor priority affects proposal order and available-amount allocation",
+        "Due dates can be used to calculate payment posting dates, but this option is incompatible with Find Payment Discounts and Summarize per Vendor; past calculated dates move to the work date with a warning",
+        "Review and apply the proposed lines before posting; generating a payment proposal does not confirm that a bank transfer occurred",
+        "The Payment Journal batch job is separate from the Payment Reconciliation Journal used to apply statement receipts to customer or vendor entries"
+      ]
     },
     {
       "sourceId": "microsoft-learn-payment-reconciliation-nb",
       "title": "Avstem bankkontoer og utlign betalinger",
       "sourceType": "microsoft-learn",
       "sourceUri": "https://learn.microsoft.com/nb-no/dynamics365/business-central/receivables-apply-payments-auto-reconcile-bank-accounts",
-      "appliesTo": "Localized current Business Central online documentation; inspected 2026-09-25",
-      "accessedDate": "2026-09-25",
-      "fields": []
+      "appliesTo": "Business Central cash-management documentation, nb-no; checked 2026-09-26",
+      "accessedDate": "2026-09-26",
+      "fields": [
+        "The Payment Reconciliation Journal can import bank statement lines and propose applications to open customer or vendor ledger entries using payment text and entry details",
+        "Review and change automatic payment applications before posting; application rules control prioritized text matching",
+        "Posting the journal records the payment applications and can close related open bank account ledger entries when selected",
+        "Unmatched statement items and payment entries require investigation or manual application; a suggested match is not itself proof of settlement",
+        "Bank Account Reconciliation is a separate workflow for reconciling statements without applying customer or vendor payments at the same time"
+      ]
     },
     {
       "sourceId": "microsoft-learn-bank-reconciliation-en-us",
@@ -1363,7 +1435,14 @@
       "sourceUri": "https://learn.microsoft.com/en-us/dynamics365/business-central/bank-how-reconcile-bank-accounts-separately",
       "appliesTo": "Business Central cash-management documentation, en-US; checked 2026-09-26",
       "accessedDate": "2026-09-26",
-      "fields": ["Separate bank account reconciliation matches statement lines to internal bank account ledger entries; distinct from payment reconciliation journal", "Import bank statement lines or suggest lines; automatic text matching supports a date tolerance and can be reviewed or replaced with manual matches", "Use Test Report and resolve Difference values before posting; matched lines with differences can't be posted, while valid unmatched internal entries remain outstanding", "Set statement ending date before matching; only bank ledger entries up to the statement end date are included", "Avoid direct G/L posting to accounts in a bank account posting group because it breaks the bank ledger-to-G/L link", "Undo can reopen a posted reconciliation; check statement sequence and subsequent balances"]
+      "fields": [
+        "Separate bank account reconciliation matches statement lines to internal bank account ledger entries; distinct from payment reconciliation journal",
+        "Import bank statement lines or suggest lines; automatic text matching supports a date tolerance and can be reviewed or replaced with manual matches",
+        "Use Test Report and resolve Difference values before posting; matched lines with differences can't be posted, while valid unmatched internal entries remain outstanding",
+        "Set statement ending date before matching; only bank ledger entries up to the statement end date are included",
+        "Avoid direct G/L posting to accounts in a bank account posting group because it breaks the bank ledger-to-G/L link",
+        "Undo can reopen a posted reconciliation; check statement sequence and subsequent balances"
+      ]
     },
     {
       "sourceId": "microsoft-learn-bank-reconciliation-sv-se",
@@ -1372,7 +1451,14 @@
       "sourceUri": "https://learn.microsoft.com/sv-se/dynamics365/business-central/bank-how-reconcile-bank-accounts-separately",
       "appliesTo": "Business Central cash-management documentation, sv-SE; checked 2026-09-26",
       "accessedDate": "2026-09-26",
-      "fields": ["Separate bank account reconciliation matches statement lines to internal bank account ledger entries; distinct from payment reconciliation journal", "Import bank statement lines or suggest lines; automatic text matching supports a date tolerance and can be reviewed or replaced with manual matches", "Use Test Report and resolve Difference values before posting; matched lines with differences can't be posted, while valid unmatched internal entries remain outstanding", "Set statement ending date before matching; only bank ledger entries up to the statement end date are included", "Avoid direct G/L posting to accounts in a bank account posting group because it breaks the bank ledger-to-G/L link", "Undo can reopen a posted reconciliation; check statement sequence and subsequent balances"]
+      "fields": [
+        "Separate bank account reconciliation matches statement lines to internal bank account ledger entries; distinct from payment reconciliation journal",
+        "Import bank statement lines or suggest lines; automatic text matching supports a date tolerance and can be reviewed or replaced with manual matches",
+        "Use Test Report and resolve Difference values before posting; matched lines with differences can't be posted, while valid unmatched internal entries remain outstanding",
+        "Set statement ending date before matching; only bank ledger entries up to the statement end date are included",
+        "Avoid direct G/L posting to accounts in a bank account posting group because it breaks the bank ledger-to-G/L link",
+        "Undo can reopen a posted reconciliation; check statement sequence and subsequent balances"
+      ]
     },
     {
       "sourceId": "microsoft-learn-bank-reconciliation-fr-fr",
@@ -1381,7 +1467,14 @@
       "sourceUri": "https://learn.microsoft.com/fr-fr/dynamics365/business-central/bank-how-reconcile-bank-accounts-separately",
       "appliesTo": "Business Central cash-management documentation, fr-FR; checked 2026-09-26",
       "accessedDate": "2026-09-26",
-      "fields": ["Separate bank account reconciliation matches statement lines to internal bank account ledger entries; distinct from payment reconciliation journal", "Import bank statement lines or suggest lines; automatic text matching supports a date tolerance and can be reviewed or replaced with manual matches", "Use Test Report and resolve Difference values before posting; matched lines with differences can't be posted, while valid unmatched internal entries remain outstanding", "Set statement ending date before matching; only bank ledger entries up to the statement end date are included", "Avoid direct G/L posting to accounts in a bank account posting group because it breaks the bank ledger-to-G/L link", "Undo can reopen a posted reconciliation; check statement sequence and subsequent balances"]
+      "fields": [
+        "Separate bank account reconciliation matches statement lines to internal bank account ledger entries; distinct from payment reconciliation journal",
+        "Import bank statement lines or suggest lines; automatic text matching supports a date tolerance and can be reviewed or replaced with manual matches",
+        "Use Test Report and resolve Difference values before posting; matched lines with differences can't be posted, while valid unmatched internal entries remain outstanding",
+        "Set statement ending date before matching; only bank ledger entries up to the statement end date are included",
+        "Avoid direct G/L posting to accounts in a bank account posting group because it breaks the bank ledger-to-G/L link",
+        "Undo can reopen a posted reconciliation; check statement sequence and subsequent balances"
+      ]
     },
     {
       "sourceId": "microsoft-learn-bank-reconciliation-de-de",
@@ -1390,7 +1483,14 @@
       "sourceUri": "https://learn.microsoft.com/de-de/dynamics365/business-central/bank-how-reconcile-bank-accounts-separately",
       "appliesTo": "Business Central cash-management documentation, de-DE; checked 2026-09-26",
       "accessedDate": "2026-09-26",
-      "fields": ["Separate bank account reconciliation matches statement lines to internal bank account ledger entries; distinct from payment reconciliation journal", "Import bank statement lines or suggest lines; automatic text matching supports a date tolerance and can be reviewed or replaced with manual matches", "Use Test Report and resolve Difference values before posting; matched lines with differences can't be posted, while valid unmatched internal entries remain outstanding", "Set statement ending date before matching; only bank ledger entries up to the statement end date are included", "Avoid direct G/L posting to accounts in a bank account posting group because it breaks the bank ledger-to-G/L link", "Undo can reopen a posted reconciliation; check statement sequence and subsequent balances"]
+      "fields": [
+        "Separate bank account reconciliation matches statement lines to internal bank account ledger entries; distinct from payment reconciliation journal",
+        "Import bank statement lines or suggest lines; automatic text matching supports a date tolerance and can be reviewed or replaced with manual matches",
+        "Use Test Report and resolve Difference values before posting; matched lines with differences can't be posted, while valid unmatched internal entries remain outstanding",
+        "Set statement ending date before matching; only bank ledger entries up to the statement end date are included",
+        "Avoid direct G/L posting to accounts in a bank account posting group because it breaks the bank ledger-to-G/L link",
+        "Undo can reopen a posted reconciliation; check statement sequence and subsequent balances"
+      ]
     },
     {
       "sourceId": "microsoft-learn-bank-reconciliation-es-es",
@@ -1399,7 +1499,14 @@
       "sourceUri": "https://learn.microsoft.com/es-es/dynamics365/business-central/bank-how-reconcile-bank-accounts-separately",
       "appliesTo": "Business Central cash-management documentation, es-ES; checked 2026-09-26",
       "accessedDate": "2026-09-26",
-      "fields": ["Separate bank account reconciliation matches statement lines to internal bank account ledger entries; distinct from payment reconciliation journal", "Import bank statement lines or suggest lines; automatic text matching supports a date tolerance and can be reviewed or replaced with manual matches", "Use Test Report and resolve Difference values before posting; matched lines with differences can't be posted, while valid unmatched internal entries remain outstanding", "Set statement ending date before matching; only bank ledger entries up to the statement end date are included", "Avoid direct G/L posting to accounts in a bank account posting group because it breaks the bank ledger-to-G/L link", "Undo can reopen a posted reconciliation; check statement sequence and subsequent balances"]
+      "fields": [
+        "Separate bank account reconciliation matches statement lines to internal bank account ledger entries; distinct from payment reconciliation journal",
+        "Import bank statement lines or suggest lines; automatic text matching supports a date tolerance and can be reviewed or replaced with manual matches",
+        "Use Test Report and resolve Difference values before posting; matched lines with differences can't be posted, while valid unmatched internal entries remain outstanding",
+        "Set statement ending date before matching; only bank ledger entries up to the statement end date are included",
+        "Avoid direct G/L posting to accounts in a bank account posting group because it breaks the bank ledger-to-G/L link",
+        "Undo can reopen a posted reconciliation; check statement sequence and subsequent balances"
+      ]
     },
     {
       "sourceId": "microsoft-learn-bank-reconciliation-da-dk",
@@ -1408,7 +1515,14 @@
       "sourceUri": "https://learn.microsoft.com/da-dk/dynamics365/business-central/bank-how-reconcile-bank-accounts-separately",
       "appliesTo": "Business Central cash-management documentation, da-DK; checked 2026-09-26",
       "accessedDate": "2026-09-26",
-      "fields": ["Separate bank account reconciliation matches statement lines to internal bank account ledger entries; distinct from payment reconciliation journal", "Import bank statement lines or suggest lines; automatic text matching supports a date tolerance and can be reviewed or replaced with manual matches", "Use Test Report and resolve Difference values before posting; matched lines with differences can't be posted, while valid unmatched internal entries remain outstanding", "Set statement ending date before matching; only bank ledger entries up to the statement end date are included", "Avoid direct G/L posting to accounts in a bank account posting group because it breaks the bank ledger-to-G/L link", "Undo can reopen a posted reconciliation; check statement sequence and subsequent balances"]
+      "fields": [
+        "Separate bank account reconciliation matches statement lines to internal bank account ledger entries; distinct from payment reconciliation journal",
+        "Import bank statement lines or suggest lines; automatic text matching supports a date tolerance and can be reviewed or replaced with manual matches",
+        "Use Test Report and resolve Difference values before posting; matched lines with differences can't be posted, while valid unmatched internal entries remain outstanding",
+        "Set statement ending date before matching; only bank ledger entries up to the statement end date are included",
+        "Avoid direct G/L posting to accounts in a bank account posting group because it breaks the bank ledger-to-G/L link",
+        "Undo can reopen a posted reconciliation; check statement sequence and subsequent balances"
+      ]
     },
     {
       "sourceId": "microsoft-learn-bank-reconciliation-fi-fi",
@@ -1417,7 +1531,14 @@
       "sourceUri": "https://learn.microsoft.com/fi-fi/dynamics365/business-central/bank-how-reconcile-bank-accounts-separately",
       "appliesTo": "Business Central cash-management documentation, fi-FI; checked 2026-09-26",
       "accessedDate": "2026-09-26",
-      "fields": ["Separate bank account reconciliation matches statement lines to internal bank account ledger entries; distinct from payment reconciliation journal", "Import bank statement lines or suggest lines; automatic text matching supports a date tolerance and can be reviewed or replaced with manual matches", "Use Test Report and resolve Difference values before posting; matched lines with differences can't be posted, while valid unmatched internal entries remain outstanding", "Set statement ending date before matching; only bank ledger entries up to the statement end date are included", "Avoid direct G/L posting to accounts in a bank account posting group because it breaks the bank ledger-to-G/L link", "Undo can reopen a posted reconciliation; check statement sequence and subsequent balances"]
+      "fields": [
+        "Separate bank account reconciliation matches statement lines to internal bank account ledger entries; distinct from payment reconciliation journal",
+        "Import bank statement lines or suggest lines; automatic text matching supports a date tolerance and can be reviewed or replaced with manual matches",
+        "Use Test Report and resolve Difference values before posting; matched lines with differences can't be posted, while valid unmatched internal entries remain outstanding",
+        "Set statement ending date before matching; only bank ledger entries up to the statement end date are included",
+        "Avoid direct G/L posting to accounts in a bank account posting group because it breaks the bank ledger-to-G/L link",
+        "Undo can reopen a posted reconciliation; check statement sequence and subsequent balances"
+      ]
     },
     {
       "sourceId": "microsoft-learn-bank-reconciliation-nb-no",
@@ -1426,7 +1547,29 @@
       "sourceUri": "https://learn.microsoft.com/nb-no/dynamics365/business-central/bank-how-reconcile-bank-accounts-separately",
       "appliesTo": "Business Central cash-management documentation, nb-NO; checked 2026-09-26",
       "accessedDate": "2026-09-26",
-      "fields": ["Separate bank account reconciliation matches statement lines to internal bank account ledger entries; distinct from payment reconciliation journal", "Import bank statement lines or suggest lines; automatic text matching supports a date tolerance and can be reviewed or replaced with manual matches", "Use Test Report and resolve Difference values before posting; matched lines with differences can't be posted, while valid unmatched internal entries remain outstanding", "Set statement ending date before matching; only bank ledger entries up to the statement end date are included", "Avoid direct G/L posting to accounts in a bank account posting group because it breaks the bank ledger-to-G/L link", "Undo can reopen a posted reconciliation; check statement sequence and subsequent balances"]
+      "fields": [
+        "Separate bank account reconciliation matches statement lines to internal bank account ledger entries; distinct from payment reconciliation journal",
+        "Import bank statement lines or suggest lines; automatic text matching supports a date tolerance and can be reviewed or replaced with manual matches",
+        "Use Test Report and resolve Difference values before posting; matched lines with differences can't be posted, while valid unmatched internal entries remain outstanding",
+        "Set statement ending date before matching; only bank ledger entries up to the statement end date are included",
+        "Avoid direct G/L posting to accounts in a bank account posting group because it breaks the bank ledger-to-G/L link",
+        "Undo can reopen a posted reconciliation; check statement sequence and subsequent balances"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-vendor-payments-fi",
+      "sourceType": "microsoft-learn",
+      "title": "Luo maksutiedostoja Suomessa",
+      "sourceUri": "https://learn.microsoft.com/fi-fi/dynamics365/business-central/localfunctionality/finland/how-to-generate-payment-files",
+      "appliesTo": "Business Central payables documentation, fi-fi; checked 2026-09-26",
+      "accessedDate": "2026-09-26",
+      "fields": [
+        "Suggest Vendor Payments creates proposed payment journal lines for entries due soon or eligible for payment discounts, according to the request-page settings",
+        "The batch excludes vendor ledger entries on hold and entries already applied with an Applies-to ID; vendor priority affects proposal order and available-amount allocation",
+        "Due dates can be used to calculate payment posting dates, but this option is incompatible with Find Payment Discounts and Summarize per Vendor; past calculated dates move to the work date with a warning",
+        "Review and apply the proposed lines before posting; generating a payment proposal does not confirm that a bank transfer occurred",
+        "The Payment Journal batch job is separate from the Payment Reconciliation Journal used to apply statement receipts to customer or vendor entries"
+      ]
     }
   ]
 }

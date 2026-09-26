@@ -1,7 +1,7 @@
 {
   "packId": "bc-services",
   "name": "Business Central Service Management",
-  "version": "1.2.0",
+  "version": "1.3.0",
   "priority": 200,
   "rules": [
     {
@@ -675,17 +675,17 @@
     },
     {
       "sourceId": "microsoft-learn-service-contracts-da-dk",
-      "title": "Overview of tasks to fulfill service contracts (da-DK)",
+      "title": "S?dan arbejder du med servicekontrakter og servicekontrakttilbud (da-DK)",
       "sourceType": "microsoft-learn",
-      "sourceUri": "https://learn.microsoft.com/en-us/dynamics365/business-central/service-fulfill-service-contracts",
-      "appliesTo": "Business Central documentation, da-DK; checked 2026-09-26 (English source fallback; localized page could not be verified)",
+      "sourceUri": "https://learn.microsoft.com/da-dk/dynamics365/business-central/service-how-to-create-service-contracts-and-service-contract-quotes",
+      "appliesTo": "Business Central service-management documentation, da-DK; checked 2026-09-26",
       "accessedDate": "2026-09-26",
       "fields": [
-        "Service contracts describe service level and expectations; templates can include customer, start date and invoice period",
-        "Customize contract details for customer-specific service hours, covered items and discounts; contracts can be created manually or from a quote",
-        "A service item can belong to multiple active contracts; assign the appropriate contract to each service order line",
-        "Review contract signing, expiry, covered service item, annual amount and invoice period before billing",
-        "Contract coverage and a service order do not themselves prove that service work was completed or posted"
+        "Create a service contract or contract quote manually or from a template; a quote is converted to a signed contract after customer acceptance",
+        "Review annual amount, contract lines, customer, invoice period and start date; a partial-period invoice may be created during quote conversion",
+        "A service item can appear on multiple contracts; contract changes require opening the locked contract and locking it again afterward",
+        "Prepaid contract changes or cancellations can require contract credit memos; canceled contracts cannot be reopened",
+        "A contract or quote describes coverage and billing terms; it does not by itself prove service work was performed or posted"
       ]
     },
     {
