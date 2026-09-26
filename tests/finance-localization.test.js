@@ -348,7 +348,7 @@ assert.ok(!wrongDepreciationCorrection.candidates.some(x =>
 const sourceTopics = [
   'chart-accounts', 'dimensions', 'vat-setup', 'vat-submission', 'finance-reports', 'accounting-periods', 'budgets',
   'year-close', 'fixed-assets', 'depreciation', 'cost-accounting', 'currencies', 'currency-adjustment', 'consolidation',
-  'column-definitions', 'disposal'
+  'column-definitions', 'disposal', 'acquisitions'
 ];
 for (const topic of sourceTopics) {
   for (const locale of samples.map(sample => sample.locale)) {
