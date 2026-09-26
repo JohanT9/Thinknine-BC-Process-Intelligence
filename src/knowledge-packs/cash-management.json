@@ -1,7 +1,7 @@
 {
   "packId": "bc-cash-management",
   "name": "Business Central Cash Management",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "priority": 200,
   "pageDefinitions": [
     {
@@ -1355,6 +1355,78 @@
       "appliesTo": "Localized current Business Central online documentation; inspected 2026-09-25",
       "accessedDate": "2026-09-25",
       "fields": []
+    },
+    {
+      "sourceId": "microsoft-learn-bank-reconciliation-en-us",
+      "title": "Reconcile bank accounts (en-US)",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/en-us/dynamics365/business-central/bank-how-reconcile-bank-accounts-separately",
+      "appliesTo": "Business Central cash-management documentation, en-US; checked 2026-09-26",
+      "accessedDate": "2026-09-26",
+      "fields": ["Separate bank account reconciliation matches statement lines to internal bank account ledger entries; distinct from payment reconciliation journal", "Import bank statement lines or suggest lines; automatic text matching supports a date tolerance and can be reviewed or replaced with manual matches", "Use Test Report and resolve Difference values before posting; matched lines with differences can't be posted, while valid unmatched internal entries remain outstanding", "Set statement ending date before matching; only bank ledger entries up to the statement end date are included", "Avoid direct G/L posting to accounts in a bank account posting group because it breaks the bank ledger-to-G/L link", "Undo can reopen a posted reconciliation; check statement sequence and subsequent balances"]
+    },
+    {
+      "sourceId": "microsoft-learn-bank-reconciliation-sv-se",
+      "title": "Stämma av bankkonton (sv-SE)",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/sv-se/dynamics365/business-central/bank-how-reconcile-bank-accounts-separately",
+      "appliesTo": "Business Central cash-management documentation, sv-SE; checked 2026-09-26",
+      "accessedDate": "2026-09-26",
+      "fields": ["Separate bank account reconciliation matches statement lines to internal bank account ledger entries; distinct from payment reconciliation journal", "Import bank statement lines or suggest lines; automatic text matching supports a date tolerance and can be reviewed or replaced with manual matches", "Use Test Report and resolve Difference values before posting; matched lines with differences can't be posted, while valid unmatched internal entries remain outstanding", "Set statement ending date before matching; only bank ledger entries up to the statement end date are included", "Avoid direct G/L posting to accounts in a bank account posting group because it breaks the bank ledger-to-G/L link", "Undo can reopen a posted reconciliation; check statement sequence and subsequent balances"]
+    },
+    {
+      "sourceId": "microsoft-learn-bank-reconciliation-fr-fr",
+      "title": "Rapprochement des comptes bancaires (fr-FR)",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/fr-fr/dynamics365/business-central/bank-how-reconcile-bank-accounts-separately",
+      "appliesTo": "Business Central cash-management documentation, fr-FR; checked 2026-09-26",
+      "accessedDate": "2026-09-26",
+      "fields": ["Separate bank account reconciliation matches statement lines to internal bank account ledger entries; distinct from payment reconciliation journal", "Import bank statement lines or suggest lines; automatic text matching supports a date tolerance and can be reviewed or replaced with manual matches", "Use Test Report and resolve Difference values before posting; matched lines with differences can't be posted, while valid unmatched internal entries remain outstanding", "Set statement ending date before matching; only bank ledger entries up to the statement end date are included", "Avoid direct G/L posting to accounts in a bank account posting group because it breaks the bank ledger-to-G/L link", "Undo can reopen a posted reconciliation; check statement sequence and subsequent balances"]
+    },
+    {
+      "sourceId": "microsoft-learn-bank-reconciliation-de-de",
+      "title": "Bankkonten abstimmen (de-DE)",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/de-de/dynamics365/business-central/bank-how-reconcile-bank-accounts-separately",
+      "appliesTo": "Business Central cash-management documentation, de-DE; checked 2026-09-26",
+      "accessedDate": "2026-09-26",
+      "fields": ["Separate bank account reconciliation matches statement lines to internal bank account ledger entries; distinct from payment reconciliation journal", "Import bank statement lines or suggest lines; automatic text matching supports a date tolerance and can be reviewed or replaced with manual matches", "Use Test Report and resolve Difference values before posting; matched lines with differences can't be posted, while valid unmatched internal entries remain outstanding", "Set statement ending date before matching; only bank ledger entries up to the statement end date are included", "Avoid direct G/L posting to accounts in a bank account posting group because it breaks the bank ledger-to-G/L link", "Undo can reopen a posted reconciliation; check statement sequence and subsequent balances"]
+    },
+    {
+      "sourceId": "microsoft-learn-bank-reconciliation-es-es",
+      "title": "Conciliar cuentas bancarias (es-ES)",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/es-es/dynamics365/business-central/bank-how-reconcile-bank-accounts-separately",
+      "appliesTo": "Business Central cash-management documentation, es-ES; checked 2026-09-26",
+      "accessedDate": "2026-09-26",
+      "fields": ["Separate bank account reconciliation matches statement lines to internal bank account ledger entries; distinct from payment reconciliation journal", "Import bank statement lines or suggest lines; automatic text matching supports a date tolerance and can be reviewed or replaced with manual matches", "Use Test Report and resolve Difference values before posting; matched lines with differences can't be posted, while valid unmatched internal entries remain outstanding", "Set statement ending date before matching; only bank ledger entries up to the statement end date are included", "Avoid direct G/L posting to accounts in a bank account posting group because it breaks the bank ledger-to-G/L link", "Undo can reopen a posted reconciliation; check statement sequence and subsequent balances"]
+    },
+    {
+      "sourceId": "microsoft-learn-bank-reconciliation-da-dk",
+      "title": "Afstem bankkonti (da-DK)",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/da-dk/dynamics365/business-central/bank-how-reconcile-bank-accounts-separately",
+      "appliesTo": "Business Central cash-management documentation, da-DK; checked 2026-09-26",
+      "accessedDate": "2026-09-26",
+      "fields": ["Separate bank account reconciliation matches statement lines to internal bank account ledger entries; distinct from payment reconciliation journal", "Import bank statement lines or suggest lines; automatic text matching supports a date tolerance and can be reviewed or replaced with manual matches", "Use Test Report and resolve Difference values before posting; matched lines with differences can't be posted, while valid unmatched internal entries remain outstanding", "Set statement ending date before matching; only bank ledger entries up to the statement end date are included", "Avoid direct G/L posting to accounts in a bank account posting group because it breaks the bank ledger-to-G/L link", "Undo can reopen a posted reconciliation; check statement sequence and subsequent balances"]
+    },
+    {
+      "sourceId": "microsoft-learn-bank-reconciliation-fi-fi",
+      "title": "Pankkitilien täsmäyttäminen (fi-FI)",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/fi-fi/dynamics365/business-central/bank-how-reconcile-bank-accounts-separately",
+      "appliesTo": "Business Central cash-management documentation, fi-FI; checked 2026-09-26",
+      "accessedDate": "2026-09-26",
+      "fields": ["Separate bank account reconciliation matches statement lines to internal bank account ledger entries; distinct from payment reconciliation journal", "Import bank statement lines or suggest lines; automatic text matching supports a date tolerance and can be reviewed or replaced with manual matches", "Use Test Report and resolve Difference values before posting; matched lines with differences can't be posted, while valid unmatched internal entries remain outstanding", "Set statement ending date before matching; only bank ledger entries up to the statement end date are included", "Avoid direct G/L posting to accounts in a bank account posting group because it breaks the bank ledger-to-G/L link", "Undo can reopen a posted reconciliation; check statement sequence and subsequent balances"]
+    },
+    {
+      "sourceId": "microsoft-learn-bank-reconciliation-nb-no",
+      "title": "Avstem bankkontoer (nb-NO)",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/nb-no/dynamics365/business-central/bank-how-reconcile-bank-accounts-separately",
+      "appliesTo": "Business Central cash-management documentation, nb-NO; checked 2026-09-26",
+      "accessedDate": "2026-09-26",
+      "fields": ["Separate bank account reconciliation matches statement lines to internal bank account ledger entries; distinct from payment reconciliation journal", "Import bank statement lines or suggest lines; automatic text matching supports a date tolerance and can be reviewed or replaced with manual matches", "Use Test Report and resolve Difference values before posting; matched lines with differences can't be posted, while valid unmatched internal entries remain outstanding", "Set statement ending date before matching; only bank ledger entries up to the statement end date are included", "Avoid direct G/L posting to accounts in a bank account posting group because it breaks the bank ledger-to-G/L link", "Undo can reopen a posted reconciliation; check statement sequence and subsequent balances"]
     }
   ]
 }

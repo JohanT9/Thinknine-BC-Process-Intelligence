@@ -116,6 +116,21 @@ for (const [context, expectedRule, sourceId] of [
 }
 for (const [objectId, appVersion, expectedPack] of [["6630","21.4.0","bc-sales"],["9304","28.0.0","bc-sales"],["143","28.0.0","bc-sales"],["44","28.0.0","bc-sales"],["6640","21.4.0","bc-purchase"],["9311","28.0.0","bc-purchase"],["146","28.0.0","bc-purchase"],["52","28.0.0","bc-purchase"],["9309","28.0.0","bc-purchase"]]) { const page=repository.lookupObject({objectType:"page",objectId,appVersion}); assert.equal(page.status,"resolved",`page ${objectId} should resolve for BC ${appVersion}`); assert.equal(page.candidates.some(c=>(c.provenance.packIds||[c.provenance.packId]).includes(expectedPack)),true,`page ${objectId} should carry its process pack identity`); }
 for(const objectId of ["143","146"]) assert.equal(repository.lookupObject({objectType:"page",objectId,appVersion:"26.0.0"}).status,"unresolved",`page ${objectId} should remain unknown for undocumented BC 26`);
+const cashManagementPack = packs.find(item => item.packId === "bc-cash-management").pack;
+for (const locale of ["en-US", "sv-SE", "fr-FR", "de-DE", "es-ES", "da-DK", "fi-FI", "nb-NO"]) {
+  const source = cashManagementPack.sources.find(item => item.sourceId ===
+    `microsoft-learn-bank-reconciliation-${locale.toLowerCase()}`);
+  assert.ok(source, `bank account reconciliation source exists for ${locale}`);
+  assert.equal(source.sourceUri,
+    `https://learn.microsoft.com/${locale.toLowerCase()}/dynamics365/business-central/bank-how-reconcile-bank-accounts-separately`,
+    `localized official bank reconciliation source for ${locale}`);
+  assert.ok(source.fields.some(field => /distinct from payment reconciliation journal/.test(field)),
+    `separate bank reconciliation workflow is documented for ${locale}`);
+  assert.ok(source.fields.some(field => /Test Report and resolve Difference values before posting/.test(field)),
+    `pre-post reconciliation controls are documented for ${locale}`);
+  assert.ok(source.fields.some(field => /Avoid direct G\/L posting/.test(field)),
+    `bank ledger and G/L linkage warning is documented for ${locale}`);
+}
 const scopedReturn=repository.resolveAction({objectRef:{objectId:"6630",appVersion:"21.4.0"},context:{pageCaption:"Sales Return Order",actionCaption:"Post"}}); assert.equal(scopedReturn.status,"resolved"); assert.equal(scopedReturn.candidates[0].provenance.ruleId,"Sales.PostSalesReturnOrder"); assert.equal(scopedReturn.candidates[0].provenance.sourceRefs.some(source=>source.sourceId==="microsoft-learn-sales-return-orders"),true);
 for(const [objectId,appVersion,expectedPack] of [["255","21.0.0","bc-cash-management"],["255","28.0.0","bc-cash-management"],["256","21.0.0","bc-cash-management"],["256","28.0.0","bc-cash-management"],["1290","28.0.0","bc-cash-management"]]){const page=repository.lookupObject({objectId,appVersion});assert.equal(page.status,"resolved");assert.equal(page.candidates.some(c=>(c.provenance.packIds||[c.provenance.packId]).includes(expectedPack)),true);}
 assert.equal(repository.lookupObject({objectId:"256",appVersion:"26.0.0"}).status,"unresolved","payment-journal identity should stay unknown in undocumented BC 26");
