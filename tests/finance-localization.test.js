@@ -377,19 +377,20 @@ assert.ok(!wrongIndexationAction.candidates.some(x =>
 const sourceTopics = [
   'chart-accounts', 'dimensions', 'vat-setup', 'vat-submission', 'finance-reports', 'accounting-periods', 'budgets',
   'year-close', 'fixed-assets', 'depreciation', 'cost-accounting', 'currencies', 'currency-adjustment', 'consolidation',
-  'column-definitions', 'disposal', 'acquisitions', 'revaluation'
+  'column-definitions', 'disposal', 'acquisitions', 'revaluation', 'maintenance', 'insurance'
 ];
 for (const topic of sourceTopics) {
   for (const locale of samples.map(sample => sample.locale)) {
     const source = financePack.sources.find(item => item.sourceId ===
       `microsoft-learn-finance-${topic}-${locale.toLowerCase()}`);
     assert.ok(source, `finance source ${topic} for ${locale}`);
-    const sourceLocale = topic === 'disposal' && locale === 'fi-FI' ? 'en-us' : locale.toLowerCase();
+    const usesEnglishFallback = /English source/.test(source.appliesTo);
+    const sourceLocale = usesEnglishFallback ? 'en-us' : locale.toLowerCase();
     assert.ok(source.sourceUri.startsWith(`https://learn.microsoft.com/${sourceLocale}/`),
       `official source URL for ${topic}/${locale}`);
-    if (topic === 'disposal' && locale === 'fi-FI') {
+    if (usesEnglishFallback) {
       assert.match(source.appliesTo,/English source/,
-        'unavailable Finnish disposal page is transparently documented as an English-source fallback');
+        `unverified ${topic} page for ${locale} is transparently documented as an English-source fallback`);
     }
     assert.ok(source.fields.length > 0, `indexed scope for ${topic}/${locale}`);
   }
