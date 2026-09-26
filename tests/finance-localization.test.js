@@ -438,7 +438,7 @@ const sourceTopics = [
   'chart-accounts', 'dimensions', 'vat-setup', 'vat-submission', 'finance-reports', 'accounting-periods', 'budgets',
   'year-close', 'fixed-assets', 'depreciation', 'cost-accounting', 'currencies', 'currency-adjustment', 'consolidation',
   'column-definitions', 'row-definitions', 'cash-flow-overview', 'cash-flow-setup',
-  'gl-revaluation', 'close-income-statement', 'accounting-periods',
+  'gl-revaluation', 'close-income-statement', 'accounting-periods', 'preclose-reports',
   'disposal', 'acquisitions', 'revaluation', 'maintenance', 'insurance'
 ];
 for (const topic of sourceTopics) {
@@ -488,6 +488,10 @@ for (const locale of samples.map(sample => sample.locale)) {
     `microsoft-learn-finance-accounting-periods-${locale.toLowerCase()}`);
   assert.ok(periods.fields.some(x => /posting dates are governed|Bokföringsdatum styrs/.test(x)),
     `posting-date versus accounting-period behavior is indexed for ${locale}`);
+  const preclose = financePack.sources.find(item => item.sourceId ===
+    `microsoft-learn-finance-preclose-reports-${locale.toLowerCase()}`);
+  assert.ok(preclose.fields.some(x => /posting-group totals with corresponding G\/L accounts/.test(x)),
+    `subledger-to-G/L verification guidance is indexed for ${locale}`);
 }
 
 const unrelated = repository.resolveAction({language:'en-US',context:{pageCaption:'Payment Journal',actionCaption:'Post'}});
