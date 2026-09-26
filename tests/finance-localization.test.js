@@ -262,6 +262,59 @@ assert.ok(!wrongColumnDefinitionAction.candidates.some(x =>
   x.provenance.ruleId === 'Finance.EditFinancialReportColumnDefinition'),
   'deleting a definition must not resolve as editing it');
 
+const depreciationCalculationSamples = [
+  {locale:'en-US',page:'Calculate Depreciation',action:'OK'},
+  {locale:'sv-SE',page:'Beräkna avskrivning',action:'OK'},
+  {locale:'fr-FR',page:'Calculer l\u2019amortissement',action:'OK'},
+  {locale:'de-DE',page:'Abschreibung berechnen',action:'OK'},
+  {locale:'es-ES',page:'Calcular depreciación',action:'Aceptar'},
+  {locale:'da-DK',page:'Beregn afskrivning',action:'OK'},
+  {locale:'fi-FI',page:'Laske poisto',action:'OK'},
+  {locale:'nb-NO',page:'Beregn avskrivning',action:'OK'}
+];
+const depreciationCalculationRule = financePack.rules.find(x =>
+  x.ruleId === 'Finance.CalculateFixedAssetDepreciation');
+for (const {locale,page,action} of depreciationCalculationSamples) {
+  const result = repository.resolveAction({language:locale,context:{pageCaption:page,actionCaption:action}});
+  assert.equal(result.status,'resolved',`${locale} calculate fixed-asset depreciation`);
+  assert.equal(result.candidates[0].provenance.ruleId,'Finance.CalculateFixedAssetDepreciation',locale);
+  assert.equal(result.candidates[0].provenance.language,locale);
+  assert.ok(result.candidates[0].provenance.sourceRefs.some(x =>
+    x.sourceId === `microsoft-learn-finance-depreciation-${locale.toLowerCase()}`),locale);
+  const instruction = knowledge.localizedInstruction(depreciationCalculationRule,locale);
+  assert.ok(instruction,`localized depreciation calculation directive for ${locale}`);
+  assert.match(instruction,/does not post|bokför dem inte|sans les comptabiliser|bucht sie aber nicht|no las registra|bogfører dem ikke|ei kirjaa|bokfører dem ikke/i,
+    `calculation and posting are distinguished for ${locale}`);
+}
+
+const depreciationPostingSamples = [
+  {locale:'en-US',page:'Fixed Asset G/L Journals',action:'Post'},
+  {locale:'sv-SE',page:'Anl.tillg. redovisningsjournal',action:'Bokföra'},
+  {locale:'fr-FR',page:'Feuille compta. immo',action:'Valider'},
+  {locale:'de-DE',page:'Anlagen-Fibu Buch.-Blatt',action:'Buchen'},
+  {locale:'es-ES',page:'A/F Diario general',action:'Registrar'},
+  {locale:'da-DK',page:'Anlægsfinanskladder',action:'Bogfør'},
+  {locale:'fi-FI',page:'Käyttöomaisuuden KP-päiväkirja',action:'Kirjaa'},
+  {locale:'nb-NO',page:'AKTIVA-finansjournaler',action:'Bokfør'}
+];
+const depreciationPostingRule = financePack.rules.find(x =>
+  x.ruleId === 'Finance.PostFixedAssetDepreciation');
+for (const {locale,page,action} of depreciationPostingSamples) {
+  const result = repository.resolveAction({language:locale,context:{pageCaption:page,actionCaption:action}});
+  assert.equal(result.status,'resolved',`${locale} post fixed-asset depreciation`);
+  assert.equal(result.candidates[0].provenance.ruleId,'Finance.PostFixedAssetDepreciation',locale);
+  assert.equal(result.candidates[0].provenance.language,locale);
+  assert.ok(result.candidates[0].provenance.sourceRefs.some(x =>
+    x.sourceId === `microsoft-learn-finance-depreciation-${locale.toLowerCase()}`),locale);
+  assert.ok(knowledge.localizedInstruction(depreciationPostingRule,locale),
+    `localized depreciation posting directive for ${locale}`);
+}
+const wrongDepreciationAction = repository.resolveAction({language:'en-US',
+  context:{pageCaption:'Fixed Asset G/L Journals',actionCaption:'Calculate Depreciation'}});
+assert.ok(!wrongDepreciationAction.candidates.some(x =>
+  x.provenance.ruleId === 'Finance.PostFixedAssetDepreciation'),
+  'calculation command must not resolve as depreciation posting');
+
 const sourceTopics = [
   'chart-accounts', 'dimensions', 'vat-setup', 'vat-submission', 'finance-reports', 'accounting-periods', 'budgets',
   'year-close', 'fixed-assets', 'depreciation', 'cost-accounting', 'currencies', 'currency-adjustment', 'consolidation',
@@ -282,4 +335,4 @@ const unrelated = repository.resolveAction({language:'en-US',context:{pageCaptio
 assert.ok(!unrelated.candidates.some(x=>x.provenance.ruleId==='Finance.PostGeneralJournal'),
   'general journal posting rule must not match the specialized payment journal');
 
-console.log('Finance directives for chart, posting, dimensions, accounting periods, budgets, currency adjustment, VAT report lines, financial report columns, and year-end resolve in all eight supported UI locales.');
+console.log('Finance directives for chart, posting, dimensions, accounting periods, budgets, currency adjustment, VAT report lines, financial report columns, fixed-asset depreciation, and year-end resolve in all eight supported UI locales.');
