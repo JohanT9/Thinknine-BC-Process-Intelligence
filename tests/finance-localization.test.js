@@ -439,7 +439,7 @@ const sourceTopics = [
   'year-close', 'fixed-assets', 'depreciation', 'cost-accounting', 'currencies', 'currency-adjustment', 'consolidation',
   'column-definitions', 'row-definitions', 'cash-flow-overview', 'cash-flow-setup',
   'gl-revaluation', 'close-income-statement', 'accounting-periods', 'preclose-reports',
-  'close-statement-reports', 'period-end-activities', 'prepayments',
+  'close-statement-reports', 'period-end-activities', 'prepayments', 'inventory-cost-gl',
   'disposal', 'acquisitions', 'revaluation', 'maintenance', 'insurance'
 ];
 for (const topic of sourceTopics) {
@@ -501,6 +501,18 @@ for (const locale of samples.map(sample => sample.locale)) {
     `microsoft-learn-finance-period-end-activities-${locale.toLowerCase()}`);
   assert.ok(periodEnd.fields.some(x => /month-end activities are optional/.test(x)),
     `period-end process optionality is indexed for ${locale}`);
+  const inventoryCost = financePack.sources.find(item => item.sourceId ===
+    `microsoft-learn-finance-inventory-cost-gl-${locale.toLowerCase()}`);
+  assert.ok(inventoryCost.fields.some(x => /Run Adjust Cost - Item Entries before Post Inventory Cost to G\/L/.test(x)),
+    `item costs are adjusted before posting inventory costs for ${locale}`);
+  assert.ok(inventoryCost.fields.some(x => /Inventory - G\/L Reconciliation compares value-entry totals/.test(x)),
+    `inventory-to-G/L reconciliation and drill-down are indexed for ${locale}`);
+  const vat = financePack.sources.find(item => item.sourceId ===
+    `microsoft-learn-finance-vat-submission-${locale.toLowerCase()}`);
+  assert.ok(vat.fields.some(x => /Test Mode checks the service connection but does not submit a real VAT return/.test(x)),
+    `VAT test mode is distinguished from real filing for ${locale}`);
+  assert.ok(vat.fields.some(x => /Tax report forms, service connections and legal filing obligations vary/.test(x)),
+    `country-specific filing boundary is indexed for ${locale}`);
 }
 
 const unrelated = repository.resolveAction({language:'en-US',context:{pageCaption:'Payment Journal',actionCaption:'Post'}});

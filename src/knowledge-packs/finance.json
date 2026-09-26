@@ -1,7 +1,7 @@
 {
   "packId": "bc-finance",
   "name": "Business Central Finance",
-  "version": "1.23.0",
+  "version": "1.24.0",
   "priority": 210,
   "rules": [
     {
@@ -2536,7 +2536,11 @@
         "VAT reporting uses VAT posting setup, VAT posting groups and VAT Date",
         "Suggest Lines, review and release workflow",
         "Submission requirements are country and region specific",
-        "Released reports require reopening before editing"
+        "Released reports require reopening before editing",
+        "Test Mode checks the service connection but does not submit a real VAT return; clear Test Mode and repeat only when an actual submission is intended",
+        "Suggest Lines creates proposed report lines from VAT entries; review VAT dates, period, included open or closed entries, and report lines before release",
+        "Release validates and locks the report for editing; reopen to make changes, then submit using the configured country or region service, or mark submitted after an external/manual filing",
+        "Tax report forms, service connections and legal filing obligations vary by country or region; verify current local functionality and tax-authority requirements"
       ]
     },
     {
@@ -2550,7 +2554,11 @@
         "VAT reporting uses VAT posting setup, VAT posting groups and VAT Date",
         "Suggest Lines, review and release workflow",
         "Submission requirements are country and region specific",
-        "Released reports require reopening before editing"
+        "Released reports require reopening before editing",
+        "Test Mode checks the service connection but does not submit a real VAT return; clear Test Mode and repeat only when an actual submission is intended",
+        "Suggest Lines creates proposed report lines from VAT entries; review VAT dates, period, included open or closed entries, and report lines before release",
+        "Release validates and locks the report for editing; reopen to make changes, then submit using the configured country or region service, or mark submitted after an external/manual filing",
+        "Tax report forms, service connections and legal filing obligations vary by country or region; verify current local functionality and tax-authority requirements"
       ]
     },
     {
@@ -2564,7 +2572,11 @@
         "VAT reporting uses VAT posting setup, VAT posting groups and VAT Date",
         "Suggest Lines, review and release workflow",
         "Submission requirements are country and region specific",
-        "Released reports require reopening before editing"
+        "Released reports require reopening before editing",
+        "Test Mode checks the service connection but does not submit a real VAT return; clear Test Mode and repeat only when an actual submission is intended",
+        "Suggest Lines creates proposed report lines from VAT entries; review VAT dates, period, included open or closed entries, and report lines before release",
+        "Release validates and locks the report for editing; reopen to make changes, then submit using the configured country or region service, or mark submitted after an external/manual filing",
+        "Tax report forms, service connections and legal filing obligations vary by country or region; verify current local functionality and tax-authority requirements"
       ]
     },
     {
@@ -2578,7 +2590,11 @@
         "VAT reporting uses VAT posting setup, VAT posting groups and VAT Date",
         "Suggest Lines, review and release workflow",
         "Submission requirements are country and region specific",
-        "Released reports require reopening before editing"
+        "Released reports require reopening before editing",
+        "Test Mode checks the service connection but does not submit a real VAT return; clear Test Mode and repeat only when an actual submission is intended",
+        "Suggest Lines creates proposed report lines from VAT entries; review VAT dates, period, included open or closed entries, and report lines before release",
+        "Release validates and locks the report for editing; reopen to make changes, then submit using the configured country or region service, or mark submitted after an external/manual filing",
+        "Tax report forms, service connections and legal filing obligations vary by country or region; verify current local functionality and tax-authority requirements"
       ]
     },
     {
@@ -2592,7 +2608,11 @@
         "VAT reporting uses VAT posting setup, VAT posting groups and VAT Date",
         "Suggest Lines, review and release workflow",
         "Submission requirements are country and region specific",
-        "Released reports require reopening before editing"
+        "Released reports require reopening before editing",
+        "Test Mode checks the service connection but does not submit a real VAT return; clear Test Mode and repeat only when an actual submission is intended",
+        "Suggest Lines creates proposed report lines from VAT entries; review VAT dates, period, included open or closed entries, and report lines before release",
+        "Release validates and locks the report for editing; reopen to make changes, then submit using the configured country or region service, or mark submitted after an external/manual filing",
+        "Tax report forms, service connections and legal filing obligations vary by country or region; verify current local functionality and tax-authority requirements"
       ]
     },
     {
@@ -2606,7 +2626,11 @@
         "VAT reporting uses VAT posting setup, VAT posting groups and VAT Date",
         "Suggest Lines, review and release workflow",
         "Submission requirements are country and region specific",
-        "Released reports require reopening before editing"
+        "Released reports require reopening before editing",
+        "Test Mode checks the service connection but does not submit a real VAT return; clear Test Mode and repeat only when an actual submission is intended",
+        "Suggest Lines creates proposed report lines from VAT entries; review VAT dates, period, included open or closed entries, and report lines before release",
+        "Release validates and locks the report for editing; reopen to make changes, then submit using the configured country or region service, or mark submitted after an external/manual filing",
+        "Tax report forms, service connections and legal filing obligations vary by country or region; verify current local functionality and tax-authority requirements"
       ]
     },
     {
@@ -2620,7 +2644,11 @@
         "VAT reporting uses VAT posting setup, VAT posting groups and VAT Date",
         "Suggest Lines, review and release workflow",
         "Submission requirements are country and region specific",
-        "Released reports require reopening before editing"
+        "Released reports require reopening before editing",
+        "Test Mode checks the service connection but does not submit a real VAT return; clear Test Mode and repeat only when an actual submission is intended",
+        "Suggest Lines creates proposed report lines from VAT entries; review VAT dates, period, included open or closed entries, and report lines before release",
+        "Release validates and locks the report for editing; reopen to make changes, then submit using the configured country or region service, or mark submitted after an external/manual filing",
+        "Tax report forms, service connections and legal filing obligations vary by country or region; verify current local functionality and tax-authority requirements"
       ]
     },
     {
@@ -2634,7 +2662,11 @@
         "VAT reporting uses VAT posting setup, VAT posting groups and VAT Date",
         "Suggest Lines, review and release workflow",
         "Submission requirements are country and region specific",
-        "Released reports require reopening before editing"
+        "Released reports require reopening before editing",
+        "Test Mode checks the service connection but does not submit a real VAT return; clear Test Mode and repeat only when an actual submission is intended",
+        "Suggest Lines creates proposed report lines from VAT entries; review VAT dates, period, included open or closed entries, and report lines before release",
+        "Release validates and locks the report for editing; reopen to make changes, then submit using the configured country or region service, or mark submitted after an external/manual filing",
+        "Tax report forms, service connections and legal filing obligations vary by country or region; verify current local functionality and tax-authority requirements"
       ]
     },
     {
@@ -4447,6 +4479,134 @@
         "Amounts can be set for the whole order or distributed by line; additional invoices can be needed after order changes",
         "A line with an invoiced prepayment cannot be deleted until its prepayment credit memo is issued",
         "Review tax, posting groups, rounding and final-invoice application according to local setup; do not infer payment receipt from invoice posting"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-finance-inventory-cost-gl-en-us",
+      "title": "Reconcile inventory costs with the general ledger (en-US)",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/en-us/dynamics365/business-central/finance-how-to-post-inventory-costs-to-the-general-ledger",
+      "appliesTo": "Business Central finance documentation, en-US; checked 2026-09-26",
+      "accessedDate": "2026-09-26",
+      "fields": [
+        "Inventory transactions create item value entries; posting inventory cost updates related G/L inventory, adjustment and COGS accounts when automatic cost posting is not enabled",
+        "Run Adjust Cost - Item Entries before Post Inventory Cost to G/L so adjusted costs are current",
+        "Clear Post to produce a test report without posting; use the dedicated test report to identify errors before posting",
+        "Skipped value entries can indicate missing setup or incompatible dimensions; review the report and resolve errors before rerunning",
+        "Inventory - G/L Reconciliation compares value-entry totals (invoiced, interim and WIP) with G/L totals; filter and drill down to investigate differences",
+        "A reconciliation difference is diagnostic evidence, not automatic proof of an error; assess date filters, posting setup, cost adjustment and posting status"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-finance-inventory-cost-gl-sv-se",
+      "title": "Reconcile inventory costs with the general ledger (sv-SE)",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/sv-se/dynamics365/business-central/finance-how-to-post-inventory-costs-to-the-general-ledger",
+      "appliesTo": "Business Central finance documentation, sv-SE; checked 2026-09-26",
+      "accessedDate": "2026-09-26",
+      "fields": [
+        "Inventory transactions create item value entries; posting inventory cost updates related G/L inventory, adjustment and COGS accounts when automatic cost posting is not enabled",
+        "Run Adjust Cost - Item Entries before Post Inventory Cost to G/L so adjusted costs are current",
+        "Clear Post to produce a test report without posting; use the dedicated test report to identify errors before posting",
+        "Skipped value entries can indicate missing setup or incompatible dimensions; review the report and resolve errors before rerunning",
+        "Inventory - G/L Reconciliation compares value-entry totals (invoiced, interim and WIP) with G/L totals; filter and drill down to investigate differences",
+        "A reconciliation difference is diagnostic evidence, not automatic proof of an error; assess date filters, posting setup, cost adjustment and posting status"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-finance-inventory-cost-gl-fr-fr",
+      "title": "Reconcile inventory costs with the general ledger (fr-FR)",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/fr-fr/dynamics365/business-central/finance-how-to-post-inventory-costs-to-the-general-ledger",
+      "appliesTo": "Business Central finance documentation, fr-FR; checked 2026-09-26",
+      "accessedDate": "2026-09-26",
+      "fields": [
+        "Inventory transactions create item value entries; posting inventory cost updates related G/L inventory, adjustment and COGS accounts when automatic cost posting is not enabled",
+        "Run Adjust Cost - Item Entries before Post Inventory Cost to G/L so adjusted costs are current",
+        "Clear Post to produce a test report without posting; use the dedicated test report to identify errors before posting",
+        "Skipped value entries can indicate missing setup or incompatible dimensions; review the report and resolve errors before rerunning",
+        "Inventory - G/L Reconciliation compares value-entry totals (invoiced, interim and WIP) with G/L totals; filter and drill down to investigate differences",
+        "A reconciliation difference is diagnostic evidence, not automatic proof of an error; assess date filters, posting setup, cost adjustment and posting status"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-finance-inventory-cost-gl-de-de",
+      "title": "Reconcile inventory costs with the general ledger (de-DE)",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/de-de/dynamics365/business-central/finance-how-to-post-inventory-costs-to-the-general-ledger",
+      "appliesTo": "Business Central finance documentation, de-DE; checked 2026-09-26",
+      "accessedDate": "2026-09-26",
+      "fields": [
+        "Inventory transactions create item value entries; posting inventory cost updates related G/L inventory, adjustment and COGS accounts when automatic cost posting is not enabled",
+        "Run Adjust Cost - Item Entries before Post Inventory Cost to G/L so adjusted costs are current",
+        "Clear Post to produce a test report without posting; use the dedicated test report to identify errors before posting",
+        "Skipped value entries can indicate missing setup or incompatible dimensions; review the report and resolve errors before rerunning",
+        "Inventory - G/L Reconciliation compares value-entry totals (invoiced, interim and WIP) with G/L totals; filter and drill down to investigate differences",
+        "A reconciliation difference is diagnostic evidence, not automatic proof of an error; assess date filters, posting setup, cost adjustment and posting status"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-finance-inventory-cost-gl-es-es",
+      "title": "Reconcile inventory costs with the general ledger (es-ES)",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/es-es/dynamics365/business-central/finance-how-to-post-inventory-costs-to-the-general-ledger",
+      "appliesTo": "Business Central finance documentation, es-ES; checked 2026-09-26",
+      "accessedDate": "2026-09-26",
+      "fields": [
+        "Inventory transactions create item value entries; posting inventory cost updates related G/L inventory, adjustment and COGS accounts when automatic cost posting is not enabled",
+        "Run Adjust Cost - Item Entries before Post Inventory Cost to G/L so adjusted costs are current",
+        "Clear Post to produce a test report without posting; use the dedicated test report to identify errors before posting",
+        "Skipped value entries can indicate missing setup or incompatible dimensions; review the report and resolve errors before rerunning",
+        "Inventory - G/L Reconciliation compares value-entry totals (invoiced, interim and WIP) with G/L totals; filter and drill down to investigate differences",
+        "A reconciliation difference is diagnostic evidence, not automatic proof of an error; assess date filters, posting setup, cost adjustment and posting status"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-finance-inventory-cost-gl-da-dk",
+      "title": "Reconcile inventory costs with the general ledger (da-DK)",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/da-dk/dynamics365/business-central/finance-how-to-post-inventory-costs-to-the-general-ledger",
+      "appliesTo": "Business Central finance documentation, da-DK; checked 2026-09-26",
+      "accessedDate": "2026-09-26",
+      "fields": [
+        "Inventory transactions create item value entries; posting inventory cost updates related G/L inventory, adjustment and COGS accounts when automatic cost posting is not enabled",
+        "Run Adjust Cost - Item Entries before Post Inventory Cost to G/L so adjusted costs are current",
+        "Clear Post to produce a test report without posting; use the dedicated test report to identify errors before posting",
+        "Skipped value entries can indicate missing setup or incompatible dimensions; review the report and resolve errors before rerunning",
+        "Inventory - G/L Reconciliation compares value-entry totals (invoiced, interim and WIP) with G/L totals; filter and drill down to investigate differences",
+        "A reconciliation difference is diagnostic evidence, not automatic proof of an error; assess date filters, posting setup, cost adjustment and posting status"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-finance-inventory-cost-gl-fi-fi",
+      "title": "Reconcile inventory costs with the general ledger (fi-FI)",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/fi-fi/dynamics365/business-central/finance-how-to-post-inventory-costs-to-the-general-ledger",
+      "appliesTo": "Business Central finance documentation, fi-FI; checked 2026-09-26",
+      "accessedDate": "2026-09-26",
+      "fields": [
+        "Inventory transactions create item value entries; posting inventory cost updates related G/L inventory, adjustment and COGS accounts when automatic cost posting is not enabled",
+        "Run Adjust Cost - Item Entries before Post Inventory Cost to G/L so adjusted costs are current",
+        "Clear Post to produce a test report without posting; use the dedicated test report to identify errors before posting",
+        "Skipped value entries can indicate missing setup or incompatible dimensions; review the report and resolve errors before rerunning",
+        "Inventory - G/L Reconciliation compares value-entry totals (invoiced, interim and WIP) with G/L totals; filter and drill down to investigate differences",
+        "A reconciliation difference is diagnostic evidence, not automatic proof of an error; assess date filters, posting setup, cost adjustment and posting status"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-finance-inventory-cost-gl-nb-no",
+      "title": "Reconcile inventory costs with the general ledger (nb-NO)",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/nb-no/dynamics365/business-central/finance-how-to-post-inventory-costs-to-the-general-ledger",
+      "appliesTo": "Business Central finance documentation, nb-NO; checked 2026-09-26",
+      "accessedDate": "2026-09-26",
+      "fields": [
+        "Inventory transactions create item value entries; posting inventory cost updates related G/L inventory, adjustment and COGS accounts when automatic cost posting is not enabled",
+        "Run Adjust Cost - Item Entries before Post Inventory Cost to G/L so adjusted costs are current",
+        "Clear Post to produce a test report without posting; use the dedicated test report to identify errors before posting",
+        "Skipped value entries can indicate missing setup or incompatible dimensions; review the report and resolve errors before rerunning",
+        "Inventory - G/L Reconciliation compares value-entry totals (invoiced, interim and WIP) with G/L totals; filter and drill down to investigate differences",
+        "A reconciliation difference is diagnostic evidence, not automatic proof of an error; assess date filters, posting setup, cost adjustment and posting status"
       ]
     }
   ]
