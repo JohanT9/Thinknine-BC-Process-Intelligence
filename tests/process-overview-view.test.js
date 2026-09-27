@@ -26,8 +26,12 @@ const groupedModel = { ...model, subprocesses: [{ subprocessId: "sales-phase",
 const container = { innerHTML: "" };
 const result = view.render(container, groupedModel, { locale: "sv-SE",
   selectedTaskIds: ["release"], reviewTasks: [
-    { taskId: "customer", approved: true },
-    { taskId: "release", approved: false, reviewSuggested: true }
+  { taskId: "customer", approved: true },
+    { taskId: "release", approved: false, reviewSuggested: true,
+      contextualExplanations: { "sv-SE": "Släpp gör ordern tillgänglig för fortsatt behandling." },
+      contextualExplanationSourceIds: ["release-sv"],
+      contextualExplanationSources: [{ sourceId: "release-sv",
+        title: "Försäljningsorder", sourceUri: "https://learn.microsoft.com/sv-se/dynamics365/business-central/sales-how-sell-products" }] }
   ] });
 assert.deepStrictEqual(result, { activityCount: 2, layoutStrategy: "horizontal",
   stateTransitionCount: 1 });
@@ -59,6 +63,9 @@ assert(container.innerHTML.includes('data-process-lane-id="sales-phase"'));
 assert(container.innerHTML.includes('style="background:#f4f8fb;border-left-color:#31566f"'));
 assert(container.innerHTML.includes("Frisläpp order"));
 assert(container.innerHTML.includes("Vald aktivitet"));
+assert(container.innerHTML.includes("Vad åtgärden innebär"));
+assert(container.innerHTML.includes("Släpp gör ordern tillgänglig"));
+assert(container.innerHTML.includes("Källa: <a href=\"https://learn.microsoft.com/sv-se/"));
 assert(!container.innerHTML.includes('class="process-overview-routes compact"'));
 assert(!container.innerHTML.includes('class="process-overview-state"'),
   "state details belong in the shared detail area, not every compact node");

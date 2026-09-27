@@ -17,6 +17,20 @@ for (const source of sources) {
   assert.ok(Array.isArray(source.fields) && source.fields.length > 0, `${source.sourceId} has documented fields`);
 }
 
+for (const pack of Object.values(packs)) {
+  for (const rule of pack.rules || []) {
+    if (!rule.localizedExplanations) continue;
+    assert.deepEqual(Object.keys(rule.localizedExplanations).sort(),
+      ['da-DK', 'de-DE', 'en-US', 'es-ES', 'fi-FI', 'fr-FR', 'nb-NO', 'sv-SE'].sort(),
+      `${rule.ruleId} explanatory text covers all supported document languages`);
+    assert.ok(rule.sourceIds?.length, `${rule.ruleId} explanatory text has source references`);
+    for (const sourceId of rule.sourceIds) {
+      assert.ok((pack.sources || []).some((source) => source.sourceId === sourceId),
+        `${rule.ruleId} references ${sourceId}`);
+    }
+  }
+}
+
 const fallbackSources = sources.filter((source) => /English source fallback|official English source used/i.test(`${source.title} ${source.appliesTo}`));
 const expectedFallbackIds = [
   'microsoft-learn-finance-disposal-fi-fi',

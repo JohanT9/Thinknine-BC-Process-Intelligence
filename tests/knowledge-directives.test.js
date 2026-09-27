@@ -1,6 +1,7 @@
 const assert=require('node:assert/strict');
 const fs=require('fs');
 const pack=JSON.parse(fs.readFileSync('src/knowledge-packs/core.json','utf8'));
+const salesPack=JSON.parse(fs.readFileSync('src/knowledge-packs/sales.json','utf8'));
 const knowledge=require('../src/engine/knowledge-domain');
 const pipeline=require('../src/engine/session-interpretation-pipeline');
 const manifest=JSON.parse(fs.readFileSync('src/knowledge-packs/index.json','utf8'));
@@ -63,3 +64,29 @@ assert.ok(directive.userDirectiveSourceIds.includes('microsoft-learn-ui-search-f
 assert.ok(directive.instruction.startsWith('Välj **Haku**'),'the recorded-step instruction should stay intact');
 assert.notEqual(directive.instruction,directive.userDirective,'the directive must remain separate from the observed-step instruction');
 console.log('Core search user directives resolve and stay localized across all eight UI languages, including session interpretation.');
+
+const salesExplanationCases=[
+ ['sv-SE','Försäljningsorder','Släpp','Bokför'],
+ ['en-US','Sales Order','Release','Post'],
+ ['fr-FR','Commande vente','Lancer','Valider'],
+ ['de-DE','Verkaufsauftrag','Freigabe','Buchen'],
+ ['es-ES','Pedido de venta','Liberar','Registrar'],
+ ['da-DK','Salgsordre','Frigiv','Bogfør'],
+ ['fi-FI','Myyntitilaus','Vapauta','Kirjaa'],
+ ['nb-NO','Ordre','Frigi','Bokfør']
+];
+for(const [language,pageCaption,releaseCaption,postCaption] of salesExplanationCases){
+ for(const [actionCaption,ruleId] of [[releaseCaption,'Sales.Release'],[postCaption,'Sales.Post']]){
+  const input={taskId:`${ruleId}-${language}`,taskType:'RunAction',pageCaption,
+   actionCaption,language,description:`Choose ${actionCaption}.`};
+  const untouched=JSON.stringify(input);
+  const task=knowledge.apply([input],[salesPack]).tasks[0];
+  const rule=salesPack.rules.find(item=>item.ruleId===ruleId);
+  assert.equal(task.knowledgeRule,ruleId,`${language} ${ruleId} resolves`);
+  assert.ok(task.contextualExplanations?.[language],`${language} ${ruleId} has a localized explanation`);
+  assert.ok(task.contextualExplanationSourceIds.includes(rule.sourceIds[0]),`${language} ${ruleId} carries source traceability`);
+  assert.equal(task.description,input.description,'explanation does not rewrite the recorded step text');
+  assert.equal(JSON.stringify(input),untouched,'knowledge enrichment leaves the input recording task unchanged');
+ }
+}
+console.log('Sales process explanations remain separate from recorded instructions and are sourced/localized in all eight supported languages.');

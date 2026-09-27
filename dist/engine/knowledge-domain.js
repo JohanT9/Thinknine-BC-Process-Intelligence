@@ -12,7 +12,10 @@
   function rules(packs = []) {
     return packs.flatMap(pack => (pack.rules || []).map(rule => ({
       ...rule, packId: pack.packId, packName: pack.name,
-      packVersion: pack.version, packPriority: pack.priority || 0
+      packVersion: pack.version, packPriority: pack.priority || 0,
+      sourceRefs: (rule.sourceIds || []).map(sourceId =>
+        (pack.sources || []).find(source => source.sourceId === sourceId))
+        .filter(Boolean)
     }))).sort((a, b) =>
       (b.priority + b.packPriority) - (a.priority + a.packPriority));
   }
@@ -74,6 +77,13 @@
     return localized[tag] || localized[base] || rule?.instructionTemplate || "";
   }
 
+  function localizedExplanation(rule, language) {
+    const localized = rule?.localizedExplanations || {};
+    const tag = text(language).trim();
+    const base = tag.split("-")[0];
+    return localized[tag] || localized[base] || "";
+  }
+
   function apply(tasks = [], packs = []) {
     const availableRules = rules(packs); const unmatched = [];
     const enriched = tasks.map(task => {
@@ -90,6 +100,7 @@
       const rule = found.rule;
       const instruction = localizedInstruction(rule, task.language || task.locale ||
         task.context?.language || task.context?.locale || "en-US");
+      const explanations = rule.localizedExplanations || null;
       return { ...task, taskType: rule.taskType || task.taskType,
         semanticAction: rule.semanticAction || task.semanticAction,
         entity: rule.entity || task.entity || "", knowledgeFrameworkVersion: VERSION,
@@ -98,6 +109,11 @@
         knowledgePackVersion: rule.packVersion,
         confidence: rule.confidence || task.confidence || 0.8,
         reviewSuggested: (rule.confidence || 0.8) < 0.85,
+        ...(explanations ? { contextualExplanations: { ...explanations },
+          contextualExplanationSourceIds: [...(rule.sourceIds || [])],
+          contextualExplanationSources: rule.sourceRefs.map(source => ({
+            sourceId: source.sourceId, title: source.title, sourceUri: source.sourceUri
+          })) } : {}),
         ...(instruction ? { userDirective: instruction,
           userDirectiveSourceIds: [...(rule.sourceIds || [])] } : {}) };
     });
@@ -110,6 +126,13 @@
       const directives = [...new Set(matches.map(item => item.userDirective).filter(Boolean))];
       const sourceIds = [...new Set(matches.flatMap(item =>
         item.userDirectiveSourceIds || []))];
+      const explanationMaps = [...new Map(matches.map(item => item.contextualExplanations)
+        .filter(Boolean).map(value => [JSON.stringify(value), value])).values()];
+      const explanationSourceIds = [...new Set(matches.flatMap(item =>
+        item.contextualExplanationSourceIds || []))];
+      const explanationSources = [...new Map(matches.flatMap(item =>
+        item.contextualExplanationSources || []).map(source => [source.sourceId, source]))
+        .values()];
       if (rules.length !== 1) return task;
       const matched = matches.find(item => item.knowledgeRule === rules[0]);
       return { ...task, knowledgeMatched: true,
@@ -118,6 +141,11 @@
         knowledgePackName: matched.knowledgePackName,
         knowledgePackVersion: matched.knowledgePackVersion,
         knowledgeFrameworkVersion: matched.knowledgeFrameworkVersion,
+        ...(explanationMaps.length === 1 ? {
+          contextualExplanations: explanationMaps[0],
+          contextualExplanationSourceIds: explanationSourceIds,
+          contextualExplanationSources: explanationSources
+        } : {}),
         ...(directives.length === 1 ? { userDirective: directives[0],
           userDirectiveSourceIds: sourceIds } : {}) };
     });
@@ -125,5 +153,6 @@
       consolidationDecisions: consolidated.decisions,
       unmatched, rules: availableRules };
   }
-  return { VERSION, apply, match, patternsMatch, rules, score, localizedInstruction };
+  return { VERSION, apply, match, patternsMatch, rules, score, localizedInstruction,
+    localizedExplanation };
 });

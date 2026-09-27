@@ -2452,13 +2452,47 @@ function createTaskDocumentationMarkdown(session, tasks, quality) {
   const profile =
     PROFILE_PRESETS[session.settings?.documentationProfile || "generic"]
       ?.label || "Generisk manual";
+  const explanationLabels = {
+    "sv-SE": "Vad åtgärden innebär",
+    "en-US": "What this action does",
+    "fr-FR": "Ce que fait cette action",
+    "de-DE": "Was diese Aktion bewirkt",
+    "es-ES": "Qué hace esta acción",
+    "da-DK": "Hvad handlingen gør",
+    "fi-FI": "Mitä toiminto tekee",
+    "nb-NO": "Hva handlingen gjør"
+  };
+  const sourceLabels = {
+    "sv-SE": "Källa", "en-US": "Source", "fr-FR": "Source",
+    "de-DE": "Quelle", "es-ES": "Fuente", "da-DK": "Kilde",
+    "fi-FI": "Lähde", "nb-NO": "Kilde"
+  };
+  const documentLanguage = globalThis.T9LanguageRegistry.normalize(
+    session.settings?.documentLanguage, "document");
+  const explanationLabel = explanationLabels[documentLanguage] ||
+    explanationLabels["en-US"];
+
+  function explanationMarkdown(task) {
+    const explanation = task.contextualExplanations?.[documentLanguage] ||
+      task.contextualExplanations?.["en-US"] || "";
+    if (!explanation) return "";
+    const sourceIds = new Set(task.contextualExplanationSourceIds || []);
+    const sources = loadedKnowledgePacks.flatMap(pack => pack.sources || [])
+      .filter(source => sourceIds.has(source.sourceId));
+    const localePrefix = `/${documentLanguage.toLowerCase()}/`;
+    const source = sources.find(item => item.sourceUri?.includes(localePrefix)) ||
+      sources.find(item => item.sourceUri?.includes("/en-us/")) || sources[0];
+    const citation = source?.sourceUri
+      ? ` *(${sourceLabels[documentLanguage] || sourceLabels["en-US"]}: [Microsoft Learn](${source.sourceUri}))*` : "";
+    return `\n\n   **${explanationLabel}:** ${explanation}${citation}`;
+  }
 
   const rendered = tasks.map(task => {
     const image = task.screenshot
       ? `\n\n   ![${task.instruction.replace(/\*\*/g, "")}](${task.screenshot})`
       : "";
 
-    return `${task.taskNo}. ${task.instruction}${image}`;
+    return `${task.taskNo}. ${task.instruction}${explanationMarkdown(task)}${image}`;
   }).join("\n\n");
 
   return `# ${session.name}

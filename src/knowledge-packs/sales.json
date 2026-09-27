@@ -1,7 +1,7 @@
 {
   "packId": "bc-sales",
   "name": "Business Central Sales",
-  "version": "2.6.0",
+  "version": "2.7.0",
   "priority": 200,
   "pageDefinitions": [
     {
@@ -320,6 +320,16 @@
         "automationIdPatterns": []
       },
       "instructionTemplate": "",
+      "localizedExplanations": {
+        "sv-SE": "När ordern släpps blir den tillgänglig för fortsatt behandling. Släppet bokför inte någon leverans eller faktura.",
+        "en-US": "Releasing makes the order available for further processing. It does not post a shipment or invoice.",
+        "fr-FR": "La validation rend la commande disponible pour la suite du traitement. Elle ne comptabilise ni expédition ni facture.",
+        "de-DE": "Durch die Freigabe steht der Auftrag für die weitere Bearbeitung zur Verfügung. Dabei werden weder Lieferung noch Rechnung gebucht.",
+        "es-ES": "La liberación deja el pedido disponible para continuar su procesamiento. No registra ningún envío ni factura.",
+        "da-DK": "Frigivelse gør ordren tilgængelig for den videre behandling. Den bogfører hverken en levering eller en faktura.",
+        "fi-FI": "Tilauksen vapauttaminen mahdollistaa sen jatkokäsittelyn. Se ei kirjaa toimitusta eikä laskua.",
+        "nb-NO": "Frigivelse gjør ordren tilgjengelig for videre behandling. Den bokfører verken en levering eller faktura."
+      },
       "languages": [
         "sv-SE",
         "en-US",
@@ -451,6 +461,16 @@
         "automationIdPatterns": []
       },
       "instructionTemplate": "",
+      "localizedExplanations": {
+        "sv-SE": "Bokföringen kan skapa en bokförd leverans och/eller faktura och uppdatera relaterade redovisningsposter, beroende på dokumentet och det valda bokföringsalternativet. Inspelningen visar att kommandot valdes, inte att bokföringen lyckades; kontrollera resultatdokumenten.",
+        "en-US": "Posting can create a posted shipment and/or invoice and update related ledger entries, depending on the document and selected posting option. The recording shows that the command was selected, not that posting succeeded; check the resulting documents.",
+        "fr-FR": "La validation peut créer une expédition enregistrée et/ou une facture, et mettre à jour les écritures comptables associées selon le document et l'option choisie. L'enregistrement montre que la commande a été sélectionnée, pas que la validation a réussi ; vérifiez les documents obtenus.",
+        "de-DE": "Die Buchung kann je nach Beleg und gewählter Buchungsoption einen gebuchten Lieferschein und/oder eine Rechnung erstellen und zugehörige Posten aktualisieren. Die Aufzeichnung zeigt nur, dass der Befehl ausgewählt wurde, nicht dass die Buchung erfolgreich war; prüfen Sie die resultierenden Belege.",
+        "es-ES": "El registro puede crear un envío registrado y/o una factura, y actualizar los movimientos relacionados según el documento y la opción elegida. La grabación solo muestra que se seleccionó el comando, no que el registro se completara; compruebe los documentos resultantes.",
+        "da-DK": "Bogføringen kan oprette en bogført levering og/eller faktura og opdatere relaterede finansposter afhængigt af dokumentet og den valgte bogføringsmulighed. Optagelsen viser, at kommandoen blev valgt, ikke at bogføringen lykkedes; kontrollér de resulterende dokumenter.",
+        "fi-FI": "Kirjaaminen voi luoda kirjatun toimituksen ja/tai laskun ja päivittää niihin liittyviä kirjanpidon tapahtumia asiakirjan ja valitun kirjausvaihtoehdon mukaan. Tallenne osoittaa, että komento valittiin, ei sitä, että kirjaus onnistui; tarkista tuloksena syntyneet asiakirjat.",
+        "nb-NO": "Bokføringen kan opprette en bokført levering og/eller faktura og oppdatere tilknyttede regnskapsposter avhengig av dokumentet og det valgte bokføringsalternativet. Opptaket viser at kommandoen ble valgt, ikke at bokføringen lyktes; kontroller resultatdokumentene."
+      },
       "languages": [
         "sv-SE",
         "en-US",

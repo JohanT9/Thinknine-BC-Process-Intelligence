@@ -157,7 +157,7 @@
       plain(processMapLabels.nodeTitle(route.target, english ? "en-US" : "sv-SE"))}`).join("; ");
   }
 
-  function detailMarkup(detail, english) {
+  function detailMarkup(detail, english, locale = english ? "en-US" : "sv-SE") {
     if (!detail) return "";
     const changes = detail.changes.map(change => {
       const before = stateValue(change.before, english);
@@ -166,7 +166,23 @@
         `<span aria-label="${english ? "changes to" : "ändras till"}">→</span> ` +
         `${escape(after)}</li>`;
     }).join("");
-    const locale = english ? "en-US" : "sv-SE";
+    const explanationLabels = { "sv-SE": "Vad åtgärden innebär",
+      "en-US": "What this action does", "fr-FR": "Ce que fait cette action",
+      "de-DE": "Was diese Aktion bewirkt", "es-ES": "Qué hace esta acción",
+      "da-DK": "Hvad handlingen gør", "fi-FI": "Mitä toiminto tekee",
+      "nb-NO": "Hva handlingen gjør" };
+    const sourceLabels = { "sv-SE": "Källa", "en-US": "Source",
+      "fr-FR": "Source", "de-DE": "Quelle", "es-ES": "Fuente",
+      "da-DK": "Kilde", "fi-FI": "Lähde", "nb-NO": "Kilde" };
+    const explanations = detail.reviewTask?.contextualExplanations || {};
+    const explanation = explanations[locale] || explanations[locale.split("-")[0]] ||
+      explanations["en-US"] || "";
+    const sources = detail.reviewTask?.contextualExplanationSources || [];
+    const localePath = `/${String(locale).toLowerCase()}/`;
+    const source = sources.find(item => item.sourceUri?.includes(localePath)) ||
+      sources.find(item => item.sourceUri?.includes("/en-us/")) || sources[0];
+    const sourceUri = /^https:\/\/learn\.microsoft\.com\//i.test(source?.sourceUri || "")
+      ? source.sourceUri : "";
     const context = [detail.containers.phase?.title, detail.containers.subtask?.title]
       .filter(Boolean).map(value => `<span>${escape(processMapLabels.nodeTitle({ title: value },
         locale))}</span>`).join("");
@@ -178,6 +194,8 @@
       <strong>${escape(plain(processMapLabels.nodeTitle(detail.node,
         english ? "en-US" : "sv-SE")))}</strong></div>
       ${context ? `<div class="process-overview-detail-context">${context}</div>` : ""}
+      ${explanation ? `<div class="process-overview-detail-explanation"><span class="process-overview-detail-label">${escape(explanationLabels[locale] || explanationLabels["en-US"])}</span>
+        <p>${escape(explanation)}</p>${sourceUri ? `<span class="process-overview-detail-source">${escape(sourceLabels[locale] || sourceLabels["en-US"])}: <a href="${escape(sourceUri)}" target="_blank" rel="noopener noreferrer">${escape(source.title || "Microsoft Learn")}</a></span>` : ""}</div>` : ""}
       ${routes ? `<div><span class="process-overview-detail-label">${english ? "Routes" : "Vägar"}</span>${routes}</div>` : ""}
       ${changes ? `<div><span class="process-overview-detail-label">${english ? "Observed changes" : "Observerade förändringar"}</span>
         <ul>${changes}</ul></div>` : !routes ? `<p class="muted">${english
@@ -240,7 +258,8 @@
     }
     const details = activityDetails(model, activities, stateTransitions, options);
     const selectedDetail = details.find(detail => selectedTaskIds.has(detail.taskId)) || details[0];
-    renderedViews.set(container, { details, english });
+    renderedViews.set(container, { details, english, locale: options.locale ||
+      (english ? "en-US" : "sv-SE") });
     const layout = graphLayout.create(model, {
       availableWidth: options.availableWidth || container.clientWidth || undefined,
       direction: options.direction
@@ -324,7 +343,8 @@
           </button>
         </li>`;
       }).join("")}</ol></div>${legendMarkup(model, english ? "en-US" : "sv-SE")}${
-        detailMarkup(selectedDetail, english)}`;
+        detailMarkup(selectedDetail, english, options.locale ||
+          (english ? "en-US" : "sv-SE"))}`;
     processConnectorView.render(container, model, {
       locale: english ? "en-US" : "sv-SE"
     });
@@ -347,7 +367,8 @@
     const view = renderedViews.get(container);
     const detail = view?.details.find(item => selected.has(item.taskId));
     const detailContainer = container?.querySelector?.("[data-process-overview-detail]");
-    if (detail && detailContainer) detailContainer.outerHTML = detailMarkup(detail, view.english);
+    if (detail && detailContainer) detailContainer.outerHTML = detailMarkup(detail,
+      view.english, view.locale);
     selectedActions[0]?.scrollIntoView?.({ block: "nearest", inline: "center" });
     return selectedActions;
   }
@@ -364,7 +385,8 @@
       else action.removeAttribute?.("aria-current");
     });
     const detailContainer = container?.querySelector?.("[data-process-overview-detail]");
-    if (detailContainer) detailContainer.outerHTML = detailMarkup(detail, view.english);
+    if (detailContainer) detailContainer.outerHTML = detailMarkup(detail,
+      view.english, view.locale);
     return true;
   }
 

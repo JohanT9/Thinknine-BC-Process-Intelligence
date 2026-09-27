@@ -165,8 +165,16 @@ function (semantic, knowledge, refs, processAnalysis) {
         ...(() => {
           const instruction = knowledge.localizedInstruction(rule,
             selected.provenance?.language || task.language || task.context?.language || "en-US");
-          return instruction ? { userDirective: instruction,
-            userDirectiveSourceIds: [...(rule.sourceIds || [])] } : {};
+          return { ...(instruction ? { userDirective: instruction,
+            userDirectiveSourceIds: [...(rule.sourceIds || [])] } : {}),
+          ...(rule.localizedExplanations ? {
+            contextualExplanations: { ...rule.localizedExplanations },
+            contextualExplanationSourceIds: [...(rule.sourceIds || [])],
+            contextualExplanationSources: (rule.sourceIds || []).map(sourceId =>
+              pack?.sources?.find(source => source.sourceId === sourceId))
+              .filter(Boolean).map(source => ({ sourceId: source.sourceId,
+                title: source.title, sourceUri: source.sourceUri }))
+          } : {}) };
         })() };
     });
   }
