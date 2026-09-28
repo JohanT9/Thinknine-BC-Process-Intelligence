@@ -328,7 +328,7 @@
         task.contextualExplanations?.[explanationLanguage.split("-")[0]] ||
         task.contextualExplanations?.["en-US"] || "";
       if (task.includeKnowledgeExplanationInWord === true && explanation &&
-          Number(task.contextualExplanationConfidence) >= 0.95 &&
+          Number(task.contextualExplanationConfidence) >= 0.85 &&
           task.contextualExplanationRuleId && explanationSource) {
         const explanationLabels = { "sv-SE": "Förklaring från BC-kunskapsbanken",
           "en-US": "Business Central knowledge explanation",

@@ -82,6 +82,10 @@ function (semantic, knowledge, refs, processAnalysis) {
       pageCaption: action.pageCaption || "",
       pageIdentification: action.pageIdentification ?
         { ...action.pageIdentification } : {},
+      ...(page.entity ? { entity: page.entity } : {}),
+      ...(Number.isFinite(Number(page.confidence)) ? {
+        pageIdentificationConfidence: Number(page.confidence)
+      } : {}),
       knowledgeObjectRef: { appId: page.appId || page.applicationId || null,
         publisher: page.publisher || null, objectType: "page",
         objectId: page.pageObjectId || action.pageObjectId ||
@@ -183,6 +187,44 @@ function (semantic, knowledge, refs, processAnalysis) {
     });
   }
 
+  function enrichCompatibilityExplanations(tasks = [], packs = []) {
+    const available = knowledge.rules(packs);
+    const semanticCaptions = { ReleaseDocument: "Release",
+      ReopenDocument: "Reopen", PostDocument: "Post" };
+    return tasks.map(task => {
+      const model = task.semanticActionModel || {};
+      const raw = model.rawInteractions || [];
+      const observedAction = [...raw].reverse().map(item =>
+        item.actionCaption || item.accessibleName || item.label || "")
+        .find(Boolean);
+      const observedPage = [...raw].reverse().map(item =>
+        item.pageCaption || item.pageContext?.pageCaption || "").find(Boolean);
+      const pageCaption = task.pageCaption || model.pageCaption || observedPage || "";
+      const semanticAction = task.semanticAction || model.actionType || task.taskType;
+      const actionCaption = task.actionCaption || observedAction ||
+        semanticCaptions[semanticAction] || "";
+      if (!pageCaption || !actionCaption) return task;
+      const candidate = { ...task, pageCaption, actionCaption,
+        semanticAction, context: { ...(task.context || {}),
+          currentPageCaption: task.context?.currentPageCaption || pageCaption,
+          currentEntity: task.entity || task.context?.currentEntity || "" } };
+      const found = knowledge.match(candidate, available);
+      if (!found || !knowledge.explanationEligible(found.rule, candidate, available)) {
+        return task;
+      }
+      const rule = found.rule;
+      return { ...task,
+        contextualExplanations: { ...knowledge.localizedExplanations(rule) },
+        contextualExplanationRuleId: rule.ruleId,
+        contextualExplanationConfidence: Number(rule.confidence),
+        contextualExplanationSourceIds: [...(rule.sourceIds || [])],
+        contextualExplanationSources: rule.sourceRefs.map(source => ({
+          sourceId: source.sourceId, title: source.title,
+          sourceUri: source.sourceUri
+        })) };
+    });
+  }
+
   function applyReleaseFindings(result, input) {
     const analysis = processAnalysis.build({
       recordingId: input.session?.id, pipelineVersion: VERSION,
@@ -265,7 +307,9 @@ function (semantic, knowledge, refs, processAnalysis) {
         typeof services.compatibilityInterpret === "function") {
       const compatibility = services.compatibilityInterpret(input);
       if (compatibility?.businessTasks?.length) {
-        const result = { ...compatibility, pipelineVersion: VERSION,
+        const result = { ...compatibility, businessTasks:
+          enrichCompatibilityExplanations(compatibility.businessTasks,
+            input.knowledgePacks || []), pipelineVersion: VERSION,
           normalizedEvents: input.normalizedEvents || [], stepGroups: groups,
           semanticActions: actions,
           consolidationDecisions,
@@ -289,5 +333,5 @@ function (semantic, knowledge, refs, processAnalysis) {
       contextEvents: input.events || [], contextCandidates: [] };
     return applyReleaseFindings(result, input);
   }
-  return { VERSION, applyReleaseFindings, interpret };
+  return { VERSION, applyReleaseFindings, enrichCompatibilityExplanations, interpret };
 });

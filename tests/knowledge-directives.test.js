@@ -102,10 +102,15 @@ const conflictingEntity=knowledge.apply([{...legacyRelease,taskId:'wrong-entity'
 assert.notEqual(conflictingEntity.knowledgeRule,'Sales.Release',
  'an entity conflicting with the sales rule must never receive its suggestion');
 const weakRulePack={...salesPack,rules:salesPack.rules.map(item=>item.ruleId==='Sales.Release'
- ? {...item,confidence:0.94}:item)};
+ ? {...item,confidence:0.84}:item)};
 const weakExplanation=knowledge.apply([{...legacyRelease,taskId:'weak-explanation'}],[weakRulePack]).tasks[0];
 assert.equal(weakExplanation.contextualExplanations,undefined,
- 'a rule below 95 percent confidence never supplies a process explanation');
+ 'a rule below 85 percent confidence never supplies a process explanation');
+const reviewableRulePack={...salesPack,rules:salesPack.rules.map(item=>item.ruleId==='Sales.Release'
+ ? {...item,confidence:0.90}:item)};
+const reviewableExplanation=knowledge.apply([{...legacyRelease,taskId:'reviewable-explanation'}],[reviewableRulePack]).tasks[0];
+assert.ok(reviewableExplanation.contextualExplanations?.['sv-SE'],
+ 'a source-backed, uniquely matched explanation at 90 percent is shown for human review');
 const ambiguousPack={...salesPack,rules:[...salesPack.rules,
  {...salesPack.rules.find(item=>item.ruleId==='Sales.Release'),ruleId:'Sales.Release.Ambiguous'}]};
 const ambiguousExplanation=knowledge.apply([{...legacyRelease,taskId:'ambiguous-explanation'}],[ambiguousPack]).tasks[0];

@@ -10,7 +10,9 @@
 function (consolidation, explanationCatalog) {
   "use strict";
   const VERSION = "2.1.0";
-  const EXPLANATION_CONFIDENCE_THRESHOLD = 0.95;
+  // Explanations are source-linked suggestions in the review UI. The user must
+  // still opt in per step before one is copied to Word.
+  const EXPLANATION_CONFIDENCE_THRESHOLD = 0.85;
   const text = value => String(value || "");
 
   function rules(packs = []) {

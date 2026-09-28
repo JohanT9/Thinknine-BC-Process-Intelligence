@@ -174,7 +174,7 @@
     const sourceLabels = { "sv-SE": "Källa", "en-US": "Source",
       "fr-FR": "Source", "de-DE": "Quelle", "es-ES": "Fuente",
       "da-DK": "Kilde", "fi-FI": "Lähde", "nb-NO": "Kilde" };
-    const explanationIsVerified = Number(detail.reviewTask?.contextualExplanationConfidence) >= 0.95 &&
+    const explanationIsVerified = Number(detail.reviewTask?.contextualExplanationConfidence) >= 0.85 &&
       Boolean(detail.reviewTask?.contextualExplanationRuleId) &&
       (detail.reviewTask?.contextualExplanationSources || []).some(item =>
         /^https:\/\/learn\.microsoft\.com\//i.test(item?.sourceUri || ""));

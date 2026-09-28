@@ -1,5 +1,13 @@
 # Changelog
 
+## 2026-09-28 - Improve reviewable explanations for older recordings
+
+- Match source-backed Business Central explanations in the legacy interpretation
+  path without changing the recorded step classification or confidence.
+- Show unique, explicitly matched source-backed explanations at 85% knowledge-rule
+  confidence for human review; Word export remains a per-step opt-in.
+- Prepare Edge extension version 4.7.6 for distribution.
+
 ## 2026-09-28 - Extend BC explanations and add Word export choice
 
 - Provide source-linked, eight-language explanations for confidently matched

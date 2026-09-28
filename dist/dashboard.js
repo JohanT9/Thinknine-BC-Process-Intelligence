@@ -2473,7 +2473,7 @@ function createTaskDocumentationMarkdown(session, tasks, quality) {
     explanationLabels["en-US"];
 
   function explanationMarkdown(task) {
-    if (!(Number(task.contextualExplanationConfidence) >= 0.95) ||
+    if (!(Number(task.contextualExplanationConfidence) >= 0.85) ||
         !task.contextualExplanationRuleId) return "";
     const explanation = task.contextualExplanations?.[documentLanguage] ||
       task.contextualExplanations?.["en-US"] || "";
@@ -2529,7 +2529,7 @@ Processen är genomförd enligt arbetsgången.
 Dokumentationskvalitet: **${quality} %**
 
 ---
-Genererad av BC Process Studio 4.7.5.
+Genererad av BC Process Studio 4.7.6.
 `;
 }
 
@@ -2569,7 +2569,7 @@ ${rendered || "Inga meningsfulla arbetssteg kunde identifieras."}
 Processen är genomförd och de registrerade ändringarna har sparats i Business Central.
 
 ---
-Automatiskt tolkat av BC Process Studio 4.7.5.
+Automatiskt tolkat av BC Process Studio 4.7.6.
 `;
 }
 
@@ -2586,7 +2586,7 @@ function createDiagnostics(session, rawEvents, businessSteps, screenshotCount) {
   }
 
   return {
-    recorderVersion: "4.7.5",
+    recorderVersion: "4.7.6",
     uiFidelityMode: true,
     sessionId: session.id,
     environment: session.settings?.environmentName || "",
@@ -3217,7 +3217,7 @@ async function exportSession(session) {
     {
       name: `${prefix}ui-fidelity.json`,
       data: bytes(JSON.stringify({
-        version: "4.7.5",
+        version: "4.7.6",
         principle: "Visible Business Central captions are preserved exactly.",
         rules: [
           "actionCaption is the text shown on the action or button.",
@@ -6063,7 +6063,7 @@ function renderStoredReviewFallback(error) {
 }
 
 function knowledgeExplanationMarkup(task) {
-  if (!(Number(task?.contextualExplanationConfidence) >= 0.95) ||
+  if (!(Number(task?.contextualExplanationConfidence) >= 0.85) ||
       !task?.contextualExplanationRuleId ||
       !(task?.contextualExplanationSources || []).some(source =>
         /^https:\/\/learn\.microsoft\.com\//i.test(source?.sourceUri || ""))) return "";

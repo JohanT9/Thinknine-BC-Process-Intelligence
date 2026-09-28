@@ -5,7 +5,7 @@
 })(typeof globalThis !== "undefined" ? globalThis : this, function () {
   "use strict";
   const array = value => Array.isArray(value) ? value : [];
-  const hasExplanation = task => Number(task?.contextualExplanationConfidence) >= 0.95 &&
+  const hasExplanation = task => Number(task?.contextualExplanationConfidence) >= 0.85 &&
     Boolean(task?.contextualExplanationRuleId) &&
     array(task?.contextualExplanationSources).some(source =>
       /^https:\/\/learn\.microsoft\.com\//i.test(source?.sourceUri || "")) &&

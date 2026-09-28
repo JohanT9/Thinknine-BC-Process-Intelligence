@@ -3,6 +3,7 @@ const fs = require("node:fs");
 const path = require("node:path");
 const catalog = require("../src/engine/knowledge-explanation-catalog");
 const knowledge = require("../src/engine/knowledge-domain");
+const sessionPipeline = require("../src/engine/session-interpretation-pipeline");
 
 const packDir = path.join(__dirname, "..", "src", "knowledge-packs");
 const packs = fs.readdirSync(packDir).filter(name => name.endsWith(".json"))
@@ -88,5 +89,17 @@ const ambiguous = knowledge.apply([{
   rules: pack.rules.filter(rule => rule.ruleId === "Core.ConfirmYes") }))).tasks[0];
 assert.equal(ambiguous?.contextualExplanations, undefined,
   "a confirmation prompt without decision context never receives a generated explanation");
+
+const legacyRelease = sessionPipeline.enrichCompatibilityExplanations([{
+  taskId: "legacy-release-fallback", taskType: "ReleaseDocument",
+  semanticAction: "ReleaseDocument", pageCaption: "Sales Order",
+  language: "en-US", confidence: 0.53
+}], packs).at(0);
+assert.equal(legacyRelease.contextualExplanationRuleId, "Sales.Release",
+  "the legacy compatibility path resolves a known Sales Order release action");
+assert.ok(legacyRelease.contextualExplanations?.["en-US"],
+  "legacy releases receive a sourced explanation independently of the generic step score");
+assert.equal(legacyRelease.confidence, 0.53,
+  "explanation matching does not rewrite the recorded step classification confidence");
 
 console.log(`Knowledge explanation coverage passed (${covered} sourced rules, eight locales, seven BC areas).`);

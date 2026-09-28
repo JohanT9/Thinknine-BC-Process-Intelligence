@@ -1,8 +1,8 @@
 {
     "name":  "thinknine-bc-process-intelligence",
-    "version":  "4.7.5",
+    "version":  "4.7.6",
     "private":  true,
-    "description":  "BC Process Studio ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â Business Process Intelligence for Microsoft Dynamics 365 Business Central.",
+    "description":  "BC Process Studio ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â Business Process Intelligence for Microsoft Dynamics 365 Business Central.",
     "scripts":  {
                     "benchmark:library":  "node scripts/benchmark-document-library.js",
                     "pretest":  "node tests/presentation-grammar.test.js \u0026\u0026 node tests/privacy-mask.test.js \u0026\u0026 node tests/review-workspace-refinement.test.js \u0026\u0026 node tests/screenshot-capture-policy.test.js \u0026\u0026 node tests/semantic-interaction-engine.test.js \u0026\u0026 node tests/task-consolidation.test.js \u0026\u0026 node tests/document-library-terminology.test.js \u0026\u0026 node tests/language-excellence.test.js \u0026\u0026 node tests/screenshot-intelligence.test.js \u0026\u0026 node tests/async-operations.test.js \u0026\u0026 node tests/document-library.test.js \u0026\u0026 node tests/document-library-view.test.js \u0026\u0026 node tests/document-batch-operations.test.js \u0026\u0026 node tests/document-batch-export.test.js \u0026\u0026 node tests/document-batch-accessibility.test.js \u0026\u0026 node tests/workflow-polish.test.js \u0026\u0026 node tests/v45-production-readiness.test.js",
