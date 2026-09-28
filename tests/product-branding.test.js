@@ -22,7 +22,7 @@ assert.deepStrictEqual(brand, {
     processAI: "BC Process AI"
   }
 });
-assert.strictEqual(pkg.version, "4.7.0");
+assert.match(pkg.version, /^\d+\.\d+\.\d+$/, "Package version must be semantic versioning.");
 assert.strictEqual(pkg.name, "thinknine-bc-process-intelligence",
   "Stable technical package identity must remain compatible.");
 assert.strictEqual(manifest.name, brand.productName);

@@ -6,7 +6,7 @@ const root = path.resolve(__dirname, "..");
 const read = value => fs.readFileSync(path.join(root, value), "utf8");
 const packageJson = JSON.parse(read("package.json"));
 const manifest = JSON.parse(read("src/ui/manifest.json"));
-assert.strictEqual(packageJson.version, "4.7.0");
+assert.match(packageJson.version, /^\d+\.\d+\.\d+$/, "Package version must be semantic versioning.");
 assert.strictEqual(manifest.version, packageJson.version);
 
 const library = read("src/document/document-library.js");

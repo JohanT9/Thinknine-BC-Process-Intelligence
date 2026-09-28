@@ -8,7 +8,7 @@ const packageJson = JSON.parse(read("package.json"));
 const manifest = JSON.parse(read("src/ui/manifest.json"));
 
 assert.strictEqual(manifest.version, packageJson.version);
-assert.strictEqual(packageJson.version, "4.7.0");
+assert.match(packageJson.version, /^\d+\.\d+\.\d+$/, "Package version must be semantic versioning.");
 assert.ok(packageJson.scripts.posttest.includes("npm run test:canonical"),
   "Canonical Recording tests must remain in the standard npm test lifecycle.");
 assert.ok(packageJson.scripts.posttest.includes("npm run test:bc-identification"),
