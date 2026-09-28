@@ -6931,10 +6931,13 @@ function renderProcessOverview() {
     const resolvedHierarchy = resolveReviewHierarchyForDisplay(
       activeReview.tasks || [], activeReview.hierarchy
     );
+    const processMapReviewTasks = globalThis.T9ProcessTaskContext.enrichForDisplay(
+      activeReview.tasks || [], activeReviewModel.businessTasks || []
+    );
     const procedureModel = globalThis.T9ProcessModel.project({
       recordingId: activeReviewSession.id,
       title: activeReviewSession.name,
-      steps: activeReview.tasks || [],
+        steps: processMapReviewTasks,
       resolvedHierarchy,
       overrides: activeReview.processOverrides || []
     });
@@ -7022,7 +7025,7 @@ function renderProcessOverview() {
         title: activeReviewSession.name,
         analysis: activeProcessAnalysis,
         decision: activeReview.processAnalysis,
-        reviewTasks: activeReview.tasks || [],
+        reviewTasks: processMapReviewTasks,
         procedureModel
       }, activeProcessMapLevel, { includeReferences: processMapIncludeReferences,
         includeBoundaries: true, locale: english ? "en-US" : "sv-SE" });
@@ -7047,7 +7050,7 @@ function renderProcessOverview() {
     const processMapRender = globalThis.T9ProcessOverviewView.render(container, activeProcessModel, {
       locale: applicationSettings.uiLocale || "sv-SE",
       selectedTaskIds: activeReviewSelection.selectedIds,
-      reviewTasks: activeReview.tasks || [],
+      reviewTasks: processMapReviewTasks,
       zoom: processMapZoom,
       direction: processMapDirection,
       theme: processMapTheme,

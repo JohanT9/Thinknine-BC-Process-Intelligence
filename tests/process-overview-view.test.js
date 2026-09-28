@@ -1,7 +1,37 @@
 const assert = require("assert");
 const fs = require("fs");
 const processModel = require("../src/document/process-model");
+const taskContext = require("../src/document/process-task-context");
 const view = require("../src/ui/process-overview-view");
+
+const savedTask = { taskId: "saved-post", taskNo: 3,
+  instruction: "Välj **Bokför**.", description: "Välj Bokför.",
+  actionCaption: "Bokför", sourceEventIds: ["event-post"] };
+const savedTaskBefore = JSON.stringify(savedTask);
+const displayTasks = taskContext.enrichForDisplay([savedTask], [{
+  taskId: "reinterpreted-post", instruction: "a different generated instruction",
+  sourceEventIds: ["event-post"], contextualExplanations: {
+    "sv-SE": "Bokföringen kan skapa bokförda dokument."
+  }, contextualExplanationSourceIds: ["sales-source-sv"],
+  contextualExplanationSources: [{ sourceId: "sales-source-sv",
+    title: "Microsoft Learn SV",
+    sourceUri: "https://learn.microsoft.com/sv-se/dynamics365/business-central/sales-how-sell-products" }]
+}]);
+assert.equal(displayTasks.length, 1, "display context must not add a recorded step");
+assert.equal(displayTasks[0].taskId, savedTask.taskId, "stored step identity stays intact");
+assert.equal(displayTasks[0].taskNo, savedTask.taskNo, "stored step numbering stays intact");
+assert.equal(displayTasks[0].instruction, savedTask.instruction,
+  "the saved instruction is not replaced by regenerated text");
+assert.ok(displayTasks[0].contextualExplanations["sv-SE"]);
+assert.equal(JSON.stringify(savedTask), savedTaskBefore,
+  "adding display context does not mutate the saved review task");
+const savedTaskModel = processModel.project({ recordingId: "saved-recording",
+  steps: displayTasks });
+const savedTaskContainer = { innerHTML: "" };
+view.render(savedTaskContainer, savedTaskModel, { locale: "sv-SE",
+  selectedTaskIds: [savedTask.taskId], reviewTasks: displayTasks });
+assert(savedTaskContainer.innerHTML.includes("Vad åtgärden innebär"),
+  "an already saved review step displays the knowledge explanation when selected");
 
 const changed = { version: "1.0.0", status: "changed",
   before: { facts: [] }, after: { facts: [] }, changes: [{
