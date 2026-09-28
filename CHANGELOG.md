@@ -1,5 +1,12 @@
 # Changelog
 
+## 2026-09-28 - Resolve saved sales-order release explanations
+
+- Use a confidently identified Business Central entity to resolve knowledge rules
+  when legacy recordings contain a generic page caption such as an extension name.
+- Reject rules when their declared entity conflicts with the recorded entity.
+- Prepare Edge extension version 4.7.3 for distribution.
+
 ## 2026-09-28 - Knowledge context in saved review steps
 
 - Show localized, source-linked explanations directly with matching steps in the

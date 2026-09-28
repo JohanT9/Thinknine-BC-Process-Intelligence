@@ -89,4 +89,15 @@ for(const [language,pageCaption,releaseCaption,postCaption] of salesExplanationC
   assert.equal(JSON.stringify(input),untouched,'knowledge enrichment leaves the input recording task unchanged');
  }
 }
+const legacyRelease={taskId:'legacy-release',taskType:'RunAction',
+ pageCaption:'Advance',entity:'SalesOrder',actionCaption:'Release',language:'sv-SE'};
+const legacyReleaseTask=knowledge.apply([legacyRelease],[salesPack]).tasks[0];
+assert.equal(legacyReleaseTask.knowledgeRule,'Sales.Release',
+ 'the identified SalesOrder entity must resolve a generic legacy page caption');
+assert.ok(legacyReleaseTask.contextualExplanations?.['sv-SE'],
+ 'previously recorded release actions get their localized explanation');
+const conflictingEntity=knowledge.apply([{...legacyRelease,taskId:'wrong-entity',
+ entity:'PurchaseOrder'}],[salesPack]).tasks[0];
+assert.notEqual(conflictingEntity.knowledgeRule,'Sales.Release',
+ 'an entity conflicting with the sales rule must never receive its suggestion');
 console.log('Sales process explanations remain separate from recorded instructions and are sourced/localized in all eight supported languages.');

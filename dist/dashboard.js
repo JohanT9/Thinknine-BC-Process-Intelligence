@@ -2525,7 +2525,7 @@ Processen är genomförd enligt arbetsgången.
 Dokumentationskvalitet: **${quality} %**
 
 ---
-Genererad av BC Process Studio 4.7.2.
+Genererad av BC Process Studio 4.7.3.
 `;
 }
 
@@ -2565,7 +2565,7 @@ ${rendered || "Inga meningsfulla arbetssteg kunde identifieras."}
 Processen är genomförd och de registrerade ändringarna har sparats i Business Central.
 
 ---
-Automatiskt tolkat av BC Process Studio 4.7.2.
+Automatiskt tolkat av BC Process Studio 4.7.3.
 `;
 }
 
@@ -2582,7 +2582,7 @@ function createDiagnostics(session, rawEvents, businessSteps, screenshotCount) {
   }
 
   return {
-    recorderVersion: "4.7.2",
+    recorderVersion: "4.7.3",
     uiFidelityMode: true,
     sessionId: session.id,
     environment: session.settings?.environmentName || "",
@@ -3213,7 +3213,7 @@ async function exportSession(session) {
     {
       name: `${prefix}ui-fidelity.json`,
       data: bytes(JSON.stringify({
-        version: "4.7.2",
+        version: "4.7.3",
         principle: "Visible Business Central captions are preserved exactly.",
         rules: [
           "actionCaption is the text shown on the action or button.",

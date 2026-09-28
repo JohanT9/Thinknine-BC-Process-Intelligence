@@ -1,6 +1,6 @@
 {
   "name": "thinknine-bc-process-intelligence",
-  "version": "4.7.2",
+  "version": "4.7.3",
   "private": true,
   "description": "BC Process Studio — Business Process Intelligence for Microsoft Dynamics 365 Business Central.",
   "scripts": {

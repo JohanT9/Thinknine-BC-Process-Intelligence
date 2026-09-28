@@ -51,7 +51,7 @@ async function load() {
   const screenshots = debug.screenshotStats || {};
 
   const rows = [
-    ["Version", debug.version || "4.7.2"],
+    ["Version", debug.version || "4.7.3"],
     ["Anslutning till BC", debug.connected ? "OK" : uiText("Inte bekräftad"), debug.connected ? "ok" : "error"],
     ["Inspelning", state.recording ? t("debug.active") : t("debug.inactive")],
     ["Aktiv session", state.sessionId || t("debug.noSession")],
