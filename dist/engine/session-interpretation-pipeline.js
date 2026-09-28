@@ -139,7 +139,8 @@ function (semantic, knowledge, refs, processAnalysis) {
       const candidates = relevant.flatMap(item => item.action.candidates || []);
       const distinct = [...new Map(candidates.map(candidate => [candidate.candidateId, candidate])).values()];
       const outputs = new Set(distinct.map(candidate => `${candidate.taskType}\u001f${candidate.semanticAction}\u001f${candidate.entity}`));
-      const status = relevant.some(item => item.action.status === "ambiguous") || outputs.size > 1
+      const status = relevant.some(item => item.action.status === "ambiguous") ||
+        outputs.size > 1 || distinct.length > 1
         ? "ambiguous" : distinct.length ? "resolved" : "unresolved";
       const selected = status === "resolved" ? distinct.sort((a, b) =>
         a.candidateId.localeCompare(b.candidateId))[0] : null;
@@ -167,8 +168,11 @@ function (semantic, knowledge, refs, processAnalysis) {
             selected.provenance?.language || task.language || task.context?.language || "en-US");
           return { ...(instruction ? { userDirective: instruction,
             userDirectiveSourceIds: [...(rule.sourceIds || [])] } : {}),
-          ...(rule.localizedExplanations ? {
+          ...(knowledge.explanationEligible(rule,
+            { ...task, entity: selected.entity }, [rule]) ? {
             contextualExplanations: { ...rule.localizedExplanations },
+            contextualExplanationRuleId: rule.ruleId,
+            contextualExplanationConfidence: Number(rule.confidence),
             contextualExplanationSourceIds: [...(rule.sourceIds || [])],
             contextualExplanationSources: (rule.sourceIds || []).map(sourceId =>
               pack?.sources?.find(source => source.sourceId === sourceId))

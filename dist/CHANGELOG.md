@@ -1,5 +1,14 @@
 # Changelog
 
+## 2026-09-28 - Require high-confidence knowledge explanations
+
+- Show Business Central process explanations only when the rule confidence is at
+  least 95%, the action and page/entity match specifically, competing rules are
+  not ambiguous, and a Microsoft Learn source is available.
+- Apply the same verification to new recordings, saved Review steps, and process
+  detail rendering; keep recorded instructions unchanged.
+- Prepare Edge extension version 4.7.4 for distribution.
+
 ## 2026-09-28 - Resolve saved sales-order release explanations
 
 - Use a confidently identified Business Central entity to resolve knowledge rules

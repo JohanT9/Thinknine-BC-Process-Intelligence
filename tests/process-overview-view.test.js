@@ -12,7 +12,9 @@ const displayTasks = taskContext.enrichForDisplay([savedTask], [{
   taskId: "reinterpreted-post", instruction: "a different generated instruction",
   sourceEventIds: ["event-post"], contextualExplanations: {
     "sv-SE": "Bokföringen kan skapa bokförda dokument."
-  }, contextualExplanationSourceIds: ["sales-source-sv"],
+  }, contextualExplanationRuleId: "Sales.Post",
+  contextualExplanationConfidence: 0.99,
+  contextualExplanationSourceIds: ["sales-source-sv"],
   contextualExplanationSources: [{ sourceId: "sales-source-sv",
     title: "Microsoft Learn SV",
     sourceUri: "https://learn.microsoft.com/sv-se/dynamics365/business-central/sales-how-sell-products" }]
@@ -59,6 +61,8 @@ const result = view.render(container, groupedModel, { locale: "sv-SE",
   { taskId: "customer", approved: true },
     { taskId: "release", approved: false, reviewSuggested: true,
       contextualExplanations: { "sv-SE": "Släpp gör ordern tillgänglig för fortsatt behandling." },
+      contextualExplanationRuleId: "Sales.Release",
+      contextualExplanationConfidence: 0.99,
       contextualExplanationSourceIds: ["release-sv"],
       contextualExplanationSources: [{ sourceId: "release-sv",
         title: "Försäljningsorder", sourceUri: "https://learn.microsoft.com/sv-se/dynamics365/business-central/sales-how-sell-products" }] }
@@ -96,6 +100,13 @@ assert(container.innerHTML.includes("Vald aktivitet"));
 assert(container.innerHTML.includes("Vad åtgärden innebär"));
 assert(container.innerHTML.includes("Släpp gör ordern tillgänglig"));
 assert(container.innerHTML.includes("Källa: <a href=\"https://learn.microsoft.com/sv-se/"));
+const unverifiedContainer = { innerHTML: "" };
+view.render(unverifiedContainer, model, { locale: "sv-SE",
+  selectedTaskIds: ["release"], reviewTasks: [{ taskId: "release",
+    contextualExplanations: { "sv-SE": "Ej verifierad text." },
+    contextualExplanationSources: [{ sourceUri: "https://learn.microsoft.com/sv-se/example" }] }] });
+assert(!unverifiedContainer.innerHTML.includes("Ej verifierad text."),
+  "the process view hides explanation text without a strong-confidence rule identity");
 assert(!container.innerHTML.includes('class="process-overview-routes compact"'));
 assert(!container.innerHTML.includes('class="process-overview-state"'),
   "state details belong in the shared detail area, not every compact node");

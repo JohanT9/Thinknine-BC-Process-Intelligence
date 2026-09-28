@@ -7,6 +7,7 @@
 })(typeof globalThis !== "undefined" ? globalThis : this, function (consolidation) {
   "use strict";
   const VERSION = "2.1.0";
+  const EXPLANATION_CONFIDENCE_THRESHOLD = 0.95;
   const text = value => String(value || "");
 
   function rules(packs = []) {
@@ -86,6 +87,39 @@
     return localized[tag] || localized[base] || rule?.instructionTemplate || "";
   }
 
+  function explanationEligible(rule, task, availableRules = []) {
+    if (!rule?.localizedExplanations || !(Number(rule.confidence) >=
+        EXPLANATION_CONFIDENCE_THRESHOLD)) return false;
+    const matchSpec = rule.match || {};
+    const actionCaption = task.actionCaption || "";
+    if (!matchSpec.actionPatterns?.length ||
+        !patternsMatch(matchSpec.actionPatterns, actionCaption)) return false;
+    const observedEntity = text(task.entity || task.context?.currentEntity)
+      .trim().toLowerCase();
+    const ruleEntity = text(rule.entity).trim().toLowerCase();
+    if (!ruleEntity || (observedEntity && observedEntity !== ruleEntity)) return false;
+    const pageCaption = task.pageCaption || task.context?.currentPageCaption ||
+      task.context?.previousPageCaption || "";
+    const pageMatches = matchSpec.pagePatterns?.length &&
+      patternsMatch(matchSpec.pagePatterns, pageCaption);
+    const identityConfidence = Number(task.pageIdentificationConfidence ??
+      task.pageIdentification?.confidence ?? task.context?.pageIdentificationConfidence ??
+      task.pageIdentity?.confidence);
+    const entityBackedPage = observedEntity === ruleEntity &&
+      Number.isFinite(identityConfidence) && identityConfidence >= 0.9;
+    if (!pageMatches && !entityBackedPage) return false;
+    const sources = rule.sourceRefs || [];
+    if (!sources.some(source => /^https:\/\/learn\.microsoft\.com\//i
+      .test(source?.sourceUri || ""))) return false;
+    const candidates = availableRules.length ? availableRules : [rule];
+    const scored = candidates.map(candidate => ({ candidate,
+      score: score(candidate, task) })).filter(item => item.score > 0)
+      .sort((a, b) => b.score - a.score);
+    const winner = scored[0];
+    return winner?.candidate.ruleId === rule.ruleId &&
+      (!scored[1] || winner.score - scored[1].score >= 5);
+  }
+
   function localizedExplanation(rule, language) {
     const localized = rule?.localizedExplanations || {};
     const tag = text(language).trim();
@@ -109,7 +143,8 @@
       const rule = found.rule;
       const instruction = localizedInstruction(rule, task.language || task.locale ||
         task.context?.language || task.context?.locale || "en-US");
-      const explanations = rule.localizedExplanations || null;
+      const explanations = explanationEligible(rule, task, availableRules)
+        ? rule.localizedExplanations : null;
       return { ...task, taskType: rule.taskType || task.taskType,
         semanticAction: rule.semanticAction || task.semanticAction,
         entity: rule.entity || task.entity || "", knowledgeFrameworkVersion: VERSION,
@@ -119,6 +154,8 @@
         confidence: rule.confidence || task.confidence || 0.8,
         reviewSuggested: (rule.confidence || 0.8) < 0.85,
         ...(explanations ? { contextualExplanations: { ...explanations },
+          contextualExplanationRuleId: rule.ruleId,
+          contextualExplanationConfidence: Number(rule.confidence),
           contextualExplanationSourceIds: [...(rule.sourceIds || [])],
           contextualExplanationSources: rule.sourceRefs.map(source => ({
             sourceId: source.sourceId, title: source.title, sourceUri: source.sourceUri
@@ -162,6 +199,7 @@
       consolidationDecisions: consolidated.decisions,
       unmatched, rules: availableRules };
   }
-  return { VERSION, apply, match, patternsMatch, rules, score, localizedInstruction,
+  return { VERSION, apply, match, patternsMatch, rules, score, explanationEligible,
+    EXPLANATION_CONFIDENCE_THRESHOLD, localizedInstruction,
     localizedExplanation };
 });

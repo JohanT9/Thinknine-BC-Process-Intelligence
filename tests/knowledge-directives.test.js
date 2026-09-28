@@ -90,7 +90,8 @@ for(const [language,pageCaption,releaseCaption,postCaption] of salesExplanationC
  }
 }
 const legacyRelease={taskId:'legacy-release',taskType:'RunAction',
- pageCaption:'Advance',entity:'SalesOrder',actionCaption:'Release',language:'sv-SE'};
+ pageCaption:'Advance',entity:'SalesOrder',pageIdentificationConfidence:1,
+ actionCaption:'Release',language:'sv-SE'};
 const legacyReleaseTask=knowledge.apply([legacyRelease],[salesPack]).tasks[0];
 assert.equal(legacyReleaseTask.knowledgeRule,'Sales.Release',
  'the identified SalesOrder entity must resolve a generic legacy page caption');
@@ -100,4 +101,14 @@ const conflictingEntity=knowledge.apply([{...legacyRelease,taskId:'wrong-entity'
  entity:'PurchaseOrder'}],[salesPack]).tasks[0];
 assert.notEqual(conflictingEntity.knowledgeRule,'Sales.Release',
  'an entity conflicting with the sales rule must never receive its suggestion');
+const weakRulePack={...salesPack,rules:salesPack.rules.map(item=>item.ruleId==='Sales.Release'
+ ? {...item,confidence:0.94}:item)};
+const weakExplanation=knowledge.apply([{...legacyRelease,taskId:'weak-explanation'}],[weakRulePack]).tasks[0];
+assert.equal(weakExplanation.contextualExplanations,undefined,
+ 'a rule below 95 percent confidence never supplies a process explanation');
+const ambiguousPack={...salesPack,rules:[...salesPack.rules,
+ {...salesPack.rules.find(item=>item.ruleId==='Sales.Release'),ruleId:'Sales.Release.Ambiguous'}]};
+const ambiguousExplanation=knowledge.apply([{...legacyRelease,taskId:'ambiguous-explanation'}],[ambiguousPack]).tasks[0];
+assert.equal(ambiguousExplanation.contextualExplanations,undefined,
+ 'an ambiguous rule match never supplies a process explanation');
 console.log('Sales process explanations remain separate from recorded instructions and are sourced/localized in all eight supported languages.');

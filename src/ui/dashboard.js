@@ -2473,12 +2473,16 @@ function createTaskDocumentationMarkdown(session, tasks, quality) {
     explanationLabels["en-US"];
 
   function explanationMarkdown(task) {
+    if (!(Number(task.contextualExplanationConfidence) >= 0.95) ||
+        !task.contextualExplanationRuleId) return "";
     const explanation = task.contextualExplanations?.[documentLanguage] ||
       task.contextualExplanations?.["en-US"] || "";
     if (!explanation) return "";
     const sourceIds = new Set(task.contextualExplanationSourceIds || []);
     const sources = loadedKnowledgePacks.flatMap(pack => pack.sources || [])
       .filter(source => sourceIds.has(source.sourceId));
+    if (!sources.some(source => /^https:\/\/learn\.microsoft\.com\//i
+      .test(source.sourceUri || ""))) return "";
     const localePrefix = `/${documentLanguage.toLowerCase()}/`;
     const source = sources.find(item => item.sourceUri?.includes(localePrefix)) ||
       sources.find(item => item.sourceUri?.includes("/en-us/")) || sources[0];
@@ -6045,6 +6049,10 @@ function renderStoredReviewFallback(error) {
 }
 
 function knowledgeExplanationMarkup(task) {
+  if (!(Number(task?.contextualExplanationConfidence) >= 0.95) ||
+      !task?.contextualExplanationRuleId ||
+      !(task?.contextualExplanationSources || []).some(source =>
+        /^https:\/\/learn\.microsoft\.com\//i.test(source?.sourceUri || ""))) return "";
   const language = activeDocumentLanguage();
   const explanations = task.contextualExplanations || {};
   const explanation = explanations[language] || explanations[language.split("-")[0]] ||
