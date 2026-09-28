@@ -1,0 +1,20 @@
+{
+  "manifestVersion": 1,
+  "product": "BC Process Studio",
+  "version": "4.7.7",
+  "channel": "beta",
+  "gitCommit": "dfe6027cb90854e84326f247710cb7727efd998c",
+  "sourceClean": true,
+  "publishedAt": "2026-09-28T09:08:25.853Z",
+  "minimumCompatibleVersion": "4.7.5",
+  "artifacts": [
+    {
+      "component": "browser-extension",
+      "browser": "edge",
+      "file": "edge/thinknine-bc-process-intelligence-4.7.7.zip",
+      "mediaType": "application/zip",
+      "sha256": "63ac6bef26b36ba3d18949ad148af7fbff780b0c5961f6d8ec9a5195c3d8ed8e"
+    }
+  ],
+  "releaseNotesReference": "CHANGELOG.md"
+}\n
