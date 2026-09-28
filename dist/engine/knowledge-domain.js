@@ -31,16 +31,25 @@
   function score(rule, task) {
     const match = rule.match || {};
     const context = task.context || {};
-    const checks = [["pagePatterns", task.pageCaption ||
-      context.currentPageCaption || context.previousPageCaption],
-    ["actionPatterns", task.actionCaption], ["fieldPatterns", task.fieldCaption],
-    ["automationIdPatterns", task.automationId]];
+    const ruleEntity = text(rule.entity).trim().toLowerCase();
+    const observedEntity = text(task.entity || context.currentEntity)
+      .trim().toLowerCase();
+    if (ruleEntity && observedEntity && ruleEntity !== observedEntity) return 0;
+    const pageCaption = task.pageCaption || context.currentPageCaption ||
+      context.previousPageCaption;
+    const checks = [["pagePatterns", pageCaption],
+      ["actionPatterns", task.actionCaption], ["fieldPatterns", task.fieldCaption],
+      ["automationIdPatterns", task.automationId]];
     let value = 0; let matched = 0; let required = 0;
     for (const [key, candidate] of checks) {
       const declared = match[key] || [];
       if (!declared.length) continue;
       required += 1;
-      if (patternsMatch(declared, candidate)) { matched += 1; value += 25; }
+      const pageResolvedByEntity = key === "pagePatterns" && ruleEntity &&
+        observedEntity === ruleEntity;
+      if (patternsMatch(declared, candidate) || pageResolvedByEntity) {
+        matched += 1; value += 25;
+      }
     }
     if (!required || matched < required) return 0;
     value += Math.round((rule.confidence || 0.5) * 50);
