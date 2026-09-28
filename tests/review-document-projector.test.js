@@ -153,7 +153,7 @@ includeKnowledgeExplanationReview.tasks[0] = {
   ...includeKnowledgeExplanationReview.tasks[0],
   includeKnowledgeExplanationInWord: true,
   contextualExplanationRuleId: "Sales.Release",
-  contextualExplanationConfidence: 0.90,
+  contextualExplanationConfidence: 0.01,
   contextualExplanations: { "sv-SE": "Släppet gör ordern klar för nästa steg." },
   contextualExplanationSources: [{ sourceId: "sales-source-sv",
     sourceUri: "https://learn.microsoft.com/sv-se/dynamics365/business-central/sales-how-sell-products" }]

@@ -10,9 +10,6 @@
 function (consolidation, explanationCatalog) {
   "use strict";
   const VERSION = "2.1.0";
-  // Explanations are source-linked suggestions in the review UI. The user must
-  // still opt in per step before one is copied to Word.
-  const EXPLANATION_CONFIDENCE_THRESHOLD = 0.85;
   const text = value => String(value || "");
 
   function rules(packs = []) {
@@ -93,8 +90,7 @@ function (consolidation, explanationCatalog) {
   }
 
   function explanationEligible(rule, task, availableRules = []) {
-    if (!localizedExplanations(rule) || !(Number(rule.confidence) >=
-        EXPLANATION_CONFIDENCE_THRESHOLD)) return false;
+    if (!localizedExplanations(rule)) return false;
     const matchSpec = rule.match || {};
     const explicitSignal = [
       [matchSpec.actionPatterns, task.actionCaption],
@@ -114,11 +110,7 @@ function (consolidation, explanationCatalog) {
       task.context?.previousPageCaption || "";
     const pageMatches = matchSpec.pagePatterns?.length &&
       patternsMatch(matchSpec.pagePatterns, pageCaption);
-    const identityConfidence = Number(task.pageIdentificationConfidence ??
-      task.pageIdentification?.confidence ?? task.context?.pageIdentificationConfidence ??
-      task.pageIdentity?.confidence);
-    const entityBackedPage = observedEntity === ruleEntity &&
-      Number.isFinite(identityConfidence) && identityConfidence >= 0.9;
+    const entityBackedPage = observedEntity === ruleEntity;
     if (!pageMatches && !entityBackedPage && !entitylessCore) return false;
     const sources = rule.sourceRefs || [];
     if (!sources.some(source => /^https:\/\/learn\.microsoft\.com\//i
@@ -223,7 +215,6 @@ function (consolidation, explanationCatalog) {
       unmatched, rules: availableRules };
   }
   return { VERSION, apply, match, patternsMatch, rules, score, explanationEligible,
-    localizedExplanations,
-    EXPLANATION_CONFIDENCE_THRESHOLD, localizedInstruction,
+    localizedExplanations, localizedInstruction,
     localizedExplanation };
 });

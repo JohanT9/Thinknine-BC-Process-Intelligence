@@ -90,7 +90,7 @@ for(const [language,pageCaption,releaseCaption,postCaption] of salesExplanationC
  }
 }
 const legacyRelease={taskId:'legacy-release',taskType:'RunAction',
- pageCaption:'Advance',entity:'SalesOrder',pageIdentificationConfidence:1,
+ pageCaption:'Advance',entity:'SalesOrder',pageIdentificationConfidence:0,
  actionCaption:'Release',language:'sv-SE'};
 const legacyReleaseTask=knowledge.apply([legacyRelease],[salesPack]).tasks[0];
 assert.equal(legacyReleaseTask.knowledgeRule,'Sales.Release',
@@ -102,10 +102,10 @@ const conflictingEntity=knowledge.apply([{...legacyRelease,taskId:'wrong-entity'
 assert.notEqual(conflictingEntity.knowledgeRule,'Sales.Release',
  'an entity conflicting with the sales rule must never receive its suggestion');
 const weakRulePack={...salesPack,rules:salesPack.rules.map(item=>item.ruleId==='Sales.Release'
- ? {...item,confidence:0.84}:item)};
+ ? {...item,confidence:0.01}:item)};
 const weakExplanation=knowledge.apply([{...legacyRelease,taskId:'weak-explanation'}],[weakRulePack]).tasks[0];
-assert.equal(weakExplanation.contextualExplanations,undefined,
- 'a rule below 85 percent confidence never supplies a process explanation');
+assert.ok(weakExplanation.contextualExplanations?.['sv-SE'],
+ 'confidence no longer blocks a source-backed, uniquely matched explanation');
 const reviewableRulePack={...salesPack,rules:salesPack.rules.map(item=>item.ruleId==='Sales.Release'
  ? {...item,confidence:0.90}:item)};
 const reviewableExplanation=knowledge.apply([{...legacyRelease,taskId:'reviewable-explanation'}],[reviewableRulePack]).tasks[0];

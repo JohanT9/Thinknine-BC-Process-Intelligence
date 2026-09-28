@@ -14,8 +14,7 @@ const supportedLocales = ["sv-SE", "en-US", "fr-FR", "de-DE", "es-ES",
 let covered = 0;
 for (const pack of packs) {
   for (const rule of pack.rules) {
-    if (Number(rule.confidence) < knowledge.EXPLANATION_CONFIDENCE_THRESHOLD ||
-        !rule.sourceIds?.length) continue;
+    if (!rule.sourceIds?.length) continue;
     assert.ok(catalog.supports({ ...rule, sourceRefs: rule.sourceIds.map(id =>
       pack.sources?.find(source => source.sourceId === id)).filter(Boolean) }),
     `${rule.ruleId} has a complete localized explanation`);

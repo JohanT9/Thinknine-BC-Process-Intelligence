@@ -2473,8 +2473,7 @@ function createTaskDocumentationMarkdown(session, tasks, quality) {
     explanationLabels["en-US"];
 
   function explanationMarkdown(task) {
-    if (!(Number(task.contextualExplanationConfidence) >= 0.85) ||
-        !task.contextualExplanationRuleId) return "";
+    if (!task.contextualExplanationRuleId) return "";
     const explanation = task.contextualExplanations?.[documentLanguage] ||
       task.contextualExplanations?.["en-US"] || "";
     if (!explanation) return "";
@@ -6063,8 +6062,7 @@ function renderStoredReviewFallback(error) {
 }
 
 function knowledgeExplanationMarkup(task) {
-  if (!(Number(task?.contextualExplanationConfidence) >= 0.85) ||
-      !task?.contextualExplanationRuleId ||
+  if (!task?.contextualExplanationRuleId ||
       !(task?.contextualExplanationSources || []).some(source =>
         /^https:\/\/learn\.microsoft\.com\//i.test(source?.sourceUri || ""))) return "";
   const language = activeDocumentLanguage();

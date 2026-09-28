@@ -1,5 +1,14 @@
 # Changelog
 
+## 2026-09-28 - Remove confidence gates for sourced explanations
+
+- Stop requiring confidence thresholds for source-backed knowledge explanations
+  in review, process details, and opt-in Word export.
+- Allow exact entity-backed matches when page identification confidence is low;
+  retain explicit action matching, unique-rule resolution, and Microsoft Learn
+  source requirements.
+- Prepare Edge extension version 4.7.7 for distribution.
+
 ## 2026-09-28 - Improve reviewable explanations for older recordings
 
 - Match source-backed Business Central explanations in the legacy interpretation
