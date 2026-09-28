@@ -1,5 +1,15 @@
 # Changelog
 
+## 2026-09-28 - Extend BC explanations and add Word export choice
+
+- Provide source-linked, eight-language explanations for confidently matched
+  knowledge rules across sales, purchasing, inventory, manufacturing, projects,
+  service, finance, cash management, and core navigation.
+- Keep display gated at 95% confidence with explicit action/field evidence,
+  unambiguous rule matching, and a Microsoft Learn source.
+- Add a per-step opt-in checkbox to include verified explanations in Word exports.
+- Prepare Edge extension version 4.7.5 for distribution.
+
 ## 2026-09-28 - Require high-confidence knowledge explanations
 
 - Show Business Central process explanations only when the rule confidence is at

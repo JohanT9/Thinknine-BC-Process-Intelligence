@@ -533,6 +533,10 @@
   function updateTask(review, index, patch) {
     const task = review.tasks[index];
     const now = new Date().toISOString();
+    if (patch.includeKnowledgeExplanationInWord !== undefined) {
+      patch = { ...patch,
+        includeKnowledgeExplanationInWord: patch.includeKnowledgeExplanationInWord === true };
+    }
     if (patch.userComment !== undefined) {
       const ownerId = task.stepId || task.taskId;
       const noteIndex = (review.stepNotes || []).findIndex(note =>

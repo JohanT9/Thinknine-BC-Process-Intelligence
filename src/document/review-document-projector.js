@@ -206,10 +206,11 @@
     const structuralTasks = structural ? structural.steps.map(step => {
       const identity = step.stepId || step.taskId;
       const current = currentTasks.find(task =>
-        (task.stepId || task.taskId) === identity
+        (task.stepId || task.taskId) === identity || task.taskId === step.taskId
       );
-      return current?.stepOverride
-        ? { ...step, stepOverride: clone(current.stepOverride) } : step;
+      return current ? { ...step, ...current,
+        ...(current.stepOverride ? { stepOverride: clone(current.stepOverride) } : {})
+      } : step;
     }) : currentTasks;
     const review = object(stepEditor.resolveReview({
       ...clone(reviewValue), tasks: structuralTasks,
@@ -316,6 +317,52 @@
         preserveUserText: task.fieldProvenance?.instruction === "user-edited" ||
           Boolean(task.structureProvenance) || task.provenance === "manual"
       }];
+
+      const explanationSources = Array.isArray(task.contextualExplanationSources)
+        ? task.contextualExplanationSources : [];
+      const explanationSource = explanationSources.find(source =>
+        /^https:\/\/learn\.microsoft\.com\//i.test(source?.sourceUri || ""));
+      const explanationLanguage = languages.normalize(
+        review.documentFields?.documentLanguage, "document");
+      const explanation = task.contextualExplanations?.[explanationLanguage] ||
+        task.contextualExplanations?.[explanationLanguage.split("-")[0]] ||
+        task.contextualExplanations?.["en-US"] || "";
+      if (task.includeKnowledgeExplanationInWord === true && explanation &&
+          Number(task.contextualExplanationConfidence) >= 0.95 &&
+          task.contextualExplanationRuleId && explanationSource) {
+        const explanationLabels = { "sv-SE": "Förklaring från BC-kunskapsbanken",
+          "en-US": "Business Central knowledge explanation",
+          "fr-FR": "Explication des connaissances Business Central",
+          "de-DE": "Erläuterung aus der Business Central-Wissensdatenbank",
+          "es-ES": "Explicación de conocimientos de Business Central",
+          "da-DK": "Forklaring fra BC-vidensbanken",
+          "fi-FI": "Business Central -tietämyskannan selitys",
+          "nb-NO": "Forklaring fra BC-kunnskapsbasen" };
+        blocks.push({
+          blockId: `block:knowledge-explanation:${stepKey}`,
+          kind: "callout",
+          calloutType: "information",
+          label: explanationLabels[explanationLanguage] || explanationLabels["en-US"],
+          sourceRef,
+          provenance: "knowledge",
+          preserveUserText: false,
+          blocks: [{
+            blockId: `block:knowledge-explanation-text:${stepKey}`,
+            kind: "paragraph",
+            text: explanation,
+            sourceRef,
+            provenance: "knowledge",
+            preserveUserText: true
+          }, {
+            blockId: `block:knowledge-explanation-source:${stepKey}`,
+            kind: "paragraph",
+            text: `Microsoft Learn: ${explanationSource.sourceUri}`,
+            sourceRef,
+            provenance: "knowledge",
+            preserveUserText: true
+          }]
+        });
+      }
 
       const resultVerification = object(task.resultVerification);
       const observedResult = text(task.observedResult) ||

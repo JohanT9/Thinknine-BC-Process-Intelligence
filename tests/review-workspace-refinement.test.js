@@ -103,6 +103,12 @@ assert(dashboard.includes("Review visibility fallback"));
 assert(dashboard.includes("Review active-task resolution failed"));
 assert(dashboard.includes("function renderStoredReviewFallback(error)"));
 assert(dashboard.includes("function renderReviewContent()"));
+assert(dashboard.includes("data-include-knowledge-explanation-in-word"),
+  "trusted knowledge explanations expose a per-step Word inclusion toggle");
+assert(dashboard.includes("includeKnowledgeExplanationInWord: event.target.checked === true"),
+  "the Word inclusion toggle persists its boolean on the selected review step");
+assert(dashboard.includes("function reviewForKnowledgeExport(review)"),
+  "Word export reattaches verified explanations to previously saved review steps");
 assert(dashboard.includes("renderStoredReviewFallback(error)"));
 assert(dashboard.includes('task?.stepOverride?.visibilityOverride !== "hidden"'));
 assert(dashboard.includes("const displayTasks = reviewTasksForDisplay(activeReview)"));

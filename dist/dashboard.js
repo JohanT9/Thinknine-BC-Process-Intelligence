@@ -2529,7 +2529,7 @@ Processen är genomförd enligt arbetsgången.
 Dokumentationskvalitet: **${quality} %**
 
 ---
-Genererad av BC Process Studio 4.7.4.
+Genererad av BC Process Studio 4.7.5.
 `;
 }
 
@@ -2569,7 +2569,7 @@ ${rendered || "Inga meningsfulla arbetssteg kunde identifieras."}
 Processen är genomförd och de registrerade ändringarna har sparats i Business Central.
 
 ---
-Automatiskt tolkat av BC Process Studio 4.7.4.
+Automatiskt tolkat av BC Process Studio 4.7.5.
 `;
 }
 
@@ -2586,7 +2586,7 @@ function createDiagnostics(session, rawEvents, businessSteps, screenshotCount) {
   }
 
   return {
-    recorderVersion: "4.7.4",
+    recorderVersion: "4.7.5",
     uiFidelityMode: true,
     sessionId: session.id,
     environment: session.settings?.environmentName || "",
@@ -3217,7 +3217,7 @@ async function exportSession(session) {
     {
       name: `${prefix}ui-fidelity.json`,
       data: bytes(JSON.stringify({
-        version: "4.7.4",
+        version: "4.7.5",
         principle: "Visible Business Central captions are preserved exactly.",
         rules: [
           "actionCaption is the text shown on the action or button.",
@@ -3373,6 +3373,7 @@ function createActiveDocumentPipeline() {
   const expectedResult = configuredExpectedResult();
   const documentLanguage = activeDocumentLanguage();
   const preparedPresentation = createActiveDocumentPresentation();
+  const reviewWithKnowledgeExplanations = reviewForKnowledgeExport(activeReview);
   return activeDocumentPipelineCache.get([
     activeReviewModel,
     activeReview,
@@ -3383,7 +3384,7 @@ function createActiveDocumentPipeline() {
     documentLanguage
   ], () => globalThis.T9WordExportPipeline.create({
       session: activeReviewModel.response.session,
-      review: activeReview,
+      review: reviewWithKnowledgeExplanations,
       expectedResult,
       documentLanguage,
       preparedPresentation,
@@ -3399,6 +3400,7 @@ function createActiveDocumentPresentation() {
   }
   const expectedResult = configuredExpectedResult();
   const documentLanguage = activeDocumentLanguage();
+  const reviewWithKnowledgeExplanations = reviewForKnowledgeExport(activeReview);
   return activeDocumentPresentationCache.get([
     activeReviewModel,
     activeReview,
@@ -3408,11 +3410,23 @@ function createActiveDocumentPresentation() {
     documentLanguage
   ], () => globalThis.T9WordExportPipeline.createPresentation({
       session: activeReviewModel.response.session,
-      review: activeReview,
+      review: reviewWithKnowledgeExplanations,
       expectedResult,
       documentLanguage,
       profileId: activeDocumentProfileId
     }));
+}
+
+function reviewForKnowledgeExport(review) {
+  if (!review || !activeReviewModel?.businessTasks?.length) return review;
+  const enriched = globalThis.T9ProcessTaskContext.enrichForDisplay(
+    review.tasks || [], activeReviewModel.businessTasks
+  );
+  const optionsByTaskId = new Map((review.tasks || []).map(task =>
+    [task.taskId, task.includeKnowledgeExplanationInWord === true]));
+  return { ...review, tasks: enriched.map(task => ({ ...task,
+    includeKnowledgeExplanationInWord: optionsByTaskId.get(task.taskId) === true
+  })) };
 }
 
 function configuredExpectedResult(settings = applicationSettings) {
@@ -6068,6 +6082,11 @@ function knowledgeExplanationMarkup(task) {
     "fi-FI": ["Mitä toiminto tekee", "Lähde"],
     "nb-NO": ["Hva handlingen gjør", "Kilde"]
   };
+  const includeLabels = { "sv-SE": "Ta med förklaringen i Word",
+    "en-US": "Include explanation in Word", "fr-FR": "Inclure l’explication dans Word",
+    "de-DE": "Erklärung in Word übernehmen", "es-ES": "Incluir explicación en Word",
+    "da-DK": "Medtag forklaringen i Word", "fi-FI": "Sisällytä selitys Wordiin",
+    "nb-NO": "Ta med forklaringen i Word" };
   const [heading, sourceLabel] = labels[language] || labels["en-US"];
   const sources = task.contextualExplanationSources || [];
   const localePath = `/${language.toLowerCase()}/`;
@@ -6078,6 +6097,10 @@ function knowledgeExplanationMarkup(task) {
   return `<aside class="review-knowledge-explanation" data-knowledge-explanation>
     <strong>${escapeHtml(heading)}</strong><p>${escapeHtml(explanation)}</p>
     ${sourceUri ? `<span class="review-knowledge-source">${escapeHtml(sourceLabel)}: <a href="${escapeHtml(sourceUri)}" target="_blank" rel="noopener noreferrer">${escapeHtml(source.title || "Microsoft Learn")}</a></span>` : ""}
+    <label class="review-knowledge-export-choice"><input type="checkbox"
+      data-include-knowledge-explanation-in-word
+      ${task.includeKnowledgeExplanationInWord === true ? "checked" : ""}>
+      <span>${escapeHtml(includeLabels[language] || includeLabels["en-US"])}</span></label>
   </aside>`;
 }
 
@@ -6863,6 +6886,16 @@ function renderReviewContent() {
         });
         reviewAutoSave.schedule();
         renderReview();
+      });
+
+    card.querySelector("[data-include-knowledge-explanation-in-word]")
+      ?.addEventListener("change", event => {
+        globalThis.T9Review.editTask(activeReview, actualIndex, {
+          includeKnowledgeExplanationInWord: event.target.checked === true
+        }, { beforeSelection: activeReviewSelection,
+          afterSelection: activeReviewSelection });
+        reviewAutoSave.schedule();
+        invalidateDocumentWorkspace();
       });
 
     card.querySelector('[data-action="add"]')

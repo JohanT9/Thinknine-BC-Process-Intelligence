@@ -78,6 +78,17 @@ const base = [{ taskId: "a", instruction: "Select No. 136",
   assert.deepEqual(review.manualSteps[0].sourceEventIds, []);
   assert.deepEqual(reviewStudio.activeTasks(review).map(item => item.taskId),
     ["a", "manual-middle", "b"]);
+  reviewStudio.editTask(review, 0, {
+    includeKnowledgeExplanationInWord: true
+  }, { now: NOW });
+  assert.equal(reviewStudio.activeTasks(review)[0].includeKnowledgeExplanationInWord,
+    true, "per-step Word explanation choice is persisted on the review task");
+  reviewStudio.undo(review);
+  assert.equal(reviewStudio.activeTasks(review)[0].includeKnowledgeExplanationInWord,
+    undefined, "undo restores the per-step Word explanation choice");
+  reviewStudio.redo(review);
+  assert.equal(reviewStudio.activeTasks(review)[0].includeKnowledgeExplanationInWord,
+    true, "redo restores the per-step Word explanation choice");
   reviewStudio.editTask(review, 1, { instruction: "Verify available stock.",
     userComment: "Required before quantity entry.", callout: {
       type: "tip", text: "Check inventory by location."
@@ -159,6 +170,30 @@ const base = [{ taskId: "a", instruction: "Select No. 136",
       item.content.text === "Confirm availability before continuing."));
   assert.equal(model.planId, prepared.plan.planId,
     "Workspace and Word share one resolved plan");
+
+  const explanationReview = reviewStudio.createReview(session, [{
+    taskId: "explained", instruction: "Release the sales order."
+  }]);
+  explanationReview.documentFields.documentLanguage = "en-US";
+  explanationReview.tasks[0] = { ...explanationReview.tasks[0],
+    includeKnowledgeExplanationInWord: true,
+    contextualExplanationRuleId: "Sales.Release",
+    contextualExplanationConfidence: 0.99,
+    contextualExplanations: { "en-US": "Releasing prepares the order for the next workflow step." },
+    contextualExplanationSources: [{ sourceUri: "https://learn.microsoft.com/en-us/dynamics365/business-central/sales-how-sell-products" }]
+  };
+  const explanationPlan = pipeline.create({ review: explanationReview, session }).plan;
+  assert.match(JSON.stringify(explanationPlan),
+    /Releasing prepares the order for the next workflow step\./,
+  "the opted-in explanation is included in the Word export plan");
+  assert.match(JSON.stringify(explanationPlan),
+    /Microsoft Learn: https:\/\/learn\.microsoft\.com\/en-us\//,
+  "the exported explanation retains its source link");
+  explanationReview.tasks[0].includeKnowledgeExplanationInWord = false;
+  assert.doesNotMatch(JSON.stringify(pipeline.create({
+    review: explanationReview, session
+  }).plan), /Releasing prepares the order for the next workflow step\./,
+  "the explanation is omitted when the per-step choice is off");
   reviewStudio.undo(review);
   assert.equal(review.manualSteps.length, 1);
   reviewStudio.undo(review);

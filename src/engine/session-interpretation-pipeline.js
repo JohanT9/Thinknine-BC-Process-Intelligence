@@ -170,7 +170,7 @@ function (semantic, knowledge, refs, processAnalysis) {
             userDirectiveSourceIds: [...(rule.sourceIds || [])] } : {}),
           ...(knowledge.explanationEligible(rule,
             { ...task, entity: selected.entity }, [rule]) ? {
-            contextualExplanations: { ...rule.localizedExplanations },
+            contextualExplanations: { ...knowledge.localizedExplanations(rule) },
             contextualExplanationRuleId: rule.ruleId,
             contextualExplanationConfidence: Number(rule.confidence),
             contextualExplanationSourceIds: [...(rule.sourceIds || [])],

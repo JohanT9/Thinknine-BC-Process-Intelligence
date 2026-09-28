@@ -148,6 +148,35 @@ assert.strictEqual(observedResult.blocks[0].text,
   "Sidan Bokförd försäljningsfaktura öppnades.");
 assert.strictEqual(observedResult.resultVerification.status, "verified");
 
+const includeKnowledgeExplanationReview = reviewFixture();
+includeKnowledgeExplanationReview.tasks[0] = {
+  ...includeKnowledgeExplanationReview.tasks[0],
+  includeKnowledgeExplanationInWord: true,
+  contextualExplanationRuleId: "Sales.Release",
+  contextualExplanationConfidence: 0.99,
+  contextualExplanations: { "sv-SE": "Släppet gör ordern klar för nästa steg." },
+  contextualExplanationSources: [{ sourceId: "sales-source-sv",
+    sourceUri: "https://learn.microsoft.com/sv-se/dynamics365/business-central/sales-how-sell-products" }]
+};
+const explanationDocument = projector.project(includeKnowledgeExplanationReview,
+  { ...options, session: { ...options.session, settings: {
+    ...options.session.settings, documentLanguage: "sv-SE" } } }).document;
+const explanationStep = explanationDocument.sections.find(section =>
+  section.kind === "workflow").blocks.find(block => block.kind === "step" &&
+    block.sourceRef.taskId === "task-1");
+const explanationBlock = explanationStep.blocks.find(block =>
+  block.blockId.startsWith("block:knowledge-explanation:"));
+assert.equal(explanationBlock.label, "Förklaring från BC-kunskapsbanken");
+assert.equal(explanationBlock.blocks[0].text,
+  "Släppet gör ordern klar för nästa steg.");
+assert.match(explanationBlock.blocks[1].text,
+  /^Microsoft Learn: https:\/\/learn\.microsoft\.com\/sv-se\//);
+assert.equal(projector.project(reviewFixture(), options).document.sections
+  .find(section => section.kind === "workflow").blocks.find(block =>
+    block.kind === "step" && block.sourceRef.taskId === "task-1").blocks.some(block =>
+    block.blockId.startsWith("block:knowledge-explanation:")), false,
+"knowledge explanations are omitted from Word unless that step opts in");
+
 const imageBlocks = workflow.blocks.filter(block => block.kind === "step")
   .flatMap(step =>
   step.blocks.filter(block => block.kind === "image")

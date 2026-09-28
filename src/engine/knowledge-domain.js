@@ -1,10 +1,13 @@
 (function (root, factory) {
   const consolidation = typeof module === "object" && module.exports
     ? require("./task-consolidation") : root.T9TaskConsolidation;
-  const api = factory(consolidation);
+  const explanationCatalog = typeof module === "object" && module.exports
+    ? require("./knowledge-explanation-catalog") : root.T9KnowledgeExplanationCatalog;
+  const api = factory(consolidation, explanationCatalog);
   if (typeof module === "object" && module.exports) module.exports = api;
   root.T9KnowledgeDomain = api;
-})(typeof globalThis !== "undefined" ? globalThis : this, function (consolidation) {
+})(typeof globalThis !== "undefined" ? globalThis : this,
+function (consolidation, explanationCatalog) {
   "use strict";
   const VERSION = "2.1.0";
   const EXPLANATION_CONFIDENCE_THRESHOLD = 0.95;
@@ -88,16 +91,23 @@
   }
 
   function explanationEligible(rule, task, availableRules = []) {
-    if (!rule?.localizedExplanations || !(Number(rule.confidence) >=
+    if (!localizedExplanations(rule) || !(Number(rule.confidence) >=
         EXPLANATION_CONFIDENCE_THRESHOLD)) return false;
     const matchSpec = rule.match || {};
-    const actionCaption = task.actionCaption || "";
-    if (!matchSpec.actionPatterns?.length ||
-        !patternsMatch(matchSpec.actionPatterns, actionCaption)) return false;
+    const explicitSignal = [
+      [matchSpec.actionPatterns, task.actionCaption],
+      [matchSpec.fieldPatterns, task.fieldCaption],
+      [matchSpec.automationIdPatterns, task.automationId]
+    ].some(([patterns, value]) => patterns?.length && patternsMatch(patterns, value));
+    if (!explicitSignal) return false;
+    if (["Core.ConfirmYes", "Core.ConfirmNo"].includes(rule.ruleId)) return false;
     const observedEntity = text(task.entity || task.context?.currentEntity)
       .trim().toLowerCase();
     const ruleEntity = text(rule.entity).trim().toLowerCase();
-    if (!ruleEntity || (observedEntity && observedEntity !== ruleEntity)) return false;
+    const entitylessCore = ["Core.SearchAndOpenPage", "Core.CreateNew"]
+      .includes(rule.ruleId) && !observedEntity;
+    if ((!ruleEntity && !entitylessCore) ||
+        (ruleEntity && observedEntity && observedEntity !== ruleEntity)) return false;
     const pageCaption = task.pageCaption || task.context?.currentPageCaption ||
       task.context?.previousPageCaption || "";
     const pageMatches = matchSpec.pagePatterns?.length &&
@@ -107,7 +117,7 @@
       task.pageIdentity?.confidence);
     const entityBackedPage = observedEntity === ruleEntity &&
       Number.isFinite(identityConfidence) && identityConfidence >= 0.9;
-    if (!pageMatches && !entityBackedPage) return false;
+    if (!pageMatches && !entityBackedPage && !entitylessCore) return false;
     const sources = rule.sourceRefs || [];
     if (!sources.some(source => /^https:\/\/learn\.microsoft\.com\//i
       .test(source?.sourceUri || ""))) return false;
@@ -121,10 +131,14 @@
   }
 
   function localizedExplanation(rule, language) {
-    const localized = rule?.localizedExplanations || {};
+    const localized = localizedExplanations(rule) || {};
     const tag = text(language).trim();
     const base = tag.split("-")[0];
     return localized[tag] || localized[base] || "";
+  }
+
+  function localizedExplanations(rule) {
+    return rule?.localizedExplanations || explanationCatalog?.localized(rule) || null;
   }
 
   function apply(tasks = [], packs = []) {
@@ -144,7 +158,7 @@
       const instruction = localizedInstruction(rule, task.language || task.locale ||
         task.context?.language || task.context?.locale || "en-US");
       const explanations = explanationEligible(rule, task, availableRules)
-        ? rule.localizedExplanations : null;
+        ? localizedExplanations(rule) : null;
       return { ...task, taskType: rule.taskType || task.taskType,
         semanticAction: rule.semanticAction || task.semanticAction,
         entity: rule.entity || task.entity || "", knowledgeFrameworkVersion: VERSION,
@@ -179,6 +193,10 @@
       const explanationSources = [...new Map(matches.flatMap(item =>
         item.contextualExplanationSources || []).map(source => [source.sourceId, source]))
         .values()];
+      const explanationRuleIds = [...new Set(matches.map(item =>
+        item.contextualExplanationRuleId).filter(Boolean))];
+      const explanationConfidences = [...new Set(matches.map(item =>
+        item.contextualExplanationConfidence).filter(Number.isFinite))];
       if (rules.length !== 1) return task;
       const matched = matches.find(item => item.knowledgeRule === rules[0]);
       return { ...task, knowledgeMatched: true,
@@ -187,8 +205,11 @@
         knowledgePackName: matched.knowledgePackName,
         knowledgePackVersion: matched.knowledgePackVersion,
         knowledgeFrameworkVersion: matched.knowledgeFrameworkVersion,
-        ...(explanationMaps.length === 1 ? {
+        ...(explanationMaps.length === 1 && explanationRuleIds.length === 1 &&
+            explanationConfidences.length === 1 ? {
           contextualExplanations: explanationMaps[0],
+          contextualExplanationRuleId: explanationRuleIds[0],
+          contextualExplanationConfidence: explanationConfidences[0],
           contextualExplanationSourceIds: explanationSourceIds,
           contextualExplanationSources: explanationSources
         } : {}),
@@ -200,6 +221,7 @@
       unmatched, rules: availableRules };
   }
   return { VERSION, apply, match, patternsMatch, rules, score, explanationEligible,
+    localizedExplanations,
     EXPLANATION_CONFIDENCE_THRESHOLD, localizedInstruction,
     localizedExplanation };
 });
