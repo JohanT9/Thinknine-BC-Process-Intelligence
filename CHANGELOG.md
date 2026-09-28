@@ -1,5 +1,11 @@
 # Changelog
 
+## 2026-09-28 - Context on previously recorded process steps
+
+- Show source-linked, localized knowledge explanations in the selected-step details for
+  previously saved reviews without rewriting saved instructions or adding process steps.
+- Prepare Edge extension version 4.7.1 for distribution.
+
 ## 2026-09-25 - Expanded source-backed Business Central process knowledge
 
 - Added English and Swedish recognition for sales and purchase return orders,
