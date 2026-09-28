@@ -1,5 +1,13 @@
 # Changelog
 
+## 2026-09-28 - Knowledge context in saved review steps
+
+- Show localized, source-linked explanations directly with matching steps in the
+  standard Review workspace, including previously saved recordings.
+- Keep explanations separate from recorded instructions and do not add steps or
+  enable the hidden Process Map interface.
+- Prepare Edge extension version 4.7.2 for distribution.
+
 ## 2026-09-28 - Context on previously recorded process steps
 
 - Show source-linked, localized knowledge explanations in the selected-step details for

@@ -82,7 +82,7 @@ importScripts("review/process-improvement-dataset.js");
 importScripts("review/knowledge-feedback-learning.js");
 importScripts("review/process-improvement-service.js");
 
-const VERSION = "4.7.1";
+const VERSION = "4.7.2";
 const tenantLicense = globalThis.T9TenantLicense.create({
   storage: chrome.storage.local, fetcher: (...args) => fetch(...args),
   config: globalThis.T9TenantLicenseConfig, version: VERSION

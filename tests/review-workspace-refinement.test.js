@@ -106,6 +106,14 @@ assert(dashboard.includes("function renderReviewContent()"));
 assert(dashboard.includes("renderStoredReviewFallback(error)"));
 assert(dashboard.includes('task?.stepOverride?.visibilityOverride !== "hidden"'));
 assert(dashboard.includes("const displayTasks = reviewTasksForDisplay(activeReview)"));
+assert(dashboard.includes("globalThis.T9ProcessTaskContext.enrichForDisplay("),
+  "Saved review tasks must receive non-mutating knowledge context in the ordinary review list.");
+assert(dashboard.includes("${knowledgeExplanationMarkup(task)}"),
+  "Knowledge explanations must render with the review step, outside the hidden process map.");
+assert(dashboard.includes("function knowledgeExplanationMarkup(task)"));
+assert(dashboard.includes('data-knowledge-explanation'));
+assert(dashboard.includes('https:\\/\\/learn\\.microsoft\\.com'));
+assert(html.includes(".review-knowledge-explanation"));
 assert(dashboard.includes("function resetReviewSurfaceForOpen()"));
 assert(dashboard.includes('$("reviewList").hidden = false;'));
 assert(dashboard.indexOf("resetReviewSurfaceForOpen();") <

@@ -2525,7 +2525,7 @@ Processen är genomförd enligt arbetsgången.
 Dokumentationskvalitet: **${quality} %**
 
 ---
-Genererad av BC Process Studio 4.7.1.
+Genererad av BC Process Studio 4.7.2.
 `;
 }
 
@@ -2565,7 +2565,7 @@ ${rendered || "Inga meningsfulla arbetssteg kunde identifieras."}
 Processen är genomförd och de registrerade ändringarna har sparats i Business Central.
 
 ---
-Automatiskt tolkat av BC Process Studio 4.7.1.
+Automatiskt tolkat av BC Process Studio 4.7.2.
 `;
 }
 
@@ -2582,7 +2582,7 @@ function createDiagnostics(session, rawEvents, businessSteps, screenshotCount) {
   }
 
   return {
-    recorderVersion: "4.7.1",
+    recorderVersion: "4.7.2",
     uiFidelityMode: true,
     sessionId: session.id,
     environment: session.settings?.environmentName || "",
@@ -3213,7 +3213,7 @@ async function exportSession(session) {
     {
       name: `${prefix}ui-fidelity.json`,
       data: bytes(JSON.stringify({
-        version: "4.7.1",
+        version: "4.7.2",
         principle: "Visible Business Central captions are preserved exactly.",
         rules: [
           "actionCaption is the text shown on the action or button.",
@@ -6044,6 +6044,35 @@ function renderStoredReviewFallback(error) {
   console.error("Review rendering fallback", error);
 }
 
+function knowledgeExplanationMarkup(task) {
+  const language = activeDocumentLanguage();
+  const explanations = task.contextualExplanations || {};
+  const explanation = explanations[language] || explanations[language.split("-")[0]] ||
+    explanations["en-US"] || "";
+  if (!explanation) return "";
+  const labels = {
+    "sv-SE": ["Vad åtgärden innebär", "Källa"],
+    "en-US": ["What this action does", "Source"],
+    "fr-FR": ["Ce que fait cette action", "Source"],
+    "de-DE": ["Was diese Aktion bewirkt", "Quelle"],
+    "es-ES": ["Qué hace esta acción", "Fuente"],
+    "da-DK": ["Hvad handlingen gør", "Kilde"],
+    "fi-FI": ["Mitä toiminto tekee", "Lähde"],
+    "nb-NO": ["Hva handlingen gjør", "Kilde"]
+  };
+  const [heading, sourceLabel] = labels[language] || labels["en-US"];
+  const sources = task.contextualExplanationSources || [];
+  const localePath = `/${language.toLowerCase()}/`;
+  const source = sources.find(item => item.sourceUri?.includes(localePath)) ||
+    sources.find(item => item.sourceUri?.includes("/en-us/")) || sources[0];
+  const sourceUri = /^https:\/\/learn\.microsoft\.com\//i.test(source?.sourceUri || "")
+    ? source.sourceUri : "";
+  return `<aside class="review-knowledge-explanation" data-knowledge-explanation>
+    <strong>${escapeHtml(heading)}</strong><p>${escapeHtml(explanation)}</p>
+    ${sourceUri ? `<span class="review-knowledge-source">${escapeHtml(sourceLabel)}: <a href="${escapeHtml(sourceUri)}" target="_blank" rel="noopener noreferrer">${escapeHtml(source.title || "Microsoft Learn")}</a></span>` : ""}
+  </aside>`;
+}
+
 function updateInstructionPreview(taskId, runs) {
   const card = [...$("reviewList").querySelectorAll("[data-review-task-id]")]
     .find(element => element.dataset.reviewTaskId === taskId);
@@ -6326,7 +6355,9 @@ function renderReviewContent() {
   renderDocumentProfileChoice();
 
   const displayTasks = reviewTasksForDisplay(activeReview);
-  const tasks = displayTasks.tasks;
+  const tasks = globalThis.T9ProcessTaskContext.enrichForDisplay(
+    displayTasks.tasks, activeReviewModel?.businessTasks || []
+  );
   const documentPresentations = documentInstructionPresentationsByTask();
   const screenshotQualities = screenshotQualityByTask();
   const progress = globalThis.T9Review.progress(activeReview);
@@ -6396,6 +6427,7 @@ function renderReviewContent() {
         <div id="review-instruction-preview-${visibleIndex}"
           class="review-instruction-preview" data-field="instruction"
           data-instruction-preview tabindex="0">${instructionRunsHtml(instructionPresentation.runs)}</div>
+        ${knowledgeExplanationMarkup(task)}
         <div class="instruction-format-toolbar" data-instruction-format-toolbar hidden
           role="toolbar" aria-label="${uiT("a11y.textFormatting")}">
           <button type="button" class="secondary" data-instruction-format="bold"
