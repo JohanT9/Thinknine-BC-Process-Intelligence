@@ -1,0 +1,693 @@
+{
+  "packId": "bc-inventory",
+  "name": "Business Central inventory",
+  "version": "1.0.0",
+  "priority": 220,
+  "rules": [
+    {
+      "ruleId": "BCExpansion.PostItemReclassification",
+      "taskType": "PostItemReclassification",
+      "semanticAction": "PostItemReclassification",
+      "entity": "ItemReclassificationJournal",
+      "priority": 1310,
+      "confidence": 0.95,
+      "verifiedRuntimeLocales": ["en-US", "sv-SE"],
+      "match": {
+        "pagePatterns": [
+          "^Item Reclass\\. Journals$",
+          "^Item Reclassification Journals$",
+          "^Artikelomklassificeringsjournaler$"
+        ],
+        "actionPatterns": [
+          "^Post$",
+          "^Bokför$"
+        ],
+        "fieldPatterns": [],
+        "automationIdPatterns": []
+      },
+      "instructionTemplate": "",
+      "languages": [
+        "en-US",
+        "sv-SE",
+        "fr-FR",
+        "de-DE",
+        "es-ES",
+        "da-DK",
+        "fi-FI",
+        "nb-NO"
+      ],
+      "aliases": [],
+      "sourceIds": [
+        "inventory-reclassify-transfer-en-us",
+        "inventory-reclassify-transfer-sv-se",
+        "inventory-reclassify-transfer-fr-fr",
+        "inventory-reclassify-transfer-de-de",
+        "inventory-reclassify-transfer-es-es",
+        "inventory-reclassify-transfer-da-dk",
+        "inventory-reclassify-transfer-fi-fi",
+        "inventory-reclassify-transfer-nb-no"
+      ],
+      "localizedExplanations": {
+        "en-US": "Posts a reclassification journal to move existing stock between locations or bins, change dimensions, or reclassify tracking data. Enter the current location/bin and the new location/bin on the same line, and verify the item, quantity, lot/serial details, and any warehouse-handling requirements. Use a transfer order instead when the movement needs a separate shipment and receipt, an in-transit location, or route-based planning. Preview the posting and review the resulting item and warehouse entries.",
+        "sv-SE": "Bokför en omklassificeringsjournal för att flytta befintligt lager mellan lagerställen eller fack, ändra dimensioner eller omklassificera spårningsuppgifter. Ange nuvarande lagerställe/fack och nytt lagerställe/fack på samma rad och kontrollera artikel, antal, parti-/serienummer och krav på lagerhantering. Använd i stället en överföringsorder när förflyttningen behöver separat utleverans och inleverans, transitplats eller planering utifrån överföringsväg. Förhandsgranska bokföringen och granska de skapade artikel- och lagerposterna.",
+        "fr-FR": "Valide un journal de reclassement pour déplacer le stock entre magasins ou emplacements, modifier des dimensions ou reclasser le suivi. Indiquez les emplacements actuels et nouveaux sur la même ligne, puis vérifiez article, quantité, numéros de lot/série et exigences d’entrepôt. Utilisez plutôt un ordre de transfert si le mouvement nécessite une expédition et une réception distinctes, un emplacement de transit ou une planification d’itinéraire. Prévisualisez la validation et contrôlez les écritures article et entrepôt créées.",
+        "de-DE": "Bucht ein Umbuchungsjournal, um vorhandenen Bestand zwischen Lagerorten oder Lagerplätzen zu verschieben, Dimensionen zu ändern oder Trackingdaten umzubuchen. Erfassen Sie aktuellen und neuen Lagerort/Lagerplatz in derselben Zeile und prüfen Sie Artikel, Menge, Chargen-/Seriennummern sowie Lageranforderungen. Verwenden Sie einen Umlagerungsauftrag, wenn ein separater Versand und Eingang, ein Transitlagerort oder routenbasierte Planung erforderlich ist. Vorschau ausführen und die erzeugten Artikel- und Lagerposten prüfen.",
+        "es-ES": "Registra un diario de reclasificación para mover existencias entre ubicaciones o contenedores, cambiar dimensiones o reclasificar datos de seguimiento. Indique la ubicación/contenedor actual y el nuevo en la misma línea, y compruebe el producto, la cantidad, los lotes/números de serie y los requisitos de almacén. Use una orden de transferencia cuando se necesiten envío y recepción separados, ubicación de tránsito o planificación por ruta. Obtenga una vista previa y revise los movimientos de producto y almacén creados.",
+        "da-DK": "Bogfører en omklassificeringskladde for at flytte eksisterende lager mellem lokationer eller hylder, ændre dimensioner eller omklassificere sporingsdata. Angiv nuværende og ny lokation/hylde på samme linje, og kontrollér varen, antal, lot-/serienumre og lagerkrav. Brug i stedet en overflytningsordre, når flytningen kræver separat levering og modtagelse, transitlokation eller ruteplanlægning. Forhåndsvis bogføringen, og gennemgå de oprettede vare- og lagerposter.",
+        "fi-FI": "Kirjaa uudelleenluokittelupäiväkirja siirtääksesi olemassa olevaa varastoa sijaintien tai hyllyjen välillä, muuttaaksesi dimensioita tai luokitellaksesi seurantatiedot uudelleen. Anna nykyinen ja uusi sijainti/hylly samalla rivillä ja tarkista nimike, määrä, erä-/sarjanumerot sekä varastokäsittelyn vaatimukset. Käytä siirtotilausta, jos tarvitaan erillinen lähetys ja vastaanotto, transit-sijainti tai reittiin perustuva suunnittelu. Esikatsele kirjaus ja tarkista syntyvät nimike- ja varastotapahtumat.",
+        "nb-NO": "Bokfører en omklassifiseringskladd for å flytte eksisterende lager mellom lokasjoner eller hyller, endre dimensjoner eller omklassifisere sporingsdata. Angi gjeldende og ny lokasjon/hylle på samme linje, og kontroller vare, mengde, parti-/serienumre og lagerkrav. Bruk en overføringsordre når flyttingen trenger separat levering og mottak, transittlokasjon eller rutebasert planlegging. Forhåndsvis bokføringen og kontroller vare- og lagerpostene som opprettes."
+      }
+    },
+    {
+      "ruleId": "BCExpansion.CalculateInventory",
+      "taskType": "CalculateInventory",
+      "semanticAction": "CalculateInventory",
+      "entity": "PhysicalInventoryJournal",
+      "priority": 1300,
+      "confidence": 0.96,
+      "match": {
+        "pagePatterns": [
+          "^Phys\\. Inventory Journal$",
+          "^Inventeringsjournal$",
+          "^Feuille inventaire$",
+          "^Inventur Buch\\.-Blatt$",
+          "^Diario inventario físico$",
+          "^Lageropgørelseskladde$",
+          "^Inventointipäiväkirja$",
+          "^Vareopptellingskladd$"
+        ],
+        "actionPatterns": [
+          "^Calculate Inventory$",
+          "^Beräkna lager$",
+          "^Calculer stock$",
+          "^Lagerbestand berechnen$",
+          "^Calcular inventario$",
+          "^Beregn beholdning$",
+          "^Laske varasto$"
+        ],
+        "fieldPatterns": [],
+        "automationIdPatterns": []
+      },
+      "instructionTemplate": "",
+      "languages": [
+        "en-US",
+        "sv-SE",
+        "fr-FR",
+        "de-DE",
+        "es-ES",
+        "da-DK",
+        "fi-FI",
+        "nb-NO"
+      ],
+      "aliases": [],
+      "sourceIds": [
+        "microsoft-learn-expansion-inventory-how-count-adjust-reclassify-en-us",
+        "microsoft-learn-expansion-inventory-how-count-adjust-reclassify-sv-se",
+        "microsoft-learn-expansion-inventory-how-count-adjust-reclassify-fr-fr",
+        "microsoft-learn-expansion-inventory-how-count-adjust-reclassify-de-de",
+        "microsoft-learn-expansion-inventory-how-count-adjust-reclassify-es-es",
+        "microsoft-learn-expansion-inventory-how-count-adjust-reclassify-da-dk",
+        "microsoft-learn-expansion-inventory-how-count-adjust-reclassify-fi-fi",
+        "microsoft-learn-expansion-inventory-how-count-adjust-reclassify-nb-no"
+      ],
+      "localizedExplanations": {
+        "en-US": "This creates physical inventory journal lines with calculated stock quantities for the selected filters. Those quantities are a starting point for the count, not evidence of what was physically counted.",
+        "sv-SE": "Här skapas inventeringsjournalrader med beräknade lagersaldon enligt valda filter. Saldona är ett underlag för inventeringen, inte ett bevis på vad som faktiskt räknats.",
+        "fr-FR": "Cette action crée les lignes d’inventaire avec le stock calculé selon les filtres. Ces quantités servent de base au comptage et ne prouvent pas les quantités réellement constatées.",
+        "de-DE": "Es werden Inventurzeilen mit berechnetem Bestand gemäß den Filtern erstellt. Diese Mengen bilden die Grundlage der Zählung und sind kein Nachweis des tatsächlich gezählten Bestands.",
+        "es-ES": "Crea líneas de inventario físico con existencias calculadas según los filtros. Son la base del recuento, no una prueba de las cantidades contadas físicamente.",
+        "da-DK": "Der oprettes lageropgørelseslinjer med beregnet beholdning efter filtrene. Antallene er grundlag for optællingen, ikke dokumentation for det fysisk optalte antal.",
+        "fi-FI": "Toiminto luo inventointirivit, joilla on suodattimien mukainen laskettu varastomäärä. Määrät ovat laskennan lähtökohta, eivät todiste fyysisesti lasketusta määrästä.",
+        "nb-NO": "Det opprettes opptellingslinjer med beregnet beholdning etter filtrene. Antallene er et grunnlag for opptellingen, ikke bevis på fysisk opptalt antall."
+      }
+    },
+    {
+      "ruleId": "BCExpansion.CountedQuantity",
+      "taskType": "CountedQuantity",
+      "semanticAction": "CountedQuantity",
+      "entity": "PhysicalInventoryJournal",
+      "priority": 1300,
+      "confidence": 0.96,
+      "match": {
+        "pagePatterns": [
+          "^Phys\\. Inventory Journal$",
+          "^Inventeringsjournal$",
+          "^Feuille inventaire$",
+          "^Inventur Buch\\.-Blatt$",
+          "^Diario inventario físico$",
+          "^Lageropgørelseskladde$",
+          "^Inventointipäiväkirja$",
+          "^Vareopptellingskladd$"
+        ],
+        "actionPatterns": [],
+        "fieldPatterns": [
+          "^Qty\\. \\(Phys\\. Inventory\\)$",
+          "^Antal inventerat$",
+          "^Qté \\(constatée\\)$",
+          "^Inventurmenge$",
+          "^Cdad\\. \\(stock físico\\)$",
+          "^Antal \\(optalt\\)$",
+          "^Määrä \\(inventointi\\)$",
+          "^Antall \\(opptalt\\)$"
+        ],
+        "automationIdPatterns": []
+      },
+      "instructionTemplate": "",
+      "languages": [
+        "en-US",
+        "sv-SE",
+        "fr-FR",
+        "de-DE",
+        "es-ES",
+        "da-DK",
+        "fi-FI",
+        "nb-NO"
+      ],
+      "aliases": [],
+      "sourceIds": [
+        "microsoft-learn-expansion-inventory-how-count-adjust-reclassify-en-us",
+        "microsoft-learn-expansion-inventory-how-count-adjust-reclassify-sv-se",
+        "microsoft-learn-expansion-inventory-how-count-adjust-reclassify-fr-fr",
+        "microsoft-learn-expansion-inventory-how-count-adjust-reclassify-de-de",
+        "microsoft-learn-expansion-inventory-how-count-adjust-reclassify-es-es",
+        "microsoft-learn-expansion-inventory-how-count-adjust-reclassify-da-dk",
+        "microsoft-learn-expansion-inventory-how-count-adjust-reclassify-fi-fi",
+        "microsoft-learn-expansion-inventory-how-count-adjust-reclassify-nb-no"
+      ],
+      "localizedExplanations": {
+        "en-US": "Enter the quantity actually counted for this inventory line. Business Central compares it with the calculated quantity to determine the adjustment. Entering the count alone does not post the adjustment.",
+        "sv-SE": "Ange det antal som faktiskt räknats för inventeringsraden. Business Central jämför det med beräknat antal för att bestämma justeringen. Inmatningen bokför inte i sig lagerjusteringen.",
+        "fr-FR": "Saisissez la quantité réellement comptée pour cette ligne. Business Central la compare à la quantité calculée pour déterminer l’ajustement. La saisie seule ne valide pas cet ajustement.",
+        "de-DE": "Erfassen Sie die tatsächlich gezählte Menge dieser Inventurzeile. Business Central vergleicht sie mit der berechneten Menge zur Ermittlung der Korrektur. Die Eingabe allein bucht die Korrektur nicht.",
+        "es-ES": "Introduzca la cantidad realmente contada para el artículo y la combinación de seguimiento de esta línea. Business Central la compara con la cantidad calculada para determinar el ajuste de inventario. Compruebe la ubicación, variante y lote o número de serie, si se usan. El recuento debe reflejar el stock físico; introducirlo no registra por sí solo el ajuste.",
+        "da-DK": "Indtast det antal, der faktisk er optalt for varen og linjens eventuelle sporingskombination. Business Central sammenligner det med det beregnede antal for at fastlægge lagerreguleringen. Kontrollér lokation, variant og lot- eller serienummer, hvis de bruges. Optællingen skal afspejle det fysiske lager; indtastningen bogfører ikke reguleringen.",
+        "fi-FI": "Syötä riville nimikkeestä ja sen mahdollisesta seurantayhdistelmästä fyysisesti laskettu määrä. Business Central vertaa sitä laskettuun määrään varast oikaisun määrittämiseksi. Tarkista sijainti, variantti sekä erä- tai sarjanumero, jos niitä käytetään. Määrän tulee vastata fyysistä varastoa; syöttäminen ei itsessään kirjaa oikaisua.",
+        "nb-NO": "Angi antallet som faktisk er telt for varen og eventuell sporingskombinasjon på linjen. Business Central sammenligner det med beregnet antall for å fastsette lagerjusteringen. Kontroller lokasjon, variant og parti- eller serienummer hvis de brukes. Tellingen skal gjenspeile fysisk lager; registreringen bokfører ikke justeringen i seg selv."
+      }
+    },
+    {
+      "ruleId": "BCExpansion.PostTransfer",
+      "taskType": "PostTransfer",
+      "semanticAction": "PostTransfer",
+      "entity": "TransferOrder",
+      "priority": 1300,
+      "confidence": 0.96,
+      "match": {
+        "pagePatterns": [
+          "^Transfer Order$",
+          "^Överföringsorder$",
+          "^Ordre de transfer$",
+          "^Umlagerungsauftrag$",
+          "^Pedido de transferencia$",
+          "^Overflytningsordre$",
+          "^Siirtotilaus$",
+          "^Overføringsordrer$"
+        ],
+        "actionPatterns": [
+          "^Post$",
+          "^bokför$",
+          "^Valider$",
+          "^Buchen$",
+          "^Registrar$",
+          "^Bogfør$",
+          "^Kirjaa$",
+          "^Bokfør$"
+        ],
+        "fieldPatterns": [],
+        "automationIdPatterns": []
+      },
+      "instructionTemplate": "",
+      "languages": [
+        "en-US",
+        "sv-SE",
+        "fr-FR",
+        "de-DE",
+        "es-ES",
+        "da-DK",
+        "fi-FI",
+        "nb-NO"
+      ],
+      "aliases": [],
+      "sourceIds": [
+        "microsoft-learn-expansion-inventory-how-transfer-between-locations-en-us",
+        "microsoft-learn-expansion-inventory-how-transfer-between-locations-sv-se",
+        "microsoft-learn-expansion-inventory-how-transfer-between-locations-fr-fr",
+        "microsoft-learn-expansion-inventory-how-transfer-between-locations-de-de",
+        "microsoft-learn-expansion-inventory-how-transfer-between-locations-es-es",
+        "microsoft-learn-expansion-inventory-how-transfer-between-locations-da-dk",
+        "microsoft-learn-expansion-inventory-how-transfer-between-locations-fi-fi",
+        "microsoft-learn-expansion-inventory-how-transfer-between-locations-nb-no"
+      ],
+      "localizedExplanations": {
+        "en-US": "Posts the selected stage of a transfer order between the From-Location and To-Location. With an in-transit location, Ship moves quantity out of the source and into transit; Receive records it at the destination. Direct transfer can post both sides at once, subject to Inventory Setup and warehouse handling. Check routes, locations, lines, quantities, tracking numbers, and the Ship/Receive choice before confirming. Tracked serial or lot numbers must arrive unchanged. A posted shipment can be undone only before receipt; then correct the order and post again.",
+        "sv-SE": "Bokför det valda steget i en överföringsorder mellan Från-lagerställe och Till-lagerställe. Med en transitplats flyttar Utleverans kvantiteten från källan till transit och Inleverans registrerar den på destinationen. Direktöverföring kan bokföra båda sidor på en gång beroende på Lagerinställningar och lagerhantering. Kontrollera överföringsväg, lagerställen, rader, antal, spårningsnummer och valet Utleverans/Inleverans före bekräftelse. Spårade serie- och partinummer måste tas emot oförändrade. En bokförd utleverans kan ångras endast före mottagningen; korrigera därefter ordern och bokför igen.",
+        "fr-FR": "Valide l’étape choisie d’un transfert entre les magasins source et destination. Avec un emplacement de transit, Expédier déplace la quantité vers le transit et Recevoir l’enregistre à destination ; le transfert direct peut comptabiliser les deux côtés selon la configuration et la gestion d’entrepôt. Vérifiez les itinéraires, emplacements, lignes, quantités, numéros suivis et l’option avant de confirmer. Les numéros de série ou de lot doivent être reçus sans changement. Une expédition validée peut être annulée uniquement avant réception.",
+        "de-DE": "Bucht den ausgewählten Schritt eines Umlagerungsauftrags zwischen Von- und Nach-Lagerort. Mit Transitlagerort verschiebt Liefern die Menge in den Transit und Empfangen bucht sie am Ziel; direkte Umlagerung kann abhängig von Einrichtung und Lagerabwicklung beide Seiten buchen. Prüfen Sie Routen, Lagerorte, Zeilen, Mengen, Trackingnummern und die Auswahl vor der Bestätigung. Serien- und Chargennummern müssen unverändert eingehen. Eine gebuchte Lieferung kann nur vor dem Eingang rückgängig gemacht werden.",
+        "es-ES": "Registra la etapa elegida de una orden de transferencia entre la ubicación de origen y destino. Con ubicación de tránsito, Enviar mueve la cantidad al tránsito y Recibir la registra en destino; la transferencia directa puede registrar ambos lados según la configuración y la gestión del almacén. Revise rutas, ubicaciones, líneas, cantidades, números de seguimiento y opción antes de confirmar. Los números de serie o lote deben recibirse sin cambios. El envío registrado solo se puede deshacer antes de la recepción.",
+        "da-DK": "Bogfører det valgte trin i en overflytningsordre mellem Fra- og Til-lokation. Med en transitlokation flytter Levering mængden til transit, og Modtagelse registrerer den på destinationen; direkte overflytning kan bogføre begge sider afhængigt af opsætning og lagerhåndtering. Kontrollér ruter, lokationer, linjer, antal, sporingsnumre og valg før bekræftelse. Serie- og lotnumre skal modtages uændret. En bogført levering kan kun fortrydes før modtagelse.",
+        "fi-FI": "Kirjaa valitun vaiheen siirtotilauksesta lähde- ja kohdesijainnin välillä. Transit-sijainnilla Lähetys siirtää määrän transit-varastoon ja Vastaanotto kirjaa sen kohteeseen; suora siirto voi kirjata molemmat puolet asetusten ja varastokäsittelyn mukaan. Tarkista reitit, sijainnit, rivit, määrät, seurantatunnukset ja valinta ennen vahvistusta. Sarja- ja eränumerot on vastaanotettava muuttumattomina. Kirjatun lähetyksen voi peruuttaa vain ennen vastaanottoa.",
+        "nb-NO": "Bokfører valgt trinn i en overføringsordre mellom fra- og til-lokasjon. Med en transittlokasjon flytter Levering mengden til transitt, og Mottak registrerer den på målet; direkte overføring kan bokføre begge sider avhengig av oppsett og lagerhåndtering. Kontroller ruter, lokasjoner, linjer, mengder, sporingsnumre og valg før bekreftelse. Serie- og partinumre må mottas uendret. En bokført levering kan bare angres før mottak."
+      }
+    },
+    {
+      "ruleId": "BCExpansion.PostPhysicalInventory",
+      "taskType": "PostPhysicalInventory",
+      "semanticAction": "PostPhysicalInventory",
+      "entity": "PhysicalInventoryJournal",
+      "priority": 1300,
+      "confidence": 0.96,
+      "match": {
+        "pagePatterns": [
+          "^Phys\\. Inventory Journal$",
+          "^Inventeringsjournal$",
+          "^Feuille inventaire$",
+          "^Inventur Buch\\.-Blatt$",
+          "^Diario inventario físico$",
+          "^Lageropgørelseskladde$",
+          "^Inventointipäiväkirja$",
+          "^Vareopptellingskladd$"
+        ],
+        "actionPatterns": [
+          "^Post$",
+          "^Bokför$",
+          "^Valider$",
+          "^Buchen$",
+          "^Registrar$",
+          "^Bogfør$",
+          "^Kirjaus$",
+          "^Bokfør$"
+        ],
+        "fieldPatterns": [],
+        "automationIdPatterns": []
+      },
+      "instructionTemplate": "",
+      "languages": [
+        "en-US",
+        "sv-SE",
+        "fr-FR",
+        "de-DE",
+        "es-ES",
+        "da-DK",
+        "fi-FI",
+        "nb-NO"
+      ],
+      "aliases": [],
+      "sourceIds": [
+        "microsoft-learn-expansion-inventory-how-count-adjust-reclassify-en-us",
+        "microsoft-learn-expansion-inventory-how-count-adjust-reclassify-sv-se",
+        "microsoft-learn-expansion-inventory-how-count-adjust-reclassify-fr-fr",
+        "microsoft-learn-expansion-inventory-how-count-adjust-reclassify-de-de",
+        "microsoft-learn-expansion-inventory-how-count-adjust-reclassify-es-es",
+        "microsoft-learn-expansion-inventory-how-count-adjust-reclassify-da-dk",
+        "microsoft-learn-expansion-inventory-how-count-adjust-reclassify-fi-fi",
+        "microsoft-learn-expansion-inventory-how-count-adjust-reclassify-nb-no"
+      ],
+      "localizedExplanations": {
+        "en-US": "Posting records inventory differences between calculated and physically counted quantities. Check the counted quantities and locations first. A warehouse physical inventory journal has a separate registration process.",
+        "sv-SE": "Bokföringen registrerar skillnader mellan beräknat och faktiskt inventerat antal. Kontrollera räknade antal och lagerställen först. Inventeringsjournal för distributionslager har ett separat registreringsförfarande.",
+        "fr-FR": "La comptabilisation enregistre dans le stock les écarts entre les quantités calculées et réellement comptées pour les lignes sélectionnées. Avant de confirmer, vérifiez les quantités saisies, les magasins, variantes et numéros de lot ou de série, ainsi que les filtres de la feuille. Les écritures créées ajustent le stock ; une feuille d’inventaire d’entrepôt suit une procédure d’enregistrement distincte.",
+        "de-DE": "Die Buchung übernimmt die Abweichungen zwischen berechneten und tatsächlich gezählten Mengen der ausgewählten Zeilen in den Lagerbestand. Prüfen Sie vor der Bestätigung die Zählmengen, Lagerorte, Varianten sowie Chargen- oder Seriennummern und die Filter des Journals. Die erzeugten Posten korrigieren den Bestand; ein Lagerinventur-Buch.-Blatt hat einen eigenen Registrierungsablauf.",
+        "es-ES": "El registro aplica al inventario las diferencias entre las cantidades calculadas y las realmente contadas en las líneas seleccionadas. Antes de confirmar, revise las cantidades, ubicaciones, variantes, lotes o números de serie y los filtros del diario. Los movimientos resultantes ajustan las existencias; el diario de inventario físico de almacén tiene un proceso de registro distinto.",
+        "da-DK": "Bogføringen overfører forskellene mellem beregnet og faktisk optalt antal på de valgte linjer til lageret. Kontrollér optællinger, lokationer, varianter, lot- eller serienumre og kladdens filtre før bekræftelse. De oprettede poster regulerer beholdningen; en lageropgørelseskladde har en særskilt registreringsproces.",
+        "fi-FI": "Kirjaus vie valittujen rivien lasketun ja fyysisesti lasketun määrän erot varastoon. Tarkista ennen vahvistamista syötetyt määrät, sijainnit, variantit, erä- tai sarjanumerot sekä päiväkirjan suodattimet. Luodut tapahtumat oikaisevat varastoa; fyysisen varaston päiväkirjalla on erillinen rekisteröintiprosessi.",
+        "nb-NO": "Bokføringen registrerer differansen mellom beregnet og faktisk opptalt antall for de valgte linjene i lageret. Kontroller opptalte mengder, lokasjoner, varianter, parti- eller serienumre og kladdens filtre før bekreftelse. Postene som opprettes justerer beholdningen; en lageropptellingskladd har en egen registreringsprosess."
+      }
+    }
+  ],
+  "sources": [
+    {
+      "sourceId": "microsoft-learn-expansion-inventory-how-count-adjust-reclassify-en-us",
+      "title": "Count, adjust, and reclassify inventory - Business Central | Microsoft Learn",
+      "sourceUri": "https://learn.microsoft.com/en-us/dynamics365/business-central/inventory-how-count-adjust-reclassify",
+      "accessedDate": "2026-09-28",
+      "appliesTo": "Business Central standard functionality. Microsoft Learn captions checked; tenant/version-specific UI captions remain unverified.",
+      "fields": [
+        "This creates physical inventory journal lines with calculated stock quantities for the selected filters. Those quantities are a starting point for the count, not evidence of what was physically counted.",
+        "Enter the quantity actually counted for this inventory line. Business Central compares it with the calculated quantity to determine the adjustment. Entering the count alone does not post the adjustment.",
+        "Posting records inventory differences between calculated and physically counted quantities. Check the counted quantities and locations first. A warehouse physical inventory journal has a separate registration process."
+      ],
+      "documentedCaptions": [
+        "Phys. Inventory Journal",
+        "Calculate Inventory",
+        "Qty. (Phys. Inventory)",
+        "Post"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-expansion-inventory-how-count-adjust-reclassify-sv-se",
+      "title": "Inventera, justera och gruppera lager - Business Central | Microsoft Learn",
+      "sourceUri": "https://learn.microsoft.com/sv-se/dynamics365/business-central/inventory-how-count-adjust-reclassify",
+      "accessedDate": "2026-09-28",
+      "appliesTo": "Business Central standard functionality. Microsoft Learn captions checked; tenant/version-specific UI captions remain unverified.",
+      "fields": [
+        "This creates physical inventory journal lines with calculated stock quantities for the selected filters. Those quantities are a starting point for the count, not evidence of what was physically counted.",
+        "Enter the quantity actually counted for this inventory line. Business Central compares it with the calculated quantity to determine the adjustment. Entering the count alone does not post the adjustment.",
+        "Posting records inventory differences between calculated and physically counted quantities. Check the counted quantities and locations first. A warehouse physical inventory journal has a separate registration process."
+      ],
+      "documentedCaptions": [
+        "Inventeringsjournal",
+        "Beräkna lager",
+        "Antal inventerat",
+        "Bokför"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-expansion-inventory-how-count-adjust-reclassify-fr-fr",
+      "title": "Inventaire, ajustement et reclassement du stock - Business Central | Microsoft Learn",
+      "sourceUri": "https://learn.microsoft.com/fr-fr/dynamics365/business-central/inventory-how-count-adjust-reclassify",
+      "accessedDate": "2026-09-28",
+      "appliesTo": "Business Central standard functionality. Microsoft Learn captions checked; tenant/version-specific UI captions remain unverified.",
+      "fields": [
+        "This creates physical inventory journal lines with calculated stock quantities for the selected filters. Those quantities are a starting point for the count, not evidence of what was physically counted.",
+        "Enter the quantity actually counted for this inventory line. Business Central compares it with the calculated quantity to determine the adjustment. Entering the count alone does not post the adjustment.",
+        "Posting records inventory differences between calculated and physically counted quantities. Check the counted quantities and locations first. A warehouse physical inventory journal has a separate registration process."
+      ],
+      "documentedCaptions": [
+        "Feuille inventaire",
+        "Calculer stock",
+        "Qté (constatée)",
+        "Valider"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-expansion-inventory-how-count-adjust-reclassify-de-de",
+      "title": "Lagerbestand erfassen, regulieren und umbuchen - Business Central | Microsoft Learn",
+      "sourceUri": "https://learn.microsoft.com/de-de/dynamics365/business-central/inventory-how-count-adjust-reclassify",
+      "accessedDate": "2026-09-28",
+      "appliesTo": "Business Central standard functionality. Microsoft Learn captions checked; tenant/version-specific UI captions remain unverified.",
+      "fields": [
+        "This creates physical inventory journal lines with calculated stock quantities for the selected filters. Those quantities are a starting point for the count, not evidence of what was physically counted.",
+        "Enter the quantity actually counted for this inventory line. Business Central compares it with the calculated quantity to determine the adjustment. Entering the count alone does not post the adjustment.",
+        "Posting records inventory differences between calculated and physically counted quantities. Check the counted quantities and locations first. A warehouse physical inventory journal has a separate registration process."
+      ],
+      "documentedCaptions": [
+        "Inventur Buch.-Blatt",
+        "Lagerbestand berechnen",
+        "Inventurmenge",
+        "Buchen"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-expansion-inventory-how-count-adjust-reclassify-es-es",
+      "title": "Recontar, ajustar y reclasificar inventario - Business Central | Microsoft Learn",
+      "sourceUri": "https://learn.microsoft.com/es-es/dynamics365/business-central/inventory-how-count-adjust-reclassify",
+      "accessedDate": "2026-09-28",
+      "appliesTo": "Business Central standard functionality. Microsoft Learn captions checked; tenant/version-specific UI captions remain unverified.",
+      "fields": [
+        "This creates physical inventory journal lines with calculated stock quantities for the selected filters. Those quantities are a starting point for the count, not evidence of what was physically counted.",
+        "Enter the quantity actually counted for this inventory line. Business Central compares it with the calculated quantity to determine the adjustment. Entering the count alone does not post the adjustment.",
+        "Posting records inventory differences between calculated and physically counted quantities. Check the counted quantities and locations first. A warehouse physical inventory journal has a separate registration process."
+      ],
+      "documentedCaptions": [
+        "Diario inventario físico",
+        "Calcular inventario",
+        "Cdad. (stock físico)",
+        "Registrar"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-expansion-inventory-how-count-adjust-reclassify-da-dk",
+      "title": "Tælle, regulere og ompostere lager - Business Central | Microsoft Learn",
+      "sourceUri": "https://learn.microsoft.com/da-dk/dynamics365/business-central/inventory-how-count-adjust-reclassify",
+      "accessedDate": "2026-09-28",
+      "appliesTo": "Business Central standard functionality. Microsoft Learn captions checked; tenant/version-specific UI captions remain unverified.",
+      "fields": [
+        "This creates physical inventory journal lines with calculated stock quantities for the selected filters. Those quantities are a starting point for the count, not evidence of what was physically counted.",
+        "Enter the quantity actually counted for this inventory line. Business Central compares it with the calculated quantity to determine the adjustment. Entering the count alone does not post the adjustment.",
+        "Posting records inventory differences between calculated and physically counted quantities. Check the counted quantities and locations first. A warehouse physical inventory journal has a separate registration process."
+      ],
+      "documentedCaptions": [
+        "Lageropgørelseskladde",
+        "Beregn beholdning",
+        "Antal (optalt)",
+        "Bogfør"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-expansion-inventory-how-count-adjust-reclassify-fi-fi",
+      "title": "Varaston laskeminen, muuttaminen ja uudelleenluokitteleminen - Business Central | Microsoft Learn",
+      "sourceUri": "https://learn.microsoft.com/fi-fi/dynamics365/business-central/inventory-how-count-adjust-reclassify",
+      "accessedDate": "2026-09-28",
+      "appliesTo": "Business Central standard functionality. Microsoft Learn captions checked; tenant/version-specific UI captions remain unverified.",
+      "fields": [
+        "This creates physical inventory journal lines with calculated stock quantities for the selected filters. Those quantities are a starting point for the count, not evidence of what was physically counted.",
+        "Enter the quantity actually counted for this inventory line. Business Central compares it with the calculated quantity to determine the adjustment. Entering the count alone does not post the adjustment.",
+        "Posting records inventory differences between calculated and physically counted quantities. Check the counted quantities and locations first. A warehouse physical inventory journal has a separate registration process."
+      ],
+      "documentedCaptions": [
+        "Inventointipäiväkirja",
+        "Laske varasto",
+        "Määrä (inventointi)",
+        "Kirjaus"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-expansion-inventory-how-count-adjust-reclassify-nb-no",
+      "title": "Tell, juster og klassifiser lagerbeholdning på nytt - Business Central | Microsoft Learn",
+      "sourceUri": "https://learn.microsoft.com/nb-no/dynamics365/business-central/inventory-how-count-adjust-reclassify",
+      "accessedDate": "2026-09-28",
+      "appliesTo": "Business Central standard functionality. Microsoft Learn captions checked; tenant/version-specific UI captions remain unverified.",
+      "fields": [
+        "This creates physical inventory journal lines with calculated stock quantities for the selected filters. Those quantities are a starting point for the count, not evidence of what was physically counted.",
+        "Enter the quantity actually counted for this inventory line. Business Central compares it with the calculated quantity to determine the adjustment. Entering the count alone does not post the adjustment.",
+        "Posting records inventory differences between calculated and physically counted quantities. Check the counted quantities and locations first. A warehouse physical inventory journal has a separate registration process."
+      ],
+      "documentedCaptions": [
+        "Vareopptellingskladd",
+        "Beregn beholdning",
+        "Antall (opptalt)",
+        "Bokfør"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-expansion-inventory-how-transfer-between-locations-en-us",
+      "title": "Transfer items between warehouse locations - Business Central | Microsoft Learn",
+      "sourceUri": "https://learn.microsoft.com/en-us/dynamics365/business-central/inventory-how-transfer-between-locations",
+      "accessedDate": "2026-09-28",
+      "appliesTo": "Business Central standard functionality. Microsoft Learn captions checked; tenant/version-specific UI captions remain unverified.",
+      "fields": [
+        "Posts the selected stage of a transfer order. With an in-transit location, Ship moves quantity to transit and Receive records it at the destination. Direct transfer can post both sides subject to setup. Tracked serial or lot numbers must arrive unchanged. A posted shipment can be undone only before receipt."
+      ],
+      "documentedCaptions": [
+        "Transfer Order",
+        "Post"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-expansion-inventory-how-transfer-between-locations-sv-se",
+      "title": "Så här överför du artiklar mellan olika distributionslagerplatser - Business Central | Microsoft Learn",
+      "sourceUri": "https://learn.microsoft.com/sv-se/dynamics365/business-central/inventory-how-transfer-between-locations",
+      "accessedDate": "2026-09-28",
+      "appliesTo": "Business Central standard functionality. Microsoft Learn captions checked; tenant/version-specific UI captions remain unverified.",
+      "fields": [
+        "Bokför valt steg i överföringsordern. Med transitplats flyttar Utleverans mängden till transit och Inleverans registrerar den på destinationen. Direktöverföring kan bokföra båda sidor beroende på inställningarna. Spårade serie- och partinummer ska tas emot oförändrade. En bokförd utleverans kan bara ångras före mottagningen."
+      ],
+      "documentedCaptions": [
+        "Överföringsorder",
+        "bokför"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-expansion-inventory-how-transfer-between-locations-fr-fr",
+      "title": "Transfert d’articles entre des entrepôts - Business Central | Microsoft Learn",
+      "sourceUri": "https://learn.microsoft.com/fr-fr/dynamics365/business-central/inventory-how-transfer-between-locations",
+      "accessedDate": "2026-09-28",
+      "appliesTo": "Business Central standard functionality. Microsoft Learn captions checked; tenant/version-specific UI captions remain unverified.",
+      "fields": [
+        "This starts posting for a transfer between locations. The posting choice and transfer setup determine whether shipment, receipt or direct transfer is recorded. The click alone does not identify which part completed."
+      ],
+      "documentedCaptions": [
+        "Ordre de transfer",
+        "Valider"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-expansion-inventory-how-transfer-between-locations-de-de",
+      "title": "Artikel zwischen Lagerorten transferieren - Business Central | Microsoft Learn",
+      "sourceUri": "https://learn.microsoft.com/de-de/dynamics365/business-central/inventory-how-transfer-between-locations",
+      "accessedDate": "2026-09-28",
+      "appliesTo": "Business Central standard functionality. Microsoft Learn captions checked; tenant/version-specific UI captions remain unverified.",
+      "fields": [
+        "This starts posting for a transfer between locations. The posting choice and transfer setup determine whether shipment, receipt or direct transfer is recorded. The click alone does not identify which part completed."
+      ],
+      "documentedCaptions": [
+        "Umlagerungsauftrag",
+        "Buchen"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-expansion-inventory-how-transfer-between-locations-es-es",
+      "title": "Transferir productos entre almacenes - Business Central | Microsoft Learn",
+      "sourceUri": "https://learn.microsoft.com/es-es/dynamics365/business-central/inventory-how-transfer-between-locations",
+      "accessedDate": "2026-09-28",
+      "appliesTo": "Business Central standard functionality. Microsoft Learn captions checked; tenant/version-specific UI captions remain unverified.",
+      "fields": [
+        "This starts posting for a transfer between locations. The posting choice and transfer setup determine whether shipment, receipt or direct transfer is recorded. The click alone does not identify which part completed."
+      ],
+      "documentedCaptions": [
+        "Pedido de transferencia",
+        "Registrar"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-expansion-inventory-how-transfer-between-locations-da-dk",
+      "title": "Overføre varer mellem lagerlokationer - Business Central | Microsoft Learn",
+      "sourceUri": "https://learn.microsoft.com/da-dk/dynamics365/business-central/inventory-how-transfer-between-locations",
+      "accessedDate": "2026-09-28",
+      "appliesTo": "Business Central standard functionality. Microsoft Learn captions checked; tenant/version-specific UI captions remain unverified.",
+      "fields": [
+        "This starts posting for a transfer between locations. The posting choice and transfer setup determine whether shipment, receipt or direct transfer is recorded. The click alone does not identify which part completed."
+      ],
+      "documentedCaptions": [
+        "Overflytningsordre",
+        "Bogfør"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-expansion-inventory-how-transfer-between-locations-fi-fi",
+      "title": "Nimikkeiden siirtäminen varastosijaintien välillä - Business Central | Microsoft Learn",
+      "sourceUri": "https://learn.microsoft.com/fi-fi/dynamics365/business-central/inventory-how-transfer-between-locations",
+      "accessedDate": "2026-09-28",
+      "appliesTo": "Business Central standard functionality. Microsoft Learn captions checked; tenant/version-specific UI captions remain unverified.",
+      "fields": [
+        "This starts posting for a transfer between locations. The posting choice and transfer setup determine whether shipment, receipt or direct transfer is recorded. The click alone does not identify which part completed."
+      ],
+      "documentedCaptions": [
+        "Siirtotilaus",
+        "Kirjaa"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-expansion-inventory-how-transfer-between-locations-nb-no",
+      "title": "Overfør varer mellom lagerlokasjoner - Business Central | Microsoft Learn",
+      "sourceUri": "https://learn.microsoft.com/nb-no/dynamics365/business-central/inventory-how-transfer-between-locations",
+      "accessedDate": "2026-09-28",
+      "appliesTo": "Business Central standard functionality. Microsoft Learn captions checked; tenant/version-specific UI captions remain unverified.",
+      "fields": [
+        "This starts posting for a transfer between locations. The posting choice and transfer setup determine whether shipment, receipt or direct transfer is recorded. The click alone does not identify which part completed."
+      ],
+      "documentedCaptions": [
+        "Overføringsordrer",
+        "Bokfør"
+      ]
+    },
+    {
+      "sourceId": "inventory-reclassify-transfer-en-us",
+      "title": "Transfer items between warehouse locations — Business Central",
+      "sourceUri": "https://learn.microsoft.com/en-us/dynamics365/business-central/inventory-how-transfer-between-locations",
+      "accessedDate": "2026-09-29",
+      "appliesTo": "Business Central standard item reclassification journal. English Microsoft Learn procedure.",
+      "fields": [
+        "Item Reclassification Journal can directly transfer stock between locations or bins, change lot/serial numbers or expiration dates, and reclassify blank-location inventory. Set current and new location, then post. Transfer orders are for separate ship/receive and in-transit workflows; setup affects supported warehouse handling."
+      ],
+      "documentedCaptions": [
+        "Item Reclass. Journals",
+        "Item Reclass. Journal",
+        "Location Code",
+        "New Location Code",
+        "Post"
+      ]
+    },
+    {
+      "sourceId": "inventory-reclassify-transfer-sv-se",
+      "title": "Överföra artiklar mellan lagerställen — Business Central",
+      "sourceUri": "https://learn.microsoft.com/sv-se/dynamics365/business-central/inventory-how-transfer-between-locations",
+      "accessedDate": "2026-09-29",
+      "appliesTo": "Business Central standard item reclassification journal. Swedish Microsoft Learn procedure; UI captions should be confirmed in the target tenant.",
+      "fields": [
+        "Artikelomklassificeringsjournal kan flytta lager direkt mellan lagerställen eller fack, ändra parti-/serienummer eller utgångsdatum och omklassificera lager utan lagerställe. Ange nuvarande och nytt lagerställe och bokför. Överföringsorder hanterar separat utleverans/inleverans och transit; inställningarna påverkar lagerhanteringsstödet."
+      ],
+      "documentedCaptions": [
+        "Artikelomklassificeringsjournaler",
+        "Artikelomklassificeringsjournal",
+        "Lagerställekod",
+        "Ny lagerställekod",
+        "Bokför"
+      ]
+    },
+    {
+      "sourceId": "inventory-reclassify-transfer-fr-fr",
+      "title": "Transfert d articles entre des entrepots — Business Central",
+      "sourceUri": "https://learn.microsoft.com/fr-fr/dynamics365/business-central/inventory-how-transfer-between-locations",
+      "accessedDate": "2026-09-29",
+      "appliesTo": "Business Central standard inventory transfers and item reclassification. Localized Microsoft Learn source; tenant extension/version and UI captions are not verified.",
+      "fields": [
+        "The article distinguishes transfer orders, which can track in-transit stock and use separate shipment and receipt, from the item reclassification journal, which can directly transfer items between locations or bins and change tracking or expiration data."
+      ],
+      "documentedCaptions": [
+        "Ordres de transfert",
+        "Feuilles reclassement article"
+      ]
+    },
+    {
+      "sourceId": "inventory-reclassify-transfer-de-de",
+      "title": "Artikel zwischen Lagerorten transferieren — Business Central",
+      "sourceUri": "https://learn.microsoft.com/de-de/dynamics365/business-central/inventory-how-transfer-between-locations",
+      "accessedDate": "2026-09-29",
+      "appliesTo": "Business Central standard inventory transfers and item reclassification. Localized Microsoft Learn source; tenant extension/version and UI captions are not verified.",
+      "fields": [
+        "The article distinguishes transfer orders, which can track in-transit stock and use separate shipment and receipt, from the item reclassification journal, which can directly transfer items between locations or bins and change tracking or expiration data."
+      ],
+      "documentedCaptions": [
+        "Umlagerungsaufträge",
+        "Umbuchungsjournal"
+      ]
+    },
+    {
+      "sourceId": "inventory-reclassify-transfer-es-es",
+      "title": "Transferir productos entre almacenes — Business Central",
+      "sourceUri": "https://learn.microsoft.com/es-es/dynamics365/business-central/inventory-how-transfer-between-locations",
+      "accessedDate": "2026-09-29",
+      "appliesTo": "Business Central standard inventory transfers and item reclassification. Localized Microsoft Learn source; tenant extension/version and UI captions are not verified.",
+      "fields": [
+        "The article distinguishes transfer orders, which can track in-transit stock and use separate shipment and receipt, from the item reclassification journal, which can directly transfer items between locations or bins and change tracking or expiration data."
+      ],
+      "documentedCaptions": [
+        "Órdenes de transferencia",
+        "Diarios reclasificación productos"
+      ]
+    },
+    {
+      "sourceId": "inventory-reclassify-transfer-da-dk",
+      "title": "Overføre varer mellem lagerlokationer — Business Central",
+      "sourceUri": "https://learn.microsoft.com/da-dk/dynamics365/business-central/inventory-how-transfer-between-locations",
+      "accessedDate": "2026-09-29",
+      "appliesTo": "Business Central standard inventory transfers and item reclassification. Localized Microsoft Learn source; tenant extension/version and UI captions are not verified.",
+      "fields": [
+        "The article distinguishes transfer orders, which can track in-transit stock and use separate shipment and receipt, from the item reclassification journal, which can directly transfer items between locations or bins and change tracking or expiration data."
+      ],
+      "documentedCaptions": [
+        "Overførselsordrer",
+        "Vareomklassificeringskladder"
+      ]
+    },
+    {
+      "sourceId": "inventory-reclassify-transfer-fi-fi",
+      "title": "Nimikkeiden siirtäminen varastosijaintien välillä — Business Central",
+      "sourceUri": "https://learn.microsoft.com/fi-fi/dynamics365/business-central/inventory-how-transfer-between-locations",
+      "accessedDate": "2026-09-29",
+      "appliesTo": "Business Central standard inventory transfers and item reclassification. Localized Microsoft Learn source; tenant extension/version and UI captions are not verified.",
+      "fields": [
+        "The article distinguishes transfer orders, which can track in-transit stock and use separate shipment and receipt, from the item reclassification journal, which can directly transfer items between locations or bins and change tracking or expiration data."
+      ],
+      "documentedCaptions": [
+        "Siirtotilaukset",
+        "Nimikkeen uudelleenluokittelupäiväkirjat"
+      ]
+    },
+    {
+      "sourceId": "inventory-reclassify-transfer-nb-no",
+      "title": "Overfør varer mellom lagerlokasjoner — Business Central",
+      "sourceUri": "https://learn.microsoft.com/nb-no/dynamics365/business-central/inventory-how-transfer-between-locations",
+      "accessedDate": "2026-09-29",
+      "appliesTo": "Business Central standard inventory transfers and item reclassification. Localized Microsoft Learn source; tenant extension/version and UI captions are not verified.",
+      "fields": [
+        "The article distinguishes transfer orders, which can track in-transit stock and use separate shipment and receipt, from the item reclassification journal, which can directly transfer items between locations or bins and change tracking or expiration data."
+      ],
+      "documentedCaptions": [
+        "Overføringsordrer",
+        "Vareomklassifiseringskladder"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,512 @@
+{
+  "packId": "bc-intercompany",
+  "name": "Business Central intercompany",
+  "version": "1.0.0",
+  "priority": 220,
+  "rules": [
+    {
+      "ruleId": "Intercompany.SetupAccountsAndDimensions",
+      "taskType": "SetupIntercompanyMappings",
+      "semanticAction": "SetupIntercompanyMappings",
+      "entity": "IntercompanySetup",
+      "priority": 1310,
+      "confidence": 0.96,
+      "verifiedRuntimeLocales": [
+        "en-US",
+        "sv-SE"
+      ],
+      "match": {
+        "pagePatterns": [
+          "^Intercompany Setup$",
+          "^Koncernintern inställning$",
+          "^Företagsintern installation$"
+        ],
+        "actionPatterns": [
+          "^IC Chart of Accounts$",
+          "^IC-dimensions$",
+          "^Koncernintern kontoplan$"
+        ],
+        "fieldPatterns": [],
+        "automationIdPatterns": []
+      },
+      "instructionTemplate": "",
+      "languages": [
+        "en-US",
+        "sv-SE",
+        "fr-FR",
+        "de-DE",
+        "es-ES",
+        "da-DK",
+        "fi-FI",
+        "nb-NO"
+      ],
+      "aliases": [],
+      "sourceIds": [
+        "microsoft-learn-expansion-intercompany-how-setup-en-us",
+        "microsoft-learn-expansion-intercompany-how-setup-sv-se",
+        "microsoft-learn-expansion-intercompany-how-setup-fr-fr",
+        "microsoft-learn-expansion-intercompany-how-setup-de-de",
+        "microsoft-learn-expansion-intercompany-how-setup-es-es",
+        "microsoft-learn-expansion-intercompany-how-setup-da-dk",
+        "microsoft-learn-expansion-intercompany-how-setup-fi-fi",
+        "microsoft-learn-expansion-intercompany-how-setup-nb-no"
+      ],
+      "localizedExplanations": {
+        "en-US": "Use this setup action to define or review the shared intercompany chart of accounts and, when the companies exchange dimensions, the shared intercompany dimensions. Agree on the common structure with every partner before mapping. Each company maps its local accounts and dimensions both to and from the shared intercompany structure; mapping only one direction can misclassify incoming or outgoing transactions. Selecting a synchronization partner can copy that baseline structure, but does not complete each company's mappings or post transactions. For partners in another tenant or environment, connection and authentication setup is a separate prerequisite.",
+        "sv-SE": "Använd inställningsåtgärden för att definiera eller granska den gemensamma koncerninterna kontoplanen och, om bolagen utbyter dimensioner, de gemensamma koncerninterna dimensionerna. Kom överens om strukturen med alla partnerbolag innan mappningen görs. Varje bolag mappar sina lokala konton och dimensioner både till och från den gemensamma strukturen; mappning åt bara ett håll kan ge fel konto eller dimension på inkommande eller utgående transaktioner. En synkroniseringspartner kan tillhandahålla basstrukturen, men varje bolags mappningar behöver fortfarande göras och inga transaktioner bokförs här. Partner i en annan klientorganisation eller miljö kräver separat anslutnings- och autentiseringskonfiguration.",
+        "fr-FR": "Utilisez cette action de configuration pour définir ou vérifier le plan comptable intersociétés commun et, si les sociétés échangent des axes analytiques, les axes communs. Convenez de la structure avec tous les partenaires avant le mappage. Chaque société doit mapper ses comptes et axes locaux dans les deux sens avec la structure commune ; un mappage unidirectionnel peut attribuer un compte ou un axe incorrect aux transactions entrantes ou sortantes. Le partenaire de synchronisation peut fournir la structure de base, mais chaque société doit encore effectuer ses mappages. Cette configuration ne comptabilise aucune transaction. Les partenaires d’un autre locataire ou environnement nécessitent une configuration de connexion et d’authentification distincte.",
+        "de-DE": "Verwenden Sie diese Einrichtungsaktion, um den gemeinsamen Intercompany-Kontenplan und bei einem Dimensionenaustausch auch die gemeinsamen Intercompany-Dimensionen festzulegen oder zu prüfen. Stimmen Sie die Struktur mit allen Partnerunternehmen ab, bevor Sie Zuordnungen vornehmen. Jedes Unternehmen ordnet seine lokalen Konten und Dimensionen in beide Richtungen der gemeinsamen Struktur zu; eine einseitige Zuordnung kann eingehende oder ausgehende Transaktionen falsch zuordnen. Ein Synchronisierungspartner kann die Basisstruktur bereitstellen, aber jedes Unternehmen muss seine Zuordnungen weiterhin selbst abschließen. Diese Einrichtung bucht keine Transaktionen. Partner in einem anderen Mandanten oder einer anderen Umgebung erfordern eine separate Verbindungs- und Authentifizierungseinrichtung.",
+        "es-ES": "Use esta acción de configuración para definir o revisar el plan de cuentas intercompañía compartido y, si las empresas intercambian dimensiones, las dimensiones comunes. Acuerde la estructura con todos los socios antes de realizar las asignaciones. Cada empresa asigna sus cuentas y dimensiones locales en ambas direcciones respecto a la estructura común; asignar solo en un sentido puede clasificar incorrectamente las transacciones entrantes o salientes. Un socio de sincronización puede proporcionar la estructura base, pero cada empresa debe completar sus asignaciones. Esta configuración no registra transacciones. Los socios de otro inquilino o entorno requieren una configuración independiente de conexión y autenticación.",
+        "da-DK": "Brug denne opsætningshandling til at definere eller gennemgå den fælles koncerninterne kontoplan og, hvis virksomhederne udveksler dimensioner, de fælles koncerninterne dimensioner. Aftal strukturen med alle partnere, før du opretter tilknytninger. Hver virksomhed tilknytter sine lokale konti og dimensioner i begge retninger til den fælles struktur; en ensrettet tilknytning kan give forkerte konti eller dimensioner på indgående eller udgående transaktioner. En synkroniseringspartner kan levere grundstrukturen, men hver virksomhed skal stadig fuldføre sine tilknytninger. Denne opsætning bogfører ikke transaktioner. Partnere i en anden lejer eller et andet miljø kræver særskilt forbindelse og godkendelse.",
+        "fi-FI": "Määritä tai tarkista tällä asetustoiminnolla yhteinen konsernin sisäinen tilikartta ja tarvittaessa yhteiset konsernin sisäiset dimensiot. Sopikaa yhteisestä rakenteesta kaikkien kumppanien kanssa ennen määritysten tekemistä. Kukin yritys yhdistää paikalliset tilinsä ja dimensioidensa arvot yhteiseen rakenteeseen molempiin suuntiin; vain yksisuuntainen määritys voi luokitella saapuvat tai lähtevät tapahtumat väärin. Synkronointikumppani voi antaa perusrakenteen, mutta yritysten on silti tehtävä omat määrityksensä. Tämä asetus ei kirjaa tapahtumia. Toisessa vuokraajassa tai ympäristössä olevat kumppanit edellyttävät erillistä yhteys- ja todennusmääritystä.",
+        "nb-NO": "Bruk denne oppsettshandlingen til å definere eller kontrollere den felles konserninterne kontoplanen og, hvis selskapene utveksler dimensjoner, de felles konserninterne dimensjonene. Avtal strukturen med alle partnerne før du tilordner. Hvert selskap tilordner sine lokale kontoer og dimensjoner begge veier mot den felles strukturen; enveis tilordning kan klassifisere innkommende eller utgående transaksjoner feil. En synkroniseringspartner kan levere grunnstrukturen, men hvert selskap må fortsatt fullføre sine tilordninger. Dette oppsettet bokfører ikke transaksjoner. Partnere i en annen leier eller et annet miljø krever separat tilkoblings- og autentiseringsoppsett."
+      }
+    },
+    {
+      "ruleId": "BCExpansion.ImportInbox",
+      "taskType": "ImportInbox",
+      "semanticAction": "ImportInbox",
+      "entity": "IntercompanyInbox",
+      "priority": 1300,
+      "confidence": 0.96,
+      "match": {
+        "pagePatterns": [
+          "^Intercompany Inbox Transactions$",
+          "^Koncerninterna inkorgstransaktioner$",
+          "^Transactions boîte de réception Intersociétés$",
+          "^Intercompany-Eingangstransaktionen$",
+          "^Transacciones de bandeja de entrada entre empresas vinculadas$",
+          "^Koncerninterne indbakketransaktioner$",
+          "^Konsernin Saapuneet-kansion tapahtumat$",
+          "^Konserninterne inngående transaksjoner$"
+        ],
+        "actionPatterns": [
+          "^Import Transaction File$",
+          "^Importera transaktionsfil$",
+          "^Importer le fichier de transaction$",
+          "^Transaktionsdatei importieren$",
+          "^Importar archivo de transacción$",
+          "^Indlæs transaktionsfil$",
+          "^Tuo tapahtumatiedosto$",
+          "^Importer transaksjonsfil$"
+        ],
+        "fieldPatterns": [],
+        "automationIdPatterns": []
+      },
+      "instructionTemplate": "",
+      "languages": [
+        "en-US",
+        "sv-SE",
+        "fr-FR",
+        "de-DE",
+        "es-ES",
+        "da-DK",
+        "fi-FI",
+        "nb-NO"
+      ],
+      "aliases": [],
+      "sourceIds": [
+        "microsoft-learn-expansion-intercompany-how-manage-intercompany-inbox-en-us",
+        "microsoft-learn-expansion-intercompany-how-manage-intercompany-inbox-sv-se",
+        "microsoft-learn-expansion-intercompany-how-manage-intercompany-inbox-fr-fr",
+        "microsoft-learn-expansion-intercompany-how-manage-intercompany-inbox-de-de",
+        "microsoft-learn-expansion-intercompany-how-manage-intercompany-inbox-es-es",
+        "microsoft-learn-expansion-intercompany-how-manage-intercompany-inbox-da-dk",
+        "microsoft-learn-expansion-intercompany-how-manage-intercompany-inbox-fi-fi",
+        "microsoft-learn-expansion-intercompany-how-manage-intercompany-inbox-nb-no"
+      ],
+      "localizedExplanations": {
+        "en-US": "Import Transaction File is available only in on-premises deployments. It loads the partner file into Intercompany Inbox Transactions; check that the partner and transaction lines are expected before processing. Importing only stages the transactions and does not create posted entries.",
+        "sv-SE": "Importera transaktionsfil är endast tillgängligt i lokala (on-premises) installationer. Åtgärden läser in partnerns fil i Koncerninterna inkorgstransaktioner. Kontrollera att partnern och transaktionsraderna är förväntade innan du behandlar dem. Importen läser bara in underlaget och skapar inga bokförda poster.",
+        "fr-FR": "L’action Importer le fichier de transaction est disponible uniquement dans les déploiements locaux (on-premises). Elle charge le fichier du partenaire dans les transactions de la boîte de réception intersociétés. Vérifiez le partenaire et les lignes reçues avant leur traitement. L’import prépare les transactions, mais ne crée aucune écriture comptabilisée.",
+        "de-DE": "Transaktionsdatei importieren ist nur bei lokalen (On-Premises-)Bereitstellungen verfügbar. Die Partnerdatei wird in die Intercompany-Eingangstransaktionen eingelesen. Prüfen Sie vor der Verarbeitung den Partner und die Transaktionszeilen. Der Import stellt die Transaktionen lediglich bereit und erzeugt keine gebuchten Posten.",
+        "es-ES": "Importar archivo de transacción solo está disponible en implementaciones locales (on-premises). Carga el archivo del socio en las transacciones de la bandeja de entrada entre empresas vinculadas. Compruebe el socio y las líneas recibidas antes de procesarlas. La importación prepara las transacciones, pero no crea movimientos registrados.",
+        "da-DK": "Indlæs transaktionsfil er kun tilgængelig i lokale (on-premises) installationer. Den indlæser partnerens fil i de koncerninterne indbakketransaktioner. Kontroller partneren og transaktionslinjerne, før de behandles. Importen klargør kun transaktionerne og opretter ikke bogførte poster.",
+        "fi-FI": "Tuo tapahtumatiedosto on käytettävissä vain paikallisissa (on-premises) asennuksissa. Se tuo kumppanin tiedoston konsernin Saapuneet-kansion tapahtumiin. Tarkista kumppani ja tapahtumarivit ennen käsittelyä. Tuonti valmistelee tapahtumat mutta ei luo kirjattuja tapahtumia.",
+        "nb-NO": "Importer transaksjonsfil er bare tilgjengelig i lokale (on-premises) installasjoner. Den laster partnerens fil inn i konserninterne innboks-transaksjoner. Kontroller partneren og transaksjonslinjene før du behandler dem. Importen klargjør transaksjonene, men oppretter ingen bokførte poster."
+      }
+    },
+    {
+      "ruleId": "BCExpansion.CompleteInbox",
+      "taskType": "CompleteInbox",
+      "semanticAction": "CompleteInbox",
+      "entity": "IntercompanyInbox",
+      "priority": 1300,
+      "confidence": 0.96,
+      "match": {
+        "pagePatterns": [
+          "^Intercompany Inbox Transactions$",
+          "^Koncerninterna inkorgstransaktioner$",
+          "^Transactions boîte de réception Intersociétés$",
+          "^Intercompany-Eingangstransaktionen$",
+          "^Transacciones de bandeja de entrada entre empresas vinculadas$",
+          "^Koncerninterne indbakketransaktioner$",
+          "^Konsernin Saapuneet-kansion tapahtumat$",
+          "^Konserninterne inngående transaksjoner$"
+        ],
+        "actionPatterns": [
+          "^Complete IC Inbox Action$",
+          "^Slutför IC-inkorgsåtgärd$",
+          "^Terminer l’action de la boîte de réception IC$",
+          "^IC-Eingangsvorgang abschl\\.$",
+          "^Completa acc\\. band\\. entrada IC$",
+          "^Fuldfør IC-indbakkehandling$",
+          "^Tot\\. kons\\. Saap\\.-kansion toim\\.$",
+          "^Fullfør KI-innbokshandling$"
+        ],
+        "fieldPatterns": [],
+        "automationIdPatterns": []
+      },
+      "instructionTemplate": "",
+      "languages": [
+        "en-US",
+        "sv-SE",
+        "fr-FR",
+        "de-DE",
+        "es-ES",
+        "da-DK",
+        "fi-FI",
+        "nb-NO"
+      ],
+      "aliases": [],
+      "sourceIds": [
+        "microsoft-learn-expansion-intercompany-how-manage-intercompany-inbox-en-us",
+        "microsoft-learn-expansion-intercompany-how-manage-intercompany-inbox-sv-se",
+        "microsoft-learn-expansion-intercompany-how-manage-intercompany-inbox-fr-fr",
+        "microsoft-learn-expansion-intercompany-how-manage-intercompany-inbox-de-de",
+        "microsoft-learn-expansion-intercompany-how-manage-intercompany-inbox-es-es",
+        "microsoft-learn-expansion-intercompany-how-manage-intercompany-inbox-da-dk",
+        "microsoft-learn-expansion-intercompany-how-manage-intercompany-inbox-fi-fi",
+        "microsoft-learn-expansion-intercompany-how-manage-intercompany-inbox-nb-no"
+      ],
+      "localizedExplanations": {
+        "en-US": "On Intercompany Inbox Transactions, Complete IC Inbox Action processes the selected line decisions. Accept creates a local document or journal lines for review and posting; it does not post them. Reject or return sends the line back to the partner’s outbox. If an accepted document was deleted before posting, recreate the inbox transaction from Handled IC Inbox Transactions before continuing.",
+        "sv-SE": "På Koncerninterna inkorgstransaktioner behandlar Slutför IC-inkorgsåtgärd de valda radåtgärderna. Acceptera skapar ett lokalt dokument eller journalrader som ska granskas och bokföras separat; åtgärden bokför dem inte. Avvisa eller returnera skickar raden till partnerns utkorg. Om ett accepterat dokument har raderats innan det bokförts kan inkorgstransaktionen återskapas från Hanterade koncerninterna inkorgstransaktioner.",
+        "fr-FR": "Dans Transactions boîte de réception Intersociétés, Terminer l’action de la boîte de réception IC traite les décisions choisies pour les lignes. Accepter crée un document local ou des lignes de feuille à vérifier et à valider séparément ; l’action ne les valide pas. Rejeter ou renvoyer transmet la ligne à la boîte d’envoi du partenaire. Si un document accepté a été supprimé avant validation, recréez la transaction à partir des transactions de boîte de réception traitées.",
+        "de-DE": "Unter Intercompany-Eingangstransaktionen verarbeitet IC-Eingangsvorgang abschließen die ausgewählten Zeilenentscheidungen. Annehmen erstellt einen lokalen Beleg oder Buch.-Blattzeilen, die separat geprüft und gebucht werden müssen; die Aktion bucht sie nicht. Ablehnen oder Zurücksenden überträgt die Zeile an den Ausgang des Partners. Wurde ein angenommener Beleg vor der Buchung gelöscht, erstellen Sie die Eingangstransaktion aus den erledigten Intercompany-Eingangstransaktionen neu.",
+        "es-ES": "En las transacciones de bandeja de entrada entre empresas vinculadas, Completa acc. band. entrada IC procesa las decisiones seleccionadas para cada línea. Aceptar crea un documento local o líneas de diario que deben revisarse y registrarse por separado; la acción no las registra. Rechazar o devolver envía la línea a la bandeja de salida del socio. Si se elimina un documento aceptado antes de registrarlo, vuelva a crear la transacción desde las transacciones de bandeja de entrada gestionadas.",
+        "da-DK": "På Koncerninterne indbakketransaktioner behandler Fuldfør IC-indbakkehandling de valgte linjehandlinger. Acceptér opretter et lokalt dokument eller kladdelinjer, som skal gennemgås og bogføres særskilt; handlingen bogfører dem ikke. Afvis eller returnér sender linjen tilbage til partnerens udbakke. Hvis et accepteret dokument blev slettet før bogføring, skal indbakketransaktionen genskabes fra Behandlede IC-indbakketransaktioner.",
+        "fi-FI": "Konsernin Saapuneet-kansion tapahtumat -sivulla Tot. kons. Saap.-kansion toim. käsittelee rivien valitut toiminnot. Hyväksy luo paikallisen asiakirjan tai päiväkirjarivejä, jotka on tarkistettava ja kirjattava erikseen; tämä toiminto ei kirjaa niitä. Hylkää tai palauta lähettää rivin kumppanin Lähtevät-kansioon. Jos hyväksytty asiakirja poistettiin ennen kirjaamista, luo Saapuneet-kansion tapahtuma uudelleen käsitellyistä tapahtumista.",
+        "nb-NO": "På Konserninterne inngående transaksjoner behandler Fullfør KI-innbokshandling de valgte linjehandlingene. Godta oppretter et lokalt dokument eller kladdelinjer som må gjennomgås og bokføres separat; handlingen bokfører dem ikke. Avvis eller returner sender linjen tilbake til partnerens utboks. Hvis et godtatt dokument ble slettet før bokføring, kan innbokstransaksjonen opprettes på nytt fra Behandlede KI-innbokstransaksjoner."
+      }
+    },
+    {
+      "ruleId": "BCExpansion.SendOutbox",
+      "taskType": "SendOutbox",
+      "semanticAction": "SendOutbox",
+      "entity": "IntercompanyOutbox",
+      "priority": 1300,
+      "confidence": 0.96,
+      "match": {
+        "pagePatterns": [
+          "^Intercompany Outbox Transactions$",
+          "^Koncerninterna utkorgstransaktioner$",
+          "^Transactions boîte d’envoi Intersociétés$",
+          "^Intercompany-Ausgangstransaktionen$",
+          "^Transacciones de bandeja de salida entre empresas vinculadas$",
+          "^Koncerninterne udbakketransaktioner$",
+          "^Konsernin Lähtevät-kansion tapahtumat$",
+          "^Konserninterne utgående transaksjoner$"
+        ],
+        "actionPatterns": [
+          "^Send to Intercompany Partner$",
+          "^Skicka till en koncernintern partner$",
+          "^Envoyer au partenaire Intersociétés$",
+          "^An Intercompany-Partner senden$",
+          "^Enviar a socio de empresas vinculadas$",
+          "^Send til koncernintern partner$",
+          "^Lähetä konsernikumppanille$",
+          "^Send til konsernintern partner$"
+        ],
+        "fieldPatterns": [],
+        "automationIdPatterns": []
+      },
+      "instructionTemplate": "",
+      "languages": [
+        "en-US",
+        "sv-SE",
+        "fr-FR",
+        "de-DE",
+        "es-ES",
+        "da-DK",
+        "fi-FI",
+        "nb-NO"
+      ],
+      "aliases": [],
+      "sourceIds": [
+        "microsoft-learn-expansion-intercompany-how-manage-intercompany-inbox-en-us",
+        "microsoft-learn-expansion-intercompany-how-manage-intercompany-inbox-sv-se",
+        "microsoft-learn-expansion-intercompany-how-manage-intercompany-inbox-fr-fr",
+        "microsoft-learn-expansion-intercompany-how-manage-intercompany-inbox-de-de",
+        "microsoft-learn-expansion-intercompany-how-manage-intercompany-inbox-es-es",
+        "microsoft-learn-expansion-intercompany-how-manage-intercompany-inbox-da-dk",
+        "microsoft-learn-expansion-intercompany-how-manage-intercompany-inbox-fi-fi",
+        "microsoft-learn-expansion-intercompany-how-manage-intercompany-inbox-nb-no"
+      ],
+      "localizedExplanations": {
+        "en-US": "On Intercompany Outbox Transactions, Send to Intercompany Partner transfers the selected posted intercompany transactions to the partner’s inbox. Sending does not confirm acceptance or posting in the partner company. Return to Inbox lets you process the transaction again; Cancel does not reverse the original posting, so correct that source transaction separately.",
+        "sv-SE": "På Koncerninterna utkorgstransaktioner överför Skicka till en koncernintern partner de valda bokförda koncerntransaktionerna till partnerns inkorg. Skickandet bekräftar inte att partnerföretaget har accepterat eller bokfört dem. Returnera till inkorg gör det möjligt att behandla transaktionen igen. Avbryt återför inte den ursprungliga bokföringen, så rätta källtransaktionen separat.",
+        "fr-FR": "Dans Transactions boîte d’envoi Intersociétés, Envoyer au partenaire Intersociétés transfère les transactions intersociétés sélectionnées et comptabilisées vers la boîte de réception du partenaire. L’envoi ne confirme ni leur acceptation ni leur validation dans la société partenaire. Retourner à la boîte de réception permet de les traiter de nouveau ; Annuler n’annule pas la comptabilisation d’origine : corrigez séparément la transaction source.",
+        "de-DE": "Unter Intercompany-Ausgangstransaktionen überträgt An Intercompany-Partner senden die ausgewählten gebuchten Intercompany-Transaktionen an den Eingang des Partners. Das Senden bestätigt weder Annahme noch Buchung in der Partnerfirma. Mit Zur Eingang zurück können Sie die Transaktion erneut verarbeiten. Abbrechen macht die ursprüngliche Buchung nicht rückgängig; korrigieren Sie die Quelltransaktion separat.",
+        "es-ES": "En las transacciones de bandeja de salida entre empresas vinculadas, Enviar a socio de empresas vinculadas transfiere al buzón del socio las transacciones intercompañía seleccionadas y registradas. El envío no confirma que la empresa asociada las haya aceptado o registrado. Devolver a bandeja de entrada permite procesarlas de nuevo; Cancelar no revierte el registro original, por lo que debe corregir la transacción de origen por separado.",
+        "da-DK": "På Koncerninterne udbakketransaktioner overfører Send til koncernintern partner de valgte bogførte koncerntransaktioner til partnerens indbakke. Afsendelsen bekræfter ikke accept eller bogføring i partnerfirmaet. Returnér til indbakke giver mulighed for at behandle transaktionen igen. Annuller tilbagefører ikke den oprindelige bogføring, så kildetransaktionen skal korrigeres særskilt.",
+        "fi-FI": "Konsernin Lähtevät-kansion tapahtumat -sivulla Lähetä konsernikumppanille siirtää valitut kirjatut konsernitapahtumat kumppanin Saapuneet-kansioon. Lähetys ei vahvista, että kumppani olisi hyväksynyt tai kirjannut tapahtumat. Palauta Saapuneet-kansioon mahdollistaa uuden käsittelyn. Peruuta ei peruuta alkuperäistä kirjausta, joten lähdetapahtuma on korjattava erikseen.",
+        "nb-NO": "På Konserninterne utgående transaksjoner overfører Send til konsernintern partner de valgte bokførte konserntransaksjonene til partnerens innboks. Sending bekrefter ikke aksept eller bokføring i partnerselskapet. Returner til innboks gjør det mulig å behandle transaksjonen på nytt. Avbryt reverserer ikke den opprinnelige bokføringen, så kildetransaksjonen må korrigeres separat."
+      }
+    }
+  ],
+  "sources": [
+    {
+      "sourceId": "microsoft-learn-expansion-intercompany-how-setup-en-us",
+      "title": "Set up intercompany transaction posting - Business Central | Microsoft Learn",
+      "sourceUri": "https://learn.microsoft.com/en-us/dynamics365/business-central/intercompany-how-setup",
+      "accessedDate": "2026-09-29",
+      "appliesTo": "Business Central intercompany configuration, common account/dimension structures and mappings. Runtime captions checked in English; tenant version remains unverified.",
+      "fields": [
+        "All partners must use the same intercompany chart of accounts and, if used, common intercompany dimensions.",
+        "Each partner maps local accounts and dimensions to and from the shared intercompany structure.",
+        "A synchronization partner can provide the baseline. Connection and authentication setup is required separately for partners in a different tenant/environment."
+      ],
+      "documentedCaptions": [
+        "Intercompany Setup",
+        "IC Chart of Accounts",
+        "IC Dimensions"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-expansion-intercompany-how-setup-sv-se",
+      "title": "Konfigurera postning av koncerninterna transaktioner - Business Central | Microsoft Learn",
+      "sourceUri": "https://learn.microsoft.com/sv-se/dynamics365/business-central/intercompany-how-setup",
+      "accessedDate": "2026-09-29",
+      "appliesTo": "Business Central koncernintern konfiguration, gemensamma konto-/dimensionsstrukturer och mappningar. Runtimeetiketter kontrollerade på svenska; tenantversion är inte verifierad.",
+      "fields": [
+        "Alla partnerbolag använder samma koncerninterna kontoplan och vid behov gemensamma koncerninterna dimensioner.",
+        "Varje partner mappar lokala konton och dimensioner både till och från den gemensamma strukturen.",
+        "En synkroniseringspartner kan tillhandahålla basstrukturen. Separat anslutnings- och autentiseringskonfiguration krävs för partner i annan klientorganisation eller miljö."
+      ],
+      "documentedCaptions": [
+        "Koncernintern inställning",
+        "IC-kontoplan",
+        "IC-dimensioner"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-expansion-intercompany-how-manage-intercompany-inbox-en-us",
+      "title": "Manage the Intercompany Inbox and Outbox - Business Central | Microsoft Learn",
+      "sourceUri": "https://learn.microsoft.com/en-us/dynamics365/business-central/intercompany-how-manage-intercompany-inbox",
+      "accessedDate": "2026-09-28",
+      "appliesTo": "Business Central standard functionality. Microsoft Learn captions checked; tenant/version-specific UI captions remain unverified.",
+      "fields": [
+        "The import reads an intercompany transaction file into the inbox. Review the partner and transactions before choosing how to process them; importing is not posting.",
+        "This processes inbox transactions according to their selected line actions. Accepted transactions can create documents or journal lines for further processing; completion does not prove that these have been posted.",
+        "The selected outgoing transactions are sent to the intercompany partner using the configured transfer method. Sending does not mean the partner has accepted or posted them."
+      ],
+      "documentedCaptions": [
+        "Intercompany Inbox Transactions",
+        "Import Transaction File",
+        "Complete IC Inbox Action",
+        "Intercompany Outbox Transactions",
+        "Send to Intercompany Partner"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-expansion-intercompany-how-manage-intercompany-inbox-sv-se",
+      "title": "Hantera koncerninterna in- och utkorgar - Business Central | Microsoft Learn",
+      "sourceUri": "https://learn.microsoft.com/sv-se/dynamics365/business-central/intercompany-how-manage-intercompany-inbox",
+      "accessedDate": "2026-09-28",
+      "appliesTo": "Business Central standard functionality. Microsoft Learn captions checked; tenant/version-specific UI captions remain unverified.",
+      "fields": [
+        "The import reads an intercompany transaction file into the inbox. Review the partner and transactions before choosing how to process them; importing is not posting.",
+        "This processes inbox transactions according to their selected line actions. Accepted transactions can create documents or journal lines for further processing; completion does not prove that these have been posted.",
+        "The selected outgoing transactions are sent to the intercompany partner using the configured transfer method. Sending does not mean the partner has accepted or posted them."
+      ],
+      "documentedCaptions": [
+        "Koncerninterna inkorgstransaktioner",
+        "Importera transaktionsfil",
+        "Slutför IC-inkorgsåtgärd",
+        "Koncerninterna utkorgstransaktioner",
+        "Skicka till en koncernintern partner"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-expansion-intercompany-how-manage-intercompany-inbox-fr-fr",
+      "title": "Gestion de la boîte de réception et la boîte d’envoi intersociétés - Business Central | Microsoft Learn",
+      "sourceUri": "https://learn.microsoft.com/fr-fr/dynamics365/business-central/intercompany-how-manage-intercompany-inbox",
+      "accessedDate": "2026-09-28",
+      "appliesTo": "Business Central standard functionality. Microsoft Learn captions checked; tenant/version-specific UI captions remain unverified.",
+      "fields": [
+        "The import reads an intercompany transaction file into the inbox. Review the partner and transactions before choosing how to process them; importing is not posting.",
+        "This processes inbox transactions according to their selected line actions. Accepted transactions can create documents or journal lines for further processing; completion does not prove that these have been posted.",
+        "The selected outgoing transactions are sent to the intercompany partner using the configured transfer method. Sending does not mean the partner has accepted or posted them."
+      ],
+      "documentedCaptions": [
+        "Transactions boîte de réception Intersociétés",
+        "Importer le fichier de transaction",
+        "Terminer l’action de la boîte de réception IC",
+        "Transactions boîte d’envoi Intersociétés",
+        "Envoyer au partenaire Intersociétés"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-expansion-intercompany-how-manage-intercompany-inbox-de-de",
+      "title": "Intercompany-Eingangs- und -Ausgangsboxen verwalten - Business Central | Microsoft Learn",
+      "sourceUri": "https://learn.microsoft.com/de-de/dynamics365/business-central/intercompany-how-manage-intercompany-inbox",
+      "accessedDate": "2026-09-28",
+      "appliesTo": "Business Central standard functionality. Microsoft Learn captions checked; tenant/version-specific UI captions remain unverified.",
+      "fields": [
+        "The import reads an intercompany transaction file into the inbox. Review the partner and transactions before choosing how to process them; importing is not posting.",
+        "This processes inbox transactions according to their selected line actions. Accepted transactions can create documents or journal lines for further processing; completion does not prove that these have been posted.",
+        "The selected outgoing transactions are sent to the intercompany partner using the configured transfer method. Sending does not mean the partner has accepted or posted them."
+      ],
+      "documentedCaptions": [
+        "Intercompany-Eingangstransaktionen",
+        "Transaktionsdatei importieren",
+        "IC-Eingangsvorgang abschl.",
+        "Intercompany-Ausgangstransaktionen",
+        "An Intercompany-Partner senden"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-expansion-intercompany-how-manage-intercompany-inbox-es-es",
+      "title": "Administrar la bandeja de entrada y la bandeja de salida intercompañía - Business Central | Microsoft Learn",
+      "sourceUri": "https://learn.microsoft.com/es-es/dynamics365/business-central/intercompany-how-manage-intercompany-inbox",
+      "accessedDate": "2026-09-28",
+      "appliesTo": "Business Central standard functionality. Microsoft Learn captions checked; tenant/version-specific UI captions remain unverified.",
+      "fields": [
+        "The import reads an intercompany transaction file into the inbox. Review the partner and transactions before choosing how to process them; importing is not posting.",
+        "This processes inbox transactions according to their selected line actions. Accepted transactions can create documents or journal lines for further processing; completion does not prove that these have been posted.",
+        "The selected outgoing transactions are sent to the intercompany partner using the configured transfer method. Sending does not mean the partner has accepted or posted them."
+      ],
+      "documentedCaptions": [
+        "Transacciones de bandeja de entrada entre empresas vinculadas",
+        "Importar archivo de transacción",
+        "Completa acc. band. entrada IC",
+        "Transacciones de bandeja de salida entre empresas vinculadas",
+        "Enviar a socio de empresas vinculadas"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-expansion-intercompany-how-manage-intercompany-inbox-da-dk",
+      "title": "Administrere koncernintern-indbakke og -udbakke - Business Central | Microsoft Learn",
+      "sourceUri": "https://learn.microsoft.com/da-dk/dynamics365/business-central/intercompany-how-manage-intercompany-inbox",
+      "accessedDate": "2026-09-28",
+      "appliesTo": "Business Central standard functionality. Microsoft Learn captions checked; tenant/version-specific UI captions remain unverified.",
+      "fields": [
+        "The import reads an intercompany transaction file into the inbox. Review the partner and transactions before choosing how to process them; importing is not posting.",
+        "This processes inbox transactions according to their selected line actions. Accepted transactions can create documents or journal lines for further processing; completion does not prove that these have been posted.",
+        "The selected outgoing transactions are sent to the intercompany partner using the configured transfer method. Sending does not mean the partner has accepted or posted them."
+      ],
+      "documentedCaptions": [
+        "Koncerninterne indbakketransaktioner",
+        "Indlæs transaktionsfil",
+        "Fuldfør IC-indbakkehandling",
+        "Koncerninterne udbakketransaktioner",
+        "Send til koncernintern partner"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-expansion-intercompany-how-manage-intercompany-inbox-fi-fi",
+      "title": "Konsernin Saapuneet- ja Lähtevät-kansion hallinta - Business Central | Microsoft Learn",
+      "sourceUri": "https://learn.microsoft.com/fi-fi/dynamics365/business-central/intercompany-how-manage-intercompany-inbox",
+      "accessedDate": "2026-09-28",
+      "appliesTo": "Business Central standard functionality. Microsoft Learn captions checked; tenant/version-specific UI captions remain unverified.",
+      "fields": [
+        "The import reads an intercompany transaction file into the inbox. Review the partner and transactions before choosing how to process them; importing is not posting.",
+        "This processes inbox transactions according to their selected line actions. Accepted transactions can create documents or journal lines for further processing; completion does not prove that these have been posted.",
+        "The selected outgoing transactions are sent to the intercompany partner using the configured transfer method. Sending does not mean the partner has accepted or posted them."
+      ],
+      "documentedCaptions": [
+        "Konsernin Saapuneet-kansion tapahtumat",
+        "Tuo tapahtumatiedosto",
+        "Tot. kons. Saap.-kansion toim.",
+        "Konsernin Lähtevät-kansion tapahtumat",
+        "Lähetä konsernikumppanille"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-expansion-intercompany-how-manage-intercompany-inbox-nb-no",
+      "title": "Administrer den konserninterne innboksen og utboksen - Business Central | Microsoft Learn",
+      "sourceUri": "https://learn.microsoft.com/nb-no/dynamics365/business-central/intercompany-how-manage-intercompany-inbox",
+      "accessedDate": "2026-09-28",
+      "appliesTo": "Business Central standard functionality. Microsoft Learn captions checked; tenant/version-specific UI captions remain unverified.",
+      "fields": [
+        "The import reads an intercompany transaction file into the inbox. Review the partner and transactions before choosing how to process them; importing is not posting.",
+        "This processes inbox transactions according to their selected line actions. Accepted transactions can create documents or journal lines for further processing; completion does not prove that these have been posted.",
+        "The selected outgoing transactions are sent to the intercompany partner using the configured transfer method. Sending does not mean the partner has accepted or posted them."
+      ],
+      "documentedCaptions": [
+        "Konserninterne inngående transaksjoner",
+        "Importer transaksjonsfil",
+        "Fullfør KI-innbokshandling",
+        "Konserninterne utgående transaksjoner",
+        "Send til konsernintern partner"
+      ]
+    },
+    {
+      "documentedCaptions": [],
+      "sourceUri": "https://learn.microsoft.com/fr-fr/dynamics365/business-central/intercompany-how-setup",
+      "title": "Set up intercompany transaction posting - Business Central | Microsoft Learn",
+      "sourceId": "microsoft-learn-expansion-intercompany-how-setup-fr-fr",
+      "accessedDate": "2026-09-29",
+      "fields": [
+        "Common account/dimension structures and reciprocal mappings are described in the localized Microsoft Learn route."
+      ],
+      "appliesTo": "Business Central intercompany configuration. Localized Learn route; runtime captions are not inferred for this locale."
+    },
+    {
+      "documentedCaptions": [],
+      "sourceUri": "https://learn.microsoft.com/de-de/dynamics365/business-central/intercompany-how-setup",
+      "title": "Intercompany-Transaktionen einrichten - Business Central | Microsoft Learn",
+      "sourceId": "microsoft-learn-expansion-intercompany-how-setup-de-de",
+      "accessedDate": "2026-09-29",
+      "fields": [
+        "Common account/dimension structures and reciprocal mappings are described in the localized Microsoft Learn route."
+      ],
+      "appliesTo": "Business Central intercompany configuration. Localized Learn route; runtime captions are not inferred for this locale."
+    },
+    {
+      "documentedCaptions": [],
+      "sourceUri": "https://learn.microsoft.com/es-es/dynamics365/business-central/intercompany-how-setup",
+      "title": "Configurar el registro de empresas vinculadas - Business Central | Microsoft Learn",
+      "sourceId": "microsoft-learn-expansion-intercompany-how-setup-es-es",
+      "accessedDate": "2026-09-29",
+      "fields": [
+        "Common account/dimension structures and reciprocal mappings are described in the localized Microsoft Learn route."
+      ],
+      "appliesTo": "Business Central intercompany configuration. Localized Learn route; runtime captions are not inferred for this locale."
+    },
+    {
+      "documentedCaptions": [],
+      "sourceUri": "https://learn.microsoft.com/da-dk/dynamics365/business-central/intercompany-how-setup",
+      "title": "Konfigurer koncernintern postering - Business Central | Microsoft Learn",
+      "sourceId": "microsoft-learn-expansion-intercompany-how-setup-da-dk",
+      "accessedDate": "2026-09-29",
+      "fields": [
+        "Common account/dimension structures and reciprocal mappings are described in the localized Microsoft Learn route."
+      ],
+      "appliesTo": "Business Central intercompany configuration. Localized Learn route; runtime captions are not inferred for this locale."
+    },
+    {
+      "documentedCaptions": [],
+      "sourceUri": "https://learn.microsoft.com/fi-fi/dynamics365/business-central/intercompany-how-setup",
+      "title": "Intercompany-tapahtumien kirjaamisen määrittäminen - Business Central | Microsoft Learn",
+      "sourceId": "microsoft-learn-expansion-intercompany-how-setup-fi-fi",
+      "accessedDate": "2026-09-29",
+      "fields": [
+        "Common account/dimension structures and reciprocal mappings are described in the localized Microsoft Learn route."
+      ],
+      "appliesTo": "Business Central intercompany configuration. Localized Learn route; runtime captions are not inferred for this locale."
+    },
+    {
+      "documentedCaptions": [],
+      "sourceUri": "https://learn.microsoft.com/nb-no/dynamics365/business-central/intercompany-how-setup",
+      "title": "Konfigurer konserninterne transaksjoner - Business Central | Microsoft Learn",
+      "sourceId": "microsoft-learn-expansion-intercompany-how-setup-nb-no",
+      "accessedDate": "2026-09-29",
+      "fields": [
+        "Common account/dimension structures and reciprocal mappings are described in the localized Microsoft Learn route."
+      ],
+      "appliesTo": "Business Central intercompany configuration. Localized Learn route; runtime captions are not inferred for this locale."
+    }
+  ]
+}

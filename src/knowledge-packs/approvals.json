@@ -1,0 +1,597 @@
+{
+  "packId": "bc-approvals",
+  "name": "Business Central approvals",
+  "version": "1.0.0",
+  "priority": 220,
+  "rules": [
+    {
+      "ruleId": "BCExpansion.ApproveRequest",
+      "taskType": "ApproveRequest",
+      "semanticAction": "ApproveRequest",
+      "entity": "ApprovalRequest",
+      "priority": 1300,
+      "confidence": 0.96,
+      "match": {
+        "pagePatterns": [
+          "^Requests to Approve$",
+          "^Begäranden att godkänna$",
+          "^Demandes à approuver$",
+          "^Zu genehmigende Anforderungen$",
+          "^Solicitudes para aprobar$",
+          "^Anmodninger til godkendelse$",
+          "^Hyväksyttävät pyynnöt$",
+          "^Forespørsler å godkjenne$"
+        ],
+        "actionPatterns": [
+          "^Approve$",
+          "^Godkänna$",
+          "^Approuver$",
+          "^Genehmigen$",
+          "^Aprobar$",
+          "^Godkend$",
+          "^Hyväksy$",
+          "^Godkjenn$"
+        ],
+        "fieldPatterns": [],
+        "automationIdPatterns": []
+      },
+      "instructionTemplate": "",
+      "languages": [
+        "en-US",
+        "sv-SE",
+        "fr-FR",
+        "de-DE",
+        "es-ES",
+        "da-DK",
+        "fi-FI",
+        "nb-NO"
+      ],
+      "aliases": [],
+      "sourceIds": [
+        "microsoft-learn-expansion-across-how-use-approval-workflows-en-us",
+        "microsoft-learn-expansion-across-how-use-approval-workflows-sv-se",
+        "microsoft-learn-expansion-across-how-use-approval-workflows-fr-fr",
+        "microsoft-learn-expansion-across-how-use-approval-workflows-de-de",
+        "microsoft-learn-expansion-across-how-use-approval-workflows-es-es",
+        "microsoft-learn-expansion-across-how-use-approval-workflows-da-dk",
+        "microsoft-learn-expansion-across-how-use-approval-workflows-fi-fi",
+        "microsoft-learn-expansion-across-how-use-approval-workflows-nb-no"
+      ],
+      "localizedExplanations": {
+        "en-US": "Approves the selected approval request assigned to you. Check the document and amount, then approve only if they meet the applicable limits and policy. Your approval completes your step; the workflow may still require others. Approval changes the workflow state but does not post the document or prove that it is correct.",
+        "sv-SE": "Godkänner den valda begäran som tilldelats dig. Kontrollera dokument och belopp och godkänn bara om de följer gällande gränser och policy. Ditt godkännande slutför ditt steg, men arbetsflödet kan kräva fler godkännare. Godkännandet ändrar arbetsflödets status; det bokför inte dokumentet och intygar inte att underlaget är korrekt.",
+        "fr-FR": "Approuve la demande qui vous est attribuée. Vérifiez le document et le montant, puis n’approuvez que s’ils respectent les limites et règles applicables. Votre décision termine votre étape, mais le circuit peut encore exiger d’autres approbateurs. Elle modifie l’état du circuit, sans comptabiliser le document ni certifier l’exactitude de son contenu.",
+        "de-DE": "Genehmigt die Ihnen zugewiesene Anforderung. Prüfen Sie Beleg und Betrag und genehmigen Sie nur, wenn sie den geltenden Grenzen und Richtlinien entsprechen. Ihre Genehmigung schließt Ihren Schritt ab; der Workflow kann weitere Genehmiger erfordern. Sie ändert den Workflowstatus, bucht den Beleg aber nicht und bestätigt auch nicht dessen sachliche Richtigkeit.",
+        "es-ES": "Aprueba la solicitud que tiene asignada. Revise el documento y el importe y apruebe solo si cumplen los límites y las normas aplicables. Su decisión completa su etapa, aunque el flujo puede requerir otros aprobadores. Cambia el estado del flujo, pero no registra el documento ni certifica que sus datos sean correctos.",
+        "da-DK": "Godkender den valgte anmodning, som er tildelt dig. Kontrollér dokument og beløb, og godkend kun, hvis de overholder gældende grænser og regler. Din godkendelse afslutter dit trin, men arbejdsgangen kan kræve flere godkendere. Den ændrer arbejdsgangens status, men bogfører ikke dokumentet og bekræfter ikke, at indholdet er korrekt.",
+        "fi-FI": "Hyväksyy sinulle osoitetun pyynnön. Tarkista asiakirja ja summa ja hyväksy vain, jos ne noudattavat sovellettavia rajoja ja käytäntöjä. Päätöksesi päättää oman vaiheesi, mutta työnkulku voi vaatia muitakin hyväksyjiä. Se muuttaa työnkulun tilaa, mutta ei kirjaa asiakirjaa eikä vahvista sen tietojen oikeellisuutta.",
+        "nb-NO": "Godkjenner forespørselen som er tildelt deg. Kontroller dokumentet og beløpet, og godkjenn bare hvis de følger gjeldende grenser og regler. Godkjenningen fullfører ditt trinn, men arbeidsflyten kan kreve flere godkjennere. Den endrer arbeidsflytstatusen, men bokfører ikke dokumentet og bekrefter ikke at innholdet er korrekt."
+      }
+    },
+    {
+      "ruleId": "BCExpansion.RejectRequest",
+      "taskType": "RejectRequest",
+      "semanticAction": "RejectRequest",
+      "entity": "ApprovalRequest",
+      "priority": 1300,
+      "confidence": 0.96,
+      "match": {
+        "pagePatterns": [
+          "^Requests to Approve$",
+          "^Begäranden att godkänna$",
+          "^Demandes à approuver$",
+          "^Zu genehmigende Anforderungen$",
+          "^Solicitudes para aprobar$",
+          "^Anmodninger til godkendelse$",
+          "^Hyväksyttävät pyynnöt$",
+          "^Forespørsler å godkjenne$"
+        ],
+        "actionPatterns": [
+          "^Reject$",
+          "^Avvisa$",
+          "^Rejeter$",
+          "^Ablehnen$",
+          "^Rechazar$",
+          "^Afvis$",
+          "^Hylkää$",
+          "^Avvis$"
+        ],
+        "fieldPatterns": [],
+        "automationIdPatterns": []
+      },
+      "instructionTemplate": "",
+      "languages": [
+        "en-US",
+        "sv-SE",
+        "fr-FR",
+        "de-DE",
+        "es-ES",
+        "da-DK",
+        "fi-FI",
+        "nb-NO"
+      ],
+      "aliases": [],
+      "sourceIds": [
+        "microsoft-learn-expansion-across-how-use-approval-workflows-en-us",
+        "microsoft-learn-expansion-across-how-use-approval-workflows-sv-se",
+        "microsoft-learn-expansion-across-how-use-approval-workflows-fr-fr",
+        "microsoft-learn-expansion-across-how-use-approval-workflows-de-de",
+        "microsoft-learn-expansion-across-how-use-approval-workflows-es-es",
+        "microsoft-learn-expansion-across-how-use-approval-workflows-da-dk",
+        "microsoft-learn-expansion-across-how-use-approval-workflows-fi-fi",
+        "microsoft-learn-expansion-across-how-use-approval-workflows-nb-no"
+      ],
+      "localizedExplanations": {
+        "en-US": "Rejects the selected approval request and ends the current approval attempt. Use the comment or stated reason to tell the requester what must be corrected; the requester can revise the unposted document and submit it again. Rejection does not delete, cancel, or reverse the underlying document or any posted entries.",
+        "sv-SE": "Avvisar den valda godkännandebegäran och avslutar det aktuella godkännandeförsöket. Ange i kommentaren eller orsaken vad beställaren behöver rätta. Beställaren kan ändra det obokförda dokumentet och skicka in det igen. Avvisningen raderar, makulerar eller återför inte dokumentet eller redan bokförda transaktioner.",
+        "fr-FR": "Rejette la demande sélectionnée et met fin à cette tentative d’approbation. Indiquez dans le commentaire ce que le demandeur doit corriger. Celui-ci peut modifier le document non comptabilisé et le soumettre à nouveau. Le rejet ne supprime, n’annule ni ne contre-passe le document ou des écritures déjà validées.",
+        "de-DE": "Lehnt die ausgewählte Genehmigungsanforderung ab und beendet diesen Genehmigungsversuch. Erläutern Sie im Kommentar, was der Antragsteller korrigieren muss. Er kann den noch nicht gebuchten Beleg ändern und erneut einreichen. Die Ablehnung löscht, storniert oder korrigiert weder den Beleg noch bereits gebuchte Posten.",
+        "es-ES": "Rechaza la solicitud seleccionada y finaliza este intento de aprobación. Indique en el comentario qué debe corregir el solicitante. Puede modificar el documento sin registrar y volver a enviarlo. El rechazo no elimina, cancela ni revierte el documento ni los movimientos ya registrados.",
+        "da-DK": "Afviser den valgte godkendelsesanmodning og afslutter det aktuelle forsøg. Skriv i kommentaren, hvad afsenderen skal rette. Afsenderen kan ændre det ikke-bogførte dokument og sende det igen. Afvisningen sletter, annullerer eller tilbagefører hverken dokumentet eller allerede bogførte poster.",
+        "fi-FI": "Hylkää valitun hyväksyntäpyynnön ja päättää tämän hyväksymisyrityksen. Kerro kommentissa, mitä pyynnön tekijän pitää korjata. Hän voi muuttaa kirjaamatonta asiakirjaa ja lähettää sen uudelleen. Hylkäys ei poista, peruuta eikä oikaise asiakirjaa tai jo kirjattuja tapahtumia.",
+        "nb-NO": "Avviser den valgte godkjenningsforespørselen og avslutter dette forsøket. Skriv i kommentaren hva avsenderen må rette. Avsenderen kan endre dokumentet som ikke er bokført og sende det inn på nytt. Avvisningen sletter, annullerer eller tilbakefører verken dokumentet eller allerede bokførte poster."
+      }
+    },
+    {
+      "ruleId": "BCExpansion.DelegateRequest",
+      "taskType": "DelegateRequest",
+      "semanticAction": "DelegateRequest",
+      "entity": "ApprovalRequest",
+      "priority": 1300,
+      "confidence": 0.96,
+      "match": {
+        "pagePatterns": [
+          "^Requests to Approve$",
+          "^Begäranden att godkänna$",
+          "^Demandes à approuver$",
+          "^Zu genehmigende Anforderungen$",
+          "^Solicitudes para aprobar$",
+          "^Anmodninger til godkendelse$",
+          "^Hyväksyttävät pyynnöt$",
+          "^Forespørsler å godkjenne$"
+        ],
+        "actionPatterns": [
+          "^Delegate$",
+          "^Delegera$",
+          "^Déléguer$",
+          "^Delegieren$",
+          "^Delegar$",
+          "^Uddeleger$",
+          "^Delegoi$",
+          "^Deleger$"
+        ],
+        "fieldPatterns": [],
+        "automationIdPatterns": []
+      },
+      "instructionTemplate": "",
+      "languages": [
+        "en-US",
+        "sv-SE",
+        "fr-FR",
+        "de-DE",
+        "es-ES",
+        "da-DK",
+        "fi-FI",
+        "nb-NO"
+      ],
+      "aliases": [],
+      "sourceIds": [
+        "microsoft-learn-expansion-across-how-use-approval-workflows-en-us",
+        "microsoft-learn-expansion-across-how-use-approval-workflows-sv-se",
+        "microsoft-learn-expansion-across-how-use-approval-workflows-fr-fr",
+        "microsoft-learn-expansion-across-how-use-approval-workflows-de-de",
+        "microsoft-learn-expansion-across-how-use-approval-workflows-es-es",
+        "microsoft-learn-expansion-across-how-use-approval-workflows-da-dk",
+        "microsoft-learn-expansion-across-how-use-approval-workflows-fi-fi",
+        "microsoft-learn-expansion-across-how-use-approval-workflows-nb-no"
+      ],
+      "localizedExplanations": {
+        "en-US": "Delegates the selected approval request to another approver according to the approval-user setup, commonly a configured substitute. Check that the intended recipient is available and authorized. Delegation changes who must act next; it does not approve, reject, or post the document.",
+        "sv-SE": "Delegerar den valda godkännandebegäran till en annan godkännare enligt användarinställningen, vanligtvis en konfigurerad ersättare. Kontrollera att mottagaren är tillgänglig och har rätt behörighet. Delegeringen ändrar vem som ska agera härnäst; den godkänner, avvisar eller bokför inte dokumentet.",
+        "fr-FR": "Transmet la demande sélectionnée à un autre approbateur selon le paramétrage des utilisateurs, généralement un suppléant défini. Vérifiez que le destinataire prévu est disponible et autorisé. La délégation change la personne qui doit agir ensuite ; elle n’approuve, ne rejette ni ne comptabilise le document.",
+        "de-DE": "Leitet die ausgewählte Anforderung gemäß der Genehmigungsbenutzereinrichtung an einen anderen Genehmiger weiter, üblicherweise an eine eingerichtete Vertretung. Prüfen Sie, ob die vorgesehene Person verfügbar und berechtigt ist. Dadurch ändert sich, wer als Nächstes handeln muss; der Beleg wird weder genehmigt noch abgelehnt oder gebucht.",
+        "es-ES": "Transfiere la solicitud seleccionada a otro aprobador según la configuración de usuarios, normalmente un sustituto definido. Compruebe que el destinatario previsto esté disponible y autorizado. La delegación cambia quién debe actuar a continuación; no aprueba, rechaza ni registra el documento.",
+        "da-DK": "Sender den valgte anmodning videre til en anden godkender efter opsætningen, typisk en registreret stedfortræder. Kontrollér, at den tiltænkte modtager er tilgængelig og har de nødvendige rettigheder. Uddelegeringen ændrer, hvem der skal handle næste gang; den godkender, afviser eller bogfører ikke dokumentet.",
+        "fi-FI": "Siirtää valitun hyväksyntäpyynnön toiselle hyväksyjälle käyttäjäasetusten mukaan, yleensä määritetylle sijaiselle. Varmista, että tarkoitettu vastaanottaja on käytettävissä ja valtuutettu. Delegointi muuttaa sitä, kenen on toimittava seuraavaksi; se ei hyväksy, hylkää eikä kirjaa asiakirjaa.",
+        "nb-NO": "Sender den valgte forespørselen videre til en annen godkjenner etter brukeroppsettet, vanligvis en registrert stedfortreder. Kontroller at den tiltenkte mottakeren er tilgjengelig og har riktig tilgang. Delegeringen endrer hvem som skal handle neste gang; den godkjenner, avviser eller bokfører ikke dokumentet."
+      }
+    },
+    {
+      "ruleId": "BCExpansion.SendApproval",
+      "taskType": "SendApproval",
+      "semanticAction": "SendApproval",
+      "entity": "ApprovalRequest",
+      "priority": 1300,
+      "confidence": 0.96,
+      "match": {
+        "pagePatterns": [
+          "^(Purchase Order|Purchase Invoice|Sales Order|Sales Invoice|Purchase Credit Memo|Sales Credit Memo|Inköpsorder|Inköpsfaktura|Försäljningsorder|Försäljningsfaktura|Inköpskreditnota|Försäljningskreditnota)$"
+        ],
+        "actionPatterns": [
+          "^Send Approval Request$",
+          "^Skicka godkännandebegäran$",
+          "^Envoyer demande d’approbation$",
+          "^Genehmigungsantrag senden$",
+          "^Enviar solicitud de aprobación$",
+          "^Send godkendelsesanmodning$",
+          "^Lähetä hyväksymispyyntö$",
+          "^Send godkjenningsforespørsel$"
+        ],
+        "fieldPatterns": [],
+        "automationIdPatterns": []
+      },
+      "instructionTemplate": "",
+      "languages": [
+        "en-US",
+        "sv-SE",
+        "fr-FR",
+        "de-DE",
+        "es-ES",
+        "da-DK",
+        "fi-FI",
+        "nb-NO"
+      ],
+      "aliases": [],
+      "sourceIds": [
+        "microsoft-learn-expansion-across-how-use-approval-workflows-en-us",
+        "microsoft-learn-expansion-across-how-use-approval-workflows-sv-se",
+        "microsoft-learn-expansion-across-how-use-approval-workflows-fr-fr",
+        "microsoft-learn-expansion-across-how-use-approval-workflows-de-de",
+        "microsoft-learn-expansion-across-how-use-approval-workflows-es-es",
+        "microsoft-learn-expansion-across-how-use-approval-workflows-da-dk",
+        "microsoft-learn-expansion-across-how-use-approval-workflows-fi-fi",
+        "microsoft-learn-expansion-across-how-use-approval-workflows-nb-no"
+      ],
+      "localizedExplanations": {
+        "en-US": "Submits the open document to the configured approval workflow. Before sending, check the vendor or customer, document lines, amounts, and that the document is ready for review. The request then waits for the assigned approvers; follow its state in Approval Entries. Sending the request is not approval and does not post the document.",
+        "sv-SE": "Skickar det öppna dokumentet till det inställda godkännandeflödet. Kontrollera leverantör eller kund, dokumentrader, belopp och att dokumentet är klart för granskning. Begäran inväntar sedan tilldelade godkännare; följ statusen i godkännandeposterna. Att skicka begäran är varken ett godkännande eller en bokföring.",
+        "fr-FR": "Soumet le document ouvert au circuit d’approbation configuré. Avant l’envoi, vérifiez le fournisseur ou le client, les lignes, les montants et que le document est prêt à être examiné. La demande attend ensuite les approbateurs désignés ; suivez son état dans les écritures d’approbation. L’envoi ne vaut ni approbation ni comptabilisation.",
+        "de-DE": "Übergibt den offenen Beleg an den eingerichteten Genehmigungsworkflow. Prüfen Sie vor dem Senden Lieferant oder Kunde, Belegzeilen, Beträge und ob der Beleg zur Prüfung bereit ist. Anschließend wartet der Antrag auf die zuständigen Genehmiger; verfolgen Sie den Status in den Genehmigungsposten. Das Senden ist weder eine Genehmigung noch eine Buchung.",
+        "es-ES": "Envía el documento abierto al flujo de aprobación configurado. Antes, revise el proveedor, las líneas, el importe y que el documento esté listo para revisión. La solicitud queda pendiente para los aprobadores definidos; revise su estado en las entradas de aprobación. Enviar la solicitud no la aprueba ni registra el documento.",
+        "da-DK": "Sender det åbne dokument til det konfigurerede godkendelsesflow. Kontrollér først leverandør/kunde, linjer, beløb og at dokumentet er klar til gennemgang. Anmodningen afventer de opsatte godkendere; følg status i godkendelsesposterne. Afsendelse godkender ikke anmodningen eller bogfører dokumentet.",
+        "fi-FI": "Lähettää avoimen asiakirjan määritettyyn hyväksyntätyönkulkuun. Tarkista ensin asiakas/toimittaja, rivit, summa ja että asiakirja on valmis tarkistettavaksi. Pyyntö jää määritettyjen hyväksyjien käsiteltäväksi; seuraa tilaa hyväksyntäpyynnöistä. Lähettäminen ei hyväksy pyyntöä eikä kirjaa asiakirjaa.",
+        "nb-NO": "Sender det åpne dokumentet til den konfigurerte godkjenningsflyten. Kontroller først kunde/leverandør, linjer, beløp og at dokumentet er klart for gjennomgang. Forespørselen venter på de angitte godkjennerne; følg statusen i godkjenningspostene. Sending godkjenner ikke forespørselen eller bokfører dokumentet."
+      }
+    },
+    {
+      "ruleId": "BCExpansion.CancelApproval",
+      "taskType": "CancelApproval",
+      "semanticAction": "CancelApproval",
+      "entity": "ApprovalRequest",
+      "priority": 1300,
+      "confidence": 0.96,
+      "match": {
+        "pagePatterns": [
+          "^(Purchase Order|Purchase Invoice|Sales Order|Sales Invoice|Purchase Credit Memo|Sales Credit Memo|Inköpsorder|Inköpsfaktura|Försäljningsorder|Försäljningsfaktura|Inköpskreditnota|Försäljningskreditnota)$"
+        ],
+        "actionPatterns": [
+          "^Cancel Approval Request$",
+          "^Avbryt godkännandebegäran$",
+          "^Annuler demande d’approbation$",
+          "^Genehmigungsanfrage stornieren$",
+          "^Cancelar solicitud de aprobación$",
+          "^Annuller godkendelsesanmodning$",
+          "^Peruuta hyväksymispyyntö$",
+          "^Annuller godkjenningsforespørsel$"
+        ],
+        "fieldPatterns": [],
+        "automationIdPatterns": []
+      },
+      "instructionTemplate": "",
+      "languages": [
+        "en-US",
+        "sv-SE",
+        "fr-FR",
+        "de-DE",
+        "es-ES",
+        "da-DK",
+        "fi-FI",
+        "nb-NO"
+      ],
+      "aliases": [],
+      "sourceIds": [
+        "microsoft-learn-expansion-across-how-use-approval-workflows-en-us",
+        "microsoft-learn-expansion-across-how-use-approval-workflows-sv-se",
+        "microsoft-learn-expansion-across-how-use-approval-workflows-fr-fr",
+        "microsoft-learn-expansion-across-how-use-approval-workflows-de-de",
+        "microsoft-learn-expansion-across-how-use-approval-workflows-es-es",
+        "microsoft-learn-expansion-across-how-use-approval-workflows-da-dk",
+        "microsoft-learn-expansion-across-how-use-approval-workflows-fi-fi",
+        "microsoft-learn-expansion-across-how-use-approval-workflows-nb-no"
+      ],
+      "localizedExplanations": {
+        "en-US": "Cancels the outstanding approval request so the document can be edited and submitted for approval again. Confirm that the request is still pending and that you intend to withdraw it; approvers can no longer act on the canceled request. This affects the approval workflow, not posted entries or the business transaction itself.",
+        "sv-SE": "Avbryter den utestående godkännandebegäran så att dokumentet kan ändras och skickas för godkännande igen. Kontrollera att begäran fortfarande väntar och att du vill återkalla den; godkännare kan därefter inte agera på den avbrutna begäran. Åtgärden påverkar arbetsflödet, inte bokförda poster eller själva affärstransaktionen.",
+        "fr-FR": "Annule la demande en attente afin que le document puisse être modifié puis soumis à nouveau. Vérifiez qu’elle est toujours en attente et que vous souhaitez bien la retirer ; les approbateurs ne pourront plus agir sur cette demande annulée. Cela concerne le circuit d’approbation, pas les écritures validées ni la transaction elle-même.",
+        "de-DE": "Bricht den offenen Genehmigungsantrag ab, damit der Beleg geändert und erneut zur Genehmigung eingereicht werden kann. Prüfen Sie, ob der Antrag noch offen ist und zurückgezogen werden soll; Genehmiger können danach nicht mehr auf den abgebrochenen Antrag reagieren. Dies betrifft den Workflow, nicht gebuchte Posten oder den Geschäftsvorfall selbst.",
+        "es-ES": "Cancela la solicitud de aprobación pendiente para poder modificar el documento y volver a enviarlo. Compruebe que sigue pendiente y que desea retirarla; los aprobadores ya no podrán actuar sobre esa solicitud cancelada. Esto afecta al flujo de aprobación, no a los movimientos registrados ni a la transacción comercial.",
+        "da-DK": "Annullerer den åbne godkendelsesanmodning, så dokumentet kan ændres og sendes til godkendelse igen. Kontrollér, at anmodningen stadig afventer, og at du vil trække den tilbage; godkendere kan derefter ikke handle på den annullerede anmodning. Handlingen påvirker godkendelsesflowet, ikke bogførte poster eller selve forretningstransaktionen.",
+        "fi-FI": "Peruuttaa avoimen hyväksyntäpyynnön, jotta asiakirjaa voidaan muokata ja se voidaan lähettää uudelleen hyväksyttäväksi. Varmista, että pyyntö on edelleen odottamassa ja että haluat vetää sen pois; hyväksyjät eivät voi enää käsitellä peruutettua pyyntöä. Toiminto vaikuttaa työnkulkuun, ei kirjattuihin tapahtumiin tai itse liiketoimeen.",
+        "nb-NO": "Avbryter den åpne godkjenningsforespørselen slik at dokumentet kan endres og sendes til godkjenning på nytt. Kontroller at forespørselen fortsatt venter, og at du vil trekke den tilbake; godkjennere kan deretter ikke handle på den avbrutte forespørselen. Handlingen påvirker arbeidsflyten, ikke bokførte poster eller selve forretningstransaksjonen."
+      }
+    },
+    {
+      "ruleId": "BCExpansion.CreateApprovalUser",
+      "taskType": "CreateApprovalUser",
+      "semanticAction": "CreateApprovalUser",
+      "entity": "ApprovalUserSetup",
+      "priority": 1380,
+      "confidence": 0.97,
+      "match": {
+        "pagePatterns": [
+          "^Approval User Setup$",
+          "^Användarinställningar för godkännande$"
+        ],
+        "actionPatterns": [
+          "^New$",
+          "^Ny$"
+        ],
+        "fieldPatterns": [],
+        "automationIdPatterns": []
+      },
+      "instructionTemplate": "",
+      "languages": [
+        "en-US",
+        "sv-SE",
+        "fr-FR",
+        "de-DE",
+        "es-ES",
+        "da-DK",
+        "fi-FI",
+        "nb-NO"
+      ],
+      "verifiedRuntimeLocales": [
+        "en-US",
+        "sv-SE"
+      ],
+      "aliases": [],
+      "sourceIds": [
+        "approval-user-setup-en-us",
+        "approval-user-setup-sv-se"
+      ],
+      "localizedExplanations": {
+        "en-US": "This creates the approval-user setup row used to route requests and enforce approval authority; it does not create or enable a workflow. Set up the approver before the requester, define sales, purchase and request limits (or unlimited authority), and assign a substitute and notification details. Test the setup. Avoid making the same person both requester and approver in a workflow user group, because their requests can be approved automatically. Then configure workflow-user groups and notifications before building and enabling the workflow.",
+        "sv-SE": "Här skapar du konfigurationsraden som används för att dirigera godkännandebegäranden och kontrollera behörighet; den skapar eller aktiverar inte ett arbetsflöde. Lägg upp godkännaren innan beställaren, ange beloppsgränser för försäljning, inköp och inköpsbegäranden (eller obegränsad behörighet) och välj ersättare och avisering. Testa konfigurationen. Undvik att samma person är både beställare och godkännare i en arbetsflödesanvändargrupp, eftersom personens begäranden då kan godkännas automatiskt. Konfigurera sedan arbetsflödesgrupper och aviseringar innan du skapar och aktiverar arbetsflödet.",
+        "fr-FR": "Cette action crée la ligne de configuration utilisée pour acheminer les demandes d’approbation et appliquer les limites d’autorité ; elle ne crée ni n’active un workflow. Configurez l’approbateur avant le demandeur, définissez les plafonds de vente, d’achat et de demande (ou une autorisation illimitée), puis le suppléant et les notifications. Testez la configuration. Évitez qu’une même personne soit à la fois demandeur et approbateur dans un groupe d’utilisateurs du workflow, car ses demandes pourraient être approuvées automatiquement. Configurez ensuite les groupes et notifications avant de créer et d’activer le workflow.",
+        "de-DE": "Diese Aktion erstellt den Einrichtungssatz, der Genehmigungsanforderungen weiterleitet und Berechtigungsgrenzen durchsetzt; sie erstellt oder aktiviert keinen Workflow. Richten Sie den Genehmiger vor dem Anforderer ein, legen Sie Verkaufs-, Einkaufs- und Anforderungsgrenzen oder unbegrenzte Berechtigungen fest und bestimmen Sie Vertretung und Benachrichtigungen. Testen Sie die Einrichtung. Dieselbe Person sollte in einer Workflow-Benutzergruppe nicht zugleich Anforderer und Genehmiger sein, da ihre Anforderungen sonst automatisch genehmigt werden können. Richten Sie anschließend Gruppen und Benachrichtigungen ein, bevor Sie den Workflow erstellen und aktivieren.",
+        "es-ES": "Esta acción crea el registro de configuración que dirige las solicitudes de aprobación y aplica los límites de autoridad; no crea ni habilita un flujo de trabajo. Configure al aprobador antes que al solicitante, defina límites de venta, compra y solicitud (o autorización ilimitada) y asigne suplente y notificaciones. Pruebe la configuración. Evite que una misma persona sea solicitante y aprobadora en un grupo de usuarios del flujo de trabajo, porque sus solicitudes podrían aprobarse automáticamente. Después configure los grupos y avisos antes de crear y habilitar el flujo.",
+        "da-DK": "Handlingen opretter den opsætningslinje, der dirigerer godkendelsesanmodninger og håndhæver godkendelsesgrænser; den opretter eller aktiverer ikke et workflow. Opsæt godkenderen før anmoderen, angiv beløbsgrænser for salg, køb og anmodninger eller ubegrænset godkendelse, og vælg stedfortræder og beskeder. Test opsætningen. Undgå, at samme person både er anmoder og godkender i en workflowbrugergruppe, da personens anmodninger ellers kan blive godkendt automatisk. Opsæt derefter grupper og beskeder, før workflowet oprettes og aktiveres.",
+        "fi-FI": "Tämä toiminto luo asetusrivin, jota käytetään hyväksyntäpyyntöjen reititykseen ja hyväksyntärajojen valvontaan; se ei luo eikä ota käyttöön työnkulkua. Määritä hyväksyjä ennen pyynnön tekijää, aseta myynnin, ostojen ja pyyntöjen euromääräiset rajat tai rajaton hyväksyntä sekä varahyväksyjä ja ilmoitukset. Testaa määritys. Vältä saman henkilön määrittämistä sekä pyynnön tekijäksi että hyväksyjäksi työnkulkuryhmässä, sillä hänen pyyntönsä voidaan hyväksyä automaattisesti. Määritä tämän jälkeen työnkulkuryhmät ja ilmoitukset ennen työnkulun luontia ja käyttöönottoa.",
+        "nb-NO": "Handlingen oppretter oppsettlinjen som brukes til å rute godkjenningsforespørsler og håndheve godkjenningsgrenser; den oppretter eller aktiverer ikke en arbeidsflyt. Sett opp godkjenneren før forespørren, angi beløpsgrenser for salg, kjøp og forespørsler eller ubegrenset godkjenning, og velg stedfortreder og varsling. Test oppsettet. Unngå at samme person både er forespørrer og godkjenner i en arbeidsflytbrukergruppe, fordi personens forespørsler da kan bli automatisk godkjent. Sett deretter opp grupper og varsler før arbeidsflyten opprettes og aktiveres."
+      }
+    }
+  ],
+  "sources": [
+    {
+      "sourceId": "approval-user-setup-en-us",
+      "title": "Set up approval users - Business Central | Microsoft Learn",
+      "sourceUri": "https://learn.microsoft.com/en-us/dynamics365/business-central/across-how-to-set-up-approval-users",
+      "accessedDate": "2026-09-30",
+      "appliesTo": "Business Central standard approval workflow setup. English page and captions verified; tenant behavior may vary by configured workflow.",
+      "fields": [
+        "This creates the approval-user setup row used to route requests and enforce approval authority; it does not create or enable a workflow. Set up the approver before the requester, define sales, purchase and request limits (or unlimited authority), and assign a substitute and notification details. Test the setup. Avoid making the same person both requester and approver in a workflow user group, because their requests can be approved automatically. Then configure workflow-user groups and notifications before building and enabling the workflow."
+      ],
+      "documentedCaptions": [
+        "Approval User Setup",
+        "New",
+        "Approver ID",
+        "Approval Amount Limit",
+        "Substitute",
+        "Approval Administrator"
+      ]
+    },
+    {
+      "sourceId": "approval-user-setup-sv-se",
+      "title": "Konfigurera godkännandeanvändare - Business Central | Microsoft Learn",
+      "sourceUri": "https://learn.microsoft.com/sv-se/dynamics365/business-central/across-how-to-set-up-approval-users",
+      "accessedDate": "2026-09-30",
+      "appliesTo": "Standardinställningar för godkännandearbetsflöden i Business Central. Svensk dokumentationssida och centrala sid-/åtgärdsetiketter verifierade; tenantkonfiguration kan påverka flödet.",
+      "fields": [
+        "Här skapar du konfigurationsraden som används för att dirigera godkännandebegäranden och kontrollera behörighet; den skapar eller aktiverar inte ett arbetsflöde. Lägg upp godkännaren innan beställaren, ange beloppsgränser för försäljning, inköp och inköpsbegäranden (eller obegränsad behörighet) och välj ersättare och avisering. Testa konfigurationen. Undvik att samma person är både beställare och godkännare i en arbetsflödesanvändargrupp, eftersom personens begäranden då kan godkännas automatiskt. Konfigurera sedan arbetsflödesgrupper och aviseringar innan du skapar och aktiverar arbetsflödet."
+      ],
+      "documentedCaptions": [
+        "Användarinställningar för godkännande",
+        "Ny",
+        "Godkännar-ID",
+        "Ersättare",
+        "Administratör för godkännande"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-expansion-across-how-use-approval-workflows-en-us",
+      "title": "Approve or reject documents in workflows - Business Central | Microsoft Learn",
+      "sourceUri": "https://learn.microsoft.com/en-us/dynamics365/business-central/across-how-use-approval-workflows",
+      "accessedDate": "2026-09-28",
+      "appliesTo": "Business Central standard functionality. Microsoft Learn captions checked; tenant/version-specific UI captions remain unverified.",
+      "fields": [
+        "This approves the selected request at your approval step. Other approvers can still be required by the workflow. Approval does not itself post the underlying document.",
+        "This rejects the selected approval request. The requester must address the reason before seeking approval again. Rejection is not deletion or reversal of the underlying document.",
+        "Delegation passes the approval request to another approver according to the approval user setup, such as a substitute. It does not approve the request.",
+        "This submits the document to the configured approval workflow. Required approvers must respond before the workflow allows further processing. Sending a request is not approval or posting.",
+        "This cancels the outstanding approval request so the document can be changed and submitted again. It does not cancel or reverse a posted transaction."
+      ],
+      "documentedCaptions": [
+        "Requests to Approve",
+        "Approve",
+        "Reject",
+        "Delegate",
+        "Send Approval Request",
+        "Cancel Approval Request"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-expansion-across-how-use-approval-workflows-sv-se",
+      "title": "Godkänna eller avvisa dokument i arbetsflöden - Business Central | Microsoft Learn",
+      "sourceUri": "https://learn.microsoft.com/sv-se/dynamics365/business-central/across-how-use-approval-workflows",
+      "accessedDate": "2026-09-28",
+      "appliesTo": "Business Central standard functionality. Microsoft Learn captions checked; tenant/version-specific UI captions remain unverified.",
+      "fields": [
+        "This approves the selected request at your approval step. Other approvers can still be required by the workflow. Approval does not itself post the underlying document.",
+        "This rejects the selected approval request. The requester must address the reason before seeking approval again. Rejection is not deletion or reversal of the underlying document.",
+        "Delegation passes the approval request to another approver according to the approval user setup, such as a substitute. It does not approve the request.",
+        "This submits the document to the configured approval workflow. Required approvers must respond before the workflow allows further processing. Sending a request is not approval or posting.",
+        "This cancels the outstanding approval request so the document can be changed and submitted again. It does not cancel or reverse a posted transaction."
+      ],
+      "documentedCaptions": [
+        "Begäranden att godkänna",
+        "Godkänna",
+        "Avvisa",
+        "Delegera",
+        "Skicka godkännandebegäran",
+        "Avbryt godkännandebegäran"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-expansion-across-how-use-approval-workflows-fr-fr",
+      "title": "Approuver ou rejeter des documents dans les flux de travail - Business Central | Microsoft Learn",
+      "sourceUri": "https://learn.microsoft.com/fr-fr/dynamics365/business-central/across-how-use-approval-workflows",
+      "accessedDate": "2026-09-28",
+      "appliesTo": "Business Central standard functionality. Microsoft Learn captions checked; tenant/version-specific UI captions remain unverified.",
+      "fields": [
+        "This approves the selected request at your approval step. Other approvers can still be required by the workflow. Approval does not itself post the underlying document.",
+        "This rejects the selected approval request. The requester must address the reason before seeking approval again. Rejection is not deletion or reversal of the underlying document.",
+        "Delegation passes the approval request to another approver according to the approval user setup, such as a substitute. It does not approve the request.",
+        "This submits the document to the configured approval workflow. Required approvers must respond before the workflow allows further processing. Sending a request is not approval or posting.",
+        "This cancels the outstanding approval request so the document can be changed and submitted again. It does not cancel or reverse a posted transaction."
+      ],
+      "documentedCaptions": [
+        "Demandes à approuver",
+        "Approuver",
+        "Rejeter",
+        "Déléguer",
+        "Envoyer demande d’approbation",
+        "Annuler demande d’approbation"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-expansion-across-how-use-approval-workflows-de-de",
+      "title": "Belege in Workflows genehmigen und ablehnen - Business Central | Microsoft Learn",
+      "sourceUri": "https://learn.microsoft.com/de-de/dynamics365/business-central/across-how-use-approval-workflows",
+      "accessedDate": "2026-09-28",
+      "appliesTo": "Business Central standard functionality. Microsoft Learn captions checked; tenant/version-specific UI captions remain unverified.",
+      "fields": [
+        "This approves the selected request at your approval step. Other approvers can still be required by the workflow. Approval does not itself post the underlying document.",
+        "This rejects the selected approval request. The requester must address the reason before seeking approval again. Rejection is not deletion or reversal of the underlying document.",
+        "Delegation passes the approval request to another approver according to the approval user setup, such as a substitute. It does not approve the request.",
+        "This submits the document to the configured approval workflow. Required approvers must respond before the workflow allows further processing. Sending a request is not approval or posting.",
+        "This cancels the outstanding approval request so the document can be changed and submitted again. It does not cancel or reverse a posted transaction."
+      ],
+      "documentedCaptions": [
+        "Zu genehmigende Anforderungen",
+        "Genehmigen",
+        "Ablehnen",
+        "Delegieren",
+        "Genehmigungsantrag senden",
+        "Genehmigungsanfrage stornieren"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-expansion-across-how-use-approval-workflows-es-es",
+      "title": "Aprobar o rechazar documentos en los flujos de trabajo - Business Central | Microsoft Learn",
+      "sourceUri": "https://learn.microsoft.com/es-es/dynamics365/business-central/across-how-use-approval-workflows",
+      "accessedDate": "2026-09-28",
+      "appliesTo": "Business Central standard functionality. Microsoft Learn captions checked; tenant/version-specific UI captions remain unverified.",
+      "fields": [
+        "This approves the selected request at your approval step. Other approvers can still be required by the workflow. Approval does not itself post the underlying document.",
+        "This rejects the selected approval request. The requester must address the reason before seeking approval again. Rejection is not deletion or reversal of the underlying document.",
+        "Delegation passes the approval request to another approver according to the approval user setup, such as a substitute. It does not approve the request.",
+        "This submits the document to the configured approval workflow. Required approvers must respond before the workflow allows further processing. Sending a request is not approval or posting.",
+        "This cancels the outstanding approval request so the document can be changed and submitted again. It does not cancel or reverse a posted transaction."
+      ],
+      "documentedCaptions": [
+        "Solicitudes para aprobar",
+        "Aprobar",
+        "Rechazar",
+        "Delegar",
+        "Enviar solicitud de aprobación",
+        "Cancelar solicitud de aprobación"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-expansion-across-how-use-approval-workflows-da-dk",
+      "title": "Godkende eller afvise dokumenter i workflows - Business Central | Microsoft Learn",
+      "sourceUri": "https://learn.microsoft.com/da-dk/dynamics365/business-central/across-how-use-approval-workflows",
+      "accessedDate": "2026-09-28",
+      "appliesTo": "Business Central standard functionality. Microsoft Learn captions checked; tenant/version-specific UI captions remain unverified.",
+      "fields": [
+        "This approves the selected request at your approval step. Other approvers can still be required by the workflow. Approval does not itself post the underlying document.",
+        "This rejects the selected approval request. The requester must address the reason before seeking approval again. Rejection is not deletion or reversal of the underlying document.",
+        "Delegation passes the approval request to another approver according to the approval user setup, such as a substitute. It does not approve the request.",
+        "This submits the document to the configured approval workflow. Required approvers must respond before the workflow allows further processing. Sending a request is not approval or posting.",
+        "This cancels the outstanding approval request so the document can be changed and submitted again. It does not cancel or reverse a posted transaction."
+      ],
+      "documentedCaptions": [
+        "Anmodninger til godkendelse",
+        "Godkend",
+        "Afvis",
+        "Uddeleger",
+        "Send godkendelsesanmodning",
+        "Annuller godkendelsesanmodning"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-expansion-across-how-use-approval-workflows-fi-fi",
+      "title": "Asiakirjojen hyväksyminen tai hylkääminen työnkuluissa - Business Central | Microsoft Learn",
+      "sourceUri": "https://learn.microsoft.com/fi-fi/dynamics365/business-central/across-how-use-approval-workflows",
+      "accessedDate": "2026-09-28",
+      "appliesTo": "Business Central standard functionality. Microsoft Learn captions checked; tenant/version-specific UI captions remain unverified.",
+      "fields": [
+        "This approves the selected request at your approval step. Other approvers can still be required by the workflow. Approval does not itself post the underlying document.",
+        "This rejects the selected approval request. The requester must address the reason before seeking approval again. Rejection is not deletion or reversal of the underlying document.",
+        "Delegation passes the approval request to another approver according to the approval user setup, such as a substitute. It does not approve the request.",
+        "This submits the document to the configured approval workflow. Required approvers must respond before the workflow allows further processing. Sending a request is not approval or posting.",
+        "This cancels the outstanding approval request so the document can be changed and submitted again. It does not cancel or reverse a posted transaction."
+      ],
+      "documentedCaptions": [
+        "Hyväksyttävät pyynnöt",
+        "Hyväksy",
+        "Hylkää",
+        "Delegoi",
+        "Lähetä hyväksymispyyntö",
+        "Peruuta hyväksymispyyntö"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-expansion-across-how-use-approval-workflows-nb-no",
+      "title": "Godkjenn eller avvis dokumenter i arbeidsflyter - Business Central | Microsoft Learn",
+      "sourceUri": "https://learn.microsoft.com/nb-no/dynamics365/business-central/across-how-use-approval-workflows",
+      "accessedDate": "2026-09-28",
+      "appliesTo": "Business Central standard functionality. Microsoft Learn captions checked; tenant/version-specific UI captions remain unverified.",
+      "fields": [
+        "This approves the selected request at your approval step. Other approvers can still be required by the workflow. Approval does not itself post the underlying document.",
+        "This rejects the selected approval request. The requester must address the reason before seeking approval again. Rejection is not deletion or reversal of the underlying document.",
+        "Delegation passes the approval request to another approver according to the approval user setup, such as a substitute. It does not approve the request.",
+        "This submits the document to the configured approval workflow. Required approvers must respond before the workflow allows further processing. Sending a request is not approval or posting.",
+        "This cancels the outstanding approval request so the document can be changed and submitted again. It does not cancel or reverse a posted transaction."
+      ],
+      "documentedCaptions": [
+        "Forespørsler å godkjenne",
+        "Godkjenn",
+        "Avvis",
+        "Deleger",
+        "Send godkjenningsforespørsel",
+        "Annuller godkjenningsforespørsel"
+      ]
+    }
+  ],
+  "sourceLocaleGaps": {
+    "approval-user-setup-en-us": [
+      "sv-SE",
+      "fr-FR",
+      "de-DE",
+      "es-ES",
+      "da-DK",
+      "fi-FI",
+      "nb-NO"
+    ],
+    "approval-user-setup-sv-se": [
+      "en-US",
+      "fr-FR",
+      "de-DE",
+      "es-ES",
+      "da-DK",
+      "fi-FI",
+      "nb-NO"
+    ]
+  }
+}

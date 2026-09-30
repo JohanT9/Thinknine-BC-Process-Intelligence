@@ -27,6 +27,65 @@ assert.equal(displayTasks[0].instruction, savedTask.instruction,
 assert.ok(displayTasks[0].contextualExplanations["sv-SE"]);
 assert.equal(JSON.stringify(savedTask), savedTaskBefore,
   "adding display context does not mutate the saved review task");
+const legacyNumberMatch = taskContext.match({ taskId: "older-review-step",
+  sourceEventNos: [21, 22] }, [{ taskId: "new-pipeline-step",
+  legacyEventNos: ["21", "22"], contextualExplanations: { "en-US": "Verified." },
+  contextualExplanationRuleId: "Sales.Release",
+  contextualExplanationSources: [{ sourceUri:
+    "https://learn.microsoft.com/en-us/dynamics365/business-central/example" }] }]);
+assert.equal(legacyNumberMatch?.contextualExplanationRuleId, "Sales.Release",
+  "older saved reviews can reconnect by legacy event numbers despite regenerated task IDs");
+const semanticIdentityMatch = taskContext.match({ taskId: "older-semantic-step",
+  semanticActionIds: ["semantic:customer-selection"] }, [{ taskId: "new-semantic-step",
+  semanticActionIds: ["semantic:customer-selection"],
+  contextualExplanations: { "en-US": "Verified." },
+  contextualExplanationRuleId: "Sales.SelectCustomer",
+  contextualExplanationSources: [{ sourceUri:
+    "https://learn.microsoft.com/en-us/dynamics365/business-central/example" }] }]);
+assert.equal(semanticIdentityMatch?.contextualExplanationRuleId,
+  "Sales.SelectCustomer", "semantic action lineage survives changed task IDs");
+const positionRecovered = taskContext.enrichForDisplay([
+  { taskId: "legacy-step-one", taskNo: 1, taskType: "SelectCustomer" },
+  { taskId: "legacy-step-two", taskNo: 2, taskType: "ReleaseDocument" }
+], [{ taskId: "current-step-one", taskNo: 1, taskType: "SelectCustomer",
+  contextualExplanations: { "en-US": "Verified customer selection." },
+  contextualExplanationRuleId: "Sales.SelectCustomer",
+  contextualExplanationSources: [{ sourceUri:
+    "https://learn.microsoft.com/en-us/dynamics365/business-central/example" }] },
+{ taskId: "current-step-two", taskNo: 2, taskType: "ReleaseDocument",
+  contextualExplanations: { "en-US": "Verified release." },
+  contextualExplanationRuleId: "Sales.Release",
+  contextualExplanationSources: [{ sourceUri:
+    "https://learn.microsoft.com/en-us/dynamics365/business-central/example" }] }]);
+assert.deepStrictEqual(positionRecovered.map(task => task.contextualExplanationRuleId),
+  ["Sales.SelectCustomer", "Sales.Release"],
+  "an old review with no lineage reconnects by matching step number and action type");
+const changedCardinality = taskContext.enrichForDisplay([
+  { taskId: "legacy-step-one", taskNo: 1, taskType: "SelectCustomer" },
+  { taskId: "user-added-step", taskNo: 2, taskType: "ManualStep" },
+  { taskId: "legacy-step-two", taskNo: 3, taskType: "ReleaseDocument" }
+], [{ taskId: "current-step-one", taskNo: 1, taskType: "SelectCustomer",
+  contextualExplanations: { "en-US": "Verified customer selection." },
+  contextualExplanationRuleId: "Sales.SelectCustomer",
+  contextualExplanationSources: [{ sourceUri:
+    "https://learn.microsoft.com/en-us/dynamics365/business-central/example" }] },
+{ taskId: "current-step-two", taskNo: 2, taskType: "ReleaseDocument",
+  contextualExplanations: { "en-US": "Verified release." },
+  contextualExplanationRuleId: "Sales.Release",
+  contextualExplanationSources: [{ sourceUri:
+    "https://learn.microsoft.com/en-us/dynamics365/business-central/example" }] }]);
+assert(changedCardinality.every(task => !task.contextualExplanationRuleId),
+  "position fallback is disabled when a review has a different number of steps");
+assert.equal(taskContext.match({ taskId: "ambiguous-legacy-step",
+  sourceEventNos: [35] }, [{ taskId: "first", sourceEventNos: [35],
+  contextualExplanations: { "en-US": "First." },
+  contextualExplanationRuleId: "Sales.Release",
+  contextualExplanationSources: [{ sourceUri: "https://learn.microsoft.com/en-us/example" }] },
+{ taskId: "second", sourceEventNos: [35],
+  contextualExplanations: { "en-US": "Second." },
+  contextualExplanationRuleId: "Sales.Reopen",
+  contextualExplanationSources: [{ sourceUri: "https://learn.microsoft.com/en-us/example" }] }]), null,
+"conflicting provenance matches remain hidden");
 const savedTaskModel = processModel.project({ recordingId: "saved-recording",
   steps: displayTasks });
 const savedTaskContainer = { innerHTML: "" };

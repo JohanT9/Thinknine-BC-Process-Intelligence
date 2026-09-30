@@ -98,6 +98,11 @@ function (adapter, knowledge, pageEngine) {
           }
         });
       }
+      if (rule.match.pageObjectIds !== undefined &&
+          (!Array.isArray(rule.match.pageObjectIds) ||
+           rule.match.pageObjectIds.some(id => !/^[0-9]{1,10}$/.test(String(id))))) {
+        add("knowledge-page-object-id-list-invalid", `${ref}/match/pageObjectIds`);
+      }
       if (rule.languages !== undefined && (!Array.isArray(rule.languages) || rule.languages.some(locale =>
         typeof locale !== "string" || !/^[a-z]{2,3}-[A-Z]{2}$/.test(locale)))) {
         add("knowledge-invalid-language-list", `${ref}/languages`);

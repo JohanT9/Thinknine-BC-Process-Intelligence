@@ -1,0 +1,1072 @@
+{
+  "packId": "bc-contact-marketing",
+  "name": "Business Central contact and marketing management",
+  "version": "1.0.0",
+  "priority": 240,
+  "rules": [
+    {
+      "ruleId": "ContactMarketing.CreateCampaign",
+      "taskType": "CreateMarketingCampaign",
+      "semanticAction": "Create",
+      "entity": "MarketingCampaign",
+      "priority": 1360,
+      "confidence": 0.95,
+      "verifiedRuntimeLocales": ["en-US", "sv-SE"],
+      "match": {
+        "pagePatterns": ["^Campaigns$", "^Kampanjer$"],
+        "actionPatterns": ["^New$", "^Ny$"],
+        "fieldPatterns": [],
+        "automationIdPatterns": []
+      },
+      "instructionTemplate": "",
+      "languages": ["en-US", "sv-SE", "fr-FR", "de-DE", "es-ES", "da-DK", "fi-FI", "nb-NO"],
+      "aliases": [],
+      "sourceIds": [
+        "contact-marketing-campaigns-en-us", "contact-marketing-campaigns-sv-se",
+        "contact-marketing-campaigns-fr-fr", "contact-marketing-campaigns-de-de",
+        "contact-marketing-campaigns-es-es", "contact-marketing-campaigns-da-dk",
+        "contact-marketing-campaigns-fi-fi", "contact-marketing-campaigns-nb-no"
+      ],
+      "localizedExplanations": {
+        "en-US": "Creates a campaign record; it does not select recipients or send a communication. First ensure campaign status codes are configured, then enter and review the campaign details. Build and verify the target audience as a separate segment, and set any campaign prices or discounts before activating the campaign. Record resulting customer or prospect touchpoints as interactions when they occur.",
+        "sv-SE": "Skapar en kampanjpost; den väljer inte mottagare och skickar inget meddelande. Kontrollera först att kampanjstatuskoderna är upplagda och fyll sedan i och granska kampanjuppgifterna. Skapa och kontrollera målgruppen i ett separat segment och ange eventuella kampanjpriser eller rabatter innan kampanjen aktiveras. Registrera kunders eller prospekts kontakter som interaktioner när de sker.",
+        "fr-FR": "Crée une fiche de campagne ; elle ne sélectionne pas les destinataires et n’envoie aucune communication. Vérifiez d’abord que les codes de statut des campagnes sont configurés, puis renseignez et contrôlez la campagne. Constituez et vérifiez le public cible dans un segment distinct, et définissez les prix ou remises de campagne avant l’activation. Enregistrez les échanges avec les clients ou prospects comme interactions lorsqu’ils ont lieu.",
+        "de-DE": "Erstellt einen Kampagnendatensatz; Empfänger werden dabei weder ausgewählt noch wird eine Nachricht versendet. Stellen Sie zuerst sicher, dass Kampagnenstatuscodes eingerichtet sind, und erfassen und prüfen Sie dann die Kampagnendaten. Erstellen und prüfen Sie die Zielgruppe in einem separaten Segment und legen Sie Kampagnenpreise oder Rabatte vor der Aktivierung fest. Erfassen Sie tatsächliche Kontakte mit Kunden oder Interessenten als Interaktionen.",
+        "es-ES": "Crea un registro de campaña; no selecciona destinatarios ni envía comunicaciones. Compruebe primero que estén configurados los códigos de estado de campaña y después complete y revise los datos. Cree y verifique el público objetivo en un segmento independiente, y establezca los precios o descuentos antes de activar la campaña. Registre como interacciones los contactos reales con clientes o posibles clientes.",
+        "da-DK": "Opretter en kampagnepost; den vælger ikke modtagere og sender ikke en meddelelse. Kontrollér først, at kampagnestatuskoderne er konfigureret, og udfyld og gennemgå derefter kampagnedetaljerne. Opret og kontrollér målgruppen i et separat segment, og angiv kampagnepriser eller rabatter før aktivering. Registrér faktiske kontakter med kunder eller kundeemner som interaktioner.",
+        "fi-FI": "Luo kampanjatietueen; se ei valitse vastaanottajia eikä lähetä viestiä. Varmista ensin, että kampanjan tilakoodit on määritetty, ja täydennä sekä tarkista kampanjan tiedot. Luo ja tarkista kohdeyleisö erillisessä segmentissä ja määritä kampanjahinnat tai alennukset ennen aktivointia. Kirjaa toteutuneet asiakas- tai potentiaalisten asiakkaiden yhteydenotot vuorovaikutuksiksi.",
+        "nb-NO": "Oppretter en kampanjepost; den velger ikke mottakere og sender ingen melding. Kontroller først at kampanjestatuskodene er konfigurert, og fyll deretter ut og gjennomgå kampanjedetaljene. Opprett og kontroller målgruppen i et eget segment, og angi kampanjepriser eller rabatter før aktivering. Registrer faktiske kontakter med kunder eller potensielle kunder som interaksjoner."
+      }
+    },
+    {
+      "ruleId": "ContactMarketing.CreateInteraction",
+      "taskType": "CreateContactInteraction",
+      "semanticAction": "CreateContactInteraction",
+      "entity": "ContactInteraction",
+      "priority": 1320,
+      "confidence": 0.95,
+      "match": {
+        "pagePatterns": [
+          "^Contacts$",
+          "^Kontakter$"
+        ],
+        "actionPatterns": [
+          "^Create Interaction$",
+          "^Skapa interaktion$"
+        ],
+        "fieldPatterns": [],
+        "automationIdPatterns": []
+      },
+      "instructionTemplate": "",
+      "languages": [
+        "en-US",
+        "sv-SE",
+        "fr-FR",
+        "de-DE",
+        "es-ES",
+        "da-DK",
+        "fi-FI",
+        "nb-NO"
+      ],
+      "aliases": [],
+      "sourceIds": [
+        "contact-marketing-interactions-en-us",
+        "contact-marketing-interactions-sv-se",
+        "contact-marketing-interactions-fr-fr",
+        "contact-marketing-interactions-de-de",
+        "contact-marketing-interactions-es-es",
+        "contact-marketing-interactions-da-dk",
+        "contact-marketing-interactions-fi-fi",
+        "contact-marketing-interactions-nb-no"
+      ],
+      "localizedExplanations": {
+        "en-US": "Starts an interaction record for the selected contact. Choose an interaction template and complete its communication details; the action documents a sales or marketing touchpoint and does not send an email by itself. For a segment, use the segment workflow so a separate interaction can be recorded for each included contact.",
+        "sv-SE": "Startar en interaktionspost för den valda kontakten. Välj en interaktionsmall och fyll i uppgifterna om kommunikationen. Åtgärden dokumenterar en sälj- eller marknadsföringskontakt men skickar inte e-post i sig. För ett segment används segmentflödet, som kan skapa en separat interaktion för varje kontakt.",
+        "fr-FR": "Crée une fiche d’interaction pour le contact sélectionné. Choisissez un modèle et renseignez les détails de la communication. L’action consigne une activité commerciale ou marketing, mais n’envoie pas elle-même de courriel. Pour plusieurs contacts, utilisez le traitement du segment afin d’enregistrer une interaction par contact.",
+        "de-DE": "Beginnt einen Interaktionseintrag für den ausgewählten Kontakt. Wählen Sie eine Interaktionsvorlage und ergänzen Sie die Kommunikationsdaten. Die Aktion dokumentiert einen Vertriebs- oder Marketingkontakt, versendet aber selbst keine E-Mail. Für mehrere Kontakte verwenden Sie den Segmentablauf, der je Kontakt eine Interaktion erfassen kann.",
+        "es-ES": "Inicia un registro de interacción para el contacto seleccionado. Elija una plantilla y complete los datos de comunicación. La acción documenta una actividad comercial o de marketing, pero no envía un correo por sí sola. Para varios contactos, use el proceso del segmento, que puede registrar una interacción por contacto.",
+        "da-DK": "Starter en interaktionspost for den valgte kontakt. Vælg en interaktionsskabelon, og udfyld oplysningerne om kommunikationen. Handlingen dokumenterer et salgs- eller marketingkontaktpunkt, men sender ikke selv en mail. Brug segmentforløbet til flere kontakter, så der kan registreres en interaktion for hver kontakt.",
+        "fi-FI": "Aloittaa vuorovaikutustietueen valitulle yhteyshenkilölle. Valitse vuorovaikutusmalli ja täydennä viestinnän tiedot. Toiminto kirjaa myynnin tai markkinoinnin yhteydenoton, mutta ei itsessään lähetä sähköpostia. Useille yhteyshenkilöille käytä segmentin käsittelyä, joka voi kirjata jokaiselle oman vuorovaikutuksen.",
+        "nb-NO": "Starter en interaksjonspost for den valgte kontakten. Velg en interaksjonsmal og fyll ut kommunikasjonsdetaljene. Handlingen dokumenterer et salgs- eller markedsføringskontaktpunkt, men sender ikke e-post i seg selv. For flere kontakter bruker du segmentflyten, som kan registrere en egen interaksjon for hver kontakt."
+      }
+    },
+    {
+      "ruleId": "ContactMarketing.CloseSalesOpportunity",
+      "taskType": "CloseSalesOpportunity",
+      "semanticAction": "CloseSalesOpportunity",
+      "entity": "SalesOpportunity",
+      "priority": 1340,
+      "confidence": 0.94,
+      "match": {
+        "pagePatterns": [
+          "^Opportunities$",
+          "^Affärsmöjligheter$"
+        ],
+        "actionPatterns": [
+          "^Close$",
+          "^Stäng$"
+        ],
+        "fieldPatterns": [],
+        "automationIdPatterns": []
+      },
+      "instructionTemplate": "",
+      "languages": [
+        "en-US",
+        "sv-SE",
+        "fr-FR",
+        "de-DE",
+        "es-ES",
+        "da-DK",
+        "fi-FI",
+        "nb-NO"
+      ],
+      "aliases": [],
+      "sourceIds": [
+        "contact-marketing-opportunities-en-us",
+        "contact-marketing-opportunities-sv-se",
+        "contact-marketing-interactions-en-us",
+        "contact-marketing-interactions-sv-se",
+        "contact-marketing-opportunities-fr-fr",
+        "contact-marketing-opportunities-de-de",
+        "contact-marketing-opportunities-es-es",
+        "contact-marketing-opportunities-da-dk",
+        "contact-marketing-opportunities-fi-fi",
+        "contact-marketing-opportunities-nb-no"
+      ],
+      "localizedExplanations": {
+        "en-US": "Closes the selected sales opportunity after negotiations end. Record whether it was won or lost, the close date, and a close code; close-code setup is required for classifying the outcome. Closing does not itself create a sales order. A quote can be made only for a company contact, and an order is made from that quote after the contact is a customer.",
+        "sv-SE": "Avslutar den valda affärsmöjligheten när förhandlingen är klar. Ange om den vanns eller förlorades, avslutsdatum och avslutskod; koderna behöver vara upplagda för att klassificera utfallet. Avslutet skapar inte en försäljningsorder. En offert kan bara skapas för en företagskontakt, och ordern görs från offerten när kontakten också har skapats som kund.",
+        "fr-FR": "Clôt l’opportunité sélectionnée à la fin des négociations. Indiquez si elle est gagnée ou perdue, la date et le code de clôture ; les codes doivent être configurés pour classifier le résultat. La clôture ne crée pas de commande. Un devis n’est possible que pour un contact de type société, et la commande est créée à partir du devis après avoir créé le contact comme client.",
+        "de-DE": "Schließt die ausgewählte Verkaufschance nach Ende der Verhandlungen. Erfassen Sie, ob sie gewonnen oder verloren wurde, sowie Abschlussdatum und -code; Abschlusscodes müssen zur Klassifizierung eingerichtet sein. Das Schließen erstellt keinen Auftrag. Ein Angebot kann nur für einen Firmenkontakt erstellt werden; ein Auftrag entsteht aus dem Angebot, nachdem der Kontakt als Debitor angelegt wurde.",
+        "es-ES": "Cierra la oportunidad seleccionada cuando terminan las negociaciones. Indique si se ganó o perdió, la fecha y el código de cierre; los códigos deben configurarse para clasificar el resultado. El cierre no crea un pedido. Solo se puede crear una oferta para un contacto de tipo empresa, y el pedido se crea desde esa oferta después de registrar el contacto como cliente.",
+        "da-DK": "Lukker den valgte salgsmulighed, når forhandlingerne er afsluttet. Angiv om den blev vundet eller tabt, lukkedato og lukningskode; koder skal være opsat for at klassificere resultatet. Lukningen opretter ikke en salgsordre. Et tilbud kan kun oprettes for en virksomhedskontakt, og ordren oprettes fra tilbuddet, efter kontakten er oprettet som kunde.",
+        "fi-FI": "Sulkee valitun myyntimahdollisuuden neuvottelujen päätyttyä. Määritä voitettu tai hävitty tulos, sulkemispäivä ja sulkemiskoodi; koodit on määritettävä tuloksen luokittelua varten. Sulkeminen ei luo myyntitilausta. Tarjouksen voi luoda vain yrityskontaktille, ja tilaus tehdään tarjouksesta sen jälkeen, kun kontakti on luotu asiakkaaksi.",
+        "nb-NO": "Lukker den valgte salgsmuligheten når forhandlingene er avsluttet. Angi om den ble vunnet eller tapt, lukkedato og lukkekode; kodene må være satt opp for å klassifisere utfallet. Lukkingen oppretter ikke en salgsordre. Et tilbud kan bare opprettes for en firmakontakt, og ordren opprettes fra tilbudet etter at kontakten er opprettet som kunde."
+      }
+    },
+    {
+      "ruleId": "ContactMarketing.UpdateOpportunityStage",
+      "taskType": "UpdateSalesOpportunity",
+      "semanticAction": "UpdateSalesOpportunityStage",
+      "entity": "SalesOpportunity",
+      "priority": 1350,
+      "confidence": 0.96,
+      "verifiedRuntimeLocales": ["en-US", "sv-SE"],
+      "match": {
+        "pagePatterns": ["^Opportunity List$", "^Affärsmöjlighetslista$"],
+        "actionPatterns": ["^Update$", "^Uppdatera$"],
+        "fieldPatterns": [],
+        "automationIdPatterns": []
+      },
+      "instructionTemplate": "",
+      "languages": ["en-US", "sv-SE", "fr-FR", "de-DE", "es-ES", "da-DK", "fi-FI", "nb-NO"],
+      "aliases": [],
+      "sourceIds": [
+        "contact-marketing-opportunities-en-us", "contact-marketing-opportunities-sv-se",
+        "contact-marketing-opportunities-fr-fr", "contact-marketing-opportunities-de-de",
+        "contact-marketing-opportunities-es-es", "contact-marketing-opportunities-da-dk",
+        "contact-marketing-opportunities-fi-fi", "contact-marketing-opportunities-nb-no"
+      ],
+      "localizedExplanations": {
+        "en-US": "Opens the update for the selected sales opportunity in its configured sales cycle. Choose the Action Type deliberately: Next or Previous moves one stage; Skip or Jump can move multiple stages only where the cycle permits it; Update changes estimates or success evaluation without changing stage. Review the opportunity and stage history after confirming. This does not close the opportunity or create a quote/order.",
+        "sv-SE": "Öppnar uppdateringen för den markerade affärsmöjligheten i dess konfigurerade säljcykel. Välj Åtgärdstyp medvetet: Nästa eller Föregående flyttar en etapp; Hoppa över eller Hoppa kan flytta flera etapper endast om säljcykeln tillåter det; Uppdatera ändrar uppskattningar eller bedömningen av vinstchansen utan att byta etapp. Kontrollera affärsmöjligheten och etapphistoriken efter bekräftelse. Detta stänger inte affärsmöjligheten och skapar ingen offert eller order.",
+        "fr-FR": "Ouvre la mise à jour de l’opportunité sélectionnée dans son cycle de vente configuré. Choisissez soigneusement le type d’action : Suivant ou Précédent déplace d’une étape ; Ignorer ou Sauter peut en franchir plusieurs uniquement si le cycle l’autorise ; Mettre à jour modifie les estimations ou l’évaluation des chances sans changer d’étape. Vérifiez l’opportunité et son historique après confirmation. Cela ne clôt pas l’opportunité et ne crée ni devis ni commande.",
+        "de-DE": "Öffnet die Aktualisierung der ausgewählten Verkaufschance im eingerichteten Verkaufszyklus. Wählen Sie den Aktionstyp bewusst: Weiter oder Zurück wechselt eine Phase; Überspringen oder Springen kann mehrere Phasen nur dann wechseln, wenn der Zyklus dies zulässt; Aktualisieren ändert Schätzungen oder Erfolgsaussichten ohne Phasenwechsel. Prüfen Sie nach der Bestätigung die Verkaufschance und den Phasenverlauf. Dadurch wird die Chance weder geschlossen noch ein Angebot oder Auftrag erstellt.",
+        "es-ES": "Abre la actualización de la oportunidad seleccionada en su ciclo de ventas configurado. Elija cuidadosamente el tipo de acción: Siguiente o Anterior avanza una etapa; Omitir o Saltar puede avanzar varias solo si el ciclo lo permite; Actualizar cambia estimaciones o la evaluación de probabilidades sin cambiar de etapa. Revise la oportunidad y su historial después de confirmar. Esto no cierra la oportunidad ni crea una oferta o pedido.",
+        "da-DK": "Åbner opdateringen af den valgte salgsmulighed i den konfigurerede salgscyklus. Vælg handlingstypen med omtanke: Næste eller Forrige flytter én fase; Spring over eller Hop kan flytte flere faser, kun hvis cyklussen tillader det; Opdater ændrer estimater eller vurderingen af succes uden at ændre fase. Gennemgå salgsmuligheden og fasehistorikken efter bekræftelse. Dette lukker ikke salgsmuligheden og opretter ikke et tilbud eller en ordre.",
+        "fi-FI": "Avaa valitun myyntimahdollisuuden päivityksen sen määritetyssä myyntisyklissä. Valitse toimintotyyppi huolellisesti: Seuraava tai Edellinen siirtää yhden vaiheen; Ohita tai Siirry voi ohittaa useita vaiheita vain, jos sykli sallii sen; Päivitä muuttaa arvioita tai onnistumistodennäköisyyttä vaihtamatta vaihetta. Tarkista myyntimahdollisuus ja vaihehistoria vahvistamisen jälkeen. Tämä ei sulje mahdollisuutta eikä luo tarjousta tai tilausta.",
+        "nb-NO": "Åpner oppdateringen av den valgte salgsmuligheten i den konfigurerte salgssyklusen. Velg handlingstype med omhu: Neste eller Forrige flytter én fase; Hopp over eller Hopp kan flytte flere faser bare hvis syklusen tillater det; Oppdater endrer estimater eller vurderingen av vinnersjanse uten å endre fase. Kontroller salgsmuligheten og fasehistorikken etter bekreftelse. Dette lukker ikke salgsmuligheten og oppretter ikke et tilbud eller en ordre."
+      }
+    },
+    {
+      "ruleId": "ContactMarketing.CreateSegmentInteraction",
+      "taskType": "CreateSegmentInteraction",
+      "semanticAction": "CreateSegmentInteraction",
+      "entity": "MarketingSegment",
+      "priority": 1330,
+      "confidence": 0.95,
+      "match": {
+        "pagePatterns": [
+          "^Segments$",
+          "^Segment$"
+        ],
+        "actionPatterns": [
+          "^Create Interaction$",
+          "^Skapa interaktion$"
+        ],
+        "fieldPatterns": [],
+        "automationIdPatterns": []
+      },
+      "instructionTemplate": "",
+      "languages": [
+        "en-US",
+        "sv-SE",
+        "fr-FR",
+        "de-DE",
+        "es-ES",
+        "da-DK",
+        "fi-FI",
+        "nb-NO"
+      ],
+      "aliases": [],
+      "sourceIds": [
+        "contact-marketing-interactions-en-us",
+        "contact-marketing-interactions-sv-se",
+        "contact-marketing-interactions-fr-fr",
+        "contact-marketing-interactions-de-de",
+        "contact-marketing-interactions-es-es",
+        "contact-marketing-interactions-da-dk",
+        "contact-marketing-interactions-fi-fi",
+        "contact-marketing-interactions-nb-no"
+      ],
+      "localizedExplanations": {
+        "en-US": "Creates an interaction for the contacts included in the selected segment. Review the segment membership and template before continuing: the operation can create a separate interaction for every contact and can optionally log the segment or create a follow-up segment. It records the interaction; it does not prove that an external message was delivered.",
+        "sv-SE": "Skapar en interaktion för kontakterna i det valda segmentet. Granska segmentets kontakter och mallen först: åtgärden kan skapa en separat interaktion för varje kontakt och kan även logga segmentet eller skapa ett uppföljningssegment. Den registrerar interaktionen men bekräftar inte att ett meddelande har levererats.",
+        "fr-FR": "Crée une interaction pour les contacts du segment sélectionné. Vérifiez les membres et le modèle : l’opération peut créer une interaction distincte par contact, journaliser le segment ou créer un segment de suivi. Elle consigne l’interaction, sans confirmer la livraison d’un message externe.",
+        "de-DE": "Erstellt eine Interaktion für die Kontakte im ausgewählten Segment. Prüfen Sie Mitglieder und Vorlage: Der Vorgang kann je Kontakt einen Eintrag erstellen, das Segment protokollieren oder ein Folgesegment anlegen. Er erfasst die Interaktion, bestätigt aber nicht die Zustellung einer externen Nachricht.",
+        "es-ES": "Crea una interacción para los contactos del segmento seleccionado. Revise sus miembros y la plantilla: la operación puede crear una interacción por contacto, registrar el segmento o crear un segmento de seguimiento. Registra la interacción, pero no confirma la entrega de un mensaje externo.",
+        "da-DK": "Opretter en interaktion for kontakterne i det valgte segment. Gennemgå medlemmerne og skabelonen: handlingen kan oprette en separat post pr. kontakt, logge segmentet eller oprette et opfølgningssegment. Den registrerer interaktionen, men bekræfter ikke levering af en ekstern meddelelse.",
+        "fi-FI": "Luo vuorovaikutuksen valitun segmentin yhteyshenkilöille. Tarkista jäsenet ja malli: toiminto voi luoda erillisen tietueen kullekin henkilölle, kirjata segmentin lokiin tai luoda seurantasegmentin. Se kirjaa vuorovaikutuksen, mutta ei vahvista ulkoisen viestin toimitusta.",
+        "nb-NO": "Oppretter en interaksjon for kontaktene i det valgte segmentet. Kontroller medlemmene og malen: operasjonen kan opprette én post per kontakt, logge segmentet eller opprette et oppfølgingssegment. Den registrerer interaksjonen, men bekrefter ikke at en ekstern melding er levert."
+      }
+    },
+    {
+      "ruleId": "ContactMarketing.CreateSegment",
+      "taskType": "CreateMarketingSegment",
+      "semanticAction": "Create",
+      "entity": "MarketingSegment",
+      "priority": 1350,
+      "confidence": 0.96,
+      "match": {
+        "pagePatterns": [
+          "^Segments$",
+          "^Segment$"
+        ],
+        "actionPatterns": [
+          "^New$",
+          "^Ny$"
+        ],
+        "fieldPatterns": [],
+        "automationIdPatterns": []
+      },
+      "instructionTemplate": "",
+      "languages": [
+        "en-US",
+        "sv-SE",
+        "fr-FR",
+        "de-DE",
+        "es-ES",
+        "da-DK",
+        "fi-FI",
+        "nb-NO"
+      ],
+      "aliases": [],
+      "sourceIds": [
+        "contact-marketing-create-segment-en-us",
+        "contact-marketing-create-segment-sv-se",
+        "contact-marketing-segments-en-us",
+        "contact-marketing-segments-sv-se",
+        "contact-marketing-create-segment-fr-fr",
+        "contact-marketing-create-segment-de-de",
+        "contact-marketing-create-segment-es-es",
+        "contact-marketing-create-segment-da-dk",
+        "contact-marketing-create-segment-fi-fi",
+        "contact-marketing-create-segment-nb-no"
+      ],
+      "localizedExplanations": {
+        "en-US": "Creates a marketing segment record that will hold a selected group of contacts, for example the target audience for a campaign or a group for a shared interaction. Enter the segment header and verify its number series; this action creates the segment shell, not its contact membership. Add contacts using explicit filters and review the resulting list before using the segment for outreach.",
+        "sv-SE": "Skapar en segmentpost som ska innehålla en utvald grupp kontakter, till exempel målgruppen för en kampanj eller en grupp för en gemensam interaktion. Fyll i segmenthuvudet och kontrollera nummerserien. Åtgärden skapar själva segmentet, inte dess kontakturval. Lägg till kontakter med tydliga filter och granska listan innan segmentet används för utskick eller annan bearbetning.",
+        "fr-FR": "Crée une fiche de segment destinée à contenir un groupe de contacts sélectionnés, par exemple le public cible d’une campagne ou les contacts d’une interaction commune. Renseignez l’en-tête et vérifiez la série de numéros. Cette action crée le segment, pas ses membres. Ajoutez les contacts avec des filtres explicites et vérifiez la liste avant toute communication.",
+        "de-DE": "Erstellt einen Segmenteintrag für eine ausgewählte Kontaktgruppe, etwa die Zielgruppe einer Kampagne oder Kontakte für eine gemeinsame Interaktion. Ergänzen Sie den Segmentkopf und prüfen Sie die Nummernserie. Die Aktion erstellt das Segment, nicht dessen Mitglieder. Fügen Sie Kontakte mit gezielten Filtern hinzu und prüfen Sie die Liste vor einer Ansprache.",
+        "es-ES": "Crea un registro de segmento para un grupo seleccionado de contactos, por ejemplo el público de una campaña o los contactos de una interacción conjunta. Complete la cabecera y compruebe la serie numérica. Esta acción crea el segmento, no sus miembros. Añada contactos con filtros explícitos y revise la lista antes de realizar comunicaciones.",
+        "da-DK": "Opretter en segmentpost til en udvalgt gruppe kontakter, f.eks. målgruppen for en kampagne eller kontakter til en fælles interaktion. Udfyld segmenthovedet, og kontrollér nummerserien. Handlingen opretter segmentet, ikke dets medlemmer. Tilføj kontakter med tydelige filtre, og gennemgå listen før kontakt.",
+        "fi-FI": "Luo segmenttitietueen valittua yhteyshenkilöryhmää varten, esimerkiksi kampanjan kohderyhmälle tai yhteisen vuorovaikutuksen kontakteille. Täydennä segmentin otsikkotiedot ja tarkista numerointi. Toiminto luo segmentin, ei sen jäseniä. Lisää yhteyshenkilöt tarkoilla suodattimilla ja tarkista luettelo ennen yhteydenottoa.",
+        "nb-NO": "Oppretter en segmentpost for en valgt gruppe kontakter, for eksempel målgruppen for en kampanje eller kontakter for en felles interaksjon. Fyll ut segmenthodet og kontroller nummerserien. Handlingen oppretter segmentet, ikke medlemmene. Legg til kontakter med tydelige filtre, og kontroller listen før utsending eller annen kontakt."
+      }
+    },
+    {
+      "ruleId": "ContactMarketing.AddContactsToSegment",
+      "taskType": "AddContactsToSegment",
+      "semanticAction": "AddContacts",
+      "entity": "MarketingSegment",
+      "priority": 1360,
+      "confidence": 0.97,
+      "match": {
+        "pagePatterns": [
+          "^Segments$",
+          "^Segment$"
+        ],
+        "actionPatterns": [
+          "^Add Contacts$",
+          "^Lägg till kontakter$"
+        ],
+        "fieldPatterns": [],
+        "automationIdPatterns": []
+      },
+      "instructionTemplate": "",
+      "languages": [
+        "en-US",
+        "sv-SE",
+        "fr-FR",
+        "de-DE",
+        "es-ES",
+        "da-DK",
+        "fi-FI",
+        "nb-NO"
+      ],
+      "aliases": [],
+      "sourceIds": [
+        "contact-marketing-add-contacts-en-us",
+        "contact-marketing-add-contacts-sv-se",
+        "contact-marketing-segments-en-us",
+        "contact-marketing-segments-sv-se",
+        "contact-marketing-add-contacts-fr-fr",
+        "contact-marketing-add-contacts-de-de",
+        "contact-marketing-add-contacts-es-es",
+        "contact-marketing-add-contacts-da-dk",
+        "contact-marketing-add-contacts-fi-fi",
+        "contact-marketing-add-contacts-nb-no",
+        "contact-marketing-segments-fr-fr",
+        "contact-marketing-segments-de-de",
+        "contact-marketing-segments-es-es",
+        "contact-marketing-segments-da-dk",
+        "contact-marketing-segments-fi-fi",
+        "contact-marketing-segments-nb-no"
+      ],
+      "localizedExplanations": {
+        "en-US": "Adds contacts matching the filters to the currently selected marketing segment. Confirm you opened the intended segment, set and review the Contact filters (and any additional criteria), then inspect the resulting members before creating interactions or using the segment as campaign audience. If the selection was added by mistake, use Go Back immediately where available; otherwise remove or refine members deliberately.",
+        "sv-SE": "Lägger till kontakter som matchar filtren i det valda marknadsföringssegmentet. Kontrollera att rätt segment är öppet, ange och granska filtren under Kontakt och eventuella övriga kriterier, och kontrollera sedan vilka medlemmar som faktiskt lades till innan du skapar interaktioner eller använder segmentet som kampanjmålgrupp. Om urvalet blev fel kan Gå tillbaka användas direkt när åtgärden finns; annars får medlemmarna tas bort eller förfinas medvetet.",
+        "fr-FR": "Ajoute au segment marketing sélectionné les contacts correspondant aux filtres. Vérifiez le segment, les filtres de la section Contact et les autres critères, puis examinez les membres ajoutés avant de créer des interactions ou d’utiliser le segment pour une campagne. Si l’ajout est erroné, utilisez immédiatement Revenir en arrière si disponible, sinon retirez ou affinez les membres.",
+        "de-DE": "Fügt dem ausgewählten Marketingsegment Kontakte hinzu, die den Filtern entsprechen. Prüfen Sie das Segment, die Filter im Abschnitt Kontakt und weitere Kriterien. Kontrollieren Sie die hinzugefügten Mitglieder, bevor Sie Interaktionen erstellen oder das Segment als Kampagnenzielgruppe verwenden. Bei einer falschen Auswahl verwenden Sie sofort Zurück, falls verfügbar, oder entfernen beziehungsweise verfeinern Sie die Mitglieder gezielt.",
+        "es-ES": "Añade al segmento de marketing seleccionado los contactos que coinciden con los filtros. Compruebe el segmento, los filtros de Contacto y los demás criterios, y revise los miembros añadidos antes de crear interacciones o usar el segmento para una campaña. Si la selección fue incorrecta, use inmediatamente Volver si está disponible; de lo contrario, quite o refine los miembros de forma deliberada.",
+        "da-DK": "Føjer kontakter, der matcher filtrene, til det valgte marketingsegment. Kontrollér segmentet, filtrene under Kontakt og eventuelle øvrige kriterier. Gennemgå de tilføjede medlemmer, før du opretter interaktioner eller bruger segmentet som kampagnemålgruppe. Hvis tilføjelsen var forkert, skal du straks bruge Gå tilbage, hvis den findes, eller bevidst fjerne eller indsnævre medlemmerne.",
+        "fi-FI": "Lisää suodattimia vastaavat yhteyshenkilöt valittuun markkinointisegmenttiin. Varmista segmentti, Yhteyshenkilö-osion suodattimet ja muut ehdot. Tarkista lisätyt jäsenet ennen vuorovaikutusten luontia tai kampanjan kohderyhmänä käyttöä. Jos valinta meni väärin, käytä heti Palaa-toimintoa, jos se on käytettävissä, tai poista tai rajaa jäsenet harkitusti.",
+        "nb-NO": "Legger kontakter som samsvarer med filtrene til det valgte markedsføringssegmentet. Kontroller segmentet, filtrene under Kontakt og eventuelle andre kriterier. Se gjennom medlemmene som ble lagt til før du oppretter interaksjoner eller bruker segmentet som kampanjemålgruppe. Hvis utvalget ble feil, bruk Gå tilbake med en gang hvis tilgjengelig, ellers fjern eller avgrens medlemmene bevisst."
+      }
+    },
+    {
+      "ruleId": "ContactMarketing.RefineOrReduceSegmentContacts",
+      "taskType": "RefineSegmentContacts",
+      "semanticAction": "RefineContacts",
+      "entity": "MarketingSegment",
+      "priority": 1370,
+      "confidence": 0.96,
+      "match": {
+        "pagePatterns": [
+          "^Segments$",
+          "^Segment$"
+        ],
+        "actionPatterns": [
+          "^Refine Contacts$",
+          "^Reduce Contacts$",
+          "^Förfina kontakter$",
+          "^Minska kontakter$"
+        ],
+        "fieldPatterns": [],
+        "automationIdPatterns": []
+      },
+      "instructionTemplate": "",
+      "languages": [
+        "en-US",
+        "sv-SE",
+        "fr-FR",
+        "de-DE",
+        "es-ES",
+        "da-DK",
+        "fi-FI",
+        "nb-NO"
+      ],
+      "aliases": [],
+      "sourceIds": [
+        "contact-marketing-add-contacts-en-us",
+        "contact-marketing-add-contacts-sv-se",
+        "contact-marketing-add-contacts-fr-fr",
+        "contact-marketing-add-contacts-de-de",
+        "contact-marketing-add-contacts-es-es",
+        "contact-marketing-add-contacts-da-dk",
+        "contact-marketing-add-contacts-fi-fi",
+        "contact-marketing-add-contacts-nb-no"
+      ],
+      "localizedExplanations": {
+        "en-US": "Changes membership in the selected segment using contact filters: Refine Contacts keeps only matching members, while Reduce Contacts removes matching members. Check which of the two operations you chose and review the filters before confirming, since the same filter has opposite effects. Verify the remaining list before logging the segment, creating interactions, or using it as a campaign audience.",
+        "sv-SE": "Ändrar medlemskapet i det valda segmentet med kontaktfilter: Förfina kontakter behåller bara medlemmar som matchar, medan Minska kontakter tar bort de matchande medlemmarna. Kontrollera vilken av åtgärderna du valt och granska filtren före bekräftelse, eftersom samma filter får motsatt effekt. Kontrollera den återstående listan innan segmentet loggas, interaktioner skapas eller segmentet används för en kampanj.",
+        "fr-FR": "Modifie les membres du segment sélectionné selon des filtres : Affiner les contacts conserve uniquement les membres correspondants, tandis que Réduire les contacts supprime ceux qui correspondent. Vérifiez l’action choisie et les filtres avant confirmation, car le même filtre a un effet opposé. Contrôlez la liste restante avant journalisation, création d’interactions ou utilisation comme public de campagne.",
+        "de-DE": "Ändert die Mitgliedschaft im ausgewählten Segment mithilfe von Kontaktfiltern: Kontakte verfeinern behält nur passende Mitglieder, Kontakte reduzieren entfernt passende Mitglieder. Prüfen Sie Aktion und Filter vor der Bestätigung, da derselbe Filter entgegengesetzt wirkt. Kontrollieren Sie die verbleibende Liste, bevor Sie das Segment protokollieren, Interaktionen erstellen oder es als Kampagnenzielgruppe verwenden.",
+        "es-ES": "Cambia los miembros del segmento con filtros de contacto: Refinar contactos conserva solo los miembros coincidentes, mientras que Reducir contactos elimina los coincidentes. Compruebe la acción y los filtros antes de confirmar, porque el mismo filtro tiene efectos opuestos. Revise la lista restante antes de registrar el segmento, crear interacciones o usarlo como público de campaña.",
+        "da-DK": "Ændrer medlemskabet i det valgte segment med kontaktfiltre: Forfin kontakter beholder kun matchende medlemmer, mens Reducer kontakter fjerner matchende medlemmer. Kontrollér handling og filtre før bekræftelse, da samme filter har modsatrettet virkning. Gennemgå den resterende liste før logning, interaktioner eller brug som kampagnemålgruppe.",
+        "fi-FI": "Muuttaa valitun segmentin jäsenyyttä yhteyshenkilösuodattimilla: Rajaa yhteyshenkilöitä säilyttää vain vastaavat jäsenet, kun taas Vähennä yhteyshenkilöitä poistaa vastaavat jäsenet. Tarkista valittu toiminto ja suodattimet ennen vahvistusta, sillä sama suodatin vaikuttaa vastakkaisesti. Tarkista jäljelle jäävä luettelo ennen kirjaamista, vuorovaikutuksia tai kampanjakohderyhmänä käyttöä.",
+        "nb-NO": "Endrer medlemskapet i det valgte segmentet med kontaktfiltre: Forfin kontakter beholder bare matchende medlemmer, mens Reduser kontakter fjerner matchende medlemmer. Kontroller hvilken handling du valgte og filtrene før du bekrefter, fordi samme filter virker motsatt. Se gjennom listen som står igjen før logging, interaksjoner eller bruk som kampanjemålgruppe."
+      }
+    }
+  ],
+  "sources": [
+    {
+      "sourceId": "contact-marketing-campaigns-en-us",
+      "title": "Manage campaigns — Business Central",
+      "sourceUri": "https://learn.microsoft.com/en-us/dynamics365/business-central/marketing-campaigns",
+      "accessedDate": "2026-09-29",
+      "appliesTo": "Business Central built-in Contact Marketing campaigns; not Dynamics 365 Sales CRM campaigns.",
+      "fields": [
+        "Campaign status codes must be set up before campaigns are created.",
+        "A campaign record is distinct from its target audience segment. Campaign prices and discounts are set before activation, and interactions are recorded as they occur."
+      ],
+      "documentedCaptions": ["Campaigns", "New"]
+    },
+    {
+      "sourceId": "contact-marketing-campaigns-sv-se",
+      "title": "Hantera kampanjer — Business Central",
+      "sourceUri": "https://learn.microsoft.com/sv-se/dynamics365/business-central/marketing-campaigns",
+      "accessedDate": "2026-09-29",
+      "appliesTo": "Business Central inbyggda kampanjhantering inom Kontakter och marknadsföring; inte Dynamics 365 Sales CRM-kampanjer.",
+      "fields": [
+        "Kampanjstatuskoder ska konfigureras innan kampanjer skapas.",
+        "En kampanjpost skiljer sig från målgruppssegmentet. Kampanjpriser och rabatter anges före aktivering och interaktioner registreras när de sker."
+      ],
+      "documentedCaptions": ["Kampanjer", "Ny"]
+    },
+    {
+      "sourceId": "contact-marketing-campaigns-fr-fr",
+      "title": "Gérer les campagnes — Business Central",
+      "sourceUri": "https://learn.microsoft.com/fr-fr/dynamics365/business-central/marketing-campaigns",
+      "accessedDate": "2026-09-29",
+      "appliesTo": "Business Central built-in Contact Marketing campaign workflow. Localized Learn route; runtime captions are not inferred for this locale.",
+      "fields": ["Campaigns have status setup, audience segments, campaign prices or discounts, and separately recorded interactions."],
+      "documentedCaptions": []
+    },
+    {
+      "sourceId": "contact-marketing-campaigns-de-de",
+      "title": "Kampagnen verwalten — Business Central",
+      "sourceUri": "https://learn.microsoft.com/de-de/dynamics365/business-central/marketing-campaigns",
+      "accessedDate": "2026-09-29",
+      "appliesTo": "Business Central built-in Contact Marketing campaign workflow. Localized Learn route; runtime captions are not inferred for this locale.",
+      "fields": ["Campaigns have status setup, audience segments, campaign prices or discounts, and separately recorded interactions."],
+      "documentedCaptions": []
+    },
+    {
+      "sourceId": "contact-marketing-campaigns-es-es",
+      "title": "Administrar campañas — Business Central",
+      "sourceUri": "https://learn.microsoft.com/es-es/dynamics365/business-central/marketing-campaigns",
+      "accessedDate": "2026-09-29",
+      "appliesTo": "Business Central built-in Contact Marketing campaign workflow. Localized Learn route; runtime captions are not inferred for this locale.",
+      "fields": ["Campaigns have status setup, audience segments, campaign prices or discounts, and separately recorded interactions."],
+      "documentedCaptions": []
+    },
+    {
+      "sourceId": "contact-marketing-campaigns-da-dk",
+      "title": "Administrer kampagner — Business Central",
+      "sourceUri": "https://learn.microsoft.com/da-dk/dynamics365/business-central/marketing-campaigns",
+      "accessedDate": "2026-09-29",
+      "appliesTo": "Business Central built-in Contact Marketing campaign workflow. Localized Learn route; runtime captions are not inferred for this locale.",
+      "fields": ["Campaigns have status setup, audience segments, campaign prices or discounts, and separately recorded interactions."],
+      "documentedCaptions": []
+    },
+    {
+      "sourceId": "contact-marketing-campaigns-fi-fi",
+      "title": "Kampanjoiden hallinta — Business Central",
+      "sourceUri": "https://learn.microsoft.com/fi-fi/dynamics365/business-central/marketing-campaigns",
+      "accessedDate": "2026-09-29",
+      "appliesTo": "Business Central built-in Contact Marketing campaign workflow. Localized Learn route; runtime captions are not inferred for this locale.",
+      "fields": ["Campaigns have status setup, audience segments, campaign prices or discounts, and separately recorded interactions."],
+      "documentedCaptions": []
+    },
+    {
+      "sourceId": "contact-marketing-campaigns-nb-no",
+      "title": "Administrere kampanjer — Business Central",
+      "sourceUri": "https://learn.microsoft.com/nb-no/dynamics365/business-central/marketing-campaigns",
+      "accessedDate": "2026-09-29",
+      "appliesTo": "Business Central built-in Contact Marketing campaign workflow. Localized Learn route; runtime captions are not inferred for this locale.",
+      "fields": ["Campaigns have status setup, audience segments, campaign prices or discounts, and separately recorded interactions."],
+      "documentedCaptions": []
+    },
+    {
+      "sourceId": "contact-marketing-opportunities-en-us",
+      "title": "Process sales opportunities — Business Central",
+      "sourceUri": "https://learn.microsoft.com/en-us/dynamics365/business-central/marketing-processing-sales-opportunities",
+      "accessedDate": "2026-09-29",
+      "appliesTo": "Microsoft Business Central built-in sales opportunity workflow. English Learn source; Dynamics 365 Sales CRM is not covered.",
+      "fields": [
+        "Close an opportunity by recording won/lost outcome, close code and date. Quotes can be created only for company contacts; orders are made from quotes after the contact is created as a customer. Opportunities can move between sales-cycle stages."
+      ],
+      "documentedCaptions": [
+        "Opportunities",
+        "Close",
+        "Create Sales Quote",
+        "Make Order",
+        "Update"
+      ]
+    },
+    {
+      "sourceId": "contact-marketing-opportunities-sv-se",
+      "title": "Bearbeta försäljningsmöjligheter — Business Central",
+      "sourceUri": "https://learn.microsoft.com/sv-se/dynamics365/business-central/marketing-processing-sales-opportunities",
+      "accessedDate": "2026-09-29",
+      "appliesTo": "Business Centrals inbyggda försäljningsmöjlighetsflöde. Svensk Microsoft Learn-källa; Dynamics 365 Sales CRM ingår inte.",
+      "fields": [
+        "Avsluta en affärsmöjlighet med vunnet/förlorat utfall, avslutskod och datum. Offert kan bara skapas för företagskontakter; order görs från offert efter att kontakten har skapats som kund. Affärsmöjligheter kan flyttas mellan säljcykeletapper."
+      ],
+      "documentedCaptions": [
+        "Affärsmöjligheter",
+        "Stäng",
+        "Skapa försäljningsoffert",
+        "Gör beställning",
+        "Uppdatera"
+      ]
+    },
+    {
+      "sourceId": "contact-marketing-interactions-en-us",
+      "title": "Create interactions on contacts and segments — Business Central",
+      "sourceUri": "https://learn.microsoft.com/en-us/dynamics365/business-central/marketing-how-create-interactions",
+      "accessedDate": "2026-09-29",
+      "appliesTo": "Microsoft Business Central contact and marketing functions. English Learn source; localized tenant captions and Dynamics 365 Sales CRM behavior are outside this rule.",
+      "fields": [
+        "Create Interaction on a contact or segment records communications using interaction templates. Segment interactions are recorded for each contact; the segment can be logged and a follow-up segment created. This action records a touchpoint and does not establish that an external communication was delivered."
+      ],
+      "documentedCaptions": [
+        "Contacts",
+        "Segments",
+        "Create Interaction"
+      ]
+    },
+    {
+      "sourceId": "contact-marketing-interactions-sv-se",
+      "title": "Create interactions on contacts and segments — Business Central",
+      "sourceUri": "https://learn.microsoft.com/sv-se/dynamics365/business-central/marketing-how-create-interactions",
+      "accessedDate": "2026-09-29",
+      "appliesTo": "Microsoft Business Central contact and marketing functions. Swedish Microsoft Learn article; tenant captions and Dynamics 365 Sales CRM behavior are not covered.",
+      "fields": [
+        "Skapa interaktion på en kontakt eller ett segment för att registrera kommunikation med hjälp av interaktionsmallar. Segmentinteraktioner registreras per kontakt; segmentet kan loggas och ett uppföljningssegment kan skapas."
+      ],
+      "documentedCaptions": [
+        "Kontakter",
+        "Segment",
+        "Skapa interaktion"
+      ]
+    },
+    {
+      "sourceId": "contact-marketing-interactions-fr-fr",
+      "title": "Create interactions on contacts and segments — Business Central",
+      "sourceUri": "https://learn.microsoft.com/fr-fr/dynamics365/business-central/marketing-how-create-interactions",
+      "accessedDate": "2026-09-29",
+      "appliesTo": "Microsoft Business Central contact and marketing functions. Localized Microsoft Learn source; tenant captions are not verified.",
+      "fields": [
+        "Consigner les communications avec un contact ou les contacts d’un segment à l’aide de modèles d’interaction. Un segment peut créer une interaction par contact, être journalisé et servir à créer un segment de suivi."
+      ],
+      "documentedCaptions": [
+        "Contacts",
+        "Segments",
+        "Créer une interaction"
+      ]
+    },
+    {
+      "sourceId": "contact-marketing-interactions-de-de",
+      "title": "Create interactions on contacts and segments — Business Central",
+      "sourceUri": "https://learn.microsoft.com/de-de/dynamics365/business-central/marketing-how-create-interactions",
+      "accessedDate": "2026-09-29",
+      "appliesTo": "Microsoft Business Central contact and marketing functions. Localized Microsoft Learn source; tenant captions are not verified.",
+      "fields": [
+        "Kommunikation mit einem Kontakt oder den Kontakten eines Segments wird mithilfe von Interaktionsvorlagen protokolliert. Ein Segment kann je Kontakt eine Interaktion erzeugen, protokolliert und als Grundlage für ein Folgesegment verwendet werden."
+      ],
+      "documentedCaptions": [
+        "Kontakte",
+        "Segmente",
+        "Interaktion erstellen"
+      ]
+    },
+    {
+      "sourceId": "contact-marketing-interactions-es-es",
+      "title": "Create interactions on contacts and segments — Business Central",
+      "sourceUri": "https://learn.microsoft.com/es-es/dynamics365/business-central/marketing-how-create-interactions",
+      "accessedDate": "2026-09-29",
+      "appliesTo": "Microsoft Business Central contact and marketing functions. Localized Microsoft Learn source; tenant captions are not verified.",
+      "fields": [
+        "Registra comunicaciones con un contacto o con los contactos de un segmento mediante plantillas de interacción. El proceso de segmento puede crear un registro por contacto, registrar el segmento y crear otro de seguimiento."
+      ],
+      "documentedCaptions": [
+        "Contactos",
+        "Segmentos",
+        "Crear interacción"
+      ]
+    },
+    {
+      "sourceId": "contact-marketing-interactions-da-dk",
+      "title": "Create interactions on contacts and segments — Business Central",
+      "sourceUri": "https://learn.microsoft.com/da-dk/dynamics365/business-central/marketing-how-create-interactions",
+      "accessedDate": "2026-09-29",
+      "appliesTo": "Microsoft Business Central contact and marketing functions. Localized Microsoft Learn source; tenant captions are not verified.",
+      "fields": [
+        "Registrer kommunikation med en kontakt eller kontakter i et segment ved hjælp af interaktionsskabeloner. Segmentforløbet kan oprette en post pr. kontakt, logge segmentet og oprette et opfølgningssegment."
+      ],
+      "documentedCaptions": [
+        "Kontakter",
+        "Segmenter",
+        "Opret interaktion"
+      ]
+    },
+    {
+      "sourceId": "contact-marketing-interactions-fi-fi",
+      "title": "Create interactions on contacts and segments — Business Central",
+      "sourceUri": "https://learn.microsoft.com/fi-fi/dynamics365/business-central/marketing-how-create-interactions",
+      "accessedDate": "2026-09-29",
+      "appliesTo": "Microsoft Business Central contact and marketing functions. Localized Microsoft Learn source; tenant captions are not verified.",
+      "fields": [
+        "Kirjaa viestintä yhteyshenkilön tai segmentin yhteyshenkilöiden kanssa vuorovaikutusmallien avulla. Segmenttitoiminto voi luoda tietueen kullekin yhteyshenkilölle, kirjata segmentin ja luoda seurantasegmentin."
+      ],
+      "documentedCaptions": [
+        "Yhteyshenkilöt",
+        "Segmentit",
+        "Luo vuorovaikutus"
+      ]
+    },
+    {
+      "sourceId": "contact-marketing-interactions-nb-no",
+      "title": "Create interactions on contacts and segments — Business Central",
+      "sourceUri": "https://learn.microsoft.com/nb-no/dynamics365/business-central/marketing-how-create-interactions",
+      "accessedDate": "2026-09-29",
+      "appliesTo": "Microsoft Business Central contact and marketing functions. Localized Microsoft Learn source; tenant captions are not verified.",
+      "fields": [
+        "Registrer kommunikasjon med én kontakt eller kontaktene i et segment ved hjelp av interaksjonsmaler. Segmentprosessen kan opprette en post per kontakt, logge segmentet og opprette et oppfølgingssegment."
+      ],
+      "documentedCaptions": [
+        "Kontakter",
+        "Segmenter",
+        "Opprett interaksjon"
+      ]
+    },
+    {
+      "sourceId": "contact-marketing-create-segment-en-us",
+      "title": "Create Segments — Business Central",
+      "sourceUri": "https://learn.microsoft.com/en-us/dynamics365/business-central/marketing-how-create-segment",
+      "accessedDate": "2026-09-29",
+      "appliesTo": "Business Central built-in Contact Marketing segment cards. English Microsoft Learn procedure.",
+      "fields": [
+        "Search Segments, choose New, enter a segment number or use the configured Marketing Setup number series, and fill in the segment header. Contact membership is added as a separate next step."
+      ],
+      "documentedCaptions": [
+        "Segments",
+        "New"
+      ]
+    },
+    {
+      "sourceId": "contact-marketing-create-segment-sv-se",
+      "title": "Skapa segment — Business Central",
+      "sourceUri": "https://learn.microsoft.com/sv-se/dynamics365/business-central/marketing-how-create-segment",
+      "accessedDate": "2026-09-29",
+      "appliesTo": "Business Central built-in Contact Marketing segment cards. Swedish Microsoft Learn procedure.",
+      "fields": [
+        "Sök efter Segment, välj Ny och ange segmentnummer eller använd nummerserien i Marknadsföringsinställningar. Fyll i segmenthuvudet; kontakter väljs separat."
+      ],
+      "documentedCaptions": [
+        "Segment",
+        "Ny"
+      ]
+    },
+    {
+      "sourceId": "contact-marketing-add-contacts-en-us",
+      "title": "Add contacts to segments — Business Central",
+      "sourceUri": "https://learn.microsoft.com/en-us/dynamics365/business-central/marketing-add-contact-segment",
+      "accessedDate": "2026-09-29",
+      "appliesTo": "Business Central built-in contact membership management for marketing segments.",
+      "fields": [
+        "Add Contacts adds contacts matching filters to a segment. Refine Contacts keeps matching members; Reduce Contacts removes matching members. Go Back can reverse the immediately preceding segment operation where available."
+      ],
+      "documentedCaptions": [
+        "Segments",
+        "Add Contacts",
+        "Refine Contacts",
+        "Reduce Contacts",
+        "Go Back"
+      ]
+    },
+    {
+      "sourceId": "contact-marketing-add-contacts-sv-se",
+      "title": "Lägg till kontakter i segment — Business Central",
+      "sourceUri": "https://learn.microsoft.com/sv-se/dynamics365/business-central/marketing-add-contact-segment",
+      "accessedDate": "2026-09-29",
+      "appliesTo": "Business Central built-in contact membership management for marketing segments. Swedish Microsoft Learn procedure.",
+      "fields": [
+        "Lägg till kontakter lägger till matchande kontakter i segmentet. Förfina kontakter behåller matchande medlemmar; Minska kontakter tar bort matchande medlemmar. Gå tillbaka kan ångra föregående segmentåtgärd när den är tillgänglig."
+      ],
+      "documentedCaptions": [
+        "Segment",
+        "Lägg till kontakter",
+        "Förfina kontakter",
+        "Minska kontakter",
+        "Gå tillbaka"
+      ]
+    },
+    {
+      "sourceId": "contact-marketing-segments-en-us",
+      "title": "Manage segments and select contacts — Business Central",
+      "sourceUri": "https://learn.microsoft.com/en-us/dynamics365/business-central/marketing-segments",
+      "accessedDate": "2026-09-29",
+      "appliesTo": "Business Central built-in Contact Marketing, not Dynamics 365 Sales CRM segment management.",
+      "fields": [
+        "A segment first requires general header information, then its contact membership is selected. Segments can define target audiences for campaigns and can preserve selection criteria."
+      ],
+      "documentedCaptions": [
+        "Segments"
+      ]
+    },
+    {
+      "sourceId": "contact-marketing-segments-sv-se",
+      "title": "Hantera segment och välj kontakter — Business Central",
+      "sourceUri": "https://learn.microsoft.com/sv-se/dynamics365/business-central/marketing-segments",
+      "accessedDate": "2026-09-29",
+      "appliesTo": "Business Central built-in Contact Marketing, not Dynamics 365 Sales CRM segment management.",
+      "fields": [
+        "Ett segment kräver först allmänna huvuduppgifter och därefter ett urval av kontakter. Segment kan användas för att definiera målgrupper för kampanjer och spara urvalskriterier."
+      ],
+      "documentedCaptions": [
+        "Segment"
+      ]
+    },
+    {
+      "sourceId": "contact-marketing-opportunities-fr-fr",
+      "title": "Traitement des opportunités de vente dans les cycles de vente - Business Central | Microsoft Learn",
+      "sourceUri": "https://learn.microsoft.com/fr-fr/dynamics365/business-central/marketing-processing-sales-opportunities",
+      "accessedDate": "2026-09-29",
+      "appliesTo": "Microsoft Business Central built-in sales opportunity workflow. Localized Microsoft Learn source for fr-FR; Dynamics 365 Sales CRM is not covered.",
+      "fields": [
+        "Close a sales opportunity by recording its won/lost outcome, configured close code and close date. Quotes require a company contact; orders are created from quotes after the contact becomes a customer."
+      ],
+      "documentedCaptions": [
+        "Opportunités",
+        "Fermer"
+      ]
+    },
+    {
+      "sourceId": "contact-marketing-opportunities-de-de",
+      "title": "Verarbeiten von Verkaufschancen in Verkaufsprozessen - Business Central | Microsoft Learn",
+      "sourceUri": "https://learn.microsoft.com/de-de/dynamics365/business-central/marketing-processing-sales-opportunities",
+      "accessedDate": "2026-09-29",
+      "appliesTo": "Microsoft Business Central built-in sales opportunity workflow. Localized Microsoft Learn source for de-DE; Dynamics 365 Sales CRM is not covered.",
+      "fields": [
+        "Close a sales opportunity by recording its won/lost outcome, configured close code and close date. Quotes require a company contact; orders are created from quotes after the contact becomes a customer."
+      ],
+      "documentedCaptions": [
+        "Verkaufschancen",
+        "Schließen"
+      ]
+    },
+    {
+      "sourceId": "contact-marketing-opportunities-es-es",
+      "title": "Procesar oportunidades de ventas en ciclos de ventas - Business Central | Microsoft Learn",
+      "sourceUri": "https://learn.microsoft.com/es-es/dynamics365/business-central/marketing-processing-sales-opportunities",
+      "accessedDate": "2026-09-29",
+      "appliesTo": "Microsoft Business Central built-in sales opportunity workflow. Localized Microsoft Learn source for es-ES; Dynamics 365 Sales CRM is not covered.",
+      "fields": [
+        "Close a sales opportunity by recording its won/lost outcome, configured close code and close date. Quotes require a company contact; orders are created from quotes after the contact becomes a customer."
+      ],
+      "documentedCaptions": [
+        "Oportunidades",
+        "Cerrar"
+      ]
+    },
+    {
+      "sourceId": "contact-marketing-opportunities-da-dk",
+      "title": "Behandle salgsmuligheder i salgsprocesser - Business Central | Microsoft Learn",
+      "sourceUri": "https://learn.microsoft.com/da-dk/dynamics365/business-central/marketing-processing-sales-opportunities",
+      "accessedDate": "2026-09-29",
+      "appliesTo": "Microsoft Business Central built-in sales opportunity workflow. Localized Microsoft Learn source for da-DK; Dynamics 365 Sales CRM is not covered.",
+      "fields": [
+        "Close a sales opportunity by recording its won/lost outcome, configured close code and close date. Quotes require a company contact; orders are created from quotes after the contact becomes a customer."
+      ],
+      "documentedCaptions": [
+        "Salgsmuligheder",
+        "Luk"
+      ]
+    },
+    {
+      "sourceId": "contact-marketing-opportunities-fi-fi",
+      "title": "Myyntisyklien myyntimahdollisuuksien käsitteleminen - Business Central | Microsoft Learn",
+      "sourceUri": "https://learn.microsoft.com/fi-fi/dynamics365/business-central/marketing-processing-sales-opportunities",
+      "accessedDate": "2026-09-29",
+      "appliesTo": "Microsoft Business Central built-in sales opportunity workflow. Localized Microsoft Learn source for fi-FI; Dynamics 365 Sales CRM is not covered.",
+      "fields": [
+        "Close a sales opportunity by recording its won/lost outcome, configured close code and close date. Quotes require a company contact; orders are created from quotes after the contact becomes a customer."
+      ],
+      "documentedCaptions": [
+        "Mahdollisuudet",
+        "Sulje"
+      ]
+    },
+    {
+      "sourceId": "contact-marketing-opportunities-nb-no",
+      "title": "Behandle salgsmuligheter i salgssykluser - Business Central | Microsoft Learn",
+      "sourceUri": "https://learn.microsoft.com/nb-no/dynamics365/business-central/marketing-processing-sales-opportunities",
+      "accessedDate": "2026-09-29",
+      "appliesTo": "Microsoft Business Central built-in sales opportunity workflow. Localized Microsoft Learn source for nb-NO; Dynamics 365 Sales CRM is not covered.",
+      "fields": [
+        "Close a sales opportunity by recording its won/lost outcome, configured close code and close date. Quotes require a company contact; orders are created from quotes after the contact becomes a customer."
+      ],
+      "documentedCaptions": [
+        "Salgsmuligheter",
+        "Lukk"
+      ]
+    },
+    {
+      "sourceId": "contact-marketing-create-segment-fr-fr",
+      "title": "Create Segments (fr-fr) — Business Central | Microsoft Learn",
+      "sourceUri": "https://learn.microsoft.com/fr-fr/dynamics365/business-central/marketing-how-create-segment",
+      "accessedDate": "2026-09-29",
+      "appliesTo": "Business Central built-in Contact Marketing segment cards. English Microsoft Learn procedure. Localized Learn URL available for fr-fr; runtime captions are not inferred from this source.",
+      "fields": [
+        "Search Segments, choose New, enter a segment number or use the configured Marketing Setup number series, and fill in the segment header. Contact membership is added as a separate next step."
+      ],
+      "documentedCaptions": [
+        "Segments",
+        "New"
+      ]
+    },
+    {
+      "sourceId": "contact-marketing-create-segment-de-de",
+      "title": "Create Segments (de-de) — Business Central | Microsoft Learn",
+      "sourceUri": "https://learn.microsoft.com/de-de/dynamics365/business-central/marketing-how-create-segment",
+      "accessedDate": "2026-09-29",
+      "appliesTo": "Business Central built-in Contact Marketing segment cards. English Microsoft Learn procedure. Localized Learn URL available for de-de; runtime captions are not inferred from this source.",
+      "fields": [
+        "Search Segments, choose New, enter a segment number or use the configured Marketing Setup number series, and fill in the segment header. Contact membership is added as a separate next step."
+      ],
+      "documentedCaptions": [
+        "Segments",
+        "New"
+      ]
+    },
+    {
+      "sourceId": "contact-marketing-create-segment-es-es",
+      "title": "Create Segments (es-es) — Business Central | Microsoft Learn",
+      "sourceUri": "https://learn.microsoft.com/es-es/dynamics365/business-central/marketing-how-create-segment",
+      "accessedDate": "2026-09-29",
+      "appliesTo": "Business Central built-in Contact Marketing segment cards. English Microsoft Learn procedure. Localized Learn URL available for es-es; runtime captions are not inferred from this source.",
+      "fields": [
+        "Search Segments, choose New, enter a segment number or use the configured Marketing Setup number series, and fill in the segment header. Contact membership is added as a separate next step."
+      ],
+      "documentedCaptions": [
+        "Segments",
+        "New"
+      ]
+    },
+    {
+      "sourceId": "contact-marketing-create-segment-da-dk",
+      "title": "Create Segments (da-dk) — Business Central | Microsoft Learn",
+      "sourceUri": "https://learn.microsoft.com/da-dk/dynamics365/business-central/marketing-how-create-segment",
+      "accessedDate": "2026-09-29",
+      "appliesTo": "Business Central built-in Contact Marketing segment cards. English Microsoft Learn procedure. Localized Learn URL available for da-dk; runtime captions are not inferred from this source.",
+      "fields": [
+        "Search Segments, choose New, enter a segment number or use the configured Marketing Setup number series, and fill in the segment header. Contact membership is added as a separate next step."
+      ],
+      "documentedCaptions": [
+        "Segments",
+        "New"
+      ]
+    },
+    {
+      "sourceId": "contact-marketing-create-segment-fi-fi",
+      "title": "Create Segments (fi-fi) — Business Central | Microsoft Learn",
+      "sourceUri": "https://learn.microsoft.com/fi-fi/dynamics365/business-central/marketing-how-create-segment",
+      "accessedDate": "2026-09-29",
+      "appliesTo": "Business Central built-in Contact Marketing segment cards. English Microsoft Learn procedure. Localized Learn URL available for fi-fi; runtime captions are not inferred from this source.",
+      "fields": [
+        "Search Segments, choose New, enter a segment number or use the configured Marketing Setup number series, and fill in the segment header. Contact membership is added as a separate next step."
+      ],
+      "documentedCaptions": [
+        "Segments",
+        "New"
+      ]
+    },
+    {
+      "sourceId": "contact-marketing-create-segment-nb-no",
+      "title": "Create Segments (nb-no) — Business Central | Microsoft Learn",
+      "sourceUri": "https://learn.microsoft.com/nb-no/dynamics365/business-central/marketing-how-create-segment",
+      "accessedDate": "2026-09-29",
+      "appliesTo": "Business Central built-in Contact Marketing segment cards. English Microsoft Learn procedure. Localized Learn URL available for nb-no; runtime captions are not inferred from this source.",
+      "fields": [
+        "Search Segments, choose New, enter a segment number or use the configured Marketing Setup number series, and fill in the segment header. Contact membership is added as a separate next step."
+      ],
+      "documentedCaptions": [
+        "Segments",
+        "New"
+      ]
+    },
+    {
+      "sourceId": "contact-marketing-add-contacts-fr-fr",
+      "title": "Add contacts to segments (fr-fr) — Business Central | Microsoft Learn",
+      "sourceUri": "https://learn.microsoft.com/fr-fr/dynamics365/business-central/marketing-add-contact-segment",
+      "accessedDate": "2026-09-29",
+      "appliesTo": "Business Central built-in contact membership management for marketing segments. Localized Learn URL available for fr-fr; runtime captions are not inferred from this source.",
+      "fields": [
+        "Add Contacts adds contacts matching filters to a segment. Refine Contacts keeps matching members; Reduce Contacts removes matching members. Go Back can reverse the immediately preceding segment operation where available."
+      ],
+      "documentedCaptions": [
+        "Segments",
+        "Add Contacts",
+        "Refine Contacts",
+        "Reduce Contacts",
+        "Go Back"
+      ]
+    },
+    {
+      "sourceId": "contact-marketing-add-contacts-de-de",
+      "title": "Add contacts to segments (de-de) — Business Central | Microsoft Learn",
+      "sourceUri": "https://learn.microsoft.com/de-de/dynamics365/business-central/marketing-add-contact-segment",
+      "accessedDate": "2026-09-29",
+      "appliesTo": "Business Central built-in contact membership management for marketing segments. Localized Learn URL available for de-de; runtime captions are not inferred from this source.",
+      "fields": [
+        "Add Contacts adds contacts matching filters to a segment. Refine Contacts keeps matching members; Reduce Contacts removes matching members. Go Back can reverse the immediately preceding segment operation where available."
+      ],
+      "documentedCaptions": [
+        "Segments",
+        "Add Contacts",
+        "Refine Contacts",
+        "Reduce Contacts",
+        "Go Back"
+      ]
+    },
+    {
+      "sourceId": "contact-marketing-add-contacts-es-es",
+      "title": "Add contacts to segments (es-es) — Business Central | Microsoft Learn",
+      "sourceUri": "https://learn.microsoft.com/es-es/dynamics365/business-central/marketing-add-contact-segment",
+      "accessedDate": "2026-09-29",
+      "appliesTo": "Business Central built-in contact membership management for marketing segments. Localized Learn URL available for es-es; runtime captions are not inferred from this source.",
+      "fields": [
+        "Add Contacts adds contacts matching filters to a segment. Refine Contacts keeps matching members; Reduce Contacts removes matching members. Go Back can reverse the immediately preceding segment operation where available."
+      ],
+      "documentedCaptions": [
+        "Segments",
+        "Add Contacts",
+        "Refine Contacts",
+        "Reduce Contacts",
+        "Go Back"
+      ]
+    },
+    {
+      "sourceId": "contact-marketing-add-contacts-da-dk",
+      "title": "Add contacts to segments (da-dk) — Business Central | Microsoft Learn",
+      "sourceUri": "https://learn.microsoft.com/da-dk/dynamics365/business-central/marketing-add-contact-segment",
+      "accessedDate": "2026-09-29",
+      "appliesTo": "Business Central built-in contact membership management for marketing segments. Localized Learn URL available for da-dk; runtime captions are not inferred from this source.",
+      "fields": [
+        "Add Contacts adds contacts matching filters to a segment. Refine Contacts keeps matching members; Reduce Contacts removes matching members. Go Back can reverse the immediately preceding segment operation where available."
+      ],
+      "documentedCaptions": [
+        "Segments",
+        "Add Contacts",
+        "Refine Contacts",
+        "Reduce Contacts",
+        "Go Back"
+      ]
+    },
+    {
+      "sourceId": "contact-marketing-add-contacts-fi-fi",
+      "title": "Add contacts to segments (fi-fi) — Business Central | Microsoft Learn",
+      "sourceUri": "https://learn.microsoft.com/fi-fi/dynamics365/business-central/marketing-add-contact-segment",
+      "accessedDate": "2026-09-29",
+      "appliesTo": "Business Central built-in contact membership management for marketing segments. Localized Learn URL available for fi-fi; runtime captions are not inferred from this source.",
+      "fields": [
+        "Add Contacts adds contacts matching filters to a segment. Refine Contacts keeps matching members; Reduce Contacts removes matching members. Go Back can reverse the immediately preceding segment operation where available."
+      ],
+      "documentedCaptions": [
+        "Segments",
+        "Add Contacts",
+        "Refine Contacts",
+        "Reduce Contacts",
+        "Go Back"
+      ]
+    },
+    {
+      "sourceId": "contact-marketing-add-contacts-nb-no",
+      "title": "Add contacts to segments (nb-no) — Business Central | Microsoft Learn",
+      "sourceUri": "https://learn.microsoft.com/nb-no/dynamics365/business-central/marketing-add-contact-segment",
+      "accessedDate": "2026-09-29",
+      "appliesTo": "Business Central built-in contact membership management for marketing segments. Localized Learn URL available for nb-no; runtime captions are not inferred from this source.",
+      "fields": [
+        "Add Contacts adds contacts matching filters to a segment. Refine Contacts keeps matching members; Reduce Contacts removes matching members. Go Back can reverse the immediately preceding segment operation where available."
+      ],
+      "documentedCaptions": [
+        "Segments",
+        "Add Contacts",
+        "Refine Contacts",
+        "Reduce Contacts",
+        "Go Back"
+      ]
+    },
+    {
+      "sourceId": "contact-marketing-segments-fr-fr",
+      "title": "Manage segments and select contacts (fr-fr) — Business Central | Microsoft Learn",
+      "sourceUri": "https://learn.microsoft.com/fr-fr/dynamics365/business-central/marketing-segments",
+      "accessedDate": "2026-09-29",
+      "appliesTo": "Business Central built-in Contact Marketing, not Dynamics 365 Sales CRM segment management. Localized Learn URL available for fr-fr; runtime captions are not inferred from this source.",
+      "fields": [
+        "A segment first requires general header information, then its contact membership is selected. Segments can define target audiences for campaigns and can preserve selection criteria."
+      ],
+      "documentedCaptions": [
+        "Segments"
+      ]
+    },
+    {
+      "sourceId": "contact-marketing-segments-de-de",
+      "title": "Manage segments and select contacts (de-de) — Business Central | Microsoft Learn",
+      "sourceUri": "https://learn.microsoft.com/de-de/dynamics365/business-central/marketing-segments",
+      "accessedDate": "2026-09-29",
+      "appliesTo": "Business Central built-in Contact Marketing, not Dynamics 365 Sales CRM segment management. Localized Learn URL available for de-de; runtime captions are not inferred from this source.",
+      "fields": [
+        "A segment first requires general header information, then its contact membership is selected. Segments can define target audiences for campaigns and can preserve selection criteria."
+      ],
+      "documentedCaptions": [
+        "Segments"
+      ]
+    },
+    {
+      "sourceId": "contact-marketing-segments-es-es",
+      "title": "Manage segments and select contacts (es-es) — Business Central | Microsoft Learn",
+      "sourceUri": "https://learn.microsoft.com/es-es/dynamics365/business-central/marketing-segments",
+      "accessedDate": "2026-09-29",
+      "appliesTo": "Business Central built-in Contact Marketing, not Dynamics 365 Sales CRM segment management. Localized Learn URL available for es-es; runtime captions are not inferred from this source.",
+      "fields": [
+        "A segment first requires general header information, then its contact membership is selected. Segments can define target audiences for campaigns and can preserve selection criteria."
+      ],
+      "documentedCaptions": [
+        "Segments"
+      ]
+    },
+    {
+      "sourceId": "contact-marketing-segments-da-dk",
+      "title": "Manage segments and select contacts (da-dk) — Business Central | Microsoft Learn",
+      "sourceUri": "https://learn.microsoft.com/da-dk/dynamics365/business-central/marketing-segments",
+      "accessedDate": "2026-09-29",
+      "appliesTo": "Business Central built-in Contact Marketing, not Dynamics 365 Sales CRM segment management. Localized Learn URL available for da-dk; runtime captions are not inferred from this source.",
+      "fields": [
+        "A segment first requires general header information, then its contact membership is selected. Segments can define target audiences for campaigns and can preserve selection criteria."
+      ],
+      "documentedCaptions": [
+        "Segments"
+      ]
+    },
+    {
+      "sourceId": "contact-marketing-segments-fi-fi",
+      "title": "Manage segments and select contacts (fi-fi) — Business Central | Microsoft Learn",
+      "sourceUri": "https://learn.microsoft.com/fi-fi/dynamics365/business-central/marketing-segments",
+      "accessedDate": "2026-09-29",
+      "appliesTo": "Business Central built-in Contact Marketing, not Dynamics 365 Sales CRM segment management. Localized Learn URL available for fi-fi; runtime captions are not inferred from this source.",
+      "fields": [
+        "A segment first requires general header information, then its contact membership is selected. Segments can define target audiences for campaigns and can preserve selection criteria."
+      ],
+      "documentedCaptions": [
+        "Segments"
+      ]
+    },
+    {
+      "sourceId": "contact-marketing-segments-nb-no",
+      "title": "Manage segments and select contacts (nb-no) — Business Central | Microsoft Learn",
+      "sourceUri": "https://learn.microsoft.com/nb-no/dynamics365/business-central/marketing-segments",
+      "accessedDate": "2026-09-29",
+      "appliesTo": "Business Central built-in Contact Marketing, not Dynamics 365 Sales CRM segment management. Localized Learn URL available for nb-no; runtime captions are not inferred from this source.",
+      "fields": [
+        "A segment first requires general header information, then its contact membership is selected. Segments can define target audiences for campaigns and can preserve selection criteria."
+      ],
+      "documentedCaptions": [
+        "Segments"
+      ]
+    }
+  ]
+}

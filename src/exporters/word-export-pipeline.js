@@ -80,6 +80,15 @@
   qualityRules,
   qualityValidation
 ) {
+  function omitObservedResultCallouts(value) {
+    if (Array.isArray(value)) return value
+      .filter(item => !String(item?.blockId || "").startsWith("block:observed-result:"))
+      .map(omitObservedResultCallouts);
+    if (!value || typeof value !== "object") return value;
+    return Object.fromEntries(Object.entries(value).map(([key, item]) =>
+      [key, omitObservedResultCallouts(item)]));
+  }
+
   function analyzeQuality(document, plan) {
     try {
       const result = quality.analyze(
@@ -138,7 +147,8 @@
     const languageDocument = language.process(semanticActionsDocument, profile);
     const localizedDocument = documentLanguage.process(languageDocument,
       options.documentLanguage || projection.document.metadata?.documentLanguage);
-    const grammarDocument = presentation.process(localizedDocument);
+    const grammarDocument = omitObservedResultCallouts(
+      presentation.process(localizedDocument));
     return semantic.deepFreeze({
       sourceSemanticDocument: projection.document,
       semanticActionsDocument,

@@ -1,0 +1,401 @@
+{
+  "packId": "bc-inventory-tracking",
+  "name": "Business Central inventory tracking",
+  "version": "1.0.0",
+  "priority": 240,
+  "rules": [
+    {
+      "ruleId": "InventoryTracking.TraceSerialOrLot",
+      "taskType": "RunAction",
+      "semanticAction": "RunAction",
+      "entity": "ItemTracing",
+      "priority": 1180,
+      "confidence": 0.95,
+      "match": {
+        "pagePatterns": [
+          "^Item Tracing$"
+        ],
+        "actionPatterns": [
+          "^Trace$"
+        ],
+        "fieldPatterns": [],
+        "automationIdPatterns": []
+      },
+      "instructionTemplate": "",
+      "languages": [
+        "en-US",
+        "sv-SE",
+        "fr-FR",
+        "de-DE",
+        "es-ES",
+        "da-DK",
+        "fi-FI",
+        "nb-NO"
+      ],
+      "aliases": [],
+      "sourceIds": [
+        "inventory-tracing-workflow-en-us",
+        "inventory-tracing-workflow-sv-se"
+      ],
+      "localizedExplanations": {
+        "en-US": "Trace follows the selected serial or lot through applied, posted inventory transactions in the direction you choose (Usage → Origin or Origin → Usage). Set item filters and decide whether to include components before running it. It can omit un-applied transactions and may not show every receipt when the same lot was received on multiple transactions; use Find Entries to see all matching open and posted records.",
+        "sv-SE": "Spåra följer valt serie- eller partinummer genom matchade, bokförda lagertransaktioner i vald riktning (Förbrukning → Ursprung eller Ursprung → Användning). Ange artikelurval och om komponenter ska ingå innan du kör spårningen. Omatchade transaktioner kan saknas, och samma parti på flera inleveranser kanske inte visas fullständigt; använd Sök poster för att hitta alla matchande öppna och bokförda poster.",
+        "fr-FR": "La traçabilité suit le numéro de série ou de lot sélectionné dans les transactions de stock comptabilisées et lettrées, dans le sens choisi (Utilisation → Origine ou Origine → Utilisation). Définissez les filtres d’article et l’inclusion éventuelle des composants avant l’exécution. Les transactions non lettrées peuvent manquer et plusieurs réceptions du même lot peuvent ne pas toutes apparaître ; utilisez Rechercher écritures pour trouver toutes les écritures ouvertes et comptabilisées correspondantes.",
+        "de-DE": "Die Artikelverfolgung verfolgt die ausgewählte Serien- oder Chargennummer in der gewählten Richtung (Verwendung → Herkunft oder Herkunft → Verwendung) durch ausgeglichene, gebuchte Lagertransaktionen. Legen Sie vor dem Ausführen Artikel- und Komponentenfilter fest. Nicht ausgeglichene Transaktionen können fehlen, und mehrere Eingänge derselben Charge werden möglicherweise nicht vollständig angezeigt; verwenden Sie „Posten suchen“, um alle passenden offenen und gebuchten Datensätze zu finden.",
+        "es-ES": "El seguimiento recorre el número de serie o lote seleccionado por las transacciones de inventario aplicadas y registradas, en la dirección elegida (Uso → Origen u Origen → Uso). Defina los filtros de artículo y si desea incluir componentes antes de ejecutarlo. Puede omitir transacciones no aplicadas y quizá no mostrar todas las recepciones del mismo lote; use Buscar movimientos para encontrar todos los registros abiertos y registrados correspondientes.",
+        "da-DK": "Sporing følger det valgte serie- eller lotnummer gennem udlignede, bogførte lagertransaktioner i den valgte retning (Forbrug → Oprindelse eller Oprindelse → Forbrug). Angiv varefiltre, og vælg om komponenter skal medtages, før du kører sporingen. Ikke-udlignede transaktioner kan mangle, og flere modtagelser af samme lot vises muligvis ikke alle; brug Find poster til at finde alle tilsvarende åbne og bogførte poster.",
+        "fi-FI": "Jäljitys seuraa valittua sarja- tai eränumeroa kohdistettujen, kirjattujen varastotapahtumien kautta valittuun suuntaan (Käyttö → Alkuperä tai Alkuperä → Käyttö). Määritä nimikesuodattimet ja komponenttien näyttö ennen suoritusta. Kohdistamattomat tapahtumat voivat puuttua, eikä samaa erää koskevia useita vastaanottoja välttämättä näytetä kaikkia; etsi kaikki vastaavat avoimet ja kirjatut tapahtumat Etsi tapahtumia -toiminnolla.",
+        "nb-NO": "Sporing følger det valgte serie- eller partinummeret gjennom utlignede, bokførte lagertransaksjoner i den valgte retningen (Bruk → Opprinnelse eller Opprinnelse → Bruk). Angi varefiltre og om komponenter skal tas med før du kjører sporingen. Ikke-utlignede transaksjoner kan mangle, og flere mottak av samme parti vises kanskje ikke alle; bruk Finn poster for å finne alle tilsvarende åpne og bokførte poster."
+      }
+    },
+    {
+      "ruleId": "InventoryTracking.FindAllSerialOrLotEntries",
+      "taskType": "RunAction",
+      "semanticAction": "RunAction",
+      "entity": "FindEntries",
+      "priority": 1180,
+      "confidence": 0.95,
+      "match": {
+        "pagePatterns": [
+          "^Find Entries$"
+        ],
+        "actionPatterns": [
+          "^Find$"
+        ],
+        "fieldPatterns": [],
+        "automationIdPatterns": []
+      },
+      "instructionTemplate": "",
+      "languages": [
+        "en-US",
+        "sv-SE",
+        "fr-FR",
+        "de-DE",
+        "es-ES",
+        "da-DK",
+        "fi-FI",
+        "nb-NO"
+      ],
+      "aliases": [],
+      "sourceIds": [
+        "inventory-tracing-workflow-en-us",
+        "inventory-tracing-workflow-sv-se"
+      ],
+      "localizedExplanations": {
+        "en-US": "Find Entries searches all instances of the specified serial or lot, including open and posted records, but it does not show the sequence of transactions. Use it with Item Tracing: tracing explains the applied transaction chain, while Find Entries helps locate remaining records and occurrences.",
+        "sv-SE": "Sök poster hittar alla förekomster av angivet serie- eller partinummer, både öppna och bokförda, men visar inte transaktionernas ordningsföljd. Använd funktionen tillsammans med Objektspårning: spårningen visar kedjan av matchade transaktioner, medan Sök poster hjälper dig hitta övriga poster och förekomster.",
+        "fr-FR": "Rechercher écritures trouve toutes les occurrences du numéro de série ou de lot, y compris les écritures ouvertes et comptabilisées, mais n’affiche pas la séquence des transactions. Utilisez cette fonction avec la traçabilité : celle-ci montre la chaîne des transactions lettrées, tandis que Rechercher écritures aide à localiser les autres occurrences.",
+        "de-DE": "„Posten suchen“ findet alle Vorkommen der Serien- oder Chargennummer, einschließlich offener und gebuchter Datensätze, zeigt jedoch keine Transaktionsreihenfolge. Verwenden Sie die Funktion zusammen mit der Artikelverfolgung: Diese zeigt die Kette ausgeglichener Transaktionen, während „Posten suchen“ weitere Datensätze und Vorkommen auffindet.",
+        "es-ES": "Buscar movimientos encuentra todas las apariciones del número de serie o lote, incluidos los registros abiertos y registrados, pero no muestra la secuencia de transacciones. Úselo junto con Seguimiento de productos: el seguimiento muestra la cadena de transacciones aplicadas y Buscar movimientos ayuda a localizar las demás apariciones.",
+        "da-DK": "Find poster finder alle forekomster af serie- eller lotnummeret, både åbne og bogførte, men viser ikke transaktionsrækkefølgen. Brug funktionen sammen med varesporing: Sporingen viser kæden af udlignede transaktioner, mens Find poster hjælper med at finde øvrige poster og forekomster.",
+        "fi-FI": "Etsi tapahtumia löytää kaikki määritetyn sarja- tai eränumeron esiintymät, sekä avoimet että kirjatut, mutta ei näytä tapahtumien järjestystä. Käytä sitä nimikkeen jäljityksen kanssa: jäljitys näyttää kohdistettujen tapahtumien ketjun, ja Etsi tapahtumia auttaa paikantamaan muut esiintymät.",
+        "nb-NO": "Finn poster finner alle forekomster av serie- eller partinummeret, både åpne og bokførte, men viser ikke transaksjonsrekkefølgen. Bruk funksjonen sammen med varesporing: Sporingen viser kjeden av utlignede transaksjoner, mens Finn poster hjelper deg med å finne andre poster og forekomster."
+      }
+    },
+    {
+      "ruleId": "InventoryTracking.AssignTrackingNumber",
+      "taskType": "AssignTrackingNumber",
+      "semanticAction": "AssignTrackingNumber",
+      "entity": "ItemTrackingLine",
+      "priority": 1330,
+      "confidence": 0.96,
+      "match": {
+        "pagePatterns": [
+          "^Item Tracking Lines$",
+          "^Artikelspårningsrader$"
+        ],
+        "actionPatterns": [
+          "^Assign (?:Serial|Lot) No\\.$",
+          "^Tilldela (?:serienr|partinr)$"
+        ],
+        "fieldPatterns": [],
+        "automationIdPatterns": []
+      },
+      "instructionTemplate": "",
+      "languages": [
+        "en-US",
+        "sv-SE",
+        "fr-FR",
+        "de-DE",
+        "es-ES",
+        "da-DK",
+        "fi-FI",
+        "nb-NO"
+      ],
+      "aliases": [],
+      "sourceIds": [
+        "inventory-tracking-en-us",
+        "inventory-tracking-sv-se",
+        "inventory-reclassify-en-us",
+        "inventory-reclassify-sv-se",
+        "inventory-tracking-fr-fr",
+        "inventory-tracking-de-de",
+        "inventory-tracking-es-es",
+        "inventory-tracking-da-dk",
+        "inventory-tracking-fi-fi",
+        "inventory-tracking-nb-no"
+      ],
+      "localizedExplanations": {
+        "en-US": "Assigns serial or lot numbers to the selected inbound quantity, automatically from configured number series or manually using supplier numbers. Confirm the tracking code supports the required tracking and the assigned quantities exactly match the document quantity (Undefined must be zero). For outbound orders, select existing available tracking entries and refresh availability if the page has been open for a while. Posting the source document carries tracking to item ledger entries; assigning a number alone does not post receipt or shipment.",
+        "sv-SE": "Tilldelar serie- eller partinummer till det valda inkommande antalet, automatiskt från konfigurerade nummerserier eller manuellt med leverantörens nummer. Kontrollera att artikelspårningskoden stöder den nödvändiga spårningen och att tilldelade kvantiteter exakt motsvarar dokumentets antal (Odefinierat ska vara noll). På utgående order väljer du befintliga tillgängliga spårningsposter och uppdaterar tillgängligheten om sidan varit öppen länge. När källdokumentet bokförs förs spårningen till artikeltransaktioner; själva nummertilldelningen bokför inte mottagning eller leverans.",
+        "fr-FR": "Attribue des numéros de série ou de lot à la quantité entrante sélectionnée, automatiquement depuis les séries configurées ou manuellement avec les numéros du fournisseur. Vérifiez que le code de suivi prend en charge le suivi requis et que les quantités attribuées correspondent exactement à la ligne (Indéfini doit être égal à zéro). Pour les commandes sortantes, sélectionnez des numéros existants disponibles et actualisez la disponibilité si la page est restée ouverte. La validation du document source reporte le suivi dans les écritures article ; l’attribution seule ne valide pas la réception ni l’expédition.",
+        "de-DE": "Weist der ausgewählten eingehenden Menge Serien- oder Chargennummern aus eingerichteten Nummernserien oder manuell anhand der Lieferantennummern zu. Prüfen Sie, ob der Artikelverfolgungscode die erforderliche Verfolgung unterstützt und die zugeordneten Mengen exakt der Belegmenge entsprechen (Nicht definiert muss null sein). Wählen Sie bei ausgehenden Aufträgen verfügbare vorhandene Trackingposten aus und aktualisieren Sie die Verfügbarkeit bei längerer Seitenöffnung. Erst beim Buchen des Quelldokuments werden Trackingdaten in Artikelposten übernommen; die Zuweisung bucht keinen Zugang oder Versand.",
+        "es-ES": "Asigna números de serie o lote a la cantidad entrante seleccionada, automáticamente desde series configuradas o manualmente con números del proveedor. Compruebe que el código de seguimiento admite el seguimiento necesario y que las cantidades asignadas coinciden exactamente con la línea (Sin definir debe ser cero). En pedidos salientes, seleccione registros de seguimiento existentes y disponibles y actualice la disponibilidad si la página lleva abierta un tiempo. Al registrar el documento de origen, el seguimiento pasa a los movimientos de producto; asignar un número no registra la recepción ni el envío.",
+        "da-DK": "Tildeler serie- eller lotnumre til den valgte indgående mængde automatisk fra konfigurerede nummerserier eller manuelt med leverandørens numre. Kontrollér, at varesporingskoden understøtter den krævede sporing, og at de tildelte mængder præcist svarer til bilagslinjen (Udefineret skal være nul). På udgående ordrer skal du vælge eksisterende tilgængelige sporingsposter og opdatere tilgængeligheden, hvis siden har været åben længe. Når kildedokumentet bogføres, overføres sporingen til vareposter; tildelingen bogfører ikke modtagelse eller forsendelse.",
+        "fi-FI": "Määrittää valitulle saapuvalle määrälle sarja- tai eränumerot automaattisesti määritetyistä numerosarjoista tai manuaalisesti toimittajanumeroilla. Tarkista, että nimikkeen seurantakoodi tukee vaadittua seurantaa ja että määritetyt määrät vastaavat täsmälleen asiakirjariviä (Määrittämätön on oltava nolla). Valitse lähtevissä tilauksissa olemassa olevat käytettävissä olevat seurantatapahtumat ja päivitä saatavuus, jos sivu on ollut pitkään auki. Lähdeasiakirjan kirjaus siirtää seurantatiedot nimiketapahtumiin; numeron määritys ei kirjaa vastaanottoa eikä lähetystä.",
+        "nb-NO": "Tildeler serie- eller partinumre til valgt innkommende mengde, automatisk fra konfigurerte nummerserier eller manuelt med leverandørens numre. Kontroller at varesporingskoden støtter nødvendig sporing, og at tildelte mengder samsvarer nøyaktig med dokumentlinjen (Udefinert må være null). På utgående ordrer velger du eksisterende tilgjengelige sporingsposter og oppdaterer tilgjengeligheten hvis siden har vært åpen lenge. Når kildedokumentet bokføres, overføres sporingen til vareposter; tildelingen bokfører ikke mottak eller forsendelse."
+      }
+    },
+    {
+      "ruleId": "InventoryTracking.ReclassifyLotOrSerialNumber",
+      "taskType": "ReclassifyLotOrSerialNumber",
+      "semanticAction": "ReclassifyItemTracking",
+      "entity": "ItemReclassificationJournalLine",
+      "priority": 1320,
+      "verifiedRuntimeLocales": [
+        "en-US",
+        "sv-SE"
+      ],
+      "confidence": 0.96,
+      "match": {
+        "pagePatterns": [
+          "^Item Reclassification Journals$",
+          "^Artikelomklassificeringsjournaler$"
+        ],
+        "actionPatterns": [
+          "^Item Tracking Lines$",
+          "^Artikelspårningsrader$"
+        ],
+        "fieldPatterns": [],
+        "automationIdPatterns": []
+      },
+      "instructionTemplate": "",
+      "languages": [
+        "en-US",
+        "sv-SE",
+        "fr-FR",
+        "de-DE",
+        "es-ES",
+        "da-DK",
+        "fi-FI",
+        "nb-NO"
+      ],
+      "aliases": [],
+      "sourceIds": [
+        "inventory-reclassify-en-us",
+        "inventory-reclassify-sv-se",
+        "inventory-tracking-fr-fr",
+        "inventory-tracking-de-de",
+        "inventory-tracking-es-es",
+        "inventory-tracking-da-dk",
+        "inventory-tracking-fi-fi",
+        "inventory-tracking-nb-no"
+      ],
+      "localizedExplanations": {
+        "en-US": "Changes the tracking identity or expiration date of existing inventory, or combines lots, by reclassifying item ledger entries. Select the current serial/lot on the journal's Item Tracking Lines and enter the new number or expiration date. To split a lot, use multiple journal lines. For the same lot number with a new expiration date, reclassify the entire lot on one line. When merging several lots, give them the same new expiration date; when merging into an existing lot, use that lot's expiration date. A blank new expiration date clears the date, so verify it before posting. Information cards can change descriptions, comments and blocked status, but not tracking numbers or quantities.",
+        "sv-SE": "Ändrar spårningsidentiteten eller utgångsdatumet för befintligt lager, eller slår ihop partier, genom att omklassificera artikelposter. Välj det befintliga serie-/partinumret på journalens Artikelspårningsrader och ange det nya numret eller utgångsdatumet. Dela ett parti med flera journalrader. Om samma partinummer ska få ett nytt utgångsdatum måste hela partiet omklassificeras på en journalrad. Vid sammanslagning av flera partier till samma nya parti ska alla ha samma nya utgångsdatum; vid sammanslagning till ett befintligt parti använder du det partiets utgångsdatum. Ett tomt nytt utgångsdatum tar bort datumet, så kontrollera det före bokföring. Informationskort kan ändra beskrivning, kommentarer och spärrstatus, men inte spårningsnummer eller kvantitet.",
+        "fr-FR": "Modifie l’identité de suivi ou la date d’expiration du stock existant, ou fusionne des lots, en reclassant les écritures article. Sélectionnez le numéro actuel dans les lignes de suivi du journal et indiquez le nouveau numéro ou la date. Utilisez plusieurs lignes pour fractionner un lot ; pour modifier la date d’un lot sans changer son numéro, reclassifiez le lot entier sur une seule ligne. Lors d’une fusion, appliquez les mêmes règles de date que pour le lot cible et vérifiez toute date laissée vide avant validation. Les fiches d’informations permettent de modifier descriptions, commentaires et blocage, pas les numéros ni les quantités suivis.",
+        "de-DE": "Ändert durch Umbuchung von Artikelposten die Trackingidentität oder das Ablaufdatum vorhandenen Bestands oder führt Chargen zusammen. Wählen Sie die bestehende Nummer in den Trackingzeilen des Journals und geben Sie die neue Nummer oder das Ablaufdatum ein. Zum Aufteilen einer Charge sind mehrere Journalzeilen nötig; soll nur das Datum derselben Chargennummer geändert werden, muss die ganze Charge auf einer Zeile umgebucht werden. Prüfen Sie beim Zusammenführen die Datumsregeln des Ziel-Loses. Ein leeres neues Ablaufdatum entfernt das Datum. Infokarten ändern Beschreibung, Kommentare und Sperrstatus, nicht Trackingnummern oder Mengen.",
+        "es-ES": "Cambia la identidad de seguimiento o la fecha de caducidad de existencias existentes, o combina lotes, mediante la reclasificación de movimientos de producto. Seleccione el número actual en las líneas de seguimiento del diario e indique el nuevo número o la fecha. Use varias líneas para dividir un lote; para cambiar la fecha sin cambiar el número de lote, reclasifique el lote completo en una sola línea. Al combinar lotes, aplique las reglas de fecha del lote de destino y revise cualquier fecha nueva vacía antes de registrar. Las fichas informativas permiten cambiar descripción, comentarios y bloqueo, pero no números ni cantidades de seguimiento.",
+        "da-DK": "Ændrer sporingsidentiteten eller udløbsdatoen for eksisterende lager eller sammenlægger lot ved at omklassificere vareposter. Vælg det eksisterende nummer på journalens varesporingslinjer, og angiv det nye nummer eller den nye udløbsdato. Brug flere journallinjer til at opdele et lot; hvis datoen for samme lotnummer skal ændres, skal hele lotten omklassificeres på én linje. Følg mållottets datoregler ved sammenlægning. En tom ny udløbsdato fjerner datoen, så kontrollér den før bogføring. Informationskort kan ændre beskrivelse, kommentarer og spærring, men ikke sporingsnumre eller antal.",
+        "fi-FI": "Muuttaa olemassa olevan varaston seurantatunnistetta tai viimeistä käyttöpäivää tai yhdistää eriä uudelleenluokittelemalla nimiketapahtumia. Valitse nykyinen tunniste päiväkirjan seurantariveiltä ja anna uusi tunniste tai päiväys. Jaa erä useilla riveillä; jos saman erän päiväystä muutetaan tunnistetta muuttamatta, koko erä on uudelleenluokiteltava yhdellä rivillä. Noudata yhdistettäessä kohde-erän päiväyssääntöjä. Tyhjä uusi päiväys poistaa päiväyksen, joten tarkista se ennen kirjaamista. Tietokortilla voi muuttaa kuvausta, kommentteja ja estotilaa, mutta ei seurantanumeroita tai määriä.",
+        "nb-NO": "Endrer sporingsidentiteten eller utløpsdatoen for eksisterende lager, eller slår sammen partier, ved å omklassifisere vareposter. Velg eksisterende nummer på journalens varesporingslinjer og angi nytt nummer eller utløpsdato. Bruk flere journallinjer for å dele et parti; hvis datoen for samme partinummer skal endres, må hele partiet omklassifiseres på én linje. Følg målpartiets datoregler ved sammenslåing. En tom ny utløpsdato fjerner datoen, så kontroller den før bokføring. Informasjonskort kan endre beskrivelse, kommentarer og sperret status, men ikke sporingsnumre eller antall."
+      }
+    }
+  ],
+  "sources": [
+    {
+      "sourceId": "inventory-tracking-en-us",
+      "title": "Track items with serial, lot, and package numbers — Business Central",
+      "sourceUri": "https://learn.microsoft.com/en-us/dynamics365/business-central/inventory-how-work-item-tracking",
+      "accessedDate": "2026-09-29",
+      "appliesTo": "Microsoft Business Central standard item tracking. English Microsoft Learn source; installed tenant version and localized UI captions outside English and Swedish are not verified.",
+      "fields": [
+        "On inbound documents, Item Tracking Lines lets a user assign serial or lot numbers manually or from predefined number series. The tracking quantities must correspond to the document quantity. Posting the source transaction carries item tracking into item ledger entries."
+      ],
+      "documentedCaptions": [
+        "Purchase Orders",
+        "Item Tracking Lines",
+        "Assign Lot No."
+      ]
+    },
+    {
+      "sourceId": "inventory-tracking-sv-se",
+      "title": "Spåra artiklar med serie-, parti- eller paketnummer — Business Central",
+      "sourceUri": "https://learn.microsoft.com/sv-se/dynamics365/business-central/inventory-how-work-item-tracking",
+      "accessedDate": "2026-09-29",
+      "appliesTo": "Microsoft Business Central standard item tracking. Swedish Microsoft Learn source; tenant extension and version are not verified.",
+      "fields": [
+        "På inkommande dokument kan sidan Artikelspårningsrader tilldela serie- eller partinummer manuellt eller från en nummerserie. Spårningskvantiteten ska motsvara dokumentraden. När källdokumentet bokförs följer spårningen med till artikeltransaktionerna."
+      ],
+      "documentedCaptions": [
+        "Inköpsorder",
+        "Artikelspårningsrader",
+        "Tilldela serienr",
+        "Tilldela partinr"
+      ]
+    },
+    {
+      "sourceId": "inventory-reclassify-en-us",
+      "title": "Track items with serial, lot, and package numbers — Business Central",
+      "sourceUri": "https://learn.microsoft.com/en-us/dynamics365/business-central/inventory-how-work-item-tracking",
+      "accessedDate": "2026-09-29",
+      "appliesTo": "Microsoft Business Central standard item tracking. English Learn source; captions outside English and Swedish are not verified.",
+      "fields": [
+        "Use Item Reclassification Journals to change existing serial/lot numbers or expiration dates, and to merge lots. Select existing tracking numbers and enter new values on Item Tracking Lines. Splitting a lot requires multiple journal lines. Post the journal to update item ledger tracking. Information cards cannot change the tracking number or quantity."
+      ],
+      "documentedCaptions": [
+        "Item Reclassification Journals",
+        "Item Tracking Lines"
+      ]
+    },
+    {
+      "sourceId": "inventory-reclassify-sv-se",
+      "title": "Spåra artiklar med serie-, parti- eller paketnummer — Business Central",
+      "sourceUri": "https://learn.microsoft.com/sv-se/dynamics365/business-central/inventory-how-work-item-tracking",
+      "accessedDate": "2026-09-29",
+      "appliesTo": "Microsoft Business Central standard item tracking. Swedish Learn source; tenant extension and version are not verified.",
+      "fields": [
+        "Använd artikelomklassificeringsjournaler för att ändra befintliga serie-/partinummer eller utgångsdatum och slå ihop partier. Välj befintliga spårningsnummer och ange de nya värdena på Artikelspårningsrader. Uppdelning av parti kräver flera journalrader. Bokför journalen för att uppdatera artikelposternas spårning. Informationskort ändrar inte spårningsnumret eller kvantiteten."
+      ],
+      "documentedCaptions": [
+        "Artikelomklassificeringsjournaler",
+        "Artikelspårningsrader"
+      ]
+    },
+    {
+      "sourceId": "inventory-tracking-fr-fr",
+      "title": "Suivi des articles avec les numéros de lot, de série et de paquet — Business Central",
+      "sourceUri": "https://learn.microsoft.com/fr-fr/dynamics365/business-central/inventory-how-work-item-tracking",
+      "accessedDate": "2026-09-29",
+      "appliesTo": "Microsoft Business Central standard item tracking. French Microsoft Learn source; tenant extension/version and localized captions are not verified.",
+      "fields": [
+        "The localized article documents assigning serial and lot numbers on inbound purchase orders and item tracking lines. It also documents reclassifying existing serial/lot numbers or expiration dates through Item Reclassification Journals, merging lots, and splitting a lot with multiple journal lines."
+      ],
+      "documentedCaptions": [
+        "Commandes d’achat",
+        "Lignes traçabilité"
+      ]
+    },
+    {
+      "sourceId": "inventory-tracking-de-de",
+      "title": "Artikel mit Serien-, Chargen- und Paketnummern verfolgen — Business Central",
+      "sourceUri": "https://learn.microsoft.com/de-de/dynamics365/business-central/inventory-how-work-item-tracking",
+      "accessedDate": "2026-09-29",
+      "appliesTo": "Microsoft Business Central standard item tracking. German Microsoft Learn source; tenant extension/version and localized captions are not verified.",
+      "fields": [
+        "The localized article documents assigning serial and lot numbers on inbound purchase orders and item tracking lines. It also documents reclassifying existing serial/lot numbers or expiration dates through Item Reclassification Journals, merging lots, and splitting a lot with multiple journal lines."
+      ],
+      "documentedCaptions": [
+        "Einkaufsbestellungen",
+        "Artikelverfolgungszeilen"
+      ]
+    },
+    {
+      "sourceId": "inventory-tracking-es-es",
+      "title": "Seguir productos con números de serie, de lote y de paquete — Business Central",
+      "sourceUri": "https://learn.microsoft.com/es-es/dynamics365/business-central/inventory-how-work-item-tracking",
+      "accessedDate": "2026-09-29",
+      "appliesTo": "Microsoft Business Central standard item tracking. Spanish Microsoft Learn source; tenant extension/version and localized captions are not verified.",
+      "fields": [
+        "The localized article documents assigning serial and lot numbers on inbound purchase orders and item tracking lines. It also documents reclassifying existing serial/lot numbers or expiration dates through Item Reclassification Journals, merging lots, and splitting a lot with multiple journal lines."
+      ],
+      "documentedCaptions": [
+        "Pedidos de compra",
+        "Líneas seguimiento"
+      ]
+    },
+    {
+      "sourceId": "inventory-tracking-da-dk",
+      "title": "Spore varer med serie-, lot- og pakkenumre — Business Central",
+      "sourceUri": "https://learn.microsoft.com/da-dk/dynamics365/business-central/inventory-how-work-item-tracking",
+      "accessedDate": "2026-09-29",
+      "appliesTo": "Microsoft Business Central standard item tracking. Danish Microsoft Learn source; tenant extension/version and localized captions are not verified.",
+      "fields": [
+        "The localized article documents assigning serial and lot numbers on inbound purchase orders and item tracking lines. It also documents reclassifying existing serial/lot numbers or expiration dates through Item Reclassification Journals, merging lots, and splitting a lot with multiple journal lines."
+      ],
+      "documentedCaptions": [
+        "Indkøbsordrer",
+        "Varesporingslinjer"
+      ]
+    },
+    {
+      "sourceId": "inventory-tracking-fi-fi",
+      "title": "Sarja-, erä- ja pakettinumeroita sisältävien nimikkeiden seuraaminen — Business Central",
+      "sourceUri": "https://learn.microsoft.com/fi-fi/dynamics365/business-central/inventory-how-work-item-tracking",
+      "accessedDate": "2026-09-29",
+      "appliesTo": "Microsoft Business Central standard item tracking. Finnish Microsoft Learn source; tenant extension/version and localized captions are not verified.",
+      "fields": [
+        "The localized article documents assigning serial and lot numbers on inbound purchase orders and item tracking lines. It also documents reclassifying existing serial/lot numbers or expiration dates through Item Reclassification Journals, merging lots, and splitting a lot with multiple journal lines."
+      ],
+      "documentedCaptions": [
+        "Ostotilaukset",
+        "Nimikkeen seurantarivit"
+      ]
+    },
+    {
+      "sourceId": "inventory-tracking-nb-no",
+      "title": "Spor varer med serie-, parti- og pakkenumre — Business Central",
+      "sourceUri": "https://learn.microsoft.com/nb-no/dynamics365/business-central/inventory-how-work-item-tracking",
+      "accessedDate": "2026-09-29",
+      "appliesTo": "Microsoft Business Central standard item tracking. Norwegian Microsoft Learn source; tenant extension/version and localized captions are not verified.",
+      "fields": [
+        "The localized article documents assigning serial and lot numbers on inbound purchase orders and item tracking lines. It also documents reclassifying existing serial/lot numbers or expiration dates through Item Reclassification Journals, merging lots, and splitting a lot with multiple journal lines."
+      ],
+      "documentedCaptions": [
+        "Kjøpsordrer",
+        "Varesporingslinjer"
+      ]
+    },
+    {
+      "sourceId": "inventory-tracing-workflow-en-us",
+      "title": "Trace item-tracked items — Business Central | Microsoft Learn",
+      "sourceUri": "https://learn.microsoft.com/en-us/dynamics365/business-central/inventory-how-to-trace-item-tracked-items",
+      "accessedDate": "2026-09-30",
+      "appliesTo": "Business Central standard item tracking. Localized rule text is provided in all supported languages; source documentation is verified in English and Swedish only.",
+      "fields": [
+        "Item Tracing follows applied, posted inventory transactions forward or backward; only applied transactions display, and repeated receipts of the same lot may not all appear."
+      ],
+      "documentedCaptions": [
+        "Item Tracing",
+        "Trace",
+        "Usage->Origin",
+        "Origin->Usage"
+      ]
+    },
+    {
+      "sourceId": "inventory-tracing-workflow-sv-se",
+      "title": "Spåra artiklar med artikelspårning — Business Central | Microsoft Learn",
+      "sourceUri": "https://learn.microsoft.com/sv-se/dynamics365/business-central/inventory-how-to-trace-item-tracked-items",
+      "accessedDate": "2026-09-30",
+      "appliesTo": "Business Central standard item tracking. Localized rule text is provided in all supported languages; source documentation is verified in English and Swedish only.",
+      "fields": [
+        "Objektspårning följer matchade, bokförda lagertransaktioner framåt eller bakåt; endast matchade transaktioner visas och flera inleveranser av samma parti kanske inte alla visas."
+      ],
+      "documentedCaptions": [
+        "Objektspårning",
+        "Spåra",
+        "Förbrukning->Ursprung",
+        "Ursprung->Användning"
+      ]
+    }
+  ],
+  "sourceLocaleGaps": {
+    "inventory-tracing-workflow-en-us": [
+      "fr-FR",
+      "de-DE",
+      "es-ES",
+      "da-DK",
+      "fi-FI",
+      "nb-NO"
+    ],
+    "inventory-tracing-workflow-sv-se": [
+      "fr-FR",
+      "de-DE",
+      "es-ES",
+      "da-DK",
+      "fi-FI",
+      "nb-NO"
+    ]
+  }
+}

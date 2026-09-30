@@ -1,0 +1,296 @@
+[
+  {
+    "ruleId": "QualityManagement.CreateInspectionTemplate",
+    "locale": "en-US",
+    "pageCaption": "Quality Inspection Templates",
+    "actionCaption": "New",
+    "sourceId": "microsoft-learn-quality-templates-en-us"
+  },
+  {
+    "ruleId": "QualityManagement.CreateTestDefinition",
+    "locale": "en-US",
+    "pageCaption": "Quality Tests",
+    "actionCaption": "New",
+    "sourceId": "microsoft-learn-quality-templates-en-us"
+  },
+  {
+    "ruleId": "QualityManagement.CopyInspectionTemplate",
+    "locale": "en-US",
+    "pageCaption": "Quality Inspection Templates",
+    "actionCaption": "Copy Template",
+    "sourceId": "microsoft-learn-quality-templates-en-us"
+  },
+  {
+    "ruleId": "QualityManagement.CreateInspectionTemplate",
+    "locale": "sv-SE",
+    "pageCaption": "Kvalitetsgranskningsmallar",
+    "actionCaption": "Ny",
+    "sourceId": "microsoft-learn-quality-templates-sv-se"
+  },
+  {
+    "ruleId": "QualityManagement.CreateTestDefinition",
+    "locale": "sv-SE",
+    "pageCaption": "Kvalitetstester",
+    "actionCaption": "Ny",
+    "sourceId": "microsoft-learn-quality-templates-sv-se"
+  },
+  {
+    "ruleId": "QualityManagement.CopyInspectionTemplate",
+    "locale": "sv-SE",
+    "pageCaption": "Kvalitetsgranskningsmallar",
+    "actionCaption": "Kopiera mall",
+    "sourceId": "microsoft-learn-quality-templates-sv-se"
+  },
+  {
+    "ruleId": "QualityManagement.CreateInspectionTemplate",
+    "locale": "fr-FR",
+    "pageCaption": "Modèles d’inspection de la qualité",
+    "actionCaption": "Nouveau",
+    "sourceId": "microsoft-learn-quality-templates-fr-fr"
+  },
+  {
+    "ruleId": "QualityManagement.CreateTestDefinition",
+    "locale": "fr-FR",
+    "pageCaption": "Tests de qualité",
+    "actionCaption": "Nouveau",
+    "sourceId": "microsoft-learn-quality-templates-fr-fr"
+  },
+  {
+    "ruleId": "QualityManagement.CopyInspectionTemplate",
+    "locale": "fr-FR",
+    "pageCaption": "Modèles d’inspection de la qualité",
+    "actionCaption": "Copier le modèle",
+    "sourceId": "microsoft-learn-quality-templates-fr-fr"
+  },
+  {
+    "ruleId": "QualityManagement.CreateInspectionTemplate",
+    "locale": "de-DE",
+    "pageCaption": "Qualitätsüberprüfungsvorlagen",
+    "actionCaption": "Neu",
+    "sourceId": "microsoft-learn-quality-templates-de-de"
+  },
+  {
+    "ruleId": "QualityManagement.CreateTestDefinition",
+    "locale": "de-DE",
+    "pageCaption": "Qualitätstests",
+    "actionCaption": "Neu",
+    "sourceId": "microsoft-learn-quality-templates-de-de"
+  },
+  {
+    "ruleId": "QualityManagement.CopyInspectionTemplate",
+    "locale": "de-DE",
+    "pageCaption": "Qualitätsüberprüfungsvorlagen",
+    "actionCaption": "Vorlage kopieren",
+    "sourceId": "microsoft-learn-quality-templates-de-de"
+  },
+  {
+    "ruleId": "QualityManagement.CreateInspectionTemplate",
+    "locale": "es-ES",
+    "pageCaption": "Plantillas de inspección de calidad",
+    "actionCaption": "Nuevo",
+    "sourceId": "microsoft-learn-quality-templates-es-es"
+  },
+  {
+    "ruleId": "QualityManagement.CreateTestDefinition",
+    "locale": "es-ES",
+    "pageCaption": "Pruebas de calidad",
+    "actionCaption": "Nuevo",
+    "sourceId": "microsoft-learn-quality-templates-es-es"
+  },
+  {
+    "ruleId": "QualityManagement.CopyInspectionTemplate",
+    "locale": "es-ES",
+    "pageCaption": "Plantillas de inspección de calidad",
+    "actionCaption": "Copiar plantilla",
+    "sourceId": "microsoft-learn-quality-templates-es-es"
+  },
+  {
+    "ruleId": "QualityManagement.CreateInspectionTemplate",
+    "locale": "da-DK",
+    "pageCaption": "Kvalitetsinspektionsskabeloner",
+    "actionCaption": "Ny",
+    "sourceId": "microsoft-learn-quality-templates-da-dk"
+  },
+  {
+    "ruleId": "QualityManagement.CreateTestDefinition",
+    "locale": "da-DK",
+    "pageCaption": "Kvalitetstest",
+    "actionCaption": "Ny",
+    "sourceId": "microsoft-learn-quality-templates-da-dk"
+  },
+  {
+    "ruleId": "QualityManagement.CopyInspectionTemplate",
+    "locale": "da-DK",
+    "pageCaption": "Kvalitetsinspektionsskabeloner",
+    "actionCaption": "Kopiér skabelon",
+    "sourceId": "microsoft-learn-quality-templates-da-dk"
+  },
+  {
+    "ruleId": "QualityManagement.CreateInspectionTemplate",
+    "locale": "fi-FI",
+    "pageCaption": "Laadun tarkastusmallit",
+    "actionCaption": "Uusi",
+    "sourceId": "microsoft-learn-quality-templates-fi-fi"
+  },
+  {
+    "ruleId": "QualityManagement.CreateTestDefinition",
+    "locale": "fi-FI",
+    "pageCaption": "Laatutestit",
+    "actionCaption": "Uusi",
+    "sourceId": "microsoft-learn-quality-templates-fi-fi"
+  },
+  {
+    "ruleId": "QualityManagement.CopyInspectionTemplate",
+    "locale": "fi-FI",
+    "pageCaption": "Laadun tarkastusmallit",
+    "actionCaption": "Kopioi malli",
+    "sourceId": "microsoft-learn-quality-templates-fi-fi"
+  },
+  {
+    "ruleId": "QualityManagement.CreateInspectionTemplate",
+    "locale": "nb-NO",
+    "pageCaption": "Maler for kvalitetsinspeksjon",
+    "actionCaption": "Ny",
+    "sourceId": "microsoft-learn-quality-templates-nb-no"
+  },
+  {
+    "ruleId": "QualityManagement.CreateTestDefinition",
+    "locale": "nb-NO",
+    "pageCaption": "Kvalitetstester",
+    "actionCaption": "Ny",
+    "sourceId": "microsoft-learn-quality-templates-nb-no"
+  },
+  {
+    "ruleId": "QualityManagement.CopyInspectionTemplate",
+    "locale": "nb-NO",
+    "pageCaption": "Maler for kvalitetsinspeksjon",
+    "actionCaption": "Kopier mal",
+    "sourceId": "microsoft-learn-quality-templates-nb-no"
+  },
+  {
+    "ruleId": "QualityManagement.CreateInspectionResult",
+    "locale": "en-US",
+    "pageCaption": "Quality Inspection Results",
+    "actionCaption": "New",
+    "sourceId": "quality-inspection-results-en-us"
+  },
+  {
+    "ruleId": "QualityManagement.CreateInspectionResult",
+    "locale": "sv-SE",
+    "pageCaption": "Quality Inspection Results",
+    "actionCaption": "New",
+    "sourceId": "quality-inspection-results-en-us"
+  },
+  {
+    "ruleId": "QualityManagement.CreateInspectionResult",
+    "locale": "fr-FR",
+    "pageCaption": "Quality Inspection Results",
+    "actionCaption": "New",
+    "sourceId": "quality-inspection-results-en-us"
+  },
+  {
+    "ruleId": "QualityManagement.CreateInspectionResult",
+    "locale": "de-DE",
+    "pageCaption": "Quality Inspection Results",
+    "actionCaption": "New",
+    "sourceId": "quality-inspection-results-en-us"
+  },
+  {
+    "ruleId": "QualityManagement.CreateInspectionResult",
+    "locale": "es-ES",
+    "pageCaption": "Quality Inspection Results",
+    "actionCaption": "New",
+    "sourceId": "quality-inspection-results-en-us"
+  },
+  {
+    "ruleId": "QualityManagement.CreateInspectionResult",
+    "locale": "da-DK",
+    "pageCaption": "Quality Inspection Results",
+    "actionCaption": "New",
+    "sourceId": "quality-inspection-results-en-us"
+  },
+  {
+    "ruleId": "QualityManagement.CreateInspectionResult",
+    "locale": "fi-FI",
+    "pageCaption": "Quality Inspection Results",
+    "actionCaption": "New",
+    "sourceId": "quality-inspection-results-en-us"
+  },
+  {
+    "ruleId": "QualityManagement.CreateInspectionResult",
+    "locale": "nb-NO",
+    "pageCaption": "Quality Inspection Results",
+    "actionCaption": "New",
+    "sourceId": "quality-inspection-results-en-us"
+  },
+  {
+    "ruleId": "QualityManagement.CreateInspectionFromSourceLine",
+    "locale": "en-US",
+    "pageCaption": "Purchase Order",
+    "actionCaption": "Create Inspection",
+    "sourceId": "quality-manual-inspection-en-us"
+  },
+  {
+    "ruleId": "QualityManagement.CreateInspectionFromSourceLine",
+    "locale": "sv-SE",
+    "pageCaption": "Inköpsorder",
+    "actionCaption": "Skapa inspektion från raden",
+    "sourceId": "quality-manual-inspection-sv-se"
+  },
+  {
+    "ruleId": "QualityManagement.ShowPurchaseOrderInspections",
+    "locale": "en-US",
+    "pageCaption": "Purchase Order",
+    "actionCaption": "Show Inspections for Item and Document",
+    "sourceId": "microsoft-learn-expansion-qms-show-inspections-en-us"
+  },
+  {
+    "ruleId": "QualityManagement.ShowPurchaseOrderInspections",
+    "locale": "sv-SE",
+    "pageCaption": "Inköpsorder",
+    "actionCaption": "Visa inspektioner för objekt och dokument",
+    "sourceId": "microsoft-learn-expansion-qms-show-inspections-sv-se"
+  },
+  {
+    "ruleId": "QualityManagement.MoveFailedInspectionInventory",
+    "locale": "en-US",
+    "pageCaption": "Quality Inspection",
+    "actionCaption": "Move Inventory",
+    "sourceId": "microsoft-learn-expansion-qms-nonconforming-en-us"
+  },
+  {
+    "ruleId": "QualityManagement.MoveFailedInspectionInventory",
+    "locale": "sv-SE",
+    "pageCaption": "Kvalitetsinspektion",
+    "actionCaption": "Flytta lager",
+    "sourceId": "microsoft-learn-expansion-qms-nonconforming-sv-se"
+  },
+  {
+    "ruleId": "QualityManagement.CreateNegativeAdjustmentFromInspection",
+    "locale": "en-US",
+    "pageCaption": "Quality Inspection",
+    "actionCaption": "Create Negative Adjustment",
+    "sourceId": "microsoft-learn-expansion-qms-nonconforming-en-us"
+  },
+  {
+    "ruleId": "QualityManagement.CreateNegativeAdjustmentFromInspection",
+    "locale": "sv-SE",
+    "pageCaption": "Kvalitetsinspektion",
+    "actionCaption": "Skapa negativ justering",
+    "sourceId": "microsoft-learn-expansion-qms-nonconforming-sv-se"
+  },
+  {
+    "ruleId": "QualityManagement.ChangeTrackingFromInspection",
+    "locale": "en-US",
+    "pageCaption": "Quality Inspection",
+    "actionCaption": "Change Item Tracking",
+    "sourceId": "microsoft-learn-expansion-qms-nonconforming-en-us"
+  },
+  {
+    "ruleId": "QualityManagement.ChangeTrackingFromInspection",
+    "locale": "sv-SE",
+    "pageCaption": "Kvalitetsinspektion",
+    "actionCaption": "Spåra ändringsobjekt",
+    "sourceId": "microsoft-learn-expansion-qms-nonconforming-sv-se"
+  }
+]

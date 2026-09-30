@@ -189,10 +189,27 @@ const base = [{ taskId: "a", instruction: "Select No. 136",
   assert.match(JSON.stringify(explanationPlan),
     /Microsoft Learn: https:\/\/learn\.microsoft\.com\/en-us\//,
   "the exported explanation retains its source link");
+  const originalInstruction = explanationReview.tasks[0].instruction;
+  reviewStudio.editTask(explanationReview, 0, {
+    contextualExplanationOverrides: { "en-US": "Explain only the checks needed before release." }
+  }, { now: NOW });
+  assert.equal(explanationReview.tasks[0].instruction, originalInstruction,
+    "editing an explanation does not alter the captured instruction");
+  const editedPlan = pipeline.create({ review: explanationReview, session }).plan;
+  assert.match(JSON.stringify(editedPlan), /Explain only the checks needed before release\./,
+    "the edited per-step explanation is used in the Word export");
+  assert.doesNotMatch(JSON.stringify(editedPlan), /Releasing prepares the order/,
+    "the generated wording is replaced in the export");
+  reviewStudio.undo(explanationReview);
+  assert.match(JSON.stringify(pipeline.create({ review: explanationReview, session }).plan),
+    /Releasing prepares the order/, "undo restores the suggested explanation");
+  reviewStudio.redo(explanationReview);
+  assert.match(JSON.stringify(pipeline.create({ review: explanationReview, session }).plan),
+    /Explain only the checks needed before release\./, "redo restores the edited wording");
   explanationReview.tasks[0].includeKnowledgeExplanationInWord = false;
   assert.doesNotMatch(JSON.stringify(pipeline.create({
     review: explanationReview, session
-  }).plan), /Releasing prepares the order for the next workflow step\./,
+  }).plan), /Explain only the checks needed before release\./,
   "the explanation is omitted when the per-step choice is off");
   reviewStudio.undo(review);
   assert.equal(review.manualSteps.length, 1);

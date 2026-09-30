@@ -98,8 +98,8 @@ assert.ok(instruction.content.runs.some(run =>
   run.text === "för ord" && run.bold));
 const observedResult = step.components.find(component =>
   component.kind === "callout");
-assert.strictEqual(observedResult.content.label, "Observed result");
-assert.strictEqual(observedResult.content.text, "Page Förs.order opened.");
+assert.strictEqual(observedResult, undefined,
+  "Word export omits the redundant observed-result callout.");
 const cover = prepared.plan.sections.find(section => section.kind === "cover")
   .components.find(component => component.kind === "cover");
 assert.strictEqual(cover.appearance.documentType, "Work instruction");

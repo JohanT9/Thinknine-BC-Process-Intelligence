@@ -1,9 +1,266 @@
 {
   "packId": "bc-warehouse",
   "name": "Business Central Warehouse",
-  "version": "2.6.0",
+  "version": "2.7.0",
   "priority": 200,
   "rules": [
+    {
+      "ruleId": "Observed.Purchase.CreateWarehouseReceipt",
+      "taskType": "CreateWarehouseReceipt",
+      "semanticAction": "CreateWarehouseReceiptFromPurchaseOrder",
+      "entity": "PurchaseOrder",
+      "priority": 1200,
+      "confidence": 0.94,
+      "match": {
+        "pagePatterns": [
+          "purchase order",
+          "inköpsorder"
+        ],
+        "actionPatterns": [
+          "^Skapa dist\\.lagerinleverans$",
+          "^Create warehouse receipt$",
+          "^Crear recepción de almacén$",
+          "^Créer réception entrepôt$",
+          "^Lagerwareneingang erstellen$",
+          "^Opret lagerindlevering$",
+          "^Luo varastovastaanotto$",
+          "^Opprett lagerinngående levering$"
+        ],
+        "fieldPatterns": [],
+        "automationIdPatterns": []
+      },
+      "instructionTemplate": "",
+      "languages": [
+        "sv-SE",
+        "en-US",
+        "fr-FR",
+        "de-DE",
+        "es-ES",
+        "da-DK",
+        "fi-FI",
+        "nb-NO"
+      ],
+      "aliases": [],
+      "sourceIds": [
+        "microsoft-learn-qms-purchase-receipt-warehouse-en-us",
+        "microsoft-learn-qms-purchase-receipt-warehouse-sv-se",
+        "microsoft-learn-qms-purchase-receipt-warehouse-fr-fr",
+        "microsoft-learn-qms-purchase-receipt-warehouse-de-de",
+        "microsoft-learn-qms-purchase-receipt-warehouse-es-es",
+        "microsoft-learn-qms-purchase-receipt-warehouse-da-dk",
+        "microsoft-learn-qms-purchase-receipt-warehouse-fi-fi",
+        "microsoft-learn-qms-purchase-receipt-warehouse-nb-no"
+      ],
+      "localizedExplanations": {
+        "en-US": "Creates a warehouse receipt from the released purchase order so receiving can be handled in the warehouse flow. Check the vendor, item, location, quantity, lot assignments and bins transferred from the order. This creates the receipt document; it does not post the receipt or create a quality inspection yet. If Quality Management is installed and a matching purchase-receipt generation rule is configured, posting the warehouse receipt is the inspection trigger. That later posting can create one inspection per lot and a put-away document.",
+        "sv-SE": "Skapar en lagerinleverans från den frisläppta inköpsordern så att mottagningen kan hanteras i lagerflödet. Kontrollera leverantör, artikel, lagerställe, antal, partifördelning och lagerplatser som förts över från ordern. Åtgärden skapar inleveransdokumentet; den bokför inte inleveransen och skapar ännu ingen kvalitetsinspektion. Om Quality Management är installerat och en matchande regel för inspektionsgenerering vid inköpsmottagning finns, utlöses inspektionen först när lagerinleveransen bokförs. Den bokföringen kan skapa en inspektion per parti och ett artikelinförseldokument.",
+        "fr-FR": "Crée une réception entrepôt à partir de la commande achat lancée afin que la réception suive le processus de l’entrepôt. Vérifiez le fournisseur, l’article, l’emplacement, la quantité, les affectations de lots et les emplacements de rangement transférés depuis la commande. Cette action crée le document de réception ; elle ne le comptabilise pas et ne crée pas encore d’inspection qualité. Si Quality Management est installé et qu’une règle de génération d’inspection correspondant à la réception achat est configurée, l’inspection est déclenchée lors de la comptabilisation de la réception entrepôt. Cette comptabilisation peut créer une inspection par lot et un document de rangement.",
+        "de-DE": "Erstellt aus dem freigegebenen Einkaufsauftrag einen Lagerwareneingang für die weitere Lagerabwicklung. Prüfen Sie Lieferant, Artikel, Lagerort, Menge, Chargenzuordnung und die aus dem Auftrag übernommenen Lagerplätze. Die Aktion erstellt das Wareneingangsdokument; sie bucht den Eingang nicht und erstellt noch keine Qualitätsprüfung. Wenn Quality Management installiert und eine passende Prüfregel für den Einkaufseingang eingerichtet ist, wird die Prüfung erst beim Buchen des Lagerwareneingangs ausgelöst. Dabei können je Charge eine Prüfung und ein Einlagerungsbeleg erstellt werden.",
+        "es-ES": "Crea una recepción de almacén a partir del pedido de compra lanzado para continuar la recepción mediante el flujo del almacén. Compruebe el proveedor, artículo, ubicación, cantidad, asignación de lotes y ubicaciones de almacén transferidas del pedido. Esta acción crea el documento de recepción; no lo registra ni crea todavía una inspección de calidad. Si Quality Management está instalado y existe una regla coincidente de generación de inspecciones para recepciones de compra, la inspección se desencadena al registrar la recepción de almacén. Ese registro puede crear una inspección por lote y un documento de ubicación.",
+        "da-DK": "Opretter en lagerindlevering fra den frigivne købsordre, så modtagelsen kan håndteres i lagerflowet. Kontrollér leverandør, vare, lokation, antal, lotfordeling og de lagerplaceringer, der er overført fra ordren. Handlingen opretter modtagelsesdokumentet; den bogfører ikke modtagelsen og opretter endnu ikke en kvalitetsinspektion. Hvis Quality Management er installeret, og der findes en matchende regel for inspektionsgenerering ved købsmodtagelse, udløses inspektionen først, når lagerindleveringen bogføres. Bogføringen kan oprette én inspektion pr. lot og et læg-på-lager-dokument.",
+        "fi-FI": "Luo vapautetusta ostotilauksesta varastovastaanoton varastoprosessia varten. Tarkista toimittaja, nimike, sijainti, määrä, eräkohtaiset määrät ja tilaukselta siirtyneet hyllypaikat. Toiminto luo vastaanottoasiakirjan; se ei kirjaa vastaanottoa eikä luo vielä laatutarkastusta. Jos Quality Management on asennettu ja ostovastaanottoon sopiva tarkastusten luontisääntö on määritetty, tarkastus käynnistyy vasta varastovastaanoton kirjauksessa. Kirjaus voi luoda yhden tarkastuksen erää kohti ja hyllytysdokumentin.",
+        "nb-NO": "Oppretter en lagerinngående levering fra den frigitte kjøpsordren, slik at mottaket kan behandles i lagerflyten. Kontroller leverandør, vare, lokasjon, antall, partifordeling og lagerplasser som er overført fra ordren. Handlingen oppretter mottaksdokumentet; den bokfører ikke mottaket og oppretter ikke en kvalitetsinspeksjon ennå. Hvis Quality Management er installert og en matchende regel for inspeksjonsgenerering ved kjøpsmottak er konfigurert, utløses inspeksjonen først når lagerleveringen bokføres. Bokføringen kan opprette én inspeksjon per parti og et lagerplasseringsdokument."
+      }
+    },
+    {
+      "ruleId": "Observed.Warehouse.RegisterWeight",
+      "taskType": "RegisterItemWeight",
+      "semanticAction": "RegisterItemWeight",
+      "entity": "WarehouseReceipt",
+      "priority": 1200,
+      "confidence": 0.94,
+      "match": {
+        "pagePatterns": [
+          "warehouse receipt",
+          "distributionslagerinleverans"
+        ],
+        "actionPatterns": [
+          "^Registrera vikt$",
+          "^Register weight$",
+          "^Enregistrer le poids$",
+          "^Gewicht erfassen$",
+          "^Registrar peso$",
+          "^Registrer vægt$",
+          "^Kirjaa paino$",
+          "^Registrer vekt$"
+        ],
+        "fieldPatterns": [],
+        "automationIdPatterns": []
+      },
+      "instructionTemplate": "",
+      "languages": [
+        "sv-SE",
+        "en-US",
+        "fr-FR",
+        "de-DE",
+        "es-ES",
+        "da-DK",
+        "fi-FI",
+        "nb-NO"
+      ],
+      "aliases": []
+    },
+    {
+      "ruleId": "Observed.Warehouse.CreateHandlingUnit",
+      "taskType": "CreateHandlingUnit",
+      "semanticAction": "CreateHandlingUnit",
+      "entity": "WarehouseReceipt",
+      "priority": 1200,
+      "confidence": 0.94,
+      "match": {
+        "pagePatterns": [
+          "warehouse receipt",
+          "distributionslagerinleverans"
+        ],
+        "actionPatterns": [
+          "^Skapa lastbärare$",
+          "^Create handling unit$",
+          "^Créer une unité de manutention$",
+          "^Ladeeinheit erstellen$",
+          "^Crear unidad de manipulación$",
+          "^Opret lasteenhed$",
+          "^Luo käsittely-yksikkö$",
+          "^Opprett håndteringsenhet$"
+        ],
+        "fieldPatterns": [],
+        "automationIdPatterns": []
+      },
+      "instructionTemplate": "",
+      "languages": [
+        "sv-SE",
+        "en-US",
+        "fr-FR",
+        "de-DE",
+        "es-ES",
+        "da-DK",
+        "fi-FI",
+        "nb-NO"
+      ],
+      "aliases": []
+    },
+    {
+      "ruleId": "Observed.Warehouse.ManualWeight",
+      "taskType": "ChooseManualWeighing",
+      "semanticAction": "ChooseManualWeighing",
+      "entity": "WarehouseReceipt",
+      "priority": 1200,
+      "confidence": 0.94,
+      "match": {
+        "pagePatterns": [
+          "warehouse receipt",
+          "distributionslagerinleverans"
+        ],
+        "actionPatterns": [
+          "^Manuell vikt$",
+          "^Manual weight$",
+          "^Poids manuel$",
+          "^Manuelles Gewicht$",
+          "^Peso manual$",
+          "^Manuel vægt$",
+          "^Manuaalinen paino$",
+          "^Manuell vekt$"
+        ],
+        "fieldPatterns": [],
+        "automationIdPatterns": []
+      },
+      "instructionTemplate": "",
+      "languages": [
+        "sv-SE",
+        "en-US",
+        "fr-FR",
+        "de-DE",
+        "es-ES",
+        "da-DK",
+        "fi-FI",
+        "nb-NO"
+      ],
+      "aliases": []
+    },
+    {
+      "ruleId": "Observed.Warehouse.EnterScaleWeight",
+      "taskType": "EnterMeasuredWeight",
+      "semanticAction": "EnterMeasuredWeight",
+      "entity": "WarehouseReceipt",
+      "priority": 1200,
+      "confidence": 0.94,
+      "match": {
+        "pagePatterns": [
+          "warehouse receipt",
+          "distributionslagerinleverans"
+        ],
+        "actionPatterns": [
+          "^Vikt från våg$",
+          "^Weight from scale$",
+          "^Poids de la balance$",
+          "^Waagengewicht$",
+          "^Peso de la báscula$",
+          "^Vægt fra vægt$",
+          "^Vaa'an paino$",
+          "^Vekt fra vekt$"
+        ],
+        "fieldPatterns": [
+          "^Vikt från våg$",
+          "^Weight from scale$",
+          "^Poids de la balance$",
+          "^Waagengewicht$",
+          "^Peso de la báscula$",
+          "^Vægt fra vægt$",
+          "^Vaa'an paino$",
+          "^Vekt fra vekt$"
+        ],
+        "automationIdPatterns": []
+      },
+      "instructionTemplate": "",
+      "languages": [
+        "sv-SE",
+        "en-US",
+        "fr-FR",
+        "de-DE",
+        "es-ES",
+        "da-DK",
+        "fi-FI",
+        "nb-NO"
+      ],
+      "aliases": []
+    },
+    {
+      "ruleId": "Observed.Warehouse.SaveWeightRegistration",
+      "taskType": "SaveWeightRegistration",
+      "semanticAction": "SaveWeightRegistration",
+      "entity": "WarehouseReceipt",
+      "priority": 1200,
+      "confidence": 0.94,
+      "match": {
+        "pagePatterns": [
+          "warehouse receipt",
+          "distributionslagerinleverans"
+        ],
+        "actionPatterns": [
+          "^Spara och stäng$",
+          "^Save and close$",
+          "^Enregistrer et fermer$",
+          "^Speichern und schließen$",
+          "^Guardar y cerrar$",
+          "^Gem og luk$",
+          "^Tallenna ja sulje$",
+          "^Lagre og lukk$"
+        ],
+        "fieldPatterns": [],
+        "automationIdPatterns": []
+      },
+      "instructionTemplate": "",
+      "languages": [
+        "sv-SE",
+        "en-US",
+        "fr-FR",
+        "de-DE",
+        "es-ES",
+        "da-DK",
+        "fi-FI",
+        "nb-NO"
+      ],
+      "aliases": []
+    },
     {
       "ruleId": "Warehouse.OpenReceipt",
       "taskType": "OpenWarehouseReceipt",
@@ -26,9 +283,25 @@
       "instructionTemplate": "",
       "languages": [
         "sv-SE",
-        "en-US"
+        "en-US",
+        "fr-FR",
+        "de-DE",
+        "es-ES",
+        "da-DK",
+        "fi-FI",
+        "nb-NO"
       ],
-      "aliases": []
+      "aliases": [],
+      "sourceIds": [
+        "microsoft-learn-advanced-receiving-putaway",
+        "microsoft-learn-advanced-receiving-putaway-sv",
+        "microsoft-learn-advanced-receiving-putaway-fr",
+        "microsoft-learn-advanced-receiving-putaway-de",
+        "microsoft-learn-advanced-receiving-putaway-es",
+        "microsoft-learn-advanced-receiving-putaway-da",
+        "microsoft-learn-advanced-receiving-putaway-fi",
+        "microsoft-learn-advanced-receiving-putaway-nb"
+      ]
     },
     {
       "ruleId": "Warehouse.OpenShipment",
@@ -52,9 +325,25 @@
       "instructionTemplate": "",
       "languages": [
         "sv-SE",
-        "en-US"
+        "en-US",
+        "fr-FR",
+        "de-DE",
+        "es-ES",
+        "da-DK",
+        "fi-FI",
+        "nb-NO"
       ],
-      "aliases": []
+      "aliases": [],
+      "sourceIds": [
+        "microsoft-learn-warehouse-pick-shipment",
+        "microsoft-learn-warehouse-pick-shipment-sv",
+        "microsoft-learn-warehouse-pick-shipment-fr",
+        "microsoft-learn-warehouse-pick-shipment-de",
+        "microsoft-learn-warehouse-pick-shipment-es",
+        "microsoft-learn-warehouse-pick-shipment-da",
+        "microsoft-learn-warehouse-pick-shipment-fi",
+        "microsoft-learn-warehouse-pick-shipment-nb"
+      ]
     },
     {
       "ruleId": "Warehouse.CreatePick",
@@ -185,9 +474,26 @@
       "instructionTemplate": "",
       "languages": [
         "sv-SE",
-        "en-US"
+        "en-US",
+        "fr-FR",
+        "de-DE",
+        "es-ES",
+        "da-DK",
+        "fi-FI",
+        "nb-NO"
       ],
-      "aliases": []
+      "aliases": [],
+      "sourceIds": [
+        "microsoft-learn-advanced-receiving-putaway",
+        "microsoft-learn-advanced-receiving-putaway-sv",
+        "microsoft-learn-advanced-receiving-putaway-fr",
+        "microsoft-learn-advanced-receiving-putaway-de",
+        "microsoft-learn-advanced-receiving-putaway-es",
+        "microsoft-learn-advanced-receiving-putaway-da",
+        "microsoft-learn-advanced-receiving-putaway-fi",
+        "microsoft-learn-advanced-receiving-putaway-nb",
+        "microsoft-learn-advanced-receiving-putaway-nb"
+      ]
     },
     {
       "ruleId": "Warehouse.PostShipment",
@@ -211,9 +517,25 @@
       "instructionTemplate": "",
       "languages": [
         "sv-SE",
-        "en-US"
+        "en-US",
+        "fr-FR",
+        "de-DE",
+        "es-ES",
+        "da-DK",
+        "fi-FI",
+        "nb-NO"
       ],
-      "aliases": []
+      "aliases": [],
+      "sourceIds": [
+        "microsoft-learn-warehouse-pick-shipment",
+        "microsoft-learn-warehouse-pick-shipment-sv",
+        "microsoft-learn-warehouse-pick-shipment-fr",
+        "microsoft-learn-warehouse-pick-shipment-de",
+        "microsoft-learn-warehouse-pick-shipment-es",
+        "microsoft-learn-warehouse-pick-shipment-da",
+        "microsoft-learn-warehouse-pick-shipment-fi",
+        "microsoft-learn-warehouse-pick-shipment-nb"
+      ]
     },
     {
       "ruleId": "Warehouse.SelectLocation",
@@ -222,6 +544,16 @@
       "entity": "Location",
       "priority": 900,
       "confidence": 0.94,
+      "sourceIds": [
+        "microsoft-learn-inventory-picks",
+        "microsoft-learn-inventory-picks-sv",
+        "microsoft-learn-inventory-picks-fr",
+        "microsoft-learn-inventory-picks-de",
+        "microsoft-learn-inventory-picks-es",
+        "microsoft-learn-inventory-picks-da",
+        "microsoft-learn-inventory-picks-fi",
+        "microsoft-learn-inventory-picks-nb"
+      ],
       "match": {
         "pagePatterns": [],
         "actionPatterns": [],
@@ -234,7 +566,13 @@
       "instructionTemplate": "",
       "languages": [
         "sv-SE",
-        "en-US"
+        "en-US",
+        "fr-FR",
+        "de-DE",
+        "es-ES",
+        "da-DK",
+        "fi-FI",
+        "nb-NO"
       ],
       "aliases": []
     },
@@ -245,6 +583,16 @@
       "entity": "Bin",
       "priority": 800,
       "confidence": 0.9,
+      "sourceIds": [
+        "microsoft-learn-inventory-picks",
+        "microsoft-learn-inventory-picks-sv",
+        "microsoft-learn-inventory-picks-fr",
+        "microsoft-learn-inventory-picks-de",
+        "microsoft-learn-inventory-picks-es",
+        "microsoft-learn-inventory-picks-da",
+        "microsoft-learn-inventory-picks-fi",
+        "microsoft-learn-inventory-picks-nb"
+      ],
       "match": {
         "pagePatterns": [],
         "actionPatterns": [],
@@ -257,7 +605,13 @@
       "instructionTemplate": "",
       "languages": [
         "sv-SE",
-        "en-US"
+        "en-US",
+        "fr-FR",
+        "de-DE",
+        "es-ES",
+        "da-DK",
+        "fi-FI",
+        "nb-NO"
       ],
       "aliases": []
     },
@@ -595,8 +949,26 @@
         "microsoft-learn-advanced-receiving-putaway-es",
         "microsoft-learn-advanced-receiving-putaway-da",
         "microsoft-learn-advanced-receiving-putaway-fi",
-        "microsoft-learn-advanced-receiving-putaway-nb"
-      ]
+        "microsoft-learn-advanced-receiving-putaway-nb",
+        "microsoft-learn-qms-purchase-receipt-warehouse-en-us",
+        "microsoft-learn-qms-purchase-receipt-warehouse-sv-se",
+        "microsoft-learn-qms-purchase-receipt-warehouse-fr-fr",
+        "microsoft-learn-qms-purchase-receipt-warehouse-de-de",
+        "microsoft-learn-qms-purchase-receipt-warehouse-es-es",
+        "microsoft-learn-qms-purchase-receipt-warehouse-da-dk",
+        "microsoft-learn-qms-purchase-receipt-warehouse-fi-fi",
+        "microsoft-learn-qms-purchase-receipt-warehouse-nb-no"
+      ],
+      "localizedExplanations": {
+        "en-US": "Posts the warehouse receipt and updates received inventory according to the warehouse setup. Before posting, verify the purchase lines, quantities, bins and item-tracking allocations, especially when a line is split across lots. If Microsoft Quality Management is installed and an enabled generation rule matches the item/location and purchase-receipt trigger, this posting also creates quality inspections, normally one per tracked lot, linked to the purchase order; the warehouse put-away is created as well. A lot-blocking setup can prevent movement until inspection passes. Review the created inspections and put-away, and complete inspection during or after put-away as your process requires.",
+        "sv-SE": "Bokför lagerinleveransen och uppdaterar mottaget lager enligt lagerinställningarna. Kontrollera inköpsrader, antal, lagerplatser och artikelspårning före bokföring, särskilt när en rad delas upp på flera partier. Om Microsoft Quality Management är installerat och en aktiv genereringsregel matchar artikel/lagerställe och utlösaren för inköpsmottagning skapar bokföringen även kvalitetsinspektioner, normalt en per spårat parti, länkade till inköpsordern. Ett artikelinförseldokument skapas också. Partispärr kan hindra förflyttning tills inspektionen godkänts. Granska inspektionerna och artikelinförseln och slutför inspektionen under eller efter införsel enligt ert flöde.",
+        "fr-FR": "Comptabilise la réception entrepôt et met à jour le stock reçu selon le paramétrage de l’entrepôt. Avant de comptabiliser, vérifiez les lignes d’achat, les quantités, les emplacements de rangement et le suivi des articles, surtout si une ligne est répartie entre plusieurs lots. Si Microsoft Quality Management est installé et qu’une règle active correspond à l’article/l’emplacement et au déclencheur de réception achat, cette comptabilisation crée aussi des inspections qualité, généralement une par lot suivi et liées à la commande achat ; le document de rangement est également créé. Le blocage d’un lot peut empêcher son déplacement jusqu’à la réussite de l’inspection. Vérifiez les inspections et le rangement, puis terminez l’inspection pendant ou après le rangement selon votre processus.",
+        "de-DE": "Bucht den Lagerwareneingang und aktualisiert den Bestand gemäß der Lagereinrichtung. Prüfen Sie vor dem Buchen Einkaufszeilen, Mengen, Lagerplätze und Artikelverfolgung, besonders wenn eine Zeile auf mehrere Chargen verteilt ist. Wenn Microsoft Quality Management installiert ist und eine aktive Prüfregel zu Artikel/Lagerort und Einkaufseingangsauslöser passt, erstellt diese Buchung zusätzlich Qualitätsprüfungen, normalerweise eine je verfolgter Charge und mit Bezug zum Einkaufsauftrag. Außerdem wird ein Einlagerungsbeleg erstellt. Eine Chargensperre kann die Bewegung bis zum Bestehen der Prüfung verhindern. Kontrollieren Sie Prüfungen und Einlagerung und schließen Sie die Prüfung je nach Prozess während oder nach der Einlagerung ab.",
+        "es-ES": "Registra la recepción de almacén y actualiza el inventario recibido según la configuración del almacén. Antes de registrar, verifique las líneas de compra, cantidades, ubicaciones y seguimiento del producto, sobre todo si una línea se divide entre varios lotes. Si Microsoft Quality Management está instalado y una regla activa coincide con el artículo/ubicación y el desencadenador de recepción de compra, este registro también crea inspecciones de calidad, normalmente una por lote con seguimiento y vinculadas al pedido de compra; también se crea el documento de ubicación. El bloqueo de lotes puede impedir el movimiento hasta que se apruebe la inspección. Revise las inspecciones y la ubicación y complete la inspección durante o después de esta operación según el proceso.",
+        "da-DK": "Bogfører lagerindleveringen og opdaterer den modtagne beholdning efter lageropsætningen. Kontrollér købsordrelinjer, antal, lagerplaceringer og varesporing før bogføring, især når en linje er fordelt på flere lot. Hvis Microsoft Quality Management er installeret, og en aktiv genereringsregel matcher varen/lokationen og købsmodtagelsestriggeren, opretter denne bogføring også kvalitetsinspektioner, normalt én pr. sporet lot og knyttet til købsordren. Et læg-på-lager-dokument oprettes også. Lotblokering kan forhindre flytning, indtil inspektionen er bestået. Gennemgå inspektioner og lagerplacering, og afslut inspektionen under eller efter placeringen efter jeres proces.",
+        "fi-FI": "Kirjaa varastovastaanoton ja päivittää vastaanotetun varaston varastoasetusten mukaan. Tarkista ennen kirjausta ostorivit, määrät, hyllypaikat ja nimikeseurannan kohdistukset, erityisesti jos rivi jakautuu usealle erälle. Jos Microsoft Quality Management on asennettu ja aktiivinen luontisääntö vastaa nimikettä/sijaintia sekä ostovastaanoton käynnistintä, kirjaus luo myös laatutarkastukset, tavallisesti yhden kutakin seurattua erää kohti ja ostotilaukseen linkitettynä. Lisäksi luodaan hyllytysasiakirja. Erän esto voi estää siirron, kunnes tarkastus on hyväksytty. Tarkista luodut tarkastukset ja hyllytys ja viimeistele tarkastus prosessin mukaan hyllytyksen aikana tai sen jälkeen.",
+        "nb-NO": "Bokfører lagerleveringen og oppdaterer mottatt beholdning etter lageroppsettet. Kontroller kjøpslinjer, antall, lagerplasser og varesporing før bokføring, særlig når en linje er fordelt på flere partier. Hvis Microsoft Quality Management er installert og en aktiv genereringsregel samsvarer med varen/lokasjonen og utløseren for kjøpsmottak, oppretter bokføringen også kvalitetsinspeksjoner, vanligvis én per sporet parti og koblet til kjøpsordren. Et lagerplasseringsdokument opprettes også. Partisperring kan hindre flytting til inspeksjonen er bestått. Gå gjennom inspeksjonene og plasseringen, og fullfør inspeksjonen under eller etter plassering etter prosessen deres."
+      }
     },
     {
       "ruleId": "Warehouse.ViewAvailabilityByEvent",
@@ -1569,6 +1941,134 @@
         "Advanced warehouse count: synchronize item ledger and warehouse data first; count all bins for an item to post a complete physical count",
         "Registering warehouse physical counts creates warehouse entries but does not itself post item, physical inventory, or value ledger entries; calculate warehouse adjustment and post to synchronize",
         "Cycle counting frequency is set per item; choose the appropriate journal path for the warehouse setup"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-qms-purchase-receipt-warehouse-en-us",
+      "title": "Quality inspections for warehouse purchase receipts",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/en-us/dynamics365/business-central/qms-purchase-receipt-testing-warehouse",
+      "appliesTo": "Business Central Quality Management extension; warehouse purchase receipt workflow; locale en-US; verified against Microsoft Learn 2026-09-30. Tenant version and installed extension remain unverified.",
+      "accessedDate": "2026-09-30",
+      "fields": [
+        "Warehouse purchase receipt is the inspection-generation trigger; creating the document alone does not trigger inspection.",
+        "Posting a warehouse receipt can create quality inspections when Quality Management is installed and a matching rule is enabled.",
+        "Item tracking can create a separate inspection for each lot; inspections are linked to the purchase order.",
+        "Posting can also generate warehouse put-away documents; inspection can be completed during or after put-away.",
+        "Lot blocking can prevent movement until the inspection passes.",
+        "Applies to warehouse-handling locations; captions and installed extension behavior can vary by tenant/version."
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-qms-purchase-receipt-warehouse-sv-se",
+      "title": "Kvalitetsinspektioner vid lagerinleverans från inköp",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/sv-se/dynamics365/business-central/qms-purchase-receipt-testing-warehouse",
+      "appliesTo": "Business Central Quality Management extension; warehouse purchase receipt workflow; locale sv-SE; verified against Microsoft Learn 2026-09-30. Tenant version and installed extension remain unverified.",
+      "accessedDate": "2026-09-30",
+      "fields": [
+        "Warehouse purchase receipt is the inspection-generation trigger; creating the document alone does not trigger inspection.",
+        "Posting a warehouse receipt can create quality inspections when Quality Management is installed and a matching rule is enabled.",
+        "Item tracking can create a separate inspection for each lot; inspections are linked to the purchase order.",
+        "Posting can also generate warehouse put-away documents; inspection can be completed during or after put-away.",
+        "Lot blocking can prevent movement until the inspection passes.",
+        "Applies to warehouse-handling locations; captions and installed extension behavior can vary by tenant/version."
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-qms-purchase-receipt-warehouse-fr-fr",
+      "title": "Inspections qualité des réceptions achat en entrepôt",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/fr-fr/dynamics365/business-central/qms-purchase-receipt-testing-warehouse",
+      "appliesTo": "Business Central Quality Management extension; warehouse purchase receipt workflow; locale fr-FR; verified against Microsoft Learn 2026-09-30. Tenant version and installed extension remain unverified.",
+      "accessedDate": "2026-09-30",
+      "fields": [
+        "Warehouse purchase receipt is the inspection-generation trigger; creating the document alone does not trigger inspection.",
+        "Posting a warehouse receipt can create quality inspections when Quality Management is installed and a matching rule is enabled.",
+        "Item tracking can create a separate inspection for each lot; inspections are linked to the purchase order.",
+        "Posting can also generate warehouse put-away documents; inspection can be completed during or after put-away.",
+        "Lot blocking can prevent movement until the inspection passes.",
+        "Applies to warehouse-handling locations; captions and installed extension behavior can vary by tenant/version."
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-qms-purchase-receipt-warehouse-de-de",
+      "title": "Qualitätsprüfungen bei Einkaufseingängen im Lager",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/de-de/dynamics365/business-central/qms-purchase-receipt-testing-warehouse",
+      "appliesTo": "Business Central Quality Management extension; warehouse purchase receipt workflow; locale de-DE; verified against Microsoft Learn 2026-09-30. Tenant version and installed extension remain unverified.",
+      "accessedDate": "2026-09-30",
+      "fields": [
+        "Warehouse purchase receipt is the inspection-generation trigger; creating the document alone does not trigger inspection.",
+        "Posting a warehouse receipt can create quality inspections when Quality Management is installed and a matching rule is enabled.",
+        "Item tracking can create a separate inspection for each lot; inspections are linked to the purchase order.",
+        "Posting can also generate warehouse put-away documents; inspection can be completed during or after put-away.",
+        "Lot blocking can prevent movement until the inspection passes.",
+        "Applies to warehouse-handling locations; captions and installed extension behavior can vary by tenant/version."
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-qms-purchase-receipt-warehouse-es-es",
+      "title": "Inspecciones de calidad en recepciones de compra de almacén",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/es-es/dynamics365/business-central/qms-purchase-receipt-testing-warehouse",
+      "appliesTo": "Business Central Quality Management extension; warehouse purchase receipt workflow; locale es-ES; verified against Microsoft Learn 2026-09-30. Tenant version and installed extension remain unverified.",
+      "accessedDate": "2026-09-30",
+      "fields": [
+        "Warehouse purchase receipt is the inspection-generation trigger; creating the document alone does not trigger inspection.",
+        "Posting a warehouse receipt can create quality inspections when Quality Management is installed and a matching rule is enabled.",
+        "Item tracking can create a separate inspection for each lot; inspections are linked to the purchase order.",
+        "Posting can also generate warehouse put-away documents; inspection can be completed during or after put-away.",
+        "Lot blocking can prevent movement until the inspection passes.",
+        "Applies to warehouse-handling locations; captions and installed extension behavior can vary by tenant/version."
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-qms-purchase-receipt-warehouse-da-dk",
+      "title": "Kvalitetsinspektion ved lagerindlevering fra køb",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/da-dk/dynamics365/business-central/qms-purchase-receipt-testing-warehouse",
+      "appliesTo": "Business Central Quality Management extension; warehouse purchase receipt workflow; locale da-DK; verified against Microsoft Learn 2026-09-30. Tenant version and installed extension remain unverified.",
+      "accessedDate": "2026-09-30",
+      "fields": [
+        "Warehouse purchase receipt is the inspection-generation trigger; creating the document alone does not trigger inspection.",
+        "Posting a warehouse receipt can create quality inspections when Quality Management is installed and a matching rule is enabled.",
+        "Item tracking can create a separate inspection for each lot; inspections are linked to the purchase order.",
+        "Posting can also generate warehouse put-away documents; inspection can be completed during or after put-away.",
+        "Lot blocking can prevent movement until the inspection passes.",
+        "Applies to warehouse-handling locations; captions and installed extension behavior can vary by tenant/version."
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-qms-purchase-receipt-warehouse-fi-fi",
+      "title": "Ostojen varastovastaanoton laatutarkastukset",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/fi-fi/dynamics365/business-central/qms-purchase-receipt-testing-warehouse",
+      "appliesTo": "Business Central Quality Management extension; warehouse purchase receipt workflow; locale fi-FI; verified against Microsoft Learn 2026-09-30. Tenant version and installed extension remain unverified.",
+      "accessedDate": "2026-09-30",
+      "fields": [
+        "Warehouse purchase receipt is the inspection-generation trigger; creating the document alone does not trigger inspection.",
+        "Posting a warehouse receipt can create quality inspections when Quality Management is installed and a matching rule is enabled.",
+        "Item tracking can create a separate inspection for each lot; inspections are linked to the purchase order.",
+        "Posting can also generate warehouse put-away documents; inspection can be completed during or after put-away.",
+        "Lot blocking can prevent movement until the inspection passes.",
+        "Applies to warehouse-handling locations; captions and installed extension behavior can vary by tenant/version."
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-qms-purchase-receipt-warehouse-nb-no",
+      "title": "Kvalitetsinspeksjoner ved lagerinngående kjøpsmottak",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/nb-no/dynamics365/business-central/qms-purchase-receipt-testing-warehouse",
+      "appliesTo": "Business Central Quality Management extension; warehouse purchase receipt workflow; locale nb-NO; verified against Microsoft Learn 2026-09-30. Tenant version and installed extension remain unverified.",
+      "accessedDate": "2026-09-30",
+      "fields": [
+        "Warehouse purchase receipt is the inspection-generation trigger; creating the document alone does not trigger inspection.",
+        "Posting a warehouse receipt can create quality inspections when Quality Management is installed and a matching rule is enabled.",
+        "Item tracking can create a separate inspection for each lot; inspections are linked to the purchase order.",
+        "Posting can also generate warehouse put-away documents; inspection can be completed during or after put-away.",
+        "Lot blocking can prevent movement until the inspection passes.",
+        "Applies to warehouse-handling locations; captions and installed extension behavior can vary by tenant/version."
       ]
     }
   ]

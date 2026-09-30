@@ -6,12 +6,50 @@
   "use strict";
   const array = value => Array.isArray(value) ? value : [];
   const hasExplanation = task => Boolean(task?.contextualExplanationRuleId) &&
-    array(task?.contextualExplanationSources).some(source =>
-      /^https:\/\/learn\.microsoft\.com\//i.test(source?.sourceUri || "")) &&
+    (["observed-workflow", "authored-process", "page-context", "vendor-documentation"].includes(task?.contextualExplanationBasis) ||
+      array(task?.contextualExplanationSources).some(source =>
+        String(source?.sourceUri || "").startsWith("https://learn.microsoft.com/"))) &&
     Object.keys(task?.contextualExplanations || {}).length > 0;
 
-  function eventIds(task) {
-    return new Set(array(task?.sourceEventIds).map(String).filter(Boolean));
+  const PROVENANCE_BUCKETS = [
+    ["sourceEventIds"],
+    ["sourceEventNos", "legacyEventNos"],
+    ["normalizedEventIds"],
+    ["semanticActionIds"]
+  ];
+
+  function provenance(task) {
+    return PROVENANCE_BUCKETS.map(fields => new Set(fields.flatMap(field =>
+      array(task?.[field])).map(String).filter(Boolean)));
+  }
+
+  function matchesProvenance(task, candidate) {
+    const taskRefs = provenance(task);
+    const candidateRefs = provenance(candidate);
+    return taskRefs.some((left, index) => {
+      const right = candidateRefs[index];
+      return left.size > 0 && right.size > 0 &&
+        [...left].some(value => right.has(value));
+    });
+  }
+
+  function actionIdentity(task) {
+    const explicit = task?.semanticAction || task?.taskType ||
+      task?.semanticActionModel?.actionType;
+    if (explicit) return String(explicit).trim().toLowerCase();
+    const idPrefix = String(task?.taskId || "").split(/[:/-]/u, 1)[0];
+    return idPrefix.trim().toLowerCase();
+  }
+
+  function positionalMatch(task, interpretedTasks, index) {
+    if (interpretedTasks.length === 0 || index < 0 ||
+        task?.taskNo !== index + 1) return null;
+    const candidate = interpretedTasks[index];
+    if (candidate?.taskNo !== index + 1 || !hasExplanation(candidate)) return null;
+    const taskAction = actionIdentity(task);
+    const candidateAction = actionIdentity(candidate);
+    return taskAction && candidateAction && taskAction === candidateAction
+      ? candidate : null;
   }
 
   function match(task, interpretedTasks) {
@@ -19,12 +57,9 @@
       candidate.taskId === task.taskId && hasExplanation(candidate));
     if (exact.length) return exact.length === 1 ? exact[0] : null;
 
-    const sourceIds = eventIds(task);
-    if (!sourceIds.size) return null;
     const candidates = interpretedTasks.filter(candidate => {
       if (!hasExplanation(candidate)) return false;
-      const candidateIds = eventIds(candidate);
-      return [...sourceIds].some(id => candidateIds.has(id));
+      return matchesProvenance(task, candidate);
     });
     const ruleIds = new Set(candidates.map(candidate => candidate.contextualExplanationRuleId));
     if (ruleIds.size !== 1) return null;
@@ -35,15 +70,21 @@
   }
 
   function enrichForDisplay(reviewTasks = [], interpretedTasks = []) {
-    return array(reviewTasks).map(task => {
-      const interpreted = match(task, array(interpretedTasks));
-      if (!interpreted) return task;
+    const review = array(reviewTasks);
+    const interpreted = array(interpretedTasks);
+    const sameLength = review.length === interpreted.length;
+    return review.map((task, index) => {
+      const matched = match(task, interpreted);
+      const context = matched || (sameLength
+        ? positionalMatch(task, interpreted, index) : null);
+      if (!context) return task;
       return { ...task,
-        contextualExplanations: { ...interpreted.contextualExplanations },
-        contextualExplanationRuleId: interpreted.contextualExplanationRuleId,
-        contextualExplanationConfidence: interpreted.contextualExplanationConfidence,
-        contextualExplanationSourceIds: [...array(interpreted.contextualExplanationSourceIds)],
-        contextualExplanationSources: array(interpreted.contextualExplanationSources)
+        contextualExplanations: { ...context.contextualExplanations },
+        contextualExplanationRuleId: context.contextualExplanationRuleId,
+        contextualExplanationConfidence: context.contextualExplanationConfidence,
+        contextualExplanationBasis: context.contextualExplanationBasis,
+        contextualExplanationSourceIds: [...array(context.contextualExplanationSourceIds)],
+        contextualExplanationSources: array(context.contextualExplanationSources)
           .map(source => ({ ...source })) };
     });
   }

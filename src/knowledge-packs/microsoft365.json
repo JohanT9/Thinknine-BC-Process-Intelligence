@@ -1,0 +1,739 @@
+{
+  "packId": "bc-microsoft365",
+  "name": "Business Central microsoft365",
+  "version": "1.0.0",
+  "priority": 220,
+  "rules": [
+    {
+      "ruleId": "BCExpansion.OpenExcel",
+      "taskType": "OpenExcel",
+      "semanticAction": "OpenExcel",
+      "entity": "Microsoft365Integration",
+      "priority": 1300,
+      "confidence": 0.96,
+      "match": {
+        "pagePatterns": [
+          "^.+$"
+        ],
+        "actionPatterns": [
+          "^Open in Excel$",
+          "^öppna i Excel$",
+          "^Ouvrir dans Excel$",
+          "^In Excel öffnen$",
+          "^Abrir en Excel$",
+          "^Åbn i Excel$",
+          "^Avaa Excelissä$",
+          "^Åpne i Excel$"
+        ],
+        "fieldPatterns": [],
+        "automationIdPatterns": []
+      },
+      "instructionTemplate": "",
+      "languages": [
+        "en-US",
+        "sv-SE",
+        "fr-FR",
+        "de-DE",
+        "es-ES",
+        "da-DK",
+        "fi-FI",
+        "nb-NO"
+      ],
+      "aliases": [],
+      "sourceIds": [
+        "microsoft-learn-expansion-across-work-with-excel-en-us",
+        "microsoft-learn-expansion-across-work-with-excel-sv-se",
+        "microsoft-learn-expansion-across-work-with-excel-fr-fr",
+        "microsoft-learn-expansion-across-work-with-excel-de-de",
+        "microsoft-learn-expansion-across-work-with-excel-es-es",
+        "microsoft-learn-expansion-across-work-with-excel-da-dk",
+        "microsoft-learn-expansion-across-work-with-excel-fi-fi",
+        "microsoft-learn-expansion-across-work-with-excel-nb-no"
+      ],
+      "localizedExplanations": {
+        "en-US": "This exports the displayed list data to Excel for analysis. Changes in that workbook are not published back to Business Central by this action; updating records uses the separate Edit in Excel feature.",
+        "sv-SE": "Här exporteras listans visade data till Excel för analys. Ändringar i arbetsboken publiceras inte tillbaka till Business Central genom denna funktion. Uppdatering av poster använder den separata funktionen Redigera i Excel.",
+        "fr-FR": "Cette action exporte les données affichées de la liste vers Excel pour analyse. Les modifications du classeur ne sont pas republiées par cette fonction ; la mise à jour utilise Modifier dans Excel.",
+        "de-DE": "Die angezeigten Listendaten werden zur Analyse nach Excel exportiert. Änderungen werden hierüber nicht nach Business Central zurückgeschrieben. Dafür dient die separate Funktion In Excel bearbeiten.",
+        "es-ES": "Exporta los datos visibles de la lista a Excel para analizarlos. Esta función no publica los cambios del libro en Business Central; para actualizar registros se usa Editar en Excel.",
+        "da-DK": "Listens viste data eksporteres til Excel til analyse. Ændringer i projektmappen publiceres ikke tilbage med denne funktion. Opdatering af poster bruger den separate funktion Rediger i Excel.",
+        "fi-FI": "Toiminto vie luettelon näkyvät tiedot Exceliin analysointia varten. Työkirjan muutoksia ei julkaista takaisin tällä toiminnolla. Tietueiden päivitykseen käytetään erillistä Muokkaa Excelissä -toimintoa.",
+        "nb-NO": "Listens viste data eksporteres til Excel for analyse. Endringer i arbeidsboken publiseres ikke tilbake med denne funksjonen. Oppdatering av poster bruker den separate funksjonen Rediger i Excel."
+      }
+    },
+    {
+      "ruleId": "BCExpansion.EditExcel",
+      "taskType": "EditExcel",
+      "semanticAction": "EditExcel",
+      "entity": "Microsoft365Integration",
+      "priority": 1300,
+      "confidence": 0.96,
+      "match": {
+        "pagePatterns": [
+          "^.+$"
+        ],
+        "actionPatterns": [
+          "^Edit in Excel$",
+          "^Redigera i Excel$",
+          "^Modifier dans Excel$",
+          "^In Excel bearbeiten$",
+          "^Editar en Excel$",
+          "^Rediger i Excel$",
+          "^Muokkaa Excelissä$"
+        ],
+        "fieldPatterns": [],
+        "automationIdPatterns": []
+      },
+      "instructionTemplate": "",
+      "languages": [
+        "en-US",
+        "sv-SE",
+        "fr-FR",
+        "de-DE",
+        "es-ES",
+        "da-DK",
+        "fi-FI",
+        "nb-NO"
+      ],
+      "aliases": [],
+      "sourceIds": [
+        "microsoft-learn-expansion-across-work-with-excel-en-us",
+        "microsoft-learn-expansion-across-work-with-excel-sv-se",
+        "microsoft-learn-expansion-across-work-with-excel-fr-fr",
+        "microsoft-learn-expansion-across-work-with-excel-de-de",
+        "microsoft-learn-expansion-across-work-with-excel-es-es",
+        "microsoft-learn-expansion-across-work-with-excel-da-dk",
+        "microsoft-learn-expansion-across-work-with-excel-fi-fi",
+        "microsoft-learn-expansion-across-work-with-excel-nb-no"
+      ],
+      "localizedExplanations": {
+        "en-US": "This opens list data in Excel with the Business Central add-in. Supported changes can be published back to Business Central, subject to permissions and validation. Opening the workbook alone does not publish changes.",
+        "sv-SE": "Här öppnas listdata i Excel med Business Central-tillägget. Ändringar som stöds kan publiceras tillbaka till Business Central med behörighetskontroll och validering. Att öppna arbetsboken publicerar inga ändringar.",
+        "fr-FR": "Les données s’ouvrent dans Excel avec le complément Business Central. Les modifications prises en charge peuvent être publiées selon les autorisations et validations. L’ouverture seule ne publie rien.",
+        "de-DE": "Die Listendaten werden mit dem Business-Central-Add-In in Excel geöffnet. Unterstützte Änderungen können unter Beachtung von Berechtigungen und Prüfungen zurückveröffentlicht werden. Das Öffnen allein veröffentlicht nichts.",
+        "es-ES": "Abre los datos en Excel con el complemento de Business Central. Los cambios compatibles pueden publicarse según permisos y validaciones. Abrir el libro no publica cambios.",
+        "da-DK": "Listedata åbnes i Excel med Business Central-tilføjelsen. Understøttede ændringer kan publiceres tilbage med kontrol af rettigheder og validering. Åbning af projektmappen publicerer intet.",
+        "fi-FI": "Luettelon tiedot avataan Excelissä Business Central -apuohjelmalla. Tuetut muutokset voi julkaista takaisin käyttöoikeuksien ja tarkistusten mukaisesti. Pelkkä avaaminen ei julkaise muutoksia.",
+        "nb-NO": "Listedata åpnes i Excel med Business Central-tillegget. Støttede endringer kan publiseres tilbake med rettighetskontroll og validering. Åpning av arbeidsboken publiserer ingenting."
+      }
+    },
+    {
+      "ruleId": "BCExpansion.ShareTeams",
+      "taskType": "ShareTeams",
+      "semanticAction": "ShareTeams",
+      "entity": "Microsoft365Integration",
+      "priority": 1300,
+      "confidence": 0.96,
+      "match": {
+        "pagePatterns": [
+          "^(?!Configure Outlook$|Konfigurera Outlook$|Configurer Outlook$|Outlook konfigurieren$|Configurar Outlook$|Konfigurer Outlook$|Määritä Outlook$|Konfigurer Outlook-siden$).+$"
+        ],
+        "actionPatterns": [
+          "^Share to Teams$",
+          "^Dela till Teams$",
+          "^Partager avec Teams$",
+          "^Für Teams freigeben$",
+          "^Compartir con Teams$",
+          "^Del med Teams$",
+          "^Jaa Teamsiin$",
+          "^Del til Teams$"
+        ],
+        "fieldPatterns": [],
+        "automationIdPatterns": []
+      },
+      "instructionTemplate": "",
+      "languages": [
+        "en-US",
+        "sv-SE",
+        "fr-FR",
+        "de-DE",
+        "es-ES",
+        "da-DK",
+        "fi-FI",
+        "nb-NO"
+      ],
+      "aliases": [],
+      "sourceIds": [
+        "microsoft-learn-expansion-across-working-with-teams-en-us",
+        "microsoft-learn-expansion-across-working-with-teams-sv-se",
+        "microsoft-learn-expansion-across-working-with-teams-fr-fr",
+        "microsoft-learn-expansion-across-working-with-teams-de-de",
+        "microsoft-learn-expansion-across-working-with-teams-es-es",
+        "microsoft-learn-expansion-across-working-with-teams-da-dk",
+        "microsoft-learn-expansion-across-working-with-teams-fi-fi",
+        "microsoft-learn-expansion-across-working-with-teams-nb-no"
+      ],
+      "localizedExplanations": {
+        "en-US": "This opens sharing of a link to the current Business Central page in Teams. Check recipients and any record preview before sending. A shared card can expose its displayed information to everyone in the conversation.",
+        "sv-SE": "Här öppnas delning av en länk till aktuell Business Central-sida i Teams. Kontrollera mottagare och eventuell postförhandsvisning innan du skickar. Uppgifter som visas på ett delat kort kan ses av alla i konversationen.",
+        "fr-FR": "Cette action prépare le partage du lien vers la page dans Teams. Vérifiez les destinataires et l’aperçu avant l’envoi. Les informations affichées sur une carte partagée sont visibles par tous les participants.",
+        "de-DE": "Die Freigabe eines Links zur aktuellen Seite in Teams wird geöffnet. Prüfen Sie Empfänger und Vorschau vor dem Senden. Angaben auf einer geteilten Karte können alle Gesprächsteilnehmer sehen.",
+        "es-ES": "Abre el uso compartido de un enlace a la página en Teams. Revise destinatarios y vista previa antes de enviar. Todos los participantes pueden ver los datos mostrados en una tarjeta compartida.",
+        "da-DK": "Her åbnes deling af et link til siden i Teams. Kontroller modtagere og forhåndsvisning før afsendelse. Oplysninger på et delt kort kan ses af alle i samtalen.",
+        "fi-FI": "Toiminto avaa nykyisen sivun linkin jakamisen Teamsissa. Tarkista vastaanottajat ja esikatselu ennen lähetystä. Jaetun kortin tiedot näkyvät kaikille keskustelun osallistujille.",
+        "nb-NO": "Her åpnes deling av en lenke til siden i Teams. Kontroller mottakere og forhåndsvisning før sending. Opplysninger på et delt kort kan ses av alle i samtalen."
+      }
+    },
+    {
+      "ruleId": "BCExpansion.OpenOneDrive",
+      "taskType": "OpenOneDrive",
+      "semanticAction": "OpenOneDrive",
+      "entity": "Microsoft365Integration",
+      "priority": 1300,
+      "confidence": 0.96,
+      "match": {
+        "pagePatterns": [
+          "^(?!Configure Outlook$|Konfigurera Outlook$|Configurer Outlook$|Outlook konfigurieren$|Configurar Outlook$|Konfigurer Outlook$|Määritä Outlook$|Konfigurer Outlook-siden$).+$"
+        ],
+        "actionPatterns": [
+          "^Open in OneDrive$",
+          "^Öppna i OneDrive$",
+          "^Abrir en OneDrive$",
+          "^Åbn i OneDrive$",
+          "^Avaa OneDrive$",
+          "^Åpne i OneDrive$"
+        ],
+        "fieldPatterns": [],
+        "automationIdPatterns": []
+      },
+      "instructionTemplate": "",
+      "languages": [
+        "en-US",
+        "sv-SE",
+        "fr-FR",
+        "de-DE",
+        "es-ES",
+        "da-DK",
+        "fi-FI",
+        "nb-NO"
+      ],
+      "aliases": [],
+      "sourceIds": [
+        "microsoft-learn-expansion-across-onedrive-overview-en-us",
+        "microsoft-learn-expansion-across-onedrive-overview-sv-se",
+        "microsoft-learn-expansion-across-onedrive-overview-fr-fr",
+        "microsoft-learn-expansion-across-onedrive-overview-de-de",
+        "microsoft-learn-expansion-across-onedrive-overview-es-es",
+        "microsoft-learn-expansion-across-onedrive-overview-da-dk",
+        "microsoft-learn-expansion-across-onedrive-overview-fi-fi",
+        "microsoft-learn-expansion-across-onedrive-overview-nb-no"
+      ],
+      "localizedExplanations": {
+        "en-US": "Copies the selected file into the Business Central folder in your work or school OneDrive, then opens that copy. Confirm that you selected the intended file and account before working with it. Open in OneDrive does not itself choose recipients or grant them access; use the separate Share action when you intend to collaborate, and review its recipients and permissions before sending.",
+        "sv-SE": "Kopierar den valda filen till Business Central-mappen i ditt arbets- eller skol-OneDrive och öppnar kopian. Kontrollera att rätt fil och konto är valt innan du arbetar vidare. Öppna i OneDrive väljer inte mottagare eller ger dem åtkomst; använd den separata åtgärden Dela om du vill samarbeta och granska mottagare och behörigheter innan du skickar.",
+        "fr-FR": "Copie le fichier sélectionné dans le dossier Business Central de votre OneDrive professionnel ou scolaire, puis ouvre cette copie. Vérifiez le fichier et le compte avant de continuer. Ouvrir dans OneDrive ne choisit pas de destinataires et ne leur donne pas accès ; utilisez l’action distincte Partager pour collaborer et contrôlez les destinataires et leurs autorisations avant l’envoi.",
+        "de-DE": "Kopiert die ausgewählte Datei in den Business-Central-Ordner Ihres geschäftlichen oder schulischen OneDrive und öffnet diese Kopie. Prüfen Sie Datei und Konto, bevor Sie fortfahren. Mit In OneDrive öffnen werden keine Empfänger ausgewählt und keine Zugriffsrechte erteilt. Verwenden Sie zum Zusammenarbeiten die separate Aktion Teilen und prüfen Sie Empfänger und Berechtigungen vor dem Senden.",
+        "es-ES": "Copia el archivo seleccionado a la carpeta Business Central de su OneDrive profesional o educativo y abre esa copia. Confirme el archivo y la cuenta antes de continuar. Abrir en OneDrive no elige destinatarios ni les concede acceso; use la acción independiente Compartir si desea colaborar y revise los destinatarios y permisos antes de enviarla.",
+        "da-DK": "Kopierer den valgte fil til Business Central-mappen i dit arbejds- eller skole-OneDrive og åbner kopien. Kontrollér fil og konto, før du fortsætter. Åbn i OneDrive vælger ikke modtagere eller giver dem adgang; brug den separate Del-handling ved samarbejde, og kontrollér modtagere og tilladelser før afsendelse.",
+        "fi-FI": "Kopioi valitun tiedoston työpaikan tai oppilaitoksen OneDriven Business Central -kansioon ja avaa kopion. Varmista ennen jatkamista, että tiedosto ja tili ovat oikeat. Avaa OneDrivessa ei valitse vastaanottajia eikä anna heille käyttöoikeutta; käytä erillistä Jaa-toimintoa yhteistyöhön ja tarkista vastaanottajat sekä oikeudet ennen lähettämistä.",
+        "nb-NO": "Kopierer den valgte filen til Business Central-mappen i OneDrive for jobb eller skole og åpner kopien. Kontroller at fil og konto er riktig før du fortsetter. Åpne i OneDrive velger ikke mottakere eller gir dem tilgang; bruk den separate Del-handlingen når du vil samarbeide, og kontroller mottakere og tillatelser før du sender."
+      }
+    },
+    {
+      "ruleId": "BCExpansion.InstallOutlook",
+      "taskType": "InstallOutlook",
+      "semanticAction": "InstallOutlook",
+      "entity": "Microsoft365Integration",
+      "priority": 1300,
+      "confidence": 0.96,
+      "match": {
+        "pagePatterns": [
+          "^Configure Outlook$",
+          "^Konfigurera Outlook$",
+          "^Configurer Outlook$",
+          "^Outlook konfigurieren$",
+          "^Configurar Outlook$",
+          "^Konfigurer Outlook$",
+          "^Määritä Outlook$",
+          "^Konfigurer Outlook-siden$"
+        ],
+        "actionPatterns": [
+          "^Install to my Outlook$",
+          "^Installera till min Outlook$",
+          "^Installer dans mon Outlook$",
+          "^In mein Outlook installieren$",
+          "^Instalar en mi Outlook$",
+          "^Installer på min Outlook$",
+          "^Asenna omaan Outlookiin$",
+          "^Installer i min Outlook$"
+        ],
+        "fieldPatterns": [],
+        "automationIdPatterns": []
+      },
+      "instructionTemplate": "",
+      "languages": [
+        "en-US",
+        "sv-SE",
+        "fr-FR",
+        "de-DE",
+        "es-ES",
+        "da-DK",
+        "fi-FI",
+        "nb-NO"
+      ],
+      "aliases": [],
+      "sourceIds": [
+        "microsoft-learn-expansion-admin-outlook-en-us",
+        "microsoft-learn-expansion-admin-outlook-sv-se",
+        "microsoft-learn-expansion-admin-outlook-fr-fr",
+        "microsoft-learn-expansion-admin-outlook-de-de",
+        "microsoft-learn-expansion-admin-outlook-es-es",
+        "microsoft-learn-expansion-admin-outlook-da-dk",
+        "microsoft-learn-expansion-admin-outlook-fi-fi",
+        "microsoft-learn-expansion-admin-outlook-nb-no"
+      ],
+      "localizedExplanations": {
+        "en-US": "This installs the Business Central add-in for your Outlook. It provides customer, vendor and document context in Outlook and connects to the Business Central environment from which it was installed.",
+        "sv-SE": "Här installeras Business Central-tillägget för ditt Outlook. Det ger kund-, leverantörs- och dokumentinformation i Outlook och ansluter till den Business Central-miljö där installationen startades.",
+        "fr-FR": "Cette action installe le complément Business Central dans votre Outlook. Il affiche le contexte des clients, fournisseurs et documents et se connecte à l’environnement d’origine de l’installation.",
+        "de-DE": "Das Business-Central-Add-In wird für Ihr Outlook installiert. Es zeigt Kunden-, Lieferanten- und Beleginformationen und verbindet sich mit der Umgebung, aus der es installiert wurde.",
+        "es-ES": "Instala el complemento de Business Central en Outlook. Ofrece contexto de clientes, proveedores y documentos y se conecta al entorno desde el que se instaló.",
+        "da-DK": "Business Central-tilføjelsen installeres i dit Outlook. Den viser kunde-, leverandør- og dokumentoplysninger og forbinder til det miljø, hvorfra den blev installeret.",
+        "fi-FI": "Toiminto asentaa Business Central -apuohjelman Outlookiisi. Se näyttää asiakas-, toimittaja- ja asiakirjatietoja ja yhdistyy ympäristöön, josta asennus käynnistettiin.",
+        "nb-NO": "Business Central-tillegget installeres i ditt Outlook. Det viser kunde-, leverandør- og dokumentinformasjon og kobler til miljøet det ble installert fra."
+      }
+    }
+  ],
+  "sources": [
+    {
+      "sourceId": "microsoft-learn-expansion-across-work-with-excel-en-us",
+      "title": "Viewing and editing in Excel from Business Central - Business Central | Microsoft Learn",
+      "sourceUri": "https://learn.microsoft.com/en-us/dynamics365/business-central/across-work-with-excel",
+      "accessedDate": "2026-09-28",
+      "appliesTo": "Business Central standard functionality. Microsoft Learn captions checked; tenant/version-specific UI captions remain unverified.",
+      "fields": [
+        "This exports the displayed list data to Excel for analysis. Changes in that workbook are not published back to Business Central by this action; updating records uses the separate Edit in Excel feature.",
+        "This opens list data in Excel with the Business Central add-in. Supported changes can be published back to Business Central, subject to permissions and validation. Opening the workbook alone does not publish changes."
+      ],
+      "documentedCaptions": [
+        "Open in Excel",
+        "Edit in Excel"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-expansion-across-work-with-excel-sv-se",
+      "title": "Visa och redigera i Excel från Business Central - Business Central | Microsoft Learn",
+      "sourceUri": "https://learn.microsoft.com/sv-se/dynamics365/business-central/across-work-with-excel",
+      "accessedDate": "2026-09-28",
+      "appliesTo": "Business Central standard functionality. Microsoft Learn captions checked; tenant/version-specific UI captions remain unverified.",
+      "fields": [
+        "This exports the displayed list data to Excel for analysis. Changes in that workbook are not published back to Business Central by this action; updating records uses the separate Edit in Excel feature.",
+        "This opens list data in Excel with the Business Central add-in. Supported changes can be published back to Business Central, subject to permissions and validation. Opening the workbook alone does not publish changes."
+      ],
+      "documentedCaptions": [
+        "öppna i Excel",
+        "Redigera i Excel"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-expansion-across-work-with-excel-fr-fr",
+      "title": "Affichage et modification dans Excel à partir de Business Central - Business Central | Microsoft Learn",
+      "sourceUri": "https://learn.microsoft.com/fr-fr/dynamics365/business-central/across-work-with-excel",
+      "accessedDate": "2026-09-28",
+      "appliesTo": "Business Central standard functionality. Microsoft Learn captions checked; tenant/version-specific UI captions remain unverified.",
+      "fields": [
+        "This exports the displayed list data to Excel for analysis. Changes in that workbook are not published back to Business Central by this action; updating records uses the separate Edit in Excel feature.",
+        "This opens list data in Excel with the Business Central add-in. Supported changes can be published back to Business Central, subject to permissions and validation. Opening the workbook alone does not publish changes."
+      ],
+      "documentedCaptions": [
+        "Ouvrir dans Excel",
+        "Modifier dans Excel"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-expansion-across-work-with-excel-de-de",
+      "title": "Anzeigen und Bearbeiten in Excel aus Business Central - Business Central | Microsoft Learn",
+      "sourceUri": "https://learn.microsoft.com/de-de/dynamics365/business-central/across-work-with-excel",
+      "accessedDate": "2026-09-28",
+      "appliesTo": "Business Central standard functionality. Microsoft Learn captions checked; tenant/version-specific UI captions remain unverified.",
+      "fields": [
+        "This exports the displayed list data to Excel for analysis. Changes in that workbook are not published back to Business Central by this action; updating records uses the separate Edit in Excel feature.",
+        "This opens list data in Excel with the Business Central add-in. Supported changes can be published back to Business Central, subject to permissions and validation. Opening the workbook alone does not publish changes."
+      ],
+      "documentedCaptions": [
+        "In Excel öffnen",
+        "In Excel bearbeiten"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-expansion-across-work-with-excel-es-es",
+      "title": "Visualización y edición en Excel desde Business Central - Business Central | Microsoft Learn",
+      "sourceUri": "https://learn.microsoft.com/es-es/dynamics365/business-central/across-work-with-excel",
+      "accessedDate": "2026-09-28",
+      "appliesTo": "Business Central standard functionality. Microsoft Learn captions checked; tenant/version-specific UI captions remain unverified.",
+      "fields": [
+        "This exports the displayed list data to Excel for analysis. Changes in that workbook are not published back to Business Central by this action; updating records uses the separate Edit in Excel feature.",
+        "This opens list data in Excel with the Business Central add-in. Supported changes can be published back to Business Central, subject to permissions and validation. Opening the workbook alone does not publish changes."
+      ],
+      "documentedCaptions": [
+        "Abrir en Excel",
+        "Editar en Excel"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-expansion-across-work-with-excel-da-dk",
+      "title": "Visning og redigering i Excel fra Business Central - Business Central | Microsoft Learn",
+      "sourceUri": "https://learn.microsoft.com/da-dk/dynamics365/business-central/across-work-with-excel",
+      "accessedDate": "2026-09-28",
+      "appliesTo": "Business Central standard functionality. Microsoft Learn captions checked; tenant/version-specific UI captions remain unverified.",
+      "fields": [
+        "This exports the displayed list data to Excel for analysis. Changes in that workbook are not published back to Business Central by this action; updating records uses the separate Edit in Excel feature.",
+        "This opens list data in Excel with the Business Central add-in. Supported changes can be published back to Business Central, subject to permissions and validation. Opening the workbook alone does not publish changes."
+      ],
+      "documentedCaptions": [
+        "Åbn i Excel",
+        "Rediger i Excel"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-expansion-across-work-with-excel-fi-fi",
+      "title": "Tarkasteleminen ja muokkaaminen Excelissä Business Central - Business Central | Microsoft Learn",
+      "sourceUri": "https://learn.microsoft.com/fi-fi/dynamics365/business-central/across-work-with-excel",
+      "accessedDate": "2026-09-28",
+      "appliesTo": "Business Central standard functionality. Microsoft Learn captions checked; tenant/version-specific UI captions remain unverified.",
+      "fields": [
+        "This exports the displayed list data to Excel for analysis. Changes in that workbook are not published back to Business Central by this action; updating records uses the separate Edit in Excel feature.",
+        "This opens list data in Excel with the Business Central add-in. Supported changes can be published back to Business Central, subject to permissions and validation. Opening the workbook alone does not publish changes."
+      ],
+      "documentedCaptions": [
+        "Avaa Excelissä",
+        "Muokkaa Excelissä"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-expansion-across-work-with-excel-nb-no",
+      "title": "Vise og redigere i Excel fra Business Central - Business Central | Microsoft Learn",
+      "sourceUri": "https://learn.microsoft.com/nb-no/dynamics365/business-central/across-work-with-excel",
+      "accessedDate": "2026-09-28",
+      "appliesTo": "Business Central standard functionality. Microsoft Learn captions checked; tenant/version-specific UI captions remain unverified.",
+      "fields": [
+        "This exports the displayed list data to Excel for analysis. Changes in that workbook are not published back to Business Central by this action; updating records uses the separate Edit in Excel feature.",
+        "This opens list data in Excel with the Business Central add-in. Supported changes can be published back to Business Central, subject to permissions and validation. Opening the workbook alone does not publish changes."
+      ],
+      "documentedCaptions": [
+        "Åpne i Excel",
+        "Rediger i Excel"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-expansion-across-working-with-teams-en-us",
+      "title": "Sharing Business Central records in Microsoft Teams - Business Central | Microsoft Learn",
+      "sourceUri": "https://learn.microsoft.com/en-us/dynamics365/business-central/across-working-with-teams",
+      "accessedDate": "2026-09-28",
+      "appliesTo": "Business Central standard functionality. Microsoft Learn captions checked; tenant/version-specific UI captions remain unverified.",
+      "fields": [
+        "This opens sharing of a link to the current Business Central page in Teams. Check recipients and any record preview before sending. A shared card can expose its displayed information to everyone in the conversation."
+      ],
+      "documentedCaptions": [
+        "Share to Teams"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-expansion-across-working-with-teams-sv-se",
+      "title": "Dela Business Central-poster i Microsoft Teams - Business Central | Microsoft Learn",
+      "sourceUri": "https://learn.microsoft.com/sv-se/dynamics365/business-central/across-working-with-teams",
+      "accessedDate": "2026-09-28",
+      "appliesTo": "Business Central standard functionality. Microsoft Learn captions checked; tenant/version-specific UI captions remain unverified.",
+      "fields": [
+        "This opens sharing of a link to the current Business Central page in Teams. Check recipients and any record preview before sending. A shared card can expose its displayed information to everyone in the conversation."
+      ],
+      "documentedCaptions": [
+        "Dela till Teams"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-expansion-across-working-with-teams-fr-fr",
+      "title": "Partage d’enregistrements Business Central dans Microsoft Teams - Business Central | Microsoft Learn",
+      "sourceUri": "https://learn.microsoft.com/fr-fr/dynamics365/business-central/across-working-with-teams",
+      "accessedDate": "2026-09-28",
+      "appliesTo": "Business Central standard functionality. Microsoft Learn captions checked; tenant/version-specific UI captions remain unverified.",
+      "fields": [
+        "This opens sharing of a link to the current Business Central page in Teams. Check recipients and any record preview before sending. A shared card can expose its displayed information to everyone in the conversation."
+      ],
+      "documentedCaptions": [
+        "Partager avec Teams"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-expansion-across-working-with-teams-de-de",
+      "title": "Freigeben von Business Central Datensätzen in Microsoft Teams - Business Central | Microsoft Learn",
+      "sourceUri": "https://learn.microsoft.com/de-de/dynamics365/business-central/across-working-with-teams",
+      "accessedDate": "2026-09-28",
+      "appliesTo": "Business Central standard functionality. Microsoft Learn captions checked; tenant/version-specific UI captions remain unverified.",
+      "fields": [
+        "This opens sharing of a link to the current Business Central page in Teams. Check recipients and any record preview before sending. A shared card can expose its displayed information to everyone in the conversation."
+      ],
+      "documentedCaptions": [
+        "Für Teams freigeben"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-expansion-across-working-with-teams-es-es",
+      "title": "Uso compartido de registros de Business Central en Microsoft Teams - Business Central | Microsoft Learn",
+      "sourceUri": "https://learn.microsoft.com/es-es/dynamics365/business-central/across-working-with-teams",
+      "accessedDate": "2026-09-28",
+      "appliesTo": "Business Central standard functionality. Microsoft Learn captions checked; tenant/version-specific UI captions remain unverified.",
+      "fields": [
+        "This opens sharing of a link to the current Business Central page in Teams. Check recipients and any record preview before sending. A shared card can expose its displayed information to everyone in the conversation."
+      ],
+      "documentedCaptions": [
+        "Compartir con Teams"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-expansion-across-working-with-teams-da-dk",
+      "title": "Deling af Business Central poster i Microsoft Teams - Business Central | Microsoft Learn",
+      "sourceUri": "https://learn.microsoft.com/da-dk/dynamics365/business-central/across-working-with-teams",
+      "accessedDate": "2026-09-28",
+      "appliesTo": "Business Central standard functionality. Microsoft Learn captions checked; tenant/version-specific UI captions remain unverified.",
+      "fields": [
+        "This opens sharing of a link to the current Business Central page in Teams. Check recipients and any record preview before sending. A shared card can expose its displayed information to everyone in the conversation."
+      ],
+      "documentedCaptions": [
+        "Del med Teams"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-expansion-across-working-with-teams-fi-fi",
+      "title": "Business Central tietueiden jakaminen Microsoft Teamsissa - Business Central | Microsoft Learn",
+      "sourceUri": "https://learn.microsoft.com/fi-fi/dynamics365/business-central/across-working-with-teams",
+      "accessedDate": "2026-09-28",
+      "appliesTo": "Business Central standard functionality. Microsoft Learn captions checked; tenant/version-specific UI captions remain unverified.",
+      "fields": [
+        "This opens sharing of a link to the current Business Central page in Teams. Check recipients and any record preview before sending. A shared card can expose its displayed information to everyone in the conversation."
+      ],
+      "documentedCaptions": [
+        "Jaa Teamsiin"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-expansion-across-working-with-teams-nb-no",
+      "title": "Dele Business Central journalposter i Microsoft Teams - Business Central | Microsoft Learn",
+      "sourceUri": "https://learn.microsoft.com/nb-no/dynamics365/business-central/across-working-with-teams",
+      "accessedDate": "2026-09-28",
+      "appliesTo": "Business Central standard functionality. Microsoft Learn captions checked; tenant/version-specific UI captions remain unverified.",
+      "fields": [
+        "This opens sharing of a link to the current Business Central page in Teams. Check recipients and any record preview before sending. A shared card can expose its displayed information to everyone in the conversation."
+      ],
+      "documentedCaptions": [
+        "Del til Teams"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-expansion-across-onedrive-overview-en-us",
+      "title": "Business Central and OneDrive for Business Integration - Business Central | Microsoft Learn",
+      "sourceUri": "https://learn.microsoft.com/en-us/dynamics365/business-central/across-onedrive-overview",
+      "accessedDate": "2026-09-28",
+      "appliesTo": "Business Central standard functionality. Microsoft Learn captions checked; tenant/version-specific UI captions remain unverified.",
+      "fields": [
+        "This copies the file to the Business Central folder in your work or school OneDrive and opens it. Opening a file is separate from choosing recipients and sharing it with others."
+      ],
+      "documentedCaptions": [
+        "Open in OneDrive"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-expansion-across-onedrive-overview-sv-se",
+      "title": "Business Central och OneDrive för företag integration - Business Central | Microsoft Learn",
+      "sourceUri": "https://learn.microsoft.com/sv-se/dynamics365/business-central/across-onedrive-overview",
+      "accessedDate": "2026-09-28",
+      "appliesTo": "Business Central standard functionality. Microsoft Learn captions checked; tenant/version-specific UI captions remain unverified.",
+      "fields": [
+        "This copies the file to the Business Central folder in your work or school OneDrive and opens it. Opening a file is separate from choosing recipients and sharing it with others."
+      ],
+      "documentedCaptions": [
+        "Öppna i OneDrive"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-expansion-across-onedrive-overview-fr-fr",
+      "title": "intégration Business Central et OneDrive Entreprise - Business Central | Microsoft Learn",
+      "sourceUri": "https://learn.microsoft.com/fr-fr/dynamics365/business-central/across-onedrive-overview",
+      "accessedDate": "2026-09-28",
+      "appliesTo": "Business Central standard functionality. Microsoft Learn captions checked; tenant/version-specific UI captions remain unverified.",
+      "fields": [
+        "This copies the file to the Business Central folder in your work or school OneDrive and opens it. Opening a file is separate from choosing recipients and sharing it with others."
+      ],
+      "documentedCaptions": [
+        "Open in OneDrive"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-expansion-across-onedrive-overview-de-de",
+      "title": "Integration von Business Central und OneDrive für Unternehmen - Business Central | Microsoft Learn",
+      "sourceUri": "https://learn.microsoft.com/de-de/dynamics365/business-central/across-onedrive-overview",
+      "accessedDate": "2026-09-28",
+      "appliesTo": "Business Central standard functionality. Microsoft Learn captions checked; tenant/version-specific UI captions remain unverified.",
+      "fields": [
+        "This copies the file to the Business Central folder in your work or school OneDrive and opens it. Opening a file is separate from choosing recipients and sharing it with others."
+      ],
+      "documentedCaptions": [
+        "Open in OneDrive"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-expansion-across-onedrive-overview-es-es",
+      "title": "integración de Business Central y OneDrive para la Empresa - Business Central | Microsoft Learn",
+      "sourceUri": "https://learn.microsoft.com/es-es/dynamics365/business-central/across-onedrive-overview",
+      "accessedDate": "2026-09-28",
+      "appliesTo": "Business Central standard functionality. Microsoft Learn captions checked; tenant/version-specific UI captions remain unverified.",
+      "fields": [
+        "This copies the file to the Business Central folder in your work or school OneDrive and opens it. Opening a file is separate from choosing recipients and sharing it with others."
+      ],
+      "documentedCaptions": [
+        "Abrir en OneDrive"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-expansion-across-onedrive-overview-da-dk",
+      "title": "integration af Business Central og OneDrive for Business - Business Central | Microsoft Learn",
+      "sourceUri": "https://learn.microsoft.com/da-dk/dynamics365/business-central/across-onedrive-overview",
+      "accessedDate": "2026-09-28",
+      "appliesTo": "Business Central standard functionality. Microsoft Learn captions checked; tenant/version-specific UI captions remain unverified.",
+      "fields": [
+        "This copies the file to the Business Central folder in your work or school OneDrive and opens it. Opening a file is separate from choosing recipients and sharing it with others."
+      ],
+      "documentedCaptions": [
+        "Åbn i OneDrive"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-expansion-across-onedrive-overview-fi-fi",
+      "title": "Business Central ja OneDrive for Business integrointi - Business Central | Microsoft Learn",
+      "sourceUri": "https://learn.microsoft.com/fi-fi/dynamics365/business-central/across-onedrive-overview",
+      "accessedDate": "2026-09-28",
+      "appliesTo": "Business Central standard functionality. Microsoft Learn captions checked; tenant/version-specific UI captions remain unverified.",
+      "fields": [
+        "This copies the file to the Business Central folder in your work or school OneDrive and opens it. Opening a file is separate from choosing recipients and sharing it with others."
+      ],
+      "documentedCaptions": [
+        "Avaa OneDrive"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-expansion-across-onedrive-overview-nb-no",
+      "title": "Business Central og OneDrive for Business integrasjon - Business Central | Microsoft Learn",
+      "sourceUri": "https://learn.microsoft.com/nb-no/dynamics365/business-central/across-onedrive-overview",
+      "accessedDate": "2026-09-28",
+      "appliesTo": "Business Central standard functionality. Microsoft Learn captions checked; tenant/version-specific UI captions remain unverified.",
+      "fields": [
+        "This copies the file to the Business Central folder in your work or school OneDrive and opens it. Opening a file is separate from choosing recipients and sharing it with others."
+      ],
+      "documentedCaptions": [
+        "Åpne i OneDrive"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-expansion-admin-outlook-en-us",
+      "title": "Get the Business Central Add-in for Outlook - Business Central | Microsoft Learn",
+      "sourceUri": "https://learn.microsoft.com/en-us/dynamics365/business-central/admin-outlook",
+      "accessedDate": "2026-09-28",
+      "appliesTo": "Business Central standard functionality. Microsoft Learn captions checked; tenant/version-specific UI captions remain unverified.",
+      "fields": [
+        "This installs the Business Central add-in for your Outlook. It provides customer, vendor and document context in Outlook and connects to the Business Central environment from which it was installed."
+      ],
+      "documentedCaptions": [
+        "Configure Outlook",
+        "Install to my Outlook"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-expansion-admin-outlook-sv-se",
+      "title": "Hämta Business Central-tillägget för Outlook - Business Central | Microsoft Learn",
+      "sourceUri": "https://learn.microsoft.com/sv-se/dynamics365/business-central/admin-outlook",
+      "accessedDate": "2026-09-28",
+      "appliesTo": "Business Central standard functionality. Microsoft Learn captions checked; tenant/version-specific UI captions remain unverified.",
+      "fields": [
+        "This installs the Business Central add-in for your Outlook. It provides customer, vendor and document context in Outlook and connects to the Business Central environment from which it was installed."
+      ],
+      "documentedCaptions": [
+        "Konfigurera Outlook",
+        "Installera till min Outlook"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-expansion-admin-outlook-fr-fr",
+      "title": "Obtention du complément Business Central pour Outlook - Business Central | Microsoft Learn",
+      "sourceUri": "https://learn.microsoft.com/fr-fr/dynamics365/business-central/admin-outlook",
+      "accessedDate": "2026-09-28",
+      "appliesTo": "Business Central standard functionality. Microsoft Learn captions checked; tenant/version-specific UI captions remain unverified.",
+      "fields": [
+        "This installs the Business Central add-in for your Outlook. It provides customer, vendor and document context in Outlook and connects to the Business Central environment from which it was installed."
+      ],
+      "documentedCaptions": [
+        "Configurer Outlook",
+        "Installer dans mon Outlook"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-expansion-admin-outlook-de-de",
+      "title": "Das Business Central-Add-in für Outlook abrufen - Business Central | Microsoft Learn",
+      "sourceUri": "https://learn.microsoft.com/de-de/dynamics365/business-central/admin-outlook",
+      "accessedDate": "2026-09-28",
+      "appliesTo": "Business Central standard functionality. Microsoft Learn captions checked; tenant/version-specific UI captions remain unverified.",
+      "fields": [
+        "This installs the Business Central add-in for your Outlook. It provides customer, vendor and document context in Outlook and connects to the Business Central environment from which it was installed."
+      ],
+      "documentedCaptions": [
+        "Outlook konfigurieren",
+        "In mein Outlook installieren"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-expansion-admin-outlook-es-es",
+      "title": "Obtener el complemento Business Central para Outlook - Business Central | Microsoft Learn",
+      "sourceUri": "https://learn.microsoft.com/es-es/dynamics365/business-central/admin-outlook",
+      "accessedDate": "2026-09-28",
+      "appliesTo": "Business Central standard functionality. Microsoft Learn captions checked; tenant/version-specific UI captions remain unverified.",
+      "fields": [
+        "This installs the Business Central add-in for your Outlook. It provides customer, vendor and document context in Outlook and connects to the Business Central environment from which it was installed."
+      ],
+      "documentedCaptions": [
+        "Configurar Outlook",
+        "Instalar en mi Outlook"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-expansion-admin-outlook-da-dk",
+      "title": "Hente Business Central-tilføjelsesprogram til Outlook - Business Central | Microsoft Learn",
+      "sourceUri": "https://learn.microsoft.com/da-dk/dynamics365/business-central/admin-outlook",
+      "accessedDate": "2026-09-28",
+      "appliesTo": "Business Central standard functionality. Microsoft Learn captions checked; tenant/version-specific UI captions remain unverified.",
+      "fields": [
+        "This installs the Business Central add-in for your Outlook. It provides customer, vendor and document context in Outlook and connects to the Business Central environment from which it was installed."
+      ],
+      "documentedCaptions": [
+        "Konfigurer Outlook",
+        "Installer på min Outlook"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-expansion-admin-outlook-fi-fi",
+      "title": "Business Central -apuohjelman hankkiminen Outlookiin - Business Central | Microsoft Learn",
+      "sourceUri": "https://learn.microsoft.com/fi-fi/dynamics365/business-central/admin-outlook",
+      "accessedDate": "2026-09-28",
+      "appliesTo": "Business Central standard functionality. Microsoft Learn captions checked; tenant/version-specific UI captions remain unverified.",
+      "fields": [
+        "This installs the Business Central add-in for your Outlook. It provides customer, vendor and document context in Outlook and connects to the Business Central environment from which it was installed."
+      ],
+      "documentedCaptions": [
+        "Määritä Outlook",
+        "Asenna omaan Outlookiin"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-expansion-admin-outlook-nb-no",
+      "title": "Hent Business Central-tillegget for Outlook - Business Central | Microsoft Learn",
+      "sourceUri": "https://learn.microsoft.com/nb-no/dynamics365/business-central/admin-outlook",
+      "accessedDate": "2026-09-28",
+      "appliesTo": "Business Central standard functionality. Microsoft Learn captions checked; tenant/version-specific UI captions remain unverified.",
+      "fields": [
+        "This installs the Business Central add-in for your Outlook. It provides customer, vendor and document context in Outlook and connects to the Business Central environment from which it was installed."
+      ],
+      "documentedCaptions": [
+        "Konfigurer Outlook-siden",
+        "Installer i min Outlook"
+      ]
+    }
+  ]
+}

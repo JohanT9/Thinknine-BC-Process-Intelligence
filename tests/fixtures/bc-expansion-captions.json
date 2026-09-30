@@ -1,0 +1,2834 @@
+[
+  {
+    "ruleId": "Sustainability.CollectAmountFromGLEntries",
+    "locale": "en-US",
+    "pageCaption": "Sustainability Journal",
+    "actionCaption": "Collect Amount from G/L Entries",
+    "sourceId": "microsoft-learn-expansion-finance-sustainability-journal-en-us",
+    "sourceUri": "https://learn.microsoft.com/en-us/dynamics365/business-central/finance-sustainability-journal"
+  },
+  {
+    "ruleId": "Sustainability.CollectAmountFromGLEntries",
+    "locale": "sv-SE",
+    "pageCaption": "Hållbarhetsjournal",
+    "actionCaption": "Samla in belopp från huvudbokstransaktioner",
+    "sourceId": "microsoft-learn-expansion-finance-sustainability-journal-sv-se",
+    "sourceUri": "https://learn.microsoft.com/sv-se/dynamics365/business-central/finance-sustainability-journal"
+  },
+  {
+    "ruleId": "Sustainability.CreateAccountCategory",
+    "locale": "en-US",
+    "pageCaption": "Sustainability Account Categories",
+    "actionCaption": "New",
+    "sourceId": "microsoft-learn-expansion-finance-sustainability-accounts-ledger-en-us",
+    "sourceUri": "https://learn.microsoft.com/en-us/dynamics365/business-central/finance-sustainability-accounts-ledger"
+  },
+  {
+    "ruleId": "Sustainability.CreateAccountCategory",
+    "locale": "sv-SE",
+    "pageCaption": "Kategorier för hållbarhetskonto",
+    "actionCaption": "Ny",
+    "sourceId": "microsoft-learn-expansion-finance-sustainability-accounts-ledger-sv-se",
+    "sourceUri": "https://learn.microsoft.com/sv-se/dynamics365/business-central/finance-sustainability-accounts-ledger"
+  },
+  {
+    "ruleId": "Sustainability.CreateAccountSubcategory",
+    "locale": "en-US",
+    "pageCaption": "Sustainability Account Subcategories",
+    "actionCaption": "New",
+    "sourceId": "microsoft-learn-expansion-finance-sustainability-accounts-ledger-en-us",
+    "sourceUri": "https://learn.microsoft.com/en-us/dynamics365/business-central/finance-sustainability-accounts-ledger"
+  },
+  {
+    "ruleId": "Sustainability.CreateAccountSubcategory",
+    "locale": "sv-SE",
+    "pageCaption": "Underkategorier för hållbarhetskonto",
+    "actionCaption": "Ny",
+    "sourceId": "microsoft-learn-expansion-finance-sustainability-accounts-ledger-sv-se",
+    "sourceUri": "https://learn.microsoft.com/sv-se/dynamics365/business-central/finance-sustainability-accounts-ledger"
+  },
+  {
+    "ruleId": "BCExpansion.PostItemReclassification",
+    "locale": "en-US",
+    "pageCaption": "Item Reclass. Journals",
+    "actionCaption": "Post",
+    "sourceId": "inventory-reclassify-transfer-en-us",
+    "sourceUri": "https://learn.microsoft.com/en-us/dynamics365/business-central/inventory-how-transfer-between-locations"
+  },
+  {
+    "ruleId": "BCExpansion.PostItemReclassification",
+    "locale": "sv-SE",
+    "pageCaption": "Artikelomklassificeringsjournaler",
+    "actionCaption": "Bokför",
+    "sourceId": "inventory-reclassify-transfer-sv-se",
+    "sourceUri": "https://learn.microsoft.com/sv-se/dynamics365/business-central/inventory-how-transfer-between-locations"
+  },
+  {
+    "ruleId": "BCExpansion.ImportInbox",
+    "locale": "en-US",
+    "pageCaption": "Intercompany Inbox Transactions",
+    "actionCaption": "Import Transaction File",
+    "sourceId": "microsoft-learn-expansion-intercompany-how-manage-intercompany-inbox-en-us",
+    "sourceUri": "https://learn.microsoft.com/en-us/dynamics365/business-central/intercompany-how-manage-intercompany-inbox"
+  },
+  {
+    "ruleId": "BCExpansion.ImportInbox",
+    "locale": "sv-SE",
+    "pageCaption": "Koncerninterna inkorgstransaktioner",
+    "actionCaption": "Importera transaktionsfil",
+    "sourceId": "microsoft-learn-expansion-intercompany-how-manage-intercompany-inbox-sv-se",
+    "sourceUri": "https://learn.microsoft.com/sv-se/dynamics365/business-central/intercompany-how-manage-intercompany-inbox"
+  },
+  {
+    "ruleId": "BCExpansion.ImportInbox",
+    "locale": "fr-FR",
+    "pageCaption": "Transactions boîte de réception Intersociétés",
+    "actionCaption": "Importer le fichier de transaction",
+    "sourceId": "microsoft-learn-expansion-intercompany-how-manage-intercompany-inbox-fr-fr",
+    "sourceUri": "https://learn.microsoft.com/fr-fr/dynamics365/business-central/intercompany-how-manage-intercompany-inbox"
+  },
+  {
+    "ruleId": "BCExpansion.ImportInbox",
+    "locale": "de-DE",
+    "pageCaption": "Intercompany-Eingangstransaktionen",
+    "actionCaption": "Transaktionsdatei importieren",
+    "sourceId": "microsoft-learn-expansion-intercompany-how-manage-intercompany-inbox-de-de",
+    "sourceUri": "https://learn.microsoft.com/de-de/dynamics365/business-central/intercompany-how-manage-intercompany-inbox"
+  },
+  {
+    "ruleId": "BCExpansion.ImportInbox",
+    "locale": "es-ES",
+    "pageCaption": "Transacciones de bandeja de entrada entre empresas vinculadas",
+    "actionCaption": "Importar archivo de transacción",
+    "sourceId": "microsoft-learn-expansion-intercompany-how-manage-intercompany-inbox-es-es",
+    "sourceUri": "https://learn.microsoft.com/es-es/dynamics365/business-central/intercompany-how-manage-intercompany-inbox"
+  },
+  {
+    "ruleId": "BCExpansion.ImportInbox",
+    "locale": "da-DK",
+    "pageCaption": "Koncerninterne indbakketransaktioner",
+    "actionCaption": "Indlæs transaktionsfil",
+    "sourceId": "microsoft-learn-expansion-intercompany-how-manage-intercompany-inbox-da-dk",
+    "sourceUri": "https://learn.microsoft.com/da-dk/dynamics365/business-central/intercompany-how-manage-intercompany-inbox"
+  },
+  {
+    "ruleId": "BCExpansion.ImportInbox",
+    "locale": "fi-FI",
+    "pageCaption": "Konsernin Saapuneet-kansion tapahtumat",
+    "actionCaption": "Tuo tapahtumatiedosto",
+    "sourceId": "microsoft-learn-expansion-intercompany-how-manage-intercompany-inbox-fi-fi",
+    "sourceUri": "https://learn.microsoft.com/fi-fi/dynamics365/business-central/intercompany-how-manage-intercompany-inbox"
+  },
+  {
+    "ruleId": "BCExpansion.ImportInbox",
+    "locale": "nb-NO",
+    "pageCaption": "Konserninterne inngående transaksjoner",
+    "actionCaption": "Importer transaksjonsfil",
+    "sourceId": "microsoft-learn-expansion-intercompany-how-manage-intercompany-inbox-nb-no",
+    "sourceUri": "https://learn.microsoft.com/nb-no/dynamics365/business-central/intercompany-how-manage-intercompany-inbox"
+  },
+  {
+    "ruleId": "BCExpansion.CompleteInbox",
+    "locale": "en-US",
+    "pageCaption": "Intercompany Inbox Transactions",
+    "actionCaption": "Complete IC Inbox Action",
+    "sourceId": "microsoft-learn-expansion-intercompany-how-manage-intercompany-inbox-en-us",
+    "sourceUri": "https://learn.microsoft.com/en-us/dynamics365/business-central/intercompany-how-manage-intercompany-inbox"
+  },
+  {
+    "ruleId": "BCExpansion.CompleteInbox",
+    "locale": "sv-SE",
+    "pageCaption": "Koncerninterna inkorgstransaktioner",
+    "actionCaption": "Slutför IC-inkorgsåtgärd",
+    "sourceId": "microsoft-learn-expansion-intercompany-how-manage-intercompany-inbox-sv-se",
+    "sourceUri": "https://learn.microsoft.com/sv-se/dynamics365/business-central/intercompany-how-manage-intercompany-inbox"
+  },
+  {
+    "ruleId": "BCExpansion.CompleteInbox",
+    "locale": "fr-FR",
+    "pageCaption": "Transactions boîte de réception Intersociétés",
+    "actionCaption": "Terminer l’action de la boîte de réception IC",
+    "sourceId": "microsoft-learn-expansion-intercompany-how-manage-intercompany-inbox-fr-fr",
+    "sourceUri": "https://learn.microsoft.com/fr-fr/dynamics365/business-central/intercompany-how-manage-intercompany-inbox"
+  },
+  {
+    "ruleId": "BCExpansion.CompleteInbox",
+    "locale": "de-DE",
+    "pageCaption": "Intercompany-Eingangstransaktionen",
+    "actionCaption": "IC-Eingangsvorgang abschl.",
+    "sourceId": "microsoft-learn-expansion-intercompany-how-manage-intercompany-inbox-de-de",
+    "sourceUri": "https://learn.microsoft.com/de-de/dynamics365/business-central/intercompany-how-manage-intercompany-inbox"
+  },
+  {
+    "ruleId": "BCExpansion.CompleteInbox",
+    "locale": "es-ES",
+    "pageCaption": "Transacciones de bandeja de entrada entre empresas vinculadas",
+    "actionCaption": "Completa acc. band. entrada IC",
+    "sourceId": "microsoft-learn-expansion-intercompany-how-manage-intercompany-inbox-es-es",
+    "sourceUri": "https://learn.microsoft.com/es-es/dynamics365/business-central/intercompany-how-manage-intercompany-inbox"
+  },
+  {
+    "ruleId": "BCExpansion.CompleteInbox",
+    "locale": "da-DK",
+    "pageCaption": "Koncerninterne indbakketransaktioner",
+    "actionCaption": "Fuldfør IC-indbakkehandling",
+    "sourceId": "microsoft-learn-expansion-intercompany-how-manage-intercompany-inbox-da-dk",
+    "sourceUri": "https://learn.microsoft.com/da-dk/dynamics365/business-central/intercompany-how-manage-intercompany-inbox"
+  },
+  {
+    "ruleId": "BCExpansion.CompleteInbox",
+    "locale": "fi-FI",
+    "pageCaption": "Konsernin Saapuneet-kansion tapahtumat",
+    "actionCaption": "Tot. kons. Saap.-kansion toim.",
+    "sourceId": "microsoft-learn-expansion-intercompany-how-manage-intercompany-inbox-fi-fi",
+    "sourceUri": "https://learn.microsoft.com/fi-fi/dynamics365/business-central/intercompany-how-manage-intercompany-inbox"
+  },
+  {
+    "ruleId": "BCExpansion.CompleteInbox",
+    "locale": "nb-NO",
+    "pageCaption": "Konserninterne inngående transaksjoner",
+    "actionCaption": "Fullfør KI-innbokshandling",
+    "sourceId": "microsoft-learn-expansion-intercompany-how-manage-intercompany-inbox-nb-no",
+    "sourceUri": "https://learn.microsoft.com/nb-no/dynamics365/business-central/intercompany-how-manage-intercompany-inbox"
+  },
+  {
+    "ruleId": "BCExpansion.SendOutbox",
+    "locale": "en-US",
+    "pageCaption": "Intercompany Outbox Transactions",
+    "actionCaption": "Send to Intercompany Partner",
+    "sourceId": "microsoft-learn-expansion-intercompany-how-manage-intercompany-inbox-en-us",
+    "sourceUri": "https://learn.microsoft.com/en-us/dynamics365/business-central/intercompany-how-manage-intercompany-inbox"
+  },
+  {
+    "ruleId": "BCExpansion.SendOutbox",
+    "locale": "sv-SE",
+    "pageCaption": "Koncerninterna utkorgstransaktioner",
+    "actionCaption": "Skicka till en koncernintern partner",
+    "sourceId": "microsoft-learn-expansion-intercompany-how-manage-intercompany-inbox-sv-se",
+    "sourceUri": "https://learn.microsoft.com/sv-se/dynamics365/business-central/intercompany-how-manage-intercompany-inbox"
+  },
+  {
+    "ruleId": "BCExpansion.SendOutbox",
+    "locale": "fr-FR",
+    "pageCaption": "Transactions boîte d’envoi Intersociétés",
+    "actionCaption": "Envoyer au partenaire Intersociétés",
+    "sourceId": "microsoft-learn-expansion-intercompany-how-manage-intercompany-inbox-fr-fr",
+    "sourceUri": "https://learn.microsoft.com/fr-fr/dynamics365/business-central/intercompany-how-manage-intercompany-inbox"
+  },
+  {
+    "ruleId": "BCExpansion.SendOutbox",
+    "locale": "de-DE",
+    "pageCaption": "Intercompany-Ausgangstransaktionen",
+    "actionCaption": "An Intercompany-Partner senden",
+    "sourceId": "microsoft-learn-expansion-intercompany-how-manage-intercompany-inbox-de-de",
+    "sourceUri": "https://learn.microsoft.com/de-de/dynamics365/business-central/intercompany-how-manage-intercompany-inbox"
+  },
+  {
+    "ruleId": "BCExpansion.SendOutbox",
+    "locale": "es-ES",
+    "pageCaption": "Transacciones de bandeja de salida entre empresas vinculadas",
+    "actionCaption": "Enviar a socio de empresas vinculadas",
+    "sourceId": "microsoft-learn-expansion-intercompany-how-manage-intercompany-inbox-es-es",
+    "sourceUri": "https://learn.microsoft.com/es-es/dynamics365/business-central/intercompany-how-manage-intercompany-inbox"
+  },
+  {
+    "ruleId": "BCExpansion.SendOutbox",
+    "locale": "da-DK",
+    "pageCaption": "Koncerninterne udbakketransaktioner",
+    "actionCaption": "Send til koncernintern partner",
+    "sourceId": "microsoft-learn-expansion-intercompany-how-manage-intercompany-inbox-da-dk",
+    "sourceUri": "https://learn.microsoft.com/da-dk/dynamics365/business-central/intercompany-how-manage-intercompany-inbox"
+  },
+  {
+    "ruleId": "BCExpansion.SendOutbox",
+    "locale": "fi-FI",
+    "pageCaption": "Konsernin Lähtevät-kansion tapahtumat",
+    "actionCaption": "Lähetä konsernikumppanille",
+    "sourceId": "microsoft-learn-expansion-intercompany-how-manage-intercompany-inbox-fi-fi",
+    "sourceUri": "https://learn.microsoft.com/fi-fi/dynamics365/business-central/intercompany-how-manage-intercompany-inbox"
+  },
+  {
+    "ruleId": "BCExpansion.SendOutbox",
+    "locale": "nb-NO",
+    "pageCaption": "Konserninterne utgående transaksjoner",
+    "actionCaption": "Send til konsernintern partner",
+    "sourceId": "microsoft-learn-expansion-intercompany-how-manage-intercompany-inbox-nb-no",
+    "sourceUri": "https://learn.microsoft.com/nb-no/dynamics365/business-central/intercompany-how-manage-intercompany-inbox"
+  },
+  {
+    "ruleId": "BCExpansion.CreateOrder",
+    "locale": "en-US",
+    "pageCaption": "Assembly Orders",
+    "actionCaption": "New",
+    "sourceId": "microsoft-learn-expansion-assembly-how-to-assemble-items-en-us",
+    "sourceUri": "https://learn.microsoft.com/en-us/dynamics365/business-central/assembly-how-to-assemble-items"
+  },
+  {
+    "ruleId": "BCExpansion.CreateOrder",
+    "locale": "sv-SE",
+    "pageCaption": "Sammansättningsbeställningar",
+    "actionCaption": "Ny",
+    "sourceId": "microsoft-learn-expansion-assembly-how-to-assemble-items-sv-se",
+    "sourceUri": "https://learn.microsoft.com/sv-se/dynamics365/business-central/assembly-how-to-assemble-items"
+  },
+  {
+    "ruleId": "BCExpansion.CreateOrder",
+    "locale": "fr-FR",
+    "pageCaption": "Commandes d’assembly",
+    "actionCaption": "Nouveau",
+    "sourceId": "microsoft-learn-expansion-assembly-how-to-assemble-items-fr-fr",
+    "sourceUri": "https://learn.microsoft.com/fr-fr/dynamics365/business-central/assembly-how-to-assemble-items"
+  },
+  {
+    "ruleId": "BCExpansion.CreateOrder",
+    "locale": "de-DE",
+    "pageCaption": "Assemblyaufträge",
+    "actionCaption": "Neu",
+    "sourceId": "microsoft-learn-expansion-assembly-how-to-assemble-items-de-de",
+    "sourceUri": "https://learn.microsoft.com/de-de/dynamics365/business-central/assembly-how-to-assemble-items"
+  },
+  {
+    "ruleId": "BCExpansion.CreateOrder",
+    "locale": "es-ES",
+    "pageCaption": "Pedidos de ensamblado",
+    "actionCaption": "Nuevo",
+    "sourceId": "microsoft-learn-expansion-assembly-how-to-assemble-items-es-es",
+    "sourceUri": "https://learn.microsoft.com/es-es/dynamics365/business-central/assembly-how-to-assemble-items"
+  },
+  {
+    "ruleId": "BCExpansion.CreateOrder",
+    "locale": "da-DK",
+    "pageCaption": "Montageordrer",
+    "actionCaption": "Ny",
+    "sourceId": "microsoft-learn-expansion-assembly-how-to-assemble-items-da-dk",
+    "sourceUri": "https://learn.microsoft.com/da-dk/dynamics365/business-central/assembly-how-to-assemble-items"
+  },
+  {
+    "ruleId": "BCExpansion.CreateOrder",
+    "locale": "fi-FI",
+    "pageCaption": "Kokoonpanotilaukset",
+    "actionCaption": "Uusi",
+    "sourceId": "microsoft-learn-expansion-assembly-how-to-assemble-items-fi-fi",
+    "sourceUri": "https://learn.microsoft.com/fi-fi/dynamics365/business-central/assembly-how-to-assemble-items"
+  },
+  {
+    "ruleId": "BCExpansion.CreateOrder",
+    "locale": "nb-NO",
+    "pageCaption": "Samlingsordrer",
+    "actionCaption": "Ny",
+    "sourceId": "microsoft-learn-expansion-assembly-how-to-assemble-items-nb-no",
+    "sourceUri": "https://learn.microsoft.com/nb-no/dynamics365/business-central/assembly-how-to-assemble-items"
+  },
+  {
+    "ruleId": "BCExpansion.QuantityToAssemble",
+    "locale": "en-US",
+    "pageCaption": "New Assembly Order",
+    "fieldCaption": "Quantity to Assemble",
+    "sourceId": "microsoft-learn-expansion-assembly-how-to-assemble-items-en-us",
+    "sourceUri": "https://learn.microsoft.com/en-us/dynamics365/business-central/assembly-how-to-assemble-items"
+  },
+  {
+    "ruleId": "BCExpansion.QuantityToAssemble",
+    "locale": "en-US",
+    "pageCaption": "Assembly Order",
+    "fieldCaption": "Quantity to Assemble",
+    "sourceId": "microsoft-learn-expansion-assembly-how-to-assemble-items-en-us",
+    "sourceUri": "https://learn.microsoft.com/en-us/dynamics365/business-central/assembly-how-to-assemble-items"
+  },
+  {
+    "ruleId": "BCExpansion.QuantityToAssemble",
+    "locale": "sv-SE",
+    "pageCaption": "Ny monteringsorder",
+    "fieldCaption": "Antal att montera",
+    "sourceId": "microsoft-learn-expansion-assembly-how-to-assemble-items-sv-se",
+    "sourceUri": "https://learn.microsoft.com/sv-se/dynamics365/business-central/assembly-how-to-assemble-items"
+  },
+  {
+    "ruleId": "BCExpansion.QuantityToAssemble",
+    "locale": "sv-SE",
+    "pageCaption": "Monteringsorder",
+    "fieldCaption": "Antal att montera",
+    "sourceId": "microsoft-learn-expansion-assembly-how-to-assemble-items-sv-se",
+    "sourceUri": "https://learn.microsoft.com/sv-se/dynamics365/business-central/assembly-how-to-assemble-items"
+  },
+  {
+    "ruleId": "BCExpansion.QuantityToAssemble",
+    "locale": "fr-FR",
+    "pageCaption": "Nouvel ordre d’assemblage",
+    "fieldCaption": "Quantité à assembler",
+    "sourceId": "microsoft-learn-expansion-assembly-how-to-assemble-items-fr-fr",
+    "sourceUri": "https://learn.microsoft.com/fr-fr/dynamics365/business-central/assembly-how-to-assemble-items"
+  },
+  {
+    "ruleId": "BCExpansion.QuantityToAssemble",
+    "locale": "fr-FR",
+    "pageCaption": "Ordre d’assemblage",
+    "fieldCaption": "Quantité à assembler",
+    "sourceId": "microsoft-learn-expansion-assembly-how-to-assemble-items-fr-fr",
+    "sourceUri": "https://learn.microsoft.com/fr-fr/dynamics365/business-central/assembly-how-to-assemble-items"
+  },
+  {
+    "ruleId": "BCExpansion.QuantityToAssemble",
+    "locale": "de-DE",
+    "pageCaption": "Neuer Montageauftrag",
+    "fieldCaption": "Zu montierende Menge",
+    "sourceId": "microsoft-learn-expansion-assembly-how-to-assemble-items-de-de",
+    "sourceUri": "https://learn.microsoft.com/de-de/dynamics365/business-central/assembly-how-to-assemble-items"
+  },
+  {
+    "ruleId": "BCExpansion.QuantityToAssemble",
+    "locale": "de-DE",
+    "pageCaption": "Montageauftrag",
+    "fieldCaption": "Zu montierende Menge",
+    "sourceId": "microsoft-learn-expansion-assembly-how-to-assemble-items-de-de",
+    "sourceUri": "https://learn.microsoft.com/de-de/dynamics365/business-central/assembly-how-to-assemble-items"
+  },
+  {
+    "ruleId": "BCExpansion.QuantityToAssemble",
+    "locale": "es-ES",
+    "pageCaption": "Nuevo pedido de ensamblado",
+    "fieldCaption": "Cantidad a ensamblar",
+    "sourceId": "microsoft-learn-expansion-assembly-how-to-assemble-items-es-es",
+    "sourceUri": "https://learn.microsoft.com/es-es/dynamics365/business-central/assembly-how-to-assemble-items"
+  },
+  {
+    "ruleId": "BCExpansion.QuantityToAssemble",
+    "locale": "es-ES",
+    "pageCaption": "Pedido de ensamblado",
+    "fieldCaption": "Cantidad a ensamblar",
+    "sourceId": "microsoft-learn-expansion-assembly-how-to-assemble-items-es-es",
+    "sourceUri": "https://learn.microsoft.com/es-es/dynamics365/business-central/assembly-how-to-assemble-items"
+  },
+  {
+    "ruleId": "BCExpansion.QuantityToAssemble",
+    "locale": "da-DK",
+    "pageCaption": "Ny montageordre",
+    "fieldCaption": "Antal til montage",
+    "sourceId": "microsoft-learn-expansion-assembly-how-to-assemble-items-da-dk",
+    "sourceUri": "https://learn.microsoft.com/da-dk/dynamics365/business-central/assembly-how-to-assemble-items"
+  },
+  {
+    "ruleId": "BCExpansion.QuantityToAssemble",
+    "locale": "da-DK",
+    "pageCaption": "Montageordre",
+    "fieldCaption": "Antal til montage",
+    "sourceId": "microsoft-learn-expansion-assembly-how-to-assemble-items-da-dk",
+    "sourceUri": "https://learn.microsoft.com/da-dk/dynamics365/business-central/assembly-how-to-assemble-items"
+  },
+  {
+    "ruleId": "BCExpansion.QuantityToAssemble",
+    "locale": "fi-FI",
+    "pageCaption": "Uusi kokoonpanotilaus",
+    "fieldCaption": "Kokoonpantava määrä",
+    "sourceId": "microsoft-learn-expansion-assembly-how-to-assemble-items-fi-fi",
+    "sourceUri": "https://learn.microsoft.com/fi-fi/dynamics365/business-central/assembly-how-to-assemble-items"
+  },
+  {
+    "ruleId": "BCExpansion.QuantityToAssemble",
+    "locale": "fi-FI",
+    "pageCaption": "Kokoonpanotilaus",
+    "fieldCaption": "Kokoonpantava määrä",
+    "sourceId": "microsoft-learn-expansion-assembly-how-to-assemble-items-fi-fi",
+    "sourceUri": "https://learn.microsoft.com/fi-fi/dynamics365/business-central/assembly-how-to-assemble-items"
+  },
+  {
+    "ruleId": "BCExpansion.QuantityToAssemble",
+    "locale": "nb-NO",
+    "pageCaption": "Ny monteringsvare",
+    "fieldCaption": "Antall å montere",
+    "sourceId": "microsoft-learn-expansion-assembly-how-to-assemble-items-nb-no",
+    "sourceUri": "https://learn.microsoft.com/nb-no/dynamics365/business-central/assembly-how-to-assemble-items"
+  },
+  {
+    "ruleId": "BCExpansion.QuantityToAssemble",
+    "locale": "nb-NO",
+    "pageCaption": "Monteringsordre",
+    "fieldCaption": "Antall å montere",
+    "sourceId": "microsoft-learn-expansion-assembly-how-to-assemble-items-nb-no",
+    "sourceUri": "https://learn.microsoft.com/nb-no/dynamics365/business-central/assembly-how-to-assemble-items"
+  },
+  {
+    "ruleId": "BCExpansion.PostOrder",
+    "locale": "en-US",
+    "pageCaption": "New Assembly Order",
+    "actionCaption": "Post",
+    "sourceId": "microsoft-learn-expansion-assembly-how-to-assemble-items-en-us",
+    "sourceUri": "https://learn.microsoft.com/en-us/dynamics365/business-central/assembly-how-to-assemble-items"
+  },
+  {
+    "ruleId": "BCExpansion.PostOrder",
+    "locale": "en-US",
+    "pageCaption": "Assembly Order",
+    "actionCaption": "Post",
+    "sourceId": "microsoft-learn-expansion-assembly-how-to-assemble-items-en-us",
+    "sourceUri": "https://learn.microsoft.com/en-us/dynamics365/business-central/assembly-how-to-assemble-items"
+  },
+  {
+    "ruleId": "BCExpansion.PostOrder",
+    "locale": "sv-SE",
+    "pageCaption": "Ny monteringsorder",
+    "actionCaption": "Bokföra",
+    "sourceId": "microsoft-learn-expansion-assembly-how-to-assemble-items-sv-se",
+    "sourceUri": "https://learn.microsoft.com/sv-se/dynamics365/business-central/assembly-how-to-assemble-items"
+  },
+  {
+    "ruleId": "BCExpansion.PostOrder",
+    "locale": "sv-SE",
+    "pageCaption": "Monteringsorder",
+    "actionCaption": "Bokföra",
+    "sourceId": "microsoft-learn-expansion-assembly-how-to-assemble-items-sv-se",
+    "sourceUri": "https://learn.microsoft.com/sv-se/dynamics365/business-central/assembly-how-to-assemble-items"
+  },
+  {
+    "ruleId": "BCExpansion.PostOrder",
+    "locale": "fr-FR",
+    "pageCaption": "Nouvel ordre d’assemblage",
+    "actionCaption": "Valider",
+    "sourceId": "microsoft-learn-expansion-assembly-how-to-assemble-items-fr-fr",
+    "sourceUri": "https://learn.microsoft.com/fr-fr/dynamics365/business-central/assembly-how-to-assemble-items"
+  },
+  {
+    "ruleId": "BCExpansion.PostOrder",
+    "locale": "fr-FR",
+    "pageCaption": "Ordre d’assemblage",
+    "actionCaption": "Valider",
+    "sourceId": "microsoft-learn-expansion-assembly-how-to-assemble-items-fr-fr",
+    "sourceUri": "https://learn.microsoft.com/fr-fr/dynamics365/business-central/assembly-how-to-assemble-items"
+  },
+  {
+    "ruleId": "BCExpansion.PostOrder",
+    "locale": "de-DE",
+    "pageCaption": "Neuer Montageauftrag",
+    "actionCaption": "Buchen",
+    "sourceId": "microsoft-learn-expansion-assembly-how-to-assemble-items-de-de",
+    "sourceUri": "https://learn.microsoft.com/de-de/dynamics365/business-central/assembly-how-to-assemble-items"
+  },
+  {
+    "ruleId": "BCExpansion.PostOrder",
+    "locale": "de-DE",
+    "pageCaption": "Montageauftrag",
+    "actionCaption": "Buchen",
+    "sourceId": "microsoft-learn-expansion-assembly-how-to-assemble-items-de-de",
+    "sourceUri": "https://learn.microsoft.com/de-de/dynamics365/business-central/assembly-how-to-assemble-items"
+  },
+  {
+    "ruleId": "BCExpansion.PostOrder",
+    "locale": "es-ES",
+    "pageCaption": "Nuevo pedido de ensamblado",
+    "actionCaption": "Registrar",
+    "sourceId": "microsoft-learn-expansion-assembly-how-to-assemble-items-es-es",
+    "sourceUri": "https://learn.microsoft.com/es-es/dynamics365/business-central/assembly-how-to-assemble-items"
+  },
+  {
+    "ruleId": "BCExpansion.PostOrder",
+    "locale": "es-ES",
+    "pageCaption": "Pedido de ensamblado",
+    "actionCaption": "Registrar",
+    "sourceId": "microsoft-learn-expansion-assembly-how-to-assemble-items-es-es",
+    "sourceUri": "https://learn.microsoft.com/es-es/dynamics365/business-central/assembly-how-to-assemble-items"
+  },
+  {
+    "ruleId": "BCExpansion.PostOrder",
+    "locale": "da-DK",
+    "pageCaption": "Ny montageordre",
+    "actionCaption": "Bogfør",
+    "sourceId": "microsoft-learn-expansion-assembly-how-to-assemble-items-da-dk",
+    "sourceUri": "https://learn.microsoft.com/da-dk/dynamics365/business-central/assembly-how-to-assemble-items"
+  },
+  {
+    "ruleId": "BCExpansion.PostOrder",
+    "locale": "da-DK",
+    "pageCaption": "Montageordre",
+    "actionCaption": "Bogfør",
+    "sourceId": "microsoft-learn-expansion-assembly-how-to-assemble-items-da-dk",
+    "sourceUri": "https://learn.microsoft.com/da-dk/dynamics365/business-central/assembly-how-to-assemble-items"
+  },
+  {
+    "ruleId": "BCExpansion.PostOrder",
+    "locale": "fi-FI",
+    "pageCaption": "Uusi kokoonpanotilaus",
+    "actionCaption": "Kirjaat",
+    "sourceId": "microsoft-learn-expansion-assembly-how-to-assemble-items-fi-fi",
+    "sourceUri": "https://learn.microsoft.com/fi-fi/dynamics365/business-central/assembly-how-to-assemble-items"
+  },
+  {
+    "ruleId": "BCExpansion.PostOrder",
+    "locale": "fi-FI",
+    "pageCaption": "Kokoonpanotilaus",
+    "actionCaption": "Kirjaat",
+    "sourceId": "microsoft-learn-expansion-assembly-how-to-assemble-items-fi-fi",
+    "sourceUri": "https://learn.microsoft.com/fi-fi/dynamics365/business-central/assembly-how-to-assemble-items"
+  },
+  {
+    "ruleId": "BCExpansion.PostOrder",
+    "locale": "nb-NO",
+    "pageCaption": "Ny monteringsvare",
+    "actionCaption": "Bokfør",
+    "sourceId": "microsoft-learn-expansion-assembly-how-to-assemble-items-nb-no",
+    "sourceUri": "https://learn.microsoft.com/nb-no/dynamics365/business-central/assembly-how-to-assemble-items"
+  },
+  {
+    "ruleId": "BCExpansion.PostOrder",
+    "locale": "nb-NO",
+    "pageCaption": "Monteringsordre",
+    "actionCaption": "Bokfør",
+    "sourceId": "microsoft-learn-expansion-assembly-how-to-assemble-items-nb-no",
+    "sourceUri": "https://learn.microsoft.com/nb-no/dynamics365/business-central/assembly-how-to-assemble-items"
+  },
+  {
+    "ruleId": "BCExpansion.ImportStatement",
+    "locale": "en-US",
+    "pageCaption": "Bank Acc. Reconciliation",
+    "actionCaption": "Import Bank Statement",
+    "sourceId": "microsoft-learn-expansion-bank-how-reconcile-bank-accounts-separately-en-us",
+    "sourceUri": "https://learn.microsoft.com/en-us/dynamics365/business-central/bank-how-reconcile-bank-accounts-separately"
+  },
+  {
+    "ruleId": "BCExpansion.ImportStatement",
+    "locale": "en-US",
+    "pageCaption": "Bank Account Reconciliation",
+    "actionCaption": "Import Bank Statement",
+    "sourceId": "microsoft-learn-expansion-bank-how-reconcile-bank-accounts-separately-en-us",
+    "sourceUri": "https://learn.microsoft.com/en-us/dynamics365/business-central/bank-how-reconcile-bank-accounts-separately"
+  },
+  {
+    "ruleId": "BCExpansion.ImportStatement",
+    "locale": "sv-SE",
+    "pageCaption": "Bankkontoavstämning",
+    "actionCaption": "Importera bankutdrag",
+    "sourceId": "microsoft-learn-expansion-bank-how-reconcile-bank-accounts-separately-sv-se",
+    "sourceUri": "https://learn.microsoft.com/sv-se/dynamics365/business-central/bank-how-reconcile-bank-accounts-separately"
+  },
+  {
+    "ruleId": "BCExpansion.ImportStatement",
+    "locale": "sv-SE",
+    "pageCaption": "Bankavstämning",
+    "actionCaption": "Importera bankutdrag",
+    "sourceId": "microsoft-learn-expansion-bank-how-reconcile-bank-accounts-separately-sv-se",
+    "sourceUri": "https://learn.microsoft.com/sv-se/dynamics365/business-central/bank-how-reconcile-bank-accounts-separately"
+  },
+  {
+    "ruleId": "BCExpansion.ImportStatement",
+    "locale": "fr-FR",
+    "pageCaption": "Rapprochement bancaire",
+    "actionCaption": "Importer le relevé bancaire",
+    "sourceId": "microsoft-learn-expansion-bank-how-reconcile-bank-accounts-separately-fr-fr",
+    "sourceUri": "https://learn.microsoft.com/fr-fr/dynamics365/business-central/bank-how-reconcile-bank-accounts-separately"
+  },
+  {
+    "ruleId": "BCExpansion.ImportStatement",
+    "locale": "de-DE",
+    "pageCaption": "Bankkontoabstimmung",
+    "actionCaption": "Bankauszug importieren",
+    "sourceId": "microsoft-learn-expansion-bank-how-reconcile-bank-accounts-separately-de-de",
+    "sourceUri": "https://learn.microsoft.com/de-de/dynamics365/business-central/bank-how-reconcile-bank-accounts-separately"
+  },
+  {
+    "ruleId": "BCExpansion.ImportStatement",
+    "locale": "de-DE",
+    "pageCaption": "Bankkontenabgleich",
+    "actionCaption": "Bankauszug importieren",
+    "sourceId": "microsoft-learn-expansion-bank-how-reconcile-bank-accounts-separately-de-de",
+    "sourceUri": "https://learn.microsoft.com/de-de/dynamics365/business-central/bank-how-reconcile-bank-accounts-separately"
+  },
+  {
+    "ruleId": "BCExpansion.ImportStatement",
+    "locale": "es-ES",
+    "pageCaption": "Conciliación bancaria",
+    "actionCaption": "Importar extracto bancario",
+    "sourceId": "microsoft-learn-expansion-bank-how-reconcile-bank-accounts-separately-es-es",
+    "sourceUri": "https://learn.microsoft.com/es-es/dynamics365/business-central/bank-how-reconcile-bank-accounts-separately"
+  },
+  {
+    "ruleId": "BCExpansion.ImportStatement",
+    "locale": "es-ES",
+    "pageCaption": "Conciliación de cuenta bancaria",
+    "actionCaption": "Importar extracto bancario",
+    "sourceId": "microsoft-learn-expansion-bank-how-reconcile-bank-accounts-separately-es-es",
+    "sourceUri": "https://learn.microsoft.com/es-es/dynamics365/business-central/bank-how-reconcile-bank-accounts-separately"
+  },
+  {
+    "ruleId": "BCExpansion.ImportStatement",
+    "locale": "da-DK",
+    "pageCaption": "Bankkontoafstemning",
+    "actionCaption": "Importér bankkontoudtog",
+    "sourceId": "microsoft-learn-expansion-bank-how-reconcile-bank-accounts-separately-da-dk",
+    "sourceUri": "https://learn.microsoft.com/da-dk/dynamics365/business-central/bank-how-reconcile-bank-accounts-separately"
+  },
+  {
+    "ruleId": "BCExpansion.ImportStatement",
+    "locale": "fi-FI",
+    "pageCaption": "Pankkitilin täsmäytys",
+    "actionCaption": "Tuo pankin tiliote",
+    "sourceId": "microsoft-learn-expansion-bank-how-reconcile-bank-accounts-separately-fi-fi",
+    "sourceUri": "https://learn.microsoft.com/fi-fi/dynamics365/business-central/bank-how-reconcile-bank-accounts-separately"
+  },
+  {
+    "ruleId": "BCExpansion.ImportStatement",
+    "locale": "nb-NO",
+    "pageCaption": "Bankkontoavstemming",
+    "actionCaption": "Importer bankkontoutdrag",
+    "sourceId": "microsoft-learn-expansion-bank-how-reconcile-bank-accounts-separately-nb-no",
+    "sourceUri": "https://learn.microsoft.com/nb-no/dynamics365/business-central/bank-how-reconcile-bank-accounts-separately"
+  },
+  {
+    "ruleId": "BCExpansion.MatchAutomatically",
+    "locale": "en-US",
+    "pageCaption": "Bank Acc. Reconciliation",
+    "actionCaption": "Match Automatically",
+    "sourceId": "microsoft-learn-expansion-bank-how-reconcile-bank-accounts-separately-en-us",
+    "sourceUri": "https://learn.microsoft.com/en-us/dynamics365/business-central/bank-how-reconcile-bank-accounts-separately"
+  },
+  {
+    "ruleId": "BCExpansion.MatchAutomatically",
+    "locale": "en-US",
+    "pageCaption": "Bank Account Reconciliation",
+    "actionCaption": "Match Automatically",
+    "sourceId": "microsoft-learn-expansion-bank-how-reconcile-bank-accounts-separately-en-us",
+    "sourceUri": "https://learn.microsoft.com/en-us/dynamics365/business-central/bank-how-reconcile-bank-accounts-separately"
+  },
+  {
+    "ruleId": "BCExpansion.MatchAutomatically",
+    "locale": "sv-SE",
+    "pageCaption": "Bankkontoavstämning",
+    "actionCaption": "Matcha automatiskt",
+    "sourceId": "microsoft-learn-expansion-bank-how-reconcile-bank-accounts-separately-sv-se",
+    "sourceUri": "https://learn.microsoft.com/sv-se/dynamics365/business-central/bank-how-reconcile-bank-accounts-separately"
+  },
+  {
+    "ruleId": "BCExpansion.MatchAutomatically",
+    "locale": "sv-SE",
+    "pageCaption": "Bankavstämning",
+    "actionCaption": "Matcha automatiskt",
+    "sourceId": "microsoft-learn-expansion-bank-how-reconcile-bank-accounts-separately-sv-se",
+    "sourceUri": "https://learn.microsoft.com/sv-se/dynamics365/business-central/bank-how-reconcile-bank-accounts-separately"
+  },
+  {
+    "ruleId": "BCExpansion.MatchAutomatically",
+    "locale": "fr-FR",
+    "pageCaption": "Rapprochement bancaire",
+    "actionCaption": "Faire correspondre automatiquement",
+    "sourceId": "microsoft-learn-expansion-bank-how-reconcile-bank-accounts-separately-fr-fr",
+    "sourceUri": "https://learn.microsoft.com/fr-fr/dynamics365/business-central/bank-how-reconcile-bank-accounts-separately"
+  },
+  {
+    "ruleId": "BCExpansion.MatchAutomatically",
+    "locale": "de-DE",
+    "pageCaption": "Bankkontoabstimmung",
+    "actionCaption": "Automatisch abgleichen",
+    "sourceId": "microsoft-learn-expansion-bank-how-reconcile-bank-accounts-separately-de-de",
+    "sourceUri": "https://learn.microsoft.com/de-de/dynamics365/business-central/bank-how-reconcile-bank-accounts-separately"
+  },
+  {
+    "ruleId": "BCExpansion.MatchAutomatically",
+    "locale": "de-DE",
+    "pageCaption": "Bankkontenabgleich",
+    "actionCaption": "Automatisch abgleichen",
+    "sourceId": "microsoft-learn-expansion-bank-how-reconcile-bank-accounts-separately-de-de",
+    "sourceUri": "https://learn.microsoft.com/de-de/dynamics365/business-central/bank-how-reconcile-bank-accounts-separately"
+  },
+  {
+    "ruleId": "BCExpansion.MatchAutomatically",
+    "locale": "es-ES",
+    "pageCaption": "Conciliación bancaria",
+    "actionCaption": "Conciliar automáticamente",
+    "sourceId": "microsoft-learn-expansion-bank-how-reconcile-bank-accounts-separately-es-es",
+    "sourceUri": "https://learn.microsoft.com/es-es/dynamics365/business-central/bank-how-reconcile-bank-accounts-separately"
+  },
+  {
+    "ruleId": "BCExpansion.MatchAutomatically",
+    "locale": "es-ES",
+    "pageCaption": "Conciliación de cuenta bancaria",
+    "actionCaption": "Conciliar automáticamente",
+    "sourceId": "microsoft-learn-expansion-bank-how-reconcile-bank-accounts-separately-es-es",
+    "sourceUri": "https://learn.microsoft.com/es-es/dynamics365/business-central/bank-how-reconcile-bank-accounts-separately"
+  },
+  {
+    "ruleId": "BCExpansion.MatchAutomatically",
+    "locale": "da-DK",
+    "pageCaption": "Bankkontoafstemning",
+    "actionCaption": "Match automatisk",
+    "sourceId": "microsoft-learn-expansion-bank-how-reconcile-bank-accounts-separately-da-dk",
+    "sourceUri": "https://learn.microsoft.com/da-dk/dynamics365/business-central/bank-how-reconcile-bank-accounts-separately"
+  },
+  {
+    "ruleId": "BCExpansion.MatchAutomatically",
+    "locale": "fi-FI",
+    "pageCaption": "Pankkitilin täsmäytys",
+    "actionCaption": "Kohdista automaattisesti",
+    "sourceId": "microsoft-learn-expansion-bank-how-reconcile-bank-accounts-separately-fi-fi",
+    "sourceUri": "https://learn.microsoft.com/fi-fi/dynamics365/business-central/bank-how-reconcile-bank-accounts-separately"
+  },
+  {
+    "ruleId": "BCExpansion.MatchAutomatically",
+    "locale": "nb-NO",
+    "pageCaption": "Bankkontoavstemming",
+    "actionCaption": "Avstem automatisk",
+    "sourceId": "microsoft-learn-expansion-bank-how-reconcile-bank-accounts-separately-nb-no",
+    "sourceUri": "https://learn.microsoft.com/nb-no/dynamics365/business-central/bank-how-reconcile-bank-accounts-separately"
+  },
+  {
+    "ruleId": "BCExpansion.PostReconciliation",
+    "locale": "en-US",
+    "pageCaption": "Bank Acc. Reconciliation",
+    "actionCaption": "Post",
+    "sourceId": "microsoft-learn-expansion-bank-how-reconcile-bank-accounts-separately-en-us",
+    "sourceUri": "https://learn.microsoft.com/en-us/dynamics365/business-central/bank-how-reconcile-bank-accounts-separately"
+  },
+  {
+    "ruleId": "BCExpansion.PostReconciliation",
+    "locale": "en-US",
+    "pageCaption": "Bank Account Reconciliation",
+    "actionCaption": "Post",
+    "sourceId": "microsoft-learn-expansion-bank-how-reconcile-bank-accounts-separately-en-us",
+    "sourceUri": "https://learn.microsoft.com/en-us/dynamics365/business-central/bank-how-reconcile-bank-accounts-separately"
+  },
+  {
+    "ruleId": "BCExpansion.PostReconciliation",
+    "locale": "sv-SE",
+    "pageCaption": "Bankkontoavstämning",
+    "actionCaption": "Bokföra",
+    "sourceId": "microsoft-learn-expansion-bank-how-reconcile-bank-accounts-separately-sv-se",
+    "sourceUri": "https://learn.microsoft.com/sv-se/dynamics365/business-central/bank-how-reconcile-bank-accounts-separately"
+  },
+  {
+    "ruleId": "BCExpansion.PostReconciliation",
+    "locale": "sv-SE",
+    "pageCaption": "Bankavstämning",
+    "actionCaption": "Bokföra",
+    "sourceId": "microsoft-learn-expansion-bank-how-reconcile-bank-accounts-separately-sv-se",
+    "sourceUri": "https://learn.microsoft.com/sv-se/dynamics365/business-central/bank-how-reconcile-bank-accounts-separately"
+  },
+  {
+    "ruleId": "BCExpansion.PostReconciliation",
+    "locale": "fr-FR",
+    "pageCaption": "Rapprochement bancaire",
+    "actionCaption": "Valider",
+    "sourceId": "microsoft-learn-expansion-bank-how-reconcile-bank-accounts-separately-fr-fr",
+    "sourceUri": "https://learn.microsoft.com/fr-fr/dynamics365/business-central/bank-how-reconcile-bank-accounts-separately"
+  },
+  {
+    "ruleId": "BCExpansion.PostReconciliation",
+    "locale": "de-DE",
+    "pageCaption": "Bankkontoabstimmung",
+    "actionCaption": "Buchen",
+    "sourceId": "microsoft-learn-expansion-bank-how-reconcile-bank-accounts-separately-de-de",
+    "sourceUri": "https://learn.microsoft.com/de-de/dynamics365/business-central/bank-how-reconcile-bank-accounts-separately"
+  },
+  {
+    "ruleId": "BCExpansion.PostReconciliation",
+    "locale": "de-DE",
+    "pageCaption": "Bankkontenabgleich",
+    "actionCaption": "Buchen",
+    "sourceId": "microsoft-learn-expansion-bank-how-reconcile-bank-accounts-separately-de-de",
+    "sourceUri": "https://learn.microsoft.com/de-de/dynamics365/business-central/bank-how-reconcile-bank-accounts-separately"
+  },
+  {
+    "ruleId": "BCExpansion.PostReconciliation",
+    "locale": "es-ES",
+    "pageCaption": "Conciliación bancaria",
+    "actionCaption": "Registrar",
+    "sourceId": "microsoft-learn-expansion-bank-how-reconcile-bank-accounts-separately-es-es",
+    "sourceUri": "https://learn.microsoft.com/es-es/dynamics365/business-central/bank-how-reconcile-bank-accounts-separately"
+  },
+  {
+    "ruleId": "BCExpansion.PostReconciliation",
+    "locale": "es-ES",
+    "pageCaption": "Conciliación de cuenta bancaria",
+    "actionCaption": "Registrar",
+    "sourceId": "microsoft-learn-expansion-bank-how-reconcile-bank-accounts-separately-es-es",
+    "sourceUri": "https://learn.microsoft.com/es-es/dynamics365/business-central/bank-how-reconcile-bank-accounts-separately"
+  },
+  {
+    "ruleId": "BCExpansion.PostReconciliation",
+    "locale": "da-DK",
+    "pageCaption": "Bankkontoafstemning",
+    "actionCaption": "Bogfør",
+    "sourceId": "microsoft-learn-expansion-bank-how-reconcile-bank-accounts-separately-da-dk",
+    "sourceUri": "https://learn.microsoft.com/da-dk/dynamics365/business-central/bank-how-reconcile-bank-accounts-separately"
+  },
+  {
+    "ruleId": "BCExpansion.PostReconciliation",
+    "locale": "fi-FI",
+    "pageCaption": "Pankkitilin täsmäytys",
+    "actionCaption": "Kirjaa",
+    "sourceId": "microsoft-learn-expansion-bank-how-reconcile-bank-accounts-separately-fi-fi",
+    "sourceUri": "https://learn.microsoft.com/fi-fi/dynamics365/business-central/bank-how-reconcile-bank-accounts-separately"
+  },
+  {
+    "ruleId": "BCExpansion.PostReconciliation",
+    "locale": "nb-NO",
+    "pageCaption": "Bankkontoavstemming",
+    "actionCaption": "Bokfør",
+    "sourceId": "microsoft-learn-expansion-bank-how-reconcile-bank-accounts-separately-nb-no",
+    "sourceUri": "https://learn.microsoft.com/nb-no/dynamics365/business-central/bank-how-reconcile-bank-accounts-separately"
+  },
+  {
+    "ruleId": "BCExpansion.ApproveRequest",
+    "locale": "en-US",
+    "pageCaption": "Requests to Approve",
+    "actionCaption": "Approve",
+    "sourceId": "microsoft-learn-expansion-across-how-use-approval-workflows-en-us",
+    "sourceUri": "https://learn.microsoft.com/en-us/dynamics365/business-central/across-how-use-approval-workflows"
+  },
+  {
+    "ruleId": "BCExpansion.ApproveRequest",
+    "locale": "sv-SE",
+    "pageCaption": "Begäranden att godkänna",
+    "actionCaption": "Godkänna",
+    "sourceId": "microsoft-learn-expansion-across-how-use-approval-workflows-sv-se",
+    "sourceUri": "https://learn.microsoft.com/sv-se/dynamics365/business-central/across-how-use-approval-workflows"
+  },
+  {
+    "ruleId": "BCExpansion.ApproveRequest",
+    "locale": "fr-FR",
+    "pageCaption": "Demandes à approuver",
+    "actionCaption": "Approuver",
+    "sourceId": "microsoft-learn-expansion-across-how-use-approval-workflows-fr-fr",
+    "sourceUri": "https://learn.microsoft.com/fr-fr/dynamics365/business-central/across-how-use-approval-workflows"
+  },
+  {
+    "ruleId": "BCExpansion.ApproveRequest",
+    "locale": "de-DE",
+    "pageCaption": "Zu genehmigende Anforderungen",
+    "actionCaption": "Genehmigen",
+    "sourceId": "microsoft-learn-expansion-across-how-use-approval-workflows-de-de",
+    "sourceUri": "https://learn.microsoft.com/de-de/dynamics365/business-central/across-how-use-approval-workflows"
+  },
+  {
+    "ruleId": "BCExpansion.ApproveRequest",
+    "locale": "es-ES",
+    "pageCaption": "Solicitudes para aprobar",
+    "actionCaption": "Aprobar",
+    "sourceId": "microsoft-learn-expansion-across-how-use-approval-workflows-es-es",
+    "sourceUri": "https://learn.microsoft.com/es-es/dynamics365/business-central/across-how-use-approval-workflows"
+  },
+  {
+    "ruleId": "BCExpansion.ApproveRequest",
+    "locale": "da-DK",
+    "pageCaption": "Anmodninger til godkendelse",
+    "actionCaption": "Godkend",
+    "sourceId": "microsoft-learn-expansion-across-how-use-approval-workflows-da-dk",
+    "sourceUri": "https://learn.microsoft.com/da-dk/dynamics365/business-central/across-how-use-approval-workflows"
+  },
+  {
+    "ruleId": "BCExpansion.ApproveRequest",
+    "locale": "fi-FI",
+    "pageCaption": "Hyväksyttävät pyynnöt",
+    "actionCaption": "Hyväksy",
+    "sourceId": "microsoft-learn-expansion-across-how-use-approval-workflows-fi-fi",
+    "sourceUri": "https://learn.microsoft.com/fi-fi/dynamics365/business-central/across-how-use-approval-workflows"
+  },
+  {
+    "ruleId": "BCExpansion.ApproveRequest",
+    "locale": "nb-NO",
+    "pageCaption": "Forespørsler å godkjenne",
+    "actionCaption": "Godkjenn",
+    "sourceId": "microsoft-learn-expansion-across-how-use-approval-workflows-nb-no",
+    "sourceUri": "https://learn.microsoft.com/nb-no/dynamics365/business-central/across-how-use-approval-workflows"
+  },
+  {
+    "ruleId": "BCExpansion.RejectRequest",
+    "locale": "en-US",
+    "pageCaption": "Requests to Approve",
+    "actionCaption": "Reject",
+    "sourceId": "microsoft-learn-expansion-across-how-use-approval-workflows-en-us",
+    "sourceUri": "https://learn.microsoft.com/en-us/dynamics365/business-central/across-how-use-approval-workflows"
+  },
+  {
+    "ruleId": "BCExpansion.RejectRequest",
+    "locale": "sv-SE",
+    "pageCaption": "Begäranden att godkänna",
+    "actionCaption": "Avvisa",
+    "sourceId": "microsoft-learn-expansion-across-how-use-approval-workflows-sv-se",
+    "sourceUri": "https://learn.microsoft.com/sv-se/dynamics365/business-central/across-how-use-approval-workflows"
+  },
+  {
+    "ruleId": "BCExpansion.RejectRequest",
+    "locale": "fr-FR",
+    "pageCaption": "Demandes à approuver",
+    "actionCaption": "Rejeter",
+    "sourceId": "microsoft-learn-expansion-across-how-use-approval-workflows-fr-fr",
+    "sourceUri": "https://learn.microsoft.com/fr-fr/dynamics365/business-central/across-how-use-approval-workflows"
+  },
+  {
+    "ruleId": "BCExpansion.RejectRequest",
+    "locale": "de-DE",
+    "pageCaption": "Zu genehmigende Anforderungen",
+    "actionCaption": "Ablehnen",
+    "sourceId": "microsoft-learn-expansion-across-how-use-approval-workflows-de-de",
+    "sourceUri": "https://learn.microsoft.com/de-de/dynamics365/business-central/across-how-use-approval-workflows"
+  },
+  {
+    "ruleId": "BCExpansion.RejectRequest",
+    "locale": "es-ES",
+    "pageCaption": "Solicitudes para aprobar",
+    "actionCaption": "Rechazar",
+    "sourceId": "microsoft-learn-expansion-across-how-use-approval-workflows-es-es",
+    "sourceUri": "https://learn.microsoft.com/es-es/dynamics365/business-central/across-how-use-approval-workflows"
+  },
+  {
+    "ruleId": "BCExpansion.RejectRequest",
+    "locale": "da-DK",
+    "pageCaption": "Anmodninger til godkendelse",
+    "actionCaption": "Afvis",
+    "sourceId": "microsoft-learn-expansion-across-how-use-approval-workflows-da-dk",
+    "sourceUri": "https://learn.microsoft.com/da-dk/dynamics365/business-central/across-how-use-approval-workflows"
+  },
+  {
+    "ruleId": "BCExpansion.RejectRequest",
+    "locale": "fi-FI",
+    "pageCaption": "Hyväksyttävät pyynnöt",
+    "actionCaption": "Hylkää",
+    "sourceId": "microsoft-learn-expansion-across-how-use-approval-workflows-fi-fi",
+    "sourceUri": "https://learn.microsoft.com/fi-fi/dynamics365/business-central/across-how-use-approval-workflows"
+  },
+  {
+    "ruleId": "BCExpansion.RejectRequest",
+    "locale": "nb-NO",
+    "pageCaption": "Forespørsler å godkjenne",
+    "actionCaption": "Avvis",
+    "sourceId": "microsoft-learn-expansion-across-how-use-approval-workflows-nb-no",
+    "sourceUri": "https://learn.microsoft.com/nb-no/dynamics365/business-central/across-how-use-approval-workflows"
+  },
+  {
+    "ruleId": "BCExpansion.DelegateRequest",
+    "locale": "en-US",
+    "pageCaption": "Requests to Approve",
+    "actionCaption": "Delegate",
+    "sourceId": "microsoft-learn-expansion-across-how-use-approval-workflows-en-us",
+    "sourceUri": "https://learn.microsoft.com/en-us/dynamics365/business-central/across-how-use-approval-workflows"
+  },
+  {
+    "ruleId": "BCExpansion.DelegateRequest",
+    "locale": "sv-SE",
+    "pageCaption": "Begäranden att godkänna",
+    "actionCaption": "Delegera",
+    "sourceId": "microsoft-learn-expansion-across-how-use-approval-workflows-sv-se",
+    "sourceUri": "https://learn.microsoft.com/sv-se/dynamics365/business-central/across-how-use-approval-workflows"
+  },
+  {
+    "ruleId": "BCExpansion.DelegateRequest",
+    "locale": "fr-FR",
+    "pageCaption": "Demandes à approuver",
+    "actionCaption": "Déléguer",
+    "sourceId": "microsoft-learn-expansion-across-how-use-approval-workflows-fr-fr",
+    "sourceUri": "https://learn.microsoft.com/fr-fr/dynamics365/business-central/across-how-use-approval-workflows"
+  },
+  {
+    "ruleId": "BCExpansion.DelegateRequest",
+    "locale": "de-DE",
+    "pageCaption": "Zu genehmigende Anforderungen",
+    "actionCaption": "Delegieren",
+    "sourceId": "microsoft-learn-expansion-across-how-use-approval-workflows-de-de",
+    "sourceUri": "https://learn.microsoft.com/de-de/dynamics365/business-central/across-how-use-approval-workflows"
+  },
+  {
+    "ruleId": "BCExpansion.DelegateRequest",
+    "locale": "es-ES",
+    "pageCaption": "Solicitudes para aprobar",
+    "actionCaption": "Delegar",
+    "sourceId": "microsoft-learn-expansion-across-how-use-approval-workflows-es-es",
+    "sourceUri": "https://learn.microsoft.com/es-es/dynamics365/business-central/across-how-use-approval-workflows"
+  },
+  {
+    "ruleId": "BCExpansion.DelegateRequest",
+    "locale": "da-DK",
+    "pageCaption": "Anmodninger til godkendelse",
+    "actionCaption": "Uddeleger",
+    "sourceId": "microsoft-learn-expansion-across-how-use-approval-workflows-da-dk",
+    "sourceUri": "https://learn.microsoft.com/da-dk/dynamics365/business-central/across-how-use-approval-workflows"
+  },
+  {
+    "ruleId": "BCExpansion.DelegateRequest",
+    "locale": "fi-FI",
+    "pageCaption": "Hyväksyttävät pyynnöt",
+    "actionCaption": "Delegoi",
+    "sourceId": "microsoft-learn-expansion-across-how-use-approval-workflows-fi-fi",
+    "sourceUri": "https://learn.microsoft.com/fi-fi/dynamics365/business-central/across-how-use-approval-workflows"
+  },
+  {
+    "ruleId": "BCExpansion.DelegateRequest",
+    "locale": "nb-NO",
+    "pageCaption": "Forespørsler å godkjenne",
+    "actionCaption": "Deleger",
+    "sourceId": "microsoft-learn-expansion-across-how-use-approval-workflows-nb-no",
+    "sourceUri": "https://learn.microsoft.com/nb-no/dynamics365/business-central/across-how-use-approval-workflows"
+  },
+  {
+    "ruleId": "BCExpansion.CreateEmployee",
+    "locale": "en-US",
+    "pageCaption": "Employees",
+    "actionCaption": "New",
+    "sourceId": "microsoft-learn-expansion-hr-how-register-employees-en-us",
+    "sourceUri": "https://learn.microsoft.com/en-us/dynamics365/business-central/hr-how-register-employees"
+  },
+  {
+    "ruleId": "BCExpansion.CreateEmployee",
+    "locale": "sv-SE",
+    "pageCaption": "Anställda",
+    "actionCaption": "Ny",
+    "sourceId": "microsoft-learn-expansion-hr-how-register-employees-sv-se",
+    "sourceUri": "https://learn.microsoft.com/sv-se/dynamics365/business-central/hr-how-register-employees"
+  },
+  {
+    "ruleId": "BCExpansion.CreateEmployee",
+    "locale": "fr-FR",
+    "pageCaption": "Employés",
+    "actionCaption": "Nouveau",
+    "sourceId": "microsoft-learn-expansion-hr-how-register-employees-fr-fr",
+    "sourceUri": "https://learn.microsoft.com/fr-fr/dynamics365/business-central/hr-how-register-employees"
+  },
+  {
+    "ruleId": "BCExpansion.CreateEmployee",
+    "locale": "de-DE",
+    "pageCaption": "Mitarbeiter",
+    "actionCaption": "Neu",
+    "sourceId": "microsoft-learn-expansion-hr-how-register-employees-de-de",
+    "sourceUri": "https://learn.microsoft.com/de-de/dynamics365/business-central/hr-how-register-employees"
+  },
+  {
+    "ruleId": "BCExpansion.CreateEmployee",
+    "locale": "es-ES",
+    "pageCaption": "Empleados",
+    "actionCaption": "Nuevo",
+    "sourceId": "microsoft-learn-expansion-hr-how-register-employees-es-es",
+    "sourceUri": "https://learn.microsoft.com/es-es/dynamics365/business-central/hr-how-register-employees"
+  },
+  {
+    "ruleId": "BCExpansion.CreateEmployee",
+    "locale": "da-DK",
+    "pageCaption": "Medarbejdere",
+    "actionCaption": "Ny",
+    "sourceId": "microsoft-learn-expansion-hr-how-register-employees-da-dk",
+    "sourceUri": "https://learn.microsoft.com/da-dk/dynamics365/business-central/hr-how-register-employees"
+  },
+  {
+    "ruleId": "BCExpansion.CreateEmployee",
+    "locale": "fi-FI",
+    "pageCaption": "Työntekijät",
+    "actionCaption": "Uusi",
+    "sourceId": "microsoft-learn-expansion-hr-how-register-employees-fi-fi",
+    "sourceUri": "https://learn.microsoft.com/fi-fi/dynamics365/business-central/hr-how-register-employees"
+  },
+  {
+    "ruleId": "BCExpansion.CreateEmployee",
+    "locale": "nb-NO",
+    "pageCaption": "Ansatte",
+    "actionCaption": "Ny",
+    "sourceId": "microsoft-learn-expansion-hr-how-register-employees-nb-no",
+    "sourceUri": "https://learn.microsoft.com/nb-no/dynamics365/business-central/hr-how-register-employees"
+  },
+  {
+    "ruleId": "BCExpansion.RegisterAbsence",
+    "locale": "en-US",
+    "pageCaption": "Absence Registration",
+    "actionCaption": "New",
+    "sourceId": "microsoft-learn-expansion-hr-how-manage-absence-en-us",
+    "sourceUri": "https://learn.microsoft.com/en-us/dynamics365/business-central/hr-how-manage-absence"
+  },
+  {
+    "ruleId": "BCExpansion.RegisterAbsence",
+    "locale": "sv-SE",
+    "pageCaption": "Frånvaroregistrering",
+    "actionCaption": "Ny",
+    "sourceId": "microsoft-learn-expansion-hr-how-manage-absence-sv-se",
+    "sourceUri": "https://learn.microsoft.com/sv-se/dynamics365/business-central/hr-how-manage-absence"
+  },
+  {
+    "ruleId": "BCExpansion.RegisterAbsence",
+    "locale": "fr-FR",
+    "pageCaption": "Saisie des absences",
+    "actionCaption": "Nouveau",
+    "sourceId": "microsoft-learn-expansion-hr-how-manage-absence-fr-fr",
+    "sourceUri": "https://learn.microsoft.com/fr-fr/dynamics365/business-central/hr-how-manage-absence"
+  },
+  {
+    "ruleId": "BCExpansion.RegisterAbsence",
+    "locale": "de-DE",
+    "pageCaption": "Abwesenheitsregistrierung",
+    "actionCaption": "Neu",
+    "sourceId": "microsoft-learn-expansion-hr-how-manage-absence-de-de",
+    "sourceUri": "https://learn.microsoft.com/de-de/dynamics365/business-central/hr-how-manage-absence"
+  },
+  {
+    "ruleId": "BCExpansion.RegisterAbsence",
+    "locale": "es-ES",
+    "pageCaption": "Registro de ausencias",
+    "actionCaption": "Nuevo",
+    "sourceId": "microsoft-learn-expansion-hr-how-manage-absence-es-es",
+    "sourceUri": "https://learn.microsoft.com/es-es/dynamics365/business-central/hr-how-manage-absence"
+  },
+  {
+    "ruleId": "BCExpansion.RegisterAbsence",
+    "locale": "da-DK",
+    "pageCaption": "Fraværsregistrering",
+    "actionCaption": "Ny",
+    "sourceId": "microsoft-learn-expansion-hr-how-manage-absence-da-dk",
+    "sourceUri": "https://learn.microsoft.com/da-dk/dynamics365/business-central/hr-how-manage-absence"
+  },
+  {
+    "ruleId": "BCExpansion.RegisterAbsence",
+    "locale": "fi-FI",
+    "pageCaption": "Poissaolon rekisteröinti",
+    "actionCaption": "Uusi",
+    "sourceId": "microsoft-learn-expansion-hr-how-manage-absence-fi-fi",
+    "sourceUri": "https://learn.microsoft.com/fi-fi/dynamics365/business-central/hr-how-manage-absence"
+  },
+  {
+    "ruleId": "BCExpansion.RegisterAbsence",
+    "locale": "nb-NO",
+    "pageCaption": "Fraværsregistrering",
+    "actionCaption": "Ny",
+    "sourceId": "microsoft-learn-expansion-hr-how-manage-absence-nb-no",
+    "sourceUri": "https://learn.microsoft.com/nb-no/dynamics365/business-central/hr-how-manage-absence"
+  },
+  {
+    "ruleId": "BCExpansion.ManualInput",
+    "locale": "en-US",
+    "pageCaption": "Sustainability Journal",
+    "fieldCaption": "Manual Input",
+    "sourceId": "microsoft-learn-expansion-finance-sustainability-journal-en-us",
+    "sourceUri": "https://learn.microsoft.com/en-us/dynamics365/business-central/finance-sustainability-journal"
+  },
+  {
+    "ruleId": "BCExpansion.ManualInput",
+    "locale": "sv-SE",
+    "pageCaption": "Hållbarhetsjournal",
+    "fieldCaption": "Manuell inmatning",
+    "sourceId": "microsoft-learn-expansion-finance-sustainability-journal-sv-se",
+    "sourceUri": "https://learn.microsoft.com/sv-se/dynamics365/business-central/finance-sustainability-journal"
+  },
+  {
+    "ruleId": "BCExpansion.ManualInput",
+    "locale": "fr-FR",
+    "pageCaption": "Journal de durabilité",
+    "fieldCaption": "Saisie manuelle",
+    "sourceId": "microsoft-learn-expansion-finance-sustainability-journal-fr-fr",
+    "sourceUri": "https://learn.microsoft.com/fr-fr/dynamics365/business-central/finance-sustainability-journal"
+  },
+  {
+    "ruleId": "BCExpansion.ManualInput",
+    "locale": "de-DE",
+    "pageCaption": "Nachhaltigkeits-Buch.-Blatt",
+    "fieldCaption": "Manuelle Eingabe",
+    "sourceId": "microsoft-learn-expansion-finance-sustainability-journal-de-de",
+    "sourceUri": "https://learn.microsoft.com/de-de/dynamics365/business-central/finance-sustainability-journal"
+  },
+  {
+    "ruleId": "BCExpansion.ManualInput",
+    "locale": "es-ES",
+    "pageCaption": "Diario de sostenibilidad",
+    "fieldCaption": "Entrada manual",
+    "sourceId": "microsoft-learn-expansion-finance-sustainability-journal-es-es",
+    "sourceUri": "https://learn.microsoft.com/es-es/dynamics365/business-central/finance-sustainability-journal"
+  },
+  {
+    "ruleId": "BCExpansion.ManualInput",
+    "locale": "da-DK",
+    "pageCaption": "Bæredygtighedskladde",
+    "fieldCaption": "Manuel indtastning",
+    "sourceId": "microsoft-learn-expansion-finance-sustainability-journal-da-dk",
+    "sourceUri": "https://learn.microsoft.com/da-dk/dynamics365/business-central/finance-sustainability-journal"
+  },
+  {
+    "ruleId": "BCExpansion.ManualInput",
+    "locale": "fi-FI",
+    "pageCaption": "Kestävyyspäiväkirja",
+    "fieldCaption": "Manuaalinen syöttö",
+    "sourceId": "microsoft-learn-expansion-finance-sustainability-journal-fi-fi",
+    "sourceUri": "https://learn.microsoft.com/fi-fi/dynamics365/business-central/finance-sustainability-journal"
+  },
+  {
+    "ruleId": "BCExpansion.ManualInput",
+    "locale": "nb-NO",
+    "pageCaption": "Bærekraftskladd",
+    "fieldCaption": "Manuelle inndata",
+    "sourceId": "microsoft-learn-expansion-finance-sustainability-journal-nb-no",
+    "sourceUri": "https://learn.microsoft.com/nb-no/dynamics365/business-central/finance-sustainability-journal"
+  },
+  {
+    "ruleId": "BCExpansion.RecalculateJournal",
+    "locale": "en-US",
+    "pageCaption": "Sustainability Journal",
+    "actionCaption": "Recalculate",
+    "sourceId": "microsoft-learn-expansion-finance-sustainability-journal-en-us",
+    "sourceUri": "https://learn.microsoft.com/en-us/dynamics365/business-central/finance-sustainability-journal"
+  },
+  {
+    "ruleId": "BCExpansion.RecalculateJournal",
+    "locale": "sv-SE",
+    "pageCaption": "Hållbarhetsjournal",
+    "actionCaption": "Omberäkna",
+    "sourceId": "microsoft-learn-expansion-finance-sustainability-journal-sv-se",
+    "sourceUri": "https://learn.microsoft.com/sv-se/dynamics365/business-central/finance-sustainability-journal"
+  },
+  {
+    "ruleId": "BCExpansion.RecalculateJournal",
+    "locale": "fr-FR",
+    "pageCaption": "Journal de durabilité",
+    "actionCaption": "Recalculer",
+    "sourceId": "microsoft-learn-expansion-finance-sustainability-journal-fr-fr",
+    "sourceUri": "https://learn.microsoft.com/fr-fr/dynamics365/business-central/finance-sustainability-journal"
+  },
+  {
+    "ruleId": "BCExpansion.RecalculateJournal",
+    "locale": "de-DE",
+    "pageCaption": "Nachhaltigkeits-Buch.-Blatt",
+    "actionCaption": "Neu berechnen",
+    "sourceId": "microsoft-learn-expansion-finance-sustainability-journal-de-de",
+    "sourceUri": "https://learn.microsoft.com/de-de/dynamics365/business-central/finance-sustainability-journal"
+  },
+  {
+    "ruleId": "BCExpansion.RecalculateJournal",
+    "locale": "es-ES",
+    "pageCaption": "Diario de sostenibilidad",
+    "actionCaption": "Recalcular",
+    "sourceId": "microsoft-learn-expansion-finance-sustainability-journal-es-es",
+    "sourceUri": "https://learn.microsoft.com/es-es/dynamics365/business-central/finance-sustainability-journal"
+  },
+  {
+    "ruleId": "BCExpansion.RecalculateJournal",
+    "locale": "da-DK",
+    "pageCaption": "Bæredygtighedskladde",
+    "actionCaption": "Genberegn",
+    "sourceId": "microsoft-learn-expansion-finance-sustainability-journal-da-dk",
+    "sourceUri": "https://learn.microsoft.com/da-dk/dynamics365/business-central/finance-sustainability-journal"
+  },
+  {
+    "ruleId": "BCExpansion.RecalculateJournal",
+    "locale": "fi-FI",
+    "pageCaption": "Kestävyyspäiväkirja",
+    "actionCaption": "Laske uudelleen",
+    "sourceId": "microsoft-learn-expansion-finance-sustainability-journal-fi-fi",
+    "sourceUri": "https://learn.microsoft.com/fi-fi/dynamics365/business-central/finance-sustainability-journal"
+  },
+  {
+    "ruleId": "BCExpansion.RecalculateJournal",
+    "locale": "nb-NO",
+    "pageCaption": "Bærekraftskladd",
+    "actionCaption": "Beregn på nytt",
+    "sourceId": "microsoft-learn-expansion-finance-sustainability-journal-nb-no",
+    "sourceUri": "https://learn.microsoft.com/nb-no/dynamics365/business-central/finance-sustainability-journal"
+  },
+  {
+    "ruleId": "BCExpansion.PostJournal",
+    "locale": "en-US",
+    "pageCaption": "Sustainability Journal",
+    "actionCaption": "Post",
+    "sourceId": "microsoft-learn-expansion-finance-sustainability-journal-en-us",
+    "sourceUri": "https://learn.microsoft.com/en-us/dynamics365/business-central/finance-sustainability-journal"
+  },
+  {
+    "ruleId": "BCExpansion.PostJournal",
+    "locale": "sv-SE",
+    "pageCaption": "Hållbarhetsjournal",
+    "actionCaption": "Bokför",
+    "sourceId": "microsoft-learn-expansion-finance-sustainability-journal-sv-se",
+    "sourceUri": "https://learn.microsoft.com/sv-se/dynamics365/business-central/finance-sustainability-journal"
+  },
+  {
+    "ruleId": "BCExpansion.PostJournal",
+    "locale": "fr-FR",
+    "pageCaption": "Journal de durabilité",
+    "actionCaption": "Poster",
+    "sourceId": "microsoft-learn-expansion-finance-sustainability-journal-fr-fr",
+    "sourceUri": "https://learn.microsoft.com/fr-fr/dynamics365/business-central/finance-sustainability-journal"
+  },
+  {
+    "ruleId": "BCExpansion.PostJournal",
+    "locale": "de-DE",
+    "pageCaption": "Nachhaltigkeits-Buch.-Blatt",
+    "actionCaption": "Buchen",
+    "sourceId": "microsoft-learn-expansion-finance-sustainability-journal-de-de",
+    "sourceUri": "https://learn.microsoft.com/de-de/dynamics365/business-central/finance-sustainability-journal"
+  },
+  {
+    "ruleId": "BCExpansion.PostJournal",
+    "locale": "es-ES",
+    "pageCaption": "Diario de sostenibilidad",
+    "actionCaption": "Registrar",
+    "sourceId": "microsoft-learn-expansion-finance-sustainability-journal-es-es",
+    "sourceUri": "https://learn.microsoft.com/es-es/dynamics365/business-central/finance-sustainability-journal"
+  },
+  {
+    "ruleId": "BCExpansion.PostJournal",
+    "locale": "da-DK",
+    "pageCaption": "Bæredygtighedskladde",
+    "actionCaption": "Bogfør",
+    "sourceId": "microsoft-learn-expansion-finance-sustainability-journal-da-dk",
+    "sourceUri": "https://learn.microsoft.com/da-dk/dynamics365/business-central/finance-sustainability-journal"
+  },
+  {
+    "ruleId": "BCExpansion.PostJournal",
+    "locale": "fi-FI",
+    "pageCaption": "Kestävyyspäiväkirja",
+    "actionCaption": "Kirjaa",
+    "sourceId": "microsoft-learn-expansion-finance-sustainability-journal-fi-fi",
+    "sourceUri": "https://learn.microsoft.com/fi-fi/dynamics365/business-central/finance-sustainability-journal"
+  },
+  {
+    "ruleId": "BCExpansion.PostJournal",
+    "locale": "nb-NO",
+    "pageCaption": "Bærekraftskladd",
+    "actionCaption": "Bokfør",
+    "sourceId": "microsoft-learn-expansion-finance-sustainability-journal-nb-no",
+    "sourceUri": "https://learn.microsoft.com/nb-no/dynamics365/business-central/finance-sustainability-journal"
+  },
+  {
+    "ruleId": "BCExpansion.CreateProposal",
+    "locale": "en-US",
+    "pageCaption": "Recurring Billing",
+    "actionCaption": "Create Billing Proposal",
+    "sourceId": "microsoft-learn-expansion-srb-recurring-billing-en-us",
+    "sourceUri": "https://learn.microsoft.com/en-us/dynamics365/business-central/srb/recurring-billing"
+  },
+  {
+    "ruleId": "BCExpansion.CreateProposal",
+    "locale": "sv-SE",
+    "pageCaption": "Återkommande fakturering",
+    "actionCaption": "Skapa faktureringsförslag",
+    "sourceId": "microsoft-learn-expansion-srb-recurring-billing-sv-se",
+    "sourceUri": "https://learn.microsoft.com/sv-se/dynamics365/business-central/srb/recurring-billing"
+  },
+  {
+    "ruleId": "BCExpansion.CreateProposal",
+    "locale": "fr-FR",
+    "pageCaption": "Facturation récurrente",
+    "actionCaption": "Créer une proposition de facturation",
+    "sourceId": "microsoft-learn-expansion-srb-recurring-billing-fr-fr",
+    "sourceUri": "https://learn.microsoft.com/fr-fr/dynamics365/business-central/srb/recurring-billing"
+  },
+  {
+    "ruleId": "BCExpansion.CreateProposal",
+    "locale": "de-DE",
+    "pageCaption": "Wiederkehrende Abrechnung",
+    "actionCaption": "Rechnungsvorschlag erstellen",
+    "sourceId": "microsoft-learn-expansion-srb-recurring-billing-de-de",
+    "sourceUri": "https://learn.microsoft.com/de-de/dynamics365/business-central/srb/recurring-billing"
+  },
+  {
+    "ruleId": "BCExpansion.CreateProposal",
+    "locale": "es-ES",
+    "pageCaption": "Facturación recurrente",
+    "actionCaption": "Crear propuesta de facturación",
+    "sourceId": "microsoft-learn-expansion-srb-recurring-billing-es-es",
+    "sourceUri": "https://learn.microsoft.com/es-es/dynamics365/business-central/srb/recurring-billing"
+  },
+  {
+    "ruleId": "BCExpansion.CreateProposal",
+    "locale": "da-DK",
+    "pageCaption": "Tilbagevendende fakturering",
+    "actionCaption": "Opret faktureringsforslag",
+    "sourceId": "microsoft-learn-expansion-srb-recurring-billing-da-dk",
+    "sourceUri": "https://learn.microsoft.com/da-dk/dynamics365/business-central/srb/recurring-billing"
+  },
+  {
+    "ruleId": "BCExpansion.CreateProposal",
+    "locale": "fi-FI",
+    "pageCaption": "Toistuva laskutus",
+    "actionCaption": "Luo laskutusehdotus",
+    "sourceId": "microsoft-learn-expansion-srb-recurring-billing-fi-fi",
+    "sourceUri": "https://learn.microsoft.com/fi-fi/dynamics365/business-central/srb/recurring-billing"
+  },
+  {
+    "ruleId": "BCExpansion.CreateProposal",
+    "locale": "nb-NO",
+    "pageCaption": "Gjentakende fakturering",
+    "actionCaption": "Opprett faktureringsforslag",
+    "sourceId": "microsoft-learn-expansion-srb-recurring-billing-nb-no",
+    "sourceUri": "https://learn.microsoft.com/nb-no/dynamics365/business-central/srb/recurring-billing"
+  },
+  {
+    "ruleId": "BCExpansion.CreateDocuments",
+    "locale": "en-US",
+    "pageCaption": "Recurring Billing",
+    "actionCaption": "Create Documents",
+    "sourceId": "microsoft-learn-expansion-srb-recurring-billing-en-us",
+    "sourceUri": "https://learn.microsoft.com/en-us/dynamics365/business-central/srb/recurring-billing"
+  },
+  {
+    "ruleId": "BCExpansion.CreateDocuments",
+    "locale": "sv-SE",
+    "pageCaption": "Återkommande fakturering",
+    "actionCaption": "Skapa dokument",
+    "sourceId": "microsoft-learn-expansion-srb-recurring-billing-sv-se",
+    "sourceUri": "https://learn.microsoft.com/sv-se/dynamics365/business-central/srb/recurring-billing"
+  },
+  {
+    "ruleId": "BCExpansion.CreateDocuments",
+    "locale": "fr-FR",
+    "pageCaption": "Facturation récurrente",
+    "actionCaption": "Créer documents",
+    "sourceId": "microsoft-learn-expansion-srb-recurring-billing-fr-fr",
+    "sourceUri": "https://learn.microsoft.com/fr-fr/dynamics365/business-central/srb/recurring-billing"
+  },
+  {
+    "ruleId": "BCExpansion.CreateDocuments",
+    "locale": "de-DE",
+    "pageCaption": "Wiederkehrende Abrechnung",
+    "actionCaption": "Belege erstellen",
+    "sourceId": "microsoft-learn-expansion-srb-recurring-billing-de-de",
+    "sourceUri": "https://learn.microsoft.com/de-de/dynamics365/business-central/srb/recurring-billing"
+  },
+  {
+    "ruleId": "BCExpansion.CreateDocuments",
+    "locale": "es-ES",
+    "pageCaption": "Facturación recurrente",
+    "actionCaption": "Crear documentos",
+    "sourceId": "microsoft-learn-expansion-srb-recurring-billing-es-es",
+    "sourceUri": "https://learn.microsoft.com/es-es/dynamics365/business-central/srb/recurring-billing"
+  },
+  {
+    "ruleId": "BCExpansion.CreateDocuments",
+    "locale": "da-DK",
+    "pageCaption": "Tilbagevendende fakturering",
+    "actionCaption": "Opret dokumenter",
+    "sourceId": "microsoft-learn-expansion-srb-recurring-billing-da-dk",
+    "sourceUri": "https://learn.microsoft.com/da-dk/dynamics365/business-central/srb/recurring-billing"
+  },
+  {
+    "ruleId": "BCExpansion.CreateDocuments",
+    "locale": "fi-FI",
+    "pageCaption": "Toistuva laskutus",
+    "actionCaption": "Luo asiakirjat",
+    "sourceId": "microsoft-learn-expansion-srb-recurring-billing-fi-fi",
+    "sourceUri": "https://learn.microsoft.com/fi-fi/dynamics365/business-central/srb/recurring-billing"
+  },
+  {
+    "ruleId": "BCExpansion.CreateDocuments",
+    "locale": "nb-NO",
+    "pageCaption": "Gjentakende fakturering",
+    "actionCaption": "Opprett dokumenter",
+    "sourceId": "microsoft-learn-expansion-srb-recurring-billing-nb-no",
+    "sourceUri": "https://learn.microsoft.com/nb-no/dynamics365/business-central/srb/recurring-billing"
+  },
+  {
+    "ruleId": "BCExpansion.SendDocument",
+    "locale": "en-US",
+    "pageCaption": "E-Document",
+    "actionCaption": "Send Document",
+    "sourceId": "microsoft-learn-expansion-finance-how-use-edocuments-en-us",
+    "sourceUri": "https://learn.microsoft.com/en-us/dynamics365/business-central/finance-how-use-edocuments"
+  },
+  {
+    "ruleId": "BCExpansion.SendDocument",
+    "locale": "en-US",
+    "pageCaption": "E-Documents",
+    "actionCaption": "Send Document",
+    "sourceId": "microsoft-learn-expansion-finance-how-use-edocuments-en-us",
+    "sourceUri": "https://learn.microsoft.com/en-us/dynamics365/business-central/finance-how-use-edocuments"
+  },
+  {
+    "ruleId": "BCExpansion.SendDocument",
+    "locale": "sv-SE",
+    "pageCaption": "E-dokument",
+    "actionCaption": "Skicka dokument",
+    "sourceId": "microsoft-learn-expansion-finance-how-use-edocuments-sv-se",
+    "sourceUri": "https://learn.microsoft.com/sv-se/dynamics365/business-central/finance-how-use-edocuments"
+  },
+  {
+    "ruleId": "BCExpansion.SendDocument",
+    "locale": "fr-FR",
+    "pageCaption": "Document électronique",
+    "actionCaption": "Envoyer le document",
+    "sourceId": "microsoft-learn-expansion-finance-how-use-edocuments-fr-fr",
+    "sourceUri": "https://learn.microsoft.com/fr-fr/dynamics365/business-central/finance-how-use-edocuments"
+  },
+  {
+    "ruleId": "BCExpansion.SendDocument",
+    "locale": "de-DE",
+    "pageCaption": "E-Belege",
+    "actionCaption": "Beleg senden",
+    "sourceId": "microsoft-learn-expansion-finance-how-use-edocuments-de-de",
+    "sourceUri": "https://learn.microsoft.com/de-de/dynamics365/business-central/finance-how-use-edocuments"
+  },
+  {
+    "ruleId": "BCExpansion.SendDocument",
+    "locale": "de-DE",
+    "pageCaption": "E-Beleg",
+    "actionCaption": "Beleg senden",
+    "sourceId": "microsoft-learn-expansion-finance-how-use-edocuments-de-de",
+    "sourceUri": "https://learn.microsoft.com/de-de/dynamics365/business-central/finance-how-use-edocuments"
+  },
+  {
+    "ruleId": "BCExpansion.SendDocument",
+    "locale": "es-ES",
+    "pageCaption": "Documento electrónico",
+    "actionCaption": "Enviar documento",
+    "sourceId": "microsoft-learn-expansion-finance-how-use-edocuments-es-es",
+    "sourceUri": "https://learn.microsoft.com/es-es/dynamics365/business-central/finance-how-use-edocuments"
+  },
+  {
+    "ruleId": "BCExpansion.SendDocument",
+    "locale": "es-ES",
+    "pageCaption": "Documentos electrónicos",
+    "actionCaption": "Enviar documento",
+    "sourceId": "microsoft-learn-expansion-finance-how-use-edocuments-es-es",
+    "sourceUri": "https://learn.microsoft.com/es-es/dynamics365/business-central/finance-how-use-edocuments"
+  },
+  {
+    "ruleId": "BCExpansion.SendDocument",
+    "locale": "da-DK",
+    "pageCaption": "E-dokument",
+    "actionCaption": "Send dokumenter",
+    "sourceId": "microsoft-learn-expansion-finance-how-use-edocuments-da-dk",
+    "sourceUri": "https://learn.microsoft.com/da-dk/dynamics365/business-central/finance-how-use-edocuments"
+  },
+  {
+    "ruleId": "BCExpansion.SendDocument",
+    "locale": "da-DK",
+    "pageCaption": "E-dokumenter",
+    "actionCaption": "Send dokumenter",
+    "sourceId": "microsoft-learn-expansion-finance-how-use-edocuments-da-dk",
+    "sourceUri": "https://learn.microsoft.com/da-dk/dynamics365/business-central/finance-how-use-edocuments"
+  },
+  {
+    "ruleId": "BCExpansion.SendDocument",
+    "locale": "fi-FI",
+    "pageCaption": "Sähköinen asiakirja",
+    "actionCaption": "Lähetä asiakirja",
+    "sourceId": "microsoft-learn-expansion-finance-how-use-edocuments-fi-fi",
+    "sourceUri": "https://learn.microsoft.com/fi-fi/dynamics365/business-central/finance-how-use-edocuments"
+  },
+  {
+    "ruleId": "BCExpansion.SendDocument",
+    "locale": "fi-FI",
+    "pageCaption": "Sähköiset asiakirjat",
+    "actionCaption": "Lähetä asiakirja",
+    "sourceId": "microsoft-learn-expansion-finance-how-use-edocuments-fi-fi",
+    "sourceUri": "https://learn.microsoft.com/fi-fi/dynamics365/business-central/finance-how-use-edocuments"
+  },
+  {
+    "ruleId": "BCExpansion.SendDocument",
+    "locale": "nb-NO",
+    "pageCaption": "E-dokument",
+    "actionCaption": "Send dokument",
+    "sourceId": "microsoft-learn-expansion-finance-how-use-edocuments-nb-no",
+    "sourceUri": "https://learn.microsoft.com/nb-no/dynamics365/business-central/finance-how-use-edocuments"
+  },
+  {
+    "ruleId": "BCExpansion.SendDocument",
+    "locale": "nb-NO",
+    "pageCaption": "E-dokumenter",
+    "actionCaption": "Send dokument",
+    "sourceId": "microsoft-learn-expansion-finance-how-use-edocuments-nb-no",
+    "sourceUri": "https://learn.microsoft.com/nb-no/dynamics365/business-central/finance-how-use-edocuments"
+  },
+  {
+    "ruleId": "BCExpansion.ViewLogs",
+    "locale": "en-US",
+    "pageCaption": "E-Document",
+    "actionCaption": "Communication Logs",
+    "sourceId": "microsoft-learn-expansion-finance-how-use-edocuments-en-us",
+    "sourceUri": "https://learn.microsoft.com/en-us/dynamics365/business-central/finance-how-use-edocuments"
+  },
+  {
+    "ruleId": "BCExpansion.ViewLogs",
+    "locale": "en-US",
+    "pageCaption": "E-Documents",
+    "actionCaption": "Communication Logs",
+    "sourceId": "microsoft-learn-expansion-finance-how-use-edocuments-en-us",
+    "sourceUri": "https://learn.microsoft.com/en-us/dynamics365/business-central/finance-how-use-edocuments"
+  },
+  {
+    "ruleId": "BCExpansion.ViewLogs",
+    "locale": "sv-SE",
+    "pageCaption": "E-dokument",
+    "actionCaption": "Kommunikationsloggar",
+    "sourceId": "microsoft-learn-expansion-finance-how-use-edocuments-sv-se",
+    "sourceUri": "https://learn.microsoft.com/sv-se/dynamics365/business-central/finance-how-use-edocuments"
+  },
+  {
+    "ruleId": "BCExpansion.ViewLogs",
+    "locale": "fr-FR",
+    "pageCaption": "Document électronique",
+    "actionCaption": "Journaux de communication",
+    "sourceId": "microsoft-learn-expansion-finance-how-use-edocuments-fr-fr",
+    "sourceUri": "https://learn.microsoft.com/fr-fr/dynamics365/business-central/finance-how-use-edocuments"
+  },
+  {
+    "ruleId": "BCExpansion.ViewLogs",
+    "locale": "de-DE",
+    "pageCaption": "E-Belege",
+    "actionCaption": "Kommunikationsprotokolle",
+    "sourceId": "microsoft-learn-expansion-finance-how-use-edocuments-de-de",
+    "sourceUri": "https://learn.microsoft.com/de-de/dynamics365/business-central/finance-how-use-edocuments"
+  },
+  {
+    "ruleId": "BCExpansion.ViewLogs",
+    "locale": "de-DE",
+    "pageCaption": "E-Beleg",
+    "actionCaption": "Kommunikationsprotokolle",
+    "sourceId": "microsoft-learn-expansion-finance-how-use-edocuments-de-de",
+    "sourceUri": "https://learn.microsoft.com/de-de/dynamics365/business-central/finance-how-use-edocuments"
+  },
+  {
+    "ruleId": "BCExpansion.ViewLogs",
+    "locale": "es-ES",
+    "pageCaption": "Documento electrónico",
+    "actionCaption": "Registros de comunicación",
+    "sourceId": "microsoft-learn-expansion-finance-how-use-edocuments-es-es",
+    "sourceUri": "https://learn.microsoft.com/es-es/dynamics365/business-central/finance-how-use-edocuments"
+  },
+  {
+    "ruleId": "BCExpansion.ViewLogs",
+    "locale": "es-ES",
+    "pageCaption": "Documentos electrónicos",
+    "actionCaption": "Registros de comunicación",
+    "sourceId": "microsoft-learn-expansion-finance-how-use-edocuments-es-es",
+    "sourceUri": "https://learn.microsoft.com/es-es/dynamics365/business-central/finance-how-use-edocuments"
+  },
+  {
+    "ruleId": "BCExpansion.ViewLogs",
+    "locale": "da-DK",
+    "pageCaption": "E-dokument",
+    "actionCaption": "Kommunikationslogfiler",
+    "sourceId": "microsoft-learn-expansion-finance-how-use-edocuments-da-dk",
+    "sourceUri": "https://learn.microsoft.com/da-dk/dynamics365/business-central/finance-how-use-edocuments"
+  },
+  {
+    "ruleId": "BCExpansion.ViewLogs",
+    "locale": "da-DK",
+    "pageCaption": "E-dokumenter",
+    "actionCaption": "Kommunikationslogfiler",
+    "sourceId": "microsoft-learn-expansion-finance-how-use-edocuments-da-dk",
+    "sourceUri": "https://learn.microsoft.com/da-dk/dynamics365/business-central/finance-how-use-edocuments"
+  },
+  {
+    "ruleId": "BCExpansion.ViewLogs",
+    "locale": "fi-FI",
+    "pageCaption": "Sähköinen asiakirja",
+    "actionCaption": "Viestintälokit",
+    "sourceId": "microsoft-learn-expansion-finance-how-use-edocuments-fi-fi",
+    "sourceUri": "https://learn.microsoft.com/fi-fi/dynamics365/business-central/finance-how-use-edocuments"
+  },
+  {
+    "ruleId": "BCExpansion.ViewLogs",
+    "locale": "fi-FI",
+    "pageCaption": "Sähköiset asiakirjat",
+    "actionCaption": "Viestintälokit",
+    "sourceId": "microsoft-learn-expansion-finance-how-use-edocuments-fi-fi",
+    "sourceUri": "https://learn.microsoft.com/fi-fi/dynamics365/business-central/finance-how-use-edocuments"
+  },
+  {
+    "ruleId": "BCExpansion.ViewLogs",
+    "locale": "nb-NO",
+    "pageCaption": "E-dokument",
+    "actionCaption": "Kommunikasjonslogger",
+    "sourceId": "microsoft-learn-expansion-finance-how-use-edocuments-nb-no",
+    "sourceUri": "https://learn.microsoft.com/nb-no/dynamics365/business-central/finance-how-use-edocuments"
+  },
+  {
+    "ruleId": "BCExpansion.ViewLogs",
+    "locale": "nb-NO",
+    "pageCaption": "E-dokumenter",
+    "actionCaption": "Kommunikasjonslogger",
+    "sourceId": "microsoft-learn-expansion-finance-how-use-edocuments-nb-no",
+    "sourceUri": "https://learn.microsoft.com/nb-no/dynamics365/business-central/finance-how-use-edocuments"
+  },
+  {
+    "ruleId": "BCExpansion.OpenExcel",
+    "locale": "en-US",
+    "pageCaption": "Purchase Order",
+    "actionCaption": "Open in Excel",
+    "sourceId": "microsoft-learn-expansion-across-work-with-excel-en-us",
+    "sourceUri": "https://learn.microsoft.com/en-us/dynamics365/business-central/across-work-with-excel"
+  },
+  {
+    "ruleId": "BCExpansion.OpenExcel",
+    "locale": "sv-SE",
+    "pageCaption": "Inköpsorder",
+    "actionCaption": "öppna i Excel",
+    "sourceId": "microsoft-learn-expansion-across-work-with-excel-sv-se",
+    "sourceUri": "https://learn.microsoft.com/sv-se/dynamics365/business-central/across-work-with-excel"
+  },
+  {
+    "ruleId": "BCExpansion.OpenExcel",
+    "locale": "fr-FR",
+    "pageCaption": "Purchase Invoice",
+    "actionCaption": "Ouvrir dans Excel",
+    "sourceId": "microsoft-learn-expansion-across-work-with-excel-fr-fr",
+    "sourceUri": "https://learn.microsoft.com/fr-fr/dynamics365/business-central/across-work-with-excel"
+  },
+  {
+    "ruleId": "BCExpansion.OpenExcel",
+    "locale": "de-DE",
+    "pageCaption": "Purchase Invoice",
+    "actionCaption": "In Excel öffnen",
+    "sourceId": "microsoft-learn-expansion-across-work-with-excel-de-de",
+    "sourceUri": "https://learn.microsoft.com/de-de/dynamics365/business-central/across-work-with-excel"
+  },
+  {
+    "ruleId": "BCExpansion.OpenExcel",
+    "locale": "es-ES",
+    "pageCaption": "Sales Order",
+    "actionCaption": "Abrir en Excel",
+    "sourceId": "microsoft-learn-expansion-across-work-with-excel-es-es",
+    "sourceUri": "https://learn.microsoft.com/es-es/dynamics365/business-central/across-work-with-excel"
+  },
+  {
+    "ruleId": "BCExpansion.OpenExcel",
+    "locale": "da-DK",
+    "pageCaption": "Inköpsorder",
+    "actionCaption": "Åbn i Excel",
+    "sourceId": "microsoft-learn-expansion-across-work-with-excel-da-dk",
+    "sourceUri": "https://learn.microsoft.com/da-dk/dynamics365/business-central/across-work-with-excel"
+  },
+  {
+    "ruleId": "BCExpansion.OpenExcel",
+    "locale": "fi-FI",
+    "pageCaption": "Sales Invoice",
+    "actionCaption": "Avaa Excelissä",
+    "sourceId": "microsoft-learn-expansion-across-work-with-excel-fi-fi",
+    "sourceUri": "https://learn.microsoft.com/fi-fi/dynamics365/business-central/across-work-with-excel"
+  },
+  {
+    "ruleId": "BCExpansion.OpenExcel",
+    "locale": "nb-NO",
+    "pageCaption": "Inköpsfaktura",
+    "actionCaption": "Åpne i Excel",
+    "sourceId": "microsoft-learn-expansion-across-work-with-excel-nb-no",
+    "sourceUri": "https://learn.microsoft.com/nb-no/dynamics365/business-central/across-work-with-excel"
+  },
+  {
+    "ruleId": "BCExpansion.EditExcel",
+    "locale": "en-US",
+    "pageCaption": "Recorded Business Central page",
+    "actionCaption": "Edit in Excel",
+    "sourceId": "microsoft-learn-expansion-across-work-with-excel-en-us",
+    "sourceUri": "https://learn.microsoft.com/en-us/dynamics365/business-central/across-work-with-excel"
+  },
+  {
+    "ruleId": "BCExpansion.EditExcel",
+    "locale": "sv-SE",
+    "pageCaption": "Recorded Business Central page",
+    "actionCaption": "Redigera i Excel",
+    "sourceId": "microsoft-learn-expansion-across-work-with-excel-sv-se",
+    "sourceUri": "https://learn.microsoft.com/sv-se/dynamics365/business-central/across-work-with-excel"
+  },
+  {
+    "ruleId": "BCExpansion.EditExcel",
+    "locale": "fr-FR",
+    "pageCaption": "Recorded Business Central page",
+    "actionCaption": "Modifier dans Excel",
+    "sourceId": "microsoft-learn-expansion-across-work-with-excel-fr-fr",
+    "sourceUri": "https://learn.microsoft.com/fr-fr/dynamics365/business-central/across-work-with-excel"
+  },
+  {
+    "ruleId": "BCExpansion.EditExcel",
+    "locale": "de-DE",
+    "pageCaption": "Recorded Business Central page",
+    "actionCaption": "In Excel bearbeiten",
+    "sourceId": "microsoft-learn-expansion-across-work-with-excel-de-de",
+    "sourceUri": "https://learn.microsoft.com/de-de/dynamics365/business-central/across-work-with-excel"
+  },
+  {
+    "ruleId": "BCExpansion.EditExcel",
+    "locale": "es-ES",
+    "pageCaption": "Recorded Business Central page",
+    "actionCaption": "Editar en Excel",
+    "sourceId": "microsoft-learn-expansion-across-work-with-excel-es-es",
+    "sourceUri": "https://learn.microsoft.com/es-es/dynamics365/business-central/across-work-with-excel"
+  },
+  {
+    "ruleId": "BCExpansion.EditExcel",
+    "locale": "da-DK",
+    "pageCaption": "Recorded Business Central page",
+    "actionCaption": "Rediger i Excel",
+    "sourceId": "microsoft-learn-expansion-across-work-with-excel-da-dk",
+    "sourceUri": "https://learn.microsoft.com/da-dk/dynamics365/business-central/across-work-with-excel"
+  },
+  {
+    "ruleId": "BCExpansion.EditExcel",
+    "locale": "fi-FI",
+    "pageCaption": "Recorded Business Central page",
+    "actionCaption": "Muokkaa Excelissä",
+    "sourceId": "microsoft-learn-expansion-across-work-with-excel-fi-fi",
+    "sourceUri": "https://learn.microsoft.com/fi-fi/dynamics365/business-central/across-work-with-excel"
+  },
+  {
+    "ruleId": "BCExpansion.EditExcel",
+    "locale": "nb-NO",
+    "pageCaption": "Recorded Business Central page",
+    "actionCaption": "Rediger i Excel",
+    "sourceId": "microsoft-learn-expansion-across-work-with-excel-nb-no",
+    "sourceUri": "https://learn.microsoft.com/nb-no/dynamics365/business-central/across-work-with-excel"
+  },
+  {
+    "ruleId": "BCExpansion.ShareTeams",
+    "locale": "en-US",
+    "pageCaption": "Recorded Business Central page",
+    "actionCaption": "Share to Teams",
+    "sourceId": "microsoft-learn-expansion-across-working-with-teams-en-us",
+    "sourceUri": "https://learn.microsoft.com/en-us/dynamics365/business-central/across-working-with-teams"
+  },
+  {
+    "ruleId": "BCExpansion.ShareTeams",
+    "locale": "sv-SE",
+    "pageCaption": "Recorded Business Central page",
+    "actionCaption": "Dela till Teams",
+    "sourceId": "microsoft-learn-expansion-across-working-with-teams-sv-se",
+    "sourceUri": "https://learn.microsoft.com/sv-se/dynamics365/business-central/across-working-with-teams"
+  },
+  {
+    "ruleId": "BCExpansion.ShareTeams",
+    "locale": "fr-FR",
+    "pageCaption": "Recorded Business Central page",
+    "actionCaption": "Partager avec Teams",
+    "sourceId": "microsoft-learn-expansion-across-working-with-teams-fr-fr",
+    "sourceUri": "https://learn.microsoft.com/fr-fr/dynamics365/business-central/across-working-with-teams"
+  },
+  {
+    "ruleId": "BCExpansion.ShareTeams",
+    "locale": "de-DE",
+    "pageCaption": "Recorded Business Central page",
+    "actionCaption": "Für Teams freigeben",
+    "sourceId": "microsoft-learn-expansion-across-working-with-teams-de-de",
+    "sourceUri": "https://learn.microsoft.com/de-de/dynamics365/business-central/across-working-with-teams"
+  },
+  {
+    "ruleId": "BCExpansion.ShareTeams",
+    "locale": "es-ES",
+    "pageCaption": "Recorded Business Central page",
+    "actionCaption": "Compartir con Teams",
+    "sourceId": "microsoft-learn-expansion-across-working-with-teams-es-es",
+    "sourceUri": "https://learn.microsoft.com/es-es/dynamics365/business-central/across-working-with-teams"
+  },
+  {
+    "ruleId": "BCExpansion.ShareTeams",
+    "locale": "da-DK",
+    "pageCaption": "Recorded Business Central page",
+    "actionCaption": "Del med Teams",
+    "sourceId": "microsoft-learn-expansion-across-working-with-teams-da-dk",
+    "sourceUri": "https://learn.microsoft.com/da-dk/dynamics365/business-central/across-working-with-teams"
+  },
+  {
+    "ruleId": "BCExpansion.ShareTeams",
+    "locale": "fi-FI",
+    "pageCaption": "Recorded Business Central page",
+    "actionCaption": "Jaa Teamsiin",
+    "sourceId": "microsoft-learn-expansion-across-working-with-teams-fi-fi",
+    "sourceUri": "https://learn.microsoft.com/fi-fi/dynamics365/business-central/across-working-with-teams"
+  },
+  {
+    "ruleId": "BCExpansion.ShareTeams",
+    "locale": "nb-NO",
+    "pageCaption": "Recorded Business Central page",
+    "actionCaption": "Del til Teams",
+    "sourceId": "microsoft-learn-expansion-across-working-with-teams-nb-no",
+    "sourceUri": "https://learn.microsoft.com/nb-no/dynamics365/business-central/across-working-with-teams"
+  },
+  {
+    "ruleId": "BCExpansion.OpenOneDrive",
+    "locale": "en-US",
+    "pageCaption": "Recorded Business Central page",
+    "actionCaption": "Open in OneDrive",
+    "sourceId": "microsoft-learn-expansion-across-onedrive-overview-en-us",
+    "sourceUri": "https://learn.microsoft.com/en-us/dynamics365/business-central/across-onedrive-overview"
+  },
+  {
+    "ruleId": "BCExpansion.OpenOneDrive",
+    "locale": "sv-SE",
+    "pageCaption": "Recorded Business Central page",
+    "actionCaption": "Öppna i OneDrive",
+    "sourceId": "microsoft-learn-expansion-across-onedrive-overview-sv-se",
+    "sourceUri": "https://learn.microsoft.com/sv-se/dynamics365/business-central/across-onedrive-overview"
+  },
+  {
+    "ruleId": "BCExpansion.OpenOneDrive",
+    "locale": "fr-FR",
+    "pageCaption": "Recorded Business Central page",
+    "actionCaption": "Open in OneDrive",
+    "sourceId": "microsoft-learn-expansion-across-onedrive-overview-fr-fr",
+    "sourceUri": "https://learn.microsoft.com/fr-fr/dynamics365/business-central/across-onedrive-overview"
+  },
+  {
+    "ruleId": "BCExpansion.OpenOneDrive",
+    "locale": "de-DE",
+    "pageCaption": "Recorded Business Central page",
+    "actionCaption": "Open in OneDrive",
+    "sourceId": "microsoft-learn-expansion-across-onedrive-overview-de-de",
+    "sourceUri": "https://learn.microsoft.com/de-de/dynamics365/business-central/across-onedrive-overview"
+  },
+  {
+    "ruleId": "BCExpansion.OpenOneDrive",
+    "locale": "es-ES",
+    "pageCaption": "Recorded Business Central page",
+    "actionCaption": "Abrir en OneDrive",
+    "sourceId": "microsoft-learn-expansion-across-onedrive-overview-es-es",
+    "sourceUri": "https://learn.microsoft.com/es-es/dynamics365/business-central/across-onedrive-overview"
+  },
+  {
+    "ruleId": "BCExpansion.OpenOneDrive",
+    "locale": "da-DK",
+    "pageCaption": "Recorded Business Central page",
+    "actionCaption": "Åbn i OneDrive",
+    "sourceId": "microsoft-learn-expansion-across-onedrive-overview-da-dk",
+    "sourceUri": "https://learn.microsoft.com/da-dk/dynamics365/business-central/across-onedrive-overview"
+  },
+  {
+    "ruleId": "BCExpansion.OpenOneDrive",
+    "locale": "fi-FI",
+    "pageCaption": "Recorded Business Central page",
+    "actionCaption": "Avaa OneDrive",
+    "sourceId": "microsoft-learn-expansion-across-onedrive-overview-fi-fi",
+    "sourceUri": "https://learn.microsoft.com/fi-fi/dynamics365/business-central/across-onedrive-overview"
+  },
+  {
+    "ruleId": "BCExpansion.OpenOneDrive",
+    "locale": "nb-NO",
+    "pageCaption": "Recorded Business Central page",
+    "actionCaption": "Åpne i OneDrive",
+    "sourceId": "microsoft-learn-expansion-across-onedrive-overview-nb-no",
+    "sourceUri": "https://learn.microsoft.com/nb-no/dynamics365/business-central/across-onedrive-overview"
+  },
+  {
+    "ruleId": "BCExpansion.InstallOutlook",
+    "locale": "en-US",
+    "pageCaption": "Configure Outlook",
+    "actionCaption": "Install to my Outlook",
+    "sourceId": "microsoft-learn-expansion-admin-outlook-en-us",
+    "sourceUri": "https://learn.microsoft.com/en-us/dynamics365/business-central/admin-outlook"
+  },
+  {
+    "ruleId": "BCExpansion.InstallOutlook",
+    "locale": "sv-SE",
+    "pageCaption": "Konfigurera Outlook",
+    "actionCaption": "Installera till min Outlook",
+    "sourceId": "microsoft-learn-expansion-admin-outlook-sv-se",
+    "sourceUri": "https://learn.microsoft.com/sv-se/dynamics365/business-central/admin-outlook"
+  },
+  {
+    "ruleId": "BCExpansion.InstallOutlook",
+    "locale": "fr-FR",
+    "pageCaption": "Configurer Outlook",
+    "actionCaption": "Installer dans mon Outlook",
+    "sourceId": "microsoft-learn-expansion-admin-outlook-fr-fr",
+    "sourceUri": "https://learn.microsoft.com/fr-fr/dynamics365/business-central/admin-outlook"
+  },
+  {
+    "ruleId": "BCExpansion.InstallOutlook",
+    "locale": "de-DE",
+    "pageCaption": "Outlook konfigurieren",
+    "actionCaption": "In mein Outlook installieren",
+    "sourceId": "microsoft-learn-expansion-admin-outlook-de-de",
+    "sourceUri": "https://learn.microsoft.com/de-de/dynamics365/business-central/admin-outlook"
+  },
+  {
+    "ruleId": "BCExpansion.InstallOutlook",
+    "locale": "es-ES",
+    "pageCaption": "Configurar Outlook",
+    "actionCaption": "Instalar en mi Outlook",
+    "sourceId": "microsoft-learn-expansion-admin-outlook-es-es",
+    "sourceUri": "https://learn.microsoft.com/es-es/dynamics365/business-central/admin-outlook"
+  },
+  {
+    "ruleId": "BCExpansion.InstallOutlook",
+    "locale": "da-DK",
+    "pageCaption": "Konfigurer Outlook",
+    "actionCaption": "Installer på min Outlook",
+    "sourceId": "microsoft-learn-expansion-admin-outlook-da-dk",
+    "sourceUri": "https://learn.microsoft.com/da-dk/dynamics365/business-central/admin-outlook"
+  },
+  {
+    "ruleId": "BCExpansion.InstallOutlook",
+    "locale": "fi-FI",
+    "pageCaption": "Määritä Outlook",
+    "actionCaption": "Asenna omaan Outlookiin",
+    "sourceId": "microsoft-learn-expansion-admin-outlook-fi-fi",
+    "sourceUri": "https://learn.microsoft.com/fi-fi/dynamics365/business-central/admin-outlook"
+  },
+  {
+    "ruleId": "BCExpansion.InstallOutlook",
+    "locale": "nb-NO",
+    "pageCaption": "Konfigurer Outlook-siden",
+    "actionCaption": "Installer i min Outlook",
+    "sourceId": "microsoft-learn-expansion-admin-outlook-nb-no",
+    "sourceUri": "https://learn.microsoft.com/nb-no/dynamics365/business-central/admin-outlook"
+  },
+  {
+    "ruleId": "BCExpansion.CalculateInventory",
+    "locale": "en-US",
+    "pageCaption": "Phys. Inventory Journal",
+    "actionCaption": "Calculate Inventory",
+    "sourceId": "microsoft-learn-expansion-inventory-how-count-adjust-reclassify-en-us",
+    "sourceUri": "https://learn.microsoft.com/en-us/dynamics365/business-central/inventory-how-count-adjust-reclassify"
+  },
+  {
+    "ruleId": "BCExpansion.CalculateInventory",
+    "locale": "sv-SE",
+    "pageCaption": "Inventeringsjournal",
+    "actionCaption": "Beräkna lager",
+    "sourceId": "microsoft-learn-expansion-inventory-how-count-adjust-reclassify-sv-se",
+    "sourceUri": "https://learn.microsoft.com/sv-se/dynamics365/business-central/inventory-how-count-adjust-reclassify"
+  },
+  {
+    "ruleId": "BCExpansion.CalculateInventory",
+    "locale": "fr-FR",
+    "pageCaption": "Feuille inventaire",
+    "actionCaption": "Calculer stock",
+    "sourceId": "microsoft-learn-expansion-inventory-how-count-adjust-reclassify-fr-fr",
+    "sourceUri": "https://learn.microsoft.com/fr-fr/dynamics365/business-central/inventory-how-count-adjust-reclassify"
+  },
+  {
+    "ruleId": "BCExpansion.CalculateInventory",
+    "locale": "de-DE",
+    "pageCaption": "Inventur Buch.-Blatt",
+    "actionCaption": "Lagerbestand berechnen",
+    "sourceId": "microsoft-learn-expansion-inventory-how-count-adjust-reclassify-de-de",
+    "sourceUri": "https://learn.microsoft.com/de-de/dynamics365/business-central/inventory-how-count-adjust-reclassify"
+  },
+  {
+    "ruleId": "BCExpansion.CalculateInventory",
+    "locale": "es-ES",
+    "pageCaption": "Diario inventario físico",
+    "actionCaption": "Calcular inventario",
+    "sourceId": "microsoft-learn-expansion-inventory-how-count-adjust-reclassify-es-es",
+    "sourceUri": "https://learn.microsoft.com/es-es/dynamics365/business-central/inventory-how-count-adjust-reclassify"
+  },
+  {
+    "ruleId": "BCExpansion.CalculateInventory",
+    "locale": "da-DK",
+    "pageCaption": "Lageropgørelseskladde",
+    "actionCaption": "Beregn beholdning",
+    "sourceId": "microsoft-learn-expansion-inventory-how-count-adjust-reclassify-da-dk",
+    "sourceUri": "https://learn.microsoft.com/da-dk/dynamics365/business-central/inventory-how-count-adjust-reclassify"
+  },
+  {
+    "ruleId": "BCExpansion.CalculateInventory",
+    "locale": "fi-FI",
+    "pageCaption": "Inventointipäiväkirja",
+    "actionCaption": "Laske varasto",
+    "sourceId": "microsoft-learn-expansion-inventory-how-count-adjust-reclassify-fi-fi",
+    "sourceUri": "https://learn.microsoft.com/fi-fi/dynamics365/business-central/inventory-how-count-adjust-reclassify"
+  },
+  {
+    "ruleId": "BCExpansion.CalculateInventory",
+    "locale": "nb-NO",
+    "pageCaption": "Vareopptellingskladd",
+    "actionCaption": "Beregn beholdning",
+    "sourceId": "microsoft-learn-expansion-inventory-how-count-adjust-reclassify-nb-no",
+    "sourceUri": "https://learn.microsoft.com/nb-no/dynamics365/business-central/inventory-how-count-adjust-reclassify"
+  },
+  {
+    "ruleId": "BCExpansion.CountedQuantity",
+    "locale": "en-US",
+    "pageCaption": "Phys. Inventory Journal",
+    "fieldCaption": "Qty. (Phys. Inventory)",
+    "sourceId": "microsoft-learn-expansion-inventory-how-count-adjust-reclassify-en-us",
+    "sourceUri": "https://learn.microsoft.com/en-us/dynamics365/business-central/inventory-how-count-adjust-reclassify"
+  },
+  {
+    "ruleId": "BCExpansion.CountedQuantity",
+    "locale": "sv-SE",
+    "pageCaption": "Inventeringsjournal",
+    "fieldCaption": "Antal inventerat",
+    "sourceId": "microsoft-learn-expansion-inventory-how-count-adjust-reclassify-sv-se",
+    "sourceUri": "https://learn.microsoft.com/sv-se/dynamics365/business-central/inventory-how-count-adjust-reclassify"
+  },
+  {
+    "ruleId": "BCExpansion.CountedQuantity",
+    "locale": "fr-FR",
+    "pageCaption": "Feuille inventaire",
+    "fieldCaption": "Qté (constatée)",
+    "sourceId": "microsoft-learn-expansion-inventory-how-count-adjust-reclassify-fr-fr",
+    "sourceUri": "https://learn.microsoft.com/fr-fr/dynamics365/business-central/inventory-how-count-adjust-reclassify"
+  },
+  {
+    "ruleId": "BCExpansion.CountedQuantity",
+    "locale": "de-DE",
+    "pageCaption": "Inventur Buch.-Blatt",
+    "fieldCaption": "Inventurmenge",
+    "sourceId": "microsoft-learn-expansion-inventory-how-count-adjust-reclassify-de-de",
+    "sourceUri": "https://learn.microsoft.com/de-de/dynamics365/business-central/inventory-how-count-adjust-reclassify"
+  },
+  {
+    "ruleId": "BCExpansion.CountedQuantity",
+    "locale": "es-ES",
+    "pageCaption": "Diario inventario físico",
+    "fieldCaption": "Cdad. (stock físico)",
+    "sourceId": "microsoft-learn-expansion-inventory-how-count-adjust-reclassify-es-es",
+    "sourceUri": "https://learn.microsoft.com/es-es/dynamics365/business-central/inventory-how-count-adjust-reclassify"
+  },
+  {
+    "ruleId": "BCExpansion.CountedQuantity",
+    "locale": "da-DK",
+    "pageCaption": "Lageropgørelseskladde",
+    "fieldCaption": "Antal (optalt)",
+    "sourceId": "microsoft-learn-expansion-inventory-how-count-adjust-reclassify-da-dk",
+    "sourceUri": "https://learn.microsoft.com/da-dk/dynamics365/business-central/inventory-how-count-adjust-reclassify"
+  },
+  {
+    "ruleId": "BCExpansion.CountedQuantity",
+    "locale": "fi-FI",
+    "pageCaption": "Inventointipäiväkirja",
+    "fieldCaption": "Määrä (inventointi)",
+    "sourceId": "microsoft-learn-expansion-inventory-how-count-adjust-reclassify-fi-fi",
+    "sourceUri": "https://learn.microsoft.com/fi-fi/dynamics365/business-central/inventory-how-count-adjust-reclassify"
+  },
+  {
+    "ruleId": "BCExpansion.CountedQuantity",
+    "locale": "nb-NO",
+    "pageCaption": "Vareopptellingskladd",
+    "fieldCaption": "Antall (opptalt)",
+    "sourceId": "microsoft-learn-expansion-inventory-how-count-adjust-reclassify-nb-no",
+    "sourceUri": "https://learn.microsoft.com/nb-no/dynamics365/business-central/inventory-how-count-adjust-reclassify"
+  },
+  {
+    "ruleId": "BCExpansion.PostTransfer",
+    "locale": "en-US",
+    "pageCaption": "Transfer Order",
+    "actionCaption": "Post",
+    "sourceId": "microsoft-learn-expansion-inventory-how-transfer-between-locations-en-us",
+    "sourceUri": "https://learn.microsoft.com/en-us/dynamics365/business-central/inventory-how-transfer-between-locations"
+  },
+  {
+    "ruleId": "BCExpansion.PostTransfer",
+    "locale": "sv-SE",
+    "pageCaption": "Överföringsorder",
+    "actionCaption": "bokför",
+    "sourceId": "microsoft-learn-expansion-inventory-how-transfer-between-locations-sv-se",
+    "sourceUri": "https://learn.microsoft.com/sv-se/dynamics365/business-central/inventory-how-transfer-between-locations"
+  },
+  {
+    "ruleId": "BCExpansion.PostTransfer",
+    "locale": "fr-FR",
+    "pageCaption": "Ordre de transfer",
+    "actionCaption": "Valider",
+    "sourceId": "microsoft-learn-expansion-inventory-how-transfer-between-locations-fr-fr",
+    "sourceUri": "https://learn.microsoft.com/fr-fr/dynamics365/business-central/inventory-how-transfer-between-locations"
+  },
+  {
+    "ruleId": "BCExpansion.PostTransfer",
+    "locale": "de-DE",
+    "pageCaption": "Umlagerungsauftrag",
+    "actionCaption": "Buchen",
+    "sourceId": "microsoft-learn-expansion-inventory-how-transfer-between-locations-de-de",
+    "sourceUri": "https://learn.microsoft.com/de-de/dynamics365/business-central/inventory-how-transfer-between-locations"
+  },
+  {
+    "ruleId": "BCExpansion.PostTransfer",
+    "locale": "es-ES",
+    "pageCaption": "Pedido de transferencia",
+    "actionCaption": "Registrar",
+    "sourceId": "microsoft-learn-expansion-inventory-how-transfer-between-locations-es-es",
+    "sourceUri": "https://learn.microsoft.com/es-es/dynamics365/business-central/inventory-how-transfer-between-locations"
+  },
+  {
+    "ruleId": "BCExpansion.PostTransfer",
+    "locale": "da-DK",
+    "pageCaption": "Overflytningsordre",
+    "actionCaption": "Bogfør",
+    "sourceId": "microsoft-learn-expansion-inventory-how-transfer-between-locations-da-dk",
+    "sourceUri": "https://learn.microsoft.com/da-dk/dynamics365/business-central/inventory-how-transfer-between-locations"
+  },
+  {
+    "ruleId": "BCExpansion.PostTransfer",
+    "locale": "fi-FI",
+    "pageCaption": "Siirtotilaus",
+    "actionCaption": "Kirjaa",
+    "sourceId": "microsoft-learn-expansion-inventory-how-transfer-between-locations-fi-fi",
+    "sourceUri": "https://learn.microsoft.com/fi-fi/dynamics365/business-central/inventory-how-transfer-between-locations"
+  },
+  {
+    "ruleId": "BCExpansion.PostTransfer",
+    "locale": "nb-NO",
+    "pageCaption": "Overføringsordrer",
+    "actionCaption": "Bokfør",
+    "sourceId": "microsoft-learn-expansion-inventory-how-transfer-between-locations-nb-no",
+    "sourceUri": "https://learn.microsoft.com/nb-no/dynamics365/business-central/inventory-how-transfer-between-locations"
+  },
+  {
+    "ruleId": "BCExpansion.MatchManually",
+    "locale": "en-US",
+    "pageCaption": "Bank Acc. Reconciliation",
+    "actionCaption": "Match Manually",
+    "sourceId": "microsoft-learn-expansion-bank-how-reconcile-bank-accounts-separately-en-us",
+    "sourceUri": "https://learn.microsoft.com/en-us/dynamics365/business-central/bank-how-reconcile-bank-accounts-separately"
+  },
+  {
+    "ruleId": "BCExpansion.MatchManually",
+    "locale": "en-US",
+    "pageCaption": "Bank Account Reconciliation",
+    "actionCaption": "Match Manually",
+    "sourceId": "microsoft-learn-expansion-bank-how-reconcile-bank-accounts-separately-en-us",
+    "sourceUri": "https://learn.microsoft.com/en-us/dynamics365/business-central/bank-how-reconcile-bank-accounts-separately"
+  },
+  {
+    "ruleId": "BCExpansion.MatchManually",
+    "locale": "sv-SE",
+    "pageCaption": "Bankkontoavstämning",
+    "actionCaption": "Matcha manuellt",
+    "sourceId": "microsoft-learn-expansion-bank-how-reconcile-bank-accounts-separately-sv-se",
+    "sourceUri": "https://learn.microsoft.com/sv-se/dynamics365/business-central/bank-how-reconcile-bank-accounts-separately"
+  },
+  {
+    "ruleId": "BCExpansion.MatchManually",
+    "locale": "sv-SE",
+    "pageCaption": "Bankavstämning",
+    "actionCaption": "Matcha manuellt",
+    "sourceId": "microsoft-learn-expansion-bank-how-reconcile-bank-accounts-separately-sv-se",
+    "sourceUri": "https://learn.microsoft.com/sv-se/dynamics365/business-central/bank-how-reconcile-bank-accounts-separately"
+  },
+  {
+    "ruleId": "BCExpansion.MatchManually",
+    "locale": "fr-FR",
+    "pageCaption": "Rapprochement bancaire",
+    "actionCaption": "Faire correspondre manuellement",
+    "sourceId": "microsoft-learn-expansion-bank-how-reconcile-bank-accounts-separately-fr-fr",
+    "sourceUri": "https://learn.microsoft.com/fr-fr/dynamics365/business-central/bank-how-reconcile-bank-accounts-separately"
+  },
+  {
+    "ruleId": "BCExpansion.MatchManually",
+    "locale": "de-DE",
+    "pageCaption": "Bankkontoabstimmung",
+    "actionCaption": "Manuell abgleichen",
+    "sourceId": "microsoft-learn-expansion-bank-how-reconcile-bank-accounts-separately-de-de",
+    "sourceUri": "https://learn.microsoft.com/de-de/dynamics365/business-central/bank-how-reconcile-bank-accounts-separately"
+  },
+  {
+    "ruleId": "BCExpansion.MatchManually",
+    "locale": "de-DE",
+    "pageCaption": "Bankkontenabgleich",
+    "actionCaption": "Manuell abgleichen",
+    "sourceId": "microsoft-learn-expansion-bank-how-reconcile-bank-accounts-separately-de-de",
+    "sourceUri": "https://learn.microsoft.com/de-de/dynamics365/business-central/bank-how-reconcile-bank-accounts-separately"
+  },
+  {
+    "ruleId": "BCExpansion.MatchManually",
+    "locale": "es-ES",
+    "pageCaption": "Conciliación bancaria",
+    "actionCaption": "Conciliar manualmente",
+    "sourceId": "microsoft-learn-expansion-bank-how-reconcile-bank-accounts-separately-es-es",
+    "sourceUri": "https://learn.microsoft.com/es-es/dynamics365/business-central/bank-how-reconcile-bank-accounts-separately"
+  },
+  {
+    "ruleId": "BCExpansion.MatchManually",
+    "locale": "es-ES",
+    "pageCaption": "Conciliación de cuenta bancaria",
+    "actionCaption": "Conciliar manualmente",
+    "sourceId": "microsoft-learn-expansion-bank-how-reconcile-bank-accounts-separately-es-es",
+    "sourceUri": "https://learn.microsoft.com/es-es/dynamics365/business-central/bank-how-reconcile-bank-accounts-separately"
+  },
+  {
+    "ruleId": "BCExpansion.MatchManually",
+    "locale": "da-DK",
+    "pageCaption": "Bankkontoafstemning",
+    "actionCaption": "Match manuelt",
+    "sourceId": "microsoft-learn-expansion-bank-how-reconcile-bank-accounts-separately-da-dk",
+    "sourceUri": "https://learn.microsoft.com/da-dk/dynamics365/business-central/bank-how-reconcile-bank-accounts-separately"
+  },
+  {
+    "ruleId": "BCExpansion.MatchManually",
+    "locale": "fi-FI",
+    "pageCaption": "Pankkitilin täsmäytys",
+    "actionCaption": "Kohdista manuaalisesti",
+    "sourceId": "microsoft-learn-expansion-bank-how-reconcile-bank-accounts-separately-fi-fi",
+    "sourceUri": "https://learn.microsoft.com/fi-fi/dynamics365/business-central/bank-how-reconcile-bank-accounts-separately"
+  },
+  {
+    "ruleId": "BCExpansion.MatchManually",
+    "locale": "nb-NO",
+    "pageCaption": "Bankkontoavstemming",
+    "actionCaption": "Avstem manuelt",
+    "sourceId": "microsoft-learn-expansion-bank-how-reconcile-bank-accounts-separately-nb-no",
+    "sourceUri": "https://learn.microsoft.com/nb-no/dynamics365/business-central/bank-how-reconcile-bank-accounts-separately"
+  },
+  {
+    "ruleId": "BCExpansion.CreatePurchaseDocument",
+    "locale": "en-US",
+    "pageCaption": "E-Document",
+    "actionCaption": "Create Document",
+    "sourceId": "microsoft-learn-expansion-finance-how-use-edocuments-purchase-en-us",
+    "sourceUri": "https://learn.microsoft.com/en-us/dynamics365/business-central/finance-how-use-edocuments-purchase"
+  },
+  {
+    "ruleId": "BCExpansion.CreatePurchaseDocument",
+    "locale": "en-US",
+    "pageCaption": "E-Documents",
+    "actionCaption": "Create Document",
+    "sourceId": "microsoft-learn-expansion-finance-how-use-edocuments-purchase-en-us",
+    "sourceUri": "https://learn.microsoft.com/en-us/dynamics365/business-central/finance-how-use-edocuments-purchase"
+  },
+  {
+    "ruleId": "BCExpansion.CreatePurchaseDocument",
+    "locale": "sv-SE",
+    "pageCaption": "E-dokument",
+    "actionCaption": "Skapa dokument",
+    "sourceId": "microsoft-learn-expansion-finance-how-use-edocuments-purchase-sv-se",
+    "sourceUri": "https://learn.microsoft.com/sv-se/dynamics365/business-central/finance-how-use-edocuments-purchase"
+  },
+  {
+    "ruleId": "BCExpansion.CreatePurchaseDocument",
+    "locale": "fr-FR",
+    "pageCaption": "Document électronique",
+    "actionCaption": "Créer un document",
+    "sourceId": "microsoft-learn-expansion-finance-how-use-edocuments-purchase-fr-fr",
+    "sourceUri": "https://learn.microsoft.com/fr-fr/dynamics365/business-central/finance-how-use-edocuments-purchase"
+  },
+  {
+    "ruleId": "BCExpansion.CreatePurchaseDocument",
+    "locale": "de-DE",
+    "pageCaption": "E-Belege",
+    "actionCaption": "Beleg erstellen",
+    "sourceId": "microsoft-learn-expansion-finance-how-use-edocuments-purchase-de-de",
+    "sourceUri": "https://learn.microsoft.com/de-de/dynamics365/business-central/finance-how-use-edocuments-purchase"
+  },
+  {
+    "ruleId": "BCExpansion.CreatePurchaseDocument",
+    "locale": "de-DE",
+    "pageCaption": "E-Beleg",
+    "actionCaption": "Beleg erstellen",
+    "sourceId": "microsoft-learn-expansion-finance-how-use-edocuments-purchase-de-de",
+    "sourceUri": "https://learn.microsoft.com/de-de/dynamics365/business-central/finance-how-use-edocuments-purchase"
+  },
+  {
+    "ruleId": "BCExpansion.CreatePurchaseDocument",
+    "locale": "es-ES",
+    "pageCaption": "Documento electrónico",
+    "actionCaption": "Crear documento",
+    "sourceId": "microsoft-learn-expansion-finance-how-use-edocuments-purchase-es-es",
+    "sourceUri": "https://learn.microsoft.com/es-es/dynamics365/business-central/finance-how-use-edocuments-purchase"
+  },
+  {
+    "ruleId": "BCExpansion.CreatePurchaseDocument",
+    "locale": "es-ES",
+    "pageCaption": "Documentos electrónicos",
+    "actionCaption": "Crear documento",
+    "sourceId": "microsoft-learn-expansion-finance-how-use-edocuments-purchase-es-es",
+    "sourceUri": "https://learn.microsoft.com/es-es/dynamics365/business-central/finance-how-use-edocuments-purchase"
+  },
+  {
+    "ruleId": "BCExpansion.CreatePurchaseDocument",
+    "locale": "da-DK",
+    "pageCaption": "E-dokument",
+    "actionCaption": "Opret dokument",
+    "sourceId": "microsoft-learn-expansion-finance-how-use-edocuments-purchase-da-dk",
+    "sourceUri": "https://learn.microsoft.com/da-dk/dynamics365/business-central/finance-how-use-edocuments-purchase"
+  },
+  {
+    "ruleId": "BCExpansion.CreatePurchaseDocument",
+    "locale": "da-DK",
+    "pageCaption": "E-dokumenter",
+    "actionCaption": "Opret dokument",
+    "sourceId": "microsoft-learn-expansion-finance-how-use-edocuments-purchase-da-dk",
+    "sourceUri": "https://learn.microsoft.com/da-dk/dynamics365/business-central/finance-how-use-edocuments-purchase"
+  },
+  {
+    "ruleId": "BCExpansion.CreatePurchaseDocument",
+    "locale": "fi-FI",
+    "pageCaption": "Sähköinen asiakirja",
+    "actionCaption": "Luo asiakirja",
+    "sourceId": "microsoft-learn-expansion-finance-how-use-edocuments-purchase-fi-fi",
+    "sourceUri": "https://learn.microsoft.com/fi-fi/dynamics365/business-central/finance-how-use-edocuments-purchase"
+  },
+  {
+    "ruleId": "BCExpansion.CreatePurchaseDocument",
+    "locale": "fi-FI",
+    "pageCaption": "Sähköiset asiakirjat",
+    "actionCaption": "Luo asiakirja",
+    "sourceId": "microsoft-learn-expansion-finance-how-use-edocuments-purchase-fi-fi",
+    "sourceUri": "https://learn.microsoft.com/fi-fi/dynamics365/business-central/finance-how-use-edocuments-purchase"
+  },
+  {
+    "ruleId": "BCExpansion.CreatePurchaseDocument",
+    "locale": "nb-NO",
+    "pageCaption": "E-dokument",
+    "actionCaption": "Opprett dokument",
+    "sourceId": "microsoft-learn-expansion-finance-how-use-edocuments-purchase-nb-no",
+    "sourceUri": "https://learn.microsoft.com/nb-no/dynamics365/business-central/finance-how-use-edocuments-purchase"
+  },
+  {
+    "ruleId": "BCExpansion.CreatePurchaseDocument",
+    "locale": "nb-NO",
+    "pageCaption": "E-dokumenter",
+    "actionCaption": "Opprett dokument",
+    "sourceId": "microsoft-learn-expansion-finance-how-use-edocuments-purchase-nb-no",
+    "sourceUri": "https://learn.microsoft.com/nb-no/dynamics365/business-central/finance-how-use-edocuments-purchase"
+  },
+  {
+    "ruleId": "BCExpansion.ApplyEmployeeTemplate",
+    "locale": "en-US",
+    "pageCaption": "Employee Card",
+    "actionCaption": "Apply Template",
+    "sourceId": "microsoft-learn-expansion-hr-how-register-employees-en-us",
+    "sourceUri": "https://learn.microsoft.com/en-us/dynamics365/business-central/hr-how-register-employees"
+  },
+  {
+    "ruleId": "BCExpansion.ApplyEmployeeTemplate",
+    "locale": "sv-SE",
+    "pageCaption": "Personalkort",
+    "actionCaption": "tillämpa mall",
+    "sourceId": "microsoft-learn-expansion-hr-how-register-employees-sv-se",
+    "sourceUri": "https://learn.microsoft.com/sv-se/dynamics365/business-central/hr-how-register-employees"
+  },
+  {
+    "ruleId": "BCExpansion.ApplyEmployeeTemplate",
+    "locale": "fr-FR",
+    "pageCaption": "Fiche salarié",
+    "actionCaption": "Appliquer le modèle",
+    "sourceId": "microsoft-learn-expansion-hr-how-register-employees-fr-fr",
+    "sourceUri": "https://learn.microsoft.com/fr-fr/dynamics365/business-central/hr-how-register-employees"
+  },
+  {
+    "ruleId": "BCExpansion.ApplyEmployeeTemplate",
+    "locale": "de-DE",
+    "pageCaption": "Mitarbeiterkarte",
+    "actionCaption": "Vorlage anwenden",
+    "sourceId": "microsoft-learn-expansion-hr-how-register-employees-de-de",
+    "sourceUri": "https://learn.microsoft.com/de-de/dynamics365/business-central/hr-how-register-employees"
+  },
+  {
+    "ruleId": "BCExpansion.ApplyEmployeeTemplate",
+    "locale": "es-ES",
+    "pageCaption": "Ficha de empleado",
+    "actionCaption": "Aplicar plantilla",
+    "sourceId": "microsoft-learn-expansion-hr-how-register-employees-es-es",
+    "sourceUri": "https://learn.microsoft.com/es-es/dynamics365/business-central/hr-how-register-employees"
+  },
+  {
+    "ruleId": "BCExpansion.ApplyEmployeeTemplate",
+    "locale": "da-DK",
+    "pageCaption": "Medarbejderkort",
+    "actionCaption": "Anvend skabelon",
+    "sourceId": "microsoft-learn-expansion-hr-how-register-employees-da-dk",
+    "sourceUri": "https://learn.microsoft.com/da-dk/dynamics365/business-central/hr-how-register-employees"
+  },
+  {
+    "ruleId": "BCExpansion.ApplyEmployeeTemplate",
+    "locale": "fi-FI",
+    "pageCaption": "Työntekijäkortti",
+    "actionCaption": "Käytä mallia",
+    "sourceId": "microsoft-learn-expansion-hr-how-register-employees-fi-fi",
+    "sourceUri": "https://learn.microsoft.com/fi-fi/dynamics365/business-central/hr-how-register-employees"
+  },
+  {
+    "ruleId": "BCExpansion.ApplyEmployeeTemplate",
+    "locale": "nb-NO",
+    "pageCaption": "Ansattkort",
+    "actionCaption": "Bruk mal",
+    "sourceId": "microsoft-learn-expansion-hr-how-register-employees-nb-no",
+    "sourceUri": "https://learn.microsoft.com/nb-no/dynamics365/business-central/hr-how-register-employees"
+  },
+  {
+    "ruleId": "BCExpansion.SendApproval",
+    "locale": "en-US",
+    "pageCaption": "Purchase Order",
+    "actionCaption": "Send Approval Request",
+    "sourceId": "microsoft-learn-expansion-across-how-use-approval-workflows-en-us",
+    "sourceUri": "https://learn.microsoft.com/en-us/dynamics365/business-central/across-how-use-approval-workflows"
+  },
+  {
+    "ruleId": "BCExpansion.SendApproval",
+    "locale": "sv-SE",
+    "pageCaption": "Inköpsorder",
+    "actionCaption": "Skicka godkännandebegäran",
+    "sourceId": "microsoft-learn-expansion-across-how-use-approval-workflows-sv-se",
+    "sourceUri": "https://learn.microsoft.com/sv-se/dynamics365/business-central/across-how-use-approval-workflows"
+  },
+  {
+    "ruleId": "BCExpansion.SendApproval",
+    "locale": "fr-FR",
+    "pageCaption": "Purchase Order",
+    "actionCaption": "Envoyer demande d’approbation",
+    "sourceId": "microsoft-learn-expansion-across-how-use-approval-workflows-fr-fr",
+    "sourceUri": "https://learn.microsoft.com/fr-fr/dynamics365/business-central/across-how-use-approval-workflows"
+  },
+  {
+    "ruleId": "BCExpansion.SendApproval",
+    "locale": "de-DE",
+    "pageCaption": "Purchase Order",
+    "actionCaption": "Genehmigungsantrag senden",
+    "sourceId": "microsoft-learn-expansion-across-how-use-approval-workflows-de-de",
+    "sourceUri": "https://learn.microsoft.com/de-de/dynamics365/business-central/across-how-use-approval-workflows"
+  },
+  {
+    "ruleId": "BCExpansion.SendApproval",
+    "locale": "es-ES",
+    "pageCaption": "Purchase Order",
+    "actionCaption": "Enviar solicitud de aprobación",
+    "sourceId": "microsoft-learn-expansion-across-how-use-approval-workflows-es-es",
+    "sourceUri": "https://learn.microsoft.com/es-es/dynamics365/business-central/across-how-use-approval-workflows"
+  },
+  {
+    "ruleId": "BCExpansion.SendApproval",
+    "locale": "da-DK",
+    "pageCaption": "Purchase Order",
+    "actionCaption": "Send godkendelsesanmodning",
+    "sourceId": "microsoft-learn-expansion-across-how-use-approval-workflows-da-dk",
+    "sourceUri": "https://learn.microsoft.com/da-dk/dynamics365/business-central/across-how-use-approval-workflows"
+  },
+  {
+    "ruleId": "BCExpansion.SendApproval",
+    "locale": "fi-FI",
+    "pageCaption": "Purchase Order",
+    "actionCaption": "Lähetä hyväksymispyyntö",
+    "sourceId": "microsoft-learn-expansion-across-how-use-approval-workflows-fi-fi",
+    "sourceUri": "https://learn.microsoft.com/fi-fi/dynamics365/business-central/across-how-use-approval-workflows"
+  },
+  {
+    "ruleId": "BCExpansion.SendApproval",
+    "locale": "nb-NO",
+    "pageCaption": "Purchase Order",
+    "actionCaption": "Send godkjenningsforespørsel",
+    "sourceId": "microsoft-learn-expansion-across-how-use-approval-workflows-nb-no",
+    "sourceUri": "https://learn.microsoft.com/nb-no/dynamics365/business-central/across-how-use-approval-workflows"
+  },
+  {
+    "ruleId": "BCExpansion.CancelApproval",
+    "locale": "en-US",
+    "pageCaption": "Purchase Invoice",
+    "actionCaption": "Cancel Approval Request",
+    "sourceId": "microsoft-learn-expansion-across-how-use-approval-workflows-en-us",
+    "sourceUri": "https://learn.microsoft.com/en-us/dynamics365/business-central/across-how-use-approval-workflows"
+  },
+  {
+    "ruleId": "BCExpansion.CancelApproval",
+    "locale": "sv-SE",
+    "pageCaption": "Inköpsfaktura",
+    "actionCaption": "Avbryt godkännandebegäran",
+    "sourceId": "microsoft-learn-expansion-across-how-use-approval-workflows-sv-se",
+    "sourceUri": "https://learn.microsoft.com/sv-se/dynamics365/business-central/across-how-use-approval-workflows"
+  },
+  {
+    "ruleId": "BCExpansion.CancelApproval",
+    "locale": "fr-FR",
+    "pageCaption": "Purchase Invoice",
+    "actionCaption": "Annuler demande d’approbation",
+    "sourceId": "microsoft-learn-expansion-across-how-use-approval-workflows-fr-fr",
+    "sourceUri": "https://learn.microsoft.com/fr-fr/dynamics365/business-central/across-how-use-approval-workflows"
+  },
+  {
+    "ruleId": "BCExpansion.CancelApproval",
+    "locale": "de-DE",
+    "pageCaption": "Purchase Invoice",
+    "actionCaption": "Genehmigungsanfrage stornieren",
+    "sourceId": "microsoft-learn-expansion-across-how-use-approval-workflows-de-de",
+    "sourceUri": "https://learn.microsoft.com/de-de/dynamics365/business-central/across-how-use-approval-workflows"
+  },
+  {
+    "ruleId": "BCExpansion.CancelApproval",
+    "locale": "es-ES",
+    "pageCaption": "Purchase Invoice",
+    "actionCaption": "Cancelar solicitud de aprobación",
+    "sourceId": "microsoft-learn-expansion-across-how-use-approval-workflows-es-es",
+    "sourceUri": "https://learn.microsoft.com/es-es/dynamics365/business-central/across-how-use-approval-workflows"
+  },
+  {
+    "ruleId": "BCExpansion.CancelApproval",
+    "locale": "da-DK",
+    "pageCaption": "Purchase Invoice",
+    "actionCaption": "Annuller godkendelsesanmodning",
+    "sourceId": "microsoft-learn-expansion-across-how-use-approval-workflows-da-dk",
+    "sourceUri": "https://learn.microsoft.com/da-dk/dynamics365/business-central/across-how-use-approval-workflows"
+  },
+  {
+    "ruleId": "BCExpansion.CancelApproval",
+    "locale": "fi-FI",
+    "pageCaption": "Purchase Invoice",
+    "actionCaption": "Peruuta hyväksymispyyntö",
+    "sourceId": "microsoft-learn-expansion-across-how-use-approval-workflows-fi-fi",
+    "sourceUri": "https://learn.microsoft.com/fi-fi/dynamics365/business-central/across-how-use-approval-workflows"
+  },
+  {
+    "ruleId": "BCExpansion.CancelApproval",
+    "locale": "nb-NO",
+    "pageCaption": "Purchase Invoice",
+    "actionCaption": "Annuller godkjenningsforespørsel",
+    "sourceId": "microsoft-learn-expansion-across-how-use-approval-workflows-nb-no",
+    "sourceUri": "https://learn.microsoft.com/nb-no/dynamics365/business-central/across-how-use-approval-workflows"
+  },
+  {
+    "ruleId": "BCExpansion.PostPhysicalInventory",
+    "locale": "en-US",
+    "pageCaption": "Phys. Inventory Journal",
+    "actionCaption": "Post",
+    "sourceId": "microsoft-learn-expansion-inventory-how-count-adjust-reclassify-en-us",
+    "sourceUri": "https://learn.microsoft.com/en-us/dynamics365/business-central/inventory-how-count-adjust-reclassify"
+  },
+  {
+    "ruleId": "BCExpansion.PostPhysicalInventory",
+    "locale": "sv-SE",
+    "pageCaption": "Inventeringsjournal",
+    "actionCaption": "Bokför",
+    "sourceId": "microsoft-learn-expansion-inventory-how-count-adjust-reclassify-sv-se",
+    "sourceUri": "https://learn.microsoft.com/sv-se/dynamics365/business-central/inventory-how-count-adjust-reclassify"
+  },
+  {
+    "ruleId": "BCExpansion.PostPhysicalInventory",
+    "locale": "fr-FR",
+    "pageCaption": "Feuille inventaire",
+    "actionCaption": "Valider",
+    "sourceId": "microsoft-learn-expansion-inventory-how-count-adjust-reclassify-fr-fr",
+    "sourceUri": "https://learn.microsoft.com/fr-fr/dynamics365/business-central/inventory-how-count-adjust-reclassify"
+  },
+  {
+    "ruleId": "BCExpansion.PostPhysicalInventory",
+    "locale": "de-DE",
+    "pageCaption": "Inventur Buch.-Blatt",
+    "actionCaption": "Buchen",
+    "sourceId": "microsoft-learn-expansion-inventory-how-count-adjust-reclassify-de-de",
+    "sourceUri": "https://learn.microsoft.com/de-de/dynamics365/business-central/inventory-how-count-adjust-reclassify"
+  },
+  {
+    "ruleId": "BCExpansion.PostPhysicalInventory",
+    "locale": "es-ES",
+    "pageCaption": "Diario inventario físico",
+    "actionCaption": "Registrar",
+    "sourceId": "microsoft-learn-expansion-inventory-how-count-adjust-reclassify-es-es",
+    "sourceUri": "https://learn.microsoft.com/es-es/dynamics365/business-central/inventory-how-count-adjust-reclassify"
+  },
+  {
+    "ruleId": "BCExpansion.PostPhysicalInventory",
+    "locale": "da-DK",
+    "pageCaption": "Lageropgørelseskladde",
+    "actionCaption": "Bogfør",
+    "sourceId": "microsoft-learn-expansion-inventory-how-count-adjust-reclassify-da-dk",
+    "sourceUri": "https://learn.microsoft.com/da-dk/dynamics365/business-central/inventory-how-count-adjust-reclassify"
+  },
+  {
+    "ruleId": "BCExpansion.PostPhysicalInventory",
+    "locale": "fi-FI",
+    "pageCaption": "Inventointipäiväkirja",
+    "actionCaption": "Kirjaus",
+    "sourceId": "microsoft-learn-expansion-inventory-how-count-adjust-reclassify-fi-fi",
+    "sourceUri": "https://learn.microsoft.com/fi-fi/dynamics365/business-central/inventory-how-count-adjust-reclassify"
+  },
+  {
+    "ruleId": "BCExpansion.PostPhysicalInventory",
+    "locale": "nb-NO",
+    "pageCaption": "Vareopptellingskladd",
+    "actionCaption": "Bokfør",
+    "sourceId": "microsoft-learn-expansion-inventory-how-count-adjust-reclassify-nb-no",
+    "sourceUri": "https://learn.microsoft.com/nb-no/dynamics365/business-central/inventory-how-count-adjust-reclassify"
+  },
+  {
+    "ruleId": "BCExpansion.BillingThroughDate",
+    "locale": "en-US",
+    "pageCaption": "Recurring Billing",
+    "fieldCaption": "Billing to Date",
+    "sourceId": "microsoft-learn-expansion-srb-recurring-billing-en-us",
+    "sourceUri": "https://learn.microsoft.com/en-us/dynamics365/business-central/srb/recurring-billing"
+  },
+  {
+    "ruleId": "BCExpansion.BillingThroughDate",
+    "locale": "sv-SE",
+    "pageCaption": "Återkommande fakturering",
+    "fieldCaption": "Faktureringsslutdatum",
+    "sourceId": "microsoft-learn-expansion-srb-recurring-billing-sv-se",
+    "sourceUri": "https://learn.microsoft.com/sv-se/dynamics365/business-central/srb/recurring-billing"
+  },
+  {
+    "ruleId": "BCExpansion.BillingThroughDate",
+    "locale": "fr-FR",
+    "pageCaption": "Facturation récurrente",
+    "fieldCaption": "Date de facturation jusqu’au",
+    "sourceId": "microsoft-learn-expansion-srb-recurring-billing-fr-fr",
+    "sourceUri": "https://learn.microsoft.com/fr-fr/dynamics365/business-central/srb/recurring-billing"
+  },
+  {
+    "ruleId": "BCExpansion.BillingThroughDate",
+    "locale": "de-DE",
+    "pageCaption": "Wiederkehrende Abrechnung",
+    "fieldCaption": "Abrechnung bis Datum",
+    "sourceId": "microsoft-learn-expansion-srb-recurring-billing-de-de",
+    "sourceUri": "https://learn.microsoft.com/de-de/dynamics365/business-central/srb/recurring-billing"
+  },
+  {
+    "ruleId": "BCExpansion.BillingThroughDate",
+    "locale": "es-ES",
+    "pageCaption": "Facturación recurrente",
+    "fieldCaption": "Facturación hasta la fecha",
+    "sourceId": "microsoft-learn-expansion-srb-recurring-billing-es-es",
+    "sourceUri": "https://learn.microsoft.com/es-es/dynamics365/business-central/srb/recurring-billing"
+  },
+  {
+    "ruleId": "BCExpansion.BillingThroughDate",
+    "locale": "da-DK",
+    "pageCaption": "Tilbagevendende fakturering",
+    "fieldCaption": "Fakturering til dato",
+    "sourceId": "microsoft-learn-expansion-srb-recurring-billing-da-dk",
+    "sourceUri": "https://learn.microsoft.com/da-dk/dynamics365/business-central/srb/recurring-billing"
+  },
+  {
+    "ruleId": "BCExpansion.BillingThroughDate",
+    "locale": "fi-FI",
+    "pageCaption": "Toistuva laskutus",
+    "fieldCaption": "Laskutuksen päättymispäivämäärä",
+    "sourceId": "microsoft-learn-expansion-srb-recurring-billing-fi-fi",
+    "sourceUri": "https://learn.microsoft.com/fi-fi/dynamics365/business-central/srb/recurring-billing"
+  },
+  {
+    "ruleId": "BCExpansion.BillingThroughDate",
+    "locale": "nb-NO",
+    "pageCaption": "Gjentakende fakturering",
+    "fieldCaption": "Faktureringssluttdato",
+    "sourceId": "microsoft-learn-expansion-srb-recurring-billing-nb-no",
+    "sourceUri": "https://learn.microsoft.com/nb-no/dynamics365/business-central/srb/recurring-billing"
+  },
+  {
+    "ruleId": "Sustainability.EnterPurchaseDocumentEmissions",
+    "locale": "en-US",
+    "pageCaption": "Purchase Order",
+    "fieldCaption": "Sustainability Account No.",
+    "sourceId": "microsoft-learn-expansion-finance-sustainability-journal-en-us",
+    "sourceUri": "https://learn.microsoft.com/en-us/dynamics365/business-central/finance-sustainability-journal"
+  },
+  {
+    "ruleId": "Sustainability.EnterPurchaseDocumentEmissions",
+    "locale": "en-US",
+    "pageCaption": "Purchase Invoice",
+    "fieldCaption": "Emission CO2",
+    "sourceId": "microsoft-learn-expansion-finance-sustainability-journal-en-us",
+    "sourceUri": "https://learn.microsoft.com/en-us/dynamics365/business-central/finance-sustainability-journal"
+  },
+  {
+    "ruleId": "Sustainability.EnterPurchaseDocumentEmissions",
+    "locale": "sv-SE",
+    "pageCaption": "Inköpsorder",
+    "fieldCaption": "Hållbarhetskontonr.",
+    "sourceId": "microsoft-learn-expansion-finance-sustainability-journal-sv-se",
+    "sourceUri": "https://learn.microsoft.com/sv-se/dynamics365/business-central/finance-sustainability-journal"
+  },
+  {
+    "ruleId": "Sustainability.EnterPurchaseDocumentEmissions",
+    "locale": "sv-SE",
+    "pageCaption": "Inköpsfaktura",
+    "fieldCaption": "Utsläpp CO2",
+    "sourceId": "microsoft-learn-expansion-finance-sustainability-journal-sv-se",
+    "sourceUri": "https://learn.microsoft.com/sv-se/dynamics365/business-central/finance-sustainability-journal"
+  },
+  {
+    "ruleId": "BCAssembly.AssemblyPolicyContext",
+    "locale": "en-US",
+    "pageCaption": "Item Card",
+    "fieldCaption": "Assembly Policy",
+    "sourceId": "microsoft-learn-assembly-policy-en-us",
+    "sourceUri": "https://learn.microsoft.com/en-us/dynamics365/business-central/assembly-assemble-to-order-or-assemble-to-stock"
+  },
+  {
+    "ruleId": "BCAssembly.AssemblyPolicyContext",
+    "locale": "sv-SE",
+    "pageCaption": "Artikelkort",
+    "fieldCaption": "Monteringsprincip",
+    "sourceId": "microsoft-learn-assembly-policy-sv-se",
+    "sourceUri": "https://learn.microsoft.com/sv-se/dynamics365/business-central/assembly-assemble-to-order-or-assemble-to-stock"
+  },
+  {
+    "ruleId": "BCExpansion.CreateApprovalUser",
+    "locale": "en-US",
+    "pageCaption": "Approval User Setup",
+    "actionCaption": "New",
+    "sourceId": "approval-user-setup-en-us",
+    "sourceUri": "https://learn.microsoft.com/en-us/dynamics365/business-central/across-how-to-set-up-approval-users"
+  },
+  {
+    "ruleId": "BCExpansion.CreateApprovalUser",
+    "locale": "sv-SE",
+    "pageCaption": "Användarinställningar för godkännande",
+    "actionCaption": "Ny",
+    "sourceId": "approval-user-setup-sv-se",
+    "sourceUri": "https://learn.microsoft.com/sv-se/dynamics365/business-central/across-how-to-set-up-approval-users"
+  }
+]

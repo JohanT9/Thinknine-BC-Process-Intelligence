@@ -1,0 +1,428 @@
+{
+  "packId": "bc-subscription-billing",
+  "name": "Business Central subscription-billing",
+  "version": "1.0.0",
+  "priority": 220,
+  "rules": [
+    {
+      "ruleId": "BCExpansion.CreateProposal",
+      "taskType": "CreateProposal",
+      "semanticAction": "CreateProposal",
+      "entity": "RecurringBilling",
+      "priority": 1300,
+      "confidence": 0.96,
+      "match": {
+        "pagePatterns": [
+          "^Recurring Billing$",
+          "^Återkommande fakturering$",
+          "^Facturation récurrente$",
+          "^Wiederkehrende Abrechnung$",
+          "^Facturación recurrente$",
+          "^Tilbagevendende fakturering$",
+          "^Toistuva laskutus$",
+          "^Gjentakende fakturering$"
+        ],
+        "actionPatterns": [
+          "^Create Billing Proposal$",
+          "^Skapa faktureringsförslag$",
+          "^Créer une proposition de facturation$",
+          "^Rechnungsvorschlag erstellen$",
+          "^Crear propuesta de facturación$",
+          "^Opret faktureringsforslag$",
+          "^Luo laskutusehdotus$",
+          "^Opprett faktureringsforslag$"
+        ],
+        "fieldPatterns": [],
+        "automationIdPatterns": []
+      },
+      "instructionTemplate": "",
+      "languages": [
+        "en-US",
+        "sv-SE",
+        "fr-FR",
+        "de-DE",
+        "es-ES",
+        "da-DK",
+        "fi-FI",
+        "nb-NO"
+      ],
+      "aliases": [],
+      "sourceIds": [
+        "microsoft-learn-expansion-srb-recurring-billing-en-us",
+        "microsoft-learn-expansion-srb-recurring-billing-sv-se",
+        "microsoft-learn-expansion-srb-recurring-billing-fr-fr",
+        "microsoft-learn-expansion-srb-recurring-billing-de-de",
+        "microsoft-learn-expansion-srb-recurring-billing-es-es",
+        "microsoft-learn-expansion-srb-recurring-billing-da-dk",
+        "microsoft-learn-expansion-srb-recurring-billing-fi-fi",
+        "microsoft-learn-expansion-srb-recurring-billing-nb-no"
+      ],
+      "localizedExplanations": {
+        "en-US": "Creates billing proposal lines from eligible subscription lines using the Billing Date, Next Billing Date and (when set) Billing to Date. Check the contract/subscription, proposed service period, quantities, pricing and amount; one line can appear only once per billing period. Creating a proposal is not invoice creation or posting, and Next Billing Date may update to reflect the proposal. If contract data changes, refresh/update the proposal before creating documents.",
+        "sv-SE": "Skapar faktureringsförslagsrader från abonnemangsrader som uppfyller villkoren, utifrån Faktureringsdatum, Nästa faktureringsdatum och vid behov Faktureringsslutdatum. Kontrollera avtal/abonnemang, tjänsteperiod, antal, pris och belopp; samma rad kan bara ingå en gång per faktureringsperiod. Förslaget skapar ingen faktura och bokför inget, men Nästa faktureringsdatum kan uppdateras för att återspegla förslaget. Uppdatera förslaget om avtalsdata ändras innan du skapar dokument.",
+        "fr-FR": "Cette action propose les lignes de contrat d’abonnement à facturer selon les dates et le rythme de facturation. Vérifiez périodes et montants. Une proposition n’est ni une facture ni une écriture validée.",
+        "de-DE": "Es werden fällige Abonnementvertragszeilen anhand von Abrechnungsdaten und Rhythmus vorgeschlagen. Prüfen Sie Zeiträume und Beträge. Ein Vorschlag ist weder eine Rechnung noch eine Buchung.",
+        "es-ES": "Propone líneas de contratos de suscripción según fechas y ritmo de facturación. Revise períodos e importes. La propuesta no es una factura ni un movimiento registrado.",
+        "da-DK": "Her foreslås abonnementskontraktlinjer ud fra faktureringsdatoer og rytme. Kontroller perioder og beløb. Forslaget er ikke en faktura eller bogført post.",
+        "fi-FI": "Toiminto ehdottaa laskutettavia tilaussopimusrivejä päivämäärien ja laskutusvälin perusteella. Tarkista jaksot ja summat. Ehdotus ei ole lasku tai kirjattu tapahtuma.",
+        "nb-NO": "Her foreslås abonnementskontraktlinjer ut fra faktureringsdatoer og frekvens. Kontroller perioder og beløp. Forslaget er ikke en faktura eller bokført post."
+      }
+    },
+    {
+      "ruleId": "BCExpansion.CreateDocuments",
+      "taskType": "CreateDocuments",
+      "semanticAction": "CreateDocuments",
+      "entity": "RecurringBilling",
+      "priority": 1300,
+      "confidence": 0.96,
+      "match": {
+        "pagePatterns": [
+          "^Recurring Billing$",
+          "^Återkommande fakturering$",
+          "^Facturation récurrente$",
+          "^Wiederkehrende Abrechnung$",
+          "^Facturación recurrente$",
+          "^Tilbagevendende fakturering$",
+          "^Toistuva laskutus$",
+          "^Gjentakende fakturering$"
+        ],
+        "actionPatterns": [
+          "^Create Documents$",
+          "^Skapa dokument$",
+          "^Créer documents$",
+          "^Belege erstellen$",
+          "^Crear documentos$",
+          "^Opret dokumenter$",
+          "^Luo asiakirjat$",
+          "^Opprett dokumenter$"
+        ],
+        "fieldPatterns": [],
+        "automationIdPatterns": []
+      },
+      "instructionTemplate": "",
+      "languages": [
+        "en-US",
+        "sv-SE",
+        "fr-FR",
+        "de-DE",
+        "es-ES",
+        "da-DK",
+        "fi-FI",
+        "nb-NO"
+      ],
+      "aliases": [],
+      "sourceIds": [
+        "microsoft-learn-expansion-srb-recurring-billing-en-us",
+        "microsoft-learn-expansion-srb-recurring-billing-sv-se",
+        "microsoft-learn-expansion-srb-recurring-billing-fr-fr",
+        "microsoft-learn-expansion-srb-recurring-billing-de-de",
+        "microsoft-learn-expansion-srb-recurring-billing-es-es",
+        "microsoft-learn-expansion-srb-recurring-billing-da-dk",
+        "microsoft-learn-expansion-srb-recurring-billing-fi-fi",
+        "microsoft-learn-expansion-srb-recurring-billing-nb-no"
+      ],
+      "localizedExplanations": {
+        "en-US": "Creates an invoice or credit memo for each eligible proposal line that has no document; the sign of the total amount determines invoice versus credit memo. Check document date, posting date, grouping (per contract, contract partner or invoice recipient) and whether Post documents is selected. Posting updates receivables/payables and the G/L according to setup. If a proposal line is marked Update Required, refresh it first; lines with an existing document cannot be billed again. Creating a document does not mean it was posted unless that option was enabled.",
+        "sv-SE": "Skapar faktura eller kreditnota för varje giltig förslagsrad som saknar dokument; totalsummans tecken avgör om det blir faktura eller kreditnota. Kontrollera dokumentdatum, bokföringsdatum, gruppering (per avtal, avtalspart eller fakturamottagare) och om Bokför dokument är valt. Bokföring uppdaterar kund-/leverantörsreskontra och redovisning enligt inställningarna. Uppdatera först förslagsrader som kräver uppdatering; en rad som redan har ett dokument kan inte faktureras igen. Dokumentet bokförs bara om alternativet för bokföring är aktiverat.",
+        "fr-FR": "Cette action crée les factures ou avoirs d’abonnement pour les lignes sans document. Vérifiez les dates et l’option de validation automatique : la création peut aussi valider les documents si elle est activée.",
+        "de-DE": "Für Vorschlagszeilen ohne Beleg werden Abonnementrechnungen oder Gutschriften erstellt. Prüfen Sie Beleg- und Buchungsdatum sowie die automatische Buchungsoption; ist sie aktiv, kann die Erstellung zugleich buchen.",
+        "es-ES": "Crea facturas o abonos de suscripción para líneas sin documentos. Revise fechas y la opción de registro automático; si está activada, la creación también puede registrar los documentos.",
+        "da-DK": "Der oprettes abonnementsfakturaer eller kreditnotaer for forslag uden dokumenter. Kontroller bilags- og bogføringsdato samt automatisk bogføring; hvis valgt, kan oprettelsen også bogføre dokumenterne.",
+        "fi-FI": "Toiminto luo tilauslaskut tai hyvityslaskut ehdotusriveille, joilla ei ole asiakirjaa. Tarkista asiakirja- ja kirjauspäivät sekä automaattinen kirjaus: käytössä oleva valinta voi myös kirjata asiakirjat.",
+        "nb-NO": "Det opprettes abonnementsfakturaer eller kreditnotaer for forslag uten dokumenter. Kontroller dokument- og bokføringsdato og automatisk bokføring; er den valgt, kan opprettelsen også bokføre dokumentene."
+      }
+    },
+    {
+      "ruleId": "BCExpansion.BillingThroughDate",
+      "taskType": "BillingThroughDate",
+      "semanticAction": "BillingThroughDate",
+      "entity": "RecurringBilling",
+      "priority": 1300,
+      "confidence": 0.96,
+      "match": {
+        "pagePatterns": [
+          "^Recurring Billing$",
+          "^Återkommande fakturering$",
+          "^Facturation récurrente$",
+          "^Wiederkehrende Abrechnung$",
+          "^Facturación recurrente$",
+          "^Tilbagevendende fakturering$",
+          "^Toistuva laskutus$",
+          "^Gjentakende fakturering$"
+        ],
+        "actionPatterns": [],
+        "fieldPatterns": [
+          "^Billing to Date$",
+          "^Faktureringsslutdatum$",
+          "^Date de facturation jusqu’au$",
+          "^Abrechnung bis Datum$",
+          "^Facturación hasta la fecha$",
+          "^Fakturering til dato$",
+          "^Laskutuksen päättymispäivämäärä$",
+          "^Faktureringssluttdato$"
+        ],
+        "automationIdPatterns": []
+      },
+      "instructionTemplate": "",
+      "languages": [
+        "en-US",
+        "sv-SE",
+        "fr-FR",
+        "de-DE",
+        "es-ES",
+        "da-DK",
+        "fi-FI",
+        "nb-NO"
+      ],
+      "aliases": [],
+      "sourceIds": [
+        "microsoft-learn-expansion-srb-recurring-billing-en-us",
+        "microsoft-learn-expansion-srb-recurring-billing-sv-se",
+        "microsoft-learn-expansion-srb-recurring-billing-fr-fr",
+        "microsoft-learn-expansion-srb-recurring-billing-de-de",
+        "microsoft-learn-expansion-srb-recurring-billing-es-es",
+        "microsoft-learn-expansion-srb-recurring-billing-da-dk",
+        "microsoft-learn-expansion-srb-recurring-billing-fi-fi",
+        "microsoft-learn-expansion-srb-recurring-billing-nb-no"
+      ],
+      "localizedExplanations": {
+        "en-US": "Sets the end of the service/billing period used for proposal lines; it can shorten or extend the period implied by the contract's billing rhythm and changes the period to be invoiced. It does not set the invoice document or posting date. Check proration and amount consequences, and ensure the date does not bill beyond the contract/subscription validity.",
+        "sv-SE": "Anger slutet på tjänste-/faktureringsperioden för förslagsraderna. Datumet kan förkorta eller förlänga perioden som följer av avtalets faktureringstakt och ändrar vilken period som faktureras. Det är inte fakturans dokument- eller bokföringsdatum. Kontrollera periodisering och belopp samt att datumet inte fakturerar efter avtalets eller abonnemangets giltighetstid.",
+        "fr-FR": "Ce champ fixe la fin de la période proposée et peut la raccourcir ou la prolonger par rapport au rythme prévu. Ce n’est pas la date de validation comptable.",
+        "de-DE": "Das Feld legt das Ende des vorgeschlagenen Abrechnungszeitraums fest und kann ihn gegenüber dem Rhythmus verkürzen oder verlängern. Es ist nicht das Buchungsdatum.",
+        "es-ES": "Fija el final del período propuesto y puede acortarlo o ampliarlo respecto al ritmo previsto. No es la fecha de registro de la factura.",
+        "da-DK": "Feltet angiver slutdatoen for den foreslåede periode og kan forkorte eller forlænge den i forhold til rytmen. Det er ikke fakturaens bogføringsdato.",
+        "fi-FI": "Kenttä määrittää ehdotetun laskutusjakson loppupäivän ja voi lyhentää tai pidentää jaksoa laskutusväliin nähden. Se ei ole laskun kirjauspäivä.",
+        "nb-NO": "Feltet angir sluttdatoen for foreslått periode og kan forkorte eller forlenge den i forhold til frekvensen. Det er ikke fakturaens bokføringsdato."
+      }
+    },
+    {
+      "ruleId": "SubscriptionBilling.ManualContractLine",
+      "taskType": "CreateSubscriptionContractLine",
+      "semanticAction": "CreateSubscriptionContractLine",
+      "entity": "SubscriptionContract",
+      "priority": 1380,
+      "confidence": 0.97,
+      "match": {
+        "pagePatterns": [
+          "^Customer Subscription Contract$",
+          "^Customer Subscription Contract Card$",
+          "^Vendor Subscription Contract$",
+          "^Vendor Subscription Contract Card$"
+        ],
+        "actionPatterns": [],
+        "fieldPatterns": [
+          "^Type$"
+        ],
+        "automationIdPatterns": []
+      },
+      "instructionTemplate": "",
+      "languages": [
+        "en-US",
+        "sv-SE",
+        "fr-FR",
+        "de-DE",
+        "es-ES",
+        "da-DK",
+        "fi-FI",
+        "nb-NO"
+      ],
+      "verifiedRuntimeLocales": [
+        "en-US"
+      ],
+      "aliases": [],
+      "sourceIds": [
+        "microsoft-learn-srb-manual-contract-lines-en-us"
+      ],
+      "localizedExplanations": {
+        "en-US": "On a customer or vendor subscription contract, choosing Item or G/L Account for a new line starts a manually created recurring-billing line. Complete the item/account, start date, billing rhythm and base period, quantity, and calculation base and percentage; the linked subscription is created only after all mandatory fields are complete. Missing required fields prevent creation. Changing the line type is treated as deleting the line, and deleting an unprocessed line can also delete its linked subscription. Use a negative quantity only for a deliberate credit scenario, and check the end date so it is billed once.",
+        "sv-SE": "På ett kund- eller leverantörsabonnemangsavtal startar valet Artikel eller Huvudbokskonto på en ny rad en manuellt skapad rad för återkommande fakturering. Fyll i artikel/konto, startdatum, faktureringsintervall och basperiod, antal samt beräkningsbas och procentsats. Det länkade abonnemanget skapas först när alla obligatoriska fält är ifyllda; saknade fält stoppar skapandet. Om radtypen ändras behandlas det som att raden tas bort, och borttagning av en rad som inte har bearbetats kan även ta bort det länkade abonnemanget. Använd negativt antal bara vid en avsiktlig kreditering och kontrollera slutdatumet så att raden faktureras en gång.",
+        "fr-FR": "Sur un contrat d’abonnement client ou fournisseur, choisir Article ou Compte général sur une nouvelle ligne lance la création manuelle d’une ligne de facturation récurrente. Renseignez l’article/le compte, la date de début, le rythme et la période de base de facturation, la quantité ainsi que la base et le pourcentage de calcul ; l’abonnement lié n’est créé qu’une fois tous les champs obligatoires remplis. Un champ requis manquant bloque la création. Modifier le type est traité comme une suppression de ligne, et supprimer une ligne non traitée peut aussi supprimer l’abonnement lié. Utilisez une quantité négative uniquement pour un avoir volontaire et vérifiez la date de fin pour qu’elle ne soit facturée qu’une fois.",
+        "de-DE": "Auf einem Kunden- oder Lieferantenabonnementvertrag startet die Auswahl Artikel oder Sachkonto in einer neuen Zeile eine manuell angelegte Zeile für wiederkehrende Abrechnung. Füllen Sie Artikel/Konto, Startdatum, Abrechnungsrhythmus und Basisperiode, Menge sowie Berechnungsbasis und Prozentsatz aus; das verknüpfte Abonnement wird erst erstellt, wenn alle Pflichtfelder vollständig sind. Fehlende Pflichtfelder verhindern die Anlage. Eine Änderung des Zeilentyps gilt als Löschen der Zeile, und das Löschen einer noch nicht verarbeiteten Zeile kann auch das verknüpfte Abonnement löschen. Verwenden Sie eine negative Menge nur für eine beabsichtigte Gutschrift und prüfen Sie das Enddatum, damit die Zeile nur einmal abgerechnet wird.",
+        "es-ES": "En un contrato de suscripción de cliente o proveedor, elegir Producto o Cuenta contable en una línea nueva inicia la creación manual de una línea de facturación recurrente. Complete el producto/cuenta, fecha de inicio, ritmo y período base de facturación, cantidad, base de cálculo y porcentaje; la suscripción vinculada solo se crea cuando se rellenan todos los campos obligatorios. Si falta alguno, no se crea. Cambiar el tipo se trata como eliminar la línea, y eliminar una línea aún no procesada también puede eliminar la suscripción vinculada. Use una cantidad negativa solo para un abono intencionado y compruebe la fecha final para que se facture una sola vez.",
+        "da-DK": "På en kunde- eller leverandørabonnementskontrakt starter valget Vare eller Finanskontonr. på en ny linje oprettelsen af en manuelt oprettet linje til tilbagevendende fakturering. Udfyld vare/konto, startdato, faktureringsrytme og basisperiode, antal samt beregningsgrundlag og procent; det tilknyttede abonnement oprettes først, når alle obligatoriske felter er udfyldt. Manglende obligatoriske felter forhindrer oprettelsen. Ændring af linjetypen behandles som sletning af linjen, og sletning af en ubehandlet linje kan også slette det tilknyttede abonnement. Brug kun et negativt antal til en tilsigtet kreditering, og kontroller slutdatoen, så linjen kun faktureres én gang.",
+        "fi-FI": "Asiakkaan tai toimittajan tilaussopimuksen uudella rivillä valinta Nimike tai Pääkirjatili käynnistää manuaalisen toistuvan laskutusrivin luonnin. Täytä nimike/tili, aloituspäivä, laskutusrytmi ja perusjakso, määrä sekä laskentaperuste ja prosentti; linkitetty tilaus luodaan vasta, kun kaikki pakolliset kentät on täytetty. Puuttuva pakollinen kenttä estää luonnin. Rivin tyypin muuttaminen käsitellään rivin poistona, ja keskeneräisen rivin poistaminen voi poistaa myös siihen liittyvän tilauksen. Käytä negatiivista määrää vain tarkoitukselliseen hyvitykseen ja tarkista päättymispäivä, jotta rivi laskutetaan vain kerran.",
+        "nb-NO": "På en kunde- eller leverandørabonnementskontrakt starter valget Vare eller Finanskonto på en ny linje opprettelsen av en manuelt registrert linje for gjentakende fakturering. Fyll ut vare/konto, startdato, faktureringsrytme og basisperiode, antall samt beregningsgrunnlag og prosent; det tilknyttede abonnementet opprettes først når alle obligatoriske felt er fylt ut. Manglende obligatoriske felt hindrer opprettelsen. Endring av linjetype behandles som sletting av linjen, og sletting av en ubehandlet linje kan også slette det tilknyttede abonnementet. Bruk negativt antall bare ved en tilsiktet kreditering, og kontroller sluttdatoen slik at linjen bare faktureres én gang."
+      }
+    }
+  ],
+  "sources": [
+    {
+      "sourceId": "microsoft-learn-srb-manual-contract-lines-en-us",
+      "title": "Manually create contract lines - Business Central | Microsoft Learn",
+      "sourceUri": "https://learn.microsoft.com/en-us/dynamics365/business-central/srb/working-with-contracts/manual-contract-lines",
+      "accessedDate": "2026-09-30",
+      "appliesTo": "Business Central Subscription Billing. English article verified. Other locale routes and tenant-specific runtime captions are unverified.",
+      "fields": [
+        "On a customer or vendor subscription contract, choosing Item or G/L Account for a new line starts a manually created recurring-billing line. Complete the item/account, start date, billing rhythm and base period, quantity, and calculation base and percentage; the linked subscription is created only after all mandatory fields are complete. Missing required fields prevent creation. Changing the line type is treated as deleting the line, and deleting an unprocessed line can also delete its linked subscription. Use a negative quantity only for a deliberate credit scenario, and check the end date so it is billed once."
+      ],
+      "documentedCaptions": [
+        "Customer Subscription Contract",
+        "Vendor Subscription Contract",
+        "Type",
+        "Item",
+        "G/L Account",
+        "Subscription Line Start Date",
+        "Billing Rhythm",
+        "Billing Base Period",
+        "Calculation Base",
+        "Calculation Base %"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-expansion-srb-recurring-billing-en-us",
+      "title": "Recurring billing - Business Central | Microsoft Learn",
+      "sourceUri": "https://learn.microsoft.com/en-us/dynamics365/business-central/srb/recurring-billing",
+      "accessedDate": "2026-09-28",
+      "appliesTo": "Business Central standard functionality. Microsoft Learn captions checked; tenant/version-specific UI captions remain unverified.",
+      "fields": [
+        "Creates billing proposal lines from eligible subscription lines using Billing Date, Next Billing Date and optional Billing to Date. Check periods, quantities, pricing and amounts; each subscription line can be proposed only once per billing period. Proposal creation is not invoicing or posting, and Next Billing Date can update. Refresh/update changed lines before creating documents.",
+        "Creates invoices or credit memos for eligible proposal lines without documents. The total amount sign determines invoice versus credit memo. Check document/posting dates, grouping per contract, contract partner or invoice recipient, and Post documents. Update Required lines must be refreshed first; a line with a document cannot be billed again.",
+        "Sets the end of the service/billing period in proposal lines and can shorten or extend the period implied by the billing rhythm. It affects the period and amount billed, not the invoice document or posting date. Check validity dates and proration."
+      ],
+      "documentedCaptions": [
+        "Recurring Billing",
+        "Create Billing Proposal",
+        "Create Documents",
+        "Billing to Date"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-expansion-srb-recurring-billing-sv-se",
+      "title": "Återkommande fakturering - Business Central | Microsoft Learn",
+      "sourceUri": "https://learn.microsoft.com/sv-se/dynamics365/business-central/srb/recurring-billing",
+      "accessedDate": "2026-09-28",
+      "appliesTo": "Business Central standard functionality. Microsoft Learn captions checked; tenant/version-specific UI captions remain unverified.",
+      "fields": [
+        "Creates billing proposal lines from eligible subscription lines using Billing Date, Next Billing Date and optional Billing to Date. Check periods, quantities, pricing and amounts; each subscription line can be proposed only once per billing period. Proposal creation is not invoicing or posting, and Next Billing Date can update. Refresh/update changed lines before creating documents.",
+        "Creates invoices or credit memos for eligible proposal lines without documents. The total amount sign determines invoice versus credit memo. Check document/posting dates, grouping per contract, contract partner or invoice recipient, and Post documents. Update Required lines must be refreshed first; a line with a document cannot be billed again.",
+        "Sets the end of the service/billing period in proposal lines and can shorten or extend the period implied by the billing rhythm. It affects the period and amount billed, not the invoice document or posting date. Check validity dates and proration."
+      ],
+      "documentedCaptions": [
+        "Återkommande fakturering",
+        "Skapa faktureringsförslag",
+        "Skapa dokument",
+        "Faktureringsslutdatum"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-expansion-srb-recurring-billing-fr-fr",
+      "title": "Facturation récurrente - Business Central | Microsoft Learn",
+      "sourceUri": "https://learn.microsoft.com/fr-fr/dynamics365/business-central/srb/recurring-billing",
+      "accessedDate": "2026-09-28",
+      "appliesTo": "Business Central standard functionality. Microsoft Learn captions checked; tenant/version-specific UI captions remain unverified.",
+      "fields": [
+        "This suggests subscription contract lines due for billing using the billing dates and billing rhythm. Review the proposed periods and amounts. A billing proposal is not an invoice or a posted transaction.",
+        "This creates subscription invoices or credit memos for proposal lines without documents. Check document and posting dates and whether automatic posting is selected; creation can include posting when that option is enabled.",
+        "This sets the end date of the proposed billing period and can shorten or extend the period implied by the billing rhythm. It is not the invoice posting date."
+      ],
+      "documentedCaptions": [
+        "Facturation récurrente",
+        "Créer une proposition de facturation",
+        "Créer documents",
+        "Date de facturation jusqu’au"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-expansion-srb-recurring-billing-de-de",
+      "title": "Wiederkehrende Abrechnung - Business Central | Microsoft Learn",
+      "sourceUri": "https://learn.microsoft.com/de-de/dynamics365/business-central/srb/recurring-billing",
+      "accessedDate": "2026-09-28",
+      "appliesTo": "Business Central standard functionality. Microsoft Learn captions checked; tenant/version-specific UI captions remain unverified.",
+      "fields": [
+        "This suggests subscription contract lines due for billing using the billing dates and billing rhythm. Review the proposed periods and amounts. A billing proposal is not an invoice or a posted transaction.",
+        "This creates subscription invoices or credit memos for proposal lines without documents. Check document and posting dates and whether automatic posting is selected; creation can include posting when that option is enabled.",
+        "This sets the end date of the proposed billing period and can shorten or extend the period implied by the billing rhythm. It is not the invoice posting date."
+      ],
+      "documentedCaptions": [
+        "Wiederkehrende Abrechnung",
+        "Rechnungsvorschlag erstellen",
+        "Belege erstellen",
+        "Abrechnung bis Datum"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-expansion-srb-recurring-billing-es-es",
+      "title": "Facturación periódica - Business Central | Microsoft Learn",
+      "sourceUri": "https://learn.microsoft.com/es-es/dynamics365/business-central/srb/recurring-billing",
+      "accessedDate": "2026-09-28",
+      "appliesTo": "Business Central standard functionality. Microsoft Learn captions checked; tenant/version-specific UI captions remain unverified.",
+      "fields": [
+        "This suggests subscription contract lines due for billing using the billing dates and billing rhythm. Review the proposed periods and amounts. A billing proposal is not an invoice or a posted transaction.",
+        "This creates subscription invoices or credit memos for proposal lines without documents. Check document and posting dates and whether automatic posting is selected; creation can include posting when that option is enabled.",
+        "This sets the end date of the proposed billing period and can shorten or extend the period implied by the billing rhythm. It is not the invoice posting date."
+      ],
+      "documentedCaptions": [
+        "Facturación recurrente",
+        "Crear propuesta de facturación",
+        "Crear documentos",
+        "Facturación hasta la fecha"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-expansion-srb-recurring-billing-da-dk",
+      "title": "Tilbagevendende fakturering - Business Central | Microsoft Learn",
+      "sourceUri": "https://learn.microsoft.com/da-dk/dynamics365/business-central/srb/recurring-billing",
+      "accessedDate": "2026-09-28",
+      "appliesTo": "Business Central standard functionality. Microsoft Learn captions checked; tenant/version-specific UI captions remain unverified.",
+      "fields": [
+        "This suggests subscription contract lines due for billing using the billing dates and billing rhythm. Review the proposed periods and amounts. A billing proposal is not an invoice or a posted transaction.",
+        "This creates subscription invoices or credit memos for proposal lines without documents. Check document and posting dates and whether automatic posting is selected; creation can include posting when that option is enabled.",
+        "This sets the end date of the proposed billing period and can shorten or extend the period implied by the billing rhythm. It is not the invoice posting date."
+      ],
+      "documentedCaptions": [
+        "Tilbagevendende fakturering",
+        "Opret faktureringsforslag",
+        "Opret dokumenter",
+        "Fakturering til dato"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-expansion-srb-recurring-billing-fi-fi",
+      "title": "Toistuva laskutus - Business Central | Microsoft Learn",
+      "sourceUri": "https://learn.microsoft.com/fi-fi/dynamics365/business-central/srb/recurring-billing",
+      "accessedDate": "2026-09-28",
+      "appliesTo": "Business Central standard functionality. Microsoft Learn captions checked; tenant/version-specific UI captions remain unverified.",
+      "fields": [
+        "This suggests subscription contract lines due for billing using the billing dates and billing rhythm. Review the proposed periods and amounts. A billing proposal is not an invoice or a posted transaction.",
+        "This creates subscription invoices or credit memos for proposal lines without documents. Check document and posting dates and whether automatic posting is selected; creation can include posting when that option is enabled.",
+        "This sets the end date of the proposed billing period and can shorten or extend the period implied by the billing rhythm. It is not the invoice posting date."
+      ],
+      "documentedCaptions": [
+        "Toistuva laskutus",
+        "Luo laskutusehdotus",
+        "Luo asiakirjat",
+        "Laskutuksen päättymispäivämäärä"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-expansion-srb-recurring-billing-nb-no",
+      "title": "Gjentakende fakturering - Business Central | Microsoft Learn",
+      "sourceUri": "https://learn.microsoft.com/nb-no/dynamics365/business-central/srb/recurring-billing",
+      "accessedDate": "2026-09-28",
+      "appliesTo": "Business Central standard functionality. Microsoft Learn captions checked; tenant/version-specific UI captions remain unverified.",
+      "fields": [
+        "This suggests subscription contract lines due for billing using the billing dates and billing rhythm. Review the proposed periods and amounts. A billing proposal is not an invoice or a posted transaction.",
+        "This creates subscription invoices or credit memos for proposal lines without documents. Check document and posting dates and whether automatic posting is selected; creation can include posting when that option is enabled.",
+        "This sets the end date of the proposed billing period and can shorten or extend the period implied by the billing rhythm. It is not the invoice posting date."
+      ],
+      "documentedCaptions": [
+        "Gjentakende fakturering",
+        "Opprett faktureringsforslag",
+        "Opprett dokumenter",
+        "Faktureringssluttdato"
+      ]
+    }
+  ],
+  "sourceLocaleGaps": {
+    "microsoft-learn-srb-manual-contract-lines-en-us": [
+      "sv-SE",
+      "fr-FR",
+      "de-DE",
+      "es-ES",
+      "da-DK",
+      "fi-FI",
+      "nb-NO"
+    ]
+  }
+}

@@ -1,250 +1,1857 @@
 {
   "packId": "aptean-fb",
   "name": "Aptean Food & Beverage",
-  "version": "2.0.0",
+  "version": "2.6.5",
   "priority": 300,
   "rules": [
     {
-      "ruleId": "Aptean.OpenQCCheck",
-      "taskType": "OpenQualityCheck",
-      "semanticAction": "OpenRecord",
-      "entity": "QualityCheck",
-      "priority": 1000,
+      "ruleId": "Aptean.CreatePurchaseContractFromHarvest",
+      "taskType": "RunAction",
+      "semanticAction": "RunAction",
+      "entity": "HarvestContract",
+      "priority": 1240,
       "confidence": 0.96,
       "match": {
         "pagePatterns": [
-          "quality.*check",
-          "qc.*check",
-          "kvalitetskontroll"
+          "^Harvest Order$",
+          "^Harvest Planning$"
         ],
         "actionPatterns": [
-          "open record",
-          "öppna post"
+          "^Create Purchase Contract$"
         ],
         "fieldPatterns": [],
         "automationIdPatterns": []
       },
       "instructionTemplate": "",
       "languages": [
+        "en-US",
         "sv-SE",
-        "en-US"
+        "fr-FR",
+        "de-DE",
+        "es-ES",
+        "da-DK",
+        "fi-FI",
+        "nb-NO"
       ],
-      "aliases": []
+      "aliases": [],
+      "sourceIds": [
+        "aptean-contracts-from-harvest-planning-2024"
+      ],
+      "localizedExplanations": {
+        "en-US": "Creates purchase contracts from the selected harvest order line(s) or Harvest Planning lines, when Aptean Contract Management is installed with Commodity Harvest Planning. Contract dates are proposed from the harvest season but can be adjusted in the creation dialog. The contract records the harvest quantity and attributes; it does not create or post a purchase order.",
+        "sv-SE": "Skapar inköpskontrakt från valda skörderader eller rader i Harvest Planning när Aptean Contract Management är installerat tillsammans med Commodity Harvest Planning. Kontraktsdatumen föreslås från skördesäsongen men kan ändras i dialogen. Kontraktet tar med skördekvantitet och attribut; åtgärden skapar eller bokför ingen inköpsorder.",
+        "fr-FR": "Crée des contrats d’achat depuis les lignes sélectionnées de l’ordre de récolte ou de la planification de récolte, si Aptean Contract Management et Commodity Harvest Planning sont tous deux installés. Les dates sont proposées à partir de la saison, mais restent modifiables dans la fenêtre de création. Le contrat reprend la quantité et les attributs de récolte ; aucun bon d’achat n’est créé ni comptabilisé par cette action.",
+        "de-DE": "Erstellt Einkaufsverträge aus ausgewählten Ernteauftrags- oder Ernteplanungszeilen, sofern Aptean Contract Management zusammen mit Commodity Harvest Planning installiert ist. Vertragsdaten werden aus der Erntesaison vorgeschlagen, können im Dialog aber geändert werden. Der Vertrag übernimmt Erntemenge und Attribute; die Aktion erstellt oder bucht keine Bestellung.",
+        "es-ES": "Crea contratos de compra a partir de las líneas seleccionadas de la orden de cosecha o de Harvest Planning si están instaladas tanto Aptean Contract Management como Commodity Harvest Planning. Las fechas del contrato se proponen según la temporada, pero se pueden cambiar en el cuadro de creación. El contrato incluye la cantidad y los atributos de cosecha; esta acción no crea ni registra un pedido de compra.",
+        "da-DK": "Opretter købekontrakter fra valgte høstordrelinjer eller Harvest Planning-linjer, når Aptean Contract Management er installeret sammen med Commodity Harvest Planning. Kontraktdatoer foreslås ud fra høstsæsonen, men kan ændres i dialogen. Kontrakten medtager høstmængde og attributter; handlingen opretter eller bogfører ikke en købsordre.",
+        "fi-FI": "Luo ostosopimuksia valituista sadonkorjuutilauksen tai Harvest Planningin riveistä, kun Aptean Contract Management on asennettu yhdessä Commodity Harvest Planningin kanssa. Sopimuspäivämäärät ehdotetaan sadonkorjuukauden perusteella, mutta niitä voi muuttaa valintaikkunassa. Sopimukseen siirtyvät sadonkorjuumäärä ja määritteet; toiminto ei luo eikä kirjaa ostotilausta.",
+        "nb-NO": "Oppretter innkjøpskontrakter fra valgte høstordrelinjer eller Harvest Planning-linjer når Aptean Contract Management er installert sammen med Commodity Harvest Planning. Kontraktdatoene foreslås fra høstsesongen, men kan endres i dialogen. Kontrakten tar med høstemengde og attributter; handlingen oppretter eller bokfører ikke en innkjøpsordre."
+      }
+    },
+    {
+      "ruleId": "Aptean.CreateCommodityReceiptFromHarvestOrder",
+      "taskType": "RunAction",
+      "semanticAction": "RunAction",
+      "entity": "CommodityReceiptCreation",
+      "priority": 1240,
+      "confidence": 0.96,
+      "match": {
+        "pagePatterns": [
+          "^Harvest Order$"
+        ],
+        "actionPatterns": [
+          "^Create Commodity Receipts$"
+        ],
+        "fieldPatterns": [],
+        "automationIdPatterns": []
+      },
+      "instructionTemplate": "",
+      "languages": [
+        "en-US",
+        "sv-SE",
+        "fr-FR",
+        "de-DE",
+        "es-ES",
+        "da-DK",
+        "fi-FI",
+        "nb-NO"
+      ],
+      "aliases": [],
+      "sourceIds": [
+        "aptean-chp-harvest-order-guide-2025"
+      ],
+      "localizedExplanations": {
+        "en-US": "Creates commodity receipt documents only for selected harvest order lines whose Type is Commodity Item. Business Central creates one receipt per commodity item; item/category/global-attribute lines are not converted by this action. Review the generated receipts and process/post them through their own receipt workflow.",
+        "sv-SE": "Skapar råvaruinleveransdokument endast för valda skörderader där Typ är Råvaruartikel. Business Central skapar en inleverans per råvaruartikel; rader av typen Artikel, Artikelkategori eller Globala attribut omvandlas inte av den här åtgärden. Granska dokumenten och hantera/bokför dem sedan i det separata inleveransflödet.",
+        "fr-FR": "Crée des réceptions de matières premières uniquement pour les lignes sélectionnées dont le type est Article de base (Commodity Item). Business Central crée une réception par article de base ; les lignes de type article, catégorie ou attribut global ne sont pas converties par cette action. Vérifiez les réceptions générées, puis traitez-les dans leur propre flux de réception.",
+        "de-DE": "Erstellt Rohwaren-Wareneingänge nur für ausgewählte Ernteauftragszeilen mit dem Typ „Commodity Item“. Business Central erstellt je Rohwarenartikel einen Wareneingang; Zeilen des Typs Artikel, Artikelkategorie oder globale Attribute werden durch diese Aktion nicht umgewandelt. Prüfen Sie die erstellten Belege und bearbeiten/buchen Sie sie anschließend im separaten Wareneingangsprozess.",
+        "es-ES": "Crea documentos de recepción de productos agrícolas solo para las líneas seleccionadas cuyo tipo sea Artículo básico (Commodity Item). Business Central crea una recepción por cada artículo básico; esta acción no convierte líneas de tipo artículo, categoría o atributos globales. Revise las recepciones creadas y procéselas en su flujo de recepción independiente.",
+        "da-DK": "Opretter kun råvaremodtagelsesdokumenter for valgte høstordrelinjer, hvor Type er Commodity Item. Business Central opretter én modtagelse pr. råvare; linjer af typen Vare, Varekategori eller Globale attributter konverteres ikke af denne handling. Gennemgå de oprettede modtagelser, og behandl/bogfør dem via det separate modtagelsesflow.",
+        "fi-FI": "Luo raaka-ainevastaanottoasiakirjoja vain valituille sadonkorjuutilauksen riveille, joiden Tyyppi on Commodity Item. Business Central luo yhden vastaanoton raaka-ainenimikettä kohden; nimike-, nimikeryhmä- tai yleisten määritteiden rivejä ei muunneta tällä toiminnolla. Tarkista luodut vastaanotot ja käsittele tai kirjaa ne erillisessä vastaanottoprosessissa.",
+        "nb-NO": "Oppretter varemottaksdokumenter bare for valgte høstordrelinjer der Type er Commodity Item. Business Central oppretter ett mottak per råvare; linjer av typen Vare, Varekategori eller Globale attributter konverteres ikke av denne handlingen. Kontroller de opprettede mottakene, og behandle/bokfør dem deretter i den separate mottaksprosessen."
+      }
+    },
+    {
+      "ruleId": "Aptean.CreatePurchaseOrdersFromForecastWorksheet",
+      "taskType": "RunAction",
+      "semanticAction": "RunAction",
+      "entity": "HarvestOrder",
+      "priority": 1260,
+      "confidence": 0.96,
+      "match": {
+        "pagePatterns": [
+          "^Forecast Approval Worksheet$"
+        ],
+        "actionPatterns": [
+          "^Create Purchase Order$"
+        ],
+        "fieldPatterns": [],
+        "automationIdPatterns": []
+      },
+      "instructionTemplate": "",
+      "languages": [
+        "en-US",
+        "sv-SE",
+        "fr-FR",
+        "de-DE",
+        "es-ES",
+        "da-DK",
+        "fi-FI",
+        "nb-NO"
+      ],
+      "aliases": [],
+      "sourceIds": [
+        "aptean-chp-forecast-approval-worksheet-2025"
+      ],
+      "localizedExplanations": {
+        "en-US": "Creates purchase orders for selected forecast approval worksheet lines using the Approval Quantity (Purchase UOM). Load forecast documents and select the lines first; for Item Category forecasts, the system may ask you to choose an item and harvest quantity. Review the generated order before posting it.",
+        "sv-SE": "Skapar inköpsorder för valda rader i prognosgodkännandejournalen med kvantiteten i Godkänd kvantitet (inköpsenhet). Läs in prognosdokument och välj rader först. För prognoser av typen Artikelkategori kan systemet be dig välja artikel och skördekvantitet. Granska den skapade ordern innan du bokför den.",
+        "fr-FR": "Crée des commandes d’achat pour les lignes sélectionnées de la feuille d’approbation des prévisions à partir de la quantité approuvée (unité d’achat). Chargez d’abord les documents de prévision et sélectionnez les lignes ; pour une prévision de catégorie d’article, le système peut demander de choisir un article et une quantité de récolte. Vérifiez la commande créée avant de la comptabiliser.",
+        "de-DE": "Erstellt Bestellungen für ausgewählte Zeilen im Prognosegenehmigungsarbeitsblatt anhand der Genehmigungsmenge (Einkaufseinheit). Laden Sie zuerst die Prognosedokumente und wählen Sie die Zeilen aus. Bei Prognosen vom Typ Artikelkategorie kann das System die Auswahl eines Artikels und einer Erntemenge verlangen. Prüfen Sie die erstellte Bestellung vor dem Buchen.",
+        "es-ES": "Crea pedidos de compra para las líneas seleccionadas de la hoja de aprobación de previsiones según la cantidad aprobada (unidad de compra). Primero cargue los documentos de previsión y seleccione las líneas; para previsiones de categoría de artículo, el sistema puede pedir que elija un artículo y una cantidad de cosecha. Revise el pedido generado antes de registrarlo.",
+        "da-DK": "Opretter købsordrer for valgte linjer i prognosegodkendelseskladden ud fra den godkendte mængde (købsenhed). Indlæs først prognosedokumenterne, og vælg linjerne. For prognoser af typen varekategori kan systemet bede dig vælge en vare og en høstmængde. Gennemgå den oprettede ordre, før du bogfører den.",
+        "fi-FI": "Luo ostotilaukset ennusteen hyväksyntätyökirjan valituille riveille hyväksytyn määrän (osto-yksikkö) perusteella. Lataa ensin ennusteasiakirjat ja valitse rivit. Nimikeluokkaennusteessa järjestelmä voi pyytää valitsemaan nimikkeen ja sadonkorjuumäärän. Tarkista luotu tilaus ennen sen kirjaamista.",
+        "nb-NO": "Oppretter innkjøpsordrer for valgte linjer i prognosegodkjenningskladden basert på godkjent antall (innkjøpsenhet). Last inn prognosedokumentene og velg linjene først. For prognoser av typen varekategori kan systemet be deg velge en vare og høstemengde. Kontroller den opprettede ordren før bokføring."
+      }
+    },
+    {
+      "ruleId": "Aptean.CreateDayForecastFromHarvestOrder",
+      "taskType": "RunAction",
+      "semanticAction": "RunAction",
+      "entity": "HarvestOrder",
+      "priority": 1260,
+      "confidence": 0.96,
+      "match": {
+        "pagePatterns": [
+          "^Harvest Order$"
+        ],
+        "actionPatterns": [
+          "^Create Day Forecast$"
+        ],
+        "fieldPatterns": [],
+        "automationIdPatterns": []
+      },
+      "instructionTemplate": "",
+      "languages": [
+        "en-US",
+        "sv-SE",
+        "fr-FR",
+        "de-DE",
+        "es-ES",
+        "da-DK",
+        "fi-FI",
+        "nb-NO"
+      ],
+      "aliases": [],
+      "sourceIds": [
+        "aptean-chp-day-forecast-2025"
+      ],
+      "localizedExplanations": {
+        "en-US": "Creates a day forecast from the selected harvest order and lines. Check that Expected Calendar Week Start (Harvest) is set; for Item Category or Global Attributes lines, the flow may ask you to select matching items and enter the relevant harvest details. This creates a forecast, not a purchase order or receipt.",
+        "sv-SE": "Skapar en dagsprognos från vald skördeorder och dess rader. Kontrollera att Förväntad start på kalendervecka (skörd) är ifyllt. För rader av typen Artikelkategori eller Globala attribut kan flödet be dig välja matchande artiklar och ange skördeuppgifter. Åtgärden skapar en prognos, inte en inköpsorder eller inleverans.",
+        "fr-FR": "Crée une prévision journalière à partir de l’ordre de récolte et des lignes sélectionnés. Vérifiez que la date de début de semaine prévue pour la récolte est renseignée ; pour les lignes de type catégorie d’article ou attributs globaux, le système peut demander de choisir les articles correspondants et de saisir les données de récolte. Cette action crée une prévision, pas une commande d’achat ni une réception.",
+        "de-DE": "Erstellt eine Tagesprognose aus dem ausgewählten Ernteauftrag und dessen Zeilen. Prüfen Sie, ob der erwartete Beginn der Kalenderwoche (Ernte) eingetragen ist. Bei Zeilen des Typs Artikelkategorie oder globale Attribute kann das System die Auswahl passender Artikel und Erntedaten verlangen. Dadurch entsteht eine Prognose, keine Bestellung oder Wareneingangsbuchung.",
+        "es-ES": "Crea una previsión diaria a partir de la orden de cosecha y las líneas seleccionadas. Compruebe que esté indicada la fecha de inicio prevista de la semana de calendario (cosecha); para líneas de tipo categoría de artículo o atributos globales, el sistema puede pedir que seleccione los artículos correspondientes y especifique los datos de cosecha. Esta acción crea una previsión, no un pedido de compra ni una recepción.",
+        "da-DK": "Opretter en dagsprognose fra den valgte høstordre og dens linjer. Kontrollér, at forventet start på kalenderugen (høst) er udfyldt. For linjer af typen varekategori eller globale attributter kan systemet bede dig vælge matchende varer og angive høstoplysninger. Handlingen opretter en prognose, ikke en købsordre eller modtagelse.",
+        "fi-FI": "Luo päiväennusteen valitusta sadonkorjuutilauksesta ja sen riveistä. Varmista, että odotettu kalenteriviikon aloitus (sadonkorjuu) on määritetty. Nimikeluokka- tai yleisten määritteiden riveillä järjestelmä voi pyytää valitsemaan vastaavat nimikkeet ja antamaan sadonkorjuutiedot. Toiminto luo ennusteen, ei ostotilausta tai vastaanottoa.",
+        "nb-NO": "Oppretter en dagsprognose fra den valgte høstordren og linjene. Kontroller at forventet start på kalenderuke (høsting) er angitt. For linjer av typen varekategori eller globale attributter kan systemet be deg velge samsvarende varer og angi høstedetaljer. Handlingen oppretter en prognose, ikke en innkjøpsordre eller mottak."
+      }
+    },
+    {
+      "ruleId": "Aptean.SetPurchaseClaimActionType",
+      "taskType": "ChangeField",
+      "semanticAction": "ChangeField",
+      "entity": "PurchaseClaim",
+      "priority": 1260,
+      "confidence": 0.95,
+      "match": {
+        "pagePatterns": [
+          "^Purchase Claim$"
+        ],
+        "actionPatterns": [
+          "^$"
+        ],
+        "fieldPatterns": [
+          "^Action Type$"
+        ],
+        "automationIdPatterns": []
+      },
+      "instructionTemplate": "",
+      "languages": [
+        "en-US",
+        "sv-SE",
+        "fr-FR",
+        "de-DE",
+        "es-ES",
+        "da-DK",
+        "fi-FI",
+        "nb-NO"
+      ],
+      "aliases": [],
+      "sourceIds": [
+        "aptean-claims-purchase-claims-2026"
+      ],
+      "localizedExplanations": {
+        "en-US": "Choose Credit to create a purchase credit document for a price/amount adjustment, or Return to create a purchase return order. For Return, specify the return reason and keep Action Quantity within the remaining received quantity. Set the claim line’s action and price/quantity details before releasing or creating related documents.",
+        "sv-SE": "Välj Kredit för att skapa ett inköpskreditdokument för en pris- eller beloppsjustering, eller Retur för att skapa en inköpsreturorder. Vid Retur anger du returorsak och håller åtgärdskvantiteten inom återstående mottagen kvantitet. Ange radens åtgärd och pris-/kvantitetsuppgifter innan du frisläpper eller skapar relaterade dokument.",
+        "fr-FR": "Choisissez Crédit pour créer un avoir d’achat correspondant à un ajustement de prix ou de montant, ou Retour pour créer un retour achat. Pour un retour, indiquez le motif et ne dépassez pas la quantité reçue restante. Définissez l’action et les détails de prix/quantité de la ligne avant de libérer la réclamation ou de créer les documents associés.",
+        "de-DE": "Wählen Sie Gutschrift für ein Einkaufs-Gutschriftdokument zur Preis- oder Betragsanpassung oder Rückgabe für einen Einkaufsrückgabeauftrag. Bei Rückgabe müssen Sie einen Rückgabegrund angeben und die Aktionsmenge auf die noch verfügbare empfangene Menge begrenzen. Legen Sie Aktion sowie Preis-/Mengendetails fest, bevor Sie den Anspruch freigeben oder zugehörige Belege erstellen.",
+        "es-ES": "Elija Crédito para crear un documento de abono de compra por un ajuste de precio o importe, o Devolución para crear un pedido de devolución de compra. En una devolución, indique el motivo y no supere la cantidad recibida restante. Defina la acción y los detalles de precio/cantidad antes de liberar la reclamación o crear documentos relacionados.",
+        "da-DK": "Vælg Kredit for at oprette et købs kreditdokument til en pris- eller beløbsregulering, eller Retur for at oprette en købsreturordre. Ved Retur skal du angive en returårsag og holde handlingsmængden inden for den resterende modtagne mængde. Angiv linjens handling og pris-/mængdeoplysninger, før du frigiver kravet eller opretter relaterede dokumenter.",
+        "fi-FI": "Valitse hyvitys, kun luodaan ostohyvityslasku hinta- tai määräsumman oikaisua varten, tai palautus, kun luodaan ostojen palautustilaus. Palautuksessa anna palautussyy äläkä ylitä jäljellä olevaa vastaanotettua määrää. Määritä rivin toiminto sekä hinta-/määrätiedot ennen vaatimuksen vapauttamista tai liittyvien asiakirjojen luontia.",
+        "nb-NO": "Velg Kredit for å opprette et kjøpskreditdokument for pris- eller beløpsjustering, eller Retur for å opprette en kjøpsreturordre. Ved Retur angir du returårsak og holder handlingsmengden innenfor gjenstående mottatt mengde. Angi linjens handling og pris-/mengdedetaljer før du frigir kravet eller oppretter relaterte dokumenter."
+      }
+    },
+    {
+      "ruleId": "Aptean.CreatePurchaseOrderFromWeekForecast",
+      "taskType": "RunAction",
+      "semanticAction": "RunAction",
+      "entity": "PurchaseOrder",
+      "priority": 1260,
+      "confidence": 0.95,
+      "match": {
+        "pagePatterns": [
+          "^Week Forecast$"
+        ],
+        "actionPatterns": [
+          "^Create Purchase Order$"
+        ],
+        "fieldPatterns": [],
+        "automationIdPatterns": []
+      },
+      "instructionTemplate": "",
+      "languages": [
+        "en-US",
+        "sv-SE",
+        "fr-FR",
+        "de-DE",
+        "es-ES",
+        "da-DK",
+        "fi-FI",
+        "nb-NO"
+      ],
+      "aliases": [],
+      "sourceIds": [
+        "aptean-chp-week-forecast-2026"
+      ],
+      "localizedExplanations": {
+        "en-US": "Creates a purchase order from the selected week forecast. The forecast’s harvest quantities and dates provide the planning context and linked quantities are updated; this action does not post the order or receive the harvest. A closed forecast cannot create new purchase orders.",
+        "sv-SE": "Skapar en inköpsorder från vald veckoprognos. Prognosens skördekvantiteter och datum ger planeringsunderlaget och kopplade kvantiteter uppdateras; ordern bokförs inte och skörden tas inte emot av den här åtgärden. En stängd prognos kan inte skapa nya inköpsorder.",
+        "fr-FR": "Crée une commande d’achat à partir de la prévision hebdomadaire sélectionnée. Les quantités et dates de récolte de la prévision fournissent le contexte de planification et les quantités liées sont mises à jour ; la commande n’est pas comptabilisée et la récolte n’est pas réceptionnée par cette action. Une prévision clôturée ne permet pas de créer de nouvelles commandes.",
+        "de-DE": "Erstellt eine Bestellung aus der ausgewählten Wochenprognose. Erntemengen und Termine der Prognose dienen als Planungsgrundlage und verknüpfte Mengen werden aktualisiert; die Bestellung wird dadurch nicht gebucht und die Ernte nicht empfangen. Aus einer geschlossenen Prognose können keine neuen Bestellungen erstellt werden.",
+        "es-ES": "Crea un pedido de compra a partir de la previsión semanal seleccionada. Las cantidades y fechas de cosecha de la previsión sirven de base para la planificación y se actualizan las cantidades vinculadas; esta acción no registra el pedido ni recibe la cosecha. Una previsión cerrada no permite crear nuevos pedidos.",
+        "da-DK": "Opretter en købsordre fra den valgte ugeprognose. Prognosens høstmængder og datoer udgør planlægningsgrundlaget, og tilknyttede mængder opdateres; handlingen bogfører ikke ordren og modtager ikke høsten. En lukket prognose kan ikke bruges til at oprette nye købsordrer.",
+        "fi-FI": "Luo ostotilauksen valitusta viikkoennusteesta. Ennusteen sadonkorjuumäärät ja päivät ohjaavat suunnittelua ja linkitetyt määrät päivittyvät; toiminto ei kirjaa tilausta eikä vastaanota satoa. Suljetusta ennusteesta ei voi luoda uusia ostotilauksia.",
+        "nb-NO": "Oppretter en innkjøpsordre fra den valgte ukeprognosen. Prognosens høstemengder og datoer gir planleggingsgrunnlaget, og koblede mengder oppdateres; handlingen bokfører ikke ordren og mottar ikke avlingen. En lukket prognose kan ikke brukes til å opprette nye innkjøpsordrer."
+      }
+    },
+    {
+      "ruleId": "Aptean.CreateHarvestOrder",
+      "taskType": "CreateNew",
+      "semanticAction": "CreateNew",
+      "entity": "HarvestOrder",
+      "priority": 1260,
+      "confidence": 0.95,
+      "match": {
+        "pagePatterns": [
+          "^Harvest Orders$"
+        ],
+        "actionPatterns": [
+          "^New$"
+        ],
+        "fieldPatterns": [],
+        "automationIdPatterns": []
+      },
+      "instructionTemplate": "",
+      "languages": [
+        "en-US",
+        "sv-SE",
+        "fr-FR",
+        "de-DE",
+        "es-ES",
+        "da-DK",
+        "fi-FI",
+        "nb-NO"
+      ],
+      "aliases": [],
+      "sourceIds": [
+        "aptean-chp-harvest-order-guide-2025"
+      ],
+      "localizedExplanations": {
+        "en-US": "Creates a harvest plan linked to an agricultural location; it does not create a purchase order or receipt by itself. Confirm that the location is usable, the season is open, and the selected items meet commodity requirements such as lot tracking and item category. Register the harvest order, then create forecasts or purchasing/receipt documents as separate steps.",
+        "sv-SE": "Skapar en skördeplan kopplad till en odlingsplats; åtgärden skapar inte i sig en inköpsorder eller inleverans. Kontrollera att odlingsplatsen kan användas, att säsongen är öppen och att artiklarna uppfyller kraven för råvaruartiklar, till exempel partispårning och artikelkategori. Registrera skördeordern och skapa prognoser eller inköps-/inleveransdokument separat.",
+        "fr-FR": "Crée un plan de récolte lié à un site agricole ; cette action ne crée pas à elle seule une commande d’achat ni une réception. Vérifiez que le site est utilisable, que la saison est ouverte et que les articles respectent les exigences, notamment le suivi des lots et la catégorie d’article. Enregistrez l’ordre de récolte, puis créez séparément les prévisions ou les documents d’achat/réception.",
+        "de-DE": "Erstellt einen Ernteplan für einen landwirtschaftlichen Standort; dadurch wird noch keine Bestellung oder Wareneingangszeile erstellt. Prüfen Sie, ob der Standort verwendbar und die Saison offen ist und die Artikelanforderungen wie Chargenverfolgung und Artikelkategorie erfüllen. Registrieren Sie den Ernteauftrag und erstellen Sie Prognosen oder Einkaufs-/Wareneingangsbelege anschließend separat.",
+        "es-ES": "Crea un plan de cosecha vinculado a una ubicación agrícola; por sí sola, esta acción no crea un pedido de compra ni una recepción. Compruebe que la ubicación se puede usar, que la temporada está abierta y que los artículos cumplen requisitos como el seguimiento de lotes y la categoría de artículo. Registre la orden de cosecha y cree por separado las previsiones o los documentos de compra/recepción.",
+        "da-DK": "Opretter en høstplan, der er knyttet til en landbrugsplacering; handlingen opretter ikke i sig selv en købsordre eller modtagelse. Kontrollér, at placeringen kan bruges, sæsonen er åben, og varerne opfylder krav som lotsporing og varekategori. Registrér høstordren, og opret derefter prognoser eller købs-/modtagelsesdokumenter separat.",
+        "fi-FI": "Luo sadonkorjuusuunnitelman, joka liittyy maatalouspaikkaan; toiminto ei itsessään luo ostotilausta tai vastaanottoa. Varmista, että paikka on käytettävissä, kausi on avoin ja nimikkeet täyttävät vaatimukset, kuten eräseurannan ja nimikeryhmän. Rekisteröi sadonkorjuutilaus ja luo ennusteet tai osto-/vastaanottoasiakirjat erikseen.",
+        "nb-NO": "Oppretter en høstplan knyttet til en landbruksplassering; handlingen oppretter ikke i seg selv en innkjøpsordre eller mottak. Kontroller at plasseringen kan brukes, sesongen er åpen og varene oppfyller krav som partisporing og varekategori. Registrer høstordren, og opprett prognoser eller innkjøps-/mottaksdokumenter separat."
+      }
+    },
+    {
+      "ruleId": "Aptean.PostQualityAction",
+      "taskType": "RunAction",
+      "semanticAction": "RunAction",
+      "entity": "QualityCheck",
+      "priority": 1280,
+      "confidence": 0.96,
+      "match": {
+        "pagePatterns": [
+          "^Quality Control Action$"
+        ],
+        "actionPatterns": [
+          "^Post$"
+        ],
+        "fieldPatterns": [],
+        "automationIdPatterns": []
+      },
+      "instructionTemplate": "",
+      "languages": [
+        "en-US",
+        "sv-SE",
+        "fr-FR",
+        "de-DE",
+        "es-ES",
+        "da-DK",
+        "fi-FI",
+        "nb-NO"
+      ],
+      "aliases": [],
+      "sourceIds": [
+        "aptean-qca-post-quality-action-2026"
+      ],
+      "localizedExplanations": {
+        "en-US": "Posting a Quality Control Action finalizes it and makes the posted record read-only. Before posting, set the action to In Progress and complete every visible action line; if validation reports an incomplete line, finish it and try again.",
+        "sv-SE": "När du bokför en kvalitetsåtgärd slutförs den och den bokförda posten blir skrivskyddad. Innan bokföring måste åtgärdens status vara Pågår och alla synliga åtgärdsrader vara slutförda. Om valideringen visar en ofullständig rad ska du komplettera den och försöka igen.",
+        "fr-FR": "La comptabilisation d’une action qualité la finalise et rend l’enregistrement comptabilisé non modifiable. Avant de comptabiliser, son statut doit être En cours et toutes les lignes visibles doivent être terminées. Si la validation signale une ligne incomplète, complétez-la puis réessayez.",
+        "de-DE": "Durch das Buchen einer Qualitätsmaßnahme wird sie abgeschlossen; der gebuchte Datensatz ist anschließend schreibgeschützt. Vor dem Buchen muss der Status „In Bearbeitung“ lauten und alle sichtbaren Maßnahmenzeilen müssen abgeschlossen sein. Meldet die Prüfung eine unvollständige Zeile, vervollständigen Sie diese und versuchen Sie es erneut.",
+        "es-ES": "Al registrar una acción de calidad, esta queda finalizada y el registro contabilizado pasa a ser de solo lectura. Antes de registrarla, el estado debe ser En curso y todas las líneas visibles deben estar completadas. Si la validación indica que falta una línea, complétela e inténtelo de nuevo.",
+        "da-DK": "Når en kvalitetsaktion bogføres, afsluttes den bogførte post og bliver skrivebeskyttet. Før bogføring skal status være I gang, og alle synlige aktionslinjer skal være fuldført. Hvis valideringen viser en ufuldstændig linje, skal du færdiggøre den og prøve igen.",
+        "fi-FI": "Laadun toimenpiteen kirjaaminen viimeistelee sen, minkä jälkeen kirjattu tietue on vain luku -tilassa. Ennen kirjaamista tilan on oltava Käynnissä ja kaikkien näkyvien toimenpiderivien on oltava valmiita. Jos tarkistus ilmoittaa keskeneräisestä rivistä, täydennä se ja yritä uudelleen.",
+        "nb-NO": "Når du bokfører en kvalitetsaktivitet, fullføres den, og den bokførte posten blir skrivebeskyttet. Før bokføring må status være Pågår, og alle synlige aktivitetslinjer må være fullført. Hvis valideringen viser en ufullstendig linje, fullfører du den og prøver på nytt."
+      }
+    },
+    {
+      "ruleId": "Aptean.AnswerQualityCheckLine",
+      "taskType": "ChangeField",
+      "semanticAction": "ChangeField",
+      "entity": "QualityCheck",
+      "priority": 1280,
+      "confidence": 0.96,
+      "match": {
+        "pagePatterns": [
+          "^Quality Control Check$",
+          "^QC Check Card$",
+          "^QC Check$"
+        ],
+        "actionPatterns": [],
+        "fieldPatterns": [
+          "^Answer$",
+          "^Result$"
+        ],
+        "automationIdPatterns": []
+      },
+      "instructionTemplate": "",
+      "languages": [
+        "en-US",
+        "sv-SE",
+        "fr-FR",
+        "de-DE",
+        "es-ES",
+        "da-DK",
+        "fi-FI",
+        "nb-NO"
+      ],
+      "aliases": [],
+      "sourceIds": [
+        "aptean-qca-answer-check-lines-2026"
+      ],
+      "localizedExplanations": {
+        "en-US": "Recording an answer on a quality check line updates its result from the configured targets; it does not post the check or determine the overall disposition by itself. Complete each required general and sample question, including any required comment. A question with a blind target may show Done instead of Pass or Fail.",
+        "sv-SE": "När du registrerar ett svar på en kvalitetskontrollrad uppdateras radens resultat utifrån konfigurerade målvärden. Det bokför inte kontrollen och avgör inte ensamt det samlade utfallet. Besvara alla obligatoriska allmänna frågor och provfrågor samt eventuella obligatoriska kommentarer. Vid dolt mål kan resultatet visas som Klar i stället för Godkänd eller Underkänd.",
+        "fr-FR": "La saisie d’une réponse sur une ligne de contrôle met à jour son résultat selon les valeurs cibles configurées ; elle ne comptabilise pas le contrôle et ne détermine pas à elle seule la décision globale. Répondez à toutes les questions obligatoires générales et d’échantillon, ainsi qu’aux commentaires requis. Avec une cible masquée, le résultat peut afficher Terminé au lieu de Réussite ou Échec.",
+        "de-DE": "Eine Antwort in einer Qualitätsprüfungszeile aktualisiert deren Ergebnis anhand der konfigurierten Zielwerte. Dadurch wird die Prüfung nicht gebucht und keine Gesamtentscheidung getroffen. Beantworten Sie alle erforderlichen allgemeinen Fragen und Stichprobenfragen sowie alle erforderlichen Kommentare. Bei einem ausgeblendeten Ziel kann das Ergebnis „Erledigt“ statt „Bestanden“ oder „Nicht bestanden“ anzeigen.",
+        "es-ES": "Al registrar una respuesta en una línea de control de calidad, su resultado se actualiza según los valores objetivo configurados; esto no registra el control ni determina por sí solo el resultado global. Responda todas las preguntas generales y de muestra obligatorias, incluidos los comentarios requeridos. Con un objetivo oculto, el resultado puede mostrarse como Hecho en lugar de Aprobado o Fallido.",
+        "da-DK": "Når du registrerer et svar på en kvalitetskontrollinje, opdateres linjens resultat ud fra de konfigurerede mål. Det bogfører ikke kontrollen og afgør ikke i sig selv det samlede resultat. Besvar alle obligatoriske generelle spørgsmål og stikprøvespørgsmål samt eventuelle obligatoriske kommentarer. Med et skjult mål kan resultatet vises som Færdig i stedet for Bestået eller Ikke bestået.",
+        "fi-FI": "Kun kirjaat vastauksen laatutarkastusriville, rivin tulos päivittyy määritettyjen tavoitearvojen perusteella. Tämä ei kirjaa tarkastusta eikä yksin ratkaise kokonaistulosta. Vastaa kaikkiin pakollisiin yleisiin kysymyksiin ja näytekysymyksiin sekä lisää vaaditut kommentit. Piilotetulla tavoitearvolla tulos voi näkyä Valmis-tilana Hyväksytty- tai Hylätty-tilan sijaan.",
+        "nb-NO": "Når du registrerer et svar på en kvalitetskontrollinje, oppdateres linjens resultat ut fra de konfigurerte målverdiene. Dette bokfører ikke kontrollen og avgjør ikke alene totalresultatet. Besvar alle obligatoriske generelle spørsmål og prøvespørsmål, inkludert eventuelle obligatoriske kommentarer. Med et skjult mål kan resultatet vises som Ferdig i stedet for Bestått eller Ikke bestått."
+      }
     },
     {
       "ruleId": "Aptean.CreateQCCheck",
       "taskType": "CreateQualityCheck",
       "semanticAction": "RunAction",
       "entity": "QualityCheck",
-      "priority": 1000,
-      "confidence": 0.95,
-      "match": {
-        "pagePatterns": [],
-        "actionPatterns": [
-          "create.*check",
-          "skapa.*kontroll"
-        ],
-        "fieldPatterns": [],
-        "automationIdPatterns": []
-      },
-      "instructionTemplate": "",
-      "languages": [
-        "sv-SE",
-        "en-US"
-      ],
-      "aliases": []
-    },
-    {
-      "ruleId": "Aptean.ReleaseQCHold",
-      "taskType": "ReleaseQualityHold",
-      "semanticAction": "RunAction",
-      "entity": "QualityHold",
-      "priority": 900,
-      "confidence": 0.93,
-      "match": {
-        "pagePatterns": [],
-        "actionPatterns": [
-          "release.*hold",
-          "släpp.*hold",
-          "frisläpp.*spärr"
-        ],
-        "fieldPatterns": [],
-        "automationIdPatterns": []
-      },
-      "instructionTemplate": "",
-      "languages": [
-        "sv-SE",
-        "en-US"
-      ],
-      "aliases": []
-    },
-    {
-      "ruleId": "Aptean.OpenSFP",
-      "taskType": "OpenShopFloorProduction",
-      "semanticAction": "Navigate",
-      "entity": "ShopFloorProduction",
-      "priority": 900,
+      "priority": 1200,
       "confidence": 0.95,
       "match": {
         "pagePatterns": [
-          "shop floor production",
-          "sfp"
+          "^Purchase Order$",
+          "^Sales Order$",
+          "^Purchase Return Order$",
+          "^Sales Return Order$",
+          "^Warehouse Receipt$",
+          "^Warehouse Shipment$",
+          "^Transfer Order$",
+          "^Released Production Order$",
+          "^Lot No\\. Information Card$"
         ],
-        "actionPatterns": [],
+        "actionPatterns": [
+          "^New$",
+          "^Create Quality Control Check$",
+          "^Create Ad-hoc Quality Control Check$"
+        ],
         "fieldPatterns": [],
         "automationIdPatterns": []
       },
       "instructionTemplate": "",
       "languages": [
+        "en-US",
         "sv-SE",
-        "en-US"
+        "fr-FR",
+        "de-DE",
+        "es-ES",
+        "da-DK",
+        "fi-FI",
+        "nb-NO"
       ],
-      "aliases": []
+      "aliases": [],
+      "sourceIds": [
+        "aptean-qca-create-adhoc-2026"
+      ],
+      "localizedExplanations": {
+        "en-US": "Creates an Aptean Quality Control check in the selected context. From a purchase order or another supported source document, the check retains the source link; creating it from a document line also carries the selected item and lot. Select the responsible QC team and a certified plan. A check created from the Quality Control Checks list starts without a source document. Creation does not enter measurements or decide pass/fail; process and post the check separately.",
+        "sv-SE": "Skapar en kontroll i Aptean Quality Control i den valda kontexten. Från en inköpsorder eller ett annat dokument som stöds behåller kontrollen källkopplingen; skapas den från en dokumentrad följer även vald artikel och parti med. Välj ansvarigt QC-team och en certifierad plan. En kontroll som skapas från listan Kvalitetskontroller saknar källdokument. Skapandet registrerar inte mätvärden eller godkänner/underkänner kontrollen; behandla och bokför den separat.",
+        "fr-FR": "Crée un contrôle Aptean Quality Control dans le contexte sélectionné. Depuis une commande achat ou un autre document pris en charge, le contrôle conserve le lien source ; depuis une ligne, il reprend aussi l’article et le lot sélectionnés. Choisissez l’équipe QC responsable et un plan certifié. Un contrôle créé depuis la liste des contrôles qualité n’a pas de document source. La création ne saisit pas les mesures et ne décide pas du résultat : traitez et comptabilisez le contrôle séparément.",
+        "de-DE": "Erstellt im ausgewählten Kontext eine Prüfung in Aptean Quality Control. Aus einer Bestellung oder einem anderen unterstützten Quelldokument übernimmt die Prüfung die Quellenverknüpfung; beim Erstellen aus einer Dokumentzeile werden auch der ausgewählte Artikel und die Charge übernommen. Wählen Sie ein zuständiges QC-Team und einen zertifizierten Prüfplan. Eine Prüfung aus der Liste der Qualitätsprüfungen hat kein Quelldokument. Beim Erstellen werden keine Messwerte oder Ergebnisse erfasst; bearbeiten und buchen Sie die Prüfung separat.",
+        "es-ES": "Crea una inspección de Aptean Quality Control en el contexto seleccionado. Si se inicia desde un pedido de compra u otro documento compatible, conserva el vínculo de origen; desde una línea también hereda el artículo y lote seleccionados. Seleccione el equipo de calidad responsable y un plan certificado. Una inspección creada desde la lista de controles de calidad no tiene documento de origen. La creación no registra mediciones ni determina el resultado; procese y registre la inspección por separado.",
+        "da-DK": "Opretter en Aptean Quality Control-kontrol i den valgte kontekst. Fra en købsordre eller et andet understøttet kildedokument bevarer kontrollen kildelinket; oprettes den fra en dokumentlinje, medtages også den valgte vare og batch. Vælg det ansvarlige QC-team og en certificeret plan. En kontrol oprettet fra listen Kvalitetskontroller har intet kildedokument. Oprettelsen registrerer ikke målinger eller resultat; behandl og bogfør kontrollen separat.",
+        "fi-FI": "Luo Aptean Quality Control -tarkastuksen valitussa asiayhteydessä. Ostotilauksesta tai muusta tuetusta lähdeasiakirjasta luotuun tarkastukseen säilyy lähdeviite; asiakirjariviltä luotaessa mukaan tulevat myös valittu nimike ja erä. Valitse vastuullinen QC-tiimi ja sertifioitu suunnitelma. Laaduntarkastusten luettelosta luodulla tarkastuksella ei ole lähdeasiakirjaa. Luonti ei kirjaa mittauksia eikä ratkaise tulosta; käsittele ja kirjaa tarkastus erikseen.",
+        "nb-NO": "Oppretter en Aptean Quality Control-kontroll i den valgte konteksten. Fra en innkjøpsordre eller et annet støttet kildedokument beholder kontrollen kildelenken; opprettes den fra en dokumentlinje, følger også valgt vare og parti med. Velg ansvarlig QC-team og en sertifisert plan. En kontroll som opprettes fra listen Kvalitetskontroller, har ikke kildedokument. Opprettelsen registrerer ikke målinger eller avgjør resultatet; behandle og bokfør kontrollen separat."
+      }
+    },
+    {
+      "ruleId": "Aptean.CreateInventoryQCTrigger",
+      "taskType": "CreateInventoryQualityTrigger",
+      "semanticAction": "CreateNew",
+      "entity": "ApteanInventoryQualityTrigger",
+      "priority": 1200,
+      "confidence": 0.96,
+      "match": {
+        "pagePatterns": [
+          "^Quality Control Triggers$"
+        ],
+        "actionPatterns": [
+          "^New$"
+        ],
+        "fieldPatterns": [],
+        "automationIdPatterns": []
+      },
+      "instructionTemplate": "",
+      "languages": [
+        "en-US",
+        "sv-SE",
+        "fr-FR",
+        "de-DE",
+        "es-ES",
+        "da-DK",
+        "fi-FI",
+        "nb-NO"
+      ],
+      "aliases": [],
+      "sourceIds": [
+        "aptean-qca-recurring-2026"
+      ],
+      "localizedExplanations": {
+        "en-US": "Creates a recurring Aptean QC trigger for stored inventory, not a purchase or warehouse receipt. Set Document Type to Inventory; Per Lot is then enabled automatically and only lot-tracked stock is evaluated. Choose a location or all locations, optionally limit a location to one bin, define the recurring interval, and select the applicable certified plan/team and filters. Schedule the inventory-check job from Quality Control Setup and verify its queue status before relying on automatic checks.",
+        "sv-SE": "Skapar en återkommande QC-utlösare för lagrat lager, inte en inköps- eller lagerinleverans. Ange Dokumenttyp = Lager; då aktiveras Per parti automatiskt och endast partispårat lager utvärderas. Välj en lagerplats eller alla lagerplatser, begränsa vid behov till ett fack, ange intervallet och välj tillämplig certifierad plan, team och filter. Schemalägg lagerkontrolljobbet från Kvalitetskontrollinställningar och kontrollera jobbets status innan automatiska kontroller förutsätts.",
+        "fr-FR": "Crée un déclencheur récurrent QC pour le stock entreposé, et non une réception achat ou entrepôt. Définissez le type de document sur Inventaire ; Per Lot est alors activé automatiquement et seuls les articles suivis par lot sont évalués. Choisissez un emplacement ou tous les emplacements, limitez éventuellement à un bac, définissez l’intervalle et sélectionnez le plan certifié, l’équipe et les filtres. Planifiez le traitement depuis la configuration Quality Control et vérifiez l’état de la file de travaux.",
+        "de-DE": "Erstellt einen wiederkehrenden QC-Auslöser für Lagerbestand, nicht für einen Einkaufs- oder Wareneingang. Legen Sie den Dokumenttyp Lagerbestand fest; Per Charge wird automatisch aktiviert und nur chargengeführter Bestand wird geprüft. Wählen Sie einen oder alle Lagerorte, begrenzen Sie bei Bedarf auf einen Lagerplatz, legen Sie das Intervall fest und wählen Sie Prüfplan, Team und Filter. Planen Sie den Prüflauf in den Quality-Control-Einstellungen und prüfen Sie den Status der Jobwarteschlange.",
+        "es-ES": "Crea un desencadenador recurrente de control de calidad para existencias almacenadas, no para una recepción de compra o almacén. Establezca el tipo de documento en Inventario; Per lote se activa automáticamente y solo se evalúan artículos con seguimiento por lote. Elija una ubicación o todas, limite opcionalmente a un bin, defina el intervalo y seleccione el plan certificado, el equipo y los filtros. Programe la tarea desde la configuración de Quality Control y compruebe el estado de la cola de trabajos.",
+        "da-DK": "Opretter en tilbagevendende QC-udløser for lagerbeholdning, ikke for en købs- eller lagerkvittering. Angiv dokumenttypen Lager; Per batch aktiveres automatisk, og kun batchsporede varer evalueres. Vælg en eller alle lagersteder, begræns eventuelt til én placering, angiv intervallet, og vælg certificeret plan, team og filtre. Planlæg lagerkontroljobbet fra Quality Control-opsætningen, og kontrollér jobkøens status.",
+        "fi-FI": "Luo toistuvan QC-laukaisimen varastossa olevalle varastolle, ei osto- tai varastovastaanotolle. Aseta asiakirjatyypiksi Varasto; Eräkohtaisesti-valinta otetaan tällöin käyttöön automaattisesti, ja vain eräseurattuja nimikkeitä arvioidaan. Valitse yksi tai kaikki varastopaikat, rajaa tarvittaessa yhteen hyllypaikkaan, määritä aikaväli sekä sertifioitu suunnitelma, tiimi ja suodattimet. Ajoita tarkastustyö Quality Control -asetuksista ja varmista työjonon tila.",
+        "nb-NO": "Oppretter en tilbakevendende QC-utløser for lagervarer, ikke for en kjøps- eller lagermottakelse. Angi dokumenttypen Lager; Per parti aktiveres automatisk, og bare partisporede varer evalueres. Velg ett eller alle lagersteder, begrens eventuelt til én hylle, angi intervallet og velg sertifisert plan, team og filtre. Planlegg lagerkontrolljobben fra Quality Control-oppsettet, og kontroller statusen i jobbkøen."
+      }
+    },
+    {
+      "ruleId": "Aptean.ScheduleInventoryQC",
+      "taskType": "ScheduleInventoryQualityChecks",
+      "semanticAction": "RunAction",
+      "entity": "ApteanInventoryQualityChecksJob",
+      "priority": 1200,
+      "confidence": 0.96,
+      "match": {
+        "pagePatterns": [
+          "^Quality Control Setup$"
+        ],
+        "actionPatterns": [
+          "^Schedule Inventory Quality Checks$"
+        ],
+        "fieldPatterns": [],
+        "automationIdPatterns": []
+      },
+      "instructionTemplate": "",
+      "languages": [
+        "en-US",
+        "sv-SE",
+        "fr-FR",
+        "de-DE",
+        "es-ES",
+        "da-DK",
+        "fi-FI",
+        "nb-NO"
+      ],
+      "aliases": [],
+      "sourceIds": [
+        "aptean-qca-recurring-2026",
+        "aptean-qca-release-2603-2026"
+      ],
+      "localizedExplanations": {
+        "en-US": "Creates the job queue entry that evaluates active Inventory-type QC triggers and creates checks when their storage-time interval is due. If an entry already exists, the action opens the filtered job queue instead. Review the recurrence and Ready status; the job evaluates lot/location/bin combinations and a posted check resets that combination’s elapsed-time clock.",
+        "sv-SE": "Skapar jobbköposten som utvärderar aktiva QC-utlösare av typen Lager och skapar kontroller när lagringstidsintervallet har uppnåtts. Om en post redan finns öppnar åtgärden den filtrerade jobbkölistan. Kontrollera upprepning och status Redo. Jobbet utvärderar kombinationer av parti, lagerplats och fack; en bokförd kontroll startar om tidsräkningen för den kombinationen.",
+        "fr-FR": "Crée l’entrée de file de travaux qui évalue les déclencheurs QC de type Inventaire et crée les contrôles lorsque l’intervalle de stockage est atteint. Si une entrée existe déjà, l’action ouvre la file filtrée. Vérifiez la récurrence et l’état Prêt. Le traitement évalue les combinaisons lot/emplacement/bac ; un contrôle comptabilisé réinitialise le délai pour cette combinaison.",
+        "de-DE": "Erstellt den Jobwarteschlangeneintrag, der aktive QC-Auslöser vom Typ Lagerbestand prüft und bei erreichtem Lagerzeitintervall Prüfungen erstellt. Ist bereits ein Eintrag vorhanden, öffnet die Aktion die gefilterte Jobwarteschlange. Prüfen Sie Wiederholung und Status Bereit. Der Lauf wertet Kombinationen aus Charge, Lagerort und Lagerplatz aus; eine gebuchte Prüfung setzt deren Zeitintervall zurück.",
+        "es-ES": "Crea la entrada de la cola de trabajos que evalúa los desencadenadores de control de calidad de tipo Inventario y crea inspecciones cuando vence el intervalo de almacenamiento. Si ya existe una entrada, la acción abre la cola filtrada. Revise la periodicidad y el estado Preparado. La tarea evalúa combinaciones de lote, ubicación y bin; una inspección registrada reinicia el tiempo de esa combinación.",
+        "da-DK": "Opretter jobkøposten, der evaluerer aktive QC-udløsere af typen Lager og opretter kontroller, når lagerintervallet udløber. Hvis posten allerede findes, åbner handlingen den filtrerede jobkø. Kontrollér gentagelsen og statussen Klar. Jobbet evaluerer kombinationer af batch, lagersted og placering; en bogført kontrol nulstiller tidsintervallet for kombinationen.",
+        "fi-FI": "Luo työjonon tapahtuman, joka arvioi aktiiviset Varasto-tyypin QC-laukaisimet ja luo tarkastuksia, kun varastointiaika täyttää aikavälin. Jos tapahtuma on jo olemassa, toiminto avaa suodatetun työjonon. Tarkista toistuvuus ja Valmis-tila. Työ arvioi erä-, varastopaikka- ja hyllypaikkayhdistelmät; kirjattu tarkastus nollaa kyseisen yhdistelmän ajan.",
+        "nb-NO": "Oppretter jobbkøoppføringen som evaluerer aktive QC-utløsere av typen Lager og oppretter kontroller når lagringsintervallet er nådd. Hvis en oppføring allerede finnes, åpner handlingen den filtrerte jobbkøen. Kontroller gjentakelsen og status Klar. Jobben evaluerer kombinasjoner av parti, lagersted og hylle; en bokført kontroll nullstiller tidsintervallet for kombinasjonen."
+      }
+    },
+    {
+      "ruleId": "Aptean.CreateNonConformanceFromQC",
+      "taskType": "CreateNonConformanceFromQualityCheck",
+      "semanticAction": "RunAction",
+      "entity": "ApteanNonConformance",
+      "priority": 1200,
+      "confidence": 0.96,
+      "match": {
+        "pagePatterns": [
+          "^Posted Quality Control Check$"
+        ],
+        "actionPatterns": [
+          "^Create (Customer|Vendor|Internal) Non Conformance Document$"
+        ],
+        "fieldPatterns": [],
+        "automationIdPatterns": []
+      },
+      "instructionTemplate": "",
+      "languages": [
+        "en-US",
+        "sv-SE",
+        "fr-FR",
+        "de-DE",
+        "es-ES",
+        "da-DK",
+        "fi-FI",
+        "nb-NO"
+      ],
+      "aliases": [],
+      "sourceIds": [
+        "aptean-qca-release-2603-2026"
+      ],
+      "localizedExplanations": {
+        "en-US": "Creates a customer, vendor or internal Aptean non-conformance document linked to this posted quality control check. This action is available only when Aptean Non Conformances is installed. It creates the follow-up record; it does not by itself resolve the quality failure or release a blocked lot. Review the source check and complete the non-conformance workflow separately.",
+        "sv-SE": "Skapar ett kund-, leverantörs- eller internt avvikelsedokument i Aptean, länkat till den här bokförda kvalitetskontrollen. Åtgärden finns bara om Aptean Non Conformances är installerat. Den skapar uppföljningsposten men löser inte kvalitetsavvikelsen och frisläpper inte ett spärrat parti. Granska källkontrollen och slutför avvikelseflödet separat.",
+        "fr-FR": "Crée un document de non-conformité client, fournisseur ou interne Aptean lié à ce contrôle qualité comptabilisé. Cette action n’est disponible que si Aptean Non Conformances est installé. Elle crée l’enregistrement de suivi, mais ne résout pas l’échec qualité et ne libère pas un lot bloqué. Examinez le contrôle source et terminez séparément le processus de non-conformité.",
+        "de-DE": "Erstellt ein Kunden-, Lieferanten- oder internes Aptean-Nichtkonformitätsdokument, das mit dieser gebuchten Qualitätsprüfung verknüpft ist. Die Aktion ist nur verfügbar, wenn Aptean Non Conformances installiert ist. Sie erstellt den Folgedatensatz, behebt aber weder den Qualitätsfehler noch gibt sie eine gesperrte Charge frei. Prüfen Sie die Quellprüfung und schließen Sie den Abweichungsprozess separat ab.",
+        "es-ES": "Crea un documento de no conformidad de cliente, proveedor o interno de Aptean vinculado a esta inspección de calidad registrada. La acción solo está disponible si está instalada la extensión Aptean Non Conformances. Crea el registro de seguimiento, pero no resuelve por sí misma el fallo de calidad ni libera un lote bloqueado. Revise la inspección de origen y complete el proceso de no conformidad por separado.",
+        "da-DK": "Opretter et Aptean-afvigelsesdokument for kunde, leverandør eller internt, som er knyttet til denne bogførte kvalitetskontrol. Handlingen er kun tilgængelig, hvis Aptean Non Conformances er installeret. Den opretter opfølgningsposten, men løser ikke kvalitetsfejlen eller frigiver en blokeret batch. Gennemgå kildekontrollen, og afslut afvigelsesprocessen separat.",
+        "fi-FI": "Luo asiakkaan, toimittajan tai sisäisen Aptean-poikkeamaraportin, joka linkittyy tähän kirjattuun laatutarkastukseen. Toiminto on käytettävissä vain, jos Aptean Non Conformances on asennettu. Se luo jatkokäsittelytietueen, mutta ei ratkaise laatupoikkeamaa eikä vapauta estettyä erää. Tarkista lähdetarkastus ja viimeistele poikkeamaprosessi erikseen.",
+        "nb-NO": "Oppretter et Aptean-avviksdokument for kunde, leverandør eller internt, koblet til denne bokførte kvalitetskontrollen. Handlingen er bare tilgjengelig hvis Aptean Non Conformances er installert. Den oppretter oppfølgingsposten, men løser ikke kvalitetsfeilen eller frigir et sperret parti. Kontroller kildekontrollen og fullfør avviksprosessen separat."
+      }
+    },
+    {
+      "priority": 1200,
+      "confidence": 0.96,
+      "instructionTemplate": "",
+      "languages": [
+        "en-US",
+        "sv-SE",
+        "fr-FR",
+        "de-DE",
+        "es-ES",
+        "da-DK",
+        "fi-FI",
+        "nb-NO"
+      ],
+      "aliases": [],
+      "match": {
+        "pagePatterns": [
+          "^Customer Non-Conformances$"
+        ],
+        "actionPatterns": [
+          "^New$"
+        ],
+        "fieldPatterns": [],
+        "automationIdPatterns": []
+      },
+      "ruleId": "Aptean.CreateCustomerNonConformance",
+      "taskType": "CreateCustomerNonConformance",
+      "semanticAction": "CreateNew",
+      "entity": "ApteanCustomerNonConformance",
+      "sourceIds": [
+        "aptean-ncf-customer-nonconformance-2026"
+      ],
+      "texts": [
+        "Creates a customer non-conformance record in Aptean Non Conformances. Use it to register a reported issue for a customer or consumer; describe the issue and root cause, classify it, identify affected items and quantities, and add a source document when applicable. A posted sales document can supply the related lines and source references. Creation leaves the record open: it does not create a return, credit or corrective action. Move it to In Progress when follow-up begins; Teams notification depends on setup.",
+        "Skapar en kundavvikelse i Aptean Non Conformances. Registrera ett rapporterat problem för en kund eller konsument, beskriv avvikelsen och grundorsaken, klassificera den, ange berörda artiklar och kvantiteter och lägg till källdokument när det finns. Ett bokfört försäljningsdokument kan fylla i rader och källreferenser. Posten förblir öppen när den skapas: ingen retur, kreditnota eller korrigerande åtgärd skapas. Ändra status till Pågår när uppföljningen börjar. Teams-avisering kräver rätt inställning.",
+        "Crée une fiche de non-conformité client dans Aptean Non Conformances. Enregistrez le problème signalé par un client ou un consommateur, décrivez le problème et sa cause racine, classez-le, indiquez les articles et quantités concernés et ajoutez un document source si nécessaire. Un document de vente comptabilisé peut fournir les lignes et références source. La fiche reste ouverte après création : aucune commande de retour, note de crédit ou action corrective n’est créée. Passez son statut à En cours au début du suivi. Les notifications Teams dépendent de la configuration.",
+        "Erstellt einen Kunden-Nichtkonformitätsdatensatz in Aptean Non Conformances. Erfassen Sie ein von einem Kunden oder Verbraucher gemeldetes Problem, beschreiben Sie Problem und Ursache, klassifizieren Sie es, geben Sie betroffene Artikel und Mengen an und fügen Sie bei Bedarf ein Quelldokument hinzu. Ein gebuchter Verkaufsbeleg kann Zeilen und Quellenverweise übernehmen. Der Datensatz bleibt nach der Erstellung offen: Es wird weder eine Rücksendung noch eine Gutschrift oder Korrekturmaßnahme erstellt. Setzen Sie den Status zu Beginn der Nachverfolgung auf In Bearbeitung. Teams-Benachrichtigungen hängen von der Einrichtung ab.",
+        "Crea un registro de no conformidad de cliente en Aptean Non Conformances. Registre el problema notificado por un cliente o consumidor, describa el problema y su causa raíz, clasifíquelo, indique los artículos y cantidades afectados y añada un documento de origen cuando corresponda. Un documento de venta registrado puede aportar las líneas y referencias de origen. El registro queda abierto al crearse: no crea una devolución, abono ni acción correctiva. Cambie el estado a En curso cuando empiece el seguimiento. Las notificaciones de Teams dependen de la configuración.",
+        "Opretter en kundes afvigelsesregistrering i Aptean Non Conformances. Registrér et problem indberettet af en kunde eller forbruger, beskriv problemet og årsagen, klassificér det, angiv berørte varer og antal, og tilføj et kildedokument, når det er relevant. Et bogført salgsdokument kan udfylde linjer og kildereferencer. Registreringen forbliver åben ved oprettelse: Den opretter ikke en retur, kreditnota eller korrigerende handling. Skift status til I gang, når opfølgningen starter. Teams-meddelelser afhænger af opsætningen.",
+        "Luo asiakkaan poikkeamatietueen Aptean Non Conformances -sovellukseen. Kirjaa asiakkaan tai kuluttajan ilmoittama ongelma, kuvaa ongelma ja sen juurisyy, luokittele se, määritä tuotteet ja määrät sekä lisää lähdeasiakirja tarvittaessa. Kirjattu myyntiasiakirja voi tuoda rivit ja lähdeviitteet. Tietue jää luonnin jälkeen avoimeksi: se ei luo palautusta, hyvityslaskua eikä korjaavaa toimenpidettä. Muuta tila Käsittelyssä-tilaksi, kun seuranta alkaa. Teams-ilmoitukset riippuvat asetuksista.",
+        "Oppretter en kundes avviksregistrering i Aptean Non Conformances. Registrer et problem meldt inn av en kunde eller forbruker, beskriv problemet og rotårsaken, klassifiser det, angi berørte varer og antall, og legg til et kildedokument ved behov. Et bokført salgsdokument kan fylle ut linjer og kildereferanser. Registreringen forblir åpen når den opprettes: Den oppretter ikke en retur, kreditnota eller korrigerende handling. Endre status til Pågår når oppfølgingen starter. Teams-varsler avhenger av oppsettet."
+      ],
+      "localizedExplanations": {
+        "en-US": "Creates a customer non-conformance record in Aptean Non Conformances. Use it to register a reported issue for a customer or consumer; describe the issue and root cause, classify it, identify affected items and quantities, and add a source document when applicable. A posted sales document can supply the related lines and source references. Creation leaves the record open: it does not create a return, credit or corrective action. Move it to In Progress when follow-up begins; Teams notification depends on setup.",
+        "sv-SE": "Skapar en kundavvikelse i Aptean Non Conformances. Registrera ett rapporterat problem för en kund eller konsument, beskriv avvikelsen och grundorsaken, klassificera den, ange berörda artiklar och kvantiteter och lägg till källdokument när det finns. Ett bokfört försäljningsdokument kan fylla i rader och källreferenser. Posten förblir öppen när den skapas: ingen retur, kreditnota eller korrigerande åtgärd skapas. Ändra status till Pågår när uppföljningen börjar. Teams-avisering kräver rätt inställning.",
+        "fr-FR": "Crée une fiche de non-conformité client dans Aptean Non Conformances. Enregistrez le problème signalé par un client ou un consommateur, décrivez le problème et sa cause racine, classez-le, indiquez les articles et quantités concernés et ajoutez un document source si nécessaire. Un document de vente comptabilisé peut fournir les lignes et références source. La fiche reste ouverte après création : aucune commande de retour, note de crédit ou action corrective n’est créée. Passez son statut à En cours au début du suivi. Les notifications Teams dépendent de la configuration.",
+        "de-DE": "Erstellt einen Kunden-Nichtkonformitätsdatensatz in Aptean Non Conformances. Erfassen Sie ein von einem Kunden oder Verbraucher gemeldetes Problem, beschreiben Sie Problem und Ursache, klassifizieren Sie es, geben Sie betroffene Artikel und Mengen an und fügen Sie bei Bedarf ein Quelldokument hinzu. Ein gebuchter Verkaufsbeleg kann Zeilen und Quellenverweise übernehmen. Der Datensatz bleibt nach der Erstellung offen: Es wird weder eine Rücksendung noch eine Gutschrift oder Korrekturmaßnahme erstellt. Setzen Sie den Status zu Beginn der Nachverfolgung auf In Bearbeitung. Teams-Benachrichtigungen hängen von der Einrichtung ab.",
+        "es-ES": "Crea un registro de no conformidad de cliente en Aptean Non Conformances. Registre el problema notificado por un cliente o consumidor, describa el problema y su causa raíz, clasifíquelo, indique los artículos y cantidades afectados y añada un documento de origen cuando corresponda. Un documento de venta registrado puede aportar las líneas y referencias de origen. El registro queda abierto al crearse: no crea una devolución, abono ni acción correctiva. Cambie el estado a En curso cuando empiece el seguimiento. Las notificaciones de Teams dependen de la configuración.",
+        "da-DK": "Opretter en kundes afvigelsesregistrering i Aptean Non Conformances. Registrér et problem indberettet af en kunde eller forbruger, beskriv problemet og årsagen, klassificér det, angiv berørte varer og antal, og tilføj et kildedokument, når det er relevant. Et bogført salgsdokument kan udfylde linjer og kildereferencer. Registreringen forbliver åben ved oprettelse: Den opretter ikke en retur, kreditnota eller korrigerende handling. Skift status til I gang, når opfølgningen starter. Teams-meddelelser afhænger af opsætningen.",
+        "fi-FI": "Luo asiakkaan poikkeamatietueen Aptean Non Conformances -sovellukseen. Kirjaa asiakkaan tai kuluttajan ilmoittama ongelma, kuvaa ongelma ja sen juurisyy, luokittele se, määritä tuotteet ja määrät sekä lisää lähdeasiakirja tarvittaessa. Kirjattu myyntiasiakirja voi tuoda rivit ja lähdeviitteet. Tietue jää luonnin jälkeen avoimeksi: se ei luo palautusta, hyvityslaskua eikä korjaavaa toimenpidettä. Muuta tila Käsittelyssä-tilaksi, kun seuranta alkaa. Teams-ilmoitukset riippuvat asetuksista.",
+        "nb-NO": "Oppretter en kundes avviksregistrering i Aptean Non Conformances. Registrer et problem meldt inn av en kunde eller forbruker, beskriv problemet og rotårsaken, klassifiser det, angi berørte varer og antall, og legg til et kildedokument ved behov. Et bokført salgsdokument kan fylle ut linjer og kildereferanser. Registreringen forblir åpen når den opprettes: Den oppretter ikke en retur, kreditnota eller korrigerende handling. Endre status til Pågår når oppfølgingen starter. Teams-varsler avhenger av oppsettet."
+      }
+    },
+    {
+      "priority": 1200,
+      "confidence": 0.96,
+      "instructionTemplate": "",
+      "languages": [
+        "en-US",
+        "sv-SE",
+        "fr-FR",
+        "de-DE",
+        "es-ES",
+        "da-DK",
+        "fi-FI",
+        "nb-NO"
+      ],
+      "aliases": [],
+      "match": {
+        "pagePatterns": [
+          "^Purchase Claims$"
+        ],
+        "actionPatterns": [
+          "^New$"
+        ],
+        "fieldPatterns": [],
+        "automationIdPatterns": []
+      },
+      "ruleId": "Aptean.CreatePurchaseClaim",
+      "taskType": "CreatePurchaseClaim",
+      "semanticAction": "CreateNew",
+      "entity": "ApteanPurchaseClaim",
+      "sourceIds": [
+        "aptean-claims-purchase-claims-2026"
+      ],
+      "texts": [
+        "Creates a purchase claim document in Aptean Claims for a vendor issue, return or price adjustment. Start from Purchase Claims → New, select the vendor, then retrieve the relevant posted receipt so item, location, original quantity and price stay tied to the source. Set the requested Credit or Return action on each line and complete the required claim values. Releasing the claim is separate from creating or posting the related purchase documents; verify claim setup and warehouse constraints before using a combined create-and-post action.",
+        "Skapar ett inköpsreklamationsdokument i Aptean Claims för ett leverantörsproblem, en retur eller en prisjustering. Börja i Inköpsreklamationer → Ny, välj leverantör och hämta den bokförda inleverans som berörs så att artikel, lagerplats, ursprunglig kvantitet och pris kopplas till källan. Ange Kredit eller Retur på varje rad och fyll i obligatoriska reklamationsvärden. Att frisläppa reklamationen är skilt från att skapa eller bokföra relaterade inköpsdokument. Kontrollera inställningar och lagerbegränsningar före en kombinerad skapa-och-bokför-åtgärd.",
+        "Crée un document de réclamation achat dans Aptean Claims pour un problème fournisseur, un retour ou un ajustement de prix. Depuis Réclamations achat → Nouveau, sélectionnez le fournisseur puis récupérez la réception comptabilisée concernée afin de conserver le lien entre l’article, l’emplacement, la quantité et le prix d’origine et leur source. Choisissez Crédit ou Retour pour chaque ligne et renseignez les valeurs requises. La libération est distincte de la création ou de la comptabilisation des documents achat associés. Vérifiez la configuration et les contraintes d’entrepôt avant une action combinée de création et comptabilisation.",
+        "Erstellt in Aptean Claims ein Einkaufsreklamationsdokument für ein Lieferantenproblem, eine Rücksendung oder eine Preisanpassung. Wählen Sie Einkaufsreklamationen → Neu, dann den Lieferanten und übernehmen Sie den betroffenen gebuchten Wareneingang, damit Artikel, Lagerort, ursprüngliche Menge und Preis mit der Quelle verknüpft bleiben. Legen Sie je Zeile die Aktion Gutschrift oder Rücksendung fest und ergänzen Sie die erforderlichen Reklamationswerte. Freigabe und Erstellung oder Buchung der zugehörigen Einkaufsbelege sind getrennte Schritte. Prüfen Sie Einrichtung und Lagerbeschränkungen vor einer kombinierten Erstellungs- und Buchungsaktion.",
+        "Crea un documento de reclamación de compra en Aptean Claims por un problema con el proveedor, una devolución o un ajuste de precio. Desde Reclamaciones de compra → Nuevo, seleccione el proveedor y recupere la recepción registrada correspondiente para mantener vinculados al origen el artículo, la ubicación, la cantidad y el precio originales. Indique Crédito o Devolución en cada línea y complete los valores requeridos. La liberación es independiente de crear o registrar los documentos de compra relacionados. Compruebe la configuración y las limitaciones del almacén antes de usar una acción combinada de creación y registro.",
+        "Opretter et købskravsdokument i Aptean Claims til en leverandørsag, returnering eller prisregulering. Gå til Købskrav → Ny, vælg leverandøren, og hent derefter den relevante bogførte modtagelse, så vare, lagersted, oprindeligt antal og pris forbliver knyttet til kilden. Vælg Kredit eller Retur for hver linje, og udfyld de nødvendige kravværdier. Frigivelse er adskilt fra oprettelse og bogføring af relaterede købsdokumenter. Kontrollér opsætning og lagerbegrænsninger, før du bruger en kombineret opret-og-bogfør-handling.",
+        "Luo ostovaatimusasiakirjan Aptean Claims -sovelluksessa toimittajaongelmaa, palautusta tai hinnan oikaisua varten. Valitse Ostovaatimukset → Uusi, valitse toimittaja ja hae asiaan kuuluva kirjattu vastaanotto, jotta nimike, varastopaikka, alkuperäinen määrä ja hinta säilyvät lähteeseen linkitettyinä. Määritä kullekin riville Hyvitys tai Palautus ja täytä vaaditut vaatimusarvot. Vapautus on erillinen vaihe liittyvien ostoasiakirjojen luomisesta tai kirjaamisesta. Tarkista asetukset ja varastorajoitukset ennen yhdistettyä luonti- ja kirjaustoimintoa.",
+        "Oppretter et kjøpskravsdokument i Aptean Claims for en leverandørsak, retur eller prisjustering. Gå til Kjøpskrav → Ny, velg leverandøren og hent den aktuelle bokførte mottakelsen slik at vare, lagersted, opprinnelig antall og pris forblir knyttet til kilden. Angi Kreditt eller Retur på hver linje og fyll ut de nødvendige kravverdiene. Frigivelse er et eget trinn fra å opprette eller bokføre de tilhørende kjøpsdokumentene. Kontroller oppsett og lagerbegrensninger før du bruker en kombinert opprett-og-bokfør-handling."
+      ],
+      "localizedExplanations": {
+        "en-US": "Creates a purchase claim document in Aptean Claims for a vendor issue, return or price adjustment. Start from Purchase Claims → New, select the vendor, then retrieve the relevant posted receipt so item, location, original quantity and price stay tied to the source. Set the requested Credit or Return action on each line and complete the required claim values. Releasing the claim is separate from creating or posting the related purchase documents; verify claim setup and warehouse constraints before using a combined create-and-post action.",
+        "sv-SE": "Skapar ett inköpsreklamationsdokument i Aptean Claims för ett leverantörsproblem, en retur eller en prisjustering. Börja i Inköpsreklamationer → Ny, välj leverantör och hämta den bokförda inleverans som berörs så att artikel, lagerplats, ursprunglig kvantitet och pris kopplas till källan. Ange Kredit eller Retur på varje rad och fyll i obligatoriska reklamationsvärden. Att frisläppa reklamationen är skilt från att skapa eller bokföra relaterade inköpsdokument. Kontrollera inställningar och lagerbegränsningar före en kombinerad skapa-och-bokför-åtgärd.",
+        "fr-FR": "Crée un document de réclamation achat dans Aptean Claims pour un problème fournisseur, un retour ou un ajustement de prix. Depuis Réclamations achat → Nouveau, sélectionnez le fournisseur puis récupérez la réception comptabilisée concernée afin de conserver le lien entre l’article, l’emplacement, la quantité et le prix d’origine et leur source. Choisissez Crédit ou Retour pour chaque ligne et renseignez les valeurs requises. La libération est distincte de la création ou de la comptabilisation des documents achat associés. Vérifiez la configuration et les contraintes d’entrepôt avant une action combinée de création et comptabilisation.",
+        "de-DE": "Erstellt in Aptean Claims ein Einkaufsreklamationsdokument für ein Lieferantenproblem, eine Rücksendung oder eine Preisanpassung. Wählen Sie Einkaufsreklamationen → Neu, dann den Lieferanten und übernehmen Sie den betroffenen gebuchten Wareneingang, damit Artikel, Lagerort, ursprüngliche Menge und Preis mit der Quelle verknüpft bleiben. Legen Sie je Zeile die Aktion Gutschrift oder Rücksendung fest und ergänzen Sie die erforderlichen Reklamationswerte. Freigabe und Erstellung oder Buchung der zugehörigen Einkaufsbelege sind getrennte Schritte. Prüfen Sie Einrichtung und Lagerbeschränkungen vor einer kombinierten Erstellungs- und Buchungsaktion.",
+        "es-ES": "Crea un documento de reclamación de compra en Aptean Claims por un problema con el proveedor, una devolución o un ajuste de precio. Desde Reclamaciones de compra → Nuevo, seleccione el proveedor y recupere la recepción registrada correspondiente para mantener vinculados al origen el artículo, la ubicación, la cantidad y el precio originales. Indique Crédito o Devolución en cada línea y complete los valores requeridos. La liberación es independiente de crear o registrar los documentos de compra relacionados. Compruebe la configuración y las limitaciones del almacén antes de usar una acción combinada de creación y registro.",
+        "da-DK": "Opretter et købskravsdokument i Aptean Claims til en leverandørsag, returnering eller prisregulering. Gå til Købskrav → Ny, vælg leverandøren, og hent derefter den relevante bogførte modtagelse, så vare, lagersted, oprindeligt antal og pris forbliver knyttet til kilden. Vælg Kredit eller Retur for hver linje, og udfyld de nødvendige kravværdier. Frigivelse er adskilt fra oprettelse og bogføring af relaterede købsdokumenter. Kontrollér opsætning og lagerbegrænsninger, før du bruger en kombineret opret-og-bogfør-handling.",
+        "fi-FI": "Luo ostovaatimusasiakirjan Aptean Claims -sovelluksessa toimittajaongelmaa, palautusta tai hinnan oikaisua varten. Valitse Ostovaatimukset → Uusi, valitse toimittaja ja hae asiaan kuuluva kirjattu vastaanotto, jotta nimike, varastopaikka, alkuperäinen määrä ja hinta säilyvät lähteeseen linkitettyinä. Määritä kullekin riville Hyvitys tai Palautus ja täytä vaaditut vaatimusarvot. Vapautus on erillinen vaihe liittyvien ostoasiakirjojen luomisesta tai kirjaamisesta. Tarkista asetukset ja varastorajoitukset ennen yhdistettyä luonti- ja kirjaustoimintoa.",
+        "nb-NO": "Oppretter et kjøpskravsdokument i Aptean Claims for en leverandørsak, retur eller prisjustering. Gå til Kjøpskrav → Ny, velg leverandøren og hent den aktuelle bokførte mottakelsen slik at vare, lagersted, opprinnelig antall og pris forblir knyttet til kilden. Angi Kreditt eller Retur på hver linje og fyll ut de nødvendige kravverdiene. Frigivelse er et eget trinn fra å opprette eller bokføre de tilhørende kjøpsdokumentene. Kontroller oppsett og lagerbegrensninger før du bruker en kombinert opprett-og-bokfør-handling."
+      }
+    },
+    {
+      "priority": 1200,
+      "confidence": 0.96,
+      "instructionTemplate": "",
+      "languages": [
+        "en-US",
+        "sv-SE",
+        "fr-FR",
+        "de-DE",
+        "es-ES",
+        "da-DK",
+        "fi-FI",
+        "nb-NO"
+      ],
+      "aliases": [],
+      "match": {
+        "pagePatterns": [
+          "^Posted Sales Claim$"
+        ],
+        "actionPatterns": [
+          "^Create Purchase Claim$"
+        ],
+        "fieldPatterns": [],
+        "automationIdPatterns": []
+      },
+      "ruleId": "Aptean.CreateClaim",
+      "taskType": "CreatePurchaseClaimFromSalesClaim",
+      "semanticAction": "RunAction",
+      "entity": "ApteanPurchaseClaim",
+      "sourceIds": [
+        "aptean-claims-purchase-claims-2026"
+      ],
+      "texts": [
+        "From a Posted Sales Claim, Create Purchase Claim creates the vendor-side Aptean purchase claim for the selected sales-claim lines and retains the reference to the posted sales claim. Review the selected lines, vendor and quantities on the new purchase claim; this action creates the claim record and does not by itself release, create or post the return/credit documents.",
+        "Från en bokförd försäljningsreklamation skapar Skapa inköpsreklamation en inköpsreklamation på leverantörssidan för valda rader och behåller referensen till den bokförda försäljningsreklamationen. Granska valda rader, leverantör och kvantiteter i den nya posten. Åtgärden skapar reklamationsposten men frisläpper, skapar eller bokför inte i sig retur- eller kreditdokument.",
+        "Depuis une réclamation vente comptabilisée, Créer une réclamation achat crée la réclamation achat fournisseur pour les lignes sélectionnées et conserve la référence à la réclamation vente comptabilisée. Vérifiez les lignes, le fournisseur et les quantités dans la nouvelle fiche. Cette action crée la réclamation, mais ne libère, ne crée ni ne comptabilise à elle seule les documents de retour ou de crédit.",
+        "Aus einer gebuchten Verkaufsreklamation erstellt „Einkaufsreklamation erstellen“ die Lieferanten-Einkaufsreklamation für die ausgewählten Zeilen und behält den Verweis auf die gebuchte Verkaufsreklamation bei. Prüfen Sie die ausgewählten Zeilen, den Lieferanten und die Mengen in der neuen Reklamation. Die Aktion erstellt den Reklamationsdatensatz, gibt aber die Rückgabe- oder Gutschriftbelege nicht frei, erstellt oder bucht sie nicht.",
+        "Desde una reclamación de venta registrada, Crear reclamación de compra crea la reclamación de compra al proveedor para las líneas seleccionadas y conserva la referencia a la reclamación de venta registrada. Revise las líneas, el proveedor y las cantidades en la nueva reclamación. La acción crea el registro de reclamación, pero no libera, crea ni registra por sí sola los documentos de devolución o abono.",
+        "Fra en bogført salgskrav opretter Opret købskrav leverandørens købskrav for de valgte linjer og bevarer referencen til det bogførte salgskrav. Kontrollér de valgte linjer, leverandøren og antal i det nye købskrav. Handlingen opretter kravregistreringen, men frigiver, opretter eller bogfører ikke i sig selv retur- eller kreditdokumenterne.",
+        "Kirjatusta myyntivaatimuksesta Luo ostovaatimus luo toimittajan ostovaatimuksen valituille riveille ja säilyttää viittauksen kirjattuun myyntivaatimukseen. Tarkista uuden vaatimuksen rivit, toimittaja ja määrät. Toiminto luo vaatimus tietueen, mutta ei itsessään vapauta, luo eikä kirjaa palautus- tai hyvitysasiakirjoja.",
+        "Fra et bokført salgskrav oppretter Opprett kjøpskrav leverandørens kjøpskrav for de valgte linjene og beholder referansen til det bokførte salgskravet. Kontroller de valgte linjene, leverandøren og antall i det nye kravet. Handlingen oppretter kravregistreringen, men frigir, oppretter eller bokfører ikke i seg selv retur- eller kreditdokumentene."
+      ],
+      "localizedExplanations": {
+        "en-US": "From a Posted Sales Claim, Create Purchase Claim creates the vendor-side Aptean purchase claim for the selected sales-claim lines and retains the reference to the posted sales claim. Review the selected lines, vendor and quantities on the new purchase claim; this action creates the claim record and does not by itself release, create or post the return/credit documents.",
+        "sv-SE": "Från en bokförd försäljningsreklamation skapar Skapa inköpsreklamation en inköpsreklamation på leverantörssidan för valda rader och behåller referensen till den bokförda försäljningsreklamationen. Granska valda rader, leverantör och kvantiteter i den nya posten. Åtgärden skapar reklamationsposten men frisläpper, skapar eller bokför inte i sig retur- eller kreditdokument.",
+        "fr-FR": "Depuis une réclamation vente comptabilisée, Créer une réclamation achat crée la réclamation achat fournisseur pour les lignes sélectionnées et conserve la référence à la réclamation vente comptabilisée. Vérifiez les lignes, le fournisseur et les quantités dans la nouvelle fiche. Cette action crée la réclamation, mais ne libère, ne crée ni ne comptabilise à elle seule les documents de retour ou de crédit.",
+        "de-DE": "Aus einer gebuchten Verkaufsreklamation erstellt „Einkaufsreklamation erstellen“ die Lieferanten-Einkaufsreklamation für die ausgewählten Zeilen und behält den Verweis auf die gebuchte Verkaufsreklamation bei. Prüfen Sie die ausgewählten Zeilen, den Lieferanten und die Mengen in der neuen Reklamation. Die Aktion erstellt den Reklamationsdatensatz, gibt aber die Rückgabe- oder Gutschriftbelege nicht frei, erstellt oder bucht sie nicht.",
+        "es-ES": "Desde una reclamación de venta registrada, Crear reclamación de compra crea la reclamación de compra al proveedor para las líneas seleccionadas y conserva la referencia a la reclamación de venta registrada. Revise las líneas, el proveedor y las cantidades en la nueva reclamación. La acción crea el registro de reclamación, pero no libera, crea ni registra por sí sola los documentos de devolución o abono.",
+        "da-DK": "Fra en bogført salgskrav opretter Opret købskrav leverandørens købskrav for de valgte linjer og bevarer referencen til det bogførte salgskrav. Kontrollér de valgte linjer, leverandøren og antal i det nye købskrav. Handlingen opretter kravregistreringen, men frigiver, opretter eller bogfører ikke i sig selv retur- eller kreditdokumenterne.",
+        "fi-FI": "Kirjatusta myyntivaatimuksesta Luo ostovaatimus luo toimittajan ostovaatimuksen valituille riveille ja säilyttää viittauksen kirjattuun myyntivaatimukseen. Tarkista uuden vaatimuksen rivit, toimittaja ja määrät. Toiminto luo vaatimus tietueen, mutta ei itsessään vapauta, luo eikä kirjaa palautus- tai hyvitysasiakirjoja.",
+        "nb-NO": "Fra et bokført salgskrav oppretter Opprett kjøpskrav leverandørens kjøpskrav for de valgte linjene og beholder referansen til det bokførte salgskravet. Kontroller de valgte linjene, leverandøren og antall i det nye kravet. Handlingen oppretter kravregistreringen, men frigir, oppretter eller bokfører ikke i seg selv retur- eller kreditdokumentene."
+      }
+    },
+    {
+      "priority": 1200,
+      "confidence": 0.96,
+      "instructionTemplate": "",
+      "languages": [
+        "en-US",
+        "sv-SE",
+        "fr-FR",
+        "de-DE",
+        "es-ES",
+        "da-DK",
+        "fi-FI",
+        "nb-NO"
+      ],
+      "aliases": [],
+      "match": {
+        "pagePatterns": [
+          "^Purchase Claim$"
+        ],
+        "actionPatterns": [
+          "^Release & Create$"
+        ],
+        "fieldPatterns": [],
+        "automationIdPatterns": []
+      },
+      "ruleId": "Aptean.ReleaseAndCreatePurchaseClaim",
+      "taskType": "ReleaseAndCreatePurchaseClaimDocuments",
+      "semanticAction": "RunAction",
+      "entity": "ApteanPurchaseClaim",
+      "sourceIds": [
+        "aptean-claims-purchase-claims-2026"
+      ],
+      "texts": [
+        "On a Purchase Claim, Release & Create releases the claim and creates the related purchase document or documents for the amounts and quantities specified on its lines. It does not post those resulting documents. Check each line’s Credit/Return action, quantity, price, tracking and source receipt before running it; review and post the created documents separately.",
+        "På en inköpsreklamation frisläpper Frisläpp och skapa reklamationen och skapar relaterat inköpsdokument för radens angivna belopp och kvantiteter. De skapade dokumenten bokförs inte. Kontrollera Kredit/Retur, kvantitet, pris, spårning och källinleverans på varje rad. Granska och bokför de nya dokumenten separat.",
+        "Sur une réclamation achat, Libérer et créer libère la réclamation et crée le ou les documents achat associés selon les montants et quantités des lignes. Les documents créés ne sont pas comptabilisés. Vérifiez pour chaque ligne l’action Crédit/Retour, la quantité, le prix, le suivi et la réception source, puis contrôlez et comptabilisez séparément les nouveaux documents.",
+        "Bei einer Einkaufsreklamation gibt „Freigeben und erstellen“ die Reklamation frei und erstellt die zugehörigen Einkaufsbelege mit den angegebenen Beträgen und Mengen. Die erstellten Belege werden nicht gebucht. Prüfen Sie je Zeile Gutschrift/Rücksendung, Menge, Preis, Artikelverfolgung und Quellwareneingang. Kontrollieren und buchen Sie die neuen Belege separat.",
+        "En una reclamación de compra, Liberar y crear libera la reclamación y crea los documentos de compra relacionados con los importes y cantidades de sus líneas. Los documentos creados no se registran. Compruebe en cada línea la acción Crédito/Devolución, la cantidad, el precio, el seguimiento y la recepción de origen; revise y registre los documentos por separado.",
+        "På et købskrav frigiver Frigiv og opret kravet og opretter de relaterede købsdokumenter med de angivne beløb og antal. De oprettede dokumenter bogføres ikke. Kontrollér Kredit/Retur, antal, pris, varesporing og kildemodtagelse på hver linje. Gennemgå og bogfør de nye dokumenter separat.",
+        "Ostovaatimuksessa Vapauta ja luo vapauttaa vaatimuksen ja luo siihen liittyvät asiakirjat riveillä määritetyillä summilla ja määrillä. Luotuja asiakirjoja ei kirjata. Tarkista jokaiselta riviltä Hyvitys/Palautus, määrä, hinta, seuranta ja lähdevastaanotto. Tarkista ja kirjaa luodut asiakirjat erikseen.",
+        "På et kjøpskrav frigir Frigi og opprett kravet og oppretter de tilhørende kjøpsdokumentene med angitte beløp og antall. De opprettede dokumentene bokføres ikke. Kontroller Kreditt/Retur, antall, pris, varesporing og kildemottak på hver linje. Gjennomgå og bokfør de nye dokumentene separat."
+      ],
+      "localizedExplanations": {
+        "en-US": "On a Purchase Claim, Release & Create releases the claim and creates the related purchase document or documents for the amounts and quantities specified on its lines. It does not post those resulting documents. Check each line’s Credit/Return action, quantity, price, tracking and source receipt before running it; review and post the created documents separately.",
+        "sv-SE": "På en inköpsreklamation frisläpper Frisläpp och skapa reklamationen och skapar relaterat inköpsdokument för radens angivna belopp och kvantiteter. De skapade dokumenten bokförs inte. Kontrollera Kredit/Retur, kvantitet, pris, spårning och källinleverans på varje rad. Granska och bokför de nya dokumenten separat.",
+        "fr-FR": "Sur une réclamation achat, Libérer et créer libère la réclamation et crée le ou les documents achat associés selon les montants et quantités des lignes. Les documents créés ne sont pas comptabilisés. Vérifiez pour chaque ligne l’action Crédit/Retour, la quantité, le prix, le suivi et la réception source, puis contrôlez et comptabilisez séparément les nouveaux documents.",
+        "de-DE": "Bei einer Einkaufsreklamation gibt „Freigeben und erstellen“ die Reklamation frei und erstellt die zugehörigen Einkaufsbelege mit den angegebenen Beträgen und Mengen. Die erstellten Belege werden nicht gebucht. Prüfen Sie je Zeile Gutschrift/Rücksendung, Menge, Preis, Artikelverfolgung und Quellwareneingang. Kontrollieren und buchen Sie die neuen Belege separat.",
+        "es-ES": "En una reclamación de compra, Liberar y crear libera la reclamación y crea los documentos de compra relacionados con los importes y cantidades de sus líneas. Los documentos creados no se registran. Compruebe en cada línea la acción Crédito/Devolución, la cantidad, el precio, el seguimiento y la recepción de origen; revise y registre los documentos por separado.",
+        "da-DK": "På et købskrav frigiver Frigiv og opret kravet og opretter de relaterede købsdokumenter med de angivne beløb og antal. De oprettede dokumenter bogføres ikke. Kontrollér Kredit/Retur, antal, pris, varesporing og kildemodtagelse på hver linje. Gennemgå og bogfør de nye dokumenter separat.",
+        "fi-FI": "Ostovaatimuksessa Vapauta ja luo vapauttaa vaatimuksen ja luo siihen liittyvät asiakirjat riveillä määritetyillä summilla ja määrillä. Luotuja asiakirjoja ei kirjata. Tarkista jokaiselta riviltä Hyvitys/Palautus, määrä, hinta, seuranta ja lähdevastaanotto. Tarkista ja kirjaa luodut asiakirjat erikseen.",
+        "nb-NO": "På et kjøpskrav frigir Frigi og opprett kravet og oppretter de tilhørende kjøpsdokumentene med angitte beløp og antall. De opprettede dokumentene bokføres ikke. Kontroller Kreditt/Retur, antall, pris, varesporing og kildemottak på hver linje. Gjennomgå og bokfør de nye dokumentene separat."
+      }
+    },
+    {
+      "priority": 1200,
+      "confidence": 0.96,
+      "instructionTemplate": "",
+      "languages": [
+        "en-US",
+        "sv-SE",
+        "fr-FR",
+        "de-DE",
+        "es-ES",
+        "da-DK",
+        "fi-FI",
+        "nb-NO"
+      ],
+      "aliases": [],
+      "match": {
+        "pagePatterns": [
+          "^Purchase Claim$"
+        ],
+        "actionPatterns": [
+          "^Release & Create & Post$"
+        ],
+        "fieldPatterns": [],
+        "automationIdPatterns": []
+      },
+      "ruleId": "Aptean.ReleaseCreateAndPostPurchaseClaim",
+      "taskType": "ReleaseCreateAndPostPurchaseClaimDocuments",
+      "semanticAction": "RunAction",
+      "entity": "ApteanPurchaseClaim",
+      "sourceIds": [
+        "aptean-claims-purchase-claims-2026"
+      ],
+      "texts": [
+        "On a Purchase Claim, Release & Create & Post releases the claim, creates the related purchase documents and posts them in the same flow. Posting finalizes the claim and its related documents; the claim cannot then be changed. Verify source receipt, line actions, quantities, prices and item tracking first. Aptean documents a limitation for Warehouse Management locations: the related documents may not be created and posted through this combined action. Confirm the warehouse-specific posting path before proceeding.",
+        "På en inköpsreklamation frisläpper Frisläpp, skapa och bokför reklamationen, skapar relaterade inköpsdokument och bokför dem i samma flöde. Bokföringen slutför reklamationen och dokumenten, varefter reklamationen inte kan ändras. Kontrollera först källinleverans, radåtgärder, kvantiteter, priser och artikelspårning. Aptean dokumenterar en begränsning för lagerplatser med lagerhantering: relaterade dokument kanske inte skapas och bokförs via den kombinerade åtgärden. Bekräfta lagerflödet innan du fortsätter.",
+        "Sur une réclamation achat, Libérer, créer et comptabiliser libère la réclamation, crée les documents achat associés et les comptabilise dans le même flux. La comptabilisation finalise la réclamation et les documents associés ; la réclamation ne peut alors plus être modifiée. Vérifiez d’abord la réception source, les actions, quantités, prix et le suivi des articles. Aptean documente une limite pour les emplacements avec gestion d’entrepôt : les documents associés peuvent ne pas être créés et comptabilisés avec cette action combinée. Confirmez le processus d’entrepôt avant de continuer.",
+        "Bei einer Einkaufsreklamation gibt „Freigeben, erstellen und buchen“ die Reklamation frei, erstellt die zugehörigen Einkaufsbelege und bucht sie in einem Ablauf. Die Buchung schließt Reklamation und Belege ab; danach kann die Reklamation nicht mehr geändert werden. Prüfen Sie zuvor Quellwareneingang, Zeilenaktionen, Mengen, Preise und Artikelverfolgung. Aptean dokumentiert eine Einschränkung für Lagerorte mit Lagerverwaltung: Zugehörige Belege können mit dieser kombinierten Aktion möglicherweise nicht erstellt und gebucht werden. Klären Sie den Lagerprozess vor dem Fortfahren.",
+        "En una reclamación de compra, Liberar, crear y registrar libera la reclamación, crea los documentos de compra relacionados y los registra en el mismo flujo. El registro finaliza la reclamación y sus documentos; después ya no se puede modificar. Verifique antes la recepción de origen, las acciones de línea, cantidades, precios y seguimiento de artículos. Aptean documenta una limitación para ubicaciones con gestión de almacén: puede que la acción combinada no cree y registre los documentos relacionados. Confirme el proceso del almacén antes de continuar.",
+        "På et købskrav frigiver Frigiv, opret og bogfør kravet, opretter de relaterede købsdokumenter og bogfører dem i samme forløb. Bogføringen afslutter kravet og dokumenterne; derefter kan kravet ikke ændres. Kontrollér først kildemodtagelse, linjehandlinger, antal, priser og varesporing. Aptean dokumenterer en begrænsning for lagersteder med lagerstyring: De relaterede dokumenter oprettes og bogføres muligvis ikke med denne kombinerede handling. Bekræft lagerprocessen, før du fortsætter.",
+        "Ostovaatimuksessa Vapauta, luo ja kirjaa vapauttaa vaatimuksen, luo siihen liittyvät ostoasiakirjat ja kirjaa ne samassa työnkulussa. Kirjaus viimeistelee vaatimuksen ja siihen liittyvät asiakirjat, minkä jälkeen vaatimusta ei voi muuttaa. Tarkista ensin lähdevastaanotto, rivitoiminnot, määrät, hinnat ja nimikeseuranta. Aptean dokumentoi rajoituksen varastonhallintaa käyttäville varastopaikoille: yhdistetty toiminto ei ehkä luo ja kirjaa liittyviä asiakirjoja. Varmista varastokohtainen työnkulku ennen jatkamista.",
+        "På et kjøpskrav frigir Frigi, opprett og bokfør kravet, oppretter de tilhørende kjøpsdokumentene og bokfører dem i samme flyt. Bokføringen fullfører kravet og dokumentene; deretter kan kravet ikke endres. Kontroller først kildemottak, linjehandlinger, antall, priser og varesporing. Aptean dokumenterer en begrensning for lagersteder med lagerstyring: De tilhørende dokumentene blir kanskje ikke opprettet og bokført med denne kombinerte handlingen. Bekreft lagerflyten før du fortsetter."
+      ],
+      "localizedExplanations": {
+        "en-US": "On a Purchase Claim, Release & Create & Post releases the claim, creates the related purchase documents and posts them in the same flow. Posting finalizes the claim and its related documents; the claim cannot then be changed. Verify source receipt, line actions, quantities, prices and item tracking first. Aptean documents a limitation for Warehouse Management locations: the related documents may not be created and posted through this combined action. Confirm the warehouse-specific posting path before proceeding.",
+        "sv-SE": "På en inköpsreklamation frisläpper Frisläpp, skapa och bokför reklamationen, skapar relaterade inköpsdokument och bokför dem i samma flöde. Bokföringen slutför reklamationen och dokumenten, varefter reklamationen inte kan ändras. Kontrollera först källinleverans, radåtgärder, kvantiteter, priser och artikelspårning. Aptean dokumenterar en begränsning för lagerplatser med lagerhantering: relaterade dokument kanske inte skapas och bokförs via den kombinerade åtgärden. Bekräfta lagerflödet innan du fortsätter.",
+        "fr-FR": "Sur une réclamation achat, Libérer, créer et comptabiliser libère la réclamation, crée les documents achat associés et les comptabilise dans le même flux. La comptabilisation finalise la réclamation et les documents associés ; la réclamation ne peut alors plus être modifiée. Vérifiez d’abord la réception source, les actions, quantités, prix et le suivi des articles. Aptean documente une limite pour les emplacements avec gestion d’entrepôt : les documents associés peuvent ne pas être créés et comptabilisés avec cette action combinée. Confirmez le processus d’entrepôt avant de continuer.",
+        "de-DE": "Bei einer Einkaufsreklamation gibt „Freigeben, erstellen und buchen“ die Reklamation frei, erstellt die zugehörigen Einkaufsbelege und bucht sie in einem Ablauf. Die Buchung schließt Reklamation und Belege ab; danach kann die Reklamation nicht mehr geändert werden. Prüfen Sie zuvor Quellwareneingang, Zeilenaktionen, Mengen, Preise und Artikelverfolgung. Aptean dokumentiert eine Einschränkung für Lagerorte mit Lagerverwaltung: Zugehörige Belege können mit dieser kombinierten Aktion möglicherweise nicht erstellt und gebucht werden. Klären Sie den Lagerprozess vor dem Fortfahren.",
+        "es-ES": "En una reclamación de compra, Liberar, crear y registrar libera la reclamación, crea los documentos de compra relacionados y los registra en el mismo flujo. El registro finaliza la reclamación y sus documentos; después ya no se puede modificar. Verifique antes la recepción de origen, las acciones de línea, cantidades, precios y seguimiento de artículos. Aptean documenta una limitación para ubicaciones con gestión de almacén: puede que la acción combinada no cree y registre los documentos relacionados. Confirme el proceso del almacén antes de continuar.",
+        "da-DK": "På et købskrav frigiver Frigiv, opret og bogfør kravet, opretter de relaterede købsdokumenter og bogfører dem i samme forløb. Bogføringen afslutter kravet og dokumenterne; derefter kan kravet ikke ændres. Kontrollér først kildemodtagelse, linjehandlinger, antal, priser og varesporing. Aptean dokumenterer en begrænsning for lagersteder med lagerstyring: De relaterede dokumenter oprettes og bogføres muligvis ikke med denne kombinerede handling. Bekræft lagerprocessen, før du fortsætter.",
+        "fi-FI": "Ostovaatimuksessa Vapauta, luo ja kirjaa vapauttaa vaatimuksen, luo siihen liittyvät ostoasiakirjat ja kirjaa ne samassa työnkulussa. Kirjaus viimeistelee vaatimuksen ja siihen liittyvät asiakirjat, minkä jälkeen vaatimusta ei voi muuttaa. Tarkista ensin lähdevastaanotto, rivitoiminnot, määrät, hinnat ja nimikeseuranta. Aptean dokumentoi rajoituksen varastonhallintaa käyttäville varastopaikoille: yhdistetty toiminto ei ehkä luo ja kirjaa liittyviä asiakirjoja. Varmista varastokohtainen työnkulku ennen jatkamista.",
+        "nb-NO": "På et kjøpskrav frigir Frigi, opprett og bokfør kravet, oppretter de tilhørende kjøpsdokumentene og bokfører dem i samme flyt. Bokføringen fullfører kravet og dokumentene; deretter kan kravet ikke endres. Kontroller først kildemottak, linjehandlinger, antall, priser og varesporing. Aptean dokumenterer en begrensning for lagersteder med lagerstyring: De tilhørende dokumentene blir kanskje ikke opprettet og bokført med denne kombinerte handlingen. Bekreft lagerflyten før du fortsetter."
+      }
+    },
+    {
+      "ruleId": "Aptean.ChangeLotInspectionStatus",
+      "taskType": "ChangeLotInspectionStatus",
+      "semanticAction": "RunAction",
+      "entity": "ApteanLotInspectionStatus",
+      "priority": 1200,
+      "confidence": 0.97,
+      "match": {
+        "pagePatterns": [
+          "^Lot No\\. Information List$"
+        ],
+        "actionPatterns": [
+          "^Change Inspection Status$"
+        ],
+        "fieldPatterns": [],
+        "automationIdPatterns": []
+      },
+      "instructionTemplate": "",
+      "languages": [
+        "en-US",
+        "sv-SE",
+        "fr-FR",
+        "de-DE",
+        "es-ES",
+        "da-DK",
+        "fi-FI",
+        "nb-NO"
+      ],
+      "aliases": [],
+      "sourceIds": [
+        "aptean-inspection-status-change-code-2025"
+      ],
+      "localizedExplanations": {
+        "en-US": "Changes the inspection status on the selected Aptean lot records. Choose the intended status and reason code, then verify the affected lots; a comment is optional. The change updates each Lot No. Information Card and creates alert and audit entries. This does not enter QC measurements or prove a check passed. The action is unavailable for lots with no inventory and lots originating from drop shipment. A hold or availability effect depends on the selected status and setup.",
+        "sv-SE": "Ändrar inspektionsstatus på valda Aptean-partiposter. Välj avsedd status och orsakskod och kontrollera vilka partier som påverkas; kommentar är valfri. Ändringen uppdaterar varje artikelspårningskort och skapar aviseringar och granskningsposter. Den registrerar inga QC-mätvärden och bevisar inte att en kontroll är godkänd. Åtgärden kan inte användas när partiet saknar lager eller kommer från direktleverans. Spärr och tillgänglighet påverkas enligt vald status och inställningar.",
+        "fr-FR": "Modifie le statut d’inspection des lots Aptean sélectionnés. Choisissez le statut et le code motif voulus, puis vérifiez les lots concernés ; le commentaire est facultatif. La modification met à jour chaque fiche de lot et crée des alertes et des entrées d’audit. Elle ne saisit pas de mesures QC et ne prouve pas qu’un contrôle est réussi. L’action est indisponible si le lot n’a aucun stock ou provient d’une livraison directe. L’effet de blocage ou de disponibilité dépend du statut et du paramétrage.",
+        "de-DE": "Ändert den Prüfstatus der ausgewählten Aptean-Chargendatensätze. Wählen Sie den gewünschten Status und Ursachencode und prüfen Sie die betroffenen Chargen; ein Kommentar ist optional. Die Änderung aktualisiert jede Chargenkarte und erstellt Warn- und Prüfprotokolleinträge. Sie erfasst keine QC-Messwerte und belegt nicht, dass eine Prüfung bestanden wurde. Bei Chargen ohne Bestand oder aus einer Direktlieferung ist die Aktion nicht verfügbar. Sperr- und Verfügbarkeitseffekte hängen vom Status und der Einrichtung ab.",
+        "es-ES": "Cambia el estado de inspección de los lotes de Aptean seleccionados. Elija el estado y el código de motivo previstos y compruebe qué lotes se verán afectados; el comentario es opcional. El cambio actualiza cada ficha de lote y crea alertas y entradas de auditoría. No registra mediciones de calidad ni demuestra que una inspección se haya superado. La acción no está disponible si el lote no tiene inventario o procede de una entrega directa. El efecto sobre el bloqueo o la disponibilidad depende del estado y de la configuración.",
+        "da-DK": "Ændrer inspektionsstatus for de valgte Aptean-batchposter. Vælg den ønskede status og årsagskode, og kontrollér hvilke batches der påvirkes; en kommentar er valgfri. Ændringen opdaterer hvert batchkort og opretter alarm- og revisionsposter. Den registrerer ikke QC-målinger og beviser ikke, at en kontrol er bestået. Handlingen er ikke tilgængelig, hvis batchen ikke har lagerbeholdning eller stammer fra en direkte levering. Spærre- og tilgængelighedseffekten afhænger af status og opsætning.",
+        "fi-FI": "Muuttaa valittujen Aptean-erien tarkastustilan. Valitse haluttu tila ja syykoodi ja tarkista, mitä eriä muutos koskee; kommentti on valinnainen. Muutos päivittää kunkin eräkortin ja luo hälytys- ja auditointimerkinnät. Se ei kirjaa QC-mittauksia eikä osoita tarkastusta hyväksytyksi. Toiminto ei ole käytettävissä, jos erällä ei ole varastoa tai se on peräisin suoratoimituksesta. Eston ja saatavuuden vaikutus määräytyy valitun tilan ja asetusten mukaan.",
+        "nb-NO": "Endrer inspeksjonsstatus for de valgte Aptean-partipostene. Velg ønsket status og årsakskode, og kontroller hvilke partier som blir berørt; kommentar er valgfritt. Endringen oppdaterer hvert partikort og oppretter varsel- og revisjonsposter. Den registrerer ikke QC-målinger og beviser ikke at en kontroll er bestått. Handlingen er ikke tilgjengelig hvis partiet mangler beholdning eller stammer fra direktesending. Sperre- og tilgjengelighetseffekten avhenger av status og oppsett."
+      }
+    },
+    {
+      "ruleId": "Aptean.GenerateInspectionStatusWorksheetLines",
+      "taskType": "GenerateInspectionStatusWorksheetLines",
+      "semanticAction": "RunAction",
+      "entity": "ApteanInspectionStatusWorksheet",
+      "priority": 1200,
+      "confidence": 0.97,
+      "match": {
+        "pagePatterns": [
+          "^Inspection Status Change Worksheet$"
+        ],
+        "actionPatterns": [
+          "^Generate Lines$"
+        ],
+        "fieldPatterns": [],
+        "automationIdPatterns": []
+      },
+      "instructionTemplate": "",
+      "languages": [
+        "en-US",
+        "sv-SE",
+        "fr-FR",
+        "de-DE",
+        "es-ES",
+        "da-DK",
+        "fi-FI",
+        "nb-NO"
+      ],
+      "aliases": [],
+      "sourceIds": [
+        "aptean-inspection-status-change-code-2025"
+      ],
+      "localizedExplanations": {
+        "en-US": "Generates candidate lot rows for the Inspection Status Change Worksheet; it does not change their inspection statuses. Enter at least one filter such as current status, item, lot or creation date. Review the generated rows and selection before applying a later status change. Set as Selected can select all filtered rows, and Delete Existing Lines can replace the worksheet contents, so verify both options before confirming.",
+        "sv-SE": "Skapar urvalsrader för partier i arbetsbladet för ändring av inspektionsstatus; statusen ändras inte. Ange minst ett filter, till exempel aktuell status, artikel, parti eller skapandedatum. Granska raderna och markeringen innan du senare ändrar status. Markera som valda kan markera alla filtrerade rader och Ta bort befintliga rader kan ersätta arbetsbladets innehåll. Kontrollera därför båda alternativen före bekräftelse.",
+        "fr-FR": "Génère des lignes candidates de lots dans la feuille de modification du statut d’inspection ; leur statut n’est pas modifié. Saisissez au moins un filtre : statut actuel, article, lot ou date de création, par exemple. Vérifiez les lignes générées et leur sélection avant d’appliquer un changement de statut. Définir comme sélectionné peut sélectionner toutes les lignes filtrées et Supprimer les lignes existantes peut remplacer le contenu de la feuille ; contrôlez ces options avant de confirmer.",
+        "de-DE": "Erzeugt mögliche Chargenzeilen im Prüfstatusänderungsarbeitsblatt, ändert aber deren Prüfstatus nicht. Geben Sie mindestens einen Filter an, etwa aktuellen Status, Artikel, Charge oder Erstellungsdatum. Prüfen Sie die erzeugten Zeilen und deren Auswahl, bevor Sie später einen Status ändern. „Als ausgewählt markieren“ kann alle gefilterten Zeilen auswählen; „Vorhandene Zeilen löschen“ kann den Arbeitsblattinhalt ersetzen. Prüfen Sie beide Optionen vor der Bestätigung.",
+        "es-ES": "Genera filas candidatas de lotes en la hoja de cambio del estado de inspección, pero no cambia sus estados. Introduzca al menos un filtro, como estado actual, artículo, lote o fecha de creación. Revise las filas generadas y su selección antes de aplicar un cambio posterior. Establecer como seleccionado puede marcar todas las filas filtradas y Eliminar líneas existentes puede sustituir el contenido de la hoja; compruebe ambas opciones antes de confirmar.",
+        "da-DK": "Opretter mulige batchlinjer i regnearket til ændring af inspektionsstatus, men ændrer ikke deres status. Angiv mindst ét filter, f.eks. nuværende status, vare, batch eller oprettelsesdato. Gennemgå de oprettede linjer og markeringen, før du senere ændrer status. Markér som valgt kan markere alle filtrerede linjer, og Slet eksisterende linjer kan erstatte regnearkets indhold; kontrollér begge muligheder før bekræftelse.",
+        "fi-FI": "Luo eräehdokasrivit tarkastustilan muutoslaskentataulukkoon, mutta ei muuta niiden tarkastustilaa. Anna vähintään yksi suodatin, kuten nykyinen tila, nimike, erä tai luontipäivä. Tarkista luodut rivit ja valinnat ennen myöhempää tilan muutosta. Aseta valituksi voi valita kaikki suodatetut rivit, ja Poista nykyiset rivit voi korvata laskentataulukon sisällön. Tarkista molemmat asetukset ennen vahvistamista.",
+        "nb-NO": "Oppretter mulige partilinjer i regnearket for endring av inspeksjonsstatus, men endrer ikke statusen deres. Angi minst ett filter, for eksempel gjeldende status, vare, parti eller opprettelsesdato. Kontroller de opprettede linjene og utvalget før du senere endrer status. Sett som valgt kan velge alle filtrerte linjer, og Slett eksisterende linjer kan erstatte regnearkets innhold; kontroller begge alternativene før du bekrefter."
+      }
+    },
+    {
+      "ruleId": "Aptean.ApplyInspectionStatusFromWorksheet",
+      "taskType": "ApplyInspectionStatusFromWorksheet",
+      "semanticAction": "RunAction",
+      "entity": "ApteanLotInspectionStatus",
+      "priority": 1200,
+      "confidence": 0.97,
+      "match": {
+        "pagePatterns": [
+          "^Inspection Status Change Worksheet$"
+        ],
+        "actionPatterns": [
+          "^Change Inspection Status$"
+        ],
+        "fieldPatterns": [],
+        "automationIdPatterns": []
+      },
+      "instructionTemplate": "",
+      "languages": [
+        "en-US",
+        "sv-SE",
+        "fr-FR",
+        "de-DE",
+        "es-ES",
+        "da-DK",
+        "fi-FI",
+        "nb-NO"
+      ],
+      "aliases": [],
+      "sourceIds": [
+        "aptean-inspection-status-change-code-2025"
+      ],
+      "localizedExplanations": {
+        "en-US": "Applies the chosen inspection status to the selected lot rows in the worksheet. Confirm the selected lines, new status and reason code before accepting. The change updates the corresponding lot cards and creates inspection status alerts and audit entries. It does not record QC measurements; availability and hold effects depend on status setup. Lots with no inventory and lots originating from drop shipment cannot have their inspection status changed.",
+        "sv-SE": "Tilldelar vald inspektionsstatus till markerade partier i arbetsbladet. Bekräfta valda rader, ny status och orsakskod innan du godkänner. Ändringen uppdaterar motsvarande artikelspårningskort och skapar statusaviseringar och granskningsposter. Den registrerar inga QC-mätvärden; tillgänglighet och spärr styrs av statusinställningarna. Partier utan lager och partier från direktleverans kan inte statusändras.",
+        "fr-FR": "Applique le statut d’inspection choisi aux lots sélectionnés dans la feuille. Confirmez les lignes, le nouveau statut et le code motif avant validation. La modification met à jour les fiches de lot correspondantes et crée des alertes et entrées d’audit. Elle ne saisit pas de mesures QC ; la disponibilité et le blocage dépendent du paramétrage du statut. Les lots sans stock ou issus d’une livraison directe ne peuvent pas être modifiés.",
+        "de-DE": "Weist den ausgewählten Chargenzeilen im Arbeitsblatt den gewählten Prüfstatus zu. Bestätigen Sie vor der Übernahme die Zeilen, den neuen Status und den Ursachencode. Die Änderung aktualisiert die zugehörigen Chargenkarten und erstellt Warn- und Prüfprotokolleinträge. Sie erfasst keine QC-Messwerte; Verfügbarkeit und Sperre hängen von der Statuskonfiguration ab. Chargen ohne Bestand und aus Direktlieferungen können nicht geändert werden.",
+        "es-ES": "Aplica el estado de inspección elegido a las líneas de lote seleccionadas en la hoja. Confirme las líneas, el nuevo estado y el código de motivo antes de aceptar. El cambio actualiza las fichas de lote correspondientes y crea alertas y entradas de auditoría. No registra mediciones de calidad; la disponibilidad y el bloqueo dependen de la configuración del estado. No se puede cambiar el estado de lotes sin inventario ni procedentes de entregas directas.",
+        "da-DK": "Anvender den valgte inspektionsstatus på de valgte batchlinjer i regnearket. Bekræft linjerne, den nye status og årsagskoden, før du accepterer. Ændringen opdaterer de tilhørende batchkort og opretter alarm- og revisionsposter. Den registrerer ikke QC-målinger; tilgængelighed og spærring afhænger af statusopsætningen. Batches uden lagerbeholdning og fra direkte leverancer kan ikke ændres.",
+        "fi-FI": "Ottaa valitun tarkastustilan käyttöön laskentataulukossa valituille eräriveille. Vahvista valitut rivit, uusi tila ja syykoodi ennen hyväksymistä. Muutos päivittää vastaavat eräkortit ja luo hälytys- ja auditointimerkinnät. Se ei kirjaa QC-mittauksia; saatavuus ja esto määräytyvät tilan asetusten mukaan. Varastottomien tai suoratoimituksesta peräisin olevien erien tarkastustilaa ei voi muuttaa.",
+        "nb-NO": "Bruker valgt inspeksjonsstatus på de valgte partilinjene i regnearket. Bekreft linjene, den nye statusen og årsakskoden før du godtar. Endringen oppdaterer de tilhørende partikortene og oppretter varsel- og revisjonsposter. Den registrerer ikke QC-målinger; tilgjengelighet og sperring avhenger av statusoppsettet. Partier uten beholdning og fra direktesending kan ikke endres."
+      }
     },
     {
       "ruleId": "Aptean.RegisterConsumption",
       "taskType": "RegisterConsumption",
       "semanticAction": "RunAction",
-      "entity": "Consumption",
-      "priority": 1000,
-      "confidence": 0.95,
+      "entity": "ApteanProductionConsumption",
+      "priority": 1200,
+      "confidence": 0.97,
       "match": {
-        "pagePatterns": [],
+        "pagePatterns": [
+          "^Inputs$"
+        ],
         "actionPatterns": [
-          "register.*consumption",
-          "registrera.*förbrukning"
+          "^\\+ Input$"
         ],
         "fieldPatterns": [],
         "automationIdPatterns": []
       },
       "instructionTemplate": "",
       "languages": [
+        "en-US",
         "sv-SE",
-        "en-US"
+        "fr-FR",
+        "de-DE",
+        "es-ES",
+        "da-DK",
+        "fi-FI",
+        "nb-NO"
       ],
-      "aliases": []
+      "aliases": [],
+      "sourceIds": [
+        "aptean-sfp-inputs-2026"
+      ],
+      "localizedExplanations": {
+        "en-US": "From Shop Floor Production > Inputs for the selected production order, + Input opens registration of component consumption. Verify the order, item, quantity, location and lot/serial tracking before saving; Save registers consumption against production and affects remaining component quantities. Automatic consumption and available fields depend on flushing, item-tracking and extension setup. This is not a purchase receipt.",
+        "sv-SE": "På Shop Floor Production > Inputs för vald produktionsorder öppnar + Input registrering av komponentförbrukning. Kontrollera order, artikel, kvantitet, lagerställe och parti-/serienummer innan du sparar. Spara registrerar förbrukningen mot produktionen och påverkar återstående komponentkvantitet. Automatisk förbrukning och fält styrs av spolningsmetod, artikelspårning och tilläggsinställningar. Detta är ingen inköpsinleverans.",
+        "fr-FR": "Dans Shop Floor Production > Inputs de l’ordre de fabrication sélectionné, + Input ouvre l’enregistrement de la consommation des composants. Vérifiez l’ordre, l’article, la quantité, l’emplacement et le suivi lot/série avant d’enregistrer. L’enregistrement impute la consommation à la production et modifie les quantités restantes. La consommation automatique et les champs dépendent du mode de consommation, du suivi et du paramétrage. Il ne s’agit pas d’une réception achat.",
+        "de-DE": "Unter Shop Floor Production > Inputs für den ausgewählten Fertigungsauftrag öffnet + Input die Erfassung des Komponentenverbrauchs. Prüfen Sie Auftrag, Artikel, Menge, Lagerort und Chargen-/Serienverfolgung vor dem Speichern. Speichern bucht den Verbrauch auf den Fertigungsauftrag und verändert die verbleibende Komponentenmenge. Automatischer Verbrauch und verfügbare Felder hängen von Verbrauchsmethode, Artikelverfolgung und Einrichtung ab. Dies ist kein Einkaufseingang.",
+        "es-ES": "En Shop Floor Production > Inputs del pedido de producción seleccionado, + Input abre el registro del consumo de componentes. Compruebe pedido, artículo, cantidad, ubicación y seguimiento de lote/serie antes de guardar. Guardar registra el consumo en producción y modifica las cantidades de componente pendientes. El consumo automático y los campos dependen del método de consumo, el seguimiento y la configuración. No es una recepción de compra.",
+        "da-DK": "I Shop Floor Production > Inputs for den valgte produktionsordre åbner + Input registrering af komponentforbrug. Kontrollér ordre, vare, antal, lagersted og lot-/serienummersporing før lagring. Lagring registrerer forbruget på produktionen og påvirker resterende komponentantal. Automatisk forbrug og felter afhænger af forbrugsmetode, varesporing og opsætning. Det er ikke en købsmodtagelse.",
+        "fi-FI": "Valitun tuotantotilauksen Shop Floor Production > Inputs -näkymässä + Input avaa komponenttien kulutuksen kirjauksen. Tarkista tilaus, nimike, määrä, varastopaikka sekä erä-/sarjanumeroseuranta ennen tallennusta. Tallennus kirjaa kulutuksen tuotannolle ja muuttaa jäljellä olevia komponenttimääriä. Automaattinen kulutus ja kentät riippuvat kulutustavasta, nimikeseurannasta ja asetuksista. Tämä ei ole ostovastaanotto.",
+        "nb-NO": "Under Shop Floor Production > Inputs for den valgte produksjonsordren åpner + Input registrering av komponentforbruk. Kontroller ordre, vare, antall, lagersted og parti-/serienummersporing før lagring. Lagring registrerer forbruket på produksjonen og påvirker gjenværende komponentantall. Automatisk forbruk og felt avhenger av forbruksmetode, varesporing og oppsett. Dette er ikke en kjøpsmottakelse."
+      }
+    },
+    {
+      "ruleId": "Aptean.CorrectConsumption",
+      "taskType": "CorrectConsumption",
+      "semanticAction": "RunAction",
+      "entity": "ApteanProductionConsumption",
+      "priority": 1200,
+      "confidence": 0.97,
+      "match": {
+        "pagePatterns": [
+          "^Inputs$"
+        ],
+        "actionPatterns": [
+          "^Correct Consumption$"
+        ],
+        "fieldPatterns": [],
+        "automationIdPatterns": []
+      },
+      "instructionTemplate": "",
+      "languages": [
+        "en-US",
+        "sv-SE",
+        "fr-FR",
+        "de-DE",
+        "es-ES",
+        "da-DK",
+        "fi-FI",
+        "nb-NO"
+      ],
+      "aliases": [],
+      "sourceIds": [
+        "aptean-sfpbc-correct-consumption-2026"
+      ],
+      "localizedExplanations": {
+        "en-US": "In the Shop Floor Production (BC) Inputs list, Correct Consumption changes a previously registered production-consumption entry. If there is one registration it opens directly; if there are several, select the intended entry from the history list. The correction reduces the quantity previously consumed. Check the production order, component and entry before saving.",
+        "sv-SE": "I listan Inputs i Shop Floor Production (BC) korrigerar Correct Consumption en tidigare registrerad produktionsförbrukning. Finns en registrering öppnas den direkt; finns flera väljer du rätt post i historiken. Korrigeringen minskar den tidigare förbrukade kvantiteten. Kontrollera produktionsorder, komponent och post före sparande.",
+        "fr-FR": "Dans la liste Inputs de Shop Floor Production (BC), Correct Consumption modifie une consommation de production déjà enregistrée. Une seule écriture s’ouvre directement ; s’il y en a plusieurs, choisissez la bonne dans l’historique. La correction diminue la quantité précédemment consommée. Vérifiez l’ordre, le composant et l’écriture avant d’enregistrer.",
+        "de-DE": "In der Inputs-Liste von Shop Floor Production (BC) ändert Correct Consumption einen zuvor gebuchten Fertigungsverbrauch. Bei nur einer Buchung wird sie direkt geöffnet; bei mehreren wählen Sie den gewünschten Eintrag im Verlauf. Die Korrektur verringert die zuvor verbrauchte Menge. Prüfen Sie Fertigungsauftrag, Komponente und Eintrag vor dem Speichern.",
+        "es-ES": "En la lista Inputs de Shop Floor Production (BC), Correct Consumption modifica un consumo de producción ya registrado. Si hay un solo registro, se abre directamente; si hay varios, seleccione el correcto en el historial. La corrección reduce la cantidad consumida anteriormente. Compruebe el pedido, el componente y el registro antes de guardar.",
+        "da-DK": "I Shop Floor Production (BC)-listen Inputs ændrer Correct Consumption en tidligere registreret produktionsforbrugspost. Hvis der kun er én post, åbnes den direkte; hvis der er flere, vælges den ønskede i historikken. Rettelsen reducerer den tidligere forbrugte mængde. Kontrollér produktionsordren, komponenten og posten før lagring.",
+        "fi-FI": "Shop Floor Production (BC) -sovelluksen Inputs-luettelossa Correct Consumption muuttaa aiemmin kirjattua tuotannon kulutustapahtumaa. Yksi tapahtuma avautuu suoraan; useista valitaan oikea historiasta. Korjaus vähentää aiemmin kulutettua määrää. Tarkista tuotantotilaus, komponentti ja tapahtuma ennen tallennusta.",
+        "nb-NO": "I Shop Floor Production (BC)-listen Inputs endrer Correct Consumption en tidligere registrert produksjonsforbrukspost. Hvis det bare finnes én post, åpnes den direkte; hvis det finnes flere, velger du riktig post i historikken. Korrigeringen reduserer tidligere forbrukt mengde. Kontroller produksjonsordre, komponent og post før lagring."
+      }
     },
     {
       "ruleId": "Aptean.RegisterOutput",
       "taskType": "RegisterOutput",
       "semanticAction": "RunAction",
-      "entity": "Output",
-      "priority": 1000,
-      "confidence": 0.95,
-      "match": {
-        "pagePatterns": [],
-        "actionPatterns": [
-          "register.*output",
-          "registrera.*utflöde"
-        ],
-        "fieldPatterns": [],
-        "automationIdPatterns": []
-      },
-      "instructionTemplate": "",
-      "languages": [
-        "sv-SE",
-        "en-US"
-      ],
-      "aliases": []
-    },
-    {
-      "ruleId": "Aptean.OpenClaim",
-      "taskType": "OpenClaim",
-      "semanticAction": "OpenRecord",
-      "entity": "Claim",
-      "priority": 900,
-      "confidence": 0.95,
+      "entity": "ApteanProductionOutput",
+      "priority": 1200,
+      "confidence": 0.97,
       "match": {
         "pagePatterns": [
-          "claim",
-          "reklamation"
+          "^Outputs$"
         ],
         "actionPatterns": [
-          "open record",
-          "öppna post"
+          "^\\+ Output$"
         ],
         "fieldPatterns": [],
         "automationIdPatterns": []
       },
       "instructionTemplate": "",
       "languages": [
+        "en-US",
         "sv-SE",
-        "en-US"
+        "fr-FR",
+        "de-DE",
+        "es-ES",
+        "da-DK",
+        "fi-FI",
+        "nb-NO"
       ],
-      "aliases": []
+      "aliases": [],
+      "sourceIds": [
+        "aptean-sfp-outputs-2026"
+      ],
+      "localizedExplanations": {
+        "en-US": "From Shop Floor Production > Outputs on the selected production order, + Output opens registration for the selected routing operation. Verify item, quantity, lot and any weight or license-plate details shown for this setup before saving. A final routing operation can register inventory and capacity; an intermediate operation records capacity only. Save posts the output; Save + New posts it and opens another registration. Fields vary by operation, item and installed extensions.",
+        "sv-SE": "Från Shop Floor Production > Outputs på vald produktionsorder öppnar + Output registreringen för vald operationsrad. Kontrollera artikel, kvantitet, parti och eventuella vikt- eller lastbäraruppgifter som visas för inställningen. Sista operationen i rutten kan registrera lager och kapacitet; en mellanoperation registrerar endast kapacitet. Spara bokför utflödet; Spara och ny bokför och öppnar en ny registrering. Fälten beror på operation, artikel och installerade tillägg.",
+        "fr-FR": "Depuis Shop Floor Production > Outputs de l’ordre sélectionné, + Output ouvre l’enregistrement de l’opération de gamme choisie. Vérifiez l’article, la quantité, le lot et les informations de poids ou de support logistique affichées avant d’enregistrer. L’opération finale peut enregistrer le stock et la capacité ; une opération intermédiaire n’enregistre que la capacité. Save comptabilise la sortie ; Save + New la comptabilise puis ouvre une autre saisie. Les champs dépendent de l’opération, de l’article et des extensions installées.",
+        "de-DE": "Unter Shop Floor Production > Outputs des ausgewählten Fertigungsauftrags öffnet + Output die Erfassung für den gewählten Arbeitsgang. Prüfen Sie Artikel, Menge, Charge sowie angezeigte Gewichts- oder Ladungsträgerdaten. Der letzte Arbeitsgang kann Bestand und Kapazität buchen; ein Zwischenarbeitsgang erfasst nur Kapazität. Save bucht den Output; Save + New bucht ihn und öffnet eine weitere Erfassung. Die Felder hängen von Arbeitsgang, Artikel und installierten Erweiterungen ab.",
+        "es-ES": "Desde Shop Floor Production > Outputs del pedido seleccionado, + Output abre el registro de la operación de ruta elegida. Compruebe artículo, cantidad, lote y los datos de peso o unidad logística que aparezcan antes de guardar. La operación final puede registrar existencias y capacidad; una operación intermedia registra solo capacidad. Save registra la salida; Save + New la registra y abre otro registro. Los campos dependen de la operación, el artículo y las extensiones instaladas.",
+        "da-DK": "Fra Shop Floor Production > Outputs på den valgte produktionsordre åbner + Output registrering for den valgte rutelinje. Kontrollér vare, antal, batch samt viste vægt- eller lasteenhedsoplysninger før lagring. Den sidste operation kan registrere lager og kapacitet; en mellemoperation registrerer kun kapacitet. Save bogfører output; Save + New bogfører det og åbner en ny registrering. Felterne afhænger af operation, vare og installerede udvidelser.",
+        "fi-FI": "Valitun tuotantotilauksen Shop Floor Production > Outputs -näkymässä + Output avaa valitun reititysvaiheen kirjauksen. Tarkista nimike, määrä, erä sekä näytetyt paino- tai lavatiedot ennen tallennusta. Viimeinen vaihe voi kirjata varaston ja kapasiteetin; välivaihe kirjaa vain kapasiteetin. Save kirjaa tuotoksen; Save + New kirjaa sen ja avaa uuden kirjauksen. Kentät riippuvat vaiheesta, nimikkeestä ja asennetuista laajennuksista.",
+        "nb-NO": "Fra Shop Floor Production > Outputs på den valgte produksjonsordren åpner + Output registrering for den valgte operasjonen. Kontroller vare, antall, parti og viste vekt- eller lastbærerdetaljer før lagring. Den siste operasjonen kan registrere beholdning og kapasitet; en mellomoperasjon registrerer bare kapasitet. Save bokfører output; Save + New bokfører den og åpner en ny registrering. Feltene avhenger av operasjon, vare og installerte utvidelser."
+      }
     },
     {
-      "ruleId": "Aptean.CreateClaim",
-      "taskType": "CreateClaim",
-      "semanticAction": "CreateNew",
-      "entity": "Claim",
-      "priority": 1000,
+      "ruleId": "Aptean.PostGrowerSettlement",
+      "taskType": "PostGrowerSettlement",
+      "semanticAction": "RunAction",
+      "entity": "ApteanGrowerSettlement",
+      "priority": 1200,
       "confidence": 0.96,
       "match": {
-        "pagePatterns": [],
+        "pagePatterns": [
+          "^Settlements$"
+        ],
         "actionPatterns": [
-          "create.*claim",
-          "skapa.*reklamation"
+          "^Post$"
         ],
         "fieldPatterns": [],
         "automationIdPatterns": []
       },
       "instructionTemplate": "",
       "languages": [
+        "en-US",
         "sv-SE",
-        "en-US"
+        "fr-FR",
+        "de-DE",
+        "es-ES",
+        "da-DK",
+        "fi-FI",
+        "nb-NO"
       ],
-      "aliases": []
+      "aliases": [],
+      "sourceIds": [
+        "aptean-grower-return-settlement-status-2026"
+      ],
+      "localizedExplanations": {
+        "en-US": "On a released Grower Return settlement, Post creates and posts the purchase invoice and changes the settlement to Invoiced; the settlement can no longer be changed. Review calculated quantities/prices and vendor groupings first. A zero-total grouping is accepted, but a purchase document with no lines is rejected. Use Create Invoice if the invoice should remain unposted, or Update Purchase Order if costs should first be applied to related orders.",
+        "sv-SE": "På en frisläppt Grower Return-avräkning skapar och bokför Bokför leverantörsfakturan och ändrar status till Fakturerad; avräkningen kan sedan inte ändras. Granska beräknade kvantiteter, priser och leverantörsgrupperingar först. En gruppering med totalsumma noll godtas, men ett inköpsdokument utan rader avvisas. Använd Skapa faktura om fakturan ska vara obokförd eller Uppdatera inköpsorder om kostnader först ska föras över till relaterade order.",
+        "fr-FR": "Sur un règlement Grower Return libéré, Post crée et comptabilise la facture achat, puis passe le règlement à Facturé ; il ne peut alors plus être modifié. Vérifiez d’abord les quantités, prix et groupes fournisseur calculés. Un groupe totalisant zéro est accepté, mais un document achat sans ligne est rejeté. Utilisez Create Invoice pour laisser la facture non comptabilisée ou Update Purchase Order pour appliquer d’abord les coûts aux commandes liées.",
+        "de-DE": "Bei einer freigegebenen Grower-Return-Abrechnung erstellt und bucht Post die Einkaufsrechnung und setzt den Status auf Invoiced; danach ist die Abrechnung nicht mehr änderbar. Prüfen Sie zuerst berechnete Mengen, Preise und Lieferantengruppen. Eine Gruppe mit Gesamtbetrag null wird akzeptiert, ein Einkaufsbeleg ohne Zeilen jedoch abgelehnt. Verwenden Sie Create Invoice für eine ungebuchte Rechnung oder Update Purchase Order, um zuerst verbundene Bestellungen zu aktualisieren.",
+        "es-ES": "En una liquidación liberada de Grower Return, Post crea y registra la factura de compra y cambia el estado a Invoiced; después ya no se puede modificar la liquidación. Revise primero las cantidades, precios y grupos de proveedor calculados. Se acepta un grupo cuyo total sea cero, pero se rechaza un documento de compra sin líneas. Use Create Invoice para dejar la factura sin registrar o Update Purchase Order para aplicar primero los costes a los pedidos relacionados.",
+        "da-DK": "På en frigivet Grower Return-afregning opretter og bogfører Post købsfakturaen og ændrer status til Invoiced; derefter kan afregningen ikke længere ændres. Gennemgå først beregnede antal, priser og leverandørgrupper. En gruppe med total nul accepteres, men et købsdokument uden linjer afvises. Brug Create Invoice for en ikke-bogført faktura eller Update Purchase Order for først at opdatere relaterede ordrer.",
+        "fi-FI": "Julkaistun Grower Return -tilityksen Post luo ja kirjaa ostolaskun ja muuttaa tilaksi Invoiced; tämän jälkeen tilitystä ei voi enää muuttaa. Tarkista ensin lasketut määrät, hinnat ja toimittajaryhmät. Nollasummainen ryhmä hyväksytään, mutta rivitöntä ostotositetta ei hyväksytä. Käytä Create Invoice -toimintoa, jos lasku jätetään kirjaamatta, tai Update Purchase Order -toimintoa kulujen kohdistamiseen tilauksiin ensin.",
+        "nb-NO": "På en frigitt Grower Return-avregning oppretter og bokfører Post kjøpsfakturaen og endrer status til Invoiced; deretter kan avregningen ikke lenger endres. Kontroller først beregnede mengder, priser og leverandørgrupper. En gruppe med totalsum null godtas, men et kjøpsdokument uten linjer avvises. Bruk Create Invoice hvis fakturaen skal stå ubokført, eller Update Purchase Order for å oppdatere relaterte ordre først."
+      }
     },
     {
-      "ruleId": "Aptean.SelectLotBatch",
-      "taskType": "SelectLotBatchNo",
-      "semanticAction": "Select",
-      "entity": "LotBatchNo",
-      "priority": 1000,
-      "confidence": 0.95,
+      "ruleId": "Aptean.CreateTradeStatement",
+      "taskType": "CreateTradeStatement",
+      "semanticAction": "RunAction",
+      "entity": "ApteanTradeStatement",
+      "priority": 1200,
+      "confidence": 0.96,
       "match": {
-        "pagePatterns": [],
-        "actionPatterns": [],
-        "fieldPatterns": [
-          "lot.*no",
-          "lotnummer",
-          "batchnummer",
-          "batchnr",
-          "partinr"
+        "pagePatterns": [
+          "^Trade Statements$"
         ],
+        "actionPatterns": [
+          "^Create Trade Statement$"
+        ],
+        "fieldPatterns": [],
         "automationIdPatterns": []
       },
       "instructionTemplate": "",
       "languages": [
+        "en-US",
         "sv-SE",
-        "en-US"
+        "fr-FR",
+        "de-DE",
+        "es-ES",
+        "da-DK",
+        "fi-FI",
+        "nb-NO"
       ],
-      "aliases": []
+      "aliases": [],
+      "sourceIds": [
+        "aptean-trade-management-statements-2025"
+      ],
+      "localizedExplanations": {
+        "en-US": "Create Trade Statement builds statements from eligible trade accrual entries within the document, from and to dates and partner filters. Confirm the partner has accrual entries. For sales, the date basis depends on Trade Management Setup: Payment uses the fully paid invoice’s closed-at date; Invoice uses accrual posting date. Review generated lines and eligibility before issuing; Suggest Trade Statement Lines replaces existing lines and their edits.",
+        "sv-SE": "Skapa handelsutdrag bygger utdrag från tillämpliga handelsperiodiseringar inom dokumentdatum, från- och tilldatum samt partnerfilter. Kontrollera att partnern har periodiseringar. För försäljning styr inställningen datumurvalet: Betalning använder stängningsdatum för helt betalda fakturor; Faktura använder periodiseringens bokföringsdatum. Granska rader och valbarhet före utfärdande. Föreslå handelsutdragsrader ersätter befintliga rader och deras ändringar.",
+        "fr-FR": "Create Trade Statement crée des relevés à partir des écritures de régularisation admissibles selon les dates et filtres partenaire. Vérifiez que le partenaire possède des écritures. Pour les ventes, la base de date dépend du paramétrage : Payment utilise la date de clôture d’une facture entièrement payée ; Invoice utilise la date comptable de l’écriture. Vérifiez les lignes et leur admissibilité avant émission. Suggest Trade Statement Lines remplace les lignes existantes et leurs modifications.",
+        "de-DE": "Create Trade Statement erstellt Abrechnungen aus passenden Handelsabgrenzungen innerhalb der Dokument- und Datumsfilter sowie Partnerfilter. Prüfen Sie, ob der Partner Abgrenzungsbuchungen hat. Bei Verkäufen hängt das Datum von der Einrichtung ab: Payment verwendet das Abschlussdatum vollständig bezahlter Rechnungen; Invoice verwendet das Buchungsdatum der Abgrenzung. Prüfen Sie Zeilen und Berechtigung vor dem Ausstellen. Suggest Trade Statement Lines ersetzt bestehende Zeilen und Änderungen daran.",
+        "es-ES": "Create Trade Statement genera liquidaciones a partir de devengos comerciales elegibles según las fechas y filtros de socio. Compruebe que el socio tenga devengos. Para ventas, la fecha depende de la configuración: Payment usa la fecha de cierre de facturas totalmente pagadas; Invoice usa la fecha de registro del devengo. Revise las líneas y su elegibilidad antes de emitir. Suggest Trade Statement Lines reemplaza las líneas existentes y sus cambios.",
+        "da-DK": "Create Trade Statement opretter opgørelser fra relevante handelsperiodiseringer inden for dokumentdato, datointerval og partnerfiltre. Kontrollér, at partneren har periodiseringer. For salg afhænger datogrundlaget af opsætningen: Payment bruger lukkedatoen for fuldt betalte fakturaer; Invoice bruger periodiseringens bogføringsdato. Gennemgå linjer og berettigelse før udstedelse. Suggest Trade Statement Lines erstatter eksisterende linjer og ændringer.",
+        "fi-FI": "Create Trade Statement luo tiliotteet sopivista kaupan jaksotuksista asiakirjapäivän, aikavälin ja kumppanisuodattimien perusteella. Varmista, että kumppanilla on jaksotuksia. Myynnissä päivämäärä riippuu asetuksesta: Payment käyttää kokonaan maksetun laskun sulkupäivää; Invoice käyttää jaksotuksen kirjauspäivää. Tarkista rivit ja kelpoisuus ennen lähettämistä. Suggest Trade Statement Lines korvaa olemassa olevat rivit ja niiden muutokset.",
+        "nb-NO": "Create Trade Statement oppretter oppgjør fra aktuelle handelsperiodiseringer innenfor dokumentdato, datointervall og partnerfiltre. Kontroller at partneren har periodiseringer. For salg avhenger datogrunnlaget av oppsettet: Payment bruker lukkedatoen for fullt betalte fakturaer; Invoice bruker bokføringsdatoen for periodiseringen. Kontroller linjer og kvalifisering før utstedelse. Suggest Trade Statement Lines erstatter eksisterende linjer og endringer."
+      }
     },
     {
-      "ruleId": "Aptean.EnterCatchWeight",
-      "taskType": "EnterCatchWeight",
-      "semanticAction": "ChangeField",
-      "entity": "CatchWeight",
-      "priority": 900,
-      "confidence": 0.93,
+      "ruleId": "Aptean.PackSalesOrder",
+      "taskType": "PackSalesOrder",
+      "semanticAction": "RunAction",
+      "entity": "ApteanSalesPackaging",
+      "priority": 1200,
+      "confidence": 0.96,
       "match": {
-        "pagePatterns": [],
-        "actionPatterns": [],
-        "fieldPatterns": [
-          "catch weight",
-          "fångstvikt",
-          "verklig vikt"
+        "pagePatterns": [
+          "^Sales Packaging$"
         ],
+        "actionPatterns": [
+          "^Pack All$"
+        ],
+        "fieldPatterns": [],
         "automationIdPatterns": []
       },
       "instructionTemplate": "",
       "languages": [
+        "en-US",
         "sv-SE",
-        "en-US"
+        "fr-FR",
+        "de-DE",
+        "es-ES",
+        "da-DK",
+        "fi-FI",
+        "nb-NO"
       ],
-      "aliases": []
+      "aliases": [],
+      "sourceIds": [
+        "aptean-pack-and-ship-packaging-2023"
+      ],
+      "localizedExplanations": {
+        "en-US": "In Aptean Sales Packaging, choose the packaging type and review each line’s outstanding quantity. Pack All assigns eligible quantities to packages; the packed quantity cannot exceed outstanding-to-pack. This prepares package records for shipment but does not post the shipment. Confirm package contents before continuing to Shipping Batch or posting.",
+        "sv-SE": "I Aptean Sales Packaging väljer du förpackningstyp och granskar återstående kvantitet på varje rad. Packa alla tilldelar tillgängliga kvantiteter till kollin; packad kvantitet får inte överstiga återstående att packa. Det förbereder kollin för leverans men bokför inte leveransen. Kontrollera kolliinnehållet innan du fortsätter till leveransbatch eller bokföring.",
+        "fr-FR": "Dans Aptean Sales Packaging, choisissez le type d’emballage et vérifiez la quantité restante de chaque ligne. Pack All affecte les quantités admissibles aux colis ; la quantité emballée ne peut pas dépasser le reste à emballer. Cette action prépare les colis, sans comptabiliser l’expédition. Vérifiez leur contenu avant de poursuivre vers Shipping Batch ou la comptabilisation.",
+        "de-DE": "Wählen Sie in Aptean Sales Packaging die Verpackungsart und prüfen Sie die noch zu verpackende Menge jeder Zeile. Pack All weist zulässige Mengen Paketen zu; die verpackte Menge darf den offenen Verpackungsbedarf nicht überschreiten. Dadurch werden Pakete vorbereitet, aber die Sendung nicht gebucht. Prüfen Sie den Paketinhalt vor dem Shipping Batch oder der Buchung.",
+        "es-ES": "En Aptean Sales Packaging, elija el tipo de embalaje y revise la cantidad pendiente de cada línea. Pack All asigna las cantidades permitidas a paquetes; la cantidad empaquetada no puede superar la pendiente. Esto prepara los paquetes, pero no registra el envío. Compruebe el contenido antes de continuar con Shipping Batch o el registro.",
+        "da-DK": "Vælg emballagetype i Aptean Sales Packaging, og gennemgå resterende antal på hver linje. Pack All fordeler tilladte antal på pakker; pakket antal må ikke overstige det resterende antal. Det klargør pakkerne, men bogfører ikke forsendelsen. Kontrollér pakkernes indhold før Shipping Batch eller bogføring.",
+        "fi-FI": "Valitse Aptean Sales Packaging -näkymässä pakkaustyyppi ja tarkista kunkin rivin jäljellä oleva pakattava määrä. Pack All kohdistaa sallitut määrät pakkauksiin; pakattu määrä ei voi ylittää jäljellä olevaa määrää. Tämä valmistelee pakkaukset mutta ei kirjaa lähetystä. Tarkista pakkauksen sisältö ennen Shipping Batch -vaihetta tai kirjausta.",
+        "nb-NO": "Velg emballasjetype i Aptean Sales Packaging, og kontroller gjenstående antall på hver linje. Pack All tilordner tillatte mengder til pakker; pakket antall kan ikke overstige gjenstående antall. Dette klargjør pakkene, men bokfører ikke forsendelsen. Kontroller pakkeinnholdet før Shipping Batch eller bokføring."
+      }
+    },
+    {
+      "ruleId": "Aptean.PostPackAndShip",
+      "taskType": "PostPackAndShip",
+      "semanticAction": "RunAction",
+      "entity": "ApteanShippingBatch",
+      "priority": 1200,
+      "confidence": 0.96,
+      "match": {
+        "pagePatterns": [
+          "^Shipping Batch$"
+        ],
+        "actionPatterns": [
+          "^Post$"
+        ],
+        "fieldPatterns": [],
+        "automationIdPatterns": []
+      },
+      "instructionTemplate": "",
+      "languages": [
+        "en-US",
+        "sv-SE",
+        "fr-FR",
+        "de-DE",
+        "es-ES",
+        "da-DK",
+        "fi-FI",
+        "nb-NO"
+      ],
+      "aliases": [],
+      "sourceIds": [
+        "aptean-pack-and-ship-posting-2023"
+      ],
+      "localizedExplanations": {
+        "en-US": "On an Aptean Shipping Batch, Post opens Post Packages after the assigned items have been packed. Choose Ship or Ship and Invoice and verify posting date, quantities and print options. Posting records the shipment and item-ledger reductions; it is distinct from sending shipment data to an integrated carrier. A shipping batch is a pending shipment until posted.",
+        "sv-SE": "I en Aptean Shipping Batch öppnar Bokför sidan Post Packages när tilldelade artiklar har packats. Välj Leverera eller Leverera och fakturera och kontrollera bokföringsdatum, kvantiteter och utskriftsval. Bokföringen registrerar leveransen och minskar lagersaldot; den är skild från att skicka leveransdata till en integrerad transportör. En leveransbatch är väntande tills den bokförs.",
+        "fr-FR": "Dans un Aptean Shipping Batch, Post ouvre Post Packages lorsque les articles affectés sont emballés. Choisissez Ship ou Ship and Invoice et vérifiez la date, les quantités et les options d’impression. La comptabilisation enregistre l’expédition et diminue le stock ; elle est distincte de l’envoi des données au transporteur intégré. Le lot reste en attente jusqu’à sa comptabilisation.",
+        "de-DE": "In einem Aptean Shipping Batch öffnet Post Packages die Seite Post Packages, nachdem die zugeordneten Artikel verpackt wurden. Wählen Sie Ship oder Ship and Invoice und prüfen Sie Datum, Mengen und Druckoptionen. Die Buchung erfasst den Versand und vermindert den Artikelbestand; sie ist vom Senden der Daten an einen integrierten Frachtführer getrennt. Bis zur Buchung bleibt die Charge ausstehend.",
+        "es-ES": "En un Aptean Shipping Batch, Post abre Post Packages cuando los artículos asignados ya están empaquetados. Elija Ship o Ship and Invoice y compruebe fecha, cantidades y opciones de impresión. El registro contabiliza el envío y reduce el inventario; es distinto de enviar datos al transportista integrado. El lote queda pendiente hasta su registro.",
+        "da-DK": "I en Aptean Shipping Batch åbner Post siden Post Packages, når de tildelte varer er pakket. Vælg Ship eller Ship and Invoice, og kontrollér dato, antal og udskriftsvalg. Bogføringen registrerer forsendelsen og reducerer lageret; det er adskilt fra at sende data til en integreret transportør. Batchen er afventende indtil bogføring.",
+        "fi-FI": "Aptean Shipping Batch -näkymässä Post avaa Post Packages -sivun, kun kohdistetut tuotteet on pakattu. Valitse Ship tai Ship and Invoice ja tarkista päivä, määrät ja tulostusasetukset. Kirjaus rekisteröi lähetyksen ja vähentää varastoa; se on eri toiminto kuin tietojen lähettäminen kuljetusliikkeen integraatioon. Erä on odottava, kunnes se kirjataan.",
+        "nb-NO": "I en Aptean Shipping Batch åpner Post siden Post Packages når de tildelte varene er pakket. Velg Ship eller Ship and Invoice, og kontroller dato, antall og utskriftsvalg. Bokføringen registrerer forsendelsen og reduserer lageret; den er atskilt fra å sende data til en integrert transportør. Batchen er ventende til den bokføres."
+      }
+    },
+    {
+      "ruleId": "Aptean.ProcessEDIMessage",
+      "taskType": "ProcessEDIMessage",
+      "semanticAction": "RunAction",
+      "entity": "ApteanEDIMessage",
+      "priority": 1200,
+      "confidence": 0.96,
+      "match": {
+        "pagePatterns": [
+          "^EDI Messages$"
+        ],
+        "actionPatterns": [
+          "^Process$"
+        ],
+        "fieldPatterns": [],
+        "automationIdPatterns": []
+      },
+      "instructionTemplate": "",
+      "languages": [
+        "en-US",
+        "sv-SE",
+        "fr-FR",
+        "de-DE",
+        "es-ES",
+        "da-DK",
+        "fi-FI",
+        "nb-NO"
+      ],
+      "aliases": [],
+      "sourceIds": [
+        "aptean-edi-messages-2026"
+      ],
+      "localizedExplanations": {
+        "en-US": "On an Aptean EDI message, Process retries or executes that specific transaction. Pending inbound processing can create a Business Central document; pending outbound processing sends data to the trading partner. Check direction, status and Linked Documents first. Failed messages are not picked up by the job queue automatically: correct the cause, then process them manually. Use Ignore only when the message must be excluded. Do not replace XML on a live message as a repair method.",
+        "sv-SE": "På ett Aptean EDI-meddelande kör eller försöker Process köra den aktuella transaktionen igen. Inkommande meddelanden kan skapa Business Central-dokument; utgående skickas till handelspartnern. Kontrollera riktning, status och länkade dokument först. Jobbkön tar inte automatiskt om hand misslyckade meddelanden: rätta orsaken och bearbeta dem manuellt. Använd Ignorera bara när meddelandet ska uteslutas. Ersätt inte XML i ett produktionsmeddelande som reparationsmetod.",
+        "fr-FR": "Sur un message Aptean EDI, Process exécute ou relance cette transaction. Un message entrant peut créer un document Business Central ; un message sortant est transmis au partenaire. Vérifiez d’abord le sens, l’état et les documents liés. La file de travaux ne reprend pas automatiquement les messages échoués : corrigez la cause puis traitez-les manuellement. Utilisez Ignore uniquement pour exclure le message. Ne remplacez pas le XML d’un message en production pour le réparer.",
+        "de-DE": "Bei einer Aptean-EDI-Nachricht führt Process genau diese Transaktion aus oder versucht sie erneut. Eingehende Nachrichten können einen Business-Central-Beleg erstellen; ausgehende werden an den Handelspartner gesendet. Prüfen Sie zuerst Richtung, Status und verknüpfte Belege. Die Jobwarteschlange verarbeitet fehlgeschlagene Nachrichten nicht automatisch erneut: Ursache beheben und manuell verarbeiten. Ignore schließt eine Nachricht aus. XML einer Live-Nachricht nicht als Reparatur ersetzen.",
+        "es-ES": "En un mensaje Aptean EDI, Process ejecuta o reintenta esa transacción. Un mensaje entrante puede crear un documento de Business Central; uno saliente se transmite al socio comercial. Compruebe primero la dirección, el estado y los documentos vinculados. La cola de trabajos no reintenta automáticamente los mensajes fallidos: corrija la causa y procéselos manualmente. Use Ignore solo para excluir el mensaje. No sustituya el XML de un mensaje en producción como método de reparación.",
+        "da-DK": "På en Aptean EDI-meddelelse udfører eller genforsøger Process den konkrete transaktion. En indgående meddelelse kan oprette et Business Central-dokument; en udgående sendes til handelspartneren. Kontrollér retning, status og tilknyttede dokumenter først. Jobkøen genbehandler ikke automatisk fejlede meddelelser: ret årsagen, og behandl dem manuelt. Brug Ignore kun for at udelukke meddelelsen. Erstat ikke XML i en live-meddelelse som reparationsmetode.",
+        "fi-FI": "Aptean EDI -sanomassa Process suorittaa kyseisen tapahtuman tai yrittää sitä uudelleen. Saapuva sanoma voi luoda Business Central -asiakirjan; lähtevä sanoma välitetään kauppakumppanille. Tarkista ensin suunta, tila ja linkitetyt asiakirjat. Työjono ei yritä epäonnistuneita sanomia automaattisesti uudelleen: korjaa syy ja käsittele sanoma manuaalisesti. Käytä Ignore-toimintoa vain, kun sanoma tulee sulkea pois. Älä korvaa tuotantosanoman XML:ää korjauskeinona.",
+        "nb-NO": "På en Aptean EDI-melding utfører eller prøver Process den aktuelle transaksjonen på nytt. En innkommende melding kan opprette et Business Central-dokument; en utgående melding sendes til handelspartneren. Kontroller retning, status og koblede dokumenter først. Jobbkøen behandler ikke feilede meldinger automatisk på nytt: rett årsaken og behandle dem manuelt. Bruk Ignore bare når meldingen skal utelates. Ikke erstatt XML i en produksjonsmelding som reparasjon."
+      }
+    },
+    {
+      "ruleId": "Aptean.ProcessAIPEvents",
+      "taskType": "ProcessAIPEvents",
+      "semanticAction": "RunAction",
+      "entity": "ApteanAIPEvents",
+      "priority": 1200,
+      "confidence": 0.96,
+      "match": {
+        "pagePatterns": [
+          "^AIP Connection Setup$"
+        ],
+        "actionPatterns": [
+          "^Process Events$"
+        ],
+        "fieldPatterns": [],
+        "automationIdPatterns": []
+      },
+      "instructionTemplate": "",
+      "languages": [
+        "en-US",
+        "sv-SE",
+        "fr-FR",
+        "de-DE",
+        "es-ES",
+        "da-DK",
+        "fi-FI",
+        "nb-NO"
+      ],
+      "aliases": [],
+      "sourceIds": [
+        "aptean-aip-connection-2026"
+      ],
+      "localizedExplanations": {
+        "en-US": "Process Events on AIP Connection Setup can process Inbound, Outbound or Both, according to subscriptions and event mappings. Outbound prepares and transfers payloads; inbound retrieves external events, transfers them into Business Central and processes them from the AIP Events list. Check product, direction, subscription and event status before running. Use Audit Log for errors; retry behavior and notifications depend on setup. This integration action is not EDI message processing.",
+        "sv-SE": "Process Events i AIP Connection Setup kan bearbeta Inbound, Outbound eller Both enligt prenumerationer och händelsemappningar. Utgående flöde förbereder och överför nyttolast; inkommande hämtar externa händelser, överför dem till Business Central och bearbetar dem från listan AIP Events. Kontrollera produkt, riktning, prenumeration och händelsestatus först. Granska fel i Audit Log; återförsök och aviseringar styrs av inställningarna. Detta är inte EDI-meddelandebearbetning.",
+        "fr-FR": "Process Events dans AIP Connection Setup traite Inbound, Outbound ou Both selon les abonnements et mappings. Le flux sortant prépare et transfère le payload ; le flux entrant récupère les événements externes, les transfère dans Business Central et les traite depuis AIP Events. Vérifiez produit, sens, abonnement et statut avant l’exécution. Consultez Audit Log pour les erreurs ; les reprises et notifications dépendent du paramétrage. Ce n’est pas le traitement des messages EDI.",
+        "de-DE": "Process Events in AIP Connection Setup verarbeitet Inbound, Outbound oder Both gemäß Abonnements und Ereigniszuordnungen. Ausgehend werden Nutzdaten vorbereitet und übertragen; eingehend werden externe Ereignisse abgerufen, nach Business Central übertragen und aus der AIP-Events-Liste verarbeitet. Prüfen Sie Produkt, Richtung, Abonnement und Ereignisstatus. Audit Log zeigt Fehler; Wiederholungen und Benachrichtigungen hängen von der Einrichtung ab. Dies ist keine EDI-Nachrichtenverarbeitung.",
+        "es-ES": "Process Events en AIP Connection Setup procesa Inbound, Outbound o Both según las suscripciones y asignaciones de eventos. El flujo saliente prepara y transfiere la carga; el entrante recupera eventos externos, los transfiere a Business Central y los procesa desde AIP Events. Compruebe producto, dirección, suscripción y estado antes de ejecutarlo. Audit Log muestra errores; los reintentos y avisos dependen de la configuración. No es el procesamiento de mensajes EDI.",
+        "da-DK": "Process Events i AIP Connection Setup behandler Inbound, Outbound eller Both efter abonnementer og hændelsestilknytninger. Udgående klargør og overfører payload; indgående henter eksterne hændelser, overfører dem til Business Central og behandler dem fra AIP Events-listen. Kontrollér produkt, retning, abonnement og hændelsesstatus. Audit Log viser fejl; genforsøg og beskeder afhænger af opsætningen. Dette er ikke EDI-meddelelsesbehandling.",
+        "fi-FI": "AIP Connection Setup -sivun Process Events käsittelee Inbound-, Outbound- tai Both-tapahtumia tilausten ja tapahtumamääritysten mukaan. Lähtevä virta valmistelee ja siirtää hyötykuorman; saapuva hakee ulkoiset tapahtumat, siirtää ne Business Centraliin ja käsittelee ne AIP Events -luettelosta. Tarkista tuote, suunta, tilaus ja tapahtuman tila. Audit Log näyttää virheet; uudelleenyritykset ja ilmoitukset määräytyvät asetuksista. Tämä ei ole EDI-sanomien käsittelyä.",
+        "nb-NO": "Process Events i AIP Connection Setup behandler Inbound, Outbound eller Both etter abonnementer og hendelseskartlegginger. Utgående klargjør og overfører payload; inngående henter eksterne hendelser, overfører dem til Business Central og behandler dem fra AIP Events-listen. Kontroller produkt, retning, abonnement og hendelsesstatus. Audit Log viser feil; nye forsøk og varsler avhenger av oppsett. Dette er ikke EDI-meldingsbehandling."
+      }
+    },
+    {
+      "ruleId": "Aptean.SendOrderToTLx",
+      "taskType": "SendOrderToTLx",
+      "semanticAction": "RunAction",
+      "entity": "ApteanTLxOrder",
+      "priority": 1200,
+      "confidence": 0.96,
+      "match": {
+        "pagePatterns": [
+          "^(Sales Order|Purchase Order)$"
+        ],
+        "actionPatterns": [
+          "^Send to TLx$"
+        ],
+        "fieldPatterns": [],
+        "automationIdPatterns": []
+      },
+      "instructionTemplate": "",
+      "languages": [
+        "en-US",
+        "sv-SE",
+        "fr-FR",
+        "de-DE",
+        "es-ES",
+        "da-DK",
+        "fi-FI",
+        "nb-NO"
+      ],
+      "aliases": [],
+      "sourceIds": [
+        "aptean-tlx-send-on-release-2025"
+      ],
+      "localizedExplanations": {
+        "en-US": "Send to TLx transmits the current eligible sales or purchase order for external routing and updates TLx status/log details. Confirm the shipment method is configured for TLx and that connection/authentication is valid. Check the last-sent time and shipment ID. Reopening a released sales order can send a cancellation request to TLx; if its TLx status is not Open, later edits are not automatically sent. Review the external shipment state before changing or resending.",
+        "sv-SE": "Skicka till TLx överför en aktuell försäljnings- eller inköpsorder som är konfigurerad för extern ruttplanering och uppdaterar TLx-status och logg. Kontrollera att leveransvillkoret är konfigurerat för TLx och att anslutning/autentisering fungerar. Granska senaste sändningstid och leverans-ID. När en frisläppt försäljningsorder öppnas igen kan en annulleringsbegäran skickas till TLx; om TLx-status inte är Öppen skickas senare ändringar inte automatiskt. Kontrollera den externa leveransstatusen före ändring eller omsändning.",
+        "fr-FR": "Send to TLx transmet la commande client ou achat admissible pour routage externe et met à jour le statut et le journal TLx. Vérifiez que le mode d’expédition est configuré pour TLx et que la connexion/authentification fonctionne. Contrôlez l’heure du dernier envoi et l’identifiant d’expédition. Rouvrir une commande client libérée peut envoyer une annulation à TLx ; si le statut TLx n’est pas Open, les modifications ultérieures ne sont pas retransmises automatiquement. Vérifiez l’état externe avant toute modification ou renvoi.",
+        "de-DE": "Send to TLx überträgt einen geeigneten Verkaufs- oder Einkaufsauftrag zur externen Routenplanung und aktualisiert TLx-Status und Protokoll. Prüfen Sie Versandart und Verbindung/Authentifizierung. Kontrollieren Sie letzte Sendezeit und Sendungs-ID. Das erneute Öffnen eines freigegebenen Verkaufsauftrags kann eine Stornierung an TLx senden; bei einem TLx-Status ungleich Open werden spätere Änderungen nicht automatisch übertragen. Prüfen Sie den externen Sendungsstatus vor Änderungen oder erneutem Senden.",
+        "es-ES": "Send to TLx transmite el pedido de venta o compra elegible para su planificación externa y actualiza el estado y registro de TLx. Compruebe que el método de envío esté configurado y que la conexión/autenticación funcione. Revise la hora del último envío y el identificador. Reabrir un pedido de venta liberado puede enviar una cancelación a TLx; si el estado de TLx no es Open, los cambios posteriores no se transmiten automáticamente. Compruebe el estado externo antes de modificar o reenviar.",
+        "da-DK": "Send to TLx sender den kvalificerede salgs- eller købsordre til ekstern ruteplanlægning og opdaterer TLx-status/log. Kontrollér, at forsendelsesmetoden er konfigureret til TLx, og at forbindelsen/godkendelsen fungerer. Se seneste sendetid og forsendelses-id. Genåbning af en frigivet salgsordre kan sende en annullering til TLx; hvis TLx-status ikke er Open, sendes senere ændringer ikke automatisk. Kontrollér den eksterne forsendelsesstatus før ændring eller gensendelse.",
+        "fi-FI": "Send to TLx lähettää kelvollisen myynti- tai ostotilauksen ulkoiseen reititykseen ja päivittää TLx-tilan/lokin. Varmista, että toimitustapa on määritetty TLx:lle ja yhteys/todennus toimii. Tarkista viimeisin lähetysaika ja lähetyksen tunnus. Vapautetun myyntitilauksen avaaminen uudelleen voi lähettää TLx:lle peruutuspyynnön; jos TLx-tila ei ole Open, myöhempiä muutoksia ei lähetetä automaattisesti. Tarkista ulkoinen lähetystila ennen muutoksia tai uudelleenlähetystä.",
+        "nb-NO": "Send to TLx sender den kvalifiserte salgs- eller innkjøpsordren til ekstern ruteplanlegging og oppdaterer TLx-status/logg. Kontroller at fraktmetoden er konfigurert for TLx og at tilkobling/autentisering fungerer. Kontroller sist sendt-tidspunkt og forsendelses-ID. Gjenåpning av en frigitt salgsordre kan sende en kansellering til TLx; hvis TLx-status ikke er Open, sendes senere endringer ikke automatisk. Kontroller ekstern forsendelsesstatus før endring eller ny sending."
+      }
+    }
+  ],
+  "sources": [
+    {
+      "sourceId": "aptean-qca-create-adhoc-2026",
+      "title": "Aptean Quality Control — Create ad-hoc checks",
+      "sourceUri": "https://erpdocs.apteancloud.com/bc/docs/QCA/create-ad-hoc-quality-control-check/",
+      "accessedDate": "2026-09-30",
+      "appliesTo": "Aptean Food & Beverage ERP extension. Confirm extension installation, version and tenant setup before treating this as runtime behavior.",
+      "fields": [
+        "Ad-hoc quality checks may start from the Quality Control Checks list, a source document (including a purchase order), a lot card, the Create Quality Control Check report or the Quality Control App. From a source document, the action links the check to the document; using the line action also links the selected item and lot. Select a team and certified plan. Creating the check does not itself record measurements or a final decision."
+      ],
+      "documentedCaptions": [
+        "Quality Control Checks",
+        "Quality Control App",
+        "Create Quality Control Check",
+        "New"
+      ]
+    },
+    {
+      "sourceId": "aptean-qca-recurring-2026",
+      "title": "Aptean Quality Control — Create recurring checks",
+      "sourceUri": "https://erpdocs.apteancloud.com/bc/docs/QCA/set-up-recurring-quality-control-checks/",
+      "accessedDate": "2026-09-30",
+      "appliesTo": "Aptean Food & Beverage ERP extension. Confirm extension installation, version and tenant setup before treating this as runtime behavior.",
+      "fields": [
+        "Inventory triggers create checks for lot-tracked inventory based on elapsed storage time, independent of purchase, sales or production document activity. Document Type Inventory sets Per Lot automatically. Location Type can scope a location and optional bin, or all locations. Schedule Inventory Quality Checks creates or opens the relevant job queue entry. Production recurring checks require Shop Floor Production and a scheduled job queue; time and output-quantity triggers are tracked separately per production routing line."
+      ],
+      "documentedCaptions": [
+        "Quality Control Triggers",
+        "Quality Control Setup",
+        "Schedule Inventory Quality Checks",
+        "Shop Floor Production Setup"
+      ]
+    },
+    {
+      "sourceId": "aptean-qca-release-2603-2026",
+      "title": "Aptean Quality Control — What’s new in version 2603.0.0.0",
+      "sourceUri": "https://erpdocs.apteancloud.com/bc/docs/QCA/2603000/",
+      "accessedDate": "2026-09-30",
+      "appliesTo": "Aptean Food & Beverage ERP extension. Confirm extension installation, version and tenant setup before treating this as runtime behavior.",
+      "fields": [
+        "Version 2603.0.0.0 adds direct creation of customer, vendor or internal non-conformance documents from a posted quality control check. The resulting non-conformance links back to its source check. These actions require the Aptean Non Conformances extension. The release also adds order links for checks created from warehouse receipts and shipments. Availability depends on installed apps and tenant version."
+      ],
+      "documentedCaptions": [
+        "Posted Quality Control Check",
+        "Create Customer Non Conformance Document",
+        "Create Vendor Non Conformance Document",
+        "Create Internal Non Conformance Document"
+      ]
+    },
+    {
+      "sourceId": "aptean-ncf-customer-nonconformance-2026",
+      "title": "Aptean Non Conformances — Customer Non-Conformance",
+      "sourceUri": "https://erpdocs.apteancloud.com/bc/docs/NCF/customer-non-conformance/",
+      "accessedDate": "2026-09-30",
+      "appliesTo": "Aptean Non Conformances extension. Confirm installation, version, categories, number series and tenant setup before treating this as runtime behavior.",
+      "fields": [
+        "Customer non-conformances can be created for a customer or consumer. Lines can be entered manually or retrieved from a posted source document. Setup includes communication method, category/subcategory, comments, root cause, customer/consumer, item and quantity, severity and status. Teams synchronization depends on setup."
+      ],
+      "documentedCaptions": [
+        "Customer Non-Conformances",
+        "Customer Non-Conformance",
+        "New",
+        "Get Posted Document To Reverse",
+        "Change Status"
+      ]
+    },
+    {
+      "sourceId": "aptean-claims-purchase-claims-2026",
+      "title": "Aptean Claims — Purchase Claims",
+      "sourceUri": "https://erpdocs.apteancloud.com/bc/docs/CLA/purchase-claims/",
+      "accessedDate": "2026-09-30",
+      "appliesTo": "Aptean Claims extension. Confirm installation, version, claim setup, posting setup and warehouse configuration before treating this as runtime behavior.",
+      "fields": [
+        "A purchase claim can be created from purchase receipts. Receipt-derived line context includes item, location, original quantity and original price. Each line needs an Action Type such as Credit or Return. Release, Release & Create, and Release & Create & Post have different effects; Release & Create creates related documents, while Release & Create & Post also posts them. Return quantities can be split by lot. Warehouse-management locations have a documented limitation when attempting to create and post related documents together."
+      ],
+      "documentedCaptions": [
+        "Purchase Claims",
+        "Purchase Claim",
+        "New",
+        "Release",
+        "Release & Create",
+        "Release & Create & Post",
+        "Reopen",
+        "Action Type",
+        "Credit",
+        "Return"
+      ]
+    },
+    {
+      "sourceId": "aptean-ncf-close-2025",
+      "title": "Aptean Non Conformances — Set Non-Conformance to Closed",
+      "sourceUri": "https://erpdocs.apteancloud.com/bc/docs/NCF/set-non-conformance-to-closed/",
+      "accessedDate": "2026-09-30",
+      "appliesTo": "Aptean Non Conformances extension. Follow-up actions may be tracked in Business Central or synchronized with Microsoft Teams, depending on setup.",
+      "fields": [
+        "A customer, vendor or internal non-conformance can be closed after its follow-up actions have been executed and completed. Status changes are performed on the specific non-conformance page; closed records are available in separate closed lists. Creating related credit, return or claim documents from selected follow-up actions also links the resulting document to the non-conformance."
+      ],
+      "documentedCaptions": [
+        "Customer Non-Conformance",
+        "Vendor Non-Conformance",
+        "Internal Non-Conformance",
+        "Create Follow Up Actions",
+        "Change Status",
+        "Closed Customer Non-Conformances"
+      ]
+    },
+    {
+      "sourceId": "aptean-inspection-status-change-code-2025",
+      "title": "Aptean Inspection Status — Change inspection status code",
+      "sourceUri": "https://erpdocs.apteancloud.com/bc/docs/ISS/change-inspection-status-code/",
+      "accessedDate": "2026-09-30",
+      "appliesTo": "Aptean Inspection Status extension. Confirm installation, status configuration, reason codes, lot inventory and tenant integrations before treating this as runtime behavior.",
+      "fields": [
+        "Inspection status can be changed for selected lots from Lot No. Information List or in batches from Inspection Status Change Worksheet. Manual changes should include a reason code. Successful changes update the lot information card and create inspection status alerts and audit trail entries. A change is blocked when lot inventory is blank or the lot originates from a drop shipment. Worksheet line generation requires at least one filter; generated rows can be selected automatically, and an option can delete existing worksheet lines."
+      ],
+      "documentedCaptions": [
+        "Lot No. Information List",
+        "Change Inspection Status",
+        "Inspection Status Change Worksheet",
+        "Generate Lines",
+        "Update Disposition Code",
+        "Delete Selected",
+        "Delete All"
+      ]
+    },
+    {
+      "sourceId": "aptean-sfp-inputs-2026",
+      "title": "Aptean Shop Floor Production — Inputs",
+      "sourceUri": "https://erpdocs.apteancloud.com/bc/docs/SFP/inputs/",
+      "accessedDate": "2026-09-30",
+      "appliesTo": "Aptean Shop Floor Production extension. SFP and SFPBC are distinct client/documentation variants; confirm installed app and version. Material tracking and consumption behavior also depends on production BOM and flushing setup.",
+      "fields": [
+        "The Inputs area supports registering production-component consumption. Selecting + Input opens the Register Input flow; saving registers the input/consumption against the production order. Actual field availability and automatic consumption depend on item, tracking and production setup."
+      ],
+      "documentedCaptions": [
+        "Inputs",
+        "+ Input",
+        "Register Input",
+        "Save",
+        "Save + New"
+      ]
+    },
+    {
+      "sourceId": "aptean-sfp-outputs-2026",
+      "title": "Aptean Shop Floor Production — Outputs",
+      "sourceUri": "https://erpdocs.apteancloud.com/bc/docs/SFP/outputs/",
+      "accessedDate": "2026-09-30",
+      "appliesTo": "Aptean Shop Floor Production extension. SFP and SFPBC are distinct client/documentation variants; confirm installed app and version.",
+      "fields": [
+        "The Outputs area is production-order and routing-operation scoped. Selecting + Output opens output registration. Final routing operations can post inventory and capacity; intermediate operations record capacity only. Registration fields vary by operation and item setup. Saving registers the output; correction reduces a prior output registration."
+      ],
+      "documentedCaptions": [
+        "Outputs",
+        "+ Output",
+        "Register Output",
+        "Save",
+        "Save + New"
+      ]
+    },
+    {
+      "sourceId": "aptean-sfpbc-register-output-2026",
+      "title": "Aptean Shop Floor Production (BC) — Register output",
+      "sourceUri": "https://erpdocs.apteancloud.com/bc/docs/SFPBC/register-output/",
+      "accessedDate": "2026-09-30",
+      "appliesTo": "Aptean Shop Floor Production (BC) extension. Confirm installed variant, version, item tracking, location and weighing/labeling extensions.",
+      "fields": [
+        "Register Output receives context from the selected production-order Outputs line. The final routing operation may post inventory and capacity; an intermediate operation posts capacity only. Fields differ with operation and item setup. Lot No. is shown only on the final operation. Weight and license plate fields require additional Aptean extensions and item/location tracking. Save registers output; Save + New registers and opens another entry."
+      ],
+      "documentedCaptions": [
+        "Outputs",
+        "+ Output",
+        "Register Output",
+        "Save",
+        "Save + New",
+        "GET WEIGHT",
+        "GENERATE NEW NO."
+      ]
+    },
+    {
+      "sourceId": "aptean-sfpbc-correct-consumption-2026",
+      "title": "Aptean Shop Floor Production (BC) — Correct consumption",
+      "sourceUri": "https://erpdocs.apteancloud.com/bc/docs/SFPBC/correct-consumption/",
+      "accessedDate": "2026-09-30",
+      "appliesTo": "Aptean Shop Floor Production (BC) extension. Confirm version and production-order/item tracking configuration.",
+      "fields": [
+        "Correct Consumption is available from the Inputs list for a registered consumption. A single existing registration opens its correction page; multiple registrations open a history list to choose the registration. Correcting consumption reduces the previously registered consumed quantity. Review the intended entry and quantity before saving."
+      ],
+      "documentedCaptions": [
+        "Inputs",
+        "Correct Consumption",
+        "Consumption Registration Entries"
+      ]
+    },
+    {
+      "sourceId": "aptean-grower-return-settlement-status-2026",
+      "title": "Aptean Grower Return — Manage settlement status",
+      "sourceUri": "https://erpdocs.apteancloud.com/bc/docs/GRR/manage-the-status-of-a-settlement/",
+      "accessedDate": "2026-09-30",
+      "appliesTo": "Aptean Grower Return extension. Confirm version, accounting method, settlement setup, permissions and posting configuration.",
+      "fields": [
+        "A settlement progresses New > Calculated > Released. From Released it can create and post a purchase invoice, create an unposted invoice for separate posting, or update related purchase orders for later invoicing. Posted/invoiced or updated settlements become immutable; partially updated purchase orders can be corrected, recalculated and retried. Exactly zero-value invoice groups are allowed; documents with no lines are rejected."
+      ],
+      "documentedCaptions": [
+        "Settlements",
+        "Calculate",
+        "Release",
+        "Recalculate",
+        "Reopen",
+        "Post",
+        "Create Invoice",
+        "Update Purchase Order",
+        "Close"
+      ]
+    },
+    {
+      "sourceId": "aptean-trade-management-statements-2025",
+      "title": "Aptean Trade Management — Create trade statements",
+      "sourceUri": "https://erpdocs.apteancloud.com/bc/docs/TMT/create-trade-statements/",
+      "accessedDate": "2026-09-30",
+      "appliesTo": "Aptean Trade Management extension. Confirm trade partner accrual entries and Trade Management Setup rules, especially whether sales inclusion is by invoice or payment.",
+      "fields": [
+        "Create Trade Statement selects trade accrual entries within document/from/to dates and optional trade partner filters. Sales accrual inclusion dates depend on setup: fully paid invoices use closed-at date when inclusion is Payment; posting date is used when inclusion is Invoice. Selected partners need eligible accrual entries. Suggested lines replace current statement lines and unsaved line changes. Eligible lines and Amount Granted control subsequent invoice/credit memo inclusion and granted amount."
+      ],
+      "documentedCaptions": [
+        "Trade Statements",
+        "Create Trade Statement",
+        "Create Trade Statements",
+        "Suggest Trade Statement Lines",
+        "Eligible",
+        "Amount Granted",
+        "Issue Trade Statement"
+      ]
+    },
+    {
+      "sourceId": "aptean-pack-and-ship-posting-2023",
+      "title": "Aptean Pack and Ship — Posting shipments",
+      "sourceUri": "https://erpdocs.apteancloud.com/bc/docs/aptean-ship/posting-shipments/",
+      "accessedDate": "2026-09-30",
+      "appliesTo": "Aptean Pack and Ship. Confirm Ship Setup, package readiness, shipping agent, carrier integration and whether the selected action posts or transmits shipment data.",
+      "fields": [
+        "Outbound documents can create packages and a shipping batch through Pack and Ship. Post requires items to be packed and opens Post Packages; the user chooses Ship or Ship and Invoice. Pack, Ship and Post combines package creation, batch assignment and posting. A shipping agent code is required for source-document Pack and Ship/Post actions. Posting records item-ledger reductions. Carrier transmission is a separate integration behavior."
+      ],
+      "documentedCaptions": [
+        "Sales Order",
+        "Sales Packaging",
+        "Shipping Batch",
+        "Pack and Ship",
+        "Post",
+        "Pack, Ship and Post",
+        "Post Packages",
+        "Ship",
+        "Ship and Invoice"
+      ]
+    },
+    {
+      "sourceId": "aptean-pack-and-ship-packaging-2023",
+      "title": "Aptean Pack and Ship — Packaging",
+      "sourceUri": "https://erpdocs.apteancloud.com/bc/docs/aptean-ship/print",
+      "accessedDate": "2026-09-30",
+      "appliesTo": "Aptean Pack and Ship. Confirm packaging type defaults and package/warehouse setup.",
+      "fields": [
+        "Packaging is performed from Sales Packaging for an outbound document. Select a Packaging Type; manually enter Qty. to Pack or use Select. The amount cannot exceed outstanding-to-pack quantity. Packing assigns item quantities to packages and reduces outstanding-to-pack; this does not itself post shipment."
+      ],
+      "documentedCaptions": [
+        "Sales Packaging",
+        "Packaging Type",
+        "Qty. to Pack",
+        "Select",
+        "Pack"
+      ]
+    },
+    {
+      "sourceId": "aptean-edi-messages-2026",
+      "title": "Aptean EDI — Messages",
+      "sourceUri": "https://erpdocs.apteancloud.com/bc/docs/EDI/messages/",
+      "accessedDate": "2026-09-30",
+      "appliesTo": "Aptean EDI extension. Message direction, port, mapping, partner setup and document options determine effects; inspect the linked documents and message status.",
+      "fields": [
+        "Pending inbound EDI processing creates a Business Central document; pending outbound processing transmits to a trading partner. Failed messages are not automatically retried by the job scheduler, which processes pending messages only; after correcting the issue, manually Process a failed message. Ignore excludes eligible unprocessed messages. Import XML replaces message data and is intended for testing/troubleshooting, not live repair."
+      ],
+      "documentedCaptions": [
+        "EDI Messages",
+        "All EDI Messages",
+        "Process",
+        "Ignore",
+        "Reset",
+        "Linked Documents",
+        "Pending",
+        "Processed",
+        "Failed",
+        "Ignored"
+      ]
+    },
+    {
+      "sourceId": "aptean-aip-connection-2026",
+      "title": "Aptean Integration Platform — Set up AIP connection",
+      "sourceUri": "https://erpdocs.apteancloud.com/bc/docs/AIP/set-up-aip-connection/",
+      "accessedDate": "2026-09-30",
+      "appliesTo": "Aptean Integration Platform connector. Requires tenant-specific credentials from Aptean support, product subscriptions, event mappings, permissions and endpoints.",
+      "fields": [
+        "Process Events supports Inbound, Outbound or Both. Outbound prepares and transfers payloads. Inbound retrieves external events, transfers them to Business Central and processes them from the event list. Both combines the two directions. Event subscriptions, inbound/outbound event mappings and product settings determine which events are eligible. Job Queue can automate processing; Audit Log exposes errors; retry attempts and notifications are configured in setup."
+      ],
+      "documentedCaptions": [
+        "AIP Connection Setup",
+        "Process Events",
+        "AIP Process Events",
+        "Inbound",
+        "Outbound",
+        "Both",
+        "Events",
+        "Audit Log",
+        "Set Up Job Queue Entry"
+      ]
+    },
+    {
+      "sourceId": "aptean-tlx-send-on-release-2025",
+      "title": "Aptean Total Logistix — Send order to TLx on release",
+      "sourceUri": "https://erpdocs.apteancloud.com/bc/docs/TLX/send-the-order-to-tlx-on-release",
+      "accessedDate": "2026-09-30",
+      "appliesTo": "Aptean Total Logistix / TLx connector. Requires configured TLx connection/authentication, shipment method eligibility and setup; order release can exchange data with external TLx.",
+      "fields": [
+        "When configured shipment method and TLx Setup permit it, releasing a sales or purchase order sends order data for routing and records TLx status/log and shipment identifier. Manual Send to TLx is available from order actions. Reopening a released sales order sends a cancel shipment request to TLx. If TLx status is not Open, edits after reopening are not sent automatically."
+      ],
+      "documentedCaptions": [
+        "Sales Order",
+        "Purchase Order",
+        "Release",
+        "Send to TLx",
+        "TLx Details",
+        "TLx Status",
+        "Last Sent to TLx",
+        "TLx Shipment ID"
+      ]
+    },
+    {
+      "sourceId": "aptean-qca-answer-check-lines-2026",
+      "title": "Aptean Quality Control — Manage quality check lines",
+      "sourceUri": "https://erpdocs.apteancloud.com/bc/docs/QCA/manage-quality-check-lines/",
+      "accessedDate": "2026-09-30",
+      "appliesTo": "Aptean Quality Control (BC) extension. Confirm extension installation, version and tenant setup before treating this as runtime behavior.",
+      "fields": [
+        "Quality check lines are questions from the quality plan. Recording an answer recalculates the line result against targets; required questions and comments must be completed. Blind targets may display Done instead of pass/fail."
+      ],
+      "documentedCaptions": [
+        "Quality Control Check",
+        "Lines",
+        "Answer",
+        "Result"
+      ]
+    },
+    {
+      "sourceId": "aptean-qca-post-quality-action-2026",
+      "title": "Aptean Quality Control — Post the quality action",
+      "sourceUri": "https://erpdocs.apteancloud.com/bc/docs/QCA/post-the-quality-action/",
+      "accessedDate": "2026-09-30",
+      "appliesTo": "Aptean Quality Control (BC) extension. Confirm extension installation, version and tenant setup before treating this as runtime behavior.",
+      "fields": [
+        "Posting requires In Progress status and all visible action lines completed. Posting finalizes the action and makes it read-only."
+      ],
+      "documentedCaptions": [
+        "Quality Control Action",
+        "Post",
+        "In Progress"
+      ]
+    },
+    {
+      "sourceId": "aptean-chp-harvest-order-guide-2025",
+      "title": "Aptean Commodity Harvest Planning — Create harvest orders",
+      "sourceUri": "https://erpdocs.apteancloud.com/bc/docs/CHP/print",
+      "accessedDate": "2026-09-30",
+      "appliesTo": "Aptean extension documentation. Confirm the corresponding extension is installed and tenant setup/version before treating as runtime behavior.",
+      "fields": [
+        "Harvest orders require an agricultural location and configured harvest lines; Register records the order, while purchase orders, forecasts and commodity receipts are distinct follow-on actions.",
+        "Create Commodity Receipts creates receipts only for harvest-order lines of Type Commodity Item, with one receipt per commodity item. Create Purchase Contract is conditional on the Aptean Contract Management extension."
+      ],
+      "documentedCaptions": [
+        "Harvest Orders",
+        "New",
+        "Register",
+        "Create Commodity Receipts",
+        "Create Commodity Receipt",
+        "Create Purchase Contract",
+        "Harvest Planning"
+      ]
+    },
+    {
+      "sourceId": "aptean-chp-week-forecast-2026",
+      "title": "Aptean Commodity Harvest Planning — Create a week forecast",
+      "sourceUri": "https://erpdocs.apteancloud.com/bc/docs/CHP/create-a-week-forecast/",
+      "accessedDate": "2026-09-30",
+      "appliesTo": "Aptean extension documentation. Confirm the corresponding extension is installed and tenant setup/version before treating as runtime behavior.",
+      "fields": [
+        "A week forecast holds harvest dates and quantities and can create a purchase order or day forecast; closed forecasts cannot be changed or used to create those documents."
+      ],
+      "documentedCaptions": [
+        "Week Forecast",
+        "Create Purchase Order",
+        "Create Day Forecast"
+      ]
+    },
+    {
+      "sourceId": "aptean-chp-day-forecast-2025",
+      "title": "Aptean Commodity Harvest Planning — Create week or day forecasts from harvest orders",
+      "sourceUri": "https://erpdocs.apteancloud.com/bc/docs/CHP/print",
+      "accessedDate": "2026-09-30",
+      "appliesTo": "Aptean Commodity Harvest Planning extension. Confirm installation, version and tenant setup before treating this as runtime behavior.",
+      "fields": [
+        "Creating a day forecast from a Harvest Order requires Expected Calendar Week Start (Harvest). Item Category and Global Attributes lines may require item selection and additional line information."
+      ],
+      "documentedCaptions": [
+        "Harvest Order",
+        "Create Day Forecast",
+        "Expected Calendar Week Start (Harvest)"
+      ]
+    },
+    {
+      "sourceId": "aptean-chp-forecast-approval-worksheet-2025",
+      "title": "Aptean Commodity Harvest Planning — Create purchase orders from forecast approval worksheet",
+      "sourceUri": "https://erpdocs.apteancloud.com/bc/docs/CHP/create-purchase-order-from-forecast-approval-worksheet/",
+      "accessedDate": "2026-09-30",
+      "appliesTo": "Aptean Commodity Harvest Planning extension. Confirm installation, version and tenant setup before treating this as runtime behavior.",
+      "fields": [
+        "Load forecast documents, select worksheet lines and set Approval Quantity (Purchase UOM) before Create Purchase Order; Item Category lines may require item and harvest-quantity selection."
+      ],
+      "documentedCaptions": [
+        "Forecast Approval Worksheet",
+        "Load Forecast Documents",
+        "Approval Quantity (Purchase UOM)",
+        "Create Purchase Order"
+      ]
+    },
+    {
+      "sourceId": "aptean-contracts-from-harvest-planning-2024",
+      "title": "Aptean Contract Management — Create a purchase contract from harvest order and harvest planning pages",
+      "sourceUri": "https://erpdocs.apteancloud.com/bc/docs/COM/create-a-purchase-contract-from-harvest-order-and-harvest-planning-pages/",
+      "accessedDate": "2026-09-30",
+      "appliesTo": "Aptean Contract Management integration with Commodity Harvest Planning. Both extensions and compatible tenant configuration are required.",
+      "fields": [
+        "Create Purchase Contract on Harvest Order or Harvest Planning creates an agreement from selected harvest line(s); dates derive from season defaults, quantity and lot attributes transfer, and the action is available only when Contract Management is installed."
+      ],
+      "documentedCaptions": [
+        "Harvest Order",
+        "Harvest Planning",
+        "Create Purchase Contract",
+        "Contract Start Date",
+        "Contract End Date"
+      ]
     }
   ]
 }

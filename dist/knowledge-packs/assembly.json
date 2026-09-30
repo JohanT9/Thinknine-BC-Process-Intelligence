@@ -1,0 +1,687 @@
+{
+  "packId": "bc-assembly",
+  "name": "Business Central assembly",
+  "version": "1.1.0",
+  "priority": 220,
+  "rules": [
+    {
+      "ruleId": "BCExpansion.CreateOrder",
+      "taskType": "CreateOrder",
+      "semanticAction": "CreateOrder",
+      "entity": "AssemblyOrder",
+      "priority": 1300,
+      "confidence": 0.96,
+      "match": {
+        "pagePatterns": [
+          "^Assembly Orders$",
+          "^Sammansättningsbeställningar$",
+          "^Commandes d’assembly$",
+          "^Assemblyaufträge$",
+          "^Pedidos de ensamblado$",
+          "^Montageordrer$",
+          "^Kokoonpanotilaukset$",
+          "^Samlingsordrer$"
+        ],
+        "actionPatterns": [
+          "^New$",
+          "^Ny$",
+          "^Nouveau$",
+          "^Neu$",
+          "^Nuevo$",
+          "^Uusi$"
+        ],
+        "fieldPatterns": [],
+        "automationIdPatterns": []
+      },
+      "instructionTemplate": "",
+      "languages": [
+        "en-US",
+        "sv-SE",
+        "fr-FR",
+        "de-DE",
+        "es-ES",
+        "da-DK",
+        "fi-FI",
+        "nb-NO"
+      ],
+      "aliases": [],
+      "sourceIds": [
+        "microsoft-learn-expansion-assembly-how-to-assemble-items-en-us",
+        "microsoft-learn-expansion-assembly-how-to-assemble-items-sv-se",
+        "microsoft-learn-expansion-assembly-how-to-assemble-items-fr-fr",
+        "microsoft-learn-expansion-assembly-how-to-assemble-items-de-de",
+        "microsoft-learn-expansion-assembly-how-to-assemble-items-es-es",
+        "microsoft-learn-expansion-assembly-how-to-assemble-items-da-dk",
+        "microsoft-learn-expansion-assembly-how-to-assemble-items-fi-fi",
+        "microsoft-learn-expansion-assembly-how-to-assemble-items-nb-no"
+      ],
+      "localizedExplanations": {
+        "en-US": "This opens a new assembly order. The assembly item and quantity determine the component and resource lines from its assembly BOM. Creating the order does not record output or consumption.",
+        "sv-SE": "Här öppnas en ny monteringsorder. Monteringsartikeln och antalet styr komponent- och resursraderna från monteringsstrukturen. Att skapa ordern registrerar ingen produktion eller förbrukning.",
+        "fr-FR": "Cette action ouvre un nouvel ordre d’assemblage. L’article et la quantité déterminent les lignes de composants et de ressources issues de la nomenclature d’assemblage. La création ne comptabilise ni sortie ni consommation.",
+        "de-DE": "Ein neuer Montageauftrag wird geöffnet. Montageartikel und Menge bestimmen die Komponenten- und Ressourcenzeilen aus der Montagestückliste. Die Erstellung bucht weder Ausstoß noch Verbrauch.",
+        "es-ES": "Abre un nuevo pedido de ensamblado. El producto y la cantidad determinan los componentes y recursos de su lista de materiales. La creación no registra producción ni consumo.",
+        "da-DK": "Her åbnes en ny montageordre. Montagevaren og antallet bestemmer komponent- og ressourcelinjerne fra montagestyklisterne. Oprettelsen bogfører ikke afgang eller forbrug.",
+        "fi-FI": "Toiminto avaa uuden kokoonpanotilauksen. Kokoonpanonimike ja määrä määrittävät rakenteen komponentti- ja resurssirivit. Luonti ei kirjaa tuotosta tai kulutusta.",
+        "nb-NO": "Her åpnes en ny monteringsordre. Monteringsvaren og antallet bestemmer komponent- og ressurslinjene fra monteringsstykklisten. Opprettelsen bokfører ikke avgang eller forbruk."
+      }
+    },
+    {
+      "ruleId": "BCExpansion.QuantityToAssemble",
+      "taskType": "QuantityToAssemble",
+      "semanticAction": "QuantityToAssemble",
+      "entity": "AssemblyOrder",
+      "priority": 1300,
+      "confidence": 0.96,
+      "match": {
+        "pagePatterns": [
+          "^New Assembly Order$",
+          "^Ny monteringsorder$",
+          "^Nouvel ordre d’assemblage$",
+          "^Neuer Montageauftrag$",
+          "^Nuevo pedido de ensamblado$",
+          "^Ny montageordre$",
+          "^Uusi kokoonpanotilaus$",
+          "^Ny monteringsvare$",
+          "^Assembly Order$",
+          "^Monteringsorder$",
+          "^Ordre d’assemblage$",
+          "^Montageauftrag$",
+          "^Pedido de ensamblado$",
+          "^Montageordre$",
+          "^Kokoonpanotilaus$",
+          "^Monteringsordre$"
+        ],
+        "actionPatterns": [],
+        "fieldPatterns": [
+          "^Quantity to Assemble$",
+          "^Antal att montera$",
+          "^Quantité à assembler$",
+          "^Zu montierende Menge$",
+          "^Cantidad a ensamblar$",
+          "^Antal til montage$",
+          "^Kokoonpantava määrä$",
+          "^Antall å montere$"
+        ],
+        "automationIdPatterns": []
+      },
+      "instructionTemplate": "",
+      "languages": [
+        "en-US",
+        "sv-SE",
+        "fr-FR",
+        "de-DE",
+        "es-ES",
+        "da-DK",
+        "fi-FI",
+        "nb-NO"
+      ],
+      "aliases": [],
+      "sourceIds": [
+        "microsoft-learn-expansion-assembly-how-to-assemble-items-en-us",
+        "microsoft-learn-expansion-assembly-how-to-assemble-items-sv-se",
+        "microsoft-learn-expansion-assembly-how-to-assemble-items-fr-fr",
+        "microsoft-learn-expansion-assembly-how-to-assemble-items-de-de",
+        "microsoft-learn-expansion-assembly-how-to-assemble-items-es-es",
+        "microsoft-learn-expansion-assembly-how-to-assemble-items-da-dk",
+        "microsoft-learn-expansion-assembly-how-to-assemble-items-fi-fi",
+        "microsoft-learn-expansion-assembly-how-to-assemble-items-nb-no"
+      ],
+      "localizedExplanations": {
+        "en-US": "This is the number of assembly items to produce in the next posting, which can be less than the order quantity. Check the corresponding component quantities to consume before posting.",
+        "sv-SE": "Detta är antalet monteringsartiklar som ska färdigställas vid nästa bokföring och kan vara lägre än orderns totala antal. Kontrollera motsvarande komponentantal att förbruka före bokföring.",
+        "fr-FR": "Il s’agit de la quantité d’articles à assembler lors de la prochaine validation, qui peut être inférieure à la quantité commandée. Vérifiez les quantités de composants à consommer avant de valider.",
+        "de-DE": "Dies ist die beim nächsten Buchen zu montierende Artikelmenge; sie kann kleiner als die Auftragsmenge sein. Prüfen Sie vorher die zu verbrauchenden Komponentenmengen.",
+        "es-ES": "Es la cantidad de productos que se ensamblará en el siguiente registro y puede ser menor que la cantidad del pedido. Revise las cantidades de componentes que se consumirán antes de registrar.",
+        "da-DK": "Dette er antallet af montagevarer til næste bogføring og kan være mindre end ordrens samlede antal. Kontroller de tilhørende komponentantal til forbrug inden bogføring.",
+        "fi-FI": "Tämä on seuraavalla kirjauksella koottavien nimikkeiden määrä, joka voi olla tilausmäärää pienempi. Tarkista vastaavat kulutettavat komponenttimäärät ennen kirjausta.",
+        "nb-NO": "Dette er antallet monteringsvarer ved neste bokføring og kan være mindre enn ordreantallet. Kontroller tilhørende komponentantall som skal forbrukes før bokføring."
+      }
+    },
+    {
+      "ruleId": "BCExpansion.PostOrder",
+      "taskType": "PostOrder",
+      "semanticAction": "PostOrder",
+      "entity": "AssemblyOrder",
+      "priority": 1300,
+      "confidence": 0.96,
+      "match": {
+        "pagePatterns": [
+          "^New Assembly Order$",
+          "^Ny monteringsorder$",
+          "^Nouvel ordre d’assemblage$",
+          "^Neuer Montageauftrag$",
+          "^Nuevo pedido de ensamblado$",
+          "^Ny montageordre$",
+          "^Uusi kokoonpanotilaus$",
+          "^Ny monteringsvare$",
+          "^Assembly Order$",
+          "^Monteringsorder$",
+          "^Ordre d’assemblage$",
+          "^Montageauftrag$",
+          "^Pedido de ensamblado$",
+          "^Montageordre$",
+          "^Kokoonpanotilaus$",
+          "^Monteringsordre$"
+        ],
+        "actionPatterns": [
+          "^Post$",
+          "^Bokföra$",
+          "^Valider$",
+          "^Buchen$",
+          "^Registrar$",
+          "^Bogfør$",
+          "^Kirjaat$",
+          "^Bokfør$"
+        ],
+        "fieldPatterns": [],
+        "automationIdPatterns": []
+      },
+      "instructionTemplate": "",
+      "languages": [
+        "en-US",
+        "sv-SE",
+        "fr-FR",
+        "de-DE",
+        "es-ES",
+        "da-DK",
+        "fi-FI",
+        "nb-NO"
+      ],
+      "aliases": [],
+      "sourceIds": [
+        "microsoft-learn-expansion-assembly-how-to-assemble-items-en-us",
+        "microsoft-learn-expansion-assembly-how-to-assemble-items-sv-se",
+        "microsoft-learn-expansion-assembly-how-to-assemble-items-fr-fr",
+        "microsoft-learn-expansion-assembly-how-to-assemble-items-de-de",
+        "microsoft-learn-expansion-assembly-how-to-assemble-items-es-es",
+        "microsoft-learn-expansion-assembly-how-to-assemble-items-da-dk",
+        "microsoft-learn-expansion-assembly-how-to-assemble-items-fi-fi",
+        "microsoft-learn-expansion-assembly-how-to-assemble-items-nb-no",
+        "microsoft-learn-assembly-qms-trigger-en-us",
+        "microsoft-learn-assembly-qms-trigger-sv-se",
+        "microsoft-learn-assembly-qms-trigger-fr-fr",
+        "microsoft-learn-assembly-qms-trigger-de-de",
+        "microsoft-learn-assembly-qms-trigger-es-es",
+        "microsoft-learn-assembly-qms-trigger-da-dk",
+        "microsoft-learn-assembly-qms-trigger-fi-fi",
+        "microsoft-learn-assembly-qms-trigger-nb-no"
+      ],
+      "localizedExplanations": {
+        "en-US": "Posting a standalone assembly order records component and resource consumption and the assembled-item output. Before posting, check the assembly quantity, component availability and substitutions, location, tracking assignments and quantities to consume. If Microsoft Quality Management is installed, Assembly Trigger is set to When Output is posted, and an enabled generation rule matches the item and context, posting can also create a quality inspection linked to the assembly output. Record test results and finish that inspection separately. If this assembly order is linked to a sales order as assemble-to-order, you cannot post its output directly from the linked assembly order; the sales shipment is the posting path. The recorded click alone does not confirm successful posting.",
+        "sv-SE": "Bokföring av en fristående monteringsorder registrerar förbrukningen av komponenter och resurser samt utflödet av den monterade artikeln. Kontrollera monteringsantal, komponenttillgång och eventuella ersättningsartiklar, lagerställe, spårning och förbrukningsantal före bokföring. Om Microsoft Quality Management är installerat, Assembly Trigger är inställd på When Output is posted och en aktiv genereringsregel matchar artikel och sammanhang kan bokföringen även skapa en kvalitetsinspektion kopplad till monteringsutflödet. Registrera testresultat och slutför inspektionen separat. Om monteringsordern är kopplad till en säljorder som montering mot kundorder kan utflödet inte bokföras direkt från den länkade monteringsordern; då sker bokföringen via leveransen av säljordern. Det inspelade klicket bekräftar inte att bokföringen lyckades.",
+        "fr-FR": "La validation d’un ordre d’assemblage autonome enregistre la consommation des composants et des ressources ainsi que la sortie de l’article assemblé. Avant de valider, vérifiez la quantité, la disponibilité des composants et les substitutions, l’emplacement, le suivi et les quantités à consommer. Si Microsoft Quality Management est installé, que le déclencheur Assembly est réglé sur When Output is posted et qu’une règle active correspond à l’article et au contexte, la validation peut aussi créer une inspection qualité liée à la sortie d’assemblage. Saisissez les résultats des tests et terminez cette inspection séparément. Si l’ordre est lié à une commande vente en assemblage à la commande, sa sortie ne peut pas être validée directement depuis l’ordre lié ; le chemin passe par l’expédition de la commande vente. Le clic enregistré ne confirme pas la réussite de la validation.",
+        "de-DE": "Die Buchung eines eigenständigen Montageauftrags erfasst den Verbrauch von Komponenten und Ressourcen sowie den Output des montierten Artikels. Prüfen Sie vor dem Buchen Menge, Komponentenverfügbarkeit und Ersatzartikel, Lagerort, Artikelverfolgung und Verbrauchsmengen. Wenn Microsoft Quality Management installiert ist, Assembly Trigger auf When Output is posted steht und eine aktive Generierungsregel zu Artikel und Kontext passt, kann die Buchung außerdem eine mit dem Montageoutput verknüpfte Qualitätsprüfung erstellen. Erfassen Sie Testergebnisse und schließen Sie die Prüfung separat ab. Bei einem mit einem Verkaufsauftrag verknüpften Montageauftrag für Auftragsmontage lässt sich der Output nicht direkt aus dem verknüpften Auftrag buchen; der Buchungsweg führt über den Versand des Verkaufsauftrags. Der aufgezeichnete Klick bestätigt keine erfolgreiche Buchung.",
+        "es-ES": "El registro de una orden de ensamblado independiente contabiliza el consumo de componentes y recursos y la salida del artículo ensamblado. Antes de registrar, compruebe la cantidad, la disponibilidad de componentes y las sustituciones, la ubicación, el seguimiento y las cantidades que se consumirán. Si Microsoft Quality Management está instalado, Assembly Trigger está configurado como When Output is posted y una regla activa coincide con el artículo y el contexto, el registro también puede crear una inspección de calidad vinculada a la salida del ensamblado. Introduzca los resultados de las pruebas y finalice la inspección por separado. Si la orden está vinculada a un pedido de venta como ensamblado bajo pedido, no puede registrar la salida directamente desde la orden vinculada; el registro se realiza mediante el envío del pedido de venta. El clic grabado no confirma que el registro haya finalizado correctamente.",
+        "da-DK": "Bogføring af en selvstændig montageordre registrerer forbruget af komponenter og ressourcer samt outputtet af den samlede vare. Kontrollér montageantal, komponenttilgængelighed og eventuelle erstatningsvarer, lokation, sporing og forbrugsantal før bogføring. Hvis Microsoft Quality Management er installeret, Assembly Trigger er sat til When Output is posted, og en aktiv genereringsregel matcher varen og konteksten, kan bogføringen også oprette en kvalitetsinspektion, der er knyttet til montageoutputtet. Registrér testresultater, og afslut inspektionen separat. Hvis montageordren er knyttet til en salgsordre som montage efter ordre, kan outputtet ikke bogføres direkte fra den tilknyttede ordre; bogføringen sker via salgsordrens levering. Det optagede klik bekræfter ikke en gennemført bogføring.",
+        "fi-FI": "Erillisen kokoonpanotilauksen kirjaus tallentaa komponenttien ja resurssien kulutuksen sekä kootun nimikkeen tuloksen. Tarkista ennen kirjausta kokoonpanomäärä, komponenttien saatavuus ja korvaavat nimikkeet, sijainti, seuranta ja kulutettavat määrät. Jos Microsoft Quality Management on asennettu, Assembly Trigger -asetuksena on When Output is posted ja aktiivinen luontisääntö vastaa nimikettä ja asiayhteyttä, kirjaus voi luoda myös kokoonpanotulokseen linkitetyn laatutarkastuksen. Kirjaa testitulokset ja viimeistele tarkastus erikseen. Jos kokoonpanotilaus liittyy myyntitilaukseen tilauksesta koottavana tuotteena, tulosta ei voi kirjata suoraan linkitetyltä kokoonpanotilaukselta; kirjaus tehdään myyntitoimituksen kautta. Tallennettu napsautus ei vahvista kirjauksen onnistumista.",
+        "nb-NO": "Bokføring av en frittstående monteringsordre registrerer forbruket av komponenter og ressurser samt resultatet av den monterte varen. Kontroller monteringsantall, komponenttilgjengelighet og eventuelle erstatningsvarer, lokasjon, sporing og forbruksantall før bokføring. Hvis Microsoft Quality Management er installert, Assembly Trigger er satt til When Output is posted, og en aktiv genereringsregel samsvarer med varen og konteksten, kan bokføringen også opprette en kvalitetsinspeksjon som er knyttet til monteringsresultatet. Registrer testresultater og fullfør inspeksjonen separat. Hvis monteringsordren er knyttet til en salgsordre som montering på ordre, kan resultatet ikke bokføres direkte fra den tilknyttede monteringsordren; bokføringen skjer via leveringen av salgsordren. Det registrerte klikket bekrefter ikke vellykket bokføring."
+      }
+    },
+    {
+      "ruleId": "BCAssembly.AssemblyPolicyContext",
+      "taskType": "SetAssemblyPolicy",
+      "semanticAction": "SetAssemblyPolicy",
+      "entity": "AssemblyItem",
+      "priority": 1450,
+      "confidence": 0.97,
+      "match": {
+        "pagePatterns": [
+          "^Item Card$",
+          "^Artikelkort$",
+          "^Fiche article$",
+          "^Artikelkarte$",
+          "^Ficha de producto$",
+          "^Varekort$",
+          "^Nimikekortti$"
+        ],
+        "actionPatterns": [],
+        "fieldPatterns": [
+          "^Assembly Policy$",
+          "^Monteringsprincip$",
+          "^Stratégie d’assemblage$",
+          "^Montagerichtlinie$",
+          "^Política de ensamblado$",
+          "^Montageprincip$",
+          "^Kokoonpanokäytäntö$",
+          "^Monteringspolicy$"
+        ],
+        "automationIdPatterns": []
+      },
+      "instructionTemplate": "",
+      "languages": [
+        "en-US",
+        "sv-SE",
+        "fr-FR",
+        "de-DE",
+        "es-ES",
+        "da-DK",
+        "fi-FI",
+        "nb-NO"
+      ],
+      "verifiedRuntimeLocales": [
+        "en-US",
+        "sv-SE"
+      ],
+      "aliases": [],
+      "sourceIds": [
+        "microsoft-learn-assembly-policy-en-us",
+        "microsoft-learn-assembly-policy-sv-se",
+        "microsoft-learn-assembly-policy-fr-fr",
+        "microsoft-learn-assembly-policy-de-de",
+        "microsoft-learn-assembly-policy-es-es",
+        "microsoft-learn-assembly-policy-da-dk",
+        "microsoft-learn-assembly-policy-fi-fi",
+        "microsoft-learn-assembly-policy-nb-no"
+      ],
+      "localizedExplanations": {
+        "en-US": "This field decides whether the item is assembled to stock or to a specific sales order. Assemble-to-Stock means assemble ahead and keep the finished item in inventory; sales availability is checked for that item, and a sales line does not automatically create a linked assembly order. Assemble-to-Order means build for a sales demand: adding it to a sales line creates a one-to-one linked assembly order whose BOM components and resources can be customized. Check which policy is selected before interpreting later assembly steps. Supported combined flows can use stock for part of a quantity and assemble the remainder.",
+        "sv-SE": "Det här fältet avgör om artikeln monteras mot lager eller mot en viss försäljningsorder. Montera mot lager innebär att montera i förväg och lagra den färdiga artikeln; tillgången på försäljningsraden kontrolleras för den artikeln, och raden skapar inte automatiskt en länkad monteringsorder. Montera mot order innebär att bygga för en försäljningsefterfrågan: när artikeln läggs på en försäljningsrad skapas en monteringsorder som kopplas en-till-en och vars komponenter och resurser från strukturen kan anpassas. Kontrollera vilket värde som är valt innan du tolkar efterföljande monteringssteg. I kombinerade flöden som stöds kan en del av antalet tas från lager och resten monteras.",
+        "fr-FR": "Ce champ détermine si l’article est assemblé pour le stock ou pour une commande client précise. Assembler pour stock signifie produire à l’avance et conserver l’article fini en stock ; la disponibilité sur la ligne de vente porte sur cet article, et la ligne ne crée pas automatiquement un ordre d’assemblage lié. Assembler à la commande signifie produire pour une demande client : l’ajout sur une ligne de vente crée un ordre d’assemblage lié un à un, dont les composants et ressources de nomenclature peuvent être adaptés. Vérifiez la valeur choisie avant d’interpréter les étapes suivantes. Dans les flux combinés pris en charge, une partie de la quantité peut provenir du stock et le reste être assemblé.",
+        "de-DE": "Dieses Feld legt fest, ob der Artikel auf Lager oder für einen bestimmten Verkaufsauftrag montiert wird. Montage auf Lager bedeutet, im Voraus zu montieren und den fertigen Artikel zu lagern; die Verfügbarkeit der Verkaufszeile wird für diesen Artikel geprüft, und die Zeile erstellt nicht automatisch einen verknüpften Montageauftrag. Auftragsbezogene Montage bedeutet, für einen Kundenbedarf zu fertigen: Beim Hinzufügen zur Verkaufszeile entsteht ein eins zu eins verknüpfter Montageauftrag, dessen Stücklistenkomponenten und Ressourcen angepasst werden können. Prüfen Sie den ausgewählten Wert, bevor Sie die folgenden Montageschritte interpretieren. In unterstützten Kombinationsabläufen kann ein Teil der Menge aus dem Bestand kommen und der Rest montiert werden.",
+        "es-ES": "Este campo determina si el producto se ensambla para existencias o para un pedido de venta concreto. Ensamblar para stock significa producir por adelantado y guardar el producto terminado; la disponibilidad de la línea de venta se comprueba para ese producto y la línea no crea automáticamente una orden de ensamblado vinculada. Ensamblar para pedido significa fabricar para una demanda concreta: al añadirlo a una línea de venta se crea una orden vinculada uno a uno, cuyos componentes y recursos de la lista de materiales se pueden adaptar. Compruebe el valor seleccionado antes de interpretar los siguientes pasos. En flujos combinados compatibles, parte de la cantidad puede salir de existencias y el resto ensamblarse.",
+        "da-DK": "Dette felt afgør, om varen monteres til lager eller til en bestemt salgsordre. Montage til lager betyder, at varen monteres på forhånd og opbevares som færdigvare; tilgængeligheden på salgslinjen kontrolleres for varen, og linjen opretter ikke automatisk en tilknyttet montageordre. Montage efter ordre betyder, at varen fremstilles til et bestemt salgsbehov: Når den føjes til en salgslinje, oprettes en montageordre, der er knyttet én til én, og dens komponenter og ressourcer fra styklisterne kan tilpasses. Kontroller den valgte værdi, før du fortolker de næste montagetrin. I understøttede kombinationsforløb kan en del af mængden tages fra lager, mens resten monteres.",
+        "fi-FI": "Tämä kenttä määrittää, kootaanko nimike varastoon vai tiettyä myyntitilausta varten. Kokoonpano varastoon tarkoittaa kokoamista etukäteen ja valmiin nimikkeen varastointia; myyntirivin saatavuus tarkistetaan tälle nimikkeelle, eikä rivi luo automaattisesti linkitettyä kokoonpanotilausta. Kokoonpano tilausta varten tarkoittaa valmistamista tiettyyn myyntitarpeeseen: myyntiriville lisääminen luo siihen yksi yhteen linkitetyn kokoonpanotilauksen, jonka rakenteen komponentteja ja resursseja voidaan mukauttaa. Tarkista valittu arvo ennen seuraavien kokoonpanovaiheiden tulkintaa. Tuetuissa yhdistelmäprosesseissa osa määrästä voidaan ottaa varastosta ja loput koota.",
+        "nb-NO": "Dette feltet avgjør om varen monteres til lager eller til en bestemt salgsordre. Montering til lager betyr å montere på forhånd og lagre den ferdige varen; tilgjengeligheten på salgslinjen kontrolleres for denne varen, og linjen oppretter ikke automatisk en koblet monteringsordre. Montering etter ordre betyr å produsere for et bestemt salgsbehov: Når varen legges til på en salgslinje, opprettes en monteringsordre som kobles én til én, og komponenter og ressurser fra stykklisten kan tilpasses. Kontroller valgt verdi før du tolker de neste monteringstrinnene. I støttede kombinasjonsflyter kan deler av mengden tas fra lager og resten monteres."
+      }
+    }
+  ],
+  "sources": [
+    {
+      "accessedDate": "2026-09-30",
+      "fields": [
+        "This field decides whether the item is assembled to stock or to a specific sales order. Assemble-to-Stock means assemble ahead and keep the finished item in inventory; sales availability is checked for that item, and a sales line does not automatically create a linked assembly order. Assemble-to-Order means build for a sales demand: adding it to a sales line creates a one-to-one linked assembly order whose BOM components and resources can be customized. Check which policy is selected before interpreting later assembly steps. Supported combined flows can use stock for part of a quantity and assemble the remainder."
+      ],
+      "documentedCaptions": [
+        "Item Card",
+        "Assembly Policy",
+        "Assemble-to-Stock",
+        "Assemble-to-Order",
+        "Sales Order",
+        "Assemble-to-Order Lines"
+      ],
+      "sourceId": "microsoft-learn-assembly-policy-en-us",
+      "title": "Understanding Assemble to Order and Assemble to Stock - Business Central | Microsoft Learn",
+      "sourceUri": "https://learn.microsoft.com/en-us/dynamics365/business-central/assembly-assemble-to-order-or-assemble-to-stock",
+      "appliesTo": "Business Central standard functionality. English page content verified; tenant/version-specific UI captions remain unverified."
+    },
+    {
+      "accessedDate": "2026-09-30",
+      "fields": [
+        "Det här fältet avgör om artikeln monteras mot lager eller mot en viss försäljningsorder. Montera mot lager innebär att montera i förväg och lagra den färdiga artikeln; tillgången på försäljningsraden kontrolleras för den artikeln, och raden skapar inte automatiskt en länkad monteringsorder. Montera mot order innebär att bygga för en försäljningsefterfrågan: när artikeln läggs på en försäljningsrad skapas en monteringsorder som kopplas en-till-en och vars komponenter och resurser från strukturen kan anpassas. Kontrollera vilket värde som är valt innan du tolkar efterföljande monteringssteg. I kombinerade flöden som stöds kan en del av antalet tas från lager och resten monteras."
+      ],
+      "documentedCaptions": [
+        "Artikelkort",
+        "Monteringsprincip",
+        "Montera mot lager",
+        "Montera mot order",
+        "Försäljningsorder"
+      ],
+      "sourceId": "microsoft-learn-assembly-policy-sv-se",
+      "title": "Understanding Assemble to Order and Assemble to Stock - Business Central | Microsoft Learn",
+      "sourceUri": "https://learn.microsoft.com/sv-se/dynamics365/business-central/assembly-assemble-to-order-or-assemble-to-stock",
+      "appliesTo": "Business Central standard functionality. Swedish localized route verified; localized runtime captions remain unverified."
+    },
+    {
+      "sourceId": "microsoft-learn-expansion-assembly-how-to-assemble-items-en-us",
+      "title": "Assemble Items - Business Central | Microsoft Learn",
+      "sourceUri": "https://learn.microsoft.com/en-us/dynamics365/business-central/assembly-how-to-assemble-items",
+      "accessedDate": "2026-09-28",
+      "appliesTo": "Business Central standard functionality. Microsoft Learn captions checked; tenant/version-specific UI captions remain unverified.",
+      "fields": [
+        "This opens a new assembly order. The assembly item and quantity determine the component and resource lines from its assembly BOM. Creating the order does not record output or consumption.",
+        "This is the number of assembly items to produce in the next posting, which can be less than the order quantity. Check the corresponding component quantities to consume before posting.",
+        "Posting an assembly order records assembly output and the related component and resource consumption. Check the quantity to assemble and quantities to consume. The recorded click alone does not confirm successful posting."
+      ],
+      "documentedCaptions": [
+        "Assembly Orders",
+        "New",
+        "New Assembly Order",
+        "Quantity to Assemble",
+        "Assembly Order",
+        "Post"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-expansion-assembly-how-to-assemble-items-sv-se",
+      "title": "Montera Artiklar - Business Central | Microsoft Learn",
+      "sourceUri": "https://learn.microsoft.com/sv-se/dynamics365/business-central/assembly-how-to-assemble-items",
+      "accessedDate": "2026-09-28",
+      "appliesTo": "Business Central standard functionality. Microsoft Learn captions checked; tenant/version-specific UI captions remain unverified.",
+      "fields": [
+        "This opens a new assembly order. The assembly item and quantity determine the component and resource lines from its assembly BOM. Creating the order does not record output or consumption.",
+        "This is the number of assembly items to produce in the next posting, which can be less than the order quantity. Check the corresponding component quantities to consume before posting.",
+        "Posting an assembly order records assembly output and the related component and resource consumption. Check the quantity to assemble and quantities to consume. The recorded click alone does not confirm successful posting."
+      ],
+      "documentedCaptions": [
+        "Sammansättningsbeställningar",
+        "Ny",
+        "Ny monteringsorder",
+        "Antal att montera",
+        "Monteringsorder",
+        "Bokföra"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-expansion-assembly-how-to-assemble-items-fr-fr",
+      "title": "Assembler des articles - Business Central | Microsoft Learn",
+      "sourceUri": "https://learn.microsoft.com/fr-fr/dynamics365/business-central/assembly-how-to-assemble-items",
+      "accessedDate": "2026-09-28",
+      "appliesTo": "Business Central standard functionality. Microsoft Learn captions checked; tenant/version-specific UI captions remain unverified.",
+      "fields": [
+        "This opens a new assembly order. The assembly item and quantity determine the component and resource lines from its assembly BOM. Creating the order does not record output or consumption.",
+        "This is the number of assembly items to produce in the next posting, which can be less than the order quantity. Check the corresponding component quantities to consume before posting.",
+        "Posting an assembly order records assembly output and the related component and resource consumption. Check the quantity to assemble and quantities to consume. The recorded click alone does not confirm successful posting."
+      ],
+      "documentedCaptions": [
+        "Commandes d’assembly",
+        "Nouveau",
+        "Nouvel ordre d’assemblage",
+        "Quantité à assembler",
+        "Ordre d’assemblage",
+        "Valider"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-expansion-assembly-how-to-assemble-items-de-de",
+      "title": "Artikel montieren - Business Central | Microsoft Learn",
+      "sourceUri": "https://learn.microsoft.com/de-de/dynamics365/business-central/assembly-how-to-assemble-items",
+      "accessedDate": "2026-09-28",
+      "appliesTo": "Business Central standard functionality. Microsoft Learn captions checked; tenant/version-specific UI captions remain unverified.",
+      "fields": [
+        "This opens a new assembly order. The assembly item and quantity determine the component and resource lines from its assembly BOM. Creating the order does not record output or consumption.",
+        "This is the number of assembly items to produce in the next posting, which can be less than the order quantity. Check the corresponding component quantities to consume before posting.",
+        "Posting an assembly order records assembly output and the related component and resource consumption. Check the quantity to assemble and quantities to consume. The recorded click alone does not confirm successful posting."
+      ],
+      "documentedCaptions": [
+        "Assemblyaufträge",
+        "Neu",
+        "Neuer Montageauftrag",
+        "Zu montierende Menge",
+        "Montageauftrag",
+        "Buchen"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-expansion-assembly-how-to-assemble-items-es-es",
+      "title": "Ensamblar artículos - Business Central | Microsoft Learn",
+      "sourceUri": "https://learn.microsoft.com/es-es/dynamics365/business-central/assembly-how-to-assemble-items",
+      "accessedDate": "2026-09-28",
+      "appliesTo": "Business Central standard functionality. Microsoft Learn captions checked; tenant/version-specific UI captions remain unverified.",
+      "fields": [
+        "This opens a new assembly order. The assembly item and quantity determine the component and resource lines from its assembly BOM. Creating the order does not record output or consumption.",
+        "This is the number of assembly items to produce in the next posting, which can be less than the order quantity. Check the corresponding component quantities to consume before posting.",
+        "Posting an assembly order records assembly output and the related component and resource consumption. Check the quantity to assemble and quantities to consume. The recorded click alone does not confirm successful posting."
+      ],
+      "documentedCaptions": [
+        "Pedidos de ensamblado",
+        "Nuevo",
+        "Nuevo pedido de ensamblado",
+        "Cantidad a ensamblar",
+        "Pedido de ensamblado",
+        "Registrar"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-expansion-assembly-how-to-assemble-items-da-dk",
+      "title": "Montere elementer - Business Central | Microsoft Learn",
+      "sourceUri": "https://learn.microsoft.com/da-dk/dynamics365/business-central/assembly-how-to-assemble-items",
+      "accessedDate": "2026-09-28",
+      "appliesTo": "Business Central standard functionality. Microsoft Learn captions checked; tenant/version-specific UI captions remain unverified.",
+      "fields": [
+        "This opens a new assembly order. The assembly item and quantity determine the component and resource lines from its assembly BOM. Creating the order does not record output or consumption.",
+        "This is the number of assembly items to produce in the next posting, which can be less than the order quantity. Check the corresponding component quantities to consume before posting.",
+        "Posting an assembly order records assembly output and the related component and resource consumption. Check the quantity to assemble and quantities to consume. The recorded click alone does not confirm successful posting."
+      ],
+      "documentedCaptions": [
+        "Montageordrer",
+        "Ny",
+        "Ny montageordre",
+        "Antal til montage",
+        "Montageordre",
+        "Bogfør"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-expansion-assembly-how-to-assemble-items-fi-fi",
+      "title": "Kokoa nimikkeet - Business Central | Microsoft Learn",
+      "sourceUri": "https://learn.microsoft.com/fi-fi/dynamics365/business-central/assembly-how-to-assemble-items",
+      "accessedDate": "2026-09-28",
+      "appliesTo": "Business Central standard functionality. Microsoft Learn captions checked; tenant/version-specific UI captions remain unverified.",
+      "fields": [
+        "This opens a new assembly order. The assembly item and quantity determine the component and resource lines from its assembly BOM. Creating the order does not record output or consumption.",
+        "This is the number of assembly items to produce in the next posting, which can be less than the order quantity. Check the corresponding component quantities to consume before posting.",
+        "Posting an assembly order records assembly output and the related component and resource consumption. Check the quantity to assemble and quantities to consume. The recorded click alone does not confirm successful posting."
+      ],
+      "documentedCaptions": [
+        "Kokoonpanotilaukset",
+        "Uusi",
+        "Uusi kokoonpanotilaus",
+        "Kokoonpantava määrä",
+        "Kokoonpanotilaus",
+        "Kirjaat"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-expansion-assembly-how-to-assemble-items-nb-no",
+      "title": "Montere elementer - Business Central | Microsoft Learn",
+      "sourceUri": "https://learn.microsoft.com/nb-no/dynamics365/business-central/assembly-how-to-assemble-items",
+      "accessedDate": "2026-09-28",
+      "appliesTo": "Business Central standard functionality. Microsoft Learn captions checked; tenant/version-specific UI captions remain unverified.",
+      "fields": [
+        "This opens a new assembly order. The assembly item and quantity determine the component and resource lines from its assembly BOM. Creating the order does not record output or consumption.",
+        "This is the number of assembly items to produce in the next posting, which can be less than the order quantity. Check the corresponding component quantities to consume before posting.",
+        "Posting an assembly order records assembly output and the related component and resource consumption. Check the quantity to assemble and quantities to consume. The recorded click alone does not confirm successful posting."
+      ],
+      "documentedCaptions": [
+        "Samlingsordrer",
+        "Ny",
+        "Ny monteringsvare",
+        "Antall å montere",
+        "Monteringsordre",
+        "Bokfør"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-assembly-policy-fr-fr",
+      "title": "Understanding Assemble to Order and Assemble to Stock - Business Central | Microsoft Learn",
+      "sourceUri": "https://learn.microsoft.com/fr-fr/dynamics365/business-central/assembly-assemble-to-order-or-assemble-to-stock",
+      "accessedDate": "2026-09-30",
+      "appliesTo": "Business Central standard functionality. Localized source page accessed; runtime tenant captions remain unverified.",
+      "fields": [
+        "Ce champ détermine si l’article est assemblé pour le stock ou pour une commande client précise. Assembler pour stock signifie produire à l’avance et conserver l’article fini en stock ; la disponibilité sur la ligne de vente porte sur cet article, et la ligne ne crée pas automatiquement un ordre d’assemblage lié. Assembler à la commande signifie produire pour une demande client : l’ajout sur une ligne de vente crée un ordre d’assemblage lié un à un, dont les composants et ressources de nomenclature peuvent être adaptés. Vérifiez la valeur choisie avant d’interpréter les étapes suivantes. Dans les flux combinés pris en charge, une partie de la quantité peut provenir du stock et le reste être assemblé."
+      ],
+      "documentedCaptions": [
+        "Fiche article",
+        "Stratégie d’assemblage"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-assembly-policy-de-de",
+      "title": "Understanding Assemble to Order and Assemble to Stock - Business Central | Microsoft Learn",
+      "sourceUri": "https://learn.microsoft.com/de-de/dynamics365/business-central/assembly-assemble-to-order-or-assemble-to-stock",
+      "accessedDate": "2026-09-30",
+      "appliesTo": "Business Central standard functionality. Localized source page accessed; runtime tenant captions remain unverified.",
+      "fields": [
+        "Dieses Feld legt fest, ob der Artikel auf Lager oder für einen bestimmten Verkaufsauftrag montiert wird. Montage auf Lager bedeutet, im Voraus zu montieren und den fertigen Artikel zu lagern; die Verfügbarkeit der Verkaufszeile wird für diesen Artikel geprüft, und die Zeile erstellt nicht automatisch einen verknüpften Montageauftrag. Auftragsbezogene Montage bedeutet, für einen Kundenbedarf zu fertigen: Beim Hinzufügen zur Verkaufszeile entsteht ein eins zu eins verknüpfter Montageauftrag, dessen Stücklistenkomponenten und Ressourcen angepasst werden können. Prüfen Sie den ausgewählten Wert, bevor Sie die folgenden Montageschritte interpretieren. In unterstützten Kombinationsabläufen kann ein Teil der Menge aus dem Bestand kommen und der Rest montiert werden."
+      ],
+      "documentedCaptions": [
+        "Artikelkarte",
+        "Montagerichtlinie"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-assembly-policy-es-es",
+      "title": "Understanding Assemble to Order and Assemble to Stock - Business Central | Microsoft Learn",
+      "sourceUri": "https://learn.microsoft.com/es-es/dynamics365/business-central/assembly-assemble-to-order-or-assemble-to-stock",
+      "accessedDate": "2026-09-30",
+      "appliesTo": "Business Central standard functionality. Localized source page accessed; runtime tenant captions remain unverified.",
+      "fields": [
+        "Este campo determina si el producto se ensambla para existencias o para un pedido de venta concreto. Ensamblar para stock significa producir por adelantado y guardar el producto terminado; la disponibilidad de la línea de venta se comprueba para ese producto y la línea no crea automáticamente una orden de ensamblado vinculada. Ensamblar para pedido significa fabricar para una demanda concreta: al añadirlo a una línea de venta se crea una orden vinculada uno a uno, cuyos componentes y recursos de la lista de materiales se pueden adaptar. Compruebe el valor seleccionado antes de interpretar los siguientes pasos. En flujos combinados compatibles, parte de la cantidad puede salir de existencias y el resto ensamblarse."
+      ],
+      "documentedCaptions": [
+        "Tarjeta de artículo",
+        "Política de ensamblaje"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-assembly-policy-da-dk",
+      "title": "Understanding Assemble to Order and Assemble to Stock - Business Central | Microsoft Learn",
+      "sourceUri": "https://learn.microsoft.com/da-dk/dynamics365/business-central/assembly-assemble-to-order-or-assemble-to-stock",
+      "accessedDate": "2026-09-30",
+      "appliesTo": "Business Central standard functionality. Localized source page accessed; runtime tenant captions remain unverified.",
+      "fields": [
+        "Dette felt afgør, om varen monteres til lager eller til en bestemt salgsordre. Montage til lager betyder, at varen monteres på forhånd og opbevares som færdigvare; tilgængeligheden på salgslinjen kontrolleres for varen, og linjen opretter ikke automatisk en tilknyttet montageordre. Montage efter ordre betyder, at varen fremstilles til et bestemt salgsbehov: Når den føjes til en salgslinje, oprettes en montageordre, der er knyttet én til én, og dens komponenter og ressourcer fra styklisterne kan tilpasses. Kontroller den valgte værdi, før du fortolker de næste montagetrin. I understøttede kombinationsforløb kan en del af mængden tages fra lager, mens resten monteres."
+      ],
+      "documentedCaptions": [
+        "Varekort",
+        "Montagepolitik"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-assembly-policy-fi-fi",
+      "title": "Understanding Assemble to Order and Assemble to Stock - Business Central | Microsoft Learn",
+      "sourceUri": "https://learn.microsoft.com/fi-fi/dynamics365/business-central/assembly-assemble-to-order-or-assemble-to-stock",
+      "accessedDate": "2026-09-30",
+      "appliesTo": "Finnish localized route could not be independently fetched in this review; the route is recorded for follow-up. Runtime captions remain unverified.",
+      "fields": [
+        "Tämä kenttä määrittää, kootaanko nimike varastoon vai tiettyä myyntitilausta varten. Kokoonpano varastoon tarkoittaa kokoamista etukäteen ja valmiin nimikkeen varastointia; myyntirivin saatavuus tarkistetaan tälle nimikkeelle, eikä rivi luo automaattisesti linkitettyä kokoonpanotilausta. Kokoonpano tilausta varten tarkoittaa valmistamista tiettyyn myyntitarpeeseen: myyntiriville lisääminen luo siihen yksi yhteen linkitetyn kokoonpanotilauksen, jonka rakenteen komponentteja ja resursseja voidaan mukauttaa. Tarkista valittu arvo ennen seuraavien kokoonpanovaiheiden tulkintaa. Tuetuissa yhdistelmäprosesseissa osa määrästä voidaan ottaa varastosta ja loput koota."
+      ],
+      "documentedCaptions": [
+        "Nimikekortti",
+        "Kokoonpanokäytäntö"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-assembly-policy-nb-no",
+      "title": "Understanding Assemble to Order and Assemble to Stock - Business Central | Microsoft Learn",
+      "sourceUri": "https://learn.microsoft.com/nb-no/dynamics365/business-central/assembly-assemble-to-order-or-assemble-to-stock",
+      "accessedDate": "2026-09-30",
+      "appliesTo": "Business Central standard functionality. Localized source page accessed; runtime tenant captions remain unverified.",
+      "fields": [
+        "Dette feltet avgjør om varen monteres til lager eller til en bestemt salgsordre. Montering til lager betyr å montere på forhånd og lagre den ferdige varen; tilgjengeligheten på salgslinjen kontrolleres for denne varen, og linjen oppretter ikke automatisk en koblet monteringsordre. Montering etter ordre betyr å produsere for et bestemt salgsbehov: Når varen legges til på en salgslinje, opprettes en monteringsordre som kobles én til én, og komponenter og ressurser fra stykklisten kan tilpasses. Kontroller valgt verdi før du tolker de neste monteringstrinnene. I støttede kombinasjonsflyter kan deler av mengden tas fra lager og resten monteres."
+      ],
+      "documentedCaptions": [
+        "Varekort",
+        "Monteringspolicy"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-assembly-qms-trigger-en-us",
+      "title": "Quality management setup and configuration",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/en-us/dynamics365/business-central/qms-setup",
+      "appliesTo": "Business Central Quality Management extension setup, assembly output trigger; locale en-US. Source locale is not independently verified for this route; installed tenant version/captions remain unverified.",
+      "accessedDate": "2026-09-30",
+      "fields": [
+        "Assembly Trigger: When Output is posted can create a quality inspection when assembly output is posted; Never disables automatic creation.",
+        "Inspection generation also depends on a matching generation rule, assigned template and configured item/location filters.",
+        "Assembly output posting and completion of the quality inspection are distinct actions.",
+        "For assemble-to-order linked to a sales order, the assembly output cannot be posted directly from the linked assembly order; post the sales shipment."
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-assembly-qms-trigger-sv-se",
+      "title": "Quality management setup and configuration",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/sv-se/dynamics365/business-central/qms-setup",
+      "appliesTo": "Business Central Quality Management extension setup, assembly output trigger; locale sv-SE. Source locale is not independently verified for this route; installed tenant version/captions remain unverified.",
+      "accessedDate": "2026-09-30",
+      "fields": [
+        "Assembly Trigger: When Output is posted can create a quality inspection when assembly output is posted; Never disables automatic creation.",
+        "Inspection generation also depends on a matching generation rule, assigned template and configured item/location filters.",
+        "Assembly output posting and completion of the quality inspection are distinct actions.",
+        "For assemble-to-order linked to a sales order, the assembly output cannot be posted directly from the linked assembly order; post the sales shipment."
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-assembly-qms-trigger-fr-fr",
+      "title": "Quality management setup and configuration",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/fr-fr/dynamics365/business-central/qms-setup",
+      "appliesTo": "Business Central Quality Management extension setup, assembly output trigger; locale fr-FR. Source locale is not independently verified for this route; installed tenant version/captions remain unverified.",
+      "accessedDate": "2026-09-30",
+      "fields": [
+        "Assembly Trigger: When Output is posted can create a quality inspection when assembly output is posted; Never disables automatic creation.",
+        "Inspection generation also depends on a matching generation rule, assigned template and configured item/location filters.",
+        "Assembly output posting and completion of the quality inspection are distinct actions.",
+        "For assemble-to-order linked to a sales order, the assembly output cannot be posted directly from the linked assembly order; post the sales shipment."
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-assembly-qms-trigger-de-de",
+      "title": "Quality management setup and configuration",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/de-de/dynamics365/business-central/qms-setup",
+      "appliesTo": "Business Central Quality Management extension setup, assembly output trigger; locale de-DE. Source locale is not independently verified for this route; installed tenant version/captions remain unverified.",
+      "accessedDate": "2026-09-30",
+      "fields": [
+        "Assembly Trigger: When Output is posted can create a quality inspection when assembly output is posted; Never disables automatic creation.",
+        "Inspection generation also depends on a matching generation rule, assigned template and configured item/location filters.",
+        "Assembly output posting and completion of the quality inspection are distinct actions.",
+        "For assemble-to-order linked to a sales order, the assembly output cannot be posted directly from the linked assembly order; post the sales shipment."
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-assembly-qms-trigger-es-es",
+      "title": "Quality management setup and configuration",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/es-es/dynamics365/business-central/qms-setup",
+      "appliesTo": "Business Central Quality Management extension setup, assembly output trigger; locale es-ES. Source locale is not independently verified for this route; installed tenant version/captions remain unverified.",
+      "accessedDate": "2026-09-30",
+      "fields": [
+        "Assembly Trigger: When Output is posted can create a quality inspection when assembly output is posted; Never disables automatic creation.",
+        "Inspection generation also depends on a matching generation rule, assigned template and configured item/location filters.",
+        "Assembly output posting and completion of the quality inspection are distinct actions.",
+        "For assemble-to-order linked to a sales order, the assembly output cannot be posted directly from the linked assembly order; post the sales shipment."
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-assembly-qms-trigger-da-dk",
+      "title": "Quality management setup and configuration",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/da-dk/dynamics365/business-central/qms-setup",
+      "appliesTo": "Business Central Quality Management extension setup, assembly output trigger; locale da-DK. Source locale is not independently verified for this route; installed tenant version/captions remain unverified.",
+      "accessedDate": "2026-09-30",
+      "fields": [
+        "Assembly Trigger: When Output is posted can create a quality inspection when assembly output is posted; Never disables automatic creation.",
+        "Inspection generation also depends on a matching generation rule, assigned template and configured item/location filters.",
+        "Assembly output posting and completion of the quality inspection are distinct actions.",
+        "For assemble-to-order linked to a sales order, the assembly output cannot be posted directly from the linked assembly order; post the sales shipment."
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-assembly-qms-trigger-fi-fi",
+      "title": "Quality management setup and configuration",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/fi-fi/dynamics365/business-central/qms-setup",
+      "appliesTo": "Business Central Quality Management extension setup, assembly output trigger; locale fi-FI. Source locale is not independently verified for this route; installed tenant version/captions remain unverified.",
+      "accessedDate": "2026-09-30",
+      "fields": [
+        "Assembly Trigger: When Output is posted can create a quality inspection when assembly output is posted; Never disables automatic creation.",
+        "Inspection generation also depends on a matching generation rule, assigned template and configured item/location filters.",
+        "Assembly output posting and completion of the quality inspection are distinct actions.",
+        "For assemble-to-order linked to a sales order, the assembly output cannot be posted directly from the linked assembly order; post the sales shipment."
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-assembly-qms-trigger-nb-no",
+      "title": "Quality management setup and configuration",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/nb-no/dynamics365/business-central/qms-setup",
+      "appliesTo": "Business Central Quality Management extension setup, assembly output trigger; locale nb-NO. Source locale is not independently verified for this route; installed tenant version/captions remain unverified.",
+      "accessedDate": "2026-09-30",
+      "fields": [
+        "Assembly Trigger: When Output is posted can create a quality inspection when assembly output is posted; Never disables automatic creation.",
+        "Inspection generation also depends on a matching generation rule, assigned template and configured item/location filters.",
+        "Assembly output posting and completion of the quality inspection are distinct actions.",
+        "For assemble-to-order linked to a sales order, the assembly output cannot be posted directly from the linked assembly order; post the sales shipment."
+      ]
+    }
+  ],
+  "sourceLocaleGaps": {
+    "microsoft-learn-assembly-policy-fi-fi": [
+      "fi-FI"
+    ]
+  }
+}

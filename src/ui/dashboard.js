@@ -6063,42 +6063,67 @@ function renderStoredReviewFallback(error) {
 
 function knowledgeExplanationMarkup(task) {
   if (!task?.contextualExplanationRuleId ||
-      !(task?.contextualExplanationSources || []).some(source =>
-        /^https:\/\/learn\.microsoft\.com\//i.test(source?.sourceUri || ""))) return "";
+      (!(["observed-workflow", "authored-process", "page-context"].includes(task.contextualExplanationBasis)) &&
+        !(task?.contextualExplanationSources || []).some(source =>
+          String(source?.sourceUri || "").startsWith("https://learn.microsoft.com/")))) return "";
   const language = activeDocumentLanguage();
   const explanations = task.contextualExplanations || {};
-  const explanation = explanations[language] || explanations[language.split("-")[0]] ||
-    explanations["en-US"] || "";
+  const overrides = task.contextualExplanationOverrides || {};
+  const hasOverride = Object.prototype.hasOwnProperty.call(overrides, language);
+  const explanation = hasOverride ? String(overrides[language] || "") :
+    explanations[language] || explanations[language.split("-")[0]] || explanations["en-US"] || "";
   if (!explanation) return "";
   const labels = {
-    "sv-SE": ["Vad åtgärden innebär", "Källa"],
-    "en-US": ["What this action does", "Source"],
-    "fr-FR": ["Ce que fait cette action", "Source"],
-    "de-DE": ["Was diese Aktion bewirkt", "Quelle"],
-    "es-ES": ["Qué hace esta acción", "Fuente"],
-    "da-DK": ["Hvad handlingen gør", "Kilde"],
-    "fi-FI": ["Mitä toiminto tekee", "Lähde"],
-    "nb-NO": ["Hva handlingen gjør", "Kilde"]
+    "sv-SE": ["Vad åtgärden innebär", "Källa"], "en-US": ["What this action does", "Source"],
+    "fr-FR": ["Ce que fait cette action", "Source"], "de-DE": ["Was diese Aktion bewirkt", "Quelle"],
+    "es-ES": ["Qué hace esta acción", "Fuente"], "da-DK": ["Hvad handlingen gør", "Kilde"],
+    "fi-FI": ["Mitä toiminto tekee", "Lähde"], "nb-NO": ["Hva handlingen gjør", "Kilde"]
   };
-  const includeLabels = { "sv-SE": "Ta med förklaringen i Word",
-    "en-US": "Include explanation in Word", "fr-FR": "Inclure l’explication dans Word",
-    "de-DE": "Erklärung in Word übernehmen", "es-ES": "Incluir explicación en Word",
-    "da-DK": "Medtag forklaringen i Word", "fi-FI": "Sisällytä selitys Wordiin",
-    "nb-NO": "Ta med forklaringen i Word" };
-  const [heading, sourceLabel] = labels[language] || labels["en-US"];
+  const text = {
+    "sv-SE": { include:"Ta med förklaringen i Word", edit:"Redigera förslagstext", reset:"Återställ förslaget", save:"Spara text", cancel:"Avbryt", prompt:"Förklaring på svenska", edited:"Egen redigering", empty:"Ange en förklaringstext.", empty:"Ange en förklaringstext." },
+    "en-US": { include:"Include explanation in Word", edit:"Edit suggested text", reset:"Restore suggestion", save:"Save text", cancel:"Cancel", prompt:"Explanation in English", edited:"Your edited explanation", empty:"Enter an explanation.", empty:"Enter an explanation." },
+    "fr-FR": { include:"Inclure l’explication dans Word", edit:"Modifier le texte proposé", reset:"Rétablir la suggestion", save:"Enregistrer le texte", cancel:"Annuler", prompt:"Explication en français", edited:"Votre texte modifié", empty:"Saisissez une explication.", empty:"Saisissez une explication." },
+    "de-DE": { include:"Erklärung in Word übernehmen", edit:"Vorschlag bearbeiten", reset:"Vorschlag wiederherstellen", save:"Text speichern", cancel:"Abbrechen", prompt:"Erläuterung auf Deutsch", edited:"Ihre bearbeitete Erläuterung", empty:"Geben Sie eine Erläuterung ein.", empty:"Geben Sie eine Erläuterung ein." },
+    "es-ES": { include:"Incluir explicación en Word", edit:"Editar el texto sugerido", reset:"Restablecer la sugerencia", save:"Guardar texto", cancel:"Cancelar", prompt:"Explicación en español", edited:"Explicación editada", empty:"Escriba una explicación.", empty:"Escriba una explicación." },
+    "da-DK": { include:"Medtag forklaringen i Word", edit:"Rediger forslagsteksten", reset:"Gendan forslaget", save:"Gem tekst", cancel:"Annuller", prompt:"Forklaring på dansk", edited:"Din redigerede forklaring", empty:"Angiv en forklaring.", empty:"Angiv en forklaring." },
+    "fi-FI": { include:"Sisällytä selitys Wordiin", edit:"Muokkaa ehdotustekstiä", reset:"Palauta ehdotus", save:"Tallenna teksti", cancel:"Peruuta", prompt:"Selitys suomeksi", edited:"Muokattu selityksesi", empty:"Kirjoita selitys.", empty:"Kirjoita selitys." },
+    "nb-NO": { include:"Ta med forklaringen i Word", edit:"Rediger forslagsteksten", reset:"Gjenopprett forslaget", save:"Lagre tekst", cancel:"Avbryt", prompt:"Forklaring på norsk", edited:"Din redigerte forklaring", empty:"Skriv inn en forklaring.", empty:"Skriv inn en forklaring." }
+  };
+  const labelsForLanguage = text[language] || text["en-US"];
+  const [defaultHeading, sourceLabel] = labels[language] || labels["en-US"];
+  const observedLabels = { "sv-SE": ["Förklaring utifrån observerat arbetsflöde", "Grundad på det inspelade arbetsflödet; inte Microsoft Learn."], "en-US": ["Explanation based on observed workflow", "Based on the recorded workflow; not Microsoft Learn."], "fr-FR": ["Explication fondée sur le flux observé", "Fondée sur le flux enregistré ; ne provient pas de Microsoft Learn."], "de-DE": ["Erläuterung zum beobachteten Ablauf", "Basiert auf dem aufgezeichneten Ablauf; nicht aus Microsoft Learn."], "es-ES": ["Explicación basada en el flujo observado", "Basada en el flujo grabado; no procede de Microsoft Learn."], "da-DK": ["Forklaring ud fra observeret arbejdsgang", "Baseret på den optagede arbejdsgang; ikke Microsoft Learn."], "fi-FI": ["Havaittuun työnkulkuun perustuva selitys", "Perustuu tallennettuun työnkulkuun; ei Microsoft Learn -sisältöä."], "nb-NO": ["Forklaring basert på observert arbeidsflyt", "Basert på den innspilte arbeidsflyten; ikke Microsoft Learn." ] };
+  const authoredLabels = { "sv-SE": ["Förklaring av arbetsmomentet", "Allmän processförklaring; inte Microsoft Learn."], "en-US": ["Explanation of this process action", "General process explanation; not Microsoft Learn."], "fr-FR": ["Explication de cette action", "Explication générale du processus ; ne provient pas de Microsoft Learn."], "de-DE": ["Erläuterung zu diesem Arbeitsschritt", "Allgemeine Prozesserläuterung; nicht aus Microsoft Learn."], "es-ES": ["Explicación de esta acción del proceso", "Explicación general del proceso; no procede de Microsoft Learn."], "da-DK": ["Forklaring af dette arbejdstrin", "Generel procesforklaring; ikke Microsoft Learn."], "fi-FI": ["Selitys tästä työvaiheesta", "Yleinen prosessiselitys; ei Microsoft Learn -sisältöä."], "nb-NO": ["Forklaring av dette prosesstrinnet", "Generell prosessforklaring; ikke Microsoft Learn."] };
+  const pageContextLabels = { "sv-SE": ["Förklaring utifrån sidkontext", "Utgår från identifierad sida och posttyp; inte Microsoft Learn."], "en-US": ["Explanation from page context", "Based on the identified page and record type; not Microsoft Learn."], "fr-FR": ["Explication selon le contexte de la page", "Fondée sur la page et le type identifiés ; ne provient pas de Microsoft Learn."], "de-DE": ["Erläuterung aus dem Seitenkontext", "Basiert auf der erkannten Seite und dem Datensatztyp; nicht aus Microsoft Learn."], "es-ES": ["Explicación según el contexto de la página", "Basada en la página y el tipo identificados; no procede de Microsoft Learn."], "da-DK": ["Forklaring ud fra sidekonteksten", "Baseret på den identificerede side og posttype; ikke Microsoft Learn."], "fi-FI": ["Sivukontekstiin perustuva selitys", "Perustuu tunnistettuun sivuun ja tietuetyyppiin; ei Microsoft Learn -sisältöä."], "nb-NO": ["Forklaring ut fra sidekonteksten", "Basert på identifisert side og posttype; ikke Microsoft Learn."] };
+  const basisLabels = task.contextualExplanationBasis === "observed-workflow" ? observedLabels
+    : task.contextualExplanationBasis === "authored-process" ? authoredLabels : null;
+  const labelsForBasis = task.contextualExplanationBasis === "page-context" ? pageContextLabels : basisLabels;
+  const [heading, observedBasisLabel] = labelsForBasis
+    ? labelsForBasis[language] || labelsForBasis["en-US"] : [defaultHeading, ""];
   const sources = task.contextualExplanationSources || [];
   const localePath = `/${language.toLowerCase()}/`;
   const source = sources.find(item => item.sourceUri?.includes(localePath)) ||
     sources.find(item => item.sourceUri?.includes("/en-us/")) || sources[0];
-  const sourceUri = /^https:\/\/learn\.microsoft\.com\//i.test(source?.sourceUri || "")
+  const sourceUri = String(source?.sourceUri || "").startsWith("https://learn.microsoft.com/")
     ? source.sourceUri : "";
   return `<aside class="review-knowledge-explanation" data-knowledge-explanation>
-    <strong>${escapeHtml(heading)}</strong><p>${escapeHtml(explanation)}</p>
+    <strong>${escapeHtml(hasOverride ? labelsForLanguage.edited : heading)}</strong>
+    <p data-knowledge-explanation-display>${escapeHtml(explanation)}</p>
     ${sourceUri ? `<span class="review-knowledge-source">${escapeHtml(sourceLabel)}: <a href="${escapeHtml(sourceUri)}" target="_blank" rel="noopener noreferrer">${escapeHtml(source.title || "Microsoft Learn")}</a></span>` : ""}
+    <div class="review-knowledge-explanation-editor" data-knowledge-explanation-editor hidden>
+      <label>${escapeHtml(labelsForLanguage.prompt)}<textarea data-knowledge-explanation-input rows="4" maxlength="2000" required>${escapeHtml(explanation)}</textarea></label>
+      <div class="review-knowledge-explanation-editor-actions">
+        <button type="button" class="primary" data-save-knowledge-explanation>${escapeHtml(labelsForLanguage.save)}</button>
+        <button type="button" class="secondary" data-cancel-knowledge-explanation>${escapeHtml(labelsForLanguage.cancel)}</button>
+      </div>
+    </div>
+    <div class="review-knowledge-explanation-actions">
+      <button type="button" class="secondary" data-action="edit-knowledge-explanation">${escapeHtml(labelsForLanguage.edit)}</button>
+      ${hasOverride ? `<button type="button" class="secondary" data-action="reset-knowledge-explanation">${escapeHtml(labelsForLanguage.reset)}</button>` : ""}
+    </div>
     <label class="review-knowledge-export-choice"><input type="checkbox"
       data-include-knowledge-explanation-in-word
       ${task.includeKnowledgeExplanationInWord === true ? "checked" : ""}>
-      <span>${escapeHtml(includeLabels[language] || includeLabels["en-US"])}</span></label>
+      <span>${escapeHtml(labelsForLanguage.include)}</span></label>
   </aside>`;
 }
 
@@ -6328,51 +6353,6 @@ function applyInstructionFormatting(control, editor, patch) {
   updateInstructionToolbar(editor.closest("[data-review-task-id]"), editor);
 }
 
-function renderExternalKnowledgeSuggestions() {
-  const section = $("reviewExternalKnowledgeSuggestions");
-  const list = $("reviewExternalKnowledgeSuggestionList");
-  if (!section || !list) return;
-  list.replaceChildren();
-  const lookup = activeReviewModel?.externalKnowledgeLookup;
-  const suggestions = lookup?.suggestions || [];
-  section.hidden = !lookup?.enabled;
-  const status = $("reviewExternalKnowledgeStatus");
-  if (status) {
-    status.textContent = lookup?.status === "no-unresolved"
-      ? uiT("review.externalKnowledgeNoUnresolved")
-      : lookup?.status === "no-suggestions"
-        ? uiTf("review.externalKnowledgeNoSuggestions", {
-          count: lookup.requestCount
-        })
-        : lookup?.status === "unavailable"
-          ? uiT("review.externalKnowledgeUnavailable") : "";
-    status.hidden = !status.textContent;
-  }
-  for (const suggestion of suggestions) {
-    const item = document.createElement("li");
-    const task = activeReviewModel.businessTasks.find(candidate =>
-      candidate.taskId === suggestion.taskId);
-    const candidate = suggestion.candidate || {};
-    const value = suggestion.kind === "object"
-      ? `${candidate.objectRef?.objectType || ""} ${candidate.objectRef?.objectId || ""}`.trim()
-      : `${candidate.action?.semanticAction || ""} — ${candidate.action?.entity || ""}`.trim();
-    const heading = document.createElement("strong");
-    heading.textContent = `${suggestion.kind === "object"
-      ? uiT("review.externalKnowledgeObject")
-      : uiT("review.externalKnowledgeAction")}: ${value || uiT("Okänt förslag")}`;
-    const details = document.createElement("p");
-    const source = candidate.provenance?.sourceId || "MCP";
-    const version = candidate.provenance?.sourceVersion || "";
-    details.textContent = uiTf("review.externalKnowledgeMeta", {
-      step: task ? String(activeReviewModel.businessTasks.indexOf(task) + 1) : "?",
-      confidence: Math.round(Math.min(0.69, Number(candidate.confidence) || 0) * 100),
-      source: `${source}${version ? `@${version}` : ""}`
-    });
-    item.append(heading, details);
-    list.append(item);
-  }
-}
-
 function renderReviewContent() {
   invalidateDocumentWorkspace();
   const list = $("reviewList");
@@ -6391,7 +6371,6 @@ function renderReviewContent() {
   const screenshotQualities = screenshotQualityByTask();
   const progress = globalThis.T9Review.progress(activeReview);
   list.innerHTML = "";
-  renderExternalKnowledgeSuggestions();
 
   $("reviewProgressBar").style.width = `${progress}%`;
   $("reviewProgress").setAttribute("aria-valuenow", String(progress));
@@ -6568,15 +6547,6 @@ function renderReviewContent() {
             ${qualityMetrics ? `<p class="metrics">${escapeHtml(qualityMetrics)}</p>` : ""}
           </details>` : ""}
         </details>
-        ${task.resultVerified && task.observedResult
-          ? `<p class="review-observed-result ${task.resultVerification?.status === "error"
-            ? "error" : "verified"}"><strong>${uiT(task.resultVerification?.status === "error"
-              ? "review.observedError" : "review.observedResult")}:</strong> ${escapeHtml(
-                globalThis.T9DocumentLanguage.translateInstruction(
-                  task.observedResult, applicationSettings.uiLocale
-                ))}</p>`
-          : ""}
-
         ${images.map((image, imageIndex) =>
           `<div class="review-screenshot">
             <div class="review-image-stage" data-review-image-index="${imageIndex}">
@@ -6883,6 +6853,53 @@ function renderReviewContent() {
           afterSelection: activeReviewSelection
         });
         reviewAutoSave.schedule();
+        renderReview();
+      });
+
+    card.querySelector('[data-action="edit-knowledge-explanation"]')
+      ?.addEventListener("click", event => {
+        const panel = event.currentTarget.closest("[data-knowledge-explanation]");
+        panel.querySelector("[data-knowledge-explanation-display]").hidden = true;
+        panel.querySelector("[data-knowledge-explanation-editor]").hidden = false;
+        event.currentTarget.hidden = true;
+        panel.querySelector("[data-knowledge-explanation-input]").focus();
+      });
+
+    card.querySelector("[data-cancel-knowledge-explanation]")
+      ?.addEventListener("click", event => {
+        const panel = event.currentTarget.closest("[data-knowledge-explanation]");
+        panel.querySelector("[data-knowledge-explanation-editor]").hidden = true;
+        panel.querySelector("[data-knowledge-explanation-display]").hidden = false;
+        panel.querySelector('[data-action="edit-knowledge-explanation"]').hidden = false;
+      });
+
+    card.querySelector("[data-save-knowledge-explanation]")
+      ?.addEventListener("click", event => {
+        const panel = event.currentTarget.closest("[data-knowledge-explanation]");
+        const input = panel.querySelector("[data-knowledge-explanation-input]");
+        const value = input.value.trim();
+        if (!value) { input.setCustomValidity(labelsForLanguage.empty); input.reportValidity(); return; }
+        input.setCustomValidity("");
+        globalThis.T9Review.editTask(activeReview, actualIndex, {
+          contextualExplanationOverrides: {
+            ...(task.contextualExplanationOverrides || {}),
+            [activeDocumentLanguage()]: value
+          }
+        }, { beforeSelection: activeReviewSelection, afterSelection: activeReviewSelection });
+        reviewAutoSave.schedule();
+        invalidateDocumentWorkspace();
+        renderReview();
+      });
+
+    card.querySelector('[data-action="reset-knowledge-explanation"]')
+      ?.addEventListener("click", () => {
+        const overrides = { ...(task.contextualExplanationOverrides || {}) };
+        delete overrides[activeDocumentLanguage()];
+        globalThis.T9Review.editTask(activeReview, actualIndex, {
+          contextualExplanationOverrides: overrides
+        }, { beforeSelection: activeReviewSelection, afterSelection: activeReviewSelection });
+        reviewAutoSave.schedule();
+        invalidateDocumentWorkspace();
         renderReview();
       });
 

@@ -24,11 +24,14 @@
         "automationIdPatterns": []
       },
       "instructionTemplate": "",
-      "languages": [
-        "sv-SE",
-        "en-US"
-      ],
-      "aliases": []
+      "languages": ["sv-SE", "en-US", "fr-FR", "de-DE", "es-ES", "da-DK", "fi-FI", "nb-NO"],
+      "aliases": [],
+      "sourceIds": [
+        "microsoft-learn-production-orders", "microsoft-learn-production-orders-sv",
+        "microsoft-learn-production-orders-fr", "microsoft-learn-production-orders-de",
+        "microsoft-learn-production-orders-es", "microsoft-learn-production-orders-da",
+        "microsoft-learn-production-orders-fi", "microsoft-learn-production-orders-nb"
+      ]
     },
     {
       "ruleId": "Manufacturing.RefreshProductionOrder",
@@ -117,6 +120,16 @@
       "entity": "Item",
       "priority": 900,
       "confidence": 0.95,
+      "sourceIds": [
+        "microsoft-learn-production-orders",
+        "microsoft-learn-production-orders-sv",
+        "microsoft-learn-production-orders-fr",
+        "microsoft-learn-production-orders-de",
+        "microsoft-learn-production-orders-es",
+        "microsoft-learn-production-orders-da",
+        "microsoft-learn-production-orders-fi",
+        "microsoft-learn-production-orders-nb"
+      ],
       "match": {
         "pagePatterns": [],
         "actionPatterns": [],
@@ -127,10 +140,7 @@
         "automationIdPatterns": []
       },
       "instructionTemplate": "",
-      "languages": [
-        "sv-SE",
-        "en-US"
-      ],
+      "languages": ["sv-SE", "en-US", "fr-FR", "de-DE", "es-ES", "da-DK", "fi-FI", "nb-NO"],
       "aliases": []
     },
     {

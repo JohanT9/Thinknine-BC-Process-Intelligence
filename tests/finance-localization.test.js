@@ -519,4 +519,44 @@ const unrelated = repository.resolveAction({language:'en-US',context:{pageCaptio
 assert.ok(!unrelated.candidates.some(x=>x.provenance.ruleId==='Finance.PostGeneralJournal'),
   'general journal posting rule must not match the specialized payment journal');
 
-console.log('Finance directives for chart, posting, dimensions, accounting periods, budgets, currency adjustment, cash flow, VAT report lines, financial report rows and columns, fixed-asset depreciation/correction/indexation, and year-end resolve in all eight supported UI locales.');
+const costPack=packs.find(x=>x.packId==='bc-cost-accounting').pack;
+const allocationKeyRule=costPack.rules.find(x=>x.ruleId==='CostAccounting.CalculateAllocationKey');
+assert.deepEqual(allocationKeyRule.verifiedRuntimeLocales,['en-US','sv-SE']);
+for(const [locale,page,action] of [
+  ['en-US','Cost Allocation','Calculate Allocation Key'],
+  ['sv-SE','Kostnadsfördelning','Beräkna fördelningsnyckel']
+]) {
+  const result=repository.resolveAction({language:locale,context:{pageCaption:page,actionCaption:action}});
+  assert.equal(result.status,'resolved',`${locale} calculate cost allocation key`);
+  assert.equal(result.candidates[0].provenance.ruleId,'CostAccounting.CalculateAllocationKey',locale);
+  assert.ok(knowledge.localizedExplanation(allocationKeyRule,locale));
+}
+for(const [page,action] of [
+  ['Cost Allocation','Run Cost Allocation'],
+  ['Cost Allocation','Post'],
+  ['Cost Centers','Calculate Allocation Key']
+]) {
+  assert.equal(knowledge.score(allocationKeyRule,{pageCaption:page,actionCaption:action,entity:'',context:{}}),0,
+    `allocation-key calculation must not match ${page} / ${action}`);
+}
+assert.match(allocationKeyRule.localizedExplanations['en-US'],/does not run the cost allocation/i);
+assert.match(allocationKeyRule.localizedExplanations['sv-SE'],/kör inte själva kostnadsfördelningen/i);
+
+const deleteCostBudgetRule=costPack.rules.find(rule=>rule.ruleId==='CostAccounting.DeleteCostBudgetEntries');
+assert.ok(deleteCostBudgetRule);
+assert.deepEqual(deleteCostBudgetRule.verifiedRuntimeLocales,['en-US']);
+assert.deepEqual(Object.keys(deleteCostBudgetRule.localizedExplanations).sort(),
+  ['da-DK','de-DE','en-US','es-ES','fi-FI','fr-FR','nb-NO','sv-SE']);
+const deleteCostBudget=repository.resolveAction({language:'en-US',context:{
+  pageCaption:'Delete Cost Budget Entries',actionCaption:'OK'
+}});
+assert.equal(deleteCostBudget.status,'resolved');
+assert.equal(deleteCostBudget.candidates[0].provenance.ruleId,'CostAccounting.DeleteCostBudgetEntries');
+assert.match(deleteCostBudgetRule.localizedExplanations['en-US'],/cannot remove one entry or a batch in the middle/i);
+assert.match(deleteCostBudgetRule.localizedExplanations['sv-SE'],/inte faktiska kostnadsposter/);
+for(const [page,action] of [
+  ['Delete Cost Entries','OK'],['Cost Budget Registers','Delete Cost Budget Entries'],['Delete Cost Budget Entries','Post']
+]) assert.equal(knowledge.score(deleteCostBudgetRule,{pageCaption:page,actionCaption:action,entity:'',context:{}}),0,
+  `cost-budget deletion must not match ${page} / ${action}`);
+
+console.log('Finance directives for chart, posting, dimensions, accounting periods, budgets, currency adjustment, cash flow, VAT report lines, financial report rows and columns, fixed-asset depreciation/correction/indexation, cost allocation key preparation, and year-end resolve in supported UI locales.');

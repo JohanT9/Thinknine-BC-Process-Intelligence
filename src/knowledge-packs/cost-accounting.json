@@ -1,0 +1,1171 @@
+{
+  "packId": "bc-cost-accounting",
+  "name": "Business Central cost accounting",
+  "version": "1.0.0",
+  "priority": 240,
+  "rules": [
+    {
+      "ruleId": "CostAccounting.TransferGeneralLedgerEntries",
+      "taskType": "TransferGeneralLedgerEntriesToCostAccounting",
+      "semanticAction": "TransferGeneralLedgerEntriesToCostAccounting",
+      "entity": "CostEntry",
+      "priority": 1320,
+      "confidence": 0.96,
+      "match": {
+        "pagePatterns": [
+          "^Transfer GL Entries to CA$",
+          "^Överför GL-poster till CA$"
+        ],
+        "actionPatterns": [
+          "^Yes$",
+          "^Ja$"
+        ],
+        "fieldPatterns": [],
+        "automationIdPatterns": []
+      },
+      "instructionTemplate": "",
+      "languages": [
+        "en-US",
+        "sv-SE",
+        "fr-FR",
+        "de-DE",
+        "es-ES",
+        "da-DK",
+        "fi-FI",
+        "nb-NO"
+      ],
+      "aliases": [],
+      "sourceIds": [
+        "cost-accounting-transfer-en-us",
+        "cost-accounting-transfer-sv-se",
+        "cost-accounting-transfer-fr-fr",
+        "cost-accounting-transfer-de-de",
+        "cost-accounting-transfer-es-es",
+        "cost-accounting-transfer-da-dk",
+        "cost-accounting-transfer-fi-fi",
+        "cost-accounting-transfer-nb-no"
+      ],
+      "localizedExplanations": {
+        "en-US": "Transfers eligible general ledger entries into cost entries for cost accounting. Before running it, check the transfer start date, G/L-to-cost-type mapping, and the required cost center or cost object dimensions. Entries that fail the criteria are skipped; review the transfer register and source links to reconcile the result.",
+        "sv-SE": "Överför kvalificerade redovisningsposter till kostnadsposter för kostnadsredovisning. Kontrollera startdatumet för överföringen, kopplingen mellan redovisningskonton och kostnadsslag samt nödvändiga dimensioner för kostnadsställe eller kostnadsobjekt. Poster som inte uppfyller villkoren hoppas över; granska överföringsregistret och källkopplingarna efter körningen.",
+        "fr-FR": "Transfère les écritures comptables admissibles vers les écritures de coûts. Avant l’exécution, vérifiez la date de début, l’association entre comptes généraux et types de coûts, ainsi que les dimensions de centre ou d’objet de coûts requises. Les écritures non admissibles sont ignorées ; contrôlez le registre de transfert et les liens vers les écritures sources.",
+        "de-DE": "Überträgt geeignete Sachposten in die Kostenposten. Prüfen Sie zuvor das Startdatum, die Zuordnung von Sachkonten zu Kostenarten und die erforderlichen Dimensionen für Kostenstelle oder Kostenträger. Nicht passende Posten werden übersprungen. Prüfen Sie anschließend das Übertragungsregister und die Verknüpfungen zu den Quellposten.",
+        "es-ES": "Transfiere los movimientos contables que cumplen los criterios a movimientos de costes. Antes de ejecutarlo, compruebe la fecha inicial, la asignación entre cuentas y tipos de coste y las dimensiones de centro u objeto de coste necesarias. Se omiten los movimientos que no cumplen los criterios; revise el registro de transferencia y los vínculos de origen.",
+        "da-DK": "Overfører de finansposter, der opfylder kriterierne, til omkostningsposter. Kontrollér startdatoen, tilknytningen mellem finanskonti og omkostningstyper samt de nødvendige dimensioner for omkostningssted eller -objekt. Poster, der ikke opfylder kriterierne, springes over; gennemgå overførselsregisteret og kildehenvisningerne bagefter.",
+        "fi-FI": "Siirtää ehdot täyttävät pääkirjan tapahtumat kustannustapahtumiksi. Tarkista ennen ajoa siirron alkamispäivä, pääkirjatilien ja kustannuslajien määritykset sekä tarvittavat kustannuspaikka- tai kustannuskohdedimensiot. Ehdot ohittavat tapahtumat jätetään pois; tarkista siirtorekisteri ja lähdetapahtumien linkit.",
+        "nb-NO": "Overfører finansposter som oppfyller kriteriene, til kostnadsposter. Kontroller startdatoen, koblingen mellom finanskontoer og kostnadstyper og nødvendige dimensjoner for kostnadssted eller kostnadsobjekt. Poster som ikke oppfyller kriteriene, hoppes over. Kontroller overføringsregisteret og koblingene til kildepostene etter kjøringen."
+      }
+    },
+    {
+      "ruleId": "CostAccounting.RunCostAllocation",
+      "taskType": "RunCostAllocation",
+      "semanticAction": "RunCostAllocation",
+      "entity": "CostAllocation",
+      "priority": 1330,
+      "confidence": 0.95,
+      "match": {
+        "pagePatterns": [
+          "^Cost Allocation$",
+          "^Kostnadsfördelning$"
+        ],
+        "actionPatterns": [
+          "^Run Cost Allocation$",
+          "^Kör kostnadsfördelning$"
+        ],
+        "fieldPatterns": [],
+        "automationIdPatterns": []
+      },
+      "instructionTemplate": "",
+      "languages": [
+        "en-US",
+        "sv-SE",
+        "fr-FR",
+        "de-DE",
+        "es-ES",
+        "da-DK",
+        "fi-FI",
+        "nb-NO"
+      ],
+      "aliases": [],
+      "sourceIds": [
+        "cost-accounting-allocations-en-us",
+        "cost-accounting-allocations-sv-se",
+        "cost-accounting-allocations-fr-fr",
+        "cost-accounting-allocations-de-de",
+        "cost-accounting-allocations-es-es",
+        "cost-accounting-allocations-da-dk",
+        "cost-accounting-allocations-fi-fi",
+        "cost-accounting-allocations-nb-no"
+      ],
+      "localizedExplanations": {
+        "en-US": "Runs selected cost allocation definitions to move costs or revenue from a source to one or more targets. Check the source range, level order and validity dates, then confirm each target and allocation base. Static bases use fixed shares; dynamic bases depend on filtered figures such as employees or sales. Review the resulting cost entries and register; this does not post general-ledger entries.",
+        "sv-SE": "Kör valda kostnadsfördelningar och flyttar kostnader eller intäkter från en källa till ett eller flera mål. Kontrollera källurval, nivåordning och giltighetsdatum samt varje mål och fördelningsbas. Fasta baser använder bestämda andelar; dynamiska baser beror på filtrerade värden som antal anställda eller försäljning. Granska skapade kostnadsposter och registret; körningen bokför inte redovisningsposter.",
+        "fr-FR": "Exécute les répartitions sélectionnées pour déplacer des coûts ou des revenus d’une source vers une ou plusieurs cibles. Vérifiez la plage source, l’ordre des niveaux, les dates de validité, les cibles et la base de répartition. Une base statique utilise des parts fixes ; une base dynamique dépend de données filtrées, comme les effectifs ou les ventes. Contrôlez les écritures de coûts et le registre obtenus ; aucune écriture générale n’est comptabilisée.",
+        "de-DE": "Führt ausgewählte Kostenumlagen aus und verteilt Kosten oder Erlöse von einer Quelle auf ein oder mehrere Ziele. Prüfen Sie Quellbereich, Ebenenreihenfolge, Gültigkeitszeitraum, Ziele und Umlagebasis. Eine statische Basis verwendet feste Anteile; eine dynamische Basis hängt von gefilterten Werten wie Mitarbeiterzahl oder Umsatz ab. Prüfen Sie die erzeugten Kostenposten und das Register; Sachposten werden dadurch nicht gebucht.",
+        "es-ES": "Ejecuta las asignaciones de costes seleccionadas para trasladar costes o ingresos desde un origen a uno o varios destinos. Revise el rango de origen, el orden de niveles, las fechas de validez, los destinos y la base. Las bases estáticas usan cuotas fijas; las dinámicas dependen de datos filtrados, como empleados o ventas. Revise los movimientos y el registro resultantes; no se contabilizan movimientos de contabilidad general.",
+        "da-DK": "Kører de valgte omkostningsfordelinger og flytter omkostninger eller indtægter fra en kilde til et eller flere mål. Kontrollér kildeinterval, niveauorden, gyldighedsdatoer, mål og fordelingsgrundlag. Statiske grundlag bruger faste andele; dynamiske grundlag afhænger af filtrerede værdier som medarbejdere eller salg. Gennemgå de oprettede omkostningsposter og registeret; der bogføres ikke finansposter.",
+        "fi-FI": "Suorittaa valitut kustannusten kohdistukset ja siirtää kustannuksia tai tuottoja lähteestä yhteen tai useampaan kohteeseen. Tarkista lähdealue, tasojen järjestys, voimassaoloajat, kohteet ja kohdistusperuste. Kiinteä peruste käyttää ennalta määritettyjä osuuksia; dynaaminen peruste riippuu suodatetuista arvoista, kuten henkilöstömäärästä tai myynnistä. Tarkista syntyneet kustannustapahtumat ja rekisteri; tämä ei kirjaa pääkirjan tapahtumia.",
+        "nb-NO": "Kjører valgte kostnadsfordelinger og flytter kostnader eller inntekter fra en kilde til ett eller flere mål. Kontroller kildeområde, nivårekkefølge, gyldighetsdatoer, mål og fordelingsgrunnlag. Statiske grunnlag bruker faste andeler; dynamiske grunnlag avhenger av filtrerte verdier som antall ansatte eller salg. Kontroller de opprettede kostnadspostene og registeret; dette bokfører ikke finansposter."
+      }
+    },
+    {
+      "ruleId": "CostAccounting.CalculateAllocationKey",
+      "taskType": "CalculateCostAllocationKey",
+      "semanticAction": "CalculateCostAllocationKey",
+      "entity": "CostAllocation",
+      "priority": 1340,
+      "confidence": 0.96,
+      "verifiedRuntimeLocales": [
+        "en-US",
+        "sv-SE"
+      ],
+      "match": {
+        "pagePatterns": [
+          "^Cost Allocation$",
+          "^Kostnadsfördelning$"
+        ],
+        "actionPatterns": [
+          "^Calculate Allocation Key$",
+          "^Beräkna fördelningsnyckel$"
+        ],
+        "fieldPatterns": [],
+        "automationIdPatterns": []
+      },
+      "instructionTemplate": "",
+      "languages": [
+        "en-US",
+        "sv-SE",
+        "fr-FR",
+        "de-DE",
+        "es-ES",
+        "da-DK",
+        "fi-FI",
+        "nb-NO"
+      ],
+      "aliases": [],
+      "sourceIds": [
+        "cost-accounting-allocations-en-us",
+        "cost-accounting-allocations-sv-se",
+        "cost-accounting-allocations-fr-fr",
+        "cost-accounting-allocations-de-de",
+        "cost-accounting-allocations-es-es",
+        "cost-accounting-allocations-da-dk",
+        "cost-accounting-allocations-fi-fi",
+        "cost-accounting-allocations-nb-no"
+      ],
+      "localizedExplanations": {
+        "en-US": "Calculates the allocation shares from each target's configured base; it prepares the key but does not run the cost allocation. Check source and target cost types/centers/objects, level, validity dates, and filters first. Static bases calculate shares from fixed ratios; dynamic bases use filtered values such as employee counts, sales, or cost entries for a date range. Review the resulting shares before running the separate allocation action.",
+        "sv-SE": "Beräknar andelarna utifrån den fördelningsbas som angetts för varje mål; åtgärden förbereder nyckeln men kör inte själva kostnadsfördelningen. Kontrollera först källans och målens kostnadsslag, kostnadsställen eller kostnadsbärare samt nivå, giltighetsdatum och filter. Fasta baser beräknar andelar från fasta kvoter; dynamiska baser använder filtrerade värden som antal anställda, försäljning eller kostnadsposter för en period. Granska andelarna innan du kör den separata fördelningsåtgärden.",
+        "fr-FR": "Calcule les parts à partir de la base définie pour chaque cible ; cette action prépare la clé sans exécuter la répartition des coûts. Vérifiez d’abord les types de coûts, centres ou objets de la source et des cibles, ainsi que le niveau, les dates de validité et les filtres. Une base statique calcule les parts selon des ratios fixes ; une base dynamique utilise des valeurs filtrées, comme les effectifs, les ventes ou les écritures sur une période. Examinez les parts avant d’exécuter l’action distincte de répartition.",
+        "de-DE": "Berechnet die Anteile anhand der für jedes Ziel eingerichteten Basis; dadurch wird der Schlüssel vorbereitet, aber die Kostenumlage nicht ausgeführt. Prüfen Sie zuerst Kostenarten, Kostenstellen oder Kostenträger von Quelle und Zielen sowie Ebene, Gültigkeitsdaten und Filter. Statische Basen berechnen Anteile aus festen Verhältnissen; dynamische Basen verwenden gefilterte Werte wie Mitarbeiterzahl, Umsatz oder Kostenposten für einen Zeitraum. Prüfen Sie die Anteile, bevor Sie die separate Umlage ausführen.",
+        "es-ES": "Calcula las cuotas según la base configurada para cada destino; prepara la clave, pero no ejecuta la asignación de costes. Revise primero los tipos de coste, centros u objetos de origen y destino, además del nivel, las fechas de validez y los filtros. Las bases estáticas calculan cuotas a partir de proporciones fijas; las dinámicas usan valores filtrados, como empleados, ventas o movimientos de costes de un período. Revise las cuotas antes de ejecutar la acción de asignación por separado.",
+        "da-DK": "Beregner andelene ud fra det fordelingsgrundlag, der er angivet for hvert mål; handlingen klargør nøglen, men kører ikke selve omkostningsfordelingen. Kontrollér først kildens og målenes omkostningstyper, omkostningssteder eller omkostningsobjekter samt niveau, gyldighedsdatoer og filtre. Statiske grundlag beregner andele ud fra faste forhold; dynamiske grundlag bruger filtrerede værdier som medarbejderantal, salg eller omkostningsposter for en periode. Gennemgå andelene, før du kører den separate fordelingshandling.",
+        "fi-FI": "Laskee osuudet kullekin kohteelle määritetyn perusteen mukaan; toiminto valmistelee kohdistusavaimen mutta ei suorita kustannusten kohdistusta. Tarkista ensin lähteen ja kohteiden kustannuslajit, kustannuspaikat tai kustannuskohteet sekä taso, voimassaoloajat ja suodattimet. Kiinteä peruste laskee osuudet kiinteistä suhteista; dynaaminen peruste käyttää suodatettuja arvoja, kuten henkilöstömäärää, myyntiä tai kustannustapahtumia ajanjaksolta. Tarkista osuudet ennen erillisen kohdistustoiminnon suorittamista.",
+        "nb-NO": "Beregner andelene ut fra fordelingsgrunnlaget som er angitt for hvert mål; handlingen klargjør fordelingsnøkkelen, men kjører ikke selve kostnadsfordelingen. Kontroller først kostnadstyper, kostnadssteder eller kostnadsobjekter for kilde og mål, samt nivå, gyldighetsdatoer og filtre. Statiske grunnlag beregner andeler fra faste forhold; dynamiske grunnlag bruker filtrerte verdier som antall ansatte, salg eller kostnadsposter for en periode. Kontroller andelene før du kjører den separate fordelingshandlingen."
+      }
+    },
+    {
+      "ruleId": "CostAccounting.CreateCostBudget",
+      "taskType": "CreateCostBudget",
+      "semanticAction": "CreateCostBudget",
+      "entity": "CostBudget",
+      "priority": 1310,
+      "confidence": 0.94,
+      "match": {
+        "pagePatterns": [
+          "^Cost Budgets$",
+          "^Kostnadsbudgetar$"
+        ],
+        "actionPatterns": [
+          "^New$",
+          "^Ny$"
+        ],
+        "fieldPatterns": [],
+        "automationIdPatterns": []
+      },
+      "instructionTemplate": "",
+      "languages": [
+        "en-US",
+        "sv-SE",
+        "fr-FR",
+        "de-DE",
+        "es-ES",
+        "da-DK",
+        "fi-FI",
+        "nb-NO"
+      ],
+      "aliases": [],
+      "sourceIds": [
+        "cost-accounting-budgets-en-us",
+        "cost-accounting-budgets-sv-se",
+        "cost-accounting-budgets-fr-fr",
+        "cost-accounting-budgets-de-de",
+        "cost-accounting-budgets-es-es",
+        "cost-accounting-budgets-da-dk",
+        "cost-accounting-budgets-fi-fi",
+        "cost-accounting-budgets-nb-no"
+      ],
+      "localizedExplanations": {
+        "en-US": "Starts a cost-accounting budget for a defined period, using cost types rather than G/L accounts as its basis. Choose the budget name and period before entering or importing figures. You can copy a G/L budget or another cost budget, then allocate budget values and compare budget with actual cost entries; this does not create G/L budget entries.",
+        "sv-SE": "Skapar en kostnadsbudget för en angiven period. Den bygger på kostnadsslag, till skillnad från redovisningsbudgeten som bygger på redovisningskonton. Ange budgetnamn och period innan du registrerar eller importerar värden. Du kan kopiera en redovisningsbudget eller en annan kostnadsbudget och därefter fördela budgetvärden och jämföra budget med utfall; detta skapar inte budgetposter i redovisningen.",
+        "fr-FR": "Crée un budget de comptabilité analytique pour une période définie, basé sur les types de coûts plutôt que sur les comptes généraux. Choisissez son nom et sa période avant de saisir ou d’importer les montants. Vous pouvez copier un budget général ou un autre budget analytique, puis répartir les valeurs et comparer le budget aux coûts réels ; cela ne crée pas d’écritures de budget général.",
+        "de-DE": "Legt ein Kostenrechnungsbudget für einen Zeitraum an. Grundlage sind Kostenarten statt Sachkonten. Wählen Sie Budgetname und Zeitraum, bevor Sie Werte erfassen oder importieren. Sie können ein Sachkontenbudget oder ein anderes Kostenbudget kopieren und anschließend Budgetwerte verteilen und Budget mit tatsächlichen Kosten vergleichen; dadurch entstehen keine Sachkontenbudgetposten.",
+        "es-ES": "Crea un presupuesto de contabilidad de costes para un periodo definido, basado en tipos de coste en lugar de cuentas contables. Elija el nombre y el periodo antes de introducir o importar importes. Puede copiar un presupuesto contable u otro presupuesto de costes, distribuir los valores y comparar el presupuesto con los costes reales; esto no crea movimientos de presupuesto contable.",
+        "da-DK": "Opretter et omkostningsregnskabsbudget for en bestemt periode, baseret på omkostningstyper i stedet for finanskonti. Vælg budgetnavn og periode, før du indtaster eller importerer beløb. Du kan kopiere et finansbudget eller et andet omkostningsbudget, fordele budgetværdier og sammenligne budget med faktiske omkostninger; det opretter ikke finansbudgetposter.",
+        "fi-FI": "Luo kustannuslaskennan budjetin määritetylle kaudelle. Perustana ovat kustannuslajit pääkirjatilien sijaan. Valitse budjetin nimi ja kausi ennen arvojen syöttämistä tai tuontia. Voit kopioida pääkirjabudjetin tai toisen kustannusbudjetin, kohdistaa budjettiarvoja ja verrata niitä toteutuneisiin kustannustapahtumiin; tämä ei luo pääkirjan budjettitapahtumia.",
+        "nb-NO": "Oppretter et kostnadsregnskapsbudsjett for en angitt periode, basert på kostnadstyper i stedet for finanskontoer. Velg budsjett og periode før du legger inn eller importerer verdier. Du kan kopiere et finansbudsjett eller et annet kostnadsbudsjett, fordele budsjettverdier og sammenligne budsjett med faktiske kostnadsposter; dette oppretter ikke finansbudsjettposter."
+      }
+    },
+    {
+      "ruleId": "CostAccounting.CreateCostCenter",
+      "taskType": "CreateCostCenter",
+      "semanticAction": "Create",
+      "entity": "CostCenter",
+      "priority": 1340,
+      "confidence": 0.94,
+      "match": {
+        "pagePatterns": [
+          "^Cost Centers$",
+          "^Kostnadsställen$"
+        ],
+        "actionPatterns": [
+          "^New$",
+          "^Ny$"
+        ],
+        "fieldPatterns": [],
+        "automationIdPatterns": []
+      },
+      "instructionTemplate": "",
+      "languages": [
+        "en-US",
+        "sv-SE",
+        "fr-FR",
+        "de-DE",
+        "es-ES",
+        "da-DK",
+        "fi-FI",
+        "nb-NO"
+      ],
+      "aliases": [],
+      "sourceIds": [
+        "cost-accounting-setup-en-us",
+        "cost-accounting-setup-sv-se",
+        "cost-accounting-overview-en-us",
+        "cost-accounting-setup-fr-fr",
+        "cost-accounting-setup-de-de",
+        "cost-accounting-setup-es-es",
+        "cost-accounting-setup-da-dk",
+        "cost-accounting-setup-fi-fi",
+        "cost-accounting-setup-nb-no",
+        "cost-accounting-overview-sv-se",
+        "cost-accounting-overview-fr-fr",
+        "cost-accounting-overview-de-de",
+        "cost-accounting-overview-es-es",
+        "cost-accounting-overview-da-dk",
+        "cost-accounting-overview-fi-fi",
+        "cost-accounting-overview-nb-no"
+      ],
+      "localizedExplanations": {
+        "en-US": "Creates a cost center to describe where costs occur, such as a department or profit center. Choose a code and hierarchy that match the organization's responsibility and allocation model, and link the center to a G/L dimension if that is part of the design. Each cost entry must be assigned to a cost type and either a cost center or a cost object, never both; additional centers may represent allocation levels beyond the G/L dimensions.",
+        "sv-SE": "Skapar ett kostnadsställe som beskriver var kostnader uppstår, till exempel en avdelning eller resultatenhet. Välj kod och hierarki så att de passar organisationens ansvar och fördelningsmodell, och koppla kostnadsstället till en redovisningsdimension om det ingår i upplägget. Varje kostnadspost ska ha ett kostnadsslag och antingen ett kostnadsställe eller ett kostnadsobjekt, aldrig båda. Ytterligare kostnadsställen kan representera fördelningsnivåer utöver redovisningsdimensionerna.",
+        "fr-FR": "Crée un centre de coûts indiquant où les coûts sont engagés, par exemple un service ou un centre de profit. Choisissez un code et une hiérarchie conformes aux responsabilités et au modèle de répartition, et liez-le à une dimension comptable si nécessaire. Chaque écriture de coût doit avoir un type de coût et soit un centre de coûts, soit un objet de coûts, jamais les deux.",
+        "de-DE": "Erstellt eine Kostenstelle, die den Entstehungsort von Kosten beschreibt, etwa eine Abteilung oder ein Profitcenter. Wählen Sie Code und Hierarchie passend zu Verantwortlichkeiten und Umlagemodell und verknüpfen Sie die Kostenstelle bei Bedarf mit einer Sachkontendimension. Jeder Kostenposten benötigt eine Kostenart und entweder eine Kostenstelle oder einen Kostenträger, niemals beides.",
+        "es-ES": "Crea un centro de coste que indica dónde se producen los costes, como un departamento o centro de beneficio. Elija un código y una jerarquía acordes con las responsabilidades y el modelo de asignación, y vincúlelo a una dimensión contable si corresponde. Cada movimiento de coste debe tener un tipo de coste y un centro de coste o un objeto de coste, nunca ambos.",
+        "da-DK": "Opretter et omkostningssted, der beskriver, hvor omkostninger opstår, f.eks. en afdeling eller et profitcenter. Vælg kode og hierarki efter ansvar og fordelingsmodel, og tilknyt omkostningsstedet til en finansdimension, hvis det indgår i designet. Hver omkostningspost skal have en omkostningstype og enten et omkostningssted eller et omkostningsobjekt, aldrig begge dele.",
+        "fi-FI": "Luo kustannuspaikan kuvaamaan, missä kustannukset syntyvät, kuten osastolla tai tulosyksikössä. Valitse vastuu- ja kohdistusmalliin sopiva koodi ja hierarkia sekä linkitä paikka tarvittaessa pääkirjan dimensioon. Jokaisella kustannustapahtumalla on oltava kustannuslaji ja joko kustannuspaikka tai kustannuskohde, ei molempia.",
+        "nb-NO": "Oppretter et kostnadssted som beskriver hvor kostnadene oppstår, for eksempel en avdeling eller et resultatsenter. Velg kode og hierarki som passer ansvar og fordelingsmodell, og koble det til en finansdimensjon hvis det inngår i oppsettet. Hver kostnadspost må ha en kostnadstype og enten et kostnadssted eller et kostnadsobjekt, aldri begge deler."
+      }
+    },
+    {
+      "ruleId": "CostAccounting.CreateCostObject",
+      "taskType": "CreateCostObject",
+      "semanticAction": "Create",
+      "entity": "CostObject",
+      "priority": 1350,
+      "confidence": 0.94,
+      "match": {
+        "pagePatterns": [
+          "^Cost Objects$",
+          "^Kostnadsbärare$"
+        ],
+        "actionPatterns": [
+          "^New$",
+          "^Ny$"
+        ],
+        "fieldPatterns": [],
+        "automationIdPatterns": []
+      },
+      "instructionTemplate": "",
+      "languages": [
+        "en-US",
+        "sv-SE",
+        "fr-FR",
+        "de-DE",
+        "es-ES",
+        "da-DK",
+        "fi-FI",
+        "nb-NO"
+      ],
+      "aliases": [],
+      "sourceIds": [
+        "cost-accounting-setup-en-us",
+        "cost-accounting-setup-sv-se",
+        "cost-accounting-overview-en-us",
+        "cost-accounting-setup-fr-fr",
+        "cost-accounting-setup-de-de",
+        "cost-accounting-setup-es-es",
+        "cost-accounting-setup-da-dk",
+        "cost-accounting-setup-fi-fi",
+        "cost-accounting-setup-nb-no",
+        "cost-accounting-overview-sv-se",
+        "cost-accounting-overview-fr-fr",
+        "cost-accounting-overview-de-de",
+        "cost-accounting-overview-es-es",
+        "cost-accounting-overview-da-dk",
+        "cost-accounting-overview-fi-fi",
+        "cost-accounting-overview-nb-no"
+      ],
+      "localizedExplanations": {
+        "en-US": "Creates a cost object for the product, service, project, or other result that should bear or be measured for costs. Define its code and relationship to the cost-object chart or relevant project mapping before using it in cost entries or allocation targets. A cost entry must have a cost type and either a cost center or a cost object, never both; cost objects represent who or what ultimately carries the cost, unlike centers that identify where it arose.",
+        "sv-SE": "Skapar ett kostnadsobjekt för den produkt, tjänst, det projekt eller annat resultat som ska bära eller mätas för kostnader. Ange kod och relation till kostnadsobjektkontoplanen eller relevant projektkoppling innan det används i kostnadsposter eller som fördelningsmål. En kostnadspost ska ha ett kostnadsslag och antingen ett kostnadsställe eller ett kostnadsobjekt, aldrig båda. Kostnadsobjektet visar vem eller vad som slutligen bär kostnaden, till skillnad från kostnadsstället som visar var den uppstod.",
+        "fr-FR": "Crée un objet de coûts pour le produit, service, projet ou résultat auquel les coûts doivent être imputés ou mesurés. Définissez son code et son lien avec le plan des objets ou le projet concerné avant de l’utiliser dans des écritures ou comme cible de répartition. Une écriture doit comporter un type de coût et soit un centre, soit un objet de coûts, jamais les deux.",
+        "de-DE": "Erstellt einen Kostenträger für das Produkt, den Service, das Projekt oder ein anderes Ergebnis, dem Kosten zugeordnet oder für das Kosten gemessen werden sollen. Definieren Sie Code und Zuordnung zum Kostenträgerplan beziehungsweise Projekt, bevor Sie ihn in Kostenposten oder als Umlageziel verwenden. Ein Kostenposten benötigt eine Kostenart und entweder Kostenstelle oder Kostenträger, niemals beides.",
+        "es-ES": "Crea un objeto de coste para el producto, servicio, proyecto u otro resultado al que se imputarán o medirán costes. Defina su código y relación con el plan de objetos o el proyecto antes de usarlo en movimientos o como destino de asignación. Un movimiento debe tener un tipo de coste y un centro de coste o un objeto de coste, nunca ambos.",
+        "da-DK": "Opretter et omkostningsobjekt for det produkt, den tjeneste, det projekt eller andet resultat, der skal bære eller måles for omkostninger. Definér kode og relation til omkostningsobjektplanen eller projektkoblingen, før det bruges på omkostningsposter eller som fordelingsmål. En post skal have en omkostningstype og enten et omkostningssted eller et omkostningsobjekt, aldrig begge dele.",
+        "fi-FI": "Luo kustannuskohteen tuotteelle, palvelulle, projektille tai muulle tulokselle, jolle kustannukset kohdistetaan tai jonka kustannuksia mitataan. Määritä koodi ja yhteys kustannuskohteiden luetteloon tai projektiin ennen käyttöä kustannustapahtumissa tai kohdistuksen kohteena. Tapahtumalla on oltava kustannuslaji ja joko kustannuspaikka tai kustannuskohde, ei molempia.",
+        "nb-NO": "Oppretter et kostnadsobjekt for produktet, tjenesten, prosjektet eller et annet resultat som skal bære eller måles for kostnader. Definer kode og kobling til kostnadsobjektplanen eller prosjektet før det brukes på kostnadsposter eller som fordelingsmål. En kostnadspost må ha en kostnadstype og enten et kostnadssted eller et kostnadsobjekt, aldri begge deler."
+      }
+    },
+    {
+      "ruleId": "CostAccounting.PostCostJournal",
+      "taskType": "PostCostJournal",
+      "semanticAction": "Post",
+      "entity": "CostJournalLine",
+      "priority": 1360,
+      "confidence": 0.95,
+      "match": {
+        "pagePatterns": [
+          "^Cost Accounting Journal$",
+          "^Cost Journal$",
+          "^Kostnadsredovisningsjournal$",
+          "^Kostnadsjournal$"
+        ],
+        "actionPatterns": [
+          "^Post$",
+          "^Bokför$"
+        ],
+        "fieldPatterns": [],
+        "automationIdPatterns": []
+      },
+      "instructionTemplate": "",
+      "languages": [
+        "en-US",
+        "sv-SE",
+        "fr-FR",
+        "de-DE",
+        "es-ES",
+        "da-DK",
+        "fi-FI",
+        "nb-NO"
+      ],
+      "aliases": [],
+      "sourceIds": [
+        "cost-accounting-journal-en-us",
+        "cost-accounting-overview-en-us",
+        "cost-accounting-journal-sv-se",
+        "cost-accounting-journal-fr-fr",
+        "cost-accounting-journal-de-de",
+        "cost-accounting-journal-es-es",
+        "cost-accounting-journal-da-dk",
+        "cost-accounting-journal-fi-fi",
+        "cost-accounting-journal-nb-no",
+        "cost-accounting-overview-sv-se",
+        "cost-accounting-overview-fr-fr",
+        "cost-accounting-overview-de-de",
+        "cost-accounting-overview-es-es",
+        "cost-accounting-overview-da-dk",
+        "cost-accounting-overview-fi-fi",
+        "cost-accounting-overview-nb-no"
+      ],
+      "localizedExplanations": {
+        "en-US": "Posts the prepared cost journal lines into cost entries for operational costs, internal charges, manual allocations, or corrections that do not originate in G/L transfer or automatic allocations. Before posting, verify posting date, cost type, amount, balancing cost type, and whether the line uses a cost center or a cost object; these dimensions must be valid and not both assigned to the same cost entry. Review the resulting cost register/entries. This is a cost-accounting posting and does not by itself create G/L entries.",
+        "sv-SE": "Bokför de förberedda kostnadsjournalraderna till kostnadsposter för driftskostnader, interna debiteringar, manuella fördelningar eller korrigeringar som inte kommer från överföring av redovisningsposter eller automatiska fördelningar. Kontrollera bokföringsdatum, kostnadsslag, belopp, motbalanserande kostnadsslag och om raden använder kostnadsställe eller kostnadsobjekt; värdena måste vara giltiga och båda dimensionerna får inte tilldelas samma kostnadspost. Granska sedan kostnadsregister och poster. Detta är bokföring i kostnadsredovisningen och skapar inte i sig redovisningsposter.",
+        "fr-FR": "Valide les lignes préparées du journal de coûts en écritures de coûts pour les charges opérationnelles, refacturations internes, répartitions manuelles ou corrections qui ne proviennent ni du transfert du grand livre ni des répartitions automatiques. Vérifiez la date, le type et le montant, le type de contrepartie, ainsi que l’utilisation d’un centre ou d’un objet de coûts ; les valeurs doivent être valides et une même écriture ne doit pas avoir les deux. Examinez le registre et les écritures obtenus. Cette validation concerne la comptabilité analytique et ne crée pas à elle seule d’écritures générales.",
+        "de-DE": "Bucht vorbereitete Kostenjournalzeilen als Kostenposten für Betriebskosten, interne Verrechnungen, manuelle Umlagen oder Korrekturen, die nicht aus Sachpostenübertragung oder automatischen Umlagen stammen. Prüfen Sie Buchungsdatum, Kostenart, Betrag, Gegenkostenart und ob Kostenstelle oder Kostenträger verwendet wird; die Werte müssen gültig sein und ein Kostenposten darf nicht beiden zugeordnet sein. Kontrollieren Sie anschließend Kostenregister und -posten. Dies ist eine Buchung in der Kostenrechnung und erzeugt allein keine Sachposten.",
+        "es-ES": "Registra las líneas preparadas del diario de costes como movimientos para costes operativos, cargos internos, asignaciones manuales o correcciones que no proceden de la transferencia del libro mayor ni de asignaciones automáticas. Compruebe fecha, tipo e importe, tipo de contrapartida y si se usa un centro o un objeto de coste; los valores deben ser válidos y no se deben asignar ambos a un mismo movimiento. Revise el registro y los movimientos resultantes. Es un registro de contabilidad de costes y no crea por sí solo movimientos contables generales.",
+        "da-DK": "Bogfører de klargjorte omkostningsjournallinjer som omkostningsposter for driftsomkostninger, interne debiteringer, manuelle fordelinger eller korrektioner, der ikke kommer fra finansoverførsel eller automatiske fordelinger. Kontrollér bogføringsdato, omkostningstype, beløb, modkonto-omkostningstype og om linjen bruger omkostningssted eller -objekt; værdierne skal være gyldige, og begge må ikke tildeles samme post. Gennemgå derefter register og poster. Dette er bogføring i omkostningsregnskabet og opretter ikke i sig selv finansposter.",
+        "fi-FI": "Kirjaa valmistellut kustannuspäiväkirjarivit kustannustapahtumiksi sellaisille toimintakustannuksille, sisäisille veloituksille, manuaalisille kohdistuksille tai korjauksille, jotka eivät tule pääkirjasiirrosta tai automaattisista kohdistuksista. Tarkista kirjauspäivä, kustannuslaji, määrä, vastakirjauslaji sekä käytetäänkö kustannuspaikkaa vai kustannuskohdetta; arvojen on oltava kelvollisia eikä molempia saa kohdistaa samaan tapahtumaan. Tarkista kustannusrekisteri ja tapahtumat. Tämä kirjaa kustannuslaskentaan eikä itsessään luo pääkirjatapahtumia.",
+        "nb-NO": "Bokfører klargjorte kostnadsjournallinjer som kostnadsposter for driftskostnader, interne belastninger, manuelle fordelinger eller korrigeringer som ikke kommer fra finansoverføring eller automatiske fordelinger. Kontroller bokføringsdato, kostnadstype, beløp, motkostnadstype og om linjen bruker kostnadssted eller -objekt; verdiene må være gyldige, og begge skal ikke tilordnes samme kostnadspost. Kontroller register og poster etterpå. Dette er bokføring i kostnadsregnskapet og oppretter ikke i seg selv finansposter."
+      }
+    },
+    {
+      "ruleId": "CostAccounting.DeleteCostBudgetEntries",
+      "taskType": "DeleteCostBudgetEntries",
+      "semanticAction": "DeleteCostBudgetEntries",
+      "entity": "CostBudgetEntry",
+      "priority": 1380,
+      "confidence": 0.97,
+      "verifiedRuntimeLocales": [
+        "en-US"
+      ],
+      "match": {
+        "pagePatterns": [
+          "^Delete Cost Budget Entries$"
+        ],
+        "actionPatterns": [
+          "^OK$"
+        ],
+        "fieldPatterns": [],
+        "automationIdPatterns": []
+      },
+      "instructionTemplate": "",
+      "languages": [
+        "en-US",
+        "sv-SE",
+        "fr-FR",
+        "de-DE",
+        "es-ES",
+        "da-DK",
+        "fi-FI",
+        "nb-NO"
+      ],
+      "aliases": [],
+      "sourceIds": [
+        "microsoft-learn-cost-accounting-delete-budget-entries-en-us"
+      ],
+      "localizedExplanations": {
+        "en-US": "Deletes cost-budget entries from the selected starting register through the last register entry. The To Register No. is the latest register and cannot be changed, so you cannot remove one entry or a batch in the middle without creating gaps. Check the starting register before confirming. To protect entries from accidental deletion, close the relevant register on Cost Budget Registers first. This removes cost-budget entries; it does not delete actual cost entries or G/L budget entries.",
+        "sv-SE": "Tar bort kostnadsbudgetposter från det valda startregistret till den sista registerposten. Till register nr är det senaste registret och kan inte ändras, så du kan inte ta bort en enstaka post eller ett intervall mitt i registret utan att skapa luckor. Kontrollera startregistret innan du bekräftar. Stäng det relevanta registret på Kostnadsbudgetregister först för att skydda poster från oavsiktlig borttagning. Åtgärden tar bort kostnadsbudgetposter, inte faktiska kostnadsposter eller huvudboksbudgetposter.",
+        "fr-FR": "Supprime les écritures budgétaires de coûts à partir du registre de départ sélectionné jusqu’à la dernière écriture du registre. Le numéro de registre final est le dernier et ne peut pas être modifié ; il est donc impossible de supprimer une écriture isolée ou un lot au milieu sans créer de lacune. Vérifiez le registre de départ avant de confirmer. Pour éviter une suppression accidentelle, fermez d’abord le registre concerné dans les registres de budgets de coûts. Cette action supprime des écritures budgétaires de coûts, et non les écritures de coûts réels ni les écritures budgétaires comptables.",
+        "de-DE": "Löscht Kostenbudgetposten ab dem ausgewählten Startregister bis zum letzten Registereintrag. Die Nummer des Zielregisters ist der letzte Eintrag und kann nicht geändert werden; einzelne Einträge oder Bereiche in der Mitte lassen sich daher nicht löschen, ohne Lücken zu erzeugen. Prüfen Sie das Startregister vor der Bestätigung. Schließen Sie das betreffende Register unter Kostenbudgetregister, um versehentliches Löschen zu verhindern. Gelöscht werden Kostenbudgetposten, keine Ist-Kostenposten oder Sachkontobudgetposten.",
+        "es-ES": "Elimina movimientos de presupuesto de costes desde el registro inicial seleccionado hasta el último movimiento del registro. El número de registro final corresponde al último registro y no se puede cambiar; por tanto, no se puede eliminar un movimiento aislado o un bloque intermedio sin dejar huecos. Compruebe el registro inicial antes de confirmar. Para evitar eliminaciones accidentales, cierre primero el registro correspondiente en Registros de presupuesto de costes. Esta acción elimina movimientos del presupuesto de costes, no movimientos de costes reales ni movimientos de presupuesto contable.",
+        "da-DK": "Sletter omkostningsbudgetposter fra det valgte startregister til den sidste registerpost. Til-registernummeret er det seneste register og kan ikke ændres, så du kan ikke slette en enkelt post eller et interval midt i registret uden at skabe huller. Kontrollér startregistret, før du bekræfter. Luk det relevante register på Omkostningsbudgetregistre først for at beskytte poster mod utilsigtet sletning. Handlingen sletter omkostningsbudgetposter, ikke faktiske omkostningsposter eller finansbudgetposter.",
+        "fi-FI": "Poistaa kustannusbudjettitapahtumat valitusta aloitusrekisteristä rekisterin viimeiseen tapahtumaan asti. Lopullinen rekisterinumero on viimeisin eikä sitä voi muuttaa, joten yksittäistä tapahtumaa tai keskellä olevaa erää ei voi poistaa jättämättä aukkoja. Tarkista aloitusrekisteri ennen vahvistamista. Suojaa tapahtumat vahingossa poistamiselta sulkemalla ensin kyseinen rekisteri kustannusbudjettirekistereissä. Toiminto poistaa kustannusbudjettitapahtumia, ei toteutuneita kustannustapahtumia eikä pääkirjan budjettitapahtumia.",
+        "nb-NO": "Sletter kostnadsbudsjettposter fra det valgte startregisteret til den siste registerposten. Til-registernummeret er det nyeste registeret og kan ikke endres, så du kan ikke slette en enkelt post eller et intervall midt i registeret uten å lage hull. Kontroller startregisteret før du bekrefter. Lukk det aktuelle registeret på Kostnadsbudsjettregistre først for å beskytte poster mot utilsiktet sletting. Handlingen sletter kostnadsbudsjettposter, ikke faktiske kostnadsposter eller finansbudsjettposter."
+      }
+    }
+  ],
+  "sources": [
+    {
+      "sourceId": "cost-accounting-transfer-en-us",
+      "title": "Transferring and posting cost entries — Business Central",
+      "sourceUri": "https://learn.microsoft.com/en-us/dynamics365/business-central/finance-transfer-and-post-cost-entries",
+      "accessedDate": "2026-09-29",
+      "appliesTo": "Microsoft Business Central cost accounting. Microsoft Learn guidance; UI caption localization and tenant version not verified.",
+      "fields": [
+        "Transfer GL Entries to CA selects entries based on dimensions, account type, cost-type mapping, zero amount, and the transfer start date. Eligible entries can be traced through the G/L, cost-entry, and cost-register links."
+      ],
+      "documentedCaptions": [
+        "Cost Entries",
+        "Transfer GL Entries to CA"
+      ]
+    },
+    {
+      "sourceId": "cost-accounting-transfer-sv-se",
+      "title": "Transferring and posting cost entries — Business Central [sv-se]",
+      "sourceUri": "https://learn.microsoft.com/sv-se/dynamics365/business-central/finance-transfer-and-post-cost-entries",
+      "accessedDate": "2026-09-29",
+      "appliesTo": "Microsoft Business Central cost accounting. Explanation translated from the English Learn source; Swedish tenant captions not verified.",
+      "fields": [
+        "Överför redovisningsposter till kostnadsposter med urval efter dimensioner, kontotyp, kostnadsslagskoppling, belopp och startdatum. Käll- och kostnadsposter kan spåras via överföringsregistret."
+      ],
+      "documentedCaptions": [
+        "Kostnadsposter",
+        "Överför redovisningsposter till kostnadsredovisning"
+      ]
+    },
+    {
+      "sourceId": "cost-accounting-transfer-fr-fr",
+      "title": "Transferring and posting cost entries — Business Central [fr-fr]",
+      "sourceUri": "https://learn.microsoft.com/fr-fr/dynamics365/business-central/finance-transfer-and-post-cost-entries",
+      "accessedDate": "2026-09-29",
+      "appliesTo": "Microsoft Business Central cost accounting. French explanation translated from the English Learn source; tenant captions not verified.",
+      "fields": [
+        "Le traitement sélectionne les écritures selon les dimensions, le type de compte, l’association au type de coûts, le montant et la date de début. Le registre permet de retracer les écritures sources et analytiques."
+      ],
+      "documentedCaptions": [
+        "Écritures de coûts",
+        "Transférer les écritures comptables vers la comptabilité analytique"
+      ]
+    },
+    {
+      "sourceId": "cost-accounting-transfer-de-de",
+      "title": "Transferring and posting cost entries — Business Central [de-de]",
+      "sourceUri": "https://learn.microsoft.com/de-de/dynamics365/business-central/finance-transfer-and-post-cost-entries",
+      "accessedDate": "2026-09-29",
+      "appliesTo": "Microsoft Business Central cost accounting. German explanation translated from the English Learn source; tenant captions not verified.",
+      "fields": [
+        "Die Übertragung filtert nach Dimensionen, Kontoart, Kostenartenzuordnung, Betrag und Startdatum. Sach-, Kosten- und Registerposten bleiben zur Nachverfolgung verknüpft."
+      ],
+      "documentedCaptions": [
+        "Kosteneinträge",
+        "Transfer G/L-Posten in die Kostenrechnung"
+      ]
+    },
+    {
+      "sourceId": "cost-accounting-transfer-es-es",
+      "title": "Transferring and posting cost entries — Business Central [es-es]",
+      "sourceUri": "https://learn.microsoft.com/es-es/dynamics365/business-central/finance-transfer-and-post-cost-entries",
+      "accessedDate": "2026-09-29",
+      "appliesTo": "Microsoft Business Central cost accounting. Spanish explanation translated from the English Learn source; tenant captions not verified.",
+      "fields": [
+        "La transferencia filtra por dimensiones, tipo de cuenta, asignación del tipo de coste, importe y fecha inicial. El registro conserva vínculos para rastrear los movimientos de origen."
+      ],
+      "documentedCaptions": [
+        "Movimientos de coste",
+        "Transferir movs. contabilidad a contabilidad de costes"
+      ]
+    },
+    {
+      "sourceId": "cost-accounting-transfer-da-dk",
+      "title": "Transferring and posting cost entries — Business Central [da-dk]",
+      "sourceUri": "https://learn.microsoft.com/da-dk/dynamics365/business-central/finance-transfer-and-post-cost-entries",
+      "accessedDate": "2026-09-29",
+      "appliesTo": "Microsoft Business Central cost accounting. Danish explanation translated from the English Learn source; tenant captions not verified.",
+      "fields": [
+        "Overførslen filtrerer efter dimensioner, kontotype, omkostningstype, beløb og startdato. Registeret bevarer sporbarheden til de oprindelige finansposter."
+      ],
+      "documentedCaptions": [
+        "Omkostningsposter",
+        "Overfør finansposter til omkostningsregnskab"
+      ]
+    },
+    {
+      "sourceId": "cost-accounting-transfer-fi-fi",
+      "title": "Transferring and posting cost entries — Business Central [fi-fi]",
+      "sourceUri": "https://learn.microsoft.com/fi-fi/dynamics365/business-central/finance-transfer-and-post-cost-entries",
+      "accessedDate": "2026-09-29",
+      "appliesTo": "Microsoft Business Central cost accounting. Finnish explanation translated from the English Learn source; tenant captions not verified.",
+      "fields": [
+        "Siirto valitsee tapahtumat dimensioiden, tilin tyypin, kustannuslajin määrityksen, summan ja alkamispäivän perusteella. Siirtorekisteristä voi seurata lähdetapahtumia."
+      ],
+      "documentedCaptions": [
+        "Kustannustapahtumat",
+        "Siirrä pääkirjan tapahtumat kustannuslaskentaan"
+      ]
+    },
+    {
+      "sourceId": "cost-accounting-transfer-nb-no",
+      "title": "Transferring and posting cost entries — Business Central [nb-no]",
+      "sourceUri": "https://learn.microsoft.com/nb-no/dynamics365/business-central/finance-transfer-and-post-cost-entries",
+      "accessedDate": "2026-09-29",
+      "appliesTo": "Microsoft Business Central cost accounting. Norwegian explanation translated from the English Learn source; tenant captions not verified.",
+      "fields": [
+        "Overføringen velger poster etter dimensjoner, kontotype, kostnadstypekobling, beløp og startdato. Overføringsregisteret gjør det mulig å spore tilbake til kildepostene."
+      ],
+      "documentedCaptions": [
+        "Kostnadsposter",
+        "Overfør finansposter til kostnadsregnskap"
+      ]
+    },
+    {
+      "sourceId": "cost-accounting-allocations-en-us",
+      "title": "Defining and allocating costs — Business Central",
+      "sourceUri": "https://learn.microsoft.com/en-us/dynamics365/business-central/finance-define-and-allocate-costs",
+      "accessedDate": "2026-09-29",
+      "appliesTo": "Microsoft Business Central cost accounting. English Learn source; tenant captions and version not verified.",
+      "fields": [
+        "Allocation sources and targets are configured with levels and validity periods. Static bases use fixed shares; dynamic bases use filtered changing values such as employee counts or sales. The Calculate Allocation Key action computes shares; allocation runs move costs between cost types, centers and objects."
+      ],
+      "documentedCaptions": [
+        "Cost Allocation",
+        "Calculate Allocation Key",
+        "Run Cost Allocation"
+      ]
+    },
+    {
+      "sourceId": "cost-accounting-allocations-sv-se",
+      "title": "Definiera och fördela kostnader — Business Central [sv-se]",
+      "sourceUri": "https://learn.microsoft.com/sv-se/dynamics365/business-central/finance-define-and-allocate-costs",
+      "accessedDate": "2026-09-29",
+      "appliesTo": "Microsoft Business Central cost accounting. Swedish Learn source; tenant captions and version not verified.",
+      "fields": [
+        "Fördelningskällor och mål ställs in med nivåer och giltighetsperioder. Fasta baser använder bestämda andelar; dynamiska baser använder filtrerade värden som antal anställda eller försäljning. Åtgärden Beräkna fördelningsnyckel beräknar andelarna; kostnadsfördelning flyttar kostnader mellan kostnadsslag, kostnadsställen och kostnadsbärare."
+      ],
+      "documentedCaptions": [
+        "Kostnadsfördelning",
+        "Beräkna fördelningsnyckel",
+        "Kör kostnadsfördelning"
+      ]
+    },
+    {
+      "sourceId": "cost-accounting-budgets-en-us",
+      "title": "Creating cost budgets — Business Central",
+      "sourceUri": "https://learn.microsoft.com/en-us/dynamics365/business-central/finance-create-cost-budgets",
+      "accessedDate": "2026-09-29",
+      "appliesTo": "Microsoft Business Central cost accounting. English Learn source; tenant captions and version not verified.",
+      "fields": [
+        "Cost budgets are based on cost types and a defined period. They can be created manually, imported, or copied. G/L budgets can be transferred; cost budgets can be allocated, reviewed in registers and compared in reports."
+      ],
+      "documentedCaptions": [
+        "Cost Budgets",
+        "New"
+      ]
+    },
+    {
+      "sourceId": "cost-accounting-budgets-sv-se",
+      "title": "Skapa kostnadsbudgetar — Business Central [sv-se]",
+      "sourceUri": "https://learn.microsoft.com/sv-se/dynamics365/business-central/finance-create-cost-budgets",
+      "accessedDate": "2026-09-29",
+      "appliesTo": "Microsoft Business Central cost accounting. Swedish Learn source; tenant captions and version not verified.",
+      "fields": [
+        "Kostnadsbudgetar baseras på kostnadsslag och en angiven period. De kan skapas manuellt, importeras eller kopieras. Budgetar kan fördelas, följas i register och jämföras med utfall i rapporter."
+      ],
+      "documentedCaptions": [
+        "Kostnadsbudgetar",
+        "Ny"
+      ]
+    },
+    {
+      "sourceId": "cost-accounting-setup-en-us",
+      "title": "Set up cost accounting — Business Central",
+      "sourceUri": "https://learn.microsoft.com/en-us/dynamics365/business-central/finance-set-up-cost-accounting",
+      "accessedDate": "2026-09-29",
+      "appliesTo": "Microsoft Business Central cost accounting setup. English Microsoft Learn source; local tenant captions and extensions not verified.",
+      "fields": [
+        "Each cost entry must have a cost type and a cost center or a cost object, but not both center and object. Cost types may be created individually or transferred from the chart of accounts. Cost centers identify where costs occur and cost objects identify what bears them."
+      ],
+      "documentedCaptions": [
+        "Cost Centers",
+        "Cost Objects",
+        "Chart of Cost Types",
+        "Get Cost Types from Chart of Accounts"
+      ]
+    },
+    {
+      "sourceId": "cost-accounting-setup-sv-se",
+      "title": "Set up cost accounting — Business Central [sv-se]",
+      "sourceUri": "https://learn.microsoft.com/sv-se/dynamics365/business-central/finance-set-up-cost-accounting",
+      "accessedDate": "2026-09-29",
+      "appliesTo": "Microsoft Business Central cost accounting setup. Swedish explanation checked against Learn; Swedish tenant captions not fully verified.",
+      "fields": [
+        "Varje kostnadspost ska ha ett kostnadsslag och ett kostnadsställe eller ett kostnadsobjekt, men inte både ställe och objekt. Kostnadsslag kan skapas separat eller hämtas från kontoplanen. Kostnadsställen visar var kostnaden uppstår och kostnadsobjekt vad som bär den."
+      ],
+      "documentedCaptions": [
+        "Kostnadsställen",
+        "Kostnadsbärare",
+        "Kostnadsslag",
+        "Hämta kostnadsslag från kontoplan"
+      ]
+    },
+    {
+      "sourceId": "cost-accounting-overview-en-us",
+      "title": "About cost accounting — Business Central",
+      "sourceUri": "https://learn.microsoft.com/en-us/dynamics365/business-central/finance-about-cost-accounting",
+      "accessedDate": "2026-09-29",
+      "appliesTo": "Microsoft Business Central built-in cost accounting concepts.",
+      "fields": [
+        "Cost types describe what kind of cost; cost centers identify where it occurs; cost objects identify what bears it. Cost accounting allocations, budgets and reporting use these structures."
+      ],
+      "documentedCaptions": [
+        "Cost Centers",
+        "Cost Objects"
+      ]
+    },
+    {
+      "sourceId": "cost-accounting-journal-en-us",
+      "title": "About cost accounting — Business Central",
+      "sourceUri": "https://learn.microsoft.com/en-us/dynamics365/business-central/finance-about-cost-accounting",
+      "accessedDate": "2026-09-29",
+      "appliesTo": "Microsoft Business Central cost journals. English Microsoft Learn conceptual and workflow source; journal captions beyond the documented page terminology may vary by tenant version.",
+      "fields": [
+        "Cost journals post entries that do not originate from the general ledger or allocations, such as operational costs, internal charges, manual allocations and corrective entries between cost types, centers and objects. They can be posted individually or recurrently."
+      ],
+      "documentedCaptions": [
+        "Cost Journal",
+        "Cost Entries"
+      ]
+    },
+    {
+      "sourceId": "cost-accounting-allocations-fr-fr",
+      "title": "Defining and allocating costs — Business Central [fr-fr]",
+      "sourceUri": "https://learn.microsoft.com/fr-fr/dynamics365/business-central/finance-define-and-allocate-costs",
+      "accessedDate": "2026-09-29",
+      "appliesTo": "Microsoft Business Central cost accounting. English Learn source; tenant captions and version not verified. Locale-specific Microsoft Learn route; runtime captions are only matched when separately verified.",
+      "fields": [
+        "Allocation sources and targets are configured with levels and validity periods. Static bases use fixed shares; dynamic bases use filtered changing values such as employee counts or sales. The Calculate Allocation Key action computes shares; allocation runs move costs between cost types, centers and objects."
+      ],
+      "documentedCaptions": [
+        "Cost Allocation",
+        "Calculate Allocation Key",
+        "Run Cost Allocation"
+      ]
+    },
+    {
+      "sourceId": "cost-accounting-allocations-de-de",
+      "title": "Defining and allocating costs — Business Central [de-de]",
+      "sourceUri": "https://learn.microsoft.com/de-de/dynamics365/business-central/finance-define-and-allocate-costs",
+      "accessedDate": "2026-09-29",
+      "appliesTo": "Microsoft Business Central cost accounting. English Learn source; tenant captions and version not verified. Locale-specific Microsoft Learn route; runtime captions are only matched when separately verified.",
+      "fields": [
+        "Allocation sources and targets are configured with levels and validity periods. Static bases use fixed shares; dynamic bases use filtered changing values such as employee counts or sales. The Calculate Allocation Key action computes shares; allocation runs move costs between cost types, centers and objects."
+      ],
+      "documentedCaptions": [
+        "Cost Allocation",
+        "Calculate Allocation Key",
+        "Run Cost Allocation"
+      ]
+    },
+    {
+      "sourceId": "cost-accounting-allocations-es-es",
+      "title": "Defining and allocating costs — Business Central [es-es]",
+      "sourceUri": "https://learn.microsoft.com/es-es/dynamics365/business-central/finance-define-and-allocate-costs",
+      "accessedDate": "2026-09-29",
+      "appliesTo": "Microsoft Business Central cost accounting. English Learn source; tenant captions and version not verified. Locale-specific Microsoft Learn route; runtime captions are only matched when separately verified.",
+      "fields": [
+        "Allocation sources and targets are configured with levels and validity periods. Static bases use fixed shares; dynamic bases use filtered changing values such as employee counts or sales. The Calculate Allocation Key action computes shares; allocation runs move costs between cost types, centers and objects."
+      ],
+      "documentedCaptions": [
+        "Cost Allocation",
+        "Calculate Allocation Key",
+        "Run Cost Allocation"
+      ]
+    },
+    {
+      "sourceId": "cost-accounting-allocations-da-dk",
+      "title": "Defining and allocating costs — Business Central [da-dk]",
+      "sourceUri": "https://learn.microsoft.com/da-dk/dynamics365/business-central/finance-define-and-allocate-costs",
+      "accessedDate": "2026-09-29",
+      "appliesTo": "Microsoft Business Central cost accounting. English Learn source; tenant captions and version not verified. Locale-specific Microsoft Learn route; runtime captions are only matched when separately verified.",
+      "fields": [
+        "Allocation sources and targets are configured with levels and validity periods. Static bases use fixed shares; dynamic bases use filtered changing values such as employee counts or sales. The Calculate Allocation Key action computes shares; allocation runs move costs between cost types, centers and objects."
+      ],
+      "documentedCaptions": [
+        "Cost Allocation",
+        "Calculate Allocation Key",
+        "Run Cost Allocation"
+      ]
+    },
+    {
+      "sourceId": "cost-accounting-allocations-fi-fi",
+      "title": "Defining and allocating costs — Business Central [fi-fi]",
+      "sourceUri": "https://learn.microsoft.com/fi-fi/dynamics365/business-central/finance-define-and-allocate-costs",
+      "accessedDate": "2026-09-29",
+      "appliesTo": "Microsoft Business Central cost accounting. English Learn source; tenant captions and version not verified. Locale-specific Microsoft Learn route; runtime captions are only matched when separately verified.",
+      "fields": [
+        "Allocation sources and targets are configured with levels and validity periods. Static bases use fixed shares; dynamic bases use filtered changing values such as employee counts or sales. The Calculate Allocation Key action computes shares; allocation runs move costs between cost types, centers and objects."
+      ],
+      "documentedCaptions": [
+        "Cost Allocation",
+        "Calculate Allocation Key",
+        "Run Cost Allocation"
+      ]
+    },
+    {
+      "sourceId": "cost-accounting-allocations-nb-no",
+      "title": "Defining and allocating costs — Business Central [nb-no]",
+      "sourceUri": "https://learn.microsoft.com/nb-no/dynamics365/business-central/finance-define-and-allocate-costs",
+      "accessedDate": "2026-09-29",
+      "appliesTo": "Microsoft Business Central cost accounting. English Learn source; tenant captions and version not verified. Locale-specific Microsoft Learn route; runtime captions are only matched when separately verified.",
+      "fields": [
+        "Allocation sources and targets are configured with levels and validity periods. Static bases use fixed shares; dynamic bases use filtered changing values such as employee counts or sales. The Calculate Allocation Key action computes shares; allocation runs move costs between cost types, centers and objects."
+      ],
+      "documentedCaptions": [
+        "Cost Allocation",
+        "Calculate Allocation Key",
+        "Run Cost Allocation"
+      ]
+    },
+    {
+      "sourceId": "cost-accounting-budgets-fr-fr",
+      "title": "Creating cost budgets — Business Central [fr-fr]",
+      "sourceUri": "https://learn.microsoft.com/fr-fr/dynamics365/business-central/finance-create-cost-budgets",
+      "accessedDate": "2026-09-29",
+      "appliesTo": "Microsoft Business Central cost accounting. English Learn source; tenant captions and version not verified. Locale-specific Microsoft Learn route; runtime captions are only matched when separately verified.",
+      "fields": [
+        "Cost budgets are based on cost types and a defined period. They can be created manually, imported, or copied. G/L budgets can be transferred; cost budgets can be allocated, reviewed in registers and compared in reports."
+      ],
+      "documentedCaptions": [
+        "Cost Budgets",
+        "New"
+      ]
+    },
+    {
+      "sourceId": "cost-accounting-budgets-de-de",
+      "title": "Creating cost budgets — Business Central [de-de]",
+      "sourceUri": "https://learn.microsoft.com/de-de/dynamics365/business-central/finance-create-cost-budgets",
+      "accessedDate": "2026-09-29",
+      "appliesTo": "Microsoft Business Central cost accounting. English Learn source; tenant captions and version not verified. Locale-specific Microsoft Learn route; runtime captions are only matched when separately verified.",
+      "fields": [
+        "Cost budgets are based on cost types and a defined period. They can be created manually, imported, or copied. G/L budgets can be transferred; cost budgets can be allocated, reviewed in registers and compared in reports."
+      ],
+      "documentedCaptions": [
+        "Cost Budgets",
+        "New"
+      ]
+    },
+    {
+      "sourceId": "cost-accounting-budgets-es-es",
+      "title": "Creating cost budgets — Business Central [es-es]",
+      "sourceUri": "https://learn.microsoft.com/es-es/dynamics365/business-central/finance-create-cost-budgets",
+      "accessedDate": "2026-09-29",
+      "appliesTo": "Microsoft Business Central cost accounting. English Learn source; tenant captions and version not verified. Locale-specific Microsoft Learn route; runtime captions are only matched when separately verified.",
+      "fields": [
+        "Cost budgets are based on cost types and a defined period. They can be created manually, imported, or copied. G/L budgets can be transferred; cost budgets can be allocated, reviewed in registers and compared in reports."
+      ],
+      "documentedCaptions": [
+        "Cost Budgets",
+        "New"
+      ]
+    },
+    {
+      "sourceId": "cost-accounting-budgets-da-dk",
+      "title": "Creating cost budgets — Business Central [da-dk]",
+      "sourceUri": "https://learn.microsoft.com/da-dk/dynamics365/business-central/finance-create-cost-budgets",
+      "accessedDate": "2026-09-29",
+      "appliesTo": "Microsoft Business Central cost accounting. English Learn source; tenant captions and version not verified. Locale-specific Microsoft Learn route; runtime captions are only matched when separately verified.",
+      "fields": [
+        "Cost budgets are based on cost types and a defined period. They can be created manually, imported, or copied. G/L budgets can be transferred; cost budgets can be allocated, reviewed in registers and compared in reports."
+      ],
+      "documentedCaptions": [
+        "Cost Budgets",
+        "New"
+      ]
+    },
+    {
+      "sourceId": "cost-accounting-budgets-fi-fi",
+      "title": "Creating cost budgets — Business Central [fi-fi]",
+      "sourceUri": "https://learn.microsoft.com/fi-fi/dynamics365/business-central/finance-create-cost-budgets",
+      "accessedDate": "2026-09-29",
+      "appliesTo": "Microsoft Business Central cost accounting. English Learn source; tenant captions and version not verified. Locale-specific Microsoft Learn route; runtime captions are only matched when separately verified.",
+      "fields": [
+        "Cost budgets are based on cost types and a defined period. They can be created manually, imported, or copied. G/L budgets can be transferred; cost budgets can be allocated, reviewed in registers and compared in reports."
+      ],
+      "documentedCaptions": [
+        "Cost Budgets",
+        "New"
+      ]
+    },
+    {
+      "sourceId": "cost-accounting-budgets-nb-no",
+      "title": "Creating cost budgets — Business Central [nb-no]",
+      "sourceUri": "https://learn.microsoft.com/nb-no/dynamics365/business-central/finance-create-cost-budgets",
+      "accessedDate": "2026-09-29",
+      "appliesTo": "Microsoft Business Central cost accounting. English Learn source; tenant captions and version not verified. Locale-specific Microsoft Learn route; runtime captions are only matched when separately verified.",
+      "fields": [
+        "Cost budgets are based on cost types and a defined period. They can be created manually, imported, or copied. G/L budgets can be transferred; cost budgets can be allocated, reviewed in registers and compared in reports."
+      ],
+      "documentedCaptions": [
+        "Cost Budgets",
+        "New"
+      ]
+    },
+    {
+      "sourceId": "cost-accounting-setup-fr-fr",
+      "title": "Set up cost accounting — Business Central [fr-fr]",
+      "sourceUri": "https://learn.microsoft.com/fr-fr/dynamics365/business-central/finance-set-up-cost-accounting",
+      "accessedDate": "2026-09-29",
+      "appliesTo": "Microsoft Business Central cost accounting setup. English Microsoft Learn source; local tenant captions and extensions not verified. Locale-specific Microsoft Learn route; runtime captions are only matched when separately verified.",
+      "fields": [
+        "Each cost entry must have a cost type and a cost center or a cost object, but not both center and object. Cost types may be created individually or transferred from the chart of accounts. Cost centers identify where costs occur and cost objects identify what bears them."
+      ],
+      "documentedCaptions": [
+        "Cost Centers",
+        "Cost Objects",
+        "Chart of Cost Types",
+        "Get Cost Types from Chart of Accounts"
+      ]
+    },
+    {
+      "sourceId": "cost-accounting-setup-de-de",
+      "title": "Set up cost accounting — Business Central [de-de]",
+      "sourceUri": "https://learn.microsoft.com/de-de/dynamics365/business-central/finance-set-up-cost-accounting",
+      "accessedDate": "2026-09-29",
+      "appliesTo": "Microsoft Business Central cost accounting setup. English Microsoft Learn source; local tenant captions and extensions not verified. Locale-specific Microsoft Learn route; runtime captions are only matched when separately verified.",
+      "fields": [
+        "Each cost entry must have a cost type and a cost center or a cost object, but not both center and object. Cost types may be created individually or transferred from the chart of accounts. Cost centers identify where costs occur and cost objects identify what bears them."
+      ],
+      "documentedCaptions": [
+        "Cost Centers",
+        "Cost Objects",
+        "Chart of Cost Types",
+        "Get Cost Types from Chart of Accounts"
+      ]
+    },
+    {
+      "sourceId": "cost-accounting-setup-es-es",
+      "title": "Set up cost accounting — Business Central [es-es]",
+      "sourceUri": "https://learn.microsoft.com/es-es/dynamics365/business-central/finance-set-up-cost-accounting",
+      "accessedDate": "2026-09-29",
+      "appliesTo": "Microsoft Business Central cost accounting setup. English Microsoft Learn source; local tenant captions and extensions not verified. Locale-specific Microsoft Learn route; runtime captions are only matched when separately verified.",
+      "fields": [
+        "Each cost entry must have a cost type and a cost center or a cost object, but not both center and object. Cost types may be created individually or transferred from the chart of accounts. Cost centers identify where costs occur and cost objects identify what bears them."
+      ],
+      "documentedCaptions": [
+        "Cost Centers",
+        "Cost Objects",
+        "Chart of Cost Types",
+        "Get Cost Types from Chart of Accounts"
+      ]
+    },
+    {
+      "sourceId": "cost-accounting-setup-da-dk",
+      "title": "Set up cost accounting — Business Central [da-dk]",
+      "sourceUri": "https://learn.microsoft.com/da-dk/dynamics365/business-central/finance-set-up-cost-accounting",
+      "accessedDate": "2026-09-29",
+      "appliesTo": "Microsoft Business Central cost accounting setup. English Microsoft Learn source; local tenant captions and extensions not verified. Locale-specific Microsoft Learn route; runtime captions are only matched when separately verified.",
+      "fields": [
+        "Each cost entry must have a cost type and a cost center or a cost object, but not both center and object. Cost types may be created individually or transferred from the chart of accounts. Cost centers identify where costs occur and cost objects identify what bears them."
+      ],
+      "documentedCaptions": [
+        "Cost Centers",
+        "Cost Objects",
+        "Chart of Cost Types",
+        "Get Cost Types from Chart of Accounts"
+      ]
+    },
+    {
+      "sourceId": "cost-accounting-setup-fi-fi",
+      "title": "Set up cost accounting — Business Central [fi-fi]",
+      "sourceUri": "https://learn.microsoft.com/fi-fi/dynamics365/business-central/finance-set-up-cost-accounting",
+      "accessedDate": "2026-09-29",
+      "appliesTo": "Microsoft Business Central cost accounting setup. English Microsoft Learn source; local tenant captions and extensions not verified. Locale-specific Microsoft Learn route; runtime captions are only matched when separately verified.",
+      "fields": [
+        "Each cost entry must have a cost type and a cost center or a cost object, but not both center and object. Cost types may be created individually or transferred from the chart of accounts. Cost centers identify where costs occur and cost objects identify what bears them."
+      ],
+      "documentedCaptions": [
+        "Cost Centers",
+        "Cost Objects",
+        "Chart of Cost Types",
+        "Get Cost Types from Chart of Accounts"
+      ]
+    },
+    {
+      "sourceId": "cost-accounting-setup-nb-no",
+      "title": "Set up cost accounting — Business Central [nb-no]",
+      "sourceUri": "https://learn.microsoft.com/nb-no/dynamics365/business-central/finance-set-up-cost-accounting",
+      "accessedDate": "2026-09-29",
+      "appliesTo": "Microsoft Business Central cost accounting setup. English Microsoft Learn source; local tenant captions and extensions not verified. Locale-specific Microsoft Learn route; runtime captions are only matched when separately verified.",
+      "fields": [
+        "Each cost entry must have a cost type and a cost center or a cost object, but not both center and object. Cost types may be created individually or transferred from the chart of accounts. Cost centers identify where costs occur and cost objects identify what bears them."
+      ],
+      "documentedCaptions": [
+        "Cost Centers",
+        "Cost Objects",
+        "Chart of Cost Types",
+        "Get Cost Types from Chart of Accounts"
+      ]
+    },
+    {
+      "sourceId": "cost-accounting-overview-sv-se",
+      "title": "About cost accounting — Business Central [sv-se]",
+      "sourceUri": "https://learn.microsoft.com/sv-se/dynamics365/business-central/finance-about-cost-accounting",
+      "accessedDate": "2026-09-29",
+      "appliesTo": "Microsoft Business Central built-in cost accounting concepts. Locale-specific Microsoft Learn route; runtime captions are only matched when separately verified.",
+      "fields": [
+        "Cost types describe what kind of cost; cost centers identify where it occurs; cost objects identify what bears it. Cost accounting allocations, budgets and reporting use these structures."
+      ],
+      "documentedCaptions": [
+        "Cost Centers",
+        "Cost Objects"
+      ]
+    },
+    {
+      "sourceId": "cost-accounting-overview-fr-fr",
+      "title": "About cost accounting — Business Central [fr-fr]",
+      "sourceUri": "https://learn.microsoft.com/fr-fr/dynamics365/business-central/finance-about-cost-accounting",
+      "accessedDate": "2026-09-29",
+      "appliesTo": "Microsoft Business Central built-in cost accounting concepts. Locale-specific Microsoft Learn route; runtime captions are only matched when separately verified.",
+      "fields": [
+        "Cost types describe what kind of cost; cost centers identify where it occurs; cost objects identify what bears it. Cost accounting allocations, budgets and reporting use these structures."
+      ],
+      "documentedCaptions": [
+        "Cost Centers",
+        "Cost Objects"
+      ]
+    },
+    {
+      "sourceId": "cost-accounting-overview-de-de",
+      "title": "About cost accounting — Business Central [de-de]",
+      "sourceUri": "https://learn.microsoft.com/de-de/dynamics365/business-central/finance-about-cost-accounting",
+      "accessedDate": "2026-09-29",
+      "appliesTo": "Microsoft Business Central built-in cost accounting concepts. Locale-specific Microsoft Learn route; runtime captions are only matched when separately verified.",
+      "fields": [
+        "Cost types describe what kind of cost; cost centers identify where it occurs; cost objects identify what bears it. Cost accounting allocations, budgets and reporting use these structures."
+      ],
+      "documentedCaptions": [
+        "Cost Centers",
+        "Cost Objects"
+      ]
+    },
+    {
+      "sourceId": "cost-accounting-overview-es-es",
+      "title": "About cost accounting — Business Central [es-es]",
+      "sourceUri": "https://learn.microsoft.com/es-es/dynamics365/business-central/finance-about-cost-accounting",
+      "accessedDate": "2026-09-29",
+      "appliesTo": "Microsoft Business Central built-in cost accounting concepts. Locale-specific Microsoft Learn route; runtime captions are only matched when separately verified.",
+      "fields": [
+        "Cost types describe what kind of cost; cost centers identify where it occurs; cost objects identify what bears it. Cost accounting allocations, budgets and reporting use these structures."
+      ],
+      "documentedCaptions": [
+        "Cost Centers",
+        "Cost Objects"
+      ]
+    },
+    {
+      "sourceId": "cost-accounting-overview-da-dk",
+      "title": "About cost accounting — Business Central [da-dk]",
+      "sourceUri": "https://learn.microsoft.com/da-dk/dynamics365/business-central/finance-about-cost-accounting",
+      "accessedDate": "2026-09-29",
+      "appliesTo": "Microsoft Business Central built-in cost accounting concepts. Locale-specific Microsoft Learn route; runtime captions are only matched when separately verified.",
+      "fields": [
+        "Cost types describe what kind of cost; cost centers identify where it occurs; cost objects identify what bears it. Cost accounting allocations, budgets and reporting use these structures."
+      ],
+      "documentedCaptions": [
+        "Cost Centers",
+        "Cost Objects"
+      ]
+    },
+    {
+      "sourceId": "cost-accounting-overview-fi-fi",
+      "title": "About cost accounting — Business Central [fi-fi]",
+      "sourceUri": "https://learn.microsoft.com/fi-fi/dynamics365/business-central/finance-about-cost-accounting",
+      "accessedDate": "2026-09-29",
+      "appliesTo": "Microsoft Business Central built-in cost accounting concepts. Locale-specific Microsoft Learn route; runtime captions are only matched when separately verified.",
+      "fields": [
+        "Cost types describe what kind of cost; cost centers identify where it occurs; cost objects identify what bears it. Cost accounting allocations, budgets and reporting use these structures."
+      ],
+      "documentedCaptions": [
+        "Cost Centers",
+        "Cost Objects"
+      ]
+    },
+    {
+      "sourceId": "cost-accounting-overview-nb-no",
+      "title": "About cost accounting — Business Central [nb-no]",
+      "sourceUri": "https://learn.microsoft.com/nb-no/dynamics365/business-central/finance-about-cost-accounting",
+      "accessedDate": "2026-09-29",
+      "appliesTo": "Microsoft Business Central built-in cost accounting concepts. Locale-specific Microsoft Learn route; runtime captions are only matched when separately verified.",
+      "fields": [
+        "Cost types describe what kind of cost; cost centers identify where it occurs; cost objects identify what bears it. Cost accounting allocations, budgets and reporting use these structures."
+      ],
+      "documentedCaptions": [
+        "Cost Centers",
+        "Cost Objects"
+      ]
+    },
+    {
+      "sourceId": "cost-accounting-journal-sv-se",
+      "title": "About cost accounting — Business Central [sv-se]",
+      "sourceUri": "https://learn.microsoft.com/sv-se/dynamics365/business-central/finance-about-cost-accounting",
+      "accessedDate": "2026-09-29",
+      "appliesTo": "Microsoft Business Central cost journals. English Microsoft Learn conceptual and workflow source; journal captions beyond the documented page terminology may vary by tenant version. Locale-specific Microsoft Learn route; runtime captions are only matched when separately verified.",
+      "fields": [
+        "Cost journals post entries that do not originate from the general ledger or allocations, such as operational costs, internal charges, manual allocations and corrective entries between cost types, centers and objects. They can be posted individually or recurrently."
+      ],
+      "documentedCaptions": [
+        "Cost Journal",
+        "Cost Entries"
+      ]
+    },
+    {
+      "sourceId": "cost-accounting-journal-fr-fr",
+      "title": "About cost accounting — Business Central [fr-fr]",
+      "sourceUri": "https://learn.microsoft.com/fr-fr/dynamics365/business-central/finance-about-cost-accounting",
+      "accessedDate": "2026-09-29",
+      "appliesTo": "Microsoft Business Central cost journals. English Microsoft Learn conceptual and workflow source; journal captions beyond the documented page terminology may vary by tenant version. Locale-specific Microsoft Learn route; runtime captions are only matched when separately verified.",
+      "fields": [
+        "Cost journals post entries that do not originate from the general ledger or allocations, such as operational costs, internal charges, manual allocations and corrective entries between cost types, centers and objects. They can be posted individually or recurrently."
+      ],
+      "documentedCaptions": [
+        "Cost Journal",
+        "Cost Entries"
+      ]
+    },
+    {
+      "sourceId": "cost-accounting-journal-de-de",
+      "title": "About cost accounting — Business Central [de-de]",
+      "sourceUri": "https://learn.microsoft.com/de-de/dynamics365/business-central/finance-about-cost-accounting",
+      "accessedDate": "2026-09-29",
+      "appliesTo": "Microsoft Business Central cost journals. English Microsoft Learn conceptual and workflow source; journal captions beyond the documented page terminology may vary by tenant version. Locale-specific Microsoft Learn route; runtime captions are only matched when separately verified.",
+      "fields": [
+        "Cost journals post entries that do not originate from the general ledger or allocations, such as operational costs, internal charges, manual allocations and corrective entries between cost types, centers and objects. They can be posted individually or recurrently."
+      ],
+      "documentedCaptions": [
+        "Cost Journal",
+        "Cost Entries"
+      ]
+    },
+    {
+      "sourceId": "cost-accounting-journal-es-es",
+      "title": "About cost accounting — Business Central [es-es]",
+      "sourceUri": "https://learn.microsoft.com/es-es/dynamics365/business-central/finance-about-cost-accounting",
+      "accessedDate": "2026-09-29",
+      "appliesTo": "Microsoft Business Central cost journals. English Microsoft Learn conceptual and workflow source; journal captions beyond the documented page terminology may vary by tenant version. Locale-specific Microsoft Learn route; runtime captions are only matched when separately verified.",
+      "fields": [
+        "Cost journals post entries that do not originate from the general ledger or allocations, such as operational costs, internal charges, manual allocations and corrective entries between cost types, centers and objects. They can be posted individually or recurrently."
+      ],
+      "documentedCaptions": [
+        "Cost Journal",
+        "Cost Entries"
+      ]
+    },
+    {
+      "sourceId": "cost-accounting-journal-da-dk",
+      "title": "About cost accounting — Business Central [da-dk]",
+      "sourceUri": "https://learn.microsoft.com/da-dk/dynamics365/business-central/finance-about-cost-accounting",
+      "accessedDate": "2026-09-29",
+      "appliesTo": "Microsoft Business Central cost journals. English Microsoft Learn conceptual and workflow source; journal captions beyond the documented page terminology may vary by tenant version. Locale-specific Microsoft Learn route; runtime captions are only matched when separately verified.",
+      "fields": [
+        "Cost journals post entries that do not originate from the general ledger or allocations, such as operational costs, internal charges, manual allocations and corrective entries between cost types, centers and objects. They can be posted individually or recurrently."
+      ],
+      "documentedCaptions": [
+        "Cost Journal",
+        "Cost Entries"
+      ]
+    },
+    {
+      "sourceId": "cost-accounting-journal-fi-fi",
+      "title": "About cost accounting — Business Central [fi-fi]",
+      "sourceUri": "https://learn.microsoft.com/fi-fi/dynamics365/business-central/finance-about-cost-accounting",
+      "accessedDate": "2026-09-29",
+      "appliesTo": "Microsoft Business Central cost journals. English Microsoft Learn conceptual and workflow source; journal captions beyond the documented page terminology may vary by tenant version. Locale-specific Microsoft Learn route; runtime captions are only matched when separately verified.",
+      "fields": [
+        "Cost journals post entries that do not originate from the general ledger or allocations, such as operational costs, internal charges, manual allocations and corrective entries between cost types, centers and objects. They can be posted individually or recurrently."
+      ],
+      "documentedCaptions": [
+        "Cost Journal",
+        "Cost Entries"
+      ]
+    },
+    {
+      "sourceId": "cost-accounting-journal-nb-no",
+      "title": "About cost accounting — Business Central [nb-no]",
+      "sourceUri": "https://learn.microsoft.com/nb-no/dynamics365/business-central/finance-about-cost-accounting",
+      "accessedDate": "2026-09-29",
+      "appliesTo": "Microsoft Business Central cost journals. English Microsoft Learn conceptual and workflow source; journal captions beyond the documented page terminology may vary by tenant version. Locale-specific Microsoft Learn route; runtime captions are only matched when separately verified.",
+      "fields": [
+        "Cost journals post entries that do not originate from the general ledger or allocations, such as operational costs, internal charges, manual allocations and corrective entries between cost types, centers and objects. They can be posted individually or recurrently."
+      ],
+      "documentedCaptions": [
+        "Cost Journal",
+        "Cost Entries"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-cost-accounting-delete-budget-entries-en-us",
+      "title": "Delete cost budget entries",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/en-us/dynamics365/business-central/finance-how-to-delete-cost-budget-entries",
+      "appliesTo": "Business Central cost accounting; delete/cancel entries from the cost budget register; English source verified 2026-09-30. Other runtime locales are not verified.",
+      "accessedDate": "2026-09-30",
+      "fields": [
+        "Delete Cost Budget Entries is a batch job that cancels cost-budget entries from the cost budget register.",
+        "Deletion starts at a chosen From Register No. and extends through the last register entry; To Register No. is populated with the last entry and cannot be changed.",
+        "A single entry or a batch in the middle cannot be deleted because that would create gaps in cost budget and register entries.",
+        "Close register entries on Cost Budget Registers to protect them from accidental deletion."
+      ]
+    }
+  ],
+  "sourceLocaleGaps": {
+    "microsoft-learn-cost-accounting-delete-budget-entries-en-us": [
+      "sv-SE",
+      "fr-FR",
+      "de-DE",
+      "es-ES",
+      "da-DK",
+      "fi-FI",
+      "nb-NO"
+    ]
+  }
+}

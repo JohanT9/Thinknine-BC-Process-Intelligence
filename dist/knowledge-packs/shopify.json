@@ -1,0 +1,920 @@
+{
+  "packId": "bc-shopify-connector",
+  "name": "Business Central Shopify connector",
+  "version": "1.0.0",
+  "priority": 240,
+  "rules": [
+    {
+      "ruleId": "Shopify.SyncOrdersFromShopify",
+      "taskType": "SyncOrdersFromShopify",
+      "semanticAction": "SyncOrdersFromShopify",
+      "entity": "ShopifyOrderImport",
+      "priority": 1320,
+      "confidence": 0.96,
+      "match": {
+        "pagePatterns": [
+          "^Shopify Shop Card$",
+          "^Shopify-butikskort$"
+        ],
+        "actionPatterns": [
+          "^Sync Orders From Shopify$",
+          "^Synkronisera beställningar från Shopify$"
+        ],
+        "fieldPatterns": [],
+        "automationIdPatterns": []
+      },
+      "instructionTemplate": "",
+      "languages": [
+        "en-US",
+        "sv-SE",
+        "fr-FR",
+        "de-DE",
+        "es-ES",
+        "da-DK",
+        "fi-FI",
+        "nb-NO"
+      ],
+      "aliases": [],
+      "sourceIds": [
+        "shopify-order-sync-en-us",
+        "shopify-order-sync-fr-fr",
+        "shopify-order-sync-de-de",
+        "shopify-order-sync-es-es",
+        "shopify-order-sync-da-dk",
+        "shopify-order-sync-fi-fi",
+        "shopify-order-sync-nb-no",
+        "shopify-order-sync-sv-se",
+        "shopify-create-sales-docs-en-us",
+        "shopify-create-sales-docs-fr-fr",
+        "shopify-create-sales-docs-de-de",
+        "shopify-create-sales-docs-es-es",
+        "shopify-create-sales-docs-da-dk",
+        "shopify-create-sales-docs-fi-fi",
+        "shopify-create-sales-docs-nb-no",
+        "shopify-create-sales-docs-sv-se",
+        "shopify-shipment-sync-en-us",
+        "shopify-shipment-sync-fr-fr",
+        "shopify-shipment-sync-de-de",
+        "shopify-shipment-sync-es-es",
+        "shopify-shipment-sync-da-dk",
+        "shopify-shipment-sync-fi-fi",
+        "shopify-shipment-sync-nb-no",
+        "shopify-shipment-sync-sv-se"
+      ],
+      "localizedExplanations": {
+        "en-US": "Runs the order import for this Shopify shop, using the filters and processing options in the request. Check shop-to-location, currency, tax, payment and shipping mappings first. Depending on setup, imported orders can create Business Central sales documents; a started sync does not prove that every order imported successfully. Review Shopify Orders and the connector log for errors or skipped records.",
+        "sv-SE": "Kör orderimporten för den här Shopify-butiken med filtren och bearbetningsalternativen på begäranssidan. Kontrollera först mappning av butik och lagerställe samt valuta, moms, betalning och leveranssätt. Importerade order kan skapa försäljningsdokument beroende på inställningarna. En startad synkronisering bekräftar inte att alla order importerades; granska Shopify-order och anslutningsprogrammets logg efter fel och överhoppade poster.",
+        "fr-FR": "Lance l’importation des commandes de cette boutique Shopify avec les filtres et options de traitement choisis. Vérifiez les associations de boutique et d’emplacement, la devise, les taxes, les paiements et les modes d’expédition. Selon le paramétrage, l’import peut créer des documents de vente. Le lancement ne prouve pas que toutes les commandes ont été importées ; consultez les commandes Shopify et le journal du connecteur pour les erreurs et éléments ignorés.",
+        "de-DE": "Startet den Bestellimport für diesen Shopify-Shop mit den gewählten Filtern und Verarbeitungsoptionen. Prüfen Sie zuerst Shop- und Lagerortzuordnung sowie Währung, Steuern, Zahlung und Versandart. Je nach Einrichtung kann der Import Verkaufsbelege erzeugen. Der Start bestätigt keinen vollständigen Import; prüfen Sie Shopify-Bestellungen und Connector-Protokoll auf Fehler und übersprungene Datensätze.",
+        "es-ES": "Ejecuta la importación de pedidos de esta tienda Shopify con los filtros y opciones seleccionados. Compruebe antes las asignaciones de tienda y ubicación, moneda, impuestos, pagos y método de envío. Según la configuración, la importación puede crear documentos de venta. El inicio no confirma que se hayan importado todos los pedidos; revise los pedidos de Shopify y el registro del conector para detectar errores y omisiones.",
+        "da-DK": "Kører ordreimporten for denne Shopify-butik med de valgte filtre og behandlingsindstillinger. Kontrollér først tilknytning af butik og lokation samt valuta, moms, betaling og forsendelsesmetode. Afhængigt af opsætningen kan importen oprette salgsbilag. En startet synkronisering bekræfter ikke, at alle ordrer blev importeret; gennemgå Shopify-ordrer og connectorloggen for fejl og oversprungne poster.",
+        "fi-FI": "Suorittaa tämän Shopify-kaupan tilausten tuonnin valituilla suodattimilla ja käsittelyasetuksilla. Tarkista ensin kaupan ja sijainnin määritykset sekä valuutta-, vero-, maksu- ja toimitustiedot. Asetuksista riippuen tuonti voi luoda myyntitositteita. Käynnistys ei vahvista kaikkien tilausten onnistunutta tuontia; tarkista Shopify-tilaukset ja yhteysohjelman loki virheiden ja ohitettujen tietueiden varalta.",
+        "nb-NO": "Kjører ordreimporten for denne Shopify-butikken med valgte filtre og behandlingsalternativer. Kontroller først tilordning av butikk og lokasjon samt valuta, avgift, betaling og fraktmetode. Avhengig av oppsettet kan importen opprette salgsdokumenter. En startet synkronisering bekrefter ikke at alle ordrer ble importert; kontroller Shopify-ordrer og connectorloggen for feil og hoppede poster."
+      }
+    },
+    {
+      "ruleId": "Shopify.SyncInventoryToShopify",
+      "taskType": "SyncInventoryToShopify",
+      "semanticAction": "SyncInventoryToShopify",
+      "entity": "ShopifyInventorySync",
+      "priority": 1320,
+      "confidence": 0.96,
+      "match": {
+        "pagePatterns": [
+          "^Shopify Shop Card$",
+          "^Shopify-butikskort$",
+          "^Shopify Products$",
+          "^Shopify-produkter$"
+        ],
+        "actionPatterns": [
+          "^Sync Inventory$",
+          "^Synkronisera lager$"
+        ],
+        "fieldPatterns": [],
+        "automationIdPatterns": []
+      },
+      "instructionTemplate": "",
+      "languages": [
+        "en-US",
+        "sv-SE",
+        "fr-FR",
+        "de-DE",
+        "es-ES",
+        "da-DK",
+        "fi-FI",
+        "nb-NO"
+      ],
+      "aliases": [],
+      "sourceIds": [
+        "shopify-inventory-sync-en-us",
+        "shopify-inventory-sync-fr-fr",
+        "shopify-inventory-sync-de-de",
+        "shopify-inventory-sync-es-es",
+        "shopify-inventory-sync-da-dk",
+        "shopify-inventory-sync-fi-fi",
+        "shopify-inventory-sync-nb-no",
+        "shopify-inventory-sync-sv-se",
+        "shopify-product-sync-en-us",
+        "shopify-product-sync-fr-fr",
+        "shopify-product-sync-de-de",
+        "shopify-product-sync-es-es",
+        "shopify-product-sync-da-dk",
+        "shopify-product-sync-fi-fi",
+        "shopify-product-sync-nb-no",
+        "shopify-product-sync-sv-se"
+      ],
+      "localizedExplanations": {
+        "en-US": "Synchronizes calculated Business Central availability to Shopify for mapped products and locations. Confirm inventory tracking is enabled in Shopify, inventory synchronization is enabled for the Shopify location, and the product, variant and location mappings exist. The calculation can include expected demand and supply rather than only on-hand stock. Check the Shopify inventory fact box and connector log to confirm the outcome; a newly added Shopify location may need inventory records for existing variants.",
+        "sv-SE": "Synkroniserar beräknad tillgänglighet i Business Central till Shopify för mappade produkter och lagerställen. Kontrollera att lagerspårning är aktiverad i Shopify, att lagersynkronisering är aktiverad för Shopify-platsen och att produkt-, variant- och platsmappningar finns. Beräkningen kan ta hänsyn till förväntad efterfrågan och tillgång, inte bara saldo. Kontrollera Shopify-faktarutan för lager och anslutningsprogrammets logg. En ny Shopify-plats kan behöva lagerposter för befintliga varianter.",
+        "fr-FR": "Synchronise vers Shopify la disponibilité calculée dans Business Central pour les produits et emplacements associés. Vérifiez le suivi du stock dans Shopify, l’activation de la synchronisation pour l’emplacement et les associations de produits, variantes et emplacements. Le calcul peut tenir compte de la demande et de l’approvisionnement prévus, et pas seulement du stock disponible. Contrôlez la zone d’informations de stock Shopify et le journal du connecteur. Un nouvel emplacement Shopify peut nécessiter des niveaux de stock pour les variantes existantes.",
+        "de-DE": "Synchronisiert die in Business Central berechnete Verfügbarkeit für zugeordnete Produkte und Lagerorte mit Shopify. Prüfen Sie die aktivierte Bestandsverfolgung in Shopify, die Synchronisierung für den Shopify-Standort sowie Produkt-, Varianten- und Standortzuordnungen. Die Berechnung kann erwartete Nachfrage und Zugänge statt nur den aktuellen Bestand berücksichtigen. Prüfen Sie die Shopify-Bestandsinfobox und das Connector-Protokoll. Für einen neuen Shopify-Standort müssen Bestandsdatensätze vorhandener Varianten gegebenenfalls angelegt werden.",
+        "es-ES": "Sincroniza con Shopify la disponibilidad calculada en Business Central para los productos y ubicaciones asignados. Compruebe que el seguimiento de inventario está activo en Shopify, que la sincronización está habilitada para la ubicación y que existen las asignaciones de producto, variante y ubicación. El cálculo puede considerar demanda y suministro previstos, no solo existencias actuales. Revise el cuadro informativo de inventario de Shopify y el registro del conector. Una ubicación nueva puede requerir registros de inventario para variantes existentes.",
+        "da-DK": "Synkroniserer den beregnede tilgængelighed fra Business Central til Shopify for tilknyttede produkter og lokationer. Kontrollér, at lagersporing er aktiveret i Shopify, synkronisering er aktiveret for Shopify-lokationen, og at produkt-, variant- og lokationstilknytninger findes. Beregningen kan medtage forventet efterspørgsel og tilgang, ikke kun lagerbeholdningen. Kontrollér Shopify-lagerfaktaboksen og connectorloggen. En ny Shopify-lokation kan kræve lagerposter for eksisterende varianter.",
+        "fi-FI": "Synkronoi Business Centralissa lasketun saatavuuden Shopifyhin yhdistetyille tuotteille ja sijainneille. Varmista, että varaston seuranta on käytössä Shopifyssa, synkronointi on sallittu Shopify-sijainnille ja tuote-, variantti- sekä sijaintimääritykset ovat olemassa. Laskenta voi huomioida ennakoidun kysynnän ja tarjonnan pelkän saldon sijaan. Tarkista Shopify-varastotietoruutu ja yhteysohjelman loki. Uusi Shopify-sijainti voi vaatia varastotietueet olemassa oleville varianteille.",
+        "nb-NO": "Synkroniserer beregnet tilgjengelighet fra Business Central til Shopify for tilordnede produkter og lokasjoner. Kontroller at lagersporing er aktivert i Shopify, at lagersynkronisering er aktivert for Shopify-lokasjonen, og at produkt-, variant- og lokasjonstilordningene finnes. Beregningen kan ta hensyn til forventet etterspørsel og tilgang, ikke bare beholdningen. Kontroller Shopify-lagerfaktaboksen og connectorloggen. En ny Shopify-lokasjon kan kreve lagerposter for eksisterende varianter."
+      }
+    },
+    {
+      "ruleId": "Shopify.CreateSalesDocumentsFromOrder",
+      "taskType": "CreateSalesDocumentsFromShopifyOrder",
+      "semanticAction": "CreateSalesDocuments",
+      "entity": "ShopifyOrder",
+      "priority": 1320,
+      "confidence": 0.96,
+      "match": {
+        "pagePatterns": [
+          "^Shopify Orders$",
+          "^Shopify-order$",
+          "^Shopify Order Card$",
+          "^Shopify-orderkort$"
+        ],
+        "actionPatterns": [
+          "^Create Sales Documents$",
+          "^Skapa försäljningsdokument$"
+        ],
+        "fieldPatterns": [],
+        "automationIdPatterns": []
+      },
+      "instructionTemplate": "",
+      "languages": [
+        "en-US",
+        "sv-SE",
+        "fr-FR",
+        "de-DE",
+        "es-ES",
+        "da-DK",
+        "fi-FI",
+        "nb-NO"
+      ],
+      "aliases": [],
+      "sourceIds": [
+        "shopify-create-sales-docs-en-us",
+        "shopify-create-sales-docs-fr-fr",
+        "shopify-create-sales-docs-de-de",
+        "shopify-create-sales-docs-es-es",
+        "shopify-create-sales-docs-da-dk",
+        "shopify-create-sales-docs-fi-fi",
+        "shopify-create-sales-docs-nb-no",
+        "shopify-create-sales-docs-sv-se"
+      ],
+      "localizedExplanations": {
+        "en-US": "Creates the Business Central sales document for the selected imported Shopify order. First verify the customer, mapped item/variant, location, currency and tax setup, then compare the Shopify order totals and lines. An order that needs fulfillment normally becomes a sales order; an already fulfilled order can become an invoice depending on the shop setting. Fix missing mappings before retrying. If recreating a document, Unlink Processed Documents only resets the link/status; it does not delete the old document, so avoid creating duplicates.",
+        "sv-SE": "Skapar ett försäljningsdokument i Business Central för den valda importerade Shopify-ordern. Kontrollera först kund, mappad artikel/variant, lagerställe, valuta och moms och jämför sedan orderns rader och belopp. En order som ska levereras blir normalt en försäljningsorder; en redan fullgjord order kan bli en faktura beroende på butikens inställning. Rätta saknade mappningar innan du försöker igen. Om dokumentet ska skapas om återställer åtgärden Koppla bort bearbetade dokument bara kopplingen och statusen; den tar inte bort det gamla dokumentet, så undvik dubbletter.",
+        "fr-FR": "Crée le document de vente Business Central pour la commande Shopify importée sélectionnée. Vérifiez d’abord le client, l’article/variante associé, l’emplacement, la devise et la configuration fiscale, puis comparez les lignes et totaux de la commande. Une commande à expédier devient généralement une commande vente ; une commande déjà exécutée peut devenir une facture selon le paramètre de la boutique. Corrigez les associations manquantes avant de réessayer. Pour recréer un document, Délier les documents traités réinitialise seulement le lien et l’état ; l’ancien document n’est pas supprimé, évitez donc les doublons.",
+        "de-DE": "Erstellt den Business Central-Verkaufsbeleg für die ausgewählte importierte Shopify-Bestellung. Prüfen Sie zuerst Kunde, zugeordneten Artikel/Variante, Lagerort, Währung und Steuerkonfiguration und vergleichen Sie anschließend Positionen und Summen. Eine zu erfüllende Bestellung wird normalerweise zum Verkaufsauftrag; eine bereits erfüllte Bestellung kann je nach Shop-Einstellung eine Rechnung werden. Beheben Sie fehlende Zuordnungen vor einem erneuten Versuch. Beim Neuerstellen setzt Behandelte Belege trennen nur Verknüpfung und Status zurück; der alte Beleg wird nicht gelöscht. Vermeiden Sie daher Duplikate.",
+        "es-ES": "Crea el documento de ventas de Business Central para el pedido importado de Shopify seleccionado. Compruebe primero el cliente, el producto/variante asignado, la ubicación, la moneda y la configuración fiscal; después compare las líneas y los totales del pedido. Un pedido que requiere preparación suele generar un pedido de venta; uno ya preparado puede generar una factura según la configuración de la tienda. Corrija las asignaciones que falten antes de volver a intentarlo. Si recrea el documento, Desvincular documentos procesados solo restablece el vínculo y el estado; no elimina el documento anterior, así que evite duplicados.",
+        "da-DK": "Opretter Business Central-salgsbilaget for den valgte importerede Shopify-ordre. Kontrollér først kunden, det tilknyttede varenummer/variant, lokationen, valutaen og momsopsætningen, og sammenlign derefter ordrelinjer og totaler. En ordre, der skal opfyldes, bliver normalt en salgsordre; en allerede opfyldt ordre kan blive en faktura afhængigt af butikkens indstilling. Ret manglende tilknytninger, før du prøver igen. Hvis bilaget skal oprettes igen, nulstiller Frakobl behandlede dokumenter kun tilknytning og status; det gamle bilag slettes ikke, så undgå dubletter.",
+        "fi-FI": "Luo Business Central -myyntiasiakirjan valitulle tuodulle Shopify-tilaukselle. Tarkista ensin asiakas, yhdistetty nimike/variantti, sijainti, valuutta ja veromääritykset ja vertaa sitten tilauksen rivejä ja summia. Toimitusta odottavasta tilauksesta tulee yleensä myyntitilaus; jo toimitetusta voi tulla lasku kaupan asetuksen mukaan. Korjaa puuttuvat yhdistämiset ennen uutta yritystä. Jos luot asiakirjan uudelleen, Poista käsiteltyjen asiakirjojen linkitys nollaa vain linkin ja tilan; vanhaa asiakirjaa ei poisteta, joten vältä kaksoiskappaleita.",
+        "nb-NO": "Oppretter salgsdokumentet i Business Central for den valgte importerte Shopify-ordren. Kontroller først kunden, tilordnet vare/variant, lokasjon, valuta og avgiftsoppsett, og sammenlign deretter ordrelinjer og totaler. En ordre som skal oppfylles blir vanligvis en salgsordre; en allerede oppfylt ordre kan bli en faktura avhengig av butikkinnstillingen. Rett manglende tilordninger før du prøver igjen. Hvis dokumentet skal opprettes på nytt, tilbakestiller Koble fra behandlede dokumenter bare koblingen og statusen; det gamle dokumentet slettes ikke, så unngå duplikater."
+      }
+    },
+    {
+      "ruleId": "Shopify.SyncShipmentsToShopify",
+      "taskType": "SyncShipmentsToShopify",
+      "semanticAction": "SyncShipmentsToShopify",
+      "entity": "PostedSalesShipment",
+      "priority": 1320,
+      "confidence": 0.96,
+      "match": {
+        "pagePatterns": [
+          "^Shopify Shop Card$",
+          "^Shopify-butikskort$",
+          "^Shopify Sales Orders$",
+          "^Shopify-försäljningsorder$"
+        ],
+        "actionPatterns": [
+          "^Sync Shipments$",
+          "^Synkronisera leveranser$",
+          "^Sync Shipments to Shopify$",
+          "^Synkronisera leveranser till Shopify$"
+        ],
+        "fieldPatterns": [],
+        "automationIdPatterns": []
+      },
+      "instructionTemplate": "",
+      "languages": [
+        "en-US",
+        "sv-SE",
+        "fr-FR",
+        "de-DE",
+        "es-ES",
+        "da-DK",
+        "fi-FI",
+        "nb-NO"
+      ],
+      "aliases": [],
+      "sourceIds": [
+        "shopify-shipment-sync-en-us",
+        "shopify-shipment-sync-fr-fr",
+        "shopify-shipment-sync-de-de",
+        "shopify-shipment-sync-es-es",
+        "shopify-shipment-sync-da-dk",
+        "shopify-shipment-sync-fi-fi",
+        "shopify-shipment-sync-nb-no",
+        "shopify-shipment-sync-sv-se"
+      ],
+      "localizedExplanations": {
+        "en-US": "Exports eligible posted Business Central shipments as fulfillments for linked Shopify orders. Filter the intended shipment set and check that the posted lines still carry their Shopify order and order-line links; manually recreated lines may not qualify. Confirm Shopify fulfillment orders are open and the order is eligible. If Send Shipping Confirmation is enabled, Shopify may notify the customer; shipping agent and tracking details can be sent too. Review the Shopify Activities cues and shipment error status after the run, then sync orders again to refresh fulfillment status in Business Central.",
+        "sv-SE": "Skickar kvalificerade bokförda leveranser från Business Central som fullgöranden för länkade Shopify-order. Filtrera fram rätt leveranser och kontrollera att de bokförda raderna fortfarande har länkar till Shopify-ordern och orderraderna; manuellt återskapade rader kanske inte tas med. Kontrollera att Shopifys fullgörandeorder är öppna och att ordern kan behandlas. Om Skicka leveransbekräftelse är aktiverat kan Shopify meddela kunden; speditörs- och spårningsuppgifter kan också skickas. Granska Shopify-aktiviteter och leveransfel efter körningen och synkronisera sedan order igen för att uppdatera fullgörandestatus i Business Central.",
+        "fr-FR": "Exporte les expéditions Business Central validées admissibles en tant que traitements des commandes Shopify associées. Filtrez les expéditions visées et vérifiez que les lignes validées conservent leurs liens vers la commande et ses lignes Shopify ; les lignes recréées manuellement peuvent être exclues. Vérifiez que les ordres de traitement Shopify sont ouverts et admissibles. Si la confirmation d’expédition est activée, Shopify peut avertir le client ; le transporteur et le suivi peuvent également être transmis. Après l’exécution, contrôlez les activités Shopify et les erreurs, puis resynchronisez les commandes pour actualiser leur état dans Business Central.",
+        "de-DE": "Exportiert geeignete gebuchte Business Central-Lieferungen als Fulfillments für verknüpfte Shopify-Bestellungen. Filtern Sie die gewünschten Lieferungen und prüfen Sie, ob die gebuchten Zeilen noch ihre Shopify-Bestell- und Bestellzeilenverknüpfungen enthalten; manuell neu erstellte Zeilen können ausgeschlossen sein. Prüfen Sie, ob Shopify-Fulfillmentaufträge offen und geeignet sind. Bei aktivierter Versandbestätigung kann Shopify den Kunden benachrichtigen; Versanddienstleister und Sendungsverfolgung können ebenfalls übertragen werden. Prüfen Sie danach Shopify-Aktivitäten und Lieferfehler und synchronisieren Sie die Bestellungen erneut, um den Status in Business Central zu aktualisieren.",
+        "es-ES": "Exporta los envíos registrados de Business Central que cumplan los requisitos como cumplimientos de los pedidos de Shopify vinculados. Filtre los envíos previstos y compruebe que las líneas registradas conservan los vínculos con el pedido y sus líneas de Shopify; las líneas recreadas manualmente pueden quedar excluidas. Confirme que las órdenes de cumplimiento de Shopify estén abiertas y sean aptas. Si está habilitada la confirmación de envío, Shopify puede avisar al cliente; también se puede enviar el transportista y el seguimiento. Después revise las actividades y errores de envío de Shopify y vuelva a sincronizar los pedidos para actualizar el estado en Business Central.",
+        "da-DK": "Eksporterer kvalificerede bogførte Business Central-forsendelser som fulfillment for tilknyttede Shopify-ordrer. Filtrér de ønskede forsendelser, og kontrollér, at de bogførte linjer stadig har deres Shopify-ordre- og ordrelinjelinks; manuelt genskabte linjer er muligvis ikke kvalificerede. Kontrollér, at Shopifys fulfillmentordrer er åbne og kvalificerede. Hvis Send forsendelsesbekræftelse er aktiveret, kan Shopify give kunden besked; fragtfirma og sporingsoplysninger kan også sendes. Gennemgå Shopify-aktiviteter og forsendelsesfejl bagefter, og synkroniser derefter ordrer igen for at opdatere fulfillmentstatus i Business Central.",
+        "fi-FI": "Vie kelvolliset kirjatut Business Central -lähetykset linkitettyjen Shopify-tilausten toimituksiksi. Suodata halutut lähetykset ja varmista, että kirjatuilla riveillä on edelleen Shopify-tilauksen ja tilausrivien linkit; manuaalisesti luodut rivit eivät ehkä kelpaa. Tarkista, että Shopifyn toimitustilaukset ovat avoimia ja kelvollisia. Jos lähetysvahvistus on käytössä, Shopify voi ilmoittaa asiakkaalle; myös kuljetusliike ja seurantatiedot voidaan lähettää. Tarkista ajon jälkeen Shopify-aktiviteetit ja lähetysvirheet ja synkronoi tilaukset uudelleen, jotta toimitustila päivittyy Business Centraliin.",
+        "nb-NO": "Eksporterer kvalifiserte bokførte Business Central-forsendelser som oppfyllelser for koblede Shopify-ordrer. Filtrer ut de aktuelle forsendelsene, og kontroller at de bokførte linjene fortsatt har koblingene til Shopify-ordren og ordrelinjene; manuelt gjenskapte linjer er kanskje ikke kvalifiserte. Kontroller at Shopifys oppfyllelsesordrer er åpne og kvalifiserte. Hvis Send leveringsbekreftelse er aktivert, kan Shopify varsle kunden; transportør og sporingsinformasjon kan også sendes. Se gjennom Shopify-aktiviteter og forsendelsesfeil etter kjøringen, og synkroniser deretter ordrene på nytt for å oppdatere oppfyllelsesstatusen i Business Central."
+      }
+    },
+    {
+      "ruleId": "Shopify.SyncProductsFromShopify",
+      "taskType": "SyncProductsFromShopify",
+      "semanticAction": "SyncProducts",
+      "entity": "ShopifyProduct",
+      "priority": 1310,
+      "confidence": 0.96,
+      "match": {
+        "pagePatterns": [
+          "^Shopify Shop Card$",
+          "^Shopify-butikskort$",
+          "^Shopify Products$",
+          "^Shopify-produkter$"
+        ],
+        "actionPatterns": [
+          "^Sync Products$",
+          "^Synkronisera produkter$"
+        ],
+        "fieldPatterns": [],
+        "automationIdPatterns": []
+      },
+      "instructionTemplate": "",
+      "languages": [
+        "en-US",
+        "sv-SE",
+        "fr-FR",
+        "de-DE",
+        "es-ES",
+        "da-DK",
+        "fi-FI",
+        "nb-NO"
+      ],
+      "aliases": [],
+      "sourceIds": [
+        "shopify-product-sync-en-us",
+        "shopify-product-sync-fr-fr",
+        "shopify-product-sync-de-de",
+        "shopify-product-sync-es-es",
+        "shopify-product-sync-da-dk",
+        "shopify-product-sync-fi-fi",
+        "shopify-product-sync-nb-no",
+        "shopify-product-sync-sv-se"
+      ],
+      "localizedExplanations": {
+        "en-US": "Synchronizes product and variant records according to the selected shop's Sync Item direction. Before running, decide which system owns product data and verify SKU/barcode mapping, variant rules, item templates and Auto Create Unknown Items. From Shopify can create Business Central items and variants in bulk; To Shopify can update store products when Can Update Shopify Products is enabled. Inspect the resulting mappings and sync log, especially before enabling recurring synchronization or publishing products.",
+        "sv-SE": "Synkroniserar produkt- och variantposter enligt riktningen Synkronisera artikel på den valda butiken. Bestäm först vilket system som äger produktdata och kontrollera SKU-/streckkodsmappning, variantregler, artikelmallar och Skapa okända artiklar automatiskt. Från Shopify kan skapa artiklar och varianter i Business Central i bulk; Till Shopify kan uppdatera butikens produkter när Kan uppdatera Shopify-produkter är aktiverat. Granska mappningar och synkroniseringslogg, särskilt innan återkommande synkronisering eller publicering aktiveras.",
+        "fr-FR": "Synchronise les produits et variantes selon le sens Synchroniser l’article défini pour la boutique. Déterminez d’abord quel système fait autorité pour les données produit et vérifiez les associations SKU/code-barres, les règles de variantes, les modèles d’article et la création automatique des articles inconnus. Le sens Depuis Shopify peut créer des articles et variantes Business Central en masse ; le sens Vers Shopify peut mettre à jour les produits lorsque la mise à jour des produits Shopify est autorisée. Examinez les associations et le journal avant toute synchronisation récurrente ou publication.",
+        "de-DE": "Synchronisiert Produkt- und Variantendatensätze gemäß der Richtung Artikel synchronisieren des ausgewählten Shops. Legen Sie zuerst fest, welches System die Produktdaten verantwortet, und prüfen Sie SKU-/Barcodezuordnung, Variantenregeln, Artikelvorlagen und automatische Erstellung unbekannter Artikel. Von Shopify kann Business Central-Artikel und Varianten massenhaft erstellen; Nach Shopify kann Shop-Produkte aktualisieren, wenn Shopify-Produkte aktualisieren aktiviert ist. Prüfen Sie Zuordnungen und Synchronisierungsprotokoll besonders vor wiederkehrender Synchronisierung oder Veröffentlichung.",
+        "es-ES": "Sincroniza productos y variantes según la dirección Sincronizar artículo de la tienda seleccionada. Antes de ejecutarlo, decida qué sistema es propietario de los datos del producto y compruebe la asignación de SKU/código de barras, las reglas de variantes, las plantillas de artículos y la creación automática de artículos desconocidos. Desde Shopify puede crear artículos y variantes de Business Central en bloque; Hacia Shopify puede actualizar productos de la tienda si está habilitada la actualización de productos de Shopify. Revise las asignaciones y el registro, sobre todo antes de programar sincronizaciones o publicar productos.",
+        "da-DK": "Synkroniserer produkt- og variantposter efter den valgte butiks retning for Synkroniser vare. Afgør først, hvilket system der ejer produktdataene, og kontrollér SKU-/stregkodetilknytning, variantregler, vareskabeloner og automatisk oprettelse af ukendte varer. Fra Shopify kan oprette Business Central-varer og varianter samlet; Til Shopify kan opdatere produkter, når opdatering af Shopify-produkter er aktiveret. Gennemgå tilknytninger og synkroniseringslog, især før tilbagevendende synkronisering eller publicering.",
+        "fi-FI": "Synkronoi tuote- ja varianttitietueet valitun kaupan Nimikkeen synkronointisuunnan mukaan. Päätä ensin, kumpi järjestelmä omistaa tuotetiedot, ja tarkista SKU-/viivakoodimääritykset, varianttisäännöt, nimikemallit ja tuntemattomien nimikkeiden automaattinen luonti. Shopify-suunnasta voidaan luoda Business Centraliin nimikkeitä ja variantteja joukkona; Shopifyhin-suunta voi päivittää kaupan tuotteita, kun päivitys on sallittu. Tarkista yhdistämiset ja loki erityisesti ennen toistuvaa synkronointia tai julkaisua.",
+        "nb-NO": "Synkroniserer produkt- og variantposter i henhold til den valgte butikkens retning for Synkroniser vare. Bestem først hvilket system som eier produktdataene, og kontroller SKU-/strekkodetilordning, variantregler, varemaler og automatisk oppretting av ukjente varer. Fra Shopify kan opprette Business Central-varer og varianter i bulk; Til Shopify kan oppdatere butikkprodukter når oppdatering av Shopify-produkter er aktivert. Se gjennom tilordninger og synkroniseringsloggen, særlig før gjentatt synkronisering eller publisering."
+      }
+    }
+  ],
+  "sources": [
+    {
+      "sourceId": "shopify-order-sync-en-us",
+      "title": "Synchronize and fulfill sales orders — Business Central",
+      "sourceUri": "https://learn.microsoft.com/en-us/dynamics365/business-central/shopify/synchronize-orders",
+      "accessedDate": "2026-09-29",
+      "appliesTo": "Microsoft Shopify Connector for Business Central. English Microsoft Learn content; installed Shopify app version and non-English tenant captions remain unverified.",
+      "fields": [
+        "Sync Orders From Shopify imports and processes orders using shop settings and request filters. Auto Sync Orders runs a job-queue task when Shopify sends a notification. Order import settings control whether BC sales documents are created; inspect order status and connector logs to verify completion."
+      ],
+      "documentedCaptions": [
+        "Shopify Shop Card",
+        "Sync Orders From Shopify"
+      ]
+    },
+    {
+      "sourceId": "shopify-order-sync-sv-se",
+      "title": "Synkronisera och uppfylla försäljningsorder — Business Central",
+      "sourceUri": "https://learn.microsoft.com/sv-se/dynamics365/business-central/shopify/synchronize-orders",
+      "accessedDate": "2026-09-29",
+      "appliesTo": "Microsoft Shopify Connector for Business Central. Swedish Microsoft Learn article; installed Shopify app version and tenant captions remain unverified.",
+      "fields": [
+        "Orderimporten använder butikens inställningar och begäransfilter. Automatisk synkronisering kör ett jobbköjobb när Shopify skickar en avisering. Inställningarna styr om försäljningsdokument skapas; kontrollera orderstatus och logg för att bekräfta utfallet."
+      ],
+      "documentedCaptions": [
+        "Shopify-butikskort",
+        "Synkronisera beställningar från Shopify"
+      ]
+    },
+    {
+      "sourceId": "shopify-inventory-sync-en-us",
+      "title": "Synchronize inventory with Shopify — Business Central",
+      "sourceUri": "https://learn.microsoft.com/en-us/dynamics365/business-central/shopify/synchronize-inventory",
+      "accessedDate": "2026-09-29",
+      "appliesTo": "Microsoft Shopify Connector for Business Central. English Microsoft Learn content; installed Shopify app version and non-English tenant captions remain unverified.",
+      "fields": [
+        "The connector synchronizes calculated Business Central availability for mapped products and locations to Shopify. Shopify inventory tracking and location synchronization must be enabled. New locations require inventory levels for existing products and variants. The connector log and Shopify inventory details support troubleshooting."
+      ],
+      "documentedCaptions": [
+        "Shopify Shop Card",
+        "Shopify Products",
+        "Sync Inventory"
+      ]
+    },
+    {
+      "sourceId": "shopify-inventory-sync-sv-se",
+      "title": "Synkronisera lager med Shopify — Business Central",
+      "sourceUri": "https://learn.microsoft.com/sv-se/dynamics365/business-central/shopify/synchronize-inventory",
+      "accessedDate": "2026-09-29",
+      "appliesTo": "Microsoft Shopify Connector for Business Central. Swedish Microsoft Learn article; installed Shopify app version and tenant captions remain unverified.",
+      "fields": [
+        "Anslutningsprogrammet synkroniserar beräknad tillgänglighet för mappade produkter och platser till Shopify. Lagerspårning och synkronisering måste vara aktiverade. Nya platser kan kräva lagernivåer för befintliga produkter och varianter. Loggen hjälper till vid felsökning."
+      ],
+      "documentedCaptions": [
+        "Shopify-butikskort",
+        "Shopify-produkter",
+        "Synkronisera lager"
+      ]
+    },
+    {
+      "sourceId": "shopify-create-sales-docs-en-us",
+      "title": "Synchronize and fulfill sales orders — Business Central",
+      "sourceUri": "https://learn.microsoft.com/en-us/dynamics365/business-central/shopify/synchronize-orders",
+      "accessedDate": "2026-09-29",
+      "appliesTo": "Microsoft Shopify Connector for Business Central. English Learn article; verify app version and captions in the tenant.",
+      "fields": [
+        "Create Sales Documents creates a sales order for an order that needs fulfillment or an invoice for an already fulfilled order, subject to shop settings. Check customer, item and location mapping, totals, and tax settings. Unlink Processed Documents does not delete the already created sales document."
+      ],
+      "documentedCaptions": [
+        "Shopify Shops",
+        "Orders",
+        "Create Sales Documents",
+        "Unlink Processed Documents"
+      ]
+    },
+    {
+      "sourceId": "shopify-create-sales-docs-sv-se",
+      "title": "Synkronisera och fullgöra försäljningsorder — Business Central",
+      "sourceUri": "https://learn.microsoft.com/sv-se/dynamics365/business-central/shopify/synchronize-orders",
+      "accessedDate": "2026-09-29",
+      "appliesTo": "Microsoft Shopify Connector for Business Central. Swedish Learn article; verify app version and captions in the tenant.",
+      "fields": [
+        "Skapa försäljningsdokument skapar en försäljningsorder för en order som ska fullgöras eller en faktura för en redan fullgjord order, beroende på butiksinställningar. Kontrollera kund-, artikel- och lagerställekopplingar, belopp och moms. Koppla bort bearbetade dokument tar inte bort det redan skapade dokumentet."
+      ],
+      "documentedCaptions": [
+        "Shopify-butiker",
+        "Order",
+        "Skapa försäljningsdokument",
+        "Koppla bort bearbetade dokument"
+      ]
+    },
+    {
+      "sourceId": "shopify-shipment-sync-en-us",
+      "title": "Synchronize and fulfill sales orders — Business Central",
+      "sourceUri": "https://learn.microsoft.com/en-us/dynamics365/business-central/shopify/synchronize-orders",
+      "accessedDate": "2026-09-29",
+      "appliesTo": "Microsoft Shopify Connector for Business Central. English Learn article; verify app version and captions in the tenant.",
+      "fields": [
+        "Sync Shipments to Shopify exports eligible posted shipments for linked Shopify orders and can send a shipping confirmation and tracking details. Shopify fulfillment orders must be eligible; posted lines need their Shopify order-line references. Review shipment errors and resynchronize orders to refresh fulfillment status."
+      ],
+      "documentedCaptions": [
+        "Sync Shipments to Shopify",
+        "Sync Shipments",
+        "Send Shipping Confirmation"
+      ]
+    },
+    {
+      "sourceId": "shopify-shipment-sync-sv-se",
+      "title": "Synkronisera och fullgöra försäljningsorder — Business Central",
+      "sourceUri": "https://learn.microsoft.com/sv-se/dynamics365/business-central/shopify/synchronize-orders",
+      "accessedDate": "2026-09-29",
+      "appliesTo": "Microsoft Shopify Connector for Business Central. Swedish Learn article; verify app version and captions in the tenant.",
+      "fields": [
+        "Synkronisera leveranser till Shopify exporterar kvalificerade bokförda leveranser för länkade Shopify-order och kan skicka leveransbekräftelse och spårningsuppgifter. Shopifys fullgörandeorder måste vara kvalificerade och bokförda rader behöver sina Shopify-orderreferenser. Granska leveransfel och synkronisera order igen för att uppdatera fullgörandestatus."
+      ],
+      "documentedCaptions": [
+        "Synkronisera leveranser till Shopify",
+        "Synkronisera leveranser",
+        "Skicka leveransbekräftelse"
+      ]
+    },
+    {
+      "sourceId": "shopify-product-sync-en-us",
+      "title": "Synchronize items with Shopify — Business Central",
+      "sourceUri": "https://learn.microsoft.com/en-us/dynamics365/business-central/shopify/synchronize-items",
+      "accessedDate": "2026-09-29",
+      "appliesTo": "Microsoft Shopify Connector for Business Central. English Learn article updated 2026-08-26; verify app version and captions in the tenant.",
+      "fields": [
+        "Sync Products follows the shop's Sync Item direction. From Shopify imports product data and may create/update items and variants in bulk according to SKU mapping and Auto Create Unknown Items. To Shopify exports/updates products and needs Can Update Shopify Products for ongoing updates. Establish the product system of record first."
+      ],
+      "documentedCaptions": [
+        "Shopify Shop Card",
+        "Shopify Products",
+        "Sync Products",
+        "Sync Item",
+        "Can Update Shopify Products"
+      ]
+    },
+    {
+      "sourceId": "shopify-product-sync-sv-se",
+      "title": "Synkronisera artiklar med Shopify — Business Central",
+      "sourceUri": "https://learn.microsoft.com/sv-se/dynamics365/business-central/shopify/synchronize-items",
+      "accessedDate": "2026-09-29",
+      "appliesTo": "Microsoft Shopify Connector for Business Central. Swedish Learn article updated 2026-08-26; verify app version and captions in the tenant.",
+      "fields": [
+        "Synkronisera produkter följer butikens riktning i Synkronisera artikel. Från Shopify importerar produktdata och kan skapa/uppdatera artiklar och varianter i bulk enligt SKU-mappning och Skapa okända artiklar automatiskt. Till Shopify exporterar/uppdaterar produkter; Kan uppdatera Shopify-produkter krävs för löpande uppdateringar. Bestäm först vilket system som är huvudkälla för produktdata."
+      ],
+      "documentedCaptions": [
+        "Shopify-butikskort",
+        "Shopify-produkter",
+        "Synkronisera produkter",
+        "Synkronisera artikel",
+        "Kan uppdatera Shopify-produkter"
+      ]
+    },
+    {
+      "sourceId": "shopify-order-sync-fr-fr",
+      "title": "Synchroniser et exécuter les commandes vente — Business Central",
+      "sourceUri": "https://learn.microsoft.com/fr-fr/dynamics365/business-central/shopify/synchronize-orders",
+      "accessedDate": "2026-09-29",
+      "appliesTo": "Microsoft Shopify Connector for Business Central. Localized Microsoft Learn source; installed extension version and tenant UI captions remain unverified.",
+      "fields": [
+        "Sync Orders From Shopify imports and processes orders using shop settings and request filters. Auto Sync Orders runs a job-queue task when Shopify sends a notification. Order import settings control whether BC sales documents are created; inspect order status and connector logs to verify completion."
+      ],
+      "documentedCaptions": [
+        "Shopify Shop Card",
+        "Sync Orders From Shopify"
+      ]
+    },
+    {
+      "sourceId": "shopify-order-sync-de-de",
+      "title": "Verkaufsaufträge synchronisieren und erfüllen — Business Central",
+      "sourceUri": "https://learn.microsoft.com/de-de/dynamics365/business-central/shopify/synchronize-orders",
+      "accessedDate": "2026-09-29",
+      "appliesTo": "Microsoft Shopify Connector for Business Central. Localized Microsoft Learn source; installed extension version and tenant UI captions remain unverified.",
+      "fields": [
+        "Sync Orders From Shopify imports and processes orders using shop settings and request filters. Auto Sync Orders runs a job-queue task when Shopify sends a notification. Order import settings control whether BC sales documents are created; inspect order status and connector logs to verify completion."
+      ],
+      "documentedCaptions": [
+        "Shopify Shop Card",
+        "Sync Orders From Shopify"
+      ]
+    },
+    {
+      "sourceId": "shopify-order-sync-es-es",
+      "title": "Sincronizar y cumplir con los pedidos de ventas — Business Central",
+      "sourceUri": "https://learn.microsoft.com/es-es/dynamics365/business-central/shopify/synchronize-orders",
+      "accessedDate": "2026-09-29",
+      "appliesTo": "Microsoft Shopify Connector for Business Central. Localized Microsoft Learn source; installed extension version and tenant UI captions remain unverified.",
+      "fields": [
+        "Sync Orders From Shopify imports and processes orders using shop settings and request filters. Auto Sync Orders runs a job-queue task when Shopify sends a notification. Order import settings control whether BC sales documents are created; inspect order status and connector logs to verify completion."
+      ],
+      "documentedCaptions": [
+        "Shopify Shop Card",
+        "Sync Orders From Shopify"
+      ]
+    },
+    {
+      "sourceId": "shopify-order-sync-da-dk",
+      "title": "Synkronisere og opfylde salgsordrer — Business Central",
+      "sourceUri": "https://learn.microsoft.com/da-dk/dynamics365/business-central/shopify/synchronize-orders",
+      "accessedDate": "2026-09-29",
+      "appliesTo": "Microsoft Shopify Connector for Business Central. Localized Microsoft Learn source; installed extension version and tenant UI captions remain unverified.",
+      "fields": [
+        "Sync Orders From Shopify imports and processes orders using shop settings and request filters. Auto Sync Orders runs a job-queue task when Shopify sends a notification. Order import settings control whether BC sales documents are created; inspect order status and connector logs to verify completion."
+      ],
+      "documentedCaptions": [
+        "Shopify Shop Card",
+        "Sync Orders From Shopify"
+      ]
+    },
+    {
+      "sourceId": "shopify-order-sync-fi-fi",
+      "title": "Myyntitilausten synkronoiminen ja täyttäminen — Business Central",
+      "sourceUri": "https://learn.microsoft.com/fi-fi/dynamics365/business-central/shopify/synchronize-orders",
+      "accessedDate": "2026-09-29",
+      "appliesTo": "Microsoft Shopify Connector for Business Central. Localized Microsoft Learn source; installed extension version and tenant UI captions remain unverified.",
+      "fields": [
+        "Sync Orders From Shopify imports and processes orders using shop settings and request filters. Auto Sync Orders runs a job-queue task when Shopify sends a notification. Order import settings control whether BC sales documents are created; inspect order status and connector logs to verify completion."
+      ],
+      "documentedCaptions": [
+        "Shopify Shop Card",
+        "Sync Orders From Shopify"
+      ]
+    },
+    {
+      "sourceId": "shopify-order-sync-nb-no",
+      "title": "Synkroniser og oppfyll salgsordrer — Business Central",
+      "sourceUri": "https://learn.microsoft.com/nb-no/dynamics365/business-central/shopify/synchronize-orders",
+      "accessedDate": "2026-09-29",
+      "appliesTo": "Microsoft Shopify Connector for Business Central. Localized Microsoft Learn source; installed extension version and tenant UI captions remain unverified.",
+      "fields": [
+        "Sync Orders From Shopify imports and processes orders using shop settings and request filters. Auto Sync Orders runs a job-queue task when Shopify sends a notification. Order import settings control whether BC sales documents are created; inspect order status and connector logs to verify completion."
+      ],
+      "documentedCaptions": [
+        "Shopify Shop Card",
+        "Sync Orders From Shopify"
+      ]
+    },
+    {
+      "sourceId": "shopify-create-sales-docs-fr-fr",
+      "title": "Synchroniser et exécuter les commandes vente — Business Central",
+      "sourceUri": "https://learn.microsoft.com/fr-fr/dynamics365/business-central/shopify/synchronize-orders",
+      "accessedDate": "2026-09-29",
+      "appliesTo": "Microsoft Shopify Connector for Business Central. Localized Microsoft Learn source; installed extension version and tenant UI captions remain unverified.",
+      "fields": [
+        "Create Sales Documents creates a sales order for an order that needs fulfillment or an invoice for an already fulfilled order, subject to shop settings. Check customer, item and location mapping, totals, and tax settings. Unlink Processed Documents does not delete the already created sales document."
+      ],
+      "documentedCaptions": [
+        "Shopify Shops",
+        "Orders",
+        "Create Sales Documents",
+        "Unlink Processed Documents"
+      ]
+    },
+    {
+      "sourceId": "shopify-create-sales-docs-de-de",
+      "title": "Verkaufsaufträge synchronisieren und erfüllen — Business Central",
+      "sourceUri": "https://learn.microsoft.com/de-de/dynamics365/business-central/shopify/synchronize-orders",
+      "accessedDate": "2026-09-29",
+      "appliesTo": "Microsoft Shopify Connector for Business Central. Localized Microsoft Learn source; installed extension version and tenant UI captions remain unverified.",
+      "fields": [
+        "Create Sales Documents creates a sales order for an order that needs fulfillment or an invoice for an already fulfilled order, subject to shop settings. Check customer, item and location mapping, totals, and tax settings. Unlink Processed Documents does not delete the already created sales document."
+      ],
+      "documentedCaptions": [
+        "Shopify Shops",
+        "Orders",
+        "Create Sales Documents",
+        "Unlink Processed Documents"
+      ]
+    },
+    {
+      "sourceId": "shopify-create-sales-docs-es-es",
+      "title": "Sincronizar y cumplir con los pedidos de ventas — Business Central",
+      "sourceUri": "https://learn.microsoft.com/es-es/dynamics365/business-central/shopify/synchronize-orders",
+      "accessedDate": "2026-09-29",
+      "appliesTo": "Microsoft Shopify Connector for Business Central. Localized Microsoft Learn source; installed extension version and tenant UI captions remain unverified.",
+      "fields": [
+        "Create Sales Documents creates a sales order for an order that needs fulfillment or an invoice for an already fulfilled order, subject to shop settings. Check customer, item and location mapping, totals, and tax settings. Unlink Processed Documents does not delete the already created sales document."
+      ],
+      "documentedCaptions": [
+        "Shopify Shops",
+        "Orders",
+        "Create Sales Documents",
+        "Unlink Processed Documents"
+      ]
+    },
+    {
+      "sourceId": "shopify-create-sales-docs-da-dk",
+      "title": "Synkronisere og opfylde salgsordrer — Business Central",
+      "sourceUri": "https://learn.microsoft.com/da-dk/dynamics365/business-central/shopify/synchronize-orders",
+      "accessedDate": "2026-09-29",
+      "appliesTo": "Microsoft Shopify Connector for Business Central. Localized Microsoft Learn source; installed extension version and tenant UI captions remain unverified.",
+      "fields": [
+        "Create Sales Documents creates a sales order for an order that needs fulfillment or an invoice for an already fulfilled order, subject to shop settings. Check customer, item and location mapping, totals, and tax settings. Unlink Processed Documents does not delete the already created sales document."
+      ],
+      "documentedCaptions": [
+        "Shopify Shops",
+        "Orders",
+        "Create Sales Documents",
+        "Unlink Processed Documents"
+      ]
+    },
+    {
+      "sourceId": "shopify-create-sales-docs-fi-fi",
+      "title": "Myyntitilausten synkronoiminen ja täyttäminen — Business Central",
+      "sourceUri": "https://learn.microsoft.com/fi-fi/dynamics365/business-central/shopify/synchronize-orders",
+      "accessedDate": "2026-09-29",
+      "appliesTo": "Microsoft Shopify Connector for Business Central. Localized Microsoft Learn source; installed extension version and tenant UI captions remain unverified.",
+      "fields": [
+        "Create Sales Documents creates a sales order for an order that needs fulfillment or an invoice for an already fulfilled order, subject to shop settings. Check customer, item and location mapping, totals, and tax settings. Unlink Processed Documents does not delete the already created sales document."
+      ],
+      "documentedCaptions": [
+        "Shopify Shops",
+        "Orders",
+        "Create Sales Documents",
+        "Unlink Processed Documents"
+      ]
+    },
+    {
+      "sourceId": "shopify-create-sales-docs-nb-no",
+      "title": "Synkroniser og oppfyll salgsordrer — Business Central",
+      "sourceUri": "https://learn.microsoft.com/nb-no/dynamics365/business-central/shopify/synchronize-orders",
+      "accessedDate": "2026-09-29",
+      "appliesTo": "Microsoft Shopify Connector for Business Central. Localized Microsoft Learn source; installed extension version and tenant UI captions remain unverified.",
+      "fields": [
+        "Create Sales Documents creates a sales order for an order that needs fulfillment or an invoice for an already fulfilled order, subject to shop settings. Check customer, item and location mapping, totals, and tax settings. Unlink Processed Documents does not delete the already created sales document."
+      ],
+      "documentedCaptions": [
+        "Shopify Shops",
+        "Orders",
+        "Create Sales Documents",
+        "Unlink Processed Documents"
+      ]
+    },
+    {
+      "sourceId": "shopify-shipment-sync-fr-fr",
+      "title": "Synchroniser et exécuter les commandes vente — Business Central",
+      "sourceUri": "https://learn.microsoft.com/fr-fr/dynamics365/business-central/shopify/synchronize-orders",
+      "accessedDate": "2026-09-29",
+      "appliesTo": "Microsoft Shopify Connector for Business Central. Localized Microsoft Learn source; installed extension version and tenant UI captions remain unverified.",
+      "fields": [
+        "Sync Shipments to Shopify exports eligible posted shipments for linked Shopify orders and can send a shipping confirmation and tracking details. Shopify fulfillment orders must be eligible; posted lines need their Shopify order-line references. Review shipment errors and resynchronize orders to refresh fulfillment status."
+      ],
+      "documentedCaptions": [
+        "Sync Shipments to Shopify",
+        "Sync Shipments",
+        "Send Shipping Confirmation"
+      ]
+    },
+    {
+      "sourceId": "shopify-shipment-sync-de-de",
+      "title": "Verkaufsaufträge synchronisieren und erfüllen — Business Central",
+      "sourceUri": "https://learn.microsoft.com/de-de/dynamics365/business-central/shopify/synchronize-orders",
+      "accessedDate": "2026-09-29",
+      "appliesTo": "Microsoft Shopify Connector for Business Central. Localized Microsoft Learn source; installed extension version and tenant UI captions remain unverified.",
+      "fields": [
+        "Sync Shipments to Shopify exports eligible posted shipments for linked Shopify orders and can send a shipping confirmation and tracking details. Shopify fulfillment orders must be eligible; posted lines need their Shopify order-line references. Review shipment errors and resynchronize orders to refresh fulfillment status."
+      ],
+      "documentedCaptions": [
+        "Sync Shipments to Shopify",
+        "Sync Shipments",
+        "Send Shipping Confirmation"
+      ]
+    },
+    {
+      "sourceId": "shopify-shipment-sync-es-es",
+      "title": "Sincronizar y cumplir con los pedidos de ventas — Business Central",
+      "sourceUri": "https://learn.microsoft.com/es-es/dynamics365/business-central/shopify/synchronize-orders",
+      "accessedDate": "2026-09-29",
+      "appliesTo": "Microsoft Shopify Connector for Business Central. Localized Microsoft Learn source; installed extension version and tenant UI captions remain unverified.",
+      "fields": [
+        "Sync Shipments to Shopify exports eligible posted shipments for linked Shopify orders and can send a shipping confirmation and tracking details. Shopify fulfillment orders must be eligible; posted lines need their Shopify order-line references. Review shipment errors and resynchronize orders to refresh fulfillment status."
+      ],
+      "documentedCaptions": [
+        "Sync Shipments to Shopify",
+        "Sync Shipments",
+        "Send Shipping Confirmation"
+      ]
+    },
+    {
+      "sourceId": "shopify-shipment-sync-da-dk",
+      "title": "Synkronisere og opfylde salgsordrer — Business Central",
+      "sourceUri": "https://learn.microsoft.com/da-dk/dynamics365/business-central/shopify/synchronize-orders",
+      "accessedDate": "2026-09-29",
+      "appliesTo": "Microsoft Shopify Connector for Business Central. Localized Microsoft Learn source; installed extension version and tenant UI captions remain unverified.",
+      "fields": [
+        "Sync Shipments to Shopify exports eligible posted shipments for linked Shopify orders and can send a shipping confirmation and tracking details. Shopify fulfillment orders must be eligible; posted lines need their Shopify order-line references. Review shipment errors and resynchronize orders to refresh fulfillment status."
+      ],
+      "documentedCaptions": [
+        "Sync Shipments to Shopify",
+        "Sync Shipments",
+        "Send Shipping Confirmation"
+      ]
+    },
+    {
+      "sourceId": "shopify-shipment-sync-fi-fi",
+      "title": "Myyntitilausten synkronoiminen ja täyttäminen — Business Central",
+      "sourceUri": "https://learn.microsoft.com/fi-fi/dynamics365/business-central/shopify/synchronize-orders",
+      "accessedDate": "2026-09-29",
+      "appliesTo": "Microsoft Shopify Connector for Business Central. Localized Microsoft Learn source; installed extension version and tenant UI captions remain unverified.",
+      "fields": [
+        "Sync Shipments to Shopify exports eligible posted shipments for linked Shopify orders and can send a shipping confirmation and tracking details. Shopify fulfillment orders must be eligible; posted lines need their Shopify order-line references. Review shipment errors and resynchronize orders to refresh fulfillment status."
+      ],
+      "documentedCaptions": [
+        "Sync Shipments to Shopify",
+        "Sync Shipments",
+        "Send Shipping Confirmation"
+      ]
+    },
+    {
+      "sourceId": "shopify-shipment-sync-nb-no",
+      "title": "Synkroniser og oppfyll salgsordrer — Business Central",
+      "sourceUri": "https://learn.microsoft.com/nb-no/dynamics365/business-central/shopify/synchronize-orders",
+      "accessedDate": "2026-09-29",
+      "appliesTo": "Microsoft Shopify Connector for Business Central. Localized Microsoft Learn source; installed extension version and tenant UI captions remain unverified.",
+      "fields": [
+        "Sync Shipments to Shopify exports eligible posted shipments for linked Shopify orders and can send a shipping confirmation and tracking details. Shopify fulfillment orders must be eligible; posted lines need their Shopify order-line references. Review shipment errors and resynchronize orders to refresh fulfillment status."
+      ],
+      "documentedCaptions": [
+        "Sync Shipments to Shopify",
+        "Sync Shipments",
+        "Send Shipping Confirmation"
+      ]
+    },
+    {
+      "sourceId": "shopify-inventory-sync-fr-fr",
+      "title": "Synchroniser les stocks avec Shopify — Business Central",
+      "sourceUri": "https://learn.microsoft.com/fr-fr/dynamics365/business-central/shopify/synchronize-inventory",
+      "accessedDate": "2026-09-29",
+      "appliesTo": "Microsoft Shopify Connector for Business Central. Localized Microsoft Learn source; installed extension version and tenant UI captions remain unverified.",
+      "fields": [
+        "The connector synchronizes calculated Business Central availability for mapped products and locations to Shopify. Shopify inventory tracking and location synchronization must be enabled. New locations require inventory levels for existing products and variants. The connector log and Shopify inventory details support troubleshooting."
+      ],
+      "documentedCaptions": [
+        "Shopify Shop Card",
+        "Shopify Products",
+        "Sync Inventory"
+      ]
+    },
+    {
+      "sourceId": "shopify-inventory-sync-de-de",
+      "title": "Bestand mit Shopify synchronisieren — Business Central",
+      "sourceUri": "https://learn.microsoft.com/de-de/dynamics365/business-central/shopify/synchronize-inventory",
+      "accessedDate": "2026-09-29",
+      "appliesTo": "Microsoft Shopify Connector for Business Central. Localized Microsoft Learn source; installed extension version and tenant UI captions remain unverified.",
+      "fields": [
+        "The connector synchronizes calculated Business Central availability for mapped products and locations to Shopify. Shopify inventory tracking and location synchronization must be enabled. New locations require inventory levels for existing products and variants. The connector log and Shopify inventory details support troubleshooting."
+      ],
+      "documentedCaptions": [
+        "Shopify Shop Card",
+        "Shopify Products",
+        "Sync Inventory"
+      ]
+    },
+    {
+      "sourceId": "shopify-inventory-sync-es-es",
+      "title": "Sincronizar inventario con Shopify — Business Central",
+      "sourceUri": "https://learn.microsoft.com/es-es/dynamics365/business-central/shopify/synchronize-inventory",
+      "accessedDate": "2026-09-29",
+      "appliesTo": "Microsoft Shopify Connector for Business Central. Localized Microsoft Learn source; installed extension version and tenant UI captions remain unverified.",
+      "fields": [
+        "The connector synchronizes calculated Business Central availability for mapped products and locations to Shopify. Shopify inventory tracking and location synchronization must be enabled. New locations require inventory levels for existing products and variants. The connector log and Shopify inventory details support troubleshooting."
+      ],
+      "documentedCaptions": [
+        "Shopify Shop Card",
+        "Shopify Products",
+        "Sync Inventory"
+      ]
+    },
+    {
+      "sourceId": "shopify-inventory-sync-da-dk",
+      "title": "Synkronisere lager med Shopify — Business Central",
+      "sourceUri": "https://learn.microsoft.com/da-dk/dynamics365/business-central/shopify/synchronize-inventory",
+      "accessedDate": "2026-09-29",
+      "appliesTo": "Microsoft Shopify Connector for Business Central. Localized Microsoft Learn source; installed extension version and tenant UI captions remain unverified.",
+      "fields": [
+        "The connector synchronizes calculated Business Central availability for mapped products and locations to Shopify. Shopify inventory tracking and location synchronization must be enabled. New locations require inventory levels for existing products and variants. The connector log and Shopify inventory details support troubleshooting."
+      ],
+      "documentedCaptions": [
+        "Shopify Shop Card",
+        "Shopify Products",
+        "Sync Inventory"
+      ]
+    },
+    {
+      "sourceId": "shopify-inventory-sync-fi-fi",
+      "title": "Synkronoi varasto Shopifyn kanssa — Business Central",
+      "sourceUri": "https://learn.microsoft.com/fi-fi/dynamics365/business-central/shopify/synchronize-inventory",
+      "accessedDate": "2026-09-29",
+      "appliesTo": "Microsoft Shopify Connector for Business Central. Localized Microsoft Learn source; installed extension version and tenant UI captions remain unverified.",
+      "fields": [
+        "The connector synchronizes calculated Business Central availability for mapped products and locations to Shopify. Shopify inventory tracking and location synchronization must be enabled. New locations require inventory levels for existing products and variants. The connector log and Shopify inventory details support troubleshooting."
+      ],
+      "documentedCaptions": [
+        "Shopify Shop Card",
+        "Shopify Products",
+        "Sync Inventory"
+      ]
+    },
+    {
+      "sourceId": "shopify-inventory-sync-nb-no",
+      "title": "Synkroniser lagerbeholdning med Shopify — Business Central",
+      "sourceUri": "https://learn.microsoft.com/nb-no/dynamics365/business-central/shopify/synchronize-inventory",
+      "accessedDate": "2026-09-29",
+      "appliesTo": "Microsoft Shopify Connector for Business Central. Localized Microsoft Learn source; installed extension version and tenant UI captions remain unverified.",
+      "fields": [
+        "The connector synchronizes calculated Business Central availability for mapped products and locations to Shopify. Shopify inventory tracking and location synchronization must be enabled. New locations require inventory levels for existing products and variants. The connector log and Shopify inventory details support troubleshooting."
+      ],
+      "documentedCaptions": [
+        "Shopify Shop Card",
+        "Shopify Products",
+        "Sync Inventory"
+      ]
+    },
+    {
+      "sourceId": "shopify-product-sync-fr-fr",
+      "title": "Synchronisation des articles avec Shopify — Business Central",
+      "sourceUri": "https://learn.microsoft.com/fr-fr/dynamics365/business-central/shopify/synchronize-items",
+      "accessedDate": "2026-09-29",
+      "appliesTo": "Microsoft Shopify Connector for Business Central. Localized Microsoft Learn source; installed extension version and tenant UI captions remain unverified.",
+      "fields": [
+        "Sync Products follows the shop's Sync Item direction. From Shopify imports product data and may create/update items and variants in bulk according to SKU mapping and Auto Create Unknown Items. To Shopify exports/updates products and needs Can Update Shopify Products for ongoing updates. Establish the product system of record first."
+      ],
+      "documentedCaptions": [
+        "Shopify Shop Card",
+        "Shopify Products",
+        "Sync Products",
+        "Sync Item",
+        "Can Update Shopify Products"
+      ]
+    },
+    {
+      "sourceId": "shopify-product-sync-de-de",
+      "title": "Artikel mit Shopify synchronisieren — Business Central",
+      "sourceUri": "https://learn.microsoft.com/de-de/dynamics365/business-central/shopify/synchronize-items",
+      "accessedDate": "2026-09-29",
+      "appliesTo": "Microsoft Shopify Connector for Business Central. Localized Microsoft Learn source; installed extension version and tenant UI captions remain unverified.",
+      "fields": [
+        "Sync Products follows the shop's Sync Item direction. From Shopify imports product data and may create/update items and variants in bulk according to SKU mapping and Auto Create Unknown Items. To Shopify exports/updates products and needs Can Update Shopify Products for ongoing updates. Establish the product system of record first."
+      ],
+      "documentedCaptions": [
+        "Shopify Shop Card",
+        "Shopify Products",
+        "Sync Products",
+        "Sync Item",
+        "Can Update Shopify Products"
+      ]
+    },
+    {
+      "sourceId": "shopify-product-sync-es-es",
+      "title": "Sincronizar todos los elementos con Shopify — Business Central",
+      "sourceUri": "https://learn.microsoft.com/es-es/dynamics365/business-central/shopify/synchronize-items",
+      "accessedDate": "2026-09-29",
+      "appliesTo": "Microsoft Shopify Connector for Business Central. Localized Microsoft Learn source; installed extension version and tenant UI captions remain unverified.",
+      "fields": [
+        "Sync Products follows the shop's Sync Item direction. From Shopify imports product data and may create/update items and variants in bulk according to SKU mapping and Auto Create Unknown Items. To Shopify exports/updates products and needs Can Update Shopify Products for ongoing updates. Establish the product system of record first."
+      ],
+      "documentedCaptions": [
+        "Shopify Shop Card",
+        "Shopify Products",
+        "Sync Products",
+        "Sync Item",
+        "Can Update Shopify Products"
+      ]
+    },
+    {
+      "sourceId": "shopify-product-sync-da-dk",
+      "title": "Synkronisere varer med Shopify — Business Central",
+      "sourceUri": "https://learn.microsoft.com/da-dk/dynamics365/business-central/shopify/synchronize-items",
+      "accessedDate": "2026-09-29",
+      "appliesTo": "Microsoft Shopify Connector for Business Central. Localized Microsoft Learn source; installed extension version and tenant UI captions remain unverified.",
+      "fields": [
+        "Sync Products follows the shop's Sync Item direction. From Shopify imports product data and may create/update items and variants in bulk according to SKU mapping and Auto Create Unknown Items. To Shopify exports/updates products and needs Can Update Shopify Products for ongoing updates. Establish the product system of record first."
+      ],
+      "documentedCaptions": [
+        "Shopify Shop Card",
+        "Shopify Products",
+        "Sync Products",
+        "Sync Item",
+        "Can Update Shopify Products"
+      ]
+    },
+    {
+      "sourceId": "shopify-product-sync-fi-fi",
+      "title": "Nimikkeiden synkronoiminen Shopifyn kanssa — Business Central",
+      "sourceUri": "https://learn.microsoft.com/fi-fi/dynamics365/business-central/shopify/synchronize-items",
+      "accessedDate": "2026-09-29",
+      "appliesTo": "Microsoft Shopify Connector for Business Central. Localized Microsoft Learn source; installed extension version and tenant UI captions remain unverified.",
+      "fields": [
+        "Sync Products follows the shop's Sync Item direction. From Shopify imports product data and may create/update items and variants in bulk according to SKU mapping and Auto Create Unknown Items. To Shopify exports/updates products and needs Can Update Shopify Products for ongoing updates. Establish the product system of record first."
+      ],
+      "documentedCaptions": [
+        "Shopify Shop Card",
+        "Shopify Products",
+        "Sync Products",
+        "Sync Item",
+        "Can Update Shopify Products"
+      ]
+    },
+    {
+      "sourceId": "shopify-product-sync-nb-no",
+      "title": "Synkroniser varer med Shopify — Business Central",
+      "sourceUri": "https://learn.microsoft.com/nb-no/dynamics365/business-central/shopify/synchronize-items",
+      "accessedDate": "2026-09-29",
+      "appliesTo": "Microsoft Shopify Connector for Business Central. Localized Microsoft Learn source; installed extension version and tenant UI captions remain unverified.",
+      "fields": [
+        "Sync Products follows the shop's Sync Item direction. From Shopify imports product data and may create/update items and variants in bulk according to SKU mapping and Auto Create Unknown Items. To Shopify exports/updates products and needs Can Update Shopify Products for ongoing updates. Establish the product system of record first."
+      ],
+      "documentedCaptions": [
+        "Shopify Shop Card",
+        "Shopify Products",
+        "Sync Products",
+        "Sync Item",
+        "Can Update Shopify Products"
+      ]
+    }
+  ]
+}

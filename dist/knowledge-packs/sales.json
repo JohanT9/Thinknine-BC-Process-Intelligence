@@ -1,7 +1,7 @@
 {
   "packId": "bc-sales",
   "name": "Business Central Sales",
-  "version": "2.7.0",
+  "version": "2.9.0",
   "priority": 200,
   "pageDefinitions": [
     {
@@ -249,6 +249,49 @@
   ],
   "rules": [
     {
+      "ruleId": "Sales.CreateSalesOrderFromList",
+      "taskType": "CreateNew",
+      "semanticAction": "CreateNew",
+      "entity": "SalesOrder",
+      "priority": 1500,
+      "confidence": 0.98,
+      "match": {
+        "pageObjectIds": ["9305"],
+        "pagePatterns": [
+          "^Sales Orders$",
+          "^Sales Order List$",
+          "^F\\u00f6rs\\.?\\s*order$",
+          "^F\\u00f6rs\\u00e4ljningsorder$"
+        ],
+        "actionPatterns": [
+          "^Ny$",
+          "^New$",
+          "^Skapa ny$",
+          "^Nouveau$",
+          "^Neu$",
+          "^Nuevo$",
+          "^Uusi$"
+        ],
+        "fieldPatterns": [],
+        "automationIdPatterns": []
+      },
+      "instructionTemplate": "",
+      "languages": [
+        "sv-SE", "en-US", "fr-FR", "de-DE", "es-ES", "da-DK", "fi-FI", "nb-NO"
+      ],
+      "aliases": [],
+      "sourceIds": [
+        "microsoft-learn-sales-order-process",
+        "microsoft-learn-sales-order-process-sv",
+        "microsoft-learn-sales-order-process-fr",
+        "microsoft-learn-sales-order-process-de",
+        "microsoft-learn-sales-order-process-es",
+        "microsoft-learn-sales-order-process-da",
+        "microsoft-learn-sales-order-process-fi",
+        "microsoft-learn-sales-order-process-nb"
+      ]
+    },
+    {
       "ruleId": "Sales.OpenSalesOrder",
       "taskType": "OpenSalesOrder",
       "semanticAction": "OpenRecord",
@@ -269,11 +312,14 @@
         "automationIdPatterns": []
       },
       "instructionTemplate": "Öppna den försäljningsorder som ska hanteras.",
-      "languages": [
-        "sv-SE",
-        "en-US"
-      ],
-      "aliases": []
+      "languages": ["sv-SE", "en-US", "fr-FR", "de-DE", "es-ES", "da-DK", "fi-FI", "nb-NO"],
+      "aliases": [],
+      "sourceIds": [
+        "microsoft-learn-sales-order-process", "microsoft-learn-sales-order-process-sv",
+        "microsoft-learn-sales-order-process-fr", "microsoft-learn-sales-order-process-de",
+        "microsoft-learn-sales-order-process-es", "microsoft-learn-sales-order-process-da",
+        "microsoft-learn-sales-order-process-fi", "microsoft-learn-sales-order-process-nb"
+      ]
     },
     {
       "ruleId": "Sales.Release",
@@ -1465,6 +1511,187 @@
         "microsoft-learn-sales-combine-shipments-fi",
         "microsoft-learn-sales-combine-shipments-nb"
       ]
+    },
+    {
+      "ruleId": "Sales.ViewSalesPriceDiscountDetails",
+      "taskType": "RunActionPath",
+      "semanticAction": "RunActionPath",
+      "entity": "SalesOrderLine",
+      "priority": 1320,
+      "confidence": 0.99,
+      "match": {
+        "pagePatterns": [
+          "^(?:Sales Orders?|Förs\\.?\\s*order|Försäljningsorder|Commandes? vente|Verkaufsaufträge?|Pedidos? de venta|Salgsordrer?|Myyntitilaukset?|Ordre)$"
+        ],
+        "actionPatterns": [
+          "^Tillämpat försäljningspris och rabatt$",
+          "^Applied Sales Price and Discount$",
+          "^Prix de vente et remise appliqués$",
+          "^Angewendeter Verkaufspreis und Rabatt$",
+          "^Precio de venta y descuento aplicados$",
+          "^Anvendt salgspris og rabat$",
+          "^Käytetty myyntihinta ja alennus$",
+          "^Anvendt salgspris og rabatt$"
+        ],
+        "fieldPatterns": [],
+        "automationIdPatterns": []
+      },
+      "instructionTemplate": "",
+      "languages": [
+        "sv-SE",
+        "en-US",
+        "fr-FR",
+        "de-DE",
+        "es-ES",
+        "da-DK",
+        "fi-FI",
+        "nb-NO"
+      ],
+      "aliases": [],
+      "sourceIds": [
+        "microsoft-learn-sales-prices-sv-se",
+        "microsoft-learn-sales-prices-en-us",
+        "microsoft-learn-sales-prices-fr-fr",
+        "microsoft-learn-sales-prices-de-de",
+        "microsoft-learn-sales-prices-es-es",
+        "microsoft-learn-sales-prices-da-dk",
+        "microsoft-learn-sales-prices-fi-fi",
+        "microsoft-learn-sales-prices-nb-no"
+      ]
+    },
+    {
+      "ruleId": "Sales.OpenManualPrice",
+      "taskType": "RunActionPath",
+      "semanticAction": "RunActionPath",
+      "entity": "SalesOrderLine",
+      "priority": 1321,
+      "confidence": 0.99,
+      "match": {
+        "pagePatterns": [
+          "^(?:Sales Orders?|Förs\\.?\\s*order|Försäljningsorder|Commandes? vente|Verkaufsaufträge?|Pedidos? de venta|Salgsordrer?|Myyntitilaukset?|Ordre)$"
+        ],
+        "actionPatterns": [
+          "^Manuellt pris(?:\\.\\.\\.|…)?$",
+          "^Manual Price(?:\\.\\.\\.|…)?$",
+          "^Prix manuel(?:\\.\\.\\.|…)?$",
+          "^Manueller Preis(?:\\.\\.\\.|…)?$",
+          "^Precio manual(?:\\.\\.\\.|…)?$",
+          "^Manuel pris(?:\\.\\.\\.|…)?$",
+          "^Manuaalinen hinta(?:\\.\\.\\.|…)?$",
+          "^Manuell pris(?:\\.\\.\\.|…)?$"
+        ],
+        "fieldPatterns": [],
+        "automationIdPatterns": []
+      },
+      "instructionTemplate": "",
+      "languages": [
+        "sv-SE",
+        "en-US",
+        "fr-FR",
+        "de-DE",
+        "es-ES",
+        "da-DK",
+        "fi-FI",
+        "nb-NO"
+      ],
+      "aliases": [],
+      "sourceIds": [
+        "microsoft-learn-sales-prices-sv-se",
+        "microsoft-learn-sales-prices-en-us",
+        "microsoft-learn-sales-prices-fr-fr",
+        "microsoft-learn-sales-prices-de-de",
+        "microsoft-learn-sales-prices-es-es",
+        "microsoft-learn-sales-prices-da-dk",
+        "microsoft-learn-sales-prices-fi-fi",
+        "microsoft-learn-sales-prices-nb-no"
+      ]
+    },
+    {
+      "ruleId": "Sales.ChangeAppliedUnitPrice",
+      "taskType": "RunAction",
+      "semanticAction": "RunAction",
+      "entity": "SalesOrderLine",
+      "priority": 1322,
+      "confidence": 0.99,
+      "match": {
+        "pagePatterns": [
+          "^(?:Sales Orders?|Förs\\.?\\s*order|Försäljningsorder|Commandes? vente|Verkaufsaufträge?|Pedidos? de venta|Salgsordrer?|Myyntitilaukset?|Ordre)$"
+        ],
+        "actionPatterns": [
+          "^Ändra tillämpat enhetspris$",
+          "^Change Applied Unit Price$",
+          "^Modifier le prix unitaire appliqué$",
+          "^Angewendeten Einzelpreis ändern$",
+          "^Cambiar precio unitario aplicado$",
+          "^Skift anvendt enhedspris$",
+          "^Muuta käytettyä yksikköhintaa$",
+          "^Endre anvendt enhetspris$"
+        ],
+        "fieldPatterns": [],
+        "automationIdPatterns": []
+      },
+      "instructionTemplate": "",
+      "languages": [
+        "sv-SE",
+        "en-US",
+        "fr-FR",
+        "de-DE",
+        "es-ES",
+        "da-DK",
+        "fi-FI",
+        "nb-NO"
+      ],
+      "aliases": [],
+      "sourceIds": [
+        "microsoft-learn-sales-prices-sv-se",
+        "microsoft-learn-sales-prices-en-us",
+        "microsoft-learn-sales-prices-fr-fr",
+        "microsoft-learn-sales-prices-de-de",
+        "microsoft-learn-sales-prices-es-es",
+        "microsoft-learn-sales-prices-da-dk",
+        "microsoft-learn-sales-prices-fi-fi",
+        "microsoft-learn-sales-prices-nb-no"
+      ]
+    },
+    {
+      "ruleId": "Sales.SetSalesLineUnitPrice",
+      "taskType": "EnterFieldValue",
+      "semanticAction": "SetSalesLineUnitPrice",
+      "entity": "SalesOrderLine",
+      "priority": 1323,
+      "confidence": 0.99,
+      "match": {
+        "pagePatterns": [
+          "^(?:Sales Orders?|Förs\\.?\\s*order|Försäljningsorder|Commandes? vente|Verkaufsaufträge?|Pedidos? de venta|Salgsordrer?|Myyntitilaukset?|Ordre)$"
+        ],
+        "actionPatterns": [],
+        "fieldPatterns": [
+          "^(?:Enhetspris|A-pris(?: exkl\\.? moms)?|Unit Price(?: Excl\\. VAT)?|Prix unitaire|Einzelpreis|Precio unitario|Enhedspris|Yksikköhinta)$"
+        ],
+        "automationIdPatterns": []
+      },
+      "instructionTemplate": "",
+      "languages": [
+        "sv-SE",
+        "en-US",
+        "fr-FR",
+        "de-DE",
+        "es-ES",
+        "da-DK",
+        "fi-FI",
+        "nb-NO"
+      ],
+      "aliases": [],
+      "sourceIds": [
+        "microsoft-learn-sales-prices-sv-se",
+        "microsoft-learn-sales-prices-en-us",
+        "microsoft-learn-sales-prices-fr-fr",
+        "microsoft-learn-sales-prices-de-de",
+        "microsoft-learn-sales-prices-es-es",
+        "microsoft-learn-sales-prices-da-dk",
+        "microsoft-learn-sales-prices-fi-fi",
+        "microsoft-learn-sales-prices-nb-no"
+      ]
     }
   ],
   "sources": [
@@ -2300,6 +2527,110 @@
         "Set an advance amount for the order or distribute it across lines; order changes can require an additional advance invoice",
         "A sales line with an invoiced prepayment requires a prepayment credit memo before deletion",
         "Review tax, posting groups, rounding, and final invoice application under local setup"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-sales-prices-sv-se",
+      "title": "Registrera speciella försäljningspriser och rabatter",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/sv-se/dynamics365/business-central/sales-how-record-sales-price-discount-payment-agreements",
+      "appliesTo": "Current Business Central sales pricing documentation (sv-SE)",
+      "accessedDate": "2026-09-28",
+      "fields": [
+        "Unit prices and line discounts on sales documents",
+        "Agreements may depend on customer, item, unit, quantity and validity dates",
+        "Business Central calculates applicable or best prices from configured agreements"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-sales-prices-en-us",
+      "title": "Record special sales prices and discounts",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/en-us/dynamics365/business-central/sales-how-record-sales-price-discount-payment-agreements",
+      "appliesTo": "Current Business Central sales pricing documentation (en-US)",
+      "accessedDate": "2026-09-28",
+      "fields": [
+        "Unit prices and line discounts on sales documents",
+        "Agreements may depend on customer, item, unit, quantity and validity dates",
+        "Business Central calculates applicable or best prices from configured agreements"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-sales-prices-fr-fr",
+      "title": "Enregistrer des prix et remises de vente spéciaux",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/fr-fr/dynamics365/business-central/sales-how-record-sales-price-discount-payment-agreements",
+      "appliesTo": "Current Business Central sales pricing documentation (fr-FR)",
+      "accessedDate": "2026-09-28",
+      "fields": [
+        "Unit prices and line discounts on sales documents",
+        "Agreements may depend on customer, item, unit, quantity and validity dates",
+        "Business Central calculates applicable or best prices from configured agreements"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-sales-prices-de-de",
+      "title": "Sonderverkaufspreise und Rabatte erfassen",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/de-de/dynamics365/business-central/sales-how-record-sales-price-discount-payment-agreements",
+      "appliesTo": "Current Business Central sales pricing documentation (de-DE)",
+      "accessedDate": "2026-09-28",
+      "fields": [
+        "Unit prices and line discounts on sales documents",
+        "Agreements may depend on customer, item, unit, quantity and validity dates",
+        "Business Central calculates applicable or best prices from configured agreements"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-sales-prices-es-es",
+      "title": "Registrar precios y descuentos de ventas especiales",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/es-es/dynamics365/business-central/sales-how-record-sales-price-discount-payment-agreements",
+      "appliesTo": "Current Business Central sales pricing documentation (es-ES)",
+      "accessedDate": "2026-09-28",
+      "fields": [
+        "Unit prices and line discounts on sales documents",
+        "Agreements may depend on customer, item, unit, quantity and validity dates",
+        "Business Central calculates applicable or best prices from configured agreements"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-sales-prices-da-dk",
+      "title": "Registrere specialsalgspriser og -rabatter",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/da-dk/dynamics365/business-central/sales-how-record-sales-price-discount-payment-agreements",
+      "appliesTo": "Current Business Central sales pricing documentation (da-DK)",
+      "accessedDate": "2026-09-28",
+      "fields": [
+        "Unit prices and line discounts on sales documents",
+        "Agreements may depend on customer, item, unit, quantity and validity dates",
+        "Business Central calculates applicable or best prices from configured agreements"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-sales-prices-fi-fi",
+      "title": "Erikoismyyntihintojen ja -alennusten kirjaaminen",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/fi-fi/dynamics365/business-central/sales-how-record-sales-price-discount-payment-agreements",
+      "appliesTo": "Current Business Central sales pricing documentation (fi-FI)",
+      "accessedDate": "2026-09-28",
+      "fields": [
+        "Unit prices and line discounts on sales documents",
+        "Agreements may depend on customer, item, unit, quantity and validity dates",
+        "Business Central calculates applicable or best prices from configured agreements"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-sales-prices-nb-no",
+      "title": "Registrer spesielle salgspriser og rabatter",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/nb-no/dynamics365/business-central/sales-how-record-sales-price-discount-payment-agreements",
+      "appliesTo": "Current Business Central sales pricing documentation (nb-NO)",
+      "accessedDate": "2026-09-28",
+      "fields": [
+        "Unit prices and line discounts on sales documents",
+        "Agreements may depend on customer, item, unit, quantity and validity dates",
+        "Business Central calculates applicable or best prices from configured agreements"
       ]
     }
   ]

@@ -320,15 +320,33 @@
 
       const explanationSources = Array.isArray(task.contextualExplanationSources)
         ? task.contextualExplanationSources : [];
-      const explanationSource = explanationSources.find(source =>
+      const explanationLanguage = metadata.documentLanguage;
+      const officialSources = explanationSources.filter(source =>
         /^https:\/\/learn\.microsoft\.com\//i.test(source?.sourceUri || ""));
-      const explanationLanguage = languages.normalize(
-        review.documentFields?.documentLanguage, "document");
-      const explanation = task.contextualExplanations?.[explanationLanguage] ||
-        task.contextualExplanations?.[explanationLanguage.split("-")[0]] ||
-        task.contextualExplanations?.["en-US"] || "";
+      const vendorSources = explanationSources.filter(source =>
+        /^https:\/\/erpdocs\.apteancloud\.com\//i.test(source?.sourceUri || ""));
+      const explanationSource = officialSources.find(source =>
+        source.sourceUri.toLowerCase().includes(`/${explanationLanguage.toLowerCase()}/`)) ||
+        officialSources[0];
+      const explanationOverrides = task.contextualExplanationOverrides || {};
+      const hasExplanationOverride = Object.prototype.hasOwnProperty.call(
+        explanationOverrides, explanationLanguage);
+      const explanation = hasExplanationOverride
+        ? String(explanationOverrides[explanationLanguage] || "")
+        : task.contextualExplanations?.[explanationLanguage] ||
+          task.contextualExplanations?.[explanationLanguage.split("-")[0]] ||
+          task.contextualExplanations?.["en-US"] || "";
+      const observedWorkflowExplanation = task.contextualExplanationBasis === "observed-workflow";
+      const authoredProcessExplanation = task.contextualExplanationBasis === "authored-process";
+      const pageContextExplanation = task.contextualExplanationBasis === "page-context";
+      const vendorDocumentationExplanation = task.contextualExplanationBasis === "vendor-documentation";
+      const vendorSource = vendorSources[0];
       if (task.includeKnowledgeExplanationInWord === true && explanation &&
-          task.contextualExplanationRuleId && explanationSource) {
+          task.contextualExplanationRuleId && (explanationSource || vendorSource || observedWorkflowExplanation || authoredProcessExplanation || pageContextExplanation)) {
+        const observedWorkflowLabels = { "sv-SE": "Förklaring utifrån observerat arbetsflöde", "en-US": "Explanation based on observed workflow", "fr-FR": "Explication fondée sur le flux observé", "de-DE": "Erläuterung zum beobachteten Ablauf", "es-ES": "Explicación basada en el flujo observado", "da-DK": "Forklaring ud fra observeret arbejdsgang", "fi-FI": "Havaittuun työnkulkuun perustuva selitys", "nb-NO": "Forklaring basert på observert arbeidsflyt" };
+        const authoredProcessLabels = { "sv-SE": "Förklaring av arbetsmomentet", "en-US": "Explanation of this process action", "fr-FR": "Explication de cette action", "de-DE": "Erläuterung zu diesem Arbeitsschritt", "es-ES": "Explicación de esta acción del proceso", "da-DK": "Forklaring af dette arbejdstrin", "fi-FI": "Selitys tästä työvaiheesta", "nb-NO": "Forklaring av dette prosesstrinnet" };
+        const pageContextLabels = { "sv-SE": "Förklaring utifrån sidkontext", "en-US": "Explanation from page context", "fr-FR": "Explication selon le contexte de la page", "de-DE": "Erläuterung aus dem Seitenkontext", "es-ES": "Explicación según el contexto de la página", "da-DK": "Forklaring ud fra sidekonteksten", "fi-FI": "Sivukontekstiin perustuva selitys", "nb-NO": "Forklaring ut fra sidekonteksten" };
+        const vendorDocumentationLabels = { "sv-SE": "Apteans produktdokumentation", "en-US": "Aptean product documentation", "fr-FR": "Documentation produit Aptean", "de-DE": "Aptean-Produktdokumentation", "es-ES": "Documentación del producto Aptean", "da-DK": "Apteans produktdokumentation", "fi-FI": "Apteanin tuotedokumentaatio", "nb-NO": "Apteans produktdokumentasjon" };
         const explanationLabels = { "sv-SE": "Förklaring från BC-kunskapsbanken",
           "en-US": "Business Central knowledge explanation",
           "fr-FR": "Explication des connaissances Business Central",
@@ -341,25 +359,45 @@
           blockId: `block:knowledge-explanation:${stepKey}`,
           kind: "callout",
           calloutType: "information",
-          label: explanationLabels[explanationLanguage] || explanationLabels["en-US"],
+          label: hasExplanationOverride
+            ? ({ "sv-SE": "Egen redigering", "en-US": "Your edited explanation",
+              "fr-FR": "Votre texte modifié", "de-DE": "Ihre bearbeitete Erläuterung",
+              "es-ES": "Explicación editada", "da-DK": "Din redigerede forklaring",
+              "fi-FI": "Muokattu selityksesi", "nb-NO": "Din redigerte forklaring" }[explanationLanguage] || "Your edited explanation")
+            : observedWorkflowExplanation
+            ? observedWorkflowLabels[explanationLanguage] || observedWorkflowLabels["en-US"]
+            : pageContextExplanation
+            ? pageContextLabels[explanationLanguage] || pageContextLabels["en-US"]
+            : authoredProcessExplanation
+            ? authoredProcessLabels[explanationLanguage] || authoredProcessLabels["en-US"]
+            : vendorDocumentationExplanation
+            ? vendorDocumentationLabels[explanationLanguage] || vendorDocumentationLabels["en-US"]
+            : explanationLabels[explanationLanguage] || explanationLabels["en-US"],
           sourceRef,
-          provenance: "knowledge",
-          preserveUserText: false,
+          provenance: hasExplanationOverride ? "user-edited" : "knowledge",
+          preserveUserText: hasExplanationOverride,
           blocks: [{
             blockId: `block:knowledge-explanation-text:${stepKey}`,
             kind: "paragraph",
             text: explanation,
             sourceRef,
-            provenance: "knowledge",
+            provenance: hasExplanationOverride ? "user-edited" : "knowledge",
             preserveUserText: true
-          }, {
+          }, ...(explanationSource ? [{
             blockId: `block:knowledge-explanation-source:${stepKey}`,
             kind: "paragraph",
             text: `Microsoft Learn: ${explanationSource.sourceUri}`,
             sourceRef,
             provenance: "knowledge",
             preserveUserText: true
-          }]
+          }] : vendorDocumentationExplanation && vendorSource ? [{
+            blockId: `block:knowledge-source:${stepKey}`,
+            kind: "paragraph",
+            text: `${vendorDocumentationLabels[explanationLanguage] || vendorDocumentationLabels["en-US"]}: ${vendorSource.sourceUri}`,
+            sourceRef,
+            provenance: "knowledge",
+            preserveUserText: true
+          }] : [])]
         });
       }
 

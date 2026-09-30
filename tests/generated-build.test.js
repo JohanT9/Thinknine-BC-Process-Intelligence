@@ -103,5 +103,9 @@ const localScripts = [...dashboardHtml.matchAll(/<script\s+src="([^"]+)"/g)]
 assert(localScripts.length > 0);
 localScripts.forEach(source => assert.ok(fs.existsSync(path.join(root, "dist", source)),
   `Built dashboard dependency is missing: ${source}`));
+assert(dashboardHtml.indexOf('engine/knowledge-explanation-catalog.js') >= 0 &&
+  dashboardHtml.indexOf('engine/knowledge-explanation-catalog.js') <
+    dashboardHtml.indexOf('engine/knowledge-domain.js'),
+"Knowledge explanation catalog must load before knowledge domain in the browser.");
 
 console.log("Generated build version integrity tests passed.");

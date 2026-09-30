@@ -97,6 +97,17 @@ const versionScoped = engine.validateKnowledgePacks([{ ...salesPack,
 assert.equal(versionScoped.diagnostics.some(item =>
   item.code === "conflicting-page-definitions"), false,
 "definitions with non-overlapping product-version ranges should not be flagged as conflicting");
+const partialSalesPage = engine.resolvePageIdentity({ pageObjectId: "42" },
+  [salesPack, { packId: "sales-partial", priority: 300, pageDefinitions: [{
+    ruleId: "Sales.Partial.Order", pageObjectId: "42", entity: "SalesOrder",
+    pageType: "document"
+  }] }]);
+assert.equal(partialSalesPage.entity, "SalesOrder",
+  "an incomplete duplicate definition does not erase a compatible standard page identity");
+assert.equal(partialSalesPage.source, "page-object-id");
+assert.equal((partialSalesPage.diagnostics || []).some(item =>
+  item.code === "ambiguous-page-identification"), false,
+"only conflicting declared facts should make an exact object ID ambiguous");
 const nonContiguousRanges = engine.validateKnowledgePacks([{ packId: "range-one", priority: 100,
   pageDefinitions: [{ ...baseDefinition, pageObjectId: "4242", ruleId: "Range.One",
     compatibility: { appVersionRanges: [

@@ -1,0 +1,2068 @@
+{
+  "packId": "bc-quality-management",
+  "name": "Microsoft Business Central Quality Management",
+  "version": "1.0.0",
+  "priority": 230,
+  "sourceLocaleGaps": {
+    "quality-manual-inspection-en-us": [
+      "fi-FI"
+    ],
+    "quality-manual-inspection-sv-se": [
+      "fi-FI"
+    ],
+    "quality-manual-inspection-fr-fr": [
+      "fi-FI"
+    ],
+    "quality-manual-inspection-de-de": [
+      "fi-FI"
+    ],
+    "quality-manual-inspection-es-es": [
+      "fi-FI"
+    ],
+    "quality-manual-inspection-da-dk": [
+      "fi-FI"
+    ],
+    "quality-manual-inspection-nb-no": [
+      "fi-FI"
+    ],
+    "quality-noncompliant-en-us": [
+      "fi-FI"
+    ],
+    "quality-noncompliant-sv-se": [
+      "fi-FI"
+    ],
+    "quality-noncompliant-fr-fr": [
+      "fi-FI"
+    ],
+    "quality-noncompliant-de-de": [
+      "fi-FI"
+    ],
+    "quality-noncompliant-es-es": [
+      "fi-FI"
+    ],
+    "quality-noncompliant-da-dk": [
+      "fi-FI"
+    ],
+    "quality-noncompliant-nb-no": [
+      "fi-FI"
+    ],
+    "quality-lot-blocking-en-us": [
+      "fi-FI",
+      "nb-NO"
+    ],
+    "quality-lot-blocking-sv-se": [
+      "fi-FI",
+      "nb-NO"
+    ],
+    "quality-lot-blocking-fr-fr": [
+      "fi-FI",
+      "nb-NO"
+    ],
+    "quality-lot-blocking-de-de": [
+      "fi-FI",
+      "nb-NO"
+    ],
+    "quality-lot-blocking-es-es": [
+      "fi-FI",
+      "nb-NO"
+    ],
+    "quality-lot-blocking-da-dk": [
+      "fi-FI",
+      "nb-NO"
+    ],
+    "quality-purchase-inspection-en-us": [
+      "fi-FI"
+    ],
+    "quality-purchase-inspection-sv-se": [
+      "fi-FI"
+    ],
+    "quality-purchase-inspection-fr-fr": [
+      "fi-FI"
+    ],
+    "quality-purchase-inspection-de-de": [
+      "fi-FI"
+    ],
+    "quality-purchase-inspection-es-es": [
+      "fi-FI"
+    ],
+    "quality-purchase-inspection-da-dk": [
+      "fi-FI"
+    ],
+    "quality-purchase-inspection-nb-no": [
+      "fi-FI"
+    ],
+    "quality-setup-en-us": [
+      "fi-FI",
+      "nb-NO"
+    ],
+    "quality-setup-sv-se": [
+      "fi-FI",
+      "nb-NO"
+    ],
+    "quality-setup-fr-fr": [
+      "fi-FI",
+      "nb-NO"
+    ],
+    "quality-setup-de-de": [
+      "fi-FI",
+      "nb-NO"
+    ],
+    "quality-setup-es-es": [
+      "fi-FI",
+      "nb-NO"
+    ],
+    "quality-setup-da-dk": [
+      "fi-FI",
+      "nb-NO"
+    ],
+    "quality-scheduled-inspections-en-us": [
+      "sv-SE",
+      "da-DK",
+      "fi-FI",
+      "nb-NO"
+    ],
+    "quality-scheduled-inspections-fr-fr": [
+      "sv-SE",
+      "da-DK",
+      "fi-FI",
+      "nb-NO"
+    ],
+    "quality-scheduled-inspections-de-de": [
+      "sv-SE",
+      "da-DK",
+      "fi-FI",
+      "nb-NO"
+    ],
+    "quality-scheduled-inspections-es-es": [
+      "sv-SE",
+      "da-DK",
+      "fi-FI",
+      "nb-NO"
+    ],
+    "microsoft-learn-expansion-qms-production-output-en-us": [
+      "fi-FI"
+    ],
+    "microsoft-learn-expansion-qms-production-output-sv-se": [
+      "fi-FI"
+    ],
+    "microsoft-learn-expansion-qms-production-output-fr-fr": [
+      "fi-FI"
+    ],
+    "microsoft-learn-expansion-qms-production-output-de-de": [
+      "fi-FI"
+    ],
+    "microsoft-learn-expansion-qms-production-output-es-es": [
+      "fi-FI"
+    ],
+    "microsoft-learn-expansion-qms-production-output-da-dk": [
+      "fi-FI"
+    ],
+    "microsoft-learn-expansion-qms-production-output-nb-no": [
+      "fi-FI"
+    ],
+    "quality-purchase-receipt-generation-en-us": [
+      "fi-FI"
+    ],
+    "quality-purchase-receipt-generation-sv-se": [
+      "fi-FI"
+    ],
+    "quality-purchase-receipt-generation-fr-fr": [
+      "fi-FI"
+    ],
+    "quality-purchase-receipt-generation-de-de": [
+      "fi-FI"
+    ],
+    "quality-purchase-receipt-generation-es-es": [
+      "fi-FI"
+    ],
+    "quality-purchase-receipt-generation-da-dk": [
+      "fi-FI"
+    ],
+    "quality-purchase-receipt-generation-nb-no": [
+      "fi-FI"
+    ],
+    "microsoft-learn-expansion-qms-show-inspections-en-us": [
+      "sv-SE",
+      "fr-FR",
+      "de-DE",
+      "es-ES",
+      "da-DK",
+      "fi-FI",
+      "nb-NO"
+    ],
+    "microsoft-learn-expansion-qms-show-inspections-sv-se": [
+      "fr-FR",
+      "de-DE",
+      "es-ES",
+      "da-DK",
+      "fi-FI",
+      "nb-NO"
+    ],
+    "microsoft-learn-expansion-qms-nonconforming-en-us": [
+      "sv-SE",
+      "fr-FR",
+      "de-DE",
+      "es-ES",
+      "da-DK",
+      "fi-FI",
+      "nb-NO"
+    ],
+    "microsoft-learn-expansion-qms-nonconforming-sv-se": [
+      "fr-FR",
+      "de-DE",
+      "es-ES",
+      "da-DK",
+      "fi-FI",
+      "nb-NO"
+    ]
+  },
+  "rules": [
+    {
+      "ruleId": "QualityManagement.CreateInspectionTemplate",
+      "taskType": "CreateInspectionTemplate",
+      "semanticAction": "CreateInspectionTemplate",
+      "entity": "MicrosoftQualityInspectionTemplate",
+      "priority": 1300,
+      "confidence": 0.96,
+      "match": {
+        "pagePatterns": [
+          "^Quality Inspection Templates$",
+          "^Kvalitetsgranskningsmallar$",
+          "^Modèles d’inspection de la qualité$",
+          "^Qualitätsüberprüfungsvorlagen$",
+          "^Plantillas de inspección de calidad$",
+          "^Kvalitetsinspektionsskabeloner$",
+          "^Laadun tarkastusmallit$",
+          "^Maler for kvalitetsinspeksjon$"
+        ],
+        "actionPatterns": [
+          "^New$",
+          "^Ny$",
+          "^Nouveau$",
+          "^Neu$",
+          "^Nuevo$",
+          "^Uusi$"
+        ],
+        "fieldPatterns": [],
+        "automationIdPatterns": []
+      },
+      "instructionTemplate": "",
+      "languages": [
+        "en-US",
+        "sv-SE",
+        "fr-FR",
+        "de-DE",
+        "es-ES",
+        "da-DK",
+        "fi-FI",
+        "nb-NO"
+      ],
+      "aliases": [],
+      "sourceIds": [
+        "microsoft-learn-quality-templates-en-us",
+        "microsoft-learn-quality-templates-sv-se",
+        "microsoft-learn-quality-templates-fr-fr",
+        "microsoft-learn-quality-templates-de-de",
+        "microsoft-learn-quality-templates-es-es",
+        "microsoft-learn-quality-templates-da-dk",
+        "microsoft-learn-quality-templates-fi-fi",
+        "microsoft-learn-quality-templates-nb-no"
+      ],
+      "localizedExplanations": {
+        "en-US": "Opens a new quality inspection template. Define the tests, sample size and any template-specific result conditions. The template provides instructions for subsequent inspections; creating it does not record an inspection result.",
+        "sv-SE": "Öppnar en ny mall för kvalitetskontroll. Ange tester, stickprovsstorlek och eventuella resultatvillkor som ska gälla för mallen. Mallen styr kommande kontroller; att skapa den registrerar inget kontrollresultat.",
+        "fr-FR": "Ouvre un nouveau modèle de contrôle qualité. Définissez les tests, la taille de l’échantillon et les conditions de résultat propres au modèle. Le modèle guide les contrôles ultérieurs ; sa création n’enregistre aucun résultat.",
+        "de-DE": "Öffnet eine neue Vorlage für Qualitätsprüfungen. Legen Sie Tests, Stichprobengröße und vorlagenspezifische Ergebnisbedingungen fest. Die Vorlage steuert spätere Prüfungen; ihre Erstellung erfasst kein Prüfergebnis.",
+        "es-ES": "Abre una nueva plantilla de inspección de calidad. Defina las pruebas, el tamaño de muestra y las condiciones de resultado específicas. La plantilla guía las inspecciones posteriores; crearla no registra resultados.",
+        "da-DK": "Åbner en ny skabelon til kvalitetskontrol. Angiv test, stikprøvestørrelse og eventuelle resultatbetingelser for skabelonen. Skabelonen styrer senere kontroller; oprettelsen registrerer intet kontrolresultat.",
+        "fi-FI": "Avaa uuden laaduntarkastusmallin. Määritä testit, otoskoko ja mallikohtaiset tulosehdot. Malli ohjaa myöhempiä tarkastuksia; sen luominen ei kirjaa tarkastustulosta.",
+        "nb-NO": "Åpner en ny mal for kvalitetskontroll. Angi tester, utvalgsstørrelse og eventuelle resultatvilkår for malen. Malen styrer senere kontroller; opprettelsen registrerer ikke et kontrollresultat."
+      }
+    },
+    {
+      "ruleId": "QualityManagement.CreateTestDefinition",
+      "taskType": "CreateTestDefinition",
+      "semanticAction": "CreateTestDefinition",
+      "entity": "MicrosoftQualityTest",
+      "priority": 1300,
+      "confidence": 0.96,
+      "match": {
+        "pagePatterns": [
+          "^Quality Tests$",
+          "^Kvalitetstester$",
+          "^Tests de qualité$",
+          "^Qualitätstests$",
+          "^Pruebas de calidad$",
+          "^Kvalitetstest$",
+          "^Laatutestit$"
+        ],
+        "actionPatterns": [
+          "^New$",
+          "^Ny$",
+          "^Nouveau$",
+          "^Neu$",
+          "^Nuevo$",
+          "^Uusi$"
+        ],
+        "fieldPatterns": [],
+        "automationIdPatterns": []
+      },
+      "instructionTemplate": "",
+      "languages": [
+        "en-US",
+        "sv-SE",
+        "fr-FR",
+        "de-DE",
+        "es-ES",
+        "da-DK",
+        "fi-FI",
+        "nb-NO"
+      ],
+      "aliases": [],
+      "sourceIds": [
+        "microsoft-learn-quality-templates-en-us",
+        "microsoft-learn-quality-templates-sv-se",
+        "microsoft-learn-quality-templates-fr-fr",
+        "microsoft-learn-quality-templates-de-de",
+        "microsoft-learn-quality-templates-es-es",
+        "microsoft-learn-quality-templates-da-dk",
+        "microsoft-learn-quality-templates-fi-fi",
+        "microsoft-learn-quality-templates-nb-no"
+      ],
+      "localizedExplanations": {
+        "en-US": "Opens a new quality test definition. Specify what is measured, the value type and allowed inputs. Configure result conditions separately: accepting an entered value is different from classifying the inspection result.",
+        "sv-SE": "Öppnar en ny definition av ett kvalitetstest. Ange vad som ska mätas, värdetyp och tillåtna inmatningsvärden. Resultatvillkor anges separat: ett tillåtet inmatningsvärde betyder inte automatiskt att kontrollen är godkänd.",
+        "fr-FR": "Ouvre une nouvelle définition de test qualité. Précisez la mesure, le type de valeur et les valeurs autorisées. Les conditions de résultat sont distinctes : une saisie autorisée ne signifie pas que le contrôle est réussi.",
+        "de-DE": "Öffnet eine neue Qualitätstestdefinition. Legen Sie Messgröße, Werttyp und zulässige Eingaben fest. Ergebnisbedingungen werden separat definiert: Eine zulässige Eingabe bedeutet nicht automatisch eine bestandene Prüfung.",
+        "es-ES": "Abre una nueva definición de prueba de calidad. Indique la medición, el tipo de valor y las entradas permitidas. Configure las condiciones de resultado por separado: una entrada permitida no implica una inspección aprobada.",
+        "da-DK": "Åbner en ny definition af en kvalitetstest. Angiv måling, værditype og tilladte input. Resultatbetingelser angives separat: en tilladt indtastning betyder ikke automatisk, at kontrollen er godkendt.",
+        "fi-FI": "Avaa uuden laatutestin määrityksen. Määritä mitattava asia, arvotyyppi ja sallitut syötteet. Tulosehdot määritetään erikseen: sallittu syöte ei automaattisesti tarkoita hyväksyttyä tarkastusta.",
+        "nb-NO": "Åpner en ny definisjon av en kvalitetstest. Angi måling, verditype og tillatte inndata. Resultatvilkår angis separat: en tillatt verdi betyr ikke automatisk at kontrollen er godkjent."
+      }
+    },
+    {
+      "ruleId": "QualityManagement.CopyInspectionTemplate",
+      "taskType": "CopyInspectionTemplate",
+      "semanticAction": "CopyInspectionTemplate",
+      "entity": "MicrosoftQualityInspectionTemplate",
+      "priority": 1300,
+      "confidence": 0.96,
+      "match": {
+        "pagePatterns": [
+          "^Quality Inspection Templates$",
+          "^Kvalitetsgranskningsmallar$",
+          "^Modèles d’inspection de la qualité$",
+          "^Qualitätsüberprüfungsvorlagen$",
+          "^Plantillas de inspección de calidad$",
+          "^Kvalitetsinspektionsskabeloner$",
+          "^Laadun tarkastusmallit$",
+          "^Maler for kvalitetsinspeksjon$"
+        ],
+        "actionPatterns": [
+          "^Copy Template$",
+          "^Kopiera mall$",
+          "^Copier le modèle$",
+          "^Vorlage kopieren$",
+          "^Copiar plantilla$",
+          "^Kopiér skabelon$",
+          "^Kopioi malli$",
+          "^Kopier mal$"
+        ],
+        "fieldPatterns": [],
+        "automationIdPatterns": []
+      },
+      "instructionTemplate": "",
+      "languages": [
+        "en-US",
+        "sv-SE",
+        "fr-FR",
+        "de-DE",
+        "es-ES",
+        "da-DK",
+        "fi-FI",
+        "nb-NO"
+      ],
+      "aliases": [],
+      "sourceIds": [
+        "microsoft-learn-quality-templates-en-us",
+        "microsoft-learn-quality-templates-sv-se",
+        "microsoft-learn-quality-templates-fr-fr",
+        "microsoft-learn-quality-templates-de-de",
+        "microsoft-learn-quality-templates-es-es",
+        "microsoft-learn-quality-templates-da-dk",
+        "microsoft-learn-quality-templates-fi-fi",
+        "microsoft-learn-quality-templates-nb-no"
+      ],
+      "localizedExplanations": {
+        "en-US": "Copy Template creates a second quality inspection template from the selected one. Before using the copy, give it the intended code and description, then review its quality tests, measurements or attributes, sample size, and pass/fail limits for the new inspection purpose. Confirm how and when inspections will be generated from it. This copies a template for future inspections; it does not copy existing inspection records or results.",
+        "sv-SE": "Kopiera mall skapar en separat kvalitetsinspektionsmall utifrån den valda mallen. Ge kopian avsedd kod och beskrivning och granska sedan kvalitetsprov, mätningar eller attribut, provstorlek och gränser för godkänt/underkänt utifrån det nya kontrollsyftet. Kontrollera också hur och när inspektioner ska skapas från mallen. Åtgärden kopierar en mall för framtida inspektioner; den kopierar inte befintliga inspektionsposter eller resultat.",
+        "fr-FR": "Copier le modèle crée un second modèle d’inspection qualité à partir du modèle sélectionné. Attribuez au nouveau modèle le code et la description prévus, puis vérifiez les tests, mesures ou attributs qualité, la taille de l’échantillon et les seuils de réussite ou d’échec selon le nouvel objectif. Confirmez également comment et quand les inspections seront générées à partir de ce modèle. Seul le modèle destiné aux inspections futures est copié, pas les inspections existantes ni leurs résultats.",
+        "de-DE": "Vorlage kopieren erstellt aus der ausgewählten Qualitätsprüfvorlage eine zweite Vorlage. Vergeben Sie den vorgesehenen Code und die passende Beschreibung. Prüfen Sie anschließend Qualitätsprüfungen, Messwerte oder Merkmale, Stichprobenumfang und Bestanden-/Nicht-bestanden-Grenzen für den neuen Prüfzweck. Klären Sie auch, wie und wann daraus Prüfungen erzeugt werden. Kopiert wird eine Vorlage für künftige Prüfungen, keine vorhandenen Prüfdatensätze oder Ergebnisse.",
+        "es-ES": "Copiar plantilla crea una segunda plantilla de inspección de calidad a partir de la seleccionada. Asigne a la copia el código y la descripción previstos; después revise las pruebas, mediciones o atributos de calidad, el tamaño de muestra y los límites de aprobado o suspenso para el nuevo propósito. Confirme también cómo y cuándo se generarán inspecciones a partir de ella. Se copia una plantilla para inspecciones futuras, no los registros ni resultados de inspecciones existentes.",
+        "da-DK": "Kopiér skabelon opretter en ekstra kvalitetskontrolskabelon ud fra den valgte. Giv kopien den tilsigtede kode og beskrivelse, og gennemgå derefter kvalitetstest, målinger eller attributter, stikprøvestørrelse og grænser for bestået/ikke bestået til det nye kontrolformål. Afklar også, hvordan og hvornår kontroller skal oprettes fra skabelonen. Handlingen kopierer en skabelon til fremtidige kontroller, ikke eksisterende kontrolposter eller resultater.",
+        "fi-FI": "Kopioi malli luo valitusta laaduntarkastusmallista erillisen mallin. Anna kopiolle aiottu koodi ja kuvaus ja tarkista sen jälkeen laatutestit, mittaukset tai määritteet, otoskoko sekä hyväksytyn ja hylätyn tuloksen rajat uuden tarkastustarkoituksen mukaan. Varmista myös, miten ja milloin tarkastuksia luodaan mallista. Toiminto kopioi tulevissa tarkastuksissa käytettävän mallin, ei olemassa olevia tarkastustietueita tai tuloksia.",
+        "nb-NO": "Kopier mal oppretter en egen kvalitetskontrollmal fra den valgte malen. Gi kopien riktig kode og beskrivelse, og gå deretter gjennom kvalitetstester, målinger eller attributter, utvalgsstørrelse og grensene for bestått/ikke bestått for det nye kontrollformålet. Avklar også hvordan og når inspeksjoner skal opprettes fra malen. Handlingen kopierer en mal for framtidige inspeksjoner, ikke eksisterende inspeksjonsposter eller resultater."
+      }
+    },
+    {
+      "ruleId": "QualityManagement.CreateManualInspectionFromTemplate",
+      "taskType": "CreateManualQualityInspection",
+      "semanticAction": "CreateManualQualityInspection",
+      "entity": "MicrosoftQualityInspection",
+      "priority": 1350,
+      "confidence": 0.96,
+      "match": {
+        "pagePatterns": [
+          "^Quality Inspection Templates$",
+          "^Kvalitetsgranskningsmallar$"
+        ],
+        "actionPatterns": [
+          "^Create Inspection$",
+          "^Skapa inspektion$"
+        ],
+        "fieldPatterns": [],
+        "automationIdPatterns": []
+      },
+      "instructionTemplate": "",
+      "languages": [
+        "en-US",
+        "sv-SE",
+        "fr-FR",
+        "de-DE",
+        "es-ES",
+        "da-DK",
+        "fi-FI",
+        "nb-NO"
+      ],
+      "aliases": [],
+      "sourceIds": [
+        "quality-manual-inspection-en-us",
+        "quality-manual-inspection-sv-se",
+        "quality-manual-inspection-fr-fr",
+        "quality-manual-inspection-de-de",
+        "quality-manual-inspection-es-es",
+        "quality-manual-inspection-da-dk",
+        "quality-manual-inspection-nb-no"
+      ],
+      "localizedExplanations": {
+        "en-US": "Creates a quality inspection from the selected template, independently of a purchase or production line. Enter a source reference and lot or serial number when relevant. This starts an inspection; it does not record a test result or mark the lot as passed.",
+        "sv-SE": "Skapar en kvalitetsinspektion från den valda mallen utan koppling till en inköps- eller produktionsrad. Ange källreferens och parti- eller serienummer vid behov. Åtgärden startar en inspektion; den registrerar inget testresultat och godkänner inte partiet.",
+        "fr-FR": "Crée une inspection qualité à partir du modèle sélectionné, sans dépendre d’une ligne d’achat ou de production. Renseignez la référence source et le lot ou numéro de série si nécessaire. Cela démarre une inspection, sans saisir de résultat ni approuver le lot.",
+        "de-DE": "Erstellt aus der ausgewählten Vorlage eine Qualitätsprüfung unabhängig von einer Einkaufs- oder Produktionszeile. Geben Sie bei Bedarf einen Quellenbezug sowie Chargen- oder Seriennummer an. Dadurch wird eine Prüfung gestartet, aber kein Ergebnis erfasst und die Charge nicht freigegeben.",
+        "es-ES": "Crea una inspección de calidad a partir de la plantilla seleccionada, sin depender de una línea de compra o producción. Indique la referencia de origen y el lote o número de serie cuando corresponda. Inicia una inspección; no registra resultados ni aprueba el lote.",
+        "da-DK": "Opretter en kvalitetsinspektion ud fra den valgte skabelon uden en købs- eller produktionslinje. Angiv kildehenvisning og lot- eller serienummer efter behov. Det starter en inspektion, men registrerer ikke et resultat og godkender ikke lotten.",
+        "fi-FI": "Luo laatutarkastuksen valitusta mallista ilman osto- tai tuotantoriviä. Anna tarvittaessa lähdeviite ja erä- tai sarjanumero. Toiminto aloittaa tarkastuksen, mutta ei kirjaa testitulosta eikä hyväksy erää.",
+        "nb-NO": "Oppretter en kvalitetsinspeksjon fra den valgte malen, uavhengig av en kjøps- eller produksjonslinje. Angi kildereferanse og parti- eller serienummer ved behov. Dette starter en inspeksjon, men registrerer ikke et resultat eller godkjenner partiet."
+      }
+    },
+    {
+      "ruleId": "QualityManagement.CreateInspectionFromSourceLine",
+      "taskType": "CreateManualQualityInspection",
+      "semanticAction": "CreateManualQualityInspection",
+      "entity": "MicrosoftQualityInspection",
+      "priority": 1365,
+      "confidence": 0.96,
+      "verifiedRuntimeLocales": [
+        "en-US",
+        "sv-SE"
+      ],
+      "match": {
+        "pagePatterns": [
+          "^Purchase Order$",
+          "^Production Order$",
+          "^Inköpsorder$",
+          "^Produktionsorder$"
+        ],
+        "actionPatterns": [
+          "^Create Inspection$",
+          "^Skapa inspektion från raden$"
+        ],
+        "fieldPatterns": [],
+        "automationIdPatterns": []
+      },
+      "instructionTemplate": "",
+      "languages": [
+        "en-US",
+        "sv-SE",
+        "fr-FR",
+        "de-DE",
+        "es-ES",
+        "da-DK",
+        "fi-FI",
+        "nb-NO"
+      ],
+      "aliases": [],
+      "sourceIds": [
+        "quality-manual-inspection-en-us",
+        "quality-manual-inspection-sv-se",
+        "quality-manual-inspection-fr-fr",
+        "quality-manual-inspection-de-de",
+        "quality-manual-inspection-es-es",
+        "quality-manual-inspection-da-dk",
+        "quality-manual-inspection-nb-no"
+      ],
+      "localizedExplanations": {
+        "en-US": "Creates a quality inspection linked to the selected purchase or production line. The source document and item context are carried into the inspection; select the applicable template and provide a lot or serial number if the item is not already tracked. This creates the inspection only: measurements and the final inspection decision are recorded separately.",
+        "sv-SE": "Skapar en kvalitetsinspektion kopplad till den markerade inköps- eller produktionsraden. Källdokumentets och artikelns uppgifter följer med till inspektionen. Välj aktuell mall och ange parti- eller serienummer om artikeln inte redan är spårad. Åtgärden skapar bara inspektionen; mätvärden och slutligt inspektionsbeslut registreras separat.",
+        "fr-FR": "Crée une inspection qualité liée à la ligne d’achat ou de production sélectionnée. Le document source et l’article sont repris dans l’inspection. Choisissez le modèle approprié et indiquez le lot ou le numéro de série si l’article n’est pas déjà suivi. La création de l’inspection ne saisit pas les mesures ni la décision finale.",
+        "de-DE": "Erstellt eine Qualitätsprüfung, die mit der ausgewählten Einkaufs- oder Produktionszeile verknüpft ist. Quelldokument und Artikelkontext werden übernommen. Wählen Sie die passende Vorlage und geben Sie bei Bedarf eine Chargen- oder Seriennummer an. Messwerte und abschließende Prüfentscheidung werden separat erfasst.",
+        "es-ES": "Crea una inspección de calidad vinculada a la línea de compra o producción seleccionada. El documento de origen y el artículo se transfieren a la inspección. Elija la plantilla adecuada e indique el lote o número de serie si es necesario. Las mediciones y la decisión final se registran por separado.",
+        "da-DK": "Opretter en kvalitetsinspektion, der er knyttet til den valgte købs- eller produktionslinje. Kildedokumentet og varen følger med til inspektionen. Vælg den relevante skabelon, og angiv lot- eller serienummer, hvis det er nødvendigt. Målinger og den endelige beslutning registreres separat.",
+        "fi-FI": "Luo laatutarkastuksen, joka liittyy valittuun osto- tai tuotantoriviin. Lähdeasiakirja ja nimiketiedot siirtyvät tarkastukseen. Valitse sopiva malli ja anna erä- tai sarjanumero tarvittaessa. Mittaukset ja lopullinen tarkastuspäätös kirjataan erikseen.",
+        "nb-NO": "Oppretter en kvalitetsinspeksjon knyttet til den valgte kjøps- eller produksjonslinjen. Kildedokumentet og varen følger med til inspeksjonen. Velg riktig mal og angi parti- eller serienummer ved behov. Målinger og den endelige inspeksjonsbeslutningen registreres separat."
+      }
+    },
+    {
+      "ruleId": "QualityManagement.ScheduleInspections",
+      "taskType": "ScheduleQualityInspections",
+      "semanticAction": "ScheduleQualityInspections",
+      "entity": "MicrosoftQualityInspectionGeneration",
+      "priority": 1350,
+      "confidence": 0.96,
+      "match": {
+        "pagePatterns": [
+          "^Quality Inspection - Schedule Inspection$",
+          "^Kvalitetsinspektion – Schemagranskning$"
+        ],
+        "actionPatterns": [
+          "^OK$"
+        ],
+        "fieldPatterns": [],
+        "automationIdPatterns": []
+      },
+      "instructionTemplate": "",
+      "languages": [
+        "en-US",
+        "sv-SE",
+        "fr-FR",
+        "de-DE",
+        "es-ES",
+        "da-DK",
+        "fi-FI",
+        "nb-NO"
+      ],
+      "aliases": [],
+      "sourceIds": [
+        "quality-manual-inspection-en-us",
+        "quality-manual-inspection-sv-se",
+        "quality-manual-inspection-fr-fr",
+        "quality-manual-inspection-de-de",
+        "quality-manual-inspection-es-es",
+        "quality-manual-inspection-da-dk",
+        "quality-manual-inspection-nb-no"
+      ],
+      "localizedExplanations": {
+        "en-US": "Runs the scheduling report across enabled inspection-generation rules and matching source records. Filter by template code or other criteria before continuing: without filters, one run can create many inspections. Check the resulting inspections and report scope; running the report does not complete inspections or record test results.",
+        "sv-SE": "Kör schemaläggningsrapporten mot aktiverade inspektionsgenereringsregler och matchande källposter. Filtrera på mallkod eller andra villkor innan du fortsätter: utan filter kan körningen skapa många inspektioner. Granska skapade inspektioner och rapportens urval; rapporten slutför inga inspektioner och registrerar inga testresultat.",
+        "fr-FR": "Exécute le rapport sur les règles de génération activées et les enregistrements source correspondants. Filtrez par code de modèle ou autre critère avant l’exécution : sans filtre, le rapport peut créer de nombreuses inspections. Vérifiez le périmètre et les inspections obtenues ; le rapport ne les termine pas et ne saisit aucun résultat.",
+        "de-DE": "Führt den Planungsbericht für aktivierte Prüfplanungregeln und passende Quelldatensätze aus. Filtern Sie vor dem Start nach Vorlagencode oder anderen Kriterien: Ohne Filter können zahlreiche Prüfungen entstehen. Prüfen Sie Umfang und erzeugte Prüfungen; der Bericht schließt sie nicht ab und erfasst keine Testergebnisse.",
+        "es-ES": "Ejecuta el informe para las reglas de generación habilitadas y los registros de origen coincidentes. Filtre por código de plantilla u otros criterios antes de continuar: sin filtros se pueden crear muchas inspecciones. Revise el alcance y las inspecciones creadas; el informe no las finaliza ni registra resultados.",
+        "da-DK": "Kører planlægningsrapporten for aktiverede genereringsregler og matchende kildedata. Filtrér efter skabelonkode eller andre kriterier før kørslen: uden filtre kan der oprettes mange inspektioner. Kontrollér omfang og oprettede inspektioner; rapporten afslutter dem ikke og registrerer ingen testresultater.",
+        "fi-FI": "Suorittaa ajoitusraportin käytössä oleville tarkastuksen luontisäännöille ja vastaaville lähdetietueille. Suodata mallikoodin tai muiden ehtojen mukaan ennen ajoa: ilman suodatusta voi syntyä paljon tarkastuksia. Tarkista rajaus ja luodut tarkastukset; raportti ei viimeistele tarkastuksia eikä kirjaa testituloksia.",
+        "nb-NO": "Kjører planleggingsrapporten for aktiverte genereringsregler og samsvarende kildedata. Filtrer på malkode eller andre vilkår før kjøringen: uten filtre kan det opprettes mange inspeksjoner. Kontroller omfanget og de opprettede inspeksjonene; rapporten fullfører dem ikke og registrerer ingen testresultater."
+      }
+    },
+    {
+      "ruleId": "QualityManagement.CreatePurchaseReturnFromFailedInspection",
+      "taskType": "CreatePurchaseReturnFromQualityInspection",
+      "semanticAction": "CreatePurchaseReturnFromQualityInspection",
+      "entity": "MicrosoftQualityInspection",
+      "priority": 1360,
+      "confidence": 0.95,
+      "match": {
+        "pagePatterns": [
+          "^Quality Inspection$",
+          "^Kvalitetsinspektion$"
+        ],
+        "actionPatterns": [
+          "^Create Purchase Return$",
+          "^Skapa inköpsretur$"
+        ],
+        "fieldPatterns": [],
+        "automationIdPatterns": []
+      },
+      "instructionTemplate": "",
+      "languages": [
+        "en-US",
+        "sv-SE",
+        "fr-FR",
+        "de-DE",
+        "es-ES",
+        "da-DK",
+        "fi-FI",
+        "nb-NO"
+      ],
+      "aliases": [],
+      "sourceIds": [
+        "quality-noncompliant-en-us",
+        "quality-noncompliant-sv-se",
+        "quality-noncompliant-fr-fr",
+        "quality-noncompliant-de-de",
+        "quality-noncompliant-es-es",
+        "quality-noncompliant-da-dk",
+        "quality-noncompliant-nb-no"
+      ],
+      "localizedExplanations": {
+        "en-US": "Starts a purchase return from the failed quality inspection for vendor-related defects. Check the failed lot or serial, location/bin filters, and whether to return the entire lot or only a failed quantity; add a return reason and vendor credit memo reference when applicable. The action creates return documents but does not prove they were posted or credited.",
+        "sv-SE": "Startar en inköpsretur från den underkända kvalitetsinspektionen vid leverantörsrelaterade fel. Kontrollera parti eller serienummer, plats- och lagerplatsfilter samt om hela partiet eller bara den underkända kvantiteten ska returneras. Ange returorsak och leverantörens kreditnotareferens vid behov. Åtgärden skapar returunderlag men bekräftar inte att det har bokförts eller krediterats.",
+        "fr-FR": "Démarre un retour achat depuis l’inspection qualité échouée pour un défaut fournisseur. Vérifiez le lot ou numéro de série, les filtres d’emplacement et de zone, ainsi que la quantité à retourner. Ajoutez un motif et une référence d’avoir fournisseur si nécessaire. L’action crée des documents de retour sans confirmer leur validation ni l’émission d’un avoir.",
+        "de-DE": "Startet bei Lieferantenmängeln eine Einkaufsrückgabe aus der fehlgeschlagenen Qualitätsprüfung. Prüfen Sie Charge oder Seriennummer, Lagerort- und Lagerplatzfilter sowie die Rückgabemenge. Ergänzen Sie bei Bedarf Rückgabegrund und Lieferantengutschrift-Referenz. Die Aktion erstellt Rückgabedokumente, bestätigt aber weder deren Buchung noch die Gutschrift.",
+        "es-ES": "Inicia una devolución de compra desde la inspección de calidad fallida por defectos del proveedor. Revise el lote o número de serie, los filtros de ubicación y almacén y la cantidad que se devolverá. Añada el motivo y la referencia del abono del proveedor si corresponde. La acción crea documentos de devolución, pero no confirma su registro ni el abono.",
+        "da-DK": "Starter en køb retur fra den fejlede kvalitetsinspektion ved leverandørrelaterede fejl. Kontrollér lot- eller serienummer, filtre for lokation og placering samt returantal. Tilføj returårsag og leverandørens kreditnotareference efter behov. Handlingen opretter returdokumenter, men bekræfter ikke bogføring eller kreditering.",
+        "fi-FI": "Käynnistää ostohyvityspalautuksen epäonnistuneesta laatutarkastuksesta toimittajavirheiden vuoksi. Tarkista erä tai sarjanumero, sijainnin ja varaston suodattimet sekä palautettava määrä. Lisää tarvittaessa palautuksen syy ja toimittajan hyvityslaskun viite. Toiminto luo palautusasiakirjat, mutta ei vahvista niiden kirjausta tai hyvitystä.",
+        "nb-NO": "Starter en kjøpsretur fra den mislykkede kvalitetsinspeksjonen ved leverandørfeil. Kontroller parti- eller serienummer, filtre for lokasjon og lagerplass samt returmengde. Legg til returårsak og leverandørens kreditnotareferanse ved behov. Handlingen oppretter returdokumenter, men bekrefter ikke bokføring eller kreditering."
+      }
+    },
+    {
+      "ruleId": "QualityManagement.BlockLotInWorkflow",
+      "taskType": "BlockQualityLotInWorkflow",
+      "semanticAction": "BlockQualityLotInWorkflow",
+      "entity": "QualityInspectionWorkflow",
+      "priority": 1370,
+      "confidence": 0.95,
+      "match": {
+        "pagePatterns": [
+          "^Workflows$",
+          "^Arbetsflöden$"
+        ],
+        "actionPatterns": [
+          "^Block Lot in the Inspection$",
+          "^Blockera partiet vid inspektionen$"
+        ],
+        "fieldPatterns": [],
+        "automationIdPatterns": []
+      },
+      "instructionTemplate": "",
+      "languages": [
+        "en-US",
+        "sv-SE",
+        "fr-FR",
+        "de-DE",
+        "es-ES",
+        "da-DK",
+        "fi-FI",
+        "nb-NO"
+      ],
+      "aliases": [],
+      "sourceIds": [
+        "quality-lot-blocking-en-us",
+        "quality-lot-blocking-sv-se",
+        "quality-lot-blocking-fr-fr",
+        "quality-lot-blocking-de-de",
+        "quality-lot-blocking-es-es",
+        "quality-lot-blocking-da-dk"
+      ],
+      "localizedExplanations": {
+        "en-US": "Adds the Quality Management workflow response that blocks the inspected lot, serial number or package. Pair it with the inspection-created event to hold material during testing, or with the inspection-finished event and FAIL condition to block only failed material. This fully blocks transactions for the tracked item (with documented warehouse-operation exceptions); it is broader than result-based document controls. Verify the condition and scope before activating the workflow.",
+        "sv-SE": "Lägger till Quality Management-svarsåtgärden som spärrar det inspekterade partiet, serienumret eller paketet. Koppla den till händelsen att en inspektion skapas för att hålla materialet spärrat under testning, eller till händelsen att inspektionen slutförs med villkoret FAIL för att spärra endast underkänt material. Det spärrar transaktioner för det spårade objektet (med dokumenterade undantag för lageroperationer) och är bredare än resultatbaserade dokumentkontroller. Kontrollera villkor och omfattning innan arbetsflödet aktiveras.",
+        "fr-FR": "Ajoute la réponse de workflow Quality Management qui bloque le lot, le numéro de série ou le colis inspecté. Associez-la à l’événement de création pour retenir le matériel pendant les tests, ou à l’événement de fin avec la condition FAIL pour bloquer uniquement le matériel non conforme. Le blocage est large et concerne les transactions de l’article suivi, avec des exceptions documentées pour les opérations d’entrepôt. Vérifiez la condition et la portée avant d’activer le workflow.",
+        "de-DE": "Fügt die Quality-Management-Workflowantwort hinzu, die die geprüfte Charge, Seriennummer oder das Paket sperrt. Verknüpfen Sie sie mit dem Ereignis bei Prüferstellung, um Material während der Prüfung zurückzuhalten, oder mit dem Ereignis bei Prüfabschluss und der Bedingung FAIL, um nur nicht bestandene Ware zu sperren. Die Sperre gilt breit für Transaktionen des verfolgten Artikels; dokumentierte Ausnahmen betreffen Lageroperationen. Prüfen Sie Bedingung und Umfang vor Aktivierung.",
+        "es-ES": "Añade la respuesta de flujo de trabajo de Quality Management que bloquea el lote, número de serie o paquete inspeccionado. Asóciela al evento de creación para retener el material durante las pruebas o al evento de finalización con la condición FAIL para bloquear solo el material no conforme. El bloqueo es amplio para las transacciones del artículo seguido, con excepciones documentadas para operaciones de almacén. Revise la condición y el alcance antes de activar el flujo.",
+        "da-DK": "Tilføjer Quality Management-workflowsvaret, der blokerer det inspicerede lot, serienummer eller pakke. Knyt det til hændelsen for oprettelse af inspektion for at holde materialet tilbage under testen, eller til hændelsen for afsluttet inspektion med betingelsen FAIL for kun at blokere ikke-bestået materiale. Blokeringen er bred for transaktioner med den sporede vare med dokumenterede undtagelser for lageroperationer. Kontrollér betingelse og omfang før aktivering.",
+        "fi-FI": "Lisää Quality Management -työnkulun vastauksen, joka estää tarkastetun erän, sarjanumeron tai pakkauksen käytön. Liitä se tarkastuksen luontitapahtumaan materiaalin pidättämiseksi testauksen ajaksi tai tarkastuksen valmistumistapahtumaan FAIL-ehdolla, jolloin estetään vain hylätty materiaali. Esto koskee laajasti jäljitettävän nimikkeen tapahtumia; varastotoiminnoissa on dokumentoituja poikkeuksia. Tarkista ehto ja laajuus ennen työnkulun aktivointia.",
+        "nb-NO": "Legger til Quality Management-arbeidsflytsvaret som blokkerer det inspiserte partiet, serienummeret eller pakken. Knytt det til hendelsen for opprettet inspeksjon for å holde materialet tilbake under testing, eller til hendelsen for fullført inspeksjon med FAIL-vilkåret for å blokkere bare materiale som ikke bestod. Blokkeringen gjelder bredt for transaksjoner på det sporede elementet, med dokumenterte unntak for lageroperasjoner. Kontroller vilkår og omfang før arbeidsflyten aktiveres."
+      }
+    },
+    {
+      "ruleId": "QualityManagement.UnblockLotOnPassInWorkflow",
+      "taskType": "UnblockQualityLotOnPass",
+      "semanticAction": "UnblockQualityLotOnPass",
+      "entity": "QualityInspectionWorkflow",
+      "priority": 1375,
+      "confidence": 0.95,
+      "match": {
+        "pagePatterns": [
+          "^Workflows$",
+          "^Arbetsflöden$"
+        ],
+        "actionPatterns": [
+          "^Unblock Lot in the Inspection$",
+          "^Avblockera partiet i inspektionen$"
+        ],
+        "fieldPatterns": [],
+        "automationIdPatterns": []
+      },
+      "instructionTemplate": "",
+      "languages": [
+        "en-US",
+        "sv-SE",
+        "fr-FR",
+        "de-DE",
+        "es-ES",
+        "da-DK",
+        "fi-FI",
+        "nb-NO"
+      ],
+      "aliases": [],
+      "sourceIds": [
+        "quality-lot-blocking-en-us",
+        "quality-lot-blocking-sv-se",
+        "quality-lot-blocking-fr-fr",
+        "quality-lot-blocking-de-de",
+        "quality-lot-blocking-es-es",
+        "quality-lot-blocking-da-dk"
+      ],
+      "localizedExplanations": {
+        "en-US": "Adds the Quality Management workflow response that removes a lot, serial or package block. Normally pair it with the inspection-finished event and a PASS result condition; first confirm that the inspection has actually been finished, because a PASS result can exist while status is still Open. Review workflow conditions and priorities so a passing result cannot unblock material that a newer open reinspection still controls.",
+        "sv-SE": "Lägger till Quality Management-svarsåtgärden som tar bort spärren för parti, serie eller paket. Koppla den normalt till händelsen att inspektionen slutförs och villkoret PASS. Kontrollera att inspektionen verkligen har status Slutförd, eftersom ett PASS-resultat kan finnas medan status fortfarande är Öppen. Granska arbetsflödesvillkor och prioriteringar så att ett godkänt resultat inte avblockerar material som fortfarande styrs av en nyare öppen återinspektion.",
+        "fr-FR": "Ajoute la réponse de workflow Quality Management qui retire le blocage du lot, du numéro de série ou du colis. Associez-la normalement à l’événement de fin d’inspection et à la condition PASS. Vérifiez que l’inspection est réellement terminée, car un résultat PASS peut exister alors que le statut reste Ouvert. Contrôlez les conditions et priorités afin qu’un résultat favorable ne débloque pas un article encore contrôlé par une réinspection ouverte plus récente.",
+        "de-DE": "Fügt die Quality-Management-Workflowantwort hinzu, die die Sperre für Charge, Seriennummer oder Paket aufhebt. Verknüpfen Sie sie üblicherweise mit dem Ereignis bei Prüfabschluss und der Bedingung PASS. Prüfen Sie, dass die Prüfung tatsächlich den Status Abgeschlossen hat, denn ein PASS-Ergebnis kann vorliegen, während der Status noch Offen ist. Kontrollieren Sie Bedingungen und Prioritäten, damit eine neuere offene Nachprüfung nicht übergangen wird.",
+        "es-ES": "Añade la respuesta de flujo de trabajo de Quality Management que quita el bloqueo del lote, número de serie o paquete. Normalmente se asocia al evento de finalización de la inspección y a la condición PASS. Confirme que la inspección está realmente finalizada, ya que puede existir un resultado PASS mientras el estado siga Abierto. Revise condiciones y prioridades para no desbloquear material controlado por una reinspección abierta más reciente.",
+        "da-DK": "Tilføjer Quality Management-workflowsvaret, der ophæver blokeringen af lot, serienummer eller pakke. Knyt det normalt til hændelsen for afsluttet inspektion og betingelsen PASS. Kontrollér, at inspektionen faktisk har status Afsluttet, da et PASS-resultat kan findes, mens status stadig er Åben. Gennemgå betingelser og prioriteter, så en nyere åben geninspektion fortsat kan styre varen.",
+        "fi-FI": "Lisää Quality Management -työnkulun vastauksen, joka poistaa erän, sarjanumeron tai pakkauksen eston. Liitä se tavallisesti tarkastuksen valmistumistapahtumaan ja PASS-ehtoon. Varmista, että tarkastuksen tila on todella Valmis, sillä PASS-tulos voi olla olemassa tilan ollessa yhä Avoin. Tarkista ehdot ja prioriteetit, jotta uudempi avoin uusintatarkastus ei jää huomiotta.",
+        "nb-NO": "Legger til Quality Management-arbeidsflytsvaret som fjerner blokkeringen av parti, serienummer eller pakke. Knytt det vanligvis til hendelsen for fullført inspeksjon og PASS-vilkåret. Kontroller at inspeksjonen faktisk har status Fullført, fordi et PASS-resultat kan finnes mens status fortsatt er Åpen. Se gjennom vilkår og prioriteter slik at en nyere åpen ny inspeksjon fortsatt kan styre varen."
+      }
+    },
+    {
+      "ruleId": "QualityManagement.FinishPurchaseReceiptInspection",
+      "taskType": "FinishQualityInspection",
+      "semanticAction": "FinishQualityInspection",
+      "entity": "MicrosoftQualityInspection",
+      "priority": 1380,
+      "confidence": 0.96,
+      "match": {
+        "pagePatterns": [
+          "^Quality Inspection$",
+          "^Kvalitetsinspektion$"
+        ],
+        "actionPatterns": [
+          "^Finish$",
+          "^Slutför$"
+        ],
+        "fieldPatterns": [],
+        "automationIdPatterns": []
+      },
+      "instructionTemplate": "",
+      "languages": [
+        "en-US",
+        "sv-SE",
+        "fr-FR",
+        "de-DE",
+        "es-ES",
+        "da-DK",
+        "fi-FI",
+        "nb-NO"
+      ],
+      "aliases": [],
+      "sourceIds": [
+        "quality-purchase-inspection-en-us",
+        "quality-purchase-inspection-sv-se",
+        "quality-setup-en-us",
+        "quality-setup-sv-se",
+        "quality-purchase-inspection-fr-fr",
+        "quality-purchase-inspection-de-de",
+        "quality-purchase-inspection-es-es",
+        "quality-purchase-inspection-da-dk",
+        "quality-purchase-inspection-nb-no",
+        "quality-setup-fr-fr",
+        "quality-setup-de-de",
+        "quality-setup-es-es",
+        "quality-setup-da-dk"
+      ],
+      "localizedExplanations": {
+        "en-US": "Finishes the selected quality inspection after the inspector enters the template measurements and reviews the calculated grade. Confirm the lot/source and result first: finishing changes inspection status and can trigger lot controls or disposition workflows, but it does not post the purchase receipt itself. Quality Inspector permission is intended for recording measurements and finishing inspections; quantity changes, reopening a finished inspection, and some other actions require Quality Admin & Supervisor.",
+        "sv-SE": "Slutför den valda kvalitetsinspektionen när inspektören har registrerat mallens mätvärden och granskat det beräknade resultatet. Kontrollera parti, källa och resultat först: slutförandet ändrar inspektionens status och kan utlösa partispärrar eller dispositionsarbetsflöden, men bokför inte själva inköpskvittot. Behörigheten Quality Inspector är avsedd för att registrera mätvärden och slutföra inspektioner; kvantitetsändringar, återöppning av en slutförd inspektion och vissa andra åtgärder kräver Quality Admin & Supervisor.",
+        "fr-FR": "Termine l’inspection sélectionnée après la saisie des mesures du modèle et la vérification du résultat calculé. Confirmez d’abord le lot, la source et le résultat : la fin modifie le statut de l’inspection et peut déclencher un blocage de lot ou un workflow de disposition, mais ne comptabilise pas la réception achat. Le rôle Quality Inspector permet la saisie des mesures et la fin des inspections ; la modification des quantités, la réouverture et certaines autres actions exigent Quality Admin & Supervisor.",
+        "de-DE": "Schließt die ausgewählte Qualitätsprüfung ab, nachdem die Messwerte der Vorlage erfasst und das berechnete Ergebnis geprüft wurden. Bestätigen Sie zuerst Charge, Quelle und Ergebnis: Der Abschluss ändert den Prüfstatus und kann Chargensperren oder Dispositionsworkflows auslösen, bucht aber nicht den Einkaufseingang. Die Berechtigung Quality Inspector ist für Messwerterfassung und Prüfabschluss vorgesehen; Mengenänderungen, Wiederöffnen abgeschlossener Prüfungen und bestimmte weitere Aktionen erfordern Quality Admin & Supervisor.",
+        "es-ES": "Finaliza la inspección seleccionada después de registrar las mediciones de la plantilla y revisar el resultado calculado. Confirme primero el lote, el origen y el resultado: finalizar cambia el estado de la inspección y puede activar bloqueos o flujos de disposición, pero no registra la recepción de compra. El permiso Quality Inspector permite registrar medidas y finalizar inspecciones; cambiar cantidades, reabrir una inspección finalizada y algunas acciones requieren Quality Admin & Supervisor.",
+        "da-DK": "Afslutter den valgte kvalitetsinspektion, når inspektøren har indtastet skabelonens målinger og gennemgået det beregnede resultat. Bekræft først lot, kilde og resultat: afslutning ændrer inspektionsstatus og kan udløse lotblokering eller dispositionsworkflows, men bogfører ikke købskvitteringen. Quality Inspector-tilladelsen er beregnet til målinger og afslutning; ændring af antal, genåbning af en afsluttet inspektion og visse andre handlinger kræver Quality Admin & Supervisor.",
+        "fi-FI": "Viimeistelee valitun laatutarkastuksen, kun tarkastaja on syöttänyt mallin mittaukset ja tarkistanut lasketun tuloksen. Vahvista ensin erä, lähde ja tulos: viimeistely muuttaa tarkastuksen tilaa ja voi käynnistää erän eston tai käsittelytyönkulun, mutta ei kirjaa ostovastaanottoa. Quality Inspector -käyttöoikeus on tarkoitettu mittausten kirjaamiseen ja tarkastusten viimeistelyyn; määrän muuttaminen, valmiin tarkastuksen avaaminen uudelleen ja eräät muut toiminnot vaativat Quality Admin & Supervisor -oikeuden.",
+        "nb-NO": "Fullfører den valgte kvalitetsinspeksjonen etter at inspektøren har registrert målingene fra malen og kontrollert den beregnede karakteren. Bekreft parti, kilde og resultat først: fullføring endrer inspeksjonsstatus og kan utløse partiblokkering eller disposisjonsarbeidsflyt, men bokfører ikke kjøpsmottaket. Quality Inspector-tillatelsen er ment for målinger og fullføring; mengdeendringer, gjenåpning av en fullført inspeksjon og enkelte andre handlinger krever Quality Admin & Supervisor."
+      }
+    },
+    {
+      "ruleId": "QualityManagement.ScheduleTimeBasedInspections",
+      "taskType": "ScheduleTimeBasedInspections",
+      "semanticAction": "ScheduleInspections",
+      "entity": "QualityInspectionGenerationRule",
+      "priority": 1310,
+      "confidence": 0.96,
+      "match": {
+        "pagePatterns": [
+          "^Inspection Generation Rules$",
+          "^Regler för inspektionsgenerering$"
+        ],
+        "actionPatterns": [
+          "^New$",
+          "^Ny$"
+        ],
+        "fieldPatterns": [
+          "^Schedule Group$",
+          "^Schemagrupp$"
+        ],
+        "automationIdPatterns": []
+      },
+      "instructionTemplate": "",
+      "languages": [
+        "en-US",
+        "sv-SE",
+        "fr-FR",
+        "de-DE",
+        "es-ES",
+        "da-DK",
+        "fi-FI",
+        "nb-NO"
+      ],
+      "aliases": [],
+      "sourceIds": [
+        "quality-scheduled-inspections-en-us",
+        "quality-scheduled-inspections-fr-fr",
+        "quality-scheduled-inspections-de-de",
+        "quality-scheduled-inspections-es-es"
+      ],
+      "localizedExplanations": {
+        "en-US": "Creates a generation rule for recurring, time-based quality inspections rather than inspections triggered by a receipt or production event. Assign the intended template, item filters and schedule group, then verify the created job queue entry, recurrence, earliest start and retry settings. This can generate inspections repeatedly across eligible stock, so constrain the rule carefully and check queue history and inspection counts after the first run.",
+        "sv-SE": "Skapar en genereringsregel för återkommande, tidsbaserade kvalitetsinspektioner i stället för kontroller som utlöses av en mottagning eller produktionshändelse. Ange avsedd mall, artikelurval och schemagrupp och kontrollera sedan det skapade jobbköinlägget, upprepning, tidigaste start och återförsöksinställningar. Regeln kan skapa inspektioner upprepade gånger för lager som uppfyller villkoren. Avgränsa den därför noga och kontrollera jobbköns historik och antal inspektioner efter första körningen.",
+        "fr-FR": "Crée une règle de génération pour les inspections qualité récurrentes déclenchées par le temps plutôt que par une réception ou une production. Attribuez le modèle, les filtres d’article et le groupe de planification voulus, puis vérifiez l’entrée de file d’attente créée, la récurrence, le démarrage et les tentatives. Cette règle peut générer des inspections répétées pour le stock admissible ; limitez-la soigneusement et vérifiez l’historique de la file et le nombre d’inspections après le premier lancement.",
+        "de-DE": "Erstellt eine Generierungsregel für wiederkehrende, zeitbasierte Qualitätsprüfungen statt für Prüfungen nach Wareneingang oder Produktion. Weisen Sie die gewünschte Vorlage, Artikelfilter und Zeitplangruppe zu und prüfen Sie anschließend den erstellten Jobwarteschlangeneintrag, Wiederholung, frühesten Start und Wiederholungsversuche. Die Regel kann wiederholt Prüfungen für passenden Bestand erzeugen. Begrenzen Sie sie sorgfältig und prüfen Sie nach dem ersten Lauf den Warteschlangenverlauf und die Anzahl der Prüfungen.",
+        "es-ES": "Crea una regla para inspecciones de calidad periódicas basadas en tiempo, en lugar de activadas por una recepción o un evento de producción. Asigne la plantilla, los filtros de producto y el grupo de programación previstos; después compruebe la entrada de cola de trabajos creada, la periodicidad, el inicio más temprano y los reintentos. La regla puede generar inspecciones repetidamente para existencias aptas, por lo que debe limitarla con cuidado y revisar el historial de la cola y el número de inspecciones tras la primera ejecución.",
+        "da-DK": "Opretter en genereringsregel for tilbagevendende, tidsbaserede kvalitetsinspektioner i stedet for inspektioner udløst af modtagelse eller produktion. Tildel den ønskede skabelon, varefiltre og planlægningsgruppe, og kontrollér derefter den oprettede jobkøpost, gentagelse, tidligste start og genforsøgsindstillinger. Reglen kan oprette inspektioner gentagne gange for kvalificeret lager, så afgræns den omhyggeligt, og kontrollér køhistorik og inspektionstal efter første kørsel.",
+        "fi-FI": "Luo generointisäännön toistuville, aikaan perustuville laaduntarkastuksille vastaanotto- tai tuotantotapahtuman käynnistämien tarkastusten sijaan. Määritä haluttu malli, nimikesuodattimet ja aikatauluryhmä ja tarkista sitten luotu työjonotietue, toistuvuus, aikaisin aloitus ja uudelleenyritysasetukset. Sääntö voi luoda tarkastuksia toistuvasti kelvolliselle varastolle, joten rajaa se huolellisesti ja tarkista jonohistoria ja tarkastusten määrä ensimmäisen suorituksen jälkeen.",
+        "nb-NO": "Oppretter en genereringsregel for gjentatte, tidsbaserte kvalitetsinspeksjoner i stedet for inspeksjoner utløst av mottak eller produksjon. Tildel ønsket mal, varefiltre og planleggingsgruppe, og kontroller deretter den opprettede jobboppføringen, gjentakelse, tidligste start og innstillinger for nye forsøk. Regelen kan generere inspeksjoner gjentatte ganger for kvalifisert lager, så avgrens den nøye og kontroller køhistorikk og antall inspeksjoner etter første kjøring."
+      }
+    },
+    {
+      "ruleId": "QualityManagement.CreateInspectionResult",
+      "taskType": "CreateQualityInspectionResult",
+      "semanticAction": "CreateQualityInspectionResult",
+      "entity": "QualityInspectionResult",
+      "priority": 1390,
+      "confidence": 0.95,
+      "match": {
+        "pagePatterns": [
+          "^Quality Inspection Results$"
+        ],
+        "actionPatterns": [
+          "^New$"
+        ],
+        "fieldPatterns": [],
+        "automationIdPatterns": []
+      },
+      "instructionTemplate": "",
+      "languages": [
+        "en-US",
+        "sv-SE",
+        "fr-FR",
+        "de-DE",
+        "es-ES",
+        "da-DK",
+        "fi-FI",
+        "nb-NO"
+      ],
+      "aliases": [],
+      "sourceIds": [
+        "quality-inspection-results-en-us",
+        "quality-inspection-results-sv-se",
+        "quality-inspection-results-fr-fr",
+        "quality-inspection-results-de-de",
+        "quality-inspection-results-es-es",
+        "quality-inspection-results-da-dk",
+        "quality-inspection-results-fi-fi",
+        "quality-inspection-results-nb-no"
+      ],
+      "localizedExplanations": {
+        "en-US": "Creates a result code that inspections can receive, such as In Progress, Fail or Pass. Set its category, evaluation sequence, visibility and whether it allows finishing; these settings affect evaluation and may trigger document-specific lot controls. A result code alone does not define which measurements pass: configure result conditions in the test or template, then verify the inspection and workflow behavior before relying on it.",
+        "sv-SE": "Skapar en resultatkod som inspektioner kan få, till exempel Pågår, Underkänd eller Godkänd. Ange kategori, utvärderingsordning, synlighet och om resultatet tillåter slutförande; inställningarna påverkar utvärderingen och kan utlösa partispärrar för dokumenttransaktioner. Resultatkoden avgör inte ensam vilka mätvärden som godkänns: konfigurera resultatvillkoren i testet eller mallen och verifiera inspektions- och arbetsflödesbeteendet innan du förlitar dig på det.",
+        "fr-FR": "Crée un code de résultat attribuable aux inspections, par exemple En cours, Échec ou Réussite. Définissez sa catégorie, son ordre d’évaluation, sa visibilité et s’il autorise la fin ; ces paramètres influencent l’évaluation et peuvent déclencher des blocages de lot propres aux documents. Le code seul ne définit pas quelles mesures réussissent : configurez les conditions dans le test ou le modèle, puis vérifiez le comportement de l’inspection et du workflow.",
+        "de-DE": "Erstellt einen Ergebniscode für Prüfungen, z. B. In Bearbeitung, Nicht bestanden oder Bestanden. Legen Sie Kategorie, Auswertungsreihenfolge, Sichtbarkeit und Abschlusszulassung fest; diese Einstellungen beeinflussen die Auswertung und können dokumentspezifische Chargensperren auslösen. Der Ergebniscode definiert allein nicht, welche Messwerte bestehen: Richten Sie Ergebnisbedingungen im Test oder in der Vorlage ein und prüfen Sie das Prüfungs- und Workflowverhalten.",
+        "es-ES": "Crea un código de resultado para las inspecciones, como En curso, Fallido o Aprobado. Configure la categoría, el orden de evaluación, la visibilidad y si permite finalizar; estos parámetros afectan a la evaluación y pueden activar bloqueos de lote por transacción. El código por sí solo no determina qué mediciones se aprueban: configure las condiciones en la prueba o plantilla y compruebe el comportamiento de la inspección y del flujo de trabajo.",
+        "da-DK": "Opretter en resultatkode til inspektioner, f.eks. I gang, Ikke bestået eller Bestået. Angiv kategori, evalueringsrækkefølge, synlighed og om resultatet tillader afslutning; indstillingerne påvirker evalueringen og kan udløse dokumentspecifik lotblokering. Resultatkoden alene afgør ikke, hvilke målinger der består: konfigurer resultatbetingelser i testen eller skabelonen, og kontrollér inspektions- og workflowadfærd.",
+        "fi-FI": "Luo tarkastukselle tuloskoodin, kuten Kesken, Hylätty tai Hyväksytty. Määritä luokka, arviointijärjestys, näkyvyys ja sallitaanko tuloksella tarkastuksen viimeistely; asetukset vaikuttavat arviointiin ja voivat käynnistää asiakirjakohtaisen eräeston. Tuloskoodi ei yksin määritä hyväksyttäviä mittauksia: määritä tulosehdot testissä tai mallissa ja varmista tarkastuksen sekä työnkulun toiminta.",
+        "nb-NO": "Oppretter en resultatkode som inspeksjoner kan få, for eksempel Pågår, Ikke bestått eller Bestått. Angi kategori, evalueringsrekkefølge, synlighet og om resultatet tillater fullføring; innstillingene påvirker evalueringen og kan utløse dokumentspesifikk partiblokkering. Resultatkoden alene definerer ikke hvilke målinger som består: konfigurer resultatvilkår i testen eller malen, og kontroller inspeksjons- og arbeidsflytatferden."
+      }
+    },
+    {
+      "ruleId": "QualityManagement.PostProductionOutputWithInspection",
+      "taskType": "PostProductionOutputWithQualityInspection",
+      "semanticAction": "PostProductionOutputWithQualityInspection",
+      "entity": "ProductionOutput",
+      "priority": 1360,
+      "confidence": 0.96,
+      "match": {
+        "pagePatterns": [
+          "^Output Journal$",
+          "^Production Journal$",
+          "^Utdatajournal$",
+          "^Produktionsjournal$"
+        ],
+        "actionPatterns": [
+          "^Post$",
+          "^Publicera$"
+        ],
+        "fieldPatterns": [],
+        "automationIdPatterns": []
+      },
+      "instructionTemplate": "",
+      "languages": [
+        "en-US",
+        "sv-SE",
+        "fr-FR",
+        "de-DE",
+        "es-ES",
+        "da-DK",
+        "fi-FI",
+        "nb-NO"
+      ],
+      "aliases": [],
+      "sourceIds": [
+        "microsoft-learn-expansion-qms-production-output-en-us",
+        "microsoft-learn-expansion-qms-production-output-sv-se",
+        "microsoft-learn-expansion-qms-production-output-fr-fr",
+        "microsoft-learn-expansion-qms-production-output-de-de",
+        "microsoft-learn-expansion-qms-production-output-es-es",
+        "microsoft-learn-expansion-qms-production-output-da-dk",
+        "microsoft-learn-expansion-qms-production-output-nb-no"
+      ],
+      "localizedExplanations": {
+        "en-US": "On an Output Journal or Production Journal, Post records the production output. A Quality Management inspection is created as a follow-up only when the extension is installed, the production inspection trigger and a matching generation rule are configured, and the item/output meets their filters. Lot tracking, a lot number, routing operation, location and output quantity can be relevant inputs. The inspection links back to the production order and operation; enter measurements and finish the inspection separately. Production quality capabilities require the Premium experience.",
+        "sv-SE": "På Utdatajournal eller Produktionsjournal bokför Publicera produktionsutflödet. En kvalitetsinspektion skapas som uppföljning endast om tillägget är installerat, utlösaren för produktionsinspektion och en matchande genereringsregel är konfigurerade och artikelns utdata uppfyller filtren. Partispårning, partinummer, routningsåtgärd, lagerställe och utkvantitet kan påverka om regeln matchar. Inspektionen länkar tillbaka till produktionsordern och åtgärden; ange mätvärden och slutför inspektionen separat. Produktionsfunktionerna för kvalitet kräver Premium-upplevelsen.",
+        "fr-FR": "Dans une feuille de sortie ou feuille de production, valider la sortie enregistre la production. Une inspection Quality Management n’est créée ensuite que si l’extension est installée, si le déclencheur d’inspection de production et une règle de génération correspondante sont configurés, et si l’article et la sortie respectent leurs filtres. Le suivi de lot, le numéro de lot, l’opération de gamme, l’emplacement et la quantité produite peuvent influer sur la correspondance. L’inspection renvoie à l’ordre de production et à l’opération ; saisissez les mesures et terminez l’inspection séparément. Les fonctions de qualité de production nécessitent l’expérience Premium.",
+        "de-DE": "In einem Output- oder Produktionsbuch.-Blatt erfasst Buchen den Produktionsoutput. Eine Quality-Management-Prüfung wird nur nachgelagert erstellt, wenn die Erweiterung installiert ist, der Produktionstrigger und eine passende Generierungsregel eingerichtet sind und Artikel sowie Output deren Filter erfüllen. Chargenverfolgung, Chargennummer, Arbeitsplanvorgang, Lagerort und Outputmenge können für die Übereinstimmung relevant sein. Die Prüfung verweist auf den Produktionsauftrag und Vorgang zurück; Messwerte erfassen und Prüfung abschließen sind separate Schritte. Produktionsqualitätsfunktionen erfordern die Premium-Umgebung.",
+        "es-ES": "En el diario de salida o diario de producción, Registrar contabiliza la salida de producción. La inspección de Quality Management solo se crea después si la extensión está instalada, el desencadenador de inspección de producción y una regla de generación coincidente están configurados, y el artículo y la salida cumplen sus filtros. El seguimiento de lotes, el número de lote, la operación de ruta, la ubicación y la cantidad de salida pueden afectar a la coincidencia. La inspección queda vinculada a la orden de producción y la operación; introduzca las mediciones y finalice la inspección por separado. Las funciones de calidad de producción requieren la experiencia Premium.",
+        "da-DK": "På en outputkladde eller produktionskladde registrerer Bogfør produktionsoutputtet. En Quality Management-inspektion oprettes kun bagefter, hvis udvidelsen er installeret, produktionstriggeren og en matchende genereringsregel er konfigureret, og varen og outputtet opfylder filtrene. Lotsporing, lotnummer, ruteoperation, lokation og outputmængde kan være relevante for matchningen. Inspektionen er knyttet til produktionsordren og operationen; registrering af målinger og færdiggørelse af inspektionen er separate trin. Produktionskvalitetsfunktioner kræver Premium-oplevelsen.",
+        "fi-FI": "Tulospäiväkirjan tai tuotantopäiväkirjan Kirjaa-toiminto kirjaa tuotannon tuloksen. Quality Management -tarkastus luodaan jatkotoimena vain, jos laajennus on asennettu, tuotannon tarkastuksen käynnistin ja vastaava luontisääntö on määritetty ja nimike sekä tulos täyttävät suodattimet. Eräseuranta, eränumero, reitityksen työvaihe, sijainti ja tulosmäärä voivat vaikuttaa vastaavuuteen. Tarkastus linkittyy tuotantotilaukseen ja työvaiheeseen; mittaukset kirjataan ja tarkastus viimeistellään erikseen. Tuotannon laatutoiminnot edellyttävät Premium-käyttökokemusta.",
+        "nb-NO": "På en outputkladde eller produksjonskladde registrerer Bokfør produksjonsresultatet. En Quality Management-inspeksjon opprettes som oppfølging bare hvis utvidelsen er installert, produksjonstriggeren og en samsvarende genereringsregel er konfigurert, og varen og produksjonsresultatet oppfyller filtrene. Sporing av partier, partinummer, rutingsoperasjon, lokasjon og produksjonsmengde kan påvirke om regelen samsvarer. Inspeksjonen kobles til produksjonsordren og operasjonen; registrering av målinger og fullføring av inspeksjonen er separate trinn. Kvalitetsfunksjoner for produksjon krever Premium-opplevelsen."
+      }
+    },
+    {
+      "ruleId": "QualityManagement.ShowPurchaseOrderInspections",
+      "taskType": "ShowQualityInspections",
+      "semanticAction": "ShowQualityInspections",
+      "entity": "MicrosoftQualityInspection",
+      "priority": 1370,
+      "confidence": 0.96,
+      "verifiedRuntimeLocales": [
+        "en-US",
+        "sv-SE"
+      ],
+      "match": {
+        "pagePatterns": [
+          "^Purchase Order$",
+          "^Inköpsorder$"
+        ],
+        "actionPatterns": [
+          "^Show Inspections for Item and Document$",
+          "^Visa inspektioner för objekt och dokument$"
+        ],
+        "fieldPatterns": [],
+        "automationIdPatterns": []
+      },
+      "instructionTemplate": "",
+      "languages": [
+        "en-US",
+        "sv-SE",
+        "fr-FR",
+        "de-DE",
+        "es-ES",
+        "da-DK",
+        "fi-FI",
+        "nb-NO"
+      ],
+      "aliases": [],
+      "sourceIds": [
+        "microsoft-learn-expansion-qms-show-inspections-en-us",
+        "microsoft-learn-expansion-qms-show-inspections-sv-se"
+      ],
+      "localizedExplanations": {
+        "en-US": "Opens the quality inspections linked to the selected purchase order item and source document. Check the item, lot and quantity to choose the right inspection, especially when a receipt created separate inspections for multiple lots. This action opens existing inspections; it does not post the receipt or finish an inspection. If none appears, check whether the Quality Management setup and generation rule created one, and whether inspections are configured to open automatically or in the background.",
+        "sv-SE": "Öppnar kvalitetsinspektionerna som är kopplade till den valda inköpsorderraden och källdokumentet. Kontrollera artikel, parti och kvantitet så att du väljer rätt inspektion, särskilt när ett kvitto har skapat separata inspektioner för flera partier. Åtgärden öppnar befintliga inspektioner; den bokför inte kvittot och slutför ingen inspektion. Om ingen inspektion visas bör du kontrollera att kvalitetskonfigurationen och genereringsregeln skapade en samt om inspektioner ska öppnas automatiskt eller skapas i bakgrunden.",
+        "fr-FR": "Ouvre les inspections qualité liées à la ligne d’achat sélectionnée et au document source. Vérifiez l’article, le lot et la quantité pour choisir la bonne inspection, surtout si une réception a créé une inspection distincte pour chaque lot. Cette action ouvre les inspections existantes ; elle ne comptabilise pas la réception et ne termine pas une inspection. Si aucune inspection n’apparaît, vérifiez la configuration Quality Management, la règle de génération et le mode d’affichage des inspections.",
+        "de-DE": "Öffnet die Qualitätsprüfungen, die mit der ausgewählten Einkaufszeile und dem Quelldokument verknüpft sind. Prüfen Sie Artikel, Charge und Menge, insbesondere wenn für mehrere Chargen getrennte Prüfungen erstellt wurden. Die Aktion öffnet vorhandene Prüfungen; sie bucht weder den Wareneingang noch schließt sie eine Prüfung ab. Wenn keine Prüfung angezeigt wird, prüfen Sie Quality-Management-Einrichtung, Generierungsregel und Anzeigeverhalten.",
+        "es-ES": "Abre las inspecciones de calidad vinculadas a la línea de compra seleccionada y al documento de origen. Compruebe el artículo, el lote y la cantidad para elegir la inspección correcta, especialmente si una recepción creó inspecciones separadas para varios lotes. Esta acción abre inspecciones existentes; no registra la recepción ni finaliza una inspección. Si no aparece ninguna, revise la configuración de Quality Management, la regla de generación y el comportamiento de visualización.",
+        "da-DK": "Åbner kvalitetsinspektioner, der er knyttet til den valgte købslinje og kildedokumentet. Kontrollér vare, lot og antal for at vælge den rigtige inspektion, især hvis en modtagelse oprettede separate inspektioner for flere lot. Handlingen åbner eksisterende inspektioner; den bogfører ikke modtagelsen eller afslutter en inspektion. Hvis ingen vises, skal du kontrollere Quality Management-opsætningen, genereringsreglen og visningsadfærden.",
+        "fi-FI": "Avaa valittuun ostoriviin ja lähdeasiakirjaan liittyvät laatutarkastukset. Tarkista nimike, erä ja määrä, jotta valitset oikean tarkastuksen, etenkin jos vastaanotto loi useita eräkohtaisia tarkastuksia. Toiminto avaa olemassa olevat tarkastukset; se ei kirjaa vastaanottoa eikä viimeistele tarkastusta. Jos tarkastusta ei näy, tarkista Quality Management -asetukset, luontisääntö ja näyttötapa.",
+        "nb-NO": "Åpner kvalitetsinspeksjonene som er knyttet til den valgte kjøpslinjen og kildedokumentet. Kontroller vare, parti og antall for å velge riktig inspeksjon, særlig når et mottak opprettet separate inspeksjoner for flere partier. Handlingen åpner eksisterende inspeksjoner; den bokfører ikke mottaket og fullfører ingen inspeksjon. Hvis ingen vises, kontroller Quality Management-oppsettet, genereringsregelen og visningsatferden."
+      }
+    },
+    {
+      "ruleId": "QualityManagement.MoveFailedInspectionInventory",
+      "taskType": "MoveFailedInspectionInventory",
+      "semanticAction": "MoveFailedInspectionInventory",
+      "entity": "MicrosoftQualityInspection",
+      "priority": 1390,
+      "confidence": 0.96,
+      "verifiedRuntimeLocales": [
+        "en-US",
+        "sv-SE"
+      ],
+      "match": {
+        "pagePatterns": [
+          "^Quality Inspection$",
+          "^Kvalitetsinspektion$"
+        ],
+        "actionPatterns": [
+          "^Move Inventory$",
+          "^Flytta lager$"
+        ],
+        "fieldPatterns": [],
+        "automationIdPatterns": []
+      },
+      "instructionTemplate": "",
+      "languages": [
+        "en-US",
+        "sv-SE",
+        "fr-FR",
+        "de-DE",
+        "es-ES",
+        "da-DK",
+        "fi-FI",
+        "nb-NO"
+      ],
+      "aliases": [],
+      "sourceIds": [
+        "microsoft-learn-expansion-qms-nonconforming-en-us",
+        "microsoft-learn-expansion-qms-nonconforming-sv-se"
+      ],
+      "localizedExplanations": {
+        "en-US": "Starts an inventory movement from the failed inspection and pre-fills details for the affected lot or tracked item, preserving the link to the quality failure. Choose whether to move the whole lot, a specific quantity, sample, passed quantity or failed quantity; verify source location/bin and destination before continuing. Use a quarantine destination when material must be held. Check whether the movement will post immediately or remain open for review, because this is an inventory action rather than just a quality-status change.",
+        "sv-SE": "Startar en lagerförflyttning från den underkända inspektionen och fyller i uppgifter för det berörda partiet eller den spårade artikeln, med en länk till kvalitetsfelet. Välj om hela partiet, en viss kvantitet, ett prov, godkänd eller underkänd kvantitet ska flyttas. Kontrollera källagerställe/lagerplats och destination innan du fortsätter; använd karantän när materialet ska hållas avskilt. Kontrollera om förflyttningen bokförs direkt eller lämnas öppen för granskning. Det här påverkar lagret, inte bara inspektionens status.",
+        "fr-FR": "Lance un mouvement de stock depuis l’inspection échouée et préremplit les données du lot ou de l’article suivi, en conservant le lien avec la non-conformité. Choisissez le lot entier, une quantité précise, un échantillon, la quantité conforme ou non conforme. Vérifiez l’emplacement et l’emplacement magasin source et destination ; utilisez une destination de quarantaine pour isoler le stock. Vérifiez si le mouvement sera comptabilisé immédiatement ou laissé ouvert pour contrôle : il modifie le stock, pas seulement le statut qualité.",
+        "de-DE": "Startet eine Lagerbewegung aus der fehlgeschlagenen Prüfung und füllt Angaben zur betroffenen Charge oder zum nachverfolgten Artikel vor, wobei der Bezug zum Qualitätsfehler erhalten bleibt. Wählen Sie die ganze Charge, eine bestimmte Menge, eine Probe sowie die bestandene oder nicht bestandene Menge. Prüfen Sie Quelllagerort und Lagerplatz sowie das Ziel; verwenden Sie Quarantäne, wenn das Material gesperrt bereitgestellt werden soll. Prüfen Sie, ob die Bewegung sofort gebucht oder zur Überprüfung offen gelassen wird. Dies verändert den Bestand und nicht nur den Qualitätsstatus.",
+        "es-ES": "Inicia un movimiento de inventario desde la inspección fallida y completa los datos del lote o artículo trazado afectado, conservando el vínculo con el defecto de calidad. Elija el lote completo, una cantidad concreta, una muestra o la cantidad aprobada o fallida. Compruebe la ubicación y el almacén de origen y destino; use una ubicación de cuarentena para retener el material. Verifique si el movimiento se registra de inmediato o queda abierto para revisión. Esta acción modifica el inventario, no solo el estado de calidad.",
+        "da-DK": "Starter en lagerflytning fra den mislykkede inspektion og udfylder oplysninger om det berørte lot eller den sporede vare, mens forbindelsen til kvalitetsfejlen bevares. Vælg hele lotten, en bestemt mængde, en prøve eller den beståede eller ikke-beståede mængde. Kontrollér kildeplacering og -beholder samt destination; brug karantæne, hvis materialet skal holdes tilbage. Kontrollér, om flytningen bogføres straks eller forbliver åben til gennemgang. Handlingen ændrer lageret, ikke kun kvalitetsstatussen.",
+        "fi-FI": "Käynnistää varastosiirron epäonnistuneesta tarkastuksesta ja täyttää tiedot kyseisestä erästä tai jäljitettävästä nimikkeestä säilyttäen yhteyden laatupoikkeamaan. Valitse koko erä, tietty määrä, näyte tai hyväksytty/hylätty määrä. Tarkista lähdesijainti ja varastopaikka sekä kohde; käytä karanteenikohdetta, kun materiaali on pidettävä erillään. Varmista, kirjataanko siirto heti vai jätetäänkö se tarkistettavaksi. Tämä muuttaa varastoa, ei vain laatutilaa.",
+        "nb-NO": "Starter en lagerflytting fra den mislykkede inspeksjonen og fyller ut opplysninger om det berørte partiet eller den sporede varen, samtidig som koblingen til kvalitetsavviket beholdes. Velg hele partiet, en bestemt mengde, en prøve eller godkjent/ikke-godkjent mengde. Kontroller kildeplassering og lagerplass samt destinasjonen; bruk karantene når materialet skal holdes tilbake. Kontroller om flyttingen bokføres med én gang eller blir stående åpen for gjennomgang. Dette endrer lagerbeholdningen, ikke bare kvalitetsstatusen."
+      }
+    },
+    {
+      "ruleId": "QualityManagement.CreateNegativeAdjustmentFromInspection",
+      "taskType": "CreateQualityNegativeAdjustment",
+      "semanticAction": "CreateQualityNegativeAdjustment",
+      "entity": "MicrosoftQualityInspection",
+      "priority": 1390,
+      "confidence": 0.96,
+      "verifiedRuntimeLocales": [
+        "en-US",
+        "sv-SE"
+      ],
+      "match": {
+        "pagePatterns": [
+          "^Quality Inspection$",
+          "^Kvalitetsinspektion$"
+        ],
+        "actionPatterns": [
+          "^Create Negative Adjustment$",
+          "^Skapa negativ justering$"
+        ],
+        "fieldPatterns": [],
+        "automationIdPatterns": []
+      },
+      "instructionTemplate": "",
+      "languages": [
+        "en-US",
+        "sv-SE",
+        "fr-FR",
+        "de-DE",
+        "es-ES",
+        "da-DK",
+        "fi-FI",
+        "nb-NO"
+      ],
+      "aliases": [],
+      "sourceIds": [
+        "microsoft-learn-expansion-qms-nonconforming-en-us",
+        "microsoft-learn-expansion-qms-nonconforming-sv-se"
+      ],
+      "localizedExplanations": {
+        "en-US": "Creates a negative inventory adjustment from the failed inspection to remove stock for disposal, destructive testing or write-off. Confirm whether the action should cover the entire lot/serial/package, a specific amount, a sample, or only the passed/failed quantity; verify location/bin filters and use a reason code when needed for the audit trail. Check the posting option carefully: immediate posting reduces inventory now, while a draft can be reviewed first. The adjustment is separate from finishing the inspection.",
+        "sv-SE": "Skapar en negativ lagerjustering från den underkända inspektionen för att ta bort lager vid kassation, destruktiv provning eller nedskrivning. Kontrollera om den ska omfatta hela partiet/serienumret/förpackningen, en viss kvantitet, ett prov eller endast godkänd/underkänd kvantitet. Granska lagerställe- och lagerplatsfilter och ange vid behov en orsakskod för revisionsspåret. Kontrollera bokföringsalternativet noga: direkt bokföring minskar lagret nu, medan ett utkast kan granskas först. Justeringen är separat från att slutföra inspektionen.",
+        "fr-FR": "Crée un ajustement négatif depuis l’inspection échouée pour retirer le stock lors d’une mise au rebut, d’un essai destructif ou d’une dépréciation. Confirmez s’il porte sur le lot, numéro de série ou colis entier, une quantité précise, un échantillon ou uniquement la quantité conforme/non conforme. Vérifiez les filtres d’emplacement et de magasin, et utilisez un code motif pour la piste d’audit si nécessaire. Contrôlez l’option de comptabilisation : une comptabilisation immédiate réduit le stock tout de suite, tandis qu’un brouillon peut être vérifié avant. L’ajustement est distinct de la clôture de l’inspection.",
+        "de-DE": "Erstellt aus der fehlgeschlagenen Prüfung eine negative Lagerkorrektur, um Bestand bei Entsorgung, zerstörender Prüfung oder Abschreibung zu entfernen. Bestätigen Sie, ob die ganze Charge/Seriennummer/Packung, eine bestimmte Menge, eine Probe oder nur die bestandene/nicht bestandene Menge betroffen ist. Prüfen Sie Lagerort- und Lagerplatzfilter und verwenden Sie bei Bedarf einen Ursachencode für den Prüfpfad. Kontrollieren Sie die Buchungsoption: sofortiges Buchen reduziert den Bestand unmittelbar; ein Entwurf kann zuerst geprüft werden. Die Korrektur ist vom Abschluss der Prüfung getrennt.",
+        "es-ES": "Crea un ajuste negativo desde la inspección fallida para retirar existencias por eliminación, prueba destructiva o baja. Confirme si afecta a todo el lote/número de serie/paquete, una cantidad concreta, una muestra o solo a la cantidad aprobada/fallida. Revise los filtros de ubicación y almacén, y use un código de motivo para dejar rastro de auditoría cuando corresponda. Compruebe la opción de registro: registrar de inmediato reduce las existencias ahora; un borrador permite revisarlo primero. El ajuste es independiente de finalizar la inspección.",
+        "da-DK": "Opretter en negativ lagerregulering fra den mislykkede inspektion for at fjerne beholdning ved kassation, destruktiv test eller nedskrivning. Bekræft, om hele lotten/serienummeret/pakken, en bestemt mængde, en prøve eller kun bestået/ikke-bestået mængde skal fjernes. Kontrollér filtre for placering og beholder, og brug en årsagskode til revisionssporet efter behov. Kontrollér bogføringsvalget: øjeblikkelig bogføring reducerer beholdningen nu, mens en kladde kan gennemgås først. Reguleringen er adskilt fra afslutning af inspektionen.",
+        "fi-FI": "Luo hylätystä tarkastuksesta negatiivisen varastokirjauksen varaston poistamiseksi hävitystä, tuhoavaa testausta tai alaskirjausta varten. Vahvista, koskeeko se koko erää/sarjanumeroa/pakkausta, tiettyä määrää, näytettä vai vain hyväksyttyä/hylättyä määrää. Tarkista sijainti- ja varastopaikkasuodattimet ja käytä tarvittaessa syykoodia tarkastusketjua varten. Tarkista kirjausvalinta: välitön kirjaus vähentää varastoa heti, kun taas luonnoksen voi tarkistaa ensin. Kirjaus on erillinen tarkastuksen viimeistelystä.",
+        "nb-NO": "Oppretter en negativ lagerjustering fra den mislykkede inspeksjonen for å fjerne beholdning ved kassering, destruktiv testing eller nedskriving. Bekreft om hele partiet/serienummeret/pakken, en bestemt mengde, en prøve eller bare godkjent/ikke-godkjent mengde skal fjernes. Kontroller filtre for lokasjon og lagerplass, og bruk en årsakskode for revisjonssporet ved behov. Kontroller bokføringsvalget: umiddelbar bokføring reduserer beholdningen nå, mens et utkast kan gjennomgås først. Justeringen er separat fra å fullføre inspeksjonen."
+      }
+    },
+    {
+      "ruleId": "QualityManagement.ChangeTrackingFromInspection",
+      "taskType": "ChangeQualityItemTracking",
+      "semanticAction": "ChangeQualityItemTracking",
+      "entity": "MicrosoftQualityInspection",
+      "priority": 1390,
+      "confidence": 0.96,
+      "verifiedRuntimeLocales": [
+        "en-US",
+        "sv-SE"
+      ],
+      "match": {
+        "pagePatterns": [
+          "^Quality Inspection$",
+          "^Kvalitetsinspektion$"
+        ],
+        "actionPatterns": [
+          "^Change Item Tracking$",
+          "^Spåra ändringsobjekt$"
+        ],
+        "fieldPatterns": [],
+        "automationIdPatterns": []
+      },
+      "instructionTemplate": "",
+      "languages": [
+        "en-US",
+        "sv-SE",
+        "fr-FR",
+        "de-DE",
+        "es-ES",
+        "da-DK",
+        "fi-FI",
+        "nb-NO"
+      ],
+      "aliases": [],
+      "sourceIds": [
+        "microsoft-learn-expansion-qms-nonconforming-en-us",
+        "microsoft-learn-expansion-qms-nonconforming-sv-se"
+      ],
+      "localizedExplanations": {
+        "en-US": "Opens an item-tracking change from the inspection to correct lot, serial or package numbers, or expiration dates, while retaining the connection to the inspection. Confirm the selected source quantity, item tracking details, location/bin filters and proposed new identifiers or date before processing. Choose whether the correction should post immediately or remain for review. This changes traceability data; it does not move or dispose of inventory, and should not be used as a substitute for those actions.",
+        "sv-SE": "Öppnar en ändring av artikelspårningen från inspektionen för att korrigera parti-, serie- eller förpackningsnummer eller utgångsdatum, med kopplingen till inspektionen bevarad. Kontrollera vald källkvantitet, spårningsuppgifter, lagerställe-/lagerplatsfilter och nya identifierare eller datum innan du fortsätter. Välj om korrigeringen ska bokföras direkt eller lämnas för granskning. Åtgärden ändrar spårbarhetsuppgifter; den flyttar eller kasserar inte lager och ersätter inte sådana åtgärder.",
+        "fr-FR": "Ouvre une modification du suivi depuis l’inspection pour corriger les numéros de lot, de série ou de colis, ou les dates d’expiration, tout en conservant le lien avec l’inspection. Vérifiez la quantité source sélectionnée, les données de suivi, les filtres d’emplacement/magasin et les nouveaux identifiants ou la nouvelle date avant traitement. Choisissez une comptabilisation immédiate ou une mise en attente pour contrôle. Cette action modifie la traçabilité ; elle ne déplace ni ne met au rebut le stock.",
+        "de-DE": "Öffnet aus der Prüfung eine Änderung der Artikelverfolgung, um Chargen-, Serien- oder Packungsnummern beziehungsweise Ablaufdaten zu korrigieren und den Bezug zur Prüfung beizubehalten. Prüfen Sie vor der Verarbeitung die ausgewählte Quellmenge, Verfolgungsdaten, Lagerort-/Lagerplatzfilter und die neuen Kennungen oder das neue Datum. Wählen Sie sofortiges Buchen oder Überprüfung. Die Aktion ändert Rückverfolgbarkeitsdaten; sie bewegt oder entsorgt keinen Bestand.",
+        "es-ES": "Abre un cambio de seguimiento de producto desde la inspección para corregir números de lote, serie o paquete, o fechas de caducidad, conservando el vínculo con la inspección. Antes de procesarlo, confirme la cantidad de origen, los datos de seguimiento, los filtros de ubicación/almacén y los nuevos identificadores o fecha. Elija si registrar de inmediato o dejarlo para revisión. Esta acción modifica la trazabilidad; no mueve ni elimina existencias.",
+        "da-DK": "Åbner en ændring af varesporing fra inspektionen for at rette lot-, serienummer- eller pakkenumre eller udløbsdatoer, mens forbindelsen til inspektionen bevares. Kontrollér valgt kildemængde, sporingsoplysninger, filtre for placering/beholder og nye identifikatorer eller dato før behandling. Vælg øjeblikkelig bogføring eller gennemgang. Handlingen ændrer sporbarhedsdata; den flytter eller bortskaffer ikke beholdning.",
+        "fi-FI": "Avaa tarkastuksesta nimikkeen jäljitystietojen muutoksen erä-, sarja- tai pakkausnumeron tai viimeisen käyttöpäivän korjaamista varten säilyttäen yhteyden tarkastukseen. Tarkista ennen käsittelyä valittu lähdemäärä, jäljitystiedot, sijainti-/varastopaikkasuodattimet ja uudet tunnisteet tai päivämäärä. Valitse välitön kirjaus tai tarkistukseen jättäminen. Toiminto muuttaa jäljitettävyystietoja; se ei siirrä eikä hävitä varastoa.",
+        "nb-NO": "Åpner en endring av varesporing fra inspeksjonen for å rette parti-, serie- eller pakkenumre eller utløpsdatoer, samtidig som koblingen til inspeksjonen beholdes. Kontroller valgt kildemengde, sporingsopplysninger, filtre for lokasjon/lagerplass og nye identifikatorer eller dato før behandling. Velg umiddelbar bokføring eller gjennomgang. Handlingen endrer sporbarhetsdata; den flytter eller kasserer ikke beholdning."
+      }
+    }
+  ],
+  "sources": [
+    {
+      "sourceId": "microsoft-learn-expansion-qms-nonconforming-en-us",
+      "title": "Process items that failed a quality inspection — Business Central | Microsoft Learn",
+      "sourceUri": "https://learn.microsoft.com/en-us/dynamics365/business-central/qms-non-compliant-processing",
+      "accessedDate": "2026-09-30",
+      "appliesTo": "Microsoft Quality Management extension. Verify installed version, inspection context, tracking and posting setup, and tenant-specific captions.",
+      "fields": [
+        "From a failed Quality Inspection, Move Inventory starts a prefilled movement linked to the quality failure. Create Negative Adjustment removes selected inventory and can be posted immediately or reviewed first. Change Item Tracking updates lot, serial, package or expiration tracking details. Verify quantity, source/destination, filters and posting options for each action."
+      ],
+      "documentedCaptions": [
+        "Quality Inspection",
+        "Move Inventory",
+        "Create Negative Adjustment",
+        "Change Item Tracking"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-expansion-qms-nonconforming-sv-se",
+      "title": "Bearbeta objekt som misslyckades med en kvalitetsinspektion — Business Central | Microsoft Learn",
+      "sourceUri": "https://learn.microsoft.com/sv-se/dynamics365/business-central/qms-non-compliant-processing",
+      "accessedDate": "2026-09-30",
+      "appliesTo": "Microsoft Quality Management-tillägget. Verifiera installerad version, inspektionskontext, spårnings- och bokföringsinställningar samt kundspecifika bildtexter.",
+      "fields": [
+        "Från en underkänd kvalitetsinspektion startar Flytta lager en förifylld lagerförflyttning kopplad till kvalitetsfelet. Skapa negativ justering tar bort vald kvantitet från lagret och kan bokföras direkt eller granskas först. Spåra ändringsobjekt uppdaterar parti-, serie-, förpacknings- eller utgångsdatumuppgifter. Kontrollera kvantitet, källa/mål, filter och bokföringsalternativ för respektive åtgärd."
+      ],
+      "documentedCaptions": [
+        "Kvalitetsinspektion",
+        "Flytta lager",
+        "Skapa negativ justering",
+        "Spåra ändringsobjekt"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-expansion-qms-show-inspections-en-us",
+      "title": "Purchase receipt inspections without warehouse handling — Business Central | Microsoft Learn",
+      "sourceUri": "https://learn.microsoft.com/en-us/dynamics365/business-central/qms-purchase-receipt-testing-simple",
+      "accessedDate": "2026-09-30",
+      "appliesTo": "Microsoft Quality Management extension. Verify extension/version, purchase inspection setup, generation rules and tenant-specific captions.",
+      "fields": [
+        "From a purchase order, Show Inspections for Item and Document opens inspections associated with the item and source document. An inspection can carry item, lot, tracked quantity and source purchase order. Opening an inspection is separate from receipt posting and finishing the inspection."
+      ],
+      "documentedCaptions": [
+        "Show Inspections for Item and Document"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-expansion-qms-show-inspections-sv-se",
+      "title": "Inköpskvittoinspektioner utan lagerhantering — Business Central | Microsoft Learn",
+      "sourceUri": "https://learn.microsoft.com/sv-se/dynamics365/business-central/qms-purchase-receipt-testing-simple",
+      "accessedDate": "2026-09-30",
+      "appliesTo": "Microsoft Quality Management extension. Verifiera tilläggsversion, inköpsinspektionsinställningar, genereringsregler och kundspecifika bildtexter.",
+      "fields": [
+        "Från en inköpsorder öppnar Visa inspektioner för objekt och dokument inspektioner som hör till artikeln och källdokumentet. En inspektion kan innehålla artikel, parti, spårad kvantitet och källorder. Att öppna inspektionen är separat från kvittobokföring och från att slutföra inspektionen."
+      ],
+      "documentedCaptions": [
+        "Visa inspektioner för objekt och dokument"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-quality-templates-en-us",
+      "title": "Microsoft Quality Management — inspection templates and tests",
+      "sourceUri": "https://learn.microsoft.com/en-us/dynamics365/business-central/qms-quality-templates",
+      "accessedDate": "2026-09-29",
+      "appliesTo": "Microsoft Quality Management extension. Learn captions verified; installed tenant captions and extension version remain unverified. Not Aptean quality functionality.",
+      "fields": [
+        "Opens a new quality inspection template. Define the tests, sample size and any template-specific result conditions. The template provides instructions for subsequent inspections; creating it does not record an inspection result.",
+        "Opens a new quality test definition. Specify what is measured, the value type and allowed inputs. Configure result conditions separately: accepting an entered value is different from classifying the inspection result.",
+        "Copies the selected quality inspection template as a starting point for another template. Review and adapt its settings to the new inspection purpose before using it."
+      ],
+      "documentedCaptions": [
+        "Quality Inspection Templates",
+        "Quality Tests",
+        "New",
+        "Copy Template"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-quality-templates-sv-se",
+      "title": "Microsoft Quality Management — inspection templates and tests",
+      "sourceUri": "https://learn.microsoft.com/sv-se/dynamics365/business-central/qms-quality-templates",
+      "accessedDate": "2026-09-29",
+      "appliesTo": "Microsoft Quality Management extension. Learn captions verified; installed tenant captions and extension version remain unverified. Not Aptean quality functionality.",
+      "fields": [
+        "Öppnar en ny mall för kvalitetskontroll. Ange tester, stickprovsstorlek och eventuella resultatvillkor som ska gälla för mallen. Mallen styr kommande kontroller; att skapa den registrerar inget kontrollresultat.",
+        "Öppnar en ny definition av ett kvalitetstest. Ange vad som ska mätas, värdetyp och tillåtna inmatningsvärden. Resultatvillkor anges separat: ett tillåtet inmatningsvärde betyder inte automatiskt att kontrollen är godkänd.",
+        "Kopierar den valda kvalitetskontrollmallen som utgångspunkt för en ny mall. Granska och anpassa inställningarna till den nya kontrollens syfte innan mallen används."
+      ],
+      "documentedCaptions": [
+        "Kvalitetsgranskningsmallar",
+        "Kvalitetstester",
+        "Ny",
+        "Kopiera mall"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-quality-templates-fr-fr",
+      "title": "Microsoft Quality Management — inspection templates and tests",
+      "sourceUri": "https://learn.microsoft.com/fr-fr/dynamics365/business-central/qms-quality-templates",
+      "accessedDate": "2026-09-29",
+      "appliesTo": "Microsoft Quality Management extension. Learn captions verified; installed tenant captions and extension version remain unverified. Not Aptean quality functionality.",
+      "fields": [
+        "Ouvre un nouveau modèle de contrôle qualité. Définissez les tests, la taille de l’échantillon et les conditions de résultat propres au modèle. Le modèle guide les contrôles ultérieurs ; sa création n’enregistre aucun résultat.",
+        "Ouvre une nouvelle définition de test qualité. Précisez la mesure, le type de valeur et les valeurs autorisées. Les conditions de résultat sont distinctes : une saisie autorisée ne signifie pas que le contrôle est réussi.",
+        "Copie le modèle de contrôle qualité sélectionné pour préparer un autre modèle. Vérifiez et adaptez ses paramètres au nouvel objectif de contrôle avant de l’utiliser."
+      ],
+      "documentedCaptions": [
+        "Modèles d’inspection de la qualité",
+        "Tests de qualité",
+        "Nouveau",
+        "Copier le modèle"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-quality-templates-de-de",
+      "title": "Microsoft Quality Management — inspection templates and tests",
+      "sourceUri": "https://learn.microsoft.com/de-de/dynamics365/business-central/qms-quality-templates",
+      "accessedDate": "2026-09-29",
+      "appliesTo": "Microsoft Quality Management extension. Learn captions verified; installed tenant captions and extension version remain unverified. Not Aptean quality functionality.",
+      "fields": [
+        "Öffnet eine neue Vorlage für Qualitätsprüfungen. Legen Sie Tests, Stichprobengröße und vorlagenspezifische Ergebnisbedingungen fest. Die Vorlage steuert spätere Prüfungen; ihre Erstellung erfasst kein Prüfergebnis.",
+        "Öffnet eine neue Qualitätstestdefinition. Legen Sie Messgröße, Werttyp und zulässige Eingaben fest. Ergebnisbedingungen werden separat definiert: Eine zulässige Eingabe bedeutet nicht automatisch eine bestandene Prüfung.",
+        "Kopiert die ausgewählte Qualitätsprüfvorlage als Grundlage für eine weitere Vorlage. Prüfen und ändern Sie die Einstellungen für den neuen Prüfzweck vor der Verwendung."
+      ],
+      "documentedCaptions": [
+        "Qualitätsüberprüfungsvorlagen",
+        "Qualitätstests",
+        "Neu",
+        "Vorlage kopieren"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-quality-templates-es-es",
+      "title": "Microsoft Quality Management — inspection templates and tests",
+      "sourceUri": "https://learn.microsoft.com/es-es/dynamics365/business-central/qms-quality-templates",
+      "accessedDate": "2026-09-29",
+      "appliesTo": "Microsoft Quality Management extension. Learn captions verified; installed tenant captions and extension version remain unverified. Not Aptean quality functionality.",
+      "fields": [
+        "Abre una nueva plantilla de inspección de calidad. Defina las pruebas, el tamaño de muestra y las condiciones de resultado específicas. La plantilla guía las inspecciones posteriores; crearla no registra resultados.",
+        "Abre una nueva definición de prueba de calidad. Indique la medición, el tipo de valor y las entradas permitidas. Configure las condiciones de resultado por separado: una entrada permitida no implica una inspección aprobada.",
+        "Copia la plantilla de inspección de calidad seleccionada como base de otra plantilla. Revise y adapte sus ajustes al nuevo propósito de inspección antes de utilizarla."
+      ],
+      "documentedCaptions": [
+        "Plantillas de inspección de calidad",
+        "Pruebas de calidad",
+        "Nuevo",
+        "Copiar plantilla"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-quality-templates-da-dk",
+      "title": "Microsoft Quality Management — inspection templates and tests",
+      "sourceUri": "https://learn.microsoft.com/da-dk/dynamics365/business-central/qms-quality-templates",
+      "accessedDate": "2026-09-29",
+      "appliesTo": "Microsoft Quality Management extension. Learn captions verified; installed tenant captions and extension version remain unverified. Not Aptean quality functionality.",
+      "fields": [
+        "Åbner en ny skabelon til kvalitetskontrol. Angiv test, stikprøvestørrelse og eventuelle resultatbetingelser for skabelonen. Skabelonen styrer senere kontroller; oprettelsen registrerer intet kontrolresultat.",
+        "Åbner en ny definition af en kvalitetstest. Angiv måling, værditype og tilladte input. Resultatbetingelser angives separat: en tilladt indtastning betyder ikke automatisk, at kontrollen er godkendt.",
+        "Kopierer den valgte kvalitetskontrolskabelon som udgangspunkt for en ny skabelon. Gennemgå og tilpas indstillingerne til det nye kontrolformål før brug."
+      ],
+      "documentedCaptions": [
+        "Kvalitetsinspektionsskabeloner",
+        "Kvalitetstest",
+        "Ny",
+        "Kopiér skabelon"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-quality-templates-fi-fi",
+      "title": "Microsoft Quality Management — inspection templates and tests",
+      "sourceUri": "https://learn.microsoft.com/fi-fi/dynamics365/business-central/qms-quality-templates",
+      "accessedDate": "2026-09-29",
+      "appliesTo": "Microsoft Quality Management extension. Learn captions verified; installed tenant captions and extension version remain unverified. Not Aptean quality functionality.",
+      "fields": [
+        "Avaa uuden laaduntarkastusmallin. Määritä testit, otoskoko ja mallikohtaiset tulosehdot. Malli ohjaa myöhempiä tarkastuksia; sen luominen ei kirjaa tarkastustulosta.",
+        "Avaa uuden laatutestin määrityksen. Määritä mitattava asia, arvotyyppi ja sallitut syötteet. Tulosehdot määritetään erikseen: sallittu syöte ei automaattisesti tarkoita hyväksyttyä tarkastusta.",
+        "Kopioi valitun laaduntarkastusmallin uuden mallin pohjaksi. Tarkista asetukset ja sovita ne uuden tarkastuksen tarkoitukseen ennen mallin käyttöä."
+      ],
+      "documentedCaptions": [
+        "Laadun tarkastusmallit",
+        "Laatutestit",
+        "Uusi",
+        "Kopioi malli"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-quality-templates-nb-no",
+      "title": "Microsoft Quality Management — inspection templates and tests",
+      "sourceUri": "https://learn.microsoft.com/nb-no/dynamics365/business-central/qms-quality-templates",
+      "accessedDate": "2026-09-29",
+      "appliesTo": "Microsoft Quality Management extension. Learn captions verified; installed tenant captions and extension version remain unverified. Not Aptean quality functionality.",
+      "fields": [
+        "Åpner en ny mal for kvalitetskontroll. Angi tester, utvalgsstørrelse og eventuelle resultatvilkår for malen. Malen styrer senere kontroller; opprettelsen registrerer ikke et kontrollresultat.",
+        "Åpner en ny definisjon av en kvalitetstest. Angi måling, verditype og tillatte inndata. Resultatvilkår angis separat: en tillatt verdi betyr ikke automatisk at kontrollen er godkjent.",
+        "Kopierer den valgte kvalitetskontrollmalen som grunnlag for en ny mal. Gjennomgå og tilpass innstillingene til det nye kontrollformålet før bruk."
+      ],
+      "documentedCaptions": [
+        "Maler for kvalitetsinspeksjon",
+        "Kvalitetstester",
+        "Ny",
+        "Kopier mal"
+      ]
+    },
+    {
+      "sourceId": "quality-manual-inspection-en-us",
+      "title": "Manual inspection creation — Business Central",
+      "sourceUri": "https://learn.microsoft.com/en-us/dynamics365/business-central/qms-manual-test-creation",
+      "accessedDate": "2026-09-29",
+      "appliesTo": "Microsoft Quality Management extension. English Microsoft Learn source; tenant extension version remains unverified.",
+      "fields": [
+        "From Quality Inspection Templates, Create Inspection starts an inspection independent of a purchase or production line. Supply a source reference and lot or serial number when applicable.",
+        "Quality Inspection - Schedule Inspection creates inspections for all enabled generation rules that match its filters. Apply a Template Code or other restrictive filters to avoid creating an unexpectedly large set. The report creates inspections but does not finish them or enter test results."
+      ],
+      "documentedCaptions": [
+        "Quality Inspection Templates",
+        "Create Inspection",
+        "Quality Inspection - Schedule Inspection",
+        "OK"
+      ]
+    },
+    {
+      "sourceId": "quality-noncompliant-en-us",
+      "title": "Handle items that failed a quality test — Business Central",
+      "sourceUri": "https://learn.microsoft.com/en-us/dynamics365/business-central/qms-non-compliant-processing",
+      "accessedDate": "2026-09-29",
+      "appliesTo": "Microsoft Quality Management extension. English Learn source; installed extension version and captions remain unverified.",
+      "fields": [
+        "From a failed inspection, Create Purchase Return creates purchase return orders for vendor-related defects. The operator can choose lot/serial or quantity, apply location/bin filters, specify a return reason and vendor credit memo number. Creating the return does not itself post it."
+      ],
+      "documentedCaptions": [
+        "Quality Inspection",
+        "Create Purchase Return"
+      ]
+    },
+    {
+      "sourceId": "quality-lot-blocking-en-us",
+      "title": "Block or unblock lots — Business Central",
+      "sourceUri": "https://learn.microsoft.com/en-us/dynamics365/business-central/qms-lot-blocking-unblocking",
+      "accessedDate": "2026-09-29",
+      "appliesTo": "Microsoft Quality Management extension. English Learn source; installed extension version and exact result-control captions remain unverified.",
+      "fields": [
+        "Quality Management supports workflow-based complete lot blocking and result-based document-specific controls. Inspection result and status are separate. When multiple inspections exist, selection criteria and result priorities determine which result controls transactions."
+      ],
+      "documentedCaptions": [
+        "Quality Management Setup",
+        "Workflows",
+        "Block Lot in the Inspection",
+        "Unblock Lot in the Inspection"
+      ]
+    },
+    {
+      "sourceId": "quality-purchase-inspection-en-us",
+      "title": "Purchase receipt inspections without warehouse handling — Business Central",
+      "sourceUri": "https://learn.microsoft.com/en-us/dynamics365/business-central/qms-purchase-receipt-testing-simple",
+      "accessedDate": "2026-09-29",
+      "appliesTo": "Microsoft Quality Management extension, purchase receipt scenario without warehouse handling. English Learn source; tenant extension version remains unverified.",
+      "fields": [
+        "For purchase receipt inspections, enter measurement values, review the calculated grade, and choose Finish. Finishing completes the quality inspection; it is separate from posting the purchase receipt. Inspection generation behavior depends on setup."
+      ],
+      "documentedCaptions": [
+        "Quality Inspection",
+        "Finish"
+      ]
+    },
+    {
+      "sourceId": "quality-purchase-inspection-sv-se",
+      "title": "Inköpskvittokontroller utan lagerhantering — Business Central",
+      "sourceUri": "https://learn.microsoft.com/sv-se/dynamics365/business-central/qms-purchase-receipt-testing-simple",
+      "accessedDate": "2026-09-29",
+      "appliesTo": "Microsoft Quality Management extension, purchase receipt scenario without warehouse handling. Swedish Learn source; tenant extension version remains unverified.",
+      "fields": [
+        "Vid kvalitetskontroller av inköpskvitton registrerar du mätvärden, granskar det beräknade resultatet och väljer Slutför. Det slutför kvalitetsinspektionen, separat från bokföring av inköpskvittot. Beteendet för inspektionsgenerering beror på konfigurationen."
+      ],
+      "documentedCaptions": [
+        "Kvalitetsinspektion",
+        "Slutför"
+      ]
+    },
+    {
+      "sourceId": "quality-setup-en-us",
+      "title": "Quality management setup and configuration — Business Central",
+      "sourceUri": "https://learn.microsoft.com/en-us/dynamics365/business-central/qms-setup",
+      "accessedDate": "2026-09-29",
+      "appliesTo": "Microsoft Quality Management extension. English Learn source; installed extension version remains unverified.",
+      "fields": [
+        "Quality Inspector can record measurements, finish inspections, and update result conditions, but cannot change setup, templates, or generation rules. Admin and supervisor permissions are required for changing inspection quantities and reopening finished inspections."
+      ],
+      "documentedCaptions": [
+        "Quality Inspector",
+        "Quality Admin & Supervisor"
+      ]
+    },
+    {
+      "sourceId": "quality-setup-sv-se",
+      "title": "Konfiguration av kvalitetshantering — Business Central",
+      "sourceUri": "https://learn.microsoft.com/sv-se/dynamics365/business-central/qms-setup",
+      "accessedDate": "2026-09-29",
+      "appliesTo": "Microsoft Quality Management extension. Swedish Learn source; installed extension version remains unverified.",
+      "fields": [
+        "Behörigheten Quality Inspector kan registrera mätvärden, slutföra inspektioner och uppdatera resultatvillkor men inte ändra konfiguration, mallar eller genereringsregler. Administratörs- och arbetsledarbehörighet krävs för att ändra inspektionskvantiteter och återöppna slutförda inspektioner."
+      ],
+      "documentedCaptions": [
+        "Quality Inspector",
+        "Quality Admin & Supervisor"
+      ]
+    },
+    {
+      "sourceId": "quality-lot-blocking-sv-se",
+      "title": "Blockera eller avblockera partier — Business Central",
+      "sourceUri": "https://learn.microsoft.com/sv-se/dynamics365/business-central/qms-lot-blocking-unblocking",
+      "accessedDate": "2026-09-29",
+      "appliesTo": "Microsoft Quality Management extension. Swedish Learn source; installed extension version and exact result-control captions remain unverified.",
+      "fields": [
+        "Quality Management stöder fullständig partispärr via arbetsflöde och resultatbaserade begränsningar per dokumenttyp. Inspektionsresultat och status är separata. Om flera inspektioner finns avgör urvalskriterier och resultatprioriteringar vilket resultat som styr transaktionerna."
+      ],
+      "documentedCaptions": [
+        "Konfiguration av kvalitetshantering",
+        "Arbetsflöden",
+        "Blockera partiet vid inspektionen",
+        "Avblockera partiet i inspektionen"
+      ]
+    },
+    {
+      "sourceId": "quality-noncompliant-sv-se",
+      "title": "Hantera objekt som misslyckades med ett kvalitetstest — Business Central",
+      "sourceUri": "https://learn.microsoft.com/sv-se/dynamics365/business-central/qms-non-compliant-processing",
+      "accessedDate": "2026-09-29",
+      "appliesTo": "Microsoft Quality Management extension. Swedish Learn source; installed extension version and captions remain unverified.",
+      "fields": [
+        "Från en misslyckad inspektion skapar Skapa inköpsretur inköpsreturorder vid leverantörsrelaterade fel. Välj parti/serie eller kvantitet, plats- och lagerplatsfilter, returorsak och eventuell leverantörskreditnotareferens. Själva skapandet bokför inte returen."
+      ],
+      "documentedCaptions": [
+        "Kvalitetsinspektion",
+        "Skapa inköpsretur"
+      ]
+    },
+    {
+      "sourceId": "quality-manual-inspection-sv-se",
+      "title": "Manuellt skapande av inspektion — Business Central",
+      "sourceUri": "https://learn.microsoft.com/sv-se/dynamics365/business-central/qms-manual-test-creation",
+      "accessedDate": "2026-09-29",
+      "appliesTo": "Microsoft Quality Management extension. Swedish Microsoft Learn source; tenant extension version remains unverified.",
+      "fields": [
+        "Från Kvalitetsgranskningsmallar startar Skapa inspektion en inspektion som inte är knuten till en inköps- eller produktionsrad. Ange källreferens och parti- eller serienummer när det behövs.",
+        "Kvalitetsinspektion – Schemagranskning skapar inspektioner för aktiverade genereringsregler som matchar filtren. Filtrera på mallkod eller andra villkor för att begränsa mängden. Rapporten skapar inspektioner men slutför dem inte och registrerar inga testresultat."
+      ],
+      "documentedCaptions": [
+        "Kvalitetsgranskningsmallar",
+        "Skapa inspektion",
+        "Kvalitetsinspektion – Schemagranskning",
+        "OK"
+      ]
+    },
+    {
+      "sourceId": "quality-purchase-receipt-generation-en-us",
+      "title": "Purchase receipt inspections without warehouse handling — Business Central",
+      "sourceUri": "https://learn.microsoft.com/en-us/dynamics365/business-central/qms-purchase-receipt-testing-simple",
+      "accessedDate": "2026-09-29",
+      "appliesTo": "Microsoft Quality Management extension; purchase receipt process without warehouse handling. Verify tenant version and setup.",
+      "fields": [
+        "An inspection generation rule with Source Type Purchase Line, template, purchase trigger and item filter can create quality inspections automatically when purchase receipt is posted. Lot tracking affects inspection grouping; a distinct inspection can be generated for each lot. This is separate from posting and completion behavior."
+      ],
+      "documentedCaptions": [
+        "Purchase Orders",
+        "Inspection Generation Rules",
+        "When Purchase Order is Received",
+        "Post",
+        "Receive"
+      ]
+    },
+    {
+      "sourceId": "quality-purchase-receipt-generation-sv-se",
+      "title": "Inköpskvittoinspektioner utan lagerhantering — Business Central",
+      "sourceUri": "https://learn.microsoft.com/sv-se/dynamics365/business-central/qms-purchase-receipt-testing-simple",
+      "accessedDate": "2026-09-29",
+      "appliesTo": "Microsoft Quality Management extension; purchase receipt process without warehouse handling. Verify tenant version and setup.",
+      "fields": [
+        "En genereringsregel med källtyp inköpsrad, mall, inköpsutlösare och artikelurval kan skapa kvalitetsinspektioner automatiskt när inköpskvittot bokförs. Partispårning påverkar gruppering; en separat inspektion kan skapas per parti. Detta är skilt från bokföring och slutförandebeteende."
+      ],
+      "documentedCaptions": [
+        "Inköpsorder",
+        "Regler för inspektionsgenerering",
+        "När inköpsordern tas emot",
+        "Bokför",
+        "Ta emot"
+      ]
+    },
+    {
+      "sourceId": "quality-scheduled-inspections-en-us",
+      "title": "Create scheduled quality inspections — Business Central",
+      "sourceUri": "https://learn.microsoft.com/en-us/dynamics365/business-central/qms-scheduled-test-creation",
+      "accessedDate": "2026-09-29",
+      "appliesTo": "Microsoft Quality Management extension. English Learn article; verify tenant version and job queue settings.",
+      "fields": [
+        "Scheduled inspection generation rules use a Schedule Group and job queue entry to create inspections at time intervals. Configure recurrence, earliest start, retry count and delay; use specific item/template rules and inspect queue history. This is periodic inventory sampling, distinct from transaction-triggered inspections."
+      ],
+      "documentedCaptions": [
+        "Inspection Generation Rules",
+        "Schedule Group",
+        "Job queue entries",
+        "Set Status to Ready"
+      ]
+    },
+    {
+      "sourceId": "quality-inspection-results-en-us",
+      "title": "Configure quality inspection results — Business Central",
+      "sourceUri": "https://learn.microsoft.com/en-us/dynamics365/business-central/qms-configuring-grades",
+      "accessedDate": "2026-09-29",
+      "appliesTo": "Microsoft Quality Management extension. English Learn article; installed tenant version and exact captions remain unverified.",
+      "fields": [
+        "Default results include INPROGRESS, FAIL and PASS. Configure result category, evaluation sequence, visibility and Finish Allowed. Define conditions separately in tests or templates; an entered/allowed value is not itself a pass classification. Results can also control document transactions for tracked items."
+      ],
+      "documentedCaptions": [
+        "Quality Inspection Results",
+        "New",
+        "Evaluation Sequence",
+        "Result Category",
+        "Finish Allowed",
+        "Configure result conditions"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-expansion-qms-production-output-en-us",
+      "title": "Inspect the quality of production output - Business Central | Microsoft Learn",
+      "sourceUri": "https://learn.microsoft.com/en-us/dynamics365/business-central/qms-production-output-testing",
+      "accessedDate": "2026-09-29",
+      "appliesTo": "Microsoft Quality Management extension for Business Central 2026 release wave 1+. Verify installed extension/version, Premium experience, setup trigger, generation rules, and tenant-specific captions.",
+      "fields": [
+        "On an Output Journal or Production Journal, Post records the production output. A Quality Management inspection is created as a follow-up only when the extension is installed, the production inspection trigger and a matching generation rule are configured, and the item/output meets their filters. Lot tracking, a lot number, routing operation, location and output quantity can be relevant inputs. The inspection links back to the production order and operation; enter measurements and finish the inspection separately. Production quality capabilities require the Premium experience."
+      ],
+      "documentedCaptions": [
+        "Output Journal",
+        "Production Journal",
+        "Post"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-expansion-qms-production-output-sv-se",
+      "title": "Kontrollera kvaliteten på produktionsresultat - Business Central | Microsoft Learn",
+      "sourceUri": "https://learn.microsoft.com/sv-se/dynamics365/business-central/qms-production-output-testing",
+      "accessedDate": "2026-09-29",
+      "appliesTo": "Microsoft Quality Management extension for Business Central 2026 release wave 1+. Verify installed extension/version, Premium experience, setup trigger, generation rules, and tenant-specific captions.",
+      "fields": [
+        "På Utdatajournal eller Produktionsjournal bokför Publicera produktionsutflödet. En kvalitetsinspektion skapas som uppföljning endast om tillägget är installerat, utlösaren för produktionsinspektion och en matchande genereringsregel är konfigurerade och artikelns utdata uppfyller filtren. Partispårning, partinummer, routningsåtgärd, lagerställe och utkvantitet kan påverka om regeln matchar. Inspektionen länkar tillbaka till produktionsordern och åtgärden; ange mätvärden och slutför inspektionen separat. Produktionsfunktionerna för kvalitet kräver Premium-upplevelsen."
+      ],
+      "documentedCaptions": [
+        "Utdatajournal",
+        "Produktionsjournal",
+        "Publicera"
+      ]
+    },
+    {
+      "sourceId": "quality-manual-inspection-fr-fr",
+      "title": "Création manuelle inspection - Business Central",
+      "sourceUri": "https://learn.microsoft.com/fr-fr/dynamics365/business-central/qms-manual-test-creation",
+      "accessedDate": "2026-09-29",
+      "appliesTo": "Microsoft Quality Management extension. Localized Microsoft Learn source; tenant extension version and UI captions are not verified.",
+      "fields": [
+        "Manual inspections can be created from item tracking lines, purchase or production lines, quality inspection templates, or the scheduled inspection report. The report can create many inspections, so apply template and other restrictive filters. Creating an inspection does not enter results or finish it."
+      ],
+      "documentedCaptions": [
+        "Modèles inspection qualité",
+        "Créer une inspection"
+      ]
+    },
+    {
+      "sourceId": "quality-manual-inspection-de-de",
+      "title": "Manuelle Inspektionserstellung - Business Central",
+      "sourceUri": "https://learn.microsoft.com/de-de/dynamics365/business-central/qms-manual-test-creation",
+      "accessedDate": "2026-09-29",
+      "appliesTo": "Microsoft Quality Management extension. Localized Microsoft Learn source; tenant extension version and UI captions are not verified.",
+      "fields": [
+        "Manual inspections can be created from item tracking lines, purchase or production lines, quality inspection templates, or the scheduled inspection report. The report can create many inspections, so apply template and other restrictive filters. Creating an inspection does not enter results or finish it."
+      ],
+      "documentedCaptions": [
+        "Qualitätsüberprüfungsvorlagen",
+        "Inspektion erstellen"
+      ]
+    },
+    {
+      "sourceId": "quality-manual-inspection-es-es",
+      "title": "Creación manual de inspecciones - Business Central",
+      "sourceUri": "https://learn.microsoft.com/es-es/dynamics365/business-central/qms-manual-test-creation",
+      "accessedDate": "2026-09-29",
+      "appliesTo": "Microsoft Quality Management extension. Localized Microsoft Learn source; tenant extension version and UI captions are not verified.",
+      "fields": [
+        "Manual inspections can be created from item tracking lines, purchase or production lines, quality inspection templates, or the scheduled inspection report. The report can create many inspections, so apply template and other restrictive filters. Creating an inspection does not enter results or finish it."
+      ],
+      "documentedCaptions": [
+        "Plantillas de inspección de calidad",
+        "Crear inspección"
+      ]
+    },
+    {
+      "sourceId": "quality-manual-inspection-da-dk",
+      "title": "Manuel oprettelse af inspektion - Business Central",
+      "sourceUri": "https://learn.microsoft.com/da-dk/dynamics365/business-central/qms-manual-test-creation",
+      "accessedDate": "2026-09-29",
+      "appliesTo": "Microsoft Quality Management extension. Localized Microsoft Learn source; tenant extension version and UI captions are not verified.",
+      "fields": [
+        "Manual inspections can be created from item tracking lines, purchase or production lines, quality inspection templates, or the scheduled inspection report. The report can create many inspections, so apply template and other restrictive filters. Creating an inspection does not enter results or finish it."
+      ],
+      "documentedCaptions": [
+        "Kvalitetsinspektionsskabeloner",
+        "Opret inspektion"
+      ]
+    },
+    {
+      "sourceId": "quality-manual-inspection-nb-no",
+      "title": "Manuell oppretting av inspeksjon - Business Central",
+      "sourceUri": "https://learn.microsoft.com/nb-no/dynamics365/business-central/qms-manual-test-creation",
+      "accessedDate": "2026-09-29",
+      "appliesTo": "Microsoft Quality Management extension. Localized Microsoft Learn source; tenant extension version and UI captions are not verified.",
+      "fields": [
+        "Manual inspections can be created from item tracking lines, purchase or production lines, quality inspection templates, or the scheduled inspection report. The report can create many inspections, so apply template and other restrictive filters. Creating an inspection does not enter results or finish it."
+      ],
+      "documentedCaptions": [
+        "Maler for kvalitetsinspeksjon",
+        "Opprett inspeksjon"
+      ]
+    },
+    {
+      "sourceId": "quality-noncompliant-fr-fr",
+      "title": "Gérer les éléments ayant échoué à un test de qualité — Business Central",
+      "sourceUri": "https://learn.microsoft.com/fr-fr/dynamics365/business-central/qms-non-compliant-processing",
+      "accessedDate": "2026-09-29",
+      "appliesTo": "Microsoft Quality Management extension. English Learn source; installed extension version and captions remain unverified.",
+      "fields": [
+        "For a failed inspection, the article describes creating vendor purchase returns and selecting affected lot/serial numbers or quantities, location/bin filters and return reason. Creating the return does not post it."
+      ],
+      "documentedCaptions": []
+    },
+    {
+      "sourceId": "quality-noncompliant-de-de",
+      "title": "Behandeln von Elementen mit fehlgeschlagenem Qualitätstest — Business Central",
+      "sourceUri": "https://learn.microsoft.com/de-de/dynamics365/business-central/qms-non-compliant-processing",
+      "accessedDate": "2026-09-29",
+      "appliesTo": "Microsoft Quality Management extension. English Learn source; installed extension version and captions remain unverified.",
+      "fields": [
+        "For a failed inspection, the article describes creating vendor purchase returns and selecting affected lot/serial numbers or quantities, location/bin filters and return reason. Creating the return does not post it."
+      ],
+      "documentedCaptions": []
+    },
+    {
+      "sourceId": "quality-noncompliant-es-es",
+      "title": "Gestionar artículos que no pasaron una prueba de calidad — Business Central",
+      "sourceUri": "https://learn.microsoft.com/es-es/dynamics365/business-central/qms-non-compliant-processing",
+      "accessedDate": "2026-09-29",
+      "appliesTo": "Microsoft Quality Management extension. English Learn source; installed extension version and captions remain unverified.",
+      "fields": [
+        "For a failed inspection, the article describes creating vendor purchase returns and selecting affected lot/serial numbers or quantities, location/bin filters and return reason. Creating the return does not post it."
+      ],
+      "documentedCaptions": []
+    },
+    {
+      "sourceId": "quality-noncompliant-da-dk",
+      "title": "Håndter elementer, der ikke bestod en kvalitetstest — Business Central",
+      "sourceUri": "https://learn.microsoft.com/da-dk/dynamics365/business-central/qms-non-compliant-processing",
+      "accessedDate": "2026-09-29",
+      "appliesTo": "Microsoft Quality Management extension. English Learn source; installed extension version and captions remain unverified.",
+      "fields": [
+        "For a failed inspection, the article describes creating vendor purchase returns and selecting affected lot/serial numbers or quantities, location/bin filters and return reason. Creating the return does not post it."
+      ],
+      "documentedCaptions": []
+    },
+    {
+      "sourceId": "quality-noncompliant-nb-no",
+      "title": "Håndtere elementer som mislyktes med en kvalitetstest — Business Central",
+      "sourceUri": "https://learn.microsoft.com/nb-no/dynamics365/business-central/qms-non-compliant-processing",
+      "accessedDate": "2026-09-29",
+      "appliesTo": "Microsoft Quality Management extension. English Learn source; installed extension version and captions remain unverified.",
+      "fields": [
+        "For a failed inspection, the article describes creating vendor purchase returns and selecting affected lot/serial numbers or quantities, location/bin filters and return reason. Creating the return does not post it."
+      ],
+      "documentedCaptions": []
+    },
+    {
+      "sourceId": "quality-lot-blocking-fr-fr",
+      "title": "Bloquer ou débloquer des lots — Business Central",
+      "sourceUri": "https://learn.microsoft.com/fr-fr/dynamics365/business-central/qms-lot-blocking-unblocking",
+      "accessedDate": "2026-09-29",
+      "appliesTo": "Microsoft Quality Management extension. English Learn source; installed extension version and exact result-control captions remain unverified.",
+      "fields": [
+        "Quality Management supports workflow-based lot blocking and result-based document-specific controls. Result and inspection status differ; setup criteria and result priorities determine which inspections control transactions."
+      ],
+      "documentedCaptions": []
+    },
+    {
+      "sourceId": "quality-lot-blocking-de-de",
+      "title": "Sperren oder Entsperren von Lots — Business Central",
+      "sourceUri": "https://learn.microsoft.com/de-de/dynamics365/business-central/qms-lot-blocking-unblocking",
+      "accessedDate": "2026-09-29",
+      "appliesTo": "Microsoft Quality Management extension. English Learn source; installed extension version and exact result-control captions remain unverified.",
+      "fields": [
+        "Quality Management supports workflow-based lot blocking and result-based document-specific controls. Result and inspection status differ; setup criteria and result priorities determine which inspections control transactions."
+      ],
+      "documentedCaptions": []
+    },
+    {
+      "sourceId": "quality-lot-blocking-es-es",
+      "title": "Bloquear o desbloquear lotes — Business Central",
+      "sourceUri": "https://learn.microsoft.com/es-es/dynamics365/business-central/qms-lot-blocking-unblocking",
+      "accessedDate": "2026-09-29",
+      "appliesTo": "Microsoft Quality Management extension. English Learn source; installed extension version and exact result-control captions remain unverified.",
+      "fields": [
+        "Quality Management supports workflow-based lot blocking and result-based document-specific controls. Result and inspection status differ; setup criteria and result priorities determine which inspections control transactions."
+      ],
+      "documentedCaptions": []
+    },
+    {
+      "sourceId": "quality-lot-blocking-da-dk",
+      "title": "Bloker eller ophæv blokering af partier — Business Central",
+      "sourceUri": "https://learn.microsoft.com/da-dk/dynamics365/business-central/qms-lot-blocking-unblocking",
+      "accessedDate": "2026-09-29",
+      "appliesTo": "Microsoft Quality Management extension. English Learn source; installed extension version and exact result-control captions remain unverified.",
+      "fields": [
+        "Quality Management supports workflow-based lot blocking and result-based document-specific controls. Result and inspection status differ; setup criteria and result priorities determine which inspections control transactions."
+      ],
+      "documentedCaptions": []
+    },
+    {
+      "sourceId": "quality-purchase-inspection-fr-fr",
+      "title": "Inspection des reçus d’achat sans gestion de l’entrepôt — Business Central",
+      "sourceUri": "https://learn.microsoft.com/fr-fr/dynamics365/business-central/qms-purchase-receipt-testing-simple",
+      "accessedDate": "2026-09-29",
+      "appliesTo": "Microsoft Quality Management extension, purchase receipt scenario without warehouse handling. English Learn source; tenant extension version remains unverified.",
+      "fields": [
+        "For receipt inspections without warehouse handling, the source covers entering measurements, reviewing calculated grade and finishing the inspection separately from posting the purchase receipt."
+      ],
+      "documentedCaptions": []
+    },
+    {
+      "sourceId": "quality-purchase-inspection-de-de",
+      "title": "Kaufbelegprüfungen ohne Lagerverwaltung — Business Central",
+      "sourceUri": "https://learn.microsoft.com/de-de/dynamics365/business-central/qms-purchase-receipt-testing-simple",
+      "accessedDate": "2026-09-29",
+      "appliesTo": "Microsoft Quality Management extension, purchase receipt scenario without warehouse handling. English Learn source; tenant extension version remains unverified.",
+      "fields": [
+        "For receipt inspections without warehouse handling, the source covers entering measurements, reviewing calculated grade and finishing the inspection separately from posting the purchase receipt."
+      ],
+      "documentedCaptions": []
+    },
+    {
+      "sourceId": "quality-purchase-inspection-es-es",
+      "title": "Inspecciones de recibos de compra sin control de almacén — Business Central",
+      "sourceUri": "https://learn.microsoft.com/es-es/dynamics365/business-central/qms-purchase-receipt-testing-simple",
+      "accessedDate": "2026-09-29",
+      "appliesTo": "Microsoft Quality Management extension, purchase receipt scenario without warehouse handling. English Learn source; tenant extension version remains unverified.",
+      "fields": [
+        "For receipt inspections without warehouse handling, the source covers entering measurements, reviewing calculated grade and finishing the inspection separately from posting the purchase receipt."
+      ],
+      "documentedCaptions": []
+    },
+    {
+      "sourceId": "quality-purchase-inspection-da-dk",
+      "title": "Kontrol af købsmodtagelser uden lagerhåndtering — Business Central",
+      "sourceUri": "https://learn.microsoft.com/da-dk/dynamics365/business-central/qms-purchase-receipt-testing-simple",
+      "accessedDate": "2026-09-29",
+      "appliesTo": "Microsoft Quality Management extension, purchase receipt scenario without warehouse handling. English Learn source; tenant extension version remains unverified.",
+      "fields": [
+        "For receipt inspections without warehouse handling, the source covers entering measurements, reviewing calculated grade and finishing the inspection separately from posting the purchase receipt."
+      ],
+      "documentedCaptions": []
+    },
+    {
+      "sourceId": "quality-purchase-inspection-nb-no",
+      "title": "Kjøpsbekreftelsesinspeksjoner uten lagerhåndtering — Business Central",
+      "sourceUri": "https://learn.microsoft.com/nb-no/dynamics365/business-central/qms-purchase-receipt-testing-simple",
+      "accessedDate": "2026-09-29",
+      "appliesTo": "Microsoft Quality Management extension, purchase receipt scenario without warehouse handling. English Learn source; tenant extension version remains unverified.",
+      "fields": [
+        "For receipt inspections without warehouse handling, the source covers entering measurements, reviewing calculated grade and finishing the inspection separately from posting the purchase receipt."
+      ],
+      "documentedCaptions": []
+    },
+    {
+      "sourceId": "quality-setup-fr-fr",
+      "title": "Configuration de la gestion de la qualité — Business Central",
+      "sourceUri": "https://learn.microsoft.com/fr-fr/dynamics365/business-central/qms-setup",
+      "accessedDate": "2026-09-29",
+      "appliesTo": "Microsoft Quality Management extension. English Learn source; installed extension version remains unverified.",
+      "fields": [
+        "The source describes Quality Management setup, roles and permissions, including that inspectors can record measurements and finish inspections but cannot change setup, templates or generation rules."
+      ],
+      "documentedCaptions": []
+    },
+    {
+      "sourceId": "quality-setup-de-de",
+      "title": "Einrichtung und Konfiguration der Qualitätsverwaltung — Business Central",
+      "sourceUri": "https://learn.microsoft.com/de-de/dynamics365/business-central/qms-setup",
+      "accessedDate": "2026-09-29",
+      "appliesTo": "Microsoft Quality Management extension. English Learn source; installed extension version remains unverified.",
+      "fields": [
+        "The source describes Quality Management setup, roles and permissions, including that inspectors can record measurements and finish inspections but cannot change setup, templates or generation rules."
+      ],
+      "documentedCaptions": []
+    },
+    {
+      "sourceId": "quality-setup-es-es",
+      "title": "Configuración de administración de calidad — Business Central",
+      "sourceUri": "https://learn.microsoft.com/es-es/dynamics365/business-central/qms-setup",
+      "accessedDate": "2026-09-29",
+      "appliesTo": "Microsoft Quality Management extension. English Learn source; installed extension version remains unverified.",
+      "fields": [
+        "The source describes Quality Management setup, roles and permissions, including that inspectors can record measurements and finish inspections but cannot change setup, templates or generation rules."
+      ],
+      "documentedCaptions": []
+    },
+    {
+      "sourceId": "quality-setup-da-dk",
+      "title": "Konfiguration af kvalitetsstyring — Business Central",
+      "sourceUri": "https://learn.microsoft.com/da-dk/dynamics365/business-central/qms-setup",
+      "accessedDate": "2026-09-29",
+      "appliesTo": "Microsoft Quality Management extension. English Learn source; installed extension version remains unverified.",
+      "fields": [
+        "The source describes Quality Management setup, roles and permissions, including that inspectors can record measurements and finish inspections but cannot change setup, templates or generation rules."
+      ],
+      "documentedCaptions": []
+    },
+    {
+      "sourceId": "quality-scheduled-inspections-fr-fr",
+      "title": "Créer des inspections de qualité planifiées — Business Central",
+      "sourceUri": "https://learn.microsoft.com/fr-fr/dynamics365/business-central/qms-scheduled-test-creation",
+      "accessedDate": "2026-09-29",
+      "appliesTo": "Microsoft Quality Management extension. English Learn article; verify tenant version and job queue settings.",
+      "fields": [
+        "Scheduled quality inspections use generation rules and filters; scope the run to avoid creating an unexpectedly large number of inspections."
+      ],
+      "documentedCaptions": []
+    },
+    {
+      "sourceId": "quality-scheduled-inspections-de-de",
+      "title": "Planen Sie Qualitätsinspektionen — Business Central",
+      "sourceUri": "https://learn.microsoft.com/de-de/dynamics365/business-central/qms-scheduled-test-creation",
+      "accessedDate": "2026-09-29",
+      "appliesTo": "Microsoft Quality Management extension. English Learn article; verify tenant version and job queue settings.",
+      "fields": [
+        "Scheduled quality inspections use generation rules and filters; scope the run to avoid creating an unexpectedly large number of inspections."
+      ],
+      "documentedCaptions": []
+    },
+    {
+      "sourceId": "quality-scheduled-inspections-es-es",
+      "title": "Crear inspecciones de calidad programadas — Business Central",
+      "sourceUri": "https://learn.microsoft.com/es-es/dynamics365/business-central/qms-scheduled-test-creation",
+      "accessedDate": "2026-09-29",
+      "appliesTo": "Microsoft Quality Management extension. English Learn article; verify tenant version and job queue settings.",
+      "fields": [
+        "Scheduled quality inspections use generation rules and filters; scope the run to avoid creating an unexpectedly large number of inspections."
+      ],
+      "documentedCaptions": []
+    },
+    {
+      "sourceId": "quality-inspection-results-sv-se",
+      "title": "Konfigurera kvalitetskontrollresultat — Business Central",
+      "sourceUri": "https://learn.microsoft.com/sv-se/dynamics365/business-central/qms-configuring-grades",
+      "accessedDate": "2026-09-29",
+      "appliesTo": "Microsoft Quality Management extension. English Learn article; installed tenant version and exact captions remain unverified.",
+      "fields": [
+        "Quality inspection result codes define classification, evaluation order, visibility and whether a result permits finishing; test or template result conditions determine which measurements pass."
+      ],
+      "documentedCaptions": []
+    },
+    {
+      "sourceId": "quality-inspection-results-fr-fr",
+      "title": "Configurer les résultats de l’inspection de la qualité — Business Central",
+      "sourceUri": "https://learn.microsoft.com/fr-fr/dynamics365/business-central/qms-configuring-grades",
+      "accessedDate": "2026-09-29",
+      "appliesTo": "Microsoft Quality Management extension. English Learn article; installed tenant version and exact captions remain unverified.",
+      "fields": [
+        "Quality inspection result codes define classification, evaluation order, visibility and whether a result permits finishing; test or template result conditions determine which measurements pass."
+      ],
+      "documentedCaptions": []
+    },
+    {
+      "sourceId": "quality-inspection-results-de-de",
+      "title": "Konfigurieren von Qualitätsüberprüfungsergebnissen — Business Central",
+      "sourceUri": "https://learn.microsoft.com/de-de/dynamics365/business-central/qms-configuring-grades",
+      "accessedDate": "2026-09-29",
+      "appliesTo": "Microsoft Quality Management extension. English Learn article; installed tenant version and exact captions remain unverified.",
+      "fields": [
+        "Quality inspection result codes define classification, evaluation order, visibility and whether a result permits finishing; test or template result conditions determine which measurements pass."
+      ],
+      "documentedCaptions": []
+    },
+    {
+      "sourceId": "quality-inspection-results-es-es",
+      "title": "Configurar los resultados de la inspección de calidad — Business Central",
+      "sourceUri": "https://learn.microsoft.com/es-es/dynamics365/business-central/qms-configuring-grades",
+      "accessedDate": "2026-09-29",
+      "appliesTo": "Microsoft Quality Management extension. English Learn article; installed tenant version and exact captions remain unverified.",
+      "fields": [
+        "Quality inspection result codes define classification, evaluation order, visibility and whether a result permits finishing; test or template result conditions determine which measurements pass."
+      ],
+      "documentedCaptions": []
+    },
+    {
+      "sourceId": "quality-inspection-results-da-dk",
+      "title": "Konfigurer resultater for kvalitetskontrol — Business Central",
+      "sourceUri": "https://learn.microsoft.com/da-dk/dynamics365/business-central/qms-configuring-grades",
+      "accessedDate": "2026-09-29",
+      "appliesTo": "Microsoft Quality Management extension. English Learn article; installed tenant version and exact captions remain unverified.",
+      "fields": [
+        "Quality inspection result codes define classification, evaluation order, visibility and whether a result permits finishing; test or template result conditions determine which measurements pass."
+      ],
+      "documentedCaptions": []
+    },
+    {
+      "sourceId": "quality-inspection-results-fi-fi",
+      "title": "Laadun tarkistuksen tulosten määrittäminen — Business Central",
+      "sourceUri": "https://learn.microsoft.com/fi-fi/dynamics365/business-central/qms-configuring-grades",
+      "accessedDate": "2026-09-29",
+      "appliesTo": "Microsoft Quality Management extension. English Learn article; installed tenant version and exact captions remain unverified.",
+      "fields": [
+        "Quality inspection result codes define classification, evaluation order, visibility and whether a result permits finishing; test or template result conditions determine which measurements pass."
+      ],
+      "documentedCaptions": []
+    },
+    {
+      "sourceId": "quality-inspection-results-nb-no",
+      "title": "Konfigurer resultater for kvalitetsinspeksjon — Business Central",
+      "sourceUri": "https://learn.microsoft.com/nb-no/dynamics365/business-central/qms-configuring-grades",
+      "accessedDate": "2026-09-29",
+      "appliesTo": "Microsoft Quality Management extension. English Learn article; installed tenant version and exact captions remain unverified.",
+      "fields": [
+        "Quality inspection result codes define classification, evaluation order, visibility and whether a result permits finishing; test or template result conditions determine which measurements pass."
+      ],
+      "documentedCaptions": []
+    },
+    {
+      "sourceId": "microsoft-learn-expansion-qms-production-output-fr-fr",
+      "title": "Inspecter la sortie de production — Business Central",
+      "sourceUri": "https://learn.microsoft.com/fr-fr/dynamics365/business-central/qms-production-output-testing",
+      "accessedDate": "2026-09-29",
+      "appliesTo": "Microsoft Quality Management extension for Business Central 2026 release wave 1+. Verify installed extension/version, Premium experience, setup trigger, generation rules, and tenant-specific captions.",
+      "fields": [
+        "Production output inspections depend on production trigger and matching generation rules. The quality inspection links back to production order and operation; measurement entry and finishing are separate from output posting."
+      ],
+      "documentedCaptions": []
+    },
+    {
+      "sourceId": "microsoft-learn-expansion-qms-production-output-de-de",
+      "title": "Überprüfung der Produktionsergebnisse — Business Central",
+      "sourceUri": "https://learn.microsoft.com/de-de/dynamics365/business-central/qms-production-output-testing",
+      "accessedDate": "2026-09-29",
+      "appliesTo": "Microsoft Quality Management extension for Business Central 2026 release wave 1+. Verify installed extension/version, Premium experience, setup trigger, generation rules, and tenant-specific captions.",
+      "fields": [
+        "Production output inspections depend on production trigger and matching generation rules. The quality inspection links back to production order and operation; measurement entry and finishing are separate from output posting."
+      ],
+      "documentedCaptions": []
+    },
+    {
+      "sourceId": "microsoft-learn-expansion-qms-production-output-es-es",
+      "title": "Inspección de la salida de producción — Business Central",
+      "sourceUri": "https://learn.microsoft.com/es-es/dynamics365/business-central/qms-production-output-testing",
+      "accessedDate": "2026-09-29",
+      "appliesTo": "Microsoft Quality Management extension for Business Central 2026 release wave 1+. Verify installed extension/version, Premium experience, setup trigger, generation rules, and tenant-specific captions.",
+      "fields": [
+        "Production output inspections depend on production trigger and matching generation rules. The quality inspection links back to production order and operation; measurement entry and finishing are separate from output posting."
+      ],
+      "documentedCaptions": []
+    },
+    {
+      "sourceId": "microsoft-learn-expansion-qms-production-output-da-dk",
+      "title": "Undersøg produktionsoutput — Business Central",
+      "sourceUri": "https://learn.microsoft.com/da-dk/dynamics365/business-central/qms-production-output-testing",
+      "accessedDate": "2026-09-29",
+      "appliesTo": "Microsoft Quality Management extension for Business Central 2026 release wave 1+. Verify installed extension/version, Premium experience, setup trigger, generation rules, and tenant-specific captions.",
+      "fields": [
+        "Production output inspections depend on production trigger and matching generation rules. The quality inspection links back to production order and operation; measurement entry and finishing are separate from output posting."
+      ],
+      "documentedCaptions": []
+    },
+    {
+      "sourceId": "microsoft-learn-expansion-qms-production-output-nb-no",
+      "title": "Undersøk produksjonsutdata — Business Central",
+      "sourceUri": "https://learn.microsoft.com/nb-no/dynamics365/business-central/qms-production-output-testing",
+      "accessedDate": "2026-09-29",
+      "appliesTo": "Microsoft Quality Management extension for Business Central 2026 release wave 1+. Verify installed extension/version, Premium experience, setup trigger, generation rules, and tenant-specific captions.",
+      "fields": [
+        "Production output inspections depend on production trigger and matching generation rules. The quality inspection links back to production order and operation; measurement entry and finishing are separate from output posting."
+      ],
+      "documentedCaptions": []
+    },
+    {
+      "sourceId": "quality-purchase-receipt-generation-fr-fr",
+      "title": "Inspection des reçus d’achat sans gestion de l’entrepôt — Business Central",
+      "sourceUri": "https://learn.microsoft.com/fr-fr/dynamics365/business-central/qms-purchase-receipt-testing-simple",
+      "accessedDate": "2026-09-29",
+      "appliesTo": "Microsoft Quality Management extension, purchase receipt scenario without warehouse handling. English Learn source; tenant extension version remains unverified.",
+      "fields": [
+        "For receipt inspections without warehouse handling, the source covers entering measurements, reviewing calculated grade and finishing the inspection separately from posting the purchase receipt."
+      ],
+      "documentedCaptions": []
+    },
+    {
+      "sourceId": "quality-purchase-receipt-generation-de-de",
+      "title": "Kaufbelegprüfungen ohne Lagerverwaltung — Business Central",
+      "sourceUri": "https://learn.microsoft.com/de-de/dynamics365/business-central/qms-purchase-receipt-testing-simple",
+      "accessedDate": "2026-09-29",
+      "appliesTo": "Microsoft Quality Management extension, purchase receipt scenario without warehouse handling. English Learn source; tenant extension version remains unverified.",
+      "fields": [
+        "For receipt inspections without warehouse handling, the source covers entering measurements, reviewing calculated grade and finishing the inspection separately from posting the purchase receipt."
+      ],
+      "documentedCaptions": []
+    },
+    {
+      "sourceId": "quality-purchase-receipt-generation-es-es",
+      "title": "Inspecciones de recibos de compra sin control de almacén — Business Central",
+      "sourceUri": "https://learn.microsoft.com/es-es/dynamics365/business-central/qms-purchase-receipt-testing-simple",
+      "accessedDate": "2026-09-29",
+      "appliesTo": "Microsoft Quality Management extension, purchase receipt scenario without warehouse handling. English Learn source; tenant extension version remains unverified.",
+      "fields": [
+        "For receipt inspections without warehouse handling, the source covers entering measurements, reviewing calculated grade and finishing the inspection separately from posting the purchase receipt."
+      ],
+      "documentedCaptions": []
+    },
+    {
+      "sourceId": "quality-purchase-receipt-generation-da-dk",
+      "title": "Kontrol af købsmodtagelser uden lagerhåndtering — Business Central",
+      "sourceUri": "https://learn.microsoft.com/da-dk/dynamics365/business-central/qms-purchase-receipt-testing-simple",
+      "accessedDate": "2026-09-29",
+      "appliesTo": "Microsoft Quality Management extension, purchase receipt scenario without warehouse handling. English Learn source; tenant extension version remains unverified.",
+      "fields": [
+        "For receipt inspections without warehouse handling, the source covers entering measurements, reviewing calculated grade and finishing the inspection separately from posting the purchase receipt."
+      ],
+      "documentedCaptions": []
+    },
+    {
+      "sourceId": "quality-purchase-receipt-generation-nb-no",
+      "title": "Kjøpsbekreftelsesinspeksjoner uten lagerhåndtering — Business Central",
+      "sourceUri": "https://learn.microsoft.com/nb-no/dynamics365/business-central/qms-purchase-receipt-testing-simple",
+      "accessedDate": "2026-09-29",
+      "appliesTo": "Microsoft Quality Management extension, purchase receipt scenario without warehouse handling. English Learn source; tenant extension version remains unverified.",
+      "fields": [
+        "For receipt inspections without warehouse handling, the source covers entering measurements, reviewing calculated grade and finishing the inspection separately from posting the purchase receipt."
+      ],
+      "documentedCaptions": []
+    }
+  ]
+}

@@ -1,0 +1,702 @@
+{
+  "packId": "bc-sustainability",
+  "name": "Business Central sustainability",
+  "version": "1.0.0",
+  "priority": 220,
+  "rules": [
+    {
+      "ruleId": "Sustainability.EnterPurchaseDocumentEmissions",
+      "taskType": "EnterPurchaseDocumentEmissions",
+      "semanticAction": "SetFieldValue",
+      "entity": "PurchaseDocumentLine",
+      "priority": 1390,
+      "confidence": 0.98,
+      "match": {
+        "pagePatterns": [
+          "^Purchase Order$",
+          "^Purchase Invoice$",
+          "^Inköpsorder$",
+          "^Inköpsfaktura$"
+        ],
+        "actionPatterns": [],
+        "fieldPatterns": [
+          "^Sustainability Account No\\.?$",
+          "^Emission CO2$",
+          "^Emission CH4$",
+          "^Emission N2O$",
+          "^Hållbarhetskontonr\\.?$",
+          "^Utsläpp CO2$",
+          "^Utsläpp CH4$",
+          "^Utsläpp N2O$"
+        ],
+        "automationIdPatterns": []
+      },
+      "instructionTemplate": "",
+      "languages": [
+        "en-US",
+        "sv-SE",
+        "fr-FR",
+        "de-DE",
+        "es-ES",
+        "da-DK",
+        "fi-FI",
+        "nb-NO"
+      ],
+      "verifiedRuntimeLocales": [
+        "en-US",
+        "sv-SE"
+      ],
+      "aliases": [],
+      "sourceIds": [
+        "microsoft-learn-expansion-finance-sustainability-accounts-ledger-en-us",
+        "microsoft-learn-expansion-finance-sustainability-accounts-ledger-sv-se",
+        "microsoft-learn-expansion-finance-sustainability-journal-en-us",
+        "microsoft-learn-expansion-finance-sustainability-journal-sv-se",
+        "microsoft-learn-expansion-finance-sustainability-journal-fr-fr",
+        "microsoft-learn-expansion-finance-sustainability-journal-de-de",
+        "microsoft-learn-expansion-finance-sustainability-journal-es-es",
+        "microsoft-learn-expansion-finance-sustainability-journal-da-dk",
+        "microsoft-learn-expansion-finance-sustainability-journal-fi-fi",
+        "microsoft-learn-expansion-finance-sustainability-journal-nb-no"
+      ],
+      "localizedExplanations": {
+        "en-US": "Use this on a purchase order or purchase invoice line when the supplier provides emissions for the purchase. First enable Use Emissions in Purchase Documents in Sustainability Setup. Select a Sustainability Account No. and enter the known CO2, CH4, or N2O amount on the line. These are fixed amounts per line, not per unit, so they are not multiplied by Quantity. The account field is available only for Item and G/L Account line types, not Resource or Charge (Item). Check the document’s Sustainability statistics before posting; posting creates a separate sustainability ledger entry for each qualifying purchase line.",
+        "sv-SE": "Använd fälten på en inköpsorder- eller inköpsfakturarad när leverantören anger utsläpp för inköpet. Aktivera först Använd utsläpp i inköpsdokument i Hållbarhetskonfiguration. Välj ett Hållbarhetskontonr. och ange känt värde för CO2, CH4 eller N2O på raden. Värdena är fasta per rad, inte per enhet, och multipliceras därför inte med Kvantitet. Kontofältet kan bara användas för rader av typen Artikel eller Redovisningskonto, inte Resurs eller Debitering (artikel). Granska utsläppssummorna under Hållbarhet i dokumentstatistiken före bokföring. Bokföringen skapar en separat hållbarhetstransaktion för varje inköpsrad med hållbarhetskonto.",
+        "fr-FR": "Utilisez ces champs sur une ligne de commande ou de facture d’achat lorsque le fournisseur indique les émissions liées à l’achat. Activez d’abord Utiliser les émissions dans les documents d’achat dans la configuration de durabilité. Sélectionnez un numéro de compte de durabilité et saisissez la valeur connue de CO2, CH4 ou N2O sur la ligne. Il s’agit d’un montant fixe par ligne, non par unité ; il n’est donc pas multiplié par la quantité. Le compte n’est disponible que pour les lignes de type Article ou Compte général, et non Ressource ou Frais (article). Vérifiez les totaux de durabilité dans les statistiques du document avant validation. La validation crée une écriture de durabilité distincte pour chaque ligne d’achat admissible.",
+        "de-DE": "Verwenden Sie diese Felder in einer Bestell- oder Einkaufsrechnungszeile, wenn der Lieferant Emissionswerte für den Einkauf angibt. Aktivieren Sie zuerst Emissionen in Einkaufsbelegen verwenden in der Nachhaltigkeitseinrichtung. Wählen Sie eine Nachhaltigkeitskontonummer und geben Sie den bekannten CO2-, CH4- oder N2O-Wert in der Zeile ein. Der Wert gilt fest je Zeile, nicht je Einheit, und wird daher nicht mit der Menge multipliziert. Das Konto ist nur für Zeilen vom Typ Artikel oder Sachkonto verfügbar, nicht für Ressource oder Zu-/Abschlag (Artikel). Prüfen Sie vor dem Buchen die Nachhaltigkeitssummen in der Belegstatistik. Für jede geeignete Einkaufszeile wird beim Buchen ein eigener Nachhaltigkeitsposten erstellt.",
+        "es-ES": "Use estos campos en una línea de pedido o factura de compra cuando el proveedor indique las emisiones de la compra. Primero, active Usar emisiones en documentos de compra en Configuración de sostenibilidad. Seleccione un n.º de cuenta de sostenibilidad e introduzca en la línea el valor conocido de CO2, CH4 o N2O. Es un importe fijo por línea, no por unidad, por lo que no se multiplica por la cantidad. La cuenta solo está disponible para líneas de tipo Producto o Cuenta; no para Recurso ni Cargo (producto). Revise los totales de sostenibilidad en las estadísticas del documento antes de registrarlo. El registro crea un movimiento de sostenibilidad independiente por cada línea de compra válida.",
+        "da-DK": "Brug disse felter på en købsordre- eller købsfakturalinje, når leverandøren oplyser emissioner for købet. Aktivér først Brug emissioner i købsdokumenter under bæredygtighedsopsætning. Vælg et bæredygtighedskontonr., og angiv den kendte CO2-, CH4- eller N2O-værdi på linjen. Værdien er fast pr. linje, ikke pr. enhed, og ganges derfor ikke med antal. Kontoen kan kun bruges på linjer af typen Vare eller Finanskonto, ikke Ressource eller Gebyr (vare). Kontrollér bæredygtighedstotalerne i dokumentstatistikken før bogføring. Bogføringen opretter en særskilt bæredygtighedspost for hver relevant købslinje.",
+        "fi-FI": "Käytä näitä kenttiä ostotilauksen tai ostolaskun rivillä, kun toimittaja ilmoittaa hankinnan päästöt. Ota ensin käyttöön Käytä päästöjä ostoasiakirjoissa vastuullisuusasetuksissa. Valitse vastuullisuustilin numero ja anna riville tunnettu CO2-, CH4- tai N2O-arvo. Arvo on kiinteä rivikohtainen määrä, ei yksikkökohtainen, joten sitä ei kerrota määrällä. Tilin voi valita vain tyypin Nimike tai Pääkirjatili riveille, ei Resurssi- tai Kulu (nimike) -riveille. Tarkista asiakirjan vastuullisuussummat tilastoista ennen kirjaamista. Kirjaus luo erillisen vastuullisuustapahtuman jokaiselle kelvolliselle ostoriville.",
+        "nb-NO": "Bruk disse feltene på en innkjøpsordre- eller innkjøpsfakturalinje når leverandøren oppgir utslipp for kjøpet. Aktiver først Bruk utslipp i kjøpsdokumenter i bærekraftsoppsettet. Velg et bærekraftskontonr. og angi kjent CO2-, CH4- eller N2O-verdi på linjen. Verdien er fast per linje, ikke per enhet, og multipliseres derfor ikke med antall. Kontoen kan bare brukes på linjer av typen Vare eller Finanskonto, ikke Ressurs eller Gebyr (vare). Kontroller bærekraftstotalene i dokumentstatistikken før bokføring. Bokføringen oppretter en egen bærekraftspost for hver kvalifiserte kjøpslinje."
+      }
+    },
+    {
+      "ruleId": "Sustainability.CollectAmountFromGLEntries",
+      "taskType": "CollectSustainabilityAmountFromGL",
+      "semanticAction": "CollectJournalSourceData",
+      "entity": "SustainabilityJournal",
+      "priority": 1380,
+      "confidence": 0.98,
+      "match": {
+        "pagePatterns": [
+          "^Sustainability Journal$",
+          "^Hållbarhetsjournal$"
+        ],
+        "actionPatterns": [
+          "^Collect Amount from G/L Entries$",
+          "^Samla in belopp från huvudbokstransaktioner$"
+        ],
+        "fieldPatterns": [],
+        "automationIdPatterns": []
+      },
+      "instructionTemplate": "",
+      "languages": [
+        "en-US",
+        "sv-SE",
+        "fr-FR",
+        "de-DE",
+        "es-ES",
+        "da-DK",
+        "fi-FI",
+        "nb-NO"
+      ],
+      "verifiedRuntimeLocales": [
+        "en-US",
+        "sv-SE"
+      ],
+      "aliases": [],
+      "sourceIds": [
+        "microsoft-learn-expansion-finance-sustainability-accounts-ledger-en-us",
+        "microsoft-learn-expansion-finance-sustainability-accounts-ledger-sv-se",
+        "microsoft-learn-expansion-finance-sustainability-journal-en-us",
+        "microsoft-learn-expansion-finance-sustainability-journal-sv-se",
+        "microsoft-learn-expansion-finance-sustainability-journal-fr-fr",
+        "microsoft-learn-expansion-finance-sustainability-journal-de-de",
+        "microsoft-learn-expansion-finance-sustainability-journal-es-es",
+        "microsoft-learn-expansion-finance-sustainability-journal-da-dk",
+        "microsoft-learn-expansion-finance-sustainability-journal-fi-fi",
+        "microsoft-learn-expansion-finance-sustainability-journal-nb-no"
+      ],
+      "localizedExplanations": {
+        "en-US": "Use this action before posting when the sustainability account category is configured to calculate a custom amount from the general ledger. It collects matching posted G/L amounts for the journal line using the configured account and optional global-dimension filters and the date range you enter; Business Central sums absolute values. Check the account filter and dates carefully because they determine which financial activity feeds the sustainability calculation. This fills the calculation input only; it does not post the journal or create sustainability ledger entries. Recalculate after changing emission factors.",
+        "sv-SE": "Kör åtgärden före bokföring när hållbarhetskontokategorin är inställd på att beräkna ett anpassat belopp från huvudboken. Den hämtar matchande bokförda redovisningsbelopp till journalraden med kontofiltret, eventuella globala dimensionsfilter och det datumintervall du anger; Business Central summerar beloppen som absolutvärden. Kontrollera konto- och datumfiltren noga eftersom de avgör vilka ekonomiska transaktioner som blir underlag för hållbarhetsberäkningen. Åtgärden fyller bara i beräkningsunderlaget: den bokför inte journalen och skapar inga hållbarhetstransaktioner. Kör omberäkning om utsläppsfaktorer ändrats.",
+        "fr-FR": "Utilisez cette action avant la validation lorsque la catégorie du compte de durabilité est configurée pour calculer un montant personnalisé à partir du grand livre. Elle collecte les montants comptabilisés correspondants pour la ligne du journal selon le filtre de compte, les filtres facultatifs de dimensions globales et la période indiquée ; Business Central additionne les valeurs absolues. Vérifiez soigneusement les filtres de compte et de dates, car ils déterminent les opérations financières utilisées par le calcul de durabilité. Cette action renseigne uniquement les données de calcul : elle ne valide pas le journal et ne crée pas d’écritures de durabilité. Recalculez après toute modification des facteurs d’émission.",
+        "de-DE": "Verwenden Sie diese Aktion vor der Buchung, wenn die Nachhaltigkeitskontenkategorie so eingerichtet ist, dass ein benutzerdefinierter Betrag aus dem Hauptbuch berechnet wird. Sie sammelt passende gebuchte Sachposten für die Journalzeile anhand des Kontenfilters, optionaler globaler Dimensionsfilter und des angegebenen Zeitraums; Business Central summiert die Absolutwerte. Prüfen Sie Konto- und Datumsfilter sorgfältig, da sie bestimmen, welche Finanzaktivitäten in die Nachhaltigkeitsberechnung einfließen. Die Aktion füllt nur die Berechnungsgrundlage; sie bucht weder das Journal noch erstellt sie Nachhaltigkeitsposten. Berechnen Sie nach Änderungen an Emissionsfaktoren erneut.",
+        "es-ES": "Use esta acción antes de registrar cuando la categoría de la cuenta de sostenibilidad esté configurada para calcular un importe personalizado desde el libro mayor. Recopila los importes contabilizados coincidentes para la línea del diario mediante el filtro de cuenta, los filtros opcionales de dimensiones globales y el intervalo de fechas indicado; Business Central suma los valores absolutos. Revise los filtros de cuenta y fecha, ya que determinan qué actividad financiera alimenta el cálculo de sostenibilidad. La acción solo completa el dato de cálculo: no registra el diario ni crea movimientos de sostenibilidad. Vuelva a calcular si cambian los factores de emisión.",
+        "da-DK": "Brug denne handling før bogføring, når bæredygtighedskontokategorien er konfigureret til at beregne et brugerdefineret beløb fra finans. Den indsamler matchende bogførte finansposter til kladdelinjen ud fra kontofilteret, eventuelle globale dimensionsfiltre og det angivne datointerval; Business Central summerer de absolutte værdier. Kontrollér konto- og datofiltrene nøje, da de bestemmer, hvilke finansposter der indgår i bæredygtighedsberegningen. Handlingen udfylder kun beregningsgrundlaget; den bogfører ikke kladden og opretter ikke bæredygtighedsposter. Genberegn, hvis emissionsfaktorerne ændres.",
+        "fi-FI": "Käytä tätä toimintoa ennen kirjaamista, kun vastuullisuustilin luokka on määritetty laskemaan mukautettu summa pääkirjasta. Se kerää päiväkirjariville sopivat kirjatut pääkirjatapahtumat tilisuodattimen, valinnaisten globaalien dimensiosuodattimien ja antamasi päivämäärävälin perusteella; Business Central summaa itseisarvot. Tarkista tili- ja päivämääräsuodattimet, koska ne määrittävät vastuullisuuslaskentaan tulevat taloustapahtumat. Toiminto täyttää vain laskennan lähtötiedot; se ei kirjaa päiväkirjaa eikä luo vastuullisuustapahtumia. Laske uudelleen, jos päästökertoimet muuttuvat.",
+        "nb-NO": "Bruk denne handlingen før bokføring når bærekraftskontokategorien er konfigurert til å beregne et egendefinert beløp fra hovedboken. Den henter samsvarende bokførte hovedboksposter til kladdelinjen ved hjelp av kontofilteret, eventuelle globale dimensjonsfiltre og datoperioden du angir; Business Central summerer absoluttverdiene. Kontroller konto- og datofiltrene nøye, fordi de avgjør hvilke økonomiske transaksjoner som inngår i bærekraftsberegningen. Handlingen fyller bare ut beregningsgrunnlaget; den bokfører ikke kladden og oppretter ingen bærekraftsposter. Beregn på nytt hvis utslippsfaktorene endres."
+      }
+    },
+    {
+      "ruleId": "Sustainability.CreateAccountCategory",
+      "taskType": "CreateSustainabilityAccountCategory",
+      "semanticAction": "CreateRecord",
+      "entity": "SustainabilityAccountCategory",
+      "priority": 1350,
+      "confidence": 0.97,
+      "match": {
+        "pagePatterns": [
+          "^Sustainability Account Categories$",
+          "^Kategorier för hållbarhetskonto$"
+        ],
+        "actionPatterns": [
+          "^New$",
+          "^Ny$"
+        ],
+        "fieldPatterns": [],
+        "automationIdPatterns": []
+      },
+      "instructionTemplate": "",
+      "languages": [
+        "en-US",
+        "sv-SE",
+        "fr-FR",
+        "de-DE",
+        "es-ES",
+        "da-DK",
+        "fi-FI",
+        "nb-NO"
+      ],
+      "verifiedRuntimeLocales": [
+        "en-US",
+        "sv-SE"
+      ],
+      "aliases": [],
+      "sourceIds": [
+        "microsoft-learn-expansion-finance-sustainability-accounts-ledger-en-us",
+        "microsoft-learn-expansion-finance-sustainability-accounts-ledger-sv-se",
+        "microsoft-learn-expansion-finance-sustainability-accounts-ledger-fr-fr",
+        "microsoft-learn-expansion-finance-sustainability-accounts-ledger-de-de",
+        "microsoft-learn-expansion-finance-sustainability-accounts-ledger-es-es",
+        "microsoft-learn-expansion-finance-sustainability-accounts-ledger-da-dk",
+        "microsoft-learn-expansion-finance-sustainability-accounts-ledger-fi-fi",
+        "microsoft-learn-expansion-finance-sustainability-accounts-ledger-nb-no"
+      ],
+      "localizedExplanations": {
+        "en-US": "Create this category to define what a sustainability account tracks and how journal amounts can be calculated. Choose either greenhouse-gas emissions or water/waste metrics, select at least one metric, and set a calculation foundation only when source quantities need to be converted using configured factors. This category is later assigned to sustainability accounts; it does not create an account or post entries. Review the matching subcategory and emission factors before using the account in a journal.",
+        "sv-SE": "Skapa kategorin för att bestämma vad ett hållbarhetskonto ska följa och hur journalvärden kan beräknas. Välj antingen växthusgasutsläpp eller vatten-/avfallsdata, markera minst ett mätvärde och ange beräkningsgrund när underlag ska omvandlas med inställda faktorer. Kategorin kopplas senare till hållbarhetskonton; den skapar inget konto och bokför inga transaktioner. Kontrollera motsvarande underkategori och utsläppsfaktorer innan kontot används i en journal.",
+        "fr-FR": "Créez cette catégorie pour définir les données suivies par un compte de durabilité et le calcul des montants de journal. Choisissez les émissions de gaz à effet de serre ou les mesures liées à l’eau et aux déchets, sélectionnez au moins une mesure et indiquez une base de calcul lorsque les données doivent être converties avec des facteurs configurés. La catégorie sera ensuite affectée à des comptes de durabilité ; elle ne crée pas de compte et ne valide aucune écriture. Vérifiez la sous-catégorie et les facteurs d’émission correspondants avant d’utiliser le compte dans un journal.",
+        "de-DE": "Erstellen Sie diese Kategorie, um festzulegen, welche Daten ein Nachhaltigkeitskonto nachverfolgt und wie Journalbeträge berechnet werden können. Wählen Sie entweder Treibhausgasemissionen oder Wasser-/Abfalldaten, mindestens einen Messwert und eine Berechnungsgrundlage, wenn Eingabemengen mit konfigurierten Faktoren umgerechnet werden sollen. Die Kategorie wird später Nachhaltigkeitskonten zugeordnet; sie erstellt kein Konto und bucht keine Einträge. Prüfen Sie vor der Verwendung des Kontos im Journal die passende Unterkategorie und die Emissionsfaktoren.",
+        "es-ES": "Cree esta categoría para definir qué datos registra una cuenta de sostenibilidad y cómo se calculan los importes del diario. Elija emisiones de gases de efecto invernadero o métricas de agua/residuos, seleccione al menos una métrica y establezca una base de cálculo cuando las cantidades de origen deban convertirse mediante factores configurados. La categoría se asigna después a cuentas de sostenibilidad; no crea una cuenta ni registra movimientos. Revise la subcategoría y los factores de emisión correspondientes antes de usar la cuenta en un diario.",
+        "da-DK": "Opret kategorien for at definere, hvad en bæredygtighedskonto sporer, og hvordan kladdens beløb kan beregnes. Vælg enten drivhusgasemissioner eller vand-/affaldsmålinger, vælg mindst én måling, og angiv et beregningsgrundlag, når inputmængder skal omregnes med konfigurerede faktorer. Kategorien tildeles senere til bæredygtighedskonti; den opretter ikke en konto og bogfører ingen poster. Kontrollér den tilsvarende underkategori og emissionsfaktorer, før kontoen bruges i en kladde.",
+        "fi-FI": "Luo tämä luokka määrittämään, mitä vastuullisuustili seuraa ja miten päiväkirjan summat voidaan laskea. Valitse joko kasvihuonekaasupäästöt tai vesi-/jätemittarit, valitse vähintään yksi mittari ja määritä laskentaperuste, kun lähtömäärät muunnetaan määritetyillä kertoimilla. Luokka liitetään myöhemmin vastuullisuustileihin; se ei luo tiliä eikä kirjaa tapahtumia. Tarkista vastaava alaluokka ja päästökertoimet ennen tilin käyttöä päiväkirjassa.",
+        "nb-NO": "Opprett kategorien for å definere hva en bærekraftskonto sporer, og hvordan kladdbeløp kan beregnes. Velg enten klimagassutslipp eller vann-/avfallsmålinger, velg minst én måling, og angi et beregningsgrunnlag når inndata skal omregnes med konfigurerte faktorer. Kategorien tilordnes senere til bærekraftskontoer; den oppretter ikke en konto og bokfører ingen poster. Kontroller den tilhørende underkategorien og utslippsfaktorene før kontoen brukes i en kladd."
+      }
+    },
+    {
+      "ruleId": "Sustainability.CreateAccountSubcategory",
+      "taskType": "CreateSustainabilityAccountSubcategory",
+      "semanticAction": "CreateRecord",
+      "entity": "SustainabilityAccountSubcategory",
+      "priority": 1350,
+      "confidence": 0.97,
+      "match": {
+        "pagePatterns": [
+          "^Sustainability Account Subcategories$",
+          "^Underkategorier för hållbarhetskonto$"
+        ],
+        "actionPatterns": [
+          "^New$",
+          "^Ny$"
+        ],
+        "fieldPatterns": [],
+        "automationIdPatterns": []
+      },
+      "instructionTemplate": "",
+      "languages": [
+        "en-US",
+        "sv-SE",
+        "fr-FR",
+        "de-DE",
+        "es-ES",
+        "da-DK",
+        "fi-FI",
+        "nb-NO"
+      ],
+      "verifiedRuntimeLocales": [
+        "en-US",
+        "sv-SE"
+      ],
+      "aliases": [],
+      "sourceIds": [
+        "microsoft-learn-expansion-finance-sustainability-accounts-ledger-en-us",
+        "microsoft-learn-expansion-finance-sustainability-accounts-ledger-sv-se",
+        "microsoft-learn-expansion-finance-sustainability-accounts-ledger-fr-fr",
+        "microsoft-learn-expansion-finance-sustainability-accounts-ledger-de-de",
+        "microsoft-learn-expansion-finance-sustainability-accounts-ledger-es-es",
+        "microsoft-learn-expansion-finance-sustainability-accounts-ledger-da-dk",
+        "microsoft-learn-expansion-finance-sustainability-accounts-ledger-fi-fi",
+        "microsoft-learn-expansion-finance-sustainability-accounts-ledger-nb-no"
+      ],
+      "localizedExplanations": {
+        "en-US": "Create a subcategory under the selected sustainability account category to supply the emission or intensity factors used by its calculation foundation. Enter the factor source as well as the relevant factors, and add energy-source and renewable/onsite settings when they apply. A single account can use different subcategories for different vehicles, fuels, or other factor sets. This is configuration only: the values affect later journal calculations but do not create ledger entries by themselves.",
+        "sv-SE": "Skapa underkategorin under vald hållbarhetskontokategori för att ange de utsläpps- eller intensitetsfaktorer som beräkningsgrunden använder. Ange källan till faktorerna och relevanta faktorvärden samt energikälla och inställningar för förnybar energi eller energi på plats när de behövs. Ett konto kan ha olika underkategorier för exempelvis fordon, bränslen eller andra faktoruppsättningar. Detta är endast konfiguration: värdena påverkar senare journalberäkningar men skapar inga transaktioner i sig.",
+        "fr-FR": "Créez une sous-catégorie sous la catégorie de compte de durabilité sélectionnée afin de fournir les facteurs d’émission ou d’intensité utilisés par la base de calcul. Indiquez la source et les facteurs pertinents, ainsi que la source d’énergie et les paramètres renouvelable/sur site s’ils s’appliquent. Un même compte peut utiliser différentes sous-catégories pour différents véhicules, carburants ou ensembles de facteurs. Il s’agit uniquement d’une configuration : ces valeurs influencent les calculs ultérieurs du journal, sans créer d’écritures à elles seules.",
+        "de-DE": "Erstellen Sie eine Unterkategorie unter der ausgewählten Nachhaltigkeitskontenkategorie, um die von der Berechnungsgrundlage verwendeten Emissions- oder Intensitätsfaktoren bereitzustellen. Geben Sie die Quelle und die relevanten Faktoren sowie bei Bedarf Energiequelle und Einstellungen für erneuerbare Energie oder Energie vor Ort an. Ein Konto kann verschiedene Unterkategorien für unterschiedliche Fahrzeuge, Kraftstoffe oder Faktorsätze verwenden. Dies ist nur eine Konfiguration: Die Werte beeinflussen spätere Journalberechnungen, erzeugen aber selbst keine Ledgerposten.",
+        "es-ES": "Cree una subcategoría dentro de la categoría de cuenta de sostenibilidad seleccionada para proporcionar los factores de emisión o intensidad que utiliza la base de cálculo. Indique el origen de los factores y los valores pertinentes, además del origen de energía y las opciones renovable/in situ cuando correspondan. Una cuenta puede usar distintas subcategorías para vehículos, combustibles u otros conjuntos de factores. Esto solo configura el sistema: los valores afectan a cálculos posteriores del diario, pero no crean movimientos por sí mismos.",
+        "da-DK": "Opret en underkategori under den valgte bæredygtighedskontokategori for at angive de emissions- eller intensitetsfaktorer, som beregningsgrundlaget bruger. Angiv faktorernes kilde og relevante værdier samt energikilde og indstillinger for vedvarende energi eller energi på stedet, når det er relevant. En konto kan bruge forskellige underkategorier til forskellige køretøjer, brændstoffer eller faktorsæt. Dette er kun konfiguration: Værdierne påvirker senere kladdeberegninger, men opretter ikke poster i sig selv.",
+        "fi-FI": "Luo alaluokka valitun vastuullisuustilin luokan alle ja anna päästö- tai intensiteettikertoimet, joita laskentaperuste käyttää. Ilmoita kertoimien lähde ja asiaankuuluvat arvot sekä energialähde ja uusiutuvaa energiaa tai käyttöpaikalla tuotettua energiaa koskevat asetukset tarvittaessa. Yhdellä tilillä voi olla eri alaluokkia eri ajoneuvoille, polttoaineille tai kertoimille. Tämä on vain määritystä: arvot vaikuttavat myöhempiin päiväkirjalaskelmiin, mutta eivät yksin luo kirjauksia.",
+        "nb-NO": "Opprett en underkategori under den valgte bærekraftskontokategorien for å angi utslipps- eller intensitetsfaktorene som beregningsgrunnlaget bruker. Oppgi kilden til faktorene og relevante verdier, samt energikilde og innstillinger for fornybar energi eller energi på stedet når det gjelder. Én konto kan bruke ulike underkategorier for forskjellige kjøretøy, drivstoff eller faktorsett. Dette er bare konfigurasjon: Verdiene påvirker senere kladdberegninger, men oppretter ikke poster i seg selv."
+      }
+    },
+    {
+      "ruleId": "BCExpansion.ManualInput",
+      "taskType": "ManualInput",
+      "semanticAction": "ManualInput",
+      "entity": "SustainabilityJournal",
+      "priority": 1300,
+      "confidence": 0.96,
+      "match": {
+        "pagePatterns": [
+          "^Sustainability Journal$",
+          "^Hållbarhetsjournal$",
+          "^Journal de durabilité$",
+          "^Nachhaltigkeits-Buch\\.-Blatt$",
+          "^Diario de sostenibilidad$",
+          "^Bæredygtighedskladde$",
+          "^Kestävyyspäiväkirja$",
+          "^Bærekraftskladd$"
+        ],
+        "actionPatterns": [],
+        "fieldPatterns": [
+          "^Manual Input$",
+          "^Manuell inmatning$",
+          "^Saisie manuelle$",
+          "^Manuelle Eingabe$",
+          "^Entrada manual$",
+          "^Manuel indtastning$",
+          "^Manuaalinen syöttö$",
+          "^Manuelle inndata$"
+        ],
+        "automationIdPatterns": []
+      },
+      "instructionTemplate": "",
+      "languages": [
+        "en-US",
+        "sv-SE",
+        "fr-FR",
+        "de-DE",
+        "es-ES",
+        "da-DK",
+        "fi-FI",
+        "nb-NO"
+      ],
+      "aliases": [],
+      "sourceIds": [
+        "microsoft-learn-expansion-finance-sustainability-journal-en-us",
+        "microsoft-learn-expansion-finance-sustainability-journal-sv-se",
+        "microsoft-learn-expansion-finance-sustainability-journal-fr-fr",
+        "microsoft-learn-expansion-finance-sustainability-journal-de-de",
+        "microsoft-learn-expansion-finance-sustainability-journal-es-es",
+        "microsoft-learn-expansion-finance-sustainability-journal-da-dk",
+        "microsoft-learn-expansion-finance-sustainability-journal-fi-fi",
+        "microsoft-learn-expansion-finance-sustainability-journal-nb-no"
+      ],
+      "localizedExplanations": {
+        "en-US": "This setting chooses between entering known sustainability amounts directly and calculating them from input data and configured factors. When manual input is enabled, calculation input fields become unavailable.",
+        "sv-SE": "Inställningen väljer mellan att ange kända hållbarhetsvärden direkt och att beräkna dem från underlag och inställda faktorer. Vid manuell inmatning blir beräkningens indatafält inte redigerbara.",
+        "fr-FR": "Ce réglage choisit entre la saisie directe de valeurs de durabilité connues et leur calcul à partir des données et facteurs configurés. La saisie manuelle désactive les champs d’entrée du calcul.",
+        "de-DE": "Die Einstellung wählt zwischen der direkten Eingabe bekannter Nachhaltigkeitswerte und der Berechnung aus Eingabedaten und Faktoren. Bei manueller Eingabe sind die Berechnungseingabefelder nicht bearbeitbar.",
+        "es-ES": "Esta opción permite introducir valores de sostenibilidad conocidos o calcularlos con datos y factores configurados. La entrada manual deshabilita los campos de datos del cálculo.",
+        "da-DK": "Indstillingen vælger mellem direkte indtastning af kendte bæredygtighedsværdier og beregning ud fra data og opsatte faktorer. Manuel indtastning låser beregningens inputfelter.",
+        "fi-FI": "Asetus valitsee tunnettujen vastuullisuusarvojen suoran syötön tai laskennan lähtötiedoista ja määritetyistä kertoimista. Manuaalinen syöttö estää laskennan lähtötietokenttien muokkauksen.",
+        "nb-NO": "Innstillingen velger mellom direkte innlegging av kjente bærekraftsverdier og beregning fra data og konfigurerte faktorer. Manuell innlegging låser beregningens inndatafelt."
+      }
+    },
+    {
+      "ruleId": "BCExpansion.RecalculateJournal",
+      "taskType": "RecalculateJournal",
+      "semanticAction": "RecalculateJournal",
+      "entity": "SustainabilityJournal",
+      "priority": 1300,
+      "confidence": 0.96,
+      "match": {
+        "pagePatterns": [
+          "^Sustainability Journal$",
+          "^Hållbarhetsjournal$",
+          "^Journal de durabilité$",
+          "^Nachhaltigkeits-Buch\\.-Blatt$",
+          "^Diario de sostenibilidad$",
+          "^Bæredygtighedskladde$",
+          "^Kestävyyspäiväkirja$",
+          "^Bærekraftskladd$"
+        ],
+        "actionPatterns": [
+          "^Recalculate$",
+          "^Omberäkna$",
+          "^Recalculer$",
+          "^Neu berechnen$",
+          "^Recalcular$",
+          "^Genberegn$",
+          "^Laske uudelleen$",
+          "^Beregn på nytt$"
+        ],
+        "fieldPatterns": [],
+        "automationIdPatterns": []
+      },
+      "instructionTemplate": "",
+      "languages": [
+        "en-US",
+        "sv-SE",
+        "fr-FR",
+        "de-DE",
+        "es-ES",
+        "da-DK",
+        "fi-FI",
+        "nb-NO"
+      ],
+      "aliases": [],
+      "sourceIds": [
+        "microsoft-learn-expansion-finance-sustainability-journal-en-us",
+        "microsoft-learn-expansion-finance-sustainability-journal-sv-se",
+        "microsoft-learn-expansion-finance-sustainability-journal-fr-fr",
+        "microsoft-learn-expansion-finance-sustainability-journal-de-de",
+        "microsoft-learn-expansion-finance-sustainability-journal-es-es",
+        "microsoft-learn-expansion-finance-sustainability-journal-da-dk",
+        "microsoft-learn-expansion-finance-sustainability-journal-fi-fi",
+        "microsoft-learn-expansion-finance-sustainability-journal-nb-no"
+      ],
+      "localizedExplanations": {
+        "en-US": "Recalculation updates the journal’s calculated amounts using the current emission factors. This matters when factors changed after the lines were entered. It does not post sustainability ledger entries.",
+        "sv-SE": "Omberäkningen uppdaterar journalens beräknade värden med aktuella utsläppsfaktorer. Det behövs när faktorer ändrats efter att raderna fylldes i. Åtgärden bokför inga hållbarhetstransaktioner.",
+        "fr-FR": "Le recalcul actualise les valeurs calculées de la feuille avec les facteurs d’émission actuels, notamment s’ils ont changé après la saisie. Il ne valide pas d’écritures de durabilité.",
+        "de-DE": "Die Neuberechnung aktualisiert berechnete Werte mit den aktuellen Emissionsfaktoren, etwa nach deren Änderung seit der Zeilenerfassung. Sie bucht keine Nachhaltigkeitsposten.",
+        "es-ES": "El recálculo actualiza los valores del diario con los factores de emisión actuales, por ejemplo si cambiaron tras introducir las líneas. No registra movimientos de sostenibilidad.",
+        "da-DK": "Genberegningen opdaterer kladdens beregnede værdier med aktuelle emissionsfaktorer, eksempelvis efter ændringer siden indtastningen. Den bogfører ikke bæredygtighedsposter.",
+        "fi-FI": "Uudelleenlaskenta päivittää päiväkirjan lasketut arvot nykyisillä päästökertoimilla, esimerkiksi kun kertoimet ovat muuttuneet rivien syöttämisen jälkeen. Se ei kirjaa vastuullisuustapahtumia.",
+        "nb-NO": "Ny beregning oppdaterer kladdens beregnede verdier med gjeldende utslippsfaktorer, for eksempel etter endringer siden registreringen. Den bokfører ikke bærekraftsposter."
+      }
+    },
+    {
+      "ruleId": "BCExpansion.PostJournal",
+      "taskType": "PostJournal",
+      "semanticAction": "PostJournal",
+      "entity": "SustainabilityJournal",
+      "priority": 1300,
+      "confidence": 0.96,
+      "match": {
+        "pagePatterns": [
+          "^Sustainability Journal$",
+          "^Hållbarhetsjournal$",
+          "^Journal de durabilité$",
+          "^Nachhaltigkeits-Buch\\.-Blatt$",
+          "^Diario de sostenibilidad$",
+          "^Bæredygtighedskladde$",
+          "^Kestävyyspäiväkirja$",
+          "^Bærekraftskladd$"
+        ],
+        "actionPatterns": [
+          "^Post$",
+          "^Bokför$",
+          "^Poster$",
+          "^Buchen$",
+          "^Registrar$",
+          "^Bogfør$",
+          "^Kirjaa$",
+          "^Bokfør$"
+        ],
+        "fieldPatterns": [],
+        "automationIdPatterns": []
+      },
+      "instructionTemplate": "",
+      "languages": [
+        "en-US",
+        "sv-SE",
+        "fr-FR",
+        "de-DE",
+        "es-ES",
+        "da-DK",
+        "fi-FI",
+        "nb-NO"
+      ],
+      "aliases": [],
+      "sourceIds": [
+        "microsoft-learn-expansion-finance-sustainability-journal-en-us",
+        "microsoft-learn-expansion-finance-sustainability-journal-sv-se",
+        "microsoft-learn-expansion-finance-sustainability-journal-fr-fr",
+        "microsoft-learn-expansion-finance-sustainability-journal-de-de",
+        "microsoft-learn-expansion-finance-sustainability-journal-es-es",
+        "microsoft-learn-expansion-finance-sustainability-journal-da-dk",
+        "microsoft-learn-expansion-finance-sustainability-journal-fi-fi",
+        "microsoft-learn-expansion-finance-sustainability-journal-nb-no"
+      ],
+      "localizedExplanations": {
+        "en-US": "Posting a sustainability journal creates sustainability ledger entries. Check accounts, amounts and calculation factors first. If calculation uses general ledger data, collect those amounts before posting.",
+        "sv-SE": "Bokföring av hållbarhetsjournalen skapar hållbarhetstransaktioner. Kontrollera konton, värden och beräkningsfaktorer först. Om beräkningen använder redovisningsdata behöver beloppen hämtas före bokföringen.",
+        "fr-FR": "La validation crée des écritures de durabilité. Vérifiez d’abord comptes, valeurs et facteurs. Si le calcul utilise le grand livre, collectez les montants avant de valider.",
+        "de-DE": "Die Buchung erzeugt Nachhaltigkeitsposten. Prüfen Sie vorher Konten, Werte und Faktoren. Bei Berechnung aus der Finanzbuchhaltung müssen die Beträge zuvor abgerufen werden.",
+        "es-ES": "El registro crea movimientos de sostenibilidad. Revise cuentas, valores y factores. Si el cálculo usa la contabilidad general, recopile los importes antes de registrar.",
+        "da-DK": "Bogføringen opretter bæredygtighedsposter. Kontroller først konti, værdier og faktorer. Hvis beregningen bruger finansdata, skal beløbene indsamles inden bogføring.",
+        "fi-FI": "Kirjaus luo vastuullisuustapahtumat. Tarkista ensin tilit, arvot ja kertoimet. Jos laskenta käyttää pääkirjan tietoja, kerää summat ennen kirjausta.",
+        "nb-NO": "Bokføringen oppretter bærekraftsposter. Kontroller først kontoer, verdier og faktorer. Hvis beregningen bruker finansdata, må beløpene hentes før bokføring."
+      }
+    }
+  ],
+  "sources": [
+    {
+      "sourceId": "microsoft-learn-expansion-finance-sustainability-accounts-ledger-fr-fr",
+      "title": "Plan comptable et comptabilité de durabilité - Business Central | Microsoft Learn",
+      "sourceUri": "https://learn.microsoft.com/fr-fr/dynamics365/business-central/finance-sustainability-accounts-ledger",
+      "accessedDate": "2026-09-29",
+      "appliesTo": "Business Central standard functionality. Localized reference text; automatic UI caption matching is not enabled for this locale.",
+      "fields": [
+        "The localized article documents account categories, calculation foundations, and subcategory emission factors."
+      ],
+      "documentedCaptions": []
+    },
+    {
+      "sourceId": "microsoft-learn-expansion-finance-sustainability-accounts-ledger-de-de",
+      "title": "Diagramm der Nachhaltigkeitskonten und des Sachkontos - Business Central | Microsoft Learn",
+      "sourceUri": "https://learn.microsoft.com/de-de/dynamics365/business-central/finance-sustainability-accounts-ledger",
+      "accessedDate": "2026-09-29",
+      "appliesTo": "Business Central standard functionality. Localized reference text; automatic UI caption matching is not enabled for this locale.",
+      "fields": [
+        "The localized article documents account categories, calculation foundations, and subcategory emission factors."
+      ],
+      "documentedCaptions": []
+    },
+    {
+      "sourceId": "microsoft-learn-expansion-finance-sustainability-accounts-ledger-es-es",
+      "title": "Plan de cuentas de sostenibilidad y contabilidad - Business Central | Microsoft Learn",
+      "sourceUri": "https://learn.microsoft.com/es-es/dynamics365/business-central/finance-sustainability-accounts-ledger",
+      "accessedDate": "2026-09-29",
+      "appliesTo": "Business Central standard functionality. Localized reference text; automatic UI caption matching is not enabled for this locale.",
+      "fields": [
+        "The localized article documents account categories, calculation foundations, and subcategory emission factors."
+      ],
+      "documentedCaptions": []
+    },
+    {
+      "sourceId": "microsoft-learn-expansion-finance-sustainability-accounts-ledger-da-dk",
+      "title": "Diagram over bæredygtighedskonti og finans - Business Central | Microsoft Learn",
+      "sourceUri": "https://learn.microsoft.com/da-dk/dynamics365/business-central/finance-sustainability-accounts-ledger",
+      "accessedDate": "2026-09-29",
+      "appliesTo": "Business Central standard functionality. Localized reference text; automatic UI caption matching is not enabled for this locale.",
+      "fields": [
+        "The localized article documents account categories, calculation foundations, and subcategory emission factors."
+      ],
+      "documentedCaptions": []
+    },
+    {
+      "sourceId": "microsoft-learn-expansion-finance-sustainability-accounts-ledger-fi-fi",
+      "title": "Chart of sustainability accounts and ledger - Business Central | Microsoft Learn",
+      "sourceUri": "https://learn.microsoft.com/fi-fi/dynamics365/business-central/finance-sustainability-accounts-ledger",
+      "accessedDate": "2026-09-29",
+      "appliesTo": "Business Central standard functionality. Localized route available; automatic UI caption matching is not enabled for this locale.",
+      "fields": [
+        "Localized Learn route recorded; content translation and UI captions were not independently verified."
+      ],
+      "documentedCaptions": []
+    },
+    {
+      "sourceId": "microsoft-learn-expansion-finance-sustainability-accounts-ledger-nb-no",
+      "title": "Chart of sustainability accounts and ledger - Business Central | Microsoft Learn",
+      "sourceUri": "https://learn.microsoft.com/nb-no/dynamics365/business-central/finance-sustainability-accounts-ledger",
+      "accessedDate": "2026-09-29",
+      "appliesTo": "Business Central standard functionality. Localized route available; automatic UI caption matching is not enabled for this locale.",
+      "fields": [
+        "Localized Learn route recorded; content translation and UI captions were not independently verified."
+      ],
+      "documentedCaptions": []
+    },
+    {
+      "sourceId": "microsoft-learn-expansion-finance-sustainability-accounts-ledger-en-us",
+      "title": "Chart of sustainability accounts and ledger - Business Central | Microsoft Learn",
+      "sourceUri": "https://learn.microsoft.com/en-us/dynamics365/business-central/finance-sustainability-accounts-ledger",
+      "accessedDate": "2026-09-29",
+      "appliesTo": "Business Central standard functionality. English captions checked; tenant/version-specific UI captions remain unverified.",
+      "fields": [
+        "A sustainability account category defines the scopes and metrics an account tracks, its calculation foundation, and related configuration. Select at least one metric; gas emissions and water/waste metrics cannot be combined in the same category.",
+        "Sustainability account subcategories define the emission or intensity factors used by calculation formulas. They can provide different factor sets for one account and do not create ledger entries by themselves."
+      ],
+      "documentedCaptions": [
+        "Sustainability Account Categories",
+        "Sustainability Account Subcategories",
+        "New",
+        "Subcategories"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-expansion-finance-sustainability-accounts-ledger-sv-se",
+      "title": "Kontoplan för hållbarhetskonton och huvudbok - Business Central | Microsoft Learn",
+      "sourceUri": "https://learn.microsoft.com/sv-se/dynamics365/business-central/finance-sustainability-accounts-ledger",
+      "accessedDate": "2026-09-29",
+      "appliesTo": "Business Central standardfunktion. Svenska Microsoft Learn-texter kontrollerade; lokala klienttexter och versionsskillnader är inte verifierade.",
+      "fields": [
+        "En hållbarhetskontokategori definierar scope och mätvärden som ett konto följer, dess beräkningsgrund och relaterad konfiguration. Välj minst ett mätvärde; gasutsläpp kan inte kombineras med vatten-/avfallsmätvärden i samma kategori.",
+        "Underkategorier för hållbarhetskonton definierar utsläpps- eller intensitetsfaktorer som beräkningsformlerna använder. De kan tillhandahålla olika faktoruppsättningar för ett konto och skapar inte transaktioner i sig."
+      ],
+      "documentedCaptions": [
+        "Kategorier för hållbarhetskonto",
+        "Underkategorier för hållbarhetskonto",
+        "Ny",
+        "Underkategorier"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-expansion-finance-sustainability-journal-en-us",
+      "title": "Record sustainability entries - Business Central | Microsoft Learn",
+      "sourceUri": "https://learn.microsoft.com/en-us/dynamics365/business-central/finance-sustainability-journal",
+      "accessedDate": "2026-09-29",
+      "appliesTo": "Business Central standard functionality. Microsoft Learn captions checked; tenant/version-specific UI captions remain unverified.",
+      "fields": [
+        "This setting chooses between entering known sustainability amounts directly and calculating them from input data and configured factors. When manual input is enabled, calculation input fields become unavailable.",
+        "Recalculation updates the journal’s calculated amounts using the current emission factors. This matters when factors changed after the lines were entered. It does not post sustainability ledger entries.",
+        "Posting a sustainability journal creates sustainability ledger entries. Check accounts, amounts and calculation factors first. If calculation uses general ledger data, collect those amounts before posting.",
+        "When a sustainability account category is configured to calculate a custom amount from the general ledger, use Collect Amount from G/L Entries before posting. The action collects matching posted G/L amounts using account and optional dimension filters and the selected date range; amounts are summed as absolute values. It fills the calculation input, but does not post the sustainability journal.",
+        "Purchase documents can record supplier-provided CO2, CH4, or N2O on eligible Item or G/L Account lines. Emission values are fixed per document line and are not multiplied by Quantity. Posting creates a separate sustainability ledger entry per eligible purchase line."
+      ],
+      "documentedCaptions": [
+        "Sustainability Journal",
+        "Manual Input",
+        "Recalculate",
+        "Post",
+        "Collect Amount from G/L Entries",
+        "Purchase Orders",
+        "Purchase Invoices",
+        "Sustainability Account No.",
+        "Emission CO2",
+        "Emission CH4",
+        "Emission N2O",
+        "Use Emissions in Purchase Documents"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-expansion-finance-sustainability-journal-sv-se",
+      "title": "Registrera hållbarhetstransaktioner - Business Central | Microsoft Learn",
+      "sourceUri": "https://learn.microsoft.com/sv-se/dynamics365/business-central/finance-sustainability-journal",
+      "accessedDate": "2026-09-29",
+      "appliesTo": "Business Central standard functionality. Microsoft Learn captions checked; tenant/version-specific UI captions remain unverified.",
+      "fields": [
+        "This setting chooses between entering known sustainability amounts directly and calculating them from input data and configured factors. When manual input is enabled, calculation input fields become unavailable.",
+        "Recalculation updates the journal’s calculated amounts using the current emission factors. This matters when factors changed after the lines were entered. It does not post sustainability ledger entries.",
+        "Posting a sustainability journal creates sustainability ledger entries. Check accounts, amounts and calculation factors first. If calculation uses general ledger data, collect those amounts before posting.",
+        "When a sustainability account category is configured to calculate a custom amount from the general ledger, use Collect Amount from G/L Entries before posting. The action collects matching posted G/L amounts using account and optional dimension filters and the selected date range; amounts are summed as absolute values. It fills the calculation input, but does not post the sustainability journal.",
+        "Inköpsdokument kan registrera leverantörens CO2-, CH4- eller N2O-värden på rader av typen Artikel eller Redovisningskonto. Utsläppsvärdena är fasta per dokumentrad och multipliceras inte med Kvantitet. Bokföringen skapar en separat hållbarhetstransaktion per kvalificerad inköpsrad."
+      ],
+      "documentedCaptions": [
+        "Hållbarhetsjournal",
+        "Manuell inmatning",
+        "Omberäkna",
+        "Bokför",
+        "Samla in belopp från huvudbokstransaktioner",
+        "Inköpsorder",
+        "Inköpsfakturor",
+        "Hållbarhetskontonr.",
+        "Utsläpp CO2",
+        "Utsläpp CH4",
+        "Utsläpp N2O",
+        "Använd utsläpp i inköpsdokument"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-expansion-finance-sustainability-journal-fr-fr",
+      "title": "Enregistrer les entrées de durabilité - Business Central | Microsoft Learn",
+      "sourceUri": "https://learn.microsoft.com/fr-fr/dynamics365/business-central/finance-sustainability-journal",
+      "accessedDate": "2026-09-28",
+      "appliesTo": "Business Central standard functionality. Microsoft Learn captions checked; tenant/version-specific UI captions remain unverified.",
+      "fields": [
+        "This setting chooses between entering known sustainability amounts directly and calculating them from input data and configured factors. When manual input is enabled, calculation input fields become unavailable.",
+        "Recalculation updates the journal’s calculated amounts using the current emission factors. This matters when factors changed after the lines were entered. It does not post sustainability ledger entries.",
+        "Posting a sustainability journal creates sustainability ledger entries. Check accounts, amounts and calculation factors first. If calculation uses general ledger data, collect those amounts before posting."
+      ],
+      "documentedCaptions": [
+        "Journal de durabilité",
+        "Saisie manuelle",
+        "Recalculer",
+        "Poster"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-expansion-finance-sustainability-journal-de-de",
+      "title": "Nachhaltigkeitseinträge erfassen - Business Central | Microsoft Learn",
+      "sourceUri": "https://learn.microsoft.com/de-de/dynamics365/business-central/finance-sustainability-journal",
+      "accessedDate": "2026-09-28",
+      "appliesTo": "Business Central standard functionality. Microsoft Learn captions checked; tenant/version-specific UI captions remain unverified.",
+      "fields": [
+        "This setting chooses between entering known sustainability amounts directly and calculating them from input data and configured factors. When manual input is enabled, calculation input fields become unavailable.",
+        "Recalculation updates the journal’s calculated amounts using the current emission factors. This matters when factors changed after the lines were entered. It does not post sustainability ledger entries.",
+        "Posting a sustainability journal creates sustainability ledger entries. Check accounts, amounts and calculation factors first. If calculation uses general ledger data, collect those amounts before posting."
+      ],
+      "documentedCaptions": [
+        "Nachhaltigkeits-Buch.-Blatt",
+        "Manuelle Eingabe",
+        "Neu berechnen",
+        "Buchen"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-expansion-finance-sustainability-journal-es-es",
+      "title": "Registrar entradas de sostenibilidad - Business Central | Microsoft Learn",
+      "sourceUri": "https://learn.microsoft.com/es-es/dynamics365/business-central/finance-sustainability-journal",
+      "accessedDate": "2026-09-28",
+      "appliesTo": "Business Central standard functionality. Microsoft Learn captions checked; tenant/version-specific UI captions remain unverified.",
+      "fields": [
+        "This setting chooses between entering known sustainability amounts directly and calculating them from input data and configured factors. When manual input is enabled, calculation input fields become unavailable.",
+        "Recalculation updates the journal’s calculated amounts using the current emission factors. This matters when factors changed after the lines were entered. It does not post sustainability ledger entries.",
+        "Posting a sustainability journal creates sustainability ledger entries. Check accounts, amounts and calculation factors first. If calculation uses general ledger data, collect those amounts before posting."
+      ],
+      "documentedCaptions": [
+        "Diario de sostenibilidad",
+        "Entrada manual",
+        "Recalcular",
+        "Registrar"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-expansion-finance-sustainability-journal-da-dk",
+      "title": "Registrer bæredygtighedsposter - Business Central | Microsoft Learn",
+      "sourceUri": "https://learn.microsoft.com/da-dk/dynamics365/business-central/finance-sustainability-journal",
+      "accessedDate": "2026-09-28",
+      "appliesTo": "Business Central standard functionality. Microsoft Learn captions checked; tenant/version-specific UI captions remain unverified.",
+      "fields": [
+        "This setting chooses between entering known sustainability amounts directly and calculating them from input data and configured factors. When manual input is enabled, calculation input fields become unavailable.",
+        "Recalculation updates the journal’s calculated amounts using the current emission factors. This matters when factors changed after the lines were entered. It does not post sustainability ledger entries.",
+        "Posting a sustainability journal creates sustainability ledger entries. Check accounts, amounts and calculation factors first. If calculation uses general ledger data, collect those amounts before posting."
+      ],
+      "documentedCaptions": [
+        "Bæredygtighedskladde",
+        "Manuel indtastning",
+        "Genberegn",
+        "Bogfør"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-expansion-finance-sustainability-journal-fi-fi",
+      "title": "Kestävyysmerkintöjen tallentaminen - Business Central | Microsoft Learn",
+      "sourceUri": "https://learn.microsoft.com/fi-fi/dynamics365/business-central/finance-sustainability-journal",
+      "accessedDate": "2026-09-28",
+      "appliesTo": "Business Central standard functionality. Microsoft Learn captions checked; tenant/version-specific UI captions remain unverified.",
+      "fields": [
+        "This setting chooses between entering known sustainability amounts directly and calculating them from input data and configured factors. When manual input is enabled, calculation input fields become unavailable.",
+        "Recalculation updates the journal’s calculated amounts using the current emission factors. This matters when factors changed after the lines were entered. It does not post sustainability ledger entries.",
+        "Posting a sustainability journal creates sustainability ledger entries. Check accounts, amounts and calculation factors first. If calculation uses general ledger data, collect those amounts before posting."
+      ],
+      "documentedCaptions": [
+        "Kestävyyspäiväkirja",
+        "Manuaalinen syöttö",
+        "Laske uudelleen",
+        "Kirjaa"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-expansion-finance-sustainability-journal-nb-no",
+      "title": "Registrer bærekraftsposter - Business Central | Microsoft Learn",
+      "sourceUri": "https://learn.microsoft.com/nb-no/dynamics365/business-central/finance-sustainability-journal",
+      "accessedDate": "2026-09-28",
+      "appliesTo": "Business Central standard functionality. Microsoft Learn captions checked; tenant/version-specific UI captions remain unverified.",
+      "fields": [
+        "This setting chooses between entering known sustainability amounts directly and calculating them from input data and configured factors. When manual input is enabled, calculation input fields become unavailable.",
+        "Recalculation updates the journal’s calculated amounts using the current emission factors. This matters when factors changed after the lines were entered. It does not post sustainability ledger entries.",
+        "Posting a sustainability journal creates sustainability ledger entries. Check accounts, amounts and calculation factors first. If calculation uses general ledger data, collect those amounts before posting."
+      ],
+      "documentedCaptions": [
+        "Bærekraftskladd",
+        "Manuelle inndata",
+        "Beregn på nytt",
+        "Bokfør"
+      ]
+    }
+  ]
+}

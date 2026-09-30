@@ -1,4 +1,154 @@
+## 4.7.28
+
+- Make New-action explanations use the identified page and record type across modules and locales.
+- Mark inferred explanations as page-contextual and omit unrelated Microsoft Learn citations.
+- Suppress generic New explanations when neither the page nor entity is identified.
+
+## 4.7.27
+
+- Remove unverified external knowledge proposals and redundant observed-result callouts from the main review cards.
+
+## 4.7.26
+
+- Explain the New action on the Purchase Orders list as opening a new purchase order, with the purchase-process source instead of a generic record-creation explanation.
+
+## 4.7.25
+
+- Add eight-language explanations for six observed warehouse-receiving actions and 15 existing source-free rules across add-on quality, production, claims, traceability, weighing, navigation, and record handling.
+- Label observed-workflow and general authored explanations separately from Microsoft Learn guidance, with no false Learn citations; preserve the per-step Word opt-in.
+
+## 4.7.24
+
+- Let reviewers edit knowledge explanation suggestions independently for each document language.
+- Save overrides on the individual step with autosave, undo/redo, restore-to-suggestion, and Word export support.
+- Label edited explanatory text clearly and retain the language-matched Microsoft Learn reference.
+
+## 4.7.23
+
+- Add 36 Microsoft Learn-backed process explanations in eight languages across intercompany, assembly, bank reconciliation, approvals, HR, sustainability, e-documents, Microsoft 365, subscription billing, and inventory.
+- Preserve recorded instructions and values while explaining the distinction between preparing, approving, sending, counting and posting.
+- Use the selected Word document language for knowledge explanations and their localized Microsoft Learn source links.
+
+## 4.7.22
+
+- Add Microsoft Learn-backed, eight-language Service Management explanations for resource allocation and the distinction between repair status and warehouse release status.
+- Clarify that active allocation means assigned work, not completed work, and that service-order status rolls up configured repair statuses and priorities.
+
 # Changelog
+
+## 2026-09-28 - Expand process explanations across sales, purchasing, warehouse, and production
+
+- Add source-backed explanations for opening sales, purchase, and production
+  orders, plus warehouse receipt and shipment actions, in all eight locales.
+- Extend explicit locale support for sourced warehouse location/bin and
+  production item selection rules.
+- Explain that opening documents does not itself post or receive transactions,
+  and distinguish warehouse receipt/put-away and pick/shipment stages.
+- Prepare Edge extension version 4.7.21 for distribution.
+
+## 2026-09-28 - Explain warehouse receipt and shipment actions
+
+- Add source-backed, eight-language explanations that distinguish opening and
+  posting warehouse receipts from opening and posting warehouse shipments.
+- Explain that receipt/put-away and pick/shipment can be separate steps based
+  on the configured warehouse flow.
+- Prepare Edge extension version 4.7.20 for distribution.
+
+## 2026-09-28 - Recover explanations from raw purchase controls
+
+- Reuse recorded raw control captions when older review steps lack normalized
+  field captions, while retaining exact sourced-match and ambiguity checks.
+- Recognize the Swedish purchase-line item number caption and explain Direct
+  Unit Cost in all eight supported interface languages.
+- Leave icon-only actions unexplained when the recording contains no reliable
+  action label.
+- Prepare Edge extension version 4.7.19 for distribution.
+
+## 2026-09-28 - Recover field explanations on older recordings
+
+- Let legacy field-edit steps match sourced explanations from a verified field
+  caption even when older recordings have no action caption.
+- Accept the optional trailing period in the English vendor-number caption
+  without weakening page, entity, source, or ambiguity checks.
+- Prepare Edge extension version 4.7.18 for distribution.
+
+## 2026-09-28 - Clarify field meanings across Business Central areas
+
+- Distinguish ordered totals from shipment, receipt, invoice, project-transfer,
+  and warehouse-handling quantities for sales, purchasing, projects, and warehousing.
+- Add focused explanations for vendor, purchase item, production item, location,
+  and bin selections in all eight supported UI languages.
+- Keep generic explanations only for actions without a verified field-specific match.
+- Prepare Edge extension version 4.7.17 for distribution.
+
+## 2026-09-28 - Clarify sales order line quantity
+
+- Explain that Quantity is the total quantity on the sales line and distinguish
+  it from the separate quantities to ship and invoice in all eight UI languages.
+- Keep the generic quantity explanation for other Business Central operations.
+- Prepare Edge extension version 4.7.16 for distribution.
+
+## 2026-09-28 - Explain new sales orders from the order list
+
+- Match the New action to a new sales-order explanation only on verified BC
+  Sales Orders list page 9305; keep the generic explanation elsewhere.
+- Document that New opens an unposted sales order and that posting is separate.
+- Prepare Edge extension version 4.7.15 for distribution.
+
+## 2026-09-28 - Explain sales customer selection specifically
+
+- Give verified customer selection steps a customer-specific explanation about
+  customer details and proposed sales-order fields in all eight UI languages.
+- Prepare Edge extension version 4.7.14 for distribution.
+
+## 2026-09-28 - Explain sales item selection specifically
+
+- Give verified sales item-number selection steps an item-specific explanation
+  instead of generic customer, vendor, or item text.
+- Cover all eight supported UI languages and prepare Edge extension version
+  4.7.13 for distribution.
+
+## 2026-09-28 - Load sourced explanations in the review page
+
+- Load the localized explanation catalog before the knowledge domain so browser
+  review runs can attach verified, localized explanations to matched tasks.
+- Add a generated-build assertion for the dependency order and prepare Edge
+  extension version 4.7.12.
+
+## 2026-09-28 - Resolve knowledge matches from legacy BC page IDs
+
+- Recognize older recordings' numeric `pageId` as Business Central page identity
+  when matching sourced explanations, even when the visible page caption is the
+  company name.
+- Resolve page evidence in the compatibility explanation path before evaluating
+  action and field rules.
+- Prepare Edge extension version 4.7.11 for distribution.
+
+## 2026-09-28 - Recover explanations for legacy review steps
+
+- Reconnect source-backed explanations on older review steps that lost event
+  lineage when the step number, action type, and overall task count still match.
+- Keep positional recovery disabled for changed review structures and mismatched
+  action types.
+- Prepare Edge extension version 4.7.10 for distribution.
+
+## 2026-09-28 - Reconnect explanations on saved review steps
+
+- Match verified explanations to older saved review steps using event numbers,
+  normalized event IDs, and semantic action lineage when task IDs have changed.
+- Keep explanations hidden when the available provenance points to conflicting
+  rules or explanation text.
+- Prepare Edge extension version 4.7.9 for distribution.
+
+## 2026-09-28 - Extend step explanations from verified page identity
+
+- Use exact, source-backed standard page identities to match explanations across
+  sales order creation, customer and item selection, quantities, and pricing.
+- Treat omitted metadata in overlapping page definitions as unknown, while
+  preserving ambiguity rejection when declared page facts conflict.
+- Add localized sales pricing explanations and Microsoft Learn sources in all
+  eight supported languages; leave unmatched actions without generated text.
+- Prepare Edge extension version 4.7.8 for distribution.
 
 ## 2026-09-28 - Remove confidence gates for sourced explanations
 

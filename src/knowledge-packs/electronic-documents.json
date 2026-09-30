@@ -1,0 +1,557 @@
+{
+  "packId": "bc-electronic-documents",
+  "name": "Business Central electronic-documents",
+  "version": "1.0.0",
+  "priority": 220,
+  "rules": [
+    {
+      "ruleId": "ElectronicDocuments.MatchPurchaseOrderLines",
+      "taskType": "MatchEDocumentPurchaseOrder",
+      "semanticAction": "MatchEDocumentPurchaseOrder",
+      "entity": "PurchaseEDocument",
+      "priority": 1320,
+      "confidence": 0.97,
+      "verifiedRuntimeLocales": [
+        "en-US",
+        "sv-SE"
+      ],
+      "match": {
+        "pagePatterns": [
+          "^E-Document$",
+          "^E-dokument$"
+        ],
+        "actionPatterns": [
+          "^Match Purchase Order$",
+          "^Matcha inköpsorder$"
+        ],
+        "fieldPatterns": [],
+        "automationIdPatterns": []
+      },
+      "instructionTemplate": "",
+      "languages": [
+        "en-US",
+        "sv-SE",
+        "fr-FR",
+        "de-DE",
+        "es-ES",
+        "da-DK",
+        "fi-FI",
+        "nb-NO"
+      ],
+      "aliases": [],
+      "sourceIds": [
+        "microsoft-learn-expansion-finance-how-use-edocuments-purchase-en-us",
+        "microsoft-learn-expansion-finance-how-use-edocuments-purchase-sv-se",
+        "microsoft-learn-expansion-finance-how-use-edocuments-purchase-fr-fr",
+        "microsoft-learn-expansion-finance-how-use-edocuments-purchase-de-de",
+        "microsoft-learn-expansion-finance-how-use-edocuments-purchase-es-es",
+        "microsoft-learn-expansion-finance-how-use-edocuments-purchase-da-dk",
+        "microsoft-learn-expansion-finance-how-use-edocuments-purchase-fi-fi",
+        "microsoft-learn-expansion-finance-how-use-edocuments-purchase-nb-no"
+      ],
+      "localizedExplanations": {
+        "en-US": "Use Match Purchase Order to reconcile an incoming vendor e-invoice with its linked purchase order. Match corresponding lines manually or use automatic matching where type, item, unit price, discount, and unit of measure agree. Check quantities and amounts on both sides; an unmatched invoice line can prevent posting, and differences in price/discount must be resolved or fall within configured tolerance. Remove an incorrect match or reset matches before applying them. Apply To Purchase Order updates the purchase document quantities and invoice details; it does not post the invoice.",
+        "sv-SE": "Använd Matcha inköpsorder för att stämma av leverantörens inkommande e-faktura mot den länkade inköpsordern. Matcha motsvarande rader manuellt eller använd automatisk matchning när typ, artikel, enhetspris, rabatt och måttenhet stämmer. Kontrollera kvantiteter och belopp på båda sidor; en omatchad fakturarad kan hindra bokföring, och pris-/rabattavvikelser måste rättas eller rymmas inom inställd tolerans. Ta bort en felaktig matchning eller återställ matchningarna innan de tillämpas. Tillämpa på inköpsorder uppdaterar inköpsdokumentets kvantiteter och fakturauppgifter men bokför inte fakturan.",
+        "fr-FR": "Utilisez la mise en correspondance avec le bon de commande pour rapprocher une facture électronique fournisseur de la commande liée. Faites correspondre les lignes manuellement ou automatiquement lorsque le type, l’article, le prix unitaire, la remise et l’unité concordent. Vérifiez les quantités et les montants des deux côtés ; une ligne non rapprochée peut empêcher la comptabilisation et les écarts de prix/remise doivent être corrigés ou rester dans la tolérance configurée. Supprimez une correspondance erronée ou réinitialisez-les avant de les appliquer. L’application met à jour les quantités à facturer et les détails de facture, mais ne comptabilise pas la facture.",
+        "de-DE": "Verwenden Sie den Abgleich mit der Bestellung, um eine eingehende elektronische Lieferantenrechnung der verknüpften Bestellung zuzuordnen. Gleichen Sie Zeilen manuell oder automatisch ab, wenn Typ, Artikel, Einzelpreis, Rabatt und Einheit übereinstimmen. Prüfen Sie Mengen und Beträge auf beiden Seiten; eine nicht zugeordnete Rechnungszeile kann die Buchung verhindern. Preis- und Rabattabweichungen müssen korrigiert werden oder innerhalb der eingerichteten Toleranz liegen. Entfernen Sie fehlerhafte Zuordnungen oder setzen Sie den Abgleich zurück, bevor Sie ihn anwenden. Das Anwenden aktualisiert Rechnungsdetails und abzurechnende Mengen, bucht die Rechnung jedoch nicht.",
+        "es-ES": "Use la conciliación con pedido para cotejar una factura electrónica recibida del proveedor con el pedido vinculado. Empareje las líneas manualmente o de forma automática si coinciden el tipo, artículo, precio unitario, descuento y unidad. Compruebe cantidades e importes en ambos lados; una línea sin conciliar puede impedir el registro y las diferencias de precio/descuento deben corregirse o estar dentro de la tolerancia configurada. Quite las coincidencias incorrectas o restablézcalas antes de aplicarlas. Aplicar al pedido actualiza cantidades e información de factura, pero no registra la factura.",
+        "da-DK": "Brug Match købsordre til at afstemme en indgående elektronisk leverandørfaktura med den tilknyttede købsordre. Match linjer manuelt eller automatisk, når type, vare, enhedspris, rabat og måleenhed stemmer. Kontrollér antal og beløb på begge sider; en umatchet fakturalinje kan forhindre bogføring, og pris-/rabatforskelle skal rettes eller være inden for den konfigurerede tolerance. Fjern forkerte match eller nulstil matchningen, før den anvendes. Anvend på købsordre opdaterer antal til fakturering og fakturaoplysninger, men bogfører ikke fakturaen.",
+        "fi-FI": "Täsmäytä saapuva toimittajan sähköinen lasku linkitettyyn ostotilaukseen käyttämällä ostotilauksen täsmäytystä. Täsmäytä rivit manuaalisesti tai automaattisesti, kun tyyppi, nimike, yksikköhinta, alennus ja mittayksikkö vastaavat toisiaan. Tarkista määrät ja summat molemmilta puolilta; täsmäämätön laskurivi voi estää kirjauksen, ja hinta-/alennuserot on korjattava tai niiden on jäätävä määritetyn toleranssin sisään. Poista virheellinen täsmäytys tai nollaa täsmäytykset ennen niiden käyttöönottoa. Käyttöönotto päivittää laskutettavat määrät ja laskutiedot ostotilaukselle, mutta ei kirjaa laskua.",
+        "nb-NO": "Bruk samsvar mot innkjøpsordre for å avstemme en innkommende elektronisk leverandørfaktura mot den tilknyttede innkjøpsordren. Match linjer manuelt eller automatisk når type, vare, enhetspris, rabatt og måleenhet stemmer. Kontroller antall og beløp på begge sider; en umatchet fakturalinje kan hindre bokføring, og pris-/rabattavvik må korrigeres eller være innenfor konfigurert toleranse. Fjern feil samsvar eller tilbakestill samsvaret før det brukes. Bruk på innkjøpsordre oppdaterer antall til fakturering og fakturadetaljer, men bokfører ikke fakturaen."
+      }
+    },
+    {
+      "ruleId": "ElectronicDocuments.UpdatePurchaseOrderLink",
+      "taskType": "UpdateEDocumentPurchaseOrderLink",
+      "semanticAction": "UpdateEDocumentPurchaseOrderLink",
+      "entity": "PurchaseEDocument",
+      "priority": 1330,
+      "confidence": 0.96,
+      "verifiedRuntimeLocales": ["en-US", "sv-SE"],
+      "match": {
+        "pagePatterns": ["^E-Document$", "^E-dokument$"],
+        "actionPatterns": ["^Update Purchase Order Link$", "^Uppdatera inköpsorderlänk$"],
+        "fieldPatterns": [],
+        "automationIdPatterns": []
+      },
+      "instructionTemplate": "",
+      "languages": ["en-US", "sv-SE", "fr-FR", "de-DE", "es-ES", "da-DK", "fi-FI", "nb-NO"],
+      "aliases": [],
+      "sourceIds": [
+        "microsoft-learn-expansion-finance-how-use-edocuments-purchase-en-us",
+        "microsoft-learn-expansion-finance-how-use-edocuments-purchase-sv-se",
+        "microsoft-learn-expansion-finance-how-use-edocuments-purchase-fr-fr",
+        "microsoft-learn-expansion-finance-how-use-edocuments-purchase-de-de",
+        "microsoft-learn-expansion-finance-how-use-edocuments-purchase-es-es",
+        "microsoft-learn-expansion-finance-how-use-edocuments-purchase-da-dk",
+        "microsoft-learn-expansion-finance-how-use-edocuments-purchase-fi-fi",
+        "microsoft-learn-expansion-finance-how-use-edocuments-purchase-nb-no"
+      ],
+      "localizedExplanations": {
+        "en-US": "Use Update Purchase Order Link when a received e-document is not linked to the correct existing order. Check the vendor and choose the intended purchase order before matching lines. If the inbound file identified an existing order, a wrong link can be corrected only before line matching; if no order was found, a failed or unlinked document can be connected here. Vendor setup may instead direct the e-document to create a purchase order when none exists, so review the document type and link outcome before continuing. This changes the link; it does not match lines or post the document.",
+        "sv-SE": "Använd Uppdatera inköpsorderlänk när ett mottaget e-dokument saknar länk till rätt befintlig order. Kontrollera leverantören och välj avsedd inköpsorder innan rader matchas. Om den inkommande filen identifierade en befintlig order kan en felaktig länk rättas endast innan radmatchningen; om ingen order hittades kan ett felaktigt eller olänkat dokument kopplas här. Leverantörsinställningen kan i stället skapa en inköpsorder när ingen finns, så granska dokumenttypen och länkningsresultatet innan du fortsätter. Åtgärden ändrar länken, men matchar inte rader och bokför inte dokumentet.",
+        "fr-FR": "Utilisez Mettre à jour le lien du bon de commande lorsqu’un document électronique reçu n’est pas associé au bon document existant. Vérifiez le fournisseur et sélectionnez le bon voulu avant de rapprocher les lignes. Si le fichier entrant identifiait une commande existante, un lien incorrect ne peut être corrigé qu’avant le rapprochement des lignes ; si aucune commande n’a été trouvée, vous pouvez associer ici un document en erreur ou non lié. La configuration du fournisseur peut aussi créer un bon de commande lorsqu’il n’en existe aucun. Vérifiez donc le type de document et le résultat du lien avant de poursuivre. Cette action change le lien ; elle ne rapproche pas les lignes et ne comptabilise pas le document.",
+        "de-DE": "Verwenden Sie Bestellung-Verknüpfung aktualisieren, wenn ein empfangenes E-Dokument nicht mit der richtigen vorhandenen Bestellung verknüpft ist. Prüfen Sie den Kreditor und wählen Sie die gewünschte Bestellung vor dem Zeilenabgleich. Wenn die Eingangsdatei eine bestehende Bestellung erkannt hat, lässt sich eine falsche Verknüpfung nur vor dem Zeilenabgleich korrigieren; wenn keine Bestellung gefunden wurde, können Sie hier ein fehlerhaftes oder nicht verknüpftes Dokument zuordnen. Die Kreditoreneinrichtung kann stattdessen eine Bestellung erstellen, wenn keine vorhanden ist. Prüfen Sie daher Dokumenttyp und Verknüpfungsergebnis. Diese Aktion ändert die Verknüpfung, gleicht aber keine Zeilen ab und bucht das Dokument nicht.",
+        "es-ES": "Use Actualizar vínculo de pedido cuando un documento electrónico recibido no esté vinculado al pedido existente correcto. Compruebe el proveedor y seleccione el pedido previsto antes de conciliar líneas. Si el archivo entrante identificó un pedido existente, el vínculo incorrecto solo se puede corregir antes de conciliar las líneas; si no se encontró ninguno, aquí puede vincular el documento que quedó con error o sin vínculo. La configuración del proveedor también puede crear un pedido si no existe, así que revise el tipo de documento y el resultado del vínculo antes de continuar. Esta acción cambia el vínculo; no concilia líneas ni registra el documento.",
+        "da-DK": "Brug Opdater købsordrereference, når et modtaget e-dokument ikke er knyttet til den korrekte eksisterende ordre. Kontrollér leverandøren, og vælg den ønskede købsordre, før du matcher linjer. Hvis den indgående fil identificerede en eksisterende ordre, kan en forkert tilknytning kun rettes før linjematchning; hvis ingen ordre blev fundet, kan et dokument med fejl eller uden tilknytning forbindes her. Leverandøropsætningen kan i stedet oprette en købsordre, hvis der ikke findes en, så kontrollér dokumenttypen og tilknytningsresultatet. Handlingen ændrer tilknytningen, men matcher ikke linjer og bogfører ikke dokumentet.",
+        "fi-FI": "Käytä ostotilauksen linkin päivittämistä, kun vastaanotettu sähköinen asiakirja ei ole linkitetty oikeaan olemassa olevaan ostotilaukseen. Tarkista toimittaja ja valitse oikea ostotilaus ennen rivien täsmäyttämistä. Jos saapuva tiedosto tunnisti olemassa olevan ostotilauksen, virheellisen linkin voi korjata vain ennen rivien täsmäytystä; jos ostotilausta ei löytynyt, virheellisen tai linkittämättömän asiakirjan voi yhdistää tässä. Toimittajan asetuksissa voidaan myös määrittää ostotilauksen luonti, jos sellaista ei ole. Tarkista siis asiakirjatyyppi ja linkityksen tulos. Toiminto muuttaa linkin, mutta ei täsmäytä rivejä eikä kirjaa asiakirjaa.",
+        "nb-NO": "Bruk Oppdater innkjøpsordrekobling når et mottatt e-dokument ikke er koblet til riktig eksisterende ordre. Kontroller leverandøren og velg riktig innkjøpsordre før du matcher linjer. Hvis innkommende fil identifiserte en eksisterende ordre, kan en feil kobling bare rettes før linjematching; hvis ingen ordre ble funnet, kan et dokument med feil eller uten kobling kobles her. Leverandøroppsettet kan i stedet opprette en innkjøpsordre når ingen finnes, så kontroller dokumenttypen og koblingsresultatet før du fortsetter. Handlingen endrer koblingen, men matcher ikke linjer og bokfører ikke dokumentet."
+      }
+    },
+    {
+      "ruleId": "BCExpansion.SendDocument",
+      "taskType": "SendDocument",
+      "semanticAction": "SendDocument",
+      "entity": "EDocument",
+      "priority": 1300,
+      "confidence": 0.96,
+      "match": {
+        "pagePatterns": [
+          "^E-Document$",
+          "^E-dokument$",
+          "^Document électronique$",
+          "^E-Belege$",
+          "^Documento electrónico$",
+          "^Sähköinen asiakirja$",
+          "^E-Documents$",
+          "^E-Beleg$",
+          "^Documentos electrónicos$",
+          "^E-dokumenter$",
+          "^Sähköiset asiakirjat$"
+        ],
+        "actionPatterns": [
+          "^Send Document$",
+          "^Skicka dokument$",
+          "^Envoyer le document$",
+          "^Beleg senden$",
+          "^Enviar documento$",
+          "^Send dokumenter$",
+          "^Lähetä asiakirja$",
+          "^Send dokument$"
+        ],
+        "fieldPatterns": [],
+        "automationIdPatterns": []
+      },
+      "instructionTemplate": "",
+      "languages": [
+        "en-US",
+        "sv-SE",
+        "fr-FR",
+        "de-DE",
+        "es-ES",
+        "da-DK",
+        "fi-FI",
+        "nb-NO"
+      ],
+      "aliases": [],
+      "sourceIds": [
+        "microsoft-learn-expansion-finance-how-use-edocuments-en-us",
+        "microsoft-learn-expansion-finance-how-use-edocuments-sv-se",
+        "microsoft-learn-expansion-finance-how-use-edocuments-fr-fr",
+        "microsoft-learn-expansion-finance-how-use-edocuments-de-de",
+        "microsoft-learn-expansion-finance-how-use-edocuments-es-es",
+        "microsoft-learn-expansion-finance-how-use-edocuments-da-dk",
+        "microsoft-learn-expansion-finance-how-use-edocuments-fi-fi",
+        "microsoft-learn-expansion-finance-how-use-edocuments-nb-no"
+      ],
+      "localizedExplanations": {
+        "en-US": "Sends the created e-document to the configured service/access point (and by email too if the sending workflow specifies it). Check the document status and service status separately: Exported means the file was created, Sent means it was sent to the provider, and neither alone proves customer receipt or approval. For Sending Error, review Error and Warnings plus communication/mapping logs, fix setup or data, then retry Send Document. The sales document must already be posted for the standard sales e-invoice flow.",
+        "sv-SE": "Skickar det skapade e-dokumentet till den inställda tjänsten/åtkomstpunkten (och även via e-post om sändningsflödet anger det). Kontrollera dokumentstatus och tjänstestatus separat: Exporterad betyder att filen skapats, Skickad att den skickats till leverantören. Ingetdera bevisar i sig att kunden tagit emot eller godkänt den. Vid sändningsfel granskar du Fel och varningar samt kommunikations- och mappningsloggar, rättar inställningar eller data och försöker sedan skicka igen. I standardflödet för e-faktura vid försäljning måste försäljningsdokumentet först vara bokfört.",
+        "fr-FR": "Le document électronique est envoyé via le service configuré. Consultez le statut du service et le journal de communication : l’action seule ne prouve ni la livraison ni l’acceptation du destinataire.",
+        "de-DE": "Der elektronische Beleg wird über den eingerichteten Dienst gesendet. Prüfen Sie Dienststatus und Kommunikationsprotokoll; die Aktion allein bestätigt weder Zustellung noch Empfängerfreigabe.",
+        "es-ES": "Envía el documento electrónico mediante el servicio configurado. Consulte el estado y el registro de comunicación; la acción no demuestra por sí sola la entrega o aceptación del destinatario.",
+        "da-DK": "Det elektroniske dokument sendes via den opsatte tjeneste. Kontroller tjenestestatus og kommunikationslog; handlingen beviser ikke i sig selv levering eller modtagerens godkendelse.",
+        "fi-FI": "Sähköinen asiakirja lähetetään määritetyn palvelun kautta. Tarkista palvelun tila ja viestintäloki; toiminto ei yksin vahvista toimitusta tai vastaanottajan hyväksyntää.",
+        "nb-NO": "Det elektroniske dokumentet sendes via den konfigurerte tjenesten. Kontroller tjenestestatus og kommunikasjonslogg; handlingen alene bekrefter ikke levering eller mottakerens godkjenning."
+      }
+    },
+    {
+      "ruleId": "BCExpansion.ViewLogs",
+      "taskType": "ViewLogs",
+      "semanticAction": "ViewLogs",
+      "entity": "EDocument",
+      "priority": 1300,
+      "confidence": 0.96,
+      "match": {
+        "pagePatterns": [
+          "^E-Document$",
+          "^E-dokument$",
+          "^Document électronique$",
+          "^E-Belege$",
+          "^Documento electrónico$",
+          "^Sähköinen asiakirja$",
+          "^E-Documents$",
+          "^E-Beleg$",
+          "^Documentos electrónicos$",
+          "^E-dokumenter$",
+          "^Sähköiset asiakirjat$"
+        ],
+        "actionPatterns": [
+          "^Communication Logs$",
+          "^Kommunikationsloggar$",
+          "^Journaux de communication$",
+          "^Kommunikationsprotokolle$",
+          "^Registros de comunicación$",
+          "^Kommunikationslogfiler$",
+          "^Viestintälokit$",
+          "^Kommunikasjonslogger$"
+        ],
+        "fieldPatterns": [],
+        "automationIdPatterns": []
+      },
+      "instructionTemplate": "",
+      "languages": [
+        "en-US",
+        "sv-SE",
+        "fr-FR",
+        "de-DE",
+        "es-ES",
+        "da-DK",
+        "fi-FI",
+        "nb-NO"
+      ],
+      "aliases": [],
+      "sourceIds": [
+        "microsoft-learn-expansion-finance-how-use-edocuments-en-us",
+        "microsoft-learn-expansion-finance-how-use-edocuments-sv-se",
+        "microsoft-learn-expansion-finance-how-use-edocuments-fr-fr",
+        "microsoft-learn-expansion-finance-how-use-edocuments-de-de",
+        "microsoft-learn-expansion-finance-how-use-edocuments-es-es",
+        "microsoft-learn-expansion-finance-how-use-edocuments-da-dk",
+        "microsoft-learn-expansion-finance-how-use-edocuments-fi-fi",
+        "microsoft-learn-expansion-finance-how-use-edocuments-nb-no"
+      ],
+      "localizedExplanations": {
+        "en-US": "Shows the chronological requests and responses between Business Central and the service for this document. Inspect timestamps, service code, status and error/warning details; use mapping logs to compare source values with transformed output and export the XML when needed. This is diagnostic history only: opening it doesn't resend, recreate or change the document. After fixing the cause, retry from the E-Document page.",
+        "sv-SE": "Visar kronologiska förfrågningar och svar mellan Business Central och tjänsten för dokumentet. Granska tidpunkter, tjänstekod, status och fel-/varningsinformation; använd mappningsloggar för att jämföra källvärden med transformerade värden och exportera XML vid behov. Detta är endast diagnostikhistorik: att öppna loggen skickar inte om eller återskapar dokumentet och ändrar det inte. När felet är rättat försöker du skicka igen från sidan E-dokument.",
+        "fr-FR": "Le journal affiche chronologiquement les requêtes et réponses entre Business Central et le service pour ce document. Comparez le statut du document avec celui du service : Exporté signifie que le fichier a été créé, tandis qu’Envoyé indique sa transmission au fournisseur. Consultez les erreurs et avertissements, puis les journaux de mappage pour comparer les valeurs source et transformées ; exportez le XML si nécessaire. Le journal est un historique de diagnostic : l’ouvrir ne renvoie ni ne recrée le document. Corrigez la cause avant de relancer l’envoi depuis la page E-Document.",
+        "de-DE": "Das Protokoll zeigt chronologisch die Anforderungen und Antworten zwischen Business Central und dem Dienst für diesen Beleg. Vergleichen Sie Belegstatus und Dienststatus: Exportiert bedeutet, dass die Datei erstellt wurde; Gesendet bedeutet, dass sie an den Anbieter übermittelt wurde. Prüfen Sie Fehler und Warnungen sowie die Zuordnungsprotokolle, um Quellwerte mit umgewandelten Werten zu vergleichen; exportieren Sie bei Bedarf die XML-Datei. Das Protokoll ist nur Diagnoseverlauf und sendet oder erstellt den Beleg beim Öffnen nicht erneut. Beheben Sie die Ursache und starten Sie den Versand auf der E-Beleg-Seite erneut.",
+        "es-ES": "El registro muestra cronológicamente las solicitudes y respuestas entre Business Central y el servicio para este documento. Compare el estado del documento con el del servicio: Exportado indica que se creó el archivo y Enviado que se transmitió al proveedor. Revise errores y advertencias, y consulte los registros de asignación para comparar los valores de origen y transformados; exporte el XML si hace falta. Es historial de diagnóstico: abrirlo no reenvía ni vuelve a crear el documento. Corrija la causa y vuelva a enviar desde la página Documento electrónico.",
+        "da-DK": "Loggen viser kronologisk anmodninger og svar mellem Business Central og tjenesten for dette dokument. Sammenlign dokumentstatus med tjenestestatus: Eksporteret betyder, at filen er oprettet; Sendt betyder, at den er overført til udbyderen. Gennemgå fejl og advarsler, og brug tilknytningslogge til at sammenligne kildeværdier med transformerede værdier; eksportér XML-filen efter behov. Loggen er kun diagnostisk historik og sender eller opretter ikke dokumentet igen, når den åbnes. Ret årsagen, og prøv at sende igen fra siden E-dokument.",
+        "fi-FI": "Loki näyttää aikajärjestyksessä Business Centralin ja palvelun väliset pyynnöt ja vastaukset tälle asiakirjalle. Vertaa asiakirjan ja palvelun tiloja: Viety tarkoittaa, että tiedosto luotiin, ja Lähetetty, että se siirrettiin palveluntarjoajalle. Tarkista virheet ja varoitukset sekä vertaa määrityslokeista lähdearvoja muunnettuihin arvoihin; vie XML tarvittaessa. Loki on vain diagnostiikkahistoriaa: avaaminen ei lähetä eikä luo asiakirjaa uudelleen. Korjaa syy ja yritä lähettää uudelleen Sähköinen asiakirja -sivulta.",
+        "nb-NO": "Loggen viser kronologisk forespørsler og svar mellom Business Central og tjenesten for dette dokumentet. Sammenlign dokumentstatus og tjenestestatus: Eksportert betyr at filen er opprettet, mens Sendt betyr at den er overført til leverandøren. Se gjennom feil og advarsler, og bruk tilordningslogger til å sammenligne kildeverdier med transformerte verdier; eksporter XML-filen ved behov. Loggen er bare diagnostisk historikk og sender eller oppretter ikke dokumentet på nytt når den åpnes. Rett årsaken og prøv å sende igjen fra E-dokument-siden."
+      }
+    },
+    {
+      "ruleId": "BCExpansion.CreatePurchaseDocument",
+      "taskType": "CreatePurchaseDocument",
+      "semanticAction": "CreatePurchaseDocument",
+      "entity": "EDocument",
+      "priority": 1300,
+      "confidence": 0.96,
+      "match": {
+        "pagePatterns": [
+          "^E-Document$",
+          "^E-dokument$",
+          "^Document électronique$",
+          "^E-Belege$",
+          "^Documento electrónico$",
+          "^Sähköinen asiakirja$",
+          "^E-Documents$",
+          "^E-Beleg$",
+          "^Documentos electrónicos$",
+          "^E-dokumenter$",
+          "^Sähköiset asiakirjat$"
+        ],
+        "actionPatterns": [
+          "^Create Document$",
+          "^Skapa dokument$",
+          "^Créer un document$",
+          "^Beleg erstellen$",
+          "^Crear documento$",
+          "^Opret dokument$",
+          "^Luo asiakirja$",
+          "^Opprett dokument$"
+        ],
+        "fieldPatterns": [],
+        "automationIdPatterns": []
+      },
+      "instructionTemplate": "",
+      "languages": [
+        "en-US",
+        "sv-SE",
+        "fr-FR",
+        "de-DE",
+        "es-ES",
+        "da-DK",
+        "fi-FI",
+        "nb-NO"
+      ],
+      "aliases": [],
+      "sourceIds": [
+        "microsoft-learn-expansion-finance-how-use-edocuments-purchase-en-us",
+        "microsoft-learn-expansion-finance-how-use-edocuments-purchase-sv-se",
+        "microsoft-learn-expansion-finance-how-use-edocuments-purchase-fr-fr",
+        "microsoft-learn-expansion-finance-how-use-edocuments-purchase-de-de",
+        "microsoft-learn-expansion-finance-how-use-edocuments-purchase-es-es",
+        "microsoft-learn-expansion-finance-how-use-edocuments-purchase-da-dk",
+        "microsoft-learn-expansion-finance-how-use-edocuments-purchase-fi-fi",
+        "microsoft-learn-expansion-finance-how-use-edocuments-purchase-nb-no"
+      ],
+      "localizedExplanations": {
+        "en-US": "Creates an unposted purchase invoice, credit memo or purchase order from the incoming e-document, according to the vendor's Receive E-Document To setting and document type. Confirm vendor identity, external document number/date, extracted data, line mappings, item references, quantities, VAT and amounts. For a purchase order, Business Central may link the e-document to an existing order or create an order; line matching updates quantities to invoice, and posting is a separate step. Duplicate vendor/document-number/date imports may be suppressed. Creating the document does not post it.",
+        "sv-SE": "Skapar en obokförd inköpsfaktura, kreditnota eller inköpsorder från det inkommande e-dokumentet enligt leverantörens inställning Ta emot e-dokument till och dokumenttypen. Kontrollera leverantör, externt dokumentnummer och datum, extraherade uppgifter, radmappningar, artikelreferenser, antal, moms och belopp. För en inköpsorder kan Business Central länka e-dokumentet till en befintlig order eller skapa en ny; radmatchning uppdaterar faktureringsantal och bokföring är ett separat steg. Dubbletter med samma leverantör, dokumentnummer och datum kan stoppas. Att skapa dokumentet bokför det inte.",
+        "fr-FR": "Cette action crée le document achat à partir du document électronique reçu et des correspondances configurées. Vérifiez fournisseur, lignes et montants avant validation.",
+        "de-DE": "Der Einkaufsbeleg wird aus dem empfangenen E-Beleg anhand der Zuordnungen erstellt. Prüfen Sie Lieferant, Zeilen und Beträge vor der Buchung.",
+        "es-ES": "Crea el documento de compra a partir del documento electrónico recibido y las asignaciones configuradas. Revise proveedor, líneas e importes antes de registrar.",
+        "da-DK": "Købsdokumentet oprettes fra det modtagne e-dokument med de opsatte tilknytninger. Kontroller leverandør, linjer og beløb før bogføring.",
+        "fi-FI": "Ostoasiakirja luodaan vastaanotetusta sähköisestä asiakirjasta määritettyjen kohdistusten avulla. Tarkista toimittaja, rivit ja summat ennen kirjaamista.",
+        "nb-NO": "Kjøpsdokumentet opprettes fra det mottatte e-dokumentet med konfigurerte tilordninger. Kontroller leverandør, linjer og beløp før bokføring."
+      }
+    }
+  ],
+  "sources": [
+    {
+      "sourceId": "microsoft-learn-expansion-finance-how-use-edocuments-en-us",
+      "title": "Use e-documents in sales - Business Central | Microsoft Learn",
+      "sourceUri": "https://learn.microsoft.com/en-us/dynamics365/business-central/finance-how-use-edocuments",
+      "accessedDate": "2026-09-28",
+      "appliesTo": "Business Central standard functionality. Microsoft Learn captions checked; tenant/version-specific UI captions remain unverified.",
+      "fields": [
+        "This sends the electronic document through the configured e-document service. Check its service status and communication log for the outcome; the action alone does not prove delivery or recipient approval.",
+        "The communication log shows the exchanges between Business Central and the e-document service. Use the recorded status and errors to investigate transmission; opening the log does not resend the document."
+      ],
+      "documentedCaptions": [
+        "E-Document",
+        "Send Document",
+        "E-Documents",
+        "Communication Logs"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-expansion-finance-how-use-edocuments-sv-se",
+      "title": "Använda e-dokument vid försäljning - Business Central | Microsoft Learn",
+      "sourceUri": "https://learn.microsoft.com/sv-se/dynamics365/business-central/finance-how-use-edocuments",
+      "accessedDate": "2026-09-28",
+      "appliesTo": "Business Central standard functionality. Microsoft Learn captions checked; tenant/version-specific UI captions remain unverified.",
+      "fields": [
+        "This sends the electronic document through the configured e-document service. Check its service status and communication log for the outcome; the action alone does not prove delivery or recipient approval.",
+        "The communication log shows the exchanges between Business Central and the e-document service. Use the recorded status and errors to investigate transmission; opening the log does not resend the document."
+      ],
+      "documentedCaptions": [
+        "E-dokument",
+        "Skicka dokument",
+        "Kommunikationsloggar"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-expansion-finance-how-use-edocuments-fr-fr",
+      "title": "Utilisation des documents électroniques dans la vente - Business Central | Microsoft Learn",
+      "sourceUri": "https://learn.microsoft.com/fr-fr/dynamics365/business-central/finance-how-use-edocuments",
+      "accessedDate": "2026-09-28",
+      "appliesTo": "Business Central standard functionality. Microsoft Learn captions checked; tenant/version-specific UI captions remain unverified.",
+      "fields": [
+        "This sends the electronic document through the configured e-document service. Check its service status and communication log for the outcome; the action alone does not prove delivery or recipient approval.",
+        "The communication log shows the exchanges between Business Central and the e-document service. Use the recorded status and errors to investigate transmission; opening the log does not resend the document."
+      ],
+      "documentedCaptions": [
+        "Document électronique",
+        "Envoyer le document",
+        "Journaux de communication"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-expansion-finance-how-use-edocuments-de-de",
+      "title": "E-Belege im Verkauf verwenden - Business Central | Microsoft Learn",
+      "sourceUri": "https://learn.microsoft.com/de-de/dynamics365/business-central/finance-how-use-edocuments",
+      "accessedDate": "2026-09-28",
+      "appliesTo": "Business Central standard functionality. Microsoft Learn captions checked; tenant/version-specific UI captions remain unverified.",
+      "fields": [
+        "This sends the electronic document through the configured e-document service. Check its service status and communication log for the outcome; the action alone does not prove delivery or recipient approval.",
+        "The communication log shows the exchanges between Business Central and the e-document service. Use the recorded status and errors to investigate transmission; opening the log does not resend the document."
+      ],
+      "documentedCaptions": [
+        "E-Belege",
+        "Beleg senden",
+        "E-Beleg",
+        "Kommunikationsprotokolle"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-expansion-finance-how-use-edocuments-es-es",
+      "title": "Usar documentos electrónicos en ventas - Business Central | Microsoft Learn",
+      "sourceUri": "https://learn.microsoft.com/es-es/dynamics365/business-central/finance-how-use-edocuments",
+      "accessedDate": "2026-09-28",
+      "appliesTo": "Business Central standard functionality. Microsoft Learn captions checked; tenant/version-specific UI captions remain unverified.",
+      "fields": [
+        "This sends the electronic document through the configured e-document service. Check its service status and communication log for the outcome; the action alone does not prove delivery or recipient approval.",
+        "The communication log shows the exchanges between Business Central and the e-document service. Use the recorded status and errors to investigate transmission; opening the log does not resend the document."
+      ],
+      "documentedCaptions": [
+        "Documento electrónico",
+        "Enviar documento",
+        "Documentos electrónicos",
+        "Registros de comunicación"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-expansion-finance-how-use-edocuments-da-dk",
+      "title": "Bruge e-dokumenter i salg - Business Central | Microsoft Learn",
+      "sourceUri": "https://learn.microsoft.com/da-dk/dynamics365/business-central/finance-how-use-edocuments",
+      "accessedDate": "2026-09-28",
+      "appliesTo": "Business Central standard functionality. Microsoft Learn captions checked; tenant/version-specific UI captions remain unverified.",
+      "fields": [
+        "This sends the electronic document through the configured e-document service. Check its service status and communication log for the outcome; the action alone does not prove delivery or recipient approval.",
+        "The communication log shows the exchanges between Business Central and the e-document service. Use the recorded status and errors to investigate transmission; opening the log does not resend the document."
+      ],
+      "documentedCaptions": [
+        "E-dokument",
+        "Send dokumenter",
+        "E-dokumenter",
+        "Kommunikationslogfiler"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-expansion-finance-how-use-edocuments-fi-fi",
+      "title": "Sähköisten asiakirjojen käyttö myynnissä - Business Central | Microsoft Learn",
+      "sourceUri": "https://learn.microsoft.com/fi-fi/dynamics365/business-central/finance-how-use-edocuments",
+      "accessedDate": "2026-09-28",
+      "appliesTo": "Business Central standard functionality. Microsoft Learn captions checked; tenant/version-specific UI captions remain unverified.",
+      "fields": [
+        "This sends the electronic document through the configured e-document service. Check its service status and communication log for the outcome; the action alone does not prove delivery or recipient approval.",
+        "The communication log shows the exchanges between Business Central and the e-document service. Use the recorded status and errors to investigate transmission; opening the log does not resend the document."
+      ],
+      "documentedCaptions": [
+        "Sähköinen asiakirja",
+        "Lähetä asiakirja",
+        "Sähköiset asiakirjat",
+        "Viestintälokit"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-expansion-finance-how-use-edocuments-nb-no",
+      "title": "Bruk e-dokumenter i salg - Business Central | Microsoft Learn",
+      "sourceUri": "https://learn.microsoft.com/nb-no/dynamics365/business-central/finance-how-use-edocuments",
+      "accessedDate": "2026-09-28",
+      "appliesTo": "Business Central standard functionality. Microsoft Learn captions checked; tenant/version-specific UI captions remain unverified.",
+      "fields": [
+        "This sends the electronic document through the configured e-document service. Check its service status and communication log for the outcome; the action alone does not prove delivery or recipient approval.",
+        "The communication log shows the exchanges between Business Central and the e-document service. Use the recorded status and errors to investigate transmission; opening the log does not resend the document."
+      ],
+      "documentedCaptions": [
+        "E-dokument",
+        "Send dokument",
+        "E-dokumenter",
+        "Kommunikasjonslogger"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-expansion-finance-how-use-edocuments-purchase-en-us",
+      "title": "Use e-documents in the purchase process - Business Central | Microsoft Learn",
+      "sourceUri": "https://learn.microsoft.com/en-us/dynamics365/business-central/finance-how-use-edocuments-purchase",
+      "accessedDate": "2026-09-28",
+      "appliesTo": "Business Central standard functionality. Microsoft Learn captions checked; tenant/version-specific UI captions remain unverified.",
+      "fields": [
+        "This creates the purchase document from the received e-document using the configured mappings. Review vendor, lines and amounts in the resulting document before posting it."
+      ],
+      "documentedCaptions": [
+        "E-Document",
+        "Create Document",
+        "E-Documents"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-expansion-finance-how-use-edocuments-purchase-sv-se",
+      "title": "Använda e-dokument i inköpsprocessen - Business Central | Microsoft Learn",
+      "sourceUri": "https://learn.microsoft.com/sv-se/dynamics365/business-central/finance-how-use-edocuments-purchase",
+      "accessedDate": "2026-09-28",
+      "appliesTo": "Business Central standard functionality. Microsoft Learn captions checked; tenant/version-specific UI captions remain unverified.",
+      "fields": [
+        "This creates the purchase document from the received e-document using the configured mappings. Review vendor, lines and amounts in the resulting document before posting it."
+      ],
+      "documentedCaptions": [
+        "E-dokument",
+        "Skapa dokument"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-expansion-finance-how-use-edocuments-purchase-fr-fr",
+      "title": "Utilisation des documents électroniques dans le processus achat - Business Central | Microsoft Learn",
+      "sourceUri": "https://learn.microsoft.com/fr-fr/dynamics365/business-central/finance-how-use-edocuments-purchase",
+      "accessedDate": "2026-09-28",
+      "appliesTo": "Business Central standard functionality. Microsoft Learn captions checked; tenant/version-specific UI captions remain unverified.",
+      "fields": [
+        "This creates the purchase document from the received e-document using the configured mappings. Review vendor, lines and amounts in the resulting document before posting it."
+      ],
+      "documentedCaptions": [
+        "Document électronique",
+        "Créer un document"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-expansion-finance-how-use-edocuments-purchase-de-de",
+      "title": "E-Belege im Kaufprozess verwenden - Business Central | Microsoft Learn",
+      "sourceUri": "https://learn.microsoft.com/de-de/dynamics365/business-central/finance-how-use-edocuments-purchase",
+      "accessedDate": "2026-09-28",
+      "appliesTo": "Business Central standard functionality. Microsoft Learn captions checked; tenant/version-specific UI captions remain unverified.",
+      "fields": [
+        "This creates the purchase document from the received e-document using the configured mappings. Review vendor, lines and amounts in the resulting document before posting it."
+      ],
+      "documentedCaptions": [
+        "E-Belege",
+        "Beleg erstellen",
+        "E-Beleg"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-expansion-finance-how-use-edocuments-purchase-es-es",
+      "title": "Usar documentos electrónicos en el proceso de compra - Business Central | Microsoft Learn",
+      "sourceUri": "https://learn.microsoft.com/es-es/dynamics365/business-central/finance-how-use-edocuments-purchase",
+      "accessedDate": "2026-09-28",
+      "appliesTo": "Business Central standard functionality. Microsoft Learn captions checked; tenant/version-specific UI captions remain unverified.",
+      "fields": [
+        "This creates the purchase document from the received e-document using the configured mappings. Review vendor, lines and amounts in the resulting document before posting it."
+      ],
+      "documentedCaptions": [
+        "Documento electrónico",
+        "Crear documento",
+        "Documentos electrónicos"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-expansion-finance-how-use-edocuments-purchase-da-dk",
+      "title": "Bruge e-dokumenter i købsprocessen - Business Central | Microsoft Learn",
+      "sourceUri": "https://learn.microsoft.com/da-dk/dynamics365/business-central/finance-how-use-edocuments-purchase",
+      "accessedDate": "2026-09-28",
+      "appliesTo": "Business Central standard functionality. Microsoft Learn captions checked; tenant/version-specific UI captions remain unverified.",
+      "fields": [
+        "This creates the purchase document from the received e-document using the configured mappings. Review vendor, lines and amounts in the resulting document before posting it."
+      ],
+      "documentedCaptions": [
+        "E-dokument",
+        "Opret dokument",
+        "E-dokumenter"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-expansion-finance-how-use-edocuments-purchase-fi-fi",
+      "title": "Sähköisten asiakirjojen käyttäminen ostoprosessissa - Business Central | Microsoft Learn",
+      "sourceUri": "https://learn.microsoft.com/fi-fi/dynamics365/business-central/finance-how-use-edocuments-purchase",
+      "accessedDate": "2026-09-28",
+      "appliesTo": "Business Central standard functionality. Microsoft Learn captions checked; tenant/version-specific UI captions remain unverified.",
+      "fields": [
+        "This creates the purchase document from the received e-document using the configured mappings. Review vendor, lines and amounts in the resulting document before posting it."
+      ],
+      "documentedCaptions": [
+        "Sähköinen asiakirja",
+        "Luo asiakirja",
+        "Sähköiset asiakirjat"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-expansion-finance-how-use-edocuments-purchase-nb-no",
+      "title": "Bruk e-dokumenter i kjøpsprosessen - Business Central | Microsoft Learn",
+      "sourceUri": "https://learn.microsoft.com/nb-no/dynamics365/business-central/finance-how-use-edocuments-purchase",
+      "accessedDate": "2026-09-28",
+      "appliesTo": "Business Central standard functionality. Microsoft Learn captions checked; tenant/version-specific UI captions remain unverified.",
+      "fields": [
+        "This creates the purchase document from the received e-document using the configured mappings. Review vendor, lines and amounts in the resulting document before posting it."
+      ],
+      "documentedCaptions": [
+        "E-dokument",
+        "Opprett dokument",
+        "E-dokumenter"
+      ]
+    }
+  ]
+}

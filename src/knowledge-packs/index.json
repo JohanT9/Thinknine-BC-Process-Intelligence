@@ -60,6 +60,81 @@
       "packId": "bc-finance",
       "file": "knowledge-packs/finance.json",
       "enabled": true
+    },
+    {
+      "packId": "bc-intercompany",
+      "file": "knowledge-packs/intercompany.json",
+      "enabled": true
+    },
+    {
+      "packId": "bc-assembly",
+      "file": "knowledge-packs/assembly.json",
+      "enabled": true
+    },
+    {
+      "packId": "bc-bank-reconciliation",
+      "file": "knowledge-packs/bank-reconciliation.json",
+      "enabled": true
+    },
+    {
+      "packId": "bc-approvals",
+      "file": "knowledge-packs/approvals.json",
+      "enabled": true
+    },
+    {
+      "packId": "bc-human-resources",
+      "file": "knowledge-packs/human-resources.json",
+      "enabled": true
+    },
+    {
+      "packId": "bc-sustainability",
+      "file": "knowledge-packs/sustainability.json",
+      "enabled": true
+    },
+    {
+      "packId": "bc-subscription-billing",
+      "file": "knowledge-packs/subscription-billing.json",
+      "enabled": true
+    },
+    {
+      "packId": "bc-electronic-documents",
+      "file": "knowledge-packs/electronic-documents.json",
+      "enabled": true
+    },
+    {
+      "packId": "bc-microsoft365",
+      "file": "knowledge-packs/microsoft365.json",
+      "enabled": true
+    },
+    {
+      "packId": "bc-inventory",
+      "file": "knowledge-packs/inventory.json",
+      "enabled": true
+    },
+    {
+      "file": "knowledge-packs/quality-management.json",
+      "packId": "bc-quality-management",
+      "enabled": true
+    },
+    {
+      "file": "knowledge-packs/cost-accounting.json",
+      "packId": "bc-cost-accounting",
+      "enabled": true
+    },
+    {
+      "file": "knowledge-packs/contact-marketing.json",
+      "packId": "bc-contact-marketing",
+      "enabled": true
+    },
+    {
+      "file": "knowledge-packs/shopify.json",
+      "packId": "bc-shopify-connector",
+      "enabled": true
+    },
+    {
+      "file": "knowledge-packs/inventory-tracking.json",
+      "packId": "bc-inventory-tracking",
+      "enabled": true
     }
   ]
 }

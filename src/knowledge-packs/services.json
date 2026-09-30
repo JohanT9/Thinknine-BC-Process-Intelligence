@@ -1,7 +1,7 @@
 {
   "packId": "bc-services",
   "name": "Business Central Service Management",
-  "version": "1.3.0",
+  "version": "1.4.0",
   "priority": 200,
   "rules": [
     {
@@ -164,7 +164,17 @@
         "microsoft-learn-service-posting-da",
         "microsoft-learn-service-posting-fi",
         "microsoft-learn-service-posting-nb"
-      ]
+      ],
+      "localizedExplanations": {
+        "en-US": "Posts the selected service-order quantities and creates the resulting service shipment or invoice and ledger entries. The order needs at least one service-item line and one service line; all service lines post together. Run Test Report and check the customer, service item, line quantities, contract coverage, and hours first. In the posting dialog, Ship records delivery, Invoice invoices already shipped quantity, Ship and Invoice does both, and Ship and Consume records consumption for previously shipped but not invoiced quantity. Review posted documents and remaining quantities; user posting policy may restrict these choices.",
+        "sv-SE": "Bokför valda antal på serviceordern och skapar serviceleverans eller faktura samt transaktionsposter. Ordern måste ha minst en serviceartikelrad och en servicerad; alla servicerader bokförs tillsammans. Kör Testrapport och kontrollera kund, serviceartikel, radantal, avtalskoppling och timmar först. I bokföringsdialogen registrerar Leverera leverans, Faktura fakturerar redan levererat antal, Leverera och fakturera gör båda och Leverera och förbruka bokför förbrukning för tidigare levererade men ännu inte fakturerade antal. Granska bokförda dokument och återstående antal; användarens bokföringspolicy kan begränsa valen.",
+        "fr-FR": "Valide les quantités de l’ordre et crée l’expédition ou la facture de service ainsi que les écritures. L’ordre doit contenir au moins une ligne d’article et une ligne de service ; toutes les lignes de service sont validées ensemble. Exécutez le rapport de test et vérifiez client, article, quantités, contrat et heures. Dans les options, Expédier enregistre la livraison, Facturer concerne les quantités déjà expédiées, Expédier et facturer fait les deux, et Expédier et consommer enregistre la consommation des quantités livrées mais non facturées. Contrôlez les documents et quantités restantes ; une stratégie utilisateur peut restreindre les options.",
+        "de-DE": "Bucht die gewählten Mengen und erstellt den Service-Lieferschein oder die Rechnung sowie die zugehörigen Posten. Der Auftrag benötigt mindestens eine Serviceartikel- und eine Servicezeile; alle Servicezeilen werden gemeinsam gebucht. Führen Sie den Testbericht aus und prüfen Sie Kunde, Artikel, Mengen, Vertrag und Stunden. Liefern bucht die Lieferung, Fakturieren berechnet bereits gelieferte Mengen, Liefern und fakturieren erledigt beides, und Liefern und verbrauchen erfasst den Verbrauch bereits gelieferter, nicht fakturierter Mengen. Prüfen Sie Belege und Restmengen; Benutzerbuchungsrichtlinien können Optionen einschränken.",
+        "es-ES": "Registra las cantidades elegidas y crea el envío o la factura de servicio y los movimientos correspondientes. El pedido necesita al menos una línea de artículo de servicio y una línea de servicio; todas las líneas se registran juntas. Ejecute el informe de prueba y revise cliente, artículo, cantidades, contrato y horas. En las opciones, Enviar registra la entrega, Facturar factura lo ya enviado, Enviar y facturar hace ambas cosas y Enviar y consumir registra el consumo de cantidades enviadas pero no facturadas. Revise documentos y cantidades restantes; la política del usuario puede limitar las opciones.",
+        "da-DK": "Bogfører de valgte mængder og opretter servicelevering eller faktura samt tilhørende poster. Ordren skal have mindst én servicevarelinje og én servicelinje; alle servicelinjer bogføres samlet. Kør testrapporten, og kontrollér kunde, servicevare, mængder, kontrakt og timer. Lever bogfører levering, Faktura fakturerer allerede leverede mængder, Lever og fakturer gør begge dele, og Lever og forbrug registrerer forbrug af leverede, ikke-fakturerede mængder. Gennemgå dokumenter og restantal; brugerpolitikken kan begrænse valgene.",
+        "fi-FI": "Kirjaa valitut määrät ja luo huoltolähetyksen tai laskun sekä tapahtumat. Tilauksessa on oltava vähintään huoltonimikerivi ja palvelurivi; kaikki palvelurivit kirjataan yhdessä. Suorita testiraportti ja tarkista asiakas, nimike, määrät, sopimus ja tunnit. Toimita kirjaa toimituksen, Laskuta jo toimitetut määrät, Toimita ja laskuta tekee molemmat, ja Toimita ja kuluta kirjaa jo toimitettujen mutta laskuttamattomien määrien kulutuksen. Tarkista asiakirjat ja jäljellä olevat määrät; käyttäjäkäytäntö voi rajoittaa vaihtoehtoja.",
+        "nb-NO": "Bokfører valgte mengder og oppretter servicelevering eller faktura med tilhørende poster. Ordren må ha minst én servicevarelinje og én servicelinje; alle servicelinjer bokføres sammen. Kjør testrapporten og kontroller kunde, servicevare, mengder, kontrakt og timer først. Lever bokfører levering, Faktura fakturerer allerede levert mengde, Lever og fakturer gjør begge deler, og Lever og forbruk registrerer forbruk av levert, ikke-fakturert mengde. Kontroller dokumenter og restmengder; brukerpolicy kan begrense valgene."
+      }
     },
     {
       "ruleId": "Services.CreateServiceOrder",
@@ -218,7 +228,70 @@
         "microsoft-learn-service-create-order-da",
         "microsoft-learn-service-create-order-fi",
         "microsoft-learn-service-create-order-nb"
-      ]
+      ],
+      "localizedExplanations": {
+        "en-US": "Creates a service order for customer-requested repair or maintenance. Select the customer, register a service-item line, and add service lines for parts, labor, or costs. Service Order Type and Salesperson Code may be required by Service Management Setup, and a number series may assign the order number. The new order does not allocate a technician, ship parts, or prove work was performed. For an accepted service quote, convert the quote to an order so its status and active resource allocations are handled correctly.",
+        "sv-SE": "Skapar en serviceorder för kundbegärd reparation eller underhåll. Välj kunden, registrera en serviceartikelrad och lägg till servicerader för delar, arbete eller kostnader. Tjänsteordertyp och säljarkod kan krävas enligt Konfigurera servicehantering, och en nummerserie kan tilldela ordernumret. Den nya ordern allokerar inte en tekniker, levererar inte delar och bekräftar inte att arbete har utförts. Om en tjänstoffert har accepterats ska den omvandlas till order så att status och aktiva resursallokeringar hanteras rätt.",
+        "fr-FR": "Crée un ordre de service pour une réparation ou maintenance demandée par le client. Sélectionnez le client, ajoutez une ligne d’article de service et des lignes pour les pièces, la main-d’œuvre ou les coûts. Le type d’ordre et le vendeur peuvent être obligatoires selon la configuration ; une série peut attribuer le numéro. L’ordre ne planifie pas un technicien, n’expédie pas de pièces et ne prouve pas que le travail a été fait. Convertissez un devis accepté pour traiter son statut et ses affectations actives.",
+        "de-DE": "Erstellt einen Serviceauftrag für eine vom Kunden angeforderte Reparatur oder Wartung. Wählen Sie den Kunden, erfassen Sie eine Serviceartikelzeile und Servicezeilen für Teile, Arbeit oder Kosten. Auftragstyp und Verkäufercode können laut Einrichtung erforderlich sein; eine Nummernserie kann die Auftragsnummer vergeben. Der Auftrag weist keinen Techniker zu, versendet keine Teile und bestätigt keine ausgeführte Arbeit. Wandeln Sie ein angenommenes Angebot um, damit Status und aktive Ressourcenzuordnungen richtig behandelt werden.",
+        "es-ES": "Crea un pedido de servicio para una reparación o mantenimiento solicitado por el cliente. Seleccione el cliente, registre una línea de artículo de servicio y añada líneas para piezas, mano de obra o costes. El tipo de pedido y el vendedor pueden ser obligatorios según la configuración; una serie puede asignar el número. El pedido no asigna técnico, no envía piezas ni prueba que el trabajo se haya realizado. Convierta una oferta aceptada para gestionar correctamente su estado y las asignaciones activas.",
+        "da-DK": "Opretter en serviceordre for kundebestilt reparation eller vedligeholdelse. Vælg kunden, registrer en servicevarelinje, og tilføj servicelinjer for dele, arbejde eller omkostninger. Ordretype og sælgerkode kan være obligatoriske efter opsætningen; en nummerserie kan tildele nummeret. Ordren tildeler ikke en tekniker, sender ikke dele og beviser ikke, at arbejdet er udført. Konverter et accepteret tilbud, så status og aktive ressourceallokeringer håndteres korrekt.",
+        "fi-FI": "Luo asiakkaan pyytämän korjauksen tai ylläpidon huoltotilauksen. Valitse asiakas, lisää huoltonimikerivi ja palvelurivejä osille, työlle tai kustannuksille. Tilaustyyppi ja myyjäkoodi voivat olla asetusten mukaan pakollisia; numerosarja voi antaa tilausnumeron. Tilaus ei kohdista teknikkoa, lähetä osia eikä todista työn valmistumista. Muunna hyväksytty tarjous tilaukseksi, jotta sen tila ja aktiiviset resurssikohdistukset käsitellään oikein.",
+        "nb-NO": "Oppretter en serviceordre for kundebestilt reparasjon eller vedlikehold. Velg kunden, registrer en servicevarelinje og legg til servicelinjer for deler, arbeid eller kostnader. Ordretype og selgerkode kan være obligatoriske; en nummerserie kan tildele ordrenummer. Ordren tildeler ikke tekniker, sender ikke deler og bekrefter ikke utført arbeid. Konverter et akseptert tilbud slik at status og aktive ressursallokeringer håndteres riktig."
+      }
+    },
+    {
+      "ruleId": "Services.ConvertAcceptedQuoteToOrder",
+      "taskType": "ConvertAcceptedServiceQuoteToOrder",
+      "semanticAction": "MakeOrder",
+      "entity": "ServiceQuote",
+      "priority": 1400,
+      "confidence": 0.97,
+      "match": {
+        "pagePatterns": [
+          "^Service Quotes$",
+          "^Service Contract Quotes$",
+          "^Offerter för tjänstkontrakt$"
+        ],
+        "actionPatterns": [
+          "^Make Order$",
+          "^Skapa order$"
+        ],
+        "fieldPatterns": [],
+        "automationIdPatterns": []
+      },
+      "instructionTemplate": "",
+      "languages": [
+        "en-US",
+        "sv-SE",
+        "fr-FR",
+        "de-DE",
+        "es-ES",
+        "da-DK",
+        "fi-FI",
+        "nb-NO"
+      ],
+      "aliases": [],
+      "sourceIds": [
+        "microsoft-learn-service-create-order",
+        "microsoft-learn-service-create-order-sv",
+        "microsoft-learn-service-create-order-fr-fr",
+        "microsoft-learn-service-create-order-de-de",
+        "microsoft-learn-service-create-order-es-es",
+        "microsoft-learn-service-create-order-da-dk",
+        "microsoft-learn-service-create-order-fi-fi",
+        "microsoft-learn-service-create-order-nb-no"
+      ],
+      "localizedExplanations": {
+        "en-US": "Converts an accepted service quote into a service order. Business Central deletes the quote, creates an order with its description, recalculates response date/time, sets the new order to Pending, and resets service-item repair statuses to Initial. Existing active resource allocations become Reallocation Needed and must be assigned again on the new order. Confirm the customer accepted this quote and review the new order after conversion; this does not post work, ship parts, or invoice the customer.",
+        "sv-SE": "Omvandlar en accepterad tjänstoffert till en serviceorder. Business Central tar bort offerten, skapar en order med offertens beskrivning, räknar om svarsdatum och svarstid, anger orderstatus Förestående och återställer serviceartiklarnas reparationsstatus till Initial. Befintliga aktiva resursallokeringar får status Omfördelning nödvändig och måste allokeras på nytt på ordern. Kontrollera kundens accept och granska den nya ordern efter konverteringen; arbetet bokförs inte, delar levereras inte och kunden faktureras inte.",
+        "fr-FR": "Convertit un devis de service accepté en ordre de service. Business Central supprime le devis, crée un ordre avec sa description, recalcule la date et l’heure de réponse, définit le nouvel ordre sur En attente et réinitialise les statuts de réparation à Initial. Les affectations de ressources actives deviennent Réaffectation nécessaire et doivent être réattribuées. Vérifiez l’acceptation du client et le nouvel ordre ; aucune intervention, expédition ni facture n’est comptabilisée.",
+        "de-DE": "Wandelt ein angenommenes Serviceangebot in einen Serviceauftrag um. Business Central löscht das Angebot, erstellt einen Auftrag mit dessen Beschreibung, berechnet Antwortdatum und -zeit neu, setzt den Auftrag auf Ausstehend und die Reparaturstatus auf Initial. Aktive Ressourcenzuordnungen werden als Neuzuordnung erforderlich markiert und müssen erneut zugewiesen werden. Prüfen Sie die Annahme und den neuen Auftrag; Arbeit, Versand und Rechnung werden nicht gebucht.",
+        "es-ES": "Convierte una oferta de servicio aceptada en un pedido de servicio. Business Central elimina la oferta, crea el pedido con su descripción, recalcula fecha y hora de respuesta, establece el pedido como Pendiente y restablece los estados de reparación a Inicial. Las asignaciones activas pasan a Reasignación necesaria y deben asignarse de nuevo. Confirme la aceptación del cliente y revise el pedido; no se registra trabajo, envío ni factura.",
+        "da-DK": "Konverterer et accepteret servicetilbud til en serviceordre. Business Central sletter tilbuddet, opretter en ordre med beskrivelsen, genberegner svardato og -tid, sætter ordren til Afventende og nulstiller reparationsstatus til Initial. Aktive ressourceallokeringer markeres til omallokering og skal tildeles igen. Kontrollér kundens accept og den nye ordre; arbejde, levering og fakturering bogføres ikke.",
+        "fi-FI": "Muuntaa hyväksytyn huoltotarjouksen huoltotilaukseksi. Business Central poistaa tarjouksen, luo tilauksen kuvauksella, laskee vastepäivän ja -ajan uudelleen, asettaa tilauksen Odottaa-tilaan ja korjaustilat Alkuperäinen-tilaan. Aktiiviset resurssikohdistukset merkitään uudelleenkohdistettaviksi ja ne on kohdistettava uudelleen. Varmista hyväksyntä ja tarkista uusi tilaus; työtä, toimitusta tai laskua ei kirjata.",
+        "nb-NO": "Konverterer et akseptert servicetilbud til en serviceordre. Business Central sletter tilbudet, oppretter en ordre med beskrivelsen, beregner svardato og -tid på nytt, setter ordren til Ventende og tilbakestiller reparasjonsstatus til Initial. Aktive ressursallokeringer merkes for omfordeling og må tildeles på nytt. Kontroller kundens aksept og den nye ordren; arbeid, levering og fakturering bokføres ikke."
+      }
     },
     {
       "ruleId": "Services.SelectServiceOrderCustomer",
@@ -282,6 +355,135 @@
         "da-DK": "Vælg den kunde, der har anmodet om servicen. Business Central udfylder relaterede kundefelter fra kundeposten. Kontrollér kunden, før du tilføjer servicelinjer.",
         "fi-FI": "Valitse palvelua pyytänyt asiakas. Business Central täyttää asiakkaaseen liittyvät kentät asiakastiedoista. Tarkista asiakas ennen huoltonimikerivien lisäämistä.",
         "nb-NO": "Velg kunden som har bedt om servicen. Business Central fyller ut relaterte kundefelt fra kundeposten. Kontroller kunden før du legger til servicevarelinjer."
+      }
+    },
+    {
+      "ruleId": "Services.AllocateServiceResource",
+      "taskType": "AllocateServiceResource",
+      "semanticAction": "AllocateResource",
+      "entity": "ServiceOrder",
+      "priority": 1310,
+      "confidence": 0.96,
+      "match": {
+        "pagePatterns": [
+          "^Service Order$",
+          "^Service Orders$",
+          "^Service Quote$",
+          "^Service Quotes$",
+          "^Dispatch Board$",
+          "^Resource Allocations$",
+          "^Tj?nsteorder$",
+          "^Serviceordrer$"
+        ],
+        "actionPatterns": [
+          "^Allocate$",
+          "^Allocate Resource$",
+          "^Allocate Resources$",
+          "^Allocate to All Service Items$",
+          "^Allokera$",
+          "^Allokera resurs$",
+          "^Tildel ressource$",
+          "^Ressourcen zuordnen$",
+          "^Asignar recursos$",
+          "^Affecter des ressources$"
+        ],
+        "fieldPatterns": [],
+        "automationIdPatterns": []
+      },
+      "instructionTemplate": "",
+      "languages": [
+        "en-US",
+        "sv-SE",
+        "fr-FR",
+        "de-DE",
+        "es-ES",
+        "da-DK",
+        "fi-FI",
+        "nb-NO"
+      ],
+      "aliases": [],
+      "sourceIds": [
+        "microsoft-learn-service-resource-allocation-en-us",
+        "microsoft-learn-service-resource-allocation-sv-se",
+        "microsoft-learn-service-resource-allocation-fr-fr",
+        "microsoft-learn-service-resource-allocation-de-de",
+        "microsoft-learn-service-resource-allocation-es-es",
+        "microsoft-learn-service-resource-allocation-da-dk",
+        "microsoft-learn-service-resource-allocation-fi-fi",
+        "microsoft-learn-service-resource-allocation-nb-no"
+      ],
+      "localizedInstructions": {
+        "sv-SE": "Tilldelningen kopplar en resurs eller resursgrupp till en serviceuppgift och anger planerat datum och timmar. Statusen Aktiv betyder att arbetet är tilldelat, inte att det är utfört; registrerade arbetstimmar och reparationsstatus hanteras separat. Kontrollera tillgänglighet och serviceartikel.",
+        "en-US": "This allocation assigns a resource or resource group to a service task and records the planned date and hours. Active means the work is assigned, not completed; actual resource hours and repair status are tracked separately. Check availability and the service item.",
+        "fr-FR": "Cette affectation associe une ressource ou un groupe de ressources à une tâche de service et indique la date et les heures prévues. Le statut Actif signifie que le travail est affecté, pas qu’il est terminé ; les heures réellement enregistrées et le statut de réparation sont suivis séparément. Vérifiez la disponibilité et l’article de service.",
+        "de-DE": "Diese Zuordnung weist einer Serviceaufgabe eine Ressource oder Ressourcengruppe sowie geplantes Datum und Stunden zu. Aktiv bedeutet, dass die Arbeit zugewiesen ist, nicht dass sie abgeschlossen wurde; tatsächliche Ressourcenstunden und Reparaturstatus werden getrennt erfasst. Prüfen Sie Verfügbarkeit und Serviceartikel.",
+        "es-ES": "Esta asignación vincula un recurso o grupo de recursos a una tarea de servicio e indica la fecha y las horas previstas. Activo significa que el trabajo está asignado, no que se haya completado; las horas reales y el estado de reparación se registran por separado. Comprueba la disponibilidad y el producto de servicio.",
+        "da-DK": "Allokeringen knytter en ressource eller ressourcegruppe til en serviceopgave og angiver planlagt dato og timer. Aktiv betyder, at arbejdet er tildelt, ikke at det er udført; registrerede timer og reparationsstatus håndteres separat. Kontrollér tilgængelighed og serviceartikel.",
+        "fi-FI": "Kohdistus liittää resurssin tai resurssiryhmän palvelutehtävään ja määrittää suunnitellun päivämäärän ja tunnit. Aktiivinen tarkoittaa, että työ on kohdistettu, ei että se on tehty; toteutuneet resurssitunnit ja korjaustila käsitellään erikseen. Tarkista saatavuus ja huoltonimike.",
+        "nb-NO": "Tildelingen knytter en ressurs eller ressursgruppe til en serviceoppgave og angir planlagt dato og timer. Aktiv betyr at arbeidet er tildelt, ikke at det er utført; registrerte timer og reparasjonsstatus håndteres separat. Kontroller tilgjengelighet og servicevare."
+      }
+    },
+    {
+      "ruleId": "Services.ChangeRepairStatus",
+      "taskType": "ChangeRepairStatus",
+      "semanticAction": "ChangeRepairStatus",
+      "entity": "ServiceOrder",
+      "priority": 1320,
+      "confidence": 0.96,
+      "match": {
+        "pagePatterns": [
+          "^Service Order$",
+          "^Service Orders$",
+          "^Service Item Worksheet$",
+          "^Service Tasks$",
+          "^Tj?nsteorder$",
+          "^Serviceordrer$"
+        ],
+        "actionPatterns": [],
+        "fieldPatterns": [
+          "^Repair Status Code$",
+          "^Repair Status$",
+          "^Reparationsstatuskod$",
+          "^Reparationsstatus$",
+          "^R?paration$",
+          "^Reparaturstatus$",
+          "^Estado de reparaci?n$",
+          "^Reparationsstatuskode$",
+          "^Korjaustilan koodi$"
+        ],
+        "automationIdPatterns": []
+      },
+      "instructionTemplate": "",
+      "languages": [
+        "en-US",
+        "sv-SE",
+        "fr-FR",
+        "de-DE",
+        "es-ES",
+        "da-DK",
+        "fi-FI",
+        "nb-NO"
+      ],
+      "aliases": [],
+      "sourceIds": [
+        "microsoft-learn-service-order-repair-status-en-us",
+        "microsoft-learn-service-order-repair-status-sv-se",
+        "microsoft-learn-service-order-repair-status-fr-fr",
+        "microsoft-learn-service-order-repair-status-de-de",
+        "microsoft-learn-service-order-repair-status-es-es",
+        "microsoft-learn-service-order-repair-status-da-dk",
+        "microsoft-learn-service-order-repair-status-fi-fi",
+        "microsoft-learn-service-order-repair-status-nb-no"
+      ],
+      "localizedInstructions": {
+        "sv-SE": "Serviceorderns status sammanfattar reparationsstatusen för orderns serviceartiklar enligt företagets kopplingar och prioritetsordning. Den är separat från Frisläppningsstatus, som styr lagerhanteringen. En ändring av reparationsstatus kan därför påverka orderstatus utan att i sig visa att arbetet är bokfört eller avslutat.",
+        "en-US": "The service order status summarizes the repair statuses of its service items according to the configured mappings and priorities. It is separate from Release Status, which controls warehouse handling. Changing a repair status can therefore affect the order status without itself proving that work was posted or completed.",
+        "fr-FR": "Le statut de la commande de service résume les statuts de réparation de ses articles selon les correspondances et priorités configurées. Il est distinct du statut de lancement, qui détermine le traitement en entrepôt. Modifier un statut de réparation peut donc modifier le statut de la commande sans prouver que le travail est comptabilisé ou terminé.",
+        "de-DE": "Der Serviceauftragsstatus fasst die Reparaturstatus der Serviceartikel gemäß den eingerichteten Zuordnungen und Prioritäten zusammen. Er ist getrennt vom Freigabestatus, der die Lagerabwicklung steuert. Eine Änderung des Reparaturstatus kann daher den Auftragsstatus beeinflussen, ohne zu belegen, dass die Arbeit gebucht oder abgeschlossen wurde.",
+        "es-ES": "El estado del pedido de servicio resume los estados de reparación de sus productos de servicio según las correspondencias y prioridades configuradas. Es distinto del estado de lanzamiento, que controla la gestión del almacén. Cambiar un estado de reparación puede modificar el estado del pedido sin demostrar que el trabajo se haya registrado o completado.",
+        "da-DK": "Serviceordrestatus opsummerer reparationsstatus for ordrens serviceartikler efter de konfigurerede tilknytninger og prioriteter. Den er adskilt fra frigivelsesstatus, som styrer lagerhåndteringen. En ændring af reparationsstatus kan derfor påvirke ordrestatus uden i sig selv at vise, at arbejdet er bogført eller afsluttet.",
+        "fi-FI": "Huoltotilauksen tila kokoaa sen huoltonimikkeiden korjaustilat määritettyjen määritysten ja prioriteettien mukaan. Se on erillinen vapautustilasta, joka ohjaa varastonkäsittelyä. Korjaustilan muutos voi siksi vaikuttaa tilauksen tilaan osoittamatta, että työ olisi kirjattu tai valmis.",
+        "nb-NO": "Serviceordrestatus oppsummerer reparasjonsstatusen for servicevarene i ordren etter de konfigurerte koblingene og prioritetene. Den er separat fra frigivelsesstatus, som styrer lagerhåndteringen. En endring av reparasjonsstatus kan derfor påvirke ordrestatus uten i seg selv å vise at arbeidet er bokført eller fullført."
       }
     }
   ],
@@ -716,6 +918,372 @@
         "A service item can belong to multiple active contracts; assign the appropriate contract to each service order line",
         "Review contract signing, expiry, covered service item, annual amount and invoice period before billing",
         "Contract coverage and a service order do not themselves prove that service work was completed or posted"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-service-resource-allocation-en-us",
+      "title": "How to allocate resources",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/en-us/dynamics365/business-central/service-how-to-allocate-resources",
+      "appliesTo": "Current en-US Business Central online documentation; inspected 2026-09-28",
+      "accessedDate": "2026-09-28",
+      "fields": [
+        "Service Orders",
+        "Service Quotes",
+        "Dispatch Board",
+        "Resource Allocations",
+        "Resource No.",
+        "Resource Group No.",
+        "Allocation Date",
+        "Allocated Hours",
+        "Active"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-service-resource-allocation-sv-se",
+      "title": "Så här tilldelar du resurser",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/sv-se/dynamics365/business-central/service-how-to-allocate-resources",
+      "appliesTo": "Current sv-SE Business Central online documentation; inspected 2026-09-28",
+      "accessedDate": "2026-09-28",
+      "fields": [
+        "Service Orders",
+        "Service Quotes",
+        "Dispatch Board",
+        "Resource Allocations",
+        "Resource No.",
+        "Resource Group No.",
+        "Allocation Date",
+        "Allocated Hours",
+        "Active"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-service-resource-allocation-fr-fr",
+      "title": "Affecter des ressources",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/fr-fr/dynamics365/business-central/service-how-to-allocate-resources",
+      "appliesTo": "Current fr-FR Business Central online documentation; inspected 2026-09-28",
+      "accessedDate": "2026-09-28",
+      "fields": [
+        "Service Orders",
+        "Service Quotes",
+        "Dispatch Board",
+        "Resource Allocations",
+        "Resource No.",
+        "Resource Group No.",
+        "Allocation Date",
+        "Allocated Hours",
+        "Active"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-service-resource-allocation-de-de",
+      "title": "Ressourcen zuordnen",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/de-de/dynamics365/business-central/service-how-to-allocate-resources",
+      "appliesTo": "Current de-DE Business Central online documentation; inspected 2026-09-28",
+      "accessedDate": "2026-09-28",
+      "fields": [
+        "Service Orders",
+        "Service Quotes",
+        "Dispatch Board",
+        "Resource Allocations",
+        "Resource No.",
+        "Resource Group No.",
+        "Allocation Date",
+        "Allocated Hours",
+        "Active"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-service-resource-allocation-es-es",
+      "title": "Asignar recursos",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/es-es/dynamics365/business-central/service-how-to-allocate-resources",
+      "appliesTo": "Current es-ES Business Central online documentation; inspected 2026-09-28",
+      "accessedDate": "2026-09-28",
+      "fields": [
+        "Service Orders",
+        "Service Quotes",
+        "Dispatch Board",
+        "Resource Allocations",
+        "Resource No.",
+        "Resource Group No.",
+        "Allocation Date",
+        "Allocated Hours",
+        "Active"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-service-resource-allocation-da-dk",
+      "title": "Sådan allokeres ressourcer",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/da-dk/dynamics365/business-central/service-how-to-allocate-resources",
+      "appliesTo": "Current da-DK Business Central online documentation; inspected 2026-09-28",
+      "accessedDate": "2026-09-28",
+      "fields": [
+        "Service Orders",
+        "Service Quotes",
+        "Dispatch Board",
+        "Resource Allocations",
+        "Resource No.",
+        "Resource Group No.",
+        "Allocation Date",
+        "Allocated Hours",
+        "Active"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-service-resource-allocation-fi-fi",
+      "title": "Resurssien kohdistaminen",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/fi-fi/dynamics365/business-central/service-how-to-allocate-resources",
+      "appliesTo": "Current fi-FI Business Central online documentation; inspected 2026-09-28",
+      "accessedDate": "2026-09-28",
+      "fields": [
+        "Service Orders",
+        "Service Quotes",
+        "Dispatch Board",
+        "Resource Allocations",
+        "Resource No.",
+        "Resource Group No.",
+        "Allocation Date",
+        "Allocated Hours",
+        "Active"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-service-resource-allocation-nb-no",
+      "title": "Tilordne ressurser",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/nb-no/dynamics365/business-central/service-how-to-allocate-resources",
+      "appliesTo": "Current nb-NO Business Central online documentation; inspected 2026-09-28",
+      "accessedDate": "2026-09-28",
+      "fields": [
+        "Service Orders",
+        "Service Quotes",
+        "Dispatch Board",
+        "Resource Allocations",
+        "Resource No.",
+        "Resource Group No.",
+        "Allocation Date",
+        "Allocated Hours",
+        "Active"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-service-order-repair-status-en-us",
+      "title": "Service order status and repair status",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/en-us/dynamics365/business-central/service-service-order-status-and-repair-status",
+      "appliesTo": "Current en-US Business Central online documentation; inspected 2026-09-28",
+      "accessedDate": "2026-09-28",
+      "fields": [
+        "Service Order Status",
+        "Repair Status Code",
+        "Release Status",
+        "Pending",
+        "In Process",
+        "On Hold",
+        "Finished"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-service-order-repair-status-sv-se",
+      "title": "Status för serviceorder och reparation",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/sv-se/dynamics365/business-central/service-service-order-status-and-repair-status",
+      "appliesTo": "Current sv-SE Business Central online documentation; inspected 2026-09-28",
+      "accessedDate": "2026-09-28",
+      "fields": [
+        "Service Order Status",
+        "Repair Status Code",
+        "Release Status",
+        "Pending",
+        "In Process",
+        "On Hold",
+        "Finished"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-service-order-repair-status-fr-fr",
+      "title": "Statuts des commandes de service et statuts de réparation",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/fr-fr/dynamics365/business-central/service-service-order-status-and-repair-status",
+      "appliesTo": "Current fr-FR Business Central online documentation; inspected 2026-09-28",
+      "accessedDate": "2026-09-28",
+      "fields": [
+        "Service Order Status",
+        "Repair Status Code",
+        "Release Status",
+        "Pending",
+        "In Process",
+        "On Hold",
+        "Finished"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-service-order-repair-status-de-de",
+      "title": "Serviceauftragsstatus und Reparaturstatus",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/de-de/dynamics365/business-central/service-service-order-status-and-repair-status",
+      "appliesTo": "Current de-DE Business Central online documentation; inspected 2026-09-28",
+      "accessedDate": "2026-09-28",
+      "fields": [
+        "Service Order Status",
+        "Repair Status Code",
+        "Release Status",
+        "Pending",
+        "In Process",
+        "On Hold",
+        "Finished"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-service-order-repair-status-es-es",
+      "title": "Estados de servicio y de reparación",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/es-es/dynamics365/business-central/service-service-order-status-and-repair-status",
+      "appliesTo": "Current es-ES Business Central online documentation; inspected 2026-09-28",
+      "accessedDate": "2026-09-28",
+      "fields": [
+        "Service Order Status",
+        "Repair Status Code",
+        "Release Status",
+        "Pending",
+        "In Process",
+        "On Hold",
+        "Finished"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-service-order-repair-status-da-dk",
+      "title": "Serviceordrestatus og reparationsstatus",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/da-dk/dynamics365/business-central/service-service-order-status-and-repair-status",
+      "appliesTo": "Current da-DK Business Central online documentation; inspected 2026-09-28",
+      "accessedDate": "2026-09-28",
+      "fields": [
+        "Service Order Status",
+        "Repair Status Code",
+        "Release Status",
+        "Pending",
+        "In Process",
+        "On Hold",
+        "Finished"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-service-order-repair-status-fi-fi",
+      "title": "Huoltotilauksen tila ja korjaustila",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/fi-fi/dynamics365/business-central/service-service-order-status-and-repair-status",
+      "appliesTo": "Current fi-FI Business Central online documentation; inspected 2026-09-28",
+      "accessedDate": "2026-09-28",
+      "fields": [
+        "Service Order Status",
+        "Repair Status Code",
+        "Release Status",
+        "Pending",
+        "In Process",
+        "On Hold",
+        "Finished"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-service-order-repair-status-nb-no",
+      "title": "Serviceordrestatus og reparasjonsstatus",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/nb-no/dynamics365/business-central/service-service-order-status-and-repair-status",
+      "appliesTo": "Current nb-NO Business Central online documentation; inspected 2026-09-28",
+      "accessedDate": "2026-09-28",
+      "fields": [
+        "Service Order Status",
+        "Repair Status Code",
+        "Release Status",
+        "Pending",
+        "In Process",
+        "On Hold",
+        "Finished"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-service-create-order-fr-fr",
+      "title": "Guide pratique pour créer des commandes de service — Business Central",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/fr-fr/dynamics365/business-central/service-how-to-create-service-orders",
+      "appliesTo": "Business Central standard Service Management. Localized Microsoft Learn source; tenant-specific captions remain unverified.",
+      "accessedDate": "2026-09-29",
+      "fields": [
+        "Service Orders page",
+        "New service order action",
+        "Customer No. selects customer and fills related fields"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-service-create-order-de-de",
+      "title": "Erstellen von Serviceaufträgen — Business Central",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/de-de/dynamics365/business-central/service-how-to-create-service-orders",
+      "appliesTo": "Business Central standard Service Management. Localized Microsoft Learn source; tenant-specific captions remain unverified.",
+      "accessedDate": "2026-09-29",
+      "fields": [
+        "Service Orders page",
+        "New service order action",
+        "Customer No. selects customer and fills related fields"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-service-create-order-es-es",
+      "title": "Creación de pedidos de servicio — Business Central",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/es-es/dynamics365/business-central/service-how-to-create-service-orders",
+      "appliesTo": "Business Central standard Service Management. Localized Microsoft Learn source; tenant-specific captions remain unverified.",
+      "accessedDate": "2026-09-29",
+      "fields": [
+        "Service Orders page",
+        "New service order action",
+        "Customer No. selects customer and fills related fields"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-service-create-order-da-dk",
+      "title": "Sådan opretter du serviceordrer — Business Central",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/da-dk/dynamics365/business-central/service-how-to-create-service-orders",
+      "appliesTo": "Business Central standard Service Management. Localized Microsoft Learn source; tenant-specific captions remain unverified.",
+      "accessedDate": "2026-09-29",
+      "fields": [
+        "Service Orders page",
+        "New service order action",
+        "Customer No. selects customer and fills related fields"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-service-create-order-fi-fi",
+      "title": "Huoltotilausten luominen — Business Central",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/fi-fi/dynamics365/business-central/service-how-to-create-service-orders",
+      "appliesTo": "Business Central standard Service Management. Localized Microsoft Learn source; tenant-specific captions remain unverified.",
+      "accessedDate": "2026-09-29",
+      "fields": [
+        "Service Orders page",
+        "New service order action",
+        "Customer No. selects customer and fills related fields"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-service-create-order-nb-no",
+      "title": "Slik oppretter du serviceordrer — Business Central",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/nb-no/dynamics365/business-central/service-how-to-create-service-orders",
+      "appliesTo": "Business Central standard Service Management. Localized Microsoft Learn source; tenant-specific captions remain unverified.",
+      "accessedDate": "2026-09-29",
+      "fields": [
+        "Service Orders page",
+        "New service order action",
+        "Customer No. selects customer and fills related fields"
       ]
     }
   ]

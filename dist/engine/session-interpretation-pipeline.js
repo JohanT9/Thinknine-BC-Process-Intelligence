@@ -197,21 +197,40 @@ function (semantic, knowledge, refs, processAnalysis) {
       const observedAction = [...raw].reverse().map(item =>
         item.actionCaption || item.accessibleName || item.label || "")
         .find(Boolean);
+      const fieldEvidence = raw.some(item => item.kind === "field-edit")
+        ? raw.filter(item => item.kind === "field-edit") : raw;
+      const observedField = [...fieldEvidence].reverse().map(item => item.fieldCaption ||
+        item.targetControl?.accessibleName || item.targetControl?.caption ||
+        item.controlIdentification?.caption || "").find(Boolean);
       const observedPage = [...raw].reverse().map(item =>
         item.pageCaption || item.pageContext?.pageCaption || "").find(Boolean);
       const pageCaption = task.pageCaption || model.pageCaption || observedPage || "";
       const semanticAction = task.semanticAction || model.actionType || task.taskType;
       const actionCaption = task.actionCaption || observedAction ||
         semanticCaptions[semanticAction] || "";
-      if (!pageCaption || !actionCaption) return task;
-      const candidate = { ...task, pageCaption, actionCaption,
-        semanticAction, context: { ...(task.context || {}),
-          currentPageCaption: task.context?.currentPageCaption || pageCaption,
-          currentEntity: task.entity || task.context?.currentEntity || "" } };
-      const found = knowledge.match(candidate, available);
-      if (!found || !knowledge.explanationEligible(found.rule, candidate, available)) {
+      // Older recordings may retain the edited field caption but have no
+      // action caption for a field edit. Let the field-specific matcher use
+      // that evidence instead of dropping the step before rule evaluation.
+      if (!pageCaption || (!actionCaption && !task.fieldCaption &&
+          !observedField && !task.automationId)) {
         return task;
       }
+      const baseCandidate = { ...task, pageCaption, actionCaption, semanticAction,
+        context: { ...(task.context || {}),
+          currentPageCaption: task.context?.currentPageCaption || pageCaption,
+          currentEntity: task.entity || task.context?.currentEntity || "" } };
+      const candidates = [...new Set([task.fieldCaption, observedField]
+        .filter(Boolean))].map(fieldCaption => knowledge.pageEvidence({
+        ...baseCandidate, fieldCaption }, packs));
+      if (!candidates.length) candidates.push(knowledge.pageEvidence(baseCandidate,
+        packs));
+      const match = candidates.map(candidate => ({ candidate,
+        found: knowledge.match(candidate, available) })).find(item => item.found &&
+        knowledge.explanationEligible(item.found.rule, item.candidate, available));
+      if (!match) {
+        return task;
+      }
+      const { candidate, found } = match;
       const rule = found.rule;
       return { ...task,
         contextualExplanations: { ...knowledge.localizedExplanations(rule) },

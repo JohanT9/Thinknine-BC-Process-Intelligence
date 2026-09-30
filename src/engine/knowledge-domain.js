@@ -3,13 +3,15 @@
     ? require("./task-consolidation") : root.T9TaskConsolidation;
   const explanationCatalog = typeof module === "object" && module.exports
     ? require("./knowledge-explanation-catalog") : root.T9KnowledgeExplanationCatalog;
-  const api = factory(consolidation, explanationCatalog);
+  const pageIdentification = typeof module === "object" && module.exports
+    ? require("./page-identification-engine") : root.T9PageIdentificationEngine;
+  const api = factory(consolidation, explanationCatalog, pageIdentification);
   if (typeof module === "object" && module.exports) module.exports = api;
   root.T9KnowledgeDomain = api;
 })(typeof globalThis !== "undefined" ? globalThis : this,
-function (consolidation, explanationCatalog) {
+function (consolidation, explanationCatalog, pageIdentification) {
   "use strict";
-  const VERSION = "2.1.0";
+  const VERSION = "2.2.0";
   const text = value => String(value || "");
 
   function rules(packs = []) {
@@ -31,15 +33,50 @@ function (consolidation, explanationCatalog) {
     });
   }
 
+  function pageEvidence(task, packs) {
+    const pageObjectId = task.pageObjectId || task.pageId ||
+      task.pageIdentification?.pageObjectId ||
+      task.pageContext?.pageObjectId || task.context?.currentPageObjectId;
+    const definition = pageObjectId && pageIdentification?.getPageDefinition(
+      pageObjectId, packs);
+    if (!definition) return task;
+    const language = text(task.language || task.locale || task.context?.language ||
+      task.context?.locale || "en-US");
+    const definitions = packs.flatMap(pack => pack.pageDefinitions || [])
+      .filter(item => String(item.pageObjectId || "") === String(pageObjectId) &&
+        (!definition.entity || item.entity === definition.entity));
+    const preferred = definitions.find(item => item.ruleId === definition.ruleId);
+    const localized = definitions.map(item => item.localizedCaptions || {});
+    const captions = localized.find(item => item[language]?.length ||
+      item[language.split("-")[0]]?.length) || preferred?.localizedCaptions ||
+      localized[0] || {};
+    const caption = captions[language]?.[0] ||
+      captions[language.split("-")[0]]?.[0] ||
+      Object.values(captions).flat()[0] || task.pageCaption || "";
+    return { ...task, knowledgePageCaption: caption,
+      pageObjectId: String(pageObjectId),
+      context: { ...(task.context || {}),
+        currentEntity: task.context?.currentEntity || definition.entity || "",
+        currentPageCaption: task.context?.currentPageCaption || caption,
+        currentPageObjectId: String(pageObjectId) } };
+  }
+
   function score(rule, task) {
     const match = rule.match || {};
     const context = task.context || {};
+    const pageObjectIds = match.pageObjectIds || [];
+    const observedPageObjectId = text(task.pageObjectId || task.pageId ||
+      task.pageIdentification?.pageObjectId || context.currentPageObjectId);
+    if (pageObjectIds.length && !pageObjectIds.map(String)
+      .includes(observedPageObjectId)) return 0;
     const ruleEntity = text(rule.entity).trim().toLowerCase();
     const observedEntity = text(task.entity || context.currentEntity)
       .trim().toLowerCase();
-    if (ruleEntity && observedEntity && ruleEntity !== observedEntity) return 0;
-    const pageCaption = task.pageCaption || context.currentPageCaption ||
+    const pageCaption = task.knowledgePageCaption || task.pageCaption || context.currentPageCaption ||
       context.previousPageCaption;
+    const pageMatches = (match.pagePatterns || []).length > 0 &&
+      patternsMatch(match.pagePatterns, pageCaption);
+    if (ruleEntity && observedEntity && ruleEntity !== observedEntity && !pageMatches) return 0;
     const checks = [["pagePatterns", pageCaption],
       ["actionPatterns", task.actionCaption], ["fieldPatterns", task.fieldCaption],
       ["automationIdPatterns", task.automationId]];
@@ -50,7 +87,7 @@ function (consolidation, explanationCatalog) {
       required += 1;
       const pageResolvedByEntity = key === "pagePatterns" && ruleEntity &&
         observedEntity === ruleEntity;
-      if (patternsMatch(declared, candidate) || pageResolvedByEntity) {
+      if (patternsMatch(declared, key === "pagePatterns" ? pageCaption : candidate) || pageResolvedByEntity) {
         matched += 1; value += 25;
       }
     }
@@ -90,7 +127,7 @@ function (consolidation, explanationCatalog) {
   }
 
   function explanationEligible(rule, task, availableRules = []) {
-    if (!localizedExplanations(rule)) return false;
+    if (!localizedExplanations(rule, task)) return false;
     const matchSpec = rule.match || {};
     const explicitSignal = [
       [matchSpec.actionPatterns, task.actionCaption],
@@ -102,19 +139,26 @@ function (consolidation, explanationCatalog) {
     const observedEntity = text(task.entity || task.context?.currentEntity)
       .trim().toLowerCase();
     const ruleEntity = text(rule.entity).trim().toLowerCase();
-    const entitylessCore = ["Core.SearchAndOpenPage", "Core.CreateNew"]
-      .includes(rule.ruleId) && !observedEntity;
-    if ((!ruleEntity && !entitylessCore) ||
-        (ruleEntity && observedEntity && observedEntity !== ruleEntity)) return false;
-    const pageCaption = task.pageCaption || task.context?.currentPageCaption ||
+    const genericCore = ["Core.SearchAndOpenPage", "Core.CreateNew", "Core.EditRecord",
+      "Core.DeleteRecord", "Core.NavigateBack", "Core.Lookup", "Core.ChangeDate"]
+      .includes(rule.ruleId);
+    if (rule.ruleId === "Core.CreateNew" && !observedEntity &&
+        !(task.knowledgePageCaption || task.pageCaption || task.context?.currentPageCaption || task.context?.previousPageCaption)) return false;
+    const entitylessCore = genericCore && !observedEntity;
+    if (!ruleEntity && !genericCore) return false;
+    const pageCaption = task.knowledgePageCaption || task.pageCaption || task.context?.currentPageCaption ||
       task.context?.previousPageCaption || "";
     const pageMatches = matchSpec.pagePatterns?.length &&
       patternsMatch(matchSpec.pagePatterns, pageCaption);
+    if (ruleEntity && observedEntity && observedEntity !== ruleEntity && !pageMatches) return false;
     const entityBackedPage = observedEntity === ruleEntity;
-    if (!pageMatches && !entityBackedPage && !entitylessCore) return false;
+    if (!pageMatches && !entityBackedPage && !entitylessCore &&
+        !(genericCore && pageCaption)) return false;
     const sources = rule.sourceRefs || [];
-    if (!sources.some(source => /^https:\/\/learn\.microsoft\.com\//i
-      .test(source?.sourceUri || ""))) return false;
+    const officialSource = sources.some(source => { const uri = String(source?.sourceUri || ""); return uri.startsWith("https://learn.microsoft.com/") || uri.startsWith("https://erpdocs.apteancloud.com/"); });
+    const authoredWorkflow = explanationCatalog?.isAuthored?.(rule) === true;
+    const pageContextCreate = rule.ruleId === "Core.CreateNew" && Boolean(pageCaption || observedEntity);
+    if (!officialSource && !authoredWorkflow && !pageContextCreate) return false;
     const candidates = availableRules.length ? availableRules : [rule];
     const scored = candidates.map(candidate => ({ candidate,
       score: score(candidate, task) })).filter(item => item.score > 0)
@@ -131,13 +175,14 @@ function (consolidation, explanationCatalog) {
     return localized[tag] || localized[base] || "";
   }
 
-  function localizedExplanations(rule) {
-    return rule?.localizedExplanations || explanationCatalog?.localized(rule) || null;
+  function localizedExplanations(rule, context) {
+    return rule?.localizedExplanations || explanationCatalog?.localized(rule, context) || null;
   }
 
   function apply(tasks = [], packs = []) {
     const availableRules = rules(packs); const unmatched = [];
-    const enriched = tasks.map(task => {
+    const enriched = tasks.map(originalTask => {
+      const task = pageEvidence(originalTask, packs);
       const found = match(task, availableRules);
       if (!found) {
         unmatched.push({ pageId: task.pageId || "", pageCaption: task.pageCaption || "",
@@ -152,7 +197,10 @@ function (consolidation, explanationCatalog) {
       const instruction = localizedInstruction(rule, task.language || task.locale ||
         task.context?.language || task.context?.locale || "en-US");
       const explanations = explanationEligible(rule, task, availableRules)
-        ? localizedExplanations(rule) : null;
+        ? localizedExplanations(rule, task) : null;
+      const explanationBasis = explanations
+        ? explanationCatalog?.basis?.(rule, task) || "microsoft-learn" : "";
+      const pageContextExplanation = explanationBasis === "page-context";
       return { ...task, taskType: rule.taskType || task.taskType,
         semanticAction: rule.semanticAction || task.semanticAction,
         entity: rule.entity || task.entity || "", knowledgeFrameworkVersion: VERSION,
@@ -164,8 +212,9 @@ function (consolidation, explanationCatalog) {
         ...(explanations ? { contextualExplanations: { ...explanations },
           contextualExplanationRuleId: rule.ruleId,
           contextualExplanationConfidence: Number(rule.confidence),
-          contextualExplanationSourceIds: [...(rule.sourceIds || [])],
-          contextualExplanationSources: rule.sourceRefs.map(source => ({
+          contextualExplanationSourceIds: pageContextExplanation ? [] : [...(rule.sourceIds || [])],
+          contextualExplanationBasis: explanationBasis,
+          contextualExplanationSources: pageContextExplanation ? [] : rule.sourceRefs.map(source => ({
             sourceId: source.sourceId, title: source.title, sourceUri: source.sourceUri
           })) } : {}),
         ...(instruction ? { userDirective: instruction,
@@ -214,7 +263,7 @@ function (consolidation, explanationCatalog) {
       consolidationDecisions: consolidated.decisions,
       unmatched, rules: availableRules };
   }
-  return { VERSION, apply, match, patternsMatch, rules, score, explanationEligible,
+  return { VERSION, apply, match, pageEvidence, patternsMatch, rules, score, explanationEligible,
     localizedExplanations, localizedInstruction,
     localizedExplanation };
 });

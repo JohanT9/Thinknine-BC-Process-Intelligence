@@ -1,0 +1,521 @@
+{
+  "packId": "bc-human-resources",
+  "name": "Business Central human-resources",
+  "version": "1.0.0",
+  "priority": 220,
+  "rules": [
+    {
+      "ruleId": "HumanResources.ViewAbsenceByCategories",
+      "taskType": "ViewEmployeeAbsenceByCategories",
+      "semanticAction": "ViewEmployeeAbsenceByCategories",
+      "entity": "AbsenceRegistration",
+      "priority": 1310,
+      "confidence": 0.95,
+      "verifiedRuntimeLocales": ["en-US", "sv-SE"],
+      "match": {
+        "pagePatterns": ["^Employees$", "^Anställda$"],
+        "actionPatterns": ["^Absences by Categories$", "^Frånvaro per kategori$"],
+        "fieldPatterns": [],
+        "automationIdPatterns": []
+      },
+      "instructionTemplate": "",
+      "languages": ["en-US", "sv-SE", "fr-FR", "de-DE", "es-ES", "da-DK", "fi-FI", "nb-NO"],
+      "aliases": [],
+      "sourceIds": [
+        "microsoft-learn-expansion-hr-how-manage-absence-en-us",
+        "microsoft-learn-expansion-hr-how-manage-absence-sv-se",
+        "microsoft-learn-expansion-hr-how-manage-absence-fr-fr",
+        "microsoft-learn-expansion-hr-how-manage-absence-de-de",
+        "microsoft-learn-expansion-hr-how-manage-absence-es-es",
+        "microsoft-learn-expansion-hr-how-manage-absence-da-dk",
+        "microsoft-learn-expansion-hr-how-manage-absence-fi-fi",
+        "microsoft-learn-expansion-hr-how-manage-absence-nb-no"
+      ],
+      "localizedExplanations": {
+        "en-US": "Opens an analysis for the selected employee's absences grouped by cause. Set only the employee and period/category filters needed for the question, then use Show Matrix to review the totals by absence cause. This analyzes the absence entries already recorded; it does not add an absence, approve leave, or calculate payroll.",
+        "sv-SE": "Öppnar en analys av den valda medarbetarens frånvaro grupperad efter orsak. Ange bara de person-, period- och orsaksfilter som behövs för frågan och välj sedan Visa matris för att granska summeringen per frånvaroorsak. Analysen visar redan registrerade frånvaroposter; den lägger inte till frånvaro, beviljar inte ledighet och beräknar inte lön.",
+        "fr-FR": "Ouvre une analyse des absences du salarié sélectionné, regroupées par motif. Définissez les filtres utiles sur le salarié, la période ou le motif, puis utilisez Afficher la matrice pour examiner les totaux. Cette analyse porte sur les absences déjà enregistrées ; elle n’ajoute pas d’absence, n’approuve pas de congé et ne calcule pas de paie.",
+        "de-DE": "Öffnet eine Analyse der Abwesenheiten des ausgewählten Mitarbeiters, gruppiert nach Abwesenheitsgrund. Legen Sie die benötigten Mitarbeiter-, Zeitraum- und Grundfilter fest und wählen Sie anschließend Matrix anzeigen, um die Summen zu prüfen. Die Analyse wertet bereits erfasste Abwesenheiten aus; sie erfasst keine Abwesenheit, genehmigt keinen Urlaub und berechnet keine Löhne.",
+        "es-ES": "Abre un análisis de las ausencias del empleado seleccionado agrupadas por motivo. Establezca los filtros necesarios de empleado, período o motivo y use Mostrar matriz para revisar los totales. El análisis utiliza ausencias ya registradas; no añade ausencias, aprueba permisos ni calcula nóminas.",
+        "da-DK": "Åbner en analyse af den valgte medarbejders fravær grupperet efter årsag. Angiv de nødvendige filtre for medarbejder, periode eller årsag, og vælg derefter Vis matrix for at gennemgå totalerne. Analysen bruger allerede registreret fravær; den tilføjer ikke fravær, godkender ikke orlov og beregner ikke løn.",
+        "fi-FI": "Avaa valitun työntekijän poissaolojen analyysin syyn mukaan ryhmiteltynä. Aseta vain tarvittavat työntekijä-, kausi- ja syysuodattimet ja tarkista summat Näytä matriisi -toiminnolla. Analyysi koskee jo kirjattuja poissaoloja; se ei lisää poissaoloja, hyväksy lomaa eikä laske palkkaa.",
+        "nb-NO": "Åpner en analyse av den valgte ansattes fravær gruppert etter årsak. Angi nødvendige filtre for ansatt, periode eller årsak, og velg deretter Vis matrise for å kontrollere totalene. Analysen viser allerede registrert fravær; den registrerer ikke nytt fravær, godkjenner ikke permisjon og beregner ikke lønn."
+      }
+    },
+    {
+      "ruleId": "HumanResources.OpenAbsenceOverview",
+      "taskType": "OpenAbsenceOverview",
+      "semanticAction": "ViewAbsenceOverview",
+      "entity": "AbsenceRegistration",
+      "priority": 1310,
+      "confidence": 0.95,
+      "verifiedRuntimeLocales": ["en-US", "sv-SE"],
+      "match": {
+        "pagePatterns": ["^Absence Registration$", "^Frånvaroregistrering$"],
+        "actionPatterns": ["^Overview by Categories$", "^Overview by Periods$", "^Översikt per kategori$", "^Översikt per perioder$"],
+        "fieldPatterns": [],
+        "automationIdPatterns": []
+      },
+      "instructionTemplate": "",
+      "languages": ["en-US", "sv-SE", "fr-FR", "de-DE", "es-ES", "da-DK", "fi-FI", "nb-NO"],
+      "aliases": [],
+      "sourceIds": [
+        "microsoft-learn-expansion-hr-how-manage-absence-en-us",
+        "microsoft-learn-expansion-hr-how-manage-absence-sv-se",
+        "microsoft-learn-expansion-hr-how-manage-absence-fr-fr",
+        "microsoft-learn-expansion-hr-how-manage-absence-de-de",
+        "microsoft-learn-expansion-hr-how-manage-absence-es-es",
+        "microsoft-learn-expansion-hr-how-manage-absence-da-dk",
+        "microsoft-learn-expansion-hr-how-manage-absence-fi-fi",
+        "microsoft-learn-expansion-hr-how-manage-absence-nb-no"
+      ],
+      "localizedExplanations": {
+        "en-US": "Opens a combined absence analysis from the registration list. Choose the category overview to compare recorded causes across employees, or the period overview to examine absences over time; set the corresponding filters and choose Show Matrix to display the results. These views summarize existing entries and do not create, change, or approve absence records.",
+        "sv-SE": "Öppnar en sammanställd frånvaroanalys från registreringslistan. Välj kategoriöversikten för att jämföra registrerade orsaker mellan anställda eller periodöversikten för att granska frånvaro över tid. Ange relevanta filter och välj Visa matris för att visa resultatet. Vyerna sammanfattar befintliga poster och skapar, ändrar eller godkänner inte frånvaro.",
+        "fr-FR": "Ouvre une analyse globale depuis la liste des absences. Choisissez la vue par catégories pour comparer les motifs enregistrés entre salariés, ou la vue par périodes pour examiner les absences dans le temps. Définissez les filtres correspondants et affichez la matrice. Ces vues résument les enregistrements existants sans les créer, les modifier ni approuver les congés.",
+        "de-DE": "Öffnet eine Gesamtanalyse aus der Abwesenheitsregistrierung. Wählen Sie die Kategorienübersicht, um erfasste Gründe zwischen Mitarbeitern zu vergleichen, oder die Periodenübersicht, um Abwesenheiten im Zeitverlauf zu untersuchen. Setzen Sie die passenden Filter und zeigen Sie die Matrix an. Diese Ansichten fassen vorhandene Einträge zusammen und erstellen, ändern oder genehmigen keine Abwesenheiten.",
+        "es-ES": "Abre un análisis general desde la lista de registro de ausencias. Elija la vista por categorías para comparar motivos registrados entre empleados o la vista por períodos para examinar las ausencias a lo largo del tiempo. Establezca los filtros correspondientes y muestre la matriz. Estas vistas resumen registros existentes y no crean, modifican ni aprueban ausencias.",
+        "da-DK": "Åbner en samlet fraværsanalyse fra registreringslisten. Vælg kategorioversigten for at sammenligne registrerede årsager på tværs af medarbejdere eller periodeoversigten for at undersøge fravær over tid. Angiv de relevante filtre, og vis matrixen. Visningerne opsummerer eksisterende poster og opretter, ændrer eller godkender ikke fravær.",
+        "fi-FI": "Avaa poissaolojen kokonaisanalyysin rekisteröintiluettelosta. Valitse luokkanäkymä vertaillaksesi kirjattuja syitä työntekijöiden välillä tai kausinäkymä tarkastellaksesi poissaoloja ajan kuluessa. Aseta vastaavat suodattimet ja näytä matriisi. Näkymät kokoavat olemassa olevat kirjaukset eivätkä luo, muuta tai hyväksy poissaoloja.",
+        "nb-NO": "Åpner en samlet fraværsanalyse fra registreringslisten. Velg kategorioversikten for å sammenligne registrerte årsaker på tvers av ansatte, eller periodeoversikten for å undersøke fravær over tid. Angi aktuelle filtre og vis matrisen. Visningene oppsummerer eksisterende poster og oppretter, endrer eller godkjenner ikke fravær."
+      }
+    },
+    {
+      "ruleId": "BCExpansion.CreateEmployee",
+      "taskType": "CreateEmployee",
+      "semanticAction": "CreateEmployee",
+      "entity": "Employee",
+      "priority": 1300,
+      "confidence": 0.96,
+      "match": {
+        "pagePatterns": [
+          "^Employees$",
+          "^Anställda$",
+          "^Employés$",
+          "^Mitarbeiter$",
+          "^Empleados$",
+          "^Medarbejdere$",
+          "^Työntekijät$",
+          "^Ansatte$"
+        ],
+        "actionPatterns": [
+          "^New$",
+          "^Ny$",
+          "^Nouveau$",
+          "^Neu$",
+          "^Nuevo$",
+          "^Uusi$"
+        ],
+        "fieldPatterns": [],
+        "automationIdPatterns": []
+      },
+      "instructionTemplate": "",
+      "languages": [
+        "en-US",
+        "sv-SE",
+        "fr-FR",
+        "de-DE",
+        "es-ES",
+        "da-DK",
+        "fi-FI",
+        "nb-NO"
+      ],
+      "aliases": [],
+      "sourceIds": [
+        "microsoft-learn-expansion-hr-how-register-employees-en-us",
+        "microsoft-learn-expansion-hr-how-register-employees-sv-se",
+        "microsoft-learn-expansion-hr-how-register-employees-fr-fr",
+        "microsoft-learn-expansion-hr-how-register-employees-de-de",
+        "microsoft-learn-expansion-hr-how-register-employees-es-es",
+        "microsoft-learn-expansion-hr-how-register-employees-da-dk",
+        "microsoft-learn-expansion-hr-how-register-employees-fi-fi",
+        "microsoft-learn-expansion-hr-how-register-employees-nb-no"
+      ],
+      "localizedExplanations": {
+        "en-US": "Creates the employee master record used by Business Central's Human Resources features. Enter the person's identity and contact details and any relevant employment, payment or absence information your process requires; use the appropriate employee template for consistent defaults. Check for an existing employee before creating a duplicate. An employee record supports personnel administration and expense reimbursement when payment details are configured, but does not create a user account, payroll calculation, salary payment or accounting entry.",
+        "sv-SE": "Skapar den anställdes grundpost som Business Centrals personalfunktioner använder. Ange identitets- och kontaktuppgifter samt relevanta anställnings-, betalnings- eller frånvarouppgifter enligt ert arbetssätt. Använd rätt personalmall för enhetliga standardvärden och kontrollera att personen inte redan finns så att du undviker dubbletter. Personalposten stödjer personaladministration och utläggsersättning när betalningsuppgifter har angetts, men skapar inget användarkonto, ingen löneberäkning, löneutbetalning eller redovisningspost.",
+        "fr-FR": "Cette action ouvre une nouvelle fiche salarié pour les informations du personnel. Complétez les données utiles. La création de la fiche ne calcule ni ne verse de salaire.",
+        "de-DE": "Eine neue Mitarbeiterkarte für Personaldaten wird geöffnet. Ergänzen Sie die erforderlichen Angaben. Das Anlegen ist keine Lohnabrechnung oder Gehaltszahlung.",
+        "es-ES": "Abre una nueva ficha de empleado para sus datos de personal. Complete la información pertinente. Crear la ficha no calcula ni paga una nómina.",
+        "da-DK": "Her åbnes en ny medarbejderpost til personaleoplysninger. Udfyld de relevante oplysninger. Oprettelsen beregner eller udbetaler ikke løn.",
+        "fi-FI": "Toiminto avaa uuden työntekijätietueen henkilötietoja varten. Täydennä tarvittavat tiedot. Luonti ei laske tai maksa palkkaa.",
+        "nb-NO": "Her åpnes en ny ansattpost for personalopplysninger. Fyll ut relevante opplysninger. Opprettelsen beregner eller utbetaler ikke lønn."
+      }
+    },
+    {
+      "ruleId": "BCExpansion.RegisterAbsence",
+      "taskType": "RegisterAbsence",
+      "semanticAction": "RegisterAbsence",
+      "entity": "AbsenceRegistration",
+      "priority": 1300,
+      "confidence": 0.96,
+      "match": {
+        "pagePatterns": [
+          "^Absence Registration$",
+          "^Frånvaroregistrering$",
+          "^Saisie des absences$",
+          "^Abwesenheitsregistrierung$",
+          "^Registro de ausencias$",
+          "^Fraværsregistrering$",
+          "^Poissaolon rekisteröinti$"
+        ],
+        "actionPatterns": [
+          "^New$",
+          "^Ny$",
+          "^Nouveau$",
+          "^Neu$",
+          "^Nuevo$",
+          "^Uusi$"
+        ],
+        "fieldPatterns": [],
+        "automationIdPatterns": []
+      },
+      "instructionTemplate": "",
+      "languages": [
+        "en-US",
+        "sv-SE",
+        "fr-FR",
+        "de-DE",
+        "es-ES",
+        "da-DK",
+        "fi-FI",
+        "nb-NO"
+      ],
+      "aliases": [],
+      "sourceIds": [
+        "microsoft-learn-expansion-hr-how-manage-absence-en-us",
+        "microsoft-learn-expansion-hr-how-manage-absence-sv-se",
+        "microsoft-learn-expansion-hr-how-manage-absence-fr-fr",
+        "microsoft-learn-expansion-hr-how-manage-absence-de-de",
+        "microsoft-learn-expansion-hr-how-manage-absence-es-es",
+        "microsoft-learn-expansion-hr-how-manage-absence-da-dk",
+        "microsoft-learn-expansion-hr-how-manage-absence-fi-fi",
+        "microsoft-learn-expansion-hr-how-manage-absence-nb-no"
+      ],
+      "localizedExplanations": {
+        "en-US": "Adds an absence entry to the selected employee's absence history. Verify the employee, cause, starting/ending dates and quantity/unit; use the same unit consistently because these entries feed absence statistics. This records an absence for HR reporting only—it doesn't approve leave, calculate payroll or update a time sheet unless a separate process is configured.",
+        "sv-SE": "Lägger till en frånvaropost i den valda anställdas frånvarohistorik. Kontrollera person, orsak, start- och slutdatum samt antal/enhet. Använd samma enhet konsekvent eftersom posterna ligger till grund för frånvarostatistiken. Registreringen är personalinformation; den beviljar inte ledighet, beräknar inte lön och uppdaterar inte en tidrapport om inte ett separat flöde har konfigurerats.",
+        "fr-FR": "Ajoute une ligne à l’historique d’absence du salarié sélectionné. Vérifiez le salarié, le motif, les dates de début et de fin ainsi que la quantité et son unité. Utilisez toujours la même unité, heure ou jour, pour obtenir des statistiques comparables. Cette saisie alimente le suivi et les rapports RH ; elle n’approuve pas un congé, ne calcule pas la paie et ne met pas à jour une feuille de temps sans processus distinct.",
+        "de-DE": "Fügt dem Abwesenheitsverlauf des ausgewählten Mitarbeiters einen Eintrag hinzu. Prüfen Sie Mitarbeiter, Abwesenheitsgrund, Anfangs- und Enddatum sowie Menge und Einheit. Verwenden Sie stets dieselbe Einheit, etwa Stunden oder Tage, damit Statistiken vergleichbar bleiben. Der Eintrag dient der Personalverwaltung und Berichterstattung; er genehmigt keinen Urlaub, berechnet keine Löhne und aktualisiert ohne separaten Prozess keinen Stundenzettel.",
+        "es-ES": "Añade una línea al historial de ausencias del empleado seleccionado. Compruebe el empleado, el motivo, las fechas de inicio y fin, y la cantidad y unidad. Utilice siempre la misma unidad, horas o días, para obtener estadísticas comparables. El registro sirve para el seguimiento e informes de RR. HH.; no aprueba permisos, calcula nóminas ni actualiza una hoja de horas sin un proceso independiente.",
+        "da-DK": "Tilføjer en linje til den valgte medarbejders fraværshistorik. Kontrollér medarbejder, fraværsårsag, start- og slutdato samt antal og enhed. Brug altid samme enhed, timer eller dage, så statistikken kan sammenlignes. Registreringen bruges til HR-opfølgning og rapportering; den godkender ikke orlov, beregner ikke løn og opdaterer ikke en timeseddel uden en særskilt proces.",
+        "fi-FI": "Lisää poissaolomerkinnän valitun työntekijän poissaolohistoriaan. Tarkista työntekijä, poissaolon syy, alku- ja loppupäivä sekä määrä ja yksikkö. Käytä aina samaa yksikköä, tunteja tai päiviä, jotta tilastot ovat vertailukelpoisia. Merkintä palvelee henkilöstöseurantaa ja raportointia; se ei hyväksy lomaa, laske palkkaa eikä päivitä työaikakirjausta ilman erillistä prosessia.",
+        "nb-NO": "Legger til en fraværspost i fraværshistorikken til den valgte ansatte. Kontroller ansatt, årsak, start- og sluttdato samt antall og enhet. Bruk alltid samme enhet, timer eller dager, slik at statistikken kan sammenlignes. Registreringen brukes til HR-oppfølging og rapportering; den godkjenner ikke permisjon, beregner ikke lønn og oppdaterer ikke en timeliste uten en egen prosess."
+      }
+    },
+    {
+      "ruleId": "BCExpansion.ApplyEmployeeTemplate",
+      "taskType": "ApplyEmployeeTemplate",
+      "semanticAction": "ApplyEmployeeTemplate",
+      "entity": "Employee",
+      "priority": 1300,
+      "confidence": 0.96,
+      "match": {
+        "pagePatterns": [
+          "^Employee Card$",
+          "^Personalkort$",
+          "^Fiche salarié$",
+          "^Mitarbeiterkarte$",
+          "^Ficha de empleado$",
+          "^Medarbejderkort$",
+          "^Työntekijäkortti$",
+          "^Ansattkort$"
+        ],
+        "actionPatterns": [
+          "^Apply Template$",
+          "^tillämpa mall$",
+          "^Appliquer le modèle$",
+          "^Vorlage anwenden$",
+          "^Aplicar plantilla$",
+          "^Anvend skabelon$",
+          "^Käytä mallia$",
+          "^Bruk mal$"
+        ],
+        "fieldPatterns": [],
+        "automationIdPatterns": []
+      },
+      "instructionTemplate": "",
+      "languages": [
+        "en-US",
+        "sv-SE",
+        "fr-FR",
+        "de-DE",
+        "es-ES",
+        "da-DK",
+        "fi-FI",
+        "nb-NO"
+      ],
+      "aliases": [],
+      "sourceIds": [
+        "microsoft-learn-expansion-hr-how-register-employees-en-us",
+        "microsoft-learn-expansion-hr-how-register-employees-sv-se",
+        "microsoft-learn-expansion-hr-how-register-employees-fr-fr",
+        "microsoft-learn-expansion-hr-how-register-employees-de-de",
+        "microsoft-learn-expansion-hr-how-register-employees-es-es",
+        "microsoft-learn-expansion-hr-how-register-employees-da-dk",
+        "microsoft-learn-expansion-hr-how-register-employees-fi-fi",
+        "microsoft-learn-expansion-hr-how-register-employees-nb-no"
+      ],
+      "localizedExplanations": {
+        "en-US": "Applies the selected employee template's predefined values to the selected employee record(s), helping standardize new-hire details. Confirm the template and selected employees first; then review the resulting fields because template values may replace or fill personnel data. Applying a template doesn't create an employee, user account or payroll entry by itself.",
+        "sv-SE": "Tillämpar den valda personalmallens fördefinierade värden på markerade personalposter och hjälper till att standardisera nyanställdas uppgifter. Kontrollera först mall och markerade personer och granska sedan de resulterande fälten eftersom mallvärden kan fylla i eller ersätta personaluppgifter. Att tillämpa mallen skapar inte i sig en anställd, ett användarkonto eller en lönepost.",
+        "fr-FR": "Applique les valeurs prédéfinies du modèle sélectionné à une ou plusieurs fiches salarié. Vérifiez le modèle et les personnes sélectionnées avant l’action, puis contrôlez les champs renseignés : un modèle peut compléter ou remplacer des informations de personnel. Cela ne crée pas de salarié, de compte utilisateur ni d’écriture de paie. Utilisez cette action pour standardiser des profils, puis adaptez les données propres à chaque personne.",
+        "de-DE": "Wendet die vordefinierten Werte der ausgewählten Vorlage auf eine oder mehrere ausgewählte Mitarbeiterkarten an. Prüfen Sie zuerst Vorlage und Mitarbeiter und kontrollieren Sie anschließend die ausgefüllten Felder, da Vorlagenwerte Personaldaten ergänzen oder ersetzen können. Dadurch werden weder Mitarbeiter noch Benutzerkonten oder Lohnposten angelegt. Verwenden Sie Vorlagen zur Standardisierung und passen Sie anschließend personenbezogene Angaben an.",
+        "es-ES": "Aplica los valores predefinidos de la plantilla seleccionada a una o varias fichas de empleado. Compruebe la plantilla y los empleados seleccionados, y revise después los campos resultantes, ya que la plantilla puede completar o sustituir datos de personal. La acción no crea empleados, cuentas de usuario ni asientos de nómina. Use plantillas para estandarizar perfiles y adapte después los datos de cada persona.",
+        "da-DK": "Anvender den valgte skabelons foruddefinerede værdier på et eller flere valgte medarbejderkort. Kontrollér skabelonen og de valgte medarbejdere først, og gennemgå derefter felterne, da skabelonværdier kan udfylde eller erstatte personaleoplysninger. Handlingen opretter ikke medarbejdere, brugerkonti eller lønposter. Brug skabeloner til at standardisere profiler, og tilpas derefter oplysninger for den enkelte.",
+        "fi-FI": "Käyttää valitun mallin ennalta määritettyjä arvoja yhteen tai useaan valittuun työntekijäkorttiin. Tarkista ensin malli ja valitut työntekijät ja käy sitten täytetyt kentät läpi, sillä malli voi täydentää tai korvata henkilöstötietoja. Toiminto ei luo työntekijää, käyttäjätiliä eikä palkkakirjausta. Käytä mallia profiilien yhdenmukaistamiseen ja täydennä sen jälkeen henkilökohtaiset tiedot.",
+        "nb-NO": "Bruker de forhåndsdefinerte verdiene i den valgte malen på ett eller flere valgte ansattkort. Kontroller malen og de valgte ansatte først, og gjennomgå deretter feltene, fordi malverdier kan fylle ut eller erstatte personalopplysninger. Handlingen oppretter ikke ansatte, brukerkontoer eller lønnsposter. Bruk maler for å standardisere profiler, og tilpass deretter opplysninger for den enkelte."
+      }
+    }
+  ],
+  "sources": [
+    {
+      "sourceId": "microsoft-learn-expansion-hr-how-register-employees-en-us",
+      "title": "Register Employees and Modify Information - Business Central | Microsoft Learn",
+      "sourceUri": "https://learn.microsoft.com/en-us/dynamics365/business-central/hr-how-register-employees",
+      "accessedDate": "2026-09-28",
+      "appliesTo": "Business Central standard functionality. Microsoft Learn captions checked; tenant/version-specific UI captions remain unverified.",
+      "fields": [
+        "This opens a new employee record for personnel information. Complete the relevant employee details. Creating an employee record is not a payroll calculation or salary payment.",
+        "This applies default employee values from a template to the employee card. Review the resulting values for this employee before continuing."
+      ],
+      "documentedCaptions": [
+        "Employees",
+        "New",
+        "Employee Card",
+        "Apply Template"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-expansion-hr-how-register-employees-sv-se",
+      "title": "Registrera medarbetare och ändra Information - Business Central | Microsoft Learn",
+      "sourceUri": "https://learn.microsoft.com/sv-se/dynamics365/business-central/hr-how-register-employees",
+      "accessedDate": "2026-09-28",
+      "appliesTo": "Business Central standard functionality. Microsoft Learn captions checked; tenant/version-specific UI captions remain unverified.",
+      "fields": [
+        "This opens a new employee record for personnel information. Complete the relevant employee details. Creating an employee record is not a payroll calculation or salary payment.",
+        "This applies default employee values from a template to the employee card. Review the resulting values for this employee before continuing."
+      ],
+      "documentedCaptions": [
+        "Anställda",
+        "Ny",
+        "Personalkort",
+        "tillämpa mall"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-expansion-hr-how-register-employees-fr-fr",
+      "title": "Enregistrer les employés et modifier les informations - Business Central | Microsoft Learn",
+      "sourceUri": "https://learn.microsoft.com/fr-fr/dynamics365/business-central/hr-how-register-employees",
+      "accessedDate": "2026-09-28",
+      "appliesTo": "Business Central standard functionality. Microsoft Learn captions checked; tenant/version-specific UI captions remain unverified.",
+      "fields": [
+        "This opens a new employee record for personnel information. Complete the relevant employee details. Creating an employee record is not a payroll calculation or salary payment.",
+        "This applies default employee values from a template to the employee card. Review the resulting values for this employee before continuing."
+      ],
+      "documentedCaptions": [
+        "Employés",
+        "Nouveau",
+        "Fiche salarié",
+        "Appliquer le modèle"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-expansion-hr-how-register-employees-de-de",
+      "title": "Mitarbeiter registrieren und Informationen ändern - Business Central | Microsoft Learn",
+      "sourceUri": "https://learn.microsoft.com/de-de/dynamics365/business-central/hr-how-register-employees",
+      "accessedDate": "2026-09-28",
+      "appliesTo": "Business Central standard functionality. Microsoft Learn captions checked; tenant/version-specific UI captions remain unverified.",
+      "fields": [
+        "This opens a new employee record for personnel information. Complete the relevant employee details. Creating an employee record is not a payroll calculation or salary payment.",
+        "This applies default employee values from a template to the employee card. Review the resulting values for this employee before continuing."
+      ],
+      "documentedCaptions": [
+        "Mitarbeiter",
+        "Neu",
+        "Mitarbeiterkarte",
+        "Vorlage anwenden"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-expansion-hr-how-register-employees-es-es",
+      "title": "Registrar empleados y modificar información - Business Central | Microsoft Learn",
+      "sourceUri": "https://learn.microsoft.com/es-es/dynamics365/business-central/hr-how-register-employees",
+      "accessedDate": "2026-09-28",
+      "appliesTo": "Business Central standard functionality. Microsoft Learn captions checked; tenant/version-specific UI captions remain unverified.",
+      "fields": [
+        "This opens a new employee record for personnel information. Complete the relevant employee details. Creating an employee record is not a payroll calculation or salary payment.",
+        "This applies default employee values from a template to the employee card. Review the resulting values for this employee before continuing."
+      ],
+      "documentedCaptions": [
+        "Empleados",
+        "Nuevo",
+        "Ficha de empleado",
+        "Aplicar plantilla"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-expansion-hr-how-register-employees-da-dk",
+      "title": "Registrere medarbejdere og redigere oplysninger - Business Central | Microsoft Learn",
+      "sourceUri": "https://learn.microsoft.com/da-dk/dynamics365/business-central/hr-how-register-employees",
+      "accessedDate": "2026-09-28",
+      "appliesTo": "Business Central standard functionality. Microsoft Learn captions checked; tenant/version-specific UI captions remain unverified.",
+      "fields": [
+        "This opens a new employee record for personnel information. Complete the relevant employee details. Creating an employee record is not a payroll calculation or salary payment.",
+        "This applies default employee values from a template to the employee card. Review the resulting values for this employee before continuing."
+      ],
+      "documentedCaptions": [
+        "Medarbejdere",
+        "Ny",
+        "Medarbejderkort",
+        "Anvend skabelon"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-expansion-hr-how-register-employees-fi-fi",
+      "title": "Työntekijöiden rekisteröinti ja tietojen muokkaaminen - Business Central | Microsoft Learn",
+      "sourceUri": "https://learn.microsoft.com/fi-fi/dynamics365/business-central/hr-how-register-employees",
+      "accessedDate": "2026-09-28",
+      "appliesTo": "Business Central standard functionality. Microsoft Learn captions checked; tenant/version-specific UI captions remain unverified.",
+      "fields": [
+        "This opens a new employee record for personnel information. Complete the relevant employee details. Creating an employee record is not a payroll calculation or salary payment.",
+        "This applies default employee values from a template to the employee card. Review the resulting values for this employee before continuing."
+      ],
+      "documentedCaptions": [
+        "Työntekijät",
+        "Uusi",
+        "Työntekijäkortti",
+        "Käytä mallia"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-expansion-hr-how-register-employees-nb-no",
+      "title": "Registrer ansatte og endre informasjon - Business Central | Microsoft Learn",
+      "sourceUri": "https://learn.microsoft.com/nb-no/dynamics365/business-central/hr-how-register-employees",
+      "accessedDate": "2026-09-28",
+      "appliesTo": "Business Central standard functionality. Microsoft Learn captions checked; tenant/version-specific UI captions remain unverified.",
+      "fields": [
+        "This opens a new employee record for personnel information. Complete the relevant employee details. Creating an employee record is not a payroll calculation or salary payment.",
+        "This applies default employee values from a template to the employee card. Review the resulting values for this employee before continuing."
+      ],
+      "documentedCaptions": [
+        "Ansatte",
+        "Ny",
+        "Ansattkort",
+        "Bruk mal"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-expansion-hr-how-manage-absence-en-us",
+      "title": "Manage Employee Absence - Business Central | Microsoft Learn",
+      "sourceUri": "https://learn.microsoft.com/en-us/dynamics365/business-central/hr-how-manage-absence",
+      "accessedDate": "2026-09-28",
+      "appliesTo": "Business Central standard functionality. Microsoft Learn captions checked; tenant/version-specific UI captions remain unverified.",
+      "fields": [
+        "A new absence line records an employee’s absence period, cause and quantity. Use consistent units such as hours or days so absence statistics remain comparable."
+      ],
+      "documentedCaptions": [
+        "Absence Registration",
+        "New"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-expansion-hr-how-manage-absence-sv-se",
+      "title": "Hantera personalfrånvaro - Business Central | Microsoft Learn",
+      "sourceUri": "https://learn.microsoft.com/sv-se/dynamics365/business-central/hr-how-manage-absence",
+      "accessedDate": "2026-09-28",
+      "appliesTo": "Business Central standard functionality. Microsoft Learn captions checked; tenant/version-specific UI captions remain unverified.",
+      "fields": [
+        "A new absence line records an employee’s absence period, cause and quantity. Use consistent units such as hours or days so absence statistics remain comparable."
+      ],
+      "documentedCaptions": [
+        "Frånvaroregistrering",
+        "Ny"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-expansion-hr-how-manage-absence-fr-fr",
+      "title": "Gérer les absences des salariés - Business Central | Microsoft Learn",
+      "sourceUri": "https://learn.microsoft.com/fr-fr/dynamics365/business-central/hr-how-manage-absence",
+      "accessedDate": "2026-09-28",
+      "appliesTo": "Business Central standard functionality. Microsoft Learn captions checked; tenant/version-specific UI captions remain unverified.",
+      "fields": [
+        "A new absence line records an employee’s absence period, cause and quantity. Use consistent units such as hours or days so absence statistics remain comparable."
+      ],
+      "documentedCaptions": [
+        "Saisie des absences",
+        "Nouveau"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-expansion-hr-how-manage-absence-de-de",
+      "title": "Analysiert die Fehlzeiten der Mitarbeiter. - Business Central | Microsoft Learn",
+      "sourceUri": "https://learn.microsoft.com/de-de/dynamics365/business-central/hr-how-manage-absence",
+      "accessedDate": "2026-09-28",
+      "appliesTo": "Business Central standard functionality. Microsoft Learn captions checked; tenant/version-specific UI captions remain unverified.",
+      "fields": [
+        "A new absence line records an employee’s absence period, cause and quantity. Use consistent units such as hours or days so absence statistics remain comparable."
+      ],
+      "documentedCaptions": [
+        "Abwesenheitsregistrierung",
+        "Neu"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-expansion-hr-how-manage-absence-es-es",
+      "title": "Gestionar ausencia empleados - Business Central | Microsoft Learn",
+      "sourceUri": "https://learn.microsoft.com/es-es/dynamics365/business-central/hr-how-manage-absence",
+      "accessedDate": "2026-09-28",
+      "appliesTo": "Business Central standard functionality. Microsoft Learn captions checked; tenant/version-specific UI captions remain unverified.",
+      "fields": [
+        "A new absence line records an employee’s absence period, cause and quantity. Use consistent units such as hours or days so absence statistics remain comparable."
+      ],
+      "documentedCaptions": [
+        "Registro de ausencias",
+        "Nuevo"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-expansion-hr-how-manage-absence-da-dk",
+      "title": "Administrere medarbejderfravær - Business Central | Microsoft Learn",
+      "sourceUri": "https://learn.microsoft.com/da-dk/dynamics365/business-central/hr-how-manage-absence",
+      "accessedDate": "2026-09-28",
+      "appliesTo": "Business Central standard functionality. Microsoft Learn captions checked; tenant/version-specific UI captions remain unverified.",
+      "fields": [
+        "A new absence line records an employee’s absence period, cause and quantity. Use consistent units such as hours or days so absence statistics remain comparable."
+      ],
+      "documentedCaptions": [
+        "Fraværsregistrering",
+        "Ny"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-expansion-hr-how-manage-absence-fi-fi",
+      "title": "Työntekijöiden poissaolojen hallinta - Business Central | Microsoft Learn",
+      "sourceUri": "https://learn.microsoft.com/fi-fi/dynamics365/business-central/hr-how-manage-absence",
+      "accessedDate": "2026-09-28",
+      "appliesTo": "Business Central standard functionality. Microsoft Learn captions checked; tenant/version-specific UI captions remain unverified.",
+      "fields": [
+        "A new absence line records an employee’s absence period, cause and quantity. Use consistent units such as hours or days so absence statistics remain comparable."
+      ],
+      "documentedCaptions": [
+        "Poissaolon rekisteröinti",
+        "Uusi"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-expansion-hr-how-manage-absence-nb-no",
+      "title": "Håndtere ansattes fravær - Business Central | Microsoft Learn",
+      "sourceUri": "https://learn.microsoft.com/nb-no/dynamics365/business-central/hr-how-manage-absence",
+      "accessedDate": "2026-09-28",
+      "appliesTo": "Business Central standard functionality. Microsoft Learn captions checked; tenant/version-specific UI captions remain unverified.",
+      "fields": [
+        "A new absence line records an employee’s absence period, cause and quantity. Use consistent units such as hours or days so absence statistics remain comparable."
+      ],
+      "documentedCaptions": [
+        "Fraværsregistrering",
+        "Ny"
+      ]
+    }
+  ]
+}

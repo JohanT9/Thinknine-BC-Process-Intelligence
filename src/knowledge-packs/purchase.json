@@ -1,7 +1,7 @@
 {
   "packId": "bc-purchase",
   "name": "Business Central Purchase",
-  "version": "2.6.0",
+  "version": "2.6.1",
   "priority": 200,
   "pageDefinitions": [
     {
@@ -240,6 +240,70 @@
   ],
   "rules": [
     {
+      "ruleId": "Purchase.CreatePurchaseOrderFromList",
+      "taskType": "CreatePurchaseOrder",
+      "semanticAction": "CreatePurchaseOrder",
+      "entity": "PurchaseOrder",
+      "priority": 1300,
+      "confidence": 0.99,
+      "match": {
+        "pagePatterns": [
+          "^Inköpsorder$",
+          "^Inköpsordrar$",
+          "^Inköpsorderlista$",
+          "^Purchase Order$",
+          "^Purchase Orders$",
+          "^Purchase Order List$",
+          "^Commande achat$",
+          "^Commandes achat$",
+          "^Bestellung$",
+          "^Bestellungen$",
+          "^Pedido de compra$",
+          "^Pedidos de compra$",
+          "^Indkøbsordre$",
+          "^Indkøbsordrer$",
+          "^Ostotilaus$",
+          "^Ostotilaukset$",
+          "^Bestilling$",
+          "^Bestillinger$"
+        ],
+        "actionPatterns": [
+          "^Ny\\.?$",
+          "^New\\.?$",
+          "^Nouveau\\.?$",
+          "^Neu\\.?$",
+          "^Nuevo\\.?$",
+          "^Opret\\.?$",
+          "^Uusi\\.?$",
+          "^Ny\\.?$"
+        ],
+        "fieldPatterns": [],
+        "automationIdPatterns": []
+      },
+      "instructionTemplate": "",
+      "languages": [
+        "sv-SE",
+        "en-US",
+        "fr-FR",
+        "de-DE",
+        "es-ES",
+        "da-DK",
+        "fi-FI",
+        "nb-NO"
+      ],
+      "aliases": [],
+      "sourceIds": [
+        "microsoft-learn-purchase-recording-sv",
+        "microsoft-learn-purchase-recording",
+        "microsoft-learn-purchase-recording-fr",
+        "microsoft-learn-purchase-recording-de",
+        "microsoft-learn-purchase-recording-es",
+        "microsoft-learn-purchase-recording-da",
+        "microsoft-learn-purchase-recording-fi",
+        "microsoft-learn-purchase-recording-nb"
+      ]
+    },
+    {
       "ruleId": "Purchase.OpenPurchaseOrder",
       "taskType": "OpenPurchaseOrder",
       "semanticAction": "OpenRecord",
@@ -261,9 +325,25 @@
       "instructionTemplate": "",
       "languages": [
         "sv-SE",
-        "en-US"
+        "en-US",
+        "fr-FR",
+        "de-DE",
+        "es-ES",
+        "da-DK",
+        "fi-FI",
+        "nb-NO"
       ],
-      "aliases": []
+      "aliases": [],
+      "sourceIds": [
+        "microsoft-learn-purchase-recording",
+        "microsoft-learn-purchase-recording-sv",
+        "microsoft-learn-purchase-recording-fr",
+        "microsoft-learn-purchase-recording-de",
+        "microsoft-learn-purchase-recording-es",
+        "microsoft-learn-purchase-recording-da",
+        "microsoft-learn-purchase-recording-fi",
+        "microsoft-learn-purchase-recording-nb"
+      ]
     },
     {
       "ruleId": "Purchase.Release",
@@ -483,8 +563,25 @@
         "microsoft-learn-purchase-recording-es",
         "microsoft-learn-purchase-recording-da",
         "microsoft-learn-purchase-recording-fi",
-        "microsoft-learn-purchase-recording-nb"
-      ]
+        "microsoft-learn-purchase-recording-nb",
+        "purchase-qms-receipt-en-us",
+        "purchase-qms-receipt-sv-se",
+        "purchase-qms-receipt-fr-fr",
+        "purchase-qms-receipt-de-de",
+        "purchase-qms-receipt-es-es",
+        "purchase-qms-receipt-da-dk",
+        "purchase-qms-receipt-nb-no"
+      ],
+      "localizedExplanations": {
+        "sv-SE": "Bokföring registrerar dokumentets rader i relevanta reskontror och huvudböcker. Beroende på dokumenttyp kan den även skapa bokförda leverans-, mottagnings- eller fakturadokument. Granska rader, belopp och dimensioner först. Om Quality Management är installerat och en matchande genereringsregel är aktiverad kan bokföringen dessutom skapa en kvalitetsinspektion för mottagningen; inspektionen slutförs separat.",
+        "en-US": "Posting records the document lines in the relevant subledgers and general ledger. Depending on the document type, it can also create posted shipment, receipt, or invoice documents. Review lines, amounts, and dimensions first. If Quality Management is installed and a matching generation rule is enabled, posting can also create a quality inspection for the receipt; the inspection is finished separately.",
+        "fr-FR": "La comptabilisation enregistre les lignes dans les auxiliaires et le grand livre concernés. Selon le type de document, elle peut aussi créer des expéditions, réceptions ou factures enregistrées. Vérifiez d’abord les lignes, montants et dimensions. Si Quality Management est installé et qu’une règle de génération correspondante est activée, la comptabilisation peut également créer une inspection qualité pour la réception ; l’inspection est terminée séparément.",
+        "de-DE": "Die Buchung erfasst die Dokumentzeilen in den relevanten Nebenbüchern und im Hauptbuch. Je nach Dokumenttyp können gebuchte Lieferungen, Wareneingänge oder Rechnungen entstehen. Prüfen Sie zuerst Zeilen, Beträge und Dimensionen. Wenn Quality Management installiert und eine passende Generierungsregel aktiviert ist, kann die Buchung zusätzlich eine Qualitätsprüfung für den Wareneingang erstellen; die Prüfung wird separat abgeschlossen.",
+        "es-ES": "El registro contabiliza las líneas en los auxiliares y el libro mayor correspondientes. Según el tipo de documento, también puede crear envíos, recepciones o facturas registrados. Revisa antes las líneas, los importes y las dimensiones. Si Quality Management está instalado y hay una regla de generación coincidente habilitada, el registro también puede crear una inspección de calidad para la recepción; la inspección se finaliza por separado.",
+        "da-DK": "Bogføring registrerer dokumentlinjerne i de relevante underposter og finans. Afhængigt af dokumenttypen kan den også oprette bogførte leverancer, modtagelser eller fakturaer. Kontrollér først linjer, beløb og dimensioner. Hvis Quality Management er installeret, og en matchende genereringsregel er aktiveret, kan bogføringen også oprette en kvalitetsinspektion for modtagelsen; inspektionen færdiggøres separat.",
+        "fi-FI": "Kirjaus tallentaa asiakirjan rivit asianomaisiin aputileihin ja pääkirjaan. Asiakirjatyypistä riippuen se voi myös luoda kirjattuja lähetys-, vastaanotto- tai laskuasiakirjoja. Tarkista ensin rivit, summat ja dimensiot. Jos Quality Management on asennettu ja vastaava luontisääntö on käytössä, kirjaus voi lisäksi luoda vastaanotolle laatutarkastuksen; tarkastus viimeistellään erikseen.",
+        "nb-NO": "Bokføring registrerer dokumentlinjene i relevante reskontroer og hovedboken. Avhengig av dokumenttypen kan den også opprette bokførte leveranser, mottak eller fakturaer. Kontroller linjer, beløp og dimensjoner først. Hvis Quality Management er installert og en samsvarende genereringsregel er aktivert, kan bokføringen også opprette en kvalitetsinspeksjon for mottaket; inspeksjonen fullføres separat."
+      }
     },
     {
       "ruleId": "Purchase.SelectVendor",
@@ -526,7 +623,7 @@
         "actionPatterns": [],
         "fieldPatterns": [
           "^leverantörsnr$",
-          "^vendor no$",
+          "^vendor no\\.?$",
           "^Leverantörsnamn$",
           "^Vendor Name$",
           "^Nom fournisseur$",
@@ -736,6 +833,7 @@
         "fieldPatterns": [
           "^Item No\\.?$",
           "^No\\.?$",
+          "^Nr$",
           "^Artikelnr$",
           "^Artikelnr$",
           "^Item No\\.$",
@@ -768,6 +866,192 @@
         "microsoft-learn-purchase-recording-da",
         "microsoft-learn-purchase-recording-fi",
         "microsoft-learn-purchase-recording-nb"
+      ]
+    },
+    {
+      "ruleId": "Purchase.SelectPurchaseLineItemFromLookup",
+      "taskType": "SelectRecord",
+      "semanticAction": "SelectRecord",
+      "entity": "PurchaseOrderLine",
+      "priority": 1295,
+      "confidence": 0.97,
+      "match": {
+        "pageObjectIds": [
+          "50"
+        ],
+        "pagePatterns": [
+          "^Purchase Order$",
+          "^InkÃ¶psorder$"
+        ],
+        "actionPatterns": [
+          "^Nr, sorterade i Stigande order Välj posten"
+        ],
+        "fieldPatterns": [],
+        "automationIdPatterns": []
+      },
+      "instructionTemplate": "",
+      "languages": [
+        "sv-SE",
+        "en-US",
+        "fr-FR",
+        "de-DE",
+        "es-ES",
+        "da-DK",
+        "fi-FI",
+        "nb-NO"
+      ],
+      "aliases": [],
+      "sourceIds": [
+        "microsoft-learn-purchase-recording",
+        "microsoft-learn-purchase-recording-sv",
+        "microsoft-learn-purchase-recording-fr",
+        "microsoft-learn-purchase-recording-de",
+        "microsoft-learn-purchase-recording-es",
+        "microsoft-learn-purchase-recording-da",
+        "microsoft-learn-purchase-recording-fi",
+        "microsoft-learn-purchase-recording-nb"
+      ]
+    },
+    {
+      "ruleId": "Purchase.OpenPurchaseOrderListFromSearch",
+      "taskType": "SelectRecord",
+      "semanticAction": "SelectRecord",
+      "entity": "PurchaseOrder",
+      "priority": 1290,
+      "confidence": 0.96,
+      "match": {
+        "pagePatterns": [
+          ".*"
+        ],
+        "actionPatterns": [
+          "^Inköpsorder Listor"
+        ],
+        "fieldPatterns": [],
+        "automationIdPatterns": []
+      },
+      "instructionTemplate": "",
+      "languages": [
+        "sv-SE",
+        "en-US",
+        "fr-FR",
+        "de-DE",
+        "es-ES",
+        "da-DK",
+        "fi-FI",
+        "nb-NO"
+      ],
+      "aliases": [],
+      "sourceIds": [
+        "microsoft-learn-purchase-recording",
+        "microsoft-learn-purchase-recording-sv",
+        "microsoft-learn-purchase-recording-fr",
+        "microsoft-learn-purchase-recording-de",
+        "microsoft-learn-purchase-recording-es",
+        "microsoft-learn-purchase-recording-da",
+        "microsoft-learn-purchase-recording-fi",
+        "microsoft-learn-purchase-recording-nb"
+      ]
+    },
+    {
+      "ruleId": "Purchase.OpenManualPurchasePrice",
+      "taskType": "RunActionPath",
+      "semanticAction": "RunActionPath",
+      "entity": "PurchaseOrderLine",
+      "priority": 1300,
+      "confidence": 0.97,
+      "match": {
+        "pageObjectIds": [
+          "50"
+        ],
+        "pagePatterns": [
+          "^Purchase Order$",
+          "^InkÃ¶psorder$"
+        ],
+        "actionPatterns": [
+          "^Manuellt pris",
+          "^Manual Price",
+          "^Prix manuel",
+          "^Manueller Preis",
+          "^Precio manual",
+          "^Manuel pris",
+          "^Manuaalinen hinta",
+          "^Manuell pris"
+        ],
+        "fieldPatterns": [],
+        "automationIdPatterns": []
+      },
+      "instructionTemplate": "",
+      "languages": [
+        "sv-SE",
+        "en-US",
+        "fr-FR",
+        "de-DE",
+        "es-ES",
+        "da-DK",
+        "fi-FI",
+        "nb-NO"
+      ],
+      "aliases": [],
+      "sourceIds": [
+        "microsoft-learn-purchase-pricing",
+        "microsoft-learn-purchase-pricing-sv",
+        "microsoft-learn-purchase-pricing-fr",
+        "microsoft-learn-purchase-pricing-de",
+        "microsoft-learn-purchase-pricing-es",
+        "microsoft-learn-purchase-pricing-da",
+        "microsoft-learn-purchase-pricing-fi",
+        "microsoft-learn-purchase-pricing-nb"
+      ]
+    },
+    {
+      "ruleId": "Purchase.SetDirectUnitCost",
+      "taskType": "SetDirectUnitCost",
+      "semanticAction": "EnterFieldValue",
+      "entity": "PurchaseOrderLine",
+      "priority": 1290,
+      "confidence": 0.97,
+      "match": {
+        "pageObjectIds": [
+          "50"
+        ],
+        "pagePatterns": [
+          "^Purchase Order$",
+          "^InkÃ¶psorder$"
+        ],
+        "actionPatterns": [],
+        "fieldPatterns": [
+          "^Direct Unit Cost$",
+          "^Direkt styckkostnad$",
+          "^CoÃ»t unitaire direct$",
+          "^Direkte Einzelkosten$",
+          "^Coste unitario directo$",
+          "^Direkte enhedsomkostning$",
+          "^Suora yksikkÃ¶kustannus$",
+          "^Direkte enhetskostnad$"
+        ],
+        "automationIdPatterns": []
+      },
+      "instructionTemplate": "",
+      "languages": [
+        "sv-SE",
+        "en-US",
+        "fr-FR",
+        "de-DE",
+        "es-ES",
+        "da-DK",
+        "fi-FI",
+        "nb-NO"
+      ],
+      "aliases": [],
+      "sourceIds": [
+        "microsoft-learn-purchase-pricing",
+        "microsoft-learn-purchase-pricing-sv",
+        "microsoft-learn-purchase-pricing-fr",
+        "microsoft-learn-purchase-pricing-de",
+        "microsoft-learn-purchase-pricing-es",
+        "microsoft-learn-purchase-pricing-da",
+        "microsoft-learn-purchase-pricing-fi",
+        "microsoft-learn-purchase-pricing-nb"
       ]
     },
     {
@@ -1423,6 +1707,118 @@
     }
   ],
   "sources": [
+    {
+      "sourceId": "microsoft-learn-purchase-pricing",
+      "title": "Record special purchase prices and discounts",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/en-us/dynamics365/business-central/purchasing-how-record-purchase-price-discount-payment-agreements",
+      "appliesTo": "Current Business Central online documentation; inspected 2026-09-28",
+      "accessedDate": "2026-09-28",
+      "fields": [
+        "purchase price selection",
+        "direct unit cost",
+        "vendor, item, quantity, unit, currency, and date criteria",
+        "line discounts"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-purchase-pricing-sv",
+      "title": "Registrera särskilda inköpspriser och rabatter",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/sv-se/dynamics365/business-central/purchasing-how-record-purchase-price-discount-payment-agreements",
+      "appliesTo": "Current Swedish Business Central online documentation; inspected 2026-09-28",
+      "accessedDate": "2026-09-28",
+      "fields": [
+        "inköpspris",
+        "direkt styckkostnad",
+        "leverantör, artikel, antal, enhet, valuta och datum",
+        "radrabatt"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-purchase-pricing-fr",
+      "title": "Prix d'achat et remises",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/fr-fr/dynamics365/business-central/purchasing-how-record-purchase-price-discount-payment-agreements",
+      "appliesTo": "Current French localized Business Central online documentation; inspected 2026-09-28",
+      "accessedDate": "2026-09-28",
+      "fields": [
+        "purchase prices",
+        "direct unit cost",
+        "vendor, item, quantity, unit, currency, date",
+        "line discounts"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-purchase-pricing-de",
+      "title": "Einkaufspreise und Rabatte",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/de-de/dynamics365/business-central/purchasing-how-record-purchase-price-discount-payment-agreements",
+      "appliesTo": "Current German localized Business Central online documentation; inspected 2026-09-28",
+      "accessedDate": "2026-09-28",
+      "fields": [
+        "purchase prices",
+        "direct unit cost",
+        "vendor, item, quantity, unit, currency, date",
+        "line discounts"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-purchase-pricing-es",
+      "title": "Precios de compra y descuentos",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/es-es/dynamics365/business-central/purchasing-how-record-purchase-price-discount-payment-agreements",
+      "appliesTo": "Current Spanish localized Business Central online documentation; inspected 2026-09-28",
+      "accessedDate": "2026-09-28",
+      "fields": [
+        "purchase prices",
+        "direct unit cost",
+        "vendor, item, quantity, unit, currency, date",
+        "line discounts"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-purchase-pricing-da",
+      "title": "Særlige købspriser og rabatter",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/da-dk/dynamics365/business-central/purchasing-how-record-purchase-price-discount-payment-agreements",
+      "appliesTo": "Current Danish localized Business Central online documentation; inspected 2026-09-28",
+      "accessedDate": "2026-09-28",
+      "fields": [
+        "purchase prices",
+        "direct unit cost",
+        "vendor, item, quantity, unit, currency, date",
+        "line discounts"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-purchase-pricing-fi",
+      "title": "Ostohinnat ja alennukset",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/fi-fi/dynamics365/business-central/purchasing-how-record-purchase-price-discount-payment-agreements",
+      "appliesTo": "Current Finnish localized Business Central online documentation; inspected 2026-09-28",
+      "accessedDate": "2026-09-28",
+      "fields": [
+        "purchase prices",
+        "direct unit cost",
+        "vendor, item, quantity, unit, currency, date",
+        "line discounts"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-purchase-pricing-nb",
+      "title": "Kjøpspriser og rabatter",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/nb-no/dynamics365/business-central/purchasing-how-record-purchase-price-discount-payment-agreements",
+      "appliesTo": "Current Norwegian localized Business Central online documentation; inspected 2026-09-28",
+      "accessedDate": "2026-09-28",
+      "fields": [
+        "purchase prices",
+        "direct unit cost",
+        "vendor, item, quantity, unit, currency, date",
+        "line discounts"
+      ]
+    },
     {
       "sourceId": "microsoft-learn-bc21-actionbar-pages",
       "title": "Pages with Action Bar Improvements",
@@ -2128,6 +2524,118 @@
         "A purchase line with an invoiced prepayment requires a prepayment credit memo before deletion",
         "Review prepayment application and final invoice balances; invoice posting does not prove vendor payment"
       ]
+    },
+    {
+      "sourceId": "purchase-qms-receipt-en-us",
+      "title": "Purchase receipt inspections without warehouse handling — Business Central",
+      "sourceUri": "https://learn.microsoft.com/en-us/dynamics365/business-central/qms-purchase-receipt-testing-simple",
+      "accessedDate": "2026-09-29",
+      "appliesTo": "Conditional Microsoft Quality Management integration on standard purchase receipt posting. Localized Microsoft Learn source; tenant setup/version are not verified.",
+      "fields": [
+        "An inspection generation rule with Source Type Purchase Line, template, purchase trigger and item filter can create quality inspections automatically when purchase receipt is posted. Lot tracking affects inspection grouping; a distinct inspection can be generated for each lot. This is separate from posting and completion behavior."
+      ],
+      "documentedCaptions": [
+        "Purchase Orders",
+        "Inspection Generation Rules",
+        "When Purchase Order is Received",
+        "Post",
+        "Receive"
+      ]
+    },
+    {
+      "sourceId": "purchase-qms-receipt-sv-se",
+      "title": "Inköpskvittoinspektioner utan lagerhantering — Business Central",
+      "sourceUri": "https://learn.microsoft.com/sv-se/dynamics365/business-central/qms-purchase-receipt-testing-simple",
+      "accessedDate": "2026-09-29",
+      "appliesTo": "Conditional Microsoft Quality Management integration on standard purchase receipt posting. Localized Microsoft Learn source; tenant setup/version are not verified.",
+      "fields": [
+        "En genereringsregel med källtyp inköpsrad, mall, inköpsutlösare och artikelurval kan skapa kvalitetsinspektioner automatiskt när inköpskvittot bokförs. Partispårning påverkar gruppering; en separat inspektion kan skapas per parti. Detta är skilt från bokföring och slutförandebeteende."
+      ],
+      "documentedCaptions": [
+        "Inköpsorder",
+        "Regler för inspektionsgenerering",
+        "När inköpsordern tas emot",
+        "Bokför",
+        "Ta emot"
+      ]
+    },
+    {
+      "sourceId": "purchase-qms-receipt-fr-fr",
+      "title": "Inspection des reçus d’achat sans gestion de l’entrepôt — Business Central",
+      "sourceUri": "https://learn.microsoft.com/fr-fr/dynamics365/business-central/qms-purchase-receipt-testing-simple",
+      "accessedDate": "2026-09-29",
+      "appliesTo": "Conditional Microsoft Quality Management integration on standard purchase receipt posting. Localized Microsoft Learn source; tenant setup/version are not verified.",
+      "fields": [
+        "For receipt inspections without warehouse handling, the source covers entering measurements, reviewing calculated grade and finishing the inspection separately from posting the purchase receipt."
+      ],
+      "documentedCaptions": []
+    },
+    {
+      "sourceId": "purchase-qms-receipt-de-de",
+      "title": "Kaufbelegprüfungen ohne Lagerverwaltung — Business Central",
+      "sourceUri": "https://learn.microsoft.com/de-de/dynamics365/business-central/qms-purchase-receipt-testing-simple",
+      "accessedDate": "2026-09-29",
+      "appliesTo": "Conditional Microsoft Quality Management integration on standard purchase receipt posting. Localized Microsoft Learn source; tenant setup/version are not verified.",
+      "fields": [
+        "For receipt inspections without warehouse handling, the source covers entering measurements, reviewing calculated grade and finishing the inspection separately from posting the purchase receipt."
+      ],
+      "documentedCaptions": []
+    },
+    {
+      "sourceId": "purchase-qms-receipt-es-es",
+      "title": "Inspecciones de recibos de compra sin control de almacén — Business Central",
+      "sourceUri": "https://learn.microsoft.com/es-es/dynamics365/business-central/qms-purchase-receipt-testing-simple",
+      "accessedDate": "2026-09-29",
+      "appliesTo": "Conditional Microsoft Quality Management integration on standard purchase receipt posting. Localized Microsoft Learn source; tenant setup/version are not verified.",
+      "fields": [
+        "For receipt inspections without warehouse handling, the source covers entering measurements, reviewing calculated grade and finishing the inspection separately from posting the purchase receipt."
+      ],
+      "documentedCaptions": []
+    },
+    {
+      "sourceId": "purchase-qms-receipt-da-dk",
+      "title": "Kontrol af købsmodtagelser uden lagerhåndtering — Business Central",
+      "sourceUri": "https://learn.microsoft.com/da-dk/dynamics365/business-central/qms-purchase-receipt-testing-simple",
+      "accessedDate": "2026-09-29",
+      "appliesTo": "Conditional Microsoft Quality Management integration on standard purchase receipt posting. Localized Microsoft Learn source; tenant setup/version are not verified.",
+      "fields": [
+        "For receipt inspections without warehouse handling, the source covers entering measurements, reviewing calculated grade and finishing the inspection separately from posting the purchase receipt."
+      ],
+      "documentedCaptions": []
+    },
+    {
+      "sourceId": "purchase-qms-receipt-nb-no",
+      "title": "Kjøpsbekreftelsesinspeksjoner uten lagerhåndtering — Business Central",
+      "sourceUri": "https://learn.microsoft.com/nb-no/dynamics365/business-central/qms-purchase-receipt-testing-simple",
+      "accessedDate": "2026-09-29",
+      "appliesTo": "Conditional Microsoft Quality Management integration on standard purchase receipt posting. Localized Microsoft Learn source; tenant setup/version are not verified.",
+      "fields": [
+        "For receipt inspections without warehouse handling, the source covers entering measurements, reviewing calculated grade and finishing the inspection separately from posting the purchase receipt."
+      ],
+      "documentedCaptions": []
     }
-  ]
+  ],
+  "sourceLocaleGaps": {
+    "purchase-qms-receipt-en-us": [
+      "fi-FI"
+    ],
+    "purchase-qms-receipt-sv-se": [
+      "fi-FI"
+    ],
+    "purchase-qms-receipt-fr-fr": [
+      "fi-FI"
+    ],
+    "purchase-qms-receipt-de-de": [
+      "fi-FI"
+    ],
+    "purchase-qms-receipt-es-es": [
+      "fi-FI"
+    ],
+    "purchase-qms-receipt-da-dk": [
+      "fi-FI"
+    ],
+    "purchase-qms-receipt-nb-no": [
+      "fi-FI"
+    ]
+  }
 }

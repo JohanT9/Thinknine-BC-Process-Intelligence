@@ -1,0 +1,446 @@
+{
+  "packId": "bc-bank-reconciliation",
+  "name": "Business Central bank-reconciliation",
+  "version": "1.0.0",
+  "priority": 220,
+  "rules": [
+    {
+      "ruleId": "BCExpansion.ImportStatement",
+      "taskType": "ImportStatement",
+      "semanticAction": "ImportStatement",
+      "entity": "BankAccountReconciliation",
+      "priority": 1300,
+      "confidence": 0.96,
+      "match": {
+        "pagePatterns": [
+          "^Bank Acc\\. Reconciliation$",
+          "^Bankkontoavstämning$",
+          "^Rapprochement bancaire$",
+          "^Bankkontoabstimmung$",
+          "^Conciliación bancaria$",
+          "^Bankkontoafstemning$",
+          "^Pankkitilin täsmäytys$",
+          "^Bankkontoavstemming$",
+          "^Bank Account Reconciliation$",
+          "^Bankavstämning$",
+          "^Bankkontenabgleich$",
+          "^Conciliación de cuenta bancaria$"
+        ],
+        "actionPatterns": [
+          "^Import Bank Statement$",
+          "^Importera bankutdrag$",
+          "^Importer le relevé bancaire$",
+          "^Bankauszug importieren$",
+          "^Importar extracto bancario$",
+          "^Importér bankkontoudtog$",
+          "^Tuo pankin tiliote$",
+          "^Importer bankkontoutdrag$"
+        ],
+        "fieldPatterns": [],
+        "automationIdPatterns": []
+      },
+      "instructionTemplate": "",
+      "languages": [
+        "en-US",
+        "sv-SE",
+        "fr-FR",
+        "de-DE",
+        "es-ES",
+        "da-DK",
+        "fi-FI",
+        "nb-NO"
+      ],
+      "aliases": [],
+      "sourceIds": [
+        "microsoft-learn-expansion-bank-how-reconcile-bank-accounts-separately-en-us",
+        "microsoft-learn-expansion-bank-how-reconcile-bank-accounts-separately-sv-se",
+        "microsoft-learn-expansion-bank-how-reconcile-bank-accounts-separately-fr-fr",
+        "microsoft-learn-expansion-bank-how-reconcile-bank-accounts-separately-de-de",
+        "microsoft-learn-expansion-bank-how-reconcile-bank-accounts-separately-es-es",
+        "microsoft-learn-expansion-bank-how-reconcile-bank-accounts-separately-da-dk",
+        "microsoft-learn-expansion-bank-how-reconcile-bank-accounts-separately-fi-fi",
+        "microsoft-learn-expansion-bank-how-reconcile-bank-accounts-separately-nb-no"
+      ],
+      "localizedExplanations": {
+        "en-US": "Imports statement lines into the selected bank account reconciliation so they can be compared with Business Central bank ledger entries. Verify the bank account, statement number/date and ending balance, and use a supported file format. Importing only creates the statement lines; it does not match them, create missing ledger entries, or post the reconciliation. Check the statement's starting/ending balance and duplicates before matching.",
+        "sv-SE": "Importerar kontoutdragsrader till den valda bankkontoavstämningen så att de kan jämföras med bankkontotransaktioner i Business Central. Kontrollera bankkonto, kontoutdragsnummer/-datum och utgående saldo samt använd ett filformat som stöds. Importen skapar endast utdragsrader; den matchar dem inte, skapar inga saknade redovisningstransaktioner och bokför inte avstämningen. Kontrollera ingående/utgående saldo och dubbletter före matchning.",
+        "fr-FR": "Importe les lignes du relevé dans le rapprochement bancaire sélectionné afin de les comparer aux écritures du compte bancaire. Vérifiez le compte, le numéro et la date du relevé ainsi que le solde de clôture, et choisissez un format pris en charge. L’import crée des lignes à rapprocher ; il ne les associe pas, ne crée pas les écritures manquantes et ne comptabilise pas le rapprochement. Vérifiez le solde d’ouverture, le solde de clôture et les doublons avant de continuer.",
+        "de-DE": "Importiert Auszugszeilen in den ausgewählten Bankkontoabgleich, damit sie mit den Bankposten in Business Central verglichen werden können. Prüfen Sie Bankkonto, Auszugsnummer und -datum sowie den Endsaldo und verwenden Sie ein unterstütztes Dateiformat. Der Import erstellt nur Auszugszeilen; er ordnet sie nicht zu, erstellt keine fehlenden Bankposten und bucht den Abgleich nicht. Prüfen Sie Anfangs- und Endsaldo sowie mögliche Duplikate.",
+        "es-ES": "Importa las líneas del extracto en la conciliación bancaria seleccionada para compararlas con los movimientos bancarios de Business Central. Compruebe la cuenta, el número y la fecha del extracto y el saldo final, y use un formato admitido. La importación solo crea líneas pendientes de conciliación: no las empareja, no crea movimientos contables que falten ni registra la conciliación. Revise los saldos inicial y final y los duplicados antes de continuar.",
+        "da-DK": "Importerer kontoudtogslinjer til den valgte bankafstemning, så de kan sammenlignes med bankposter i Business Central. Kontrollér bankkonto, kontoudtogsnr. og -dato samt slutsaldo, og brug et understøttet filformat. Importen opretter kun kontoudtogslinjer; den matcher dem ikke, opretter ikke manglende bankposter og bogfører ikke afstemningen. Kontrollér startsaldo, slutsaldo og dubletter, før du fortsætter.",
+        "fi-FI": "Tuo tilioterivit valittuun pankkitilin täsmäytykseen, jossa niitä verrataan Business Centralin pankkitilitapahtumiin. Tarkista pankkitili, tiliotteen numero ja päivä sekä loppusaldo ja käytä tuettua tiedostomuotoa. Tuonti luo vain täsmäytettäviä rivejä: se ei kohdista rivejä, luo puuttuvia pankkitilitapahtumia eikä kirjaa täsmäytystä. Tarkista alku- ja loppusaldo sekä mahdolliset kaksoiskappaleet ennen jatkamista.",
+        "nb-NO": "Importerer kontoutdragslinjer til den valgte bankavstemmingen, slik at de kan sammenlignes med bankposter i Business Central. Kontroller bankkonto, kontoutdragsnummer og -dato samt sluttsaldo, og bruk et støttet filformat. Importen oppretter bare kontoutdragslinjer; den matcher dem ikke, oppretter ikke manglende bankposter og bokfører ikke avstemmingen. Kontroller startsaldo, sluttsaldo og eventuelle duplikater før du fortsetter."
+      }
+    },
+    {
+      "ruleId": "BCExpansion.MatchAutomatically",
+      "taskType": "MatchAutomatically",
+      "semanticAction": "MatchAutomatically",
+      "entity": "BankAccountReconciliation",
+      "priority": 1300,
+      "confidence": 0.96,
+      "match": {
+        "pagePatterns": [
+          "^Bank Acc\\. Reconciliation$",
+          "^Bankkontoavstämning$",
+          "^Rapprochement bancaire$",
+          "^Bankkontoabstimmung$",
+          "^Conciliación bancaria$",
+          "^Bankkontoafstemning$",
+          "^Pankkitilin täsmäytys$",
+          "^Bankkontoavstemming$",
+          "^Bank Account Reconciliation$",
+          "^Bankavstämning$",
+          "^Bankkontenabgleich$",
+          "^Conciliación de cuenta bancaria$"
+        ],
+        "actionPatterns": [
+          "^Match Automatically$",
+          "^Matcha automatiskt$",
+          "^Faire correspondre automatiquement$",
+          "^Automatisch abgleichen$",
+          "^Conciliar automáticamente$",
+          "^Match automatisk$",
+          "^Kohdista automaattisesti$",
+          "^Avstem automatisk$"
+        ],
+        "fieldPatterns": [],
+        "automationIdPatterns": []
+      },
+      "instructionTemplate": "",
+      "languages": [
+        "en-US",
+        "sv-SE",
+        "fr-FR",
+        "de-DE",
+        "es-ES",
+        "da-DK",
+        "fi-FI",
+        "nb-NO"
+      ],
+      "aliases": [],
+      "sourceIds": [
+        "microsoft-learn-expansion-bank-how-reconcile-bank-accounts-separately-en-us",
+        "microsoft-learn-expansion-bank-how-reconcile-bank-accounts-separately-sv-se",
+        "microsoft-learn-expansion-bank-how-reconcile-bank-accounts-separately-fr-fr",
+        "microsoft-learn-expansion-bank-how-reconcile-bank-accounts-separately-de-de",
+        "microsoft-learn-expansion-bank-how-reconcile-bank-accounts-separately-es-es",
+        "microsoft-learn-expansion-bank-how-reconcile-bank-accounts-separately-da-dk",
+        "microsoft-learn-expansion-bank-how-reconcile-bank-accounts-separately-fi-fi",
+        "microsoft-learn-expansion-bank-how-reconcile-bank-accounts-separately-nb-no"
+      ],
+      "localizedExplanations": {
+        "en-US": "Matches imported statement lines with bank account ledger entries using configured criteria, including transaction text and (if configured) date tolerance. Review Match Details and every proposed link, especially one-to-many amounts, fees and similar transactions; automatic matching can leave lines unmatched or match the wrong entry. Resolve missing entries separately, then validate that Difference is zero before posting. Matching itself doesn't post.",
+        "sv-SE": "Matchar importerade kontoutdragsrader med bankkontotransaktioner enligt inställda kriterier, bland annat transaktionstext och eventuell datumtolerans. Granska matchningsdetaljer och varje föreslagen koppling, särskilt delade belopp, avgifter och liknande transaktioner; automatisk matchning kan lämna rader omatchade eller koppla fel transaktion. Hantera saknade transaktioner separat och kontrollera sedan att Differens är noll före bokföring. Matchningen bokför inget.",
+        "fr-FR": "Associe automatiquement les lignes importées du relevé aux écritures bancaires selon les critères configurés, notamment le texte de transaction et, si elle est définie, la tolérance de date. Examinez les détails et chaque association proposée, en particulier les montants répartis entre plusieurs écritures, les frais et les transactions similaires : des lignes peuvent rester sans correspondance ou être mal associées. Traitez séparément les écritures manquantes, puis vérifiez que l’écart est nul avant de comptabiliser. Le rapprochement automatique ne comptabilise rien.",
+        "de-DE": "Ordnet importierte Auszugszeilen anhand der eingerichteten Kriterien automatisch Bankposten zu, darunter Buchungstext und gegebenenfalls Datumstoleranz. Prüfen Sie die Details jeder vorgeschlagenen Zuordnung, besonders bei Teilbeträgen, Gebühren und ähnlichen Umsätzen: Zeilen können offen bleiben oder falsch zugeordnet werden. Ergänzen Sie fehlende Bankposten separat und prüfen Sie vor der Buchung, dass die Differenz null ist. Der automatische Abgleich selbst bucht nichts.",
+        "es-ES": "Empareja automáticamente las líneas importadas del extracto con movimientos bancarios según los criterios configurados, como el texto de la operación y, si existe, la tolerancia de fecha. Revise cada propuesta y sus detalles, sobre todo importes divididos, comisiones y operaciones similares: pueden quedar líneas sin emparejar o asociarse al movimiento incorrecto. Gestione por separado los movimientos que falten y compruebe que la diferencia sea cero antes de registrar. La conciliación automática no registra nada por sí sola.",
+        "da-DK": "Matcher automatisk importerede kontoudtogslinjer med bankposter efter de konfigurerede kriterier, herunder transaktionstekst og eventuel datotolerance. Gennemgå detaljerne for hvert foreslået match, især delbeløb, gebyrer og lignende transaktioner: linjer kan forblive umatchede eller blive forbundet forkert. Opret manglende bankposter separat, og kontrollér, at differencen er nul før bogføring. Den automatiske matchning bogfører ikke i sig selv.",
+        "fi-FI": "Kohdistaa tuodut tilioterivit automaattisesti pankkitilitapahtumiin määritettyjen ehtojen, kuten tapahtumatekstin ja mahdollisen päivämäärätoleranssin, mukaan. Tarkista kohdistuksen tiedot ja jokainen ehdotettu linkitys, erityisesti jaetut summat, kulut ja samankaltaiset tapahtumat: rivejä voi jäädä kohdistamatta tai ne voivat kohdistua väärin. Käsittele puuttuvat tapahtumat erikseen ja varmista ennen kirjaamista, että erotus on nolla. Automaattinen kohdistus ei itsessään kirjaa mitään.",
+        "nb-NO": "Matcher importerte kontoutdragslinjer automatisk med bankposter etter de konfigurerte kriteriene, blant annet transaksjonstekst og eventuell datotoleranse. Gå gjennom detaljene for hver foreslåtte kobling, særlig delbeløp, gebyrer og lignende transaksjoner: linjer kan bli stående uten treff eller kobles feil. Håndter manglende bankposter separat, og kontroller at differansen er null før bokføring. Den automatiske matchingen bokfører ikke i seg selv."
+      }
+    },
+    {
+      "ruleId": "BCExpansion.PostReconciliation",
+      "taskType": "PostReconciliation",
+      "semanticAction": "PostReconciliation",
+      "entity": "BankAccountReconciliation",
+      "priority": 1300,
+      "confidence": 0.96,
+      "match": {
+        "pagePatterns": [
+          "^Bank Acc\\. Reconciliation$",
+          "^Bankkontoavstämning$",
+          "^Rapprochement bancaire$",
+          "^Bankkontoabstimmung$",
+          "^Conciliación bancaria$",
+          "^Bankkontoafstemning$",
+          "^Pankkitilin täsmäytys$",
+          "^Bankkontoavstemming$",
+          "^Bank Account Reconciliation$",
+          "^Bankavstämning$",
+          "^Bankkontenabgleich$",
+          "^Conciliación de cuenta bancaria$"
+        ],
+        "actionPatterns": [
+          "^Post$",
+          "^Bokföra$",
+          "^Valider$",
+          "^Buchen$",
+          "^Registrar$",
+          "^Bogfør$",
+          "^Kirjaa$",
+          "^Bokfør$"
+        ],
+        "fieldPatterns": [],
+        "automationIdPatterns": []
+      },
+      "instructionTemplate": "",
+      "languages": [
+        "en-US",
+        "sv-SE",
+        "fr-FR",
+        "de-DE",
+        "es-ES",
+        "da-DK",
+        "fi-FI",
+        "nb-NO"
+      ],
+      "aliases": [],
+      "sourceIds": [
+        "microsoft-learn-expansion-bank-how-reconcile-bank-accounts-separately-en-us",
+        "microsoft-learn-expansion-bank-how-reconcile-bank-accounts-separately-sv-se",
+        "microsoft-learn-expansion-bank-how-reconcile-bank-accounts-separately-fr-fr",
+        "microsoft-learn-expansion-bank-how-reconcile-bank-accounts-separately-de-de",
+        "microsoft-learn-expansion-bank-how-reconcile-bank-accounts-separately-es-es",
+        "microsoft-learn-expansion-bank-how-reconcile-bank-accounts-separately-da-dk",
+        "microsoft-learn-expansion-bank-how-reconcile-bank-accounts-separately-fi-fi",
+        "microsoft-learn-expansion-bank-how-reconcile-bank-accounts-separately-nb-no"
+      ],
+      "localizedExplanations": {
+        "en-US": "Posts the completed bank account reconciliation, recording the matched statement/ledger relationships and creating the bank statement history. Before posting, verify the statement ending balance, matched and outstanding items, and Difference = 0; resolve any discrepancy rather than forcing a match. Review the test report and posted reconciliation afterward. This is the separate Bank Acc. Reconciliation process, not posting a Payment Reconciliation Journal.",
+        "sv-SE": "Bokför den färdiga bankkontoavstämningen, registrerar kopplingarna mellan utdragsrader och redovisningstransaktioner och skapar bankkontots avstämningshistorik. Kontrollera utgående saldo, matchade och utestående poster samt att Differens = 0 före bokföring; utred differenser i stället för att tvinga fram en matchning. Granska testrapporten och den bokförda avstämningen efteråt. Detta är Bankkontoavstämning, inte bokföring av en betalningsavstämningsjournal.",
+        "fr-FR": "La validation termine le rapprochement bancaire lorsque les lignes du relevé, les écritures et les contrôles de solde concordent. Résolvez d’abord les écarts. Cette action diffère de la validation d’une feuille de rapprochement des paiements.",
+        "de-DE": "Die Buchung schließt die Bankkontoabstimmung ab, wenn Auszugszeilen, Bankposten und Saldenprüfungen übereinstimmen. Klären Sie zuvor Differenzen. Dies ist nicht die Buchung eines Zahlungsabstimmungs-Buch.-Blatts.",
+        "es-ES": "El registro finaliza la conciliación bancaria cuando coinciden las líneas, los movimientos y los controles de saldo. Resuelva primero las diferencias. Es distinto de registrar un diario de conciliación de pagos.",
+        "da-DK": "Bogføringen afslutter bankafstemningen, når kontoudtog, bankposter og saldokontroller stemmer. Afklar først differencer. Handlingen er forskellig fra bogføring af en betalingsudligningskladde.",
+        "fi-FI": "Kirjaus päättää pankkitilin täsmäytyksen, kun tilioterivit, pankkitapahtumat ja saldotarkistukset täsmäävät. Selvitä erot ensin. Tämä eroaa maksujen täsmäytyspäiväkirjan kirjaamisesta.",
+        "nb-NO": "Bokføringen avslutter bankavstemmingen når kontoutdrag, bankposter og saldokontroller stemmer. Avklar differanser først. Dette er forskjellig fra å bokføre en betalingsavstemmingskladd."
+      }
+    },
+    {
+      "ruleId": "BCExpansion.MatchManually",
+      "taskType": "MatchManually",
+      "semanticAction": "MatchManually",
+      "entity": "BankAccountReconciliation",
+      "priority": 1300,
+      "confidence": 0.96,
+      "match": {
+        "pagePatterns": [
+          "^Bank Acc\\. Reconciliation$",
+          "^Bankkontoavstämning$",
+          "^Rapprochement bancaire$",
+          "^Bankkontoabstimmung$",
+          "^Conciliación bancaria$",
+          "^Bankkontoafstemning$",
+          "^Pankkitilin täsmäytys$",
+          "^Bankkontoavstemming$",
+          "^Bank Account Reconciliation$",
+          "^Bankavstämning$",
+          "^Bankkontenabgleich$",
+          "^Conciliación de cuenta bancaria$"
+        ],
+        "actionPatterns": [
+          "^Match Manually$",
+          "^Matcha manuellt$",
+          "^Faire correspondre manuellement$",
+          "^Manuell abgleichen$",
+          "^Conciliar manualmente$",
+          "^Match manuelt$",
+          "^Kohdista manuaalisesti$",
+          "^Avstem manuelt$"
+        ],
+        "fieldPatterns": [],
+        "automationIdPatterns": []
+      },
+      "instructionTemplate": "",
+      "languages": [
+        "en-US",
+        "sv-SE",
+        "fr-FR",
+        "de-DE",
+        "es-ES",
+        "da-DK",
+        "fi-FI",
+        "nb-NO"
+      ],
+      "aliases": [],
+      "sourceIds": [
+        "microsoft-learn-expansion-bank-how-reconcile-bank-accounts-separately-en-us",
+        "microsoft-learn-expansion-bank-how-reconcile-bank-accounts-separately-sv-se",
+        "microsoft-learn-expansion-bank-how-reconcile-bank-accounts-separately-fr-fr",
+        "microsoft-learn-expansion-bank-how-reconcile-bank-accounts-separately-de-de",
+        "microsoft-learn-expansion-bank-how-reconcile-bank-accounts-separately-es-es",
+        "microsoft-learn-expansion-bank-how-reconcile-bank-accounts-separately-da-dk",
+        "microsoft-learn-expansion-bank-how-reconcile-bank-accounts-separately-fi-fi",
+        "microsoft-learn-expansion-bank-how-reconcile-bank-accounts-separately-nb-no"
+      ],
+      "localizedExplanations": {
+        "en-US": "Links the selected bank statement line or lines to the selected bank account ledger entry or entries. Confirm the amounts, dates and transaction references on both sides; a statement line can correspond to multiple ledger entries, or vice versa. Remove an incorrect match and reconcile any amount difference separately. This changes the reconciliation match only—it doesn't create or post a payment. Validate the full statement before posting.",
+        "sv-SE": "Kopplar valda kontoutdragsrader till valda bankkontotransaktioner. Kontrollera belopp, datum och transaktionsreferenser på båda sidor; en utdragsrad kan motsvara flera redovisningstransaktioner och tvärtom. Ta bort en felaktig matchning och hantera beloppsskillnader separat. Åtgärden ändrar endast avstämningskopplingen – den skapar eller bokför ingen betalning. Kontrollera hela utdraget före bokföring.",
+        "fr-FR": "Relie les lignes de relevé sélectionnées aux écritures bancaires choisies. Vérifiez des deux côtés les montants, dates et références : une ligne peut correspondre à plusieurs écritures, et inversement. Supprimez toute association incorrecte et traitez séparément l’écart de montant. Cette action modifie uniquement les correspondances du rapprochement ; elle ne crée ni ne comptabilise un paiement. Vérifiez le relevé complet avant de le comptabiliser.",
+        "de-DE": "Verknüpft ausgewählte Auszugszeilen mit den ausgewählten Bankposten. Prüfen Sie auf beiden Seiten Betrag, Datum und Referenz: Eine Auszugszeile kann mehreren Bankposten entsprechen und umgekehrt. Entfernen Sie falsche Zuordnungen und behandeln Sie Betragsdifferenzen separat. Diese Aktion ändert nur die Zuordnung im Abgleich; sie erstellt oder bucht keine Zahlung. Prüfen Sie den gesamten Auszug vor dem Buchen.",
+        "es-ES": "Vincula las líneas seleccionadas del extracto con los movimientos bancarios elegidos. Compruebe importes, fechas y referencias en ambos lados: una línea puede corresponder a varios movimientos y viceversa. Elimine los vínculos incorrectos y gestione por separado cualquier diferencia de importe. Esta acción solo modifica las coincidencias de la conciliación; no crea ni registra pagos. Revise el extracto completo antes de registrarlo.",
+        "da-DK": "Kobler de valgte kontoudtogslinjer til de valgte bankposter. Kontrollér beløb, datoer og referencer på begge sider: én kontoudtogslinje kan svare til flere bankposter og omvendt. Fjern forkerte match, og håndter beløbsforskelle separat. Handlingen ændrer kun matchningen i afstemningen; den opretter eller bogfører ikke en betaling. Gennemgå hele kontoudtoget før bogføring.",
+        "fi-FI": "Yhdistää valitut tilioterivit valittuihin pankkitilitapahtumiin. Tarkista molemmilta puolilta summat, päivät ja viitteet: yksi tilioterivi voi vastata useita tapahtumia ja päinvastoin. Poista virheelliset kohdistukset ja käsittele summien erot erikseen. Toiminto muuttaa vain täsmäytyksen kohdistuksia; se ei luo eikä kirjaa maksua. Tarkista koko tiliote ennen kirjaamista.",
+        "nb-NO": "Kobler de valgte kontoutdragslinjene til de valgte bankpostene. Kontroller beløp, datoer og referanser på begge sider: én kontoutdragslinje kan svare til flere bankposter og omvendt. Fjern feil koblinger, og håndter beløpsavvik separat. Handlingen endrer bare matchingen i avstemmingen; den oppretter eller bokfører ingen betaling. Kontroller hele kontoutdraget før bokføring."
+      }
+    }
+  ],
+  "sources": [
+    {
+      "sourceId": "microsoft-learn-expansion-bank-how-reconcile-bank-accounts-separately-en-us",
+      "title": "Reconcile bank accounts - Business Central | Microsoft Learn",
+      "sourceUri": "https://learn.microsoft.com/en-us/dynamics365/business-central/bank-how-reconcile-bank-accounts-separately",
+      "accessedDate": "2026-09-28",
+      "appliesTo": "Business Central standard functionality. Microsoft Learn captions checked; tenant/version-specific UI captions remain unverified.",
+      "fields": [
+        "The import loads bank statement lines for reconciliation against bank account ledger entries. It requires a supported statement format. Loading a statement does not itself reconcile or post the account.",
+        "Automatic matching compares statement lines with bank account ledger entries using amounts and matching criteria such as date tolerance. Review the matches and unmatched lines before posting the reconciliation.",
+        "Posting completes the bank reconciliation after statement lines and bank ledger entries have been reconciled and the balance checks agree. Resolve differences first. This action is distinct from posting a payment reconciliation journal.",
+        "This links selected bank statement lines to selected bank ledger entries. Verify the amounts and the transactions being linked before posting the reconciliation."
+      ],
+      "documentedCaptions": [
+        "Bank Acc. Reconciliation",
+        "Import Bank Statement",
+        "Bank Account Reconciliation",
+        "Match Automatically",
+        "Post",
+        "Match Manually"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-expansion-bank-how-reconcile-bank-accounts-separately-sv-se",
+      "title": "Stämma av bankkonton - Business Central | Microsoft Learn",
+      "sourceUri": "https://learn.microsoft.com/sv-se/dynamics365/business-central/bank-how-reconcile-bank-accounts-separately",
+      "accessedDate": "2026-09-28",
+      "appliesTo": "Business Central standard functionality. Microsoft Learn captions checked; tenant/version-specific UI captions remain unverified.",
+      "fields": [
+        "The import loads bank statement lines for reconciliation against bank account ledger entries. It requires a supported statement format. Loading a statement does not itself reconcile or post the account.",
+        "Automatic matching compares statement lines with bank account ledger entries using amounts and matching criteria such as date tolerance. Review the matches and unmatched lines before posting the reconciliation.",
+        "Posting completes the bank reconciliation after statement lines and bank ledger entries have been reconciled and the balance checks agree. Resolve differences first. This action is distinct from posting a payment reconciliation journal.",
+        "This links selected bank statement lines to selected bank ledger entries. Verify the amounts and the transactions being linked before posting the reconciliation."
+      ],
+      "documentedCaptions": [
+        "Bankkontoavstämning",
+        "Importera bankutdrag",
+        "Bankavstämning",
+        "Matcha automatiskt",
+        "Bokföra",
+        "Matcha manuellt"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-expansion-bank-how-reconcile-bank-accounts-separately-fr-fr",
+      "title": "le rapprochement de comptes bancaires, - Business Central | Microsoft Learn",
+      "sourceUri": "https://learn.microsoft.com/fr-fr/dynamics365/business-central/bank-how-reconcile-bank-accounts-separately",
+      "accessedDate": "2026-09-28",
+      "appliesTo": "Business Central standard functionality. Microsoft Learn captions checked; tenant/version-specific UI captions remain unverified.",
+      "fields": [
+        "The import loads bank statement lines for reconciliation against bank account ledger entries. It requires a supported statement format. Loading a statement does not itself reconcile or post the account.",
+        "Automatic matching compares statement lines with bank account ledger entries using amounts and matching criteria such as date tolerance. Review the matches and unmatched lines before posting the reconciliation.",
+        "Posting completes the bank reconciliation after statement lines and bank ledger entries have been reconciled and the balance checks agree. Resolve differences first. This action is distinct from posting a payment reconciliation journal.",
+        "This links selected bank statement lines to selected bank ledger entries. Verify the amounts and the transactions being linked before posting the reconciliation."
+      ],
+      "documentedCaptions": [
+        "Rapprochement bancaire",
+        "Importer le relevé bancaire",
+        "Faire correspondre automatiquement",
+        "Valider",
+        "Faire correspondre manuellement"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-expansion-bank-how-reconcile-bank-accounts-separately-de-de",
+      "title": "Bankkonten abstimmen - Business Central | Microsoft Learn",
+      "sourceUri": "https://learn.microsoft.com/de-de/dynamics365/business-central/bank-how-reconcile-bank-accounts-separately",
+      "accessedDate": "2026-09-28",
+      "appliesTo": "Business Central standard functionality. Microsoft Learn captions checked; tenant/version-specific UI captions remain unverified.",
+      "fields": [
+        "The import loads bank statement lines for reconciliation against bank account ledger entries. It requires a supported statement format. Loading a statement does not itself reconcile or post the account.",
+        "Automatic matching compares statement lines with bank account ledger entries using amounts and matching criteria such as date tolerance. Review the matches and unmatched lines before posting the reconciliation.",
+        "Posting completes the bank reconciliation after statement lines and bank ledger entries have been reconciled and the balance checks agree. Resolve differences first. This action is distinct from posting a payment reconciliation journal.",
+        "This links selected bank statement lines to selected bank ledger entries. Verify the amounts and the transactions being linked before posting the reconciliation."
+      ],
+      "documentedCaptions": [
+        "Bankkontoabstimmung",
+        "Bankauszug importieren",
+        "Bankkontenabgleich",
+        "Automatisch abgleichen",
+        "Buchen",
+        "Manuell abgleichen"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-expansion-bank-how-reconcile-bank-accounts-separately-es-es",
+      "title": "Conciliar cuentas bancarias - Business Central | Microsoft Learn",
+      "sourceUri": "https://learn.microsoft.com/es-es/dynamics365/business-central/bank-how-reconcile-bank-accounts-separately",
+      "accessedDate": "2026-09-28",
+      "appliesTo": "Business Central standard functionality. Microsoft Learn captions checked; tenant/version-specific UI captions remain unverified.",
+      "fields": [
+        "The import loads bank statement lines for reconciliation against bank account ledger entries. It requires a supported statement format. Loading a statement does not itself reconcile or post the account.",
+        "Automatic matching compares statement lines with bank account ledger entries using amounts and matching criteria such as date tolerance. Review the matches and unmatched lines before posting the reconciliation.",
+        "Posting completes the bank reconciliation after statement lines and bank ledger entries have been reconciled and the balance checks agree. Resolve differences first. This action is distinct from posting a payment reconciliation journal.",
+        "This links selected bank statement lines to selected bank ledger entries. Verify the amounts and the transactions being linked before posting the reconciliation."
+      ],
+      "documentedCaptions": [
+        "Conciliación bancaria",
+        "Importar extracto bancario",
+        "Conciliación de cuenta bancaria",
+        "Conciliar automáticamente",
+        "Registrar",
+        "Conciliar manualmente"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-expansion-bank-how-reconcile-bank-accounts-separately-da-dk",
+      "title": "Afstem bankkonti - Business Central | Microsoft Learn",
+      "sourceUri": "https://learn.microsoft.com/da-dk/dynamics365/business-central/bank-how-reconcile-bank-accounts-separately",
+      "accessedDate": "2026-09-28",
+      "appliesTo": "Business Central standard functionality. Microsoft Learn captions checked; tenant/version-specific UI captions remain unverified.",
+      "fields": [
+        "The import loads bank statement lines for reconciliation against bank account ledger entries. It requires a supported statement format. Loading a statement does not itself reconcile or post the account.",
+        "Automatic matching compares statement lines with bank account ledger entries using amounts and matching criteria such as date tolerance. Review the matches and unmatched lines before posting the reconciliation.",
+        "Posting completes the bank reconciliation after statement lines and bank ledger entries have been reconciled and the balance checks agree. Resolve differences first. This action is distinct from posting a payment reconciliation journal.",
+        "This links selected bank statement lines to selected bank ledger entries. Verify the amounts and the transactions being linked before posting the reconciliation."
+      ],
+      "documentedCaptions": [
+        "Bankkontoafstemning",
+        "Importér bankkontoudtog",
+        "Match automatisk",
+        "Bogfør",
+        "Match manuelt"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-expansion-bank-how-reconcile-bank-accounts-separately-fi-fi",
+      "title": "Pankkitilien täsmäyttäminen - Business Central | Microsoft Learn",
+      "sourceUri": "https://learn.microsoft.com/fi-fi/dynamics365/business-central/bank-how-reconcile-bank-accounts-separately",
+      "accessedDate": "2026-09-28",
+      "appliesTo": "Business Central standard functionality. Microsoft Learn captions checked; tenant/version-specific UI captions remain unverified.",
+      "fields": [
+        "The import loads bank statement lines for reconciliation against bank account ledger entries. It requires a supported statement format. Loading a statement does not itself reconcile or post the account.",
+        "Automatic matching compares statement lines with bank account ledger entries using amounts and matching criteria such as date tolerance. Review the matches and unmatched lines before posting the reconciliation.",
+        "Posting completes the bank reconciliation after statement lines and bank ledger entries have been reconciled and the balance checks agree. Resolve differences first. This action is distinct from posting a payment reconciliation journal.",
+        "This links selected bank statement lines to selected bank ledger entries. Verify the amounts and the transactions being linked before posting the reconciliation."
+      ],
+      "documentedCaptions": [
+        "Pankkitilin täsmäytys",
+        "Tuo pankin tiliote",
+        "Kohdista automaattisesti",
+        "Kirjaa",
+        "Kohdista manuaalisesti"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-expansion-bank-how-reconcile-bank-accounts-separately-nb-no",
+      "title": "Avstem bankkontoer - Business Central | Microsoft Learn",
+      "sourceUri": "https://learn.microsoft.com/nb-no/dynamics365/business-central/bank-how-reconcile-bank-accounts-separately",
+      "accessedDate": "2026-09-28",
+      "appliesTo": "Business Central standard functionality. Microsoft Learn captions checked; tenant/version-specific UI captions remain unverified.",
+      "fields": [
+        "The import loads bank statement lines for reconciliation against bank account ledger entries. It requires a supported statement format. Loading a statement does not itself reconcile or post the account.",
+        "Automatic matching compares statement lines with bank account ledger entries using amounts and matching criteria such as date tolerance. Review the matches and unmatched lines before posting the reconciliation.",
+        "Posting completes the bank reconciliation after statement lines and bank ledger entries have been reconciled and the balance checks agree. Resolve differences first. This action is distinct from posting a payment reconciliation journal.",
+        "This links selected bank statement lines to selected bank ledger entries. Verify the amounts and the transactions being linked before posting the reconciliation."
+      ],
+      "documentedCaptions": [
+        "Bankkontoavstemming",
+        "Importer bankkontoutdrag",
+        "Avstem automatisk",
+        "Bokfør",
+        "Avstem manuelt"
+      ]
+    }
+  ]
+}

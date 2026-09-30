@@ -55,10 +55,9 @@
   function diagnostic(code, message, details = {}) {
     return { code, severity: "warning", message, ...details };
   }
-  function semanticShape(definition) {
-    return JSON.stringify([definition.entity || null, definition.pageType || null,
-      definition.tableId || null, definition.recordType || null,
-      definition.documentType || null]);
+  function semanticConflict(left, right) {
+    return ["entity", "pageType", "tableId", "recordType", "documentType"]
+      .some(key => left[key] && right[key] && left[key] !== right[key]);
   }
   function compareVersion(left, right) {
     const a = text(left).split(/[.+-]/).slice(0, 3).map(Number);
@@ -209,7 +208,7 @@
     });
     for (const [id, values] of byId) {
       const conflictingPairs = values.some((left, index) => values.slice(index + 1)
-        .some(right => semanticShape(left) !== semanticShape(right) &&
+        .some(right => semanticConflict(left, right) &&
           versionRangesOverlap(left, right)));
       if (values.length > 1 && conflictingPairs) diagnostics.push(diagnostic(
         "conflicting-page-definitions", "Packs define conflicting page metadata.",
@@ -285,13 +284,15 @@
     const sorted = [...candidates].sort(compare);
     if (!sorted.length) return null;
     const best = sorted[0];
-    const shapes = new Set(sorted.map(semanticShape));
-    const override = shapes.size > 1 ? explicitOverride(sorted) : null;
+    const hasConflict = sorted.some((left, index) => sorted.slice(index + 1)
+      .some(right => semanticConflict(left, right)));
+    const override = hasConflict ? explicitOverride(sorted) : null;
     const selected = override || best;
     const tied = sorted.filter(item => item.packPriority === selected.packPriority &&
       item.priority === selected.priority);
-    if ((shapes.size > 1 && !override) ||
-        new Set(tied.map(semanticShape)).size > 1) {
+    if ((hasConflict && !override) ||
+        tied.some((left, index) => tied.slice(index + 1)
+          .some(right => semanticConflict(left, right)))) {
       return fallback(observed, observed.pageObjectId ? "runtime-metadata" :
         "generic-fallback", observed.pageObjectId ? 0.6 : 0.25,
       [...diagnostics, diagnostic("ambiguous-page-identification",
