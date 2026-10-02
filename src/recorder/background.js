@@ -83,14 +83,16 @@ importScripts("review/knowledge-feedback-learning.js");
 importScripts("review/process-improvement-service.js");
 
 const VERSION = "__APP_VERSION__";
-const tenantLicense = globalThis.T9TenantLicense.create({
-  storage: chrome.storage.local, fetcher: (...args) => fetch(...args),
-  config: globalThis.T9TenantLicenseConfig, version: VERSION
-});
 const consultantLicense = globalThis.T9ConsultantLicense.create({
   storage: chrome.storage.local, fetcher: (...args) => fetch(...args),
-  identity: chrome.identity, config: globalThis.T9TenantLicenseConfig.consultant,
+  identity: chrome.identity, config: globalThis.T9TenantLicenseConfig,
   version: VERSION
+});
+const tenantLicense = globalThis.T9TenantLicense.create({
+  storage: chrome.storage.local, fetcher: (...args) => fetch(...args),
+  authenticatedTrial: request => consultantLicense.requestTenantTrial(
+    request.tenantId, request.installationId),
+  config: globalThis.T9TenantLicenseConfig, version: VERSION
 });
 
 const documentUsage = globalThis.T9DocumentUsage.create({
@@ -114,6 +116,10 @@ chrome.alarms?.onAlarm.addListener(alarm => {
 });
 
 async function requireRecordingLicense(url) {
+  const account = await consultantLicense.state();
+  if (!account.refreshToken) {
+    throw new Error("license.signInRequired");
+  }
   try { return { source: "tenant", ...(await tenantLicense.requireLicense(url)) }; }
   catch (tenantError) {
     if (!consultantLicense.configured()) throw tenantError;
@@ -1872,7 +1878,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
         }
         const tab = await chrome.tabs.get(message.tabId);
         sendResponse({ ok: true,
-          license: await tenantLicense.requestTrial(tab.url, message.email) });
+          license: await tenantLicense.requestTrial(tab.url) });
         break;
       }
       case "T9_LICENSE_SUMMARY": {
@@ -1884,13 +1890,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
         break;
       }
       case "T9_CONSULTANT_LICENSE_STATUS": {
-        let value = await consultantLicense.state();
-        if (value.refreshToken && value.license && consultantLicense.configured()) {
-          try {
-            await consultantLicense.register(await tenantLicense.installationId());
-            value = await consultantLicense.state();
-          } catch { /* Status still shows the authenticated account and can retry later. */ }
-        }
+        const value = await consultantLicense.state();
         sendResponse({ ok: true, configured: consultantLicense.configured(),
           signedIn: Boolean(value.refreshToken), expiresAt: value.expiresAt || 0,
           profile: value.profile || {}, license: value.license || null });
@@ -2844,7 +2844,8 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     }
   })().catch(async error => {
     await setDebug({ lastError: String(error) });
-    sendResponse({ ok: false, error: error.message || String(error) });
+    sendResponse({ ok: false, error: error.message || String(error),
+      status: error.status, code: error.code });
   });
 
   return true;

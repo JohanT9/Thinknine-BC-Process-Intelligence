@@ -29,9 +29,10 @@ over HTTPS: it should return {"status":"ok"}. No registration data is exposed.
 Enable HTTPS Only in App Service. Use Azure SSH to administer the private
 registry after deployment, and take backups before changing it.
 
-The extension remains disabled until notice, tenant-switch handling, licensing
-and failure tests are complete. Free F1 is a test tier, not an availability
-commitment for production license enforcement.
+The extension is configured to use this pilot service. Before distributing it,
+publish the privacy notice in the extension, confirm the registration data
+retention policy, and complete the Entra setup below. Free F1 is a test tier,
+not an availability commitment for production license enforcement.
 
 ## Protected administrator interface
 
@@ -56,8 +57,12 @@ node -e 'console.log(require("crypto").randomBytes(32).toString("hex"))'
 The key is held only in the page's memory and sent in Authorization headers.
 Reloading requires logging in again. Logout clears page data; inactivity of 30
 minutes also logs out. No cookie, localStorage or embedded secret is used.
-Only exact same-origin assets and requests are allowed by the CSP. The API does
-not enable CORS. Key comparisons use a fixed-length SHA-256 timing-safe compare.
+Only exact same-origin assets and requests are allowed by the CSP. The public
+license API answers CORS preflight requests only for Chrome/Edge extension
+origins (`chrome-extension://`, `edge-extension://`, and Edge's `extension://`)
+with a valid 32-character extension ID; it allows only POST, OPTIONS,
+Authorization and Content-Type. Admin routes do not enable CORS. Key
+comparisons use a fixed-length SHA-256 timing-safe compare.
 Admin traffic has separate in-memory rate limiting. Proxy-level limits are still
 needed, especially when several clients share the proxy socket address.
 
@@ -69,7 +74,8 @@ installation/tenant pairs, not verified people or machines. It does not send
 email. Manually created entries are denied until intentionally enabled.
 The administrator can change the displayed license type manually. A separate
 destructive reset removes both the license and trial claim so a tenant can test
-the trial flow again; it requires typing the full tenant ID.
+the trial flow again; it requires two confirmations, with the tenant ID shown
+in the second confirmation.
 
 ## Consultant licenses (Microsoft Entra)
 
@@ -79,6 +85,19 @@ scope `License.Check`, then add App Service settings:
 
 - `LICENSE_ENTRA_AUDIENCE`: the API application's expected access-token audience
 - `LICENSE_ENTRA_SCOPE`: `License.Check`
+
+The same API registration is required for tenant trials and user registration.
+`POST /v1/license/trial` requires a verified Entra bearer token with the
+delegated `License.Check` scope. The service derives the user's name and email
+from that token; clients cannot supply a trial contact address. Configure
+`LICENSE_ENTRA_AUDIENCE` and `LICENSE_ENTRA_SCOPE` before testing trial
+activation. Anonymous trial calls receive HTTP 401. A successful first sign-in
+for an eligible, unlicensed tenant creates a 30-day trial, registers the user,
+and records the tenant in the same license registry used by `/admin`. A second
+trial is denied. Existing active tenant licenses are checked first and are not
+replaced by a trial. Configure the extension's multitenant Entra app and
+delegated API scope described below so both tenant users and consultants can
+sign in.
 
 The API validates RS256 signature, key id, audience, expiry, scope, issuer,
 tenant id and object id. The extension's app registration must be multitenant
@@ -90,6 +109,12 @@ After the consultant signs in, the license page displays the Entra tenant and
 object ids needed to create the named license in admin. Tenant licensing is
 checked first; the consultant license is only a fallback for customer tenants
 without an active tenant license.
+
+The extension popup also shows the current BC tenant's license type and expiry.
+Starting a process or bug recording prompts the user to sign in with Microsoft.
+For an eligible tenant without a license, the first authenticated sign-in starts
+the trial automatically. The signed-in user's identity is visible with the
+tenant's registered users in the license administration interface.
 
 Edits use a revision check and serialized atomic replacement to prevent lost
 updates within this single process. The immediately previous registry is saved
@@ -127,3 +152,16 @@ The tables are `LicenseTenants`, `LicenseConsultantCompanies`, `LicenseUsers`,
 `LicenseTrialClaims`, `LicenseInstallations`, `LicenseAuditEvents`,
 `LicenseNotifications`, and `LicenseMetadata`. Entity writes use ETags and
 retry optimistic concurrency conflicts.
+
+## First sign-in trial validation
+
+After configuring Entra, rebuild and load the extension, then use a disposable test tenant:
+
+1. Confirm `/health` returns HTTP 200 and the expected storage mode.
+2. Open an eligible, unlicensed Business Central tenant and open the extension popup. The card should show that no license is active and a trial can start.
+3. Start a recording or use the license card action. Accept the registration notice and complete Microsoft sign-in. The tenant should receive a 30-day trial and the popup should show `Trial · 30 days` with its expiry date.
+4. In `/admin`, confirm the tenant entry is enabled, has license type `trial` and the same expiry, and the signed-in identity appears under registered users.
+5. Reopen the popup and confirm the cached active trial is shown. Repeat the request against the same tenant and confirm the service refuses a second trial.
+6. Send a trial request without an Authorization header and confirm HTTP 401. Check a known active tenant and confirm its existing type and expiry are unchanged after sign-in.
+
+Use only a disposable tenant for trial reset tests. Reset deletes the trial license and claim and is intentionally destructive.

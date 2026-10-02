@@ -205,7 +205,21 @@ salesRecordingSteps.forEach((task, index) => {
     found.rule.sourceRefs?.some(source =>
       /^https:\/\/learn\.microsoft\.com\//i.test(source.sourceUri || "")),
   `${task.taskType} explanation stays localized and Microsoft Learn sourced`);
+  if (task.taskType === "CreateNew") {
+    const explanation = knowledge.localizedExplanations(found.rule, resolved);
+    assert.match(explanation["sv-SE"], /öppnar Ny en ny försäljningsorder/,
+      "known Sales New action keeps its module-specific explanation");
+    assert.equal(catalog.basis(found.rule, resolved), "microsoft-learn",
+      "known Sales New explanation retains its Microsoft Learn provenance");
+    for (const locale of supportedLocales) {
+      assert.ok(explanation[locale], "known Sales New explanation is localized in " + locale);
+    }
+  }
 });
+const fallbackCreate = { taskType: "CreateNew", semanticAction: "CreateNew" };
+assert.match(catalog.localized(fallbackCreate, { pageCaption: "Anpassad sida" })["sv-SE"],
+  /Anpassad sida/, "unknown pages keep the page-context fallback");
+assert.equal(catalog.basis(fallbackCreate, { pageCaption: "Anpassad sida" }), "page-context");
 const wrongPageCreate = knowledge.match({ taskType: "CreateNew",
   semanticAction: "CreateNew", actionCaption: "Ny", pageObjectId: "42",
   pageCaption: "Förs.order", entity: "SalesOrder", language: "sv-SE" },

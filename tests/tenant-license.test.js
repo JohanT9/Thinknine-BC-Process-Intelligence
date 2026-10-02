@@ -19,14 +19,14 @@ async function main() {
     config: { enabled: true, endpoint: "https://license.example/check",
       trialEndpoint: "https://license.example/trial" },
     version: "4.7.0", now: () => time, uuid: () => tenant,
+    authenticatedTrial: async ({ tenantId }) => ({ tenantId, allowed: true,
+      expiresAt: new Date(time + 86400000).toISOString() }),
     storage: { get: async () => data, set: async value => { data = { ...data, ...value }; } },
     fetcher: async (endpoint, request) => {
       calls++;
       const body = JSON.parse(request.body);
-      assert.ok([options.config.endpoint, options.config.trialEndpoint].includes(endpoint));
-      assert.deepEqual(Object.keys(body).sort(), endpoint.endsWith("/trial")
-        ? ["email", "installationId", "tenantId", "version"]
-        : ["installationId", "tenantId", "version"]);
+      assert.equal(endpoint, options.config.endpoint);
+      assert.deepEqual(Object.keys(body).sort(), ["installationId", "tenantId", "version"]);
       assert.ok(!request.body.includes("Private"));
       if (offline) throw new Error("offline");
       return { ok: true, json: async () => ({ allowed, tenantId: tenant,
@@ -59,7 +59,8 @@ async function main() {
   allowed = false;
   assert.equal((await client.check(url)).trialAvailable, true);
   allowed = true;
-  assert.equal((await client.requestTrial(url, "User@example.com")).allowed, true);
+  assert.equal((await client.requestTrial(url)).allowed, true);
+  assert.equal((await client.summaries())[0].licenseType, "trial");
   const disabled = license.create({ ...options, config: { enabled: false } });
   const before = calls;
   await disabled.requireLicense("not even a URL");

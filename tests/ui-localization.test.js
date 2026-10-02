@@ -97,6 +97,21 @@ assert.match(technicalHtml, /data-i18n-aria-label="technical\.closeSharing"/);
 assert.match(licenseHtml, /<script src="i18n\.js"><\/script>/);
 assert.match(licenseHtml, /data-i18n="license\.pageTitle"/);
 assert.equal(i18n.translate("license.pageTitle", "en-US"), "License information");
+for (const locale of i18n.SUPPORTED_LOCALES) {
+  for (const key of ["license.cardTitle", "license.cardUnknown", "license.cardCheckFailed",
+    "license.cardNeedsConsent", "license.cardActive",
+    "license.cardTrialAvailable", "license.cardTrialReady", "license.cardStartTrial",
+    "license.cardSignInTrial", "license.cardNoTrial", "license.cardSignInHelp",
+    "license.trialServiceUnavailable", "license.microsoftUnavailable",
+    "license.cardOpenBc", "license.cardWorking", "license.cardSignIn",
+    "license.signInRequired",
+    "license.trialActivated", "license.signInComplete", "license.signInFailed",
+    "license.userRegistrationFailed", "license.trialFailed", "license.noEligibleTrial",
+    "license.trialType", "license.consultantType", "license.standardType",
+    "license.registrationNotice", "license.acceptPrompt", "license.registrationCancelled"]) {
+    assert.ok(i18n.translate(key, locale) !== key, `${key} missing in ${locale}`);
+  }
+}
 assert.match(license, /T9_GET_SETTINGS/);
 assert.match(license, /Intl\.DateTimeFormat\(currentUiLocale/);
 assert.match(content, /uiText\("Inspelning pågår", "Recording in progress"\)/);

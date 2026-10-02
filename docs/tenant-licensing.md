@@ -1,9 +1,13 @@
 # Tenant licensing foundation
 
-The publisher configuration in `src/engine/tenant-license-config.js` now enables
+The publisher configuration in `src/engine/tenant-license-config.js` enables
 the Azure pilot endpoint. The popup requires explicit acceptance of the V1
-registration notice before any license request, including cached approvals.
-The notice lists the data, publisher, endpoint and retention behavior.
+registration notice before a license check or Entra sign-in. Its first page
+shows the current Business Central tenant's license type, status and expiry.
+Starting a recording requires Microsoft sign-in. On a tenant without a license,
+the first authenticated sign-in activates a 30-day trial when the tenant is
+eligible; the signed-in Entra email is used as the trial contact. The notice
+lists the data, publisher, endpoint and retention behavior.
 This configuration is for the publisher's pilot; store privacy disclosures and
 an agreed retention policy must be completed before distributing to customers.
 
@@ -56,29 +60,36 @@ installation idempotently; notify the publisher once per new installation, not
 on every check. Tenant is first known when a BC recording starts, not at install.
 Do not accept an installation ID as proof of tenant membership.
 
-Respond with JSON `{ "tenantId": "<requested UUID>", "allowed": true,
-"expiresAt": "<UTC ISO date>" }`. Use `allowed: false` for unknown, suspended or
-expired tenants. Tenant lookup and expiration must be enforced by the service.
-Do not embed administrator credentials or signing secrets in the extension.
-Apply request body limits, validation and rate limiting to the public endpoint.
+The license check responds with JSON `{ "tenantId": "<requested UUID>",
+"allowed": true, "expiresAt": "<UTC ISO date>" }`. Use `allowed: false` for
+unknown, suspended or expired tenants. Trial requests use the same validated
+installation, tenant and version fields and require a verified Entra bearer
+token; the server derives the contact address from that identity and registers
+the user when it activates the trial. Reject anonymous trial requests and
+prevent a tenant from receiving a second trial. Tenant lookup and expiration
+must be enforced by the service. Do not embed administrator credentials or
+signing secrets in the extension. Apply body limits, validation and rate
+limiting to the public endpoints.
 
 Approved responses are cached locally until the earlier of one hour or license
 expiry. After cache expiry an unavailable service blocks new recordings; there
 is no indefinite offline allowance. Local history remains accessible.
 
 Licensing is evaluated per Business Central tenant, not per user or browser.
-Every installation in the same tenant receives the same license result. The
-random installation ID is used only for registration statistics.
+Every installation in the same tenant receives the same license result. Entra
+sign-in identifies the user for registration; the current service does not
+independently prove that the account has Business Central access to the tenant.
+The random installation ID is used only for registration statistics.
 
 ## Activation checklist
 
-1. Choose hosting and implement the endpoint and an administrator license store.
-2. Publish a privacy notice disclosing installation/tenant/version registration,
-   its purpose, retention and recipient; add a visible first-use explanation.
+1. Configure Entra token validation for the API and the administrator license store.
+2. Publish a privacy notice disclosing installation/tenant/version checks,
+   Entra identity registration, trial contact details, purpose, retention and recipient.
 3. Add only the service's exact HTTPS origin to manifest host permissions.
 4. Configure the endpoint and enable the publisher configuration; rebuild.
-5. Test permitted, unknown, expired and switched tenants, offline behavior and
-   installation notification with the deployed service.
+5. Test authenticated and anonymous trial requests, eligibility, duplicate trials,
+   active/expired/suspended tenants, switched tenants and offline behavior.
 
 ## Scope and limitations
 

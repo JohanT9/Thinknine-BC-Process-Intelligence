@@ -15,7 +15,13 @@
           claims.upn || claims.unique_name || "") };
     } catch { return {}; }
   }
-  function create({ storage, fetcher, identity, config, version, now = Date.now }) {
+  function create({ storage, fetcher, identity, config: suppliedConfig, version, now = Date.now, logger = console }) {
+    // The tenant trial endpoint is configured beside `consultant`, while the
+    // consultant client needs both. Accept the published root config and fold
+    // the trial URL into its consultant settings.
+    const config = suppliedConfig?.consultant
+      ? { ...suppliedConfig.consultant, trialEndpoint: suppliedConfig.trialEndpoint }
+      : suppliedConfig;
     async function state() { return (await storage.get(KEY))[KEY] || {}; }
     async function signIn() {
       if (!config?.enabled || !config.clientId || !config.scope) throw new Error("Konsultinloggning är inte konfigurerad ännu.");
@@ -30,11 +36,17 @@
       const redirected = await identity.launchWebAuthFlow({ url: authorize.href, interactive: true });
       const response = new URL(redirected);
       if (response.searchParams.get("state") !== stateValue || !response.searchParams.get("code")) throw new Error("Entra-inloggningen kunde inte verifieras.");
-      const tokenResponse = await fetcher("https://login.microsoftonline.com/organizations/oauth2/v2.0/token", {
+      let tokenResponse;
+      try { tokenResponse = await fetcher("https://login.microsoftonline.com/organizations/oauth2/v2.0/token", {
         method: "POST", headers: { "Content-Type": "application/x-www-form-urlencoded" },
         body: new URLSearchParams({ client_id: config.clientId, grant_type: "authorization_code",
           code: response.searchParams.get("code"), redirect_uri: redirectUri,
           code_verifier: verifier, scope: `openid profile offline_access ${config.scope}` }) });
+      } catch {
+        const error = new Error("Microsoft sign-in could not be completed because the token service was unreachable.");
+        error.code = "entra-signin-unreachable";
+        throw error;
+      }
       if (!tokenResponse.ok) throw new Error("Entra-inloggningen kunde inte slutföras.");
       const tokens = await tokenResponse.json();
       const value = { accessToken: tokens.access_token, refreshToken: tokens.refresh_token,
@@ -49,10 +61,16 @@
       if (expectedOwner && ownerOf(value.profile) !== expectedOwner) throw new Error("Account changed");
       if (value.accessToken && value.expiresAt > now() + 60000) return value.accessToken;
       if (!value.refreshToken) throw new Error("Logga in med din konsultlicens.");
-      const response = await fetcher("https://login.microsoftonline.com/organizations/oauth2/v2.0/token", {
+      let response;
+      try { response = await fetcher("https://login.microsoftonline.com/organizations/oauth2/v2.0/token", {
         method: "POST", headers: { "Content-Type": "application/x-www-form-urlencoded" },
         body: new URLSearchParams({ client_id: config.clientId, grant_type: "refresh_token",
           refresh_token: value.refreshToken, scope: `openid profile offline_access ${config.scope}` }) });
+      } catch {
+        const error = new Error("Microsoft-inloggningen måste förnyas.");
+        error.code = "entra-reauth-required";
+        throw error;
+      }
       if (!response.ok) { await signOut(); throw new Error("Konsultinloggningen har gått ut. Logga in igen."); }
       const tokens = await response.json();
       const updated = { accessToken: tokens.access_token,
@@ -104,6 +122,36 @@
       if (!response.ok) throw new Error(`Användaren kunde inte registreras (HTTP ${response.status}).`);
       return response.json();
     }
+    async function requestTenantTrial(tenantId, installationId) {
+      const token = await accessToken();
+      let response;
+      try {
+        response = await fetcher(config.trialEndpoint, { method: "POST", credentials: "omit",
+          headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+          body: JSON.stringify({ installationId, tenantId, version }) });
+      } catch (cause) {
+        const diagnostic = {
+          name: typeof cause?.name === "string" ? cause.name.slice(0, 40) : "Error",
+          message: typeof cause?.message === "string" ? cause.message.slice(0, 120) : "Network request failed"
+        };
+        logger.warn("BC Process Studio: tenant trial request failed before an HTTP response.", diagnostic);
+        const error = new Error("Licenstjänsten kunde inte nås.");
+        error.code = "trial-service-unreachable";
+        throw error;
+      }
+      let detail = "";
+      let result = null;
+      try { result = await response.json(); detail = String(result?.error || ""); } catch { /* Keep status. */ }
+      if (!response.ok) {
+        const error = new Error(response.status === 409
+          ? "Denna tenant har redan använt eller fått en testlicens."
+          : response.status === 401 ? "Microsoft-inloggningen avvisades av licenstjänsten."
+            : `Testlicensen kunde inte skapas (HTTP ${response.status}${detail ? `: ${detail}` : ""}).`);
+        error.status = response.status;
+        throw error;
+      }
+      return result;
+    }
     async function recordUsage(event, owner) {
       const token = await accessToken(owner);
       const profile = (await state()).profile;
@@ -126,7 +174,8 @@
         return (await response.json()).authorized === true;
       } catch { return false; }
     }
-    return Object.freeze({ signIn, signOut, check, register, registerTenantUser, recordUsage,
+    return Object.freeze({ signIn, signOut, check, register, registerTenantUser,
+      requestTenantTrial, recordUsage,
       hasApplicationAdminRole, state,
       configured: () => Boolean(config?.enabled && config.clientId && config.scope) });
   }

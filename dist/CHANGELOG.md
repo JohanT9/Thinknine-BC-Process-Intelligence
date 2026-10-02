@@ -1,3 +1,63 @@
+## 4.7.41
+
+- Prefer source-backed, module-specific explanations when an action such as New has a known rule; use the generic page-context explanation only as a fallback.
+
+## 4.7.40
+
+- Pass the tenant trial endpoint from the published license configuration to the authenticated trial client so trial activation calls the correct service URL.
+
+## 4.7.39
+
+- Log the safe error type and message when an authenticated trial request fails before receiving an HTTP response; never log its token or request body.
+
+## 4.7.38
+
+- Show trial activation progress, success and actionable errors directly below the license action in the extension popup.
+
+## 4.7.37
+
+- Show a dedicated trial action and status for signed-in users whose tenant is eligible.
+- Retry Entra sign-in when a stored token cannot be refreshed and distinguish Microsoft and licensing-service network errors.
+
+## 4.7.36
+
+- Hide license type and expiry details unless the latest license check confirms an active license.
+
+## 4.7.35
+
+- Make the process recording card use the same shared primary style as the bug reporting card.
+
+## 4.7.34
+
+- Remove the dropdown behavior from tenant license information so status, type, expiry and license action are visible together.
+- Make the process recording card teal with white text to match the bug reporting card.
+
+## 4.7.33
+
+- Refine the recorder popup hierarchy with balanced process/bug cards and a compact license summary.
+- Keep license status, type and expiry visible; expand the summary to sign in or check details.
+
+## 4.7.32
+
+- Move tenant license information below the process and bug recording choices.
+- Compact the popup's first view to keep its actions visible without vertical scrolling.
+
+## 4.7.31
+
+- Refresh the current tenant license from the service whenever the popup opens instead of treating the one-hour cache as current.
+- Hide cached green status when verification fails or the license notice has not been accepted.
+
+## 4.7.30
+
+- Require Microsoft Entra sign-in before starting a recording and activate an eligible tenant's 30-day trial on first sign-in.
+- Show the current tenant license type and expiry prominently in the popup, and register the signed-in user in license administration.
+- Require the authenticated trial endpoint, keep existing tenant licenses unchanged, and document the Azure Entra setup.
+
+## 4.7.29
+
+- Offer an immediate tenant trial request when the license check times out, without requiring Entra sign-in.
+- Allow an optional email address and include automatically activated trials in license administration.
+
 ## 4.7.28
 
 - Make New-action explanations use the identified page and record type across modules and locales.

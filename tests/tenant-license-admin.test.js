@@ -16,7 +16,13 @@ async function main() {
   const notificationEvents = [];
   const notifier = { configured: true, scan: async () => {},
     send: async event => { notificationEvents.push(event); return { sent: true }; } };
-  const server = await createService({ dataDirectory: directory, adminKey: key, notifier });
+  const server = await createService({ dataDirectory: directory, adminKey: key, notifier,
+    entraValidator: async authorization => {
+      if (authorization !== "Bearer signed-in") {
+        const error = new Error("unauthorized"); error.status = 401; throw error;
+      }
+      return { tid: tenant, oid: second, name: "Trial User", preferredUsername: "trial@example.com" };
+    } });
   await new Promise(resolve => server.listen(0, "127.0.0.1", resolve));
   const base = `http://127.0.0.1:${server.address().port}`;
   const get = (route, secret = key) => fetch(base + route, {
@@ -79,13 +85,13 @@ async function main() {
     assert.equal(state.registrations.length, 1);
     assert.equal(state.installationCount, 1);
     const trialResponse = await fetch(base + "/v1/license/trial", { method: "POST",
-      headers: { "Content-Type": "application/json" }, body: JSON.stringify({
-        tenantId: trialTenant, installationId: second, version: "4.7.0",
-        email: "trial@example.com"
-      }) });
+      headers: { "Content-Type": "application/json", Authorization: "Bearer signed-in" },
+      body: JSON.stringify({ tenantId: trialTenant, installationId: second, version: "4.7.0" }) });
     assert.equal(trialResponse.status, 200);
     state = await (await get("/admin/api/state")).json();
     assert.equal(state.tenants[trialTenant].licenseType, "trial");
+    assert.ok(Date.parse(state.tenants[trialTenant].expiresAt) > Date.now() + 29 * 86400000);
+    assert.ok(Date.parse(state.tenants[trialTenant].expiresAt) <= Date.now() + 30 * 86400000);
     const reset = await fetch(base + "/admin/api/tenant/reset", { method: "POST",
       headers: { Authorization: "Bearer " + key, "Content-Type": "application/json" },
       body: JSON.stringify({ tenantId: trialTenant, revision: state.revision }) });

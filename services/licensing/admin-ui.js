@@ -466,9 +466,10 @@ $("consultantForm").addEventListener("submit", event => {
 $("resetTrial").addEventListener("click", () => run(async () => {
   const id = selectedTenantId;
   if (!id) return;
-  const confirmation = prompt(
-    `Detta raderar licensen och tidigare testanspråk. Tenant kan därefter begära en ny testlicens.\n\nSkriv tenant-ID för att bekräfta:\n${id}`);
-  if (confirmation?.trim().toLowerCase() !== id) {
+  if (!confirm(`Återställa testperioden för ${id}?\n\nLicensen och tidigare testanspråk tas bort så att tenanten kan begära en ny testlicens.`)) {
+    message("Återställningen avbröts."); return;
+  }
+  if (!confirm(`Bekräfta återställning av testperioden för tenant ${id}. Detta kan inte ångras.`)) {
     message("Återställningen avbröts."); return;
   }
   state = await api("tenant/reset", { tenantId: id, revision: state.revision });

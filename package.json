@@ -1,6 +1,6 @@
 {
   "name": "thinknine-bc-process-intelligence",
-  "version": "4.7.28",
+  "version": "4.7.41",
   "private": true,
   "description": "BC Process Studio ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â Business Process Intelligence for Microsoft Dynamics 365 Business Central.",
   "scripts": {
@@ -82,7 +82,7 @@
     "test:selective-regeneration": "node tests/selective-regeneration.test.js",
     "test:safe-regeneration": "node tests/safe-regeneration-preview.test.js",
     "test:step-repair": "node tests/step-repair.test.js && node tests/step-repair-async.test.js",
-    "test:ui-localization": "node tests/ui-localization.test.js && node tests/tenant-account-ui.test.js",
+    "test:ui-localization": "node tests/ui-localization.test.js && node tests/tenant-account-ui.test.js && node tests/popup-license-freshness.test.js && node tests/popup-trial-feedback.test.js && node tests/consultant-license-client.test.js",
     "test:document-language": "node tests/document-language.test.js && npm run test:new-languages",
     "test:language-registry": "node tests/language-registry.test.js && node tests/language-preferences.test.js",
     "build": "node scripts/build.js",

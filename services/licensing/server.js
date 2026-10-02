@@ -13,6 +13,7 @@ const GUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/;
 const EMAIL = /^[^\s@<>]+@[^\s@<>]+\.[^\s@<>]+$/u;
 const MAX_BODY = 2048;
 const ORGANIZATION_OBJECT_ID = "00000000-0000-0000-0000-000000000000";
+const EXTENSION_ORIGIN = /^(?:(?:chrome|edge)-extension|extension):\/\/[a-p]{32}$/;
 const exact = (v, keys) => v && !Array.isArray(v) && Object.keys(v).sort().join() === [...keys].sort().join();
 function validRequest(v) {
   return exact(v, ["installationId", "tenantId", "version"]) && GUID.test(v.installationId) &&
@@ -23,8 +24,7 @@ function email(value) {
   return result.length <= 254 && EMAIL.test(result) && !/[\u0000-\u001f\u007f]/.test(result) ? result : "";
 }
 function validTrialRequest(v) {
-  return exact(v, ["email", "installationId", "tenantId", "version"]) &&
-    validRequest({ installationId: v.installationId, tenantId: v.tenantId, version: v.version }) && Boolean(email(v.email));
+  return validRequest(v);
 }
 function validConsultantRegistration(v) {
   return exact(v, ["installationId", "version"]) && GUID.test(v.installationId) &&
@@ -202,13 +202,16 @@ async function createService({ dataDirectory, now = Date.now, rateLimit = 120,
     trialWrites = operation.catch(() => {});
     return operation;
   }
-  function requestTrial(v) {
+  function requestTrial(v, identity) {
     const operation = trialWrites.then(async () => {
       const normalizedEmail = email(v.email);
       const emailHash = crypto.createHash("sha256").update(normalizedEmail).digest("hex");
       const allClaims = await claims(); const existing = allClaims[v.tenantId];
       if (existing) {
         const error = new Error("trial-already-used"); error.status = 409; throw error;
+      }
+      if ((await registry())[v.tenantId]) {
+        const error = new Error("tenant-already-registered"); error.status = 409; throw error;
       }
       const requestedAt = new Date(now()).toISOString();
       const expiresAt = new Date(now() + 30 * 86400000).toISOString();
@@ -220,20 +223,45 @@ async function createService({ dataDirectory, now = Date.now, rateLimit = 120,
       else await atomicWrite(claimsFile, { ...allClaims, [v.tenantId]: claim });
       const license = await mutateRegistry(current => {
         if (current[v.tenantId]) { const error = new Error("tenant-already-registered"); error.status = 409; throw error; }
-        const entry = { name: "Testlicens", contactEmail: normalizedEmail, emailVerified: false,
+        const entry = { name: "Testlicens", ...(normalizedEmail ? { contactEmail: normalizedEmail } : {}), emailVerified: false,
           licenseType: "trial", trialStartedAt: requestedAt, enabled: true, expiresAt };
         return { updated: { ...current, [v.tenantId]: entry }, value: entry };
       });
       void notifications.send({ id: `new-trial:${v.tenantId}:${requestedAt}`,
         type: "trial-requested", entityId: v.tenantId,
         subject: "BC Process Studio: ny testlicens",
-        text: `En ny 30-dagars testlicens har skapats för tenant ${v.tenantId} (${normalizedEmail}).` })
+        text: `En ny 30-dagars testlicens har skapats för tenant ${v.tenantId}${normalizedEmail ? ` (${normalizedEmail})` : ""}.` })
         .catch(() => {});
-      void recordAudit({ actor: "public-api", action: "trial-created", entityType: "tenant",
+      void recordAudit({ actor: "entra-user", action: "trial-created", entityType: "tenant",
         entityId: v.tenantId, details: { licenseType: "trial", expiresAt } });
-      await register(v); return license;
+      await register(v);
+      await registerTenantUserIdentity(v, identity);
+      return license;
     });
     trialWrites = operation.catch(() => {}); return operation;
+  }
+  async function registerTenantUserIdentity(value, identity) {
+    const tenantEntry = (await registry())[value.tenantId];
+    if (!tenantEntry?.enabled || Date.parse(tenantEntry.expiresAt) <= now()) {
+      const error = new Error("tenant-license-inactive"); error.status = 403; throw error;
+    }
+    const id = `${value.tenantId}:${identity.tid}:${identity.oid}`;
+    const timestamp = new Date(now()).toISOString();
+    const registration = await mutateTenantUsers(current => {
+      const existing = current[id] || {};
+      const updatedEntry = { tenantId: value.tenantId, entraTenantId: identity.tid,
+        objectId: identity.oid, name: identity.name,
+        email: email(identity.preferredUsername), installationId: value.installationId,
+        version: value.version, firstSeenAt: existing.firstSeenAt || timestamp,
+        lastSeenAt: timestamp };
+      return { updated: { ...current, [id]: updatedEntry },
+        value: { entry: updatedEntry, created: !current[id] } };
+    });
+    const entry = registration.entry;
+    if (registration.created) void recordAudit({ actor: "microsoft-entra",
+      action: "tenant-user-connected", entityType: "tenant", entityId: value.tenantId,
+      details: { entraTenantId: identity.tid, objectId: identity.oid, name: identity.name } });
+    return { registered: true, tenantId: entry.tenantId, name: entry.name, email: entry.email };
   }
   const buckets = new Map();
   function throttled(address) {
@@ -261,15 +289,34 @@ async function createService({ dataDirectory, now = Date.now, rateLimit = 120,
   const server = http.createServer(async (request, response) => {
     const pathname = new URL(request.url, "http://license.local").pathname;
     if (pathname === "/admin" || pathname.startsWith("/admin/")) return admin(request, response);
-    const reply = (status, value) => { response.writeHead(status, { "Content-Type": "application/json",
-      "Cache-Control": "no-store", "X-Content-Type-Options": "nosniff" }); response.end(JSON.stringify(value)); };
+    const apiRoutes = ["/v1/license/usage", "/v1/license/check", "/v1/license/trial",
+      "/v1/license/user/register", "/v1/license/consultant/check",
+      "/v1/license/consultant/register"];
+    const extensionOrigin = EXTENSION_ORIGIN.test(request.headers.origin || "")
+      ? request.headers.origin : "";
+    const reply = (status, value) => {
+      const headers = { "Content-Type": "application/json", "Cache-Control": "no-store",
+        "X-Content-Type-Options": "nosniff" };
+      if (extensionOrigin && pathname.startsWith("/v1/license/")) {
+        headers["Access-Control-Allow-Origin"] = extensionOrigin;
+        headers["Access-Control-Allow-Methods"] = "POST, OPTIONS";
+        headers["Access-Control-Allow-Headers"] = "Authorization, Content-Type";
+        headers["Access-Control-Max-Age"] = "600";
+        headers.Vary = "Origin";
+      }
+      response.writeHead(status, headers);
+      response.end(JSON.stringify(value));
+    };
+    if (request.method === "OPTIONS" && apiRoutes.includes(request.url)) {
+      if (!extensionOrigin) return reply(403, { error: "origin-not-allowed" });
+      return reply(204, {});
+    }
     if (request.url === "/health" && request.method === "GET") {
       try { await registry(); await claims(); return reply(200, { status: "ok",
         storage: storage ? "azure-table" : "file" }); }
       catch { return reply(503, { status: "unavailable" }); }
     }
-    if (!["/v1/license/usage", "/v1/license/check", "/v1/license/trial", "/v1/license/user/register", "/v1/license/consultant/check",
-      "/v1/license/consultant/register"].includes(request.url)) return reply(404, { error: "not-found" });
+    if (!apiRoutes.includes(request.url)) return reply(404, { error: "not-found" });
     if (request.method !== "POST") return reply(405, { error: "method-not-allowed" });
     if (throttled(request.socket.remoteAddress)) return reply(429, { error: "rate-limit" });
     if (request.headers["content-type"]?.split(";")[0].trim() !== "application/json") return reply(415, { error: "json-required" });
@@ -297,28 +344,7 @@ async function createService({ dataDirectory, now = Date.now, rateLimit = 120,
         if (!validRequest(value)) return reply(400, { error: "invalid-request" });
         try {
           const identity = await validateEntra(request.headers.authorization || "");
-          const tenantEntry = (await registry())[value.tenantId];
-          if (!tenantEntry?.enabled || Date.parse(tenantEntry.expiresAt) <= now()) {
-            return reply(403, { error: "tenant-license-inactive" });
-          }
-          const id = `${value.tenantId}:${identity.tid}:${identity.oid}`;
-          const timestamp = new Date(now()).toISOString();
-          const registration = await mutateTenantUsers(current => {
-            const existing = current[id] || {};
-            const updatedEntry = { tenantId: value.tenantId, entraTenantId: identity.tid,
-              objectId: identity.oid, name: identity.name,
-              email: email(identity.preferredUsername), installationId: value.installationId,
-              version: value.version, firstSeenAt: existing.firstSeenAt || timestamp,
-              lastSeenAt: timestamp };
-            return { updated: { ...current, [id]: updatedEntry },
-              value: { entry: updatedEntry, created: !current[id] } };
-          });
-          const entry = registration.entry;
-          if (registration.created) void recordAudit({ actor: "microsoft-entra",
-            action: "tenant-user-connected", entityType: "tenant", entityId: value.tenantId,
-            details: { entraTenantId: identity.tid, objectId: identity.oid, name: identity.name } });
-          return reply(200, { registered: true, tenantId: entry.tenantId,
-            name: entry.name, email: entry.email });
+          return reply(200, await registerTenantUserIdentity(value, identity));
         } catch (error) { return reply(error.status || 503, { error: error.message }); }
       }
       if (request.url === "/v1/license/consultant/register") {
@@ -374,9 +400,15 @@ async function createService({ dataDirectory, now = Date.now, rateLimit = 120,
       }
       if (request.url.endsWith("/trial")) {
         if (!validTrialRequest(value)) return reply(400, { error: "invalid-request" });
-        try { const license = await requestTrial({ ...value, email: email(value.email) });
-          return reply(200, { tenantId: value.tenantId, allowed: true, expiresAt: license.expiresAt });
-        } catch (error) { if (error.status === 409) return reply(409, { error: error.message }); throw error; }
+        try {
+          const identity = await validateEntra(request.headers.authorization || "");
+          const license = await requestTrial({ ...value, email: email(identity.preferredUsername) }, identity);
+          return reply(200, { tenantId: value.tenantId, allowed: true,
+            licenseType: "trial", licenseStatus: "active", expiresAt: license.expiresAt });
+        } catch (error) {
+          if (Number.isInteger(error.status)) return reply(error.status, { error: error.message });
+          throw error;
+        }
       }
       if (!validRequest(value)) return reply(400, { error: "invalid-request" });
       const tenants = await registry(), entry = tenants[value.tenantId];

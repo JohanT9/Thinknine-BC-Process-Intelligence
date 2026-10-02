@@ -75,13 +75,163 @@ async function currentTab() {
 }
 
 function showMessage(text, error = false) {
-  updateText($("message"), text || "");
+  const message = String(text || "");
+  updateText($("message"), message.startsWith("license.") ? t(message) : message);
   $("message").style.color = error ? "#b42318" : "#166534";
+}
+
+function setLicenseFeedback(text, error = false) {
+  updateText($("licenseCardFeedback"), text || "");
+  $("licenseCardFeedback").classList.toggle("error", error);
 }
 
 function setStarting(starting) {
   $("startProcess").disabled = starting;
   $("startBug").disabled = starting;
+}
+
+function formatLicenseExpiry(value) {
+  const timestamp = typeof value === "number" ? value : Date.parse(value || "");
+  return Number.isFinite(timestamp) && timestamp > 0
+    ? new Intl.DateTimeFormat(currentUiLocale, { dateStyle: "medium" }).format(new Date(timestamp))
+    : t("license.noExpiryDate");
+}
+
+function renderLicenseCard(license, { tenantId = "", signedIn = false,
+  checkFailed = false, needsConsent = false } = {}) {
+  const card = $("licenseCard");
+  const currentLicense = checkFailed || needsConsent ? null : license;
+  const displayedLicense = currentLicense?.allowed === true ? currentLicense : null;
+  card.classList.toggle("active", Boolean(currentLicense?.allowed));
+  card.classList.toggle("inactive", Boolean(tenantId && !currentLicense?.allowed));
+  updateText($("licenseCardType"), displayedLicense?.licenseType === "trial"
+    ? t("license.trialType") : displayedLicense?.licenseType === "consultant"
+      ? t("license.consultantType") : displayedLicense?.licenseType === "standard" || displayedLicense?.allowed
+        ? t("license.standardType") : "—");
+  updateText($("licenseCardExpiry"), formatLicenseExpiry(displayedLicense?.expiresAt));
+  const trialAvailable = currentLicense?.trialAvailable === true;
+  const statusKey = !tenantId ? "license.cardUnknown"
+    : needsConsent ? "license.cardNeedsConsent"
+      : checkFailed ? "license.cardCheckFailed"
+        : currentLicense?.allowed ? "license.cardActive"
+          : trialAvailable ? signedIn ? "license.cardTrialReady" : "license.cardTrialAvailable"
+            : signedIn ? "license.cardNoTrial" : "license.cardSignInHelp";
+  updateText($("licenseCardStatus"), t(statusKey));
+  const actionKey = trialAvailable
+    ? signedIn ? "license.cardStartTrial" : "license.cardSignInTrial"
+    : "license.cardSignIn";
+  updateText($("licenseCardAction"), t(actionKey));
+  $("licenseCardAction").disabled = !tenantId;
+  $("licenseCardAction").title = tenantId ? "" : t("license.cardOpenBc");
+}
+
+async function updateLicenseCard() {
+  let tenantId = "";
+  let license = null;
+  let signedIn = false;
+  let checkFailed = false;
+  let needsConsent = false;
+  try {
+    const tab = await currentTab();
+    if (tab?.url?.includes("businesscentral.dynamics.com")) {
+      tenantId = globalThis.T9TenantLicense.tenantFromUrl(tab.url);
+      const [information, account] = await Promise.all([
+        send({ type: "T9_LICENSE_INFORMATION" }, 3000),
+        send({ type: "T9_CONSULTANT_LICENSE_STATUS" }, 3000)
+      ]);
+      signedIn = account?.signedIn === true;
+      if (!information?.ok) {
+        checkFailed = true;
+      } else if (information.information?.requiresAcceptance) {
+        needsConsent = true;
+      } else {
+        const current = await send({ type: "T9_LICENSE_CHECK", tabId: tab.id, force: true }, 10000);
+        if (!current?.ok) throw new Error(current?.error || t("technical.requestFailed"));
+        license = current.license || null;
+        if (license?.allowed !== true && signedIn) {
+          try {
+            const consultant = await send({ type: "T9_CONSULTANT_LICENSE_CHECK", tabId: tab.id }, 5000);
+            if (consultant?.license?.allowed) license = consultant.license;
+          } catch { /* Keep the freshly checked tenant result. */ }
+        }
+      }
+    }
+  } catch {
+    checkFailed = true;
+    license = null;
+  }
+  renderLicenseCard(license, { tenantId, signedIn, checkFailed, needsConsent });
+}
+
+async function prepareTenantLicense(tabId, { forceCheck = false } = {}) {
+  const licenseInfo = await send({ type: "T9_LICENSE_INFORMATION" });
+  if (!licenseInfo?.ok) throw new Error(licenseInfo?.error || "License configuration unavailable");
+  if (licenseInfo.information.requiresAcceptance) {
+    const notice = tf("license.registrationNotice", { endpoint: licenseInfo.information.endpoint });
+    if (!globalThis.confirm(notice + "\n\n" + t("license.acceptPrompt"))) {
+      throw new Error(t("license.registrationCancelled"));
+    }
+    const accepted = await send({ type: "T9_ACCEPT_LICENSE_NOTICE" });
+    if (!accepted?.ok) throw new Error(accepted?.error || t("technical.requestFailed"));
+  }
+
+  let tenantResult = null;
+  let checkError = null;
+  try {
+    tenantResult = await send({ type: "T9_LICENSE_CHECK", tabId, force: forceCheck }, 10000);
+    if (!tenantResult?.ok) throw Object.assign(new Error(tenantResult?.error || t("technical.requestFailed")),
+      { status: tenantResult?.status });
+  } catch (error) { checkError = error; }
+
+  let account = await send({ type: "T9_CONSULTANT_LICENSE_STATUS" }, 5000);
+  if (!account?.signedIn) {
+    account = await send({ type: "T9_MICROSOFT_SIGN_IN" }, 120000);
+    if (!account?.ok) throw new Error(account?.code === "entra-signin-unreachable"
+      ? t("license.microsoftUnavailable") : account?.error || t("license.signInFailed"));
+    account = { ...account, signedIn: true };
+  }
+
+  if (tenantResult?.license?.allowed) {
+    const registered = await send({ type: "T9_TENANT_USER_REGISTER", tabId }, 10000);
+    if (!registered?.ok) throw new Error(registered?.error || t("license.userRegistrationFailed"));
+    return { source: "tenant", license: tenantResult.license, tenantId: tenantResult.tenantId, account };
+  }
+
+  if (tenantResult?.license?.trialAvailable || checkError) {
+    try {
+      let trial = await send({ type: "T9_REQUEST_TRIAL", tabId }, 15000);
+      if (!trial?.ok && trial.code === "entra-reauth-required") {
+        await send({ type: "T9_CONSULTANT_LICENSE_SIGN_OUT" });
+        account = await send({ type: "T9_MICROSOFT_SIGN_IN" }, 120000);
+        if (!account?.ok) throw new Error(account?.code === "entra-signin-unreachable"
+          ? t("license.microsoftUnavailable") : account?.error || t("license.signInFailed"));
+        trial = await send({ type: "T9_REQUEST_TRIAL", tabId }, 15000);
+      }
+      if (!trial?.ok) {
+        const message = trial.code === "trial-service-unreachable"
+          ? t("license.trialServiceUnavailable") : trial.error || t("license.trialFailed");
+        throw Object.assign(new Error(message), { status: trial?.status });
+      }
+      return { source: "tenant", license: trial.license, tenantId: tenantResult?.tenantId, account };
+    } catch (error) {
+      if (error.status === 409) {
+        const current = await send({ type: "T9_LICENSE_CHECK", tabId, force: true }, 10000);
+        if (current?.ok && current.license?.allowed) {
+          const registered = await send({ type: "T9_TENANT_USER_REGISTER", tabId }, 10000);
+          if (!registered?.ok) throw new Error(registered?.error || t("license.userRegistrationFailed"));
+          return { source: "tenant", license: current.license, tenantId: current.tenantId, account };
+        }
+      }
+      throw error;
+    }
+  }
+
+  if (checkError) throw checkError;
+  const consultant = await send({ type: "T9_CONSULTANT_LICENSE_CHECK", tabId }, 10000);
+  if (consultant?.license?.allowed) {
+    return { source: "consultant", license: consultant.license, tenantId: tenantResult?.tenantId, account };
+  }
+  throw new Error(t("license.noEligibleTrial"));
 }
 
 function displayLatestAction(action) {
@@ -185,55 +335,9 @@ async function startRecording(recordingPurpose) {
     if (!tab?.url?.includes("businesscentral.dynamics.com")) {
       throw new Error(t("recorder.openBcFirst"));
     }
-    const licenseInfo = await send({ type: "T9_LICENSE_INFORMATION" });
-    if (!licenseInfo?.ok) throw new Error(licenseInfo?.error || "License configuration unavailable");
-    if (licenseInfo.information.requiresAcceptance) {
-      const sv = currentUiLocale === "sv-SE";
-      const notice = sv
-        ? "Tenantlicens för BC Process Studio\n\nVid licenskontroll skickas installations-ID, tenant-ID och tilläggsversion till licenstjänsten för BC Process Studio. För att använda en aktiv tenantlicens loggar användaren även in med Microsoft. Namn, e-post/UPN, Entra tenant-ID och objekt-ID registreras för administration tillsammans med första och senaste användning. För nya sparade processdokument och felrapporter skickas dokumenttyp, skapandetid och ett hashat tekniskt ID för statistik per användare. Dokumentinnehåll, inspelningar, bilder, företagsnamn och affärsdata skickas inte. Azure kan även logga tekniska anslutningsuppgifter.\n\nKontroll sker vid inspelning och godkänt besked cachas i högst en timme. Utan aktiv licens eller kontakt efter cacheutgång kan nya inspelningar inte startas. Befintliga dokument finns kvar.\n\nTjänst: "
-        : "BC Process Studio tenant licensing\n\nLicense checks send the installation ID, tenant ID and extension version to the BC Process Studio licensing service. To use an active tenant license, the user also signs in with Microsoft. Name, email/UPN, Entra tenant ID and object ID are registered for administration together with first and latest use. For newly saved process documents and bug reports, document type, creation time and a hashed technical ID are sent for per-user statistics. Document content, recordings, images, company names and business data are not sent. Azure may also log technical connection information.\n\nChecks occur during recording; approvals are cached for at most one hour. Without an active license or contact after cache expiry, new recordings cannot start. Existing documents remain available.\n\nService: ";
-      if (!globalThis.confirm(notice + licenseInfo.information.endpoint +
-          (sv ? "\n\nGodkänn registreringen och fortsätt?" : "\n\nAccept registration and continue?"))) {
-        throw new Error(sv ? "Licensregistreringen avbröts. Inga uppgifter skickades." : "Registration cancelled. No data was sent.");
-      }
-      const accepted = await send({ type: "T9_ACCEPT_LICENSE_NOTICE" });
-      if (!accepted?.ok) throw new Error(accepted?.error || "License registration failed");
-    }
-    const check = await send({ type: "T9_LICENSE_CHECK", tabId: tab.id }, 10000);
-    if (!check?.ok) throw new Error(check?.error || "License check failed");
-    if (check.license.allowed) {
-      let account = await send({ type: "T9_CONSULTANT_LICENSE_STATUS" });
-      if (!account?.signedIn) {
-        const signedIn = await send({ type: "T9_MICROSOFT_SIGN_IN" }, 120000);
-        if (!signedIn?.ok) throw new Error(signedIn?.error || (currentUiLocale === "sv-SE"
-          ? "Microsoft-inloggningen kunde inte slutföras." : "Microsoft sign-in could not be completed."));
-        account = signedIn;
-      }
-      const registered = await send({ type: "T9_TENANT_USER_REGISTER", tabId: tab.id }, 10000);
-      if (!registered?.ok) throw new Error(registered?.error || (currentUiLocale === "sv-SE"
-        ? "Användaren kunde inte registreras för tenantlicensen." : "The user could not be registered for the tenant license."));
-    }
-    let consultantAllowed = false;
-    if (!check.license.allowed) {
-      try {
-        const consultant = await send({ type: "T9_CONSULTANT_LICENSE_CHECK", tabId: tab.id }, 10000);
-        consultantAllowed = consultant?.license?.allowed === true;
-      } catch { /* Tenant trial flow remains available when no consultant is signed in. */ }
-    }
-    if (!check.license.allowed && !consultantAllowed && check.license.trialAvailable) {
-      const email = await requestTrialEmail();
-      if (!email) throw new Error(currentUiLocale === "sv-SE"
-        ? "Begäran om testlicens avbröts." : "Trial request cancelled.");
-      const trial = await send({ type: "T9_REQUEST_TRIAL", tabId: tab.id, email }, 10000);
-      if (!trial?.ok || !trial.license?.allowed) {
-        throw new Error(trial?.error || (currentUiLocale === "sv-SE"
-          ? "Testlicensen kunde inte skapas." : "The trial could not be created."));
-      }
-    } else if (!check.license.allowed && !consultantAllowed) {
-      throw new Error(currentUiLocale === "sv-SE"
-        ? "Denna tenant saknar en aktiv licens och kan inte starta en ny testperiod."
-        : "This tenant has no active license and cannot start a new trial.");
-    }
+    const authorization = await prepareTenantLicense(tab.id);
+    renderLicenseCard(authorization.license,
+      { tenantId: authorization.tenantId, signedIn: true });
     await ensureContentScript(tab);
     showMessage(t("recorder.connectionWorks"));
 
@@ -251,6 +355,7 @@ async function startRecording(recordingPurpose) {
     showMessage(recordingPurpose === "bug-report"
       ? t("recorder.bugStarted") : t("recorder.processStarted"));
     await refresh();
+    await updateLicenseCard();
   } catch (error) {
     showMessage(error.message, true);
   } finally {
@@ -258,29 +363,27 @@ async function startRecording(recordingPurpose) {
   }
 }
 
-function requestTrialEmail() {
-  const dialog = $("trialDialog");
-  const form = $("trialForm");
-  const email = $("trialEmail");
-  email.value = "";
-  dialog.showModal();
-  setTimeout(() => email.focus(), 0);
-  return new Promise(resolve => {
-    const finish = value => {
-      form.removeEventListener("submit", submit);
-      $("cancelTrial").removeEventListener("click", cancel);
-      dialog.removeEventListener("cancel", cancel);
-      if (dialog.open) dialog.close();
-      resolve(value);
-    };
-    const submit = event => { event.preventDefault();
-      if (form.reportValidity()) finish(email.value.trim()); };
-    const cancel = event => { event.preventDefault(); finish(""); };
-    form.addEventListener("submit", submit);
-    $("cancelTrial").addEventListener("click", cancel);
-    dialog.addEventListener("cancel", cancel);
-  });
-}
+$("licenseCardAction").addEventListener("click", async () => {
+  const card = $("licenseCard");
+  const action = $("licenseCardAction");
+  action.disabled = true;
+  card.setAttribute("aria-busy", "true");
+  setLicenseFeedback(t("license.cardWorking"));
+  try {
+    const tab = await currentTab();
+    if (!tab?.url?.includes("businesscentral.dynamics.com")) throw new Error(t("license.cardOpenBc"));
+    updateText($("licenseCardStatus"), t("license.cardWorking"));
+    const result = await prepareTenantLicense(tab.id, { forceCheck: true });
+    renderLicenseCard(result.license, { tenantId: result.tenantId, signedIn: true });
+    setLicenseFeedback(t(result.license.licenseType === "trial" ? "license.trialActivated" : "license.signInComplete"));
+  } catch (error) {
+    setLicenseFeedback(error.message || t("license.trialFailed"), true);
+    await updateLicenseCard();
+  } finally {
+    card.setAttribute("aria-busy", "false");
+    action.disabled = false;
+  }
+});
 
 $("startProcess").addEventListener("click", () => startRecording("documentation"));
 $("startBug").addEventListener("click", () => startRecording("bug-report"));
@@ -467,7 +570,7 @@ $("dashboard").addEventListener("click", () => chrome.runtime.openOptionsPage())
 $("knowledgeAdmin").addEventListener("click", () => {
   chrome.tabs.create({ url: chrome.runtime.getURL("knowledge-admin.html") });
 });
-loadUiLocale().then(refresh).then(async () => {
+loadUiLocale().then(refresh).then(updateLicenseCard).then(async () => {
   try {
     const access = await send({ type: "T9_GET_KNOWLEDGE_ADMIN_ACCESS" }, 3000);
     $("knowledgeAdmin").hidden = access?.authorized !== true;

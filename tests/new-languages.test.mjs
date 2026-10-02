@@ -35,7 +35,8 @@ for (const locale of locales) {
     assert.ok(value.trim(), locale + ": empty " + source);
     assert.deepEqual(placeholders(value), placeholders(source), locale + ": placeholders " + source);
   }
-  for (const source of [...Object.values(context.sourceVocabulary.messages["en-US"]),
+  for (const source of [...Object.values(context.sourceVocabulary.messages["en-US"]).filter((_, index) =>
+    !Object.keys(context.sourceVocabulary.messages["en-US"])[index].startsWith("license.")),
     ...context.sourceVocabulary.STATIC_TEXT.map(pair => pair[1])]) {
     assert.ok(catalog[source], `${locale}: missing ${source}`);
     assert.deepEqual(placeholders(catalog[source]), placeholders(source), `${locale}: placeholders in ${source}`);

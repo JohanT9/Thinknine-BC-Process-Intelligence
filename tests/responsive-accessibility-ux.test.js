@@ -26,6 +26,21 @@ assert(technicalReport.includes("dialog select{box-sizing:border-box;width:100%}
 assert(popup.includes(
   'aria-describedby="nameDialogHelp documentLanguageHelp"'));
 assert(popup.includes('id="documentLanguageHelp"'));
+assert(popup.indexOf('id="startBug"') < popup.indexOf('id="licenseCard"'),
+  "license information follows the process and bug recording choices");
+assert(popup.includes("#startPanel > .hint{display:none}"),
+  "the redundant popup tagline is hidden to keep its primary actions in view");
+assert(popup.includes('<section id="licenseCard" class="license-card"'),
+  "license status is displayed in a static information panel, not a dropdown");
+assert(popup.includes('class="license-summary"') && popup.includes('id="licenseCardStatus"') &&
+  popup.includes('id="licenseCardType"') && popup.includes('id="licenseCardExpiry"'),
+  "license status, type and expiry remain visible in the disclosure summary");
+assert(popup.includes(".status{display:flex;align-items:center;gap:8px;padding:0"),
+  "recording state appears as a compact indicator instead of a competing block");
+assert(popup.includes(".mode-card{text-align:left;padding:12px 13px;background:#fff"),
+  "recording choices retain a consistent card layout");
+assert(popup.includes('id="startProcess" class="primary mode-card"'),
+  "the process recording choice uses the shared primary teal and white button style");
 
 assert(design.includes("@media (pointer: coarse)"));
 assert(design.includes("--controlHeight:44px;--targetSize:44px"));

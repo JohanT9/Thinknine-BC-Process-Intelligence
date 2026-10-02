@@ -755,17 +755,28 @@
       createNewText[locale](page || createNewRecordTypes[entity]?.[locale] || entity,
         createNewRecordTypes[entity]?.[locale] || "")]));
   }
-  function basis(rule, context) { return contextualCreateNew(rule, context) ? "page-context"
-    : String(rule?.ruleId || "").startsWith("Observed.")
-    ? "observed-workflow" : (rule?.sourceRefs || []).some(source => String(source?.sourceUri || "").startsWith("https://erpdocs.apteancloud.com/"))
-      ? "vendor-documentation" : isAuthored(rule) ? "authored-process" : "microsoft-learn"; }
+  function basis(rule, context) {
+    const ruleId = String(rule?.ruleId || "");
+    const sourceRefs = rule?.sourceRefs || [];
+    if (ruleId.startsWith("Observed.")) return "observed-workflow";
+    if (sourceRefs.some(source => String(source?.sourceUri || "")
+      .startsWith("https://erpdocs.apteancloud.com/"))) return "vendor-documentation";
+    if (isAuthored(rule)) return "authored-process";
+    const specificKey = specific[ruleId];
+    if (specificKey && text[specificKey]) {
+      return sourceRefs.some(source => String(source?.sourceUri || "")
+        .startsWith("https://learn.microsoft.com/")) ? "microsoft-learn" : "authored-process";
+    }
+    return contextualCreateNew(rule, context) ? "page-context" : "microsoft-learn";
+  }
 
   function localized(rule, context) {
+    if (observedWorkflow[rule?.ruleId]) return { ...observedWorkflow[rule.ruleId] };
+    const specificKey = specific[rule?.ruleId];
+    if (specificKey && text[specificKey]) return { ...text[specificKey] };
     const contextual = contextualCreateNew(rule, context);
     if (contextual) return contextual;
-    if (observedWorkflow[rule?.ruleId]) return { ...observedWorkflow[rule.ruleId] };
-
-    const key = specific[rule?.ruleId] || direct[rule?.semanticAction] ||
+    const key = direct[rule?.semanticAction] ||
       (rule?.sourceRefs?.length ? "action" : "");
     return key ? { ...text[key] } : null;
   }
