@@ -47,6 +47,7 @@ table{width:100%;border-collapse:collapse}th,td{text-align:left;padding:9px;bord
 .review-zoom-toolbar{display:flex;align-items:center;gap:4px;margin-top:12px}.review-zoom-toolbar button{margin:0;min-height:36px}.review-zoom-value{min-width:48px;text-align:center;font-variant-numeric:tabular-nums}
 .review-toolbar{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px;align-items:center}
 .review-toolbar-group{display:flex;gap:4px;padding-right:10px;border-right:1px solid #d8dee5}
+.review-toolbar-group button{white-space:nowrap}
 .review-toolbar-group:last-child{padding-right:0;border-right:0}
 .review-toolbar button{margin:0;min-height:38px}
 .review-toolbar button:disabled{cursor:not-allowed;opacity:.48}
@@ -600,15 +601,15 @@ body.process-map-focus-active{overflow:hidden}.process-overview-card.process-map
           class="secondary review-next-action" aria-keyshortcuts="Alt+N"
           aria-describedby="reviewKeyboardHelp" data-i18n="review.nextUnreviewed"
           disabled>N&auml;sta ogranskade</button>
+        <div class="review-toolbar-group" role="group" aria-label="Historik">
+          <button id="undoReview" data-review-command="undo" data-review-toolbar-item class="secondary" aria-keyshortcuts="Control+Z Meta+Z" disabled>Ångra</button>
+          <button id="redoReview" data-review-command="redo" data-review-toolbar-item class="secondary" aria-keyshortcuts="Control+Y Meta+Shift+Z" disabled>Gör om</button>
+        </div>
+        <button id="exportWordReview" data-review-command="export" data-review-toolbar-item class="secondary" disabled>Exportera Word</button>
+        <button id="openReviewDocumentFields" data-review-toolbar-item class="secondary">Dokumentinformation</button>
         <details id="reviewMoreActions" class="review-toolbar-more">
           <summary data-review-toolbar-item aria-controls="reviewMoreActionsPanel" aria-expanded="false">Fler åtgärder</summary>
           <div id="reviewMoreActionsPanel" class="review-toolbar-more-panel">
-            <div class="review-toolbar-group" role="group" aria-label="Historik">
-              <button id="undoReview" data-review-command="undo" data-review-toolbar-item class="secondary" aria-keyshortcuts="Control+Z Meta+Z" disabled>Ångra</button>
-              <button id="redoReview" data-review-command="redo" data-review-toolbar-item class="secondary" aria-keyshortcuts="Control+Y Meta+Shift+Z" disabled>Gör om</button>
-            </div>
-            <button id="exportWordReview" data-review-command="export" data-review-toolbar-item class="secondary" disabled>Exportera Word</button>
-            <button id="openReviewDocumentFields" data-review-toolbar-item class="secondary">Dokumentinformation</button>
             <button id="openProcessAnalysis" data-review-toolbar-item data-feature="processIntelligence" hidden class="secondary process-analysis-trigger" aria-haspopup="dialog" aria-controls="processAnalysisDialog">Processanalys
               <output id="processAnalysisBadge" aria-label="Matchningsgrad" hidden></output></button>
             <div class="review-toolbar-group review-zoom-toolbar" id="reviewZoomToolbar" role="toolbar"

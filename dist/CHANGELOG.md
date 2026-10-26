@@ -1,4 +1,5 @@
 ## Unreleased
+- Keep Undo, Redo, Export Word and Document information directly visible in the Review toolbar again; only structural and advanced actions stay under More actions. History buttons no longer wrap their labels at narrow widths.
 - Fix a crash in release-gate analysis when a meaningful step group was left unresolved.
 - Load the Business Central version helper in every dynamic capture-script injection, matching the manifest, so tabs opened before install or update keep version context.
 - Keep a trailing period that belongs to a captured lookup caption (for example "No."), and prefer captured field captions over generic labels in Word customer, vendor, item, location and dimension steps.
