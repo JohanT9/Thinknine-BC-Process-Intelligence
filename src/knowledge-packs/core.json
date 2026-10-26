@@ -161,19 +161,19 @@
       "match": {
         "pagePatterns": [],
         "actionPatterns": [
-          "^Ny(?:tt)?(?:\\s+(?:post|order|faktura|kreditnota))?$",
-          "^New(?:\\s+(?:record|order|invoice|credit memo))?$",
-          "^Create new$",
-          "^Skapa ny$",
-          "^Nouveau$",
-          "^Nouvelle$",
-          "^Neu(?:e|er|es)?$",
-          "^Nuevo$",
-          "^Nueva$",
-          "^Opret$",
-          "^Uusi$",
-          "^Opprett$",
-          "^Opprette$"
+          "^Ny(?:tt)?(?:\\s+(?:post|order|faktura|kreditnota))?\\.?$",
+          "^New(?:\\s+(?:record|order|invoice|credit memo))?\\.?$",
+          "^Create new\\.?$",
+          "^Skapa ny\\.?$",
+          "^Nouveau\\.?$",
+          "^Nouvelle\\.?$",
+          "^Neu(?:e|er|es)?\\.?$",
+          "^Nuevo\\.?$",
+          "^Nueva\\.?$",
+          "^Opret\\.?$",
+          "^Uusi\\.?$",
+          "^Opprett\\.?$",
+          "^Opprette\\.?$"
         ],
         "fieldPatterns": [],
         "automationIdPatterns": []

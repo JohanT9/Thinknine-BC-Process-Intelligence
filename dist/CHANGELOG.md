@@ -1,4 +1,6 @@
 ## Unreleased
+- Move Aptean Weigh Scale and Weighbridge knowledge into its own Aptean Weigh Scale section, sourced from the public Aptean WSC, SCI and WBR articles. Add 15 documented actions (Get Weight, Fill Weight Manually, Transfer Weigh Scale Entries, Create Inbound/Outbound Register, Post Quantity To Receive and others) with explanations in all eight languages; keep existing rule IDs. See docs/APTEAN_WEIGH_SCALE.md.
+- Let an identified entity stand in for another page of the same entity or an unidentifiable caption, accept a trailing period on New actions, and explain bare Yes/No confirmations only with page or entity context.
 - Keep Undo, Redo, Export Word and Document information directly visible in the Review toolbar again; only structural and advanced actions stay under More actions. History buttons no longer wrap their labels at narrow widths.
 - Fix a crash in release-gate analysis when a meaningful step group was left unresolved.
 - Load the Business Central version helper in every dynamic capture-script injection, matching the manifest, so tabs opened before install or update keep version context.

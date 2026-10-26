@@ -42,6 +42,11 @@
       "enabled": true
     },
     {
+      "file": "knowledge-packs/aptean-weigh-scale.json",
+      "packId": "aptean-weigh-scale",
+      "enabled": true
+    },
+    {
       "packId": "bc-standard-pages",
       "file": "knowledge-packs/bc-standard-pages.json",
       "enabled": true

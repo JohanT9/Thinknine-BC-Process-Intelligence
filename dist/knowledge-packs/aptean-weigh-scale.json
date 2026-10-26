@@ -1,0 +1,1508 @@
+{
+  "packId": "aptean-weigh-scale",
+  "name": "Aptean Weigh Scale and Weighbridge Receiving",
+  "version": "1.0.0",
+  "priority": 300,
+  "appliesTo": "Business Central tenants with the Aptean Weigh Scale (WSC) extension and Aptean Scale Integration (SCI), and optionally Aptean Weighbridge Receiving (WBR). These rules describe vendor add-on behaviour, not standard Business Central.",
+  "modules": [
+    {
+      "code": "WSC",
+      "name": "Weigh Scale",
+      "documentation": "https://erpdocs.apteancloud.com/bc/docs/WSC/introduction/",
+      "permissionSets": [
+        "WEIGHSCALE122FDW",
+        "WSCBASIC122FDW"
+      ],
+      "requiredSetup": [
+        "Manage permission sets",
+        "Set up weigh scale",
+        "Weigh scale user setup"
+      ],
+      "integrations": [
+        "CAW",
+        "LBL",
+        "LPL",
+        "PAC",
+        "SCI",
+        "SFP",
+        "MWR"
+      ],
+      "releaseHistory": "Initial release 2301.0.0.0 (September 2023); latest listed 2604.0.0.0 (October 2026)."
+    },
+    {
+      "code": "SCI",
+      "name": "Scale Integration",
+      "documentation": "https://erpdocs.apteancloud.com/bc/docs/SCI/scale-integration/",
+      "notes": "Scales are read through PrintNode and must have Scale Verification set to Verified before they can be assigned on Location Scale Integration Setup."
+    },
+    {
+      "code": "WBR",
+      "name": "Weighbridge Receiving",
+      "documentation": "https://erpdocs.apteancloud.com/bc/docs/WBR/introduction/"
+    }
+  ],
+  "documentationGaps": [
+    "Aptean documentation publishes English captions only. Localized captions for Weigh Scale and Weighbridge actions are not verified; new rules match English captions, and explanations are translated into all eight languages.",
+    "The four Observed.Warehouse handling-unit and delivery-unit rules come from recorded sessions. Their captions (Handling Unit Code, Delivery Unit Code, Number of Delivery Units, Create handling unit) do not appear in the public WSC or WBR articles; WBR documents Handling Unit weight and count on the Weighbridge Ticket only.",
+    "Observed.Warehouse.ManualWeight and Observed.Warehouse.SaveWeightRegistration were recorded as Manual weight and Save and close on the warehouse receipt; the public articles document Fill Weight Manually and Save on Weigh Scale Registration.",
+    "The Aptean Scale Integration pages for setup, testing and logs were not retrieved; Get Weight behaviour is described from the Weigh Scale and Weighbridge articles.",
+    "Individual Weigh Scale release-note pages were not retrieved; only the release list is recorded."
+  ],
+  "rules": [
+    {
+      "ruleId": "Observed.Warehouse.RegisterWeight",
+      "taskType": "RegisterItemWeight",
+      "semanticAction": "RegisterItemWeight",
+      "entity": "WarehouseReceipt",
+      "priority": 1200,
+      "confidence": 0.94,
+      "match": {
+        "pagePatterns": [
+          "warehouse receipt",
+          "distributionslagerinleverans",
+          "lagerinleverans"
+        ],
+        "actionPatterns": [
+          "^Registrera vikt$",
+          "^Register weight$",
+          "^Enregistrer le poids$",
+          "^Gewicht erfassen$",
+          "^Registrar peso$",
+          "^Registrer vægt$",
+          "^Kirjaa paino$",
+          "^Registrer vekt$"
+        ],
+        "fieldPatterns": [],
+        "automationIdPatterns": [],
+        "pageObjectIds": [
+          "5768"
+        ]
+      },
+      "instructionTemplate": "",
+      "languages": [
+        "sv-SE",
+        "en-US",
+        "fr-FR",
+        "de-DE",
+        "es-ES",
+        "da-DK",
+        "fi-FI",
+        "nb-NO"
+      ],
+      "aliases": [],
+      "sourceIds": [
+        "aptean-wsc-default-scales-receipts-2023",
+        "aptean-wsc-registration-2026"
+      ]
+    },
+    {
+      "ruleId": "Observed.Warehouse.SelectHandlingUnitCode",
+      "taskType": "SelectLookupValue",
+      "semanticAction": "SelectLookupValue",
+      "entity": "WarehouseReceipt",
+      "priority": 1200,
+      "confidence": 0.94,
+      "match": {
+        "pagePatterns": [
+          "warehouse receipt",
+          "distributionslagerinleverans",
+          "lagerinleverans"
+        ],
+        "actionPatterns": [],
+        "fieldPatterns": [
+          "^Lastbärarekod$",
+          "^Handling Unit Code$",
+          "^Code unité de manutention$",
+          "^Ladeeinheitencode$",
+          "^Código unidad de manipulación$",
+          "^Lasteenhedskode$",
+          "^Käsittely-yksikön koodi$",
+          "^Håndteringsenhetskode$"
+        ],
+        "automationIdPatterns": [],
+        "pageObjectIds": [
+          "5768"
+        ]
+      },
+      "instructionTemplate": "",
+      "languages": [
+        "sv-SE",
+        "en-US",
+        "fr-FR",
+        "de-DE",
+        "es-ES",
+        "da-DK",
+        "fi-FI",
+        "nb-NO"
+      ],
+      "aliases": [],
+      "sourceIds": [
+        "aptean-wbr-weighbridge-ticket-2026",
+        "aptean-wbr-register-inbound-outbound-weight-2026"
+      ]
+    },
+    {
+      "ruleId": "Observed.Warehouse.SelectDeliveryUnitCode",
+      "taskType": "SelectLookupValue",
+      "semanticAction": "SelectLookupValue",
+      "entity": "WarehouseReceipt",
+      "priority": 1200,
+      "confidence": 0.94,
+      "match": {
+        "pagePatterns": [
+          "warehouse receipt",
+          "distributionslagerinleverans",
+          "lagerinleverans"
+        ],
+        "actionPatterns": [],
+        "fieldPatterns": [
+          "^Leveransenhetskod$",
+          "^Delivery Unit Code$",
+          "^Code unité de livraison$",
+          "^Liefereinheitencode$",
+          "^Código de unidad de entrega$",
+          "^Leveringsenhedskode$",
+          "^Toimitusyksikön koodi$",
+          "^Leveringsenhetskode$"
+        ],
+        "automationIdPatterns": [],
+        "pageObjectIds": [
+          "5768"
+        ]
+      },
+      "instructionTemplate": "",
+      "languages": [
+        "sv-SE",
+        "en-US",
+        "fr-FR",
+        "de-DE",
+        "es-ES",
+        "da-DK",
+        "fi-FI",
+        "nb-NO"
+      ],
+      "aliases": [],
+      "sourceIds": [
+        "aptean-wbr-weighbridge-ticket-2026",
+        "aptean-wbr-register-inbound-outbound-weight-2026"
+      ]
+    },
+    {
+      "ruleId": "Observed.Warehouse.SetDeliveryUnitCount",
+      "taskType": "EnterFieldValue",
+      "semanticAction": "EnterFieldValue",
+      "entity": "WarehouseReceipt",
+      "priority": 1200,
+      "confidence": 0.94,
+      "match": {
+        "pagePatterns": [
+          "warehouse receipt",
+          "distributionslagerinleverans",
+          "lagerinleverans"
+        ],
+        "actionPatterns": [],
+        "fieldPatterns": [
+          "^Antal leveransenheter$",
+          "^Number of Delivery Units$",
+          "^Nombre d’unités de livraison$",
+          "^Anzahl Liefereinheiten$",
+          "^Número de unidades de entrega$",
+          "^Antal leveringsenheder$",
+          "^Toimitusyksiköiden määrä$",
+          "^Antall leveringsenheter$"
+        ],
+        "automationIdPatterns": [],
+        "pageObjectIds": [
+          "5768"
+        ]
+      },
+      "instructionTemplate": "",
+      "languages": [
+        "sv-SE",
+        "en-US",
+        "fr-FR",
+        "de-DE",
+        "es-ES",
+        "da-DK",
+        "fi-FI",
+        "nb-NO"
+      ],
+      "aliases": [],
+      "sourceIds": [
+        "aptean-wbr-weighbridge-ticket-2026",
+        "aptean-wbr-register-inbound-outbound-weight-2026"
+      ]
+    },
+    {
+      "ruleId": "Observed.Warehouse.CreateHandlingUnit",
+      "taskType": "CreateHandlingUnit",
+      "semanticAction": "CreateHandlingUnit",
+      "entity": "WarehouseReceipt",
+      "priority": 1200,
+      "confidence": 0.94,
+      "match": {
+        "pagePatterns": [
+          "warehouse receipt",
+          "distributionslagerinleverans",
+          "lagerinleverans"
+        ],
+        "actionPatterns": [
+          "^Skapa lastbärare$",
+          "^Create handling unit$",
+          "^Créer une unité de manutention$",
+          "^Ladeeinheit erstellen$",
+          "^Crear unidad de manipulación$",
+          "^Opret lasteenhed$",
+          "^Luo käsittely-yksikkö$",
+          "^Opprett håndteringsenhet$"
+        ],
+        "fieldPatterns": [],
+        "automationIdPatterns": [],
+        "pageObjectIds": [
+          "5768"
+        ]
+      },
+      "instructionTemplate": "",
+      "languages": [
+        "sv-SE",
+        "en-US",
+        "fr-FR",
+        "de-DE",
+        "es-ES",
+        "da-DK",
+        "fi-FI",
+        "nb-NO"
+      ],
+      "aliases": [],
+      "sourceIds": [
+        "aptean-wbr-weighbridge-ticket-2026",
+        "aptean-wbr-register-inbound-outbound-weight-2026"
+      ]
+    },
+    {
+      "ruleId": "Observed.Warehouse.ManualWeight",
+      "taskType": "ChooseManualWeighing",
+      "semanticAction": "ChooseManualWeighing",
+      "entity": "WarehouseReceipt",
+      "priority": 1200,
+      "confidence": 0.94,
+      "match": {
+        "pagePatterns": [
+          "warehouse receipt",
+          "distributionslagerinleverans",
+          "lagerinleverans"
+        ],
+        "actionPatterns": [
+          "^Manuell vikt$",
+          "^Manual weight$",
+          "^Poids manuel$",
+          "^Manuelles Gewicht$",
+          "^Peso manual$",
+          "^Manuel vægt$",
+          "^Manuaalinen paino$",
+          "^Manuell vekt$"
+        ],
+        "fieldPatterns": [],
+        "automationIdPatterns": [],
+        "pageObjectIds": [
+          "5768"
+        ]
+      },
+      "instructionTemplate": "",
+      "languages": [
+        "sv-SE",
+        "en-US",
+        "fr-FR",
+        "de-DE",
+        "es-ES",
+        "da-DK",
+        "fi-FI",
+        "nb-NO"
+      ],
+      "aliases": [],
+      "sourceIds": [
+        "aptean-wsc-registration-2026"
+      ]
+    },
+    {
+      "ruleId": "Observed.Warehouse.EnterScaleWeight",
+      "taskType": "EnterMeasuredWeight",
+      "semanticAction": "EnterMeasuredWeight",
+      "entity": "WarehouseReceipt",
+      "priority": 1200,
+      "confidence": 0.94,
+      "match": {
+        "pagePatterns": [
+          "warehouse receipt",
+          "distributionslagerinleverans",
+          "lagerinleverans"
+        ],
+        "actionPatterns": [
+          "^Vikt från våg$",
+          "^Weight from scale$",
+          "^Poids de la balance$",
+          "^Waagengewicht$",
+          "^Peso de la báscula$",
+          "^Vægt fra vægt$",
+          "^Vaa'an paino$",
+          "^Vekt fra vekt$"
+        ],
+        "fieldPatterns": [
+          "^Vikt från våg$",
+          "^Weight from scale$",
+          "^Poids de la balance$",
+          "^Waagengewicht$",
+          "^Peso de la báscula$",
+          "^Vægt fra vægt$",
+          "^Vaa'an paino$",
+          "^Vekt fra vekt$"
+        ],
+        "automationIdPatterns": [],
+        "pageObjectIds": [
+          "5768"
+        ]
+      },
+      "instructionTemplate": "",
+      "languages": [
+        "sv-SE",
+        "en-US",
+        "fr-FR",
+        "de-DE",
+        "es-ES",
+        "da-DK",
+        "fi-FI",
+        "nb-NO"
+      ],
+      "aliases": [],
+      "sourceIds": [
+        "aptean-wsc-registration-2026"
+      ]
+    },
+    {
+      "ruleId": "Observed.Warehouse.SaveWeightRegistration",
+      "taskType": "SaveWeightRegistration",
+      "semanticAction": "SaveWeightRegistration",
+      "entity": "WarehouseReceipt",
+      "priority": 1200,
+      "confidence": 0.94,
+      "match": {
+        "pagePatterns": [
+          "warehouse receipt",
+          "distributionslagerinleverans",
+          "lagerinleverans"
+        ],
+        "actionPatterns": [
+          "^Spara och stäng$",
+          "^Save and close$",
+          "^Enregistrer et fermer$",
+          "^Speichern und schließen$",
+          "^Guardar y cerrar$",
+          "^Gem og luk$",
+          "^Tallenna ja sulje$",
+          "^Lagre og lukk$"
+        ],
+        "fieldPatterns": [],
+        "automationIdPatterns": [],
+        "pageObjectIds": [
+          "5768"
+        ]
+      },
+      "instructionTemplate": "",
+      "languages": [
+        "sv-SE",
+        "en-US",
+        "fr-FR",
+        "de-DE",
+        "es-ES",
+        "da-DK",
+        "fi-FI",
+        "nb-NO"
+      ],
+      "aliases": [],
+      "sourceIds": [
+        "aptean-wsc-registration-2026",
+        "aptean-wsc-default-scales-receipts-2023"
+      ]
+    },
+    {
+      "ruleId": "AptWeighScale.RegisterWeightShipment",
+      "taskType": "RegisterItemWeight",
+      "semanticAction": "RegisterItemWeight",
+      "entity": "WarehouseShipment",
+      "priority": 1250,
+      "confidence": 0.95,
+      "match": {
+        "pagePatterns": [
+          "distlagerutleverans",
+          "warehouse shipment"
+        ],
+        "actionPatterns": [
+          "^Register Weight$"
+        ],
+        "fieldPatterns": [],
+        "automationIdPatterns": []
+      },
+      "instructionTemplate": "",
+      "languages": [
+        "en-US",
+        "sv-SE",
+        "fr-FR",
+        "de-DE",
+        "es-ES",
+        "da-DK",
+        "fi-FI",
+        "nb-NO"
+      ],
+      "aliases": [],
+      "sourceIds": [
+        "aptean-wsc-default-scales-shipments-2023",
+        "aptean-wsc-registration-2026"
+      ],
+      "verifiedRuntimeLocales": [
+        "en-US"
+      ],
+      "localizedExplanations": {
+        "en-US": "Opens Weigh Scale Registration for the selected warehouse shipment line. The page only opens if the item is lot- or license-plate-tracked, a non-catch-weight unit is set up for the scale, and the related warehouse pick has been registered. Registering weight does not release or post the shipment.",
+        "sv-SE": "Öppnar Weigh Scale Registration för vald rad på lagerutleveransen. Sidan öppnas bara om artikeln har parti- eller license plate-spårning, enheten för en artikel utan catch weight är upplagd för vågen och tillhörande lagerplockning är registrerad. Viktregistreringen frisläpper eller bokför inte utleveransen.",
+        "fr-FR": "Ouvre Weigh Scale Registration pour la ligne d’expédition entrepôt sélectionnée. La page s’ouvre uniquement si l’article est suivi par lot ou par plaque (license plate), si l’unité d’un article sans poids variable est configurée pour la balance et si le prélèvement entrepôt associé est enregistré. L’enregistrement du poids ne lance ni ne valide l’expédition.",
+        "de-DE": "Öffnet Weigh Scale Registration für die ausgewählte Zeile der Lagerlieferung. Die Seite öffnet sich nur, wenn der Artikel chargen- oder License-Plate-verfolgt ist, die Einheit eines Artikels ohne Catch Weight für die Waage eingerichtet ist und die zugehörige Lagerkommissionierung registriert wurde. Das Erfassen des Gewichts gibt die Lieferung weder frei noch bucht es sie.",
+        "es-ES": "Abre Weigh Scale Registration para la línea seleccionada del envío de almacén. La página solo se abre si el producto tiene seguimiento por lote o por license plate, la unidad de un producto sin peso variable está configurada para la báscula y el picking de almacén relacionado está registrado. Registrar el peso no lanza ni registra el envío.",
+        "da-DK": "Åbner Weigh Scale Registration for den valgte linje på lagerleverancen. Siden åbnes kun, hvis varen har lot- eller license plate-sporing, enheden for en vare uden catch weight er sat op til vægten, og det tilhørende lagerpluk er registreret. Vægtregistreringen frigiver eller bogfører ikke leverancen.",
+        "fi-FI": "Avaa Weigh Scale Registration -sivun valitulle varastotoimituksen riville. Sivu avautuu vain, jos nimikkeellä on erä- tai license plate -seuranta, ei-catch weight -nimikkeen yksikkö on määritetty vaa'alle ja siihen liittyvä varastokeräily on rekisteröity. Painon rekisteröinti ei vapauta eikä kirjaa toimitusta.",
+        "nb-NO": "Åpner Weigh Scale Registration for valgt linje på lagerleveringen. Siden åpnes bare hvis varen har parti- eller license plate-sporing, enheten for en vare uten catch weight er satt opp for vekten, og tilhørende lagerplukk er registrert. Vektregistreringen frigir eller bokfører ikke leveringen."
+      }
+    },
+    {
+      "ruleId": "AptWeighScale.GetWeight",
+      "taskType": "EnterMeasuredWeight",
+      "semanticAction": "EnterMeasuredWeight",
+      "entity": "WeighScaleRegistration",
+      "priority": 1250,
+      "confidence": 0.95,
+      "match": {
+        "pagePatterns": [
+          "^Weigh Scale Registration$",
+          "^Weight Scale Registration$"
+        ],
+        "actionPatterns": [
+          "^Get Weight$"
+        ],
+        "fieldPatterns": [],
+        "automationIdPatterns": []
+      },
+      "instructionTemplate": "",
+      "languages": [
+        "en-US",
+        "sv-SE",
+        "fr-FR",
+        "de-DE",
+        "es-ES",
+        "da-DK",
+        "fi-FI",
+        "nb-NO"
+      ],
+      "aliases": [],
+      "sourceIds": [
+        "aptean-wsc-registration-2026",
+        "aptean-wsc-introduction-2025",
+        "aptean-sci-scales-assignments-2023"
+      ],
+      "verifiedRuntimeLocales": [
+        "en-US"
+      ],
+      "localizedExplanations": {
+        "en-US": "Reads the current value from the scale through Aptean Scale Integration into Weight From Scale. Weight Quantity To Handle is then calculated as Weight From Scale minus Tare Weight. Check the weigh scale, unit and tare before saving; nothing is registered until you choose Save.",
+        "sv-SE": "Hämtar vågens aktuella värde via Aptean Scale Integration till Weight From Scale. Weight Quantity To Handle beräknas sedan som Weight From Scale minus Tare Weight. Kontrollera våg, enhet och taravikt innan du sparar; inget registreras förrän du väljer Save.",
+        "fr-FR": "Lit la valeur actuelle de la balance via Aptean Scale Integration dans Weight From Scale. Weight Quantity To Handle est ensuite calculé comme Weight From Scale moins Tare Weight. Vérifiez la balance, l’unité et la tare avant d’enregistrer ; rien n’est enregistré avant de choisir Save.",
+        "de-DE": "Liest den aktuellen Wert der Waage über Aptean Scale Integration in Weight From Scale ein. Weight Quantity To Handle wird anschließend als Weight From Scale minus Tare Weight berechnet. Prüfen Sie Waage, Einheit und Tara vor dem Speichern; erst mit Save wird etwas registriert.",
+        "es-ES": "Lee el valor actual de la báscula mediante Aptean Scale Integration en Weight From Scale. Después se calcula Weight Quantity To Handle como Weight From Scale menos Tare Weight. Compruebe la báscula, la unidad y la tara antes de guardar; no se registra nada hasta elegir Save.",
+        "da-DK": "Henter vægtens aktuelle værdi via Aptean Scale Integration til Weight From Scale. Weight Quantity To Handle beregnes derefter som Weight From Scale minus Tare Weight. Kontrollér vægt, enhed og tara, før du gemmer; intet registreres, før du vælger Save.",
+        "fi-FI": "Lukee vaa'an nykyisen arvon Aptean Scale Integrationin kautta kenttään Weight From Scale. Weight Quantity To Handle lasketaan sitten Weight From Scale miinus Tare Weight. Tarkista vaaka, yksikkö ja taara ennen tallennusta; mitään ei rekisteröidä ennen kuin valitset Save.",
+        "nb-NO": "Henter vektens gjeldende verdi via Aptean Scale Integration til Weight From Scale. Weight Quantity To Handle beregnes deretter som Weight From Scale minus Tare Weight. Kontroller vekt, enhet og tara før du lagrer; ingenting registreres før du velger Save."
+      }
+    },
+    {
+      "ruleId": "AptWeighScale.FillWeightManually",
+      "taskType": "ChooseManualWeighing",
+      "semanticAction": "ChooseManualWeighing",
+      "entity": "WeighScaleRegistration",
+      "priority": 1250,
+      "confidence": 0.95,
+      "match": {
+        "pagePatterns": [
+          "^Weigh Scale Registration$",
+          "^Weight Scale Registration$"
+        ],
+        "actionPatterns": [
+          "^Fill Weight Manually$"
+        ],
+        "fieldPatterns": [],
+        "automationIdPatterns": []
+      },
+      "instructionTemplate": "",
+      "languages": [
+        "en-US",
+        "sv-SE",
+        "fr-FR",
+        "de-DE",
+        "es-ES",
+        "da-DK",
+        "fi-FI",
+        "nb-NO"
+      ],
+      "aliases": [],
+      "sourceIds": [
+        "aptean-wsc-registration-2026"
+      ],
+      "verifiedRuntimeLocales": [
+        "en-US"
+      ],
+      "localizedExplanations": {
+        "en-US": "Lets you type the Weight From Scale value yourself instead of reading it from the connected scale. Use it only when the scale reading is available by other means, and enter it in the unit shown; Tare Weight is still subtracted to give Weight Quantity To Handle.",
+        "sv-SE": "Låter dig själv skriva in värdet i Weight From Scale i stället för att läsa det från den anslutna vågen. Använd det bara när vågens avläsning finns tillgänglig på annat sätt och ange den i den visade enheten; Tare Weight dras fortfarande av för att ge Weight Quantity To Handle.",
+        "fr-FR": "Permet de saisir vous-même Weight From Scale au lieu de lire la valeur sur la balance connectée. Utilisez-le uniquement si la pesée est disponible autrement et saisissez-la dans l’unité affichée ; Tare Weight est toujours déduit pour obtenir Weight Quantity To Handle.",
+        "de-DE": "Ermöglicht die manuelle Eingabe von Weight From Scale, statt den Wert von der angeschlossenen Waage zu lesen. Verwenden Sie dies nur, wenn die Wägung auf anderem Weg vorliegt, und geben Sie sie in der angezeigten Einheit ein; Tare Weight wird weiterhin abgezogen, um Weight Quantity To Handle zu ermitteln.",
+        "es-ES": "Permite escribir usted mismo Weight From Scale en lugar de leerlo de la báscula conectada. Úselo solo cuando la lectura esté disponible por otro medio e introdúzcala en la unidad mostrada; Tare Weight se sigue restando para obtener Weight Quantity To Handle.",
+        "da-DK": "Lader dig selv indtaste Weight From Scale i stedet for at læse værdien fra den tilsluttede vægt. Brug det kun, når vejningen foreligger på anden måde, og angiv den i den viste enhed; Tare Weight trækkes stadig fra for at give Weight Quantity To Handle.",
+        "fi-FI": "Voit syöttää Weight From Scale -arvon itse sen sijaan, että se luetaan liitetystä vaa'asta. Käytä tätä vain, kun punnitustulos on saatavilla muuta kautta, ja syötä se näytetyssä yksikössä; Tare Weight vähennetään edelleen, jolloin saadaan Weight Quantity To Handle.",
+        "nb-NO": "Lar deg selv skrive inn Weight From Scale i stedet for å lese verdien fra den tilkoblede vekten. Bruk det bare når veiingen er tilgjengelig på annen måte, og angi den i enheten som vises; Tare Weight trekkes fortsatt fra for å gi Weight Quantity To Handle."
+      }
+    },
+    {
+      "ruleId": "AptWeighScale.SaveRegistration",
+      "taskType": "SaveWeightRegistration",
+      "semanticAction": "SaveWeightRegistration",
+      "entity": "WeighScaleRegistration",
+      "priority": 1250,
+      "confidence": 0.95,
+      "match": {
+        "pagePatterns": [
+          "^Weigh Scale Registration$",
+          "^Weight Scale Registration$"
+        ],
+        "actionPatterns": [
+          "^Save$"
+        ],
+        "fieldPatterns": [],
+        "automationIdPatterns": []
+      },
+      "instructionTemplate": "",
+      "languages": [
+        "en-US",
+        "sv-SE",
+        "fr-FR",
+        "de-DE",
+        "es-ES",
+        "da-DK",
+        "fi-FI",
+        "nb-NO"
+      ],
+      "aliases": [],
+      "sourceIds": [
+        "aptean-wsc-registration-2026",
+        "aptean-wsc-default-scales-receipts-2023"
+      ],
+      "verifiedRuntimeLocales": [
+        "en-US"
+      ],
+      "localizedExplanations": {
+        "en-US": "Registers the weighing as a weigh scale entry for the document line. It does not post the warehouse receipt or shipment: entries with status Pending must be transferred to item tracking with Transfer Weigh Scale Entries, and a receipt with pending entries cannot be posted.",
+        "sv-SE": "Registrerar vägningen som en weigh scale-post för dokumentraden. Lagerinleveransen eller utleveransen bokförs inte: poster med status Pending måste överföras till artikelspårningen med Transfer Weigh Scale Entries, och en inleverans med väntande poster kan inte bokföras.",
+        "fr-FR": "Enregistre la pesée comme écriture de balance pour la ligne du document. La réception ou l’expédition entrepôt n’est pas validée : les écritures au statut Pending doivent être transférées vers le suivi d’article avec Transfer Weigh Scale Entries, et une réception avec des écritures en attente ne peut pas être validée.",
+        "de-DE": "Registriert die Wägung als Waagenposten für die Belegzeile. Der Lagereingang oder die Lagerlieferung wird nicht gebucht: Posten mit dem Status Pending müssen mit Transfer Weigh Scale Entries in die Artikelverfolgung übertragen werden, und ein Eingang mit offenen Posten kann nicht gebucht werden.",
+        "es-ES": "Registra la pesada como movimiento de báscula para la línea del documento. No registra la recepción ni el envío de almacén: los movimientos con estado Pending deben transferirse al seguimiento de producto con Transfer Weigh Scale Entries, y una recepción con movimientos pendientes no se puede registrar.",
+        "da-DK": "Registrerer vejningen som en vægtpost for dokumentlinjen. Lagermodtagelsen eller leverancen bogføres ikke: poster med status Pending skal overføres til varesporing med Transfer Weigh Scale Entries, og en modtagelse med ventende poster kan ikke bogføres.",
+        "fi-FI": "Rekisteröi punnituksen vaakatapahtumaksi asiakirjarivillä. Varastovastaanottoa tai -toimitusta ei kirjata: Pending-tilaiset tapahtumat on siirrettävä nimikkeen seurantaan toiminnolla Transfer Weigh Scale Entries, eikä vastaanottoa, jolla on odottavia tapahtumia, voi kirjata.",
+        "nb-NO": "Registrerer veiingen som en vektpost for dokumentlinjen. Lagermottaket eller leveringen bokføres ikke: poster med status Pending må overføres til varesporing med Transfer Weigh Scale Entries, og et mottak med ventende poster kan ikke bokføres."
+      }
+    },
+    {
+      "ruleId": "AptWeighScale.SaveAndPrintLabels",
+      "taskType": "SaveWeightRegistration",
+      "semanticAction": "SaveWeightRegistration",
+      "entity": "WeighScaleRegistration",
+      "priority": 1250,
+      "confidence": 0.95,
+      "match": {
+        "pagePatterns": [
+          "^Weigh Scale Registration$",
+          "^Weight Scale Registration$"
+        ],
+        "actionPatterns": [
+          "^Save and Print Labels$"
+        ],
+        "fieldPatterns": [],
+        "automationIdPatterns": []
+      },
+      "instructionTemplate": "",
+      "languages": [
+        "en-US",
+        "sv-SE",
+        "fr-FR",
+        "de-DE",
+        "es-ES",
+        "da-DK",
+        "fi-FI",
+        "nb-NO"
+      ],
+      "aliases": [],
+      "sourceIds": [
+        "aptean-wsc-registration-2026",
+        "aptean-wsc-integrations-2025"
+      ],
+      "verifiedRuntimeLocales": [
+        "en-US"
+      ],
+      "localizedExplanations": {
+        "en-US": "Saves the weighing as a weigh scale entry and prints labels for it through Aptean Labeling. Check lot number, license plate and weight before printing, because the label reflects the registered values; the warehouse document is not posted.",
+        "sv-SE": "Sparar vägningen som en weigh scale-post och skriver ut etiketter för den via Aptean Labeling. Kontrollera partinummer, license plate och vikt före utskrift eftersom etiketten visar de registrerade värdena; lagerdokumentet bokförs inte.",
+        "fr-FR": "Enregistre la pesée comme écriture de balance et imprime ses étiquettes via Aptean Labeling. Vérifiez le numéro de lot, la plaque (license plate) et le poids avant l’impression, car l’étiquette reprend les valeurs enregistrées ; le document entrepôt n’est pas validé.",
+        "de-DE": "Speichert die Wägung als Waagenposten und druckt Etiketten dafür über Aptean Labeling. Prüfen Sie Chargennummer, License Plate und Gewicht vor dem Druck, da das Etikett die registrierten Werte zeigt; der Lagerbeleg wird nicht gebucht.",
+        "es-ES": "Guarda la pesada como movimiento de báscula e imprime sus etiquetas mediante Aptean Labeling. Compruebe el número de lote, la license plate y el peso antes de imprimir, porque la etiqueta refleja los valores registrados; el documento de almacén no se registra.",
+        "da-DK": "Gemmer vejningen som en vægtpost og udskriver etiketter til den via Aptean Labeling. Kontrollér lotnummer, license plate og vægt før udskrivning, fordi etiketten viser de registrerede værdier; lagerdokumentet bogføres ikke.",
+        "fi-FI": "Tallentaa punnituksen vaakatapahtumaksi ja tulostaa sille tarrat Aptean Labelingin kautta. Tarkista eränumero, license plate ja paino ennen tulostusta, koska tarra näyttää rekisteröidyt arvot; varastoasiakirjaa ei kirjata.",
+        "nb-NO": "Lagrer veiingen som en vektpost og skriver ut etiketter for den via Aptean Labeling. Kontroller partinummer, license plate og vekt før utskrift, fordi etiketten viser de registrerte verdiene; lagerdokumentet bokføres ikke."
+      }
+    },
+    {
+      "ruleId": "AptWeighScale.AssignLotNo",
+      "taskType": "AssignLotNumber",
+      "semanticAction": "AssignLotNumber",
+      "entity": "WeighScaleRegistration",
+      "priority": 1250,
+      "confidence": 0.95,
+      "match": {
+        "pagePatterns": [
+          "^Weigh Scale Registration$",
+          "^Weight Scale Registration$"
+        ],
+        "actionPatterns": [
+          "^Assign Lot No\\.?$"
+        ],
+        "fieldPatterns": [],
+        "automationIdPatterns": []
+      },
+      "instructionTemplate": "",
+      "languages": [
+        "en-US",
+        "sv-SE",
+        "fr-FR",
+        "de-DE",
+        "es-ES",
+        "da-DK",
+        "fi-FI",
+        "nb-NO"
+      ],
+      "aliases": [],
+      "sourceIds": [
+        "aptean-wsc-registration-2026"
+      ],
+      "verifiedRuntimeLocales": [
+        "en-US"
+      ],
+      "localizedExplanations": {
+        "en-US": "Opens a dialog where you choose Existing Lot if the item already has lots, or New Lot to create one; the system then fills Lot No. With Use Expiration Dates the expiration date is set automatically for a new lot, and with Require Expiration Date Entry you must enter it.",
+        "sv-SE": "Öppnar en dialog där du väljer Existing Lot om artikeln redan har partier eller New Lot för att skapa ett; systemet fyller sedan i Lot No. Med Use Expiration Dates sätts utgångsdatum automatiskt för ett nytt parti, och med Require Expiration Date Entry måste du ange det.",
+        "fr-FR": "Ouvre une boîte de dialogue où vous choisissez Existing Lot si l’article a déjà des lots, ou New Lot pour en créer un ; le système renseigne ensuite Lot No. Avec Use Expiration Dates, la date d’expiration est définie automatiquement pour un nouveau lot ; avec Require Expiration Date Entry, vous devez la saisir.",
+        "de-DE": "Öffnet einen Dialog, in dem Sie Existing Lot wählen, wenn der Artikel bereits Chargen hat, oder New Lot, um eine anzulegen; das System füllt dann Lot No. aus. Mit Use Expiration Dates wird das Ablaufdatum für eine neue Charge automatisch gesetzt, mit Require Expiration Date Entry müssen Sie es eingeben.",
+        "es-ES": "Abre un cuadro de diálogo donde elige Existing Lot si el producto ya tiene lotes, o New Lot para crear uno; después el sistema rellena Lot No. Con Use Expiration Dates la fecha de caducidad se asigna automáticamente a un lote nuevo, y con Require Expiration Date Entry debe introducirla.",
+        "da-DK": "Åbner en dialog, hvor du vælger Existing Lot, hvis varen allerede har lot, eller New Lot for at oprette et; systemet udfylder derefter Lot No. Med Use Expiration Dates sættes udløbsdatoen automatisk for et nyt lot, og med Require Expiration Date Entry skal du angive den.",
+        "fi-FI": "Avaa valintaikkunan, jossa valitset Existing Lot, jos nimikkeellä on jo eriä, tai New Lot uuden erän luomiseksi; järjestelmä täyttää sitten Lot No. -kentän. Use Expiration Dates -asetuksella uuden erän vanhenemispäivä asetetaan automaattisesti, ja Require Expiration Date Entry -asetuksella se on syötettävä.",
+        "nb-NO": "Åpner en dialog der du velger Existing Lot hvis varen allerede har partier, eller New Lot for å opprette et; systemet fyller deretter ut Lot No. Med Use Expiration Dates settes utløpsdatoen automatisk for et nytt parti, og med Require Expiration Date Entry må du angi den."
+      }
+    },
+    {
+      "ruleId": "AptWeighScale.CreateLicensePlate",
+      "taskType": "CreateLicensePlate",
+      "semanticAction": "CreateLicensePlate",
+      "entity": "WeighScaleRegistration",
+      "priority": 1250,
+      "confidence": 0.95,
+      "match": {
+        "pagePatterns": [
+          "^Weigh Scale Registration$",
+          "^Weight Scale Registration$"
+        ],
+        "actionPatterns": [
+          "^Create License Plate$"
+        ],
+        "fieldPatterns": [],
+        "automationIdPatterns": []
+      },
+      "instructionTemplate": "",
+      "languages": [
+        "en-US",
+        "sv-SE",
+        "fr-FR",
+        "de-DE",
+        "es-ES",
+        "da-DK",
+        "fi-FI",
+        "nb-NO"
+      ],
+      "aliases": [],
+      "sourceIds": [
+        "aptean-wsc-registration-2026",
+        "aptean-wsc-integrations-2025"
+      ],
+      "verifiedRuntimeLocales": [
+        "en-US"
+      ],
+      "localizedExplanations": {
+        "en-US": "Creates a license plate for the weighed quantity and fills License Plate No. on the registration, based on the Aptean License Plating setup. Check that the item is license-plate-tracked; the warehouse document itself is not posted by this action.",
+        "sv-SE": "Skapar en license plate för den vägda kvantiteten och fyller i License Plate No. i registreringen enligt inställningarna i Aptean License Plating. Kontrollera att artikeln har license plate-spårning; själva lagerdokumentet bokförs inte av åtgärden.",
+        "fr-FR": "Crée une plaque (license plate) pour la quantité pesée et renseigne License Plate No. dans l’enregistrement, selon le paramétrage d’Aptean License Plating. Vérifiez que l’article est suivi par plaque ; cette action ne valide pas le document entrepôt.",
+        "de-DE": "Erstellt ein License Plate für die gewogene Menge und füllt License Plate No. in der Registrierung gemäß der Einrichtung von Aptean License Plating. Prüfen Sie, ob der Artikel per License Plate verfolgt wird; der Lagerbeleg selbst wird dadurch nicht gebucht.",
+        "es-ES": "Crea una license plate para la cantidad pesada y rellena License Plate No. en el registro según la configuración de Aptean License Plating. Compruebe que el producto tiene seguimiento por license plate; esta acción no registra el documento de almacén.",
+        "da-DK": "Opretter en license plate for den vejede mængde og udfylder License Plate No. i registreringen ud fra opsætningen af Aptean License Plating. Kontrollér, at varen har license plate-sporing; selve lagerdokumentet bogføres ikke af handlingen.",
+        "fi-FI": "Luo license platen punnitulle määrälle ja täyttää rekisteröintiin License Plate No. -kentän Aptean License Plating -asetusten mukaisesti. Tarkista, että nimikkeellä on license plate -seuranta; toiminto ei kirjaa itse varastoasiakirjaa.",
+        "nb-NO": "Oppretter en license plate for den veide mengden og fyller ut License Plate No. i registreringen basert på oppsettet i Aptean License Plating. Kontroller at varen har license plate-sporing; selve lagerdokumentet bokføres ikke av handlingen."
+      }
+    },
+    {
+      "ruleId": "AptWeighScale.AssignLotAttributes",
+      "taskType": "AssignLotAttributes",
+      "semanticAction": "AssignLotAttributes",
+      "entity": "WeighScaleRegistration",
+      "priority": 1250,
+      "confidence": 0.95,
+      "match": {
+        "pagePatterns": [
+          "^Weigh Scale Registration$",
+          "^Weight Scale Registration$"
+        ],
+        "actionPatterns": [
+          "^Assign Lot Attributes$"
+        ],
+        "fieldPatterns": [],
+        "automationIdPatterns": []
+      },
+      "instructionTemplate": "",
+      "languages": [
+        "en-US",
+        "sv-SE",
+        "fr-FR",
+        "de-DE",
+        "es-ES",
+        "da-DK",
+        "fi-FI",
+        "nb-NO"
+      ],
+      "aliases": [],
+      "sourceIds": [
+        "aptean-wsc-registration-2026"
+      ],
+      "verifiedRuntimeLocales": [
+        "en-US"
+      ],
+      "localizedExplanations": {
+        "en-US": "Opens Lot Attribute Values for the lot on the registration, where you can review attribute values already linked to the item or add new ones. Changing lot attributes does not change the weight or post the document.",
+        "sv-SE": "Öppnar Lot Attribute Values för partiet i registreringen, där du kan granska attributvärden som redan är kopplade till artikeln eller lägga till nya. Att ändra partiattribut påverkar inte vikten och bokför inte dokumentet.",
+        "fr-FR": "Ouvre Lot Attribute Values pour le lot de l’enregistrement, où vous pouvez consulter les valeurs d’attribut déjà liées à l’article ou en ajouter. Modifier les attributs de lot ne change pas le poids et ne valide pas le document.",
+        "de-DE": "Öffnet Lot Attribute Values für die Charge der Registrierung, wo Sie bereits mit dem Artikel verknüpfte Attributwerte prüfen oder neue hinzufügen können. Das Ändern von Chargenattributen ändert weder das Gewicht noch bucht es den Beleg.",
+        "es-ES": "Abre Lot Attribute Values para el lote del registro, donde puede revisar los valores de atributo ya vinculados al producto o añadir otros nuevos. Cambiar los atributos del lote no modifica el peso ni registra el documento.",
+        "da-DK": "Åbner Lot Attribute Values for lottet i registreringen, hvor du kan gennemgå attributværdier, der allerede er knyttet til varen, eller tilføje nye. Ændring af lotattributter ændrer ikke vægten og bogfører ikke dokumentet.",
+        "fi-FI": "Avaa rekisteröinnin erälle Lot Attribute Values -sivun, jossa voit tarkastella nimikkeeseen jo liitettyjä attribuuttiarvoja tai lisätä uusia. Eräattribuuttien muuttaminen ei muuta painoa eikä kirjaa asiakirjaa.",
+        "nb-NO": "Åpner Lot Attribute Values for partiet i registreringen, der du kan se attributtverdier som allerede er knyttet til varen, eller legge til nye. Endring av partiattributter endrer ikke vekten og bokfører ikke dokumentet."
+      }
+    },
+    {
+      "ruleId": "AptWeighScale.OpenWeighScaleEntries",
+      "taskType": "OpenWeighScaleEntries",
+      "semanticAction": "OpenWeighScaleEntries",
+      "entity": "WeighScaleEntry",
+      "priority": 1250,
+      "confidence": 0.95,
+      "match": {
+        "pagePatterns": [
+          "warehouse receipt",
+          "distributionslagerinleverans",
+          "lagerinleverans",
+          "distlagerutleverans",
+          "warehouse shipment",
+          "^Released Production Order$"
+        ],
+        "actionPatterns": [
+          "^Weigh Scale Entries$"
+        ],
+        "fieldPatterns": [],
+        "automationIdPatterns": []
+      },
+      "instructionTemplate": "",
+      "languages": [
+        "en-US",
+        "sv-SE",
+        "fr-FR",
+        "de-DE",
+        "es-ES",
+        "da-DK",
+        "fi-FI",
+        "nb-NO"
+      ],
+      "aliases": [],
+      "sourceIds": [
+        "aptean-wsc-entries-2025",
+        "aptean-wsc-released-production-2023"
+      ],
+      "verifiedRuntimeLocales": [
+        "en-US"
+      ],
+      "localizedExplanations": {
+        "en-US": "Opens Weigh Scale Entries for the selected line, listing each weighing with scale, weight from scale, tare, quantity, lot, license plate, expiration date and status. Pending entries still need to be transferred to item tracking; Transferred entries already are.",
+        "sv-SE": "Öppnar Weigh Scale Entries för vald rad med varje vägning: våg, vikt från våg, tara, kvantitet, parti, license plate, utgångsdatum och status. Poster med status Pending behöver fortfarande överföras till artikelspårningen; Transferred-poster är redan överförda.",
+        "fr-FR": "Ouvre Weigh Scale Entries pour la ligne sélectionnée, avec chaque pesée : balance, poids de la balance, tare, quantité, lot, plaque, date d’expiration et statut. Les écritures Pending doivent encore être transférées vers le suivi d’article ; les écritures Transferred le sont déjà.",
+        "de-DE": "Öffnet Weigh Scale Entries für die ausgewählte Zeile mit jeder Wägung: Waage, Gewicht von der Waage, Tara, Menge, Charge, License Plate, Ablaufdatum und Status. Posten mit Pending müssen noch in die Artikelverfolgung übertragen werden; Transferred-Posten sind bereits übertragen.",
+        "es-ES": "Abre Weigh Scale Entries para la línea seleccionada con cada pesada: báscula, peso de la báscula, tara, cantidad, lote, license plate, fecha de caducidad y estado. Los movimientos Pending aún deben transferirse al seguimiento de producto; los Transferred ya lo están.",
+        "da-DK": "Åbner Weigh Scale Entries for den valgte linje med hver vejning: vægt, vægt fra vægten, tara, antal, lot, license plate, udløbsdato og status. Poster med Pending skal stadig overføres til varesporing; Transferred-poster er allerede overført.",
+        "fi-FI": "Avaa valitun rivin Weigh Scale Entries -sivun, jossa näkyy jokainen punnitus: vaaka, vaa'an paino, taara, määrä, erä, license plate, vanhenemispäivä ja tila. Pending-tapahtumat on vielä siirrettävä nimikkeen seurantaan; Transferred-tapahtumat on jo siirretty.",
+        "nb-NO": "Åpner Weigh Scale Entries for valgt linje med hver veiing: vekt, vekt fra vekten, tara, antall, parti, license plate, utløpsdato og status. Poster med Pending må fortsatt overføres til varesporing; Transferred-poster er allerede overført."
+      }
+    },
+    {
+      "ruleId": "AptWeighScale.TransferWeighScaleEntries",
+      "taskType": "TransferWeighScaleEntries",
+      "semanticAction": "TransferWeighScaleEntries",
+      "entity": "WeighScaleEntry",
+      "priority": 1250,
+      "confidence": 0.95,
+      "match": {
+        "pagePatterns": [
+          "warehouse receipt",
+          "distributionslagerinleverans",
+          "lagerinleverans",
+          "distlagerutleverans",
+          "warehouse shipment"
+        ],
+        "actionPatterns": [
+          "^Transfer Weigh Scale Entries$"
+        ],
+        "fieldPatterns": [],
+        "automationIdPatterns": []
+      },
+      "instructionTemplate": "",
+      "languages": [
+        "en-US",
+        "sv-SE",
+        "fr-FR",
+        "de-DE",
+        "es-ES",
+        "da-DK",
+        "fi-FI",
+        "nb-NO"
+      ],
+      "aliases": [],
+      "sourceIds": [
+        "aptean-wsc-default-scales-receipts-2023",
+        "aptean-wsc-entries-2025"
+      ],
+      "verifiedRuntimeLocales": [
+        "en-US"
+      ],
+      "localizedExplanations": {
+        "en-US": "Transfers the pending weigh scale entries for the lot number to the item tracking lines of the warehouse document. A warehouse receipt with entries still in Pending status cannot be posted, so run this before posting and then check the tracking lines; the action itself does not post.",
+        "sv-SE": "Överför väntande weigh scale-poster för partinumret till lagerdokumentets artikelspårningsrader. En lagerinleverans med poster som fortfarande har status Pending kan inte bokföras, så kör åtgärden före bokföring och kontrollera sedan spårningsraderna; själva åtgärden bokför inget.",
+        "fr-FR": "Transfère les écritures de balance en attente du numéro de lot vers les lignes de suivi d’article du document entrepôt. Une réception entrepôt avec des écritures encore au statut Pending ne peut pas être validée ; exécutez donc cette action avant la validation, puis vérifiez les lignes de suivi. L’action ne valide rien.",
+        "de-DE": "Überträgt die offenen Waagenposten der Chargennummer in die Artikelverfolgungszeilen des Lagerbelegs. Ein Lagereingang mit Posten im Status Pending kann nicht gebucht werden; führen Sie die Aktion daher vor dem Buchen aus und prüfen Sie danach die Verfolgungszeilen. Die Aktion selbst bucht nichts.",
+        "es-ES": "Transfiere los movimientos de báscula pendientes del número de lote a las líneas de seguimiento de producto del documento de almacén. Una recepción de almacén con movimientos en estado Pending no se puede registrar, así que ejecute la acción antes de registrar y revise después las líneas de seguimiento; la acción no registra nada.",
+        "da-DK": "Overfører ventende vægtposter for lotnummeret til lagerdokumentets varesporingslinjer. En lagermodtagelse med poster, der stadig har status Pending, kan ikke bogføres, så kør handlingen før bogføring og kontrollér derefter sporingslinjerne; handlingen bogfører ikke selv.",
+        "fi-FI": "Siirtää eränumeron odottavat vaakatapahtumat varastoasiakirjan nimikkeen seurantariveille. Varastovastaanottoa, jolla on vielä Pending-tilaisia tapahtumia, ei voi kirjata, joten suorita toiminto ennen kirjausta ja tarkista sitten seurantarivit; toiminto ei itse kirjaa mitään.",
+        "nb-NO": "Overfører ventende vektposter for partinummeret til lagerdokumentets varesporingslinjer. Et lagermottak med poster som fortsatt har status Pending kan ikke bokføres, så kjør handlingen før bokføring og kontroller deretter sporingslinjene; handlingen bokfører ikke selv."
+      }
+    },
+    {
+      "ruleId": "AptWeighScale.ChangeEntryStatus",
+      "taskType": "ChangeWeighScaleEntryStatus",
+      "semanticAction": "ChangeWeighScaleEntryStatus",
+      "entity": "WeighScaleRegistration",
+      "priority": 1250,
+      "confidence": 0.95,
+      "match": {
+        "pagePatterns": [
+          "^Weigh Scale Registration$",
+          "^Weight Scale Registration$"
+        ],
+        "actionPatterns": [
+          "^Change Status$"
+        ],
+        "fieldPatterns": [],
+        "automationIdPatterns": []
+      },
+      "instructionTemplate": "",
+      "languages": [
+        "en-US",
+        "sv-SE",
+        "fr-FR",
+        "de-DE",
+        "es-ES",
+        "da-DK",
+        "fi-FI",
+        "nb-NO"
+      ],
+      "aliases": [],
+      "sourceIds": [
+        "aptean-wsc-entries-2025"
+      ],
+      "verifiedRuntimeLocales": [
+        "en-US"
+      ],
+      "localizedExplanations": {
+        "en-US": "After confirmation, resets a weigh scale entry from Transferred to Pending. Use it when the related item tracking lines were deleted or the entry contains a mistake; the entry must then be transferred again before the receipt can be posted.",
+        "sv-SE": "Återställer efter bekräftelse en weigh scale-post från Transferred till Pending. Använd den när tillhörande artikelspårningsrader har tagits bort eller posten innehåller ett fel; posten måste sedan överföras igen innan inleveransen kan bokföras.",
+        "fr-FR": "Après confirmation, remet une écriture de balance de Transferred à Pending. Utilisez-la lorsque les lignes de suivi d’article associées ont été supprimées ou que l’écriture contient une erreur ; elle doit ensuite être transférée à nouveau avant de pouvoir valider la réception.",
+        "de-DE": "Setzt einen Waagenposten nach Bestätigung von Transferred auf Pending zurück. Verwenden Sie dies, wenn die zugehörigen Artikelverfolgungszeilen gelöscht wurden oder der Posten einen Fehler enthält; danach muss der Posten erneut übertragen werden, bevor der Eingang gebucht werden kann.",
+        "es-ES": "Tras confirmar, devuelve un movimiento de báscula de Transferred a Pending. Úselo cuando se hayan eliminado las líneas de seguimiento relacionadas o el movimiento contenga un error; después debe transferirse de nuevo antes de poder registrar la recepción.",
+        "da-DK": "Nulstiller efter bekræftelse en vægtpost fra Transferred til Pending. Brug den, når de tilhørende varesporingslinjer er slettet, eller posten indeholder en fejl; posten skal derefter overføres igen, før modtagelsen kan bogføres.",
+        "fi-FI": "Palauttaa vahvistuksen jälkeen vaakatapahtuman tilasta Transferred tilaan Pending. Käytä tätä, kun siihen liittyvät nimikkeen seurantarivit on poistettu tai tapahtumassa on virhe; tapahtuma on sitten siirrettävä uudelleen ennen kuin vastaanoton voi kirjata.",
+        "nb-NO": "Tilbakestiller etter bekreftelse en vektpost fra Transferred til Pending. Bruk den når tilhørende varesporingslinjer er slettet eller posten inneholder en feil; posten må deretter overføres på nytt før mottaket kan bokføres."
+      }
+    },
+    {
+      "ruleId": "AptWeighbridge.GetWeight",
+      "taskType": "EnterMeasuredWeight",
+      "semanticAction": "EnterMeasuredWeight",
+      "entity": "WeighbridgeTicket",
+      "priority": 1250,
+      "confidence": 0.95,
+      "match": {
+        "pagePatterns": [
+          "^Weighbridge Ticket$"
+        ],
+        "actionPatterns": [
+          "^Get Weight$"
+        ],
+        "fieldPatterns": [],
+        "automationIdPatterns": []
+      },
+      "instructionTemplate": "",
+      "languages": [
+        "en-US",
+        "sv-SE",
+        "fr-FR",
+        "de-DE",
+        "es-ES",
+        "da-DK",
+        "fi-FI",
+        "nb-NO"
+      ],
+      "aliases": [],
+      "sourceIds": [
+        "aptean-wbr-weighbridge-ticket-2026"
+      ],
+      "verifiedRuntimeLocales": [
+        "en-US"
+      ],
+      "localizedExplanations": {
+        "en-US": "Reads the weighbridge scale into the field you select, Inbound Scale Reading or Outbound Scale Reading. If the field already has a value you are asked whether to replace it. The reading updates the calculated vehicle weight and Calc. Quantity To Receive; nothing is posted.",
+        "sv-SE": "Läser vågbryggans värde till det fält du väljer, Inbound Scale Reading eller Outbound Scale Reading. Om fältet redan har ett värde får du frågan om det ska ersättas. Avläsningen uppdaterar beräknad fordonsvikt och Calc. Quantity To Receive; inget bokförs.",
+        "fr-FR": "Lit le pont-bascule dans le champ choisi, Inbound Scale Reading ou Outbound Scale Reading. Si le champ contient déjà une valeur, une confirmation demande s’il faut la remplacer. La lecture met à jour le poids calculé du véhicule et Calc. Quantity To Receive ; rien n’est validé.",
+        "de-DE": "Liest die Fahrzeugwaage in das gewählte Feld, Inbound Scale Reading oder Outbound Scale Reading. Hat das Feld bereits einen Wert, werden Sie gefragt, ob er ersetzt werden soll. Die Wägung aktualisiert das berechnete Fahrzeuggewicht und Calc. Quantity To Receive; es wird nichts gebucht.",
+        "es-ES": "Lee la báscula de camiones en el campo que elija, Inbound Scale Reading u Outbound Scale Reading. Si el campo ya tiene un valor, se pregunta si debe reemplazarse. La lectura actualiza el peso calculado del vehículo y Calc. Quantity To Receive; no se registra nada.",
+        "da-DK": "Læser brovægtens værdi ind i det felt, du vælger, Inbound Scale Reading eller Outbound Scale Reading. Har feltet allerede en værdi, bliver du spurgt, om den skal erstattes. Aflæsningen opdaterer den beregnede køretøjsvægt og Calc. Quantity To Receive; intet bogføres.",
+        "fi-FI": "Lukee ajoneuvovaa'an arvon valitsemaasi kenttään, Inbound Scale Reading tai Outbound Scale Reading. Jos kentässä on jo arvo, sinulta kysytään, korvataanko se. Lukema päivittää lasketun ajoneuvon painon ja Calc. Quantity To Receive -arvon; mitään ei kirjata.",
+        "nb-NO": "Leser verdien fra brovekten inn i feltet du velger, Inbound Scale Reading eller Outbound Scale Reading. Har feltet allerede en verdi, blir du spurt om den skal erstattes. Avlesningen oppdaterer beregnet kjøretøyvekt og Calc. Quantity To Receive; ingenting bokføres."
+      }
+    },
+    {
+      "ruleId": "AptWeighbridge.CreateInboundRegister",
+      "taskType": "CreateInboundRegister",
+      "semanticAction": "CreateInboundRegister",
+      "entity": "WeighbridgeTicket",
+      "priority": 1250,
+      "confidence": 0.95,
+      "match": {
+        "pagePatterns": [
+          "^Weighbridge Ticket$"
+        ],
+        "actionPatterns": [
+          "^Create Inbound Register$"
+        ],
+        "fieldPatterns": [],
+        "automationIdPatterns": []
+      },
+      "instructionTemplate": "",
+      "languages": [
+        "en-US",
+        "sv-SE",
+        "fr-FR",
+        "de-DE",
+        "es-ES",
+        "da-DK",
+        "fi-FI",
+        "nb-NO"
+      ],
+      "aliases": [],
+      "sourceIds": [
+        "aptean-wbr-register-inbound-outbound-weight-2026",
+        "aptean-wbr-weighbridge-ticket-2026"
+      ],
+      "verifiedRuntimeLocales": [
+        "en-US"
+      ],
+      "localizedExplanations": {
+        "en-US": "Registers the inbound weight for a weighbridge ticket with Unknown Tare Receiving. After confirmation the source document is posted, license plates are created for the received items, detailed warehouse entries are created and the ticket status becomes Inbound Registered. It requires Aptean Beverage Advanced Warehouse Management and lot- and license-plate-tracked items.",
+        "sv-SE": "Registrerar ingående vikt för en vågbryggebiljett med Unknown Tare Receiving. Efter bekräftelse bokförs källdokumentet, license plates skapas för mottagna artiklar, detaljerade lagerposter skapas och biljettens status blir Inbound Registered. Kräver Aptean Beverage Advanced Warehouse Management och artiklar med parti- och license plate-spårning.",
+        "fr-FR": "Enregistre le poids entrant d’un ticket de pont-bascule avec Unknown Tare Receiving. Après confirmation, le document source est validé, des plaques sont créées pour les articles reçus, des écritures entrepôt détaillées sont créées et le statut devient Inbound Registered. Nécessite Aptean Beverage Advanced Warehouse Management et des articles suivis par lot et par plaque.",
+        "de-DE": "Registriert das Eingangsgewicht eines Wiegescheins mit Unknown Tare Receiving. Nach Bestätigung wird der Herkunftsbeleg gebucht, License Plates werden für die empfangenen Artikel erstellt, detaillierte Lagerposten entstehen und der Status wird Inbound Registered. Erfordert Aptean Beverage Advanced Warehouse Management sowie chargen- und License-Plate-verfolgte Artikel.",
+        "es-ES": "Registra el peso de entrada de un ticket de báscula con Unknown Tare Receiving. Tras confirmar, se registra el documento de origen, se crean license plates para los productos recibidos, se generan movimientos de almacén detallados y el estado pasa a Inbound Registered. Requiere Aptean Beverage Advanced Warehouse Management y productos con seguimiento por lote y license plate.",
+        "da-DK": "Registrerer indgående vægt for en brovægtsbillet med Unknown Tare Receiving. Efter bekræftelse bogføres kildedokumentet, der oprettes license plates for de modtagne varer og detaljerede lagerposter, og status bliver Inbound Registered. Kræver Aptean Beverage Advanced Warehouse Management og varer med lot- og license plate-sporing.",
+        "fi-FI": "Rekisteröi saapuvan painon ajoneuvovaakalipulle, jossa on Unknown Tare Receiving. Vahvistuksen jälkeen lähdeasiakirja kirjataan, vastaanotetuille nimikkeille luodaan license platet ja yksityiskohtaiset varastotapahtumat, ja tilaksi tulee Inbound Registered. Edellyttää Aptean Beverage Advanced Warehouse Managementia sekä erä- ja license plate -seurattuja nimikkeitä.",
+        "nb-NO": "Registrerer inngående vekt for en brovektbillett med Unknown Tare Receiving. Etter bekreftelse bokføres kildedokumentet, det opprettes license plates for mottatte varer og detaljerte lagerposter, og statusen blir Inbound Registered. Krever Aptean Beverage Advanced Warehouse Management og varer med parti- og license plate-sporing."
+      }
+    },
+    {
+      "ruleId": "AptWeighbridge.CreateOutboundRegister",
+      "taskType": "CreateOutboundRegister",
+      "semanticAction": "CreateOutboundRegister",
+      "entity": "WeighbridgeTicket",
+      "priority": 1250,
+      "confidence": 0.95,
+      "match": {
+        "pagePatterns": [
+          "^Weighbridge Ticket$"
+        ],
+        "actionPatterns": [
+          "^Create Outbound Register$"
+        ],
+        "fieldPatterns": [],
+        "automationIdPatterns": []
+      },
+      "instructionTemplate": "",
+      "languages": [
+        "en-US",
+        "sv-SE",
+        "fr-FR",
+        "de-DE",
+        "es-ES",
+        "da-DK",
+        "fi-FI",
+        "nb-NO"
+      ],
+      "aliases": [],
+      "sourceIds": [
+        "aptean-wbr-register-inbound-outbound-weight-2026",
+        "aptean-wbr-weighbridge-ticket-2026"
+      ],
+      "verifiedRuntimeLocales": [
+        "en-US"
+      ],
+      "localizedExplanations": {
+        "en-US": "Registers the outbound (empty vehicle) weight after the inbound registration. Enter Outbound Scale Reading, Outbound Packaging Tare and Outbound Packaging Count first. After confirmation the source document is posted, detailed warehouse entries with license plates are created and the status becomes Outbound Registered.",
+        "sv-SE": "Registrerar utgående vikt (tomt fordon) efter den ingående registreringen. Ange först Outbound Scale Reading, Outbound Packaging Tare och Outbound Packaging Count. Efter bekräftelse bokförs källdokumentet, detaljerade lagerposter med license plates skapas och statusen blir Outbound Registered.",
+        "fr-FR": "Enregistre le poids sortant (véhicule vide) après l’enregistrement entrant. Saisissez d’abord Outbound Scale Reading, Outbound Packaging Tare et Outbound Packaging Count. Après confirmation, le document source est validé, des écritures entrepôt détaillées avec plaques sont créées et le statut devient Outbound Registered.",
+        "de-DE": "Registriert das Ausgangsgewicht (leeres Fahrzeug) nach der Eingangsregistrierung. Geben Sie zuerst Outbound Scale Reading, Outbound Packaging Tare und Outbound Packaging Count ein. Nach Bestätigung wird der Herkunftsbeleg gebucht, detaillierte Lagerposten mit License Plates entstehen und der Status wird Outbound Registered.",
+        "es-ES": "Registra el peso de salida (vehículo vacío) después del registro de entrada. Introduzca primero Outbound Scale Reading, Outbound Packaging Tare y Outbound Packaging Count. Tras confirmar, se registra el documento de origen, se crean movimientos de almacén detallados con license plates y el estado pasa a Outbound Registered.",
+        "da-DK": "Registrerer udgående vægt (tomt køretøj) efter den indgående registrering. Angiv først Outbound Scale Reading, Outbound Packaging Tare og Outbound Packaging Count. Efter bekræftelse bogføres kildedokumentet, der oprettes detaljerede lagerposter med license plates, og status bliver Outbound Registered.",
+        "fi-FI": "Rekisteröi lähtevän painon (tyhjä ajoneuvo) saapuvan rekisteröinnin jälkeen. Syötä ensin Outbound Scale Reading, Outbound Packaging Tare ja Outbound Packaging Count. Vahvistuksen jälkeen lähdeasiakirja kirjataan, luodaan yksityiskohtaiset varastotapahtumat license plateineen ja tilaksi tulee Outbound Registered.",
+        "nb-NO": "Registrerer utgående vekt (tomt kjøretøy) etter den inngående registreringen. Angi først Outbound Scale Reading, Outbound Packaging Tare og Outbound Packaging Count. Etter bekreftelse bokføres kildedokumentet, det opprettes detaljerte lagerposter med license plates, og statusen blir Outbound Registered."
+      }
+    },
+    {
+      "ruleId": "AptWeighbridge.PostQuantityToReceive",
+      "taskType": "PostQuantityToReceive",
+      "semanticAction": "PostQuantityToReceive",
+      "entity": "WeighbridgeTicket",
+      "priority": 1250,
+      "confidence": 0.95,
+      "match": {
+        "pagePatterns": [
+          "^Weighbridge Ticket$"
+        ],
+        "actionPatterns": [
+          "^Post Quantity To Receive$"
+        ],
+        "fieldPatterns": [],
+        "automationIdPatterns": []
+      },
+      "instructionTemplate": "",
+      "languages": [
+        "en-US",
+        "sv-SE",
+        "fr-FR",
+        "de-DE",
+        "es-ES",
+        "da-DK",
+        "fi-FI",
+        "nb-NO"
+      ],
+      "aliases": [],
+      "sourceIds": [
+        "aptean-wbr-posting-2023",
+        "aptean-wbr-weighbridge-ticket-2026"
+      ],
+      "verifiedRuntimeLocales": [
+        "en-US"
+      ],
+      "localizedExplanations": {
+        "en-US": "Posts the weighbridge ticket's quantity to the released source document and sets the ticket status to Posted. The ticket must have status New, both scale readings with the outbound reading lower than the inbound one, and non-zero Quantity To Receive and Split %; only one ticket can be posted per purchase order line.",
+        "sv-SE": "Bokför vågbryggebiljettens kvantitet på det frisläppta källdokumentet och sätter biljettens status till Posted. Biljetten måste ha status New, båda vågavläsningarna med lägre utgående än ingående värde samt Quantity To Receive och Split % skilda från noll; endast en biljett kan bokföras per inköpsorderrad.",
+        "fr-FR": "Valide la quantité du ticket de pont-bascule sur le document source lancé et passe le statut du ticket à Posted. Le ticket doit être au statut New, avoir les deux pesées avec une pesée sortante inférieure à l’entrante, et des valeurs Quantity To Receive et Split % non nulles ; un seul ticket peut être validé par ligne de commande d’achat.",
+        "de-DE": "Bucht die Menge des Wiegescheins auf den freigegebenen Herkunftsbeleg und setzt den Status auf Posted. Der Wiegeschein muss den Status New haben, beide Wägungen enthalten, wobei die Ausgangswägung kleiner als die Eingangswägung ist, sowie Quantity To Receive und Split % ungleich null; pro Bestellzeile kann nur ein Wiegeschein gebucht werden.",
+        "es-ES": "Registra la cantidad del ticket de báscula en el documento de origen lanzado y cambia el estado del ticket a Posted. El ticket debe tener estado New, ambas lecturas con la de salida menor que la de entrada, y Quantity To Receive y Split % distintos de cero; solo se puede registrar un ticket por línea de pedido de compra.",
+        "da-DK": "Bogfører brovægtsbillettens antal på det frigivne kildedokument og sætter billettens status til Posted. Billetten skal have status New, begge vejninger med lavere udgående end indgående værdi samt Quantity To Receive og Split % forskellige fra nul; der kan kun bogføres én billet pr. købsordrelinje.",
+        "fi-FI": "Kirjaa ajoneuvovaakalipun määrän vapautettuun lähdeasiakirjaan ja asettaa lipun tilaksi Posted. Lipun tilan on oltava New, molemmat punnitukset on annettava niin, että lähtevä on saapuvaa pienempi, ja Quantity To Receive sekä Split % eivät saa olla nollia; kullekin ostotilausriville voi kirjata vain yhden lipun.",
+        "nb-NO": "Bokfører brovektbillettens antall på det frigitte kildedokumentet og setter billettens status til Posted. Billetten må ha status New, begge veiingene med lavere utgående enn inngående verdi, og Quantity To Receive og Split % forskjellig fra null; bare én billett kan bokføres per innkjøpsordrelinje."
+      }
+    }
+  ],
+  "sources": [
+    {
+      "sourceType": "vendor-documentation",
+      "accessedDate": "2026-10-26",
+      "sourceId": "aptean-wsc-introduction-2025",
+      "title": "Aptean Weigh Scale — Introduction",
+      "sourceUri": "https://erpdocs.apteancloud.com/bc/docs/WSC/introduction/",
+      "articleDate": "2025-05-29",
+      "appliesTo": "Aptean Weigh Scale (WSC) extension; works together with Aptean Scale Integration (SCI).",
+      "fields": [
+        "Connects warehouse receipt and shipment documents to electronic scales set up in Aptean Scale Integration.",
+        "Lets users choose the unit of measure used for weighing on warehouse receipts and shipments.",
+        "Registers log entries created when Get Weight runs in Scale Integration, removing manual entry.",
+        "A preferred measurement system can be the default for specific locations."
+      ],
+      "documentedCaptions": [
+        "Get Weight"
+      ]
+    },
+    {
+      "sourceType": "vendor-documentation",
+      "accessedDate": "2026-10-26",
+      "sourceId": "aptean-wsc-setup-2026",
+      "title": "Aptean Weigh Scale — Setup",
+      "sourceUri": "https://erpdocs.apteancloud.com/bc/docs/WSC/setup/",
+      "articleDate": "2026-02-25",
+      "appliesTo": "Required setups for the Aptean Weigh Scale extension.",
+      "fields": [
+        "Required setups: Manage permission sets, Set up weigh scale, Weigh scale user setup."
+      ],
+      "documentedCaptions": []
+    },
+    {
+      "sourceType": "vendor-documentation",
+      "accessedDate": "2026-10-26",
+      "sourceId": "aptean-wsc-permission-sets-2024",
+      "title": "Aptean Weigh Scale — Manage permission sets",
+      "sourceUri": "https://erpdocs.apteancloud.com/bc/docs/WSC/manage-permission-sets/",
+      "articleDate": "2024-11-05",
+      "appliesTo": "Permission sets for the Aptean Weigh Scale extension.",
+      "fields": [
+        "System permission set WEIGHSCALE122FDW (Direct) grants read, modify, delete and create permissions.",
+        "System permission set WSCBASIC122FDW (Indirect) is used together with other permission sets.",
+        "Assign a permission set on the User Card, User Permission Sets FastTab, Permission Set field."
+      ],
+      "documentedCaptions": [
+        "Users",
+        "User Card",
+        "User Permission Sets",
+        "Permission Set"
+      ]
+    },
+    {
+      "sourceType": "vendor-documentation",
+      "accessedDate": "2026-10-26",
+      "sourceId": "aptean-wsc-set-up-weigh-scale-2026",
+      "title": "Aptean Weigh Scale — Set up weigh scale",
+      "sourceUri": "https://erpdocs.apteancloud.com/bc/docs/WSC/set-up-weigh-scale/",
+      "articleDate": "2026-02-25",
+      "appliesTo": "Weigh Scale Setup page, General FastTab.",
+      "fields": [
+        "Use Lot No. for Receipt: Blank leaves Lot No. empty when a receipt registration is reopened after Save or Save and Close; Last Weight Scale Entry fills the lot number of the last weigh scale entry.",
+        "Use Packaging Code: Blank uses the item card shipping container/unit setup if present; Last Weight Scale Entry uses Item Bound setups from the item and Order Bound or missing setups from the last weigh scale entry."
+      ],
+      "documentedCaptions": [
+        "Weigh Scale Setup",
+        "Use Lot No. for Receipt",
+        "Use Packaging Code",
+        "Save",
+        "Save and Close"
+      ]
+    },
+    {
+      "sourceType": "vendor-documentation",
+      "accessedDate": "2026-10-26",
+      "sourceId": "aptean-wsc-user-setup-2026",
+      "title": "Aptean Weigh Scale — Weigh scale user setup",
+      "sourceUri": "https://erpdocs.apteancloud.com/bc/docs/WSC/weigh-scale-user-setup/",
+      "articleDate": "2026-02-25",
+      "appliesTo": "Weigh Scale User Setup page.",
+      "fields": [
+        "The scale code is filled from the user's default setup, otherwise from the location default, and can be changed manually.",
+        "Fields: User ID, Location Code, Scale Code, and Purpose (default receipt or default shipment weigh scale)."
+      ],
+      "documentedCaptions": [
+        "Weigh Scale User Setup",
+        "User ID",
+        "Location Code",
+        "Scale Code",
+        "Purpose"
+      ]
+    },
+    {
+      "sourceType": "vendor-documentation",
+      "accessedDate": "2026-10-26",
+      "sourceId": "aptean-wsc-default-scales-locations-2023",
+      "title": "Aptean Weigh Scale — Assign default scales to locations",
+      "sourceUri": "https://erpdocs.apteancloud.com/bc/docs/WSC/assign-default-scales-to-locations/",
+      "articleDate": "2023-09-29",
+      "appliesTo": "Location Card, General FastTab.",
+      "fields": [
+        "Receipt Default Weigh Scale and Shipment Default Weigh Scale are assigned from Location Scale Integration Setup.",
+        "With Use Packaging for Receipt/Shipment Weigh Scale on the item card, order-bound shipping containers and units are updated from transferred weigh scale entries.",
+        "More than one scale can be assigned to one location."
+      ],
+      "documentedCaptions": [
+        "Location Card",
+        "Receipt Default Weigh Scale",
+        "Shipment Default Weigh Scale",
+        "Location Scale Integration Setup"
+      ]
+    },
+    {
+      "sourceType": "vendor-documentation",
+      "accessedDate": "2026-10-26",
+      "sourceId": "aptean-wsc-default-scales-receipts-2023",
+      "title": "Aptean Weigh Scale — Assign default scales to warehouse receipts",
+      "sourceUri": "https://erpdocs.apteancloud.com/bc/docs/WSC/assign-default-scales-to-warehouse-receipts/",
+      "articleDate": "2023-09-29",
+      "appliesTo": "Warehouse Receipt page with the Aptean Weigh Scale extension.",
+      "fields": [
+        "Receipt Default Weigh Scale is filled from the location and can be changed through Location Scale Integration Setup.",
+        "Lines FastTab: Line > Register Weight opens the weigh scale registration; Line > Weigh Scale Entries lists the entries.",
+        "Related > Transfer Weigh Scale Entries moves Pending entries for the lot number to the item tracking line.",
+        "Registration cannot open without lot or license plate tracking, or for a non-catch-weight item whose unit is not in the scale UOM setup.",
+        "A warehouse receipt with Pending weigh scale entries cannot be posted."
+      ],
+      "documentedCaptions": [
+        "Warehouse Receipt",
+        "Receipt Default Weigh Scale",
+        "Register Weight",
+        "Weigh Scale Entries",
+        "Transfer Weigh Scale Entries"
+      ]
+    },
+    {
+      "sourceType": "vendor-documentation",
+      "accessedDate": "2026-10-26",
+      "sourceId": "aptean-wsc-default-scales-shipments-2023",
+      "title": "Aptean Weigh Scale — Assign default scales to warehouse shipment",
+      "sourceUri": "https://erpdocs.apteancloud.com/bc/docs/WSC/assign-default-scales-to-warehouse-shipment/",
+      "articleDate": "2023-09-29",
+      "appliesTo": "Warehouse Shipment page with the Aptean Weigh Scale extension.",
+      "fields": [
+        "Shipment Default Weigh Scale is assigned through Location Scale Integration Setup.",
+        "Lines FastTab: Line > Register Weight opens Weigh Scale Registration; Line > Weigh Scale Entries lists the entries.",
+        "Registration cannot open without lot or license plate tracking, for a non-catch-weight item whose unit is not in the scale UOM setup, or before the related warehouse pick is registered."
+      ],
+      "documentedCaptions": [
+        "Warehouse Shipment",
+        "Shipment Default Weigh Scale",
+        "Register Weight",
+        "Weigh Scale Entries",
+        "Release"
+      ]
+    },
+    {
+      "sourceType": "vendor-documentation",
+      "accessedDate": "2026-10-26",
+      "sourceId": "aptean-wsc-registration-2026",
+      "title": "Aptean Weigh Scale — Weigh scale registration",
+      "sourceUri": "https://erpdocs.apteancloud.com/bc/docs/WSC/weigh-scale-registration/",
+      "articleDate": "2026-04-22",
+      "appliesTo": "Weigh Scale Registration page opened by Register Weight on a warehouse receipt or shipment.",
+      "fields": [
+        "General FastTab: Item No., Item Description, Weigh Scale, License Plate No., Lot No., Expiration Date, Location Code, Variant Code.",
+        "Shipping FastTab: Shipping Container Code, No. of Shipping Containers, Shipping Unit Code, No. of Shipping Units, Tare Weight.",
+        "Weight FastTab: Quantity, Weight From Scale, Weight Quantity To Handle (Weight From Scale minus Tare Weight), Unit of Measure.",
+        "Totals FastTab: Total Quantity Weighted, Total Quantity to Receive, Total Weight Quantity Weighted, Item Tracking Quantity.",
+        "Actions: Get Weight, Fill Weight Manually, Assign Lot No. (Existing Lot or New Lot), Create License Plate, Assign Lot Attributes, Save and Print Labels, Save.",
+        "Use Expiration Dates sets the expiration date for a new lot; Require Expiration Date Entry requires manual entry.",
+        "Catch-weight items allow under- and over-delivery for Weight Quantity to Handle."
+      ],
+      "documentedCaptions": [
+        "Weigh Scale Registration",
+        "Get Weight",
+        "Fill Weight Manually",
+        "Assign Lot No.",
+        "Existing Lot",
+        "New Lot",
+        "Create License Plate",
+        "Assign Lot Attributes",
+        "Lot Attribute Values",
+        "Save and Print Labels",
+        "Save",
+        "Weight From Scale",
+        "Tare Weight",
+        "Weight Quantity To Handle"
+      ]
+    },
+    {
+      "sourceType": "vendor-documentation",
+      "accessedDate": "2026-10-26",
+      "sourceId": "aptean-wsc-entries-2025",
+      "title": "Aptean Weigh Scale — Weigh scale entries",
+      "sourceUri": "https://erpdocs.apteancloud.com/bc/docs/WSC/weigh-scale-entries/",
+      "articleDate": "2025-09-24",
+      "appliesTo": "Weigh Scale Entries page for warehouse receipts and shipments.",
+      "fields": [
+        "Fields: Entry No., Item No., Weight Scale, Weight From Scale, Unit of Measure, Tare Weight, Quantity, Lot No., License Plate No., Expiration Date, Status.",
+        "Status is Pending or Transferred; registering a pick creates posted entries with status Transferred.",
+        "Change Status on the Weigh Scale Registration page resets a Transferred entry to Pending after confirmation, for example when item tracking lines were deleted.",
+        "Posted Weigh Scale Entries is available from Registration Pick."
+      ],
+      "documentedCaptions": [
+        "Weigh Scale Entries",
+        "Weigh Scale Registration",
+        "Change Status",
+        "Posted Weigh Scale Entries"
+      ]
+    },
+    {
+      "sourceType": "vendor-documentation",
+      "accessedDate": "2026-10-26",
+      "sourceId": "aptean-wsc-input-output-2023",
+      "title": "Aptean Weigh Scale — Input and output registration",
+      "sourceUri": "https://erpdocs.apteancloud.com/bc/docs/WSC/input-registration/",
+      "articleDate": "2023-09-29",
+      "appliesTo": "Shop Floor Production Power App with the Aptean Weigh Scale extension.",
+      "fields": [
+        "Input and output pages offer Weight from Scale, Tare Weight and a non-editable Weight Quantity.",
+        "Get Weight reads the scale through Scale Integration; Fill Weight Manually allows manual entry; Save creates a Transferred weigh scale entry linked to the production order component line.",
+        "Entries are visible from Released Production Order > Prod. Order Components > Related > Line > Weigh Scale Entries.",
+        "With Aptean Catch Weight installed, a Quantity field associates the captured weight."
+      ],
+      "documentedCaptions": [
+        "Get Weight",
+        "Fill Weight Manually",
+        "Save",
+        "Weigh Scale Entries"
+      ]
+    },
+    {
+      "sourceType": "vendor-documentation",
+      "accessedDate": "2026-10-26",
+      "sourceId": "aptean-wsc-work-center-2023",
+      "title": "Aptean Weigh Scale — Assign default scales to Work Center",
+      "sourceUri": "https://erpdocs.apteancloud.com/bc/docs/WSC/assign-default-scales-to-work-center/",
+      "articleDate": "2023-09-29",
+      "appliesTo": "Work Center Card and Machine Center Card, Default Scale FastTab.",
+      "fields": [
+        "Default Consumption Scale and Default Output Scale are assigned from Location Scale Integration Setup filtered by the work center location."
+      ],
+      "documentedCaptions": [
+        "Work Center Card",
+        "Default Scale",
+        "Default Consumption Scale",
+        "Default Output Scale"
+      ]
+    },
+    {
+      "sourceType": "vendor-documentation",
+      "accessedDate": "2026-10-26",
+      "sourceId": "aptean-wsc-released-production-2023",
+      "title": "Aptean Weigh Scale — Register weigh scale entries for Released Production Order",
+      "sourceUri": "https://erpdocs.apteancloud.com/bc/docs/WSC/register-weigh-scale-entries-for-released-production-order/",
+      "articleDate": "2023-09-29",
+      "appliesTo": "Released Production Order with Aptean Shop Floor Production.",
+      "fields": [
+        "Lines FastTab: Line > Weigh Scale Entries shows all registered weigh scale entries for the production order."
+      ],
+      "documentedCaptions": [
+        "Released Production Order",
+        "Weigh Scale Entries"
+      ]
+    },
+    {
+      "sourceType": "vendor-documentation",
+      "accessedDate": "2026-10-26",
+      "sourceId": "aptean-wsc-integrations-2025",
+      "title": "Aptean Weigh Scale — Integrations",
+      "sourceUri": "https://erpdocs.apteancloud.com/bc/docs/WSC/integrations/",
+      "articleDate": "2025-09-24",
+      "appliesTo": "Extensions that integrate with Aptean Weigh Scale.",
+      "fields": [
+        "Catch Weight (CAW), Labeling (LBL), License Plating (LPL), Packaging (PAC), Scale Integration (SCI), Shop Floor Production (SFP) and Mobile Warehouse Registration (MWR)."
+      ],
+      "documentedCaptions": []
+    },
+    {
+      "sourceType": "vendor-documentation",
+      "accessedDate": "2026-10-26",
+      "sourceId": "aptean-sci-scales-assignments-2023",
+      "title": "Aptean Scale Integration — Scales assignments",
+      "sourceUri": "https://erpdocs.apteancloud.com/bc/docs/SCI/scales-assignments/",
+      "articleDate": "2023-08-01",
+      "appliesTo": "Scales page in Aptean Scale Integration; scales are read through PrintNode.",
+      "fields": [
+        "Fields: Code, Description, Scale PrintNode ID, Scale Device name, Scale PrintNode Computer ID, Scale Verification.",
+        "A scale is only available as Scale Code on Location Scale Integration Setup after Scale Verification is Verified."
+      ],
+      "documentedCaptions": [
+        "Scales",
+        "Scale Verification",
+        "Location Scale Integration Setup"
+      ]
+    },
+    {
+      "sourceType": "vendor-documentation",
+      "accessedDate": "2026-10-26",
+      "sourceId": "aptean-wbr-weighbridge-ticket-2026",
+      "title": "Aptean Weighbridge Receiving — Weighbridge Ticket",
+      "sourceUri": "https://erpdocs.apteancloud.com/bc/docs/WBR/weighbridge-ticket/",
+      "articleDate": "2026-07-22",
+      "appliesTo": "Aptean Weighbridge Receiving (WBR). Field availability depends on enabled extensions, item tracking, location setup and tenant version.",
+      "fields": [
+        "General FastTab includes Source Type, Source No., Status, Weighbridge Base UOM, Unknown Tare Receiving, Source Location, Scale Code and External Ticket No.",
+        "Inbound/Outbound FastTab: Inbound Scale Reading, Handling Unit weight and count, packaging weights, calculated vehicle weights, Calc. Quantity To Receive and Quantity To Receive.",
+        "Lines FastTab: Split %, source line, item, quantity, unit, lot, Quantity to Receive and inbound packaging tare/count/weight.",
+        "Logistics FastTab: weigh-in/out date and time, vehicle and trailer registration, driver name.",
+        "Actions > Get Weight reads either Inbound Scale Reading or Outbound Scale Reading and asks before replacing an existing value."
+      ],
+      "documentedCaptions": [
+        "Weighbridge Ticket",
+        "Weighbridge Tickets",
+        "Get Weight",
+        "Inbound Scale Reading",
+        "Outbound Scale Reading",
+        "Handling Unit weight",
+        "Handling Unit Count",
+        "Location Scale Integration Setup"
+      ]
+    },
+    {
+      "sourceType": "vendor-documentation",
+      "accessedDate": "2026-10-26",
+      "sourceId": "aptean-wbr-register-inbound-outbound-weight-2026",
+      "title": "Aptean Weighbridge Receiving — Register inbound and outbound weight",
+      "sourceUri": "https://erpdocs.apteancloud.com/bc/docs/WBR/register-inbound-and-outbound-weight/",
+      "articleDate": "2026-07-22",
+      "appliesTo": "Requires Unknown Tare Receiving, Aptean Beverage Advanced Warehouse Management enabled on Feature Control, and lot- and license-plate-tracked items.",
+      "fields": [
+        "Create Inbound Register posts the source document, creates license plates and detailed warehouse entries, and sets status Inbound Registered.",
+        "Create Outbound Register requires the inbound registration, posts the source document, creates detailed warehouse entries with license plates and sets status Outbound Registered.",
+        "Handling Unit Count below zero raises an error."
+      ],
+      "documentedCaptions": [
+        "Create Inbound Register",
+        "Create Outbound Register",
+        "Outbound Packaging Tare",
+        "Outbound Packaging Count"
+      ]
+    },
+    {
+      "sourceType": "vendor-documentation",
+      "accessedDate": "2026-10-26",
+      "sourceId": "aptean-wbr-posting-2023",
+      "title": "Aptean Weighbridge Receiving — Posting of weighbridge ticket",
+      "sourceUri": "https://erpdocs.apteancloud.com/bc/docs/WBR/posting-of-weighbridge-ticket/",
+      "articleDate": "2023-11-29",
+      "appliesTo": "Weighbridge tickets with Unknown Tare Receiving turned off.",
+      "fields": [
+        "Requires status New, a released source document with at least one line, both scale readings with outbound lower than inbound, and non-zero Quantity To Receive and Split %.",
+        "Actions > Post Quantity To Receive posts the source document and sets the ticket status to Posted.",
+        "Only one weighbridge ticket can be posted against a purchase order line."
+      ],
+      "documentedCaptions": [
+        "Post Quantity To Receive"
+      ]
+    }
+  ]
+}

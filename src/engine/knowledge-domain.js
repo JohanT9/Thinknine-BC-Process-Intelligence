@@ -79,6 +79,23 @@ function (consolidation, explanationCatalog, pageIdentification) {
         currentPageObjectId: String(pageObjectId) } };
   }
 
+  const captionEntityCaches = new WeakMap();
+  function captionEntity(caption, language, packs) {
+    const cacheOwner = Array.isArray(packs) ? packs : captionEntity;
+    if (!captionEntityCaches.has(cacheOwner)) captionEntityCaches.set(cacheOwner, new Map());
+    const captionEntityCache = captionEntityCaches.get(cacheOwner);
+    const key = `${text(language)}\u001f${text(caption)}`;
+    if (captionEntityCache.has(key)) return captionEntityCache.get(key);
+    let entity = "";
+    try {
+      entity = text(pageIdentification?.resolvePageIdentity?.({ pageCaption: caption,
+        language }, packs)?.entity).trim().toLowerCase();
+    } catch { /* page identification is optional evidence */ }
+    if (captionEntityCache.size >= 2048) captionEntityCache.clear();
+    captionEntityCache.set(key, entity);
+    return entity;
+  }
+
   function score(rule, task, packs = []) {
     const match = rule.match || {};
     const context = task.context || {};
@@ -101,13 +118,19 @@ function (consolidation, explanationCatalog, pageIdentification) {
     const checks = [["pagePatterns", pageCaption],
       ["actionPatterns", task.actionCaption], ["fieldPatterns", task.fieldCaption],
       ["automationIdPatterns", task.automationId]];
-    // An identified entity may stand in for the page only when the caption is
-    // missing or unreliable (for example a company name used as page title); a
-    // confidently identified, different page must not be overridden.
+    // An identified entity may stand in for the page unless the caption is a
+    // reliably identified page of a different entity. Missing, low-confidence or
+    // unidentifiable captions (for example a company name used as page title) and
+    // other pages of the same entity (card versus list) do not contradict it.
     const pageConfidence = Number(task.pageIdentificationConfidence ??
       context.pageIdentificationConfidence ?? NaN);
-    const unreliablePageCaption = !pageCaption ||
-      (Number.isFinite(pageConfidence) && pageConfidence < 0.6);
+    const entityStandsInForPage = () => {
+      if (!pageCaption || (Number.isFinite(pageConfidence) && pageConfidence < 0.6)) return true;
+      const identified = captionEntity(pageCaption, task.language || context.language, packs);
+      if (identified) return identified === ruleEntity;
+      // An unmapped caption only yields to the entity when nobody vouched for it.
+      return !Number.isFinite(pageConfidence);
+    };
     let value = 0; let matched = 0; let required = 0;
     for (const [key, candidate] of checks) {
       const declared = match[key] || [];
@@ -117,7 +140,7 @@ function (consolidation, explanationCatalog, pageIdentification) {
         observedEntity === ruleEntity;
       if (patternsMatch(declared, key === "pagePatterns" ? pageCaption : candidate) ||
           (key === "pagePatterns" && pageResolvedByObjectId) ||
-          (pageResolvedByEntity && unreliablePageCaption)) {
+          (pageResolvedByEntity && entityStandsInForPage())) {
         matched += 1; value += 25;
       }
     }
@@ -254,7 +277,7 @@ function (consolidation, explanationCatalog, pageIdentification) {
     // purchase order) are different business operations and must retain their
     // own instruction instead of being rewritten as a new record.
     return /^(?:(?:ny(?:tt)?(?:\s+(?:post|order|faktura|kreditnota))?)|(?:new(?:\s+(?:record|order|invoice|credit memo))?)|(?:skapa ny|create new|nouveau|nouvelle|neu(?:e|er|es)?|nuevo|nueva|uusi|opret|opprett(?:e)?))$/iu
-      .test(text(value).trim());
+      .test(text(value).trim().replace(/\.$/u, ""));
   }
   function contextualCreateInstruction(rule, task) {
     if (!/^Create/u.test(String(rule?.taskType || rule?.semanticAction || ""))) return "";
@@ -287,6 +310,11 @@ function (consolidation, explanationCatalog, pageIdentification) {
       "Core.DeleteRecord", "Core.NavigateBack", "Core.Lookup", "Core.ChangeDate",
       "Core.ConfirmYes", "Core.ConfirmNo"]
       .includes(rule.ruleId);
+    // A bare Yes/No says nothing about what was confirmed; only explain it when
+    // the page or entity gives the decision context.
+    if (["Core.ConfirmYes", "Core.ConfirmNo"].includes(rule.ruleId) && !observedEntity &&
+        !(task.knowledgePageCaption || task.pageCaption || task.context?.currentPageCaption ||
+          task.context?.previousPageCaption)) return false;
     if (rule.ruleId === "Core.CreateNew" && !observedEntity &&
         !(task.knowledgePageCaption || task.pageCaption || task.context?.currentPageCaption || task.context?.previousPageCaption)) return false;
     const entitylessCore = genericCore && !observedEntity;

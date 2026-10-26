@@ -24,7 +24,7 @@ for (const pack of packs) {
     assert.deepEqual(Object.keys(localized).sort(), [...supportedLocales].sort(),
       `${rule.ruleId} covers all supported interface languages`);
     const refs = pack.sources.filter(source => rule.sourceIds.includes(source.sourceId));
-    if (pack.packId === "aptean-fb") {
+    if (/^aptean-/u.test(pack.packId)) {
       assert.ok(refs.some(source => source.sourceUri?.startsWith("https://erpdocs.apteancloud.com/bc/docs/")),
         `${rule.ruleId} has an official Aptean documentation reference`);
     } else {
@@ -330,7 +330,7 @@ assert.equal(legacyPurchaseCost.contextualExplanationRuleId,
   "Purchase.SetDirectUnitCost",
   "old purchase cost steps recover the direct unit cost field from raw evidence");
 assert.match(legacyPurchaseCost.contextualExplanations["sv-SE"],
-  /inköpspriset per enhet/);
+  /inköpskostnaden per enhet/);
 
 const legacyPurchaseDropdownItem = sessionPipeline.enrichCompatibilityExplanations([{
   taskId: "legacy-purchase-dropdown-item", taskType: "SelectRecord",
@@ -338,9 +338,20 @@ const legacyPurchaseDropdownItem = sessionPipeline.enrichCompatibilityExplanatio
   actionCaption: 'Nr, sorterade i Stigande order Välj posten "30043"',
   selectedCaption: "30043", entity: "PurchaseOrderLine", language: "sv-SE"
 }], packs)[0];
-assert.equal(legacyPurchaseDropdownItem.contextualExplanationRuleId,
+// A "Nr" lookup on a purchase line can be an item, G/L account or resource; without
+// field evidence the step must not be explained as an item selection.
+assert.equal(legacyPurchaseDropdownItem.contextualExplanationRuleId, undefined,
+  "a purchase-line Nr choice without field evidence is not claimed to be an item");
+const legacyPurchaseItemField = sessionPipeline.enrichCompatibilityExplanations([{
+  taskId: "legacy-purchase-dropdown-item-field", taskType: "SelectRecord",
+  semanticAction: "SelectRecord", pageId: "50", pageCaption: "Contoso Ltd.",
+  actionCaption: 'Nr, sorterade i Stigande order Välj posten "30043"',
+  fieldCaption: "Artikel Nr", selectedCaption: "30043", entity: "PurchaseOrderLine",
+  language: "sv-SE"
+}], packs)[0];
+assert.equal(legacyPurchaseItemField.contextualExplanationRuleId,
   "Purchase.SelectPurchaseLineItemFromLookup",
-  "purchase item dropdown choices use their recorded Nr column context");
+  "purchase item dropdown choices with the recorded Artikel Nr field are explained");
 
 const legacyManualPurchasePrice = sessionPipeline.enrichCompatibilityExplanations([{
   taskId: "legacy-manual-purchase-price", taskType: "RunActionPath",
@@ -492,6 +503,12 @@ for (const [ruleId, pageId, entity, taskType, actionCaption, fieldCaption] of ob
   assert.ok(result.contextualExplanations?.["sv-SE"], `${ruleId} supplies a Swedish explanation`);
   if (ruleId === "Observed.Purchase.CreateWarehouseReceipt") {
     assert.equal(result.contextualExplanationSources.length, 8, `${ruleId} cites localized warehouse Quality Management evidence`);
+  } else if (/^Observed\.Warehouse\.(?:RegisterWeight|ManualWeight|EnterScaleWeight|SaveWeightRegistration|SelectHandlingUnitCode|SelectDeliveryUnitCode|SetDeliveryUnitCount|CreateHandlingUnit)$/u.test(ruleId)) {
+    // Weigh-scale workflows are supported by Aptean documentation only.
+    assert.ok(result.contextualExplanationSources.length > 0 &&
+      result.contextualExplanationSources.every(source =>
+        source.sourceUri.startsWith("https://erpdocs.apteancloud.com/bc/docs/")),
+    `${ruleId} cites Aptean documentation and no Microsoft Learn source`);
   } else {
     assert.deepEqual(result.contextualExplanationSources, [], `${ruleId} does not imply a Microsoft Learn source`);
   }

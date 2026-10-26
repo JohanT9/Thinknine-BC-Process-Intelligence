@@ -3206,9 +3206,10 @@
   function basis(rule, context) {
     const ruleId = String(rule?.ruleId || "");
     const sourceRefs = rule?.sourceRefs || [];
+    // Observed rules explain recorded workflows; vendor pages only support them.
+    if (ruleId.startsWith("Observed.")) return "observed-workflow";
     if (sourceRefs.some(source => String(source?.sourceUri || "")
       .startsWith("https://erpdocs.apteancloud.com/"))) return "vendor-documentation";
-    if (ruleId.startsWith("Observed.")) return "observed-workflow";
     if (ruleId.startsWith("Core.") &&
         (contextualCreateNew(rule, context) || contextualCoreExplanation(rule, context))) return "page-context";
     if (isAuthored(rule)) return "authored-process";
