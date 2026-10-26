@@ -22,7 +22,7 @@ BugReport
   evidence: screenshot/diagnostic/attachment references
   notes / annotations (human)
   traceability
-  enrichment: optional telemetry, AI analysis, and external issue references
+  enrichment: optional telemetry and external issue references
 ```
 
 Statuses are deliberately limited to `draft`, `ready`, `resolved`, and
@@ -103,12 +103,10 @@ Application Insights enrichment is additive schema-version-1 data under
 provenance, correlation context, status, raw records, normalized events, and
 warnings. It is not Canonical evidence and never changes captured errors.
 
-AI Technical Analysis is additive derived data under `enrichment.analysis`.
-It records provider/model/prompt versions, the exact source-evidence fingerprint,
-validated citations, disclosure, and stale state. Attaching or removing it
-returns a new report and never rewrites evidence, telemetry, deterministic
-diagnostics, or human content. This compatible optional field does not increase
-the Bug Report schema version.
+`enrichment.analysis` is kept for compatibility. Bug Report AI analysis has
+been removed, so new reports leave it `null`. A value stored by an earlier
+version is preserved unchanged in the report, but it is no longer shown,
+exported or included in Issue Packages.
 
 Successful issue creation appends a lightweight record to
 `enrichment.externalIssues`: provider, destination, external ID/URL, creation

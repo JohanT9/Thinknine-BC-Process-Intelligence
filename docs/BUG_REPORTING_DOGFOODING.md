@@ -4,7 +4,7 @@
 
 The UX regression checks cover mode discoverability, one-action bug start, distinct recording status, error-capture feedback, stop-to-open behavior, silent-bug fallback title, expected-result focus, visible/copyable captured error, collapsed technical details, optional telemetry/AI, issue preview, responsive layout, and preservation of normal documentation recording.
 
-Existing domain suites continue to cover validation/runtime errors, multiple evidence records, diagnostics and partial call stacks, telemetry states, stale AI analysis, local issue packages, provider consent, saves, and exports.
+Existing domain suites continue to cover validation/runtime errors, multiple evidence records, diagnostics and partial call stacks, telemetry states, local issue packages, provider consent, saves, and exports.
 
 The CI gate also runs a sanitized bug-report scenario corpus through the actual
 report service, issue-package projection, and Markdown formatter. Its 24 flows
@@ -41,7 +41,7 @@ rather than changing production evidence to match the example text.
 No live Business Central browser session is available in the automated workspace, so real click counts, error-dialog capture, React/control-add-in capture, and visual long-report behavior were not claimed as manually verified. Pilot verification should cover standard BC errors, a silent problem, an Aptean/control-add-in flow, local-only use, Issue Preview, keyboard navigation, narrow viewports, and long reports.
 
 In report sharing, **Include AL call stack when available** is independent from
-technical details, telemetry, and AI. It is selected automatically when the
+technical details and telemetry. It is selected automatically when the
 recorded Business Central error contains a call stack. If Business Central did
 not expose or the recorder did not capture one, the disabled choice explains
 that no call stack is available; the export never invents one.

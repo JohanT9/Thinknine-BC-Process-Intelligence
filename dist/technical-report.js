@@ -208,8 +208,7 @@
       } finally { button.disabled = false; }
     }));
     document.getElementById("downloadMarkdown").addEventListener("click", action(async () => {
-      await download(await workspace.exportMarkdown({ includeAiAnalysis:
-        false }), `${bugReportId}.md`);
+      await download(await workspace.exportMarkdown(), `${bugReportId}.md`);
       message.textContent = t("technical.markdownExported");
     }));
     let issuePreviewRequestId = 0;
@@ -226,8 +225,7 @@
         const reportSnapshot = JSON.stringify(snapshot.report);
         const generated = await send({ type: "T9_BUILD_ISSUE_PACKAGE", bugReportId,
           options: { includeTelemetry: document.getElementById(
-            "issueIncludeTelemetry").checked, includeAiAnalysis:
-            document.getElementById("issueIncludeAi").checked,
+            "issueIncludeTelemetry").checked,
             includeCallStack: document.getElementById("issueIncludeCallStack").checked,
             includeTechnicalDetails: document.getElementById(
               "issueIncludeTechnical").checked } });
@@ -251,8 +249,6 @@
           `${t("technical.destination")}: ${document.getElementById(
             "issueProvider").value || t("technical.offlineOnly")}`,
           `${t("technical.telemetry")}: ${pkg.inclusion.telemetry ? included : excluded}`,
-          `${t("technical.aiAnalysis")}: ${pkg.inclusion.aiAnalysis
-            ? t("technical.includedLabelled") : excluded}`,
           `${t("technical.callStack")}: ${pkg.inclusion.callStack ? included : excluded}`,
           `${t("technical.technicalDetails")}: ${pkg.inclusion.technicalDetails
             ? included : excluded}`,
@@ -309,7 +305,7 @@
     document.getElementById("issueProvider").addEventListener("change", action(async () => {
       issuePreviewState = null; updateShareUi(); await generateIssuePreview();
     }));
-    for (const id of ["issueIncludeTelemetry", "issueIncludeAi", "issueIncludeCallStack",
+    for (const id of ["issueIncludeTelemetry", "issueIncludeCallStack",
       "issueIncludeTechnical"]) {
       document.getElementById(id).addEventListener("change", action(async () => {
         issuePreviewState = null; await generateIssuePreview();
@@ -411,8 +407,7 @@
       if (!provider) throw new Error(t("technical.selectProvider"));
       const button = document.getElementById("shareReport"); button.disabled = true;
       const submissionControls = ["issueProvider", "issueConsent",
-        "issueConfirmDuplicate", "issueIncludeTelemetry", "issueIncludeAi",
-        "issueIncludeCallStack", "issueIncludeTechnical"].map(id =>
+        "issueConfirmDuplicate", "issueIncludeTelemetry", "issueIncludeCallStack", "issueIncludeTechnical"].map(id =>
         document.getElementById(id)).filter(Boolean);
       const priorDisabledStates = submissionControls.map(control => control.disabled);
       submissionControls.forEach(control => { control.disabled = true; });

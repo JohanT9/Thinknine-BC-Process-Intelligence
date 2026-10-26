@@ -87,7 +87,6 @@
       <option value="azure-devops">Azure DevOps</option><option value="github">GitHub</option></select></label>
     <details class="share-options"><summary>Content and settings</summary>
       <label><input id="issueIncludeTelemetry" type="checkbox"> Include telemetry summary</label>
-      <label><input id="issueIncludeAi" type="checkbox"> Include current AI-assisted analysis</label>
       <label><input id="issueIncludeCallStack" type="checkbox" checked> Include AL call stack when available
         <span id="issueCallStackAvailability"></span></label>
       <label><input id="issueIncludeTechnical" type="checkbox"> Include technical details in description</label>
@@ -123,8 +122,7 @@
       <h3>Attachments</h3><ul id="issueAttachments"></ul>
       <button id="copyIssueDescription" type="button">Copy Issue Description</button>
     </details>
-    <label id="issueConsentRow" hidden><input id="issueConsent" type="checkbox"> I reviewed the destination,
-      description, attachments, telemetry/AI choices, and sensitive-data warning</label>
+    <label id="issueConsentRow" hidden><input id="issueConsent" type="checkbox"> I reviewed the destination, description, attachments, telemetry choice, and sensitive-data warning</label>
     <label id="issueDuplicateRow" hidden><input id="issueConfirmDuplicate" type="checkbox"> Create another issue even if this report already has an external reference</label>
     <div class="share-actions">
       <button id="shareReport" type="button">Download report package</button>
@@ -140,10 +138,6 @@
   <script src="i18n.js"></script>
   <script src="bug-report/bug-report-model.js"></script>
   <script src="bug-report/bug-report-completeness.js"></script>
-  <script src="bug-report/ai-evidence-policy.js"></script>
-  <script src="bug-report/ai-analysis-input.js"></script>
-  <script src="bug-report/ai-analysis-model.js"></script>
-  <script src="bug-report/ai-analysis-prompt.js"></script>
   <script src="bug-report/bug-report-generator.js"></script>
   <script src="bug-report/bug-report-text-export.js"></script>
   <script src="bug-report/technical-report-workspace.js"></script>

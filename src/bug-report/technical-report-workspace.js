@@ -82,11 +82,6 @@
         generator.project(report, { errorEvidence: evidence }), exportOptions); },
       replaceTelemetry(errorEvidenceId, telemetry, now) {
         return commit(model.attachTelemetry(report, errorEvidenceId, telemetry, now));
-      },
-      replaceAiAnalysis(analysis, now) {
-        return commit(model.attachAiAnalysis(report, analysis, now));
-      },
-      removeAiAnalysis(now) { return commit(model.removeAiAnalysis(report, now));
       }
     };
     return api;

@@ -1,24 +1,20 @@
 (function (root, factory) {
   const completeness = typeof module === "object" && module.exports
     ? require("./bug-report-completeness") : root.T9BugReportCompleteness;
-  const aiInput = typeof module === "object" && module.exports
-    ? require("./ai-analysis-input") : root.T9AiAnalysisInput;
-  const aiModel = typeof module === "object" && module.exports
-    ? require("./ai-analysis-model") : root.T9AiAnalysisModel;
   const languages = typeof module === "object" && module.exports
     ? require("../engine/language-registry") : root.T9LanguageRegistry;
-  const api = factory(completeness, aiInput, aiModel, languages);
+  const api = factory(completeness, languages);
   if (typeof module === "object" && module.exports) module.exports = api;
   root.T9BugReportGenerator = api;
 })(typeof globalThis !== "undefined" ? globalThis : this, function (
-  completeness, aiInput, aiModel, languages
+  completeness, languages
 ) {
   "use strict";
   const clone = value => value == null ? value : JSON.parse(JSON.stringify(value));
   const text = value => typeof value === "string" ? value : "";
   const SECTION_ORDER = Object.freeze(["summary", "environment", "reproduction",
     "expected-result", "actual-result", "bc-errors", "technical-diagnostics",
-    "al-call-stack", "affected-objects", "telemetry", "correlated-timeline", "ai-analysis",
+    "al-call-stack", "affected-objects", "telemetry", "correlated-timeline",
     "evidence", "notes", "traceability"]);
   const LABELS = Object.freeze({ timestamp: "Timestamp",
     internalSessionId: "Internal Session ID",
@@ -39,14 +35,14 @@
       actual: "Faktiskt resultat", errors: "Business Central-fel",
       diagnostics: "Teknisk diagnostik", objects: "Refererade AL-objekt",
       telemetry: "Application Insights-telemetri", timeline: "Korrelerad tidslinje",
-      analysis: "AI-assisterad teknisk analys", evidence: "Skärmbilder och bevis",
+      evidence: "Skärmbilder och bevis",
       notes: "Ytterligare anteckningar", traceability: "Teknisk spårbarhet" }),
     "en-US": Object.freeze({ summary: "Summary", environment: "Environment",
       reproduction: "Steps to Reproduce", expected: "Expected Result",
       actual: "Actual Result", errors: "Business Central Error",
       diagnostics: "Technical Diagnostics", objects: "Referenced AL Objects",
       telemetry: "Application Insights Telemetry", timeline: "Correlated Timeline",
-      analysis: "AI-assisted Technical Analysis", evidence: "Screenshots and Evidence",
+      evidence: "Screenshots and Evidence",
       notes: "Additional Notes", traceability: "Technical Traceability" })
   });
 
@@ -119,10 +115,6 @@
       correlationReasons: clone(event.correlationReasons || []),
       provenance: "external-telemetry-evidence" })))]
       .filter(item => item.timestamp).sort((a, b) => a.timestamp.localeCompare(b.timestamp));
-    const currentAiInput = aiInput.build(report, errors,
-      report.enrichment?.analysis?.inputPolicy || {});
-    const analysis = aiModel.withStaleness(report.enrichment?.analysis,
-      currentAiInput.sourceEvidenceFingerprint);
     const checks = completeness.evaluate(report, errors);
     const sections = [
       { id: "summary", title: titles.summary, kind: "summary", provenance: "manual",
@@ -157,11 +149,6 @@
           contexts: telemetryContexts } },
       { id: "correlated-timeline", title: titles.timeline,
         kind: "timeline", provenance: "derived-correlation", content: timeline },
-      { id: "ai-analysis", title: titles.analysis,
-        kind: "ai-analysis", provenance: "ai-analysis", content: {
-          available: Boolean(analysis), analysis,
-          currentFingerprint: currentAiInput.sourceEvidenceFingerprint,
-          disclosure: currentAiInput.disclosure } },
       { id: "evidence", title: titles.evidence, kind: "evidence",
         provenance: "mixed", content: { screenshots: clone(
           (report.evidence?.screenshots || []).filter(item =>

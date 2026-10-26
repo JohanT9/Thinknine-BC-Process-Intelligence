@@ -15,7 +15,7 @@
           [`- ${label}: ${value(child)}`];
     });
   }
-  function markdown(document, options = {}) {
+  function markdown(document) {
     const locale = languages.normalize(document.documentLanguage, "document");
     const localized = (english, swedish) => languages.translate(english, locale,
       locale === "sv-SE" ? swedish : english);
@@ -63,19 +63,12 @@
     add(byId.get("correlated-timeline").title,
       (byId.get("correlated-timeline")?.content || [])
       .map(item => `- ${item.timestamp} [${item.source}] ${item.label}`));
-    const ai = byId.get("ai-analysis")?.content?.analysis;
-    if (options.includeAiAnalysis && ai) add(byId.get("ai-analysis").title, [
-      `Status: ${ai.status}`, ai.summary,
-      ...ai.observations.map(item => `- Observation: ${item.text} [${(item.citations || []).join(", ")}]`),
-      ...ai.hypotheses.map(item => `- ${localized("Possible hypothesis (not verified)", "Möjlig hypotes (inte verifierad)")}: ${item.text}`),
-      ...ai.recommendedNextChecks.map(item => `- ${localized("Next check", "Nästa kontroll")}: ${item.text}`),
-      ...ai.missingEvidence.map(item => `- ${localized("Missing evidence", "Bevis som saknas")}: ${item.text}`)]);
     add(byId.get("notes").title, byId.get("notes").content.map(note =>
       `- ${note.text || note.content || ""}`));
     return `${out.join("\n").trim()}\n`;
   }
-  function plainText(document, options = {}) {
-    return markdown(document, options).replace(/^#{1,6}\s+/gmu, "")
+  function plainText(document) {
+    return markdown(document).replace(/^#{1,6}\s+/gmu, "")
       .replace(/```text\n|```/gu, "").replace(/`([^`]*)`/gu, "$1");
   }
   return { markdown, plainText };

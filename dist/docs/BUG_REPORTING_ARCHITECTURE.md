@@ -82,15 +82,10 @@ Three origins stay explicit:
 
 Bug Reports and optional enrichment remain local in `chrome.storage.local`.
 Application Insights is queried only after explicit opt-in through Microsoft
-Entra PKCE. Optional AI Technical Analysis is a separate derived-enrichment
-stage invoked only by explicit user consent through an Entra-protected broker;
-it cannot mutate source evidence. Business values, company/user/session identifiers, errors, call
+Entra PKCE. Business values, company/user/session identifiers, errors, call
 stacks and screenshots may be sensitive. The internal model is therefore not an
 external support package. A future sanitization/export policy must explicitly
 select and redact data before sharing.
-
-See `AI_TECHNICAL_ANALYSIS.md`, `AI_EVIDENCE_POLICY.md`, and
-`AI_PRIVACY_AND_SECURITY.md` for this optional external-analysis boundary.
 
 ## Captured BC error evidence
 
@@ -127,8 +122,6 @@ historical metadata, never a new source of truth. See `ISSUE_PACKAGE.md` and
   preserves every unknown segment; it never invents object, app or line data.
 - **Application Insights:** optional external evidence is implemented; see
   [Application Insights enrichment](APPLICATION_INSIGHTS_ENRICHMENT.md).
-- **AI:** optional analysis consumes selected evidence and produces a separate
-  non-authoritative analysis object.
 - **Export:** Markdown, offline Issue Package, Azure DevOps, and GitHub consume
   derived report projections. Future Word/PDF support remains separate. The
   domain does not depend on DOCX or destination APIs.
@@ -141,6 +134,6 @@ historical metadata, never a new source of truth. See `ISSUE_PACKAGE.md` and
 - Human-authored content survives regeneration? **Yes.**
 - Error capture implemented? **Yes, for documented observable modal surfaces.**
 - AL call-stack frame parsing implemented? **Yes, deterministic version 1.0.0.**
-- Root-cause assistance implemented? **Optional, non-authoritative AI analysis.**
-- Telemetry added? **Optional read enrichment.** AI added? **Optional.**
+- Root-cause assistance implemented? **No.**
+- Telemetry added? **Optional read enrichment.** AI added? **No.**
 - External creation added? **Explicit Azure DevOps/GitHub destinations.**

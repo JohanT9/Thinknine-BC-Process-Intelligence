@@ -39,7 +39,6 @@
       content?.apps?.length);
     if (section.kind === "telemetry") return Boolean(content?.configured &&
       content?.contexts?.length);
-    if (section.kind === "ai-analysis") return Boolean(content?.available);
     if (section.kind === "timeline") return Boolean(Array.isArray(content) &&
       content.length > 1);
     if (section.kind === "traceability") return false;
@@ -121,7 +120,7 @@
     technicalDetails.appendChild(element(doc, "p",
       ui("Only technical information captured for this error is shown.", locale)));
     const advancedKinds = new Set(["metadata", "diagnostics", "call-stack",
-      "objects", "telemetry", "timeline", "ai-analysis", "traceability",
+      "objects", "telemetry", "timeline", "traceability",
       "errors"]);
     const editorDuplicateKinds = new Set(["summary", "text", "notes"]);
     let technicalSectionCount = 0;
@@ -349,29 +348,6 @@
         section.content.forEach(item => list.appendChild(element(doc, "li",
           `${item.timestamp} [${item.source}] ${item.label}`)));
         node.appendChild(list);
-      } else if (section.kind === "ai-analysis") {
-        if (!section.content.available) node.appendChild(element(doc, "p",
-          "AI analysis is optional and has not been run."));
-        else {
-          const analysis = section.content.analysis;
-          node.appendChild(element(doc, "p", analysis.status === "stale"
-            ? "This AI analysis is stale. Re-analyze before relying on it."
-            : "Derived AI analysis — not captured evidence."));
-          node.appendChild(element(doc, "h3", "Summary"));
-          node.appendChild(element(doc, "p", analysis.summary));
-          const addItems = (title, items, prefix = "") => {
-            node.appendChild(element(doc, "h3", title));
-            const values = doc.createElement("ul");
-            items.forEach(item => values.appendChild(element(doc, "li",
-              `${prefix}${item.text || item}`))); node.appendChild(values);
-          };
-          addItems("Evidence-based observations", analysis.observations || []);
-          addItems("Possible root-cause hypotheses", analysis.hypotheses || [],
-            "Not verified: ");
-          addItems("Recommended investigation", analysis.recommendedNextChecks || []);
-          addItems("Missing evidence", analysis.missingEvidence || []);
-          addItems("Warnings and limitations", analysis.warnings || []);
-        }
       }
       if (editorDuplicateKinds.has(section.kind)) continue;
       if (advancedKinds.has(section.kind)) {
