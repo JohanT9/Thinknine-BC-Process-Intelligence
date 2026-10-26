@@ -50,7 +50,6 @@
   }
 
   function stateValue(value, locale = "en-US") {
-    const english = String(locale || "").toLowerCase().startsWith("en");
     if (value?.value !== undefined && value?.value !== null) return String(value.value);
     if (typeof value?.checked === "boolean") return value.checked
       ? uiText("on", locale, "On", "På") : uiText("off", locale, "Off", "Av");
@@ -234,7 +233,6 @@
   }
 
   function minimapMarkup(layout, details, selectedTaskIds, locale) {
-    const english = String(locale || "").toLowerCase().startsWith("en");
     const selectedNodes = details.filter(detail => selectedTaskIds.has(detail.taskId))
       .map(detail => detail.node.nodeId);
     const map = processMapMinimap.create(layout, details.map(detail => ({

@@ -20,7 +20,6 @@
   const SCHEMA_VERSION = 1;
   const ENGINE_VERSION = "1.6.0";
   const clone = value => value == null ? value : JSON.parse(JSON.stringify(value));
-  const text = value => typeof value === "string" ? value : "";
   const confidenceRank = Object.freeze({ low: 1, medium: 2, high: 3 });
 
   function capturedFact(kind, value, evidenceId) {

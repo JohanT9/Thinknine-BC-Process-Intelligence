@@ -320,6 +320,7 @@ let screenshotQueue = [];
 let screenshotWorkerRunning = false;
 let screenshotWorkerPromise = Promise.resolve();
 let lastScreenshotAt = 0;
+let lastScreenshotError = null;
 const preActionCaptures = new Map();
 
 const screenshotStats = {
@@ -2945,7 +2946,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
               client: knowledgeMcpLease.client, repository: repositoryState.repository, consent: true
             });
             const resolveLookup = async item => {
-              const { lookup, index, cacheKey, resultKey } = item;
+              const { lookup, cacheKey, resultKey } = item;
               const kind = lookup?.kind;
               const request = lookup?.request || {};
               const result = kind === "object" ? await adapter.resolveObject(request)

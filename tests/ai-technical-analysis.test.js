@@ -1,6 +1,5 @@
 const assert = require("assert");
 const fs = require("fs");
-const policy = require("../src/bug-report/ai-evidence-policy");
 const inputBuilder = require("../src/bug-report/ai-analysis-input");
 const analysisModel = require("../src/bug-report/ai-analysis-model");
 const prompt = require("../src/bug-report/ai-analysis-prompt");

@@ -334,7 +334,6 @@ function (consolidation, explanationCatalog, pageIdentification) {
     const sources = rule.sourceRefs || [];
     const officialSource = sources.some(source => { const uri = String(source?.sourceUri || ""); return uri.startsWith("https://learn.microsoft.com/") || uri.startsWith("https://erpdocs.apteancloud.com/"); });
     const authoredWorkflow = explanationCatalog?.isAuthored?.(rule) === true;
-    const pageContextCreate = rule.ruleId === "Core.CreateNew" && Boolean(pageCaption || observedEntity);
     const pageContextAction = rule.ruleId?.startsWith("Core.") && Boolean(pageCaption || observedEntity);
     if (!officialSource && !authoredWorkflow && !pageContextAction) return false;
     const candidates = availableRules.length ? availableRules : [rule];

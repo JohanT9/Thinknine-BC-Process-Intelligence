@@ -144,7 +144,6 @@ function (semantic, knowledge, refs, taskVisibility, processAnalysis) {
         appVersion: page.appVersion || null },
       knowledgeControlRef: { controlId: control.controlId || null,
         automationId: control.automationId || null, fieldId: control.fieldId || null },
-      actionCaption: observedActionCaption || "",
       fieldCaption: actionTask ? "" : action.targetField || "",
       selectedCaption: action.selectedValue || "",
       value: typeof action.checked === "boolean"

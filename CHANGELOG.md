@@ -1,4 +1,6 @@
 ## Unreleased
+- Add ESLint (pinned 9.15.0) to npm run lint. It found and fixed: a ReferenceError when saving an empty knowledge explanation, an undeclared screenshot error variable, a duplicated function where the first copy never ran, duplicate object keys, and dead code.
+- Show knowledge explanations backed by Aptean documentation in Review with a link to the Aptean article, and show the provenance note (recorded workflow, page context, process explanation or vendor documentation) in all eight languages.
 - Move Aptean Weigh Scale and Weighbridge knowledge into its own Aptean Weigh Scale section, sourced from the public Aptean WSC, SCI and WBR articles. Add 15 documented actions (Get Weight, Fill Weight Manually, Transfer Weigh Scale Entries, Create Inbound/Outbound Register, Post Quantity To Receive and others) with explanations in all eight languages; keep existing rule IDs. See docs/APTEAN_WEIGH_SCALE.md.
 - Let an identified entity stand in for another page of the same entity or an unidentifiable caption, accept a trailing period on New actions, and explain bare Yes/No confirmations only with page or entity context.
 - Keep Undo, Redo, Export Word and Document information directly visible in the Review toolbar again; only structural and advanced actions stay under More actions. History buttons no longer wrap their labels at narrow widths.

@@ -5,7 +5,6 @@
 })(typeof globalThis !== "undefined" ? globalThis : this, function () {
   "use strict";
   const ENGINE_VERSION = "1.0.0";
-  const clone = value => value == null ? value : JSON.parse(JSON.stringify(value));
   const freeze = value => {
     if (!value || typeof value !== "object" || Object.isFrozen(value)) return value;
     Object.values(value).forEach(freeze); return Object.freeze(value);

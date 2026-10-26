@@ -158,10 +158,6 @@
     }
     return String(frame.documentId || frame.frameId || event?.source?.frameId || "").trim();
   }
-  function tabIdOf(event) {
-    const value = event?.frameContext?.tabId;
-    return value == null ? "" : String(value);
-  }
   function normalizedCaption(value) {
     return String(value || "").normalize("NFKC").replace(/\s+/gu, " ")
       .trim().toLocaleLowerCase();

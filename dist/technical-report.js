@@ -109,12 +109,6 @@
         throw new Error("Permission for the configured issue destination was not granted.");
       }
     }
-    async function requestBrokerPermission(configuration) {
-      const origin = `${new URL(configuration.brokerUrl).origin}/*`;
-      if (!await chrome.permissions.request({ origins: [origin] })) {
-        throw new Error("Permission for the configured AI broker was not granted.");
-      }
-    }
     const mediaAssets = {};
     const recording = session.recordingHeader
       ? globalThis.T9CanonicalRecording.fromLegacyProjection(

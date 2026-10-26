@@ -283,11 +283,6 @@ for (const descriptor of index.packs.filter(item =>
     fs.writeFileSync(packFile, `${JSON.stringify(pack, null, 2)}\n`);
   }
 }
-const existingIds = new Set(index.packs.filter(item =>
-  !["bc-standard-pages", "bc-application-reference-28"].includes(item.packId)).flatMap(descriptor => {
-  const pack = JSON.parse(fs.readFileSync(path.join(root, "src", descriptor.file), "utf8"));
-  return (pack.pageDefinitions || []).map(page => String(page.pageObjectId));
-}));
 const basePages = index.packs.filter(item =>
   !["bc-standard-pages", "bc-application-reference-28"].includes(item.packId))
   .flatMap(item => JSON.parse(fs.readFileSync(path.join(root, "src", item.file), "utf8")).pageDefinitions || []);

@@ -1377,9 +1377,6 @@
     "Sales.ApplyCreditMemoEntries": "applyCreditMemo",
     "Purchase.GetReceiptLines": "getPurchaseReceiptLines",
     "Purchase.GetOrderLines": "getPurchaseOrderLines",
-    "Sales.GetShipmentLines": "getSalesShipmentLines",
-    "Purchase.GetReceiptLines": "getPurchaseReceiptLines",
-    "Purchase.GetOrderLines": "getPurchaseOrderLines",
     "Sales.GetShipmentLines": "getSalesShipmentLines"
   };
   const documentExecutionSpecific = {
@@ -3160,7 +3157,7 @@
       "de-DE": (page, entity) => `Öffnet den ausgewählten ${entity || "Datensatz"} zur Bearbeitung${page ? ` auf der Seite ${page}` : ""}. Prüfen Sie den Datensatz; Änderungen gelten nach dem Speichern und können Folgebelege beeinflussen.`,
       "es-ES": (page, entity) => `Abre ${entity || "el registro"} seleccionado para editar${page ? ` en la página ${page}` : ""}. Confirma que sea el registro correcto; los cambios surten efecto al guardar y pueden afectar documentos posteriores.`,
       "da-DK": (page, entity) => `Åbner den valgte ${entity || "post"} til redigering${page ? ` på siden ${page}` : ""}. Kontrollér, at posten er korrekt; ændringerne gælder, når de gemmes, og kan påvirke efterfølgende dokumenter.`,
-      "fi-FI": (page, entity) => `Avaa valitun tietueen muokattavaksi${page ? ` sivulla ${page}` : ""}. Varmista, että tietue on oikea; muutokset tulevat voimaan tallennettaessa ja voivat vaikuttaa myöhempiin asiakirjoihin.`,
+      "fi-FI": page => `Avaa valitun tietueen muokattavaksi${page ? ` sivulla ${page}` : ""}. Varmista, että tietue on oikea; muutokset tulevat voimaan tallennettaessa ja voivat vaikuttaa myöhempiin asiakirjoihin.`,
       "nb-NO": (page, entity) => `Åpner den valgte ${entity || "posten"} for redigering${page ? ` på siden ${page}` : ""}. Kontroller at posten er riktig; endringer gjelder når de lagres og kan påvirke etterfølgende dokumenter.`
     },
     "Core.DeleteRecord": {
@@ -3170,7 +3167,7 @@
       "de-DE": (page, entity) => `Fordert das Löschen des ausgewählten ${entity || "Datensatzes"}${page ? ` auf der Seite ${page}` : ""} an. Prüfen Sie Datensatz und abhängige Belege genau; das Löschen kann schwer rückgängig zu machen oder bei Verwendung blockiert sein.`,
       "es-ES": (page, entity) => `Solicita eliminar ${entity || "el registro"} seleccionado${page ? ` desde la página ${page}` : ""}. Comprueba su identidad y los documentos relacionados; la eliminación puede ser difícil de revertir o bloquearse si está en uso.`,
       "da-DK": (page, entity) => `Anmoder sletning af den valgte ${entity || "post"}${page ? ` fra siden ${page}` : ""}. Kontrollér identitet og relaterede dokumenter grundigt; sletning kan være svær at fortryde eller blokeres, hvis posten er i brug.`,
-      "fi-FI": (page, entity) => `Pyytää valitun tietueen poistamista${page ? ` sivulta ${page}` : ""}. Tarkista tietue ja siihen liittyvät asiakirjat huolellisesti; poistoa voi olla vaikea perua, tai se voidaan estää, jos tietue on käytössä.`,
+      "fi-FI": page => `Pyytää valitun tietueen poistamista${page ? ` sivulta ${page}` : ""}. Tarkista tietue ja siihen liittyvät asiakirjat huolellisesti; poistoa voi olla vaikea perua, tai se voidaan estää, jos tietue on käytössä.`,
       "nb-NO": (page, entity) => `Ber om å slette den valgte ${entity || "posten"}${page ? ` fra siden ${page}` : ""}. Kontroller identitet og relaterte dokumenter nøye; sletting kan være vanskelig å angre eller bli blokkert hvis posten er i bruk.`
     },
     "Core.ConfirmYes": {
