@@ -11,7 +11,7 @@
 ) {
   "use strict";
   const SCHEMA_VERSION = 1;
-  const NORMALIZATION_VERSION = "2.7.0";
+  const NORMALIZATION_VERSION = "2.8.0";
   const cache = new WeakMap();
   const clone = value => value == null ? value : JSON.parse(JSON.stringify(value));
   function freeze(value) { if (!value || typeof value !== "object" || Object.isFrozen(value)) return value; Object.values(value).forEach(freeze); return Object.freeze(value); }
@@ -126,6 +126,7 @@
       value: valueModel(raw, identified),
       previousValue: Object.prototype.hasOwnProperty.call(raw, "previousValue") ? { raw: clone(raw.previousValue), normalized: clone(raw.previousValue) } : null,
       selection, state: kind === "toggle-change" ? { checked: raw.checked ?? raw.value } : null,
+      focusedFieldContext: clone(raw.focusedFieldContext || null),
       coordinates: { pointer: event.coordinates ? clone(event.coordinates) :
           raw.clientX != null ? { x: raw.clientX, y: raw.clientY } : undefined,
         localBounds: clone(raw.localBounds), topViewportBounds: clone(raw.topViewportBounds),
@@ -143,6 +144,88 @@
       evidence: [{ source: "normalization-rule", value: reason }],
       futureMetadata: clone(raw.futureMetadata || raw.futureRawMetadata),
       rawEventType: raw.type || "unknown"
+    });
+  }
+  function pageIdOf(event) {
+    const page = event?.pageIdentification || {};
+    return String(page.pageObjectId || page.legacyPageId || page.pageId ||
+      page.pageIdentity || "").trim();
+  }
+  function frameIdOf(event) {
+    const frame = event?.frameContext || {};
+    if (frame.browserFrameId != null && frame.tabId != null) {
+      return `tab:${frame.tabId}:frame:${frame.browserFrameId}`;
+    }
+    return String(frame.documentId || frame.frameId || event?.source?.frameId || "").trim();
+  }
+  function tabIdOf(event) {
+    const value = event?.frameContext?.tabId;
+    return value == null ? "" : String(value);
+  }
+  function normalizedCaption(value) {
+    return String(value || "").normalize("NFKC").replace(/\s+/gu, " ")
+      .trim().toLocaleLowerCase();
+  }
+  function companyFromUrl(value) {
+    try { return new URL(value).searchParams.get("company") || ""; }
+    catch { return ""; }
+  }
+  function usefulPageCaption(event) {
+    const page = event.pageIdentification || {};
+    const caption = String(page.pageCaption || page.caption || "").trim();
+    const title = String(page.documentTitle || "").trim();
+    const company = companyFromUrl(page.frameUrl || page.topUrl || "");
+    const candidate = caption && normalizedCaption(caption) !==
+      normalizedCaption(company) ? caption : title;
+    if (!candidate || /^(?:dynamics 365 business central(?:\s*\([^)]*\))?|business central)$/iu
+      .test(candidate)) return "";
+    return candidate;
+  }
+  // Business Central sometimes reports the company name as the page caption
+  // for one frame while a sibling frame exposes the actual page title. Carry
+  // the latest observed title forward by page ID so clicks retain their page
+  // and entity context in later documentation stages.
+  function resolvePageContext(events) {
+    const latestByPage = new Map();
+    const firstByPage = new Map();
+    const latestByFrame = new Map();
+    const firstByFrame = new Map();
+    for (const event of events) {
+      const id = pageIdOf(event);
+      const caption = usefulPageCaption(event);
+      if (id && caption) {
+        if (!firstByPage.has(id)) firstByPage.set(id, caption);
+        latestByPage.set(id, caption);
+      }
+      const frame = frameIdOf(event);
+      if (frame && caption) {
+        if (!firstByFrame.has(frame)) firstByFrame.set(frame, caption);
+        latestByFrame.set(frame, caption);
+      }
+    }
+    const currentByPage = new Map();
+    const currentByFrame = new Map();
+    return events.map(event => {
+      const id = pageIdOf(event);
+      const frame = frameIdOf(event);
+      const page = event.pageIdentification || {};
+      const useful = usefulPageCaption(event);
+      if (id && useful) currentByPage.set(id, useful);
+      if (frame && useful) currentByFrame.set(frame, useful);
+      const company = companyFromUrl(page.frameUrl || page.topUrl || "");
+      const observed = String(page.pageCaption || page.caption || "").trim();
+      const genericCaption = /^(?:dynamics 365 business central(?:\s*\([^)]*\))?|business central)$/iu.test(observed) ||
+        Boolean(company && normalizedCaption(observed) === normalizedCaption(company));
+      if ((!id || !latestByPage.has(id)) && (!frame || !latestByFrame.has(frame))) return event;
+      if (!genericCaption) return event;
+      const caption = (id && currentByPage.get(id)) || (frame && currentByFrame.get(frame)) ||
+        (id && firstByPage.get(id)) || (frame && firstByFrame.get(frame));
+      if (!caption) return event;
+      return freeze({ ...event, pageIdentification: { ...page,
+        pageCaption: caption, contextResolution: {
+          source: "recording-page-state",
+          pageId: id || null
+        } } });
     });
   }
   function canCoalesce(pending, event, kind) {
@@ -165,20 +248,48 @@
     const cached = useCache && recording && typeof recording === "object"
       ? cache.get(recording) : null;
     if (cached && cached.revision === revision) return cached.result;
-    const events = []; let pending = null;
+    const events = []; let pending = null; let focusedFieldContext = null;
     const flush = () => { if (!pending) return; const owner = pending.sources.at(-1); events.push(create(owner, pending.kind, pending.reason, pending.sources, options)); pending = null; };
     for (const event of recording?.events || []) {
+      const raw = rawOf(event);
       const [kind, reason] = classify(event, options);
-      if (!kind) { if (rawOf(event).type === "focus") flush(); continue; }
+      if (!kind) {
+        if (raw.type === "focus") {
+          flush();
+          const caption = String(raw.accessibleName || raw.fieldName || raw.label || "").trim();
+          const tellMe = /^(?:tell me what you want to do|berätta vad du vill göra)\.?$/iu.test(caption);
+          focusedFieldContext = caption && !tellMe ? {
+            caption, pageId: String(raw.pageId || ""),
+            timestamp: event.timestamp || raw.timestamp || ""
+          } : null;
+        }
+        continue;
+      }
+      let candidate = event;
+      if (focusedFieldContext) {
+        const focusPageId = focusedFieldContext.pageId;
+        const nextPageId = String(raw.pageId || "");
+        const age = Date.parse(event.timestamp || raw.timestamp || "") -
+          Date.parse(focusedFieldContext.timestamp || "");
+        if ((!focusPageId || !nextPageId || focusPageId === nextPageId) &&
+            (!Number.isFinite(age) || age <= 30000)) {
+          candidate = { ...event, raw: { ...raw,
+            focusedFieldContext: clone(focusedFieldContext) } };
+        } else focusedFieldContext = null;
+      }
       if (kind === "value-change") {
-        if (canCoalesce(pending, event, kind)) pending.sources.push(event);
-        else { flush(); pending = { kind, reason, sources: [event] }; }
-      } else { flush(); events.push(create(event, kind, reason, [event], options)); }
+        if (canCoalesce(pending, candidate, kind)) pending.sources.push(candidate);
+        else { flush(); pending = { kind, reason, sources: [candidate] }; }
+      } else { flush(); events.push(create(candidate, kind, reason, [candidate], options)); }
+      const rawCaption = String(raw.accessibleName || raw.fieldName || raw.label || "");
+      const helperHint = /(?:obligatoriska fält.*inte är ifyllda|tryck på alt\s*\+\s*i.*förslag för det här fältet|värdet i det här fältet är obligatoriskt)/iu.test(rawCaption);
+      if (["selection-change", "toggle-change", "value-change"].includes(kind) ||
+          (kind === "activation" && !helperHint)) focusedFieldContext = null;
     }
     flush();
     const result = freeze({ schemaVersion: SCHEMA_VERSION,
       normalizationVersion: NORMALIZATION_VERSION,
-      recordingId: recording?.id, events });
+      recordingId: recording?.id, events: resolvePageContext(events) });
     if (useCache && recording && typeof recording === "object") cache.set(recording,
       { revision, result });
     return result;

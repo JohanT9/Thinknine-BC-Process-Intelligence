@@ -53,7 +53,7 @@ const isolated = live.derive({ session: { id: "new-session", eventCount: 0,
   lastEvent: { actionCaption: "Old action" }
 } });
 assert.equal(isolated.eventCount, 0);
-assert.deepEqual(isolated.screenshots, { requested: 0, captured: 0, pending: 0,
+assert.deepEqual(isolated.screenshots, { requested: 0, captured: 0, pending: 0, dropped: 0,
   errors: 0, lastCapturedAt: "" });
 assert.equal(isolated.latestAction, null);
 assert.deepEqual(isolated.warnings.map(item => item.code), ["no-events-yet"]);
@@ -63,7 +63,22 @@ assert.match(background, /previousState\.recording \|\| previousState\.sessionId
 assert.match(background, /preActionCaptures\.clear\(\)/);
 assert.match(background, /previous session screenshots/);
 assert(background.indexOf("previous session screenshots") <
-  background.indexOf("await saveScreenshots(id, {});"),
+  background.indexOf("await screenshotAssetStore.initialize(id);"),
 "Previous screenshot work must settle before the new session store is initialized.");
+
+// Every warning code is translated for the popup in every UI language.
+globalThis.T9LanguageRegistry = require("../src/engine/language-registry");
+require("../src/ui/i18n");
+const statusSource = fs.readFileSync(path.join(__dirname, "../src/engine/recording-live-status.js"), "utf8");
+const warningCodes = [...statusSource.matchAll(/code: "([a-z-]+)"/g)].map(match => match[1]);
+assert(warningCodes.length >= 8);
+for (const { locale } of globalThis.T9LanguageRegistry.supported("ui")) {
+  for (const code of warningCodes) {
+    const key = `recorder.warning.${code}`;
+    assert.notEqual(globalThis.T9UiI18n.translate(key, locale), key, `${key} ${locale}`);
+  }
+}
+assert.ok(fs.readFileSync(path.join(__dirname, "../src/ui/popup.js"), "utf8")
+  .includes("recorder.warning.${item.code}"), "the popup translates warnings by code");
 
 console.log("Recording live status behaviour tests passed.");

@@ -258,7 +258,7 @@ assert(detailTarget.outerHTML.includes('data-process-transition-type="conditiona
 assert(detailTarget.outerHTML.includes('data-process-transition-type="alternate"'));
 assert(detailTarget.outerHTML.includes("stock-available"));
 assert(detailTarget.outerHTML.includes("conditional"));
-assert.deepStrictEqual(view.routeLabel({ transitionType: "alternate" }, false), "Alternativ");
+assert.deepStrictEqual(view.routeLabel({ transitionType: "alternate" }, "sv-SE"), "Alternativ");
 assert(view.detailMarkup({ node: { nodeType: "activity", title: "VAT" },
   containers: {}, outgoing: [], changes: [{ factKind: "toggle-state",
     before: { control: { caption: "Moms" }, checked: false },
@@ -304,10 +304,10 @@ assert(dashboard.includes("T9ProcessOverviewView.selectNode"));
 assert(dashboard.includes("resolvedHierarchy,"));
 assert(dashboard.includes('"ArrowLeft", "ArrowRight"'));
 assert(dashboard.includes('locale: applicationSettings.uiLocale || "sv-SE"'));
-assert.deepStrictEqual(view.reviewState({ reviewTask: { approved: false } }, true),
+assert.deepStrictEqual(view.reviewState({ reviewTask: { approved: false } }, "en-US"),
   { name: "pending", label: "Not reviewed" });
 assert.deepStrictEqual(view.semanticState({ node: { metadata: {
-  semanticStatus: "suggested" } } }, false),
+  semanticStatus: "suggested" } } }, "sv-SE"),
 { name: "suggested", label: "Referensförslag" });
 const semanticContainer = { innerHTML: "" };
 view.render(semanticContainer, { nodes: [{ nodeId: "suggestion", nodeType: "activity",

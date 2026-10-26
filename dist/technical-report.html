@@ -48,6 +48,7 @@
     @media(max-width:420px){header,main{padding:8px}.report-core-fields,.report-more-fields,.technical-details{padding:12px}.secondary-actions button{flex:1 1 130px}}
   </style>
   <link rel="stylesheet" href="design-system.css">
+  <style>#emailChoice button{min-height:44px}</style>
 </head>
 <body>
   <header>
@@ -65,6 +66,18 @@
       </div>
     </details>
     <span id="workspaceMessage" role="status"></span></header>
+  <dialog id="emailChoice" aria-labelledby="emailChoiceTitle">
+    <h2 id="emailChoiceTitle" data-i18n="outlook.title">Email the report</h2>
+    <p data-i18n="outlook.help">Choose Outlook or save an email file.</p>
+    <p data-i18n="outlook.permission">Outlook needs permission to read and change your mail.</p>
+    <div class="secondary-actions">
+      <button id="outlookDraft" type="button" data-i18n="outlook.open">Open draft in Outlook</button>
+      <button id="emailFile" type="button" data-i18n="outlook.file">Save email file (.eml)</button>
+      <button id="closeEmailChoice" type="button" data-i18n="outlook.close">Close</button>
+    </div>
+    <p id="outlookStatus" role="status"></p>
+    <a id="outlookLink" hidden target="_blank" rel="noopener noreferrer" data-i18n="outlook.open">Open draft in Outlook</a>
+  </dialog>
   <main id="technicalReport" aria-live="polite"></main>
   <dialog id="issuePreview" aria-labelledby="issuePreviewTitle">
     <form method="dialog"><button value="cancel" aria-label="Close report sharing" data-i18n-aria-label="technical.closeSharing">Close</button></form>
@@ -120,6 +133,10 @@
   </dialog>
   <script src="engine/locale-catalogs.js"></script>
   <script src="engine/language-registry.js"></script>
+<script src="engine/page-identity.js"></script>
+<script src="engine/process-taxonomy-schema.js"></script>
+<script src="engine/canonical-semantic-model.js"></script>
+<script src="engine/canonical-recording.js"></script>
   <script src="i18n.js"></script>
   <script src="bug-report/bug-report-model.js"></script>
   <script src="bug-report/bug-report-completeness.js"></script>
@@ -131,7 +148,12 @@
   <script src="bug-report/bug-report-text-export.js"></script>
   <script src="bug-report/technical-report-workspace.js"></script>
   <script src="bug-report/email-draft.js"></script>
+<script src="engine/tenant-license-config.js"></script>
+<script src="bug-report/outlook-draft.js"></script>
+  <script src="bug-report/external-issue-url.js"></script>
   <script src="bug-report/report-pdf.bundle.js"></script>
+  <script src="engine/screenshot-asset-paths.js"></script>
+  <script src="engine/screenshot-batch-loader.js"></script>
   <script src="technical-report-workspace-view.js"></script>
 <script src="tooltips.js"></script>
 <script src="technical-report.js"></script>

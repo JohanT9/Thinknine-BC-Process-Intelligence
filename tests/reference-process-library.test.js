@@ -6,7 +6,11 @@ const seed = require("../src/engine/business-central-reference-process-seed").li
 const validation = service.validate(seed);
 assert.strictEqual(validation.valid, true, JSON.stringify(validation.diagnostics, null, 2));
 const registry = service.create(seed);
-assert.strictEqual(registry.library.references.length, 37);
+assert.strictEqual(registry.library.references.length, 43);
+for (const id of ["reference:bc:finance-general-journal-posting",
+  "reference:bc:finance-bank-account-reconciliation", "reference:bc:finance-vendor-payment-journal",
+  "reference:bc:quality-manual-purchase-inspection", "reference:bc:quality-warehouse-receipt-reinspection",
+  "reference:bc:quality-production-output-sampling"]) assert(registry.get(id), id);
 const required = ["Simple Sales Order", "Advanced Warehouse Outbound", "Purchase Return",
   "Physical Inventory", "Production with Warehouse Picking", "Demand Forecast",
   "Assembly to Order", "Expiration Date Handling"];

@@ -87,7 +87,8 @@
     });
     const allDecisions = [...groupDecisions, ...eventDecisions];
     const qualityGate = qualityGuard.evaluate({ normalizedEvents, stepGroups: groups,
-      semanticActions: actions, businessTasks: tasks });
+      semanticActions: actions, businessTasks: tasks,
+      groupingDiagnostics: input.groupingDiagnostics });
     const contradictionAnalysis = contradictions.analyze({ stepGroups: groups,
       businessTasks: tasks, languagePolicy: input.languagePolicy });
     const releaseStatus = qualityGate.status === "blocked" ||

@@ -170,7 +170,79 @@
     reference("tracking-expiration", "Expiration Date Handling", "domain:item-tracking",
       "Capture and validate expiration dates for tracked inventory.", ["document:item-tracking-lines"],
       ["Assign Lot Number", "Enter Expiration Date", "Post"],
-      { configurationRequirements: ["Expiration Date Formula", "Strict Expiration Posting"] })
+      { configurationRequirements: ["Expiration Date Formula", "Strict Expiration Posting"] }),
+
+    reference("finance-general-journal-posting", "General Journal Posting",
+      "domain:record-to-report",
+      "Enter and post financial journal lines to the general ledger using the selected journal template and batch.",
+      ["document:general-journal"], ["Enter Journal Lines", "Review Journal Check", "Post Journal"], {
+        optionalActions: ["Review Journal Check"], configurationRequirements:
+          ["General journal template and batch", "Posting setup for the selected accounts"],
+        metadata: { sourceUrls: ["https://learn.microsoft.com/en-us/dynamics365/business-central/ui-work-general-journals"],
+          evidenceScope: "Fields, balancing behavior and background checks depend on template and batch." }
+      }),
+    reference("finance-bank-account-reconciliation", "Bank Account Reconciliation",
+      "domain:record-to-report",
+      "Import or enter a bank statement, match statement lines to bank ledger entries, validate the difference, and post the reconciliation.",
+      ["document:bank-account-reconciliation", "document:bank-statement-lines",
+        "document:bank-account-ledger-entries"], ["Import Bank Statement", "Match Automatically",
+        "Match Manually", "Review Differences", "Preview Test Report", "Post Bank Reconciliation"], {
+        configurationRequirements: ["Bank account with posting setup", "Statement import format or manual entry"],
+        metadata: { sourceUrls: ["https://learn.microsoft.com/en-us/dynamics365/business-central/bank-how-reconcile-bank-accounts-separately"],
+          evidenceScope: "Standard Bank Acc. Reconciliation page; regional bank-reconciliation functionality can differ." }
+      }),
+    reference("finance-vendor-payment-journal", "Vendor Payment Journal",
+      "domain:record-to-report",
+      "Suggest vendor payments, review and apply the generated lines, then post the payment journal; the bank transfer is separate.",
+      ["document:payment-journal"], ["Suggest Vendor Payments", "Review Payment Lines",
+        "Apply Payment to Invoice", "Post Payment Journal"], {
+        configurationRequirements: ["Payment journal batch", "Vendor prioritization for full suggestion benefits"],
+        metadata: { sourceUrls: ["https://learn.microsoft.com/en-us/dynamics365/business-central/payables-how-suggest-vendor-payments",
+          "https://learn.microsoft.com/en-us/dynamics365/business-central/payables-how-post-payments-refunds"],
+          evidenceScope: "Posting records the payment in Business Central; actual bank transfer uses separate bank processing." }
+      }),
+
+    reference("quality-manual-purchase-inspection", "Manual Purchase Inspection",
+      "domain:quality-management",
+      "Create a quality inspection from a tracked purchase line before posting the receipt, record test values, and finish the inspection.",
+      ["document:purchase-order", "document:item-tracking-lines", "document:quality-inspection"],
+      ["Assign Lot Number", "Enter Expiration Date", "Create Quality Inspection",
+        "Enter Test Results", "Finish Quality Inspection"], {
+        configurationRequirements: ["Quality Management and Warehouse modules",
+          "Lot tracking", "RECEIVE generation rule enabled for manual inspection"],
+        metadata: { sourceUrls: ["https://learn.microsoft.com/en-us/dynamics365/business-central/qms-purchase-receipt-testing-simple"],
+          evidenceScope: "Microsoft Learn sample procedure; inspection is created before receipt posting." }
+      }),
+    reference("quality-warehouse-receipt-reinspection", "Warehouse Receipt Inspection and Reinspection",
+      "domain:quality-management",
+      "Post a lot-tracked warehouse receipt that generates an inspection, finish a failed inspection, create and pass a reinspection, then register put-away.",
+      ["document:purchase-order", "document:warehouse-receipt", "document:posted-warehouse-receipt",
+        "document:quality-inspection", "document:warehouse-put-away"],
+      ["Release", "Create Warehouse Receipt", "Assign Lot Number", "Post Warehouse Receipt",
+        "Enter Test Results", "Finish Inspection", "Create Re-inspection",
+        "Enter Test Results", "Finish Inspection", "Register Put-away"], {
+        configurationRequirements: ["Quality Management and Warehouse modules",
+          "Advanced warehouse location", "Lot tracking",
+          "RECEIVE rule triggered when warehouse receipt is posted"],
+        metadata: { sourceUrls: ["https://learn.microsoft.com/en-us/dynamics365/business-central/qms-purchase-receipt-testing-warehouse"],
+          evidenceScope: "Microsoft Learn WHITE-location demonstration; other location setups use different inbound steps." }
+      }),
+    reference("quality-production-output-sampling", "Production Output Sampling Inspection",
+      "domain:quality-management",
+      "Configure a sampled PRODUCTION inspection, post production output, then record and finish the generated sample inspection.",
+      ["document:production-order", "document:production-journal", "document:quality-test",
+        "document:quality-inspection-template", "document:quality-inspection-generation-rule",
+        "document:quality-inspection"],
+      ["Create Quality Tests", "Configure Production Template", "Set Sample Size",
+        "Set Production Output Trigger", "Create Production Order", "Refresh Production Order",
+        "Enter Output Quantity", "Post Production Output", "Enter Sample Results",
+        "Finish Inspection"], {
+        variants: ["variant:premium-manufacturing"],
+        configurationRequirements: ["Premium experience", "Quality Management and Manufacturing modules",
+          "PRODUCTION template with tests and sample amount", "Inspection rule triggered when output is posted"],
+        metadata: { sourceUrls: ["https://learn.microsoft.com/en-us/dynamics365/business-central/qms-production-output-testing"],
+          evidenceScope: "Microsoft Learn sampled inspection demonstration; the sample result does not classify unsampled quantity." }
+      })
   ];
   const library = Object.freeze({ schemaVersion: "1.0.0", libraryId: "bc-reference-processes",
     namespace: "bc", references: refs, metadata: { product:

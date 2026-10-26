@@ -8,7 +8,7 @@ const registry=require('../src/engine/language-registry');
   const elements={};const sent=[];
   const get=id=>elements[id] ||= {value:'tenant',textContent:'',addEventListener(event,fn){this[event]=fn;}};
   const sandbox={document:{getElementById:get},URLSearchParams,location:{search:''},Date,Intl,
-    T9LanguageRegistry:registry,T9UiI18n:{DEFAULT_LOCALE:locale,translate:()=> 'Consultant'},
+    T9LanguageRegistry:registry,T9AsyncOperations:require('../src/ui/async-operations'),setTimeout,clearTimeout,T9UiI18n:{DEFAULT_LOCALE:locale,translate:()=> 'Consultant'},
     chrome:{runtime:{sendMessage(message,cb){sent.push(message.type);cb({ok:true,configured:true,signedIn:false});}}}};
   vm.createContext(sandbox);
   vm.runInContext(source+`\nfunction setup(active,signedIn) {licenses=[{tenantId:'tenant',allowed:active,expiresAt:Date.now()+10000}]; accountStatus={configured:true,signedIn,license:{status:'expired'}};renderAccountStatus();}`,sandbox);

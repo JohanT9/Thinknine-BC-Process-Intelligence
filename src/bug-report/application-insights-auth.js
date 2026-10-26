@@ -21,7 +21,8 @@
         .replace(/Bearer\s+\S+/giu, "Bearer [redacted]").slice(0, 300) };
   }
   async function authenticate(configuration) {
-    const cached = tokens.get(configuration.clientId);
+    const cacheKey = `${configuration.tenantId}:${configuration.clientId}`;
+    const cached = tokens.get(cacheKey);
     if (cached && cached.expiresAt > Date.now() + 60000) return cached.accessToken;
     const verifier = random(48); const state = random(24);
     const redirectUri = chrome.identity.getRedirectURL("application-insights");
@@ -42,6 +43,7 @@
     const tokenResponse = await fetch(`https://login.microsoftonline.com/${encodeURIComponent(
       configuration.tenantId)}/oauth2/v2.0/token`, { method: "POST",
       headers: { "Content-Type": "application/x-www-form-urlencoded" },
+      signal: AbortSignal.timeout(10000),
       body: new URLSearchParams({ client_id: configuration.clientId,
         grant_type: "authorization_code", code, redirect_uri: redirectUri,
         code_verifier: verifier, scope: "https://api.applicationinsights.io/.default" }) });
@@ -50,7 +52,7 @@
     const payload = await tokenResponse.json();
     if (!payload.access_token) throw Object.assign(new Error("Microsoft did not return an access token."),
       { category: "unauthorized" });
-    tokens.set(configuration.clientId, { accessToken: payload.access_token,
+    tokens.set(cacheKey, { accessToken: payload.access_token,
       expiresAt: Date.now() + Math.min(Number(payload.expires_in || 3600), 3600) * 1000 });
     return payload.access_token;
   }

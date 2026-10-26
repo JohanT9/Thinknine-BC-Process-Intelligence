@@ -35,14 +35,24 @@
     return ["action", "dialog"].includes(captureCategory);
   }
 
-  function canReuse(existing, candidate) {
-    if (existing?.category === FIELD_INPUT || candidate?.category === FIELD_INPUT) {
-      return existing?.category === FIELD_INPUT &&
-        candidate?.category === FIELD_INPUT &&
-        existing.captureKey === candidate.captureKey;
-    }
-    return true;
+  function captureKey(event = {}) {
+    const field = String(event.fieldName || "").trim();
+    const interaction = String(event.interactionId || "").trim();
+    if (!field || !interaction) return "";
+    const page = String(event.pageObjectId || event.pageId ||
+      event.pageCaption || event.documentTitle || "").trim();
+    const control = String(event.fieldId || event.controlId ||
+      event.automationId || event.target?.automationId ||
+      event.target?.id || "").trim();
+    return JSON.stringify([interaction, page, field, control]);
   }
 
-  return { FIELD_INPUT, canReuse, category, shouldCapture };
+  function canReuse(existing, candidate) {
+    return existing?.category === FIELD_INPUT &&
+      candidate?.category === FIELD_INPUT &&
+      Boolean(String(existing.captureKey || "").trim()) &&
+      String(existing.captureKey) === String(candidate.captureKey || "");
+  }
+
+  return { FIELD_INPUT, canReuse, captureKey, category, shouldCapture };
 });

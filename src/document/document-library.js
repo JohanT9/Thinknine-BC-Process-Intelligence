@@ -166,8 +166,8 @@
     return new RegExp(expression, "u").test(searchText);
   }
 
-  function compare(sort) {
-    const textCompare = (left, right) => left.localeCompare(right, "sv-SE", {
+  function compare(sort, locale = "sv-SE") {
+    const textCompare = (left, right) => left.localeCompare(right, locale, {
       sensitivity: "base", numeric: true
     });
     const descendingDate = field => (left, right) =>
@@ -206,12 +206,13 @@
         includesDate(record.createdAt, filters.created) &&
         includesDate(record.modifiedAt, filters.modified);
     }).map(item => item.record).sort(compare(
-      SORTS.includes(options.sort) ? options.sort : "modified"
+      SORTS.includes(options.sort) ? options.sort : "modified",
+      languages.normalize(options.locale || "sv-SE", "ui")
     ));
     return deepFreeze(values);
   }
 
-  function groupByProfile(records) {
+  function groupByProfile(records, locale = "sv-SE") {
     const groups = new Map();
     records.forEach(record => {
       const key = record.profile.profileId;
@@ -223,7 +224,8 @@
       groups.get(key).documents.push(record);
     });
     return deepFreeze([...groups.values()].sort((a, b) =>
-      a.displayName.localeCompare(b.displayName, "sv-SE", { sensitivity: "base" })
+      a.displayName.localeCompare(b.displayName,
+        languages.normalize(locale, "ui"), { sensitivity: "base" })
     ).map(group => ({ ...group, documents: [...group.documents] })));
   }
 

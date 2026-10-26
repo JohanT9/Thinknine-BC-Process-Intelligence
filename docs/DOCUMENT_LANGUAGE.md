@@ -35,6 +35,9 @@ Language selectors, normalization, persistence, badges, and filtering are genera
 - System-derived observed-result labels and bounded result sentences follow the
   selected document language; observed Business Central captions inside them
   remain unchanged.
+- Evidence-backed observed-result and observed-error callouts are retained in
+  the Word preparation path, so reviewers can see verified outcomes in exported
+  instructions as well as in Review.
 
 ## Ownership and flow
 

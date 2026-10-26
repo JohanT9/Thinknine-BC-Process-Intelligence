@@ -9,6 +9,9 @@ function activeTenantLicense() {
 }
 let currentUiLocale = globalThis.T9UiI18n.DEFAULT_LOCALE;
 const text = (swedish, english) => globalThis.T9LanguageRegistry.translate(english, currentUiLocale, swedish);
+// License errors from the background are i18n keys such as "license.serviceUnavailable".
+const errorText = error => String(error?.message || "").startsWith("license.")
+  ? globalThis.T9UiI18n.translate(error.message, currentUiLocale) : error?.message || "";
 
 function dateTime(value) {
   if (!Number.isFinite(value) || value <= 0) return "—";
@@ -16,10 +19,13 @@ function dateTime(value) {
     .format(new Date(value));
 }
 function send(message) {
-  return new Promise((resolve, reject) => chrome.runtime.sendMessage(message, response => {
-    const error = chrome.runtime.lastError;
-    if (error) reject(new Error(error.message)); else resolve(response);
-  }));
+  return globalThis.T9AsyncOperations.withTimeout(
+    new Promise((resolve, reject) => chrome.runtime.sendMessage(message, response => {
+      const error = chrome.runtime.lastError;
+      if (error) reject(new Error(error.message)); else resolve(response);
+    })), 10000, "License administration", {
+      errorMessage: globalThis.T9UiI18n.translate("technical.requestTimeout", currentUiLocale)
+    });
 }
 function render(license) {
   renderAccountStatus();
@@ -91,7 +97,7 @@ async function load(force = false) {
         text("Visar senast kända licensinformation. En BC-flik behövs bara för en ny serverkontroll.", "Showing the latest known license information. A BC tab is only needed for a new server check.");
   } catch (error) {
     await summary().catch(() => {});
-    $("message").textContent = error.message;
+    $("message").textContent = errorText(error);
     $("message").className = "error";
   } finally { $("refresh").disabled = !(Number.isInteger(tabId) && tabId > 0); }
 }
@@ -133,7 +139,7 @@ $("consultantSignIn").addEventListener("click", async () => {
     if (!result?.ok) throw new Error(result?.error || text("Inloggningen misslyckades.", "Sign-in failed."));
     await consultantStatus();
   } catch (error) {
-    $("message").textContent = error.message; $("message").className = "error";
+    $("message").textContent = errorText(error); $("message").className = "error";
     await consultantStatus().catch(() => {});
   }
   finally { $("consultantSignIn").disabled = false; }

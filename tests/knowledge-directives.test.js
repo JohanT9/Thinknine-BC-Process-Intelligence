@@ -97,6 +97,10 @@ assert.equal(legacyReleaseTask.knowledgeRule,'Sales.Release',
  'the identified SalesOrder entity must resolve a generic legacy page caption');
 assert.ok(legacyReleaseTask.contextualExplanations?.['sv-SE'],
  'previously recorded release actions get their localized explanation');
+const confidentOtherPage=knowledge.apply([{...legacyRelease,taskId:'confident-other-page',
+ pageCaption:'Purchase Order',pageIdentificationConfidence:0.95}],[salesPack]).tasks[0];
+assert.notEqual(confidentOtherPage.knowledgeRule,'Sales.Release',
+ 'a confidently identified different page is not overridden by a stale entity');
 const conflictingEntity=knowledge.apply([{...legacyRelease,taskId:'wrong-entity',
  entity:'PurchaseOrder'}],[salesPack]).tasks[0];
 assert.notEqual(conflictingEntity.knowledgeRule,'Sales.Release',

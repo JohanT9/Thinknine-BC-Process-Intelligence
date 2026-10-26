@@ -9,9 +9,16 @@ const cases = background.slice(start, end);
 let clientClosed = false;
 let lastToolCall = null;
 const knowledgeAdapter = require("../src/engine/knowledge-mcp-adapter");
+const knowledgeCache = require("../src/engine/knowledge-mcp-cache");
+const cacheKeySource = background.slice(background.indexOf("async function knowledgeMcpCacheKey("),
+  background.indexOf("\n}\n", background.indexOf("async function knowledgeMcpCacheKey(")) + 2);
+const knowledgeMcpCacheKey = new Function("globalThis", "crypto", "TextEncoder",
+  `return ${cacheKeySource.replace("async function knowledgeMcpCacheKey", "async function")}`)(
+  { T9KnowledgeMcpCache: knowledgeCache }, globalThis.crypto, TextEncoder);
 const run = new Function("message", "sender", "chrome", "getSettings",
-  "getKnowledgeMcpClient", "isKnowledgeMcpSettingsSender", "pageKnowledgePacksReady",
-  "globalThis", "sendResponse", "knowledgeMcpClient", `return (async () => { switch (message.type) {
+  "knowledgeMcpClientManager", "isKnowledgeMcpSettingsSender", "pageKnowledgePacksReady",
+  "globalThis", "sendResponse", "knowledgeMcpClient", "KNOWLEDGE_MCP_CACHE_KEY",
+  "knowledgeMcpCacheKey", `return (async () => { switch (message.type) {
     ${cases} } })();`);
 
 async function invoke(message, { enabled = false, allowedSender = true, clientError = null } = {}) {
@@ -50,13 +57,19 @@ async function invoke(message, { enabled = false, allowedSender = true, clientEr
       confidence: 0.99, provenance: { sourceId: "bc-core", sourceVersion: "1.0.0" }
     }] } };
   }, close() { clientClosed = true; } };
-  const chrome = { runtime: { id: "extension", getURL: page => `chrome-extension://extension/${page}`,
+  const stored = {};
+  const chrome = { storage: { local: {
+    async get(key) { return key in stored ? { [key]: stored[key] } : {}; },
+    async set(values) { Object.assign(stored, values); } } },
+    runtime: { id: "extension", getURL: page => `chrome-extension://extension/${page}`,
     connectNative: () => { throw new Error("Unexpected connection"); } } };
   await run(message, allowedSender ? { id: "extension", url: chrome.runtime.getURL("dashboard.html") }
     : { id: "extension", url: "https://businesscentral.dynamics.com/" }, chrome,
-  async () => ({ knowledgeMcpEnabled: enabled, uiLocale: "en-US" }), () => client,
+  async () => ({ knowledgeMcpEnabled: enabled, uiLocale: "en-US" }),
+  require("../src/engine/knowledge-mcp-client-manager").create(() => client),
   sender => sender.id === chrome.runtime.id && sender.url === chrome.runtime.getURL("dashboard.html"),
-  Promise.resolve({ repository: {} }), { BCKnowledgeMcpAdapter: knowledgeAdapter }, value => { result = value; }, client);
+  Promise.resolve({ repository: {} }), { BCKnowledgeMcpAdapter: knowledgeAdapter, T9KnowledgeMcpCache: knowledgeCache },
+  value => { result = value; }, client, "t9KnowledgeMcpLookupCacheV1", knowledgeMcpCacheKey);
   return result;
 }
 

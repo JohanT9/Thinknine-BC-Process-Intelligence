@@ -1,7 +1,7 @@
 {
   "packId": "bc-warehouse",
   "name": "Business Central Warehouse",
-  "version": "2.7.0",
+  "version": "2.7.1",
   "priority": 200,
   "rules": [
     {
@@ -27,7 +27,10 @@
           "^Opprett lagerinngående levering$"
         ],
         "fieldPatterns": [],
-        "automationIdPatterns": []
+        "automationIdPatterns": [],
+        "pageObjectIds": [
+          "50"
+        ]
       },
       "instructionTemplate": "",
       "languages": [
@@ -72,7 +75,8 @@
       "match": {
         "pagePatterns": [
           "warehouse receipt",
-          "distributionslagerinleverans"
+          "distributionslagerinleverans",
+          "lagerinleverans"
         ],
         "actionPatterns": [
           "^Registrera vikt$",
@@ -85,7 +89,10 @@
           "^Registrer vekt$"
         ],
         "fieldPatterns": [],
-        "automationIdPatterns": []
+        "automationIdPatterns": [],
+        "pageObjectIds": [
+          "5768"
+        ]
       },
       "instructionTemplate": "",
       "languages": [
@@ -98,7 +105,65 @@
         "fi-FI",
         "nb-NO"
       ],
-      "aliases": []
+      "aliases": [],
+      "sourceIds": ["aptean-weigh-scale-user-guide-2026"]
+    },
+    {
+      "ruleId": "Observed.Warehouse.SelectHandlingUnitCode",
+      "taskType": "SelectLookupValue",
+      "semanticAction": "SelectLookupValue",
+      "entity": "WarehouseReceipt",
+      "priority": 1200,
+      "confidence": 0.94,
+      "match": {
+        "pagePatterns": ["warehouse receipt", "distributionslagerinleverans", "lagerinleverans"],
+        "actionPatterns": [],
+        "fieldPatterns": ["^Lastbärarekod$", "^Handling Unit Code$", "^Code unité de manutention$", "^Ladeeinheitencode$", "^Código unidad de manipulación$", "^Lasteenhedskode$", "^Käsittely-yksikön koodi$", "^Håndteringsenhetskode$"],
+        "automationIdPatterns": [],
+        "pageObjectIds": ["5768"]
+      },
+      "instructionTemplate": "",
+      "languages": ["sv-SE", "en-US", "fr-FR", "de-DE", "es-ES", "da-DK", "fi-FI", "nb-NO"],
+      "aliases": [],
+      "sourceIds": ["aptean-wbr-weighbridge-ticket-2026", "aptean-weigh-scale-user-guide-2026"]
+    },
+    {
+      "ruleId": "Observed.Warehouse.SelectDeliveryUnitCode",
+      "taskType": "SelectLookupValue",
+      "semanticAction": "SelectLookupValue",
+      "entity": "WarehouseReceipt",
+      "priority": 1200,
+      "confidence": 0.94,
+      "match": {
+        "pagePatterns": ["warehouse receipt", "distributionslagerinleverans", "lagerinleverans"],
+        "actionPatterns": [],
+        "fieldPatterns": ["^Leveransenhetskod$", "^Delivery Unit Code$", "^Code unité de livraison$", "^Liefereinheitencode$", "^Código de unidad de entrega$", "^Leveringsenhedskode$", "^Toimitusyksikön koodi$", "^Leveringsenhetskode$"],
+        "automationIdPatterns": [],
+        "pageObjectIds": ["5768"]
+      },
+      "instructionTemplate": "",
+      "languages": ["sv-SE", "en-US", "fr-FR", "de-DE", "es-ES", "da-DK", "fi-FI", "nb-NO"],
+      "aliases": [],
+      "sourceIds": ["aptean-wbr-weighbridge-ticket-2026", "aptean-weigh-scale-user-guide-2026"]
+    },
+    {
+      "ruleId": "Observed.Warehouse.SetDeliveryUnitCount",
+      "taskType": "EnterFieldValue",
+      "semanticAction": "EnterFieldValue",
+      "entity": "WarehouseReceipt",
+      "priority": 1200,
+      "confidence": 0.94,
+      "match": {
+        "pagePatterns": ["warehouse receipt", "distributionslagerinleverans", "lagerinleverans"],
+        "actionPatterns": [],
+        "fieldPatterns": ["^Antal leveransenheter$", "^Number of Delivery Units$", "^Nombre d’unités de livraison$", "^Anzahl Liefereinheiten$", "^Número de unidades de entrega$", "^Antal leveringsenheder$", "^Toimitusyksiköiden määrä$", "^Antall leveringsenheter$"],
+        "automationIdPatterns": [],
+        "pageObjectIds": ["5768"]
+      },
+      "instructionTemplate": "",
+      "languages": ["sv-SE", "en-US", "fr-FR", "de-DE", "es-ES", "da-DK", "fi-FI", "nb-NO"],
+      "aliases": [],
+      "sourceIds": ["aptean-wbr-weighbridge-ticket-2026", "aptean-weigh-scale-user-guide-2026"]
     },
     {
       "ruleId": "Observed.Warehouse.CreateHandlingUnit",
@@ -110,7 +175,8 @@
       "match": {
         "pagePatterns": [
           "warehouse receipt",
-          "distributionslagerinleverans"
+          "distributionslagerinleverans",
+          "lagerinleverans"
         ],
         "actionPatterns": [
           "^Skapa lastbärare$",
@@ -123,7 +189,10 @@
           "^Opprett håndteringsenhet$"
         ],
         "fieldPatterns": [],
-        "automationIdPatterns": []
+        "automationIdPatterns": [],
+        "pageObjectIds": [
+          "5768"
+        ]
       },
       "instructionTemplate": "",
       "languages": [
@@ -136,7 +205,8 @@
         "fi-FI",
         "nb-NO"
       ],
-      "aliases": []
+      "aliases": [],
+      "sourceIds": ["aptean-wbr-weighbridge-ticket-2026", "aptean-weigh-scale-user-guide-2026"]
     },
     {
       "ruleId": "Observed.Warehouse.ManualWeight",
@@ -148,7 +218,8 @@
       "match": {
         "pagePatterns": [
           "warehouse receipt",
-          "distributionslagerinleverans"
+          "distributionslagerinleverans",
+          "lagerinleverans"
         ],
         "actionPatterns": [
           "^Manuell vikt$",
@@ -161,7 +232,10 @@
           "^Manuell vekt$"
         ],
         "fieldPatterns": [],
-        "automationIdPatterns": []
+        "automationIdPatterns": [],
+        "pageObjectIds": [
+          "5768"
+        ]
       },
       "instructionTemplate": "",
       "languages": [
@@ -174,7 +248,8 @@
         "fi-FI",
         "nb-NO"
       ],
-      "aliases": []
+      "aliases": [],
+      "sourceIds": ["aptean-weigh-scale-user-guide-2026"]
     },
     {
       "ruleId": "Observed.Warehouse.EnterScaleWeight",
@@ -186,7 +261,8 @@
       "match": {
         "pagePatterns": [
           "warehouse receipt",
-          "distributionslagerinleverans"
+          "distributionslagerinleverans",
+          "lagerinleverans"
         ],
         "actionPatterns": [
           "^Vikt från våg$",
@@ -208,7 +284,10 @@
           "^Vaa'an paino$",
           "^Vekt fra vekt$"
         ],
-        "automationIdPatterns": []
+        "automationIdPatterns": [],
+        "pageObjectIds": [
+          "5768"
+        ]
       },
       "instructionTemplate": "",
       "languages": [
@@ -221,7 +300,8 @@
         "fi-FI",
         "nb-NO"
       ],
-      "aliases": []
+      "aliases": [],
+      "sourceIds": ["aptean-weigh-scale-user-guide-2026"]
     },
     {
       "ruleId": "Observed.Warehouse.SaveWeightRegistration",
@@ -233,7 +313,8 @@
       "match": {
         "pagePatterns": [
           "warehouse receipt",
-          "distributionslagerinleverans"
+          "distributionslagerinleverans",
+          "lagerinleverans"
         ],
         "actionPatterns": [
           "^Spara och stäng$",
@@ -246,7 +327,10 @@
           "^Lagre og lukk$"
         ],
         "fieldPatterns": [],
-        "automationIdPatterns": []
+        "automationIdPatterns": [],
+        "pageObjectIds": [
+          "5768"
+        ]
       },
       "instructionTemplate": "",
       "languages": [
@@ -259,7 +343,8 @@
         "fi-FI",
         "nb-NO"
       ],
-      "aliases": []
+      "aliases": [],
+      "sourceIds": ["aptean-weigh-scale-user-guide-2026"]
     },
     {
       "ruleId": "Warehouse.OpenReceipt",
@@ -1297,6 +1382,48 @@
     }
   ],
   "sources": [
+    {
+      "sourceId": "aptean-weigh-scale-user-guide-2026",
+      "title": "Weigh Scale - User Guide",
+      "sourceType": "vendor-documentation",
+      "sourceUri": "https://erpdocs.apteancloud.com/bc/home",
+      "appliesTo": "Aptean Weigh Scale Registration on warehouse receipts and shipments. Based on the locally supplied Weigh Scale User Guide, article 'Weigh scale registration' (pages 35-38) and 'Register weight for warehouse receipt' (pages 33-34). Exact fields depend on extension setup, tracking requirements, and tenant version.",
+      "accessedDate": "2026-10-03",
+      "fields": [
+        "Register Weight opens Weigh Scale Registration for a warehouse receipt or shipment line.",
+        "Get Weight retrieves the reading into Weight from Scale; Fill Weight Manually allows entering that value directly.",
+        "Save registers the weighing activity as a weigh-scale entry associated with the document line.",
+        "Pending weigh-scale entries must be transferred to item tracking before the warehouse receipt can be posted."
+      ]
+    },
+    {
+      "sourceId": "aptean-wbr-weighbridge-ticket-2026",
+      "title": "Weighbridge Ticket",
+      "sourceType": "vendor-documentation",
+      "sourceUri": "https://erpdocs.apteancloud.com/bc/docs/WBR/weighbridge-ticket/",
+      "appliesTo": "Aptean Weighbridge Receiving. Field availability and workflow depend on enabled extensions, item tracking, location setup, and tenant version.",
+      "accessedDate": "2026-10-02",
+      "fields": [
+        "Handling Unit Weight and Handling Unit Count describe the total weight and number of units received.",
+        "Inbound Scale Reading is the gross weight of the vehicle, items, and packaging entering the warehouse.",
+        "Quantity To Receive is the net weight for receipt lines; packaging tare/count and calculated vehicle weight contribute to it.",
+        "The weighbridge ticket has its own status and source document relationship."
+      ]
+    },
+    {
+      "sourceId": "aptean-wbr-register-inbound-outbound-weight-2026",
+      "title": "Register Inbound and Outbound Weight",
+      "sourceType": "vendor-documentation",
+      "sourceUri": "https://erpdocs.apteancloud.com/bc/docs/WBR/register-inbound-and-outbound-weight/",
+      "appliesTo": "Conditional Aptean Beverage Advanced Warehouse Management weighbridge flow; requires Unknown Tare Receiving and item lot/license-plate tracking as documented. Do not assume every tenant has this extension or setup.",
+      "accessedDate": "2026-10-02",
+      "fields": [
+        "Creating an inbound register posts the source document and changes the weighbridge status to Inbound Registered.",
+        "The documented workflow requires Unknown Tare Receiving, Aptean Beverage Advanced Warehouse Management, and lot- plus license-plate-tracked items.",
+        "Inbound registration creates license plates and detailed warehouse entries for the registered quantity.",
+        "Outbound registration is a later step and requires inbound registration first."
+      ]
+    },
     {
       "sourceId": "microsoft-learn-inventory-picks",
       "title": "Pick items with inventory picks",

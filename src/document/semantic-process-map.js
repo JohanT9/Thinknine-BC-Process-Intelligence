@@ -186,12 +186,15 @@
     return processModel(model.recordingId, model.title, values, model.transitions); }
   function withBoundaries(model, locale) { if (!model.nodes.length) return model;
     const english = String(locale || "").toLowerCase().startsWith("en");
+    const swedish = String(locale || "").toLowerCase().startsWith("sv");
+    const endTitle = swedish ? "Slut" : english ? "End" :
+      globalThis.T9UiI18n?.translateStaticText?.("End", locale) || "End";
     const boundary = (position, nodeType, title) => ({ nodeId: processGraph.stableId(
       "semantic-map-boundary", [model.recordingId, model.title, position]), nodeType, title,
       sourceStepIds: [], sourceEventIds: [], metadata: { structuralBoundary: true,
         semanticLevel: "businessCentral" } });
     const start = boundary("start", "start", "Start");
-    const end = boundary("end", "end", english ? "End" : "Slut");
+    const end = boundary("end", "end", endTitle);
     const relationships = [...model.transitions,
       ...model.startNodeIds.map(nodeId => ({ fromNodeId: start.nodeId, toNodeId: nodeId,
         transitionType: "sequence" })),

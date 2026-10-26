@@ -22,6 +22,11 @@
     const config = suppliedConfig?.consultant
       ? { ...suppliedConfig.consultant, trialEndpoint: suppliedConfig.trialEndpoint }
       : suppliedConfig;
+    const timedFetch = (url, options = {}) => {
+      const { timeoutMs = 10000, ...requestOptions } = options;
+      return fetcher(url, { ...requestOptions,
+        signal: requestOptions.signal || AbortSignal.timeout(timeoutMs) });
+    };
     async function state() { return (await storage.get(KEY))[KEY] || {}; }
     async function signIn() {
       if (!config?.enabled || !config.clientId || !config.scope) throw new Error("Konsultinloggning är inte konfigurerad ännu.");
@@ -37,7 +42,7 @@
       const response = new URL(redirected);
       if (response.searchParams.get("state") !== stateValue || !response.searchParams.get("code")) throw new Error("Entra-inloggningen kunde inte verifieras.");
       let tokenResponse;
-      try { tokenResponse = await fetcher("https://login.microsoftonline.com/organizations/oauth2/v2.0/token", {
+      try { tokenResponse = await timedFetch("https://login.microsoftonline.com/organizations/oauth2/v2.0/token", {
         method: "POST", headers: { "Content-Type": "application/x-www-form-urlencoded" },
         body: new URLSearchParams({ client_id: config.clientId, grant_type: "authorization_code",
           code: response.searchParams.get("code"), redirect_uri: redirectUri,
@@ -49,6 +54,10 @@
       }
       if (!tokenResponse.ok) throw new Error("Entra-inloggningen kunde inte slutföras.");
       const tokens = await tokenResponse.json();
+      if (!tokens?.access_token || !Number.isFinite(Number(tokens.expires_in)) ||
+          Number(tokens.expires_in) <= 0) throw Object.assign(
+        new Error("Microsoft sign-in response did not include a valid access token."),
+        { code: "entra-token-invalid" });
       const value = { accessToken: tokens.access_token, refreshToken: tokens.refresh_token,
         expiresAt: now() + Number(tokens.expires_in || 0) * 1000,
         profile: tokenProfile(tokens.id_token || "") };
@@ -62,7 +71,7 @@
       if (value.accessToken && value.expiresAt > now() + 60000) return value.accessToken;
       if (!value.refreshToken) throw new Error("Logga in med din konsultlicens.");
       let response;
-      try { response = await fetcher("https://login.microsoftonline.com/organizations/oauth2/v2.0/token", {
+      try { response = await timedFetch("https://login.microsoftonline.com/organizations/oauth2/v2.0/token", {
         method: "POST", headers: { "Content-Type": "application/x-www-form-urlencoded" },
         body: new URLSearchParams({ client_id: config.clientId, grant_type: "refresh_token",
           refresh_token: value.refreshToken, scope: `openid profile offline_access ${config.scope}` }) });
@@ -83,7 +92,7 @@
     async function check(tenantId, installationId) {
       if (!config?.enabled) return { allowed: false, configured: false };
       const token = await accessToken();
-      const response = await fetcher(config.endpoint, { method: "POST", credentials: "omit",
+      const response = await timedFetch(config.endpoint, { method: "POST", credentials: "omit",
         headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
         body: JSON.stringify({ installationId, tenantId, version }) });
       if (response.status === 401) { await signOut(); throw new Error("Konsultinloggningen behöver förnyas."); }
@@ -94,7 +103,7 @@
     }
     async function register(installationId) {
       const token = await accessToken();
-      const response = await fetcher(config.endpoint.replace(/\/check$/, "/register"), {
+      const response = await timedFetch(config.endpoint.replace(/\/check$/, "/register"), {
         method: "POST", credentials: "omit",
         headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
         body: JSON.stringify({ installationId, version }) });
@@ -114,7 +123,7 @@
     }
     async function registerTenantUser(tenantId, installationId) {
       const token = await accessToken();
-      const response = await fetcher(config.endpoint.replace(/\/consultant\/check$/, "/user/register"), {
+      const response = await timedFetch(config.endpoint.replace(/\/consultant\/check$/, "/user/register"), {
         method: "POST", credentials: "omit",
         headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
         body: JSON.stringify({ installationId, tenantId, version }) });
@@ -126,7 +135,8 @@
       const token = await accessToken();
       let response;
       try {
-        response = await fetcher(config.trialEndpoint, { method: "POST", credentials: "omit",
+        response = await timedFetch(config.trialEndpoint, { timeoutMs: 30000,
+          method: "POST", credentials: "omit",
           headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
           body: JSON.stringify({ installationId, tenantId, version }) });
       } catch (cause) {
@@ -135,8 +145,11 @@
           message: typeof cause?.message === "string" ? cause.message.slice(0, 120) : "Network request failed"
         };
         logger.warn("BC Process Studio: tenant trial request failed before an HTTP response.", diagnostic);
-        const error = new Error("Licenstjänsten kunde inte nås.");
-        error.code = "trial-service-unreachable";
+        const timedOut = cause?.name === "TimeoutError" || cause?.name === "AbortError";
+        const error = new Error(timedOut
+          ? "Licenstjänsten svarade inte inom tidsgränsen."
+          : "Licenstjänsten kunde inte nås.");
+        error.code = timedOut ? "trial-service-timeout" : "trial-service-unreachable";
         throw error;
       }
       let detail = "";
@@ -156,8 +169,8 @@
       const token = await accessToken(owner);
       const profile = (await state()).profile;
       if (profile?.tenantId + ":" + profile?.objectId !== owner) throw new Error("Account changed");
-      const response = await fetcher(config.endpoint.replace(/\/consultant\/check$/, "/usage"), {
-        method: "POST", credentials: "omit", signal: AbortSignal.timeout(10000),
+      const response = await timedFetch(config.endpoint.replace(/\/consultant\/check$/, "/usage"), {
+        method: "POST", credentials: "omit",
         headers: { "Content-Type": "application/json", Authorization: "Bearer " + token },
         body: JSON.stringify(event) });
       if (!response.ok) throw new Error("Usage statistics could not be synchronized");
@@ -168,7 +181,7 @@
       if (!config?.adminAccessEndpoint) return false;
       try {
         const token = await accessToken();
-        const response = await fetcher(config.adminAccessEndpoint, { method: "GET",
+        const response = await timedFetch(config.adminAccessEndpoint, { method: "GET",
           credentials: "omit", headers: { Authorization: `Bearer ${token}` } });
         if (!response.ok) return false;
         return (await response.json()).authorized === true;

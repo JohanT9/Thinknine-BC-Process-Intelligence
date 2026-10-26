@@ -26,7 +26,7 @@ const sourceError = { id: "canonical:error", recordingId: "result-verification",
 const [errorKind, errorReason] = normalization.classify(sourceError);
 assert.strictEqual(errorKind, "error-outcome");
 assert.strictEqual(errorReason, "observed-business-central-error");
-assert.strictEqual(normalization.NORMALIZATION_VERSION, "2.7.0");
+assert.strictEqual(normalization.NORMALIZATION_VERSION, "2.8.0");
 assert.strictEqual(sourceError.raw.copiedDetails, "Sensitive diagnostic details");
 
 const grouped = grouping.group({ recordingId: "result-verification", events: [
@@ -42,7 +42,7 @@ const grouped = grouping.group({ recordingId: "result-verification", events: [
 
 assert.strictEqual(grouped.groupingVersion, grouping.GROUPING_VERSION);
 assert.strictEqual(grouping.CAPTURE_PACKET_VERSION, "1.6.0");
-assert.strictEqual(grouping.RESULT_VERIFICATION_VERSION, "1.2.0");
+assert.strictEqual(grouping.RESULT_VERIFICATION_VERSION, "1.4.0");
 assert.strictEqual(grouped.groups.length, 1,
   "an action and all its immediate outcomes form one packet");
 const verification = grouped.groups[0].capturePacket.resultVerification;
@@ -63,7 +63,7 @@ const navigation = grouping.group({ recordingId: "result-verification", events: 
 assert.strictEqual(navigation.groups[0].capturePacket.resultVerification.status,
   "verified");
 assert.strictEqual(navigation.groups[0].capturePacket.resultVerification.summary,
-  "Sidan F\u00f6rs.order \u00f6ppnades.");
+  "Sidan F\u00f6rs.order visas nu.");
 
 const unverified = grouping.group({ recordingId: "result-verification", events: [
   event("only", "activation", { actionIdentification: { caption: "Spara" } })
@@ -82,10 +82,22 @@ const statusResult = grouping.group({ recordingId: "result-verification", events
   event("status", "status-message", { interactionId: "interaction:post",
     interactionIds: ["interaction:post"], screenshotAssetId: "status.png" })
 ] }).groups[0].capturePacket.resultVerification;
-assert.strictEqual(statusResult.status, "verified");
-assert.strictEqual(statusResult.primaryOutcome, "status-message");
-assert.strictEqual(statusResult.summary,
-  "Business Central visade ett statusmeddelande.");
+// A status message without readable text is not evidence of completion.
+assert.strictEqual(statusResult.status, "unverified");
+assert.strictEqual(statusResult.expectedResultSuggestion, "");
+const statusWith = caption => grouping.group({ recordingId: "result-verification", events: [
+  event("post", "activation", { interactionId: "interaction:post",
+    interactionIds: ["interaction:post"], actionIdentification: { caption: "Post" } }),
+  event("status", "status-message", { interactionId: "interaction:post",
+    interactionIds: ["interaction:post"], controlIdentification: { caption } })
+] }).groups[0].capturePacket.resultVerification;
+const confirmed = statusWith("Sales order 1001 was posted.");
+assert.strictEqual(confirmed.status, "verified");
+assert.strictEqual(confirmed.primaryOutcome, "status-message");
+assert.ok(confirmed.summary.includes("Sales order 1001 was posted"),
+  "the exact Business Central confirmation is preserved");
+assert.strictEqual(statusWith("Showing 20 rows").status, "unverified",
+  "list announcements do not verify a business outcome");
 assert.ok(!JSON.stringify(statusResult).includes("Sales order 1001"),
   "status text must remain in canonical evidence rather than the document model");
 const orphanStatus = grouping.group({ recordingId: "result-verification", events: [
@@ -107,9 +119,9 @@ const interpreted = pipeline.interpret({
 assert.strictEqual(interpreted.businessTasks.length, 1);
 assert.strictEqual(interpreted.businessTasks[0].resultVerified, true);
 assert.strictEqual(interpreted.businessTasks[0].observedResult,
-  "Sidan F\u00f6rs.order \u00f6ppnades.");
+  "Sidan F\u00f6rs.order visas nu.");
 assert.strictEqual(interpreted.businessTasks[0].expectedResultSuggestion,
-  "Sidan F\u00f6rs.order \u00f6ppnades.");
+  "Sidan F\u00f6rs.order visas nu.");
 assert.strictEqual(interpreted.businessTasks[0].expectedResult, undefined,
   "observations must not overwrite the editable expected-result field");
 

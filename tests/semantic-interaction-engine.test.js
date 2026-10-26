@@ -71,7 +71,8 @@ const itemNumberEntry = only([{
 }, { taskId: "item-result", taskType: "EnterFieldValue",
   fieldCaption: "Sortera efter Nr", instructionValue: "30043",
   instruction: 'Ange 30043 i "Sortera efter Nr".'
-}], "EnterItemNumber", "Ange __30043__ i **Artikel Nr**.");
+// Without row-type evidence the field is not claimed to be an item number.
+}], "EnterFieldValue", "Ange __30043__ i **Nr**.");
 assert.strictEqual(itemNumberEntry.inputInteractionCount, 3);
 const redundantSortedSelection = engine.consolidateInteractions([{
   taskId: "number-entry", taskType: "EnterFieldValue",
@@ -378,7 +379,7 @@ assert.deepStrictEqual(customer.annotationRefs, [{ annotationId: "ann-1" }]);
 assert.deepStrictEqual(customer.rawInteractions[0].future, { retained: true });
 only(select("Artikelnr", "136"), "SelectItem", "Välj artikel **136**.");
 only(select("Leverantörsnr", "V-10"), "SelectVendor",
-  "Välj leverantör **V-10**.");
+  "Välj **V-10** i **Leverantörsnr**.");
 only(select("Lagerställekod", "BLÅ"), "SelectLocation",
   "Välj lagerställe **BLÅ**.");
 only(select("Dimensionsvärde", "SALES"), "SelectDimension",
@@ -401,7 +402,7 @@ only([{ taskId: "lookup", taskType: "RunAction",
   actionCaption: "Välj ett värde för Betalningsvillkor"
 }, { taskId: "lookup-row", taskType: "Select",
   selectedCaption: 'Välj posten "30D"' }], "SelectLookupValue",
-"Välj värde **30D**.");
+"Välj **30D** i **Betalningsvillkor**.");
 only([{ taskId: "field", taskType: "ChangeField", fieldCaption: "Referens",
   value: "ABC", inputSources: ["input"], unknown: { version: 2 } }],
 "EnterFieldValue", "Ange __ABC__ i **Referens**.");
@@ -438,7 +439,7 @@ const fieldLandingSequence = [{ taskId: "number-focus",
 const visibleFieldActions = engine.consolidateInteractions(fieldLandingSequence);
 assert.strictEqual(visibleFieldActions.length, 2);
 assert.strictEqual(visibleFieldActions[0].instruction,
-  "Välj Nr **136**.");
+  "Välj **136** i **Nr**.");
 assert.deepStrictEqual(visibleFieldActions[0].sourceEventNos, [10, 11, 12]);
 assert.strictEqual(visibleFieldActions[1].instruction,
   "Ange __500__ i **Antal**.");
@@ -454,7 +455,7 @@ const focusWorkflow = focusDocument.sections.find(value =>
 assert.strictEqual(focusWorkflow.blocks.filter(value =>
   value.kind === "step").length, 2);
 assert.deepStrictEqual(focusWorkflow.suppressedInteractions.flatMap(value =>
-  value.sourceEventNos), ["13", "14"]);
+  value.sourceEventNos), [13, 14]);
 
 const original = select("Kundnr", "1033");
 const before = JSON.stringify(original);
@@ -514,7 +515,7 @@ const step = document.sections.find(value => value.kind === "workflow")
 assert.strictEqual(step.blocks.find(value => value.kind === "paragraph").text,
   "Välj **1033** i **Kundnr**.");
 assert.strictEqual(step.semanticAction.futureSchemaField, "preserved");
-assert.deepStrictEqual(step.semanticAction.sourceEventNos, ["7"]);
+assert.deepStrictEqual(step.semanticAction.sourceEventNos, [7]);
 assert.deepStrictEqual(step.blocks.find(value => value.kind === "image")
   .annotationRefs, [{ annotationId: "annotation-1",
     screenshotRef: "customer.png" }]);
@@ -571,7 +572,7 @@ for(const locale of registry.supported('document').map(item=>item.locale)) {
 for (const type of ['Item','Resource','G/L Account','Fixed Asset','Custom Type']) {
   const pair=lookupPair.map(item=>({...item}));
   pair[0].rowTypeContext={schemaVersion:1,source:'same-row-type',caption:'Type',value:type};
-  const output=only(pair,'SelectLookupValue',`Välj **0015** i **No.** (**${type}**).`);
+  const output=only(pair,type==='Item'?'EnterItemNumber':'SelectLookupValue',`Välj **0015** i **No.** (**${type}**).`);
   assert.equal(output.rowTypeContext.value,type);
   if(type==='Item') assert.equal(output.selectedEntity,'Item');
   for(const locale of registry.supported('document').map(item=>item.locale))

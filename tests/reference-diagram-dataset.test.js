@@ -5,7 +5,12 @@ const graph = require("../src/document/process-graph");
 
 const checked = model.validate(seed);
 assert.strictEqual(checked.valid, true, JSON.stringify(checked.diagnostics));
-assert.strictEqual(checked.dataset.diagrams.length, 43);
+assert.strictEqual(checked.dataset.diagrams.length, 49);
+for (const name of ["Manual Purchase Inspection", "Warehouse Receipt Inspection and Reinspection",
+  "Production Output Sampling Inspection", "General Journal Posting",
+  "Bank Account Reconciliation", "Vendor Payment Journal"]) {
+  assert(checked.dataset.diagrams.some(item => item.name === name), name);
+}
 assert(checked.dataset.diagrams.every(item => item.sourceId && item.abstractionLevel === "BC_PROCESS"));
 assert(checked.dataset.diagrams.every(item => !item.originalImageAssetId));
 assert(checked.dataset.diagrams.every(item => item.facts.every(fact => fact.sourceId)));
@@ -119,7 +124,7 @@ assert.strictEqual(manual.publishable, true);
 assert.strictEqual(manual.normalized.labels[2].sourceLabel, "Generate Pick");
 assert.strictEqual(manual.normalized.labels[2].canonicalConceptId, "concept:create-warehouse-pick");
 const published = model.pipeline().publish(manual);
-assert.strictEqual(published.diagrams.length, 44);
+assert.strictEqual(published.diagrams.length, checked.dataset.diagrams.length + 1);
 const externalSource = { id: "source:partner:one", sourceType: "PartnerDocumentation",
   title: "Partner process", publisher: "Partner" };
 const sourced = model.pipeline().ingest({ inputType: "ManualProcess", source: externalSource,

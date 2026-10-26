@@ -9,13 +9,19 @@
     includeTelemetry: false, includeTelemetryMessages: false,
     includeEnvironment: false, includeRawCallStackFragments: false,
     includeScreenshots: false });
+  const bearerPattern = /\b(Bearer\s+)[A-Z0-9._~+/=-]+/giu;
+  const namedSecretPattern = /(["']?(?:access[_ -]?token|refresh[_ -]?token|client[_ -]?secret|api[_ -]?key|password|token|secret)["']?\s*[:=]\s*["']?)[^\s,;&"']+/giu;
+  const querySecretPattern = /([?&](?:access_token|refresh_token|client_secret|api_key|code)=)[^&#\s]+/giu;
   function policy(overrides = {}) {
     return { ...DEFAULTS, ...Object.fromEntries(Object.entries(overrides)
       .filter(([key]) => Object.hasOwn(DEFAULTS, key)).map(([key, value]) =>
         [key, Boolean(value)])), version: VERSION };
   }
   function redact(value) {
-    return String(value || "").replace(/[\w.+-]+@[\w.-]+\.[a-z]{2,}/giu,
+    return String(value || "").replace(bearerPattern, "$1[redacted]")
+      .replace(namedSecretPattern, "$1[redacted]")
+      .replace(querySecretPattern, "$1[redacted]")
+      .replace(/[\w.+-]+@[\w.-]+\.[a-z]{2,}/giu,
       "[redacted-email]").replace(/\b[0-9a-f]{8}-[0-9a-f-]{27,}\b/giu,
       "[redacted-guid]").replace(/(https?:\/\/[^\s?]+)\?\S+/giu, "$1?[redacted-query]");
   }

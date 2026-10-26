@@ -34,7 +34,7 @@
     confirmno: { actionType: "ConfirmNo", captions: /^(nej|no|non)$/i },
     open: { actionType: "OpenRecord", captions: /open record|öppna post|åbn post/i },
     back: { actionType: "NavigateBack", captions: /^(tillbaka|back|tilbage)$/i },
-    new: { actionType: "CreateNew", captions: /^(ny|new|ny post)$/i },
+    new: { actionType: "CreateNew", captions: /^(?:ny(?:tt)?(?:\s+(?:post|order|faktura|kreditnota))?|new(?:\s+(?:record|order|invoice|credit memo))?|skapa ny|create new|nouveau|nouvelle|neu(?:e|er|es)?|nuevo|nueva|opret|opprett(?:e)?|uusi)$/iu },
     edit: { actionType: "EditRecord", captions: /^(redigera|edit|rediger)$/i },
     delete: { actionType: "DeleteRecord", captions: /^(ta bort|delete|slet)$/i }
   };

@@ -11,9 +11,9 @@
 ) {
   "use strict";
   const SCHEMA_VERSION = 1;
-  const GROUPING_VERSION = "1.24.0";
+  const GROUPING_VERSION = "1.29.0";
   const CAPTURE_PACKET_VERSION = "1.6.0";
-  const RESULT_VERIFICATION_VERSION = "1.2.0";
+  const RESULT_VERIFICATION_VERSION = "1.4.0";
   const cache = new WeakMap();
   const clone = value => value == null ? value : JSON.parse(JSON.stringify(value));
   function freeze(value) { if (!value || typeof value !== "object" || Object.isFrozen(value)) return value; Object.values(value).forEach(freeze); return Object.freeze(value); }
@@ -77,6 +77,10 @@
     return "supporting";
   }
   function primaryEvent(events) {
+    // A lookup result is supporting evidence for the field activation. Keep
+    // the originating control/page as the group context so later semantic
+    // interpretation can explain what the selected record was entered into.
+    if (events.some(isLookupOrigin)) return events.find(isLookupOrigin);
     if (events.some(event => event.kind === "activation") &&
         !events.some(isLookupOrigin) && outcomeEvents(events).length) {
       return events.find(event => event.kind === "activation");
@@ -91,29 +95,41 @@
     return event.controlIdentification?.caption ||
       event.actionIdentification?.caption || "";
   }
+  const COMPLETION_MESSAGE = /(?:\b(?:has been\s+)?(?:successfully\s+)?(?:created|saved|posted|processed|registered|generated|applied|released|sent|completed)\b|\b(?:skapats|skapades|skapade|sparats|sparades|sparad|sparat|bokf[oö]rts|registrerats|registrerades|till[aä]mpats|frisl[aä]ppts|skickats|slutf[oö]rts)\b|\b(?:cr[eé][eé](?:e|es|s)?|enregistr[eé](?:e|es|s)?|valid[eé](?:e|es|s)?|comptabilis[eé](?:e|es|s)?|envoy[eé](?:e|es|s)?|termin[eé](?:e|es|s)?)\b|\b(?:creado|guardado|registrado|contabilizado|aplicado|enviado|finalizado)s?\b|\b(?:erstellt|gespeichert|gebucht|registriert|angewendet|freigegeben|gesendet|abgeschlossen)\b|\b(?:oprettet|gemt|bogf[oø]rt|registreret|anvendt|frigivet|sendt|afsluttet)\b|\b(?:luotu|tallennettu|kirjattu|rekister[oö]ity|sovellettu|vapautettu|l[aä]hetetty|valmis)\b|\b(?:opprettet|lagret|bokf[oø]rt|registrert|brukt|frigitt|sendt|fullf[oø]rt)\b)/iu;
+  function isCompletionMessage(text) { return COMPLETION_MESSAGE.test(String(text || "")); }
+  function isListAnnouncement(text) {
+    return /(?:^|\b)(?:lista med rubriken|list with (?:the )?title|list titled|sorterade? i|sorted (?:in|by)|attributnamn|attribute name)(?:\b|$)/iu
+      .test(String(text || ""));
+  }
   function outcomeDescription(event) {
     const pageCaption = observedCaption(event, "page");
     const controlCaption = observedCaption(event, "control");
+    const completion = event.kind === "dialog-open" &&
+      isCompletionMessage(controlCaption);
     switch (event.kind) {
       case "navigation": return pageCaption
-        ? `Sidan ${pageCaption} \u00f6ppnades.` : "En ny sida \u00f6ppnades.";
-      case "dialog-open": return pageCaption
-        ? `Dialogrutan ${pageCaption} \u00f6ppnades.` : "En dialogruta \u00f6ppnades.";
-      case "dialog-close": return "Dialogrutan st\u00e4ngdes.";
+        ? `Sidan ${pageCaption} visas nu.` : "En ny sida öppnades.";
+      case "dialog-open": return completion
+        ? `Business Central bekräftade att “${controlCaption.replace(/[.!?]+$/u, "") }”.`
+        : pageCaption ? `Dialogrutan ${pageCaption} visas nu.` : "En dialogruta öppnades.";
+      case "dialog-close": return pageCaption
+        ? `Dialogrutan ${pageCaption} stängdes.` : "Dialogrutan stängdes.";
       case "value-change": return controlCaption
-        ? `${controlCaption} uppdaterades.` : "F\u00e4ltv\u00e4rdet uppdaterades.";
+        ? `Värdet i ${controlCaption} ändrades.` : "Ett fältvärde ändrades.";
       case "selection-change": return controlCaption
-        ? `Ett val registrerades i ${controlCaption}.` : "Ett val registrerades.";
+        ? `Valet i ${controlCaption} ändrades.` : "Ett val ändrades.";
       case "toggle-change": return controlCaption
-        ? `${controlCaption} ${event.state?.checked ? "aktiverades" : "inaktiverades"}.`
-        : `Alternativet ${event.state?.checked ? "aktiverades" : "inaktiverades"}.`;
-      case "status-message": return "Business Central visade ett statusmeddelande.";
+        ? `Du ${event.state?.checked ? "aktiverade" : "inaktiverade"} ${controlCaption}.`
+        : `Ett alternativ slogs ${event.state?.checked ? "på" : "av"}.`;
+      case "status-message": return isCompletionMessage(controlCaption)
+        ? `Business Central bekräftade att “${controlCaption.replace(/[.!?]+$/u, "") }”.`
+        : "Business Central visade ett meddelande.";
       case "error-outcome": return "Business Central visade ett fel.";
       default: return "";
     }
   }
   function resultVerification(outcomes) {
-    const values = outcomes.map(event => ({
+    const observedValues = outcomes.map(event => ({
       kind: event.kind,
       normalizedEventId: event.normalizedEventId,
       sourceEventIds: unique(event.sourceEventIds || [event.sourceEventId]),
@@ -125,16 +141,38 @@
         ? { checked: Boolean(event.state.checked) } : {}),
       description: outcomeDescription(event)
     }));
+    // A status announcement is not proof that a business operation completed.
+    // Keep explicit completion messages and, when a completion is present, a
+    // nearby document reference; list counts and progress messages remain only
+    // in the underlying captured events.
+    const completionIndex = observedValues.findIndex(value =>
+      (value.kind === "dialog-open" || value.kind === "status-message") &&
+      /^Business Central bekräftade(?: att)?/u.test(value.description));
+    const completion = completionIndex >= 0 ? observedValues[completionIndex] : null;
+    const reference = completion ? observedValues.slice(completionIndex + 1).find(value =>
+      value.kind === "status-message" && value.controlCaption &&
+      !isCompletionMessage(value.controlCaption) && !isListAnnouncement(value.controlCaption)) : null;
+    const values = observedValues.filter((value, index) => {
+      if (value.kind !== "status-message") return true;
+      if (index === completionIndex || index === (reference
+        ? observedValues.indexOf(reference) : -1)) return true;
+      return false;
+    });
     const error = values.find(value => value.kind === "error-outcome");
-    const primary = error || values.at(-1) || null;
+    const primary = error || completion || values.at(-1) || null;
+    const summary = completion
+      ? `${completion.description}${reference
+        ? ` Referensen är ${reference.controlCaption.replace(/[.!?]+$/u, "")}.` : ""}`
+      : primary?.description || "Inspelningen visar inte vad som hände efter den här åtgärden.";
     return {
       version: RESULT_VERIFICATION_VERSION,
       status: error ? "error" : primary ? "verified" : "unverified",
       primaryOutcome: primary?.kind || null,
       primaryOutcomeEventId: primary?.normalizedEventId || null,
       outcomes: values,
-      summary: primary?.description || "Resultatet kunde inte verifieras automatiskt.",
-      expectedResultSuggestion: primary?.description || "",
+      summary,
+      // Missing evidence is not an expected result; only suggest observed outcomes.
+      expectedResultSuggestion: primary ? summary : "",
       sourceEventIds: unique(values.flatMap(value => value.sourceEventIds))
     };
   }
@@ -217,6 +255,8 @@
       sequence, primaryEventId: primary.normalizedEventId,
       primarySourceEventId: primary.sourceEventId,
       pageContext: clone(primary.pageIdentification || {}),
+      fieldContext: clone(primary.focusedFieldContext ||
+        [...events].reverse().map(event => event.focusedFieldContext).find(Boolean) || null),
       controlContext: clone(primary.controlIdentification || {}),
       actionContext: clone(primary.actionIdentification),
       uiHierarchy: clone(primary.uiHierarchy || []),
@@ -252,8 +292,22 @@
     const caption = String(event.actionIdentification?.caption ||
       event.controlIdentification?.caption || event.rawEvent?.label || "")
       .trim().split(/\s*(?:→|->)\s*/).at(-1);
+    // BC validation tips and shortcut hints are explanatory overlays, not
+    // actions performed in the business process. Never turn clicks on these
+    // surfaces into procedure steps.
+    if (event.rawEventType === "click" &&
+        /^(?:den här gruppen innehåller .* obligatoriska fält|tryck på alt\s*\+\s*i .*förslag för det här fältet|this group contains .* required fields|press alt\s*\+\s*i .*suggestion for this field)/iu.test(caption)) return true;
+    if (event.rawEventType === "click" &&
+        /^(?:värdet i det här fältet är obligatoriskt|the value in this field is required)/iu.test(caption)) return true;
+    const embeddedLabels = caption.match(/\b(?:antal|quantity|qty|lastbärare|pallet|tare|taravikt|weight|vikt|leveransenhet|unit|kod|code)\b/giu) || [];
+    if (event.rawEventType === "click" && caption.length > 70 &&
+        embeddedLabels.length >= 4) return true;
+    // Fluent UI often exposes icon-only commands as private-use Unicode glyphs.
+    // With no accessible action name they cannot form an actionable instruction.
+    if (event.rawEventType === "click" && /^[\uE000-\uF8FF]+$/u.test(caption)) return true;
     if (["textbox", "searchbox"].includes(event.controlIdentification?.role) &&
-        /^(?:tell me what you want to do|berätta vad du vill göra)\.?$/iu.test(caption)) return true;
+        /^(?:tell me what you want to do|berätta vad du vill göra)\.?$/iu.test(caption) &&
+        (event.kind !== "value-change" || !String(event.value?.normalized || "").trim())) return true;
     const scrollCommand = /^(?:rulla|scroll)(?:\s+(?:åt|to\s+the))?\s+(?:höger|vänster|upp|ned|ner|right|left|up|down)\.?$/iu.test(caption);
     const displayCommand = /^(?:visa resten|show more|show less|visa mindre|visa sekundära åtgärder|show secondary actions)\.?$/iu.test(caption);
     const control = event.controlIdentification || {};

@@ -15,6 +15,7 @@ function setup() {
     activeReviewModel: { screenshotData: {} }, activeReviewSelection: {},
     annotationItems: () => [], renderStepRepairGallery: () => {},
     renderReview: () => {}, show: () => {}, reviewAutoSave: { schedule() {} },
+    uiT: value => value,
     repairs: 0,
     T9Review: { resolveTask: () => ({ selectedScreenshotAssetId: "old" }),
       repairTaskScreenshot: () => { context.repairs += 1; return { ok: true }; } },

@@ -36,7 +36,8 @@ assert.ok(
 );
 assert.ok(
   dashboardHtml.includes("Regenerera fr&aring;n inspelning") &&
-    dashboard.includes("const replaceEmptyReview = existing.review") &&
+    dashboard.includes("const emptyReview = storedReview &&") &&
+    dashboard.includes("reviewUnchanged && model.businessTasks.length > 0 &&") &&
     dashboard.includes('"empty-generated-result"'),
   "Review regeneration must use a correctly encoded label, reject empty output and recover an empty stored Review."
 );
@@ -129,7 +130,7 @@ assert.ok(
 );
 
 assert.ok(
-  dashboard.includes("Inga sessioner har sparats ännu."),
+  dashboard.includes('uiT("library.emptySessions")'),
   "Dashboard must render an explicit empty state."
 );
 

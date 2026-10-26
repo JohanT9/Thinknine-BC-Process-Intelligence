@@ -25,5 +25,15 @@
       .replace(/\b[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}\b/giu,
         "[id]");
   }
-  return { mask };
+  function maskFieldValues(event, settings = {}) {
+    if (!event || typeof event !== "object" || Array.isArray(event)) return event;
+    const masked = { ...event };
+    for (const property of ["value", "previousValue"]) {
+      if (Object.prototype.hasOwnProperty.call(event, property)) {
+        masked[property] = mask(event.fieldName, event[property], settings);
+      }
+    }
+    return masked;
+  }
+  return { mask, maskFieldValues };
 });

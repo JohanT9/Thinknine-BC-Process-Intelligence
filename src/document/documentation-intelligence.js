@@ -23,6 +23,7 @@
     "document.missing-revision-history": "Revisionshistorik",
     "step.empty-instruction": "Tydlig instruktion",
     "step.very-short-instruction": "Instruktion med sammanhang",
+    "step.generic-instruction": "Handlingsbaserad instruktion",
     "step.duplicate-instruction": "Unika instruktioner",
     "screenshot.missing": "Visuellt stöd för steget",
     "screenshot.missing-alt-text": "Beskrivande alternativtext",
@@ -181,7 +182,8 @@
     }
     if (profile.workflowExpectations?.explanatoryText === "expanded" &&
         facts.instructions.some(value => value.trim().length < 40) &&
-        !diagnosticRules.has("step.very-short-instruction")) {
+        !diagnosticRules.has("step.very-short-instruction") &&
+        !diagnosticRules.has("step.generic-instruction")) {
       values.push(profileItem(profile, "expanded-text", "Workflow",
         "Utöka förklaringen i korta steg",
         "Lägg gärna till sammanhang som hjälper en ny användare."));

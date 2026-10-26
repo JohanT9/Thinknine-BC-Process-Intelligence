@@ -20,7 +20,17 @@ assert.strictEqual(privacy.mask("Antal", "500", { maskValues: false }), "500");
 const background = fs.readFileSync(path.join(__dirname,
   "../src/recorder/background.js"), "utf8");
 assert(background.includes('importScripts("engine/privacy-mask.js")'));
-assert(background.includes("globalThis.T9PrivacyMask.mask("));
+assert(/globalThis\.T9PrivacyMask\s*\.maskFieldValues\(sourceEvent, settings\)/u.test(background));
+
+// Both the new and the previous field value are masked, without mutating input.
+const fieldEvent = { fieldName: "Lösenord", value: "nytt", previousValue: "gammalt" };
+const maskedEvent = privacy.maskFieldValues(fieldEvent, settings);
+assert.deepStrictEqual(maskedEvent, { fieldName: "Lösenord", value: "[maskerat]",
+  previousValue: "[maskerat]" });
+assert.strictEqual(fieldEvent.previousValue, "gammalt");
+assert(!("previousValue" in privacy.maskFieldValues({ fieldName: "Antal", value: "5" }, settings)),
+  "absent values are not introduced");
+assert.strictEqual(privacy.maskFieldValues(null, settings), null);
 assert(!background.includes('return "[antal]"'));
 assert(background.includes("item.source?.eventId === sourceEventId"),
   "only exact source-message redelivery may be deduplicated");

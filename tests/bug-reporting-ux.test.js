@@ -48,7 +48,7 @@ assert.match(popupLogic, /recorder\.discardConfirm/);
 assert.match(uiTranslations, /Alla registrerade händelser och bilder i den tas bort/);
 assert.match(background, /case "T9_CANCEL_RECORDING"/);
 assert.match(background, /await cancelActiveSession\(\)/);
-assert.match(background, /BC_ERROR_EVIDENCE_PREFIX \+ id/);
+assert.match(background, /await bcErrorEvidenceStore\.remove\(id\)/);
 assert.match(popup, /id="recordingName" required/);
 assert.match(popup, /class="name-fields"[\s\S]*class="name-field"[\s\S]*id="recordingName"[\s\S]*class="name-field"[\s\S]*id="recordingDocumentLanguage"/);
 assert.match(popup, /input,textarea,select\{width:100%/);

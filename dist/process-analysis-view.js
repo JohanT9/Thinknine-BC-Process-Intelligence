@@ -18,7 +18,9 @@
     .test(stepLabel(step).replace(/^\w+:/u, "").replace(/[-_]+/gu, " ").trim()); }
   function localized(value, labels) { const source = text(value);
     return labels.processNames?.[source] ||
-      processMapLabels?.nodeTitle({ title: source }, labels.locale || "en-US") || source; }
+      (/^domain:/iu.test(source) && processMapLabels?.domainTitle
+        ? processMapLabels.domainTitle(source, labels.locale || "en-US")
+        : processMapLabels?.nodeTitle({ title: source }, labels.locale || "en-US")) || source; }
   function actionEvidenceLabel(item, labels) { const name = localized(stepLabel(item), labels);
     const qualifiers = array(item?.qualifiers).map(value =>
       labels.actionQualifiers?.[value] || value).filter(Boolean);

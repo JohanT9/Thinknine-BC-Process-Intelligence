@@ -51,7 +51,7 @@ async function load() {
   const screenshots = debug.screenshotStats || {};
 
   const rows = [
-    ["Version", debug.version || "4.7.41"],
+    ["Version", debug.version || chrome.runtime.getManifest().version],
     ["Anslutning till BC", debug.connected ? "OK" : uiText("Inte bekräftad"), debug.connected ? "ok" : "error"],
     ["Inspelning", state.recording ? t("debug.active") : t("debug.inactive")],
     ["Aktiv session", state.sessionId || t("debug.noSession")],

@@ -83,7 +83,7 @@ assert.match(dashboard, /T9Review\.displayScreenshotAssetIds/,
   "Review rendering and document projection must share the selected asset.");
 assert.match(background, /case "T9_CAPTURE_STEP_REPAIR_SCREENSHOT"/);
 assert.match(background, /case "T9_SAVE_STEP_REPAIR_SCREENSHOT"/);
-assert.match(background, /screenshots\[assetKey\] = image/);
+assert.match(background, /await saveScreenshot\(recordingId, assetKey, image\)/);
 assert.match(dashboard, /T9_SAVE_STEP_REPAIR_SCREENSHOT/,
   "a newly captured screenshot is persisted only after explicit approval");
 assert.doesNotMatch(background,

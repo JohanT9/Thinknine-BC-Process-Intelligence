@@ -113,9 +113,20 @@ assert(content.includes("[role=\\\"checkbox\\\"]") ||
 // documents, without broadening access to arbitrary external origins.
 assert.strictEqual(manifest.content_scripts[0].all_frames, true);
 assert.strictEqual(manifest.content_scripts[0].match_about_blank, true);
-assert.deepStrictEqual(manifest.content_scripts[0].js,
-  ["capture-focus-session.js", "capture-surface-mode.js",
-    "bc-error-detector.js", "content.js"]);
+const captureScripts = ["engine/business-central-version-capture.js",
+  "capture-field-privacy.js", "capture-focus-session.js", "capture-surface-mode.js",
+  "bc-error-detector.js", "capture-indicator-i18n.js", "content.js"];
+assert.deepStrictEqual(manifest.content_scripts[0].js, captureScripts);
+// Dynamic registration and re-injection must load the same helpers as the
+// manifest; otherwise tabs opened before install/update lose capture context.
+const backgroundScriptList = background.match(
+  /const CAPTURE_SCRIPT_FILES = Object\.freeze\((\[[\s\S]*?\])\)/u);
+assert(backgroundScriptList, "background must declare one capture script list");
+assert.deepStrictEqual(JSON.parse(backgroundScriptList[1]), captureScripts);
+assert.strictEqual((background.match(/\.\.\.CAPTURE_SCRIPT_FILES/gu) || []).length, 3);
+const popupScriptList = popup.match(/files: (\["engine\/business-central-version-capture\.js"[\s\S]*?\])/u);
+assert(popupScriptList, "popup injection must include every capture helper");
+assert.deepStrictEqual(JSON.parse(popupScriptList[1]), captureScripts);
 assert(!manifest.host_permissions.includes("<all_urls>"));
 assert(manifest.permissions.includes("webNavigation"));
 assert(background.includes("allFrames: true"));
@@ -127,8 +138,6 @@ assert(background.includes("chrome.webNavigation.getAllFrames"));
 assert(background.includes('case "T9_CAPTURE_BEFORE_ACTION"'));
 assert(background.includes("consumePreActionCapture"));
 assert(background.includes("activeContent.sessionId !== id"));
-assert(popup.includes(
-  'files: ["capture-focus-session.js", "capture-surface-mode.js",'));
 assert((background.match(/await registerRecorderContentScript\(\);/gu) || [])
   .length >= 2, "Install and browser startup must refresh persistent registration.");
 

@@ -17,6 +17,7 @@ const analysis = model.build({ recordingId: "recording:analysis",
     { actionId: "action:included", stepGroupIds: ["group:included"] },
     { actionId: "action:ignored", stepGroupIds: ["group:ignored"] }
   ], businessTasks: [{ taskId: "task:included", stepGroupIds: ["group:included"],
+    pageCaption: "Sales Order", instruction: "Select Release on the Sales Order page.",
     sourceEventIds: ["event:included", "event:included-2"] }],
   consolidationDecisions: [{ decisionId: "consolidation:1", outcome: "merged",
     decisionCode: "BCPS-PROCESS-MERGE-001", ruleId: "lookup-selection",
@@ -29,13 +30,16 @@ const analysis = model.build({ recordingId: "recording:analysis",
 assert.strictEqual(analysis.schemaVersion, 1);
 assert.strictEqual(analysis.modelVersion, "1.4.0");
 assert.strictEqual(analysis.decisionCodeRegistryVersion, "1.0.0");
-assert.strictEqual(analysis.qualityGuardVersion, "1.0.0");
+assert.strictEqual(analysis.qualityGuardVersion, "1.5.0");
 assert.strictEqual(analysis.contradictionEngineVersion, "1.0.0");
-assert.strictEqual(analysis.qualityGate.status, "passed");
+// The unassigned meaningful event must be explained before release.
+assert.strictEqual(analysis.qualityGate.status, "review-required");
+assert.deepStrictEqual(analysis.qualityGate.findings.map(item => item.code),
+  ["BCPS-PROCESS-GUARD-COVERAGE-002"]);
 assert.strictEqual(analysis.contradictionAnalysis.status, "passed");
 assert.strictEqual(analysis.contradictionAnalysis.languageAssessment,
   "insufficient-evidence");
-assert.strictEqual(analysis.releaseGate.status, "passed");
+assert.strictEqual(analysis.releaseGate.status, "review-required");
 assert.strictEqual(analysis.decisions.consolidations[0].decisionCode,
   "BCPS-PROCESS-MERGE-001");
 assert.deepStrictEqual(analysis.decisions.consolidations[0].inputTaskIds,

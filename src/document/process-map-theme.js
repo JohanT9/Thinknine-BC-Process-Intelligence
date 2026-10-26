@@ -47,9 +47,14 @@
   });
   function normalize(value) { return Object.hasOwn(THEMES, value) ? value : DEFAULT_THEME_ID; }
   function resolve(value) { return THEMES[normalize(value)]; }
-  function list(locale = "sv-SE") { const language = String(locale).toLowerCase().startsWith("en")
-    ? "en" : "sv"; return Object.values(THEMES).map(theme => Object.freeze({
-      id: theme.id, label: theme.labels[language]
-    })); }
+  function list(locale = "sv-SE") { const swedish = String(locale).toLowerCase().startsWith("sv");
+    return Object.values(THEMES).map(theme => {
+      const english = theme.labels.en;
+      const themeKey = theme.id === "business-central" ? "businessCentral" : theme.id;
+      const label = globalThis.T9UiI18n?.translate?.(`processTheme.${themeKey}`, locale) ||
+        (swedish ? theme.labels.sv :
+          globalThis.T9UiI18n?.translateStaticText?.(english, locale) || english);
+      return Object.freeze({ id: theme.id, label });
+    }); }
   return { DEFAULT_THEME_ID, THEMES, list, normalize, resolve };
 });

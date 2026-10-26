@@ -14,8 +14,8 @@
           "selectedCaption": "500",
           "screenshot": "quantity.png",
           "resultStatus": "verified",
-          "observedResult": "Quantity uppdaterades.",
-          "expectedResultSuggestion": "Quantity uppdaterades.",
+          "observedResult": "Värdet i Quantity ändrades.",
+          "expectedResultSuggestion": "Värdet i Quantity ändrades.",
           "important": false,
           "sectionBoundaryAfter": false
         }
@@ -24,7 +24,7 @@
         {
           "stepNumber": 1,
           "instruction": "Ange __500__ i **Quantity**.",
-          "observedResult": "Quantity uppdaterades.",
+          "observedResult": "Värdet i Quantity ändrades.",
           "screenshot": "quantity.png"
         }
       ]
@@ -46,8 +46,8 @@
           "selectedCaption": "",
           "screenshot": "sales-order.png",
           "resultStatus": "verified",
-          "observedResult": "Sidan Sales Order öppnades.",
-          "expectedResultSuggestion": "Sidan Sales Order öppnades.",
+          "observedResult": "Sidan Sales Order visas nu.",
+          "expectedResultSuggestion": "Sidan Sales Order visas nu.",
           "important": false,
           "sectionBoundaryAfter": false
         }
@@ -56,7 +56,7 @@
         {
           "stepNumber": 1,
           "instruction": "Välj **Open**.",
-          "observedResult": "Sidan Sales Order öppnades.",
+          "observedResult": "Sidan Sales Order visas nu.",
           "screenshot": "sales-order.png"
         }
       ]
@@ -73,8 +73,8 @@
           "selectedCaption": "30043",
           "screenshot": "record.png",
           "resultStatus": "verified",
-          "observedResult": "Ett val registrerades i No..",
-          "expectedResultSuggestion": "Ett val registrerades i No..",
+          "observedResult": "Valet i No. ändrades.",
+          "expectedResultSuggestion": "Valet i No. ändrades.",
           "important": false,
           "sectionBoundaryAfter": false
         }
@@ -83,7 +83,7 @@
         {
           "stepNumber": 1,
           "instruction": "Välj posten **30043**.",
-          "observedResult": "Ett val registrerades i No..",
+          "observedResult": "Valet i No. ändrades.",
           "screenshot": "record.png"
         }
       ]
@@ -100,8 +100,8 @@
           "selectedCaption": "",
           "screenshot": "blocked.png",
           "resultStatus": "verified",
-          "observedResult": "Blocked aktiverades.",
-          "expectedResultSuggestion": "Blocked aktiverades.",
+          "observedResult": "Du aktiverade Blocked.",
+          "expectedResultSuggestion": "Du aktiverade Blocked.",
           "important": false,
           "sectionBoundaryAfter": false
         }
@@ -110,7 +110,7 @@
         {
           "stepNumber": 1,
           "instruction": "Aktivera **Blocked**.",
-          "observedResult": "Blocked aktiverades.",
+          "observedResult": "Du aktiverade Blocked.",
           "screenshot": "blocked.png"
         }
       ]
@@ -127,8 +127,8 @@
           "selectedCaption": "Open",
           "screenshot": "status.png",
           "resultStatus": "verified",
-          "observedResult": "Ett val registrerades i Status.",
-          "expectedResultSuggestion": "Ett val registrerades i Status.",
+          "observedResult": "Valet i Status ändrades.",
+          "expectedResultSuggestion": "Valet i Status ändrades.",
           "important": false,
           "sectionBoundaryAfter": false
         }
@@ -137,7 +137,7 @@
         {
           "stepNumber": 1,
           "instruction": "Välj **Open** i **Status**.",
-          "observedResult": "Ett val registrerades i Status.",
+          "observedResult": "Valet i Status ändrades.",
           "screenshot": "status.png"
         }
       ]
@@ -159,8 +159,8 @@
           "selectedCaption": "10000",
           "screenshot": null,
           "resultStatus": "verified",
-          "observedResult": "No. uppdaterades.",
-          "expectedResultSuggestion": "No. uppdaterades.",
+          "observedResult": "Värdet i No. ändrades.",
+          "expectedResultSuggestion": "Värdet i No. ändrades.",
           "important": false,
           "sectionBoundaryAfter": false
         },
@@ -173,8 +173,8 @@
           "selectedCaption": "30043",
           "screenshot": null,
           "resultStatus": "verified",
-          "observedResult": "No. uppdaterades.",
-          "expectedResultSuggestion": "No. uppdaterades.",
+          "observedResult": "Värdet i No. ändrades.",
+          "expectedResultSuggestion": "Värdet i No. ändrades.",
           "important": false,
           "sectionBoundaryAfter": false
         }
@@ -183,13 +183,13 @@
         {
           "stepNumber": 1,
           "instruction": "Ange __10000__ i **No.**.",
-          "observedResult": "No. uppdaterades.",
+          "observedResult": "Värdet i No. ändrades.",
           "screenshot": null
         },
         {
           "stepNumber": 2,
           "instruction": "Ange __30043__ i **No.**.",
-          "observedResult": "No. uppdaterades.",
+          "observedResult": "Värdet i No. ändrades.",
           "screenshot": null
         }
       ]
@@ -233,7 +233,7 @@
           "selectedCaption": "",
           "screenshot": "sales-order-action.png",
           "resultStatus": "unverified",
-          "observedResult": "Resultatet kunde inte verifieras automatiskt.",
+          "observedResult": "Inspelningen visar inte vad som hände efter den här åtgärden.",
           "expectedResultSuggestion": "",
           "important": false,
           "sectionBoundaryAfter": false
@@ -260,8 +260,8 @@
           "selectedCaption": "2026-09-23",
           "screenshot": "posting-date.png",
           "resultStatus": "verified",
-          "observedResult": "Posting Date uppdaterades.",
-          "expectedResultSuggestion": "Posting Date uppdaterades.",
+          "observedResult": "Värdet i Posting Date ändrades.",
+          "expectedResultSuggestion": "Värdet i Posting Date ändrades.",
           "important": false,
           "sectionBoundaryAfter": false
         }
@@ -270,7 +270,7 @@
         {
           "stepNumber": 1,
           "instruction": "Ange __2026-09-23__ i **Posting Date**.",
-          "observedResult": "Posting Date uppdaterades.",
+          "observedResult": "Värdet i Posting Date ändrades.",
           "screenshot": "posting-date.png"
         }
       ]
@@ -287,8 +287,8 @@
           "selectedCaption": "Synthetic description",
           "screenshot": "description.png",
           "resultStatus": "verified",
-          "observedResult": "Description uppdaterades.",
-          "expectedResultSuggestion": "Description uppdaterades.",
+          "observedResult": "Värdet i Description ändrades.",
+          "expectedResultSuggestion": "Värdet i Description ändrades.",
           "important": false,
           "sectionBoundaryAfter": false
         }
@@ -297,7 +297,7 @@
         {
           "stepNumber": 1,
           "instruction": "Ange __Synthetic description__ i **Description**.",
-          "observedResult": "Description uppdaterades.",
+          "observedResult": "Värdet i Description ändrades.",
           "screenshot": "description.png"
         }
       ]
@@ -314,8 +314,8 @@
           "selectedCaption": "",
           "screenshot": "released.png",
           "resultStatus": "verified",
-          "observedResult": "Business Central visade ett statusmeddelande.",
-          "expectedResultSuggestion": "Business Central visade ett statusmeddelande.",
+          "observedResult": "Business Central bekräftade att “Released”.",
+          "expectedResultSuggestion": "Business Central bekräftade att “Released”.",
           "important": false,
           "sectionBoundaryAfter": false
         }
@@ -324,7 +324,7 @@
         {
           "stepNumber": 1,
           "instruction": "Välj **Release**.",
-          "observedResult": "Business Central visade ett statusmeddelande.",
+          "observedResult": "Business Central bekräftade att “Released”.",
           "screenshot": "released.png"
         }
       ]
@@ -351,7 +351,7 @@
           "selectedCaption": "Manual Price...",
           "screenshot": "functions.png",
           "resultStatus": "unverified",
-          "observedResult": "Resultatet kunde inte verifieras automatiskt.",
+          "observedResult": "Inspelningen visar inte vad som hände efter den här åtgärden.",
           "expectedResultSuggestion": "",
           "important": false,
           "sectionBoundaryAfter": false
@@ -378,8 +378,8 @@
           "selectedCaption": "5",
           "screenshot": null,
           "resultStatus": "verified",
-          "observedResult": "Quantity uppdaterades.",
-          "expectedResultSuggestion": "Quantity uppdaterades.",
+          "observedResult": "Värdet i Quantity ändrades.",
+          "expectedResultSuggestion": "Värdet i Quantity ändrades.",
           "important": false,
           "sectionBoundaryAfter": false
         },
@@ -392,8 +392,8 @@
           "selectedCaption": "50",
           "screenshot": null,
           "resultStatus": "verified",
-          "observedResult": "Quantity uppdaterades.",
-          "expectedResultSuggestion": "Quantity uppdaterades.",
+          "observedResult": "Värdet i Quantity ändrades.",
+          "expectedResultSuggestion": "Värdet i Quantity ändrades.",
           "important": false,
           "sectionBoundaryAfter": false
         }
@@ -402,13 +402,13 @@
         {
           "stepNumber": 1,
           "instruction": "Ange __5__ i **Quantity**.",
-          "observedResult": "Quantity uppdaterades.",
+          "observedResult": "Värdet i Quantity ändrades.",
           "screenshot": null
         },
         {
           "stepNumber": 2,
           "instruction": "Ange __50__ i **Quantity**.",
-          "observedResult": "Quantity uppdaterades.",
+          "observedResult": "Värdet i Quantity ändrades.",
           "screenshot": null
         }
       ]
@@ -425,7 +425,7 @@
           "selectedCaption": "",
           "screenshot": "control-addin.png",
           "resultStatus": "unverified",
-          "observedResult": "Resultatet kunde inte verifieras automatiskt.",
+          "observedResult": "Inspelningen visar inte vad som hände efter den här åtgärden.",
           "expectedResultSuggestion": "",
           "important": false,
           "sectionBoundaryAfter": false
@@ -452,8 +452,8 @@
           "selectedCaption": "",
           "screenshot": "backorder-off.png",
           "resultStatus": "verified",
-          "observedResult": "Backorder inaktiverades.",
-          "expectedResultSuggestion": "Backorder inaktiverades.",
+          "observedResult": "Du inaktiverade Backorder.",
+          "expectedResultSuggestion": "Du inaktiverade Backorder.",
           "important": false,
           "sectionBoundaryAfter": false
         }
@@ -462,7 +462,7 @@
         {
           "stepNumber": 1,
           "instruction": "Inaktivera **Backorder**.",
-          "observedResult": "Backorder inaktiverades.",
+          "observedResult": "Du inaktiverade Backorder.",
           "screenshot": "backorder-off.png"
         }
       ]
@@ -479,7 +479,7 @@
           "selectedCaption": "",
           "screenshot": "save-close.png",
           "resultStatus": "unverified",
-          "observedResult": "Resultatet kunde inte verifieras automatiskt.",
+          "observedResult": "Inspelningen visar inte vad som hände efter den här åtgärden.",
           "expectedResultSuggestion": "",
           "important": false,
           "sectionBoundaryAfter": false

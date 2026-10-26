@@ -1213,8 +1213,8 @@
       task?.provenance === "manual");
     const placeholderCount = tasks.filter(task =>
       task?.taskType === "Unclassified" &&
-      ["", "Utför uppgiften."].includes(String(
-        task.instruction || task.description || "").trim())).length;
+      taskVisibility.isGenericInstruction(
+        task.instruction || task.description || "")).length;
     return !consultantOwned && placeholderCount >= 3 &&
       placeholderCount / tasks.length >= 0.25;
   }

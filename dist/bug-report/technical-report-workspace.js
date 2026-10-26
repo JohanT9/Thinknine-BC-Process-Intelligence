@@ -19,6 +19,7 @@
     const evidence = clone(options.errorEvidence || []);
     let saveState = "saved";
     let savePromise = Promise.resolve(report);
+    let inFlightSave = false;
     let revision = 0;
     const history = [clone(report)];
     let historyIndex = 0;
@@ -57,20 +58,24 @@
         report = model.normalize(history[historyIndex]); saveState = "unsaved";
         notify(); } return report; },
       save() {
-        if (saveState === "saving") return savePromise.then(() => api.flush());
+        if (inFlightSave) return savePromise.then(() => api.flush());
         const savingRevision = revision;
         const snapshot = clone(report);
+        inFlightSave = true;
         saveState = "saving"; notify(); savePromise = options.store.save(snapshot)
         .then(saved => { if (revision === savingRevision) {
           report = model.normalize(saved); saveState = "saved";
         } else saveState = "unsaved";
           notify(); return report; })
-        .catch(error => { saveState = "failed"; notify(); throw error; });
+        .catch(error => { saveState = "failed"; notify(); throw error; })
+        .finally(() => { inFlightSave = false; });
         return savePromise;
       },
       async flush() { if (saveState === "unsaved" || saveState === "failed") {
         await api.save();
-      } else await savePromise; return report; },
+      } else if (inFlightSave) await savePromise;
+        if (saveState === "unsaved" || saveState === "failed") await api.flush();
+        return report; },
       async exportMarkdown(exportOptions = {}) { await api.flush(); return textExport.markdown(
         generator.project(report, { errorEvidence: evidence }), exportOptions); },
       async exportPlainText(exportOptions = {}) { await api.flush(); return textExport.plainText(

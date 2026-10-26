@@ -1,8 +1,10 @@
 (function (root, factory) {
-  const api = factory();
+  const languages = typeof module === "object" && module.exports
+    ? require("../engine/language-registry") : root.T9LanguageRegistry;
+  const api = factory(languages);
   if (typeof module === "object" && module.exports) module.exports = api;
   root.T9BugReportTextExport = api;
-})(typeof globalThis !== "undefined" ? globalThis : this, function () {
+})(typeof globalThis !== "undefined" ? globalThis : this, function (languages) {
   "use strict";
   const value = input => input == null ? "" : String(input);
   function metadataRows(input, prefix = "") {
@@ -14,18 +16,20 @@
     });
   }
   function markdown(document, options = {}) {
-    const swedish = document.documentLanguage !== "en-US";
+    const locale = languages.normalize(document.documentLanguage, "document");
+    const localized = (english, swedish) => languages.translate(english, locale,
+      locale === "sv-SE" ? swedish : english);
     const byId = new Map(document.sections.map(section => [section.id, section]));
     const out = [`# ${document.title}`, ""];
     const add = (title, lines) => {
-      out.push(`## ${title}`, "", ...(lines.length ? lines : [swedish
-        ? "_Inte angivet._" : "_Not provided._"]), "");
+      out.push(`## ${title}`, "", ...(lines.length ? lines : [localized(
+        "_Not provided._", "_Inte angivet._")]), "");
     };
     const summary = byId.get("summary").content;
     add(byId.get("summary").title, [value(summary.summary),
       `Status: ${value(summary.status)}`,
-      ...(summary.severity ? [`${swedish ? "Allvarlighetsgrad" : "Severity"}: ${summary.severity}`] : []),
-      ...(summary.category ? [`${swedish ? "Kategori" : "Category"}: ${summary.category}`] : [])]);
+      ...(summary.severity ? [`${localized("Severity", "Allvarlighetsgrad")}: ${summary.severity}`] : []),
+      ...(summary.category ? [`${localized("Category", "Kategori")}: ${summary.category}`] : [])]);
     add(byId.get("environment").title, metadataRows(byId.get("environment").content));
     const reproduction = byId.get("reproduction").content;
     add(byId.get("reproduction").title, reproduction.map(step =>
@@ -34,15 +38,15 @@
       [byId.get("expected-result").content].filter(Boolean));
     const actual = byId.get("actual-result").content;
     add(byId.get("actual-result").title, [
-      ...actual.capturedErrors.map(item => `${swedish
-        ? "Registrerat BC-fel" : "Captured BC error"}: ${item.rawMessage}`)]
+      ...actual.capturedErrors.map(item => `${localized("Captured BC error",
+        "Registrerat BC-fel")}: ${item.rawMessage}`)]
       .filter(Boolean));
     const rows = byId.get("technical-diagnostics").content.rows;
     add(byId.get("technical-diagnostics").title,
       rows.map(row => `- ${row.label}: \`${row.value}\``));
     const stacks = byId.get("al-call-stack").content;
     add(byId.get("al-call-stack").title, stacks.flatMap(stack => [
-      `${swedish ? "Tolkningsstatus" : "Parse status"}: ${stack.parseStatus}`,
+      `${localized("Parse status", "Tolkningsstatus")}: ${stack.parseStatus}`,
       ...stack.frames.map(frame => `${frame.frameIndex + 1}. ${frame.objectType || ""} ${frame.objectId || ""} ${frame.objectName || ""}.${frame.methodName || ""}`.trim()),
       ...(stack.rawCallStack ? ["", "```text", stack.rawCallStack, "```"] : [])
     ]));
@@ -51,9 +55,9 @@
       `- ${item.objectType} ${item.objectId} — ${item.objectName}`));
     const telemetry = byId.get("telemetry")?.content;
     add(byId.get("telemetry").title, !telemetry?.configured
-      ? [swedish ? "Inte konfigurerad eller inte hämtad." :
-        "Not configured or not fetched."] : telemetry.contexts.flatMap(context => [
-        `${swedish ? "Felbevis" : "Error evidence"}: ${context.errorEvidenceId}`,
+      ? [localized("Not configured or not fetched.",
+        "Inte konfigurerad eller inte hämtad.")] : telemetry.contexts.flatMap(context => [
+        `${localized("Error evidence", "Felbevis")}: ${context.errorEvidenceId}`,
         `Status: ${context.status}`,
         ...context.events.map(event => `- ${event.timestamp} [${event.category}] ${event.eventName || event.message} (correlation: ${(event.correlationReasons || []).join(", ")})`)]));
     add(byId.get("correlated-timeline").title,
@@ -63,9 +67,9 @@
     if (options.includeAiAnalysis && ai) add(byId.get("ai-analysis").title, [
       `Status: ${ai.status}`, ai.summary,
       ...ai.observations.map(item => `- Observation: ${item.text} [${(item.citations || []).join(", ")}]`),
-      ...ai.hypotheses.map(item => `- ${swedish ? "Möjlig hypotes (inte verifierad)" : "Possible hypothesis (not verified)"}: ${item.text}`),
-      ...ai.recommendedNextChecks.map(item => `- ${swedish ? "Nästa kontroll" : "Next check"}: ${item.text}`),
-      ...ai.missingEvidence.map(item => `- ${swedish ? "Bevis som saknas" : "Missing evidence"}: ${item.text}`)]);
+      ...ai.hypotheses.map(item => `- ${localized("Possible hypothesis (not verified)", "Möjlig hypotes (inte verifierad)")}: ${item.text}`),
+      ...ai.recommendedNextChecks.map(item => `- ${localized("Next check", "Nästa kontroll")}: ${item.text}`),
+      ...ai.missingEvidence.map(item => `- ${localized("Missing evidence", "Bevis som saknas")}: ${item.text}`)]);
     add(byId.get("notes").title, byId.get("notes").content.map(note =>
       `- ${note.text || note.content || ""}`));
     return `${out.join("\n").trim()}\n`;

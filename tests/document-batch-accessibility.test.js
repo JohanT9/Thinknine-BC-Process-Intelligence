@@ -20,8 +20,22 @@ assert(dashboard.includes('event.key === "Escape"') &&
   dashboard.includes('event.key.toLowerCase() === "a"'));
 assert(dashboard.includes('$("libraryBatchMetadataDialog").returnValue = ""'),
   "a cancelled reopened dialog must never reuse a previous apply result");
-assert(dashboard.includes("Åtgärden kan inte ångras.") &&
-  dashboard.includes("kan återställas via metadataredigering."));
+// Destructive and reversible batch actions say so, in every UI language.
+assert(dashboard.includes('uiTf("library.deleteCountConfirm"') &&
+  dashboard.includes('uiTf("library.archiveCountConfirm"'));
+{
+  globalThis.T9LanguageRegistry = require("../src/engine/language-registry");
+  require("../src/ui/i18n");
+  assert.match(globalThis.T9UiI18n.translate("library.deleteCountConfirm", "sv-SE"),
+    /kan inte ångras/u);
+  assert.match(globalThis.T9UiI18n.translate("library.archiveCountConfirm", "sv-SE"),
+    /kan ångras/u);
+  for (const { locale } of globalThis.T9LanguageRegistry.supported("ui")) {
+    for (const key of ["library.deleteCountConfirm", "library.archiveCountConfirm"]) {
+      assert.notEqual(globalThis.T9UiI18n.translate(key, locale), key, `${key} ${locale}`);
+    }
+  }
+}
 assert(dashboard.includes("async function exportLibraryDocument") &&
   dashboard.includes("T9WordExportPipeline.create") &&
   dashboard.includes("T9DocumentBatchOperations.execute"));

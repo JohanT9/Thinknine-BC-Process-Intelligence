@@ -126,6 +126,23 @@
     result.events.forEach(event => { const id = assets.get(Number(event.raw?.eventNo)); if (id) event.screenshotAssetId = id; });
     return result;
   }
+  function fromLegacyProjection(header, session, projectedEvents = []) {
+    const projection = Array.isArray(projectedEvents) ? projectedEvents : [];
+    const events = projection.map(source => {
+      const { canonicalSourceEventId, canonicalScreenshotAssetId, ...event } = source || {};
+      return event;
+    });
+    const base = fromLegacy(session, events, {});
+    base.events = base.events.map((event, index) => ({
+      ...event,
+      ...(projection[index]?.canonicalSourceEventId
+        ? { id: String(projection[index].canonicalSourceEventId) } : {}),
+      ...(projection[index]?.canonicalScreenshotAssetId
+        ? { screenshotAssetId: String(projection[index].canonicalScreenshotAssetId) } : {})
+    }));
+    return normalize({ ...base, ...(header && typeof header === "object" ? header : {}),
+      events: base.events });
+  }
   function integrityDiagnostics(input, options = {}) {
     const diagnostics = [];
     if (!input || Number(input.schemaVersion) !== SCHEMA_VERSION) {
@@ -174,13 +191,19 @@
       ? event : { ...event, identification: clone(event.raw.identification) });
     result.assets = Array.isArray(result.assets) ? result.assets : []; result.metadata ||= {}; result.metadata.recordingPurpose = normalizeRecordingPurpose(result.metadata.recordingPurpose); result.metadata.taxonomyReferences = taxonomySchema.normalizeRecordingReferences(result.metadata.taxonomyReferences); result.semanticInterpretation = semanticModel.normalize(result.semanticInterpretation); return result;
   }
-  function addEvent(recording, source, identification = null) {
+  function addEvent(recording, source, identification = null, sourceEventIds = null) {
     if (!source || typeof source !== "object" || Array.isArray(source) || !source.type) throw new TypeError("A raw event with a type is required.");
     const sourceId = source.sourceEventId || source.captureId;
-    if (sourceId && recording.events?.some(event => event.source?.eventId === sourceId)) return recording;
-    const result = normalize(recording);
+    if (sourceId && (sourceEventIds?.has(sourceId) || (!sourceEventIds &&
+        recording.events?.some(event => event.source?.eventId === sourceId)))) return recording;
+    const result = recording.schemaVersion === SCHEMA_VERSION && recording.metadata &&
+        Array.isArray(recording.events)
+      ? { ...recording, metadata: { ...recording.metadata },
+        events: recording.events.slice() }
+      : normalize(recording);
     if (result.metadata.finishedAt) throw new Error("Completed recording evidence is immutable.");
     result.events.push(canonicalEvent(result.id, source, result.events.length, identification));
+    sourceEventIds?.add(sourceId);
     result.updatedAt = source.timestamp || new Date().toISOString();
     return result;
   }
@@ -213,9 +236,37 @@
   function setSemanticClassification(recording, classification) { const result = normalize(recording); const value = semanticModel.normalizeClassification(classification); requireSemanticEvents(result, value); result.semanticInterpretation = semanticModel.upsertClassification(result.semanticInterpretation, value); return result; }
   function setDocumentStateTransition(recording, transition) { const result = normalize(recording); const value = semanticModel.normalizeTransition(transition); requireSemanticEvents(result, value); result.semanticInterpretation = semanticModel.upsertDocumentStateTransition(result.semanticInterpretation, value); return result; }
   function semanticForEvent(recording, eventId) { return semanticModel.forEvent(normalize(recording).semanticInterpretation, eventId); }
-  function legacyView(recording) { const value = normalize(recording); const session = clone(value.compatibility?.session || {}); Object.assign(session, { id: value.id, name: session.name || value.metadata.title, purpose: session.purpose || "", recordingPurpose: value.metadata.recordingPurpose, taxonomyReferences: clone(value.metadata.taxonomyReferences), startedAt: session.startedAt || value.metadata.startedAt, completedAt: session.completedAt || value.metadata.finishedAt || null, updatedAt: value.updatedAt, eventCount: value.events.length }); return { session, events: value.events.map(event => ({ ...clone(event.raw || { id: event.id, timestamp: event.timestamp, type: event.type }), ...(event.identification ? { identification: clone(event.identification) } : {}) })) }; }
+  function canonicalValue(recording) {
+    return recording?.schemaVersion === SCHEMA_VERSION && recording.metadata &&
+      Array.isArray(recording.events) ? recording : normalize(recording);
+  }
+  function legacySessionView(recording) {
+    const value = canonicalValue(recording);
+    const session = clone(value.compatibility?.session || {});
+    Object.assign(session, { id: value.id,
+      name: session.name || value.metadata.title, purpose: session.purpose || "",
+      recordingPurpose: value.metadata.recordingPurpose,
+      taxonomyReferences: clone(value.metadata.taxonomyReferences),
+      startedAt: session.startedAt || value.metadata.startedAt,
+      completedAt: session.completedAt || value.metadata.finishedAt || null,
+      updatedAt: value.updatedAt, eventCount: value.events.length });
+    return session;
+  }
+  function legacyEventView(event) {
+    return { ...(event?.raw || { id: event?.id, timestamp: event?.timestamp,
+      type: event?.type }), ...(event?.identification
+        ? { identification: event.identification } : {}) };
+  }
+  function legacyView(recording) {
+    const value = canonicalValue(recording);
+    return { session: legacySessionView(value), events: value.events.map(event => ({
+      ...clone(event.raw || { id: event.id, timestamp: event.timestamp,
+        type: event.type }), ...(event.identification
+        ? { identification: clone(event.identification) } : {}) })) };
+  }
   return { RECORDING_PURPOSES, SCHEMA_VERSION, addEvent, addScreenshot, create,
-    finish, fromLegacy, integrityDiagnostics, legacyView, normalize, rename,
+    finish, fromLegacy, fromLegacyProjection, integrityDiagnostics, legacyEventView,
+    legacySessionView, legacyView, normalize, rename,
     semanticForEvent, setDocumentLanguage, setDocumentStateTransition,
     setSemanticClassification, setTaxonomyReferences,
     normalizeRecordingPurpose };

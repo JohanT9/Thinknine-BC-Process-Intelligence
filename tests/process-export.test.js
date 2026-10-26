@@ -218,7 +218,7 @@ assert(semanticSvg.includes(".semantic-observed .status-dot{fill:#15803d}"));
 assert(semanticSvg.includes(".map-node-document>*:first-child{fill:#eef8fd;stroke:#2878a5}"),
   "node type colors must remain visible for observed semantic nodes");
 assert(semanticSvg.includes("Observerat"));
-assert(semanticSvg.includes("Föreslaget"));
+assert(semanticSvg.includes("Referensförslag"));
 assert(semanticSvg.includes("Villkorligt"));
 assert(semanticSvg.includes("Kundunikt"));
 assert(semanticSvg.includes(".semantic-suggested .status-dot{fill:#a16207}"));

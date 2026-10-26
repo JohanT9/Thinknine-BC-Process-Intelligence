@@ -1,4 +1,6 @@
 const $ = id => document.getElementById(id);
+const extensionVersion = chrome.runtime.getManifest().version;
+if ($("extensionVersion")) $("extensionVersion").textContent = `v${extensionVersion}`;
 
 function updateText(element, value) {
   const text = String(value);
@@ -66,7 +68,8 @@ async function switchUiLocale(event) {
 }
 
 async function send(message, timeout = 5000) {
-  return withTimeout(chrome.runtime.sendMessage(message), timeout, "Kommunikationen med tillägget");
+  return withTimeout(chrome.runtime.sendMessage(message), timeout,
+    "Extension communication", { errorMessage: t("technical.requestTimeout") });
 }
 
 async function currentTab() {
@@ -81,7 +84,8 @@ function showMessage(text, error = false) {
 }
 
 function setLicenseFeedback(text, error = false) {
-  updateText($("licenseCardFeedback"), text || "");
+  const message = String(text || "");
+  updateText($("licenseCardFeedback"), message.startsWith("license.") ? t(message) : message);
   $("licenseCardFeedback").classList.toggle("error", error);
 }
 
@@ -199,17 +203,19 @@ async function prepareTenantLicense(tabId, { forceCheck = false } = {}) {
 
   if (tenantResult?.license?.trialAvailable || checkError) {
     try {
-      let trial = await send({ type: "T9_REQUEST_TRIAL", tabId }, 15000);
+      let trial = await send({ type: "T9_REQUEST_TRIAL", tabId }, 45000);
       if (!trial?.ok && trial.code === "entra-reauth-required") {
         await send({ type: "T9_CONSULTANT_LICENSE_SIGN_OUT" });
         account = await send({ type: "T9_MICROSOFT_SIGN_IN" }, 120000);
         if (!account?.ok) throw new Error(account?.code === "entra-signin-unreachable"
           ? t("license.microsoftUnavailable") : account?.error || t("license.signInFailed"));
-        trial = await send({ type: "T9_REQUEST_TRIAL", tabId }, 15000);
+        trial = await send({ type: "T9_REQUEST_TRIAL", tabId }, 45000);
       }
       if (!trial?.ok) {
-        const message = trial.code === "trial-service-unreachable"
-          ? t("license.trialServiceUnavailable") : trial.error || t("license.trialFailed");
+        const message = trial.code === "trial-service-timeout"
+          ? t("license.trialServiceTimeout")
+          : trial.code === "trial-service-unreachable"
+            ? t("license.trialServiceUnavailable") : trial.error || t("license.trialFailed");
         throw Object.assign(new Error(message), { status: trial?.status });
       }
       return { source: "tenant", license: trial.license, tenantId: tenantResult?.tenantId, account };
@@ -255,7 +261,11 @@ function renderLiveStatus(liveStatus) {
     ? t("recorder.connected") : t("recorder.notConfirmed"));
   $("connectionStatus").className = liveStatus.connected ? "live-ok" : "";
   const warning = $("captureWarning");
-  const messages = (liveStatus.warnings || []).map(item => item.message);
+  const messages = (liveStatus.warnings || []).map(item => {
+    const key = `recorder.warning.${item.code}`;
+    const translated = item.code ? t(key) : "";
+    return translated && translated !== key ? translated : item.message;
+  });
   warning.hidden = messages.length === 0;
   updateText(warning, messages.join(" "));
 }
@@ -264,7 +274,8 @@ async function pingTab(tabId) {
   try {
     return await withTimeout(chrome.tabs.sendMessage(tabId, {
       type: "T9_CONTENT_PING"
-    }), 1800, "Kontrollen av Business Central-fliken");
+    }), 1800, "Business Central tab check", {
+      errorMessage: t("technical.requestTimeout") });
   } catch {
     return null;
   }
@@ -277,9 +288,11 @@ async function ensureContentScript(tab) {
   try {
     await withTimeout(chrome.scripting.executeScript({
       target: { tabId: tab.id, allFrames: true },
-      files: ["capture-focus-session.js", "capture-surface-mode.js",
-        "bc-error-detector.js", "content.js"]
-    }), 4000, "Inläsningen av inspelningsskriptet");
+      files: ["engine/business-central-version-capture.js", "capture-field-privacy.js",
+        "capture-focus-session.js", "capture-surface-mode.js",
+        "bc-error-detector.js", "capture-indicator-i18n.js", "content.js"]
+    }), 4000, "Capture script injection", {
+      errorMessage: t("technical.requestTimeout") });
   } catch (error) {
     throw new Error(tf("recorder.injectFailed", { detail: error.message }));
   }
@@ -466,7 +479,7 @@ async function finishRecording(name, documentLanguage) {
       documentLanguage: globalThis.T9LanguageRegistry.normalize(
         documentLanguage, "document"
       )
-    }, pendingBugRecording ? 30000 : 5000);
+    }, 240000);
     if (!response?.ok) {
       throw new Error(response?.error || t("recorder.stopFailed"));
     }
@@ -484,7 +497,7 @@ async function discardWithLegacyBackground() {
   const sessionId = stateResponse?.state?.sessionId;
   if (!sessionId) return { ok: true, sessionId: null };
 
-  const stopped = await send({ type: "T9_STOP" }, 30000);
+  const stopped = await send({ type: "T9_STOP" }, 240000);
   if (!stopped?.ok) {
     throw new Error(stopped?.error || t("recorder.stopFailed"));
   }

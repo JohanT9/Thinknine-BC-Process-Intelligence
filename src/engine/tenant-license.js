@@ -6,6 +6,7 @@
   const GUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
   const KEY = "t9TenantLicenseV1";
   const CONSENT_KEY = "t9TenantLicenseNoticeV1";
+  const NEGATIVE_CACHE_MS = 30 * 1000;
   function tenantFromUrl(value) {
     try {
       const url = new URL(value);
@@ -18,7 +19,20 @@
   function create({ storage, fetcher, config, version, authenticatedTrial, now = Date.now,
     uuid = () => crypto.randomUUID() }) {
     const pending = new Map();
+    const pendingTrials = new Map();
     let queue = Promise.resolve();
+    let storageWriteQueue = Promise.resolve();
+    let installationPromise = null;
+    function updateStoredLicense(update) {
+      const operation = storageWriteQueue.then(async () => {
+        const latest = (await storage.get(KEY))[KEY] || {};
+        const next = update(latest);
+        await storage.set({ [KEY]: next });
+        return next;
+      });
+      storageWriteQueue = operation.catch(() => {});
+      return operation;
+    }
     async function information() {
       const accepted = (await storage.get(CONSENT_KEY))[CONSENT_KEY];
       return { enabled: config.enabled, endpoint: config.endpoint,
@@ -43,10 +57,10 @@
     async function check(url, options = {}) {
       if (!config.enabled) return { allowed: true, mode: "disabled" };
       if ((await information()).requiresAcceptance) {
-        throw new Error("Bekräfta licensregistreringen i tilläggets popup innan du startar inspelningen.");
+        throw new Error("license.acceptBeforeRecording");
       }
       const tenantId = tenantFromUrl(url);
-      if (!tenantId) throw new Error("Licensen kräver en Business Central-adress med tenant-ID.");
+      if (!tenantId) throw new Error("license.tenantUrlRequired");
       if (pending.has(tenantId)) return pending.get(tenantId);
       const operation = queue.then(() => verify(tenantId, options.force === true));
       queue = operation.catch(() => {});
@@ -56,34 +70,59 @@
     function checkedEndpoint(value) {
       const endpoint = new URL(value);
       if (endpoint.protocol !== "https:" || endpoint.username || endpoint.password ||
-          endpoint.search || endpoint.hash) throw new Error("Ogiltig HTTPS-adress för licenstjänsten.");
+          endpoint.search || endpoint.hash) throw new Error("license.invalidEndpoint");
       return endpoint;
     }
     async function identity() {
       const stored = (await storage.get(KEY))[KEY] || {};
-      return { stored, installationId: GUID.test(stored.installationId || "")
-        ? stored.installationId : uuid() };
+      if (GUID.test(stored.installationId || "")) {
+        return { stored, installationId: stored.installationId };
+      }
+      if (!installationPromise) {
+        installationPromise = updateStoredLicense(latest => ({ ...latest,
+          installationId: GUID.test(latest.installationId || "")
+            ? latest.installationId : uuid() }))
+          .then(value => ({ stored: value, installationId: value.installationId }))
+          .finally(() => { installationPromise = null; });
+      }
+      return installationPromise;
     }
     async function installationId() { return (await identity()).installationId; }
     async function verify(tenantId, force = false) {
       const endpoint = checkedEndpoint(config.endpoint);
       const { stored, installationId } = await identity();
       const cached = stored.tenants?.[tenantId];
-      if (!force && cached && cached.checkedAt <= now() && cached.refreshAt > now() &&
-          cached.expiresAt > now() && cached.endpoint === endpoint.href &&
-          cached.allowed === true) return cached;
+      const checkedAt = Number(cached?.checkedAt) || 0;
+      const cacheMatchesEndpoint = cached?.endpoint === endpoint.href &&
+        checkedAt <= now();
+      const activeCacheFresh = cached?.allowed === true &&
+        Number(cached.expiresAt) > now() && Number(cached.refreshAt) > now();
+      const negativeCacheFresh = cached?.allowed !== true &&
+        now() - checkedAt < NEGATIVE_CACHE_MS;
+      if (!force && cacheMatchesEndpoint && (activeCacheFresh || negativeCacheFresh)) {
+        return { ...cached, allowed: cached.allowed === true &&
+          Number(cached.expiresAt) > now() };
+      }
       // Never include URL, company, user identity, screenshots or recording data.
-      const response = await fetcher(endpoint.href, {
-        method: "POST", credentials: "omit", redirect: "error",
-        headers: { "Content-Type": "application/json" },
-        signal: AbortSignal.timeout(5000),
-        body: JSON.stringify({ installationId, tenantId, version })
-      });
-      if (!response.ok) throw new Error("Licenstjänsten kunde inte nås. Försök igen senare.");
+      let response;
+      try {
+        response = await fetcher(endpoint.href, {
+          method: "POST", credentials: "omit", redirect: "error",
+          headers: { "Content-Type": "application/json" },
+          signal: AbortSignal.timeout(5000),
+          body: JSON.stringify({ installationId, tenantId, version })
+        });
+      } catch (cause) {
+        const error = new Error("license.serviceUnavailable");
+        error.code = cause?.name === "TimeoutError" ? "license-service-timeout" :
+          "license-service-unreachable";
+        throw error;
+      }
+      if (!response.ok) throw new Error("license.serviceUnavailable");
       const result = await response.json();
       const expiresAt = Date.parse(result.expiresAt);
       if (result.tenantId !== tenantId || typeof result.allowed !== "boolean" ||
-          !Number.isFinite(expiresAt)) throw new Error("Licenstjänsten gav ett ogiltigt svar.");
+          !Number.isFinite(expiresAt)) throw new Error("license.invalidResponse");
       const timestamp = now();
       const entry = { allowed: result.allowed && expiresAt > timestamp,
         trialAvailable: result.trialAvailable === true,
@@ -93,31 +132,35 @@
           ? result.licenseType : "",
         checkedAt: timestamp, expiresAt, endpoint: endpoint.href,
         refreshAt: Math.min(expiresAt, timestamp + 60 * 60 * 1000) };
-      // Re-read so concurrent checks for different tenants do not overwrite each other.
-      const latest = (await storage.get(KEY))[KEY] || {};
-      await storage.set({ [KEY]: { installationId,
-        tenants: { ...latest.tenants, [tenantId]: entry } } });
+      await updateStoredLicense(latest => ({ ...latest, installationId,
+        tenants: { ...latest.tenants, [tenantId]: entry } }));
       return entry;
     }
     async function requestTrial(url) {
       if (!config.enabled) return { allowed: true, mode: "disabled" };
-      if ((await information()).requiresAcceptance) throw new Error("Bekräfta licensregistreringen innan du begär en testlicens.");
+      if ((await information()).requiresAcceptance) throw new Error("license.acceptBeforeTrial");
       const tenantId = tenantFromUrl(url);
-      if (!tenantId) throw new Error("Testlicensen kräver en Business Central-adress med tenant-ID.");
-      if (typeof authenticatedTrial !== "function") throw new Error("Entra-inloggning krävs för att aktivera en testlicens.");
+      if (!tenantId) throw new Error("license.trialTenantUrlRequired");
+      if (pendingTrials.has(tenantId)) return pendingTrials.get(tenantId);
+      const operation = activateTrial(tenantId);
+      pendingTrials.set(tenantId, operation);
+      try { return await operation; } finally { pendingTrials.delete(tenantId); }
+    }
+    async function activateTrial(tenantId) {
+      if (typeof authenticatedTrial !== "function") throw new Error("license.trialSignInRequired");
       const { installationId } = await identity();
       const result = await authenticatedTrial({ tenantId, installationId, version });
       const expiresAt = Date.parse(result.expiresAt);
-      if (result.tenantId !== tenantId || result.allowed !== true || !Number.isFinite(expiresAt)) {
-        throw new Error("Licenstjänsten gav ett ogiltigt svar.");
+      if (result.tenantId !== tenantId || result.allowed !== true || !Number.isFinite(expiresAt) ||
+          expiresAt <= now()) {
+        throw new Error("license.invalidTrialResponse");
       }
       const timestamp = now();
       const entry = { allowed: expiresAt > timestamp, trialAvailable: false, checkedAt: timestamp,
         licenseStatus: "active", licenseType: "trial", expiresAt, endpoint: config.endpoint,
         refreshAt: Math.min(expiresAt, timestamp + 3600000) };
-      const latest = (await storage.get(KEY))[KEY] || {};
-      await storage.set({ [KEY]: { installationId,
-        tenants: { ...latest.tenants, [tenantId]: entry } } });
+      await updateStoredLicense(latest => ({ ...latest, installationId,
+        tenants: { ...latest.tenants, [tenantId]: entry } }));
       return entry;
     }
     async function requireLicense(url) {

@@ -19,13 +19,22 @@ const asyncOperations = require("../src/ui/async-operations");
   assert.strictEqual(cancelled.length, 2);
 
   let timeoutCallback;
+  const timeoutTimers = {
+    setTimeout(callback) { timeoutCallback = callback; return 2; },
+    clearTimeout() {}
+  };
   const timed = asyncOperations.withTimeout(new Promise(() => {}), 100,
-    "Statuskontrollen", {
-      setTimeout(callback) { timeoutCallback = callback; return 2; },
-      clearTimeout() {}
-    });
+    "Status check", timeoutTimers);
   timeoutCallback();
-  await assert.rejects(timed, /Statuskontrollen tog för lång tid/);
+  await assert.rejects(timed, /^Error: Status check took too long\.$/);
+
+  // Callers supply the localized user-facing message; the label is only a
+  // technical fallback.
+  const localized = asyncOperations.withTimeout(new Promise(() => {}), 100,
+    "Status check", { ...timeoutTimers,
+      errorMessage: "Åtgärden tog för lång tid." });
+  timeoutCallback();
+  await assert.rejects(localized, /^Error: Åtgärden tog för lång tid\.$/);
 
   let calls = 0;
   let release;

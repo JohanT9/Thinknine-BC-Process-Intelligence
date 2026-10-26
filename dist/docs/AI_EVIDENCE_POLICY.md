@@ -29,8 +29,8 @@ Screenshots are always excluded in this milestone. Optional switches can include
 bounded notes or relevant normalized telemetry; telemetry messages require a
 separate opt-in. The disclosure records what was sent and excluded.
 
-Emails, GUIDs, and URL query strings are redacted deterministically without
-changing authoritative evidence. Limits apply to steps, frames, events, and
+Bearer credentials, named secrets, emails, GUIDs, and URL query strings are
+redacted deterministically across errors, free text, and opted-in telemetry
+without changing authoritative evidence. Limits apply to steps, frames, events, and
 estimated tokens. Free text can still be sensitive, so explicit consent remains
 required and administrators must review broker logging and provider retention.
-

@@ -48,7 +48,9 @@
   let diagnosticsEnabled = false;
   let recordingPurpose = null;
   let uiLocale = "sv-SE";
-  const uiText = (swedish, english) => uiLocale.startsWith("en") ? english : swedish;
+  const uiText = (swedish, english) => globalThis.T9CaptureIndicatorI18n?.translate
+    ? globalThis.T9CaptureIndicatorI18n.translate(english, uiLocale, swedish)
+    : uiLocale.startsWith("en") ? english : swedish;
   let lastUrl = location.href;
   let lastPageSignature = "";
   const sourceFrameId = crypto.randomUUID();
@@ -201,7 +203,8 @@
   function indicatorTone(liveStatus) {
     const codes = new Set((liveStatus?.warnings || []).map(item => item.code));
     if (!liveStatus?.connected || codes.has("screenshot-error") ||
-        codes.has("recording-truncated")) return "error";
+        codes.has("recording-truncated") || codes.has("capture-write-error") ||
+        codes.has("license-blocked")) return "error";
     return codes.size ? "warning" : "ok";
   }
 
@@ -221,9 +224,12 @@
       `${liveStatus?.eventCount || 0} ${uiText("händelser", "events")} · ` +
       `${liveStatus?.screenshots?.captured || 0} ${uiText("bilder", "screenshots")}`;
     const warning = shadow.getElementById("indicatorWarning");
-    const messages = (liveStatus?.warnings || []).map(item => item.message);
-    warning.hidden = messages.length === 0;
-    warning.textContent = messages[0] || "";
+    const primaryWarning = liveStatus?.warnings?.[0];
+    warning.hidden = !primaryWarning;
+    warning.textContent = primaryWarning
+      ? globalThis.T9CaptureIndicatorI18n?.translateWarning?.(
+        primaryWarning.code, uiLocale) || primaryWarning.message || ""
+      : "";
   }
 
   function refreshRecordingIndicator() {
@@ -573,11 +579,17 @@
   }
 
   function context() {
+    let businessCentralVersions = {};
+    try {
+      businessCentralVersions = globalThis.T9BusinessCentralVersionCapture
+        ?.extract(document.body?.innerText || document.body?.textContent || "") || {};
+    } catch { /* Version details are optional and must never block capture. */ }
     return {
       pageId: getPageId(),
       pageCaption: getPageCaption(),
       documentTitle: clean(document.title, 250),
       companyName: getCompanyName(),
+      businessCentralVersions,
       frameUrl: location.href,
       topUrl: getTopUrl(),
       frameDepth: getFrameDepth()
@@ -923,6 +935,7 @@
   }
 
   function valueOf(element) {
+    if (globalThis.T9CaptureFieldPrivacy?.isSensitive(element)) return "[maskerat]";
     if (element instanceof HTMLInputElement) {
       if (element.type === "checkbox") return element.checked;
       if (element.type === "radio") return element.checked ? element.value : "";

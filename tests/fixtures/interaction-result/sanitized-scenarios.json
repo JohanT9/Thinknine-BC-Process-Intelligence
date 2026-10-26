@@ -23,7 +23,7 @@
       "id": "action-status", "surface": "standard-bc",
       "events": [
         { "id": "release", "kind": "activation", "interaction": "release", "control": "Release" },
-        { "id": "status", "kind": "status-message", "interaction": "release", "screenshot": "released-status" }
+        { "id": "status", "kind": "status-message", "interaction": "release", "control": "The document was released.", "screenshot": "released-status" }
       ],
       "expected": { "groups": [{ "interaction": "release", "interactionEvents": ["release"], "results": ["status"], "status": "verified", "primaryOutcome": "status-message", "primaryEvent": "status", "outcomes": ["status-message"], "screenshot": "released-status", "screenshotRole": "result" }] }
     },

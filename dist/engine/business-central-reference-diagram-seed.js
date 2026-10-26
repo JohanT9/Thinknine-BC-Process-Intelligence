@@ -12,6 +12,40 @@
     productVersion: "", retrievedAt: null, verifiedAt: "2026-09-02T00:00:00.000Z",
     verifiedBy: "BC Process Studio", licenseNotes: "Semantic internal reference; no external source asset included.",
     notes: "Representative patterns, not mandatory customer behaviour." };
+  const qualitySources = [
+    { id: "source:microsoftlearn:qms-purchase-manual", sourceType: "MicrosoftLearn",
+      title: "Create an inspection manually from item tracking", url:
+        "https://learn.microsoft.com/en-us/dynamics365/business-central/qms-purchase-receipt-testing-simple",
+      publisher: "Microsoft", product: "Dynamics 365 Business Central Quality Management",
+      retrievedAt: "2026-10-03T00:00:00.000Z", notes: "Sample scenario; inspection is created before purchase receipt posting." },
+    { id: "source:microsoftlearn:qms-purchase-warehouse", sourceType: "MicrosoftLearn",
+      title: "Create an inspection automatically from a warehouse receipt and reinspect the lot", url:
+        "https://learn.microsoft.com/en-us/dynamics365/business-central/qms-purchase-receipt-testing-warehouse",
+      publisher: "Microsoft", product: "Dynamics 365 Business Central Quality Management",
+      retrievedAt: "2026-10-03T00:00:00.000Z", notes: "Sample WHITE advanced-warehouse scenario; location setup changes the inbound process." },
+    { id: "source:microsoftlearn:qms-production-output", sourceType: "MicrosoftLearn",
+      title: "Create a sampled inspection automatically from production output", url:
+        "https://learn.microsoft.com/en-us/dynamics365/business-central/qms-production-output-testing",
+      publisher: "Microsoft", product: "Dynamics 365 Business Central Quality Management",
+      retrievedAt: "2026-10-03T00:00:00.000Z", notes: "Sampled quantity is inspected; the result does not automatically classify the remaining output." }
+  ];
+  const financeSources = [
+    { id: "source:microsoftlearn:general-journals", sourceType: "MicrosoftLearn",
+      title: "Working with general journals to post directly to G/L", url:
+        "https://learn.microsoft.com/en-us/dynamics365/business-central/ui-work-general-journals",
+      publisher: "Microsoft", product: "Dynamics 365 Business Central", retrievedAt: "2026-10-03T00:00:00.000Z",
+      notes: "General journal behavior depends on template, batch, posting setup, and enabled validation." },
+    { id: "source:microsoftlearn:bank-reconciliation", sourceType: "MicrosoftLearn",
+      title: "Reconcile bank accounts", url:
+        "https://learn.microsoft.com/en-us/dynamics365/business-central/bank-how-reconcile-bank-accounts-separately",
+      publisher: "Microsoft", product: "Dynamics 365 Business Central", retrievedAt: "2026-10-03T00:00:00.000Z",
+      notes: "Standard Bank Acc. Reconciliation workflow; North American local functionality can differ." },
+    { id: "source:microsoftlearn:payment-journal", sourceType: "MicrosoftLearn",
+      title: "Record payments and refunds in the payment journal", url:
+        "https://learn.microsoft.com/en-us/dynamics365/business-central/payables-how-post-payments-refunds",
+      publisher: "Microsoft", product: "Dynamics 365 Business Central", retrievedAt: "2026-10-03T00:00:00.000Z",
+      notes: "Posting the journal records the payment in BC; the actual bank transfer is a separate step." }
+  ];
   const documents = [
     ["document:sales-order", "Sales Order", { sv: "Försäljningsorder" }, 36, 42],
     ["document:warehouse-shipment", "Warehouse Shipment", { sv: "Dist.lagerutleverans" }],
@@ -64,7 +98,23 @@
     ["document:item-reclassification-journal", "Item Reclassification Journal",
       { sv: "Artikelomklassificeringsjournal" }],
     ["document:physical-inventory-journal", "Physical Inventory Journal",
-      { sv: "Inventeringsjournal" }]
+      { sv: "Inventeringsjournal" }],
+    ["document:quality-inspection", "Quality Inspection", { sv: "Kvalitetsinspektion" }],
+    ["document:quality-inspection-template", "Quality Inspection Template",
+      { sv: "Kvalitetsinspektionsmall" }],
+    ["document:quality-test", "Quality Test", { sv: "Kvalitetstest" }],
+    ["document:quality-inspection-generation-rule", "Quality Inspection Generation Rule",
+      { sv: "Regel för generering av kvalitetsinspektion" }],
+    ["document:quality-inspection-result", "Quality Inspection Result",
+      { sv: "Kvalitetsinspektionsresultat" }],
+    ["document:general-journal", "General Journal", { sv: "Redovisningsjournal" }],
+    ["document:payment-journal", "Payment Journal", { sv: "Betalningsjournal" }],
+    ["document:bank-account-reconciliation", "Bank Account Reconciliation",
+      { sv: "Bankavstämning" }],
+    ["document:bank-statement-lines", "Bank Statement Lines",
+      { sv: "Bankkontoutdragsrader" }],
+    ["document:bank-account-ledger-entries", "Bank Account Ledger Entries",
+      { sv: "Bankkontotransaktioner" }]
   ].map(([id, canonicalName, localizedCaptions, tableId, pageId]) => ({ id, canonicalName,
     localizedCaptions, namespace: "Microsoft.BusinessCentral", tableId: tableId ?? null,
     pageId: pageId ?? null, entityType: "Document", aliases: [] }));
@@ -86,6 +136,18 @@
     ["concept:post-warehouse-receipt", "Post Warehouse Receipt", ["Post Receipt"]],
     ["concept:create-warehouse-put-away", "Create Warehouse Put-away", ["Create Put-away"]],
     ["concept:put-away", "Register Put-away", ["Register Put Away"]],
+    ["concept:create-quality-inspection", "Create Quality Inspection", ["Create Quality Inspections"]],
+    ["concept:record-quality-results", "Record Quality Inspection Results", ["Enter Test Results"]],
+    ["concept:finish-quality-inspection", "Finish Quality Inspection", ["Finish Inspection"]],
+    ["concept:create-quality-reinspection", "Create Quality Reinspection", ["Create Re-inspection"]],
+    ["concept:post-production-output", "Post Production Output", ["Post Output"]],
+    ["concept:import-bank-statement", "Import Bank Statement", ["Import Bank Transactions"]],
+    ["concept:match-bank-entries", "Match Bank Entries", ["Match Automatically", "Match Manually"]],
+    ["concept:test-bank-reconciliation", "Test Bank Reconciliation", ["Test Report"]],
+    ["concept:post-bank-reconciliation", "Post Bank Reconciliation", ["Post Reconciliation"]],
+    ["concept:suggest-vendor-payments", "Suggest Vendor Payments", ["Suggest Payments"]],
+    ["concept:post-journal", "Post Journal", ["Post General Journal"]],
+    ["concept:post-payment-journal", "Post Payment Journal", ["Post Payments"]],
     ["concept:transfer", "Transfer", ["Ship and Receive Transfer"]],
     ["concept:create-transfer-order", "Create Transfer Order", ["New Transfer Order"]],
     ["concept:post-transfer-shipment", "Post Transfer Shipment", ["Ship Transfer Order"]],
@@ -143,23 +205,28 @@
   function reference(id, name, domain, process, variant, steps, options = {}) {
     const diagramId = `reference-diagram:bc:${id}`;
     const processGraph = graph(diagramId, steps, options.edges || null);
-    return { id: diagramId, name, description: options.description || name, sourceId: SOURCE_ID,
+    const sourceId = options.sourceId || SOURCE_ID;
+    const verificationStatus = options.verificationStatus || "Verified";
+    return { id: diagramId, name, description: options.description || name, sourceId,
       domain, businessProcess: process, bcProcess: options.bcProcess || name, processVariant: variant || null,
       abstractionLevel: "BC_PROCESS", product: "Microsoft Dynamics 365 Business Central",
       productVersion: "", language: "en", namespace: "Microsoft.BusinessCentral",
-      verificationStatus: "Verified", datasetPartition: options.partition || "GeneralReference",
+      verificationStatus, datasetPartition: options.partition || "GeneralReference",
       confidence: 1, confidenceDetails: { classification: 1, nodes: 1, entityMappings: 1,
         relationships: 1, variant: variant ? 1 : null }, createdAt: "2026-09-02T00:00:00.000Z",
-      updatedAt: "2026-09-02T00:00:00.000Z", processGraph, sourceLabels: {}, canonicalMappings: {},
+      updatedAt: "2026-09-02T00:00:00.000Z", processGraph,
+      sourceLabels: options.sourceLabels || {}, canonicalMappings: {},
       variants: options.variants || [], proposals: [], manualDecisions: [],
-      verificationHistory: [{ verificationId: `${diagramId}:verification:1`, status: "Verified",
-        decidedAt: "2026-09-02T00:00:00.000Z", decidedBy: "BC Process Studio",
-        notes: "Verified against the existing internal taxonomy and lifecycle seed.", source: "manual" }],
+      verificationHistory: [{ verificationId: `${diagramId}:verification:1`, status: verificationStatus,
+        decidedAt: options.reviewedAt || "2026-09-02T00:00:00.000Z", decidedBy: "BC Process Studio",
+        notes: options.verificationNotes || "Verified against the existing internal taxonomy and lifecycle seed.", source: "manual" }],
       facts: processGraph.relationships.map(edge => ({ subjectId: edge.fromNodeId,
-        predicate: edge.relationshipType, objectId: edge.toNodeId, sourceId: SOURCE_ID,
-        extraction: "manual", confidence: 1, verifiedBy: "BC Process Studio",
-        verifiedAt: "2026-09-02T00:00:00.000Z" })), metadata: {
-        representativeNotMandatory: true, sourceAssetRequired: false } };
+        predicate: edge.relationshipType, objectId: edge.toNodeId, sourceId,
+        extraction: options.factExtraction || "manual", confidence: options.factConfidence ?? 1,
+        verifiedBy: verificationStatus === "Verified" ? "BC Process Studio" : null,
+        verifiedAt: options.reviewedAt || "2026-09-02T00:00:00.000Z" })), metadata: {
+        representativeNotMandatory: true, sourceAssetRequired: false,
+        ...(options.metadata || {}) } };
   }
   const diagrams = [
     reference("simple-sales-order", "Simple Sales Order", "domain:order-to-cash",
@@ -547,10 +614,104 @@
         { title: "Record Physical Count", type: "manualAction" },
         { title: "Post Inventory Differences", type: "posting",
           refs: ["concept:post-inventory-differences"], edge: "posts" }])
+    ,reference("quality-manual-purchase-inspection", "Manual Purchase Inspection",
+      "domain:quality-management", "Purchase Receipt Quality Inspection", "Manual inspection", [
+        { title: "Purchase Order", type: "document", refs: ["document:purchase-order"] },
+        { title: "Assign Lot and Expiration Date", refs: ["concept:assign-lot-number"] },
+        { title: "Item Tracking Lines", type: "document", refs: ["document:item-tracking-lines"] },
+        { title: "Create Quality Inspection", refs: ["concept:create-quality-inspection"], edge: "creates" },
+        { title: "Enter Test Results", refs: ["concept:record-quality-results"] },
+        { title: "Finish Quality Inspection", refs: ["concept:finish-quality-inspection"], edge: "completes" }
+      ], { sourceId: "source:microsoftlearn:qms-purchase-manual", verificationStatus: "PartiallyVerified",
+        reviewedAt: "2026-10-03T00:00:00.000Z", factExtraction: "metadata", factConfidence: 0.85,
+        verificationNotes: "Represents the linked Microsoft Learn sample procedure, not a mandatory purchase workflow.",
+        sourceLabels: { "source:microsoftlearn:qms-purchase-manual": "Microsoft Learn — manual inspection from item tracking" },
+        metadata: { representativeNotMandatory: true, modulesRequired: ["Quality Management", "Warehouse"],
+          inspectionCreatedBeforeReceiptPosting: true } }),
+    reference("quality-warehouse-receipt-reinspection", "Warehouse Receipt Inspection and Reinspection",
+      "domain:quality-management", "Warehouse Receipt Quality Inspection", "Failed lot reinspected", [
+        { title: "Purchase Order", type: "document", refs: ["document:purchase-order"] },
+        { title: "Warehouse Receipt", type: "document", refs: ["document:warehouse-receipt"] },
+        { title: "Assign Lot and Expiration Date", refs: ["concept:assign-lot-number"] },
+        { title: "Post Warehouse Receipt", type: "posting", refs: ["concept:post-warehouse-receipt"], edge: "posts" },
+        { title: "Generated Quality Inspection", type: "document", refs: ["document:quality-inspection"], edge: "creates" },
+        { title: "Enter Failed Test Results" },
+        { title: "Finish Failed Inspection", refs: ["concept:finish-quality-inspection"] },
+        { title: "Create Reinspection", refs: ["concept:create-quality-reinspection"], edge: "creates" },
+        { title: "Enter Passing Test Results" },
+        { title: "Finish Passing Inspection", refs: ["concept:finish-quality-inspection"] },
+        { title: "Register Warehouse Put-away", type: "warehouseActivity", refs: ["document:warehouse-put-away"] }
+      ], { sourceId: "source:microsoftlearn:qms-purchase-warehouse", verificationStatus: "PartiallyVerified",
+        reviewedAt: "2026-10-03T00:00:00.000Z", factExtraction: "metadata", factConfidence: 0.85,
+        verificationNotes: "Represents Microsoft's WHITE-location advanced-warehouse sample; other location setups use other inbound steps.",
+        sourceLabels: { "source:microsoftlearn:qms-purchase-warehouse": "Microsoft Learn — warehouse receipt inspection and reinspection" },
+        metadata: { representativeNotMandatory: true, modulesRequired: ["Quality Management", "Warehouse"],
+          sampleLocation: "WHITE", scenario: "failed inspection followed by a passing reinspection" } }),
+    reference("quality-production-output-sampling", "Production Output Sampling Inspection",
+      "domain:quality-management", "Production Output Quality Inspection", "Sampled output", [
+        { title: "Quality Tests", type: "document", refs: ["document:quality-test"] },
+        { title: "Production Inspection Template", type: "document", refs: ["document:quality-inspection-template"] },
+        { title: "Configure Sample and Tests" },
+        { title: "Production Inspection Generation Rule", type: "document", refs: ["document:quality-inspection-generation-rule"] },
+        { title: "Released Production Order", type: "document", refs: ["document:production-order"] },
+        { title: "Production Journal", type: "document", refs: ["document:production-journal"] },
+        { title: "Post Production Output", type: "posting", refs: ["concept:post-production-output"], edge: "posts" },
+        { title: "Generated Sample Inspection", type: "document", refs: ["document:quality-inspection"], edge: "creates" },
+        { title: "Enter Sample Results" },
+        { title: "Finish Sample Inspection", refs: ["concept:finish-quality-inspection"] }
+      ], { sourceId: "source:microsoftlearn:qms-production-output", verificationStatus: "PartiallyVerified",
+        reviewedAt: "2026-10-03T00:00:00.000Z", factExtraction: "metadata", factConfidence: 0.85,
+        verificationNotes: "Represents Microsoft's Premium production sampling example; the sample does not classify the unsampled remainder.",
+        sourceLabels: { "source:microsoftlearn:qms-production-output": "Microsoft Learn — sampled inspection from production output" },
+        metadata: { representativeNotMandatory: true, modulesRequired: ["Quality Management", "Manufacturing"],
+          experienceRequired: "Premium", unsampledQuantityAutomaticallyClassified: false } }),
+    reference("finance-general-journal-posting", "General Journal Posting",
+      "domain:record-to-report", "General Journal Posting", "Standard journal batch", [
+        { title: "General Journal", type: "document", refs: ["document:general-journal"] },
+        { title: "Select Journal Batch" },
+        { title: "Enter Posting Date, Document and Accounts" },
+        { title: "Enter Amounts and Dimensions" },
+        { title: "Review Journal Check", optional: true },
+        { title: "Post General Journal", type: "posting", refs: ["concept:post-journal"], edge: "posts" }
+      ], { sourceId: "source:microsoftlearn:general-journals", verificationStatus: "PartiallyVerified",
+        reviewedAt: "2026-10-03T00:00:00.000Z", factExtraction: "metadata", factConfidence: 0.85,
+        verificationNotes: "Represents a general-journal posting pattern; fields and checks depend on the journal template and batch.",
+        sourceLabels: { "source:microsoftlearn:general-journals": "Microsoft Learn — work with general journals" },
+        metadata: { representativeNotMandatory: true, backgroundErrorCheckOptional: true } }),
+    reference("finance-bank-account-reconciliation", "Bank Account Reconciliation",
+      "domain:record-to-report", "Bank Account Reconciliation", "Statement import and matching", [
+        { title: "Bank Account Reconciliation", type: "document", refs: ["document:bank-account-reconciliation"] },
+        { title: "Select Bank Account and Enter Statement Date and Ending Balance" },
+        { title: "Import Bank Statement", refs: ["concept:import-bank-statement"], edge: "creates" },
+        { title: "Bank Statement Lines", type: "document", refs: ["document:bank-statement-lines"] },
+        { title: "Match Automatically; Review and Match Remaining Lines Manually", refs: ["concept:match-bank-entries"] },
+        { title: "Review Differences and Outstanding Entries", type: "decision" },
+        { title: "Preview Test Report", refs: ["concept:test-bank-reconciliation"] },
+        { title: "Post Bank Reconciliation", type: "posting", refs: ["concept:post-bank-reconciliation"], edge: "posts" }
+      ], { sourceId: "source:microsoftlearn:bank-reconciliation", verificationStatus: "PartiallyVerified",
+        reviewedAt: "2026-10-03T00:00:00.000Z", factExtraction: "metadata", factConfidence: 0.85,
+        verificationNotes: "Standard Bank Acc. Reconciliation sample. Resolve differences before posting; regional bank-reconciliation pages can differ.",
+        sourceLabels: { "source:microsoftlearn:bank-reconciliation": "Microsoft Learn — reconcile bank accounts" },
+        metadata: { representativeNotMandatory: true, postBlockedByStatementLineDifferences: true,
+          alternateMatchingMethods: ["automatic", "manual"], northAmericaMayDiffer: true } }),
+    reference("finance-vendor-payment-journal", "Vendor Payment Journal",
+      "domain:record-to-report", "Vendor Payment Journal", "Suggested vendor payments", [
+        { title: "Payment Journal", type: "document", refs: ["document:payment-journal"] },
+        { title: "Open Payment Journal Batch" },
+        { title: "Suggest Vendor Payments" , refs: ["concept:suggest-vendor-payments"] },
+        { title: "Review Due Dates, Discounts and Suggested Lines" },
+        { title: "Apply Payments to Vendor Documents" },
+        { title: "Post Payment Journal", type: "posting", refs: ["concept:post-payment-journal"], edge: "posts" },
+        { title: "Execute Bank Transfer Separately", type: "externalAction", optional: true }
+      ], { sourceId: "source:microsoftlearn:payment-journal", verificationStatus: "PartiallyVerified",
+        reviewedAt: "2026-10-03T00:00:00.000Z", factExtraction: "metadata", factConfidence: 0.85,
+        verificationNotes: "Posting records the payment in Business Central; it does not itself transfer money from the bank.",
+        sourceLabels: { "source:microsoftlearn:payment-journal": "Microsoft Learn — record payments in the payment journal" },
+        metadata: { representativeNotMandatory: true, actualBankTransferIsSeparate: true } })
   ];
   const dataset = Object.freeze({ schemaVersion: 1, datasetId: "bc-reference-diagram-dataset",
     taxonomyVersion: "1.0.0", createdAt: "2026-09-02T00:00:00.000Z",
-    updatedAt: "2026-09-02T00:00:00.000Z", sources: [source], assets: [], concepts,
+    updatedAt: "2026-10-03T00:00:00.000Z", sources: [source, ...qualitySources, ...financeSources], assets: [], concepts,
     documents, diagrams, metadata: { productNamespaces: ["Microsoft.BusinessCentral"],
       semanticDataPreferredOverImages: true, externalImagesRedistributableByDefault: false } });
   return { dataset };

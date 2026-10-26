@@ -6,17 +6,30 @@
   "use strict";
   const clone = value => value == null ? value : JSON.parse(JSON.stringify(value));
   const cleanLabel = value => String(value || "").normalize("NFKC")
-    .toLocaleLowerCase().replace(/[.:：]+$/u, "").replace(/\s+/gu, " ").trim();
+    .toLowerCase().replace(/[.:：]+$/u, "").replace(/\s+/gu, " ").trim();
   const LABELS = Object.freeze({
-    timestamp: ["timestamp", "date and time", "datum och tid", "dato og klokkeslæt"],
-    internalSessionId: ["internal session id", "internt sessions-id", "internt sessions-id"],
-    applicationInsightsSessionId: ["application insights session id", "application insights-sessions-id"],
-    clientActivityId: ["client activity id", "klientaktivitets-id", "klientaktivitets-id"],
-    userTelemetryId: ["user telemetry id", "användartelemetri-id", "brugertelemetri-id"],
-    serverInstanceId: ["server instance id", "serverinstans-id"],
-    environment: ["environment", "miljö", "miljø"],
-    company: ["company", "företag", "virksomhed"],
-    rawCallStack: ["al call stack", "al-anropsstack", "al-kaldestak"]
+    timestamp: ["timestamp", "date and time", "datum och tid", "dato og klokkeslæt",
+      "dato og klokkeslett", "päivämäärä ja kellonaika", "date et heure", "datum und uhrzeit", "fecha y hora"],
+    internalSessionId: ["internal session id", "internt sessions-id", "intern sessions-id",
+      "intern økt-id", "sisäinen istuntotunnus", "identifiant de session interne",
+      "interne sitzungs-id", "id. de sesión interna"],
+    applicationInsightsSessionId: ["application insights session id", "application insights-sessions-id",
+      "application insights-session-id", "application insights økt-id",
+      "application insights -istuntotunnus", "identifiant de session application insights",
+      "application insights-sitzungs-id", "id. de sesión de application insights"],
+    clientActivityId: ["client activity id", "klientaktivitets-id", "klientaktivitets-id",
+      "klientaktivitets-id", "asiakasaktiviteetin tunnus", "identifiant d’activité client",
+      "clientaktivitäts-id", "id. de actividad del cliente"],
+    userTelemetryId: ["user telemetry id", "användartelemetri-id", "brugertelemetri-id",
+      "brukertelemetri-id", "käyttäjän telemetriatunnus", "identifiant de télémétrie utilisateur",
+      "benutzertelemetrie-id", "id. de telemetría del usuario"],
+    serverInstanceId: ["server instance id", "serverinstans-id", "serverinstans-id",
+      "serverinstans-id", "palvelininstanssin tunnus", "identifiant d’instance du serveur",
+      "serverinstanz-id", "id. de instancia del servidor"],
+    environment: ["environment", "miljö", "miljø", "miljø", "ympäristö", "environnement", "umgebung", "entorno"],
+    company: ["company", "företag", "virksomhed", "firma", "yritys", "société", "unternehmen", "empresa"],
+    rawCallStack: ["al call stack", "al-anropsstack", "al-kaldestak", "al-kallestakk",
+      "al-kutsupino", "pile d’appels al", "al-aufrufstapel", "pila de llamadas al"]
   });
   const LOOKUP = new Map(Object.entries(LABELS).flatMap(([field, labels]) =>
     labels.map(label => [cleanLabel(label), field])));
@@ -106,26 +119,35 @@
   const ERROR_TEXT = /(?:spill inträffade|ett fel uppstod|something went wrong|an error occurred|exception|stack overflow|måste ha ett värde|must have a value|du har inte följande behörigheter|you do not have the following permissions|kunde inte (?:bokföras|registreras|slutföras)|could not be (?:posted|registered|completed))/iu;
   function recoverFromRecording(recording = {}) {
     const events = Array.isArray(recording.events) ? recording.events : [];
-    return events.flatMap((event, index) => {
-      if (event.raw?.type !== "dialog-open") return [];
-      const message = String(event.raw?.label || event.raw?.accessibleName || "")
-        .replace(/\s+OK\s*$/iu, "").trim();
-      if (!message || !ERROR_TEXT.test(message)) return [];
-      const preceding = events.slice(0, index).reverse().find(candidate =>
-        !["focus", "page-state", "dialog-open", "dialog-close",
-          "status-message", "bc-error"].includes(candidate.raw?.type));
-      return [normalize({ errorEvidenceId: `bc-error:${recording.id}:recovered:${
-        event.raw?.eventNo || index + 1}`, recordingId: recording.id,
-      capturedAt: event.timestamp || event.raw?.timestamp || new Date(0).toISOString(),
-      rawMessage: message, rawDiagnostics: "", diagnosticsAvailable: false,
-      diagnosticsStatus: "diagnostics-unavailable",
-      precedingActionEventId: preceding?.id || null,
-      triggerRelationship: preceding ? "preceding-interaction-recovered" : "none",
-      supportUrl: event.raw?.topUrl || event.raw?.frameUrl || "",
-      errorScreenshotAssetId: event.screenshotAssetId || null,
-      screenshotStatus: event.screenshotAssetId ? "screenshot-captured" : "screenshot-unavailable",
-      source: { kind: "canonical-dialog-recovery", confidence: 0.7 } })];
+    const excludedFromTrigger = new Set(["focus", "page-state", "dialog-open",
+      "dialog-close", "status-message", "bc-error"]);
+    const recovered = [];
+    let preceding = null;
+    events.forEach((event, index) => {
+      if (event.raw?.type === "dialog-open") {
+        const message = String(event.raw?.label || event.raw?.accessibleName || "")
+          .replace(/\s+OK\s*$/iu, "").trim();
+        if (message && ERROR_TEXT.test(message)) {
+          recovered.push(normalize({
+            errorEvidenceId: `bc-error:${recording.id}:recovered:${
+              event.raw?.eventNo || index + 1}`,
+            recordingId: recording.id,
+            capturedAt: event.timestamp || event.raw?.timestamp || new Date(0).toISOString(),
+            rawMessage: message, rawDiagnostics: "", diagnosticsAvailable: false,
+            diagnosticsStatus: "diagnostics-unavailable",
+            precedingActionEventId: preceding?.id || null,
+            triggerRelationship: preceding ? "preceding-interaction-recovered" : "none",
+            supportUrl: event.raw?.topUrl || event.raw?.frameUrl || "",
+            errorScreenshotAssetId: event.screenshotAssetId || null,
+            screenshotStatus: event.screenshotAssetId
+              ? "screenshot-captured" : "screenshot-unavailable",
+            source: { kind: "canonical-dialog-recovery", confidence: 0.7 }
+          }));
+        }
+      }
+      if (!excludedFromTrigger.has(event.raw?.type)) preceding = event;
     });
+    return recovered;
   }
 
   return { LABELS, normalize, parseRawDiagnostics, recoverFromRecording, supportUrl };
