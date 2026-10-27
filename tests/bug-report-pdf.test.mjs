@@ -11,6 +11,12 @@ const pkg = { title: "Fel vid Registrera vikt", documentLanguage: "sv-SE", gener
   errorEvidence: { primary: { rawMessage: "Ett fel inträffade.", supportUrl: url } },
   reproduction: [{ instruction: "Välj **Registrera vikt**." }], callStack: [], diagnostics: { rows: [] } };
 const model = project(pkg);
+// Instruction markers are formatting, not content; captured error text stays exact.
+const marked = project({ ...pkg, reproduction: [{ instruction: "Ange __PO-1001__ i **External Document No.**." }],
+  errorEvidence: { primary: { rawMessage: "Value **must** not be __blank__.", supportUrl: url } } });
+assert.deepEqual(marked.steps.map(step => step.instruction), ["Ange PO-1001 i External Document No.."]);
+assert.ok(marked.sections.find(section => section.id === "actual").rows
+  .includes("Value **must** not be __blank__."), "captured BC error text is not altered");
 const staleDescription = project({ ...pkg, actualResult: { userDescription: "REMOVED_LEGACY_TEXT" } });
 assert.ok(!JSON.stringify(staleDescription).includes("REMOVED_LEGACY_TEXT"));
 assert.ok(JSON.stringify(staleDescription).includes(pkg.errorEvidence.primary.rawMessage));

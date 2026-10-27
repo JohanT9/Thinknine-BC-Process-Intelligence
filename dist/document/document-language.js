@@ -281,7 +281,7 @@
     if (!protectedText) {
       for (const property of ["text", "title", "label", "caption"]) {
         if (typeof result[property] !== "string") continue;
-        const translated = translateInstruction(result[property], language);
+        const translated = localizedInstruction(result[property], language);
         if (translated !== result[property]) {
           result[property] = translated;
           if (property === "text") delete result.presentationRuns;
@@ -319,6 +319,16 @@
           "document-language"])], documentLanguageVersion: VERSION } });
   }
 
+  // Sensitive values are stored with the language-neutral capture marker "[maskerat]".
+  const MASKED_VALUE = Object.freeze({ "sv-SE": "[maskerat]", "en-US": "[masked]",
+    "fr-FR": "[masqué]", "de-DE": "[maskiert]", "es-ES": "[enmascarado]",
+    "da-DK": "[maskeret]", "fi-FI": "[peitetty]", "nb-NO": "[maskert]" });
+  function localizedInstruction(value, language) {
+    const translated = translateInstruction(value, language);
+    const marker = MASKED_VALUE[normalize(language)] || MASKED_VALUE["en-US"];
+    return translated.replaceAll("[maskerat]", marker);
+  }
+
   return { VERSION, DEFAULT_LANGUAGE, SUPPORTED_LANGUAGES, normalize,
-    systemText, translateInstruction, process };
+    systemText, translateInstruction: localizedInstruction, process };
 });

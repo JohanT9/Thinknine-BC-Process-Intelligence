@@ -1728,6 +1728,8 @@ async function createAndOpenBugReport(recordingId, reportTitle = "", regenerateC
     canonicalScreenshotAssetId: recording.events[index]?.screenshotAssetId || "" }));
   const packResult = await pageKnowledgePacksReady;
   const interpretation = globalThis.T9SessionInterpretationPipeline.interpret({
+    language: globalThis.T9LanguageRegistry.normalize(
+      recording.metadata?.documentLanguage, "document"),
     session: legacy.session, events: projectedEvents,
     normalizedEvents: normalized.events, stepGroups: grouped.groups,
     supportingEvents: grouped.supportingEvents,

@@ -95,8 +95,8 @@ table{width:100%;border-collapse:collapse}th,td{text-align:left;padding:9px;bord
 .review-step-content{min-width:0;min-height:0;overflow:auto}
 .review-step-workspace[data-layout="focus"] .review-list{width:100%;max-width:100%;padding:18px 24px}
 .review-step-workspace[data-layout="focus"] .review-card{display:none}
-.review-step-workspace[data-layout="focus"] .review-card[data-active-step="true"]{display:grid;grid-template-columns:40px minmax(0,1fr) 120px;margin:0;box-shadow:0 1px 4px rgba(15,23,42,.08)}
-.review-step-workspace[data-layout="focus"] .review-card.selected:not([data-active-step="true"]){display:grid;grid-template-columns:40px minmax(0,1fr) 120px;margin:12px 0 0;box-shadow:0 1px 4px rgba(15,23,42,.08)}
+.review-step-workspace[data-layout="focus"] .review-card[data-active-step="true"]{display:grid;grid-template-columns:40px minmax(0,1fr) auto;margin:0;box-shadow:0 1px 4px rgba(15,23,42,.08)}
+.review-step-workspace[data-layout="focus"] .review-card.selected:not([data-active-step="true"]){display:grid;grid-template-columns:40px minmax(0,1fr) auto;margin:12px 0 0;box-shadow:0 1px 4px rgba(15,23,42,.08)}
 .review-step-workspace[data-filter-empty="true"] .review-card{display:none!important}
 .review-step-layout-toggle[aria-pressed="true"]{border-color:#008489!important;background:#e4f5f5!important;color:#064f52!important}
 .review-knowledge-disclosure,.review-external-disclosure{margin:10px 0;border:1px solid #d8dee5;border-radius:6px;background:#f8fafb}
@@ -104,7 +104,7 @@ table{width:100%;border-collapse:collapse}th,td{text-align:left;padding:9px;bord
 .review-knowledge-disclosure[open],.review-external-disclosure[open]{padding-bottom:8px}
 .review-knowledge-disclosure>aside,.review-external-disclosure>aside{margin:0 10px}
 .review-step-empty{margin:16px 24px;padding:28px;text-align:center;color:#52606d;background:#f7f9fa;border:1px solid #d8dee5;border-radius:8px}
-.review-card{border:1px solid #d8dee5;border-left:4px solid transparent;border-radius:8px;margin-bottom:16px;padding:16px;display:grid;grid-template-columns:48px minmax(0,1fr) 150px;gap:16px;background:#fff}
+.review-card{border:1px solid #d8dee5;border-left:4px solid transparent;border-radius:8px;margin-bottom:16px;padding:16px;display:grid;grid-template-columns:48px minmax(0,1fr) minmax(150px,auto);gap:16px;background:#fff}
 .review-card.approved{border-color:#d8dee5;border-left-color:#5a9f5a;background:#f7fbf7}
 .review-card.edited{border-color:#d8dee5;border-left-color:#0f6cbd;background:#f7fbff}
 .review-screenshot-quality{margin:10px 0 2px;padding:8px 10px;border-left:4px solid #64748b;background:#f3f6fa;color:#334155;font-size:13px}.review-screenshot-quality[data-quality="high"]{border-color:#107c10;background:#f0fdf4}.review-screenshot-quality[data-quality="medium"],.review-screenshot-quality[data-quality="protected"],.review-screenshot-quality[data-quality="manual"]{border-color:#0f6cbd;background:#eff6ff}.review-screenshot-quality[data-quality="low"],.review-screenshot-quality[data-quality="unresolved"]{border-color:#c35a00;background:#fff7ed}.review-screenshot-quality summary{cursor:pointer;font-weight:600}.review-screenshot-quality p{margin:6px 0 0}.review-screenshot-quality .metrics{color:#52606d}
@@ -170,7 +170,7 @@ table{width:100%;border-collapse:collapse}th,td{text-align:left;padding:9px;bord
 .review-image{display:block;max-width:100%;height:auto;border:1px solid #d8dee5;border-radius:5px;box-sizing:border-box;image-rendering:-webkit-optimize-contrast}
 .review-annotation-layer{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;overflow:visible}
 .review-annotate-button{margin-top:6px}
-.review-card.compact{grid-template-columns:44px minmax(0,1fr) 150px;gap:10px;margin-bottom:7px;padding:8px}
+.review-card.compact{grid-template-columns:44px minmax(0,1fr) minmax(150px,auto);gap:10px;margin-bottom:7px;padding:8px}
 .review-card.compact .review-number{font-size:18px}
 .review-card.compact .review-field-heading,.review-card.compact .review-comment-section,.review-card.compact .review-add-comment,.review-card.compact .review-technical-details,.review-card.compact .review-screenshot{display:none}
 .review-card.compact textarea[data-edit-field="instruction"]{height:38px;min-height:38px;resize:none;overflow:hidden;white-space:nowrap}
@@ -463,7 +463,7 @@ body.process-map-focus-active{overflow:hidden}.process-overview-card.process-map
 <div id="message" role="status" aria-live="polite" aria-atomic="true"></div>
 <section class="document-library" aria-labelledby="documentLibraryTitle">
   <h2 id="documentLibraryTitle">BC Knowledge Base</h2>
-  <p class="muted">Hitta tidigare dokumentation med hjälp av innehåll och dokumentinformation.</p>
+  <p class="muted" data-i18n="Hitta tidigare dokumentation med hjälp av innehåll och dokumentinformation.">Hitta tidigare dokumentation med hjälp av innehåll och dokumentinformation.</p>
   <div class="library-primary-controls" role="search">
     <label for="librarySearch">Sök dokument
       <input id="librarySearch" type="search" autocomplete="off" aria-keyshortcuts="/ Escape"
@@ -585,7 +585,7 @@ body.process-map-focus-active{overflow:hidden}.process-overview-card.process-map
           <div id="reviewSummary" class="muted"></div>
         </div>
         <button id="closeReview" class="debug"
-          aria-label="Stäng granskning">Stäng</button>
+          aria-label="Stäng granskning" data-i18n-aria-label="Stäng granskning">Stäng</button>
       </div>
       <p id="reviewExportStatus" role="status" aria-live="polite" hidden></p>
       <div id="workspaceTabs" class="workspace-tabs" role="tablist"

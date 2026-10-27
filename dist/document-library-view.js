@@ -11,6 +11,11 @@
     })[character]);
   }
 
+  // Built-in profile and theme names are stored in English and shown in the interface language.
+  const BUILT_IN_NAMES = Object.freeze({ "Business Process": "Affärsprocess",
+    "Bug Report": "Felrapport", "Technical Report": "Teknisk rapport" });
+  const builtInName = (name, locale) => BUILT_IN_NAMES[name]
+    ? localized(name, locale, BUILT_IN_NAMES[name]) : name;
   function localized(english, locale, swedish = english, values = {}) {
     let result = languages.translate(english, locale,
       locale === "sv-SE" ? swedish : english);
@@ -51,7 +56,7 @@
             locale, record.favourite ? "Ta bort från favoriter" :
               "Lägg till i favoriter"))}">${record.favourite ? "★" : "☆"}</button></div>
       <div class="library-card-meta">
-        <span class="library-profile">${escape(record.profile.displayName)} · ${escape(record.theme.displayName)}</span>
+        <span class="library-profile">${escape(builtInName(record.profile.displayName, locale))} · ${escape(builtInName(record.theme.displayName, locale))}</span>
         ${record.archived ? `<span class="library-card-status">${escape(localized(
           "Archived", locale, "Arkiverad"))}</span>` : ""}
         ${record.status ? `<span>${escape(record.status)}</span>` : ""}
@@ -87,9 +92,15 @@
     const activeId = records.some(value => value.projectId === state.activeId)
       ? state.activeId : records[0]?.projectId;
     if (!records.length) {
-      container.innerHTML = `<p class="library-empty">${escape(localized(
-        "No documents in the Document Library match the search and filters.",
-        locale, "Det finns inga dokument i Dokumentbiblioteket som matchar sökningen och filtren."))}</p>`;
+      container.innerHTML = state.storedCount === 0
+        ? `<p class="library-empty">${escape(localized(
+          "No documents yet. Open Business Central, select BC Process Studio in the browser toolbar and choose Document a process.",
+          locale, "Det finns inga dokument ännu. Öppna Business Central, välj BC Process Studio i webbläsarens verktygsfält och välj Dokumentera en process."))}</p>`
+        : `<div class="library-empty"><p>${escape(localized(
+          "No documents in the Document Library match the search and filters.",
+          locale, "Det finns inga dokument i Dokumentbiblioteket som matchar sökningen och filtren."))}</p>
+          <button type="button" class="secondary" data-library-action="clear-search-filters">${escape(localized(
+            "Clear search and filters", locale, "Rensa sökning och filter"))}</button></div>`;
       return null;
     }
     container.innerHTML = records.map(record => card(record,
@@ -107,7 +118,7 @@
     if (!records.length) return renderList(container, records, state);
     container.innerHTML = groups.map(group =>
       `<section class="library-group" aria-labelledby="library-group-${escape(group.profileId)}">
-        <h3 id="library-group-${escape(group.profileId)}">${escape(group.displayName)}</h3>
+        <h3 id="library-group-${escape(group.profileId)}">${escape(builtInName(group.displayName, locale))}</h3>
         <div class="library-group-cards">${group.documents.map(record =>
           card(record, selectedIds.has(record.projectId),
             record.projectId === activeId, locale)).join("")}</div></section>`

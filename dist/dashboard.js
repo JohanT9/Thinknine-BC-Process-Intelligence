@@ -481,7 +481,8 @@ function applyProfile(profileName, updateControls = true) {
 
 
 function show(text, error = false) {
-  $("message").textContent = text || "";
+  // Known service-worker messages are translated; other text is shown as received.
+  $("message").textContent = text ? uiT(text) : "";
   $("message").style.color = error ? "#b42318" : "#166534";
 }
 
@@ -3111,7 +3112,7 @@ async function prepareSessionModel(session, options = {}) {
   });
 
   if (!response.ok) {
-    throw new Error(response.error || "Sessionen kunde inte läsas.");
+    throw new Error(response.error || uiT("Sessionen kunde inte läsas."));
   }
 
   const imagePaths = {};
@@ -3259,7 +3260,7 @@ async function exportSession(session) {
   });
 
   if (!response.ok) {
-    throw new Error(response.error || "Sessionen kunde inte läsas.");
+    throw new Error(response.error || uiT("Sessionen kunde inte läsas."));
   }
 
   const imagePaths = {};
@@ -3596,7 +3597,7 @@ async function downloadBlob(blob, filename) {
     });
 
     if (!response.ok) {
-      throw new Error(response.error || "Filen kunde inte sparas.");
+      throw new Error(response.error || uiT("Filen kunde inte sparas."));
     }
 
     return response.downloadId;
@@ -3643,7 +3644,7 @@ function imageDataToDataUrl(imageData) {
 
 function createActiveDocumentPipeline() {
   if (!activeReviewModel || !activeReview) {
-    throw new Error("Dokumentet är inte tillgängligt ännu.");
+    throw new Error(uiT("Dokumentet är inte tillgängligt ännu."));
   }
   const expectedResult = configuredExpectedResult();
   const documentLanguage = activeDocumentLanguage();
@@ -3671,7 +3672,7 @@ function createActiveDocumentPipeline() {
 
 function createActiveDocumentPresentation() {
   if (!activeReviewModel || !activeReview) {
-    throw new Error("Dokumentet är inte tillgängligt ännu.");
+    throw new Error(uiT("Dokumentet är inte tillgängligt ännu."));
   }
   const expectedResult = configuredExpectedResult();
   const documentLanguage = activeDocumentLanguage();
@@ -3786,12 +3787,12 @@ async function prepareDocumentMedia(pipeline) {
 async function exportLibraryDocument(record, exportSettings) {
   const session = documentLibrarySessions.get(record.projectId);
   if (!session || session.status === "recording") {
-    throw new Error(`Dokumentet "${record.title}" kan inte exporteras.`);
+    throw new Error(uiTf("Dokumentet \"{title}\" kan inte exporteras.", { title: record.title }));
   }
   if (session.recordingPurpose === "bug-report" ||
       record.metadata?.recordingPurpose === "bug-report") {
     throw new Error(
-      `Felrapporten "${record.title}" exporteras från Technical Report Workspace.`
+      uiTf("Felrapporten \"{title}\" exporteras från Technical Report Workspace.", { title: record.title })
     );
   }
   const model = await prepareSessionModel(session);
@@ -3832,13 +3833,13 @@ async function exportLibraryDocument(record, exportSettings) {
 
 async function exportActiveReviewToWord() {
   if (!activeReviewSession || !activeReview) {
-    throw new Error("Ingen granskning är öppen.");
+    throw new Error(uiT("Ingen granskning är öppen."));
   }
 
   if (!globalThis.T9Export?.word?.renderPlan ||
       !globalThis.T9WordExportPipeline) {
     throw new Error(
-      "Word-exportbiblioteket kunde inte laddas. Kör npm install och npm run build."
+      uiT("Word-exportbiblioteket kunde inte laddas. Kör npm install och npm run build.")
     );
   }
 
@@ -4177,7 +4178,7 @@ async function loadProcessAnalysis(force = false) {
   processAnalysisRequest = send({ type: "T9_MATCH_REFERENCE_PROCESS", sessionId })
     .then(response => {
       if (!response?.ok) throw new Error(response?.error ||
-        "Processanalysen kunde inte genomföras.");
+        uiT("Processanalysen kunde inte genomföras."));
       if (activeReviewSession?.id !== sessionId) return null;
       activeProcessAnalysis = response.result;
       updateProcessAnalysisBadge();
@@ -4295,7 +4296,7 @@ async function persistDocumentLibrary() {
     records: documentLibraryRecords
   });
   if (!response?.ok) throw new Error(
-    response?.error || "Dokumentbiblioteket kunde inte sparas."
+    response?.error || uiT("Dokumentbiblioteket kunde inte sparas.")
   );
 }
 
@@ -4347,9 +4348,11 @@ function renderDocumentLibrary() {
     ? view.renderGrouped($("libraryResults"),
       globalThis.T9DocumentLibrary.groupByProfile(records,
         applicationSettings.uiLocale || "sv-SE"),
-      { ...documentLibrarySelection, locale: applicationSettings.uiLocale })
+      { ...documentLibrarySelection, locale: applicationSettings.uiLocale,
+        storedCount: documentLibraryRecords.length })
     : view.renderList($("libraryResults"), records,
-      { ...documentLibrarySelection, locale: applicationSettings.uiLocale });
+      { ...documentLibrarySelection, locale: applicationSettings.uiLocale,
+        storedCount: documentLibraryRecords.length });
   documentLibrarySelection = globalThis.T9DocumentBatchOperations.selection({
     ...documentLibrarySelection,
     activeId
@@ -4526,7 +4529,7 @@ function openBatchMetadataDialog(mode = "metadata") {
   const modeField = { tags: "Tags", profile: "Profile", theme: "Theme" }[mode];
   if (modeField) $("libraryBatchUse" + modeField).checked = true;
   $("libraryBatchMetadataDescription").textContent =
-    `Endast markerade fält ändras för ${count} dokument.`;
+    uiTf("Endast markerade fält ändras för {count} dokument.", { count });
   $("libraryBatchMetadataDialog").returnValue = "";
   $("libraryBatchMetadataDialog").showModal();
   $(modeField ? "libraryBatch" + modeField + "Value" :
@@ -5060,7 +5063,7 @@ async function synchronizeDocumentWorkspace() {
         );
       } catch (error) {
         $("documentWorkspaceStatus").textContent =
-          `Dokumentet kunde inte visas: ${error.message}`;
+          uiTf("Dokumentet kunde inte visas: {error}", { error: error.message });
         break;
       }
     }
@@ -5073,7 +5076,7 @@ async function synchronizeDocumentWorkspace() {
 async function switchWorkspace(workspace, focusTab = false) {
   if (workspace === "document" && annotationEditorState) {
     $("annotationStatus").textContent =
-      "Slutför eller avbryt annoteringen innan du byter arbetsyta.";
+      uiT("Slutför eller avbryt annoteringen innan du byter arbetsyta.");
     return false;
   }
   if (workspace === "document" && activeReviewEdit) {
@@ -5511,7 +5514,7 @@ function addManualInformationStep(afterIndex) {
     `[data-review-task-id="${created.manualStepId}"]`
   );
   if (card) editReviewField(card, created.manualStepId, "instruction");
-  show("Informationssteget lades till. Skriv texten och spara.");
+  show(uiT("Informationssteget lades till. Skriv texten och spara."));
 }
 
 function mergeSelectedReviewTasks() {
@@ -5560,7 +5563,7 @@ function splitSelectedReviewTask() {
   );
   if (!result.splitTasks.length) {
     $("reviewFooterText").textContent =
-      "Placera markören mellan två textdelar i instruktionen.";
+      uiT("Placera markören mellan två textdelar i instruktionen.");
     instruction?.focus();
     return;
   }
@@ -5582,7 +5585,7 @@ function restoreReviewHistory(direction) {
         direction
       )) {
     $("annotationStatus").textContent =
-      "Det finns ingen annoteringsändring att återställa.";
+      uiT("Det finns ingen annoteringsändring att återställa.");
     return;
   }
   const previous = globalThis.T9ReviewMove.capturePositions($("reviewList"));
@@ -5659,7 +5662,7 @@ function finishReviewEdit(control, commit) {
       $("reviewFooterText").textContent = uiT("review.autosaving");
       if (revisionChanged) {
         $("reviewFooterText").textContent =
-          "Steget ändrades under redigering. Din text bevarades och sparas.";
+          uiT("Steget ändrades under redigering. Din text bevarades och sparas.");
       }
     }
   } else if (!commit) {
@@ -5889,7 +5892,7 @@ function openStepRepair(taskIndex) {
     }).catch(error => {
       if (operation.current()) {
         $("stepRepairGallery").innerHTML = '<p role="alert">' +
-          escapeHtml(error.message || "Skärmbilderna kunde inte läsas in.") +
+          escapeHtml(error.message || uiT("Skärmbilderna kunde inte läsas in.")) +
           '</p>';
       }
     });
@@ -5903,13 +5906,13 @@ $("captureStepRepairScreenshot").addEventListener("click", async () => {
   if (button.disabled) return;
   button.disabled = true;
   $("stepRepairStatus").textContent =
-    "Tar en bild från den senast använda Business Central-fliken...";
+    uiT("Tar en bild från den senast använda Business Central-fliken...");
   try {
     const response = await send({ type: "T9_CAPTURE_STEP_REPAIR_SCREENSHOT",
       sessionId: activeReviewSession.id, stepId: stepRepairState.taskId });
     if (!operation.current()) return;
     if (!response.ok) throw new Error(response.error ||
-      "Skärmbilden kunde inte tas.");
+      uiT("Skärmbilden kunde inte tas."));
     activeReviewModel.screenshotData[response.assetId] = response.image;
     stepRepairState.selectedAssetId = response.assetId;
     stepRepairState.capturedAssetId = response.assetId;
@@ -5918,7 +5921,7 @@ $("captureStepRepairScreenshot").addEventListener("click", async () => {
     stepRepairState.capturedAt = response.capturedAt;
     renderStepRepairGallery();
     $("stepRepairStatus").textContent =
-      "Den nya bilden är vald. Bekräfta för att uppdatera steget.";
+      uiT("Den nya bilden är vald. Bekräfta för att uppdatera steget.");
   } catch (error) {
     if (!operation.current()) return;
     $("stepRepairStatus").textContent = error.message;
@@ -5957,7 +5960,7 @@ $("applyStepRepair").addEventListener("click", async () => {
         button.disabled = false;
         return;
       }
-      if (!saved.ok) throw new Error(saved.error || "Bilden kunde inte sparas.");
+      if (!saved.ok) throw new Error(saved.error || uiT("Bilden kunde inte sparas."));
     } catch (error) {
       if (!operation.current()) return;
       $("stepRepairStatus").textContent = error.message;
@@ -6223,9 +6226,9 @@ function markAnnotationsChanged(message) {
   reviewAutoSave.schedule();
   renderActiveAnnotation();
   $("annotationStatus").textContent =
-    `${message} Väntar på automatisk sparning.`;
+    uiTf("{message} Väntar på automatisk sparning.", { message });
   $("reviewFooterText").textContent =
-    "Annoteringen väntar på automatisk sparning.";
+    uiT("Annoteringen väntar på automatisk sparning.");
 }
 
 function addAnnotation(type, geometry) {
@@ -6252,7 +6255,7 @@ function addAnnotation(type, geometry) {
     return true;
   } catch (error) {
     $("annotationStatus").textContent =
-      `Markeringen kunde inte läggas till: ${error.message}`;
+      uiTf("Markeringen kunde inte läggas till: {error}", { error: error.message });
     return false;
   }
 }
@@ -6282,7 +6285,7 @@ function updateAnnotation(annotationId, geometry, message, options = {}) {
     return true;
   } catch (error) {
     $("annotationStatus").textContent =
-      `Markeringen kunde inte uppdateras: ${error.message}`;
+      uiTf("Markeringen kunde inte uppdateras: {error}", { error: error.message });
     return false;
   }
 }
@@ -6480,7 +6483,7 @@ function renderStoredReviewFallback(error) {
     list.appendChild(card);
   });
   list.setAttribute("aria-rowcount", String(stored.length));
-  const reason = String(error?.message || "okänt renderingsfel");
+  const reason = String(error?.message || uiT("okänt renderingsfel"));
   show(uiTf("review.renderFallback", { reason }), true);
   console.error("Review rendering fallback", error);
 }
@@ -6805,10 +6808,10 @@ function renderReviewContent() {
   renderReviewAttention(tasks);
   $("reviewFooterText").textContent =
     annotationChangesPending
-      ? "Annoteringar har ändrats. Välj Spara för att lagra dem."
+      ? uiT("Annoteringar har ändrats. Välj Spara för att lagra dem.")
       : activeReview.status === "completed"
-      ? "Granskningen är slutförd."
-      : "Ändringar sparas lokalt i Edge.";
+      ? uiT("Granskningen är slutförd.")
+      : uiT("Ändringar sparas lokalt i webbläsaren.");
 
   tasks.forEach((task, visibleIndex) => {
     const actualIndex = activeReview.tasks.findIndex(candidate =>
@@ -6829,7 +6832,7 @@ function renderReviewContent() {
     card.setAttribute("role", "row");
     card.setAttribute("aria-rowindex", String(visibleIndex + 1));
     card.setAttribute("aria-label",
-      `${uiT("Steg")} ${visibleIndex + 1}, ${reviewStateLabel}`);
+      `${uiTf("Steg {step}", { step: visibleIndex + 1 })}, ${reviewStateLabel}`);
     card.className = `review-card ${reviewState}`;
 
     const images = reviewImages(task);
@@ -6855,11 +6858,11 @@ function renderReviewContent() {
       <div class="review-fields" role="gridcell">
         <div class="review-field-heading">
           <span class="review-field-title">
-            <label for="review-instruction-${visibleIndex}">Instruktion</label>
+            <label for="review-instruction-${visibleIndex}">${uiT("Instruktion")}</label>
             <span class="review-state-label ${reviewState}">${reviewStateLabel}</span>
           </span>
           <button data-action="edit-instruction" class="secondary"
-            aria-label="${uiTf("a11y.editInstruction", { step: visibleIndex + 1 })}">Redigera</button>
+            aria-label="${uiTf("a11y.editInstruction", { step: visibleIndex + 1 })}">${uiT("Redigera")}</button>
         </div>
         <div id="review-instruction-preview-${visibleIndex}"
           class="review-instruction-preview" data-field="instruction"
@@ -6876,19 +6879,19 @@ function renderReviewContent() {
           <button type="button" class="secondary" data-instruction-format="italic"
             aria-label="${uiT("a11y.italic")}" aria-pressed="false"><em>K</em></button>
           <details class="review-advanced-formatting"><summary>${escapeHtml(reviewAdvancedFormattingLabel())}</summary><div class="review-advanced-format-options">
-          <label>Typsnitt<select data-instruction-font>
+          <label>${uiT("Typsnitt")}<select data-instruction-font>
             ${globalThis.T9TextFormat.FONT_FAMILIES.map(font =>
               `<option value="${escapeHtml(font)}" ${font === "Arial" ? "selected" : ""}>${escapeHtml(font)}</option>`).join("")}
           </select></label>
-          <label>Storlek<select data-instruction-size>
+          <label>${uiT("Storlek")}<select data-instruction-size>
             ${globalThis.T9TextFormat.FONT_SIZES.map(size =>
               `<option value="${size}" ${size === 11 ? "selected" : ""}>${size} pt</option>`).join("")}
           </select></label>
-          <label>Textfärg<select data-instruction-text-color data-color-select>
+          <label>${uiT("Textfärg")}<select data-instruction-text-color data-color-select>
             ${globalThis.T9TextFormat.COLORS.map(color =>
               `<option value="${color.value}" style="background:${color.value};color:${["#000000", "#0F4C81", "#008C95", "#C50F1F", "#107C10", "#CA5010"].includes(color.value) ? "#FFFFFF" : "#000000"}">${escapeHtml(color.name)}</option>`).join("")}
           </select></label>
-          <label>Bakgrund<select data-instruction-background-color data-color-select>
+          <label>${uiT("Bakgrund")}<select data-instruction-background-color data-color-select>
             ${globalThis.T9TextFormat.COLORS.map(color =>
               `<option value="${color.value}" style="background:${color.value};color:${["#000000", "#0F4C81", "#008C95", "#C50F1F", "#107C10", "#CA5010"].includes(color.value) ? "#FFFFFF" : "#000000"}">${escapeHtml(color.name)}</option>`).join("")}
           </select></label>
@@ -6901,13 +6904,13 @@ function renderReviewContent() {
           readonly>${escapeHtml(instructionPresentation.text)}</textarea>
         <div class="review-comment-section" ${task.userComment ? "" : "hidden"}>
           <div class="review-field-heading">
-            <label for="review-comment-${visibleIndex}">Kommentar</label>
+            <label for="review-comment-${visibleIndex}">${uiT("Kommentar")}</label>
             <span>
               <button data-action="reset-comment" class="secondary" hidden
                 ${task.userComment === generatedComment ? "disabled" : ""}
-                aria-label="${uiTf("a11y.resetComment", { step: visibleIndex + 1 })}">Återställ text</button>
+                aria-label="${uiTf("a11y.resetComment", { step: visibleIndex + 1 })}">${uiT("Återställ text")}</button>
               <button data-action="edit-comment" class="secondary"
-                aria-label="${uiTf("a11y.editComment", { step: visibleIndex + 1 })}">Redigera</button>
+                aria-label="${uiTf("a11y.editComment", { step: visibleIndex + 1 })}">${uiT("Redigera")}</button>
             </span>
           </div>
           <div id="review-comment-preview-${visibleIndex}"
@@ -6920,19 +6923,19 @@ function renderReviewContent() {
             <button type="button" class="secondary" data-comment-format="italic"
               aria-label="${uiT("a11y.italic")}" aria-pressed="false"><em>K</em></button>
             <details class="review-advanced-formatting"><summary>${escapeHtml(reviewAdvancedFormattingLabel())}</summary><div class="review-advanced-format-options">
-            <label>Typsnitt<select data-comment-font>
+            <label>${uiT("Typsnitt")}<select data-comment-font>
               ${globalThis.T9TextFormat.FONT_FAMILIES.map(font =>
                 `<option value="${escapeHtml(font)}">${escapeHtml(font)}</option>`).join("")}
             </select></label>
-            <label>Storlek<select data-comment-size>
+            <label>${uiT("Storlek")}<select data-comment-size>
               ${globalThis.T9TextFormat.FONT_SIZES.map(size =>
                 `<option value="${size}">${size} pt</option>`).join("")}
             </select></label>
-            <label>Textfärg<select data-comment-text-color data-color-select>
+            <label>${uiT("Textfärg")}<select data-comment-text-color data-color-select>
               ${globalThis.T9TextFormat.COLORS.map(color =>
                 `<option value="${color.value}">${escapeHtml(color.name)}</option>`).join("")}
             </select></label>
-            <label>Bakgrund<select data-comment-background-color data-color-select>
+            <label>${uiT("Bakgrund")}<select data-comment-background-color data-color-select>
               ${globalThis.T9TextFormat.COLORS.map(color =>
                 `<option value="${color.value}">${escapeHtml(color.name)}</option>`).join("")}
             </select></label>
@@ -6946,33 +6949,33 @@ function renderReviewContent() {
         </div>
         <button data-action="add-comment" class="secondary review-add-comment"
           ${task.userComment ? "hidden" : ""}
-          aria-label="${uiTf("a11y.addComment", { step: visibleIndex + 1 })}">Lägg till kommentar</button>
+          aria-label="${uiTf("a11y.addComment", { step: visibleIndex + 1 })}">${uiT("Lägg till kommentar")}</button>
         ${task.manualStepId ? `<div class="review-field-heading">
-          <label for="review-manual-type-${visibleIndex}">Informationstyp</label>
+          <label for="review-manual-type-${visibleIndex}">${uiT("Informationstyp")}</label>
           <select id="review-manual-type-${visibleIndex}" data-action="manual-type"
-            aria-label="Informationstyp för manuellt steg ${visibleIndex + 1}">
+            aria-label="${uiTf("Informationstyp för manuellt steg {step}", { step: visibleIndex + 1 })}">
             ${globalThis.T9ManualInformationSteps.STEP_TYPES.map(type =>
               `<option value="${type}" ${task.stepType === type ? "selected" : ""}>${type}</option>`
             ).join("")}
           </select>
         </div>
         <div class="review-field-heading">
-          <label for="review-callout-${visibleIndex}">Faktaruta</label>
+          <label for="review-callout-${visibleIndex}">${uiT("Faktaruta")}</label>
           <button data-action="edit-callout" class="secondary"
-            aria-label="Redigera faktaruta för steg ${visibleIndex + 1}">Redigera</button>
+            aria-label="${uiTf("Redigera faktaruta för steg {step}", { step: visibleIndex + 1 })}">${uiT("Redigera")}</button>
         </div>
         <input id="review-callout-${visibleIndex}" data-edit-field="manualCallout"
-          aria-label="Faktaruta för manuellt steg ${visibleIndex + 1}"
+          aria-label="${uiTf("Faktaruta för manuellt steg {step}", { step: visibleIndex + 1 })}"
           value="${escapeHtml(task.callout?.text || "")}" readonly>` : ""}
         <details class="review-technical-details">
           <summary>${uiT("Teknisk information")}</summary>
           <div class="review-meta">
             ${escapeHtml(task.taskType || "Task")}
             · Confidence ${task.confidenceScore ?? task.confidence ?? 0}%
-            ${task.stepOverride ? " · Redigerad" : " · Genererad"}
+            ${task.stepOverride ? ` · ${uiT("Redigerad")}` : ` · ${uiT("Genererad")}`}
             ${task.provenance === "manual"
-              ? ` · Manuellt ${escapeHtml(task.stepType || "information")}` : ""}
-            ${task.stepOverride?.screenshotOverride ? " · Manuell skärmbild" : ""}
+              ? ` · ${uiT("Manuellt")} ${escapeHtml(task.stepType || "information")}` : ""}
+            ${task.stepOverride?.screenshotOverride ? ` · ${uiT("Manuell skärmbild")}` : ""}
             ${task.knowledgeRule
               ? ` · ${escapeHtml(task.knowledgeRule)}`
               : ""}
@@ -6988,7 +6991,7 @@ function renderReviewContent() {
           `<div class="review-screenshot">
             <div class="review-image-stage" data-review-image-index="${imageIndex}">
               <img class="review-image" src="${image.imageUrl}"
-                alt="Skärmbild ${imageIndex + 1} för steg ${visibleIndex + 1}">
+                alt="${uiTf("Skärmbild {image} för steg {step}", { image: imageIndex + 1, step: visibleIndex + 1 })}">
               <svg class="review-annotation-layer" aria-hidden="true"></svg>
             </div>
             ${task.screenshotEvidence?.relation === "subsequent-captured-page-state" &&
@@ -6997,11 +7000,11 @@ function renderReviewContent() {
               ? `<p class="review-related-screenshot-note">${escapeHtml(
                 task.screenshotEvidence.caption || "")}</p>` : ""}
             <button data-action="annotate" class="secondary review-annotate-button"
-              aria-label="${uiTf("a11y.editImage", { image: imageIndex + 1, step: visibleIndex + 1 })}">Redigera bild</button>
+              aria-label="${uiTf("a11y.editImage", { image: imageIndex + 1, step: visibleIndex + 1 })}">${uiT("Redigera bild")}</button>
             ${images.length > 1 ? `<button data-action="select-screenshot"
               data-screenshot-index="${imageIndex}" class="secondary"
               aria-label="${uiTf("a11y.useScreenshot", { image: imageIndex + 1, step: visibleIndex + 1 })}"
-              ${task.selectedScreenshotAssetId === image.path ? "disabled" : ""}>Använd</button>` : ""}
+              ${task.selectedScreenshotAssetId === image.path ? "disabled" : ""}>${uiT("Använd")}</button>` : ""}
           </div>`
         ).join("")}
       </div>
@@ -7010,7 +7013,7 @@ function renderReviewContent() {
           <input data-action="approve" type="checkbox"
             aria-label="${uiTf("a11y.approveStep", { step: visibleIndex + 1 })}"
             ${task.approved ? "checked" : ""}>
-          Godkänd
+          ${uiT("Godkänd")}
         </label>
         <div class="review-step-actions-menu">
           <button type="button" class="review-step-actions-trigger"
@@ -7019,31 +7022,31 @@ function renderReviewContent() {
             aria-label="${uiTf("a11y.stepActions", { step: visibleIndex + 1 })}" hidden>
             <button data-drag-handle class="secondary" draggable="true"
               aria-label="${uiTf("a11y.dragStep", { step: visibleIndex + 1 })}"
-              aria-keyshortcuts="Alt+ArrowUp Alt+ArrowDown">Flytta</button>
+              aria-keyshortcuts="Alt+ArrowUp Alt+ArrowDown">${uiT("Flytta")}</button>
             <button data-action="add" class="secondary"
-              aria-label="${uiTf("a11y.addAfter", { step: visibleIndex + 1 })}">Lägg till efter</button>
+              aria-label="${uiTf("a11y.addAfter", { step: visibleIndex + 1 })}">${uiT("Lägg till efter")}</button>
             <button data-action="repair-step" class="secondary"
-              aria-label="${uiTf("a11y.changeImage", { step: visibleIndex + 1 })}">Byt bild</button>
+              aria-label="${uiTf("a11y.changeImage", { step: visibleIndex + 1 })}">${uiT("Byt bild")}</button>
             <button data-action="split-step" class="secondary"
-              aria-label="Dela steg ${visibleIndex + 1} vid markören">Dela vid markören</button>
+              aria-label="${uiTf("Dela steg {step} vid markören", { step: visibleIndex + 1 })}">${uiT("Dela vid markören")}</button>
             <button data-action="move-up" class="secondary"
               ${actualIndex === 0 ? "disabled" : ""}
-              aria-label="Flytta steg ${visibleIndex + 1} uppåt">Flytta upp</button>
+              aria-label="${uiTf("Flytta steg {step} uppåt", { step: visibleIndex + 1 })}">${uiT("Flytta upp")}</button>
             <button data-action="move-down" class="secondary"
               ${actualIndex >= activeReview.tasks.length - 1 ? "disabled" : ""}
-              aria-label="Flytta steg ${visibleIndex + 1} nedåt">Flytta ned</button>
+              aria-label="${uiTf("Flytta steg {step} nedåt", { step: visibleIndex + 1 })}">${uiT("Flytta ned")}</button>
             <button data-action="regenerate-step" class="secondary"
               ${!activeReviewSession || !activeReviewModel ? "disabled" : ""}
-              aria-label="Regenerera steg ${visibleIndex + 1}">Regenerera det här steget</button>
+              aria-label="${uiTf("Regenerera steg {step}", { step: visibleIndex + 1 })}">${uiT("Regenerera det här steget")}</button>
             <button data-action="reset-instruction" class="secondary"
               ${task.fieldProvenance?.instruction === "user-edited" ? "" : "disabled"}
-              aria-label="${uiTf("a11y.resetInstruction", { step: visibleIndex + 1 })}">Återställ text</button>
+              aria-label="${uiTf("a11y.resetInstruction", { step: visibleIndex + 1 })}">${uiT("Återställ text")}</button>
             <button data-action="remove" class="secondary review-hide-action"
-              aria-label="${uiTf("a11y.hideStep", { step: visibleIndex + 1 })}">Dölj</button>
+              aria-label="${uiTf("a11y.hideStep", { step: visibleIndex + 1 })}">${uiT("Dölj")}</button>
             ${task.manualStepId ? `<button data-action="delete-manual" class="danger"
-              aria-label="Ta bort manuellt steg ${visibleIndex + 1}">Ta bort manuellt steg</button>` : ""}
+              aria-label="${uiTf("Ta bort manuellt steg {step}", { step: visibleIndex + 1 })}">${uiT("Ta bort manuellt steg")}</button>` : ""}
             <button data-action="toggle-layout" class="secondary"
-              aria-pressed="false">Komprimera</button>
+              aria-pressed="false">${uiT("Komprimera")}</button>
           </div>
         </div>
       </div>`;
@@ -7442,7 +7445,7 @@ function renderReviewContent() {
         );
         reviewAutoSave.schedule();
         renderReview();
-        show("Det manuella informationssteget togs bort.");
+        show(uiT("Det manuella informationssteget togs bort."));
       });
 
     card.querySelector('[data-action="toggle-layout"]')
@@ -7454,7 +7457,8 @@ function renderReviewContent() {
         globalThis.T9ReviewLayout.apply(
           list,
           $("compactReviewSteps"),
-          reviewLayoutState
+          reviewLayoutState,
+          uiT
         );
       });
 
@@ -7462,7 +7466,8 @@ function renderReviewContent() {
   globalThis.T9ReviewLayout.apply(
     list,
     $("compactReviewSteps"),
-    reviewLayoutState
+    reviewLayoutState,
+    uiT
   );
   applyReviewSelection();
 }
@@ -7499,7 +7504,7 @@ function renderReview() {
     renderReviewContent();
     if (!$('reviewList').children.length && activeReview?.tasks?.length) {
       renderStoredReviewFallback(new Error(
-        "Den filtrerade steglistan blev tom trots lagrade steg."
+        uiT("Den filtrerade steglistan blev tom trots lagrade steg.")
       ));
     }
   } catch (error) {
@@ -7771,7 +7776,7 @@ async function saveActiveReview(options = {}) {
   const response = queued.value;
 
   if (!response.ok) {
-    throw new Error(response.error || "Granskningen kunde inte sparas.");
+    throw new Error(response.error || uiT("Granskningen kunde inte sparas."));
   }
 
   const currentSession = activeReviewSession === savedSession;
@@ -7792,8 +7797,8 @@ async function saveActiveReview(options = {}) {
   if (options.render !== false && unchanged) renderReview();
   else if (options.render === false && currentSession) {
     $("reviewFooterText").textContent = unchanged
-      ? "Alla ändringar är sparade."
-      : "Nyare ändringar väntar på att sparas.";
+      ? uiT("Alla ändringar är sparade.")
+      : uiT("Nyare ändringar väntar på att sparas.");
     if (annotationEditorState && unchanged) {
   $("annotationStatus").textContent = uiT("review.annotationSaved");
     }
@@ -7833,7 +7838,7 @@ async function openReview(session) {
     sessionId: session.id
   });
   if (reviewOpenRequestId !== requestId || activeReviewSession !== session) return;
-  if (existing?.ok === false) throw new Error(existing.error || "Granskningen kunde inte läsas.");
+  if (existing?.ok === false) throw new Error(existing.error || uiT("Granskningen kunde inte läsas."));
   activeReview = existing.review
     ? globalThis.T9Review.normalizeReview({
       ...existing.review,
@@ -7937,7 +7942,7 @@ async function completeReviewOpen(session, storedReview, initialUpdatedAt,
       applyReviewZoom({ persist: false, preservePosition: true });
     }).catch(error => {
       if (isCurrent()) show(error.message ||
-        "Skärmbilderna kunde inte läsas in.", true);
+        uiT("Skärmbilderna kunde inte läsas in."), true);
     });
     if (loadStatus) {
       loadStatus.hidden = true;
@@ -7950,7 +7955,7 @@ async function completeReviewOpen(session, storedReview, initialUpdatedAt,
       loadStatus.hidden = false;
       loadStatus.textContent = uiT("review.openedPartial");
     }
-    show(error.message || "Skärmbilder och processkontext kunde inte läsas in.", true);
+    show(error.message || uiT("Skärmbilder och processkontext kunde inte läsas in."), true);
   }
 }
 
@@ -7969,7 +7974,7 @@ async function closeReview() {
   } catch (error) {
     show(error.message, true);
     $("reviewFooterText").textContent =
-      "Granskningen kunde inte stängas eftersom sparningen misslyckades.";
+      uiT("Granskningen kunde inte stängas eftersom sparningen misslyckades.");
     return;
   }
   annotationEditorState = null;
@@ -8104,7 +8109,7 @@ async function loadSessions() {
           sessionId: session.id
         });
         if (!response?.ok) {
-          throw new Error(response?.error || "Sessionen kunde inte tas bort.");
+          throw new Error(response?.error || uiT("Sessionen kunde inte tas bort."));
         }
         await loadSessions();
         show(`Sessionen "${session.name}" har tagits bort.`);
@@ -8144,8 +8149,8 @@ $("advancedToggle").addEventListener("click", () => {
   const expanded = panel.classList.contains("open");
   $("advancedToggle").setAttribute("aria-expanded", String(expanded));
   $("advancedToggle").textContent = expanded
-    ? "Dölj avancerade dataskyddsinställningar"
-    : "Visa avancerade dataskyddsinställningar";
+    ? uiT("Dölj avancerade dataskyddsinställningar")
+    : uiT("Visa avancerade dataskyddsinställningar");
 });
 
 $("reviewWorkspaceTab").addEventListener("click", () => {
@@ -8663,7 +8668,7 @@ $("closeAnnotationEditor").addEventListener("click", async () => {
     await closeAnnotationEditor();
   } catch (error) {
     $("annotationStatus").textContent =
-      `Annoteringarna kunde inte sparas: ${error.message}`;
+      uiTf("Annoteringarna kunde inte sparas: {error}", { error: error.message });
   }
 });
 $("cancelAnnotationEditor").addEventListener("click", async () => {
@@ -8671,7 +8676,7 @@ $("cancelAnnotationEditor").addEventListener("click", async () => {
     await closeAnnotationEditor({ cancel: true });
   } catch (error) {
     $("annotationStatus").textContent =
-      `Återställningen kunde inte sparas: ${error.message}`;
+      uiTf("Återställningen kunde inte sparas: {error}", { error: error.message });
   }
 });
 $("rectangleAnnotationTool").addEventListener("click", () => {
@@ -8749,7 +8754,7 @@ $("annotationSurface").addEventListener("pointerdown", event => {
     );
     releaseActiveAnnotationPointer();
     $("annotationStatus").textContent =
-      "Pekgesten kunde inte startas. Försök igen.";
+      uiT("Pekgesten kunde inte startas. Försök igen.");
   }
   renderActiveAnnotation();
   event.preventDefault();
@@ -9107,7 +9112,8 @@ $("compactReviewSteps").addEventListener("click", () => {
   globalThis.T9ReviewLayout.apply(
     $("reviewList"),
     $("compactReviewSteps"),
-    reviewLayoutState
+    reviewLayoutState,
+    uiT
   );
 });
 $("addReviewStep").addEventListener("click", () => {
@@ -9127,7 +9133,7 @@ function regenerationChangeGroup(title, items) {
 
 function regenerationBlockingMessage(reasons = []) {
   if (reasons.includes("empty-generated-result")) {
-    return "Den nya tolkningen gav inga steg. Den sparade granskningen kommer inte att \u00e4ndras.";
+    return uiT("Den nya tolkningen gav inga steg. Den sparade granskningen kommer inte att \u00e4ndras.");
   }
   if (reasons.includes("selection-structure-change")) {
     return uiT("Urvalet inneh\u00e5ller steg som har slagits samman, delats eller tagits bort. Anv\u00e4nd full regenerering f\u00f6r att granska struktur\u00e4ndringen s\u00e4kert.");
@@ -9141,7 +9147,7 @@ function regenerationBlockingMessage(reasons = []) {
   if (reasons.some(reason => reason.startsWith("selection-"))) {
     return uiT("De valda stegen kan inte mappas exakt till den nya tolkningen. Ingen dokumentation har \u00e4ndrats.");
   }
-  return "Granskningen inneh\u00e5ller manuella \u00e4ndringar som inte kan flyttas s\u00e4kert. Regenereringen \u00e4r blockerad s\u00e5 att inget konsultarbete skrivs \u00f6ver.";
+  return uiT("Granskningen inneh\u00e5ller manuella \u00e4ndringar som inte kan flyttas s\u00e4kert. Regenereringen \u00e4r blockerad s\u00e5 att inget konsultarbete skrivs \u00f6ver.");
 }
 
 function showRegenerationPreview(preview) {
@@ -9171,24 +9177,24 @@ function showRegenerationPreview(preview) {
     `<div class="regeneration-preview-stat"><strong>${Number(value) || 0}</strong>` +
       `<span>${escapeHtml(label)}</span></div>`).join("");
   const groups = [
-    regenerationChangeGroup("Tillagda steg", (changes.added || [])
+    regenerationChangeGroup(uiT("Tillagda steg"), (changes.added || [])
       .map(regenerationStepLabel)),
-    regenerationChangeGroup("Borttagna steg", (changes.removed || [])
+    regenerationChangeGroup(uiT("Borttagna steg"), (changes.removed || [])
       .map(regenerationStepLabel)),
-    regenerationChangeGroup("\u00c4ndrad instruktion", (changes.changed || [])
+    regenerationChangeGroup(uiT("\u00c4ndrad instruktion"), (changes.changed || [])
       .map(item => `${regenerationStepLabel(item.before)} \u2192 ${regenerationStepLabel(item.after)}`)),
     regenerationChangeGroup(uiT("Ny standardtext bakom redigering"),
       (changes.generatedChanges || [])
         .map(item => `${regenerationStepLabel(item.before)} \u2192 ${regenerationStepLabel(item.after)}`)),
-    regenerationChangeGroup("Sammanslagna steg", (changes.merges || [])
+    regenerationChangeGroup(uiT("Sammanslagna steg"), (changes.merges || [])
       .map(item => `${item.before.map(regenerationStepLabel).join(" + ")} \u2192 ${item.after.map(regenerationStepLabel).join(" + ")}`)),
-    regenerationChangeGroup("Delade steg", (changes.splits || [])
+    regenerationChangeGroup(uiT("Delade steg"), (changes.splits || [])
       .map(item => `${item.before.map(regenerationStepLabel).join(" + ")} \u2192 ${item.after.map(regenerationStepLabel).join(" + ")}`)),
-    regenerationChangeGroup("Bytt sk\u00e4rmbild", (changes.screenshotChanges || [])
+    regenerationChangeGroup(uiT("Bytt sk\u00e4rmbild"), (changes.screenshotChanges || [])
       .map(item => regenerationStepLabel(item.after)))
   ].filter(Boolean);
   $("regenerationPreviewChanges").innerHTML = groups.join("") ||
-    `<p class="muted">Inga inneh\u00e5lls\u00e4ndringar uppt\u00e4cktes.</p>`;
+    `<p class="muted">${escapeHtml(uiT("Inga inneh\u00e5lls\u00e4ndringar uppt\u00e4cktes."))}</p>`;
   const warning = $("regenerationPreviewWarning");
   warning.hidden = !preview.blocked;
   warning.textContent = preview.blocked
@@ -9230,15 +9236,14 @@ async function runReviewRegeneration(selectedIds = null) {
     renderReview();
     show(selectedIds
       ? uiTf("review.selectedRegenerated", { count: preview.nextStepCount })
-      : `Dokumentationen har regenererats fr\u00e5n inspelningen. ` +
-        `${preview.previousStepCount} steg blev ${preview.nextStepCount}.`);
+      : uiTf("Dokumentationen har regenererats fr\u00e5n inspelningen. {before} steg blev {after}.",
+        { before: preview.previousStepCount, after: preview.nextStepCount }));
   } catch (error) {
     if (error?.code === "STALE_REGENERATION_PREVIEW") {
-      show(uiT("Granskningen ändrades efter förhandsgranskningen. " +
-        "Öppna en ny förhandsgranskning och kontrollera ändringarna igen."), true);
+      show(uiT("Granskningen ändrades efter förhandsgranskningen. Öppna en ny förhandsgranskning och kontrollera ändringarna igen."), true);
       return;
     }
-    show(`Dokumentationen kunde inte regenereras: ${error.message}`, true);
+    show(uiTf("Dokumentationen kunde inte regenereras: {error}", { error: error.message }), true);
   }
 }
 
@@ -9343,6 +9348,12 @@ $("librarySearch").addEventListener("keydown", event => {
   $("libraryStatus").textContent += ` ${uiT("library.searchCleared")}`;
 });
 $("libraryResults").addEventListener("click", async event => {
+  if (event.target.closest?.('[data-library-action="clear-search-filters"]')) {
+    $("librarySearch").value = "";
+    resetDocumentLibraryFilters();
+    $("librarySearch").focus();
+    return;
+  }
   const card = event.target.closest?.("[data-library-project-id]");
   if (!card) return;
   const projectId = card.dataset.libraryProjectId;
@@ -9635,7 +9646,7 @@ async function initializeDashboard() {
       DEFAULTS.documentationProfile || "generic", false);
     updateFilenamePreview();
     show(
-      "Inställningarna kunde inte läsas. Standardvärden visas.",
+      uiT("Inställningarna kunde inte läsas. Standardvärden visas."),
       true
     );
   }

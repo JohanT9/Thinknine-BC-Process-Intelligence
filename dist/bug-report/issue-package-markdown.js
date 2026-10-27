@@ -29,6 +29,11 @@
     notes: "Notes" });
   const inline = input => value(input).replace(/\\/gu, "\\\\")
     .replace(/([*_[\]<>])/gu, "\\$1");
+  // Instructions mark captured values as __value__ and interface elements as **element**.
+  const instruction = input => value(input).split(/(__[\s\S]+?__|\*\*[\s\S]+?\*\*)/u)
+    .map(part => /^__[\s\S]+__$/u.test(part) ? `**${inline(part.slice(2, -2))}**`
+      : /^\*\*[\s\S]+\*\*$/u.test(part) ? `*${inline(part.slice(2, -2))}*` : inline(part))
+    .join("");
   function metadata(input, prefix = "") {
     return Object.entries(input || {}).flatMap(([key, child]) => {
       if (key === "authorship" || child == null || child === "") return [];
@@ -56,7 +61,7 @@
       value(error.rawMessage).trim() === summary);
     if (!duplicatesCapturedError) add(labels.summary, [inline(summary)]);
     add(labels.reproduction, pkg.reproduction.map((step, index) =>
-      `${index + 1}. ${inline(step.instruction)}`));
+      `${index + 1}. ${instruction(step.instruction)}`));
     add(labels.expected, [inline(pkg.expectedResult)]);
     add(labels.actual, [inline(pkg.actualResult?.userDescription)]);
     add(labels.error, errors.flatMap((error, index) => [

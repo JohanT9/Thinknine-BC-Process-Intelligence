@@ -33,7 +33,8 @@
     return setAll(state, !allAreCompact(state, taskIds));
   }
 
-  function apply(list, globalButton, state) {
+  // label translates the Swedish button text into the interface language.
+  function apply(list, globalButton, state, label = text => text) {
     const cards = [...list.querySelectorAll("[data-review-task-id]")];
     for (const card of cards) {
       const compact = isCompact(state, card.dataset.reviewTaskId);
@@ -41,7 +42,7 @@
       const button = card.querySelector('[data-action="toggle-layout"]');
       if (button) {
         button.setAttribute("aria-pressed", String(compact));
-        button.textContent = compact ? "Expandera" : "Komprimera";
+        button.textContent = label(compact ? "Expandera" : "Komprimera");
       }
     }
     const compact = allAreCompact(
@@ -49,7 +50,7 @@
       cards.map(card => card.dataset.reviewTaskId)
     );
     globalButton.setAttribute("aria-pressed", String(compact));
-    globalButton.textContent = compact ? "Expandera alla" : "Komprimera alla";
+    globalButton.textContent = label(compact ? "Expandera alla" : "Komprimera alla");
     return state;
   }
 

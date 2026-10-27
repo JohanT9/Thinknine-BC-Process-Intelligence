@@ -42,7 +42,7 @@ assert(html.includes(".annotation-stage img{display:block;max-width:100%;height:
 assert(html.includes(".annotation-editor{padding:18px;width:min(100%,1400px);margin-inline:auto;box-sizing:border-box}"));
 assert(html.includes("margin:-18px 0 0;padding:18px 0 1px"));
 assert(html.includes('<h3 id="annotationTitle">Redigera bild</h3>'));
-assert(dashboard.includes(">Redigera bild</button>"));
+assert(dashboard.includes('>${uiT("Redigera bild")}</button>'));
 assert(!dashboard.includes(">Annotera</button>"));
 assert(dashboard.includes("T9Review.visibleTaskNumber("));
 assert(!dashboard.includes("`Redigera bild för steg ${task.taskNo}`"));
