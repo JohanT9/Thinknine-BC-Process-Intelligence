@@ -21,8 +21,9 @@ assert(dashboard.includes('event.key.toLowerCase() === "s"') &&
 assert(html.includes('aria-keyshortcuts="/ Escape"'));
 assert(html.includes('data-i18n="Saved recordings">Saved recordings</summary>') &&
   html.includes('id="sessionTools" class="session-tools"'));
-assert(html.includes(">BC Review Studio</button>") &&
-  html.includes(">BC Document Generator</button>"));
+// The workspace tabs read as the workflow steps; the module names remain as tooltips.
+assert(/title="BC Review Studio"\s+data-i18n="review\.flowReview">Granska<\/button>/u.test(html) &&
+  /title="BC Document Generator"\s+data-i18n="review\.flowShare">Dela<\/button>/u.test(html));
 assert(html.includes("Fler åtgärder") && html.includes("Ta bort permanent"));
 assert(dashboard.includes('setAttribute("aria-busy", "true")') &&
   dashboard.includes('setAttribute("aria-busy", "false")'));

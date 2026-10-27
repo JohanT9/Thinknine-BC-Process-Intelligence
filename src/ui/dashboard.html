@@ -316,6 +316,14 @@ body.process-map-focus-active{overflow:hidden}.process-overview-card.process-map
 @container (min-width:760px){.review-step-body:has(.review-step-images:not(:empty)){grid-template-columns:minmax(0,1.15fr) minmax(0,1fr)}.review-step-images{order:-1}}
 /* Document beside the review: the header spans both columns. */
 .review-title-row{gap:8px}.review-document-beside{margin-left:auto}
+/* Workflow: a completed Record step, then the Review and Share tabs. */
+#workspaceTabs{align-items:center;gap:30px;border-bottom:0}
+#workspaceTabs::before{content:attr(data-recorded-label);color:#107c10;font-weight:600;white-space:nowrap}
+#workspaceTabs button{position:relative;margin:0;border:1px solid #c9d1d3!important;border-radius:999px!important;background:#fff!important;color:#374151!important;padding:5px 16px}
+#workspaceTabs button::before{content:"→" / "";position:absolute;left:-22px;top:50%;transform:translateY(-50%);color:#69727f;font-weight:400}
+#workspaceTabs button[aria-selected="true"]{background:#008489!important;border-color:#008489!important;color:#fff!important;font-weight:600}
+#documentWorkspaceTab[data-ready="true"]::after{content:"" / "";display:inline-block;width:8px;height:8px;margin-left:8px;border-radius:50%;background:#107c10;vertical-align:middle}
+#documentWorkspaceTab[data-ready="true"][aria-selected="true"]::after{background:#fff}
 .review-shell.document-beside{display:grid;grid-template-columns:minmax(0,1fr) minmax(380px,42%);grid-template-rows:auto minmax(0,1fr)}
 .review-shell.document-beside>.review-header{grid-column:1/-1}
 .review-shell.document-beside>#reviewWorkspacePanel{grid-column:1;grid-row:2;min-height:0;overflow:auto}
@@ -324,7 +332,8 @@ body.process-map-focus-active{overflow:hidden}.process-overview-card.process-map
 .review-shell.document-beside #documentToolbar .document-export-check,.review-shell.document-beside #documentFitPage,.review-shell.document-beside #documentResetZoom,.review-shell.document-beside #documentContinuousMode,.review-shell.document-beside #documentPageMode{display:none}
 .review-shell.annotation-mode.document-beside{display:flex}
 .review-shell.annotation-mode.document-beside>#documentWorkspacePanel{display:none}
-@media(max-width:1199px){.review-document-beside[aria-pressed="false"]{margin-left:auto}}
+/* Narrower screens reach the document through the Share step instead. */
+@media(max-width:1199px){.review-document-beside{display:none}}
 .review-toast{position:sticky;bottom:72px;z-index:3;width:max-content;max-width:calc(100% - 32px);margin:0 auto 8px;display:flex;align-items:center;gap:14px;padding:10px 14px;border-radius:8px;background:#242424;color:#fff;box-shadow:0 6px 18px rgba(15,23,42,.25)}
 .review-toast button{margin:0;padding:2px 4px;border:0;background:transparent;color:#fff;font-weight:700;text-decoration:underline}
 @media(prefers-reduced-motion:reduce){.review-step-progress-bar span{transition:none}}
@@ -624,9 +633,11 @@ body.process-map-focus-active{overflow:hidden}.process-overview-card.process-map
       <div id="workspaceTabs" class="workspace-tabs" role="tablist"
         aria-label="Dokumentationsarbetsyta">
         <button id="reviewWorkspaceTab" role="tab" aria-selected="true"
-          aria-controls="reviewWorkspacePanel" tabindex="0">BC Review Studio</button>
+          aria-controls="reviewWorkspacePanel" tabindex="0" title="BC Review Studio"
+          data-i18n="review.flowReview">Granska</button>
         <button id="documentWorkspaceTab" role="tab" aria-selected="false"
-          aria-controls="documentWorkspacePanel" tabindex="-1">BC Document Generator</button>
+          aria-controls="documentWorkspacePanel" tabindex="-1" title="BC Document Generator"
+          data-i18n="review.flowShare">Dela</button>
       </div>
       <div id="reviewToolbar" class="review-toolbar" role="toolbar" aria-label="Redigeringskommandon">
         <button id="saveReview" data-review-toolbar-item class="secondary" aria-keyshortcuts="Control+S Meta+S">Spara</button>

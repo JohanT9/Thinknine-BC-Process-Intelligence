@@ -498,6 +498,9 @@
       "technical.requestFailed": "Begäran misslyckades.",
       "technical.reportCopied": "Rapporten har kopierats.",
       "technical.markdownExported": "Markdown har exporterats.",
+      "review.flowShare": "Dela",
+      "review.flowReview": "Granska",
+      "review.flowRecorded": "Spela in",
       "technical.regenerateConfirm": "Generera om hela rapporten från inspelningen? Manuella stegändringar och bildval ersätts. Titel, allvarlighetsgrad och förväntat resultat behålls.",
       "technical.telemetrySaved": "Telemetriinställningen har sparats. Ingen hemlighet eller token lagrades.",
       "technical.telemetryConnection": "Telemetrianslutning: {status}.",
@@ -820,6 +823,9 @@
       "technical.requestFailed": "Request failed.",
       "technical.reportCopied": "Report copied.",
       "technical.markdownExported": "Markdown exported.",
+      "review.flowShare": "Share",
+      "review.flowReview": "Review",
+      "review.flowRecorded": "Record",
       "technical.regenerateConfirm": "Regenerate the report from the recording? Manual step edits and image selections will be replaced. Title, severity and expected result are retained.",
       "technical.telemetrySaved": "Telemetry configuration saved. No secret or token was stored.",
       "technical.telemetryConnection": "Telemetry connection: {status}.",
@@ -1872,6 +1878,7 @@
     ,["Dölj dokument", "Hide document"]
     ,["Motsvarande dokumentposition visas.", "The corresponding position in the document is shown."]
     ,["Dokumentation: {name}", "Documentation: {name}"]
+    ,["Alla steg är godkända. Dokumentet är klart att dela.", "All steps are approved. The document is ready to share."]
   ]);
 
   const staticLookup = new Map();

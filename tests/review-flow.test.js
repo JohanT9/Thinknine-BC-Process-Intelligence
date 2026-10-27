@@ -73,6 +73,16 @@ assert.match(attention, /uiTf\("Dokument: \{document\} · Gränssnitt: \{interfa
 assert.match(html, /id="reviewStepProgressText"/u);
 assert.match(html, /id="reviewLanguages"/u);
 
+// The workspace tabs read as the workflow: a completed Record step, then Review and Share.
+assert.match(html, /title="BC Review Studio"\s+data-i18n="review\.flowReview">Granska<\/button>/u);
+assert.match(html, /title="BC Document Generator"\s+data-i18n="review\.flowShare">Dela<\/button>/u);
+assert.match(html, /#workspaceTabs::before\{content:attr\(data-recorded-label\)/u);
+assert.match(html, /#workspaceTabs button::before\{content:"→" \/ ""/u, "arrows are decorative, not part of tab names");
+assert.match(attention, /\$\("workspaceTabs"\)\.dataset\.recordedLabel = `✓ \$\{uiT\("review\.flowRecorded"\)\}`/u);
+assert.match(attention, /\$\("documentWorkspaceTab"\)\.dataset\.ready = String\(readyToShare\)/u);
+assert.match(html, /@media\(max-width:1199px\)\{\.review-document-beside\{display:none\}\}/u,
+  "narrower screens reach the document through the Share step");
+
 // New texts are translated into every interface language.
 globalThis.T9LanguageRegistry = require("../src/engine/language-registry");
 globalThis.T9LocaleCatalogs = require("../src/engine/locale-catalogs");

@@ -37,6 +37,9 @@
       (function(root) {
         const catalogs = {
           "fr-FR": {
+            "All steps are approved. The document is ready to share.": "Toutes les \xE9tapes sont approuv\xE9es. Le document est pr\xEAt \xE0 \xEAtre partag\xE9.",
+            "Share": "Partager",
+            "Record": "Enregistrer",
             "Documentation: {name}": "Documentation : {name}",
             "The corresponding position in the document is shown.": "La position correspondante dans le document est affich\xE9e.",
             "Hide document": "Masquer le document",
@@ -1038,6 +1041,9 @@
             "error report": "rapport d\u2019erreur"
           },
           "de-DE": {
+            "All steps are approved. The document is ready to share.": "Alle Schritte sind freigegeben. Das Dokument kann geteilt werden.",
+            "Share": "Teilen",
+            "Record": "Aufzeichnen",
             "Documentation: {name}": "Dokumentation: {name}",
             "The corresponding position in the document is shown.": "Die entsprechende Stelle im Dokument wird angezeigt.",
             "Hide document": "Dokument ausblenden",
@@ -2039,6 +2045,9 @@
             "error report": "Fehlerbericht"
           },
           "es-ES": {
+            "All steps are approved. The document is ready to share.": "Todos los pasos est\xE1n aprobados. El documento est\xE1 listo para compartir.",
+            "Share": "Compartir",
+            "Record": "Grabar",
             "Documentation: {name}": "Documentaci\xF3n: {name}",
             "The corresponding position in the document is shown.": "Se muestra la posici\xF3n correspondiente en el documento.",
             "Hide document": "Ocultar documento",
@@ -3040,6 +3049,9 @@
             "error report": "informe de errores"
           },
           "da-DK": {
+            "All steps are approved. The document is ready to share.": "Alle trin er godkendt. Dokumentet er klar til at blive delt.",
+            "Share": "Del",
+            "Record": "Optag",
             "Documentation: {name}": "Dokumentation: {name}",
             "The corresponding position in the document is shown.": "Den tilsvarende placering i dokumentet vises.",
             "Hide document": "Skjul dokument",
@@ -4041,6 +4053,9 @@
             "error report": "fejlrapport"
           },
           "fi-FI": {
+            "All steps are approved. The document is ready to share.": "Kaikki vaiheet on hyv\xE4ksytty. Asiakirja on valmis jaettavaksi.",
+            "Share": "Jaa",
+            "Record": "Tallenna",
             "Documentation: {name}": "Dokumentaatio: {name}",
             "The corresponding position in the document is shown.": "Vastaava kohta asiakirjassa n\xE4ytet\xE4\xE4n.",
             "Hide document": "Piilota asiakirja",
@@ -5042,6 +5057,9 @@
             "error report": "virheraportti"
           },
           "nb-NO": {
+            "All steps are approved. The document is ready to share.": "Alle trinn er godkjent. Dokumentet er klart til \xE5 deles.",
+            "Share": "Del",
+            "Record": "Ta opp",
             "Documentation: {name}": "Dokumentasjon: {name}",
             "The corresponding position in the document is shown.": "Den tilsvarende plasseringen i dokumentet vises.",
             "Hide document": "Skjul dokument",

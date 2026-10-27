@@ -5307,6 +5307,12 @@ function renderReviewAttention(tasks) {
     total: tasks.length, remaining
   });
   const approved = tasks.length - remaining;
+  // The workflow shows recording as done and marks Share once every step is approved.
+  $("workspaceTabs").dataset.recordedLabel = `✓ ${uiT("review.flowRecorded")}`;
+  const readyToShare = tasks.length > 0 && remaining === 0;
+  $("documentWorkspaceTab").dataset.ready = String(readyToShare);
+  $("documentWorkspaceTab").title = readyToShare
+    ? uiT("Alla steg är godkända. Dokumentet är klart att dela.") : "BC Document Generator";
   $("reviewStepProgressText").textContent = uiTf("{approved} av {total} godkända",
     { approved, total: tasks.length });
   $("reviewStepProgressBar").style.width = `${tasks.length ? approved / tasks.length * 100 : 0}%`;
