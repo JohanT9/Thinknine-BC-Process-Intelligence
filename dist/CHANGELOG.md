@@ -1,3 +1,18 @@
+## Unreleased
+- Show Undo, Redo, Document information and the step layout toggle as icons in the narrow Review toolbar, keeping every action visible in fewer rows; the button text remains the accessible name and tooltip.
+- Emphasise Email PDF in the bug report only once the report is complete and states the expected result.
+- Translate error messages that carry values, such as HTTP statuses from the licensing service, into all eight languages.
+- Show bug report severity in the document language in the PDF, the email subject and the text export; email priority headers still use the stored value.
+- Write Word export test output to the system temp folder so test runs no longer modify the committed sample documents.
+- Show the license type and validity in the popup only for a checked, active license instead of "License type: — · Valid until: No expiry date".
+- Show bug report severity options in the interface language, with "Not set" for the empty choice; stored values are unchanged.
+- Show text colour names and the bold/italic button letters in the Review editor in the interface language (for example B/I in English and F/K in German).
+- Save step approvals, hidden steps and structural changes (move, merge, split, undo and redo) automatically. Previously they were kept only until the page was reloaded unless Save was pressed.
+- Show one save state in the Review footer: saving, saved with the time, or failed with a Try again button. The footer stays visible at the bottom, and Save in the toolbar becomes a secondary action because changes save automatically.
+- Explain why Complete review is unavailable and how many steps remain to approve.
+- Let the Review step workspace use the full width in line with the toolbar, and move the repeated step and selection counts to screen readers only.
+- Translate merge, undo and redo messages into all eight languages, and remove a stray scrollbar from the workspace tabs at narrow widths.
+
 ## 4.7.202
 - Show Review step cards, status messages, regeneration results, tooltips and accessible names in the selected interface language. They were shown in Swedish for every language. Known error messages from the background service and licensing are translated where they are displayed.
 - Write generated create instructions (for example "Start creating a new sales order…") in the recording’s document language instead of always in English.

@@ -77,6 +77,21 @@ for (const file of ["src/recorder/background.js", "src/engine/consultant-license
   }
 }
 
+// Messages carrying values are translated through templates; page text is matched exactly only.
+assert.strictEqual(i18n.translate("Användaren kunde inte registreras (HTTP 503).", "de-DE"),
+  "Der Benutzer konnte nicht registriert werden (HTTP 503).");
+assert.strictEqual(i18n.translate("Konsultregistreringen kunde inte skapas (HTTP 400: tenant $&).", "en-US"),
+  "The consultant registration could not be created (HTTP 400: tenant $&).");
+assert.strictEqual(i18n.translateStaticText("Steg för steg", "en-US"), "Steg för steg",
+  "a template never rewrites ordinary page text");
+for (const source of [read("src/engine/consultant-license.js"), read("src/recorder/background.js")]) {
+  for (const match of source.matchAll(/new Error\(`([^`]*\$\{[^`]*)`\)/gu)) {
+    if (!swedish.test(match[1])) continue;
+    const sample = match[1].replace(/\$\{[^}]*\}/gu, "404");
+    assert.notStrictEqual(i18n.translate(sample, "en-US"), sample, `"${match[1]}" is translatable`);
+  }
+}
+
 // Generated create instructions follow the recording's document language.
 const canonical = require("../src/engine/canonical-recording");
 const normalization = require("../src/engine/event-normalization");
@@ -167,5 +182,19 @@ const cardLabels = new Set(uiLocales.map(locale => {
 }));
 assert.strictEqual(cardLabels.size, uiLocales.length,
   "built-in library names are translated into every interface language");
+
+// Text formatting controls: colour names and bold/italic letters follow the interface language.
+const textFormat = require("../src/engine/text-format");
+for (const color of textFormat.COLORS) {
+  for (const locale of uiLocales.filter(locale => !["sv-SE", "en-US"].includes(locale))) {
+    const english = i18n.translate(color.name, "en-US");
+    assert.ok(english !== color.name || english === "Orange", `${color.name} has an English name`);
+    assert.ok(catalogs[locale][english], `${locale} names the colour ${english}`);
+  }
+}
+const dashboardSource = read("src/ui/dashboard.js");
+assert.ok(dashboardSource.includes("${escapeHtml(uiT(color.name))}</option>"));
+assert.ok(!dashboardSource.includes("<strong>F</strong>") && !dashboardSource.includes("<em>K</em>"));
+assert.match(dashboardSource, /"en-US": \["B", "I"\]/u);
 
 console.log(`UX language pass tests passed across ${uiLocales.length} interface languages.`);

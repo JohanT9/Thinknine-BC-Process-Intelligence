@@ -114,6 +114,8 @@ function renderLicenseCard(license, { tenantId = "", signedIn = false,
       ? t("license.consultantType") : displayedLicense?.licenseType === "standard" || displayedLicense?.allowed
         ? t("license.standardType") : "—");
   updateText($("licenseCardExpiry"), formatLicenseExpiry(displayedLicense?.expiresAt));
+  // Type and validity are only meaningful for a checked, active license.
+  $("licenseCardMeta").hidden = !displayedLicense;
   const trialAvailable = currentLicense?.trialAvailable === true;
   const statusKey = !tenantId ? "license.cardUnknown"
     : needsConsent ? "license.cardNeedsConsent"

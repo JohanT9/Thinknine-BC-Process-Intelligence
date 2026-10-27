@@ -177,4 +177,7 @@ const consentTranslations = globalThis.T9LanguageRegistry.supported("ui").map(it
   globalThis.T9UiI18n.translateStaticText(consentLabel, item.locale));
 assert.strictEqual(new Set(consentTranslations).size, consentTranslations.length,
   "the share consent label is translated into every interface language");
+// Sending is emphasised only once the report is complete and states the expected result.
+assert.ok(report.includes(".primary-actions #emailReport.is-ready,#shareReport{background:#008c95"));
+assert.match(reportLogic, /classList\.toggle\("is-ready", Boolean\(result\.ready &&\s+String\(state\.report\?\.expectedResult\?\.text/u);
 console.log("Bug Reporting UX tests passed.");

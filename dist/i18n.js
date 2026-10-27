@@ -1913,14 +1913,48 @@
     ,["Microsoft-autentisering är inte konfigurerad i licenstjänsten.", "Microsoft authentication is not configured in the license service."]
     ,["Microsoft-inloggningen avvisades av licenstjänsten.", "The license service rejected the Microsoft sign-in."]
     ,["Logga in med din konsultlicens.", "Sign in with your consultant license."]
+    ,["Sparat {time}", "Saved {time}"]
+    ,["Försök igen", "Try again"]
+    ,["Godkänn alla steg för att slutföra granskningen. {count} kvar.", "Approve all steps to complete the review. {count} remaining."]
+    ,["Välj intilliggande steg för att slå samman dem.", "Select adjacent steps to merge them."]
+    ,["Stegen kunde inte slås samman.", "The steps could not be merged."]
+    ,["Senaste ändringen ångrades.", "The latest change was undone."]
+    ,["Ändringen gjordes om.", "The change was redone."]
+    ,["Annoteringsändringen ångrades.", "The annotation change was undone."]
+    ,["Annoteringsändringen gjordes om.", "The annotation change was redone."]
+    ,["Inte angiven", "Not set"]
+    ,["Låg", "Low"]
+    ,["Medel", "Medium"]
+    ,["Hög", "High"]
+    ,["Kritisk", "Critical"]
+    ,["Svart", "Black"]
+    ,["Vit", "White"]
+    ,["Mörkblå", "Dark blue"]
+    ,["Turkos", "Turquoise"]
+    ,["Röd", "Red"]
+    ,["Grön", "Green"]
+    ,["Gul", "Yellow"]
+    ,["Orange", "Orange"]
+    ,["Konsultregistreringen kunde inte skapas (HTTP {status}).", "The consultant registration could not be created (HTTP {status})."]
+    ,["Användaren kunde inte registreras (HTTP {status}).", "The user could not be registered (HTTP {status})."]
   ]);
 
   const staticLookup = new Map();
   const staticSources = new WeakMap();
+  // Pairs with {placeholders} also translate messages that carry values, such as HTTP statuses.
+  const staticTemplates = [];
+  const escapeRegExp = value => value.replace(/[.*+?^${}()|[\]\\]/gu, "\\$&");
   STATIC_TEXT.forEach(([sv, en]) => {
     const variants = { "sv-SE": sv, "en-US": en };
     for (const locale of SUPPORTED_LOCALES) variants[locale] = languageRegistry.translate(en, locale, sv);
     for (const value of Object.values(variants)) staticLookup.set(value, variants);
+    if (!/\{[a-z]+\}/iu.test(sv)) return;
+    for (const value of new Set(Object.values(variants))) {
+      const names = [...value.matchAll(/\{([a-z]+)\}/giu)].map(match => match[1]);
+      const pattern = new RegExp(`^${escapeRegExp(value)
+        .replace(/\\\{[a-z]+\\\}/giu, "([\\s\\S]+?)")}$`, "u");
+      staticTemplates.push({ pattern, names, variants });
+    }
   });
   const safeTextTags = new Set(["BUTTON", "SUMMARY", "LEGEND", "OPTION", "TH",
     "DT", "LABEL", "H2", "H3", "H4"]);
@@ -1929,6 +1963,22 @@
   function translateStaticText(value, locale) {
     const normalized = normalizeLocale(locale);
     return staticLookup.get(String(value || "").trim())?.[normalized] || value;
+  }
+
+  // Messages (not page text) may also match a template, so values such as HTTP statuses
+  // are carried into the translation.
+  function translateMessageText(value, locale) {
+    const normalized = normalizeLocale(locale);
+    const text = String(value || "").trim();
+    const exact = staticLookup.get(text)?.[normalized];
+    if (exact) return exact;
+    for (const template of staticTemplates) {
+      const match = template.pattern.exec(text);
+      if (!match) continue;
+      return template.names.reduce((result, name, index) =>
+        result.replace(`{${name}}`, () => match[index + 1]), template.variants[normalized]);
+    }
+    return value;
   }
 
   function excludedFromInterfaceTranslation(node) {
@@ -2073,7 +2123,7 @@
       messages["en-US"][key], normalized, messages[DEFAULT_LOCALE]?.[key]);
     if (messages[DEFAULT_LOCALE]?.[key] !== undefined) return messages[DEFAULT_LOCALE][key];
     // Interface text written as a static Swedish/English pair is keyed by its own wording.
-    return translateStaticText(key, normalized);
+    return translateMessageText(key, normalized);
   }
 
   function format(key, values, locale = DEFAULT_LOCALE) {

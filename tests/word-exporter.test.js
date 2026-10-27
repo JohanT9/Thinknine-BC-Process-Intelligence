@@ -52,7 +52,8 @@ assert.ok(result.bytes.length > 2000);
 assert.strictEqual(result.taskCount, 2);
 assert.strictEqual(result.imageCount, 1);
 
-const output = path.join(__dirname, "sample-word-export.docx");
+// Written outside the repository so test runs do not modify tracked sample files.
+const output = path.join(require("os").tmpdir(), "bc-process-studio-sample-word-export.docx");
 fs.writeFileSync(output, result.bytes);
 
 assert.ok(fs.existsSync(output));

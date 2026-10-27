@@ -301,11 +301,16 @@ dialog::backdrop { background: rgb(0 0 0 / 40%) !important; }
   .library-card-footer{align-items:stretch;flex-direction:column}
   .review-title-row{align-items:flex-start}
   .review-title-row h2{min-width:0}
-  .workspace-tabs{overflow-x:auto;scrollbar-gutter:stable}
+  .workspace-tabs{overflow-x:auto;overflow-y:hidden;scrollbar-gutter:stable}
   .workspace-tabs button{flex:0 0 auto;white-space:nowrap}
   .review-toolbar{align-items:stretch}
   .review-toolbar>button,.review-toolbar>.review-toolbar-group{flex:1 1 auto}
   .review-toolbar .review-toolbar-group button{flex:1}
+  /* Secondary commands become icons so every action stays visible in a few rows.
+     The button text remains the accessible name and the tooltip. */
+  .review-toolbar [data-icon]{flex:0 0 auto!important;min-width:44px;font-size:0;padding-inline:10px}
+  .review-toolbar [data-icon]::before{content:attr(data-icon);font-size:20px;line-height:1}
+  .review-toolbar .review-toolbar-group:has([data-icon]){flex:0 0 auto}
 }
 @media (pointer: coarse) {
   :root{--controlHeight:44px;--targetSize:44px}
