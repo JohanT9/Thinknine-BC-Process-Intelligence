@@ -37,6 +37,10 @@
       (function(root) {
         const catalogs = {
           "fr-FR": {
+            "Documentation: {name}": "Documentation : {name}",
+            "The corresponding position in the document is shown.": "La position correspondante dans le document est affich\xE9e.",
+            "Hide document": "Masquer le document",
+            "Show document": "Afficher le document",
             "Document: {document} \xB7 Interface: {interface}": "Document : {document} \xB7 Interface : {interface}",
             "{approved} of {total} approved": "{approved} sur {total} approuv\xE9es",
             "Step {step} hidden.": "\xC9tape {step} masqu\xE9e.",
@@ -1034,6 +1038,10 @@
             "error report": "rapport d\u2019erreur"
           },
           "de-DE": {
+            "Documentation: {name}": "Dokumentation: {name}",
+            "The corresponding position in the document is shown.": "Die entsprechende Stelle im Dokument wird angezeigt.",
+            "Hide document": "Dokument ausblenden",
+            "Show document": "Dokument anzeigen",
             "Document: {document} \xB7 Interface: {interface}": "Dokument: {document} \xB7 Oberfl\xE4che: {interface}",
             "{approved} of {total} approved": "{approved} von {total} freigegeben",
             "Step {step} hidden.": "Schritt {step} ausgeblendet.",
@@ -2031,6 +2039,10 @@
             "error report": "Fehlerbericht"
           },
           "es-ES": {
+            "Documentation: {name}": "Documentaci\xF3n: {name}",
+            "The corresponding position in the document is shown.": "Se muestra la posici\xF3n correspondiente en el documento.",
+            "Hide document": "Ocultar documento",
+            "Show document": "Mostrar documento",
             "Document: {document} \xB7 Interface: {interface}": "Documento: {document} \xB7 Interfaz: {interface}",
             "{approved} of {total} approved": "{approved} de {total} aprobados",
             "Step {step} hidden.": "Paso {step} oculto.",
@@ -3028,6 +3040,10 @@
             "error report": "informe de errores"
           },
           "da-DK": {
+            "Documentation: {name}": "Dokumentation: {name}",
+            "The corresponding position in the document is shown.": "Den tilsvarende placering i dokumentet vises.",
+            "Hide document": "Skjul dokument",
+            "Show document": "Vis dokument",
             "Document: {document} \xB7 Interface: {interface}": "Dokument: {document} \xB7 Brugerflade: {interface}",
             "{approved} of {total} approved": "{approved} af {total} godkendt",
             "Step {step} hidden.": "Trin {step} skjult.",
@@ -4025,6 +4041,10 @@
             "error report": "fejlrapport"
           },
           "fi-FI": {
+            "Documentation: {name}": "Dokumentaatio: {name}",
+            "The corresponding position in the document is shown.": "Vastaava kohta asiakirjassa n\xE4ytet\xE4\xE4n.",
+            "Hide document": "Piilota asiakirja",
+            "Show document": "N\xE4yt\xE4 asiakirja",
             "Document: {document} \xB7 Interface: {interface}": "Asiakirja: {document} \xB7 K\xE4ytt\xF6liittym\xE4: {interface}",
             "{approved} of {total} approved": "{approved}/{total} hyv\xE4ksytty",
             "Step {step} hidden.": "Vaihe {step} piilotettu.",
@@ -5022,6 +5042,10 @@
             "error report": "virheraportti"
           },
           "nb-NO": {
+            "Documentation: {name}": "Dokumentasjon: {name}",
+            "The corresponding position in the document is shown.": "Den tilsvarende plasseringen i dokumentet vises.",
+            "Hide document": "Skjul dokument",
+            "Show document": "Vis dokument",
             "Document: {document} \xB7 Interface: {interface}": "Dokument: {document} \xB7 Grensesnitt: {interface}",
             "{approved} of {total} approved": "{approved} av {total} godkjent",
             "Step {step} hidden.": "Trinn {step} skjult.",

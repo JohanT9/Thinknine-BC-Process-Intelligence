@@ -311,7 +311,20 @@ body.process-map-focus-active{overflow:hidden}.process-overview-card.process-map
 .review-step-text>button{justify-self:start}
 .review-primary-actions .review-approve-next{min-height:40px;padding:8px 18px;font-weight:600}
 .review-instruction-preview:not([data-editing="true"]){cursor:text}
-@media(min-width:1100px){.review-step-body:has(.review-step-images:not(:empty)){grid-template-columns:minmax(0,1.15fr) minmax(0,1fr)}.review-step-images{order:-1}}
+.review-step-content{container-type:inline-size}
+@container (max-width:720px){.review-card,.review-step-workspace[data-layout="focus"] .review-card[data-active-step="true"]{grid-template-columns:36px minmax(0,1fr)!important}.review-actions{grid-column:1/-1;flex-direction:row;flex-wrap:wrap;justify-content:flex-start}}
+@container (min-width:760px){.review-step-body:has(.review-step-images:not(:empty)){grid-template-columns:minmax(0,1.15fr) minmax(0,1fr)}.review-step-images{order:-1}}
+/* Document beside the review: the header spans both columns. */
+.review-title-row{gap:8px}.review-document-beside{margin-left:auto}
+.review-shell.document-beside{display:grid;grid-template-columns:minmax(0,1fr) minmax(380px,42%);grid-template-rows:auto minmax(0,1fr)}
+.review-shell.document-beside>.review-header{grid-column:1/-1}
+.review-shell.document-beside>#reviewWorkspacePanel{grid-column:1;grid-row:2;min-height:0;overflow:auto}
+.review-shell.document-beside>#documentWorkspacePanel{grid-column:2;grid-row:2;min-height:0;border-left:1px solid #d8dee5}
+/* Beside the review, the document toolbar keeps viewing controls; review actions stay in the review toolbar. */
+.review-shell.document-beside #documentToolbar .document-export-check,.review-shell.document-beside #documentFitPage,.review-shell.document-beside #documentResetZoom,.review-shell.document-beside #documentContinuousMode,.review-shell.document-beside #documentPageMode{display:none}
+.review-shell.annotation-mode.document-beside{display:flex}
+.review-shell.annotation-mode.document-beside>#documentWorkspacePanel{display:none}
+@media(max-width:1199px){.review-document-beside[aria-pressed="false"]{margin-left:auto}}
 .review-toast{position:sticky;bottom:72px;z-index:3;width:max-content;max-width:calc(100% - 32px);margin:0 auto 8px;display:flex;align-items:center;gap:14px;padding:10px 14px;border-radius:8px;background:#242424;color:#fff;box-shadow:0 6px 18px rgba(15,23,42,.25)}
 .review-toast button{margin:0;padding:2px 4px;border:0;background:transparent;color:#fff;font-weight:700;text-decoration:underline}
 @media(prefers-reduced-motion:reduce){.review-step-progress-bar span{transition:none}}
@@ -603,6 +616,7 @@ body.process-map-focus-active{overflow:hidden}.process-overview-card.process-map
           <div id="reviewSummary" class="muted"></div>
           <div id="reviewLanguages" class="review-languages"></div>
         </div>
+        <button id="reviewDocumentBeside" type="button" class="secondary review-document-beside" aria-pressed="false" aria-controls="documentWorkspacePanel">Visa dokument</button>
         <button id="closeReview" class="debug"
           aria-label="Stäng granskning" data-i18n-aria-label="Stäng granskning">Stäng</button>
       </div>

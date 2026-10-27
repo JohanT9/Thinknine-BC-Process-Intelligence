@@ -1868,6 +1868,10 @@
     ,["Steg {step} dolt.", "Step {step} hidden."]
     ,["{approved} av {total} godkända", "{approved} of {total} approved"]
     ,["Dokument: {document} · Gränssnitt: {interface}", "Document: {document} · Interface: {interface}"]
+    ,["Visa dokument", "Show document"]
+    ,["Dölj dokument", "Hide document"]
+    ,["Motsvarande dokumentposition visas.", "The corresponding position in the document is shown."]
+    ,["Dokumentation: {name}", "Documentation: {name}"]
   ]);
 
   const staticLookup = new Map();

@@ -2,6 +2,10 @@
 (function (root) {
   const catalogs = {
   "fr-FR": {
+    "Documentation: {name}": "Documentation : {name}",
+    "The corresponding position in the document is shown.": "La position correspondante dans le document est affichée.",
+    "Hide document": "Masquer le document",
+    "Show document": "Afficher le document",
     "Document: {document} · Interface: {interface}": "Document : {document} · Interface : {interface}",
     "{approved} of {total} approved": "{approved} sur {total} approuvées",
     "Step {step} hidden.": "Étape {step} masquée.",
@@ -991,6 +995,10 @@
     "error report": "rapport d’erreur"
   },
   "de-DE": {
+    "Documentation: {name}": "Dokumentation: {name}",
+    "The corresponding position in the document is shown.": "Die entsprechende Stelle im Dokument wird angezeigt.",
+    "Hide document": "Dokument ausblenden",
+    "Show document": "Dokument anzeigen",
     "Document: {document} · Interface: {interface}": "Dokument: {document} · Oberfläche: {interface}",
     "{approved} of {total} approved": "{approved} von {total} freigegeben",
     "Step {step} hidden.": "Schritt {step} ausgeblendet.",
@@ -1980,6 +1988,10 @@
     "error report": "Fehlerbericht"
   },
   "es-ES": {
+    "Documentation: {name}": "Documentación: {name}",
+    "The corresponding position in the document is shown.": "Se muestra la posición correspondiente en el documento.",
+    "Hide document": "Ocultar documento",
+    "Show document": "Mostrar documento",
     "Document: {document} · Interface: {interface}": "Documento: {document} · Interfaz: {interface}",
     "{approved} of {total} approved": "{approved} de {total} aprobados",
     "Step {step} hidden.": "Paso {step} oculto.",
@@ -2969,6 +2981,10 @@
     "error report": "informe de errores"
   },
   "da-DK": {
+    "Documentation: {name}": "Dokumentation: {name}",
+    "The corresponding position in the document is shown.": "Den tilsvarende placering i dokumentet vises.",
+    "Hide document": "Skjul dokument",
+    "Show document": "Vis dokument",
     "Document: {document} · Interface: {interface}": "Dokument: {document} · Brugerflade: {interface}",
     "{approved} of {total} approved": "{approved} af {total} godkendt",
     "Step {step} hidden.": "Trin {step} skjult.",
@@ -3958,6 +3974,10 @@
     "error report": "fejlrapport"
   },
   "fi-FI": {
+    "Documentation: {name}": "Dokumentaatio: {name}",
+    "The corresponding position in the document is shown.": "Vastaava kohta asiakirjassa näytetään.",
+    "Hide document": "Piilota asiakirja",
+    "Show document": "Näytä asiakirja",
     "Document: {document} · Interface: {interface}": "Asiakirja: {document} · Käyttöliittymä: {interface}",
     "{approved} of {total} approved": "{approved}/{total} hyväksytty",
     "Step {step} hidden.": "Vaihe {step} piilotettu.",
@@ -4947,6 +4967,10 @@
     "error report": "virheraportti"
   },
   "nb-NO": {
+    "Documentation: {name}": "Dokumentasjon: {name}",
+    "The corresponding position in the document is shown.": "Den tilsvarende plasseringen i dokumentet vises.",
+    "Hide document": "Skjul dokument",
+    "Show document": "Vis dokument",
     "Document: {document} · Interface: {interface}": "Dokument: {document} · Grensesnitt: {interface}",
     "{approved} of {total} approved": "{approved} av {total} godkjent",
     "Step {step} hidden.": "Trinn {step} skjult.",

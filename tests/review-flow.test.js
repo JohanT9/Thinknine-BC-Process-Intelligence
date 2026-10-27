@@ -19,7 +19,32 @@ assert.match(card, /<div class="review-step-body"><div class="review-step-text">
 assert.match(card, /<\/div><div class="review-step-images">\s+\$\{images\.map\(/u);
 assert.ok(card.indexOf('data-action="approve-next"') < card.indexOf('<details class="review-technical-details">'),
   "Approve and next follows the instruction and explanation");
-assert.match(html, /@media\(min-width:1100px\)\{\.review-step-body:has\(\.review-step-images:not\(:empty\)\)\{grid-template-columns:/u);
+// The step column's own width decides the layout, so it also works beside the document.
+assert.match(html, /\.review-step-content\{container-type:inline-size\}/u);
+assert.match(html, /@container \(min-width:760px\)\{\.review-step-body:has\(\.review-step-images:not\(:empty\)\)\{grid-template-columns:/u);
+assert.match(html, /@container \(max-width:720px\)\{\.review-card,/u);
+
+// The document can be shown beside the review on wide screens; narrower screens switch tabs.
+assert.match(html, /<button id="reviewDocumentBeside" type="button" class="secondary review-document-beside" aria-pressed="false" aria-controls="documentWorkspacePanel">Visa dokument<\/button>/u);
+assert.match(dashboard, /const DOCUMENT_BESIDE_MEDIA = globalThis\.matchMedia\?\.\("\(min-width: 1200px\)"\);/u);
+const toggle = between("async function toggleDocumentBesideReview(", "\n}\n");
+assert.match(toggle, /if \(!DOCUMENT_BESIDE_MEDIA\?\.matches\) \{\s+await switchWorkspace\("document", true\);/u);
+assert.match(toggle, /localStorage\?\.setItem\(DOCUMENT_BESIDE_STORAGE_KEY/u);
+assert.match(toggle, /T9DocumentWorkspaceExperience\.fit\(documentViewState, "fitWidth"\)/u);
+const workspaceState = between("function applyWorkspaceState(", "\n}\n");
+assert.match(workspaceState, /\$\("documentWorkspacePanel"\)\.hidden = !documentActive && !beside;/u);
+assert.match(between("async function synchronizeDocumentWorkspace(", "\n}\n"),
+  /workspaceState\.active === "document" \|\| documentBesideActive\(\)/u,
+  "the document keeps up with review changes while shown beside it");
+assert.match(between("function invalidateDocumentWorkspace(", "\n}\n"),
+  /if \(!documentBesideActive\(\)\) return;[\s\S]*synchronizeDocumentWorkspace\(\)\.then\(\(\) => revealDocumentContext\(\)\)/u);
+assert.match(between("function publishWorkspaceContext(", "\n}\n"),
+  /if \(origin === "review" && documentBesideActive\(\)\) revealDocumentContext\(\);/u,
+  "selecting a step shows it in the document");
+assert.match(between("async function activateDocumentContext(", "\n}\n"),
+  /if \(!documentBesideActive\(\)\) await switchWorkspace\("review"\);/u,
+  "selecting a step in the document beside the review keeps the document visible");
+assert.match(html, /\.review-shell\.document-beside\{display:grid;grid-template-columns:minmax\(0,1fr\) minmax\(380px,42%\)/u);
 
 // Approve and next approves, saves, moves on and keeps focus on the next step's button.
 const approveNext = between("function approveAndShowNextStep(", "\nlet reviewToastTimer");

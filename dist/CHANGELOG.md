@@ -1,4 +1,6 @@
 ## Unreleased
+- Show the document beside the review on screens at least 1200 pixels wide with Show document. The selected step is highlighted in the document, selecting a step in the document selects it in the review, and the document updates as the review changes. The choice is remembered; narrower screens switch to the document tab instead.
+- Lay out each step from the width of its own column, so steps stay readable beside the document, and translate the review title prefix.
 - Show each step's screenshot beside its instruction on wide screens, so the evidence and the text can be compared without scrolling.
 - Add Approve and next to every step: it approves the step, moves to the next step that needs review and keeps focus on the same button, so a review can be completed with repeated Enter.
 - Edit an instruction by clicking its text, show approval progress in the step list and the document and interface languages under the title.
