@@ -301,7 +301,7 @@ dialog::backdrop { background: rgb(0 0 0 / 40%) !important; }
   .library-card-footer{align-items:stretch;flex-direction:column}
   .review-title-row{align-items:flex-start}
   .review-title-row h2{min-width:0}
-  .workspace-tabs{overflow-x:auto;scrollbar-gutter:stable}
+  .workspace-tabs{overflow-x:auto;overflow-y:hidden;scrollbar-gutter:stable}
   .workspace-tabs button{flex:0 0 auto;white-space:nowrap}
   .review-toolbar{align-items:stretch}
   .review-toolbar>button,.review-toolbar>.review-toolbar-group{flex:1 1 auto}

@@ -81,7 +81,7 @@ table{width:100%;border-collapse:collapse}th,td{text-align:left;padding:9px;bord
 .review-status dt{font-size:12px;color:#52606d}
 .review-status dd{margin:0;font-size:16px;font-weight:700;color:#1f2933}
 .review-list{padding:18px;width:min(100%,1400px);margin-inline:auto;box-sizing:border-box}
-.review-step-workspace{display:grid;grid-template-columns:minmax(220px,280px) minmax(0,1fr);gap:0;min-height:0;height:100%;max-width:1500px;margin:0 auto}
+.review-step-workspace{display:grid;grid-template-columns:minmax(220px,280px) minmax(0,1fr);gap:0;min-height:0;height:100%;width:100%;max-width:1364px;margin:0 auto}
 .review-step-navigation{border-right:1px solid #d8dee5;background:#f7f9fa;padding:12px;overflow:auto;min-height:0}
 .review-step-navigation h3{font-size:14px;margin:4px 8px 10px}
 .review-step-navigation-list{display:grid;gap:4px}
@@ -176,7 +176,7 @@ table{width:100%;border-collapse:collapse}th,td{text-align:left;padding:9px;bord
 .review-card.compact textarea[data-edit-field="instruction"]{height:38px;min-height:38px;resize:none;overflow:hidden;white-space:nowrap}
 .review-card.compact .review-actions{display:flex;align-content:start;gap:5px;margin-top:0}
 .review-card.compact .review-actions label{margin:0;align-self:center}
-.review-footer{padding:16px max(16px,calc((100% - 1368px)/2));border-top:1px solid #d8dee5;display:flex;justify-content:space-between;background:#f8fafc}
+.review-footer{padding:16px max(16px,calc((100% - 1368px)/2));border-top:1px solid #d8dee5;display:flex;justify-content:space-between;align-items:center;gap:12px;background:#f8fafc;position:sticky;bottom:0;z-index:2}
 #reviewWorkspacePanel{min-height:0;flex:1;overflow:auto;overscroll-behavior:contain}
 .review-document-fields{margin:16px auto;padding:16px;border:1px solid #cbd8e6;border-radius:8px;background:#f7faff;width:min(calc(100% - 40px),1360px);box-sizing:border-box}
 .review-document-fields h3{margin:0 0 10px}
@@ -299,6 +299,8 @@ body.process-map-focus-active{overflow:hidden}.process-overview-card.process-map
 .review-step-workspace[data-filter="pending"] .review-card:not([data-review-filter-state="pending"]),.review-step-workspace[data-filter="edited"] .review-card:not([data-review-filter-state="edited"]),.review-step-workspace[data-filter="approved"] .review-card:not([data-review-filter-state="approved"]){display:none!important}
 .review-step-workspace[data-filter="pending"] .review-card.selected,.review-step-workspace[data-filter="edited"] .review-card.selected,.review-step-workspace[data-filter="approved"] .review-card.selected{display:grid!important}
 .review-status div:nth-child(n+3){display:none}
+/* The step and selection counts repeat the summary under the title; keep them for screen readers only. */
+.review-header>#reviewStatus{position:absolute;width:1px;height:1px;margin:0;overflow:hidden;clip-path:inset(50%);white-space:nowrap}
 .review-knowledge-disclosure>summary,.review-external-disclosure>summary{list-style:none}
 .review-knowledge-disclosure>summary::-webkit-details-marker,.review-external-disclosure>summary::-webkit-details-marker{display:none}
 .review-knowledge-disclosure>summary::after,.review-external-disclosure>summary::after{content:"＋";float:right;color:#52606d}
@@ -596,7 +598,7 @@ body.process-map-focus-active{overflow:hidden}.process-overview-card.process-map
           aria-controls="documentWorkspacePanel" tabindex="-1">BC Document Generator</button>
       </div>
       <div id="reviewToolbar" class="review-toolbar" role="toolbar" aria-label="Redigeringskommandon">
-        <button id="saveReview" data-review-toolbar-item class="primary" aria-keyshortcuts="Control+S Meta+S">Spara</button>
+        <button id="saveReview" data-review-toolbar-item class="secondary" aria-keyshortcuts="Control+S Meta+S">Spara</button>
         <button id="completeReview" class="primary" disabled data-review-toolbar-item>Slutför granskning</button>
         <button id="nextUnreviewedStep" data-review-toolbar-item
           class="secondary review-next-action" aria-keyshortcuts="Alt+N"
@@ -776,7 +778,7 @@ body.process-map-focus-active{overflow:hidden}.process-overview-card.process-map
       </section>
       <footer id="reviewFooter" class="review-footer">
         <span id="reviewFooterText" role="status" aria-live="polite"></span>
-        <button id="saveReviewBottom" class="primary">Spara</button>
+        <button id="saveReviewBottom" class="primary" hidden>Försök igen</button>
       </footer>
       </div>
     </section>

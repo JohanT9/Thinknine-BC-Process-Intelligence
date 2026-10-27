@@ -5110,6 +5110,26 @@ const reviewSaveQueue = globalThis.T9ReviewEdit.createSaveQueue(
   })
 );
 
+// The Review footer shows one save state: pending, saved (with time) or failed with retry.
+let reviewSaveState = { status: "idle", at: null };
+function reviewSaveStatusText() {
+  if (reviewSaveState.status === "pending") return uiT("Sparar…");
+  if (reviewSaveState.status === "failed") return uiT("review.autosaveFailed");
+  if (reviewSaveState.status === "saved" && reviewSaveState.at) {
+    return uiTf("Sparat {time}", { time: reviewSaveState.at.toLocaleTimeString(
+      applicationSettings.uiLocale || undefined, { hour: "2-digit", minute: "2-digit" }) });
+  }
+  return uiT("Ändringar sparas lokalt i webbläsaren.");
+}
+function setReviewSaveState(status) {
+  reviewSaveState = { status, at: status === "saved" ? new Date() : reviewSaveState.at };
+  $("reviewFooter").dataset.saveState = status;
+  $("saveReviewBottom").hidden = status !== "failed";
+  if (!annotationChangesPending && activeReview?.status !== "completed") {
+    $("reviewFooterText").textContent = reviewSaveStatusText();
+  }
+}
+
 const reviewAutoSave = globalThis.T9ReviewEdit.createAutoSave(
   () => {
     if (globalThis.T9ReviewAnnotationEditor.hasActiveGesture(
@@ -5121,9 +5141,11 @@ const reviewAutoSave = globalThis.T9ReviewEdit.createAutoSave(
     return saveActiveReview({ render: false, announce: false });
   },
   {
+    onSchedule: () => setReviewSaveState("pending"),
+    onSaved: () => setReviewSaveState("saved"),
     onError(error) {
       show(error.message, true);
-      $("reviewFooterText").textContent = uiT("review.autosaveFailed");
+      setReviewSaveState("failed");
       if (annotationEditorState) {
         $("annotationStatus").textContent =
           uiT("review.autosaveRetry");
@@ -5178,6 +5200,15 @@ function applyReviewToolbarState() {
     !activeReview?.structureOverrides?.length;
   $("completeReview").disabled = !activeReview ||
     !globalThis.T9Review.canComplete(activeReview);
+  // Explain why completion is unavailable instead of only disabling the button.
+  const remainingApprovals = globalThis.T9Review.activeTasks(activeReview || { tasks: [] })
+    .filter(task => !task.approved).length;
+  const completeHint = $("completeReview").disabled && remainingApprovals
+    ? uiTf("Godkänn alla steg för att slutföra granskningen. {count} kvar.",
+      { count: remainingApprovals }) : "";
+  $("completeReview").title = completeHint;
+  if (completeHint) $("completeReview").setAttribute("aria-description", completeHint);
+  else $("completeReview").removeAttribute("aria-description");
   $("regenerateSelectedReview").disabled =
     !activeReviewSelection.selectedIds.length;
   const navigation = reviewNavigationState();
@@ -5418,7 +5449,10 @@ function selectedReviewTaskIds(fallbackId) {
     : [fallbackId];
 }
 
+// Called after every structural change (move, merge, split, undo/redo), so it also saves.
 function renderMovedReview(previousPositions, focusId) {
+  invalidateDocumentWorkspace();
+  reviewAutoSave.schedule();
   renderReview();
   loadProcessAnalysis().catch(error => {
     console.warn("BC Process Studio process analysis preload failed", error);
@@ -5489,6 +5523,8 @@ function deleteReviewTasks(selectedIds) {
       beforeSelection: activeReviewSelection
     });
   });
+  invalidateDocumentWorkspace();
+  reviewAutoSave.schedule();
   const remainingIds = reviewTaskIds();
   const nextId = remainingIds[Math.min(firstIndex, remainingIds.length - 1)] || null;
   activeReviewSelection = nextId
@@ -5526,8 +5562,8 @@ function mergeSelectedReviewTasks() {
   });
   if (!result.mergedTask) {
     show(result.reason === "non-adjacent-steps"
-      ? "Välj intilliggande steg för att slå samman dem."
-      : "Stegen kunde inte slås samman.", true);
+      ? uiT("Välj intilliggande steg för att slå samman dem.")
+      : uiT("Stegen kunde inte slås samman."), true);
     return;
   }
   const mergedId = result.mergedTask.taskId;
@@ -5609,8 +5645,8 @@ function restoreReviewHistory(direction) {
     renderActiveAnnotation();
     applyReviewToolbarState();
     $("annotationStatus").textContent = direction === "undo"
-      ? "Annoteringsändringen ångrades."
-      : "Annoteringsändringen gjordes om.";
+      ? uiT("Annoteringsändringen ångrades.")
+      : uiT("Annoteringsändringen gjordes om.");
     return;
   }
   activeReviewSelection = result.selection ||
@@ -5623,7 +5659,7 @@ function restoreReviewHistory(direction) {
     annotationChangesPending = true;
     reviewAutoSave.schedule();
   }
-  show(direction === "undo" ? "Senaste ändringen ångrades." : "Ändringen gjordes om.");
+  show(direction === "undo" ? uiT("Senaste ändringen ångrades.") : uiT("Ändringen gjordes om."));
 }
 
 function finishReviewEdit(control, commit) {
@@ -5659,7 +5695,6 @@ function finishReviewEdit(control, commit) {
       );
       invalidateDocumentWorkspace();
       reviewAutoSave.schedule();
-      $("reviewFooterText").textContent = uiT("review.autosaving");
       if (revisionChanged) {
         $("reviewFooterText").textContent =
           uiT("Steget ändrades under redigering. Din text bevarades och sparas.");
@@ -6811,7 +6846,7 @@ function renderReviewContent() {
       ? uiT("Annoteringar har ändrats. Välj Spara för att lagra dem.")
       : activeReview.status === "completed"
       ? uiT("Granskningen är slutförd.")
-      : uiT("Ändringar sparas lokalt i webbläsaren.");
+      : reviewSaveStatusText();
 
   tasks.forEach((task, visibleIndex) => {
     const actualIndex = activeReview.tasks.findIndex(candidate =>
@@ -7112,6 +7147,8 @@ function renderReviewContent() {
             afterSelection: activeReviewSelection
           }
         );
+        invalidateDocumentWorkspace();
+        reviewAutoSave.schedule();
         renderReview();
       });
 
@@ -7796,9 +7833,7 @@ async function saveActiveReview(options = {}) {
   }
   if (options.render !== false && unchanged) renderReview();
   else if (options.render === false && currentSession) {
-    $("reviewFooterText").textContent = unchanged
-      ? uiT("Alla ändringar är sparade.")
-      : uiT("Nyare ändringar väntar på att sparas.");
+    setReviewSaveState(unchanged ? "saved" : "pending");
     if (annotationEditorState && unchanged) {
   $("annotationStatus").textContent = uiT("review.annotationSaved");
     }
@@ -7829,6 +7864,8 @@ async function openReview(session) {
   activeReviewModel = null;
   reviewOpenRequestId = `${session.id}:${Date.now()}:${Math.random()}`;
   const requestId = reviewOpenRequestId;
+  reviewSaveState = { status: "idle", at: null };
+  $("saveReviewBottom").hidden = true;
   externalKnowledgeSuggestionState = { sessionId: session.id, requestId: "",
     status: "idle", requestCount: 0, suggestions: [] };
   annotationChangesPending = false;
@@ -8967,8 +9004,10 @@ globalThis.T9ReviewToolbar.bind($("reviewToolbar"), (command, button) => {
 async function saveReviewExplicitly() {
   try {
     await reviewPersistence.saveExplicitly();
+    setReviewSaveState("saved");
   } catch (error) {
     show(error.message, true);
+    setReviewSaveState("failed");
   }
 }
 $("saveReview").addEventListener("click", saveReviewExplicitly);

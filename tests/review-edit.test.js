@@ -221,6 +221,21 @@ assert.strictEqual(removed.focusout, listeners.focusout);
     ["save", { render: false }],
     "queue-flush"
   ]);
+
+  // Autosave reports pending, saved and failed states so the Review can show them.
+  const states = [];
+  let failNext = false;
+  const reporting = edit.createAutoSave(async () => {
+    if (failNext) throw new Error("disk full");
+  }, { setTimer: () => 1, clearTimer() {},
+    onSchedule: () => states.push("pending"), onSaved: () => states.push("saved"),
+    onError: error => states.push(`failed:${error.message}`) });
+  reporting.schedule();
+  await reporting.flush();
+  failNext = true;
+  reporting.schedule();
+  await reporting.flush().catch(() => {});
+  assert.deepStrictEqual(states, ["pending", "saved", "pending", "failed:disk full"]);
   console.log("Review editing behaviour tests passed.");
 })().catch(error => {
   console.error(error);

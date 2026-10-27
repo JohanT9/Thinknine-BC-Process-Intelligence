@@ -2,6 +2,15 @@
 (function (root) {
   const catalogs = {
   "fr-FR": {
+    "The annotation change was redone.": "La modification de l’annotation a été rétablie.",
+    "The annotation change was undone.": "La modification de l’annotation a été annulée.",
+    "The change was redone.": "La modification a été rétablie.",
+    "The latest change was undone.": "La dernière modification a été annulée.",
+    "The steps could not be merged.": "Les étapes n’ont pas pu être fusionnées.",
+    "Select adjacent steps to merge them.": "Sélectionnez des étapes adjacentes pour les fusionner.",
+    "Approve all steps to complete the review. {count} remaining.": "Approuvez toutes les étapes pour terminer la révision. {count} restante(s).",
+    "Try again": "Réessayer",
+    "Saved {time}": "Enregistré à {time}",
     "Technical Report": "Rapport technique",
     "Bug Report": "Rapport de bogue",
     "Business Process": "Processus métier",
@@ -1008,6 +1017,15 @@
     "error report": "rapport d’erreur"
   },
   "de-DE": {
+    "The annotation change was redone.": "Die Anmerkungsänderung wurde wiederhergestellt.",
+    "The annotation change was undone.": "Die Anmerkungsänderung wurde rückgängig gemacht.",
+    "The change was redone.": "Die Änderung wurde wiederhergestellt.",
+    "The latest change was undone.": "Die letzte Änderung wurde rückgängig gemacht.",
+    "The steps could not be merged.": "Die Schritte konnten nicht zusammengeführt werden.",
+    "Select adjacent steps to merge them.": "Wählen Sie benachbarte Schritte aus, um sie zusammenzuführen.",
+    "Approve all steps to complete the review. {count} remaining.": "Geben Sie alle Schritte frei, um die Prüfung abzuschließen. {count} verbleibend.",
+    "Try again": "Erneut versuchen",
+    "Saved {time}": "Gespeichert um {time}",
     "Technical Report": "Technischer Bericht",
     "Bug Report": "Fehlerbericht",
     "Business Process": "Geschäftsprozess",
@@ -2014,6 +2032,15 @@
     "error report": "Fehlerbericht"
   },
   "es-ES": {
+    "The annotation change was redone.": "Se rehízo el cambio de la anotación.",
+    "The annotation change was undone.": "Se deshizo el cambio de la anotación.",
+    "The change was redone.": "Se rehízo el cambio.",
+    "The latest change was undone.": "Se deshizo el último cambio.",
+    "The steps could not be merged.": "No se pudieron combinar los pasos.",
+    "Select adjacent steps to merge them.": "Seleccione pasos adyacentes para combinarlos.",
+    "Approve all steps to complete the review. {count} remaining.": "Apruebe todos los pasos para completar la revisión. Quedan {count}.",
+    "Try again": "Reintentar",
+    "Saved {time}": "Guardado a las {time}",
     "Technical Report": "Informe técnico",
     "Bug Report": "Informe de error",
     "Business Process": "Proceso empresarial",
@@ -3020,6 +3047,15 @@
     "error report": "informe de errores"
   },
   "da-DK": {
+    "The annotation change was redone.": "Annoteringsændringen blev gentaget.",
+    "The annotation change was undone.": "Annoteringsændringen blev fortrudt.",
+    "The change was redone.": "Ændringen blev gentaget.",
+    "The latest change was undone.": "Den seneste ændring blev fortrudt.",
+    "The steps could not be merged.": "Trinnene kunne ikke lægges sammen.",
+    "Select adjacent steps to merge them.": "Vælg tilstødende trin for at lægge dem sammen.",
+    "Approve all steps to complete the review. {count} remaining.": "Godkend alle trin for at fuldføre gennemgangen. {count} tilbage.",
+    "Try again": "Prøv igen",
+    "Saved {time}": "Gemt {time}",
     "Technical Report": "Teknisk rapport",
     "Bug Report": "Fejlrapport",
     "Business Process": "Forretningsproces",
@@ -4026,6 +4062,15 @@
     "error report": "fejlrapport"
   },
   "fi-FI": {
+    "The annotation change was redone.": "Merkinnän muutos tehtiin uudelleen.",
+    "The annotation change was undone.": "Merkinnän muutos kumottiin.",
+    "The change was redone.": "Muutos tehtiin uudelleen.",
+    "The latest change was undone.": "Viimeisin muutos kumottiin.",
+    "The steps could not be merged.": "Vaiheita ei voitu yhdistää.",
+    "Select adjacent steps to merge them.": "Valitse vierekkäiset vaiheet yhdistääksesi ne.",
+    "Approve all steps to complete the review. {count} remaining.": "Hyväksy kaikki vaiheet tarkistuksen viimeistelemiseksi. {count} jäljellä.",
+    "Try again": "Yritä uudelleen",
+    "Saved {time}": "Tallennettu {time}",
     "Technical Report": "Tekninen raportti",
     "Bug Report": "Virheraportti",
     "Business Process": "Liiketoimintaprosessi",
@@ -5032,6 +5077,15 @@
     "error report": "virheraportti"
   },
   "nb-NO": {
+    "The annotation change was redone.": "Merknadsendringen ble gjort på nytt.",
+    "The annotation change was undone.": "Merknadsendringen ble angret.",
+    "The change was redone.": "Endringen ble gjort på nytt.",
+    "The latest change was undone.": "Den siste endringen ble angret.",
+    "The steps could not be merged.": "Trinnene kunne ikke slås sammen.",
+    "Select adjacent steps to merge them.": "Velg tilstøtende trinn for å slå dem sammen.",
+    "Approve all steps to complete the review. {count} remaining.": "Godkjenn alle trinn for å fullføre gjennomgangen. {count} gjenstår.",
+    "Try again": "Prøv igjen",
+    "Saved {time}": "Lagret {time}",
     "Technical Report": "Teknisk rapport",
     "Bug Report": "Feilrapport",
     "Business Process": "Forretningsprosess",

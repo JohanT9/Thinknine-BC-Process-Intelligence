@@ -123,6 +123,7 @@
       timer = null;
       const attempt = running.then(() => save()).then(result => {
         lastError = null;
+        try { options.onSaved?.(); } catch {}
         return result;
       }, error => {
         lastError = error;
@@ -137,6 +138,7 @@
       schedule() {
         if (timer !== null) clearTimer(timer);
         lastError = null;
+        try { options.onSchedule?.(); } catch {}
         timer = setTimer(() => {
           const attempt = run();
           running = attempt.catch(() => undefined);

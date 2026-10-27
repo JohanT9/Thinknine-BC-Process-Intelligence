@@ -37,6 +37,15 @@
       (function(root) {
         const catalogs = {
           "fr-FR": {
+            "The annotation change was redone.": "La modification de l\u2019annotation a \xE9t\xE9 r\xE9tablie.",
+            "The annotation change was undone.": "La modification de l\u2019annotation a \xE9t\xE9 annul\xE9e.",
+            "The change was redone.": "La modification a \xE9t\xE9 r\xE9tablie.",
+            "The latest change was undone.": "La derni\xE8re modification a \xE9t\xE9 annul\xE9e.",
+            "The steps could not be merged.": "Les \xE9tapes n\u2019ont pas pu \xEAtre fusionn\xE9es.",
+            "Select adjacent steps to merge them.": "S\xE9lectionnez des \xE9tapes adjacentes pour les fusionner.",
+            "Approve all steps to complete the review. {count} remaining.": "Approuvez toutes les \xE9tapes pour terminer la r\xE9vision. {count} restante(s).",
+            "Try again": "R\xE9essayer",
+            "Saved {time}": "Enregistr\xE9 \xE0 {time}",
             "Technical Report": "Rapport technique",
             "Bug Report": "Rapport de bogue",
             "Business Process": "Processus m\xE9tier",
@@ -1051,6 +1060,15 @@
             "error report": "rapport d\u2019erreur"
           },
           "de-DE": {
+            "The annotation change was redone.": "Die Anmerkungs\xE4nderung wurde wiederhergestellt.",
+            "The annotation change was undone.": "Die Anmerkungs\xE4nderung wurde r\xFCckg\xE4ngig gemacht.",
+            "The change was redone.": "Die \xC4nderung wurde wiederhergestellt.",
+            "The latest change was undone.": "Die letzte \xC4nderung wurde r\xFCckg\xE4ngig gemacht.",
+            "The steps could not be merged.": "Die Schritte konnten nicht zusammengef\xFChrt werden.",
+            "Select adjacent steps to merge them.": "W\xE4hlen Sie benachbarte Schritte aus, um sie zusammenzuf\xFChren.",
+            "Approve all steps to complete the review. {count} remaining.": "Geben Sie alle Schritte frei, um die Pr\xFCfung abzuschlie\xDFen. {count} verbleibend.",
+            "Try again": "Erneut versuchen",
+            "Saved {time}": "Gespeichert um {time}",
             "Technical Report": "Technischer Bericht",
             "Bug Report": "Fehlerbericht",
             "Business Process": "Gesch\xE4ftsprozess",
@@ -2065,6 +2083,15 @@
             "error report": "Fehlerbericht"
           },
           "es-ES": {
+            "The annotation change was redone.": "Se reh\xEDzo el cambio de la anotaci\xF3n.",
+            "The annotation change was undone.": "Se deshizo el cambio de la anotaci\xF3n.",
+            "The change was redone.": "Se reh\xEDzo el cambio.",
+            "The latest change was undone.": "Se deshizo el \xFAltimo cambio.",
+            "The steps could not be merged.": "No se pudieron combinar los pasos.",
+            "Select adjacent steps to merge them.": "Seleccione pasos adyacentes para combinarlos.",
+            "Approve all steps to complete the review. {count} remaining.": "Apruebe todos los pasos para completar la revisi\xF3n. Quedan {count}.",
+            "Try again": "Reintentar",
+            "Saved {time}": "Guardado a las {time}",
             "Technical Report": "Informe t\xE9cnico",
             "Bug Report": "Informe de error",
             "Business Process": "Proceso empresarial",
@@ -3079,6 +3106,15 @@
             "error report": "informe de errores"
           },
           "da-DK": {
+            "The annotation change was redone.": "Annoterings\xE6ndringen blev gentaget.",
+            "The annotation change was undone.": "Annoterings\xE6ndringen blev fortrudt.",
+            "The change was redone.": "\xC6ndringen blev gentaget.",
+            "The latest change was undone.": "Den seneste \xE6ndring blev fortrudt.",
+            "The steps could not be merged.": "Trinnene kunne ikke l\xE6gges sammen.",
+            "Select adjacent steps to merge them.": "V\xE6lg tilst\xF8dende trin for at l\xE6gge dem sammen.",
+            "Approve all steps to complete the review. {count} remaining.": "Godkend alle trin for at fuldf\xF8re gennemgangen. {count} tilbage.",
+            "Try again": "Pr\xF8v igen",
+            "Saved {time}": "Gemt {time}",
             "Technical Report": "Teknisk rapport",
             "Bug Report": "Fejlrapport",
             "Business Process": "Forretningsproces",
@@ -4093,6 +4129,15 @@
             "error report": "fejlrapport"
           },
           "fi-FI": {
+            "The annotation change was redone.": "Merkinn\xE4n muutos tehtiin uudelleen.",
+            "The annotation change was undone.": "Merkinn\xE4n muutos kumottiin.",
+            "The change was redone.": "Muutos tehtiin uudelleen.",
+            "The latest change was undone.": "Viimeisin muutos kumottiin.",
+            "The steps could not be merged.": "Vaiheita ei voitu yhdist\xE4\xE4.",
+            "Select adjacent steps to merge them.": "Valitse vierekk\xE4iset vaiheet yhdist\xE4\xE4ksesi ne.",
+            "Approve all steps to complete the review. {count} remaining.": "Hyv\xE4ksy kaikki vaiheet tarkistuksen viimeistelemiseksi. {count} j\xE4ljell\xE4.",
+            "Try again": "Yrit\xE4 uudelleen",
+            "Saved {time}": "Tallennettu {time}",
             "Technical Report": "Tekninen raportti",
             "Bug Report": "Virheraportti",
             "Business Process": "Liiketoimintaprosessi",
@@ -5107,6 +5152,15 @@
             "error report": "virheraportti"
           },
           "nb-NO": {
+            "The annotation change was redone.": "Merknadsendringen ble gjort p\xE5 nytt.",
+            "The annotation change was undone.": "Merknadsendringen ble angret.",
+            "The change was redone.": "Endringen ble gjort p\xE5 nytt.",
+            "The latest change was undone.": "Den siste endringen ble angret.",
+            "The steps could not be merged.": "Trinnene kunne ikke sl\xE5s sammen.",
+            "Select adjacent steps to merge them.": "Velg tilst\xF8tende trinn for \xE5 sl\xE5 dem sammen.",
+            "Approve all steps to complete the review. {count} remaining.": "Godkjenn alle trinn for \xE5 fullf\xF8re gjennomgangen. {count} gjenst\xE5r.",
+            "Try again": "Pr\xF8v igjen",
+            "Saved {time}": "Lagret {time}",
             "Technical Report": "Teknisk rapport",
             "Bug Report": "Feilrapport",
             "Business Process": "Forretningsprosess",

@@ -1913,6 +1913,15 @@
     ,["Microsoft-autentisering är inte konfigurerad i licenstjänsten.", "Microsoft authentication is not configured in the license service."]
     ,["Microsoft-inloggningen avvisades av licenstjänsten.", "The license service rejected the Microsoft sign-in."]
     ,["Logga in med din konsultlicens.", "Sign in with your consultant license."]
+    ,["Sparat {time}", "Saved {time}"]
+    ,["Försök igen", "Try again"]
+    ,["Godkänn alla steg för att slutföra granskningen. {count} kvar.", "Approve all steps to complete the review. {count} remaining."]
+    ,["Välj intilliggande steg för att slå samman dem.", "Select adjacent steps to merge them."]
+    ,["Stegen kunde inte slås samman.", "The steps could not be merged."]
+    ,["Senaste ändringen ångrades.", "The latest change was undone."]
+    ,["Ändringen gjordes om.", "The change was redone."]
+    ,["Annoteringsändringen ångrades.", "The annotation change was undone."]
+    ,["Annoteringsändringen gjordes om.", "The annotation change was redone."]
   ]);
 
   const staticLookup = new Map();

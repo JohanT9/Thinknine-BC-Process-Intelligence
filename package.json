@@ -73,7 +73,7 @@
     "test:process-version-workflow": "node tests/process-version-workflow.test.js",
     "test:regeneration": "node tests/regenerate-from-recording.test.js",
     "test:review-regeneration-ui": "node tests/review-regeneration-ui.test.js",
-    "test:review-step-actions-ux": "node tests/review-step-actions-ux.test.js",
+    "test:review-step-actions-ux": "node tests/review-step-actions-ux.test.js && node tests/review-save-state.test.js",
     "test:review-visual-hierarchy": "node tests/review-visual-hierarchy.test.js",
     "test:review-navigation-ux": "node tests/review-navigation-ux.test.js && node tests/review-attention.test.js",
     "test:responsive-accessibility-ux": "node tests/responsive-accessibility-ux.test.js",
