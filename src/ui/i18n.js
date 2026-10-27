@@ -1863,6 +1863,11 @@
     ,["Orange", "Orange"]
     ,["Konsultregistreringen kunde inte skapas (HTTP {status}).", "The consultant registration could not be created (HTTP {status})."]
     ,["Användaren kunde inte registreras (HTTP {status}).", "The user could not be registered (HTTP {status})."]
+    ,["Nästa steg", "Next step"]
+    ,["Godkänn och nästa", "Approve and next"]
+    ,["Steg {step} dolt.", "Step {step} hidden."]
+    ,["{approved} av {total} godkända", "{approved} of {total} approved"]
+    ,["Dokument: {document} · Gränssnitt: {interface}", "Document: {document} · Interface: {interface}"]
   ]);
 
   const staticLookup = new Map();

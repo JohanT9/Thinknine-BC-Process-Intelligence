@@ -37,6 +37,11 @@
       (function(root) {
         const catalogs = {
           "fr-FR": {
+            "Document: {document} \xB7 Interface: {interface}": "Document : {document} \xB7 Interface : {interface}",
+            "{approved} of {total} approved": "{approved} sur {total} approuv\xE9es",
+            "Step {step} hidden.": "\xC9tape {step} masqu\xE9e.",
+            "Approve and next": "Approuver et suivant",
+            "Next step": "\xC9tape suivante",
             "The user could not be registered (HTTP {status}).": "L\u2019utilisateur n\u2019a pas pu \xEAtre enregistr\xE9 (HTTP {status}).",
             "The consultant registration could not be created (HTTP {status}).": "L\u2019enregistrement du consultant n\u2019a pas pu \xEAtre cr\xE9\xE9 (HTTP {status}).",
             "Orange": "Orange",
@@ -1029,6 +1034,11 @@
             "error report": "rapport d\u2019erreur"
           },
           "de-DE": {
+            "Document: {document} \xB7 Interface: {interface}": "Dokument: {document} \xB7 Oberfl\xE4che: {interface}",
+            "{approved} of {total} approved": "{approved} von {total} freigegeben",
+            "Step {step} hidden.": "Schritt {step} ausgeblendet.",
+            "Approve and next": "Freigeben und weiter",
+            "Next step": "N\xE4chster Schritt",
             "The user could not be registered (HTTP {status}).": "Der Benutzer konnte nicht registriert werden (HTTP {status}).",
             "The consultant registration could not be created (HTTP {status}).": "Die Beraterregistrierung konnte nicht erstellt werden (HTTP {status}).",
             "Orange": "Orange",
@@ -2021,6 +2031,11 @@
             "error report": "Fehlerbericht"
           },
           "es-ES": {
+            "Document: {document} \xB7 Interface: {interface}": "Documento: {document} \xB7 Interfaz: {interface}",
+            "{approved} of {total} approved": "{approved} de {total} aprobados",
+            "Step {step} hidden.": "Paso {step} oculto.",
+            "Approve and next": "Aprobar y siguiente",
+            "Next step": "Paso siguiente",
             "The user could not be registered (HTTP {status}).": "No se pudo registrar el usuario (HTTP {status}).",
             "The consultant registration could not be created (HTTP {status}).": "No se pudo crear el registro de consultor (HTTP {status}).",
             "Orange": "Naranja",
@@ -3013,6 +3028,11 @@
             "error report": "informe de errores"
           },
           "da-DK": {
+            "Document: {document} \xB7 Interface: {interface}": "Dokument: {document} \xB7 Brugerflade: {interface}",
+            "{approved} of {total} approved": "{approved} af {total} godkendt",
+            "Step {step} hidden.": "Trin {step} skjult.",
+            "Approve and next": "Godkend og n\xE6ste",
+            "Next step": "N\xE6ste trin",
             "The user could not be registered (HTTP {status}).": "Brugeren kunne ikke registreres (HTTP {status}).",
             "The consultant registration could not be created (HTTP {status}).": "Konsulentregistreringen kunne ikke oprettes (HTTP {status}).",
             "Orange": "Orange",
@@ -4005,6 +4025,11 @@
             "error report": "fejlrapport"
           },
           "fi-FI": {
+            "Document: {document} \xB7 Interface: {interface}": "Asiakirja: {document} \xB7 K\xE4ytt\xF6liittym\xE4: {interface}",
+            "{approved} of {total} approved": "{approved}/{total} hyv\xE4ksytty",
+            "Step {step} hidden.": "Vaihe {step} piilotettu.",
+            "Approve and next": "Hyv\xE4ksy ja seuraava",
+            "Next step": "Seuraava vaihe",
             "The user could not be registered (HTTP {status}).": "K\xE4ytt\xE4j\xE4\xE4 ei voitu rekister\xF6id\xE4 (HTTP {status}).",
             "The consultant registration could not be created (HTTP {status}).": "Konsultin rekister\xF6inti\xE4 ei voitu luoda (HTTP {status}).",
             "Orange": "Oranssi",
@@ -4997,6 +5022,11 @@
             "error report": "virheraportti"
           },
           "nb-NO": {
+            "Document: {document} \xB7 Interface: {interface}": "Dokument: {document} \xB7 Grensesnitt: {interface}",
+            "{approved} of {total} approved": "{approved} av {total} godkjent",
+            "Step {step} hidden.": "Trinn {step} skjult.",
+            "Approve and next": "Godkjenn og neste",
+            "Next step": "Neste trinn",
             "The user could not be registered (HTTP {status}).": "Brukeren kunne ikke registreres (HTTP {status}).",
             "The consultant registration could not be created (HTTP {status}).": "Konsulentregistreringen kunne ikke opprettes (HTTP {status}).",
             "Orange": "Oransje",

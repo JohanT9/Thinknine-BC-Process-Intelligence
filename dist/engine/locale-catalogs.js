@@ -2,6 +2,11 @@
 (function (root) {
   const catalogs = {
   "fr-FR": {
+    "Document: {document} · Interface: {interface}": "Document : {document} · Interface : {interface}",
+    "{approved} of {total} approved": "{approved} sur {total} approuvées",
+    "Step {step} hidden.": "Étape {step} masquée.",
+    "Approve and next": "Approuver et suivant",
+    "Next step": "Étape suivante",
     "The user could not be registered (HTTP {status}).": "L’utilisateur n’a pas pu être enregistré (HTTP {status}).",
     "The consultant registration could not be created (HTTP {status}).": "L’enregistrement du consultant n’a pas pu être créé (HTTP {status}).",
     "Orange": "Orange",
@@ -986,6 +991,11 @@
     "error report": "rapport d’erreur"
   },
   "de-DE": {
+    "Document: {document} · Interface: {interface}": "Dokument: {document} · Oberfläche: {interface}",
+    "{approved} of {total} approved": "{approved} von {total} freigegeben",
+    "Step {step} hidden.": "Schritt {step} ausgeblendet.",
+    "Approve and next": "Freigeben und weiter",
+    "Next step": "Nächster Schritt",
     "The user could not be registered (HTTP {status}).": "Der Benutzer konnte nicht registriert werden (HTTP {status}).",
     "The consultant registration could not be created (HTTP {status}).": "Die Beraterregistrierung konnte nicht erstellt werden (HTTP {status}).",
     "Orange": "Orange",
@@ -1970,6 +1980,11 @@
     "error report": "Fehlerbericht"
   },
   "es-ES": {
+    "Document: {document} · Interface: {interface}": "Documento: {document} · Interfaz: {interface}",
+    "{approved} of {total} approved": "{approved} de {total} aprobados",
+    "Step {step} hidden.": "Paso {step} oculto.",
+    "Approve and next": "Aprobar y siguiente",
+    "Next step": "Paso siguiente",
     "The user could not be registered (HTTP {status}).": "No se pudo registrar el usuario (HTTP {status}).",
     "The consultant registration could not be created (HTTP {status}).": "No se pudo crear el registro de consultor (HTTP {status}).",
     "Orange": "Naranja",
@@ -2954,6 +2969,11 @@
     "error report": "informe de errores"
   },
   "da-DK": {
+    "Document: {document} · Interface: {interface}": "Dokument: {document} · Brugerflade: {interface}",
+    "{approved} of {total} approved": "{approved} af {total} godkendt",
+    "Step {step} hidden.": "Trin {step} skjult.",
+    "Approve and next": "Godkend og næste",
+    "Next step": "Næste trin",
     "The user could not be registered (HTTP {status}).": "Brugeren kunne ikke registreres (HTTP {status}).",
     "The consultant registration could not be created (HTTP {status}).": "Konsulentregistreringen kunne ikke oprettes (HTTP {status}).",
     "Orange": "Orange",
@@ -3938,6 +3958,11 @@
     "error report": "fejlrapport"
   },
   "fi-FI": {
+    "Document: {document} · Interface: {interface}": "Asiakirja: {document} · Käyttöliittymä: {interface}",
+    "{approved} of {total} approved": "{approved}/{total} hyväksytty",
+    "Step {step} hidden.": "Vaihe {step} piilotettu.",
+    "Approve and next": "Hyväksy ja seuraava",
+    "Next step": "Seuraava vaihe",
     "The user could not be registered (HTTP {status}).": "Käyttäjää ei voitu rekisteröidä (HTTP {status}).",
     "The consultant registration could not be created (HTTP {status}).": "Konsultin rekisteröintiä ei voitu luoda (HTTP {status}).",
     "Orange": "Oranssi",
@@ -4922,6 +4947,11 @@
     "error report": "virheraportti"
   },
   "nb-NO": {
+    "Document: {document} · Interface: {interface}": "Dokument: {document} · Grensesnitt: {interface}",
+    "{approved} of {total} approved": "{approved} av {total} godkjent",
+    "Step {step} hidden.": "Trinn {step} skjult.",
+    "Approve and next": "Godkjenn og neste",
+    "Next step": "Neste trinn",
     "The user could not be registered (HTTP {status}).": "Brukeren kunne ikke registreres (HTTP {status}).",
     "The consultant registration could not be created (HTTP {status}).": "Konsulentregistreringen kunne ikke opprettes (HTTP {status}).",
     "Orange": "Oransje",

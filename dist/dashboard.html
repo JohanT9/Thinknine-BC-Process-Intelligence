@@ -299,6 +299,22 @@ body.process-map-focus-active{overflow:hidden}.process-overview-card.process-map
 .review-step-workspace[data-filter="pending"] .review-card:not([data-review-filter-state="pending"]),.review-step-workspace[data-filter="edited"] .review-card:not([data-review-filter-state="edited"]),.review-step-workspace[data-filter="approved"] .review-card:not([data-review-filter-state="approved"]){display:none!important}
 .review-step-workspace[data-filter="pending"] .review-card.selected,.review-step-workspace[data-filter="edited"] .review-card.selected,.review-step-workspace[data-filter="approved"] .review-card.selected{display:grid!important}
 .review-status div:nth-child(n+3){display:none}
+/* Review flow: screenshot beside the instruction, approval progress, undo toast. */
+.review-languages{margin-top:4px;font-size:12px;color:#52606d}
+.review-step-progress{display:grid;gap:5px;margin:0 8px 10px;font-size:12px;color:#52606d}
+.review-step-progress-bar{height:6px;border-radius:3px;background:#e2e8ee;overflow:hidden}
+.review-step-progress-bar span{display:block;height:100%;width:0;background:#107c10;transition:width .25s}
+.review-step-body{display:grid;gap:16px;min-width:0}
+.review-step-text,.review-step-images{display:grid;gap:12px;align-content:start;min-width:0}
+.review-step-images:empty{display:none}
+.review-primary-actions{display:flex;flex-wrap:wrap;gap:8px}
+.review-step-text>button{justify-self:start}
+.review-primary-actions .review-approve-next{min-height:40px;padding:8px 18px;font-weight:600}
+.review-instruction-preview:not([data-editing="true"]){cursor:text}
+@media(min-width:1100px){.review-step-body:has(.review-step-images:not(:empty)){grid-template-columns:minmax(0,1.15fr) minmax(0,1fr)}.review-step-images{order:-1}}
+.review-toast{position:sticky;bottom:72px;z-index:3;width:max-content;max-width:calc(100% - 32px);margin:0 auto 8px;display:flex;align-items:center;gap:14px;padding:10px 14px;border-radius:8px;background:#242424;color:#fff;box-shadow:0 6px 18px rgba(15,23,42,.25)}
+.review-toast button{margin:0;padding:2px 4px;border:0;background:transparent;color:#fff;font-weight:700;text-decoration:underline}
+@media(prefers-reduced-motion:reduce){.review-step-progress-bar span{transition:none}}
 /* The step and selection counts repeat the summary under the title; keep them for screen readers only. */
 .review-header>#reviewStatus{position:absolute;width:1px;height:1px;margin:0;overflow:hidden;clip-path:inset(50%);white-space:nowrap}
 .review-knowledge-disclosure>summary,.review-external-disclosure>summary{list-style:none}
@@ -585,6 +601,7 @@ body.process-map-focus-active{overflow:hidden}.process-overview-card.process-map
         <div>
           <h2 id="reviewTitle">BC Review Studio</h2>
           <div id="reviewSummary" class="muted"></div>
+          <div id="reviewLanguages" class="review-languages"></div>
         </div>
         <button id="closeReview" class="debug"
           aria-label="Stäng granskning" data-i18n-aria-label="Stäng granskning">Stäng</button>
@@ -722,6 +739,10 @@ body.process-map-focus-active{overflow:hidden}.process-overview-card.process-map
       <div id="reviewStepWorkspace" class="review-step-workspace" data-layout="focus">
         <nav class="review-step-navigation" aria-label="Dokumentets steg">
           <h3>Steg</h3>
+          <div class="review-step-progress">
+            <span id="reviewStepProgressText"></span>
+            <div class="review-step-progress-bar" aria-hidden="true"><span id="reviewStepProgressBar"></span></div>
+          </div>
           <label class="review-step-filter-label" for="reviewStepFilter">Visa
             <select id="reviewStepFilter">
               <option value="all" data-i18n-ignore>Alla steg</option>
@@ -776,6 +797,10 @@ body.process-map-focus-active{overflow:hidden}.process-overview-card.process-map
       </div>
       <div id="annotationStatus" class="sr-only" role="status" aria-live="polite" aria-atomic="true"></div>
       </section>
+      <div id="reviewToast" class="review-toast" role="status" aria-live="polite" hidden>
+        <span id="reviewToastText"></span>
+        <button type="button" id="reviewToastUndo">Ångra</button>
+      </div>
       <footer id="reviewFooter" class="review-footer">
         <span id="reviewFooterText" role="status" aria-live="polite"></span>
         <button id="saveReviewBottom" class="primary" hidden>Försök igen</button>
