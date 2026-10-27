@@ -2,7 +2,7 @@
 
 ## Automated representative coverage
 
-The UX regression checks cover mode discoverability, one-action bug start, distinct recording status, error-capture feedback, stop-to-open behavior, silent-bug fallback title, expected-result focus, visible/copyable captured error, collapsed technical details, optional telemetry/AI, issue preview, responsive layout, and preservation of normal documentation recording.
+The UX regression checks cover mode discoverability, one-action bug start, distinct recording status, error-capture feedback, stop-to-open behavior, silent-bug fallback title, expected-result focus, visible/copyable captured error, collapsed technical details, optional telemetry, responsive layout, and preservation of normal documentation recording.
 
 Existing domain suites continue to cover validation/runtime errors, multiple evidence records, diagnostics and partial call stacks, telemetry states, local issue packages, provider consent, saves, and exports.
 
@@ -38,13 +38,11 @@ rather than changing production evidence to match the example text.
 
 ## Manual verification status
 
-No live Business Central browser session is available in the automated workspace, so real click counts, error-dialog capture, React/control-add-in capture, and visual long-report behavior were not claimed as manually verified. Pilot verification should cover standard BC errors, a silent problem, an Aptean/control-add-in flow, local-only use, Issue Preview, keyboard navigation, narrow viewports, and long reports.
+No live Business Central browser session is available in the automated workspace, so real click counts, error-dialog capture, React/control-add-in capture, and visual long-report behavior were not claimed as manually verified. Pilot verification should cover standard BC errors, a silent problem, an Aptean/control-add-in flow, local-only use, PDF and email export, keyboard navigation, narrow viewports, and long reports.
 
-In report sharing, **Include AL call stack when available** is independent from
-technical details and telemetry. It is selected automatically when the
-recorded Business Central error contains a call stack. If Business Central did
-not expose or the recorder did not capture one, the disabled choice explains
-that no call stack is available; the export never invents one.
+PDF and email exports include the AL call stack when the recorded Business
+Central error contains one, and never telemetry or technical details. If
+Business Central did not expose a call stack, the export never invents one.
 
 If a clear Business Central error dialog was retained as a canonical dialog event
 but the dedicated error-evidence message was missed, reopening the report performs

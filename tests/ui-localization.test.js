@@ -26,9 +26,9 @@ assert.equal(i18n.format("library.manyShown", { count: 4 }, "en-US"),
 assert.equal(i18n.translateStaticText("Spara", "en-US"), "Save");
 assert.equal(i18n.translateStaticText("Save", "sv-SE"), "Spara");
 assert.equal(i18n.translateStaticText(
-  "Include technical details in description", "sv-SE"),
-"Inkludera tekniska detaljer i beskrivningen");
-assert.equal(i18n.translate("technical.included", "sv-SE"), "inkluderat");
+  "Regenerate from the recording", "sv-SE"),
+"Generera om från inspelningen");
+assert.equal(i18n.translate("technical.markdownExported", "sv-SE"), "Markdown har exporterats.");
 
 const dashboardHtml = fs.readFileSync(path.join(root,
   "src/ui/dashboard.html"), "utf8");
@@ -91,9 +91,8 @@ assert.match(build, /"i18n\.js"/);
 assert.match(debugHtml, /<script src="i18n\.js"><\/script>/);
 assert.match(debug, /T9_GET_SETTINGS/);
 assert.match(technicalHtml, /<script src="i18n\.js"><\/script>/);
-assert.match(technical, /technical\.issueCopied/);
-assert.match(technical, /technical\.sensitiveCategories/);
-assert.match(technicalHtml, /data-i18n-aria-label="technical\.closeSharing"/);
+assert.match(technical, /technical\.markdownExported/);
+assert.match(technical, /technical\.someImagesMissing/);
 assert.match(licenseHtml, /<script src="i18n\.js"><\/script>/);
 assert.match(licenseHtml, /data-i18n="license\.pageTitle"/);
 assert.equal(i18n.translate("license.pageTitle", "en-US"), "License information");

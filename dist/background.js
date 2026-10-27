@@ -79,11 +79,6 @@ importScripts("bug-report/application-insights-transport.js");
 importScripts("bug-report/bug-report-generator.js");
 importScripts("bug-report/issue-package.js");
 importScripts("bug-report/issue-package-markdown.js");
-importScripts("bug-report/issue-submission-service.js");
-importScripts("bug-report/external-issue-auth.js");
-importScripts("bug-report/issue-http-transport.js");
-importScripts("bug-report/azure-devops-adapter.js");
-importScripts("bug-report/github-issue-adapter.js");
 importScripts("document/document-library.js");
 importScripts("review/process-improvement-dataset.js");
 importScripts("review/knowledge-feedback-learning.js");
@@ -295,13 +290,11 @@ const processImprovement = globalThis.T9ProcessImprovementService.create({
 });
 const DEBUG_KEY = "t9_debug";
 const TELEMETRY_CONFIG_KEY = "t9_application_insights_configuration";
-const ISSUE_CONFIG_KEY = "t9_external_issue_configuration";
 
 let writeQueue = Promise.resolve();
 let stoppingSessionId = null;
 let errorEvidenceWrites = Promise.resolve();
 const telemetryRefreshGeneration = new Map();
-let issueReferenceWriteQueue = Promise.resolve();
 const tenantLicenseFailureNotifications = new Map();
 
 const SCREENSHOT_MIN_INTERVAL_MS = 1100;
@@ -585,136 +578,6 @@ async function technicalDiagnosticsPolicyEnabled() {
   } catch {
     return false;
   }
-}
-
-async function getIssueConfiguration() {
-  const data = await chrome.storage.local.get(ISSUE_CONFIG_KEY);
-  return data[ISSUE_CONFIG_KEY] || { defaultProvider: "",
-    azureDevOps: { enabled: false }, github: { enabled: false } };
-}
-
-async function saveIssueConfiguration(value = {}) {
-  const azure = value.azureDevOps || {}; const github = value.github || {};
-  const configuration = { defaultProvider: ["azure-devops", "github"].includes(
-    value.defaultProvider) ? value.defaultProvider : "",
-  azureDevOps: { enabled: Boolean(azure.enabled),
-    organization: String(azure.organization || "").trim(),
-    project: String(azure.project || "").trim(),
-    workItemType: String(azure.workItemType || "Bug").trim(),
-    areaPath: String(azure.areaPath || "").trim(),
-    iterationPath: String(azure.iterationPath || "").trim(),
-    descriptionField: String(azure.descriptionField || "System.Description").trim(),
-    severityField: String(azure.severityField || "").trim(),
-    tags: (azure.tags || []).map(String).map(item => item.trim()).filter(Boolean),
-    tenantId: String(azure.tenantId || "").trim(),
-    clientId: String(azure.clientId || "").trim(),
-    scope: String(azure.scope || "499b84ac-1321-427f-aa17-267ca6975798/.default").trim() },
-  github: { enabled: Boolean(github.enabled),
-    repository: String(github.repository || "").trim(),
-    labels: (github.labels || []).map(String).map(item => item.trim()).filter(Boolean),
-    brokerUrl: String(github.brokerUrl || "").trim(),
-    tenantId: String(github.tenantId || "").trim(),
-    clientId: String(github.clientId || "").trim(), scope: String(github.scope || "").trim() } };
-  await chrome.storage.local.set({ [ISSUE_CONFIG_KEY]: configuration });
-  globalThis.T9ExternalIssueAuth.clear(); return configuration;
-}
-
-async function azureRequest(configuration, token, path, options = {}) {
-  const url = `https://dev.azure.com/${encodeURIComponent(configuration.organization)}/${
-    encodeURIComponent(configuration.project)}/${path}`;
-  const method = String(options.method || "GET").toUpperCase();
-  const response = await globalThis.T9IssueHttpTransport.create().request(url,
-    { ...options, headers: { ...(options.headers || {}),
-      Authorization: `Bearer ${token}` } },
-    { service: "Azure DevOps", mayHaveCommitted: method === "POST" || method === "PATCH" });
-  if (!response.ok) throw Object.assign(new Error(
-    `Azure DevOps returned HTTP ${response.status}.`), { status: response.status });
-  return response.status === 204 ? {} : response.json();
-}
-
-function dataUrlBytes(value) {
-  const match = /^data:([^;,]+)?(?:;base64)?,(.*)$/u.exec(String(value || ""));
-  if (!match) throw Object.assign(new Error("Screenshot asset is unavailable."),
-    { category: "attachment-failed" });
-  const binary = atob(match[2]); const bytes = new Uint8Array(binary.length);
-  for (let index = 0; index < binary.length; index += 1) bytes[index] = binary.charCodeAt(index);
-  return bytes;
-}
-
-function createAzureProvider(configuration, recordingId) {
-  return globalThis.T9AzureDevOpsAdapter.create({ async invoke(operation, request) {
-    const token = await globalThis.T9ExternalIssueAuth.authenticate(configuration,
-      "azure-devops-issues");
-    if (operation === "test") { await azureRequest(configuration, token,
-      "_apis/wit/workitemtypes?api-version=7.1");
-      return { status: "connected", destination: `${configuration.organization}/${
-        configuration.project}` }; }
-    const item = await azureRequest(configuration, token,
-      `_apis/wit/workitems/$${encodeURIComponent(configuration.workItemType)}?api-version=7.1`,
-      { method: "POST", headers: { "Content-Type": "application/json-patch+json" },
-        body: JSON.stringify(request.fields) });
-    const recording = await getCanonicalRecording(recordingId);
-    const attachments = request.attachments || [];
-    const screenshotPathByAssetId = globalThis.T9ScreenshotAssetPaths
-      .assetPathIndex(recording);
-    const pathByAssetId = new Map(attachments.flatMap(attachment => {
-      const path = screenshotPathByAssetId.get(String(attachment.assetId));
-      return path ? [[attachment.assetId, path]] : [];
-    }));
-    const attachmentFailures = [];
-    for (let offset = 0; offset < attachments.length; offset += 10) {
-      const batch = attachments.slice(offset, offset + 10);
-      const paths = [...new Set(batch.map(attachment =>
-        pathByAssetId.get(attachment.assetId)).filter(Boolean))];
-      let screenshotValues = {};
-      try {
-        if (paths.length) screenshotValues = await getScreenshotDataForPaths(
-          recordingId, paths);
-      } catch (error) {
-        attachmentFailures.push(...batch.map(attachment => ({
-          attachmentId: attachment.attachmentId,
-          category: error.category || "attachment-failed",
-          message: String(error.message).slice(0, 200) })));
-        continue;
-      }
-      for (const attachment of batch) {
-      try {
-        const source = screenshotValues[pathByAssetId.get(attachment.assetId)] || null;
-        const uploaded = await azureRequest(configuration, token,
-          `_apis/wit/attachments?fileName=${encodeURIComponent(attachment.fileName)}&api-version=7.1`,
-          { method: "POST", headers: { "Content-Type": attachment.mediaType },
-            body: dataUrlBytes(source) });
-        await azureRequest(configuration, token,
-          `_apis/wit/workitems/${item.id}?api-version=7.1`, { method: "PATCH",
-            headers: { "Content-Type": "application/json-patch+json" },
-            body: JSON.stringify([{ op: "add", path: "/relations/-", value: {
-              rel: "AttachedFile", url: uploaded.url,
-              attributes: { comment: attachment.role } } }]) });
-      } catch (error) { attachmentFailures.push({ attachmentId: attachment.attachmentId,
-        category: error.category || "attachment-failed", message: String(error.message).slice(0, 200) }); }
-      }
-    }
-    return { destination: `${configuration.organization}/${configuration.project}`,
-      externalId: item.id, url: item._links?.html?.href || item.url,
-      createdAt: new Date().toISOString(), attachmentFailures };
-  } });
-}
-
-function createGitHubProvider(configuration) {
-  return globalThis.T9GitHubIssueAdapter.create({ async invoke(operation, request) {
-    const token = await globalThis.T9ExternalIssueAuth.authenticate(configuration,
-      "github-issues-broker");
-    const base = new URL(configuration.brokerUrl); base.pathname = `${base.pathname.replace(/\/$/u,
-      "")}/external-issues/github/${operation}`;
-    const response = await globalThis.T9IssueHttpTransport.create().request(base, { method: "POST", headers: {
-      Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
-    body: JSON.stringify(request) }, { service: "GitHub App broker",
-      mayHaveCommitted: operation === "create" });
-    if (!response.ok) throw Object.assign(new Error(
-      `GitHub App broker returned HTTP ${response.status}.`), { status: response.status,
-      uncertain: operation === "create" && response.status >= 500 });
-    return response.json();
-  } });
 }
 
 async function capture(tabId) {
@@ -2235,15 +2098,6 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
         break;
       }
 
-      case "T9_GET_ISSUE_CONFIGURATION":
-        sendResponse({ ok: true, configuration: await getIssueConfiguration() });
-        break;
-
-      case "T9_SAVE_ISSUE_CONFIGURATION":
-        sendResponse({ ok: true, configuration: await saveIssueConfiguration(
-          message.configuration) });
-        break;
-
       case "T9_BUILD_ISSUE_PACKAGE": { // Local projection only; no transmission.
         const report = await bugReportStore.load(message.bugReportId);
         if (!report) throw new Error("Bug Report kunde inte hittas.");
@@ -2255,64 +2109,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
             includeTechnicalDetails: Boolean(
               message.options?.includeTechnicalDetails) });
         sendResponse({ ok: true, issuePackage,
-          markdown: globalThis.T9IssuePackageMarkdown.markdown(issuePackage),
-          existingReferences: report.enrichment?.externalIssues || [] });
-        break;
-      }
-
-      case "T9_TEST_ISSUE_CONNECTION": {
-        const all = await getIssueConfiguration(); const providerId = message.provider;
-        if (!["azure-devops", "github"].includes(providerId)) throw Object.assign(
-          new Error("Select a configured issue destination."),
-          { category: "configuration-error" });
-        const configuration = providerId === "azure-devops" ? all.azureDevOps : all.github;
-        const provider = providerId === "azure-devops"
-          ? createAzureProvider(configuration, "") : createGitHubProvider(configuration);
-        const service = globalThis.T9IssueSubmissionService.create(provider);
-        sendResponse({ ok: true, result: await service.testConnection(configuration) });
-        break;
-      }
-
-      case "T9_CREATE_EXTERNAL_ISSUE": { // Explicit preview confirmation only.
-        const report = await bugReportStore.load(message.bugReportId);
-        if (!report) throw new Error("Bug Report kunde inte hittas.");
-        const existing = report.enrichment?.externalIssues || [];
-        if (existing.length && !message.confirmDuplicate) throw Object.assign(
-          new Error("Report already has an external issue. Confirm deliberate re-submission."),
-          { category: "existing-external-issue" });
-        const evidence = await getBcErrorEvidenceForRecording(report.recordingId);
-        const issuePackage = message.issuePackage;
-        if (globalThis.T9IssuePackage.isStale(issuePackage, report,
-          { errorEvidence: evidence })) throw Object.assign(
-          new Error("Issue Package is stale. Generate a new preview before submission."),
-          { category: "stale-package" });
-        const all = await getIssueConfiguration(); const providerId = message.provider;
-        if (!["azure-devops", "github"].includes(providerId)) throw Object.assign(
-          new Error("Select a configured issue destination."),
-          { category: "configuration-error" });
-        const configuration = providerId === "azure-devops" ? all.azureDevOps : all.github;
-        const provider = providerId === "azure-devops"
-          ? createAzureProvider(configuration, report.recordingId)
-          : createGitHubProvider(configuration);
-        const result = await globalThis.T9IssueSubmissionService.create(provider).submit(
-          issuePackage, configuration, { explicitConfirmation: true,
-            idempotencyKey: issuePackage.packageId });
-        const persistReference = issueReferenceWriteQueue.then(async () => {
-          try {
-            const latest = await bugReportStore.load(report.bugReportId);
-            if (!latest) return { referenceSaved: false, referenceSaveError:
-              "The report was removed after the external issue was created." };
-            const saved = globalThis.T9BugReportModel.attachExternalIssue(latest,
-              result.reference, new Date().toISOString());
-            return { referenceSaved: true,
-              report: await bugReportStore.save(saved) };
-          } catch (error) {
-            return { referenceSaved: false,
-              referenceSaveError: String(error.message || error).slice(0, 200) };
-          }
-        });
-        issueReferenceWriteQueue = persistReference.catch(() => {});
-        sendResponse({ ok: true, result, ...(await persistReference) });
+          markdown: globalThis.T9IssuePackageMarkdown.markdown(issuePackage) });
         break;
       }
 

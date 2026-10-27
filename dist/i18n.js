@@ -128,14 +128,14 @@
   }
 };
   const asyncOperationMessages = Object.freeze({
-    "sv-SE": Object.freeze({ "technical.requestTimeout": "Åtgärden tog för lång tid. Läs in tillägget igen och försök på nytt.", "technical.someImagesMissing": "Vissa bevisbilder kunde inte läsas in och kan saknas i exporten.", "technical.issueReferenceNotSaved": "Ärendet skapades, men referensen kunde inte sparas lokalt. Använd länken eller ärende-ID:t ovan och skapa inte ärendet igen." }),
-    "en-US": Object.freeze({ "technical.requestTimeout": "The operation timed out. Reload the extension and try again.", "technical.someImagesMissing": "Some evidence images could not be loaded and may be missing from the export.", "technical.issueReferenceNotSaved": "The issue was created, but its reference could not be saved locally. Use the link or issue ID above; do not create it again." }),
-    "fr-FR": Object.freeze({ "technical.requestTimeout": "L’opération a expiré. Rechargez l’extension et réessayez.", "technical.someImagesMissing": "Certaines images de preuve n’ont pas pu être chargées et risquent de manquer dans l’exportation.", "technical.issueReferenceNotSaved": "Le ticket a été créé, mais sa référence n’a pas pu être enregistrée localement. Utilisez le lien ou l’identifiant ci-dessus ; ne le créez pas à nouveau." }),
-    "de-DE": Object.freeze({ "technical.requestTimeout": "Der Vorgang hat zu lange gedauert. Laden Sie die Erweiterung neu und versuchen Sie es erneut.", "technical.someImagesMissing": "Einige Beweisbilder konnten nicht geladen werden und fehlen möglicherweise im Export.", "technical.issueReferenceNotSaved": "Das Issue wurde erstellt, aber die Referenz konnte lokal nicht gespeichert werden. Verwenden Sie den Link oder die ID oben und erstellen Sie es nicht erneut." }),
-    "es-ES": Object.freeze({ "technical.requestTimeout": "La operación agotó el tiempo de espera. Vuelva a cargar la extensión e inténtelo de nuevo.", "technical.someImagesMissing": "No se pudieron cargar algunas imágenes de evidencia y podrían faltar en la exportación.", "technical.issueReferenceNotSaved": "La incidencia se creó, pero no se pudo guardar la referencia localmente. Use el enlace o el ID anterior y no vuelva a crearla." }),
-    "da-DK": Object.freeze({ "technical.requestTimeout": "Handlingen fik timeout. Genindlæs udvidelsen, og prøv igen.", "technical.someImagesMissing": "Nogle dokumentationsbilleder kunne ikke indlæses og kan mangle i eksporten.", "technical.issueReferenceNotSaved": "Sagen blev oprettet, men referencen kunne ikke gemmes lokalt. Brug linket eller sags-id’et ovenfor, og opret ikke sagen igen." }),
-    "fi-FI": Object.freeze({ "technical.requestTimeout": "Toiminto aikakatkaistiin. Lataa laajennus uudelleen ja yritä uudestaan.", "technical.someImagesMissing": "Joitakin todistuskuvia ei voitu ladata, joten ne saattavat puuttua viennistä.", "technical.issueReferenceNotSaved": "Tiketti luotiin, mutta viitettä ei voitu tallentaa paikallisesti. Käytä yllä olevaa linkkiä tai tunnusta äläkä luo tikettiä uudelleen." }),
-    "nb-NO": Object.freeze({ "technical.requestTimeout": "Operasjonen fikk tidsavbrudd. Last inn utvidelsen på nytt, og prøv igjen.", "technical.someImagesMissing": "Noen dokumentasjonsbilder kunne ikke lastes inn og kan mangle i eksporten.", "technical.issueReferenceNotSaved": "Saken ble opprettet, men referansen kunne ikke lagres lokalt. Bruk lenken eller saks-ID-en ovenfor, og ikke opprett saken på nytt." })
+    "sv-SE": Object.freeze({ "technical.requestTimeout": "Åtgärden tog för lång tid. Läs in tillägget igen och försök på nytt.", "technical.someImagesMissing": "Vissa bevisbilder kunde inte läsas in och kan saknas i exporten." }),
+    "en-US": Object.freeze({ "technical.requestTimeout": "The operation timed out. Reload the extension and try again.", "technical.someImagesMissing": "Some evidence images could not be loaded and may be missing from the export." }),
+    "fr-FR": Object.freeze({ "technical.requestTimeout": "L’opération a expiré. Rechargez l’extension et réessayez.", "technical.someImagesMissing": "Certaines images de preuve n’ont pas pu être chargées et risquent de manquer dans l’exportation." }),
+    "de-DE": Object.freeze({ "technical.requestTimeout": "Der Vorgang hat zu lange gedauert. Laden Sie die Erweiterung neu und versuchen Sie es erneut.", "technical.someImagesMissing": "Einige Beweisbilder konnten nicht geladen werden und fehlen möglicherweise im Export." }),
+    "es-ES": Object.freeze({ "technical.requestTimeout": "La operación agotó el tiempo de espera. Vuelva a cargar la extensión e inténtelo de nuevo.", "technical.someImagesMissing": "No se pudieron cargar algunas imágenes de evidencia y podrían faltar en la exportación." }),
+    "da-DK": Object.freeze({ "technical.requestTimeout": "Handlingen fik timeout. Genindlæs udvidelsen, og prøv igen.", "technical.someImagesMissing": "Nogle dokumentationsbilleder kunne ikke indlæses og kan mangle i eksporten." }),
+    "fi-FI": Object.freeze({ "technical.requestTimeout": "Toiminto aikakatkaistiin. Lataa laajennus uudelleen ja yritä uudestaan.", "technical.someImagesMissing": "Joitakin todistuskuvia ei voitu ladata, joten ne saattavat puuttua viennistä." }),
+    "nb-NO": Object.freeze({ "technical.requestTimeout": "Operasjonen fikk tidsavbrudd. Last inn utvidelsen på nytt, og prøv igjen.", "technical.someImagesMissing": "Noen dokumentasjonsbilder kunne ikke lastes inn og kan mangle i eksporten." })
   });
   // Live recording warnings are keyed by the warning code from recording-live-status.
   const recordingWarningMessages = Object.freeze({
@@ -503,28 +503,7 @@
       "technical.telemetryConnection": "Telemetrianslutning: {status}.",
       "technical.selectPrimaryError": "Välj ett primärt fel innan telemetrin uppdateras.",
       "technical.fetchingTelemetry": "Hämtar telemetri från den konfigurerade Microsoft-slutpunkten…",
-      "technical.issueCopied": "Ärendebeskrivningen har kopierats.",
-      "technical.shareHelp": "Välj vart rapporten ska skickas. Inget skickas utan din bekräftelse.",
-      "technical.packageExported": "Det lokala ärendepaketet har exporterats.",
-      "technical.submissionConsent": "Granskning och uttryckligt samtycke krävs före överföring.",
-      "technical.selectProvider": "Välj Azure DevOps eller GitHub före överföring.",
-      "technical.openExternalIssue": "Öppna externt ärende",
-      "technical.issueCreated": "Ärende {id} skapades.",
-      "technical.issueCreatedOneAttachmentFailed": "Ärende {id} skapades, men 1 bilaga kunde inte bifogas.",
-      "technical.issueCreatedManyAttachmentsFailed": "Ärende {id} skapades, men {count} bilagor kunde inte bifogas.",
-      "technical.issueLinkUnavailable": "Länken kunde inte verifieras, men använd ärende-ID:t {id} för att hitta det.",
       "technical.issueSubmissionTimeout": "Åtgärden tog för lång tid.",
-      "technical.closeSharing": "Stäng delning av felrapport",
-      "technical.destination": "Mål",
-      "technical.offlineOnly": "endast lokalt paket",
-      "technical.telemetry": "Telemetri",
-      "technical.callStack": "AL-anropsstack",
-      "technical.callStackUnavailable": "ingen anropsstack fångades i BC-felet",
-      "technical.technicalDetails": "Tekniska detaljer",
-      "technical.attachments": "Bilagor",
-      "technical.included": "inkluderat",
-      "technical.excluded": "utelämnat",
-      "technical.sensitiveCategories": "Kategorier som kan vara känsliga",
       "debug.none": "Inget",
       "debug.noSession": "Ingen",
       "debug.active": "Pågår",
@@ -597,7 +576,6 @@
       "a11y.hideStep": "Dölj steg {step} från dokumentet",
       "a11y.editorHelp": "Dubbelklicka eller tryck Enter för att redigera. Ctrl+Enter sparar",
       "a11y.saveEditor": "Ctrl+Enter sparar",
-      "technical.issuePreviewHelp": "Felrapporten förblir lokal och auktoritativ. Ingenting skickas förrän du har granskat paketet och valt Skapa ärende.",
       "recorder.inactive": "Inte aktiv",
       "recorder.processActive": "Processinspelning pågår",
       "recorder.bugActive": "Felrapportering pågår",
@@ -847,28 +825,7 @@
       "technical.telemetryConnection": "Telemetry connection: {status}.",
       "technical.selectPrimaryError": "Select a primary error before telemetry refresh.",
       "technical.fetchingTelemetry": "Fetching telemetry from the configured Microsoft endpoint…",
-      "technical.issueCopied": "Issue description copied.",
-      "technical.shareHelp": "Choose where the report should go. Nothing is sent without your confirmation.",
-      "technical.packageExported": "Offline Issue Package exported.",
-      "technical.submissionConsent": "Review and explicit submission consent are required.",
-      "technical.selectProvider": "Select Azure DevOps or GitHub before submission.",
-      "technical.openExternalIssue": "Open external issue",
-      "technical.issueCreated": "Issue {id} created.",
-      "technical.issueCreatedOneAttachmentFailed": "Issue {id} created, but 1 attachment could not be added.",
-      "technical.issueCreatedManyAttachmentsFailed": "Issue {id} created, but {count} attachments could not be added.",
-      "technical.issueLinkUnavailable": "The link could not be verified. Use issue ID {id} to find it.",
       "technical.issueSubmissionTimeout": "The operation timed out.",
-      "technical.closeSharing": "Close report sharing",
-      "technical.destination": "Destination",
-      "technical.offlineOnly": "offline only",
-      "technical.telemetry": "Telemetry",
-      "technical.callStack": "AL call stack",
-      "technical.callStackUnavailable": "no call stack was captured with the BC error",
-      "technical.technicalDetails": "Technical details",
-      "technical.attachments": "Attachments",
-      "technical.included": "included",
-      "technical.excluded": "excluded",
-      "technical.sensitiveCategories": "Potentially sensitive categories",
       "debug.none": "None",
       "debug.noSession": "None",
       "debug.active": "In progress",
@@ -941,7 +898,6 @@
       "a11y.hideStep": "Hide step {step} from the document",
       "a11y.editorHelp": "Double-click or press Enter to edit. Ctrl+Enter saves",
       "a11y.saveEditor": "Ctrl+Enter saves",
-      "technical.issuePreviewHelp": "The Bug Report remains local and authoritative. Nothing is submitted until you review this package and select Create Issue.",
       "recorder.inactive": "Not active",
       "recorder.processActive": "Process recording in progress",
       "recorder.bugActive": "Issue recording in progress",
@@ -1077,7 +1033,6 @@
       "review.imageNumber": "Image {number}",
       "review.imageQuality.medium": "Acceptable",
       "review.imageScore": "Score",
-      "technical.destination": "Destination",
       "debug.corrections": "Corrections",
     }),"de-DE": Object.freeze({
       "license.cardTitle": "Lizenz für diesen Business Central-Mandanten",
@@ -1280,8 +1235,6 @@
       "license.status": "Status",
       "license.tenantId": "Tenant-ID",
       "review.imageMargin": "margen",
-      "technical.destination": "Destination",
-      "technical.telemetry": "Telemetri",
       "debug.noSession": "Ingen",
       "debug.title": "BC Process Recorder — Teknisk diagnostik",
       "debug.rawDiagnostics": "Rådiagnostik",
@@ -1420,8 +1373,6 @@
       "license.status": "Status",
       "library.documentLanguage": "Dokumentspråk",
       "review.imageMargin": "marg",
-      "technical.destination": "Mål",
-      "technical.telemetry": "Telemetri",
       "debug.noSession": "Ingen",
       "debug.active": "Pågår",
       "a11y.commentFormatting": "Kommentarformatering",
@@ -1576,12 +1527,7 @@
     ,["Stäng av fångstdiagnostik", "Disable capture diagnostics"]
     ,["Rå diagnostik", "Raw diagnostics"], ["Teknisk felrapport", "Technical Bug Report"]
     ,["Kopiera hela rapporten", "Copy full report"], ["Exportera Markdown", "Export Markdown"]
-    ,["Skapa ärende", "Create Issue"]
-    ,["Dela rapport", "Share report"], ["Dela felrapport", "Share bug report"]
-    ,["Välj vart rapporten ska skickas. Inget skickas utan din bekräftelse.", "Choose where the report should go. Nothing is sent without your confirmation."]
-    ,["Innehåll och inställningar", "Content and settings"]
-    ,["Granska rapportens innehåll", "Review report content"]
-    ,["Hämta rapportpaket", "Download report package"]
+    ,["Dela rapport", "Share report"]
     ,["Sparad automatiskt", "Saved automatically"], ["Sparar…", "Saving…"]
     ,["Ändringar väntar på att sparas", "Changes waiting to be saved"]
     ,["Kunde inte spara ändringarna", "Could not save changes"]
@@ -1599,17 +1545,11 @@
     ,["Spara publik brokerinställning", "Save public broker configuration"]
     ,["Analysera tekniska bevis", "Analyze technical evidence"]
     ,["Förhandsgranska ärendepaket", "Issue Package Preview"]
-    ,["Mål", "Destination"], ["Endast lokalt paket", "Offline package only"]
-    ,["Azure DevOps-inställning", "Azure DevOps configuration"]
-    ,["GitHub-inställning", "GitHub configuration"]
-    ,["Aktiverad", "Enabled"], ["Organisation", "Organization"]
-    ,["Projekt", "Project"], ["Ärendetyp", "Work item type"]
-    ,["Områdessökväg", "Area path"], ["Iterationssökväg", "Iteration path"]
-    ,["Spara publik målkonfiguration", "Save public destination configuration"]
+    ,["Aktiverad", "Enabled"]
+    ,["Projekt", "Project"]
     ,["Generera förhandsgranskning", "Generate preview"]
     ,["Överföringssammanfattning", "Transmission summary"]
     ,["Titel", "Title"], ["Beskrivning", "Description"], ["Bilagor", "Attachments"]
-    ,["Kopiera ärendebeskrivning", "Copy Issue Description"]
     ,["Exportera lokalt ärendepaket", "Export Offline Issue Package"]
     ,["Redigerbara rapportfält", "Editable report fields"]
     ,["Beskriv felet", "Describe the problem"]
@@ -1659,20 +1599,17 @@
     ,["Senaste fel", "Latest error"], ["Skärmbildsfel", "Screenshot error"]
     ,["Senast uppdaterad", "Last updated"], ["Inte bekräftad", "Not confirmed"]
     ,["Ångra", "Undo"], ["Gör om", "Redo"], ["Stäng", "Close"]
-    ,["Tenant-ID", "Tenant ID"], ["Publikt klient-ID", "Public client ID"]
+    ,["Tenant-ID", "Tenant ID"]
     ,["Application Insights App-ID", "Application Insights App ID"]
     ,["Förväntad miljö", "Expected environment"]
     ,["Aktivera valfri berikning", "Enable optional enrichment"]
     ,["Fönster (minuter)", "Window (minutes)"]
-    ,["Broker OAuth-scope", "Broker OAuth scope"]
     ,["HTTPS-adress till broker", "HTTPS broker URL"]
     ,["Leverantörsmodell", "Provider model"]
     ,["Inkludera filtrerade telemetrihändelser", "Include filtered telemetry events"]
     ,["Inkludera maskerade telemetrimeddelanden", "Include redacted telemetry messages"]
     ,["Inkludera maskerade användaranteckningar", "Include redacted human notes"]
     ,["Jag förstår att valda bevis lämnar det här tillägget", "I understand that the selected evidence will leave this extension"]
-    ,["Inkludera telemetrisammanfattning", "Include telemetry summary"]
-    ,["Inkludera AL-anropsstack när den finns", "Include AL call stack when available"]
     ,["Endast teknisk information som fångats för detta fel visas.", "Only technical information captured for this error is shown."]
     ,["Business Central-miljö", "Business Central environment"]
     ,["Business Central-företag", "Business Central company"]
@@ -1703,17 +1640,6 @@
     ,["Windows-hjälparen är öppnad. Välj Dela bifogad rapport och sedan Outlook.",
       "Windows helper is open. Choose Share attached report and then Outlook."]
     ,["Används när en felrapport skapas som adresserat e-postutkast.", "Used when a bug report is prepared as an addressed email draft."]
-    ,["Inkludera tekniska detaljer i beskrivningen", "Include technical details in description"]
-    ,["Databas (ägare/namn)", "Repository (owner/name)"]
-    ,["Etiketter, kommaseparerade", "Labels, comma separated"]
-    ,["Taggar, kommaseparerade", "Tags, comma separated"]
-    ,["GitHub App-brokeradress", "GitHub App broker URL"]
-    ,["Broker Entra tenant-ID", "Broker Entra tenant ID"]
-    ,["Publikt klient-ID för broker", "Broker public client ID"]
-    ,["Testa Azure DevOps-anslutning", "Test Azure DevOps connection"]
-    ,["Testa GitHub-anslutning", "Test GitHub connection"]
-    ,["Jag har granskat mål, beskrivning, bilagor, telemetrival och varningen om känsliga data", "I reviewed the destination, description, attachments, telemetry choice, and sensitive-data warning"]
-    ,["Skapa ett nytt ärende även om rapporten redan har en extern referens", "Create another issue even if this report already has an external reference"]
     ,["Visa avancerade dataskyddsinställningar", "Show advanced privacy settings"]
     ,["Dataskydd", "Privacy"]
     ,["Masterdata och testdata", "Master data and test data"]

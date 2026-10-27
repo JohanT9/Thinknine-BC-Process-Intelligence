@@ -1099,7 +1099,6 @@ local and external references into a derived timeline without merging stores or
 claiming causation. Authentication is Entra authorization code with PKCE; no
 confidential credential or token is persisted. See
 [APPLICATION_INSIGHTS_ENRICHMENT.md](APPLICATION_INSIGHTS_ENRICHMENT.md).
-Issue Package is a downstream renderer/provider-neutral projection of the same
-Technical Report. Azure DevOps and GitHub adapters map that package without
-owning report semantics. External systems are write-only initial destinations;
-no synchronization or read-back can overwrite the Bug Report.
+Issue Package is a downstream, renderer-neutral projection of the same
+Technical Report, used by the PDF and email exports. It never changes the Bug
+Report.

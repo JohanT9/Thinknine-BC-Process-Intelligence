@@ -181,16 +181,7 @@
     return normalize(result);
   }
 
-  function attachExternalIssue(report, reference, updatedAt) {
-    const result = normalize(report);
-    const existing = result.enrichment.externalIssues || [];
-    result.enrichment.externalIssues = [...existing, { ...clone(reference),
-      authorship: "external-submission-reference" }];
-    result.updatedAt = updatedAt || result.updatedAt;
-    return normalize(result);
-  }
-
   return { CATEGORIES, SCHEMA_VERSION, STATUSES, normalize, normalizeStep,
-    attachExternalIssue, attachTelemetry, selectPrimaryError,
+    attachTelemetry, selectPrimaryError,
     updateHumanContent, updateReproductionStep, updateScreenshotVisibility };
 });

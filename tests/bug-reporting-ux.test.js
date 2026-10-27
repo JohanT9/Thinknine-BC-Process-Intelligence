@@ -68,30 +68,20 @@ assert.match(report, /class="primary-actions"[\s\S]*id="emailReport"[\s\S]*id="e
 assert.doesNotMatch(report, /id="saveReport"/);
 assert.match(report, /<details class="report-options"><summary>More options<\/summary>/);
 assert.doesNotMatch(report, /<details class="report-options" open/);
-assert.match(report, /Share bug report/);
-assert.doesNotMatch(report, /id="openIssuePreview"/);
+// External issue destinations (Azure DevOps, GitHub, offline package) were removed.
+assert.doesNotMatch(report, /Share bug report|id="issuePreview"|id="shareReport"|id="openIssuePreview"/);
+assert.doesNotMatch(reportLogic, /T9_CREATE_EXTERNAL_ISSUE|T9_SAVE_ISSUE_CONFIGURATION|T9_TEST_ISSUE_CONNECTION/);
+assert.doesNotMatch(background, /T9_CREATE_EXTERNAL_ISSUE|T9_SAVE_ISSUE_CONFIGURATION|T9_TEST_ISSUE_CONNECTION/);
 assert.match(report, /id="regenerateReport"/);
 assert.match(reportLogic, /if \(!window\.confirm\(t\("technical\.regenerateConfirm"\)\)\) return/);
 assert.match(reportLogic, /await workspace\.flush\(\);\s+await send\(\{ type: "T9_REGENERATE_BUG_REPORT"/);
 assert.doesNotMatch(report, /id="includeAiExport"|id="includeTechnicalZip"/);
 assert.match(report, /id="emailReport"[^>]*>E-posta PDF<\/button>/);
 assert.match(report, /src="bug-report\/email-draft\.js"/);
-assert.match(report, /<details class="share-options"><summary>Content and settings<\/summary>/);
-assert.match(report, /id="issueIncludeTechnical"/);
-assert.doesNotMatch(report, /id="issueIncludeTechnical"[^>]*checked/);
-assert.match(report, /id="issueIncludeCallStack"[^>]*checked/);
-assert.match(report, /id="issueCallStackAvailability"/);
-assert.match(reportLogic, /includeCallStack: document\.getElementById\("issueIncludeCallStack"\)\.checked/);
-assert.match(reportLogic, /const hasCallStack = \(session\.bcErrorEvidence \|\| \[\]\)\.some/);
-assert.match(reportLogic, /callStackInput\.disabled = !hasCallStack/);
-assert.match(report, /<details class="share-preview"><summary>Review report content<\/summary>/);
-assert.match(report, /class="share-preview"[\s\S]*id="copyIssueDescription"/);
-assert.match(report, /id="adoConfiguration"/);
-assert.match(report, /id="githubConfiguration"/);
-assert.match(report, /id="shareReport"[^>]*>Download report package<\/button>/);
-assert.doesNotMatch(report, /id="refreshIssuePreview"/);
-assert.doesNotMatch(report, /id="downloadIssuePackage"/);
-assert.doesNotMatch(report, /id="submitExternalIssue"/);
+// PDF and email keep the former defaults: the AL call stack when Business Central exposed one,
+// no telemetry and no technical details.
+assert.match(reportLogic, /const includeCallStack = \(session\.bcErrorEvidence \|\| \[\]\)\.some/);
+assert.match(reportLogic, /options: \{ includeTelemetry: false, includeCallStack,\s+includeTechnicalDetails: false \}/);
 assert.match(reportView, /Technical details/);
 assert.match(reportView, /advancedKinds/);
 assert.match(reportView, /function hasSectionContent\(section\)/);
@@ -134,14 +124,9 @@ assert.match(reportView, /Needs attention/);
 assert.doesNotMatch(reportView, /Ready to share/);
 assert.match(reportLogic, /technical-report-expectedResult/);
 assert.match(reportLogic, /firstMissing\?\.focus/);
-assert.match(reportLogic, /function updateShareUi\(\)/);
-assert.match(reportLogic, /provider !== "azure-devops"/);
-assert.match(reportLogic, /provider !== "github"/);
-assert.match(reportLogic, /function downloadOfflinePackage\(\)/);
 assert.match(reportLogic, /function emailReport\(\)/);
 assert.match(reportLogic, /T9BugReportEmailDraft\.build/);
 assert.match(reportLogic, /message\/rfc822/);
-assert.match(reportLogic, /function submitExternalIssue\(\)/);
 assert.match(reportLogic, /const renderAndAutosave = state =>/);
 assert.match(reportLogic, /setTimeout\(\(\) => workspace\.save\(\)/);
 assert.match(reportLogic, /await workspace\.flush\(\); window\.close\(\)/);
@@ -163,21 +148,15 @@ for (const list of reportLogic.matchAll(
   /\[((?:\s*"[^"]+",?)+)\s*\](?=\)\s*\{|\.map\(id =>\s*document\.getElementById\(id\)\))/gu)) {
   lookedUp.push(...[...list[1].matchAll(/"([^"]+)"/gu)].map(match => match[1]));
 }
-assert.ok(lookedUp.includes("issueIncludeTechnical"), "id lists are scanned");
 assert.deepStrictEqual(lookedUp.filter(id => !reportIds.has(id)), [],
   "technical-report.js only references elements present in technical-report.html");
 assert.ok(!report.includes("issueIncludeAi") && !reportLogic.includes("includeAiAnalysis"),
-  "the removed AI analysis option is not offered when sharing");
+  "the removed AI analysis option is not offered");
 
 globalThis.T9LanguageRegistry = require("../src/engine/language-registry");
 globalThis.T9LocaleCatalogs = require("../src/engine/locale-catalogs");
 require("../src/ui/i18n");
-const consentLabel = report.match(/id="issueConsent" type="checkbox">([^<]+)</u)[1].trim();
-const consentTranslations = globalThis.T9LanguageRegistry.supported("ui").map(item =>
-  globalThis.T9UiI18n.translateStaticText(consentLabel, item.locale));
-assert.strictEqual(new Set(consentTranslations).size, consentTranslations.length,
-  "the share consent label is translated into every interface language");
 // Sending is emphasised only once the report is complete and states the expected result.
-assert.ok(report.includes(".primary-actions #emailReport.is-ready,#shareReport{background:#008c95"));
+assert.ok(report.includes(".primary-actions #emailReport.is-ready{background:#008c95"));
 assert.match(reportLogic, /classList\.toggle\("is-ready", Boolean\(result\.ready &&\s+String\(state\.report\?\.expectedResult\?\.text/u);
 console.log("Bug Reporting UX tests passed.");

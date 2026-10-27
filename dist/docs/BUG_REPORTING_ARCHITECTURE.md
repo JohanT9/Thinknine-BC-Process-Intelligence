@@ -110,11 +110,10 @@ and [Technical Report Workspace](TECHNICAL_REPORT_WORKSPACE.md).
 
 ## Future extension boundaries
 
-Issue Package and initial Azure DevOps/GitHub creation are now downstream
-derived projections. Preview and explicit consent are mandatory; destination
-formatting cannot mutate evidence. Lightweight External Issue References are
-historical metadata, never a new source of truth. See `ISSUE_PACKAGE.md` and
-`EXTERNAL_ISSUE_SECURITY.md`.
+Issue Package is a downstream derived projection used by the PDF and email
+exports; formatting cannot mutate evidence. Submission to Azure DevOps or GitHub
+was removed. External issue references stored by earlier versions are kept
+unchanged in the report. See `ISSUE_PACKAGE.md`.
 
 - **BC Error Dialog & Copy Details Capture:** implemented for observable modal
   surfaces and already-visible diagnostic DOM, without clipboard permission.
@@ -122,8 +121,7 @@ historical metadata, never a new source of truth. See `ISSUE_PACKAGE.md` and
   preserves every unknown segment; it never invents object, app or line data.
 - **Application Insights:** optional external evidence is implemented; see
   [Application Insights enrichment](APPLICATION_INSIGHTS_ENRICHMENT.md).
-- **Export:** Markdown, offline Issue Package, Azure DevOps, and GitHub consume
-  derived report projections. Future Word/PDF support remains separate. The
+- **Export:** Markdown, PDF and email consume derived report projections. Future Word/PDF support remains separate. The
   domain does not depend on DOCX or destination APIs.
 
 ## Self review
@@ -136,4 +134,4 @@ historical metadata, never a new source of truth. See `ISSUE_PACKAGE.md` and
 - AL call-stack frame parsing implemented? **Yes, deterministic version 1.0.0.**
 - Root-cause assistance implemented? **No.**
 - Telemetry added? **Optional read enrichment.** AI added? **No.**
-- External creation added? **Explicit Azure DevOps/GitHub destinations.**
+- External creation added? **No.**
