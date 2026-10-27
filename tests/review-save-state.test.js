@@ -46,4 +46,13 @@ assert.match(between('$("completeReview").disabled = !activeReview ||', "\n  $(\
 // The step workspace lines up with the toolbar and uses the available width.
 assert.match(html, /\.review-step-workspace\{[^}]*width:100%;max-width:1364px;margin:0 auto\}/u);
 
+// At narrow widths secondary commands become icons; the text stays the name and tooltip.
+const design = read("src/ui/design-system.css");
+for (const [id, text] of [["undoReview", "Ångra"], ["redoReview", "Gör om"],
+  ["openReviewDocumentFields", "Dokumentinformation"]]) {
+  assert.match(html, new RegExp(`id="${id}"[^>]*data-icon="[^"]+" title="${text}"[^>]*>${text}</button>`, "u"));
+}
+assert.match(html, /id="reviewStepLayoutToggle"[^>]*data-icon="☰"/u);
+assert.match(design, /\.review-toolbar \[data-icon\]\{[^}]*font-size:0/u);
+assert.match(design, /\.review-toolbar \[data-icon\]::before\{content:attr\(data-icon\)/u);
 console.log("Review save state and layout tests passed.");

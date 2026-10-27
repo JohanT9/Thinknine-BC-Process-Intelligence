@@ -37,6 +37,8 @@
       (function(root) {
         const catalogs = {
           "fr-FR": {
+            "The user could not be registered (HTTP {status}).": "L\u2019utilisateur n\u2019a pas pu \xEAtre enregistr\xE9 (HTTP {status}).",
+            "The consultant registration could not be created (HTTP {status}).": "L\u2019enregistrement du consultant n\u2019a pas pu \xEAtre cr\xE9\xE9 (HTTP {status}).",
             "Orange": "Orange",
             "Yellow": "Jaune",
             "Green": "Vert",
@@ -1073,6 +1075,8 @@
             "error report": "rapport d\u2019erreur"
           },
           "de-DE": {
+            "The user could not be registered (HTTP {status}).": "Der Benutzer konnte nicht registriert werden (HTTP {status}).",
+            "The consultant registration could not be created (HTTP {status}).": "Die Beraterregistrierung konnte nicht erstellt werden (HTTP {status}).",
             "Orange": "Orange",
             "Yellow": "Gelb",
             "Green": "Gr\xFCn",
@@ -2109,6 +2113,8 @@
             "error report": "Fehlerbericht"
           },
           "es-ES": {
+            "The user could not be registered (HTTP {status}).": "No se pudo registrar el usuario (HTTP {status}).",
+            "The consultant registration could not be created (HTTP {status}).": "No se pudo crear el registro de consultor (HTTP {status}).",
             "Orange": "Naranja",
             "Yellow": "Amarillo",
             "Green": "Verde",
@@ -3145,6 +3151,8 @@
             "error report": "informe de errores"
           },
           "da-DK": {
+            "The user could not be registered (HTTP {status}).": "Brugeren kunne ikke registreres (HTTP {status}).",
+            "The consultant registration could not be created (HTTP {status}).": "Konsulentregistreringen kunne ikke oprettes (HTTP {status}).",
             "Orange": "Orange",
             "Yellow": "Gul",
             "Green": "Gr\xF8n",
@@ -4181,6 +4189,8 @@
             "error report": "fejlrapport"
           },
           "fi-FI": {
+            "The user could not be registered (HTTP {status}).": "K\xE4ytt\xE4j\xE4\xE4 ei voitu rekister\xF6id\xE4 (HTTP {status}).",
+            "The consultant registration could not be created (HTTP {status}).": "Konsultin rekister\xF6inti\xE4 ei voitu luoda (HTTP {status}).",
             "Orange": "Oranssi",
             "Yellow": "Keltainen",
             "Green": "Vihre\xE4",
@@ -5217,6 +5227,8 @@
             "error report": "virheraportti"
           },
           "nb-NO": {
+            "The user could not be registered (HTTP {status}).": "Brukeren kunne ikke registreres (HTTP {status}).",
+            "The consultant registration could not be created (HTTP {status}).": "Konsulentregistreringen kunne ikke opprettes (HTTP {status}).",
             "Orange": "Oransje",
             "Yellow": "Gul",
             "Green": "Gr\xF8nn",

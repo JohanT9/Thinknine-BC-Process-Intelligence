@@ -170,6 +170,10 @@
         const disclosure = container.querySelector(selector);
         if (disclosure) disclosure.open = true;
       });
+      // Sending is the main action once the report is complete and states what was expected;
+      // until then it stays available without being emphasised.
+      document.getElementById("emailReport").classList.toggle("is-ready", Boolean(result.ready &&
+        String(state.report?.expectedResult?.text || "").trim()));
       return result;
     };
     let autosaveTimer = null;

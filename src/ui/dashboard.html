@@ -605,11 +605,11 @@ body.process-map-focus-active{overflow:hidden}.process-overview-card.process-map
           aria-describedby="reviewKeyboardHelp" data-i18n="review.nextUnreviewed"
           disabled>N&auml;sta ogranskade</button>
         <div class="review-toolbar-group" role="group" aria-label="Historik">
-          <button id="undoReview" data-review-command="undo" data-review-toolbar-item class="secondary" aria-keyshortcuts="Control+Z Meta+Z" disabled>Ångra</button>
-          <button id="redoReview" data-review-command="redo" data-review-toolbar-item class="secondary" aria-keyshortcuts="Control+Y Meta+Shift+Z" disabled>Gör om</button>
+          <button id="undoReview" data-review-command="undo" data-review-toolbar-item class="secondary" data-icon="↶" title="Ångra" aria-keyshortcuts="Control+Z Meta+Z" disabled>Ångra</button>
+          <button id="redoReview" data-review-command="redo" data-review-toolbar-item class="secondary" data-icon="↷" title="Gör om" aria-keyshortcuts="Control+Y Meta+Shift+Z" disabled>Gör om</button>
         </div>
         <button id="exportWordReview" data-review-command="export" data-review-toolbar-item class="secondary" disabled>Exportera Word</button>
-        <button id="openReviewDocumentFields" data-review-toolbar-item class="secondary">Dokumentinformation</button>
+        <button id="openReviewDocumentFields" data-review-toolbar-item class="secondary" data-icon="ⓘ" title="Dokumentinformation">Dokumentinformation</button>
         <details id="reviewMoreActions" class="review-toolbar-more">
           <summary data-review-toolbar-item aria-controls="reviewMoreActionsPanel" aria-expanded="false">Fler åtgärder</summary>
           <div id="reviewMoreActionsPanel" class="review-toolbar-more-panel">
@@ -632,7 +632,7 @@ body.process-map-focus-active{overflow:hidden}.process-overview-card.process-map
             <button id="resetReviewStructure" data-review-command="reset-structure" data-review-toolbar-item class="secondary" disabled>Återställ struktur</button>
           </div>
         </details>
-        <button id="reviewStepLayoutToggle" type="button" class="secondary review-step-layout-toggle" aria-pressed="true" title="Visa alla steg i listan">Visa alla steg</button>
+        <button id="reviewStepLayoutToggle" type="button" class="secondary review-step-layout-toggle" data-icon="☰" aria-pressed="true" title="Visa alla steg i listan">Visa alla steg</button>
         <div id="reviewSelectionActions" class="review-selection-actions" role="group" aria-label="Valda" hidden>
           <dl class="review-selection-count"><dt>Valda</dt><dd id="reviewSelectionCount">0</dd></dl>
           <button id="mergeReviewSteps" data-review-command="merge" data-review-toolbar-item class="secondary" disabled>Slå samman</button>

@@ -1,4 +1,7 @@
 ## Unreleased
+- Show Undo, Redo, Document information and the step layout toggle as icons in the narrow Review toolbar, keeping every action visible in fewer rows; the button text remains the accessible name and tooltip.
+- Emphasise Email PDF in the bug report only once the report is complete and states the expected result.
+- Translate error messages that carry values, such as HTTP statuses from the licensing service, into all eight languages.
 - Show bug report severity in the document language in the PDF, the email subject and the text export; email priority headers still use the stored value.
 - Write Word export test output to the system temp folder so test runs no longer modify the committed sample documents.
 - Show the license type and validity in the popup only for a checked, active license instead of "License type: — · Valid until: No expiry date".
