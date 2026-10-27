@@ -1,7 +1,7 @@
 # External Issue Security
 
 Nothing is transmitted when recording stops, a Bug Report becomes ready,
-telemetry loads, AI completes, preview opens, or an offline package is built.
+telemetry loads, preview opens, or an offline package is built.
 The user must select a configured destination, inspect the preview and sensitive
 categories, explicitly consent, and press Create Issue.
 
@@ -9,8 +9,7 @@ categories, explicitly consent, and press Create Issue.
 
 Depending on preview choices, transmission may include report narrative,
 reproduction, exact error, environment/technical identifiers, AL stack, notes,
-selected screenshots, bounded telemetry summary, and current labelled AI
-analysis. Raw Events, Canonical payloads, raw telemetry results, extension
+selected screenshots, and a bounded telemetry summary. Raw Events, Canonical payloads, raw telemetry results, extension
 storage, and credentials are excluded. The UI does not silently remove business
 data; it exposes categories for human review.
 
@@ -33,8 +32,7 @@ host permission is requested before connecting.
 - ambiguous timeouts are marked uncertain and never blindly retried;
 - partial attachment failure retains the created external reference;
 - successful creation stores only provider, destination, external ID/URL,
-  time, source revision, and AI/telemetry inclusion flags.
+  time, source revision, and the telemetry inclusion flag.
 
 There is no bidirectional synchronization, automatic update, external read-back,
 issue routing, or customer support portal in this milestone.
-

@@ -1,6 +1,6 @@
 # Technical Report Workspace
 
-The default reading order prioritizes editable human context, reproduction, expected and actual results, captured BC errors, and evidence. Exact error text remains visible and copyable. Environment, diagnostics, structured/raw AL call stacks, objects, telemetry, AI, timeline, and traceability are collapsed under **Technical details**. A newly created report focuses the first missing high-value human field.
+The default reading order prioritizes editable human context, reproduction, expected and actual results, captured BC errors, and evidence. Exact error text remains visible and copyable. Environment, diagnostics, structured/raw AL call stacks, objects, telemetry, timeline, and traceability are collapsed under **Technical details**. A newly created report focuses the first missing high-value human field.
 
 `technical-report.html?bugReportId=<id>` is a dedicated local workspace. It
 loads through existing APIs, projects current domain state and saves through the
@@ -32,14 +32,8 @@ and the derived timeline are read-only, escaped, and exported from the shared
 projection. Raw results are collapsed. No real
 BC/Application Insights pair was available locally; tests use synthetic data.
 
-Optional AI analysis requires broker configuration, exact-host permission,
-explicit consent, and an explicit Analyze action. It appears in a separately
-labelled read-only section; stale results require explicit re-analysis. Export
-excludes AI unless the user selects the dedicated inclusion option. No real AI
-provider was available locally; deterministic tests use a synthetic provider.
-
 Create Issue opens a modal Issue Package Preview without cluttering the report
 editor. It displays destination, type/configuration, title, complete description,
-selected attachments, telemetry/AI inclusion, sensitive categories, existing
+selected attachments, telemetry inclusion, sensitive categories, existing
 external-reference warning, copy and offline export. Submission remains disabled
 during an active request and requires explicit review consent.

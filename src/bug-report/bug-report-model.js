@@ -181,18 +181,6 @@
     return normalize(result);
   }
 
-  function attachAiAnalysis(report, analysis, updatedAt) {
-    const result = normalize(report);
-    result.enrichment.analysis = clone(analysis);
-    result.updatedAt = updatedAt || result.updatedAt;
-    return normalize(result);
-  }
-
-  function removeAiAnalysis(report, updatedAt) {
-    const result = normalize(report); result.enrichment.analysis = null;
-    result.updatedAt = updatedAt || result.updatedAt; return normalize(result);
-  }
-
   function attachExternalIssue(report, reference, updatedAt) {
     const result = normalize(report);
     const existing = result.enrichment.externalIssues || [];
@@ -203,6 +191,6 @@
   }
 
   return { CATEGORIES, SCHEMA_VERSION, STATUSES, normalize, normalizeStep,
-    attachAiAnalysis, attachExternalIssue, attachTelemetry, removeAiAnalysis, selectPrimaryError,
+    attachExternalIssue, attachTelemetry, selectPrimaryError,
     updateHumanContent, updateReproductionStep, updateScreenshotVisibility };
 });

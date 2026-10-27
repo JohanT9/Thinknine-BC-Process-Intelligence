@@ -33,7 +33,7 @@ Copy Details availability is detected. Text is captured automatically only when
 already exposed in accessible DOM. The recorder does not click actions, close
 dialogs, request clipboard permission or monitor the global clipboard.
 
-Capture itself transmits nothing. Later optional telemetry, AI, or issue
+Capture itself transmits nothing. Later optional telemetry or issue
 submission requires a separate explicit user action and never changes captured
 evidence. Real BC verification was not possible in this automated workspace;
 behavior is verified with sanitized fixtures.

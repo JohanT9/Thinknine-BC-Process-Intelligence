@@ -502,9 +502,6 @@
       "technical.telemetryConnection": "Telemetrianslutning: {status}.",
       "technical.selectPrimaryError": "Välj ett primärt fel innan telemetrin uppdateras.",
       "technical.fetchingTelemetry": "Hämtar telemetri från den konfigurerade Microsoft-slutpunkten…",
-      "technical.aiSaved": "Den publika AI-brokerinställningen har sparats. Ingen leverantörsnyckel lagrades.",
-      "technical.aiConsent": "Uttryckligt samtycke krävs före AI-analys.",
-      "technical.sendingAi": "Skickar minimerade bevis till den konfigurerade AI-brokern…",
       "technical.issueCopied": "Ärendebeskrivningen har kopierats.",
       "technical.shareHelp": "Välj vart rapporten ska skickas. Inget skickas utan din bekräftelse.",
       "technical.packageExported": "Det lokala ärendepaketet har exporterats.",
@@ -520,13 +517,11 @@
       "technical.destination": "Mål",
       "technical.offlineOnly": "endast lokalt paket",
       "technical.telemetry": "Telemetri",
-      "technical.aiAnalysis": "AI-analys",
       "technical.callStack": "AL-anropsstack",
       "technical.callStackUnavailable": "ingen anropsstack fångades i BC-felet",
       "technical.technicalDetails": "Tekniska detaljer",
       "technical.attachments": "Bilagor",
       "technical.included": "inkluderat",
-      "technical.includedLabelled": "inkluderat och märkt",
       "technical.excluded": "utelämnat",
       "technical.sensitiveCategories": "Kategorier som kan vara känsliga",
       "debug.none": "Inget",
@@ -851,9 +846,6 @@
       "technical.telemetryConnection": "Telemetry connection: {status}.",
       "technical.selectPrimaryError": "Select a primary error before telemetry refresh.",
       "technical.fetchingTelemetry": "Fetching telemetry from the configured Microsoft endpoint…",
-      "technical.aiSaved": "Public AI broker configuration saved. No provider key was stored.",
-      "technical.aiConsent": "Explicit consent is required before AI analysis.",
-      "technical.sendingAi": "Sending minimized evidence to the configured AI broker…",
       "technical.issueCopied": "Issue description copied.",
       "technical.shareHelp": "Choose where the report should go. Nothing is sent without your confirmation.",
       "technical.packageExported": "Offline Issue Package exported.",
@@ -869,13 +861,11 @@
       "technical.destination": "Destination",
       "technical.offlineOnly": "offline only",
       "technical.telemetry": "Telemetry",
-      "technical.aiAnalysis": "AI analysis",
       "technical.callStack": "AL call stack",
       "technical.callStackUnavailable": "no call stack was captured with the BC error",
       "technical.technicalDetails": "Technical details",
       "technical.attachments": "Attachments",
       "technical.included": "included",
-      "technical.includedLabelled": "included and labelled",
       "technical.excluded": "excluded",
       "technical.sensitiveCategories": "Potentially sensitive categories",
       "debug.none": "None",
@@ -1586,7 +1576,7 @@
     ,["Stäng av fångstdiagnostik", "Disable capture diagnostics"]
     ,["Rå diagnostik", "Raw diagnostics"], ["Teknisk felrapport", "Technical Bug Report"]
     ,["Kopiera hela rapporten", "Copy full report"], ["Exportera Markdown", "Export Markdown"]
-    ,["Skapa ärende", "Create Issue"], ["Inkludera AI-analys i kopiering/export", "Include AI analysis in copy/export"]
+    ,["Skapa ärende", "Create Issue"]
     ,["Dela rapport", "Share report"], ["Dela felrapport", "Share bug report"]
     ,["Välj vart rapporten ska skickas. Inget skickas utan din bekräftelse.", "Choose where the report should go. Nothing is sent without your confirmation."]
     ,["Innehåll och inställningar", "Content and settings"]
@@ -1603,13 +1593,11 @@
     ,["Lägg till minst ett synligt reproduktionssteg.", "Add at least one visible reproduction step."]
     ,["Beskriv det faktiska resultatet eller fånga ett BC-fel.", "Describe the actual result or capture a BC error."]
     ,["Application Insights (valfritt)", "Application Insights (optional)"]
-    ,["AI-teknisk analys (valfritt)", "AI technical analysis (optional)"]
     ,["Spara telemetriinställning", "Save telemetry configuration"]
     ,["Testa telemetrianslutning", "Test telemetry connection"]
     ,["Uppdatera telemetri för valt fel", "Refresh telemetry for selected error"]
     ,["Spara publik brokerinställning", "Save public broker configuration"]
     ,["Analysera tekniska bevis", "Analyze technical evidence"]
-    ,["Ta bort AI-analys", "Remove AI analysis"]
     ,["Förhandsgranska ärendepaket", "Issue Package Preview"]
     ,["Mål", "Destination"], ["Endast lokalt paket", "Offline package only"]
     ,["Azure DevOps-inställning", "Azure DevOps configuration"]
@@ -1679,13 +1667,11 @@
     ,["Broker OAuth-scope", "Broker OAuth scope"]
     ,["HTTPS-adress till broker", "HTTPS broker URL"]
     ,["Leverantörsmodell", "Provider model"]
-    ,["Organisationens policy aktiverar AI-analys", "Organization policy enables AI analysis"]
     ,["Inkludera filtrerade telemetrihändelser", "Include filtered telemetry events"]
     ,["Inkludera maskerade telemetrimeddelanden", "Include redacted telemetry messages"]
     ,["Inkludera maskerade användaranteckningar", "Include redacted human notes"]
     ,["Jag förstår att valda bevis lämnar det här tillägget", "I understand that the selected evidence will leave this extension"]
     ,["Inkludera telemetrisammanfattning", "Include telemetry summary"]
-    ,["Inkludera aktuell AI-stödd analys", "Include current AI-assisted analysis"]
     ,["Inkludera AL-anropsstack när den finns", "Include AL call stack when available"]
     ,["Endast teknisk information som fångats för detta fel visas.", "Only technical information captured for this error is shown."]
     ,["Business Central-miljö", "Business Central environment"]
@@ -1726,7 +1712,7 @@
     ,["Publikt klient-ID för broker", "Broker public client ID"]
     ,["Testa Azure DevOps-anslutning", "Test Azure DevOps connection"]
     ,["Testa GitHub-anslutning", "Test GitHub connection"]
-    ,["Jag har granskat mål, beskrivning, bilagor, telemetri-/AI-val och varningen om känsliga data", "I reviewed the destination, description, attachments, telemetry/AI choices, and sensitive-data warning"]
+    ,["Jag har granskat mål, beskrivning, bilagor, telemetrival och varningen om känsliga data", "I reviewed the destination, description, attachments, telemetry choice, and sensitive-data warning"]
     ,["Skapa ett nytt ärende även om rapporten redan har en extern referens", "Create another issue even if this report already has an external reference"]
     ,["Visa avancerade dataskyddsinställningar", "Show advanced privacy settings"]
     ,["Dataskydd", "Privacy"]

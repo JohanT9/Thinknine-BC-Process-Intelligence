@@ -105,8 +105,11 @@ assert.ok(fs.existsSync(path.join(root, "dist/technical-report.js")));
 assert.ok(fs.existsSync(path.join(root, "dist/design-system.css")));
 assert.ok(fs.existsSync(path.join(root,
   "dist/bug-report/application-insights-provider.js")));
-assert.ok(fs.existsSync(path.join(root,
-  "dist/bug-report/technical-analysis-provider.js")));
+for (const removed of ["ai-analysis-input", "ai-analysis-model", "ai-analysis-prompt",
+  "ai-broker-auth", "ai-broker-transport", "ai-evidence-policy", "technical-analysis-provider"]) {
+  assert.ok(!fs.existsSync(path.join(root, `dist/bug-report/${removed}.js`)),
+    `removed AI analysis module ${removed} must not ship`);
+}
 assert.ok(fs.existsSync(path.join(root, "dist/bug-report/issue-package.js")));
 assert.ok(fs.existsSync(path.join(root,
   "dist/bug-report/azure-devops-adapter.js")));

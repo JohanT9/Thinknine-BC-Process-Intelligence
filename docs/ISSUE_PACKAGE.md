@@ -11,8 +11,7 @@ diagnostics, call-stack order, notes, and selected screenshot references. It
 does not rebuild semantics from Raw Events.
 
 The schema-version-1 package contains stable package/report IDs, source revision,
-title and sections, selected attachments, optional telemetry summary, optional
-current AI analysis, inclusion policy, privacy categories, and provenance.
+title and sections, selected attachments, optional telemetry summary, inclusion policy, privacy categories, and provenance.
 Exact BC error and raw call-stack content are preserved. Destination formatting
 escapes markup but does not rewrite evidence.
 
@@ -32,8 +31,7 @@ rejected until preview is regenerated. An already-created External Issue
 Reference stays historical; no destination is silently updated.
 
 Telemetry is excluded by default and, when selected, contains only the existing
-bounded normalized summary—not raw query results. AI is included only when
-selected and current, and remains labelled AI-assisted and not authoritative.
+bounded normalized summary—not raw query results.
 
 The human-readable issue description excludes environment diagnostics and the
 AL call stack by default so the recorded problem remains easy to scan. Users can

@@ -3,6 +3,7 @@ const fs = require("fs");
 const model = require("../src/bug-report/bug-report-model");
 const packages = require("../src/bug-report/issue-package");
 const formatter = require("../src/bug-report/issue-package-markdown");
+const generator = require("../src/bug-report/bug-report-generator");
 const azure = require("../src/bug-report/azure-devops-adapter");
 const github = require("../src/bug-report/github-issue-adapter");
 const submissions = require("../src/bug-report/issue-submission-service");
@@ -46,7 +47,7 @@ let report = model.normalize({ schemaVersion: 1, bugReportId: "bug-report:issue"
     }] } } }, analysis: null } });
 
 const options = { generatedAt: "2026-08-24T12:00:00Z",
-  includeTelemetry: false, includeAiAnalysis: false };
+  includeTelemetry: false };
 const pkg = packages.build(report, { errorEvidence: evidence }, options);
 assert.deepStrictEqual(pkg, packages.build(report, { errorEvidence: evidence }, options));
 assert.strictEqual(pkg.provenance.type, "derived-issue-package");
@@ -57,7 +58,7 @@ assert.strictEqual(pkg.errorEvidence.primary.rawMessage, evidence[0].rawMessage)
 assert.deepStrictEqual(pkg.callStack[0].frames.map(item => item.objectId), [80, 42]);
 assert.deepStrictEqual(pkg.attachments.map(item => item.assetId),
   ["error-shot", "shot-1", "shot-2"]);
-assert.strictEqual(pkg.telemetry, null); assert.strictEqual(pkg.aiAnalysis, null);
+assert.strictEqual(pkg.telemetry, null); assert.ok(!("aiAnalysis" in pkg));
 const markdown = formatter.markdown(pkg);
 assert(!markdown.includes("Obsolete event"));
 assert(markdown.includes(evidence[0].rawMessage));
@@ -84,18 +85,21 @@ const telemetryPkg = packages.build(report, { errorEvidence: evidence }, {
 assert.strictEqual(telemetryPkg.telemetry.contexts[0].events[0].telemetryEventId,
   "event-1");
 
-const currentFingerprint = require("../src/bug-report/ai-analysis-input")
-  .build(report, evidence, {}).sourceEvidenceFingerprint;
-report = model.attachAiAnalysis(report, { schemaVersion: 1, analysisId: "analysis-1",
-  sourceEvidenceFingerprint: currentFingerprint, status: "completed",
-  summary: "Inspect posting.", observations: [], hypotheses: [], recommendedNextChecks: [],
-  missingEvidence: [], warnings: [], riskFlags: [], inputPolicy: {} }, report.updatedAt);
-assert(packages.build(report, { errorEvidence: evidence }, { ...options,
-  includeAiAnalysis: true }).aiAnalysis);
+// AI analysis was removed; an analysis stored by an earlier version is kept but never shared.
+const legacyAnalysis = { schemaVersion: 1, analysisId: "analysis-1", status: "current",
+  summary: "Legacy AI summary.", observations: [], hypotheses: [] };
+const legacy = model.normalize({ ...report, enrichment: { ...report.enrichment,
+  analysis: legacyAnalysis } });
+assert.deepStrictEqual(legacy.enrichment.analysis, legacyAnalysis);
+const legacyPkg = packages.build(legacy, { errorEvidence: evidence }, { ...options,
+  includeAiAnalysis: true });
+assert.ok(!("aiAnalysis" in legacyPkg) && !("aiAnalysis" in legacyPkg.inclusion));
+assert.ok(!legacyPkg.privacy.categories.includes("ai-analysis"));
+assert.ok(!formatter.markdown(legacyPkg).includes("Legacy AI summary."));
+assert.ok(!generator.project(legacy, { errorEvidence: evidence }).sections
+  .some(item => item.id === "ai-analysis"));
 const changed = model.updateHumanContent(report, { expectedResult: "Changed" },
   "2026-08-24T13:00:00Z");
-assert.strictEqual(packages.build(changed, { errorEvidence: evidence }, {
-  ...options, includeAiAnalysis: true }).aiAnalysis, null);
 assert(packages.isStale(pkg, changed, { errorEvidence: evidence }));
 
 const adoConfig = { enabled: true, organization: "org", project: "project",

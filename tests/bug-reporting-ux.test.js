@@ -153,4 +153,28 @@ assert.match(dashboard, /T9_OPEN_TECHNICAL_REPORT/);
 assert.match(dashboard, /bugReportId:\s*`bug-report:\$\{session\.id\}`/);
 assert.match(report, /@media\(max-width:700px\)/);
 assert.match(popupLogic, /recordingPurpose === "bug-report" \? "T9_START_BUG_RECORDING" : "T9_START"/);
+
+// Every element the report script looks up, directly or through an id list, exists in the page.
+const reportIds = new Set([...report.matchAll(/\sid="([^"]+)"/gu)].map(match => match[1]));
+assert.match(reportView, /const id = `technical-report-\$\{field\.name\}`;/u);
+["title", "expectedResult"].forEach(field => reportIds.add(`technical-report-${field}`));
+const lookedUp = [...reportLogic.matchAll(/getElementById\("([^"]+)"\)/gu)].map(match => match[1]);
+for (const list of reportLogic.matchAll(
+  /\[((?:\s*"[^"]+",?)+)\s*\](?=\)\s*\{|\.map\(id =>\s*document\.getElementById\(id\)\))/gu)) {
+  lookedUp.push(...[...list[1].matchAll(/"([^"]+)"/gu)].map(match => match[1]));
+}
+assert.ok(lookedUp.includes("issueIncludeTechnical"), "id lists are scanned");
+assert.deepStrictEqual(lookedUp.filter(id => !reportIds.has(id)), [],
+  "technical-report.js only references elements present in technical-report.html");
+assert.ok(!report.includes("issueIncludeAi") && !reportLogic.includes("includeAiAnalysis"),
+  "the removed AI analysis option is not offered when sharing");
+
+globalThis.T9LanguageRegistry = require("../src/engine/language-registry");
+globalThis.T9LocaleCatalogs = require("../src/engine/locale-catalogs");
+require("../src/ui/i18n");
+const consentLabel = report.match(/id="issueConsent" type="checkbox">([^<]+)</u)[1].trim();
+const consentTranslations = globalThis.T9LanguageRegistry.supported("ui").map(item =>
+  globalThis.T9UiI18n.translateStaticText(consentLabel, item.locale));
+assert.strictEqual(new Set(consentTranslations).size, consentTranslations.length,
+  "the share consent label is translated into every interface language");
 console.log("Bug Reporting UX tests passed.");

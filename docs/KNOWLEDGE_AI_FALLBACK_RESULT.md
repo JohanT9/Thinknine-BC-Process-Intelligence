@@ -7,7 +7,7 @@ the supplied signal keys, and remains a review-only suggestion with capped,
 uncalibrated confidence. It cannot alter a process classification or publish a
 knowledge rule.
 
-The existing AI broker only supports technical bug analysis. No knowledge
+No knowledge
 resolution endpoint or provider is configured, so the new AI path makes no external
 calls until an approved provider and explicit consent are supplied.
 

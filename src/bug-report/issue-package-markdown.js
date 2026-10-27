@@ -14,10 +14,9 @@
     directLink: "Öppna i Business Central",
     technical: "Tekniska detaljer", environment: "Miljö",
     diagnostics: "Diagnostik", callStack: "AL-anropsstack",
-    telemetry: "Telemetri", ai: "AI-assisterad analys (inte auktoritativ)",
+    telemetry: "Telemetri",
     status: "Status", relatedEvents: "relaterade händelser",
-    relatedBy: "kopplad genom", observation: "Observation",
-    hypothesis: "Möjlig rotorsak (inte verifierad)", notes: "Anteckningar" });
+    relatedBy: "kopplad genom", notes: "Anteckningar" });
   const ENGLISH = Object.freeze({ summary: "Summary",
     reproduction: "Steps to Reproduce", expected: "Expected Result",
     actual: "Actual Result", error: "Business Central Error",
@@ -25,10 +24,9 @@
     directLink: "Open in Business Central",
     technical: "Technical Details", environment: "Environment",
     diagnostics: "Diagnostics", callStack: "AL Call Stack",
-    telemetry: "Telemetry", ai: "AI-Assisted Analysis (not authoritative)",
+    telemetry: "Telemetry",
     status: "Status", relatedEvents: "related events", relatedBy: "related by",
-    observation: "Observation", hypothesis:
-      "Possible root-cause hypothesis (not verified)", notes: "Notes" });
+    notes: "Notes" });
   const inline = input => value(input).replace(/\\/gu, "\\\\")
     .replace(/([*_[\]<>])/gu, "\\$1");
   function metadata(input, prefix = "") {
@@ -85,12 +83,6 @@
       `- ${labels.status}: ${inline(context.status)}; ${labels.relatedEvents}: ${context.eventCount}`,
       ...(context.events || []).map(event => `  - ${inline(event.timestamp)} ${
         inline(event.eventName)} — ${labels.relatedBy} ${inline((event.correlationReasons || []).join(", "))}`)]));
-    if (pkg.aiAnalysis) add(labels.ai, [
-      `${labels.status}: ${inline(pkg.aiAnalysis.status)}`, inline(pkg.aiAnalysis.summary),
-      ...(pkg.aiAnalysis.observations || []).map(item => `- ${labels.observation}: ${inline(item.text)} [${
-        inline((item.citations || []).join(", "))}]`),
-      ...(pkg.aiAnalysis.hypotheses || []).map(item =>
-        `- ${labels.hypothesis}: ${inline(item.text)}`)]);
     add(labels.notes, pkg.notes.map(item => `- ${inline(item.text || item.content)}`));
     return `${out.join("\n").trim()}\n`;
   }

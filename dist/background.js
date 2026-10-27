@@ -76,13 +76,6 @@ importScripts("bug-report/telemetry-enrichment.js");
 importScripts("bug-report/application-insights-provider.js");
 importScripts("bug-report/application-insights-auth.js");
 importScripts("bug-report/application-insights-transport.js");
-importScripts("bug-report/ai-evidence-policy.js");
-importScripts("bug-report/ai-analysis-input.js");
-importScripts("bug-report/ai-analysis-model.js");
-importScripts("bug-report/ai-analysis-prompt.js");
-importScripts("bug-report/technical-analysis-provider.js");
-importScripts("bug-report/ai-broker-auth.js");
-importScripts("bug-report/ai-broker-transport.js");
 importScripts("bug-report/bug-report-generator.js");
 importScripts("bug-report/issue-package.js");
 importScripts("bug-report/issue-package-markdown.js");
@@ -302,14 +295,12 @@ const processImprovement = globalThis.T9ProcessImprovementService.create({
 });
 const DEBUG_KEY = "t9_debug";
 const TELEMETRY_CONFIG_KEY = "t9_application_insights_configuration";
-const AI_CONFIG_KEY = "t9_ai_analysis_configuration";
 const ISSUE_CONFIG_KEY = "t9_external_issue_configuration";
 
 let writeQueue = Promise.resolve();
 let stoppingSessionId = null;
 let errorEvidenceWrites = Promise.resolve();
 const telemetryRefreshGeneration = new Map();
-const aiAnalysisGeneration = new Map();
 let issueReferenceWriteQueue = Promise.resolve();
 const tenantLicenseFailureNotifications = new Map();
 
@@ -587,23 +578,6 @@ async function saveTelemetryConfiguration(value = {}) {
   return configuration;
 }
 
-async function getAiConfiguration() {
-  const data = await chrome.storage.local.get(AI_CONFIG_KEY);
-  return data[AI_CONFIG_KEY] || { enabled: false, tenantId: "", clientId: "",
-    scope: "", brokerUrl: "", model: "", maxInputTokens: 12000 };
-}
-
-async function saveAiConfiguration(value = {}) {
-  const configuration = { enabled: Boolean(value.enabled),
-    tenantId: String(value.tenantId || "").trim(),
-    clientId: String(value.clientId || "").trim(), scope: String(value.scope || "").trim(),
-    brokerUrl: String(value.brokerUrl || "").trim(), model: String(value.model || "").trim(),
-    maxInputTokens: Math.min(20000, Math.max(2000,
-      Number(value.maxInputTokens || 12000))) };
-  await chrome.storage.local.set({ [AI_CONFIG_KEY]: configuration });
-  globalThis.T9AiBrokerAuth.clear(); return configuration;
-}
-
 async function technicalDiagnosticsPolicyEnabled() {
   try {
     const policy = await chrome.storage.managed.get("technicalDiagnosticsEnabled");
@@ -611,13 +585,6 @@ async function technicalDiagnosticsPolicyEnabled() {
   } catch {
     return false;
   }
-}
-
-function createAiProvider(configuration) {
-  return globalThis.T9TechnicalAnalysisProvider.create({ async invoke(request) {
-    const token = await globalThis.T9AiBrokerAuth.authenticate(configuration);
-    return globalThis.T9AiBrokerTransport.invoke(configuration, token, request);
-  } });
 }
 
 async function getIssueConfiguration() {
@@ -2266,60 +2233,6 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
         break;
       }
 
-      case "T9_GET_AI_CONFIGURATION":
-        sendResponse({ ok: true, configuration: await getAiConfiguration() });
-        break;
-
-      case "T9_SAVE_AI_CONFIGURATION":
-        sendResponse({ ok: true, configuration: await saveAiConfiguration(
-          message.configuration) });
-        break;
-
-      case "T9_ANALYZE_BUG_REPORT": { // Explicit consent and user action only.
-        const configuration = await getAiConfiguration();
-        const validation = globalThis.T9AiBrokerTransport.validateConfiguration(
-          configuration);
-        if (!validation.valid) throw Object.assign(new Error(
-          validation.errors.join(" ")), { category: "not-configured" });
-        const report = await bugReportStore.load(message.bugReportId);
-        if (!report) throw new Error("Bug Report kunde inte hittas.");
-        const evidence = await getBcErrorEvidenceForRecording(report.recordingId);
-        const generation = (aiAnalysisGeneration.get(report.bugReportId) || 0) + 1;
-        aiAnalysisGeneration.set(report.bugReportId, generation);
-        const result = await createAiProvider(configuration).analyzeTechnicalBug(
-          report, evidence, message.policy || {}, configuration);
-        if (aiAnalysisGeneration.get(report.bugReportId) !== generation || result.ignored) {
-          sendResponse({ ok: true, ignored: true, reason: "superseded-analysis" });
-          break;
-        }
-        const latest = await bugReportStore.load(report.bugReportId);
-        if (!latest) { sendResponse({ ok: true, ignored: true,
-          reason: "report-removed" }); break; }
-        const latestInput = globalThis.T9AiAnalysisInput.build(latest, evidence,
-          message.policy || {});
-        if (latestInput.sourceEvidenceFingerprint !==
-          result.analysis.sourceEvidenceFingerprint) {
-          sendResponse({ ok: true, ignored: true, reason: "evidence-changed" });
-          break;
-        }
-        result.analysis.inputPolicy = globalThis.T9AiEvidencePolicy.policy(
-          message.policy || {});
-        const saved = globalThis.T9BugReportModel.attachAiAnalysis(latest,
-          result.analysis, new Date().toISOString());
-        sendResponse({ ok: true, report: await bugReportStore.save(saved),
-          analysis: result.analysis, disclosure: result.input.disclosure });
-        break;
-      }
-
-      case "T9_REMOVE_BUG_REPORT_AI_ANALYSIS": {
-        const report = await bugReportStore.load(message.bugReportId);
-        if (!report) throw new Error("Bug Report kunde inte hittas.");
-        sendResponse({ ok: true, report: await bugReportStore.save(
-          globalThis.T9BugReportModel.removeAiAnalysis(report,
-            new Date().toISOString())) });
-        break;
-      }
-
       case "T9_GET_ISSUE_CONFIGURATION":
         sendResponse({ ok: true, configuration: await getIssueConfiguration() });
         break;
@@ -2336,7 +2249,6 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
         const issuePackage = globalThis.T9IssuePackage.build(report,
           { errorEvidence: evidence }, { generatedAt: new Date().toISOString(),
             includeTelemetry: Boolean(message.options?.includeTelemetry),
-            includeAiAnalysis: Boolean(message.options?.includeAiAnalysis),
             includeCallStack: Boolean(message.options?.includeCallStack),
             includeTechnicalDetails: Boolean(
               message.options?.includeTechnicalDetails) });

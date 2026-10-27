@@ -35,7 +35,6 @@
               externalId: String(result.externalId), url: result.url,
               createdAt: result.createdAt || new Date().toISOString(),
               sourceRevision: pkg.sourceRevision,
-              includedAi: Boolean(pkg.inclusion.aiAnalysis),
               includedTelemetry: Boolean(pkg.inclusion.telemetry) },
             attachmentFailures: result.attachmentFailures || [] };
         } catch (error) { throw Object.assign(new Error(sanitizeError(error).message),
