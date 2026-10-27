@@ -32,8 +32,5 @@ and the derived timeline are read-only, escaped, and exported from the shared
 projection. Raw results are collapsed. No real
 BC/Application Insights pair was available locally; tests use synthetic data.
 
-Create Issue opens a modal Issue Package Preview without cluttering the report
-editor. It displays destination, type/configuration, title, complete description,
-selected attachments, telemetry inclusion, sensitive categories, existing
-external-reference warning, copy and offline export. Submission remains disabled
-during an active request and requires explicit review consent.
+Email PDF and Export PDF build the Issue Package locally and render it with the
+selected screenshots. Nothing is sent to an issue tracker.

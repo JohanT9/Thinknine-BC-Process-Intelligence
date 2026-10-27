@@ -1,8 +1,10 @@
 # Issue Package
 
-Issue Package is the provider-neutral, derived projection used for preview,
-copy, offline export, Azure DevOps, and GitHub. The local Bug Report and its
-referenced Canonical evidence remain authoritative.
+Issue Package is the derived, renderer-neutral projection of a Technical Bug
+Report that the PDF and email exports render. The local Bug Report and its
+referenced Canonical evidence remain authoritative. Submission to Azure DevOps
+or GitHub and the offline JSON package were removed; external issue references
+stored by earlier versions stay unchanged in the report.
 
 The deterministic builder consumes the existing Technical Report projection.
 It therefore respects visible resolved reproduction steps, human edits,
@@ -11,9 +13,8 @@ diagnostics, call-stack order, notes, and selected screenshot references. It
 does not rebuild semantics from Raw Events.
 
 The schema-version-1 package contains stable package/report IDs, source revision,
-title and sections, selected attachments, optional telemetry summary, inclusion policy, privacy categories, and provenance.
-Exact BC error and raw call-stack content are preserved. Destination formatting
-escapes markup but does not rewrite evidence.
+title and sections, selected attachments, inclusion policy, privacy categories,
+and provenance. Exact BC error and raw call-stack content are preserved.
 
 The package carries the report's document language. Markdown headings and
 structural labels use that language; captured errors, user-authored text, and
@@ -23,35 +24,14 @@ If the generated summary is identical to a captured Business Central error, the
 Markdown description omits the duplicate summary section. A distinct human
 summary is always retained.
 
-## Revision and inclusion
+## Inclusion
 
-The source revision fingerprints the Technical Report state. Editing or
-regenerating the Bug Report makes an unsubmitted package stale and submission is
-rejected until preview is regenerated. An already-created External Issue
-Reference stays historical; no destination is silently updated.
+PDF and email exports include the AL call stack when Business Central exposed
+one. They exclude telemetry and technical details.
 
-Telemetry is excluded by default and, when selected, contains only the existing
-bounded normalized summary—not raw query results.
-
-The human-readable issue description excludes environment diagnostics and the
-AL call stack by default so the recorded problem remains easy to scan. Users can
-explicitly include those details under one technical section. The provider-neutral
-offline package still preserves the structured technical fields either way.
-
-## Attachments and offline package
+## Attachments
 
 Only the dedicated error screenshot and the first selected screenshot for each
 visible reproduction step are included. Names are stable and human-readable,
 with roles `error-evidence` and `reproduction-evidence`. Originals remain
-unchanged. Annotation-composed assets may be referenced through the existing
-asset architecture; Issue Package does not redraw them.
-
-The workspace can always copy Markdown or export a portable JSON offline
-package containing a manifest, package metadata, Markdown, and selected image
-data. It contains no storage dump, Raw Events, raw telemetry, authentication
-tokens, or provider secrets. ZIP is deferred until a shared, tested archive
-utility exists; JSON avoids introducing a second ZIP implementation.
-
-The explicit future boundary is `Bug Report -> Issue Package -> Sanitization
-Policy -> Destination Adapter`. This milestone provides transparent review and
-category disclosure, not an elaborate DLP engine.
+unchanged.

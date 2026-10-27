@@ -111,10 +111,11 @@ for (const removed of ["ai-analysis-input", "ai-analysis-model", "ai-analysis-pr
     `removed AI analysis module ${removed} must not ship`);
 }
 assert.ok(fs.existsSync(path.join(root, "dist/bug-report/issue-package.js")));
-assert.ok(fs.existsSync(path.join(root,
-  "dist/bug-report/azure-devops-adapter.js")));
-assert.ok(fs.existsSync(path.join(root,
-  "dist/bug-report/github-issue-adapter.js")));
+for (const removed of ["azure-devops-adapter", "github-issue-adapter", "issue-submission-service",
+  "external-issue-auth", "issue-http-transport", "external-issue-url"]) {
+  assert.ok(!fs.existsSync(path.join(root, `dist/bug-report/${removed}.js`)),
+    `removed issue destination module ${removed} must not ship`);
+}
 const localScripts = [...dashboardHtml.matchAll(/<script\s+src="([^"]+)"/g)]
   .map(match => match[1]).filter(source => !/^https?:/i.test(source));
 assert(localScripts.length > 0);

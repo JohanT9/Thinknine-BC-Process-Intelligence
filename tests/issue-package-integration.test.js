@@ -4,9 +4,6 @@ const model = require("../src/bug-report/bug-report-model");
 const packages = require("../src/bug-report/issue-package");
 const formatter = require("../src/bug-report/issue-package-markdown");
 const generator = require("../src/bug-report/bug-report-generator");
-const azure = require("../src/bug-report/azure-devops-adapter");
-const github = require("../src/bug-report/github-issue-adapter");
-const submissions = require("../src/bug-report/issue-submission-service");
 
 const evidence = [{ errorEvidenceId: "error-1", capturedAt: "2026-08-24T10:00:00Z",
   rawMessage: "Posting **failed** <script>alert(1)</script>\nDo not alter this error.",
@@ -102,72 +99,7 @@ const changed = model.updateHumanContent(report, { expectedResult: "Changed" },
   "2026-08-24T13:00:00Z");
 assert(packages.isStale(pkg, changed, { errorEvidence: evidence }));
 
-const adoConfig = { enabled: true, organization: "org", project: "project",
-  workItemType: "Bug", tenantId: "tenant", clientId: "client",
-  scope: "499b84ac-1321-427f-aa17-267ca6975798/.default", tags: ["bc"] };
-let adoCall;
-const ado = azure.create({ async invoke(operation, request) { adoCall = { operation, request };
-  return operation === "test" ? { status: "connected" } : { destination: "org/project",
-    externalId: 123, url: "https://dev.azure.com/org/project/_workitems/edit/123" }; } });
-assert(ado.validatePackage(pkg, adoConfig).valid);
-assert(!azure.fieldMap(pkg, adoConfig)[1].value.includes("<script>"));
-
-const ghConfig = { enabled: true, repository: "owner/repository",
-  brokerUrl: "https://broker.example", tenantId: "tenant", clientId: "client",
-  scope: "api://broker/issues", labels: ["bug"] };
-let ghCall;
-const gh = github.create({ async invoke(operation, request) { ghCall = { operation, request };
-  return operation === "test" ? { status: "connected" } : {
-    destination: "owner/repository", externalId: 45,
-    url: "https://github.com/owner/repository/issues/45" }; } });
-assert(gh.validatePackage(pkg, ghConfig).warnings.length === 1);
-
-(async () => {
-  assert.strictEqual((await ado.testConnection(adoConfig)).status, "connected");
-  const service = submissions.create(ado);
-  await assert.rejects(() => service.submit(pkg, adoConfig),
-    error => error.category === "confirmation-required");
-  const created = await service.submit(pkg, adoConfig, { explicitConfirmation: true });
-  assert.strictEqual(created.reference.externalId, "123");
-  assert.strictEqual(adoCall.request.fields[0].path, "/fields/System.Title");
-  const ghCreated = await submissions.create(gh).submit(pkg, ghConfig,
-    { explicitConfirmation: true });
-  assert.strictEqual(ghCall.request.issue.labels[0], "bug");
-  assert.strictEqual(ghCreated.status, "partial-success");
-
-  let release;
-  const pendingProvider = { id: "fake", capabilities: () => ({}),
-    validatePackage: () => ({ valid: true, errors: [] }),
-    testConnection: async () => ({}), createIssue: () => new Promise(resolve => {
-      release = resolve; }) };
-  const pendingService = submissions.create(pendingProvider);
-  const pending = pendingService.submit(pkg, { destination: "x" },
-    { explicitConfirmation: true });
-  await assert.rejects(() => pendingService.submit(pkg, { destination: "x" },
-    { explicitConfirmation: true }), error => error.category === "duplicate-submission");
-  release({ destination: "x", externalId: "1", url: "https://example.test/1" });
-  await pending;
-
-  const timeout = { ...pendingProvider, id: "timeout", async createIssue() {
-    throw Object.assign(new Error("timeout"), { category: "ambiguous-timeout",
-      uncertain: true }); } };
-  await assert.rejects(() => submissions.create(timeout).submit(pkg,
-    { destination: "x" }, { explicitConfirmation: true }),
-  error => error.category === "ambiguous-timeout" && error.uncertain);
-  const unauthorized = { ...pendingProvider, id: "unauthorized", async createIssue() {
-    throw Object.assign(new Error("Authorization: Bearer sensitive"), { status: 401 }); } };
-  await assert.rejects(() => submissions.create(unauthorized).submit(pkg,
-    { destination: "x" }, { explicitConfirmation: true }),
-  error => error.category === "unauthorized" && !error.message.includes("sensitive"));
-
-  assert.strictEqual(gh.validatePackage({ ...pkg, expectedResult: "x".repeat(70000) },
-    ghConfig).valid, false);
-  const referenced = model.attachExternalIssue(report, created.reference,
-    "2026-08-24T14:00:00Z");
-  assert.strictEqual(referenced.enrichment.externalIssues[0].externalId, "123");
-  assert.strictEqual(report.enrichment.externalIssues, undefined);
-  assert(!/client_secret|access_token|refresh_token|Bearer sensitive/iu.test(
-    JSON.stringify(pkg)));
-  assert(!fs.readFileSync("src/ui/technical-report.js", "utf8").includes("innerHTML"));
-  console.log("Issue Package and destination integration tests passed.");
-})().catch(error => { console.error(error); process.exitCode = 1; });
+// External issue destinations were removed; the package stays a local projection.
+assert(!/client_secret|access_token|refresh_token|Bearer/iu.test(JSON.stringify(pkg)));
+assert(!fs.readFileSync("src/ui/technical-report.js", "utf8").includes("innerHTML"));
+console.log("Issue Package integration tests passed.");

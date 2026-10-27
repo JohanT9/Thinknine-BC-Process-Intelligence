@@ -7,8 +7,6 @@
   let currentUiLocale = globalThis.T9UiI18n.DEFAULT_LOCALE;
   let supportEmail = "";
   const t = key => globalThis.T9UiI18n.translate(key, currentUiLocale);
-  const tf = (key, values) => globalThis.T9UiI18n.format(
-    key, values, currentUiLocale);
   const send = payload => new Promise((resolve, reject) => {
     chrome.runtime.sendMessage(payload, response => {
       if (chrome.runtime.lastError) reject(chrome.runtime.lastError);
@@ -41,74 +39,14 @@
     if (!loaded.report) throw new Error(t("technical.reportNotFound"));
     const session = await send({ type: "T9_GET_SESSION_DATA",
       sessionId: loaded.report.recordingId, includeScreenshots: false });
-    const callStackInput = document.getElementById("issueIncludeCallStack");
-    const hasCallStack = (session.bcErrorEvidence || []).some(item =>
+    // Reports include the AL call stack when Business Central exposed one.
+    const includeCallStack = (session.bcErrorEvidence || []).some(item =>
       String(item.rawCallStack || "").trim());
-    callStackInput.checked = hasCallStack;
-    callStackInput.disabled = !hasCallStack;
-    document.getElementById("issueCallStackAvailability").textContent = hasCallStack
-      ? "" : `— ${t("technical.callStackUnavailable")}`;
     const store = { save: report => send({ type: "T9_SAVE_BUG_REPORT", report })
       .then(response => response.report) };
     const workspace = globalThis.T9TechnicalReportWorkspace.create({
       report: loaded.report, errorEvidence: session.bcErrorEvidence, store
     });
-    const issueConfiguration = (await send({
-      type: "T9_GET_ISSUE_CONFIGURATION" })).configuration;
-    const setValue = (id, value) => { const element = document.getElementById(id);
-      if (element.type === "checkbox") element.checked = Boolean(value);
-      else element.value = Array.isArray(value) ? value.join(", ") : value || ""; };
-    for (const [id, value] of Object.entries({ adoEnabled: issueConfiguration.azureDevOps?.enabled,
-      adoOrganization: issueConfiguration.azureDevOps?.organization,
-      adoProject: issueConfiguration.azureDevOps?.project,
-      adoWorkItemType: issueConfiguration.azureDevOps?.workItemType || "Bug",
-      adoAreaPath: issueConfiguration.azureDevOps?.areaPath,
-      adoIterationPath: issueConfiguration.azureDevOps?.iterationPath,
-      adoTags: issueConfiguration.azureDevOps?.tags,
-      adoTenantId: issueConfiguration.azureDevOps?.tenantId,
-      adoClientId: issueConfiguration.azureDevOps?.clientId,
-      adoScope: issueConfiguration.azureDevOps?.scope ||
-        "499b84ac-1321-427f-aa17-267ca6975798/.default",
-      githubEnabled: issueConfiguration.github?.enabled,
-      githubRepository: issueConfiguration.github?.repository,
-      githubLabels: issueConfiguration.github?.labels,
-      githubBrokerUrl: issueConfiguration.github?.brokerUrl,
-      githubTenantId: issueConfiguration.github?.tenantId,
-      githubClientId: issueConfiguration.github?.clientId,
-      githubScope: issueConfiguration.github?.scope })) setValue(id, value);
-    setValue("issueProvider", issueConfiguration.defaultProvider);
-    const csv = id => document.getElementById(id).value.split(",")
-      .map(value => value.trim()).filter(Boolean);
-    const issueConfigurationFromForm = () => ({
-      defaultProvider: document.getElementById("issueProvider").value,
-      azureDevOps: { enabled: document.getElementById("adoEnabled").checked,
-        organization: document.getElementById("adoOrganization").value,
-        project: document.getElementById("adoProject").value,
-        workItemType: document.getElementById("adoWorkItemType").value,
-        areaPath: document.getElementById("adoAreaPath").value,
-        iterationPath: document.getElementById("adoIterationPath").value,
-        tags: csv("adoTags"), tenantId: document.getElementById("adoTenantId").value,
-        clientId: document.getElementById("adoClientId").value,
-        scope: document.getElementById("adoScope").value },
-      github: { enabled: document.getElementById("githubEnabled").checked,
-        repository: document.getElementById("githubRepository").value,
-        labels: csv("githubLabels"), brokerUrl:
-          document.getElementById("githubBrokerUrl").value,
-        tenantId: document.getElementById("githubTenantId").value,
-        clientId: document.getElementById("githubClientId").value,
-        scope: document.getElementById("githubScope").value } });
-    async function requestIssuePermission(configuration) {
-      const origins = [];
-      if (configuration.azureDevOps.enabled && configuration.azureDevOps.organization) {
-        origins.push("https://dev.azure.com/*");
-      }
-      if (configuration.github.enabled && configuration.github.brokerUrl) {
-        origins.push(`${new URL(configuration.github.brokerUrl).origin}/*`);
-      }
-      if (origins.length && !await chrome.permissions.request({ origins })) {
-        throw new Error("Permission for the configured issue destination was not granted.");
-      }
-    }
     const mediaAssets = {};
     const recording = session.recordingHeader
       ? globalThis.T9CanonicalRecording.fromLegacyProjection(
@@ -225,60 +163,20 @@
         }
         const reportSnapshot = JSON.stringify(snapshot.report);
         const generated = await send({ type: "T9_BUILD_ISSUE_PACKAGE", bugReportId,
-          options: { includeTelemetry: document.getElementById(
-            "issueIncludeTelemetry").checked,
-            includeCallStack: document.getElementById("issueIncludeCallStack").checked,
-            includeTechnicalDetails: document.getElementById(
-              "issueIncludeTechnical").checked } });
+          options: { includeTelemetry: false, includeCallStack,
+            includeTechnicalDetails: false } });
         if (requestId !== issuePreviewRequestId) return null;
         if (JSON.stringify(workspace.state().report) !== reportSnapshot) {
           issuePreviewState = null;
           throw new Error(t("technical.requestFailed"));
         }
         issuePreviewState = generated;
-        document.getElementById("issueTitle").textContent = issuePreviewState.issuePackage.title;
-        document.getElementById("issueDescription").textContent = issuePreviewState.markdown;
-        const list = document.getElementById("issueAttachments"); list.replaceChildren();
-        for (const attachment of issuePreviewState.issuePackage.attachments) {
-          const item = document.createElement("li");
-          item.textContent = `${attachment.fileName} — ${attachment.role}`; list.append(item);
-        }
-        const pkg = issuePreviewState.issuePackage;
-        const included = t("technical.included");
-        const excluded = t("technical.excluded");
-        document.getElementById("issueTransmissionSummary").textContent = [
-          `${t("technical.destination")}: ${document.getElementById(
-            "issueProvider").value || t("technical.offlineOnly")}`,
-          `${t("technical.telemetry")}: ${pkg.inclusion.telemetry ? included : excluded}`,
-          `${t("technical.callStack")}: ${pkg.inclusion.callStack ? included : excluded}`,
-          `${t("technical.technicalDetails")}: ${pkg.inclusion.technicalDetails
-            ? included : excluded}`,
-          `${t("technical.attachments")}: ${pkg.attachments.length}`,
-          `${t("technical.sensitiveCategories")}: ${pkg.privacy.categories.join(", ")}`
-        ].join(" · ");
-        document.getElementById("issueResult").textContent =
-          issuePreviewState.existingReferences.length ?
-            "Warning: this report already has an external issue reference." : "Package is current.";
         return generated;
       })();
       issuePreviewPending = pending;
       const generated = await pending;
       return requestId === issuePreviewRequestId ? generated :
         issuePreviewPending || issuePreviewState;
-    }
-    function updateShareUi() {
-      const provider = document.getElementById("issueProvider").value;
-      const external = Boolean(provider);
-      document.getElementById("issueConsentRow").hidden = !external;
-      document.getElementById("issueDuplicateRow").hidden = !external;
-      document.getElementById("adoConfiguration").hidden =
-        provider !== "azure-devops";
-      document.getElementById("githubConfiguration").hidden =
-        provider !== "github";
-      document.getElementById("shareReport").textContent = external
-        ? globalThis.T9UiI18n.translateStaticText("Create Issue", currentUiLocale)
-        : globalThis.T9UiI18n.translateStaticText("Download report package",
-          currentUiLocale);
     }
     async function loadIssuePackageAttachments() {
       const attachments = issuePreviewState?.issuePackage?.attachments || [];
@@ -302,57 +200,6 @@
       const missingCount = offlineAttachments.filter(item => !item.dataUrl).length;
       return { attachments: offlineAttachments.filter(item => item.dataUrl),
         missingCount: Math.max(missingCount, result.missingPaths.length) };
-    }
-    document.getElementById("issueProvider").addEventListener("change", action(async () => {
-      issuePreviewState = null; updateShareUi(); await generateIssuePreview();
-    }));
-    for (const id of ["issueIncludeTelemetry", "issueIncludeCallStack",
-      "issueIncludeTechnical"]) {
-      document.getElementById(id).addEventListener("change", action(async () => {
-        issuePreviewState = null; await generateIssuePreview();
-      }));
-    }
-    document.getElementById("saveIssueConfiguration").addEventListener("click", action(async () => {
-      const configuration = issueConfigurationFromForm();
-      await requestIssuePermission(configuration);
-      await send({ type: "T9_SAVE_ISSUE_CONFIGURATION", configuration });
-      document.getElementById("issueResult").textContent =
-        "Public destination configuration saved. No token or secret was stored.";
-    }));
-    const testIssueConnection = provider => action(async () => {
-      const configuration = issueConfigurationFromForm(); await requestIssuePermission(configuration);
-      await send({ type: "T9_SAVE_ISSUE_CONFIGURATION", configuration });
-      const response = await send({ type: "T9_TEST_ISSUE_CONNECTION", provider });
-      document.getElementById("issueResult").textContent =
-        `${provider} connection: ${response.result.status || "connected"}.`;
-    });
-    document.getElementById("testAdoConnection").addEventListener("click",
-      testIssueConnection("azure-devops"));
-    document.getElementById("testGithubConnection").addEventListener("click",
-      testIssueConnection("github"));
-    document.getElementById("copyIssueDescription").addEventListener("click", action(async () => {
-      if (!issuePreviewState) await generateIssuePreview();
-      await navigator.clipboard.writeText(issuePreviewState.markdown);
-      document.getElementById("issueResult").textContent =
-        t("technical.issueCopied");
-    }));
-    async function downloadOfflinePackage() {
-      if (!issuePreviewState) await generateIssuePreview();
-      const imageResult = await loadIssuePackageAttachments();
-      if (imageResult.missingCount) message.textContent =
-        t("technical.someImagesMissing");
-      const offline = { manifest: { schemaVersion: 1,
-        packageId: issuePreviewState.issuePackage.packageId,
-        sourceRevision: issuePreviewState.issuePackage.sourceRevision,
-        files: ["bug-report.md", ...imageResult.attachments.map(item =>
-          item.fileName)] }, issuePackage: issuePreviewState.issuePackage,
-        bugReportMarkdown: issuePreviewState.markdown,
-        attachments: imageResult.attachments };
-      await download(JSON.stringify(offline, null, 2), `${bugReportId}-issue-package.json`);
-      document.getElementById("issueResult").textContent = [
-        t("technical.packageExported"), imageResult.missingCount
-          ? t("technical.someImagesMissing") : ""
-      ].filter(Boolean).join(" ");
     }
     let preparedEmail = null;
     const outlookClient = globalThis.T9OutlookDraft.create({ identity: chrome.identity,
@@ -401,55 +248,6 @@
         currentUiLocale), imageResult.missingCount
           ? t("technical.someImagesMissing") : ""].filter(Boolean).join(" ");
     }
-    async function submitExternalIssue() {
-      if (!document.getElementById("issueConsent").checked) throw new Error(
-        t("technical.submissionConsent"));
-      const provider = document.getElementById("issueProvider").value;
-      if (!provider) throw new Error(t("technical.selectProvider"));
-      const button = document.getElementById("shareReport"); button.disabled = true;
-      const submissionControls = ["issueProvider", "issueConsent",
-        "issueConfirmDuplicate", "issueIncludeTelemetry", "issueIncludeCallStack", "issueIncludeTechnical"].map(id =>
-        document.getElementById(id)).filter(Boolean);
-      const priorDisabledStates = submissionControls.map(control => control.disabled);
-      submissionControls.forEach(control => { control.disabled = true; });
-      try {
-        if (!issuePreviewState) await generateIssuePreview();
-        const response = await send({ type: "T9_CREATE_EXTERNAL_ISSUE", bugReportId,
-          provider, issuePackage: issuePreviewState.issuePackage,
-          confirmDuplicate: document.getElementById("issueConfirmDuplicate").checked });
-        const reference = response.result.reference;
-        const result = document.getElementById("issueResult"); result.replaceChildren();
-        const attachmentFailureCount = response.result.attachmentFailures?.length || 0;
-        const createdText = attachmentFailureCount
-          ? tf(attachmentFailureCount === 1
-            ? "technical.issueCreatedOneAttachmentFailed"
-            : "technical.issueCreatedManyAttachmentsFailed",
-          { id: reference.externalId, count: attachmentFailureCount })
-          : tf("technical.issueCreated", { id: reference.externalId });
-        result.append(document.createTextNode(createdText + " "));
-        if (response.referenceSaved === false) {
-          result.append(document.createTextNode(t("technical.issueReferenceNotSaved") + " "));
-        }
-        const safeIssueUrl = globalThis.T9ExternalIssueUrl.safe(reference.url);
-        if (safeIssueUrl) {
-          const link = document.createElement("a"); link.href = safeIssueUrl;
-          link.target = "_blank"; link.rel = "noopener noreferrer";
-          link.textContent = t("technical.openExternalIssue"); result.append(link);
-        } else {
-          result.append(document.createTextNode(tf(
-            "technical.issueLinkUnavailable", { id: reference.externalId })));
-        }
-      } finally {
-        button.disabled = false;
-        submissionControls.forEach((control, index) => {
-          control.disabled = priorDisabledStates[index];
-        });
-      }
-    }
-    document.getElementById("shareReport").addEventListener("click", action(async () => {
-      if (document.getElementById("issueProvider").value) await submitExternalIssue();
-      else await downloadOfflinePackage();
-    }));
     const emailChoice = document.getElementById("emailChoice");
     const outlookButton = document.getElementById("outlookDraft");
     const outlookStatus = document.getElementById("outlookStatus");

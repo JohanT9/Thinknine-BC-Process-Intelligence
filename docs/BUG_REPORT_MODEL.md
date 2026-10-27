@@ -22,7 +22,7 @@ BugReport
   evidence: screenshot/diagnostic/attachment references
   notes / annotations (human)
   traceability
-  enrichment: optional telemetry and external issue references
+  enrichment: optional telemetry (external issue references from earlier versions are kept)
 ```
 
 Statuses are deliberately limited to `draft`, `ready`, `resolved`, and

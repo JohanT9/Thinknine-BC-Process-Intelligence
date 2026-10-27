@@ -52,7 +52,7 @@ Current product areas:
 
 ## Report a Business Central bug
 
-Open the extension while Business Central is active and choose **Report a Bug**. Reproduce the problem, then choose **Stop and open bug report**. BC Process Studio creates and opens a local draft with reproduction steps, screenshots, captured BC error evidence, and technical diagnostics when available. Add the expected result and any missing business context, then copy or export locally—or explicitly preview and submit to a configured issue destination. Telemetry, AI analysis, and external integrations are optional.
+Open the extension while Business Central is active and choose **Report a Bug**. Reproduce the problem, then choose **Stop and open bug report**. BC Process Studio creates and opens a local draft with reproduction steps, screenshots, captured BC error evidence, and technical diagnostics when available. Add the expected result and any missing business context, then email it as a PDF or export it locally. Telemetry is optional.
 
 Both process and bug recording start immediately. When you select Stop, enter
 the final process or report name and confirm its document language in the naming
@@ -1130,9 +1130,5 @@ kommentarsfält har programmatiskt kopplade labels, kontextknappar annonserar
 aktuellt steg och granskningsförloppet exponeras som en progressbar med aktuellt
 procentvärde. En visuellt dold hjälptext beskriver selection, redigering och
 tangentbordsflyttning för skärmläsare.
-Completed Technical Bug Reports can also be previewed as provider-neutral Issue
-Packages, copied/exported offline, or explicitly submitted to configured Azure
-DevOps or GitHub destinations. Azure DevOps uses Entra PKCE; GitHub uses an
-administrator GitHub App broker. No destination credential is stored in report
-data, and ordinary recording/documentation is unaffected. See
-`docs/ISSUE_PACKAGE.md`.
+Completed Technical Bug Reports are shared as PDF by email or exported as PDF or
+Markdown. See `docs/ISSUE_PACKAGE.md`.
