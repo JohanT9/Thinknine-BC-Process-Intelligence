@@ -28673,7 +28673,8 @@
     text(model.title, 20, bold);
     y -= 10;
     informationCard();
-    if (model.severity) text(`${label("Severity", "Allvarlighetsgrad")}: ${model.severity}`, 11, bold, teal);
+    const severityNames = { Low: "L\xE5g", Medium: "Medel", High: "H\xF6g", Critical: "Kritisk" };
+    if (model.severity) text(`${label("Severity", "Allvarlighetsgrad")}: ${severityNames[model.severity] ? label(model.severity, severityNames[model.severity]) : model.severity}`, 11, bold, teal);
     y -= 6;
     directLinks();
     y -= 10;

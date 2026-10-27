@@ -15,6 +15,8 @@
           [`- ${label}: ${value(child)}`];
     });
   }
+  // Severity is stored in English; exports show it in the document language.
+  const SEVERITY_NAMES = Object.freeze({ Low: "Låg", Medium: "Medel", High: "Hög", Critical: "Kritisk" });
   function markdown(document) {
     const locale = languages.normalize(document.documentLanguage, "document");
     const localized = (english, swedish) => languages.translate(english, locale,
@@ -28,7 +30,9 @@
     const summary = byId.get("summary").content;
     add(byId.get("summary").title, [value(summary.summary),
       `Status: ${value(summary.status)}`,
-      ...(summary.severity ? [`${localized("Severity", "Allvarlighetsgrad")}: ${summary.severity}`] : []),
+      ...(summary.severity ? [`${localized("Severity", "Allvarlighetsgrad")}: ${
+        SEVERITY_NAMES[summary.severity] ? localized(summary.severity,
+          SEVERITY_NAMES[summary.severity]) : summary.severity}`] : []),
       ...(summary.category ? [`${localized("Category", "Kategori")}: ${summary.category}`] : [])]);
     add(byId.get("environment").title, metadataRows(byId.get("environment").content));
     const reproduction = byId.get("reproduction").content;

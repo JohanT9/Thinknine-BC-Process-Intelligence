@@ -34,7 +34,10 @@
       localized("Business Central error", "Business Central-fel"));
     const severity = ["Low", "Medium", "High", "Critical"].find(value =>
       value.toLowerCase() === cleanHeader(issuePackage?.summary?.severity).toLowerCase());
-    const subject = severity ? `${title} - ${localized("Severity", "Nivå")} ${severity}` : title;
+    // Severity is stored in English; the subject shows it in the report language.
+    const severityNames = { Low: "Låg", Medium: "Medel", High: "Hög", Critical: "Kritisk" };
+    const subject = severity ? `${title} - ${localized("Severity", "Nivå")} ${
+      localized(severity, severityNames[severity])}` : title;
     const importance = severity === "Critical" ? "high" : severity === "Low" ? "low" : "normal";
     const priority = importance === "high" ? "1" : importance === "low" ? "5" : "3";
     const attachmentName = `${safeName(title)}-${safeName(localized("error report", "felrapport"))}.json`;

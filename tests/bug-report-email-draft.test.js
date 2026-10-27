@@ -9,8 +9,10 @@ assert.strictEqual(draft.to, "support@example.com");
 for (const severity of ["", "1", "Low", "Medium", "High", "Critical"]) {
   const result = email.build({ title: "Fel vid registrering", summary: { severity } }, "{}",
     { to: "support@example.com", locale: "sv-SE" });
+  // The subject shows severity in the report language; priority headers use the stored value.
+  const swedishSeverity = { Low: "Låg", Medium: "Medel", High: "Hög", Critical: "Kritisk" }[severity];
   const expected = severity && severity !== "1"
-    ? `Fel vid registrering - Nivå ${severity}` : "Fel vid registrering";
+    ? `Fel vid registrering - Nivå ${swedishSeverity}` : "Fel vid registrering";
   assert.strictEqual(result.subject, expected);
   const importance = severity === "Critical" ? "high" : severity === "Low" ? "low" : "normal";
   const priority = severity === "Critical" ? "1" : severity === "Low" ? "5" : "3";

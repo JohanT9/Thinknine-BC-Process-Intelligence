@@ -49,7 +49,8 @@ const result = word.createDocx(
   zipWriter
 );
 
-const output = path.join(__dirname, "sample-mixed-images.docx");
+// Written outside the repository so test runs do not modify tracked sample files.
+const output = path.join(require("os").tmpdir(), "bc-process-studio-sample-mixed-images.docx");
 fs.writeFileSync(output, result.bytes);
 
 assert.strictEqual(result.imageCount, 2);

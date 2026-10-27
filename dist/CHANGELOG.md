@@ -1,4 +1,6 @@
 ## Unreleased
+- Show bug report severity in the document language in the PDF, the email subject and the text export; email priority headers still use the stored value.
+- Write Word export test output to the system temp folder so test runs no longer modify the committed sample documents.
 - Show the license type and validity in the popup only for a checked, active license instead of "License type: — · Valid until: No expiry date".
 - Show bug report severity options in the interface language, with "Not set" for the empty choice; stored values are unchanged.
 - Show text colour names and the bold/italic button letters in the Review editor in the interface language (for example B/I in English and F/K in German).
