@@ -4116,7 +4116,7 @@ function processAnalysisLabels() {
         "Invoice": "Fakturera", "Post": "Bokför", "Unknown step": "Okänt steg",
         "Inventory Movement": "Lagerflyttning", "Assembly to Stock": "Montering mot lager",
         "Sales Returns": "Försäljningsreturer", "Purchase Returns": "Inköpsreturer",
-        "Warehouse Movement": "Lagerförflyttning", "Item Tracking": "Artikelspårning",
+        "Item Tracking": "Artikelspårning",
         "Lot Tracking": "Partispårning", "Serial Tracking": "Serienummerspårning",
         "Expiration Date Handling": "Hantering av utgångsdatum",
         "Assign Lot Number": "Tilldela partinummer",
@@ -6485,11 +6485,24 @@ function renderStoredReviewFallback(error) {
   console.error("Review rendering fallback", error);
 }
 
+// Labels for the knowledge explanation panel, in the document language.
+const KNOWLEDGE_EXPLANATION_TEXT = {
+  "sv-SE": { include:"Ta med förklaringen i Word", edit:"Redigera förslagstext", reset:"Återställ förslaget", save:"Spara text", cancel:"Avbryt", prompt:"Förklaring på svenska", edited:"Egen redigering", empty:"Ange en förklaringstext." },
+  "en-US": { include:"Include explanation in Word", edit:"Edit suggested text", reset:"Restore suggestion", save:"Save text", cancel:"Cancel", prompt:"Explanation in English", edited:"Your edited explanation", empty:"Enter an explanation." },
+  "fr-FR": { include:"Inclure l’explication dans Word", edit:"Modifier le texte proposé", reset:"Rétablir la suggestion", save:"Enregistrer le texte", cancel:"Annuler", prompt:"Explication en français", edited:"Votre texte modifié", empty:"Saisissez une explication." },
+  "de-DE": { include:"Erklärung in Word übernehmen", edit:"Vorschlag bearbeiten", reset:"Vorschlag wiederherstellen", save:"Text speichern", cancel:"Abbrechen", prompt:"Erläuterung auf Deutsch", edited:"Ihre bearbeitete Erläuterung", empty:"Geben Sie eine Erläuterung ein." },
+  "es-ES": { include:"Incluir explicación en Word", edit:"Editar el texto sugerido", reset:"Restablecer la sugerencia", save:"Guardar texto", cancel:"Cancelar", prompt:"Explicación en español", edited:"Explicación editada", empty:"Escriba una explicación." },
+  "da-DK": { include:"Medtag forklaringen i Word", edit:"Rediger forslagsteksten", reset:"Gendan forslaget", save:"Gem tekst", cancel:"Annuller", prompt:"Forklaring på dansk", edited:"Din redigerede forklaring", empty:"Angiv en forklaring." },
+  "fi-FI": { include:"Sisällytä selitys Wordiin", edit:"Muokkaa ehdotustekstiä", reset:"Palauta ehdotus", save:"Tallenna teksti", cancel:"Peruuta", prompt:"Selitys suomeksi", edited:"Muokattu selityksesi", empty:"Kirjoita selitys." },
+  "nb-NO": { include:"Ta med forklaringen i Word", edit:"Rediger forslagsteksten", reset:"Gjenopprett forslaget", save:"Lagre tekst", cancel:"Avbryt", prompt:"Forklaring på norsk", edited:"Din redigerte forklaring", empty:"Skriv inn en forklaring." }
+};
+
 function knowledgeExplanationMarkup(task) {
   if (!task?.contextualExplanationRuleId ||
       (!(["observed-workflow", "authored-process", "page-context"].includes(task.contextualExplanationBasis)) &&
         !(task?.contextualExplanationSources || []).some(source =>
-          String(source?.sourceUri || "").startsWith("https://learn.microsoft.com/")))) return "";
+          /^https:\/\/(?:learn\.microsoft\.com\/|erpdocs\.apteancloud\.com\/bc\/docs\/)/u
+            .test(String(source?.sourceUri || ""))))) return "";
   const language = activeDocumentLanguage();
   const explanations = task.contextualExplanations || {};
   const overrides = task.contextualExplanationOverrides || {};
@@ -6503,35 +6516,30 @@ function knowledgeExplanationMarkup(task) {
     "es-ES": ["Qué hace esta acción", "Fuente"], "da-DK": ["Hvad handlingen gør", "Kilde"],
     "fi-FI": ["Mitä toiminto tekee", "Lähde"], "nb-NO": ["Hva handlingen gjør", "Kilde"]
   };
-  const text = {
-    "sv-SE": { include:"Ta med förklaringen i Word", edit:"Redigera förslagstext", reset:"Återställ förslaget", save:"Spara text", cancel:"Avbryt", prompt:"Förklaring på svenska", edited:"Egen redigering", empty:"Ange en förklaringstext.", empty:"Ange en förklaringstext." },
-    "en-US": { include:"Include explanation in Word", edit:"Edit suggested text", reset:"Restore suggestion", save:"Save text", cancel:"Cancel", prompt:"Explanation in English", edited:"Your edited explanation", empty:"Enter an explanation.", empty:"Enter an explanation." },
-    "fr-FR": { include:"Inclure l’explication dans Word", edit:"Modifier le texte proposé", reset:"Rétablir la suggestion", save:"Enregistrer le texte", cancel:"Annuler", prompt:"Explication en français", edited:"Votre texte modifié", empty:"Saisissez une explication.", empty:"Saisissez une explication." },
-    "de-DE": { include:"Erklärung in Word übernehmen", edit:"Vorschlag bearbeiten", reset:"Vorschlag wiederherstellen", save:"Text speichern", cancel:"Abbrechen", prompt:"Erläuterung auf Deutsch", edited:"Ihre bearbeitete Erläuterung", empty:"Geben Sie eine Erläuterung ein.", empty:"Geben Sie eine Erläuterung ein." },
-    "es-ES": { include:"Incluir explicación en Word", edit:"Editar el texto sugerido", reset:"Restablecer la sugerencia", save:"Guardar texto", cancel:"Cancelar", prompt:"Explicación en español", edited:"Explicación editada", empty:"Escriba una explicación.", empty:"Escriba una explicación." },
-    "da-DK": { include:"Medtag forklaringen i Word", edit:"Rediger forslagsteksten", reset:"Gendan forslaget", save:"Gem tekst", cancel:"Annuller", prompt:"Forklaring på dansk", edited:"Din redigerede forklaring", empty:"Angiv en forklaring.", empty:"Angiv en forklaring." },
-    "fi-FI": { include:"Sisällytä selitys Wordiin", edit:"Muokkaa ehdotustekstiä", reset:"Palauta ehdotus", save:"Tallenna teksti", cancel:"Peruuta", prompt:"Selitys suomeksi", edited:"Muokattu selityksesi", empty:"Kirjoita selitys.", empty:"Kirjoita selitys." },
-    "nb-NO": { include:"Ta med forklaringen i Word", edit:"Rediger forslagsteksten", reset:"Gjenopprett forslaget", save:"Lagre tekst", cancel:"Avbryt", prompt:"Forklaring på norsk", edited:"Din redigerte forklaring", empty:"Skriv inn en forklaring.", empty:"Skriv inn en forklaring." }
-  };
-  const labelsForLanguage = text[language] || text["en-US"];
+  const labelsForLanguage = KNOWLEDGE_EXPLANATION_TEXT[language] ||
+    KNOWLEDGE_EXPLANATION_TEXT["en-US"];
   const [defaultHeading, sourceLabel] = labels[language] || labels["en-US"];
   const observedLabels = { "sv-SE": ["Förklaring utifrån observerat arbetsflöde", "Grundad på det inspelade arbetsflödet; inte Microsoft Learn."], "en-US": ["Explanation based on observed workflow", "Based on the recorded workflow; not Microsoft Learn."], "fr-FR": ["Explication fondée sur le flux observé", "Fondée sur le flux enregistré ; ne provient pas de Microsoft Learn."], "de-DE": ["Erläuterung zum beobachteten Ablauf", "Basiert auf dem aufgezeichneten Ablauf; nicht aus Microsoft Learn."], "es-ES": ["Explicación basada en el flujo observado", "Basada en el flujo grabado; no procede de Microsoft Learn."], "da-DK": ["Forklaring ud fra observeret arbejdsgang", "Baseret på den optagede arbejdsgang; ikke Microsoft Learn."], "fi-FI": ["Havaittuun työnkulkuun perustuva selitys", "Perustuu tallennettuun työnkulkuun; ei Microsoft Learn -sisältöä."], "nb-NO": ["Forklaring basert på observert arbeidsflyt", "Basert på den innspilte arbeidsflyten; ikke Microsoft Learn." ] };
   const authoredLabels = { "sv-SE": ["Förklaring av arbetsmomentet", "Allmän processförklaring; inte Microsoft Learn."], "en-US": ["Explanation of this process action", "General process explanation; not Microsoft Learn."], "fr-FR": ["Explication de cette action", "Explication générale du processus ; ne provient pas de Microsoft Learn."], "de-DE": ["Erläuterung zu diesem Arbeitsschritt", "Allgemeine Prozesserläuterung; nicht aus Microsoft Learn."], "es-ES": ["Explicación de esta acción del proceso", "Explicación general del proceso; no procede de Microsoft Learn."], "da-DK": ["Forklaring af dette arbejdstrin", "Generel procesforklaring; ikke Microsoft Learn."], "fi-FI": ["Selitys tästä työvaiheesta", "Yleinen prosessiselitys; ei Microsoft Learn -sisältöä."], "nb-NO": ["Forklaring av dette prosesstrinnet", "Generell prosessforklaring; ikke Microsoft Learn."] };
   const pageContextLabels = { "sv-SE": ["Förklaring utifrån sidkontext", "Utgår från identifierad sida och posttyp; inte Microsoft Learn."], "en-US": ["Explanation from page context", "Based on the identified page and record type; not Microsoft Learn."], "fr-FR": ["Explication selon le contexte de la page", "Fondée sur la page et le type identifiés ; ne provient pas de Microsoft Learn."], "de-DE": ["Erläuterung aus dem Seitenkontext", "Basiert auf der erkannten Seite und dem Datensatztyp; nicht aus Microsoft Learn."], "es-ES": ["Explicación según el contexto de la página", "Basada en la página y el tipo identificados; no procede de Microsoft Learn."], "da-DK": ["Forklaring ud fra sidekonteksten", "Baseret på den identificerede side og posttype; ikke Microsoft Learn."], "fi-FI": ["Sivukontekstiin perustuva selitys", "Perustuu tunnistettuun sivuun ja tietuetyyppiin; ei Microsoft Learn -sisältöä."], "nb-NO": ["Forklaring ut fra sidekonteksten", "Basert på identifisert side og posttype; ikke Microsoft Learn."] };
   const basisLabels = task.contextualExplanationBasis === "observed-workflow" ? observedLabels
     : task.contextualExplanationBasis === "authored-process" ? authoredLabels : null;
-  const labelsForBasis = task.contextualExplanationBasis === "page-context" ? pageContextLabels : basisLabels;
+  const vendorLabels = { "sv-SE": ["Förklaring från leverantörens dokumentation", "Grundad på tilläggsleverantörens dokumentation; inte Microsoft Learn."], "en-US": ["Explanation from vendor documentation", "Based on the extension vendor's documentation; not Microsoft Learn."], "fr-FR": ["Explication issue de la documentation de l’éditeur", "Fondée sur la documentation de l’éditeur de l’extension ; ne provient pas de Microsoft Learn."], "de-DE": ["Erläuterung aus der Herstellerdokumentation", "Basiert auf der Dokumentation des Erweiterungsherstellers; nicht aus Microsoft Learn."], "es-ES": ["Explicación según la documentación del proveedor", "Basada en la documentación del proveedor de la extensión; no procede de Microsoft Learn."], "da-DK": ["Forklaring fra leverandørens dokumentation", "Baseret på udvidelsesleverandørens dokumentation; ikke Microsoft Learn."], "fi-FI": ["Selitys toimittajan dokumentaatiosta", "Perustuu laajennuksen toimittajan dokumentaatioon; ei Microsoft Learnista."], "nb-NO": ["Forklaring fra leverandørens dokumentasjon", "Basert på utvidelsesleverandørens dokumentasjon; ikke Microsoft Learn."] };
+  const labelsForBasis = task.contextualExplanationBasis === "page-context" ? pageContextLabels
+    : task.contextualExplanationBasis === "vendor-documentation" ? vendorLabels : basisLabels;
   const [heading, observedBasisLabel] = labelsForBasis
     ? labelsForBasis[language] || labelsForBasis["en-US"] : [defaultHeading, ""];
   const sources = task.contextualExplanationSources || [];
   const localePath = `/${language.toLowerCase()}/`;
   const source = sources.find(item => item.sourceUri?.includes(localePath)) ||
     sources.find(item => item.sourceUri?.includes("/en-us/")) || sources[0];
-  const sourceUri = String(source?.sourceUri || "").startsWith("https://learn.microsoft.com/")
-    ? source.sourceUri : "";
+  // Only official documentation is linked: Microsoft Learn or the Aptean docs.
+  const sourceUri = /^https:\/\/(?:learn\.microsoft\.com\/|erpdocs\.apteancloud\.com\/bc\/docs\/)/u
+    .test(String(source?.sourceUri || "")) ? source.sourceUri : "";
   return `<aside class="review-knowledge-explanation" data-knowledge-explanation>
     <strong>${escapeHtml(hasOverride ? labelsForLanguage.edited : heading)}</strong>
     <p data-knowledge-explanation-display>${escapeHtml(explanation)}</p>
+    ${observedBasisLabel && !hasOverride ? `<span class="review-knowledge-basis">${escapeHtml(observedBasisLabel)}</span>` : ""}
     ${sourceUri ? `<span class="review-knowledge-source">${escapeHtml(sourceLabel)}: <a href="${escapeHtml(sourceUri)}" target="_blank" rel="noopener noreferrer">${escapeHtml(source.title || "Microsoft Learn")}</a></span>` : ""}
     <div class="review-knowledge-explanation-editor" data-knowledge-explanation-editor hidden>
       <label>${escapeHtml(labelsForLanguage.prompt)}<textarea data-knowledge-explanation-input rows="4" maxlength="2000" required>${escapeHtml(explanation)}</textarea></label>
@@ -6578,31 +6586,6 @@ function instructionSelectionOffsets(editor) {
   const anchor = offset(selection.anchorNode, selection.anchorOffset);
   const focus = offset(selection.focusNode, selection.focusOffset);
   return { start: Math.min(anchor, focus), end: Math.max(anchor, focus) };
-}
-
-function restoreInstructionSelection(editor, start, end) {
-  const range = document.createRange();
-  const selection = globalThis.getSelection?.();
-  let offset = 0;
-  let startPoint = null;
-  let endPoint = null;
-  const walker = document.createTreeWalker(editor, NodeFilter.SHOW_TEXT);
-  let node;
-  while ((node = walker.nextNode())) {
-    const next = offset + node.textContent.length;
-    if (!startPoint && start <= next) startPoint = [node, start - offset];
-    if (!endPoint && end <= next) { endPoint = [node, end - offset]; break; }
-    offset = next;
-  }
-  const fallback = editor.lastChild || editor;
-  const fallbackOffset = fallback.nodeType === Node.TEXT_NODE
-    ? fallback.textContent.length : fallback.childNodes.length;
-  startPoint ||= [fallback, fallbackOffset];
-  endPoint ||= [fallback, fallbackOffset];
-  range.setStart(...startPoint);
-  range.setEnd(...endPoint);
-  selection?.removeAllRanges();
-  selection?.addRange(range);
 }
 
 function instructionRunsFromEditor(editor) {
@@ -7348,7 +7331,8 @@ function renderReviewContent() {
         const panel = event.currentTarget.closest("[data-knowledge-explanation]");
         const input = panel.querySelector("[data-knowledge-explanation-input]");
         const value = input.value.trim();
-        if (!value) { input.setCustomValidity(labelsForLanguage.empty); input.reportValidity(); return; }
+        if (!value) { input.setCustomValidity((KNOWLEDGE_EXPLANATION_TEXT[activeDocumentLanguage()] ||
+          KNOWLEDGE_EXPLANATION_TEXT["en-US"]).empty); input.reportValidity(); return; }
         input.setCustomValidity("");
         globalThis.T9Review.editTask(activeReview, actualIndex, {
           contextualExplanationOverrides: {
@@ -8824,7 +8808,7 @@ $("annotationSurface").addEventListener("pointerup", event => {
     releaseActiveAnnotationPointer();
   }
 });
-$("annotationSurface").addEventListener("pointercancel", event => {
+$("annotationSurface").addEventListener("pointercancel", () => {
   if (!annotationEditorState?.draft && !annotationEditorState?.translation) return;
   try {
     annotationEditorState = globalThis.T9ReviewAnnotationEditor.cancel(

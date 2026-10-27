@@ -167,7 +167,7 @@ const sourceCode = fs.readFileSync(
 );
 for (const forbidden of ["../review/", "../ui/", "../exporters/", "document-planner",
   "screenshot-intelligence", "language-excellence"]) {
-  assert.ok(!sourceCode.includes(`require(\"${forbidden}`),
+  assert.ok(!sourceCode.includes(`require("${forbidden}`),
     `Presentation Grammar must not import ${forbidden}.`);
 }
 

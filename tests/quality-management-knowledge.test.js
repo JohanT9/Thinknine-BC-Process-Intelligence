@@ -5,7 +5,6 @@ const root = path.resolve(__dirname, '..');
 const knowledge = require('../src/engine/knowledge-domain');
 const repositoryApi = require('../src/engine/knowledge-repository');
 const pipeline = require('../src/engine/session-interpretation-pipeline');
-const projector = require('../src/document/review-document-projector');
 const locales = require('../src/engine/language-registry').supported().map(x => x.locale).sort();
 const manifest = require('../src/knowledge-packs/index.json');
 const packs = manifest.packs.filter(p => p.enabled).map(p =>

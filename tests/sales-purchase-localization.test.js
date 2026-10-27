@@ -137,7 +137,7 @@ const invoiceCases=[
  ['nb-NO','Kjøpsfaktura','Hent mottakslinjer','Hent ordrelinjer','Salgsfakturaer','Hent leveringslinjer']
 ];
 for(const [locale,purchasePage,receipt,order,salesPage,shipment] of invoiceCases){
- for(const [packId,page,action,ruleId,sourcePrefix] of [['bc-purchase',purchasePage,receipt,'Purchase.GetReceiptLines','microsoft-learn-purchase-combine-invoice'],['bc-purchase',purchasePage,order,'Purchase.GetOrderLines','microsoft-learn-purchase-combine-invoice'],['bc-sales',salesPage,shipment,'Sales.GetShipmentLines','microsoft-learn-sales-combine-shipments']]){
+ for(const [,page,action,ruleId,sourcePrefix] of [['bc-purchase',purchasePage,receipt,'Purchase.GetReceiptLines','microsoft-learn-purchase-combine-invoice'],['bc-purchase',purchasePage,order,'Purchase.GetOrderLines','microsoft-learn-purchase-combine-invoice'],['bc-sales',salesPage,shipment,'Sales.GetShipmentLines','microsoft-learn-sales-combine-shipments']]){
   const result=repo.resolveAction({language:locale,context:{pageCaption:page,actionCaption:action}});
   assert.equal(result.status,'resolved',locale+' '+ruleId);assert.equal(result.candidates[0].provenance.ruleId,ruleId);assert.equal(result.candidates[0].provenance.language,locale);assert.ok(result.candidates[0].provenance.sourceRefs.some(x=>x.sourceId.startsWith(sourcePrefix)&&x.sourceId.endsWith(locale==='en-US'?'':`-${locale.slice(0,2).toLowerCase()}`)),locale+' '+ruleId+' source');
  }

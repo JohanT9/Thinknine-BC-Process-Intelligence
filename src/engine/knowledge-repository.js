@@ -17,7 +17,6 @@ function (adapter, knowledge, pageEngine) {
   const object = value => value && typeof value === "object" && !Array.isArray(value);
   const array = value => Array.isArray(value) ? value : [];
   const str = value => typeof value === "string" || typeof value === "number" ? String(value).trim() : "";
-  const unique = items => [...new Set(items)];
   const freeze = value => {
     if (!value || typeof value !== "object" || Object.isFrozen(value)) return value;
     Object.values(value).forEach(freeze); return Object.freeze(value);

@@ -1,3 +1,4 @@
+/* global Buffer -- used only after a typeof check when running in Node. */
 (function (root, factory) {
   const languages = typeof module === "object" && module.exports
     ? require("../engine/language-registry") : root.T9LanguageRegistry;

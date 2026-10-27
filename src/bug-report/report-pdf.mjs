@@ -1,3 +1,4 @@
+/* global Buffer -- used only after a typeof check when running in Node. */
 import languages from "../engine/language-registry.js";
 import { PDFDocument, StandardFonts, rgb, PDFString } from "pdf-lib";
 import JSZip from "jszip";

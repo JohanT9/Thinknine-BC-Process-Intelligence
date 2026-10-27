@@ -539,7 +539,6 @@
   }
 
   function globalComponents(document, theme) {
-    const localizedLanguage = languages.normalize(document.metadata?.documentLanguage) !== "sv-SE";
     const label = (en, sv) => languages.translate(en, document.metadata?.documentLanguage, sv);
     const branding = supports(theme, "supportsBranding")
       ? clone(theme.branding)

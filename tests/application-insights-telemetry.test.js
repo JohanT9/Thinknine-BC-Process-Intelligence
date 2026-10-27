@@ -1,7 +1,6 @@
 const assert = require("assert");
 const fs = require("fs");
 const definitions = require("../src/bug-report/telemetry-query-definitions");
-const enrichment = require("../src/bug-report/telemetry-enrichment");
 const providerModule = require("../src/bug-report/application-insights-provider");
 const reportModel = require("../src/bug-report/bug-report-model");
 const generator = require("../src/bug-report/bug-report-generator");

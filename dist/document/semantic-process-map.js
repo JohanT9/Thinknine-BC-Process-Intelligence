@@ -130,7 +130,7 @@
       metadata: { semanticStatus: index === titles.length - 1 ? "observed" : "reference",
         semanticLevel: index === 0 ? "domain" : index === titles.length - 1 ? "process" : "businessProcess" } })));
   }
-  function graphFor(input, model) { const confirmedId = input.decision?.confirmedReferenceId;
+  function graphFor(input) { const confirmedId = input.decision?.confirmedReferenceId;
     return input.analysis?.referenceGraphs?.[confirmedId] || input.analysis?.bestReferenceGraph || null; }
   function fromReferenceGraph(input, model, graph) { const incomingByNode = new Map(array(
     graph.relationships).map(relationship => [relationship.toNodeId || relationship.targetNodeId,

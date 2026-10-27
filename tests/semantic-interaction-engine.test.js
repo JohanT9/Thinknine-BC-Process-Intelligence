@@ -48,7 +48,7 @@ const englishSortedRecord = only([{
 assert.strictEqual(englishSortedRecord.selectedValue, "SO100049");
 assert.strictEqual(englishSortedRecord.rawInteractions[0].actionCaption,
   'No., sorted in Ascending order Open record "SO100049".');
-const swedishSortedRecord = only([{
+only([{
   taskId: "sales-order-row-sv", taskType: "Select",
   actionCaption: 'Nr, sorterade i Stigande ordning Öppna posten "SO100050".'
 }], "SelectRecord", "Välj försäljningsordern **SO100050**.");
@@ -57,7 +57,7 @@ const unknownSortedRecord = only([{
   actionCaption: 'No., sorted in Ascending order Open record "X100050".'
 }], "SelectRecord", "Välj posten **X100050**.");
 assert.strictEqual(unknownSortedRecord.selectedValue, "X100050");
-const purchaseOrderContext = only([{
+only([{
   taskId: "purchase-order-row", taskType: "RunAction",
   identifications: [{ page: { caption: "Purchase Orders" } }],
   actionCaption: 'No., sorted in Descending order Open record "PO100004".'
@@ -146,7 +146,7 @@ assert.strictEqual(genericSearchInput[0].targetField,
 assert.strictEqual(engine.processInteractions([{
   taskType: "SearchAndOpenPage", resultCaption: "Customers",
   searchFieldCaption: "Tell me what you want to do.",
-  instructionValue: "customer", resultCaption: "Customers"
+  instructionValue: "customer"
 }, { taskType: "EnterFieldValue",
   fieldCaption: "Tell me what you want to do.",
   instructionValue: "vendor" }]).length, 2,

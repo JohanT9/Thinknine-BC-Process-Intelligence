@@ -10,7 +10,6 @@
     "pageextension", "report", "query", "xmlport", "enum", "interface"]);
   const TRIGGERS = new Set(["onrun", "onvalidate", "oninsert", "onmodify",
     "ondelete", "onopenpage", "onaction"]);
-  const clone = value => value == null ? value : JSON.parse(JSON.stringify(value));
   const warning = (code, frameIndex) => ({ code, ...(frameIndex == null
     ? {} : { frameIndex }) });
 

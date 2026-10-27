@@ -30,7 +30,7 @@
     observation: "Observation", hypothesis:
       "Possible root-cause hypothesis (not verified)", notes: "Notes" });
   const inline = input => value(input).replace(/\\/gu, "\\\\")
-    .replace(/([*_\[\]<>])/gu, "\\$1");
+    .replace(/([*_[\]<>])/gu, "\\$1");
   function metadata(input, prefix = "") {
     return Object.entries(input || {}).flatMap(([key, child]) => {
       if (key === "authorship" || child == null || child === "") return [];
@@ -95,6 +95,6 @@
     return `${out.join("\n").trim()}\n`;
   }
   function plainText(pkg) { return markdown(pkg).replace(/^#{1,6}\s+/gmu, "")
-    .replace(/```+text\n|```+/gu, "").replace(/\\([*_\[\]<>\\])/gu, "$1"); }
+    .replace(/```+text\n|```+/gu, "").replace(/\\([*_[\]<>\\])/gu, "$1"); }
   return { code, markdown, plainText };
 });

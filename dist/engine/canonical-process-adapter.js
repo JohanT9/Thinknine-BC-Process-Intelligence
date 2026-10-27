@@ -75,8 +75,6 @@
     const page = obj(task.pageIdentification || task.pageContext || task.semanticActionModel?.pageIdentification);
     const pageId = text(page.pageObjectId || page.pageId || page.id || task.pageObjectId || task.pageId ||
       sources.map(event => event.page?.pageObjectId || event.page?.id).find(Boolean));
-    const caption = text(page.pageCaption || page.caption || page.name || task.pageCaption ||
-      sources.map(event => event.page?.caption || event.page?.name).find(Boolean));
     const entity = text(page.entity || task.entity);
     if (!pageId && !entity) return null;
     return { appId: text(page.appId || page.applicationId || sources.map(event => event.raw?.appId).find(Boolean)),
@@ -84,12 +82,6 @@
       objectType: text(page.objectType || (pageId ? "page" : null)),
       objectId: pageId && /^\d+$/.test(pageId) ? pageId : null,
       appVersion: text(page.appVersion || sources.map(event => event.raw?.appVersion).find(Boolean)) };
-  }
-
-  function pointerFor(event, keys) {
-    const raw = obj(event?.raw);
-    const key = keys.find(item => own(raw, item));
-    return key ? { eventId: String(event.id), pointer: `/raw/${key}` } : null;
   }
 
   function knowledgeCandidates(task, sourceEventIds, releaseId, report, subject) {

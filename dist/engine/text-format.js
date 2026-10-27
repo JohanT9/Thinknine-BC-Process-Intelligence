@@ -43,10 +43,6 @@
     return segments.filter(segment => segment.text !== "");
   }
 
-  function quoteLabels(value) {
-    return String(value).replace(/\*\*([^*]+?)\*\*/g, '"$1"');
-  }
-
   function sameFormatting(left, right) {
     return ["bold", "italic", "monospace", "fontFamily", "fontSize",
       "textColor", "backgroundColor"]

@@ -140,7 +140,6 @@
   }
   function evaluate(candidate, stepGroup, profile, context = {}) {
     const state = { score: 0, reasons: [], rejected: [], informative: false };
-    const primary = stepGroup?.primaryNormalizedEvent || {};
     const role = candidate.captureRole;
     const intent = context.roleIntent || roleIntent(stepGroup);
     const sourceIds = new Set(stepGroup?.sourceEventIds || []);
