@@ -1,6 +1,7 @@
 const assert = require("assert");
 const fs = require("fs");
 const path = require("path");
+const vm = require("vm");
 
 const root = path.resolve(__dirname, "..");
 const read = relativePath => fs.readFileSync(path.join(root, relativePath), "utf8");
@@ -12,8 +13,21 @@ const dashboardHtml = read("dist/dashboard.html");
 
 assert.ok(!dashboard.includes("__APP_VERSION__"));
 assert.ok(!background.includes("__APP_VERSION__"));
-assert.ok(dashboard.includes(`recorderVersion: "${packageJson.version}"`));
-assert.ok(background.includes(`const VERSION = "${packageJson.version}"`));
+const manifest = JSON.parse(read("dist/manifest.json"));
+const lock = JSON.parse(read("package-lock.json"));
+assert.strictEqual(manifest.version, packageJson.version);
+assert.strictEqual(lock.version, packageJson.version);
+assert.strictEqual(lock.packages[""].version, packageJson.version);
+assert(read("dist/VERSION.txt").includes(`Version ${packageJson.version}`));
+for (const [source, identifier] of [[dashboard, "APP_VERSION"], [background, "VERSION"]]) {
+  const declaration = source.match(new RegExp(`const ${identifier} = ([^;]+);`));
+  assert(declaration, `Missing runtime version: ${identifier}`);
+  const runtimeVersion = vm.runInNewContext(declaration[1], {
+    chrome: { runtime: { getManifest: () => manifest } }
+  });
+  assert.strictEqual(runtimeVersion, packageJson.version);
+}
+assert(dashboard.includes("recorderVersion: APP_VERSION"));
 assert.ok(dashboard.includes('const CONTEXT_BUILDER_VERSION = "1.0.0"'));
 assert.ok(dashboard.includes(
   'const KNOWLEDGE_PACK_FRAMEWORK_VERSION = "2.0.0"'

@@ -37,6 +37,15 @@
       "external-system": "External system" }
   });
 
+  function labelFor(kind, locale) {
+    const english = LABELS.en[kind] || "";
+    const swedish = LABELS.sv[kind] || english;
+    if (String(locale).toLowerCase().startsWith("sv")) return swedish;
+    const translated = typeof globalThis !== "undefined"
+      ? globalThis.T9UiI18n?.translateStaticText?.(english, locale) : null;
+    return translated || english;
+  }
+
   function canonicalType(node = {}) {
     const semanticLevel = node.metadata?.semanticLevel;
     const type = node.metadata?.originalNodeType ||
@@ -48,9 +57,8 @@
   function presentationFor(node = {}, locale = "sv-SE") {
     const type = canonicalType(node);
     const definition = KINDS[type];
-    const language = String(locale).toLowerCase().startsWith("en") ? "en" : "sv";
     return Object.freeze({ version: VERSION, sourceType: type, ...definition,
-      label: LABELS[language][definition.kind] || "" });
+      label: labelFor(definition.kind, locale) });
   }
 
   return { KINDS, LABELS, VERSION, canonicalType, presentationFor };

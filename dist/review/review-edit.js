@@ -116,30 +116,46 @@
     const setTimer = options.setTimer || setTimeout;
     const clearTimer = options.clearTimer || clearTimeout;
     let timer = null;
+    let running = Promise.resolve();
+    let lastError = null;
 
-    async function run() {
+    function run() {
       timer = null;
-      try {
-        await save();
-      } catch (error) {
-        options.onError?.(error);
-      }
+      const attempt = running.then(() => save()).then(result => {
+        lastError = null;
+        return result;
+      }, error => {
+        lastError = error;
+        try { options.onError?.(error); } catch {}
+        throw error;
+      });
+      running = attempt.catch(() => undefined);
+      return attempt;
     }
 
     return {
       schedule() {
         if (timer !== null) clearTimer(timer);
-        timer = setTimer(run, delay);
+        lastError = null;
+        timer = setTimer(() => {
+          const attempt = run();
+          running = attempt.catch(() => undefined);
+        }, delay);
       },
       flush() {
-        if (timer === null) return Promise.resolve();
-        clearTimer(timer);
-        return run();
+        if (timer !== null) {
+          clearTimer(timer);
+          return run();
+        }
+        return running.then(() => {
+          if (lastError) throw lastError;
+        });
       },
       cancel() {
         if (timer !== null) clearTimer(timer);
         timer = null;
       },
+      clearError() { lastError = null; },
       pending() {
         return timer !== null;
       }
@@ -183,14 +199,19 @@
 
   function createPersistenceCoordinator(options) {
     async function flush() {
-      await options.autoSave.flush();
-      await options.saveQueue.flush();
+      let failure = null;
+      try { await options.autoSave.flush(); } catch (error) { failure = error; }
+      try { await options.saveQueue.flush(); } catch (error) { failure ||= error; }
+      if (failure) throw failure;
     }
 
     async function saveExplicitly(saveOptions) {
-      await flush();
+      // An explicit save is also the user's recovery path after a failed
+      // autosave. Flush the pending write, then retry the current state once.
+      try { await flush(); } catch {}
       await options.save(saveOptions);
       await options.saveQueue.flush();
+      options.autoSave.clearError?.();
     }
 
     return { flush, saveExplicitly };

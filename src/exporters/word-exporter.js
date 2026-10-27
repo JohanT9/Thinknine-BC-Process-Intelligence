@@ -402,6 +402,12 @@
     }
 
     if (imageInfo) {
+      if (task.screenshotEvidence?.relation === "subsequent-captured-page-state" &&
+          task.screenshotEvidence.caption) {
+        content += paragraph(task.screenshotEvidence.caption, "", {
+          size: 18, italic: true, color: "5C6670", spacingAfter: 80
+        });
+      }
       content += imageParagraph(
         imageInfo.relId,
         imageInfo.imageIndex,
@@ -860,7 +866,7 @@
     body += paragraph("Förväntat resultat", "Heading1");
     body += paragraph(
       options.expectedResult ||
-      "Processen är genomförd enligt arbetsgången och de registrerade ändringarna har sparats i Business Central."
+      "Stegen beskriver det observerade arbetsflödet. Kontrollera dokumentets status och bekräfta om processen kräver bokföring i Business Central."
     );
 
     body += paragraph("Versionshistorik", "Heading1");

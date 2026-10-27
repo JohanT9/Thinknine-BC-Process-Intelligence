@@ -41,7 +41,15 @@
     }
     let draftQueue = Promise.resolve();
     async function readReviews() {
-      const stored = await storage.get(null);
+      let stored;
+      if (typeof storage.getKeys === "function") {
+        const keys = (await storage.getKeys()).filter(key =>
+          key === DRAFTS_KEY || key.startsWith(reviewPrefix));
+        if (!keys.includes(DRAFTS_KEY)) keys.push(DRAFTS_KEY);
+        stored = await storage.get(keys);
+      } else {
+        stored = await storage.get(null);
+      }
       return { stored: stored || {}, reviews: Object.entries(stored || {})
         .filter(([key, value]) => key.startsWith(reviewPrefix) &&
           value && typeof value === "object")

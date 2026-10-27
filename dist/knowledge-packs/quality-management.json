@@ -1,7 +1,7 @@
 {
   "packId": "bc-quality-management",
   "name": "Microsoft Business Central Quality Management",
-  "version": "1.0.0",
+  "version": "1.0.2",
   "priority": 230,
   "sourceLocaleGaps": {
     "quality-manual-inspection-en-us": [
@@ -1123,6 +1123,66 @@
         "fi-FI": "Avaa tarkastuksesta nimikkeen jäljitystietojen muutoksen erä-, sarja- tai pakkausnumeron tai viimeisen käyttöpäivän korjaamista varten säilyttäen yhteyden tarkastukseen. Tarkista ennen käsittelyä valittu lähdemäärä, jäljitystiedot, sijainti-/varastopaikkasuodattimet ja uudet tunnisteet tai päivämäärä. Valitse välitön kirjaus tai tarkistukseen jättäminen. Toiminto muuttaa jäljitettävyystietoja; se ei siirrä eikä hävitä varastoa.",
         "nb-NO": "Åpner en endring av varesporing fra inspeksjonen for å rette parti-, serie- eller pakkenumre eller utløpsdatoer, samtidig som koblingen til inspeksjonen beholdes. Kontroller valgt kildemengde, sporingsopplysninger, filtre for lokasjon/lagerplass og nye identifikatorer eller dato før behandling. Velg umiddelbar bokføring eller gjennomgang. Handlingen endrer sporbarhetsdata; den flytter eller kasserer ikke beholdning."
       }
+    },
+    {
+      "ruleId": "QualityManagement.CreateInspectionFromTrackingLine",
+      "taskType": "CreateManualQualityInspection",
+      "semanticAction": "CreateManualQualityInspection",
+      "entity": "MicrosoftQualityInspection",
+      "priority": 1370,
+      "confidence": 0.98,
+      "match": {
+        "pagePatterns": [
+          "^Item Tracking Lines$",
+          "^Artikelspårningsrader$",
+          "^Lignes de traçabilité$",
+          "^Artikelverfolgungszeilen$",
+          "^Líneas de seguimiento del artículo$",
+          "^Varesporingslinjer$"
+        ],
+        "actionPatterns": [
+          "^Create Quality Inspections$",
+          "^Skapa inspektion$",
+          "^Créer une inspection$",
+          "^Inspektion erstellen$",
+          "^Crear inspección$",
+          "^Opret inspektion$",
+          "^Opprett inspeksjon$"
+        ],
+        "fieldPatterns": [],
+        "automationIdPatterns": []
+      },
+      "instructionTemplate": "",
+      "languages": [
+        "en-US",
+        "sv-SE",
+        "fr-FR",
+        "de-DE",
+        "es-ES",
+        "da-DK",
+        "fi-FI",
+        "nb-NO"
+      ],
+      "aliases": [],
+      "sourceIds": [
+        "quality-manual-inspection-en-us",
+        "quality-manual-inspection-sv-se",
+        "quality-manual-inspection-fr-fr",
+        "quality-manual-inspection-de-de",
+        "quality-manual-inspection-es-es",
+        "quality-manual-inspection-da-dk",
+        "quality-manual-inspection-nb-no"
+      ],
+      "localizedExplanations": {
+        "en-US": "Creates a quality inspection for the selected item-tracking line and links it to the originating document. Item, lot or serial number, and tracked quantity carry into the inspection. This action creates the inspection; it does not post the receipt or finish the inspection. Availability depends on a matching inspection-generation rule and the user’s permissions.",
+        "sv-SE": "Skapar en kvalitetsinspektion för den markerade artikelspårningsraden och kopplar den till källdokumentet. Artikel, parti- eller serienummer och spårad kvantitet följer med till inspektionen. Åtgärden skapar inspektionen; den bokför inte kvittot och slutför inte kontrollen. Åtgärden kräver en matchande genereringsregel och rätt behörighet.",
+        "fr-FR": "Crée une inspection de qualité pour la ligne de traçabilité sélectionnée et la relie au document d’origine. L’article, le numéro de lot ou de série et la quantité suivie sont repris dans l’inspection. Cette action crée l’inspection ; elle ne comptabilise pas la réception et ne termine pas le contrôle. La disponibilité dépend d’une règle de génération d’inspection correspondante et des autorisations de l’utilisateur.",
+        "de-DE": "Erstellt eine Qualitätsprüfung für die ausgewählte Artikelverfolgungszeile und verknüpft sie mit dem Quelldokument. Artikel, Chargen- oder Seriennummer und verfolgte Menge werden in die Prüfung übernommen. Mit dieser Aktion wird die Prüfung erstellt; sie bucht weder den Wareneingang noch schließt sie die Prüfung ab. Die Verfügbarkeit hängt von einer passenden Prüfungs-Generierungsregel und den Berechtigungen des Benutzers ab.",
+        "es-ES": "Crea una inspección de calidad para la línea de seguimiento del artículo seleccionada y la vincula al documento de origen. El artículo, el número de lote o serie y la cantidad seguida se transfieren a la inspección. Esta acción crea la inspección; no registra la recepción ni finaliza la inspección. Su disponibilidad depende de una regla de generación de inspecciones coincidente y de los permisos del usuario.",
+        "da-DK": "Opretter en kvalitetsinspektion for den valgte varesporingslinje og knytter den til kildedokumentet. Vare, lot- eller serienummer og sporet antal overføres til inspektionen. Handlingen opretter inspektionen; den bogfører ikke modtagelsen og afslutter ikke inspektionen. Tilgængeligheden afhænger af en matchende regel for oprettelse af inspektioner og brugerens tilladelser.",
+        "fi-FI": "Luo laatutarkastuksen valitulle nimikkeen jäljitysriville ja linkittää sen lähdeasiakirjaan. Nimike, erä- tai sarjanumero ja jäljitetty määrä siirtyvät tarkastukseen. Tämä toiminto luo tarkastuksen; se ei kirjaa vastaanottoa eikä viimeistele tarkastusta. Toiminnon käytettävyys riippuu vastaavasta tarkastusten luontisäännöstä ja käyttäjän käyttöoikeuksista.",
+        "nb-NO": "Oppretter en kvalitetsinspeksjon for den valgte varesporingslinjen og kobler den til kildedokumentet. Vare, parti- eller serienummer og sporet antall overføres til inspeksjonen. Handlingen oppretter inspeksjonen; den bokfører ikke mottaket og fullfører ikke inspeksjonen. Tilgjengeligheten avhenger av en samsvarende regel for inspeksjonsgenerering og brukerens tillatelser."
+      }
     }
   ],
   "sources": [
@@ -1160,10 +1220,10 @@
     },
     {
       "sourceId": "microsoft-learn-expansion-qms-show-inspections-en-us",
-      "title": "Purchase receipt inspections without warehouse handling — Business Central | Microsoft Learn",
+      "title": "Work with quality inspections — Business Central | Microsoft Learn",
       "sourceUri": "https://learn.microsoft.com/en-us/dynamics365/business-central/qms-purchase-receipt-testing-simple",
-      "accessedDate": "2026-09-30",
-      "appliesTo": "Microsoft Quality Management extension. Verify extension/version, purchase inspection setup, generation rules and tenant-specific captions.",
+      "accessedDate": "2026-10-02",
+      "appliesTo": "Microsoft Quality Management extension. Current en-US Learn page inspected 2026-10-02; tenant extension/version and captions remain to be verified.",
       "fields": [
         "From a purchase order, Show Inspections for Item and Document opens inspections associated with the item and source document. An inspection can carry item, lot, tracked quantity and source purchase order. Opening an inspection is separate from receipt posting and finishing the inspection."
       ],
@@ -1330,19 +1390,21 @@
     },
     {
       "sourceId": "quality-manual-inspection-en-us",
-      "title": "Manual inspection creation — Business Central",
+      "title": "Work with quality inspections — Business Central | Microsoft Learn",
       "sourceUri": "https://learn.microsoft.com/en-us/dynamics365/business-central/qms-manual-test-creation",
-      "accessedDate": "2026-09-29",
-      "appliesTo": "Microsoft Quality Management extension. English Microsoft Learn source; tenant extension version remains unverified.",
+      "accessedDate": "2026-10-02",
+      "appliesTo": "Microsoft Quality Management extension; localized Microsoft Learn article checked 2026-10-02. Captions are documented in Learn; verify installed tenant extension/version and actual tenant captions.",
       "fields": [
-        "From Quality Inspection Templates, Create Inspection starts an inspection independent of a purchase or production line. Supply a source reference and lot or serial number when applicable.",
-        "Quality Inspection - Schedule Inspection creates inspections for all enabled generation rules that match its filters. Apply a Template Code or other restrictive filters to avoid creating an unexpectedly large set. The report creates inspections but does not finish them or enter test results."
+        "Inspection can be created from item-tracking lines after selecting one or more tracking lines and using Quality Management > Create Quality Inspections; the inspection links to the purchase/production source and selected lot/serial data.",
+        "Create Quality Inspection from a purchase/production line is a separate method; finishing, measurement entry, and receipt posting are separate steps."
       ],
       "documentedCaptions": [
-        "Quality Inspection Templates",
-        "Create Inspection",
-        "Quality Inspection - Schedule Inspection",
-        "OK"
+        "Item Tracking Lines",
+        "Quality Management",
+        "Create Quality Inspections",
+        "Quality Inspections",
+        "Finish",
+        "Certificate of Analysis"
       ]
     },
     {
@@ -1377,10 +1439,10 @@
     },
     {
       "sourceId": "quality-purchase-inspection-en-us",
-      "title": "Purchase receipt inspections without warehouse handling — Business Central",
+      "title": "Work with quality inspections — Business Central | Microsoft Learn",
       "sourceUri": "https://learn.microsoft.com/en-us/dynamics365/business-central/qms-purchase-receipt-testing-simple",
-      "accessedDate": "2026-09-29",
-      "appliesTo": "Microsoft Quality Management extension, purchase receipt scenario without warehouse handling. English Learn source; tenant extension version remains unverified.",
+      "accessedDate": "2026-10-02",
+      "appliesTo": "Microsoft Quality Management extension. Current en-US Learn page supports test entry and Finish; it does not establish automatic receipt-generation behavior. Tenant extension version remains unverified.",
       "fields": [
         "For purchase receipt inspections, enter measurement values, review the calculated grade, and choose Finish. Finishing completes the quality inspection; it is separate from posting the purchase receipt. Inspection generation behavior depends on setup."
       ],
@@ -1463,36 +1525,34 @@
     },
     {
       "sourceId": "quality-manual-inspection-sv-se",
-      "title": "Manuellt skapande av inspektion — Business Central",
+      "title": "Manuellt skapande av inspektion — Business Central | Microsoft Learn",
       "sourceUri": "https://learn.microsoft.com/sv-se/dynamics365/business-central/qms-manual-test-creation",
-      "accessedDate": "2026-09-29",
-      "appliesTo": "Microsoft Quality Management extension. Swedish Microsoft Learn source; tenant extension version remains unverified.",
+      "accessedDate": "2026-10-02",
+      "appliesTo": "Microsoft Quality Management extension; localized Microsoft Learn article checked 2026-10-02. Captions are documented in Learn; verify installed tenant extension/version and actual tenant captions.",
       "fields": [
-        "Från Kvalitetsgranskningsmallar startar Skapa inspektion en inspektion som inte är knuten till en inköps- eller produktionsrad. Ange källreferens och parti- eller serienummer när det behövs.",
-        "Kvalitetsinspektion – Schemagranskning skapar inspektioner för aktiverade genereringsregler som matchar filtren. Filtrera på mallkod eller andra villkor för att begränsa mängden. Rapporten skapar inspektioner men slutför dem inte och registrerar inga testresultat."
+        "Artikelspårningsrader är en separat metod: välj specifika parti-/serierader och åtgärden Skapa inspektion; parti och kvantitet fylls i och källdokumentet kopplas till inspektionen.",
+        "Skapa inspektion från inköps-/produktionsrad är en annan metod; mätvärden, slutförande och kvittobokföring är separata steg."
       ],
       "documentedCaptions": [
-        "Kvalitetsgranskningsmallar",
+        "Artikelspårningsrader",
         "Skapa inspektion",
-        "Kvalitetsinspektion – Schemagranskning",
-        "OK"
+        "Skapa inspektion från raden",
+        "Kvalitetsinspektioner",
+        "Slutför"
       ]
     },
     {
       "sourceId": "quality-purchase-receipt-generation-en-us",
-      "title": "Purchase receipt inspections without warehouse handling — Business Central",
+      "title": "Create an inspection manually from item tracking — Business Central | Microsoft Learn",
       "sourceUri": "https://learn.microsoft.com/en-us/dynamics365/business-central/qms-purchase-receipt-testing-simple",
-      "accessedDate": "2026-09-29",
-      "appliesTo": "Microsoft Quality Management extension; purchase receipt process without warehouse handling. Verify tenant version and setup.",
+      "accessedDate": "2026-10-02",
+      "appliesTo": "WARNING: the current en-US page at this URI now documents manual creation from item tracking, not automatic non-warehouse receipt generation. Do not use this record as evidence for automatic receipt behavior.",
       "fields": [
-        "An inspection generation rule with Source Type Purchase Line, template, purchase trigger and item filter can create quality inspections automatically when purchase receipt is posted. Lot tracking affects inspection grouping; a distinct inspection can be generated for each lot. This is separate from posting and completion behavior."
+        "The current en-US URI documents manual inspection creation from item-tracking lines. It does not establish automatic inspection generation when a non-warehouse purchase receipt posts."
       ],
       "documentedCaptions": [
-        "Purchase Orders",
-        "Inspection Generation Rules",
-        "When Purchase Order is Received",
-        "Post",
-        "Receive"
+        "Item Tracking Lines",
+        "Create Quality Inspections"
       ]
     },
     {
@@ -1580,70 +1640,75 @@
       "sourceId": "quality-manual-inspection-fr-fr",
       "title": "Création manuelle inspection - Business Central",
       "sourceUri": "https://learn.microsoft.com/fr-fr/dynamics365/business-central/qms-manual-test-creation",
-      "accessedDate": "2026-09-29",
-      "appliesTo": "Microsoft Quality Management extension. Localized Microsoft Learn source; tenant extension version and UI captions are not verified.",
+      "accessedDate": "2026-10-02",
+      "appliesTo": "Microsoft Quality Management extension; localized Microsoft Learn article checked 2026-10-02. Captions are documented in Learn; verify installed tenant extension/version and actual tenant captions.",
       "fields": [
         "Manual inspections can be created from item tracking lines, purchase or production lines, quality inspection templates, or the scheduled inspection report. The report can create many inspections, so apply template and other restrictive filters. Creating an inspection does not enter results or finish it."
       ],
       "documentedCaptions": [
         "Modèles inspection qualité",
-        "Créer une inspection"
+        "Créer une inspection",
+        "Lignes de traçabilité"
       ]
     },
     {
       "sourceId": "quality-manual-inspection-de-de",
       "title": "Manuelle Inspektionserstellung - Business Central",
       "sourceUri": "https://learn.microsoft.com/de-de/dynamics365/business-central/qms-manual-test-creation",
-      "accessedDate": "2026-09-29",
-      "appliesTo": "Microsoft Quality Management extension. Localized Microsoft Learn source; tenant extension version and UI captions are not verified.",
+      "accessedDate": "2026-10-02",
+      "appliesTo": "Microsoft Quality Management extension; localized Microsoft Learn article checked 2026-10-02. Captions are documented in Learn; verify installed tenant extension/version and actual tenant captions.",
       "fields": [
         "Manual inspections can be created from item tracking lines, purchase or production lines, quality inspection templates, or the scheduled inspection report. The report can create many inspections, so apply template and other restrictive filters. Creating an inspection does not enter results or finish it."
       ],
       "documentedCaptions": [
         "Qualitätsüberprüfungsvorlagen",
-        "Inspektion erstellen"
+        "Inspektion erstellen",
+        "Artikelverfolgungszeilen"
       ]
     },
     {
       "sourceId": "quality-manual-inspection-es-es",
       "title": "Creación manual de inspecciones - Business Central",
       "sourceUri": "https://learn.microsoft.com/es-es/dynamics365/business-central/qms-manual-test-creation",
-      "accessedDate": "2026-09-29",
-      "appliesTo": "Microsoft Quality Management extension. Localized Microsoft Learn source; tenant extension version and UI captions are not verified.",
+      "accessedDate": "2026-10-02",
+      "appliesTo": "Microsoft Quality Management extension; localized Microsoft Learn article checked 2026-10-02. Captions are documented in Learn; verify installed tenant extension/version and actual tenant captions.",
       "fields": [
         "Manual inspections can be created from item tracking lines, purchase or production lines, quality inspection templates, or the scheduled inspection report. The report can create many inspections, so apply template and other restrictive filters. Creating an inspection does not enter results or finish it."
       ],
       "documentedCaptions": [
         "Plantillas de inspección de calidad",
-        "Crear inspección"
+        "Crear inspección",
+        "Líneas de seguimiento del artículo"
       ]
     },
     {
       "sourceId": "quality-manual-inspection-da-dk",
       "title": "Manuel oprettelse af inspektion - Business Central",
       "sourceUri": "https://learn.microsoft.com/da-dk/dynamics365/business-central/qms-manual-test-creation",
-      "accessedDate": "2026-09-29",
-      "appliesTo": "Microsoft Quality Management extension. Localized Microsoft Learn source; tenant extension version and UI captions are not verified.",
+      "accessedDate": "2026-10-02",
+      "appliesTo": "Microsoft Quality Management extension; localized Microsoft Learn article checked 2026-10-02. Captions are documented in Learn; verify installed tenant extension/version and actual tenant captions.",
       "fields": [
         "Manual inspections can be created from item tracking lines, purchase or production lines, quality inspection templates, or the scheduled inspection report. The report can create many inspections, so apply template and other restrictive filters. Creating an inspection does not enter results or finish it."
       ],
       "documentedCaptions": [
         "Kvalitetsinspektionsskabeloner",
-        "Opret inspektion"
+        "Opret inspektion",
+        "Varesporingslinjer"
       ]
     },
     {
       "sourceId": "quality-manual-inspection-nb-no",
       "title": "Manuell oppretting av inspeksjon - Business Central",
       "sourceUri": "https://learn.microsoft.com/nb-no/dynamics365/business-central/qms-manual-test-creation",
-      "accessedDate": "2026-09-29",
-      "appliesTo": "Microsoft Quality Management extension. Localized Microsoft Learn source; tenant extension version and UI captions are not verified.",
+      "accessedDate": "2026-10-02",
+      "appliesTo": "Microsoft Quality Management extension; localized Microsoft Learn article checked 2026-10-02. Captions are documented in Learn; verify installed tenant extension/version and actual tenant captions.",
       "fields": [
         "Manual inspections can be created from item tracking lines, purchase or production lines, quality inspection templates, or the scheduled inspection report. The report can create many inspections, so apply template and other restrictive filters. Creating an inspection does not enter results or finish it."
       ],
       "documentedCaptions": [
         "Maler for kvalitetsinspeksjon",
-        "Opprett inspeksjon"
+        "Opprett inspeksjon",
+        "Varesporingslinjer"
       ]
     },
     {
@@ -2063,6 +2128,48 @@
         "For receipt inspections without warehouse handling, the source covers entering measurements, reviewing calculated grade and finishing the inspection separately from posting the purchase receipt."
       ],
       "documentedCaptions": []
+    },
+    {
+      "sourceId": "microsoft-learn-qms-warehouse-receipt-en-us",
+      "title": "Create an inspection automatically from a warehouse receipt and reinspect the lot — Business Central | Microsoft Learn",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/en-us/dynamics365/business-central/qms-purchase-receipt-testing-warehouse",
+      "accessedDate": "2026-10-02",
+      "appliesTo": "Microsoft Quality Management extension; en-US documentation inspected 2026-10-02. Verify tenant generation rules, permissions, and extension version.",
+      "fields": [
+        "A filtered inspection-generation rule can create an inspection when a warehouse receipt posts; the flow depends on location/item filters and warehouse configuration.",
+        "A failed inspection can be finished, reinspected with a new revision, retested, and followed by registering put-away."
+      ],
+      "documentedCaptions": [
+        "Create Receiving Rule",
+        "Warehouse Receipt",
+        "Post",
+        "Quality Inspections",
+        "Create Re-inspection",
+        "Finish",
+        "Register"
+      ]
+    },
+    {
+      "sourceId": "microsoft-learn-qms-warehouse-receipt-sv-se",
+      "title": "Test av inköpskvitton med lagerhantering — Business Central | Microsoft Learn",
+      "sourceType": "microsoft-learn",
+      "sourceUri": "https://learn.microsoft.com/sv-se/dynamics365/business-central/qms-purchase-receipt-testing-warehouse",
+      "accessedDate": "2026-10-02",
+      "appliesTo": "Microsoft Quality Management extension; sv-SE documentation inspected 2026-10-02. Verify tenant generation rules, permissions, and extension version.",
+      "fields": [
+        "På lageraktiverad plats skapas inspektioner när lagerkvittot bokförs; en inspektion kan skapas per parti.",
+        "Ett underkänt resultat kan följas av ominspektion; efter godkänt resultat registreras lagerinförseln."
+      ],
+      "documentedCaptions": [
+        "Inköpsorder",
+        "Artikelspårningsrader",
+        "Skapa lagerkvitto",
+        "Publicera",
+        "Kvalitetsinspektioner",
+        "Slutför",
+        "Registrera"
+      ]
     }
   ]
 }

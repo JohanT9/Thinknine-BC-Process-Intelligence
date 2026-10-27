@@ -1,7 +1,7 @@
 {
   "packId": "bc-core",
   "name": "Business Central Core",
-  "version": "2.3.0",
+  "version": "2.4.2",
   "priority": 100,
   "pageDefinitions": [
     {
@@ -139,16 +139,15 @@
       "match": {
         "pagePatterns": [],
         "actionPatterns": [
-          "^Tillbaka$",
-          "^Back$"
+          "^Tillbaka$", "^Back$", "^Précédent$", "^Retour$", "^Zurück$",
+          "^Atrás$", "^Volver$", "^Tilbage$", "^Takaisin$", "^Tilbake$"
         ],
         "fieldPatterns": [],
         "automationIdPatterns": []
       },
       "instructionTemplate": "",
       "languages": [
-        "sv-SE",
-        "en-US"
+        "sv-SE", "en-US", "fr-FR", "de-DE", "es-ES", "da-DK", "fi-FI", "nb-NO"
       ],
       "aliases": []
     },
@@ -162,13 +161,19 @@
       "match": {
         "pagePatterns": [],
         "actionPatterns": [
-          "^Ny$",
-          "^New$",
-          "^Skapa ny$",
-          "^Nouveau$",
-          "^Neu$",
-          "^Nuevo$",
-          "^Uusi$"
+          "^Ny(?:tt)?(?:\\s+(?:post|order|faktura|kreditnota))?\\.?$",
+          "^New(?:\\s+(?:record|order|invoice|credit memo))?\\.?$",
+          "^Create new\\.?$",
+          "^Skapa ny\\.?$",
+          "^Nouveau\\.?$",
+          "^Nouvelle\\.?$",
+          "^Neu(?:e|er|es)?\\.?$",
+          "^Nuevo\\.?$",
+          "^Nueva\\.?$",
+          "^Opret\\.?$",
+          "^Uusi\\.?$",
+          "^Opprett\\.?$",
+          "^Opprette\\.?$"
         ],
         "fieldPatterns": [],
         "automationIdPatterns": []
@@ -216,16 +221,15 @@
       "match": {
         "pagePatterns": [],
         "actionPatterns": [
-          "^Redigera$",
-          "^Edit$"
+          "^Redigera$", "^Edit$", "^Modifier$", "^Bearbeiten$", "^Editar$",
+          "^Rediger$", "^Muokkaa$"
         ],
         "fieldPatterns": [],
         "automationIdPatterns": []
       },
       "instructionTemplate": "",
       "languages": [
-        "sv-SE",
-        "en-US"
+        "sv-SE", "en-US", "fr-FR", "de-DE", "es-ES", "da-DK", "fi-FI", "nb-NO"
       ],
       "aliases": []
     },
@@ -239,16 +243,15 @@
       "match": {
         "pagePatterns": [],
         "actionPatterns": [
-          "^Ta bort$",
-          "^Delete$"
+          "^Ta bort$", "^Delete$", "^Supprimer$", "^Löschen$", "^Eliminar$",
+          "^Slet$", "^Poista$", "^Slett$"
         ],
         "fieldPatterns": [],
         "automationIdPatterns": []
       },
       "instructionTemplate": "",
       "languages": [
-        "sv-SE",
-        "en-US"
+        "sv-SE", "en-US", "fr-FR", "de-DE", "es-ES", "da-DK", "fi-FI", "nb-NO"
       ],
       "aliases": []
     },
@@ -357,8 +360,7 @@
       },
       "instructionTemplate": "",
       "languages": [
-        "sv-SE",
-        "en-US"
+        "sv-SE", "en-US", "fr-FR", "de-DE", "es-ES", "da-DK", "fi-FI", "nb-NO"
       ],
       "aliases": []
     },
@@ -374,14 +376,16 @@
         "actionPatterns": [],
         "fieldPatterns": [
           "datum",
-          "date"
+          "date",
+          "fecha",
+          "dato",
+          "päivämäärä"
         ],
         "automationIdPatterns": []
       },
       "instructionTemplate": "",
       "languages": [
-        "sv-SE",
-        "en-US"
+        "sv-SE", "en-US", "fr-FR", "de-DE", "es-ES", "da-DK", "fi-FI", "nb-NO"
       ],
       "aliases": []
     }

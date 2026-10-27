@@ -247,24 +247,19 @@
       "priority": 1300,
       "confidence": 0.99,
       "match": {
+        "pageObjectIds": [
+          "9307"
+        ],
         "pagePatterns": [
-          "^Inköpsorder$",
           "^Inköpsordrar$",
           "^Inköpsorderlista$",
-          "^Purchase Order$",
           "^Purchase Orders$",
           "^Purchase Order List$",
-          "^Commande achat$",
           "^Commandes achat$",
-          "^Bestellung$",
           "^Bestellungen$",
-          "^Pedido de compra$",
           "^Pedidos de compra$",
-          "^Indkøbsordre$",
           "^Indkøbsordrer$",
-          "^Ostotilaus$",
           "^Ostotilaukset$",
-          "^Bestilling$",
           "^Bestillinger$"
         ],
         "actionPatterns": [
@@ -301,6 +296,63 @@
         "microsoft-learn-purchase-recording-da",
         "microsoft-learn-purchase-recording-fi",
         "microsoft-learn-purchase-recording-nb"
+      ]
+    },
+    {
+      "ruleId": "Purchase.ApplyPurchasePricesAndDiscounts",
+      "taskType": "ApplyPurchasePricesAndDiscounts",
+      "semanticAction": "ApplyPurchasePricesAndDiscounts",
+      "entity": "PurchaseOrder",
+      "priority": 1180,
+      "confidence": 0.96,
+      "match": {
+        "pageObjectIds": [
+          "50"
+        ],
+        "pagePatterns": [
+          "^Inköpsorder$",
+          "^Purchase Order$",
+          "^Commande achat$",
+          "^Einkaufsbestellung$",
+          "^Pedido de compra$",
+          "^Købsordre$",
+          "^Ostotilaus$",
+          "^Innkjøpsordre$"
+        ],
+        "actionPatterns": [
+          "^Tillämpat inköpspris och rabatt$",
+          "^Apply (?:Purchase )?Prices and Discounts?$",
+          "^Appliquer les prix et remises d’achat$",
+          "^Einkaufspreise und Rabatte anwenden$",
+          "^Aplicar precios y descuentos de compra$",
+          "^Anvend købspriser og rabatter$",
+          "^Käytä ostohintoja ja alennuksia$",
+          "^Bruk kjøpspriser og rabatter$"
+        ],
+        "fieldPatterns": [],
+        "automationIdPatterns": []
+      },
+      "instructionTemplate": "",
+      "languages": [
+        "sv-SE",
+        "en-US",
+        "fr-FR",
+        "de-DE",
+        "es-ES",
+        "da-DK",
+        "fi-FI",
+        "nb-NO"
+      ],
+      "aliases": [],
+      "sourceIds": [
+        "microsoft-learn-purchase-pricing",
+        "microsoft-learn-purchase-pricing-sv",
+        "microsoft-learn-purchase-pricing-fr",
+        "microsoft-learn-purchase-pricing-de",
+        "microsoft-learn-purchase-pricing-es",
+        "microsoft-learn-purchase-pricing-da",
+        "microsoft-learn-purchase-pricing-fi",
+        "microsoft-learn-purchase-pricing-nb"
       ]
     },
     {
@@ -631,7 +683,14 @@
           "^Nombre del proveedor$",
           "^Kreditornavn$",
           "^Toimittajan nimi$",
-          "^Leverandørnavn$"
+          "^Leverandørnavn$",
+          "^Leverantör$",
+          "^Supplier$",
+          "^Fournisseur$",
+          "^Kreditor$",
+          "^Proveedor$",
+          "^Leverandør$",
+          "^Toimittaja$"
         ],
         "automationIdPatterns": []
       },
@@ -881,12 +940,20 @@
         ],
         "pagePatterns": [
           "^Purchase Order$",
-          "^InkÃ¶psorder$"
+          "^Inköpsorder$"
         ],
         "actionPatterns": [
           "^Nr, sorterade i Stigande order Välj posten"
         ],
-        "fieldPatterns": [],
+        "fieldPatterns": [
+          "^Artikel Nr$",
+          "^Item No\\.?$",
+          "^N° d’article$",
+          "^Artikelnr\\.?$",
+          "^N\\.?º de artículo$",
+          "^Varenr\\.?$",
+          "^Nimikenro$"
+        ],
         "automationIdPatterns": []
       },
       "instructionTemplate": "",
@@ -914,8 +981,8 @@
     },
     {
       "ruleId": "Purchase.OpenPurchaseOrderListFromSearch",
-      "taskType": "SelectRecord",
-      "semanticAction": "SelectRecord",
+      "taskType": "SearchAndOpenPage",
+      "semanticAction": "SearchAndOpenPage",
       "entity": "PurchaseOrder",
       "priority": 1290,
       "confidence": 0.96,
@@ -965,7 +1032,7 @@
         ],
         "pagePatterns": [
           "^Purchase Order$",
-          "^InkÃ¶psorder$"
+          "^Inköpsorder$"
         ],
         "actionPatterns": [
           "^Manuellt pris",
@@ -1016,17 +1083,17 @@
         ],
         "pagePatterns": [
           "^Purchase Order$",
-          "^InkÃ¶psorder$"
+          "^Inköpsorder$"
         ],
         "actionPatterns": [],
         "fieldPatterns": [
           "^Direct Unit Cost$",
           "^Direkt styckkostnad$",
-          "^CoÃ»t unitaire direct$",
+          "^Coût unitaire direct$",
           "^Direkte Einzelkosten$",
           "^Coste unitario directo$",
           "^Direkte enhedsomkostning$",
-          "^Suora yksikkÃ¶kustannus$",
+          "^Suora yksikkökustannus$",
           "^Direkte enhetskostnad$"
         ],
         "automationIdPatterns": []
@@ -1052,7 +1119,17 @@
         "microsoft-learn-purchase-pricing-da",
         "microsoft-learn-purchase-pricing-fi",
         "microsoft-learn-purchase-pricing-nb"
-      ]
+      ],
+      "localizedInstructions": {
+        "sv-SE": "I dialogrutan Ändra tillämpad direkt enhetskostnad anger du det avtalade styckpriset och enheten. Kontrollera valuta och om moms ingår, och välj OK.",
+        "en-US": "In the Change Applied Direct Unit Cost dialog, enter the agreed unit cost and unit of measure. Check the currency and whether tax is included, then select OK.",
+        "fr-FR": "Dans la boîte de dialogue de modification du coût unitaire direct appliqué, saisissez le coût unitaire convenu et l’unité de mesure. Vérifiez la devise et l’inclusion des taxes, puis sélectionnez OK.",
+        "de-DE": "Geben Sie im Dialog „Angewandte direkte Einzelkosten ändern“ die vereinbarten Stückkosten und die Einheit ein. Prüfen Sie Währung und Steuerbehandlung, und wählen Sie OK.",
+        "es-ES": "En el cuadro Cambiar coste unitario directo aplicado, introduce el coste unitario y la unidad de medida acordados. Comprueba la divisa y si incluye impuestos, y selecciona Aceptar.",
+        "da-DK": "Angiv den aftalte enhedsomkostning og enhed i dialogboksen Skift anvendt direkte enhedsomkostning. Kontrollér valuta og momsbehandling, og vælg OK.",
+        "fi-FI": "Syötä sovittu yksikkökustannus ja mittayksikkö Muuta käytössä olevaa suoraa yksikkökustannusta -valintaikkunassa. Tarkista valuutta ja veron sisältyminen ja valitse OK.",
+        "nb-NO": "Angi avtalt enhetskostnad og måleenhet i dialogboksen Endre anvendt direkte enhetskostnad. Kontroller valuta og avgiftsbehandling, og velg OK."
+      }
     },
     {
       "ruleId": "Purchase.SetPurchaseLineQuantity",

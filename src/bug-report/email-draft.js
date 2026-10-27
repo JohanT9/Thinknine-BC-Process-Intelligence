@@ -23,16 +23,20 @@
   }
   const lines = value => String(value).match(/.{1,76}/gu)?.join("\r\n") || "";
   function build(issuePackage, packageContent, options = {}) {
-    const to = validAddress(options.to);
-    if (!to) throw new Error("En giltig supportadress måste anges i inställningarna.");
-    const title = cleanHeader(issuePackage?.title || "Business Central-fel");
     const localized = (en, sv) => languages.translate(en, options.locale || "sv-SE", sv);
+    const to = validAddress(options.to);
+    if (!to) throw new Error(localized(
+      "A valid support address must be provided in settings.",
+      "En giltig supportadress måste anges i inställningarna."
+    ));
+    const title = cleanHeader(issuePackage?.title ||
+      localized("Business Central error", "Business Central-fel"));
     const severity = ["Low", "Medium", "High", "Critical"].find(value =>
       value.toLowerCase() === cleanHeader(issuePackage?.summary?.severity).toLowerCase());
     const subject = severity ? `${title} - ${localized("Severity", "Nivå")} ${severity}` : title;
     const importance = severity === "Critical" ? "high" : severity === "Low" ? "low" : "normal";
     const priority = importance === "high" ? "1" : importance === "low" ? "5" : "3";
-    const attachmentName = `${safeName(title)}-felrapport.json`;
+    const attachmentName = `${safeName(title)}-${safeName(localized("error report", "felrapport"))}.json`;
     const boundary = `=_BC_Process_Studio_${safeName(issuePackage?.packageId)}`;
     const bodyBoundary = `${boundary}_body`;
     const body = "\r\n\r\n" + localized("Hello,", "Hej,") + "\r\n\r\n" +
@@ -63,7 +67,7 @@
       "Content-Transfer-Encoding: base64", "", lines(base64(htmlBody)),
       `--${bodyBoundary}--`,
       ...parts, `--${boundary}--`, ""].join("\r\n");
-    return { to, subject, attachmentName,
+    return { to, subject, attachmentName, htmlBody, importance, attachments,
       fileName: `${safeName(title)}.eml`, content };
   }
   return { build, validAddress };

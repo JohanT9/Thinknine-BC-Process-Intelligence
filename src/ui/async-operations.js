@@ -8,7 +8,7 @@
     const cancel = timers.clearTimeout || clearTimeout;
     return new Promise((resolve, reject) => {
       const timer = schedule(() => reject(
-        new Error(`${label} tog för lång tid.`)
+        new Error(timers.errorMessage || `${label} took too long.`)
       ), milliseconds);
       Promise.resolve(promise).then(
         value => {

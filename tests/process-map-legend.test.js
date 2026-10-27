@@ -13,7 +13,7 @@ const swedish = legend.create(model, "sv-SE");
 assert.strictEqual(swedish.title, "Teckenförklaring");
 assert.deepStrictEqual(swedish.nodes.map(item => item.label), ["Dokument", "Bokföring"]);
 assert.deepStrictEqual(swedish.routes.map(item => item.label), ["Nästa", "Bokför som"]);
-assert.deepStrictEqual(swedish.statuses.map(item => item.label), ["Observerat", "Föreslaget"]);
+assert.deepStrictEqual(swedish.statuses.map(item => item.label), ["Observerat", "Referensförslag"]);
 assert(Object.isFrozen(swedish));
 assert(Object.isFrozen(swedish.nodes));
 assert(Object.isFrozen(swedish.statuses));

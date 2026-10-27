@@ -310,3 +310,8 @@ Expanded **E-Document → Communication Logs** in all eight explanation language
 ### HR action context — 2026-09-30
 
 Expanded **Absence Registration → New** and **Employee Card → Apply Template** to the same level in all eight languages. Absence registration now describes the employee, cause, dates, quantity/unit, consistent hour/day units for useful statistics, and the boundary between HR reporting and leave approval, payroll or timesheets. Template application now makes clear which selected employee records receive predefined data and that users should review fields because templates can fill or replace data; applying a template does not create an employee or a payroll record. Microsoft Learn supports these HR workflows: [Manage employee absence](https://learn.microsoft.com/en-us/dynamics365/business-central/hr-how-manage-absence) and [Register employees](https://learn.microsoft.com/en-us/dynamics365/business-central/hr-how-register-employees).
+
+
+### Process taxonomy page-view gap — 2026-10-26
+
+Payment Journal (page 256), Bank Account Reconciliation (pages 379 and 388) and Bank Account Ledger Entries (page 372) now have canonical page views, verified against the Business Central 28 application reference in `bc-application-reference-28.json`. Quality Inspection, Quality Inspection Template, Quality Test, Quality Inspection Generation Rule and Quality Inspection Result still have no verified page object IDs, and Bank Statement Lines is a page part without a standalone view. These documents are recognised by localized captions only and carry `metadata.pageViewGap` in the taxonomy seed. Do not add guessed IDs; add views when a Microsoft source confirms them.

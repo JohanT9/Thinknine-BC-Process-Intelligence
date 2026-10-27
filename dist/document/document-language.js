@@ -26,8 +26,8 @@
         "The required master data and settings are available.",
       "Instruktionerna följer de benämningar som visades i Business Central.":
         "The instructions use the labels shown in Business Central.",
-      "Processen är genomförd enligt arbetsgången och de registrerade ändringarna har sparats i Business Central.":
-        "The process has been completed according to the workflow and the recorded changes have been saved in Business Central.",
+      "Stegen beskriver det observerade arbetsflödet. Kontrollera dokumentets status och bekräfta om processen kräver bokföring i Business Central.":
+        "The recorded steps describe the observed workflow. Check the document status and confirm whether the process requires posting in Business Central.",
       "Ej angiven": "Not specified",
       "Pågående": "In progress",
       "Slutförd": "Completed",
@@ -37,6 +37,19 @@
       "Processkärmbild": "Process screenshot",
       "Utför uppgiften.": "Complete the task."
     })
+  });
+  const DEFAULT_EXPECTED_RESULT =
+    "Stegen beskriver det observerade arbetsflödet. Kontrollera dokumentets " +
+    "status och bekräfta om processen kräver bokföring i Business Central.";
+  const DEFAULT_EXPECTED_RESULT_BY_LANGUAGE = Object.freeze({
+    "sv-SE": DEFAULT_EXPECTED_RESULT,
+    "en-US": "The steps describe the workflow observed in the recording. Check the document status and confirm whether the process requires posting in Business Central.",
+    "fr-FR": "Les étapes décrivent le flux observé dans l’enregistrement. Vérifiez le statut du document et confirmez si le processus nécessite une validation dans Business Central.",
+    "de-DE": "Die Schritte beschreiben den beobachteten Ablauf. Prüfen Sie den Belegstatus und bestätigen Sie, ob der Prozess eine Buchung in Business Central erfordert.",
+    "es-ES": "Los pasos describen el flujo de trabajo observado. Compruebe el estado del documento y confirme si el proceso requiere contabilización en Business Central.",
+    "da-DK": "Trinnene beskriver det observerede forløb. Kontrollér dokumentets status, og bekræft, om processen kræver bogføring i Business Central.",
+    "fi-FI": "Vaiheet kuvaavat tallenteessa havaittua työnkulkua. Tarkista asiakirjan tila ja varmista, edellyttääkö prosessi kirjaamista Business Centralissa.",
+    "nb-NO": "Trinnene beskriver arbeidsflyten som ble observert. Kontroller dokumentstatusen og bekreft om prosessen krever bokføring i Business Central."
   });
 
   function clone(value) {
@@ -49,14 +62,174 @@
 
   function systemText(value, language) {
     const text = String(value ?? "");
-    if (normalize(language) === "sv-SE") return text;
+    const locale = normalize(language);
+    if (text === DEFAULT_EXPECTED_RESULT) {
+      return DEFAULT_EXPECTED_RESULT_BY_LANGUAGE[locale];
+    }
+    if (locale === "sv-SE") return text;
     const english = SYSTEM_TEXT["en-US"][text];
-    return english ? languages.translate(english, language) : text;
+    return english ? languages.translate(english, locale) : text;
   }
 
   function translateInstruction(value, language) {
     const source = String(value ?? "");
-    if (normalize(language) === "sv-SE") return source;
+    const locale = normalize(language);
+    if (locale === "sv-SE") return source;
+    if (source === "Inspelningen visar inte vad som hände efter den här åtgärden.") {
+      const messages = {
+        "en-US": "The recording does not show what happened after this action.",
+        "fr-FR": "L’enregistrement ne montre pas ce qui s’est passé après cette action.",
+        "de-DE": "Die Aufzeichnung zeigt nicht, was nach dieser Aktion geschah.",
+        "es-ES": "La grabación no muestra qué ocurrió después de esta acción.",
+        "da-DK": "Optagelsen viser ikke, hvad der skete efter denne handling.",
+        "fi-FI": "Tallenne ei näytä, mitä tämän toiminnon jälkeen tapahtui.",
+        "nb-NO": "Opptaket viser ikke hva som skjedde etter denne handlingen."
+      };
+      if (messages[locale]) return messages[locale];
+    }
+    const toggleInstruction = source.match(/^Du (aktiverade|inaktiverade) ([\s\S]+)\.$/u);
+    if (toggleInstruction) {
+      const [, action, caption] = toggleInstruction;
+      const enabled = action === "aktiverade";
+      const templates = {
+        "en-US": () => `You ${enabled ? "enabled" : "disabled"} ${caption}.`,
+        "fr-FR": () => `Vous avez ${enabled ? "activé" : "désactivé"} ${caption}.`,
+        "de-DE": () => `Sie haben ${caption} ${enabled ? "aktiviert" : "deaktiviert"}.`,
+        "es-ES": () => `Ha ${enabled ? "activado" : "desactivado"} ${caption}.`,
+        "da-DK": () => `Du ${enabled ? "aktiverede" : "deaktiverede"} ${caption}.`,
+        "fi-FI": () => `Kytkit kohteen ${caption} ${enabled ? "käyttöön" : "pois käytöstä"}.`,
+        "nb-NO": () => `Du ${enabled ? "aktiverte" : "deaktiverte"} ${caption}.`
+      };
+      if (templates[locale]) return templates[locale]();
+    }
+    const optionState = source.match(/^Alternativet är nu (aktiverat|inaktiverat)\.$/u);
+    if (optionState) {
+      const enabled = optionState[1] === "aktiverat";
+      const templates = {
+        "en-US": () => `The option is now ${enabled ? "enabled" : "disabled"}.`,
+        "fr-FR": () => `L’option est maintenant ${enabled ? "activée" : "désactivée"}.`,
+        "de-DE": () => `Die Option ist jetzt ${enabled ? "aktiviert" : "deaktiviert"}.`,
+        "es-ES": () => `La opción está ${enabled ? "activada" : "desactivada"}.`,
+        "da-DK": () => `Indstillingen er nu ${enabled ? "aktiveret" : "deaktiveret"}.`,
+        "fi-FI": () => `Asetus on nyt ${enabled ? "käytössä" : "pois käytöstä"}.`,
+        "nb-NO": () => `Alternativet er nå ${enabled ? "aktivert" : "deaktivert"}.`
+      };
+      if (templates[locale]) return templates[locale]();
+    }
+    const unnamedToggle = source.match(/^Ett alternativ slogs (på|av)\.$/u);
+    if (unnamedToggle) {
+      const enabled = unnamedToggle[1] === "på";
+      const templates = {
+        "en-US": () => `An option was turned ${enabled ? "on" : "off"}.`,
+        "fr-FR": () => `Une option a été ${enabled ? "activée" : "désactivée"}.`,
+        "de-DE": () => `Eine Option wurde ${enabled ? "eingeschaltet" : "ausgeschaltet"}.`,
+        "es-ES": () => `Se ${enabled ? "activó" : "desactivó"} una opción.`,
+        "da-DK": () => `En indstilling blev slået ${enabled ? "til" : "fra"}.`,
+        "fi-FI": () => `Valinta ${enabled ? "otettiin käyttöön" : "poistettiin käytöstä"}.`,
+        "nb-NO": () => `Et alternativ ble slått ${enabled ? "på" : "av"}.`
+      };
+      if (templates[locale]) return templates[locale]();
+    }
+
+    const eventOutcomePatterns = [
+      [/^Sidan ([\s\S]+?) visas nu\.$/u, {
+        "en-US": value => `The ${value} page is now displayed.`,
+        "fr-FR": value => `La page ${value} s’affiche maintenant.`,
+        "de-DE": value => `Die Seite ${value} wird jetzt angezeigt.`,
+        "es-ES": value => `Ahora se muestra la página ${value}.`,
+        "da-DK": value => `Siden ${value} vises nu.`,
+        "fi-FI": value => `Sivu ${value} näkyy nyt.`,
+        "nb-NO": value => `Siden ${value} vises nå.`
+      }],
+      [/^Dialogrutan ([\s\S]+?) visas nu\.$/u, {
+        "en-US": value => `The ${value} dialog is now open.`,
+        "fr-FR": value => `La boîte de dialogue ${value} est maintenant ouverte.`,
+        "de-DE": value => `Der Dialog ${value} ist jetzt geöffnet.`,
+        "es-ES": value => `El cuadro de diálogo ${value} está abierto.`,
+        "da-DK": value => `Dialogboksen ${value} er nu åben.`,
+        "fi-FI": value => `Valintaikkuna ${value} on nyt auki.`,
+        "nb-NO": value => `Dialogboksen ${value} er nå åpen.`
+      }],
+      [/^Värdet i ([\s\S]+?) ändrades\.$/u, {
+        "en-US": value => `The value in ${value} changed.`,
+        "fr-FR": value => `La valeur du champ ${value} a changé.`,
+        "de-DE": value => `Der Wert in ${value} wurde geändert.`,
+        "es-ES": value => `El valor de ${value} ha cambiado.`,
+        "da-DK": value => `Værdien i ${value} blev ændret.`,
+        "fi-FI": value => `Kentän ${value} arvo muuttui.`,
+        "nb-NO": value => `Verdien i ${value} ble endret.`
+      }],
+      [/^Valet i ([\s\S]+?) ändrades\.$/u, {
+        "en-US": value => `The selection in ${value} changed.`,
+        "fr-FR": value => `La sélection dans ${value} a changé.`,
+        "de-DE": value => `Die Auswahl in ${value} wurde geändert.`,
+        "es-ES": value => `Cambió la selección de ${value}.`,
+        "da-DK": value => `Valget i ${value} blev ændret.`,
+        "fi-FI": value => `Kentän ${value} valinta muuttui.`,
+        "nb-NO": value => `Valget i ${value} ble endret.`
+      }],
+      [/^Ett fältvärde ändrades\.$/u, {
+        "en-US": () => "A field value changed.",
+        "fr-FR": () => "La valeur d’un champ a changé.",
+        "de-DE": () => "Der Wert eines Feldes wurde geändert.",
+        "es-ES": () => "Cambió el valor de un campo.",
+        "da-DK": () => "Værdien i et felt blev ændret.",
+        "fi-FI": () => "Kentän arvo muuttui.",
+        "nb-NO": () => "Verdien i et felt ble endret."
+      }],
+      [/^Ett val ändrades\.$/u, {
+        "en-US": () => "A selection was made.",
+        "fr-FR": () => "Une sélection a été effectuée.",
+        "de-DE": () => "Es wurde eine Auswahl getroffen.",
+        "es-ES": () => "Se realizó una selección.",
+        "da-DK": () => "Der blev foretaget et valg.",
+        "fi-FI": () => "Valinta tehtiin.",
+        "nb-NO": () => "Et valg ble gjort."
+      }],
+      [/^Business Central visade ett meddelande\.$/u, {
+        "en-US": () => "Business Central displayed a message.",
+        "fr-FR": () => "Business Central a affiché un message.",
+        "de-DE": () => "Business Central hat eine Meldung angezeigt.",
+        "es-ES": () => "Business Central mostró un mensaje.",
+        "da-DK": () => "Business Central viste en meddelelse.",
+        "fi-FI": () => "Business Central näytti ilmoituksen.",
+        "nb-NO": () => "Business Central viste en melding."
+      }]
+    ];
+    for (const [pattern, templates] of eventOutcomePatterns) {
+      const match = source.match(pattern);
+      if (match && templates[locale]) return templates[locale](match[1]);
+    }
+    const observedConfirmation = source.match(
+      /^Business Central bekräftade(?::| att) “([\s\S]+?)”\.(?: (?:Referens: “([\s\S]+)”|Referensen är ([\s\S]+))\.)?$/u
+    );
+    if (observedConfirmation) {
+      const [message, quotedReference, plainReference] = observedConfirmation.slice(1);
+      const reference = plainReference || quotedReference;
+      const templates = {
+        "en-US": () => `Business Central confirmed that “${message}”.${reference ? ` Reference: ${reference}.` : ""}`,
+        "fr-FR": () => `Business Central a confirmé que « ${message} ».${reference ? ` Référence : ${reference}.` : ""}`,
+        "de-DE": () => `Business Central hat bestätigt, dass „${message}“.${reference ? ` Referenz: ${reference}.` : ""}`,
+        "es-ES": () => `Business Central confirmó que «${message}».${reference ? ` Referencia: ${reference}.` : ""}`,
+        "da-DK": () => `Business Central bekræftede, at “${message}”.${reference ? ` Reference: ${reference}.` : ""}`,
+        "fi-FI": () => `Business Central vahvisti, että ”${message}”.${reference ? ` Viite: ${reference}.` : ""}`,
+        "nb-NO": () => `Business Central bekreftet at «${message}».${reference ? ` Referanse: ${reference}.` : ""}`
+      };
+      if (templates[locale]) return templates[locale]();
+    }
+    const actionOnPage = source.match(/^Välj ([\s\S]+?) på sidan ([\s\S]+?)\.$/u);
+    if (actionOnPage) {
+      const templates = {
+        "en-US": (action, page) => `Choose ${action} on the ${page} page.`,
+        "fr-FR": (action, page) => `Sélectionnez ${action} sur la page ${page}.`,
+        "de-DE": (action, page) => `Wählen Sie ${action} auf der Seite ${page} aus.`,
+        "es-ES": (action, page) => `Selecciona ${action} en la página ${page}.`,
+        "da-DK": (action, page) => `Vælg ${action} på siden ${page}.`,
+        "fi-FI": (action, page) => `Valitse ${action} sivulla ${page}.`,
+        "nb-NO": (action, page) => `Velg ${action} på siden ${page}.`
+      };
+      if (templates[locale]) return templates[locale](actionOnPage[1], actionOnPage[2]);
+    }
     const confirmation = source.match(/^(Ange [\s\S]+\.) (Välj \*\*OK\*\*\.)$/u);
     if (confirmation) return translateInstruction(confirmation[1], language) + ' ' +
       translateInstruction(confirmation[2], language);

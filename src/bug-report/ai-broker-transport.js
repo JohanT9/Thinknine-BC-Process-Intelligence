@@ -19,9 +19,19 @@
     const validation = validateConfiguration(configuration);
     if (!validation.valid) throw Object.assign(new Error(validation.errors.join(" ")),
       { category: "not-configured" });
-    const response = await fetch(new URL("analysis/technical-bug", configuration.brokerUrl), {
-      method: "POST", headers: { Authorization: `Bearer ${token}`,
-        "Content-Type": "application/json" }, body: JSON.stringify(request) });
+    let response;
+    try {
+      response = await fetch(new URL("analysis/technical-bug", configuration.brokerUrl), {
+        method: "POST", headers: { Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json" }, body: JSON.stringify(request),
+        signal: AbortSignal.timeout(60000) });
+    } catch (cause) {
+      if (cause?.name === "TimeoutError" || cause?.name === "AbortError") {
+        throw Object.assign(new Error("AI broker request timed out. Try again."),
+          { category: "timeout", cause });
+      }
+      throw cause;
+    }
     if (!response.ok) throw Object.assign(new Error(
       response.status === 429 ? "AI provider rate limit reached." :
         "AI broker request failed."), { category: response.status === 429

@@ -3,11 +3,13 @@
     ? require("./process-visual-grammar") : root.T9ProcessVisualGrammar;
   const routeGrammar = typeof module === "object" && module.exports
     ? require("./process-route-grammar") : root.T9ProcessRouteGrammar;
-  const api = factory(visualGrammar, routeGrammar);
+  const processMapLabels = typeof module === "object" && module.exports
+    ? require("./process-map-labels") : root.T9ProcessMapLabels;
+  const api = factory(visualGrammar, routeGrammar, processMapLabels);
   if (typeof module === "object" && module.exports) module.exports = api;
   root.T9ProcessMapLegend = api;
 })(typeof globalThis !== "undefined" ? globalThis : this,
-  function (visualGrammar, routeGrammar) {
+  function (visualGrammar, routeGrammar, processMapLabels) {
   "use strict";
   const VERSION = "1.0.0";
   const STATUS_LABELS = Object.freeze({
@@ -21,21 +23,24 @@
   }); }
   function create(model = {}, locale = "sv-SE") {
     const english = String(locale).toLowerCase().startsWith("en");
+    const swedish = String(locale).toLowerCase().startsWith("sv");
+    const translate = (englishText, swedishText) => swedish ? swedishText :
+      globalThis.T9UiI18n?.translateStaticText?.(englishText, locale) || englishText;
     const nodes = unique((model.nodes || []).map(node => {
       const visual = visualGrammar.presentationFor(node, locale);
       return Object.freeze({ kind: visual.kind, shape: visual.shape,
-        label: visual.label || (english ? "Action" : "Åtgärd") });
+        label: visual.label || translate("Action", "Åtgärd") });
     }), "kind");
     const routes = unique((model.transitions || model.relationships || []).map(relationship => {
       const visual = routeGrammar.presentationFor(relationship, locale);
       return Object.freeze({ kind: visual.kind, line: visual.line,
-        label: routeGrammar.LABELS[english ? "en" : "sv"][visual.kind] ||
-          (english ? "Flow" : "Flöde") });
+        label: routeGrammar.labelFor?.(visual.kind, locale) || translate("Flow", "Flöde") });
     }), "kind");
     const statuses = unique((model.nodes || []).map(node => node?.metadata?.semanticStatus)
       .filter(Boolean).map(status => Object.freeze({ status,
-        label: STATUS_LABELS[english ? "en" : "sv"][status] || status })), "status");
-    return Object.freeze({ version: VERSION, title: english ? "Legend" : "Teckenförklaring",
+        label: processMapLabels?.statusTitle(status, locale) ||
+          STATUS_LABELS[english ? "en" : "sv"][status] || status })), "status");
+    return Object.freeze({ version: VERSION, title: translate("Legend", "Teckenförklaring"),
       nodes: Object.freeze(nodes), routes: Object.freeze(routes),
       statuses: Object.freeze(statuses) });
   }

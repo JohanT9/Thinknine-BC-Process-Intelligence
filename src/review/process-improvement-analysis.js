@@ -20,6 +20,13 @@
     "BCPS-PROCESS-GUARD-FIELD-001": "field preservation",
     "BCPS-PROCESS-GUARD-VALUE-001": "value preservation",
     "BCPS-PROCESS-GUARD-RESULT-001": "result-only step filtering",
+    "BCPS-PROCESS-GUARD-RESULT-002": "business outcome verification",
+    "BCPS-PROCESS-GUARD-RESULT-003": "observed business-action completion",
+    "BCPS-PROCESS-GUARD-INSTRUCTION-001": "instruction clarity",
+    "BCPS-PROCESS-GUARD-CONTEXT-001": "field and value context",
+    "BCPS-PROCESS-GUARD-CONTEXT-002": "action page context",
+    "BCPS-PROCESS-GUARD-KNOWLEDGE-001": "cross-module knowledge disambiguation",
+    "BCPS-PROCESS-GUARD-COVERAGE-001": "recording-to-documentation coverage",
     "BCPS-PROCESS-GUARD-MERGE-001": "interaction grouping"
   });
   const integer = (value, label) => {

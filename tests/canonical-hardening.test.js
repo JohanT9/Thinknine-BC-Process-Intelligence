@@ -21,9 +21,10 @@ assert.ok(background.includes("settleBounded(screenshotWorkerPromise"));
 assert.ok(background.includes("settleBounded(canonicalStore.flush()"));
 assert.ok(background.includes("settleBounded(rawEventStore.flush()"));
 assert.ok(background.includes("CANONICAL_SETTLE_TIMEOUT_MS = 60000"));
-assert.ok(background.indexOf("canonicalStore.associateScreenshot(") <
-  background.indexOf("saveScreenshots(item.sessionId, screenshots)"),
-"Canonical screenshot registration must precede legacy compatibility storage.");
+// The asset is stored before the Canonical event references it; ordering is
+// covered behaviourally in screenshot-capture-policy.test.js.
+assert.ok(background.includes("T9ScreenshotTargetRegistration.register("),
+  "Queued screenshots must register through the shared asset/Canonical sequence.");
 assert.ok(background.indexOf("integrityDiagnostics(canonicalRecording") <
   background.indexOf("canonicalStore.finalize(state.sessionId"),
 "Integrity validation must precede immutable finalization.");

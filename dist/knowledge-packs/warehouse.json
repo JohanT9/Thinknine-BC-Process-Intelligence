@@ -1,7 +1,7 @@
 {
   "packId": "bc-warehouse",
   "name": "Business Central Warehouse",
-  "version": "2.7.0",
+  "version": "2.7.1",
   "priority": 200,
   "rules": [
     {
@@ -27,7 +27,10 @@
           "^Opprett lagerinngående levering$"
         ],
         "fieldPatterns": [],
-        "automationIdPatterns": []
+        "automationIdPatterns": [],
+        "pageObjectIds": [
+          "50"
+        ]
       },
       "instructionTemplate": "",
       "languages": [
@@ -61,205 +64,6 @@
         "fi-FI": "Luo vapautetusta ostotilauksesta varastovastaanoton varastoprosessia varten. Tarkista toimittaja, nimike, sijainti, määrä, eräkohtaiset määrät ja tilaukselta siirtyneet hyllypaikat. Toiminto luo vastaanottoasiakirjan; se ei kirjaa vastaanottoa eikä luo vielä laatutarkastusta. Jos Quality Management on asennettu ja ostovastaanottoon sopiva tarkastusten luontisääntö on määritetty, tarkastus käynnistyy vasta varastovastaanoton kirjauksessa. Kirjaus voi luoda yhden tarkastuksen erää kohti ja hyllytysdokumentin.",
         "nb-NO": "Oppretter en lagerinngående levering fra den frigitte kjøpsordren, slik at mottaket kan behandles i lagerflyten. Kontroller leverandør, vare, lokasjon, antall, partifordeling og lagerplasser som er overført fra ordren. Handlingen oppretter mottaksdokumentet; den bokfører ikke mottaket og oppretter ikke en kvalitetsinspeksjon ennå. Hvis Quality Management er installert og en matchende regel for inspeksjonsgenerering ved kjøpsmottak er konfigurert, utløses inspeksjonen først når lagerleveringen bokføres. Bokføringen kan opprette én inspeksjon per parti og et lagerplasseringsdokument."
       }
-    },
-    {
-      "ruleId": "Observed.Warehouse.RegisterWeight",
-      "taskType": "RegisterItemWeight",
-      "semanticAction": "RegisterItemWeight",
-      "entity": "WarehouseReceipt",
-      "priority": 1200,
-      "confidence": 0.94,
-      "match": {
-        "pagePatterns": [
-          "warehouse receipt",
-          "distributionslagerinleverans"
-        ],
-        "actionPatterns": [
-          "^Registrera vikt$",
-          "^Register weight$",
-          "^Enregistrer le poids$",
-          "^Gewicht erfassen$",
-          "^Registrar peso$",
-          "^Registrer vægt$",
-          "^Kirjaa paino$",
-          "^Registrer vekt$"
-        ],
-        "fieldPatterns": [],
-        "automationIdPatterns": []
-      },
-      "instructionTemplate": "",
-      "languages": [
-        "sv-SE",
-        "en-US",
-        "fr-FR",
-        "de-DE",
-        "es-ES",
-        "da-DK",
-        "fi-FI",
-        "nb-NO"
-      ],
-      "aliases": []
-    },
-    {
-      "ruleId": "Observed.Warehouse.CreateHandlingUnit",
-      "taskType": "CreateHandlingUnit",
-      "semanticAction": "CreateHandlingUnit",
-      "entity": "WarehouseReceipt",
-      "priority": 1200,
-      "confidence": 0.94,
-      "match": {
-        "pagePatterns": [
-          "warehouse receipt",
-          "distributionslagerinleverans"
-        ],
-        "actionPatterns": [
-          "^Skapa lastbärare$",
-          "^Create handling unit$",
-          "^Créer une unité de manutention$",
-          "^Ladeeinheit erstellen$",
-          "^Crear unidad de manipulación$",
-          "^Opret lasteenhed$",
-          "^Luo käsittely-yksikkö$",
-          "^Opprett håndteringsenhet$"
-        ],
-        "fieldPatterns": [],
-        "automationIdPatterns": []
-      },
-      "instructionTemplate": "",
-      "languages": [
-        "sv-SE",
-        "en-US",
-        "fr-FR",
-        "de-DE",
-        "es-ES",
-        "da-DK",
-        "fi-FI",
-        "nb-NO"
-      ],
-      "aliases": []
-    },
-    {
-      "ruleId": "Observed.Warehouse.ManualWeight",
-      "taskType": "ChooseManualWeighing",
-      "semanticAction": "ChooseManualWeighing",
-      "entity": "WarehouseReceipt",
-      "priority": 1200,
-      "confidence": 0.94,
-      "match": {
-        "pagePatterns": [
-          "warehouse receipt",
-          "distributionslagerinleverans"
-        ],
-        "actionPatterns": [
-          "^Manuell vikt$",
-          "^Manual weight$",
-          "^Poids manuel$",
-          "^Manuelles Gewicht$",
-          "^Peso manual$",
-          "^Manuel vægt$",
-          "^Manuaalinen paino$",
-          "^Manuell vekt$"
-        ],
-        "fieldPatterns": [],
-        "automationIdPatterns": []
-      },
-      "instructionTemplate": "",
-      "languages": [
-        "sv-SE",
-        "en-US",
-        "fr-FR",
-        "de-DE",
-        "es-ES",
-        "da-DK",
-        "fi-FI",
-        "nb-NO"
-      ],
-      "aliases": []
-    },
-    {
-      "ruleId": "Observed.Warehouse.EnterScaleWeight",
-      "taskType": "EnterMeasuredWeight",
-      "semanticAction": "EnterMeasuredWeight",
-      "entity": "WarehouseReceipt",
-      "priority": 1200,
-      "confidence": 0.94,
-      "match": {
-        "pagePatterns": [
-          "warehouse receipt",
-          "distributionslagerinleverans"
-        ],
-        "actionPatterns": [
-          "^Vikt från våg$",
-          "^Weight from scale$",
-          "^Poids de la balance$",
-          "^Waagengewicht$",
-          "^Peso de la báscula$",
-          "^Vægt fra vægt$",
-          "^Vaa'an paino$",
-          "^Vekt fra vekt$"
-        ],
-        "fieldPatterns": [
-          "^Vikt från våg$",
-          "^Weight from scale$",
-          "^Poids de la balance$",
-          "^Waagengewicht$",
-          "^Peso de la báscula$",
-          "^Vægt fra vægt$",
-          "^Vaa'an paino$",
-          "^Vekt fra vekt$"
-        ],
-        "automationIdPatterns": []
-      },
-      "instructionTemplate": "",
-      "languages": [
-        "sv-SE",
-        "en-US",
-        "fr-FR",
-        "de-DE",
-        "es-ES",
-        "da-DK",
-        "fi-FI",
-        "nb-NO"
-      ],
-      "aliases": []
-    },
-    {
-      "ruleId": "Observed.Warehouse.SaveWeightRegistration",
-      "taskType": "SaveWeightRegistration",
-      "semanticAction": "SaveWeightRegistration",
-      "entity": "WarehouseReceipt",
-      "priority": 1200,
-      "confidence": 0.94,
-      "match": {
-        "pagePatterns": [
-          "warehouse receipt",
-          "distributionslagerinleverans"
-        ],
-        "actionPatterns": [
-          "^Spara och stäng$",
-          "^Save and close$",
-          "^Enregistrer et fermer$",
-          "^Speichern und schließen$",
-          "^Guardar y cerrar$",
-          "^Gem og luk$",
-          "^Tallenna ja sulje$",
-          "^Lagre og lukk$"
-        ],
-        "fieldPatterns": [],
-        "automationIdPatterns": []
-      },
-      "instructionTemplate": "",
-      "languages": [
-        "sv-SE",
-        "en-US",
-        "fr-FR",
-        "de-DE",
-        "es-ES",
-        "da-DK",
-        "fi-FI",
-        "nb-NO"
-      ],
-      "aliases": []
     },
     {
       "ruleId": "Warehouse.OpenReceipt",

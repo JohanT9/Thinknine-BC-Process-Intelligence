@@ -6,10 +6,19 @@
   "use strict";
   const ENDPOINT = "https://api.applicationinsights.io";
   async function query(configuration, token, kql) {
-    const response = await fetch(`${ENDPOINT}/v1/apps/${encodeURIComponent(
-      configuration.applicationId)}/query`, { method: "POST",
-      headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
-      body: JSON.stringify({ query: kql }) });
+    let response;
+    try {
+      response = await fetch(`${ENDPOINT}/v1/apps/${encodeURIComponent(
+        configuration.applicationId)}/query`, { method: "POST",
+        headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
+        body: JSON.stringify({ query: kql }), signal: AbortSignal.timeout(30000) });
+    } catch (cause) {
+      if (cause?.name === "TimeoutError" || cause?.name === "AbortError") {
+        throw Object.assign(new Error("Application Insights query timed out."),
+          { category: "timeout", cause });
+      }
+      throw cause;
+    }
     if (!response.ok) throw Object.assign(new Error("Application Insights query failed."),
       { status: response.status });
     return response.json();

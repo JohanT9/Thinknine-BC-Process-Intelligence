@@ -14,6 +14,7 @@ assert.deepStrictEqual(keys.sessionDataKeys("session-1"), [
   "t9_raw_recording_session-1",
   "t9_events_session-1",
   "t9_screenshots_session-1",
+  "t9_screenshot_manifest_session-1",
   "t9_review_session-1"
 ]);
 

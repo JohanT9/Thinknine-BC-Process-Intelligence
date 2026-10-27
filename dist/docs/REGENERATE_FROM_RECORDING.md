@@ -147,7 +147,7 @@ Map-based matching is linear or near-linear for normal recordings and has a
 5,000-Step regression. Regeneration does not load screenshot bytes, access DOM,
 render Word, call external services, upload data, or use AI.
 
-Review Studio exposes **Regenerera frÃ¥n inspelning** under **Fler Ã¥tgÃ¤rder**.
+Review Studio exposes **Regenerera från inspelning** under **Fler åtgärder**.
 The command opens an accessible, non-destructive comparison before apply. It
 shows current/next counts and lists added, removed, changed, merged, split, and
 screenshot-changed Steps. The user must explicitly approve the preview; Cancel

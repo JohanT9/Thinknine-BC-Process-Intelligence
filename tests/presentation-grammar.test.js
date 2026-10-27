@@ -79,10 +79,11 @@ const option = paragraph({
   taskId: "status", taskType: "SelectOption", fieldCaption: "Status",
   value: "Frisläppt", instruction: "Välj status."
 });
-assert.strictEqual(option.text, "Välj Status Frisläppt.");
-assert.strictEqual(option.presentationRuns[0].role, "action");
-assert.strictEqual(option.presentationRuns[1].role, "interface");
-assert.strictEqual(option.presentationRuns[3].role, "value");
+assert.strictEqual(option.text, "Välj Frisläppt som värde för Status.");
+assert.deepStrictEqual(option.presentationRuns.map(run => [run.text, run.role]), [
+  ["Välj ", "action"], ["Frisläppt", "value"], [" som värde för ", "text"],
+  ["Status", "interface"], [".", "text"]
+]);
 
 const checkbox = paragraph({
   taskId: "blocked", taskType: "Checkbox", fieldCaption: "Spärrad",

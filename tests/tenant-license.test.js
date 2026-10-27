@@ -37,7 +37,7 @@ async function main() {
     }
   };
   const client = license.create(options);
-  await assert.rejects(client.requireLicense(url), /Bekräfta/);
+  await assert.rejects(client.requireLicense(url), /^Error: license.acceptBeforeRecording$/);
   assert.equal(calls, 0);
   assert.equal((await client.information()).requiresAcceptance, true);
   await client.acceptNotice();
@@ -54,7 +54,10 @@ async function main() {
   assert.equal(calls, 2);
   time += 3600001;
   assert.equal((await client.summaries())[0].licenseStatus, "active");
-  await assert.rejects(client.requireLicense(url), /offline/);
+  // Network failures surface as a translatable key with a diagnostic code.
+  await assert.rejects(client.requireLicense(url), error =>
+    error.message === "license.serviceUnavailable" &&
+    error.code === "license-service-unreachable");
   offline = false;
   allowed = false;
   assert.equal((await client.check(url)).trialAvailable, true);
@@ -68,3 +71,19 @@ async function main() {
   console.log("Tenant license tests passed.");
 }
 main().catch(error => { console.error(error); process.exitCode = 1; });
+
+// Every error key the license engine throws is translated in every UI language.
+{
+  const fs = require("node:fs");
+  globalThis.T9LanguageRegistry = require("../src/engine/language-registry.js");
+  require("../src/ui/i18n.js");
+  const source = fs.readFileSync(require.resolve("../src/engine/tenant-license.js"), "utf8");
+  const keys = [...new Set(source.match(/"license\.[A-Za-z]+"/g).map(key => JSON.parse(key)))];
+  assert.ok(keys.length >= 9);
+  for (const { locale } of globalThis.T9LanguageRegistry.supported("ui")) {
+    for (const key of keys) {
+      const value = globalThis.T9UiI18n.translate(key, locale);
+      assert.ok(value && value !== key, `${key} is translated for ${locale}`);
+    }
+  }
+}

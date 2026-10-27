@@ -1,3 +1,534 @@
+## Unreleased
+- Move Aptean Weigh Scale and Weighbridge knowledge into its own Aptean Weigh Scale section, sourced from the public Aptean WSC, SCI and WBR articles. Add 15 documented actions (Get Weight, Fill Weight Manually, Transfer Weigh Scale Entries, Create Inbound/Outbound Register, Post Quantity To Receive and others) with explanations in all eight languages; keep existing rule IDs. See docs/APTEAN_WEIGH_SCALE.md.
+- Let an identified entity stand in for another page of the same entity or an unidentifiable caption, accept a trailing period on New actions, and explain bare Yes/No confirmations only with page or entity context.
+- Keep Undo, Redo, Export Word and Document information directly visible in the Review toolbar again; only structural and advanced actions stay under More actions. History buttons no longer wrap their labels at narrow widths.
+- Fix a crash in release-gate analysis when a meaningful step group was left unresolved.
+- Load the Business Central version helper in every dynamic capture-script injection, matching the manifest, so tabs opened before install or update keep version context.
+- Keep a trailing period that belongs to a captured lookup caption (for example "No."), and prefer captured field captions over generic labels in Word customer, vendor, item, location and dimension steps.
+- Describe process-map legend routes by route type instead of an individual edge label, and give decision routes a localized spoken summary instead of an arrow.
+- Stop the process quality guard from copying instruction text (which can contain captured values) into findings.
+- Keep control characters out of MCP diagnostics without stripping digits and capital letters.
+- Let an identified entity stand in for an unreliable page caption in knowledge matching, while a confidently identified different page still wins.
+- Keep the expected-result suggestion empty when no outcome was observed.
+- Translate license-service errors, live recording warnings, documentation-profile texts and the Markdown export into all eight registered languages.
+- Add verified page views for Payment Journal, Bank Account Reconciliation and Bank Account Ledger Entries; record the remaining Quality Management page-ID gap.
+- Repair mis-encoded text in package metadata, the changelog and regeneration documentation; normalize source files to LF line endings.
+- Bring the test suite back in line with the current behaviour and add behavioural coverage for BC error evidence storage, screenshot coalescing and registration, privacy masking of previous values, and Markdown export languages.
+
+## 4.7.200
+- Reuse Outlook access tokens across report tabs for the browser session, bound to the current license account. Try silent Entra sign-in before interactive sign-in and stop forcing account selection.
+- Invalidate the Outlook session cache on sign-out and rejected tokens; retain consent, draft-only access and .eml fallback.
+
+## 4.7.199
+- Offer optional Outlook draft creation with PDF attachment and on-demand delegated Mail.ReadWrite consent; retain local .eml export. Never send mail automatically.
+- Preserve created/uncertain draft status to avoid duplicate creation on retries.
+
+## 4.7.198
+- Restore the active development changes to authored source and align project/lock/manifest versions; include capture helpers in repeatable builds.
+- Load canonical recording dependencies in document and technical-report pages; verify browser projection and screenshot references across registered languages.
+- Replace the built-in expected-result claim that work was completed and saved with a neutral description of the recorded workflow and a reminder to verify posting status.
+- Align default copy across recording settings, review, dashboard export and Word export; retain customized expected-result text and localize the new default in all eight document languages.
+
+## 4.7.197
+- Describe checkbox and option changes in natural language, naming the observed option and whether it was enabled or disabled; localize the explanation across all supported document languages.
+- Version the updated step grouping and result-verification wording so regenerated explanations refresh consistently.
+
+## 4.7.196
+- Explain missing outcome evidence in natural language without suggesting that the Business Central action failed; add localized copy for all supported document languages.
+
+## 4.7.195
+- Describe observed success messages in a more natural way while preserving the exact Business Central confirmation text and the captured document reference.
+- Version the revised step grouping and result-verification wording so regenerated results refresh consistently.
+
+## 4.7.194
+- Rewrite common observed navigation, dialog, field-change and selection outcomes in natural, factual language across all eight UI languages.
+- Extend the recorder stop request timeout to cover the bounded evidence flush and report-generation work instead of timing out after 5–30 seconds.
+
+## 4.7.193
+- Freeze issue destination, consent, duplicate confirmation and package options while an external submission is being prepared, preventing the displayed choice from changing during the request.
+
+## 4.7.192
+- Preserve successful remote issue submissions when local reference storage fails, and show clear guidance so users do not accidentally submit duplicates.
+- Serialize local external-issue reference writes and lock submission while its preview is prepared.
+
+## 4.7.191
+- Prevent overlapping support-issue preview requests from replacing newer choices with stale results.
+- Require the report to be saved before preview creation and reject a preview if its source changes while building.
+
+## 4.7.190
+- Write the active-recording license failure diagnostic only once per distinct error, avoiding repeated storage writes while the license check is cached.
+- Clear the notification guard when its recording ends.
+
+## 4.7.189
+- Cache failed active-recording license checks briefly so an unavailable license service is not retried for every captured event.
+- Preserve per-recording tenant isolation and retry after the 30-second recheck interval.
+
+## 4.7.188
+- Avoid rereading the recording session from storage for every captured event by retaining its license tenant ID in active recorder state.
+- Keep checking the current tab's tenant on every event and retain a storage fallback for sessions created by older versions.
+
+## 4.7.187
+- Show a localized high-priority recorder warning when the active tenant/license check blocks incoming recording events.
+- Keep the original license error in diagnostics and add all-locale regression coverage.
+
+## 4.7.186
+- Load Azure DevOps issue screenshots in small batches and preserve successful issue creation when a screenshot batch cannot be read.
+- Report failed attachment batches as partial success so users retain the created issue reference and do not need to recreate the issue.
+
+## 4.7.185
+- Reuse the on-demand, batched screenshot loader for support email drafts after preview image data was removed.
+- Invalidate an issue-package preview whenever the report is edited and reject previews that race with new edits.
+
+## 4.7.184
+- Build support-issue previews without transferring screenshot data; fetch the image batches only when exporting a PDF or offline package.
+- Exclude unavailable images from exports and show a localized warning in all eight UI languages.
+
+## 4.7.183
+- Translate all six live recording warning types in each of the eight supported interface languages.
+- Preserve warning severity codes for localized display while retaining the original diagnostic text.
+
+## 4.7.182
+- Show the recorder's high-priority incomplete-capture warning for raw event write failures as well as later persistence failures.
+- Name the failed persistence stage and add regression checks for raw, canonical and evidence update failures.
+
+## 4.7.181
+- Keep the technical bug-report editor available when screenshot evidence is missing or a screenshot batch cannot be read; continue loading later batches and report partial evidence.
+- Add regression coverage for recoverable screenshot-batch failures in the report flow.
+
+## 4.7.180
+- Remove a redundant screenshot-manifest read from each image batch; the asset store already filters requested keys against the selected recording's manifest.
+- Add isolation regression coverage proving unlisted screenshot keys cannot be loaded.
+
+## 4.7.179
+- Load review screenshots in bounded batches too, preventing the background's 1,000-path limit from breaking review of long recordings.
+- Keep an explicit list of screenshot paths that were unavailable during review or export.
+
+## 4.7.178
+- Require an interaction ID before coalescing field screenshots; separate edits of the same field retain distinct evidence while retries in one identified edit may reuse a capture.
+
+## 4.7.177
+- Include Business Central page and control identity in field screenshot coalescing so repeated captions such as “No.” cannot merge across documents or controls.
+- Add regression coverage for same-label fields on different pages and controls.
+
+## 4.7.176
+- Include exact missing screenshot paths in session-export diagnostics so incomplete image evidence can be traced.
+- Add a ZIP-integrity regression test covering file headers, UTF-8 filenames, payload bytes, CRC values and the central directory.
+
+## 4.7.175
+- Show bounded screenshot-export progress in the library status message so large exports do not appear frozen.
+
+## 4.7.174
+- Export session screenshots in bounded requests instead of attaching every base64 image to the initial session response, preventing oversized extension messages on larger recordings.
+- Report screenshot paths that disappeared during export and test batching, de-duplication, failure handling and limits.
+
+## 4.7.173
+- Keep separate action and dialog events from sharing a delayed screenshot; only identified changes to the same field may coalesce.
+- Prioritize observed result evidence when the bounded screenshot queue is full.
+- Add queue and capture-policy regression coverage for evidence separation and outcome priority.
+
+## 4.7.172
+- Reuse unchanged chunked event logs during repeated opens after validating the storage header revision; snapshots expire and are bounded by count and event volume.
+- Add regression coverage for cache hits, header invalidation, expiry, caller isolation and oversized-log bypass.
+
+## 4.7.171
+- Avoid a full deep-clone of every event when opening a recording; build the compatibility response directly from canonical events while preserving its existing shape.
+- Add a regression test comparing the projected response to the established legacy view.
+
+## 4.7.170
+- Cache normalized events and grouped review steps briefly across repeated opens of the same recording revision, avoiding repeated interpretation of unchanged sessions.
+- Cache keys include recording timestamp, event/asset counts and knowledge configuration; storage is bounded and large sessions bypass it.
+
+## 4.7.169
+- Build one screenshot asset-to-path index per report operation instead of rescanning every event and asset for every image; applies to report opening and external issue attachments.
+- Added 10,000-event path-index regression coverage.
+
+## 4.7.168
+- Extend explicit private-field masking through shadow-DOM hosts so nested Business Central controls inherit the host's privacy marker.
+- Add a shadow-root regression case.
+
+## 4.7.167
+- Mask password, payment-card, one-time-code and explicitly private/sensitive form values at capture time, including values inside marked containers.
+- Load the privacy guard on static and manual content-script injection paths; add privacy regression coverage.
+
+## 4.7.166
+- Add a localized Retry save action when a technical report autosave fails; retry uses the same flush path as exports and closing.
+- Add localization coverage for all eight supported UI languages.
+
+## 4.7.165
+- Preserve explicit zero confidence from capture and knowledge rules instead of replacing it with a reassuring fallback; low-confidence matches remain reviewable.
+- Added regression checks for both matched and unmatched zero-confidence actions.
+
+## 4.7.164
+- Technical report saves now preserve the newest edit when edits occur during an in-flight save; flush waits and retries the latest revision before export/close.
+- Added regression coverage for transient storage failure and concurrent edits during save.
+
+## 4.7.163
+- Delete orphaned screenshot pointers and image blobs when a recording manifest is missing, without touching another recording's assets.
+
+## 4.7.162
+- Load process-improvement and knowledge-feedback views from review keys only, avoiding unrelated event and screenshot payloads during analysis.
+
+## 4.7.161
+- Remove orphaned chunked recording events when a recording header is missing or damaged, including through key enumeration on current Edge versions.
+
+## 4.7.160
+- Bound the screenshot backlog and retain higher-priority dialog evidence during rapid sessions so stopping a recording cannot wait on an unbounded queue.
+
+## 4.7.159
+- Match recovered error context to saved error evidence by message in linear time, including on recordings with many dialogs.
+
+## 4.7.158
+- Migrate older error evidence using storage key enumeration when supported, avoiding payload reads for unrelated recordings and screenshots.
+
+## 4.7.157
+- Recover Business Central error dialogs and their preceding actions in one linear pass, keeping older technical reports responsive on long recordings.
+
+## 4.7.156
+- Initialize per-recording error-evidence indexes when bug reports start, avoiding even the one-time full storage scan for new reports.
+
+## 4.7.155
+- Index Business Central error evidence by recording so opening technical reports reads only their evidence and deleting a report also removes its associated evidence.
+
+## 4.7.154
+- Give tenant trial requests more time during license-service cold starts, distinguish timeouts from network failures, and localize the retry guidance in all supported languages.
+
+## 4.7.153
+- Keep damaged chunked recordings deletable by reading only their event-count header during removal.
+
+## 4.7.152
+- Keep document-library bug report listing scoped to bug-report keys so chunked process event records are never loaded just to display the list.
+
+## 4.7.151
+- Store canonical process events as separate records too; ordinary capture appends now write one event, while screenshot associations update only their affected event. Keep cleanup and cache release aligned with completed session lifecycle.
+
+## 4.7.150
+- Store raw captured events as individual records with a small recording header, so each new interaction writes only its own event instead of rewriting the complete raw event history. Existing recordings migrate on the next save.
+
+## 4.7.149
+- Release the active recording snapshots and source-event indexes after a successful stop to avoid retaining completed capture data in the service worker.
+
+## 4.7.148
+- Cached active raw and canonical recording snapshots and source-event indexes during a capture session to avoid reloading and rescanning the growing event history for every new event.
+
+## 4.7.147
+- Reused verified negative tenant license checks for 30 seconds to reduce repeated popup latency while discovering other users' new tenant trials after the short cache window.
+
+## 4.7.146
+- Kept event writes recoverable if best-effort error reporting also fails, limited live persistence warnings to raw-to-canonical event gaps, removed the broad stop veto, and reconciled the final session event count from the canonical log.
+
+## 4.7.145
+- Update capture diagnostics incrementally instead of rebuilding event-type and category counts from the full recording after every event.
+
+## 4.7.144
+- Keep draining the screenshot queue after a canonical screenshot-link write fails, while preserving the recording-integrity error for review.
+
+## 4.7.143
+- Continue screenshot capture after an individual image asset cannot be stored, and report dropped image evidence without aborting the queue.
+
+## 4.7.142
+- Surface event-persistence failures as a high-priority recording indicator warning so incomplete captures are visible immediately.
+
+## 4.7.141
+- Apply the same privacy masking to previous and current field values before persisting captured events.
+
+## 4.7.140
+- Preserve autosave failures through review close/export flushes and let explicit save retry the current review.
+
+## 4.7.139
+- Stop rewriting the full legacy event array after every captured event; create its compatibility snapshot once at recording finalization.
+
+## 4.7.138
+- Do not treat progress text, list counts, or a document number alone as proof that an operation succeeded; retain explicit multilingual completion messages and linked document references.
+
+## 4.7.137
+- Load only review-linked screenshots initially; fetch alternate images on demand and migrate legacy screenshot storage once.
+- Cache canonicalized legacy recordings so reopening a document does not repeat conversion or re-read screenshot payloads.
+- Store identical screenshot bytes once per recording using SHA-256 content references.
+- Build bug reports and issue attachments from screenshot indexes, loading only images actually attached.
+- Recover stale legacy screenshot blobs after interrupted migration without loading them again.
+- Send one event projection instead of duplicating every event in both canonical and compatibility payloads.
+- Load only referenced screenshots in the technical issue report workspace.
+
+## 4.7.131
+- Preserve manually repaired screenshot paths when reopening or exporting recordings.
+
+## 4.7.130
+- Surface dropped screenshot captures in the live recording status.
+
+## 4.7.129
+- Deduplicate active recording license checks for 30 seconds per tenant/session while preserving per-event tenant isolation.
+
+## 4.7.128
+- Reuse semantic block and plan component indexes within each document-quality analysis.
+
+## 4.7.127
+- Sort document-library titles and profiles using the selected interface language.
+
+## 4.7.126
+- Skip redundant full-recording preload for newly persisted capture events.
+
+## 4.7.125
+- Redact sensitive credential parameters in URL fragments as well as query strings.
+
+## 4.7.124
+- Redact additional credential and signature parameters from URLs in issue evidence.
+
+## 4.7.123
+- Make diagnostic label matching independent of the operating system's default locale.
+
+## 4.7.122
+- Preserve unusual JSON keys safely while sanitizing issue evidence.
+
+## 4.7.121
+- Localize timeout feedback across all supported languages and bound license administration messaging.
+
+## 4.7.120
+- Recognize copied Business Central diagnostic labels in all supported application languages.
+
+## 4.7.119
+- Localize external issue timeout feedback in the bug-report workspace.
+
+## 4.7.118
+- Reject successful-looking Entra token responses without a valid access token before persisting consultant sign-in state.
+
+## 4.7.117
+- Keep successful external issue references visible when a returned link is missing or unsafe; only verified HTTPS links are clickable.
+
+## 4.7.116
+- Localize external issue creation results and report exactly how many attachments failed.
+
+## 4.7.115
+- Preserve ambiguous issue-submission timeouts through the UI and warn users to check for the issue before retrying.
+
+## 4.7.114
+- Bound Azure DevOps and GitHub issue requests to thirty seconds and flag create timeouts as ambiguous outcomes.
+
+## 4.7.113
+- Keep the shared native knowledge connection alive until all concurrent lookups release it.
+
+## 4.7.112
+- Reject malformed successful AI Broker token responses before caching or starting analysis.
+
+## 4.7.111
+- Scope AI Broker and Application Insights OAuth token caches to the tenant as well as the client ID.
+
+## 4.7.110
+- Bound Microsoft OAuth token exchanges to ten seconds for GitHub/Azure DevOps, AI Broker and Application Insights integrations.
+
+## 4.7.109
+- Add localized JSON attachment filenames for bug-report email drafts across all eight languages.
+
+## 4.7.108
+- Localize invalid support-address errors and fallback report titles/JSON filenames in email drafts.
+
+## 4.7.107
+- Localize invalid support-address validation in bug-report email drafts, using English fallback for non-Swedish locales.
+
+## 4.7.101
+- Localize bulk-delete completion and partial-failure counts so the library reports accurately in the selected interface language.
+
+## 4.7.100
+- Localize library batch-operation results and progress, Review open/save/render-fallback notices, and screenshot/structure reset feedback in all eight interface languages.
+
+## 4.7.99
+- Apply a ten-second network bound to every consultant-license request, including Entra token exchange, tenant registration, tenant checks and trial activation.
+
+## 4.7.98
+- Localize annotation-cancel and Review Studio close-error messages, including the underlying failure detail, in all eight interface languages.
+
+## 4.7.97
+- Localize session deletion, bulk archive and permanent bulk deletion confirmations, including record counts, across all eight interface languages.
+
+## 4.7.96
+- Localize dynamic Review Studio, session-library, and batch-export status messages across all eight supported interface languages, and format session dates using the selected locale.
+
+## 4.7.95
+- Bound AI broker analysis and Application Insights query requests, and show a retryable timeout error instead of leaving diagnostics waiting indefinitely.
+
+## 4.7.94
+- Redact bearer credentials, named secrets and sensitive URL parameters from explicitly consented AI evidence, including reproduction text and opt-in telemetry.
+
+## 4.7.93
+- Preserve evidence-backed Business Central result and error callouts in Word preparation, and localize their labels in all eight supported document languages.
+- Normalize tenant-license service failures into retryable user-facing errors, reject already-expired trial activations, and bound the Entra-authenticated trial request so it cannot leave the action hanging.
+
+## 4.7.92
+- Shorten translated bank-reconciliation match captions so process-map SVG exports show the complete automatic/manual matching sequence without truncation.
+
+## 4.7.91
+- Localize all 140 labels used in the 49 built-in reference process diagrams across Swedish, English, French, German, Spanish, Danish, Finnish, and Norwegian Bokmål; add a regression gate so new map nodes cannot silently ship without all supported translations.
+- Add source-linked reference flows for general journal posting, bank reconciliation, and vendor payment journals, including the separate bank-transfer boundary and regional/setup caveats.
+
+## 4.7.90
+- Add three source-linked Quality Management process references (manual purchase inspection, warehouse-receipt reinspection, and sampled production-output inspection) and taxonomy entities for their extension-specific pages; keep each example partially verified and preserve its configuration and sample-quantity limits.
+
+## 4.7.89
+- Localize the process-map connection editor and search-result counts explicitly in all eight supported UI languages.
+
+## 4.7.88
+- Translate process-map controls, explanations, evidence states, routes, themes and version comparisons in all eight UI languages; preserve each selected locale through map rendering and SVG export instead of treating every non-English locale as Swedish.
+- Translate process-classification assessments and qualitative evidence labels in all eight UI languages; normalize known Swedish taxonomy labels before rendering other locales.
+- Translate the in-Business-Central recording indicator in all eight UI languages, including guidance controls and confirmation/error messages for dynamically injected recorder sessions.
+
+## 4.7.87
+- Show the related-page timing note only while the associated screenshot remains selected; hide stale attribution when a reviewer replaces that image.
+
+## 4.7.86
+- Carry the related-later-page-capture note into the semantic document so Word exports retain its timing and evidence context.
+
+## 4.7.85
+- Show and export a localized note whenever a nearby later page capture is used for a navigation/search step; preserve the source event number and distance in the review data.
+
+## 4.7.84
+- Attach the first nearby captured page state to a navigation/search task when its own source events have no screenshot; label the related event and distance so the later screenshot is not presented as if it came from the action itself.
+
+## 4.7.83
+- Ground Aptean Weigh Scale registration, manual weight entry, handling-unit fields and save-versus-post explanations in the supplied vendor guide; distinguish a pending weight entry from a posted warehouse receipt in all eight languages.
+- Load only session summaries, bug-report summaries and library metadata when listing recordings; enumerate storage keys first instead of materializing every event, screenshot and review payload on each library refresh.
+- Start opening a document while its last-opened activity is persisted in parallel, so a slow library write cannot delay review navigation.
+- Detect generic placeholder instructions in all eight supported languages across process review, quality checks, compatibility fallback selection and export diagnostics.
+- Give the placeholder warning a specific action-oriented title in Documentation Intelligence and avoid a duplicate profile recommendation for the same issue.
+- Cache malformed or schema-invalid MCP lookup results for the existing short retry window so reopening a document does not immediately repeat the same slow failed lookup.
+- Close silent UI-language fallbacks for French, German, Danish and Norwegian strings; verify all 332 UI messages preserve dynamic placeholders in all eight languages.
+- Preserve observed page and action context when published module knowledge replaces a generic action match.
+
+## 4.7.81
+- Preserve canonical source event numbers through semantic-step consolidation, including cases where an older semantic action carries an empty trace; this restores source screenshots and traceability on affected steps across all modules.
+
+## 4.7.80
+- Let exact Business Central page-object IDs satisfy page-context matching when localized captions are unavailable; keep mismatched page IDs from matching and preserve localized source explanations.
+- Correct mojibake in Swedish, French and Finnish purchase captions.
+- Check both semantic actions and module task types for required completion evidence, including Aptean Quality Control, inventory-status updates and retrieved project, return and shipment lines; keep ordinary record creation and field entry out of the outcome gate.
+- Cache compiled knowledge patterns and use a linear top-candidate scan to keep cross-module disambiguation fast.
+
+## 4.7.79
+- Match purchase-order creation from purchase-order list captions in all supported languages, and stop treating singular purchase-order document pages as the list where a new order is created.
+
+## 4.7.79
+- Match purchase-order creation from purchase-order list captions in all supported languages, and stop treating singular purchase-order document pages as the list where a new order is created.
+
+## 4.7.78
+- Withhold near-tied cross-module action matches for review instead of assigning business meaning by knowledge-pack order; preserve candidate diagnostics and accept decisive page-object/entity evidence.
+
+## 4.7.77
+- Preserve conditional Aptean Weighbridge source links on inbound weight, handling-unit and scale-reading steps; keep saving the scale dialog distinct from posting the warehouse receipt.
+- Verify Microsoft Learn and Aptean explanations retain their language, provenance and direct citation through review and Word document projection.
+- Preserve lookup context, selected row type and field values across all eight supported Business Central UI languages.
+- Extend recording-quality coverage across all 25 populated module packs, including page identification confidence, observed outcomes and manual-state traceability during regeneration.
+## 4.7.76
+- Recognize core back, edit, delete, lookup, and date-field actions in all eight supported UI languages so localized steps receive the same process context across modules.
+- Preserve the observed page and action in localized “New” explanations even when a module or extension entity has no verified translation; use a safe generic record description instead of guessing an entity name.
+- Parse localized lookup prompts from action text consistently in all supported locales, preserving the selected value, target field and inferred row entity even when the platform omits a separate field caption.
+- Recognize localized number captions used by French and Spanish lookup fields when applying same-row type context.
+- Read the displayed, licensed, diagnostic and exported-document version directly from the extension manifest to prevent stale version labels after reloads.
+- Send every business step with a missing or weakly identified page to review, including low-confidence generic fallbacks across all modules.
+- Add sourced, eight-language explanations for fixed-asset depreciation cancellation and purchase/sales return-reason selection.
+
+## 4.7.75
+- Make lookup groups use the lookup-field interaction as their primary context, preserving the originating field, page and row type while retaining the chosen record as result evidence.
+
+## 4.7.74
+- Preserve selected lookup values when the recorder groups the lookup and its selection into one step group, while requiring explicit selection evidence to avoid reusing a pre-existing field value.
+
+## 4.7.73
+- Recognize customer, item, vendor, location and dimension fields in all eight supported Business Central UI languages so lookup steps receive the right semantic type and localized entity label.
+
+## 4.7.72
+- Require observable completion evidence for additional payment applications, project transfers, quality-result creation and external connector import/synchronization actions.
+
+## 4.7.71
+- Preserve observed purchase-line type for item, G/L account, resource, fixed asset and item charge lookups; render contextual number fields in all eight supported document languages.
+
+## 4.7.70
+- Localize generated field, option, checkbox and menu-path instructions in all eight document languages, preserve the chosen document locale, and localize item-number fields using observed row type.
+
+## 4.7.69
+- Require observed page context for specific create, apply, post, transfer, calculate, reopen and other business-action steps, not only generic clicks.
+
+## 4.7.68
+- Require observed completion evidence for payment and ledger applications, cost-accounting transfers, calculations and document reopening across relevant modules.
+
+## 4.7.67
+- Limit the dialog-not-result warning to field changes, so ordinary actions whose expected result is opening a dialog are not incorrectly flagged.
+
+## 4.7.66
+- Do not treat opening or closing a dialog as proof that a field change or business result was saved; require an observed status or navigation outcome.
+
+## 4.7.65
+- Use the focused field caption consistently in specialized date, checkbox, option and lookup interactions when value events omit their own label.
+
+## 4.7.64
+- Preserve the focused field caption when value-change events omit their own label, so semantic instructions and field-specific rules remain contextual.
+
+## 4.7.63
+- Stop field and lookup consolidation at observed page changes, while continuing to allow confirmed modal lookups across their result page.
+
+## 4.7.62
+- Add observed Business Central page context to generic action and record-selection steps in all supported document languages; flag when page identity is missing.
+
+## 4.7.61
+- Require review when posting, release, delete, cancellation, approval or other critical actions lack an observed completion outcome; localize the warning in all eight languages.
+
+## 4.7.60
+- Flag meaningful recorded events that did not make it into a documented step, linking the review finding to their source events.
+
+## 4.7.59
+- Phrase New actions as starting record creation, so a click is not documented as a completed or saved record; apply the wording in all eight supported languages.
+
+## 4.7.58
+- Extend localized contextual creation instructions to additional Business Central documents, journals, warehouse tasks and master records.
+
+## 4.7.57
+- Expand contextual New-step descriptions to common Business Central master and document types, with localized names in all eight supported languages; use page captions without guessing for unrecognized entities.
+
+## 4.7.56
+- Explain recognized New actions with the Business Central record type (purchase order, sales order, customer, vendor, item) while preserving the observed action and page captions; unknown pages remain unguessed.
+
+## 4.7.51
+- Show the saved review before loading screenshots and rebuilding the session/process model; hydrate those enrichments asynchronously after the editor opens.
+
+## 4.7.50
+- Report external-knowledge cache hits and misses separately so the review does not imply it always contacts the MCP service.
+- Briefly cache transient MCP connection failures to avoid repeating the same long timeout on every open.
+
+## 4.7.49
+- Cache reviewed external knowledge responses locally for 30 days so reopening the same process does not repeat the same MCP lookups.
+- Use a privacy-preserving request hash as the cache key, and prune expired or excess entries.
+
+## 4.7.48
+- Run external knowledge lookups asynchronously after the review opens, limit each recording to 12 deduplicated unresolved matches, and resolve up to four requests concurrently.
+- Display unverified suggestions beside the matching review step with source and confidence instead of silently discarding them.
+
+## 4.7.47
+- Open the review editor without waiting for unused external knowledge lookups. The previous path could make up to 40 serial MCP requests before rendering the review.
+
+## 4.7.46
+
+- Recover Business Central page context across the main page and embedded frames, so actions keep the observed page title instead of the company name.
+- Preserve Tell Me search terms and combine searching with opening the selected Business Central list.
+- Carry the last focused field into record selection, exclude required-field help clicks and unlabeled icons, and identify item-number entry from the observed line type.
+- Replace the default expected-result claim that changes were saved with a check of document status and whether posting is required.
+
+## 4.7.45
+
+- Complete localized explanations for all eight supported languages across every rule with a contextual explanation.
+- Add verified localized search/page captions and confirmation actions for the income statement closing batch job.
+- Match the quality-inspection tracking-line action using Learn-verified captions in seven locales; provide all eight explanation locales, with English captions retained for Finnish until Learn publishes a Finnish scenario article.
+
+## 4.7.44
+
+- Add an exact-context year-end explanation for running the Close Income Statement batch job in English and Swedish.
+- Distinguish closing the fiscal year, generating closing journal lines, and posting the journal; note the additional-reporting-currency exception and rerun after prior-year entries.
+## 4.7.43
+
+- Keep an explicit page caption authoritative when matching process knowledge; entity-based page fallback now applies only when no page caption is available.
+- Preserve entity fallback for recordings that lack a page caption, while preventing a matching action on a visibly different page from borrowing another page's explanation.
+## 4.7.42
+
+- Explain Microsoft Quality Management inspection creation from selected item-tracking lines using source-verified English and Swedish page/action captions.
+- Refresh QMS source metadata for the current Learn page content and record the distinct warehouse-receipt paths per locale.
+- Align displayed/runtime extension version with the package version.
+
 ## 4.7.41
 
 - Prefer source-backed, module-specific explanations when an action such as New has a known rule; use the generic page-context explanation only as a fallback.
@@ -1771,7 +2302,7 @@
 - Prevented regeneration from replacing a populated Review with an empty
   interpretation, and recover empty generated Reviews when source-derived Steps
   are available on the next open.
-- Exposed safe **Regenerera frÃ¥n inspelning** in Review Studio so stored generated
+- Exposed safe **Regenerera från inspelning** in Review Studio so stored generated
   Reviews can adopt current grouping and semantic rules without a new recording.
 - Absorbed an immediately duplicated `Manuellt pris` capture into the existing
   menu-path action so it remains traceable without creating a redundant step.
@@ -1993,7 +2524,7 @@
 - Removed dashboard-owned Knowledge Pack scoring in favour of the existing
   engine Knowledge Domain, leaving UI code responsible for orchestration only.
 - Use the visible Business Central search-result caption without appending its
-  result type (for example `FÃ¶rs.order`, not `FÃ¶rs.order Listor`) and retain the
+  result type (for example `Förs.order`, not `Förs.order Listor`) and retain the
   screenshot where that result is visible instead of the loading/navigation state.
 - Recognize the trailing Business Central result-row icon when repairing existing
   automatically generated search steps.
@@ -2190,7 +2721,7 @@
   orphan diagnostics, and legacy Review projection.
 - Reused Review Undo/Redo, autosave, export flushing, and shared rendering.
 
-## 4.6.0 â€” Screenshot Selection Engine
+## 4.6.0 — Screenshot Selection Engine
 
 - Added deterministic schema-v1 screenshot selection results with algorithm
   version `1.0.0`, stable input fingerprints, reasons, and rejected candidates.
@@ -2204,7 +2735,7 @@
 - Added null-selection, duplicate, legacy, future-field, and 5,000-candidate
   performance coverage without image loading, OCR, AI, or computer vision.
 
-## 4.6.0 â€” Event â†’ Step Grouping
+## 4.6.0 — Event → Step Grouping
 
 - Added deterministic schema-v1 Step Groups with grouping algorithm version
   `1.0.0`, stable source-derived IDs, primary/supporting events, and diagnostics.
@@ -2217,7 +2748,7 @@
 - Added a Step Group entry point for Semantic Interaction Rules while retaining
   legacy consolidation fallback and unchanged Review/Workspace/Word behavior.
 
-## 4.6.0 â€” Event Normalization
+## 4.6.0 — Event Normalization
 
 - Added immutable schema-v1 Normalized Interaction Events derived from canonical
   raw evidence and BC identification.
@@ -2231,7 +2762,7 @@
 - Exposed normalized mechanics to Semantic Interaction Rules while preserving
   legacy fallbacks and unchanged Review, Workspace, and Word behavior.
 
-## 4.6.0 â€” BC Page / Control / Action Identification
+## 4.6.0 — BC Page / Control / Action Identification
 
 - Added immutable schema-v1 identification linked to canonical source events.
 - Captured explicit page-route IDs, technical control/action attributes,
@@ -2243,7 +2774,7 @@
 - Exposed detached identification metadata to existing processing while keeping
   Review, semantic wording, Document Workspace, and Word behavior unchanged.
 
-## 4.6.0 â€” Raw Event Persistence
+## 4.6.0 — Raw Event Persistence
 
 - Made Canonical Recording the first durable write for newly accepted events.
 - Added source-generated event identities, canonical insertion ordering, frame
@@ -3041,3 +3572,26 @@
 - Added unit tests with no external dependencies.
 - Added session-graph.json and confidence-report.json.
 - Kept Edge-only distribution as the primary product path.
+
+- Localized quality-inspection page and action matchers are included for all Learn-confirmed locales; Finnish retains localized explanations with English matcher captions pending localized Learn evidence.
+
+## 4.7.47
+- Open the review editor without waiting for unused external knowledge lookups. The previous path could make up to 40 serial MCP requests before rendering the review.
+
+
+
+
+
+
+# 4.7.102
+- Localized diagnostic capture outcomes and AL call-stack table labels across all eight UI languages.
+## 4.7.102
+- Localize captured-diagnostic outcomes and structured AL call-stack labels in technical reports across all eight interface languages.
+## 4.7.103
+- Make technical-report Markdown labels follow the selected document language instead of treating every non-English locale as Swedish.
+## 4.7.104
+- Serialize tenant-license storage updates and deduplicate concurrent trial activation per tenant to prevent lost tenant records or inconsistent installation IDs.
+## 4.7.105
+- Localize Document Library card actions, metadata, dates and empty state in all eight UI languages; invalid dates now get a clear fallback.
+## 4.7.106
+- Localize the built-in expected-result default in every supported document language without rewriting user-authored text.

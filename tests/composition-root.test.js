@@ -52,7 +52,8 @@ const flagged = pipeline.applyReleaseFindings({ normalizedEvents: [{
   interactionIds: ["interaction:a", "interaction:b"],
   groupingReason: ["same-control"] }], semanticActions: [],
 businessTasks: [{ taskId: "t:flag", stepGroupIds: ["g:flag"],
-  sourceEventIds: ["e:flag"] }], consolidationDecisions: [] }, {
+  sourceEventIds: ["e:flag"], pageCaption: "Sales Order",
+  instruction: "Select Release on the Sales Order page." }], consolidationDecisions: [] }, {
   session: { id: "release-findings" }
 });
 assert.strictEqual(flagged.processAnalysis.releaseGate.status,
@@ -221,7 +222,14 @@ const unclassifiedFallback = pipeline.interpret({ session: { id: "legacy" },
   contextCandidates: [], interpretedSteps: [], businessSteps: [] }) });
 assert.strictEqual(unclassifiedFallback.compatibilityMode,
   "legacy-placeholder-dominated");
-assert.deepStrictEqual(unclassifiedFallback.businessTasks, compatibilityTasks);
+// Legacy tasks keep their content but are flagged for review by the release gate.
+assert.deepStrictEqual(unclassifiedFallback.businessTasks.map(task => ({
+  taskId: task.taskId, taskType: task.taskType, instruction: task.instruction,
+  sourceEventNos: task.sourceEventNos })), compatibilityTasks);
+assert.strictEqual(unclassifiedFallback.businessTasks[0].reviewStatus, "review-suggested");
+assert.deepStrictEqual(compatibilityTasks[0], { taskId: "legacy-action",
+  taskType: "RunAction", instruction: "Välj Släpp.", sourceEventNos: [1] },
+"the compatibility input is not mutated");
 
 const packs = [{ packId: "sales", name: "Sales", version: "1", rules: [{
   ruleId: "quantity", priority: 100, confidence: 0.95,

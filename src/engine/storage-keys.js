@@ -8,6 +8,9 @@
   const RAW_RECORDING_PREFIX = "t9_raw_recording_";
   const EVENT_PREFIX = "t9_events_";
   const SCREENSHOT_PREFIX = "t9_screenshots_";
+  const SCREENSHOT_ASSET_PREFIX = "t9_screenshot_asset_";
+  const SCREENSHOT_BLOB_PREFIX = "t9_screenshot_blob_";
+  const SCREENSHOT_MANIFEST_PREFIX = "t9_screenshot_manifest_";
   const REVIEW_PREFIX = "t9_review_";
   const DOCUMENT_LIBRARY_KEY = "t9_document_library";
   const BUG_REPORT_PREFIX = "t9_bug_report_";
@@ -20,6 +23,7 @@
       RAW_RECORDING_PREFIX + sessionId,
       EVENT_PREFIX + sessionId,
       SCREENSHOT_PREFIX + sessionId,
+      SCREENSHOT_MANIFEST_PREFIX + sessionId,
       REVIEW_PREFIX + sessionId
     ];
   }
@@ -33,6 +37,9 @@
     RECORDING_PREFIX,
     RAW_RECORDING_PREFIX,
     SCREENSHOT_PREFIX,
+    SCREENSHOT_ASSET_PREFIX,
+    SCREENSHOT_BLOB_PREFIX,
+    SCREENSHOT_MANIFEST_PREFIX,
     SESSION_PREFIX,
     sessionDataKeys
   };

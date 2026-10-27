@@ -1,0 +1,15 @@
+# Optional Outlook drafts
+
+The email button offers an Outlook draft or a local .eml file. Outlook is never contacted on installation, sign-in for licensing, report load, or local export. The Outlook action requests only Graph's exact origin and delegated Mail.ReadWrite through authorization code + PKCE; no Mail.Send, application mailbox permission, client secret, refresh token or license access token is used. Graph tokens are cached in page memory and chrome.storage.session across report tabs, bound to the current license-account namespace. They are not written to local/sync storage and are cleared on explicit license sign-out. Cached tokens expire; a 401 invalidates them. An Outlook action tries non-interactive Entra SSO first (prompt=none), then an interactive flow only when required, without forcing select_account. The license profile supplies a login_hint, not a license token. No offline_access or refresh token is requested. Outlook web cookies remain separate: an OAuth token does not sign the browser into Outlook, and tenant/MFA policies still apply.
+
+The action uploads the generated PDF, recipient, subject and short email body to the mailbox selected during Microsoft sign-in. It creates a draft, never sends it, and opens a verified Outlook web link. Client signatures are not injected. Mail.ReadWrite also permits reading/updating/deleting mail, even though this feature only creates drafts. Tenant policy can require admin approval; the UI discloses this and retains .eml export. PDFs too large for a single attachment/request use .eml export.
+
+A per-report/revision/recipient hashed local key stores pending/created status and the verified draft link; no access token or PDF is persisted there. A timeout or ambiguous response blocks automatic recreation for that report revision, including after reload. Check Outlook Drafts before using .eml. A successful creation can reopen its stored link without another POST; the user may have deleted or sent that draft later, so this is not a mailbox synchronization feature.
+
+## Entra configuration and verification
+
+Uses the existing public client in tenant-license-config.js and the existing chrome.identity.getRedirectURL("entra") redirect. In its Entra app registration, add Microsoft Graph delegated Mail.ReadWrite and confirm that the public-client authorization-code/PKCE redirect remains registered for each supported extension identity. Each customer grants user or admin consent according to its policy. No global admin consent is performed by this implementation. An Exchange Online mailbox is required.
+
+Live verification must cover allowed consent, admin-required consent, cancel, PDF attachment, selected account, Outlook web editing, local .eml fallback, large PDF, duplicate click/reload and network failure. Mock tests do not prove that the app registration or customer mailbox is ready.
+
+Sources: https://learn.microsoft.com/en-us/graph/api/user-post-messages and https://learn.microsoft.com/en-us/graph/permissions-reference#mailreadwrite

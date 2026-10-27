@@ -20,23 +20,32 @@ const result = guard.evaluate({ normalizedEvents: [
     stepGroupIds: ["group:merge"] }
 ] });
 
-assert.strictEqual(result.guardVersion, "1.0.0");
+assert.strictEqual(result.guardVersion, "1.5.0");
 assert.strictEqual(result.status, "blocked");
 assert.deepStrictEqual(new Set(result.findings.map(item => item.code)), new Set([
   "BCPS-PROCESS-GUARD-TRACE-001", "BCPS-PROCESS-GUARD-FIELD-001",
   "BCPS-PROCESS-GUARD-VALUE-001", "BCPS-PROCESS-GUARD-RESULT-001",
-  "BCPS-PROCESS-GUARD-MERGE-001"
+  "BCPS-PROCESS-GUARD-MERGE-001",
+  // Tasks without observed page context or an explanatory instruction need review.
+  "BCPS-PROCESS-GUARD-CONTEXT-002", "BCPS-PROCESS-GUARD-INSTRUCTION-001"
 ]));
 assert.strictEqual(result.counts.blocked, 4);
-assert.strictEqual(result.counts.review, 1);
+assert.strictEqual(result.counts.review, 9);
 assert(!JSON.stringify(result).includes("Customer Name"),
   "guard findings must not copy captured business values");
+
+const terse = guard.evaluate({ businessTasks: [{ taskId: "t", sourceEventIds: ["e"],
+  pageCaption: "Sales Order", instruction: "Välj SECRET" }] });
+assert(terse.findings.some(item => item.code === "BCPS-PROCESS-GUARD-INSTRUCTION-001"));
+assert(!JSON.stringify(terse).includes("SECRET"),
+  "instruction findings must not copy instruction text, which embeds captured values");
 
 const allowed = guard.evaluate({ normalizedEvents: [{ normalizedEventId: "n" }],
   stepGroups: [{ stepGroupId: "g", interactionIds: ["a", "b"],
     groupingReason: ["confirmation-dialog"], normalizedEvents: [{ kind: "activation" }] }],
   businessTasks: [{ taskId: "t", sourceEventIds: ["e"], stepGroupIds: ["g"],
-    fieldCaption: "Quantity", selectedCaption: "500",
+    fieldCaption: "Quantity", selectedCaption: "500", pageCaption: "Sales Order",
+    instruction: "Enter 500 in Quantity.",
     semanticActionModel: { targetField: "Quantity", selectedValue: "500" } }] });
 assert.strictEqual(allowed.status, "passed");
 

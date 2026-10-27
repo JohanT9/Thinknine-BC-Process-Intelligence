@@ -1,8 +1,11 @@
 importScripts("engine/locale-catalogs.js");
 importScripts("engine/language-registry.js");
 importScripts("engine/storage-keys.js");
+importScripts("engine/storage-queries.js");
+importScripts("engine/knowledge-mcp-client-manager.js");
 importScripts("engine/business-central-url-context.js");
 importScripts("engine/tenant-license.js");
+importScripts("engine/recording-license-guard.js");
 importScripts("engine/tenant-license-config.js");
 importScripts("engine/consultant-license.js");
 importScripts("engine/document-usage.js");
@@ -24,6 +27,7 @@ importScripts("engine/business-central-reference-diagram-seed.js");
 importScripts("engine/reference-diagram-dataset.js");
 importScripts("document/multi-level-process-graph.js");
 importScripts("engine/raw-event-persistence.js");
+importScripts("engine/event-log-storage.js");
 importScripts("engine/bc-ui-identification.js");
 importScripts("engine/event-normalization.js");
 importScripts("engine/capture-packet-integrity.js");
@@ -35,16 +39,25 @@ importScripts("engine/task-consolidation.js");
 importScripts("engine/knowledge-domain.js");
 importScripts("engine/knowledge-repository.js");
 importScripts("engine/knowledge-native-mcp-client.js");
+importScripts("engine/knowledge-mcp-cache.js");
 importScripts("engine/knowledge-mcp-adapter.js");
 importScripts("engine/process-decision-code-registry.js");
+importScripts("review/task-visibility.js");
 importScripts("engine/process-quality-guard.js");
 importScripts("engine/process-contradiction-engine.js");
 importScripts("engine/process-analysis-model.js");
 importScripts("engine/session-interpretation-pipeline.js");
 importScripts("engine/privacy-mask.js");
+importScripts("engine/recording-derived-cache.js");
 importScripts("engine/screenshot-capture-policy.js");
+importScripts("engine/screenshot-queue-policy.js");
+importScripts("engine/screenshot-asset-paths.js");
+importScripts("engine/screenshot-asset-store.js");
+importScripts("engine/screenshot-target-registration.js");
 importScripts("engine/recording-live-status.js");
+importScripts("engine/recovering-queue.js");
 importScripts("bug-report/bc-diagnostic-evidence.js");
+importScripts("engine/bc-error-evidence-store.js");
 importScripts("bug-report/al-call-stack-parser.js");
 importScripts("bug-report/technical-diagnostics.js");
 importScripts("bug-report/error-evidence-model.js");
@@ -75,6 +88,7 @@ importScripts("bug-report/issue-package.js");
 importScripts("bug-report/issue-package-markdown.js");
 importScripts("bug-report/issue-submission-service.js");
 importScripts("bug-report/external-issue-auth.js");
+importScripts("bug-report/issue-http-transport.js");
 importScripts("bug-report/azure-devops-adapter.js");
 importScripts("bug-report/github-issue-adapter.js");
 importScripts("document/document-library.js");
@@ -82,7 +96,10 @@ importScripts("review/process-improvement-dataset.js");
 importScripts("review/knowledge-feedback-learning.js");
 importScripts("review/process-improvement-service.js");
 
-const VERSION = "4.7.41";
+const VERSION = chrome.runtime.getManifest().version;
+const recordingDerivedCache = globalThis.T9RecordingDerivedCache.create({
+  maxEntries: 3, maxEvents: 5000, ttlMs: 5 * 60 * 1000
+});
 const consultantLicense = globalThis.T9ConsultantLicense.create({
   storage: chrome.storage.local, fetcher: (...args) => fetch(...args),
   identity: chrome.identity, config: globalThis.T9TenantLicenseConfig,
@@ -93,6 +110,9 @@ const tenantLicense = globalThis.T9TenantLicense.create({
   authenticatedTrial: request => consultantLicense.requestTenantTrial(
     request.tenantId, request.installationId),
   config: globalThis.T9TenantLicenseConfig, version: VERSION
+});
+const recordingLicenseGuard = globalThis.T9RecordingLicenseGuard.create({
+  validate: requireRecordingLicense
 });
 
 const documentUsage = globalThis.T9DocumentUsage.create({
@@ -131,13 +151,20 @@ async function requireRecordingLicense(url) {
   }
 }
 const windowsSharePorts = new Set();
-let knowledgeMcpClient = null;
-function getKnowledgeMcpClient() {
-  if (!knowledgeMcpClient) knowledgeMcpClient =
-    globalThis.BCKnowledgeNativeMcpClient.create({
-      connectNative: host => chrome.runtime.connectNative(host)
-    });
-  return knowledgeMcpClient;
+const KNOWLEDGE_MCP_CACHE_KEY = "t9KnowledgeMcpLookupCacheV1";
+const knowledgeMcpClientManager = globalThis.T9KnowledgeMcpClientManager.create(() =>
+  globalThis.BCKnowledgeNativeMcpClient.create({
+    connectNative: host => chrome.runtime.connectNative(host)
+  }));
+async function knowledgeMcpCacheKey(lookup) {
+  const stable = value => Array.isArray(value) ? value.map(stable)
+    : value && typeof value === "object"
+      ? Object.fromEntries(Object.keys(value).sort().map(key => [key, stable(value[key])]))
+      : value;
+  const source = JSON.stringify({ cacheVersion: globalThis.T9KnowledgeMcpCache.VERSION,
+    kind: lookup?.kind, request: stable(lookup?.request || {}) });
+  const digest = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(source));
+  return Array.from(new Uint8Array(digest), byte => byte.toString(16).padStart(2, "0")).join("");
 }
 function isKnowledgeMcpSettingsSender(sender) {
   return sender.id === chrome.runtime.id &&
@@ -194,8 +221,8 @@ const DEFAULT_SETTINGS = {
   exportFileNamePattern: "{process} - {environment} - {date}",
   documentationProfile: "generic",
   defaultExpectedResult:
-    "Processen är genomförd enligt arbetsgången och de registrerade " +
-    "ändringarna har sparats i Business Central.",
+    "Stegen beskriver det observerade arbetsflödet. Kontrollera dokumentets " +
+    "status och bekräfta om processen kräver bokföring i Business Central.",
   captureScreenshots: true,
   showClickHighlights: true,
   screenshotMode: "important",
@@ -238,9 +265,37 @@ const {
   RAW_RECORDING_PREFIX,
   RECORDING_PREFIX,
   REVIEW_PREFIX,
+  SCREENSHOT_ASSET_PREFIX,
+  SCREENSHOT_BLOB_PREFIX,
+  SCREENSHOT_MANIFEST_PREFIX,
   SCREENSHOT_PREFIX,
   SESSION_PREFIX
 } = globalThis.T9StorageKeys;
+const screenshotAssetStore = globalThis.T9ScreenshotAssetStore.create({
+  storage: chrome.storage.local,
+  legacyLoad: async id => {
+    const key = SCREENSHOT_PREFIX + id;
+    const data = await chrome.storage.local.get(key);
+    return data[key] || {};
+  },
+  assetPrefix: SCREENSHOT_ASSET_PREFIX,
+  blobPrefix: SCREENSHOT_BLOB_PREFIX,
+  manifestPrefix: SCREENSHOT_MANIFEST_PREFIX,
+  legacyPrefix: SCREENSHOT_PREFIX
+});
+const bcErrorEvidenceStore = globalThis.T9BcErrorEvidenceStore.create({
+  storage: chrome.storage.local,
+  prefix: BC_ERROR_EVIDENCE_PREFIX,
+  indexPrefix: `${BC_ERROR_EVIDENCE_PREFIX}index_`
+});
+const rawEventLogStorage = globalThis.T9EventLogStorage.create({
+  storage: chrome.storage.local,
+  prefix: RAW_RECORDING_PREFIX
+});
+const canonicalEventLogStorage = globalThis.T9EventLogStorage.create({
+  storage: chrome.storage.local,
+  prefix: RECORDING_PREFIX
+});
 const processImprovement = globalThis.T9ProcessImprovementService.create({
   storage: chrome.storage.local, reviewPrefix: REVIEW_PREFIX,
   validateDraft: validateKnowledgeDraft
@@ -252,13 +307,14 @@ const ISSUE_CONFIG_KEY = "t9_external_issue_configuration";
 
 let writeQueue = Promise.resolve();
 let stoppingSessionId = null;
-let canonicalPersistenceError = null;
 let errorEvidenceWrites = Promise.resolve();
 const telemetryRefreshGeneration = new Map();
 const aiAnalysisGeneration = new Map();
-const issueSubmissionGeneration = new Map();
+let issueReferenceWriteQueue = Promise.resolve();
+const tenantLicenseFailureNotifications = new Map();
 
 const SCREENSHOT_MIN_INTERVAL_MS = 1100;
+const SCREENSHOT_MAX_QUEUE_ITEMS = 40;
 const CANONICAL_SETTLE_TIMEOUT_MS = 60000;
 let screenshotQueue = [];
 let screenshotWorkerRunning = false;
@@ -426,40 +482,57 @@ async function saveEvents(id, events) {
 }
 
 async function getScreenshots(id) {
-  const key = SCREENSHOT_PREFIX + id;
-  const data = await chrome.storage.local.get(key);
-  return data[key] || {};
+  const result = await screenshotAssetStore.load(id);
+  return result.assets;
 }
 
-async function saveScreenshots(id, screenshots) {
-  await chrome.storage.local.set({
-    [SCREENSHOT_PREFIX + id]: screenshots
-  });
+async function saveScreenshot(id, key, image) {
+  return screenshotAssetStore.save(id, key, image);
+}
+
+async function getScreenshotDataForPaths(id, requestedPaths) {
+  const keys = [...new Set((Array.isArray(requestedPaths)
+    ? requestedPaths : []).map(globalThis.T9ScreenshotAssetPaths.keyForPath)
+    .filter(Boolean))];
+  const result = await screenshotAssetStore.load(id, keys);
+  return Object.fromEntries(Object.entries(result.assets).map(([key, value]) =>
+    [globalThis.T9ScreenshotAssetPaths.pathForKey(key), value]));
 }
 
 async function getCanonicalRecording(id) {
   const key = RECORDING_PREFIX + id;
   const data = await chrome.storage.local.get(key);
+  if (data[key]?.eventStorageFormat === "chunked-v1") {
+    return globalThis.T9CanonicalRecording.normalize(
+      await canonicalEventLogStorage.load(id));
+  }
   if (data[key]) return globalThis.T9CanonicalRecording.normalize(data[key]);
   const session = await getSession(id);
   if (!session) return null;
-  return globalThis.T9CanonicalRecording.fromLegacy(session, await getEvents(id), await getScreenshots(id));
+  const events = await getEvents(id);
+  // Older recordings keep screenshots in one large storage value. Migrate that
+  // value once, but build the canonical event/asset index from keys only so the
+  // review-open path never materializes every image as a data URL.
+  const screenshotManifest = await screenshotAssetStore.manifest(id);
+  const screenshotMetadata = Object.fromEntries(screenshotManifest.keys
+    .filter(assetKey => /^\d+$/u.test(assetKey))
+    .map(assetKey => [assetKey, "data:image/png;base64,"]));
+  const recording = globalThis.T9CanonicalRecording.fromLegacy(
+    session, events, screenshotMetadata);
+  await saveCanonicalRecording(recording);
+  return recording;
 }
 
 async function saveCanonicalRecording(recording) {
-  await chrome.storage.local.set({ [RECORDING_PREFIX + recording.id]: recording });
+  await canonicalEventLogStorage.save(recording);
 }
 
 async function getRawRecording(id) {
-  const key = RAW_RECORDING_PREFIX + id;
-  const data = await chrome.storage.local.get(key);
-  return data[key] || null;
+  return rawEventLogStorage.load(id);
 }
 
 async function saveRawRecording(recording) {
-  await chrome.storage.local.set({
-    [RAW_RECORDING_PREFIX + recording.recordingId]: recording
-  });
+  await rawEventLogStorage.save(recording);
 }
 
 const rawEventStore = globalThis.T9RawEventPersistence.createRawStore({
@@ -483,7 +556,11 @@ const bugReportStore = globalThis.T9BugReportStore.createStore({
     await recordDocumentUsage("bug-report", value.bugReportId, !existing);
   },
   async remove(key) { await chrome.storage.local.remove(key); },
-  async all() { return chrome.storage.local.get(null); }
+  async all() {
+    return globalThis.T9StorageQueries.getByPrefixes(
+      chrome.storage.local, [BUG_REPORT_PREFIX]
+    );
+  }
 }, BUG_REPORT_PREFIX);
 
 const telemetryProvider = globalThis.T9ApplicationInsightsProvider.create({
@@ -577,8 +654,11 @@ async function saveIssueConfiguration(value = {}) {
 async function azureRequest(configuration, token, path, options = {}) {
   const url = `https://dev.azure.com/${encodeURIComponent(configuration.organization)}/${
     encodeURIComponent(configuration.project)}/${path}`;
-  const response = await fetch(url, { ...options, headers: { ...(options.headers || {}),
-    Authorization: `Bearer ${token}` } });
+  const method = String(options.method || "GET").toUpperCase();
+  const response = await globalThis.T9IssueHttpTransport.create().request(url,
+    { ...options, headers: { ...(options.headers || {}),
+      Authorization: `Bearer ${token}` } },
+    { service: "Azure DevOps", mayHaveCommitted: method === "POST" || method === "PATCH" });
   if (!response.ok) throw Object.assign(new Error(
     `Azure DevOps returned HTTP ${response.status}.`), { status: response.status });
   return response.status === 204 ? {} : response.json();
@@ -605,12 +685,33 @@ function createAzureProvider(configuration, recordingId) {
       `_apis/wit/workitems/$${encodeURIComponent(configuration.workItemType)}?api-version=7.1`,
       { method: "POST", headers: { "Content-Type": "application/json-patch+json" },
         body: JSON.stringify(request.fields) });
-    const screenshotValues = await getScreenshots(recordingId); const recording =
-      await getCanonicalRecording(recordingId); const attachmentFailures = [];
-    for (const attachment of request.attachments || []) {
-      try { const event = recording?.events?.find(value =>
-        value.screenshotAssetId === attachment.assetId);
-        const source = event ? screenshotValues[event.raw?.eventNo] : null;
+    const recording = await getCanonicalRecording(recordingId);
+    const attachments = request.attachments || [];
+    const screenshotPathByAssetId = globalThis.T9ScreenshotAssetPaths
+      .assetPathIndex(recording);
+    const pathByAssetId = new Map(attachments.flatMap(attachment => {
+      const path = screenshotPathByAssetId.get(String(attachment.assetId));
+      return path ? [[attachment.assetId, path]] : [];
+    }));
+    const attachmentFailures = [];
+    for (let offset = 0; offset < attachments.length; offset += 10) {
+      const batch = attachments.slice(offset, offset + 10);
+      const paths = [...new Set(batch.map(attachment =>
+        pathByAssetId.get(attachment.assetId)).filter(Boolean))];
+      let screenshotValues = {};
+      try {
+        if (paths.length) screenshotValues = await getScreenshotDataForPaths(
+          recordingId, paths);
+      } catch (error) {
+        attachmentFailures.push(...batch.map(attachment => ({
+          attachmentId: attachment.attachmentId,
+          category: error.category || "attachment-failed",
+          message: String(error.message).slice(0, 200) })));
+        continue;
+      }
+      for (const attachment of batch) {
+      try {
+        const source = screenshotValues[pathByAssetId.get(attachment.assetId)] || null;
         const uploaded = await azureRequest(configuration, token,
           `_apis/wit/attachments?fileName=${encodeURIComponent(attachment.fileName)}&api-version=7.1`,
           { method: "POST", headers: { "Content-Type": attachment.mediaType },
@@ -623,6 +724,7 @@ function createAzureProvider(configuration, recordingId) {
               attributes: { comment: attachment.role } } }]) });
       } catch (error) { attachmentFailures.push({ attachmentId: attachment.attachmentId,
         category: error.category || "attachment-failed", message: String(error.message).slice(0, 200) }); }
+      }
     }
     return { destination: `${configuration.organization}/${configuration.project}`,
       externalId: item.id, url: item._links?.html?.href || item.url,
@@ -636,9 +738,10 @@ function createGitHubProvider(configuration) {
       "github-issues-broker");
     const base = new URL(configuration.brokerUrl); base.pathname = `${base.pathname.replace(/\/$/u,
       "")}/external-issues/github/${operation}`;
-    const response = await fetch(base, { method: "POST", headers: {
+    const response = await globalThis.T9IssueHttpTransport.create().request(base, { method: "POST", headers: {
       Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
-    body: JSON.stringify(request) });
+    body: JSON.stringify(request) }, { service: "GitHub App broker",
+      mayHaveCommitted: operation === "create" });
     if (!response.ok) throw Object.assign(new Error(
       `GitHub App broker returned HTTP ${response.status}.`), { status: response.status,
       uncertain: operation === "create" && response.status >= 500 });
@@ -726,18 +829,8 @@ async function saveStepRepairScreenshot(recordingId, assetKey, image) {
   if (!await getSession(recordingId)) {
     throw new Error("Inspelningen kunde inte hittas.");
   }
-  const screenshots = await getScreenshots(recordingId);
-  screenshots[assetKey] = image;
-  await saveScreenshots(recordingId, screenshots);
+  await saveScreenshot(recordingId, assetKey, image);
   return { assetId: `screenshots/${assetKey}.png` };
-}
-
-function screenshotPriority(category) {
-  if (category === "dialog") return 3;
-  if (category === "field-input") return 2;
-  if (category === "action") return 2;
-  if (category === "navigation") return 1;
-  return 0;
 }
 
 async function enqueueScreenshot({
@@ -749,27 +842,11 @@ async function enqueueScreenshot({
   captureKey = ""
 }) {
   screenshotStats.requested += 1;
-
-  const existing = screenshotQueue.find(item =>
-    item.sessionId === sessionId &&
-    Math.abs(item.eventNo - eventNo) <= 2 &&
-    globalThis.T9ScreenshotCapturePolicy.canReuse(item, {
-      category, captureKey
-    })
-  );
-
-  if (existing) {
-    existing.targets ||= [{ eventNo: existing.eventNo,
-      eventId: existing.eventId }];
-    if (!existing.targets.some(target => target.eventNo === eventNo)) {
-      existing.targets.push({ eventNo, eventId });
-    }
-    if (screenshotPriority(category) > screenshotPriority(existing.category)) {
-      existing.category = category;
-      existing.eventNo = eventNo;
-      existing.eventId = eventId;
-      existing.tabId = tabId;
-    }
+  const result = globalThis.T9ScreenshotQueuePolicy.enqueue(screenshotQueue, {
+    sessionId, eventNo, eventId, tabId, category, captureKey,
+    queuedAt: Date.now()
+  }, SCREENSHOT_MAX_QUEUE_ITEMS);
+  if (result.reused) {
     screenshotStats.reused += 1;
     await setDebug({
       screenshotQueueLength: screenshotQueue.length,
@@ -777,22 +854,9 @@ async function enqueueScreenshot({
     });
     return;
   }
-
-  screenshotQueue.push({
-    sessionId,
-    eventNo,
-    eventId,
-    tabId,
-    category,
-    captureKey,
-    targets: [{ eventNo, eventId }],
-    queuedAt: Date.now()
-  });
-
-  screenshotQueue.sort((a, b) =>
-    screenshotPriority(b.category) - screenshotPriority(a.category) ||
-    a.queuedAt - b.queuedAt
-  );
+  if (result.dropped) {
+    screenshotStats.dropped += result.dropped.targets?.length || 1;
+  }
 
   await setDebug({
     screenshotQueueLength: screenshotQueue.length,
@@ -824,6 +888,8 @@ async function processScreenshotQueue() {
       const state = await getState();
       if (!state.recording || state.sessionId !== item.sessionId) {
         screenshotStats.dropped += 1;
+        await setDebug({ screenshotQueueLength: screenshotQueue.length,
+          screenshotStats: { ...screenshotStats } });
         continue;
       }
 
@@ -832,31 +898,41 @@ async function processScreenshotQueue() {
 
       if (!image) {
         screenshotStats.dropped += 1;
+        await setDebug({ screenshotQueueLength: screenshotQueue.length,
+          screenshotStats: { ...screenshotStats } });
         continue;
       }
-
-      const screenshots = await getScreenshots(item.sessionId);
 
       // One stable capture may represent nearby events, but every event must retain
       // an addressable screenshot so the complete recording is available in Review.
       const targets = item.targets?.length ? item.targets :
         [{ eventNo: item.eventNo, eventId: item.eventId }];
       const capturedAt = new Date().toISOString();
-      for (const target of targets) {
-        screenshots[target.eventNo] = image;
-        await canonicalStore.associateScreenshot(
-          item.sessionId, target.eventId, image, capturedAt
-        );
+      const registration = await globalThis.T9ScreenshotTargetRegistration.register({
+        targets,
+        async saveAsset(target) {
+          await saveScreenshot(item.sessionId, String(target.eventNo), image);
+        },
+        associate(target) {
+          return canonicalStore.associateScreenshot(
+            item.sessionId, target.eventId, image, capturedAt
+          );
+        }
+      });
+      if (registration.failures.length) {
+        screenshotStats.errors += registration.failures.length;
+        screenshotStats.dropped += registration.failures.length;
+        lastScreenshotError = String(registration.failures[0].error?.message ||
+          registration.failures[0].error);
       }
-      await saveScreenshots(item.sessionId, screenshots);
-
-      screenshotStats.captured += 1;
+      if (registration.saved) screenshotStats.captured += 1;
 
       await setDebug({
         screenshotQueueLength: screenshotQueue.length,
         screenshotStats: { ...screenshotStats },
         lastScreenshotAt: new Date().toISOString(),
-        lastScreenshotError: null
+        lastScreenshotError: registration.failures.length
+          ? lastScreenshotError : null
       });
     }
   } finally {
@@ -879,8 +955,17 @@ async function recordEvent(rawEvent, captureContext = {}) {
   const acceptedState = await getState();
   if (!acceptedState.recording || !acceptedState.sessionId ||
       stoppingSessionId === acceptedState.sessionId) return;
-  await requireActiveTenantLicense(acceptedState);
+  try {
+    await requireActiveTenantLicense(acceptedState);
+  } catch (error) {
+    await setDebug({ lastError: String(error), recordingHealth: {
+      status: "license-error", occurredAt: new Date().toISOString(),
+      operation: "tenant-license" } });
+    throw error;
+  }
 
+  let rawEventPersisted = false;
+  let canonicalEventPersisted = false;
   const operation = writeQueue.then(async () => {
     const recordingId = acceptedState.sessionId;
     const session = await getSession(recordingId);
@@ -907,14 +992,11 @@ async function recordEvent(rawEvent, captureContext = {}) {
       }
     };
 
-    if ("value" in sourceEvent) {
-      sourceEvent.value = globalThis.T9PrivacyMask.mask(
-        sourceEvent.fieldName, sourceEvent.value, settings
-      );
-    }
+    const privacySafeEvent = globalThis.T9PrivacyMask
+      .maskFieldValues(sourceEvent, settings);
 
     const rawResult = await rawEventStore.appendRawEvent(
-      recordingId, sourceEvent, { maxEvents: settings.maxEvents }
+      recordingId, privacySafeEvent, { maxEvents: settings.maxEvents }
     );
     if (rawResult.status === "truncated") {
       await setDebug({ lastError: "Maximalt antal händelser har uppnåtts.",
@@ -922,6 +1004,7 @@ async function recordEvent(rawEvent, captureContext = {}) {
           diagnostic: rawResult.diagnostic } });
       return;
     }
+    rawEventPersisted = true;
     const debugState = await chrome.storage.local.get(DEBUG_KEY);
     if (debugState[DEBUG_KEY]?.captureDiagnosticsEnabled) {
       await appendCaptureDiagnostic({ stage: "raw-event-persisted",
@@ -929,12 +1012,17 @@ async function recordEvent(rawEvent, captureContext = {}) {
       captureContext);
     }
 
-    const canonicalBefore = await getCanonicalRecording(recordingId);
-    const alreadyCanonical = canonicalBefore.events.some(item =>
+    // Raw persistence assigns the authoritative sequence, so a new event does
+    // not need a full canonical preload before the append transaction. Read it
+    // only for a duplicate raw event, where retry recovery must detect whether
+    // canonical projection already completed.
+    const canonicalBefore = rawResult.status === "duplicate"
+      ? await getCanonicalRecording(recordingId) : null;
+    const alreadyCanonical = Boolean(canonicalBefore?.events.some(item =>
       item.source?.eventId === sourceEventId
-    );
+    ));
     const event = { ...rawResult.event,
-      eventNo: canonicalBefore.events.length + 1 };
+      eventNo: rawResult.event.acceptedSequence };
 
     // Interpretation starts only after authoritative raw persistence succeeds.
     await pageKnowledgePacksReady;
@@ -947,14 +1035,19 @@ async function recordEvent(rawEvent, captureContext = {}) {
     const canonicalEvent = canonical.events.find(item =>
       item.source?.eventId === event.sourceEventId
     );
+    canonicalEventPersisted = Boolean(canonicalEvent);
+    if (!canonicalEventPersisted) {
+      throw new Error("Canonical event append completed without a matching event.");
+    }
     if (debugState[DEBUG_KEY]?.captureDiagnosticsEnabled) {
       await appendCaptureDiagnostic({ stage: "canonical-event-appended",
         eventType: event.type, accepted: true, sourceEventId }, captureContext);
     }
-    const events = canonical.events.map(item => item.raw);
-    await saveEvents(recordingId, events);
-
-    session.eventCount = events.length;
+    // The canonical event store is authoritative during capture. Keep the
+    // legacy event-array snapshot for compatibility, but write it once when
+    // the recording is finalized instead of rewriting the growing array for
+    // every captured interaction.
+    session.eventCount = canonical.events.length;
     session.updatedAt = event.timestamp;
     await saveSession(session);
 
@@ -965,13 +1058,29 @@ async function recordEvent(rawEvent, captureContext = {}) {
       const preActionImage = await consumePreActionCapture(event,
         captureContext, recordingId);
       if (preActionImage) {
-        const screenshots = await getScreenshots(recordingId);
-        screenshots[event.eventNo] = preActionImage;
-        await canonicalStore.associateScreenshot(recordingId,
-          canonicalEvent.id, preActionImage, new Date().toISOString());
-        await saveScreenshots(recordingId, screenshots);
-        lastScreenshotAt = Date.now();
-        screenshotStats.captured += 1;
+        let preActionSaved = false;
+        try {
+          await saveScreenshot(recordingId, String(event.eventNo), preActionImage);
+          preActionSaved = true;
+        } catch (error) {
+          screenshotStats.errors += 1;
+          screenshotStats.dropped += 1;
+          lastScreenshotError = String(error?.message || error);
+          await setDebug({ screenshotStats: { ...screenshotStats },
+            lastScreenshotError });
+        }
+        if (preActionSaved) {
+          await canonicalStore.associateScreenshot(recordingId,
+            canonicalEvent.id, preActionImage, new Date().toISOString());
+          lastScreenshotAt = Date.now();
+          screenshotStats.captured += 1;
+        } else {
+          await enqueueScreenshot({ sessionId: recordingId,
+            eventNo: event.eventNo, eventId: canonicalEvent.id,
+            tabId: captureContext.tabId || acceptedState.tabId,
+            category: captureCategory,
+            captureKey: globalThis.T9ScreenshotCapturePolicy.captureKey(event) });
+        }
       } else {
         await enqueueScreenshot({
           sessionId: recordingId,
@@ -979,25 +1088,20 @@ async function recordEvent(rawEvent, captureContext = {}) {
           eventId: canonicalEvent.id,
           tabId: captureContext.tabId || acceptedState.tabId,
           category: captureCategory,
-          captureKey: event.fieldName || ""
+          captureKey: globalThis.T9ScreenshotCapturePolicy.captureKey(event)
         });
       }
     }
 
-    const eventTypeCounts = {};
-    const eventCategoryCounts = {};
-
-    for (const savedEvent of events) {
-      eventTypeCounts[savedEvent.type] =
-        (eventTypeCounts[savedEvent.type] || 0) + 1;
-      eventCategoryCounts[savedEvent.category] =
-        (eventCategoryCounts[savedEvent.category] || 0) + 1;
-    }
+    const { eventTypeCounts, eventCategoryCounts } =
+      globalThis.T9RecordingLiveStatus.incrementEventCounts(
+        debugState[DEBUG_KEY] || {}, event
+      );
 
     await setDebug({
       connected: true,
       activeSessionId: recordingId,
-      eventCount: events.length,
+      eventCount: canonical.events.length,
       eventTypeCounts,
       eventCategoryCounts,
       screenshotQueueLength: screenshotQueue.length,
@@ -1019,9 +1123,10 @@ async function recordEvent(rawEvent, captureContext = {}) {
     });
     return { recordingId, canonicalEvent, event };
   });
-  writeQueue = operation.catch(async error => {
-    canonicalPersistenceError ||= error;
-    await setDebug({ lastError: String(error) });
+  writeQueue = globalThis.T9RecoveringQueue.recover(operation, async error => {
+    await setDebug({ lastError: String(error), recordingHealth:
+      globalThis.T9RecordingLiveStatus.persistenceFailure({ rawEventPersisted,
+        canonicalEventPersisted, occurredAt: new Date().toISOString() }) });
   });
 
   return operation;
@@ -1072,26 +1177,27 @@ async function recordCaptureGuidance(kind, sender = {}) {
 
 async function saveBcErrorEvidence(evidence) {
   const normalized = globalThis.T9BcDiagnosticEvidence.normalize(evidence);
-  await chrome.storage.local.set({
-    [BC_ERROR_EVIDENCE_PREFIX + normalized.errorEvidenceId]: normalized
-  });
-  return normalized;
+  return bcErrorEvidenceStore.save(normalized);
 }
 
 async function getBcErrorEvidenceForRecording(recordingId) {
-  const all = await chrome.storage.local.get(null);
-  const stored = Object.entries(all).filter(([key, value]) =>
-    key.startsWith(BC_ERROR_EVIDENCE_PREFIX) && value?.recordingId === recordingId)
-    .map(([, value]) => globalThis.T9BcDiagnosticEvidence.normalize(value))
+  const stored = (await bcErrorEvidenceStore.list(recordingId))
+    .map(value => globalThis.T9BcDiagnosticEvidence.normalize(value))
     .sort((a, b) => String(a.capturedAt).localeCompare(String(b.capturedAt)));
   if (stored.length) {
     const recording = await getCanonicalRecording(recordingId);
     const candidates = globalThis.T9BcDiagnosticEvidence.recoverFromRecording(
       recording || {});
+    const candidateByMessage = new Map();
+    for (const candidate of candidates) {
+      if (candidate.rawMessage && candidate.supportUrl &&
+          !candidateByMessage.has(candidate.rawMessage)) {
+        candidateByMessage.set(candidate.rawMessage, candidate);
+      }
+    }
     const enriched = [];
     for (const item of stored) {
-      const candidate = candidates.find(value =>
-        value.rawMessage === item.rawMessage && value.supportUrl);
+      const candidate = candidateByMessage.get(item.rawMessage);
       const next = candidate && candidate.supportUrl !== item.supportUrl
         ? globalThis.T9BcDiagnosticEvidence.normalize({ ...item,
           supportUrl: candidate.supportUrl }) : item;
@@ -1148,9 +1254,7 @@ async function captureBcErrorEvidence(input, sender) {
       state.sessionId, recorded.canonicalEvent.id, image, new Date().toISOString());
     const associated = associatedRecording.events.find(item =>
       item.id === recorded.canonicalEvent.id);
-    const screenshots = await getScreenshots(state.sessionId);
-    screenshots[recorded.event.eventNo] = image;
-    await saveScreenshots(state.sessionId, screenshots);
+    await saveScreenshot(state.sessionId, String(recorded.event.eventNo), image);
     evidence = await saveBcErrorEvidence({ ...evidence,
       errorScreenshotAssetId: associated?.screenshotAssetId || null,
       screenshotStatus: "screenshot-captured" });
@@ -1182,6 +1286,13 @@ async function captureBcErrorEvidence(input, sender) {
 
 
 const CONTENT_SCRIPT_ID = "thinknine-bc-recorder-main";
+// Must match manifest.json content_scripts so dynamically injected frames get
+// the same capture helpers as statically injected ones.
+const CAPTURE_SCRIPT_FILES = Object.freeze([
+  "engine/business-central-version-capture.js", "capture-field-privacy.js",
+  "capture-focus-session.js", "capture-surface-mode.js", "bc-error-detector.js",
+  "capture-indicator-i18n.js", "content.js"
+]);
 
 async function registerRecorderContentScript() {
   try {
@@ -1201,8 +1312,7 @@ async function registerRecorderContentScript() {
         "https://businesscentral.dynamics.com/*",
         "https://*.businesscentral.dynamics.com/*"
       ],
-      js: ["capture-focus-session.js", "capture-surface-mode.js",
-        "bc-error-detector.js", "content.js"],
+      js: [...CAPTURE_SCRIPT_FILES],
       allFrames: true,
       matchOriginAsFallback: true,
       runAt: "document_start",
@@ -1266,8 +1376,7 @@ async function injectRecorderIntoExistingBcTabs() {
           tabId: tab.id,
           allFrames: true
         },
-        files: ["capture-focus-session.js", "capture-surface-mode.js",
-          "bc-error-detector.js", "content.js"],
+        files: [...CAPTURE_SCRIPT_FILES],
         world: "ISOLATED"
       });
       results.push({ tabId: tab.id, ok: true });
@@ -1315,8 +1424,7 @@ async function ensureContentScript(tabId) {
         tabId,
         allFrames: true
       },
-      files: ["capture-focus-session.js", "capture-surface-mode.js",
-        "bc-error-detector.js", "content.js"]
+      files: [...CAPTURE_SCRIPT_FILES]
     });
   } catch (error) {
     await setDebug({
@@ -1344,13 +1452,31 @@ async function ensureContentScript(tabId) {
 
 async function requireActiveTenantLicense(state) {
   if (!globalThis.T9TenantLicenseConfig.enabled || !state.recording) return;
-  const session = await getSession(state.sessionId);
-  const tab = await chrome.tabs.get(state.tabId);
-  const currentTenant = globalThis.T9TenantLicense.tenantFromUrl(tab.url);
-  if (!currentTenant || currentTenant !== session?.licenseTenantId) {
-    throw new Error("Tenant har ändrats. Stoppa inspelningen och starta en ny i rätt tenant.");
+  try {
+    const licenseTenantId = state.licenseTenantId ||
+      (await getSession(state.sessionId))?.licenseTenantId;
+    const tab = await chrome.tabs.get(state.tabId);
+    await recordingLicenseGuard.check({ recordingId: state.sessionId,
+      licenseTenantId, url: tab.url });
+  } catch (error) {
+    const sessionId = String(state.sessionId || "");
+    const errorMessage = String(error);
+    const previous = tenantLicenseFailureNotifications.get(sessionId);
+    if (previous?.errorMessage === errorMessage) await previous.promise;
+    else {
+      const promise = setDebug({ lastError: errorMessage, recordingHealth: {
+        status: "license-error", occurredAt: new Date().toISOString(),
+        operation: "tenant-license" } }).catch(writeError => {
+          if (tenantLicenseFailureNotifications.get(sessionId)?.promise === promise) {
+            tenantLicenseFailureNotifications.delete(sessionId);
+          }
+          throw writeError;
+        });
+      tenantLicenseFailureNotifications.set(sessionId, { errorMessage, promise });
+      await promise;
+    }
+    throw error;
   }
-  await requireRecordingLicense(tab.url);
 }
 
 async function startSession(message, tabId) {
@@ -1374,7 +1500,8 @@ async function startSession(message, tabId) {
   const contentContext = (await pingContentScript(tabId))?.observedContext || {};
   const observedContext = {
     ...urlContext,
-    companyName: urlContext.companyName || contentContext.companyName || ""
+    companyName: urlContext.companyName || contentContext.companyName || "",
+    businessCentralVersions: contentContext.businessCentralVersions || {}
   };
   const environmentChanged = Boolean(observedContext.environmentName) &&
     observedContext.environmentName !==
@@ -1396,6 +1523,8 @@ async function startSession(message, tabId) {
     await chrome.storage.local.set({ [SETTINGS_KEY]: settings });
   }
   const id = sessionId(message.name);
+  recordingLicenseGuard.clear(id);
+  tenantLicenseFailureNotifications.delete(id);
   const now = new Date().toISOString();
 
   await settleBounded(writeQueue, "previous session event writes");
@@ -1408,7 +1537,6 @@ async function startSession(message, tabId) {
   errorEvidenceWrites = Promise.resolve();
   screenshotQueue = [];
   stoppingSessionId = null;
-  canonicalPersistenceError = null;
   lastScreenshotAt = 0;
   screenshotStats.requested = 0;
   screenshotStats.captured = 0;
@@ -1423,6 +1551,9 @@ async function startSession(message, tabId) {
     purpose: message.purpose || "",
     recordingPurpose: globalThis.T9CanonicalRecording
       .normalizeRecordingPurpose(message.recordingPurpose),
+    businessCentral: { environment: observedContext.environmentName || "",
+      company: observedContext.companyName || "",
+      ...observedContext.businessCentralVersions },
     startedAt: now,
     completedAt: null,
     updatedAt: now,
@@ -1432,9 +1563,12 @@ async function startSession(message, tabId) {
     settings
   };
 
+  if (session.recordingPurpose === "bug-report") {
+    await bcErrorEvidenceStore.initialize(id);
+  }
   await saveSession(session);
   await saveEvents(id, []);
-  await saveScreenshots(id, {});
+  await screenshotAssetStore.initialize(id);
   await rawEventStore.create(id, now);
   await canonicalStore.create(globalThis.T9CanonicalRecording.create({
     id, startedAt: now, legacySession: session
@@ -1444,6 +1578,7 @@ async function startSession(message, tabId) {
     sessionId: id,
     tabId,
     startedAt: now,
+    licenseTenantId: session.licenseTenantId,
     recordingPurpose: session.recordingPurpose
   });
   await setDebug(globalThis.T9RecordingLiveStatus.freshSessionDebug(id));
@@ -1514,14 +1649,6 @@ async function stopSession(finalName = "", documentLanguage = "") {
     } });
     throw error;
   }
-  if (canonicalPersistenceError) {
-    await setDebug({ lastError: String(canonicalPersistenceError),
-      canonicalIntegrityDiagnostic: { code: "canonical-write-failure",
-        operation: "accepted-event-write" } });
-    throw new Error(
-      "Recording remains incomplete because canonical evidence could not be persisted."
-    );
-  }
   try {
     await settleBounded(screenshotWorkerPromise, "screenshot registrations");
     await settleBounded(canonicalStore.flush(), "canonical persistence queue");
@@ -1558,8 +1685,10 @@ async function stopSession(finalName = "", documentLanguage = "") {
       session.settings = { ...(session.settings || {}), documentLanguage:
         globalThis.T9LanguageRegistry.normalize(documentLanguage, "document") };
     }
-    const legacyEvents = await getEvents(state.sessionId);
     const canonicalRecording = await getCanonicalRecording(state.sessionId);
+    session.eventCount = canonicalRecording?.events?.length || 0;
+    const legacyEvents = (canonicalRecording?.events || []).map(event => event.raw);
+    await saveEvents(state.sessionId, legacyEvents);
     const rawRecording = await getRawRecording(state.sessionId);
     const integrityDiagnostics = globalThis.T9CanonicalRecording
       .integrityDiagnostics(canonicalRecording, {
@@ -1607,7 +1736,13 @@ async function stopSession(finalName = "", documentLanguage = "") {
     activeSessionId: null,
     lastError: null
   });
+  rawEventStore.release(state.sessionId);
+  canonicalStore.release(state.sessionId);
+  rawEventLogStorage.release(state.sessionId);
+  canonicalEventLogStorage.release(state.sessionId);
   stoppingSessionId = null;
+  recordingLicenseGuard.clear(state.sessionId);
+  tenantLicenseFailureNotifications.delete(String(state.sessionId));
 
   return session;
 }
@@ -1617,7 +1752,9 @@ async function createAndOpenBugReport(recordingId, reportTitle = "", regenerateC
   const normalized = globalThis.T9EventNormalization.normalizeRecording(recording);
   const grouped = globalThis.T9EventStepGrouping.group(normalized);
   const legacy = globalThis.T9CanonicalRecording.legacyView(recording);
-  const screenshots = await getScreenshots(recordingId);
+  const screenshotManifest = await screenshotAssetStore.manifest(recordingId);
+  const screenshots = globalThis.T9ScreenshotAssetPaths.eventPathsFromKeys(
+    screenshotManifest.keys);
   const projectedEvents = legacy.events.map((event, index) => ({ ...event,
     canonicalSourceEventId: recording.events[index]?.id || "",
     canonicalScreenshotAssetId: recording.events[index]?.screenshotAssetId || "" }));
@@ -1673,7 +1810,9 @@ async function refreshStoredBugReport(report) {
 }
 
 async function listSessions() {
-  const all = await chrome.storage.local.get(null);
+  const all = await globalThis.T9StorageQueries.getByPrefixes(
+    chrome.storage.local, [SESSION_PREFIX]
+  );
   return Object.entries(all)
     .filter(([key]) => key.startsWith(SESSION_PREFIX))
     .map(([, value]) => value)
@@ -1681,7 +1820,10 @@ async function listSessions() {
 }
 
 async function getDocumentLibraryBootstrap() {
-  const all = await chrome.storage.local.get(null);
+  const all = await globalThis.T9StorageQueries.getByPrefixes(
+    chrome.storage.local, [SESSION_PREFIX, BUG_REPORT_PREFIX],
+    [globalThis.T9StorageKeys.DOCUMENT_LIBRARY_KEY]
+  );
   const sessions = Object.entries(all)
     .filter(([key]) => key.startsWith(SESSION_PREFIX))
     .map(([, value]) => value)
@@ -1714,10 +1856,13 @@ async function saveDocumentLibrary(records) {
 }
 
 async function deleteSession(id) {
+  await screenshotAssetStore.remove(id);
+  await rawEventLogStorage.remove(id);
+  await canonicalEventLogStorage.remove(id);
+  await bcErrorEvidenceStore.remove(id);
   await chrome.storage.local.remove(
     [
       ...globalThis.T9StorageKeys.sessionDataKeys(id),
-      globalThis.T9StorageKeys.BC_ERROR_EVIDENCE_PREFIX + id
     ]
   );
 }
@@ -1806,6 +1951,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
           if (preActionCaptures.get(message.interactionId) === entry) {
             preActionCaptures.delete(message.interactionId);
             screenshotStats.dropped += 1;
+            void setDebug({ screenshotStats: { ...screenshotStats } });
           }
         }, 10000);
         sendResponse({ ok: true });
@@ -1938,6 +2084,11 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
       }
       case "T9_CONSULTANT_LICENSE_SIGN_OUT": {
         await consultantLicense.signOut();
+        if (chrome.storage.session) {
+          const outlookKeys = Object.keys(await chrome.storage.session.get(null))
+            .filter(key => key.startsWith("t9OutlookAuthSessionV1:"));
+          if (outlookKeys.length) await chrome.storage.session.remove(outlookKeys);
+        }
         sendResponse({ ok: true });
         break;
       }
@@ -2188,17 +2339,8 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
             includeCallStack: Boolean(message.options?.includeCallStack),
             includeTechnicalDetails: Boolean(
               message.options?.includeTechnicalDetails) });
-        const screenshotValues = await getScreenshots(report.recordingId);
-        const recording = await getCanonicalRecording(report.recordingId);
-        const offlineAttachments = issuePackage.attachments.map(attachment => {
-          const event = recording?.events?.find(value =>
-            value.screenshotAssetId === attachment.assetId);
-          return { ...attachment, dataUrl: event ?
-            screenshotValues[event.raw?.eventNo] || null : null };
-        });
         sendResponse({ ok: true, issuePackage,
           markdown: globalThis.T9IssuePackageMarkdown.markdown(issuePackage),
-          offlineAttachments,
           existingReferences: report.enrichment?.externalIssues || [] });
         break;
       }
@@ -2237,21 +2379,25 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
         const provider = providerId === "azure-devops"
           ? createAzureProvider(configuration, report.recordingId)
           : createGitHubProvider(configuration);
-        const generationKey = `${report.bugReportId}:${providerId}`;
-        const generation = (issueSubmissionGeneration.get(generationKey) || 0) + 1;
-        issueSubmissionGeneration.set(generationKey, generation);
         const result = await globalThis.T9IssueSubmissionService.create(provider).submit(
           issuePackage, configuration, { explicitConfirmation: true,
             idempotencyKey: issuePackage.packageId });
-        const latest = await bugReportStore.load(report.bugReportId);
-        if (!latest || issueSubmissionGeneration.get(generationKey) !== generation) {
-          sendResponse({ ok: true, ignored: true, reason: "superseded-submission",
-            result }); break;
-        }
-        const saved = globalThis.T9BugReportModel.attachExternalIssue(latest,
-          result.reference, new Date().toISOString());
-        sendResponse({ ok: true, result,
-          report: await bugReportStore.save(saved) });
+        const persistReference = issueReferenceWriteQueue.then(async () => {
+          try {
+            const latest = await bugReportStore.load(report.bugReportId);
+            if (!latest) return { referenceSaved: false, referenceSaveError:
+              "The report was removed after the external issue was created." };
+            const saved = globalThis.T9BugReportModel.attachExternalIssue(latest,
+              result.reference, new Date().toISOString());
+            return { referenceSaved: true,
+              report: await bugReportStore.save(saved) };
+          } catch (error) {
+            return { referenceSaved: false,
+              referenceSaveError: String(error.message || error).slice(0, 200) };
+          }
+        });
+        issueReferenceWriteQueue = persistReference.catch(() => {});
+        sendResponse({ ok: true, result, ...(await persistReference) });
         break;
       }
 
@@ -2361,13 +2507,22 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
 
       case "T9_GET_SESSION_DATA": {
         const recording = await getCanonicalRecording(message.sessionId);
-        const legacy = recording
-          ? globalThis.T9CanonicalRecording.legacyView(recording)
-          : { session: null, events: [] };
-        const normalized = recording
-          ? globalThis.T9EventNormalization.normalizeRecording(recording)
-          : { schemaVersion: 1, recordingId: message.sessionId, events: [] };
-        const grouped = globalThis.T9EventStepGrouping.group(normalized);
+        const legacySession = recording
+          ? globalThis.T9CanonicalRecording.legacySessionView(recording) : null;
+        const configurationRevision = globalThis.T9PageIdentificationEngine
+          .configurationVersion();
+        let derived = recording
+          ? recordingDerivedCache.get(recording, configurationRevision) : null;
+        if (!derived) {
+          const normalized = recording
+            ? globalThis.T9EventNormalization.normalizeRecording(recording)
+            : { schemaVersion: 1, recordingId: message.sessionId, events: [] };
+          derived = { normalized,
+            grouped: globalThis.T9EventStepGrouping.group(normalized) };
+          if (recording) recordingDerivedCache.set(recording, derived,
+            configurationRevision);
+        }
+        const { normalized, grouped } = derived;
         const mechanicsBySource = new Map();
         const groupsByNormalizedEvent = new Map();
         grouped.groups.forEach(group => group.normalizedEventIds.forEach(id =>
@@ -2377,34 +2532,57 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
           mechanicsBySource.set(id, item)
         ));
         const projectedEvents = recording
-          ? legacy.events.map((event, index) => ({
-              ...event,
-              canonicalSourceEventId: recording.events[index]?.id || "",
+          ? recording.events.map(canonicalEvent => ({
+              ...globalThis.T9CanonicalRecording.legacyEventView(canonicalEvent),
+              canonicalSourceEventId: canonicalEvent.id || "",
               canonicalScreenshotAssetId:
-                recording.events[index]?.screenshotAssetId || "",
+                canonicalEvent.screenshotAssetId || "",
               normalizedInteraction: mechanicsBySource.get(
-                recording.events[index]?.id
+                canonicalEvent.id
               ) || null,
               stepGroup: groupsByNormalizedEvent.get(
-                mechanicsBySource.get(recording.events[index]?.id)
+                mechanicsBySource.get(canonicalEvent.id)
                   ?.normalizedEventId
               ) || null
             }))
-          : legacy.events;
+          : [];
+        const recordingHeader = recording
+          ? { ...recording, events: [] } : null;
+        const screenshotManifest = await screenshotAssetStore.manifest(
+          message.sessionId);
+        const screenshots = message.includeScreenshots === false ? {} :
+          await getScreenshots(message.sessionId);
         sendResponse({
           ok: true,
-          recording,
-          session: legacy.session,
+          recordingHeader,
+          session: legacySession,
           events: projectedEvents,
           normalizedEvents: normalized.events,
           stepGroups: grouped.groups,
           supportingEvents: grouped.supportingEvents,
           groupingDiagnostics: grouped.diagnostics,
-          screenshots: message.includeScreenshots === false
-            ? {}
-            : await getScreenshots(message.sessionId),
+          screenshotPaths: screenshotManifest.paths,
+          screenshots,
           bcErrorEvidence: await getBcErrorEvidenceForRecording(message.sessionId)
         });
+        break;
+      }
+
+      case "T9_GET_SCREENSHOT_ASSETS": {
+        if (!await getSession(message.sessionId)) {
+          throw new Error("Inspelningen kunde inte hittas.");
+        }
+        const requestedPaths = [...new Set((Array.isArray(message.paths)
+          ? message.paths : []).filter(value => typeof value === "string"))];
+        if (requestedPaths.length > 1000) {
+          throw new Error("För många skärmbilder begärdes samtidigt.");
+        }
+        const screenshots = await getScreenshotDataForPaths(
+          message.sessionId, requestedPaths);
+        const available = new Set(await screenshotAssetStore
+          .manifest(message.sessionId).then(result => result.paths));
+        sendResponse({ ok: true, screenshots,
+          missingPaths: requestedPaths.filter(path => !available.has(path)) });
         break;
       }
 
@@ -2681,17 +2859,17 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
           sendResponse({ ok: false, reason: "knowledge-mcp-consent-required" });
           break;
         }
+        let knowledgeMcpLease = null;
         try {
-          const client = getKnowledgeMcpClient();
-          const tools = await client.listTools();
+          knowledgeMcpLease = knowledgeMcpClientManager.acquire();
+          const tools = await knowledgeMcpLease.client.listTools();
           sendResponse({ ok: true, toolCount: tools.length });
         } catch (error) {
           const detail = String(error?.message || error || "").replace(/[\u0000-\u001f]+/gu, " ").trim().slice(0, 240);
           sendResponse({ ok: false, reason: "knowledge-mcp-unavailable",
             ...(detail ? { detail } : {}) });
         } finally {
-          knowledgeMcpClient?.close();
-          knowledgeMcpClient = null;
+          knowledgeMcpLease?.release();
         }
         break;
       }
@@ -2706,9 +2884,10 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
           sendResponse({ ok: false, reason: "knowledge-mcp-consent-required" });
           break;
         }
+        let knowledgeMcpLease = null;
         try {
-          const client = getKnowledgeMcpClient();
-          const response = await client.callTool({
+          knowledgeMcpLease = knowledgeMcpClientManager.acquire();
+          const response = await knowledgeMcpLease.client.callTool({
             name: globalThis.BCKnowledgeMcpAdapter.TOOL_OBJECT,
             arguments: { objectType: "page", objectId: "22",
               productFamily: "business-central",
@@ -2717,12 +2896,11 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
           const result = globalThis.BCKnowledgeMcpAdapter.parseToolResult("object", response);
           sendResponse({ ok: true, result });
         } catch (error) {
-          const detail = String(error?.message || error || "").replace(/[\\u0000-\\u001f]+/gu, " ").trim().slice(0, 240);
+          const detail = String(error?.message || error || "").replace(/[\u0000-\u001f]+/gu, " ").trim().slice(0, 240);
           sendResponse({ ok: false, reason: "knowledge-mcp-unavailable",
             ...(detail ? { detail } : {}) });
         } finally {
-          knowledgeMcpClient?.close();
-          knowledgeMcpClient = null;
+          knowledgeMcpLease?.release();
         }
         break;
       }
@@ -2741,29 +2919,69 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
           sendResponse({ ok: false, reason: "knowledge-repository-unavailable" });
           break;
         }
-        const lookups = Array.isArray(message.lookups) ? message.lookups.slice(0, 40) : [];
-        const results = [];
+        const lookups = Array.isArray(message.lookups) ? message.lookups.slice(0, 12) : [];
+        const results = new Array(lookups.length);
+        const cacheUpdates = [];
+        let knowledgeMcpLease = null;
+        let cacheHitCount = 0;
         try {
-          const adapter = globalThis.BCKnowledgeMcpAdapter.createMcpKnowledgeAdapter({
-            client: getKnowledgeMcpClient(), repository: repositoryState.repository, consent: true
-          });
+          const cacheData = await chrome.storage.local.get(KNOWLEDGE_MCP_CACHE_KEY);
+          const cache = cacheData[KNOWLEDGE_MCP_CACHE_KEY] || {};
+          const misses = [];
           for (const [index, lookup] of lookups.entries()) {
-            const kind = lookup?.kind;
-            const request = lookup?.request || {};
-            const result = kind === "object" ? await adapter.resolveObject(request)
-              : kind === "action" ? await adapter.resolveAction(request)
-                : { status: "unresolved", candidates: [], reason: "invalid-lookup-kind" };
-            results.push({ key: typeof lookup?.key === "string"
-              ? lookup.key.slice(0, 160) : "lookup-" + index, kind, result });
+            const cacheKey = await knowledgeMcpCacheKey(lookup);
+            const cached = globalThis.T9KnowledgeMcpCache.read(cache, cacheKey);
+            const resultKey = typeof lookup?.key === "string"
+              ? lookup.key.slice(0, 160) : "lookup-" + index;
+            if (cached) {
+              results[index] = { key: resultKey, kind: lookup?.kind,
+                result: cached, fromCache: true };
+              cacheHitCount++;
+            } else misses.push({ lookup, index, cacheKey, resultKey });
           }
-          sendResponse({ ok: true, results });
+          if (misses.length) {
+            knowledgeMcpLease = knowledgeMcpClientManager.acquire();
+            const adapter = globalThis.BCKnowledgeMcpAdapter.createMcpKnowledgeAdapter({
+              client: knowledgeMcpLease.client, repository: repositoryState.repository, consent: true
+            });
+            const resolveLookup = async item => {
+              const { lookup, index, cacheKey, resultKey } = item;
+              const kind = lookup?.kind;
+              const request = lookup?.request || {};
+              const result = kind === "object" ? await adapter.resolveObject(request)
+                : kind === "action" ? await adapter.resolveAction(request)
+                  : { status: "unresolved", candidates: [], reason: "invalid-lookup-kind" };
+              if (result?.status === "suggested" && result?.source === "mcp-unverified" &&
+                  result?.requiresReview === true) cacheUpdates.push({ key: cacheKey, result });
+              else if (globalThis.T9KnowledgeMcpCache.isTransientFailure(result)) {
+                cacheUpdates.push({ key: cacheKey, result,
+                  ttlMs: globalThis.T9KnowledgeMcpCache.TRANSIENT_FAILURE_TTL_MS });
+              }
+              return { key: resultKey, kind, result, fromCache: false };
+            };
+            // Native MCP requests are bounded by the client timeout. Resolve a
+            // small batch concurrently instead of serially blocking for N×12s.
+            for (let offset = 0; offset < misses.length; offset += 4) {
+              const batch = misses.slice(offset, offset + 4);
+              const resolved = await Promise.all(batch.map(resolveLookup));
+              batch.forEach((item, index) => { results[item.index] = resolved[index]; });
+            }
+            if (cacheUpdates.length) {
+              const nextCache = globalThis.T9KnowledgeMcpCache.write(cache, cacheUpdates);
+              await chrome.storage.local.set({ [KNOWLEDGE_MCP_CACHE_KEY]: nextCache });
+            }
+          }
+          sendResponse({ ok: true, results,
+            fromCache: results.length > 0 && results.every(item => item?.fromCache === true),
+            cacheHitCount, cacheMissCount: misses.length,
+            failureCount: results.filter(item => item?.result?.status === "unresolved").length,
+            cacheTtlDays: 30 });
         } catch (error) {
-          const detail = String(error?.message || error || "").replace(/[\\u0000-\\u001f]+/gu, " ").trim().slice(0, 240);
+          const detail = String(error?.message || error || "").replace(/[\u0000-\u001f]+/gu, " ").trim().slice(0, 240);
           sendResponse({ ok: false, reason: "knowledge-mcp-unavailable",
             ...(detail ? { detail } : {}) });
         } finally {
-          knowledgeMcpClient?.close();
-          knowledgeMcpClient = null;
+          knowledgeMcpLease?.release();
         }
         break;
       }
@@ -2781,9 +2999,11 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
           sendResponse({ ok: false, reason: "knowledge-repository-unavailable" });
           break;
         }
+        let knowledgeMcpLease = null;
         try {
+          knowledgeMcpLease = knowledgeMcpClientManager.acquire();
           const adapter = globalThis.BCKnowledgeMcpAdapter.createMcpKnowledgeAdapter({
-            client: getKnowledgeMcpClient(), repository: repositoryState.repository,
+            client: knowledgeMcpLease.client, repository: repositoryState.repository,
             consent: true
           });
           const request = message.request || {};
@@ -2798,8 +3018,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
           sendResponse({ ok: false, reason: "knowledge-mcp-unavailable",
             ...(detail ? { detail } : {}) });
         } finally {
-          knowledgeMcpClient?.close();
-          knowledgeMcpClient = null;
+          knowledgeMcpLease?.release();
         }
         break;
       }
@@ -2845,7 +3064,8 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   })().catch(async error => {
     await setDebug({ lastError: String(error) });
     sendResponse({ ok: false, error: error.message || String(error),
-      status: error.status, code: error.code });
+      status: error.status, code: error.code, category: error.category,
+      uncertain: error.uncertain === true });
   });
 
   return true;

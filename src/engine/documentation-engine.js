@@ -7,7 +7,10 @@
   function markdown(session, tasks, confidence) {
     const steps = (tasks || []).map((task, index) => {
       const image = task.screenshot
-        ? `\n\n   ![${String(task.instruction || "").replace(/\*\*/g, "")}](${task.screenshot})`
+        ? `\n\n   ![${String(task.instruction || "").replace(/\*\*/g, "")}](${task.screenshot})` +
+          (task.screenshotEvidence?.relation === "subsequent-captured-page-state" &&
+            task.screenshotEvidence.caption
+            ? `\n\n   *${task.screenshotEvidence.caption}*` : "")
         : "";
       return `${index + 1}. ${task.instruction}${image}`;
     }).join("\n\n");
@@ -24,7 +27,7 @@ ${steps || "Inga dokumenterbara arbetssteg identifierades."}
 
 ## Förväntat resultat
 
-Processen är genomförd enligt arbetsgången.
+Stegen beskriver det observerade arbetsflödet. Kontrollera dokumentets status och bekräfta om processen kräver bokföring i Business Central.
 
 ## Kvalitet
 

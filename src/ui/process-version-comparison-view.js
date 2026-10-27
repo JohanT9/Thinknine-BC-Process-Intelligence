@@ -9,6 +9,11 @@
     })[character]);
   }
 
+  function localized(key, english, swedish, locale) {
+    return globalThis.T9UiI18n?.translate?.(`processVersion.${key}`, locale) ||
+      (String(locale || "").toLowerCase().startsWith("sv") ? swedish : english);
+  }
+
   function snapshot(value) {
     return value?.processSnapshot || value || {};
   }
@@ -33,8 +38,8 @@
 
   function render(container, comparison, options = {}) {
     if (!container || !comparison?.diff) return { changed: false, nodeCount: 0 };
-    const english = String(options.locale || "").toLowerCase().startsWith("en");
-    const currentLabel = english ? "Current" : "Aktuellt";
+    const locale = options.locale || "sv-SE";
+    const currentLabel = localized("current", "Current", "Aktuellt", locale);
     const diff = comparison.diff;
     const toModel = snapshot(comparison.to);
     const statuses = nodeStatus(diff);
@@ -48,15 +53,15 @@
     ...removed.map(node => ({ node, status: "removed" }))];
     const summary = diff.summary || {};
     const metrics = [
-      [summary.addedNodes, english ? "Added" : "Tillagda"],
-      [summary.removedNodes, english ? "Removed" : "Borttagna"],
-      [summary.modifiedNodes, english ? "Modified" : "Ändrade"],
-      [summary.movedNodes, english ? "Moved" : "Flyttade"],
+      [summary.addedNodes, localized("added", "Added", "Tillagda", locale)],
+      [summary.removedNodes, localized("removed", "Removed", "Borttagna", locale)],
+      [summary.modifiedNodes, localized("modified", "Modified", "Ändrade", locale)],
+      [summary.movedNodes, localized("moved", "Moved", "Flyttade", locale)],
       [(summary.addedTransitions || 0) + (summary.removedTransitions || 0) +
-        (summary.modifiedTransitions || 0), english ? "Routes" : "Vägar"],
+        (summary.modifiedTransitions || 0), localized("routes", "Routes", "Vägar", locale)],
       [(summary.addedStateTransitions || 0) +
         (summary.removedStateTransitions || 0) +
-        (summary.modifiedStateTransitions || 0), english ? "States" : "Tillstånd"]
+        (summary.modifiedStateTransitions || 0), localized("states", "States", "Tillstånd", locale)]
     ];
     container.innerHTML = `<div class="process-version-heading"><strong>${escape(
       label(comparison.from, currentLabel))}</strong><span aria-hidden="true">→</span><strong>${escape(
@@ -64,19 +69,20 @@
       <div class="process-version-metrics">${metrics.map(([count, text]) =>
         `<div><strong>${Number(count) || 0}</strong><span>${escape(text)}</span></div>`
       ).join("")}</div>
-      <div class="process-version-flow" role="list" aria-label="${english
-        ? "Process changes" : "Processändringar"}">${nodes.map(({ node, status }) =>
+      <div class="process-version-flow" role="list" aria-label="${escape(localized(
+        "changes", "Process changes", "Processändringar", locale))}">${nodes.map(({ node, status }) =>
         `<div role="listitem" class="process-version-node ${escape(status)}">
-          <span>${escape(status === "added" ? (english ? "Added" : "Tillagd")
-            : status === "removed" ? (english ? "Removed" : "Borttagen")
-              : status === "modified" ? (english ? "Modified" : "Ändrad")
-                : status === "moved" ? (english ? "Moved" : "Flyttad") : "")}</span>
+          <span>${escape(status === "added" ? localized("added", "Added", "Tillagd", locale)
+            : status === "removed" ? localized("removed", "Removed", "Borttagen", locale)
+              : status === "modified" ? localized("modified", "Modified", "Ändrad", locale)
+                : status === "moved" ? localized("moved", "Moved", "Flyttad", locale) : "")}</span>
           <strong>${escape(node.title || node.nodeType)}</strong>
         </div>`).join("")}</div>
       <p class="muted">${escape(summary.changed
-        ? (english ? "Only semantic process changes are shown."
-          : "Endast semantiska processändringar visas.")
-        : (english ? "No semantic process changes." : "Inga semantiska processändringar."))}</p>`;
+        ? localized("semanticOnly", "Only semantic process changes are shown.",
+          "Endast semantiska processändringar visas.", locale)
+        : localized("none", "No semantic process changes.",
+          "Inga semantiska processändringar.", locale))}</p>`;
     return { changed: Boolean(summary.changed), nodeCount: nodes.length };
   }
 

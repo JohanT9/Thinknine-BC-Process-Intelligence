@@ -15,17 +15,32 @@
     let writes = Promise.resolve();
     let pendingWrites = 0;
     const failures = [];
+    const recordingCache = new Map();
+    const sourceEventIds = new Map();
+
+    function cacheRecording(recordingId, recording) {
+      recordingCache.set(recordingId, recording);
+      if (!sourceEventIds.has(recordingId)) {
+        sourceEventIds.set(recordingId, new Set((recording?.events || [])
+          .map(event => event.sourceEventId).filter(Boolean)));
+      }
+    }
 
     function enqueue(recordingId, operation, operationType) {
       pendingWrites += 1;
       const result = writes.then(async () => {
-        const current = await adapter.load(recordingId);
+        const current = recordingCache.has(recordingId)
+          ? recordingCache.get(recordingId) : await adapter.load(recordingId);
+        if (!recordingCache.has(recordingId) && current) cacheRecording(recordingId, current);
         const outcome = await operation(current);
         const next = outcome?.stored === undefined ? outcome : outcome.stored;
         if (next !== current) await adapter.save(next);
+        if (next && next !== current) cacheRecording(recordingId, next);
         return clone(outcome?.stored === undefined ? next : outcome.result);
       });
       const tracked = result.catch(error => {
+        recordingCache.delete(recordingId);
+        sourceEventIds.delete(recordingId);
         failures.push({ code: "raw-event-write-failure", recordingId,
           operationType, message: String(error?.message || error) });
         throw error;
@@ -48,9 +63,10 @@
               !sourceEvent.sourceEventId) throw new TypeError(
             "A raw event with type and sourceEventId is required."
           );
-          const duplicate = current.events.find(item =>
-            item.sourceEventId === sourceEvent.sourceEventId
-          );
+          const knownIds = sourceEventIds.get(recordingId);
+          const duplicate = knownIds?.has(sourceEvent.sourceEventId)
+            ? current.events.find(item => item.sourceEventId === sourceEvent.sourceEventId)
+            : null;
           if (duplicate) return { stored: current, result: {
             status: "duplicate", event: duplicate
           } };
@@ -69,12 +85,18 @@
           }
           const event = clone({ ...sourceEvent, recordingId,
             acceptedSequence: current.events.length + 1 });
-          return { stored: { ...current, events: [...current.events, event] },
+          const stored = { ...current, events: [...current.events, event] };
+          if (knownIds) knownIds.add(event.sourceEventId);
+          return { stored,
             result: { status: "appended", event } };
         }, "append-raw-event");
       },
       load(recordingId) { return enqueue(recordingId, current => current, "load"); },
       flush() { return writes; },
+      release(recordingId) {
+        recordingCache.delete(recordingId);
+        sourceEventIds.delete(recordingId);
+      },
       diagnostics() { return { pendingWrites,
         failures: failures.map(item => ({ ...item })) }; }
     };
@@ -85,21 +107,36 @@
     let writes = Promise.resolve();
     let pendingWrites = 0;
     const failures = [];
+    const recordingCache = new Map();
+    const sourceEventIds = new Map();
+
+    function cacheRecording(recordingId, recording) {
+      recordingCache.set(recordingId, recording);
+      if (!sourceEventIds.has(recordingId)) {
+        sourceEventIds.set(recordingId, new Set((recording?.events || [])
+          .map(event => event?.source?.eventId).filter(Boolean)));
+      }
+    }
 
     function enqueue(recordingId, operation, operationType) {
       pendingWrites += 1;
       const result = writes.then(async () => {
         let phase = "load";
         try {
-          const current = await adapter.load(recordingId);
+          const current = recordingCache.has(recordingId)
+            ? recordingCache.get(recordingId) : await adapter.load(recordingId);
+          if (!recordingCache.has(recordingId) && current) cacheRecording(recordingId, current);
           phase = "operation";
           const next = await operation(current);
           if (next !== current) {
             phase = "save";
             await adapter.save(next);
           }
+          if (next && next !== current) cacheRecording(recordingId, next);
           return next;
         } catch (error) {
+          recordingCache.delete(recordingId);
+          sourceEventIds.delete(recordingId);
           error.canonicalWritePhase = phase;
           throw error;
         }
@@ -121,7 +158,8 @@
       append(recordingId, rawEvent, identification = null) {
         return enqueue(recordingId, current => {
           if (!current) throw new Error(`Recording not found: ${recordingId}`);
-          return canonical.addEvent(current, rawEvent, identification);
+          return canonical.addEvent(current, rawEvent, identification,
+            sourceEventIds.get(recordingId));
         }, "append-event");
       },
       associateScreenshot(recordingId, eventId, dataUrl, createdAt) {
@@ -155,6 +193,10 @@
         }, "finalize");
       },
       flush() { return writes; },
+      release(recordingId) {
+        recordingCache.delete(recordingId);
+        sourceEventIds.delete(recordingId);
+      },
       diagnostics() { return { pendingWrites, failures: failures.map(value =>
         ({ ...value })) }; }
     };

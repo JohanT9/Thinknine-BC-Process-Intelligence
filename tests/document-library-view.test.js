@@ -34,6 +34,8 @@ const bugRecord = library.normalize({ projectId: "bug-1", title: "Feltest",
   profile: { profileId: "bug-report", displayName: "Bug Report" },
   metadata: { recordingPurpose: "bug-report" } });
 view.renderList(container, [bugRecord], {});
+assert(container.innerHTML.includes("Open bug report"), "English is the default UI language");
+view.renderList(container, [bugRecord], { locale: "sv-SE" });
 assert(container.innerHTML.includes("Öppna felrapport"));
 assert(!container.innerHTML.includes("Öppna dokumentation"));
 const englishRecord = library.normalize({ projectId: "en-1", title: "English",
@@ -45,7 +47,7 @@ assert.strictEqual(view.activeFilterCount({ filters: {
   created: { from: "2026-01-01", to: "2026-02-01" }
 } }), 4);
 assert.strictEqual(view.activeFilterCount({ filters: {} }), 0);
-assert.strictEqual(view.renderList(container, [], {}), null);
+assert.strictEqual(view.renderList(container, [], { locale: "sv-SE" }), null);
 assert(container.innerHTML.includes("inga dokument i Dokumentbiblioteket"));
 
 function fakeCard(projectId) {

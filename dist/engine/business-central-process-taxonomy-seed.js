@@ -52,7 +52,16 @@
     "document:general-journal": ["Redovisningsjournal", "Redovisningsjournaler"],
     "document:item-journal": ["Artikeljournal", "Artikeljournaler"],
     "document:item-reclassification-journal": ["Artikelomklassificeringsjournal"],
-    "document:physical-inventory-journal": ["Inventeringsjournal"]
+    "document:physical-inventory-journal": ["Inventeringsjournal"],
+    "document:quality-inspection": ["Quality Inspection", "Quality Inspections", "Kvalitetsinspektion", "Kvalitetsinspektioner", "Inspektion qualité", "Qualitätsprüfung", "Inspección de calidad", "Kvalitetsinspektion", "Kvalitetsinspeksjon"],
+    "document:quality-inspection-template": ["Quality Inspection Template", "Quality Inspection Templates", "Kvalitetsinspektionsmall", "Kvalitetsinspektionsmallar", "Modèle d’inspection qualité", "Qualitätsprüfvorlage", "Plantilla de inspección de calidad", "Skabelon til kvalitetsinspektion", "Laatutarkastuksen malli", "Mal for kvalitetsinspeksjon"],
+    "document:quality-test": ["Quality Test", "Quality Tests", "Kvalitetstest", "Kvalitetstester", "Test qualité", "Qualitätstest", "Prueba de calidad", "Kvalitetstest", "Laatutesti", "Kvalitetstest"],
+    "document:quality-inspection-generation-rule": ["Quality Inspection Generation Rule", "Quality Inspection Generation Rules", "Regel för generering av kvalitetsinspektion", "Regler för generering av kvalitetsinspektioner", "Règle de génération d’inspection qualité", "Regel zur Erstellung von Qualitätsprüfungen", "Regla de generación de inspecciones de calidad", "Regel for generering af kvalitetsinspektion", "Laatutarkastuksen luontisääntö", "Regel for generering av kvalitetsinspeksjon"],
+    "document:quality-inspection-result": ["Quality Inspection Result", "Quality Inspection Results", "Kvalitetsinspektionsresultat", "Résultat d’inspection qualité", "Qualitätsprüfungsergebnis", "Resultado de inspección de calidad", "Resultat af kvalitetsinspektion", "Laatutarkastuksen tulos", "Resultat av kvalitetsinspeksjon"],
+    "document:payment-journal": ["Payment Journal", "Payment Journals", "Betalningsjournal", "Journal des paiements", "Zahlungsbuchblatt", "Diario de pagos", "Betalingskladde", "Maksupäiväkirja", "Betalingskladder"],
+    "document:bank-account-reconciliation": ["Bank Account Reconciliation", "Bank Acc. Reconciliation", "Stämma av bankkonton", "Rapprochement des comptes bancaires", "Bankkonten abstimmen", "Conciliar cuentas bancarias", "Afstem bankkonti", "Pankkitilien täsmäyttäminen", "Avstem bankkontoer"],
+    "document:bank-statement-lines": ["Bank Statement Lines", "Bankkontoutdragsrader", "Lignes de relevé bancaire", "Kontoauszugszeilen", "Líneas del extracto bancario", "Kontoudtogslinjer", "Tiliotteen rivit", "Kontoutdragslinjer"],
+    "document:bank-account-ledger-entries": ["Bank Account Ledger Entries", "Bankkontotransaktioner", "Écritures comptables du compte bancaire", "Bankkonto-Ledgerposten", "Movimientos de cuenta bancaria", "Bankkontoposter", "Pankkitilitapahtumat", "Bankkontoposter"]
   };
   const primaryDomainByDocumentId = new Map([
     ["domain:order-to-cash", ["sales-quote", "sales-order", "sales-invoice",
@@ -68,15 +77,28 @@
     ["domain:assembly", ["assembly-order"]],
     ["domain:forecast-to-plan", ["demand-forecast", "planning-worksheet",
       "requisition-worksheet", "order-planning"]],
+    ["domain:quality-management", ["quality-inspection", "quality-inspection-template",
+      "quality-test", "quality-inspection-generation-rule", "quality-inspection-result"]],
     ["domain:returns", ["sales-return-order", "purchase-return-order", "return-receipt",
       "return-shipment", "sales-credit-memo", "posted-sales-credit-memo",
       "purchase-credit-memo", "posted-purchase-credit-memo"]],
     ["domain:inventory-to-deliver", ["inventory-movement", "item-journal",
       "item-reclassification-journal", "physical-inventory-journal"]],
     ["domain:item-tracking", ["item-tracking-lines"]],
-    ["domain:record-to-report", ["general-journal"]]
+    ["domain:record-to-report", ["general-journal", "payment-journal",
+      "bank-account-reconciliation", "bank-statement-lines", "bank-account-ledger-entries"]]
   ].flatMap(([domainId, documentIds]) => documentIds.map(documentId =>
     [`document:${documentId}`, domainId])));
+  // Documents recognised by caption only until a Microsoft source verifies
+  // their page object IDs. Do not add guessed IDs; record the gap here.
+  const PAGE_VIEW_GAPS = Object.freeze({
+    "document:quality-inspection": "Quality Management app page IDs not yet verified against Microsoft Learn.",
+    "document:quality-inspection-template": "Quality Management app page IDs not yet verified against Microsoft Learn.",
+    "document:quality-test": "Quality Management app page IDs not yet verified against Microsoft Learn.",
+    "document:quality-inspection-generation-rule": "Quality Management app page IDs not yet verified against Microsoft Learn.",
+    "document:quality-inspection-result": "Quality Management app page IDs not yet verified against Microsoft Learn.",
+    "document:bank-statement-lines": "Bank statement lines are a page part; no standalone page view is verified."
+  });
   const view = (pageObjectId, viewType, name) => ({
     pageObjectId: String(pageObjectId), viewType, name
   });
@@ -132,11 +154,21 @@
     ["document:general-journal", "General Journal", "journal", [view(39, "worksheet", "General Journal")], ["81"]],
     ["document:item-journal", "Item Journal", "journal", [view(40, "worksheet", "Item Journal")], ["83"]],
     ["document:item-reclassification-journal", "Item Reclassification Journal", "journal", [view(393, "worksheet", "Item Reclass. Journal")], ["83"]],
-    ["document:physical-inventory-journal", "Physical Inventory Journal", "journal", [view(392, "worksheet", "Phys. Inventory Journal")], ["83"]]
+    ["document:physical-inventory-journal", "Physical Inventory Journal", "journal", [view(392, "worksheet", "Phys. Inventory Journal")], ["83"]],
+    ["document:quality-inspection", "Quality Inspection", "quality-inspection", [], []],
+    ["document:quality-inspection-template", "Quality Inspection Template", "quality-setup", [], []],
+    ["document:quality-test", "Quality Test", "quality-setup", [], []],
+    ["document:quality-inspection-generation-rule", "Quality Inspection Generation Rule", "quality-setup", [], []],
+    ["document:quality-inspection-result", "Quality Inspection Result", "quality-result", [], []],
+    ["document:payment-journal", "Payment Journal", "journal", [view(256, "worksheet", "Payment Journal")], ["81"]],
+    ["document:bank-account-reconciliation", "Bank Account Reconciliation", "reconciliation", [view(379, "document", "Bank Acc. Reconciliation"), view(388, "list", "Bank Acc. Reconciliation List")], ["273", "274"]],
+    ["document:bank-statement-lines", "Bank Statement Lines", "statement-lines", [], []],
+    ["document:bank-account-ledger-entries", "Bank Account Ledger Entries", "ledger-entries", [view(372, "list", "Bank Account Ledger Entries")], ["271"]]
   ].map(([id, name, documentType, pageViews, tableIds]) => ({
     id, name, documentType, primaryDomainId: primaryDomainByDocumentId.get(id) || null, pageViews,
     pageIds: pageViews.map(item => item.pageObjectId), tableIds,
-    aliases: documentAliases[id] || []
+    aliases: documentAliases[id] || [],
+    ...(pageViews.length ? {} : { metadata: { pageViewGap: PAGE_VIEW_GAPS[id] } })
   }));
 
   const definitions = [
@@ -299,6 +331,26 @@
         ["enter-general-journal", "Enter General Journal", [["open-general-journal", "Open General Journal", "open"], ["enter-journal-lines", "Enter Journal Lines", "enter"]]],
         ["post-general-journal", "Post General Journal", [["post-journal", "Post Journal", "post"]]]
       ] },
+    { domainId: "domain:record-to-report", businessId: "business-process:bank-account-reconciliation",
+      businessName: "Bank Account Reconciliation", processId: "bc-process:record-to-report:bank-account-reconciliation",
+      processName: "Bank Statement → Match Ledger Entries → Validate → Post Reconciliation",
+      documentIds: ["document:bank-account-reconciliation", "document:bank-statement-lines",
+        "document:bank-account-ledger-entries", "document:general-journal"],
+      steps: [
+        ["create-bank-reconciliation", "Create Bank Reconciliation", [["open-bank-reconciliation", "Open Bank Account Reconciliation", "open"], ["select-bank-account", "Select Bank Account", "select"], ["enter-statement-date-balance", "Enter Statement Date and Ending Balance", "enter"], ["import-bank-statement", "Import Bank Statement", "invoke"]]],
+        ["match-bank-entries", "Match Bank Statement Lines", [["match-automatically", "Match Automatically", "invoke"], ["match-unmatched-manually", "Match Remaining Entries Manually", "invoke"]]],
+        ["validate-bank-reconciliation", "Validate Reconciliation", [["review-reconciliation-differences", "Review Differences and Outstanding Entries", "invoke"], ["preview-reconciliation-test-report", "Preview Test Report", "invoke"]]],
+        ["post-bank-reconciliation", "Post Bank Reconciliation", [["post-bank-reconciliation", "Post Bank Reconciliation", "post"]]]
+      ] },
+    { domainId: "domain:record-to-report", businessId: "business-process:vendor-payment-journal",
+      businessName: "Vendor Payment Journal", processId: "bc-process:record-to-report:vendor-payment-journal",
+      processName: "Suggest Vendor Payments → Review and Apply → Post Payment Journal",
+      documentIds: ["document:payment-journal", "document:general-journal"],
+      steps: [
+        ["suggest-vendor-payments", "Suggest Vendor Payments", [["open-payment-journal", "Open Payment Journal", "open"], ["suggest-payments", "Suggest Vendor Payments", "invoke"]]],
+        ["review-and-apply-vendor-payments", "Review and Apply Payments", [["review-payment-lines", "Review Suggested Payment Lines", "invoke"], ["select-invoices-to-pay", "Apply Payments to Vendor Documents", "select"]]],
+        ["post-vendor-payment-journal", "Post Vendor Payment Journal", [["post-vendor-payment", "Post Payment Journal", "post"]]]
+      ] },
     { domainId: "domain:inventory-to-deliver", businessId: "business-process:item-adjustment",
       businessName: "Item Adjustment", processId: "bc-process:inventory:item-journal",
       processName: "Item Journal → Enter Adjustment → Post Journal",
@@ -323,6 +375,44 @@
         ["calculate-physical-inventory", "Calculate Physical Inventory", [["open-physical-inventory", "Open Physical Inventory Journal", "open"], ["calculate-inventory", "Calculate Inventory", "invoke"]]],
         ["record-physical-count", "Record Physical Count", [["enter-physical-count", "Enter Physical Count", "enter"]]],
         ["post-physical-inventory", "Post Inventory Differences", [["post-physical-inventory", "Post Inventory Differences", "post"]]]
+      ] },
+    { domainId: "domain:quality-management", businessId: "business-process:quality-purchase-inspection",
+      businessName: "Purchase Receipt Quality Inspection", processId: "bc-process:quality-management:purchase-inspection-manual",
+      processName: "Purchase Order → Item Tracking → Quality Inspection → Finish Inspection",
+      documentIds: ["document:purchase-order", "document:item-tracking-lines",
+        "document:quality-inspection"],
+      steps: [
+        ["prepare-purchase-order", "Prepare Purchase Order", [["open-purchase-orders", "Open Purchase Orders", "open"], ["create-purchase-order", "Create Purchase Order Line", "enter"]]],
+        ["assign-item-tracking", "Assign Item Tracking", [["open-item-tracking", "Open Item Tracking Lines", "invoke"], ["assign-lot-and-expiration", "Assign Lot and Expiration Date", "enter"]]],
+        ["create-inspection", "Create Quality Inspection", [["create-inspection-from-tracking", "Create Quality Inspection from Tracking Line", "invoke"]]],
+        ["record-inspection-results", "Record Inspection Results", [["enter-inspection-results", "Enter Test Results", "enter"]]],
+        ["finish-inspection", "Finish Quality Inspection", [["finish-inspection", "Finish Inspection", "invoke"]]]
+      ] },
+    { domainId: "domain:quality-management", businessId: "business-process:quality-warehouse-reinspection",
+      businessName: "Warehouse Receipt Inspection and Reinspection", processId: "bc-process:quality-management:warehouse-reinspection",
+      processName: "Warehouse Receipt → Failed Inspection → Reinspection → Passed Inspection → Put-away",
+      documentIds: ["document:purchase-order", "document:warehouse-receipt",
+        "document:posted-warehouse-receipt", "document:quality-inspection",
+        "document:warehouse-put-away"],
+      steps: [
+        ["prepare-receipt", "Prepare Purchase Order and Warehouse Receipt", [["open-purchase-orders", "Open Purchase Orders", "open"], ["create-purchase-order", "Create Purchase Order", "enter"], ["release-purchase-order", "Release Purchase Order", "invoke"], ["create-warehouse-receipt", "Create Warehouse Receipt", "invoke"]]],
+        ["track-and-post-receipt", "Track Items and Post Receipt", [["assign-receipt-lot", "Assign Lot and Expiration Date", "enter"], ["post-warehouse-receipt", "Post Warehouse Receipt", "post"]]],
+        ["fail-first-inspection", "Complete Failed Inspection", [["open-generated-inspection", "Open Generated Quality Inspection", "open"], ["enter-failed-results", "Enter Failed Test Results", "enter"], ["finish-failed-inspection", "Finish Inspection", "invoke"]]],
+        ["create-reinspection", "Create Reinspection", [["create-reinspection", "Create Re-inspection", "invoke"]]],
+        ["pass-reinspection", "Complete Passing Reinspection", [["enter-passing-results", "Enter Passing Test Results", "enter"], ["finish-passing-inspection", "Finish Inspection", "invoke"]]],
+        ["register-put-away", "Register Warehouse Put-away", [["register-put-away", "Register Put-away", "invoke"]]]
+      ] },
+    { domainId: "domain:quality-management", businessId: "business-process:quality-production-sampling",
+      businessName: "Production Output Sampling Inspection", processId: "bc-process:quality-management:production-sampling",
+      processName: "Production Order → Post Output → Sampled Quality Inspection → Finish Inspection",
+      documentIds: ["document:production-order", "document:production-journal",
+        "document:quality-inspection-template", "document:quality-test",
+        "document:quality-inspection-generation-rule", "document:quality-inspection"],
+      steps: [
+        ["configure-production-inspection", "Configure Production Inspection", [["open-quality-tests", "Open Quality Tests", "open"], ["create-quality-tests", "Create Quality Tests", "enter"], ["configure-production-template", "Configure Production Template and Sample", "enter"], ["configure-output-trigger", "Configure Production Output Trigger", "enter"]]],
+        ["create-production-order", "Create and Refresh Production Order", [["open-released-production-orders", "Open Released Production Orders", "open"], ["create-production-order", "Create Production Order", "enter"], ["refresh-production-order", "Refresh Production Order", "invoke"]]],
+        ["post-production-output", "Post Production Output", [["open-production-journal", "Open Production Journal", "open"], ["enter-output-quantity", "Enter Output Quantity", "enter"], ["post-output", "Post Production Output", "post"]]],
+        ["finish-sampled-inspection", "Finish Sampled Quality Inspection", [["open-output-inspection", "Open Quality Inspection", "open"], ["enter-sample-results", "Enter Sample Results", "enter"], ["finish-sample-inspection", "Finish Inspection", "invoke"]]]
       ] }
   ];
 

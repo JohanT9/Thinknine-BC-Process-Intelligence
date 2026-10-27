@@ -69,6 +69,15 @@
     return explanationSets.size === 1 ? explanationSets.values().next().value : null;
   }
 
+  function matchInterpretedTask(task, interpretedTasks) {
+    const exact = interpretedTasks.filter(candidate => candidate.taskId &&
+      candidate.taskId === task.taskId);
+    if (exact.length === 1) return exact[0];
+    const candidates = interpretedTasks.filter(candidate =>
+      matchesProvenance(task, candidate));
+    return candidates.length === 1 ? candidates[0] : null;
+  }
+
   function enrichForDisplay(reviewTasks = [], interpretedTasks = []) {
     const review = array(reviewTasks);
     const interpreted = array(interpretedTasks);
@@ -77,15 +86,29 @@
       const matched = match(task, interpreted);
       const context = matched || (sameLength
         ? positionalMatch(task, interpreted, index) : null);
-      if (!context) return task;
-      return { ...task,
+      const interpretedTask = matchInterpretedTask(task, interpreted);
+      const result = context ? { ...task,
         contextualExplanations: { ...context.contextualExplanations },
         contextualExplanationRuleId: context.contextualExplanationRuleId,
         contextualExplanationConfidence: context.contextualExplanationConfidence,
         contextualExplanationBasis: context.contextualExplanationBasis,
         contextualExplanationSourceIds: [...array(context.contextualExplanationSourceIds)],
         contextualExplanationSources: array(context.contextualExplanationSources)
-          .map(source => ({ ...source })) };
+          .map(source => ({ ...source })) } : { ...task };
+      if (!interpretedTask) return result;
+      const processValidationCodes = [...new Set([
+        ...array(task.processValidation?.codes),
+        ...array(interpretedTask.processValidation?.codes)
+      ].map(String))];
+      if (processValidationCodes.length) result.processValidation = {
+        ...(task.processValidation || {}),
+        ...(interpretedTask.processValidation || {}),
+        codes: processValidationCodes };
+      if (interpretedTask.reviewSuggested) result.reviewSuggested = true;
+      if (!task.resultVerification && interpretedTask.resultVerification) {
+        result.resultVerification = { ...interpretedTask.resultVerification };
+      }
+      return result;
     });
   }
 

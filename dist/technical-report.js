@@ -12,14 +12,22 @@
   const send = payload => new Promise((resolve, reject) => {
     chrome.runtime.sendMessage(payload, response => {
       if (chrome.runtime.lastError) reject(chrome.runtime.lastError);
-      else if (!response?.ok) reject(new Error(response?.error ||
-        t("technical.requestFailed")));
+      else if (!response?.ok) reject(Object.assign(new Error(response?.error ||
+        t("technical.requestFailed")), { category: response?.category,
+        uncertain: response?.uncertain === true }));
       else resolve(response);
     });
   });
   const action = handler => async () => {
     try { await handler(); }
-    catch (error) { message.textContent = error.message || String(error); }
+    catch (error) {
+      const detail = error.category === "timeout"
+        ? t("technical.issueSubmissionTimeout") : error.message || String(error);
+      message.textContent = error.uncertain
+        ? `${globalThis.T9UiI18n.translateStaticText(
+          "The destination may have created the issue. Check before retrying.",
+          currentUiLocale)} ${detail}` : detail;
+    }
   };
   function download(text, filename, type = "text/markdown;charset=utf-8", open = false) {
     const blob = new Blob([text], { type });
@@ -32,7 +40,7 @@
     const loaded = await send({ type: "T9_LOAD_BUG_REPORT", bugReportId });
     if (!loaded.report) throw new Error(t("technical.reportNotFound"));
     const session = await send({ type: "T9_GET_SESSION_DATA",
-      sessionId: loaded.report.recordingId, includeScreenshots: true });
+      sessionId: loaded.report.recordingId, includeScreenshots: false });
     const callStackInput = document.getElementById("issueIncludeCallStack");
     const hasCallStack = (session.bcErrorEvidence || []).some(item =>
       String(item.rawCallStack || "").trim());
@@ -108,20 +116,47 @@
       }
     }
     const mediaAssets = {};
-    (loaded.report.evidence?.screenshots || []).forEach(item => {
-      const event = session.recording?.events?.find(value =>
-        value.screenshotAssetId === item.assetId);
-      if (event && session.screenshots?.[event.raw?.eventNo]) mediaAssets[item.assetId] = {
-        source: session.screenshots[event.raw.eventNo]
-      };
-    });
+    const recording = session.recordingHeader
+      ? globalThis.T9CanonicalRecording.fromLegacyProjection(
+        session.recordingHeader, session.session, session.events
+      ) : session.recording;
+    const screenshotIds = (loaded.report.evidence?.screenshots || [])
+      .map(item => item.assetId);
+    const screenshotPathByAssetId = globalThis.T9ScreenshotAssetPaths
+      .assetPathIndex(recording);
+    const screenshotPaths = [...new Set(screenshotIds.map(id =>
+      screenshotPathByAssetId.get(String(id))).filter(Boolean))];
+    async function loadReportScreenshots() {
+      if (!screenshotPaths.length) return;
+      const loadingMessage = globalThis.T9UiI18n.translateStaticText(
+        "Loading report screenshots…", currentUiLocale);
+      if (!message.textContent) message.textContent = loadingMessage;
+      const result = await globalThis.T9ScreenshotBatchLoader.load({
+        sessionId: loaded.report.recordingId, screenshotPaths, batchSize: 10,
+        continueOnError: true, send: async request => {
+          try { return await send(request); }
+          catch (error) { return { ok: false, error: error.message }; }
+        }, onAsset({ path, value }) {
+          const item = (loaded.report.evidence?.screenshots || []).find(entry =>
+            screenshotPathByAssetId.get(String(entry.assetId)) === path);
+          if (item) mediaAssets[item.assetId] = { source: value };
+        }
+      });
+      render(workspace.state());
+      if (message.textContent === loadingMessage) {
+        message.textContent = result.missingPaths.length
+          ? t("review.openedPartial") : "";
+      }
+    }
     const persistentDisclosures = [".report-more-fields", ".reproduction-editor",
       ".technical-details", ".additional-evidence", ".screenshot-editor"];
+    let issuePreviewState = null;
     const render = state => {
       const openDisclosures = persistentDisclosures.filter(selector =>
         container.querySelector(selector)?.open);
       const result = globalThis.T9TechnicalReportWorkspaceView.render(
         container, state, { mediaAssets, locale: currentUiLocale,
+        onRetrySave: action(async () => { await workspace.flush(); }),
         onCopy: value => navigator.clipboard.writeText(value),
         onEdit(name, value) {
           if (["title", "summary", "severity", "category"].includes(name)) {
@@ -145,6 +180,7 @@
     };
     let autosaveTimer = null;
     const renderAndAutosave = state => {
+      if (state.saveState === "unsaved") issuePreviewState = null;
       render(state);
       if (state.saveState !== "unsaved") return;
       clearTimeout(autosaveTimer);
@@ -177,46 +213,67 @@
         location.reload();
       } finally { button.disabled = false; }
     }));
-    document.getElementById("downloadMarkdown").addEventListener("click", async () => {
+    document.getElementById("downloadMarkdown").addEventListener("click", action(async () => {
       await download(await workspace.exportMarkdown({ includeAiAnalysis:
         false }), `${bugReportId}.md`);
       message.textContent = t("technical.markdownExported");
-    });
-    let issuePreviewState = null;
+    }));
+    let issuePreviewRequestId = 0;
+    let issuePreviewPending = null;
     async function generateIssuePreview() {
-      await workspace.flush();
-      issuePreviewState = await send({ type: "T9_BUILD_ISSUE_PACKAGE", bugReportId,
-        options: { includeTelemetry: document.getElementById(
-          "issueIncludeTelemetry").checked, includeAiAnalysis:
-          document.getElementById("issueIncludeAi").checked,
-          includeCallStack: document.getElementById("issueIncludeCallStack").checked,
-          includeTechnicalDetails: document.getElementById(
-            "issueIncludeTechnical").checked } });
-      document.getElementById("issueTitle").textContent = issuePreviewState.issuePackage.title;
-      document.getElementById("issueDescription").textContent = issuePreviewState.markdown;
-      const list = document.getElementById("issueAttachments"); list.replaceChildren();
-      for (const attachment of issuePreviewState.issuePackage.attachments) {
-        const item = document.createElement("li");
-        item.textContent = `${attachment.fileName} — ${attachment.role}`; list.append(item);
-      }
-      const pkg = issuePreviewState.issuePackage;
-      const included = t("technical.included");
-      const excluded = t("technical.excluded");
-      document.getElementById("issueTransmissionSummary").textContent = [
-        `${t("technical.destination")}: ${document.getElementById(
-          "issueProvider").value || t("technical.offlineOnly")}`,
-        `${t("technical.telemetry")}: ${pkg.inclusion.telemetry ? included : excluded}`,
-        `${t("technical.aiAnalysis")}: ${pkg.inclusion.aiAnalysis
-          ? t("technical.includedLabelled") : excluded}`,
-        `${t("technical.callStack")}: ${pkg.inclusion.callStack ? included : excluded}`,
-        `${t("technical.technicalDetails")}: ${pkg.inclusion.technicalDetails
-          ? included : excluded}`,
-        `${t("technical.attachments")}: ${pkg.attachments.length}`,
-        `${t("technical.sensitiveCategories")}: ${pkg.privacy.categories.join(", ")}`
-      ].join(" · ");
-      document.getElementById("issueResult").textContent =
-        issuePreviewState.existingReferences.length ?
-          "Warning: this report already has an external issue reference." : "Package is current.";
+      const requestId = ++issuePreviewRequestId;
+      const pending = (async () => {
+        await workspace.flush();
+        const snapshot = workspace.state();
+        if (snapshot.saveState !== "saved") {
+          issuePreviewState = null;
+          throw new Error(t("technical.requestFailed"));
+        }
+        const reportSnapshot = JSON.stringify(snapshot.report);
+        const generated = await send({ type: "T9_BUILD_ISSUE_PACKAGE", bugReportId,
+          options: { includeTelemetry: document.getElementById(
+            "issueIncludeTelemetry").checked, includeAiAnalysis:
+            document.getElementById("issueIncludeAi").checked,
+            includeCallStack: document.getElementById("issueIncludeCallStack").checked,
+            includeTechnicalDetails: document.getElementById(
+              "issueIncludeTechnical").checked } });
+        if (requestId !== issuePreviewRequestId) return null;
+        if (JSON.stringify(workspace.state().report) !== reportSnapshot) {
+          issuePreviewState = null;
+          throw new Error(t("technical.requestFailed"));
+        }
+        issuePreviewState = generated;
+        document.getElementById("issueTitle").textContent = issuePreviewState.issuePackage.title;
+        document.getElementById("issueDescription").textContent = issuePreviewState.markdown;
+        const list = document.getElementById("issueAttachments"); list.replaceChildren();
+        for (const attachment of issuePreviewState.issuePackage.attachments) {
+          const item = document.createElement("li");
+          item.textContent = `${attachment.fileName} — ${attachment.role}`; list.append(item);
+        }
+        const pkg = issuePreviewState.issuePackage;
+        const included = t("technical.included");
+        const excluded = t("technical.excluded");
+        document.getElementById("issueTransmissionSummary").textContent = [
+          `${t("technical.destination")}: ${document.getElementById(
+            "issueProvider").value || t("technical.offlineOnly")}`,
+          `${t("technical.telemetry")}: ${pkg.inclusion.telemetry ? included : excluded}`,
+          `${t("technical.aiAnalysis")}: ${pkg.inclusion.aiAnalysis
+            ? t("technical.includedLabelled") : excluded}`,
+          `${t("technical.callStack")}: ${pkg.inclusion.callStack ? included : excluded}`,
+          `${t("technical.technicalDetails")}: ${pkg.inclusion.technicalDetails
+            ? included : excluded}`,
+          `${t("technical.attachments")}: ${pkg.attachments.length}`,
+          `${t("technical.sensitiveCategories")}: ${pkg.privacy.categories.join(", ")}`
+        ].join(" · ");
+        document.getElementById("issueResult").textContent =
+          issuePreviewState.existingReferences.length ?
+            "Warning: this report already has an external issue reference." : "Package is current.";
+        return generated;
+      })();
+      issuePreviewPending = pending;
+      const generated = await pending;
+      return requestId === issuePreviewRequestId ? generated :
+        issuePreviewPending || issuePreviewState;
     }
     function updateShareUi() {
       const provider = document.getElementById("issueProvider").value;
@@ -231,6 +288,29 @@
         ? globalThis.T9UiI18n.translateStaticText("Create Issue", currentUiLocale)
         : globalThis.T9UiI18n.translateStaticText("Download report package",
           currentUiLocale);
+    }
+    async function loadIssuePackageAttachments() {
+      const attachments = issuePreviewState?.issuePackage?.attachments || [];
+      const pathByAssetId = new Map(attachments.flatMap(attachment => {
+        const path = screenshotPathByAssetId.get(String(attachment.assetId));
+        return path ? [[attachment.assetId, path]] : [];
+      }));
+      const imagesByPath = new Map();
+      const requestedPaths = [...new Set(pathByAssetId.values())];
+      const result = requestedPaths.length
+        ? await globalThis.T9ScreenshotBatchLoader.load({
+          sessionId: loaded.report.recordingId, screenshotPaths: requestedPaths,
+          batchSize: 10, continueOnError: true, send, onAsset({ path, value }) {
+            imagesByPath.set(path, value);
+          }
+        }) : { missingPaths: [] };
+      const offlineAttachments = attachments.map(attachment => {
+        const path = pathByAssetId.get(attachment.assetId);
+        return { ...attachment, dataUrl: path ? imagesByPath.get(path) || null : null };
+      });
+      const missingCount = offlineAttachments.filter(item => !item.dataUrl).length;
+      return { attachments: offlineAttachments.filter(item => item.dataUrl),
+        missingCount: Math.max(missingCount, result.missingPaths.length) };
     }
     document.getElementById("issueProvider").addEventListener("change", action(async () => {
       issuePreviewState = null; updateShareUi(); await generateIssuePreview();
@@ -267,22 +347,38 @@
     }));
     async function downloadOfflinePackage() {
       if (!issuePreviewState) await generateIssuePreview();
+      const imageResult = await loadIssuePackageAttachments();
+      if (imageResult.missingCount) message.textContent =
+        t("technical.someImagesMissing");
       const offline = { manifest: { schemaVersion: 1,
         packageId: issuePreviewState.issuePackage.packageId,
         sourceRevision: issuePreviewState.issuePackage.sourceRevision,
-        files: ["bug-report.md", ...issuePreviewState.offlineAttachments.map(item =>
+        files: ["bug-report.md", ...imageResult.attachments.map(item =>
           item.fileName)] }, issuePackage: issuePreviewState.issuePackage,
         bugReportMarkdown: issuePreviewState.markdown,
-        attachments: issuePreviewState.offlineAttachments };
+        attachments: imageResult.attachments };
       await download(JSON.stringify(offline, null, 2), `${bugReportId}-issue-package.json`);
-      document.getElementById("issueResult").textContent =
-        t("technical.packageExported");
+      document.getElementById("issueResult").textContent = [
+        t("technical.packageExported"), imageResult.missingCount
+          ? t("technical.someImagesMissing") : ""
+      ].filter(Boolean).join(" ");
     }
-    async function emailReport() {
+    let preparedEmail = null;
+    const outlookClient = globalThis.T9OutlookDraft.create({ identity: chrome.identity,
+      storage: chrome.storage.local, sessionStorage: chrome.storage.session, fetcher: fetch,
+      getAccount: async () => {
+        const status = await send({ type: "T9_CONSULTANT_LICENSE_STATUS" });
+        return status.signedIn ? status.profile || {} : {};
+      },
+      clientId: globalThis.T9TenantLicenseConfig.consultant.clientId });
+    async function prepareEmail() {
       if (!supportEmail) throw new Error(globalThis.T9UiI18n.translateStaticText(
         "Add a support email address in settings first.", currentUiLocale));
       await generateIssuePreview();
-      const selectedImages = issuePreviewState.offlineAttachments;
+      const imageResult = await loadIssuePackageAttachments();
+      const selectedImages = imageResult.attachments;
+      if (imageResult.missingCount) message.textContent =
+        t("technical.someImagesMissing");
       const offline = { manifest: { schemaVersion: 1,
         packageId: issuePreviewState.issuePackage.packageId,
         sourceRevision: issuePreviewState.issuePackage.sourceRevision,
@@ -300,50 +396,128 @@
       const draft = globalThis.T9BugReportEmailDraft.build(
         issuePreviewState.issuePackage, JSON.stringify(offline, null, 2), {
           to: supportEmail, locale: currentUiLocale, attachments });
+      return { draft, imageResult, reportKey: bugReportId + ":" +
+        issuePreviewState.issuePackage.sourceRevision };
+    }
+    async function emailReport() {
+      const { draft, imageResult } = preparedEmail || await prepareEmail();
       const result = await download(draft.content, draft.fileName,
         "message/rfc822;charset=utf-8", true);
-      message.textContent = globalThis.T9UiI18n.translateStaticText(
+      message.textContent = [globalThis.T9UiI18n.translateStaticText(
         result.opened
           ? "Email draft created with the report attached."
           : "Email draft saved. Open the downloaded .eml file to continue.",
-        currentUiLocale);
+        currentUiLocale), imageResult.missingCount
+          ? t("technical.someImagesMissing") : ""].filter(Boolean).join(" ");
     }
     async function submitExternalIssue() {
       if (!document.getElementById("issueConsent").checked) throw new Error(
         t("technical.submissionConsent"));
       const provider = document.getElementById("issueProvider").value;
       if (!provider) throw new Error(t("technical.selectProvider"));
-      if (!issuePreviewState) await generateIssuePreview();
       const button = document.getElementById("shareReport"); button.disabled = true;
-      try { const response = await send({ type: "T9_CREATE_EXTERNAL_ISSUE", bugReportId,
-        provider, issuePackage: issuePreviewState.issuePackage,
-        confirmDuplicate: document.getElementById("issueConfirmDuplicate").checked });
+      const submissionControls = ["issueProvider", "issueConsent",
+        "issueConfirmDuplicate", "issueIncludeTelemetry", "issueIncludeAi",
+        "issueIncludeCallStack", "issueIncludeTechnical"].map(id =>
+        document.getElementById(id)).filter(Boolean);
+      const priorDisabledStates = submissionControls.map(control => control.disabled);
+      submissionControls.forEach(control => { control.disabled = true; });
+      try {
+        if (!issuePreviewState) await generateIssuePreview();
+        const response = await send({ type: "T9_CREATE_EXTERNAL_ISSUE", bugReportId,
+          provider, issuePackage: issuePreviewState.issuePackage,
+          confirmDuplicate: document.getElementById("issueConfirmDuplicate").checked });
         const reference = response.result.reference;
         const result = document.getElementById("issueResult"); result.replaceChildren();
-        result.append(document.createTextNode(response.result.status === "partial-success"
-          ? `Issue ${reference.externalId} created; some attachments failed. `
-          : `Issue ${reference.externalId} created. `));
-        const url = new URL(reference.url); if (url.protocol !== "https:") throw new Error(
-          "The destination returned an unsafe issue URL.");
-        const link = document.createElement("a"); link.href = url.toString();
-        link.target = "_blank"; link.rel = "noopener noreferrer";
-        link.textContent = t("technical.openExternalIssue"); result.append(link);
-      } finally { button.disabled = false; }
+        const attachmentFailureCount = response.result.attachmentFailures?.length || 0;
+        const createdText = attachmentFailureCount
+          ? tf(attachmentFailureCount === 1
+            ? "technical.issueCreatedOneAttachmentFailed"
+            : "technical.issueCreatedManyAttachmentsFailed",
+          { id: reference.externalId, count: attachmentFailureCount })
+          : tf("technical.issueCreated", { id: reference.externalId });
+        result.append(document.createTextNode(createdText + " "));
+        if (response.referenceSaved === false) {
+          result.append(document.createTextNode(t("technical.issueReferenceNotSaved") + " "));
+        }
+        const safeIssueUrl = globalThis.T9ExternalIssueUrl.safe(reference.url);
+        if (safeIssueUrl) {
+          const link = document.createElement("a"); link.href = safeIssueUrl;
+          link.target = "_blank"; link.rel = "noopener noreferrer";
+          link.textContent = t("technical.openExternalIssue"); result.append(link);
+        } else {
+          result.append(document.createTextNode(tf(
+            "technical.issueLinkUnavailable", { id: reference.externalId })));
+        }
+      } finally {
+        button.disabled = false;
+        submissionControls.forEach((control, index) => {
+          control.disabled = priorDisabledStates[index];
+        });
+      }
     }
     document.getElementById("shareReport").addEventListener("click", action(async () => {
       if (document.getElementById("issueProvider").value) await submitExternalIssue();
       else await downloadOfflinePackage();
     }));
-    document.getElementById("emailReport").addEventListener("click", action(emailReport));
+    const emailChoice = document.getElementById("emailChoice");
+    const outlookButton = document.getElementById("outlookDraft");
+    const outlookStatus = document.getElementById("outlookStatus");
+    const outlookLink = document.getElementById("outlookLink");
+    document.getElementById("emailReport").addEventListener("click", () => {
+      if (!emailChoice.open) {
+        preparedEmail = null;
+        outlookStatus.textContent = "";
+        outlookLink.hidden = true;
+        emailChoice.showModal();
+      }
+    });
+    document.getElementById("closeEmailChoice").addEventListener("click", () => emailChoice.close());
+    document.getElementById("emailFile").addEventListener("click", action(async () => {
+      const button = document.getElementById("emailFile");
+      button.disabled = true;
+      try { await emailReport(); emailChoice.close(); }
+      finally { button.disabled = false; }
+    }));
+    outlookButton.addEventListener("click", async () => {
+      outlookButton.disabled = true;
+      document.getElementById("emailFile").disabled = true;
+      outlookStatus.textContent = t("outlook.working");
+      try {
+        // Request only Graph's exact origin, directly from the explicit user action.
+        const permitted = await chrome.permissions.request({ origins: ["https://graph.microsoft.com/*"] });
+        if (!permitted) throw { outlookCode: "consent" };
+        preparedEmail = await prepareEmail();
+        const result = await outlookClient.draft({ reportKey: preparedEmail.reportKey,
+          email: preparedEmail.draft });
+        outlookLink.href = result.webLink;
+        outlookLink.hidden = false;
+        outlookStatus.textContent = t(result.recovery ? "outlook.uncertain" : "outlook.created");
+        if (preparedEmail.imageResult.missingCount) outlookStatus.textContent += " " + t("technical.someImagesMissing");
+        try { await chrome.tabs.create({ url: result.webLink }); }
+        catch { /* The verified link remains available if the tab could not open. */ }
+      } catch (error) {
+        const key = ["consent", "uncertain", "size", "configuration"].includes(error.outlookCode)
+          ? error.outlookCode : "failed";
+        outlookStatus.textContent = t("outlook." + key);
+      } finally {
+        outlookButton.disabled = false;
+        document.getElementById("emailFile").disabled = false;
+      }
+    });
     document.getElementById("exportPdf").addEventListener("click", action(async () => {
       await generateIssuePreview();
-      const selectedImages = issuePreviewState.offlineAttachments;
+      const imageResult = await loadIssuePackageAttachments();
+      if (imageResult.missingCount) message.textContent = t("review.openedPartial");
       const pdf = await globalThis.T9BugReportPdf.create(issuePreviewState.issuePackage,
-        selectedImages);
+        imageResult.attachments);
       const name = issuePreviewState.issuePackage.title.replace(/[^\p{L}\p{N}._-]+/gu, "-").slice(0, 70) || "felrapport";
       await download(pdf.bytes, `${name}.pdf`, "application/pdf");
-      message.textContent = globalThis.T9UiI18n.translateStaticText("PDF-rapporten har sparats.", currentUiLocale);
+      message.textContent = [globalThis.T9UiI18n.translateStaticText(
+        "PDF-rapporten har sparats.", currentUiLocale), imageResult.missingCount
+        ? t("technical.someImagesMissing") : ""].filter(Boolean).join(" ");
     }));
+    void loadReportScreenshots();
   }
   async function initialize() {
     try {

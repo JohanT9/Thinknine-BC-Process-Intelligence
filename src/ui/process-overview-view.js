@@ -37,17 +37,26 @@
     return String(value ?? "").replace(/\*\*|__/gu, "").trim();
   }
 
+  function uiText(key, locale, englishText, swedishText = englishText) {
+    const i18n = typeof globalThis !== "undefined" ? globalThis.T9UiI18n : null;
+    if (i18n?.translate) return i18n.translate(`processMap.${key}`, locale);
+    return String(locale || "").toLowerCase().startsWith("en")
+      ? englishText : swedishText;
+  }
+
   function stateLabel(transition) {
     return transition?.before?.control?.caption ||
       transition?.after?.control?.caption || transition?.factKey || "Status";
   }
 
-  function stateValue(value, english = false) {
+  function stateValue(value, locale = "en-US") {
+    const english = String(locale || "").toLowerCase().startsWith("en");
     if (value?.value !== undefined && value?.value !== null) return String(value.value);
     if (typeof value?.checked === "boolean") return value.checked
-      ? (english ? "On" : "På") : (english ? "Off" : "Av");
+      ? uiText("on", locale, "On", "På") : uiText("off", locale, "Off", "Av");
     if (typeof value?.visible === "boolean") return value.visible
-      ? (english ? "Visible" : "Synlig") : (english ? "Closed" : "Stängd");
+      ? uiText("visible", locale, "Visible", "Synlig")
+      : uiText("closed", locale, "Closed", "Stängd");
     if (value?.outcome) return String(value.outcome);
     if (value?.page?.caption) return String(value.page.caption);
     return "";
@@ -92,41 +101,41 @@
     });
   }
 
-  function reviewState(detail, english) {
+  function reviewState(detail, locale) {
     if (!detail?.reviewTask) return null;
     if (detail.reviewTask.approved) return {
-      name: "approved", label: english ? "Reviewed" : "Granskad"
+      name: "approved", label: uiText("reviewed", locale, "Reviewed", "Granskad")
     };
     if (detail.reviewTask.reviewSuggested ||
         Number(detail.reviewTask.confidenceScore) < 80) {
-      return { name: "attention", label: english ? "Review" : "Granska" };
+      return { name: "attention", label: uiText("review", locale, "Review", "Granska") };
     }
-    return { name: "pending", label: english ? "Not reviewed" : "Ej granskad" };
+    return { name: "pending", label: uiText("notReviewed", locale, "Not reviewed", "Ej granskad") };
   }
 
-  function semanticState(detail, english) {
+  function semanticState(detail, locale) {
     const status = detail?.node?.metadata?.semanticStatus;
     if (status === "observed") return { name: status,
-      label: english ? "Observed" : "Observerat" };
+      label: uiText("observed", locale, "Observed", "Observerat") };
     if (status === "suggested") return { name: status,
-      label: english ? "Reference suggestion" : "Referensförslag" };
+      label: uiText("referenceSuggestion", locale, "Reference suggestion", "Referensförslag") };
     if (status === "conditional") return { name: status,
-      label: english ? "Conditional step" : "Villkorligt steg" };
+      label: uiText("conditional", locale, "Conditional step", "Villkorligt steg") };
     if (status === "customerSpecific") return { name: status,
-      label: english ? "Customer-specific" : "Kundunikt" };
+      label: uiText("customerSpecific", locale, "Customer-specific", "Kundunikt") };
     if (status === "reference") return { name: status,
-      label: english ? "Reference" : "Referens" };
+      label: uiText("reference", locale, "Reference", "Referens") };
     return null;
   }
 
-  function routeLabel(route, english) {
+  function routeLabel(route, locale) {
     const handoff = processMapLabels.handoffTitle(route.metadata?.responsibilityHandoff,
-      english ? "en-US" : "sv-SE");
+      locale);
     if (handoff) return handoff;
-    return routeGrammar.presentationFor(route, english ? "en-US" : "sv-SE").label;
+    return routeGrammar.presentationFor(route, locale).label;
   }
 
-  function routesMarkup(detail, english, compact = false) {
+  function routesMarkup(detail, locale, compact = false) {
     const decision = detail?.node?.nodeType === "decision" ||
       detail?.node?.metadata?.originalNodeType === "decision";
     const routes = (detail?.outgoing || []).filter(route =>
@@ -134,36 +143,39 @@
     );
     if (!routes.length) return "";
     return `<${compact ? "span" : "ul"} class="process-overview-routes${compact ? " compact" : ""}">${routes.map(route => {
-      const visual = routeGrammar.presentationFor(route, english ? "en-US" : "sv-SE");
+      const visual = routeGrammar.presentationFor(route, locale);
       return `<${compact ? "span" : "li"} class="process-overview-route process-overview-route-${visual.kind}"
         data-process-transition-type="${escape(route.transitionType)}" data-process-line="${visual.line}">
-        <strong>${escape(routeLabel(route, english))}</strong><span aria-hidden="true">→</span>
+        <strong>${escape(routeLabel(route, locale))}</strong><span aria-hidden="true">→</span>
         <span>${escape(plain(processMapLabels.nodeTitle(route.target,
-          english ? "en-US" : "sv-SE")))}</span>
+          locale)))}</span>
         ${compact ? "" : `<span class="process-overview-route-meta">${escape(route.transitionType)}${
           route.condition && route.condition !== route.label ? ` · ${escape(route.condition)}` : ""}</span>`}
       </${compact ? "span" : "li"}>`;
     }).join("")}</${compact ? "span" : "ul"}>`;
   }
 
-  function routeSummary(detail, english) {
+  function routeSummary(detail, locale) {
     const routes = (detail?.outgoing || []).filter(route =>
       route.transitionType !== "sequence" || detail.node.nodeType === "decision" ||
       detail.node.metadata?.originalNodeType === "decision" ||
       route.metadata?.responsibilityHandoff);
     if (!routes.length) return "";
-    const connector = english ? "to" : "till";
-    return routes.map(route => `${routeLabel(route, english)} ${connector} ${
-      plain(processMapLabels.nodeTitle(route.target, english ? "en-US" : "sv-SE"))}`).join("; ");
+    // Spoken by screen readers, so use a localized phrase rather than an arrow.
+    const template = uiText("routeTo", locale, "{label} to {target}", "{label} till {target}");
+    return routes.map(route => template
+      .replace("{label}", routeLabel(route, locale))
+      .replace("{target}", plain(processMapLabels.nodeTitle(route.target, locale))))
+      .join("; ");
   }
 
   function detailMarkup(detail, english, locale = english ? "en-US" : "sv-SE") {
     if (!detail) return "";
     const changes = detail.changes.map(change => {
-      const before = stateValue(change.before, english);
-      const after = stateValue(change.after, english);
+      const before = stateValue(change.before, locale);
+      const after = stateValue(change.after, locale);
       return `<li><strong>${escape(stateLabel(change))}:</strong> ${escape(before)} ` +
-        `<span aria-label="${english ? "changes to" : "ändras till"}">→</span> ` +
+        `<span aria-label="${escape(uiText("changesTo", locale, "changes to", "ändras till"))}">→</span> ` +
         `${escape(after)}</li>`;
     }).join("");
     const explanationLabels = { "sv-SE": "Vad åtgärden innebär",
@@ -190,21 +202,21 @@
     const context = [detail.containers.phase?.title, detail.containers.subtask?.title]
       .filter(Boolean).map(value => `<span>${escape(processMapLabels.nodeTitle({ title: value },
         locale))}</span>`).join("");
-    const routes = routesMarkup(detail, english);
+    const routes = routesMarkup(detail, locale);
     return `<aside class="process-overview-detail" data-process-overview-detail aria-live="polite">
-      <div><span class="process-overview-detail-label">${detail.node.nodeType === "decision"
-        ? (english ? "Selected decision" : "Valt beslut")
-        : (english ? "Selected activity" : "Vald aktivitet")}</span>
+      <div><span class="process-overview-detail-label">${escape(detail.node.nodeType === "decision"
+        ? uiText("selectedDecision", locale, "Selected decision", "Valt beslut")
+        : uiText("selectedActivity", locale, "Selected activity", "Vald aktivitet"))}</span>
       <strong>${escape(plain(processMapLabels.nodeTitle(detail.node,
-        english ? "en-US" : "sv-SE")))}</strong></div>
+        locale)))}</strong></div>
       ${context ? `<div class="process-overview-detail-context">${context}</div>` : ""}
-      ${explanation ? `<div class="process-overview-detail-explanation"><span class="process-overview-detail-label">${escape(explanationLabels[locale] || explanationLabels["en-US"])}</span>
-        <p>${escape(explanation)}</p>${sourceUri ? `<span class="process-overview-detail-source">${escape(sourceLabels[locale] || sourceLabels["en-US"])}: <a href="${escape(sourceUri)}" target="_blank" rel="noopener noreferrer">${escape(source.title || "Microsoft Learn")}</a></span>` : ""}</div>` : ""}
-      ${routes ? `<div><span class="process-overview-detail-label">${english ? "Routes" : "Vägar"}</span>${routes}</div>` : ""}
-      ${changes ? `<div><span class="process-overview-detail-label">${english ? "Observed changes" : "Observerade förändringar"}</span>
+      ${explanation ? `<div class="process-overview-detail-explanation"><span class="process-overview-detail-label">${escape(explanationLabels[locale] || uiText("whatActionDoes", locale, "What this action does", "Vad åtgärden innebär"))}</span>
+        <p>${escape(explanation)}</p>${sourceUri ? `<span class="process-overview-detail-source">${escape(sourceLabels[locale] || uiText("source", locale, "Source", "Källa"))}: <a href="${escape(sourceUri)}" target="_blank" rel="noopener noreferrer">${escape(source.title || "Microsoft Learn")}</a></span>` : ""}</div>` : ""}
+      ${routes ? `<div><span class="process-overview-detail-label">${escape(uiText("routes", locale, "Routes", "Vägar"))}</span>${routes}</div>` : ""}
+      ${changes ? `<div><span class="process-overview-detail-label">${escape(uiText("observedChanges", locale, "Observed changes", "Observerade förändringar"))}</span>
         <ul>${changes}</ul></div>` : !routes ? `<p class="muted">${english
-          ? "No observed state change is linked to this activity."
-          : "Ingen observerad statusförändring är kopplad till aktiviteten."}</p>` : ""}
+          ? uiText("noStateChange", locale, "No observed state change is linked to this activity.", "Ingen observerad statusförändring är kopplad till aktiviteten.")
+          : uiText("noStateChange", locale, "No observed state change is linked to this activity.", "Ingen observerad statusförändring är kopplad till aktiviteten.")}</p>` : ""}
     </aside>`;
   }
 
@@ -221,20 +233,21 @@
       <span class="process-grammar-legend-title">${escape(legend.title)}</span>${nodes}${routes}</aside>`;
   }
 
-  function minimapMarkup(layout, details, selectedTaskIds, english) {
+  function minimapMarkup(layout, details, selectedTaskIds, locale) {
+    const english = String(locale || "").toLowerCase().startsWith("en");
     const selectedNodes = details.filter(detail => selectedTaskIds.has(detail.taskId))
       .map(detail => detail.node.nodeId);
     const map = processMapMinimap.create(layout, details.map(detail => ({
       nodeId: detail.node.nodeId, title: plain(processMapLabels.nodeTitle(detail.node,
-        english ? "en-US" : "sv-SE"))
+        locale))
     })), selectedNodes);
-    return `<nav class="process-map-minimap" aria-label="${english
-      ? "Process map overview" : "Översikt över processkartan"}">
-      <strong>${english ? "Map overview" : "Kartöversikt"}</strong>
+    return `<nav class="process-map-minimap" aria-label="${escape(uiText("overview", locale,
+      "Process map overview", "Översikt över processkartan"))}">
+      <strong>${escape(uiText("mapOverview", locale, "Map overview", "Kartöversikt"))}</strong>
       <span class="process-map-minimap-grid" style="--minimap-columns:${map.columns};--minimap-rows:${map.rows}">${
         map.items.map((item, index) => `<button type="button" data-process-minimap-node="${
           escape(item.nodeId)}" style="--minimap-column:${item.column + 1};--minimap-row:${item.row + 1}"
-          aria-label="${escape(`${english ? "Go to step" : "Gå till steg"} ${index + 1}: ${item.title}`)}"
+          aria-label="${escape(`${uiText("goToStep", locale, "Go to step", "Gå till steg")} ${index + 1}: ${item.title}`)}"
           aria-current="${item.selected ? "step" : "false"}" title="${escape(item.title)}"><span>${
           index + 1}</span></button>`).join("")}</span></nav>`;
   }
@@ -242,6 +255,7 @@
   function render(container, model, options = {}) {
     if (!container) return { activityCount: 0, stateTransitionCount: 0 };
     const english = String(options.locale || "").toLowerCase().startsWith("en");
+    const locale = options.locale || (english ? "en-US" : "sv-SE");
     const selectedTaskIds = new Set(options.selectedTaskIds || []);
     const activities = (model?.nodes || []).filter(node =>
       !["start", "end", "subprocess"].includes(node.nodeType)
@@ -255,9 +269,9 @@
     });
     if (!activities.length) {
       renderedViews.delete(container);
-      container.innerHTML = `<p class="muted">${english
-        ? "No process activities are available."
-        : "Det finns inga processaktiviteter att visa."}</p>`;
+      container.innerHTML = `<p class="muted">${escape(uiText("noActivities",
+        options.locale || (english ? "en-US" : "sv-SE"), "No process activities are available.",
+        "Det finns inga processaktiviteter att visa."))}</p>`;
       return { activityCount: 0, stateTransitionCount: 0 };
     }
     const details = activityDetails(model, activities, stateTransitions, options);
@@ -268,10 +282,14 @@
       availableWidth: options.availableWidth || container.clientWidth || undefined,
       direction: options.direction
     });
-    const lanes = processLaneModel.create(model, { unassignedTitle: english
-      ? "Other steps" : "Övriga steg", roleNames: english ? {} : {
-        purchasing: "Inköp", warehouse: "Lager", sales: "Försäljning",
-        production: "Produktion", finance: "Ekonomi", system: "System" } });
+    const lanes = processLaneModel.create(model, { unassignedTitle: uiText("otherSteps", locale,
+      "Other steps", "Övriga steg"), roleNames: Object.fromEntries([
+        "purchasing", "warehouse", "sales", "production", "finance", "system"
+      ].map(role => [role, uiText(`role.${role}`, locale, ({ purchasing: "Purchasing",
+        warehouse: "Warehouse", sales: "Sales", production: "Production",
+        finance: "Finance", system: "System" })[role], ({ purchasing: "Inköp",
+        warehouse: "Lager", sales: "Försäljning", production: "Produktion",
+        finance: "Ekonomi", system: "System" })[role])])) });
     const theme = processMapTheme.resolve(options.theme);
     const branchedLayout = layout.flowDirection === "topToBottomBranches";
     const showLaneHeaders = lanes.visible && !branchedLayout;
@@ -283,10 +301,10 @@
       .map(segment => segment.nodeIds.at(-1)) : [];
     const rowEndIds = new Set([...layout.rows.slice(0, -1).map(row => row.nodeIds.at(-1)),
       ...laneEndIds]);
-    container.innerHTML = `${minimapMarkup(layout, details, selectedTaskIds, english)}<div class="process-diagram-scroll" tabindex="0" role="group"
+    container.innerHTML = `${minimapMarkup(layout, details, selectedTaskIds, locale)}<div class="process-diagram-scroll" tabindex="0" role="group"
       data-process-theme="${escape(options.theme || "business-central")}"
       data-process-density="${options.density === "compact" ? "compact" : "standard"}"
-      aria-label="${english ? "Process flow" : "Processflöde"}">
+      aria-label="${escape(uiText("processFlow", locale, "Process flow", "Processflöde"))}">
       <ol class="process-overview-list" data-process-layout-version="${layout.layoutVersion}"
         data-process-direction="${layout.direction}" data-process-flow="${layout.flowDirection}"
         style="--process-columns:${layout.columnCount};zoom:${Number(options.zoom) || 100}%">${details.map(detail => {
@@ -294,17 +312,16 @@
         const phase = detail.containers.phase?.title;
         const subtask = detail.containers.subtask?.title;
         const decision = detail.node.nodeType === "decision";
-        const status = reviewState(detail, english);
-        const semantic = semanticState(detail, english);
+        const status = reviewState(detail, locale);
+        const semantic = semanticState(detail, locale);
         const title = plain(processMapLabels.nodeTitle(detail.node, options.locale));
         const placement = placementById.get(detail.node.nodeId);
-        const visual = visualGrammar.presentationFor(detail.node,
-          english ? "en-US" : "sv-SE");
+        const visual = visualGrammar.presentationFor(detail.node, locale);
         const boundary = ["start", "end"].includes(visual.kind);
         const stepNumber = details.slice(0, detail.index).filter(item => !["start", "end"]
-          .includes(visualGrammar.presentationFor(item.node, english ? "en-US" : "sv-SE").kind))
+          .includes(visualGrammar.presentationFor(item.node, locale).kind))
           .length + 1;
-        const accessibleRoutes = routeSummary(detail, english);
+        const accessibleRoutes = routeSummary(detail, locale);
         const lane = laneStartIds.get(detail.node.nodeId);
         const laneRole = String(lane?.laneId || "").replace(/^role:/u, "");
         const laneColors = theme.rolePalette?.[laneRole] || theme.rolePalette?.default ||
@@ -325,10 +342,10 @@
             data-process-node-action="${escape(detail.node.nodeId)}"
             ${detail.taskId ? `data-process-task-id="${escape(detail.taskId)}"` : ""}
             aria-pressed="${selected}"${selected ? ' aria-current="step"' : ""}
-            aria-label="${escape(`${english ? "Step" : "Steg"} ${detail.index + 1}: ${title}${status ? `. ${status.label}` : ""}${accessibleRoutes ? `. ${accessibleRoutes}` : ""}`)}">
+            aria-label="${escape(`${uiText("step", locale, "Step", "Steg")} ${detail.index + 1}: ${title}${status ? `. ${status.label}` : ""}${accessibleRoutes ? `. ${accessibleRoutes}` : ""}`)}">
             <span class="process-map-drag-handle" data-process-drag-handle draggable="${
-              options.reorderable === true}" title="${english ? "Drag to change position" :
-                "Dra för att ändra position"}" aria-hidden="true">⠿</span>
+              options.reorderable === true}" title="${escape(uiText("drag", locale,
+                "Drag to change position", "Dra för att ändra position"))}" aria-hidden="true">⠿</span>
             <span class="process-overview-number" aria-hidden="true"><span>${boundary ? "" :
               decision ? "?" : stepNumber}</span></span>
             <span class="process-overview-content">
@@ -339,18 +356,17 @@
               ${!["action", "process-step"].includes(visual.kind)
                 ? `<span class="process-overview-node-type">${escape(visual.label)}</span>` : ""}
               <strong>${escape(title)}</strong>
-              ${routesMarkup(detail, english, true)}
+              ${routesMarkup(detail, locale, true)}
               ${status ? `<span class="process-overview-review-state ${status.name}">${escape(status.label)}</span>` : ""}
               ${semantic ? `<span class="process-overview-semantic-state ${semantic.name}">${escape(
                 semantic.label)}</span>` : ""}
             </span>
           </button>
         </li>`;
-      }).join("")}</ol></div>${legendMarkup(model, english ? "en-US" : "sv-SE")}${
-        detailMarkup(selectedDetail, english, options.locale ||
-          (english ? "en-US" : "sv-SE"))}`;
+      }).join("")}</ol></div>${legendMarkup(model, locale)}${
+        detailMarkup(selectedDetail, english, locale)}`;
     processConnectorView.render(container, model, {
-      locale: english ? "en-US" : "sv-SE"
+      locale
     });
     return { activityCount: activities.length, layoutStrategy: layout.strategy,
       stateTransitionCount: [...stateTransitions.values()].flat().length };

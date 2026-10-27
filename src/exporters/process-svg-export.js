@@ -37,13 +37,15 @@
   const ordered = model => [...(model.nodes || [])].sort((left, right) =>
     (left.processOrder ?? left.sequence ?? 0) - (right.processOrder ?? right.sequence ?? 0) ||
     left.nodeId.localeCompare(right.nodeId));
-  function stateValue(value, english) { if (value?.value !== undefined && value?.value !== null)
+  function stateValue(value, locale) { if (value?.value !== undefined && value?.value !== null)
     return String(value.value); if (typeof value?.checked === "boolean") return value.checked
-      ? (english ? "On" : "På") : (english ? "Off" : "Av");
+      ? (globalThis.T9UiI18n?.translate("processMap.on", locale) || "On")
+      : (globalThis.T9UiI18n?.translate("processMap.off", locale) || "Off");
     if (typeof value?.visible === "boolean") return value.visible
-      ? (english ? "Visible" : "Synlig") : (english ? "Closed" : "Stängd");
+      ? (globalThis.T9UiI18n?.translate("processMap.visible", locale) || "Visible")
+      : (globalThis.T9UiI18n?.translate("processMap.closed", locale) || "Closed");
     return String(value?.outcome || value?.page?.caption || ""); }
-  function rowsFor(model, nodes, columns, english, graph) {
+  function rowsFor(model, nodes, columns, locale, graph) {
     if (graph?.flowDirection === "topToBottomBranches") {
       const nodeById = new Map(nodes.map(node => [node.nodeId, node]));
       const placements = new Map(graph.nodes.map(item => [item.nodeId, item]));
@@ -63,10 +65,10 @@
           firstInLane: false }] : [])
       ] };
     }
-    const lanes = processLaneModel.create(model, { unassignedTitle: english
-      ? "Other steps" : "Övriga steg", roleNames: english ? {} : {
-        purchasing: "Inköp", warehouse: "Lager", sales: "Försäljning",
-        production: "Produktion", finance: "Ekonomi", system: "System" } });
+    const lanes = processLaneModel.create(model, { unassignedTitle:
+      globalThis.T9UiI18n?.translate("processMap.otherSteps", locale) || "Other steps",
+      roleNames: Object.fromEntries(["purchasing", "warehouse", "sales", "production",
+        "finance", "system"].map(role => [role, processMapLabels.roleTitle(role, locale)])) });
     const laneById = new Map(lanes.lanes.map(lane => [lane.laneId, lane]));
     const assignment = node => lanes.assignments[node.nodeId] ||
       (node.nodeType === "start" ? "boundary:start" : "boundary:end");
@@ -153,7 +155,9 @@
       x="34" y="${y + 21}">${escape(legend.title)}</text>${markup}</g>` };
   }
   function svg(model, options = {}) {
-    const english = String(options.language || "").toLowerCase().startsWith("en");
+    const locale = options.language || "en-US";
+    const localized = (en, sv) => String(locale).toLowerCase().startsWith("sv") ? sv :
+      globalThis.T9UiI18n?.translateStaticText?.(en, locale) || en;
     const theme = processMapTheme.resolve(options.theme);
     const density = options.density === "compact" ? "compact" : "standard";
     const nodes = ordered(model); let columns = Math.max(1, Math.min(5,
@@ -175,7 +179,7 @@
     const gapX = density === "compact" ? 52 : 72;
     const gapY = density === "compact" ? 44 : 64;
     const margin = 64; const header = 126; const laneHeader = 42;
-    const layout = rowsFor(model, nodes, columns, english, graph); const boxes = {};
+    const layout = rowsFor(model, nodes, columns, locale, graph); const boxes = {};
     let cursorY = header;
     const laneBands = []; let activeLaneBand;
     layout.rows.forEach(row => { if (row.firstInLane) activeLaneBand = null;
@@ -222,7 +226,7 @@
         change.before?.control?.caption || change.after?.control?.caption || change.factKey;
         return `<text x="${box.x + box.width / 2}" y="${box.y + box.height - 12 + index * 13}"
           class="state" text-anchor="middle">${escape(label)}: ${escape(stateValue(change.before,
-          english))} → ${escape(stateValue(change.after, english))}</text>`; }).join("");
+          locale))} → ${escape(stateValue(change.after, locale))}</text>`; }).join("");
       const semanticStatus = node?.metadata?.semanticStatus;
       const semanticClass = semanticStatus ? ` semantic-${escape(semanticStatus)}` : "";
       const boundary = ["start", "end"].includes(visual.kind);
@@ -235,7 +239,7 @@
         box.x + box.width - 13}" cy="${box.y + 14}" r="6"><title>${
         escape(processMapLabels.statusTitle(semanticStatus, options.language))}</title></circle>` : "";
       const kindLabel = visual.label ? `<text class="node-kind" x="${box.x + 24}" y="${box.y + 22}">${
-        escape(String(visual.label).toLocaleUpperCase(english ? "en-US" : "sv-SE"))}</text>` : "";
+        escape(String(visual.label).toLocaleUpperCase(locale))}</text>` : "";
       return `<g class="map-node map-node-${escape(visual.kind)}${semanticClass}" data-node-type="${
         escape(node.nodeType)}" data-node-id="${escape(node.nodeId)}">${nodeShape(node, box, visual)}<title>${
         escape(fullTitle)}</title>${badge}${statusMarker}${kindLabel}<text class="node-title" x="${
@@ -249,12 +253,14 @@
       width - 40}" height="${Math.max(laneHeader, lane.bottom - lane.y)}" rx="12" style="fill:${
         escape(colors[0])};stroke:${escape(colors[1])}"/><path class="lane-accent" d="M 32 ${
         lane.y + laneHeader} H ${width - 32}" style="stroke:${escape(colors[1])}"/><text x="38" y="${lane.y + 26}">${
-      escape(`${english ? "OWNER" : "ANSVAR"}: ${processMapLabels.nodeTitle({ title: lane.title },
+      escape(`${localized("OWNER", "ANSVAR")}: ${processMapLabels.nodeTitle({ title: lane.title },
         options.language)}`)}</text></g>`; }).join("");
     const title = options.title || model.title || "Process";
-    const subtitle = options.subtitle || (english ? "Microsoft Dynamics 365 Business Central · Process map" : "Microsoft Dynamics 365 Business Central · Processkarta");
-    const footer = options.footer || (english ? "Based on the recorded process in BC Process Studio" : "Baserad på den inspelade processen i BC Process Studio");
-    return applyTheme(`<?xml version="1.0" encoding="UTF-8"?>\n<svg data-process-layout="${graph.strategy}" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${width} ${height}" role="img" aria-labelledby="title description"><title id="title">${escape(title)}</title><desc id="description">${escape(english ? "Exported process diagram" : "Exporterat processdiagram")}</desc><defs><filter id="card-shadow" x="-15%" y="-15%" width="140%" height="150%"><feDropShadow dx="0" dy="3" stdDeviation="4" flood-color="#172b3a" flood-opacity=".14"/></filter><marker id="arrow" markerWidth="10" markerHeight="10" refX="9" refY="5" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#49657a"/></marker></defs><style>.background{fill:#fff}.top-accent{fill:#31566f}.subtitle,.footer{font:12px 'Segoe UI',Arial,sans-serif;fill:#3f5668}.lane-panel{fill:#f4f8fb;stroke:#c8d5df;stroke-width:1.5}.lane-accent{fill:none;stroke:#31566f;stroke-width:2}.lane text{font:700 12px 'Segoe UI',Arial,sans-serif;letter-spacing:.7px;fill:#213547}.map-node>*:first-child{fill:#fefefe;stroke:#52606d;stroke-width:2;filter:url(#card-shadow)}.map-node text{font:600 14px 'Segoe UI',Arial,sans-serif;fill:#172b3a}.map-node .node-kind{font:700 9px 'Segoe UI',Arial,sans-serif;letter-spacing:.8px;fill:#3f5668}.map-node .node-title{font-weight:650}.map-node .state{font:11px 'Segoe UI',Arial,sans-serif;fill:#3f5668}.map-node .step-badge{fill:#31566f;stroke:#fff;stroke-width:3;filter:none}.map-node .step-number{font:700 12px 'Segoe UI',Arial,sans-serif;fill:#fff}.map-node-business-process>*:first-child{fill:#eaf3f8;stroke:#31566f}.map-node-document>*:first-child{fill:#eef8fd;stroke:#2878a5}.map-node-posted-document>*:first-child{fill:#eef8f0;stroke:#347447}.map-node-posting>*:first-child,.map-node-decision>*:first-child{fill:#fff4ce;stroke:#7a5b00}.map-node-system-action>*:first-child{fill:#f6f2ff;stroke:#66558f;stroke-dasharray:6 4}.map-node-manual-action>*:first-child{fill:#fff8ef;stroke:#8a5a2b}.semantic-observed>*:first-child,.legend-status.semantic-observed{fill:#dff3e5;stroke:#15803d}.semantic-suggested>*:first-child,.legend-status.semantic-suggested{fill:#fff8e1;stroke:#a16207;stroke-dasharray:6 4}.semantic-conditional>*:first-child,.legend-status.semantic-conditional{fill:#f5f3ff;stroke:#7c3aed;stroke-dasharray:6 4}.semantic-customerSpecific>*:first-child,.legend-status.semantic-customerSpecific{fill:#e0f2fe;stroke:#0369a1}.semantic-reference>*:first-child,.legend-status.semantic-reference{fill:#eef1f4;stroke:#64717d}.edge{fill:none;stroke:#49657a;stroke-width:3;stroke-linejoin:round}.edge-alternate,.edge-loop,.edge-return{stroke:#8a6d1d;stroke-dasharray:7 5}.edge-conditional,.edge-branch{stroke:#765b00;stroke-width:3}.edge-creates{stroke:#2878a5;stroke-dasharray:2 5}.edge-posts{stroke:#347447;stroke-width:4}.route-label{font:12px 'Segoe UI',Arial,sans-serif;fill:#5f4b16;paint-order:stroke;stroke:#fff;stroke-width:4px;stroke-linejoin:round}.diagram-legend>rect{fill:#f4f8fb;stroke:#c8d5df}.diagram-legend text{font:12px 'Segoe UI',Arial,sans-serif;fill:#172b3a}.diagram-legend .legend-title{font-weight:700}.legend-item>*:first-child{fill:#fefefe;stroke:#52606d;stroke-width:2}.legend-route{fill:none!important;stroke:#49657a!important}.legend-route-dashed{stroke-dasharray:7 5}.legend-route-dotted{stroke-dasharray:2 5}.legend-route-double{stroke-width:4!important}</style><rect class="background" width="100%" height="100%"/><rect class="top-accent" width="100%" height="10"/><text x="${margin}" y="49" style="font:700 25px 'Segoe UI',Arial,sans-serif;fill:#172b3a">${escape(title)}</text><text class="subtitle" x="${margin}" y="74">${escape(subtitle)}</text>${laneMarkup}<g class="edges">${edges}</g><g class="nodes">${nodeMarkup}</g>${legend.markup}<text class="footer" x="${margin}" y="${height - 9}">${escape(footer)}</text></svg>\n`, theme);
+    const subtitle = options.subtitle || `Microsoft Dynamics 365 Business Central · ${localized("Process map", "Processkarta")}`;
+    const footer = options.footer || localized("Based on the recorded process in BC Process Studio",
+      "Baserad på den inspelade processen i BC Process Studio");
+    const description = localized("Exported process diagram", "Exporterat processdiagram");
+    return applyTheme(`<?xml version="1.0" encoding="UTF-8"?>\n<svg data-process-layout="${graph.strategy}" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${width} ${height}" role="img" aria-labelledby="title description"><title id="title">${escape(title)}</title><desc id="description">${escape(description)}</desc><defs><filter id="card-shadow" x="-15%" y="-15%" width="140%" height="150%"><feDropShadow dx="0" dy="3" stdDeviation="4" flood-color="#172b3a" flood-opacity=".14"/></filter><marker id="arrow" markerWidth="10" markerHeight="10" refX="9" refY="5" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#49657a"/></marker></defs><style>.background{fill:#fff}.top-accent{fill:#31566f}.subtitle,.footer{font:12px 'Segoe UI',Arial,sans-serif;fill:#3f5668}.lane-panel{fill:#f4f8fb;stroke:#c8d5df;stroke-width:1.5}.lane-accent{fill:none;stroke:#31566f;stroke-width:2}.lane text{font:700 12px 'Segoe UI',Arial,sans-serif;letter-spacing:.7px;fill:#213547}.map-node>*:first-child{fill:#fefefe;stroke:#52606d;stroke-width:2;filter:url(#card-shadow)}.map-node text{font:600 14px 'Segoe UI',Arial,sans-serif;fill:#172b3a}.map-node .node-kind{font:700 9px 'Segoe UI',Arial,sans-serif;letter-spacing:.8px;fill:#3f5668}.map-node .node-title{font-weight:650}.map-node .state{font:11px 'Segoe UI',Arial,sans-serif;fill:#3f5668}.map-node .step-badge{fill:#31566f;stroke:#fff;stroke-width:3;filter:none}.map-node .step-number{font:700 12px 'Segoe UI',Arial,sans-serif;fill:#fff}.map-node-business-process>*:first-child{fill:#eaf3f8;stroke:#31566f}.map-node-document>*:first-child{fill:#eef8fd;stroke:#2878a5}.map-node-posted-document>*:first-child{fill:#eef8f0;stroke:#347447}.map-node-posting>*:first-child,.map-node-decision>*:first-child{fill:#fff4ce;stroke:#7a5b00}.map-node-system-action>*:first-child{fill:#f6f2ff;stroke:#66558f;stroke-dasharray:6 4}.map-node-manual-action>*:first-child{fill:#fff8ef;stroke:#8a5a2b}.semantic-observed>*:first-child,.legend-status.semantic-observed{fill:#dff3e5;stroke:#15803d}.semantic-suggested>*:first-child,.legend-status.semantic-suggested{fill:#fff8e1;stroke:#a16207;stroke-dasharray:6 4}.semantic-conditional>*:first-child,.legend-status.semantic-conditional{fill:#f5f3ff;stroke:#7c3aed;stroke-dasharray:6 4}.semantic-customerSpecific>*:first-child,.legend-status.semantic-customerSpecific{fill:#e0f2fe;stroke:#0369a1}.semantic-reference>*:first-child,.legend-status.semantic-reference{fill:#eef1f4;stroke:#64717d}.edge{fill:none;stroke:#49657a;stroke-width:3;stroke-linejoin:round}.edge-alternate,.edge-loop,.edge-return{stroke:#8a6d1d;stroke-dasharray:7 5}.edge-conditional,.edge-branch{stroke:#765b00;stroke-width:3}.edge-creates{stroke:#2878a5;stroke-dasharray:2 5}.edge-posts{stroke:#347447;stroke-width:4}.route-label{font:12px 'Segoe UI',Arial,sans-serif;fill:#5f4b16;paint-order:stroke;stroke:#fff;stroke-width:4px;stroke-linejoin:round}.diagram-legend>rect{fill:#f4f8fb;stroke:#c8d5df}.diagram-legend text{font:12px 'Segoe UI',Arial,sans-serif;fill:#172b3a}.diagram-legend .legend-title{font-weight:700}.legend-item>*:first-child{fill:#fefefe;stroke:#52606d;stroke-width:2}.legend-route{fill:none!important;stroke:#49657a!important}.legend-route-dashed{stroke-dasharray:7 5}.legend-route-dotted{stroke-dasharray:2 5}.legend-route-double{stroke-width:4!important}</style><rect class="background" width="100%" height="100%"/><rect class="top-accent" width="100%" height="10"/><text x="${margin}" y="49" style="font:700 25px 'Segoe UI',Arial,sans-serif;fill:#172b3a">${escape(title)}</text><text class="subtitle" x="${margin}" y="74">${escape(subtitle)}</text>${laneMarkup}<g class="edges">${edges}</g><g class="nodes">${nodeMarkup}</g>${legend.markup}<text class="footer" x="${margin}" y="${height - 9}">${escape(footer)}</text></svg>\n`, theme);
   }
   return { applyTheme, edgePath, legendFor, rowsFor, svg };
 });

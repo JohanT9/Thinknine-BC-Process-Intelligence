@@ -105,7 +105,10 @@ for (const sample of fixtures) {
   assert.equal(enriched.contextualExplanationRuleId, ruleId, `${ruleId} ${locale} visible explanation`);
   assert.ok(enriched.contextualExplanations[locale]);
   assert.ok(enriched.contextualExplanationSources.some(s=>s.sourceId===sourceId));
-  assert.equal(enriched.instruction, observed.instruction);
+  // Only the literal New action receives the contextual create instruction;
+  // saved recordings (checked below) keep their stored instruction.
+  assert.equal(enriched.instruction,
+    enriched.contextualInstruction || observed.instruction);
   assert.equal(enriched.value, observed.value);
   assert.deepEqual(enriched.screenshots, observed.screenshots);
   assert.equal(JSON.stringify(observed), before, 'input is immutable');

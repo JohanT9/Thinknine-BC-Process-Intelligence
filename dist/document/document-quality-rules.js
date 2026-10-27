@@ -5,24 +5,38 @@
   const componentValidation = typeof module === "object" && module.exports
     ? require("./document-component-validation")
     : root.T9DocumentComponentValidation;
-  const api = factory(quality, componentValidation);
+  const taskVisibility = typeof module === "object" && module.exports
+    ? require("../review/task-visibility") : root.T9ReviewTaskVisibility;
+  const api = factory(quality, componentValidation, taskVisibility);
   if (typeof module === "object" && module.exports) module.exports = api;
   root.T9DocumentQualityRules = api;
 })(typeof globalThis !== "undefined" ? globalThis : this, function (
   quality,
-  componentValidation
+  componentValidation,
+  taskVisibility
 ) {
   const VERSION = "1.0.0";
+  let activeEvaluationContext = null;
 
   function text(value) {
     return typeof value === "string" ? value.trim() : "";
   }
 
   function rule(ruleId, severity, targetType, description, evaluate) {
-    return { ruleId, version: VERSION, severity, targetType, description, evaluate };
+    return { ruleId, version: VERSION, severity, targetType, description,
+      evaluate(context) {
+        const previous = activeEvaluationContext;
+        activeEvaluationContext = context;
+        try { return evaluate(context); }
+        finally { activeEvaluationContext = previous; }
+      }
+    };
   }
 
   function semanticBlocks(document) {
+    const cache = activeEvaluationContext?.qualityRuleCache;
+    if (activeEvaluationContext?.document === document &&
+        cache?.has("semanticBlocks")) return cache.get("semanticBlocks");
     const result = [];
     function visit(blocks, section, parentLocation) {
       (blocks || []).forEach(block => {
@@ -49,10 +63,16 @@
       section,
       `section:${section?.sectionId || "missing"}`
     ));
+    if (activeEvaluationContext?.document === document) {
+      cache?.set("semanticBlocks", result);
+    }
     return result;
   }
 
   function planComponents(plan) {
+    const cache = activeEvaluationContext?.qualityRuleCache;
+    if (activeEvaluationContext?.plan === plan &&
+        cache?.has("planComponents")) return cache.get("planComponents");
     const result = [];
     function visit(values, parentLocation) {
       (values || []).forEach(component => {
@@ -67,6 +87,9 @@
       section?.components,
       `plan-section:${section?.planSectionId || "missing"}`
     ));
+    if (activeEvaluationContext?.plan === plan) {
+      cache?.set("planComponents", result);
+    }
     return result;
   }
 
@@ -175,6 +198,21 @@
                 { characterCount: instruction.length, threshold: 15 })]
               : [];
           })),
+
+    rule("step.generic-instruction", "warning", "step",
+      "Generic placeholder instructions do not explain the recorded action.",
+      ({ document }) => semanticBlocks(document)
+        .filter(item => item.block?.kind === "step")
+        .flatMap(item => {
+          const instruction = text(item.block.blocks?.find(block =>
+            block.kind === "paragraph")?.text);
+          return instruction && taskVisibility.isGenericInstruction(instruction)
+            ? [finding("Step uses a generic placeholder instruction.",
+              item.location, source(document, item.section, item.block),
+              "Replace it with the observed action, page, and relevant value.",
+              { instruction })]
+            : [];
+        })),
 
     rule("step.duplicate-instruction", "warning", "step",
       "Exact normalized instruction duplicates may be accidental.",

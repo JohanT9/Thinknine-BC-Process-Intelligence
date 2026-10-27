@@ -141,6 +141,7 @@
   function analyze(document, plan, registry) {
     const findings = [];
     const diagnosticIds = new Set();
+    const context = { document, plan, qualityRuleCache: new Map() };
     function add(value) {
       if (diagnosticIds.has(value.diagnosticId)) return;
       diagnosticIds.add(value.diagnosticId);
@@ -148,7 +149,7 @@
     }
     (registry?.rules || []).forEach(rule => {
       try {
-        const values = rule.evaluate({ document, plan }) || [];
+        const values = rule.evaluate(context) || [];
         values.forEach(value => add(diagnostic(rule, value)));
       } catch (error) {
         add(diagnostic({

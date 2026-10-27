@@ -72,7 +72,15 @@
       unsaved: "Changes waiting to be saved", failed: "Could not save changes" };
     const status = element(doc, "p", ui(saveLabels[workspaceState.saveState] ||
       workspaceState.saveState, locale), `save-state save-state-${workspaceState.saveState}`);
-    status.setAttribute("role", "status"); container.appendChild(status);
+    status.setAttribute("role", "status");
+    if (workspaceState.saveState === "failed" && options.onRetrySave) {
+      const retry = element(doc, "button", ui("Retry save", locale),
+        "technical-retry-save");
+      retry.type = "button";
+      retry.addEventListener("click", options.onRetrySave);
+      status.appendChild(retry);
+    }
+    container.appendChild(status);
     const severityLabel = element(doc, "label", ui("Severity", locale));
     severityLabel.htmlFor = "technical-report-severity";
     const severity = doc.createElement("select");
@@ -203,21 +211,25 @@
               onCopy, locale));
         }); node.appendChild(dl);
         section.content.captureStatuses.forEach(status => node.appendChild(
-          element(doc, "p", status.diagnosticsStatus === "diagnostics-capture-failed"
+          element(doc, "p", ui(status.diagnosticsStatus === "diagnostics-capture-failed"
             ? "Diagnostic capture failed."
             : status.diagnosticsStatus === "diagnostics-unavailable"
               ? "Diagnostics were not provided by Business Central."
-              : "Diagnostics captured.")));
+              : "Diagnostics captured.", locale))));
       } else if (section.kind === "call-stack") {
         section.content.forEach(stack => {
           const table = doc.createElement("table");
           table.appendChild(element(doc, "caption",
-            `Structured AL call stack — ${stack.parseStatus}`));
+            `${ui("Structured AL call stack", locale)} — ${stack.parseStatus}`));
           const head = doc.createElement("thead");
           const header = doc.createElement("tr");
-          ["#", "Object", "Method / Trigger", "App / Extension", "Source / Line",
-            "Parse Status"].forEach(value => header.appendChild(element(doc, "th",
-            value))); head.appendChild(header); table.appendChild(head);
+          [["#", "#"], ["Object", "Objekt"],
+            ["Method / Trigger", "Metod/utlösare"],
+            ["App / Extension", "App/tillägg"], ["Source / Line", "Källa/rad"],
+            ["Parse Status", "Tolkningsstatus"]].forEach(([english, swedish]) =>
+            header.appendChild(element(doc, "th",
+              ui(english === "#" ? english : swedish, locale))));
+          head.appendChild(header); table.appendChild(head);
           const body = doc.createElement("tbody");
           stack.frames.forEach(frame => {
             const row = doc.createElement("tr");

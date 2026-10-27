@@ -50,7 +50,16 @@
     "document:general-journal": "General Journal",
     "document:item-journal": "Item Journal",
     "document:item-reclassification-journal": "Item Reclassification Journal",
-    "document:physical-inventory-journal": "Physical Inventory Journal"
+    "document:physical-inventory-journal": "Physical Inventory Journal",
+    "document:quality-inspection": "Quality Inspection",
+    "document:quality-inspection-template": "Quality Inspection Template",
+    "document:quality-test": "Quality Test",
+    "document:quality-inspection-generation-rule": "Quality Inspection Generation Rule",
+    "document:quality-inspection-result": "Quality Inspection Result",
+    "document:payment-journal": "Payment Journal",
+    "document:bank-account-reconciliation": "Bank Account Reconciliation",
+    "document:bank-statement-lines": "Bank Statement Lines",
+    "document:bank-account-ledger-entries": "Bank Account Ledger Entries"
   });
   const SV_NODE_TITLES = Object.freeze({
     "Order to Cash": "Order till betalning",
@@ -133,6 +142,20 @@
     "document:item-journal": "Artikeljournal",
     "document:item-reclassification-journal": "Artikelomklassificeringsjournal",
     "document:physical-inventory-journal": "Inventeringsjournal",
+    "document:quality-inspection": "Kvalitetsinspektion",
+    "document:quality-inspection-template": "Kvalitetsinspektionsmall",
+    "document:quality-test": "Kvalitetstest",
+    "document:quality-inspection-generation-rule": "Regel för generering av kvalitetsinspektion",
+    "document:quality-inspection-result": "Kvalitetsinspektionsresultat",
+    "document:payment-journal": "Betalningsjournal",
+    "document:bank-account-reconciliation": "Bankkontoavstämning",
+    "document:bank-statement-lines": "Kontoutdragsrader",
+    "document:bank-account-ledger-entries": "Bankkontotransaktioner",
+    "Bank Account Reconciliation": "Bankkontoavstämning",
+    "Vendor Payment Journal": "Leverantörsbetalningsjournal",
+    "Purchase Receipt Quality Inspection": "Kvalitetsinspektion vid inköpsinleverans",
+    "Warehouse Receipt Inspection and Reinspection": "Inspektion och ominspektion vid lagerinleverans",
+    "Production Output Sampling Inspection": "Stickprovsinspektion av produktionsutflöde",
     "Create Sales Return Order": "Skapa försäljningsreturorder",
     "Receive Sales Return": "Ta emot försäljningsretur",
     "Post Sales Return": "Bokför försäljningsretur",
@@ -205,33 +228,228 @@
   });
   const EN_DOCUMENT_IDS_BY_TITLE = Object.freeze(Object.fromEntries(
     Object.entries(EN_NODE_TITLES).map(([id, title]) => [title, id])));
+  const EN_NODE_TITLES_BY_SWEDISH = Object.freeze(Object.fromEntries(
+    Object.entries(SV_NODE_TITLES).map(([key, localized]) => [
+      String(localized).toLocaleLowerCase(), EN_NODE_TITLES[key] || key])));
   const SV_NODE_TITLES_BY_KEY = Object.freeze(Object.fromEntries(
     Object.entries(SV_NODE_TITLES).map(([title, localized]) =>
       [title.toLocaleLowerCase(), localized])));
-  function english(locale) { return String(locale || "").toLowerCase().startsWith("en"); }
+  const DOMAIN_TITLES = Object.freeze({
+    "domain:order-to-cash": "Order to Cash", "domain:source-to-pay": "Source to Pay",
+    "domain:forecast-to-plan": "Forecast to Plan", "domain:plan-to-produce": "Plan to Produce",
+    "domain:inventory-to-deliver": "Inventory to Deliver", "domain:record-to-report": "Record to Report",
+    "domain:returns": "Returns", "domain:transfers": "Transfers", "domain:assembly": "Assembly",
+    "domain:item-tracking": "Item Tracking", "domain:quality-management": "Quality Management",
+    "domain:warehouse-management": "Warehouse Management"
+  });
+  // These labels occur throughout the canonical process maps. Keep them local and
+  // explicit: process-map rendering must never depend on a live translation lookup.
+  const LOCALIZED_NODE_TITLES = Object.freeze({
+    "Start": { "sv-SE": "Start", "fr-FR": "Début", "de-DE": "Start", "es-ES": "Inicio", "da-DK": "Start", "fi-FI": "Alku", "nb-NO": "Start" },
+    "End": { "sv-SE": "Slut", "fr-FR": "Fin", "de-DE": "Ende", "es-ES": "Fin", "da-DK": "Slut", "fi-FI": "Loppu", "nb-NO": "Slutt" },
+    "Order to Cash": { "sv-SE": "Order till betalning", "fr-FR": "De la commande au paiement", "de-DE": "Auftrag bis Zahlung", "es-ES": "Del pedido al cobro", "da-DK": "Fra ordre til betaling", "fi-FI": "Tilauksesta maksuun", "nb-NO": "Fra ordre til betaling" },
+    "Source to Pay": { "sv-SE": "Inköp till betalning", "fr-FR": "De l’approvisionnement au paiement", "de-DE": "Beschaffung bis Zahlung", "es-ES": "Del aprovisionamiento al pago", "da-DK": "Fra indkøb til betaling", "fi-FI": "Hankinnasta maksuun", "nb-NO": "Fra innkjøp til betaling" },
+    "Forecast to Plan": { "sv-SE": "Prognos till plan", "fr-FR": "De la prévision au plan", "de-DE": "Von der Prognose zum Plan", "es-ES": "De la previsión al plan", "da-DK": "Fra prognose til plan", "fi-FI": "Ennusteesta suunnitelmaan", "nb-NO": "Fra prognose til plan" },
+    "Plan to Produce": { "sv-SE": "Planering till produktion", "fr-FR": "De la planification à la production", "de-DE": "Von der Planung zur Fertigung", "es-ES": "De la planificación a la producción", "da-DK": "Fra plan til produktion", "fi-FI": "Suunnittelusta tuotantoon", "nb-NO": "Fra planlegging til produksjon" },
+    "Inventory to Deliver": { "sv-SE": "Lager till leverans", "fr-FR": "Du stock à la livraison", "de-DE": "Vom Lager zur Lieferung", "es-ES": "Del inventario a la entrega", "da-DK": "Fra lager til levering", "fi-FI": "Varastosta toimitukseen", "nb-NO": "Fra lager til levering" },
+    "Record to Report": { "sv-SE": "Redovisning till rapportering", "fr-FR": "De l’enregistrement au reporting", "de-DE": "Von der Buchung zum Bericht", "es-ES": "Del registro al informe", "da-DK": "Fra registrering til rapportering", "fi-FI": "Kirjauksesta raportointiin", "nb-NO": "Fra registrering til rapportering" },
+    "Returns": { "sv-SE": "Returer", "fr-FR": "Retours", "de-DE": "Retouren", "es-ES": "Devoluciones", "da-DK": "Returneringer", "fi-FI": "Palautukset", "nb-NO": "Returer" },
+    "Transfers": { "sv-SE": "Överföringar", "fr-FR": "Transferts", "de-DE": "Umlagerungen", "es-ES": "Transferencias", "da-DK": "Overførsler", "fi-FI": "Siirrot", "nb-NO": "Overføringer" },
+    "Assembly": { "sv-SE": "Montering", "fr-FR": "Assemblage", "de-DE": "Montage", "es-ES": "Ensamblado", "da-DK": "Montage", "fi-FI": "Kokoonpano", "nb-NO": "Montering" },
+    "Item Tracking": { "sv-SE": "Artikelspårning", "fr-FR": "Suivi des articles", "de-DE": "Artikelverfolgung", "es-ES": "Seguimiento de productos", "da-DK": "Varesporing", "fi-FI": "Nimikkeen jäljitys", "nb-NO": "Varesporing" },
+    "Quality Management": { "sv-SE": "Kvalitetshantering", "fr-FR": "Gestion de la qualité", "de-DE": "Qualitätsmanagement", "es-ES": "Gestión de calidad", "da-DK": "Kvalitetsstyring", "fi-FI": "Laadunhallinta", "nb-NO": "Kvalitetsstyring" },
+    "Warehouse Management": { "sv-SE": "Lagerhantering", "fr-FR": "Gestion de l’entrepôt", "de-DE": "Lagerverwaltung", "es-ES": "Gestión de almacén", "da-DK": "Lagerstyring", "fi-FI": "Varastonhallinta", "nb-NO": "Lagerstyring" },
+    "Sales Order": { "sv-SE": "Försäljningsorder", "fr-FR": "Commande vente", "de-DE": "Verkaufsauftrag", "es-ES": "Pedido venta", "da-DK": "Salgsordre", "fi-FI": "Myyntitilaus", "nb-NO": "Salgsordre" },
+    "Purchase Order": { "sv-SE": "Inköpsorder", "fr-FR": "Commande achat", "de-DE": "Einkaufsbestellung", "es-ES": "Pedido compra", "da-DK": "Indkøbsordre", "fi-FI": "Ostotilaus", "nb-NO": "Innkjøpsordre" },
+    "Production Order": { "sv-SE": "Produktionsorder", "fr-FR": "Ordre de fabrication", "de-DE": "Fertigungsauftrag", "es-ES": "Orden de producción", "da-DK": "Produktionsordre", "fi-FI": "Tuotantotilaus", "nb-NO": "Produksjonsordre" },
+    "Release": { "sv-SE": "Frisläpp", "fr-FR": "Lancer", "de-DE": "Freigeben", "es-ES": "Lanzar", "da-DK": "Frigiv", "fi-FI": "Vapauta", "nb-NO": "Frigi" },
+    "Post Shipment": { "sv-SE": "Bokför utleverans", "fr-FR": "Comptabiliser l’expédition", "de-DE": "Lieferung buchen", "es-ES": "Registrar envío", "da-DK": "Bogfør afsendelse", "fi-FI": "Kirjaa lähetys", "nb-NO": "Bokfør levering" },
+    "Production Journal": { "sv-SE": "Produktionsjournal", "fr-FR": "Journal de production", "de-DE": "Fertigungsbuch.-Blatt", "es-ES": "Diario de producción", "da-DK": "Produktionskladde", "fi-FI": "Tuotantopäiväkirja", "nb-NO": "Produksjonskladde" },
+    "Planning Worksheet": { "sv-SE": "Planeringsförslag", "fr-FR": "Feuille planification", "de-DE": "Planungsvorschlag", "es-ES": "Hoja planificación", "da-DK": "Planlægningskladde", "fi-FI": "Suunnittelulaskentataulukko", "nb-NO": "Planleggingskladd" },
+    "Review Action Messages": { "sv-SE": "Granska åtgärdsmeddelanden", "fr-FR": "Vérifier messages action", "de-DE": "Aktionsmeldungen prüfen", "es-ES": "Revisar mensajes acción", "da-DK": "Gennemgå handlingsmeddelelser", "fi-FI": "Tarkista toimintasanomat", "nb-NO": "Se gjennom handlingsmeldinger" },
+    "Post Consumption": { "sv-SE": "Bokför förbrukning", "fr-FR": "Comptabiliser consommation", "de-DE": "Verbrauch buchen", "es-ES": "Registrar consumo", "da-DK": "Bogfør forbrug", "fi-FI": "Kirjaa kulutus", "nb-NO": "Bokfør forbruk" },
+    "Post Output": { "sv-SE": "Bokför utflöde", "fr-FR": "Comptabiliser sortie", "de-DE": "Output buchen", "es-ES": "Registrar salida", "da-DK": "Bogfør output", "fi-FI": "Kirjaa tuotanto", "nb-NO": "Bokfør ferdigmelding" },
+    "Calculate Plan": { "sv-SE": "Beräkna plan", "fr-FR": "Calculer le plan", "de-DE": "Plan berechnen", "es-ES": "Calcular plan", "da-DK": "Beregn plan", "fi-FI": "Laske suunnitelma", "nb-NO": "Beregn plan" },
+    "Item Tracking Lines": { "sv-SE": "Artikelspårningsrader", "fr-FR": "Lignes suivi article", "de-DE": "Artikelverfolgungszeilen", "es-ES": "Líneas seguimiento producto", "da-DK": "Varesporingslinjer", "fi-FI": "Nimikkeen jäljitysrivit", "nb-NO": "Varesporingslinjer" },
+    "Warehouse Receipt": { "sv-SE": "Lagerinleverans", "fr-FR": "Réception entrepôt", "de-DE": "Lagerbeleg", "es-ES": "Recepción almacén", "da-DK": "Lagerindlevering", "fi-FI": "Varastovastaanotto", "nb-NO": "Lagerinnlevering" },
+    "Finish Production Order": { "sv-SE": "Avsluta produktionsorder", "fr-FR": "Terminer ordre fabrication", "de-DE": "Fertigungsauftrag beenden", "es-ES": "Finalizar orden producción", "da-DK": "Afslut produktionsordre", "fi-FI": "Viimeistele tuotantotilaus", "nb-NO": "Fullfør produksjonsordre" },
+    "Finished Production Order": { "sv-SE": "Avslutad produktionsorder", "fr-FR": "Ordre fabrication terminée", "de-DE": "Beendeter Fertigungsauftrag", "es-ES": "Orden producción finalizada", "da-DK": "Afsluttet produktionsordre", "fi-FI": "Valmis tuotantotilaus", "nb-NO": "Fullført produksjonsordre" },
+    "Warehouse Shipment": { "sv-SE": "Lagerutleverans", "fr-FR": "Expédition entrepôt", "de-DE": "Lagerlieferung", "es-ES": "Envío almacén", "da-DK": "Lagerafsendelse", "fi-FI": "Varastotoimitus", "nb-NO": "Lagerlevering" },
+    "Create Warehouse Pick": { "sv-SE": "Skapa lagerplockning", "fr-FR": "Créer prélèvement entrepôt", "de-DE": "Lagerkommissionierung erstellen", "es-ES": "Crear picking almacén", "da-DK": "Opret lagerpluk", "fi-FI": "Luo varastokeräily", "nb-NO": "Opprett lagerplukk" },
+    "Warehouse Pick": { "sv-SE": "Lagerplockning", "fr-FR": "Prélèvement entrepôt", "de-DE": "Lagerkommissionierung", "es-ES": "Picking almacén", "da-DK": "Lagerpluk", "fi-FI": "Varastokeräily", "nb-NO": "Lagerplukk" },
+    "Register Pick": { "sv-SE": "Registrera plockning", "fr-FR": "Enregistrer prélèvement", "de-DE": "Kommissionierung registrieren", "es-ES": "Registrar picking", "da-DK": "Registrer pluk", "fi-FI": "Rekisteröi keräily", "nb-NO": "Registrer plukk" },
+    "Post Warehouse Receipt": { "sv-SE": "Bokför lagerinleverans", "fr-FR": "Comptabiliser réception entrepôt", "de-DE": "Lagerbeleg buchen", "es-ES": "Registrar recepción almacén", "da-DK": "Bogfør lagerindlevering", "fi-FI": "Kirjaa varastovastaanotto", "nb-NO": "Bokfør lagerinnlevering" },
+    "Warehouse Put-away": { "sv-SE": "Lagerinlagring", "fr-FR": "Rangement entrepôt", "de-DE": "Lagerplätzeinlagerung", "es-ES": "Ubicación almacén", "da-DK": "Lagerplacering", "fi-FI": "Varastopaikalle vienti", "nb-NO": "Lagerinnlagring" },
+    "Register Put-away": { "sv-SE": "Registrera inlagring", "fr-FR": "Enregistrer rangement", "de-DE": "Einlagerung registrieren", "es-ES": "Registrar ubicación", "da-DK": "Registrer lagerplacering", "fi-FI": "Rekisteröi varastopaikalle vienti", "nb-NO": "Registrer innlagring" },
+    "Transfer Order": { "sv-SE": "Överföringsorder", "fr-FR": "Ordre transfert", "de-DE": "Umlagerungsauftrag", "es-ES": "Orden transferencia", "da-DK": "Overførselsordre", "fi-FI": "Siirtotilaus", "nb-NO": "Overføringsordre" },
+    "Create Production Order": { "sv-SE": "Skapa produktionsorder", "fr-FR": "Créer ordre fabrication", "de-DE": "Fertigungsauftrag erstellen", "es-ES": "Crear orden producción", "da-DK": "Opret produktionsordre", "fi-FI": "Luo tuotantotilaus", "nb-NO": "Opprett produksjonsordre" },
+    "Accept Action Message": { "sv-SE": "Acceptera åtgärdsmeddelande", "fr-FR": "Accepter message action", "de-DE": "Aktionsmeldung annehmen", "es-ES": "Aceptar mensaje acción", "da-DK": "Acceptér handlingsmeddelelse", "fi-FI": "Hyväksy toimintasanoma", "nb-NO": "Godta handlingsmelding" },
+    "Post Tracked Transaction": { "sv-SE": "Bokför spårad transaktion", "fr-FR": "Comptabiliser transaction suivie", "de-DE": "Nachverfolgten Vorgang buchen", "es-ES": "Registrar transacción seguida", "da-DK": "Bogfør sporet transaktion", "fi-FI": "Kirjaa jäljitetty tapahtuma", "nb-NO": "Bokfør sporet transaksjon" },
+    "Create Quality Inspection": { "sv-SE": "Skapa kvalitetskontroll", "fr-FR": "Créer contrôle qualité", "de-DE": "Qualitätsprüfung erstellen", "es-ES": "Crear inspección de calidad", "da-DK": "Opret kvalitetskontrol", "fi-FI": "Luo laaduntarkastus", "nb-NO": "Opprett kvalitetskontroll" },
+    "Enter Test Results": { "sv-SE": "Ange testresultat", "fr-FR": "Saisir résultats test", "de-DE": "Prüfergebnisse eingeben", "es-ES": "Introducir resultados prueba", "da-DK": "Angiv testresultater", "fi-FI": "Syötä testitulokset", "nb-NO": "Angi testresultater" },
+    "Finish Quality Inspection": { "sv-SE": "Slutför kvalitetskontroll", "fr-FR": "Terminer contrôle qualité", "de-DE": "Qualitätsprüfung abschließen", "es-ES": "Finalizar inspección calidad", "da-DK": "Afslut kvalitetskontrol", "fi-FI": "Viimeistele laaduntarkastus", "nb-NO": "Fullfør kvalitetskontroll" },
+    "Create Reinspection": { "sv-SE": "Skapa omkontroll", "fr-FR": "Créer nouveau contrôle", "de-DE": "Nachprüfung erstellen", "es-ES": "Crear reinspección", "da-DK": "Opret genkontrol", "fi-FI": "Luo uusintatarkastus", "nb-NO": "Opprett ny kontroll" },
+    "General Journal": { "sv-SE": "Redovisningsjournal", "fr-FR": "Feuille comptabilité", "de-DE": "Fibu.-Buch.-Blatt", "es-ES": "Diario general", "da-DK": "Finanskladde", "fi-FI": "Yleinen päiväkirja", "nb-NO": "Generell kladd" },
+    "Bank Account Reconciliation": { "sv-SE": "Bankkontoavstämning", "fr-FR": "Rapprochement bancaire", "de-DE": "Bankkontoabstimmung", "es-ES": "Conciliación bancaria", "da-DK": "Bankkontoafstemning", "fi-FI": "Pankkitilin täsmäytys", "nb-NO": "Bankavstemming" },
+    "Select Bank Account and Enter Statement Date and Ending Balance": { "sv-SE": "Välj bankkonto och ange kontoutdragsdatum och slutsaldo", "fr-FR": "Choisir compte bancaire et saisir date et solde final", "de-DE": "Bankkonto wählen und Auszugsdatum sowie Endsaldo eingeben", "es-ES": "Seleccionar cuenta y fecha e importe final del extracto", "da-DK": "Vælg bankkonto, og angiv kontoudtogsdato og slutsaldo", "fi-FI": "Valitse pankkitili ja syötä tiliotteen päivä ja loppusaldo", "nb-NO": "Velg bankkonto, og angi kontoutskriftsdato og sluttsaldo" },
+    "Import Bank Statement": { "sv-SE": "Importera kontoutdrag", "fr-FR": "Importer relevé bancaire", "de-DE": "Kontoauszug importieren", "es-ES": "Importar extracto bancario", "da-DK": "Importér kontoudtog", "fi-FI": "Tuo tiliote", "nb-NO": "Importer kontoutskrift" },
+    "Post Bank Reconciliation": { "sv-SE": "Bokför bankavstämning", "fr-FR": "Comptabiliser rapprochement bancaire", "de-DE": "Bankabstimmung buchen", "es-ES": "Registrar conciliación bancaria", "da-DK": "Bogfør bankafstemning", "fi-FI": "Kirjaa pankkitäsmäytys", "nb-NO": "Bokfør bankavstemming" },
+    "Payment Journal": { "sv-SE": "Betalningsjournal", "fr-FR": "Feuille paiements", "de-DE": "Zahlungsbuch.-Blatt", "es-ES": "Diario de pagos", "da-DK": "Betalingskladde", "fi-FI": "Maksupäiväkirja", "nb-NO": "Betalingskladde" },
+    "Suggest Vendor Payments": { "sv-SE": "Föreslå leverantörsbetalningar", "fr-FR": "Proposer paiements fournisseurs", "de-DE": "Kreditorenzahlungen vorschlagen", "es-ES": "Sugerir pagos a proveedores", "da-DK": "Foreslå leverandørbetalinger", "fi-FI": "Ehdota toimittajamaksuja", "nb-NO": "Foreslå leverandørbetalinger" },
+    "Post Payment Journal": { "sv-SE": "Bokför betalningsjournal", "fr-FR": "Comptabiliser feuille paiements", "de-DE": "Zahlungsbuch.-Blatt buchen", "es-ES": "Registrar diario de pagos", "da-DK": "Bogfør betalingskladde", "fi-FI": "Kirjaa maksupäiväkirja", "nb-NO": "Bokfør betalingskladde" },
+    "Execute Bank Transfer Separately": { "sv-SE": "Genomför banköverföringen separat", "fr-FR": "Effectuer le virement séparément", "de-DE": "Banküberweisung separat ausführen", "es-ES": "Realizar la transferencia bancaria por separado", "da-DK": "Gennemfør bankoverførslen separat", "fi-FI": "Tee pankkisiirto erikseen", "nb-NO": "Utfør bankoverføringen separat" },
+    "Assign Lot and Expiration Date": { "sv-SE": "Tilldela parti och utgångsdatum", "fr-FR": "Affecter lot et date d’expiration", "de-DE": "Charge und Ablaufdatum zuweisen", "es-ES": "Asignar lote y fecha de caducidad", "da-DK": "Tildel lot og udløbsdato", "fi-FI": "Määritä erä ja viimeinen käyttöpäivä", "nb-NO": "Tilordne parti og utløpsdato" },
+    "Generated Quality Inspection": { "sv-SE": "Skapad kvalitetskontroll", "fr-FR": "Contrôle qualité généré", "de-DE": "Erzeugte Qualitätsprüfung", "es-ES": "Inspección de calidad generada", "da-DK": "Oprettet kvalitetskontrol", "fi-FI": "Luotu laaduntarkastus", "nb-NO": "Generert kvalitetskontroll" },
+    "Enter Failed Test Results": { "sv-SE": "Ange underkända testresultat", "fr-FR": "Saisir résultats de test non conformes", "de-DE": "Fehlgeschlagene Prüfergebnisse eingeben", "es-ES": "Introducir resultados de prueba fallidos", "da-DK": "Angiv ikke-beståede testresultater", "fi-FI": "Syötä hylätyt testitulokset", "nb-NO": "Angi mislykkede testresultater" },
+    "Finish Failed Inspection": { "sv-SE": "Slutför underkänd kontroll", "fr-FR": "Terminer le contrôle non conforme", "de-DE": "Fehlgeschlagene Prüfung abschließen", "es-ES": "Finalizar inspección fallida", "da-DK": "Afslut ikke-bestået kontrol", "fi-FI": "Viimeistele hylätty tarkastus", "nb-NO": "Fullfør mislykket kontroll" },
+    "Enter Passing Test Results": { "sv-SE": "Ange godkända testresultat", "fr-FR": "Saisir résultats de test conformes", "de-DE": "Bestandene Prüfergebnisse eingeben", "es-ES": "Introducir resultados de prueba aprobados", "da-DK": "Angiv beståede testresultater", "fi-FI": "Syötä hyväksytyt testitulokset", "nb-NO": "Angi beståtte testresultater" },
+    "Finish Passing Inspection": { "sv-SE": "Slutför godkänd kontroll", "fr-FR": "Terminer le contrôle conforme", "de-DE": "Bestandene Prüfung abschließen", "es-ES": "Finalizar inspección aprobada", "da-DK": "Afslut bestået kontrol", "fi-FI": "Viimeistele hyväksytty tarkastus", "nb-NO": "Fullfør bestått kontroll" },
+    "Register Warehouse Put-away": { "sv-SE": "Registrera lagerinlagring", "fr-FR": "Enregistrer rangement entrepôt", "de-DE": "Lagerplatzeinlagerung registrieren", "es-ES": "Registrar ubicación en almacén", "da-DK": "Registrer lagerplacering", "fi-FI": "Rekisteröi varastoon sijoitus", "nb-NO": "Registrer lagerinnlagring" },
+    "Quality Tests": { "sv-SE": "Kvalitetstester", "fr-FR": "Tests qualité", "de-DE": "Qualitätstests", "es-ES": "Pruebas de calidad", "da-DK": "Kvalitetstest", "fi-FI": "Laatutestit", "nb-NO": "Kvalitetstester" },
+    "Production Inspection Template": { "sv-SE": "Mall för produktionskontroll", "fr-FR": "Modèle de contrôle production", "de-DE": "Vorlage Fertigungsprüfung", "es-ES": "Plantilla inspección producción", "da-DK": "Skabelon til produktionskontrol", "fi-FI": "Tuotannon tarkastusmalli", "nb-NO": "Mal for produksjonskontroll" },
+    "Configure Sample and Tests": { "sv-SE": "Konfigurera stickprov och tester", "fr-FR": "Configurer échantillon et tests", "de-DE": "Stichprobe und Tests konfigurieren", "es-ES": "Configurar muestra y pruebas", "da-DK": "Konfigurer prøve og test", "fi-FI": "Määritä näyte ja testit", "nb-NO": "Konfigurer prøve og tester" },
+    "Production Inspection Generation Rule": { "sv-SE": "Regel för att skapa produktionskontroller", "fr-FR": "Règle de création des contrôles production", "de-DE": "Regel zur Erzeugung von Fertigungsprüfungen", "es-ES": "Regla de generación de inspección de producción", "da-DK": "Regel for oprettelse af produktionskontrol", "fi-FI": "Tuotannon tarkastuksen luontisääntö", "nb-NO": "Regel for opprettelse av produksjonskontroll" },
+    "Released Production Order": { "sv-SE": "Frisläppt produktionsorder", "fr-FR": "Ordre de fabrication lancée", "de-DE": "Freigegebener Fertigungsauftrag", "es-ES": "Orden de producción lanzada", "da-DK": "Frigivet produktionsordre", "fi-FI": "Vapautettu tuotantotilaus", "nb-NO": "Frigitt produksjonsordre" },
+    "Post Production Output": { "sv-SE": "Bokför produktionsutfall", "fr-FR": "Comptabiliser sortie de production", "de-DE": "Fertigungsausstoß buchen", "es-ES": "Registrar salida de producción", "da-DK": "Bogfør produktionsoutput", "fi-FI": "Kirjaa tuotannon valmistuminen", "nb-NO": "Bokfør produksjonsresultat" },
+    "Generated Sample Inspection": { "sv-SE": "Skapad stickprovskontroll", "fr-FR": "Contrôle d’échantillon généré", "de-DE": "Erzeugte Stichprobenprüfung", "es-ES": "Inspección de muestra generada", "da-DK": "Oprettet prøveinspektion", "fi-FI": "Luotu näytetarkastus", "nb-NO": "Generert prøvekontroll" },
+    "Enter Sample Results": { "sv-SE": "Ange stickprovsresultat", "fr-FR": "Saisir résultats échantillon", "de-DE": "Stichprobenergebnisse eingeben", "es-ES": "Introducir resultados de muestra", "da-DK": "Angiv prøveresultater", "fi-FI": "Syötä näytteen tulokset", "nb-NO": "Angi prøveresultater" },
+    "Finish Sample Inspection": { "sv-SE": "Slutför stickprovskontroll", "fr-FR": "Terminer contrôle échantillon", "de-DE": "Stichprobenprüfung abschließen", "es-ES": "Finalizar inspección de muestra", "da-DK": "Afslut prøveinspektion", "fi-FI": "Viimeistele näytetarkastus", "nb-NO": "Fullfør prøvekontroll" },
+    "Select Journal Batch": { "sv-SE": "Välj journalmall", "fr-FR": "Sélectionner lot de feuille", "de-DE": "Buch.-Blattname auswählen", "es-ES": "Seleccionar lote de diario", "da-DK": "Vælg kladdekladde", "fi-FI": "Valitse päiväkirjaerä", "nb-NO": "Velg kladdemal" },
+    "Enter Posting Date, Document and Accounts": { "sv-SE": "Ange bokföringsdatum, dokument och konton", "fr-FR": "Saisir date comptabilisation, document et comptes", "de-DE": "Buchungsdatum, Beleg und Konten eingeben", "es-ES": "Introducir fecha registro, documento y cuentas", "da-DK": "Angiv bogføringsdato, bilag og konti", "fi-FI": "Syötä kirjauspäivä, asiakirja ja tilit", "nb-NO": "Angi bokføringsdato, dokument og kontoer" },
+    "Enter Amounts and Dimensions": { "sv-SE": "Ange belopp och dimensioner", "fr-FR": "Saisir montants et dimensions", "de-DE": "Beträge und Dimensionen eingeben", "es-ES": "Introducir importes y dimensiones", "da-DK": "Angiv beløb og dimensioner", "fi-FI": "Syötä summat ja dimensiot", "nb-NO": "Angi beløp og dimensjoner" },
+    "Review Journal Check": { "sv-SE": "Granska journalens kontrollresultat", "fr-FR": "Vérifier le contrôle de la feuille", "de-DE": "Buch.-Blattprüfung überprüfen", "es-ES": "Revisar validación del diario", "da-DK": "Gennemgå kladdens kontrol", "fi-FI": "Tarkista päiväkirjan tarkistus", "nb-NO": "Kontroller kladdesjekken" },
+    "Bank Statement Lines": { "sv-SE": "Kontoutdragsrader", "fr-FR": "Lignes du relevé bancaire", "de-DE": "Kontoauszugszeilen", "es-ES": "Líneas del extracto bancario", "da-DK": "Kontoudtogslinjer", "fi-FI": "Tilioterivit", "nb-NO": "Kontoutskriftslinjer" },
+    "Bank Account Ledger Entries": { "sv-SE": "Bankkontotransaktioner", "fr-FR": "Écritures comptables du compte bancaire", "de-DE": "Bankkontoposten", "es-ES": "Movimientos de cuenta bancaria", "da-DK": "Bankkontoposter", "fi-FI": "Pankkitilitapahtumat", "nb-NO": "Bankkontoposter" },
+    "Quality Inspection": { "sv-SE": "Kvalitetsinspektion", "fr-FR": "Inspection qualité", "de-DE": "Qualitätsprüfung", "es-ES": "Inspección de calidad", "da-DK": "Kvalitetsinspektion", "fi-FI": "Laatutarkastus", "nb-NO": "Kvalitetsinspeksjon" },
+    "Quality Inspection Template": { "sv-SE": "Kvalitetsinspektionsmall", "fr-FR": "Modèle d’inspection qualité", "de-DE": "Qualitätsprüfvorlage", "es-ES": "Plantilla de inspección de calidad", "da-DK": "Skabelon til kvalitetsinspektion", "fi-FI": "Laatutarkastuksen malli", "nb-NO": "Mal for kvalitetsinspeksjon" },
+    "Quality Test": { "sv-SE": "Kvalitetstest", "fr-FR": "Test qualité", "de-DE": "Qualitätstest", "es-ES": "Prueba de calidad", "da-DK": "Kvalitetstest", "fi-FI": "Laatutesti", "nb-NO": "Kvalitetstest" },
+    "Quality Inspection Generation Rule": { "sv-SE": "Regel för generering av kvalitetsinspektion", "fr-FR": "Règle de génération d’inspection qualité", "de-DE": "Regel zur Erstellung von Qualitätsprüfungen", "es-ES": "Regla de generación de inspecciones de calidad", "da-DK": "Regel for generering af kvalitetsinspektion", "fi-FI": "Laatutarkastuksen luontisääntö", "nb-NO": "Regel for generering av kvalitetsinspeksjon" },
+    "Quality Inspection Result": { "sv-SE": "Kvalitetsinspektionsresultat", "fr-FR": "Résultat d’inspection qualité", "de-DE": "Qualitätsprüfungsergebnis", "es-ES": "Resultado de inspección de calidad", "da-DK": "Resultat af kvalitetsinspektion", "fi-FI": "Laatutarkastuksen tulos", "nb-NO": "Resultat av kvalitetsinspeksjon" },
+    "Vendor Payment Journal": { "sv-SE": "Leverantörsbetalningsjournal", "fr-FR": "Feuille de paiement fournisseur", "de-DE": "Kreditorenzahlungen im Zahlungsbuch.-Blatt", "es-ES": "Diario de pagos a proveedores", "da-DK": "Betalingskladde for leverandører", "fi-FI": "Toimittajamaksujen päiväkirja", "nb-NO": "Betalingskladd for leverandører" },
+    "Purchase Receipt Quality Inspection": { "sv-SE": "Kvalitetsinspektion vid inköpsinleverans", "fr-FR": "Inspection qualité à la réception d’achat", "de-DE": "Qualitätsprüfung beim Einkaufswareneingang", "es-ES": "Inspección de calidad en la recepción de compra", "da-DK": "Kvalitetsinspektion ved købsmodtagelse", "fi-FI": "Ostovastaanoton laatutarkastus", "nb-NO": "Kvalitetsinspeksjon ved innkjøpsmottak" },
+    "Warehouse Receipt Inspection and Reinspection": { "sv-SE": "Inspektion och ominspektion vid lagerinleverans", "fr-FR": "Inspection et réinspection à la réception entrepôt", "de-DE": "Prüfung und Nachprüfung beim Lagerwareneingang", "es-ES": "Inspección y reinspección en la recepción de almacén", "da-DK": "Inspektion og geninspektion ved lagerindlevering", "fi-FI": "Varastovastaanoton tarkastus ja uusintatarkastus", "nb-NO": "Inspeksjon og ny inspeksjon ved lagermottak" },
+    "Production Output Sampling Inspection": { "sv-SE": "Stickprovsinspektion av produktionsutflöde", "fr-FR": "Inspection par échantillonnage de la production", "de-DE": "Stichprobenprüfung der Fertigungsausbringung", "es-ES": "Inspección por muestreo de la producción", "da-DK": "Stikprøveinspektion af produktionsoutput", "fi-FI": "Tuotannon tuotoksen otantatarkastus", "nb-NO": "Stikkprøveinspeksjon av produksjonsutbytte" },
+    "Match Automatically; Review and Match Remaining Lines Manually": { "sv-SE": "Matcha automatiskt; matcha återstående rader manuellt", "fr-FR": "Associer automatiquement ; vérifier et associer le reste", "de-DE": "Automatisch zuordnen; übrige Zeilen manuell prüfen", "es-ES": "Conciliar automáticamente; revisar y conciliar las demás líneas", "da-DK": "Match automatisk; gennemgå og match resten manuelt", "fi-FI": "Kohdista automaattisesti; tarkista ja kohdista loput käsin", "nb-NO": "Match automatisk; kontroller og match resten manuelt" },
+    "Review Differences and Outstanding Entries": { "sv-SE": "Granska differenser och utestående poster", "fr-FR": "Vérifier écarts et écritures en attente", "de-DE": "Differenzen und offene Posten prüfen", "es-ES": "Revisar diferencias y movimientos pendientes", "da-DK": "Gennemgå differencer og udestående poster", "fi-FI": "Tarkista erot ja avoimet tapahtumat", "nb-NO": "Gjennomgå avvik og utestående poster" },
+    "Preview Test Report": { "sv-SE": "Förhandsgranska test rapport", "fr-FR": "Aperçu du rapport de test", "de-DE": "Testbericht anzeigen", "es-ES": "Vista previa del informe de prueba", "da-DK": "Vis test rapport", "fi-FI": "Esikatsele testiraportti", "nb-NO": "Forhåndsvis testrapport" },
+    "Open Payment Journal Batch": { "sv-SE": "Öppna betalningsjournalens journalmall", "fr-FR": "Ouvrir le lot de la feuille paiements", "de-DE": "Zahlungsbuch.-Blattname öffnen", "es-ES": "Abrir lote del diario de pagos", "da-DK": "Åbn betalingskladdens kladde", "fi-FI": "Avaa maksupäiväkirjaerä", "nb-NO": "Åpne betalingskladdens mal" },
+    "Review Due Dates, Discounts and Suggested Lines": { "sv-SE": "Granska förfallodatum, rabatter och föreslagna rader", "fr-FR": "Vérifier échéances, remises et lignes proposées", "de-DE": "Fälligkeiten, Rabatte und vorgeschlagene Zeilen prüfen", "es-ES": "Revisar vencimientos, descuentos y líneas sugeridas", "da-DK": "Gennemgå forfaldsdatoer, rabatter og foreslåede linjer", "fi-FI": "Tarkista eräpäivät, alennukset ja ehdotetut rivit", "nb-NO": "Gjennomgå forfallsdatoer, rabatter og foreslåtte linjer" },
+    "Apply Payments to Vendor Documents": { "sv-SE": "Koppla betalningar till leverantörsdokument", "fr-FR": "Affecter paiements aux documents fournisseur", "de-DE": "Zahlungen Kreditorenbelegen zuordnen", "es-ES": "Aplicar pagos a documentos de proveedor", "da-DK": "Udlign betalinger med leverandørbilag", "fi-FI": "Kohdista maksut toimittajan asiakirjoihin", "nb-NO": "Koble betalinger til leverandørdokumenter" },
+    "Post General Journal": { "sv-SE": "Bokför redovisningsjournal", "fr-FR": "Comptabiliser la feuille comptabilité", "de-DE": "Fibu.-Buch.-Blatt buchen", "es-ES": "Registrar diario general", "da-DK": "Bogfør finanskladde", "fi-FI": "Kirjaa yleinen päiväkirja", "nb-NO": "Bokfør generell kladd" },
+    "Create Sales Order": { "sv-SE": "Skapa försäljningsorder", "fr-FR": "Créer commande vente", "de-DE": "Verkaufsauftrag erstellen", "es-ES": "Crear pedido venta", "da-DK": "Opret salgsordre", "fi-FI": "Luo myyntitilaus", "nb-NO": "Opprett salgsordre" },
+    "Posted Warehouse Shipment": { "sv-SE": "Bokförd lagerutleverans", "fr-FR": "Expédition entrepôt comptabilisée", "de-DE": "Gebuchte Lagerlieferung", "es-ES": "Envío de almacén registrado", "da-DK": "Bogført lagerafsendelse", "fi-FI": "Kirjattu varastotoimitus", "nb-NO": "Bokført lagerlevering" },
+    "Create Purchase Order": { "sv-SE": "Skapa inköpsorder", "fr-FR": "Créer commande achat", "de-DE": "Einkaufsbestellung erstellen", "es-ES": "Crear pedido compra", "da-DK": "Opret indkøbsordre", "fi-FI": "Luo ostotilaus", "nb-NO": "Opprett innkjøpsordre" },
+    "Receive": { "sv-SE": "Ta emot", "fr-FR": "Recevoir", "de-DE": "Empfangen", "es-ES": "Recibir", "da-DK": "Modtag", "fi-FI": "Vastaanota", "nb-NO": "Motta" },
+    "Post Purchase Receipt": { "sv-SE": "Bokför inköpsinleverans", "fr-FR": "Comptabiliser réception achat", "de-DE": "Einkaufslieferung buchen", "es-ES": "Registrar recepción de compra", "da-DK": "Bogfør indkøbsmodtagelse", "fi-FI": "Kirjaa ostovastaanotto", "nb-NO": "Bokfør innkjøpsmottak" },
+    "Posted Purchase Receipt": { "sv-SE": "Bokförd inköpsinleverans", "fr-FR": "Réception achat comptabilisée", "de-DE": "Gebuchte Einkaufslieferung", "es-ES": "Recepción de compra registrada", "da-DK": "Bogført indkøbsmodtagelse", "fi-FI": "Kirjattu ostovastaanotto", "nb-NO": "Bokført innkjøpsmottak" },
+    "Purchase Invoice": { "sv-SE": "Inköpsfaktura", "fr-FR": "Facture achat", "de-DE": "Einkaufsrechnung", "es-ES": "Factura compra", "da-DK": "Købsfaktura", "fi-FI": "Ostolasku", "nb-NO": "Innkjøpsfaktura" },
+    "Post Purchase Invoice": { "sv-SE": "Bokför inköpsfaktura", "fr-FR": "Comptabiliser facture achat", "de-DE": "Einkaufsrechnung buchen", "es-ES": "Registrar factura de compra", "da-DK": "Bogfør købsfaktura", "fi-FI": "Kirjaa ostolasku", "nb-NO": "Bokfør innkjøpsfaktura" },
+    "Posted Purchase Invoice": { "sv-SE": "Bokförd inköpsfaktura", "fr-FR": "Facture achat comptabilisée", "de-DE": "Gebuchte Einkaufsrechnung", "es-ES": "Factura de compra registrada", "da-DK": "Bogført købsfaktura", "fi-FI": "Kirjattu ostolasku", "nb-NO": "Bokført innkjøpsfaktura" },
+    "Get Source Documents": { "sv-SE": "Hämta källdokument", "fr-FR": "Obtenir les documents source", "de-DE": "Quelldokumente abrufen", "es-ES": "Obtener documentos origen", "da-DK": "Hent kildedokumenter", "fi-FI": "Hae lähdeasiakirjat", "nb-NO": "Hent kildedokumenter" },
+    "Posted Warehouse Receipt": { "sv-SE": "Bokförd lagerinleverans", "fr-FR": "Réception entrepôt comptabilisée", "de-DE": "Gebuchter Lagerbeleg", "es-ES": "Recepción de almacén registrada", "da-DK": "Bogført lagerindlevering", "fi-FI": "Kirjattu varastovastaanotto", "nb-NO": "Bokført lagerinnlevering" },
+    "Post Transfer Shipment": { "sv-SE": "Bokför överföringsutleverans", "fr-FR": "Comptabiliser expédition transfert", "de-DE": "Umlagerungslieferung buchen", "es-ES": "Registrar envío de transferencia", "da-DK": "Bogfør overførselsafsendelse", "fi-FI": "Kirjaa siirtolähetys", "nb-NO": "Bokfør overføringslevering" },
+    "Posted Transfer Shipment": { "sv-SE": "Bokförd överföringsutleverans", "fr-FR": "Expédition transfert comptabilisée", "de-DE": "Gebuchte Umlagerungslieferung", "es-ES": "Envío de transferencia registrado", "da-DK": "Bogført overførselsafsendelse", "fi-FI": "Kirjattu siirtolähetys", "nb-NO": "Bokført overføringslevering" },
+    "Post Transfer Receipt": { "sv-SE": "Bokför överföringsinleverans", "fr-FR": "Comptabiliser réception transfert", "de-DE": "Umlagerungseingang buchen", "es-ES": "Registrar recepción de transferencia", "da-DK": "Bogfør overførselsmodtagelse", "fi-FI": "Kirjaa siirtovastaanotto", "nb-NO": "Bokfør overføringsmottak" },
+    "Posted Transfer Receipt": { "sv-SE": "Bokförd överföringsinleverans", "fr-FR": "Réception transfert comptabilisée", "de-DE": "Gebuchter Umlagerungseingang", "es-ES": "Recepción de transferencia registrada", "da-DK": "Bogført overførselsmodtagelse", "fi-FI": "Kirjattu siirtovastaanotto", "nb-NO": "Bokført overføringsmottak" },
+    "Create Transfer Order": { "sv-SE": "Skapa överföringsorder", "fr-FR": "Créer ordre transfert", "de-DE": "Umlagerungsauftrag erstellen", "es-ES": "Crear orden de transferencia", "da-DK": "Opret overførselsordre", "fi-FI": "Luo siirtotilaus", "nb-NO": "Opprett overføringsordre" },
+    "Create Warehouse Put-away": { "sv-SE": "Skapa lagerinlagring", "fr-FR": "Créer rangement entrepôt", "de-DE": "Lagerplatzeinlagerung erstellen", "es-ES": "Crear ubicación almacén", "da-DK": "Opret lagerplacering", "fi-FI": "Luo varastoon sijoitus", "nb-NO": "Opprett lagerinnlagring" },
+    "Assembly Order": { "sv-SE": "Monteringsorder", "fr-FR": "Ordre d’assemblage", "de-DE": "Montageauftrag", "es-ES": "Orden de ensamblado", "da-DK": "Montageordre", "fi-FI": "Kokoonpanotilaus", "nb-NO": "Monteringsordre" },
+    "Post Assembly": { "sv-SE": "Bokför montering", "fr-FR": "Comptabiliser assemblage", "de-DE": "Montage buchen", "es-ES": "Registrar ensamblado", "da-DK": "Bogfør montage", "fi-FI": "Kirjaa kokoonpano", "nb-NO": "Bokfør montering" },
+    "Create Assembly Order": { "sv-SE": "Skapa monteringsorder", "fr-FR": "Créer ordre d’assemblage", "de-DE": "Montageauftrag erstellen", "es-ES": "Crear orden de ensamblado", "da-DK": "Opret montageordre", "fi-FI": "Luo kokoonpanotilaus", "nb-NO": "Opprett monteringsordre" },
+    "Carry Out Action Message": { "sv-SE": "Verkställ åtgärdsmeddelande", "fr-FR": "Exécuter le message action", "de-DE": "Aktionsmeldung ausführen", "es-ES": "Ejecutar mensaje de acción", "da-DK": "Udfør handlingsmeddelelse", "fi-FI": "Suorita toimintasanoma", "nb-NO": "Utfør handlingsmelding" },
+    "Demand Forecast": { "sv-SE": "Efterfrågeprognos", "fr-FR": "Prévision demande", "de-DE": "Bedarfsprognose", "es-ES": "Previsión de demanda", "da-DK": "Efterspørgselsprognose", "fi-FI": "Kysyntäennuste", "nb-NO": "Etterspørselsprognose" },
+    "Enter Forecast Quantity": { "sv-SE": "Ange prognoskvantitet", "fr-FR": "Saisir quantité prévision", "de-DE": "Prognosemenge eingeben", "es-ES": "Introducir cantidad prevista", "da-DK": "Angiv prognoseantal", "fi-FI": "Syötä ennustemäärä", "nb-NO": "Angi prognoseantall" },
+    "Review Forecast by Period": { "sv-SE": "Granska prognos per period", "fr-FR": "Vérifier prévision par période", "de-DE": "Prognose nach Periode prüfen", "es-ES": "Revisar previsión por período", "da-DK": "Gennemgå prognose pr. periode", "fi-FI": "Tarkista ennuste jaksoittain", "nb-NO": "Gjennomgå prognose per periode" },
+    "Requisition Worksheet": { "sv-SE": "Inköpsförslag", "fr-FR": "Feuille réquisition", "de-DE": "Bestellvorschlag", "es-ES": "Hoja de solicitudes", "da-DK": "Varebehovskladde", "fi-FI": "Ostoehdotus", "nb-NO": "Bestillingsforslag" },
+    "Order Planning": { "sv-SE": "Orderplanering", "fr-FR": "Planification commande", "de-DE": "Auftragsplanung", "es-ES": "Planificación de pedidos", "da-DK": "Ordreplanlægning", "fi-FI": "Tilaussuunnittelu", "nb-NO": "Ordreplanlegging" },
+    "Calculate Unfulfilled Demand": { "sv-SE": "Beräkna ouppfylld efterfrågan", "fr-FR": "Calculer demande non satisfaite", "de-DE": "Nicht erfüllten Bedarf berechnen", "es-ES": "Calcular demanda pendiente", "da-DK": "Beregn udækket efterspørgsel", "fi-FI": "Laske täyttämätön kysyntä", "nb-NO": "Beregn udekket etterspørsel" },
+    "Review Demand Order": { "sv-SE": "Granska behovsorder", "fr-FR": "Vérifier ordre demande", "de-DE": "Bedarfsauftrag prüfen", "es-ES": "Revisar orden de demanda", "da-DK": "Gennemgå behovsordre", "fi-FI": "Tarkista tarvetilaus", "nb-NO": "Gjennomgå behovsordre" },
+    "Create Supply Order": { "sv-SE": "Skapa försörjningsorder", "fr-FR": "Créer ordre approvisionnement", "de-DE": "Beschaffungsauftrag erstellen", "es-ES": "Crear orden de suministro", "da-DK": "Opret forsyningsordre", "fi-FI": "Luo hankintatilaus", "nb-NO": "Opprett forsyningsordre" },
+    "Supply recommendation?": { "sv-SE": "Försörjningsförslag?", "fr-FR": "Suggestion d’approvisionnement ?", "de-DE": "Beschaffungsvorschlag?", "es-ES": "¿Recomendación de suministro?", "da-DK": "Forsyningsforslag?", "fi-FI": "Hankintaehdotus?", "nb-NO": "Forsyningsforslag?" },
+    "Create Purchase Orders": { "sv-SE": "Skapa inköpsorder", "fr-FR": "Créer commandes achat", "de-DE": "Einkaufsbestellungen erstellen", "es-ES": "Crear pedidos compra", "da-DK": "Opret indkøbsordrer", "fi-FI": "Luo ostotilaukset", "nb-NO": "Opprett innkjøpsordrer" },
+    "Create Production Orders": { "sv-SE": "Skapa produktionsorder", "fr-FR": "Créer ordres fabrication", "de-DE": "Fertigungsaufträge erstellen", "es-ES": "Crear órdenes producción", "da-DK": "Opret produktionsordrer", "fi-FI": "Luo tuotantotilaukset", "nb-NO": "Opprett produksjonsordrer" },
+    "Create Transfer Orders": { "sv-SE": "Skapa överföringsorder", "fr-FR": "Créer ordres transfert", "de-DE": "Umlagerungsaufträge erstellen", "es-ES": "Crear órdenes transferencia", "da-DK": "Opret overførselsordrer", "fi-FI": "Luo siirtotilaukset", "nb-NO": "Opprett overføringsordrer" },
+    "Sales Return Order": { "sv-SE": "Försäljningsreturorder", "fr-FR": "Commande retour vente", "de-DE": "Verkaufsrückgabeauftrag", "es-ES": "Pedido devolución venta", "da-DK": "Salgsreturordre", "fi-FI": "Myyntipalautustilaus", "nb-NO": "Salgsreturordre" },
+    "Receive Return": { "sv-SE": "Ta emot retur", "fr-FR": "Recevoir retour", "de-DE": "Rückgabe empfangen", "es-ES": "Recibir devolución", "da-DK": "Modtag retur", "fi-FI": "Vastaanota palautus", "nb-NO": "Motta retur" },
+    "Posted Return Receipt": { "sv-SE": "Bokförd returinleverans", "fr-FR": "Réception retour comptabilisée", "de-DE": "Gebuchter Rückgabezugang", "es-ES": "Recepción de devolución registrada", "da-DK": "Bogført returmodtagelse", "fi-FI": "Kirjattu palautusvastaanotto", "nb-NO": "Bokført returmottak" },
+    "Sales Credit Memo": { "sv-SE": "Försäljningskreditnota", "fr-FR": "Avoir vente", "de-DE": "Verkaufsgutschrift", "es-ES": "Abono de venta", "da-DK": "Salgskreditnota", "fi-FI": "Myynnin hyvityslasku", "nb-NO": "Salgskreditnota" },
+    "Posted Sales Credit Memo": { "sv-SE": "Bokförd försäljningskreditnota", "fr-FR": "Avoir vente comptabilisé", "de-DE": "Gebuchte Verkaufsgutschrift", "es-ES": "Abono de venta registrado", "da-DK": "Bogført salgskreditnota", "fi-FI": "Kirjattu myynnin hyvityslasku", "nb-NO": "Bokført salgskreditnota" },
+    "Create Drop Shipment Purchase Order": { "sv-SE": "Skapa inköpsorder för direktleverans", "fr-FR": "Créer commande achat livraison directe", "de-DE": "Einkaufsbestellung für Direktlieferung erstellen", "es-ES": "Crear pedido compra de envío directo", "da-DK": "Opret indkøbsordre til direkte levering", "fi-FI": "Luo suoralähetyksen ostotilaus", "nb-NO": "Opprett innkjøpsordre for direktelevering" },
+    "Purchase Return Order": { "sv-SE": "Inköpsreturorder", "fr-FR": "Commande retour achat", "de-DE": "Einkaufsrückgabeauftrag", "es-ES": "Pedido devolución compra", "da-DK": "Købsreturordre", "fi-FI": "Ostopalautustilaus", "nb-NO": "Innkjøpsreturordre" },
+    "Ship Return": { "sv-SE": "Leverera retur", "fr-FR": "Expédier retour", "de-DE": "Rückgabe versenden", "es-ES": "Enviar devolución", "da-DK": "Afsend retur", "fi-FI": "Lähetä palautus", "nb-NO": "Send retur" },
+    "Posted Return Shipment": { "sv-SE": "Bokförd returleverans", "fr-FR": "Expédition retour comptabilisée", "de-DE": "Gebuchte Rücksendung", "es-ES": "Envío de devolución registrado", "da-DK": "Bogført returforsendelse", "fi-FI": "Kirjattu palautuslähetys", "nb-NO": "Bokført returforsendelse" },
+    "Purchase Credit Memo": { "sv-SE": "Inköpskreditnota", "fr-FR": "Avoir achat", "de-DE": "Einkaufsgutschrift", "es-ES": "Abono de compra", "da-DK": "Købskreditnota", "fi-FI": "Oston hyvityslasku", "nb-NO": "Innkjøpskreditnota" },
+    "Posted Purchase Credit Memo": { "sv-SE": "Bokförd inköpskreditnota", "fr-FR": "Avoir achat comptabilisé", "de-DE": "Gebuchte Einkaufsgutschrift", "es-ES": "Abono de compra registrado", "da-DK": "Bogført købskreditnota", "fi-FI": "Kirjattu oston hyvityslasku", "nb-NO": "Bokført innkjøpskreditnota" },
+    "Inventory Pick": { "sv-SE": "Lagerplockning", "fr-FR": "Prélèvement stock", "de-DE": "Lagerkommissionierung", "es-ES": "Picking de inventario", "da-DK": "Lagerpluk", "fi-FI": "Varastokeräily", "nb-NO": "Lagerplukk" },
+    "Post Pick and Shipment": { "sv-SE": "Bokför plockning och utleverans", "fr-FR": "Comptabiliser prélèvement et expédition", "de-DE": "Kommissionierung und Lieferung buchen", "es-ES": "Registrar picking y envío", "da-DK": "Bogfør pluk og afsendelse", "fi-FI": "Kirjaa keräily ja lähetys", "nb-NO": "Bokfør plukk og levering" },
+    "Posted Inventory Pick": { "sv-SE": "Bokförd lagerplockning", "fr-FR": "Prélèvement stock comptabilisé", "de-DE": "Gebuchte Lagerkommissionierung", "es-ES": "Picking de inventario registrado", "da-DK": "Bogført lagerpluk", "fi-FI": "Kirjattu varastokeräily", "nb-NO": "Bokført lagerplukk" },
+    "Inventory Put-away": { "sv-SE": "Lagerinlagring", "fr-FR": "Rangement stock", "de-DE": "Lagerplatzeinlagerung", "es-ES": "Ubicación de inventario", "da-DK": "Lagerplacering", "fi-FI": "Varastoon sijoitus", "nb-NO": "Lagerinnlagring" },
+    "Post Receipt and Put-away": { "sv-SE": "Bokför inleverans och inlagring", "fr-FR": "Comptabiliser réception et rangement", "de-DE": "Wareneingang und Einlagerung buchen", "es-ES": "Registrar recepción y ubicación", "da-DK": "Bogfør modtagelse og lagerplacering", "fi-FI": "Kirjaa vastaanotto ja varastoon sijoitus", "nb-NO": "Bokfør mottak og innlagring" },
+    "Posted Inventory Put-away": { "sv-SE": "Bokförd lagerinlagring", "fr-FR": "Rangement stock comptabilisé", "de-DE": "Gebuchte Lagerplatzeinlagerung", "es-ES": "Ubicación de inventario registrada", "da-DK": "Bogført lagerplacering", "fi-FI": "Kirjattu varastoon sijoitus", "nb-NO": "Bokført lagerinnlagring" },
+    "Inventory Movement": { "sv-SE": "Lagerflyttning", "fr-FR": "Mouvement stock", "de-DE": "Lag Umlagerung", "es-ES": "Movimiento de inventario", "da-DK": "Lagerflytning", "fi-FI": "Varastosiirto", "nb-NO": "Lagervareflytting" },
+    "Create Inventory Movement": { "sv-SE": "Skapa lagerflyttning", "fr-FR": "Créer mouvement stock", "de-DE": "Lag Umlagerung erstellen", "es-ES": "Crear movimiento de inventario", "da-DK": "Opret lagerflytning", "fi-FI": "Luo varastosiirto", "nb-NO": "Opprett lagervareflytting" },
+    "Register Inventory Movement": { "sv-SE": "Registrera lagerflyttning", "fr-FR": "Enregistrer mouvement stock", "de-DE": "Lag Umlagerung registrieren", "es-ES": "Registrar movimiento de inventario", "da-DK": "Registrer lagerflytning", "fi-FI": "Rekisteröi varastosiirto", "nb-NO": "Registrer lagervareflytting" },
+    "Warehouse Movement": { "sv-SE": "Lagerförflyttning", "fr-FR": "Mouvement entrepôt", "de-DE": "Lagerbewegung", "es-ES": "Movimiento de almacén", "da-DK": "Lagerflytning", "fi-FI": "Varastosiirto", "nb-NO": "Lagerflytting" },
+    "Create Warehouse Movement": { "sv-SE": "Skapa lagerförflyttning", "fr-FR": "Créer mouvement entrepôt", "de-DE": "Lagerbewegung erstellen", "es-ES": "Crear movimiento de almacén", "da-DK": "Opret lagerflytning", "fi-FI": "Luo varastosiirto", "nb-NO": "Opprett lagerflytting" },
+    "Register Warehouse Movement": { "sv-SE": "Registrera lagerförflyttning", "fr-FR": "Enregistrer mouvement entrepôt", "de-DE": "Lagerbewegung registrieren", "es-ES": "Registrar movimiento de almacén", "da-DK": "Registrer lagerflytning", "fi-FI": "Rekisteröi varastosiirto", "nb-NO": "Registrer lagerflytting" },
+    "Assign Item Tracking": { "sv-SE": "Tilldela artikelspårning", "fr-FR": "Affecter suivi article", "de-DE": "Artikelverfolgung zuweisen", "es-ES": "Asignar seguimiento de producto", "da-DK": "Tildel varesporing", "fi-FI": "Määritä nimikkeen jäljitys", "nb-NO": "Tilordne varesporing" },
+    "Assign Lot Number": { "sv-SE": "Tilldela partinummer", "fr-FR": "Affecter numéro de lot", "de-DE": "Chargennummer zuweisen", "es-ES": "Asignar número de lote", "da-DK": "Tildel lotnummer", "fi-FI": "Määritä eränumero", "nb-NO": "Tilordne partinummer" },
+    "Assign Serial Number": { "sv-SE": "Tilldela serienummer", "fr-FR": "Affecter numéro de série", "de-DE": "Seriennummer zuweisen", "es-ES": "Asignar número de serie", "da-DK": "Tildel serienummer", "fi-FI": "Määritä sarjanumero", "nb-NO": "Tilordne serienummer" },
+    "Enter Expiration Date": { "sv-SE": "Ange utgångsdatum", "fr-FR": "Saisir date d’expiration", "de-DE": "Ablaufdatum eingeben", "es-ES": "Introducir fecha de caducidad", "da-DK": "Angiv udløbsdato", "fi-FI": "Syötä viimeinen käyttöpäivä", "nb-NO": "Angi utløpsdato" },
+    "Item Reclassification Journal": { "sv-SE": "Artikelomklassificeringsjournal", "fr-FR": "Feuille reclassement article", "de-DE": "Artikelumbuchungs Buch.-Blatt", "es-ES": "Diario de reclasificación de producto", "da-DK": "Vareomklassificeringskladde", "fi-FI": "Nimikkeen uudelleenluokittelupäiväkirja", "nb-NO": "Vareomklassifiseringskladd" },
+    "Enter Item Reclassification": { "sv-SE": "Ange artikelomklassificering", "fr-FR": "Saisir reclassement article", "de-DE": "Artikelumbuchung eingeben", "es-ES": "Introducir reclasificación de producto", "da-DK": "Angiv vareomklassificering", "fi-FI": "Syötä nimikkeen uudelleenluokittelu", "nb-NO": "Angi vareomklassifisering" },
+    "Post Reclassification": { "sv-SE": "Bokför omklassificering", "fr-FR": "Comptabiliser reclassement", "de-DE": "Umbuchung buchen", "es-ES": "Registrar reclasificación", "da-DK": "Bogfør omklassificering", "fi-FI": "Kirjaa uudelleenluokittelu", "nb-NO": "Bokfør omklassifisering" },
+    "Physical Inventory Journal": { "sv-SE": "Inventeringsjournal", "fr-FR": "Feuille inventaire physique", "de-DE": "Inventurbuch.-Blatt", "es-ES": "Diario de inventario físico", "da-DK": "Fysisk lagerkladde", "fi-FI": "Fyysisen varaston päiväkirja", "nb-NO": "Fysisk lagerkladd" },
+    "Calculate Physical Inventory": { "sv-SE": "Beräkna inventering", "fr-FR": "Calculer inventaire physique", "de-DE": "Inventur berechnen", "es-ES": "Calcular inventario físico", "da-DK": "Beregn fysisk lager", "fi-FI": "Laske fyysinen varasto", "nb-NO": "Beregn fysisk lager" },
+    "Record Physical Count": { "sv-SE": "Registrera inventerat antal", "fr-FR": "Enregistrer quantité comptée", "de-DE": "Gezählte Menge erfassen", "es-ES": "Registrar cantidad contada", "da-DK": "Registrer optalt antal", "fi-FI": "Kirjaa laskettu määrä", "nb-NO": "Registrer opptalt antall" },
+    "Post Inventory Differences": { "sv-SE": "Bokför inventeringsdifferenser", "fr-FR": "Comptabiliser écarts inventaire", "de-DE": "Inventurdifferenzen buchen", "es-ES": "Registrar diferencias de inventario", "da-DK": "Bogfør lagerafvigelser", "fi-FI": "Kirjaa varastoerot", "nb-NO": "Bokfør lageravvik" },
+    "Planned Production Order": { "sv-SE": "Planerad produktionsorder", "fr-FR": "Ordre de fabrication planifiée", "de-DE": "Geplanter Fertigungsauftrag", "es-ES": "Orden de producción planificada", "da-DK": "Planlagt produktionsordre", "fi-FI": "Suunniteltu tuotantotilaus", "nb-NO": "Planlagt produksjonsordre" },
+    "Change Status to Firm Planned": { "sv-SE": "Ändra status till fast planerad", "fr-FR": "Définir le statut sur planifié ferme", "de-DE": "Status auf fest geplant ändern", "es-ES": "Cambiar estado a planificada en firme", "da-DK": "Skift status til fast planlagt", "fi-FI": "Muuta tila kiinteästi suunnitelluksi", "nb-NO": "Endre status til fast planlagt" },
+    "Firm Planned Production Order": { "sv-SE": "Fast planerad produktionsorder", "fr-FR": "Ordre de fabrication planifiée ferme", "de-DE": "Fest geplanter Fertigungsauftrag", "es-ES": "Orden de producción planificada en firme", "da-DK": "Fast planlagt produktionsordre", "fi-FI": "Kiinteästi suunniteltu tuotantotilaus", "nb-NO": "Fast planlagt produksjonsordre" },
+    "Change Status to Released": { "sv-SE": "Ändra status till frisläppt", "fr-FR": "Définir le statut sur lancé", "de-DE": "Status auf freigegeben ändern", "es-ES": "Cambiar estado a lanzada", "da-DK": "Skift status til frigivet", "fi-FI": "Muuta tila vapautetuksi", "nb-NO": "Endre status til frigitt" }
+  });
+  function swedish(locale) { return String(locale || "").toLowerCase().startsWith("sv"); }
   function nodeTitle(node, locale) { const title = String(node?.title || "");
-    if (english(locale)) return EN_NODE_TITLES[title] || title;
+    const normalizedLocale = String(locale || "en-US").toLowerCase();
+    const explicitLocale = normalizedLocale.startsWith("sv") ? "sv-SE" :
+      normalizedLocale.startsWith("fr") ? "fr-FR" : normalizedLocale.startsWith("de") ? "de-DE" :
+      normalizedLocale.startsWith("es") ? "es-ES" : normalizedLocale.startsWith("da") ? "da-DK" :
+      normalizedLocale.startsWith("fi") ? "fi-FI" : normalizedLocale.startsWith("nb") ||
+        normalizedLocale.startsWith("no") ? "nb-NO" : "en-US";
+    if (LOCALIZED_NODE_TITLES[title]?.[explicitLocale])
+      return LOCALIZED_NODE_TITLES[title][explicitLocale];
+    if (!swedish(locale)) { const canonical = EN_NODE_TITLES[title] ||
+      EN_NODE_TITLES_BY_SWEDISH[title.toLocaleLowerCase()] || title;
+      return globalThis.T9UiI18n?.translateStaticText?.(canonical, locale) || canonical; }
     const taxonomyId = EN_DOCUMENT_IDS_BY_TITLE[title];
     return SV_NODE_TITLES[title] || SV_NODE_TITLES[taxonomyId] ||
       SV_NODE_TITLES_BY_KEY[title.toLocaleLowerCase()] || title; }
-  function statusTitle(status, locale) { const labels = english(locale) ? {
-    observed: "Observed", suggested: "Reference suggestion", conditional: "Conditional",
-    customerSpecific: "Customer-specific", reference: "Reference"
-  } : { observed: "Observerat", suggested: "Referensförslag", conditional: "Villkorligt",
-    customerSpecific: "Kundunikt", reference: "Referens" };
-    return labels[status] || status;
+  function domainTitle(value, locale) { const raw = String(value || "").trim();
+    const canonical = DOMAIN_TITLES[raw.toLowerCase()] || raw;
+    return nodeTitle({ title: canonical }, locale); }
+  function statusTitle(status, locale) { const labels = { observed: ["Observed", "Observerat"],
+    suggested: ["Reference suggestion", "Referensförslag"], conditional: ["Conditional", "Villkorligt"],
+    customerSpecific: ["Customer-specific", "Kundunikt"], reference: ["Reference", "Referens"] };
+    const pair = labels[status]; if (!pair) return status;
+    if (swedish(locale)) return pair[1];
+    return globalThis.T9UiI18n?.translateStaticText?.(pair[0], locale) || pair[0];
   }
   function roleTitle(role, locale) { const id = String(role?.id || role || "");
-    const labels = english(locale) ? { purchasing: "Purchasing", warehouse: "Warehouse",
+    const english = { purchasing: "Purchasing", warehouse: "Warehouse",
       sales: "Sales", production: "Production", finance: "Finance", inventory: "Inventory",
-      system: "System" } : {
+      system: "System" };
+    const swedishLabels = {
       purchasing: "Inköp", warehouse: "Lager", sales: "Försäljning",
       production: "Produktion", finance: "Ekonomi", inventory: "Lagerstyrning",
       system: "System" };
-    return labels[id] || String(role?.name || id);
+    if (swedish(locale)) return swedishLabels[id] || String(role?.name || id);
+    const label = english[id];
+    return label ? globalThis.T9UiI18n?.translateStaticText?.(label, locale) || label :
+      String(role?.name || id);
   }
   function handoffTitle(handoff, locale) { if (!handoff?.from || !handoff?.to) return "";
     return `${roleTitle(handoff.from, locale)} → ${roleTitle(handoff.to, locale)}`; }
-  return { EN_DOCUMENT_IDS_BY_TITLE, EN_NODE_TITLES, SV_NODE_TITLES,
-    handoffTitle, nodeTitle, roleTitle, statusTitle };
+  return { DOMAIN_TITLES, EN_DOCUMENT_IDS_BY_TITLE, EN_NODE_TITLES,
+    LOCALIZED_NODE_TITLES, SV_NODE_TITLES, domainTitle, handoffTitle, nodeTitle, roleTitle,
+    statusTitle };
 });

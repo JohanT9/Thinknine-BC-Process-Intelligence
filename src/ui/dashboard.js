@@ -4,8 +4,8 @@ const DEFAULTS = {
   exportFileNamePattern: "{process} - {environment} - {date}",
   documentationProfile: "generic",
   defaultExpectedResult:
-    "Processen är genomförd enligt arbetsgången och de registrerade " +
-    "ändringarna har sparats i Business Central.",
+    "Stegen beskriver det observerade arbetsflödet. Kontrollera dokumentets " +
+    "status och bekräfta om processen kräver bokföring i Business Central.",
   captureScreenshots: true,
   showClickHighlights: true,
   screenshotMode: "important",
@@ -34,6 +34,9 @@ const DEFAULTS = {
 };
 
 let applicationSettings = { ...DEFAULTS };
+const APP_VERSION = chrome.runtime.getManifest().version;
+const extensionVersionLabel = document.getElementById("extensionVersion");
+if (extensionVersionLabel) extensionVersionLabel.textContent = `v${APP_VERSION}`;
 
 const uiT = key => globalThis.T9UiI18n.translate(
   key, applicationSettings.uiLocale
@@ -312,6 +315,9 @@ let loadedKnowledgeRelease = null;
 let loadedKnowledgeRepository = null;
 let loadedKnowledgeRules = [];
 let unmatchedKnowledgeItems = [];
+let externalKnowledgeSuggestionState = {
+  sessionId: "", requestId: "", status: "idle", requestCount: 0, suggestions: []
+};
 
 async function loadKnowledgePacks() {
   const indexUrl = chrome.runtime.getURL("knowledge-packs/index.json");
@@ -342,8 +348,6 @@ function applyKnowledgePackFramework(tasks) {
 
 const PROFILE_PRESETS = {
   generic: {
-    label: "Generisk manual",
-    help: "Maskerar transaktionsnummer, företagsnamn, tenant och URL. Kund-, artikel-, lagerplats- och lot-/batchvärden behålls.",
     maskSalesOrderNo: true,
     maskPurchaseOrderNo: true,
     maskInvoiceNo: true,
@@ -360,8 +364,6 @@ const PROFILE_PRESETS = {
     maskLotBatchNo: false
   },
   customer: {
-    label: "Kundspecifik manual",
-    help: "Behåller kundens masterdata och transaktionsvärden. Tenant och URL tas bort.",
     maskSalesOrderNo: false,
     maskPurchaseOrderNo: false,
     maskInvoiceNo: false,
@@ -378,8 +380,6 @@ const PROFILE_PRESETS = {
     maskLotBatchNo: false
   },
   internal: {
-    label: "Intern dokumentation",
-    help: "Behåller all affärsdata. Endast teknisk tenant- och URL-information tas bort.",
     maskSalesOrderNo: false,
     maskPurchaseOrderNo: false,
     maskInvoiceNo: false,
@@ -396,8 +396,6 @@ const PROFILE_PRESETS = {
     maskLotBatchNo: false
   },
   training: {
-    label: "Utbildningsmaterial",
-    help: "Maskerar transaktionsnummer men behåller tydliga exempel på masterdata och testdata.",
     maskSalesOrderNo: true,
     maskPurchaseOrderNo: true,
     maskInvoiceNo: true,
@@ -415,9 +413,61 @@ const PROFILE_PRESETS = {
   }
 };
 
+// Profile names follow the document language in exports; the help text follows
+// the interface language.
+const PROFILE_TEXT = {
+  generic: {
+    "sv-SE": ["Generisk manual", "Maskerar transaktionsnummer, företagsnamn, tenant och URL. Kund-, artikel-, lagerplats- och lot-/batchvärden behålls."],
+    "en-US": ["Generic manual", "Masks transaction numbers, company name, tenant and URL. Customer, item, location and lot/batch values are kept."],
+    "fr-FR": ["Manuel générique", "Masque les numéros de transaction, le nom de la société, le locataire et l’URL. Les valeurs de client, d’article, de magasin et de lot sont conservées."],
+    "de-DE": ["Allgemeines Handbuch", "Maskiert Transaktionsnummern, Firmenname, Mandant und URL. Debitoren-, Artikel-, Lagerort- und Chargenwerte bleiben erhalten."],
+    "es-ES": ["Manual genérico", "Enmascara los números de transacción, el nombre de la empresa, el inquilino y la URL. Se conservan los valores de cliente, producto, almacén y lote."],
+    "da-DK": ["Generel manual", "Maskerer transaktionsnumre, firmanavn, lejer og URL. Debitor-, vare-, lokations- og lot-/batchværdier bevares."],
+    "fi-FI": ["Yleinen käyttöohje", "Peittää tapahtumanumerot, yrityksen nimen, vuokraajan ja URL-osoitteen. Asiakas-, nimike-, sijainti- ja eräarvot säilytetään."],
+    "nb-NO": ["Generell manual", "Maskerer transaksjonsnumre, firmanavn, leier og URL. Kunde-, vare-, lokasjons- og parti-/batchverdier beholdes."]
+  },
+  customer: {
+    "sv-SE": ["Kundspecifik manual", "Behåller kundens masterdata och transaktionsvärden. Tenant och URL tas bort."],
+    "en-US": ["Customer-specific manual", "Keeps the customer's master data and transaction values. Tenant and URL are removed."],
+    "fr-FR": ["Manuel spécifique au client", "Conserve les données de base et les valeurs de transaction du client. Le locataire et l’URL sont supprimés."],
+    "de-DE": ["Kundenspezifisches Handbuch", "Behält die Stammdaten und Transaktionswerte des Kunden. Mandant und URL werden entfernt."],
+    "es-ES": ["Manual específico del cliente", "Conserva los datos maestros y los valores de transacción del cliente. Se eliminan el inquilino y la URL."],
+    "da-DK": ["Kundespecifik manual", "Bevarer kundens stamdata og transaktionsværdier. Lejer og URL fjernes."],
+    "fi-FI": ["Asiakaskohtainen käyttöohje", "Säilyttää asiakkaan perustiedot ja tapahtuma-arvot. Vuokraaja ja URL-osoite poistetaan."],
+    "nb-NO": ["Kundespesifikk manual", "Beholder kundens hoveddata og transaksjonsverdier. Leier og URL fjernes."]
+  },
+  internal: {
+    "sv-SE": ["Intern dokumentation", "Behåller all affärsdata. Endast teknisk tenant- och URL-information tas bort."],
+    "en-US": ["Internal documentation", "Keeps all business data. Only technical tenant and URL information is removed."],
+    "fr-FR": ["Documentation interne", "Conserve toutes les données métier. Seules les informations techniques de locataire et d’URL sont supprimées."],
+    "de-DE": ["Interne Dokumentation", "Behält alle Geschäftsdaten. Nur technische Mandanten- und URL-Informationen werden entfernt."],
+    "es-ES": ["Documentación interna", "Conserva todos los datos empresariales. Solo se elimina la información técnica de inquilino y URL."],
+    "da-DK": ["Intern dokumentation", "Bevarer alle forretningsdata. Kun teknisk lejer- og URL-information fjernes."],
+    "fi-FI": ["Sisäinen dokumentaatio", "Säilyttää kaikki liiketoimintatiedot. Vain tekniset vuokraaja- ja URL-tiedot poistetaan."],
+    "nb-NO": ["Intern dokumentasjon", "Beholder alle forretningsdata. Bare teknisk leier- og URL-informasjon fjernes."]
+  },
+  training: {
+    "sv-SE": ["Utbildningsmaterial", "Maskerar transaktionsnummer men behåller tydliga exempel på masterdata och testdata."],
+    "en-US": ["Training material", "Masks transaction numbers but keeps clear examples of master data and test data."],
+    "fr-FR": ["Support de formation", "Masque les numéros de transaction mais conserve des exemples clairs de données de base et de test."],
+    "de-DE": ["Schulungsmaterial", "Maskiert Transaktionsnummern, behält aber eindeutige Beispiele für Stamm- und Testdaten."],
+    "es-ES": ["Material de formación", "Enmascara los números de transacción, pero conserva ejemplos claros de datos maestros y de prueba."],
+    "da-DK": ["Undervisningsmateriale", "Maskerer transaktionsnumre, men bevarer tydelige eksempler på stamdata og testdata."],
+    "fi-FI": ["Koulutusmateriaali", "Peittää tapahtumanumerot mutta säilyttää selkeät esimerkit perus- ja testitiedoista."],
+    "nb-NO": ["Opplæringsmateriell", "Maskerer transaksjonsnumre, men beholder tydelige eksempler på hoveddata og testdata."]
+  }
+};
+
+function profileText(profileName, locale) {
+  const texts = PROFILE_TEXT[profileName] || PROFILE_TEXT.generic;
+  const [label, help] = texts[locale] || texts["en-US"];
+  return { label, help };
+}
+
 function applyProfile(profileName, updateControls = true) {
   const preset = PROFILE_PRESETS[profileName] || PROFILE_PRESETS.generic;
-  $("profileHelp").textContent = preset.help;
+  $("profileHelp").textContent = profileText(profileName,
+    globalThis.T9UiI18n?.normalizeLocale?.(applicationSettings.uiLocale) || "en-US").help;
 
   if (!updateControls) return;
 
@@ -2448,10 +2498,21 @@ function runBusinessTaskEngine(businessSteps) {
   };
 }
 
+// Markdown-only system text; shared headings come from T9DocumentLanguage so
+// the Markdown export matches Word in every document language.
+const MARKDOWN_TEXT = {
+  "sv-SE": { documentationType: "Dokumentationstyp", sensitiveValues: "Känsliga värden hanteras enligt vald dokumentationsprofil.", noTasks: "Inga dokumenterbara affärsuppgifter kunde identifieras.", quality: "Kvalitet", documentationQuality: "Dokumentationskvalitet:", generatedBy: "Genererad av" },
+  "en-US": { documentationType: "Documentation type", sensitiveValues: "Sensitive values are handled according to the selected documentation profile.", noTasks: "No documentable business tasks could be identified.", quality: "Quality", documentationQuality: "Documentation quality:", generatedBy: "Generated by" },
+  "fr-FR": { documentationType: "Type de documentation", sensitiveValues: "Les valeurs sensibles sont traitées selon le profil de documentation choisi.", noTasks: "Aucune tâche métier documentable n’a pu être identifiée.", quality: "Qualité", documentationQuality: "Qualité de la documentation :", generatedBy: "Généré par" },
+  "de-DE": { documentationType: "Dokumentationstyp", sensitiveValues: "Sensible Werte werden gemäß dem ausgewählten Dokumentationsprofil behandelt.", noTasks: "Es konnten keine dokumentierbaren Geschäftsaufgaben erkannt werden.", quality: "Qualität", documentationQuality: "Dokumentationsqualität:", generatedBy: "Erstellt mit" },
+  "es-ES": { documentationType: "Tipo de documentación", sensitiveValues: "Los valores confidenciales se tratan según el perfil de documentación seleccionado.", noTasks: "No se pudo identificar ninguna tarea empresarial documentable.", quality: "Calidad", documentationQuality: "Calidad de la documentación:", generatedBy: "Generado por" },
+  "da-DK": { documentationType: "Dokumentationstype", sensitiveValues: "Følsomme værdier håndteres i henhold til den valgte dokumentationsprofil.", noTasks: "Der kunne ikke identificeres nogen forretningsopgaver, der kan dokumenteres.", quality: "Kvalitet", documentationQuality: "Dokumentationskvalitet:", generatedBy: "Genereret af" },
+  "fi-FI": { documentationType: "Dokumentaation tyyppi", sensitiveValues: "Arkaluonteiset arvot käsitellään valitun dokumentaatioprofiilin mukaisesti.", noTasks: "Dokumentoitavia liiketoimintatehtäviä ei tunnistettu.", quality: "Laatu", documentationQuality: "Dokumentaation laatu:", generatedBy: "Luonut" },
+  "nb-NO": { documentationType: "Dokumentasjonstype", sensitiveValues: "Sensitive verdier håndteres i henhold til valgt dokumentasjonsprofil.", noTasks: "Ingen forretningsoppgaver som kan dokumenteres, ble funnet.", quality: "Kvalitet", documentationQuality: "Dokumentasjonskvalitet:", generatedBy: "Generert av" }
+};
+
 function createTaskDocumentationMarkdown(session, tasks, quality) {
-  const profile =
-    PROFILE_PRESETS[session.settings?.documentationProfile || "generic"]
-      ?.label || "Generisk manual";
+  const documentText = globalThis.T9DocumentLanguage;
   const explanationLabels = {
     "sv-SE": "Vad åtgärden innebär",
     "en-US": "What this action does",
@@ -2471,6 +2532,10 @@ function createTaskDocumentationMarkdown(session, tasks, quality) {
     session.settings?.documentLanguage, "document");
   const explanationLabel = explanationLabels[documentLanguage] ||
     explanationLabels["en-US"];
+  const text = MARKDOWN_TEXT[documentLanguage] || MARKDOWN_TEXT["en-US"];
+  const system = value => documentText.systemText(value, documentLanguage);
+  const profile = profileText(session.settings?.documentationProfile || "generic",
+    documentLanguage).label;
 
   function explanationMarkdown(task) {
     if (!task.contextualExplanationRuleId) return "";
@@ -2491,84 +2556,48 @@ function createTaskDocumentationMarkdown(session, tasks, quality) {
   }
 
   const rendered = tasks.map(task => {
+    // Generated instructions follow the document language; captured labels
+    // and values inside them are preserved by translateInstruction.
+    const instruction = documentText.translateInstruction(task.instruction,
+      documentLanguage);
     const image = task.screenshot
-      ? `\n\n   ![${task.instruction.replace(/\*\*/g, "")}](${task.screenshot})`
+      ? `\n\n   ![${instruction.replace(/\*\*/g, "")}](${task.screenshot})`
       : "";
 
-    return `${task.taskNo}. ${task.instruction}${explanationMarkdown(task)}${image}`;
+    return `${task.taskNo}. ${instruction}${explanationMarkdown(task)}${image}`;
   }).join("\n\n");
 
   return `# ${session.name}
 
-## Dokumentationstyp
+## ${text.documentationType}
 
 ${profile}
 
-## Syfte
+## ${system("Syfte")}
 
-${session.purpose || "Syfte har inte angetts."}
+${session.purpose || system("Ej angiven")}
 
-## Förutsättningar
+## ${system("Förutsättningar")}
 
-- Användaren har behörighet till berörda sidor och åtgärder.
-- Processen genomförs med korrekta grunddata.
-- Benämningar på sidor, fält och åtgärder återges exakt som de visades i Business Central.
-- Känsliga värden hanteras enligt vald dokumentationsprofil.
+- ${system("Användaren har behörighet till berörda sidor och åtgärder.")}
+- ${system("Nödvändiga grunddata och inställningar finns upplagda.")}
+- ${system("Instruktionerna följer de benämningar som visades i Business Central.")}
+- ${text.sensitiveValues}
 
-## Arbetsgång
+## ${system("Arbetsgång")}
 
-${rendered || "Inga dokumenterbara affärsuppgifter kunde identifieras."}
+${rendered || text.noTasks}
 
-## Förväntat resultat
+## ${system("Förväntat resultat")}
 
-Processen är genomförd enligt arbetsgången.
+${system(DEFAULTS.defaultExpectedResult)}
 
-## Kvalitet
+## ${text.quality}
 
-Dokumentationskvalitet: **${quality} %**
-
----
-Genererad av BC Process Studio __APP_VERSION__.
-`;
-}
-
-
-function createDocumentationMarkdown(session, businessSteps) {
-  const rendered = businessSteps.map(step => {
-    const image = step.screenshot
-      ? `\n\n   ![${step.description.replace(/\*\*/g, "")}](${step.screenshot})`
-      : "";
-
-    return `${step.step}. ${step.description}${image}`;
-  }).join("\n\n");
-
-  return `# ${session.name}
-
-## Syfte
-
-${session.purpose || "Syfte har inte angetts."}
-
-## Dokumentationstyp
-
-${PROFILE_PRESETS[session.settings?.documentationProfile || "generic"]?.label || "Generisk manual"}
-
-## Förutsättningar
-
-- Användaren har behörighet till berörda sidor och åtgärder.
-- Processen genomförs med korrekta grunddata.
-- Benämningar på sidor, fält och åtgärder återges exakt som de visades i Business Central vid inspelningen.
-- Känsliga affärsvärden kan vara maskerade.
-
-## Arbetsgång
-
-${rendered || "Inga meningsfulla arbetssteg kunde identifieras."}
-
-## Förväntat resultat
-
-Processen är genomförd och de registrerade ändringarna har sparats i Business Central.
+${text.documentationQuality} **${quality} %**
 
 ---
-Automatiskt tolkat av BC Process Studio __APP_VERSION__.
+${text.generatedBy} BC Process Studio ${APP_VERSION}.
 `;
 }
 
@@ -2585,7 +2614,7 @@ function createDiagnostics(session, rawEvents, businessSteps, screenshotCount) {
   }
 
   return {
-    recorderVersion: "__APP_VERSION__",
+    recorderVersion: APP_VERSION,
     uiFidelityMode: true,
     sessionId: session.id,
     environment: session.settings?.environmentName || "",
@@ -2664,6 +2693,11 @@ async function loadSettings() {
     ...DEFAULTS,
     ...(response?.settings || {})
   };
+  const oldAutomaticExpectedResult = "Processen är genomförd enligt arbetsgången och de registrerade " +
+    "ändringarna har sparats i Business Central.";
+  if (settings.defaultExpectedResult === oldAutomaticExpectedResult) {
+    settings.defaultExpectedResult = DEFAULTS.defaultExpectedResult;
+  }
   applicationSettings = { ...settings };
   globalThis.T9UiI18n.apply(settings.uiLocale);
   globalThis.T9UiI18n.observe(() => applicationSettings.uiLocale);
@@ -2875,7 +2909,7 @@ async function fetchExternalKnowledgeSuggestions(tasks) {
       !globalThis.T9KnowledgeMcpWorkflow) return { enabled: false,
         status: "disabled", requestCount: 0, suggestions: [] };
   const requests = globalThis.T9KnowledgeMcpWorkflow.buildRequests(
-    tasks, applicationSettings.uiLocale, 40);
+    tasks, applicationSettings.uiLocale, 12);
   if (!requests.length) return { enabled: true, status: "no-unresolved",
     requestCount: 0, suggestions: [] };
   try {
@@ -2887,18 +2921,193 @@ async function fetchExternalKnowledgeSuggestions(tasks) {
       requests, response.results);
     return { enabled: true,
       status: suggestions.length ? "suggestions" : "no-suggestions",
-      requestCount: requests.length, suggestions };
+      requestCount: requests.length, suggestions,
+      fromCache: response.fromCache === true,
+      cacheHitCount: Number(response.cacheHitCount) || 0,
+      cacheMissCount: Number(response.cacheMissCount) || 0,
+      failureCount: Number(response.failureCount) || 0,
+      cacheTtlDays: Number(response.cacheTtlDays) || 30 };
   } catch {
     return { enabled: true, status: "unavailable",
       requestCount: requests.length, suggestions: [] };
   }
 }
 
+function externalKnowledgeLabels() {
+  const locale = activeDocumentLanguage();
+  const labels = {
+    "sv-SE": { loading: "Kontrollerar sparade kunskapsförslag…",
+      cached: "Återanvände sparade externa kunskapsförslag.",
+      counts: (hits, misses, failures) => `Cache: ${hits} återanvända, ${misses} nya, ${failures} misslyckade uppslag.`,
+      found: count => `Externa kunskapsförslag: ${count}. De är obekräftade och visas bara som granskningsunderlag.`,
+      none: "Inga externa kandidater hittades för steg utan lokal kunskapsmatchning.",
+      failed: "Externa kunskapsförslag kunde inte hämtas. Den lokala dokumentationen är opåverkad.",
+      heading: "Externt kunskapsförslag · obekräftat", object: "Business Central-objekt",
+      action: "Föreslagen åtgärd", source: "Källa", confidence: "matchningsgrad",
+      advisory: "Kontrollera förslaget innan du använder det i processdokumentationen." },
+    "en-US": { loading: "Checking saved knowledge suggestions…",
+      cached: "Reused cached external knowledge suggestions.",
+      counts: (hits, misses, failures) => `Cache: ${hits} reused, ${misses} new, ${failures} failed lookups.`,
+      found: count => `External knowledge suggestions: ${count}. Unverified; shown for review only.`,
+      none: "No external candidates were found for steps without a local knowledge match.",
+      failed: "External knowledge suggestions could not be retrieved. Local documentation is unaffected.",
+      heading: "External knowledge suggestion · unverified", object: "Business Central object",
+      action: "Suggested action", source: "Source", confidence: "match confidence",
+      advisory: "Verify the suggestion before using it in process documentation." },
+    "fr-FR": { loading: "Vérification des suggestions de connaissances enregistrées…",
+      cached: "Suggestions externes mises en cache réutilisées.",
+      counts: (hits, misses, failures) => `Cache : ${hits} réutilisées, ${misses} nouvelles, ${failures} recherches en échec.`,
+      found: count => `Suggestions externes : ${count}. Non vérifiées, affichées pour examen.`,
+      none: "Aucun candidat externe n’a été trouvé pour les étapes sans correspondance locale.",
+      failed: "Les suggestions externes sont indisponibles. La documentation locale reste accessible.",
+      heading: "Suggestion externe · non vérifiée", object: "Objet Business Central",
+      action: "Action suggérée", source: "Source", confidence: "confiance",
+      advisory: "Vérifiez la suggestion avant de l’utiliser dans la documentation." },
+    "de-DE": { loading: "Gespeicherte Wissensvorschläge werden geprüft…",
+      cached: "Zwischengespeicherte externe Wissensvorschläge wiederverwendet.",
+      counts: (hits, misses, failures) => `Cache: ${hits} wiederverwendet, ${misses} neu, ${failures} fehlgeschlagen.`,
+      found: count => `Externe Wissensvorschläge: ${count}. Ungeprüft und nur zur Prüfung angezeigt.`,
+      none: "Für Schritte ohne lokalen Wissenstreffer wurden keine externen Kandidaten gefunden.",
+      failed: "Externe Vorschläge konnten nicht abgerufen werden. Die lokale Dokumentation bleibt verfügbar.",
+      heading: "Externer Wissensvorschlag · ungeprüft", object: "Business Central-Objekt",
+      action: "Vorgeschlagene Aktion", source: "Quelle", confidence: "Trefferwahrscheinlichkeit",
+      advisory: "Prüfen Sie den Vorschlag, bevor Sie ihn in der Prozessdokumentation verwenden." },
+    "es-ES": { loading: "Comprobando sugerencias de conocimiento guardadas…",
+      cached: "Se reutilizaron sugerencias externas guardadas.",
+      counts: (hits, misses, failures) => `Caché: ${hits} reutilizadas, ${misses} nuevas, ${failures} fallidas.`,
+      found: count => `Sugerencias externas: ${count}. Sin verificar; solo para revisión.`,
+      none: "No se encontraron candidatos externos para pasos sin coincidencia local.",
+      failed: "No se pudieron obtener sugerencias externas. La documentación local sigue disponible.",
+      heading: "Sugerencia externa · sin verificar", object: "Objeto de Business Central",
+      action: "Acción sugerida", source: "Fuente", confidence: "confianza",
+      advisory: "Verifique la sugerencia antes de usarla en la documentación del proceso." },
+    "da-DK": { loading: "Kontrollerer gemte vidensforslag…",
+      cached: "Gemte eksterne vidensforslag blev genbrugt.",
+      counts: (hits, misses, failures) => `Cache: ${hits} genbrugt, ${misses} nye, ${failures} mislykkede opslag.`,
+      found: count => `Eksterne vidensforslag: ${count}. Ikke bekræftet; vises kun til gennemgang.`,
+      none: "Der blev ikke fundet eksterne kandidater til trin uden et lokalt vidensmatch.",
+      failed: "Eksterne forslag kunne ikke hentes. Den lokale dokumentation er stadig tilgængelig.",
+      heading: "Eksternt vidensforslag · ikke bekræftet", object: "Business Central-objekt",
+      action: "Foreslået handling", source: "Kilde", confidence: "matchsikkerhed",
+      advisory: "Kontrollér forslaget, før du bruger det i procesdokumentationen." },
+    "fi-FI": { loading: "Tarkistetaan tallennetut tietoehdotukset…",
+      cached: "Välimuistissa olevat ulkoiset tietoehdotukset käytettiin uudelleen.",
+      counts: (hits, misses, failures) => `Välimuisti: ${hits} uudelleenkäytetty, ${misses} uutta, ${failures} epäonnistunutta hakua.`,
+      found: count => `Ulkoiset tietoehdotukset: ${count}. Vahvistamattomia, vain tarkastelua varten.`,
+      none: "Paikallista tietovastaavuutta vailla oleville vaiheille ei löytynyt ulkoisia ehdokkaita.",
+      failed: "Ulkoisia ehdotuksia ei voitu hakea. Paikallinen dokumentaatio on käytettävissä.",
+      heading: "Ulkoinen tietoehdotus · vahvistamaton", object: "Business Central -objekti",
+      action: "Ehdotettu toiminto", source: "Lähde", confidence: "osuman luotettavuus",
+      advisory: "Tarkista ehdotus ennen sen käyttöä prosessidokumentaatiossa." },
+    "nb-NO": { loading: "Kontrollerer lagrede kunnskapsforslag…",
+      cached: "Bufrede eksterne kunnskapsforslag ble brukt på nytt.",
+      counts: (hits, misses, failures) => `Hurtigbuffer: ${hits} gjenbrukt, ${misses} nye, ${failures} mislykkede oppslag.`,
+      found: count => `Eksterne kunnskapsforslag: ${count}. Ikke bekreftet; vises bare til gjennomgang.`,
+      none: "Fant ingen eksterne kandidater for trinn uten lokalt kunnskapstreff.",
+      failed: "Eksterne forslag kunne ikke hentes. Den lokale dokumentasjonen er tilgjengelig.",
+      heading: "Eksternt kunnskapsforslag · ikke bekreftet", object: "Business Central-objekt",
+      action: "Foreslått handling", source: "Kilde", confidence: "treffsikkerhet",
+      advisory: "Kontroller forslaget før du bruker det i prosessdokumentasjonen." }
+  };
+  return labels[locale] || labels["en-US"];
+}
+
+function externalKnowledgeCandidateMarkup(suggestion) {
+  const labels = externalKnowledgeLabels();
+  const candidate = suggestion?.candidate || {};
+  let description = "";
+  if (suggestion.kind === "object") {
+    const ref = candidate.objectRef || {};
+    description = `${labels.object}: ${[ref.objectType, ref.objectId,
+      ref.publisher, ref.appVersion].filter(Boolean).join(" · ")}`;
+  } else {
+    const action = candidate.action || {};
+    description = `${labels.action}: ${[action.taskType, action.semanticAction,
+      action.entity].filter(Boolean).join(" · ")}`;
+  }
+  const provenance = candidate.provenance || {};
+  const sourceUri = /^https:\/\//u.test(String(provenance.sourceUri || ""))
+    ? provenance.sourceUri : "";
+  const source = provenance.sourceId || "MCP";
+  const confidence = Number.isFinite(candidate.confidence)
+    ? ` · ${labels.confidence}: ${Math.round(candidate.confidence * 100)}%` : "";
+  return `<li><strong>${escapeHtml(description)}</strong>${confidence}
+    <span class="external-knowledge-source"> · ${escapeHtml(labels.source)}:
+      ${sourceUri ? `<a href="${escapeHtml(sourceUri)}" target="_blank" rel="noopener noreferrer">${escapeHtml(source)}</a>` : escapeHtml(source)}
+    </span></li>`;
+}
+
+function externalKnowledgeMarkupForTask(taskId) {
+  const suggestions = externalKnowledgeSuggestionState.suggestions.filter(item =>
+    item.taskId === taskId
+  );
+  if (!suggestions.length) return "";
+  const labels = externalKnowledgeLabels();
+  return `<details class="review-external-disclosure"><summary>${escapeHtml(labels.heading)}</summary><aside class="external-knowledge-suggestions" data-external-knowledge>
+    <p>${escapeHtml(labels.advisory)}</p>
+    <ul>${suggestions.map(externalKnowledgeCandidateMarkup).join("")}</ul>
+  </aside></details>`;
+}
+
+function updateExternalKnowledgeReviewUi() {
+  const status = $("externalKnowledgeStatus");
+  if (!status) return;
+  const state = externalKnowledgeSuggestionState;
+  if (!state.sessionId || state.sessionId !== activeReviewSession?.id ||
+      state.status === "disabled" || state.status === "no-unresolved" ||
+      state.status === "idle") {
+    status.hidden = true;
+    status.textContent = "";
+  } else {
+    status.hidden = false;
+    const labels = externalKnowledgeLabels();
+    const counts = state.cacheHitCount !== undefined
+      ? ` ${labels.counts(state.cacheHitCount, state.cacheMissCount || 0,
+        state.failureCount || 0)}` : "";
+    status.textContent = state.status === "loading" ? labels.loading
+      : state.status === "suggestions" ? `${labels.found(state.suggestions.length)}${counts}`
+      : state.failureCount ? `${labels.failed}${counts}`
+      : state.status === "no-suggestions" ? `${labels.none}${counts}`
+      : `${labels.failed}${counts}`;
+  }
+  for (const card of $("reviewList").querySelectorAll("[data-review-task-id]")) {
+    const slot = card.querySelector("[data-external-knowledge-slot]");
+    if (slot) slot.innerHTML = externalKnowledgeMarkupForTask(card.dataset.reviewTaskId);
+  }
+}
+
+function startExternalKnowledgeSuggestions(model, sessionId) {
+  const requestId = `${sessionId}:${Date.now()}:${Math.random()}`;
+  externalKnowledgeSuggestionState = { sessionId, requestId,
+    status: applicationSettings.knowledgeMcpEnabled ? "loading" : "disabled",
+    requestCount: 0, suggestions: [] };
+  updateExternalKnowledgeReviewUi();
+  if (!applicationSettings.knowledgeMcpEnabled) return;
+  fetchExternalKnowledgeSuggestions(model?.externalKnowledgeTasks || [])
+    .then(result => {
+      if (activeReviewSession?.id !== sessionId ||
+          externalKnowledgeSuggestionState.requestId !== requestId) return;
+      externalKnowledgeSuggestionState = { sessionId, requestId,
+        status: result.status, requestCount: result.requestCount || 0,
+        suggestions: result.suggestions || [], fromCache: result.fromCache === true,
+        cacheHitCount: result.cacheHitCount, cacheMissCount: result.cacheMissCount,
+        failureCount: result.failureCount };
+      updateExternalKnowledgeReviewUi();
+    })
+    .catch(() => {
+      if (activeReviewSession?.id !== sessionId ||
+          externalKnowledgeSuggestionState.requestId !== requestId) return;
+      externalKnowledgeSuggestionState = { sessionId, requestId,
+        status: "unavailable", requestCount: 0, suggestions: [] };
+      updateExternalKnowledgeReviewUi();
+    });
+}
+
 async function prepareSessionModel(session, options = {}) {
   const response = await send({
     type: "T9_GET_SESSION_DATA",
     sessionId: session.id,
-    includeScreenshots: true
+    includeScreenshots: options.includeScreenshots === true
   });
 
   if (!response.ok) {
@@ -2907,11 +3116,22 @@ async function prepareSessionModel(session, options = {}) {
 
   const imagePaths = {};
   const screenshotData = {};
-
-  for (const [eventNo, dataUrl] of Object.entries(response.screenshots || {})) {
-    imagePaths[eventNo] =
-      `screenshots/${String(eventNo).padStart(6, "0")}.png`;
-    screenshotData[imagePaths[eventNo]] = dataUrl;
+  const screenshotEntries = globalThis.T9ScreenshotAssetPaths.entries(
+    response.screenshots || {});
+  const screenshotPaths = [...new Set([
+    ...(Array.isArray(response.screenshotPaths) ? response.screenshotPaths : []),
+    ...screenshotEntries.map(item => item.path)
+  ])].filter(path => typeof path === "string" &&
+    /^screenshots\/(?:\d{6,}\.png|repair-[a-z0-9_-]+-\d+\.png)$/iu.test(path));
+  for (const path of screenshotPaths) {
+    const match = /^screenshots\/(\d+)\.png$/u.exec(path);
+    if (match) {
+      const eventNo = String(Number(match[1]));
+      if (Number.isSafeInteger(Number(eventNo))) imagePaths[eventNo] = path;
+    }
+  }
+  for (const item of screenshotEntries) {
+    screenshotData[item.path] = item.value;
   }
 
   const model = globalThis.T9SessionInterpretationPipeline.interpret({
@@ -2926,9 +3146,13 @@ async function prepareSessionModel(session, options = {}) {
     sessionGraph: globalThis.T9Engine?.sessionGraph,
     confidence: globalThis.T9Engine?.confidence,
     compatibilityInterpret: interpretLegacyCompatibility });
-  const canonicalProcess = response.recording
+  const canonicalRecording = response.recordingHeader
+    ? globalThis.T9CanonicalRecording.fromLegacyProjection(
+      response.recordingHeader, response.session, response.events
+    ) : response.recording;
+  const canonicalProcess = canonicalRecording
     ? globalThis.BCProcessAdapter.normalizeProcess({
-      recording: response.recording,
+      recording: canonicalRecording,
       interpretation: model,
       normalizedEvents: response.normalizedEvents,
       stepGroups: response.stepGroups,
@@ -2973,21 +3197,65 @@ async function prepareSessionModel(session, options = {}) {
   return {
     response,
     imagePaths,
+    screenshotPaths,
     screenshotData,
     canonicalProcess,
     canonicalKnowledgeResolutions,
+    externalKnowledgeTasks,
     externalKnowledgeLookup,
     ...model
   };
 }
 
+function screenshotPathsForReview(model, review, options = {}) {
+  const available = new Set(model?.screenshotPaths || []);
+  if (options.all === true) return [...available];
+  const tasks = [...(review?.tasks || []), ...(model?.businessTasks || [])]
+    .map(task => globalThis.T9Review.resolveTask(task || {}));
+  return globalThis.T9ScreenshotAssetPaths.forTasks(tasks, [...available]);
+}
+
+async function loadReviewScreenshots(model, review, options = {}) {
+  if (!model) return {};
+  model.screenshotData ||= {};
+  while (true) {
+    if (model.screenshotLoadPromise) {
+      await model.screenshotLoadPromise;
+      continue;
+    }
+    const requested = screenshotPathsForReview(model, review, options);
+    const missing = requested.filter(path => !model.screenshotData[path]);
+    if (!missing.length) return model.screenshotData;
+    const operation = (async () => {
+      const result = await globalThis.T9ScreenshotBatchLoader.load({
+        sessionId: model.response.session.id, screenshotPaths: missing,
+        send, batchSize: 10,
+        onAsset({ path, value }) { model.screenshotData[path] = value; }
+      });
+      model.missingScreenshotPaths = [...new Set([
+        ...(model.missingScreenshotPaths || []), ...result.missingPaths
+      ])];
+      return model.screenshotData;
+    })();
+    model.screenshotLoadPromise = operation;
+    try {
+      await operation;
+      return model.screenshotData;
+    } finally {
+      if (model.screenshotLoadPromise === operation) {
+        model.screenshotLoadPromise = null;
+      }
+    }
+  }
+}
+
 async function exportSession(session) {
-  show(`Förbereder export av "${session.name}"...`);
+  show(uiTf("library.exportPreparing", { title: session.name }));
 
   const response = await send({
     type: "T9_GET_SESSION_DATA",
     sessionId: session.id,
-    includeScreenshots: true
+    includeScreenshots: false
   });
 
   if (!response.ok) {
@@ -2996,15 +3264,20 @@ async function exportSession(session) {
 
   const imagePaths = {};
   const imageFiles = [];
-
-  for (const [eventNo, dataUrl] of Object.entries(response.screenshots || {})) {
-    const path = `screenshots/${String(eventNo).padStart(6, "0")}.png`;
-    imagePaths[eventNo] = path;
-    imageFiles.push({
-      name: path,
-      data: dataUrlBytes(dataUrl)
-    });
-  }
+  const screenshotExport = await globalThis.T9ScreenshotBatchLoader.load({
+    sessionId: session.id, screenshotPaths: response.screenshotPaths,
+    send, batchSize: 10,
+    onProgress({ completedPaths, totalPaths }) {
+      show(`${uiTf("library.exportPreparing", { title: session.name })} ` +
+        `${completedPaths}/${totalPaths}`);
+    },
+    onAsset({ path, value }) {
+      const key = globalThis.T9ScreenshotAssetPaths.keyForPath(path);
+      const eventNo = globalThis.T9ScreenshotAssetPaths.eventNumber(key);
+      if (eventNo) imagePaths[eventNo] = path;
+      imageFiles.push({ name: path, data: dataUrlBytes(value) });
+    }
+  });
 
   const model = globalThis.T9SessionInterpretationPipeline.interpret({
     session: response.session, events: response.events,
@@ -3028,6 +3301,8 @@ async function exportSession(session) {
     imageFiles.length,
     interpretedSteps.length
   );
+  diagnostics.missingScreenshotCount = screenshotExport.missingPaths.length;
+  diagnostics.missingScreenshotPaths = [...screenshotExport.missingPaths];
 
   diagnostics.businessTaskCount = finalBusinessTasks.length;
   diagnostics.businessTaskQuality = knowledgeQuality;
@@ -3216,7 +3491,7 @@ async function exportSession(session) {
     {
       name: `${prefix}ui-fidelity.json`,
       data: bytes(JSON.stringify({
-        version: "__APP_VERSION__",
+        version: APP_VERSION,
         principle: "Visible Business Central captions are preserved exactly.",
         rules: [
           "actionCaption is the text shown on the action or button.",
@@ -3251,7 +3526,8 @@ async function exportSession(session) {
   link.click();
 
   setTimeout(() => URL.revokeObjectURL(url), 60000);
-  show(`ZIP-export skapad i UI Fidelity-läge: ${response.events.length} råhändelser blev ${businessSteps.length} arbetssteg och ${imageFiles.length} bilder.`);
+  show(uiTf("library.exportSessionCreated", { events: response.events.length,
+    steps: businessSteps.length, images: imageFiles.length }));
 }
 
 
@@ -3526,6 +3802,7 @@ async function exportLibraryDocument(record, exportSettings) {
       tasks: globalThis.T9Review.normalizeTasks(existing.review.tasks)
     })
     : globalThis.T9Review.createReview(session, model.businessTasks);
+  await loadReviewScreenshots(model, review);
   const themeId = globalThis.T9DocumentThemeRegistry.get(
     globalThis.T9DocumentThemeRegistry.BUILT_IN_REGISTRY,
     record.theme.themeId
@@ -3571,6 +3848,8 @@ async function exportActiveReviewToWord() {
     );
   }
 
+  await loadReviewScreenshots(activeReviewModel, activeReview);
+
   const pipeline = createActiveDocumentPipeline();
   const mediaAssets = await prepareDocumentMedia(pipeline);
   globalThis.T9WordExportPipeline.validateMedia(
@@ -3605,6 +3884,7 @@ async function exportActiveReviewToWord() {
 let activeReviewSession = null;
 let activeReview = null;
 let activeReviewModel = null;
+let reviewOpenRequestId = "";
 let activeProcessModel = null;
 let activeProcessBaseModel = null;
 let selectedProcessMapNodeId = null;
@@ -3682,6 +3962,10 @@ function setProcessMapFocus(active) {
   else processMapFocusReturn?.focus?.();
 }
 let activeReviewSelection = globalThis.T9ReviewSelection.create();
+let reviewStepLayout = "focus";
+let reviewStepFilter = "all";
+let currentReviewStepTasks = [];
+let currentReviewStepPresentations = new Map();
 let activeReviewEdit = null;
 let reviewReturnFocus = null;
 let reviewLayoutState = globalThis.T9ReviewLayout.create();
@@ -3716,8 +4000,9 @@ const activeDocumentPipelineCache = globalThis.T9WorkspaceController
   .createRevisionCache();
 
 function processAnalysisLabels() {
-  const english = String(applicationSettings.uiLocale || "").startsWith("en");
-  return english ? {
+  const locale = globalThis.T9UiI18n.normalizeLocale(applicationSettings.uiLocale || "sv-SE");
+  const english = locale !== "sv-SE";
+  const labels = english ? {
     locale: "en-US",
     detected: "Detected reference process", unknownDomain: "Domain not identified",
     match: "match", confirmedConfidence: "manually confirmed",
@@ -3856,6 +4141,23 @@ function processAnalysisLabels() {
           "Överföringsorder → Överföringsutleverans → På väg → Överföringsinleverans"
       }
   };
+  const localize = (value, key = "") => {
+    if (typeof value === "string") {
+      const messageKey = `processAnalysis.${key}`;
+      const translated = globalThis.T9UiI18n.translate(messageKey, locale);
+      return translated === messageKey
+        ? globalThis.T9UiI18n.translateStaticText(value, locale) : translated;
+    }
+    if (!value || typeof value !== "object") return value;
+    return Object.fromEntries(Object.entries(value).map(([childKey, nested]) =>
+      [childKey, localize(nested, key ? `${key}.${childKey}` : childKey)]));
+  };
+  if (!english) return labels;
+  labels.locale = locale;
+  if (locale !== "en-US") {
+    for (const [key, value] of Object.entries(labels)) labels[key] = localize(value, key);
+  }
+  return labels;
 }
 
 function updateProcessAnalysisBadge() {
@@ -4002,6 +4304,7 @@ function libraryOptions() {
   const checked = id => $(id)?.checked === true;
   return {
     search: value("librarySearch"),
+    locale: applicationSettings.uiLocale || "sv-SE",
     sort: value("librarySort", "modified"),
     filters: {
       profile: value("libraryProfileFilter"),
@@ -4042,9 +4345,11 @@ function renderDocumentLibrary() {
   const view = globalThis.T9DocumentLibraryView;
   const activeId = $("libraryGroupProfiles").checked
     ? view.renderGrouped($("libraryResults"),
-      globalThis.T9DocumentLibrary.groupByProfile(records),
-      documentLibrarySelection)
-    : view.renderList($("libraryResults"), records, documentLibrarySelection);
+      globalThis.T9DocumentLibrary.groupByProfile(records,
+        applicationSettings.uiLocale || "sv-SE"),
+      { ...documentLibrarySelection, locale: applicationSettings.uiLocale })
+    : view.renderList($("libraryResults"), records,
+      { ...documentLibrarySelection, locale: applicationSettings.uiLocale });
   documentLibrarySelection = globalThis.T9DocumentBatchOperations.selection({
     ...documentLibrarySelection,
     activeId
@@ -4174,7 +4479,7 @@ function selectedLibraryRecords() {
 
 async function commitLibraryBatch(result, confirmation) {
   if (!result.affected) {
-    renderLibraryBatchToolbar("Inga metadataändringar behövdes.");
+    renderLibraryBatchToolbar(uiT("library.noMetadataChanges"));
     return 0;
   }
   const previous = documentLibraryRecords;
@@ -4194,7 +4499,7 @@ async function commitLibraryBatch(result, confirmation) {
   );
   refreshLibraryFilters();
   renderDocumentLibrary();
-  renderLibraryBatchToolbar(confirmation.replace("{count}", result.affected));
+  renderLibraryBatchToolbar(uiTf(confirmation, { count: result.affected }));
   return result.affected;
 }
 
@@ -4517,7 +4822,7 @@ function revealReviewContext(options = {}) {
       });
     }
   }
-  $("reviewFooterText").textContent = "Motsvarande granskningssteg visas.";
+  $("reviewFooterText").textContent = uiT("review.footerCurrentStep");
 }
 
 function documentSections() {
@@ -4720,7 +5025,7 @@ async function synchronizeDocumentWorkspace() {
     while (activeReview && workspaceState.active === "document" &&
         globalThis.T9WorkspaceController.needsRender(workspaceState)) {
       const requestedRevision = workspaceState.revision;
-      $("documentWorkspaceStatus").textContent = "Uppdaterar dokumentet...";
+      $("documentWorkspaceStatus").textContent = uiT("review.documentUpdating");
       try {
         const pipeline = createActiveDocumentPipeline();
         const mediaAssets = await composeDocumentWorkspaceMedia(
@@ -4815,10 +5120,10 @@ const reviewAutoSave = globalThis.T9ReviewEdit.createAutoSave(
   {
     onError(error) {
       show(error.message, true);
-      $("reviewFooterText").textContent = "Automatisk sparning misslyckades.";
+      $("reviewFooterText").textContent = uiT("review.autosaveFailed");
       if (annotationEditorState) {
         $("annotationStatus").textContent =
-          "Automatisk sparning misslyckades. Försök spara igen.";
+          uiT("review.autosaveRetry");
       }
     }
   }
@@ -4854,10 +5159,17 @@ function applyReviewToolbarState() {
   globalThis.T9ReviewToolbar.apply($("reviewToolbar"), state);
   const selectionBar = $("reviewSelectionActions");
   const selectedCount = activeReviewSelection.selectedIds.filter(id => reviewTaskIds().includes(id)).length;
-  if (!selectedCount && selectionBar.contains(document.activeElement)) {
-    $("reviewMoreActions").querySelector("summary").focus();
+  if (selectedCount <= 1 && !selectionBar.hidden &&
+      selectionBar.contains(document.activeElement)) {
+    const activeId = activeReviewSelection.activeId ||
+      activeReviewSelection.selectedIds[0];
+    const activeCard = [...$("reviewList").querySelectorAll("[data-review-task-id]")]
+      .find(card => card.dataset.reviewTaskId === activeId);
+    const stepActions = activeCard?.querySelector(".review-step-actions-trigger");
+    (stepActions?.getClientRects().length
+      ? stepActions : $("reviewMoreActions").querySelector("summary")).focus();
   }
-  selectionBar.hidden = selectedCount === 0;
+  selectionBar.hidden = selectedCount <= 1;
   $("reviewSelectionCount").textContent = String(selectedCount);
   $("resetReviewStructure").disabled =
     !activeReview?.structureOverrides?.length;
@@ -4935,11 +5247,25 @@ function applyReviewSelection(focusActive = false, publish = true) {
     );
     const active = activeReviewSelection.activeId === card.dataset.reviewTaskId;
     card.classList.toggle("selected", selected);
+    const primaryId = activeReviewSelection.activeId ||
+      activeReviewSelection.selectedIds[0] ||
+      $("reviewStepNavigation")?.querySelector("[data-step-id]")?.dataset.stepId ||
+      $("reviewList").firstElementChild?.dataset.reviewTaskId;
+    card.dataset.activeStep = String(card.dataset.reviewTaskId === primaryId);
     card.setAttribute("aria-selected", String(selected));
     const initial = !activeReviewSelection.activeId &&
       card === $("reviewList").firstElementChild;
     card.tabIndex = active || initial ? 0 : -1;
     if (focusActive && active) card.focus();
+  }
+  const primaryId = activeReviewSelection.activeId ||
+    activeReviewSelection.selectedIds[0] ||
+    $("reviewStepNavigation")?.querySelector("[data-step-id]")?.dataset.stepId ||
+    $("reviewList").firstElementChild?.dataset.reviewTaskId;
+  for (const item of $("reviewStepNavigation")?.querySelectorAll("[data-step-id]") || []) {
+    const current = item.dataset.stepId === primaryId;
+    item.setAttribute("aria-current", current ? "step" : "false");
+    item.tabIndex = current ? 0 : -1;
   }
   applyReviewToolbarState();
   applyReviewStatus();
@@ -4956,6 +5282,92 @@ function applyReviewSelection(focusActive = false, publish = true) {
   }
 }
 
+function reviewStepUiLabels() {
+  const locale = globalThis.T9UiI18n?.normalizeLocale?.(
+    applicationSettings.uiLocale || "sv-SE") || "sv-SE";
+  const labels = {
+    "sv-SE": ["Steg", "Visa", "Alla steg", "Ej granskade", "Ändrade", "Godkända", "Visa alla steg", "Fokusera på ett steg", "Godkänd", "Ändrad", "Ej granskad", "Inga steg matchar filtret."],
+    "en-US": ["Steps", "Show", "All steps", "Unreviewed", "Edited", "Approved", "Show all steps", "Focus on one step", "Approved", "Edited", "Unreviewed", "No steps match this filter."],
+    "fr-FR": ["Étapes", "Afficher", "Toutes les étapes", "Non vérifiées", "Modifiées", "Approuvées", "Afficher toutes les étapes", "Se concentrer sur une étape", "Approuvée", "Modifiée", "Non vérifiée", "Aucune étape ne correspond à ce filtre."],
+    "de-DE": ["Schritte", "Anzeigen", "Alle Schritte", "Nicht geprüft", "Bearbeitet", "Genehmigt", "Alle Schritte anzeigen", "Einen Schritt fokussieren", "Genehmigt", "Bearbeitet", "Nicht geprüft", "Keine Schritte entsprechen diesem Filter."],
+    "es-ES": ["Pasos", "Mostrar", "Todos los pasos", "Sin revisar", "Editados", "Aprobados", "Mostrar todos los pasos", "Enfocar un paso", "Aprobado", "Editado", "Sin revisar", "Ningún paso coincide con este filtro."],
+    "da-DK": ["Trin", "Vis", "Alle trin", "Ikke gennemgået", "Redigeret", "Godkendt", "Vis alle trin", "Fokusér på ét trin", "Godkendt", "Redigeret", "Ikke gennemgået", "Ingen trin matcher dette filter."],
+    "fi-FI": ["Vaiheet", "Näytä", "Kaikki vaiheet", "Tarkistamattomat", "Muokatut", "Hyväksytyt", "Näytä kaikki vaiheet", "Kohdista yhteen vaiheeseen", "Hyväksytty", "Muokattu", "Tarkistamaton", "Suodattimelle ei löydy vaiheita."],
+    "nb-NO": ["Trinn", "Vis", "Alle trinn", "Ikke gjennomgått", "Endret", "Godkjent", "Vis alle trinn", "Fokuser på ett trinn", "Godkjent", "Endret", "Ikke gjennomgått", "Ingen trinn samsvarer med filteret."]
+  };
+  return labels[locale] || labels["en-US"];
+}
+
+function reviewStepStatusLabel(task) {
+  const labels = reviewStepUiLabels();
+  if (task.approved) return labels[8];
+  if (task.reviewStatus === "edited" || task.stepOverride || task.userComment ||
+      task.manualStepId || task.provenance === "manual") return labels[9];
+  return labels[10];
+}
+
+function reviewAdvancedFormattingLabel() {
+  const locale = globalThis.T9UiI18n?.normalizeLocale?.(
+    applicationSettings.uiLocale || "sv-SE") || "sv-SE";
+  return ({ "sv-SE": "Mer formatering", "en-US": "More formatting",
+    "fr-FR": "Mise en forme avancée", "de-DE": "Weitere Formatierung",
+    "es-ES": "Más formato", "da-DK": "Mere formatering",
+    "fi-FI": "Lisää muotoilua", "nb-NO": "Mer formatering" })[locale] || "More formatting";
+}
+
+function renderReviewStepNavigation(tasks, presentations) {
+  const navigation = $("reviewStepNavigation");
+  if (!navigation) return [];
+  currentReviewStepTasks = tasks;
+  currentReviewStepPresentations = presentations;
+  const labels = reviewStepUiLabels();
+  $("reviewStepWorkspace").querySelector("nav").setAttribute("aria-label", labels[0]);
+  $("reviewStepWorkspace").querySelector("nav h3").textContent = labels[0];
+  $("reviewStepFilter").parentElement.firstChild.textContent = `${labels[1]} `;
+  const filter = $("reviewStepFilter");
+  filter.options[0].textContent = labels[2];
+  filter.options[1].textContent = labels[3];
+  filter.options[2].textContent = labels[4];
+  filter.options[3].textContent = labels[5];
+  filter.value = reviewStepFilter;
+  $("reviewStepWorkspace").dataset.filter = reviewStepFilter;
+  const filteredTasks = tasks.filter(task => reviewStepFilter === "all" ||
+    (reviewStepFilter === "approved" && task.approved) ||
+    (reviewStepFilter === "edited" && reviewStepStatusLabel(task) === labels[9]) ||
+    (reviewStepFilter === "pending" && reviewStepStatusLabel(task) === labels[10]));
+  $("reviewStepWorkspace").dataset.filterEmpty = String(
+    reviewStepFilter !== "all" && filteredTasks.length === 0
+  );
+  navigation.innerHTML = filteredTasks.map(task => {
+    const index = tasks.indexOf(task);
+    const title = String(presentations.get(task.taskId)?.text || task.description || "Steg")
+      .replace(/\s+/gu, " ").trim();
+    const state = reviewStepStatusLabel(task);
+    const stateCode = task.approved ? "approved"
+      : state === labels[9] ? "edited" : "pending";
+    return `<button type="button" class="review-step-nav-item" data-step-id="${escapeHtml(task.taskId)}" data-state="${stateCode}" aria-label="${escapeHtml(`${labels[0]} ${index + 1}: ${title}`)}" aria-current="false">
+      <span class="review-step-nav-number">${index + 1}</span><span><span class="review-step-nav-text">${escapeHtml(title || `Steg ${index + 1}`)}</span><span class="review-step-nav-state">${state}</span></span></button>`;
+  }).join("");
+  navigation.querySelectorAll("[data-step-id]").forEach(button => {
+    button.addEventListener("click", event => {
+      const taskId = button.dataset.stepId;
+      dispatchReviewSelection({
+        type: "select",
+        id: taskId,
+        range: event.shiftKey,
+        additive: event.ctrlKey || event.metaKey
+      });
+      $("reviewList").querySelector(
+        `[data-review-task-id="${CSS.escape(taskId)}"]`
+      )?.scrollIntoView({ block: "center" });
+      $("reviewFooterText").textContent = uiT("review.footerCurrentStep");
+    });
+  });
+  $("reviewStepEmpty").hidden = filteredTasks.length > 0;
+  $("reviewStepEmpty").textContent = labels[11];
+  return filteredTasks;
+}
+
 function activateProcessOverviewTask(taskId, focusCard = false) {
   if (!taskId || !reviewTaskIds().includes(taskId)) return false;
   activeReviewSelection = globalThis.T9ReviewSelection.reduce(
@@ -4967,7 +5379,7 @@ function activateProcessOverviewTask(taskId, focusCard = false) {
   const card = [...$("reviewList").querySelectorAll("[data-review-task-id]")]
     .find(element => element.dataset.reviewTaskId === taskId);
   card?.scrollIntoView({ block: "center" });
-  $("reviewFooterText").textContent = "Motsvarande granskningssteg visas.";
+  $("reviewFooterText").textContent = uiT("review.footerCurrentStep");
   return true;
 }
 
@@ -5244,7 +5656,7 @@ function finishReviewEdit(control, commit) {
       );
       invalidateDocumentWorkspace();
       reviewAutoSave.schedule();
-      $("reviewFooterText").textContent = "Ändringen sparas automatiskt.";
+      $("reviewFooterText").textContent = uiT("review.autosaving");
       if (revisionChanged) {
         $("reviewFooterText").textContent =
           "Steget ändrades under redigering. Din text bevarades och sparas.";
@@ -5467,8 +5879,20 @@ function openStepRepair(taskIndex) {
   });
   $("stepRepairStatus").textContent = "";
   $("captureStepRepairScreenshot").disabled = false;
-  renderStepRepairGallery();
   $("stepRepairDialog").showModal();
+  $("stepRepairGallery").innerHTML = '<p class="muted">' +
+    escapeHtml(uiT("Hämtar skärmbilder…")) + '</p>';
+  const operation = stepRepairContext();
+  void loadReviewScreenshots(activeReviewModel, activeReview, { all: true })
+    .then(() => {
+      if (operation.current()) renderStepRepairGallery();
+    }).catch(error => {
+      if (operation.current()) {
+        $("stepRepairGallery").innerHTML = '<p role="alert">' +
+          escapeHtml(error.message || "Skärmbilderna kunde inte läsas in.") +
+          '</p>';
+      }
+    });
 }
 
 $("captureStepRepairScreenshot").addEventListener("click", async () => {
@@ -5558,7 +5982,7 @@ $("applyStepRepair").addEventListener("click", async () => {
   stepRepairState = null;
   reviewAutoSave.schedule();
   renderReview();
-  show("Stegets skärmbild har reparerats.");
+  show(uiT("review.screenshotRepaired"));
 });
 
 $("stepRepairDialog").addEventListener("close", () => {
@@ -5776,7 +6200,7 @@ async function closeAnnotationEditor(options = {}) {
     await saveActiveReview({ render: false, announce: false });
     await reviewSaveQueue.flush();
   } else {
-    $("annotationStatus").textContent = "Sparar annoteringar.";
+    $("annotationStatus").textContent = uiT("review.annotationSaving");
     await flushReviewPersistence();
   }
   annotationEditorState = null;
@@ -6057,7 +6481,7 @@ function renderStoredReviewFallback(error) {
   });
   list.setAttribute("aria-rowcount", String(stored.length));
   const reason = String(error?.message || "okänt renderingsfel");
-  show(`Stegen visas i säkert läge. Renderingsfel: ${reason}`, true);
+  show(uiTf("review.renderFallback", { reason }), true);
   console.error("Review rendering fallback", error);
 }
 
@@ -6288,7 +6712,7 @@ function setFormattingSelect(select, value, mixed) {
   if (mixed) {
     const option = document.createElement("option");
     option.value = "";
-    option.textContent = "Blandat";
+    option.textContent = uiT("review.mixed");
     option.dataset.mixedFormat = "true";
     select.prepend(option);
     select.value = "";
@@ -6370,11 +6794,31 @@ function renderReviewContent() {
   const documentPresentations = documentInstructionPresentationsByTask();
   const screenshotQualities = screenshotQualityByTask();
   const progress = globalThis.T9Review.progress(activeReview);
+  const visibleNavigationTasks = renderReviewStepNavigation(tasks, documentPresentations);
+  const activeStepId = activeReviewSelection.activeId || activeReviewSelection.selectedIds[0];
+  if (activeStepId && visibleNavigationTasks.length &&
+      !visibleNavigationTasks.some(task => task.taskId === activeStepId)) {
+    activeReviewSelection = globalThis.T9ReviewSelection.reduce(
+      activeReviewSelection,
+      { type: "select", id: visibleNavigationTasks[0].taskId },
+      reviewTaskIds()
+    );
+  }
+  $("reviewStepWorkspace").dataset.layout = reviewStepLayout;
+  $("reviewStepLayoutToggle").setAttribute("aria-pressed", String(reviewStepLayout === "focus"));
+  $("reviewStepLayoutToggle").textContent = reviewStepLayout === "focus"
+    ? reviewStepUiLabels()[6] : reviewStepUiLabels()[7];
+  $("reviewStepLayoutToggle").title = $("reviewStepLayoutToggle").textContent;
   list.innerHTML = "";
 
   $("reviewProgressBar").style.width = `${progress}%`;
   $("reviewProgress").setAttribute("aria-valuenow", String(progress));
-  list.setAttribute("aria-rowcount", String(tasks.length));
+  const visibleCount = reviewStepFilter === "all" ? tasks.length
+    : tasks.filter(task => reviewStepFilter === "approved" ? task.approved
+      : reviewStepFilter === "edited" ? reviewStepStatusLabel(task) === reviewStepUiLabels()[9]
+      : reviewStepStatusLabel(task) === reviewStepUiLabels()[10]).length;
+  list.setAttribute("aria-rowcount", String(reviewStepLayout === "focus"
+    ? Math.min(1, visibleCount) : visibleCount));
   renderReviewAttention(tasks);
   $("reviewFooterText").textContent =
     annotationChangesPending
@@ -6397,6 +6841,8 @@ function renderReviewContent() {
       : userEdited ? uiT("Ändrad") : uiT("Ej granskat");
     card.dataset.reviewTaskId = task.taskId;
     card.dataset.reviewState = reviewState;
+    card.dataset.reviewFilterState = reviewState === "approved" ? "approved"
+      : reviewState === "edited" ? "edited" : "pending";
     card.setAttribute("role", "row");
     card.setAttribute("aria-rowindex", String(visibleIndex + 1));
     card.setAttribute("aria-label",
@@ -6435,13 +6881,18 @@ function renderReviewContent() {
         <div id="review-instruction-preview-${visibleIndex}"
           class="review-instruction-preview" data-field="instruction"
           data-instruction-preview tabindex="0">${instructionRunsHtml(instructionPresentation.runs)}</div>
-        ${knowledgeExplanationMarkup(task)}
+        ${knowledgeExplanationMarkup(task)
+          ? `<details class="review-knowledge-disclosure"><summary>${escapeHtml(({ "sv-SE": "Förklaring", "en-US": "Explanation", "fr-FR": "Explication", "de-DE": "Erklärung", "es-ES": "Explicación", "da-DK": "Forklaring", "fi-FI": "Selitys", "nb-NO": "Forklaring" })[activeDocumentLanguage()] || "Explanation")}</summary>${knowledgeExplanationMarkup(task)}</details>`
+          : ""}
+        ${processQualityMarkup(task)}
+        <div data-external-knowledge-slot>${externalKnowledgeMarkupForTask(task.taskId)}</div>
         <div class="instruction-format-toolbar" data-instruction-format-toolbar hidden
           role="toolbar" aria-label="${uiT("a11y.textFormatting")}">
           <button type="button" class="secondary" data-instruction-format="bold"
             aria-label="${uiT("a11y.bold")}" aria-pressed="false"><strong>F</strong></button>
           <button type="button" class="secondary" data-instruction-format="italic"
             aria-label="${uiT("a11y.italic")}" aria-pressed="false"><em>K</em></button>
+          <details class="review-advanced-formatting"><summary>${escapeHtml(reviewAdvancedFormattingLabel())}</summary><div class="review-advanced-format-options">
           <label>Typsnitt<select data-instruction-font>
             ${globalThis.T9TextFormat.FONT_FAMILIES.map(font =>
               `<option value="${escapeHtml(font)}" ${font === "Arial" ? "selected" : ""}>${escapeHtml(font)}</option>`).join("")}
@@ -6458,6 +6909,7 @@ function renderReviewContent() {
             ${globalThis.T9TextFormat.COLORS.map(color =>
               `<option value="${color.value}" style="background:${color.value};color:${["#000000", "#0F4C81", "#008C95", "#C50F1F", "#107C10", "#CA5010"].includes(color.value) ? "#FFFFFF" : "#000000"}">${escapeHtml(color.name)}</option>`).join("")}
           </select></label>
+          </div></details>
         </div>
         <textarea id="review-instruction-${visibleIndex}" data-edit-field="instruction" hidden
           aria-label="${uiTf("a11y.instruction", { step: visibleIndex + 1 })}"
@@ -6484,6 +6936,7 @@ function renderReviewContent() {
               aria-label="${uiT("a11y.bold")}" aria-pressed="false"><strong>F</strong></button>
             <button type="button" class="secondary" data-comment-format="italic"
               aria-label="${uiT("a11y.italic")}" aria-pressed="false"><em>K</em></button>
+            <details class="review-advanced-formatting"><summary>${escapeHtml(reviewAdvancedFormattingLabel())}</summary><div class="review-advanced-format-options">
             <label>Typsnitt<select data-comment-font>
               ${globalThis.T9TextFormat.FONT_FAMILIES.map(font =>
                 `<option value="${escapeHtml(font)}">${escapeHtml(font)}</option>`).join("")}
@@ -6500,6 +6953,7 @@ function renderReviewContent() {
               ${globalThis.T9TextFormat.COLORS.map(color =>
                 `<option value="${color.value}">${escapeHtml(color.name)}</option>`).join("")}
             </select></label>
+            </div></details>
           </div>
           <textarea id="review-comment-${visibleIndex}" data-field="userComment" data-edit-field="userComment" hidden
             data-original-value="${escapeHtml(generatedComment)}"
@@ -6554,6 +7008,11 @@ function renderReviewContent() {
                 alt="Skärmbild ${imageIndex + 1} för steg ${visibleIndex + 1}">
               <svg class="review-annotation-layer" aria-hidden="true"></svg>
             </div>
+            ${task.screenshotEvidence?.relation === "subsequent-captured-page-state" &&
+              image.path === task.screenshotEvidence.screenshotRef &&
+              image.path === (task.selectedScreenshotAssetId || task.screenshot)
+              ? `<p class="review-related-screenshot-note">${escapeHtml(
+                task.screenshotEvidence.caption || "")}</p>` : ""}
             <button data-action="annotate" class="secondary review-annotate-button"
               aria-label="${uiTf("a11y.editImage", { image: imageIndex + 1, step: visibleIndex + 1 })}">Redigera bild</button>
             ${images.length > 1 ? `<button data-action="select-screenshot"
@@ -6582,6 +7041,17 @@ function renderReviewContent() {
               aria-label="${uiTf("a11y.addAfter", { step: visibleIndex + 1 })}">Lägg till efter</button>
             <button data-action="repair-step" class="secondary"
               aria-label="${uiTf("a11y.changeImage", { step: visibleIndex + 1 })}">Byt bild</button>
+            <button data-action="split-step" class="secondary"
+              aria-label="Dela steg ${visibleIndex + 1} vid markören">Dela vid markören</button>
+            <button data-action="move-up" class="secondary"
+              ${actualIndex === 0 ? "disabled" : ""}
+              aria-label="Flytta steg ${visibleIndex + 1} uppåt">Flytta upp</button>
+            <button data-action="move-down" class="secondary"
+              ${actualIndex >= activeReview.tasks.length - 1 ? "disabled" : ""}
+              aria-label="Flytta steg ${visibleIndex + 1} nedåt">Flytta ned</button>
+            <button data-action="regenerate-step" class="secondary"
+              ${!activeReviewSession || !activeReviewModel ? "disabled" : ""}
+              aria-label="Regenerera steg ${visibleIndex + 1}">Regenerera det här steget</button>
             <button data-action="reset-instruction" class="secondary"
               ${task.fieldProvenance?.instruction === "user-edited" ? "" : "disabled"}
               aria-label="${uiTf("a11y.resetInstruction", { step: visibleIndex + 1 })}">Återställ text</button>
@@ -6921,6 +7391,30 @@ function renderReviewContent() {
     card.querySelector('[data-action="repair-step"]')
       .addEventListener("click", () => openStepRepair(actualIndex));
 
+    card.querySelector('[data-action="split-step"]')
+      .addEventListener("click", () => {
+        activateProcessOverviewTask(task.taskId, false);
+        splitSelectedReviewTask();
+      });
+
+    card.querySelector('[data-action="move-up"]')
+      .addEventListener("click", () => {
+        activateProcessOverviewTask(task.taskId, false);
+        moveReviewTasksByOffset(-1, task.taskId);
+      });
+
+    card.querySelector('[data-action="move-down"]')
+      .addEventListener("click", () => {
+        activateProcessOverviewTask(task.taskId, false);
+        moveReviewTasksByOffset(1, task.taskId);
+      });
+
+    card.querySelector('[data-action="regenerate-step"]')
+      .addEventListener("click", () => {
+        activateProcessOverviewTask(task.taskId, false);
+        runReviewRegeneration([task.taskId]);
+      });
+
     card.querySelector('[data-action="reset-instruction"]')
       .addEventListener("click", () => {
         globalThis.T9Review.resetTaskField(activeReview, actualIndex, "instruction", {
@@ -6941,7 +7435,7 @@ function renderReviewContent() {
           }
         );
         if (!result.ok) {
-          show("Skärmbilden har annoteringar. Ta bort eller byt annoteringarna först.", true);
+          show(uiT("review.screenshotAnnotationBlock"), true);
           return;
         }
         reviewAutoSave.schedule();
@@ -6989,6 +7483,33 @@ function renderReviewContent() {
   applyReviewSelection();
 }
 
+function processQualityMarkup(task) {
+  const codes = [...new Set(task?.processValidation?.codes || [])];
+  if (!codes.length) return "";
+  const locale = activeDocumentLanguage();
+  const text = {
+    "sv-SE": { heading: "Kontrollera steget", instruction: "Instruktionen blev vag eller generell.", context: "Fält eller registrerat värde saknas i steget.", pageContext: "Åtgärden saknar observerad sidkontext.", outcome: "Ändringen observerades, men affärsresultatet verifierades inte.", criticalOutcome: "Inspelningen visar inte det slutförda resultatet av åtgärden.", coverage: "En inspelad åtgärd saknar ett dokumenterat steg.", ambiguousKnowledge: "Flera moduler matchar åtgärden. Kontrollera rätt process innan du godkänner steget.", other: "Steget behöver granskas mot inspelningen." },
+    "en-US": { heading: "Review this step", instruction: "The instruction is vague or generic.", context: "The field or entered value is missing from the step.", pageContext: "The action is missing observed page context.", outcome: "The change was observed, but the business outcome was not verified.", criticalOutcome: "The recording does not show the completed result of this action.", coverage: "A recorded action has no corresponding documented step.", ambiguousKnowledge: "More than one module matches this action. Confirm the correct process before approving the step.", other: "Check this step against the recording." },
+    "fr-FR": { heading: "Vérifier cette étape", instruction: "L’instruction est vague ou générique.", context: "Le champ ou la valeur saisie manque dans l’étape.", pageContext: "Le contexte de la page où l’action a été observée manque.", outcome: "La modification a été observée, mais le résultat métier n’a pas été vérifié.", criticalOutcome: "L’enregistrement ne montre pas le résultat final de cette action.", coverage: "Une action enregistrée n’a pas d’étape documentée correspondante.", ambiguousKnowledge: "Plusieurs modules correspondent à cette action. Confirmez le bon processus avant d’approuver l’étape.", other: "Vérifiez cette étape par rapport à l’enregistrement." },
+    "de-DE": { heading: "Schritt überprüfen", instruction: "Die Anweisung ist vage oder allgemein.", context: "Das Feld oder der eingegebene Wert fehlt im Schritt.", pageContext: "Der beobachtete Seitenkontext für diese Aktion fehlt.", outcome: "Die Änderung wurde beobachtet, das Geschäftsergebnis jedoch nicht überprüft.", criticalOutcome: "Die Aufzeichnung zeigt nicht das abgeschlossene Ergebnis dieser Aktion.", coverage: "Zu einer aufgezeichneten Aktion fehlt ein dokumentierter Schritt.", ambiguousKnowledge: "Mehrere Module passen zu dieser Aktion. Bestätigen Sie den richtigen Prozess, bevor Sie den Schritt freigeben.", other: "Prüfen Sie diesen Schritt anhand der Aufzeichnung." },
+    "es-ES": { heading: "Revisar este paso", instruction: "La instrucción es vaga o genérica.", context: "Falta el campo o el valor introducido en el paso.", pageContext: "Falta el contexto observado de la página para esta acción.", outcome: "Se observó el cambio, pero no se verificó el resultado empresarial.", criticalOutcome: "La grabación no muestra el resultado final de esta acción.", coverage: "Una acción grabada no tiene un paso documentado correspondiente.", ambiguousKnowledge: "Varios módulos coinciden con esta acción. Confirma el proceso correcto antes de aprobar el paso.", other: "Comprueba este paso con la grabación." },
+    "da-DK": { heading: "Kontrollér dette trin", instruction: "Instruktionen er vag eller generisk.", context: "Feltet eller den indtastede værdi mangler i trinnet.", pageContext: "Den observerede sidekontekst for handlingen mangler.", outcome: "Ændringen blev observeret, men forretningsresultatet blev ikke bekræftet.", criticalOutcome: "Optagelsen viser ikke det fuldførte resultat af handlingen.", coverage: "En optaget handling mangler et tilsvarende dokumenteret trin.", ambiguousKnowledge: "Flere moduler passer til handlingen. Kontrollér den rigtige proces, før trinnet godkendes.", other: "Kontrollér trinnet i forhold til optagelsen." },
+    "fi-FI": { heading: "Tarkista tämä vaihe", instruction: "Ohje on epämääräinen tai yleinen.", context: "Kenttä tai syötetty arvo puuttuu vaiheesta.", pageContext: "Toiminnon havaittu sivukonteksti puuttuu.", outcome: "Muutos havaittiin, mutta liiketoiminnan tulosta ei vahvistettu.", criticalOutcome: "Tallenne ei osoita toiminnon valmistunutta tulosta.", coverage: "Tallennetulta toiminnolta puuttuu vastaava dokumentoitu vaihe.", ambiguousKnowledge: "Useampi moduuli vastaa tätä toimintoa. Vahvista oikea prosessi ennen vaiheen hyväksymistä.", other: "Tarkista vaihe tallenteesta." },
+    "nb-NO": { heading: "Kontroller dette trinnet", instruction: "Instruksjonen er vag eller generell.", context: "Feltet eller den angitte verdien mangler i trinnet.", pageContext: "Den observerte sidekonteksten for handlingen mangler.", outcome: "Endringen ble observert, men forretningsresultatet ble ikke bekreftet.", criticalOutcome: "Innspillingen viser ikke det fullførte resultatet av handlingen.", coverage: "En registrert handling mangler et tilsvarende dokumentert trinn.", ambiguousKnowledge: "Flere moduler passer til handlingen. Bekreft riktig prosess før du godkjenner trinnet.", other: "Kontroller trinnet mot innspillingen." }
+  }[locale] || { heading: "Review this step", instruction: "The instruction is vague or generic.", context: "The field or entered value is missing from the step.", pageContext: "The action is missing observed page context.", outcome: "The change was observed, but the business outcome was not verified.", criticalOutcome: "The recording does not show the completed result of this action.", coverage: "A recorded action has no corresponding documented step.", ambiguousKnowledge: "More than one module matches this action. Confirm the correct process before approving the step.", other: "Check this step against the recording." };
+  const messageByCode = {
+    "BCPS-PROCESS-GUARD-INSTRUCTION-001": text.instruction,
+    "BCPS-PROCESS-GUARD-CONTEXT-001": text.context,
+    "BCPS-PROCESS-GUARD-CONTEXT-002": text.pageContext,
+    "BCPS-PROCESS-GUARD-RESULT-002": text.outcome,
+    "BCPS-PROCESS-GUARD-RESULT-003": text.criticalOutcome,
+    "BCPS-PROCESS-GUARD-COVERAGE-001": text.coverage,
+    "BCPS-PROCESS-GUARD-KNOWLEDGE-001": text.ambiguousKnowledge
+  };
+  const messages = codes.map(code => messageByCode[code] || text.other);
+  return `<aside class="review-process-quality" role="note"><strong>${escapeHtml(text.heading)}</strong><ul>${messages.map(message => `<li>${escapeHtml(message)}</li>`).join("")}</ul></aside>`;
+}
+
 function renderReview() {
   try {
     renderReviewContent();
@@ -7033,75 +7554,54 @@ function renderProcessOverview() {
     const displayedLevel = hasSemanticAnalysis ? activeProcessMapLevel : "procedure";
     $("editProcessMapNode").disabled = displayedLevel === "procedure" || !selectedProcessMapNodeId;
     $("editProcessMapRelationship").disabled = displayedLevel === "procedure" || !selectedProcessMapNodeId;
-    const english = String(applicationSettings.uiLocale || "").startsWith("en");
+    const mapLocale = globalThis.T9UiI18n.normalizeLocale(applicationSettings.uiLocale || "sv-SE");
     processMapZoom = globalThis.T9ProcessMapViewport.normalize(processMapZoom);
     $("processMapZoomValue").textContent = `${processMapZoom}%`;
     $("processMapZoomOut").disabled = processMapZoom <=
       globalThis.T9ProcessMapViewport.MIN_ZOOM;
     $("processMapZoomIn").disabled = processMapZoom >=
       globalThis.T9ProcessMapViewport.MAX_ZOOM;
-    $("processMapFit").textContent = english ? "Fit" : "Anpassa";
+    $("processMapFit").textContent = uiT("processMap.fit");
     processMapDirection = normalizedProcessMapDirection(processMapDirection);
     $("processMapDirection").value = processMapDirection;
-    $("processMapDirection").options[0].textContent = english ? "Automatic" : "Automatisk";
-    $("processMapDirection").options[1].textContent = english ? "Vertical" : "Lodrät";
-    $("processMapDirection").title = english ? "Choose process map direction" :
-      "Välj processkartans riktning";
-    document.querySelector('label[for="processMapDirection"]').textContent = english
-      ? "Layout" : "Layout";
+    $("processMapDirection").options[0].textContent = uiT("processMap.automatic");
+    $("processMapDirection").options[1].textContent = uiT("processMap.vertical");
+    $("processMapDirection").title = uiT("processMap.direction");
+    document.querySelector('label[for="processMapDirection"]').textContent = uiT("processMap.layout");
     processMapTheme = globalThis.T9ProcessMapTheme.normalize(processMapTheme);
     const themeSelect = $("processMapTheme");
     themeSelect.innerHTML = globalThis.T9ProcessMapTheme.list(
       applicationSettings.uiLocale || "sv-SE"
     ).map(theme => `<option value="${theme.id}">${theme.label}</option>`).join("");
     themeSelect.value = processMapTheme;
-    themeSelect.title = english ? "Choose the process map visual theme" :
-      "Välj processkartans visuella tema";
-    document.querySelector('label[for="processMapTheme"]').textContent = english ? "Theme" : "Tema";
+    themeSelect.title = uiT("processMap.chooseTheme");
+    document.querySelector('label[for="processMapTheme"]').textContent = uiT("processMap.theme");
     processMapDensity = normalizedProcessMapDensity(processMapDensity);
     $("processMapDensity").value = processMapDensity;
-    $("processMapDensity").options[0].textContent = "Standard";
-    $("processMapDensity").options[1].textContent = english ? "Compact" : "Kompakt";
-    $("processMapDensity").title = english ? "Choose process map density" :
-      "Välj processkartans täthet";
+    $("processMapDensity").options[0].textContent = uiT("processMap.standard");
+    $("processMapDensity").options[1].textContent = uiT("processMap.compact");
+    $("processMapDensity").title = uiT("processMap.chooseDensity");
     $("processMapIncludeReferences").checked = processMapIncludeReferences;
-    $("processMapIncludeReferences").parentElement.lastChild.textContent = english
-      ? " Show reference suggestions" : " Visa referensförslag";
+    $("processMapIncludeReferences").parentElement.lastChild.textContent = ` ${uiT("processMap.references")}`;
     $("processMapIncludeReferences").parentElement.hidden = displayedLevel === "procedure";
-    document.querySelector('label[for="processMapDensity"]').textContent = english
-      ? "Density" : "Täthet";
+    document.querySelector('label[for="processMapDensity"]').textContent = uiT("processMap.density");
     const focusActive = $("processOverviewDisclosure").classList.contains("process-map-focus");
     $("processMapFocus").textContent = focusActive
-      ? (english ? "Close focus" : "Stäng fokus")
-      : (english ? "Focus mode" : "Fokusläge");
+      ? uiT("processMap.closeFocus") : uiT("processMap.focus");
     $("processMapFocus").title = focusActive
-      ? (english ? "Close process map focus mode (Esc)" : "Stäng processkartans fokusläge (Esc)")
-      : (english ? "Show the process map in focus mode" : "Visa processkartan i fokusläge");
+      ? `${uiT("processMap.closeFocus")} (Esc)` : uiT("processMap.focus");
     $("processMapFocus").setAttribute("aria-pressed", String(focusActive));
-    document.querySelector('label[for="processMapSearch"]').textContent = english
-      ? "Search map" : "Sök i kartan";
-    $("processMapSearch").placeholder = english
-      ? "Step, document or action" : "Steg, dokument eller åtgärd";
-    $("processMapSearchNext").textContent = english ? "Next match" : "Nästa träff";
-    $("processMapFit").title = english ? "Fit the complete process map to the available width" :
-      "Anpassa hela processkartan till tillgänglig bredd";
-    $("processMapZoomOut").title = english ? "Zoom out the process map" :
-      "Zooma ut processkartan";
-    $("processMapZoomIn").title = english ? "Zoom in the process map" :
-      "Zooma in processkartan";
-    $("processMapResetZoom").title = english ? "Reset the process map to 100%" :
-      "Återställ processkartan till 100 %";
-    $("processMapViewportControls").setAttribute("aria-label", english
-      ? "Process map size" : "Processkartans storlek");
-    const descriptions = english ? {
-      business: "High-level business flow derived from the confirmed process classification.",
-      businessCentral: "Business Central documents and actions compared with the reference process.",
-      procedure: "The actual recorded user procedure. Select an activity to open its Review step."
-    } : {
-      business: "Övergripande affärsflöde från den bekräftade processklassificeringen.",
-      businessCentral: "Business Central-dokument och åtgärder jämförda med referensprocessen.",
-      procedure: "Den faktiska inspelade användarproceduren. Välj en aktivitet för att öppna granskningssteget."
-    };
+    document.querySelector('label[for="processMapSearch"]').textContent = uiT("processMap.search");
+    $("processMapSearch").placeholder = uiT("processMap.searchPlaceholder");
+    $("processMapSearchNext").textContent = uiT("processMap.nextMatch");
+    $("processMapFit").title = uiT("processMap.fitTitle");
+    $("processMapZoomOut").title = uiT("processMap.zoomOut");
+    $("processMapZoomIn").title = uiT("processMap.zoomIn");
+    $("processMapResetZoom").title = uiT("processMap.resetZoom");
+    $("processMapViewportControls").setAttribute("aria-label", uiT("processMap.size"));
+    const descriptions = { business: uiT("processMap.business"),
+      businessCentral: uiT("processMap.businessCentral"),
+      procedure: uiT("processMap.procedure") };
     $("processMapDescription").textContent = descriptions[displayedLevel];
     $("processMapLegend").hidden = displayedLevel === "procedure";
     for (const item of $("processMapLegend").querySelectorAll(
@@ -7116,7 +7616,7 @@ function renderProcessOverview() {
         reviewTasks: processMapReviewTasks,
         procedureModel
       }, activeProcessMapLevel, { includeReferences: processMapIncludeReferences,
-        includeBoundaries: true, locale: english ? "en-US" : "sv-SE" });
+        includeBoundaries: true, locale: mapLocale });
     activeProcessBaseModel = model;
     activeProcessModel = displayedLevel === "procedure" ? model :
       globalThis.T9ProcessMapRelationshipOverrides.apply(
@@ -7145,9 +7645,9 @@ function renderProcessOverview() {
       density: processMapDensity,
       reorderable: displayedLevel !== "procedure"
     });
-    const layoutNames = english ? { horizontal: "Horizontal", serpentine: "Multi-row",
-      branched: "Branched", vertical: "Vertical" } : { horizontal: "Vågrät",
-      serpentine: "Flera rader", branched: "Förgrenad", vertical: "Lodrät" };
+    const layoutNames = { horizontal: uiT("processMap.horizontal"),
+      serpentine: uiT("processMap.multiRow"), branched: uiT("processMap.branched"),
+      vertical: uiT("processMap.verticalLayout") };
     $("processMapLayoutStatus").textContent = layoutNames[processMapRender.layoutStrategy] || "";
     applyProcessMapSearch(false);
   } catch (error) {
@@ -7303,7 +7803,7 @@ async function saveActiveReview(options = {}) {
     annotationChangesPending = false;
   }
   if (options.announce !== false && currentSession) {
-    show(`Granskningen för "${savedSession.name}" har sparats.`);
+    show(uiTf("review.savedNotice", { title: savedSession.name }));
   }
   if (options.render !== false && unchanged) renderReview();
   else if (options.render === false && currentSession) {
@@ -7311,7 +7811,7 @@ async function saveActiveReview(options = {}) {
       ? "Alla ändringar är sparade."
       : "Nyare ändringar väntar på att sparas.";
     if (annotationEditorState && unchanged) {
-      $("annotationStatus").textContent = "Annoteringarna är sparade.";
+  $("annotationStatus").textContent = uiT("review.annotationSaved");
     }
   }
 }
@@ -7334,44 +7834,31 @@ function resetReviewSurfaceForOpen() {
 
 async function openReview(session) {
   reviewReturnFocus = document.activeElement;
-  show(`Förbereder granskning av "${session.name}"...`);
+  show(uiTf("review.preparing", { title: session.name }));
 
   activeReviewSession = session;
+  activeReviewModel = null;
+  reviewOpenRequestId = `${session.id}:${Date.now()}:${Math.random()}`;
+  const requestId = reviewOpenRequestId;
+  externalKnowledgeSuggestionState = { sessionId: session.id, requestId: "",
+    status: "idle", requestCount: 0, suggestions: [] };
   annotationChangesPending = false;
   updateFilenamePreview();
-  activeReviewModel = await prepareSessionModel(session, { includeExternalKnowledge: true });
-
   const existing = await send({
     type: "T9_GET_REVIEW",
     sessionId: session.id
   });
-
-  const replaceEmptyReview = existing.review &&
-    (!Array.isArray(existing.review.tasks) || existing.review.tasks.length === 0) &&
-    activeReviewModel.businessTasks.length > 0;
-  const replacePlaceholderReview = existing.review &&
-    !String(existing.review.documentFields?.expectedResult ||
-      existing.review.expectedResult || "").trim() &&
-    (globalThis.T9Review.isGeneratedPlaceholderOnly(existing.review) ||
-      globalThis.T9Review.hasGeneratedLookupSearchLeak(existing.review) ||
-      globalThis.T9Review.hasGeneratedMenuPathLeak(existing.review) ||
-      globalThis.T9Review.hasGeneratedCloseScreenshotLeak(existing.review) ||
-      globalThis.T9Review.hasGeneratedSearchInputLeak(existing.review) ||
-      globalThis.T9Review.hasGeneratedSearchResultTypeLeak(existing.review) ||
-      globalThis.T9Review.hasGeneratedSearchEvidenceDrift(existing.review,
-        activeReviewModel.businessTasks)) &&
-    activeReviewModel.businessTasks.length > 0;
-  activeReview = existing.review && !replaceEmptyReview && !replacePlaceholderReview
+  if (reviewOpenRequestId !== requestId || activeReviewSession !== session) return;
+  if (existing?.ok === false) throw new Error(existing.error || "Granskningen kunde inte läsas.");
+  activeReview = existing.review
     ? globalThis.T9Review.normalizeReview({
-        ...existing.review,
-        tasks: globalThis.T9Review.normalizeTasks(existing.review.tasks)
-      })
-    : globalThis.T9Review.replaceGeneratedReview(
-      session,
-      activeReviewModel.businessTasks,
-      existing.review
-    );
+      ...existing.review,
+      tasks: globalThis.T9Review.normalizeTasks(existing.review.tasks)
+    })
+    : globalThis.T9Review.replaceGeneratedReview(session, [], null);
   activeReviewSelection = globalThis.T9ReviewSelection.create();
+  reviewStepFilter = "all";
+  reviewStepLayout = "focus";
   activeReviewEdit = null;
   activeProcessMapLevel = "businessCentral";
   processMapIncludeReferences = false;
@@ -7409,6 +7896,78 @@ async function openReview(session) {
   $("closeReview").focus();
   updateFilenamePreview();
   show("");
+  const loadStatus = $("reviewLoadStatus");
+  if (loadStatus) {
+    loadStatus.hidden = true;
+    loadStatus.textContent = "";
+  }
+  void completeReviewOpen(session, existing.review, activeReview.updatedAt,
+    requestId);
+}
+
+async function completeReviewOpen(session, storedReview, initialUpdatedAt,
+  requestId) {
+  const isCurrent = () => reviewOpenRequestId === requestId &&
+    activeReviewSession === session && $("reviewOverlay").classList.contains("open");
+  const loadStatus = $("reviewLoadStatus");
+  try {
+    if (loadStatus) {
+      loadStatus.hidden = false;
+      loadStatus.textContent = uiT("review.loadingContext");
+    }
+    const model = await prepareSessionModel(session);
+    if (!isCurrent()) return;
+    activeReviewModel = model;
+
+    const reviewUnchanged = activeReview?.updatedAt === initialUpdatedAt;
+    const emptyReview = storedReview &&
+      (!Array.isArray(storedReview.tasks) || storedReview.tasks.length === 0);
+    const placeholderReview = storedReview &&
+      !String(storedReview.documentFields?.expectedResult ||
+        storedReview.expectedResult || "").trim() &&
+      (globalThis.T9Review.isGeneratedPlaceholderOnly(activeReview) ||
+        globalThis.T9Review.hasGeneratedLookupSearchLeak(activeReview) ||
+        globalThis.T9Review.hasGeneratedMenuPathLeak(activeReview) ||
+        globalThis.T9Review.hasGeneratedCloseScreenshotLeak(activeReview) ||
+        globalThis.T9Review.hasGeneratedSearchInputLeak(activeReview) ||
+        globalThis.T9Review.hasGeneratedSearchResultTypeLeak(activeReview) ||
+        globalThis.T9Review.hasGeneratedSearchEvidenceDrift(activeReview,
+          model.businessTasks));
+    if (!storedReview || (reviewUnchanged && model.businessTasks.length > 0 &&
+        (emptyReview || placeholderReview))) {
+      activeReview = globalThis.T9Review.replaceGeneratedReview(session,
+        model.businessTasks, storedReview || activeReview);
+    }
+
+    // Keep text usable immediately, then add screenshots/context when ready.
+    // Wait until an in-progress inline edit is finished before rerendering.
+    while (isCurrent() && activeReviewEdit) {
+      await new Promise(resolve => setTimeout(resolve, 250));
+    }
+    if (!isCurrent()) return;
+    renderReview();
+    applyReviewZoom({ persist: false, preservePosition: true });
+    void loadReviewScreenshots(model, activeReview).then(() => {
+      if (!isCurrent()) return;
+      renderReview();
+      applyReviewZoom({ persist: false, preservePosition: true });
+    }).catch(error => {
+      if (isCurrent()) show(error.message ||
+        "Skärmbilderna kunde inte läsas in.", true);
+    });
+    if (loadStatus) {
+      loadStatus.hidden = true;
+      loadStatus.textContent = "";
+    }
+    startExternalKnowledgeSuggestions(activeReviewModel, session.id);
+  } catch (error) {
+    if (!isCurrent()) return;
+    if (loadStatus) {
+      loadStatus.hidden = false;
+      loadStatus.textContent = uiT("review.openedPartial");
+    }
+    show(error.message || "Skärmbilder och processkontext kunde inte läsas in.", true);
+  }
 }
 
 async function closeReview() {
@@ -7443,6 +8002,10 @@ async function closeReview() {
   activeReviewSession = null;
   activeReview = null;
   activeReviewModel = null;
+  reviewOpenRequestId = "";
+  externalKnowledgeSuggestionState = { sessionId: "", requestId: "",
+    status: "idle", requestCount: 0, suggestions: [] };
+  updateExternalKnowledgeReviewUi();
   activeProcessModel = null;
   activeProcessAnalysis = null;
   processAnalysisRequest = null;
@@ -7498,7 +8061,7 @@ async function loadSessions() {
     const cell = document.createElement("td");
     cell.colSpan = 5;
     cell.className = "muted";
-    cell.textContent = "Inga sessioner har sparats ännu.";
+    cell.textContent = uiT("library.emptySessions");
     row.appendChild(cell);
     body.appendChild(row);
     return;
@@ -7508,15 +8071,15 @@ async function loadSessions() {
 
     row.innerHTML = `
       <td>${escapeHtml(session.name)}</td>
-      <td>${new Date(session.startedAt).toLocaleString("sv-SE")}</td>
+      <td>${new Date(session.startedAt).toLocaleString(applicationSettings.uiLocale)}</td>
       <td>${session.eventCount || 0}</td>
-      <td>${session.status === "recording" ? "Pågår" : "Avslutad"}</td>
+      <td>${escapeHtml(uiT(session.status === "recording" ? "session.recording" : "session.ended"))}</td>
       <td></td>`;
 
     const actions = row.lastElementChild;
 
     const reviewButton = document.createElement("button");
-    reviewButton.textContent = "Granska";
+    reviewButton.textContent = uiT("library.review");
     reviewButton.className = "primary";
     reviewButton.disabled = session.status === "recording";
     reviewButton.addEventListener("click", async () => {
@@ -7531,7 +8094,7 @@ async function loadSessions() {
     });
 
     const exportButton = document.createElement("button");
-    exportButton.textContent = "Exportera ZIP";
+    exportButton.textContent = uiT("library.exportZip");
     exportButton.className = "secondary";
     exportButton.addEventListener("click", async () => {
       exportButton.disabled = true;
@@ -7546,10 +8109,10 @@ async function loadSessions() {
     });
 
     const deleteButton = document.createElement("button");
-    deleteButton.textContent = "Ta bort";
+    deleteButton.textContent = uiT("common.delete");
     deleteButton.className = "danger";
     deleteButton.addEventListener("click", async () => {
-      if (!confirm(`Ta bort sessionen "${session.name}"?`)) return;
+      if (!confirm(uiTf("library.deleteSessionConfirm", { name: session.name }))) return;
       deleteButton.disabled = true;
       try {
         const response = await send({
@@ -7603,6 +8166,55 @@ $("advancedToggle").addEventListener("click", () => {
 
 $("reviewWorkspaceTab").addEventListener("click", () => {
   switchWorkspace("review");
+});
+$("reviewStepFilter").addEventListener("change", event => {
+  reviewStepFilter = event.target.value;
+  const visible = renderReviewStepNavigation(currentReviewStepTasks,
+    currentReviewStepPresentations);
+  $("reviewList").setAttribute("aria-rowcount", String(reviewStepLayout === "focus"
+    ? Math.min(1, visible.length) : visible.length));
+  const activeId = activeReviewSelection.activeId || activeReviewSelection.selectedIds[0];
+  if (visible.length && !visible.some(task => task.taskId === activeId)) {
+    activateProcessOverviewTask(visible[0].taskId, false);
+  }
+});
+$("reviewStepNavigation").addEventListener("keydown", event => {
+  const current = event.target.closest?.("[data-step-id]");
+  if (!current || !["ArrowDown", "ArrowUp", "Home", "End"].includes(event.key)) return;
+  const items = [...$("reviewStepNavigation").querySelectorAll("[data-step-id]")];
+  const index = items.indexOf(current);
+  const nextIndex = event.key === "Home" ? 0 : event.key === "End" ? items.length - 1
+    : (index + (event.key === "ArrowDown" ? 1 : -1) + items.length) % items.length;
+  const next = items[nextIndex];
+  if (!next) return;
+  event.preventDefault();
+  if (event.shiftKey || event.ctrlKey || event.metaKey) {
+    dispatchReviewSelection({
+      type: "select",
+      id: next.dataset.stepId,
+      range: event.shiftKey,
+      additive: event.ctrlKey || event.metaKey
+    });
+  } else {
+    activateProcessOverviewTask(next.dataset.stepId, false);
+  }
+  next.focus();
+});
+$("reviewStepLayoutToggle").addEventListener("click", event => {
+  reviewStepLayout = reviewStepLayout === "focus" ? "all" : "focus";
+  const workspace = $("reviewStepWorkspace");
+  workspace.dataset.layout = reviewStepLayout;
+  event.currentTarget.setAttribute("aria-pressed", String(reviewStepLayout === "focus"));
+  event.currentTarget.textContent = reviewStepLayout === "focus"
+    ? reviewStepUiLabels()[6] : reviewStepUiLabels()[7];
+  event.currentTarget.title = event.currentTarget.textContent;
+  const matchedCount = $("reviewStepNavigation").querySelectorAll("[data-step-id]").length;
+  $("reviewList").setAttribute("aria-rowcount", String(reviewStepLayout === "focus"
+    ? Math.min(1, matchedCount) : matchedCount));
+  if (reviewStepLayout === "focus") {
+    const current = activeReviewSelection.activeId || activeReviewSelection.selectedIds[0];
+    if (current) $("reviewStepNavigation").querySelector(`[data-step-id="${CSS.escape(current)}"]`)?.scrollIntoView({ block: "nearest" });
+  }
 });
 $("documentWorkspaceTab").addEventListener("click", () => {
   switchWorkspace("document");
@@ -7664,13 +8276,16 @@ $("saveProcessMapNode").addEventListener("click", () => {
 function processRelationshipId(edge, index) {
   return edge.transitionId || edge.relationshipId || `relationship:${index}`;
 }
+function processMapEditorLabel(key, fallback) {
+  const locale = applicationSettings.uiLocale || "sv-SE";
+  return globalThis.T9UiI18n?.translate?.(`processMapEditor.${key}`, locale) || fallback;
+}
 function populateProcessRelationshipEditor(relationshipId = "") {
-  const english = String(applicationSettings.uiLocale || "").startsWith("en");
   const outgoing = (activeProcessModel?.transitions || []).map((edge, index) => ({
     ...edge, editorId: processRelationshipId(edge, index)
   })).filter(edge => edge.fromNodeId === selectedProcessMapNodeId);
   const existing = $("processMapRelationshipExisting");
-  existing.replaceChildren(...[{ editorId: "", label: english ? "New connection" : "Ny koppling" },
+  existing.replaceChildren(...[{ editorId: "", label: processMapEditorLabel("newConnection", "Ny koppling") },
     ...outgoing.map(edge => ({ editorId: edge.editorId, label: edge.label ||
       `${edge.transitionType}: ${activeProcessModel.nodes.find(node =>
         node.nodeId === edge.toNodeId)?.title || edge.toNodeId}` }))].map(item => {
@@ -7812,11 +8427,12 @@ function applyProcessMapSearch(advance) {
     action.classList.toggle("process-map-search-match", matchIndexes.has(index));
     action.classList.toggle("process-map-search-current", index === processMapSearchCursor);
   });
-  const english = String(applicationSettings.uiLocale || "").startsWith("en");
   const hasQuery = Boolean($("processMapSearch").value.trim());
+  const resultLabel = matches.length === 1
+    ? processMapEditorLabel("match", "träff")
+    : processMapEditorLabel("matches", "träffar");
   $("processMapSearchResult").textContent = hasQuery
-    ? `${matches.length} ${english ? (matches.length === 1 ? "match" : "matches") :
-      (matches.length === 1 ? "träff" : "träffar")}` : "";
+    ? `${matches.length} ${resultLabel}` : "";
   $("processMapSearchNext").disabled = !matches.length;
   if (processMapSearchCursor >= 0) {
     actions[processMapSearchCursor]?.scrollIntoView?.({ block: "nearest", inline: "center" });
@@ -8277,7 +8893,7 @@ $("annotationSurface").addEventListener("keydown", event => {
     );
     releaseActiveAnnotationPointer();
     renderActiveAnnotation();
-    $("annotationStatus").textContent = "Pågående markering avbröts.";
+    $("annotationStatus").textContent = uiT("review.annotationCanceled");
   }
 });
 let reviewWordExportPending = false;
@@ -8343,7 +8959,7 @@ globalThis.T9ReviewToolbar.bind($("reviewToolbar"), (command, button) => {
     activeReviewSelection = globalThis.T9ReviewSelection.create();
     reviewAutoSave.schedule();
     renderReview();
-    show("Dokumentstrukturen återställdes till genererad struktur.");
+  show(uiT("review.structureReset"));
   } else if (command === "move-up") {
     moveReviewTasksByOffset(
       -1,
@@ -8485,7 +9101,7 @@ $("resetExpectedResult").addEventListener("click", () => {
   reviewAutoSave.schedule();
   invalidateDocumentWorkspace();
   applyReviewToolbarState();
-  show("Förväntat resultat återställdes till standardtexten.");
+  show(uiT("review.expectedReset"));
 });
 $("reviewMoreActions").addEventListener("toggle", event => {
   event.currentTarget.querySelector("summary").setAttribute(
@@ -8665,7 +9281,7 @@ globalThis.T9ReviewAccessibility.bindDialog($("reviewDialog"), async () => {
     const target = annotationEditorState
       ? $("annotationStatus")
       : $("reviewFooterText");
-    target.textContent = `Det gick inte att stänga: ${error.message}`;
+    target.textContent = uiTf("review.closeFailed", { detail: error.message });
   }
 });
 $("reviewOverlay").addEventListener("click", event => {
@@ -8740,7 +9356,7 @@ $("librarySearch").addEventListener("keydown", event => {
   event.preventDefault();
   event.currentTarget.value = "";
   renderDocumentLibrary();
-  $("libraryStatus").textContent += " Sökningen rensades.";
+  $("libraryStatus").textContent += ` ${uiT("library.searchCleared")}`;
 });
 $("libraryResults").addEventListener("click", async event => {
   const card = event.target.closest?.("[data-library-project-id]");
@@ -8785,15 +9401,13 @@ $("libraryResults").addEventListener("click", async event => {
     record.projectId === projectId);
   const bugReport = session.recordingPurpose === "bug-report" ||
     libraryRecord?.metadata?.recordingPurpose === "bug-report";
-  try {
-    await updateDocumentLibraryRecord(projectId, {
+  // Opening a document must not wait for a whole-library storage write.
+  // Persist the activity marker in the background while the review loads.
+  updateDocumentLibraryRecord(projectId, {
       lastOpenedAt: new Date().toISOString(),
       recentActivity: [bugReport
-        ? "Felrapporten öppnades" : "Dokumentationen öppnades"]
-    }, { render: false });
-  } catch (error) {
-    show(error.message, true);
-  }
+        ? uiT("library.recentBugReport") : uiT("library.recentDocument")]
+    }, { render: false }).catch(error => show(error.message, true));
   try {
     if (bugReport) {
       await send({ type: "T9_OPEN_TECHNICAL_REPORT",
@@ -8817,14 +9431,14 @@ $("libraryResults").addEventListener("keydown", event => {
       documentLibrarySelection, matches.map(record => record.projectId)
     );
     renderDocumentLibrarySelection();
-    renderLibraryBatchToolbar(`${matches.length} dokument valdes.`);
+    renderLibraryBatchToolbar(uiTf("library.selectedCount", { count: matches.length }));
     return;
   }
   if (event.key === "Escape" && documentLibrarySelection.selectedIds.length) {
     event.preventDefault();
     documentLibrarySelection = globalThis.T9DocumentBatchOperations.clear();
     renderDocumentLibrarySelection();
-    renderLibraryBatchToolbar("Dokumentvalet rensades.");
+    renderLibraryBatchToolbar(uiT("library.selectionCleared"));
     return;
   }
   if (event.key === " " && event.target === card) {
@@ -8865,19 +9479,18 @@ $("libraryBatchSelectAll").addEventListener("click", () => {
     documentLibrarySelection, matches.map(record => record.projectId)
   );
   renderDocumentLibrarySelection();
-  renderLibraryBatchToolbar(`${matches.length} dokument valdes.`);
+  renderLibraryBatchToolbar(uiTf("library.selectedCount", { count: matches.length }));
 });
 $("libraryBatchClear").addEventListener("click", () => {
   documentLibrarySelection = globalThis.T9DocumentBatchOperations.clear();
   renderDocumentLibrarySelection();
   $("librarySearch").focus();
-  $("libraryBatchStatus").textContent = "Dokumentvalet rensades.";
+  $("libraryBatchStatus").textContent = uiT("library.selectionCleared");
 });
 $("libraryBatchExport").addEventListener("click", async () => {
   const records = selectedLibraryRecords();
   if (!records.length || !confirm(
-    `Exportera ${records.length} dokument till separata Word-filer? ` +
-    "Dokumenten ändras inte. Välj Avbryt för att stoppa innan exporten startar."
+    uiTf("library.confirmWordExport", { count: records.length })
   )) return;
   const progress = $("libraryBatchProgress");
   const controls = [...$("libraryBatchToolbar").querySelectorAll("button")];
@@ -8905,7 +9518,8 @@ $("libraryBatchExport").addEventListener("click", async () => {
         const record = recordsById.get(value.projectId);
         if (value.phase === "starting") {
           $("libraryBatchStatus").textContent =
-            `Exporterar ${value.completed + 1} av ${value.total}: ${record.title}.`;
+            uiTf("library.exportProgress", { current: value.completed + 1,
+              total: value.total, title: record.title });
         } else {
           exported = value.completed;
           progress.value = exported;
@@ -8913,13 +9527,14 @@ $("libraryBatchExport").addEventListener("click", async () => {
       } }
     );
     exported = result.completed;
-    $("libraryBatchStatus").textContent =
-      `✓ ${exported} dokument exporterades.`;
+    $("libraryBatchStatus").textContent = uiTf("library.exportComplete",
+      { count: exported });
   } catch (error) {
     exported = Number.isInteger(error.completed) ? error.completed : exported;
-    show(`${error.message} ${exported} dokument exporterades innan felet.`, true);
-    $("libraryBatchStatus").textContent =
-      `Exporten avbröts efter ${exported} av ${records.length} dokument.`;
+    show(`${error.message} ${uiTf("library.exportFailureDetail",
+      { count: exported })}`, true);
+    $("libraryBatchStatus").textContent = uiTf("library.exportAborted",
+      { current: exported, total: records.length });
   } finally {
     controls.forEach(button => { button.disabled = false; });
     progress.hidden = true;
@@ -8931,7 +9546,7 @@ $("libraryBatchFavourite").addEventListener("click", async () => {
     const result = globalThis.T9DocumentBatchOperations.favourite(
       documentLibraryRecords, documentLibrarySelection, true
     );
-    await commitLibraryBatch(result, "✓ {count} dokument favoritmarkerades.");
+    await commitLibraryBatch(result, "library.batchFavourited");
   } catch (error) {
     show(error.message, true);
   }
@@ -8948,29 +9563,27 @@ $("libraryBatchMetadataDialog").addEventListener("close", async event => {
       documentLibraryRecords, documentLibrarySelection,
       batchMetadataOperation()
     );
-    await commitLibraryBatch(result, "✓ Metadata uppdaterades för {count} dokument.");
+    await commitLibraryBatch(result, "library.batchMetadataUpdated");
   } catch (error) {
     show(error.message, true);
   }
 });
 $("libraryBatchArchive").addEventListener("click", async () => {
   const count = documentLibrarySelection.selectedIds.length;
-  if (!confirm(`Arkivera ${count} dokument? Åtgärden ändrar endast metadata ` +
-      "och kan återställas via metadataredigering.")) return;
+  if (!confirm(uiTf("library.archiveCountConfirm", { count }))) return;
   try {
     const result = globalThis.T9DocumentBatchOperations.apply(
       documentLibraryRecords, documentLibrarySelection, { type: "archive",
         fields: { archived: { selected: true, value: true } } }
     );
-    await commitLibraryBatch(result, "✓ {count} dokument arkiverades.");
+    await commitLibraryBatch(result, "library.batchArchived");
   } catch (error) {
     show(error.message, true);
   }
 });
 $("libraryBatchDelete").addEventListener("click", async () => {
   const count = documentLibrarySelection.selectedIds.length;
-  if (!confirm(`Ta bort ${count} dokument och tillhörande sessioner permanent? ` +
-      "Åtgärden kan inte ångras.")) return;
+  if (!confirm(uiTf("library.deleteCountConfirm", { count }))) return;
   const plan = globalThis.T9DocumentBatchOperations.remove(
     documentLibraryRecords, documentLibrarySelection
   );
@@ -8980,16 +9593,18 @@ $("libraryBatchDelete").addEventListener("click", async () => {
       const response = await send({ type: "T9_DELETE_SESSION",
         sessionId: projectId });
       if (!response?.ok) throw new Error(
-        response?.error || "Ett dokument kunde inte tas bort."
+        response?.error || uiT("library.deleteFailed")
       );
       deleted += 1;
     }
     documentLibrarySelection = globalThis.T9DocumentBatchOperations.clear();
     await loadSessions();
-    $("libraryBatchStatus").textContent = `✓ ${deleted} dokument togs bort.`;
+    $("libraryBatchStatus").textContent = uiTf("library.batchDeleteComplete",
+      { count: deleted });
   } catch (error) {
     await loadSessions();
-    show(`${error.message} ${deleted} dokument hann tas bort.`, true);
+    show(`${error.message} ${uiTf("library.batchDeleteFailure",
+      { count: deleted })}`, true);
   }
 });
 $("exportFileNamePattern").addEventListener("input", updateFilenamePreview);

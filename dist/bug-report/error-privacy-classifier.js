@@ -12,7 +12,7 @@
   const emailPattern = /\b[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}\b/giu;
   const bearerPattern = /\b(Bearer\s+)[A-Z0-9._~+/=-]+/giu;
   const namedSecretPattern = /\b(access[_ -]?token|refresh[_ -]?token|client[_ -]?secret|api[_ -]?key|password)\b\s*[:=]\s*([^\s,;&]+)/giu;
-  const querySecretPattern = /([?&](?:access_token|refresh_token|client_secret|api_key|code)=)[^&#\s]+/giu;
+  const querySecretPattern = /([?&#](?:access_token|refresh_token|id_token|client_secret|api_key|api-key|code|assertion|password|secret|token|sig|signature)=)[^&#\s]+/giu;
   const matches = (pattern, value) => { pattern.lastIndex = 0;
     const result = pattern.test(value); pattern.lastIndex = 0; return result; };
   const keyPart = path => String(path).split(".").pop().replace(/\[\d+\]/gu, "")
@@ -44,7 +44,9 @@
       sanitize(item, `${path}[${index}]`));
     if (typeof value === "object") return Object.keys(value).reduce((out, key) => {
       if (key === "rawEvidence") return out;
-      out[key] = sanitize(value[key], path ? `${path}.${key}` : key);
+      Object.defineProperty(out, key, { value: sanitize(value[key],
+        path ? `${path}.${key}` : key), enumerable: true, configurable: true,
+        writable: true });
       return out;
     }, {});
     return value;

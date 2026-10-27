@@ -27,6 +27,23 @@
     };
   }
 
+  function incrementEventCounts(current = {}, event = {}) {
+    const eventTypeCounts = { ...(current.eventTypeCounts || {}) };
+    const eventCategoryCounts = { ...(current.eventCategoryCounts || {}) };
+    const type = text(event.type, 60) || "other";
+    const category = text(event.category, 60) || "other";
+    eventTypeCounts[type] = nonNegative(eventTypeCounts[type]) + 1;
+    eventCategoryCounts[category] = nonNegative(eventCategoryCounts[category]) + 1;
+    return { eventTypeCounts, eventCategoryCounts };
+  }
+
+  function persistenceFailure({ rawEventPersisted = false,
+    canonicalEventPersisted = false, occurredAt = new Date().toISOString() } = {}) {
+    const operation = !rawEventPersisted ? "raw-event-write" :
+      !canonicalEventPersisted ? "raw-to-canonical-event" : "event-evidence-update";
+    return { status: "persistence-error", occurredAt, operation };
+  }
+
   function freshSessionDebug(activeSessionId) {
     return {
       activeSessionId: String(activeSessionId || ""), eventCount: 0, lastEvent: null,
@@ -48,10 +65,23 @@
       captured: nonNegative(screenshotStats.captured),
       pending: nonNegative(sessionDebug.screenshotQueueLength),
       errors: nonNegative(screenshotStats.errors),
+      dropped: nonNegative(screenshotStats.dropped),
       lastCapturedAt: text(sessionDebug.lastScreenshotAt, 40)
     };
     const warnings = [];
 
+    if (sessionDebug.recordingHealth?.status === "license-error") {
+      warnings.push({ code: "license-blocked",
+        message: "Licensen eller tenantkontexten hindrar fortsatt inspelning." });
+    }
+    if (sessionDebug.recordingHealth?.status === "persistence-error") {
+      warnings.push({ code: "capture-write-error",
+        message: "En inspelningshändelse kunde inte sparas säkert. Inspelningen kan vara ofullständig." });
+    }
+    if (sessionDebug.recordingHealth?.status === "truncated") {
+      warnings.push({ code: "recording-truncated",
+        message: "Maximalt antal händelser har uppnåtts." });
+    }
     if (!connected) warnings.push({ code: "bc-not-connected",
       message: "Kontakten med Business Central är inte bekräftad." });
     if (eventCount === 0) warnings.push({ code: "no-events-yet",
@@ -59,16 +89,16 @@
     if (screenshots.errors > 0 || sessionDebug.lastScreenshotError) {
       warnings.push({ code: "screenshot-error",
         message: "Minst en skärmbild kunde inte tas." });
+    } else if (screenshots.dropped > 0 &&
+        session?.settings?.captureScreenshots !== false &&
+        session?.settings?.screenshotMode !== "none") {
+      warnings.push({ code: "screenshot-dropped",
+        message: "Några skärmbilder kunde inte sparas. Vissa steg kan sakna bild." });
     } else if (eventCount > 0 && session?.settings?.captureScreenshots !== false &&
         screenshots.captured === 0 && screenshots.pending === 0) {
       warnings.push({ code: "no-screenshots-yet",
         message: "Händelser registreras, men ingen skärmbild har sparats ännu." });
     }
-    if (sessionDebug.recordingHealth?.status === "truncated") {
-      warnings.push({ code: "recording-truncated",
-        message: "Maximalt antal händelser har uppnåtts." });
-    }
-
     return {
       eventCount,
       connected: Boolean(connected),
@@ -82,5 +112,6 @@
     };
   }
 
-  return { derive, freshSessionDebug, latestAction };
+  return { derive, freshSessionDebug, incrementEventCounts, latestAction,
+    persistenceFailure };
 });

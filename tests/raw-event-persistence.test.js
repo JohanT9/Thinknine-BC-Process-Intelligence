@@ -224,8 +224,10 @@ function rawMemoryAdapter(initial = null) {
   assert(background.indexOf("rawEventStore.appendRawEvent(") <
     background.indexOf("T9BCUIIdentification.identify(event"),
   "Raw evidence must be durable before Canonical interpretation.");
-  assert(background.indexOf("canonicalStore.append(") <
-    background.indexOf("saveEvents(recordingId, events)"),
+  assert(background.includes(
+    "const legacyEvents = (canonicalRecording?.events || []).map(event => event.raw)") &&
+    background.indexOf("canonicalStore.append(") <
+    background.indexOf("saveEvents(state.sessionId, legacyEvents)"),
   "Canonical projection must precede legacy compatibility projection.");
   assert(content.includes("`${sessionId}:${sourceFrameId}:${localSequence}`"));
   assert(!background.includes("previous?.signature"));

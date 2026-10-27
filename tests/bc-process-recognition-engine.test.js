@@ -225,8 +225,15 @@ taxonomyPageViews.forEach(({ document, view }) => {
   assert.strictEqual(evidence.observations[0].document?.view?.viewType, view.viewType,
     `BC page ${view.pageObjectId} must retain its card/list/worksheet semantics.`);
 });
-taxonomySeed.documents.forEach(document => assert(document.pageViews.length > 0,
-  `${document.id} must have at least one canonical Business Central view.`));
+taxonomySeed.documents.forEach(document => assert(document.pageViews.length > 0 ||
+  document.metadata?.pageViewGap,
+  `${document.id} must have a canonical Business Central view or a recorded verification gap.`));
+assert.deepStrictEqual(taxonomySeed.documents.filter(document => !document.pageViews.length)
+  .map(document => document.id).sort(), [
+  "document:bank-statement-lines", "document:quality-inspection",
+  "document:quality-inspection-generation-rule", "document:quality-inspection-result",
+  "document:quality-inspection-template", "document:quality-test"
+], "New documents without verified page views must be recorded explicitly.");
 taxonomySeed.documents.filter(document => document.primaryDomainId).forEach(document =>
   document.pageViews.forEach(view => {
     const result = engine.recognize(synthetic(`domain-owner-${view.pageObjectId}`, [

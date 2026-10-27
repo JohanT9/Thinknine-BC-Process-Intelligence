@@ -30,7 +30,7 @@ const quantity = run([
     value: { normalized: "500" }, screenshotAssetId: "shot-2" })
 ]);
 assert.strictEqual(quantity.schemaVersion, 1);
-assert.strictEqual(quantity.groupingVersion, "1.24.0");
+assert.strictEqual(quantity.groupingVersion, "1.29.0");
 // Regression: event 125 from the user's September 7 recording. No usable name or identity.
 const legacyBack = run([event("legacy125", "activation", {
   rawEventType: "click", actionIdentification: { caption: "\uE72B" },
@@ -117,7 +117,9 @@ const lookupEvents = [
 const customer = run(lookupEvents);
 assert.strictEqual(customer.groups.length, 1);
 assert.strictEqual(customer.groups[0].groupKind, "lookup-interaction");
-assert.strictEqual(customer.groups[0].primaryEventId, "normalized:l4");
+// The lookup field is the primary context; the chosen record stays as evidence.
+assert.strictEqual(customer.groups[0].primaryEventId, "normalized:l1");
+assert.ok(customer.groups[0].normalizedEventIds.includes("normalized:l4"));
 assert.ok(customer.groups[0].groupingReason.includes("selected-record"));
 assert.ok(customer.groups[0].groupingReason.includes("resulting-control-value-match"));
 assert.deepStrictEqual(customer.groups[0].frameContexts.map(value => value.frameId),
@@ -189,7 +191,8 @@ assert.strictEqual(rowSelection.groups[0].groupKind, "row-interaction",
   "a selected Business Central list row must retain its distinct interaction type");
 const rowSemanticInput = semantic.processStepGroups(rowSelection.groups)[0];
 assert.strictEqual(rowSemanticInput.actionType, "SelectRecord");
-assert.strictEqual(rowSemanticInput.displayText, "V\u00e4lj posten **30043**.");
+assert.strictEqual(rowSemanticInput.displayText,
+  "V\u00e4lj posten **30043** p\u00e5 sidan **Sales Order**.");
 
 const toggle = run([event("t1", "toggle-change", {
   controlIdentification: { identity: { value: "Blocked" }, type: "checkbox" },
@@ -279,7 +282,7 @@ const technicalMenuAction = semantic.processStepGroups(
   technicalMenuHierarchy.groups)[0];
 assert.strictEqual(technicalMenuAction.actionType, "RunActionPath");
 assert.strictEqual(technicalMenuAction.displayText,
-  "V\u00e4lj **Posting** \u2192 **Post**.");
+  "V\u00e4lj **Posting** \u2192 **Post** p\u00e5 sidan **Sales Order**.");
 assert.deepStrictEqual(technicalMenuAction.actionPath, ["Posting", "Post"]);
 
 const repeatedIntentionalActivation = run([
@@ -534,7 +537,11 @@ for (const caption of ['Actions Product A Product B', 'Åtgärder', 'Toiminnot',
 for (const kind of ['value-change', 'toggle-change']) {
   const searchField = event('search-field', kind, { rawEventType: 'field-change',
     controlIdentification: {role:'textbox',caption:'Tell me what you want to do.'}, value:{normalized:'sales ord'} });
-  assert.equal(run([searchField]).groups.length, 0);
+  // Tell Me search terms are preserved as their own step (combined with the
+  // opened list when one follows).
+  const searchGroups = run([searchField]).groups;
+  assert.equal(searchGroups.length, kind === 'value-change' ? 1 : 0);
+  if (searchGroups.length) assert.ok(JSON.stringify(searchGroups[0]).includes("sales ord"));
   assert.equal(run([{...searchField,controlIdentification:{role:'textbox',caption:'Description'}}]).groups.length, 1);
 }
 

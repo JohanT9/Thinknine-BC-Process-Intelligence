@@ -6,6 +6,21 @@
   "use strict";
 
   const text = value => typeof value === "string" ? value.trim() : "";
+  const normalizeInstruction = value => text(value).normalize("NFKC")
+    .toLowerCase().replace(/[^\p{L}\p{N}]+/gu, " ").trim();
+  const GENERIC_INSTRUCTIONS = new Set([
+    "utför uppgiften", "perform the task", "complete the task",
+    "effectuez la tâche", "complete la tarea", "führen sie die aufgabe aus",
+    "udfør opgaven", "suorita tehtävä", "utfør oppgaven",
+    "välj värde", "choose a value", "select a value",
+    "choisissez une valeur", "sélectionnez une valeur",
+    "wählen sie einen wert", "seleccione un valor", "elija un valor",
+    "vælg en værdi", "valitse arvo", "velg en verdi"
+  ]);
+
+  function isGenericInstruction(value) {
+    return !text(value) || GENERIC_INSTRUCTIONS.has(normalizeInstruction(value));
+  }
 
   function screenshots(task) {
     if (Array.isArray(task?.screenshots) && task.screenshots.length) {
@@ -16,8 +31,7 @@
 
   function isGeneratedPlaceholder(task, review) {
     const instruction = text(task?.instruction) || text(task?.description);
-    const placeholder = !instruction ||
-      ["Utför uppgiften.", "Perform the task."].includes(instruction);
+    const placeholder = isGenericInstruction(instruction);
     if (task?.taskType !== "Unclassified" || !placeholder) return false;
 
     if (task.approved || text(task.userComment) || task.stepOverride ||
@@ -35,5 +49,5 @@
   const isVisible = (task, review) =>
     !task?.deleted && !isGeneratedPlaceholder(task, review);
 
-  return { isGeneratedPlaceholder, isVisible };
+  return { isGenericInstruction, isGeneratedPlaceholder, isVisible };
 });

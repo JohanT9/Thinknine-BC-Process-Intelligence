@@ -34,6 +34,7 @@
     const tokenResponse = await fetch(`https://login.microsoftonline.com/${
       encodeURIComponent(configuration.tenantId)}/oauth2/v2.0/token`, {
       method: "POST", headers: { "Content-Type": "application/x-www-form-urlencoded" },
+      signal: AbortSignal.timeout(10000),
       body: new URLSearchParams({ client_id: configuration.clientId,
         grant_type: "authorization_code", code, redirect_uri: redirectUri,
         code_verifier: verifier, scope: configuration.scope }) });
@@ -49,4 +50,3 @@
   function clear() { tokens.clear(); }
   return { authenticate, clear };
 });
-

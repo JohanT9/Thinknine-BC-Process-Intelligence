@@ -52,8 +52,8 @@
     "Instruktionerna följer de benämningar som visades i Business Central."
   ]);
   const DEFAULT_EXPECTED_RESULT =
-    "Processen är genomförd enligt arbetsgången och de registrerade " +
-    "ändringarna har sparats i Business Central.";
+    "Stegen beskriver det observerade arbetsflödet. Kontrollera dokumentets " +
+    "status och bekräfta om processen kräver bokföring i Business Central.";
 
   function clone(value) {
     if (value === undefined) return undefined;
@@ -328,6 +328,8 @@
       const explanationSource = officialSources.find(source =>
         source.sourceUri.toLowerCase().includes(`/${explanationLanguage.toLowerCase()}/`)) ||
         officialSources[0];
+      const explanationSourceLanguage = explanationSource?.sourceLanguage || "";
+      const sourceLanguageMatches = explanationSource?.sourceMatchesExplanationLanguage;
       const explanationOverrides = task.contextualExplanationOverrides || {};
       const hasExplanationOverride = Object.prototype.hasOwnProperty.call(
         explanationOverrides, explanationLanguage);
@@ -399,6 +401,28 @@
             preserveUserText: true
           }] : [])]
         });
+        if (explanationSource && sourceLanguageMatches === false &&
+            explanationSourceLanguage) {
+          const sourceLanguageLabels = {
+            "sv-SE": { English: "Källan är på engelska", Swedish: "Källan är på svenska", French: "Källan är på franska", German: "Källan är på tyska", Spanish: "Källan är på spanska", Danish: "Källan är på danska", Finnish: "Källan är på finska", Norwegian: "Källan är på norska" },
+            "en-US": { English: "Source is in English", Swedish: "Source is in Swedish", French: "Source is in French", German: "Source is in German", Spanish: "Source is in Spanish", Danish: "Source is in Danish", Finnish: "Source is in Finnish", Norwegian: "Source is in Norwegian" },
+            "fr-FR": { English: "Source en anglais", Swedish: "Source en suédois", French: "Source en français", German: "Source en allemand", Spanish: "Source en espagnol", Danish: "Source en danois", Finnish: "Source en finnois", Norwegian: "Source en norvégien" },
+            "de-DE": { English: "Quelle auf Englisch", Swedish: "Quelle auf Schwedisch", French: "Quelle auf Französisch", German: "Quelle auf Deutsch", Spanish: "Quelle auf Spanisch", Danish: "Quelle auf Dänisch", Finnish: "Quelle auf Finnisch", Norwegian: "Quelle auf Norwegisch" },
+            "es-ES": { English: "Fuente en inglés", Swedish: "Fuente en sueco", French: "Fuente en francés", German: "Fuente en alemán", Spanish: "Fuente en español", Danish: "Fuente en danés", Finnish: "Fuente en finés", Norwegian: "Fuente en noruego" },
+            "da-DK": { English: "Kilden er på engelsk", Swedish: "Kilden er på svensk", French: "Kilden er på fransk", German: "Kilden er på tysk", Spanish: "Kilden er på spansk", Danish: "Kilden er på dansk", Finnish: "Kilden er på finsk", Norwegian: "Kilden er på norsk" },
+            "fi-FI": { English: "Lähde on englanniksi", Swedish: "Lähde on ruotsiksi", French: "Lähde on ranskaksi", German: "Lähde on saksaksi", Spanish: "Lähde on espanjaksi", Danish: "Lähde on tanskaksi", Finnish: "Lähde on suomeksi", Norwegian: "Lähde on norjaksi" },
+            "nb-NO": { English: "Kilden er på engelsk", Swedish: "Kilden er på svensk", French: "Kilden er på fransk", German: "Kilden er på tysk", Spanish: "Kilden er på spansk", Danish: "Kilden er på dansk", Finnish: "Kilden er på finsk", Norwegian: "Kilden er på norsk" }
+          };
+          const sourceLabel = sourceLanguageLabels[explanationLanguage]?.[explanationSourceLanguage] ||
+            sourceLanguageLabels["en-US"][explanationSourceLanguage];
+          const sourceBlock = blocks.find(block =>
+            block.blockId === `block:knowledge-explanation:${stepKey}`);
+          if (sourceLabel && sourceBlock) sourceBlock.blocks.unshift({
+            blockId: `block:knowledge-source-language:${stepKey}`,
+            kind: "paragraph", text: sourceLabel, sourceRef,
+            provenance: "knowledge", preserveUserText: true
+          });
+        }
       }
 
       const resultVerification = object(task.resultVerification);
@@ -406,12 +430,16 @@
         text(resultVerification.summary);
       const observedStatus = text(resultVerification.status);
       if (observedResult && ["verified", "error"].includes(observedStatus)) {
+        const observedResultLabel = languages.translate("Observed result",
+          explanationLanguage, "Observerat resultat");
+        const observedErrorLabel = languages.translate("Observed error",
+          explanationLanguage, "Observerat fel");
         blocks.push({
           blockId: `block:observed-result:${stepKey}`,
           kind: "callout",
           calloutType: "information",
-          label: observedStatus === "error" ? "Observerat fel" :
-            "Observerat resultat",
+          label: observedStatus === "error" ? observedErrorLabel :
+            observedResultLabel,
           sourceRef,
           provenance: "system-derived",
           resultVerification: clone(resultVerification),
@@ -494,6 +522,23 @@
       }
 
       const screenshots = screenshotRefs(task);
+      if (task.screenshotEvidence?.relation ===
+          "subsequent-captured-page-state" &&
+          text(task.screenshotEvidence.screenshotRef) &&
+          text(task.selectedScreenshotAssetId || task.screenshot) ===
+            text(task.screenshotEvidence.screenshotRef) &&
+          text(task.screenshotEvidence.caption)) {
+        blocks.push({
+          blockId: `block:screenshot-evidence-note:${stepKey}`,
+          kind: "paragraph",
+          text: task.screenshotEvidence.caption,
+          provenance: "derived",
+        sourceRef: { ...sourceRef,
+          screenshotRef: task.screenshotEvidence.screenshotRef,
+          screenshotEventNo: task.screenshotEvidence.eventNo,
+            screenshotEventGap: task.screenshotEvidence.eventGap }
+        });
+      }
       if (!screenshots.length) {
         diagnostics.push(diagnostic(
           "missing-screenshot",

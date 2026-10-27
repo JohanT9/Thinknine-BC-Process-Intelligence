@@ -6,16 +6,27 @@
     ? require("./knowledge-domain") : root.T9KnowledgeDomain;
   const refs = typeof module === "object" && module.exports
     ? require("./source-reference") : root.T9SourceReference;
+  const taskVisibility = typeof module === "object" && module.exports
+    ? require("../review/task-visibility") : root.T9ReviewTaskVisibility;
   const processAnalysis = typeof module === "object" && module.exports
     ? require("./process-analysis-model") : root.T9ProcessAnalysisModel;
-  const api = factory(semantic, knowledge, refs, processAnalysis);
+  const api = factory(semantic, knowledge, refs, taskVisibility, processAnalysis);
   if (typeof module === "object" && module.exports) module.exports = api;
   root.T9SessionInterpretationPipeline = api;
 })(typeof globalThis !== "undefined" ? globalThis : this,
-function (semantic, knowledge, refs, processAnalysis) {
+function (semantic, knowledge, refs, taskVisibility, processAnalysis) {
   "use strict";
   const VERSION = "1.3.0";
   const unique = values => [...new Set((values || []).filter(Boolean))];
+
+  function isPlaceholderDominated(tasks = []) {
+    const values = Array.isArray(tasks) ? tasks : [];
+    const placeholders = values.filter(value =>
+      value.taskType === "Unclassified" && taskVisibility.isGenericInstruction(
+        value.instruction || value.description || "")).length;
+    return values.length > 0 && placeholders >= 3 &&
+      placeholders / values.length >= 0.25;
+  }
 
   function eventIndex(events = []) {
     const byCanonicalId = new Map();
@@ -24,6 +35,46 @@ function (semantic, knowledge, refs, processAnalysis) {
         event.canonicalSourceEventId, event);
     });
     return byCanonicalId;
+  }
+
+  function relatedScreenshotCaption(eventNo, eventGap, language = "en-US") {
+    const messages = {
+      "sv-SE": "Relaterad sidbild från senare i flödet (händelse {event}, {gap} händelser senare)",
+      "en-US": "Related page capture from later in the flow (event {event}, {gap} events later)",
+      "fr-FR": "Capture de page associée, prise plus tard dans le flux (événement {event}, {gap} événements après)",
+      "de-DE": "Zugehöriger Seitenstand aus dem späteren Ablauf (Ereignis {event}, {gap} Ereignisse später)",
+      "es-ES": "Captura de página relacionada posterior en el flujo (evento {event}, {gap} eventos después)",
+      "da-DK": "Relateret sidebillede fra et senere trin (hændelse {event}, {gap} hændelser senere)",
+      "fi-FI": "Liittyvä sivunäkymä myöhemmästä vaiheesta (tapahtuma {event}, {gap} tapahtumaa myöhemmin)",
+      "nb-NO": "Relatert sidebilde fra et senere trinn (hendelse {event}, {gap} hendelser senere)"
+    };
+    const template = messages[language] || messages[String(language).split("-")[0]] ||
+      messages["en-US"];
+    return template.replace("{event}", String(eventNo))
+      .replace("{gap}", String(eventGap));
+  }
+
+  function subsequentPageScreenshot(task, screenshots, maxEventGap = 10,
+    language = "en-US") {
+    if (!task || !screenshots || !/^(?:SearchAndOpenPage|Navigate|OpenPage)$/u
+      .test(String(task.taskType || task.semanticAction || ""))) return null;
+    const sourceNos = (task.sourceEventNos || []).map(Number)
+      .filter(Number.isSafeInteger);
+    if (!sourceNos.length) return null;
+    const lastSourceNo = Math.max(...sourceNos);
+    const screenshotEventNo = Object.keys(screenshots).map(Number)
+      .filter(eventNo => Number.isSafeInteger(eventNo) &&
+        eventNo > lastSourceNo && eventNo - lastSourceNo <= maxEventGap &&
+        screenshots[eventNo])
+      .sort((a, b) => a - b)[0];
+    if (!screenshotEventNo) return null;
+    return { screenshot: screenshots[screenshotEventNo],
+      screenshotEvidence: { eventNo: screenshotEventNo,
+        screenshotRef: screenshots[screenshotEventNo],
+        relation: "subsequent-captured-page-state",
+        eventGap: screenshotEventNo - lastSourceNo,
+        caption: relatedScreenshotCaption(screenshotEventNo,
+          screenshotEventNo - lastSourceNo, language) } };
   }
 
   function context(action, sourceEvents) {
@@ -117,7 +168,8 @@ function (semantic, knowledge, refs, processAnalysis) {
       sectionBoundaryAfter: Boolean(action.captureGuidance?.sectionBoundaryAfter),
       context: context(action, sourceEvents), automationId: "",
       reviewStatus: action.confidence < 0.85 ? "review-suggested" : "unreviewed",
-      confidence: action.confidence || 0.55 };
+      confidence: Number.isFinite(action.confidence)
+        ? Math.max(0, Math.min(1, action.confidence)) : 0.55 };
   }
 
   function applyRepositoryResolutions(tasks, repository, releaseId, inputLanguage = "") {
@@ -158,6 +210,15 @@ function (semantic, knowledge, refs, processAnalysis) {
       const pack = matched && repository.getRelease(releaseId)?.packs.find(item =>
         item.packId === selected.provenance.packId);
       const rule = pack?.rules.find(item => item.ruleId === ruleId);
+      const explanationContext = { ...task, entity: selected.entity,
+        knowledgePageCaption: task.pageCaption || task.context?.currentPageCaption || "",
+        actionCaption: task.actionCaption || "",
+        language: selected.provenance?.language || task.language ||
+          task.context?.language || inputLanguage || "en-US" };
+      const instruction = knowledge.localizedInstruction(rule,
+        explanationContext.language);
+      const contextualInstruction = knowledge.contextualInstruction?.(rule,
+        explanationContext) || "";
       return { ...task, taskType: selected.taskType, semanticAction: selected.semanticAction,
         entity: selected.entity, knowledgeRule: ruleId,
         knowledgePackId: selected.provenance.packId,
@@ -167,14 +228,18 @@ function (semantic, knowledge, refs, processAnalysis) {
         reviewSuggested: Number.isFinite(selected.confidence)
           ? selected.confidence < 0.85 : task.reviewSuggested,
         knowledgeResolution: resolution,
+        ...(contextualInstruction ? { contextualInstruction,
+          instruction: contextualInstruction, description: contextualInstruction,
+          semanticActionModel: task.semanticActionModel ? {
+            ...task.semanticActionModel, displayText: contextualInstruction
+          } : task.semanticActionModel } : {}),
         ...(() => {
-          const instruction = knowledge.localizedInstruction(rule,
-            selected.provenance?.language || task.language || task.context?.language || "en-US");
           return { ...(instruction ? { userDirective: instruction,
-            userDirectiveSourceIds: [...(rule.sourceIds || [])] } : {}),
-          ...(knowledge.explanationEligible(rule,
-            { ...task, entity: selected.entity }, [rule]) ? {
-            contextualExplanations: { ...knowledge.localizedExplanations(rule) },
+            userDirectiveSourceIds: [...(rule.sourceIds || [])] } : {
+              userDirective: undefined, userDirectiveSourceIds: [] }),
+          ...(knowledge.explanationEligible(rule, explanationContext, [rule]) ? {
+            contextualExplanations: { ...knowledge.localizedExplanations(rule,
+              explanationContext) },
             contextualExplanationRuleId: rule.ruleId,
             contextualExplanationConfidence: Number(rule.confidence),
             contextualExplanationSourceIds: [...(rule.sourceIds || [])],
@@ -233,7 +298,8 @@ function (semantic, knowledge, refs, processAnalysis) {
       const { candidate, found } = match;
       const rule = found.rule;
       return { ...task,
-        contextualExplanations: { ...knowledge.localizedExplanations(rule) },
+        contextualExplanations: { ...knowledge.localizedExplanations(rule,
+          candidate) },
         contextualExplanationRuleId: rule.ruleId,
         contextualExplanationConfidence: Number(rule.confidence),
         contextualExplanationSourceIds: [...(rule.sourceIds || [])],
@@ -245,7 +311,7 @@ function (semantic, knowledge, refs, processAnalysis) {
   }
 
   function applyReleaseFindings(result, input) {
-    const analysis = processAnalysis.build({
+    const baseAnalysis = processAnalysis.build({
       recordingId: input.session?.id, pipelineVersion: VERSION,
       normalizedEvents: result.normalizedEvents, stepGroups: result.stepGroups,
       semanticActions: result.semanticActions, businessTasks: result.businessTasks,
@@ -254,6 +320,12 @@ function (semantic, knowledge, refs, processAnalysis) {
       languagePolicy: input.languagePolicy,
       groupingDiagnostics: input.groupingDiagnostics
     });
+    const analysis = { ...baseAnalysis,
+      qualityGate: { ...baseAnalysis.qualityGate,
+        findings: [...(baseAnalysis.qualityGate?.findings || [])],
+        counts: { ...(baseAnalysis.qualityGate?.counts || {}) } },
+      decisions: { ...baseAnalysis.decisions,
+        stepGroups: [...(baseAnalysis.decisions?.stepGroups || [])] } };
     const findings = [
       ...(analysis.qualityGate?.findings || []),
       ...(analysis.contradictionAnalysis?.findings || [])
@@ -264,6 +336,47 @@ function (semantic, knowledge, refs, processAnalysis) {
       if (!byTask.has(taskId)) byTask.set(taskId, []);
       byTask.get(taskId).push(finding);
     };
+    const unresolvedGroups = new Map((analysis.decisions?.stepGroups || [])
+      .filter(decision => decision.outcome === "unresolved")
+      .map(decision => [String(decision.subjectId), decision]));
+    for (const finding of findings) {
+      if (finding.subjectType !== "step-group") continue;
+      const id = String(finding.subjectId || "");
+      unresolvedGroups.delete(id);
+    }
+    const groups = result.stepGroups || [];
+    unresolvedGroups.forEach((decision, groupId) => {
+      const group = groups.find(value => String(value.stepGroupId || "") === groupId);
+      if (!group || group.guidance?.ignored || group.status === "ignored") return;
+      const meaningful = (group.normalizedEvents || []).filter(event =>
+        !["status-message", "dialog-open", "dialog-close", "navigation"]
+          .includes(event.kind));
+      if (!meaningful.length) return;
+      const finding = { code: "BCPS-PROCESS-GUARD-COVERAGE-001",
+        severity: "review", subjectType: "step-group", subjectId: groupId,
+        evidenceRefs: [...(group.sourceEventIds || [])],
+        details: { invariant: "meaningful-observed-group-must-be-explained",
+          eventKinds: meaningful.map(event => event.kind),
+          reasonCode: decision.reasonCode },
+        provenance: { authorship: "derived", source: "session-interpretation-pipeline" } };
+      analysis.qualityGate.findings.push(finding);
+      analysis.qualityGate.counts.review += 1;
+      analysis.qualityGate.counts.total += 1;
+      if (analysis.qualityGate.status === "passed") analysis.qualityGate.status = "review-required";
+      analysis.decisions.stepGroups = analysis.decisions.stepGroups.map(value =>
+        String(value.subjectId) === groupId ? { ...value,
+          decisionCodes: [...(value.decisionCodes || []),
+          { code: "BCPS-PROCESS-COVERAGE-001", outcome: "unresolved",
+            domain: "coverage", registryVersion: "1.0.0" }] } : value);
+    });
+    analysis.releaseGate = { ...baseAnalysis.releaseGate,
+      status: analysis.qualityGate.counts.blocked ? "blocked" :
+        analysis.qualityGate.counts.review ? "review-required" :
+          baseAnalysis.releaseGate.status,
+      reviewFindingCount: analysis.qualityGate.counts.review +
+        (baseAnalysis.contradictionAnalysis?.counts?.review || 0),
+      blockingFindingCount: analysis.qualityGate.counts.blocked +
+        (baseAnalysis.contradictionAnalysis?.counts?.blocked || 0) };
     findings.forEach(finding => {
       if (finding.subjectType === "task") {
         add(String(finding.subjectId || ""), finding);
@@ -304,6 +417,9 @@ function (semantic, knowledge, refs, processAnalysis) {
     const tasks = repositoryTasks.map((value, index) => ({
       ...value, taskNo: index + 1,
       taskId: `${value.taskType || "Task"}:${refs.stableIdentity(value)}`,
+      ...(!value.screenshot ? subsequentPageScreenshot(value,
+        input.imagePaths, 10, input.language || input.session?.language ||
+          "en-US") || {} : {}),
       ...(!value.screenshot ? (() => {
         const evidence = new Set(value.sourceEventIds || []);
         const source = baseTasks.find(candidate => (candidate.sourceEventIds || [])
@@ -316,13 +432,7 @@ function (semantic, knowledge, refs, processAnalysis) {
       .map(decision => ({ ...decision,
         outputTaskId: decision.outputIndex == null
           ? null : tasks[decision.outputIndex]?.taskId || null }));
-    const placeholderCount = tasks.filter(value =>
-      value.taskType === "Unclassified" &&
-      (!String(value.instruction || "").trim() ||
-        String(value.instruction).trim() === "Utför uppgiften.")).length;
-    const placeholderDominated = placeholderCount >= 3 &&
-      placeholderCount / tasks.length >= 0.25;
-    if (placeholderDominated &&
+    if (isPlaceholderDominated(tasks) &&
         typeof services.compatibilityInterpret === "function") {
       const compatibility = services.compatibilityInterpret(input);
       if (compatibility?.businessTasks?.length) {
@@ -352,5 +462,7 @@ function (semantic, knowledge, refs, processAnalysis) {
       contextEvents: input.events || [], contextCandidates: [] };
     return applyReleaseFindings(result, input);
   }
-  return { VERSION, applyReleaseFindings, enrichCompatibilityExplanations, interpret };
+  return { VERSION, applyReleaseFindings, enrichCompatibilityExplanations,
+    relatedScreenshotCaption, subsequentPageScreenshot,
+    interpret, isPlaceholderDominated };
 });

@@ -71,7 +71,8 @@ const interpreted = pipeline.interpret({
 
 assert.strictEqual(interpreted.businessTasks.length, 1);
 assert.strictEqual(interpreted.businessTasks[0].taskType, "RunAction");
-assert.strictEqual(interpreted.businessTasks[0].instruction, "Välj **Släpp**.");
+assert.strictEqual(interpreted.businessTasks[0].instruction,
+  "Välj **Släpp** på sidan **Förs.order**.");
 assert.strictEqual(interpreted.businessTasks[0].screenshot,
   "screenshots/000003.png", "the observed result image should win");
 assert.strictEqual(interpreted.businessTasks[0].interactionId,

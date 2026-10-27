@@ -1,7 +1,7 @@
 {
   "packId": "bc-finance",
   "name": "Business Central Finance",
-  "version": "1.25.0",
+  "version": "1.27.0",
   "priority": 210,
   "rules": [
     {
@@ -1000,6 +1000,64 @@
         "da-DK": "Kontrollér det valgte regnskabsår og alle dets regnskabsperioder, og sørg for, at det næste regnskabsår allerede er oprettet, før du afslutter året. Business Central markerer årets perioder som afsluttet og datolåst; året kan ikke åbnes igen, og markeringerne kan ikke fjernes. Mindst ét regnskabsår skal forblive åbent. Matchningen viser kun, at handlingen blev valgt, ikke at året blev afsluttet.",
         "fi-FI": "Tarkista ennen tilikauden sulkemista valittu tilikausi ja kaikki sen kirjanpitojaksot sekä varmista, että seuraava tilikausi on jo luotu. Business Central merkitsee vuoden jaksot suljetuiksi ja päivämäärälukituiksi; tilikautta ei voi avata uudelleen eikä merkintöjä poistaa, ja vähintään yhden tilikauden on jäätävä avoimeksi. Osuma osoittaa vain, että toiminto valittiin, ei sitä, että tilikausi suljettiin.",
         "nb-NO": "Kontroller det valgte regnskapsåret og alle regnskapsperiodene, og sørg for at det neste regnskapsåret allerede er opprettet før du lukker året. Business Central merker periodene i året som lukket og datolåst; året kan ikke åpnes på nytt, og merkene kan ikke fjernes. Minst ett regnskapsår må være åpent. Treffet viser bare at handlingen ble valgt, ikke at året ble lukket."
+      }
+    },
+    {
+      "ruleId": "Finance.RunCloseIncomeStatement",
+      "taskType": "RunIncomeStatementClosingBatch",
+      "semanticAction": "RunIncomeStatementClosingBatch",
+      "entity": "IncomeStatementClosingBatch",
+      "priority": 1530,
+      "confidence": 0.98,
+      "match": {
+        "pagePatterns": [
+          "^Close Income Statement$",
+          "^Stäng resultaträkning$",
+          "^Fermer l’état du revenu$",
+          "^Einkommensrechnung schließen$",
+          "^Cerrar declaración de ingresos$",
+          "^Luk resultatopgørelse$",
+          "^Sulje tulolaskelma$",
+          "^Lukk resultatregnskap$"
+        ],
+        "actionPatterns": [
+          "^OK$",
+          "^Aceptar$"
+        ],
+        "fieldPatterns": [],
+        "automationIdPatterns": []
+      },
+      "instructionTemplate": "",
+      "languages": [
+        "en-US",
+        "sv-SE",
+        "fr-FR",
+        "de-DE",
+        "es-ES",
+        "da-DK",
+        "fi-FI",
+        "nb-NO"
+      ],
+      "aliases": [],
+      "sourceIds": [
+        "microsoft-learn-finance-close-income-statement-en-us",
+        "microsoft-learn-finance-close-income-statement-sv-se",
+        "microsoft-learn-finance-close-income-statement-fr-fr",
+        "microsoft-learn-finance-close-income-statement-de-de",
+        "microsoft-learn-finance-close-income-statement-es-es",
+        "microsoft-learn-finance-close-income-statement-da-dk",
+        "microsoft-learn-finance-close-income-statement-fi-fi",
+        "microsoft-learn-finance-close-income-statement-nb-no"
+      ],
+      "localizedExplanations": {
+        "en-US": "Runs the year-end batch that calculates the income-statement account balances for the closed fiscal year and creates closing lines in the selected journal. The fiscal year must already be closed. Review the generated journal, select the balancing and retained-earnings accounts, and post it as a separate step. With an additional reporting currency, Business Central posts the entries directly instead. If you later post more entries to the prior year, run the batch again to refresh the closing lines. This action is distinct from closing accounting periods and from posting the generated journal.",
+        "sv-SE": "Kör årsslutsjobbet som beräknar saldona på resultaträkningskonton för det avslutade räkenskapsåret och skapar avslutsrader i den valda journalen. Räkenskapsåret måste redan vara avslutat. Granska journalen, ange motkonto och konto för balanserad vinst eller förlust och bokför den i ett separat steg. Med en alternativ rapporteringsvaluta bokför Business Central posterna direkt i stället. Om du senare bokför fler poster på föregående år kör du jobbet igen för att uppdatera avslutsraderna. Åtgärden är skild från att stänga bokföringsperioder och från att bokföra den skapade journalen.",
+        "fr-FR": "Exécute le traitement de clôture annuelle qui calcule les soldes des comptes de résultat de l’exercice clôturé et crée des lignes de clôture dans la feuille sélectionnée. L’exercice doit déjà être clôturé. Examinez la feuille générée, sélectionnez le compte de contrepartie et le compte de report à nouveau, puis validez-la séparément. Avec une devise report supplémentaire, Business Central comptabilise directement les écritures. Si vous comptabilisez ensuite d’autres écritures sur l’exercice précédent, relancez le traitement pour actualiser les lignes de clôture. Cette action est distincte de la clôture des périodes comptables et de la validation de la feuille générée.",
+        "de-DE": "Führt den Jahresabschluss-Stapelauftrag aus. Er berechnet die Salden der GuV-Konten für das abgeschlossene Geschäftsjahr und erstellt Abschlusszeilen im ausgewählten Buch.-Blatt. Das Geschäftsjahr muss bereits geschlossen sein. Prüfen Sie das erstellte Buch.-Blatt, wählen Sie Gegenkonto und Bilanzkonto für den Gewinnvortrag aus und buchen Sie es in einem separaten Schritt. Bei zusätzlicher Berichtswährung bucht Business Central die Posten stattdessen direkt. Wenn Sie später weitere Posten im Vorjahr buchen, führen Sie den Stapelauftrag erneut aus, um die Abschlusszeilen zu aktualisieren. Diese Aktion ist von der Schließung der Buchungsperioden und von der Buchung des erstellten Buch.-Blatts getrennt.",
+        "es-ES": "Ejecuta el proceso de cierre anual, que calcula los saldos de las cuentas de pérdidas y ganancias del ejercicio cerrado y crea líneas de cierre en el diario seleccionado. El ejercicio ya debe estar cerrado. Revise el diario generado, seleccione la cuenta de contrapartida y la cuenta de resultados acumulados, y regístrelo en un paso independiente. Si hay una divisa adicional de informe, Business Central registra los movimientos directamente. Si después registra más movimientos en el ejercicio anterior, vuelva a ejecutar el proceso para actualizar las líneas de cierre. Esta acción es distinta del cierre de periodos contables y del registro del diario generado.",
+        "da-DK": "Kører årslukningsjobbet, som beregner saldiene på resultatkontiene for det afsluttede regnskabsår og opretter afslutningslinjer i den valgte kladde. Regnskabsåret skal allerede være afsluttet. Gennemgå den oprettede kladde, vælg modkonto og konto for overført resultat, og bogfør den som et separat trin. Med en ekstra rapporteringsvaluta bogfører Business Central i stedet posterne direkte. Hvis du senere bogfører flere poster i det foregående år, skal jobbet køres igen for at opdatere afslutningslinjerne. Denne handling er adskilt fra lukning af regnskabsperioder og bogføring af den oprettede kladde.",
+        "fi-FI": "Suorittaa tilikauden päätöseräajon, joka laskee suljetun tilikauden tulostilien saldot ja luo päätösrivit valittuun päiväkirjaan. Tilikauden on oltava jo suljettu. Tarkista luotu päiväkirja, valitse vastatili ja kertyneiden voittovarojen tili ja kirjaa päiväkirja erillisenä vaiheena. Jos käytössä on lisäraportointivaluutta, Business Central kirjaa tapahtumat suoraan sen sijaan. Jos kirjaat myöhemmin lisää tapahtumia edelliselle tilikaudelle, päivitä päätösrivit suorittamalla eräajo uudelleen. Tämä toiminto on eri asia kuin kirjanpitokausien sulkeminen ja luodun päiväkirjan kirjaaminen.",
+        "nb-NO": "Kjører årsavslutningsjobben, som beregner saldoene på resultatregnskapskontoene for det avsluttede regnskapsåret og oppretter avslutningslinjer i den valgte kladden. Regnskapsåret må allerede være lukket. Kontroller den opprettede kladden, velg motkonto og konto for overført overskudd, og bokfør den som et eget trinn. Med en ekstra rapporteringsvaluta bokfører Business Central postene direkte i stedet. Hvis du senere bokfører flere poster i det foregående året, kjører du jobben på nytt for å oppdatere avslutningslinjene. Denne handlingen er atskilt fra lukking av regnskapsperioder og bokføring av den opprettede kladden."
       }
     }
   ],
@@ -3890,14 +3948,18 @@
       "title": "Close income statement accounts (en-US)",
       "sourceType": "microsoft-learn",
       "sourceUri": "https://learn.microsoft.com/en-us/dynamics365/business-central/year-close-income-statement",
-      "appliesTo": "Business Central finance documentation, en-US; checked 2026-09-26",
-      "accessedDate": "2026-09-26",
+      "appliesTo": "Business Central finance documentation; localized page/search caption and batch-job sequence verified against the matching Microsoft Learn article on 2026-10-02. Confirm request-page caption, posting setup, and tenant workflow before treating a recording as tenant-verified.",
+      "accessedDate": "2026-10-02",
       "fields": [
         "Fiscal year must be closed before running the batch job",
         "Batch creates closing journal lines that require a balancing and retained earnings account and manual review/posting",
         "Closing-date entries preserve ordinary year-end balances",
         "Additional reporting currency is an exception: the batch posts directly to G/L",
         "Run the batch again after prior-year postings to refresh income statement closing entries"
+      ],
+      "documentedCaptions": [
+        "Close Income Statement",
+        "OK"
       ]
     },
     {
@@ -3905,14 +3967,18 @@
       "title": "Avsluta resultaträkningskonton (sv-SE)",
       "sourceType": "microsoft-learn",
       "sourceUri": "https://learn.microsoft.com/sv-se/dynamics365/business-central/year-close-income-statement",
-      "appliesTo": "Business Central finance documentation, sv-SE; checked 2026-09-26",
-      "accessedDate": "2026-09-26",
+      "appliesTo": "Business Central finance documentation; localized page/search caption and batch-job sequence verified against the matching Microsoft Learn article on 2026-10-02. Confirm request-page caption, posting setup, and tenant workflow before treating a recording as tenant-verified.",
+      "accessedDate": "2026-10-02",
       "fields": [
         "Räkenskapsåret måste avslutas innan batch-jobbet körs",
         "Batch-jobbet skapar avslutsrader som kräver motkonto och konto för balanserad vinst eller förlust samt manuell granskning och bokföring",
         "Avslutsdatum bevarar ordinarie saldon vid årets slut",
         "Alternativ rapporteringsvaluta är ett undantag: batch-jobbet bokför direkt i redovisningen",
         "Kör batch-jobbet igen efter bokföring på föregående år för att uppdatera avslutsraderna"
+      ],
+      "documentedCaptions": [
+        "Stäng resultaträkning",
+        "OK"
       ]
     },
     {
@@ -3920,14 +3986,18 @@
       "title": "Clôture des comptes de résultats (fr-FR)",
       "sourceType": "microsoft-learn",
       "sourceUri": "https://learn.microsoft.com/fr-fr/dynamics365/business-central/year-close-income-statement",
-      "appliesTo": "Business Central finance documentation, fr-FR; checked 2026-09-26",
-      "accessedDate": "2026-09-26",
+      "appliesTo": "Business Central finance documentation; localized page/search caption and batch-job sequence verified against the matching Microsoft Learn article on 2026-10-02. Confirm request-page caption, posting setup, and tenant workflow before treating a recording as tenant-verified.",
+      "accessedDate": "2026-10-02",
       "fields": [
         "L’exercice doit être clôturé avant d’exécuter le traitement",
         "Le traitement crée des lignes de clôture dans une feuille nécessitant un compte de contrepartie et un compte de bénéfices; examiner et valider manuellement",
         "La date de clôture fictive préserve les soldes des dates ordinaires",
         "Une devise report supplémentaire est une exception: le traitement valide directement les écritures",
         "Relancer le traitement après des écritures sur l’exercice précédent pour actualiser les lignes"
+      ],
+      "documentedCaptions": [
+        "Fermer l’état du revenu",
+        "OK"
       ]
     },
     {
@@ -3935,14 +4005,18 @@
       "title": "GuV-Konten abschließen (de-DE)",
       "sourceType": "microsoft-learn",
       "sourceUri": "https://learn.microsoft.com/de-de/dynamics365/business-central/year-close-income-statement",
-      "appliesTo": "Business Central finance documentation, de-DE; checked 2026-09-26",
-      "accessedDate": "2026-09-26",
+      "appliesTo": "Business Central finance documentation; localized page/search caption and batch-job sequence verified against the matching Microsoft Learn article on 2026-10-02. Confirm request-page caption, posting setup, and tenant workflow before treating a recording as tenant-verified.",
+      "accessedDate": "2026-10-02",
       "fields": [
         "Das Geschäftsjahr muss vor dem Stapelauftrag geschlossen werden",
         "Der Batchauftrag erstellt Abschlusszeilen im Buch.-Blatt; Gegenkonto und Abschlusskonto GuV angeben und vor dem Buchen prüfen",
         "Das Ultimodatum bewahrt Salden für normale Geschäftsjahresdaten",
         "Eine zusätzliche Berichtswährung ist eine Ausnahme: der Batchauftrag bucht direkt in die Finanzbuchhaltung",
         "Nach Buchungen im Vorjahr den Batchauftrag erneut ausführen, um die Abschlusszeilen zu aktualisieren"
+      ],
+      "documentedCaptions": [
+        "Einkommensrechnung schließen",
+        "OK"
       ]
     },
     {
@@ -3950,14 +4024,18 @@
       "title": "Cerrar cuentas de extracto de ingresos (es-ES)",
       "sourceType": "microsoft-learn",
       "sourceUri": "https://learn.microsoft.com/es-es/dynamics365/business-central/year-close-income-statement",
-      "appliesTo": "Business Central finance documentation, es-ES; checked 2026-09-26",
-      "accessedDate": "2026-09-26",
+      "appliesTo": "Business Central finance documentation; localized page/search caption and batch-job sequence verified against the matching Microsoft Learn article on 2026-10-02. Confirm request-page caption, posting setup, and tenant workflow before treating a recording as tenant-verified.",
+      "accessedDate": "2026-10-02",
       "fields": [
         "El ejercicio debe cerrarse antes de ejecutar el proceso",
         "El proceso crea líneas de cierre en un diario y requiere una cuenta de contrapartida y otra de ganancias; revisar y registrar manualmente",
         "La fecha de cierre ficticia conserva los saldos de las fechas ordinarias",
         "La divisa adicional de informe es una excepción: el proceso registra directamente en contabilidad",
         "Volver a ejecutar el proceso tras registrar en un ejercicio anterior para actualizar las líneas de cierre"
+      ],
+      "documentedCaptions": [
+        "Cerrar declaración de ingresos",
+        "Aceptar"
       ]
     },
     {
@@ -3965,14 +4043,18 @@
       "title": "Lukke resultatopgørelseskonti (da-DK)",
       "sourceType": "microsoft-learn",
       "sourceUri": "https://learn.microsoft.com/da-dk/dynamics365/business-central/year-close-income-statement",
-      "appliesTo": "Business Central finance documentation, da-DK; checked 2026-09-26",
-      "accessedDate": "2026-09-26",
+      "appliesTo": "Business Central finance documentation; localized page/search caption and batch-job sequence verified against the matching Microsoft Learn article on 2026-10-02. Confirm request-page caption, posting setup, and tenant workflow before treating a recording as tenant-verified.",
+      "accessedDate": "2026-10-02",
       "fields": [
         "Regnskabsåret skal afsluttes før kørslen",
         "Kørslen opretter afslutningslinjer i en kladde og kræver modkonto samt resultatkonto; gennemgå og bogfør manuelt",
         "Ultimodatoen bevarer saldi på årets almindelige datoer",
         "En ekstra rapporteringsvaluta er en undtagelse: kørslen bogfører direkte til finansposterne",
         "Kør kørslen igen efter posteringer i et tidligere regnskabsår for at opdatere afslutningslinjerne"
+      ],
+      "documentedCaptions": [
+        "Luk resultatopgørelse",
+        "OK"
       ]
     },
     {
@@ -3980,14 +4062,18 @@
       "title": "Tuloslaskelman tilien sulkeminen (fi-FI)",
       "sourceType": "microsoft-learn",
       "sourceUri": "https://learn.microsoft.com/fi-fi/dynamics365/business-central/year-close-income-statement",
-      "appliesTo": "Business Central finance documentation, fi-FI; checked 2026-09-26",
-      "accessedDate": "2026-09-26",
+      "appliesTo": "Business Central finance documentation; localized page/search caption and batch-job sequence verified against the matching Microsoft Learn article on 2026-10-02. Confirm request-page caption, posting setup, and tenant workflow before treating a recording as tenant-verified.",
+      "accessedDate": "2026-10-02",
       "fields": [
         "Tilikausi on suljettava ennen eräajon suorittamista",
         "Eräajo luo päätösrivien päiväkirjan ja edellyttää vastatiliä sekä jakamattoman voiton tiliä; tarkista ja kirjaa manuaalisesti",
         "Tilikauden päättämispäivä säilyttää tavallisten päivien saldot",
         "Lisäraportointivaluutta on poikkeus: eräajo kirjaa suoraan pääkirjanpitoon",
         "Suorita eräajo uudelleen edelliselle tilikaudelle tehtyjen kirjausten jälkeen, jotta päätösrivit päivittyvät"
+      ],
+      "documentedCaptions": [
+        "Sulje tulolaskelma",
+        "OK"
       ]
     },
     {
@@ -3995,14 +4081,18 @@
       "title": "Lukke resultatregnskapskontoer (nb-NO)",
       "sourceType": "microsoft-learn",
       "sourceUri": "https://learn.microsoft.com/nb-no/dynamics365/business-central/year-close-income-statement",
-      "appliesTo": "Business Central finance documentation, nb-NO; checked 2026-09-26",
-      "accessedDate": "2026-09-26",
+      "appliesTo": "Business Central finance documentation; localized page/search caption and batch-job sequence verified against the matching Microsoft Learn article on 2026-10-02. Confirm request-page caption, posting setup, and tenant workflow before treating a recording as tenant-verified.",
+      "accessedDate": "2026-10-02",
       "fields": [
         "Regnskapsåret må lukkes før den satsvise jobben kjøres",
         "Jobben oppretter avslutningslinjer i en kladd og krever motkonto og konto for tilbakeholdt overskudd; gjennomgå og bokfør manuelt",
         "Avslutningsdatoen bevarer saldoer på ordinære datoer",
         "En tilleggsrapporteringsvaluta er et unntak: jobben bokfører direkte mot Finans",
         "Kjør jobben på nytt etter posteringer i tidligere regnskapsår for å oppdatere avslutningslinjene"
+      ],
+      "documentedCaptions": [
+        "Lukk resultatregnskap",
+        "OK"
       ]
     },
     {

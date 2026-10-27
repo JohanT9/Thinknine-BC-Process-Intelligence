@@ -34,7 +34,7 @@ assert.ok(
 );
 
 assert.ok(
-  html.includes('id="reviewZoomToolbar" class="review-zoom-toolbar" role="toolbar"') &&
+  /id="reviewZoomToolbar"[^>]*role="toolbar"/u.test(html) &&
     html.includes('id="reviewResetZoom"') && html.includes('id="reviewZoomOut"') &&
     html.includes('id="reviewZoomValue"') && html.includes('id="reviewZoomIn"') &&
     html.includes('.review-zoom-content{zoom:var(--review-zoom,1)}') &&

@@ -29,16 +29,23 @@
       creates: "Creates", posts: "Posts as", unknown: "Flow" }
   });
 
+  function labelFor(kind, locale) {
+    const english = LABELS.en[kind] || LABELS.en.unknown;
+    const fallback = String(locale).toLowerCase().startsWith("sv")
+      ? LABELS.sv[kind] || LABELS.sv.unknown : english;
+    return globalThis.T9UiI18n?.translate?.(`processRoute.${kind}`, locale) ||
+      globalThis.T9UiI18n?.translateStaticText?.(english, locale) || fallback;
+  }
+
   function presentationFor(relationship = {}, locale = "sv-SE") {
     const sourceType = relationship.transitionType || relationship.relationshipType || "sequence";
     const route = ROUTES[sourceType] || {
       kind: "unknown", line: "solid", tone: "neutral", marker: "arrow"
     };
-    const language = String(locale).toLowerCase().startsWith("en") ? "en" : "sv";
     return Object.freeze({ version: VERSION, sourceType, ...route,
       label: String(relationship.label || relationship.condition ||
-        LABELS[language][route.kind] || LABELS[language].unknown) });
+        labelFor(route.kind, locale)) });
   }
 
-  return { LABELS, ROUTES, VERSION, presentationFor };
+  return { LABELS, ROUTES, VERSION, labelFor, presentationFor };
 });
