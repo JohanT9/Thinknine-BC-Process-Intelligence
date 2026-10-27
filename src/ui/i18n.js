@@ -1922,6 +1922,19 @@
     ,["Ändringen gjordes om.", "The change was redone."]
     ,["Annoteringsändringen ångrades.", "The annotation change was undone."]
     ,["Annoteringsändringen gjordes om.", "The annotation change was redone."]
+    ,["Inte angiven", "Not set"]
+    ,["Låg", "Low"]
+    ,["Medel", "Medium"]
+    ,["Hög", "High"]
+    ,["Kritisk", "Critical"]
+    ,["Svart", "Black"]
+    ,["Vit", "White"]
+    ,["Mörkblå", "Dark blue"]
+    ,["Turkos", "Turquoise"]
+    ,["Röd", "Red"]
+    ,["Grön", "Green"]
+    ,["Gul", "Yellow"]
+    ,["Orange", "Orange"]
   ]);
 
   const staticLookup = new Map();

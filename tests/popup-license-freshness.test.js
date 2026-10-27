@@ -51,6 +51,8 @@ async function main() {
   assert.equal(checked.elements.get("licenseCardType").textContent, "—");
   assert.equal(checked.elements.get("licenseCardExpiry").textContent, "—",
     "an inactive response never shows a misleading license type or expiry date");
+  assert.equal(checked.elements.get("licenseCardMeta").hidden, true,
+    "license type and validity are hidden until a license is active");
   assert.equal(checked.elements.get("licenseCardStatus").textContent, "license.cardTrialAvailable");
   assert.equal(checked.elements.get("licenseCardAction").textContent, "license.cardSignInTrial");
 
@@ -64,6 +66,8 @@ async function main() {
   assert.equal(active.elements.get("licenseCard").classes.active, true,
     "a successful current server response still shows the active state");
   assert.equal(active.elements.get("licenseCardStatus").textContent, "license.cardActive");
+  assert.equal(active.elements.get("licenseCardMeta").hidden, false,
+    "an active license shows its type and validity");
 
   const ready = harness({
     T9_LICENSE_INFORMATION: { ok: true, information: { requiresAcceptance: false } },
@@ -86,6 +90,7 @@ async function main() {
   assert.equal(offline.elements.get("licenseCard").classes.active, false,
     "a failed refresh never leaves a stale green license card");
   assert.equal(offline.elements.get("licenseCardType").textContent, "—");
+  assert.equal(offline.elements.get("licenseCardMeta").hidden, true);
   assert.equal(offline.elements.get("licenseCardStatus").textContent, "license.cardCheckFailed");
 
   const consent = harness({

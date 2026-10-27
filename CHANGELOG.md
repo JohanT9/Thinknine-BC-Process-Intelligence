@@ -1,4 +1,7 @@
 ## Unreleased
+- Show the license type and validity in the popup only for a checked, active license instead of "License type: — · Valid until: No expiry date".
+- Show bug report severity options in the interface language, with "Not set" for the empty choice; stored values are unchanged.
+- Show text colour names and the bold/italic button letters in the Review editor in the interface language (for example B/I in English and F/K in German).
 - Save step approvals, hidden steps and structural changes (move, merge, split, undo and redo) automatically. Previously they were kept only until the page was reloaded unless Save was pressed.
 - Show one save state in the Review footer: saving, saved with the time, or failed with a Try again button. The footer stays visible at the bottom, and Save in the toolbar becomes a secondary action because changes save automatically.
 - Explain why Complete review is unavailable and how many steps remain to approve.

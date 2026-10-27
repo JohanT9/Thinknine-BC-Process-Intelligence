@@ -168,4 +168,18 @@ const cardLabels = new Set(uiLocales.map(locale => {
 assert.strictEqual(cardLabels.size, uiLocales.length,
   "built-in library names are translated into every interface language");
 
+// Text formatting controls: colour names and bold/italic letters follow the interface language.
+const textFormat = require("../src/engine/text-format");
+for (const color of textFormat.COLORS) {
+  for (const locale of uiLocales.filter(locale => !["sv-SE", "en-US"].includes(locale))) {
+    const english = i18n.translate(color.name, "en-US");
+    assert.ok(english !== color.name || english === "Orange", `${color.name} has an English name`);
+    assert.ok(catalogs[locale][english], `${locale} names the colour ${english}`);
+  }
+}
+const dashboardSource = read("src/ui/dashboard.js");
+assert.ok(dashboardSource.includes("${escapeHtml(uiT(color.name))}</option>"));
+assert.ok(!dashboardSource.includes("<strong>F</strong>") && !dashboardSource.includes("<em>K</em>"));
+assert.match(dashboardSource, /"en-US": \["B", "I"\]/u);
+
 console.log(`UX language pass tests passed across ${uiLocales.length} interface languages.`);

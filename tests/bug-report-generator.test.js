@@ -180,7 +180,9 @@ const severitySelect = allElements(container).find(item =>
   item.id === "technical-report-severity");
 assert.strictEqual(severitySelect.tagName, "select");
 assert.deepStrictEqual(severitySelect.children.map(item => item.textContent),
-  ["", "Low", "Medium", "High", "Critical"]);
+  ["Not set", "Low", "Medium", "High", "Critical"]);
+assert.deepStrictEqual(severitySelect.children.map(item => item.value),
+  ["", "Low", "Medium", "High", "Critical"], "stored severity values stay language-neutral");
 assert.strictEqual(severitySelect.value, "High");
 for (const savedValue of ["", "1", "Blank"]) {
   const state = controller.state();
@@ -189,7 +191,7 @@ for (const savedValue of ["", "1", "Blank"]) {
   const select = allElements(container).find(item => item.id === "technical-report-severity");
   assert.strictEqual(select.value, "");
   assert.strictEqual(select.children.length, 5);
-  assert.strictEqual(select.children[0].textContent, "");
+  assert.strictEqual(select.children[0].textContent, "Not set");
   assert.strictEqual(select.children[0].value, "");
 }
 const severityEdits = [];

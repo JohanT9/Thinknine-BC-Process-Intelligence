@@ -5340,6 +5340,14 @@ function reviewStepStatusLabel(task) {
   return labels[10];
 }
 
+// Bold and italic letters as in each language’s word processors (B/I, F/K, G/I, N/K, L/K).
+function formatButtonLetters() {
+  const letters = { "sv-SE": ["F", "K"], "en-US": ["B", "I"], "fr-FR": ["G", "I"],
+    "de-DE": ["F", "K"], "es-ES": ["N", "K"], "da-DK": ["F", "K"], "fi-FI": ["L", "K"],
+    "nb-NO": ["F", "K"] }[globalThis.T9UiI18n?.normalizeLocale?.(applicationSettings.uiLocale)] || ["B", "I"];
+  return { bold: letters[0], italic: letters[1] };
+}
+
 function reviewAdvancedFormattingLabel() {
   const locale = globalThis.T9UiI18n?.normalizeLocale?.(
     applicationSettings.uiLocale || "sv-SE") || "sv-SE";
@@ -6910,9 +6918,9 @@ function renderReviewContent() {
         <div class="instruction-format-toolbar" data-instruction-format-toolbar hidden
           role="toolbar" aria-label="${uiT("a11y.textFormatting")}">
           <button type="button" class="secondary" data-instruction-format="bold"
-            aria-label="${uiT("a11y.bold")}" aria-pressed="false"><strong>F</strong></button>
+            aria-label="${uiT("a11y.bold")}" aria-pressed="false"><strong>${formatButtonLetters().bold}</strong></button>
           <button type="button" class="secondary" data-instruction-format="italic"
-            aria-label="${uiT("a11y.italic")}" aria-pressed="false"><em>K</em></button>
+            aria-label="${uiT("a11y.italic")}" aria-pressed="false"><em>${formatButtonLetters().italic}</em></button>
           <details class="review-advanced-formatting"><summary>${escapeHtml(reviewAdvancedFormattingLabel())}</summary><div class="review-advanced-format-options">
           <label>${uiT("Typsnitt")}<select data-instruction-font>
             ${globalThis.T9TextFormat.FONT_FAMILIES.map(font =>
@@ -6924,11 +6932,11 @@ function renderReviewContent() {
           </select></label>
           <label>${uiT("Textfärg")}<select data-instruction-text-color data-color-select>
             ${globalThis.T9TextFormat.COLORS.map(color =>
-              `<option value="${color.value}" style="background:${color.value};color:${["#000000", "#0F4C81", "#008C95", "#C50F1F", "#107C10", "#CA5010"].includes(color.value) ? "#FFFFFF" : "#000000"}">${escapeHtml(color.name)}</option>`).join("")}
+              `<option value="${color.value}" style="background:${color.value};color:${["#000000", "#0F4C81", "#008C95", "#C50F1F", "#107C10", "#CA5010"].includes(color.value) ? "#FFFFFF" : "#000000"}">${escapeHtml(uiT(color.name))}</option>`).join("")}
           </select></label>
           <label>${uiT("Bakgrund")}<select data-instruction-background-color data-color-select>
             ${globalThis.T9TextFormat.COLORS.map(color =>
-              `<option value="${color.value}" style="background:${color.value};color:${["#000000", "#0F4C81", "#008C95", "#C50F1F", "#107C10", "#CA5010"].includes(color.value) ? "#FFFFFF" : "#000000"}">${escapeHtml(color.name)}</option>`).join("")}
+              `<option value="${color.value}" style="background:${color.value};color:${["#000000", "#0F4C81", "#008C95", "#C50F1F", "#107C10", "#CA5010"].includes(color.value) ? "#FFFFFF" : "#000000"}">${escapeHtml(uiT(color.name))}</option>`).join("")}
           </select></label>
           </div></details>
         </div>
@@ -6954,9 +6962,9 @@ function renderReviewContent() {
           <div class="instruction-format-toolbar" data-comment-format-toolbar hidden
             role="toolbar" aria-label="${uiT("a11y.commentFormatting")}">
             <button type="button" class="secondary" data-comment-format="bold"
-              aria-label="${uiT("a11y.bold")}" aria-pressed="false"><strong>F</strong></button>
+              aria-label="${uiT("a11y.bold")}" aria-pressed="false"><strong>${formatButtonLetters().bold}</strong></button>
             <button type="button" class="secondary" data-comment-format="italic"
-              aria-label="${uiT("a11y.italic")}" aria-pressed="false"><em>K</em></button>
+              aria-label="${uiT("a11y.italic")}" aria-pressed="false"><em>${formatButtonLetters().italic}</em></button>
             <details class="review-advanced-formatting"><summary>${escapeHtml(reviewAdvancedFormattingLabel())}</summary><div class="review-advanced-format-options">
             <label>${uiT("Typsnitt")}<select data-comment-font>
               ${globalThis.T9TextFormat.FONT_FAMILIES.map(font =>
@@ -6968,11 +6976,11 @@ function renderReviewContent() {
             </select></label>
             <label>${uiT("Textfärg")}<select data-comment-text-color data-color-select>
               ${globalThis.T9TextFormat.COLORS.map(color =>
-                `<option value="${color.value}">${escapeHtml(color.name)}</option>`).join("")}
+                `<option value="${color.value}">${escapeHtml(uiT(color.name))}</option>`).join("")}
             </select></label>
             <label>${uiT("Bakgrund")}<select data-comment-background-color data-color-select>
               ${globalThis.T9TextFormat.COLORS.map(color =>
-                `<option value="${color.value}">${escapeHtml(color.name)}</option>`).join("")}
+                `<option value="${color.value}">${escapeHtml(uiT(color.name))}</option>`).join("")}
             </select></label>
             </div></details>
           </div>

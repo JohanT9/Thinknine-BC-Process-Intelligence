@@ -96,7 +96,8 @@
     const severityValues = ["", "Low", "Medium", "High", "Critical"];
     const savedSeverity = workspaceState.report.summary.severity || "";
     severityValues.forEach(value => {
-      const option = element(doc, "option", value); option.value = value;
+      // Stored values stay in English; the displayed label follows the interface language.
+      const option = element(doc, "option", ui(value || "Not set", locale)); option.value = value;
       severity.appendChild(option);
     });
     // Unknown legacy values are not selectable; known values retain their classification.
