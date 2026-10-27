@@ -79,7 +79,8 @@ async function currentTab() {
 
 function showMessage(text, error = false) {
   const message = String(text || "");
-  updateText($("message"), message.startsWith("license.") ? t(message) : message);
+  // Known service-worker messages are translated; other text is shown as received.
+  updateText($("message"), t(message));
   $("message").style.color = error ? "#b42318" : "#166534";
 }
 

@@ -3,7 +3,10 @@ import languages from "../engine/language-registry.js";
 import { PDFDocument, StandardFonts, rgb, PDFString } from "pdf-lib";
 import JSZip from "jszip";
 
-const plain = value => String(value || "").replace(/\*\*/gu, "").trim();
+const plain = value => String(value || "").trim();
+// Instructions mark captured values as __value__ and interface elements as **element**.
+const instructionText = value => plain(value).replace(/__([\s\S]+?)__/gu, "$1")
+  .replace(/\*\*([\s\S]+?)\*\*/gu, "$1");
 export function project(pkg) {
   const locale = languages.normalize(pkg.documentLanguage);
   const sv = locale === "sv-SE";
@@ -26,7 +29,7 @@ export function project(pkg) {
   const triggerIndex = steps.findIndex(step => triggerId
     ? step.source?.sourceCanonicalEventIds?.includes(triggerId) : step.failurePoint);
   const trigger = triggerIndex >= 0 ? { number: triggerIndex + 1,
-    instruction: plain(steps[triggerIndex].instruction) } : null;
+    instruction: instructionText(steps[triggerIndex].instruction) } : null;
   const sections = [];
   const add = (id, title, rows) => { rows = rows.map(plain).filter(Boolean);
     if (rows.length) sections.push({ id, title, rows }); };
@@ -35,7 +38,7 @@ export function project(pkg) {
   ].filter(Boolean))]);
   add("expected", label("Expected result", "Förväntat resultat"), [pkg.expectedResult]);
   add("reproduction", label("Steps to reproduce", "Steg för att återskapa"),
-    steps.map((step, index) => `${index + 1}. ${plain(step.instruction)}${index === triggerIndex
+    steps.map((step, index) => `${index + 1}. ${instructionText(step.instruction)}${index === triggerIndex
       ? (label(" - Error occurred here", " - Felet inträffade här")) : ""}`));
   add("environment", label("Environment", "Miljö"), [
     bc.environment && `${label("Environment", "Miljö")}: ${bc.environment}`,
@@ -70,7 +73,7 @@ export function project(pkg) {
   }))];
   return { title: plain(pkg.title), date: pkg.errorEvidence?.primary?.capturedAt || pkg.sourceUpdatedAt || pkg.generatedAt,
     company: bc.company || "", environment: bc.environment || "", severity: plain(pkg.summary?.severity), sections, links, sv, locale, trigger,
-    steps: steps.map((step, index) => ({ number: index + 1, instruction: plain(step.instruction),
+    steps: steps.map((step, index) => ({ number: index + 1, instruction: instructionText(step.instruction),
       id: step.reproductionStepId, assets: step.screenshotAssetIds || step.source?.screenshotAssetIds || [] })) };
 }
 

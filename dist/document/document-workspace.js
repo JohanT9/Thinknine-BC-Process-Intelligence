@@ -19,6 +19,12 @@
     return JSON.parse(JSON.stringify(value));
   }
 
+  // Same date form as the Word export's metadata table.
+  function displayDate(value) {
+    const date = new Date(value || "");
+    return Number.isNaN(date.getTime()) ? String(value || "") : date.toLocaleDateString("sv-SE");
+  }
+
   function workspaceItem(component, suffix, kind, content = {}) {
     return {
       workspaceItemId: `${component.componentId}:${suffix}`,
@@ -41,7 +47,8 @@
         }));
       } else if (component.kind === "metadata") {
         result.push(workspaceItem(component, "metadata", "metadata", {
-          rows: component.content.rows || []
+          rows: (component.content.rows || []).map(row => row.key === "date"
+            ? { ...row, value: displayDate(row.value) } : row)
         }));
       } else if (component.kind === "step") {
         result.push(workspaceItem(component, "title", "stepTitle", {

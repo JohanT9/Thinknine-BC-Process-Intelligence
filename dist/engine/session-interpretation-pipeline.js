@@ -406,9 +406,12 @@ function (semantic, knowledge, refs, taskVisibility, processAnalysis) {
     const activeGroups = groups.filter(group => !group.guidance?.ignored);
     const actions = semantic.processStepGroups(activeGroups);
     const byId = eventIndex(input.events);
+    // Generated instructions are written in the recording's document language.
+    const documentLanguage = input.language || input.session?.settings?.documentLanguage ||
+      input.session?.language || "en-US";
     const baseTasks = actions.filter(action => !action.hidden)
       .map((action, index) => ({ ...task(action, index, byId, input.imagePaths),
-        language: input.language || input.session?.language || "en-US" }));
+        language: documentLanguage }));
     const knowledgeResult = knowledge.apply(baseTasks, input.knowledgePacks || []);
     const repositoryTasks = applyRepositoryResolutions(knowledgeResult.tasks,
       input.knowledgeRepository, input.knowledgeReleaseId, input.language ||

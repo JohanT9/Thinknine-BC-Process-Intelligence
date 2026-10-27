@@ -9,7 +9,7 @@ const i18n = fs.readFileSync("src/ui/i18n.js", "utf8");
 assert(dashboard.includes("const reviewState = task.approved"));
 assert(dashboard.includes('card.dataset.reviewState = reviewState'));
 assert(dashboard.includes('class="review-state-label ${reviewState}"'));
-assert(dashboard.includes('${uiT("Steg")} ${visibleIndex + 1}, ${reviewStateLabel}'),
+assert(dashboard.includes('${uiTf("Steg {step}", { step: visibleIndex + 1 })}, ${reviewStateLabel}'),
   "screen readers must receive the textual Step state");
 assert(dashboard.includes('class="secondary review-hide-action"'),
   "reversible Hide must not look like a permanent destructive error");

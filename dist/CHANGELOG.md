@@ -1,3 +1,12 @@
+## Unreleased
+- Show Review step cards, status messages, regeneration results, tooltips and accessible names in the selected interface language. They were shown in Swedish for every language. Known error messages from the background service and licensing are translated where they are displayed.
+- Write generated create instructions (for example "Start creating a new sales order…") in the recording’s document language instead of always in English.
+- Show captured values in bold and interface elements in italics in bug report steps, the PDF and issue descriptions, instead of raw formatting markers. Captured Business Central error text is no longer altered in the PDF.
+- Show the document date and the documentation profile name (for example "Generic manual") in the document preview and Word metadata instead of a timestamp and an internal identifier.
+- Show masked field values with a marker in the document language; stored recordings keep the original marker.
+- Distinguish an empty Document Library from a search without matches, explain how to start, and offer to clear search and filters. Show built-in library profile names in the interface language.
+- Translate the bug report regeneration confirmation into all eight languages and keep the review step actions from overlapping with longer translations.
+
 ## 4.7.201
 - Remove the Bug Report AI technical analysis. No page could start it, yet the share dialog offered an "Include current AI-assisted analysis" choice that could never contain anything. The broker sign-in, broker transport, prompt, evidence policy and analysis modules are gone, so the extension no longer contains any path that sends bug evidence to an AI service. An analysis stored by an earlier version stays in the saved report but is no longer shown, exported or shared, and a saved AI broker configuration is left untouched.
 - Translate the share consent label into all eight languages; a line break in the page had kept it in English.

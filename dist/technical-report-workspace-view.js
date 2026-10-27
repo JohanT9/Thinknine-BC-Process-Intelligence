@@ -10,6 +10,15 @@
   };
   const ui = (text, locale) => globalThis.T9UiI18n?.translateStaticText(
     text, locale) || text;
+  // Instructions mark captured values as __value__ and interface elements as **element**.
+  function appendInstruction(doc, parent, instruction) {
+    const segments = globalThis.T9TextFormat?.instructionSegments(instruction) ||
+      [{ text: String(instruction || "") }];
+    for (const segment of segments) {
+      parent.appendChild(element(doc, segment.bold ? "strong"
+        : segment.italic ? "em" : "span", segment.text));
+    }
+  }
   function copyButton(doc, label, value, onCopy, locale) {
     const button = element(doc, "button", ui("Copy", locale), "technical-copy");
     button.type = "button"; button.setAttribute("aria-label", label);
@@ -140,7 +149,8 @@
       else if (section.kind === "reproduction") {
         const list = doc.createElement("ol");
         section.content.forEach(step => {
-          const item = element(doc, "li", step.instruction);
+          const item = doc.createElement("li");
+          appendInstruction(doc, item, step.instruction);
           if (step.failurePoint) {
             item.className = "failure-point";
             item.appendChild(element(doc, "strong",

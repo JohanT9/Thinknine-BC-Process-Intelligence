@@ -498,6 +498,7 @@
       "technical.requestFailed": "Begäran misslyckades.",
       "technical.reportCopied": "Rapporten har kopierats.",
       "technical.markdownExported": "Markdown har exporterats.",
+      "technical.regenerateConfirm": "Generera om hela rapporten från inspelningen? Manuella stegändringar och bildval ersätts. Titel, allvarlighetsgrad och förväntat resultat behålls.",
       "technical.telemetrySaved": "Telemetriinställningen har sparats. Ingen hemlighet eller token lagrades.",
       "technical.telemetryConnection": "Telemetrianslutning: {status}.",
       "technical.selectPrimaryError": "Välj ett primärt fel innan telemetrin uppdateras.",
@@ -596,7 +597,6 @@
       "a11y.hideStep": "Dölj steg {step} från dokumentet",
       "a11y.editorHelp": "Dubbelklicka eller tryck Enter för att redigera. Ctrl+Enter sparar",
       "a11y.saveEditor": "Ctrl+Enter sparar",
-      "technical.aiDisclosure": "En uttrycklig analys skickar ett minimerat och maskerat tekniskt bevispaket till den Entra-skyddade broker som du har konfigurerat. Skärmbilder, råa händelser, rå diagnostik, tenant-/företags-/användar-/sessions-ID:n och rå telemetri utesluts.",
       "technical.issuePreviewHelp": "Felrapporten förblir lokal och auktoritativ. Ingenting skickas förrän du har granskat paketet och valt Skapa ärende.",
       "recorder.inactive": "Inte aktiv",
       "recorder.processActive": "Processinspelning pågår",
@@ -842,6 +842,7 @@
       "technical.requestFailed": "Request failed.",
       "technical.reportCopied": "Report copied.",
       "technical.markdownExported": "Markdown exported.",
+      "technical.regenerateConfirm": "Regenerate the report from the recording? Manual step edits and image selections will be replaced. Title, severity and expected result are retained.",
       "technical.telemetrySaved": "Telemetry configuration saved. No secret or token was stored.",
       "technical.telemetryConnection": "Telemetry connection: {status}.",
       "technical.selectPrimaryError": "Select a primary error before telemetry refresh.",
@@ -940,7 +941,6 @@
       "a11y.hideStep": "Hide step {step} from the document",
       "a11y.editorHelp": "Double-click or press Enter to edit. Ctrl+Enter saves",
       "a11y.saveEditor": "Ctrl+Enter saves",
-      "technical.aiDisclosure": "Explicit analysis sends a minimized, redacted technical evidence package to your configured Entra-protected broker. Screenshots, raw events, raw diagnostics, tenant/company/user/session IDs and raw telemetry are excluded.",
       "technical.issuePreviewHelp": "The Bug Report remains local and authoritative. Nothing is submitted until you review this package and select Create Issue.",
       "recorder.inactive": "Not active",
       "recorder.processActive": "Process recording in progress",
@@ -1740,6 +1740,179 @@
     ,["E-postadress", "Email address"], ["Starta testperiod", "Start trial"]
     ,["Generera om från inspelningen", "Regenerate from the recording"]
     ,["Visa alla steg", "Show all steps"]
+    ,["Kommentar", "Comment"]
+    ,["Informationstyp", "Information type"]
+    ,["Faktaruta", "Fact box"]
+    ,["Typsnitt", "Font"]
+    ,["Storlek", "Size"]
+    ,["Textfärg", "Text color"]
+    ,["Bakgrund", "Background"]
+    ,["Använd", "Use"]
+    ,["Byt bild", "Change image"]
+    ,["Dela vid markören", "Split at cursor"]
+    ,["Regenerera det här steget", "Regenerate this step"]
+    ,["Ta bort manuellt steg", "Delete manual step"]
+    ,["Expandera", "Expand"]
+    ,["Expandera alla", "Expand all"]
+    ,["Redigerad", "Edited"]
+    ,["Genererad", "Generated"]
+    ,["Manuellt", "Manual"]
+    ,["Manuell skärmbild", "Manual screenshot"]
+    ,["Steg {step}", "Step {step}"]
+    ,["Informationstyp för manuellt steg {step}", "Information type for manual step {step}"]
+    ,["Redigera faktaruta för steg {step}", "Edit fact box for step {step}"]
+    ,["Faktaruta för manuellt steg {step}", "Fact box for manual step {step}"]
+    ,["Skärmbild {image} för steg {step}", "Screenshot {image} for step {step}"]
+    ,["Dela steg {step} vid markören", "Split step {step} at the cursor"]
+    ,["Flytta steg {step} uppåt", "Move step {step} up"]
+    ,["Flytta steg {step} nedåt", "Move step {step} down"]
+    ,["Regenerera steg {step}", "Regenerate step {step}"]
+    ,["Ta bort manuellt steg {step}", "Delete manual step {step}"]
+    ,["Stäng granskning", "Close review"]
+    ,["Annoteringar har ändrats. Välj Spara för att lagra dem.", "Annotations have changed. Select Save to store them."]
+    ,["Granskningen är slutförd.", "The review is complete."]
+    ,["Ändringar sparas lokalt i webbläsaren.", "Changes are saved locally in this browser."]
+    ,["Alla ändringar är sparade.", "All changes are saved."]
+    ,["Nyare ändringar väntar på att sparas.", "Newer changes are waiting to be saved."]
+    ,["Granskningen kunde inte sparas.", "The review could not be saved."]
+    ,["Granskningen kunde inte läsas.", "The review could not be read."]
+    ,["Skärmbilderna kunde inte läsas in.", "The screenshots could not be loaded."]
+    ,["Skärmbilder och processkontext kunde inte läsas in.", "Screenshots and process context could not be loaded."]
+    ,["Granskningen kunde inte stängas eftersom sparningen misslyckades.", "The review could not be closed because saving failed."]
+    ,["Sessionen kunde inte tas bort.", "The session could not be deleted."]
+    ,["Sessionen kunde inte läsas.", "The session could not be read."]
+    ,["Den begärda dokumentationen kunde inte öppnas.", "The requested documentation could not be opened."]
+    ,["Hämtar skärmbilder…", "Loading screenshots…"]
+    ,["Markeringen kunde inte uppdateras: {error}", "The markup could not be updated: {error}"]
+    ,["Markeringen kunde inte läggas till: {error}", "The markup could not be added: {error}"]
+    ,["Annoteringarna kunde inte sparas: {error}", "The annotations could not be saved: {error}"]
+    ,["Återställningen kunde inte sparas: {error}", "The reset could not be saved: {error}"]
+    ,["Pekgesten kunde inte startas. Försök igen.", "The pointer gesture could not be started. Try again."]
+    ,["okänt renderingsfel", "unknown rendering error"]
+    ,["Den filtrerade steglistan blev tom trots lagrade steg.", "The filtered step list was empty although steps are stored."]
+    ,["Det manuella informationssteget togs bort.", "The manual information step was removed."]
+    ,["Dölj avancerade dataskyddsinställningar", "Hide advanced privacy settings"]
+    ,["Filen kunde inte sparas.", "The file could not be saved."]
+    ,["Dokumentet är inte tillgängligt ännu.", "The document is not available yet."]
+    ,["Dokumentet \"{title}\" kan inte exporteras.", "The document \"{title}\" cannot be exported."]
+    ,["Felrapporten \"{title}\" exporteras från Technical Report Workspace.", "The bug report \"{title}\" is exported from the Technical Report Workspace."]
+    ,["Ingen granskning är öppen.", "No review is open."]
+    ,["Word-exportbiblioteket kunde inte laddas. Kör npm install och npm run build.", "The Word export library could not be loaded. Run npm install and npm run build."]
+    ,["Processanalysen kunde inte genomföras.", "The process analysis could not be completed."]
+    ,["Dokumentbiblioteket kunde inte sparas.", "The Document Library could not be saved."]
+    ,["Endast markerade fält ändras för {count} dokument.", "Only the selected fields are changed for {count} documents."]
+    ,["Dokumentet kunde inte visas: {error}", "The document could not be displayed: {error}"]
+    ,["Slutför eller avbryt annoteringen innan du byter arbetsyta.", "Finish or cancel the annotation before switching workspace."]
+    ,["Informationssteget lades till. Skriv texten och spara.", "The information step was added. Write the text and save."]
+    ,["Placera markören mellan två textdelar i instruktionen.", "Place the cursor between two parts of the instruction text."]
+    ,["Det finns ingen annoteringsändring att återställa.", "There is no annotation change to undo."]
+    ,["Steget ändrades under redigering. Din text bevarades och sparas.", "The step changed while you were editing. Your text was kept and is being saved."]
+    ,["Tar en bild från den senast använda Business Central-fliken...", "Capturing an image from the most recently used Business Central tab…"]
+    ,["Skärmbilden kunde inte tas.", "The screenshot could not be captured."]
+    ,["Den nya bilden är vald. Bekräfta för att uppdatera steget.", "The new image is selected. Confirm to update the step."]
+    ,["Bilden kunde inte sparas.", "The image could not be saved."]
+    ,["{message} Väntar på automatisk sparning.", "{message} Waiting for automatic save."]
+    ,["Annoteringen väntar på automatisk sparning.", "The annotation is waiting for automatic save."]
+    ,["Den nya tolkningen gav inga steg. Den sparade granskningen kommer inte att ändras.", "The new interpretation produced no steps. The saved review will not be changed."]
+    ,["Granskningen innehåller manuella ändringar som inte kan flyttas säkert. Regenereringen är blockerad så att inget konsultarbete skrivs över.", "The review contains manual changes that cannot be moved safely. Regeneration is blocked so that no consultant work is overwritten."]
+    ,["Tillagda steg", "Added steps"]
+    ,["Borttagna steg", "Removed steps"]
+    ,["Ändrad instruktion", "Changed instruction"]
+    ,["Sammanslagna steg", "Merged steps"]
+    ,["Delade steg", "Split steps"]
+    ,["Bytt skärmbild", "Changed screenshot"]
+    ,["Inga innehållsändringar upptäcktes.", "No content changes were detected."]
+    ,["Dokumentationen har regenererats från inspelningen. {before} steg blev {after}.", "The documentation was regenerated from the recording. {before} steps became {after}."]
+    ,["Granskningen ändrades efter förhandsgranskningen. Öppna en ny förhandsgranskning och kontrollera ändringarna igen.", "The review changed after the preview. Open a new preview and check the changes again."]
+    ,["Dokumentationen kunde inte regenereras: {error}", "The documentation could not be regenerated: {error}"]
+    ,["Inställningarna kunde inte läsas. Standardvärden visas.", "Settings could not be read. Default values are shown."]
+    ,["Infoga filnamnsvariabel. Använd vänster och höger pil för att navigera.", "Insert file name variable. Use the left and right arrow keys to navigate."]
+    ,["Filter för Dokumentbibliotek", "Document Library filters"]
+    ,["Batchåtgärder", "Batch actions"]
+    ,["Batchförlopp", "Batch progress"]
+    ,["Dokument i Dokumentbiblioteket", "Documents in the Document Library"]
+    ,["Dokumentationsarbetsyta", "Documentation workspace"]
+    ,["Redigeringskommandon", "Editing commands"]
+    ,["Historik", "History"]
+    ,["Matchningsgrad", "Match level"]
+    ,["Zooma granskning", "Zoom review"]
+    ,["Zooma ut granskning", "Zoom out review"]
+    ,["Aktuell zoom i granskning", "Current review zoom"]
+    ,["Zooma in granskning", "Zoom in review"]
+    ,["Visa alla steg i listan", "Show all steps in the list"]
+    ,["Granskningsförlopp", "Review progress"]
+    ,["Dokumentstatus", "Document status"]
+    ,["Processkartans storlek", "Process map size"]
+    ,["Välj processkartans riktning", "Choose the process map direction"]
+    ,["Välj processkartans visuella tema", "Choose the process map visual theme"]
+    ,["Välj processkartans täthet", "Choose the process map density"]
+    ,["Visa processkartan i fokusläge", "Show the process map in focus mode"]
+    ,["Anpassa hela processkartan till tillgänglig bredd", "Fit the whole process map to the available width"]
+    ,["Zooma ut processkartan", "Zoom out the process map"]
+    ,["Zooma in processkartan", "Zoom in the process map"]
+    ,["Återställ processkartan till 100 %", "Reset the process map to 100%"]
+    ,["Dokumentets steg", "Document steps"]
+    ,["Annotationsverktyg", "Annotation tools"]
+    ,["Rityta för skärmbildsannotering", "Drawing area for screenshot annotation"]
+    ,["Markeringar i skärmbilden", "Markup in the screenshot"]
+    ,["Dokumentvisning", "Document view"]
+    ,["Anpassa storlek", "Fit size"]
+    ,["Zooma ut", "Zoom out"]
+    ,["Aktuell zoom", "Current zoom"]
+    ,["Zooma in", "Zoom in"]
+    ,["Visningsläge", "View mode"]
+    ,["Sidnavigering", "Page navigation"]
+    ,["Föregående sida", "Previous page"]
+    ,["Aktuell sida", "Current page"]
+    ,["Nästa sida", "Next page"]
+    ,["Åtgärder för bildbyte", "Image replacement actions"]
+    ,["Inspelningen kunde inte hittas.", "The recording could not be found."]
+    ,["Ingen öppen Business Central-flik hittades.", "No open Business Central tab was found."]
+    ,["Den kompletterande skärmbilden kunde inte tas.", "The additional screenshot could not be captured."]
+    ,["Den kompletterande skärmbilden är ogiltig.", "The additional screenshot is invalid."]
+    ,["Okänd inspelningsmarkering.", "Unknown recording marker."]
+    ,["Ingen aktiv inspelning hittades i den här fliken.", "No active recording was found in this tab."]
+    ,["Registrera ett steg innan du markerar det.", "Record a step before you mark it."]
+    ,["Det finns ännu ingen bild för det senaste steget.", "There is no image for the latest step yet."]
+    ,["En inspelning är redan aktiv. Stoppa eller avbryt den innan en ny startas.", "A recording is already active. Stop or cancel it before starting a new one."]
+    ,["Inspelningsskriptet kunde inte ansluta till Business Central-fliken. Uppdatera BC med Ctrl+F5 och försök igen.", "The recording script could not connect to the Business Central tab. Refresh BC with Ctrl+F5 and try again."]
+    ,["Inspelningsskriptet tog inte emot startstatus.", "The recording script did not receive the start status."]
+    ,["Inspelningen kunde inte verifieras i Business Central-fliken.", "The recording could not be verified in the Business Central tab."]
+    ,["Inga rapportsteg kunde återskapas. Befintlig rapport har inte ändrats.", "No report steps could be recreated. The existing report has not been changed."]
+    ,["Ingen Business Central-flik angavs.", "No Business Central tab was specified."]
+    ,["Licensregistrering måste bekräftas i tilläggets popup.", "License registration must be confirmed in the extension popup."]
+    ,["Licenskontroll får bara startas från tilläggets licensvyer.", "License checks can only be started from the extension's license views."]
+    ,["Testlicens får bara begäras från tilläggets popup.", "A trial license can only be requested from the extension popup."]
+    ,["Licensöversikten får bara öppnas från tilläggets licensvyer.", "The license overview can only be opened from the extension's license views."]
+    ,["Microsoft-inloggning får bara startas från tilläggets licensvyer.", "Microsoft sign-in can only be started from the extension's license views."]
+    ,["Användarregistrering får bara startas från tilläggets licensvyer.", "User registration can only be started from the extension's license views."]
+    ,["Ingen Business Central-tenant kunde identifieras.", "No Business Central tenant could be identified."]
+    ,["Konsultinloggning får bara startas från licenssidan.", "Consultant sign-in can only be started from the license page."]
+    ,["Ingen aktiv felinspelning finns.", "There is no active bug recording."]
+    ,["Felrapporten kunde inte hittas.", "The bug report could not be found."]
+    ,["Bug Report kunde inte hittas.", "The bug report could not be found."]
+    ,["Välj ett specifikt Business Central-fel för korrelation.", "Select a specific Business Central error for correlation."]
+    ,["Felevidensen kunde inte hittas.", "The error evidence could not be found."]
+    ,["Ingen aktiv inspelning finns.", "There is no active recording."]
+    ,["Kunde inte öppna inspelningsdialogen. Öppna tillägget för att stoppa inspelningen.", "The recording dialog could not be opened. Open the extension to stop the recording."]
+    ,["För många skärmbilder begärdes samtidigt.", "Too many screenshots were requested at the same time."]
+    ,["Windows-delning får bara startas från felrapportvyn.", "Windows sharing can only be started from the bug report view."]
+    ,["Felrapporten är ogiltig eller för stor för Windows-delning (max 24 MB).", "The bug report is invalid or too large for Windows sharing (max. 24 MB)."]
+    ,["Windows-hjälparen svarade inte. Ingen rapport har skickats.", "The Windows helper did not respond. No report has been sent."]
+    ,["Windows-delning kunde inte startas.", "Windows sharing could not be started."]
+    ,["Supportadressen är inte en giltig e-postadress.", "The support address is not a valid email address."]
+    ,["Konsultinloggning är inte konfigurerad ännu.", "Consultant sign-in is not configured yet."]
+    ,["Entra-inloggningen kunde inte verifieras.", "The Entra sign-in could not be verified."]
+    ,["Entra-inloggningen kunde inte slutföras.", "The Entra sign-in could not be completed."]
+    ,["Microsoft-inloggningen måste förnyas.", "The Microsoft sign-in must be renewed."]
+    ,["Konsultinloggningen har gått ut. Logga in igen.", "The consultant sign-in has expired. Sign in again."]
+    ,["Konsultinloggningen behöver förnyas.", "The consultant sign-in needs to be renewed."]
+    ,["Konsultlicensen kunde inte kontrolleras.", "The consultant license could not be checked."]
+    ,["Licenstjänsten saknar stöd för konsultregistrering. Distribuera den senaste tjänste-ZIP-filen.", "The license service does not support consultant registration. Deploy the latest service ZIP file."]
+    ,["Licenstjänsten avvisade Microsoft-inloggningen. Kontrollera LICENSE_ENTRA_AUDIENCE och LICENSE_ENTRA_SCOPE i Azure.", "The license service rejected the Microsoft sign-in. Check LICENSE_ENTRA_AUDIENCE and LICENSE_ENTRA_SCOPE in Azure."]
+    ,["Microsoft-autentisering är inte konfigurerad i licenstjänsten.", "Microsoft authentication is not configured in the license service."]
+    ,["Microsoft-inloggningen avvisades av licenstjänsten.", "The license service rejected the Microsoft sign-in."]
+    ,["Logga in med din konsultlicens.", "Sign in with your consultant license."]
   ]);
 
   const staticLookup = new Map();
@@ -1771,7 +1944,8 @@
     let node = walker.nextNode();
     while (node) {
       const parent = node.parentElement;
-      if (parent && safeTextTags.has(parent.tagName) &&
+      if (parent && (safeTextTags.has(parent.tagName) || (parent.tagName === "SPAN" &&
+          safeTextTags.has(parent.parentElement?.tagName))) &&
           !excludedFromInterfaceTranslation(node)) {
         const trimmed = node.nodeValue.trim();
         const previous = staticSources.get(node);
@@ -1785,6 +1959,29 @@
         }
       }
       node = walker.nextNode();
+    }
+    applyStaticAttributes(locale, target.body || target);
+  }
+
+  // Static tooltips and accessible names written in the page markup.
+  const staticAttributes = ["title", "aria-label", "data-tooltip-native-title"];
+  const staticAttributeSources = new WeakMap();
+  function applyStaticAttributes(locale, target) {
+    if (!target?.querySelectorAll) return;
+    const selector = staticAttributes.map(name => `[${name}]`).join(",");
+    for (const element of target.querySelectorAll(selector)) {
+      if (element.closest?.("#documentWorkspace, #reviewList, #annotationStage, [data-i18n-ignore]")) continue;
+      const sources = staticAttributeSources.get(element) || {};
+      for (const name of staticAttributes) {
+        if (!element.hasAttribute(name) || element.hasAttribute(`data-i18n-${name}`)) continue;
+        const current = element.getAttribute(name);
+        const previous = sources[name];
+        const source = previous?.rendered === current ? previous.source : current;
+        const translated = translateStaticText(source, locale);
+        sources[name] = { source, rendered: translated };
+        if (translated !== current) element.setAttribute(name, translated);
+      }
+      staticAttributeSources.set(element, sources);
     }
   }
 
@@ -1874,7 +2071,9 @@
     if (messages[normalized]?.[key] !== undefined) return messages[normalized][key];
     if (messages["en-US"]?.[key] !== undefined) return languageRegistry.translate(
       messages["en-US"][key], normalized, messages[DEFAULT_LOCALE]?.[key]);
-    return messages[DEFAULT_LOCALE]?.[key] ?? key;
+    if (messages[DEFAULT_LOCALE]?.[key] !== undefined) return messages[DEFAULT_LOCALE][key];
+    // Interface text written as a static Swedish/English pair is keyed by its own wording.
+    return translateStaticText(key, normalized);
   }
 
   function format(key, values, locale = DEFAULT_LOCALE) {

@@ -30,6 +30,13 @@
   languages
 ) {
   const PLANNER_VERSION = "1.0.0";
+  // Documentation profile IDs shown by name; other languages come from the locale catalogs.
+  const PROFILE_NAMES = Object.freeze({
+    generic: ["Generic manual", "Generisk manual"],
+    customer: ["Customer-specific manual", "Kundspecifik manual"],
+    internal: ["Internal documentation", "Intern dokumentation"],
+    training: ["Training material", "Utbildningsmaterial"]
+  });
 
   function clone(value) {
     if (value === undefined) return undefined;
@@ -461,7 +468,9 @@
               value: document.metadata.environment },
             { key: "documentationProfile", group: "context",
               label: label("Documentation type", "Dokumentationstyp"),
-              value: document.metadata.documentationProfile },
+              value: PROFILE_NAMES[document.metadata.documentationProfile]
+                ? label(...PROFILE_NAMES[document.metadata.documentationProfile])
+                : document.metadata.documentationProfile },
             { key: "reviewStatus", group: "review", label: label("Review status", "Granskningsstatus"),
               value: document.metadata.statusLabel },
             { key: "reviewer", group: "review", label: label("Reviewed by", "Granskad av"),

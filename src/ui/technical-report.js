@@ -22,7 +22,7 @@
     try { await handler(); }
     catch (error) {
       const detail = error.category === "timeout"
-        ? t("technical.issueSubmissionTimeout") : error.message || String(error);
+        ? t("technical.issueSubmissionTimeout") : t(error.message || String(error));
       message.textContent = error.uncertain
         ? `${globalThis.T9UiI18n.translateStaticText(
           "The destination may have created the issue. Check before retrying.",
@@ -179,7 +179,7 @@
       if (state.saveState !== "unsaved") return;
       clearTimeout(autosaveTimer);
       autosaveTimer = setTimeout(() => workspace.save().catch(error => {
-        message.textContent = error.message;
+        message.textContent = t(error.message);
       }), 600);
     };
     workspace.subscribe(renderAndAutosave); renderAndAutosave(workspace.state());
@@ -196,10 +196,7 @@
     document.getElementById("undoReport").addEventListener("click", workspace.undo);
     document.getElementById("redoReport").addEventListener("click", workspace.redo);
     document.getElementById("regenerateReport").addEventListener("click", action(async () => {
-      const confirmation = currentUiLocale === "sv-SE"
-        ? "Generera om hela rapporten från inspelningen? Manuella stegändringar och bildval ersätts. Titel, allvarlighetsgrad och förväntat resultat behålls."
-        : "Regenerate the report from the recording? Manual step edits and image selections will be replaced. Title, severity and expected result are retained.";
-      if (!window.confirm(confirmation)) return;
+      if (!window.confirm(t("technical.regenerateConfirm"))) return;
       const button = document.getElementById("regenerateReport"); button.disabled = true;
       try {
         await workspace.flush();
@@ -521,5 +518,5 @@
       "Technical Bug Report", currentUiLocale);
     await start();
   }
-  initialize().catch(error => { message.textContent = error.message; });
+  initialize().catch(error => { message.textContent = t(error.message); });
 })();

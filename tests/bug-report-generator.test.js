@@ -141,6 +141,24 @@ assert.strictEqual(rendered.sectionCount, generator.SECTION_ORDER.length);
 assert.strictEqual(container.attributes["aria-label"],
   "Technical Bug Report: Edited title");
 const allElements = node => [node, ...node.children.flatMap(allElements)];
+
+// Reproduction steps show captured values in bold and interface elements in italics,
+// never the raw __value__ / **element** markers.
+globalThis.T9TextFormat = require("../src/engine/text-format");
+const formattedState = JSON.parse(JSON.stringify(controller.state()));
+formattedState.document.sections.find(section => section.kind === "reproduction")
+  .content[0].instruction = "Ange __PO-1001__ i **External Document No.**.";
+const formattedContainer = new Element("main");
+view.render(formattedContainer, formattedState, { onEditReproductionStep: () => {},
+  onSetScreenshotVisibility: () => {} }, fakeDocument);
+const formattedStep = allElements(formattedContainer).find(item => item.tagName === "li" &&
+  item.children.some(child => child.textContent === "PO-1001"));
+assert.deepStrictEqual(formattedStep.children.slice(0, 5).map(child =>
+  [child.tagName, child.textContent]), [["span", "Ange "], ["strong", "PO-1001"],
+  ["span", " i "], ["em", "External Document No."], ["span", "."]]);
+assert(!allElements(formattedContainer).some(item => /\*\*|__/u.test(item.textContent)));
+delete globalThis.T9TextFormat;
+
 assert(allElements(container).some(item => item.tagName === "details"));
 assert(allElements(container).some(item => item.tagName === "table"));
 assert(allElements(container).some(item => item.tagName === "dd" &&
