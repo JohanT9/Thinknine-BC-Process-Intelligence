@@ -1,4 +1,4 @@
-## Unreleased
+## 4.7.202
 - Show Review step cards, status messages, regeneration results, tooltips and accessible names in the selected interface language. They were shown in Swedish for every language. Known error messages from the background service and licensing are translated where they are displayed.
 - Write generated create instructions (for example "Start creating a new sales order…") in the recording’s document language instead of always in English.
 - Show captured values in bold and interface elements in italics in bug report steps, the PDF and issue descriptions, instead of raw formatting markers. Captured Business Central error text is no longer altered in the PDF.
