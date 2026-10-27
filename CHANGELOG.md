@@ -1,4 +1,4 @@
-## Unreleased
+## 4.7.201
 - Remove the Bug Report AI technical analysis. No page could start it, yet the share dialog offered an "Include current AI-assisted analysis" choice that could never contain anything. The broker sign-in, broker transport, prompt, evidence policy and analysis modules are gone, so the extension no longer contains any path that sends bug evidence to an AI service. An analysis stored by an earlier version stays in the saved report but is no longer shown, exported or shared, and a saved AI broker configuration is left untouched.
 - Translate the share consent label into all eight languages; a line break in the page had kept it in English.
 - Add ESLint (pinned 9.15.0) to npm run lint. It found and fixed: a ReferenceError when saving an empty knowledge explanation, an undeclared screenshot error variable, a duplicated function where the first copy never ran, duplicate object keys, and dead code.
