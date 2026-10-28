@@ -182,3 +182,27 @@ Fresh Step Groups may change Step boundaries. Reconciliation prefers stable
 Group identity, then exact semantic/Event evidence; exact partitions and
 consolidations are reported, while ambiguous overrides remain unresolved. See
 [REGENERATE_FROM_RECORDING.md](REGENERATE_FROM_RECORDING.md).
+
+## Business Central client controls that are not steps
+
+Closing, scrolling, showing more, browser history, field hints and the Tell Me search are
+client mechanics, not business steps. Recognition prefers structure, which works in every
+Business Central language:
+
+- A button in a dialog joins the interaction of the action that opened the dialog, so OK,
+  Close or a close icon complete that action instead of becoming a step. Only a dialog whose
+  opener was not recorded still depends on captions.
+- A choice in a field's suggestion list joins the field edit.
+- Private-use icon glyphs, section toggles and dialog-close controls are recognized without text.
+
+The remaining captions live in one catalog, `src/engine/bc-client-captions.js`, used by
+normalization, grouping, the semantic engine and the legacy noise filter. It lists only
+captions observed in recordings. Microsoft Learn translations of these client texts are
+machine translated and differ from the client (Swedish Business Central shows "Visa resten",
+not "Visa mer"), so they are not used as sources.
+
+Documented gaps: no observed captions for the categories `close`, `scroll`, `display`,
+`history`, `tellMe` and `fieldHint` in fr-FR, de-DE, es-ES, da-DK, fi-FI and nb-NO. In those
+Business Central languages, a click on these controls outside a recorded dialog can still
+become a step that the reviewer removes. Add captions from a recording in that language;
+`tests/bc-client-captions.test.js` keeps this list and the catalog in agreement.

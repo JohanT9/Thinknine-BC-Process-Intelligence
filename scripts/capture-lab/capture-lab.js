@@ -112,7 +112,8 @@ function connect(wsUrl) {
     mark("6 Quantity = 5 (slow typing), Enter"); await type("5", 900); await enter();
     mark("7 Quantity again = 6, Tab"); await click('#lines input[data-k="qty"]'); await selectAll(); await type("6"); await tab();
     mark("8 Release"); await click("#actRelease");
-    mark("9 Post... and OK"); await click("#actPost"); await click("#dlgOk"); await sleep(800);
+    mark("9 Statistics, then close the dialog (German caption)"); await click("#actStats"); await click("#dlgClose");
+    mark("10 Post... and OK"); await click("#actPost"); await click("#dlgOk"); await sleep(800);
 
     const messages = await evaluate("window.__messages");
     const events = messages.filter(m => m.type === "T9_RECORD_EVENT").map(m => m.event);

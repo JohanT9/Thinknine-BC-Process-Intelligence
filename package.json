@@ -121,7 +121,7 @@
     "test:process-quality-guard": "node tests/process-quality-guard.test.js",
     "test:process-contradictions": "node tests/process-contradiction-engine.test.js",
     "test:process-analysis-corpus": "node tests/process-analysis-corpus.test.js",
-    "test:process-e2e-corpus": "node tests/process-e2e-corpus.test.js && node tests/capture-lab-corpus.test.js",
+    "test:process-e2e-corpus": "node tests/process-e2e-corpus.test.js && node tests/capture-lab-corpus.test.js && node tests/bc-client-captions.test.js",
     "test:process-output-quality": "node tests/process-output-quality.test.js",
     "test:process-language-matrix": "node tests/process-language-matrix.test.js",
     "test:process-golden": "node tests/process-golden-baseline.test.js",

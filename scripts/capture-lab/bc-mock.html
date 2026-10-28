@@ -14,6 +14,7 @@ table{border-collapse:collapse;margin:12px}td{border:1px solid #ccc;padding:2px}
   <button role="menuitem" aria-label="New" id="actNew">New</button>
   <button role="menuitem" aria-label="Release" id="actRelease">Release</button>
   <button role="menuitem" aria-label="Post..." id="actPost">Post...</button>
+  <button role="menuitem" aria-label="Statistics" id="actStats">Statistics</button>
 </div>
 <div id="card" hidden>
   <div class="field control" role="group"><a class="caption" id="capCust">Customer Name</a>
@@ -61,6 +62,14 @@ document.getElementById("actNew").addEventListener("click", () => {
 });
 document.getElementById("actRelease").addEventListener("click", () => {
   document.getElementById("status").textContent = "The status was changed to Released.";
+});
+// A dialog closed with a German caption: only the dialog structure shows it is not a step.
+document.getElementById("actStats").addEventListener("click", () => {
+  const dialog = document.createElement("div");
+  dialog.setAttribute("role", "dialog"); dialog.setAttribute("aria-modal", "true");
+  dialog.innerHTML = `<p>Sales Order Statistics</p><button id="dlgClose" aria-label="Schließen">Schließen</button>`;
+  document.body.appendChild(dialog);
+  dialog.querySelector("#dlgClose").addEventListener("click", () => setTimeout(() => dialog.remove(), 50));
 });
 document.getElementById("actPost").addEventListener("click", () => {
   const dialog = document.createElement("div");

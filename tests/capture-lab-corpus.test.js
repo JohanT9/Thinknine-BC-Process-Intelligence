@@ -29,6 +29,10 @@ assert.strictEqual(suggestion.interactionId, customerEdit.interactionId);
 const post = events.find(item => item.type === "click" && item.label === "Post...");
 const ok = events.find(item => item.type === "click" && item.label === "OK");
 assert.strictEqual(ok.interactionId, post.interactionId);
+// Closing a dialog joins the action that opened it, whatever the caption language.
+const statistics = events.find(item => item.type === "click" && item.label === "Statistics");
+const close = events.find(item => item.type === "click" && item.label === "Schließen");
+assert.strictEqual(close.interactionId, statistics.interactionId);
 
 let recording = canonical.create({ id: "capture-lab", name: "Capture lab" });
 const sourceEvents = [];
@@ -58,6 +62,7 @@ assert.deepStrictEqual(steps, [
   "Ange __5__ i **Quantity**.",
   "Ange __6__ i **Quantity**.",
   "Välj **Release** på sidan **Sales Order - Dynamics 365 Business Central**.",
+  "Välj **Statistics** på sidan **Sales Order - Dynamics 365 Business Central**.",
   "Välj **Post...** på sidan **Sales Order - Dynamics 365 Business Central**."
 ]);
 assert(!steps.some(step => /Ada\b|Aktivera/u.test(step)),

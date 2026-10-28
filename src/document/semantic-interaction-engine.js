@@ -1,10 +1,12 @@
 (function (root, factory) {
   const sourceReference = typeof module === "object" && module.exports
     ? require("../engine/source-reference") : root.T9SourceReference;
-  const api = factory(sourceReference);
+  const captions = typeof module === "object" && module.exports
+    ? require("../engine/bc-client-captions") : root.T9BCClientCaptions;
+  const api = factory(sourceReference, captions);
   if (typeof module === "object" && module.exports) module.exports = api;
   root.T9SemanticInteractionEngine = api;
-})(typeof globalThis !== "undefined" ? globalThis : this, function (sourceReference) {
+})(typeof globalThis !== "undefined" ? globalThis : this, function (sourceReference, captions) {
   const ENGINE_VERSION = "1.5.0";
   const documentCache = new WeakMap();
 
@@ -1072,7 +1074,7 @@
       match(context) {
         const value = context.interactions[context.index];
         return ["RunAction", "ClickAction"].includes(value?.taskType) &&
-          /^(?:stäng|close)$/iu.test(closeCaption(value));
+          captions.matches("close", closeCaption(value));
       },
       consolidate(context) {
         const value = context.interactions[context.index];
