@@ -1,5 +1,6 @@
 ## Unreleased
 - Recognize the Business Central client controls that are not steps (close, scroll, show more or less, back and forward, field hints and Tell Me) in French, German, Spanish, Danish, Finnish and Norwegian too. The captions are read from the web client's own language resources, which also corrects English and Swedish wordings that newer clients use, such as "The value for this field is required" and "Visa mer".
+- Measure capture quality on a corpus of real and lab recordings: `npm run quality:capture` classifies every produced step as correct, wrong, duplicate or extra and lists missing steps, and CI fails when a recording gets worse than its baseline. `npm run quality:import` turns an exported recording ZIP into a corpus entry with values pseudonymized and URLs, e-mail addresses and company removed. See docs/CAPTURE_QUALITY.md.
 
 ## 4.7.206
 - Record a choice from a field suggestion list as one step with the chosen value. Previously the typed characters, the click on the suggestion and the final value became three steps.

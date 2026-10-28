@@ -1,0 +1,15 @@
+{
+  "schemaVersion": 1,
+  "recordings": [
+    {
+      "id": "lab-sales-order-typeahead",
+      "expected": 10,
+      "produced": 10,
+      "correct": 10,
+      "wrong": 0,
+      "duplicates": 0,
+      "extras": 0,
+      "missing": 0
+    }
+  ]
+}
