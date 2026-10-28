@@ -181,6 +181,24 @@
     return activeInteraction.interactionId;
   }
 
+  // A choice in a field's suggestion list continues the field edit, and a button in a dialog
+  // continues the action that opened the dialog, so neither starts a separate step.
+  let recentField = null;
+  function owningInteraction(target) {
+    if (!(target instanceof Element)) return "";
+    if (target.closest('[role="option"]')?.closest('[role="listbox"]')) {
+      const active = document.activeElement;
+      const field = active?.matches?.(EDITABLE_SELECTOR) ? active
+        : recentField && Date.now() - recentField.at < 3000 ? recentField.element : null;
+      return field?.isConnected ? interactionForElement(field, true) : "";
+    }
+    const dialog = target.closest('[role="dialog"],[aria-modal="true"]');
+    if (dialog && !target.matches(EDITABLE_SELECTOR) && categoryOf(target) === "action") {
+      return dialogInteractions.get(dialog) || "";
+    }
+    return "";
+  }
+
   function interactionForElement(element, createIfMissing = false) {
     if (!(element instanceof Element)) return currentInteractionId();
     const existing = elementInteractions.get(element);
@@ -905,7 +923,8 @@
       controlId: element?.getAttribute?.("data-control-id") || "",
       elementId: element?.id || "",
       nameAttribute: element?.getAttribute?.("name") || "",
-      inputType: element?.getAttribute?.("type") || "",
+      inputType: element instanceof HTMLInputElement ? element.type
+        : element?.getAttribute?.("type") || "",
       ariaHasPopup: element?.getAttribute?.("aria-haspopup") || "",
       placeholder,
       accessibleName,
@@ -913,7 +932,9 @@
       label: accessibleName,
       readOnly: Boolean(element?.readOnly),
       disabled: Boolean(element?.disabled || element?.getAttribute?.("aria-disabled") === "true"),
-      checked: element?.checked ?? undefined,
+      // Text inputs also expose checked=false; only checkboxes and radio buttons have a state.
+      checked: element instanceof HTMLInputElement &&
+        ["checkbox", "radio"].includes(element.type) ? element.checked : undefined,
       selected: element?.getAttribute?.("aria-selected") === "true" || undefined,
       reactInteractive: isObservableReactTarget(element) || undefined,
       controlAddIn: uiHierarchy.some(item => item.type === "controlAddIn") || /Mui[A-Z]/.test(String(element?.className || "")),
@@ -1053,7 +1074,7 @@
       (observedTarget instanceof Element ? observedTarget : null);
     const label = concisePointerLabel(event, target);
     if (!target || !label) return;
-    const interactionId = activateInteraction("", target, "pointer");
+    const interactionId = activateInteraction(owningInteraction(target), target, "pointer");
     pendingPointerCapture = { interactionId, target, createdAt: Date.now() };
     try {
       chrome.runtime.sendMessage({ type: "T9_CAPTURE_BEFORE_ACTION",
@@ -1091,7 +1112,7 @@
         pendingPointerCapture.target.contains?.(observedTarget))
       ? pendingPointerCapture.interactionId : "";
     const interactionId = preActionCaptureId ||
-      activateInteraction("", target, "click");
+      activateInteraction(owningInteraction(target), target, "click");
     activateInteraction(interactionId, target, "click");
     pendingPointerCapture = null;
 
@@ -1174,6 +1195,7 @@
 
     if (element instanceof Element) {
       clearTimeout(inputTimers.get(element));
+      recentField = { element, at: Date.now() };
       const finalValue = valueOf(element);
       const outcome = focusSessions.finish(element, finalValue);
       if (outcome.emit) {

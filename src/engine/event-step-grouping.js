@@ -81,6 +81,12 @@
     // the originating control/page as the group context so later semantic
     // interpretation can explain what the selected record was entered into.
     if (events.some(isLookupOrigin)) return events.find(isLookupOrigin);
+    // A click into a field only starts the edit; the committed value is the step.
+    const commits = events.filter(event => isCommit(event.kind));
+    const activation = events.find(event => event.kind === "activation");
+    if (activation && commits.some(event => controlKey(event) === controlKey(activation))) {
+      return commits.at(-1);
+    }
     if (events.some(event => event.kind === "activation") &&
         !events.some(isLookupOrigin) && outcomeEvents(events).length) {
       return events.find(event => event.kind === "activation");

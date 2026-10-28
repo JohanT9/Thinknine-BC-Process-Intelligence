@@ -1,3 +1,10 @@
+## Unreleased
+- Record a choice from a field suggestion list as one step with the chosen value. Previously the typed characters, the click on the suggestion and the final value became three steps.
+- Stop recording edits in text fields as enabled checkboxes ("Enable …"). Only checkboxes and radio buttons now record a checked state.
+- Document a field edit by its committed value, not by the click that put the cursor in the field, so edited fields no longer disappear from the steps.
+- Keep a button in a dialog (for example OK after Post) with the action that opened the dialog instead of adding a separate step.
+- Add a capture lab (`npm run capture:lab`) that drives the real recorder in Microsoft Edge on a Business Central-shaped page, and a regression test that requires one correct step per user action.
+
 ## 4.7.205
 - Use a dark appearance by default. Choose Light or Follow system under Appearance in the settings; the choice applies immediately to every BC Process Studio page in the browser.
 - Keep the document preview on white paper with dark text in every appearance, so it matches the Word document.
