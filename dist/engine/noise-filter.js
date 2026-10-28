@@ -1,23 +1,16 @@
 (function (root, factory) {
-  const api = factory();
+  const captions = typeof module === "object" && module.exports
+    ? require("./bc-client-captions") : root.T9BCClientCaptions;
+  const api = factory(captions);
   if (typeof module === "object" && module.exports) module.exports = api;
   root.T9Engine = root.T9Engine || {};
   root.T9Engine.noiseFilter = api;
-})(typeof globalThis !== "undefined" ? globalThis : this, function () {
+})(typeof globalThis !== "undefined" ? globalThis : this, function (captions) {
   const ignoredTypes = new Set(["pointer", "page-state", "hover", "scroll"]);
-  const ignoredCaptions = [
-    /^\uE72B$/i, // Legacy BC back/dismiss navigation icon.
-    /^(?:stäng|close|dismiss)\.?$/i,
-    /^(?:visa resten|show more|show less|visa mindre|visa sekundära åtgärder|show secondary actions)\.?$/i,
-    /^(?:rulla|scroll)(?:\s+(?:åt|to\s+the))?\s+(?:höger|vänster|upp|ned|ner|right|left|up|down)\.?$/i,
-    /^bakåt$/i,
-    /^tillbaka$/i,
-    /^back$/i,
-    /^framåt$/i,
-    /^forward$/i,
-    /^berätta vad du vill göra\.?$/i,
-    /^tell me what you want to do\.?$/i
-  ];
+  // The legacy BC back/dismiss icon glyph, then the shared client caption categories.
+  const isIgnoredCaption = caption => /^$/u.test(caption) ||
+    ["close", "display", "scroll", "history", "tellMe"].some(category =>
+      captions.matches(category, caption));
 
   function clean(value) {
     return String(value || "").replace(/\s+/g, " ").trim();
@@ -39,13 +32,13 @@
 
     const caption = clean(event.fieldName || event.label).split(/\s*(?:→|->)\s*/).at(-1);
     if (["textbox", "searchbox"].includes(event.role) &&
-        /^(?:tell me what you want to do|berätta vad du vill göra)\.?$/iu.test(caption)) return true;
+        captions.matches("tellMe", caption)) return true;
     // Legacy recordings may lack section metadata. Only suppress a bare section click,
     // never a field interaction or a recorded value.
     if (event.type === "click" && /^(?:vikt|weight)\.?$/iu.test(caption) &&
         !event.fieldId && !event.inputType && event.value == null &&
         !["input", "textarea"].includes(event.controlType) && event.role !== "textbox") return true;
-    if (ignoredCaptions.some(pattern => pattern.test(caption))) {
+    if (isIgnoredCaption(caption)) {
       return event.type !== "field-change" || !String(event.value || "").trim();
     }
 

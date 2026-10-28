@@ -1,7 +1,7 @@
 {
   "packId": "aptean-fb",
   "name": "Aptean Food & Beverage",
-  "version": "2.6.5",
+  "version": "2.6.6",
   "priority": 300,
   "rules": [
     {
@@ -417,7 +417,6 @@
           "^Lot No\\. Information Card$"
         ],
         "actionPatterns": [
-          "^New$",
           "^Create Quality Control Check$",
           "^Create Ad-hoc Quality Control Check$"
         ],

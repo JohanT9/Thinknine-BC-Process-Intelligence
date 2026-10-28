@@ -3,11 +3,13 @@
     ? require("./bc-ui-identification") : root.T9BCUIIdentification;
   const pageIdentification = typeof module === "object" && module.exports
     ? require("./page-identification-engine") : root.T9PageIdentificationEngine;
-  const api = factory(identification, pageIdentification);
+  const captions = typeof module === "object" && module.exports
+    ? require("./bc-client-captions") : root.T9BCClientCaptions;
+  const api = factory(identification, pageIdentification, captions);
   if (typeof module === "object" && module.exports) module.exports = api;
   root.T9EventNormalization = api;
 })(typeof globalThis !== "undefined" ? globalThis : this, function (
-  identification, pageIdentification
+  identification, pageIdentification, captions
 ) {
   "use strict";
   const SCHEMA_VERSION = 1;
@@ -253,7 +255,7 @@
         if (raw.type === "focus") {
           flush();
           const caption = String(raw.accessibleName || raw.fieldName || raw.label || "").trim();
-          const tellMe = /^(?:tell me what you want to do|berätta vad du vill göra)\.?$/iu.test(caption);
+          const tellMe = captions.matches("tellMe", caption);
           focusedFieldContext = caption && !tellMe ? {
             caption, pageId: String(raw.pageId || ""),
             timestamp: event.timestamp || raw.timestamp || ""
@@ -278,7 +280,7 @@
         else { flush(); pending = { kind, reason, sources: [candidate] }; }
       } else { flush(); events.push(create(candidate, kind, reason, [candidate], options)); }
       const rawCaption = String(raw.accessibleName || raw.fieldName || raw.label || "");
-      const helperHint = /(?:obligatoriska fält.*inte är ifyllda|tryck på alt\s*\+\s*i.*förslag för det här fältet|värdet i det här fältet är obligatoriskt)/iu.test(rawCaption);
+      const helperHint = captions.matches("fieldHint", rawCaption);
       if (["selection-change", "toggle-change", "value-change"].includes(kind) ||
           (kind === "activation" && !helperHint)) focusedFieldContext = null;
     }

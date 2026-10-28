@@ -3,11 +3,13 @@
     ? require("./capture-packet-integrity") : root.T9CapturePacketIntegrity;
   const observedState = typeof module === "object" && module.exports
     ? require("./observed-state") : root.T9ObservedState;
-  const api = factory(integrity, observedState);
+  const captions = typeof module === "object" && module.exports
+    ? require("./bc-client-captions") : root.T9BCClientCaptions;
+  const api = factory(integrity, observedState, captions);
   if (typeof module === "object" && module.exports) module.exports = api;
   root.T9EventStepGrouping = api;
 })(typeof globalThis !== "undefined" ? globalThis : this, function (
-  integrity, observedState
+  integrity, observedState, captions
 ) {
   "use strict";
   const SCHEMA_VERSION = 1;
@@ -81,6 +83,12 @@
     // the originating control/page as the group context so later semantic
     // interpretation can explain what the selected record was entered into.
     if (events.some(isLookupOrigin)) return events.find(isLookupOrigin);
+    // A click into a field only starts the edit; the committed value is the step.
+    const commits = events.filter(event => isCommit(event.kind));
+    const activation = events.find(event => event.kind === "activation");
+    if (activation && commits.some(event => controlKey(event) === controlKey(activation))) {
+      return commits.at(-1);
+    }
     if (events.some(event => event.kind === "activation") &&
         !events.some(isLookupOrigin) && outcomeEvents(events).length) {
       return events.find(event => event.kind === "activation");
@@ -295,10 +303,7 @@
     // BC validation tips and shortcut hints are explanatory overlays, not
     // actions performed in the business process. Never turn clicks on these
     // surfaces into procedure steps.
-    if (event.rawEventType === "click" &&
-        /^(?:den här gruppen innehåller .* obligatoriska fält|tryck på alt\s*\+\s*i .*förslag för det här fältet|this group contains .* required fields|press alt\s*\+\s*i .*suggestion for this field)/iu.test(caption)) return true;
-    if (event.rawEventType === "click" &&
-        /^(?:värdet i det här fältet är obligatoriskt|the value in this field is required)/iu.test(caption)) return true;
+    if (event.rawEventType === "click" && captions.matches("fieldHint", caption)) return true;
     const embeddedLabels = caption.match(/\b(?:antal|quantity|qty|lastbärare|pallet|tare|taravikt|weight|vikt|leveransenhet|unit|kod|code)\b/giu) || [];
     if (event.rawEventType === "click" && caption.length > 70 &&
         embeddedLabels.length >= 4) return true;
@@ -306,13 +311,13 @@
     // With no accessible action name they cannot form an actionable instruction.
     if (event.rawEventType === "click" && /^[\uE000-\uF8FF]+$/u.test(caption)) return true;
     if (["textbox", "searchbox"].includes(event.controlIdentification?.role) &&
-        /^(?:tell me what you want to do|berätta vad du vill göra)\.?$/iu.test(caption) &&
+        captions.matches("tellMe", caption) &&
         (event.kind !== "value-change" || !String(event.value?.normalized || "").trim())) return true;
-    const scrollCommand = /^(?:rulla|scroll)(?:\s+(?:åt|to\s+the))?\s+(?:höger|vänster|upp|ned|ner|right|left|up|down)\.?$/iu.test(caption);
-    const displayCommand = /^(?:visa resten|show more|show less|visa mindre|visa sekundära åtgärder|show secondary actions)\.?$/iu.test(caption);
+    const scrollCommand = captions.matches("scroll", caption);
+    const displayCommand = captions.matches("display", caption);
     const control = event.controlIdentification || {};
     const closeCommand = event.rawEventType === "dialog-close" ||
-      control.controlType === "dialogClose" || /^(?:stäng|close|dismiss)\.?$/iu.test(caption) ||
+      control.controlType === "dialogClose" || captions.matches("close", caption) ||
       (event.rawEventType === "click" && caption === "\uE72B");
     const sectionToggle = control.controlType === "sectionToggle" ||
       (event.rawEventType === "click" && /^(?:vikt|weight)\.?$/iu.test(caption) &&

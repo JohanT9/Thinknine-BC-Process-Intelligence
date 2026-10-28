@@ -1,0 +1,84 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><title>Sales Orders - Dynamics 365 Business Central</title>
+<style>
+body{font:14px Segoe UI;margin:0}.bar{display:flex;gap:6px;padding:8px;background:#eee}
+.field{display:flex;gap:10px;margin:6px 12px}.field a.caption{width:180px}
+table{border-collapse:collapse;margin:12px}td{border:1px solid #ccc;padding:2px}
+[role=dialog]{position:fixed;top:120px;left:200px;background:#fff;border:1px solid #333;padding:20px}
+</style></head>
+<body>
+<!-- Shaped like the Business Central web client: action bar menu items, captioned fields,
+     an editable lines grid that re-renders after a commit, a posting dialog and status text. -->
+<div class="ms-nav-layout-head"><span class="title" id="pageCaption">Sales Orders</span></div>
+<div class="bar" role="menubar">
+  <button role="menuitem" aria-label="New" id="actNew">New</button>
+  <button role="menuitem" aria-label="Release" id="actRelease">Release</button>
+  <button role="menuitem" aria-label="Post..." id="actPost">Post...</button>
+  <button role="menuitem" aria-label="Statistics" id="actStats">Statistics</button>
+</div>
+<div id="card" hidden>
+  <div class="field control" role="group"><a class="caption" id="capCust">Customer Name</a>
+    <input class="stringcontrol-edit" aria-labelledby="capCust" id="custName" aria-autocomplete="list" aria-controls="custList"></div>
+  <div role="listbox" id="custList" hidden><div role="option" id="optAdatum">Adatum Corporation</div><div role="option">Alpine Ski House</div></div>
+  <div class="field control" role="group"><a class="caption" id="capExt">External Document No.</a>
+    <input class="stringcontrol-edit" aria-labelledby="capExt" id="extDoc"></div>
+  <div class="field control" role="group"><a class="caption" id="capDate">Posting Date</a>
+    <input class="stringcontrol-edit" aria-labelledby="capDate" id="postDate" value="26.10.2026"></div>
+  <table role="grid" aria-label="Lines"><thead><tr role="row"><th role="columnheader">Type</th><th role="columnheader">No.</th><th role="columnheader">Quantity</th></tr></thead>
+    <tbody id="lines"></tbody></table>
+</div>
+<div id="status" role="status" aria-live="polite"></div>
+<script>
+// Lines re-render after a committed edit, as the BC client replaces the cell editors.
+const row = { type: "Item", no: "", qty: "" };
+function renderLines() {
+  const body = document.getElementById("lines");
+  body.innerHTML = `<tr role="row" aria-rowindex="1"><td role="gridcell">${row.type}</td>
+    <td role="gridcell"><input aria-label="No." class="stringcontrol-edit" data-k="no" value="${row.no}"></td>
+    <td role="gridcell"><input aria-label="Quantity" class="stringcontrol-edit" data-k="qty" value="${row.qty}"></td></tr>`;
+  body.querySelectorAll("input").forEach(input => input.addEventListener("change", () => {
+    row[input.dataset.k] = input.dataset.k === "qty" ? String(Number(input.value)) : input.value.toUpperCase();
+    setTimeout(() => { const focused = document.activeElement?.dataset?.k; renderLines();
+      if (focused) document.querySelector(`#lines input[data-k="${focused}"]`)?.focus(); }, 30);
+  }));
+}
+// Typeahead: typing opens suggestions; picking one sets the value by script, as BC does.
+const cust=document.getElementById("custName"), list=document.getElementById("custList");
+cust.addEventListener("input",()=>{list.hidden=!cust.value;});
+list.addEventListener("mousedown",e=>e.preventDefault());
+list.addEventListener("click",e=>{const o=e.target.closest("[role=option]");if(!o)return;cust.value=o.textContent;list.hidden=true;});
+// Item numbers complete on Tab to the first match.
+document.addEventListener("keydown",e=>{const t=e.target;if(t.dataset&&t.dataset.k==="no"&&e.key==="Tab"&&/^1896/i.test(t.value)){t.value="1896-S";}},true);
+// Dates are reformatted by the client after validation.
+document.getElementById("postDate").addEventListener("change", event => {
+  const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(event.target.value);
+  if (m) setTimeout(() => { event.target.value = `${m[3]}.${m[2]}.${m[1]}`; }, 50);
+});
+document.getElementById("actNew").addEventListener("click", () => {
+  history.pushState({}, "", location.pathname + "?page=42");
+  document.title = "Sales Order - Dynamics 365 Business Central";
+  document.getElementById("pageCaption").textContent = "Sales Order";
+  document.getElementById("card").hidden = false; renderLines();
+});
+document.getElementById("actRelease").addEventListener("click", () => {
+  document.getElementById("status").textContent = "The status was changed to Released.";
+});
+// A dialog closed with a German caption: only the dialog structure shows it is not a step.
+document.getElementById("actStats").addEventListener("click", () => {
+  const dialog = document.createElement("div");
+  dialog.setAttribute("role", "dialog"); dialog.setAttribute("aria-modal", "true");
+  dialog.innerHTML = `<p>Sales Order Statistics</p><button id="dlgClose" aria-label="Schließen">Schließen</button>`;
+  document.body.appendChild(dialog);
+  dialog.querySelector("#dlgClose").addEventListener("click", () => setTimeout(() => dialog.remove(), 50));
+});
+document.getElementById("actPost").addEventListener("click", () => {
+  const dialog = document.createElement("div");
+  dialog.setAttribute("role", "dialog"); dialog.setAttribute("aria-modal", "true");
+  dialog.innerHTML = `<p>Choose an option: Ship and Invoice</p><button id="dlgOk" aria-label="OK">OK</button>`;
+  document.body.appendChild(dialog);
+  dialog.querySelector("#dlgOk").addEventListener("click", () => setTimeout(() => {
+    dialog.remove(); document.getElementById("status").textContent = "The order was posted.";
+  }, 80));
+});
+</script>
+</body></html>

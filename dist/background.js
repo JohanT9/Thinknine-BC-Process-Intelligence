@@ -29,6 +29,7 @@ importScripts("document/multi-level-process-graph.js");
 importScripts("engine/raw-event-persistence.js");
 importScripts("engine/event-log-storage.js");
 importScripts("engine/bc-ui-identification.js");
+importScripts("engine/bc-client-captions.js");
 importScripts("engine/event-normalization.js");
 importScripts("engine/capture-packet-integrity.js");
 importScripts("engine/observed-state.js");
