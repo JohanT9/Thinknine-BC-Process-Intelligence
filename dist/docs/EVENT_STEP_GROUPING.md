@@ -228,9 +228,19 @@ they group the same way as the mouse:
   that declares it, either in `aria-keyshortcuts` or as `(F9)` at the end of its tooltip or
   name. Controls in an open dialog are searched first. It is recorded only when every
   declaring control names the same action. The event keeps `shortcut` (for example
-  `Ctrl+Delete`) and owns what the action opens, so its dialog buttons join it.
-- An undeclared shortcut stays evidence (`key-command`) and never becomes a step, because the
-  recorder does not guess what it did. F2, F4 and Alt+arrows in a field act on that field.
+  `Ctrl+Delete`) and owns what the action opens, so its dialog buttons join it. Tooltips may
+  use the client's localized key names (STRG, UMSCHALT, Skift, Maj, Entf, Suppr), which are
+  read as Ctrl, Shift and Delete.
+- A shortcut that no control declares starts an action of its own. It becomes a step only when
+  Business Central visibly responds in that action, with a dialog, a page or a message. The
+  step is then "Press **Ctrl+Delete**." (`PressShortcut`), and the response shows its
+  meaning. The recorder never guesses which action it was. Without a response it stays
+  evidence (`key-command`). F2, F4 and Alt+arrows in a field act on that field.
+- An undeclared shortcut also records `shortcutEvidence`: how many elements on the page
+  declare `aria-keyshortcuts` or `accesskey`, and up to five buttons, menu items or tabs whose
+  `aria-keyshortcuts`, `accesskey`, `title`, `aria-label` or `aria-description` mentions
+  the key. Only those command attributes are read, never field values or rows. The evidence
+  shows how the client marks a shortcut that the recorder could not name.
 - Enter or Space on a button, link or menu item is one click, marked `inputSource: "keyboard"`.
   It is not recorded as both a key and a click.
 - Enter on a list row, or in a search or type-ahead field with a highlighted suggestion, is
@@ -244,11 +254,26 @@ they group the same way as the mouse:
   editor that the client re-rendered is found again by caption, row and grid. Typing in it
   ends the wait.
 - A click into an empty plain text input that nothing else in its interaction follows only
-  places the cursor (`focus-only-click`), for example before Ctrl+Delete.
+  places the cursor (`focus-only-click`), for example before Ctrl+Delete. A click on the page
+  form, which the client names after the page ("New - Purchase Order"), is layout like the
+  main landmark and is never a step.
+
+### What Business Central answered
+
+A dialog whose text is not a question, and is not a completion message, is a message that
+Business Central showed in response to the step. The step's result then reads "Business Central
+showed the message “…”", and not that its dialog closed. The message keeps Business Central's
+own language. A message that something must be different or cannot be done is never a
+completion, even when it names a completed state, as in "Status must be equal to Open …
+Current value is Released". The refusal phrases are listed for every registered language in
+`event-step-grouping.js`. The recorder cannot tell an error dialog from an information
+dialog in documentation recordings, so the wording stays neutral.
 
 Business Central's own language resources do not show how the web client renders shortcuts
-in the page. Both declaration forms are supported, and the shortcut texts have not yet been
-verified against a live client. `npm run capture:lab -- keyboard-navigation` exercises all of
+in the page. A recording from Business Central 26 (SaaS, Swedish) showed that no control on a
+purchase order declared Ctrl+Delete in either form. That recording is in the capture quality
+corpus as `bc-purchase-order-ctrl-delete`. Whether action shortcuts such as F9 are declared
+is not yet known; `shortcutEvidence` in the next recordings will show it. `npm run capture:lab -- keyboard-navigation` exercises all of
 the above. It uses the content script in headless Edge on a Business Central-shaped page, and
 `tests/capture-lab-corpus.test.js` checks the captured events and the steps in every document
 language.

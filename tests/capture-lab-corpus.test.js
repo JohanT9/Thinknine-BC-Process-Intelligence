@@ -48,7 +48,7 @@ function assertLocalized(prepared, steps) {
     for (const step of localized) {
       const translated = documentLanguage.translateInstruction(step, locale);
       // Danish and Norwegian also say "posten" and "siden"; their Swedish forms are checked.
-      assert(!/\b(?:Välj|Ange|Börja|Sök|öppna|listan|artikel|kund|sidan|genom att|filtrerade)\b/u
+      assert(!/\b(?:Välj|Ange|Börja|Sök|Tryck|öppna|listan|artikel|kund|sidan|genom att|filtrerade)\b/u
         .test(translated), `${locale}: ${translated}`);
       for (const value of step.match(/(?:\*\*|__)[^*_]+(?:\*\*|__)/gu) || []) {
         assert(translated.includes(value), `${locale} keeps ${value}`);
@@ -116,7 +116,9 @@ const deleteLine = byLabel("key", "Delete Line");
 assert.deepStrictEqual([deleteLine.shortcut, deleteLine.category], ["Ctrl+Delete", "action"]);
 const postKey = byLabel("key", "Post...");
 assert.strictEqual(postKey.shortcut, "F9");
-assert.strictEqual(byLabel("click", "OK").interactionId, postKey.interactionId);
+const postOk = keys.slice(keys.indexOf(postKey)).find(item => item.type === "click" &&
+  item.label === "OK");
+assert.strictEqual(postOk.interactionId, postKey.interactionId);
 assert.strictEqual(byLabel("key", "Search").shortcut, "Alt+Q");
 // Enter on a dialog button is one click, marked as made from the keyboard, not a key and a click.
 const yes = keys.filter(item => item.label === "Yes" || item.accessibleName === "Yes");
@@ -129,6 +131,13 @@ const searchText = keys.findIndex(item => item.inputSource === "input" &&
 const result = keys.findIndex(item => item.type === "key" && item.selectedCaption === "Sales Orders");
 assert(searchText >= 0 && result > searchText, "the search text comes before the result");
 assert.strictEqual(byLabel("key", "101003 School of Fine Art")?.selectedCaption, "101003");
+// A shortcut no control declares stays a key of its own action, with evidence of which
+// controls mention its key; F7 alone is declared, Shift+F7 is not.
+const undeclared = keys.find(item => item.shortcut === "Shift+F7");
+assert.strictEqual(undeclared.category, "interaction");
+assert.notStrictEqual(undeclared.interactionId, deleteLine.interactionId);
+assert.deepStrictEqual(undeclared.shortcutEvidence.samples.map(item => item.title), ["Statistics (F7)"]);
+assert(undeclared.shortcutEvidence.declaredShortcuts >= 2);
 // Arrow keys only move the selection.
 assert(!keys.some(item => /^Arrow/u.test(item.key || "")));
 // Values the client reformats are recorded as shown, with the typed text beside them.
@@ -147,9 +156,19 @@ assert.deepStrictEqual(keyboardSteps, [
   "Ange __1,200.00__ i **Unit Price Excl. VAT**.",
   "Välj **Balance (LCY)** på sidan **Sales Order 101003 - Dynamics 365 Business Central**.",
   "Välj **Delete Line** på sidan **Sales Order 101003 - Dynamics 365 Business Central**.",
+  "Tryck på **Shift+F7**.",
   "Välj **Post...** på sidan **Sales Order 101003 - Dynamics 365 Business Central**."
 ]);
 assertLocalized(keyboardPrepared, keyboardSteps);
+// A refusal is the result of the shortcut that caused it, and a completion of Post.
+const keyboardResults = pipeline.interpret({ session: { id: "capture-lab", name: "Capture lab",
+  settings: { documentLanguage: "sv-SE" } }, events: keyboardPrepared.sourceEvents,
+normalizedEvents: keyboardPrepared.normalized.events, stepGroups: keyboardPrepared.grouped.groups,
+supportingEvents: keyboardPrepared.grouped.supportingEvents,
+groupingDiagnostics: keyboardPrepared.grouped.diagnostics, imagePaths: {}, knowledgePacks })
+  .businessTasks.map(task => task.resultVerification?.summary || "");
+assert.match(keyboardResults.at(-2), /^Business Central visade meddelandet “Status must be equal to 'Open'/u);
+assert.strictEqual(keyboardResults.at(-1), "Business Central bekräftade att “The order was posted”.");
 
 console.log(`Capture lab corpus passed (${fixture.userActions.length + keyboard.userActions.length} ` +
   `user actions, ${steps.length + keyboardSteps.length} steps).`);

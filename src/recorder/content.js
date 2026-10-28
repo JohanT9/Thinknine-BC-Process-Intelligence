@@ -1309,6 +1309,29 @@
     return null;
   }
 
+  // Which action controls mention a shortcut's key, and whether the page declares shortcuts at
+  // all. Only command captions and attributes are read, never field values or rows.
+  const KEY_ALIASES = { Delete: ["Delete", "Del", "Entf", "Suppr", "Supr"],
+    Insert: ["Insert", "Ins", "Einfg", "Inser"] };
+  function shortcutEvidence(shortcut) {
+    const key = shortcut.split("+").at(-1);
+    // Key names are letters and digits only (F9, Q, Delete), so they need no escaping.
+    const names = (KEY_ALIASES[key] || [key]).filter(name => /^[\p{L}\p{N}]+$/u.test(name));
+    const mentions = new RegExp(String.raw`(?:^|[^\p{L}\p{N}])(?:${names.join("|")})(?:$|[^\p{L}\p{N}])`, "iu");
+    const attributes = ["aria-keyshortcuts", "accesskey", "title", "aria-label", "aria-description"];
+    const controls = [...document.querySelectorAll('button,[role="button"],[role="menuitem"],' +
+      '[role="menuitemcheckbox"],[role="tab"]')];
+    const samples = controls.filter(element => attributes.some(name =>
+      mentions.test(element.getAttribute(name) || ""))).slice(0, 5).map(element => ({
+      role: element.getAttribute("role") || element.tagName.toLowerCase(),
+      ...Object.fromEntries(attributes.map(name => [name, clean(element.getAttribute(name) || "", 120)])
+        .filter(([, value]) => value)),
+      hidden: Boolean(element.closest('[hidden],[aria-hidden="true"]')) ||
+        !element.getClientRects().length }));
+    return { key, declaredShortcuts: document.querySelectorAll("[aria-keyshortcuts]").length,
+      accessKeys: document.querySelectorAll("[accesskey]").length, samples };
+  }
+
   // Enter in a search box or type-ahead field chooses the suggestion the client marks as
   // active or selected, and is recorded as a click on it would be: an option in the field's
   // suggestion list continues the field edit, a result row is an action of its own.
@@ -1380,13 +1403,18 @@
         ...descriptor(suggestion) });
       return;
     }
-    const interactionId = interactionForElement(eventTarget, false) ||
-      activateInteraction(owningInteraction(target), target, "keyboard");
+    // A page shortcut no control declares is still a new user action; the evidence of which
+    // controls mention the key shows how the client marks shortcuts.
+    const pageShortcut = Boolean(shortcut) && !fieldKey;
+    const interactionId = pageShortcut ? activateInteraction("", target, "shortcut")
+      : interactionForElement(eventTarget, false) ||
+        activateInteraction(owningInteraction(target), target, "keyboard");
     const selectedCaption = event.key === "Enter" && !editable &&
       categoryOf(target) === "selection" ? selectionCaption(target) : "";
     const entry = { ...keyFields(event),
       category: selectedCaption ? "selection" : "interaction",
       ...(shortcut ? { shortcut } : {}),
+      ...(pageShortcut && !event.repeat ? { shortcutEvidence: shortcutEvidence(shortcut) } : {}),
       ...(selectedCaption ? { selectedValue: selectedCaption, selectedCaption } : {}),
       interactionId, fieldName: getLabel(eventTarget), ...descriptor(target) };
     const clickTarget = !editable && ["Enter", " ", "Spacebar"].includes(event.key)

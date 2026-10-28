@@ -25,6 +25,13 @@ assert.deepStrictEqual(keyboard.declaredShortcuts("Control+Delete Alt+q  F9"),
 assert.strictEqual(keyboard.tooltipShortcut("Post... (F9)"), "F9");
 assert.strictEqual(keyboard.tooltipShortcut("Search (Alt+Q)"), "Alt+Q");
 assert.strictEqual(keyboard.tooltipShortcut("Bogfør (Shift+F9)"), "Shift+F9");
+// The client's localized key names (STRG, UMSCHALT, Skift, Maj) and Delete labels are read.
+assert.strictEqual(keyboard.tooltipShortcut("Löschen (STRG+Entf)"), "Ctrl+Delete");
+assert.strictEqual(keyboard.tooltipShortcut("Buchen (UMSCHALT+F9)"), "Shift+F9");
+assert.strictEqual(keyboard.tooltipShortcut("Bokför (Skift+F9)"), "Shift+F9");
+assert.strictEqual(keyboard.tooltipShortcut("Supprimer (Ctrl+Suppr)"), "Ctrl+Delete");
+assert.strictEqual(keyboard.tooltipShortcut("Ta bort (Ctrl+Del)"), "Ctrl+Delete");
+assert.deepStrictEqual(keyboard.declaredShortcuts("Strg+Entf"), ["Ctrl+Delete"]);
 // A caption that only ends with parentheses is not a shortcut.
 assert.strictEqual(keyboard.tooltipShortcut("Balance (LCY)"), "");
 assert.strictEqual(keyboard.tooltipShortcut("Sales Order (2 of 5)"), "");

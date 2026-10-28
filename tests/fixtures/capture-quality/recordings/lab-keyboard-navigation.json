@@ -13,6 +13,7 @@
     { "target": "Unit Price Excl. VAT", "value": "1,200.00" },
     { "target": "Balance (LCY)" },
     { "target": "Delete Line" },
+    { "target": "Shift+F7" },
     { "target": "Post..." }
   ]
 }

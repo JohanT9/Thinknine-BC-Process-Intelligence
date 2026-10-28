@@ -61,7 +61,8 @@ const scenarios = {
     mark("5 FactBox Balance (LCY) drilldown"); await click("#balance"); await sleep(500);
     mark("6 Escape back to the order"); await key("Escape", "Escape", 27); await sleep(500);
     mark("7 Ctrl+Delete on line 2, Enter to confirm"); await click('#lines input[data-row="1"]'); await key("Delete", "Delete", 46, "", 2); await sleep(300); await enter(); await sleep(400);
-    mark("8 F9 to post, OK"); await key("F9", "F9", 120); await sleep(300); await click('[role=dialog] button[aria-label="OK"]'); await sleep(800);
+    mark("8 Shift+F7, which no control declares, then OK on the message"); await key("F7", "F7", 118, "", 8); await sleep(300); await click('[role=dialog] button[aria-label="OK"]'); await sleep(500);
+    mark("9 F9 to post, OK"); await key("F9", "F9", 120); await sleep(300); await click('[role=dialog] button[aria-label="OK"]'); await sleep(800);
   } }
 };
 const selected = process.argv[2] ? [process.argv[2]] : Object.keys(scenarios);

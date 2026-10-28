@@ -2,10 +2,20 @@
   "schemaVersion": 1,
   "recordings": [
     {
+      "id": "bc-purchase-order-ctrl-delete",
+      "expected": 1,
+      "produced": 1,
+      "correct": 1,
+      "wrong": 0,
+      "duplicates": 0,
+      "extras": 0,
+      "missing": 0
+    },
+    {
       "id": "lab-keyboard-navigation",
-      "expected": 7,
-      "produced": 7,
-      "correct": 7,
+      "expected": 8,
+      "produced": 8,
+      "correct": 8,
       "wrong": 0,
       "duplicates": 0,
       "extras": 0,

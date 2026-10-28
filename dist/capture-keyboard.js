@@ -9,12 +9,21 @@
   // Clipboard, undo and select-all edit text; they are not commands of the page.
   const EDITING = new Set(["Ctrl+A", "Ctrl+C", "Ctrl+V", "Ctrl+X", "Ctrl+Y", "Ctrl+Z",
     "Ctrl+Shift+Z", "Meta+A", "Meta+C", "Meta+V", "Meta+X", "Meta+Z", "Meta+Shift+Z"]);
-  const KEY_NAMES = { " ": "Space", Spacebar: "Space", Esc: "Escape", Del: "Delete",
-    Control: "Ctrl", Ctrl: "Ctrl", Option: "Alt", Command: "Meta", Cmd: "Meta", Win: "Meta" };
+  // Keyed in lower case. The localized modifier names are the web client's own
+  // (Keyboard_ControlKey, Keyboard_ShiftKey, Keyboard_CommandKey in its language resources);
+  // Entf, Suppr and Supr are the German, French and Spanish labels of Delete.
+  const KEY_NAMES = { " ": "Space", spacebar: "Space", esc: "Escape", "échap": "Escape",
+    echap: "Escape", del: "Delete", entf: "Delete", suppr: "Delete", supr: "Delete",
+    ins: "Insert", einfg: "Insert", control: "Ctrl", ctrl: "Ctrl", strg: "Ctrl",
+    alt: "Alt", option: "Alt", shift: "Shift", skift: "Shift", umschalt: "Shift", maj: "Shift",
+    "mayúsculas": "Shift", vaihto: "Shift", meta: "Meta", command: "Meta", cmd: "Meta",
+    kommando: "Meta", befehl: "Meta", komento: "Meta", commande: "Meta", comando: "Meta",
+    win: "Meta" };
 
   function keyName(key) {
     const text = String(key || "").trim();
-    if (KEY_NAMES[text]) return KEY_NAMES[text];
+    const known = KEY_NAMES[text.toLowerCase()];
+    if (known) return known;
     return text.length === 1 ? text.toUpperCase() : text;
   }
 
@@ -46,8 +55,8 @@
       .map(item => combo(item.split("+")));
   }
 
-  const NAMED_KEYS = /^(?:Delete|Del|Insert|Enter|Escape|Esc|Home|End|PageUp|PageDown|Tab|Space|Backspace|Arrow(?:Up|Down|Left|Right))$/iu;
-  const MODIFIER_NAMES = /^(?:Ctrl|Control|Alt|Shift|Meta|Cmd|Command|Option)$/iu;
+  const NAMED_KEYS = /^(?:Delete|Insert|Enter|Escape|Home|End|PageUp|PageDown|Tab|Space|Backspace|Arrow(?:Up|Down|Left|Right))$/u;
+  const isModifierName = part => ["Ctrl", "Alt", "Shift", "Meta"].includes(keyName(part));
 
   // A tooltip or name that ends with the shortcut in parentheses, such as "Post... (F9)".
   // A caption such as "Balance (LCY)" is not one: the key must be a function key, or a
@@ -58,9 +67,10 @@
     const parts = match[1].split("+").map(part => part.trim());
     const key = parts.at(-1);
     const modifiers = parts.slice(0, -1);
-    if (!modifiers.every(part => MODIFIER_NAMES.test(part))) return "";
+    if (!modifiers.every(isModifierName)) return "";
     const functionKey = /^F(?:[1-9]|1[0-2])$/u.test(key);
-    const heldKey = modifiers.length && (/^[\p{L}\p{N}]$/u.test(key) || NAMED_KEYS.test(key));
+    const heldKey = modifiers.length && (/^[\p{L}\p{N}]$/u.test(key) ||
+      NAMED_KEYS.test(keyName(key)));
     return functionKey || heldKey ? combo(parts) : "";
   }
 

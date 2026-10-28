@@ -60,6 +60,28 @@ assert.deepStrictEqual([lab.expected, lab.correct, lab.duplicates, lab.extras, l
   [10, 10, 0, 0, 0]);
 assert(quality.report(result, { verbose: true }).includes("TOTAL"));
 
+// Real Business Central: Ctrl+Delete, which no control declared, is one step because the client
+// visibly responded. Its confirmation and the refusal belong to it, the click on the page form
+// before it is no step, and the refusal is the step's result in every document language.
+const ctrlDelete = quality.loadCorpus().find(item => item.id === "bc-purchase-order-ctrl-delete");
+const [pressed] = replay(ctrlDelete.events, { documentLanguage: "sv-SE" }).tasks;
+assert.strictEqual(replay(ctrlDelete.events, { documentLanguage: "sv-SE" }).tasks.length, 1);
+assert.deepStrictEqual([pressed.taskType, pressed.instruction],
+  ["PressShortcut", "Tryck på **Ctrl+Delete**."]);
+assert.match(pressed.resultVerification.summary,
+  /^Business Central visade meddelandet “Status måste vara lika med Öppen/u);
+const languageModule = require("../src/document/document-language");
+for (const locale of ["en-US", "fr-FR", "de-DE", "es-ES", "da-DK", "fi-FI", "nb-NO"]) {
+  for (const text of [pressed.instruction, pressed.resultVerification.summary]) {
+    const translated = languageModule.translateInstruction(text, locale);
+    assert(!/\b(?:Tryck på|visade meddelandet)\b/u.test(translated), `${locale}: ${translated}`);
+  }
+  assert(languageModule.translateInstruction(pressed.instruction, locale).includes("**Ctrl+Delete**"));
+  // Business Central's own message keeps its language.
+  assert(languageModule.translateInstruction(pressed.resultVerification.summary, locale)
+    .includes("Status måste vara lika med Öppen"), locale);
+}
+
 // A worse result is reported as a regression.
 const worse = { recordings: result.recordings.map(item => item.id === lab.id
   ? { ...item, correct: 9, duplicates: 1 } : item) };
@@ -71,7 +93,8 @@ assert.deepStrictEqual(quality.compare(worse, quality.readBaseline()).regression
 const labEvents = JSON.parse(fs.readFileSync(path.join(__dirname,
   "fixtures/capture-lab/sales-order-typeahead.json"), "utf8")).events;
 const exportedEvents = labEvents.map((event, index) => ({ ...event, eventNo: index + 1,
-  companyName: "Real Customer Ltd", pageCaption: "Real Customer Ltd", identification: { stale: true },
+  companyName: "Real Customer Ltd", pageCaption: "Real Customer Ltd",
+  documentTitle: "Sales Order - 1001 ∙ Northwind Traders", identification: { stale: true },
   topUrl: "https://businesscentral.dynamics.com/0f0e1d2c-3b4a-5968-7766-554433221100/Production?company=Real%20Customer&page=42&bookmark=abc",
   ...(index === 0 ? { note: "Sent by anna.svensson@example.com" } : {}) }));
 const dir = fs.mkdtempSync(path.join(os.tmpdir(), "capture-quality-"));
@@ -83,7 +106,7 @@ fs.writeFileSync(zipPath, zipWriter.create([
 const { entry, pseudonymized } = importer.importRecording(zipPath, { id: "imported" });
 fs.rmSync(dir, { recursive: true, force: true });
 const text = JSON.stringify(entry.events);
-for (const secret of ["Adatum", "PO-1001", "Real Customer", "anna.svensson", "bookmark",
+for (const secret of ["Adatum", "PO-1001", "Real Customer", "Northwind", "anna.svensson", "bookmark",
   "0f0e1d2c-3b4a", "tenant-demo"]) {
   assert(!text.includes(secret), `removed: ${secret}`);
 }

@@ -51,6 +51,7 @@ function readFolder(dir) {
 
 const DATA_FIELDS = ["value", "previousValue", "enteredValue", "selectedValue", "selectedCaption"];
 const COMPANY_FIELDS = ["companyName", "company"];
+const TITLE_FIELDS = ["pageCaption", "documentTitle"];
 const DATA_ROLES = new Set(["option", "row", "gridcell", "cell", "listitem", "treeitem"]);
 const hasLetter = text => /\p{L}/u.test(text);
 
@@ -76,6 +77,8 @@ function collectDataWords(events) {
     DATA_FIELDS.forEach(field => values.push(event[field]));
     // Business Central can show the company name as the page caption, so its words go too.
     COMPANY_FIELDS.forEach(field => values.push(event[field]));
+    // A card's title names its record after "∙", as in "Purchase Order - 1001 ∙ Fabrikam".
+    TITLE_FIELDS.forEach(field => values.push(String(event[field] || "").split("∙").slice(1).join(" ")));
     if (event.type === "click" && DATA_ROLES.has(event.role)) values.push(event.label, event.accessibleName);
   }
   const captionWords = new Set(events.filter(event => !DATA_ROLES.has(event.role))

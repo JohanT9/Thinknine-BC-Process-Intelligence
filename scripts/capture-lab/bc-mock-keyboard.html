@@ -95,7 +95,8 @@ function showCard([no, name]) {
   previousPage = () => showCard([no, name]);
   show(42, `Sales Order ${no}`, `<div class="bar" role="menubar">
       <button role="menuitem" aria-label="Post..." aria-keyshortcuts="F9" id="actPost">Post...</button>
-      <button role="menuitem" aria-label="Delete Line" aria-keyshortcuts="Control+Delete">Delete Line</button></div>
+      <button role="menuitem" aria-label="Delete Line" aria-keyshortcuts="Control+Delete">Delete Line</button>
+      <button role="menuitem" aria-label="Statistics" title="Statistics (F7)">Statistics</button></div>
     <div class="field control" role="group"><a class="caption" id="capCust">Customer Name</a>
       <input class="stringcontrol-edit" aria-labelledby="capCust" value="${name}" readonly></div>
     <div class="field control" role="group"><a class="caption" id="capDate">Order Date</a>
@@ -122,7 +123,10 @@ function showCard([no, name]) {
 function confirmDialog(text, buttons, done) {
   const dialog = document.createElement("div");
   dialog.setAttribute("role", "dialog"); dialog.setAttribute("aria-modal", "true");
-  dialog.innerHTML = `<p>${text}</p>${buttons.map(caption =>
+  // As in the client, the dialog is named by its message, not by its buttons.
+  const messageId = `msg${Date.now()}`;
+  dialog.setAttribute("aria-labelledby", messageId);
+  dialog.innerHTML = `<p id="${messageId}">${text}</p>${buttons.map(caption =>
     `<button aria-label="${caption}">${caption}</button>`).join("")}`;
   document.body.appendChild(dialog);
   dialog.querySelectorAll("button").forEach(button => button.addEventListener("click", () =>
@@ -142,7 +146,12 @@ document.addEventListener("keydown", event => {
   if (event.key === "Escape" && previousPage && document.title.startsWith("Customer Ledger")) {
     event.preventDefault(); setTimeout(previousPage, 60);
   }
-  if (event.key === "F9" && document.getElementById("actPost")) { event.preventDefault(); openPostDialog(); }
+  if (event.key === "F9" && !event.shiftKey && document.getElementById("actPost")) { event.preventDefault(); openPostDialog(); }
+  // A shortcut no control declares; the client answers with a message.
+  if (event.key === "F7" && event.shiftKey && document.getElementById("actPost")) {
+    event.preventDefault();
+    confirmDialog("Status must be equal to 'Open' in Sales Header: Document Type=Order, No.=101003. Current value is 'Released'.", ["OK"], () => {});
+  }
   if (event.ctrlKey && event.key === "Delete" && event.target.closest?.("#lines")) {
     event.preventDefault();
     const row = Number(event.target.closest("tr").getAttribute("aria-rowindex")) - 1;

@@ -128,7 +128,7 @@
       interaction: { mechanism: mechanism(raw), key: raw.key || undefined, code: raw.code || undefined,
         altKey: raw.altKey || undefined, ctrlKey: raw.ctrlKey || undefined,
         metaKey: raw.metaKey || undefined, shiftKey: raw.shiftKey || undefined,
-        repeat: raw.repeat || undefined },
+        repeat: raw.repeat || undefined, shortcut: raw.shortcut || undefined },
       value: valueModel(raw, identified),
       previousValue: Object.prototype.hasOwnProperty.call(raw, "previousValue") ? { raw: clone(raw.previousValue), normalized: clone(raw.previousValue) } : null,
       selection, state: kind === "toggle-change" ? { checked: raw.checked ?? raw.value } : null,

@@ -19,7 +19,7 @@ expected steps. Steps are aligned in order, so a step in the wrong place does no
 The corpus starts with two capture lab recordings of a Business Central-shaped page: one
 used with the mouse and one used from the keyboard (shortcuts, arrow keys, Tell Me, a FactBox
 and values the client reformats). Run `npm run capture:lab` to capture them again after a
-recorder change. Recordings from real Business Central are added with the importer.
+recorder change. Recordings from real Business Central are added with the importer; the first is `bc-purchase-order-ctrl-delete` (Ctrl+Delete on a released purchase order).
 
 ## Commands
 
@@ -53,6 +53,8 @@ the same change so the improvement is kept.
   random pseudonyms of the same shape. A typed fragment stays a prefix of the chosen value, so
   type-ahead behaves as recorded. Words that are also control captions (for example an
   option such as Item) are kept.
+- The company name and the record name in page titles (after "∙") are pseudonymized wherever
+  they occur.
 - URLs keep only the page number. E-mail addresses and the company name are removed, and
   GUIDs are replaced consistently so events keep their interaction.
 - Screenshots are not part of `events.json` and are never imported.

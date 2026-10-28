@@ -1526,6 +1526,12 @@
           ? `Ange __${selected}__ i **${field}**.`
           : `Fyll i **${field}**.`;
       } }),
+    // Above every caption-based rule: the target of an undeclared shortcut is only where the
+    // focus was, so its text says nothing about what the shortcut did.
+    singleRule({ ruleId: "undeclared-keyboard-shortcut", priority: 200,
+      match: value => value?.taskType === "PressShortcut" && Boolean(text(value?.shortcut)),
+      actionType: () => "PressShortcut",
+      display: value => `Tryck på **${text(value.shortcut)}**.` }),
     singleRule({ ruleId: "generic-captioned-action", priority: 5,
       match: value => value?.taskType === "RunAction" &&
         Boolean(text(value?.actionCaption)),
@@ -1593,15 +1599,18 @@
     const opensList = /\s+(?:listor|lists)$/iu.test(observedAction);
     const observedField = presentationText(control.caption || "").replace(
       /^(?:choose|select)(?:\s+(?:a|an))?\s+value\s+for\s+|^välj(?:\s+ett)?\s+värde\s+för\s+|^(?:choisissez|choisir|sélectionnez|sélectionner)\s+(?:une?\s+)?valeur\s+pour\s+|^wählen\s+sie\s+(?:einen?\s+)?wert\s+für\s+|^(?:seleccione|seleccionar|elija)\s+(?:un\s+)?valor\s+para\s+|^vælg\s+(?:en\s+)?værdi\s+for\s+|^valitse\s+arvo\s+(?:kohteelle|kentälle|kenttään)\s+|^velg\s+(?:en\s+)?verdi\s+for\s+/iu, "").trim();
+    // A shortcut no control declared is described by its keys, never by a guessed action.
+    const shortcut = primary.kind === "key-command" ? text(primary.interaction?.shortcut) : "";
     return {
       rowTypeContext: clone(primary.rowTypeContext),
       kind: group.groupKind,
       taskId: group.stepGroupId,
-      taskType: action.actionType === "SearchAndOpenPage"
+      taskType: shortcut ? "PressShortcut" : action.actionType === "SearchAndOpenPage"
         ? "SearchAndOpenPage" : opensList
           ? "OpenPage" : types[group.groupKind] || "Unclassified",
-      fieldCaption: observedField,
-      actionCaption: observedAction,
+      fieldCaption: shortcut ? "" : observedField,
+      actionCaption: shortcut || observedAction,
+      ...(shortcut ? { shortcut } : {}),
       selectedCaption: selected ? String(selected) : "",
       selectedValue: selected,
       uiHierarchy: clone(group?.uiHierarchy || primary.uiHierarchy || []),

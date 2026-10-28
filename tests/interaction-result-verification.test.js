@@ -42,7 +42,7 @@ const grouped = grouping.group({ recordingId: "result-verification", events: [
 
 assert.strictEqual(grouped.groupingVersion, grouping.GROUPING_VERSION);
 assert.strictEqual(grouping.CAPTURE_PACKET_VERSION, "1.6.0");
-assert.strictEqual(grouping.RESULT_VERIFICATION_VERSION, "1.4.0");
+assert.strictEqual(grouping.RESULT_VERIFICATION_VERSION, "1.5.0");
 assert.strictEqual(grouped.groups.length, 1,
   "an action and all its immediate outcomes form one packet");
 const verification = grouped.groups[0].capturePacket.resultVerification;
@@ -131,5 +131,23 @@ assert.ok(!dashboard.includes("review-observed-result"), "verified outcomes are 
 assert.ok(!dashboard.includes("renderExternalKnowledgeSuggestions"), "unverified external proposals are omitted from the main review");
 assert.ok(content.includes('type: "status-message"'));
 assert.ok(content.includes("observedStatusMessages"));
+
+// A refusal that names a completed state is never a confirmation, in any registered language;
+// real completions still are.
+for (const refusal of [
+  "Status must be equal to 'Open' in Sales Header: Document Type=Order, No.=101003. Current value is 'Released'.",
+  "Status måste vara lika med Öppen i Inköpshuvud: Dokumenttyp=Order, Nr=2600187. Aktuellt värde är Släppt.",
+  "Der Status muss gleich 'Offen' sein. Der aktuelle Wert ist 'Freigegeben'.",
+  "Le statut doit être égal à 'Ouvert'. La valeur actuelle est 'Lancé'.",
+  "El estado debe ser igual a 'Abierto'. El valor actual es 'Lanzado'.",
+  "Status skal være lig med 'Åben'. Den aktuelle værdi er 'Frigivet'.",
+  "Tilan on oltava 'Avoin'. Nykyinen arvo on 'Vapautettu'.",
+  "Status må være lik 'Åpen'. Gjeldende verdi er 'Frigitt'.",
+  "Det är inte tillåtet eftersom ordern har frisläppts."
+]) assert.strictEqual(grouping.isCompletionMessage(refusal), false, refusal);
+for (const completion of ["The order was posted.", "Sales order 1001 has been released.",
+  "Ordern har bokförts.", "Der Auftrag wurde gebucht.", "No. 1001 was posted."]) {
+  assert.strictEqual(grouping.isCompletionMessage(completion), true, completion);
+}
 
 console.log("Interaction result verification tests passed.");

@@ -4,6 +4,10 @@
 - Record keyboard use as the steps it performs. A shortcut such as F9 or Ctrl+Delete is recorded as the action that declares it, together with the dialog it opens. Enter on a list row or on a highlighted Tell Me result chooses it. Enter on a dialog button is one step, not two. Previously these steps were missing or duplicated. A shortcut that no control declares stays evidence and is never guessed.
 - Record a field value as Business Central shows it after validation, for example 28.10.2026 for "t" or 1,200.00 for 1200, and keep the typed text beside it, masked like the value.
 - A click that only puts the cursor in an empty field, for example before a keyboard shortcut, is no longer a step.
+- Document a keyboard shortcut that no button declares, such as Ctrl+Delete in Business Central, as "Press **Ctrl+Delete**." when Business Central visibly responds to it. The response shows what it did. A recording also notes which buttons mention the key, so that we can learn how the client marks its shortcuts.
+- A click on the page itself (for example on "New - Purchase Order") is no longer a step.
+- Show the message Business Central answered with as the step's result, for example "Status must be equal to Open …", instead of "The dialog closed". A message saying that something must be different or cannot be done is no longer described as a confirmation, even when it mentions Released or Posted.
+- The capture quality importer now also pseudonymizes the company name and the record name in page titles. The corpus gains its first recording from real Business Central.
 - Translate record selections, opened lists and Tell Me searches into every document language. Previously Swedish words remained, for example "Wählen Sie posten" or "Sök efter".
 
 ## 4.7.206

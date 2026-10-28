@@ -269,6 +269,32 @@
       };
       if (templates[locale]) return templates[locale];
     }
+    // Key names stay as recorded (Ctrl+Delete), like other technical identifiers.
+    const shortcut = source.match(/^Tryck på ([\s\S]+?)\.$/u);
+    if (shortcut) {
+      const keys = shortcut[1];
+      const templates = {
+        "en-US": `Press ${keys}.`, "fr-FR": `Appuyez sur ${keys}.`,
+        "de-DE": `Drücken Sie ${keys}.`, "es-ES": `Pulsa ${keys}.`,
+        "da-DK": `Tryk på ${keys}.`, "fi-FI": `Paina ${keys}.`, "nb-NO": `Trykk på ${keys}.`
+      };
+      if (templates[locale]) return templates[locale];
+    }
+    // The message is Business Central's own text and keeps its language.
+    const shownMessage = source.match(/^Business Central visade meddelandet “([\s\S]+)”\.$/u);
+    if (shownMessage) {
+      const message = shownMessage[1];
+      const templates = {
+        "en-US": `Business Central showed the message “${message}”.`,
+        "fr-FR": `Business Central a affiché le message « ${message} ».`,
+        "de-DE": `Business Central hat die Meldung „${message}“ angezeigt.`,
+        "es-ES": `Business Central mostró el mensaje «${message}».`,
+        "da-DK": `Business Central viste meddelelsen “${message}”.`,
+        "fi-FI": `Business Central näytti viestin ”${message}”.`,
+        "nb-NO": `Business Central viste meldingen «${message}».`
+      };
+      if (templates[locale]) return templates[locale];
+    }
     const searchAndOpen = source.match(/^Sök efter ([\s\S]+?) och öppna (listan )?([\s\S]+?)\.$/u);
     if (searchAndOpen) {
       const [, query, isList, result] = searchAndOpen;

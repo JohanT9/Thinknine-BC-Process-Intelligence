@@ -15,7 +15,7 @@
   const SCHEMA_VERSION = 1;
   const GROUPING_VERSION = "1.29.0";
   const CAPTURE_PACKET_VERSION = "1.6.0";
-  const RESULT_VERIFICATION_VERSION = "1.4.0";
+  const RESULT_VERIFICATION_VERSION = "1.5.0";
   const cache = new WeakMap();
   const clone = value => value == null ? value : JSON.parse(JSON.stringify(value));
   function freeze(value) { if (!value || typeof value !== "object" || Object.isFrozen(value)) return value; Object.values(value).forEach(freeze); return Object.freeze(value); }
@@ -83,6 +83,8 @@
     // the originating control/page as the group context so later semantic
     // interpretation can explain what the selected record was entered into.
     if (events.some(isLookupOrigin)) return events.find(isLookupOrigin);
+    // A group can only start with a key when it is a shortcut Business Central responded to.
+    if (events[0]?.kind === "key-command" && events[0].interaction?.shortcut) return events[0];
     // A click into a field only starts the edit; the committed value is the step.
     const commits = events.filter(event => isCommit(event.kind));
     const activation = events.find(event => event.kind === "activation");
@@ -104,16 +106,40 @@
       event.actionIdentification?.caption || "";
   }
   const COMPLETION_MESSAGE = /(?:\b(?:has been\s+)?(?:successfully\s+)?(?:created|saved|posted|processed|registered|generated|applied|released|sent|completed)\b|\b(?:skapats|skapades|skapade|sparats|sparades|sparad|sparat|bokf[oö]rts|registrerats|registrerades|till[aä]mpats|frisl[aä]ppts|skickats|slutf[oö]rts)\b|\b(?:cr[eé][eé](?:e|es|s)?|enregistr[eé](?:e|es|s)?|valid[eé](?:e|es|s)?|comptabilis[eé](?:e|es|s)?|envoy[eé](?:e|es|s)?|termin[eé](?:e|es|s)?)\b|\b(?:creado|guardado|registrado|contabilizado|aplicado|enviado|finalizado)s?\b|\b(?:erstellt|gespeichert|gebucht|registriert|angewendet|freigegeben|gesendet|abgeschlossen)\b|\b(?:oprettet|gemt|bogf[oø]rt|registreret|anvendt|frigivet|sendt|afsluttet)\b|\b(?:luotu|tallennettu|kirjattu|rekister[oö]ity|sovellettu|vapautettu|l[aä]hetetty|valmis)\b|\b(?:opprettet|lagret|bokf[oø]rt|registrert|brukt|frigitt|sendt|fullf[oø]rt)\b)/iu;
-  function isCompletionMessage(text) { return COMPLETION_MESSAGE.test(String(text || "")); }
+  // A message that something must be different or cannot be done refuses the action, even when
+  // it names a completed state ("Status must be equal to Open … Current value is Released").
+  // The phrases are those of Business Central's validation messages in every registered language.
+  const REFUSAL_PHRASES = ["must", "cannot", "can't", "can not", "is not", "are not",
+    "does not", "do not", "not allowed", "måste", "kan inte", "får inte", "är inte",
+    "finns inte", "skal være", "kan ikke", "må ikke", "er ikke", "findes ikke", "finnes ikke",
+    "må være", "muss", "müssen", "kann nicht", "darf nicht", "ist nicht", "existiert nicht",
+    "doit", "doivent", "ne peut", "ne pouvez", "n'est pas", "n’est pas", "n'existe pas",
+    "n’existe pas", "debe", "deben", "no se puede", "no puede", "no es", "no existe",
+    "on oltava", "täytyy", "ei voi", "ei ole", "ei löydy"];
+  const REFUSAL_MESSAGE = new RegExp(`(?<!\\p{L})(?:${REFUSAL_PHRASES.join("|")})(?!\\p{L})`, "iu");
+  function isCompletionMessage(text) {
+    const value = String(text || "");
+    return COMPLETION_MESSAGE.test(value) && !REFUSAL_MESSAGE.test(value);
+  }
   function isListAnnouncement(text) {
     return /(?:^|\b)(?:lista med rubriken|list with (?:the )?title|list titled|sorterade? i|sorted (?:in|by)|attributnamn|attribute name)(?:\b|$)/iu
       .test(String(text || ""));
+  }
+  // A dialog whose text is not a question, such as "Status must be equal to Open …", is a
+  // message Business Central showed in response; a question asks the user to confirm.
+  function isMessageDialog(event) {
+    const caption = observedCaption(event, "control").trim();
+    return event.kind === "dialog-open" && caption.length > 0 && !/[?？]$/u.test(caption) &&
+      !isCompletionMessage(caption);
   }
   function outcomeDescription(event) {
     const pageCaption = observedCaption(event, "page");
     const controlCaption = observedCaption(event, "control");
     const completion = event.kind === "dialog-open" &&
       isCompletionMessage(controlCaption);
+    if (isMessageDialog(event)) {
+      return `Business Central visade meddelandet “${controlCaption.replace(/[.!]+$/u, "")}”.`;
+    }
     switch (event.kind) {
       case "navigation": return pageCaption
         ? `Sidan ${pageCaption} visas nu.` : "En ny sida öppnades.";
@@ -167,7 +193,10 @@
       return false;
     });
     const error = values.find(value => value.kind === "error-outcome");
-    const primary = error || completion || values.at(-1) || null;
+    // A message the action led to tells more than the closing of its dialog.
+    const message = [...values].reverse().find(value => value.kind === "dialog-open" &&
+      /^Business Central visade meddelandet/u.test(value.description));
+    const primary = error || completion || message || values.at(-1) || null;
     const summary = completion
       ? `${completion.description}${reference
         ? ` Referensen är ${reference.controlCaption.replace(/[.!?]+$/u, "")}.` : ""}`
@@ -292,6 +321,15 @@
       event.controlIdentification?.controlType === "interactiveSurface" &&
       event.value?.normalized == null && !event.selection;
   }
+  // A shortcut the recorder could not name is a step only when Business Central visibly
+  // responded to it in the same interaction; its meaning then shows in that result. Keys that
+  // act on the focused field belong to the field edit.
+  const FIELD_SHORTCUTS = new Set(["F2", "F4", "Alt+ArrowDown", "Alt+ArrowUp"]);
+  function isVisibleShortcut(event, resultInteractions) {
+    const shortcut = event.kind === "key-command" ? event.interaction?.shortcut : "";
+    return Boolean(shortcut && !FIELD_SHORTCUTS.has(shortcut) && event.interactionId &&
+      resultInteractions.has(event.interactionId));
+  }
   function isNoise(event) {
     // Clicking an empty editable surface only focuses it. Its accessible name
     // can be a required-field hint rather than a field caption, in any locale.
@@ -303,8 +341,9 @@
         event.value?.normalized == null && !event.selection) return true;
     // A page landmark is layout, not an actionable control. Keep the raw
     // event as supporting evidence without inventing a Choose instruction.
+    // The page form is the same kind of container: Business Central names it after the page.
     if (event.rawEventType === "click" && event.kind === "activation" &&
-        event.controlIdentification?.role === "main" &&
+        ["main", "form"].includes(event.controlIdentification?.role) &&
         !event.controlIdentification?.fieldId && !event.value?.normalized) return true;
     const caption = String(event.actionIdentification?.caption ||
       event.controlIdentification?.caption || event.rawEvent?.label || "")
@@ -406,6 +445,10 @@
     if (cache.has(normalizedRecording)) return cache.get(normalizedRecording);
     const groups = []; const guidanceEvents = []; const supportingEvents = [];
     const assignments = new Map();
+    // Interactions in which Business Central visibly responded: a dialog, page or message.
+    const shortcutResults = new Set((normalizedRecording.events || []).filter(event =>
+      ["dialog-open", "navigation", "status-message", "error-outcome"].includes(event.kind))
+      .map(event => event.interactionId).filter(Boolean));
     let pending = null; let lastStandaloneNavigation = null;
     const emit = () => {
       if (!pending) return;
@@ -447,7 +490,8 @@
       }
       const lookupKeyboardEvidence = event.kind === "key-command" &&
         isLookupOrigin(pending?.events[0]);
-      if (isNoise(event) && !lookupKeyboardEvidence) { emit(); supportingEvents.push(freeze({ normalizedEventId: event.normalizedEventId, classification: "noise", reason: "non-step-mechanic" })); assignments.set(event.normalizedEventId, "supporting"); continue; }
+      const visibleShortcut = isVisibleShortcut(event, shortcutResults);
+      if (isNoise(event) && !lookupKeyboardEvidence && !visibleShortcut) { emit(); supportingEvents.push(freeze({ normalizedEventId: event.normalizedEventId, classification: "noise", reason: "non-step-mechanic" })); assignments.set(event.normalizedEventId, "supporting"); continue; }
       if (isUnclassifiedMechanic(event)) { emit(); supportingEvents.push(freeze({
         normalizedEventId: event.normalizedEventId, classification: "unclassified",
         reason: "no-documentable-interaction" }));
@@ -583,6 +627,6 @@
   }
   function normalizeStepGroup(value) { if (!value || Number(value.schemaVersion) !== SCHEMA_VERSION) throw new Error("Unsupported Step Group schema."); return freeze(clone(value)); }
   return { CAPTURE_PACKET_VERSION, GROUPING_VERSION, RESULT_VERIFICATION_VERSION,
-    SCHEMA_VERSION, group,
+    SCHEMA_VERSION, group, isCompletionMessage,
     normalizeStepGroup };
 });
