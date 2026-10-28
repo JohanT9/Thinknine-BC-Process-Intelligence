@@ -37,7 +37,7 @@ assert(popup.includes('class="license-summary"') && popup.includes('id="licenseC
   "license status, type and expiry remain visible in the disclosure summary");
 assert(popup.includes(".status{display:flex;align-items:center;gap:8px;padding:0"),
   "recording state appears as a compact indicator instead of a competing block");
-assert(popup.includes(".mode-card{text-align:left;padding:12px 13px;background:#fff"),
+assert(popup.includes(".mode-card{text-align:left;padding:12px 13px;background:var(--c-bg-ffffff)"),
   "recording choices retain a consistent card layout");
 assert(popup.includes('id="startProcess" class="primary mode-card"'),
   "the process recording choice uses the shared primary teal and white button style");

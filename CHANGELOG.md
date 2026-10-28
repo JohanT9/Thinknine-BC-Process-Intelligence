@@ -1,3 +1,14 @@
+## Unreleased
+- Use a dark appearance by default. Choose Light or Follow system under Appearance in the settings; the choice applies immediately to every BC Process Studio page in the browser.
+- Keep the document preview on white paper with dark text in every appearance, so it matches the Word document.
+- Translate the support email help text in the settings.
+- Redesign the start page around two views, Documents and Settings, with a New recording button that explains how to start a recording in Business Central and switches to an open Business Central tab.
+- Show each document's review status (Not reviewed, In review with approved steps, Ready to share) and list started reviews under Continue where you left off.
+- Filter documents with one click: All, Documentation, Bug reports, Needs review, Favorites and Archived. Archived documents leave the main list and stay available under Archived. Select multiple shows the checkboxes and the batch actions.
+- Move Export recording (ZIP), Export Word, Archive and Delete into each document's menu and remove the separate Saved recordings table.
+- Group the settings into General, Documents, Recording, Bug reports and Advanced. Changes save automatically and show when they were saved; a failed save keeps the changes and offers a retry. Appearance is chosen with direct buttons.
+- Translate the filename template help, preview and validation messages.
+
 ## 4.7.204
 - Show the review workspace tabs as the workflow Record → Review → Share. Recording shows as done, Share is marked once every step is approved, and the module names remain as tooltips.
 - Show the document beside the review on screens at least 1200 pixels wide with Show document. The selected step is highlighted in the document, selecting a step in the document selects it in the review, and the document updates as the review changes. The choice is remembered; narrower screens switch to the document tab instead.

@@ -177,8 +177,9 @@ const bugReportCard = { projectId: "p", title: "Report", tags: [], modifiedAt: "
   theme: { themeId: "technical-report", displayName: "Technical Report" },
   metadata: { recordingPurpose: "bug-report" }, documentLanguage: "sv-SE" };
 const cardLabels = new Set(uiLocales.map(locale => {
-  libraryView.renderList(container, [bugReportCard], { locale });
-  return container.innerHTML.match(/library-profile">([^<]+)</u)[1];
+  libraryView.renderGrouped(container, [{ profileId: "bug-report", displayName: "Bug Report",
+    documents: [bugReportCard] }], { locale });
+  return container.innerHTML.match(/<h3 id="library-group-bug-report">([^<]+)</u)[1];
 }));
 assert.strictEqual(cardLabels.size, uiLocales.length,
   "built-in library names are translated into every interface language");

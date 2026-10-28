@@ -19,8 +19,8 @@ assert(dashboard.includes('event.key !== "/"') &&
 assert(dashboard.includes('event.key.toLowerCase() === "s"') &&
   html.includes('aria-keyshortcuts="Control+S Meta+S"'));
 assert(html.includes('aria-keyshortcuts="/ Escape"'));
-assert(html.includes('data-i18n="Saved recordings">Saved recordings</summary>') &&
-  html.includes('id="sessionTools" class="session-tools"'));
+// Recording actions (ZIP export, delete) live in each document's menu; no separate table.
+assert(!html.includes('id="sessionTools"') && !html.includes('id="sessions"'));
 // The workspace tabs read as the workflow steps; the module names remain as tooltips.
 assert(/title="BC Review Studio"\s+data-i18n="review\.flowReview">Granska<\/button>/u.test(html) &&
   /title="BC Document Generator"\s+data-i18n="review\.flowShare">Dela<\/button>/u.test(html));
@@ -33,9 +33,8 @@ assert(dashboard.includes("const previous = documentLibraryRecords") &&
 assert(dashboard.includes("{ render: false }") &&
   dashboard.includes("options.render !== false"),
 "opening a document must retain its connected return-focus control");
-assert(dashboard.includes('if (!$("sessionTools").open) return;') &&
-  dashboard.includes('$("sessions").replaceChildren()'),
-"collapsed raw-session tools must not retain unnecessary table DOM");
+assert(dashboard.includes('action === "export-recording"') && dashboard.includes('action === "delete"'),
+  "every recording can still be exported as ZIP and deleted from the documents list");
 assert(dashboard.includes('document.querySelector("dialog[open]")'),
   "global search shortcut must not move focus behind a modal dialog");
 console.log("Workflow polish regression tests passed.");

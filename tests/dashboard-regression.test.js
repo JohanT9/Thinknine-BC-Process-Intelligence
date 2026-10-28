@@ -130,8 +130,9 @@ assert.ok(
 );
 
 assert.ok(
-  dashboard.includes('uiT("library.emptySessions")'),
-  "Dashboard must render an explicit empty state."
+  dashboard.includes("storedCount: documentLibraryRecords.length") &&
+    !dashboard.includes('$("sessions")'),
+  "The documents list renders the empty state; the separate recordings table is gone."
 );
 
 assert.ok(

@@ -30,8 +30,8 @@ assert(popupHtml.includes("Öppna Dokumentbibliotek") &&
   popupHtml.includes("Tekniska verktyg") &&
   popupHtml.includes('src="async-operations.js"'));
 
-assert(dashboardHtml.includes('<details id="settingsPanel" class="settings-panel">') &&
-  dashboardHtml.includes("Inställningar för dokumentation, export och inspelning"));
+assert(dashboardHtml.includes('<section id="settingsPanel" class="settings-view" aria-labelledby="settingsTitle" hidden>') &&
+  dashboardHtml.includes('data-home-view="settings" aria-controls="settingsPanel"'));
 
 const installation = read("INSTALLERA.txt");
 assert(installation.startsWith("BC PROCESS STUDIO BY THINKNINE 4.7.0"));

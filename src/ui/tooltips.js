@@ -100,7 +100,9 @@
     }
 
     function targetFrom(event) {
-      return event.target?.closest?.(TARGET_SELECTOR) || null;
+      // Menu items show their full text already; a tooltip would cover the next item.
+      const target = event.target?.closest?.(TARGET_SELECTOR) || null;
+      return target?.closest?.("[data-no-tooltip]") ? null : target;
     }
     function onPointerOver(event) {
       const target = targetFrom(event);
