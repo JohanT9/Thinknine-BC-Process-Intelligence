@@ -33,14 +33,44 @@
     return new Intl.DateTimeFormat(locale, { dateStyle: "medium" }).format(timestamp);
   }
 
-  function card(record, selected, active, locale = "en-US") {
+  // The review state comes from the saved review: approved steps of the visible steps.
+  function documentState(record, progress) {
+    if (record.metadata?.status === "recording") return { state: "recording" };
+    if (record.metadata?.recordingPurpose === "bug-report") return { state: "bug-report" };
+    const total = Number(progress?.total) || 0;
+    const approved = Math.min(Number(progress?.approved) || 0, total);
+    if (progress?.completed || (total > 0 && approved >= total)) {
+      return { state: "ready", total, approved };
+    }
+    return { state: approved > 0 ? "review" : "new", total, approved };
+  }
+
+  function stateLabel(state, locale) {
+    if (state.state === "recording") return localized("Recording", locale, "Spelar in");
+    if (state.state === "ready") return localized("Ready to share", locale, "Klar att dela");
+    if (state.state === "review") {
+      return localized("In review · {approved} of {total}", locale,
+        "Granskas · {approved} av {total}", state);
+    }
+    return state.state === "new" ? localized("Not reviewed", locale, "Ej granskad") : "";
+  }
+
+  function card(record, selected, active, locale = "en-US", progress = null) {
     const bugReport = record.metadata?.recordingPurpose === "bug-report";
+    const state = documentState(record, progress);
+    const recording = state.state === "recording";
     const language = languages.get(record.documentLanguage);
     const safeTitle = escape(record.title);
     const visibleTags = record.tags.slice(0, 3);
     const hiddenTagCount = Math.max(0, record.tags.length - visibleTags.length);
+    const label = stateLabel(state, locale);
+    const openLabel = bugReport ? localized("Open bug report", locale, "Öppna felrapport")
+      : state.state === "ready" || recording
+        ? localized("Open documentation", locale, "Öppna dokumentation")
+        : localized("Review", locale, "Granska");
     return `<article class="library-card" role="listitem" tabindex="${active ? 0 : -1}"
       data-selected="${selected}" ${active ? 'aria-current="true"' : ""}
+      data-kind="${bugReport ? "bug-report" : "documentation"}"
       data-library-project-id="${escape(record.projectId)}">
       <div class="library-card-heading"><label class="library-select">
         <input type="checkbox" data-library-action="select"
@@ -48,33 +78,76 @@
             "Select document: {title}", locale, "Välj dokument: {title}",
             { title: record.title }))}">
         <span class="sr-only">${escape(localized("Select document", locale,
-          "Välj dokument"))}</span></label><h4 title="${safeTitle}">${safeTitle}</h4>
-        <span class="library-language" aria-label="${escape(language.nativeName)}">${escape(language.shortCode)}</span>
+          "Välj dokument"))}</span></label>
+        <span class="library-kind" aria-hidden="true">${bugReport ? "!" : "≡"}</span>
+        <div class="library-card-title"><h4 title="${safeTitle}">${safeTitle}</h4>
+          <div class="library-card-meta">
+            <span>${escape(bugReport ? localized("Bug report", locale, "Felrapport")
+              : localized("Documentation", locale, "Dokumentation"))}</span>
+            ${record.metadata?.company ? `<span>${escape(record.metadata.company)}</span>` : ""}
+            <span class="library-language" aria-label="${escape(language.nativeName)}">${escape(language.shortCode)}</span>
+            <span>${escape(localized("Changed {date}", locale,
+              "Ändrad {date}", { date: date(record.modifiedAt, locale) }))}</span>
+            ${record.archived ? `<span class="library-card-status">${escape(localized(
+              "Archived", locale, "Arkiverad"))}</span>` : ""}
+            ${record.status ? `<span>${escape(record.status)}</span>` : ""}
+            ${record.author ? `<span>${escape(localized("By {author}", locale,
+              "Av {author}", { author: record.author }))}</span>` : ""}
+          </div>
+          ${visibleTags.length ? `<div class="library-tags">${visibleTags.map(tag =>
+            `<span>${escape(tag)}</span>`).join("")}${hiddenTagCount
+            ? `<span aria-label="${escape(localized("Additional tags: {count}",
+              locale, "Ytterligare taggar: {count}", { count: hiddenTagCount }))}">+${hiddenTagCount}</span>` : ""}</div>` : ""}
+        </div></div>
+      ${label ? `<span class="library-state" data-state="${state.state}">${escape(label)}</span>` : "<span></span>"}
+      <div class="library-card-footer">
         <button class="library-favourite" data-library-action="favourite"
           aria-pressed="${record.favourite}" aria-label="${escape(localized(
             record.favourite ? "Remove from favorites" : "Add to favorites",
             locale, record.favourite ? "Ta bort från favoriter" :
-              "Lägg till i favoriter"))}">${record.favourite ? "★" : "☆"}</button></div>
-      <div class="library-card-meta">
-        <span class="library-profile">${escape(builtInName(record.profile.displayName, locale))} · ${escape(builtInName(record.theme.displayName, locale))}</span>
-        ${record.archived ? `<span class="library-card-status">${escape(localized(
-          "Archived", locale, "Arkiverad"))}</span>` : ""}
-        ${record.status ? `<span>${escape(record.status)}</span>` : ""}
-        ${record.author ? `<span>${escape(localized("By {author}", locale,
-          "Av {author}", { author: record.author }))}</span>` : ""}
-      </div>
-      ${visibleTags.length ? `<div class="library-tags">${visibleTags.map(tag =>
-        `<span>${escape(tag)}</span>`).join("")}${hiddenTagCount
-        ? `<span aria-label="${escape(localized("Additional tags: {count}",
-          locale, "Ytterligare taggar: {count}", { count: hiddenTagCount }))}">+${hiddenTagCount}</span>` : ""}</div>` : ""}
-      <div class="library-card-footer">
-        <span class="muted">${escape(localized("Changed {date}", locale,
-          "Ändrad {date}", { date: date(record.modifiedAt, locale) }))}${record.readingMinutes ? ` · ${record.readingMinutes} min` : ""}</span>
-        <button class="secondary" data-library-action="open">${bugReport
-          ? localized("Open bug report", locale, "Öppna felrapport") :
-            localized("Open documentation", locale, "Öppna dokumentation")}</button>
+              "Lägg till i favoriter"))}">${record.favourite ? "★" : "☆"}</button>
+        <button class="secondary" data-library-action="open" ${recording ? "disabled" : ""}>${escape(openLabel)}</button>
+        <details class="library-card-menu" data-library-menu>
+          <summary aria-label="${escape(localized("More actions for {title}", locale,
+            "Fler åtgärder för {title}", { title: record.title }))}">⋯</summary>
+          <div class="library-card-menu-panel" data-no-tooltip>
+            ${bugReport || recording ? "" : `<button type="button" data-library-action="export-word">${escape(
+              localized("Export Word", locale, "Exportera Word"))}</button>`}
+            ${recording ? "" : `<button type="button" data-library-action="export-recording">${escape(
+              localized("Export recording (ZIP)", locale, "Exportera inspelning (ZIP)"))}</button>`}
+            <button type="button" data-library-action="archive">${escape(record.archived
+              ? localized("Restore from archive", locale, "Återställ från arkivet")
+              : localized("Archive", locale, "Arkivera"))}</button>
+            <hr>
+            <button type="button" class="danger" data-library-action="delete">${escape(
+              localized("Delete…", locale, "Ta bort…"))}</button>
+          </div>
+        </details>
       </div>
     </article>`;
+  }
+
+  // Started reviews that are not finished, so the user can continue where they left off.
+  function renderContinue(container, records, state = {}) {
+    const locale = state.locale || "en-US";
+    const progress = state.progress || new Map();
+    const items = records.filter(record => !record.archived &&
+      documentState(record, progress.get(record.projectId)).state === "review")
+      .slice(0, state.limit || 3);
+    container.innerHTML = items.map(record => {
+      const value = documentState(record, progress.get(record.projectId));
+      const percent = value.total ? Math.round(value.approved / value.total * 100) : 0;
+      return `<button type="button" class="library-continue-card"
+        data-library-continue="${escape(record.projectId)}">
+        <span class="library-continue-kind">${escape(localized("Documentation · changed {date}",
+          locale, "Dokumentation · ändrad {date}", { date: date(record.modifiedAt, locale) }))}</span>
+        <strong>${escape(record.title)}</strong>
+        <span class="library-progress" aria-hidden="true"><span style="width:${percent}%"></span></span>
+        <span class="library-continue-next">${escape(localized(
+          "{approved} of {total} steps approved · Continue reviewing →", locale,
+          "{approved} av {total} steg godkända · Fortsätt granska →", value))}</span></button>`;
+    }).join("");
+    return items.length;
   }
 
   function activeFilterCount(options = {}) {
@@ -104,7 +177,8 @@
       return null;
     }
     container.innerHTML = records.map(record => card(record,
-      selectedIds.has(record.projectId), record.projectId === activeId, locale
+      selectedIds.has(record.projectId), record.projectId === activeId, locale,
+      state.progress?.get(record.projectId)
     )).join("");
     return activeId;
   }
@@ -121,7 +195,8 @@
         <h3 id="library-group-${escape(group.profileId)}">${escape(builtInName(group.displayName, locale))}</h3>
         <div class="library-group-cards">${group.documents.map(record =>
           card(record, selectedIds.has(record.projectId),
-            record.projectId === activeId, locale)).join("")}</div></section>`
+            record.projectId === activeId, locale,
+            state.progress?.get(record.projectId))).join("")}</div></section>`
     ).join("");
     return activeId;
   }
@@ -144,5 +219,6 @@
     ) || null;
   }
 
-  return { activeFilterCount, applySelection, card, renderGrouped, renderList };
+  return { activeFilterCount, applySelection, card, documentState, renderContinue,
+    renderGrouped, renderList };
 });

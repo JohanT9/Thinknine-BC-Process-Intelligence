@@ -281,10 +281,11 @@ assert.ok(html.includes('src="engine/export-settings.js"'));
 assert.ok(!html.includes('id="alwaysAskExportLocation"'));
 assert.ok(html.includes('id="exportFileNamePattern"'));
 assert.ok(html.includes('id="supportEmail"'));
-assert.ok(html.includes('id="saveSupportEmail"'));
 assert.ok(html.includes('id="supportEmailStatus"'));
-assert.ok(dashboard.includes("async function saveSupportEmail()"));
-assert.ok(dashboard.includes('$("saveSupportEmail").addEventListener'));
+// Settings save automatically; the support address is validated before it is saved.
+assert.ok(!html.includes('id="saveSupportEmail"'));
+assert.ok(dashboard.includes("if (!email.checkValidity())"));
+assert.ok(dashboard.includes('$("settingsPanel").addEventListener("change", scheduleSettingsSave)'));
 assert.ok(html.includes('id="filenamePreview"'));
 assert.ok(html.includes('id="filenameValidation"'));
 assert.ok(html.includes('id="filenameVariableHelp"'));

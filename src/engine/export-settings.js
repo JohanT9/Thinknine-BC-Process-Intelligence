@@ -112,30 +112,34 @@
     return issues;
   }
 
-  function validationMessages(pattern) {
+  // The texts are Swedish templates; callers pass format() to show them in another language.
+  const fillTemplate = (template, values = {}) => Object.entries(values).reduce(
+    (result, [name, value]) => result.replaceAll(`{${name}}`, String(value)), template);
+
+  function validationMessages(pattern, format = fillTemplate) {
     const issues = validateTemplate(pattern);
     const unknown = [...new Set(
       issues.filter(issue => issue.type === "unknown").map(issue => issue.token)
     )];
     const messages = [];
-    if (unknown.length) messages.push(`Okända variabler: ${unknown.join(", ")}.`);
+    if (unknown.length) {
+      messages.push(format("Okända variabler: {variables}.", { variables: unknown.join(", ") }));
+    }
     const missing = issues.find(issue => issue.type === "missing-close");
     if (missing) {
-      messages.push(`Variabeln "${missing.token}" saknar avslutande }.`);
+      messages.push(format("Variabeln \"{token}\" saknar avslutande }.", { token: missing.token }));
     }
     if (issues.some(issue => issue.type === "duplicate-open")) {
-      messages.push("Dubbla { är inte tillåtna.");
+      messages.push(format("Dubbla { är inte tillåtna."));
     }
     const malformed = [...new Set(
       issues
         .filter(issue => issue.type === "malformed")
-        .map(issue => issue.token === "}" ? "fristående }" : issue.token)
+        .map(issue => issue.token === "}" ? format("fristående }") : issue.token)
     )];
     if (malformed.length) {
-      messages.push(
-        `Felaktiga variabler: ${malformed.join(", ")}. ` +
-        "Använd formatet {namn}."
-      );
+      messages.push(format("Felaktiga variabler: {variables}. Använd formatet {namn}.",
+        { variables: malformed.join(", ") }));
     }
     return messages;
   }
@@ -148,7 +152,7 @@
     return input.selectionStart;
   }
 
-  function renderVariableControls(container, help, onSelect) {
+  function renderVariableControls(container, help, onSelect, format = fillTemplate) {
     container.replaceChildren();
     const buttons = variableDefinitions.map(definition => {
       const token = `{${definition.name}}`;
@@ -157,7 +161,7 @@
       button.type = "button";
       button.dataset.variable = token;
       button.textContent = token;
-      button.setAttribute("aria-label", `Infoga variabeln ${token}`);
+      button.setAttribute("aria-label", format("Infoga variabeln {token}", { token }));
       button.addEventListener("click", () => onSelect(token));
       container.appendChild(button);
       return button;
@@ -180,15 +184,15 @@
         buttons[target].focus();
       });
     });
-    help.textContent = `Tillgängliga variabler: ${variableDefinitions
+    help.textContent = format("Tillgängliga variabler: {variables}", { variables: variableDefinitions
       .map(definition => `{${definition.name}}`)
-      .join(", ")}`;
+      .join(", ") });
   }
 
-  function updatePreview(elements, session, settings, now = new Date()) {
-    const messages = validationMessages(elements.input.value);
+  function updatePreview(elements, session, settings, now = new Date(), format = fillTemplate) {
+    const messages = validationMessages(elements.input.value, format);
     const filename = buildFileName("docx", session, settings, now);
-    elements.preview.textContent = `Förhandsvisning: ${filename}`;
+    elements.preview.textContent = format("Förhandsvisning: {filename}", { filename });
     elements.preview.setAttribute(
       "aria-live",
       messages.length > 0 ? "off" : "polite"

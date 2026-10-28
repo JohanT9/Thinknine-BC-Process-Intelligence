@@ -39,18 +39,18 @@ assert.ok(dashboard.includes('id="environmentName"'));
 assert.ok(dashboard.includes('id="companyName"'));
 assert.ok(dashboard.includes('id="defaultExpectedResult"'));
 assert.ok(dashboard.includes('aria-describedby="defaultExpectedResultHelp"'));
-assert.ok(dashboard.includes("#defaultExpectedResult{width:380px;max-width:100%;box-sizing:border-box;resize:vertical}"));
+assert.ok(dashboard.includes("#defaultExpectedResult{width:100%;max-width:520px;box-sizing:border-box;resize:vertical}"));
 assert.ok(dashboard.includes(".library-toggle-row label{display:inline-flex;align-items:center;gap:8px;margin:0}"));
 
 assert.ok(css.includes("prefers-reduced-motion: reduce"));
 assert.ok(css.includes("forced-colors: active"));
 assert.ok(css.includes(":focus-visible"));
 assert.ok(css.includes("[hidden] { display: none !important; }"));
-assert.ok(css.includes("header:not(.app-shell-bar) h1"));
+assert.ok(css.includes("header:not(.app-shell-bar):not(.home-appbar) h1"));
 assert.ok(css.includes("button.library-favourite"));
-assert.ok(css.includes(".library-card-heading h4{display:-webkit-box") &&
-  css.includes("-webkit-line-clamp:2") && css.includes("padding-top:1px"));
-assert.ok(css.includes(".library-card-heading .library-favourite{align-self:flex-start;transform:translateY(-6px)}"));
+// Documents are a status-first list: one row per document, long titles end with an ellipsis.
+assert.ok(css.includes(".library-card{display:grid;grid-template-columns:minmax(0,1fr) auto auto;") &&
+  css.includes(".library-card-title h4{margin:0;overflow:hidden;font-size:14.5px;text-overflow:ellipsis;white-space:nowrap}"));
 assert.ok(css.includes("border-color: transparent !important"));
 assert.ok(css.includes('input:not([type="checkbox"]):not([type="radio"])'));
 assert.ok(css.includes('input[type="checkbox"], input[type="radio"]'));

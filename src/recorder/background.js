@@ -1654,9 +1654,19 @@ async function listSessions() {
 
 async function getDocumentLibraryBootstrap() {
   const all = await globalThis.T9StorageQueries.getByPrefixes(
-    chrome.storage.local, [SESSION_PREFIX, BUG_REPORT_PREFIX],
+    chrome.storage.local, [SESSION_PREFIX, BUG_REPORT_PREFIX, REVIEW_PREFIX],
     [globalThis.T9StorageKeys.DOCUMENT_LIBRARY_KEY]
   );
+  // Only the review progress is returned; the reviews themselves stay in storage.
+  const reviewProgress = Object.entries(all)
+    .filter(([key, value]) => key.startsWith(REVIEW_PREFIX) && value)
+    .map(([key, review]) => {
+      const tasks = (Array.isArray(review.tasks) ? review.tasks : []).filter(task =>
+        globalThis.T9ReviewTaskVisibility.isVisible(task, review));
+      return { sessionId: key.slice(REVIEW_PREFIX.length), total: tasks.length,
+        approved: tasks.filter(task => task.approved).length,
+        completed: review.status === "completed" };
+    });
   const sessions = Object.entries(all)
     .filter(([key]) => key.startsWith(SESSION_PREFIX))
     .map(([, value]) => value)
@@ -1666,7 +1676,8 @@ async function getDocumentLibraryBootstrap() {
     .map(([, value]) => globalThis.T9BugReportModel.normalize(value))
     .sort((a, b) => String(b.updatedAt).localeCompare(String(a.updatedAt)));
   const records = all[globalThis.T9StorageKeys.DOCUMENT_LIBRARY_KEY];
-  return { sessions, reports, records: Array.isArray(records) ? records : [] };
+  return { sessions, reports, reviewProgress,
+    records: Array.isArray(records) ? records : [] };
 }
 
 async function getDocumentLibrary() {

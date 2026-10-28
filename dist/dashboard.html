@@ -7,14 +7,14 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>BC Process Studio — BC Knowledge Base</title>
 <style>
-body{font-family:"Segoe UI",Arial,sans-serif;max-width:1050px;margin:35px auto;padding:0 20px;color:var(--c-fg-1f2933)}
+body{font-family:"Segoe UI",Arial,sans-serif;max-width:1120px;margin:0 auto 40px;padding:0 20px;color:var(--c-fg-1f2933)}
 .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
 h1{margin-bottom:5px}.muted{color:var(--c-fg-52606d)}
 fieldset{border:1px solid var(--c-bd-d8dee5);border-radius:8px;padding:18px;margin:20px 0}
 legend{font-weight:600}
 label{display:block;margin:9px 0}
 input[type=number],input[type=text],select{padding:8px;width:380px;max-width:100%;box-sizing:border-box}
-#defaultExpectedResult{width:380px;max-width:100%;box-sizing:border-box;resize:vertical}
+#defaultExpectedResult{width:100%;max-width:520px;box-sizing:border-box;resize:vertical}
 button{border:0;border-radius:5px;padding:9px 13px;font-weight:600;cursor:pointer;margin-right:6px}
 .primary{background:var(--c-bg-0f6cbd);color:var(--c-fg-ffffff)}.danger{background:var(--c-bg-fee2e2);color:var(--c-fg-991b1b)}.secondary{background:var(--c-bg-dbeafe);color:var(--c-fg-1e3a8a)}.debug{background:var(--c-bg-e5e7eb);color:var(--c-fg-374151)}
 button{transition:background-color .12s ease,box-shadow .12s ease}button:focus-visible,input:focus-visible,select:focus-visible,summary:focus-visible{outline:3px solid var(--c-bd-0f6cbd);outline-offset:2px}.primary:hover{background:var(--c-bg-0b5fa8)}.secondary:hover{background:var(--c-bg-c7ddf8)}.danger:hover{background:var(--c-bg-fecaca)}.debug:hover{background:var(--c-bg-d1d5db)}button:disabled{cursor:not-allowed;opacity:.55}
@@ -34,7 +34,6 @@ table{width:100%;border-collapse:collapse}th,td{text-align:left;padding:9px;bord
 .library-card-heading{display:flex;gap:8px;align-items:start}.library-card h4{margin:0;flex:1}.library-language{background:var(--c-bg-008b8b);color:var(--c-fg-ffffff);border-radius:3px;font-size:11px;font-weight:700;padding:3px 5px}.library-favourite{font-size:20px;line-height:1;padding:3px 6px;margin:0;background:transparent;color:var(--c-fg-7c5800)}
 .library-profile{color:var(--c-fg-0f4c81);font-weight:600}.library-tags{display:flex;gap:5px;flex-wrap:wrap;margin:8px 0}.library-tags span{background:var(--c-bg-edf2f7);border-radius:99px;padding:3px 8px;font-size:12px}
 .library-empty{grid-column:1/-1;padding:28px;text-align:center;background:var(--c-bg-f8fafc);border-radius:8px}.library-status{min-height:20px}
-.session-tools{margin:28px 0}.session-tools>summary{font-size:18px;font-weight:700;cursor:pointer;padding:10px 0}.session-tools-body{padding:0 0 12px}
 .library-select{margin:2px 0}.library-select input{width:auto}.library-batch-toolbar{position:sticky;top:0;z-index:5;display:flex;flex-wrap:wrap;align-items:center;gap:6px;padding:10px 12px;margin:10px 0;background:var(--c-bg-eef6ff);border:1px solid var(--c-bd-9bc4e2);border-radius:8px}.library-batch-toolbar button{margin:0}.library-batch-count{font-weight:700;margin-right:auto}.library-batch-progress{width:100%;margin:4px 0 0}.library-batch-dialog{border:0;border-radius:9px;box-shadow:0 18px 55px rgba(15,23,42,.3);padding:22px;min-width:min(520px,calc(100vw - 48px))}.library-batch-dialog::backdrop{background:rgba(15,23,42,.42)}.library-batch-fields{display:grid;grid-template-columns:auto 1fr;gap:10px;align-items:center}.library-batch-fields label{display:contents}.library-batch-fields input[type=checkbox]{width:auto}.library-batch-fields input[type=text],.library-batch-fields select{width:100%}.library-batch-dialog footer{text-align:right;margin-top:18px}
 .library-batch-more{position:relative}.library-batch-more>summary{cursor:pointer;font-weight:600;padding:9px 13px;background:var(--c-bg-e5e7eb);border-radius:5px;color:var(--c-fg-374151)}.library-batch-more[open]{width:100%;padding-top:4px}.library-batch-more[open]>summary{width:max-content;margin-bottom:7px}.library-batch-more button{margin-right:6px}
 .review-overlay{position:fixed;inset:0;background:rgba(15,23,42,.58);display:none;z-index:1000;padding:24px;overflow:hidden}
@@ -293,7 +292,7 @@ body.process-map-focus-active{overflow:hidden}.process-overview-card.process-map
 .filename-preview.invalid{background:var(--c-bg-fef2f2);color:var(--c-fg-991b1b)}
 .filename-template-invalid{border-color:var(--c-bd-b91c1c);outline:1px solid var(--c-bd-b91c1c)}
 .filename-validation{min-height:18px;margin-top:5px;color:var(--c-fg-991b1b);font-size:13px}
-.settings-panel{margin:16px 0}.settings-panel>summary{cursor:pointer;font-weight:700;color:var(--c-fg-17365d)}.settings-panel-body{margin-top:12px}
+
 .settings-inline{display:flex;align-items:center;gap:8px;flex-wrap:wrap}.settings-inline input{flex:1 1 260px;max-width:380px}.settings-save-status{min-height:18px;margin:5px 0 0;color:var(--c-fg-52606d);font-size:13px}.settings-save-status.saved{color:var(--c-fg-107c10)}
 .review-zoom-content{min-height:100%;display:flex;flex-direction:column}
 .review-step-workspace{flex:1;min-height:420px}
@@ -353,17 +352,136 @@ body.process-map-focus-active{overflow:hidden}.process-overview-card.process-map
 <link rel="stylesheet" href="design-system.css">
 </head>
 <body>
-<h1>BC Process Studio <small id="extensionVersion">v—</small></h1>
-<p class="muted" data-i18n="app.tagline">Business Process Intelligence för Microsoft Dynamics 365 Business Central.</p>
-<p><strong data-i18n="app.promise">Gör Business Central-processer till kunskap.</strong>
-  <span data-i18n="app.promiseDetail">Spela in. Dokumentera. Förbättra.</span></p>
+<header class="home-appbar">
+  <h1 class="home-brand">BC Process Studio <small id="extensionVersion">v—</small></h1>
+  <nav class="home-views" aria-label="Vyer">
+    <button id="homeViewDocuments" type="button" data-home-view="documents" aria-controls="documentsView" aria-current="page">Dokument</button>
+    <button id="homeViewSettings" type="button" data-home-view="settings" aria-controls="settingsPanel">Inställningar</button>
+  </nav>
+  <button id="newRecording" type="button" class="primary home-new-recording" aria-haspopup="dialog" aria-controls="newRecordingDialog">+ Ny inspelning</button>
+</header>
 
-<details id="settingsPanel" class="settings-panel">
-<summary data-i18n="settings.summary">Inställningar för dokumentation, export och inspelning</summary>
-<div class="settings-panel-body">
-<fieldset>
-<legend>Dokumentation</legend>
+<div id="message" role="status" aria-live="polite" aria-atomic="true"></div>
 
+<section id="documentsView" class="document-library" aria-labelledby="documentLibraryTitle">
+  <p class="home-module">BC Knowledge Base</p>
+  <h2 id="documentLibraryTitle" class="home-title">Dokument</h2>
+  <p class="muted home-lead" data-i18n="Processdokumentation och felrapporter från dina inspelningar i Business Central.">Processdokumentation och felrapporter från dina inspelningar i Business Central.</p>
+
+  <section id="libraryContinue" class="library-continue" aria-labelledby="libraryContinueTitle" hidden>
+    <h3 id="libraryContinueTitle">Fortsätt där du slutade</h3>
+    <div id="libraryContinueList" class="library-continue-list"></div>
+  </section>
+
+  <div class="library-heading">
+    <h3 id="libraryAllTitle">Alla dokument</h3>
+  </div>
+  <div class="library-primary-controls" role="search">
+    <label for="librarySearch"><span class="sr-only">Sök dokument</span>
+      <input id="librarySearch" type="search" autocomplete="off" aria-keyshortcuts="/ Escape"
+        aria-describedby="libraryStatus" placeholder="Titel, profil, tagg eller arbetsflöde"
+        data-i18n-placeholder="library.searchPlaceholder">
+    </label>
+    <label for="librarySort"><span class="sr-only">Sortera</span>
+      <select id="librarySort">
+        <option value="modified">Senast ändrad</option><option value="created">Skapad</option>
+        <option value="alphabetical">Alfabetiskt</option><option value="recent">Senast öppnad</option>
+        <option value="profile">Dokumentprofil</option>
+      </select>
+    </label>
+    <button id="librarySelectMode" type="button" class="secondary" aria-pressed="false" aria-controls="libraryResults">Välj flera</button>
+  </div>
+  <div class="library-quick-row">
+    <div id="libraryQuickFilters" class="library-quick-filters" role="group" aria-label="Visa">
+      <button type="button" data-library-filter="all" aria-pressed="true"><span>Alla</span> <span class="library-quick-count"></span></button>
+      <button type="button" data-library-filter="documentation" aria-pressed="false"><span>Dokumentation</span> <span class="library-quick-count"></span></button>
+      <button type="button" data-library-filter="bug-report" aria-pressed="false"><span>Felrapporter</span> <span class="library-quick-count"></span></button>
+      <button type="button" data-library-filter="review" aria-pressed="false"><span>Behöver granskas</span> <span class="library-quick-count"></span></button>
+      <button type="button" data-library-filter="favourite" aria-pressed="false"><span>Favoriter</span> <span class="library-quick-count"></span></button>
+      <button type="button" data-library-filter="archived" aria-pressed="false"><span>Arkiverade</span> <span class="library-quick-count"></span></button>
+    </div>
+    <details id="libraryFilterDisclosure" class="library-filter-disclosure">
+      <summary><span data-i18n="library.filters">Filter</span>
+        <span id="libraryFilterCount" class="library-filter-count" hidden></span>
+      </summary>
+      <div class="library-filter-panel" role="group" aria-label="Filter för Dokumentbibliotek">
+        <label for="libraryProfileFilter">Dokumentprofil
+          <select id="libraryProfileFilter"><option value="">Alla profiler</option></select>
+        </label>
+        <label for="libraryLanguageFilter">
+          <span data-i18n="library.documentLanguage">Dokumentspråk</span>
+          <select id="libraryLanguageFilter" data-language-select="document"
+            data-language-all-label="library.allLanguages">
+            <option value="" data-i18n="library.allLanguages">Alla språk</option>
+            <option value="sv-SE">Svenska</option>
+            <option value="en-US">English</option>
+          </select>
+        </label>
+        <label for="libraryThemeFilter">Tema
+          <select id="libraryThemeFilter"><option value="">Alla teman</option></select></label>
+        <label for="libraryCreatedFrom">Skapad från<input id="libraryCreatedFrom" type="date"></label>
+        <label for="libraryCreatedTo">Skapad till<input id="libraryCreatedTo" type="date"></label>
+        <label for="libraryModifiedFrom">Ändrad från<input id="libraryModifiedFrom" type="date"></label>
+        <label for="libraryModifiedTo">Ändrad till<input id="libraryModifiedTo" type="date"></label>
+        <div class="library-filter-options">
+          <label><input id="libraryFavouriteFilter" type="checkbox"> Endast favoriter</label>
+          <label><input id="libraryRecentFilter" type="checkbox"> Nyligen använda</label>
+          <label><input id="libraryGroupProfiles" type="checkbox"> Gruppera per profil</label>
+        </div>
+        <div class="library-filter-actions">
+          <button id="libraryResetFilters" type="button" class="secondary"
+            disabled data-i18n="library.resetFilters">Återställ filter</button>
+        </div>
+      </div>
+    </details>
+  </div>
+  <p id="libraryStatus" class="library-status muted" role="status" aria-live="polite" aria-atomic="true"></p>
+  <div id="libraryResults" class="library-results" role="list" data-select-mode="false"
+    aria-label="Dokument i Dokumentbiblioteket" aria-describedby="libraryStatus"></div>
+  <div id="libraryBatchToolbar" class="library-batch-toolbar" role="toolbar"
+    aria-label="Batchåtgärder" aria-describedby="libraryBatchStatus" hidden>
+    <span id="libraryBatchCount" class="library-batch-count"></span>
+    <button id="libraryBatchSelectAll" class="secondary">Välj alla träffar</button>
+    <button id="libraryBatchExport" class="primary">Exportera Word</button>
+    <button id="libraryBatchFavourite" class="secondary">Favoritmarkera</button>
+    <button id="libraryBatchArchive" class="secondary">Arkivera</button>
+    <details class="library-batch-more">
+      <summary>Fler åtgärder</summary>
+      <div class="library-batch-more-panel">
+        <button id="libraryBatchTags" class="secondary">Taggar</button>
+        <button id="libraryBatchProfile" class="secondary">Profil</button>
+        <button id="libraryBatchTheme" class="secondary">Tema</button>
+        <button id="libraryBatchMetadata" class="secondary">Redigera metadata</button>
+        <button id="libraryBatchDelete" class="danger">Ta bort permanent</button>
+      </div>
+    </details>
+    <button id="libraryBatchClear" class="secondary">Avbryt</button>
+    <progress id="libraryBatchProgress" class="library-batch-progress" max="1"
+      value="0" hidden aria-label="Batchförlopp"></progress>
+  </div>
+  <p id="libraryBatchStatus" class="sr-only" role="status" aria-live="polite"
+    aria-atomic="true"></p>
+</section>
+
+<section id="settingsPanel" class="settings-view" aria-labelledby="settingsTitle" hidden>
+<div class="settings-view-heading">
+  <h2 id="settingsTitle" class="home-title" data-i18n="Inställningar">Inställningar</h2>
+  <p class="muted home-lead"><span data-i18n="Ändringar sparas direkt.">Ändringar sparas direkt.</span>
+    <span id="settingsSaveState" class="settings-save-state" role="status" aria-live="polite" data-state="idle"></span>
+    <button id="settingsSaveRetry" type="button" class="secondary" hidden>Försök igen</button></p>
+</div>
+<div class="settings-layout">
+<nav class="settings-nav" aria-label="Inställningsgrupper">
+  <button type="button" data-settings-section="general" aria-controls="settingsGeneral" aria-current="true">Allmänt</button>
+  <button type="button" data-settings-section="documents" aria-controls="settingsDocuments">Dokument</button>
+  <button type="button" data-settings-section="recording" aria-controls="settingsRecording">Inspelning</button>
+  <button type="button" data-settings-section="bug-reports" aria-controls="settingsBugReports">Felrapporter</button>
+  <button type="button" data-settings-section="advanced" aria-controls="settingsAdvanced">Avancerat</button>
+</nav>
+<div class="settings-sections">
+
+<section id="settingsGeneral" class="settings-section" aria-labelledby="settingsGeneralTitle">
+<h3 id="settingsGeneralTitle">Allmänt</h3>
 <label for="uiLocale" data-i18n="settings.language">Gränssnittsspråk</label>
 <select id="uiLocale" aria-describedby="uiLocaleHelp" data-language-select="ui">
   <option value="sv-SE">Svenska</option>
@@ -373,14 +491,20 @@ body.process-map-focus-active{overflow:hidden}.process-overview-card.process-map
   Ändrar språket i BC Process Studio. Inspelat innehåll och dokument påverkas inte.
 </p>
 
-<label for="appearance" data-i18n="settings.appearance">Utseende</label>
-<select id="appearance" aria-describedby="appearanceHelp">
-  <option value="dark" data-i18n="settings.appearanceDark">Mörkt</option>
-  <option value="system" data-i18n="settings.appearanceSystem">Följ systemet</option>
-  <option value="light" data-i18n="settings.appearanceLight">Ljust</option>
-</select>
+<fieldset id="appearance" class="settings-segmented" aria-describedby="appearanceHelp">
+  <legend data-i18n="settings.appearance">Utseende</legend>
+  <div class="settings-segmented-options">
+  <label><input type="radio" name="appearance" value="dark"> <span data-i18n="settings.appearanceDark">Mörkt</span></label>
+  <label><input type="radio" name="appearance" value="system"> <span data-i18n="settings.appearanceSystem">Följ systemet</span></label>
+  <label><input type="radio" name="appearance" value="light"> <span data-i18n="settings.appearanceLight">Ljust</span></label>
+  </div>
+</fieldset>
 <p id="appearanceHelp" class="muted" data-i18n="settings.appearanceHelp">Gäller direkt för alla sidor i BC Process Studio i den här webbläsaren.</p>
+</section>
 
+<section id="settingsDocuments" class="settings-section" aria-labelledby="settingsDocumentsTitle" hidden>
+<h3 id="settingsDocumentsTitle">Dokument</h3>
+<p class="muted" data-i18n="Standardvärden för nya dokument.">Standardvärden för nya dokument.</p>
 <label for="documentLanguage" data-i18n="settings.documentLanguage">Dokumentspråk</label>
 <select id="documentLanguage" aria-describedby="documentLanguageHelp"
   data-language-select="document">
@@ -401,48 +525,10 @@ body.process-map-focus-active{overflow:hidden}.process-overview-card.process-map
 <label for="companyName">Företag</label>
 <input id="companyName" type="text">
 
-<label for="supportEmail">Supportadress för felrapporter</label>
-<div class="settings-inline">
-  <input id="supportEmail" type="email" autocomplete="email"
-    placeholder="support@example.com" aria-describedby="supportEmailHelp supportEmailStatus">
-  <button id="saveSupportEmail" type="button">Spara supportadress</button>
-</div>
-<p id="supportEmailStatus" class="settings-save-status" role="status" aria-live="polite"></p>
-<p id="supportEmailHelp" class="muted" data-i18n="Används när en felrapport skapas som adresserat e-postutkast.">Används när en felrapport skapas som adresserat e-postutkast.</p>
-
 <label for="defaultExpectedResult">Standardtext för förväntat resultat</label>
 <textarea id="defaultExpectedResult" rows="3"
   aria-describedby="defaultExpectedResultHelp"></textarea>
-<p id="defaultExpectedResultHelp" class="muted">
-  Används i nya och befintliga dokument som inte har en egen manuellt ändrad text.
-</p>
-
-<button id="advancedToggle" class="secondary" type="button"
-  aria-expanded="false" aria-controls="advancedPanel" hidden>Visa avancerade dataskyddsinställningar</button>
-
-<div id="advancedPanel" class="advanced" hidden>
-  <h3>Dataskydd</h3>
-  <label><input id="maskSalesOrderNo" type="checkbox"> Försäljningsordernummer</label>
-  <label><input id="maskPurchaseOrderNo" type="checkbox"> Inköpsordernummer</label>
-  <label><input id="maskInvoiceNo" type="checkbox"> Fakturanummer</label>
-  <label><input id="maskReceiptNo" type="checkbox"> Inleveransnummer</label>
-  <label><input id="maskShipmentNo" type="checkbox"> Utleveransnummer</label>
-  <label><input id="maskProductionOrderNo" type="checkbox"> Produktionsordernummer</label>
-  <label><input id="maskPostedDocumentNo" type="checkbox"> Övriga bokförda dokumentnummer</label>
-  <label><input id="maskCompanyName" type="checkbox"> Företagsnamn</label>
-  <label><input id="maskTenantAndUrl" type="checkbox"> Tenant och URL</label>
-
-  <h3>Masterdata och testdata</h3>
-  <label><input id="maskCustomerNo" type="checkbox"> Kundnummer</label>
-  <label><input id="maskVendorNo" type="checkbox"> Leverantörsnummer</label>
-  <label><input id="maskItemNo" type="checkbox"> Artikelnummer</label>
-  <label><input id="maskLocationCode" type="checkbox"> Lagerplatskoder</label>
-  <label><input id="maskLotBatchNo" type="checkbox"> Lot-/Batchnummer</label>
-</div>
-</fieldset>
-
-<fieldset>
-<legend>Export</legend>
+<p id="defaultExpectedResultHelp" class="muted" data-i18n="Används i nya och befintliga dokument som inte har en egen manuellt ändrad text.">Används i nya och befintliga dokument som inte har en egen manuellt ändrad text.</p>
 
 <label for="exportFileNamePattern">Filnamnsmall</label>
 <input
@@ -474,25 +560,33 @@ body.process-map-focus-active{overflow:hidden}.process-overview-card.process-map
   aria-live="polite"
   aria-atomic="true"
 ></div>
-</fieldset>
 
-<fieldset aria-labelledby="knowledgeMcpLegend">
-<legend id="knowledgeMcpLegend" data-i18n="settings.knowledgeMcpLegend">External knowledge suggestions</legend>
-<label for="knowledgeMcpEnabled">
-  <input id="knowledgeMcpEnabled" type="checkbox" aria-describedby="knowledgeMcpHelp">
-  <span data-i18n="settings.knowledgeMcpEnable">Allow read-only MCP knowledge lookups</span>
-</label>
-<p id="knowledgeMcpHelp" class="hint" data-i18n="settings.knowledgeMcpHelp">
-  Off by default. When enabled, only unresolved object/action IDs, app identity and version, visible page/control captions and the interface language may be sent to the local read-only knowledge service. Recordings, screenshots, entered values and tenant, environment or company details are not sent. Results are unverified suggestions for review.
-</p>
-<button id="testKnowledgeMcp" class="secondary" type="button" data-i18n="settings.knowledgeMcpTest">Test local connection</button>
-<p id="knowledgeMcpStatus" class="settings-save-status" role="status" aria-live="polite"></p>
-<button id="testKnowledgeMcpSampleLookup" class="secondary" type="button" data-i18n="settings.knowledgeMcpSampleLookup">Test sample lookup (sends BC page 22 only)</button>
-<p id="knowledgeMcpSampleLookupStatus" class="settings-save-status" role="status" aria-live="polite"></p>
-</fieldset>
+<button id="advancedToggle" class="secondary" type="button"
+  aria-expanded="false" aria-controls="advancedPanel" hidden>Visa avancerade dataskyddsinställningar</button>
 
-<fieldset>
-<legend>Inspelning</legend>
+<div id="advancedPanel" class="advanced" hidden>
+  <h3>Dataskydd</h3>
+  <label><input id="maskSalesOrderNo" type="checkbox"> Försäljningsordernummer</label>
+  <label><input id="maskPurchaseOrderNo" type="checkbox"> Inköpsordernummer</label>
+  <label><input id="maskInvoiceNo" type="checkbox"> Fakturanummer</label>
+  <label><input id="maskReceiptNo" type="checkbox"> Inleveransnummer</label>
+  <label><input id="maskShipmentNo" type="checkbox"> Utleveransnummer</label>
+  <label><input id="maskProductionOrderNo" type="checkbox"> Produktionsordernummer</label>
+  <label><input id="maskPostedDocumentNo" type="checkbox"> Övriga bokförda dokumentnummer</label>
+  <label><input id="maskCompanyName" type="checkbox"> Företagsnamn</label>
+  <label><input id="maskTenantAndUrl" type="checkbox"> Tenant och URL</label>
+
+  <h3>Masterdata och testdata</h3>
+  <label><input id="maskCustomerNo" type="checkbox"> Kundnummer</label>
+  <label><input id="maskVendorNo" type="checkbox"> Leverantörsnummer</label>
+  <label><input id="maskItemNo" type="checkbox"> Artikelnummer</label>
+  <label><input id="maskLocationCode" type="checkbox"> Lagerplatskoder</label>
+  <label><input id="maskLotBatchNo" type="checkbox"> Lot-/Batchnummer</label>
+</div>
+</section>
+
+<section id="settingsRecording" class="settings-section" aria-labelledby="settingsRecordingTitle" hidden>
+<h3 id="settingsRecordingTitle">Inspelning</h3>
 <label><input id="showClickHighlights" type="checkbox" aria-describedby="clickHighlightHelp"> <span data-i18n="settings.clickHighlights">Show click highlights while recording</span></label>
 <p id="clickHighlightHelp" class="hint" data-i18n="settings.clickHighlightsHelp">Briefly outlines the clicked control. Highlights are excluded from captured screenshots.</p>
 <label><input id="captureScreenshots" type="checkbox"> Ta skärmbilder</label>
@@ -506,89 +600,51 @@ body.process-map-focus-active{overflow:hidden}.process-overview-card.process-map
 
 <label for="maxEvents">Maximalt antal händelser</label>
 <input id="maxEvents" type="number" min="100" max="50000">
-
-<button id="save" class="primary" data-i18n="settings.save">Spara inställningar</button>
-</fieldset>
-</div>
-</details>
-
-<div id="message" role="status" aria-live="polite" aria-atomic="true"></div>
-<section class="document-library" aria-labelledby="documentLibraryTitle">
-  <h2 id="documentLibraryTitle">BC Knowledge Base</h2>
-  <p class="muted" data-i18n="Hitta tidigare dokumentation med hjälp av innehåll och dokumentinformation.">Hitta tidigare dokumentation med hjälp av innehåll och dokumentinformation.</p>
-  <div class="library-primary-controls" role="search">
-    <label for="librarySearch">Sök dokument
-      <input id="librarySearch" type="search" autocomplete="off" aria-keyshortcuts="/ Escape"
-        aria-describedby="libraryStatus" placeholder="Titel, profil, tagg eller arbetsflöde"
-        data-i18n-placeholder="library.searchPlaceholder">
-    </label>
-    <label for="librarySort">Sortera
-      <select id="librarySort">
-        <option value="modified">Senast ändrad</option><option value="created">Skapad</option>
-        <option value="alphabetical">Alfabetiskt</option><option value="recent">Senast öppnad</option>
-        <option value="profile">Dokumentprofil</option>
-      </select>
-    </label>
-  </div>
-  <details id="libraryFilterDisclosure" class="library-filter-disclosure">
-    <summary><span data-i18n="library.filters">Filter</span>
-      <span id="libraryFilterCount" class="library-filter-count" hidden></span>
-    </summary>
-    <div class="library-filter-panel" role="group" aria-label="Filter för Dokumentbibliotek">
-      <label for="libraryProfileFilter">Dokumentprofil
-        <select id="libraryProfileFilter"><option value="">Alla profiler</option></select>
-      </label>
-      <label for="libraryLanguageFilter">
-        <span data-i18n="library.documentLanguage">Dokumentspråk</span>
-        <select id="libraryLanguageFilter" data-language-select="document"
-          data-language-all-label="library.allLanguages">
-          <option value="" data-i18n="library.allLanguages">Alla språk</option>
-          <option value="sv-SE">Svenska</option>
-          <option value="en-US">English</option>
-        </select>
-      </label>
-      <label for="libraryThemeFilter">Tema
-        <select id="libraryThemeFilter"><option value="">Alla teman</option></select></label>
-      <label for="libraryCreatedFrom">Skapad från<input id="libraryCreatedFrom" type="date"></label>
-      <label for="libraryCreatedTo">Skapad till<input id="libraryCreatedTo" type="date"></label>
-      <label for="libraryModifiedFrom">Ändrad från<input id="libraryModifiedFrom" type="date"></label>
-      <label for="libraryModifiedTo">Ändrad till<input id="libraryModifiedTo" type="date"></label>
-      <div class="library-filter-options">
-        <label><input id="libraryFavouriteFilter" type="checkbox"> Endast favoriter</label>
-        <label><input id="libraryRecentFilter" type="checkbox"> Nyligen använda</label>
-        <label><input id="libraryGroupProfiles" type="checkbox"> Gruppera per profil</label>
-      </div>
-      <div class="library-filter-actions">
-        <button id="libraryResetFilters" type="button" class="secondary"
-          disabled data-i18n="library.resetFilters">Återställ filter</button>
-      </div>
-    </div>
-  </details>
-  <div id="libraryBatchToolbar" class="library-batch-toolbar" role="toolbar"
-    aria-label="Batchåtgärder" aria-describedby="libraryBatchStatus" hidden>
-    <span id="libraryBatchCount" class="library-batch-count"></span>
-    <button id="libraryBatchSelectAll" class="secondary">Välj alla träffar</button>
-    <button id="libraryBatchClear" class="secondary">Rensa val</button>
-    <button id="libraryBatchExport" class="primary">Exportera Word</button>
-    <button id="libraryBatchFavourite" class="secondary">Favoritmarkera</button>
-    <button id="libraryBatchTags" class="secondary">Taggar</button>
-    <button id="libraryBatchProfile" class="secondary">Profil</button>
-    <button id="libraryBatchTheme" class="secondary">Tema</button>
-    <details class="library-batch-more">
-      <summary>Fler åtgärder</summary>
-      <button id="libraryBatchMetadata" class="secondary">Redigera metadata</button>
-      <button id="libraryBatchArchive" class="secondary">Arkivera</button>
-      <button id="libraryBatchDelete" class="danger">Ta bort permanent</button>
-    </details>
-    <progress id="libraryBatchProgress" class="library-batch-progress" max="1"
-      value="0" hidden aria-label="Batchförlopp"></progress>
-  </div>
-  <p id="libraryBatchStatus" class="sr-only" role="status" aria-live="polite"
-    aria-atomic="true"></p>
-  <p id="libraryStatus" class="library-status muted" role="status" aria-live="polite" aria-atomic="true"></p>
-  <div id="libraryResults" class="library-results" role="list"
-    aria-label="Dokument i Dokumentbiblioteket" aria-describedby="libraryStatus"></div>
 </section>
+
+<section id="settingsBugReports" class="settings-section" aria-labelledby="settingsBugReportsTitle" hidden>
+<h3 id="settingsBugReportsTitle">Felrapporter</h3>
+<label for="supportEmail">Supportadress för felrapporter</label>
+<input id="supportEmail" type="email" autocomplete="email"
+  placeholder="support@example.com" aria-describedby="supportEmailHelp supportEmailStatus">
+<p id="supportEmailStatus" class="settings-save-status" role="status" aria-live="polite"></p>
+<p id="supportEmailHelp" class="muted" data-i18n="Används när en felrapport skapas som adresserat e-postutkast.">Används när en felrapport skapas som adresserat e-postutkast.</p>
+</section>
+
+<section id="settingsAdvanced" class="settings-section" aria-labelledby="knowledgeMcpLegend" hidden>
+<h3 id="knowledgeMcpLegend" data-i18n="settings.knowledgeMcpLegend">External knowledge suggestions</h3>
+<label for="knowledgeMcpEnabled">
+  <input id="knowledgeMcpEnabled" type="checkbox" aria-describedby="knowledgeMcpHelp">
+  <span data-i18n="settings.knowledgeMcpEnable">Allow read-only MCP knowledge lookups</span>
+</label>
+<p id="knowledgeMcpHelp" class="hint" data-i18n="settings.knowledgeMcpHelp">
+  Off by default. When enabled, only unresolved object/action IDs, app identity and version, visible page/control captions and the interface language may be sent to the local read-only knowledge service. Recordings, screenshots, entered values and tenant, environment or company details are not sent. Results are unverified suggestions for review.
+</p>
+<div class="settings-actions">
+<button id="testKnowledgeMcp" class="secondary" type="button" data-i18n="settings.knowledgeMcpTest">Test local connection</button>
+<button id="testKnowledgeMcpSampleLookup" class="secondary" type="button" data-i18n="settings.knowledgeMcpSampleLookup">Test sample lookup (sends BC page 22 only)</button>
+</div>
+<p id="knowledgeMcpStatus" class="settings-save-status" role="status" aria-live="polite"></p>
+<p id="knowledgeMcpSampleLookupStatus" class="settings-save-status" role="status" aria-live="polite"></p>
+</section>
+</div>
+</div>
+</section>
+
+<dialog id="newRecordingDialog" class="new-recording-dialog" aria-labelledby="newRecordingTitle">
+  <h2 id="newRecordingTitle">Starta en ny inspelning</h2>
+  <p class="muted" data-i18n="Inspelningen startas från Business Central-fliken.">Inspelningen startas från Business Central-fliken.</p>
+  <ol>
+    <li data-i18n="Öppna Business Central i en flik i den här webbläsaren.">Öppna Business Central i en flik i den här webbläsaren.</li>
+    <li data-i18n="Välj BC Process Studio i webbläsarens verktygsfält.">Välj BC Process Studio i webbläsarens verktygsfält.</li>
+    <li data-i18n="Välj Dokumentera en process eller Rapportera ett fel.">Välj Dokumentera en process eller Rapportera ett fel.</li>
+  </ol>
+  <p id="newRecordingStatus" class="muted" role="status" aria-live="polite"></p>
+  <footer>
+    <button id="closeNewRecording" type="button" class="secondary">Stäng</button>
+    <button id="openBusinessCentral" type="button" class="primary">Gå till Business Central</button>
+  </footer>
+</dialog>
 
 <dialog id="libraryBatchMetadataDialog" class="library-batch-dialog"
   aria-labelledby="libraryBatchMetadataTitle">
@@ -615,17 +671,6 @@ body.process-map-focus-active{overflow:hidden}.process-overview-card.process-map
   </form>
 </dialog>
 
-<details id="sessionTools" class="session-tools">
-  <summary data-i18n="Saved recordings">Saved recordings</summary>
-  <div class="session-tools-body">
-    <p class="muted" data-i18n="Manage saved recordings and ZIP exports.">Manage saved recordings and ZIP exports.</p>
-    <button id="refresh" class="secondary">Uppdatera inspelningar</button>
-    <table>
-    <thead><tr><th>Namn</th><th>Startad</th><th>Händelser</th><th>Status</th><th>Åtgärder</th></tr></thead>
-    <tbody id="sessions"></tbody>
-    </table>
-  </div>
-</details>
 
 
 <div id="reviewOverlay" class="review-overlay" aria-hidden="true">

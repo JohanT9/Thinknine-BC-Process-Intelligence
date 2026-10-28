@@ -49,7 +49,9 @@ const $ = id => document.getElementById(id);
 
 // Appearance applies immediately and is shared by every extension page (dark by default).
 if ($("appearance") && globalThis.T9Appearance) {
-  $("appearance").value = globalThis.T9Appearance.read();
+  const current = $("appearance").querySelector(
+    `input[value="${globalThis.T9Appearance.read()}"]`);
+  if (current) current.checked = true;
   $("appearance").addEventListener("change", event => {
     globalThis.T9Appearance.set(event.target.value);
   });
@@ -491,7 +493,7 @@ function applyProfile(profileName, updateControls = true) {
 function show(text, error = false) {
   // Known service-worker messages are translated; other text is shown as received.
   $("message").textContent = text ? uiT(text) : "";
-  $("message").style.color = error ? "#b42318" : "#166534";
+  $("message").style.color = error ? "var(--colorStatusDanger)" : "var(--colorStatusSuccess)";
 }
 
 function escapeHtml(value) {
@@ -2724,11 +2726,6 @@ async function loadSettings() {
       element.value = value;
     }
   }
-  if (settings.supportEmail && $("supportEmailStatus")) {
-    $("supportEmailStatus").textContent = globalThis.T9UiI18n.translateStaticText(
-      "Sparad", settings.uiLocale);
-    $("supportEmailStatus").classList.add("saved");
-  }
 
   const documentationProfile = $("documentationProfile");
   if (documentationProfile) {
@@ -2740,6 +2737,7 @@ async function loadSettings() {
     documentationProfile?.value || DEFAULTS.documentationProfile || "generic",
     false
   );
+  initializeFilenameVariables();
   updateFilenamePreview();
 }
 
@@ -2765,10 +2763,74 @@ async function saveSettings() {
     type: "T9_SAVE_SETTINGS",
     settings
   });
+  if (response?.ok === false) {
+    throw new Error(response.error || uiT("Inställningarna kunde inte sparas."));
+  }
 
   applicationSettings = { ...settings, ...(response?.settings || {}) };
+}
 
-  show(globalThis.T9UiI18n.translate("settings.saved", settings.uiLocale));
+// Settings save as soon as they change. Saves run one at a time, a change made during a
+// save is saved afterwards, and a failure keeps the edits on the page with a retry.
+let settingsSaveTimer = 0;
+let settingsSaveRunning = null;
+let settingsSaveQueued = false;
+
+function setSettingsSaveState(state, detail = "") {
+  const status = $("settingsSaveState");
+  status.dataset.state = state;
+  status.textContent = state === "saving" ? uiT("Sparar…")
+    : state === "saved" ? uiTf("Sparat {time}", { time: new Date().toLocaleTimeString(
+      applicationSettings.uiLocale || "en-US", { hour: "2-digit", minute: "2-digit" }) })
+      : state === "error" ? uiTf("Inställningarna kunde inte sparas. {detail}", { detail })
+        : "";
+  $("settingsSaveRetry").hidden = state !== "error";
+}
+
+async function autoSaveSettings() {
+  clearTimeout(settingsSaveTimer);
+  if (settingsSaveRunning) {
+    settingsSaveQueued = true;
+    return settingsSaveRunning;
+  }
+  const email = $("supportEmail");
+  email.value = email.value.trim();
+  if (!email.checkValidity()) {
+    $("supportEmailStatus").textContent =
+      uiT("Ange en giltig e-postadress, till exempel support@example.com.");
+    $("supportEmailStatus").classList.remove("saved");
+    setSettingsSaveState("error", uiT("Kontrollera supportadressen."));
+    return null;
+  }
+  // An invalid filename template is shown under the field and not saved.
+  if (globalThis.T9Engine.exportSettings.validationMessages(
+    $("exportFileNamePattern").value).length) {
+    setSettingsSaveState("error", uiT("Rätta filnamnsmallen."));
+    return null;
+  }
+  setSettingsSaveState("saving");
+  settingsSaveRunning = saveSettings().then(() => {
+    $("supportEmailStatus").textContent = "";
+    setSettingsSaveState("saved");
+  }, error => {
+    setSettingsSaveState("error", uiT(error.message || String(error)));
+  }).finally(() => {
+    settingsSaveRunning = null;
+    if (settingsSaveQueued) {
+      settingsSaveQueued = false;
+      autoSaveSettings();
+    }
+  });
+  return settingsSaveRunning;
+}
+
+function scheduleSettingsSave(event) {
+  // The interface language and the appearance save through their own handlers.
+  if (!event.target.matches?.("input, select, textarea") ||
+      event.target.id === "uiLocale" || event.target.name === "appearance") return;
+  clearTimeout(settingsSaveTimer);
+  if (event.type === "change") autoSaveSettings();
+  else settingsSaveTimer = setTimeout(autoSaveSettings, 700);
 }
 
 async function testKnowledgeMcpConnection() {
@@ -2842,27 +2904,13 @@ async function testKnowledgeMcpSampleLookup() {
     button.disabled = false;
   }
 }
-async function saveSupportEmail() {
-  const input = $("supportEmail");
-  const status = $("supportEmailStatus");
-  input.value = input.value.trim();
-  status.classList.remove("saved");
-  if (!input.reportValidity()) return;
-  try {
-    await saveSettings();
-    status.textContent = globalThis.T9UiI18n.translateStaticText(
-      "Supportadressen har sparats.", applicationSettings.uiLocale);
-    status.classList.add("saved");
-  } catch (error) {
-    status.textContent = error.message || String(error);
-  }
-}
-
 async function changeUiLocale(event) {
   const previousLocale = applicationSettings.uiLocale;
   const uiLocale = globalThis.T9UiI18n.normalizeLocale(event.target.value);
   globalThis.T9UiI18n.apply(uiLocale);
   applicationSettings = { ...applicationSettings, uiLocale };
+  initializeFilenameVariables();
+  updateFilenamePreview();
   try {
     const response = await send({ type: "T9_SAVE_UI_LOCALE", uiLocale });
     if (!response?.ok) throw new Error(response?.error || "Language could not be saved.");
@@ -3575,7 +3623,9 @@ function updateFilenamePreview(
   return globalThis.T9Engine.exportSettings.updatePreview(
     { input, preview, validation },
     session,
-    settings
+    settings,
+    new Date(),
+    uiTf
   );
 }
 
@@ -3590,7 +3640,8 @@ function initializeFilenameVariables() {
   globalThis.T9Engine.exportSettings.renderVariableControls(
     $("filenameVariables"),
     $("filenameVariableHelp"),
-    insertFilenameVariable
+    insertFilenameVariable,
+    uiTf
   );
 }
 
@@ -4279,6 +4330,33 @@ let documentLibrarySessions = new Map();
 let documentLibrarySelection = globalThis.T9DocumentBatchOperations.selection();
 const DOCUMENT_LIBRARY_RENDER_LIMIT = 200;
 let visibleDocumentLibraryRecords = [];
+// Review progress per document, the active quick filter and whether checkboxes are shown.
+let documentLibraryProgress = new Map();
+let libraryQuickFilter = "all";
+let librarySelectMode = false;
+const LIBRARY_QUICK_FILTERS = Object.freeze({
+  all: record => !record.archived,
+  documentation: record => !record.archived &&
+    record.metadata?.recordingPurpose !== "bug-report",
+  "bug-report": record => !record.archived &&
+    record.metadata?.recordingPurpose === "bug-report",
+  review: record => !record.archived && ["new", "review"].includes(
+    globalThis.T9DocumentLibraryView.documentState(record,
+      documentLibraryProgress.get(record.projectId)).state),
+  favourite: record => !record.archived && record.favourite,
+  archived: record => record.archived
+});
+
+function libraryMatches(options = libraryOptions()) {
+  return globalThis.T9DocumentLibrary.query(documentLibraryIndex, options)
+    .filter(LIBRARY_QUICK_FILTERS[libraryQuickFilter] || LIBRARY_QUICK_FILTERS.all);
+}
+
+function reviewProgressSummary(review) {
+  const tasks = globalThis.T9Review.activeTasks(review);
+  return { total: tasks.length, approved: tasks.filter(task => task.approved).length,
+    completed: review.status === "completed" };
+}
 
 function librarySessionRecord(session) {
   const bugReport = session.recordingPurpose === "bug-report";
@@ -4358,21 +4436,32 @@ function fillLibraryFilter(id, values, selected) {
 
 function renderDocumentLibrary() {
   const options = libraryOptions();
-  const matches = globalThis.T9DocumentLibrary.query(
+  const searched = globalThis.T9DocumentLibrary.query(
     documentLibraryIndex, options
   );
+  for (const button of $("libraryQuickFilters").querySelectorAll("[data-library-filter]")) {
+    const filter = button.dataset.libraryFilter;
+    button.setAttribute("aria-pressed", String(filter === libraryQuickFilter));
+    button.querySelector(".library-quick-count").textContent =
+      String(searched.filter(LIBRARY_QUICK_FILTERS[filter]).length);
+  }
+  const matches = searched.filter(LIBRARY_QUICK_FILTERS[libraryQuickFilter]);
   const records = matches.slice(0, DOCUMENT_LIBRARY_RENDER_LIMIT);
   visibleDocumentLibraryRecords = records;
   const view = globalThis.T9DocumentLibraryView;
+  const viewState = { ...documentLibrarySelection, locale: applicationSettings.uiLocale,
+    storedCount: documentLibraryRecords.length, progress: documentLibraryProgress };
   const activeId = $("libraryGroupProfiles").checked
     ? view.renderGrouped($("libraryResults"),
       globalThis.T9DocumentLibrary.groupByProfile(records,
-        applicationSettings.uiLocale || "sv-SE"),
-      { ...documentLibrarySelection, locale: applicationSettings.uiLocale,
-        storedCount: documentLibraryRecords.length })
-    : view.renderList($("libraryResults"), records,
-      { ...documentLibrarySelection, locale: applicationSettings.uiLocale,
-        storedCount: documentLibraryRecords.length });
+        applicationSettings.uiLocale || "sv-SE"), viewState)
+    : view.renderList($("libraryResults"), records, viewState);
+  $("libraryResults").dataset.selectMode = String(librarySelectMode);
+  // Continue where you left off: started reviews, shown while nothing is searched.
+  const continueCount = options.search.trim() ? 0 : view.renderContinue(
+    $("libraryContinueList"), globalThis.T9DocumentLibrary.query(documentLibraryIndex,
+      { locale: options.locale, sort: "modified" }), viewState);
+  $("libraryContinue").hidden = continueCount === 0;
   documentLibrarySelection = globalThis.T9DocumentBatchOperations.selection({
     ...documentLibrarySelection,
     activeId
@@ -4424,7 +4513,12 @@ function renderDocumentLibrarySelection() {
 
 function renderLibraryBatchToolbar(message = "") {
   const count = documentLibrarySelection.selectedIds.length;
-  $("libraryBatchToolbar").hidden = count === 0;
+  $("libraryBatchToolbar").hidden = !librarySelectMode && count === 0;
+  for (const id of ["libraryBatchExport", "libraryBatchFavourite", "libraryBatchArchive",
+    "libraryBatchTags", "libraryBatchProfile", "libraryBatchTheme",
+    "libraryBatchMetadata", "libraryBatchDelete"]) {
+    $(id).disabled = count === 0;
+  }
   $("libraryBatchCount").textContent = count === 1
     ? uiT("library.oneSelected")
     : uiTf("library.manySelected", { count });
@@ -4446,6 +4540,8 @@ function refreshLibraryFilters() {
 
 async function loadDocumentLibrary(sessions, bootstrap = {}) {
   documentLibrarySessions = new Map(sessions.map(session => [session.id, session]));
+  documentLibraryProgress = new Map((bootstrap.reviewProgress || []).map(value =>
+    [value.sessionId, value]));
   const stored = new Map((bootstrap.records || []).map(record =>
     [record.projectId || record.sessionId, record]
   ));
@@ -8166,6 +8262,9 @@ async function closeReview() {
   $("reviewDialog").style.removeProperty("--review-header-height");
   $("reviewOverlay").classList.remove("open");
   $("reviewOverlay").setAttribute("aria-hidden", "true");
+  if (activeReviewSession && activeReview) {
+    documentLibraryProgress.set(activeReviewSession.id, reviewProgressSummary(activeReview));
+  }
   activeReviewSession = null;
   activeReview = null;
   activeReviewModel = null;
@@ -8218,88 +8317,7 @@ async function loadSessions() {
   const sessions = Array.isArray(response?.sessions)
     ? response.sessions
     : [];
-  const body = $("sessions");
-  body.innerHTML = "";
   await loadDocumentLibrary(sessions, response || {});
-  if (!$("sessionTools").open) return;
-
-  if (!sessions.length) {
-    const row = document.createElement("tr");
-    const cell = document.createElement("td");
-    cell.colSpan = 5;
-    cell.className = "muted";
-    cell.textContent = uiT("library.emptySessions");
-    row.appendChild(cell);
-    body.appendChild(row);
-    return;
-  }
-  for (const session of sessions) {
-    const row = document.createElement("tr");
-
-    row.innerHTML = `
-      <td>${escapeHtml(session.name)}</td>
-      <td>${new Date(session.startedAt).toLocaleString(applicationSettings.uiLocale)}</td>
-      <td>${session.eventCount || 0}</td>
-      <td>${escapeHtml(uiT(session.status === "recording" ? "session.recording" : "session.ended"))}</td>
-      <td></td>`;
-
-    const actions = row.lastElementChild;
-
-    const reviewButton = document.createElement("button");
-    reviewButton.textContent = uiT("library.review");
-    reviewButton.className = "primary";
-    reviewButton.disabled = session.status === "recording";
-    reviewButton.addEventListener("click", async () => {
-      reviewButton.disabled = true;
-      try {
-        await openReview(session);
-      } catch (error) {
-        show(error.message, true);
-      } finally {
-        reviewButton.disabled = false;
-      }
-    });
-
-    const exportButton = document.createElement("button");
-    exportButton.textContent = uiT("library.exportZip");
-    exportButton.className = "secondary";
-    exportButton.addEventListener("click", async () => {
-      exportButton.disabled = true;
-
-      try {
-        await exportSession(session);
-      } catch (error) {
-        show(error.message, true);
-      } finally {
-        exportButton.disabled = false;
-      }
-    });
-
-    const deleteButton = document.createElement("button");
-    deleteButton.textContent = uiT("common.delete");
-    deleteButton.className = "danger";
-    deleteButton.addEventListener("click", async () => {
-      if (!confirm(uiTf("library.deleteSessionConfirm", { name: session.name }))) return;
-      deleteButton.disabled = true;
-      try {
-        const response = await send({
-          type: "T9_DELETE_SESSION",
-          sessionId: session.id
-        });
-        if (!response?.ok) {
-          throw new Error(response?.error || uiT("Sessionen kunde inte tas bort."));
-        }
-        await loadSessions();
-        show(`Sessionen "${session.name}" har tagits bort.`);
-      } catch (error) {
-        show(error.message, true);
-        deleteButton.disabled = false;
-      }
-    });
-
-    actions.append(reviewButton, exportButton, deleteButton);
-    body.appendChild(row);
-  }
 }
 
 async function openRequestedReview() {
@@ -9497,17 +9515,55 @@ globalThis.T9ReviewMove.bind($("reviewList"), {
   move: moveReviewTasksTo
 });
 
-$("save").addEventListener("click", saveSettings);
 $("testKnowledgeMcp").addEventListener("click", testKnowledgeMcpConnection);
 $("testKnowledgeMcpSampleLookup").addEventListener("click", testKnowledgeMcpSampleLookup);
-$("saveSupportEmail").addEventListener("click", saveSupportEmail);
 $("uiLocale").addEventListener("change", changeUiLocale);
-$("refresh").addEventListener("click", loadSessions);
-$("sessionTools").addEventListener("toggle", () => {
-  if ($("sessionTools").open) {
-    loadSessions().catch(error => show(error.message, true));
-  } else {
-    $("sessions").replaceChildren();
+$("settingsPanel").addEventListener("change", scheduleSettingsSave);
+$("settingsPanel").addEventListener("input", scheduleSettingsSave);
+$("settingsSaveRetry").addEventListener("click", autoSaveSettings);
+// The start page has two views, Documents and Settings; settings are grouped in sections.
+function showHomeView(view, focus = false) {
+  for (const button of document.querySelectorAll("[data-home-view]")) {
+    if (button.dataset.homeView === view) button.setAttribute("aria-current", "page");
+    else button.removeAttribute("aria-current");
+  }
+  $("documentsView").hidden = view !== "documents";
+  $("settingsPanel").hidden = view !== "settings";
+  if (focus) (view === "settings" ? $("settingsTitle") : $("documentLibraryTitle"))
+    .scrollIntoView({ block: "nearest" });
+}
+for (const button of document.querySelectorAll("[data-home-view]")) {
+  button.addEventListener("click", () => showHomeView(button.dataset.homeView, true));
+}
+$("settingsPanel").querySelector(".settings-nav").addEventListener("click", event => {
+  const button = event.target.closest?.("[data-settings-section]");
+  if (!button) return;
+  for (const item of document.querySelectorAll("[data-settings-section]")) {
+    item.setAttribute("aria-current", String(item === button));
+    $(item.getAttribute("aria-controls")).hidden = item !== button;
+  }
+});
+$("newRecording").addEventListener("click", () => {
+  $("newRecordingStatus").textContent = "";
+  $("newRecordingDialog").showModal();
+});
+$("closeNewRecording").addEventListener("click", () => $("newRecordingDialog").close());
+$("newRecordingDialog").addEventListener("close", () => $("newRecording").focus());
+// Switches to an open Business Central tab; recording starts from the extension there.
+$("openBusinessCentral").addEventListener("click", async () => {
+  try {
+    const [tab] = await chrome.tabs.query({ url: ["https://businesscentral.dynamics.com/*",
+      "https://*.businesscentral.dynamics.com/*"] });
+    if (!tab) {
+      $("newRecordingStatus").textContent = uiT(
+        "Ingen Business Central-flik är öppen. Öppna Business Central och följ stegen ovan.");
+      return;
+    }
+    await chrome.tabs.update(tab.id, { active: true });
+    await chrome.windows.update(tab.windowId, { focused: true });
+    $("newRecordingDialog").close();
+  } catch (error) {
+    $("newRecordingStatus").textContent = uiT(error.message || String(error));
   }
 });
 for (const id of ["librarySearch", "libraryProfileFilter",
@@ -9530,6 +9586,7 @@ $("librarySearch").addEventListener("keydown", event => {
 $("libraryResults").addEventListener("click", async event => {
   if (event.target.closest?.('[data-library-action="clear-search-filters"]')) {
     $("librarySearch").value = "";
+    libraryQuickFilter = "all";
     resetDocumentLibraryFilters();
     $("librarySearch").focus();
     return;
@@ -9541,8 +9598,10 @@ $("libraryResults").addEventListener("click", async event => {
     "[data-library-project-id]"
   )].map(element => element.dataset.libraryProjectId);
   const selectionControl = event.target.closest?.('[data-library-action="select"]');
-  const cardAction = event.target.closest?.("[data-library-action]");
-  if (selectionControl || !cardAction) {
+  const cardAction = event.target.closest?.("[data-library-action], [data-library-menu]");
+  // Outside selection mode a click on the row only selects with Ctrl, Cmd or Shift.
+  if (selectionControl || (!cardAction && (librarySelectMode ||
+      event.shiftKey || event.ctrlKey || event.metaKey))) {
     documentLibrarySelection = globalThis.T9DocumentBatchOperations.select(
       documentLibrarySelection, visibleIds, projectId, {
         shift: event.shiftKey,
@@ -9569,7 +9628,56 @@ $("libraryResults").addEventListener("click", async event => {
     )?.focus();
     return;
   }
+  const menuAction = event.target.closest?.(".library-card-menu-panel [data-library-action]");
+  if (menuAction) {
+    menuAction.closest("details").open = false;
+    await runLibraryMenuAction(menuAction.dataset.libraryAction, projectId, card);
+    return;
+  }
   if (!event.target.closest?.('[data-library-action="open"]')) return;
+  await openLibraryDocument(projectId);
+});
+
+async function runLibraryMenuAction(action, projectId, card) {
+  const record = documentLibraryRecords.find(value => value.projectId === projectId);
+  const session = documentLibrarySessions.get(projectId);
+  if (!record || !session) return;
+  const focusCard = () => $("libraryResults").querySelector(
+    `[data-library-project-id="${CSS.escape(projectId)}"] summary`)?.focus();
+  try {
+    if (action === "export-word") {
+      const settingsResponse = await send({ type: "T9_GET_SETTINGS" });
+      show(uiTf("library.exportProgress", { current: 1, total: 1, title: record.title }));
+      await exportLibraryDocument(record, { ...DEFAULTS,
+        ...(settingsResponse?.settings || {}) });
+      show(uiTf("library.exportComplete", { count: 1 }));
+    } else if (action === "export-recording") {
+      await exportSession(session);
+    } else if (action === "archive") {
+      await updateDocumentLibraryRecord(projectId, { archived: !record.archived });
+      show(record.archived ? uiTf("\"{title}\" har återställts från arkivet.", { title: record.title })
+        : uiTf("\"{title}\" har arkiverats. Du hittar det under Arkiverade.", { title: record.title }));
+      $("librarySearch").focus();
+      return;
+    } else if (action === "delete") {
+      if (!confirm(uiTf("library.deleteSessionConfirm", { name: session.name }))) {
+        focusCard();
+        return;
+      }
+      const response = await send({ type: "T9_DELETE_SESSION", sessionId: projectId });
+      if (!response?.ok) throw new Error(response?.error || uiT("Sessionen kunde inte tas bort."));
+      await loadSessions();
+      show(uiTf("\"{title}\" har tagits bort.", { title: record.title }));
+      $("librarySearch").focus();
+      return;
+    }
+  } catch (error) {
+    show(error.message, true);
+  }
+  if (card.isConnected) focusCard();
+}
+
+async function openLibraryDocument(projectId) {
   const session = documentLibrarySessions.get(projectId);
   if (!session || session.status === "recording") return;
   const libraryRecord = documentLibraryRecords.find(record =>
@@ -9593,14 +9701,61 @@ $("libraryResults").addEventListener("click", async event => {
   } catch (error) {
     show(error.message, true);
   }
+}
+$("libraryContinueList").addEventListener("click", event => {
+  const item = event.target.closest?.("[data-library-continue]");
+  if (item) openLibraryDocument(item.dataset.libraryContinue);
+});
+// One row menu is open at a time; Escape and clicks elsewhere close it.
+$("libraryResults").addEventListener("toggle", event => {
+  if (!event.target.matches?.(".library-card-menu") || !event.target.open) return;
+  for (const menu of $("libraryResults").querySelectorAll(".library-card-menu[open]")) {
+    if (menu !== event.target) menu.open = false;
+  }
+  event.target.querySelector(".library-card-menu-panel button")?.focus();
+}, true);
+document.addEventListener("click", event => {
+  for (const menu of document.querySelectorAll(".library-card-menu[open]")) {
+    if (!menu.contains(event.target)) menu.open = false;
+  }
+});
+$("libraryResults").addEventListener("keydown", event => {
+  const openMenu = event.target.closest?.(".library-card-menu[open]");
+  if (openMenu && event.key === "Escape") {
+    event.preventDefault();
+    event.stopPropagation();
+    openMenu.open = false;
+    openMenu.querySelector("summary").focus();
+    return;
+  }
+  if (openMenu && ["ArrowDown", "ArrowUp"].includes(event.key)) {
+    const items = [...openMenu.querySelectorAll(".library-card-menu-panel button")];
+    const index = items.indexOf(document.activeElement);
+    event.preventDefault();
+    event.stopPropagation();
+    items[(index + (event.key === "ArrowDown" ? 1 : -1) + items.length) % items.length]?.focus();
+    return;
+  }
+}, true);
+$("libraryQuickFilters").addEventListener("click", event => {
+  const button = event.target.closest?.("[data-library-filter]");
+  if (!button) return;
+  libraryQuickFilter = button.dataset.libraryFilter;
+  renderDocumentLibrary();
+});
+$("librarySelectMode").addEventListener("click", () => {
+  librarySelectMode = !librarySelectMode;
+  $("librarySelectMode").setAttribute("aria-pressed", String(librarySelectMode));
+  if (!librarySelectMode) {
+    documentLibrarySelection = globalThis.T9DocumentBatchOperations.clear();
+  }
+  renderDocumentLibrary();
 });
 $("libraryResults").addEventListener("keydown", event => {
   const card = event.target.closest?.("[data-library-project-id]");
   const visibleIds = visibleDocumentLibraryRecords.map(record => record.projectId);
   if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === "a") {
-    const matches = globalThis.T9DocumentLibrary.query(
-      documentLibraryIndex, libraryOptions()
-    );
+    const matches = libraryMatches();
     event.preventDefault();
     documentLibrarySelection = globalThis.T9DocumentBatchOperations.selectAll(
       documentLibrarySelection, matches.map(record => record.projectId)
@@ -9647,9 +9802,7 @@ $("libraryResults").addEventListener("keydown", event => {
   )?.focus();
 });
 $("libraryBatchSelectAll").addEventListener("click", () => {
-  const matches = globalThis.T9DocumentLibrary.query(
-    documentLibraryIndex, libraryOptions()
-  );
+  const matches = libraryMatches();
   documentLibrarySelection = globalThis.T9DocumentBatchOperations.selectAll(
     documentLibrarySelection, matches.map(record => record.projectId)
   );
@@ -9658,6 +9811,9 @@ $("libraryBatchSelectAll").addEventListener("click", () => {
 });
 $("libraryBatchClear").addEventListener("click", () => {
   documentLibrarySelection = globalThis.T9DocumentBatchOperations.clear();
+  librarySelectMode = false;
+  $("librarySelectMode").setAttribute("aria-pressed", "false");
+  $("libraryResults").dataset.selectMode = "false";
   renderDocumentLibrarySelection();
   $("librarySearch").focus();
   $("libraryBatchStatus").textContent = uiT("library.selectionCleared");
@@ -9793,6 +9949,7 @@ document.addEventListener("keydown", event => {
     return;
   }
   event.preventDefault();
+  showHomeView("documents");
   $("librarySearch").focus();
   $("librarySearch").select();
 });

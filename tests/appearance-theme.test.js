@@ -76,7 +76,7 @@ assert.ok((1.05) / (luminance(brand) + 0.05) >= 4.5, "white on the dark brand co
 
 // The setting offers dark, system and light in every interface language.
 const dashboard = read("src/ui/dashboard.html");
-assert.match(dashboard, /<select id="appearance" aria-describedby="appearanceHelp">\s*<option value="dark" data-i18n="settings\.appearanceDark">Mörkt<\/option>\s*<option value="system" data-i18n="settings\.appearanceSystem">Följ systemet<\/option>\s*<option value="light" data-i18n="settings\.appearanceLight">Ljust<\/option>/u);
+assert.match(dashboard, /<fieldset id="appearance" class="settings-segmented" aria-describedby="appearanceHelp">\s*<legend data-i18n="settings\.appearance">Utseende<\/legend>\s*<div class="settings-segmented-options">\s*<label><input type="radio" name="appearance" value="dark"> <span data-i18n="settings\.appearanceDark">Mörkt<\/span><\/label>\s*<label><input type="radio" name="appearance" value="system"> <span data-i18n="settings\.appearanceSystem">Följ systemet<\/span><\/label>\s*<label><input type="radio" name="appearance" value="light"> <span data-i18n="settings\.appearanceLight">Ljust<\/span><\/label>/u);
 globalThis.T9LanguageRegistry = require("../src/engine/language-registry");
 globalThis.T9LocaleCatalogs = require("../src/engine/locale-catalogs");
 require("../src/ui/i18n");

@@ -81,7 +81,7 @@
     "test:selective-regeneration": "node tests/selective-regeneration.test.js",
     "test:safe-regeneration": "node tests/safe-regeneration-preview.test.js",
     "test:step-repair": "node tests/step-repair.test.js && node tests/step-repair-async.test.js",
-    "test:ui-localization": "node tests/ui-localization.test.js && node tests/tenant-account-ui.test.js && node tests/popup-license-freshness.test.js && node tests/popup-trial-feedback.test.js && node tests/consultant-license-client.test.js && node tests/ux-language-pass.test.js",
+    "test:ui-localization": "node tests/ui-localization.test.js && node tests/tenant-account-ui.test.js && node tests/popup-license-freshness.test.js && node tests/popup-trial-feedback.test.js && node tests/consultant-license-client.test.js && node tests/ux-language-pass.test.js && node tests/start-page.test.js",
     "test:document-language": "node tests/document-language.test.js && node tests/markdown-export-language.test.js && npm run test:new-languages",
     "test:language-registry": "node tests/language-registry.test.js && node tests/language-preferences.test.js",
     "build": "node scripts/build.js",

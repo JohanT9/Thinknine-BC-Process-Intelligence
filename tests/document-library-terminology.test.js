@@ -18,7 +18,8 @@ assert(popupScript.includes('$("dashboard").addEventListener("click"') &&
 assert(dashboardHtml.includes(
   "<title>BC Process Studio — BC Knowledge Base</title>"
 ));
-assert(dashboardHtml.includes('<h2 id="documentLibraryTitle">BC Knowledge Base</h2>'));
+assert(dashboardHtml.includes('<p class="home-module">BC Knowledge Base</p>') &&
+  dashboardHtml.includes('<h2 id="documentLibraryTitle" class="home-title">Dokument</h2>'));
 assert(dashboardHtml.includes('aria-label="Filter för Dokumentbibliotek"'));
 assert(dashboardHtml.includes('aria-label="Dokument i Dokumentbiblioteket"'));
 assert(dashboardHtml.includes('id="libraryFilterDisclosure"'));
