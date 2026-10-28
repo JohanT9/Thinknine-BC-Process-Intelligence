@@ -50,6 +50,7 @@ function readFolder(dir) {
 }
 
 const DATA_FIELDS = ["value", "previousValue", "enteredValue", "selectedValue", "selectedCaption"];
+const COMPANY_FIELDS = ["companyName", "company"];
 const DATA_ROLES = new Set(["option", "row", "gridcell", "cell", "listitem", "treeitem"]);
 const hasLetter = text => /\p{L}/u.test(text);
 
@@ -73,6 +74,8 @@ function collectDataWords(events) {
   const values = [];
   for (const event of events) {
     DATA_FIELDS.forEach(field => values.push(event[field]));
+    // Business Central can show the company name as the page caption, so its words go too.
+    COMPANY_FIELDS.forEach(field => values.push(event[field]));
     if (event.type === "click" && DATA_ROLES.has(event.role)) values.push(event.label, event.accessibleName);
   }
   const captionWords = new Set(events.filter(event => !DATA_ROLES.has(event.role))
@@ -122,7 +125,7 @@ function sanitizeEvents(events, { keepValues = false } = {}) {
     return result;
   };
   const sanitizeString = (text, key) => {
-    if (["companyName", "company"].includes(key)) return "";
+    if (COMPANY_FIELDS.includes(key)) return "";
     const result = sanitizeUrl(text)
       .replace(/[\p{L}\p{N}._%+-]+@[\p{L}\p{N}.-]+\.\p{L}{2,}/gu, "user@example.invalid")
       // The same GUID gets the same replacement, so events stay linked to their interaction.

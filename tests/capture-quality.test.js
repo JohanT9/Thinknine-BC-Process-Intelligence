@@ -71,7 +71,7 @@ assert.deepStrictEqual(quality.compare(worse, quality.readBaseline()).regression
 const labEvents = JSON.parse(fs.readFileSync(path.join(__dirname,
   "fixtures/capture-lab/sales-order-typeahead.json"), "utf8")).events;
 const exportedEvents = labEvents.map((event, index) => ({ ...event, eventNo: index + 1,
-  companyName: "Real Customer Ltd", identification: { stale: true },
+  companyName: "Real Customer Ltd", pageCaption: "Real Customer Ltd", identification: { stale: true },
   topUrl: "https://businesscentral.dynamics.com/0f0e1d2c-3b4a-5968-7766-554433221100/Production?company=Real%20Customer&page=42&bookmark=abc",
   ...(index === 0 ? { note: "Sent by anna.svensson@example.com" } : {}) }));
 const dir = fs.mkdtempSync(path.join(os.tmpdir(), "capture-quality-"));
