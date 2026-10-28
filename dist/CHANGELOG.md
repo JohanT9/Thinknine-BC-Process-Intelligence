@@ -1,4 +1,4 @@
-## Unreleased
+## 4.7.204
 - Show the review workspace tabs as the workflow Record → Review → Share. Recording shows as done, Share is marked once every step is approved, and the module names remain as tooltips.
 - Show the document beside the review on screens at least 1200 pixels wide with Show document. The selected step is highlighted in the document, selecting a step in the document selects it in the review, and the document updates as the review changes. The choice is remembered; narrower screens switch to the document tab instead.
 - Lay out each step from the width of its own column, so steps stay readable beside the document, and translate the review title prefix.
