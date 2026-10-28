@@ -28,6 +28,10 @@ const maskedEvent = privacy.maskFieldValues(fieldEvent, settings);
 assert.deepStrictEqual(maskedEvent, { fieldName: "Lösenord", value: "[maskerat]",
   previousValue: "[maskerat]" });
 assert.strictEqual(fieldEvent.previousValue, "gammalt");
+// The typed text kept beside a validated value is masked the same way.
+assert.deepStrictEqual(privacy.maskFieldValues({ fieldName: "Unit Price", value: "1,200.00",
+  enteredValue: "1200" }, settings), { fieldName: "Unit Price", value: "[belopp]",
+  enteredValue: "[belopp]" });
 assert(!("previousValue" in privacy.maskFieldValues({ fieldName: "Antal", value: "5" }, settings)),
   "absent values are not introduced");
 assert.strictEqual(privacy.maskFieldValues(null, settings), null);

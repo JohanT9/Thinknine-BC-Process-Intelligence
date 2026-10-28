@@ -2,6 +2,16 @@
   "schemaVersion": 1,
   "recordings": [
     {
+      "id": "lab-keyboard-navigation",
+      "expected": 7,
+      "produced": 7,
+      "correct": 7,
+      "wrong": 0,
+      "duplicates": 0,
+      "extras": 0,
+      "missing": 0
+    },
+    {
       "id": "lab-sales-order-typeahead",
       "expected": 10,
       "produced": 10,

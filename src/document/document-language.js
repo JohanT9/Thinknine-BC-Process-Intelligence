@@ -243,6 +243,61 @@
       };
       if (templates[locale]) return templates[locale]();
     }
+    // Records, lists and search results: the generic rules below would keep the Swedish noun.
+    const recordChoice = source.match(/^Välj posten ([\s\S]+?)(?: på sidan ([\s\S]+?))?\.$/u);
+    if (recordChoice) {
+      const [, record, page] = recordChoice;
+      const templates = {
+        "en-US": () => `Choose the record ${record}${page ? ` on the ${page} page` : ""}.`,
+        "fr-FR": () => `Sélectionnez l’enregistrement ${record}${page ? ` sur la page ${page}` : ""}.`,
+        "de-DE": () => `Wählen Sie den Datensatz ${record}${page ? ` auf der Seite ${page}` : ""} aus.`,
+        "es-ES": () => `Selecciona el registro ${record}${page ? ` en la página ${page}` : ""}.`,
+        "da-DK": () => `Vælg posten ${record}${page ? ` på siden ${page}` : ""}.`,
+        "fi-FI": () => `Valitse tietue ${record}${page ? ` sivulla ${page}` : ""}.`,
+        "nb-NO": () => `Velg posten ${record}${page ? ` på siden ${page}` : ""}.`
+      };
+      if (templates[locale]) return templates[locale]();
+    }
+    const openList = source.match(/^Öppna listan ([\s\S]+?)\.$/u);
+    if (openList) {
+      const list = openList[1];
+      const templates = {
+        "en-US": `Open the ${list} list.`, "fr-FR": `Ouvrez la liste ${list}.`,
+        "de-DE": `Öffnen Sie die Liste ${list}.`, "es-ES": `Abre la lista ${list}.`,
+        "da-DK": `Åbn listen ${list}.`, "fi-FI": `Avaa luettelo ${list}.`,
+        "nb-NO": `Åpne listen ${list}.`
+      };
+      if (templates[locale]) return templates[locale];
+    }
+    const searchAndOpen = source.match(/^Sök efter ([\s\S]+?) och öppna (listan )?([\s\S]+?)\.$/u);
+    if (searchAndOpen) {
+      const [, query, isList, result] = searchAndOpen;
+      const templates = {
+        "en-US": `Search for ${query} and open ${isList ? `the ${result} list` : result}.`,
+        "fr-FR": `Recherchez ${query} et ouvrez ${isList ? "la liste " : ""}${result}.`,
+        "de-DE": `Suchen Sie nach ${query} und öffnen Sie ${isList ? "die Liste " : ""}${result}.`,
+        "es-ES": `Busca ${query} y abre ${isList ? "la lista " : ""}${result}.`,
+        "da-DK": `Søg efter ${query} og åbn ${isList ? "listen " : ""}${result}.`,
+        "fi-FI": `Hae ${query} ja avaa ${isList ? "luettelo " : ""}${result}.`,
+        "nb-NO": `Søk etter ${query} og åpne ${isList ? "listen " : ""}${result}.`
+      };
+      if (templates[locale]) return templates[locale];
+    }
+    const filteredSearch = source.match(
+      /^Sök efter ([\s\S]+?) i ([\s\S]+?) och välj den filtrerade posten\.$/u);
+    if (filteredSearch) {
+      const [, query, field] = filteredSearch;
+      const templates = {
+        "en-US": `Search for ${query} in ${field} and select the matching record.`,
+        "fr-FR": `Recherchez ${query} dans ${field} puis sélectionnez l’enregistrement correspondant.`,
+        "de-DE": `Suchen Sie nach ${query} in ${field} und wählen Sie den passenden Datensatz aus.`,
+        "es-ES": `Busca ${query} en ${field} y selecciona el registro coincidente.`,
+        "da-DK": `Søg efter ${query} i ${field} og vælg den matchende post.`,
+        "fi-FI": `Etsi ${query} kentästä ${field} ja valitse vastaava tietue.`,
+        "nb-NO": `Søk etter ${query} i ${field} og velg den samsvarende posten.`
+      };
+      if (templates[locale]) return templates[locale];
+    }
     const actionOnPage = source.match(/^Välj ([\s\S]+?) på sidan ([\s\S]+?)\.$/u);
     if (actionOnPage) {
       const templates = {

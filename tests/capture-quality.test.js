@@ -41,6 +41,10 @@ assert.strictEqual(reordered.correct, 1);
 assert.strictEqual(reordered.missing, 1);
 assert.strictEqual(reordered.extras, 1);
 
+// A chosen record without a control caption is identified by the record.
+const record = score([{ target: "101003" }], [{ selectedCaption: "101003", instruction: "Choose 101003" }]);
+assert.deepStrictEqual([record.correct, record.extras, record.missing], [1, 0, 0]);
+
 // Corpus entries are validated.
 assert.throws(() => quality.validate({ schemaVersion: 1, id: "x", events: [] }, "x.json"),
   /expectedSteps is required/u);

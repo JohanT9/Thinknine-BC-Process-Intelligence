@@ -11,6 +11,28 @@ assert.strictEqual(language.translateInstruction("Spärrad aktiverades.", "en-US
   "Spärrad was enabled.");
 assert.strictEqual(language.translateInstruction("En dialogruta öppnades.", "en-US"),
   "A dialog opened.");
+// Record, list and search instructions are translated as a whole in every document language;
+// no Swedish noun is left behind and the captured captions and values are kept.
+const navigationTemplates = [
+  "Välj posten **101003** på sidan **Sales Order**.", "Välj posten **101003**.",
+  "Öppna listan **Sales Orders**.", "Sök efter __sales ord__ och öppna listan **Sales Orders**.",
+  "Sök efter __sales ord__ och öppna **Sales Orders**.",
+  "Sök efter __1896__ i **No.** och välj den filtrerade posten."
+];
+for (const locale of ["en-US", "fr-FR", "de-DE", "es-ES", "da-DK", "fi-FI", "nb-NO"]) {
+  for (const source of navigationTemplates) {
+    const translated = language.translateInstruction(source, locale);
+    assert.notStrictEqual(translated, source, `${locale}: ${source}`);
+    assert(!/\b(?:Välj|Sök|öppna|listan|sidan|filtrerade)\b/u.test(translated), `${locale}: ${translated}`);
+    for (const value of source.match(/(?:\*\*|__)[^*_]+(?:\*\*|__)/gu)) {
+      assert(translated.includes(value), `${locale} keeps ${value}`);
+    }
+  }
+}
+assert.strictEqual(language.translateInstruction(navigationTemplates[0], "de-DE"),
+  "Wählen Sie den Datensatz **101003** auf der Seite **Sales Order** aus.");
+assert.strictEqual(language.translateInstruction(navigationTemplates[3], "en-US"),
+  "Search for __sales ord__ and open the **Sales Orders** list.");
 
 const source = {
   schemaVersion: 1,

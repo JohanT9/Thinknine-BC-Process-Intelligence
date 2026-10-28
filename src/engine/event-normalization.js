@@ -13,7 +13,7 @@
 ) {
   "use strict";
   const SCHEMA_VERSION = 1;
-  const NORMALIZATION_VERSION = "2.8.0";
+  const NORMALIZATION_VERSION = "2.9.0";
   const cache = new WeakMap();
   const clone = value => value == null ? value : JSON.parse(JSON.stringify(value));
   function freeze(value) { if (!value || typeof value !== "object" || Object.isFrozen(value)) return value; Object.values(value).forEach(freeze); return Object.freeze(value); }
@@ -68,6 +68,10 @@
     if ((type === "click" || /pointer|mouse/.test(type)) && control === "lookup") return ["activation", "identified-lookup-trigger"];
     if (["click", "key", "keydown"].includes(type) && identified.action && (type === "click" || ["Enter", " ", "Space"].includes(raw.key))) return ["activation", "identified-action-activation"];
     if (type === "click" && ["listRow", "repeaterCell"].includes(control)) return ["selection-change", "identified-row-selection"];
+    // The recorder names a shortcut's action only when the page declares it unambiguously,
+    // and records Enter on a row or an active suggestion as the choice it makes.
+    if (["key", "keydown"].includes(type) && raw.shortcut && raw.category === "action") return ["activation", "declared-shortcut-activation"];
+    if (["key", "keydown"].includes(type) && raw.key === "Enter" && raw.category === "selection" && raw.selectedCaption) return ["selection-change", "keyboard-selection"];
     if (["field-change", "change", "input"].includes(type) && (control === "checkbox" || typeof raw.value === "boolean" || (raw.checked != null && !["text", "search", "email", "number", "password", "tel", "url"].includes(raw.inputType) && !["textbox", "searchbox", "combobox"].includes(raw.role)))) return ["toggle-change", "verified-checked-state"];
     if (["field-change", "change"].includes(type) && control === "option") return ["selection-change", "identified-option-change"];
     if (["field-change", "input", "change"].includes(type)) {
@@ -238,7 +242,7 @@
     return controlKey(pending.sources[0]) === controlKey(event) &&
       sameKnownContext(pending.sources[0], event, pageKey) &&
       sameKnownContext(pending.sources[0], event, frameKey) &&
-      ["input", "change", "focusout"].includes(raw.inputSource || raw.type);
+      ["input", "change", "focusout", "validated"].includes(raw.inputSource || raw.type);
   }
   function normalizeRecording(recording, options = {}) {
     const useCache = !options.knowledgePacks;

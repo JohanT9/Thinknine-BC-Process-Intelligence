@@ -49,7 +49,7 @@ function readFolder(dir) {
   };
 }
 
-const DATA_FIELDS = ["value", "previousValue", "selectedValue", "selectedCaption"];
+const DATA_FIELDS = ["value", "previousValue", "enteredValue", "selectedValue", "selectedCaption"];
 const DATA_ROLES = new Set(["option", "row", "gridcell", "cell", "listitem", "treeitem"]);
 const hasLetter = text => /\p{L}/u.test(text);
 

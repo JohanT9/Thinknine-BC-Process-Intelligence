@@ -765,6 +765,14 @@
       value?.fieldCaption).replace(/[.:]+$/u, "").toLocaleLowerCase();
     const isSearchField = value => !value ||
       /sökfält|search field|sök|search|berätta|tell me/iu.test(value);
+    // A recorded Tell Me result carries its category (Lists) in one of its captions; a row
+    // chosen with Enter keeps the bare caption as its selection.
+    const resultCaptionOf = value => {
+      const captions = [value?.selectedCaption, value?.actionCaption, value?.fieldCaption]
+        .map(text).filter(Boolean);
+      return captions.find(caption =>
+        /\s+(?:listor|lists)\s*[-]*$/iu.test(caption)) || captions[0] || "";
+    };
     const rule = {
       ruleId: "search-and-open-with-redundant-field",
       priority: 98,
@@ -787,8 +795,7 @@
         const nextValue = meaningfulValue(next);
         const currentField = searchField(current);
         const nextField = searchField(next);
-        const resultCaption = text(candidateResult?.selectedCaption ||
-          candidateResult?.actionCaption || candidateResult?.fieldCaption);
+        const resultCaption = resultCaptionOf(candidateResult);
         const hasRecordedResult = Boolean(candidateResult &&
           /\s+(?:listor|lists)\s*[\uE000-\uF8FF]*$/iu.test(resultCaption));
         const hasResult = hasRecordedResult || Boolean(text(current.resultCaption ||
@@ -806,8 +813,7 @@
           inputEnd += 1;
         }
         const candidateResult = context.interactions[inputEnd + 1];
-        const resultCaption = text(candidateResult?.selectedCaption ||
-          candidateResult?.actionCaption || candidateResult?.fieldCaption)
+        const resultCaption = resultCaptionOf(candidateResult)
           .replace(/[\uE000-\uF8FF]/gu, "").replace(/\s+/gu, " ").trim();
         const hasRecordedResult = /\s+(?:listor|lists)$/iu.test(resultCaption);
         const values = context.interactions.slice(context.index,

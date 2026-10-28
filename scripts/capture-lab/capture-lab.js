@@ -1,8 +1,10 @@
 // Capture lab: runs the real content script in headless Edge against a Business Central-shaped
 // page, drives it with trusted mouse and keyboard input, feeds the captured events through the
 // real service worker and interprets them with the dashboard pipeline.
-// Needs Microsoft Edge and a built dist/ (npm run build). Usage: npm run capture:lab
-// Writes the captured events to tests/fixtures/capture-lab/ and prints the interpreted steps.
+// Needs Microsoft Edge and a built dist/ (npm run build).
+// Usage: npm run capture:lab [-- <scenario>]   (default: every scenario)
+// Writes the captured events to tests/fixtures/capture-lab/<scenario>.json and prints the
+// interpreted steps.
 const fs = require("fs");
 const path = require("path");
 const os = require("os");
@@ -35,6 +37,39 @@ function connect(wsUrl) {
     return new Promise((resolve, reject) => pending.set(msg.id, { resolve, reject })); } };
 }
 
+const scenarios = {
+  // Mouse and typing on a sales order: type-ahead, reformatted values, lines and dialogs.
+  "sales-order-typeahead": { page: "bc-mock.html", async run({ click, type, tab, enter, selectAll, mark, sleep }) {
+    mark("1 New"); await click("#actNew"); await sleep(600);
+    mark("2 Customer Name: type Ada, pick Adatum Corporation, Tab"); await click("#custName"); await type("Ada", 700); await click("#optAdatum"); await tab();
+    mark("3 External Document No. = PO-1001, Enter"); await click("#extDoc"); await type("PO-1001"); await enter();
+    mark("4 Posting Date = 2026-10-27 (reformatted), Tab"); await click("#postDate"); await selectAll(); await type("2026-10-27"); await tab();
+    mark("5 Line No. = 1896-s, Tab to Quantity"); await click('#lines input[data-k="no"]'); await type("1896"); await tab();
+    mark("6 Quantity = 5 (slow typing), Enter"); await type("5", 900); await enter();
+    mark("7 Quantity again = 6, Tab"); await click('#lines input[data-k="qty"]'); await selectAll(); await type("6"); await tab();
+    mark("8 Release"); await click("#actRelease");
+    mark("9 Statistics, then close the dialog (German caption)"); await click("#actStats"); await click("#dlgClose");
+    mark("10 Post... and OK"); await click("#actPost"); await click("#dlgOk"); await sleep(800);
+  } },
+  // The same client used from the keyboard: shortcuts, arrow keys, Tell Me, a FactBox and
+  // values the client reformats after validation.
+  "keyboard-navigation": { page: "bc-mock-keyboard.html", async run({ click, type, tab, enter, key, selectAll, mark, sleep }) {
+    mark("1 Tell Me (Alt+Q): sales orders, Enter"); await key("q", "KeyQ", 81, "", 1); await sleep(300); await type("sales ord"); await enter(); await sleep(500);
+    mark("2 Arrow down twice to 101003, Enter to open it"); await key("ArrowDown", "ArrowDown", 40); await key("ArrowDown", "ArrowDown", 40); await enter(); await sleep(500);
+    mark("3 Order Date = t, shown as 28.10.2026, Tab"); await click("#orderDate"); await selectAll(); await type("t"); await tab(); await sleep(400);
+    mark("4 Unit Price on line 1 = 1200, shown as 1,200.00, Tab"); await click('#lines input[data-row="0"]'); await type("1200"); await tab(); await sleep(400);
+    mark("5 FactBox Balance (LCY) drilldown"); await click("#balance"); await sleep(500);
+    mark("6 Escape back to the order"); await key("Escape", "Escape", 27); await sleep(500);
+    mark("7 Ctrl+Delete on line 2, Enter to confirm"); await click('#lines input[data-row="1"]'); await key("Delete", "Delete", 46, "", 2); await sleep(300); await enter(); await sleep(400);
+    mark("8 F9 to post, OK"); await key("F9", "F9", 120); await sleep(300); await click('[role=dialog] button[aria-label="OK"]'); await sleep(800);
+  } }
+};
+const selected = process.argv[2] ? [process.argv[2]] : Object.keys(scenarios);
+if (selected.some(name => !scenarios[name])) {
+  console.error(`Unknown scenario. Choose one of: ${Object.keys(scenarios).join(", ")}`);
+  process.exit(2);
+}
+
 (async () => {
   try {
     const version = await json(`http://127.0.0.1:${port}/json/version`);
@@ -45,6 +80,14 @@ function connect(wsUrl) {
       const worker = targetInfos.find(t => t.type === "service_worker" && new URL(t.url).pathname === "/background.js");
       if (worker) extensionId = new URL(worker.url).host; else await sleep(200);
     }
+    for (const name of selected) await runScenario(cdp, extensionId, name, scenarios[name]);
+    cdp.close();
+  } catch (error) { console.error(error.stack || error.message); process.exitCode = 1; }
+  finally { child.kill(); }
+})();
+
+async function runScenario(cdp, extensionId, name, scenario) {
+    console.log(`\n=== ${name}`);
     const { targetId } = await cdp.send("Target.createTarget", { url: "about:blank" });
     const { sessionId: s } = await cdp.send("Target.attachToTarget", { targetId, flatten: true });
     const page = (method, params) => cdp.send(method, params, s);
@@ -55,7 +98,7 @@ function connect(wsUrl) {
       if (r.exceptionDetails) throw new Error(JSON.stringify(r.exceptionDetails).slice(0, 600));
       return r.result.value;
     };
-    await page("Page.navigate", { url: "file:///" + path.join(__dirname, "bc-mock.html").replace(/\\/g, "/") });
+    await page("Page.navigate", { url: "file:///" + path.join(__dirname, scenario.page).replace(/\\/g, "/") });
     await sleep(800);
     // A minimal extension runtime for the content script; messages are collected.
     await evaluate(`window.__messages = []; window.__handlers = [];
@@ -66,7 +109,7 @@ function connect(wsUrl) {
         getURL: value => value },
         storage: { onChanged: { addListener() {} }, local: { get: async () => ({}) } } }; 1`);
     for (const file of ["engine/business-central-version-capture.js", "capture-field-privacy.js",
-      "capture-focus-session.js", "capture-surface-mode.js", "bc-error-detector.js",
+      "capture-focus-session.js", "capture-keyboard.js", "capture-surface-mode.js", "bc-error-detector.js",
       "capture-indicator-i18n.js", "content.js"]) {
       await evaluate(fs.readFileSync(path.join(dist, file), "utf8") + "\n;1");
     }
@@ -83,9 +126,10 @@ function connect(wsUrl) {
       await page("Input.dispatchMouseEvent", { type: "mouseReleased", x, y, button: "left", clickCount: 1 });
       await sleep(500);
     };
-    const key = async (name, code, keyCode, text) => {
-      await page("Input.dispatchKeyEvent", { type: "keyDown", key: name, code, windowsVirtualKeyCode: keyCode, ...(text ? { text } : {}) });
-      await page("Input.dispatchKeyEvent", { type: "keyUp", key: name, code, windowsVirtualKeyCode: keyCode });
+    // modifiers: 1 Alt, 2 Ctrl, 4 Meta, 8 Shift.
+    const key = async (name, code, keyCode, text, modifiers = 0) => {
+      await page("Input.dispatchKeyEvent", { type: "keyDown", key: name, code, windowsVirtualKeyCode: keyCode, modifiers, ...(text ? { text } : {}) });
+      await page("Input.dispatchKeyEvent", { type: "keyUp", key: name, code, windowsVirtualKeyCode: keyCode, modifiers });
       await sleep(400);
     };
     const type = async (value, delay = 140) => {
@@ -104,16 +148,7 @@ function connect(wsUrl) {
     const steps = [];
     const mark = label => steps.push({ label, at: Date.now() });
 
-    mark("1 New"); await click("#actNew"); await sleep(600);
-    mark("2 Customer Name: type Ada, pick Adatum Corporation, Tab"); await click("#custName"); await type("Ada", 700); await click("#optAdatum"); await tab();
-    mark("3 External Document No. = PO-1001, Enter"); await click("#extDoc"); await type("PO-1001"); await enter();
-    mark("4 Posting Date = 2026-10-27 (reformatted), Tab"); await click("#postDate"); await selectAll(); await type("2026-10-27"); await tab();
-    mark("5 Line No. = 1896-s, Tab to Quantity"); await click('#lines input[data-k="no"]'); await type("1896"); await tab();
-    mark("6 Quantity = 5 (slow typing), Enter"); await type("5", 900); await enter();
-    mark("7 Quantity again = 6, Tab"); await click('#lines input[data-k="qty"]'); await selectAll(); await type("6"); await tab();
-    mark("8 Release"); await click("#actRelease");
-    mark("9 Statistics, then close the dialog (German caption)"); await click("#actStats"); await click("#dlgClose");
-    mark("10 Post... and OK"); await click("#actPost"); await click("#dlgOk"); await sleep(800);
+    await scenario.run({ click, type, tab, enter, key, selectAll, mark, sleep });
 
     const messages = await evaluate("window.__messages");
     const events = messages.filter(m => m.type === "T9_RECORD_EVENT").map(m => m.event);
@@ -122,10 +157,10 @@ function connect(wsUrl) {
     const fixtureEvents = events.map(event => Object.fromEntries(Object.entries(event)
       .map(([name, value]) => [name, typeof value === "string" && value.startsWith("file:")
         ? bcUrl : value])));
-    fs.writeFileSync(path.join(outDir, "sales-order-typeahead.json"), JSON.stringify({
+    fs.writeFileSync(path.join(outDir, `${name}.json`), JSON.stringify({
       schemaVersion: 1,
       provenance: "Captured by the real content script in headless Edge from " +
-        "scripts/capture-lab/bc-mock.html (a Business Central-shaped page); no customer data.",
+        `scripts/capture-lab/${scenario.page} (a Business Central-shaped page); no customer data.`,
       userActions: steps.map(step => step.label), events: fixtureEvents }, null, 1) + "\n");
     console.log("captured events", events.length);
     console.log(events.map(e => `${e.type}${e.inputSource ? "/" + e.inputSource : ""} ${e.fieldName || e.accessibleName || e.label || ""} ${e.value !== undefined ? JSON.stringify(e.value) : ""} [${String(e.interactionId || "").slice(-6)}]`).join("\n"));
@@ -172,7 +207,5 @@ function connect(wsUrl) {
         compatibilityMode: model.compatibilityMode || "" }; })()`);
     console.log("\nnormalized", model.normalized.length, "groups", model.groups.length, "tasks", model.tasks.length, model.compatibilityMode);
     console.log(model.tasks.map((t, i) => `${i + 1}. [${t.type}] ${t.instruction}`).join("\n"));
-    cdp.close();
-  } catch (error) { console.error(error.stack || error.message); process.exitCode = 1; }
-  finally { child.kill(); }
-})();
+    await cdp.send("Target.closeTarget", { targetId });
+}

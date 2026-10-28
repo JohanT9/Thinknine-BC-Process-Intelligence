@@ -1096,14 +1096,10 @@
     showClickHighlight(target, event);
     if (!target) return;
     const category = categoryOf(target);
-    const role = target.getAttribute?.("role") || "";
-    const selectedElement = role === "row"
-      ? target.querySelector?.('[role="gridcell"]') || target : target;
-    const selectedCaption = category === "selection"
-      ? clean(selectedElement?.innerText || selectedElement?.textContent || "")
-      : "";
+    const selectedCaption = category === "selection" ? selectionCaption(target) : "";
     const targetDescriptor = descriptor(target);
-    const pointerLabel = category === "interaction"
+    // An explicit aria-labelledby caption names the control, as in the accessible name.
+    const pointerLabel = category === "interaction" && !target.hasAttribute("aria-labelledby")
       ? concisePointerLabel(event, target) : "";
     const pointerPath = event.composedPath?.() || [];
     const preActionCaptureId = pendingPointerCapture &&
@@ -1115,6 +1111,7 @@
       activateInteraction(owningInteraction(target), target, "click");
     activateInteraction(interactionId, target, "click");
     pendingPointerCapture = null;
+    const keyboard = keyboardActivationFor(target);
 
     record({
       type: "click",
@@ -1125,6 +1122,7 @@
       clientY: event.clientY,
       pointerTarget: true,
       interactionId,
+      ...(keyboard ? { inputSource: "keyboard", key: keyboard.key } : {}),
       ...(preActionCaptureId ? { preActionCaptureId } : {}),
       ...targetDescriptor,
       ...(pointerLabel ? { accessibleName: pointerLabel,
@@ -1150,7 +1148,72 @@
       uiState: { ...targetDescriptor.uiState, resultVisible: true }
     });
     if (source !== "focusout") focusSessions.commit(element, value);
+    if (source !== "input") settleField(element, value);
     return true;
+  }
+
+  // Business Central validates a committed value and can show it in another form: t becomes
+  // a date and 1200 becomes 1,200.00. The value shown afterwards is what the step records; the
+  // typed text stays as enteredValue. A value put back to what it was before the edit, or
+  // emptied, was rejected and is left to the error evidence. Lines are re-rendered after a
+  // commit, so a replaced editor is found again by its caption, row and grid. Typing in the
+  // field again, or in the editor that replaced it, ends the wait: that is a new edit.
+  const SETTLE_DELAYS_MS = [300, 1200];
+  const settling = new Set();
+
+  function fieldLocator(element) {
+    const grid = element.closest('[role="grid"],[role="treegrid"],table');
+    return { label: getLabel(element),
+      rowIndex: element.closest("[aria-rowindex]")?.getAttribute("aria-rowindex") || "",
+      gridLabel: grid?.getAttribute("aria-label") || "" };
+  }
+
+  function relocateField(locator) {
+    if (!locator.label) return null;
+    const found = [...document.querySelectorAll(EDITABLE_SELECTOR)].filter(element =>
+      (element.closest("[aria-rowindex]")?.getAttribute("aria-rowindex") || "") === locator.rowIndex &&
+      (element.closest('[role="grid"],[role="treegrid"],table')?.getAttribute("aria-label") || "") ===
+        locator.gridLabel && getLabel(element) === locator.label);
+    return found.length === 1 ? found[0] : null;
+  }
+
+  function stopSettling(element) {
+    let locator = null;
+    for (const state of settling) {
+      if (state.element !== element) {
+        if (state.element.isConnected) continue;
+        locator ||= fieldLocator(element);
+        if (locator.label !== state.locator.label || locator.rowIndex !== state.locator.rowIndex ||
+            locator.gridLabel !== state.locator.gridLabel) continue;
+      }
+      state.timers.forEach(clearTimeout);
+      settling.delete(state);
+    }
+  }
+
+  function settleField(element, entered) {
+    stopSettling(element);
+    if (typeof entered !== "string") return;
+    const state = { element, entered, value: entered, previous: focusSessions.previous(element),
+      interactionId: interactionForElement(element, true), locator: fieldLocator(element) };
+    state.timers = SETTLE_DELAYS_MS.map((delay, index) => setTimeout(() => {
+      if (!settling.has(state)) return;
+      if (index === SETTLE_DELAYS_MS.length - 1) settling.delete(state);
+      const current = element.isConnected ? element : relocateField(state.locator);
+      const value = current ? valueOf(current) : undefined;
+      if (typeof value !== "string" || value === state.value || value === "" ||
+          value === state.previous || value === "[maskerat]") return;
+      state.value = value;
+      elementInteractions.set(current, state.interactionId);
+      focusSessions.commit(current, value);
+      const targetDescriptor = descriptor(current);
+      record({ type: "field-change", category: "field",
+        fieldName: getLabel(current) || "Okänt fält", value, enteredValue: state.entered,
+        previousValue: state.previous, inputSource: "validated",
+        interactionId: state.interactionId, ...targetDescriptor,
+        uiState: { ...targetDescriptor.uiState, resultVisible: true } });
+    }, delay));
+    settling.add(state);
   }
 
   window.addEventListener("input", event => {
@@ -1163,6 +1226,7 @@
       rejectionReason: element ? "" : "no-editable-target" });
     if (!(element instanceof Element)) return;
 
+    stopSettling(element);
     clearTimeout(inputTimers.get(element));
     inputTimers.set(
       element,
@@ -1211,28 +1275,131 @@
     }
   }, true);
 
+  function selectionCaption(target) {
+    const selectedElement = target.getAttribute?.("role") === "row"
+      ? target.querySelector?.('[role="gridcell"]') || target : target;
+    return clean(selectedElement?.innerText || selectedElement?.textContent || "");
+  }
+
+  function keyFields(event) {
+    return { type: "key", key: event.key, code: event.code, altKey: event.altKey,
+      ctrlKey: event.ctrlKey, metaKey: event.metaKey, shiftKey: event.shiftKey,
+      repeat: event.repeat, inputSource: "keyboard" };
+  }
+
+  // A shortcut names an action only when the available controls that declare it, in
+  // aria-keyshortcuts or as "(F9)" at the end of a tooltip or name, all name the same action.
+  // Controls in an open dialog come first, as the client sends the key there.
+  const SHORTCUT_TARGETS = 'button,a[href],[role="button"],[role="menuitem"],' +
+    '[role="link"],[role="tab"],[aria-keyshortcuts],[title]';
+  function shortcutAction(shortcut, from) {
+    const keyboard = globalThis.T9CaptureKeyboard;
+    if (!keyboard || !shortcut) return null;
+    const scopes = [from?.closest?.('[role="dialog"],[aria-modal="true"]'), document]
+      .filter(Boolean);
+    for (const scope of scopes) {
+      const found = [...scope.querySelectorAll(SHORTCUT_TARGETS)].filter(element =>
+        keyboard.matches(element, shortcut) && !element.disabled &&
+        element.getAttribute("aria-disabled") !== "true" &&
+        !element.closest('[hidden],[aria-hidden="true"]'));
+      const names = new Set(found.map(element => clean(element.getAttribute("aria-label") ||
+        element.textContent || "")));
+      if (found.length) return names.size === 1 ? found[0] : null;
+    }
+    return null;
+  }
+
+  // Enter in a search box or type-ahead field chooses the suggestion the client marks as
+  // active or selected, and is recorded as a click on it would be: an option in the field's
+  // suggestion list continues the field edit, a result row is an action of its own.
+  function activeSuggestion(field) {
+    const byId = id => id ? field.ownerDocument.getElementById(id) : null;
+    const active = byId(field.getAttribute("aria-activedescendant"));
+    if (active?.matches?.('[role="option"],[role="row"]')) return active;
+    const lists = ["aria-controls", "aria-owns"].flatMap(name =>
+      String(field.getAttribute(name) || "").split(/s+/u)).map(byId).filter(Boolean);
+    const suggests = field.getAttribute("aria-autocomplete") ||
+      ["searchbox", "combobox"].includes(field.getAttribute("role"));
+    if (!lists.length && suggests) {
+      const dialog = field.closest('[role="dialog"],[aria-modal="true"]');
+      if (dialog) lists.push(dialog);
+    }
+    for (const list of lists) {
+      const selected = list.querySelector('[role="option"][aria-selected="true"],' +
+        '[role="row"][aria-selected="true"]');
+      if (selected && selected.getClientRects().length) return selected;
+    }
+    return null;
+  }
+
+  // Enter or Space on a button, link or menu item makes the browser click it; the click is
+  // the recorded action and is marked as made from the keyboard. If no click follows, the
+  // key itself is recorded.
+  const KEYBOARD_CLICK_SELECTOR = 'button,a[href],[role="button"],[role="menuitem"],' +
+    '[role="link"],[role="tab"],[role="checkbox"],[role="switch"],' +
+    'input[type="checkbox"],input[type="radio"],input[type="button"],input[type="submit"]';
+  const FIELD_KEYS = new Set(["F2", "F4", "Alt+ArrowDown", "Alt+ArrowUp"]);
+  let keyboardActivation = null;
+  function keyboardActivationFor(target) {
+    const pending = keyboardActivation;
+    if (!pending || Date.now() - pending.at > 1000 || !(pending.target === target ||
+        pending.target.contains?.(target) || target.contains?.(pending.target))) return null;
+    clearTimeout(pending.timer);
+    keyboardActivation = null;
+    return pending;
+  }
+
   window.addEventListener("keydown", event => {
-    if (!["Enter", " ", "Spacebar", "Escape", "F4"].includes(event.key)) return;
+    if (isRecorderUiEvent(event)) return;
     const eventTarget = eventElement(event);
     const target = interactiveTarget(eventTarget, event) || eventTarget;
+    const shortcut = globalThis.T9CaptureKeyboard?.shortcutOf(event) || "";
+    const editable = eventTarget instanceof Element && eventTarget.matches(EDITABLE_SELECTOR);
+    // F2, F4 and Alt+arrows act on the focused field, never on a page action.
+    const fieldKey = editable && FIELD_KEYS.has(shortcut);
+    const action = shortcut && !event.repeat && !fieldKey
+      ? shortcutAction(shortcut, eventTarget) : null;
+    if (action) {
+      record({ ...keyFields(event), category: "action", shortcut,
+        interactionId: activateInteraction(owningInteraction(action), action, "shortcut"),
+        ...descriptor(action) });
+      return;
+    }
+    if (!shortcut && !["Enter", " ", "Spacebar", "Escape"].includes(event.key)) return;
+    const suggestion = event.key === "Enter" && editable ? activeSuggestion(eventTarget) : null;
+    if (suggestion) {
+      // The typed text comes first, as it would after a pause before a click.
+      clearTimeout(inputTimers.get(eventTarget));
+      if (valueOf(eventTarget) !== "") emitField(eventTarget, "input");
+      const caption = selectionCaption(suggestion);
+      const interactionId = suggestion.matches('[role="option"]')
+        ? interactionForElement(eventTarget, true)
+        : activateInteraction(owningInteraction(suggestion), suggestion, "keyboard");
+      record({ ...keyFields(event), category: "selection",
+        selectedValue: caption, selectedCaption: caption, interactionId,
+        ...descriptor(suggestion) });
+      return;
+    }
     const interactionId = interactionForElement(eventTarget, false) ||
-      activateInteraction("", target, "keyboard");
-
-    record({
-      type: "key",
-      category: "interaction",
-      key: event.key,
-      code: event.code,
-      altKey: event.altKey,
-      ctrlKey: event.ctrlKey,
-      metaKey: event.metaKey,
-      shiftKey: event.shiftKey,
-      repeat: event.repeat,
-      inputSource: "keyboard",
-      interactionId,
-      fieldName: getLabel(eventTarget),
-      ...descriptor(target)
-    });
+      activateInteraction(owningInteraction(target), target, "keyboard");
+    const selectedCaption = event.key === "Enter" && !editable &&
+      categoryOf(target) === "selection" ? selectionCaption(target) : "";
+    const entry = { ...keyFields(event),
+      category: selectedCaption ? "selection" : "interaction",
+      ...(shortcut ? { shortcut } : {}),
+      ...(selectedCaption ? { selectedValue: selectedCaption, selectedCaption } : {}),
+      interactionId, fieldName: getLabel(eventTarget), ...descriptor(target) };
+    const clickTarget = !editable && ["Enter", " ", "Spacebar"].includes(event.key)
+      ? target.closest?.(KEYBOARD_CLICK_SELECTOR) : null;
+    if (!clickTarget) { record(entry); return; }
+    if (keyboardActivation) clearTimeout(keyboardActivation.timer);
+    const pending = { target: clickTarget, key: event.key, at: Date.now() };
+    pending.timer = setTimeout(() => {
+      if (keyboardActivation !== pending) return;
+      keyboardActivation = null;
+      record(entry);
+    }, 400);
+    keyboardActivation = pending;
   }, true);
 
   const observer = new MutationObserver(() => {

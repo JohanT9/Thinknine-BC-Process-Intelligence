@@ -218,3 +218,37 @@ deliberately left out except in English: Afvis, Hylkää, Verwerfen, Descartar, 
 Ignorer are also the captions of Business Central business actions such as Reject, which must
 stay steps. When the client changes a caption, read the same keys from a newer platform
 artifact; `tests/bc-client-captions.test.js` checks coverage for every registered language.
+
+## Keyboard use and validated values
+
+The recorder ties keyboard actions to the user action they perform when it captures them, so
+they group the same way as the mouse:
+
+- A shortcut (a function key, or a key held with Ctrl, Alt or Meta) is recorded as the action
+  that declares it, either in `aria-keyshortcuts` or as `(F9)` at the end of its tooltip or
+  name. Controls in an open dialog are searched first. It is recorded only when every
+  declaring control names the same action. The event keeps `shortcut` (for example
+  `Ctrl+Delete`) and owns what the action opens, so its dialog buttons join it.
+- An undeclared shortcut stays evidence (`key-command`) and never becomes a step, because the
+  recorder does not guess what it did. F2, F4 and Alt+arrows in a field act on that field.
+- Enter or Space on a button, link or menu item is one click, marked `inputSource: "keyboard"`.
+  It is not recorded as both a key and a click.
+- Enter on a list row, or in a search or type-ahead field with a highlighted suggestion, is
+  recorded as choosing it (`keyboard-selection`), owned exactly as a click on the same element
+  would be. The typed text is recorded first. Arrow keys only move the selection.
+- After a commit, the client can show the value in another form: `t` becomes a date and 1200
+  becomes 1,200.00. The value shown 0.3 and 1.2 seconds later is recorded in the same
+  interaction (`inputSource: "validated"`), and the typed text is kept as `enteredValue`. Both
+  are masked like any other value. Neither a value put back to what it was before, nor an
+  emptied value, is used: these are rejections and are left to the error evidence. A line
+  editor that the client re-rendered is found again by caption, row and grid. Typing in it
+  ends the wait.
+- A click into an empty plain text input that nothing else in its interaction follows only
+  places the cursor (`focus-only-click`), for example before Ctrl+Delete.
+
+Business Central's own language resources do not show how the web client renders shortcuts
+in the page. Both declaration forms are supported, and the shortcut texts have not yet been
+verified against a live client. `npm run capture:lab -- keyboard-navigation` exercises all of
+the above. It uses the content script in headless Edge on a Business Central-shaped page, and
+`tests/capture-lab-corpus.test.js` checks the captured events and the steps in every document
+language.

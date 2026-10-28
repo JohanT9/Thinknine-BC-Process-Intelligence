@@ -2,7 +2,7 @@
 
 ## Boundary and version
 
-Event Normalization 2.5.0 converts persisted browser mechanics plus BC UI
+Event Normalization 2.9.0 converts persisted browser mechanics plus BC UI
 Identification into deterministic, renderer-neutral interactions:
 
 ```text
@@ -64,6 +64,13 @@ produce one fallback `value-change` with
 `changed-value-on-focusout-fallback` evidence. Equal values or focus movement
 alone produce no meaningful normalized event. A focusout lacking an initial
 value does not invent a change.
+
+A `validated` value, which is what the client shows after it validated the commit (see
+[EVENT_STEP_GROUPING.md](EVENT_STEP_GROUPING.md#keyboard-use-and-validated-values)), joins the
+same normalized event as its last source, so the committed value is the one the client showed.
+A recorded shortcut whose declared action the recorder resolved becomes an `activation`
+(`declared-shortcut-activation`). Enter that chooses a row or a highlighted suggestion becomes a
+`selection-change` (`keyboard-selection`). Other keys remain `key-command` evidence.
 
 Native and fallback events for the same identified control coalesce only within
 the current focus/commit sequence. A new focus boundary closes the previous

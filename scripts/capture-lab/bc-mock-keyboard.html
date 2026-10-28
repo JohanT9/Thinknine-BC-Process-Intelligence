@@ -1,0 +1,155 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><title>Role Center - Dynamics 365 Business Central</title>
+<style>
+body{font:14px Segoe UI;margin:0}.bar{display:flex;gap:6px;padding:8px;background:#eee}
+.field{display:flex;gap:10px;margin:6px 12px}.field a.caption{width:180px}
+table{border-collapse:collapse;margin:12px}td{border:1px solid #ccc;padding:2px}
+tr[aria-selected=true]{background:#def}
+[role=dialog]{position:fixed;top:120px;left:200px;background:#fff;border:1px solid #333;padding:20px}
+.ms-nav-factbox{position:fixed;right:0;top:60px;width:220px;border-left:1px solid #ccc;padding:8px}
+</style></head>
+<body>
+<!-- Shaped like the Business Central web client when it is used from the keyboard: Tell Me
+     (Alt+Q), arrow keys in a list, Enter to open a record, fields the client reformats after
+     validation, a FactBox drilldown, Escape to close a page, Ctrl+Delete on a line and F9 to
+     post. Page changes replace the content and the URL, as the client does. -->
+<div class="ms-nav-layout-head"><span class="title" id="pageCaption">Role Center</span>
+  <button id="tellMe" aria-label="Search" title="Search (Alt+Q)">Search</button></div>
+<div id="content"></div>
+<div id="status" role="status" aria-live="polite"></div>
+<script>
+const content = document.getElementById("content");
+const orders = [["101001", "Adatum Corporation"], ["101002", "Trey Research"],
+  ["101003", "School of Fine Art"]];
+let lines = [{ no: "1896-S", price: "" }, { no: "1900-S", price: "" }];
+let previousPage = null;
+
+function show(page, caption, html) {
+  history.pushState({}, "", `${location.pathname}?page=${page}`);
+  document.title = `${caption} - Dynamics 365 Business Central`;
+  document.getElementById("pageCaption").textContent = caption;
+  content.innerHTML = html;
+}
+
+// Tell Me: a dialog with a search box and a result grid (caption and category); Enter
+// opens the highlighted result.
+function openTellMe() {
+  const dialog = document.createElement("div");
+  dialog.setAttribute("role", "dialog"); dialog.setAttribute("aria-modal", "true");
+  dialog.setAttribute("aria-label", "Tell me what you want to do");
+  dialog.innerHTML = `<input role="searchbox" class="stringcontrol-edit" aria-label="Tell me what you want to do">
+    <table role="grid" aria-label="Results"><tbody id="tellMeResults"></tbody></table>`;
+  document.body.appendChild(dialog);
+  const input = dialog.querySelector("input");
+  const results = dialog.querySelector("#tellMeResults");
+  input.addEventListener("input", () => {
+    results.innerHTML = /^sales/i.test(input.value)
+      ? `<tr role="row" aria-selected="true"><td role="gridcell">Sales Orders</td><td role="gridcell">Lists</td></tr>
+        <tr role="row"><td role="gridcell">Sales Quotes</td><td role="gridcell">Lists</td></tr>` : "";
+  });
+  input.addEventListener("keydown", event => {
+    if (event.key !== "Enter" || !results.firstElementChild) return;
+    event.preventDefault();
+    setTimeout(() => { dialog.remove(); showList(); }, 60);
+  });
+  input.focus();
+}
+document.getElementById("tellMe").addEventListener("click", openTellMe);
+
+// A list: arrow keys move the selected row, Enter opens it.
+function showList() {
+  show(9305, "Sales Orders", `<div class="bar" role="menubar">
+      <button role="menuitem" aria-label="New" aria-keyshortcuts="Alt+N">New</button></div>
+    <table role="grid" aria-label="Sales Orders"><tbody>${orders.map(([no, name], index) =>
+      `<tr role="row" tabindex="-1" aria-selected="${index === 0}"><td role="gridcell">${no}</td><td role="gridcell">${name}</td></tr>`).join("")}</tbody></table>`);
+  const rows = [...content.querySelectorAll("tr")];
+  rows[0].tabIndex = 0; rows[0].focus();
+  content.querySelector("table").addEventListener("keydown", event => {
+    const index = rows.indexOf(document.activeElement);
+    if (index < 0) return;
+    if (event.key === "ArrowDown" || event.key === "ArrowUp") {
+      event.preventDefault();
+      const next = rows[Math.max(0, Math.min(rows.length - 1, index + (event.key === "ArrowDown" ? 1 : -1)))];
+      rows.forEach(row => { row.tabIndex = -1; row.setAttribute("aria-selected", String(row === next)); });
+      next.tabIndex = 0; next.focus();
+    }
+    if (event.key === "Enter") { event.preventDefault(); setTimeout(() => showCard(orders[index]), 60); }
+  });
+}
+
+function renderLines() {
+  const body = document.getElementById("lines");
+  body.innerHTML = lines.map((line, index) => `<tr role="row" aria-rowindex="${index + 1}">
+    <td role="gridcell"><input aria-label="No." class="stringcontrol-edit" value="${line.no}" readonly></td>
+    <td role="gridcell"><input aria-label="Unit Price Excl. VAT" class="stringcontrol-edit" data-row="${index}" value="${line.price}"></td></tr>`).join("");
+  body.querySelectorAll("input[data-row]").forEach(input => input.addEventListener("change", () => {
+    // The client validates the amount and shows it in its display format.
+    const amount = Number(input.value.replace(/,/g, ""));
+    lines[input.dataset.row].price = amount.toLocaleString("en-US", { minimumFractionDigits: 2 });
+    setTimeout(() => { input.value = lines[input.dataset.row].price; }, 120);
+  }));
+}
+
+// A card with fields the client reformats, a FactBox and lines.
+function showCard([no, name]) {
+  previousPage = () => showCard([no, name]);
+  show(42, `Sales Order ${no}`, `<div class="bar" role="menubar">
+      <button role="menuitem" aria-label="Post..." aria-keyshortcuts="F9" id="actPost">Post...</button>
+      <button role="menuitem" aria-label="Delete Line" aria-keyshortcuts="Control+Delete">Delete Line</button></div>
+    <div class="field control" role="group"><a class="caption" id="capCust">Customer Name</a>
+      <input class="stringcontrol-edit" aria-labelledby="capCust" value="${name}" readonly></div>
+    <div class="field control" role="group"><a class="caption" id="capDate">Order Date</a>
+      <input class="stringcontrol-edit" aria-labelledby="capDate" id="orderDate" value="27.10.2026"></div>
+    <table role="grid" aria-label="Lines"><tbody id="lines"></tbody></table>
+    <div class="ms-nav-factbox" role="region" aria-label="Customer Details">
+      <div class="field control" role="group"><a class="caption" id="capBal">Balance (LCY)</a>
+        <a href="#" role="link" aria-labelledby="capBal" id="balance">4,316.92</a></div></div>`);
+  renderLines();
+  // Dates: t is today and the client shows the validated date in its own format.
+  document.getElementById("orderDate").addEventListener("change", event => {
+    const value = event.target.value.trim().toLowerCase() === "t" ? "28.10.2026" : event.target.value;
+    setTimeout(() => { event.target.value = value; }, 150);
+  });
+  document.getElementById("balance").addEventListener("click", event => {
+    event.preventDefault();
+    setTimeout(() => show(25, "Customer Ledger Entries", `<table role="grid" aria-label="Customer Ledger Entries"><tbody>
+      <tr role="row" tabindex="0"><td role="gridcell">103201</td><td role="gridcell">4,316.92</td></tr></tbody></table>`), 60);
+    setTimeout(() => content.querySelector("tr")?.focus(), 120);
+  });
+  document.getElementById("actPost").addEventListener("click", openPostDialog);
+}
+
+function confirmDialog(text, buttons, done) {
+  const dialog = document.createElement("div");
+  dialog.setAttribute("role", "dialog"); dialog.setAttribute("aria-modal", "true");
+  dialog.innerHTML = `<p>${text}</p>${buttons.map(caption =>
+    `<button aria-label="${caption}">${caption}</button>`).join("")}`;
+  document.body.appendChild(dialog);
+  dialog.querySelectorAll("button").forEach(button => button.addEventListener("click", () =>
+    setTimeout(() => { dialog.remove(); done(button.textContent); }, 60)));
+  dialog.querySelector("button").focus();
+}
+
+function openPostDialog() {
+  confirmDialog("Choose an option: Ship and Invoice", ["OK", "Cancel"], answer => {
+    if (answer === "OK") document.getElementById("status").textContent = "The order was posted.";
+  });
+}
+
+// Client shortcuts.
+document.addEventListener("keydown", event => {
+  if (event.altKey && event.key.toLowerCase() === "q") { event.preventDefault(); openTellMe(); }
+  if (event.key === "Escape" && previousPage && document.title.startsWith("Customer Ledger")) {
+    event.preventDefault(); setTimeout(previousPage, 60);
+  }
+  if (event.key === "F9" && document.getElementById("actPost")) { event.preventDefault(); openPostDialog(); }
+  if (event.ctrlKey && event.key === "Delete" && event.target.closest?.("#lines")) {
+    event.preventDefault();
+    const row = Number(event.target.closest("tr").getAttribute("aria-rowindex")) - 1;
+    confirmDialog("Do you want to delete the selected lines?", ["Yes", "No"], answer => {
+      if (answer === "Yes") { lines = lines.filter((line, index) => index !== row); renderLines(); }
+    });
+  }
+}, true);
+</script>
+</body></html>

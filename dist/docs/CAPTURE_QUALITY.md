@@ -16,6 +16,11 @@ normalization, step grouping, session interpretation), and every produced step i
 Precision is correct steps divided by produced steps; recall is correct steps divided by
 expected steps. Steps are aligned in order, so a step in the wrong place does not count.
 
+The corpus starts with two capture lab recordings of a Business Central-shaped page: one
+used with the mouse and one used from the keyboard (shortcuts, arrow keys, Tell Me, a FactBox
+and values the client reformats). Run `npm run capture:lab` to capture them again after a
+recorder change. Recordings from real Business Central are added with the importer.
+
 ## Commands
 
 ```sh

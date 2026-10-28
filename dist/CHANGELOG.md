@@ -1,6 +1,10 @@
 ## Unreleased
 - Recognize the Business Central client controls that are not steps (close, scroll, show more or less, back and forward, field hints and Tell Me) in French, German, Spanish, Danish, Finnish and Norwegian too. The captions are read from the web client's own language resources, which also corrects English and Swedish wordings that newer clients use, such as "The value for this field is required" and "Visa mer".
 - Measure capture quality on a corpus of real and lab recordings: `npm run quality:capture` classifies every produced step as correct, wrong, duplicate or extra and lists missing steps, and CI fails when a recording gets worse than its baseline. `npm run quality:import` turns an exported recording ZIP into a corpus entry with values pseudonymized and URLs, e-mail addresses and company removed. See docs/CAPTURE_QUALITY.md.
+- Record keyboard use as the steps it performs. A shortcut such as F9 or Ctrl+Delete is recorded as the action that declares it, together with the dialog it opens. Enter on a list row or on a highlighted Tell Me result chooses it. Enter on a dialog button is one step, not two. Previously these steps were missing or duplicated. A shortcut that no control declares stays evidence and is never guessed.
+- Record a field value as Business Central shows it after validation, for example 28.10.2026 for "t" or 1,200.00 for 1200, and keep the typed text beside it, masked like the value.
+- A click that only puts the cursor in an empty field, for example before a keyboard shortcut, is no longer a step.
+- Translate record selections, opened lists and Tell Me searches into every document language. Previously Swedish words remained, for example "Wählen Sie posten" or "Sök efter".
 
 ## 4.7.206
 - Record a choice from a field suggestion list as one step with the chosen value. Previously the typed characters, the click on the suggestion and the final value became three steps.

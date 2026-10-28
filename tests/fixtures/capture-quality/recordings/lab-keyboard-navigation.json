@@ -1,0 +1,18 @@
+{
+  "schemaVersion": 1,
+  "id": "lab-keyboard-navigation",
+  "source": "capture-lab",
+  "provenance": "Captured by the real content script on the capture lab's Business Central-shaped page used from the keyboard; no customer data.",
+  "documentLanguage": "en-US",
+  "reviewed": true,
+  "eventsFrom": "tests/fixtures/capture-lab/keyboard-navigation.json",
+  "expectedSteps": [
+    { "target": "Search", "value": "sales ord" },
+    { "target": "101003" },
+    { "target": "Order Date", "value": "28.10.2026" },
+    { "target": "Unit Price Excl. VAT", "value": "1,200.00" },
+    { "target": "Balance (LCY)" },
+    { "target": "Delete Line" },
+    { "target": "Post..." }
+  ]
+}

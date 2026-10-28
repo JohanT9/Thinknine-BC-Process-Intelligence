@@ -283,6 +283,15 @@
       interactionIds: interactionIds(events), status: "candidate"
     });
   }
+  // A click into an empty plain text input (no role of its own) that nothing else in its
+  // interaction follows only puts the cursor there, for example before a keyboard shortcut.
+  // Followed by typing or a choice, the click stays part of that step.
+  function onlyFocusesInput(event) {
+    return event.rawEventType === "click" && event.kind === "activation" &&
+      event.controlIdentification?.role === "input" &&
+      event.controlIdentification?.controlType === "interactiveSurface" &&
+      event.value?.normalized == null && !event.selection;
+  }
   function isNoise(event) {
     // Clicking an empty editable surface only focuses it. Its accessible name
     // can be a required-field hint rather than a field caption, in any locale.
@@ -400,6 +409,14 @@
     let pending = null; let lastStandaloneNavigation = null;
     const emit = () => {
       if (!pending) return;
+      if (pending.events.length === 1 && onlyFocusesInput(pending.events[0])) {
+        const [event] = pending.events;
+        supportingEvents.push(freeze({ normalizedEventId: event.normalizedEventId,
+          classification: "noise", reason: "focus-only-click" }));
+        assignments.set(event.normalizedEventId, "supporting");
+        pending = null;
+        return;
+      }
       const value = makeGroup(normalizedRecording.recordingId, pending.events,
         pending.reasons, groups.length + 1);
       groups.push(value);

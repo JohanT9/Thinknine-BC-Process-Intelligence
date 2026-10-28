@@ -1122,7 +1122,7 @@ const CONTENT_SCRIPT_ID = "thinknine-bc-recorder-main";
 // the same capture helpers as statically injected ones.
 const CAPTURE_SCRIPT_FILES = Object.freeze([
   "engine/business-central-version-capture.js", "capture-field-privacy.js",
-  "capture-focus-session.js", "capture-surface-mode.js", "bc-error-detector.js",
+  "capture-focus-session.js", "capture-keyboard.js", "capture-surface-mode.js", "bc-error-detector.js",
   "capture-indicator-i18n.js", "content.js"
 ]);
 

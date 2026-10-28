@@ -6,8 +6,11 @@
 const normalize = value => String(value ?? "").normalize("NFC").trim()
   .replace(/\s+/gu, " ").replace(/(?:\.\.\.|…|\.)$/u, "").toLowerCase();
 
+// A step on a control is identified by its caption; choosing a record in a list has no
+// control caption and is identified by the chosen record.
 function targetsOf(task) {
-  return [task.actionCaption, task.fieldCaption].map(normalize).filter(Boolean);
+  const captions = [task.actionCaption, task.fieldCaption].map(normalize).filter(Boolean);
+  return captions.length ? captions : [normalize(task.selectedCaption)].filter(Boolean);
 }
 
 function valuesOf(task) {
