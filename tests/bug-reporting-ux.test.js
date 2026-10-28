@@ -157,6 +157,6 @@ globalThis.T9LanguageRegistry = require("../src/engine/language-registry");
 globalThis.T9LocaleCatalogs = require("../src/engine/locale-catalogs");
 require("../src/ui/i18n");
 // Sending is emphasised only once the report is complete and states the expected result.
-assert.ok(report.includes(".primary-actions #emailReport.is-ready{background:#008c95"));
+assert.ok(report.includes(".primary-actions #emailReport.is-ready{background:var(--c-bg-008c95)"));
 assert.match(reportLogic, /classList\.toggle\("is-ready", Boolean\(result\.ready &&\s+String\(state\.report\?\.expectedResult\?\.text/u);
 console.log("Bug Reporting UX tests passed.");

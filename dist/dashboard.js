@@ -46,6 +46,14 @@ const uiTf = (key, values) => globalThis.T9UiI18n.format(
 );
 
 const $ = id => document.getElementById(id);
+
+// Appearance applies immediately and is shared by every extension page (dark by default).
+if ($("appearance") && globalThis.T9Appearance) {
+  $("appearance").value = globalThis.T9Appearance.read();
+  $("appearance").addEventListener("change", event => {
+    globalThis.T9Appearance.set(event.target.value);
+  });
+}
 const send = message => chrome.runtime.sendMessage(message);
 const processIntelligenceEnabled = () =>
   globalThis.T9FeatureFlags?.isEnabled("processIntelligence") === true;

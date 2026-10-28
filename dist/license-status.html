@@ -2,17 +2,19 @@
 <html lang="sv">
 <head>
   <meta charset="utf-8">
+  <script src="appearance.js"></script>
+  <link rel="stylesheet" href="theme.css">
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <title>Licensinformation — BC Process Studio</title>
   <style>
-    :root{font-family:"Segoe UI",Arial,sans-serif;color:#172b45;background:#f5f8f9}
-    *{box-sizing:border-box}body{margin:0}header{background:#05474f;color:#fff;padding:22px max(24px,calc((100vw - 760px)/2))}
+    :root{font-family:"Segoe UI",Arial,sans-serif;color:var(--c-fg-172b45);background:var(--c-bg-f5f8f9)}
+    *{box-sizing:border-box}body{margin:0}header{background:var(--c-bg-05474f);color:var(--c-fg-ffffff);padding:22px max(24px,calc((100vw - 760px)/2))}
     header strong,header span{display:block}header span{margin-top:4px;opacity:.8}main{max-width:808px;margin:auto;padding:24px}
-    section{background:#fff;border:1px solid #ccdee0;border-radius:7px;padding:24px}h1{font-size:25px;margin:0 0 20px}h2{font-size:19px;color:#007a82;margin:0 0 18px}
-    dl{display:grid;grid-template-columns:180px 1fr;gap:0;margin:0}dt,dd{padding:12px;border-bottom:1px solid #e1eaeb;margin:0}dt{font-weight:650}dd{overflow-wrap:anywhere}
-    .status{display:inline-block;padding:4px 10px;border-radius:999px;font-weight:700}.active{background:#e5f4ea;color:#176b38}.inactive{background:#fde7e9;color:#a4262c}.unknown{background:#fff4ce;color:#6d5700}
-    label{display:block;font-weight:650;margin-bottom:6px}select{width:100%;padding:10px;border:1px solid #8b9fa8;border-radius:3px;background:#fff;font:inherit;margin-bottom:18px}.toolbar{display:flex;gap:10px;margin-top:20px}.toolbar button{width:230px;min-height:40px;padding:9px 16px;border:1px solid #007a82;border-radius:3px;background:#007a82;color:#fff;font:inherit;cursor:pointer}.toolbar button:disabled{opacity:.6;cursor:wait}
-    #message{min-height:24px;margin-top:14px}.error{color:#a4262c}@media(max-width:560px){dl{grid-template-columns:1fr}dt{padding-bottom:2px;border:0}dd{padding-top:2px}.toolbar button{width:100%}}
+    section{background:var(--c-bg-ffffff);border:1px solid var(--c-bd-ccdee0);border-radius:7px;padding:24px}h1{font-size:25px;margin:0 0 20px}h2{font-size:19px;color:var(--c-fg-007a82);margin:0 0 18px}
+    dl{display:grid;grid-template-columns:180px 1fr;gap:0;margin:0}dt,dd{padding:12px;border-bottom:1px solid var(--c-bd-e1eaeb);margin:0}dt{font-weight:650}dd{overflow-wrap:anywhere}
+    .status{display:inline-block;padding:4px 10px;border-radius:999px;font-weight:700}.active{background:var(--c-bg-e5f4ea);color:var(--c-fg-176b38)}.inactive{background:var(--c-bg-fde7e9);color:var(--c-fg-a4262c)}.unknown{background:var(--c-bg-fff4ce);color:var(--c-fg-6d5700)}
+    label{display:block;font-weight:650;margin-bottom:6px}select{width:100%;padding:10px;border:1px solid var(--c-bd-8b9fa8);border-radius:3px;background:var(--c-bg-ffffff);font:inherit;margin-bottom:18px}.toolbar{display:flex;gap:10px;margin-top:20px}.toolbar button{width:230px;min-height:40px;padding:9px 16px;border:1px solid var(--c-bd-007a82);border-radius:3px;background:var(--c-bg-007a82);color:var(--c-fg-ffffff);font:inherit;cursor:pointer}.toolbar button:disabled{opacity:.6;cursor:wait}
+    #message{min-height:24px;margin-top:14px}.error{color:var(--c-fg-a4262c)}@media(max-width:560px){dl{grid-template-columns:1fr}dt{padding-bottom:2px;border:0}dd{padding-top:2px}.toolbar button{width:100%}}
   </style>
 </head>
 <body>

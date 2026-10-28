@@ -1,3 +1,8 @@
+## Unreleased
+- Use a dark appearance by default. Choose Light or Follow system under Appearance in the settings; the choice applies immediately to every BC Process Studio page in the browser.
+- Keep the document preview on white paper with dark text in every appearance, so it matches the Word document.
+- Translate the support email help text in the settings.
+
 ## 4.7.204
 - Show the review workspace tabs as the workflow Record → Review → Share. Recording shows as done, Share is marked once every step is approved, and the module names remain as tooltips.
 - Show the document beside the review on screens at least 1200 pixels wide with Show document. The selected step is highlighted in the document, selecting a step in the document selects it in the review, and the document updates as the review changes. The choice is remembered; narrower screens switch to the document tab instead.

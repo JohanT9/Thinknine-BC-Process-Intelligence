@@ -150,6 +150,8 @@ for (const file of ["capture-field-privacy.js", "capture-indicator-i18n.js"]) {
 for (const file of [
   "dashboard.html",
   "design-system.css",
+  "theme.css",
+  "appearance.js",
   "dashboard.js",
   "i18n.js",
   "tooltips.js",

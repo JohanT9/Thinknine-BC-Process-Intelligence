@@ -2,6 +2,11 @@
 (function (root) {
   const catalogs = {
   "fr-FR": {
+    "Applies immediately to every BC Process Studio page in this browser.": "S’applique immédiatement à toutes les pages de BC Process Studio dans ce navigateur.",
+    "Light": "Clair",
+    "Follow system": "Suivre le système",
+    "Dark": "Sombre",
+    "Appearance": "Apparence",
     "All steps are approved. The document is ready to share.": "Toutes les étapes sont approuvées. Le document est prêt à être partagé.",
     "Share": "Partager",
     "Record": "Enregistrer",
@@ -998,6 +1003,11 @@
     "error report": "rapport d’erreur"
   },
   "de-DE": {
+    "Applies immediately to every BC Process Studio page in this browser.": "Gilt sofort für alle Seiten von BC Process Studio in diesem Browser.",
+    "Light": "Hell",
+    "Follow system": "Systemeinstellung verwenden",
+    "Dark": "Dunkel",
+    "Appearance": "Darstellung",
     "All steps are approved. The document is ready to share.": "Alle Schritte sind freigegeben. Das Dokument kann geteilt werden.",
     "Share": "Teilen",
     "Record": "Aufzeichnen",
@@ -1994,6 +2004,11 @@
     "error report": "Fehlerbericht"
   },
   "es-ES": {
+    "Applies immediately to every BC Process Studio page in this browser.": "Se aplica de inmediato a todas las páginas de BC Process Studio en este navegador.",
+    "Light": "Claro",
+    "Follow system": "Seguir el sistema",
+    "Dark": "Oscuro",
+    "Appearance": "Apariencia",
     "All steps are approved. The document is ready to share.": "Todos los pasos están aprobados. El documento está listo para compartir.",
     "Share": "Compartir",
     "Record": "Grabar",
@@ -2990,6 +3005,11 @@
     "error report": "informe de errores"
   },
   "da-DK": {
+    "Applies immediately to every BC Process Studio page in this browser.": "Gælder straks for alle sider i BC Process Studio i denne browser.",
+    "Light": "Lyst",
+    "Follow system": "Følg systemet",
+    "Dark": "Mørkt",
+    "Appearance": "Udseende",
     "All steps are approved. The document is ready to share.": "Alle trin er godkendt. Dokumentet er klar til at blive delt.",
     "Share": "Del",
     "Record": "Optag",
@@ -3986,6 +4006,11 @@
     "error report": "fejlrapport"
   },
   "fi-FI": {
+    "Applies immediately to every BC Process Studio page in this browser.": "Koskee heti kaikkia BC Process Studion sivuja tässä selaimessa.",
+    "Light": "Vaalea",
+    "Follow system": "Noudata järjestelmää",
+    "Dark": "Tumma",
+    "Appearance": "Ulkoasu",
     "All steps are approved. The document is ready to share.": "Kaikki vaiheet on hyväksytty. Asiakirja on valmis jaettavaksi.",
     "Share": "Jaa",
     "Record": "Tallenna",
@@ -4982,6 +5007,11 @@
     "error report": "virheraportti"
   },
   "nb-NO": {
+    "Applies immediately to every BC Process Studio page in this browser.": "Gjelder umiddelbart for alle sider i BC Process Studio i denne nettleseren.",
+    "Light": "Lyst",
+    "Follow system": "Følg systemet",
+    "Dark": "Mørkt",
+    "Appearance": "Utseende",
     "All steps are approved. The document is ready to share.": "Alle trinn er godkjent. Dokumentet er klart til å deles.",
     "Share": "Del",
     "Record": "Ta opp",
