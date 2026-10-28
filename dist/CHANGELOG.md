@@ -1,4 +1,4 @@
-## Unreleased
+## 4.7.206
 - Record a choice from a field suggestion list as one step with the chosen value. Previously the typed characters, the click on the suggestion and the final value became three steps.
 - Stop recording edits in text fields as enabled checkboxes ("Enable …"). Only checkboxes and radio buttons now record a checked state.
 - Document a field edit by its committed value, not by the click that put the cursor in the field, so edited fields no longer disappear from the steps.
