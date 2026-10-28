@@ -3,6 +3,8 @@
 - Stop recording edits in text fields as enabled checkboxes ("Enable …"). Only checkboxes and radio buttons now record a checked state.
 - Document a field edit by its committed value, not by the click that put the cursor in the field, so edited fields no longer disappear from the steps.
 - Keep a button in a dialog (for example OK after Post) with the action that opened the dialog instead of adding a separate step.
+- Stop describing New on a sales order, purchase order, warehouse receipt or transfer order as creating an Aptean quality check. The Aptean Food & Beverage rule now requires the app's own Create Quality Control Check action, and a test keeps third-party rules from taking over standard actions on standard pages.
+- Translate record selections (customer, item, vendor, location, dimension value) into every document language; previously the Swedish record type remained, for example "Choose artikel".
 - Add a capture lab (`npm run capture:lab`) that drives the real recorder in Microsoft Edge on a Business Central-shaped page, and a regression test that requires one correct step per user action.
 
 ## 4.7.205

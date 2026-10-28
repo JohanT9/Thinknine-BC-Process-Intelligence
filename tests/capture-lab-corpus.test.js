@@ -63,4 +63,26 @@ assert.deepStrictEqual(steps, [
 assert(!steps.some(step => /Ada\b|Aktivera/u.test(step)),
   "no typed fragment and no checkbox step for a text field");
 
+// In every other document language no Swedish template word remains; captured values stay.
+const documentLanguage = require("../src/document/document-language");
+const locales = require("../src/engine/language-registry").supported("document")
+  .map(item => item.locale).filter(locale => locale !== "sv-SE");
+for (const locale of locales) {
+  // A new document is interpreted in its document language and projected with translation.
+  const localized = pipeline.interpret({ session: { id: "capture-lab", name: "Capture lab",
+    settings: { documentLanguage: locale } }, events: sourceEvents,
+  normalizedEvents: normalized.events, stepGroups: grouped.groups,
+  supportingEvents: grouped.supportingEvents, groupingDiagnostics: grouped.diagnostics,
+  imagePaths: {}, knowledgePacks }).businessTasks.map(task => task.instruction);
+  assert.strictEqual(localized.length, steps.length, locale);
+  for (const step of localized) {
+    const translated = documentLanguage.translateInstruction(step, locale);
+    assert(!/\b(?:Välj|Ange|Börja|artikel|kund|sidan|genom att)\b/u.test(translated),
+      `${locale}: ${translated}`);
+    for (const value of step.match(/(?:\*\*|__)[^*_]+(?:\*\*|__)/gu) || []) {
+      assert(translated.includes(value), `${locale} keeps ${value}`);
+    }
+  }
+}
+
 console.log(`Capture lab corpus passed (${fixture.userActions.length} user actions, ${steps.length} steps).`);

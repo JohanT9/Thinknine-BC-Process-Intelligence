@@ -131,6 +131,32 @@
       if (templates[locale]) return templates[locale]();
     }
 
+    // Record selections name the record type in the document language; the value is kept.
+    const recordSelection = source.match(
+      /^Välj (kund|artikel|leverantör|lagerställe|dimensionsvärde) ([\s\S]+)\.$/u);
+    if (recordSelection) {
+      const nouns = {
+        "en-US": { kund: "the customer", artikel: "the item", leverantör: "the vendor",
+          lagerställe: "the location", dimensionsvärde: "the dimension value" },
+        "fr-FR": { kund: "le client", artikel: "l’article", leverantör: "le fournisseur",
+          lagerställe: "le magasin", dimensionsvärde: "la valeur de dimension" },
+        "de-DE": { kund: "den Debitor", artikel: "den Artikel", leverantör: "den Kreditor",
+          lagerställe: "den Lagerort", dimensionsvärde: "den Dimensionswert" },
+        "es-ES": { kund: "el cliente", artikel: "el producto", leverantör: "el proveedor",
+          lagerställe: "el almacén", dimensionsvärde: "el valor de dimensión" },
+        "da-DK": { kund: "debitoren", artikel: "varen", leverantör: "kreditoren",
+          lagerställe: "lokationen", dimensionsvärde: "dimensionsværdien" },
+        "fi-FI": { kund: "asiakas", artikel: "nimike", leverantör: "toimittaja",
+          lagerställe: "sijainti", dimensionsvärde: "dimension arvo" },
+        "nb-NO": { kund: "kunden", artikel: "varen", leverantör: "leverandøren",
+          lagerställe: "lokasjonen", dimensionsvärde: "dimensjonsverdien" }
+      };
+      const verbs = { "en-US": "Choose", "fr-FR": "Choisissez", "de-DE": "Wählen Sie",
+        "es-ES": "Seleccione", "da-DK": "Vælg", "fi-FI": "Valitse", "nb-NO": "Velg" };
+      const [, noun, value] = recordSelection;
+      if (nouns[locale]) return `${verbs[locale]} ${nouns[locale][noun]} ${value}.`;
+    }
+
     const eventOutcomePatterns = [
       [/^Sidan ([\s\S]+?) visas nu\.$/u, {
         "en-US": value => `The ${value} page is now displayed.`,
