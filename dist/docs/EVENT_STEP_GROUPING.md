@@ -196,13 +196,25 @@ Business Central language:
 - Private-use icon glyphs, section toggles and dialog-close controls are recognized without text.
 
 The remaining captions live in one catalog, `src/engine/bc-client-captions.js`, used by
-normalization, grouping, the semantic engine and the legacy noise filter. It lists only
-captions observed in recordings. Microsoft Learn translations of these client texts are
-machine translated and differ from the client (Swedish Business Central shows "Visa resten",
-not "Visa mer"), so they are not used as sources.
+normalization, grouping, the semantic engine and the legacy noise filter. Every registered
+language is covered. The captions come from the web client's own language resources, not from
+Microsoft Learn, whose translations of these texts are machine translated and differ from the
+client. Source: the public on-premises platform artifact 26.18.55014.0, file
+`WebClient/.../WebPublish/wwwroot/Resources/Lang/<culture>/Microsoft.Dynamics.Framework.Resource.js`,
+with these resource keys:
 
-Documented gaps: no observed captions for the categories `close`, `scroll`, `display`,
-`history`, `tellMe` and `fieldHint` in fr-FR, de-DE, es-ES, da-DK, fi-FI and nb-NO. In those
-Business Central languages, a click on these controls outside a recorded dialog can still
-become a step that the reviewer removes. Add captions from a recording in that language;
-`tests/bc-client-captions.test.js` keeps this list and the catalog in agreement.
+| Category | Resource keys |
+| --- | --- |
+| `close` | `CloseButton`, `DetailsPageExitAction`, `PdfControl_Close`, `DatePickerCloseText` |
+| `scroll` | `ScrollLeft`, `ScrollRight` |
+| `display` | `ShowMoreFields`, `ShowLess`, `CommandBar_ShowWrappedItemsInContextMenu_Tooltip`, `CommandBar_ShowMore_Tooltip`, `CommandBar_ShowLess_Tooltip` |
+| `history` | `Back_Title`, `HelpPaneBackButton`, `HelpPaneForwardButton` |
+| `tellMe` | `ProductMenuBar_PageSearch` (its first sentence) |
+| `fieldHint` | `HasMandatoryField`, `MandatoryIcon_Tooltip`, `Autofill_AnnouncementSupportedField` |
+
+Swedish and English also keep wordings observed in older recordings (for example "Tillbaka",
+"Scroll up"). The client's Dismiss translations (`ClosePane`, `NotificationDismiss`) are
+deliberately left out except in English: Afvis, Hylkää, Verwerfen, Descartar, Forkast and
+Ignorer are also the captions of Business Central business actions such as Reject, which must
+stay steps. When the client changes a caption, read the same keys from a newer platform
+artifact; `tests/bc-client-captions.test.js` checks coverage for every registered language.

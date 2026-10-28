@@ -302,8 +302,11 @@
       .trim().split(/\s*(?:→|->)\s*/).at(-1);
     // BC validation tips and shortcut hints are explanatory overlays, not
     // actions performed in the business process. Never turn clicks on these
-    // surfaces into procedure steps.
-    if (event.rawEventType === "click" && captions.matches("fieldHint", caption)) return true;
+    // surfaces into procedure steps. A required field carries the same hint as its caption, so
+    // a lookup or a chosen value on it is still a step.
+    if (event.rawEventType === "click" && captions.matches("fieldHint", caption) &&
+        event.controlIdentification?.controlType !== "lookup" &&
+        !String(event.value?.normalized || "").trim()) return true;
     const embeddedLabels = caption.match(/\b(?:antal|quantity|qty|lastbärare|pallet|tare|taravikt|weight|vikt|leveransenhet|unit|kod|code)\b/giu) || [];
     if (event.rawEventType === "click" && caption.length > 70 &&
         embeddedLabels.length >= 4) return true;
