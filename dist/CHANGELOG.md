@@ -1,4 +1,4 @@
-## Unreleased
+## 4.7.205
 - Use a dark appearance by default. Choose Light or Follow system under Appearance in the settings; the choice applies immediately to every BC Process Studio page in the browser.
 - Keep the document preview on white paper with dark text in every appearance, so it matches the Word document.
 - Translate the support email help text in the settings.
