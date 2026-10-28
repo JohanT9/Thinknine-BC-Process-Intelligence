@@ -3997,6 +3997,18 @@ let annotationChangesPending = false;
 let annotationEditorBaseline = null;
 let workspaceState = globalThis.T9WorkspaceController.create();
 let documentWorkspaceSync = null;
+// The document can be shown beside the review on wide screens; narrower screens switch tabs.
+const DOCUMENT_BESIDE_STORAGE_KEY = "t9.reviewWorkspace.documentBeside";
+const DOCUMENT_BESIDE_MEDIA = globalThis.matchMedia?.("(min-width: 1200px)");
+let documentBesideReview = (() => {
+  try { return globalThis.localStorage?.getItem(DOCUMENT_BESIDE_STORAGE_KEY) === "true"; }
+  catch { return false; }
+})();
+let documentBesideSyncTimer = 0;
+function documentBesideActive() {
+  return documentBesideReview && Boolean(DOCUMENT_BESIDE_MEDIA?.matches) &&
+    workspaceState.active === "review" && !annotationEditorState;
+}
 const activeDocumentPipelineCache = globalThis.T9WorkspaceController
   .createRevisionCache();
 
@@ -4757,7 +4769,35 @@ function publishWorkspaceContext(patch, reason, origin) {
     navigationReason: reason,
     focusOrigin: origin
   });
+  // With the document beside the review, the selected step is shown in both.
+  if (origin === "review" && documentBesideActive()) revealDocumentContext();
 }
+
+async function toggleDocumentBesideReview() {
+  if (!DOCUMENT_BESIDE_MEDIA?.matches) {
+    await switchWorkspace("document", true);
+    return;
+  }
+  documentBesideReview = !documentBesideActive();
+  try { globalThis.localStorage?.setItem(DOCUMENT_BESIDE_STORAGE_KEY, String(documentBesideReview)); }
+  catch { /* The choice applies for this session. */ }
+  applyWorkspaceState();
+  if (documentBesideActive()) {
+    await synchronizeDocumentWorkspace();
+    // The narrower column shows the whole page width; the saved zoom is unchanged.
+    documentViewState = globalThis.T9DocumentWorkspaceExperience.fit(documentViewState, "fitWidth");
+    applyDocumentView({ persist: false });
+    revealDocumentContext();
+  }
+}
+$("reviewDocumentBeside").addEventListener("click", () => {
+  toggleDocumentBesideReview().catch(error => show(error.message, true));
+});
+DOCUMENT_BESIDE_MEDIA?.addEventListener?.("change", () => {
+  if (!activeReview) return;
+  applyWorkspaceState();
+  if (documentBesideActive()) synchronizeDocumentWorkspace().then(() => revealDocumentContext());
+});
 
 function documentContextElement(itemId) {
   return [...$("documentWorkspace").querySelectorAll(
@@ -4799,7 +4839,7 @@ function revealDocumentContext(options = {}) {
     element.classList.remove("workspace-context-highlight");
   }, reducedMotion ? 0 : 1400);
   $("documentWorkspaceStatus").textContent =
-    "Motsvarande dokumentposition visas.";
+    uiT("Motsvarande dokumentposition visas.");
 }
 
 function revealReviewContext(options = {}) {
@@ -5003,13 +5043,22 @@ function updateContinuousDocumentPage() {
 
 function invalidateDocumentWorkspace() {
   workspaceState = globalThis.T9WorkspaceController.invalidate(workspaceState);
+  if (!documentBesideActive()) return;
+  clearTimeout(documentBesideSyncTimer);
+  documentBesideSyncTimer = setTimeout(() => {
+    synchronizeDocumentWorkspace().then(() => revealDocumentContext());
+  }, 600);
 }
 
 function applyWorkspaceState() {
   const documentActive = workspaceState.active === "document";
+  const beside = documentBesideActive();
   $("reviewDialog").classList.toggle("document-workspace-mode", documentActive);
+  $("reviewDialog").classList.toggle("document-beside", beside);
   $("reviewWorkspacePanel").hidden = documentActive;
-  $("documentWorkspacePanel").hidden = !documentActive;
+  $("documentWorkspacePanel").hidden = !documentActive && !beside;
+  $("reviewDocumentBeside").setAttribute("aria-pressed", String(beside));
+  $("reviewDocumentBeside").textContent = beside ? uiT("Dölj dokument") : uiT("Visa dokument");
   for (const [workspace, tabId] of [
     ["review", "reviewWorkspaceTab"],
     ["document", "documentWorkspaceTab"]
@@ -5025,7 +5074,7 @@ async function synchronizeDocumentWorkspace() {
   if (!globalThis.T9WorkspaceController.needsRender(workspaceState)) return;
   if (documentWorkspaceSync) return documentWorkspaceSync;
   documentWorkspaceSync = (async () => {
-    while (activeReview && workspaceState.active === "document" &&
+    while (activeReview && (workspaceState.active === "document" || documentBesideActive()) &&
         globalThis.T9WorkspaceController.needsRender(workspaceState)) {
       const requestedRevision = workspaceState.revision;
       $("documentWorkspaceStatus").textContent = uiT("review.documentUpdating");
@@ -5257,7 +5306,57 @@ function renderReviewAttention(tasks) {
   $("reviewSummary").textContent = uiTf("review.readiness", {
     total: tasks.length, remaining
   });
+  const approved = tasks.length - remaining;
+  // The workflow shows recording as done and marks Share once every step is approved.
+  $("workspaceTabs").dataset.recordedLabel = `✓ ${uiT("review.flowRecorded")}`;
+  const readyToShare = tasks.length > 0 && remaining === 0;
+  $("documentWorkspaceTab").dataset.ready = String(readyToShare);
+  $("documentWorkspaceTab").title = readyToShare
+    ? uiT("Alla steg är godkända. Dokumentet är klart att dela.") : "BC Document Generator";
+  $("reviewStepProgressText").textContent = uiTf("{approved} av {total} godkända",
+    { approved, total: tasks.length });
+  $("reviewStepProgressBar").style.width = `${tasks.length ? approved / tasks.length * 100 : 0}%`;
+  // Generated text follows the document language; controls follow the interface language.
+  const languageName = (locale, kind) => globalThis.T9LanguageRegistry.supported(kind)
+    .find(language => language.locale === locale)?.nativeName || locale;
+  $("reviewLanguages").textContent = uiTf("Dokument: {document} · Gränssnitt: {interface}", {
+    document: languageName(activeDocumentLanguage(), "document"),
+    interface: languageName(globalThis.T9UiI18n.normalizeLocale(applicationSettings.uiLocale), "ui")
+  });
 }
+
+// Approves a step and moves to the next one that still needs review.
+function approveAndShowNextStep(taskId) {
+  const index = activeReview.tasks.findIndex(task => task.taskId === taskId);
+  if (index >= 0 && !activeReview.tasks[index].approved) {
+    globalThis.T9Review.approveTask(activeReview, index, true, {
+      beforeSelection: activeReviewSelection,
+      afterSelection: activeReviewSelection
+    });
+    invalidateDocumentWorkspace();
+    reviewAutoSave.schedule();
+    renderReview();
+  }
+  if (activateNextUnreviewedStep()) {
+    $("reviewList").querySelector(
+      `[data-review-task-id="${CSS.escape(activeReviewSelection.activeId)}"] [data-action="approve-next"]`
+    )?.focus();
+  } else if (!$("completeReview").disabled) {
+    $("completeReview").focus();
+  }
+}
+
+let reviewToastTimer = null;
+function showReviewUndoToast(message) {
+  $("reviewToastText").textContent = message;
+  $("reviewToast").hidden = false;
+  clearTimeout(reviewToastTimer);
+  reviewToastTimer = setTimeout(() => { $("reviewToast").hidden = true; }, 10000);
+}
+$("reviewToastUndo").addEventListener("click", () => {
+  $("reviewToast").hidden = true;
+  restoreReviewHistory("undo");
+});
 function applyReviewStatus() {
   const status = globalThis.T9ReviewStatus.derive(
     activeReview?.tasks || [],
@@ -6907,6 +7006,7 @@ function renderReviewContent() {
           <button data-action="edit-instruction" class="secondary"
             aria-label="${uiTf("a11y.editInstruction", { step: visibleIndex + 1 })}">${uiT("Redigera")}</button>
         </div>
+        <div class="review-step-body"><div class="review-step-text">
         <div id="review-instruction-preview-${visibleIndex}"
           class="review-instruction-preview" data-field="instruction"
           data-instruction-preview tabindex="0">${instructionRunsHtml(instructionPresentation.runs)}</div>
@@ -7010,6 +7110,10 @@ function renderReviewContent() {
         <input id="review-callout-${visibleIndex}" data-edit-field="manualCallout"
           aria-label="${uiTf("Faktaruta för manuellt steg {step}", { step: visibleIndex + 1 })}"
           value="${escapeHtml(task.callout?.text || "")}" readonly>` : ""}
+        <div class="review-primary-actions">
+          <button type="button" class="primary review-approve-next" data-action="approve-next">
+            ${task.approved ? uiT("Nästa steg") : uiT("Godkänn och nästa")}</button>
+        </div>
         <details class="review-technical-details">
           <summary>${uiT("Teknisk information")}</summary>
           <div class="review-meta">
@@ -7030,6 +7134,7 @@ function renderReviewContent() {
             ${qualityMetrics ? `<p class="metrics">${escapeHtml(qualityMetrics)}</p>` : ""}
           </details>` : ""}
         </details>
+        </div><div class="review-step-images">
         ${images.map((image, imageIndex) =>
           `<div class="review-screenshot">
             <div class="review-image-stage" data-review-image-index="${imageIndex}">
@@ -7050,6 +7155,7 @@ function renderReviewContent() {
               ${task.selectedScreenshotAssetId === image.path ? "disabled" : ""}>${uiT("Använd")}</button>` : ""}
           </div>`
         ).join("")}
+        </div></div>
       </div>
       <div class="review-actions" role="gridcell">
         <label class="review-approve-action">
@@ -7162,6 +7268,18 @@ function renderReviewContent() {
 
     card.querySelector('[data-action="edit-instruction"]')
       .addEventListener("click", () => {
+        editReviewField(card, task.taskId, "instruction");
+      });
+    card.querySelector('[data-action="approve-next"]')
+      .addEventListener("click", event => {
+        // The card's own click handler would select this step again after moving on.
+        event.stopPropagation();
+        approveAndShowNextStep(task.taskId);
+      });
+    card.querySelector("[data-instruction-preview]")
+      .addEventListener("click", event => {
+        if (event.currentTarget.dataset.editing === "true" ||
+            event.target.closest("a, button")) return;
         editReviewField(card, task.taskId, "instruction");
       });
     const instructionControl = card.querySelector(
@@ -7477,8 +7595,10 @@ function renderReviewContent() {
 
     card.querySelector('[data-action="remove"]')
       .addEventListener("click", () => {
+        const stepNumber = reviewTaskIds().indexOf(task.taskId) + 1;
         deleteReviewTasks([task.taskId]);
         reviewAutoSave.schedule();
+        showReviewUndoToast(uiTf("Steg {step} dolt.", { step: stepNumber }));
       });
 
     card.querySelector('[data-action="delete-manual"]')
@@ -7920,7 +8040,7 @@ async function openReview(session) {
   reviewAutoSave.cancel();
   resetReviewSurfaceForOpen();
 
-  $("reviewTitle").textContent = `Dokumentation: ${session.name}`;
+  $("reviewTitle").textContent = uiTf("Dokumentation: {name}", { name: session.name });
   $("reviewOverlay").classList.add("open");
   $("reviewOverlay").setAttribute("aria-hidden", "false");
   $("documentWorkspaceTab").disabled = false;
@@ -7985,6 +8105,11 @@ async function completeReviewOpen(session, storedReview, initialUpdatedAt,
       if (!isCurrent()) return;
       renderReview();
       applyReviewZoom({ persist: false, preservePosition: true });
+      // A remembered document-beside choice builds the document once screenshots are available.
+      if (documentBesideActive()) {
+        documentViewState = globalThis.T9DocumentWorkspaceExperience.fit(documentViewState, "fitWidth");
+        invalidateDocumentWorkspace();
+      }
     }).catch(error => {
       if (isCurrent()) show(error.message ||
         uiT("Skärmbilderna kunde inte läsas in."), true);
@@ -8621,7 +8746,7 @@ async function activateDocumentContext(target) {
   ];
   if (!itemContext?.selectedStepId) return;
   publishWorkspaceContext(itemContext, "document-selection", "document");
-  await switchWorkspace("review");
+  if (!documentBesideActive()) await switchWorkspace("review");
   revealReviewContext({ focus: true });
 }
 $("documentWorkspace").addEventListener("click", event => {

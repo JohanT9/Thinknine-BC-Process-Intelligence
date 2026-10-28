@@ -1,3 +1,12 @@
+## Unreleased
+- Show the review workspace tabs as the workflow Record → Review → Share. Recording shows as done, Share is marked once every step is approved, and the module names remain as tooltips.
+- Show the document beside the review on screens at least 1200 pixels wide with Show document. The selected step is highlighted in the document, selecting a step in the document selects it in the review, and the document updates as the review changes. The choice is remembered; narrower screens switch to the document tab instead.
+- Lay out each step from the width of its own column, so steps stay readable beside the document, and translate the review title prefix.
+- Show each step's screenshot beside its instruction on wide screens, so the evidence and the text can be compared without scrolling.
+- Add Approve and next to every step: it approves the step, moves to the next step that needs review and keeps focus on the same button, so a review can be completed with repeated Enter.
+- Edit an instruction by clicking its text, show approval progress in the step list and the document and interface languages under the title.
+- Offer undo for ten seconds after hiding a step instead of asking for confirmation.
+
 ## 4.7.203
 - Remove sharing bug reports to Azure DevOps and GitHub and the offline JSON package. No control opened the share dialog. The adapters, sign-in, transport, configuration and dialog are gone; bug reports are shared as PDF by email or exported as PDF or Markdown with the same content as before. External issue references and a saved destination configuration from earlier versions are left untouched.
 - Show Undo, Redo, Document information and the step layout toggle as icons in the narrow Review toolbar, keeping every action visible in fewer rows; the button text remains the accessible name and tooltip.
