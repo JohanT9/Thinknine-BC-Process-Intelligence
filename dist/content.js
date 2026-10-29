@@ -55,6 +55,20 @@
   let lastPageSignature = "";
   const sourceFrameId = crypto.randomUUID();
   let sourceSequence = 0;
+  let sequenceSessionId = null;
+  const eventDelivery = globalThis.T9CaptureDelivery.create({
+    transport(message, done) {
+      chrome.runtime.sendMessage(message, response => {
+        done(chrome.runtime.lastError ? null : response);
+      });
+    },
+    // The background counts the missing sequence number as a gap in the recording.
+    onLost(message, attempts) {
+      diagnostic("runtime-message-lost", { eventType: message.event?.type, accepted: false,
+        rejectionReason: `not-delivered-after-${attempts}-attempts`,
+        sourceEventId: message.event?.sourceEventId });
+    }
+  });
   const inputTimers = new WeakMap();
   const elementInteractions = new WeakMap();
   const observedDialogs = new Set();
@@ -993,6 +1007,11 @@
     }
 
     try {
+      // Each recording numbers this frame's events from 1, so a missing event shows as a gap.
+      if (sequenceSessionId !== sessionId) {
+        sequenceSessionId = sessionId;
+        sourceSequence = 0;
+      }
       const localSequence = ++sourceSequence;
       const sourceEventId = `${sessionId}:${sourceFrameId}:${localSequence}`;
       diagnostic("target-resolved", { ...summary, accepted: true,
@@ -1001,7 +1020,7 @@
         sourceEventId });
       diagnostic("runtime-message-sent", { ...summary, accepted: true,
         sourceEventId });
-      chrome.runtime.sendMessage({
+      eventDelivery.deliver({
         type: "T9_RECORD_EVENT",
         event: {
           sourceEventId,
@@ -1012,14 +1031,12 @@
           captureProvenance: {
             producer: "business-central-content-script",
             frameInstanceId: sourceFrameId,
-            localSequence
+            localSequence, sequenceScope: "recording"
           },
           timestamp: new Date().toISOString(),
           ...context(),
           ...event
         }
-      }, () => {
-        void chrome.runtime.lastError;
       });
     } catch {
       // Ignore transient extension reload errors.

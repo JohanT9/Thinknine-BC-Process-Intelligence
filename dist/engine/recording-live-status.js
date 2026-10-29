@@ -49,7 +49,7 @@
       activeSessionId: String(activeSessionId || ""), eventCount: 0, lastEvent: null,
       lastError: null, screenshotStats: { requested: 0, captured: 0, reused: 0,
         dropped: 0, errors: 0 }, screenshotQueueLength: 0, lastScreenshotAt: null,
-      lastScreenshotError: null, recordingHealth: null
+      lastScreenshotError: null, recordingHealth: null, captureSequence: {}
     };
   }
 
@@ -77,6 +77,13 @@
     if (sessionDebug.recordingHealth?.status === "persistence-error") {
       warnings.push({ code: "capture-write-error",
         message: "En inspelningshändelse kunde inte sparas säkert. Inspelningen kan vara ofullständig." });
+    }
+    // Numbers a frame used that never arrived: events not delivered yet, or lost.
+    const missingEvents = Object.values(sessionDebug.captureSequence || {}).reduce(
+      (total, frame) => total + Math.max(0, nonNegative(frame?.max) - nonNegative(frame?.count)), 0);
+    if (missingEvents > 0) {
+      warnings.push({ code: "events-missing", count: missingEvents,
+        message: "Några händelser har inte kommit fram. Inspelningen kan vara ofullständig." });
     }
     if (sessionDebug.recordingHealth?.status === "truncated") {
       warnings.push({ code: "recording-truncated",

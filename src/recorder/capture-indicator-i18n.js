@@ -18,6 +18,7 @@
   const warningMessages = Object.freeze({
     "sv-SE": Object.freeze({
       "capture-write-error": "En inspelningshändelse kunde inte sparas. Inspelningen kan vara ofullständig.",
+      "events-missing": "Några händelser har inte kommit fram. Inspelningen kan vara ofullständig.",
       "license-blocked": "Licensen eller tenantkontexten hindrar fortsatt inspelning.",
       "recording-truncated": "Gränsen för antal händelser har nåtts. Inspelningen är ofullständig.",
       "screenshot-error": "Minst en skärmbild kunde inte tas.",
@@ -27,6 +28,7 @@
     }),
     "en-US": Object.freeze({
       "capture-write-error": "A recording event could not be saved. The recording may be incomplete.",
+      "events-missing": "Some events have not arrived. The recording may be incomplete.",
       "license-blocked": "The license or tenant context is preventing recording from continuing.",
       "recording-truncated": "The event limit was reached. The recording is incomplete.",
       "screenshot-error": "At least one screenshot could not be captured.",
@@ -36,6 +38,7 @@
     }),
     "fr-FR": Object.freeze({
       "capture-write-error": "Un événement d’enregistrement n’a pas pu être sauvegardé. L’enregistrement est peut-être incomplet.",
+      "events-missing": "Certains événements ne sont pas arrivés. L’enregistrement est peut-être incomplet.",
       "license-blocked": "La licence ou le contexte du locataire empêche la poursuite de l’enregistrement.",
       "recording-truncated": "La limite d’événements est atteinte. L’enregistrement est incomplet.",
       "screenshot-error": "Au moins une capture d’écran n’a pas pu être prise.",
@@ -45,6 +48,7 @@
     }),
     "de-DE": Object.freeze({
       "capture-write-error": "Ein Aufzeichnungsereignis konnte nicht gespeichert werden. Die Aufzeichnung ist möglicherweise unvollständig.",
+      "events-missing": "Einige Ereignisse sind nicht angekommen. Die Aufzeichnung ist möglicherweise unvollständig.",
       "license-blocked": "Die Lizenz oder der Mandantenkontext verhindert die Fortsetzung der Aufzeichnung.",
       "recording-truncated": "Das Ereignislimit wurde erreicht. Die Aufzeichnung ist unvollständig.",
       "screenshot-error": "Mindestens ein Screenshot konnte nicht aufgenommen werden.",
@@ -54,6 +58,7 @@
     }),
     "es-ES": Object.freeze({
       "capture-write-error": "No se pudo guardar un evento de grabación. Es posible que la grabación esté incompleta.",
+      "events-missing": "Algunos eventos no han llegado. Es posible que la grabación esté incompleta.",
       "license-blocked": "La licencia o el contexto del inquilino impide continuar la grabación.",
       "recording-truncated": "Se alcanzó el límite de eventos. La grabación está incompleta.",
       "screenshot-error": "No se pudo capturar al menos una captura de pantalla.",
@@ -63,6 +68,7 @@
     }),
     "da-DK": Object.freeze({
       "capture-write-error": "En optagelseshændelse kunne ikke gemmes. Optagelsen kan være ufuldstændig.",
+      "events-missing": "Nogle hændelser er ikke nået frem. Optagelsen kan være ufuldstændig.",
       "license-blocked": "Licensen eller lejerkonteksten forhindrer optagelsen i at fortsætte.",
       "recording-truncated": "Grænsen for hændelser er nået. Optagelsen er ufuldstændig.",
       "screenshot-error": "Mindst ét skærmbillede kunne ikke tages.",
@@ -72,6 +78,7 @@
     }),
     "fi-FI": Object.freeze({
       "capture-write-error": "Tallennustapahtumaa ei voitu tallentaa. Tallenne saattaa olla puutteellinen.",
+      "events-missing": "Osa tapahtumista ei ole tullut perille. Tallenne saattaa olla puutteellinen.",
       "license-blocked": "Käyttöoikeus tai vuokraajan konteksti estää tallennuksen jatkamisen.",
       "recording-truncated": "Tapahtumien enimmäismäärä saavutettiin. Tallenne on puutteellinen.",
       "screenshot-error": "Vähintään yhtä kuvakaappausta ei voitu ottaa.",
@@ -81,6 +88,7 @@
     }),
     "nb-NO": Object.freeze({
       "capture-write-error": "En opptakshendelse kunne ikke lagres. Opptaket kan være ufullstendig.",
+      "events-missing": "Noen hendelser har ikke kommet frem. Opptaket kan være ufullstendig.",
       "license-blocked": "Lisensen eller leietakerkonteksten hindrer opptaket i å fortsette.",
       "recording-truncated": "Grensen for hendelser er nådd. Opptaket er ufullstendig.",
       "screenshot-error": "Minst ett skjermbilde kunne ikke tas.",

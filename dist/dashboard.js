@@ -2642,6 +2642,8 @@ function createDiagnostics(session, rawEvents, businessSteps, screenshotCount) {
       : 0,
     screenshotCount,
     rawTypeCounts,
+    // Events a frame numbered but that never reached the recording.
+    captureSequenceGaps: globalThis.T9CaptureSequence?.gaps(rawEvents) || null,
     semanticActionCounts,
     valueRoleCounts: businessSteps.reduce((counts, step) => {
       const role = step.valueRole || "None";

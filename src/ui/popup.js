@@ -330,7 +330,7 @@ async function ensureContentScript(tab) {
     await withTimeout(chrome.scripting.executeScript({
       target: { tabId: tab.id, allFrames: true },
       files: ["engine/business-central-version-capture.js", "capture-field-privacy.js",
-        "capture-focus-session.js", "capture-keyboard.js", "capture-surface-mode.js",
+        "capture-focus-session.js", "capture-keyboard.js", "capture-delivery.js", "capture-surface-mode.js",
         "bc-error-detector.js", "capture-indicator-i18n.js", "content.js"]
     }), 4000, "Capture script injection", {
       errorMessage: t("technical.requestTimeout") });

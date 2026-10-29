@@ -56,6 +56,7 @@ importScripts("engine/screenshot-asset-paths.js");
 importScripts("engine/screenshot-asset-store.js");
 importScripts("engine/screenshot-target-registration.js");
 importScripts("engine/recording-live-status.js");
+importScripts("engine/capture-sequence.js");
 importScripts("engine/recovering-queue.js");
 importScripts("bug-report/bc-diagnostic-evidence.js");
 importScripts("engine/bc-error-evidence-store.js");
@@ -930,10 +931,15 @@ async function recordEvent(rawEvent, captureContext = {}) {
         debugState[DEBUG_KEY] || {}, event
       );
 
+    // A repeated delivery of a stored event does not count again, so gaps stay exact.
+    const captureSequence = rawResult.status === "duplicate"
+      ? debugState[DEBUG_KEY]?.captureSequence || {}
+      : globalThis.T9CaptureSequence.track(debugState[DEBUG_KEY]?.captureSequence, sourceEvent);
     await setDebug({
       connected: true,
       activeSessionId: recordingId,
       eventCount: canonical.events.length,
+      captureSequence,
       eventTypeCounts,
       eventCategoryCounts,
       screenshotQueueLength: screenshotQueue.length,
@@ -1122,7 +1128,7 @@ const CONTENT_SCRIPT_ID = "thinknine-bc-recorder-main";
 // the same capture helpers as statically injected ones.
 const CAPTURE_SCRIPT_FILES = Object.freeze([
   "engine/business-central-version-capture.js", "capture-field-privacy.js",
-  "capture-focus-session.js", "capture-keyboard.js", "capture-surface-mode.js", "bc-error-detector.js",
+  "capture-focus-session.js", "capture-keyboard.js", "capture-delivery.js", "capture-surface-mode.js", "bc-error-detector.js",
   "capture-indicator-i18n.js", "content.js"
 ]);
 
