@@ -142,4 +142,18 @@ assert.strictEqual(salesLine[1].fieldCaption, "Antal");
 assert.strictEqual(salesLine[1].instruction, "Ange __500__ i **Antal**.");
 assert.strictEqual(salesLine[2].taskType, "ReleaseDocument");
 
+// In the interpretation pipeline the semantic rules already decided which steps exist: each
+// step is only described again, never merged with another, and never hidden. A knowledge pack
+// that types Alt+N as choosing a vendor, because the new page's cursor was in Vendor Name,
+// must not make the step disappear.
+const decided = consolidation.consolidateWithAnalysis([...tasks, {
+  taskId: "SelectVendor-011", taskType: "SelectVendor", actionCaption: "Alt+N",
+  fieldCaption: "Leverantörsnamn", instruction: "Tryck på **Alt+N**.", sourceEventNos: [27] }],
+{ mergeSteps: false });
+assert.strictEqual(decided.tasks.length, tasks.length + 1, "no step is merged or hidden");
+assert(decided.decisions.every(decision => decision.outcome === "preserved"));
+assert.strictEqual(decided.tasks.at(-1).instruction, "Tryck på **Alt+N**.");
+assert.deepStrictEqual(decided.tasks.map(task => task.sourceEventNos),
+  [[21], [22], [23], [24], [25], [26], [27]]);
+
 console.log("Business task consolidation behaviour tests passed.");

@@ -3365,6 +3365,9 @@ async function exportSession(session) {
   diagnostics.missingScreenshotPaths = [...screenshotExport.missingPaths];
 
   diagnostics.businessTaskCount = finalBusinessTasks.length;
+  // Whether the steps came from the semantic rules or from the legacy compatibility path,
+  // which is used only when most steps would be placeholders. It shows if that path is needed.
+  diagnostics.interpretationMode = model.compatibilityMode || "semantic";
   diagnostics.businessTaskQuality = knowledgeQuality;
   diagnostics.knowledgePackVersion = "2.0.0";
   diagnostics.knowledgeFrameworkVersion = KNOWLEDGE_PACK_FRAMEWORK_VERSION;
