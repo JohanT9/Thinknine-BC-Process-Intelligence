@@ -47,11 +47,11 @@ newer active step; it remains supporting evidence when causality is uncertain.
 
 ## User experience and compatibility
 
-Verified steps show a distinct **Observerat resultat** or **Observerat fel**
-line in Review Studio. The same evidence-backed summary is projected as a
-system-derived information callout under its owning Step in Semantic Document,
-Document Workspace, and Word. Its label and generated sentence follow the UI or
-document language while observed Business Central captions remain unchanged.
+The observed result is evidence of the step, not document text. It
+is no longer projected as an **Observerat resultat** or **Observerat fel** callout
+in process documents, their preview or Word. It remains in the step's
+`resultVerification`, where it suggests an expected result, and in the capture
+quality evidence. Bug reports keep their own result presentation.
 
 The document-level expected-result field remains fully manual, visually
 separate, and is never overwritten by an observation or suggestion. Historical

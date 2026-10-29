@@ -425,34 +425,8 @@
         }
       }
 
-      const resultVerification = object(task.resultVerification);
-      const observedResult = text(task.observedResult) ||
-        text(resultVerification.summary);
-      const observedStatus = text(resultVerification.status);
-      if (observedResult && ["verified", "error"].includes(observedStatus)) {
-        const observedResultLabel = languages.translate("Observed result",
-          explanationLanguage, "Observerat resultat");
-        const observedErrorLabel = languages.translate("Observed error",
-          explanationLanguage, "Observerat fel");
-        blocks.push({
-          blockId: `block:observed-result:${stepKey}`,
-          kind: "callout",
-          calloutType: "information",
-          label: observedStatus === "error" ? observedErrorLabel :
-            observedResultLabel,
-          sourceRef,
-          provenance: "system-derived",
-          resultVerification: clone(resultVerification),
-          blocks: [{
-            blockId: `block:observed-result-text:${stepKey}`,
-            kind: "paragraph",
-            text: observedResult,
-            sourceRef,
-            provenance: "system-derived"
-          }]
-        });
-      }
-
+      // What the recording observed after a step stays in the step's evidence and suggests its
+      // expected result; the process document does not repeat it.
       const ownedNotes = (review.stepNotes || []).filter(note => {
         const ownerIds = [task.stepId, task.taskId,
           ...(task.sourceStepIds || []), ...(task.manualStepIds || [])]

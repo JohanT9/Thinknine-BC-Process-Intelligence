@@ -242,9 +242,9 @@ assert.ok(position("Bokför ordern.") < position("Förväntat resultat"));
 assert.ok(position("Förväntat resultat") < position("Versionshistorik"));
 assert.ok(!output.documentXml.includes("Detta steg ska inte exporteras."));
 assert.ok(output.documentXml.includes("Kommentar: "));
-// Since 4.7.93 evidence-backed results are preserved in Word with a localized label.
-assert.ok(output.documentXml.includes("Observerat resultat:"), "Word export keeps evidence-backed observed results");
-assert.ok(output.documentXml.includes("Sidan Bokförd försäljningsfaktura öppnades."), "the stored observed result is exported unchanged");
+// The observed result is evidence of the step and is not exported as document text.
+assert.ok(!output.documentXml.includes("Observerat resultat"), "Word export omits observed results");
+assert.ok(!output.documentXml.includes("Sidan Bokförd försäljningsfaktura öppnades."), "the stored observed result is not exported");
 assert.equal(preparedPresentation.presentationDocument.sections.flatMap(section => section.blocks || []).some(block => block.blockId?.startsWith("block:observed-result:")), false, "prepared Word presentation omits observed-result callouts");
 assert.equal(baseReview.tasks.find(task => task.taskId === "task-b").observedResult, "Sidan Bokförd försäljningsfaktura öppnades.", "raw review evidence remains intact outside the Word presentation");
 assert.ok(output.documentXml.includes("Kontrollera kundnumret."));

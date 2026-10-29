@@ -138,15 +138,10 @@ assert.strictEqual(
   workflow.blocks[1].blocks[1].blocks[0].text,
   "Kontrollera kundnumret."
 );
-const observedResult = workflow.blocks[2].blocks.find(block =>
-  block.blockId.startsWith("block:observed-result:"));
-assert.strictEqual(observedResult.kind, "callout");
-assert.strictEqual(observedResult.calloutType, "information");
-assert.strictEqual(observedResult.label, "Observerat resultat");
-assert.strictEqual(observedResult.provenance, "system-derived");
-assert.strictEqual(observedResult.blocks[0].text,
-  "Sidan Bokförd försäljningsfaktura öppnades.");
-assert.strictEqual(observedResult.resultVerification.status, "verified");
+// What the recording observed after a step is evidence, not document text: a verified result
+// adds no block to the step.
+assert.ok(!workflow.blocks[2].blocks.some(block =>
+  block.blockId.startsWith("block:observed-result:") || block.kind === "callout"));
 
 const includeKnowledgeExplanationReview = reviewFixture();
 includeKnowledgeExplanationReview.tasks[0] = {
