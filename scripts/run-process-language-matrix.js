@@ -36,10 +36,8 @@ function evaluate(scenario, locale) {
       task.instruction, locale);
     if (step.instruction !== expectedInstruction) failures.push(
       `step ${index + 1} instruction differs`);
-    const expectedResult = ["verified", "error"].includes(
-      task.resultVerification?.status)
-      ? documentLanguage.translateInstruction(task.observedResult, locale) : "";
-    if (step.observedResult !== expectedResult) failures.push(
+    // The observed result is evidence of the task; no document language shows it.
+    if (step.observedResult !== "") failures.push(
       `step ${index + 1} result differs`);
     if (step.screenshot !== (task.screenshot || null)) failures.push(
       `step ${index + 1} screenshot differs`);

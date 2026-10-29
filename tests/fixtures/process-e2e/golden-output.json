@@ -24,7 +24,7 @@
         {
           "stepNumber": 1,
           "instruction": "Ange __500__ i **Quantity**.",
-          "observedResult": "Värdet i Quantity ändrades.",
+          "observedResult": null,
           "screenshot": "quantity.png"
         }
       ]
@@ -56,7 +56,7 @@
         {
           "stepNumber": 1,
           "instruction": "Välj **Open**.",
-          "observedResult": "Sidan Sales Order visas nu.",
+          "observedResult": null,
           "screenshot": "sales-order.png"
         }
       ]
@@ -83,7 +83,7 @@
         {
           "stepNumber": 1,
           "instruction": "Välj posten **30043**.",
-          "observedResult": "Valet i No. ändrades.",
+          "observedResult": null,
           "screenshot": "record.png"
         }
       ]
@@ -110,7 +110,7 @@
         {
           "stepNumber": 1,
           "instruction": "Aktivera **Blocked**.",
-          "observedResult": "Du aktiverade Blocked.",
+          "observedResult": null,
           "screenshot": "blocked.png"
         }
       ]
@@ -137,7 +137,7 @@
         {
           "stepNumber": 1,
           "instruction": "Välj **Open** i **Status**.",
-          "observedResult": "Valet i Status ändrades.",
+          "observedResult": null,
           "screenshot": "status.png"
         }
       ]
@@ -183,13 +183,13 @@
         {
           "stepNumber": 1,
           "instruction": "Ange __10000__ i **No.**.",
-          "observedResult": "Värdet i No. ändrades.",
+          "observedResult": null,
           "screenshot": null
         },
         {
           "stepNumber": 2,
           "instruction": "Ange __30043__ i **No.**.",
-          "observedResult": "Värdet i No. ändrades.",
+          "observedResult": null,
           "screenshot": null
         }
       ]
@@ -216,7 +216,7 @@
         {
           "stepNumber": 1,
           "instruction": "Välj **Post**.",
-          "observedResult": "Business Central visade ett fel.",
+          "observedResult": null,
           "screenshot": "posting-error.png"
         }
       ]
@@ -270,7 +270,7 @@
         {
           "stepNumber": 1,
           "instruction": "Ange __2026-09-23__ i **Posting Date**.",
-          "observedResult": "Värdet i Posting Date ändrades.",
+          "observedResult": null,
           "screenshot": "posting-date.png"
         }
       ]
@@ -297,7 +297,7 @@
         {
           "stepNumber": 1,
           "instruction": "Ange __Synthetic description__ i **Description**.",
-          "observedResult": "Värdet i Description ändrades.",
+          "observedResult": null,
           "screenshot": "description.png"
         }
       ]
@@ -324,7 +324,7 @@
         {
           "stepNumber": 1,
           "instruction": "Välj **Release**.",
-          "observedResult": "Business Central bekräftade att “Released”.",
+          "observedResult": null,
           "screenshot": "released.png"
         }
       ]
@@ -402,13 +402,13 @@
         {
           "stepNumber": 1,
           "instruction": "Ange __5__ i **Quantity**.",
-          "observedResult": "Värdet i Quantity ändrades.",
+          "observedResult": null,
           "screenshot": null
         },
         {
           "stepNumber": 2,
           "instruction": "Ange __50__ i **Quantity**.",
-          "observedResult": "Värdet i Quantity ändrades.",
+          "observedResult": null,
           "screenshot": null
         }
       ]
@@ -462,7 +462,7 @@
         {
           "stepNumber": 1,
           "instruction": "Inaktivera **Backorder**.",
-          "observedResult": "Du inaktiverade Backorder.",
+          "observedResult": null,
           "screenshot": "backorder-off.png"
         }
       ]

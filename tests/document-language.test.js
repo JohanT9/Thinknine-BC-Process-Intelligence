@@ -118,15 +118,10 @@ assert.ok(instruction.content.runs.some(run =>
   run.text === "Sök" && run.italic));
 assert.ok(instruction.content.runs.some(run =>
   run.text === "för ord" && run.bold));
-const observedResult = step.components.find(component =>
-  component.kind === "callout");
-// Since 4.7.93 evidence-backed results are kept in Word, in the document language,
-// while the captured Business Central caption is preserved.
-assert.ok(observedResult, "Word export keeps the evidence-backed observed result.");
-assert.strictEqual(observedResult.accessibility.label, "Observed result");
-assert.ok(observedResult.accessibility.description.includes("Förs.order"));
-assert.ok(!/Sidan|öppnades/u.test(observedResult.accessibility.description),
-  "the generated result sentence follows the English document language");
+// The observed result stays evidence of the step; the document and its Word export do not
+// repeat it.
+assert.ok(!step.components.some(component => component.kind === "callout"),
+  "no observed result in the exported step");
 const cover = prepared.plan.sections.find(section => section.kind === "cover")
   .components.find(component => component.kind === "cover");
 assert.strictEqual(cover.appearance.documentType, "Work instruction");

@@ -43,10 +43,8 @@ function inspect(scenario, output) {
       `task ${index + 1} has no result status`);
     if (task.screenshot && !capturedScreenshots.has(task.screenshot)) failures.push(
       `task ${index + 1} uses an uncaptured screenshot`);
-    const projectedResult = ["verified", "error"].includes(
-      task.resultVerification?.status) ? task.observedResult : "";
-    if (step && (step.instruction !== task.instruction ||
-        step.observedResult !== projectedResult ||
+    // The observed result is evidence of the task; the document step does not repeat it.
+    if (step && (step.instruction !== task.instruction || step.observedResult !== "" ||
         step.screenshot !== (task.screenshot || null))) failures.push(
       `task ${index + 1} differs from its projected document step`);
 
