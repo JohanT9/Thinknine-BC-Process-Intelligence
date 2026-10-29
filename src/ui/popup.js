@@ -230,8 +230,14 @@ async function prepareTenantLicense(tabId, { forceCheck = false } = {}) {
   }
 
   if (tenantResult?.license?.allowed) {
-    const registered = await send({ type: "T9_TENANT_USER_REGISTER", tabId }, 10000);
-    if (!registered?.ok) throw new Error(registered?.error || t("license.userRegistrationFailed"));
+    // A license from the cache is being checked again while the service starts; the user is
+    // registered with the service then too, without holding up the recording.
+    if (tenantResult.license.stale) {
+      send({ type: "T9_TENANT_USER_REGISTER", tabId }, LICENSE_CHECK_TIMEOUT_MS).catch(() => {});
+    } else {
+      const registered = await send({ type: "T9_TENANT_USER_REGISTER", tabId }, 10000);
+      if (!registered?.ok) throw new Error(registered?.error || t("license.userRegistrationFailed"));
+    }
     return { source: "tenant", license: tenantResult.license, tenantId: tenantResult.tenantId, account };
   }
 
@@ -384,8 +390,9 @@ async function startRecording(recordingPurpose) {
       throw new Error(t("recorder.openBcFirst"));
     }
     const authorization = await prepareTenantLicense(tab.id);
-    renderLicenseCard(authorization.license,
-      { tenantId: authorization.tenantId, signedIn: true });
+    // A license from the cache is shown as last known until the service has confirmed it.
+    renderLicenseCard(authorization.license, { tenantId: authorization.tenantId, signedIn: true,
+      checking: authorization.license?.stale === true, lastKnown: authorization.license });
     await ensureContentScript(tab);
     showMessage(t("recorder.connectionWorks"));
 

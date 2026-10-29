@@ -145,6 +145,37 @@ async function main() {
   assert.equal(consent.elements.get("licenseCardStatus").textContent, "license.cardNeedsConsent");
   assert.equal(consent.elements.get("licenseCardChecked").hidden, true);
 
+  // Starting a recording on a license from the cache does not wait for the user registration,
+  // which needs the license service that is still starting; a confirmed license does.
+  const prepareStart = source.indexOf("async function prepareTenantLicense(");
+  const prepareEnd = source.indexOf("function displayLatestAction(", prepareStart);
+  assert.ok(prepareStart >= 0 && prepareEnd > prepareStart);
+  const prepare = license => {
+    const sent = [];
+    const send = async (message, timeout) => {
+      sent.push({ ...message, timeout });
+      if (message.type === "T9_LICENSE_INFORMATION") return { ok: true, information: {} };
+      if (message.type === "T9_LICENSE_CHECK") return { ok: true, tenantId: "tenant", license };
+      if (message.type === "T9_CONSULTANT_LICENSE_STATUS") return { ok: true, signedIn: true };
+      if (message.type === "T9_TENANT_USER_REGISTER") return new Promise(() => {});
+      throw new Error(message.type);
+    };
+    const run = new Function("send", "t", "tf", "LICENSE_CHECK_TIMEOUT_MS",
+      `${source.slice(prepareStart, prepareEnd)}; return prepareTenantLicense;`)(send,
+      key => key, key => key, 35000);
+    return { sent, result: run(17) };
+  };
+  const cachedStart = prepare({ allowed: true, stale: true, licenseType: "standard" });
+  const cachedResult = await Promise.race([cachedStart.result,
+    new Promise(resolve => setTimeout(() => resolve("waited"), 100))]);
+  assert.equal(cachedResult.license.stale, true, "a cached license starts the recording at once");
+  assert.ok(cachedStart.sent.some(message => message.type === "T9_TENANT_USER_REGISTER"),
+    "the user is still registered, in the background");
+  const confirmedStart = prepare({ allowed: true, licenseType: "standard" });
+  assert.equal(await Promise.race([confirmedStart.result,
+    new Promise(resolve => setTimeout(() => resolve("waited"), 100))]), "waited",
+  "a confirmed license waits for the registration as before");
+
   console.log("Popup license status shows the last known result while it checks and never shows cached access as active.");
 }
 main().catch(error => { console.error(error); process.exitCode = 1; });

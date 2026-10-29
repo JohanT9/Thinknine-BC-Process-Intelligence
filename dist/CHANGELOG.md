@@ -11,6 +11,7 @@
 - Translate record selections, opened lists and Tell Me searches into every document language. Previously Swedish words remained, for example "Wählen Sie posten" or "Sök efter".
 - The first license check of a browser session no longer fails with "The license could not be verified". The license service needs about 20 seconds to start after a period without use, but the check gave up after 5. It now waits up to 30 seconds. Starting a recording waited for the same check and now succeeds too.
 - The license card shows the last known license at once, with the time it was checked, while it checks again, and replaces it with the service's answer. A license is only shown as active (green) once the service has confirmed it. If the check fails, the last known license stays visible, labelled as such.
+- Start a recording at once on a license the service confirmed during the last seven days, and check it again in the background. A license that has been blocked or has expired in the meantime stops the next recording. A license last confirmed more than seven days ago still waits for the service.
 
 ## 4.7.206
 - Record a choice from a field suggestion list as one step with the chosen value. Previously the typed characters, the click on the suggestion and the final value became three steps.
