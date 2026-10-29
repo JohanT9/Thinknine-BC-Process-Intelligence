@@ -138,6 +138,13 @@ assert.strictEqual(undeclared.category, "interaction");
 assert.notStrictEqual(undeclared.interactionId, deleteLine.interactionId);
 assert.deepStrictEqual(undeclared.shortcutEvidence.samples.map(item => item.title), ["Statistics (F7)"]);
 assert(undeclared.shortcutEvidence.declaredShortcuts >= 2);
+// Every event the content script sent was stored: each frame numbers a recording's events from
+// 1 and no number is missing.
+const captureSequence = require("../src/engine/capture-sequence");
+for (const recorded of [events, keys]) {
+  assert(recorded.every(item => item.captureProvenance?.sequenceScope === "recording"));
+  assert.deepStrictEqual(captureSequence.gaps(recorded), { missingCount: 0, frames: [] });
+}
 // Arrow keys only move the selection, and a space in a text field is typing.
 assert(!keys.some(item => /^Arrow/u.test(item.key || "")));
 assert(!keys.some(item => item.type === "key" && item.key === " "));

@@ -406,7 +406,7 @@ function (consolidation, explanationCatalog, pageIdentification) {
       (requested === "no" && actual === "nb");
   }
 
-  function apply(tasks = [], packs = []) {
+  function apply(tasks = [], packs = [], { mergeSteps = true } = {}) {
     const availableRules = rules(packs); const unmatched = [];
     const enriched = tasks.map(originalTask => {
       const task = pageEvidence(originalTask, packs);
@@ -464,7 +464,7 @@ function (consolidation, explanationCatalog, pageIdentification) {
         ...(effectiveInstruction ? { userDirective: effectiveInstruction,
           userDirectiveSourceIds: [...(rule.sourceIds || [])] } : {}) };
     });
-    const consolidated = consolidation.consolidateWithAnalysis(enriched);
+    const consolidated = consolidation.consolidateWithAnalysis(enriched, { mergeSteps });
     const tasksWithKnowledge = consolidated.tasks.map(task => {
       const sourceTaskIds = new Set(task.sourceTaskIds || [task.taskId]);
       const matches = enriched.filter(item => sourceTaskIds.has(item.taskId) ||

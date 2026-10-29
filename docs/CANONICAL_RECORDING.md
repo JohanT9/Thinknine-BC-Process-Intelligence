@@ -174,6 +174,26 @@ cannot be replaced or deleted. Finalization waits for accepted writes and then
 prevents further event or asset changes. The serialized ownership and recovery
 contract is documented in [Raw Event Persistence](RAW_EVENT_PERSISTENCE.md).
 
+### Delivery from the page
+
+The browser can stop the extension's background worker at any time, also during a
+recording. The content script therefore keeps each event until the worker has
+answered that it stored it (`src/recorder/capture-delivery.js`). An event that was
+not confirmed is sent again after 0.25, 1, 3, 8 and 15 seconds. The worker ignores
+a source delivery ID it already stored, so a repeat is safe. After a failure,
+later events wait so they still arrive in order. An event that is still not
+delivered after the last attempt is reported as lost. Lost events are not dropped
+silently.
+
+Each frame numbers a recording's events from 1 (`sourceSequence`, with
+`captureProvenance.sequenceScope: "recording"`). The worker counts per frame
+the numbers it stored. While recording, the popup and the on-page indicator warn
+"Some events have not arrived" (`events-missing`) when a number is missing.
+Exports list the missing numbers per frame as `captureSequenceGaps` in
+`diagnostics.json` (`src/engine/capture-sequence.js`). A gap never blocks
+finishing a recording. Events from older versions, which numbered a frame's
+events across recordings, are not counted.
+
 ## Process Model traceability
 
 Generated process activities store canonical Event IDs as references; the

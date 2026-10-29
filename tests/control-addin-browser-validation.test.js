@@ -58,6 +58,8 @@ function browserOutput(edge, url, profile) {
         "capture-focus-session.js"), "text/javascript"],
       "/capture-keyboard.js": [path.join(root, "src", "recorder",
         "capture-keyboard.js"), "text/javascript"],
+      "/capture-delivery.js": [path.join(root, "src", "recorder",
+        "capture-delivery.js"), "text/javascript"],
       "/capture-surface-mode.js": [path.join(root, "src", "recorder",
         "capture-surface-mode.js"), "text/javascript"],
       "/bc-error-detector.js": [path.join(root, "src", "recorder",

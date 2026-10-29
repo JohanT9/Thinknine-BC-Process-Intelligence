@@ -156,6 +156,28 @@ Group adapter and retain group/source identity. Legacy low-level task
 consolidation remains only for older Review input without groups. No persistence
 migration is required.
 
+### One decision about which steps exist
+
+In the interpretation pipeline, Semantic Interaction Rules decide which actions
+become steps and which are merged or hidden. They decide once, over the Step
+Groups. Knowledge packs then type a step (for example as choosing an item), and
+task consolidation describes each step again on its own (`mergeSteps: false`).
+At that stage steps are never merged with each other, and a step the rules kept
+is never hidden. If its new description would hide it, the step keeps its
+description. This removed two kinds of error. A second merge could combine
+steps the rules had kept apart, and a knowledge type could hide a step: for
+example, Alt+N on a purchase order was typed as choosing a vendor because the
+cursor of the new page was in Vendor Name, and then disappeared. The 20 process
+scenarios in 8 languages, the capture lab and the capture quality corpus
+produce the same steps as before.
+
+The legacy compatibility path still merges at task consolidation, because its
+older step builders do not run the semantic rules. It is used only when
+placeholders dominate the result. Exports record which path produced the steps
+(`interpretationMode` in `diagnostics.json`, `semantic` or
+`legacy-placeholder-dominated`), so that the path, and the old noise filter it
+uses, can be retired once real recordings show that it is not needed.
+
 Capture Packets and their recorder interaction IDs survive the Semantic Action
 handoff and are copied to generated Review tasks. This lets later diagnostics and
 repair workflows consume the established packet without rediscovering event

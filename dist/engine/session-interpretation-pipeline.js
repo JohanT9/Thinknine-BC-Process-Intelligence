@@ -412,7 +412,9 @@ function (semantic, knowledge, refs, taskVisibility, processAnalysis) {
     const baseTasks = actions.filter(action => !action.hidden)
       .map((action, index) => ({ ...task(action, index, byId, input.imagePaths),
         language: documentLanguage }));
-    const knowledgeResult = knowledge.apply(baseTasks, input.knowledgePacks || []);
+    // The semantic rules above decided which steps exist; knowledge only describes them.
+    const knowledgeResult = knowledge.apply(baseTasks, input.knowledgePacks || [],
+      { mergeSteps: false });
     const repositoryTasks = applyRepositoryResolutions(knowledgeResult.tasks,
       input.knowledgeRepository, input.knowledgeReleaseId, input.language ||
         input.session?.language || "en-US");

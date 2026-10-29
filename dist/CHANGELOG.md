@@ -1,3 +1,7 @@
+## Unreleased
+- Decide in one place which actions become steps. Knowledge packs now only describe a step and can no longer merge steps or make one disappear. Previously, for example, Alt+N on a purchase order was hidden after it was typed as choosing a vendor. All reference scenarios, in every language, produce the same steps as before. Exports record whether the older fallback interpretation was used, so that it can be retired.
+- Events are no longer lost when the browser stops the extension's background process during a recording. The page keeps each event until it has been saved and resends it if needed, in the original order. A missing event is shown as a warning while recording ("Some events have not arrived") and listed in the export's diagnostics.
+
 ## 4.7.209
 - Process documents no longer show an "Observed result" box under each step, in the preview or in Word. What the recording observed is still kept as evidence of the step and still suggests its expected result.
 

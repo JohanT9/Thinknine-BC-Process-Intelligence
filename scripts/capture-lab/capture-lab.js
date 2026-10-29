@@ -110,7 +110,7 @@ async function runScenario(cdp, extensionId, name, scenario) {
         getURL: value => value },
         storage: { onChanged: { addListener() {} }, local: { get: async () => ({}) } } }; 1`);
     for (const file of ["engine/business-central-version-capture.js", "capture-field-privacy.js",
-      "capture-focus-session.js", "capture-keyboard.js", "capture-surface-mode.js", "bc-error-detector.js",
+      "capture-focus-session.js", "capture-keyboard.js", "capture-delivery.js", "capture-surface-mode.js", "bc-error-detector.js",
       "capture-indicator-i18n.js", "content.js"]) {
       await evaluate(fs.readFileSync(path.join(dist, file), "utf8") + "\n;1");
     }

@@ -15,17 +15,18 @@
  ],
  "events": [
   {
-   "sourceEventId": "lab-session:3a8694a2-5da2-49c6-ac90-0069f9c3dc58:1",
+   "sourceEventId": "lab-session:d50db762-7ba2-4c5e-8270-d0df7254ba8a:1",
    "recordingId": "lab-session",
    "source": "business-central-content-script",
-   "sourceFrameId": "3a8694a2-5da2-49c6-ac90-0069f9c3dc58",
+   "sourceFrameId": "d50db762-7ba2-4c5e-8270-d0df7254ba8a",
    "sourceSequence": 1,
    "captureProvenance": {
     "producer": "business-central-content-script",
-    "frameInstanceId": "3a8694a2-5da2-49c6-ac90-0069f9c3dc58",
-    "localSequence": 1
+    "frameInstanceId": "d50db762-7ba2-4c5e-8270-d0df7254ba8a",
+    "localSequence": 1,
+    "sequenceScope": "recording"
    },
-   "timestamp": "2026-10-29T09:14:01.851Z",
+   "timestamp": "2026-10-29T11:11:41.698Z",
    "pageId": "",
    "pageCaption": "Sales Orders - Dynamics 365 Business Central",
    "documentTitle": "Sales Orders - Dynamics 365 Business Central",
@@ -41,17 +42,18 @@
    }
   },
   {
-   "sourceEventId": "lab-session:3a8694a2-5da2-49c6-ac90-0069f9c3dc58:2",
+   "sourceEventId": "lab-session:d50db762-7ba2-4c5e-8270-d0df7254ba8a:2",
    "recordingId": "lab-session",
    "source": "business-central-content-script",
-   "sourceFrameId": "3a8694a2-5da2-49c6-ac90-0069f9c3dc58",
+   "sourceFrameId": "d50db762-7ba2-4c5e-8270-d0df7254ba8a",
    "sourceSequence": 2,
    "captureProvenance": {
     "producer": "business-central-content-script",
-    "frameInstanceId": "3a8694a2-5da2-49c6-ac90-0069f9c3dc58",
-    "localSequence": 2
+    "frameInstanceId": "d50db762-7ba2-4c5e-8270-d0df7254ba8a",
+    "localSequence": 2,
+    "sequenceScope": "recording"
    },
-   "timestamp": "2026-10-29T09:14:01.940Z",
+   "timestamp": "2026-10-29T11:11:41.885Z",
    "pageId": "",
    "pageCaption": "Sales Orders - Dynamics 365 Business Central",
    "documentTitle": "Sales Orders - Dynamics 365 Business Central",
@@ -65,8 +67,8 @@
    "clientX": 29,
    "clientY": 37,
    "pointerTarget": true,
-   "interactionId": "3a8694a2-5da2-49c6-ac90-0069f9c3dc58:2689073d-2e44-4da1-903b-e4b7dac65e39",
-   "preActionCaptureId": "3a8694a2-5da2-49c6-ac90-0069f9c3dc58:2689073d-2e44-4da1-903b-e4b7dac65e39",
+   "interactionId": "d50db762-7ba2-4c5e-8270-d0df7254ba8a:63eaac5f-9296-4758-8b05-d4ef8abbfd06",
+   "preActionCaptureId": "d50db762-7ba2-4c5e-8270-d0df7254ba8a:63eaac5f-9296-4758-8b05-d4ef8abbfd06",
    "role": "menuitem",
    "controlType": "button",
    "automationId": "",
@@ -108,17 +110,18 @@
    }
   },
   {
-   "sourceEventId": "lab-session:3a8694a2-5da2-49c6-ac90-0069f9c3dc58:3",
+   "sourceEventId": "lab-session:d50db762-7ba2-4c5e-8270-d0df7254ba8a:3",
    "recordingId": "lab-session",
    "source": "business-central-content-script",
-   "sourceFrameId": "3a8694a2-5da2-49c6-ac90-0069f9c3dc58",
+   "sourceFrameId": "d50db762-7ba2-4c5e-8270-d0df7254ba8a",
    "sourceSequence": 3,
    "captureProvenance": {
     "producer": "business-central-content-script",
-    "frameInstanceId": "3a8694a2-5da2-49c6-ac90-0069f9c3dc58",
-    "localSequence": 3
+    "frameInstanceId": "d50db762-7ba2-4c5e-8270-d0df7254ba8a",
+    "localSequence": 3,
+    "sequenceScope": "recording"
    },
-   "timestamp": "2026-10-29T09:14:01.943Z",
+   "timestamp": "2026-10-29T11:11:41.898Z",
    "pageId": "42",
    "pageCaption": "Sales Order - Dynamics 365 Business Central",
    "documentTitle": "Sales Order - Dynamics 365 Business Central",
@@ -129,23 +132,24 @@
    "frameDepth": 0,
    "type": "page-state",
    "category": "navigation",
-   "interactionId": "3a8694a2-5da2-49c6-ac90-0069f9c3dc58:2689073d-2e44-4da1-903b-e4b7dac65e39",
+   "interactionId": "d50db762-7ba2-4c5e-8270-d0df7254ba8a:63eaac5f-9296-4758-8b05-d4ef8abbfd06",
    "uiState": {
     "resultVisible": true
    }
   },
   {
-   "sourceEventId": "lab-session:3a8694a2-5da2-49c6-ac90-0069f9c3dc58:4",
+   "sourceEventId": "lab-session:d50db762-7ba2-4c5e-8270-d0df7254ba8a:4",
    "recordingId": "lab-session",
    "source": "business-central-content-script",
-   "sourceFrameId": "3a8694a2-5da2-49c6-ac90-0069f9c3dc58",
+   "sourceFrameId": "d50db762-7ba2-4c5e-8270-d0df7254ba8a",
    "sourceSequence": 4,
    "captureProvenance": {
     "producer": "business-central-content-script",
-    "frameInstanceId": "3a8694a2-5da2-49c6-ac90-0069f9c3dc58",
-    "localSequence": 4
+    "frameInstanceId": "d50db762-7ba2-4c5e-8270-d0df7254ba8a",
+    "localSequence": 4,
+    "sequenceScope": "recording"
    },
-   "timestamp": "2026-10-29T09:14:02.249Z",
+   "timestamp": "2026-10-29T11:11:42.092Z",
    "pageId": "42",
    "pageCaption": "Sales Order - Dynamics 365 Business Central",
    "documentTitle": "Sales Order - Dynamics 365 Business Central",
@@ -156,7 +160,7 @@
    "frameDepth": 0,
    "type": "navigation",
    "category": "navigation",
-   "interactionId": "3a8694a2-5da2-49c6-ac90-0069f9c3dc58:2689073d-2e44-4da1-903b-e4b7dac65e39",
+   "interactionId": "d50db762-7ba2-4c5e-8270-d0df7254ba8a:63eaac5f-9296-4758-8b05-d4ef8abbfd06",
    "uiState": {
     "resultVisible": true
    },
@@ -164,17 +168,18 @@
    "to": "https://businesscentral.dynamics.com/tenant-demo/Production?company=CRONUS"
   },
   {
-   "sourceEventId": "lab-session:3a8694a2-5da2-49c6-ac90-0069f9c3dc58:5",
+   "sourceEventId": "lab-session:d50db762-7ba2-4c5e-8270-d0df7254ba8a:5",
    "recordingId": "lab-session",
    "source": "business-central-content-script",
-   "sourceFrameId": "3a8694a2-5da2-49c6-ac90-0069f9c3dc58",
+   "sourceFrameId": "d50db762-7ba2-4c5e-8270-d0df7254ba8a",
    "sourceSequence": 5,
    "captureProvenance": {
     "producer": "business-central-content-script",
-    "frameInstanceId": "3a8694a2-5da2-49c6-ac90-0069f9c3dc58",
-    "localSequence": 5
+    "frameInstanceId": "d50db762-7ba2-4c5e-8270-d0df7254ba8a",
+    "localSequence": 5,
+    "sequenceScope": "recording"
    },
-   "timestamp": "2026-10-29T09:14:03.062Z",
+   "timestamp": "2026-10-29T11:11:43.022Z",
    "pageId": "42",
    "pageCaption": "Sales Order - Dynamics 365 Business Central",
    "documentTitle": "Sales Order - Dynamics 365 Business Central",
@@ -186,7 +191,7 @@
    "type": "focus",
    "category": "lifecycle",
    "value": "",
-   "interactionId": "3a8694a2-5da2-49c6-ac90-0069f9c3dc58:9f60d59b-b488-429e-9ddc-b9483264bc27",
+   "interactionId": "d50db762-7ba2-4c5e-8270-d0df7254ba8a:c5c46de7-49f0-477b-9100-1980ce3fa39a",
    "role": "input",
    "controlType": "input",
    "automationId": "",
@@ -236,17 +241,18 @@
    }
   },
   {
-   "sourceEventId": "lab-session:3a8694a2-5da2-49c6-ac90-0069f9c3dc58:6",
+   "sourceEventId": "lab-session:d50db762-7ba2-4c5e-8270-d0df7254ba8a:6",
    "recordingId": "lab-session",
    "source": "business-central-content-script",
-   "sourceFrameId": "3a8694a2-5da2-49c6-ac90-0069f9c3dc58",
+   "sourceFrameId": "d50db762-7ba2-4c5e-8270-d0df7254ba8a",
    "sourceSequence": 6,
    "captureProvenance": {
     "producer": "business-central-content-script",
-    "frameInstanceId": "3a8694a2-5da2-49c6-ac90-0069f9c3dc58",
-    "localSequence": 6
+    "frameInstanceId": "d50db762-7ba2-4c5e-8270-d0df7254ba8a",
+    "localSequence": 6,
+    "sequenceScope": "recording"
    },
-   "timestamp": "2026-10-29T09:14:03.136Z",
+   "timestamp": "2026-10-29T11:11:43.094Z",
    "pageId": "42",
    "pageCaption": "Sales Order - Dynamics 365 Business Central",
    "documentTitle": "Sales Order - Dynamics 365 Business Central",
@@ -260,8 +266,8 @@
    "clientX": 242,
    "clientY": 72,
    "pointerTarget": true,
-   "interactionId": "3a8694a2-5da2-49c6-ac90-0069f9c3dc58:9f60d59b-b488-429e-9ddc-b9483264bc27",
-   "preActionCaptureId": "3a8694a2-5da2-49c6-ac90-0069f9c3dc58:9f60d59b-b488-429e-9ddc-b9483264bc27",
+   "interactionId": "d50db762-7ba2-4c5e-8270-d0df7254ba8a:c5c46de7-49f0-477b-9100-1980ce3fa39a",
+   "preActionCaptureId": "d50db762-7ba2-4c5e-8270-d0df7254ba8a:c5c46de7-49f0-477b-9100-1980ce3fa39a",
    "role": "input",
    "controlType": "input",
    "automationId": "",
@@ -310,17 +316,18 @@
    }
   },
   {
-   "sourceEventId": "lab-session:3a8694a2-5da2-49c6-ac90-0069f9c3dc58:7",
+   "sourceEventId": "lab-session:d50db762-7ba2-4c5e-8270-d0df7254ba8a:7",
    "recordingId": "lab-session",
    "source": "business-central-content-script",
-   "sourceFrameId": "3a8694a2-5da2-49c6-ac90-0069f9c3dc58",
+   "sourceFrameId": "d50db762-7ba2-4c5e-8270-d0df7254ba8a",
    "sourceSequence": 7,
    "captureProvenance": {
     "producer": "business-central-content-script",
-    "frameInstanceId": "3a8694a2-5da2-49c6-ac90-0069f9c3dc58",
-    "localSequence": 7
+    "frameInstanceId": "d50db762-7ba2-4c5e-8270-d0df7254ba8a",
+    "localSequence": 7,
+    "sequenceScope": "recording"
    },
-   "timestamp": "2026-10-29T09:14:04.248Z",
+   "timestamp": "2026-10-29T11:11:44.209Z",
    "pageId": "42",
    "pageCaption": "Sales Order - Dynamics 365 Business Central",
    "documentTitle": "Sales Order - Dynamics 365 Business Central",
@@ -335,7 +342,7 @@
    "value": "A",
    "previousValue": "",
    "inputSource": "input",
-   "interactionId": "3a8694a2-5da2-49c6-ac90-0069f9c3dc58:9f60d59b-b488-429e-9ddc-b9483264bc27",
+   "interactionId": "d50db762-7ba2-4c5e-8270-d0df7254ba8a:c5c46de7-49f0-477b-9100-1980ce3fa39a",
    "role": "input",
    "controlType": "input",
    "automationId": "",
@@ -385,17 +392,18 @@
    }
   },
   {
-   "sourceEventId": "lab-session:3a8694a2-5da2-49c6-ac90-0069f9c3dc58:8",
+   "sourceEventId": "lab-session:d50db762-7ba2-4c5e-8270-d0df7254ba8a:8",
    "recordingId": "lab-session",
    "source": "business-central-content-script",
-   "sourceFrameId": "3a8694a2-5da2-49c6-ac90-0069f9c3dc58",
+   "sourceFrameId": "d50db762-7ba2-4c5e-8270-d0df7254ba8a",
    "sourceSequence": 8,
    "captureProvenance": {
     "producer": "business-central-content-script",
-    "frameInstanceId": "3a8694a2-5da2-49c6-ac90-0069f9c3dc58",
-    "localSequence": 8
+    "frameInstanceId": "d50db762-7ba2-4c5e-8270-d0df7254ba8a",
+    "localSequence": 8,
+    "sequenceScope": "recording"
    },
-   "timestamp": "2026-10-29T09:14:04.963Z",
+   "timestamp": "2026-10-29T11:11:44.919Z",
    "pageId": "42",
    "pageCaption": "Sales Order - Dynamics 365 Business Central",
    "documentTitle": "Sales Order - Dynamics 365 Business Central",
@@ -410,7 +418,7 @@
    "value": "Ad",
    "previousValue": "",
    "inputSource": "input",
-   "interactionId": "3a8694a2-5da2-49c6-ac90-0069f9c3dc58:9f60d59b-b488-429e-9ddc-b9483264bc27",
+   "interactionId": "d50db762-7ba2-4c5e-8270-d0df7254ba8a:c5c46de7-49f0-477b-9100-1980ce3fa39a",
    "role": "input",
    "controlType": "input",
    "automationId": "",
@@ -460,17 +468,18 @@
    }
   },
   {
-   "sourceEventId": "lab-session:3a8694a2-5da2-49c6-ac90-0069f9c3dc58:9",
+   "sourceEventId": "lab-session:d50db762-7ba2-4c5e-8270-d0df7254ba8a:9",
    "recordingId": "lab-session",
    "source": "business-central-content-script",
-   "sourceFrameId": "3a8694a2-5da2-49c6-ac90-0069f9c3dc58",
+   "sourceFrameId": "d50db762-7ba2-4c5e-8270-d0df7254ba8a",
    "sourceSequence": 9,
    "captureProvenance": {
     "producer": "business-central-content-script",
-    "frameInstanceId": "3a8694a2-5da2-49c6-ac90-0069f9c3dc58",
-    "localSequence": 9
+    "frameInstanceId": "d50db762-7ba2-4c5e-8270-d0df7254ba8a",
+    "localSequence": 9,
+    "sequenceScope": "recording"
    },
-   "timestamp": "2026-10-29T09:14:05.678Z",
+   "timestamp": "2026-10-29T11:11:45.630Z",
    "pageId": "42",
    "pageCaption": "Sales Order - Dynamics 365 Business Central",
    "documentTitle": "Sales Order - Dynamics 365 Business Central",
@@ -485,7 +494,7 @@
    "value": "Ada",
    "previousValue": "",
    "inputSource": "input",
-   "interactionId": "3a8694a2-5da2-49c6-ac90-0069f9c3dc58:9f60d59b-b488-429e-9ddc-b9483264bc27",
+   "interactionId": "d50db762-7ba2-4c5e-8270-d0df7254ba8a:c5c46de7-49f0-477b-9100-1980ce3fa39a",
    "role": "input",
    "controlType": "input",
    "automationId": "",
@@ -535,17 +544,18 @@
    }
   },
   {
-   "sourceEventId": "lab-session:3a8694a2-5da2-49c6-ac90-0069f9c3dc58:10",
+   "sourceEventId": "lab-session:d50db762-7ba2-4c5e-8270-d0df7254ba8a:10",
    "recordingId": "lab-session",
    "source": "business-central-content-script",
-   "sourceFrameId": "3a8694a2-5da2-49c6-ac90-0069f9c3dc58",
+   "sourceFrameId": "d50db762-7ba2-4c5e-8270-d0df7254ba8a",
    "sourceSequence": 10,
    "captureProvenance": {
     "producer": "business-central-content-script",
-    "frameInstanceId": "3a8694a2-5da2-49c6-ac90-0069f9c3dc58",
-    "localSequence": 10
+    "frameInstanceId": "d50db762-7ba2-4c5e-8270-d0df7254ba8a",
+    "localSequence": 10,
+    "sequenceScope": "recording"
    },
-   "timestamp": "2026-10-29T09:14:05.867Z",
+   "timestamp": "2026-10-29T11:11:45.821Z",
    "pageId": "42",
    "pageCaption": "Sales Order - Dynamics 365 Business Central",
    "documentTitle": "Sales Order - Dynamics 365 Business Central",
@@ -561,8 +571,8 @@
    "clientX": 40,
    "clientY": 98,
    "pointerTarget": true,
-   "interactionId": "3a8694a2-5da2-49c6-ac90-0069f9c3dc58:9f60d59b-b488-429e-9ddc-b9483264bc27",
-   "preActionCaptureId": "3a8694a2-5da2-49c6-ac90-0069f9c3dc58:9f60d59b-b488-429e-9ddc-b9483264bc27",
+   "interactionId": "d50db762-7ba2-4c5e-8270-d0df7254ba8a:c5c46de7-49f0-477b-9100-1980ce3fa39a",
+   "preActionCaptureId": "d50db762-7ba2-4c5e-8270-d0df7254ba8a:c5c46de7-49f0-477b-9100-1980ce3fa39a",
    "role": "option",
    "controlType": "div",
    "automationId": "",
@@ -604,17 +614,18 @@
    }
   },
   {
-   "sourceEventId": "lab-session:3a8694a2-5da2-49c6-ac90-0069f9c3dc58:11",
+   "sourceEventId": "lab-session:d50db762-7ba2-4c5e-8270-d0df7254ba8a:11",
    "recordingId": "lab-session",
    "source": "business-central-content-script",
-   "sourceFrameId": "3a8694a2-5da2-49c6-ac90-0069f9c3dc58",
+   "sourceFrameId": "d50db762-7ba2-4c5e-8270-d0df7254ba8a",
    "sourceSequence": 11,
    "captureProvenance": {
     "producer": "business-central-content-script",
-    "frameInstanceId": "3a8694a2-5da2-49c6-ac90-0069f9c3dc58",
-    "localSequence": 11
+    "frameInstanceId": "d50db762-7ba2-4c5e-8270-d0df7254ba8a",
+    "localSequence": 11,
+    "sequenceScope": "recording"
    },
-   "timestamp": "2026-10-29T09:14:06.378Z",
+   "timestamp": "2026-10-29T11:11:46.335Z",
    "pageId": "42",
    "pageCaption": "Sales Order - Dynamics 365 Business Central",
    "documentTitle": "Sales Order - Dynamics 365 Business Central",
@@ -629,7 +640,7 @@
    "value": "Adatum Corporation",
    "previousValue": "",
    "inputSource": "change",
-   "interactionId": "3a8694a2-5da2-49c6-ac90-0069f9c3dc58:9f60d59b-b488-429e-9ddc-b9483264bc27",
+   "interactionId": "d50db762-7ba2-4c5e-8270-d0df7254ba8a:c5c46de7-49f0-477b-9100-1980ce3fa39a",
    "role": "input",
    "controlType": "input",
    "automationId": "",
@@ -679,17 +690,18 @@
    }
   },
   {
-   "sourceEventId": "lab-session:3a8694a2-5da2-49c6-ac90-0069f9c3dc58:12",
+   "sourceEventId": "lab-session:d50db762-7ba2-4c5e-8270-d0df7254ba8a:12",
    "recordingId": "lab-session",
    "source": "business-central-content-script",
-   "sourceFrameId": "3a8694a2-5da2-49c6-ac90-0069f9c3dc58",
+   "sourceFrameId": "d50db762-7ba2-4c5e-8270-d0df7254ba8a",
    "sourceSequence": 12,
    "captureProvenance": {
     "producer": "business-central-content-script",
-    "frameInstanceId": "3a8694a2-5da2-49c6-ac90-0069f9c3dc58",
-    "localSequence": 12
+    "frameInstanceId": "d50db762-7ba2-4c5e-8270-d0df7254ba8a",
+    "localSequence": 12,
+    "sequenceScope": "recording"
    },
-   "timestamp": "2026-10-29T09:14:06.379Z",
+   "timestamp": "2026-10-29T11:11:46.336Z",
    "pageId": "42",
    "pageCaption": "Sales Order - Dynamics 365 Business Central",
    "documentTitle": "Sales Order - Dynamics 365 Business Central",
@@ -701,7 +713,7 @@
    "type": "focus",
    "category": "lifecycle",
    "value": "",
-   "interactionId": "3a8694a2-5da2-49c6-ac90-0069f9c3dc58:974cc7f6-862a-440a-8477-6b4b367e53c9",
+   "interactionId": "d50db762-7ba2-4c5e-8270-d0df7254ba8a:0e525d2d-52c4-42fe-9f9d-49e6e175a724",
    "role": "input",
    "controlType": "input",
    "automationId": "",
@@ -751,17 +763,18 @@
    }
   },
   {
-   "sourceEventId": "lab-session:3a8694a2-5da2-49c6-ac90-0069f9c3dc58:13",
+   "sourceEventId": "lab-session:d50db762-7ba2-4c5e-8270-d0df7254ba8a:13",
    "recordingId": "lab-session",
    "source": "business-central-content-script",
-   "sourceFrameId": "3a8694a2-5da2-49c6-ac90-0069f9c3dc58",
+   "sourceFrameId": "d50db762-7ba2-4c5e-8270-d0df7254ba8a",
    "sourceSequence": 13,
    "captureProvenance": {
     "producer": "business-central-content-script",
-    "frameInstanceId": "3a8694a2-5da2-49c6-ac90-0069f9c3dc58",
-    "localSequence": 13
+    "frameInstanceId": "d50db762-7ba2-4c5e-8270-d0df7254ba8a",
+    "localSequence": 13,
+    "sequenceScope": "recording"
    },
-   "timestamp": "2026-10-29T09:14:06.861Z",
+   "timestamp": "2026-10-29T11:11:46.831Z",
    "pageId": "42",
    "pageCaption": "Sales Order - Dynamics 365 Business Central",
    "documentTitle": "Sales Order - Dynamics 365 Business Central",
@@ -775,8 +788,8 @@
    "clientX": 242,
    "clientY": 99,
    "pointerTarget": true,
-   "interactionId": "3a8694a2-5da2-49c6-ac90-0069f9c3dc58:e3587c8a-1bd4-4ef7-b680-092a5ce47f8c",
-   "preActionCaptureId": "3a8694a2-5da2-49c6-ac90-0069f9c3dc58:e3587c8a-1bd4-4ef7-b680-092a5ce47f8c",
+   "interactionId": "d50db762-7ba2-4c5e-8270-d0df7254ba8a:06488ba7-70a5-445f-be9d-33d490b40d41",
+   "preActionCaptureId": "d50db762-7ba2-4c5e-8270-d0df7254ba8a:06488ba7-70a5-445f-be9d-33d490b40d41",
    "role": "input",
    "controlType": "input",
    "automationId": "",
@@ -825,17 +838,18 @@
    }
   },
   {
-   "sourceEventId": "lab-session:3a8694a2-5da2-49c6-ac90-0069f9c3dc58:14",
+   "sourceEventId": "lab-session:d50db762-7ba2-4c5e-8270-d0df7254ba8a:14",
    "recordingId": "lab-session",
    "source": "business-central-content-script",
-   "sourceFrameId": "3a8694a2-5da2-49c6-ac90-0069f9c3dc58",
+   "sourceFrameId": "d50db762-7ba2-4c5e-8270-d0df7254ba8a",
    "sourceSequence": 14,
    "captureProvenance": {
     "producer": "business-central-content-script",
-    "frameInstanceId": "3a8694a2-5da2-49c6-ac90-0069f9c3dc58",
-    "localSequence": 14
+    "frameInstanceId": "d50db762-7ba2-4c5e-8270-d0df7254ba8a",
+    "localSequence": 14,
+    "sequenceScope": "recording"
    },
-   "timestamp": "2026-10-29T09:14:08.457Z",
+   "timestamp": "2026-10-29T11:11:48.421Z",
    "pageId": "42",
    "pageCaption": "Sales Order - Dynamics 365 Business Central",
    "documentTitle": "Sales Order - Dynamics 365 Business Central",
@@ -854,7 +868,7 @@
    "repeat": false,
    "inputSource": "keyboard",
    "category": "interaction",
-   "interactionId": "3a8694a2-5da2-49c6-ac90-0069f9c3dc58:e3587c8a-1bd4-4ef7-b680-092a5ce47f8c",
+   "interactionId": "d50db762-7ba2-4c5e-8270-d0df7254ba8a:06488ba7-70a5-445f-be9d-33d490b40d41",
    "fieldName": "External Document No.",
    "role": "input",
    "controlType": "input",
@@ -904,17 +918,18 @@
    }
   },
   {
-   "sourceEventId": "lab-session:3a8694a2-5da2-49c6-ac90-0069f9c3dc58:15",
+   "sourceEventId": "lab-session:d50db762-7ba2-4c5e-8270-d0df7254ba8a:15",
    "recordingId": "lab-session",
    "source": "business-central-content-script",
-   "sourceFrameId": "3a8694a2-5da2-49c6-ac90-0069f9c3dc58",
+   "sourceFrameId": "d50db762-7ba2-4c5e-8270-d0df7254ba8a",
    "sourceSequence": 15,
    "captureProvenance": {
     "producer": "business-central-content-script",
-    "frameInstanceId": "3a8694a2-5da2-49c6-ac90-0069f9c3dc58",
-    "localSequence": 15
+    "frameInstanceId": "d50db762-7ba2-4c5e-8270-d0df7254ba8a",
+    "localSequence": 15,
+    "sequenceScope": "recording"
    },
-   "timestamp": "2026-10-29T09:14:08.459Z",
+   "timestamp": "2026-10-29T11:11:48.440Z",
    "pageId": "42",
    "pageCaption": "Sales Order - Dynamics 365 Business Central",
    "documentTitle": "Sales Order - Dynamics 365 Business Central",
@@ -929,7 +944,7 @@
    "value": "PO-1001",
    "previousValue": "",
    "inputSource": "change",
-   "interactionId": "3a8694a2-5da2-49c6-ac90-0069f9c3dc58:e3587c8a-1bd4-4ef7-b680-092a5ce47f8c",
+   "interactionId": "d50db762-7ba2-4c5e-8270-d0df7254ba8a:06488ba7-70a5-445f-be9d-33d490b40d41",
    "role": "input",
    "controlType": "input",
    "automationId": "",
@@ -979,17 +994,18 @@
    }
   },
   {
-   "sourceEventId": "lab-session:3a8694a2-5da2-49c6-ac90-0069f9c3dc58:16",
+   "sourceEventId": "lab-session:d50db762-7ba2-4c5e-8270-d0df7254ba8a:16",
    "recordingId": "lab-session",
    "source": "business-central-content-script",
-   "sourceFrameId": "3a8694a2-5da2-49c6-ac90-0069f9c3dc58",
+   "sourceFrameId": "d50db762-7ba2-4c5e-8270-d0df7254ba8a",
    "sourceSequence": 16,
    "captureProvenance": {
     "producer": "business-central-content-script",
-    "frameInstanceId": "3a8694a2-5da2-49c6-ac90-0069f9c3dc58",
-    "localSequence": 16
+    "frameInstanceId": "d50db762-7ba2-4c5e-8270-d0df7254ba8a",
+    "localSequence": 16,
+    "sequenceScope": "recording"
    },
-   "timestamp": "2026-10-29T09:14:08.876Z",
+   "timestamp": "2026-10-29T11:11:48.859Z",
    "pageId": "42",
    "pageCaption": "Sales Order - Dynamics 365 Business Central",
    "documentTitle": "Sales Order - Dynamics 365 Business Central",
@@ -1001,7 +1017,7 @@
    "type": "focus",
    "category": "lifecycle",
    "value": "26.10.2026",
-   "interactionId": "3a8694a2-5da2-49c6-ac90-0069f9c3dc58:d59aa9b1-e9ab-448a-97f2-a90d745f9720",
+   "interactionId": "d50db762-7ba2-4c5e-8270-d0df7254ba8a:36a7d925-c9f8-49e5-83e1-e3810ffdca06",
    "role": "input",
    "controlType": "input",
    "automationId": "",
@@ -1051,17 +1067,18 @@
    }
   },
   {
-   "sourceEventId": "lab-session:3a8694a2-5da2-49c6-ac90-0069f9c3dc58:17",
+   "sourceEventId": "lab-session:d50db762-7ba2-4c5e-8270-d0df7254ba8a:17",
    "recordingId": "lab-session",
    "source": "business-central-content-script",
-   "sourceFrameId": "3a8694a2-5da2-49c6-ac90-0069f9c3dc58",
+   "sourceFrameId": "d50db762-7ba2-4c5e-8270-d0df7254ba8a",
    "sourceSequence": 17,
    "captureProvenance": {
     "producer": "business-central-content-script",
-    "frameInstanceId": "3a8694a2-5da2-49c6-ac90-0069f9c3dc58",
-    "localSequence": 17
+    "frameInstanceId": "d50db762-7ba2-4c5e-8270-d0df7254ba8a",
+    "localSequence": 17,
+    "sequenceScope": "recording"
    },
-   "timestamp": "2026-10-29T09:14:08.953Z",
+   "timestamp": "2026-10-29T11:11:48.934Z",
    "pageId": "42",
    "pageCaption": "Sales Order - Dynamics 365 Business Central",
    "documentTitle": "Sales Order - Dynamics 365 Business Central",
@@ -1075,8 +1092,8 @@
    "clientX": 242,
    "clientY": 126,
    "pointerTarget": true,
-   "interactionId": "3a8694a2-5da2-49c6-ac90-0069f9c3dc58:d59aa9b1-e9ab-448a-97f2-a90d745f9720",
-   "preActionCaptureId": "3a8694a2-5da2-49c6-ac90-0069f9c3dc58:d59aa9b1-e9ab-448a-97f2-a90d745f9720",
+   "interactionId": "d50db762-7ba2-4c5e-8270-d0df7254ba8a:36a7d925-c9f8-49e5-83e1-e3810ffdca06",
+   "preActionCaptureId": "d50db762-7ba2-4c5e-8270-d0df7254ba8a:36a7d925-c9f8-49e5-83e1-e3810ffdca06",
    "role": "input",
    "controlType": "input",
    "automationId": "",
@@ -1125,17 +1142,18 @@
    }
   },
   {
-   "sourceEventId": "lab-session:3a8694a2-5da2-49c6-ac90-0069f9c3dc58:18",
+   "sourceEventId": "lab-session:d50db762-7ba2-4c5e-8270-d0df7254ba8a:18",
    "recordingId": "lab-session",
    "source": "business-central-content-script",
-   "sourceFrameId": "3a8694a2-5da2-49c6-ac90-0069f9c3dc58",
+   "sourceFrameId": "d50db762-7ba2-4c5e-8270-d0df7254ba8a",
    "sourceSequence": 18,
    "captureProvenance": {
     "producer": "business-central-content-script",
-    "frameInstanceId": "3a8694a2-5da2-49c6-ac90-0069f9c3dc58",
-    "localSequence": 18
+    "frameInstanceId": "d50db762-7ba2-4c5e-8270-d0df7254ba8a",
+    "localSequence": 18,
+    "sequenceScope": "recording"
    },
-   "timestamp": "2026-10-29T09:14:11.013Z",
+   "timestamp": "2026-10-29T11:11:50.994Z",
    "pageId": "42",
    "pageCaption": "Sales Order - Dynamics 365 Business Central",
    "documentTitle": "Sales Order - Dynamics 365 Business Central",
@@ -1150,7 +1168,7 @@
    "value": "2026-10-27",
    "previousValue": "26.10.2026",
    "inputSource": "change",
-   "interactionId": "3a8694a2-5da2-49c6-ac90-0069f9c3dc58:d59aa9b1-e9ab-448a-97f2-a90d745f9720",
+   "interactionId": "d50db762-7ba2-4c5e-8270-d0df7254ba8a:36a7d925-c9f8-49e5-83e1-e3810ffdca06",
    "role": "input",
    "controlType": "input",
    "automationId": "",
@@ -1200,17 +1218,18 @@
    }
   },
   {
-   "sourceEventId": "lab-session:3a8694a2-5da2-49c6-ac90-0069f9c3dc58:19",
+   "sourceEventId": "lab-session:d50db762-7ba2-4c5e-8270-d0df7254ba8a:19",
    "recordingId": "lab-session",
    "source": "business-central-content-script",
-   "sourceFrameId": "3a8694a2-5da2-49c6-ac90-0069f9c3dc58",
+   "sourceFrameId": "d50db762-7ba2-4c5e-8270-d0df7254ba8a",
    "sourceSequence": 19,
    "captureProvenance": {
     "producer": "business-central-content-script",
-    "frameInstanceId": "3a8694a2-5da2-49c6-ac90-0069f9c3dc58",
-    "localSequence": 19
+    "frameInstanceId": "d50db762-7ba2-4c5e-8270-d0df7254ba8a",
+    "localSequence": 19,
+    "sequenceScope": "recording"
    },
-   "timestamp": "2026-10-29T09:14:11.033Z",
+   "timestamp": "2026-10-29T11:11:50.996Z",
    "pageId": "42",
    "pageCaption": "Sales Order - Dynamics 365 Business Central",
    "documentTitle": "Sales Order - Dynamics 365 Business Central",
@@ -1222,7 +1241,7 @@
    "type": "focus",
    "category": "lifecycle",
    "value": "",
-   "interactionId": "3a8694a2-5da2-49c6-ac90-0069f9c3dc58:8713dc88-ce5f-4bfe-a005-c5645faea043",
+   "interactionId": "d50db762-7ba2-4c5e-8270-d0df7254ba8a:ea0fe728-0f45-4ad6-82c5-2c3a4d21372c",
    "role": "input",
    "controlType": "input",
    "automationId": "",
@@ -1285,17 +1304,18 @@
    }
   },
   {
-   "sourceEventId": "lab-session:3a8694a2-5da2-49c6-ac90-0069f9c3dc58:20",
+   "sourceEventId": "lab-session:d50db762-7ba2-4c5e-8270-d0df7254ba8a:20",
    "recordingId": "lab-session",
    "source": "business-central-content-script",
-   "sourceFrameId": "3a8694a2-5da2-49c6-ac90-0069f9c3dc58",
+   "sourceFrameId": "d50db762-7ba2-4c5e-8270-d0df7254ba8a",
    "sourceSequence": 20,
    "captureProvenance": {
     "producer": "business-central-content-script",
-    "frameInstanceId": "3a8694a2-5da2-49c6-ac90-0069f9c3dc58",
-    "localSequence": 20
+    "frameInstanceId": "d50db762-7ba2-4c5e-8270-d0df7254ba8a",
+    "localSequence": 20,
+    "sequenceScope": "recording"
    },
-   "timestamp": "2026-10-29T09:14:11.323Z",
+   "timestamp": "2026-10-29T11:11:51.307Z",
    "pageId": "42",
    "pageCaption": "Sales Order - Dynamics 365 Business Central",
    "documentTitle": "Sales Order - Dynamics 365 Business Central",
@@ -1311,7 +1331,7 @@
    "enteredValue": "2026-10-27",
    "previousValue": "26.10.2026",
    "inputSource": "validated",
-   "interactionId": "3a8694a2-5da2-49c6-ac90-0069f9c3dc58:d59aa9b1-e9ab-448a-97f2-a90d745f9720",
+   "interactionId": "d50db762-7ba2-4c5e-8270-d0df7254ba8a:36a7d925-c9f8-49e5-83e1-e3810ffdca06",
    "role": "input",
    "controlType": "input",
    "automationId": "",
@@ -1361,17 +1381,18 @@
    }
   },
   {
-   "sourceEventId": "lab-session:3a8694a2-5da2-49c6-ac90-0069f9c3dc58:21",
+   "sourceEventId": "lab-session:d50db762-7ba2-4c5e-8270-d0df7254ba8a:21",
    "recordingId": "lab-session",
    "source": "business-central-content-script",
-   "sourceFrameId": "3a8694a2-5da2-49c6-ac90-0069f9c3dc58",
+   "sourceFrameId": "d50db762-7ba2-4c5e-8270-d0df7254ba8a",
    "sourceSequence": 21,
    "captureProvenance": {
     "producer": "business-central-content-script",
-    "frameInstanceId": "3a8694a2-5da2-49c6-ac90-0069f9c3dc58",
-    "localSequence": 21
+    "frameInstanceId": "d50db762-7ba2-4c5e-8270-d0df7254ba8a",
+    "localSequence": 21,
+    "sequenceScope": "recording"
    },
-   "timestamp": "2026-10-29T09:14:11.526Z",
+   "timestamp": "2026-10-29T11:11:51.480Z",
    "pageId": "42",
    "pageCaption": "Sales Order - Dynamics 365 Business Central",
    "documentTitle": "Sales Order - Dynamics 365 Business Central",
@@ -1385,8 +1406,8 @@
    "clientX": 88,
    "clientY": 183,
    "pointerTarget": true,
-   "interactionId": "3a8694a2-5da2-49c6-ac90-0069f9c3dc58:8c924bed-c38e-4a18-8d53-e2d1f1b1dc06",
-   "preActionCaptureId": "3a8694a2-5da2-49c6-ac90-0069f9c3dc58:8c924bed-c38e-4a18-8d53-e2d1f1b1dc06",
+   "interactionId": "d50db762-7ba2-4c5e-8270-d0df7254ba8a:66f83af0-b5b2-43a4-9e8a-9083f712b53d",
+   "preActionCaptureId": "d50db762-7ba2-4c5e-8270-d0df7254ba8a:66f83af0-b5b2-43a4-9e8a-9083f712b53d",
    "role": "input",
    "controlType": "input",
    "automationId": "",
@@ -1448,17 +1469,18 @@
    }
   },
   {
-   "sourceEventId": "lab-session:3a8694a2-5da2-49c6-ac90-0069f9c3dc58:22",
+   "sourceEventId": "lab-session:d50db762-7ba2-4c5e-8270-d0df7254ba8a:22",
    "recordingId": "lab-session",
    "source": "business-central-content-script",
-   "sourceFrameId": "3a8694a2-5da2-49c6-ac90-0069f9c3dc58",
+   "sourceFrameId": "d50db762-7ba2-4c5e-8270-d0df7254ba8a",
    "sourceSequence": 22,
    "captureProvenance": {
     "producer": "business-central-content-script",
-    "frameInstanceId": "3a8694a2-5da2-49c6-ac90-0069f9c3dc58",
-    "localSequence": 22
+    "frameInstanceId": "d50db762-7ba2-4c5e-8270-d0df7254ba8a",
+    "localSequence": 22,
+    "sequenceScope": "recording"
    },
-   "timestamp": "2026-10-29T09:14:12.657Z",
+   "timestamp": "2026-10-29T11:11:52.810Z",
    "pageId": "42",
    "pageCaption": "Sales Order - Dynamics 365 Business Central",
    "documentTitle": "Sales Order - Dynamics 365 Business Central",
@@ -1473,7 +1495,7 @@
    "value": "1896-S",
    "previousValue": "",
    "inputSource": "change",
-   "interactionId": "3a8694a2-5da2-49c6-ac90-0069f9c3dc58:8c924bed-c38e-4a18-8d53-e2d1f1b1dc06",
+   "interactionId": "d50db762-7ba2-4c5e-8270-d0df7254ba8a:66f83af0-b5b2-43a4-9e8a-9083f712b53d",
    "role": "input",
    "controlType": "input",
    "automationId": "",
@@ -1536,17 +1558,18 @@
    }
   },
   {
-   "sourceEventId": "lab-session:3a8694a2-5da2-49c6-ac90-0069f9c3dc58:23",
+   "sourceEventId": "lab-session:d50db762-7ba2-4c5e-8270-d0df7254ba8a:23",
    "recordingId": "lab-session",
    "source": "business-central-content-script",
-   "sourceFrameId": "3a8694a2-5da2-49c6-ac90-0069f9c3dc58",
+   "sourceFrameId": "d50db762-7ba2-4c5e-8270-d0df7254ba8a",
    "sourceSequence": 23,
    "captureProvenance": {
     "producer": "business-central-content-script",
-    "frameInstanceId": "3a8694a2-5da2-49c6-ac90-0069f9c3dc58",
-    "localSequence": 23
+    "frameInstanceId": "d50db762-7ba2-4c5e-8270-d0df7254ba8a",
+    "localSequence": 23,
+    "sequenceScope": "recording"
    },
-   "timestamp": "2026-10-29T09:14:12.658Z",
+   "timestamp": "2026-10-29T11:11:52.811Z",
    "pageId": "42",
    "pageCaption": "Sales Order - Dynamics 365 Business Central",
    "documentTitle": "Sales Order - Dynamics 365 Business Central",
@@ -1558,7 +1581,7 @@
    "type": "focus",
    "category": "lifecycle",
    "value": "",
-   "interactionId": "3a8694a2-5da2-49c6-ac90-0069f9c3dc58:89d64418-bce2-48b8-b3a3-424a33409ed9",
+   "interactionId": "d50db762-7ba2-4c5e-8270-d0df7254ba8a:e6585798-7873-4776-9ced-f102d737d189",
    "role": "input",
    "controlType": "input",
    "automationId": "",
@@ -1621,17 +1644,18 @@
    }
   },
   {
-   "sourceEventId": "lab-session:3a8694a2-5da2-49c6-ac90-0069f9c3dc58:24",
+   "sourceEventId": "lab-session:d50db762-7ba2-4c5e-8270-d0df7254ba8a:24",
    "recordingId": "lab-session",
    "source": "business-central-content-script",
-   "sourceFrameId": "3a8694a2-5da2-49c6-ac90-0069f9c3dc58",
+   "sourceFrameId": "d50db762-7ba2-4c5e-8270-d0df7254ba8a",
    "sourceSequence": 24,
    "captureProvenance": {
     "producer": "business-central-content-script",
-    "frameInstanceId": "3a8694a2-5da2-49c6-ac90-0069f9c3dc58",
-    "localSequence": 24
+    "frameInstanceId": "d50db762-7ba2-4c5e-8270-d0df7254ba8a",
+    "localSequence": 24,
+    "sequenceScope": "recording"
    },
-   "timestamp": "2026-10-29T09:14:12.690Z",
+   "timestamp": "2026-10-29T11:11:52.843Z",
    "pageId": "42",
    "pageCaption": "Sales Order - Dynamics 365 Business Central",
    "documentTitle": "Sales Order - Dynamics 365 Business Central",
@@ -1643,7 +1667,7 @@
    "type": "focus",
    "category": "lifecycle",
    "value": "",
-   "interactionId": "3a8694a2-5da2-49c6-ac90-0069f9c3dc58:63d731ae-9725-4c96-bf55-97037c818c51",
+   "interactionId": "d50db762-7ba2-4c5e-8270-d0df7254ba8a:b79dab2e-8e44-40f1-8401-9957b92855eb",
    "role": "input",
    "controlType": "input",
    "automationId": "",
@@ -1706,17 +1730,18 @@
    }
   },
   {
-   "sourceEventId": "lab-session:3a8694a2-5da2-49c6-ac90-0069f9c3dc58:25",
+   "sourceEventId": "lab-session:d50db762-7ba2-4c5e-8270-d0df7254ba8a:25",
    "recordingId": "lab-session",
    "source": "business-central-content-script",
-   "sourceFrameId": "3a8694a2-5da2-49c6-ac90-0069f9c3dc58",
+   "sourceFrameId": "d50db762-7ba2-4c5e-8270-d0df7254ba8a",
    "sourceSequence": 25,
    "captureProvenance": {
     "producer": "business-central-content-script",
-    "frameInstanceId": "3a8694a2-5da2-49c6-ac90-0069f9c3dc58",
-    "localSequence": 25
+    "frameInstanceId": "d50db762-7ba2-4c5e-8270-d0df7254ba8a",
+    "localSequence": 25,
+    "sequenceScope": "recording"
    },
-   "timestamp": "2026-10-29T09:14:13.682Z",
+   "timestamp": "2026-10-29T11:11:53.827Z",
    "pageId": "42",
    "pageCaption": "Sales Order - Dynamics 365 Business Central",
    "documentTitle": "Sales Order - Dynamics 365 Business Central",
@@ -1731,7 +1756,7 @@
    "value": "5",
    "previousValue": "",
    "inputSource": "input",
-   "interactionId": "3a8694a2-5da2-49c6-ac90-0069f9c3dc58:63d731ae-9725-4c96-bf55-97037c818c51",
+   "interactionId": "d50db762-7ba2-4c5e-8270-d0df7254ba8a:b79dab2e-8e44-40f1-8401-9957b92855eb",
    "role": "input",
    "controlType": "input",
    "automationId": "",
@@ -1794,17 +1819,18 @@
    }
   },
   {
-   "sourceEventId": "lab-session:3a8694a2-5da2-49c6-ac90-0069f9c3dc58:26",
+   "sourceEventId": "lab-session:d50db762-7ba2-4c5e-8270-d0df7254ba8a:26",
    "recordingId": "lab-session",
    "source": "business-central-content-script",
-   "sourceFrameId": "3a8694a2-5da2-49c6-ac90-0069f9c3dc58",
+   "sourceFrameId": "d50db762-7ba2-4c5e-8270-d0df7254ba8a",
    "sourceSequence": 26,
    "captureProvenance": {
     "producer": "business-central-content-script",
-    "frameInstanceId": "3a8694a2-5da2-49c6-ac90-0069f9c3dc58",
-    "localSequence": 26
+    "frameInstanceId": "d50db762-7ba2-4c5e-8270-d0df7254ba8a",
+    "localSequence": 26,
+    "sequenceScope": "recording"
    },
-   "timestamp": "2026-10-29T09:14:13.991Z",
+   "timestamp": "2026-10-29T11:11:54.138Z",
    "pageId": "42",
    "pageCaption": "Sales Order - Dynamics 365 Business Central",
    "documentTitle": "Sales Order - Dynamics 365 Business Central",
@@ -1823,7 +1849,7 @@
    "repeat": false,
    "inputSource": "keyboard",
    "category": "interaction",
-   "interactionId": "3a8694a2-5da2-49c6-ac90-0069f9c3dc58:63d731ae-9725-4c96-bf55-97037c818c51",
+   "interactionId": "d50db762-7ba2-4c5e-8270-d0df7254ba8a:b79dab2e-8e44-40f1-8401-9957b92855eb",
    "fieldName": "Quantity",
    "role": "input",
    "controlType": "input",
@@ -1886,17 +1912,18 @@
    }
   },
   {
-   "sourceEventId": "lab-session:3a8694a2-5da2-49c6-ac90-0069f9c3dc58:27",
+   "sourceEventId": "lab-session:d50db762-7ba2-4c5e-8270-d0df7254ba8a:27",
    "recordingId": "lab-session",
    "source": "business-central-content-script",
-   "sourceFrameId": "3a8694a2-5da2-49c6-ac90-0069f9c3dc58",
+   "sourceFrameId": "d50db762-7ba2-4c5e-8270-d0df7254ba8a",
    "sourceSequence": 27,
    "captureProvenance": {
     "producer": "business-central-content-script",
-    "frameInstanceId": "3a8694a2-5da2-49c6-ac90-0069f9c3dc58",
-    "localSequence": 27
+    "frameInstanceId": "d50db762-7ba2-4c5e-8270-d0df7254ba8a",
+    "localSequence": 27,
+    "sequenceScope": "recording"
    },
-   "timestamp": "2026-10-29T09:14:13.991Z",
+   "timestamp": "2026-10-29T11:11:54.138Z",
    "pageId": "42",
    "pageCaption": "Sales Order - Dynamics 365 Business Central",
    "documentTitle": "Sales Order - Dynamics 365 Business Central",
@@ -1911,7 +1938,7 @@
    "value": "5",
    "previousValue": "",
    "inputSource": "change",
-   "interactionId": "3a8694a2-5da2-49c6-ac90-0069f9c3dc58:63d731ae-9725-4c96-bf55-97037c818c51",
+   "interactionId": "d50db762-7ba2-4c5e-8270-d0df7254ba8a:b79dab2e-8e44-40f1-8401-9957b92855eb",
    "role": "input",
    "controlType": "input",
    "automationId": "",
@@ -1974,17 +2001,18 @@
    }
   },
   {
-   "sourceEventId": "lab-session:3a8694a2-5da2-49c6-ac90-0069f9c3dc58:28",
+   "sourceEventId": "lab-session:d50db762-7ba2-4c5e-8270-d0df7254ba8a:28",
    "recordingId": "lab-session",
    "source": "business-central-content-script",
-   "sourceFrameId": "3a8694a2-5da2-49c6-ac90-0069f9c3dc58",
+   "sourceFrameId": "d50db762-7ba2-4c5e-8270-d0df7254ba8a",
    "sourceSequence": 28,
    "captureProvenance": {
     "producer": "business-central-content-script",
-    "frameInstanceId": "3a8694a2-5da2-49c6-ac90-0069f9c3dc58",
-    "localSequence": 28
+    "frameInstanceId": "d50db762-7ba2-4c5e-8270-d0df7254ba8a",
+    "localSequence": 28,
+    "sequenceScope": "recording"
    },
-   "timestamp": "2026-10-29T09:14:14.023Z",
+   "timestamp": "2026-10-29T11:11:54.170Z",
    "pageId": "42",
    "pageCaption": "Sales Order - Dynamics 365 Business Central",
    "documentTitle": "Sales Order - Dynamics 365 Business Central",
@@ -1996,7 +2024,7 @@
    "type": "focus",
    "category": "lifecycle",
    "value": "5",
-   "interactionId": "3a8694a2-5da2-49c6-ac90-0069f9c3dc58:16cd1bb0-f974-481a-86b3-c31110182268",
+   "interactionId": "d50db762-7ba2-4c5e-8270-d0df7254ba8a:68c18f8d-1cda-473e-a60f-cb5725bba48e",
    "role": "input",
    "controlType": "input",
    "automationId": "",
@@ -2059,17 +2087,18 @@
    }
   },
   {
-   "sourceEventId": "lab-session:3a8694a2-5da2-49c6-ac90-0069f9c3dc58:29",
+   "sourceEventId": "lab-session:d50db762-7ba2-4c5e-8270-d0df7254ba8a:29",
    "recordingId": "lab-session",
    "source": "business-central-content-script",
-   "sourceFrameId": "3a8694a2-5da2-49c6-ac90-0069f9c3dc58",
+   "sourceFrameId": "d50db762-7ba2-4c5e-8270-d0df7254ba8a",
    "sourceSequence": 29,
    "captureProvenance": {
     "producer": "business-central-content-script",
-    "frameInstanceId": "3a8694a2-5da2-49c6-ac90-0069f9c3dc58",
-    "localSequence": 29
+    "frameInstanceId": "d50db762-7ba2-4c5e-8270-d0df7254ba8a",
+    "localSequence": 29,
+    "sequenceScope": "recording"
    },
-   "timestamp": "2026-10-29T09:14:14.486Z",
+   "timestamp": "2026-10-29T11:11:54.622Z",
    "pageId": "42",
    "pageCaption": "Sales Order - Dynamics 365 Business Central",
    "documentTitle": "Sales Order - Dynamics 365 Business Central",
@@ -2083,8 +2112,8 @@
    "clientX": 270,
    "clientY": 183,
    "pointerTarget": true,
-   "interactionId": "3a8694a2-5da2-49c6-ac90-0069f9c3dc58:b204d2f7-773d-44dc-9070-2f32421bd24f",
-   "preActionCaptureId": "3a8694a2-5da2-49c6-ac90-0069f9c3dc58:b204d2f7-773d-44dc-9070-2f32421bd24f",
+   "interactionId": "d50db762-7ba2-4c5e-8270-d0df7254ba8a:e063b5de-bfd8-4caf-960d-661298072490",
+   "preActionCaptureId": "d50db762-7ba2-4c5e-8270-d0df7254ba8a:e063b5de-bfd8-4caf-960d-661298072490",
    "role": "input",
    "controlType": "input",
    "automationId": "",
@@ -2146,17 +2175,18 @@
    }
   },
   {
-   "sourceEventId": "lab-session:3a8694a2-5da2-49c6-ac90-0069f9c3dc58:30",
+   "sourceEventId": "lab-session:d50db762-7ba2-4c5e-8270-d0df7254ba8a:30",
    "recordingId": "lab-session",
    "source": "business-central-content-script",
-   "sourceFrameId": "3a8694a2-5da2-49c6-ac90-0069f9c3dc58",
+   "sourceFrameId": "d50db762-7ba2-4c5e-8270-d0df7254ba8a",
    "sourceSequence": 30,
    "captureProvenance": {
     "producer": "business-central-content-script",
-    "frameInstanceId": "3a8694a2-5da2-49c6-ac90-0069f9c3dc58",
-    "localSequence": 30
+    "frameInstanceId": "d50db762-7ba2-4c5e-8270-d0df7254ba8a",
+    "localSequence": 30,
+    "sequenceScope": "recording"
    },
-   "timestamp": "2026-10-29T09:14:15.150Z",
+   "timestamp": "2026-10-29T11:11:55.290Z",
    "pageId": "42",
    "pageCaption": "Sales Order - Dynamics 365 Business Central",
    "documentTitle": "Sales Order - Dynamics 365 Business Central",
@@ -2171,7 +2201,7 @@
    "value": "6",
    "previousValue": "5",
    "inputSource": "change",
-   "interactionId": "3a8694a2-5da2-49c6-ac90-0069f9c3dc58:b204d2f7-773d-44dc-9070-2f32421bd24f",
+   "interactionId": "d50db762-7ba2-4c5e-8270-d0df7254ba8a:e063b5de-bfd8-4caf-960d-661298072490",
    "role": "input",
    "controlType": "input",
    "automationId": "",
@@ -2234,17 +2264,18 @@
    }
   },
   {
-   "sourceEventId": "lab-session:3a8694a2-5da2-49c6-ac90-0069f9c3dc58:31",
+   "sourceEventId": "lab-session:d50db762-7ba2-4c5e-8270-d0df7254ba8a:31",
    "recordingId": "lab-session",
    "source": "business-central-content-script",
-   "sourceFrameId": "3a8694a2-5da2-49c6-ac90-0069f9c3dc58",
+   "sourceFrameId": "d50db762-7ba2-4c5e-8270-d0df7254ba8a",
    "sourceSequence": 31,
    "captureProvenance": {
     "producer": "business-central-content-script",
-    "frameInstanceId": "3a8694a2-5da2-49c6-ac90-0069f9c3dc58",
-    "localSequence": 31
+    "frameInstanceId": "d50db762-7ba2-4c5e-8270-d0df7254ba8a",
+    "localSequence": 31,
+    "sequenceScope": "recording"
    },
-   "timestamp": "2026-10-29T09:14:15.632Z",
+   "timestamp": "2026-10-29T11:11:55.784Z",
    "pageId": "42",
    "pageCaption": "Sales Order - Dynamics 365 Business Central",
    "documentTitle": "Sales Order - Dynamics 365 Business Central",
@@ -2258,8 +2289,8 @@
    "clientX": 89,
    "clientY": 37,
    "pointerTarget": true,
-   "interactionId": "3a8694a2-5da2-49c6-ac90-0069f9c3dc58:f84d1077-3a82-489c-9dd3-193ce381d31d",
-   "preActionCaptureId": "3a8694a2-5da2-49c6-ac90-0069f9c3dc58:f84d1077-3a82-489c-9dd3-193ce381d31d",
+   "interactionId": "d50db762-7ba2-4c5e-8270-d0df7254ba8a:9f0e20a1-9489-446e-b3c5-12613a29b4b3",
+   "preActionCaptureId": "d50db762-7ba2-4c5e-8270-d0df7254ba8a:9f0e20a1-9489-446e-b3c5-12613a29b4b3",
    "role": "menuitem",
    "controlType": "button",
    "automationId": "",
@@ -2301,17 +2332,18 @@
    }
   },
   {
-   "sourceEventId": "lab-session:3a8694a2-5da2-49c6-ac90-0069f9c3dc58:32",
+   "sourceEventId": "lab-session:d50db762-7ba2-4c5e-8270-d0df7254ba8a:32",
    "recordingId": "lab-session",
    "source": "business-central-content-script",
-   "sourceFrameId": "3a8694a2-5da2-49c6-ac90-0069f9c3dc58",
+   "sourceFrameId": "d50db762-7ba2-4c5e-8270-d0df7254ba8a",
    "sourceSequence": 32,
    "captureProvenance": {
     "producer": "business-central-content-script",
-    "frameInstanceId": "3a8694a2-5da2-49c6-ac90-0069f9c3dc58",
-    "localSequence": 32
+    "frameInstanceId": "d50db762-7ba2-4c5e-8270-d0df7254ba8a",
+    "localSequence": 32,
+    "sequenceScope": "recording"
    },
-   "timestamp": "2026-10-29T09:14:15.633Z",
+   "timestamp": "2026-10-29T11:11:55.785Z",
    "pageId": "42",
    "pageCaption": "Sales Order - Dynamics 365 Business Central",
    "documentTitle": "Sales Order - Dynamics 365 Business Central",
@@ -2322,7 +2354,7 @@
    "frameDepth": 0,
    "type": "status-message",
    "category": "result",
-   "interactionId": "3a8694a2-5da2-49c6-ac90-0069f9c3dc58:f84d1077-3a82-489c-9dd3-193ce381d31d",
+   "interactionId": "d50db762-7ba2-4c5e-8270-d0df7254ba8a:9f0e20a1-9489-446e-b3c5-12613a29b4b3",
    "label": "The status was changed to Released.",
    "role": "status",
    "controlType": "div",
@@ -2365,17 +2397,18 @@
    }
   },
   {
-   "sourceEventId": "lab-session:3a8694a2-5da2-49c6-ac90-0069f9c3dc58:33",
+   "sourceEventId": "lab-session:d50db762-7ba2-4c5e-8270-d0df7254ba8a:33",
    "recordingId": "lab-session",
    "source": "business-central-content-script",
-   "sourceFrameId": "3a8694a2-5da2-49c6-ac90-0069f9c3dc58",
+   "sourceFrameId": "d50db762-7ba2-4c5e-8270-d0df7254ba8a",
    "sourceSequence": 33,
    "captureProvenance": {
     "producer": "business-central-content-script",
-    "frameInstanceId": "3a8694a2-5da2-49c6-ac90-0069f9c3dc58",
-    "localSequence": 33
+    "frameInstanceId": "d50db762-7ba2-4c5e-8270-d0df7254ba8a",
+    "localSequence": 33,
+    "sequenceScope": "recording"
    },
-   "timestamp": "2026-10-29T09:14:16.238Z",
+   "timestamp": "2026-10-29T11:11:56.369Z",
    "pageId": "42",
    "pageCaption": "Sales Order - Dynamics 365 Business Central",
    "documentTitle": "Sales Order - Dynamics 365 Business Central",
@@ -2389,8 +2422,8 @@
    "clientX": 222,
    "clientY": 37,
    "pointerTarget": true,
-   "interactionId": "3a8694a2-5da2-49c6-ac90-0069f9c3dc58:19a26734-46ba-44e6-af1f-0d8871b404eb",
-   "preActionCaptureId": "3a8694a2-5da2-49c6-ac90-0069f9c3dc58:19a26734-46ba-44e6-af1f-0d8871b404eb",
+   "interactionId": "d50db762-7ba2-4c5e-8270-d0df7254ba8a:eaca3d26-2581-4f9a-90a7-81826e6d4e8c",
+   "preActionCaptureId": "d50db762-7ba2-4c5e-8270-d0df7254ba8a:eaca3d26-2581-4f9a-90a7-81826e6d4e8c",
    "role": "menuitem",
    "controlType": "button",
    "automationId": "",
@@ -2432,17 +2465,18 @@
    }
   },
   {
-   "sourceEventId": "lab-session:3a8694a2-5da2-49c6-ac90-0069f9c3dc58:34",
+   "sourceEventId": "lab-session:d50db762-7ba2-4c5e-8270-d0df7254ba8a:34",
    "recordingId": "lab-session",
    "source": "business-central-content-script",
-   "sourceFrameId": "3a8694a2-5da2-49c6-ac90-0069f9c3dc58",
+   "sourceFrameId": "d50db762-7ba2-4c5e-8270-d0df7254ba8a",
    "sourceSequence": 34,
    "captureProvenance": {
     "producer": "business-central-content-script",
-    "frameInstanceId": "3a8694a2-5da2-49c6-ac90-0069f9c3dc58",
-    "localSequence": 34
+    "frameInstanceId": "d50db762-7ba2-4c5e-8270-d0df7254ba8a",
+    "localSequence": 34,
+    "sequenceScope": "recording"
    },
-   "timestamp": "2026-10-29T09:14:16.239Z",
+   "timestamp": "2026-10-29T11:11:56.370Z",
    "pageId": "42",
    "pageCaption": "Sales Order - Dynamics 365 Business Central",
    "documentTitle": "Sales Order - Dynamics 365 Business Central",
@@ -2453,7 +2487,7 @@
    "frameDepth": 0,
    "type": "dialog-open",
    "category": "dialog",
-   "interactionId": "3a8694a2-5da2-49c6-ac90-0069f9c3dc58:19a26734-46ba-44e6-af1f-0d8871b404eb",
+   "interactionId": "d50db762-7ba2-4c5e-8270-d0df7254ba8a:eaca3d26-2581-4f9a-90a7-81826e6d4e8c",
    "role": "dialog",
    "controlType": "div",
    "automationId": "",
@@ -2500,17 +2534,18 @@
    }
   },
   {
-   "sourceEventId": "lab-session:3a8694a2-5da2-49c6-ac90-0069f9c3dc58:35",
+   "sourceEventId": "lab-session:d50db762-7ba2-4c5e-8270-d0df7254ba8a:35",
    "recordingId": "lab-session",
    "source": "business-central-content-script",
-   "sourceFrameId": "3a8694a2-5da2-49c6-ac90-0069f9c3dc58",
+   "sourceFrameId": "d50db762-7ba2-4c5e-8270-d0df7254ba8a",
    "sourceSequence": 35,
    "captureProvenance": {
     "producer": "business-central-content-script",
-    "frameInstanceId": "3a8694a2-5da2-49c6-ac90-0069f9c3dc58",
-    "localSequence": 35
+    "frameInstanceId": "d50db762-7ba2-4c5e-8270-d0df7254ba8a",
+    "localSequence": 35,
+    "sequenceScope": "recording"
    },
-   "timestamp": "2026-10-29T09:14:16.831Z",
+   "timestamp": "2026-10-29T11:11:56.959Z",
    "pageId": "42",
    "pageCaption": "Sales Order - Dynamics 365 Business Central",
    "documentTitle": "Sales Order - Dynamics 365 Business Central",
@@ -2524,8 +2559,8 @@
    "clientX": 258,
    "clientY": 198,
    "pointerTarget": true,
-   "interactionId": "3a8694a2-5da2-49c6-ac90-0069f9c3dc58:19a26734-46ba-44e6-af1f-0d8871b404eb",
-   "preActionCaptureId": "3a8694a2-5da2-49c6-ac90-0069f9c3dc58:19a26734-46ba-44e6-af1f-0d8871b404eb",
+   "interactionId": "d50db762-7ba2-4c5e-8270-d0df7254ba8a:eaca3d26-2581-4f9a-90a7-81826e6d4e8c",
+   "preActionCaptureId": "d50db762-7ba2-4c5e-8270-d0df7254ba8a:eaca3d26-2581-4f9a-90a7-81826e6d4e8c",
    "role": "button",
    "controlType": "button",
    "automationId": "",
@@ -2574,17 +2609,18 @@
    }
   },
   {
-   "sourceEventId": "lab-session:3a8694a2-5da2-49c6-ac90-0069f9c3dc58:36",
+   "sourceEventId": "lab-session:d50db762-7ba2-4c5e-8270-d0df7254ba8a:36",
    "recordingId": "lab-session",
    "source": "business-central-content-script",
-   "sourceFrameId": "3a8694a2-5da2-49c6-ac90-0069f9c3dc58",
+   "sourceFrameId": "d50db762-7ba2-4c5e-8270-d0df7254ba8a",
    "sourceSequence": 36,
    "captureProvenance": {
     "producer": "business-central-content-script",
-    "frameInstanceId": "3a8694a2-5da2-49c6-ac90-0069f9c3dc58",
-    "localSequence": 36
+    "frameInstanceId": "d50db762-7ba2-4c5e-8270-d0df7254ba8a",
+    "localSequence": 36,
+    "sequenceScope": "recording"
    },
-   "timestamp": "2026-10-29T09:14:16.891Z",
+   "timestamp": "2026-10-29T11:11:57.012Z",
    "pageId": "42",
    "pageCaption": "Sales Order - Dynamics 365 Business Central",
    "documentTitle": "Sales Order - Dynamics 365 Business Central",
@@ -2595,7 +2631,7 @@
    "frameDepth": 0,
    "type": "dialog-close",
    "category": "dialog",
-   "interactionId": "3a8694a2-5da2-49c6-ac90-0069f9c3dc58:19a26734-46ba-44e6-af1f-0d8871b404eb",
+   "interactionId": "d50db762-7ba2-4c5e-8270-d0df7254ba8a:eaca3d26-2581-4f9a-90a7-81826e6d4e8c",
    "label": "Sales Order StatisticsSchließen",
    "role": "dialog",
    "controlType": "div",
@@ -2638,17 +2674,18 @@
    }
   },
   {
-   "sourceEventId": "lab-session:3a8694a2-5da2-49c6-ac90-0069f9c3dc58:37",
+   "sourceEventId": "lab-session:d50db762-7ba2-4c5e-8270-d0df7254ba8a:37",
    "recordingId": "lab-session",
    "source": "business-central-content-script",
-   "sourceFrameId": "3a8694a2-5da2-49c6-ac90-0069f9c3dc58",
+   "sourceFrameId": "d50db762-7ba2-4c5e-8270-d0df7254ba8a",
    "sourceSequence": 37,
    "captureProvenance": {
     "producer": "business-central-content-script",
-    "frameInstanceId": "3a8694a2-5da2-49c6-ac90-0069f9c3dc58",
-    "localSequence": 37
+    "frameInstanceId": "d50db762-7ba2-4c5e-8270-d0df7254ba8a",
+    "localSequence": 37,
+    "sequenceScope": "recording"
    },
-   "timestamp": "2026-10-29T09:14:17.419Z",
+   "timestamp": "2026-10-29T11:11:57.536Z",
    "pageId": "42",
    "pageCaption": "Sales Order - Dynamics 365 Business Central",
    "documentTitle": "Sales Order - Dynamics 365 Business Central",
@@ -2662,8 +2699,8 @@
    "clientX": 154,
    "clientY": 37,
    "pointerTarget": true,
-   "interactionId": "3a8694a2-5da2-49c6-ac90-0069f9c3dc58:207960ed-600f-4c93-9f6f-1c486d28fa7a",
-   "preActionCaptureId": "3a8694a2-5da2-49c6-ac90-0069f9c3dc58:207960ed-600f-4c93-9f6f-1c486d28fa7a",
+   "interactionId": "d50db762-7ba2-4c5e-8270-d0df7254ba8a:7a407f67-1e6a-4f7f-8587-4a237411d6d8",
+   "preActionCaptureId": "d50db762-7ba2-4c5e-8270-d0df7254ba8a:7a407f67-1e6a-4f7f-8587-4a237411d6d8",
    "role": "menuitem",
    "controlType": "button",
    "automationId": "",
@@ -2705,17 +2742,18 @@
    }
   },
   {
-   "sourceEventId": "lab-session:3a8694a2-5da2-49c6-ac90-0069f9c3dc58:38",
+   "sourceEventId": "lab-session:d50db762-7ba2-4c5e-8270-d0df7254ba8a:38",
    "recordingId": "lab-session",
    "source": "business-central-content-script",
-   "sourceFrameId": "3a8694a2-5da2-49c6-ac90-0069f9c3dc58",
+   "sourceFrameId": "d50db762-7ba2-4c5e-8270-d0df7254ba8a",
    "sourceSequence": 38,
    "captureProvenance": {
     "producer": "business-central-content-script",
-    "frameInstanceId": "3a8694a2-5da2-49c6-ac90-0069f9c3dc58",
-    "localSequence": 38
+    "frameInstanceId": "d50db762-7ba2-4c5e-8270-d0df7254ba8a",
+    "localSequence": 38,
+    "sequenceScope": "recording"
    },
-   "timestamp": "2026-10-29T09:14:17.420Z",
+   "timestamp": "2026-10-29T11:11:57.537Z",
    "pageId": "42",
    "pageCaption": "Sales Order - Dynamics 365 Business Central",
    "documentTitle": "Sales Order - Dynamics 365 Business Central",
@@ -2726,7 +2764,7 @@
    "frameDepth": 0,
    "type": "dialog-open",
    "category": "dialog",
-   "interactionId": "3a8694a2-5da2-49c6-ac90-0069f9c3dc58:207960ed-600f-4c93-9f6f-1c486d28fa7a",
+   "interactionId": "d50db762-7ba2-4c5e-8270-d0df7254ba8a:7a407f67-1e6a-4f7f-8587-4a237411d6d8",
    "role": "dialog",
    "controlType": "div",
    "automationId": "",
@@ -2773,17 +2811,18 @@
    }
   },
   {
-   "sourceEventId": "lab-session:3a8694a2-5da2-49c6-ac90-0069f9c3dc58:39",
+   "sourceEventId": "lab-session:d50db762-7ba2-4c5e-8270-d0df7254ba8a:39",
    "recordingId": "lab-session",
    "source": "business-central-content-script",
-   "sourceFrameId": "3a8694a2-5da2-49c6-ac90-0069f9c3dc58",
+   "sourceFrameId": "d50db762-7ba2-4c5e-8270-d0df7254ba8a",
    "sourceSequence": 39,
    "captureProvenance": {
     "producer": "business-central-content-script",
-    "frameInstanceId": "3a8694a2-5da2-49c6-ac90-0069f9c3dc58",
-    "localSequence": 39
+    "frameInstanceId": "d50db762-7ba2-4c5e-8270-d0df7254ba8a",
+    "localSequence": 39,
+    "sequenceScope": "recording"
    },
-   "timestamp": "2026-10-29T09:14:18.023Z",
+   "timestamp": "2026-10-29T11:11:58.126Z",
    "pageId": "42",
    "pageCaption": "Sales Order - Dynamics 365 Business Central",
    "documentTitle": "Sales Order - Dynamics 365 Business Central",
@@ -2797,8 +2836,8 @@
    "clientX": 238,
    "clientY": 198,
    "pointerTarget": true,
-   "interactionId": "3a8694a2-5da2-49c6-ac90-0069f9c3dc58:207960ed-600f-4c93-9f6f-1c486d28fa7a",
-   "preActionCaptureId": "3a8694a2-5da2-49c6-ac90-0069f9c3dc58:207960ed-600f-4c93-9f6f-1c486d28fa7a",
+   "interactionId": "d50db762-7ba2-4c5e-8270-d0df7254ba8a:7a407f67-1e6a-4f7f-8587-4a237411d6d8",
+   "preActionCaptureId": "d50db762-7ba2-4c5e-8270-d0df7254ba8a:7a407f67-1e6a-4f7f-8587-4a237411d6d8",
    "role": "button",
    "controlType": "button",
    "automationId": "",
@@ -2847,17 +2886,18 @@
    }
   },
   {
-   "sourceEventId": "lab-session:3a8694a2-5da2-49c6-ac90-0069f9c3dc58:40",
+   "sourceEventId": "lab-session:d50db762-7ba2-4c5e-8270-d0df7254ba8a:40",
    "recordingId": "lab-session",
    "source": "business-central-content-script",
-   "sourceFrameId": "3a8694a2-5da2-49c6-ac90-0069f9c3dc58",
+   "sourceFrameId": "d50db762-7ba2-4c5e-8270-d0df7254ba8a",
    "sourceSequence": 40,
    "captureProvenance": {
     "producer": "business-central-content-script",
-    "frameInstanceId": "3a8694a2-5da2-49c6-ac90-0069f9c3dc58",
-    "localSequence": 40
+    "frameInstanceId": "d50db762-7ba2-4c5e-8270-d0df7254ba8a",
+    "localSequence": 40,
+    "sequenceScope": "recording"
    },
-   "timestamp": "2026-10-29T09:14:18.111Z",
+   "timestamp": "2026-10-29T11:11:58.211Z",
    "pageId": "42",
    "pageCaption": "Sales Order - Dynamics 365 Business Central",
    "documentTitle": "Sales Order - Dynamics 365 Business Central",
@@ -2868,7 +2908,7 @@
    "frameDepth": 0,
    "type": "dialog-close",
    "category": "dialog",
-   "interactionId": "3a8694a2-5da2-49c6-ac90-0069f9c3dc58:207960ed-600f-4c93-9f6f-1c486d28fa7a",
+   "interactionId": "d50db762-7ba2-4c5e-8270-d0df7254ba8a:7a407f67-1e6a-4f7f-8587-4a237411d6d8",
    "label": "Choose an option: Ship and InvoiceOK",
    "role": "dialog",
    "controlType": "div",
@@ -2911,17 +2951,18 @@
    }
   },
   {
-   "sourceEventId": "lab-session:3a8694a2-5da2-49c6-ac90-0069f9c3dc58:41",
+   "sourceEventId": "lab-session:d50db762-7ba2-4c5e-8270-d0df7254ba8a:41",
    "recordingId": "lab-session",
    "source": "business-central-content-script",
-   "sourceFrameId": "3a8694a2-5da2-49c6-ac90-0069f9c3dc58",
+   "sourceFrameId": "d50db762-7ba2-4c5e-8270-d0df7254ba8a",
    "sourceSequence": 41,
    "captureProvenance": {
     "producer": "business-central-content-script",
-    "frameInstanceId": "3a8694a2-5da2-49c6-ac90-0069f9c3dc58",
-    "localSequence": 41
+    "frameInstanceId": "d50db762-7ba2-4c5e-8270-d0df7254ba8a",
+    "localSequence": 41,
+    "sequenceScope": "recording"
    },
-   "timestamp": "2026-10-29T09:14:18.111Z",
+   "timestamp": "2026-10-29T11:11:58.211Z",
    "pageId": "42",
    "pageCaption": "Sales Order - Dynamics 365 Business Central",
    "documentTitle": "Sales Order - Dynamics 365 Business Central",
@@ -2932,7 +2973,7 @@
    "frameDepth": 0,
    "type": "status-message",
    "category": "result",
-   "interactionId": "3a8694a2-5da2-49c6-ac90-0069f9c3dc58:207960ed-600f-4c93-9f6f-1c486d28fa7a",
+   "interactionId": "d50db762-7ba2-4c5e-8270-d0df7254ba8a:7a407f67-1e6a-4f7f-8587-4a237411d6d8",
    "label": "The order was posted.",
    "role": "status",
    "controlType": "div",

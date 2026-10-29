@@ -32,6 +32,13 @@ const missingImage = live.derive({ session, connected: true, debug: {
 assert.deepEqual(missingImage.warnings.map(item => item.code),
   ["no-screenshots-yet"]);
 
+// Numbers a frame used that never arrived are reported while recording; delivered ones are not.
+const gap = live.derive({ session, connected: true, debug: {
+  screenshotStats: { requested: 2, captured: 1 },
+  captureSequence: { frame: { max: 5, count: 3 }, other: { max: 2, count: 2 } } } });
+assert.deepEqual(gap.warnings.map(item => [item.code, item.count]), [["events-missing", 2]]);
+assert.deepEqual(live.freshSessionDebug("next").captureSequence, {});
+
 const safeLabel = live.latestAction({ actionCaption: "  Manuellt   pris  ",
   value: "SENSITIVE", pageCaption: "Sida" });
 assert.equal(safeLabel.label, "Manuellt pris");

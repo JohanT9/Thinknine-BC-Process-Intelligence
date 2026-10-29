@@ -19,8 +19,21 @@
     return unique(inputs.filter(task => (task.sourceEventIds || [])
       .some(id => evidence.has(id))).map(task => task.taskId));
   }
-  function consolidateWithAnalysis(tasks = []) {
-    const outputs = engine.consolidateInteractions(tasks).map((task, index) => ({
+  // In the interpretation pipeline the semantic rules have already decided, over the recorded
+  // step groups, which actions become steps and which are merged or hidden. There each step is
+  // only described again on its own (mergeSteps: false), for example after a knowledge pack
+  // typed it as choosing an item: steps are not merged again, and a step the rules kept is
+  // never hidden. If its description would hide it, the step keeps the one it had. Tasks built
+  // without the semantic rules (the legacy compatibility path) are still merged here.
+  function describe(task) {
+    const described = engine.consolidateInteractions([task]);
+    const value = described.length === 1 ? described[0] : task;
+    return [task.taskId ? { ...value, sourceTaskIds: [String(task.taskId)] } : value];
+  }
+  function consolidateWithAnalysis(tasks = [], { mergeSteps = true } = {}) {
+    const consolidated = mergeSteps ? engine.consolidateInteractions(tasks)
+      : tasks.flatMap(describe);
+    const outputs = consolidated.map((task, index) => ({
       ...task,
       taskNo: index + 1,
       taskId: `${task.taskType || "Task"}-${String(index + 1).padStart(3, "0")}`

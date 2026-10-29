@@ -143,6 +143,10 @@ copyFile(
   path.join(dist, "capture-keyboard.js")
 );
 copyFile(
+  path.join(src, "recorder", "capture-delivery.js"),
+  path.join(dist, "capture-delivery.js")
+);
+copyFile(
   path.join(src, "recorder", "capture-surface-mode.js"),
   path.join(dist, "capture-surface-mode.js")
 );
