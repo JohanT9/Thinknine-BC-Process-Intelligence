@@ -8,6 +8,8 @@ function updateText(element, value) {
 }
 
 const withTimeout = globalThis.T9AsyncOperations.withTimeout;
+// A license check may wake the license service; leave room for the background's own limit.
+const LICENSE_CHECK_TIMEOUT_MS = globalThis.T9TenantLicense.CHECK_TIMEOUT_MS + 5000;
 let currentUiLocale = globalThis.T9UiI18n.DEFAULT_LOCALE;
 let defaultDocumentLanguage = "en-US";
 const t = key => globalThis.T9UiI18n.translate(key, currentUiLocale);
@@ -102,23 +104,32 @@ function formatLicenseExpiry(value) {
     : t("license.noExpiryDate");
 }
 
+// While a check runs, or when it fails, the last known result is shown as such, with the time it
+// was checked; only a result the service has just confirmed is shown as an active license.
 function renderLicenseCard(license, { tenantId = "", signedIn = false,
-  checkFailed = false, needsConsent = false } = {}) {
+  checkFailed = false, needsConsent = false, checking = false, lastKnown = null } = {}) {
   const card = $("licenseCard");
-  const currentLicense = checkFailed || needsConsent ? null : license;
-  const displayedLicense = currentLicense?.allowed === true ? currentLicense : null;
-  card.classList.toggle("active", Boolean(currentLicense?.allowed));
-  card.classList.toggle("inactive", Boolean(tenantId && !currentLicense?.allowed));
+  const known = (checking || checkFailed) && !needsConsent ? lastKnown : null;
+  const currentLicense = checkFailed || needsConsent ? null : checking ? known : license;
+  const displayedLicense = currentLicense?.allowed === true ? currentLicense
+    : known?.allowed === true ? known : null;
+  card.classList.toggle("active", Boolean(!checking && currentLicense?.allowed));
+  card.classList.toggle("inactive", Boolean(tenantId && !checking && !currentLicense?.allowed));
+  updateText($("licenseCardChecked"), known
+    ? tf(checking ? "license.cardRechecking" : "license.cardLastKnown",
+      { time: formatCheckedAt(known.checkedAt) }) : "");
+  $("licenseCardChecked").hidden = !known;
   updateText($("licenseCardType"), displayedLicense?.licenseType === "trial"
     ? t("license.trialType") : displayedLicense?.licenseType === "consultant"
       ? t("license.consultantType") : displayedLicense?.licenseType === "standard" || displayedLicense?.allowed
         ? t("license.standardType") : "—");
   updateText($("licenseCardExpiry"), formatLicenseExpiry(displayedLicense?.expiresAt));
-  // Type and validity are only meaningful for a checked, active license.
+  // Type and validity are only meaningful for an active license, current or last known.
   $("licenseCardMeta").hidden = !displayedLicense;
   const trialAvailable = currentLicense?.trialAvailable === true;
   const statusKey = !tenantId ? "license.cardUnknown"
     : needsConsent ? "license.cardNeedsConsent"
+      : checking && !known ? "license.cardChecking"
       : checkFailed ? "license.cardCheckFailed"
         : currentLicense?.allowed ? "license.cardActive"
           : trialAvailable ? signedIn ? "license.cardTrialReady" : "license.cardTrialAvailable"
@@ -132,8 +143,22 @@ function renderLicenseCard(license, { tenantId = "", signedIn = false,
   $("licenseCardAction").title = tenantId ? "" : t("license.cardOpenBc");
 }
 
+function formatCheckedAt(value) {
+  return new Intl.DateTimeFormat(currentUiLocale, { dateStyle: "medium", timeStyle: "short" })
+    .format(new Date(value));
+}
+
+async function lastKnownLicense(tenantId) {
+  try {
+    const summary = await send({ type: "T9_LICENSE_SUMMARY" }, 3000);
+    const entry = summary?.licenses?.find(item => item.tenantId === tenantId);
+    return entry?.checkedAt > 0 ? entry : null;
+  } catch { return null; }
+}
+
 async function updateLicenseCard() {
   let tenantId = "";
+  let lastKnown = null;
   let license = null;
   let signedIn = false;
   let checkFailed = false;
@@ -152,7 +177,11 @@ async function updateLicenseCard() {
       } else if (information.information?.requiresAcceptance) {
         needsConsent = true;
       } else {
-        const current = await send({ type: "T9_LICENSE_CHECK", tabId: tab.id, force: true }, 10000);
+        lastKnown = await lastKnownLicense(tenantId);
+        renderLicenseCard(null, { tenantId, signedIn, checking: true, lastKnown });
+        $("licenseCard").setAttribute("aria-busy", "true");
+        const current = await send({ type: "T9_LICENSE_CHECK", tabId: tab.id, force: true },
+          LICENSE_CHECK_TIMEOUT_MS);
         if (!current?.ok) throw new Error(current?.error || t("technical.requestFailed"));
         license = current.license || null;
         if (license?.allowed !== true && signedIn) {
@@ -167,7 +196,8 @@ async function updateLicenseCard() {
     checkFailed = true;
     license = null;
   }
-  renderLicenseCard(license, { tenantId, signedIn, checkFailed, needsConsent });
+  $("licenseCard").removeAttribute("aria-busy");
+  renderLicenseCard(license, { tenantId, signedIn, checkFailed, needsConsent, lastKnown });
 }
 
 async function prepareTenantLicense(tabId, { forceCheck = false } = {}) {
@@ -185,7 +215,8 @@ async function prepareTenantLicense(tabId, { forceCheck = false } = {}) {
   let tenantResult = null;
   let checkError = null;
   try {
-    tenantResult = await send({ type: "T9_LICENSE_CHECK", tabId, force: forceCheck }, 10000);
+    tenantResult = await send({ type: "T9_LICENSE_CHECK", tabId, force: forceCheck },
+      LICENSE_CHECK_TIMEOUT_MS);
     if (!tenantResult?.ok) throw Object.assign(new Error(tenantResult?.error || t("technical.requestFailed")),
       { status: tenantResult?.status });
   } catch (error) { checkError = error; }
@@ -199,8 +230,14 @@ async function prepareTenantLicense(tabId, { forceCheck = false } = {}) {
   }
 
   if (tenantResult?.license?.allowed) {
-    const registered = await send({ type: "T9_TENANT_USER_REGISTER", tabId }, 10000);
-    if (!registered?.ok) throw new Error(registered?.error || t("license.userRegistrationFailed"));
+    // A license from the cache is being checked again while the service starts; the user is
+    // registered with the service then too, without holding up the recording.
+    if (tenantResult.license.stale) {
+      send({ type: "T9_TENANT_USER_REGISTER", tabId }, LICENSE_CHECK_TIMEOUT_MS).catch(() => {});
+    } else {
+      const registered = await send({ type: "T9_TENANT_USER_REGISTER", tabId }, 10000);
+      if (!registered?.ok) throw new Error(registered?.error || t("license.userRegistrationFailed"));
+    }
     return { source: "tenant", license: tenantResult.license, tenantId: tenantResult.tenantId, account };
   }
 
@@ -224,7 +261,8 @@ async function prepareTenantLicense(tabId, { forceCheck = false } = {}) {
       return { source: "tenant", license: trial.license, tenantId: tenantResult?.tenantId, account };
     } catch (error) {
       if (error.status === 409) {
-        const current = await send({ type: "T9_LICENSE_CHECK", tabId, force: true }, 10000);
+        const current = await send({ type: "T9_LICENSE_CHECK", tabId, force: true },
+          LICENSE_CHECK_TIMEOUT_MS);
         if (current?.ok && current.license?.allowed) {
           const registered = await send({ type: "T9_TENANT_USER_REGISTER", tabId }, 10000);
           if (!registered?.ok) throw new Error(registered?.error || t("license.userRegistrationFailed"));
@@ -292,7 +330,7 @@ async function ensureContentScript(tab) {
     await withTimeout(chrome.scripting.executeScript({
       target: { tabId: tab.id, allFrames: true },
       files: ["engine/business-central-version-capture.js", "capture-field-privacy.js",
-        "capture-focus-session.js", "capture-surface-mode.js",
+        "capture-focus-session.js", "capture-keyboard.js", "capture-surface-mode.js",
         "bc-error-detector.js", "capture-indicator-i18n.js", "content.js"]
     }), 4000, "Capture script injection", {
       errorMessage: t("technical.requestTimeout") });
@@ -352,8 +390,9 @@ async function startRecording(recordingPurpose) {
       throw new Error(t("recorder.openBcFirst"));
     }
     const authorization = await prepareTenantLicense(tab.id);
-    renderLicenseCard(authorization.license,
-      { tenantId: authorization.tenantId, signedIn: true });
+    // A license from the cache is shown as last known until the service has confirmed it.
+    renderLicenseCard(authorization.license, { tenantId: authorization.tenantId, signedIn: true,
+      checking: authorization.license?.stale === true, lastKnown: authorization.license });
     await ensureContentScript(tab);
     showMessage(t("recorder.connectionWorks"));
 

@@ -18,12 +18,14 @@ function dateTime(value) {
   return new Intl.DateTimeFormat(currentUiLocale, { dateStyle: "long", timeStyle: "short" })
     .format(new Date(value));
 }
-function send(message) {
+// A license check may wake the license service, which takes up to 30 seconds.
+const LICENSE_CHECK_TIMEOUT_MS = 35000;
+function send(message, timeout = 10000) {
   return globalThis.T9AsyncOperations.withTimeout(
     new Promise((resolve, reject) => chrome.runtime.sendMessage(message, response => {
       const error = chrome.runtime.lastError;
       if (error) reject(new Error(error.message)); else resolve(response);
-    })), 10000, "License administration", {
+    })), timeout, "License administration", {
       errorMessage: globalThis.T9UiI18n.translate("technical.requestTimeout", currentUiLocale)
     });
 }
@@ -87,7 +89,7 @@ async function load(force = false) {
   try {
     let selectedTenant = "";
     if (Number.isInteger(tabId) && tabId > 0) {
-      const result = await send({ type: "T9_LICENSE_CHECK", tabId, force });
+      const result = await send({ type: "T9_LICENSE_CHECK", tabId, force }, LICENSE_CHECK_TIMEOUT_MS);
       if (!result?.ok) throw new Error(result?.error || text("Licensen kunde inte kontrolleras.", "The license could not be checked."));
       selectedTenant = result.tenantId;
     }

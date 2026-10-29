@@ -1,0 +1,21 @@
+{
+  "schemaVersion": 1,
+  "id": "lab-sales-order-typeahead",
+  "source": "capture-lab",
+  "provenance": "Captured by the real content script on the capture lab's Business Central-shaped page; no customer data.",
+  "documentLanguage": "en-US",
+  "reviewed": true,
+  "eventsFrom": "tests/fixtures/capture-lab/sales-order-typeahead.json",
+  "expectedSteps": [
+    { "target": "New" },
+    { "target": "Customer Name", "value": "Adatum Corporation" },
+    { "target": "External Document No.", "value": "PO-1001" },
+    { "target": "Posting Date", "value": "27.10.2026" },
+    { "target": "No.", "value": "1896-S" },
+    { "target": "Quantity", "value": "5" },
+    { "target": "Quantity", "value": "6" },
+    { "target": "Release" },
+    { "target": "Statistics" },
+    { "target": "Post..." }
+  ]
+}

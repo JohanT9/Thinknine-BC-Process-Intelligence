@@ -81,7 +81,7 @@
     "test:selective-regeneration": "node tests/selective-regeneration.test.js",
     "test:safe-regeneration": "node tests/safe-regeneration-preview.test.js",
     "test:step-repair": "node tests/step-repair.test.js && node tests/step-repair-async.test.js",
-    "test:ui-localization": "node tests/ui-localization.test.js && node tests/tenant-account-ui.test.js && node tests/popup-license-freshness.test.js && node tests/popup-trial-feedback.test.js && node tests/consultant-license-client.test.js && node tests/ux-language-pass.test.js && node tests/start-page.test.js",
+    "test:ui-localization": "node tests/ui-localization.test.js && node tests/tenant-account-ui.test.js && node tests/popup-license-freshness.test.js && node tests/tenant-license.test.js && node tests/popup-trial-feedback.test.js && node tests/consultant-license-client.test.js && node tests/ux-language-pass.test.js && node tests/start-page.test.js",
     "test:document-language": "node tests/document-language.test.js && node tests/markdown-export-language.test.js && npm run test:new-languages",
     "test:language-registry": "node tests/language-registry.test.js && node tests/language-preferences.test.js",
     "build": "node scripts/build.js",
@@ -97,7 +97,7 @@
     "test:branding": "node tests/product-branding.test.js",
     "test:design-system": "node tests/design-system.test.js && node tests/appearance-theme.test.js",
     "test:bc-url-context": "node tests/business-central-url-context.test.js",
-    "preci": "npm run test:branding && npm run test:design-system && npm run test:bc-url-context && npm run test:bug-reporting-ux && npm run test:recording-live-status && npm run test:recording-indicator && npm run test:recording-completion-navigation && npm run test:recording-guidance && npm run test:result-verification && npm run test:review-regeneration-ui && npm run test:review-step-actions-ux && npm run test:review-visual-hierarchy && npm run test:review-navigation-ux && npm run test:responsive-accessibility-ux && npm run test:tooltips && npm run test:selective-regeneration && npm run test:safe-regeneration && npm run test:step-repair && npm run test:correction-feedback && npm run test:process-improvement-dataset && npm run test:process-improvement-service && npm run test:process-improvement-analysis && npm run test:process-export && npm run test:process-version-workflow && npm run test:product-validation && npm run test:knowledge-mcp && npm run test:language-registry && npm run test:ui-localization && npm run test:document-language && npm run test:document-usage && npm run test:click-highlight && npm run test:row-type && npm run test:feature-flags && npm run test:review-simplified-status && npm run test:error-analysis-engine && npm run test:error-analysis-rules && npm run test:error-incident-correlation && npm run test:error-diagnosis && npm run test:error-codes && npm run test:error-privacy && npm run test:error-analysis-corpus && npm run test:process-analysis-model && npm run test:process-decision-codes && npm run test:process-quality-guard && npm run test:process-contradictions && npm run test:process-analysis-corpus && npm run test:process-e2e-corpus && npm run test:process-output-quality && npm run test:process-language-matrix && npm run test:process-golden && npm run test:process-metamorphic-corpus",
+    "preci": "npm run test:branding && npm run test:design-system && npm run test:bc-url-context && npm run test:bug-reporting-ux && npm run test:recording-live-status && npm run test:recording-indicator && npm run test:recording-completion-navigation && npm run test:recording-guidance && npm run test:result-verification && npm run test:review-regeneration-ui && npm run test:review-step-actions-ux && npm run test:review-visual-hierarchy && npm run test:review-navigation-ux && npm run test:responsive-accessibility-ux && npm run test:tooltips && npm run test:selective-regeneration && npm run test:safe-regeneration && npm run test:step-repair && npm run test:correction-feedback && npm run test:process-improvement-dataset && npm run test:process-improvement-service && npm run test:process-improvement-analysis && npm run test:process-export && npm run test:process-version-workflow && npm run test:product-validation && npm run test:knowledge-mcp && npm run test:language-registry && npm run test:ui-localization && npm run test:document-language && npm run test:document-usage && npm run test:click-highlight && npm run test:row-type && npm run test:feature-flags && npm run test:review-simplified-status && npm run test:error-analysis-engine && npm run test:error-analysis-rules && npm run test:error-incident-correlation && npm run test:error-diagnosis && npm run test:error-codes && npm run test:error-privacy && npm run test:error-analysis-corpus && npm run test:process-analysis-model && npm run test:process-decision-codes && npm run test:process-quality-guard && npm run test:process-contradictions && npm run test:process-analysis-corpus && npm run test:process-e2e-corpus && npm run test:capture-quality && npm run test:process-output-quality && npm run test:process-language-matrix && npm run test:process-golden && npm run test:process-metamorphic-corpus",
     "ci": "npm run lint && npm test && npm run build && npm run check",
     "dev:build": "node scripts/build.js",
     "dev:check": "npm run build && npm run check",
@@ -121,7 +121,7 @@
     "test:process-quality-guard": "node tests/process-quality-guard.test.js",
     "test:process-contradictions": "node tests/process-contradiction-engine.test.js",
     "test:process-analysis-corpus": "node tests/process-analysis-corpus.test.js",
-    "test:process-e2e-corpus": "node tests/process-e2e-corpus.test.js && node tests/capture-lab-corpus.test.js && node tests/bc-client-captions.test.js",
+    "test:process-e2e-corpus": "node tests/process-e2e-corpus.test.js && node tests/capture-lab-corpus.test.js && node tests/capture-keyboard.test.js && node tests/bc-client-captions.test.js",
     "test:process-output-quality": "node tests/process-output-quality.test.js",
     "test:process-language-matrix": "node tests/process-language-matrix.test.js",
     "test:process-golden": "node tests/process-golden-baseline.test.js",
@@ -129,7 +129,10 @@
     "test:process-metamorphic-corpus": "node tests/process-metamorphic-corpus.test.js",
     "test:source-recovery": "node tests/canonical-legacy-projection.test.js && node tests/event-log-storage.test.js && node tests/browser-recording-projection.test.js",
     "test:outlook-draft": "node tests/outlook-draft.test.js",
-    "capture:lab": "node scripts/capture-lab/capture-lab.js"
+    "capture:lab": "node scripts/capture-lab/capture-lab.js",
+    "quality:capture": "node scripts/capture-quality/run.js",
+    "quality:import": "node scripts/capture-quality/import-recording.js",
+    "test:capture-quality": "node tests/capture-quality.test.js"
   },
   "engines": {
     "node": ">=20"

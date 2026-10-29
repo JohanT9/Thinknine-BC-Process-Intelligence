@@ -7,6 +7,12 @@
   const KEY = "t9TenantLicenseV1";
   const CONSENT_KEY = "t9TenantLicenseNoticeV1";
   const NEGATIVE_CACHE_MS = 30 * 1000;
+  // An idle license service takes about 20 seconds to start; a shorter limit makes the first
+  // check of every browser session fail.
+  const CHECK_TIMEOUT_MS = 30 * 1000;
+  // A license the service confirmed this recently is used at once while it is checked again in
+  // the background, so that a blocked license stops the next recording, not this one.
+  const STALE_LIMIT_MS = 7 * 24 * 60 * 60 * 1000;
   function tenantFromUrl(value) {
     try {
       const url = new URL(value);
@@ -20,6 +26,7 @@
     uuid = () => crypto.randomUUID() }) {
     const pending = new Map();
     const pendingTrials = new Map();
+    const refreshing = new Map();
     let queue = Promise.resolve();
     let storageWriteQueue = Promise.resolve();
     let installationPromise = null;
@@ -61,6 +68,11 @@
       }
       const tenantId = tenantFromUrl(url);
       if (!tenantId) throw new Error("license.tenantUrlRequired");
+      // An answer from the cache never waits for a check that is already under way.
+      if (options.force !== true) {
+        const cached = await cachedResult(tenantId, { allowStale: true });
+        if (cached) return cached;
+      }
       if (pending.has(tenantId)) return pending.get(tenantId);
       const operation = queue.then(() => verify(tenantId, options.force === true));
       queue = operation.catch(() => {});
@@ -88,20 +100,34 @@
       return installationPromise;
     }
     async function installationId() { return (await identity()).installationId; }
+    async function cachedResult(tenantId, { allowStale = false } = {}) {
+      const endpoint = checkedEndpoint(config.endpoint);
+      const cached = ((await storage.get(KEY))[KEY] || {}).tenants?.[tenantId];
+      const checkedAt = Number(cached?.checkedAt) || 0;
+      if (cached?.endpoint !== endpoint.href || checkedAt > now()) return null;
+      const unexpired = cached.allowed === true && Number(cached.expiresAt) > now();
+      if (unexpired && Number(cached.refreshAt) > now()) return { ...cached, allowed: true };
+      if (cached.allowed !== true && now() - checkedAt < NEGATIVE_CACHE_MS) {
+        return { ...cached, allowed: false };
+      }
+      if (allowStale && unexpired && now() - checkedAt < STALE_LIMIT_MS) {
+        refreshInBackground(tenantId);
+        return { ...cached, allowed: true, stale: true };
+      }
+      return null;
+    }
+    // The result is stored for the next check; a failure keeps the last confirmed result.
+    function refreshInBackground(tenantId) {
+      if (refreshing.has(tenantId)) return;
+      refreshing.set(tenantId, verify(tenantId, true).catch(() => {})
+        .finally(() => refreshing.delete(tenantId)));
+    }
     async function verify(tenantId, force = false) {
       const endpoint = checkedEndpoint(config.endpoint);
-      const { stored, installationId } = await identity();
-      const cached = stored.tenants?.[tenantId];
-      const checkedAt = Number(cached?.checkedAt) || 0;
-      const cacheMatchesEndpoint = cached?.endpoint === endpoint.href &&
-        checkedAt <= now();
-      const activeCacheFresh = cached?.allowed === true &&
-        Number(cached.expiresAt) > now() && Number(cached.refreshAt) > now();
-      const negativeCacheFresh = cached?.allowed !== true &&
-        now() - checkedAt < NEGATIVE_CACHE_MS;
-      if (!force && cacheMatchesEndpoint && (activeCacheFresh || negativeCacheFresh)) {
-        return { ...cached, allowed: cached.allowed === true &&
-          Number(cached.expiresAt) > now() };
+      const { installationId } = await identity();
+      if (!force) {
+        const cached = await cachedResult(tenantId);
+        if (cached) return cached;
       }
       // Never include URL, company, user identity, screenshots or recording data.
       let response;
@@ -109,7 +135,7 @@
         response = await fetcher(endpoint.href, {
           method: "POST", credentials: "omit", redirect: "error",
           headers: { "Content-Type": "application/json" },
-          signal: AbortSignal.timeout(5000),
+          signal: AbortSignal.timeout(CHECK_TIMEOUT_MS),
           body: JSON.stringify({ installationId, tenantId, version })
         });
       } catch (cause) {
@@ -168,8 +194,10 @@
       if (!result.allowed) throw new Error("Denna Business Central-tenant saknar en aktiv BC Process Studio-licens.");
       return result;
     }
+    // Lets callers and tests wait for background refreshes to finish.
+    function refreshed() { return Promise.all(refreshing.values()); }
     return Object.freeze({ check, requestTrial, requireLicense, information,
-      summaries, installationId, acceptNotice });
+      summaries, installationId, acceptNotice, refreshed });
   }
-  return Object.freeze({ create, tenantFromUrl });
+  return Object.freeze({ create, tenantFromUrl, CHECK_TIMEOUT_MS, STALE_LIMIT_MS });
 });

@@ -114,7 +114,7 @@ assert(content.includes("[role=\\\"checkbox\\\"]") ||
 assert.strictEqual(manifest.content_scripts[0].all_frames, true);
 assert.strictEqual(manifest.content_scripts[0].match_about_blank, true);
 const captureScripts = ["engine/business-central-version-capture.js",
-  "capture-field-privacy.js", "capture-focus-session.js", "capture-surface-mode.js",
+  "capture-field-privacy.js", "capture-focus-session.js", "capture-keyboard.js", "capture-surface-mode.js",
   "bc-error-detector.js", "capture-indicator-i18n.js", "content.js"];
 assert.deepStrictEqual(manifest.content_scripts[0].js, captureScripts);
 // Dynamic registration and re-injection must load the same helpers as the

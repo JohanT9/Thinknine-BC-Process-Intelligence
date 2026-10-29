@@ -196,13 +196,97 @@ Business Central language:
 - Private-use icon glyphs, section toggles and dialog-close controls are recognized without text.
 
 The remaining captions live in one catalog, `src/engine/bc-client-captions.js`, used by
-normalization, grouping, the semantic engine and the legacy noise filter. It lists only
-captions observed in recordings. Microsoft Learn translations of these client texts are
-machine translated and differ from the client (Swedish Business Central shows "Visa resten",
-not "Visa mer"), so they are not used as sources.
+normalization, grouping, the semantic engine and the legacy noise filter. Every registered
+language is covered. The captions come from the web client's own language resources, not from
+Microsoft Learn, whose translations of these texts are machine translated and differ from the
+client. Source: the public on-premises platform artifact 26.18.55014.0, file
+`WebClient/.../WebPublish/wwwroot/Resources/Lang/<culture>/Microsoft.Dynamics.Framework.Resource.js`,
+with these resource keys:
 
-Documented gaps: no observed captions for the categories `close`, `scroll`, `display`,
-`history`, `tellMe` and `fieldHint` in fr-FR, de-DE, es-ES, da-DK, fi-FI and nb-NO. In those
-Business Central languages, a click on these controls outside a recorded dialog can still
-become a step that the reviewer removes. Add captions from a recording in that language;
-`tests/bc-client-captions.test.js` keeps this list and the catalog in agreement.
+| Category | Resource keys |
+| --- | --- |
+| `close` | `CloseButton`, `DetailsPageExitAction`, `PdfControl_Close`, `DatePickerCloseText` |
+| `scroll` | `ScrollLeft`, `ScrollRight` |
+| `display` | `ShowMoreFields`, `ShowLess`, `CommandBar_ShowWrappedItemsInContextMenu_Tooltip`, `CommandBar_ShowMore_Tooltip`, `CommandBar_ShowLess_Tooltip` |
+| `history` | `Back_Title`, `HelpPaneBackButton`, `HelpPaneForwardButton` |
+| `tellMe` | `ProductMenuBar_PageSearch` (its first sentence) |
+| `fieldHint` | `HasMandatoryField`, `MandatoryIcon_Tooltip`, `Autofill_AnnouncementSupportedField` |
+
+Swedish and English also keep wordings observed in older recordings (for example "Tillbaka",
+"Scroll up"). The client's Dismiss translations (`ClosePane`, `NotificationDismiss`) are
+deliberately left out except in English: Afvis, Hylkää, Verwerfen, Descartar, Forkast and
+Ignorer are also the captions of Business Central business actions such as Reject, which must
+stay steps. When the client changes a caption, read the same keys from a newer platform
+artifact; `tests/bc-client-captions.test.js` checks coverage for every registered language.
+
+## Keyboard use and validated values
+
+The recorder ties keyboard actions to the user action they perform when it captures them, so
+they group the same way as the mouse:
+
+- A shortcut (a function key, or a key held with Ctrl, Alt or Meta) is recorded as the action
+  that declares it, either in `aria-keyshortcuts` or as `(F9)` at the end of its tooltip or
+  name. Controls in an open dialog are searched first. It is recorded only when every
+  declaring control names the same action. The event keeps `shortcut` (for example
+  `Ctrl+Delete`) and owns what the action opens, so its dialog buttons join it. Tooltips may
+  use the client's localized key names (STRG, UMSCHALT, Skift, Maj, Entf, Suppr), which are
+  read as Ctrl, Shift and Delete.
+- A shortcut that no control declares starts an action of its own. It becomes a step only when
+  Business Central visibly responds in that action, with a dialog, a page or a message. The
+  step is then "Press **Ctrl+Delete**." (`PressShortcut`), and the response shows its
+  meaning. The recorder never guesses which action it was. Without a response it stays
+  evidence (`key-command`). F2, F4 and Alt+arrows in a field act on that field.
+- An undeclared shortcut also records `shortcutEvidence`: how many elements on the page
+  declare `aria-keyshortcuts` or `accesskey`, and up to five buttons, menu items or tabs whose
+  `aria-keyshortcuts`, `accesskey`, `title`, `aria-label` or `aria-description` mentions
+  the key. Only those command attributes are read, never field values or rows. The evidence
+  shows how the client marks a shortcut that the recorder could not name.
+- Space in a text field is typing and is not recorded as a key.
+- Enter or Space on a button, link or menu item is one click, marked `inputSource: "keyboard"`.
+  It is not recorded as both a key and a click.
+- Enter on a list row, or in a search or type-ahead field with a highlighted suggestion, is
+  recorded as choosing it (`keyboard-selection`), owned exactly as a click on the same element
+  would be. The typed text is recorded first. Arrow keys only move the selection.
+- After a commit, the client can show the value in another form: `t` becomes a date and 1200
+  becomes 1,200.00. The value shown 0.3 and 1.2 seconds later is recorded in the same
+  interaction (`inputSource: "validated"`), and the typed text is kept as `enteredValue`. Both
+  are masked like any other value. Neither a value put back to what it was before, nor an
+  emptied value, is used: these are rejections and are left to the error evidence. A line
+  editor that the client re-rendered is found again by caption, row and grid. Typing in it
+  ends the wait.
+- A click into an empty plain text input that nothing else in its interaction follows only
+  places the cursor (`focus-only-click`), for example before Ctrl+Delete. A click on the page
+  form, which the client names after the page ("New - Purchase Order"), is layout like the
+  main landmark and is never a step.
+
+### What Business Central answered
+
+A dialog whose text is not a question, and is not a completion message, is a message that
+Business Central showed in response to the step. The step's result then reads "Business Central
+showed the message “…”", and not that its dialog closed. The message keeps Business Central's
+own language. A message that something must be different or cannot be done is never a
+completion, even when it names a completed state, as in "Status must be equal to Open …
+Current value is Released". The refusal phrases are listed for every registered language in
+`event-step-grouping.js`. The recorder cannot tell an error dialog from an information
+dialog in documentation recordings, so the wording stays neutral. A dialog in which the user
+typed a value before it closed, such as Tell me, asks for input and is never a message,
+whatever its text says.
+
+Tell me opened with its shortcut (Alt+Q) starts the same sequence as a click on its button:
+the shortcut, the search typed in its field (recognized by the client's caption in every
+registered language) and the chosen result become one step, "Search for __…__ and open
+**…**". The result is named without its category: "Lists" or "Listor" is removed, and in
+other client languages the result keeps the words it shares with the title of the page it
+opened. Because the client does not declare Alt+N either, "Press **Alt+N**." is documented
+by its result, the page it opened. The focus that lands in a field of that page is part of the
+result and does not make the shortcut a field step.
+
+Business Central's own language resources do not show how the web client renders shortcuts
+in the page. Recordings from Business Central 26 (SaaS, Swedish) showed that no control
+declared Ctrl+Delete, Alt+Q or Alt+N in any form: `shortcutEvidence` found no
+`aria-keyshortcuts`, no `accesskey` and no button text naming the key. Both recordings
+are in the capture quality corpus, as `bc-purchase-order-ctrl-delete` and
+`bc-purchase-order-alt-shortcuts`. Whether F9 is declared is not yet known. `npm run capture:lab -- keyboard-navigation` exercises all of
+the above. It uses the content script in headless Edge on a Business Central-shaped page, and
+`tests/capture-lab-corpus.test.js` checks the captured events and the steps in every document
+language.

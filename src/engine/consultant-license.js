@@ -123,8 +123,9 @@
     }
     async function registerTenantUser(tenantId, installationId) {
       const token = await accessToken();
+      // Registration may run while the license service starts, which takes about 20 seconds.
       const response = await timedFetch(config.endpoint.replace(/\/consultant\/check$/, "/user/register"), {
-        method: "POST", credentials: "omit",
+        timeoutMs: 30000, method: "POST", credentials: "omit",
         headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
         body: JSON.stringify({ installationId, tenantId, version }) });
       if (response.status === 401) throw new Error("Microsoft-inloggningen avvisades av licenstjänsten.");

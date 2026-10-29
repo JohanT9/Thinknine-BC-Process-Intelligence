@@ -28,7 +28,8 @@
   function maskFieldValues(event, settings = {}) {
     if (!event || typeof event !== "object" || Array.isArray(event)) return event;
     const masked = { ...event };
-    for (const property of ["value", "previousValue"]) {
+    // enteredValue is the text typed before the client validated it.
+    for (const property of ["value", "previousValue", "enteredValue"]) {
       if (Object.prototype.hasOwnProperty.call(event, property)) {
         masked[property] = mask(event.fieldName, event[property], settings);
       }

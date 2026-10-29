@@ -1,0 +1,170 @@
+const assert = require("assert");
+const fs = require("fs");
+const os = require("os");
+const path = require("path");
+const { score } = require("../scripts/capture-quality/score");
+const quality = require("../scripts/capture-quality/run");
+const importer = require("../scripts/capture-quality/import-recording");
+const { replay } = require("../scripts/capture-quality/replay");
+const zipWriter = require("../src/exporters/zip-writer");
+
+// Scoring: every produced step is correct, wrong, a duplicate or extra; expected steps
+// without a produced step are missing.
+const task = (actionCaption, selectedCaption = "", instruction = actionCaption) =>
+  ({ actionCaption, fieldCaption: actionCaption, selectedCaption, instruction });
+const expected = [{ target: "New" }, { target: "Customer Name", value: "Adatum" },
+  { target: "Quantity", value: "5" }, { target: "Post..." }];
+
+const perfect = score(expected, [task("New"), task("Customer Name", "Adatum"),
+  task("Quantity", "5"), task("Post…")]);
+assert.deepStrictEqual([perfect.correct, perfect.wrong, perfect.duplicates, perfect.extras,
+  perfect.missing, perfect.precision, perfect.recall], [4, 0, 0, 0, 0, 1, 1]);
+
+// The duplicates the recorder used to produce: a typed fragment and a repeated field step.
+const noisy = score(expected, [task("New"), task("Customer Name", "Ada"),
+  task("Customer Name", "Adatum"), task("Customer Name", "Adatum"), task("Enable Quantity"),
+  task("Quantity", "5")]);
+assert.deepStrictEqual([noisy.correct, noisy.wrong, noisy.duplicates, noisy.extras,
+  noisy.missing], [3, 0, 2, 1, 1]);
+// Which of two identical steps counts as correct does not matter; the fragment never does.
+assert.strictEqual(noisy.steps[1].outcome, "duplicate");
+assert.strictEqual(noisy.steps[4].outcome, "extra");
+assert.deepStrictEqual(noisy.missingSteps, [{ target: "Post..." }]);
+
+const wrongValue = score(expected.slice(0, 3), [task("New"), task("Customer Name", "Alpine"),
+  task("Quantity", "5")]);
+assert.deepStrictEqual([wrongValue.correct, wrongValue.wrong, wrongValue.missing], [2, 1, 0]);
+// Order matters: a step after its place in the process cannot stand in for it.
+const reordered = score([{ target: "Release" }, { target: "Post..." }],
+  [task("Post..."), task("Release")]);
+assert.strictEqual(reordered.correct, 1);
+assert.strictEqual(reordered.missing, 1);
+assert.strictEqual(reordered.extras, 1);
+
+// A chosen record without a control caption is identified by the record.
+const record = score([{ target: "101003" }], [{ selectedCaption: "101003", instruction: "Choose 101003" }]);
+assert.deepStrictEqual([record.correct, record.extras, record.missing], [1, 0, 0]);
+
+// Corpus entries are validated.
+assert.throws(() => quality.validate({ schemaVersion: 1, id: "x", events: [] }, "x.json"),
+  /expectedSteps is required/u);
+assert.throws(() => quality.validate({ schemaVersion: 1, id: "x", events: [],
+  expectedSteps: [{ value: "1" }] }, "x.json"), /target is required/u);
+
+// The corpus is no worse than its stored baseline, and the lab recording is perfect.
+const result = quality.evaluate();
+const { regressions } = quality.compare(result, quality.readBaseline());
+assert.deepStrictEqual(regressions, []);
+const lab = result.recordings.find(item => item.id === "lab-sales-order-typeahead");
+assert.deepStrictEqual([lab.expected, lab.correct, lab.duplicates, lab.extras, lab.missing],
+  [10, 10, 0, 0, 0]);
+assert(quality.report(result, { verbose: true }).includes("TOTAL"));
+
+// Real Business Central: Ctrl+Delete, which no control declared, is one step because the client
+// visibly responded. Its confirmation and the refusal belong to it, the click on the page form
+// before it is no step, and the refusal is the step's result in every document language.
+const ctrlDelete = quality.loadCorpus().find(item => item.id === "bc-purchase-order-ctrl-delete");
+const [pressed] = replay(ctrlDelete.events, { documentLanguage: "sv-SE" }).tasks;
+assert.strictEqual(replay(ctrlDelete.events, { documentLanguage: "sv-SE" }).tasks.length, 1);
+assert.deepStrictEqual([pressed.taskType, pressed.instruction],
+  ["PressShortcut", "Tryck på **Ctrl+Delete**."]);
+assert.match(pressed.resultVerification.summary,
+  /^Business Central visade meddelandet “Status måste vara lika med Öppen/u);
+const languageModule = require("../src/document/document-language");
+for (const locale of ["en-US", "fr-FR", "de-DE", "es-ES", "da-DK", "fi-FI", "nb-NO"]) {
+  for (const text of [pressed.instruction, pressed.resultVerification.summary]) {
+    const translated = languageModule.translateInstruction(text, locale);
+    assert(!/\b(?:Tryck på|visade meddelandet)\b/u.test(translated), `${locale}: ${translated}`);
+  }
+  assert(languageModule.translateInstruction(pressed.instruction, locale).includes("**Ctrl+Delete**"));
+  // Business Central's own message keeps its language.
+  assert(languageModule.translateInstruction(pressed.resultVerification.summary, locale)
+    .includes("Status måste vara lika med Öppen"), locale);
+}
+
+// Real Business Central, where the page runs in an inner frame titled by the company: Tell me
+// opened with Alt+Q, a search and a result chosen with the mouse are one step, and Alt+N is
+// documented by the page it opened. The search box is no message.
+const altShortcuts = quality.loadCorpus().find(item => item.id === "bc-purchase-order-alt-shortcuts");
+const searched = replay(altShortcuts.events, { documentLanguage: "sv-SE" }).tasks;
+assert.deepStrictEqual(searched.map(task => task.instruction), [
+  "Sök efter __ink ord__ och öppna listan **Inköpsorder**.", "Tryck på **Alt+N**."]);
+assert.deepStrictEqual(searched.map(task => task.resultVerification.summary), [
+  "Sidan Inköpsorder (RDG) visas nu.", "Sidan Ny - Inköpsorder (RDG) visas nu."]);
+assert(!searched.some(task => /Rhloqw/u.test(task.instruction + task.resultVerification.summary)),
+  "the company is not taken for a page");
+for (const locale of ["en-US", "fr-FR", "de-DE", "es-ES", "da-DK", "fi-FI", "nb-NO"]) {
+  for (const task of searched) {
+    const translated = languageModule.translateInstruction(task.instruction, locale);
+    assert(!/\b(?:Sök efter|öppna|listan|Tryck på)\b/u.test(translated), `${locale}: ${translated}`);
+  }
+}
+// In a client language whose Tell me field and result category are not Swedish or English,
+// the result is named by the words it shares with the page it opened.
+const german = JSON.parse(JSON.stringify(altShortcuts.events)
+  .replaceAll("Berätta vad du vill göra.", "Was möchten Sie tun?")
+  .replaceAll("Inköpsorder Listor", "Inköpsorder Listen"));
+assert.strictEqual(replay(german, { documentLanguage: "sv-SE" }).tasks[0].instruction,
+  "Sök efter __ink ord__ och öppna **Inköpsorder**.");
+
+// A worse result is reported as a regression.
+const worse = { recordings: result.recordings.map(item => item.id === lab.id
+  ? { ...item, correct: 9, duplicates: 1 } : item) };
+assert.deepStrictEqual(quality.compare(worse, quality.readBaseline()).regressions.sort(),
+  [`${lab.id}: correct 10 -> 9`, `${lab.id}: duplicates 0 -> 1`]);
+
+// Import: an exported recording ZIP becomes a draft entry without customer values, URLs or
+// company, and pseudonymization does not change which steps the recording produces.
+const labEvents = JSON.parse(fs.readFileSync(path.join(__dirname,
+  "fixtures/capture-lab/sales-order-typeahead.json"), "utf8")).events;
+const exportedEvents = labEvents.map((event, index) => ({ ...event, eventNo: index + 1,
+  companyName: "Real Customer Ltd", pageCaption: "Real Customer Ltd",
+  documentTitle: "Sales Order - 1001 ∙ Northwind Traders", identification: { stale: true },
+  topUrl: "https://businesscentral.dynamics.com/0f0e1d2c-3b4a-5968-7766-554433221100/Production?company=Real%20Customer&page=42&bookmark=abc",
+  ...(index === 0 ? { note: "Sent by anna.svensson@example.com" } : {}) }));
+const dir = fs.mkdtempSync(path.join(os.tmpdir(), "capture-quality-"));
+const zipPath = path.join(dir, "export.zip");
+const encode = value => new TextEncoder().encode(JSON.stringify(value));
+fs.writeFileSync(zipPath, zipWriter.create([
+  { name: "Sales order/session.json", data: encode({ id: "s1", documentLanguage: "sv-SE" }) },
+  { name: "Sales order/events.json", data: encode(exportedEvents) }]));
+const { entry, pseudonymized } = importer.importRecording(zipPath, { id: "imported" });
+fs.rmSync(dir, { recursive: true, force: true });
+const text = JSON.stringify(entry.events);
+for (const secret of ["Adatum", "PO-1001", "Real Customer", "Northwind", "anna.svensson", "bookmark",
+  "0f0e1d2c-3b4a", "tenant-demo"]) {
+  assert(!text.includes(secret), `removed: ${secret}`);
+}
+assert(pseudonymized >= 2);
+assert(text.includes("page=42"), "the page number is kept");
+assert(entry.events.every(event => !("identification" in event) && !("eventNo" in event)));
+assert.strictEqual(entry.documentLanguage, "sv-SE");
+assert.strictEqual(entry.reviewed, false);
+// Captions, numbers and dates stay; a typed fragment stays a prefix of the chosen value.
+for (const caption of ["Customer Name", "External Document No.", "Quantity", "1896-S", "2026-10-27"]) {
+  assert(text.includes(caption), `kept: ${caption}`);
+}
+const chosen = entry.events.find(event => event.type === "field-change" &&
+  event.fieldName === "Customer Name" && event.inputSource === "change").value;
+const typed = entry.events.filter(event => event.type === "field-change" &&
+  event.fieldName === "Customer Name" && event.inputSource === "input").map(event => event.value);
+assert(typed.length && typed.every(value => chosen.startsWith(value)), "typed prefixes kept");
+assert.notStrictEqual(chosen, "Adatum Corporation");
+
+// A Tell me result names a page of Business Central and stays; a record chosen later does not.
+const tellMeWords = importer.collectDataWords([
+  { type: "field-change", fieldName: "Berätta vad du vill göra.", value: "ink ord" },
+  { type: "click", role: "gridcell", label: "Inköpsorder Listor ", selectedCaption: "Inköpsorder Listor " },
+  { type: "page-state", pageCaption: "Inköpsorder" },
+  { type: "click", role: "gridcell", label: "Greenfood Iberica", selectedCaption: "Greenfood Iberica" }]);
+assert(!tellMeWords.includes("listor"), tellMeWords.join(","));
+assert(tellMeWords.includes("greenfood") && tellMeWords.includes("iberica"));
+
+const original = replay(labEvents, { documentLanguage: "sv-SE" }).tasks;
+const sanitized = replay(entry.events, { documentLanguage: "sv-SE" }).tasks;
+assert.deepStrictEqual(sanitized.map(item => item.taskType), original.map(item => item.taskType));
+assert.strictEqual(entry.expectedSteps.length, original.length);
+assert.strictEqual(entry.expectedSteps[1].value, chosen);
+
+console.log(`Capture quality tests passed (${result.recordings.length} corpus recordings, ` +
+  `precision ${Math.round(result.totals.precision * 100)}%, recall ${Math.round(result.totals.recall * 100)}%).`);

@@ -37,8 +37,8 @@ model = append(model, raw("e4", "field-change", { fieldName: "Quantity",
 let result = normalization.normalizeRecording(model);
 assert.strictEqual(JSON.stringify(original), before);
 assert.strictEqual(result.schemaVersion, 1);
-assert.strictEqual(result.normalizationVersion, "2.8.0");
-assert.strictEqual(normalization.NORMALIZATION_VERSION, "2.8.0");
+assert.strictEqual(result.normalizationVersion, "2.10.0");
+assert.strictEqual(normalization.NORMALIZATION_VERSION, "2.10.0");
 assert.strictEqual(result.events.length, 1);
 assert.strictEqual(result.events[0].kind, "value-change");
 assert.deepStrictEqual(result.events[0].sourceEventIds,
@@ -257,3 +257,36 @@ const normalTextInput = append(recording('ordinary-text-regression'), raw('ordin
 assert.equal(normalization.normalizeRecording(normalTextInput).events[0].kind, 'value-change');
 
 assert.equal(normalization.normalizeRecording(normalTextInput).events[0].state, null);
+
+// In the web client the page runs in an inner frame whose first heading is the company name;
+// the top frame's title names the page and sees the page change without the user action.
+{
+  const at = seconds => `2026-10-29T08:43:${String(seconds).padStart(2, "0")}.000Z`;
+  let frames = recording("inner-frame-page");
+  const inner = { sourceFrameId: "inner", frameDepth: 1, pageCaption: "Contoso Ltd" };
+  const top = { sourceFrameId: "top", frameDepth: 0 };
+  frames = append(frames, raw("f1", "key", { ...inner, timestamp: at(16), key: "n", altKey: true,
+    shortcut: "Alt+N", category: "interaction", interactionId: "alt-n", pageId: "9307" }));
+  frames = append(frames, raw("f2", "page-state", { ...top, timestamp: at(20),
+    pageCaption: "Ny - Inköpsorder (UAT)", pageId: "50" }));
+  frames = append(frames, raw("f3", "page-state", { ...inner, timestamp: at(21),
+    interactionId: "alt-n", pageId: "50" }));
+  frames = append(frames, raw("f4", "page-state", { ...top, timestamp: at(25),
+    pageCaption: "Ny - Inköpsorder (UAT)", pageId: "50" }));
+  const pages = normalization.normalizeRecording(frames).events.filter(event =>
+    event.kind === "navigation");
+  assert.deepStrictEqual(pages.map(event => event.interactionId), ["alt-n", "alt-n", undefined],
+    "the top frame's page change joins the action within the window, a later one does not");
+  assert.deepStrictEqual(pages.map(event => event.pageIdentification.pageCaption),
+    Array(3).fill("Ny - Inköpsorder (UAT)"), "the inner frame takes the top frame's caption");
+  assert.strictEqual(pages[1].pageIdentification.contextResolution.source, "top-frame-title");
+  // A page the top frame never titled keeps its own caption.
+  const own = normalization.normalizeRecording(frames).events[0];
+  assert.strictEqual(own.pageIdentification.pageCaption, "Contoso Ltd");
+  // Unless that caption is the company name the recording identified.
+  const titled = append(recording("company-heading"), raw("c1", "key", { ...inner,
+    companyName: "Contoso Ltd", key: "q", altKey: true, shortcut: "Alt+Q", category: "interaction" }));
+  const page = normalization.normalizeRecording(titled).events[0].pageIdentification;
+  assert.strictEqual(page.pageCaption, undefined);
+  assert.notStrictEqual(page.caption, "Contoso Ltd");
+}

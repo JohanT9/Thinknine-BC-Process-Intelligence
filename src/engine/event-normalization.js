@@ -13,7 +13,7 @@
 ) {
   "use strict";
   const SCHEMA_VERSION = 1;
-  const NORMALIZATION_VERSION = "2.8.0";
+  const NORMALIZATION_VERSION = "2.10.0";
   const cache = new WeakMap();
   const clone = value => value == null ? value : JSON.parse(JSON.stringify(value));
   function freeze(value) { if (!value || typeof value !== "object" || Object.isFrozen(value)) return value; Object.values(value).forEach(freeze); return Object.freeze(value); }
@@ -68,6 +68,10 @@
     if ((type === "click" || /pointer|mouse/.test(type)) && control === "lookup") return ["activation", "identified-lookup-trigger"];
     if (["click", "key", "keydown"].includes(type) && identified.action && (type === "click" || ["Enter", " ", "Space"].includes(raw.key))) return ["activation", "identified-action-activation"];
     if (type === "click" && ["listRow", "repeaterCell"].includes(control)) return ["selection-change", "identified-row-selection"];
+    // The recorder names a shortcut's action only when the page declares it unambiguously,
+    // and records Enter on a row or an active suggestion as the choice it makes.
+    if (["key", "keydown"].includes(type) && raw.shortcut && raw.category === "action") return ["activation", "declared-shortcut-activation"];
+    if (["key", "keydown"].includes(type) && raw.key === "Enter" && raw.category === "selection" && raw.selectedCaption) return ["selection-change", "keyboard-selection"];
     if (["field-change", "change", "input"].includes(type) && (control === "checkbox" || typeof raw.value === "boolean" || (raw.checked != null && !["text", "search", "email", "number", "password", "tel", "url"].includes(raw.inputType) && !["textbox", "searchbox", "combobox"].includes(raw.role)))) return ["toggle-change", "verified-checked-state"];
     if (["field-change", "change"].includes(type) && control === "option") return ["selection-change", "identified-option-change"];
     if (["field-change", "input", "change"].includes(type)) {
@@ -88,6 +92,11 @@
       rawOf(item).interactionId || item.interaction?.id).filter(Boolean)
       .map(String))];
     const selection = raw.selectedValue != null || raw.selectedCaption || raw.selectedKey ? { value: clone(raw.selectedValue), caption: raw.selectedCaption || undefined, key: raw.selectedKey || undefined, transientIndex: raw.selectedIndex ?? undefined } : null;
+    // The company name shown as a heading names no page.
+    const company = normalizedCaption(raw.companyName);
+    const pageName = value => value && (!company || normalizedCaption(value) !== company)
+      ? value : undefined;
+    const caption = pageName(raw.pageCaption) || pageName(identified.pageIdentity?.caption);
     return freeze({
       normalizedEventId: `normalized:${sourceIds.map(id => `${id.length}:${id}`).join("|")}`,
       schemaVersion: SCHEMA_VERSION,
@@ -107,7 +116,9 @@
       pageIdentification: clone({ ...(identified.page || {}),
         ...(identified.pageIdentity || {}),
         legacyPageId: raw.pageId || identified.pageIdentity?.pageId || undefined,
-        pageCaption: raw.pageCaption || identified.pageIdentity?.caption || undefined,
+        pageCaption: caption,
+        ...(company ? { caption: pageName(identified.page?.caption) ||
+          pageName(identified.pageIdentity?.caption) } : {}),
         documentTitle: raw.documentTitle || identified.pageIdentity?.documentTitle || undefined,
         frameUrl: raw.frameUrl || identified.frameContext?.frameUrl || undefined,
         topUrl: raw.topUrl || identified.frameContext?.topUrl || undefined,
@@ -124,7 +135,7 @@
       interaction: { mechanism: mechanism(raw), key: raw.key || undefined, code: raw.code || undefined,
         altKey: raw.altKey || undefined, ctrlKey: raw.ctrlKey || undefined,
         metaKey: raw.metaKey || undefined, shiftKey: raw.shiftKey || undefined,
-        repeat: raw.repeat || undefined },
+        repeat: raw.repeat || undefined, shortcut: raw.shortcut || undefined },
       value: valueModel(raw, identified),
       previousValue: Object.prototype.hasOwnProperty.call(raw, "previousValue") ? { raw: clone(raw.previousValue), normalized: clone(raw.previousValue) } : null,
       selection, state: kind === "toggle-change" ? { checked: raw.checked ?? raw.value } : null,
@@ -201,8 +212,17 @@
         latestByFrame.set(frame, caption);
       }
     }
+    // In the web client the page runs in an inner frame whose first heading is the company
+    // name, while the top frame's title names the page. The top frame's caption therefore
+    // names inner-frame events of the same page.
+    const firstTopByPage = new Map();
+    for (const event of events) {
+      const id = pageIdOf(event); const caption = usefulPageCaption(event);
+      if (id && caption && depthOf(event) === 0 && !firstTopByPage.has(id)) firstTopByPage.set(id, caption);
+    }
     const currentByPage = new Map();
     const currentByFrame = new Map();
+    const currentTopByPage = new Map();
     return events.map(event => {
       const id = pageIdOf(event);
       const frame = frameIdOf(event);
@@ -210,8 +230,15 @@
       const useful = usefulPageCaption(event);
       if (id && useful) currentByPage.set(id, useful);
       if (frame && useful) currentByFrame.set(frame, useful);
-      const company = companyFromUrl(page.frameUrl || page.topUrl || "");
+      if (id && useful && depthOf(event) === 0) currentTopByPage.set(id, useful);
       const observed = String(page.pageCaption || page.caption || "").trim();
+      const top = id && depthOf(event) > 0
+        ? currentTopByPage.get(id) || firstTopByPage.get(id) : "";
+      if (top && normalizedCaption(observed) !== normalizedCaption(top)) {
+        return freeze({ ...event, pageIdentification: { ...page, pageCaption: top,
+          contextResolution: { source: "top-frame-title", pageId: id } } });
+      }
+      const company = companyFromUrl(page.frameUrl || page.topUrl || "");
       const genericCaption = /^(?:dynamics 365 business central(?:\s*\([^)]*\))?|business central)$/iu.test(observed) ||
         Boolean(company && normalizedCaption(observed) === normalizedCaption(company));
       if ((!id || !latestByPage.has(id)) && (!frame || !latestByFrame.has(frame))) return event;
@@ -226,6 +253,31 @@
         } } });
     });
   }
+  function depthOf(event) {
+    const depth = event?.pageIdentification?.frameDepth;
+    return depth == null || depth === "" ? NaN : Number(depth);
+  }
+  // The top frame sees a page change but not the user action that caused it; the inner frame
+  // records the same page change in that action. The top frame's observation joins it.
+  const FRAME_NAVIGATION_WINDOW_MS = 1500;
+  function linkTopFrameNavigation(events) {
+    const owned = events.filter(event => event.kind === "navigation" && event.interactionId &&
+      depthOf(event) > 0 && pageIdOf(event));
+    if (!owned.length) return events;
+    return events.map(event => {
+      if (event.kind !== "navigation" || event.interactionId || depthOf(event) !== 0) return event;
+      const id = pageIdOf(event); const time = Date.parse(event.timestamp || "");
+      if (!id || !Number.isFinite(time)) return event;
+      const distance = other => Math.abs(Date.parse(other.timestamp || "") - time);
+      const partner = owned.filter(other => pageIdOf(other) === id &&
+        distance(other) <= FRAME_NAVIGATION_WINDOW_MS)
+        .sort((left, right) => distance(left) - distance(right))[0];
+      if (!partner) return event;
+      return freeze({ ...event, interactionId: partner.interactionId,
+        interactionIds: [partner.interactionId], evidence: [...(event.evidence || []),
+          { source: "inner-frame-page-change", value: partner.normalizedEventId }] });
+    });
+  }
   function canCoalesce(pending, event, kind) {
     if (!pending || pending.kind !== "value-change" || kind !== "value-change") return false;
     const previous = rawOf(pending.sources.at(-1)); const raw = rawOf(event);
@@ -238,7 +290,7 @@
     return controlKey(pending.sources[0]) === controlKey(event) &&
       sameKnownContext(pending.sources[0], event, pageKey) &&
       sameKnownContext(pending.sources[0], event, frameKey) &&
-      ["input", "change", "focusout"].includes(raw.inputSource || raw.type);
+      ["input", "change", "focusout", "validated"].includes(raw.inputSource || raw.type);
   }
   function normalizeRecording(recording, options = {}) {
     const useCache = !options.knowledgePacks;
@@ -287,7 +339,7 @@
     flush();
     const result = freeze({ schemaVersion: SCHEMA_VERSION,
       normalizationVersion: NORMALIZATION_VERSION,
-      recordingId: recording?.id, events: resolvePageContext(events) });
+      recordingId: recording?.id, events: linkTopFrameNavigation(resolvePageContext(events)) });
     if (useCache && recording && typeof recording === "object") cache.set(recording,
       { revision, result });
     return result;

@@ -2,8 +2,8 @@ const assert = require("assert");
 const fs = require("fs");
 const path = require("path");
 
-// Client controls that are not business steps. Only observed captions are listed; the other
-// registered languages are documented gaps rather than guessed translations.
+// Client controls that are not business steps. Captions come from the Business Central web
+// client's own language resources and from recordings, never from hand translation.
 const captions = require("../src/engine/bc-client-captions");
 const locales = require("../src/engine/language-registry").supported("document")
   .map(item => item.locale);
@@ -13,24 +13,57 @@ for (const [caption, category] of [["Stäng", "close"], ["Close", "close"], ["Di
   ["Show less", "display"], ["Tillbaka", "history"], ["Forward", "history"],
   ["Berätta vad du vill göra", "tellMe"], ["Tell me what you want to do", "tellMe"],
   ["Värdet i det här fältet är obligatoriskt", "fieldHint"],
-  ["Press Alt+I to get a suggestion for this field", "fieldHint"]]) {
+  ["Press Alt+I to get a suggestion for this field", "fieldHint"],
+  // Wordings of the current client resources.
+  ["The value for this field is required.", "fieldHint"],
+  ["This group contains one or more mandatory fields that are not filled in.", "fieldHint"],
+  ["Show the rest", "display"], ["Visa mer", "display"],
+  ["Tell me what you want to do. Quickly access actions, pages, reports, documentation, and apps and consulting services.", "tellMe"]]) {
   assert(captions.matches(category, caption), `${category}: ${caption}`);
 }
-for (const caption of ["Release", "Post...", "Statistics", "Close Order", "Show Document", ""]) {
+
+// Captions from the web client resources (platform 26.18.55014.0) in every other language.
+const resourceCaptions = {
+  "fr-FR": { close: "Fermer", scroll: "Défiler vers la droite", display: "Afficher le reste",
+    history: "Précédent", tellMe: "Dites-moi ce que vous voulez faire",
+    fieldHint: "La valeur de ce champ est obligatoire." },
+  "de-DE": { close: "Schließen", scroll: "Nach rechts verschieben", display: "Mehr anzeigen",
+    history: "Zurück", tellMe: "Was möchten Sie tun?",
+    fieldHint: "Diese Gruppe enthält mindestens ein Pflichtfeld, das nicht ausgefüllt wurde." },
+  "es-ES": { close: "Cerrar", scroll: "Desplazarse hacia la izquierda", display: "Mostrar menos",
+    history: "Atrás", tellMe: "Indique qué desea hacer.",
+    fieldHint: "Pulse Alt + I para generar una sugerencia para este campo." },
+  "da-DK": { close: "Luk", scroll: "Rul til højre", display: "Vis sekundære handlinger",
+    history: "Fremad", tellMe: "Fortæl mig, hvad du vil foretage dig",
+    fieldHint: "Værdien i dette felt er påkrævet." },
+  "fi-FI": { close: "Sulje", scroll: "Vieritä vasemmalle", display: "Näytä loput",
+    history: "Takaisin", tellMe: "Kerro, mitä haluat tehdä. Voit siirtyä nopeasti toimintoihin.",
+    fieldHint: "Luo ehdotus tälle kentälle painamalla Alt+I." },
+  "nb-NO": { close: "Lukk", scroll: "Bla til venstre", display: "Skjul sekundære handlinger",
+    history: "Tilbake", tellMe: "Fortell hva du vil gjøre",
+    fieldHint: "Denne gruppen inneholder én eller flere obligatoriske felt som ikke er fylt ut." }
+};
+for (const [locale, byCategory] of Object.entries(resourceCaptions)) {
+  for (const [category, caption] of Object.entries(byCategory)) {
+    assert(captions.matches(category, caption), `${locale} ${category}: ${caption}`);
+  }
+}
+
+// Business actions stay steps, including actions that share a word with a client control.
+for (const caption of ["Release", "Post...", "Statistics", "Close Order", "Show Document", "",
+  "Afvis", "Hylkää", "Verwerfen", "Descartar", "Forkast", "Ignorer", "Reject", "Avvisa",
+  "Luk ordre", "Auftrag schließen", "Fermer la commande", "Vis bilag", "Mostrar documento"]) {
   assert(!Object.keys(captions.CAPTIONS).some(category => captions.matches(category, caption)),
     `not a client control: ${caption}`);
 }
 
-// Every category has Swedish and English captions; the documented gaps match the catalog.
-for (const [category, byLocale] of Object.entries(captions.CAPTIONS)) {
-  assert(byLocale["sv-SE"]?.length && byLocale["en-US"]?.length, category);
-}
+// Every category covers every registered Business Central language, and the resource keys
+// behind the catalog are documented.
+assert.deepStrictEqual(captions.gaps(locales), []);
 const doc = fs.readFileSync(path.join(__dirname, "../docs/EVENT_STEP_GROUPING.md"), "utf8");
-const gaps = captions.gaps(locales);
-const gapLocales = [...new Set(gaps.map(gap => gap.locale))];
-const gapCategories = [...new Set(gaps.map(gap => gap.category))];
-for (const value of [...gapLocales, ...gapCategories]) {
-  assert(doc.includes(value), `documented gap: ${value}`);
+for (const key of ["CloseButton", "ScrollRight", "CommandBar_ShowWrappedItemsInContextMenu_Tooltip",
+  "HelpPaneBackButton", "ProductMenuBar_PageSearch", "MandatoryIcon_Tooltip", "26.18.55014.0"]) {
+  assert(doc.includes(key), `documented source: ${key}`);
 }
 
 // The engines use the shared catalog instead of their own caption lists.
