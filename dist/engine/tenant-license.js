@@ -7,6 +7,9 @@
   const KEY = "t9TenantLicenseV1";
   const CONSENT_KEY = "t9TenantLicenseNoticeV1";
   const NEGATIVE_CACHE_MS = 30 * 1000;
+  // An idle license service takes about 20 seconds to start; a shorter limit makes the first
+  // check of every browser session fail.
+  const CHECK_TIMEOUT_MS = 30 * 1000;
   function tenantFromUrl(value) {
     try {
       const url = new URL(value);
@@ -109,7 +112,7 @@
         response = await fetcher(endpoint.href, {
           method: "POST", credentials: "omit", redirect: "error",
           headers: { "Content-Type": "application/json" },
-          signal: AbortSignal.timeout(5000),
+          signal: AbortSignal.timeout(CHECK_TIMEOUT_MS),
           body: JSON.stringify({ installationId, tenantId, version })
         });
       } catch (cause) {
@@ -171,5 +174,5 @@
     return Object.freeze({ check, requestTrial, requireLicense, information,
       summaries, installationId, acceptNotice });
   }
-  return Object.freeze({ create, tenantFromUrl });
+  return Object.freeze({ create, tenantFromUrl, CHECK_TIMEOUT_MS });
 });

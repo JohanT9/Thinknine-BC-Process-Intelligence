@@ -8,6 +8,8 @@ function updateText(element, value) {
 }
 
 const withTimeout = globalThis.T9AsyncOperations.withTimeout;
+// A license check may wake the license service; leave room for the background's own limit.
+const LICENSE_CHECK_TIMEOUT_MS = globalThis.T9TenantLicense.CHECK_TIMEOUT_MS + 5000;
 let currentUiLocale = globalThis.T9UiI18n.DEFAULT_LOCALE;
 let defaultDocumentLanguage = "en-US";
 const t = key => globalThis.T9UiI18n.translate(key, currentUiLocale);
@@ -152,7 +154,10 @@ async function updateLicenseCard() {
       } else if (information.information?.requiresAcceptance) {
         needsConsent = true;
       } else {
-        const current = await send({ type: "T9_LICENSE_CHECK", tabId: tab.id, force: true }, 10000);
+        updateText($("licenseCardStatus"), t("license.cardChecking"));
+        $("licenseCard").setAttribute("aria-busy", "true");
+        const current = await send({ type: "T9_LICENSE_CHECK", tabId: tab.id, force: true },
+          LICENSE_CHECK_TIMEOUT_MS);
         if (!current?.ok) throw new Error(current?.error || t("technical.requestFailed"));
         license = current.license || null;
         if (license?.allowed !== true && signedIn) {
@@ -167,6 +172,7 @@ async function updateLicenseCard() {
     checkFailed = true;
     license = null;
   }
+  $("licenseCard").removeAttribute("aria-busy");
   renderLicenseCard(license, { tenantId, signedIn, checkFailed, needsConsent });
 }
 
@@ -185,7 +191,8 @@ async function prepareTenantLicense(tabId, { forceCheck = false } = {}) {
   let tenantResult = null;
   let checkError = null;
   try {
-    tenantResult = await send({ type: "T9_LICENSE_CHECK", tabId, force: forceCheck }, 10000);
+    tenantResult = await send({ type: "T9_LICENSE_CHECK", tabId, force: forceCheck },
+      LICENSE_CHECK_TIMEOUT_MS);
     if (!tenantResult?.ok) throw Object.assign(new Error(tenantResult?.error || t("technical.requestFailed")),
       { status: tenantResult?.status });
   } catch (error) { checkError = error; }
@@ -224,7 +231,8 @@ async function prepareTenantLicense(tabId, { forceCheck = false } = {}) {
       return { source: "tenant", license: trial.license, tenantId: tenantResult?.tenantId, account };
     } catch (error) {
       if (error.status === 409) {
-        const current = await send({ type: "T9_LICENSE_CHECK", tabId, force: true }, 10000);
+        const current = await send({ type: "T9_LICENSE_CHECK", tabId, force: true },
+          LICENSE_CHECK_TIMEOUT_MS);
         if (current?.ok && current.license?.allowed) {
           const registered = await send({ type: "T9_TENANT_USER_REGISTER", tabId }, 10000);
           if (!registered?.ok) throw new Error(registered?.error || t("license.userRegistrationFailed"));

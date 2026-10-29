@@ -87,3 +87,20 @@ main().catch(error => { console.error(error); process.exitCode = 1; });
     }
   }
 }
+
+// An idle license service needed 20 seconds to answer its first check; the check and every
+// view that waits for it must allow for that, and say what is happening meanwhile.
+{
+  const fs = require("node:fs");
+  assert.ok(license.CHECK_TIMEOUT_MS >= 25000);
+  for (const view of ["../src/ui/popup.js", "../src/ui/license-status.js"]) {
+    const source = fs.readFileSync(require.resolve(view), "utf8");
+    const checks = source.match(/type: "T9_LICENSE_CHECK"[^;]*;/g) || [];
+    assert.ok(checks.length > 0, view);
+    for (const check of checks) assert.match(check, /LICENSE_CHECK_TIMEOUT_MS/, `${view}: ${check}`);
+  }
+  for (const { locale } of globalThis.T9LanguageRegistry.supported("ui")) {
+    const value = globalThis.T9UiI18n.translate("license.cardChecking", locale);
+    assert.ok(value && value !== "license.cardChecking", locale);
+  }
+}

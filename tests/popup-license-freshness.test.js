@@ -11,7 +11,10 @@ function harness(responses) {
   const elements = new Map();
   const $ = id => {
     if (!elements.has(id)) elements.set(id, { textContent: "", disabled: false,
-      title: "", classes: {}, classList: { toggle(name, enabled) { this.owner.classes[name] = enabled; } } });
+      title: "", classes: {}, attributes: {},
+      setAttribute(name, value) { this.attributes[name] = String(value); },
+      removeAttribute(name) { delete this.attributes[name]; },
+      classList: { toggle(name, enabled) { this.owner.classes[name] = enabled; } } });
     const element = elements.get(id);
     element.classList.owner = element;
     return element;
@@ -20,16 +23,20 @@ function harness(responses) {
     $, t: key => key, updateText: (element, value) => { element.textContent = value; },
     formatLicenseExpiry: value => value ? String(value) : "—",
     currentTab: async () => ({ id: 17, url: "https://businesscentral.dynamics.com/20afb97e-bbca-4f0d-a72b-e4cbbcdd57fb/Sandbox" }),
-    send: async message => {
-      sent.push(message);
+    send: async (message, timeout) => {
+      // What the card says while the check is under way.
+      const card = elements.get("licenseCard");
+      sent.push({ ...message, timeout, statusDuring: elements.get("licenseCardStatus")?.textContent,
+        busyDuring: card?.attributes["aria-busy"] });
       if (responses.throwOn === message.type) throw new Error("offline");
       return responses[message.type];
     },
     globalThis: { T9TenantLicense: { tenantFromUrl: () => "20afb97e-bbca-4f0d-a72b-e4cbbcdd57fb" } }
   };
   const update = new Function("globalThis", "currentTab", "send", "t", "updateText", "formatLicenseExpiry", "$",
-    `${functions}; return updateLicenseCard;`)(sandbox.globalThis, sandbox.currentTab,
-    sandbox.send, sandbox.t, sandbox.updateText, sandbox.formatLicenseExpiry, sandbox.$);
+    "LICENSE_CHECK_TIMEOUT_MS", `${functions}; return updateLicenseCard;`)(sandbox.globalThis,
+    sandbox.currentTab, sandbox.send, sandbox.t, sandbox.updateText, sandbox.formatLicenseExpiry, sandbox.$,
+    35000);
   return { update, sent, elements };
 }
 
@@ -45,6 +52,13 @@ async function main() {
   await checked.update();
   assert.ok(checked.sent.some(message => message.type === "T9_LICENSE_CHECK" && message.force === true),
     "opening the popup forces a current server check");
+  // The first check of a session may wake the license service; the card says it is checking
+  // and waits long enough instead of reporting a failure after a few seconds.
+  const check = checked.sent.find(message => message.type === "T9_LICENSE_CHECK");
+  assert.equal(check.timeout, 35000);
+  assert.equal(check.statusDuring, "license.cardChecking");
+  assert.equal(check.busyDuring, "true");
+  assert.equal(checked.elements.get("licenseCard").attributes["aria-busy"], undefined);
   assert.ok(!checked.sent.some(message => message.type === "T9_LICENSE_SUMMARY"),
     "a cached active summary is not used to present the card");
   assert.equal(checked.elements.get("licenseCard").classes.active, false);
@@ -92,6 +106,8 @@ async function main() {
   assert.equal(offline.elements.get("licenseCardType").textContent, "—");
   assert.equal(offline.elements.get("licenseCardMeta").hidden, true);
   assert.equal(offline.elements.get("licenseCardStatus").textContent, "license.cardCheckFailed");
+  assert.equal(offline.elements.get("licenseCard").attributes["aria-busy"], undefined,
+    "a failed check is no longer shown as busy");
 
   const consent = harness({
     T9_LICENSE_INFORMATION: { ok: true, information: { requiresAcceptance: true } },

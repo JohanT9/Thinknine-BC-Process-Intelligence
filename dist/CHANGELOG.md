@@ -9,6 +9,7 @@
 - Show the message Business Central answered with as the step's result, for example "Status must be equal to Open …", instead of "The dialog closed". A message saying that something must be different or cannot be done is no longer described as a confirmation, even when it mentions Released or Posted.
 - The capture quality importer now also pseudonymizes the company name and the record name in page titles. The corpus gains its first recording from real Business Central.
 - Translate record selections, opened lists and Tell Me searches into every document language. Previously Swedish words remained, for example "Wählen Sie posten" or "Sök efter".
+- The first license check of a browser session no longer fails with "The license could not be verified". The license service needs about 20 seconds to start after a period without use, but the check gave up after 5. It now waits up to 30 seconds, and the license card says that the license is being checked. Starting a recording waited for the same check and now succeeds too.
 
 ## 4.7.206
 - Record a choice from a field suggestion list as one step with the chosen value. Previously the typed characters, the click on the suggestion and the final value became three steps.
