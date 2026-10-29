@@ -107,6 +107,24 @@ const german = JSON.parse(JSON.stringify(altShortcuts.events)
 assert.strictEqual(replay(german, { documentLanguage: "sv-SE" }).tasks[0].instruction,
   "Sök efter __ink ord__ och öppna **Inköpsorder**.");
 
+// Every corpus recording yields a valid process model, as the review needs to open with its
+// screenshots: a merged step must reference semantic actions that exist.
+const processAdapter = require("../src/engine/canonical-process-adapter");
+const canonicalRecording = require("../src/engine/canonical-recording");
+for (const item of quality.loadCorpus()) {
+  const replayed = replay(item.events, { documentLanguage: "sv-SE" });
+  const session = { id: item.id, name: item.id, settings: { documentLanguage: "sv-SE" } };
+  const processModel = processAdapter.normalizeProcess({
+    recording: canonicalRecording.fromLegacyProjection({ id: item.id, schemaVersion: 1 },
+      session, replayed.sourceEvents),
+    interpretation: replayed.interpretation, normalizedEvents: replayed.normalized.events,
+    stepGroups: replayed.grouped.groups,
+    normalizerVersion: replayed.normalized.events[0]?.normalizationVersion,
+    knowledgeReleaseId: "capture-quality" });
+  assert(processModel.ok, `${item.id}: ${JSON.stringify(processModel.diagnostics?.filter(value =>
+    value.severity === "error"))}`);
+}
+
 // A worse result is reported as a regression.
 const worse = { recordings: result.recordings.map(item => item.id === lab.id
   ? { ...item, correct: 9, duplicates: 1 } : item) };

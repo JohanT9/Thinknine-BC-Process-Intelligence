@@ -436,7 +436,7 @@
       ruleId: config.ruleId,
       priority: config.priority,
       match(context) {
-        return config.match(context.interactions[context.index]);
+        return config.match(context.interactions[context.index], context);
       },
       consolidate(context) {
         const value = context.interactions[context.index];
@@ -867,14 +867,16 @@
       if (value?.taskType !== "SearchAndOpenPage") return null;
       const raw = value.semanticActionModel?.rawInteractions;
       if (!Array.isArray(raw) || raw.length < 3) return null;
+      // Tell me is opened by its button or its shortcut, and its result is opened with Enter
+      // or chosen with the mouse.
       const searchIndex = raw.findIndex(item =>
-        item?.taskType === "SearchAndOpenPage");
+        ["SearchAndOpenPage", "PressShortcut"].includes(item?.taskType));
       const queryIndex = raw.findIndex((item, index) => index > searchIndex &&
         ["EnterFieldValue", "ChangeField"].includes(item?.taskType) &&
         Boolean(meaningfulValue(item)));
       const resultIndex = raw.findIndex((item, index) => index > queryIndex &&
-        item?.taskType === "OpenPage" && Boolean(text(item.actionCaption ||
-          item.selectedCaption || item.pageCaption)));
+        ["OpenPage", "Select", "SelectRecord"].includes(item?.taskType) &&
+        Boolean(text(item.actionCaption || item.selectedCaption || item.pageCaption)));
       return searchIndex >= 0 && queryIndex > searchIndex &&
         resultIndex > queryIndex ? { raw, searchIndex, queryIndex, resultIndex } : null;
     };
@@ -1350,6 +1352,7 @@
   const LOCATION = /lagerställe|location(?: code)?|emplacement(?: code)?|lagerort|ubicaci[oó]n(?: code)?|lokation(?:skode)?|sijainti|varastopaikka|lokasjon(?:skode)?/iu;
   const DIMENSION = /dimensi[oó]n|dimensjon|dimensionsvärde|dimension value|valeur de dimension|dimensionswert|valor de dimensión|dimensionsværdi|dimensio(?:n|arvo|n arvo)?/iu;
 
+  const SEARCH_AND_OPEN_RULE = searchAndOpenWithRedundantFieldRule();
   const BUILT_IN_RULES = deepFreeze([
     successAcknowledgementRule(),
     fieldDialogConfirmationRule(),
@@ -1362,7 +1365,7 @@
     genericMenuPathRule(),
     closeDialogRule(),
     recordedCompositeSearchAndOpenRule(),
-    searchAndOpenWithRedundantFieldRule(),
+    SEARCH_AND_OPEN_RULE,
     selectionRule({ ruleId: "customer-selection", priority: 100,
       actionType: "SelectCustomer", fieldPattern: CUSTOMER, preserveFieldCaption: true,
       verb: "Välj kund", targetField: "Kund", requireValue: true }),
@@ -1547,8 +1550,10 @@
       } }),
     // Above every caption-based rule: the target of an undeclared shortcut is only where the
     // focus was, so its text says nothing about what the shortcut did.
+    // A shortcut that opened Tell me, followed by a search and its result, is that search.
     singleRule({ ruleId: "undeclared-keyboard-shortcut", priority: 200,
-      match: value => value?.taskType === "PressShortcut" && Boolean(text(value?.shortcut)),
+      match: (value, context) => value?.taskType === "PressShortcut" &&
+        Boolean(text(value?.shortcut)) && !SEARCH_AND_OPEN_RULE.match(context),
       actionType: () => "PressShortcut",
       display: value => `Tryck på **${text(value.shortcut)}**.` }),
     singleRule({ ruleId: "generic-captioned-action", priority: 5,
