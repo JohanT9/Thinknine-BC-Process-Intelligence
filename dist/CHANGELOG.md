@@ -1,4 +1,4 @@
-## Unreleased
+## 4.7.212
 - License administration: "Restart trial (30 days)" keeps the license and makes it an active trial license for 30 days from today. The full reset, which deletes the license so that the tenant can request a new trial, is now named "Delete and allow a new trial license". In 4.7.211 it was named "Reset trial period", which did not say that the license is deleted.
 
 ## 4.7.211
