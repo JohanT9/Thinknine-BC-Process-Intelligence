@@ -79,7 +79,17 @@ async function main() {
   assert.equal(blocked.allowed, false);
   assert.equal(blocked.trialAvailable, true);
   await assert.rejects(client.requireLicense(url), /saknar en aktiv/);
+  // A blocked result is never used in place of the service beyond the short negative cache:
+  // a license activated again lets the next recording start, and a forced check sees it at once.
   allowed = true;
+  assert.equal((await client.check(url, { force: true })).allowed, true);
+  allowed = false;
+  await client.check(url, { force: true });
+  time += 30001;
+  allowed = true;
+  const reactivated = await client.requireLicense(url);
+  assert.equal(reactivated.allowed, true);
+  assert.equal(reactivated.stale, undefined, "the reactivation was read from the service");
   assert.equal((await client.requestTrial(url)).allowed, true);
   assert.equal((await client.summaries())[0].licenseType, "trial");
   // Starting a recording does not wait for a check the popup has already begun.
