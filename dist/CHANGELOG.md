@@ -1,3 +1,6 @@
+## 4.7.211
+- License administration (licensing service): a redesigned admin view with the same functions. It has tabs for overview, licenses, usage, event log and installations. Customer and consultant licenses are in one searchable list with status filters and relative dates. Editing happens in dialogs, deleting and resetting a trial are confirmed by typing the tenant ID, and the view has a dark theme by default and a light option, as in the extension. The service must be deployed separately before the change is visible.
+
 ## 4.7.210
 - Decide in one place which actions become steps. Knowledge packs now only describe a step and can no longer merge steps or make one disappear. Previously, for example, Alt+N on a purchase order was hidden after it was typed as choosing a vendor. All reference scenarios, in every language, produce the same steps as before. Exports record whether the older fallback interpretation was used, so that it can be retired.
 - Events are no longer lost when the browser stops the extension's background process during a recording. The page keeps each event until it has been saved and resends it if needed, in the original order. A missing event is shown as a warning while recording ("Some events have not arrived") and listed in the export's diagnostics.
