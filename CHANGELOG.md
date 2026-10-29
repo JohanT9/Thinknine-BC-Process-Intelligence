@@ -1,4 +1,4 @@
-## Unreleased
+## 4.7.211
 - License administration (licensing service): a redesigned admin view with the same functions. It has tabs for overview, licenses, usage, event log and installations. Customer and consultant licenses are in one searchable list with status filters and relative dates. Editing happens in dialogs, deleting and resetting a trial are confirmed by typing the tenant ID, and the view has a dark theme by default and a light option, as in the extension. The service must be deployed separately before the change is visible.
 
 ## 4.7.210
