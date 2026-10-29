@@ -1,3 +1,3 @@
 BC Process Studio
-Version 4.7.206
+Version 4.7.207
 Edge development folder: dist
