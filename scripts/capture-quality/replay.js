@@ -42,7 +42,8 @@ function replay(events, { id = "capture-quality", documentLanguage = "en-US",
   normalizedEvents: normalized.events, stepGroups: grouped.groups,
   supportingEvents: grouped.supportingEvents, groupingDiagnostics: grouped.diagnostics,
   imagePaths: {}, knowledgePacks });
-  return { normalized, grouped, tasks: interpreted.businessTasks };
+  return { normalized, grouped, tasks: interpreted.businessTasks, interpretation: interpreted,
+    sourceEvents };
 }
 
 module.exports = { DERIVED_FIELDS, enabledKnowledgePacks, rawEvent, replay };

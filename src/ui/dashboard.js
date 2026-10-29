@@ -3231,7 +3231,8 @@ async function prepareSessionModel(session, options = {}) {
       }, loadedKnowledgeRelease?.releaseId) })) : [];
   unmatchedKnowledgeItems = model.unmatchedKnowledgeItems;
   const externalKnowledgeTasks = model.businessTasks.map((task, index) => {
-    const step = canonicalProcess?.process.steps[index];
+    // An invalid process model leaves the steps without its references; it never stops the review.
+    const step = canonicalProcess?.ok ? canonicalProcess.process.steps[index] : undefined;
     const localResolution = canonicalKnowledgeResolutions[index];
     return { ...task,
       knowledgeObjectRef: task.knowledgeObjectRef?.objectId
@@ -5585,7 +5586,9 @@ function renderReviewStepNavigation(tasks, presentations) {
   );
   navigation.innerHTML = filteredTasks.map(task => {
     const index = tasks.indexOf(task);
-    const title = String(presentations.get(task.taskId)?.text || task.description || "Steg")
+    // Without a presentation the stored text still carries its emphasis markers.
+    const title = String(presentations.get(task.taskId)?.text ||
+      String(task.description || "").replace(/\*\*|__/gu, "") || "Steg")
       .replace(/\s+/gu, " ").trim();
     const state = reviewStepStatusLabel(task);
     const stateCode = task.approved ? "approved"
