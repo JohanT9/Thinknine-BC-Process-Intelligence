@@ -1,4 +1,4 @@
-## Unreleased
+## 4.7.208
 - Open the review of a recording in which Tell me was opened with Alt+Q and a result was chosen with the mouse. In 4.7.207 the merged search step referred to a step that did not exist, so the review showed the stored text without screenshots and reported that screenshots or process context could not be loaded. The review now also opens when its process model is incomplete, and the step list never shows the text formatting marks (**).
 
 ## 4.7.207
