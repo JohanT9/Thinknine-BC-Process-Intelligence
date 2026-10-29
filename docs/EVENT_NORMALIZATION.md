@@ -2,7 +2,7 @@
 
 ## Boundary and version
 
-Event Normalization 2.9.0 converts persisted browser mechanics plus BC UI
+Event Normalization 2.10.0 converts persisted browser mechanics plus BC UI
 Identification into deterministic, renderer-neutral interactions:
 
 ```text
@@ -91,6 +91,15 @@ Dialog presence transitions are captured and normalized separately as
 transition evidence; MutationObserver activity alone is not a business action.
 Captured `bc-error` evidence becomes `error-outcome`; sensitive diagnostic
 details remain only in their dedicated raw/bug-report evidence model.
+
+In the Business Central web client the page runs in an inner frame whose first heading is the
+app bar's company name, while the top frame's title names the page. The recorder skips a
+heading equal to the company name, and normalization drops a page caption equal to the
+recorded `companyName`. An inner-frame event of a page the top frame titled (the same page
+ID) takes the top frame's caption (`contextResolution.source: "top-frame-title"`). The top
+frame sees a page change without the user action that caused it. Its navigation joins the
+inner frame's navigation to the same page ID within 1.5 seconds, and so that action (evidence
+`inner-frame-page-change`).
 
 Unknown mechanics remain `unknown` with their raw source identity and evidence.
 No wording, intent, step boundary, or business outcome is generated here.

@@ -15,7 +15,7 @@
   const SCHEMA_VERSION = 1;
   const GROUPING_VERSION = "1.29.0";
   const CAPTURE_PACKET_VERSION = "1.6.0";
-  const RESULT_VERIFICATION_VERSION = "1.5.0";
+  const RESULT_VERIFICATION_VERSION = "1.6.0";
   const cache = new WeakMap();
   const clone = value => value == null ? value : JSON.parse(JSON.stringify(value));
   function freeze(value) { if (!value || typeof value !== "object" || Object.isFrozen(value)) return value; Object.values(value).forEach(freeze); return Object.freeze(value); }
@@ -127,10 +127,25 @@
   }
   // A dialog whose text is not a question, such as "Status must be equal to Open …", is a
   // message Business Central showed in response; a question asks the user to confirm.
+  // A dialog the user typed in while it was open, such as Tell me, asks for input; it is not a
+  // message, whatever its text says. Set for the recording being grouped.
+  let inputDialogIds = new Set();
+  function dialogsTakingInput(events) {
+    const ids = new Set();
+    events.forEach((event, index) => {
+      if (event.kind !== "dialog-open") return;
+      for (const later of events.slice(index + 1)) {
+        if (later.kind === "dialog-close" && later.interactionId &&
+            later.interactionId === event.interactionId) break;
+        if (later.kind === "value-change") { ids.add(event.normalizedEventId); break; }
+      }
+    });
+    return ids;
+  }
   function isMessageDialog(event) {
     const caption = observedCaption(event, "control").trim();
     return event.kind === "dialog-open" && caption.length > 0 && !/[?？]$/u.test(caption) &&
-      !isCompletionMessage(caption);
+      !isCompletionMessage(caption) && !inputDialogIds.has(event.normalizedEventId);
   }
   function outcomeDescription(event) {
     const pageCaption = observedCaption(event, "page");
@@ -443,6 +458,7 @@
   }
   function group(normalizedRecording) {
     if (cache.has(normalizedRecording)) return cache.get(normalizedRecording);
+    inputDialogIds = dialogsTakingInput(normalizedRecording.events || []);
     const groups = []; const guidanceEvents = []; const supportingEvents = [];
     const assignments = new Map();
     // Interactions in which Business Central visibly responded: a dialog, page or message.

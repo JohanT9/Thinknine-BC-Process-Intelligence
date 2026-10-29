@@ -53,6 +53,8 @@ the same change so the improvement is kept.
   random pseudonyms of the same shape. A typed fragment stays a prefix of the chosen value, so
   type-ahead behaves as recorded. Words that are also control captions (for example an
   option such as Item) are kept.
+- A result chosen in Tell me after a search, such as "Purchase Orders Lists", names a page of
+  Business Central and is kept.
 - The company name and the record name in page titles (after "∙") are pseudonymized wherever
   they occur.
 - URLs keep only the page number. E-mail addresses and the company name are removed, and

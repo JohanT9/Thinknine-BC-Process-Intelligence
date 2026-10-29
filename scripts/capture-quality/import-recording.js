@@ -13,6 +13,7 @@ const path = require("path");
 const zlib = require("zlib");
 const crypto = require("crypto");
 const { rawEvent, replay } = require("./replay");
+const captions = require("../../src/engine/bc-client-captions");
 const { corpusDir } = require("./run");
 
 function readZip(file) {
@@ -71,9 +72,27 @@ const wordsOf = text => String(text ?? "").match(TOKEN) || [];
 // Words of field values and chosen records. Words that are also control captions (an option
 // such as Item or Released) are Business Central captions, not customer data, and a typed
 // fragment of a longer word is handled as a prefix of that word.
+// Tell me lists Business Central's pages, reports and actions, not records: the result chosen
+// after a search in it, such as "Purchase Orders Lists", is a caption.
+function tellMeResults(events) {
+  const results = new Set();
+  let searching = false;
+  for (const event of events) {
+    const caption = event.fieldName || event.accessibleName || event.label || "";
+    if (event.type === "field-change" && captions.matches("tellMe", caption)) searching = true;
+    else if (searching && (event.selectedCaption || DATA_ROLES.has(event.role))) {
+      results.add(event);
+      searching = false;
+    } else if (["navigation", "page-state", "dialog-close"].includes(event.type)) searching = false;
+  }
+  return results;
+}
+
 function collectDataWords(events) {
   const values = [];
+  const results = tellMeResults(events);
   for (const event of events) {
+    if (results.has(event)) continue;
     DATA_FIELDS.forEach(field => values.push(event[field]));
     // Business Central can show the company name as the page caption, so its words go too.
     COMPANY_FIELDS.forEach(field => values.push(event[field]));

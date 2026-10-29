@@ -763,31 +763,61 @@
   function searchAndOpenWithRedundantFieldRule() {
     const searchField = value => text(value?.searchFieldCaption ||
       value?.fieldCaption).replace(/[.:]+$/u, "").toLocaleLowerCase();
-    const isSearchField = value => !value ||
+    const isSearchField = value => !value || captions.matches("tellMe", value) ||
       /sökfält|search field|sök|search|berätta|tell me/iu.test(value);
     // A recorded Tell Me result carries its category (Lists) in one of its captions; a row
     // chosen with Enter keeps the bare caption as its selection.
+    const CATEGORY = /\s+(?:listor|lists)\s*[\uE000-\uF8FF]*$/iu;
     const resultCaptionOf = value => {
-      const captions = [value?.selectedCaption, value?.actionCaption, value?.fieldCaption]
+      const candidates = [value?.selectedCaption, value?.actionCaption, value?.fieldCaption]
         .map(text).filter(Boolean);
-      return captions.find(caption =>
-        /\s+(?:listor|lists)\s*[-]*$/iu.test(caption)) || captions[0] || "";
+      return candidates.find(caption => CATEGORY.test(caption)) || candidates[0] || "";
+    };
+    const clean = value => text(value).replace(/[\uE000-\uF8FF]/gu, "").replace(/\s+/gu, " ").trim();
+    // The page a chosen result opened, as the top frame titled it.
+    const openedPage = value => {
+      const verification = value?.resultVerification || value?.capturePacket?.resultVerification;
+      return verification?.primaryOutcome === "navigation"
+        ? clean([...(verification.outcomes || [])].reverse()
+          .find(outcome => outcome.kind === "navigation")?.pageCaption) : "";
+    };
+    // The words a result and the page it opened share name the page in any language, without
+    // the result's category or the title's environment.
+    const sharedWords = (left, right) => {
+      const a = clean(left).split(" "); const b = clean(right).split(" ");
+      let count = 0;
+      while (count < a.length && count < b.length &&
+        a[count].toLocaleLowerCase() === b[count].toLocaleLowerCase()) count += 1;
+      return a.slice(0, count).join(" ");
+    };
+    // Tell me opened by its shortcut starts the same sequence as a click on its button.
+    const opensSearch = (current, next) => current?.taskType === "SearchAndOpenPage" ||
+      (current?.taskType === "PressShortcut" &&
+        captions.matches("tellMe", text(next?.searchFieldCaption || next?.fieldCaption)));
+    const sequence = context => {
+      let inputEnd = context.index + 1;
+      while (inputEnd + 1 < context.interactions.length &&
+          ["EnterFieldValue", "ChangeField"].includes(
+            context.interactions[inputEnd + 1]?.taskType) &&
+          isSearchField(searchField(context.interactions[inputEnd + 1]))) {
+        inputEnd += 1;
+      }
+      const candidateResult = context.interactions[inputEnd + 1];
+      const resultCaption = clean(resultCaptionOf(candidateResult));
+      const category = CATEGORY.test(resultCaption);
+      const opened = openedPage(candidateResult);
+      const result = category ? resultCaption.replace(CATEGORY, "")
+        : opened && sharedWords(resultCaption, opened) || "";
+      return { inputEnd, candidateResult, result, category };
     };
     const rule = {
       ruleId: "search-and-open-with-redundant-field",
       priority: 98,
       match(context) {
         const current = context.interactions[context.index];
-        let inputEnd = context.index + 1;
-        while (inputEnd + 1 < context.interactions.length &&
-            ["EnterFieldValue", "ChangeField"].includes(
-              context.interactions[inputEnd + 1]?.taskType) &&
-            isSearchField(searchField(context.interactions[inputEnd + 1]))) {
-          inputEnd += 1;
-        }
+        const { inputEnd, candidateResult, result } = sequence(context);
         const next = context.interactions[inputEnd];
-        const candidateResult = context.interactions[inputEnd + 1];
-        if (current?.taskType !== "SearchAndOpenPage" ||
+        if (!opensSearch(current, context.interactions[context.index + 1]) ||
             !["EnterFieldValue", "ChangeField"].includes(next?.taskType)) {
           return false;
         }
@@ -795,9 +825,7 @@
         const nextValue = meaningfulValue(next);
         const currentField = searchField(current);
         const nextField = searchField(next);
-        const resultCaption = resultCaptionOf(candidateResult);
-        const hasRecordedResult = Boolean(candidateResult &&
-          /\s+(?:listor|lists)\s*[\uE000-\uF8FF]*$/iu.test(resultCaption));
+        const hasRecordedResult = Boolean(candidateResult && result);
         const hasResult = hasRecordedResult || Boolean(text(current.resultCaption ||
           current.selectedCaption));
         return Boolean(nextValue && hasResult &&
@@ -805,17 +833,8 @@
           isSearchField(currentField) && isSearchField(nextField));
       },
       consolidate(context) {
-        let inputEnd = context.index + 1;
-        while (inputEnd + 1 < context.interactions.length &&
-            ["EnterFieldValue", "ChangeField"].includes(
-              context.interactions[inputEnd + 1]?.taskType) &&
-            isSearchField(searchField(context.interactions[inputEnd + 1]))) {
-          inputEnd += 1;
-        }
-        const candidateResult = context.interactions[inputEnd + 1];
-        const resultCaption = resultCaptionOf(candidateResult)
-          .replace(/[\uE000-\uF8FF]/gu, "").replace(/\s+/gu, " ").trim();
-        const hasRecordedResult = /\s+(?:listor|lists)$/iu.test(resultCaption);
+        const { inputEnd, result: recordedResult, category } = sequence(context);
+        const hasRecordedResult = Boolean(recordedResult);
         const values = context.interactions.slice(context.index,
           hasRecordedResult ? inputEnd + 2 : inputEnd + 1);
         const current = values[0];
@@ -823,13 +842,13 @@
         const search = text(current.searchCaption || current.actionCaption || "Sök");
         const field = text(current.searchFieldCaption || current.fieldCaption ||
           values[1].fieldCaption || "sökfältet");
-        const result = hasRecordedResult
-          ? resultCaption.replace(/\s+(?:listor|lists)$/iu, "")
+        const result = hasRecordedResult ? recordedResult
           : text(current.resultCaption || current.selectedCaption);
         return { consumed: values.length, action: action(rule, values, {
           actionType: "SearchAndOpenPage",
           displayText: hasRecordedResult
-            ? "Sök efter __" + selectedValue + "__ och öppna listan **" + result + "**."
+            ? "Sök efter __" + selectedValue + "__ och öppna " + (category ? "listan " : "") +
+              "**" + result + "**."
             : "Välj **" + search + "**, ange __" + selectedValue + "__ i **" +
               field + "**" + (result ? " och välj **" + result + "**" : "") + ".",
           selectedValue, targetField: field,
@@ -1615,7 +1634,9 @@
       selectedValue: selected,
       uiHierarchy: clone(group?.uiHierarchy || primary.uiHierarchy || []),
       pageContext: clone(page), pageIdentification: clone(page),
-      fieldContext: clone(group.fieldContext || primary.focusedFieldContext || null),
+      // The focus after a shortcut is part of what it did, not the field it acted on.
+      fieldContext: shortcut ? null
+        : clone(group.fieldContext || primary.focusedFieldContext || null),
       pageIdentity: page.pageIdentity || null,
       pageObjectId: page.pageObjectId || null,
       pageId: page.legacyPageId || page.pageId || page.id || "",

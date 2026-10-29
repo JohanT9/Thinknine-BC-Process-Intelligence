@@ -138,8 +138,9 @@ assert.strictEqual(undeclared.category, "interaction");
 assert.notStrictEqual(undeclared.interactionId, deleteLine.interactionId);
 assert.deepStrictEqual(undeclared.shortcutEvidence.samples.map(item => item.title), ["Statistics (F7)"]);
 assert(undeclared.shortcutEvidence.declaredShortcuts >= 2);
-// Arrow keys only move the selection.
+// Arrow keys only move the selection, and a space in a text field is typing.
 assert(!keys.some(item => /^Arrow/u.test(item.key || "")));
+assert(!keys.some(item => item.type === "key" && item.key === " "));
 // Values the client reformats are recorded as shown, with the typed text beside them.
 for (const [field, value, entered] of [["Order Date", "28.10.2026", "t"],
   ["Unit Price Excl. VAT", "1,200.00", "1200"]]) {

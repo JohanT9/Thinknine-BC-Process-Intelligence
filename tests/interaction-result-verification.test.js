@@ -26,7 +26,7 @@ const sourceError = { id: "canonical:error", recordingId: "result-verification",
 const [errorKind, errorReason] = normalization.classify(sourceError);
 assert.strictEqual(errorKind, "error-outcome");
 assert.strictEqual(errorReason, "observed-business-central-error");
-assert.strictEqual(normalization.NORMALIZATION_VERSION, "2.9.0");
+assert.strictEqual(normalization.NORMALIZATION_VERSION, "2.10.0");
 assert.strictEqual(sourceError.raw.copiedDetails, "Sensitive diagnostic details");
 
 const grouped = grouping.group({ recordingId: "result-verification", events: [
@@ -42,7 +42,7 @@ const grouped = grouping.group({ recordingId: "result-verification", events: [
 
 assert.strictEqual(grouped.groupingVersion, grouping.GROUPING_VERSION);
 assert.strictEqual(grouping.CAPTURE_PACKET_VERSION, "1.6.0");
-assert.strictEqual(grouping.RESULT_VERIFICATION_VERSION, "1.5.0");
+assert.strictEqual(grouping.RESULT_VERIFICATION_VERSION, "1.6.0");
 assert.strictEqual(grouped.groups.length, 1,
   "an action and all its immediate outcomes form one packet");
 const verification = grouped.groups[0].capturePacket.resultVerification;
@@ -149,5 +149,22 @@ for (const completion of ["The order was posted.", "Sales order 1001 has been re
   "Ordern har bokförts.", "Der Auftrag wurde gebucht.", "No. 1001 was posted."]) {
   assert.strictEqual(grouping.isCompletionMessage(completion), true, completion);
 }
+
+// A dialog the user types in, such as Tell me, is not a message whatever its text; one only
+// answered with a button is.
+const dialogWith = typing => grouping.group({ recordingId: "result-verification", events: [
+  event("open", "activation", { interactionId: "interaction:open",
+    interactionIds: ["interaction:open"], actionIdentification: { caption: "Search" } }),
+  event("dialog", "dialog-open", { interactionId: "interaction:open",
+    interactionIds: ["interaction:open"],
+    controlIdentification: { caption: "Not sure what to search for? Explore pages" } }),
+  ...(typing ? [event("typed", "value-change", { interactionId: "interaction:typed",
+    interactionIds: ["interaction:typed"], controlIdentification: { caption: "Tell me" },
+    value: { normalized: "sales" } })] : []),
+  event("closed", "dialog-close", { interactionId: "interaction:open",
+    interactionIds: ["interaction:open"] })
+] }).groups[0].capturePacket.resultVerification.summary;
+assert.doesNotMatch(dialogWith(true), /visade meddelandet/u);
+assert.match(dialogWith(false), /^Business Central visade meddelandet “Not sure what to search for/u);
 
 console.log("Interaction result verification tests passed.");

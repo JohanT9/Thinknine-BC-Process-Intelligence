@@ -241,6 +241,7 @@ they group the same way as the mouse:
   `aria-keyshortcuts`, `accesskey`, `title`, `aria-label` or `aria-description` mentions
   the key. Only those command attributes are read, never field values or rows. The evidence
   shows how the client marks a shortcut that the recorder could not name.
+- Space in a text field is typing and is not recorded as a key.
 - Enter or Space on a button, link or menu item is one click, marked `inputSource: "keyboard"`.
   It is not recorded as both a key and a click.
 - Enter on a list row, or in a search or type-ahead field with a highlighted suggestion, is
@@ -267,13 +268,25 @@ own language. A message that something must be different or cannot be done is ne
 completion, even when it names a completed state, as in "Status must be equal to Open …
 Current value is Released". The refusal phrases are listed for every registered language in
 `event-step-grouping.js`. The recorder cannot tell an error dialog from an information
-dialog in documentation recordings, so the wording stays neutral.
+dialog in documentation recordings, so the wording stays neutral. A dialog in which the user
+typed a value before it closed, such as Tell me, asks for input and is never a message,
+whatever its text says.
+
+Tell me opened with its shortcut (Alt+Q) starts the same sequence as a click on its button:
+the shortcut, the search typed in its field (recognized by the client's caption in every
+registered language) and the chosen result become one step, "Search for __…__ and open
+**…**". The result is named without its category: "Lists" or "Listor" is removed, and in
+other client languages the result keeps the words it shares with the title of the page it
+opened. Because the client does not declare Alt+N either, "Press **Alt+N**." is documented
+by its result, the page it opened. The focus that lands in a field of that page is part of the
+result and does not make the shortcut a field step.
 
 Business Central's own language resources do not show how the web client renders shortcuts
-in the page. A recording from Business Central 26 (SaaS, Swedish) showed that no control on a
-purchase order declared Ctrl+Delete in either form. That recording is in the capture quality
-corpus as `bc-purchase-order-ctrl-delete`. Whether action shortcuts such as F9 are declared
-is not yet known; `shortcutEvidence` in the next recordings will show it. `npm run capture:lab -- keyboard-navigation` exercises all of
+in the page. Recordings from Business Central 26 (SaaS, Swedish) showed that no control
+declared Ctrl+Delete, Alt+Q or Alt+N in any form: `shortcutEvidence` found no
+`aria-keyshortcuts`, no `accesskey` and no button text naming the key. Both recordings
+are in the capture quality corpus, as `bc-purchase-order-ctrl-delete` and
+`bc-purchase-order-alt-shortcuts`. Whether F9 is declared is not yet known. `npm run capture:lab -- keyboard-navigation` exercises all of
 the above. It uses the content script in headless Edge on a Business Central-shaped page, and
 `tests/capture-lab-corpus.test.js` checks the captured events and the steps in every document
 language.

@@ -82,6 +82,31 @@ for (const locale of ["en-US", "fr-FR", "de-DE", "es-ES", "da-DK", "fi-FI", "nb-
     .includes("Status måste vara lika med Öppen"), locale);
 }
 
+// Real Business Central, where the page runs in an inner frame titled by the company: Tell me
+// opened with Alt+Q, a search and a result chosen with the mouse are one step, and Alt+N is
+// documented by the page it opened. The search box is no message.
+const altShortcuts = quality.loadCorpus().find(item => item.id === "bc-purchase-order-alt-shortcuts");
+const searched = replay(altShortcuts.events, { documentLanguage: "sv-SE" }).tasks;
+assert.deepStrictEqual(searched.map(task => task.instruction), [
+  "Sök efter __ink ord__ och öppna listan **Inköpsorder**.", "Tryck på **Alt+N**."]);
+assert.deepStrictEqual(searched.map(task => task.resultVerification.summary), [
+  "Sidan Inköpsorder (RDG) visas nu.", "Sidan Ny - Inköpsorder (RDG) visas nu."]);
+assert(!searched.some(task => /Rhloqw/u.test(task.instruction + task.resultVerification.summary)),
+  "the company is not taken for a page");
+for (const locale of ["en-US", "fr-FR", "de-DE", "es-ES", "da-DK", "fi-FI", "nb-NO"]) {
+  for (const task of searched) {
+    const translated = languageModule.translateInstruction(task.instruction, locale);
+    assert(!/\b(?:Sök efter|öppna|listan|Tryck på)\b/u.test(translated), `${locale}: ${translated}`);
+  }
+}
+// In a client language whose Tell me field and result category are not Swedish or English,
+// the result is named by the words it shares with the page it opened.
+const german = JSON.parse(JSON.stringify(altShortcuts.events)
+  .replaceAll("Berätta vad du vill göra.", "Was möchten Sie tun?")
+  .replaceAll("Inköpsorder Listor", "Inköpsorder Listen"));
+assert.strictEqual(replay(german, { documentLanguage: "sv-SE" }).tasks[0].instruction,
+  "Sök efter __ink ord__ och öppna **Inköpsorder**.");
+
 // A worse result is reported as a regression.
 const worse = { recordings: result.recordings.map(item => item.id === lab.id
   ? { ...item, correct: 9, duplicates: 1 } : item) };
@@ -125,6 +150,15 @@ const typed = entry.events.filter(event => event.type === "field-change" &&
   event.fieldName === "Customer Name" && event.inputSource === "input").map(event => event.value);
 assert(typed.length && typed.every(value => chosen.startsWith(value)), "typed prefixes kept");
 assert.notStrictEqual(chosen, "Adatum Corporation");
+
+// A Tell me result names a page of Business Central and stays; a record chosen later does not.
+const tellMeWords = importer.collectDataWords([
+  { type: "field-change", fieldName: "Berätta vad du vill göra.", value: "ink ord" },
+  { type: "click", role: "gridcell", label: "Inköpsorder Listor ", selectedCaption: "Inköpsorder Listor " },
+  { type: "page-state", pageCaption: "Inköpsorder" },
+  { type: "click", role: "gridcell", label: "Greenfood Iberica", selectedCaption: "Greenfood Iberica" }]);
+assert(!tellMeWords.includes("listor"), tellMeWords.join(","));
+assert(tellMeWords.includes("greenfood") && tellMeWords.includes("iberica"));
 
 const original = replay(labEvents, { documentLanguage: "sv-SE" }).tasks;
 const sanitized = replay(entry.events, { documentLanguage: "sv-SE" }).tasks;

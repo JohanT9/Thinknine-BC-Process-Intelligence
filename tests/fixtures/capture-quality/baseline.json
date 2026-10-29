@@ -2,6 +2,16 @@
   "schemaVersion": 1,
   "recordings": [
     {
+      "id": "bc-purchase-order-alt-shortcuts",
+      "expected": 2,
+      "produced": 2,
+      "correct": 2,
+      "wrong": 0,
+      "duplicates": 0,
+      "extras": 0,
+      "missing": 0
+    },
+    {
       "id": "bc-purchase-order-ctrl-delete",
       "expected": 1,
       "produced": 1,

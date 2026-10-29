@@ -554,10 +554,15 @@
       '[data-control-name="PageTitle"]'
     ];
 
+    // The client's app bar shows the company name as the first heading of its inner frame;
+    // it does not name the page.
+    let company;
     for (const selector of selectors) {
       for (const element of document.querySelectorAll(selector)) {
         const text = textOf(element);
-        if (text && text.length < 180) return text;
+        if (!text || text.length >= 180) continue;
+        company ??= getCompanyName().toLocaleLowerCase();
+        if (text.toLocaleLowerCase() !== company) return text;
       }
     }
 
@@ -1389,6 +1394,9 @@
       return;
     }
     if (!shortcut && !["Enter", " ", "Spacebar", "Escape"].includes(event.key)) return;
+    // Space in a text field is typing.
+    if (!shortcut && editable && [" ", "Spacebar"].includes(event.key) &&
+        !eventTarget.matches('input[type="checkbox"],input[type="radio"],select')) return;
     const suggestion = event.key === "Enter" && editable ? activeSuggestion(eventTarget) : null;
     if (suggestion) {
       // The typed text comes first, as it would after a pause before a click.
