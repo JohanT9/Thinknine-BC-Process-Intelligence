@@ -341,9 +341,11 @@ function licenseRow(item) {
     if (expandedUsers.has(usersKey)) expandedUsers.delete(usersKey); else expandedUsers.add(usersKey);
     renderLicenses();
   }, { "aria-expanded": String(expandedUsers.has(usersKey)) });
+  // Restarting the trial keeps the license; the full reset deletes it so the tenant can ask again.
   const menuItems = [
+    ...(kind === "tenant" ? [button("Starta om testperioden (30 dagar)", "", () => restartTrial(item))] : []),
     button("Radera licens", "destructive", () => removeLicense(item)),
-    ...(kind === "tenant" ? [button("Återställ testperiod", "", () => resetTrial(item))] : [])];
+    ...(kind === "tenant" ? [button("Radera och tillåt ny testlicens", "destructive", () => resetTrial(item))] : [])];
   const menu = element("details", { className: "menu" }, [
     element("summary", { text: "…", attributes: { "aria-label": `Fler åtgärder för ${name}` } }),
     element("div", { className: "menu-items" }, menuItems)]);
@@ -534,11 +536,24 @@ async function removeLicense(item) {
       : "Konsultlicensen är raderad.", "success");
   }));
 }
+// The license stays, as a trial license that is active for 30 days from now; it can be changed
+// again with Redigera, so it needs no confirmation.
+async function restartTrial(item) {
+  const { license, id } = item;
+  await quietly(run(async () => {
+    const expiresAt = new Date(Date.now() + 30 * 86400000).toISOString();
+    state = await api("tenant", { tenantId: id, name: license.name || "",
+      contactEmail: license.contactEmail || "", licenseType: "trial", enabled: true,
+      expiresAt, revision: state.revision });
+    render();
+    message(`Testperioden för ${license.name || id} gäller nu till ${utc(expiresAt)} UTC.`, "success");
+  }));
+}
 async function resetTrial(item) {
   const confirmed = await confirmTyped({
-    title: `Återställ testperioden för ${item.license.name || item.id}?`,
-    text: "Licensen och tidigare testanspråk tas bort, så att tenanten kan begära en ny testlicens. Detta kan inte ångras och är avsett för kontrollerade tester.",
-    label: "Skriv tenant-ID för att bekräfta", expected: item.id, accept: "Återställ helt" });
+    title: `Radera licensen för ${item.license.name || item.id} och tillåt en ny testlicens?`,
+    text: "Licensen och det tidigare testanspråket tas bort. Tenanten kan sedan begära en ny 30-dagars testlicens från tillägget. Detta kan inte ångras och är avsett för kontrollerade tester. Vill du bara förlänga testperioden, välj Starta om testperioden i stället.",
+    label: "Skriv tenant-ID för att bekräfta", expected: item.id, accept: "Radera och tillåt ny testlicens" });
   if (!confirmed) { message("Återställningen avbröts."); return; }
   await quietly(run(async () => {
     state = await api("tenant/reset", { tenantId: item.id, revision: state.revision });

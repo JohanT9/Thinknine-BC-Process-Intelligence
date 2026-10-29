@@ -1,3 +1,6 @@
+## Unreleased
+- License administration: "Restart trial (30 days)" keeps the license and makes it an active trial license for 30 days from today. The full reset, which deletes the license so that the tenant can request a new trial, is now named "Delete and allow a new trial license". In 4.7.211 it was named "Reset trial period", which did not say that the license is deleted.
+
 ## 4.7.211
 - License administration (licensing service): a redesigned admin view with the same functions. It has tabs for overview, licenses, usage, event log and installations. Customer and consultant licenses are in one searchable list with status filters and relative dates. Editing happens in dialogs, deleting and resetting a trial are confirmed by typing the tenant ID, and the view has a dark theme by default and a light option, as in the extension. The service must be deployed separately before the change is visible.
 
