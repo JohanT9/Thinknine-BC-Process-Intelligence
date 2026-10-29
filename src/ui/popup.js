@@ -104,23 +104,32 @@ function formatLicenseExpiry(value) {
     : t("license.noExpiryDate");
 }
 
+// While a check runs, or when it fails, the last known result is shown as such, with the time it
+// was checked; only a result the service has just confirmed is shown as an active license.
 function renderLicenseCard(license, { tenantId = "", signedIn = false,
-  checkFailed = false, needsConsent = false } = {}) {
+  checkFailed = false, needsConsent = false, checking = false, lastKnown = null } = {}) {
   const card = $("licenseCard");
-  const currentLicense = checkFailed || needsConsent ? null : license;
-  const displayedLicense = currentLicense?.allowed === true ? currentLicense : null;
-  card.classList.toggle("active", Boolean(currentLicense?.allowed));
-  card.classList.toggle("inactive", Boolean(tenantId && !currentLicense?.allowed));
+  const known = (checking || checkFailed) && !needsConsent ? lastKnown : null;
+  const currentLicense = checkFailed || needsConsent ? null : checking ? known : license;
+  const displayedLicense = currentLicense?.allowed === true ? currentLicense
+    : known?.allowed === true ? known : null;
+  card.classList.toggle("active", Boolean(!checking && currentLicense?.allowed));
+  card.classList.toggle("inactive", Boolean(tenantId && !checking && !currentLicense?.allowed));
+  updateText($("licenseCardChecked"), known
+    ? tf(checking ? "license.cardRechecking" : "license.cardLastKnown",
+      { time: formatCheckedAt(known.checkedAt) }) : "");
+  $("licenseCardChecked").hidden = !known;
   updateText($("licenseCardType"), displayedLicense?.licenseType === "trial"
     ? t("license.trialType") : displayedLicense?.licenseType === "consultant"
       ? t("license.consultantType") : displayedLicense?.licenseType === "standard" || displayedLicense?.allowed
         ? t("license.standardType") : "—");
   updateText($("licenseCardExpiry"), formatLicenseExpiry(displayedLicense?.expiresAt));
-  // Type and validity are only meaningful for a checked, active license.
+  // Type and validity are only meaningful for an active license, current or last known.
   $("licenseCardMeta").hidden = !displayedLicense;
   const trialAvailable = currentLicense?.trialAvailable === true;
   const statusKey = !tenantId ? "license.cardUnknown"
     : needsConsent ? "license.cardNeedsConsent"
+      : checking && !known ? "license.cardChecking"
       : checkFailed ? "license.cardCheckFailed"
         : currentLicense?.allowed ? "license.cardActive"
           : trialAvailable ? signedIn ? "license.cardTrialReady" : "license.cardTrialAvailable"
@@ -134,8 +143,22 @@ function renderLicenseCard(license, { tenantId = "", signedIn = false,
   $("licenseCardAction").title = tenantId ? "" : t("license.cardOpenBc");
 }
 
+function formatCheckedAt(value) {
+  return new Intl.DateTimeFormat(currentUiLocale, { dateStyle: "medium", timeStyle: "short" })
+    .format(new Date(value));
+}
+
+async function lastKnownLicense(tenantId) {
+  try {
+    const summary = await send({ type: "T9_LICENSE_SUMMARY" }, 3000);
+    const entry = summary?.licenses?.find(item => item.tenantId === tenantId);
+    return entry?.checkedAt > 0 ? entry : null;
+  } catch { return null; }
+}
+
 async function updateLicenseCard() {
   let tenantId = "";
+  let lastKnown = null;
   let license = null;
   let signedIn = false;
   let checkFailed = false;
@@ -154,7 +177,8 @@ async function updateLicenseCard() {
       } else if (information.information?.requiresAcceptance) {
         needsConsent = true;
       } else {
-        updateText($("licenseCardStatus"), t("license.cardChecking"));
+        lastKnown = await lastKnownLicense(tenantId);
+        renderLicenseCard(null, { tenantId, signedIn, checking: true, lastKnown });
         $("licenseCard").setAttribute("aria-busy", "true");
         const current = await send({ type: "T9_LICENSE_CHECK", tabId: tab.id, force: true },
           LICENSE_CHECK_TIMEOUT_MS);
@@ -173,7 +197,7 @@ async function updateLicenseCard() {
     license = null;
   }
   $("licenseCard").removeAttribute("aria-busy");
-  renderLicenseCard(license, { tenantId, signedIn, checkFailed, needsConsent });
+  renderLicenseCard(license, { tenantId, signedIn, checkFailed, needsConsent, lastKnown });
 }
 
 async function prepareTenantLicense(tabId, { forceCheck = false } = {}) {
