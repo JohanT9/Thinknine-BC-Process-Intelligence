@@ -18,7 +18,7 @@
     "test:review-document-fields": "node tests/review-document-fields.test.mjs",
     "test:event-normalization": "node tests/event-normalization.test.js",
     "test:event-step-grouping": "node tests/event-step-grouping.test.js",
-    "test:capture-packets": "node tests/capture-packet-integration.test.js && node tests/selection-screenshot.test.js",
+    "test:capture-packets": "node tests/capture-packet-integration.test.js && node tests/selection-screenshot.test.js && node tests/click-target-outline.test.js",
     "test:capture-packet-integrity": "node tests/capture-packet-integrity.test.js",
     "test:capture-validation": "node tests/capture-validation-suite.test.js",
     "test:product-validation": "node tests/product-validation-suite.test.js",

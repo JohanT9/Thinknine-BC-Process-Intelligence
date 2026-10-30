@@ -196,6 +196,29 @@
     });
   }
 
+  // The control a step clicked, typed in or chose is outlined in its screenshot. The outline is
+  // an ordinary annotation marked as generated, so it can be moved or removed like any other;
+  // the screenshot itself is not changed.
+  const CLICK_TARGET_PADDING = 0.004;
+  function outlineClickTargets(review, tasks, recordingId, now) {
+    for (const task of tasks) {
+      const box = task.screenshotHighlight;
+      const screenshotRef = task.screenshots?.[0];
+      if (!box || !screenshotRef || box.screenshotRef !== screenshotRef) continue;
+      const existing = annotations.findScreenshotSet(review.annotations, screenshotRef);
+      if (existing?.items?.some(item => item.metadata?.source === "click-target" &&
+          item.metadata?.sourceEventNo === box.sourceEventNo)) continue;
+      try {
+        annotations.add(review, screenshotRef, annotations.createAnnotation("rectangle", {
+          x: box.x - CLICK_TARGET_PADDING, y: box.y - CLICK_TARGET_PADDING,
+          width: box.width + 2 * CLICK_TARGET_PADDING, height: box.height + 2 * CLICK_TARGET_PADDING
+        }, { recordingId, screenshotAssetId: screenshotRef, ownerStepId: task.taskId,
+          provenance: "generated", now,
+          metadata: { source: "click-target", sourceEventNo: box.sourceEventNo } }), { now });
+      } catch { /* a box outside the screenshot is left out */ }
+    }
+  }
+
   function createReview(session, tasks) {
     const now = new Date().toISOString();
     const normalizedTasks = normalizeTasks(tasks, { modern: true });
@@ -219,7 +242,7 @@
               [id, position + 1])) }).state;
       });
     }
-    return {
+    const review = {
       reviewVersion: "1.0.0",
       sessionId: session.id,
       sessionName: session.name,
@@ -248,6 +271,11 @@
       generatedTasks: clone(normalizedTasks),
       tasks: normalizedTasks
     };
+    if (session.settings?.highlightClickTargets !== false) {
+      outlineClickTargets(review, normalizedTasks, session.id, now);
+      review.updatedAt = now;
+    }
+    return review;
   }
 
   function normalizeReview(review) {
@@ -1322,8 +1350,10 @@
     const consultantOwned = tasks.some(task => task?.approved ||
       task?.userComment || task?.stepOverride || task?.manualStepId ||
       task?.provenance === "manual");
+    // An outline the review generated and nobody changed is not the consultant's work.
     const annotated = (review?.annotations?.screenshotSets || [])
-      .some(set => Array.isArray(set?.items) && set.items.length > 0);
+      .some(set => Array.isArray(set?.items) && set.items.some(item =>
+        item?.provenance !== "generated" || item.updatedAt !== item.createdAt));
     if (consultantOwned || annotated) return false;
 
     const generatedSearchTasks = generatedTasks.filter(task =>

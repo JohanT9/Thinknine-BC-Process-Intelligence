@@ -81,11 +81,17 @@
       return ownerId && !oneToOneTarget(stepMap, ownerId);
     })) reasons.push("notes");
     if (array(review?.annotations?.screenshotSets).some(set =>
-      array(set?.items).length > 0)) reasons.push("annotations");
+      userAnnotations(set).length > 0)) reasons.push("annotations");
     const hierarchy = review?.hierarchy || {};
     if (["sections", "subtasks", "assignments", "overrides"].some(key =>
       array(hierarchy[key]).length > 0)) reasons.push("hierarchy");
     return reasons;
+  }
+
+  // A generated outline nobody changed is recreated by regeneration; anything else is user work.
+  function userAnnotations(set) {
+    return array(set?.items).filter(item => item?.provenance !== "generated" ||
+      item.updatedAt !== item.createdAt);
   }
 
   function stepId(step) {
@@ -260,7 +266,7 @@
       const nextScreenshots = screenshotIds(fresh);
       const annotated = array(currentReview?.annotations?.screenshotSets).some(set =>
         previousScreenshots.includes(String(set?.screenshotRef)) &&
-        array(set?.items).length > 0);
+        userAnnotations(set).length > 0);
       if (annotated && JSON.stringify(previousScreenshots) !==
           JSON.stringify(nextScreenshots)) reasons.push("selection-annotated-image");
       const identity = {

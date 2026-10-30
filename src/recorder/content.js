@@ -870,6 +870,28 @@
       rowId:row.id || row.getAttribute('aria-rowindex') || '', ...found[0]} : undefined;
   }
 
+  // The element's box as a share of the browser tab's viewport, which is what a screenshot shows.
+  // Business Central runs the page in an inner frame of the same origin, so the frame offsets
+  // add up to the top window; a frame of another origin cannot be measured and gives none.
+  function viewportBounds(bounds) {
+    if (!bounds || !(bounds.width > 0) || !(bounds.height > 0)) return undefined;
+    try {
+      let x = bounds.x; let y = bounds.y; let view = window;
+      while (view !== view.top) {
+        const frame = view.frameElement;
+        if (!frame) return undefined;
+        const box = frame.getBoundingClientRect();
+        x += box.x + frame.clientLeft; y += box.y + frame.clientTop;
+        view = view.parent;
+      }
+      const width = view.innerWidth; const height = view.innerHeight;
+      if (!(width > 0) || !(height > 0)) return undefined;
+      const share = value => Math.round(value * 10000) / 10000;
+      return { x: share(x / width), y: share(y / height), width: share(bounds.width / width),
+        height: share(bounds.height / height) };
+    } catch { return undefined; }
+  }
+
   function descriptor(element) {
     const bounds = element?.getBoundingClientRect?.();
     const labelledBy = element?.getAttribute?.("aria-labelledby") || "";
@@ -962,6 +984,7 @@
       rowTypeContext: rowTypeContext(element),
       localBounds: bounds ? { x: bounds.x, y: bounds.y,
         width: bounds.width, height: bounds.height } : undefined,
+      topViewportBounds: viewportBounds(bounds),
       devicePixelRatio: window.devicePixelRatio || 1,
       viewportScale: window.visualViewport?.scale || 1,
       uiState: {
@@ -1152,9 +1175,12 @@
     });
   }, true);
 
+  // The typed text last recorded per field, so a suggestion choice does not repeat it.
+  const recordedInputs = new WeakMap();
   function emitField(element, source, previousValue) {
     if (!(element instanceof Element)) return false;
     const value = valueOf(element);
+    if (source === "input") recordedInputs.set(element, value);
 
     const targetDescriptor = descriptor(element);
     record({
@@ -1418,7 +1444,9 @@
     if (suggestion) {
       // The typed text comes first, as it would after a pause before a click.
       clearTimeout(inputTimers.get(eventTarget));
-      if (valueOf(eventTarget) !== "") emitField(eventTarget, "input");
+      if (valueOf(eventTarget) !== "" && recordedInputs.get(eventTarget) !== valueOf(eventTarget)) {
+        emitField(eventTarget, "input");
+      }
       const caption = selectionCaption(suggestion);
       // A lookup field's suggestion grid (aria-haspopup="grid") chooses the field's value, so its
       // row continues the field edit like an option in a list box. Tell Me results stay separate.
