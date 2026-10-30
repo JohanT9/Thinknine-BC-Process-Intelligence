@@ -1,4 +1,4 @@
-## Unreleased
+## 4.7.220
 - Licensing service: the daily summary email lists only the licenses that end within 7 days, soonest first, as one list. Licenses that have already expired and those that end later are no longer included.
 
 ## 4.7.219
