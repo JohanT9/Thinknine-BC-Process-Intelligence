@@ -21,6 +21,11 @@
   const leading = text => new RegExp(`^${stem(text)}(?:[.?](?:\\s.*)?)?$`, "iu");
   // A hint sentence inside a longer accessible description.
   const contains = (...texts) => texts.map(text => new RegExp(stem(text), "iu"));
+  // A whole announcement built from a resource template: {0}, {1} and {2} stand for any text,
+  // spaces and an ellipsis may vary, and the closing period is optional.
+  const template = (...texts) => texts.map(text => new RegExp(`^${text.trim().replace(/[.]$/u, "")
+    .split(/\{\d\}/u).map(part => escape(part).replace(/\s+/gu, "\\s*")
+      .replace(/(?:\\\.){3}|…/gu, "(?:\\.\\.\\.|…)")).join(".+?")}\\.?$`, "iu"));
 
   const CAPTIONS = Object.freeze({
     // CloseButton, DetailsPageExitAction, PdfControl_Close, DatePickerCloseText. The client's
@@ -120,6 +125,62 @@
     }
   });
 
+  // Status announcements the client only reads to screen readers: saving state, sorting, a list's
+  // row count and the number of suggestions while typing. They show nothing new on screen.
+  // Resource keys: SavingState_Saving, SavingState_Saved, Sorting_AriaSortText,
+  // Table_TotalNumberOfRowsChanged(OneItem), Search_TotalNumberOfRowsChanged(OneItem),
+  // FilterAsYouTypeResults_None, FilterAsYouTypeResults_One, FilterAsYouTypeResults_MoreThanOne.
+  const ANNOUNCEMENTS = Object.freeze({
+    "sv-SE": template("Sparar ...", "Sparad", "{0}, sorterade i {1} order",
+      "Lista med rubriken {0} har nu {1} objekt", "Lista med rubriken {0} har nu ett objekt",
+      "Listan med rubriken {0} har nu {2} objekt för {1}", "Listan med rubriken {0} har nu ett objekt för {1}",
+      "Det finns inga förslag för {0}.", "Det finns ett förslag för {0}.", "{0} förslag finns för {1}."),
+    "en-US": template("Saving...", "Saved", "{0}, sorted in {1} order",
+      "List with title \"{0}\" now has {1} items", "List with title \"{0}\" now has one item",
+      "List with title \"{0}\" now has {2} items for {1}", "List with title \"{0}\" now has one item for {1}",
+      "No suggestions available for {0}.", "One suggestion available for {0}.", "{0} suggestions available for {1}."),
+    "fr-FR": template("Enregistrement en cours...", "Enregistré", "{0}, trié dans l'ordre {1}",
+      "La liste portant le titre « {0} » compte désormais {1} articles",
+      "La liste portant le titre « {0} » compte désormais un article",
+      "La liste portant le titre « {0} » compte désormais {2} articles pour {1}",
+      "La liste portant le titre « {0} » compte désormais un article pour {1}",
+      "Aucune suggestion disponible pour {0}.", "Une suggestion disponible pour {0}.",
+      "{0} suggestions disponibles pour {1}."),
+    "de-DE": template("Wird gespeichert ...", "Gespeichert", "{0}, Sortierreihenfolge {1}",
+      "Liste mit Titel „{0}“ hat jetzt {1} Artikel", "Liste mit Titel „{0}“ hat jetzt einen Artikel",
+      "Liste mit Titel \"{0}\" weist jetzt {2} Artikel für {1} auf",
+      "Liste mit Titel „{0}“ weist jetzt einen Artikel für {1} auf",
+      "Für {0} sind keine Vorschläge verfügbar.", "Für {0} sind ist ein Vorschlag verfügbar.",
+      "{0} Vorschläge sind für {1} verfügbar."),
+    "es-ES": template("Guardando...", "Guardado", "{0}, ordenados en el pedido {1}",
+      "La lista con el título \"{0}\" tiene ahora {1} elementos",
+      "La lista con el título \"{0}\" tiene ahora un elemento",
+      "La lista con el título \"{0}\" tiene ahora {2} elementos para {1}",
+      "La lista con el título \"{0}\" tiene ahora un elemento para {1}",
+      "No hay sugerencias disponibles para {0}.", "Hay una sugerencia disponible para {0}.",
+      "{0} sugerencias disponibles para {1}."),
+    "da-DK": template("Gemmer...", "Gemt", "{0}, sorteret i rækkefølgen {1}",
+      "Listen med titlen \"{0}\" indeholder nu {1} elementer",
+      "Listen med titlen \"{0}\" indeholder nu ét element",
+      "Listen med titlen \"{0}\" indeholder nu {2} elementer for {1}",
+      "Listen med titlen \"{0}\" indeholder nu ét element for {1}",
+      "Ingen forslag til {0}.", "Ét forslag til {0}.", "{0} forslag til {1}."),
+    "fi-FI": template("Tallennetaan...", "Tallennettu", "{0}, järjestettynä {1} mukaan",
+      "Luettelossa {0} on nyt {1} kohdetta", "Luettelossa {0} on nyt yksi kohde",
+      "Luettelossa {0} on nyt {2} nimikettä kohteessa {1}", "Luettelossa {0} on nyt yksi nimike kohteelle {1}",
+      "Ei ehdotuksia kohteelle {0}.", "Yksi ehdotus kohteelle {0}.", "{0} ehdotusta kohteelle {1}."),
+    "nb-NO": template("Lagrer …", "Lagret", "{0}, sortert i {1} rekkefølge",
+      "Listen med tittelen {0} har nå {1} elementer", "Listen med tittelen {0} har nå ett element",
+      "Listen med tittelen {0} har nå {2} elementer for {1}", "Listen med tittelen {0} har nå ett element for {1}",
+      "Ingen forslag tilgjengelig for {0}.", "Ett forslag tilgjengelig for {0}.",
+      "{0} forslag tilgjengelig for {1}.")
+  });
+
+  function isAnnouncement(text) {
+    const value = String(text || "").trim();
+    return Boolean(value) && Object.values(ANNOUNCEMENTS).some(patterns => patterns.some(pattern => pattern.test(value)));
+  }
+
   function matches(category, caption) {
     const text = String(caption || "").trim();
     return Boolean(text) && Object.values(CAPTIONS[category] || {})
@@ -132,5 +193,5 @@
       locales.filter(locale => !byLocale[locale]).map(locale => ({ category, locale })));
   }
 
-  return { CAPTIONS, gaps, matches };
+  return { ANNOUNCEMENTS, CAPTIONS, gaps, isAnnouncement, matches };
 });

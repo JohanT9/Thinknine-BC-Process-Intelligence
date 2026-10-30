@@ -78,5 +78,28 @@ assert(background.indexOf('"engine/bc-client-captions.js"') <
   background.indexOf('"engine/event-normalization.js"'));
 const dashboard = fs.readFileSync(path.join(__dirname, "../src/ui/dashboard.html"), "utf8");
 assert(dashboard.indexOf("engine/bc-client-captions.js") < dashboard.indexOf("engine/noise-filter.js"));
+assert(background.indexOf('"engine/bc-client-captions.js"') <
+  background.indexOf('"engine/screenshot-capture-policy.js"'));
+
+// Status announcements the client only reads to screen readers, in every registered language,
+// as observed and as the resources word them with their placeholders filled in.
+assert.deepStrictEqual(Object.keys(captions.ANNOUNCEMENTS).sort(), [...locales].sort());
+for (const text of ["Nr, sorterade i Stigande order", "Lista med rubriken Förs.order har nu 147 objekt",
+  "Det finns inga förslag för förs ord.", "75 förslag finns för i. Använd UPPIL och NEDPIL för att navigera.",
+  "Sparar ...", "Sparad", "No., sorted in Ascending order", "List with title \"Sales Orders\" now has 12 items",
+  "Saving...", "Saved", "N°, trié dans l'ordre Croissant", "Enregistrement en cours...",
+  "Liste mit Titel „Verkaufsaufträge“ hat jetzt 3 Artikel", "Für 1000 sind keine Vorschläge verfügbar.",
+  "La lista con el título \"Pedidos\" tiene ahora 4 elementos", "Guardando...",
+  "Listen med titlen \"Salgsordrer\" indeholder nu 5 elementer", "Gemt",
+  "Luettelossa Myyntitilaukset on nyt 6 kohdetta", "Tallennettu",
+  "Listen med tittelen Salgsordrer har nå 7 elementer", "Lagrer …", "Lagrer ..."]) {
+  assert(captions.isAnnouncement(text), `announcement: ${text}`);
+}
+// Notifications, record titles, errors and longer texts are not announcements.
+for (const text of ["Aviseringar: 2 Denna kund har förfallet saldo", "SO1000269 ∙ Greenfood Iberica. Förs.order",
+  "Börja validera data i dokument och journaler", "Sparad order", "Saved views", "Det finns inga", "",
+  "The quantity cannot be negative.", "Bokföringen misslyckades."]) {
+  assert(!captions.isAnnouncement(text), `not an announcement: ${text}`);
+}
 
 console.log("Business Central client caption tests passed.");

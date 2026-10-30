@@ -1,9 +1,14 @@
 (function (root, factory) {
-  const api = factory();
+  const captions = typeof module === "object" && module.exports
+    ? require("./bc-client-captions") : root.T9BCClientCaptions;
+  const api = factory(captions);
   if (typeof module === "object" && module.exports) module.exports = api;
   root.T9ScreenshotCapturePolicy = api;
-})(typeof globalThis !== "undefined" ? globalThis : this, function () {
+})(typeof globalThis !== "undefined" ? globalThis : this, function (captions) {
   const FIELD_INPUT = "field-input";
+  // A status message the client only reads to screen readers (saving, sorting, row counts,
+  // suggestions) shows nothing new and gets no screenshot of its own.
+  const ANNOUNCEMENT = "announcement";
 
   function hasValue(event) {
     return event?.value !== undefined && event?.value !== null &&
@@ -17,6 +22,8 @@
             event.previousValue !== event.value)) && hasValue(event)) {
       return FIELD_INPUT;
     }
+    if (event?.type === "status-message" && captions?.isAnnouncement(
+      event.accessibleName || event.label || event.text || "")) return ANNOUNCEMENT;
     if (event?.type === "click" && event.pointerTarget === true &&
         String(event.accessibleName || event.label || "").trim()) return "action";
     return event?.category || "";
@@ -54,5 +61,5 @@
       String(existing.captureKey) === String(candidate.captureKey || "");
   }
 
-  return { FIELD_INPUT, canReuse, captureKey, category, shouldCapture };
+  return { ANNOUNCEMENT, FIELD_INPUT, canReuse, captureKey, category, shouldCapture };
 });

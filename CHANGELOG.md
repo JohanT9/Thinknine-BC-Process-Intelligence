@@ -1,3 +1,6 @@
+## 4.7.221
+- Fewer and more timely screenshots while recording. Status messages that Business Central only reads to screen readers, such as saving, sorting, a list's row count and the number of suggestions while typing, no longer get a screenshot of their own; they are still recorded. In a sales order recording this removes about 25 of 65 screenshots. Notifications, errors and other results still get one. The texts are recognized in every registered language from the web client's own language resources. Screenshots are also taken up to twice a second instead of about once a second, within the browser's limit, so each one is closer to its step.
+
 ## 4.7.220
 - Licensing service: the daily summary email lists only the licenses that end within 7 days, soonest first, as one list. Licenses that have already expired and those that end later are no longer included.
 

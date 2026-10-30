@@ -233,6 +233,12 @@ with these resource keys:
 | `history` | `Back_Title`, `HelpPaneBackButton`, `HelpPaneForwardButton` |
 | `tellMe` | `ProductMenuBar_PageSearch` (its first sentence) |
 | `fieldHint` | `HasMandatoryField`, `MandatoryIcon_Tooltip`, `Autofill_AnnouncementSupportedField` |
+| announcements (`isAnnouncement`) | `SavingState_Saving`, `SavingState_Saved`, `Sorting_AriaSortText`, `Table_TotalNumberOfRowsChanged`, `Table_TotalNumberOfRowsChangedOneItem`, `Search_TotalNumberOfRowsChanged`, `Search_TotalNumberOfRowsChangedOneItem`, `FilterAsYouTypeResults_None`, `FilterAsYouTypeResults_One`, `FilterAsYouTypeResults_MoreThanOne` |
+
+The announcements are status messages the client only reads to screen readers. Their
+templates keep the placeholders, which match any text. A status message that is an
+announcement gets no screenshot of its own (`screenshot-capture-policy.js`); it is still
+recorded as an event.
 
 Swedish and English also keep wordings observed in older recordings (for example "Tillbaka",
 "Scroll up"). The client's Dismiss translations (`ClosePane`, `NotificationDismiss`) are
