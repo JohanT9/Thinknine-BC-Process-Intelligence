@@ -1,4 +1,4 @@
-## Unreleased
+## 4.7.214
 - Screenshots now show the moment of their step. When Business Central announced several status messages, such as "Saving..." and "The list now has 148 items", each one requested its own screenshot, and those requests went ahead of the screenshot of an entered field. The extension takes about one screenshot per second, so a field's screenshot could be taken more than 20 seconds later and show another field being typed. Screenshots are now taken in the order of the events, one screenshot covers a burst of status messages, and a request that has waited more than 3 seconds is skipped instead of attaching a picture of a later moment. Recordings made earlier keep their screenshots.
 - A number typed in the No. field of an item line and chosen from the list is described with the item number field, for example "Search for 30043 in Item No.", in every document language. Previously the step named the column's sort button, "Sort by No.".
 
