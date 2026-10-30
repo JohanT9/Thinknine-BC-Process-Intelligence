@@ -72,6 +72,40 @@ queuePolicy.enqueue(queue, { sessionId: "other", eventNo: 2, eventId: "x2",
   category: "field-input", captureKey: "Antal", queuedAt: 5 });
 assert.strictEqual(queue.length, 3, "recordings never share a capture");
 
+// Captures run in event order. A field typed after a burst of status messages is not overtaken
+// by later status messages, and the burst shares one capture.
+const ordered = [];
+queuePolicy.enqueue(ordered, { sessionId: "s", eventNo: 10, eventId: "e10",
+  category: "field-input", captureKey: "Kundnr", queuedAt: 0 });
+queuePolicy.enqueue(ordered, { sessionId: "s", eventNo: 11, eventId: "e11", category: "result", queuedAt: 10 });
+queuePolicy.enqueue(ordered, { sessionId: "s", eventNo: 12, eventId: "e12", category: "result", queuedAt: 400 });
+queuePolicy.enqueue(ordered, { sessionId: "s", eventNo: 13, eventId: "e13",
+  category: "field-input", captureKey: "Nr", queuedAt: 2000 });
+queuePolicy.enqueue(ordered, { sessionId: "s", eventNo: 14, eventId: "e14", category: "result", queuedAt: 2100 });
+assert.deepStrictEqual(ordered.map(item => item.eventNo), [10, 11, 13, 14]);
+assert.deepStrictEqual(ordered[1].targets.map(target => target.eventNo), [11, 12]);
+
+// A request that waited too long would show a later moment, so it is returned as stale.
+let taken = queuePolicy.next(ordered, 1000);
+assert.strictEqual(taken.item.eventNo, 10);
+assert.deepStrictEqual(taken.stale, []);
+taken = queuePolicy.next(ordered, 10 + queuePolicy.MAX_DELAY_MS + 1);
+assert.deepStrictEqual(taken.stale.map(item => item.eventNo), [11]);
+assert.strictEqual(taken.item.eventNo, 13);
+taken = queuePolicy.next(ordered, 99999);
+assert.strictEqual(taken.item, null);
+assert.deepStrictEqual(taken.stale.map(item => item.eventNo), [14]);
+
+// A full queue gives up the least important request, not the newest one.
+const full = [];
+queuePolicy.enqueue(full, { sessionId: "s", eventNo: 1, eventId: "a", category: "navigation", queuedAt: 0 });
+queuePolicy.enqueue(full, { sessionId: "s", eventNo: 5, eventId: "b",
+  category: "field-input", captureKey: "Antal", queuedAt: 1 });
+const overflow = queuePolicy.enqueue(full, { sessionId: "s", eventNo: 9, eventId: "c",
+  category: "field-input", captureKey: "Pris", queuedAt: 2 }, 2);
+assert.strictEqual(overflow.dropped.eventNo, 1);
+assert.deepStrictEqual(full.map(item => item.eventNo), [5, 9]);
+
 const registration = require("../src/engine/screenshot-target-registration");
 (async () => {
   const saved = [];

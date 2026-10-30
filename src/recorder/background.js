@@ -314,6 +314,7 @@ const screenshotStats = {
   captured: 0,
   reused: 0,
   dropped: 0,
+  stale: 0,
   errors: 0
 };
 
@@ -716,7 +717,14 @@ async function processScreenshotQueue() {
         await new Promise(resolve => setTimeout(resolve, waitMs));
       }
 
-      const item = screenshotQueue.shift();
+      const { item, stale } = globalThis.T9ScreenshotQueuePolicy.next(screenshotQueue, Date.now());
+      if (stale.length) {
+        screenshotStats.dropped += stale.reduce((sum, value) => sum + (value.targets?.length || 1), 0);
+        screenshotStats.stale += stale.length;
+        await setDebug({ screenshotQueueLength: screenshotQueue.length,
+          screenshotStats: { ...screenshotStats } });
+      }
+      if (!item) continue;
 
       const state = await getState();
       if (!state.recording || state.sessionId !== item.sessionId) {
@@ -1380,6 +1388,7 @@ async function startSession(message, tabId) {
   screenshotStats.captured = 0;
   screenshotStats.reused = 0;
   screenshotStats.dropped = 0;
+  screenshotStats.stale = 0;
   screenshotStats.errors = 0;
 
   const session = {

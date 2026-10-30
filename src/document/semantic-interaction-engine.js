@@ -641,15 +641,18 @@
         const itemRow = first.rowTypeContext?.source === "same-row-type" &&
           /^(?:artikel|item|article|artículo|tuote|vare)$/iu.test(
             text(first.rowTypeContext.value));
-        const searchField = text(first.fieldCaption || first.targetControl?.caption ||
+        // The line's number column is announced by its sort button ("Sortera efter Nr"); on an
+        // item line the field is the item number.
+        const observedField = text(first.fieldCaption || first.targetControl?.caption ||
           first.actionCaption || "Nr");
+        const searchField = itemRow && sortingNumber(first) ? "Artikelnr." : observedField;
         return { consumed: values.length, action: action(rule, values, {
           actionType: itemRow ? "SearchAndSelectRecord" : "EnterFieldValue",
           displayText: itemRow
             ? `Sök efter __${selectedValue}__ i **${searchField}** och välj den filtrerade posten.`
             : `Ange __${selectedValue}__ i **Nr**.`,
           selectedValue, targetField: itemRow ? "Artikel Nr" : "Nr",
-          ...(itemRow ? { searchFieldCaption: searchField } : {}),
+          ...(itemRow ? { searchFieldCaption: observedField } : {}),
           ...(itemRow ? { selectedEntity: "Item",
             rowTypeContext: clone(first.rowTypeContext) } : {})
         }) };
