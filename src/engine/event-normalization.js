@@ -13,7 +13,7 @@
 ) {
   "use strict";
   const SCHEMA_VERSION = 1;
-  const NORMALIZATION_VERSION = "2.11.0";
+  const NORMALIZATION_VERSION = "2.12.0";
   const cache = new WeakMap();
   const clone = value => value == null ? value : JSON.parse(JSON.stringify(value));
   function freeze(value) { if (!value || typeof value !== "object" || Object.isFrozen(value)) return value; Object.values(value).forEach(freeze); return Object.freeze(value); }
@@ -61,6 +61,9 @@
     const control = identified.control?.type || ""; const type = raw.type || "unknown";
     if (type === "capture-guidance") return ["capture-guidance", "explicit-recording-guidance"];
     if (type === "bc-error") return ["error-outcome", "observed-business-central-error"];
+    // The client's banner for a change that failed validation is an error the user saw.
+    if (type === "status-message" && captions.isPageError(raw.accessibleName || raw.label ||
+      raw.text || "")) return ["error-outcome", "page-validation-error"];
     if (type === "status-message") return ["status-message", "observed-accessible-status-message"];
     if (type === "click" && (control === "checkbox" || (raw.checked != null && !["text", "search", "email", "number", "password", "tel", "url"].includes(raw.inputType) && !["textbox", "searchbox", "combobox"].includes(raw.role)))) return ["toggle-change", "verified-checked-state"];
     if (["dialog", "dialog-open"].includes(type)) return ["dialog-open", "observed-dialog-open"];

@@ -95,6 +95,23 @@ for (const text of ["Nr, sorterade i Stigande order", "Lista med rubriken Förs.
   "Listen med tittelen Salgsordrer har nå 7 elementer", "Lagrer …", "Lagrer ..."]) {
   assert(captions.isAnnouncement(text), `announcement: ${text}`);
 }
+// The banner of a change that failed validation is a page error in every language, desktop and
+// mobile, without the link markup; the error's own text and other messages are not.
+assert.deepStrictEqual(Object.keys(captions.PAGE_ERRORS).sort(), [...locales].sort());
+for (const text of ["Sidan innehåller ett fel. Uppdatera (F5) för att ångra ändringen eller rätta felet.",
+  "The page has 3 errors. Refresh (F5) to undo the changes, or correct the errors.",
+  "La page comporte une erreur. Actualisez (F5) pour annuler la modification ou corriger l’erreur.",
+  "Die Seite enthält einen Fehler. Aktualisieren Sie (F5), um die Änderung rückgängig zu machen oder den Fehler zu korrigieren.",
+  "La página tiene un error. Seleccione Actualizar (F5) para deshacer el cambio o corregir el error.",
+  "Siden har en fejl. Opdater (F5) for at fortryde ændringen eller rette fejlen.",
+  "Sivulla on yksi virhe. Päivitä (F5), jos haluat kumota muutoksen, tai korjaa virhe.",
+  "Siden har en feil. Rett feilen, eller prøv å angre endringen.Angre"]) {
+  assert(captions.isPageError(text), `page error: ${text}`);
+}
+for (const text of ["Du kan inte skapa den här typen av dokument när leverantör 10137 är spärrad med typen Alla",
+  "Sparad", "Aviseringar: 2 Denna kund har förfallet saldo", ""]) {
+  assert(!captions.isPageError(text), `not a page error: ${text}`);
+}
 // Notifications, record titles, errors and longer texts are not announcements.
 for (const text of ["Aviseringar: 2 Denna kund har förfallet saldo", "SO1000269 ∙ Greenfood Iberica. Förs.order",
   "Börja validera data i dokument och journaler", "Sparad order", "Saved views", "Det finns inga", "",

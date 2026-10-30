@@ -367,15 +367,25 @@ async function setState(state) {
   await chrome.action.setBadgeBackgroundColor({ color: "#b00020" });
 }
 
-async function setDebug(patch) {
-  const data = await chrome.storage.local.get(DEBUG_KEY);
-  const debug = {
-    ...(data[DEBUG_KEY] || {}),
-    version: VERSION,
-    updatedAt: new Date().toISOString(),
-    ...patch
-  };
-  await chrome.storage.local.set({ [DEBUG_KEY]: debug });
+// Debug state is read, changed and written back in one queue. Concurrent writers, such as the
+// screenshot worker during event capture, otherwise wrote back an older copy and lost counts,
+// which made the live status report events as missing. A patch may be a function of the
+// current state, for counters that must build on the latest value.
+let debugWrites = Promise.resolve();
+function setDebug(patch) {
+  const operation = debugWrites.then(async () => {
+    const data = await chrome.storage.local.get(DEBUG_KEY);
+    const current = data[DEBUG_KEY] || {};
+    const changes = typeof patch === "function" ? patch(current) : patch;
+    await chrome.storage.local.set({ [DEBUG_KEY]: {
+      ...current,
+      version: VERSION,
+      updatedAt: new Date().toISOString(),
+      ...changes
+    } });
+  });
+  debugWrites = operation.catch(() => {});
+  return operation;
 }
 
 function diagnosticUrl(value) {
@@ -388,8 +398,6 @@ function diagnosticUrl(value) {
 }
 
 async function appendCaptureDiagnostic(value = {}, sender = {}) {
-  const data = await chrome.storage.local.get(DEBUG_KEY);
-  const current = data[DEBUG_KEY] || {};
   const entry = {
     timestamp: value.timestamp || new Date().toISOString(),
     stage: String(value.stage || "unknown").slice(0, 50),
@@ -406,21 +414,19 @@ async function appendCaptureDiagnostic(value = {}, sender = {}) {
     parentFrameId: sender.parentFrameId,
     documentId: sender.documentId || ""
   };
-  const captureDiagnostics = [...(current.captureDiagnostics || []), entry]
-    .slice(-100);
-  const captureStageCounts = { ...(current.captureStageCounts || {}) };
-  captureStageCounts[entry.stage] = (captureStageCounts[entry.stage] || 0) + 1;
-  await setDebug({ captureDiagnostics, captureStageCounts,
-    lastCaptureDiagnostic: entry });
+  await setDebug(current => {
+    const captureStageCounts = { ...(current.captureStageCounts || {}) };
+    captureStageCounts[entry.stage] = (captureStageCounts[entry.stage] || 0) + 1;
+    return { captureDiagnostics: [...(current.captureDiagnostics || []), entry].slice(-100),
+      captureStageCounts, lastCaptureDiagnostic: entry };
+  });
 }
 
 async function updateFrameDiagnostic(sender = {}, frameUrl = "", frameDepth,
   state = {}, reported = {}) {
-  const data = await chrome.storage.local.get(DEBUG_KEY);
-  const current = data[DEBUG_KEY] || {};
   const key = `${sender.tab?.id ?? "?"}:${sender.frameId ?? "?"}:` +
     `${sender.documentId || "unknown"}`;
-  const frames = { ...(current.frameDiagnostics || {}), [key]: {
+  const frame = {
     tabId: sender.tab?.id,
     frameId: sender.frameId,
     parentFrameId: sender.parentFrameId,
@@ -435,16 +441,16 @@ async function updateFrameDiagnostic(sender = {}, frameUrl = "", frameDepth,
     contentRecorderActive: Boolean(reported.recorderActive),
     contentDiagnosticsEnabled: Boolean(reported.diagnosticsEnabled),
     lastPingAt: new Date().toISOString()
-  } };
-  const frameDiagnostics = Object.fromEntries(Object.entries(frames).slice(-100));
-  await setDebug({ frameDiagnostics,
+  };
+  await setDebug(current => ({ frameDiagnostics: Object.fromEntries(Object.entries({
+    ...(current.frameDiagnostics || {}), [key]: frame }).slice(-100)),
     framePermissionScope: ["https://businesscentral.dynamics.com/*",
       "https://*.businesscentral.dynamics.com/*"],
     externalFramesRequireExplicitHostPermission: true,
     connected: true,
     lastPingAt: new Date().toISOString(),
     lastFrameUrl: diagnosticUrl(frameUrl || sender.url),
-    lastError: null });
+    lastError: null }));
 }
 
 async function getSession(id) {
@@ -936,22 +942,16 @@ async function recordEvent(rawEvent, captureContext = {}) {
       }
     }
 
-    const { eventTypeCounts, eventCategoryCounts } =
-      globalThis.T9RecordingLiveStatus.incrementEventCounts(
-        debugState[DEBUG_KEY] || {}, event
-      );
-
-    // A repeated delivery of a stored event does not count again, so gaps stay exact.
-    const captureSequence = rawResult.status === "duplicate"
-      ? debugState[DEBUG_KEY]?.captureSequence || {}
-      : globalThis.T9CaptureSequence.track(debugState[DEBUG_KEY]?.captureSequence, sourceEvent);
-    await setDebug({
+    // Counters build on the latest debug state inside the write. A repeated delivery of a stored
+    // event does not count again, so gaps stay exact.
+    await setDebug(current => ({
+      ...globalThis.T9RecordingLiveStatus.incrementEventCounts(current, event),
+      captureSequence: rawResult.status === "duplicate"
+        ? current.captureSequence || {}
+        : globalThis.T9CaptureSequence.track(current.captureSequence, sourceEvent),
       connected: true,
       activeSessionId: recordingId,
       eventCount: canonical.events.length,
-      captureSequence,
-      eventTypeCounts,
-      eventCategoryCounts,
       screenshotQueueLength: screenshotQueue.length,
       screenshotStats: { ...screenshotStats },
       lastEvent: {
@@ -968,7 +968,7 @@ async function recordEvent(rawEvent, captureContext = {}) {
         )
       },
       lastError: null
-    });
+    }));
     return { recordingId, canonicalEvent, event };
   });
   writeQueue = globalThis.T9RecoveringQueue.recover(operation, async error => {

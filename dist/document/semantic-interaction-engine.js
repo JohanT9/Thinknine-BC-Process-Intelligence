@@ -1634,8 +1634,17 @@
     const selectedEvent = [...(group?.evidence || [])].reverse().find(item =>
       item.kind === "selection-change");
     // A row chosen in a field's suggestion list is the field's value; the typed text only searched.
+    // The recorder gives the chosen row the field's interaction; earlier recordings are joined by
+    // grouping (field-suggestion-choice).
+    const groupEvents = group?.normalizedEvents || [];
+    const typedInLookup = groupEvents.some(item => item.kind === "value-change" &&
+      item.controlIdentification?.controlType === "lookup");
+    const keyboardRow = groupEvents.find(item => item.kind === "selection-change" &&
+      item.subtype === "keyboard" && ["listRow", "repeaterCell"].includes(
+        item.controlIdentification?.controlType || item.controlIdentification?.type));
     const suggestionChoice = (group?.groupingReason || []).includes("field-suggestion-choice")
-      ? (group?.normalizedEvents || []).find(item => item.kind === "selection-change") : null;
+      ? groupEvents.find(item => item.kind === "selection-change")
+      : typedInLookup ? keyboardRow : null;
     const selectedMechanic = suggestionChoice || (group?.normalizedEvents || []).find(item =>
       item.normalizedEventId === selectedEvent?.normalizedEventId);
     const selected = selectedMechanic?.selection?.value ??

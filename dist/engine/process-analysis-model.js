@@ -47,7 +47,9 @@
       if (group.guidance?.ignored || group.status === "ignored") {
         outcome = "excluded"; reasonCode = "process-group-explicitly-ignored";
       } else if (relatedActions.length && relatedActions.every(action => action.hidden)) {
-        outcome = "excluded"; reasonCode = "process-action-hidden";
+        outcome = "excluded";
+        reasonCode = relatedActions.every(action => action.hiddenReason === "rejected-and-retried")
+          ? "process-action-rejected-and-retried" : "process-action-hidden";
       } else if (!relatedTasks.length) {
         outcome = "unresolved"; reasonCode = relatedActions.length
           ? "process-action-not-projected" : "process-group-not-interpreted";

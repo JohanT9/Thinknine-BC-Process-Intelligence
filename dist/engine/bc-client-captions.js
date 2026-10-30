@@ -176,6 +176,51 @@
       "{0} forslag tilgjengelig for {1}.")
   });
 
+  // The client's banner when a change on the page failed validation, for example a blocked vendor.
+  // Resource keys: Validation_MessageOneError_Desktop, Validation_MessageMultipleErrors_Desktop,
+  // Validation_MessageOneError_Mobile, Validation_MessageMultipleErrors_Mobile. Link markup
+  // ([[[Refresh (F5)]]]) is read without its brackets.
+  const pageError = (...texts) => template(...texts.map(value => value.replace(/\[{3,4}([^\]]*)\]{3,4}/gu, "$1")));
+  const PAGE_ERRORS = Object.freeze({
+    "sv-SE": pageError("Sidan innehåller ett fel. [[[Uppdatera (F5)]]] för att ångra ändringen eller rätta felet.",
+      "Sidan {0} innehåller fel. [[[Uppdatera (F5)]]] för att ångra ändringarna eller rätta felen.",
+      "Sidan innehåller ett fel. Åtgärda felet eller försök ångra ändringen.[[[[Ångra]]]]",
+      "Sidan innehåller {0} fel. Åtgärda felen eller försök ångra ändringarna.[[[[Ångra]]]]"),
+    "en-US": pageError("The page has an error. [[[Refresh (F5)]]] to undo the change, or correct the error.",
+      "The page has {0} errors. [[[Refresh (F5)]]] to undo the changes, or correct the errors.",
+      "The page has an error. Correct the error or try to undo the change.[[[[Undo]]]]",
+      "The page has {0} errors. Correct the errors or try to undo the changes.[[[[Undo]]]]"),
+    "fr-FR": pageError("La page comporte une erreur. [[[Actualisez (F5)]]] pour annuler la modification ou corriger l’erreur.",
+      "La page contient {0} erreurs. [[[Actualisez (F5)]]] pour annuler les modifications ou corriger les erreurs.",
+      "La page comporte une erreur. Corrigez l'erreur ou tentez d'annuler la modification.[[[[Annuler]]]]",
+      "La page comporte {0} erreurs. Corrigez les erreurs ou tentez d'annuler les modifications.[[[[Annuler]]]]"),
+    "de-DE": pageError("Die Seite enthält einen Fehler. [[[Aktualisieren Sie (F5)]]], um die Änderung rückgängig zu machen oder den Fehler zu korrigieren.",
+      "Die Seite enthält {0} Fehler. [[[Aktualisieren Sie (F5)]]], um die Änderungen rückgängig zu machen oder die Fehler zu korrigieren.",
+      "Die Seite weist einen Fehler auf. Beheben Sie den Fehler, oder versuchen Sie, die Änderung rückgängig zu machen.[[[Rückgängig]]]",
+      "Die Seite weist {0} Fehler auf. Beheben Sie die Fehler, oder versuchen Sie, die Änderungen rückgängig zu machen.[[[Rückgängig]]]"),
+    "es-ES": pageError("La página tiene un error. Seleccione [[[Actualizar (F5)]]] para deshacer el cambio o corregir el error.",
+      "La página tiene {0} errores. Seleccione [[[Actualizar (F5)]]] para deshacer los cambios o corregir los errores.",
+      "La página tiene un error. Corríjalo o intente deshacer el cambio.[[[Deshacer]]]",
+      "La página tiene {0} errores. Corríjalos o intente deshacer los cambios.[[[Deshacer]]]"),
+    "da-DK": pageError("Siden har en fejl. [[[Opdater (F5)]]] for at fortryde ændringen eller rette fejlen.",
+      "Siden har {0} fejl. [[[Opdater (F5)]]] for at annullere ændringerne eller løse fejlene.",
+      "Siden har en fejl. Ret fejlen, eller prøv at annullere ændringen.[[[Fortryd]]]",
+      "Siden har {0} fejl. Ret fejlene, eller prøv at annullere ændringerne.[[[Fortryd]]]"),
+    "fi-FI": pageError("Sivulla on yksi virhe. [[[Päivitä (F5)]]], jos haluat kumota muutoksen, tai korjaa virhe.",
+      "Sivulla on {0} virhettä. [[[Päivitä (F5)]]], jos haluat kumota muutokset, tai korjaa virheet.",
+      "Sivulla on virhe. Korjaa virhe tai yritä kumota muutos. [[[Kumoa]]]",
+      "Sivulla on {0} virhettä. Korjaa virheet tai yritä kumota muutokset. [[[Kumoa]]]"),
+    "nb-NO": pageError("Siden har en feil. [[[Oppdater (F5)]]] for å angre endringen, eller korriger feilen.",
+      "Siden har {0} feil. [[[Oppdater (F5)]]] for å angre endringene, eller korriger feilene.",
+      "Siden har en feil. Rett feilen, eller prøv å angre endringen.[[[[Angre]]]]",
+      "Siden har {0} feil. Rett feilene, eller prøv å angre endringene.[[[[Angre]]]]")
+  });
+
+  function isPageError(text) {
+    const value = String(text || "").trim();
+    return Boolean(value) && Object.values(PAGE_ERRORS).some(patterns => patterns.some(pattern => pattern.test(value)));
+  }
+
   function isAnnouncement(text) {
     const value = String(text || "").trim();
     return Boolean(value) && Object.values(ANNOUNCEMENTS).some(patterns => patterns.some(pattern => pattern.test(value)));
@@ -193,5 +238,5 @@
       locales.filter(locale => !byLocale[locale]).map(locale => ({ category, locale })));
   }
 
-  return { ANNOUNCEMENTS, CAPTIONS, gaps, isAnnouncement, matches };
+  return { ANNOUNCEMENTS, CAPTIONS, PAGE_ERRORS, gaps, isAnnouncement, isPageError, matches };
 });
