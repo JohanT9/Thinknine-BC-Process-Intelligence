@@ -1,4 +1,4 @@
-## Unreleased
+## 4.7.213
 - License administration: a deleted license is kept for 30 days under "Deleted licenses" and can be restored together with its users, or deleted permanently. This also applies to "Delete and allow a new trial license", where the restore brings back the trial claim unless the tenant has requested a new trial. A restore never overwrites a license that has been created again under the same ID.
 - Licensing service: on App Service Free the service keeps itself loaded by requesting its own health check every 10 minutes, so that license checks no longer wait about 20 seconds for a cold start after an idle period.
 - Licensing service: a GitHub Actions workflow deploys the service to Azure when a change to it reaches main, after its tests pass, and verifies that the deployed version is the one from the commit. Azure sign-in uses OpenID Connect and needs a one-time setup described in services/licensing/AZURE.md.
