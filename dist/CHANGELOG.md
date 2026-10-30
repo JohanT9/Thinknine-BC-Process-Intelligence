@@ -1,4 +1,4 @@
-## Unreleased
+## 4.7.225
 - A step that clicks a named control, such as OK in a dialog or the last item of a menu path, shows the screenshot taken at the click. It showed the page after the dialog closed.
 - Every step in a new recording keeps the frame around its clicked control. The frame and the chosen screenshot were lost when a step was described again after interpretation, so only some steps had a frame.
 
