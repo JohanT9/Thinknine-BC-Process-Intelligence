@@ -38,7 +38,7 @@ async function createService({ dataDirectory, now = Date.now, rateLimit = 120,
   entraClientId = "", entraAdminRole = "License.Administrator", adminEntraValidator = null,
   notificationWebhookUrl = "", notificationWebhookToken = "",
   notificationRecipient = "", notifier = null, tableAccountUrl = "",
-  managedIdentityClientId = "", migrateFromFiles = false, backupEnabled = false,
+  managedIdentityClientId = "", migrateFromFiles = false, backupEnabled = false, adminUrl = "",
   backupContainer = "license-backups", backupCredential = null, backupFetcher = null }) {
   await fs.mkdir(dataDirectory, { recursive: true, mode: 0o700 });
   const registryFile = path.join(dataDirectory, "tenants.json");
@@ -132,7 +132,7 @@ async function createService({ dataDirectory, now = Date.now, rateLimit = 120,
     .catch(error => console.error("License audit failed:", error.message));
   const notifications = notifier || createNotifier({ dataDirectory,
     webhookUrl: notificationWebhookUrl, webhookToken: notificationWebhookToken,
-    recipient: notificationRecipient, fetcher, now, storage,
+    recipient: notificationRecipient, fetcher, now, storage, adminUrl,
     onDelivery: event => recordAudit({ actor: "system", action: event.success
       ? "notification-sent" : "notification-failed", entityType: "notification",
     entityId: event.entityId, details: { eventType: event.type,
@@ -490,11 +490,12 @@ async function createService({ dataDirectory, now = Date.now, rateLimit = 120,
         expiresAt: entry ? entry.expiresAt : new Date(now() + 60000).toISOString() });
     } catch { return reply(503, { error: "service-unavailable" }); }
   });
-  const scanNotifications = () => Promise.all([registry(), consultants()])
-    .then(([tenantLicenses, consultantLicenses]) => notifications.scan(tenantLicenses, consultantLicenses))
+  // The daily summary of expiring licenses: checked every five minutes, sent once a day.
+  const scanNotifications = () => Promise.resolve(notifications.due ? notifications.due() : true)
+    .then(async isDue => isDue && notifications.scan(await registry(), await consultants()))
     .catch(error => console.error("License notification scan failed:", error.message));
   void scanNotifications();
-  const notificationTimer = setInterval(scanNotifications, 6 * 60 * 60 * 1000);
+  const notificationTimer = setInterval(scanNotifications, 5 * 60 * 1000);
   notificationTimer.unref();
   server.on("close", () => clearInterval(notificationTimer));
   server.on("close", backup.start());
@@ -542,6 +543,7 @@ if (require.main === module) {
     managedIdentityClientId: process.env.LICENSE_MANAGED_IDENTITY_CLIENT_ID || "",
     migrateFromFiles: process.env.LICENSE_STORAGE_MIGRATE_FROM_FILES === "true",
     backupEnabled: process.env.LICENSE_BACKUP_ENABLED === "true",
+    adminUrl: process.env.WEBSITE_HOSTNAME ? `https://${process.env.WEBSITE_HOSTNAME}/admin#licenser` : "",
     backupContainer: process.env.LICENSE_BACKUP_CONTAINER || "license-backups" }).then(server => {
     const cloud = Boolean(process.env.WEBSITE_SITE_NAME);
     server.listen(Number(process.env.PORT || process.env.LICENSE_PORT) || 8787,
