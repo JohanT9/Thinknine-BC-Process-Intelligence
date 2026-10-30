@@ -299,7 +299,8 @@ let errorEvidenceWrites = Promise.resolve();
 const telemetryRefreshGeneration = new Map();
 const tenantLicenseFailureNotifications = new Map();
 
-const SCREENSHOT_MIN_INTERVAL_MS = 1100;
+// Chrome and Edge allow two captureVisibleTab calls per second; 600 ms stays inside that.
+const SCREENSHOT_MIN_INTERVAL_MS = 600;
 const SCREENSHOT_MAX_QUEUE_ITEMS = 40;
 const CANONICAL_SETTLE_TIMEOUT_MS = 60000;
 let screenshotQueue = [];

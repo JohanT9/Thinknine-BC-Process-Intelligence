@@ -51,6 +51,20 @@ assert(background.includes("T9ScreenshotCapturePolicy.shouldCapture"));
 assert(background.includes('importScripts("engine/screenshot-queue-policy.js")'));
 assert(background.includes("T9ScreenshotTargetRegistration.register("));
 
+// A status message that only announces sorting, row counts, suggestions or saving gets no
+// screenshot; a notification or other result still does.
+const announcement = { type: "status-message", category: "result", accessibleName: "Nr, sorterade i Stigande order" };
+assert.strictEqual(policy.category(announcement), policy.ANNOUNCEMENT);
+assert.strictEqual(policy.shouldCapture(settings, announcement), false);
+assert.strictEqual(policy.shouldCapture({ ...settings, screenshotMode: "all" }, { ...announcement,
+  accessibleName: "Lista med rubriken Förs.order har nu 148 objekt" }), false);
+const notification = { type: "status-message", category: "result",
+  accessibleName: "Aviseringar: 2 Denna kund har förfallet saldo" };
+assert.strictEqual(policy.category(notification), "result");
+assert.strictEqual(policy.shouldCapture(settings, notification), true);
+assert(background.includes("SCREENSHOT_MIN_INTERVAL_MS = 600"),
+  "two captures per second stay inside the browser's captureVisibleTab limit");
+
 const queuePolicy = require("../src/engine/screenshot-queue-policy");
 const queue = [];
 queuePolicy.enqueue(queue, { sessionId: "s", eventNo: 1, eventId: "e1",
