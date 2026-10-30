@@ -1,0 +1,90 @@
+name: Deploy license service
+
+# Deploys services/licensing to Azure App Service when a change to it reaches main.
+# Azure sign-in uses OpenID Connect: no password or publish profile is stored in GitHub.
+# Setup: services/licensing/AZURE.md, "Automatic deployment from GitHub".
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "services/licensing/**"
+      - "scripts/package-license-service.js"
+      - ".github/workflows/deploy-license-service.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  id-token: write
+
+concurrency:
+  group: deploy-license-service
+  cancel-in-progress: false
+
+env:
+  RESOURCE_GROUP: rg-bc-process-studio
+  APP_NAME: thinknine-bc-license
+  SERVICE_URL: https://thinknine-bc-license-gparapcbbzgkgfha.swedencentral-01.azurewebsites.net
+
+jobs:
+  deploy:
+    # Skipped until the Azure identity is configured as repository variables.
+    if: vars.AZURE_CLIENT_ID != ''
+    runs-on: ubuntu-latest
+    environment: production
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+
+      - name: Install dependencies
+        run: |
+          npm install --ignore-scripts
+          npm ci --ignore-scripts --prefix services/licensing
+
+      - name: Test license service
+        run: |
+          node tests/tenant-license-service.test.js
+          node tests/tenant-license-admin.test.js
+          node tests/license-keep-warm.test.js
+          node tests/license-table-storage.test.js
+          node tests/license-audit-log.test.js
+          node tests/license-notifications.test.js
+          node tests/consultant-license.test.js
+
+      - name: Package license service
+        run: node scripts/package-license-service.js
+
+      - name: Sign in to Azure
+        uses: azure/login@v2
+        with:
+          client-id: ${{ vars.AZURE_CLIENT_ID }}
+          tenant-id: ${{ vars.AZURE_TENANT_ID }}
+          subscription-id: ${{ vars.AZURE_SUBSCRIPTION_ID }}
+
+      - name: Deploy to App Service
+        run: >
+          az webapp deploy --resource-group "$RESOURCE_GROUP" --name "$APP_NAME"
+          --src-path release/bc-license-service.zip --type zip
+
+      - name: Verify the deployed service
+        run: |
+          # The service is healthy and serves exactly the admin script from this commit.
+          expected=$(sha256sum services/licensing/admin-ui.js | cut -d' ' -f1)
+          for attempt in $(seq 1 18); do
+            health=$(curl -fsS --max-time 30 "$SERVICE_URL/health" || true)
+            served=$(curl -fsS --max-time 30 "$SERVICE_URL/admin/admin.js" | sha256sum | cut -d' ' -f1 || true)
+            if echo "$health" | grep -q '"status":"ok"' && [ "$served" = "$expected" ]; then
+              echo "Deployed and healthy: $health"
+              exit 0
+            fi
+            sleep 10
+          done
+          echo "::error::The service is not healthy or does not serve this commit's admin script."
+          echo "Health: $health"
+          exit 1

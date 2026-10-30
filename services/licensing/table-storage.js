@@ -11,6 +11,7 @@ const TABLES = Object.freeze({
   registrations: "LicenseInstallations",
   audit: "LicenseAuditEvents",
   notifications: "LicenseNotifications",
+  deletedLicenses: "LicenseDeletedItems",
   metadata: "LicenseMetadata"
 });
 const PARTITION = "v1";

@@ -34,6 +34,43 @@ publish the privacy notice in the extension, confirm the registration data
 retention policy, and complete the Entra setup below. Free F1 is a test tier,
 not an availability commitment for production license enforcement.
 
+## Keeping the service loaded
+
+App Service Free (F1) unloads the app after about 20 minutes without requests,
+and the next license check then waits for a cold start of about 20 seconds.
+The service therefore requests its own public `/health` every 10 minutes. On
+App Service the address comes from `WEBSITE_HOSTNAME`; nothing needs to be
+configured. Set `LICENSE_KEEP_WARM=false` to turn it off, for example after
+moving to a plan with Always On, or `LICENSE_KEEP_WARM_URL` to ping another
+address. A failed ping is logged once, and so is the recovery. If the platform
+restarts the app, the first request after that still waits for a cold start.
+
+## Automatic deployment from GitHub
+
+`.github/workflows/deploy-license-service.yml` deploys the service when a change
+under `services/licensing/` reaches main, and can also be started by hand under
+Actions. It runs the service tests, packages the ZIP, deploys it and then waits
+until `/health` is OK and `/admin/admin.js` matches the commit. GitHub signs in
+to Azure with OpenID Connect through a user-assigned managed identity that may
+only deploy to this web app; no password or publish profile is stored.
+
+One-time setup:
+
+1. Signed in with `az login`, run
+   `powershell -ExecutionPolicy Bypass -File scripts/setup-license-deploy-identity.ps1`.
+   It creates `id-bc-license-deploy`, trusts GitHub's `production` environment
+   of this repository and grants **Website Contributor** on the web app only.
+2. In GitHub, Settings > Environments, create the environment `production`
+   (either spelling works; the script trusts `production` and `Production`).
+   Add yourself as a required reviewer if every deployment should wait for
+   approval.
+3. In Settings > Secrets and variables > Actions > Variables, add the three
+   values the script prints: `AZURE_CLIENT_ID`, `AZURE_TENANT_ID` and
+   `AZURE_SUBSCRIPTION_ID`. They are identifiers, not secrets.
+
+Until `AZURE_CLIENT_ID` exists the workflow is skipped. The manual command
+below still works.
+
 ## Protected administrator interface
 
 The public `/admin` page contains only the login interface and assets. Tenant
@@ -150,7 +187,7 @@ file mode after new Table Storage writes without first exporting the newer data.
 
 The tables are `LicenseTenants`, `LicenseConsultantCompanies`, `LicenseUsers`,
 `LicenseTrialClaims`, `LicenseInstallations`, `LicenseAuditEvents`,
-`LicenseNotifications`, and `LicenseMetadata`. Entity writes use ETags and
+`LicenseNotifications`, `LicenseDeletedItems` and `LicenseMetadata`. Entity writes use ETags and
 retry optimistic concurrency conflicts.
 
 ## First sign-in trial validation

@@ -31,6 +31,9 @@ async function main() {
   const save = value => fetch(base + "/admin/api/tenant", { method: "POST",
     headers: { Authorization: "Bearer " + key, "Content-Type": "application/json" },
     body: JSON.stringify(value) });
+  const post = (route, value) => fetch(base + route, { method: "POST",
+    headers: { Authorization: "Bearer " + key, "Content-Type": "application/json" },
+    body: JSON.stringify(value) });
   const saveConsultant = value => fetch(base + "/admin/api/consultant", { method: "POST",
     headers: { Authorization: "Bearer " + key, "Content-Type": "application/json" },
     body: JSON.stringify(value) });
@@ -109,6 +112,48 @@ async function main() {
     assert.equal(deletion.status, 200);
     state = await deletion.json();
     assert.equal(state.tenants[tenant], undefined);
+    // Deleted licenses are kept and can be restored with their users and trial claim.
+    assert.equal(state.deletedLicenses.length, 2);
+    const deletedTenant = state.deletedLicenses.find(item => item.entityId === tenant);
+    const deletedTrial = state.deletedLicenses.find(item => item.entityId === trialTenant);
+    assert.equal(deletedTenant.action, "tenant-deleted");
+    assert.equal(deletedTenant.name, "Salico UAT");
+    assert.equal(deletedTenant.deletedBy, "administrator-key");
+    assert.ok(Date.parse(deletedTenant.purgeAfter) > Date.now() + 29 * 86400000);
+    assert.equal(deletedTrial.action, "tenant-trial-reset");
+    assert.equal(deletedTrial.restoresTrialClaim, true);
+    assert.equal(deletedTrial.users, 1);
+    assert.equal((await post("/admin/api/deleted/restore", { id: "not-an-id" })).status, 400);
+    assert.equal((await post("/admin/api/deleted/restore", { id: deletedTrial.id, extra: 1 })).status, 400);
+    const restored = await post("/admin/api/deleted/restore", { id: deletedTrial.id });
+    assert.equal(restored.status, 200);
+    state = await restored.json();
+    assert.equal(state.tenants[trialTenant].licenseType, "trial");
+    assert.equal(state.tenantUsers.filter(user => user.tenantId === trialTenant).length, 1);
+    assert.deepEqual(state.deletedLicenses.map(item => item.id), [deletedTenant.id]);
+    const checkAfterRestore = await (await fetch(base + "/v1/license/check", { method: "POST",
+      headers: { "Content-Type": "application/json" }, body: JSON.stringify({
+        tenantId: trialTenant, installationId: second, version: "4.7.0" }) })).json();
+    assert.equal(checkAfterRestore.allowed, true);
+    assert.equal(checkAfterRestore.trialAvailable, false);
+    assert.equal((await post("/admin/api/deleted/restore", { id: deletedTrial.id })).status, 404);
+    // A license created again under the same ID is never overwritten by a restore.
+    const recreated = await save({ ...edit, name: "Ny Salico", revision: state.revision });
+    assert.equal(recreated.status, 200);
+    state = await recreated.json();
+    assert.equal((await post("/admin/api/deleted/restore", { id: deletedTenant.id })).status, 409);
+    assert.equal((await (await get("/admin/api/state")).json()).tenants[tenant].name, "Ny Salico");
+    const purged = await post("/admin/api/deleted/purge", { id: deletedTenant.id });
+    assert.equal(purged.status, 200);
+    state = await purged.json();
+    assert.equal(state.deletedLicenses.length, 0);
+    const staleDeletion = await fetch(base + "/admin/api/tenant", { method: "DELETE",
+      headers: { Authorization: "Bearer " + key, "Content-Type": "application/json" },
+      body: JSON.stringify({ tenantId: tenant, revision: "0".repeat(64) }) });
+    assert.equal(staleDeletion.status, 409);
+    state = await (await get("/admin/api/state")).json();
+    assert.equal(state.deletedLicenses.length, 0);
+    assert.equal(state.tenants[tenant].name, "Ny Salico");
     const consultant = { entraTenantId: tenant, objectId: second,
       name: "Consultant One", email: "consultant@example.com", enabled: true,
       expiresAt: "2027-12-31T23:59:59Z", revision: state.consultantRevision };
@@ -117,12 +162,47 @@ async function main() {
     state = await consultantSaved.json();
     assert.equal(state.consultants[`${tenant}:00000000-0000-0000-0000-000000000000`].name,
       "Consultant One");
+    const consultantDeleted = await fetch(base + "/admin/api/consultant", { method: "DELETE",
+      headers: { Authorization: "Bearer " + key, "Content-Type": "application/json" },
+      body: JSON.stringify({ entraTenantId: tenant, objectId: "00000000-0000-0000-0000-000000000000",
+        revision: state.consultantRevision }) });
+    assert.equal(consultantDeleted.status, 200);
+    state = await consultantDeleted.json();
+    assert.deepEqual(state.consultants, {});
+    const deletedConsultant = state.deletedLicenses.find(item => item.kind === "consultant");
+    assert.equal(deletedConsultant.name, "Consultant One");
+    state = await (await post("/admin/api/deleted/restore", { id: deletedConsultant.id })).json();
+    assert.equal(state.consultants[`${tenant}:00000000-0000-0000-0000-000000000000`].name,
+      "Consultant One");
+    assert.ok(state.auditEvents.some(event => event.action === "consultant-restored"));
+    assert.ok(state.auditEvents.some(event => event.action === "tenant-restored"));
+    assert.ok(state.auditEvents.some(event => event.action === "deleted-license-purged"));
     assert.ok(state.auditEvents.some(event => event.action === "tenant-saved"));
     assert.ok(state.auditEvents.some(event => event.action === "tenant-trial-reset"));
     assert.ok(state.auditEvents.some(event => event.action === "consultant-saved"));
     await assert.rejects(createService({ dataDirectory: directory, adminKey: "weak" }), /64-character/);
     console.log("Tenant license admin protection, editing and conflict tests passed.");
   } finally { await new Promise(resolve => server.close(resolve)); }
+  // Items older than the 30-day retention disappear the next time the state is read.
+  const kept = await createService({ dataDirectory: directory, adminKey: key, notifier });
+  await new Promise(resolve => kept.listen(0, "127.0.0.1", resolve));
+  try {
+    const keptBase = `http://127.0.0.1:${kept.address().port}`;
+    const headers = { Authorization: "Bearer " + key, "Content-Type": "application/json" };
+    let keptState = await (await fetch(keptBase + "/admin/api/state", { headers })).json();
+    keptState = await (await fetch(keptBase + "/admin/api/tenant", { method: "DELETE", headers,
+      body: JSON.stringify({ tenantId: tenant, revision: keptState.revision }) })).json();
+    assert.equal(keptState.deletedLicenses.length, 1);
+  } finally { await new Promise(resolve => kept.close(resolve)); }
+  const later = await createService({ dataDirectory: directory, adminKey: key, notifier,
+    now: () => Date.now() + 31 * 86400000 });
+  await new Promise(resolve => later.listen(0, "127.0.0.1", resolve));
+  try {
+    const laterState = await (await fetch(`http://127.0.0.1:${later.address().port}/admin/api/state`, {
+      headers: { Authorization: "Bearer " + key } })).json();
+    assert.equal(laterState.deletedLicenses.length, 0);
+    assert.deepEqual(JSON.parse(await fs.readFile(path.join(directory, "deleted-licenses.json"), "utf8")), {});
+  } finally { await new Promise(resolve => later.close(resolve)); }
   const disabled = await createService({ dataDirectory: directory });
   await new Promise(resolve => disabled.listen(0, "127.0.0.1", resolve));
   try {
