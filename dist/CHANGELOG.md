@@ -1,4 +1,4 @@
-## Unreleased
+## 4.7.217
 - License administration: notes per customer and consultant license, for example the agreement, contact person or invoicing. They are shown in the license list, included in search and the CSV export, and kept when a trial is restarted.
 - License administration: the license list can be sorted by end date, soonest first, next to "Needs action" on the overview, which already lists licenses that expire within 30 days.
 - License administration: a backup. "Download backup" on the overview gives a file with every license table. The service can also write a daily copy to Azure Blob Storage, kept for 90 days, after a one-time setup with scripts/setup-license-backup.ps1. The overview shows the latest copy or the latest failure.
