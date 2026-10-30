@@ -49,6 +49,7 @@ async function main() {
     assert.match(await oauthReturnPage.text(), /Administratörsåtkomst/);
     assert.equal((await get("/admin/../tenants.json", "")).status, 404);
     assert.equal((await get("/admin/admin.js", "")).status, 200);
+    assert.equal((await get("/admin/admin-i18n.js", "")).status, 200);
     let state = await (await get("/admin/api/state")).json();
     assert.deepEqual(state.tenants, original);
     assert.equal(state.notificationConfigured, true);
@@ -154,6 +155,32 @@ async function main() {
     state = await (await get("/admin/api/state")).json();
     assert.equal(state.deletedLicenses.length, 0);
     assert.equal(state.tenants[tenant].name, "Ny Salico");
+    // Notes are optional: saved when sent, kept when omitted and removed when empty.
+    const current = state.tenants[tenant];
+    const tenantEdit = { tenantId: tenant, name: current.name, contactEmail: current.contactEmail,
+      licenseType: current.licenseType, enabled: current.enabled, expiresAt: current.expiresAt };
+    assert.equal((await save({ ...tenantEdit, notes: "x".repeat(2001), revision: state.revision })).status, 400);
+    assert.equal((await save({ ...tenantEdit, notes: "bad\u0000", revision: state.revision })).status, 400);
+    state = await (await save({ ...tenantEdit, notes: "  Avtal till 2027.\nKontakt: Anna  ",
+      revision: state.revision })).json();
+    assert.equal(state.tenants[tenant].notes, "Avtal till 2027.\nKontakt: Anna");
+    state = await (await save({ ...tenantEdit, name: "Salico", revision: state.revision })).json();
+    assert.equal(state.tenants[tenant].notes, "Avtal till 2027.\nKontakt: Anna");
+    state = await (await save({ ...tenantEdit, notes: "", revision: state.revision })).json();
+    assert.equal("notes" in state.tenants[tenant], false);
+    // The download holds every dataset and is logged; it needs the administrator.
+    assert.equal((await get("/admin/api/backup", "")).status, 401);
+    const download = await get("/admin/api/backup");
+    assert.equal(download.status, 200);
+    assert.match(download.headers.get("content-disposition"), /attachment; filename="bc-process-studio-licenses-\d{4}-\d{2}-\d{2}\.json"/);
+    const exported = await download.json();
+    assert.equal(exported.format, "bc-process-studio-license-backup");
+    assert.equal(exported.storage, "file");
+    assert.equal(exported.data.tenants[tenant].name, "Ny Salico");
+    assert.equal(exported.counts.tenants, Object.keys(exported.data.tenants).length);
+    state = await (await get("/admin/api/state")).json();
+    assert.equal(state.backup.configured, false);
+    assert.ok(state.auditEvents.some(event => event.action === "backup-downloaded"));
     const consultant = { entraTenantId: tenant, objectId: second,
       name: "Consultant One", email: "consultant@example.com", enabled: true,
       expiresAt: "2027-12-31T23:59:59Z", revision: state.consultantRevision };
@@ -162,6 +189,12 @@ async function main() {
     state = await consultantSaved.json();
     assert.equal(state.consultants[`${tenant}:00000000-0000-0000-0000-000000000000`].name,
       "Consultant One");
+    state = await (await saveConsultant({ ...consultant, objectId: "00000000-0000-0000-0000-000000000000",
+      notes: "Partner sedan 2025", revision: state.consultantRevision })).json();
+    state = await (await saveConsultant({ ...consultant, objectId: "00000000-0000-0000-0000-000000000000",
+      enabled: false, revision: state.consultantRevision })).json();
+    assert.equal(state.consultants[`${tenant}:00000000-0000-0000-0000-000000000000`].notes,
+      "Partner sedan 2025", "omitted notes are kept");
     const consultantDeleted = await fetch(base + "/admin/api/consultant", { method: "DELETE",
       headers: { Authorization: "Bearer " + key, "Content-Type": "application/json" },
       body: JSON.stringify({ entraTenantId: tenant, objectId: "00000000-0000-0000-0000-000000000000",

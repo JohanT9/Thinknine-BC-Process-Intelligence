@@ -8,6 +8,7 @@ const { createNotifier } = require("./notifications.js");
 const { createDocumentUsage, validUsage } = require("./document-usage.js");
 const { createAuditLog } = require("./audit-log.js");
 const { createTableStorage } = require("./table-storage.js");
+const { createBackup, STATUS_KEY: BACKUP_STATUS_KEY } = require("./backup.js");
 
 const GUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/;
 const EMAIL = /^[^\s@<>]+@[^\s@<>]+\.[^\s@<>]+$/u;
@@ -37,7 +38,8 @@ async function createService({ dataDirectory, now = Date.now, rateLimit = 120,
   entraClientId = "", entraAdminRole = "License.Administrator", adminEntraValidator = null,
   notificationWebhookUrl = "", notificationWebhookToken = "",
   notificationRecipient = "", notifier = null, tableAccountUrl = "",
-  managedIdentityClientId = "", migrateFromFiles = false }) {
+  managedIdentityClientId = "", migrateFromFiles = false, backupEnabled = false,
+  backupContainer = "license-backups", backupCredential = null, backupFetcher = null }) {
   await fs.mkdir(dataDirectory, { recursive: true, mode: 0o700 });
   const registryFile = path.join(dataDirectory, "tenants.json");
   const claimsFile = path.join(dataDirectory, "trial-claims.json");
@@ -300,10 +302,48 @@ async function createService({ dataDirectory, now = Date.now, rateLimit = 120,
     buckets.set(address, bucket); return bucket.count > rateLimit;
   }
   const usage = createDocumentUsage({ dataDirectory, storage, now });
+  // Every dataset, read from the active storage, for the download and the daily backup.
+  async function collectBackupData() {
+    if (storage) {
+      const data = {};
+      for (const name of Object.keys(storage.tables)) {
+        data[name] = name === "audit" ? await storage.readList("audit", 1000000) : await storage.readMap(name);
+      }
+      return data;
+    }
+    return { tenants: await registry(), claims: await claims(), consultants: await consultants(),
+      tenantUsers: await tenantUsers(), deletedLicenses: await deletedLicenses(),
+      registrations: await registrationEntries(), audit: await audit.read(1000000),
+      documentUsage: await optionalJson(path.join(dataDirectory, "document-usage.json")),
+      notifications: await optionalJson(path.join(dataDirectory, "notification-state.json")) };
+  }
+  const backupStatusFile = path.join(dataDirectory, "backup-status.json");
+  const backup = createBackup({ collect: collectBackupData, storageMode: storage ? "azure-table" : "file",
+    now, accountUrl: backupEnabled ? tableAccountUrl : "", container: backupContainer,
+    credential: backupEnabled ? backupCredential || (() => {
+      const { ManagedIdentityCredential } = require("@azure/identity");
+      return new ManagedIdentityCredential(managedIdentityClientId || undefined);
+    })() : null,
+    fetcher: backupFetcher || fetcher,
+    readStatus: async () => storage ? (await storage.readMap("metadata"))[BACKUP_STATUS_KEY] || null
+      : (await optionalJson(backupStatusFile))[BACKUP_STATUS_KEY] || null,
+    writeStatus: status => storage
+      ? storage.mutateMap("metadata", current => ({ updated: { ...current, [BACKUP_STATUS_KEY]: status } }))
+      : atomicWrite(backupStatusFile, { [BACKUP_STATUS_KEY]: status }),
+    onResult: result => {
+      void recordAudit({ actor: "system", action: result.success ? "backup-created" : "backup-failed",
+        entityType: "backup", entityId: result.name,
+        details: result.success ? result.counts : { error: result.error } });
+      if (!result.success) void notifications.send({ id: `backup-failed:${result.name}`,
+        type: "backup-failed", entityId: result.name,
+        subject: "BC Process Studio: licenssäkerhetskopian misslyckades",
+        text: `Säkerhetskopian ${result.name} kunde inte skrivas: ${result.error}` }).catch(() => {});
+    } });
   const admin = createAdmin({ dataDirectory, registry, mutateRegistry,
     consultants, mutateConsultants,
     tenantUsers, mutateTenantUsers, registrations: registrationEntries,
-    deleteTrialClaim, claims, restoreTrialClaim, deletedLicenses, mutateDeletedLicenses, now, adminKey, notificationConfigured: notifications.configured,
+    deleteTrialClaim, claims, restoreTrialClaim, deletedLicenses, mutateDeletedLicenses, now, adminKey,
+    backup, notificationConfigured: notifications.configured,
     auditEvents: audit.read, recordAudit, usageSummary: usage.summary,
     validateAdminEntra, entraClientId: entraClientId || entraAudience.replace(/^api:\/\//, ""),
     entraScope: entraAudience ? `${entraAudience.startsWith("api://") ? entraAudience : `api://${entraAudience}`}/${entraScope}` : "",
@@ -457,6 +497,7 @@ async function createService({ dataDirectory, now = Date.now, rateLimit = 120,
   const notificationTimer = setInterval(scanNotifications, 6 * 60 * 60 * 1000);
   notificationTimer.unref();
   server.on("close", () => clearInterval(notificationTimer));
+  server.on("close", backup.start());
   server.requestTimeout = 10000; server.headersTimeout = 10000; return server;
 }
 
@@ -499,7 +540,9 @@ if (require.main === module) {
     notificationRecipient: process.env.LICENSE_NOTIFICATION_RECIPIENT || "",
     tableAccountUrl: process.env.LICENSE_TABLE_ACCOUNT_URL || "",
     managedIdentityClientId: process.env.LICENSE_MANAGED_IDENTITY_CLIENT_ID || "",
-    migrateFromFiles: process.env.LICENSE_STORAGE_MIGRATE_FROM_FILES === "true" }).then(server => {
+    migrateFromFiles: process.env.LICENSE_STORAGE_MIGRATE_FROM_FILES === "true",
+    backupEnabled: process.env.LICENSE_BACKUP_ENABLED === "true",
+    backupContainer: process.env.LICENSE_BACKUP_CONTAINER || "license-backups" }).then(server => {
     const cloud = Boolean(process.env.WEBSITE_SITE_NAME);
     server.listen(Number(process.env.PORT || process.env.LICENSE_PORT) || 8787,
       cloud ? "0.0.0.0" : "127.0.0.1", () => console.log("License service started (HTTPS provided by deployment gateway)."));

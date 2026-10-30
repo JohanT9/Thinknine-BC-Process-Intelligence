@@ -5,30 +5,36 @@
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <title>Licensadministration – BC Process Studio</title>
   <link rel="stylesheet" href="/admin/admin.css">
+  <script src="/admin/admin-i18n.js" defer></script>
   <script src="/admin/admin.js" defer></script>
 </head>
 <body>
-  <a class="skip" href="#content">Hoppa till innehållet</a>
+  <a class="skip" href="#content" data-i18n="page.skip">Hoppa till innehållet</a>
   <header class="appbar">
     <div class="appbar-inner">
-      <div class="brand"><strong>BC Process Studio</strong><span>Licensadministration</span></div>
-      <nav id="tabs" class="tabs" aria-label="Avsnitt" hidden>
-        <a href="#oversikt" data-view="oversikt">Översikt</a>
-        <a href="#licenser" data-view="licenser">Licenser</a>
-        <a href="#anvandning" data-view="anvandning">Användning</a>
-        <a href="#handelser" data-view="handelser">Händelselogg</a>
-        <a href="#installationer" data-view="installationer">Installationer</a>
+      <div class="brand"><strong>BC Process Studio</strong><span data-i18n="page.subtitle">Licensadministration</span></div>
+      <nav id="tabs" class="tabs" aria-label="Avsnitt" data-i18n-label="nav.label" hidden>
+        <a href="#oversikt" data-view="oversikt" data-i18n="nav.overview">Översikt</a>
+        <a href="#licenser" data-view="licenser" data-i18n="nav.licenses">Licenser</a>
+        <a href="#anvandning" data-view="anvandning" data-i18n="nav.usage">Användning</a>
+        <a href="#handelser" data-view="handelser" data-i18n="nav.audit">Händelselogg</a>
+        <a href="#installationer" data-view="installationer" data-i18n="nav.installations">Installationer</a>
       </nav>
       <div class="appbar-actions">
-        <label class="visually-hidden" for="appearance">Utseende</label>
+        <label class="visually-hidden" for="language" data-i18n="language.label">Språk</label>
+        <select id="language" class="compact">
+          <option value="sv" lang="sv">Svenska</option>
+          <option value="en" lang="en">English</option>
+        </select>
+        <label class="visually-hidden" for="appearance" data-i18n="appearance.label">Utseende</label>
         <select id="appearance" class="compact">
-          <option value="dark">Mörkt</option>
-          <option value="light">Ljust</option>
-          <option value="system">Som systemet</option>
+          <option value="dark" data-i18n="appearance.dark">Mörkt</option>
+          <option value="light" data-i18n="appearance.light">Ljust</option>
+          <option value="system" data-i18n="appearance.system">Som systemet</option>
         </select>
         <span id="signedIn" class="signed-in" hidden></span>
-        <button id="refresh" type="button" class="ghost" hidden>Uppdatera</button>
-        <button id="logout" type="button" class="ghost" hidden>Logga ut</button>
+        <button id="refresh" type="button" class="ghost" data-i18n="header.refresh" hidden>Uppdatera</button>
+        <button id="logout" type="button" class="ghost" data-i18n="header.logout" hidden>Logga ut</button>
       </div>
     </div>
   </header>
@@ -36,16 +42,16 @@
   <main id="content" tabindex="-1">
     <section id="login" class="login" aria-labelledby="loginTitle">
       <div class="card login-card">
-        <h1 id="loginTitle">Administratörsåtkomst</h1>
-        <p>Logga in med ett Microsoft-konto som har rollen <strong>License.Administrator</strong>.</p>
-        <button id="entraLogin" type="button" class="primary wide" hidden>Logga in med Microsoft</button>
+        <h1 id="loginTitle" data-i18n="login.title">Administratörsåtkomst</h1>
+        <p id="loginIntro">Logga in med ett Microsoft-konto som har rollen <strong>License.Administrator</strong>.</p>
+        <button id="entraLogin" type="button" class="primary wide" data-i18n="login.microsoft" hidden>Logga in med Microsoft</button>
         <details id="keyFallback">
-          <summary>Använd reservnyckel</summary>
-          <p class="muted">Adminnyckeln sparas inte i webbläsaren. Använd endast HTTPS.</p>
+          <summary data-i18n="login.fallback">Använd reservnyckel</summary>
+          <p class="muted" data-i18n="login.fallbackHint">Adminnyckeln sparas inte i webbläsaren. Använd endast HTTPS.</p>
           <form id="loginForm">
-            <label for="adminKey">Adminnyckel</label>
+            <label for="adminKey" data-i18n="login.key">Adminnyckel</label>
             <input id="adminKey" type="password" autocomplete="off" required maxlength="64" spellcheck="false">
-            <button type="submit" class="primary">Logga in med reservnyckel</button>
+            <button type="submit" class="primary" data-i18n="login.keySubmit">Logga in med reservnyckel</button>
           </form>
         </details>
       </div>
@@ -55,88 +61,102 @@
       <section id="view-oversikt" class="view" data-view="oversikt" aria-labelledby="overviewTitle">
         <div class="page-head">
           <div>
-            <h1 id="overviewTitle">Översikt</h1>
-            <p class="muted">Spärrar och ändringar börjar gälla vid nästa licenskontroll. Godkännanden kan vara cachade i högst en timme.</p>
+            <h1 id="overviewTitle" data-i18n="overview.title">Översikt</h1>
+            <p class="muted" data-i18n="overview.intro">Spärrar och ändringar börjar gälla vid nästa licenskontroll. Godkännanden kan vara cachade i högst en timme.</p>
           </div>
         </div>
-        <div class="metrics" aria-label="Nyckeltal">
-          <button type="button" class="metric" data-goto-license="active"><strong id="metricActive">0</strong><span>Aktiva licenser</span></button>
-          <button type="button" class="metric" data-goto-license="trial"><strong id="metricTrial">0</strong><span>Aktiva testlicenser</span></button>
-          <button type="button" class="metric" data-goto-license="pending" data-tone="info"><strong id="metricPending">0</strong><span>Väntar på aktivering</span></button>
-          <button type="button" class="metric" data-goto-license="expiring" data-tone="warning"><strong id="metricExpiring">0</strong><span>Löper ut inom 30 dagar</span></button>
-          <button type="button" class="metric" data-goto-license="inactive" data-tone="critical"><strong id="metricInactive">0</strong><span>Utgångna eller spärrade</span></button>
-          <button type="button" class="metric" data-goto-view="anvandning"><strong id="metricUsers">0</strong><span>Anslutna användare</span></button>
-          <button type="button" class="metric" data-goto-audit="notification-failed" data-tone="critical"><strong id="metricMailFailures">0</strong><span>Misslyckade mejl</span></button>
+        <div class="metrics" aria-label="Nyckeltal" data-i18n-label="overview.metrics">
+          <button type="button" class="metric" data-goto-license="active"><strong id="metricActive">0</strong><span data-i18n="metric.active">Aktiva licenser</span></button>
+          <button type="button" class="metric" data-goto-license="trial"><strong id="metricTrial">0</strong><span data-i18n="metric.trial">Aktiva testlicenser</span></button>
+          <button type="button" class="metric" data-goto-license="pending" data-tone="info"><strong id="metricPending">0</strong><span data-i18n="metric.pending">Väntar på aktivering</span></button>
+          <button type="button" class="metric" data-goto-license="expiring" data-tone="warning"><strong id="metricExpiring">0</strong><span data-i18n="metric.expiring">Löper ut inom 30 dagar</span></button>
+          <button type="button" class="metric" data-goto-license="inactive" data-tone="critical"><strong id="metricInactive">0</strong><span data-i18n="metric.inactive">Utgångna eller spärrade</span></button>
+          <button type="button" class="metric" data-goto-view="anvandning"><strong id="metricUsers">0</strong><span data-i18n="metric.users">Anslutna användare</span></button>
+          <button type="button" class="metric" data-goto-audit="notification-failed" data-tone="critical"><strong id="metricMailFailures">0</strong><span data-i18n="metric.mailFailures">Misslyckade mejl</span></button>
         </div>
 
         <div class="overview-grid">
           <section class="card" aria-labelledby="actionTitle">
             <div class="card-head">
-              <h2 id="actionTitle">Kräver åtgärd <span id="actionCount" class="count">0</span></h2>
+              <h2 id="actionTitle"><span data-i18n="action.title">Kräver åtgärd</span> <span id="actionCount" class="count">0</span></h2>
             </div>
             <ul id="actionQueue" class="action-list"></ul>
-            <p id="actionEmpty" class="empty">Inget kräver åtgärd just nu.</p>
+            <p id="actionEmpty" class="empty" data-i18n="action.empty">Inget kräver åtgärd just nu.</p>
           </section>
-          <section class="card" aria-labelledby="notificationTitle">
-            <div class="card-head"><h2 id="notificationTitle">E-postnotifieringar</h2></div>
-            <p id="notificationStatus" class="status-line"></p>
-            <p class="muted small">Utgående licenser, väntande aktiveringar och misslyckade utskick skickas till den konfigurerade mottagaren.</p>
-            <button id="testNotification" type="button" class="secondary">Skicka testmejl</button>
-          </section>
+          <div class="side-cards">
+            <section class="card" aria-labelledby="notificationTitle">
+              <div class="card-head"><h2 id="notificationTitle" data-i18n="notifications.title">E-postnotifieringar</h2></div>
+              <p id="notificationStatus" class="status-line"></p>
+              <p class="muted small" data-i18n="notifications.help">Utgående licenser, väntande aktiveringar och misslyckade utskick skickas till den konfigurerade mottagaren.</p>
+              <button id="testNotification" type="button" class="secondary" data-i18n="notifications.test">Skicka testmejl</button>
+            </section>
+            <section class="card" aria-labelledby="backupTitle">
+              <div class="card-head"><h2 id="backupTitle" data-i18n="backup.title">Säkerhetskopiering</h2></div>
+              <p id="backupStatus" class="status-line"></p>
+              <p id="backupDetail" class="small" role="status" hidden></p>
+              <p id="backupHelp" class="muted small"></p>
+              <button id="downloadBackup" type="button" class="secondary" data-i18n="backup.download">Ladda ner säkerhetskopia</button>
+            </section>
+          </div>
         </div>
       </section>
 
       <section id="view-licenser" class="view" data-view="licenser" aria-labelledby="licensesTitle" hidden>
         <div class="page-head">
           <div>
-            <h1 id="licensesTitle">Licenser <span id="licenseTotal" class="count">0</span></h1>
-            <p class="muted">Kundföretag har en tenantlicens för sin Business Central-tenant. Konsultföretag har en licens för sin Entra-tenant som gäller hos alla kunder.</p>
+            <h1 id="licensesTitle"><span data-i18n="licenses.title">Licenser</span> <span id="licenseTotal" class="count">0</span></h1>
+            <p class="muted" data-i18n="licenses.intro">Kundföretag har en tenantlicens för sin Business Central-tenant. Konsultföretag har en licens för sin Entra-tenant som gäller hos alla kunder.</p>
           </div>
           <div class="head-actions">
-            <button id="newTenant" type="button" class="primary">+ Ny kundlicens</button>
-            <button id="newConsultant" type="button" class="secondary">+ Ny konsultlicens</button>
-            <button id="exportLicenses" type="button" class="secondary">Exportera CSV</button>
+            <button id="newTenant" type="button" class="primary" data-i18n="licenses.newTenant">+ Ny kundlicens</button>
+            <button id="newConsultant" type="button" class="secondary" data-i18n="licenses.newConsultant">+ Ny konsultlicens</button>
+            <button id="exportLicenses" type="button" class="secondary" data-i18n="licenses.export">Exportera CSV</button>
           </div>
         </div>
         <div class="filter-bar">
-          <label class="visually-hidden" for="licenseSearch">Sök licens</label>
-          <input id="licenseSearch" type="search" class="search" placeholder="Sök på namn, tenant-ID eller e-post">
-          <div class="segmented" role="group" aria-label="Typ av företag">
-            <button type="button" data-kind="all" aria-pressed="true">Alla</button>
-            <button type="button" data-kind="tenant" aria-pressed="false">Kundföretag</button>
-            <button type="button" data-kind="consultant" aria-pressed="false">Konsultföretag</button>
+          <label class="visually-hidden" for="licenseSearch" data-i18n="licenses.search">Sök licens</label>
+          <input id="licenseSearch" type="search" class="search" placeholder="Sök på namn, tenant-ID, e-post eller anteckning" data-i18n-placeholder="licenses.searchPlaceholder">
+          <div class="segmented" role="group" aria-label="Typ av företag" data-i18n-label="licenses.kindGroup">
+            <button type="button" data-kind="all" aria-pressed="true" data-i18n="kind.all">Alla</button>
+            <button type="button" data-kind="tenant" aria-pressed="false" data-i18n="kind.tenant">Kundföretag</button>
+            <button type="button" data-kind="consultant" aria-pressed="false" data-i18n="kind.consultant">Konsultföretag</button>
           </div>
+          <label class="inline-label" for="licenseSort" data-i18n="licenses.sort">Sortera</label>
+          <select id="licenseSort">
+            <option value="name" data-i18n="licenses.sortName">Namn</option>
+            <option value="expiry" data-i18n="licenses.sortExpiry">Slutdatum (närmast först)</option>
+          </select>
         </div>
-        <div id="licenseChips" class="chips" role="group" aria-label="Status"></div>
+        <div id="licenseChips" class="chips" role="group" aria-label="Status" data-i18n-label="licenses.statusGroup"></div>
         <p id="licenseResult" class="result-line" role="status" aria-live="polite"></p>
         <ul id="licenseList" class="list"></ul>
         <div id="licenseEmpty" class="empty-state" hidden>
           <p id="licenseEmptyText"></p>
-          <button id="clearLicenseFilters" type="button" class="secondary" hidden>Rensa filter</button>
+          <button id="clearLicenseFilters" type="button" class="secondary" data-i18n="licenses.clearFilters" hidden>Rensa filter</button>
         </div>
         <section class="card deleted-card" aria-labelledby="deletedTitle">
-          <div class="card-head"><h2 id="deletedTitle">Raderade licenser <span id="deletedCount" class="count">0</span></h2></div>
-          <p class="muted small">En raderad licens sparas i 30 dagar och kan återställas med sina användare. Därefter tas den bort automatiskt.</p>
+          <div class="card-head"><h2 id="deletedTitle"><span data-i18n="deleted.title">Raderade licenser</span> <span id="deletedCount" class="count">0</span></h2></div>
+          <p class="muted small" data-i18n="deleted.help">En raderad licens sparas i 30 dagar och kan återställas med sina användare. Därefter tas den bort automatiskt.</p>
           <ul id="deletedList" class="action-list"></ul>
-          <p id="deletedEmpty" class="empty">Inga raderade licenser.</p>
+          <p id="deletedEmpty" class="empty" data-i18n="deleted.empty">Inga raderade licenser.</p>
         </section>
       </section>
 
       <section id="view-anvandning" class="view" data-view="anvandning" aria-labelledby="usageTitle" hidden>
         <div class="page-head">
           <div>
-            <h1 id="usageTitle">Användning</h1>
-            <p class="muted">Unika sparade processdokument och felrapporter per användare från införandet. Redigeringar och exporter räknas inte igen, och äldre dokument ingår inte. Offlinehändelser visas efter synkronisering.</p>
+            <h1 id="usageTitle" data-i18n="usage.title">Användning</h1>
+            <p class="muted" data-i18n="usage.intro">Unika sparade processdokument och felrapporter per användare från införandet. Redigeringar och exporter räknas inte igen, och äldre dokument ingår inte. Offlinehändelser visas efter synkronisering.</p>
           </div>
         </div>
         <div class="filter-bar">
-          <label class="visually-hidden" for="usageSearch">Sök användare</label>
-          <input id="usageSearch" type="search" class="search" placeholder="Sök på namn, e-post eller ID">
-          <label class="inline-label" for="usagePeriod">Period</label>
-          <select id="usagePeriod"><option value="all">Totalt</option><option value="7">Senaste 7 dagarna</option><option value="30">Senaste 30 dagarna</option><option value="90">Senaste 90 dagarna</option></select>
+          <label class="visually-hidden" for="usageSearch" data-i18n="usage.search">Sök användare</label>
+          <input id="usageSearch" type="search" class="search" placeholder="Sök på namn, e-post eller ID" data-i18n-placeholder="usage.searchPlaceholder">
+          <label class="inline-label" for="usagePeriod" data-i18n="usage.period">Period</label>
+          <select id="usagePeriod"><option value="all" data-i18n="usage.periodAll">Totalt</option><option value="7" data-i18n="usage.period7">Senaste 7 dagarna</option><option value="30" data-i18n="usage.period30">Senaste 30 dagarna</option><option value="90" data-i18n="usage.period90">Senaste 90 dagarna</option></select>
         </div>
         <div class="table-card"><table class="data-table usage-table">
-          <thead><tr><th scope="col">Namn</th><th scope="col">E-post</th><th scope="col">Entra tenant-ID</th><th scope="col">Objekt-ID</th><th scope="col" class="num">Processdokument</th><th scope="col" class="num">Felrapporter</th><th scope="col">Senast skapad (UTC)</th></tr></thead>
+          <thead><tr><th scope="col" data-i18n="users.name">Namn</th><th scope="col" data-i18n="users.email">E-post</th><th scope="col" data-i18n="users.entraTenant">Entra tenant-ID</th><th scope="col" data-i18n="users.objectId">Objekt-ID</th><th scope="col" class="num" data-i18n="usage.documents">Processdokument</th><th scope="col" class="num" data-i18n="usage.reports">Felrapporter</th><th scope="col" data-i18n="usage.lastCreated">Senast skapad (UTC)</th></tr></thead>
           <tbody id="documentUsage"></tbody>
         </table></div>
         <p id="usageEmpty" class="empty">Ingen dokumentstatistik har registrerats ännu.</p>
@@ -145,18 +165,18 @@
       <section id="view-handelser" class="view" data-view="handelser" aria-labelledby="auditTitle" hidden>
         <div class="page-head">
           <div>
-            <h1 id="auditTitle">Händelselogg</h1>
-            <p class="muted">De senaste 500 licens- och notifieringshändelserna, nyast först. Tider anges i UTC.</p>
+            <h1 id="auditTitle" data-i18n="audit.title">Händelselogg</h1>
+            <p class="muted" data-i18n="audit.intro">De senaste 500 licens- och notifieringshändelserna, nyast först. Tider anges i UTC.</p>
           </div>
-          <div class="head-actions"><button id="exportAudit" type="button" class="secondary">Exportera CSV</button></div>
+          <div class="head-actions"><button id="exportAudit" type="button" class="secondary" data-i18n="audit.export">Exportera CSV</button></div>
         </div>
         <div class="filter-bar">
-          <label class="visually-hidden" for="auditSearch">Sök händelse</label>
-          <input id="auditSearch" type="search" class="search" placeholder="Sök på händelse, företag eller ID">
+          <label class="visually-hidden" for="auditSearch" data-i18n="audit.search">Sök händelse</label>
+          <input id="auditSearch" type="search" class="search" placeholder="Sök på händelse, företag eller ID" data-i18n-placeholder="audit.searchPlaceholder">
         </div>
-        <div id="auditChips" class="chips" role="group" aria-label="Händelsetyp"></div>
+        <div id="auditChips" class="chips" role="group" aria-label="Händelsetyp" data-i18n-label="audit.typeGroup"></div>
         <div class="table-card"><table class="data-table audit-table">
-          <thead><tr><th scope="col">Tidpunkt</th><th scope="col">Händelse</th><th scope="col">Företag/ID</th><th scope="col">Utförd av</th><th scope="col">Detaljer</th></tr></thead>
+          <thead><tr><th scope="col" data-i18n="audit.time">Tidpunkt</th><th scope="col" data-i18n="audit.event">Händelse</th><th scope="col" data-i18n="audit.subject">Företag/ID</th><th scope="col" data-i18n="audit.actor">Utförd av</th><th scope="col" data-i18n="audit.details">Detaljer</th></tr></thead>
           <tbody id="auditEvents"></tbody>
         </table></div>
         <p id="auditEmpty" class="empty">Inga händelser har registrerats ännu.</p>
@@ -165,15 +185,15 @@
       <section id="view-installationer" class="view" data-view="installationer" aria-labelledby="registrationTitle" hidden>
         <div class="page-head">
           <div>
-            <h1 id="registrationTitle">Installationer</h1>
+            <h1 id="registrationTitle" data-i18n="installations.title">Installationer</h1>
             <p id="registrationCount" class="muted"></p>
           </div>
         </div>
         <div class="table-card"><table class="data-table">
-          <thead><tr><th scope="col">Registrerad (UTC)</th><th scope="col">Tenant-ID</th><th scope="col">Installations-ID</th><th scope="col">Version</th></tr></thead>
+          <thead><tr><th scope="col" data-i18n="installations.registered">Registrerad (UTC)</th><th scope="col" data-i18n="installations.tenant">Tenant-ID</th><th scope="col" data-i18n="installations.installation">Installations-ID</th><th scope="col" data-i18n="installations.version">Version</th></tr></thead>
           <tbody id="registrations"></tbody>
         </table></div>
-        <p id="registrationEmpty" class="empty" hidden>Inga installationer har registrerats ännu.</p>
+        <p id="registrationEmpty" class="empty" data-i18n="installations.empty" hidden>Inga installationer har registrerats ännu.</p>
       </section>
     </div>
   </main>
@@ -181,29 +201,32 @@
   <dialog id="tenantDialog" aria-labelledby="tenantDialogTitle">
     <form id="tenantForm" method="dialog">
       <h2 id="tenantDialogTitle">Ny kundlicens</h2>
-      <label for="tenantId">Tenant-ID</label>
+      <label for="tenantId" data-i18n="tenantForm.tenantId">Tenant-ID</label>
       <input id="tenantId" required maxlength="36" spellcheck="false" autocomplete="off" class="mono" placeholder="00000000-0000-0000-0000-000000000000">
-      <label for="tenantName">Namn för administrationen</label>
+      <label for="tenantName" data-i18n="tenantForm.name">Namn för administrationen</label>
       <input id="tenantName" maxlength="100" autocomplete="off">
-      <label for="contactEmail">Kontaktadress</label>
+      <label for="contactEmail" data-i18n="tenantForm.contact">Kontaktadress</label>
       <input id="contactEmail" type="email" maxlength="254" autocomplete="off">
       <div class="field-row">
-        <div><label for="licenseType">Licenstyp</label>
-          <select id="licenseType"><option value="standard">Ordinarie licens</option><option value="trial">Testlicens</option></select></div>
-        <div><label for="expiresAt">Slutdatum (UTC)</label>
+        <div><label for="licenseType" data-i18n="tenantForm.type">Licenstyp</label>
+          <select id="licenseType"><option value="standard" data-i18n="type.standard">Ordinarie licens</option><option value="trial" data-i18n="type.trial">Testlicens</option></select></div>
+        <div><label for="expiresAt" data-i18n="tenantForm.expires">Slutdatum (UTC)</label>
           <input id="expiresAt" type="datetime-local" step="1" required></div>
       </div>
-      <div class="quick-dates" role="group" aria-label="Förläng från i dag">
-        <span>Sätt slutdatum:</span>
-        <button type="button" class="link" data-extend="tenant" data-days="30">+30 dagar</button>
-        <button type="button" class="link" data-extend="tenant" data-days="365">+1 år</button>
+      <div class="quick-dates" role="group" aria-label="Förläng från i dag" data-i18n-label="tenantForm.quick">
+        <span data-i18n="tenantForm.setExpiry">Sätt slutdatum:</span>
+        <button type="button" class="link" data-extend="tenant" data-days="30" data-i18n="tenantForm.days30">+30 dagar</button>
+        <button type="button" class="link" data-extend="tenant" data-days="365" data-i18n="tenantForm.year">+1 år</button>
       </div>
-      <label class="check"><input id="enabled" type="checkbox"> Licensen är aktiverad</label>
-      <p id="disableWarning" class="callout warning" hidden>Licensen spärras vid nästa licenskontroll. Befintliga godkännanden kan gälla i upp till en timme.</p>
+      <label class="check"><input id="enabled" type="checkbox"> <span data-i18n="tenantForm.enabled">Licensen är aktiverad</span></label>
+      <p id="disableWarning" class="callout warning" data-i18n="tenantForm.disableWarning" hidden>Licensen spärras vid nästa licenskontroll. Befintliga godkännanden kan gälla i upp till en timme.</p>
+      <label for="tenantNotes" data-i18n="tenantForm.notes">Anteckningar</label>
+      <textarea id="tenantNotes" maxlength="2000" rows="3" aria-describedby="tenantNotesHint"></textarea>
+      <p id="tenantNotesHint" class="muted small field-hint" data-i18n="tenantForm.notesHint">Till exempel avtal, kontaktperson eller fakturering. Visas bara i administrationen.</p>
       <p id="tenantFormError" class="form-error" role="alert" hidden></p>
       <div class="dialog-actions">
-        <button type="button" class="secondary" data-close>Avbryt</button>
-        <button id="save" type="submit" class="primary" value="save">Spara licens</button>
+        <button type="button" class="secondary" data-close data-i18n="tenantForm.cancel">Avbryt</button>
+        <button id="save" type="submit" class="primary" value="save" data-i18n="tenantForm.save">Spara licens</button>
       </div>
     </form>
   </dialog>
@@ -211,24 +234,27 @@
   <dialog id="consultantDialog" aria-labelledby="consultantDialogTitle">
     <form id="consultantForm" method="dialog">
       <h2 id="consultantDialogTitle">Ny konsultlicens</h2>
-      <label for="consultantTenantId">Entra tenant-ID</label>
+      <label for="consultantTenantId" data-i18n="consultantForm.tenantId">Entra tenant-ID</label>
       <input id="consultantTenantId" required maxlength="36" spellcheck="false" autocomplete="off" class="mono" placeholder="00000000-0000-0000-0000-000000000000">
-      <label for="consultantName">Företagsnamn</label>
+      <label for="consultantName" data-i18n="consultantForm.name">Företagsnamn</label>
       <input id="consultantName" maxlength="100" autocomplete="off">
-      <label for="consultantEmail">E-post för administration</label>
+      <label for="consultantEmail" data-i18n="consultantForm.email">E-post för administration</label>
       <input id="consultantEmail" type="email" maxlength="254" autocomplete="off">
-      <label for="consultantExpiresAt">Slutdatum (UTC)</label>
+      <label for="consultantExpiresAt" data-i18n="tenantForm.expires">Slutdatum (UTC)</label>
       <input id="consultantExpiresAt" type="datetime-local" step="1" required>
-      <div class="quick-dates" role="group" aria-label="Förläng från i dag">
-        <span>Sätt slutdatum:</span>
-        <button type="button" class="link" data-extend="consultant" data-days="30">+30 dagar</button>
-        <button type="button" class="link" data-extend="consultant" data-days="365">+1 år</button>
+      <div class="quick-dates" role="group" aria-label="Förläng från i dag" data-i18n-label="tenantForm.quick">
+        <span data-i18n="tenantForm.setExpiry">Sätt slutdatum:</span>
+        <button type="button" class="link" data-extend="consultant" data-days="30" data-i18n="tenantForm.days30">+30 dagar</button>
+        <button type="button" class="link" data-extend="consultant" data-days="365" data-i18n="tenantForm.year">+1 år</button>
       </div>
-      <label class="check"><input id="consultantEnabled" type="checkbox"> Konsultlicensen är aktiverad</label>
+      <label class="check"><input id="consultantEnabled" type="checkbox"> <span data-i18n="consultantForm.enabled">Konsultlicensen är aktiverad</span></label>
+      <label for="consultantNotes" data-i18n="tenantForm.notes">Anteckningar</label>
+      <textarea id="consultantNotes" maxlength="2000" rows="3" aria-describedby="consultantNotesHint"></textarea>
+      <p id="consultantNotesHint" class="muted small field-hint" data-i18n="tenantForm.notesHint">Till exempel avtal, kontaktperson eller fakturering. Visas bara i administrationen.</p>
       <p id="consultantFormError" class="form-error" role="alert" hidden></p>
       <div class="dialog-actions">
-        <button type="button" class="secondary" data-close>Avbryt</button>
-        <button type="submit" class="primary" value="save">Spara konsultlicens</button>
+        <button type="button" class="secondary" data-close data-i18n="tenantForm.cancel">Avbryt</button>
+        <button type="submit" class="primary" value="save" data-i18n="consultantForm.save">Spara konsultlicens</button>
       </div>
     </form>
   </dialog>
@@ -240,7 +266,7 @@
       <label id="confirmLabel" for="confirmInput"></label>
       <input id="confirmInput" autocomplete="off" spellcheck="false" class="mono">
       <div class="dialog-actions">
-        <button type="button" class="secondary" data-close>Avbryt</button>
+        <button type="button" class="secondary" data-close data-i18n="confirm.cancel">Avbryt</button>
         <button id="confirmAccept" type="submit" class="danger" value="confirm" disabled></button>
       </div>
     </form>

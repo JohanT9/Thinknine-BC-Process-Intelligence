@@ -10,7 +10,7 @@ async function main() {
     bundle: true, platform: "node", target: "node24", format: "cjs", write: false,
     logLevel: "warning" });
   zip.file("server.js", bundled.outputFiles[0].contents);
-  for (const file of ["package.json", "admin.html", "admin-ui.js", "admin.css"]) {
+  for (const file of ["package.json", "admin.html", "admin-ui.js", "admin-i18n.js", "admin.css"]) {
     zip.file(file, await fs.readFile(path.join(root, "services/licensing", file)));
   }
   const bytes = await zip.generateAsync({ type: "nodebuffer" });

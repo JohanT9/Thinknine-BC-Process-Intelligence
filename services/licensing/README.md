@@ -81,6 +81,16 @@ Admin tests: `node tests/tenant-license-admin.test.js`.
 
 Keep-warm tests: `node tests/license-keep-warm.test.js`.
 
+Backup tests: `node tests/license-backup.test.js`. Admin language tests:
+`node tests/license-admin-i18n.test.js`.
+
+Each customer and consultant license can carry administration notes (at most
+2,000 characters). They are stored with the license, shown and searchable in the
+admin view and included in the CSV export; an empty value removes them.
+
+The admin view is available in Swedish and English. The texts are in
+`admin-i18n.js`; the choice is remembered per browser.
+
 ## Dokumentstatistik per användare
 
 Admin visar antal unika sparade processdokument och felrapporter per Microsoft-användare,
