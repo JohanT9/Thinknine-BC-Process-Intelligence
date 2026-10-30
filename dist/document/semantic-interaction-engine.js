@@ -387,7 +387,7 @@
           if (candidate?.rowTypeContext && !values[0]?.rowTypeContext) break;
           const candidateField = text(candidate?.fieldCaption || controlCaption(candidate));
           if (candidateField && !fieldPattern.test(candidateField) && !LOOKUP.test(candidateField) &&
-              !config.extraMatch?.(candidate) &&
+              !config.extraMatch?.(candidate) && !selectedRecordValue(candidate) &&
               !["Select", "SelectRecord", "SelectOption", "SelectLookupValue"].includes(
                 candidate?.taskType || candidate?.semanticAction)) break;
           const selectedSoFar = values.map(value => selectedRecordValue(value) ||
