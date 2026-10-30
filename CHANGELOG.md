@@ -1,4 +1,4 @@
-## Unreleased
+## 4.7.215
 - The process document and its preview keep the steps shown in Review. The document ran the step rules once more on steps that were already decided, so a customer step followed by an item step became one step, "Choose Customer No. 30043", with the item number as the customer, and the item step disappeared. Steps that the interpretation already decided now stay as they are, and a step kept as recorded is described from the same information as in Review. Existing recordings show the corrected document the next time it is opened.
 
 ## 4.7.214
