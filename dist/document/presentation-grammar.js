@@ -164,7 +164,7 @@
       const isSortByNumber = /^(?:sortera efter\s+nr\.?|sort by\s+(?:no\.?|nr\.?)|trier par\s+n[°º.]|sortieren nach\s+nr\.?|ordenar por\s+n\.?[º°]|sort[eé]r? efter\s+nr\.?|lajittele\s+nro(?::n)?\s+mukaan|sorter etter\s+nr\.?)$/iu
         .test(observedSearchField);
       const searchField = isSortByNumber
-        ? sortByNumberCaptions[locale] : observedSearchField || {
+        ? (itemRow ? itemNumberLabels[locale] : sortByNumberCaptions[locale]) : observedSearchField || {
         "sv-SE": "nummerfältet", "en-US": "the number field",
         "fr-FR": "le champ du numéro", "de-DE": "das Nummernfeld",
         "es-ES": "el campo de número", "da-DK": "nummerfeltet",

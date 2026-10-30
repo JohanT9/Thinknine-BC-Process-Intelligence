@@ -45,6 +45,36 @@ const itemNumber = grammar.presentationFor({
 assert.strictEqual(itemNumber.text, "Ange 30043 i Artikel Nr.");
 assert.strictEqual(itemNumber.runs.find(run => run.text === "30043").bold, true);
 
+// On an item line the number column is announced by its sort button; the step names the item
+// number field in the document language instead of "Sortera efter Nr".
+const itemRowLookup = { actionType: "SearchAndSelectRecord", targetField: "Artikel Nr",
+  searchFieldCaption: "Sortera efter Nr", selectedValue: "30043", selectedEntity: "Item",
+  rowTypeContext: { source: "same-row-type", schemaVersion: 1, caption: "Typ", value: "Artikel" } };
+const itemRowTexts = {
+  "sv-SE": "Sök efter 30043 i Artikelnr. och välj den filtrerade posten.",
+  "en-US": "Search for 30043 in Item No. and select the matching record.",
+  "fr-FR": "Recherchez 30043 dans N° d’article puis sélectionnez l’enregistrement correspondant.",
+  "de-DE": "Suchen Sie nach 30043 in Artikelnr. und wählen Sie den passenden Datensatz aus.",
+  "es-ES": "Busque 30043 en N.º de artículo y seleccione el registro coincidente.",
+  "da-DK": "Søg efter 30043 i Varenr. og vælg den matchende post.",
+  "fi-FI": "Etsi 30043 kentästä Nimikenro ja valitse vastaava tietue.",
+  "nb-NO": "Søk etter 30043 i Varenr. og velg den samsvarende posten."
+};
+for (const [locale, expected] of Object.entries(itemRowTexts)) {
+  assert.strictEqual(grammar.presentationFor(itemRowLookup, "", locale).text, expected, locale);
+}
+// A list sorted by number keeps its observed search field.
+assert.strictEqual(grammar.presentationFor({ ...itemRowLookup, rowTypeContext: undefined,
+  selectedEntity: undefined }, "").text, "Sök efter 30043 i Sortera efter Nr och välj den filtrerade posten.");
+const lineLookup = interactions.processInteractions([{ taskId: "line-no", taskType: "ChangeField",
+  fieldCaption: "Sortera efter Nr", value: "30043", inputSources: ["input"],
+  rowTypeContext: itemRowLookup.rowTypeContext, sourceEventNos: [1] },
+{ taskId: "line-row", taskType: "RunAction", actionCaption: "Välj post",
+  selectedCaption: 'Välj posten "30043"', value: "30043", sourceEventNos: [2] }]);
+assert.strictEqual(lineLookup[0].displayText,
+  "Sök efter __30043__ i **Artikelnr.** och välj den filtrerade posten.");
+assert.strictEqual(lineLookup[0].searchFieldCaption, "Sortera efter Nr", "the observed caption stays as evidence");
+
 const projectedItemNumber = paragraph({
   taskId: "projected-item", taskType: "EnterItemNumber",
   fieldCaption: "Artikel Nr", value: "30043",
