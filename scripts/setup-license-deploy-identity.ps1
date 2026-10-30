@@ -8,10 +8,11 @@ $resourceGroup = "rg-bc-process-studio"
 $appName = "thinknine-bc-license"
 $identityName = "id-bc-license-deploy"
 $repository = "JohanT9/Thinknine-BC-Process-Intelligence"
-# GitHub environment names are case-insensitive but Entra compares the subject exactly,
-# so both spellings of the environment are trusted.
+# This repository's OIDC tokens name the owner and repository with their immutable IDs
+# (repo:Owner@id/Repo@id:...). Entra compares the subject exactly, so it must match the
+# environment as the workflow spells it. The plain form covers the older subject format.
 $subjects = @{ "github-production" = "repo:${repository}:environment:production";
-  "github-production-capitalized" = "repo:${repository}:environment:Production" }
+  "github-production-immutable" = "repo:JohanT9@187523751/Thinknine-BC-Process-Intelligence@1322950871:environment:production" }
 
 function Invoke-Az {
   $output = & az @args
