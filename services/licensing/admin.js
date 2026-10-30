@@ -4,6 +4,18 @@ const crypto = require("node:crypto");
 const GUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/;
 const ORGANIZATION_OBJECT_ID = "00000000-0000-0000-0000-000000000000";
 const hash = value => crypto.createHash("sha256").update(value).digest();
+// Free-text administration notes per customer; line breaks and tabs are allowed.
+const MAX_NOTES = 2000;
+const validNotes = value => value === undefined || (typeof value === "string" &&
+  value.length <= MAX_NOTES && !/[\u0000-\u0008\u000b\u000c\u000e-\u001f\u007f]/u.test(value));
+const keysWithoutNotes = value => Object.keys(value).filter(key => key !== "notes").sort().join(",");
+// Applies submitted notes to a license: empty notes are removed, omitted notes are kept.
+function withNotes(license, notes) {
+  if (notes === undefined) return license;
+  const trimmed = notes.trim();
+  const { notes: _previous, ...rest } = license;
+  return trimmed ? { ...rest, notes: trimmed } : rest;
+}
 
 function buildActions(tenants, consultants, timestamp) {
   const organizations = new Map();
@@ -59,6 +71,7 @@ function deletedSummary(id, item) {
 function createAdmin({ dataDirectory, registry, mutateRegistry, deleteTrialClaim,
   claims = async () => ({}), restoreTrialClaim = async () => {},
   deletedLicenses = async () => ({}), mutateDeletedLicenses = async () => ({}),
+  backup = null,
   consultants, mutateConsultants, tenantUsers, mutateTenantUsers, registrations = null, now, adminKey = "",
   usageSummary = async () => [], notificationConfigured = false, auditEvents = async () => [], recordAudit = async () => {},
   sendTestNotification = async () => ({ sent: false, configured: false }),
@@ -73,6 +86,7 @@ function createAdmin({ dataDirectory, registry, mutateRegistry, deleteTrialClaim
     ["/admin", ["admin.html", "text/html; charset=utf-8"]],
     ["/admin/", ["admin.html", "text/html; charset=utf-8"]],
     ["/admin/admin.js", ["admin-ui.js", "text/javascript; charset=utf-8"]],
+    ["/admin/admin-i18n.js", ["admin-i18n.js", "text/javascript; charset=utf-8"]],
     ["/admin/admin.css", ["admin.css", "text/css; charset=utf-8"]]
   ]);
   function limited(address) {
@@ -104,6 +118,7 @@ function createAdmin({ dataDirectory, registry, mutateRegistry, deleteTrialClaim
         ? { value: kept } : { updated: kept, value: kept };
     });
     return { revision, tenants, consultants: consultantLicenses, consultantRevision,
+      backup: backup ? await backup.status() : { configured: false },
       deletedLicenses: Object.entries(deleted || {}).map(([id, item]) => deletedSummary(id, item))
         .sort((a, b) => b.deletedAt.localeCompare(a.deletedAt)),
       actions: buildActions(tenants, consultantLicenses, now()), notificationConfigured,
@@ -157,6 +172,16 @@ function createAdmin({ dataDirectory, registry, mutateRegistry, deleteTrialClaim
       if (pathname === "/admin/api/knowledge-access" && request.method === "GET") {
         return reply(200, { authorized: adminActor.startsWith("entra:") });
       }
+      // The full export is offered as a file; it contains contact addresses, so it is logged.
+      if (pathname === "/admin/api/backup" && request.method === "GET") {
+        if (!backup) return reply(404, { error: "not-found" });
+        const exported = await backup.exportData();
+        void recordAudit({ actor: adminActor, action: "backup-downloaded", entityType: "backup",
+          entityId: exported.createdAt, details: exported.counts });
+        response.writeHead(200, { ...headers, "Content-Type": "application/json",
+          "Content-Disposition": `attachment; filename="bc-process-studio-licenses-${exported.createdAt.slice(0, 10)}.json"` });
+        return response.end(JSON.stringify(exported));
+      }
       if (pathname === "/admin/api/state" && request.method === "GET") {
         return reply(200, await snapshot());
       }
@@ -179,7 +204,7 @@ function createAdmin({ dataDirectory, registry, mutateRegistry, deleteTrialClaim
       const chunks = [];
       for await (const chunk of request) {
         size += chunk.length;
-        if (size > 2048) { reply(413, { error: "body-too-large" }); request.resume(); return; }
+        if (size > 8192) { reply(413, { error: "body-too-large" }); request.resume(); return; }
         chunks.push(chunk);
       }
       let value;
@@ -236,7 +261,8 @@ function createAdmin({ dataDirectory, registry, mutateRegistry, deleteTrialClaim
           GUID.test(value.objectId || "") && /^[0-9a-f]{64}$/.test(value.revision || "");
         const expected = deleteConsultant ? "entraTenantId,objectId,revision"
           : "email,enabled,entraTenantId,expiresAt,name,objectId,revision";
-        if (!baseValid || Object.keys(value).sort().join(",") !== expected ||
+        if (!baseValid || (deleteConsultant ? Object.keys(value).sort().join(",") : keysWithoutNotes(value)) !== expected ||
+            (!deleteConsultant && !validNotes(value.notes)) ||
             (!deleteConsultant && (typeof value.name !== "string" || value.name.length > 100 ||
               typeof value.email !== "string" || value.email.length > 254 ||
               typeof value.enabled !== "boolean" || !Number.isFinite(Date.parse(value.expiresAt))))) {
@@ -261,8 +287,10 @@ function createAdmin({ dataDirectory, registry, mutateRegistry, deleteTrialClaim
           if (deleteConsultant) {
             for (const key of Object.keys(updated)) if (key.startsWith(`${value.entraTenantId}:`)) delete updated[key];
           } else {
-            const organization = { name: value.name.trim(), email: value.email.trim().toLowerCase(),
-              enabled: value.enabled, expiresAt: new Date(value.expiresAt).toISOString() };
+            const previous = current[`${value.entraTenantId}:${ORGANIZATION_OBJECT_ID}`] || {};
+            const organization = withNotes({ ...(previous.notes ? { notes: previous.notes } : {}),
+              name: value.name.trim(), email: value.email.trim().toLowerCase(),
+              enabled: value.enabled, expiresAt: new Date(value.expiresAt).toISOString() }, value.notes);
             updated[`${value.entraTenantId}:${ORGANIZATION_OBJECT_ID}`] = organization;
             for (const [key, entry] of Object.entries(updated)) {
               if (key.startsWith(`${value.entraTenantId}:`) && key !== `${value.entraTenantId}:${ORGANIZATION_OBJECT_ID}`) {
@@ -314,7 +342,8 @@ function createAdmin({ dataDirectory, registry, mutateRegistry, deleteTrialClaim
         return reply(200, await snapshot());
       }
       if (!value || Array.isArray(value) ||
-          Object.keys(value).sort().join(",") !== "contactEmail,enabled,expiresAt,licenseType,name,revision,tenantId" ||
+          keysWithoutNotes(value) !== "contactEmail,enabled,expiresAt,licenseType,name,revision,tenantId" ||
+          !validNotes(value.notes) ||
           !GUID.test(value.tenantId) || typeof value.enabled !== "boolean" ||
           typeof value.name !== "string" || value.name.length > 100 ||
           /[\u0000-\u001f]/.test(value.name) ||
@@ -331,12 +360,12 @@ function createAdmin({ dataDirectory, registry, mutateRegistry, deleteTrialClaim
       const result = await mutateRegistry(async tenants => {
         const currentRevision = hash(JSON.stringify(tenants)).toString("hex");
         if (currentRevision !== value.revision) return { value: { conflict: true } };
-        return { updated: { ...tenants, [value.tenantId]: {
+        return { updated: { ...tenants, [value.tenantId]: withNotes({
           ...tenants[value.tenantId], name: value.name.trim(),
           contactEmail: value.contactEmail.trim().toLowerCase(),
           licenseType: value.licenseType,
           enabled: value.enabled, expiresAt: new Date(value.expiresAt).toISOString()
-        } }, value: {} };
+        }, value.notes) }, value: {} };
       });
       if (result.conflict) return reply(409, { error: "registry-changed" });
       void recordAudit({ actor: adminActor, action: "tenant-saved",

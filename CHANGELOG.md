@@ -1,3 +1,9 @@
+## 4.7.217
+- License administration: notes per customer and consultant license, for example the agreement, contact person or invoicing. They are shown in the license list, included in search and the CSV export, and kept when a trial is restarted.
+- License administration: the license list can be sorted by end date, soonest first, next to "Needs action" on the overview, which already lists licenses that expire within 30 days.
+- License administration: a backup. "Download backup" on the overview gives a file with every license table. The service can also write a daily copy to Azure Blob Storage, kept for 90 days, after a one-time setup with scripts/setup-license-backup.ps1. The overview shows the latest copy or the latest failure.
+- License administration in English. The language is chosen next to the appearance and remembered in the browser; the default follows the browser language. The administration is available in Swedish and English only; the extension's other languages are not included.
+
 ## 4.7.216
 - Page names in steps no longer end with the company badge, for example "Sales Order - SO1000269 ∙ Greenfood Iberica" instead of "... (UAT)". The web client adds the badge to every browser title. It is recognized from the product title "Dynamics 365 Business Central (UAT)" or as a word of the company name, and other parentheses in a page name are kept. The observed title stays in the step's evidence.
 

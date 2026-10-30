@@ -114,7 +114,7 @@ async function main() {
   for (const id of ["documentUsage", "usagePeriod", "usageSearch", "usageEmpty"]) elements.set(id, element());
   elements.get("usagePeriod").value = "30";
   const source = await fs.readFile(path.join(__dirname, "../services/licensing/admin-ui.js"), "utf8");
-  const context = { $: id => elements.get(id), document: { createElement: element },
+  const context = { $: id => elements.get(id), document: { createElement: element }, t: textKey => textKey,
     state: { tenantUsers: [{ entraTenantId: "tenant-a", objectId: "user-a", name: "Alice" }],
       consultants: { "tenant-a:00000000-0000-0000-0000-000000000000": { name: "Organization" } },
       documentUsage: summaries.map(s => ({ ...s, name: s.objectId === "user-a" ? "<script>Alice</script>" : s.name })) },

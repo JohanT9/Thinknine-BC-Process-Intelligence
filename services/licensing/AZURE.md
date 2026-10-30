@@ -45,6 +45,32 @@ moving to a plan with Always On, or `LICENSE_KEEP_WARM_URL` to ping another
 address. A failed ping is logged once, and so is the recovery. If the platform
 restarts the app, the first request after that still waits for a cold start.
 
+## Backup
+
+The admin overview has **Ladda ner säkerhetskopia / Download backup**: a JSON
+file with every license table, including deleted licenses, trial claims, users,
+installations, document usage and the event log. It contains contact addresses,
+so keep it protected. Every download is recorded in the event log.
+
+The service can also write the same export once a day to Azure Blob Storage,
+as `license-backups/licenses-YYYY-MM-DD.json` in the storage account that holds
+the tables. An existing blob is never overwritten. It checks every six hours
+and the first time five minutes after start. A failure is recorded in the event
+log, shown on the overview and sent as a notification.
+
+To enable it, signed in with `az login`, run
+`powershell -ExecutionPolicy Bypass -File scripts/setup-license-backup.ps1`.
+It creates the private container, grants the web app's managed identity
+**Storage Blob Data Contributor** on that container only, adds a lifecycle rule
+that deletes copies after 90 days (an existing lifecycle policy is not
+replaced; the script then says which rule to add) and sets
+`LICENSE_BACKUP_ENABLED=true`. The web app restarts.
+
+The copies are in the same storage account as the tables, so they protect
+against mistakes and faulty writes, not against losing the account itself.
+There is no restore button: restoring means importing the chosen file's
+datasets into the tables, which should be planned for the specific situation.
+
 ## Automatic deployment from GitHub
 
 `.github/workflows/deploy-license-service.yml` deploys the service when a change
