@@ -3,10 +3,9 @@ const path = require("node:path");
 const crypto = require("node:crypto");
 
 const EMAIL = /^[^\s@<>]+@[^\s@<>]+\.[^\s@<>]+$/u;
-// The daily summary lists licenses that expired within, or end within, this many days and
-// marks those that end within SOON_DAYS, the limit the admin view calls expiring.
-const DIGEST_DAYS = 30;
-const SOON_DAYS = 7;
+// The daily summary lists the licenses that have not expired and end within this many days,
+// the limit the admin view calls expiring.
+const DIGEST_DAYS = 7;
 
 function createNotifier({ dataDirectory, webhookUrl = "", webhookToken = "",
   recipient = "", fetcher = fetch, now = Date.now, onDelivery = async () => {},
@@ -61,8 +60,8 @@ function createNotifier({ dataDirectory, webhookUrl = "", webhookToken = "",
     });
     return operation;
   }
-  // One daily summary of every license that has expired recently or ends soon, sent once a day
-  // from the configured local hour. It replaces one reminder per license.
+  // One daily summary of every license that ends within DIGEST_DAYS, sent once a day from the
+  // configured local hour. It replaces one reminder per license.
   function localDay(timestamp) {
     const parts = Object.fromEntries(new Intl.DateTimeFormat("sv-SE", { timeZone: digestTimeZone,
       year: "numeric", month: "2-digit", day: "2-digit", hour: "2-digit", hourCycle: "h23" })
@@ -83,28 +82,22 @@ function createNotifier({ dataDirectory, webhookUrl = "", webhookToken = "",
     return [
       ...Object.entries(tenants || {}).map(([id, entry]) => ({ id, entry, kind: "tenant" })),
       ...[...organizations].map(([id, entry]) => ({ id, entry, kind: "consultant" }))
-    ].filter(item => item.entry.enabled).map(item => ({ ...item,
-      expired: Date.parse(item.entry.expiresAt) <= timestamp,
-      days: Math.round((calendarDay(Date.parse(item.entry.expiresAt)) - today) / 86400000) }))
-      .filter(item => item.days > -DIGEST_DAYS && item.days <= DIGEST_DAYS)
+    ].filter(item => item.entry.enabled && Date.parse(item.entry.expiresAt) > timestamp)
+      .map(item => ({ ...item,
+        days: Math.round((calendarDay(Date.parse(item.entry.expiresAt)) - today) / 86400000) }))
+      .filter(item => item.days <= DIGEST_DAYS)
       .sort((a, b) => Date.parse(a.entry.expiresAt) - Date.parse(b.entry.expiresAt));
   }
   function digestText(items, date) {
     const utc = value => new Date(value).toISOString().slice(0, 16).replace("T", " ") + " UTC";
-    const relative = days => days === 0 ? "i dag" : days === 1 ? "i morgon" : days === -1 ? "i går"
-      : days > 0 ? `om ${days} dagar` : `för ${-days} dagar sedan`;
+    const relative = days => days === 0 ? "i dag" : days === 1 ? "i morgon" : `om ${days} dagar`;
     const line = item => {
       const kind = item.kind === "consultant" ? "konsultföretag"
         : item.entry.licenseType === "trial" ? "kundföretag, testlicens" : "kundföretag, ordinarie licens";
-      const when = `${item.expired ? "gick ut" : "går ut"} ${utc(item.entry.expiresAt)} (${relative(item.days)})`;
-      return `- ${item.entry.name || "Namnlöst företag"} – ${kind} – ${when} – ID ${item.id}`;
+      return `- ${item.entry.name || "Namnlöst företag"} – ${kind} – går ut ${utc(item.entry.expiresAt)} ` +
+        `(${relative(item.days)}) – ID ${item.id}`;
     };
-    const groups = [["Har gått ut", items.filter(item => item.expired)],
-      [`Inom ${SOON_DAYS} dagar`, items.filter(item => !item.expired && item.days <= SOON_DAYS)],
-      [`Inom ${DIGEST_DAYS} dagar`, items.filter(item => !item.expired && item.days > SOON_DAYS)]]
-      .filter(([, group]) => group.length);
-    return [`Licenser som har gått ut eller går ut inom ${DIGEST_DAYS} dagar, ${date}.`, "",
-      ...groups.flatMap(([title, group]) => [`${title} (${group.length})`, ...group.map(line), ""]),
+    return [`Licenser som går ut inom ${DIGEST_DAYS} dagar, ${date}:`, "", ...items.map(line), "",
       ...(adminUrl ? [`Förläng eller spärra licenserna i licensadministrationen: ${adminUrl}`]
         : ["Förläng eller spärra licenserna i licensadministrationen."])].join("\n");
   }
@@ -121,11 +114,11 @@ function createNotifier({ dataDirectory, webhookUrl = "", webhookToken = "",
     const items = expiringLicenses(tenants, consultants, timestamp);
     if (!items.length) return { sent: false, reason: "nothing-expiring" };
     return send({ id: `expiry-digest:${today.date}`, type: "license-expiry-digest", entityId: today.date,
-      subject: `BC Process Studio: ${items.length} ${items.length === 1 ? "licens har gått ut eller går ut snart"
-        : "licenser har gått ut eller går ut snart"}`,
+      subject: `BC Process Studio: ${items.length} ${items.length === 1 ? "licens" : "licenser"} ` +
+        `går ut inom ${DIGEST_DAYS} dagar`,
       text: digestText(items, today.date) });
   }
   return Object.freeze({ send, scan, due, configured: Boolean(endpoint && recipient) });
 }
 
-module.exports = { createNotifier, DIGEST_DAYS, SOON_DAYS };
+module.exports = { createNotifier, DIGEST_DAYS };

@@ -21,7 +21,7 @@ async function main() {
   assert.equal(requests[0].options.headers.Authorization, "Bearer secret");
   assert.equal(JSON.parse(requests[0].options.body).to, "admin@example.com");
 
-  // One summary a day from 08:00 Swedish time lists every expired or expiring license.
+  // One summary a day from 08:00 Swedish time lists every license that ends within 7 days.
   let clock = Date.parse("2026-09-18T05:30:00Z"); // 07:30 in Stockholm (summer time)
   const digestRequests = [];
   const digest = createNotifier({ dataDirectory: await fs.mkdtemp(path.join(os.tmpdir(), "t9-license-digest-")),
@@ -31,6 +31,8 @@ async function main() {
   const tenants = {
     soon: { name: "Fabrikam", enabled: true, licenseType: "trial", expiresAt: "2026-09-21T10:00:00Z" },
     month: { name: "Contoso", enabled: true, licenseType: "standard", expiresAt: "2026-10-10T10:00:00Z" },
+    seven: { name: "Seven", enabled: true, expiresAt: "2026-09-25T21:00:00Z" },
+    eight: { name: "Eight", enabled: true, expiresAt: "2026-09-26T08:00:00Z" },
     expired: { name: "Adatum", enabled: true, expiresAt: "2026-09-10T10:00:00Z" },
     longAgo: { name: "Old", enabled: true, expiresAt: "2026-01-01T10:00:00Z" },
     blocked: { name: "Blocked", enabled: false, expiresAt: "2026-09-20T10:00:00Z" },
@@ -46,17 +48,14 @@ async function main() {
   assert.equal(digestRequests.length, 1, "one email for all licenses");
   const mail = digestRequests[0];
   assert.equal(mail.eventType, "license-expiry-digest");
-  assert.equal(mail.subject, "BC Process Studio: 4 licenser har gått ut eller går ut snart");
+  assert.equal(mail.subject, "BC Process Studio: 3 licenser går ut inom 7 dagar");
   const lines = mail.text.split("\n");
-  assert.equal(lines[0], "Licenser som har gått ut eller går ut inom 30 dagar, 2026-09-18.");
-  assert.ok(lines.includes("Har gått ut (1)"));
-  assert.ok(lines.includes("Inom 7 dagar (2)"));
-  assert.ok(lines.includes("Inom 30 dagar (1)"));
-  assert.ok(mail.text.indexOf("Konsult AB") < mail.text.indexOf("Fabrikam"), "soonest first");
-  assert.match(mail.text, /- Adatum – kundföretag, ordinarie licens – gick ut 2026-09-10 10:00 UTC \(för 8 dagar sedan\) – ID expired/);
-  assert.match(mail.text, /- Fabrikam – kundföretag, testlicens – går ut 2026-09-21 10:00 UTC \(om 3 dagar\) – ID soon/);
-  assert.match(mail.text, /- Konsult AB – konsultföretag – går ut 2026-09-19 10:00 UTC \(i morgon\) – ID c1/);
-  assert.ok(!/Old|Blocked|Later|Consultant user/.test(mail.text), "only enabled licenses within 30 days, one per company");
+  assert.deepEqual(lines.slice(0, 5), ["Licenser som går ut inom 7 dagar, 2026-09-18:", "",
+    "- Konsult AB – konsultföretag – går ut 2026-09-19 10:00 UTC (i morgon) – ID c1",
+    "- Fabrikam – kundföretag, testlicens – går ut 2026-09-21 10:00 UTC (om 3 dagar) – ID soon",
+    "- Seven – kundföretag, ordinarie licens – går ut 2026-09-25 21:00 UTC (om 7 dagar) – ID seven"]);
+  assert.ok(!/Adatum|Contoso|Eight|Old|Blocked|Later|Consultant user/.test(mail.text),
+    "only enabled licenses that have not expired and end within 7 days, one per company");
   assert.ok(lines.at(-1).endsWith("https://licenses.example.test/admin#licenser"));
   assert.equal(await digest.due(), false, "sent once a day");
   assert.deepEqual(await digest.scan(tenants, consultants), { sent: false, duplicate: true });
