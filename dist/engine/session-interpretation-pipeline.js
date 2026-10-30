@@ -124,8 +124,19 @@ function (semantic, knowledge, refs, taskVisibility, processAnalysis) {
     // A click's screenshot is taken at the click, before the client responds, so for a choice
     // in a list it shows the chosen row. A queued screenshot of a later event can show a later
     // moment, such as the next field being typed.
-    const choiceAtClick = /^Select/u.test(String(action.actionType || "")) ? [...sourceEvents]
-      .reverse().find(event => event.preActionCaptureId && screenshots[event.eventNo]) : null;
+    // A step that clicks a named control, such as OK in a dialog, likewise shows that control as
+    // it was clicked, not the page after the dialog closed.
+    const named = value => String(value || "").replace(/[-]/gu, "")
+      .replace(/\s+/gu, " ").trim().toLocaleLowerCase();
+    const clicksControl = /Action|Dialog/u.test(String(action.actionType || "")) &&
+      action.actionType !== "SearchAndOpenPage";
+    const clickedCaption = !clicksControl ? "" : named(Array.isArray(action.actionPath) &&
+      action.actionPath.length ? action.actionPath.at(-1) : action.actionCaption ||
+        action.rawInteractions?.[0]?.actionCaption || action.targetField || "");
+    const choiceAtClick = (/^Select/u.test(String(action.actionType || "")) ? [...sourceEvents]
+      .reverse().find(event => event.preActionCaptureId && screenshots[event.eventNo]) : null) ||
+      (clickedCaption ? [...sourceEvents].reverse().find(event => event.preActionCaptureId &&
+        screenshots[event.eventNo] && named(event.label || event.accessibleName) === clickedCaption) : null);
     const screenshot = (choiceAtClick && screenshots[choiceAtClick.eventNo]) ||
       screenshots[preferredEventNo] || action.preferredScreenshotRef ||
       [...eventNos].reverse().map(no => screenshots[no]).find(Boolean) ||

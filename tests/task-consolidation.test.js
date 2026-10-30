@@ -156,4 +156,24 @@ assert.strictEqual(decided.tasks.at(-1).instruction, "Tryck på **Alt+N**.");
 assert.deepStrictEqual(decided.tasks.map(task => task.sourceEventNos),
   [[21], [22], [23], [24], [25], [26], [27]]);
 
+// Describing a decided step again keeps the screenshot and the outline chosen with it.
+{
+  const highlight = { screenshotRef: "screenshots/000112.png", sourceEventNo: 112,
+    x: 0.5956, y: 0.631, width: 0.0334, height: 0.025 };
+  // A decided step carries the interactions it was built from; describing it again rebuilds it
+  // from them, which dropped what the pipeline added to the step.
+  const [described] = consolidation.consolidateWithAnalysis([{ taskId: "ok", taskType: "SelectVendor",
+    fieldCaption: "Leverantörsnr", selectedCaption: "11579", value: "11579",
+    instruction: "Välj **11579** i **Leverantörsnr**.", sourceEventNos: [112, 115],
+    semanticActionModel: { actionType: "SelectVendor", targetField: "Leverantörsnr", selectedValue: "11579",
+      rawInteractions: [{ taskId: "group", taskType: "ChangeField", fieldCaption: "Leverantörsnr",
+        value: "11579", inputSources: ["change"] }] },
+    screenshot: "screenshots/000112.png", screenshots: ["screenshots/000112.png"],
+    screenshotHighlight: highlight, preferredScreenshotRef: "screenshots/000115.png" }],
+  { mergeSteps: false }).tasks;
+  assert.strictEqual(described.screenshot, "screenshots/000112.png");
+  assert.deepStrictEqual(described.screenshots, ["screenshots/000112.png"]);
+  assert.deepStrictEqual(described.screenshotHighlight, highlight);
+}
+
 console.log("Business task consolidation behaviour tests passed.");
