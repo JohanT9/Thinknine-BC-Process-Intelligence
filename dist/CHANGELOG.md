@@ -1,4 +1,4 @@
-## Unreleased
+## 4.7.216
 - Page names in steps no longer end with the company badge, for example "Sales Order - SO1000269 ∙ Greenfood Iberica" instead of "... (UAT)". The web client adds the badge to every browser title. It is recognized from the product title "Dynamics 365 Business Central (UAT)" or as a word of the company name, and other parentheses in a page name are kept. The observed title stays in the step's evidence.
 
 ## 4.7.215
