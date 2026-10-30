@@ -1,4 +1,4 @@
-## Unreleased
+## 4.7.224
 - The recording window no longer says that events have not arrived when they have. The background worker's status was written back from an older copy when screenshots and events were recorded at the same time, which lost counts; status writes are now made one at a time. A recording that showed the warning after 4.7.221 was complete.
 - An item chosen in a document line's suggestion list is "Choose item 1283344" again on purchase orders as on sales orders, also when Business Central redraws the page after the choice.
 - A quantity that Business Central shows in its own format after it was entered (1500 becomes 1 500) is one step with the shown value, also when the page is redrawn in between. It was two steps.
