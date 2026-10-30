@@ -47,4 +47,31 @@ const fallback = interpret({ 1: "screenshots/000001.png", 3: "screenshots/000003
   .find(task => /905/u.test(task.instruction));
 assert.notStrictEqual(fallback.screenshot, "screenshots/000002.png");
 assert.ok(fallback.screenshot);
+// A step that clicks a named control, OK in a dialog, shows the screenshot taken at that click,
+// not the page after the dialog closed.
+{
+  const dialogPage = { sourceFrameId: "inner", frameDepth: 1, pageId: "7002", pageCaption: "Ändra tillämpad direkt enhetskostnad" };
+  const dialogEvents = [
+    { ...dialogPage, type: "click", category: "action", controlType: "button", role: "button",
+      accessibleName: "OK", label: "OK", pointerTarget: true, interactionId: "inner:ok",
+      preActionCaptureId: "inner:ok-capture", timestamp: at(20) },
+    { ...dialogPage, type: "dialog-close", category: "dialog", controlType: "form", role: "dialog",
+      accessibleName: "Ändra tillämpad direkt enhetskostnad", interactionId: "inner:ok", timestamp: at(21) }
+  ].map((event, index) => ({ ...event, sourceEventId: `dialog:${index + 1}`, sourceSequence: 10 + index,
+    recordingId: "selection-screenshot" }));
+  let dialogRecording = canonical.create({ id: "dialog-screenshot", name: "Dialog screenshot" });
+  const dialogInput = dialogEvents.map((event, index) => {
+    dialogRecording = canonical.addEvent(dialogRecording, event, identify.identify(event, { eventId: `dialog:event:${index}` }));
+    return { ...event, eventNo: index + 1, canonicalSourceEventId: dialogRecording.events.at(-1).id };
+  });
+  const dialogNormalized = normalization.normalizeRecording(dialogRecording);
+  const dialogGrouped = grouping.group(dialogNormalized);
+  const okTask = pipeline.interpret({ session: { id: "dialog", name: "Dialog", settings: { documentLanguage: "sv-SE" } },
+    events: dialogInput, normalizedEvents: dialogNormalized.events, stepGroups: dialogGrouped.groups,
+    supportingEvents: dialogGrouped.supportingEvents, groupingDiagnostics: dialogGrouped.diagnostics,
+    imagePaths: { 1: "screenshots/ok-click.png", 2: "screenshots/after-close.png" }, knowledgePacks: [] })
+    .businessTasks.find(task => /OK/u.test(task.instruction));
+  assert.ok(okTask);
+  assert.strictEqual(okTask.screenshot, "screenshots/ok-click.png");
+}
 console.log("Selection screenshot tests passed.");

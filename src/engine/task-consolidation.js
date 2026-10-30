@@ -25,10 +25,15 @@
   // typed it as choosing an item: steps are not merged again, and a step the rules kept is
   // never hidden. If its description would hide it, the step keeps the one it had. Tasks built
   // without the semantic rules (the legacy compatibility path) are still merged here.
+  // The step's screenshot and the outline of its clicked control were chosen with the step and
+  // stay with it when it is described again.
   function describe(task) {
     const described = engine.consolidateInteractions([task]);
     const value = described.length === 1 ? described[0] : task;
-    return [task.taskId ? { ...value, sourceTaskIds: [String(task.taskId)] } : value];
+    const kept = task.screenshot ? { screenshot: task.screenshot,
+      screenshots: task.screenshots ? [...task.screenshots] : [task.screenshot],
+      ...(task.screenshotHighlight ? { screenshotHighlight: { ...task.screenshotHighlight } } : {}) } : {};
+    return [task.taskId ? { ...value, ...kept, sourceTaskIds: [String(task.taskId)] } : { ...value, ...kept }];
   }
   function consolidateWithAnalysis(tasks = [], { mergeSteps = true } = {}) {
     const consolidated = mergeSteps ? engine.consolidateInteractions(tasks)
