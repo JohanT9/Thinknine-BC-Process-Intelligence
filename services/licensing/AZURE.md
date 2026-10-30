@@ -60,8 +60,11 @@ One-time setup:
    `powershell -ExecutionPolicy Bypass -File scripts/setup-license-deploy-identity.ps1`.
    It creates `id-bc-license-deploy`, trusts GitHub's `production` environment
    of this repository and grants **Website Contributor** on the web app only.
+   This repository's tokens use the subject format with immutable IDs,
+   `repo:JohanT9@187523751/Thinknine-BC-Process-Intelligence@1322950871:environment:production`;
+   if sign-in fails with AADSTS700213, the error shows the subject to trust.
 2. In GitHub, Settings > Environments, create the environment `production`
-   (either spelling works; the script trusts `production` and `Production`).
+   (either spelling works; the workflow's own spelling decides the subject).
    Add yourself as a required reviewer if every deployment should wait for
    approval.
 3. In Settings > Secrets and variables > Actions > Variables, add the three
