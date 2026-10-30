@@ -16,6 +16,14 @@ function Invoke-Az {
   if ($LASTEXITCODE -ne 0) { throw "az $($args -join ' ') failed." }
   return $output
 }
+# For a lookup that may find nothing: Windows PowerShell turns az's error output into a
+# terminating error under "Stop", so it runs with "Continue" and returns $null on failure.
+function Get-AzOptional {
+  $ErrorActionPreference = "Continue"
+  $output = & az @args 2>$null
+  if ($LASTEXITCODE -ne 0) { return $null }
+  return $output
+}
 
 $settings = Invoke-Az webapp config appsettings list --resource-group $resourceGroup --name $appName --output json | ConvertFrom-Json
 $tableUrl = ($settings | Where-Object { $_.name -eq "LICENSE_TABLE_ACCOUNT_URL" }).value
@@ -36,21 +44,26 @@ if ($identityClientId) {
 if (-not $principalId) { throw "The web app's managed identity could not be found." }
 
 # A private container, created through Azure Resource Manager so no data-plane role is needed here.
-$existing = & az storage container-rm show --storage-account $account.id --name $container --output json 2>$null
-if ($LASTEXITCODE -ne 0 -or -not $existing) {
+$exists = Invoke-Az storage container-rm exists --storage-account $account.id --name $container --query exists --output tsv
+if ($exists -ne "true") {
   Invoke-Az storage container-rm create --storage-account $account.id --name $container --public-access off --output none
 }
 $containerScope = "$($account.id)/blobServices/default/containers/$container"
 $assigned = Invoke-Az role assignment list --assignee $principalId --scope $containerScope `
   --role "Storage Blob Data Contributor" --output json | ConvertFrom-Json
 if (-not $assigned) {
-  Invoke-Az role assignment create --assignee-object-id $principalId --assignee-principal-type ServicePrincipal `
-    --role "Storage Blob Data Contributor" --scope $containerScope --output none
+  # A new container can take a moment to become visible to role assignments.
+  for ($attempt = 1; $attempt -le 6; $attempt++) {
+    if (Get-AzOptional role assignment create --assignee-object-id $principalId --assignee-principal-type ServicePrincipal `
+        --role "Storage Blob Data Contributor" --scope $containerScope --query id --output tsv) { break }
+    if ($attempt -eq 6) { throw "The role assignment could not be created." }
+    Start-Sleep -Seconds 10
+  }
 }
 
 # Old copies are deleted by the storage account itself. An existing lifecycle policy is never replaced.
-$policy = & az storage account management-policy show --account-name $accountName --resource-group $account.resourceGroup --output json 2>$null
-if ($LASTEXITCODE -eq 0 -and $policy) {
+$policy = Get-AzOptional storage account management-policy show --account-name $accountName --resource-group $account.resourceGroup --output json
+if ($policy) {
   if (($policy | ConvertFrom-Json).policy.rules.name -notcontains "license-backups-retention") {
     Write-Warning "The storage account already has a lifecycle policy. Add a rule that deletes blobs under '$container/licenses-' after $retentionDays days yourself."
   }

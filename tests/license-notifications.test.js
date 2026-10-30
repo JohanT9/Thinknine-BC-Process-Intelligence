@@ -32,11 +32,13 @@ async function main() {
   const actions = buildActions({
     pending: { name: "Pending", enabled: false, requestedAt: "2026-09-18T10:00:00Z",
       expiresAt: "2026-10-18T10:00:00Z" },
-    expiring: { name: "Expiring", enabled: true, expiresAt: "2026-09-28T12:00:00Z" },
+    expiring: { name: "Expiring", enabled: true, expiresAt: "2026-09-25T12:00:00Z" },
+    tenDays: { name: "Ten days", enabled: true, expiresAt: "2026-09-28T12:00:00Z" },
     later: { name: "Later", enabled: true, expiresAt: "2027-09-18T12:00:00Z" }
   }, {}, timestamp);
+  // Only a license that ends within seven days needs action.
   assert.deepEqual(actions.map(item => item.actionType), ["pending", "expiring"]);
-  assert.equal(actions[1].daysRemaining, 10);
+  assert.equal(actions[1].daysRemaining, 7);
 
   const disabled = createNotifier({ dataDirectory: directory, now: () => timestamp,
     fetcher: async () => { throw new Error("must not run"); } });

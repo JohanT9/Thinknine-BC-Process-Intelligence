@@ -1,3 +1,7 @@
+## 4.7.218
+- License administration: a license counts as expiring soon when it ends within 7 days instead of 30. This applies to its status, the "Expiring within 7 days" filter and key figure, and the "Needs action" list. Email reminders are still sent 30, 14 and 3 days before the end date.
+- The backup setup script no longer stops when the container or lifecycle policy it checks for does not exist yet.
+
 ## 4.7.217
 - License administration: notes per customer and consultant license, for example the agreement, contact person or invoicing. They are shown in the license list, included in search and the CSV export, and kept when a trial is restarted.
 - License administration: the license list can be sorted by end date, soonest first, next to "Needs action" on the overview, which already lists licenses that expire within 30 days.

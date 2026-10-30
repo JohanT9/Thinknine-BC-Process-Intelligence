@@ -17,6 +17,8 @@ function withNotes(license, notes) {
   return trimmed ? { ...rest, notes: trimmed } : rest;
 }
 
+// A license that ends within this many days is "expiring" and needs action.
+const EXPIRING_DAYS = 7;
 function buildActions(tenants, consultants, timestamp) {
   const organizations = new Map();
   for (const [id, license] of Object.entries(consultants || {})) {
@@ -36,7 +38,7 @@ function buildActions(tenants, consultants, timestamp) {
     let actionType = "";
     if (!license.enabled && license.requestedAt) actionType = "pending";
     else if (license.enabled && daysRemaining <= 0) actionType = "expired";
-    else if (license.enabled && daysRemaining <= 30) actionType = "expiring";
+    else if (license.enabled && daysRemaining <= EXPIRING_DAYS) actionType = "expiring";
     if (actionType) actions.push({ id, kind, name: license.name || id, actionType,
       expiresAt: license.expiresAt, daysRemaining });
   }
@@ -377,4 +379,4 @@ function createAdmin({ dataDirectory, registry, mutateRegistry, deleteTrialClaim
   }
   return handle;
 }
-module.exports = { createAdmin, buildActions };
+module.exports = { createAdmin, buildActions, EXPIRING_DAYS };
