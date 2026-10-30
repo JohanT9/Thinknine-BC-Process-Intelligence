@@ -1,4 +1,4 @@
-## Unreleased
+## 4.7.226
 - A row chosen with Enter in a field's suggestion list, such as an item number, shows the screenshot with the list open and the chosen row framed. It showed the field afterwards with only the typed text. New recordings also cut the frame to the visible part of a list, so a row wider than its list is not framed beyond it.
 
 ## 4.7.225
