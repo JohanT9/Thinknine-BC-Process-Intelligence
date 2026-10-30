@@ -102,10 +102,36 @@ function showCard([no, name]) {
     <div class="field control" role="group"><a class="caption" id="capDate">Order Date</a>
       <input class="stringcontrol-edit" aria-labelledby="capDate" id="orderDate" value="27.10.2026"></div>
     <table role="grid" aria-label="Lines"><tbody id="lines"></tbody></table>
+    <div class="field control" role="group"><a class="caption" id="capItem">Item No.</a>
+      <input class="stringcontrol-edit" role="combobox" aria-labelledby="capItem" id="itemNo"
+        aria-haspopup="grid" aria-expanded="false" aria-controls="itemSuggestions" autocomplete="off">
+      <table role="grid" aria-label="Item suggestions" id="itemSuggestions" hidden><tbody></tbody></table></div>
     <div class="ms-nav-factbox" role="region" aria-label="Customer Details">
       <div class="field control" role="group"><a class="caption" id="capBal">Balance (LCY)</a>
         <a href="#" role="link" aria-labelledby="capBal" id="balance">4,316.92</a></div></div>`);
   renderLines();
+  // A lookup field: typing opens a suggestion grid with the first row highlighted, Enter chooses
+  // it and the field then holds the chosen number.
+  const itemNo = document.getElementById("itemNo");
+  const suggestions = document.getElementById("itemSuggestions");
+  itemNo.addEventListener("input", () => {
+    const rows = [["1928-S", "Conference Bundle 1-8"], ["1900-S", "Paris Guest Chair"]]
+      .filter(([number]) => number.startsWith(itemNo.value.trim()));
+    suggestions.tBodies[0].innerHTML = rows.map(([number, description], index) =>
+      `<tr role="row" aria-selected="${index === 0}"><td role="gridcell">${number}</td><td role="gridcell">${description}</td></tr>`).join("");
+    suggestions.hidden = !rows.length;
+    itemNo.setAttribute("aria-expanded", String(rows.length > 0));
+  });
+  itemNo.addEventListener("keydown", event => {
+    const row = suggestions.querySelector('[aria-selected="true"]');
+    if (event.key !== "Enter" || suggestions.hidden || !row) return;
+    event.preventDefault();
+    setTimeout(() => {
+      itemNo.value = row.cells[0].textContent;
+      suggestions.hidden = true; itemNo.setAttribute("aria-expanded", "false");
+      itemNo.dispatchEvent(new Event("change", { bubbles: true }));
+    }, 60);
+  });
   // Dates: t is today and the client shows the validated date in its own format.
   document.getElementById("orderDate").addEventListener("change", event => {
     const value = event.target.value.trim().toLowerCase() === "t" ? "28.10.2026" : event.target.value;

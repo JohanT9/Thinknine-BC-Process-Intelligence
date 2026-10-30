@@ -58,6 +58,7 @@ const scenarios = {
     mark("2 Arrow down twice to 101003, Enter to open it"); await key("ArrowDown", "ArrowDown", 40); await key("ArrowDown", "ArrowDown", 40); await enter(); await sleep(500);
     mark("3 Order Date = t, shown as 28.10.2026, Tab"); await click("#orderDate"); await selectAll(); await type("t"); await tab(); await sleep(400);
     mark("4 Unit Price on line 1 = 1200, shown as 1,200.00, Tab"); await click('#lines input[data-row="0"]'); await type("1200"); await tab(); await sleep(400);
+    mark("4b Item No. = 19, Enter on the highlighted suggestion 1928-S, Tab"); await click("#itemNo"); await type("19"); await sleep(300); await enter(); await sleep(300); await tab(); await sleep(400);
     mark("5 FactBox Balance (LCY) drilldown"); await click("#balance"); await sleep(500);
     mark("6 Escape back to the order"); await key("Escape", "Escape", 27); await sleep(500);
     mark("7 Ctrl+Delete on line 2, Enter to confirm"); await click('#lines input[data-row="1"]'); await key("Delete", "Delete", 46, "", 2); await sleep(300); await enter(); await sleep(400);

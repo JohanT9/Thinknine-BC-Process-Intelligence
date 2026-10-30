@@ -23,9 +23,9 @@
     },
     {
       "id": "lab-keyboard-navigation",
-      "expected": 8,
-      "produced": 8,
-      "correct": 8,
+      "expected": 9,
+      "produced": 9,
+      "correct": 9,
       "wrong": 0,
       "duplicates": 0,
       "extras": 0,

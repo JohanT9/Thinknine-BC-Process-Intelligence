@@ -1,3 +1,8 @@
+## Unreleased
+- Typing part of an item number on a document line and choosing a suggestion with Enter is one step with the chosen number, for example "Choose item 1283344", in every document language. It was three steps: the typed text, "Select record 1283344" and the typed text again. The recorder now gives the chosen row the field's interaction, and recordings made earlier are joined when they are interpreted. A recorder fault also stopped it from finding the suggestion list that a field names in aria-controls; that is corrected.
+- A customer chosen by number is described with that number, for example "Choose 1240 in Customer No.". The customer name that Business Central fills in afterwards was used instead.
+- The generated label of an item choice is translated in every document language instead of always showing the Swedish "Artikelnummer".
+
 ## 4.7.221
 - Fewer and more timely screenshots while recording. Status messages that Business Central only reads to screen readers, such as saving, sorting, a list's row count and the number of suggestions while typing, no longer get a screenshot of their own; they are still recorded. In a sales order recording this removes about 25 of 65 screenshots. Notifications, errors and other results still get one. The texts are recognized in every registered language from the web client's own language resources. Screenshots are also taken up to twice a second instead of about once a second, within the browser's limit, so each one is closer to its step.
 

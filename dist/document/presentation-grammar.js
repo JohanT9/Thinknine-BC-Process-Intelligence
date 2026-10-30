@@ -141,7 +141,9 @@
     const contextualNumberField = rowTypeContext?.source === "same-row-type" &&
       rowTypeContext.schemaVersion === 1 && isNumberField && rowEntity
       ? numberFields[rowEntity]?.[locale] : "";
-    const field = actionType === "EnterItemNumber" && itemRow
+    // "Artikelnummer" is the item rule's own label, not a captured caption, so it is translated.
+    const generatedItemField = actionType === "SelectItem" && rawField === "Artikelnummer";
+    const field = (actionType === "EnterItemNumber" && itemRow) || generatedItemField
       ? itemNumberLabels[locale] : contextualNumberField || rawField;
     if (actionType === "SearchAndSelectRecord" && value) {
       const phrases = {
