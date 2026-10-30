@@ -566,6 +566,13 @@ assert.ok(Date.now() - started < 5000, "large grouping regression");
       value: "1283344", rowTypeContext: { source: "same-row-type", schemaVersion: 1, caption: "Typ", value: "Artikel" } }]);
   assert.strictEqual(steps.length, 2);
   assert.strictEqual(steps[0].instruction, "Välj **1240** i **Kundnr**.");
+  // Searching in the field and choosing the record in its list is still one customer step.
+  const chosen = semantic.consolidateInteractions([
+    { taskId: "typed", taskType: "ChangeField", fieldCaption: "Kundnr", value: "iber", inputSources: ["input"] },
+    { taskId: "row", taskType: "RunAction", fieldCaption: "Nr, sorterade i Stigande order Välj posten \"905\"",
+      actionCaption: "Nr, sorterade i Stigande order Välj posten \"905\"" },
+    { taskId: "result", taskType: "ChangeField", fieldCaption: "Kundnr", value: "905", inputSources: ["change"] }]);
+  assert.deepStrictEqual(chosen.map(step => step.instruction), ["Välj **905** i **Kundnr**."]);
 }
 
 console.log("Event Step Grouping tests passed.");
