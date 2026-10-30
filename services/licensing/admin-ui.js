@@ -3,6 +3,8 @@ const $ = id => document.getElementById(id);
 const ORGANIZATION = "00000000-0000-0000-0000-000000000000";
 const GUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 const VIEWS = ["oversikt", "licenser", "anvandning", "handelser", "installationer"];
+// The same limit as the service's "Needs action" list.
+const EXPIRING_DAYS = 7;
 let key = "";
 let state = null;
 let busy = false;
@@ -232,7 +234,7 @@ function statusOf(license) {
   if (!license.enabled) return license.requestedAt
     ? { code: "pending", label: t("status.pending") } : { code: "blocked", label: t("status.blocked") };
   if (days <= 0) return { code: "expired", label: t("status.expired") };
-  if (days <= 30) return { code: "expiring", label: t("status.expiring") };
+  if (days <= EXPIRING_DAYS) return { code: "expiring", label: t("status.expiring") };
   return { code: "active", label: t("status.active") };
 }
 const STATUS_FILTERS = ["all", "active", "trial", "pending", "expiring", "inactive"];
@@ -244,7 +246,7 @@ function inFilter(item, filter) {
     (filter === "active" && active) ||
     (filter === "trial" && active && license.licenseType === "trial") ||
     (filter === "pending" && !license.enabled && Boolean(license.requestedAt)) ||
-    (filter === "expiring" && active && daysUntil(license.expiresAt) <= 30) ||
+    (filter === "expiring" && active && daysUntil(license.expiresAt) <= EXPIRING_DAYS) ||
     (filter === "inactive" && ((!license.enabled && !license.requestedAt) || expires <= Date.now()));
 }
 function matchesSearch(item, search) {
