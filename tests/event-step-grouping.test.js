@@ -30,7 +30,7 @@ const quantity = run([
     value: { normalized: "500" }, screenshotAssetId: "shot-2" })
 ]);
 assert.strictEqual(quantity.schemaVersion, 1);
-assert.strictEqual(quantity.groupingVersion, "1.30.0");
+assert.strictEqual(quantity.groupingVersion, "1.31.0");
 // Regression: event 125 from the user's September 7 recording. No usable name or identity.
 const legacyBack = run([event("legacy125", "activation", {
   rawEventType: "click", actionIdentification: { caption: "\uE72B" },
@@ -550,6 +550,34 @@ assert.ok(Date.now() - started < 5000, "large grouping regression");
   assert.strictEqual(late.groups.length, 2);
   const mouse = run([events[0], { ...events[2], subtype: "interaction" }]);
   assert.ok(!mouse.groups[0].groupingReason.includes("field-suggestion-choice"));
+}
+
+// The client redraws the page after a commit and then shows the validated value: 1500 becomes
+// 1 500. The redraw has no interaction and does not end the field edit, so it is one step.
+{
+  const at = ms => new Date(Date.parse("2026-10-30T15:24:43.000Z") + ms).toISOString();
+  const quantityControl = { identity: { value: "qty" }, caption: "Sortera efter Antal" };
+  const result = run([
+    event("a1", "value-change", { subtype: "change", interactionId: "q", interactionIds: ["q"],
+      timestamp: at(607), controlIdentification: quantityControl, value: { normalized: "1500" } }),
+    event("a2", "navigation", { timestamp: at(640) }),
+    event("a3", "status-message", { interactionId: "q", interactionIds: ["q"], timestamp: at(648) }),
+    event("a4", "navigation", { timestamp: at(1100) }),
+    event("a5", "value-change", { subtype: "validated", interactionId: "q", interactionIds: ["q"],
+      timestamp: at(1929), controlIdentification: quantityControl, value: { normalized: "1 500" } })
+  ]);
+  assert.strictEqual(result.groups.length, 1);
+  assert.ok(result.groups[0].groupingReason.includes("client-redraw-after-commit"));
+  // The final value is primary, not the redraw after it; a choice after typing stays primary.
+  assert.strictEqual(result.groups[0].primaryNormalizedEvent.value.normalized, "1 500");
+  const redrawLast = run([
+    event("b1", "value-change", { subtype: "change", interactionId: "f", interactionIds: ["f"],
+      timestamp: at(0), controlIdentification: quantityControl, value: { normalized: "7" } }),
+    event("b2", "navigation", { interactionId: "f", interactionIds: ["f"], timestamp: at(100) })]);
+  assert.strictEqual(redrawLast.groups[0].primaryNormalizedEvent.kind, "value-change");
+  // A redraw long after the commit is not part of the edit.
+  assert.strictEqual(run([result.groups[0].normalizedEvents[0],
+    event("c2", "navigation", { timestamp: at(5000) })]).groups[0].normalizedEvents.length, 1);
 }
 
 // The customer number names the customer, not the name the client filled in after it.

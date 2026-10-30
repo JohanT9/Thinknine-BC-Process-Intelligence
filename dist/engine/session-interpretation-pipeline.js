@@ -94,6 +94,28 @@ function (semantic, knowledge, refs, taskVisibility, processAnalysis) {
       pendingSemanticHint: action.actionType || "" };
   }
 
+  // A change Business Central rejected with an error, made again in the same field as the next
+  // step, was a failed attempt and not part of the process. It is hidden like other non-steps,
+  // with its error kept on the action as evidence.
+  // Two choices in the same field are the same kind of step, however specific each was named.
+  const sameKind = (first, second) => first === second ||
+    (/^Select/u.test(String(first || "")) && /^Select/u.test(String(second || "")));
+  function hideRejectedAttempts(actions, describe) {
+    const visible = actions.filter(action => !action.hidden);
+    const tasks = describe(actions);
+    const rejected = new Set();
+    tasks.forEach((current, index) => {
+      const next = tasks[index + 1];
+      if (current.resultVerification?.status === "error" && next &&
+          next.resultVerification?.status !== "error" && sameKind(current.taskType, next.taskType) &&
+          String(current.fieldCaption || "") !== "" && current.fieldCaption === next.fieldCaption) {
+        rejected.add(visible[index]);
+      }
+    });
+    return rejected.size ? actions.map(action => rejected.has(action)
+      ? { ...action, hidden: true, hiddenReason: "rejected-and-retried" } : action) : actions;
+  }
+
   function task(action, index, eventsById, screenshots = {}) {
     const sourceEvents = (action.sourceEventIds || []).map(id =>
       eventsById.get(id)).filter(Boolean);
@@ -424,14 +446,15 @@ function (semantic, knowledge, refs, taskVisibility, processAnalysis) {
   function interpret(input = {}, services = {}) {
     const groups = input.stepGroups || [];
     const activeGroups = groups.filter(group => !group.guidance?.ignored);
-    const actions = semantic.processStepGroups(activeGroups);
     const byId = eventIndex(input.events);
     // Generated instructions are written in the recording's document language.
     const documentLanguage = input.language || input.session?.settings?.documentLanguage ||
       input.session?.language || "en-US";
-    const baseTasks = actions.filter(action => !action.hidden)
+    const describe = values => values.filter(action => !action.hidden)
       .map((action, index) => ({ ...task(action, index, byId, input.imagePaths),
         language: documentLanguage }));
+    const actions = hideRejectedAttempts(semantic.processStepGroups(activeGroups), describe);
+    const baseTasks = describe(actions);
     // The semantic rules above decided which steps exist; knowledge only describes them.
     const knowledgeResult = knowledge.apply(baseTasks, input.knowledgePacks || [],
       { mergeSteps: false });
@@ -486,7 +509,7 @@ function (semantic, knowledge, refs, taskVisibility, processAnalysis) {
       contextEvents: input.events || [], contextCandidates: [] };
     return applyReleaseFindings(result, input);
   }
-  return { VERSION, applyReleaseFindings, enrichCompatibilityExplanations,
+  return { VERSION, applyReleaseFindings, enrichCompatibilityExplanations, hideRejectedAttempts,
     relatedScreenshotCaption, subsequentPageScreenshot,
     interpret, isPlaceholderDominated };
 });

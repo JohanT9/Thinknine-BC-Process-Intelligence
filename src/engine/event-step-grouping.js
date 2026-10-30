@@ -13,7 +13,7 @@
 ) {
   "use strict";
   const SCHEMA_VERSION = 1;
-  const GROUPING_VERSION = "1.30.0";
+  const GROUPING_VERSION = "1.31.0";
   const CAPTURE_PACKET_VERSION = "1.6.0";
   const RESULT_VERIFICATION_VERSION = "1.6.0";
   const cache = new WeakMap();
@@ -95,6 +95,12 @@
         !events.some(isLookupOrigin) && outcomeEvents(events).length) {
       return events.find(event => event.kind === "activation");
     }
+    // The client can redraw the page after a field's final commit; that value is still the step.
+    // A choice after the typing, such as a Tell Me result that opens a page, stays primary.
+    const lastValue = events.findLastIndex(event => event.kind === "value-change");
+    const lastChoice = events.findLastIndex(event => event.kind === "selection-change");
+    if (lastValue >= 0 && lastValue > lastChoice && events.slice(lastValue + 1)
+      .every(event => ["navigation", "status-message"].includes(event.kind))) return events[lastValue];
     return [...events].reverse().find(event => ["value-change", "toggle-change",
       "selection-change", "activation", "dialog-open", "dialog-close",
       "navigation", "error-outcome"].includes(event.kind)) || events.at(-1);
@@ -441,6 +447,15 @@
     return event.kind === "value-change" && identity(event.controlIdentification) !== "" &&
       identity(event.controlIdentification) === identity(field.controlIdentification);
   }
+  // After a commit the client redraws the page without a user action, and can then show the value
+  // validated ("1500" becomes "1 500"). The redraw must not end the field edit before that value.
+  const CLIENT_REDRAW_MS = 2000;
+  function clientRedraw(events, event) {
+    if (event.kind !== "navigation" || interactionIds([event]).length) return false;
+    const field = [...events].reverse().find(item => item.kind === "value-change");
+    return Boolean(field) && (!pageKey(event) || pageKey(event) === pageKey(field)) &&
+      elapsed(field, event) <= CLIENT_REDRAW_MS;
+  }
   function lookupCanClose(events, event) {
     const origin = events[0];
     if (!isLookupOrigin(origin) || event.kind !== "value-change") return false;
@@ -527,6 +542,11 @@
         pending.events.push(event);
         pending.reasons.push(event.kind === "value-change" ? "suggestion-committed-value"
           : "suggestion-supporting-result");
+        continue;
+      }
+      if (pending && clientRedraw(pending.events, event)) {
+        pending.events.push(event);
+        pending.reasons.push("client-redraw-after-commit");
         continue;
       }
       if (pending && sameRecordedInteraction(pending.events, event)) {

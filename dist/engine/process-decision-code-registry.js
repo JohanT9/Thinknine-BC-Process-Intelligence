@@ -17,6 +17,9 @@
       domain: "filtering", outcome: "excluded" }),
     entry({ id: "hidden-semantic-action", code: "BCPS-PROCESS-FILTER-002",
       domain: "filtering", outcome: "excluded" }),
+    // A change Business Central rejected and the user made again in the same field.
+    entry({ id: "rejected-and-retried", code: "BCPS-PROCESS-FILTER-003",
+      domain: "filtering", outcome: "excluded" }),
     entry({ id: "action-not-projected", code: "BCPS-PROCESS-PROJECT-001",
       domain: "projection", outcome: "unresolved" }),
     entry({ id: "group-not-interpreted", code: "BCPS-PROCESS-INTERPRET-001",
@@ -29,6 +32,7 @@
     "process-group-produced-task": "task-projected",
     "process-group-explicitly-ignored": "explicitly-ignored",
     "process-action-hidden": "hidden-semantic-action",
+    "process-action-rejected-and-retried": "rejected-and-retried",
     "process-action-not-projected": "action-not-projected",
     "process-group-not-interpreted": "group-not-interpreted",
     "process-event-unassigned": "event-unassigned"
