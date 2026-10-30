@@ -74,4 +74,40 @@ assert.ok(fallback.screenshot);
   assert.ok(okTask);
   assert.strictEqual(okTask.screenshot, "screenshots/ok-click.png");
 }
+// A row chosen with Enter in a lookup field's suggestion list: the step shows the screenshot
+// taken with the list open, outlined around the chosen row, not the field afterwards.
+{
+  const line = { sourceFrameId: "inner", frameDepth: 1, pageId: "50", pageCaption: "Inköpsorder",
+    rowTypeContext: { source: "same-row-type", schemaVersion: 1, caption: "Typ", value: "Artikel" } };
+  const lookup = { ...line, controlType: "input", role: "combobox", ariaHasPopup: "grid",
+    accessibleName: "Sortera efter Nr", fieldName: "Sortera efter Nr", label: "Sortera efter Nr",
+    elementId: "lineNo", interactionId: "inner:item" };
+  const keyEvents = [
+    { ...lookup, type: "field-change", category: "field", inputSource: "input", value: "3", timestamp: at(38),
+      uiState: { menuOpen: true, resultVisible: true }, topViewportBounds: { x: 0.1, y: 0.9, width: 0.03, height: 0.02 } },
+    { ...line, type: "key", key: "Enter", category: "selection", inputSource: "keyboard", controlType: "tr",
+      role: "row", accessibleName: "1283344 Wrapspapper brunt", selectedCaption: "1283344", selectedValue: "1283344",
+      interactionId: "inner:item", timestamp: "2026-10-05T05:45:38.400Z",
+      topViewportBounds: { x: 0.1265, y: 0.766, width: 0.21, height: 0.0218 } },
+    { ...lookup, type: "field-change", category: "field", inputSource: "change", value: "3",
+      timestamp: "2026-10-05T05:45:38.800Z", uiState: { resultVisible: true },
+      topViewportBounds: { x: 0.1, y: 0.9, width: 0.03, height: 0.02 } }
+  ].map((event, index) => ({ ...event, sourceEventId: `key:${index + 1}`, sourceSequence: 20 + index,
+    recordingId: "selection-screenshot" }));
+  let keyRecording = canonical.create({ id: "key-screenshot", name: "Key screenshot" });
+  const keyInput = keyEvents.map((event, index) => {
+    keyRecording = canonical.addEvent(keyRecording, event, identify.identify(event, { eventId: `key:event:${index}` }));
+    return { ...event, eventNo: index + 1, canonicalSourceEventId: keyRecording.events.at(-1).id };
+  });
+  const keyNormalized = normalization.normalizeRecording(keyRecording);
+  const keyGrouped = grouping.group(keyNormalized);
+  const [itemTask] = pipeline.interpret({ session: { id: "key", name: "Key", settings: { documentLanguage: "sv-SE" } },
+    events: keyInput, normalizedEvents: keyNormalized.events, stepGroups: keyGrouped.groups,
+    supportingEvents: keyGrouped.supportingEvents, groupingDiagnostics: keyGrouped.diagnostics,
+    imagePaths: { 1: "screenshots/list-open.png", 3: "screenshots/field-after.png" }, knowledgePacks: [] }).businessTasks;
+  assert.ok(/1283344/u.test(itemTask.instruction), itemTask.instruction);
+  assert.strictEqual(itemTask.screenshot, "screenshots/list-open.png");
+  assert.deepStrictEqual(itemTask.screenshotHighlight, { screenshotRef: "screenshots/list-open.png",
+    sourceEventNo: 2, x: 0.1265, y: 0.766, width: 0.21, height: 0.0218 });
+}
 console.log("Selection screenshot tests passed.");

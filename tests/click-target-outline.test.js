@@ -11,7 +11,7 @@ const regeneration = require("../src/review/review-regeneration");
 
 // The recorder's measurement, run against a page inside an inner frame of the same origin.
 const source = fs.readFileSync(path.join(__dirname, "../src/recorder/content.js"), "utf8");
-const start = source.indexOf("  function viewportBounds(bounds) {");
+const start = source.indexOf("  // Only the visible part counts");
 const helper = source.slice(start, source.indexOf("  function descriptor(element) {"));
 assert(start > 0, "the recorder measures the viewport box");
 const top = { innerWidth: 1000, innerHeight: 500 };
@@ -20,9 +20,10 @@ const inner = { top, parent: top, frameElement: { clientLeft: 2, clientTop: 3,
   getBoundingClientRect: () => ({ x: 88, y: 47 }) } };
 inner.top = top;
 // The box crosses the context as JSON, so it compares like a plain object.
-const run = (view, bounds) => {
-  const json = vm.runInNewContext(`${helper}; JSON.stringify(viewportBounds(bounds))`,
-    { window: view, bounds, Math, JSON });
+const run = (view, bounds, element, styles = new Map()) => {
+  const json = vm.runInNewContext(`${helper}; JSON.stringify(viewportBounds(bounds, element))`,
+    { window: view, bounds, element, Math, JSON, getComputedStyle: node => styles.get(node) ||
+      { overflowX: "visible", overflowY: "visible" } });
   return json === undefined ? undefined : JSON.parse(json);
 };
 assert.deepStrictEqual(run(inner, { x: 404, y: 419, width: 28, height: 25 }),
@@ -34,6 +35,15 @@ const foreign = { top, parent: top, get frameElement() { throw new Error("cross-
 assert.strictEqual(run(foreign, { x: 1, y: 1, width: 10, height: 10 }), undefined);
 assert.strictEqual(run({ top, parent: top, frameElement: null }, { x: 1, y: 1, width: 10, height: 10 }), undefined);
 assert.strictEqual(run(top, { x: 1, y: 1, width: 0, height: 10 }), undefined);
+// A row wider than its scrolling list is cut to the list; a parent that does not clip is ignored.
+const list = { getBoundingClientRect: () => ({ x: 100, y: 0, width: 300, height: 500 }), parentElement: null };
+const wrapper = { getBoundingClientRect: () => ({ x: 0, y: 0, width: 50, height: 50 }), parentElement: list };
+const row = { parentElement: wrapper };
+const clipped = run(top, { x: 150, y: 100, width: 600, height: 20 }, row,
+  new Map([[list, { overflowX: "auto", overflowY: "hidden" }]]));
+assert.deepStrictEqual(clipped, { x: 0.15, y: 0.2, width: 0.25, height: 0.04 });
+assert.strictEqual(run(top, { x: 450, y: 100, width: 100, height: 20 }, row,
+  new Map([[list, { overflowX: "auto", overflowY: "auto" }]])), undefined, "a row scrolled out of view has no box");
 
 // A new review outlines the box in the step's screenshot as a generated rectangle.
 const task = { taskId: "customer", instruction: "Välj **905** i **Kundnr**.",
