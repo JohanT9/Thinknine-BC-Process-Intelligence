@@ -126,7 +126,7 @@ function (semantic, knowledge, refs, taskVisibility, processAnalysis) {
     // moment, such as the next field being typed.
     // A step that clicks a named control, such as OK in a dialog, likewise shows that control as
     // it was clicked, not the page after the dialog closed.
-    const named = value => String(value || "").replace(/[-]/gu, "")
+    const named = value => String(value || "").replace(/[\uE000-\uF8FF]/gu, "")
       .replace(/\s+/gu, " ").trim().toLocaleLowerCase();
     const clicksControl = /Action|Dialog/u.test(String(action.actionType || "")) &&
       action.actionType !== "SearchAndOpenPage";
@@ -137,14 +137,23 @@ function (semantic, knowledge, refs, taskVisibility, processAnalysis) {
       .reverse().find(event => event.preActionCaptureId && screenshots[event.eventNo]) : null) ||
       (clickedCaption ? [...sourceEvents].reverse().find(event => event.preActionCaptureId &&
         screenshots[event.eventNo] && named(event.label || event.accessibleName) === clickedCaption) : null);
+    // A row chosen with Enter in a field's suggestion list has no screenshot of its own; the last
+    // screenshot with the list open before the choice shows the row, and the row is outlined.
+    const choiceByKey = !choiceAtClick && /^Select/u.test(String(action.actionType || ""))
+      ? [...sourceEvents].reverse().find(event => event.type === "key" && event.selectedCaption) : null;
+    const listBeforeChoice = choiceByKey ? sourceEvents.filter(event =>
+      event.eventNo < choiceByKey.eventNo && screenshots[event.eventNo] && event.uiState?.menuOpen &&
+      Date.parse(choiceByKey.timestamp) - Date.parse(event.timestamp) <= 3000).at(-1) : null;
     const screenshot = (choiceAtClick && screenshots[choiceAtClick.eventNo]) ||
+      (listBeforeChoice && screenshots[listBeforeChoice.eventNo]) ||
       screenshots[preferredEventNo] || action.preferredScreenshotRef ||
       [...eventNos].reverse().map(no => screenshots[no]).find(Boolean) ||
       action.screenshotRefs?.at(-1) || null;
     // The control the user clicked, typed in or chose, as a share of the screenshot, from the
     // event the screenshot belongs to. A screenshot of another event shows another moment.
-    const screenshotEvent = screenshot ? [...sourceEvents].reverse()
-      .find(event => screenshots[event.eventNo] === screenshot) : null;
+    const screenshotEvent = listBeforeChoice && screenshot === screenshots[listBeforeChoice.eventNo]
+      ? choiceByKey : screenshot ? [...sourceEvents].reverse()
+        .find(event => screenshots[event.eventNo] === screenshot) : null;
     const highlightBox = screenshotEvent?.topViewportBounds;
     const highlightable = ["click", "field-change"].includes(screenshotEvent?.type) ||
       (screenshotEvent?.type === "key" && Boolean(screenshotEvent.selectedCaption));

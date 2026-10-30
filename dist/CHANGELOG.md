@@ -1,3 +1,6 @@
+## Unreleased
+- A row chosen with Enter in a field's suggestion list, such as an item number, shows the screenshot with the list open and the chosen row framed. It showed the field afterwards with only the typed text. New recordings also cut the frame to the visible part of a list, so a row wider than its list is not framed beyond it.
+
 ## 4.7.225
 - A step that clicks a named control, such as OK in a dialog or the last item of a menu path, shows the screenshot taken at the click. It showed the page after the dialog closed.
 - Every step in a new recording keeps the frame around its clicked control. The frame and the chosen screenshot were lost when a step was described again after interpretation, so only some steps had a frame.

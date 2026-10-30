@@ -873,9 +873,27 @@
   // The element's box as a share of the browser tab's viewport, which is what a screenshot shows.
   // Business Central runs the page in an inner frame of the same origin, so the frame offsets
   // add up to the top window; a frame of another origin cannot be measured and gives none.
-  function viewportBounds(bounds) {
+  // Only the visible part counts: a row wider than its scrolling list is cut to the list.
+  function visibleBounds(element, bounds) {
+    let left = bounds.x; let top = bounds.y;
+    let right = bounds.x + bounds.width; let bottom = bounds.y + bounds.height;
+    for (let parent = element?.parentElement; parent; parent = parent.parentElement) {
+      const style = getComputedStyle(parent);
+      if (style.overflowX === "visible" && style.overflowY === "visible") continue;
+      const box = parent.getBoundingClientRect();
+      left = Math.max(left, box.x); top = Math.max(top, box.y);
+      right = Math.min(right, box.x + box.width); bottom = Math.min(bottom, box.y + box.height);
+    }
+    return right > left && bottom > top
+      ? { x: left, y: top, width: right - left, height: bottom - top } : null;
+  }
+
+  function viewportBounds(bounds, element) {
     if (!bounds || !(bounds.width > 0) || !(bounds.height > 0)) return undefined;
     try {
+      const visible = element ? visibleBounds(element, bounds) : bounds;
+      if (!visible) return undefined;
+      bounds = visible;
       let x = bounds.x; let y = bounds.y; let view = window;
       while (view !== view.top) {
         const frame = view.frameElement;
@@ -984,7 +1002,7 @@
       rowTypeContext: rowTypeContext(element),
       localBounds: bounds ? { x: bounds.x, y: bounds.y,
         width: bounds.width, height: bounds.height } : undefined,
-      topViewportBounds: viewportBounds(bounds),
+      topViewportBounds: viewportBounds(bounds, element),
       devicePixelRatio: window.devicePixelRatio || 1,
       viewportScale: window.visualViewport?.scale || 1,
       uiState: {
