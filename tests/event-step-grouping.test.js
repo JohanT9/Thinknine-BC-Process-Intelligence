@@ -30,7 +30,7 @@ const quantity = run([
     value: { normalized: "500" }, screenshotAssetId: "shot-2" })
 ]);
 assert.strictEqual(quantity.schemaVersion, 1);
-assert.strictEqual(quantity.groupingVersion, "1.29.0");
+assert.strictEqual(quantity.groupingVersion, "1.30.0");
 // Regression: event 125 from the user's September 7 recording. No usable name or identity.
 const legacyBack = run([event("legacy125", "activation", {
   rawEventType: "click", actionIdentification: { caption: "\uE72B" },
@@ -515,6 +515,65 @@ const started = Date.now();
 const large = run(largeEvents);
 assert.strictEqual(large.groups.length, 5000);
 assert.ok(Date.now() - started < 5000, "large grouping regression");
+
+// Typing in a lookup field and choosing a suggestion row with Enter is one field edit, even in a
+// recording where the row had an interaction of its own. The client's response joins it, and the
+// chosen row is the value: 3 searched, 1283344 was chosen.
+{
+  const at = ms => new Date(Date.parse("2026-10-30T13:14:17.000Z") + ms).toISOString();
+  const lookup = { identity: { value: "boxee" }, caption: "Sortera efter Nr", role: "combobox",
+    controlType: "lookup", type: "lookup" };
+  const row = { caption: "1283344 Wrapspapper brunt", role: "row", controlType: "listRow", type: "listRow" };
+  const events = [
+    event("s1", "value-change", { subtype: "input", interactionId: "field", interactionIds: ["field"],
+      timestamp: at(478), controlIdentification: lookup, value: { normalized: "3" } }),
+    event("s2", "value-change", { subtype: "input", interactionId: "field", interactionIds: ["field"],
+      timestamp: at(1545), controlIdentification: lookup, value: { normalized: "3" } }),
+    event("s3", "selection-change", { subtype: "keyboard", interactionId: "row", interactionIds: ["row"],
+      timestamp: at(1549), controlIdentification: row, selection: { value: "1283344", caption: "1283344" } }),
+    event("s4", "navigation", { timestamp: at(1719) }),
+    event("s5", "status-message", { timestamp: at(1752) }),
+    event("s6", "value-change", { subtype: "change", interactionId: "field", interactionIds: ["field"],
+      timestamp: at(1794), controlIdentification: lookup, value: { normalized: "3" } }),
+    event("s7", "value-change", { subtype: "change", interactionId: "quantity", interactionIds: ["quantity"],
+      timestamp: at(6817), controlIdentification: { identity: { value: "qty" }, caption: "Antal" },
+      value: { normalized: "48" } })
+  ];
+  const result = run(events);
+  assert.deepStrictEqual(result.groups.map(group => group.sourceEventIds.map(id => id.slice(7))),
+    [["s1", "s2", "s3", "s4", "s5", "s6"], ["s7"]]);
+  assert.ok(result.groups[0].groupingReason.includes("field-suggestion-choice"));
+  const [chosen] = semantic.processStepGroups([result.groups[0]]);
+  assert.strictEqual(chosen.selectedValue, "1283344");
+  // A choice made long after the typing, or with the mouse, is not joined by this rule.
+  const late = run([events[0], { ...events[2], timestamp: at(5000) }]);
+  assert.strictEqual(late.groups.length, 2);
+  const mouse = run([events[0], { ...events[2], subtype: "interaction" }]);
+  assert.ok(!mouse.groups[0].groupingReason.includes("field-suggestion-choice"));
+}
+
+// The customer number names the customer, not the name the client filled in after it.
+{
+  const [customer] = semantic.consolidateInteractions([
+    { taskId: "no", taskType: "ChangeField", fieldCaption: "Kundnr", value: "1240", inputSources: ["change"] },
+    { taskId: "name", taskType: "ChangeField", fieldCaption: "Kundens namn", value: "Dagab Hässleholm 130",
+      inputSources: ["focusout"] }]);
+  assert.strictEqual(customer.instruction, "Välj **1240** i **Kundnr**.");
+  // An item line after the customer is its own step.
+  const steps = semantic.consolidateInteractions([
+    { taskId: "no", taskType: "ChangeField", fieldCaption: "Kundnr", value: "1240", inputSources: ["change"] },
+    { taskId: "item", taskType: "Select", fieldCaption: "Sortera efter Nr", selectedCaption: "1283344",
+      value: "1283344", rowTypeContext: { source: "same-row-type", schemaVersion: 1, caption: "Typ", value: "Artikel" } }]);
+  assert.strictEqual(steps.length, 2);
+  assert.strictEqual(steps[0].instruction, "Välj **1240** i **Kundnr**.");
+  // Searching in the field and choosing the record in its list is still one customer step.
+  const chosen = semantic.consolidateInteractions([
+    { taskId: "typed", taskType: "ChangeField", fieldCaption: "Kundnr", value: "iber", inputSources: ["input"] },
+    { taskId: "row", taskType: "RunAction", fieldCaption: "Nr, sorterade i Stigande order Välj posten \"905\"",
+      actionCaption: "Nr, sorterade i Stigande order Välj posten \"905\"" },
+    { taskId: "result", taskType: "ChangeField", fieldCaption: "Kundnr", value: "905", inputSources: ["change"] }]);
+  assert.deepStrictEqual(chosen.map(step => step.instruction), ["Välj **905** i **Kundnr**."]);
+}
 
 console.log("Event Step Grouping tests passed.");
 

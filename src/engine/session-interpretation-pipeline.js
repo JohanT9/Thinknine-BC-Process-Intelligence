@@ -99,7 +99,13 @@ function (semantic, knowledge, refs, taskVisibility, processAnalysis) {
       eventsById.get(id)).filter(Boolean);
     const eventNos = unique(sourceEvents.map(event => event.eventNo));
     const preferredEventNo = eventsById.get(action.preferredSourceEventId)?.eventNo;
-    const screenshot = screenshots[preferredEventNo] || action.preferredScreenshotRef ||
+    // A click's screenshot is taken at the click, before the client responds, so for a choice
+    // in a list it shows the chosen row. A queued screenshot of a later event can show a later
+    // moment, such as the next field being typed.
+    const choiceAtClick = /^Select/u.test(String(action.actionType || "")) ? [...sourceEvents]
+      .reverse().find(event => event.preActionCaptureId && screenshots[event.eventNo]) : null;
+    const screenshot = (choiceAtClick && screenshots[choiceAtClick.eventNo]) ||
+      screenshots[preferredEventNo] || action.preferredScreenshotRef ||
       [...eventNos].reverse().map(no => screenshots[no]).find(Boolean) ||
       action.screenshotRefs?.at(-1) || null;
     const trace = refs.normalize({ recordingId: action.recordingId,

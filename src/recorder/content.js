@@ -1362,7 +1362,7 @@
     const active = byId(field.getAttribute("aria-activedescendant"));
     if (active?.matches?.('[role="option"],[role="row"]')) return active;
     const lists = ["aria-controls", "aria-owns"].flatMap(name =>
-      String(field.getAttribute(name) || "").split(/s+/u)).map(byId).filter(Boolean);
+      String(field.getAttribute(name) || "").split(/\s+/u)).map(byId).filter(Boolean);
     const suggests = field.getAttribute("aria-autocomplete") ||
       ["searchbox", "combobox"].includes(field.getAttribute("role"));
     if (!lists.length && suggests) {
@@ -1420,7 +1420,11 @@
       clearTimeout(inputTimers.get(eventTarget));
       if (valueOf(eventTarget) !== "") emitField(eventTarget, "input");
       const caption = selectionCaption(suggestion);
-      const interactionId = suggestion.matches('[role="option"]')
+      // A lookup field's suggestion grid (aria-haspopup="grid") chooses the field's value, so its
+      // row continues the field edit like an option in a list box. Tell Me results stay separate.
+      const fieldSuggestion = suggestion.matches('[role="option"]') ||
+        eventTarget.getAttribute("aria-haspopup") === "grid";
+      const interactionId = fieldSuggestion
         ? interactionForElement(eventTarget, true)
         : activateInteraction(owningInteraction(suggestion), suggestion, "keyboard");
       record({ ...keyFields(event), category: "selection",

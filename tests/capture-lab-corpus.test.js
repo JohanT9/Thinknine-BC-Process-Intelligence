@@ -131,6 +131,14 @@ const searchText = keys.findIndex(item => item.inputSource === "input" &&
 const result = keys.findIndex(item => item.type === "key" && item.selectedCaption === "Sales Orders");
 assert(searchText >= 0 && result > searchText, "the search text comes before the result");
 assert.strictEqual(byLabel("key", "101003 School of Fine Art")?.selectedCaption, "101003");
+// Enter on the highlighted row of a lookup field's suggestion grid chooses it within the field
+// edit: the typed text first, then the choice and the field's new value, in one interaction.
+const itemEdit = keys.filter(item => item.fieldName === "Item No." || item.selectedCaption === "1928-S");
+assert.deepStrictEqual(itemEdit.filter(item => item.type !== "focus" && item.type !== "click")
+  .map(item => [item.type, item.inputSource, item.value || item.selectedCaption]),
+[["field-change", "input", "19"], ["key", "keyboard", "1928-S"],
+  ["field-change", "change", "1928-S"], ["field-change", "change", "1928-S"]]);
+assert.strictEqual(new Set(itemEdit.map(item => item.interactionId)).size, 1);
 // A shortcut no control declares stays a key of its own action, with evidence of which
 // controls mention its key; F7 alone is declared, Shift+F7 is not.
 const undeclared = keys.find(item => item.shortcut === "Shift+F7");
@@ -162,6 +170,7 @@ assert.deepStrictEqual(keyboardSteps, [
   "Välj posten **101003** på sidan **Sales Order 101003 - Dynamics 365 Business Central**.",
   "Ange __28.10.2026__ i **Order Date**.",
   "Ange __1,200.00__ i **Unit Price Excl. VAT**.",
+  "Välj artikel **1928-S**.",
   "Välj **Balance (LCY)** på sidan **Sales Order 101003 - Dynamics 365 Business Central**.",
   "Välj **Delete Line** på sidan **Sales Order 101003 - Dynamics 365 Business Central**.",
   "Tryck på **Shift+F7**.",

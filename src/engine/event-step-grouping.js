@@ -13,7 +13,7 @@
 ) {
   "use strict";
   const SCHEMA_VERSION = 1;
-  const GROUPING_VERSION = "1.29.0";
+  const GROUPING_VERSION = "1.30.0";
   const CAPTURE_PACKET_VERSION = "1.6.0";
   const RESULT_VERIFICATION_VERSION = "1.6.0";
   const cache = new WeakMap();
@@ -413,6 +413,34 @@
     if (["change", "focusout"].includes(last.subtype) && event.subtype === "input") return false;
     return true;
   }
+  // Typing in a lookup field opens its suggestion grid; Enter on a row there chooses the record.
+  // The choice, the client's response and the field's final commit belong to the field edit.
+  // Recordings made before the recorder gave that row the field's interaction need this join.
+  const SUGGESTION_CHOICE_MS = 3000;
+  function suggestionField(events) {
+    return [...events].reverse().find(item => item.kind === "value-change" &&
+      item.controlIdentification?.controlType === "lookup");
+  }
+  function suggestionChoice(events) {
+    return events.find(item => item.kind === "selection-change" && item.subtype === "keyboard" &&
+      isRowSelection(item));
+  }
+  function choosesFieldSuggestion(events, event) {
+    const field = suggestionField(events);
+    return Boolean(field && field === events.at(-1) && field.subtype === "input" &&
+      event.kind === "selection-change" && event.subtype === "keyboard" && isRowSelection(event) &&
+      !suggestionChoice(events) && field.frameContext?.frameId === event.frameContext?.frameId &&
+      elapsed(field, event) <= SUGGESTION_CHOICE_MS);
+  }
+  function completesFieldSuggestion(events, event) {
+    const choice = suggestionChoice(events);
+    const field = suggestionField(events);
+    if (!choice || !field || elapsed(choice, event) > SUGGESTION_CHOICE_MS) return false;
+    if (["navigation", "status-message"].includes(event.kind)) return pageKey(event) === pageKey(field) ||
+      event.kind === "status-message";
+    return event.kind === "value-change" && identity(event.controlIdentification) !== "" &&
+      identity(event.controlIdentification) === identity(field.controlIdentification);
+  }
   function lookupCanClose(events, event) {
     const origin = events[0];
     if (!isLookupOrigin(origin) || event.kind !== "value-change") return false;
@@ -488,6 +516,17 @@
         supportingEvents.push(freeze({ normalizedEventId: event.normalizedEventId,
           classification: "guidance", reason: "explicit-recording-guidance" }));
         assignments.set(event.normalizedEventId, "supporting");
+        continue;
+      }
+      if (pending && choosesFieldSuggestion(pending.events, event)) {
+        pending.events.push(event);
+        pending.reasons.push("field-suggestion-choice");
+        continue;
+      }
+      if (pending && completesFieldSuggestion(pending.events, event)) {
+        pending.events.push(event);
+        pending.reasons.push(event.kind === "value-change" ? "suggestion-committed-value"
+          : "suggestion-supporting-result");
         continue;
       }
       if (pending && sameRecordedInteraction(pending.events, event)) {

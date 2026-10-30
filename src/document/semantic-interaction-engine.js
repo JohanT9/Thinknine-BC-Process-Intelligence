@@ -120,6 +120,10 @@
   function selectedRecordValue(value) {
     for (const candidate of [value?.selectedCaption, value?.actionCaption,
       value?.instruction, value?.description]) {
+      // A generated instruction marks the record in bold; the page named after it is not part of it.
+      const marked = text(candidate).match(
+        /(?:välj posten|select record|open record|öppna posten?)\s+\*\*([^*]+)\*\*/iu);
+      if (marked) return marked[1].trim();
       const match = text(candidate).replace(/\*\*/gu, "").match(RECORD_SELECTION);
       if (match) return match[1].replace(/["“”]+$/gu, "").trim();
       const embedded = text(candidate).replace(/\*\*/gu, "")
@@ -378,6 +382,14 @@
           if (crossesNonModalPage(values, candidate)) break;
           const candidateLookupField = lookupField(candidate);
           if (candidateLookupField && !fieldPattern.test(candidateLookupField)) break;
+          // A document line never continues a header selection, and an edit of another field
+          // is its own step even when it ends with a chosen record.
+          if (candidate?.rowTypeContext && !values[0]?.rowTypeContext) break;
+          const candidateField = text(candidate?.fieldCaption || controlCaption(candidate));
+          if (candidateField && !fieldPattern.test(candidateField) && !LOOKUP.test(candidateField) &&
+              !config.extraMatch?.(candidate) && !selectedRecordValue(candidate) &&
+              !["Select", "SelectRecord", "SelectOption", "SelectLookupValue"].includes(
+                candidate?.taskType || candidate?.semanticAction)) break;
           const selectedSoFar = values.map(value => selectedRecordValue(value) ||
             (["Select", "SelectRecord", "SelectOption", "SelectLookupValue"].includes(value.taskType)
               ? meaningfulValue(value) : "")).find(Boolean);
@@ -410,9 +422,15 @@
         const observedField = config.preserveFieldCaption ? values.map(value =>
           lookupField(value) || text(controlCaption(value) || value.targetControl?.caption || value.actionCaption))
           .find(caption => caption && fieldPattern.test(caption) && !selectedRecordValue({actionCaption:caption})) : "";
-        const selectedValue = values.map(selectedRecordValue).find(Boolean) ||
+        // The row actually chosen wins; otherwise the value of the field the step names, not a
+        // value the client filled into a neighbouring field (Kundens namn after Kundnr).
+        const ownFieldValue = observedField ? [...values].reverse().filter(value =>
+          text(controlCaption(value) || value.fieldCaption) === observedField)
+          .map(meaningfulValue).find(Boolean) : "";
+        const selectedValue = values.map(groupedSelectionValue).find(Boolean) ||
+          values.map(selectedRecordValue).find(Boolean) ||
           meaningfulValue({ selectedCaption: explicitSelection?.selectedCaption }) ||
-          [...values].reverse().map(meaningfulValue).find(Boolean) || "";
+          ownFieldValue || [...values].reverse().map(meaningfulValue).find(Boolean) || "";
         return {
           consumed: values.length,
           action: action(rule, values, {
@@ -1615,7 +1633,10 @@
     };
     const selectedEvent = [...(group?.evidence || [])].reverse().find(item =>
       item.kind === "selection-change");
-    const selectedMechanic = (group?.normalizedEvents || []).find(item =>
+    // A row chosen in a field's suggestion list is the field's value; the typed text only searched.
+    const suggestionChoice = (group?.groupingReason || []).includes("field-suggestion-choice")
+      ? (group?.normalizedEvents || []).find(item => item.kind === "selection-change") : null;
+    const selectedMechanic = suggestionChoice || (group?.normalizedEvents || []).find(item =>
       item.normalizedEventId === selectedEvent?.normalizedEventId);
     const selected = selectedMechanic?.selection?.value ??
       selectedMechanic?.selection?.caption ?? primary.selection?.value ??
@@ -1653,7 +1674,8 @@
       entity: page.entity || "", pageConfidence: page.confidence ?? null,
       pageIdentificationSource: page.source || "",
       targetControl: clone(control),
-      value: primary.value?.normalized ?? primary.state?.checked ?? selected,
+      value: suggestionChoice && selected !== ""
+        ? selected : primary.value?.normalized ?? primary.state?.checked ?? selected,
       inputSources: primary.subtype ? [primary.subtype] : [],
       sourceEventIds: group.sourceEventIds || [],
       normalizedEventIds: group.normalizedEventIds || [],

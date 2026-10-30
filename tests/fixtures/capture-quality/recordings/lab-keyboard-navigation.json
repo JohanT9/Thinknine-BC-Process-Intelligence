@@ -11,6 +11,7 @@
     { "target": "101003" },
     { "target": "Order Date", "value": "28.10.2026" },
     { "target": "Unit Price Excl. VAT", "value": "1,200.00" },
+    { "target": "Item No.", "value": "1928-S" },
     { "target": "Balance (LCY)" },
     { "target": "Delete Line" },
     { "target": "Shift+F7" },
