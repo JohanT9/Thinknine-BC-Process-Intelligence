@@ -1763,7 +1763,21 @@
         annotationRefs: (step.blocks || []).filter(block => block.kind === "image")
           .flatMap(block => block.annotationRefs || [])
       }));
-      const actions = processInteractions(interactions, rules);
+      // A step the interpretation pipeline already decided carries its semantic action model and
+      // stays one step; only older steps without one may still be combined by the rules here.
+      // Otherwise a customer step followed by an item step became one step with the item value.
+      const actions = [];
+      let pending = [];
+      const flush = () => {
+        if (pending.length) actions.push(...processInteractions(pending, rules));
+        pending = [];
+      };
+      interactions.forEach(interaction => {
+        if (!interaction.semanticActionModel) { pending.push(interaction); return; }
+        flush();
+        actions.push(...processInteractions([interaction], rules));
+      });
+      flush();
       let stepIndex = 0;
       const suppressedInteractions = [];
       const semanticSteps = actions.map(entry => {

@@ -254,7 +254,8 @@
   function processBlock(block, action, documentLanguage) {
     const result = clone(block);
     const blockAction = result.kind === "step"
-      ? result.semanticAction || result.interaction || action
+      // A step kept as recorded is described from its semantic action model, as in Review.
+      ? result.semanticAction || result.interaction?.semanticActionModel || result.interaction || action
       : action;
     if (result.kind === "paragraph" && typeof result.text === "string") {
       if (result.preserveUserText || result.provenance === "user-edited") {

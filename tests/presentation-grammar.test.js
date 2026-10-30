@@ -75,6 +75,29 @@ assert.strictEqual(lineLookup[0].displayText,
   "Sök efter __30043__ i **Artikelnr.** och välj den filtrerade posten.");
 assert.strictEqual(lineLookup[0].searchFieldCaption, "Sortera efter Nr", "the observed caption stays as evidence");
 
+// Steps the interpretation pipeline decided stay separate in the document: a customer step
+// followed by an item step was merged into one step that showed the item number as customer.
+const decidedSteps = projector.project({ sessionId: "decided", sessionName: "Decided", tasks: [{
+  taskId: "customer", taskType: "SelectCustomer", fieldCaption: "Kundnr", actionCaption: "Kundnr",
+  value: "905", selectedValue: "iber", selectedCaption: "905", instructionValue: "905",
+  inputSources: ["change"], entity: "Customer",
+  instruction: "Välj **905** i **Kundnr**.", sourceEventNos: [32, 40],
+  semanticActionModel: { actionType: "SelectCustomer", displayText: "Välj **905** i **Kundnr**.",
+    selectedValue: "905", targetField: "Kundnr" }
+}, {
+  taskId: "item", taskType: "SearchAndSelectRecord", fieldCaption: "Artikel Nr", value: "30043",
+  actionCaption: 'Nr, sorterade i Stigande order Välj posten "30043"', selectedCaption: "30043",
+  instructionValue: "30043", entity: "SalesOrder",
+  instruction: "Sök efter __30043__ i **Artikelnr.** och välj den filtrerade posten.",
+  sourceEventNos: [53, 57], semanticActionModel: itemRowLookup
+}] }).document;
+const decidedTexts = grammar.process(language.process(interactions.processDocument(decidedSteps)))
+  .sections.find(section => section.kind === "workflow").blocks
+  .filter(block => block.kind === "step")
+  .map(step => step.blocks.find(block => block.kind === "paragraph").text);
+assert.deepStrictEqual(decidedTexts, ["Välj Kundnr 905.",
+  "Sök efter 30043 i Artikelnr. och välj den filtrerade posten."]);
+
 const projectedItemNumber = paragraph({
   taskId: "projected-item", taskType: "EnterItemNumber",
   fieldCaption: "Artikel Nr", value: "30043",
