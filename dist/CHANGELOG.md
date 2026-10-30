@@ -1,3 +1,6 @@
+## Unreleased
+- Licensing service: the daily summary email lists only the licenses that end within 7 days, soonest first, as one list. Licenses that have already expired and those that end later are no longer included.
+
 ## 4.7.219
 - Licensing service: one summary email a day at 08:00 Swedish time lists every license that has expired in the last 30 days or ends within 30 days, grouped as expired, within 7 days and within 30 days, with a link to the license administration. It replaces the separate reminder per license 30, 14 and 3 days ahead and after expiry. No email is sent on a day when nothing is expiring, and a summary missed while the service was down is sent when it starts.
 
