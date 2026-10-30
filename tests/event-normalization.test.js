@@ -37,8 +37,8 @@ model = append(model, raw("e4", "field-change", { fieldName: "Quantity",
 let result = normalization.normalizeRecording(model);
 assert.strictEqual(JSON.stringify(original), before);
 assert.strictEqual(result.schemaVersion, 1);
-assert.strictEqual(result.normalizationVersion, "2.10.0");
-assert.strictEqual(normalization.NORMALIZATION_VERSION, "2.10.0");
+assert.strictEqual(result.normalizationVersion, "2.11.0");
+assert.strictEqual(normalization.NORMALIZATION_VERSION, "2.11.0");
 assert.strictEqual(result.events.length, 1);
 assert.strictEqual(result.events[0].kind, "value-change");
 assert.deepStrictEqual(result.events[0].sourceEventIds,
@@ -289,4 +289,28 @@ assert.equal(normalization.normalizeRecording(normalTextInput).events[0].state, 
   const page = normalization.normalizeRecording(titled).events[0].pageIdentification;
   assert.strictEqual(page.pageCaption, undefined);
   assert.notStrictEqual(page.caption, "Contoso Ltd");
+}
+
+// The browser title ends with the company badge, "(UAT)", which names the company, not the page.
+{
+  const url = "https://businesscentral.dynamics.com/t/Sandbox?company=Salico%20UAT&page=42";
+  const top = { sourceFrameId: "top", frameDepth: 0, frameUrl: url, topUrl: url };
+  let titled = recording("company-badge");
+  titled = append(titled, raw("b1", "page-state", { ...top, pageId: "42",
+    pageCaption: "Förs.order - SO1000269 ∙ Greenfood Iberica (UAT)" }));
+  titled = append(titled, raw("b2", "page-state", { ...top, pageId: "43",
+    pageCaption: "Artikelkort (Lager)" }));
+  const [order, card] = normalization.normalizeRecording(titled).events;
+  assert.strictEqual(order.pageIdentification.pageCaption, "Förs.order - SO1000269 ∙ Greenfood Iberica");
+  assert.strictEqual(order.pageIdentification.observedPageCaption,
+    "Förs.order - SO1000269 ∙ Greenfood Iberica (UAT)", "the observed caption stays as evidence");
+  assert.strictEqual(order.pageIdentification.companyBadge, "UAT");
+  assert.strictEqual(card.pageIdentification.pageCaption, "Artikelkort (Lager)",
+    "other parentheses are part of the caption");
+  // A badge that is not part of the company name is recognized from the product title.
+  const plain = { sourceFrameId: "top", frameDepth: 0 };
+  let product = recording("product-badge");
+  product = append(product, raw("p1", "page-state", { ...plain, pageCaption: "Dynamics 365 Business Central (TEST)" }));
+  product = append(product, raw("p2", "page-state", { ...plain, pageId: "21", pageCaption: "Kunder (TEST)" }));
+  assert.strictEqual(normalization.normalizeRecording(product).events.at(-1).pageIdentification.pageCaption, "Kunder");
 }

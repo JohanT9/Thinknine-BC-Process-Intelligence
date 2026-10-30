@@ -13,7 +13,7 @@
 ) {
   "use strict";
   const SCHEMA_VERSION = 1;
-  const NORMALIZATION_VERSION = "2.10.0";
+  const NORMALIZATION_VERSION = "2.11.0";
   const cache = new WeakMap();
   const clone = value => value == null ? value : JSON.parse(JSON.stringify(value));
   function freeze(value) { if (!value || typeof value !== "object" || Object.isFrozen(value)) return value; Object.values(value).forEach(freeze); return Object.freeze(value); }
@@ -179,6 +179,32 @@
     try { return new URL(value).searchParams.get("company") || ""; }
     catch { return ""; }
   }
+  // The web client ends every browser title with the company badge in parentheses, such as
+  // "Förs.order (UAT)" and "Dynamics 365 Business Central (UAT)". The badge names the company,
+  // not the page, so it is removed from page captions. A badge is recognized from the product
+  // title or as a word of the company name; the observed caption stays as evidence.
+  function withoutCompanyBadge(events) {
+    const badges = new Set();
+    for (const event of events) {
+      const page = event.pageIdentification || {};
+      for (const value of [page.pageCaption, page.caption, page.documentTitle]) {
+        const product = /^dynamics 365 business central\s*\(([^)]+)\)$/iu.exec(String(value || "").trim());
+        if (product) badges.add(normalizedCaption(product[1]));
+      }
+      for (const word of companyFromUrl(page.frameUrl || page.topUrl || "").split(/\s+/u)) {
+        if (word) badges.add(normalizedCaption(word));
+      }
+    }
+    if (!badges.size) return events;
+    return events.map(event => {
+      const page = event.pageIdentification || {};
+      const caption = String(page.pageCaption || "");
+      const match = /^(.+?)\s*\(([^()]+)\)$/u.exec(caption.trim());
+      if (!match || !badges.has(normalizedCaption(match[2]))) return event;
+      return freeze({ ...event, pageIdentification: { ...page, pageCaption: match[1].trim(),
+        observedPageCaption: caption, companyBadge: match[2] } });
+    });
+  }
   function usefulPageCaption(event) {
     const page = event.pageIdentification || {};
     const caption = String(page.pageCaption || page.caption || "").trim();
@@ -339,7 +365,8 @@
     flush();
     const result = freeze({ schemaVersion: SCHEMA_VERSION,
       normalizationVersion: NORMALIZATION_VERSION,
-      recordingId: recording?.id, events: linkTopFrameNavigation(resolvePageContext(events)) });
+      recordingId: recording?.id,
+      events: withoutCompanyBadge(linkTopFrameNavigation(resolvePageContext(events))) });
     if (useCache && recording && typeof recording === "object") cache.set(recording,
       { revision, result });
     return result;
