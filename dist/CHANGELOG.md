@@ -1,4 +1,4 @@
-## Unreleased
+## 4.7.223
 - Screenshots in new documents outline the control each step clicked, typed in or chose with a red frame. The frame is an ordinary annotation marked as generated: move or remove it under Edit image, and it is included in the Word export; the screenshot itself is not changed. It is drawn only on the screenshot of the same event, so it never marks a control in a picture of another moment, and an untouched frame does not prevent regenerating the steps. The recorder now measures the control in the whole tab through Business Central's inner frame, so recordings made earlier get no frames. The setting "Outline the clicked control in screenshots" turns it off, in every interface language.
 - Choosing a suggestion with Enter no longer records the typed text a second time when it was already recorded while typing.
 
