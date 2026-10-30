@@ -44,8 +44,9 @@ async function createService({ dataDirectory, now = Date.now, rateLimit = 120,
   const registrationsFile = path.join(dataDirectory, "registrations.jsonl");
   const consultantsFile = path.join(dataDirectory, "consultants.json");
   const tenantUsersFile = path.join(dataDirectory, "tenant-users.json");
-  for (const file of initializeRegistry ? [registryFile, claimsFile, consultantsFile, tenantUsersFile]
-    : [claimsFile, consultantsFile, tenantUsersFile]) {
+  const deletedLicensesFile = path.join(dataDirectory, "deleted-licenses.json");
+  for (const file of initializeRegistry ? [registryFile, claimsFile, consultantsFile, tenantUsersFile, deletedLicensesFile]
+    : [claimsFile, consultantsFile, tenantUsersFile, deletedLicensesFile]) {
     try { await fs.writeFile(file, "{}\n", { flag: "wx", mode: 0o600 }); }
     catch (error) { if (error.code !== "EEXIST") throw error; }
   }
@@ -111,13 +112,19 @@ async function createService({ dataDirectory, now = Date.now, rateLimit = 120,
     if (!value || Array.isArray(value) || typeof value !== "object") throw new Error("Invalid tenant user registry");
     return value;
   }
+  async function deletedLicenses() {
+    const value = storage ? await storage.readMap("deletedLicenses")
+      : JSON.parse(await fs.readFile(deletedLicensesFile, "utf8"));
+    if (!value || Array.isArray(value) || typeof value !== "object") throw new Error("Invalid deleted license registry");
+    return value;
+  }
   async function atomicWrite(file, value, backup = false) {
     if (backup) await fs.copyFile(file, file + ".backup");
     const temporary = `${file}.${crypto.randomUUID()}.tmp`;
     await fs.writeFile(temporary, JSON.stringify(value, null, 2) + "\n", { flag: "wx", mode: 0o600 });
     await fs.rename(temporary, file);
   }
-  await registry(); await claims(); await consultants(); await tenantUsers();
+  await registry(); await claims(); await consultants(); await tenantUsers(); await deletedLicenses();
   const audit = createAuditLog({ dataDirectory, now, storage });
   const recordAudit = event => audit.log(event)
     .catch(error => console.error("License audit failed:", error.message));
@@ -162,6 +169,16 @@ async function createService({ dataDirectory, now = Date.now, rateLimit = 120,
     });
     tenantUserWrites = operation.catch(() => {}); return operation;
   }
+  let deletedLicenseWrites = Promise.resolve();
+  function mutateDeletedLicenses(action) {
+    if (storage) return storage.mutateMap("deletedLicenses", action);
+    const operation = deletedLicenseWrites.then(async () => {
+      const result = await action(await deletedLicenses());
+      if (result?.updated) await atomicWrite(deletedLicensesFile, result.updated, true);
+      return result?.value;
+    });
+    deletedLicenseWrites = operation.catch(() => {}); return operation;
+  }
   async function registrationEntries() {
     if (storage) return Object.values(await storage.readMap("registrations"))
       .sort((a, b) => String(a.registeredAt).localeCompare(String(b.registeredAt)));
@@ -198,6 +215,17 @@ async function createService({ dataDirectory, now = Date.now, rateLimit = 120,
       const allClaims = await claims(); if (!allClaims[tenantId]) return;
       const updated = { ...allClaims }; delete updated[tenantId];
       await atomicWrite(claimsFile, updated, true);
+    });
+    trialWrites = operation.catch(() => {});
+    return operation;
+  }
+  // A restored license gets its trial claim back unless the tenant has claimed a new trial since.
+  function restoreTrialClaim(tenantId, claim) {
+    const operation = trialWrites.then(async () => {
+      if (storage) return storage.mutateMap("claims", allClaims => allClaims[tenantId]
+        ? {} : { updated: { ...allClaims, [tenantId]: claim } });
+      const allClaims = await claims(); if (allClaims[tenantId]) return;
+      await atomicWrite(claimsFile, { ...allClaims, [tenantId]: claim }, true);
     });
     trialWrites = operation.catch(() => {});
     return operation;
@@ -275,7 +303,7 @@ async function createService({ dataDirectory, now = Date.now, rateLimit = 120,
   const admin = createAdmin({ dataDirectory, registry, mutateRegistry,
     consultants, mutateConsultants,
     tenantUsers, mutateTenantUsers, registrations: registrationEntries,
-    deleteTrialClaim, now, adminKey, notificationConfigured: notifications.configured,
+    deleteTrialClaim, claims, restoreTrialClaim, deletedLicenses, mutateDeletedLicenses, now, adminKey, notificationConfigured: notifications.configured,
     auditEvents: audit.read, recordAudit, usageSummary: usage.summary,
     validateAdminEntra, entraClientId: entraClientId || entraAudience.replace(/^api:\/\//, ""),
     entraScope: entraAudience ? `${entraAudience.startsWith("api://") ? entraAudience : `api://${entraAudience}`}/${entraScope}` : "",
@@ -432,6 +460,30 @@ async function createService({ dataDirectory, now = Date.now, rateLimit = 120,
   server.requestTimeout = 10000; server.headersTimeout = 10000; return server;
 }
 
+// App Service Free unloads an app after about 20 idle minutes, so the next license check waits
+// for a cold start. Requesting our own public /health keeps it loaded.
+const KEEP_WARM_INTERVAL_MS = 10 * 60 * 1000;
+function startKeepWarm({ url, intervalMs = KEEP_WARM_INTERVAL_MS, fetcher = fetch, log = console }) {
+  if (!url) return () => {};
+  let failing = false;
+  const ping = () => fetcher(url, { signal: AbortSignal.timeout(30000) }).then(response => {
+    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+    if (failing) log.log("Keep-warm ping recovered.");
+    failing = false;
+  }).catch(error => {
+    if (!failing) log.error("Keep-warm ping failed:", error.message);
+    failing = true;
+  });
+  const timer = setInterval(ping, intervalMs);
+  timer.unref();
+  return () => clearInterval(timer);
+}
+function keepWarmUrl(env) {
+  if (env.LICENSE_KEEP_WARM === "false") return "";
+  if (env.LICENSE_KEEP_WARM_URL) return env.LICENSE_KEEP_WARM_URL;
+  return env.WEBSITE_HOSTNAME ? `https://${env.WEBSITE_HOSTNAME}/health` : "";
+}
+
 if (require.main === module) {
   const dataDirectory = process.env.LICENSE_DATA_DIRECTORY;
   if (!dataDirectory || !path.isAbsolute(dataDirectory)) {
@@ -451,7 +503,8 @@ if (require.main === module) {
     const cloud = Boolean(process.env.WEBSITE_SITE_NAME);
     server.listen(Number(process.env.PORT || process.env.LICENSE_PORT) || 8787,
       cloud ? "0.0.0.0" : "127.0.0.1", () => console.log("License service started (HTTPS provided by deployment gateway)."));
+    server.on("close", startKeepWarm({ url: keepWarmUrl(process.env) }));
   }).catch(error => { console.error(error.message); process.exitCode = 1; });
 }
 module.exports = { createService, validRequest, validTrialRequest,
-  validConsultantRegistration };
+  validConsultantRegistration, startKeepWarm, keepWarmUrl };

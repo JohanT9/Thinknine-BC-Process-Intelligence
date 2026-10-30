@@ -114,6 +114,12 @@
           <p id="licenseEmptyText"></p>
           <button id="clearLicenseFilters" type="button" class="secondary" hidden>Rensa filter</button>
         </div>
+        <section class="card deleted-card" aria-labelledby="deletedTitle">
+          <div class="card-head"><h2 id="deletedTitle">Raderade licenser <span id="deletedCount" class="count">0</span></h2></div>
+          <p class="muted small">En raderad licens sparas i 30 dagar och kan återställas med sina användare. Därefter tas den bort automatiskt.</p>
+          <ul id="deletedList" class="action-list"></ul>
+          <p id="deletedEmpty" class="empty">Inga raderade licenser.</p>
+        </section>
       </section>
 
       <section id="view-anvandning" class="view" data-view="anvandning" aria-labelledby="usageTitle" hidden>

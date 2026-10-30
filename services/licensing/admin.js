@@ -33,7 +33,32 @@ function buildActions(tenants, consultants, timestamp) {
     a.daysRemaining - b.daysRemaining || a.name.localeCompare(b.name));
 }
 
+// Deleted licenses are kept this long so a mistaken deletion can be undone.
+const RETENTION_MS = 30 * 86400000;
+// An Azure table string property holds 32K characters; related users are dropped above this.
+const MAX_ITEM_CHARACTERS = 30000;
+function deletedItem({ kind, entityId, action, actor, timestamp, entries, related, claim }) {
+  const item = { kind, entityId, action, deletedBy: actor,
+    deletedAt: new Date(timestamp).toISOString(),
+    purgeAfter: new Date(timestamp + RETENTION_MS).toISOString(),
+    entries, related, ...(claim ? { claim } : {}) };
+  if (JSON.stringify(item).length <= MAX_ITEM_CHARACTERS) return item;
+  return { ...item, related: {}, relatedOmitted: Object.keys(related).length };
+}
+function deletedSummary(id, item) {
+  const license = item.kind === "consultant"
+    ? item.entries[`${item.entityId}:${ORGANIZATION_OBJECT_ID}`] || Object.values(item.entries)[0]
+    : item.entries[item.entityId];
+  return { id, kind: item.kind, entityId: item.entityId, action: item.action,
+    name: license?.name || "", licenseType: license?.licenseType || "",
+    expiresAt: license?.expiresAt || "", deletedBy: item.deletedBy, deletedAt: item.deletedAt,
+    purgeAfter: item.purgeAfter, users: Object.keys(item.related || {}).length,
+    usersOmitted: item.relatedOmitted || 0, restoresTrialClaim: Boolean(item.claim) };
+}
+
 function createAdmin({ dataDirectory, registry, mutateRegistry, deleteTrialClaim,
+  claims = async () => ({}), restoreTrialClaim = async () => {},
+  deletedLicenses = async () => ({}), mutateDeletedLicenses = async () => ({}),
   consultants, mutateConsultants, tenantUsers, mutateTenantUsers, registrations = null, now, adminKey = "",
   usageSummary = async () => [], notificationConfigured = false, auditEvents = async () => [], recordAudit = async () => {},
   sendTestNotification = async () => ({ sent: false, configured: false }),
@@ -71,7 +96,16 @@ function createAdmin({ dataDirectory, registry, mutateRegistry, deleteTrialClaim
       registrationItems = (await fs.readFile(registrationsFile, "utf8"))
         .split("\n").filter(Boolean).map(line => JSON.parse(line));
     } catch (error) { if (error.code !== "ENOENT") throw error; }
+    // Expired items are purged lazily whenever the administration reads its state.
+    const deleted = await mutateDeletedLicenses(current => {
+      const kept = Object.fromEntries(Object.entries(current)
+        .filter(([, item]) => Date.parse(item.purgeAfter) > now()));
+      return Object.keys(kept).length === Object.keys(current).length
+        ? { value: kept } : { updated: kept, value: kept };
+    });
     return { revision, tenants, consultants: consultantLicenses, consultantRevision,
+      deletedLicenses: Object.entries(deleted || {}).map(([id, item]) => deletedSummary(id, item))
+        .sort((a, b) => b.deletedAt.localeCompare(a.deletedAt)),
       actions: buildActions(tenants, consultantLicenses, now()), notificationConfigured,
       auditEvents: events, documentUsage: await usageSummary(),
       tenantUsers: Object.values(users).sort((a, b) => b.lastSeenAt.localeCompare(a.lastSeenAt)).slice(0, 1000),
@@ -132,7 +166,10 @@ function createAdmin({ dataDirectory, registry, mutateRegistry, deleteTrialClaim
       const deleteTenant = pathname === "/admin/api/tenant" && request.method === "DELETE";
       const resetTenant = pathname === "/admin/api/tenant/reset" && request.method === "POST";
       const testNotification = pathname === "/admin/api/notification/test" && request.method === "POST";
-      if (!saveTenant && !deleteTenant && !resetTenant && !saveConsultant && !deleteConsultant && !testNotification) {
+      const restoreDeleted = pathname === "/admin/api/deleted/restore" && request.method === "POST";
+      const purgeDeleted = pathname === "/admin/api/deleted/purge" && request.method === "POST";
+      if (!saveTenant && !deleteTenant && !resetTenant && !saveConsultant && !deleteConsultant &&
+          !testNotification && !restoreDeleted && !purgeDeleted) {
         return reply(405, { error: "method-not-allowed" });
       }
       if (request.headers["content-type"]?.split(";")[0].trim() !== "application/json") {
@@ -157,6 +194,43 @@ function createAdmin({ dataDirectory, registry, mutateRegistry, deleteTrialClaim
         if (!result.sent) return reply(503, { error: "notification-failed" });
         return reply(200, await snapshot());
       }
+      if (restoreDeleted || purgeDeleted) {
+        if (!value || Array.isArray(value) || Object.keys(value).join(",") !== "id" ||
+            !GUID.test(value.id || "")) return reply(400, { error: "invalid-request" });
+        const item = (await deletedLicenses())[value.id];
+        if (!item) return reply(404, { error: "not-found" });
+        if (restoreDeleted) {
+          const prefix = `${item.entityId}:`;
+          const restored = item.kind === "consultant"
+            ? await mutateConsultants(current => Object.keys(current).some(key => key.startsWith(prefix))
+              ? { value: { exists: true } }
+              : { updated: { ...current, ...item.related, ...item.entries }, value: {} })
+            : await mutateRegistry(current => current[item.entityId]
+              ? { value: { exists: true } } : { updated: { ...current, ...item.entries }, value: {} });
+          if (restored.exists) return reply(409, { error: "license-exists" });
+          if (item.kind === "tenant") {
+            await mutateTenantUsers(current => ({ updated: { ...item.related, ...current } }));
+            if (item.claim) await restoreTrialClaim(item.entityId, item.claim);
+          }
+        }
+        await mutateDeletedLicenses(current => {
+          const updated = { ...current }; delete updated[value.id]; return { updated };
+        });
+        void recordAudit({ actor: adminActor,
+          action: restoreDeleted ? `${item.kind}-restored` : "deleted-license-purged",
+          entityType: item.kind, entityId: item.entityId,
+          details: restoreDeleted ? { deletedAt: item.deletedAt } : { deletedAt: item.deletedAt, action: item.action } });
+        return reply(200, await snapshot());
+      }
+      // The deleted license goes to the deleted-licenses store first, so a failure below loses nothing.
+      async function keepDeleted(details) {
+        const id = crypto.randomUUID();
+        await mutateDeletedLicenses(current => ({ updated: { ...current,
+          [id]: deletedItem({ ...details, actor: adminActor, timestamp: now() }) } }));
+        return () => mutateDeletedLicenses(current => {
+          const updated = { ...current }; delete updated[id]; return { updated };
+        });
+      }
       if (saveConsultant || deleteConsultant) {
         const baseValid = value && !Array.isArray(value) && GUID.test(value.entraTenantId || "") &&
           GUID.test(value.objectId || "") && /^[0-9a-f]{64}$/.test(value.revision || "");
@@ -167,6 +241,18 @@ function createAdmin({ dataDirectory, registry, mutateRegistry, deleteTrialClaim
               typeof value.email !== "string" || value.email.length > 254 ||
               typeof value.enabled !== "boolean" || !Number.isFinite(Date.parse(value.expiresAt))))) {
           return reply(400, { error: "invalid-request" });
+        }
+        let discard = async () => {};
+        if (deleteConsultant) {
+          const current = await consultants();
+          if (hash(JSON.stringify(current)).toString("hex") !== value.revision) return reply(409, { error: "registry-changed" });
+          const prefix = `${value.entraTenantId}:`;
+          const all = Object.fromEntries(Object.entries(current).filter(([key]) => key.startsWith(prefix)));
+          const organizationKey = prefix + ORGANIZATION_OBJECT_ID;
+          const entries = all[organizationKey] ? { [organizationKey]: all[organizationKey] } : all;
+          const related = Object.fromEntries(Object.entries(all).filter(([key]) => !(key in entries)));
+          if (Object.keys(all).length) discard = await keepDeleted({ kind: "consultant",
+            entityId: value.entraTenantId, action: "consultant-deleted", entries, related });
         }
         const result = await mutateConsultants(current => {
           const currentRevision = hash(JSON.stringify(current)).toString("hex");
@@ -186,7 +272,7 @@ function createAdmin({ dataDirectory, registry, mutateRegistry, deleteTrialClaim
           }
           return { updated, value: {} };
         });
-        if (result.conflict) return reply(409, { error: "registry-changed" });
+        if (result.conflict) { await discard(); return reply(409, { error: "registry-changed" }); }
         void recordAudit({ actor: adminActor,
           action: deleteConsultant ? "consultant-deleted" : "consultant-saved",
           entityType: "consultant", entityId: value.entraTenantId,
@@ -199,6 +285,15 @@ function createAdmin({ dataDirectory, registry, mutateRegistry, deleteTrialClaim
             Object.keys(value).sort().join(",") !== "revision,tenantId" ||
             !GUID.test(value.tenantId) || typeof value.revision !== "string" ||
             !/^[0-9a-f]{64}$/.test(value.revision)) return reply(400, { error: "invalid-request" });
+        const tenants = await registry();
+        if (hash(JSON.stringify(tenants)).toString("hex") !== value.revision) return reply(409, { error: "registry-changed" });
+        if (!tenants[value.tenantId]) return reply(404, { error: "not-found" });
+        const related = Object.fromEntries(Object.entries(await tenantUsers())
+          .filter(([, user]) => user.tenantId === value.tenantId));
+        const discard = await keepDeleted({ kind: "tenant", entityId: value.tenantId,
+          action: resetTenant ? "tenant-trial-reset" : "tenant-deleted",
+          entries: { [value.tenantId]: tenants[value.tenantId] }, related,
+          claim: resetTenant ? (await claims())[value.tenantId] : undefined });
         const result = await mutateRegistry(async tenants => {
           const currentRevision = hash(JSON.stringify(tenants)).toString("hex");
           if (currentRevision !== value.revision) return { value: { conflict: true } };
@@ -206,8 +301,10 @@ function createAdmin({ dataDirectory, registry, mutateRegistry, deleteTrialClaim
           const updated = { ...tenants }; delete updated[value.tenantId];
           return { updated, value: {} };
         });
-        if (result.conflict) return reply(409, { error: "registry-changed" });
-        if (result.missing) return reply(404, { error: "not-found" });
+        if (result.conflict || result.missing) {
+          await discard();
+          return reply(result.conflict ? 409 : 404, { error: result.conflict ? "registry-changed" : "not-found" });
+        }
         await mutateTenantUsers(users => ({ updated: Object.fromEntries(
           Object.entries(users).filter(([, user]) => user.tenantId !== value.tenantId)) }));
         if (resetTenant) await deleteTrialClaim(value.tenantId);

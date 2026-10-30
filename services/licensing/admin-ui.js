@@ -19,7 +19,9 @@ const errors = {
   "invalid-request": "Kontrollera tenant-ID, namn och slutdatum.",
   "notification-not-configured": "E-postnotifieringar är inte konfigurerade.",
   "notification-failed": "Testmejlet kunde inte skickas. Kontrollera Logic Appens körningshistorik.",
-  "rate-limit": "För många anrop. Vänta en minut och försök igen."
+  "rate-limit": "För många anrop. Vänta en minut och försök igen.",
+  "license-exists": "Det finns redan en licens med samma ID. Radera eller ändra den innan du återställer den raderade.",
+  "not-found": "Licensen finns inte längre. Uppdatera vyn."
 };
 
 // Appearance: dark by default like the extension, remembered in this browser only.
@@ -54,7 +56,7 @@ function logout() {
   $("workspace").hidden = true;
   for (const id of ["tabs", "refresh", "logout", "signedIn"]) $(id).hidden = true;
   $("adminKey").value = "";
-  for (const id of ["licenseList", "registrations", "actionQueue", "auditEvents", "documentUsage"]) {
+  for (const id of ["licenseList", "deletedList", "registrations", "actionQueue", "auditEvents", "documentUsage"]) {
     $(id).replaceChildren();
   }
   if (authConfig) {
@@ -323,6 +325,33 @@ function renderLicenses() {
     ? "Inga licenser finns ännu. Lägg till en kundlicens eller en konsultlicens."
     : "Ingen licens matchar sökningen och filtren.";
   $("clearLicenseFilters").hidden = all.length === 0;
+  renderDeleted();
+}
+
+// Deleted licenses wait here for 30 days and can be restored with their users.
+function renderDeleted() {
+  const items = state.deletedLicenses || [];
+  $("deletedCount").textContent = String(items.length);
+  $("deletedEmpty").hidden = items.length !== 0;
+  $("deletedList").replaceChildren(...items.map(item => {
+    const name = item.name || item.entityId;
+    const days = Math.max(0, daysUntil(item.purgeAfter));
+    const details = [item.kind === "consultant" ? "Konsultföretag" : "Kundföretag",
+      `raderad ${utc(item.deletedAt)} UTC av ${actorLabel(item.deletedBy)}`,
+      item.users ? `${item.users} användare sparade` : "",
+      item.usersOmitted ? `${item.usersOmitted} användare sparades inte` : "",
+      days === 1 ? "tas bort automatiskt i morgon" : `tas bort automatiskt om ${days} dagar`].filter(Boolean);
+    return element("li", { className: "action-item" }, [
+      element("span", { className: "pill blocked", text: item.action === "tenant-trial-reset"
+        ? "Raderad, ny testlicens tillåten" : "Raderad" }),
+      element("div", {}, [
+        element("div", { className: "title", text: name }),
+        element("div", { className: "meta mono", text: item.entityId }),
+        element("div", { className: "meta", text: details.join(" · ") })]),
+      element("div", { className: "item-actions" }, [
+        button("Återställ", "primary", () => restoreDeleted(item), { "aria-label": `Återställ ${name}` }),
+        button("Radera permanent", "secondary", () => purgeDeleted(item), { "aria-label": `Radera ${name} permanent` })])]);
+  }));
 }
 
 function licenseRow(item) {
@@ -384,7 +413,9 @@ const EVENT_LABELS = {
   "tenant-user-connected": "Användare ansluten", "tenant-saved": "Tenantlicens sparad",
   "tenant-deleted": "Tenantlicens raderad", "tenant-trial-reset": "Testperiod återställd",
   "consultant-saved": "Konsultlicens sparad", "consultant-deleted": "Konsultlicens raderad",
-  "notification-sent": "Notifiering skickad", "notification-failed": "Notifiering misslyckades" };
+  "notification-sent": "Notifiering skickad", "notification-failed": "Notifiering misslyckades",
+  "tenant-restored": "Tenantlicens återställd", "consultant-restored": "Konsultlicens återställd",
+  "deleted-license-purged": "Raderad licens borttagen permanent" };
 const ACTOR_LABELS = { administrator: "Administratör", "public-api": "Publikt API",
   "microsoft-entra": "Microsoft Entra", system: "System" };
 // Administrators act with the reserve key or as a signed-in Microsoft account.
@@ -520,8 +551,8 @@ async function removeLicense(item) {
   const confirmed = await confirmTyped({
     title: `Radera licensen för ${name}?`,
     text: item.kind === "tenant"
-      ? "Licensen tas bort permanent. En testperiod som redan har använts kan inte begäras igen."
-      : "Konsultlicensen tas bort permanent. Konsulternas användare förlorar licensen vid nästa kontroll.",
+      ? "Kunden förlorar licensen vid nästa licenskontroll. Licensen sparas i 30 dagar under Raderade licenser och kan återställas där. En testperiod som redan har använts kan inte begäras igen."
+      : "Konsulterna förlorar licensen vid nästa licenskontroll. Licensen sparas i 30 dagar under Raderade licenser och kan återställas där.",
     label: `Skriv ${item.kind === "tenant" ? "tenant-ID" : "Entra tenant-ID"} för att bekräfta`,
     expected: item.id, accept: "Radera licens" });
   if (!confirmed) { message("Raderingen avbröts."); return; }
@@ -532,8 +563,8 @@ async function removeLicense(item) {
         revision: state.consultantRevision }, "DELETE");
     render();
     message(item.kind === "tenant"
-      ? "Tenantlicensen är raderad. En tidigare använd testperiod kan inte begäras igen."
-      : "Konsultlicensen är raderad.", "success");
+      ? "Tenantlicensen är raderad och kan återställas under Raderade licenser i 30 dagar."
+      : "Konsultlicensen är raderad och kan återställas under Raderade licenser i 30 dagar.", "success");
   }));
 }
 // The license stays, as a trial license that is active for 30 days from now; it can be changed
@@ -552,13 +583,33 @@ async function restartTrial(item) {
 async function resetTrial(item) {
   const confirmed = await confirmTyped({
     title: `Radera licensen för ${item.license.name || item.id} och tillåt en ny testlicens?`,
-    text: "Licensen och det tidigare testanspråket tas bort. Tenanten kan sedan begära en ny 30-dagars testlicens från tillägget. Detta kan inte ångras och är avsett för kontrollerade tester. Vill du bara förlänga testperioden, välj Starta om testperioden i stället.",
+    text: "Licensen och det tidigare testanspråket tas bort. Tenanten kan sedan begära en ny 30-dagars testlicens från tillägget. Licensen kan återställas under Raderade licenser i 30 dagar, men bara så länge tenanten inte har begärt en ny. Vill du bara förlänga testperioden, välj Starta om testperioden i stället.",
     label: "Skriv tenant-ID för att bekräfta", expected: item.id, accept: "Radera och tillåt ny testlicens" });
   if (!confirmed) { message("Återställningen avbröts."); return; }
   await quietly(run(async () => {
     state = await api("tenant/reset", { tenantId: item.id, revision: state.revision });
     render();
-    message("Tenanten är helt återställd och kan begära en ny testlicens.", "success");
+    message("Licensen är raderad och tenanten kan begära en ny testlicens.", "success");
+  }));
+}
+async function restoreDeleted(item) {
+  await quietly(run(async () => {
+    state = await api("deleted/restore", { id: item.id });
+    render();
+    message(`Licensen för ${item.name || item.entityId} är återställd.`, "success");
+  }));
+}
+async function purgeDeleted(item) {
+  const name = item.name || item.entityId;
+  const confirmed = await confirmTyped({
+    title: `Radera ${name} permanent?`,
+    text: "Licensen och dess sparade användare tas bort för gott och kan inte återställas.",
+    label: "Skriv ID för att bekräfta", expected: item.entityId, accept: "Radera permanent" });
+  if (!confirmed) { message("Raderingen avbröts."); return; }
+  await quietly(run(async () => {
+    state = await api("deleted/purge", { id: item.id });
+    render();
+    message(`${name} är permanent raderad.`, "success");
   }));
 }
 

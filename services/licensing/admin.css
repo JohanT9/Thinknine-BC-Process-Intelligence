@@ -150,6 +150,8 @@ main { max-width: 1240px; margin: auto; padding: 28px 24px 64px; outline: none; 
   background: var(--surface-2); }
 .action-item .title { font-weight: 600; overflow-wrap: anywhere; }
 .action-item .meta { color: var(--muted); font-size: 13px; }
+.deleted-card { margin-top: 24px; }
+.item-actions { display: flex; flex-wrap: wrap; gap: 8px; justify-content: flex-end; }
 .status-line { display: flex; align-items: center; gap: 8px; font-weight: 600; }
 .dot { width: 9px; height: 9px; border-radius: 50%; flex: none; background: var(--faint); }
 .dot.ok { background: var(--success); }
@@ -262,6 +264,9 @@ body[aria-busy="true"] { cursor: progress; }
   .license-main .status, .license-main .expiry { grid-column: 1 / -1; display: flex; gap: 10px; align-items: center; }
   .license-main .expiry .relative { display: inline; }
   .row-actions { grid-column: 1 / -1; justify-content: flex-start; }
+  .deleted-card .action-item { grid-template-columns: minmax(0, 1fr); }
+  .deleted-card .pill { justify-self: start; }
+  .item-actions { justify-content: flex-start; }
 }
 @media (max-width: 600px) {
   .appbar-inner { padding: 8px 16px; gap: 8px; }

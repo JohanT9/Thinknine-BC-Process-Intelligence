@@ -39,6 +39,14 @@ type does not reset trial eligibility. The separate full-reset action removes
 both the tenant license and its trial claim and is intended for controlled test
 use only.
 
+Deleted licenses are kept for 30 days in `deleted-licenses.json` (the
+`LicenseDeletedItems` table in Azure). Each item holds the license, its
+connected users and, after a full reset, the trial claim. The admin view lists
+them under "Raderade licenser" and can restore one or delete it permanently.
+A restore never overwrites a license that exists again under the same ID, and
+it brings back the trial claim only if the tenant has not claimed a new trial.
+Items older than 30 days are removed the next time the admin state is read.
+
 `registrations.jsonl` records each installation/tenant pair once, including
 version and registration time. Existing records are loaded at startup so a
 restart does not produce duplicate registrations. No email is sent yet. The log
@@ -70,6 +78,8 @@ a convenience licensing barrier, not proof of tenant membership.
 Tests: `node tests/tenant-license-service.test.js`.
 
 Admin tests: `node tests/tenant-license-admin.test.js`.
+
+Keep-warm tests: `node tests/license-keep-warm.test.js`.
 
 ## Dokumentstatistik per användare
 
