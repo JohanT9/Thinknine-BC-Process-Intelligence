@@ -1,3 +1,7 @@
+## 4.7.223
+- Screenshots in new documents outline the control each step clicked, typed in or chose with a red frame. The frame is an ordinary annotation marked as generated: move or remove it under Edit image, and it is included in the Word export; the screenshot itself is not changed. It is drawn only on the screenshot of the same event, so it never marks a control in a picture of another moment, and an untouched frame does not prevent regenerating the steps. The recorder now measures the control in the whole tab through Business Central's inner frame, so recordings made earlier get no frames. The setting "Outline the clicked control in screenshots" turns it off, in every interface language.
+- Choosing a suggestion with Enter no longer records the typed text a second time when it was already recorded while typing.
+
 ## 4.7.222
 - Typing part of an item number on a document line and choosing a suggestion with Enter is one step with the chosen number, for example "Choose item 1283344", in every document language. It was three steps: the typed text, "Select record 1283344" and the typed text again. The recorder now gives the chosen row the field's interaction, and recordings made earlier are joined when they are interpreted. A recorder fault also stopped it from finding the suggestion list that a field names in aria-controls; that is corrected.
 - A customer chosen by number is described with that number, for example "Choose 1240 in Customer No.". The customer name that Business Central fills in afterwards was used instead.

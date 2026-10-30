@@ -108,6 +108,19 @@ function (semantic, knowledge, refs, taskVisibility, processAnalysis) {
       screenshots[preferredEventNo] || action.preferredScreenshotRef ||
       [...eventNos].reverse().map(no => screenshots[no]).find(Boolean) ||
       action.screenshotRefs?.at(-1) || null;
+    // The control the user clicked, typed in or chose, as a share of the screenshot, from the
+    // event the screenshot belongs to. A screenshot of another event shows another moment.
+    const screenshotEvent = screenshot ? [...sourceEvents].reverse()
+      .find(event => screenshots[event.eventNo] === screenshot) : null;
+    const highlightBox = screenshotEvent?.topViewportBounds;
+    const highlightable = ["click", "field-change"].includes(screenshotEvent?.type) ||
+      (screenshotEvent?.type === "key" && Boolean(screenshotEvent.selectedCaption));
+    const screenshotHighlight = highlightable && [highlightBox?.x, highlightBox?.y,
+      highlightBox?.width, highlightBox?.height].every(Number.isFinite) &&
+      highlightBox.width > 0 && highlightBox.height > 0
+      ? { screenshotRef: screenshot, sourceEventNo: screenshotEvent.eventNo,
+        x: highlightBox.x, y: highlightBox.y, width: highlightBox.width, height: highlightBox.height }
+      : null;
     const trace = refs.normalize({ recordingId: action.recordingId,
       sourceEventIds: action.sourceEventIds,
       normalizedEventIds: action.normalizedEventIds,
@@ -160,6 +173,7 @@ function (semantic, knowledge, refs, taskVisibility, processAnalysis) {
         ? { checked: action.checked } : {}),
       sourceEventNos: eventNos,
       ...trace, screenshot, screenshots: screenshot ? [screenshot] : [],
+      ...(screenshotHighlight ? { screenshotHighlight } : {}),
       captureGuidance: { ...(action.captureGuidance || {}) },
       ...(action.resultVerification ? {
         resultVerification: { ...action.resultVerification },

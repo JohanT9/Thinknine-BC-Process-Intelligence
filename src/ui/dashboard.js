@@ -8,6 +8,7 @@ const DEFAULTS = {
     "status och bekräfta om processen kräver bokföring i Business Central.",
   captureScreenshots: true,
   showClickHighlights: true,
+  highlightClickTargets: true,
   screenshotMode: "important",
   maskValues: true,
   maxEvents: 20000,

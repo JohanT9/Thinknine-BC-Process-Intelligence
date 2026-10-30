@@ -1089,6 +1089,8 @@
             "Changes are saved automatically.": "Les modifications sont enregistr\xE9es automatiquement.",
             "Show click highlights while recording": "Afficher les rep\xE8res de clic pendant l\u2019enregistrement",
             "Briefly outlines the clicked control. Highlights are excluded from captured screenshots.": "Encadre bri\xE8vement le contr\xF4le cliqu\xE9. Les rep\xE8res sont exclus des captures d\u2019\xE9cran enregistr\xE9es.",
+            "Outline the clicked control in screenshots": "Encadrer le contr\xF4le cliqu\xE9 dans les captures d\u2019\xE9cran",
+            "New documents get a red frame around the control each step clicked, typed in or chose. Move or remove it under Edit image; the screenshot itself is not changed.": "Les nouveaux documents re\xE7oivent un cadre rouge autour du contr\xF4le sur lequel chaque \xE9tape a cliqu\xE9, saisi ou choisi. D\xE9placez-le ou supprimez-le sous Modifier l\u2019image ; la capture d\u2019\xE9cran elle-m\xEAme n\u2019est pas modifi\xE9e.",
             "Microsoft account": "Compte Microsoft",
             "The tenant license is active. Sign in with Microsoft for user registration and statistics. No consultant license is needed.": "La licence du locataire est active. Connectez-vous avec Microsoft pour l\u2019enregistrement de l\u2019utilisateur et les statistiques. Aucune licence de consultant n\u2019est n\xE9cessaire.",
             "error report": "rapport d\u2019erreur"
@@ -2146,6 +2148,8 @@
             "Changes are saved automatically.": "\xC4nderungen werden automatisch gespeichert.",
             "Show click highlights while recording": "Klickmarkierungen w\xE4hrend der Aufnahme anzeigen",
             "Briefly outlines the clicked control. Highlights are excluded from captured screenshots.": "Umrahmt kurz das angeklickte Steuerelement. Die Markierungen werden nicht in gespeicherte Screenshots aufgenommen.",
+            "Outline the clicked control in screenshots": "Angeklicktes Steuerelement in Screenshots umrahmen",
+            "New documents get a red frame around the control each step clicked, typed in or chose. Move or remove it under Edit image; the screenshot itself is not changed.": "Neue Dokumente erhalten einen roten Rahmen um das Steuerelement, das der Schritt angeklickt, ausgef\xFCllt oder ausgew\xE4hlt hat. Verschieben oder entfernen Sie ihn unter \u201EBild bearbeiten\u201C; der Screenshot selbst wird nicht ge\xE4ndert.",
             "Microsoft account": "Microsoft-Konto",
             "The tenant license is active. Sign in with Microsoft for user registration and statistics. No consultant license is needed.": "Die Mandantenlizenz ist aktiv. Melden Sie sich mit Microsoft f\xFCr die Benutzerregistrierung und Statistik an. Eine Beraterlizenz ist nicht erforderlich.",
             "error report": "Fehlerbericht"
@@ -3203,6 +3207,8 @@
             "Changes are saved automatically.": "Los cambios se guardan autom\xE1ticamente.",
             "Show click highlights while recording": "Mostrar marcas de clic durante la grabaci\xF3n",
             "Briefly outlines the clicked control. Highlights are excluded from captured screenshots.": "Enmarca brevemente el control pulsado. Las marcas no se incluyen en las capturas de pantalla guardadas.",
+            "Outline the clicked control in screenshots": "Enmarcar el control seleccionado en las capturas de pantalla",
+            "New documents get a red frame around the control each step clicked, typed in or chose. Move or remove it under Edit image; the screenshot itself is not changed.": "Los documentos nuevos reciben un marco rojo alrededor del control en el que cada paso hizo clic, escribi\xF3 o eligi\xF3. Mu\xE9valo o qu\xEDtelo en Editar imagen; la captura de pantalla en s\xED no cambia.",
             "Microsoft account": "Cuenta de Microsoft",
             "The tenant license is active. Sign in with Microsoft for user registration and statistics. No consultant license is needed.": "La licencia del inquilino est\xE1 activa. Inicie sesi\xF3n con Microsoft para el registro de usuarios y las estad\xEDsticas. No se necesita una licencia de consultor.",
             "error report": "informe de errores"
@@ -4260,6 +4266,8 @@
             "Changes are saved automatically.": "\xC6ndringer gemmes automatisk.",
             "Show click highlights while recording": "Vis klikmarkeringer under optagelse",
             "Briefly outlines the clicked control. Highlights are excluded from captured screenshots.": "Indrammer kort den kontrol, du klikker p\xE5. Markeringerne medtages ikke i gemte sk\xE6rmbilleder.",
+            "Outline the clicked control in screenshots": "Indram den klikkede kontrol i sk\xE6rmbilleder",
+            "New documents get a red frame around the control each step clicked, typed in or chose. Move or remove it under Edit image; the screenshot itself is not changed.": "Nye dokumenter f\xE5r en r\xF8d ramme om den kontrol, som hvert trin klikkede p\xE5, skrev i eller valgte. Flyt eller fjern den under Rediger billede; selve sk\xE6rmbilledet \xE6ndres ikke.",
             "Microsoft account": "Microsoft-konto",
             "The tenant license is active. Sign in with Microsoft for user registration and statistics. No consultant license is needed.": "Tenantlicensen er aktiv. Log ind med Microsoft til brugerregistrering og statistik. En konsulentlicens er ikke n\xF8dvendig.",
             "error report": "fejlrapport"
@@ -5317,6 +5325,8 @@
             "Changes are saved automatically.": "Muutokset tallennetaan automaattisesti.",
             "Show click highlights while recording": "N\xE4yt\xE4 napsautuskorostukset tallennuksen aikana",
             "Briefly outlines the clicked control. Highlights are excluded from captured screenshots.": "Kehyst\xE4\xE4 napsautetun ohjausobjektin hetkeksi. Korostukset eiv\xE4t sis\xE4lly tallennettuihin n\xE4ytt\xF6kuviin.",
+            "Outline the clicked control in screenshots": "Kehyst\xE4 napsautettu ohjausobjekti kuvakaappauksissa",
+            "New documents get a red frame around the control each step clicked, typed in or chose. Move or remove it under Edit image; the screenshot itself is not changed.": "Uusiin asiakirjoihin tulee punainen kehys sen ohjausobjektin ymp\xE4rille, jota kukin vaihe napsautti, johon se kirjoitti tai jonka se valitsi. Siirr\xE4 tai poista kehys kohdassa Muokkaa kuvaa; itse kuvakaappausta ei muuteta.",
             "Microsoft account": "Microsoft-tili",
             "The tenant license is active. Sign in with Microsoft for user registration and statistics. No consultant license is needed.": "Vuokraajan lisenssi on aktiivinen. Kirjaudu Microsoft-tilill\xE4 k\xE4ytt\xE4j\xE4rekister\xF6inti\xE4 ja tilastoja varten. Konsulttilisenssi\xE4 ei tarvita.",
             "error report": "virheraportti"
@@ -6374,6 +6384,8 @@
             "Changes are saved automatically.": "Endringer lagres automatisk.",
             "Show click highlights while recording": "Vis klikkmarkeringer under opptak",
             "Briefly outlines the clicked control. Highlights are excluded from captured screenshots.": "Rammer kort inn kontrollen du klikker p\xE5. Markeringene tas ikke med i lagrede skjermbilder.",
+            "Outline the clicked control in screenshots": "Ramme inn kontrollen det ble klikket p\xE5 i skjermbilder",
+            "New documents get a red frame around the control each step clicked, typed in or chose. Move or remove it under Edit image; the screenshot itself is not changed.": "Nye dokumenter f\xE5r en r\xF8d ramme rundt kontrollen hvert trinn klikket p\xE5, skrev i eller valgte. Flytt eller fjern den under Rediger bilde; selve skjermbildet endres ikke.",
             "Microsoft account": "Microsoft-konto",
             "The tenant license is active. Sign in with Microsoft for user registration and statistics. No consultant license is needed.": "Leietakerlisensen er aktiv. Logg p\xE5 med Microsoft for brukerregistrering og statistikk. Ingen konsulentlisens er n\xF8dvendig.",
             "error report": "feilrapport"
