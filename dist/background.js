@@ -216,6 +216,7 @@ const DEFAULT_SETTINGS = {
   captureScreenshots: true,
   showClickHighlights: true,
   highlightClickTargets: true,
+  focusScreenshots: true,
   screenshotMode: "important",
   maskValues: true,
   maxEvents: 20000,

@@ -9,6 +9,7 @@ const DEFAULTS = {
   captureScreenshots: true,
   showClickHighlights: true,
   highlightClickTargets: true,
+  focusScreenshots: true,
   screenshotMode: "important",
   maskValues: true,
   maxEvents: 20000,
@@ -3836,7 +3837,9 @@ async function composeDocumentMediaForTarget(
       review,
       paths: screenshotPaths,
       screenshotSources: screenshotSources || {},
-      convertOriginal
+      convertOriginal,
+      // Documents show the part of each screenshot around its marks, readable at page width.
+      focus: applicationSettings?.focusScreenshots !== false
     });
   return Object.fromEntries(screenshotAssets.map(asset => [
     asset.assetId,

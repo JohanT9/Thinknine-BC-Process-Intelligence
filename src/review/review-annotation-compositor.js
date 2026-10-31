@@ -43,6 +43,34 @@
     });
   }
 
+  // A Business Central screenshot is the whole wide window; at document width its text is too
+  // small to read. The focus is a part around the step's marks, about two fifths of the width at
+  // 16:9, so the text shows about two and a half times larger. Without marks, or when the marks
+  // need nearly the whole picture, the whole screenshot is used.
+  const FOCUS_WIDTH = 0.4;
+  const FOCUS_ASPECT = 9 / 16;
+  const FOCUS_MAX = 0.85;
+  function focusRegion(items, width, height) {
+    const boxes = (items || []).filter(item => item?.visibility !== "hidden" &&
+      ["x", "y", "width", "height"].every(key => Number.isFinite(item?.geometry?.[key])))
+      .map(item => item.geometry);
+    if (!boxes.length) return null;
+    const left = Math.min(...boxes.map(box => box.x)) * width;
+    const top = Math.min(...boxes.map(box => box.y)) * height;
+    const right = Math.max(...boxes.map(box => box.x + box.width)) * width;
+    const bottom = Math.max(...boxes.map(box => box.y + box.height)) * height;
+    const margin = Math.max(width * 0.06, 24);
+    let regionWidth = Math.max(width * FOCUS_WIDTH, right - left + 2 * margin,
+      (bottom - top + 2 * margin) / FOCUS_ASPECT);
+    let regionHeight = Math.max(regionWidth * FOCUS_ASPECT, bottom - top + 2 * margin);
+    if (regionWidth >= width * FOCUS_MAX || regionHeight >= height * FOCUS_MAX * 1.15) return null;
+    regionWidth = Math.min(regionWidth, width); regionHeight = Math.min(regionHeight, height);
+    const clamp = (value, size, limit) => Math.max(0, Math.min(value, limit - size));
+    return { x: Math.round(clamp((left + right - regionWidth) / 2, regionWidth, width)),
+      y: Math.round(clamp((top + bottom - regionHeight) / 2, regionHeight, height)),
+      width: Math.round(regionWidth), height: Math.round(regionHeight) };
+  }
+
   async function composeScreenshot(source, items, options = {}) {
     const createCanvas = options.createCanvas || (() =>
       root.document.createElement("canvas"));
@@ -69,12 +97,23 @@
       )}`;
       overlayImage = await loadImage(overlaySource, options);
       context.drawImage(overlayImage, 0, 0, width, height);
-      const blob = await canvasBlob(canvas);
+      const region = options.focus ? focusRegion(items, width, height) : null;
+      let output = canvas;
+      if (region) {
+        output = createCanvas(region.width, region.height);
+        output.width = region.width;
+        output.height = region.height;
+        output.getContext("2d").drawImage(canvas, region.x, region.y, region.width,
+          region.height, 0, 0, region.width, region.height);
+      }
+      const blob = await canvasBlob(output);
+      if (output !== canvas) { output.width = 0; output.height = 0; }
       return {
         bytes: new Uint8Array(await blob.arrayBuffer()),
         mimeType: "image/png",
-        width,
-        height
+        width: region ? region.width : width,
+        height: region ? region.height : height,
+        ...(region ? { focus: { ...region, sourceWidth: width, sourceHeight: height } } : {})
       };
     } finally {
       canvas.width = 0;
@@ -112,5 +151,5 @@
     ))];
   }
 
-  return { composeReview, composeScreenshot, pathsForTasks };
+  return { composeReview, composeScreenshot, focusRegion, pathsForTasks };
 });
