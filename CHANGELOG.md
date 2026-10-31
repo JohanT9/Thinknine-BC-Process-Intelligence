@@ -1,3 +1,6 @@
+## 4.7.227
+- The preview and the Word document zoom each screenshot in on its marks, such as the frame around the clicked control, so the text is readable at page width. The part shown is two fifths of the screenshot width around the marks and stays inside the screenshot; a screenshot without marks, or with marks spread over most of it, is shown whole. The saved screenshot and its annotations are not changed. The setting "Zoom screenshots in on the marked control" turns it off, in every interface language.
+
 ## 4.7.226
 - A row chosen with Enter in a field's suggestion list, such as an item number, shows the screenshot with the list open and the chosen row framed. It showed the field afterwards with only the typed text. New recordings also cut the frame to the visible part of a list, so a row wider than its list is not framed beyond it.
 

@@ -293,6 +293,30 @@ function renderingEnvironment() {
     0.1
   );
 
+  // With focus, the document shows the part around the marks: two fifths of the width at 16:9,
+  // centred on the marks and kept inside the screenshot. Without focus, or without marks, or when
+  // the marks need nearly the whole picture, the whole screenshot is used.
+  const okButton = { geometry: { x: 0.5956, y: 0.631, width: 0.0334, height: 0.025 } };
+  assert.deepStrictEqual(compositor.focusRegion([okButton], 2514, 1282),
+    { x: 1037, y: 542, width: 1006, height: 566 });
+  assert.deepStrictEqual(compositor.focusRegion([{ geometry: { x: 0, y: 0, width: 0.02, height: 0.02 } }], 2514, 1282),
+    { x: 0, y: 0, width: 1006, height: 566 }, "kept inside the screenshot");
+  assert.strictEqual(compositor.focusRegion([{ geometry: { x: 0.05, y: 0.1, width: 0.9, height: 0.05 } }], 2514, 1282), null);
+  assert.strictEqual(compositor.focusRegion([], 2514, 1282), null);
+  assert.strictEqual(compositor.focusRegion([{ ...okButton, visibility: "hidden" }], 2514, 1282), null);
+  const focusEnvironment = renderingEnvironment();
+  const focused = await compositor.composeScreenshot("data:image/png;base64,original",
+    [{ ...rectangle, geometry: { x: 0.5, y: 0.5, width: 0.02, height: 0.02 } }],
+    { ...focusEnvironment, focus: true });
+  assert.deepStrictEqual([focused.width, focused.height], [640, 360]);
+  assert.deepStrictEqual(focused.focus, { x: 496, y: 279, width: 640, height: 360,
+    sourceWidth: 1600, sourceHeight: 900 });
+  assert.deepStrictEqual(focusEnvironment.canvases[1].calls[0].slice(1), [496, 279, 640, 360, 0, 0, 640, 360]);
+  const whole = await compositor.composeScreenshot("data:image/png;base64,original",
+    [{ ...rectangle, geometry: { x: 0.5, y: 0.5, width: 0.02, height: 0.02 } }], renderingEnvironment());
+  assert.deepStrictEqual([whole.width, whole.height], [1600, 900]);
+  assert.strictEqual(whole.focus, undefined);
+
   console.log("Review annotation compositor tests passed.");
 })().catch(error => {
   console.error(error);
