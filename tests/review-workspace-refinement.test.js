@@ -40,7 +40,9 @@ assert(html.includes("padding:16px max(16px,calc((100% - 1368px)/2))"));
 assert(html.includes(".annotation-stage{position:relative;width:fit-content;max-width:100%;margin:0"));
 assert(html.includes(".annotation-stage img{display:block;max-width:100%;height:auto;image-rendering:-webkit-optimize-contrast}"));
 assert(html.includes(".annotation-editor{padding:18px;width:min(100%,1400px);margin-inline:auto;box-sizing:border-box}"));
-assert(html.includes("margin:-18px 0 0;padding:18px 0 1px"));
+assert(html.includes("margin:-18px 0 0;padding:12px 0 8px"));
+assert(html.includes("@media(max-width:640px){.annotation-editor-sticky{position:static}}"),
+  "In a narrow window the image editor header must not cover the image");
 assert(html.includes('<h3 id="annotationTitle">Redigera bild</h3>'));
 assert(dashboard.includes('>${uiT("Redigera bild")}</button>'));
 assert(!dashboard.includes(">Annotera</button>"));

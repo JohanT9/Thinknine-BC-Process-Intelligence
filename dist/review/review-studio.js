@@ -457,6 +457,15 @@
     return removed;
   }
 
+  function setScreenshotFocus(review, screenshotRef, focus, options = {}) {
+    const beforeAnnotations = historyEngine.snapshot(review.annotations);
+    const changed = annotations.setFocus(review, screenshotRef, focus, options);
+    if (changed) {
+      recordAnnotationChange(review, "annotation-focus", beforeAnnotations, options);
+    }
+    return changed;
+  }
+
   function move(review, index, delta, options = {}) {
     const task = review.tasks[index];
     if (!task) return review;
@@ -1352,8 +1361,8 @@
       task?.provenance === "manual");
     // An outline the review generated and nobody changed is not the consultant's work.
     const annotated = (review?.annotations?.screenshotSets || [])
-      .some(set => Array.isArray(set?.items) && set.items.some(item =>
-        item?.provenance !== "generated" || item.updatedAt !== item.createdAt));
+      .some(set => set?.focus || (Array.isArray(set?.items) && set.items.some(item =>
+        item?.provenance !== "generated" || item.updatedAt !== item.createdAt)));
     if (consultantOwned || annotated) return false;
 
     const generatedSearchTasks = generatedTasks.filter(task =>
@@ -1384,6 +1393,7 @@
     addAnnotation,
     updateAnnotation,
     removeAnnotation,
+    setScreenshotFocus,
     normalizeTasks,
     renumber,
     move,

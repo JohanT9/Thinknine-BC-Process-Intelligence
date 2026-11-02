@@ -197,7 +197,7 @@ tbody tr:hover { background: var(--colorBrandSubtle); }
 .workspace-tabs button[aria-selected="true"] { color: var(--colorBrandPrimary) !important; border-bottom: 2px solid var(--colorBrandPrimary) !important; }
 .document-workspace-panel { background: var(--c-bg-e6e8eb) !important; }
 .document-workspace-page { box-shadow: var(--shadow8); }
-.annotation-toolbar button[aria-pressed="true"], .document-toolbar button[aria-pressed="true"] { background: var(--colorBrandPrimary) !important; color: var(--colorTextOnBrand) !important; }
+.annotation-toolbar button[aria-pressed="true"], .annotation-focus button[aria-pressed="true"], .document-toolbar button[aria-pressed="true"] { background: var(--colorBrandPrimary) !important; color: var(--colorTextOnBrand) !important; }
 .annotation-stage [data-selected="true"] { stroke: var(--colorBrandPrimary) !important; }
 .annotation-stage polygon[data-selected="true"] { fill: var(--colorBrandPrimary) !important; }
 .annotation-stage svg:focus-visible, .annotation-list button[aria-current="true"] {

@@ -81,7 +81,7 @@
       return ownerId && !oneToOneTarget(stepMap, ownerId);
     })) reasons.push("notes");
     if (array(review?.annotations?.screenshotSets).some(set =>
-      userAnnotations(set).length > 0)) reasons.push("annotations");
+      userAnnotations(set).length > 0 || set?.focus)) reasons.push("annotations");
     const hierarchy = review?.hierarchy || {};
     if (["sections", "subtasks", "assignments", "overrides"].some(key =>
       array(hierarchy[key]).length > 0)) reasons.push("hierarchy");
@@ -266,7 +266,7 @@
       const nextScreenshots = screenshotIds(fresh);
       const annotated = array(currentReview?.annotations?.screenshotSets).some(set =>
         previousScreenshots.includes(String(set?.screenshotRef)) &&
-        userAnnotations(set).length > 0);
+        (userAnnotations(set).length > 0 || set?.focus));
       if (annotated && JSON.stringify(previousScreenshots) !==
           JSON.stringify(nextScreenshots)) reasons.push("selection-annotated-image");
       const identity = {
