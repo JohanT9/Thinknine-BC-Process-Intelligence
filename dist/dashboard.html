@@ -255,10 +255,14 @@ body.process-map-focus-active{overflow:hidden}.process-overview-card.process-map
 .review-shell.document-workspace-mode .document-workspace-panel{height:auto;min-height:0;flex:1}
 .review-shell.document-workspace-mode .review-zoom-toolbar,.review-shell.document-workspace-mode .review-toolbar,.review-shell.document-workspace-mode .review-toolbar-secondary,.review-shell.document-workspace-mode .review-progress,.review-shell.document-workspace-mode #reviewStatus{display:none}
 .annotation-editor{padding:18px;width:min(100%,1400px);margin-inline:auto;box-sizing:border-box}
-.annotation-editor-sticky{position:sticky;top:var(--review-header-height,0px);z-index:3;background:var(--c-bg-ffffff);margin:-18px 0 0;padding:18px 0 1px}
-.annotation-editor-header{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:12px}
+.annotation-editor-sticky{position:sticky;top:var(--review-header-height,0px);z-index:3;background:var(--c-bg-ffffff);margin:-18px 0 0;padding:12px 0 8px}
+.annotation-editor-header{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:8px}
+.annotation-editor-header p{margin:0}
+.annotation-editor-header>div:last-child{display:flex;gap:6px;flex-shrink:0}
+@media(max-width:640px){.annotation-editor-sticky{position:static}}
+.annotation-controls{display:flex;flex-wrap:wrap;align-items:center;gap:8px 20px}
 .annotation-editor-header h3{margin:0 0 4px}
-.annotation-toolbar{display:flex;gap:6px;align-items:center;margin-bottom:12px}
+.annotation-toolbar{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
 .annotation-toolbar button{margin:0}
 .annotation-toolbar button[aria-pressed="true"]{background:var(--c-bg-0f6cbd);color:var(--c-fg-ffffff);box-shadow:inset 0 0 0 2px var(--c-ot-084f8a)}
 .annotation-stage{position:relative;width:fit-content;max-width:100%;margin:0;background:var(--c-bg-f3f6fa);line-height:0;touch-action:none;cursor:crosshair}
@@ -268,6 +272,13 @@ body.process-map-focus-active{overflow:hidden}.process-overview-card.process-map
 .annotation-stage [data-selected="true"]{stroke:var(--c-ot-0f6cbd)}
 .annotation-stage polygon[data-selected="true"]{fill:var(--c-ot-0f6cbd)}
 .annotation-stage svg:focus-visible{outline:3px solid var(--c-bd-0f6cbd)}
+.annotation-focus{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.annotation-focus span{font-weight:600;margin-inline-end:4px}
+.annotation-focus button{margin:0}
+.annotation-focus button[aria-pressed="true"]{background:var(--c-bg-0f6cbd);color:var(--c-fg-ffffff);box-shadow:inset 0 0 0 2px var(--c-ot-084f8a)}
+.annotation-focus-layer{position:absolute;inset:0;overflow:hidden;pointer-events:none}
+.annotation-focus-frame{position:absolute;box-shadow:0 0 0 100vmax rgba(15,23,42,.45);outline:3px solid var(--c-ot-0f6cbd)}
+.annotation-focus-frame[data-mode="auto"]{outline-style:dashed}
 .annotation-help{margin:10px 0;color:var(--c-fg-52606d);font-size:13px;line-height:1.4}
 .annotation-details{display:grid;grid-template-columns:minmax(180px,280px) 1fr;gap:16px;margin-top:12px}
 .annotation-advanced>summary{cursor:pointer;font-weight:600;padding:8px 0;color:var(--c-fg-334e68)}.annotation-advanced[open]>summary{margin-bottom:8px}
@@ -283,7 +294,7 @@ body.process-map-focus-active{overflow:hidden}.process-overview-card.process-map
 .process-analysis-reference-comparison{margin-top:14px;padding:12px;background:var(--c-bg-ffffff);border:1px solid var(--c-bd-d8dee5);border-radius:7px}.process-analysis-reference-comparison>summary{cursor:pointer;font-weight:700}.process-analysis-reference-comparison>p{color:var(--c-fg-526273)}.process-analysis-reference-comparison .process-analysis-list{margin-top:10px}
 @media(max-width:800px){.review-card,.review-card.compact{grid-template-columns:44px 1fr}.review-actions{grid-column:1/-1;flex-direction:row;flex-wrap:wrap}.library-controls{grid-template-columns:1fr}.review-toolbar-more{margin-left:0}.review-toolbar-more-panel{position:fixed;left:24px;right:24px;bottom:24px;top:auto;width:auto;max-height:70vh;overflow:auto}.review-toolbar-group{padding-right:5px}.review-header{padding:14px}.review-list{padding:12px}.document-workspace-body{flex-direction:column}.process-analysis-metrics,.process-analysis-columns,.process-analysis-variant,.process-analysis-evidence dl{grid-template-columns:1fr}.process-analysis-dialog footer{flex-wrap:wrap}.process-analysis-dialog footer button{flex:1 1 auto}}
 @media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important;transition:none!important;animation:none!important}}
-@media(forced-colors:active){.document-workspace-page,.library-card,.review-card,.review-toolbar-more-panel,.process-analysis-summary,.process-analysis-list,.process-analysis-alternatives{border:1px solid CanvasText}.document-toolbar,.review-header{border-color:CanvasText}.review-card.selected{outline:3px solid Highlight}.review-fields [data-edit-field][data-editing=true]{outline:3px solid Highlight}.annotation-toolbar button[aria-pressed="true"]{background:Highlight;color:HighlightText;box-shadow:inset 0 0 0 2px HighlightText}.process-analysis-meter span{background:Highlight}}
+@media(forced-colors:active){.document-workspace-page,.library-card,.review-card,.review-toolbar-more-panel,.process-analysis-summary,.process-analysis-list,.process-analysis-alternatives{border:1px solid CanvasText}.document-toolbar,.review-header{border-color:CanvasText}.review-card.selected{outline:3px solid Highlight}.review-fields [data-edit-field][data-editing=true]{outline:3px solid Highlight}.annotation-toolbar button[aria-pressed="true"],.annotation-focus button[aria-pressed="true"]{background:Highlight;color:HighlightText;box-shadow:inset 0 0 0 2px HighlightText}.annotation-focus-frame{outline-color:Highlight}.process-analysis-meter span{background:Highlight}}
 
 .summary strong{display:block;font-size:18px;margin-top:4px}
 .filename-variables{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0}
@@ -851,26 +862,36 @@ body.process-map-focus-active{overflow:hidden}.process-overview-card.process-map
         <div class="annotation-editor-header">
           <div>
             <h3 id="annotationTitle">Redigera bild</h3>
-            <p id="annotationDescription" class="muted">Markera viktiga områden utan att ändra originalbilden.</p>
+            <p id="annotationDescription" class="muted" data-i18n="Markera viktiga områden utan att ändra originalbilden.">Markera viktiga områden utan att ändra originalbilden.</p>
           </div>
           <div>
             <button id="cancelAnnotationEditor" class="debug">Avbryt</button>
             <button id="closeAnnotationEditor" class="secondary">Klar</button>
           </div>
         </div>
-        <div class="annotation-toolbar" role="toolbar" aria-label="Annotationsverktyg">
-          <button id="rectangleAnnotationTool" class="secondary" aria-pressed="true">Rektangel</button>
-          <button id="arrowAnnotationTool" class="secondary" aria-pressed="false">Pil</button>
-          <button id="deleteAnnotation" class="danger" disabled>Ta bort markering</button>
+        <div class="annotation-controls">
+          <div class="annotation-toolbar" role="toolbar" aria-label="Annotationsverktyg">
+            <button id="rectangleAnnotationTool" class="secondary" aria-pressed="true">Rektangel</button>
+            <button id="arrowAnnotationTool" class="secondary" aria-pressed="false">Pil</button>
+            <button id="deleteAnnotation" class="danger" disabled>Ta bort markering</button>
+          </div>
+          <div class="annotation-focus" role="group" aria-labelledby="annotationFocusLabel">
+            <span id="annotationFocusLabel" data-i18n="Zoom i dokumentet">Zoom i dokumentet</span>
+            <button id="automaticFocus" class="secondary" aria-pressed="true">Automatisk</button>
+            <button id="wholeFocus" class="secondary" aria-pressed="false">Hela bilden</button>
+            <button id="regionFocus" class="secondary" aria-pressed="false">Eget utsnitt</button>
+          </div>
         </div>
       </div>
       <div id="annotationStage" class="annotation-stage">
-        <img id="annotationImage" alt="Skärmbild som redigeras">
+        <img id="annotationImage" alt="Skärmbild som redigeras" data-i18n-alt="Skärmbild som redigeras">
+        <div class="annotation-focus-layer" aria-hidden="true"><div id="annotationFocusFrame" class="annotation-focus-frame" hidden></div></div>
         <svg id="annotationSurface" class="review-annotation-layer" tabindex="0"
-          role="img" aria-label="Rityta för skärmbildsannotering"
+          role="img" aria-label="Rityta för skärmbildsannotering" data-i18n-aria-label="Rityta för skärmbildsannotering"
           aria-describedby="annotationHelp" aria-keyshortcuts="Enter Escape Delete ArrowUp ArrowDown ArrowLeft ArrowRight"></svg>
       </div>
-      <p id="annotationHelp" class="annotation-help">Välj rektangel eller pil och dra på bilden. Enter skapar vald markering centrerat. Välj en markering för att flytta den med pekare eller piltangenter. Delete tar bort och Escape avbryter en pågående gest.</p>
+      <p id="annotationFocusHelp" class="annotation-help" aria-live="polite"></p>
+      <p id="annotationHelp" class="annotation-help" data-i18n="Välj rektangel eller pil och dra på bilden. Enter skapar vald markering centrerat. Välj en markering för att flytta den med pekare eller piltangenter. Delete tar bort och Escape avbryter en pågående gest.">Välj rektangel eller pil och dra på bilden. Enter skapar vald markering centrerat. Välj en markering för att flytta den med pekare eller piltangenter. Delete tar bort och Escape avbryter en pågående gest.</p>
       <div class="annotation-details">
         <div>
           <h4>Markeringar</h4>

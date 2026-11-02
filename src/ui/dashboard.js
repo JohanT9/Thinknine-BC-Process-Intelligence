@@ -6300,14 +6300,100 @@ function initializeReviewScreenshots(card, task, images) {
   }
 }
 
+function annotationFocusChoice() {
+  return globalThis.T9ReviewAnnotations.findScreenshotSet(
+    activeReview?.annotations,
+    annotationEditorState.screenshotRef
+  )?.focus || null;
+}
+
+// The part of the screenshot the document shows, in fractions, or null for the whole screenshot.
+function annotationFocusFraction(choice) {
+  const image = $("annotationImage");
+  const width = image.naturalWidth;
+  const height = image.naturalHeight;
+  if (!width || !height) return null;
+  if (!choice && applicationSettings?.focusScreenshots === false) return null;
+  const region = globalThis.T9ReviewAnnotationCompositor.screenshotRegion(
+    choice, annotationItems(annotationEditorState.screenshotRef), width, height, true
+  );
+  return region && { x: region.x / width, y: region.y / height,
+    width: region.width / width, height: region.height / height };
+}
+
+function renderAnnotationFocus() {
+  const choice = annotationFocusChoice();
+  const draft = annotationEditorState.draft?.type === "focus"
+    ? globalThis.T9ReviewAnnotationEditor.geometry(annotationEditorState) : null;
+  const box = draft
+    ? { x: Math.min(draft.x, draft.x + draft.width), y: Math.min(draft.y, draft.y + draft.height),
+      width: Math.abs(draft.width), height: Math.abs(draft.height) }
+    : annotationFocusFraction(choice);
+  const frame = $("annotationFocusFrame");
+  frame.hidden = !box;
+  if (box) {
+    frame.dataset.mode = draft || choice?.mode === "region" ? "region" : "auto";
+    Object.assign(frame.style, { left: `${box.x * 100}%`, top: `${box.y * 100}%`,
+      width: `${box.width * 100}%`, height: `${box.height * 100}%` });
+  }
+  const focusTool = annotationEditorState.tool === "focus";
+  $("automaticFocus").setAttribute("aria-pressed", String(!choice && !focusTool));
+  $("wholeFocus").setAttribute("aria-pressed", String(choice?.mode === "whole" && !focusTool));
+  $("regionFocus").setAttribute("aria-pressed", String(choice?.mode === "region" || focusTool));
+  $("annotationFocusHelp").textContent = uiT(focusTool
+    ? "Dra på bilden för att välja den del som visas i dokumentet. Med tangentbordet väljer Enter ett utsnitt och piltangenterna flyttar det."
+    : choice?.mode === "region" ? "Dokumentet visar den inramade delen av bilden."
+      : choice?.mode === "whole" ? "Dokumentet visar hela bilden."
+        : applicationSettings?.focusScreenshots === false
+          ? "Automatisk zoom är avstängd i inställningarna. Dokumentet visar hela bilden."
+          : box ? "Dokumentet visar den streckade delen runt markeringarna."
+            : "Dokumentet visar hela bilden eftersom markeringar saknas eller täcker nästan hela bilden.");
+}
+
+function setAnnotationFocus(focus, message, options = {}) {
+  if (!annotationEditorState) return false;
+  try {
+    const changed = globalThis.T9Review.setScreenshotFocus(
+      activeReview,
+      annotationEditorState.screenshotRef,
+      focus,
+      {
+        groupKey: options.groupKey,
+        beforeAnnotationSelection: annotationEditorState.selectedId,
+        afterAnnotationSelection: annotationEditorState.selectedId
+      }
+    );
+    if (changed) markAnnotationsChanged(message);
+    else renderActiveAnnotation();
+    return true;
+  } catch (error) {
+    renderActiveAnnotation();
+    $("annotationStatus").textContent = error instanceof RangeError
+      ? uiT("Utsnittet är för litet. Dra ett större område.")
+      : uiTf("Utsnittet kunde inte sparas: {error}", { error: error.message });
+    return false;
+  }
+}
+
+// Choosing "Own selection" starts from the part the document shows now.
+function initialFocusRegion() {
+  const image = $("annotationImage");
+  const current = annotationFocusFraction(null);
+  return current ? { mode: "region", ...current }
+    : globalThis.T9ReviewAnnotationEditor.centeredFocus(
+      image.naturalWidth && image.naturalHeight ? image.naturalWidth / image.naturalHeight : 16 / 9);
+}
+
 function renderActiveAnnotation(updateControls = true) {
   if (!annotationEditorState) return;
+  const focusDraft = annotationEditorState.draft?.type === "focus";
+  renderAnnotationFocus();
   renderAnnotationSvg(
     $("annotationSurface"),
     $("annotationImage"),
     annotationEditorState.screenshotRef,
     {
-      draft: globalThis.T9ReviewAnnotationEditor.geometry(
+      draft: focusDraft ? null : globalThis.T9ReviewAnnotationEditor.geometry(
         annotationEditorState
       ),
       draftType: annotationEditorState.draft?.type,
@@ -6382,23 +6468,23 @@ function renderAnnotationControls() {
   );
   $("deleteAnnotation").disabled = !selected;
   $("annotationList").innerHTML = items.map((annotation, index) => {
-    const type = annotation.type === "arrow" ? "Pil" : "Rektangel";
+    const type = uiT(annotation.type === "arrow" ? "Pil" : "Rektangel");
     return `<li><button class="secondary" data-annotation-id="${escapeHtml(annotation.annotationId)}"
       aria-current="${annotation.annotationId === annotationEditorState.selectedId}">${type} ${index + 1}</button></li>`;
   }).join("");
   if (!selected) {
     $("annotationProperties").innerHTML =
-      '<p class="muted">Välj en markering för att ändra dess geometri.</p>';
+      `<p class="muted">${escapeHtml(uiT("Välj en markering för att ändra dess geometri."))}</p>`;
     return;
   }
   $("annotationProperties").innerHTML = annotationGeometryFields(selected)
-    .map(([key, label]) => `<label>${label}
+    .map(([key, label]) => `<label>${escapeHtml(uiT(label))}
       <input type="number" min="0" max="100" step="1"
         data-annotation-geometry="${key}"
         value="${Math.round(selected.geometry[key] * 100)}">
     </label>`)
     .join("") +
-    '<div class="annotation-properties-actions"><button data-action="apply-annotation-geometry" class="primary">Tillämpa</button></div>';
+    `<div class="annotation-properties-actions"><button data-action="apply-annotation-geometry" class="primary">${escapeHtml(uiT("Tillämpa"))}</button></div>`;
 }
 
 function updateAnnotationStickyOffset() {
@@ -6484,7 +6570,7 @@ function markAnnotationsChanged(message) {
   reviewAutoSave.schedule();
   renderActiveAnnotation();
   $("annotationStatus").textContent =
-    uiTf("{message} Väntar på automatisk sparning.", { message });
+    uiTf("{message} Väntar på automatisk sparning.", { message: uiT(message) });
   $("reviewFooterText").textContent =
     uiT("Annoteringen väntar på automatisk sparning.");
 }
@@ -8904,6 +8990,36 @@ $("arrowAnnotationTool").addEventListener("click", () => {
   $("annotationSurface").focus();
 });
 $("deleteAnnotation").addEventListener("click", deleteSelectedAnnotation);
+function leaveFocusTool() {
+  if (annotationEditorState?.tool !== "focus") return;
+  annotationEditorState = globalThis.T9ReviewAnnotationEditor.selectTool(
+    annotationEditorState,
+    "rectangle"
+  );
+}
+$("automaticFocus").addEventListener("click", () => {
+  if (!annotationEditorState) return;
+  leaveFocusTool();
+  setAnnotationFocus(null, "Automatisk zoom används.");
+  $("annotationSurface").focus();
+});
+$("wholeFocus").addEventListener("click", () => {
+  if (!annotationEditorState) return;
+  leaveFocusTool();
+  setAnnotationFocus({ mode: "whole" }, "Dokumentet visar hela bilden.");
+  $("annotationSurface").focus();
+});
+$("regionFocus").addEventListener("click", () => {
+  if (!annotationEditorState) return;
+  const choice = annotationFocusChoice();
+  annotationEditorState = globalThis.T9ReviewAnnotationEditor.selectTool(
+    annotationEditorState,
+    "focus"
+  );
+  if (choice?.mode === "region") renderActiveAnnotation();
+  else setAnnotationFocus(initialFocusRegion(), "Eget utsnitt valt.");
+  $("annotationSurface").focus();
+});
 $("annotationList").addEventListener("click", event => {
   const button = event.target.closest?.("[data-annotation-id]");
   if (!button || !annotationEditorState) return;
@@ -8946,7 +9062,7 @@ $("annotationSurface").addEventListener("pointerdown", event => {
   );
   const annotationId = event.target.dataset?.annotationId;
   const annotation = annotationById(annotationId);
-  const nextState = annotation
+  const nextState = annotation && annotationEditorState.tool !== "focus"
     ? globalThis.T9ReviewAnnotationEditor.beginTranslation(
       annotationEditorState,
       annotation,
@@ -9015,7 +9131,9 @@ $("annotationSurface").addEventListener("pointerup", event => {
       const type = movedState.draft.type;
       const result = globalThis.T9ReviewAnnotationEditor.finish(movedState);
       annotationEditorState = result.state;
-      addAnnotation(type, result.geometry);
+      if (type === "focus") {
+        setAnnotationFocus({ mode: "region", ...result.geometry }, "Utsnittet uppdaterades.");
+      } else addAnnotation(type, result.geometry);
     }
   } finally {
     releaseActiveAnnotationPointer();
@@ -9034,7 +9152,25 @@ $("annotationSurface").addEventListener("pointercancel", () => {
 });
 $("annotationSurface").addEventListener("keydown", event => {
   if (!annotationEditorState) return;
-  if (event.key === "Enter") {
+  if (annotationEditorState.tool === "focus" &&
+      (event.key === "Enter" || event.key.startsWith("Arrow"))) {
+    event.preventDefault();
+    const choice = annotationFocusChoice();
+    if (event.key === "Enter" || choice?.mode !== "region") {
+      setAnnotationFocus(initialFocusRegion(), "Utsnittet uppdaterades.");
+      return;
+    }
+    const image = $("annotationImage");
+    const step = (event.shiftKey ? 10 : 1) * 10;
+    const deltaX = event.key === "ArrowLeft" ? -step / image.naturalWidth
+      : event.key === "ArrowRight" ? step / image.naturalWidth : 0;
+    const deltaY = event.key === "ArrowUp" ? -step / image.naturalHeight
+      : event.key === "ArrowDown" ? step / image.naturalHeight : 0;
+    setAnnotationFocus({
+      mode: "region",
+      ...globalThis.T9ReviewAnnotationEditor.translatedGeometry("rectangle", choice, deltaX, deltaY)
+    }, "Utsnittet flyttades.", { groupKey: `annotation-focus:${annotationEditorState.screenshotRef}` });
+  } else if (event.key === "Enter") {
     event.preventDefault();
     const type = annotationEditorState.tool;
     addAnnotation(

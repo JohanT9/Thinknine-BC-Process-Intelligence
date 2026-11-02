@@ -19,8 +19,10 @@
     };
   }
 
+  // "focus" draws the part of the screenshot that documents show instead of a mark.
+  const TOOLS = ["rectangle", "arrow", "focus"];
   function selectTool(state, tool) {
-    if (tool !== "rectangle" && tool !== "arrow") return state;
+    if (!TOOLS.includes(tool)) return state;
     return { ...state, tool, draft: null, translation: null };
   }
 
@@ -51,7 +53,7 @@
   }
 
   function begin(state, start) {
-    if (!start || !["rectangle", "arrow"].includes(state.tool)) return state;
+    if (!start || !TOOLS.includes(state.tool)) return state;
     return {
       ...state,
       selectedId: null,
@@ -93,6 +95,12 @@
 
   function centeredRectangle() {
     return { x: 0.3, y: 0.375, width: 0.4, height: 0.25 };
+  }
+
+  // A focus region of two fifths of the width at 16:9 around the middle, for keyboard use.
+  function centeredFocus(aspect = 1) {
+    const height = Math.min(1, 0.4 * aspect * 9 / 16);
+    return { mode: "region", x: 0.3, y: (1 - height) / 2, width: 0.4, height };
   }
 
   function centeredArrow() {
@@ -256,6 +264,7 @@
     cancel,
     centeredRectangle,
     centeredArrow,
+    centeredFocus,
     translatedGeometry,
     beginTranslation,
     moveTranslation,

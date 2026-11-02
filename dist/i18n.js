@@ -1532,6 +1532,36 @@
       "Highlight important areas without changing the original image."],
     ["Klar", "Done"], ["Rektangel", "Rectangle"], ["Pil", "Arrow"],
     ["Ta bort markering", "Delete annotation"], ["Markeringar", "Annotations"],
+    ["Start X", "Start X"],
+    ["Start Y", "Start Y"],
+    ["Slut X", "End X"],
+    ["Slut Y", "End Y"],
+    ["Bredd", "Width"],
+    ["Höjd", "Height"],
+    ["Välj en markering för att ändra dess geometri.", "Select an annotation to change its position and size."],
+    ["Välj rektangel eller pil och dra på bilden. Enter skapar vald markering centrerat. Välj en markering för att flytta den med pekare eller piltangenter. Delete tar bort och Escape avbryter en pågående gest.", "Choose rectangle or arrow and drag on the image. Enter creates the chosen annotation in the centre. Select an annotation to move it with the pointer or the arrow keys. Delete removes it and Escape cancels a gesture in progress."],
+    ["Skärmbild som redigeras", "Screenshot being edited"],
+    ["Zoom i dokumentet", "Zoom in the document"],
+    ["Hela bilden", "Whole image"],
+    ["Eget utsnitt", "Own selection"],
+    ["Dra på bilden för att välja den del som visas i dokumentet. Med tangentbordet väljer Enter ett utsnitt och piltangenterna flyttar det.", "Drag on the image to choose the part shown in the document. With the keyboard, Enter chooses a selection and the arrow keys move it."],
+    ["Dokumentet visar den inramade delen av bilden.", "The document shows the framed part of the image."],
+    ["Dokumentet visar hela bilden.", "The document shows the whole image."],
+    ["Automatisk zoom är avstängd i inställningarna. Dokumentet visar hela bilden.", "Automatic zoom is turned off in the settings. The document shows the whole image."],
+    ["Dokumentet visar den streckade delen runt markeringarna.", "The document shows the dashed part around the annotations."],
+    ["Dokumentet visar hela bilden eftersom markeringar saknas eller täcker nästan hela bilden.", "The document shows the whole image because there are no annotations or they cover nearly all of it."],
+    ["Automatisk zoom används.", "Automatic zoom is used."],
+    ["Eget utsnitt valt.", "Own selection chosen."],
+    ["Utsnittet uppdaterades.", "The selection was updated."],
+    ["Utsnittet flyttades.", "The selection was moved."],
+    ["Utsnittet är för litet. Dra ett större område.", "The selection is too small. Drag a larger area."],
+    ["Utsnittet kunde inte sparas: {error}", "The selection could not be saved: {error}"],
+    ["Rektangel tillagd.", "Rectangle added."],
+    ["Pil tillagd.", "Arrow added."],
+    ["Markeringen uppdaterades.", "The annotation was updated."],
+    ["Markeringens geometri uppdaterades.", "The annotation's position and size were updated."],
+    ["Markeringen flyttades.", "The annotation was moved."],
+    ["Markeringen togs bort.", "The annotation was deleted."],
     ["Exakt position och storlek", "Exact position and size"],
     ["Anpassa bredd", "Fit width"], ["Anpassa sida", "Fit page"],
     ["Kontinuerligt", "Continuous"], ["Sidläge", "Page mode"],
@@ -2170,6 +2200,9 @@
     });
     target.querySelectorAll("[data-i18n-title]").forEach(element => {
       element.title = translate(element.dataset.i18nTitle, normalized);
+    });
+    target.querySelectorAll("[data-i18n-alt]").forEach(element => {
+      element.alt = translate(element.dataset.i18nAlt, normalized);
     });
     target.querySelectorAll("[data-i18n-aria-label]").forEach(element => {
       element.setAttribute("aria-label", translate(

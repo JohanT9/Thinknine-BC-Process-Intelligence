@@ -71,6 +71,19 @@
       width: Math.round(regionWidth), height: Math.round(regionHeight) };
   }
 
+  // The part a document shows: the screenshot's own choice ("whole" or a chosen region) wins;
+  // otherwise the automatic focus when it is on.
+  function screenshotRegion(choice, items, width, height, automatic) {
+    if (choice?.mode === "whole") return null;
+    if (choice?.mode === "region") {
+      const x = Math.round(Math.max(0, Math.min(1, choice.x)) * width);
+      const y = Math.round(Math.max(0, Math.min(1, choice.y)) * height);
+      return { x, y, width: Math.max(1, Math.min(width - x, Math.round(choice.width * width))),
+        height: Math.max(1, Math.min(height - y, Math.round(choice.height * height))) };
+    }
+    return automatic ? focusRegion(items, width, height) : null;
+  }
+
   async function composeScreenshot(source, items, options = {}) {
     const createCanvas = options.createCanvas || (() =>
       root.document.createElement("canvas"));
@@ -97,7 +110,7 @@
       )}`;
       overlayImage = await loadImage(overlaySource, options);
       context.drawImage(overlayImage, 0, 0, width, height);
-      const region = options.focus ? focusRegion(items, width, height) : null;
+      const region = screenshotRegion(options.focusChoice, items, width, height, options.focus);
       let output = canvas;
       if (region) {
         output = createCanvas(region.width, region.height);
@@ -134,8 +147,8 @@
       );
       const items = Array.isArray(set?.items) ? set.items : [];
       const hasSupportedItems = svg.descriptors(items, 1, 1).length > 0;
-      result[path] = hasSupportedItems
-        ? await composeScreenshot(source, items, options)
+      result[path] = hasSupportedItems || set?.focus?.mode === "region"
+        ? await composeScreenshot(source, items, { ...options, focusChoice: set?.focus })
         : options.convertOriginal(source);
     }
     return result;
@@ -151,5 +164,5 @@
     ))];
   }
 
-  return { composeReview, composeScreenshot, focusRegion, pathsForTasks };
+  return { composeReview, composeScreenshot, focusRegion, screenshotRegion, pathsForTasks };
 });

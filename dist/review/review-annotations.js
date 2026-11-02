@@ -305,6 +305,39 @@
     return clone(removed);
   }
 
+  // The part of a screenshot that documents show. No focus follows the automatic zoom; "whole"
+  // shows the whole screenshot; "region" shows the chosen part, in fractions of the screenshot.
+  const MIN_FOCUS_SIZE = 0.05;
+  function normalizedFocus(focus) {
+    if (!focus) return null;
+    if (focus.mode === "whole") return { mode: "whole" };
+    if (focus.mode !== "region") throw new TypeError(`Unsupported focus mode: ${focus.mode}`);
+    const box = normalizedRectangle(focus);
+    if (box.width < MIN_FOCUS_SIZE || box.height < MIN_FOCUS_SIZE) {
+      throw new RangeError("The focus region is too small.");
+    }
+    return { mode: "region", ...box };
+  }
+
+  function setFocus(review, screenshotRef, focus, options = {}) {
+    const next = normalizedFocus(focus);
+    const { store, set: existing } = editableSet(review, screenshotRef);
+    if (JSON.stringify(existing?.focus || null) === JSON.stringify(next)) return null;
+    let set = existing;
+    if (!set) {
+      set = createScreenshotSet(normalizedScreenshotRef(screenshotRef), options);
+      store.screenshotSets.push(set);
+    }
+    if (next) set.focus = next;
+    else delete set.focus;
+    const now = options.now || new Date().toISOString();
+    set.revision = Number.isInteger(set.revision) ? set.revision + 1 : 1;
+    set.updatedAt = now;
+    review.annotations = store;
+    review.updatedAt = now;
+    return next || { mode: "auto" };
+  }
+
   function diagnostics(store, screenshotAssetIds = [], ownerStepIds = []) {
     const assets = new Set(screenshotAssetIds.map(String));
     const owners = new Set(ownerStepIds.map(String));
@@ -346,6 +379,8 @@
     diagnostics,
     add,
     update,
-    remove
+    remove,
+    normalizedFocus,
+    setFocus
   };
 });

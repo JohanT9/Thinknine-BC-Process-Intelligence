@@ -1,3 +1,8 @@
+## 4.7.228
+- Edit image has "Zoom in the document" with three choices per screenshot: Automatic (the part around the marks, shown with a dashed frame), Whole image, and Own selection, where you drag the part the document shows; with the keyboard, Enter chooses a selection and the arrow keys move it. Outside the chosen part the image is dimmed. The choice is saved with the screenshot, can be undone and cancelled like a mark, and applies to the preview and the Word document also when automatic zoom is turned off in the settings. A screenshot with a chosen zoom counts as your work when the document is regenerated. The saved screenshot is not changed.
+- The image editor is translated in every interface language: its description, help text, status messages, the list of marks and the position and size fields were shown in Swedish.
+- The image editor header takes less space: the tools and the zoom choices share one row, and the zoom explanation is shown below the image. In a narrow window the header scrolls with the page instead of covering the image.
+
 ## 4.7.227
 - The preview and the Word document zoom each screenshot in on its marks, such as the frame around the clicked control, so the text is readable at page width. The part shown is two fifths of the screenshot width around the marks and stays inside the screenshot; a screenshot without marks, or with marks spread over most of it, is shown whole. The saved screenshot and its annotations are not changed. The setting "Zoom screenshots in on the marked control" turns it off, in every interface language.
 
