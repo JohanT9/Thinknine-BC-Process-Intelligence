@@ -111,9 +111,11 @@ assert(dashboard.includes("all: record => !record.archived,") &&
 assert(dashboard.includes("documentLibraryProgress.set(activeReviewSession.id, reviewProgressSummary(activeReview));"),
   "closing a review updates its status on the start page");
 
-// Only the review progress leaves storage for the start page.
+// Only the review progress leaves storage for the start page, read from the progress entries
+// rather than from the reviews (tests/review-progress-store.test.js).
 const background = read("src/recorder/background.js");
-assert(background.includes("[SESSION_PREFIX, BUG_REPORT_PREFIX, REVIEW_PREFIX]") &&
+assert(background.includes("[SESSION_PREFIX, BUG_REPORT_PREFIX],") &&
+  background.includes("reviewProgressStore.list()") &&
   background.includes("return { sessions, reports, reviewProgress,"));
 
 // New start page texts are translated in every interface language.

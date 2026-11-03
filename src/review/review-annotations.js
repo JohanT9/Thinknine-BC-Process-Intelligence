@@ -29,9 +29,12 @@
     [TYPES.TEXT_LABEL]: Object.freeze({ fill: "#111827", opacity: 1 })
   });
 
+  // Same result as a JSON round trip, without re-serializing strings (engine/json-clone.js).
+  const jsonClone = typeof module === "object" && module.exports
+    ? require("../engine/json-clone") : globalThis.T9JsonClone;
+
   function clone(value) {
-    if (value === undefined) return undefined;
-    return JSON.parse(JSON.stringify(value));
+    return jsonClone.clone(value);
   }
 
   function finiteNumber(value, name) {

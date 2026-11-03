@@ -1,7 +1,9 @@
+importScripts("engine/json-clone.js");
 importScripts("engine/locale-catalogs.js");
 importScripts("engine/language-registry.js");
 importScripts("engine/storage-keys.js");
 importScripts("engine/storage-queries.js");
+importScripts("engine/review-progress-store.js");
 importScripts("engine/knowledge-mcp-client-manager.js");
 importScripts("engine/business-central-url-context.js");
 importScripts("engine/tenant-license.js");
@@ -257,6 +259,7 @@ const {
   RAW_RECORDING_PREFIX,
   RECORDING_PREFIX,
   REVIEW_PREFIX,
+  REVIEW_PROGRESS_PREFIX,
   SCREENSHOT_ASSET_PREFIX,
   SCREENSHOT_BLOB_PREFIX,
   SCREENSHOT_MANIFEST_PREFIX,
@@ -287,6 +290,11 @@ const rawEventLogStorage = globalThis.T9EventLogStorage.create({
 const canonicalEventLogStorage = globalThis.T9EventLogStorage.create({
   storage: chrome.storage.local,
   prefix: RECORDING_PREFIX
+});
+const reviewProgressStore = globalThis.T9ReviewProgressStore.create({
+  storage: chrome.storage.local, reviewPrefix: REVIEW_PREFIX,
+  progressPrefix: REVIEW_PROGRESS_PREFIX,
+  isVisible: (task, review) => globalThis.T9ReviewTaskVisibility.isVisible(task, review)
 });
 const processImprovement = globalThis.T9ProcessImprovementService.create({
   storage: chrome.storage.local, reviewPrefix: REVIEW_PREFIX,
@@ -1672,20 +1680,16 @@ async function listSessions() {
 }
 
 async function getDocumentLibraryBootstrap() {
-  const all = await globalThis.T9StorageQueries.getByPrefixes(
-    chrome.storage.local, [SESSION_PREFIX, BUG_REPORT_PREFIX, REVIEW_PREFIX],
-    [globalThis.T9StorageKeys.DOCUMENT_LIBRARY_KEY]
-  );
-  // Only the review progress is returned; the reviews themselves stay in storage.
-  const reviewProgress = Object.entries(all)
-    .filter(([key, value]) => key.startsWith(REVIEW_PREFIX) && value)
-    .map(([key, review]) => {
-      const tasks = (Array.isArray(review.tasks) ? review.tasks : []).filter(task =>
-        globalThis.T9ReviewTaskVisibility.isVisible(task, review));
-      return { sessionId: key.slice(REVIEW_PREFIX.length), total: tasks.length,
-        approved: tasks.filter(task => task.approved).length,
-        completed: review.status === "completed" };
-    });
+  const [all, progress] = await Promise.all([
+    globalThis.T9StorageQueries.getByPrefixes(
+      chrome.storage.local, [SESSION_PREFIX, BUG_REPORT_PREFIX],
+      [globalThis.T9StorageKeys.DOCUMENT_LIBRARY_KEY]
+    ),
+    reviewProgressStore.list()
+  ]);
+  // Only the review progress is returned, read from the small progress entries.
+  const reviewProgress = progress.map(({ sessionId, total, approved, completed }) =>
+    ({ sessionId, total, approved, completed }));
   const sessions = Object.entries(all)
     .filter(([key]) => key.startsWith(SESSION_PREFIX))
     .map(([, value]) => value)
@@ -2455,24 +2459,24 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
       }
 
       case "T9_SAVE_REVIEW": {
-        const existing = (await chrome.storage.local.get(REVIEW_PREFIX + message.sessionId))[REVIEW_PREFIX + message.sessionId];
+        const hadTasks = await reviewProgressStore.hasTasks(message.sessionId);
         const review = {
           ...(message.review || {}),
           sessionId: message.sessionId,
           updatedAt: new Date().toISOString()
         };
-        await chrome.storage.local.set({
-          [REVIEW_PREFIX + message.sessionId]: review
-        });
-        await recordDocumentUsage("process-document", message.sessionId, !existing?.tasks?.length && Boolean(review.tasks?.length));
-        sendResponse({ ok: true, review });
+        await chrome.storage.local.set(reviewProgressStore.entries(message.sessionId, review));
+        await recordDocumentUsage("process-document", message.sessionId, !hadTasks && Boolean(review.tasks?.length));
+        // The page already has the review; sending it back cost as much as saving it.
+        sendResponse({ ok: true, sessionId: review.sessionId, updatedAt: review.updatedAt });
         break;
       }
 
       case "T9_DELETE_REVIEW":
-        await chrome.storage.local.remove(
-          REVIEW_PREFIX + message.sessionId
-        );
+        await chrome.storage.local.remove([
+          REVIEW_PREFIX + message.sessionId,
+          REVIEW_PROGRESS_PREFIX + message.sessionId
+        ]);
         sendResponse({ ok: true });
         break;
 

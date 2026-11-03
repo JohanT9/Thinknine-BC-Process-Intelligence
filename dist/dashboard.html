@@ -255,12 +255,13 @@ body.process-map-focus-active{overflow:hidden}.process-overview-card.process-map
 .review-shell.document-workspace-mode .document-workspace-panel{height:auto;min-height:0;flex:1}
 .review-shell.document-workspace-mode .review-zoom-toolbar,.review-shell.document-workspace-mode .review-toolbar,.review-shell.document-workspace-mode .review-toolbar-secondary,.review-shell.document-workspace-mode .review-progress,.review-shell.document-workspace-mode #reviewStatus{display:none}
 .annotation-editor{padding:18px;width:min(100%,1400px);margin-inline:auto;box-sizing:border-box}
-.annotation-editor-sticky{position:sticky;top:var(--review-header-height,0px);z-index:3;background:var(--c-bg-ffffff);margin:-18px 0 0;padding:12px 0 8px}
+.annotation-editor-sticky{position:sticky;top:0;z-index:3;background:var(--c-bg-ffffff);margin:-18px 0 0;padding:12px 0 8px}
 .annotation-editor-header{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:8px}
 .annotation-editor-header p{margin:0}
 .annotation-editor-header>div:last-child{display:flex;gap:6px;flex-shrink:0}
 @media(max-width:640px){.annotation-editor-sticky{position:static}}
 .annotation-controls{display:flex;flex-wrap:wrap;align-items:center;gap:8px 20px}
+.annotation-save-error{margin:8px 0 0;padding:8px 10px;border-radius:6px;background:var(--c-bg-fef2f2);color:var(--c-fg-991b1b);font-size:13px;line-height:1.4}
 .annotation-editor-header h3{margin:0 0 4px}
 .annotation-toolbar{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
 .annotation-toolbar button{margin:0}
@@ -882,6 +883,7 @@ body.process-map-focus-active{overflow:hidden}.process-overview-card.process-map
             <button id="regionFocus" class="secondary" aria-pressed="false">Eget utsnitt</button>
           </div>
         </div>
+        <p id="annotationSaveError" class="annotation-save-error" role="alert" hidden></p>
       </div>
       <div id="annotationStage" class="annotation-stage">
         <img id="annotationImage" alt="Skärmbild som redigeras" data-i18n-alt="Skärmbild som redigeras">
@@ -1152,6 +1154,7 @@ body.process-map-focus-active{overflow:hidden}.process-overview-card.process-map
   </form>
 </dialog>
 
+<script src="engine/json-clone.js"></script>
 <script src="engine/locale-catalogs.js"></script>
   <script src="engine/language-registry.js"></script>
 <script src="engine/page-identity.js"></script>

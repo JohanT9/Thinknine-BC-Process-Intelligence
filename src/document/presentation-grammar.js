@@ -12,8 +12,12 @@
     "sv-SE", "en-US", "fr-FR", "de-DE", "es-ES", "da-DK", "fi-FI", "nb-NO"
   ]);
 
+  // Same result as a JSON round trip, without re-serializing strings (engine/json-clone.js).
+  const jsonClone = typeof module === "object" && module.exports
+    ? require("../engine/json-clone") : globalThis.T9JsonClone;
+
   function clone(value) {
-    return value === undefined ? undefined : JSON.parse(JSON.stringify(value));
+    return jsonClone.clone(value);
   }
 
   function run(text, role = "text") {

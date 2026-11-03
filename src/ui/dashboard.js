@@ -326,6 +326,7 @@ let loadedKnowledgePacks = [];
 let loadedKnowledgeRelease = null;
 let loadedKnowledgeRepository = null;
 let loadedKnowledgeRules = [];
+let knowledgePacksReady = Promise.resolve();
 let unmatchedKnowledgeItems = [];
 let externalKnowledgeSuggestionState = {
   sessionId: "", requestId: "", status: "idle", requestCount: 0, suggestions: []
@@ -2697,11 +2698,11 @@ function createDiagnostics(session, rawEvents, businessSteps, screenshotCount) {
 }
 
 async function loadSettings() {
-  try {
-    await loadKnowledgePacks();
-  } catch (error) {
+  // The library does not need the Knowledge Packs, so they load while it is shown; building a
+  // document waits for them.
+  knowledgePacksReady = loadKnowledgePacks().catch(error => {
     console.warn("Knowledge Packs could not be loaded.", error);
-  }
+  });
 
   const response = await send({ type: "T9_GET_SETTINGS" });
   const settings = {
@@ -3165,6 +3166,7 @@ function startExternalKnowledgeSuggestions(model, sessionId) {
 }
 
 async function prepareSessionModel(session, options = {}) {
+  await knowledgePacksReady;
   const response = await send({
     type: "T9_GET_SESSION_DATA",
     sessionId: session.id,
@@ -3313,6 +3315,7 @@ async function loadReviewScreenshots(model, review, options = {}) {
 
 async function exportSession(session) {
   show(uiTf("library.exportPreparing", { title: session.name }));
+  await knowledgePacksReady;
 
   const response = await send({
     type: "T9_GET_SESSION_DATA",
@@ -3743,7 +3746,6 @@ function createActiveDocumentPresentation() {
   }
   const expectedResult = configuredExpectedResult();
   const documentLanguage = activeDocumentLanguage();
-  const reviewWithKnowledgeExplanations = reviewForKnowledgeExport(activeReview);
   return activeDocumentPresentationCache.get([
     activeReviewModel,
     activeReview,
@@ -3753,7 +3755,7 @@ function createActiveDocumentPresentation() {
     documentLanguage
   ], () => globalThis.T9WordExportPipeline.createPresentation({
       session: activeReviewModel.response.session,
-      review: reviewWithKnowledgeExplanations,
+      review: reviewForKnowledgeExport(activeReview),
       expectedResult,
       documentLanguage,
       profileId: activeDocumentProfileId
@@ -5288,6 +5290,7 @@ function setReviewSaveState(status) {
   reviewSaveState = { status, at: status === "saved" ? new Date() : reviewSaveState.at };
   $("reviewFooter").dataset.saveState = status;
   $("saveReviewBottom").hidden = status !== "failed";
+  if (status === "saved") $("annotationSaveError").hidden = true;
   if (!annotationChangesPending && activeReview?.status !== "completed") {
     $("reviewFooterText").textContent = reviewSaveStatusText();
   }
@@ -5312,6 +5315,9 @@ const reviewAutoSave = globalThis.T9ReviewEdit.createAutoSave(
       if (annotationEditorState) {
         $("annotationStatus").textContent =
           uiT("review.autosaveRetry");
+        $("annotationSaveError").textContent =
+          uiTf("Annoteringarna kunde inte sparas: {error}", { error: error.message });
+        $("annotationSaveError").hidden = false;
       }
     }
   }
@@ -6487,15 +6493,6 @@ function renderAnnotationControls() {
     `<div class="annotation-properties-actions"><button data-action="apply-annotation-geometry" class="primary">${escapeHtml(uiT("Tillämpa"))}</button></div>`;
 }
 
-function updateAnnotationStickyOffset() {
-  if (!annotationEditorState) return;
-  const reviewHeader = $("reviewDialog").querySelector(".review-header");
-  $("reviewDialog").style.setProperty(
-    "--review-header-height",
-    `${reviewHeader.offsetHeight}px`
-  );
-}
-
 function openAnnotationEditor(task, imageData) {
   annotationEditorBaseline = globalThis.T9ReviewAnnotationEditor.baseline(
     activeReview
@@ -6513,9 +6510,9 @@ function openAnnotationEditor(task, imageData) {
   }, "screenshot-selection", "review");
   $("documentWorkspaceTab").disabled = true;
   $("reviewDialog").classList.add("annotation-mode");
-  updateAnnotationStickyOffset();
   $("reviewList").hidden = true;
   $("reviewFooter").hidden = true;
+  $("annotationSaveError").hidden = true;
   $("annotationEditor").hidden = false;
   const visibleStepNumber = globalThis.T9Review.visibleTaskNumber(
     activeReview,
@@ -6548,7 +6545,13 @@ async function closeAnnotationEditor(options = {}) {
     await reviewSaveQueue.flush();
   } else {
     $("annotationStatus").textContent = uiT("review.annotationSaving");
-    await flushReviewPersistence();
+    // A failed autosave keeps its error until something saves again, so Done retries the
+    // current state once instead of failing on an error that may be gone.
+    try {
+      await flushReviewPersistence();
+    } catch {
+      await reviewPersistence.saveExplicitly({ render: false, announce: false });
+    }
   }
   annotationEditorState = null;
   annotationEditorBaseline = null;
@@ -6557,7 +6560,6 @@ async function closeAnnotationEditor(options = {}) {
   $("reviewList").hidden = false;
   $("reviewFooter").hidden = false;
   $("reviewDialog").classList.remove("annotation-mode");
-  $("reviewDialog").style.removeProperty("--review-header-height");
   renderReview();
   const card = [...$("reviewList").querySelectorAll("[data-review-task-id]")]
     .find(element => element.dataset.reviewTaskId === taskId);
@@ -7867,17 +7869,20 @@ function processQualityMarkup(task) {
 }
 
 function renderReview() {
-  try {
-    renderReviewContent();
-    if (!$('reviewList').children.length && activeReview?.tasks?.length) {
-      renderStoredReviewFallback(new Error(
-        uiT("Den filtrerade steglistan blev tom trots lagrade steg.")
-      ));
+  // The review does not change while it renders, so its visible steps are resolved once.
+  globalThis.T9Review.withActiveTaskCache(() => {
+    try {
+      renderReviewContent();
+      if (!$('reviewList').children.length && activeReview?.tasks?.length) {
+        renderStoredReviewFallback(new Error(
+          uiT("Den filtrerade steglistan blev tom trots lagrade steg.")
+        ));
+      }
+    } catch (error) {
+      renderStoredReviewFallback(error);
     }
-  } catch (error) {
-    renderStoredReviewFallback(error);
-  }
-  renderProcessOverview();
+    renderProcessOverview();
+  });
 }
 
 function renderProcessOverview() {
@@ -8155,7 +8160,10 @@ async function saveActiveReview(options = {}) {
     savedUpdatedAt
   });
   if (unchanged) {
-    activeReview = response.review;
+    // The background returns only what it set. A new review object, as when the whole review
+    // came back, so caches keyed on the review are rebuilt after a save.
+    activeReview = { ...savedReview, sessionId: response.sessionId,
+      updatedAt: response.updatedAt };
     annotationChangesPending = false;
   }
   if (options.announce !== false && currentSession) {
@@ -8183,7 +8191,6 @@ function resetReviewSurfaceForOpen() {
   $("reviewFooter").hidden = false;
   $("documentWorkspaceTab").disabled = false;
   $("reviewDialog").classList.remove("annotation-mode");
-  $("reviewDialog").style.removeProperty("--review-header-height");
 }
 
 async function openReview(session) {
@@ -8357,7 +8364,6 @@ async function closeReview() {
   $("reviewList").hidden = false;
   $("reviewFooter").hidden = false;
   $("reviewDialog").classList.remove("annotation-mode");
-  $("reviewDialog").style.removeProperty("--review-header-height");
   $("reviewOverlay").classList.remove("open");
   $("reviewOverlay").setAttribute("aria-hidden", "true");
   if (activeReviewSession && activeReview) {
@@ -8410,8 +8416,8 @@ async function closeReview() {
   reviewReturnFocus = null;
 }
 
-async function loadSessions() {
-  const response = await send({ type: "T9_GET_DOCUMENT_LIBRARY_BOOTSTRAP" });
+async function loadSessions(request = null) {
+  const response = await (request || send({ type: "T9_GET_DOCUMENT_LIBRARY_BOOTSTRAP" }));
   const sessions = Array.isArray(response?.sessions)
     ? response.sessions
     : [];
@@ -8957,22 +8963,35 @@ $("closeDocumentViewSettings").addEventListener("click", () => {
 });
 
 $("closeReview").addEventListener("click", closeReview);
-$("closeAnnotationEditor").addEventListener("click", async () => {
+// Done and Cancel save before the editor closes. While that runs both are disabled, and a failure
+// is shown in the editor, which stays open with the edits, instead of only to screen readers.
+let annotationEditorClosing = false;
+async function finishAnnotationEditor(cancel, button) {
+  if (annotationEditorClosing) return;
+  annotationEditorClosing = true;
+  const buttons = [$("cancelAnnotationEditor"), $("closeAnnotationEditor")];
+  for (const element of buttons) element.disabled = true;
+  $("annotationEditor").setAttribute("aria-busy", "true");
+  $("annotationSaveError").hidden = true;
   try {
-    await closeAnnotationEditor();
+    await closeAnnotationEditor({ cancel });
   } catch (error) {
-    $("annotationStatus").textContent =
-      uiTf("Annoteringarna kunde inte sparas: {error}", { error: error.message });
+    const message = uiTf(cancel ? "Återställningen kunde inte sparas: {error}"
+      : "Annoteringarna kunde inte sparas: {error}", { error: error.message });
+    $("annotationStatus").textContent = message;
+    $("annotationSaveError").textContent = message;
+    $("annotationSaveError").hidden = false;
+  } finally {
+    annotationEditorClosing = false;
+    for (const element of buttons) element.disabled = false;
+    $("annotationEditor").removeAttribute("aria-busy");
+    if (annotationEditorState) button.focus();
   }
-});
-$("cancelAnnotationEditor").addEventListener("click", async () => {
-  try {
-    await closeAnnotationEditor({ cancel: true });
-  } catch (error) {
-    $("annotationStatus").textContent =
-      uiTf("Återställningen kunde inte sparas: {error}", { error: error.message });
-  }
-});
+}
+$("closeAnnotationEditor").addEventListener("click", event =>
+  finishAnnotationEditor(false, event.currentTarget));
+$("cancelAnnotationEditor").addEventListener("click", event =>
+  finishAnnotationEditor(true, event.currentTarget));
 $("rectangleAnnotationTool").addEventListener("click", () => {
   annotationEditorState = globalThis.T9ReviewAnnotationEditor.selectTool(
     annotationEditorState,
@@ -9052,7 +9071,6 @@ $("annotationProperties").addEventListener("click", event => {
 $("annotationImage").addEventListener("load", () => {
   renderActiveAnnotation(false);
 });
-globalThis.addEventListener("resize", updateAnnotationStickyOffset);
 $("annotationSurface").addEventListener("pointerdown", event => {
   if (!annotationEditorState || event.button !== 0) return;
   const start = globalThis.T9ReviewAnnotationEditor.point(
@@ -10106,6 +10124,9 @@ document.addEventListener("keydown", event => {
 async function initializeDashboard() {
   initializeFilenameVariables();
   populateBatchMetadataOptions();
+  // The library is requested while the settings load; it is shown once both are there.
+  const libraryRequest = send({ type: "T9_GET_DOCUMENT_LIBRARY_BOOTSTRAP" });
+  libraryRequest.catch(() => {});
   try {
     await loadSettings();
   } catch (error) {
@@ -10138,7 +10159,7 @@ async function initializeDashboard() {
 
   let sessionsLoaded = false;
   try {
-    await loadSessions();
+    await loadSessions(libraryRequest);
     sessionsLoaded = true;
   } catch (error) {
     console.error("BC Process Studio loadSessions failed", error);
