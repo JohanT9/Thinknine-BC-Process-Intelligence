@@ -340,6 +340,7 @@
   }
 
   function record(review, type, beforeTasks, options = {}) {
+    activeTaskCache?.clear();
     const createdAt = options.now || new Date().toISOString();
     const feedback = correctionFeedback.create(
       type, beforeTasks, review.tasks, options
@@ -871,9 +872,30 @@
     return { review, splitTasks: result.splitTasks };
   }
 
+  // While a view renders it asks for the visible steps many times without changing the review.
+  // withActiveTaskCache() resolves them once for that synchronous call; any recorded change or a
+  // different tasks array resolves them again.
+  let activeTaskCache = null;
+
+  function withActiveTaskCache(render) {
+    if (activeTaskCache) return render();
+    activeTaskCache = new Map();
+    try {
+      return render();
+    } finally {
+      activeTaskCache = null;
+    }
+  }
+
   function activeTasks(review) {
-    return review.tasks.map(stepEditor.resolve)
+    const cached = activeTaskCache?.get(review);
+    if (cached && cached.tasks === review.tasks && cached.length === review.tasks.length) {
+      return [...cached.visible];
+    }
+    const visible = review.tasks.map(stepEditor.resolve)
       .filter(task => taskVisibility.isVisible(task, review));
+    activeTaskCache?.set(review, { tasks: review.tasks, length: review.tasks.length, visible });
+    return activeTaskCache ? [...visible] : visible;
   }
 
   function displayScreenshotAssetIds(task, availableAssetIds) {
@@ -1435,6 +1457,7 @@
     processImprovementDataset: improvementDataset.create,
     applySelectiveRegeneration,
     activeTasks,
+    withActiveTaskCache,
     visibleTaskNumber,
     canComplete,
     progress,

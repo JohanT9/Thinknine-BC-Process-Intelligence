@@ -6,9 +6,12 @@
   const DIAGNOSTIC_SCHEMA_VERSION = "1.0.0";
   const SEVERITIES = Object.freeze(["error", "warning", "information"]);
 
+  // Same result as a JSON round trip, without re-serializing strings (engine/json-clone.js).
+  const jsonClone = typeof module === "object" && module.exports
+    ? require("../engine/json-clone") : globalThis.T9JsonClone;
+
   function clone(value) {
-    if (value === undefined) return undefined;
-    return JSON.parse(JSON.stringify(value));
+    return jsonClone.clone(value);
   }
 
   function object(value) {

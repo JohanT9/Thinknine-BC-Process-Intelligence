@@ -11,8 +11,12 @@
     "manual-snapshot", "generated-baseline", "imported", "regenerated"
   ]);
 
+  // Same result as a JSON round trip, without re-serializing strings (engine/json-clone.js).
+  const jsonClone = typeof module === "object" && module.exports
+    ? require("../engine/json-clone") : globalThis.T9JsonClone;
+
   function clone(value) {
-    return value === undefined ? undefined : JSON.parse(JSON.stringify(value));
+    return jsonClone.clone(value);
   }
 
   function deepFreeze(value) {

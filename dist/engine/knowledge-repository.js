@@ -314,16 +314,16 @@ function (adapter, knowledge, pageEngine) {
     catch { return { ok: false, snapshot: null, diagnostics: [diagnostic("knowledge-manifest-load-failed", "/manifest")] }; }
     const manifestDiagnostics = validateManifest(manifest);
     if (manifestDiagnostics.some(item => item.severity === "error")) return { ok: false, snapshot: null, diagnostics: manifestDiagnostics };
-    const packs = [];
-    for (const descriptor of manifest.packs.filter(item => item.enabled)) {
-      try {
-        const url = options.resolveUrl ? options.resolveUrl(descriptor.file) : descriptor.file;
-        const pack = await fetchJson(url);
-        packs.push({ packId: descriptor.packId, pack });
-      } catch {
-        return { ok: false, snapshot: null, diagnostics: [diagnostic("knowledge-required-pack-load-failed", `/packs/${descriptor.packId}`)] };
-      }
+    // The packs are fetched in parallel; the first one in manifest order that fails is reported.
+    const descriptors = manifest.packs.filter(item => item.enabled);
+    const fetched = await Promise.allSettled(descriptors.map(descriptor =>
+      fetchJson(options.resolveUrl ? options.resolveUrl(descriptor.file) : descriptor.file)));
+    const failed = fetched.findIndex(result => result.status === "rejected");
+    if (failed >= 0) {
+      return { ok: false, snapshot: null, diagnostics: [diagnostic("knowledge-required-pack-load-failed", `/packs/${descriptors[failed].packId}`)] };
     }
+    const packs = descriptors.map((descriptor, index) =>
+      ({ packId: descriptor.packId, pack: fetched[index].value }));
     return importRelease(manifest, packs);
   }
 

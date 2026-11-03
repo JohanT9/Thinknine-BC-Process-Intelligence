@@ -199,11 +199,20 @@ assert.ok(
 );
 assert.ok(
   html.includes('class="annotation-editor-sticky"') &&
-    html.includes("top:var(--review-header-height,0px)") &&
-    js.includes("function updateAnnotationStickyOffset()") &&
-    js.includes('globalThis.addEventListener("resize", updateAnnotationStickyOffset)'),
+    html.includes(".annotation-editor-sticky{position:sticky;top:0;") &&
+    html.includes("#reviewWorkspacePanel{min-height:0;flex:1;overflow:auto"),
   "Annotation editor actions should remain available while scrolling."
 );
+// The editor scrolls inside the workspace panel below the review header, so an offset by the
+// header's height left the actions floating in the middle of the image.
+assert.ok(!html.includes("--review-header-height") && !js.includes("--review-header-height"),
+  "The annotation editor header must stick to the top of its scrolling panel.");
+// Done and Cancel save before closing. A failure must be visible in the editor, not only to
+// screen readers, and Done retries once, since a failed autosave keeps its error until the next save.
+assert.ok(html.includes('<p id="annotationSaveError" class="annotation-save-error" role="alert" hidden></p>') &&
+    js.includes('$("annotationSaveError").hidden = false;') &&
+    js.includes("await reviewPersistence.saveExplicitly({ render: false, announce: false });"),
+  "A failed save when the image editor closes must be shown and Done must retry.");
 assert.ok(
   html.includes('id="message" role="status" aria-live="polite"') &&
     html.includes('aria-controls="advancedPanel"') &&

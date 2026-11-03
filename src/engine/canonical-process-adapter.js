@@ -26,17 +26,27 @@
   // Stable content fingerprint, not a cryptographic authenticity signature.
   // Two independently seeded 64-bit FNV streams make IDs compact and repeatable
   // in both current browsers and the Node 20 CI runtime.
+  // The 64-bit state is kept in four 16-bit limbs: the same result as BigInt arithmetic, which
+  // was slow enough to dominate opening a large document. The prime is 0x100_000001b3.
+  function fnv1a64(input, seed) {
+    let h0 = seed[0], h1 = seed[1], h2 = seed[2], h3 = seed[3];
+    for (let index = 0; index < input.length; index += 1) {
+      h0 ^= input.charCodeAt(index);
+      const t0 = h0 * 0x1b3;
+      const t1 = h1 * 0x1b3 + (t0 >>> 16);
+      const t2 = h2 * 0x1b3 + h0 * 0x100 + (t1 >>> 16);
+      h3 = (h3 * 0x1b3 + h1 * 0x100 + (t2 >>> 16)) & 0xffff;
+      h0 = t0 & 0xffff; h1 = t1 & 0xffff; h2 = t2 & 0xffff;
+    }
+    const hex = (high, low) => (((high << 16) | low) >>> 0).toString(16).padStart(8, "0");
+    return hex(h3, h2) + hex(h1, h0);
+  }
+  const limbs = seed => [0n, 16n, 32n, 48n].map(shift => Number((seed >> shift) & 0xffffn));
+  const FNV_SEEDS = [limbs(14695981039346656037n), limbs(7809847782465536322n)];
+
   function digest(value) {
     const input = canonical(value);
-    const hash = seed => {
-      let state = seed;
-      for (let index = 0; index < input.length; index += 1) {
-        state ^= BigInt(input.charCodeAt(index));
-        state = BigInt.asUintN(64, state * 1099511628211n);
-      }
-      return state.toString(16).padStart(16, "0");
-    };
-    return `fnv1a64:${hash(14695981039346656037n)}${hash(7809847782465536322n)}`;
+    return `fnv1a64:${fnv1a64(input, FNV_SEEDS[0])}${fnv1a64(input, FNV_SEEDS[1])}`;
   }
 
   function mergeDiagnostics(...groups) {

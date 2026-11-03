@@ -12,6 +12,8 @@
   const SCREENSHOT_BLOB_PREFIX = "t9_screenshot_blob_";
   const SCREENSHOT_MANIFEST_PREFIX = "t9_screenshot_manifest_";
   const REVIEW_PREFIX = "t9_review_";
+  // Not "t9_review_progress_": everything under REVIEW_PREFIX is read as a review.
+  const REVIEW_PROGRESS_PREFIX = "t9_progress_";
   const DOCUMENT_LIBRARY_KEY = "t9_document_library";
   const BUG_REPORT_PREFIX = "t9_bug_report_";
   const BC_ERROR_EVIDENCE_PREFIX = "t9_bc_error_evidence_";
@@ -24,7 +26,8 @@
       EVENT_PREFIX + sessionId,
       SCREENSHOT_PREFIX + sessionId,
       SCREENSHOT_MANIFEST_PREFIX + sessionId,
-      REVIEW_PREFIX + sessionId
+      REVIEW_PREFIX + sessionId,
+      REVIEW_PROGRESS_PREFIX + sessionId
     ];
   }
 
@@ -34,6 +37,7 @@
     EVENT_PREFIX,
     DOCUMENT_LIBRARY_KEY,
     REVIEW_PREFIX,
+    REVIEW_PROGRESS_PREFIX,
     RECORDING_PREFIX,
     RAW_RECORDING_PREFIX,
     SCREENSHOT_PREFIX,

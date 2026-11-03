@@ -5,9 +5,12 @@
 })(typeof globalThis !== "undefined" ? globalThis : this, function () {
   const MAX_ENTRIES = 100;
 
+  // Same result as a JSON round trip, without re-serializing strings (engine/json-clone.js).
+  const jsonClone = typeof module === "object" && module.exports
+    ? require("../engine/json-clone") : globalThis.T9JsonClone;
+
   function clone(value) {
-    if (value === undefined) return undefined;
-    return JSON.parse(JSON.stringify(value));
+    return jsonClone.clone(value);
   }
 
   function ensure(review) {
@@ -23,6 +26,97 @@
 
   function snapshot(tasks) {
     return clone(tasks || []);
+  }
+
+  // An entry stores the steps in their order before and after the command, but the content of
+  // only the steps the command added, removed or changed. Undo and redo take every other step
+  // from the current steps, which are the entry's other side. Full copies of every step made a
+  // review grow by megabytes per edit. Entries without stable unique step IDs keep full copies.
+  const TASK_DELTA = "task-delta";
+
+  function taskIds(tasks) {
+    const ids = (Array.isArray(tasks) ? tasks : []).map(task => task?.taskId);
+    if (ids.some(id => typeof id !== "string" || !id) || new Set(ids).size !== ids.length) {
+      return null;
+    }
+    return ids;
+  }
+
+  function taskDelta(beforeTasks, afterTasks) {
+    const before = Array.isArray(beforeTasks) ? beforeTasks : [];
+    const after = Array.isArray(afterTasks) ? afterTasks : [];
+    const beforeTaskOrder = taskIds(before);
+    const afterTaskOrder = taskIds(after);
+    if (!beforeTaskOrder || !afterTaskOrder) return null;
+    const beforeText = new Map(before.map(task => [task.taskId, JSON.stringify(task)]));
+    const afterText = new Map(after.map(task => [task.taskId, JSON.stringify(task)]));
+    return {
+      taskStorage: TASK_DELTA,
+      beforeTaskOrder,
+      afterTaskOrder,
+      beforeTasks: before.filter(task => afterText.get(task.taskId) !== beforeText.get(task.taskId))
+        .map(task => JSON.parse(beforeText.get(task.taskId))),
+      afterTasks: after.filter(task => beforeText.get(task.taskId) !== afterText.get(task.taskId))
+        .map(task => JSON.parse(afterText.get(task.taskId)))
+    };
+  }
+
+  function fullTaskStorage(beforeTasks, afterTasks) {
+    return { beforeTasks: snapshot(beforeTasks), afterTasks: snapshot(afterTasks) };
+  }
+
+  function sameTasks(storage) {
+    if (storage.taskStorage === TASK_DELTA) {
+      return !storage.beforeTasks.length && !storage.afterTasks.length &&
+        storage.beforeTaskOrder.join("\u001f") === storage.afterTaskOrder.join("\u001f");
+    }
+    return JSON.stringify(storage.beforeTasks) === JSON.stringify(storage.afterTasks);
+  }
+
+  // The steps on one side of an entry, given the steps on its other side. Null when a step that
+  // the entry did not store is missing from those steps.
+  function entryTasks(entry, side, otherSideTasks) {
+    if (entry?.taskStorage !== TASK_DELTA) return snapshot(entry?.[`${side}Tasks`]);
+    const stored = new Map((entry[`${side}Tasks`] || []).map(task => [task.taskId, task]));
+    const other = new Map((Array.isArray(otherSideTasks) ? otherSideTasks : [])
+      .map(task => [task?.taskId, task]));
+    const tasks = (entry[`${side}TaskOrder`] || []).map(id => stored.get(id) || other.get(id));
+    return tasks.every(Boolean) ? snapshot(tasks) : null;
+  }
+
+  function unchangedIdsPresent(storage, side, tasks) {
+    const changed = new Set(storage[`${side}Tasks`].map(task => task.taskId));
+    const present = new Set((Array.isArray(tasks) ? tasks : []).map(task => task?.taskId));
+    return storage[`${side}TaskOrder`].every(id => changed.has(id) || present.has(id));
+  }
+
+  // Converts entries with full copies, from the current position outwards, as long as the steps
+  // they did not change exist where undo or redo would take them from.
+  function compact(review) {
+    ensure(review);
+    const entries = review.commandHistory;
+    const isFull = entry => entry && entry.taskStorage !== TASK_DELTA &&
+      (Array.isArray(entry.beforeTasks) || Array.isArray(entry.afterTasks));
+    if (!entries.some(isFull)) return review;
+    // restored: the side undo ("before") or redo ("after") restores, starting from anchor.
+    const convert = (index, restored, anchor) => {
+      const entry = entries[index];
+      if (!isFull(entry)) return entryTasks(entry, restored, anchor);
+      const storage = taskDelta(entry.beforeTasks, entry.afterTasks);
+      if (storage && unchangedIdsPresent(storage, restored, anchor)) {
+        entries[index] = { ...entry, ...storage };
+      }
+      return entry[`${restored}Tasks`];
+    };
+    let anchor = review.tasks;
+    for (let index = review.historyIndex - 1; index >= 0 && anchor; index -= 1) {
+      anchor = convert(index, "before", anchor);
+    }
+    anchor = review.tasks;
+    for (let index = review.historyIndex; index < entries.length && anchor; index += 1) {
+      anchor = convert(index, "after", anchor);
+    }
+    return review;
   }
 
   function groupedMetadata(previous, current) {
@@ -52,9 +146,9 @@
   }
 
   function record(review, command) {
-    ensure(review);
-    const beforeTasks = snapshot(command.beforeTasks);
-    const afterTasks = snapshot(command.afterTasks);
+    compact(review);
+    const taskStorage = taskDelta(command.beforeTasks, command.afterTasks) ||
+      fullTaskStorage(command.beforeTasks, command.afterTasks);
     const beforeAnnotations = command.beforeAnnotations === undefined
       ? undefined
       : clone(command.beforeAnnotations);
@@ -86,7 +180,7 @@
     const afterGeneratedTasks = command.afterGeneratedTasks === undefined
       ? undefined : clone(command.afterGeneratedTasks);
     if (
-      JSON.stringify(beforeTasks) === JSON.stringify(afterTasks) &&
+      sameTasks(taskStorage) &&
       command.beforeStatus === command.afterStatus &&
       JSON.stringify(beforeAnnotations) === JSON.stringify(afterAnnotations) &&
       JSON.stringify(beforeStructureOverrides) ===
@@ -101,15 +195,18 @@
     }
     let entries = review.commandHistory.slice(0, review.historyIndex);
     const previous = entries.at(-1);
-    if (
-      command.groupKey &&
-      previous?.groupKey === command.groupKey &&
+    // A grouped command extends the previous entry: its steps before stay those before the group.
+    const groupedBefore = command.groupKey && previous?.groupKey === command.groupKey &&
       previous.type === command.type
-    ) {
+      ? entryTasks(previous, "before", command.beforeTasks) : null;
+    if (groupedBefore) {
+      const { taskStorage: _storage, beforeTaskOrder: _beforeOrder,
+        afterTaskOrder: _afterOrder, ...rest } = previous;
       entries[entries.length - 1] = {
-        ...previous,
+        ...rest,
+        ...(taskDelta(groupedBefore, command.afterTasks) ||
+          fullTaskStorage(groupedBefore, command.afterTasks)),
         updatedAt: command.createdAt,
-        afterTasks,
         afterAnnotations,
         afterStructureOverrides,
         afterManualSteps,
@@ -133,8 +230,7 @@
         createdAt: command.createdAt,
         updatedAt: command.createdAt,
         groupKey: command.groupKey || null,
-        beforeTasks,
-        afterTasks,
+        ...taskStorage,
         beforeAnnotations,
         afterAnnotations,
         beforeStructureOverrides,
@@ -199,9 +295,9 @@
       ? review.historyIndex - 1
       : review.historyIndex;
     const entry = review.commandHistory[entryIndex];
-    review.tasks = snapshot(
-      direction === "undo" ? entry.beforeTasks : entry.afterTasks
-    );
+    const tasks = entryTasks(entry, direction === "undo" ? "before" : "after", review.tasks);
+    if (!tasks) return null;
+    review.tasks = tasks;
     const annotations = direction === "undo"
       ? entry.beforeAnnotations
       : entry.afterAnnotations;
@@ -249,8 +345,10 @@
     MAX_ENTRIES,
     canRedo,
     canUndo,
+    compact,
     directionFromKey,
     ensure,
+    entryTasks,
     record,
     redo: review => restore(review, "redo"),
     snapshot,
