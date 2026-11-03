@@ -18,7 +18,7 @@ const knowledgeMcpCacheKey = new Function("globalThis", "crypto", "TextEncoder",
 const run = new Function("message", "sender", "chrome", "getSettings",
   "knowledgeMcpClientManager", "isKnowledgeMcpSettingsSender", "pageKnowledgePacksReady",
   "globalThis", "sendResponse", "knowledgeMcpClient", "KNOWLEDGE_MCP_CACHE_KEY",
-  "knowledgeMcpCacheKey", `return (async () => { switch (message.type) {
+  "knowledgeMcpCacheKey", "KNOWLEDGE_MCP_KEEP_ALIVE_MS", `return (async () => { switch (message.type) {
     ${cases} } })();`);
 
 async function invoke(message, { enabled = false, allowedSender = true, clientError = null } = {}) {
@@ -69,7 +69,7 @@ async function invoke(message, { enabled = false, allowedSender = true, clientEr
   require("../src/engine/knowledge-mcp-client-manager").create(() => client),
   sender => sender.id === chrome.runtime.id && sender.url === chrome.runtime.getURL("dashboard.html"),
   Promise.resolve({ repository: {} }), { BCKnowledgeMcpAdapter: knowledgeAdapter, T9KnowledgeMcpCache: knowledgeCache },
-  value => { result = value; }, client, "t9KnowledgeMcpLookupCacheV1", knowledgeMcpCacheKey);
+  value => { result = value; }, client, "t9KnowledgeMcpLookupCacheV1", knowledgeMcpCacheKey, 0);
   return result;
 }
 
@@ -107,6 +107,13 @@ async function main() {
   assert.ok(batch.results.every(item => item.result.status === "suggested" &&
     item.result.source === "mcp-unverified" && item.result.requiresReview),
   JSON.stringify(batch.results));
+  // More lookups than run at once keep their order.
+  const wide = await invoke({ type: "T9_LOOKUP_KNOWLEDGE_MCP_BATCH", lookups: Array.from({ length: 7 },
+    (_, index) => ({ key: `w${index}`, kind: "object", request: { objectRef: {
+      objectType: "page", objectId: String(100 + index) }, productFamily: "business-central" } })) },
+  { enabled: true });
+  assert.deepStrictEqual(wide.results.map(item => item.key), ["w0", "w1", "w2", "w3", "w4", "w5", "w6"]);
+  assert.ok(wide.results.every(item => item.result.status === "suggested"));
   const blockedBatch = await invoke({ type: "T9_LOOKUP_KNOWLEDGE_MCP_BATCH", lookups: [] });
   assert.deepStrictEqual(blockedBatch, { ok: false, reason: "knowledge-mcp-consent-required" });
   assert.deepStrictEqual(await invoke({ type: "T9_TEST_KNOWLEDGE_MCP_CONNECTION" },
@@ -114,6 +121,31 @@ async function main() {
   { ok: false, reason: "knowledge-mcp-unavailable",
     detail: "Specified native messaging host not found." });
   assert.strictEqual(clientClosed, true, "The connection check must stop its temporary MCP host");
+
+  // A document lookup keeps the started host for a short while so the next document reuses it;
+  // the connection check and an elapsed idle period stop it.
+  const timers = [];
+  const created = [];
+  const manager = require("../src/engine/knowledge-mcp-client-manager").create(() => {
+    const host = { closed: false, close() { host.closed = true; } };
+    created.push(host);
+    return host;
+  }, { setTimer: (callback, ms) => { const timer = { callback, ms }; timers.push(timer); return timer; },
+    clearTimer: timer => { timer.cleared = true; } });
+  manager.acquire().release({ keepAliveMs: 60000 });
+  assert.strictEqual(created[0].closed, false);
+  assert.strictEqual(timers[0].ms, 60000);
+  const reused = manager.acquire();
+  assert.strictEqual(reused.client, created[0], "a lookup within the idle period reuses the host");
+  assert.strictEqual(timers[0].cleared, true);
+  reused.release({ keepAliveMs: 60000 });
+  timers[1].callback();
+  assert.strictEqual(created[0].closed, true, "the idle host stops");
+  const next = manager.acquire();
+  assert.notStrictEqual(next.client, created[0]);
+  next.release();
+  assert.strictEqual(created[1].closed, true, "without keepAliveMs the host stops at once");
+  assert.ok(background.includes("knowledgeMcpLease?.release({ keepAliveMs: KNOWLEDGE_MCP_KEEP_ALIVE_MS })"));
   console.log("Knowledge MCP consent and sender guards passed.");
 }
 

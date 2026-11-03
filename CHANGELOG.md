@@ -1,3 +1,6 @@
+## 4.7.230
+- External knowledge suggestions are checked while a document opens instead of after its review is shown, so they are ready together with the review. Up to four lookups run at a time without waiting for the slowest of each group, and the local knowledge service stays started for a minute so documents opened after one another do not start it again.
+
 ## 4.7.229
 - When you scroll in Edit image, the tools stay at the top of the editor, directly below the review header. They used to stop halfway down the window and cover the image.
 - Done and Cancel in Edit image could seem to do nothing: when saving failed, the editor stayed open and the error was only announced to screen readers. The error is now shown in the editor, the buttons are disabled while saving, and Done tries to save again after an earlier automatic save failed instead of repeating that failure.
