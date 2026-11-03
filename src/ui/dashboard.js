@@ -8281,6 +8281,8 @@ async function completeReviewOpen(session, storedReview, initialUpdatedAt,
     const model = await prepareSessionModel(session);
     if (!isCurrent()) return;
     activeReviewModel = model;
+    // Look up external knowledge while the review renders instead of after it.
+    startExternalKnowledgeSuggestions(activeReviewModel, session.id);
 
     const reviewUnchanged = activeReview?.updatedAt === initialUpdatedAt;
     const emptyReview = storedReview &&
@@ -8327,7 +8329,6 @@ async function completeReviewOpen(session, storedReview, initialUpdatedAt,
       loadStatus.hidden = true;
       loadStatus.textContent = "";
     }
-    startExternalKnowledgeSuggestions(activeReviewModel, session.id);
   } catch (error) {
     if (!isCurrent()) return;
     if (loadStatus) {

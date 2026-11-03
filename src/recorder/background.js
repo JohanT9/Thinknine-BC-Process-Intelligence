@@ -144,6 +144,7 @@ async function requireRecordingLicense(url) {
 }
 const windowsSharePorts = new Set();
 const KNOWLEDGE_MCP_CACHE_KEY = "t9KnowledgeMcpLookupCacheV1";
+const KNOWLEDGE_MCP_KEEP_ALIVE_MS = 60 * 1000;
 const knowledgeMcpClientManager = globalThis.T9KnowledgeMcpClientManager.create(() =>
   globalThis.BCKnowledgeNativeMcpClient.create({
     connectNative: host => chrome.runtime.connectNative(host)
@@ -2705,13 +2706,15 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
               }
               return { key: resultKey, kind, result, fromCache: false };
             };
-            // Native MCP requests are bounded by the client timeout. Resolve a
-            // small batch concurrently instead of serially blocking for N×12s.
-            for (let offset = 0; offset < misses.length; offset += 4) {
-              const batch = misses.slice(offset, offset + 4);
-              const resolved = await Promise.all(batch.map(resolveLookup));
-              batch.forEach((item, index) => { results[item.index] = resolved[index]; });
-            }
+            // Native MCP requests are bounded by the client timeout. Up to four run at once,
+            // and each finished lookup starts the next instead of waiting for the slowest of four.
+            let nextMiss = 0;
+            await Promise.all(Array.from({ length: Math.min(4, misses.length) }, async () => {
+              while (nextMiss < misses.length) {
+                const item = misses[nextMiss++];
+                results[item.index] = await resolveLookup(item);
+              }
+            }));
             if (cacheUpdates.length) {
               const nextCache = globalThis.T9KnowledgeMcpCache.write(cache, cacheUpdates);
               await chrome.storage.local.set({ [KNOWLEDGE_MCP_CACHE_KEY]: nextCache });
@@ -2727,7 +2730,8 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
           sendResponse({ ok: false, reason: "knowledge-mcp-unavailable",
             ...(detail ? { detail } : {}) });
         } finally {
-          knowledgeMcpLease?.release();
+          // Documents opened shortly after this one reuse the started host.
+          knowledgeMcpLease?.release({ keepAliveMs: KNOWLEDGE_MCP_KEEP_ALIVE_MS });
         }
         break;
       }
