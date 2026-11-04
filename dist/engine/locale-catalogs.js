@@ -1082,7 +1082,9 @@
     "The preview and the Word document show the part of the screenshot around its marks, so the text is readable. A screenshot without marks is shown whole. The saved screenshot is not changed.": "L’aperçu et le document Word affichent la partie de la capture d’écran autour de ses repères, afin que le texte soit lisible. Une capture sans repère est affichée en entier. La capture enregistrée n’est pas modifiée.",
     "Microsoft account": "Compte Microsoft",
     "The tenant license is active. Sign in with Microsoft for user registration and statistics. No consultant license is needed.": "La licence du locataire est active. Connectez-vous avec Microsoft pour l’enregistrement de l’utilisateur et les statistiques. Aucune licence de consultant n’est nécessaire.",
-    "error report": "rapport d’erreur"
+    "error report": "rapport d’erreur",
+    "Business Central error": "Erreur Business Central",
+    "Reported Business Central problem": "Problème Business Central signalé"
   },
   "de-DE": {
     "Correct the file name template.": "Korrigieren Sie die Dateinamensvorlage.",
@@ -2165,7 +2167,9 @@
     "The preview and the Word document show the part of the screenshot around its marks, so the text is readable. A screenshot without marks is shown whole. The saved screenshot is not changed.": "Die Vorschau und das Word-Dokument zeigen den Teil des Screenshots um seine Markierungen, damit der Text lesbar ist. Ein Screenshot ohne Markierung wird vollständig angezeigt. Der gespeicherte Screenshot wird nicht geändert.",
     "Microsoft account": "Microsoft-Konto",
     "The tenant license is active. Sign in with Microsoft for user registration and statistics. No consultant license is needed.": "Die Mandantenlizenz ist aktiv. Melden Sie sich mit Microsoft für die Benutzerregistrierung und Statistik an. Eine Beraterlizenz ist nicht erforderlich.",
-    "error report": "Fehlerbericht"
+    "error report": "Fehlerbericht",
+    "Business Central error": "Business Central-Fehler",
+    "Reported Business Central problem": "Gemeldetes Business Central-Problem"
   },
   "es-ES": {
     "Correct the file name template.": "Corrija la plantilla de nombre de archivo.",
@@ -3248,7 +3252,9 @@
     "The preview and the Word document show the part of the screenshot around its marks, so the text is readable. A screenshot without marks is shown whole. The saved screenshot is not changed.": "La vista previa y el documento de Word muestran la parte de la captura alrededor de sus marcas, para que el texto se pueda leer. Una captura sin marcas se muestra completa. La captura guardada no cambia.",
     "Microsoft account": "Cuenta de Microsoft",
     "The tenant license is active. Sign in with Microsoft for user registration and statistics. No consultant license is needed.": "La licencia del inquilino está activa. Inicie sesión con Microsoft para el registro de usuarios y las estadísticas. No se necesita una licencia de consultor.",
-    "error report": "informe de errores"
+    "error report": "informe de errores",
+    "Business Central error": "Error de Business Central",
+    "Reported Business Central problem": "Problema de Business Central notificado"
   },
   "da-DK": {
     "Correct the file name template.": "Ret skabelonen til filnavnet.",
@@ -4331,7 +4337,9 @@
     "The preview and the Word document show the part of the screenshot around its marks, so the text is readable. A screenshot without marks is shown whole. The saved screenshot is not changed.": "Eksemplet og Word-dokumentet viser den del af skærmbilledet, der er omkring markeringerne, så teksten kan læses. Et skærmbillede uden markeringer vises helt. Det gemte skærmbillede ændres ikke.",
     "Microsoft account": "Microsoft-konto",
     "The tenant license is active. Sign in with Microsoft for user registration and statistics. No consultant license is needed.": "Tenantlicensen er aktiv. Log ind med Microsoft til brugerregistrering og statistik. En konsulentlicens er ikke nødvendig.",
-    "error report": "fejlrapport"
+    "error report": "fejlrapport",
+    "Business Central error": "Business Central-fejl",
+    "Reported Business Central problem": "Rapporteret Business Central-problem"
   },
   "fi-FI": {
     "Correct the file name template.": "Korjaa tiedostonimen malli.",
@@ -5414,7 +5422,9 @@
     "The preview and the Word document show the part of the screenshot around its marks, so the text is readable. A screenshot without marks is shown whole. The saved screenshot is not changed.": "Esikatselu ja Word-asiakirja näyttävät kuvakaappauksesta merkintöjen ympäröivän osan, jotta teksti on luettavissa. Kuvakaappaus ilman merkintöjä näytetään kokonaan. Tallennettua kuvakaappausta ei muuteta.",
     "Microsoft account": "Microsoft-tili",
     "The tenant license is active. Sign in with Microsoft for user registration and statistics. No consultant license is needed.": "Vuokraajan lisenssi on aktiivinen. Kirjaudu Microsoft-tilillä käyttäjärekisteröintiä ja tilastoja varten. Konsulttilisenssiä ei tarvita.",
-    "error report": "virheraportti"
+    "error report": "virheraportti",
+    "Business Central error": "Business Central -virhe",
+    "Reported Business Central problem": "Ilmoitettu Business Central -ongelma"
   },
   "nb-NO": {
     "Correct the file name template.": "Rett malen for filnavn.",
@@ -6497,7 +6507,9 @@
     "The preview and the Word document show the part of the screenshot around its marks, so the text is readable. A screenshot without marks is shown whole. The saved screenshot is not changed.": "Forhåndsvisningen og Word-dokumentet viser delen av skjermbildet rundt markeringene, slik at teksten kan leses. Et skjermbilde uten markeringer vises i sin helhet. Det lagrede skjermbildet endres ikke.",
     "Microsoft account": "Microsoft-konto",
     "The tenant license is active. Sign in with Microsoft for user registration and statistics. No consultant license is needed.": "Leietakerlisensen er aktiv. Logg på med Microsoft for brukerregistrering og statistikk. Ingen konsulentlisens er nødvendig.",
-    "error report": "feilrapport"
+    "error report": "feilrapport",
+    "Business Central error": "Business Central-feil",
+    "Reported Business Central problem": "Rapportert Business Central-problem"
   }
 };
   for (const values of Object.values(catalogs)) Object.freeze(values);

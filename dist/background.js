@@ -2002,6 +2002,37 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
         break;
       }
 
+      case "T9_REPORT_VISIBLE_BC_ERROR": {
+        // A bug report from an error that is already on screen: a bug recording is started,
+        // every frame captures the open error dialog through the normal evidence path, and
+        // the recording is stopped at once. Nothing was captured before the user asked.
+        const tabId = message.tabId || sender.tab?.id;
+        if (!tabId) throw new Error("Ingen Business Central-flik angavs.");
+        const session = await startSession({ name: "Business Central-fel", purpose: "",
+          recordingPurpose: "bug-report" }, tabId);
+        let captured = 0;
+        try {
+          const frames = await chrome.webNavigation.getAllFrames({ tabId })
+            .catch(() => null) || [{ frameId: 0 }];
+          const results = await Promise.all(frames.map(frame => chrome.tabs.sendMessage(
+            tabId, { type: "T9_CAPTURE_VISIBLE_BC_ERROR", sessionId: session.id },
+            { frameId: frame.frameId }).catch(() => null)));
+          captured = results.reduce((sum, result) => sum + (Number(result?.captured) || 0), 0);
+        } catch (error) {
+          await cancelActiveSession();
+          throw error;
+        }
+        if (!captured) {
+          await cancelActiveSession();
+          throw new Error("recorder.noVisibleError");
+        }
+        const stopped = await stopSession("", message.documentLanguage);
+        const created = await createAndOpenBugReport(stopped.id, "");
+        sendResponse({ ok: true, session: stopped, report: created.report,
+          workspaceUrl: created.workspaceUrl, tabId: created.tabId });
+        break;
+      }
+
       case "T9_CREATE_BUG_REPORT": {
         const recording = await getCanonicalRecording(message.recordingId);
         const errorEvidence = await getBcErrorEvidenceForRecording(

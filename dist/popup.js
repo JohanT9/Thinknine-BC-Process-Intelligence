@@ -95,6 +95,7 @@ function setLicenseFeedback(text, error = false) {
 function setStarting(starting) {
   $("startProcess").disabled = starting;
   $("startBug").disabled = starting;
+  $("reportVisibleError").disabled = starting;
 }
 
 function formatLicenseExpiry(value) {
@@ -418,6 +419,35 @@ async function startRecording(recordingPurpose) {
   }
 }
 
+// Creates a bug report from the Business Central error dialog that is open now, without a
+// recording of the steps before it.
+async function reportVisibleError() {
+  setStarting(true);
+  showMessage(t("recorder.checking"));
+  try {
+    const tab = await currentTab();
+    if (!tab?.url?.includes("businesscentral.dynamics.com")) {
+      throw new Error(t("recorder.openBcFirst"));
+    }
+    const authorization = await prepareTenantLicense(tab.id);
+    renderLicenseCard(authorization.license, { tenantId: authorization.tenantId, signedIn: true,
+      checking: authorization.license?.stale === true, lastKnown: authorization.license });
+    await ensureContentScript(tab);
+    showMessage(t("recorder.capturingVisibleError"));
+    const response = await send({ type: "T9_REPORT_VISIBLE_BC_ERROR", tabId: tab.id,
+      documentLanguage: globalThis.T9LanguageRegistry.normalize(
+        defaultDocumentLanguage, "document") }, 120000);
+    if (!response?.ok) throw new Error(response?.error || t("recorder.startFailed"));
+    showMessage(t("recorder.reportOpened"));
+    await refresh();
+    await updateLicenseCard();
+  } catch (error) {
+    showMessage(error.message, true);
+  } finally {
+    setStarting(false);
+  }
+}
+
 $("licenseCardAction").addEventListener("click", async () => {
   const card = $("licenseCard");
   const action = $("licenseCardAction");
@@ -442,6 +472,7 @@ $("licenseCardAction").addEventListener("click", async () => {
 
 $("startProcess").addEventListener("click", () => startRecording("documentation"));
 $("startBug").addEventListener("click", () => startRecording("bug-report"));
+$("reportVisibleError").addEventListener("click", reportVisibleError);
 $("languageSwitch").addEventListener("change", switchUiLocale);
 $("languageSettingsButton").addEventListener("click", () => {
   $("languageSettingsStatus").textContent = t("settings.autoSave");

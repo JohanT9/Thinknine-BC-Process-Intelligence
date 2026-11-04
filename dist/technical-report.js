@@ -27,11 +27,60 @@
           currentUiLocale)} ${detail}` : detail;
     }
   };
-  function download(text, filename, type = "text/markdown;charset=utf-8", open = false) {
-    const blob = new Blob([text], { type });
-    const url = URL.createObjectURL(blob);
-    return send({ type: "T9_DOWNLOAD_FILE", url, filename, open }).finally(() =>
-      URL.revokeObjectURL(url));
+  // Resolves when the browser has written the file, so a message never claims a file was
+  // saved while the download is still running, waiting in a Save as dialog or was cancelled.
+  function downloadCompleted(downloadId) {
+    return new Promise((resolve, reject) => {
+      let settled = false;
+      const finish = state => {
+        if (settled || state === "in_progress") return;
+        settled = true; chrome.downloads.onChanged.removeListener(listener);
+        if (state === "complete") resolve();
+        else reject(new Error(t("technical.downloadNotSaved")));
+      };
+      const listener = delta => {
+        if (delta.id === downloadId && delta.state?.current) finish(delta.state.current);
+      };
+      chrome.downloads.onChanged.addListener(listener);
+      chrome.downloads.search({ id: downloadId }).then(([item]) => {
+        if (item) finish(item.state);
+      }, () => {});
+    });
+  }
+  async function download(text, filename, type = "text/markdown;charset=utf-8", open = false) {
+    const url = URL.createObjectURL(new Blob([text], { type }));
+    try {
+      const result = await send({ type: "T9_DOWNLOAD_FILE", url, filename, open });
+      message.textContent = t("technical.waitingForDownload");
+      await downloadCompleted(result.downloadId);
+      return result;
+    } finally { URL.revokeObjectURL(url); }
+  }
+  // A file name in the given language for a report without a usable title.
+  const reportFileName = locale => globalThis.T9LanguageRegistry.translate("error report",
+    locale, "felrapport").replace(/\s+/gu, "-");
+  const busyButtons = ["emailReport", "exportPdf", "downloadMarkdown", "copySummary"]
+    .map(id => document.getElementById(id));
+  // Export actions run one at a time and show what is happening until they finish.
+  async function busy(progress, work) {
+    busyButtons.forEach(button => { button.disabled = true; });
+    message.textContent = progress;
+    try { return await work(); }
+    catch (error) { if (message.textContent === progress) message.textContent = ""; throw error; }
+    finally { busyButtons.forEach(button => { button.disabled = false; }); }
+  }
+  async function copyText(text, html = "") {
+    try {
+      if (html && globalThis.ClipboardItem && navigator.clipboard?.write) {
+        await navigator.clipboard.write([new ClipboardItem({
+          "text/plain": new Blob([text], { type: "text/plain" }),
+          "text/html": new Blob([html], { type: "text/html" }) })]);
+      } else await navigator.clipboard.writeText(text);
+      return true;
+    } catch {
+      message.textContent = t("technical.copyFailed");
+      return false;
+    }
   }
   async function start() {
     if (!bugReportId) throw new Error(t("technical.missingReportId"));
@@ -83,13 +132,43 @@
     const persistentDisclosures = [".report-more-fields", ".reproduction-editor",
       ".technical-details", ".additional-evidence", ".screenshot-editor"];
     let issuePreviewState = null;
-    const render = state => {
-      const openDisclosures = persistentDisclosures.filter(selector =>
-        container.querySelector(selector)?.open);
-      const result = globalThis.T9TechnicalReportWorkspaceView.render(
-        container, state, { mediaAssets, locale: currentUiLocale,
+    // Rebuilding the report keeps the focused field, its caret and any text typed into it
+    // that has not been committed yet; the field commits it when the user leaves it.
+    function captureFocus() {
+      const active = document.activeElement;
+      if (!active || !container.contains(active)) return null;
+      const selector = active.id ? `#${CSS.escape(active.id)}` : active.dataset.focusKey
+        ? `[data-focus-key="${CSS.escape(active.dataset.focusKey)}"]` : null;
+      if (!selector) return null;
+      const editable = active.tagName === "TEXTAREA" ||
+        (active.tagName === "INPUT" && active.type === "text");
+      return { selector, editable, value: active.value, start: active.selectionStart,
+        end: active.selectionEnd, scrollTop: active.scrollTop };
+    }
+    function restoreFocus(saved) {
+      const next = saved && container.querySelector(saved.selector);
+      if (!next) return;
+      if (saved.editable && next.value !== saved.value) {
+        const committed = next.value;
+        next.value = saved.value;
+        let changed = false;
+        next.addEventListener("change", () => { changed = true; }, { once: true });
+        next.addEventListener("blur", () => {
+          if (!changed && next.value !== committed) next.dispatchEvent(new Event("change"));
+        }, { once: true });
+      }
+      next.focus({ preventScroll: true });
+      if (saved.editable) {
+        try { next.setSelectionRange(saved.start, saved.end); } catch { /* not a text field */ }
+        next.scrollTop = saved.scrollTop;
+      }
+    }
+    let renderedRevision = null;
+    const viewOptions = () => ({ mediaAssets, locale: currentUiLocale,
         onRetrySave: action(async () => { await workspace.flush(); }),
-        onCopy: value => navigator.clipboard.writeText(value),
+        onCopy: value => copyText(value).then(copied => {
+          if (copied) message.textContent = t("technical.copied");
+        }),
         onEdit(name, value) {
           if (["title", "summary", "severity", "category"].includes(name)) {
             workspace.edit({ summary: { [name]: value } });
@@ -101,30 +180,66 @@
         onSelectPrimaryError: id => workspace.selectPrimaryError(id)
         ,onEditReproductionStep: (id, patch) =>
           workspace.updateReproductionStep(id, patch)
+        ,onAddReproductionStep: instruction => workspace.addReproductionStep(instruction)
         ,onSetScreenshotVisibility: (assetId, visibility) =>
           workspace.updateScreenshotVisibility(assetId, visibility)
         });
+    const render = state => {
+      const openDisclosures = persistentDisclosures.filter(selector =>
+        container.querySelector(selector)?.open);
+      const focus = captureFocus();
+      const scrollY = window.scrollY;
+      const result = globalThis.T9TechnicalReportWorkspaceView.render(
+        container, state, viewOptions());
+      renderedRevision = state.revision;
       openDisclosures.forEach(selector => {
         const disclosure = container.querySelector(selector);
         if (disclosure) disclosure.open = true;
       });
+      restoreFocus(focus);
+      if (window.scrollY !== scrollY) window.scrollTo(0, scrollY);
       // Sending is the main action once the report is complete and states what was expected;
       // until then it stays available without being emphasised.
       document.getElementById("emailReport").classList.toggle("is-ready", Boolean(result.ready &&
         String(state.report?.expectedResult?.text || "").trim()));
       return result;
     };
+    // Changes are drawn after the browser has moved focus and finished a click, so a field
+    // or button the user is reaching for is not replaced underneath them.
+    let pendingState = null;
+    let renderTimer = null;
+    let pointerHeld = false;
+    const drawPending = () => {
+      renderTimer = null;
+      if (pointerHeld || !pendingState) return;
+      const state = pendingState; pendingState = null;
+      if (state.revision === renderedRevision && globalThis.T9TechnicalReportWorkspaceView
+        .renderSaveState(container, state, viewOptions())) return;
+      render(state);
+    };
+    const scheduleRender = state => {
+      pendingState = state;
+      if (!renderTimer) renderTimer = setTimeout(drawPending, 0);
+    };
+    document.addEventListener("pointerdown", () => { pointerHeld = true; }, true);
+    const releasePointer = () => {
+      pointerHeld = false;
+      if (pendingState && !renderTimer) renderTimer = setTimeout(drawPending, 0);
+    };
+    ["pointerup", "pointercancel"].forEach(type =>
+      document.addEventListener(type, releasePointer, true));
+    window.addEventListener("blur", releasePointer);
     let autosaveTimer = null;
     const renderAndAutosave = state => {
       if (state.saveState === "unsaved") issuePreviewState = null;
-      render(state);
+      scheduleRender(state);
       if (state.saveState !== "unsaved") return;
       clearTimeout(autosaveTimer);
       autosaveTimer = setTimeout(() => workspace.save().catch(error => {
         message.textContent = t(error.message);
       }), 600);
     };
-    workspace.subscribe(renderAndAutosave); renderAndAutosave(workspace.state());
+    workspace.subscribe(renderAndAutosave); render(workspace.state());
     if (query.get("new") === "1") {
       const title = document.getElementById("technical-report-title");
       const expected = document.getElementById("technical-report-expectedResult");
@@ -137,18 +252,31 @@
     }));
     document.getElementById("undoReport").addEventListener("click", workspace.undo);
     document.getElementById("redoReport").addEventListener("click", workspace.redo);
-    document.getElementById("regenerateReport").addEventListener("click", action(async () => {
-      if (!window.confirm(t("technical.regenerateConfirm"))) return;
-      const button = document.getElementById("regenerateReport"); button.disabled = true;
+    const regenerateDialog = document.getElementById("regenerateDialog");
+    document.getElementById("regenerateReport").addEventListener("click", () => {
+      if (!regenerateDialog.open) regenerateDialog.showModal();
+    });
+    document.getElementById("cancelRegenerate").addEventListener("click", () =>
+      regenerateDialog.close());
+    document.getElementById("confirmRegenerate").addEventListener("click", action(async () => {
+      const button = document.getElementById("confirmRegenerate"); button.disabled = true;
       try {
         await workspace.flush();
         await send({ type: "T9_REGENERATE_BUG_REPORT", bugReportId });
         location.reload();
       } finally { button.disabled = false; }
     }));
-    document.getElementById("downloadMarkdown").addEventListener("click", action(async () => {
-      await download(await workspace.exportMarkdown(), `${bugReportId}.md`);
-      message.textContent = t("technical.markdownExported");
+    document.getElementById("downloadMarkdown").addEventListener("click", action(() =>
+      busy(t("technical.waitingForDownload"), async () => {
+        await download(await workspace.exportMarkdown(), `${bugReportId}.md`);
+        message.textContent = t("technical.markdownExported");
+      })));
+    document.getElementById("copySummary").addEventListener("click", action(async () => {
+      // Built from the current state, so the copy happens within the click.
+      const summary = globalThis.T9BugReportTextExport.summary(workspace.state().document);
+      if (await copyText(summary.text, summary.html)) {
+        message.textContent = t("technical.summaryCopied");
+      }
     }));
     let issuePreviewRequestId = 0;
     let issuePreviewPending = null;
@@ -217,22 +345,13 @@
       const selectedImages = imageResult.attachments;
       if (imageResult.missingCount) message.textContent =
         t("technical.someImagesMissing");
-      const offline = { manifest: { schemaVersion: 1,
-        packageId: issuePreviewState.issuePackage.packageId,
-        sourceRevision: issuePreviewState.issuePackage.sourceRevision,
-        files: ["bug-report.md", ...selectedImages.map(item =>
-          item.fileName)] }, issuePackage: issuePreviewState.issuePackage,
-        bugReportMarkdown: issuePreviewState.markdown,
-        attachments: selectedImages };
       const pdf = await globalThis.T9BugReportPdf.create(issuePreviewState.issuePackage,
         selectedImages);
       const pdfBase64 = globalThis.T9BugReportPdf.base64(pdf.bytes);
-      const includeTechnicalPackage = false;
-      const attachments = [{ fileName: "felrapport.pdf", mediaType: "application/pdf", base64: pdfBase64 }];
-      if (includeTechnicalPackage) attachments.push({ fileName: "tekniskt-paket.zip", mediaType: "application/zip",
-        base64: globalThis.T9BugReportPdf.base64(await globalThis.T9BugReportPdf.technicalZip(offline)) });
+      const attachments = [{ fileName: `${reportFileName(currentUiLocale)}.pdf`,
+        mediaType: "application/pdf", base64: pdfBase64 }];
       const draft = globalThis.T9BugReportEmailDraft.build(
-        issuePreviewState.issuePackage, JSON.stringify(offline, null, 2), {
+        issuePreviewState.issuePackage, "", {
           to: supportEmail, locale: currentUiLocale, attachments });
       return { draft, imageResult, reportKey: bugReportId + ":" +
         issuePreviewState.issuePackage.sourceRevision };
@@ -261,12 +380,18 @@
       }
     });
     document.getElementById("closeEmailChoice").addEventListener("click", () => emailChoice.close());
-    document.getElementById("emailFile").addEventListener("click", action(async () => {
+    document.getElementById("emailFile").addEventListener("click", async () => {
       const button = document.getElementById("emailFile");
-      button.disabled = true;
-      try { await emailReport(); emailChoice.close(); }
-      finally { button.disabled = false; }
-    }));
+      button.disabled = true; outlookButton.disabled = true;
+      outlookStatus.textContent = t("technical.creatingEmail");
+      try {
+        await busy(t("technical.creatingEmail"), emailReport);
+        outlookStatus.textContent = "";
+        emailChoice.close();
+      } catch (error) {
+        outlookStatus.textContent = t(error.message || String(error));
+      } finally { button.disabled = false; outlookButton.disabled = false; }
+    });
     outlookButton.addEventListener("click", async () => {
       outlookButton.disabled = true;
       document.getElementById("emailFile").disabled = true;
@@ -293,18 +418,20 @@
         document.getElementById("emailFile").disabled = false;
       }
     });
-    document.getElementById("exportPdf").addEventListener("click", action(async () => {
-      await generateIssuePreview();
-      const imageResult = await loadIssuePackageAttachments();
-      if (imageResult.missingCount) message.textContent = t("review.openedPartial");
-      const pdf = await globalThis.T9BugReportPdf.create(issuePreviewState.issuePackage,
-        imageResult.attachments);
-      const name = issuePreviewState.issuePackage.title.replace(/[^\p{L}\p{N}._-]+/gu, "-").slice(0, 70) || "felrapport";
-      await download(pdf.bytes, `${name}.pdf`, "application/pdf");
-      message.textContent = [globalThis.T9UiI18n.translateStaticText(
-        "PDF-rapporten har sparats.", currentUiLocale), imageResult.missingCount
-        ? t("technical.someImagesMissing") : ""].filter(Boolean).join(" ");
-    }));
+    document.getElementById("exportPdf").addEventListener("click", action(() =>
+      busy(t("technical.creatingPdf"), async () => {
+        await generateIssuePreview();
+        const imageResult = await loadIssuePackageAttachments();
+        const pdf = await globalThis.T9BugReportPdf.create(issuePreviewState.issuePackage,
+          imageResult.attachments);
+        const name = issuePreviewState.issuePackage.title.replace(/[^\p{L}\p{N}._-]+/gu, "-")
+          .replace(/^-+|-+$/gu, "").slice(0, 70) ||
+          reportFileName(workspace.state().document.documentLanguage);
+        await download(pdf.bytes, `${name}.pdf`, "application/pdf");
+        message.textContent = [globalThis.T9UiI18n.translateStaticText(
+          "PDF-rapporten har sparats.", currentUiLocale), imageResult.missingCount
+          ? t("technical.someImagesMissing") : ""].filter(Boolean).join(" ");
+      })));
     void loadReportScreenshots();
   }
   async function initialize() {

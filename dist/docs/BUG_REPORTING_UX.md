@@ -33,4 +33,8 @@ When the user adds context about what happened, that description appears before 
 
 Telemetry is optional and user-triggered. The report is shared as a PDF by email or saved as a PDF or Markdown file; Email PDF is emphasised once the report is complete and states the expected result.
 
+**Copy summary** puts the title, severity, visible reproduction steps, expected result and actual result (the user's description and the captured Business Central errors, verbatim) on the clipboard in the document language, as formatted HTML and plain text. It sends nothing itself.
+
+Autosave never redraws the report on its own: a save that does not change the report updates only the save status. When an edit redraws the report, the focused field keeps its focus, cursor and any text typed into it that is not yet committed. Exports show progress, disable the export actions while they run and report a file as saved only after the browser download has completed. Regenerating from the recording is confirmed in a translated dialog with Cancel focused.
+
 Advanced merge, split, and screenshot-change controls remain in Review; the bug-report workspace intentionally exposes only wording correction and report inclusion.

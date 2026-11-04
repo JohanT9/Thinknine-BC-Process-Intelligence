@@ -8,8 +8,8 @@
 })(typeof globalThis !== "undefined" ? globalThis : this, function (languages) {
   "use strict";
   const cleanHeader = value => String(value || "").replace(/[\r\n]+/gu, " ").trim();
-  const safeName = value => cleanHeader(value).replace(/[^\p{L}\p{N}._-]+/gu, "-")
-    .replace(/^-+|-+$/gu, "").slice(0, 70) || "felrapport";
+  const safeName = (value, fallback = "error-report") => cleanHeader(value)
+    .replace(/[^\p{L}\p{N}._-]+/gu, "-").replace(/^-+|-+$/gu, "").slice(0, 70) || fallback;
   function validAddress(value) {
     const address = cleanHeader(value);
     return /^[^\s@<>]+@[^\s@<>]+\.[^\s@<>]+$/u.test(address) ? address : "";
@@ -40,7 +40,8 @@
       localized(severity, severityNames[severity])}` : title;
     const importance = severity === "Critical" ? "high" : severity === "Low" ? "low" : "normal";
     const priority = importance === "high" ? "1" : importance === "low" ? "5" : "3";
-    const attachmentName = `${safeName(title)}-${safeName(localized("error report", "felrapport"))}.json`;
+    const reportName = safeName(localized("error report", "felrapport"));
+    const attachmentName = `${safeName(title, reportName)}-${reportName}.json`;
     const boundary = `=_BC_Process_Studio_${safeName(issuePackage?.packageId)}`;
     const bodyBoundary = `${boundary}_body`;
     const body = "\r\n\r\n" + localized("Hello,", "Hej,") + "\r\n\r\n" +
@@ -72,7 +73,7 @@
       `--${bodyBoundary}--`,
       ...parts, `--${boundary}--`, ""].join("\r\n");
     return { to, subject, attachmentName, htmlBody, importance, attachments,
-      fileName: `${safeName(title)}.eml`, content };
+      fileName: `${safeName(title, reportName)}.eml`, content };
   }
   return { build, validAddress };
 });

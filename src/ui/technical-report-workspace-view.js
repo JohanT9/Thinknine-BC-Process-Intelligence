@@ -10,6 +10,10 @@
   };
   const ui = (text, locale) => globalThis.T9UiI18n?.translateStaticText(
     text, locale) || text;
+  const uiKey = (key, locale, fallback) => {
+    const value = globalThis.T9UiI18n?.translate(key, locale);
+    return value && value !== key ? value : fallback;
+  };
   // Instructions mark captured values as __value__ and interface elements as **element**.
   function appendInstruction(doc, parent, instruction) {
     const segments = globalThis.T9TextFormat?.instructionSegments(instruction) ||
@@ -22,6 +26,7 @@
   function copyButton(doc, label, value, onCopy, locale) {
     const button = element(doc, "button", ui("Copy", locale), "technical-copy");
     button.type = "button"; button.setAttribute("aria-label", label);
+    button.dataset.focusKey = `copy-${label}`;
     button.addEventListener("click", () => onCopy(String(value || "")));
     return button;
   }
@@ -68,6 +73,28 @@
         Array.isArray(value) ? value.join(", ") : String(value)));
     });
   }
+  function fillSaveState(doc, status, workspaceState, options, locale) {
+    const saveLabels = { saved: "Saved automatically", saving: "Saving…",
+      unsaved: "Changes waiting to be saved", failed: "Could not save changes" };
+    status.className = `save-state save-state-${workspaceState.saveState}`;
+    status.textContent = ui(saveLabels[workspaceState.saveState] ||
+      workspaceState.saveState, locale);
+    if (workspaceState.saveState === "failed" && options.onRetrySave) {
+      const retry = element(doc, "button", ui("Retry save", locale),
+        "technical-retry-save");
+      retry.type = "button"; retry.dataset.focusKey = "retry-save";
+      retry.addEventListener("click", options.onRetrySave);
+      status.appendChild(retry);
+    }
+  }
+  // A save that changes nothing in the report updates only its status, so the fields the
+  // user is working in stay as they are.
+  function renderSaveState(container, workspaceState, options = {}, doc = document) {
+    const status = container.querySelector(".save-state");
+    if (!status) return false;
+    fillSaveState(doc, status, workspaceState, options, options.locale || "en-US");
+    return true;
+  }
   function render(container, workspaceState, options = {}, doc = document) {
     const onCopy = options.onCopy || (() => {});
     const onEdit = options.onEdit || (() => {});
@@ -76,18 +103,9 @@
     container.replaceChildren();
     container.setAttribute("aria-label", `Technical Bug Report: ${report.title}`);
     container.appendChild(element(doc, "h1", report.title));
-    const saveLabels = { saved: "Saved automatically", saving: "Saving…",
-      unsaved: "Changes waiting to be saved", failed: "Could not save changes" };
-    const status = element(doc, "p", ui(saveLabels[workspaceState.saveState] ||
-      workspaceState.saveState, locale), `save-state save-state-${workspaceState.saveState}`);
+    const status = element(doc, "p", "", "save-state");
     status.setAttribute("role", "status");
-    if (workspaceState.saveState === "failed" && options.onRetrySave) {
-      const retry = element(doc, "button", ui("Retry save", locale),
-        "technical-retry-save");
-      retry.type = "button";
-      retry.addEventListener("click", options.onRetrySave);
-      status.appendChild(retry);
-    }
+    fillSaveState(doc, status, workspaceState, options, locale);
     container.appendChild(status);
     const severityLabel = element(doc, "label", ui("Severity", locale));
     severityLabel.htmlFor = "technical-report-severity";
@@ -166,18 +184,27 @@
             instruction: Object.prototype.hasOwnProperty.call(
               step.stepOverride?.fields || {}, "instruction")
               ? step.stepOverride.fields.instruction : step.instruction,
-            included: step.visibility !== "hidden" }));
-        if (editableSteps.length && options.onEditReproductionStep) {
+            included: step.visibility !== "hidden", manual: step.origin === "manual" }));
+        if (options.onEditReproductionStep) {
           const editor = doc.createElement("details");
           editor.className = "reproduction-editor";
           editor.appendChild(element(doc, "summary",
             ui("Edit reproduction steps", locale)));
+          // A report without steps, such as one made from an error already on screen, asks
+          // for them and opens the editor.
+          if (!editableSteps.length) {
+            node.appendChild(element(doc, "p", uiKey("technical.noRecordedSteps", locale,
+              "No steps were recorded. Describe the steps that led to the error."),
+            "reproduction-empty"));
+            editor.open = true;
+          }
           editableSteps.forEach(step => {
             const row = doc.createElement("div"); row.className = "reproduction-editor-row";
             const label = element(doc, "label",
               `${ui("Step", locale)} ${step.number}`);
             const input = doc.createElement("input");
             input.value = step.instruction;
+            input.dataset.focusKey = `step-${step.reproductionStepId}`;
             input.setAttribute("aria-label", `${ui("Step", locale)} ${step.number}`);
             input.addEventListener("change", () => options.onEditReproductionStep(
               step.reproductionStepId, { instruction: input.value }));
@@ -188,6 +215,7 @@
               "reproduction-include");
             const include = doc.createElement("input"); include.type = "checkbox";
             include.checked = step.included;
+            include.dataset.focusKey = `step-include-${step.reproductionStepId}`;
             include.setAttribute("aria-label",
               `${ui("Include in report", locale)}: ${ui("Step", locale)} ${step.number}`);
             include.addEventListener("change", () => options.onEditReproductionStep(
@@ -195,15 +223,47 @@
                 ? "visible" : "hidden" }));
             includeLabel.appendChild(include);
             label.appendChild(input); row.append(label, includeLabel);
-            if (step.hasInstructionOverride) {
+            if (step.manual) {
+              const remove = element(doc, "button", uiKey("technical.removeStep", locale,
+                "Remove"));
+              remove.type = "button";
+              remove.dataset.focusKey = `step-remove-${step.reproductionStepId}`;
+              remove.setAttribute("aria-label", `${uiKey("technical.removeStep", locale,
+                "Remove")}: ${ui("Step", locale)} ${step.number}`);
+              remove.addEventListener("click", () => options.onEditReproductionStep(
+                step.reproductionStepId, { remove: true }));
+              row.appendChild(remove);
+            } else if (step.hasInstructionOverride) {
               const reset = element(doc, "button", ui("Use generated text", locale));
               reset.type = "button";
+              reset.dataset.focusKey = `step-reset-${step.reproductionStepId}`;
               reset.addEventListener("click", () => options.onEditReproductionStep(
                 step.reproductionStepId, { resetInstruction: true }));
               row.appendChild(reset);
             }
             editor.appendChild(row);
           });
+          if (options.onAddReproductionStep) {
+            const row = doc.createElement("div");
+            row.className = "reproduction-editor-row reproduction-add";
+            const label = element(doc, "label", uiKey("technical.newStep", locale, "New step"));
+            const input = doc.createElement("input");
+            input.id = "technical-report-new-step";
+            const add = element(doc, "button", uiKey("technical.addStep", locale, "Add step"));
+            add.type = "button"; add.dataset.focusKey = "add-step";
+            const submit = () => {
+              const instruction = input.value.trim();
+              if (!instruction) { input.focus(); return; }
+              input.value = "";
+              options.onAddReproductionStep(instruction);
+            };
+            add.addEventListener("click", submit);
+            input.addEventListener("keydown", event => {
+              if (event.key === "Enter") { event.preventDefault(); submit(); }
+            });
+            label.appendChild(input); row.append(label, add);
+            editor.appendChild(row);
+          }
           node.appendChild(editor);
         }
       } else if (section.kind === "actual-result") {
@@ -261,6 +321,7 @@
         all.forEach(error => {
           if (all.length > 1) {
             const choose = doc.createElement("button"); choose.type = "button";
+            choose.dataset.focusKey = `primary-${error.errorEvidenceId}`;
             choose.textContent = error.errorEvidenceId ===
               section.content.primaryErrorEvidenceId ? ui("Primary error", locale) :
               ui("Select as primary error", locale);
@@ -330,6 +391,7 @@
               "screenshot-include");
             const include = doc.createElement("input"); include.type = "checkbox";
             include.checked = screenshot.visibility !== "hidden";
+            include.dataset.focusKey = `screenshot-${screenshot.assetId}`;
             include.setAttribute("aria-label", `${ui("Include in report", locale)}: ${
               screenshotLabel(screenshot)} ${index + 1}`);
             include.addEventListener("change", () => options.onSetScreenshotVisibility(
@@ -380,5 +442,5 @@
     return { sectionCount: report.sections.length,
       ready: report.completeness.ready };
   }
-  return { render };
+  return { render, renderSaveState };
 });

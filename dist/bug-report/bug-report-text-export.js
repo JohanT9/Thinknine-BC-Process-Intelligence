@@ -75,5 +75,47 @@
     return markdown(document).replace(/^#{1,6}\s+/gmu, "")
       .replace(/```text\n|```/gu, "").replace(/`([^`]*)`/gu, "$1");
   }
-  return { markdown, plainText };
+  const escapeHtml = input => value(input).replace(/[&<>"']/gu, character => ({
+    "&": "&amp;", "<": "&lt;", ">": "&gt;", "\"": "&quot;", "'": "&#39;" })[character]);
+  // A short report to paste into a chat or a ticket: title, severity, steps, expected and
+  // actual result in the document language. Plain text and HTML carry the same content.
+  function summary(document, format = globalThis.T9TextFormat) {
+    const locale = languages.normalize(document.documentLanguage, "document");
+    const byId = new Map(document.sections.map(section => [section.id, section]));
+    const severity = byId.get("summary")?.content?.severity;
+    const severityLine = severity ? `${languages.translate("Severity", locale,
+      "Allvarlighetsgrad")}: ${SEVERITY_NAMES[severity] ? languages.translate(severity, locale,
+      SEVERITY_NAMES[severity]) : severity}` : "";
+    const steps = byId.get("reproduction")?.content || [];
+    const expected = value(byId.get("expected-result")?.content).trim();
+    const actual = byId.get("actual-result")?.content || {};
+    const actualLines = [value(actual.userDescription).trim(),
+      ...(actual.capturedErrors || []).map(item => value(item.rawMessage).trim())]
+      .filter(Boolean);
+    const segments = instruction => format?.instructionSegments(instruction) ||
+      [{ text: value(instruction) }];
+    const plainStep = instruction => segments(instruction).map(segment =>
+      segment.italic ? `"${segment.text}"` : segment.text).join("");
+    const htmlStep = instruction => segments(instruction).map(segment =>
+      segment.bold ? `<strong>${escapeHtml(segment.text)}</strong>` : segment.italic
+        ? `<em>${escapeHtml(segment.text)}</em>` : escapeHtml(segment.text)).join("");
+    const blocks = [
+      ["reproduction", steps.map(step => `${step.number}. ${plainStep(step.instruction)}`),
+        steps.length ? `<ol>${steps.map(step =>
+          `<li>${htmlStep(step.instruction)}</li>`).join("")}</ol>` : ""],
+      ["expected-result", expected ? [expected] : [],
+        expected ? `<p>${escapeHtml(expected)}</p>` : ""],
+      ["actual-result", actualLines, actualLines.map(line =>
+        `<p>${escapeHtml(line)}</p>`).join("")]
+    ].filter(([, lines]) => lines.length);
+    const text = [[document.title, severityLine].filter(Boolean).join("\n"),
+      ...blocks.map(([id, lines]) => [byId.get(id).title, ...lines].join("\n"))]
+      .join("\n\n");
+    const html = `<p><strong>${escapeHtml(document.title)}</strong></p>` +
+      (severityLine ? `<p>${escapeHtml(severityLine)}</p>` : "") +
+      blocks.map(([id, , markup]) => `<p><strong>${escapeHtml(byId.get(id).title)}` +
+        `</strong></p>${markup}`).join("");
+    return { text: `${text}\n`, html };
+  }
+  return { markdown, plainText, summary };
 });

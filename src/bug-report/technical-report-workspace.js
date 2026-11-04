@@ -38,7 +38,8 @@
     const api = {
       state() { return { report: clone(report), evidence: clone(evidence),
         document: generator.project(report, { errorEvidence: evidence }),
-        saveState, canUndo: historyIndex > 0,
+        // Changes with every edit, undo and redo, but not when a save completes.
+        revision, saveState, canUndo: historyIndex > 0,
         canRedo: historyIndex < history.length - 1 }; },
       subscribe(listener) { listeners.add(listener); return () => listeners.delete(listener); },
       edit(patch, now) { return commit(model.updateHumanContent(report, patch, now)); },
@@ -47,6 +48,9 @@
       },
       updateReproductionStep(id, patch, now) {
         return commit(model.updateReproductionStep(report, id, patch, now));
+      },
+      addReproductionStep(instruction, now) {
+        return commit(model.addReproductionStep(report, instruction, now));
       },
       updateScreenshotVisibility(assetId, visibility, now) {
         return commit(model.updateScreenshotVisibility(report, assetId, visibility, now));

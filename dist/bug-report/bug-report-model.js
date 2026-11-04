@@ -24,7 +24,8 @@
     return { ...clone(value), reproductionStepId: String(
       value.reproductionStepId || value.stepId || `reproduction-step-${index + 1}`
     ), order: index + 1, instruction: text(value.instruction),
-    authorship: "derived", source: { ...clone(source),
+    // A step the user added to the report is theirs; recorded steps are derived.
+    authorship: value.origin === "manual" ? "human" : "derived", source: { ...clone(source),
       recordingId: source.recordingId ? String(source.recordingId) : undefined,
       sourceCanonicalEventIds: unique(source.sourceCanonicalEventIds),
       sourceStepId: source.sourceStepId ? String(source.sourceStepId) : undefined,
@@ -136,6 +137,20 @@
       step.reproductionStepId === id);
     if (index < 0) throw new TypeError("Reproduction step was not found.");
     const current = result.reproduction.steps[index];
+    if (current.origin === "manual") {
+      // The user's own steps are edited and removed directly; there is no generated text.
+      if (patch.remove) result.reproduction.steps.splice(index, 1);
+      else {
+        const instruction = Object.prototype.hasOwnProperty.call(patch, "instruction")
+          ? text(patch.instruction).trim() : current.instruction;
+        if (!instruction) throw new TypeError("Reproduction step text is required.");
+        result.reproduction.steps[index] = { ...current, instruction,
+          visibility: patch.visibility === "hidden" || patch.visibility === "visible"
+            ? patch.visibility : current.visibility, updatedAt: updatedAt || current.updatedAt };
+      }
+      result.updatedAt = updatedAt || result.updatedAt;
+      return normalize(result);
+    }
     const fields = { ...(current.stepOverride?.fields || {}) };
     if (Object.prototype.hasOwnProperty.call(patch, "instruction")) {
       const instruction = text(patch.instruction).trim();
@@ -152,6 +167,22 @@
         ? patch.visibility : current.visibility,
       stepOverride: hasOverride ? { ...otherOverride, fields,
         authorship: "human", updatedAt: updatedAt || previousOverride.updatedAt } : null };
+    result.updatedAt = updatedAt || result.updatedAt;
+    return normalize(result);
+  }
+
+  // Adds a step written by the user after the recorded steps, for example when the report
+  // was created from an error that was already shown and no steps were recorded.
+  function addReproductionStep(report, instruction, updatedAt) {
+    const result = normalize(report);
+    const value = text(instruction).trim();
+    if (!value) throw new TypeError("Reproduction step text is required.");
+    const ids = new Set(result.reproduction.steps.map(step => step.reproductionStepId));
+    let number = result.reproduction.steps.length + 1;
+    while (ids.has(`manual-step-${number}`)) number += 1;
+    result.reproduction.steps.push({ reproductionStepId: `manual-step-${number}`,
+      origin: "manual", instruction: value, visibility: "visible", source: {},
+      ...(updatedAt ? { createdAt: updatedAt, updatedAt } : {}) });
     result.updatedAt = updatedAt || result.updatedAt;
     return normalize(result);
   }
@@ -182,6 +213,6 @@
   }
 
   return { CATEGORIES, SCHEMA_VERSION, STATUSES, normalize, normalizeStep,
-    attachTelemetry, selectPrimaryError,
+    addReproductionStep, attachTelemetry, selectPrimaryError,
     updateHumanContent, updateReproductionStep, updateScreenshotVisibility };
 });

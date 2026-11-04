@@ -73,7 +73,10 @@ assert.doesNotMatch(report, /Share bug report|id="issuePreview"|id="shareReport"
 assert.doesNotMatch(reportLogic, /T9_CREATE_EXTERNAL_ISSUE|T9_SAVE_ISSUE_CONFIGURATION|T9_TEST_ISSUE_CONNECTION/);
 assert.doesNotMatch(background, /T9_CREATE_EXTERNAL_ISSUE|T9_SAVE_ISSUE_CONFIGURATION|T9_TEST_ISSUE_CONNECTION/);
 assert.match(report, /id="regenerateReport"/);
-assert.match(reportLogic, /if \(!window\.confirm\(t\("technical\.regenerateConfirm"\)\)\) return/);
+// Regeneration replaces manual step edits, so it asks in the page's own translated dialog.
+assert.doesNotMatch(reportLogic, /window\.confirm/);
+assert.match(report, /<dialog id="regenerateDialog" aria-labelledby="regenerateTitle"[\s\S]*data-i18n="technical\.regenerateConfirm"[\s\S]*id="confirmRegenerate"[\s\S]*id="cancelRegenerate"/);
+assert.match(reportLogic, /getElementById\("confirmRegenerate"\)\.addEventListener\("click"/);
 assert.match(reportLogic, /await workspace\.flush\(\);\s+await send\(\{ type: "T9_REGENERATE_BUG_REPORT"/);
 assert.doesNotMatch(report, /id="includeAiExport"|id="includeTechnicalZip"/);
 assert.match(report, /id="emailReport"[^>]*>E-posta PDF<\/button>/);

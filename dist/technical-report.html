@@ -50,13 +50,14 @@
     @media(max-width:420px){header,main{padding:8px}.report-core-fields,.report-more-fields,.technical-details{padding:12px}.secondary-actions button{flex:1 1 130px}}
   </style>
   <link rel="stylesheet" href="design-system.css">
-  <style>#emailChoice button{min-height:44px}</style>
+  <style>#emailChoice button,#regenerateDialog button{min-height:44px}#regenerateDialog{width:min(560px,calc(100vw - 24px))}</style>
 </head>
 <body>
   <header>
     <div class="primary-actions">
       <button id="emailReport" type="button">E-posta PDF</button>
       <button id="exportPdf" type="button">Exportera PDF</button>
+      <button id="copySummary" type="button" data-i18n="technical.copySummary" data-i18n-title="technical.copySummaryHelp">Copy summary</button>
       <button id="closeReport" type="button">Close</button>
     </div>
     <details class="report-options"><summary>More options</summary>
@@ -80,7 +81,15 @@
     <p id="outlookStatus" role="status"></p>
     <a id="outlookLink" hidden target="_blank" rel="noopener noreferrer" data-i18n="outlook.open">Open draft in Outlook</a>
   </dialog>
-  <main id="technicalReport" aria-live="polite"></main>
+  <dialog id="regenerateDialog" aria-labelledby="regenerateTitle" aria-describedby="regenerateText">
+    <h2 id="regenerateTitle" data-i18n="technical.regenerateTitle">Regenerate the report?</h2>
+    <p id="regenerateText" data-i18n="technical.regenerateConfirm">Regenerate the report from the recording? Manual step edits and image selections will be replaced. Title, severity and expected result are retained.</p>
+    <div class="secondary-actions">
+      <button id="confirmRegenerate" type="button" data-i18n="technical.regenerateAction">Regenerate</button>
+      <button id="cancelRegenerate" type="button" data-i18n="technical.cancel" autofocus>Cancel</button>
+    </div>
+  </dialog>
+  <main id="technicalReport"></main>
   <script src="engine/locale-catalogs.js"></script>
   <script src="engine/language-registry.js"></script>
 <script src="engine/page-identity.js"></script>
