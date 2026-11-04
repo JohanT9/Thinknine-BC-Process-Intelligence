@@ -51,8 +51,11 @@ function harness(mode = 'success', values = {}, locks = null, sessionValues = nu
       assert.equal(options.method, 'GET');
       if (mode === 'missingDraft') return { ok: false, status: 404 };
       const id = decodeURIComponent(url.split('/').pop().split('?')[0]);
+      // Graph names the draft's Outlook on the web link on outlook.office365.com.
       return { ok: true, status: 200, json: async () => ({ id, isDraft: true,
-        webLink: mode === 'badLink' ? 'https://evil.example/' : 'https://outlook.office.com/mail/drafts/id' }) };
+        webLink: mode === 'badLink' ? 'https://evil.example/'
+          : `https://outlook.office365.com/owa/?ItemID=${encodeURIComponent(id.replace(/_/gu, "+")
+            .replace(/-/gu, "/"))}&exvsurl=1&viewmodel=ReadMessageItem` }) };
     }
     assert.equal(url, 'https://graph.microsoft.com/v1.0/me/messages');
     const payload = JSON.parse(options.body);
@@ -63,7 +66,8 @@ function harness(mode = 'success', values = {}, locks = null, sessionValues = nu
     if (mode === 'server') return { ok: false, status: 503 };
     if (mode === 'denied') return { ok: false, status: 403 };
     if (mode === 'unauthorized') return { ok: false, status: 401 };
-    return { ok: true, status: 201, json: async () => ({ id: 'draft-1', isDraft: true,
+    // Graph ids use "_" and "-"; its webLink carries the same id in the older form.
+    return { ok: true, status: 201, json: async () => ({ id: 'AAMkAD_draft-1=', isDraft: true,
       webLink: mode === 'badLink' ? 'https://evil.example/' : 'https://outlook.office.com/mail/drafts/id' }) };
   };
   return { client: outlook.create({ identity, fetcher, clientId: 'public-client',
@@ -79,9 +83,11 @@ function harness(mode = 'success', values = {}, locks = null, sessionValues = nu
   assert.equal(h.calls.length, 0);
   const request = { reportKey: 'report:revision-1', email: makeEmail('en-US') };
   const result = await h.client.draft(request);
+  // Graph's own link to the draft, on the Outlook on the web host the browser is signed in to
+  // rather than outlook.office365.com. The compose link does not open an existing draft.
   assert.equal(result.webLink,
-    'https://outlook.office.com/mail/deeplink/compose/draft-1?ItemID=draft-1&exvsurl=1');
-  assert(!result.recovery, 'a verified draft should open directly in compose mode');
+    'https://outlook.office.com/owa/?ItemID=AAMkAD%2Bdraft%2F1%3D&exvsurl=1&viewmodel=ReadMessageItem');
+  assert(!result.recovery, 'a verified draft should open directly');
   assert.equal(h.auth.length, 1);
   assert.equal(h.auth[0].interactive, false, 'existing Microsoft session must be tried silently');
   const sessions = {};

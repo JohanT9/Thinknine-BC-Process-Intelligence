@@ -135,9 +135,12 @@
           }
           const webLink = safeLink(message.webLink);
           if (!webLink) return { webLink: DRAFTS, reused: true, recovery: true };
-          const composeLink = new URL("/mail/deeplink/compose/" + encodeURIComponent(id), webLink);
-          composeLink.search = new URLSearchParams({ ItemID: id, exvsurl: "1" });
-          return { webLink: composeLink.href, reused: true };
+          // Graph's own link opens the draft; Outlook on the web's compose link does not open
+          // an existing draft and shows the mailbox. Graph names outlook.office365.com, where
+          // the browser has a sign-in of its own; work accounts use outlook.office.com.
+          const draftLink = new URL(webLink);
+          if (draftLink.hostname === "outlook.office365.com") draftLink.hostname = "outlook.office.com";
+          return { webLink: draftLink.href, reused: true };
         }
         let result;
         try { result = await fetcher(GRAPH, { method: "POST",

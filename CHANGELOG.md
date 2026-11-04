@@ -1,3 +1,8 @@
+## 4.7.232
+- Outlook draft: the draft opens in Outlook on the web at outlook.office.com through Outlook's own link to it. Previously the link named outlook.office365.com, which asked for a separate sign-in even when Outlook on the web was signed in, and then opened the mailbox instead of the draft.
+- Bug report: Business Central's error banner on the page ("The page has an error. Refresh (F5)…") now counts as an error. Report the error shown now captures the error messages listed in the banner, and a bug recording captures them as error evidence when they appear. Previously only error dialogs were recognised, so an error such as a failed delete shown in the banner could not be reported.
+- Bug report: a field's validation error, the message Business Central shows on the field's error icon, is captured with the page error, for example "Artikelspårningskod bör ändras från åtgärden Ändra artikelspårningskod.". The field caption is added when the message does not name the field.
+
 ## 4.7.231
 - Report the error shown now: create a bug report from the Business Central error message that is already open, without recording. The message, its details and a screenshot are captured the same way as during a bug recording. Nothing is captured before you choose the action, and if no error message is open nothing is saved.
 - Bug report: add your own reproduction steps, edit them and remove them. A report without recorded steps asks for them. Regenerating from the recording keeps the steps you wrote. A recorded step without text is no longer listed.

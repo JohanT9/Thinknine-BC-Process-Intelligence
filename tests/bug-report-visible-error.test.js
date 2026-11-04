@@ -153,6 +153,28 @@ assert.match(content, /message\.type === "T9_CAPTURE_VISIBLE_BC_ERROR"/);
 assert.match(content, /if \(current\?\.captured\) return current\.capture;/,
   "a capture the dialog observer already started is counted");
 assert.match(content, /stored\?\.sessionId === sessionId \? stored : null/);
+// The page's validation banner counts as an error, during a recording and when reporting
+// an error already shown; the banner sentence itself is left out of the captured message.
+assert.ok(content.includes('surface: banner ? "page-error-banner" : "field-validation-error"'));
+assert.match(content, /\.\.\.banners\.map\(observePageError\)/);
+assert.match(content, /if \(recording && recordingPurpose === "bug-report"\) \{\s+new Map\(pageErrorBanners\(\)/);
+assert.match(content, /\.\.\.lines\.filter\(line => !generic\.has\(line\)\),\s+\.\.\.fieldErrorMessages\(\)/);
+// A field's validation message is the accessible name of the error icon it is labelled by,
+// as the client renders it (aria-invalid, aria-labelledby "<label> validation_tooltip_N").
+assert.match(content, /document\.querySelectorAll\('\[aria-invalid="true"\]'\)/);
+assert.match(content, /\["aria-labelledby", "aria-describedby", "aria-errormessage"\]/);
+assert.match(content, /const isIcon = element => \/validation\/iu\.test/);
+assert.match(content, /const fieldsOnly = !banners\.length && fieldErrorMessages\(\)\.length/);
+const manifest = JSON.parse(read("src/ui/manifest.json"));
+const captureFiles = JSON.parse(background.match(/const CAPTURE_SCRIPT_FILES = Object\.freeze\((\[[\s\S]*?\])\);/u)[1]);
+assert.deepStrictEqual(manifest.content_scripts[0].js, captureFiles,
+  "static and dynamic content scripts load the same files");
+assert.ok(captureFiles.indexOf("engine/bc-client-captions.js") < captureFiles.indexOf("content.js"));
+const captions = require("../src/engine/bc-client-captions");
+assert.ok(captions.isPageError(
+  "Sidan innehåller ett fel. Uppdatera (F5) för att ångra ändringen eller rätta felet."));
+assert.ok(!captions.isPageError("Du kan inte ta bort Artikel 30043 därför att det finns minst " +
+  "en Artikeljournalrad som inkluderar den här artikeln."));
 
 // Every interface language has the new texts.
 globalThis.T9LanguageRegistry = languages;
