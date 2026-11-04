@@ -1153,11 +1153,103 @@
     return capture;
   }
 
-  // An error dialog that was already open when a report of it was requested.
+  // The client's banner for a change that failed validation ("The page has an error. Refresh
+  // (F5)…") is not a dialog. Its error messages are listed beside it, so the banner's own
+  // container up to the page's fields is read and the messages other than the banner are kept.
+  const pageErrorLifecycles = new WeakMap();
+  const PAGE_STRUCTURE = 'input,textarea,select,[role="grid"],[role="toolbar"],' +
+    '[role="menubar"],[role="menuitem"],[role="dialog"],[aria-modal="true"]';
+  const textLines = element => String(element.innerText || element.textContent || "")
+    .split(/\n+/u).map(line => line.trim()).filter(Boolean);
+  const isPageErrorText = text => Boolean(globalThis.T9BCClientCaptions?.isPageError(text));
+  function bannerLines(element) {
+    const lines = textLines(element);
+    if (isPageErrorText(clean(lines.join(" "), 2000))) return lines;
+    return lines.filter(isPageErrorText);
+  }
+  function pageErrorBanners() {
+    return [...document.querySelectorAll(
+      '[role="status"],[role="alert"],[aria-live="polite"],[aria-live="assertive"]'
+    )].filter(element => !element.closest(
+      '[role="dialog"],[aria-modal="true"],#t9-recording-indicator-host') &&
+      !element.hidden && element.getAttribute("aria-hidden") !== "true" &&
+      bannerLines(element).length);
+  }
+  function pageErrorContainer(banner) {
+    let container = banner;
+    let parent = banner.parentElement;
+    for (let depth = 0; parent && parent !== document.body && depth < 6; depth += 1) {
+      if (parent.querySelector(PAGE_STRUCTURE) || textLines(parent).length > 20) break;
+      container = parent;
+      parent = parent.parentElement;
+    }
+    return container;
+  }
+  // A field whose value failed validation is marked aria-invalid and names its error icon in
+  // aria-labelledby; the icon's accessible name is the message the client shows on hover.
+  // The field's own label gives the caption when the message does not already name it.
+  function fieldErrorMessages() {
+    const messages = [];
+    document.querySelectorAll('[aria-invalid="true"]').forEach(field => {
+      if (field.closest('[role="dialog"],[aria-modal="true"]')) return;
+      const referenced = ["aria-labelledby", "aria-describedby", "aria-errormessage"]
+        .flatMap(name => String(field.getAttribute(name) || "").split(/\s+/u))
+        .filter(Boolean).map(id => document.getElementById(id)).filter(Boolean);
+      const isIcon = element => /validation/iu.test(String(element.className || ""));
+      const message = referenced.filter(isIcon).map(element => clean(
+        element.getAttribute("aria-label") || element.getAttribute("title") ||
+        element.textContent, 1000)).find(Boolean);
+      if (!message) return;
+      const caption = clean(referenced.filter(element => !isIcon(element))
+        .map(element => element.textContent).join(" "), 200);
+      const line = caption && !message.includes(caption) ? `${caption}: ${message}` : message;
+      if (!messages.includes(line)) messages.push(line);
+    });
+    return messages;
+  }
+  function observePageError(banner) {
+    if (recordingPurpose !== "bug-report") return Promise.resolve(null);
+    const container = banner ? pageErrorContainer(banner) : document.documentElement;
+    const generic = new Set(banner ? bannerLines(banner) : []);
+    const lines = banner ? textLines(container) : [];
+    const messages = [...lines.filter(line => !generic.has(line)),
+      ...fieldErrorMessages().filter(line => !lines.includes(line))];
+    const message = (messages.length ? messages : lines).join("\n").slice(0, 4000);
+    if (!message) return Promise.resolve(null);
+    const stored = pageErrorLifecycles.get(container);
+    if (stored?.sessionId === sessionId && stored.message === message) return stored.capture;
+    const errorEvidenceId = `bc-error:${sessionId}:${crypto.randomUUID()}`;
+    const capture = new Promise(resolve => {
+      try {
+        chrome.runtime.sendMessage({ type: "T9_CAPTURE_BC_ERROR",
+          evidence: { errorEvidenceId, capturedAt: new Date().toISOString(),
+            rawMessage: message, rawDiagnostics: "", diagnosticsAvailable: false,
+            source: { kind: "business-central-ui",
+              surface: banner ? "page-error-banner" : "field-validation-error",
+              confidence: 0.8 },
+            frameContext: { sourceFrameId, frameUrl: location.href,
+              topUrl: getTopUrl(), frameDepth: getFrameDepth() } } }, response => {
+            void chrome.runtime.lastError;
+            resolve(response || null);
+          });
+      } catch { resolve(null); }
+    });
+    pageErrorLifecycles.set(container, { sessionId, message, capture });
+    return capture;
+  }
+
+  // An error that was already shown when a report of it was requested: an error dialog or
+  // the page's error banner.
   function captureVisibleBugErrors() {
     const dialogs = document.querySelectorAll(
       '[role="dialog"],[role="alertdialog"],[aria-modal="true"]');
-    return Promise.all([...new Set(dialogs)].map(observeBugError)).then(results =>
+    // One capture per banner container, even when it holds several live regions.
+    const banners = [...new Map(pageErrorBanners().map(banner =>
+      [pageErrorContainer(banner), banner])).values()];
+    // A field error can be shown on its own, without the page's banner.
+    const fieldsOnly = !banners.length && fieldErrorMessages().length ? [null] : [];
+    return Promise.all([...[...new Set(dialogs)].map(observeBugError),
+      ...banners.map(observePageError), ...fieldsOnly.map(observePageError)]).then(results =>
       results.filter(result => result?.ok && result.evidence).length);
   }
 
@@ -1587,6 +1679,12 @@
         label: message, ...statusDescriptor,
         uiState: { ...statusDescriptor.uiState, resultVisible: true } });
     });
+
+    // During a bug recording the page's error banner is error evidence, like an error dialog.
+    if (recording && recordingPurpose === "bug-report") {
+      new Map(pageErrorBanners().map(banner => [pageErrorContainer(banner), banner]))
+        .forEach(observePageError);
+    }
 
     const signature = `${getPageId()}|${getPageCaption()}|${location.href}`;
     if (signature !== lastPageSignature) {
