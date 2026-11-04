@@ -1,3 +1,12 @@
+## 4.7.231
+- Report the error shown now: create a bug report from the Business Central error message that is already open, without recording. The message, its details and a screenshot are captured the same way as during a bug recording. Nothing is captured before you choose the action, and if no error message is open nothing is saved.
+- Bug report: add your own reproduction steps, edit them and remove them. A report without recorded steps asks for them. Regenerating from the recording keeps the steps you wrote. A recorded step without text is no longer listed.
+- Bug report: the suggested title of a report without recorded steps is "Business Central error" in the document language, and the generic suggested titles are now translated in every document language. In Swedish, the reproduction step label reads "Steg" instead of "Step".
+- Bug report: text typed into a field is no longer lost when an earlier change is saved automatically. A save now updates only the save status, and when the report is redrawn the field you are in keeps its focus, cursor and text.
+- Bug report: Copy summary copies the title, severity, steps, expected and actual result in the document language, formatted for Teams, Azure DevOps or a ticket and as plain text.
+- Bug report: PDF, email and Markdown export show their progress and cannot be started twice at once. "Saved" is shown only after the browser has saved the file; a cancelled or failed download is reported.
+- Bug report: Copy buttons confirm the copy or report that it failed. Regenerate from the recording asks in a translated dialog instead of the browser's confirmation box. The PDF attached to an email is named in the interface language instead of always "felrapport.pdf", and preparing an email no longer builds an unused copy of the report with all its images.
+
 ## 4.7.230
 - External knowledge suggestions are checked while a document opens instead of after its review is shown, so they are ready together with the review. Up to four lookups run at a time without waiting for the slowest of each group, and the local knowledge service stays started for a minute so documents opened after one another do not start it again.
 

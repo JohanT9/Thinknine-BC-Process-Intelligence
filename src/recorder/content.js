@@ -450,6 +450,17 @@
       return false;
     }
 
+    if (message.type === "T9_CAPTURE_VISIBLE_BC_ERROR") {
+      // The background has just started this bug recording; take it over before scanning,
+      // since the state change may not have reached this frame yet.
+      recording = true;
+      sessionId = message.sessionId || null;
+      recordingPurpose = "bug-report";
+      captureVisibleBugErrors().then(captured => sendResponse({ ok: true, captured }),
+        () => sendResponse({ ok: true, captured: 0 }));
+      return true;
+    }
+
     if (message.type === "T9_CONTENT_PING") {
       sendResponse({
         ok: true,
@@ -1086,9 +1097,15 @@
 
   const errorDialogLifecycles = new WeakMap();
 
+  // Resolves with the background's response when the dialog is a new Business Central error
+  // for this recording, and with null otherwise.
   function observeBugError(dialog) {
-    if (recordingPurpose !== "bug-report" || !globalThis.T9BcErrorDetector) return;
-    const current = errorDialogLifecycles.get(dialog);
+    if (recordingPurpose !== "bug-report" || !globalThis.T9BcErrorDetector) {
+      return Promise.resolve(null);
+    }
+    const stored = errorDialogLifecycles.get(dialog);
+    // A dialog captured by an earlier recording is captured again by a new one.
+    const current = stored?.sessionId === sessionId ? stored : null;
     const openedAt = current?.openedAt || new Date().toISOString();
     const buttons = [...dialog.querySelectorAll(
       'button,[role="button"],[role="menuitem"]'
@@ -1111,22 +1128,37 @@
         dialog.getAttribute("aria-labelledby") || "dialog",
       frameInstanceId: sourceFrameId, openedAt };
     const identified = globalThis.T9BcErrorDetector.classifySnapshot(snapshot);
-    if (!identified.detected || current?.captured) return;
+    // A capture already under way, for example started by the dialog observer when the
+    // recording began, is shared instead of reported as nothing.
+    if (current?.captured) return current.capture;
+    if (!identified.detected) return Promise.resolve(null);
     const errorEvidenceId = `bc-error:${sessionId}:${crypto.randomUUID()}`;
+    const capture = new Promise(resolve => {
+      try {
+        chrome.runtime.sendMessage({ type: "T9_CAPTURE_BC_ERROR",
+          evidence: { errorEvidenceId, capturedAt: new Date().toISOString(),
+            rawMessage: snapshot.message, rawDiagnostics: snapshot.detailsText,
+            diagnosticsAvailable: identified.detailsAvailable,
+            source: { kind: "business-central-ui", surface: identified.surface,
+              confidence: identified.confidence },
+            frameContext: { sourceFrameId, frameUrl: location.href,
+              topUrl: getTopUrl(), frameDepth: getFrameDepth() } } }, response => {
+            void chrome.runtime.lastError;
+            resolve(response || null);
+          });
+      } catch { resolve(null); }
+    });
     errorDialogLifecycles.set(dialog, { openedAt, captured: true,
-      errorEvidenceId });
-    try {
-      chrome.runtime.sendMessage({ type: "T9_CAPTURE_BC_ERROR",
-        evidence: { errorEvidenceId, capturedAt: new Date().toISOString(),
-          rawMessage: snapshot.message, rawDiagnostics: snapshot.detailsText,
-          diagnosticsAvailable: identified.detailsAvailable,
-          source: { kind: "business-central-ui", surface: identified.surface,
-            confidence: identified.confidence },
-          frameContext: { sourceFrameId, frameUrl: location.href,
-            topUrl: getTopUrl(), frameDepth: getFrameDepth() } } }, () => {
-          void chrome.runtime.lastError;
-        });
-    } catch {}
+      errorEvidenceId, sessionId, capture });
+    return capture;
+  }
+
+  // An error dialog that was already open when a report of it was requested.
+  function captureVisibleBugErrors() {
+    const dialogs = document.querySelectorAll(
+      '[role="dialog"],[role="alertdialog"],[aria-modal="true"]');
+    return Promise.all([...new Set(dialogs)].map(observeBugError)).then(results =>
+      results.filter(result => result?.ok && result.evidence).length);
   }
 
   window.addEventListener("pointerdown", event => {

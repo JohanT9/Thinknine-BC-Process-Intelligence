@@ -115,11 +115,26 @@
       ? `Valideringsfel i \u201d${field}\u201d` : `Validation error in \u201c${field}\u201d`;
     if (errorEvidence.length && page) return swedish
       ? `Business Central-fel i \u201d${page}\u201d` : `Business Central error in \u201c${page}\u201d`;
-    if (errorEvidence.length) return swedish
-      ? "Business Central-fel i inspelad process"
-      : "Business Central error during recorded process";
-    return swedish ? "Rapporterat problem i Business Central"
-      : "Reported Business Central problem";
+    // A report made from an error already on screen has no recorded process to refer to.
+    if (errorEvidence.length && !reproductionSteps.length) {
+      return languages.translate("Business Central error", language, "Business Central-fel");
+    }
+    if (errorEvidence.length) return languages.translate(
+      "Business Central error during recorded process", language,
+      "Business Central-fel i inspelad process");
+    return languages.translate("Reported Business Central problem", language,
+      "Rapporterat problem i Business Central");
+  }
+  // The generated fallback titles in every document language, which a better suggestion
+  // may replace; a title the user wrote is never replaced.
+  const GENERIC_TITLES = new Set(["Business Central error",
+    "Business Central error during recorded process", "Reported Business Central problem",
+    "Business Central-fel", "Business Central-fel i inspelad process",
+    "Rapporterat problem i Business Central"]);
+  for (const { locale } of languages.supported("document")) {
+    ["Business Central error", "Business Central error during recorded process",
+      "Reported Business Central problem"].forEach(english =>
+      GENERIC_TITLES.add(languages.translate(english, locale, english)));
   }
 
   function createBugReportFromRecording(recording, derivedSteps = [], context = {}) {
@@ -131,8 +146,11 @@
       throw new Error("Bug Reports require a completed recording.");
     }
     const now = context.now || recording.updatedAt || new Date().toISOString();
+    // A step without text, such as the open error dialog itself when the report was made
+    // from an error already on screen, describes nothing to reproduce.
     let steps = derivedSteps.map((step, index) =>
-      reproductionStep(step, index, recording.id));
+      reproductionStep(step, index, recording.id)).filter(step => step.instruction.trim() ||
+      String(step.stepOverride?.fields?.instruction || "").trim());
     const canonicalEventIds = unique(steps.flatMap(step =>
       step.source.sourceCanonicalEventIds));
     const screenshotAssetIds = unique(steps.flatMap(step =>
@@ -214,6 +232,10 @@
         ? clone(regenerated.technicalDiagnostics) :
         clone(current.technicalDiagnostics),
       notes: clone(current.notes), annotations: clone(current.annotations),
+      // Steps the user wrote are kept after the regenerated recorded steps.
+      reproduction: { ...regenerated.reproduction, steps: [
+        ...(regenerated.reproduction?.steps || []),
+        ...clone(current.reproduction.steps.filter(step => step.origin === "manual"))] },
       evidence: { ...regenerated.evidence,
         screenshots: unique([
           ...regenerated.evidence.screenshots.map(item => JSON.stringify(item)),
@@ -273,10 +295,7 @@
 
   function refreshSuggestedTitle(report, recording, errorEvidence = [], updatedAt) {
     const current = model.normalize(report);
-    const genericTitles = new Set(["Rapporterat problem i Business Central",
-      "Reported Business Central problem",
-      "Business Central-fel i inspelad process",
-      "Business Central error during recorded process"]);
+    const genericTitles = GENERIC_TITLES;
     if (!genericTitles.has(current.summary.title) || !errorEvidence.length) {
       return current;
     }
