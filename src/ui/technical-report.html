@@ -50,7 +50,15 @@
     @media(max-width:420px){header,main{padding:8px}.report-core-fields,.report-more-fields,.technical-details{padding:12px}.secondary-actions button{flex:1 1 130px}}
   </style>
   <link rel="stylesheet" href="design-system.css">
-  <style>#emailChoice button,#regenerateDialog button{min-height:44px}#regenerateDialog{width:min(560px,calc(100vw - 24px))}</style>
+  <style>#emailChoice button,#regenerateDialog button{min-height:44px}
+.send-confirm{margin-top:12px;padding:12px 16px;border:1px solid var(--c-bd-ccd5df);border-radius:6px}.send-confirm h3{margin:0 0 8px}
+.send-confirm dl{display:grid;grid-template-columns:max-content minmax(0,1fr);gap:6px 12px;align-items:center;margin:0 0 8px}.send-confirm dt{font-weight:600}.send-confirm dd{margin:0;overflow-wrap:anywhere;min-width:0}
+.send-confirm label{margin:0}.send-confirm input[aria-invalid=true]{border:2px solid var(--c-bd-b42318)}.send-confirm .send-help{font-size:.875rem;margin-top:-2px}
+.recipient-field{position:relative}.recipient-suggestions{position:absolute;left:0;right:0;top:100%;z-index:3;margin:2px 0 0;padding:4px 0;list-style:none;max-height:240px;overflow:auto;background:var(--c-bg-ffffff);border:1px solid var(--c-bd-8392a5);border-radius:6px;box-shadow:0 6px 18px rgba(0,0,0,.25)}
+.recipient-suggestions li{padding:6px 10px;cursor:pointer;overflow-wrap:anywhere}.recipient-suggestions li[aria-selected=true],.recipient-suggestions li:hover{background:var(--c-bg-f5f7fa)}
+.recipient-suggestions .suggestion-address{display:block;font-size:.875rem;opacity:.8}.people-search{display:flex;flex-wrap:wrap;align-items:center;gap:4px 12px;margin:0 0 8px;font-size:.875rem}.people-search button{margin:0}
+.send-confirm .primary-send{background:var(--c-bg-008c95);color:var(--c-fg-ffffff);border:1px solid var(--c-bd-007078);border-radius:4px}
+@media(max-width:420px){.send-confirm dl{grid-template-columns:1fr}.send-confirm .send-help-gap{display:none}}#regenerateDialog{width:min(560px,calc(100vw - 24px))}</style>
 </head>
 <body>
   <header>
@@ -78,6 +86,32 @@
       <button id="emailFile" type="button" data-i18n="outlook.file">Save email file (.eml)</button>
       <button id="closeEmailChoice" type="button" data-i18n="outlook.close">Close</button>
     </div>
+    <p data-i18n="outlook.sendHelp">Or send it straight from your mailbox. You check the recipient, subject and attachment first.</p>
+    <p data-i18n="outlook.sendPermission">Sending directly also requires permission to send email as you (Mail.Send).</p>
+    <div class="secondary-actions">
+      <button id="sendDirect" type="button" data-i18n="outlook.sendDirect">Send directly</button>
+    </div>
+    <section id="sendConfirm" class="send-confirm" aria-labelledby="sendConfirmTitle" hidden>
+      <h3 id="sendConfirmTitle" data-i18n="outlook.confirmTitle">Send this email?</h3>
+      <dl>
+        <dt><label for="sendConfirmTo" data-i18n="outlook.confirmTo">To</label></dt>
+        <dd class="recipient-field"><input id="sendConfirmTo" type="text" inputmode="email" autocomplete="off" spellcheck="false" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="recipientSuggestions" aria-describedby="sendRecipientsHelp"></dd>
+        <dt><label for="sendConfirmCc" data-i18n="outlook.confirmCc">Cc</label></dt>
+        <dd class="recipient-field"><input id="sendConfirmCc" type="text" inputmode="email" autocomplete="off" spellcheck="false" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="recipientSuggestions" aria-describedby="sendRecipientsHelp"></dd>
+        <dt class="send-help-gap" aria-hidden="true"></dt><dd id="sendRecipientsHelp" class="send-help" data-i18n="outlook.recipientsHelp">Separate several addresses with a comma or semicolon.</dd>
+        <dt data-i18n="outlook.confirmSubject">Subject</dt><dd id="sendConfirmSubject" data-i18n-ignore></dd>
+        <dt data-i18n="outlook.confirmAttachment">Attachment</dt><dd id="sendConfirmAttachment" data-i18n-ignore></dd>
+      </dl>
+      <ul id="recipientSuggestions" class="recipient-suggestions" role="listbox" data-i18n-aria-label="outlook.suggestions" aria-label="Suggested recipients" hidden></ul>
+      <div id="peopleSearch" class="people-search" hidden>
+        <button id="searchPeople" type="button" data-i18n="outlook.peopleSearch">Search people in Microsoft 365</button>
+        <span data-i18n="outlook.peoplePermission">Suggestions from Microsoft 365 require permission to read the people you work with (People.Read).</span>
+      </div>
+      <div class="secondary-actions">
+        <button id="confirmSend" type="button" class="primary-send" data-i18n="outlook.send">Send</button>
+        <button id="cancelSend" type="button" data-i18n="outlook.cancel">Cancel</button>
+      </div>
+    </section>
     <p id="outlookStatus" role="status"></p>
     <a id="outlookLink" hidden target="_blank" rel="noopener noreferrer" data-i18n="outlook.open">Open draft in Outlook</a>
   </dialog>

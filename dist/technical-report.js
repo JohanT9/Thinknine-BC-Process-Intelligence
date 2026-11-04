@@ -371,12 +371,241 @@
     const outlookButton = document.getElementById("outlookDraft");
     const outlookStatus = document.getElementById("outlookStatus");
     const outlookLink = document.getElementById("outlookLink");
+    const sendButton = document.getElementById("sendDirect");
+    const sendConfirm = document.getElementById("sendConfirm");
+    const confirmSend = document.getElementById("confirmSend");
+    const cancelSend = document.getElementById("cancelSend");
+    const recipientFields = [document.getElementById("sendConfirmTo"),
+      document.getElementById("sendConfirmCc")];
+    // Recipient suggestions: addresses this browser has sent reports to, kept only in local
+    // storage, and people from Microsoft 365 once the user has approved People.Read.
+    const RECENT_RECIPIENTS = "t9RecentRecipientsV1";
+    const suggestionList = document.getElementById("recipientSuggestions");
+    const peopleSearch = document.getElementById("peopleSearch");
+    const searchPeopleButton = document.getElementById("searchPeople");
+    let peopleState = "unknown"; // unknown, ready, signIn or unavailable
+    let suggestions = [], activeSuggestion = -1, suggestionField = null, suggestionTimer = 0;
+    async function recentRecipients() {
+      try {
+        const stored = (await chrome.storage.local.get(RECENT_RECIPIENTS))[RECENT_RECIPIENTS];
+        return Array.isArray(stored) ? stored.filter(item => typeof item?.address === "string") : [];
+      } catch { return []; }
+    }
+    async function rememberRecipients(list) {
+      const used = new Set(list.map(address => address.toLowerCase()));
+      const kept = (await recentRecipients()).filter(item => !used.has(item.address.toLowerCase()));
+      const now = Date.now();
+      try {
+        await chrome.storage.local.set({ [RECENT_RECIPIENTS]: [...list.map(address =>
+          ({ address, usedAt: now })), ...kept].slice(0, 20) });
+      } catch { /* Suggestions are a convenience; the email has already been sent. */ }
+    }
+    const typedTerm = field => field.value.split(/[\s,;]+/u).pop() || "";
+    function closeSuggestions() {
+      clearTimeout(suggestionTimer);
+      suggestions = []; activeSuggestion = -1;
+      suggestionList.hidden = true;
+      suggestionList.replaceChildren();
+      recipientFields.forEach(field => {
+        field.setAttribute("aria-expanded", "false");
+        field.removeAttribute("aria-activedescendant");
+      });
+    }
+    function showSuggestions(field, items) {
+      suggestions = items; activeSuggestion = -1;
+      if (!items.length) { closeSuggestions(); return; }
+      suggestionField = field;
+      field.parentElement.append(suggestionList);
+      suggestionList.replaceChildren(...items.map((item, index) => {
+        const option = document.createElement("li");
+        option.id = "recipientSuggestion" + index;
+        option.setAttribute("role", "option");
+        option.setAttribute("aria-selected", "false");
+        if (item.name && item.name.toLowerCase() !== item.address.toLowerCase()) {
+          const name = document.createElement("span");
+          name.textContent = item.name;
+          const address = document.createElement("span");
+          address.className = "suggestion-address";
+          address.textContent = item.address;
+          option.append(name, address);
+        } else option.textContent = item.address;
+        // Keep focus in the field so that the choice does not close the list first.
+        option.addEventListener("mousedown", event => event.preventDefault());
+        option.addEventListener("click", () => chooseSuggestion(index));
+        return option;
+      }));
+      suggestionList.hidden = false;
+      field.setAttribute("aria-expanded", "true");
+    }
+    function markSuggestion(index) {
+      activeSuggestion = index;
+      [...suggestionList.children].forEach((option, position) => {
+        option.setAttribute("aria-selected", String(position === index));
+      });
+      const option = suggestionList.children[index];
+      suggestionField.setAttribute("aria-activedescendant", option.id);
+      option.scrollIntoView({ block: "nearest" });
+    }
+    function chooseSuggestion(index) {
+      const field = suggestionField, item = suggestions[index];
+      if (!field || !item) return;
+      const term = typedTerm(field);
+      field.value = field.value.slice(0, field.value.length - term.length) + item.address + "; ";
+      field.removeAttribute("aria-invalid");
+      closeSuggestions();
+      field.focus();
+    }
+    async function suggestRecipients(field) {
+      const term = typedTerm(field).toLowerCase();
+      if (!term) { closeSuggestions(); return; }
+      const present = new Set(recipientFields.flatMap(input =>
+        globalThis.T9OutlookDraft.addresses(input.value).valid.map(address => address.toLowerCase())));
+      const fits = item => !present.has(item.address.toLowerCase()) &&
+        (item.address.toLowerCase().includes(term) || item.name?.toLowerCase().includes(term));
+      const recent = (await recentRecipients()).filter(fits).slice(0, 5);
+      if (typedTerm(field).toLowerCase() !== term) return;
+      showSuggestions(field, recent);
+      if (term.length < 2 || ["signIn", "unavailable"].includes(peopleState)) return;
+      clearTimeout(suggestionTimer);
+      suggestionTimer = setTimeout(async () => {
+        let found;
+        try { found = await outlookClient.people(term); }
+        catch { peopleState = "unavailable"; return; }
+        if (found === null) { peopleState = "signIn"; peopleSearch.hidden = false; return; }
+        peopleState = "ready";
+        if (document.activeElement !== field || typedTerm(field).toLowerCase() !== term) return;
+        const seen = new Set(recent.map(item => item.address.toLowerCase()));
+        showSuggestions(field, [...recent, ...found.filter(item => fits(item) &&
+          !seen.has(item.address.toLowerCase()))]);
+      }, 250);
+    }
+    recipientFields.forEach(field => {
+      field.addEventListener("input", () => { suggestRecipients(field); });
+      field.addEventListener("blur", closeSuggestions);
+      field.addEventListener("keydown", event => {
+        if (suggestionList.hidden || suggestionField !== field) return;
+        if (event.key === "ArrowDown" || event.key === "ArrowUp") {
+          event.preventDefault();
+          const step = event.key === "ArrowDown" ? 1 : -1;
+          markSuggestion((activeSuggestion + step + suggestions.length) % suggestions.length);
+        } else if (event.key === "Enter" && activeSuggestion >= 0) {
+          event.preventDefault();
+          chooseSuggestion(activeSuggestion);
+        } else if (event.key === "Escape") {
+          // Close only the list; the dialog stays open.
+          event.preventDefault();
+          event.stopPropagation();
+          closeSuggestions();
+        }
+      });
+    });
+    // Signing in for People.Read happens only from this button, never while typing.
+    searchPeopleButton.addEventListener("click", async () => {
+      searchPeopleButton.disabled = true;
+      try {
+        const ready = await outlookClient.people("", { interactive: true });
+        if (ready === null) throw { outlookCode: "consent" };
+        peopleState = "ready";
+        peopleSearch.hidden = true;
+        outlookStatus.textContent = "";
+        const field = recipientFields.find(input => typedTerm(input)) || recipientFields[0];
+        field.focus();
+        suggestRecipients(field);
+      } catch {
+        outlookStatus.textContent = t("outlook.peopleFailed");
+      } finally { searchPeopleButton.disabled = false; }
+    });
+    const emailButtons = [outlookButton, document.getElementById("emailFile"), sendButton];
+    let pendingSend = null;
+    const closeSendConfirm = () => { pendingSend = null; sendConfirm.hidden = true; closeSuggestions(); };
     document.getElementById("emailReport").addEventListener("click", () => {
       if (!emailChoice.open) {
         preparedEmail = null;
+        closeSendConfirm();
         outlookStatus.textContent = "";
         outlookLink.hidden = true;
         emailChoice.showModal();
+      }
+    });
+    const sendMessageKey = code => ({ consent: "outlook.sendConsent",
+      uncertain: "outlook.sendUncertain", size: "outlook.size",
+      configuration: "outlook.configuration" })[code] || "outlook.sendFailed";
+    // Sending cannot be undone, so the email is prepared first and shown with its recipient,
+    // subject and attachment; it is sent only from that confirmation.
+    sendButton.addEventListener("click", async () => {
+      emailButtons.forEach(button => { button.disabled = true; });
+      closeSendConfirm();
+      outlookLink.hidden = true;
+      outlookStatus.textContent = t("technical.creatingPdf");
+      try {
+        // Request only Graph's exact origin, directly from the explicit user action.
+        const permitted = await chrome.permissions.request({ origins: ["https://graph.microsoft.com/*"] });
+        if (!permitted) throw { outlookCode: "consent" };
+        const prepared = await prepareEmail();
+        const attachment = prepared.draft.attachments[0];
+        const size = new Intl.NumberFormat(currentUiLocale, { maximumFractionDigits: 0 })
+          .format(attachment.base64.length * 3 / 4 / 1024);
+        recipientFields.forEach(field => { field.removeAttribute("aria-invalid"); });
+        recipientFields[0].value = prepared.draft.to;
+        recipientFields[1].value = "";
+        document.getElementById("sendConfirmSubject").textContent = prepared.draft.subject;
+        document.getElementById("sendConfirmAttachment").textContent =
+          `${attachment.fileName} (${size} kB)`;
+        pendingSend = prepared;
+        sendConfirm.hidden = false;
+        outlookStatus.textContent = prepared.imageResult.missingCount
+          ? t("technical.someImagesMissing") : "";
+        confirmSend.focus();
+      } catch (error) {
+        outlookStatus.textContent = error?.outlookCode
+          ? t(sendMessageKey(error.outlookCode)) : t(error?.message || String(error));
+      } finally {
+        emailButtons.forEach(button => { button.disabled = false; });
+      }
+    });
+    cancelSend.addEventListener("click", () => {
+      closeSendConfirm();
+      outlookStatus.textContent = "";
+      sendButton.focus();
+    });
+    confirmSend.addEventListener("click", async () => {
+      if (!pendingSend) return;
+      const sending = pendingSend;
+      // The recipients are checked here so that a typing error is shown at its field and
+      // nothing is sent until every address is valid.
+      const [to, cc] = recipientFields.map(field => globalThis.T9OutlookDraft.addresses(field.value));
+      recipientFields.forEach(field => { field.removeAttribute("aria-invalid"); });
+      const wrong = !to.valid.length || to.invalid.length ? 0 : cc.invalid.length ? 1 : -1;
+      if (wrong >= 0) {
+        const field = recipientFields[wrong];
+        const invalid = [to, cc][wrong].invalid;
+        field.setAttribute("aria-invalid", "true");
+        outlookStatus.textContent = invalid.length
+          ? t("outlook.invalidRecipient").replace("{address}", invalid.join(", "))
+          : t("outlook.missingRecipient");
+        field.focus();
+        return;
+      }
+      const controls = [...emailButtons, confirmSend, cancelSend, searchPeopleButton, ...recipientFields];
+      controls.forEach(control => { control.disabled = true; });
+      outlookStatus.textContent = t("outlook.sending");
+      try {
+        await outlookClient.send({ reportKey: sending.reportKey, email: { ...sending.draft,
+          to: to.valid.join("; "), cc: cc.valid.join("; ") } });
+        closeSendConfirm();
+        await rememberRecipients([...to.valid, ...cc.valid]);
+        const sent = t("outlook.sent").replace("{to}", [...to.valid, ...cc.valid].join(", "));
+        outlookStatus.textContent = sent;
+        message.textContent = [sent, sending.imageResult.missingCount
+          ? t("technical.someImagesMissing") : ""].filter(Boolean).join(" ");
+        sendButton.focus();
+      } catch (error) {
+        // An unconfirmed send may have gone out; the confirmation closes so that it is not
+        // sent again by a second click before Sent Items has been checked.
+        if (error?.outlookCode === "uncertain") closeSendConfirm();
+        outlookStatus.textContent = t(sendMessageKey(error?.outlookCode));
+      } finally {
+        controls.forEach(control => { control.disabled = false; });
       }
     });
     document.getElementById("closeEmailChoice").addEventListener("click", () => emailChoice.close());
