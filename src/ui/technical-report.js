@@ -105,6 +105,46 @@
       .map(item => item.assetId);
     const screenshotPathByAssetId = globalThis.T9ScreenshotAssetPaths
       .assetPathIndex(recording);
+    // While the report masks values, screenshots are shown and sent with the regions
+    // measured at capture, as the user adjusted them, filled in; the originals are kept.
+    const redaction = globalThis.T9ScreenshotRedaction;
+    const assetsById = new Map((session.recordingHeader?.assets || recording?.assets || [])
+      .map(asset => [String(asset.id), asset]));
+    const screenshotEntry = (report, assetId) => (report.evidence?.screenshots || [])
+      .find(item => item.assetId === assetId);
+    const coveredRegions = (report, assetId) => report.privacy?.maskValues === false ? []
+      : redaction.covered(assetsById.get(String(assetId)), screenshotEntry(report, assetId));
+    const redactedSources = new Map(), readySources = new Map();
+    function maskedSource(report, assetId, source) {
+      const regions = coveredRegions(report, assetId);
+      if (!source || !regions.length) return Promise.resolve(source);
+      const key = assetId + JSON.stringify(regions);
+      if (!redactedSources.has(key)) {
+        redactedSources.set(key, redaction.apply(source, regions).then(value => {
+          readySources.set(key, value); return value;
+        }));
+      }
+      return redactedSources.get(key);
+    }
+    // A screenshot with regions to cover is shown only once they are covered.
+    function displayedAssets(report) {
+      return Object.fromEntries(Object.entries(mediaAssets).map(([assetId, media]) => {
+        const regions = coveredRegions(report, assetId);
+        if (!regions.length || !media?.source) return [assetId, media];
+        const key = assetId + JSON.stringify(regions);
+        if (readySources.has(key)) return [assetId, { ...media, source: readySources.get(key) }];
+        maskedSource(report, assetId, media.source).then(() => render(workspace.state()))
+          .catch(() => { message.textContent = t("technical.maskingFailed"); });
+        return [assetId, {}];
+      }));
+    }
+    function maskingSummary(report) {
+      const shown = (report.evidence?.screenshots || []).filter(item => item.visibility !== "hidden");
+      return { coveredScreenshots: shown.filter(item =>
+        redaction.covered(assetsById.get(String(item.assetId)), item).length).length,
+      unmeasuredScreenshots: shown.filter(item =>
+        !redaction.measured(assetsById.get(String(item.assetId)))).length };
+    }
     const screenshotPaths = [...new Set(screenshotIds.map(id =>
       screenshotPathByAssetId.get(String(id))).filter(Boolean))];
     async function loadReportScreenshots() {
@@ -164,7 +204,10 @@
       }
     }
     let renderedRevision = null;
-    const viewOptions = () => ({ mediaAssets, locale: currentUiLocale,
+    const viewOptions = (state = workspace.state()) => ({
+        mediaAssets: displayedAssets(state.report), masking: maskingSummary(state.report),
+        locale: currentUiLocale,
+        onEditRedactions: assetId => openRedactionEditor(assetId),
         onRetrySave: action(async () => { await workspace.flush(); }),
         onCopy: value => copyText(value).then(copied => {
           if (copied) message.textContent = t("technical.copied");
@@ -190,7 +233,7 @@
       const focus = captureFocus();
       const scrollY = window.scrollY;
       const result = globalThis.T9TechnicalReportWorkspaceView.render(
-        container, state, viewOptions());
+        container, state, viewOptions(state));
       renderedRevision = state.revision;
       openDisclosures.forEach(selector => {
         const disclosure = container.querySelector(selector);
@@ -321,10 +364,17 @@
             imagesByPath.set(path, value);
           }
         }) : { missingPaths: [] };
-      const offlineAttachments = attachments.map(attachment => {
+      // The PDF and email get the screenshots as the report shows them; an image that
+      // cannot be covered stops the export rather than leaving its values in.
+      const report = workspace.state().report;
+      const offlineAttachments = await Promise.all(attachments.map(async attachment => {
         const path = pathByAssetId.get(attachment.assetId);
-        return { ...attachment, dataUrl: path ? imagesByPath.get(path) || null : null };
-      });
+        const source = path ? imagesByPath.get(path) || null : null;
+        let dataUrl = source;
+        try { dataUrl = await maskedSource(report, attachment.assetId, source); }
+        catch { throw new Error(t("technical.maskingFailed")); }
+        return { ...attachment, dataUrl };
+      }));
       const missingCount = offlineAttachments.filter(item => !item.dataUrl).length;
       return { attachments: offlineAttachments.filter(item => item.dataUrl),
         missingCount: Math.max(missingCount, result.missingPaths.length) };
@@ -607,6 +657,138 @@
       } finally {
         controls.forEach(control => { control.disabled = false; });
       }
+    });
+    // Adjusting the covered regions of one screenshot: choose a measured region to show or
+    // cover it, drag over the image to cover more, or add a region and move it with the
+    // arrow keys (Shift+arrow changes its size). Nothing changes until Done.
+    const redactionDialog = document.getElementById("redactionDialog");
+    const redactionImage = document.getElementById("redactionImage");
+    const redactionStage = document.getElementById("redactionStage");
+    const redactionBoxes = document.getElementById("redactionBoxes");
+    let editing = null;
+    function drawRedactions(focusId = null) {
+      redactionBoxes.replaceChildren(...editing.regions.map((region, index) => {
+        const box = document.createElement("button");
+        box.type = "button";
+        box.className = ["redaction-box", region.removed ? "is-removed" : "",
+          region.source === "manual" ? "is-manual" : ""].filter(Boolean).join(" ");
+        box.dataset.id = region.id;
+        Object.assign(box.style, { left: `${region.x * 100}%`, top: `${region.y * 100}%`,
+          width: `${region.width * 100}%`, height: `${region.height * 100}%` });
+        box.setAttribute("aria-label", t(region.source === "manual" ? "technical.boxAdded"
+          : region.removed ? "technical.boxShown" : "technical.boxCovered")
+          .replace("{n}", String(index + 1)));
+        return box;
+      }));
+      if (focusId) redactionBoxes.querySelector(`[data-id="${CSS.escape(focusId)}"]`)?.focus();
+    }
+    function openRedactionEditor(assetId) {
+      const report = workspace.state().report;
+      const asset = assetsById.get(String(assetId));
+      editing = { assetId, regions: redaction.editable(asset, screenshotEntry(report, assetId)),
+        returnKey: `redact-${assetId}` };
+      redactionImage.src = mediaAssets[assetId]?.source || "";
+      document.getElementById("redactionUnmeasured").hidden = redaction.measured(asset);
+      drawRedactions();
+      redactionDialog.showModal();
+    }
+    const addManualRegion = bounds => {
+      const region = { id: `manual:${Date.now().toString(36)}${Math.random().toString(36).slice(2, 6)}`,
+        source: "manual", removed: false, ...bounds };
+      editing.regions.push(region);
+      return region;
+    };
+    redactionBoxes.addEventListener("click", event => {
+      const box = event.target.closest(".redaction-box");
+      if (!box || !editing) return;
+      const index = editing.regions.findIndex(region => region.id === box.dataset.id);
+      const region = editing.regions[index];
+      if (region.source === "manual") {
+        editing.regions.splice(index, 1);
+        drawRedactions();
+        document.getElementById("addRedaction").focus();
+      } else {
+        region.removed = !region.removed;
+        drawRedactions(region.id);
+      }
+    });
+    redactionBoxes.addEventListener("keydown", event => {
+      const box = event.target.closest(".redaction-box");
+      const region = box && editing?.regions.find(item => item.id === box.dataset.id);
+      if (!region || region.source !== "manual") return;
+      const step = 0.01;
+      const moves = { ArrowLeft: [-step, 0], ArrowRight: [step, 0], ArrowUp: [0, -step], ArrowDown: [0, step] };
+      if (moves[event.key]) {
+        event.preventDefault();
+        const [dx, dy] = moves[event.key];
+        const next = event.shiftKey
+          ? { ...region, width: region.width + dx, height: region.height + dy }
+          : { ...region, x: region.x + dx, y: region.y + dy };
+        const bounds = redaction.box({ ...next, x: Math.min(next.x, 1 - region.width),
+          y: Math.min(next.y, 1 - region.height) });
+        if (bounds && bounds.width >= 0.01 && bounds.height >= 0.01) Object.assign(region, bounds);
+        drawRedactions(region.id);
+      } else if (event.key === "Delete" || event.key === "Backspace") {
+        event.preventDefault();
+        editing.regions = editing.regions.filter(item => item !== region);
+        drawRedactions();
+        document.getElementById("addRedaction").focus();
+      }
+    });
+    let drawing = null;
+    const pointAt = event => {
+      const bounds = redactionStage.getBoundingClientRect();
+      return { x: Math.min(1, Math.max(0, (event.clientX - bounds.left) / bounds.width)),
+        y: Math.min(1, Math.max(0, (event.clientY - bounds.top) / bounds.height)) };
+    };
+    redactionStage.addEventListener("pointerdown", event => {
+      if (!editing || event.button !== 0 || event.target.closest(".redaction-box")) return;
+      event.preventDefault();
+      redactionStage.setPointerCapture(event.pointerId);
+      drawing = { start: pointAt(event), region: null };
+    });
+    redactionStage.addEventListener("pointermove", event => {
+      if (!drawing) return;
+      const point = pointAt(event);
+      const bounds = { x: Math.min(drawing.start.x, point.x), y: Math.min(drawing.start.y, point.y),
+        width: Math.abs(point.x - drawing.start.x), height: Math.abs(point.y - drawing.start.y) };
+      if (!drawing.region && bounds.width > 0.005 && bounds.height > 0.005) {
+        drawing.region = addManualRegion(bounds);
+      }
+      if (drawing.region) { Object.assign(drawing.region, bounds); drawRedactions(); }
+    });
+    const finishDrawing = () => {
+      if (!drawing) return;
+      const region = drawing.region;
+      drawing = null;
+      if (region) drawRedactions(region.id);
+    };
+    redactionStage.addEventListener("pointerup", finishDrawing);
+    redactionStage.addEventListener("pointercancel", finishDrawing);
+    document.getElementById("addRedaction").addEventListener("click", () => {
+      const region = addManualRegion({ x: 0.4, y: 0.47, width: 0.2, height: 0.06 });
+      drawRedactions(region.id);
+    });
+    document.getElementById("resetRedactions").addEventListener("click", () => {
+      editing.regions = editing.regions.filter(region => region.source === "auto")
+        .map(region => ({ ...region, removed: false }));
+      drawRedactions();
+    });
+    document.getElementById("saveRedactions").addEventListener("click", () => {
+      workspace.updateScreenshotRedactions(editing.assetId, {
+        removed: editing.regions.filter(region => region.source === "auto" && region.removed)
+          .map(region => region.id),
+        added: editing.regions.filter(region => region.source === "manual")
+          .map(({ id, x, y, width, height }) => ({ id, x, y, width, height })) });
+      redactionDialog.close();
+    });
+    document.getElementById("cancelRedactions").addEventListener("click", () => redactionDialog.close());
+    // Focus returns to the screenshot's Adjust masking button.
+    redactionDialog.addEventListener("close", () => {
+      const key = editing?.returnKey;
+      editing = null; drawing = null;
+      redactionImage.removeAttribute("src");
+      if (key) container.querySelector(`[data-focus-key="${CSS.escape(key)}"]`)?.focus();
     });
     document.getElementById("closeEmailChoice").addEventListener("click", () => emailChoice.close());
     document.getElementById("emailFile").addEventListener("click", async () => {

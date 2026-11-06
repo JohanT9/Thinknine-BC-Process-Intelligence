@@ -80,7 +80,8 @@ context.clearClickHighlight();
 
 // Capture waits for every injected frame to hide its UI, and restores on errors.
 const background=read('src/recorder/background.js');
-const captureSource=background.slice(background.indexOf('async function capture(tabId)'), background.indexOf('async function captureStepRepairScreenshot'));
+const captureSource=background.slice(background.indexOf('const captureValueRegions = new Map();'), background.indexOf('async function captureStepRepairScreenshot'));
+assert.ok(captureSource.includes('async function capture(tabId, options = {})'));
 (async()=>{
   for(const failure of [false,true]) {
     const hidden=new Set(); const restored=[];
@@ -99,6 +100,23 @@ const captureSource=background.slice(background.indexOf('async function capture(
     vm.runInNewContext(captureSource,sandbox);
     assert.equal(await sandbox.capture(1),failure?null:'image');
     assert.equal(hidden.size,0); assert.deepEqual(restored.sort(),[0,5]);
+  }
+  // A bug report screenshot also gets the regions each frame measured; a frame that did not
+  // answer leaves the screenshot not completely measured.
+  for(const unanswered of [false,true]) {
+    const sandbox={ crypto: require("node:crypto").webcrypto, screenshotStats:{errors:0}, setDebug:async()=>{}, chrome:{
+      webNavigation:{getAllFrames:async()=>[{frameId:0},{frameId:5}]},
+      tabs:{get:async()=>({active:true,windowId:2}), sendMessage:async(id,m,{frameId})=>{
+        if(unanswered&&frameId===5) throw Error('Frame without content script');
+        return m.collectValueRegions?{ok:true,valueRegions:[{x:frameId/10,y:0,width:0.1,height:0.1,kind:'amount'}]}:{ok:true};
+      },captureVisibleTab:async()=>'image'+unanswered}
+    }};
+    vm.runInNewContext(captureSource,sandbox);
+    assert.equal(await sandbox.capture(1,{valueRegions:true}),'image'+unanswered);
+    const details=sandbox.valueRegionsFor('image'+unanswered);
+    assert.equal(details.valueRegions.length,unanswered?1:2);
+    assert.equal(details.valueRegionsComplete,!unanswered);
+    assert.deepEqual({...sandbox.valueRegionsFor('image'+unanswered)},{},'read once');
   }
   console.log('Click highlights: input transparency, fallback, expiry, settings and all-frame screenshot cleanup passed.');
 })().catch(error=>{console.error(error);process.exitCode=1;});

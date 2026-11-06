@@ -207,7 +207,8 @@
     result.updatedAt = source.timestamp || new Date().toISOString();
     return result;
   }
-  function addScreenshot(recording, eventReference, dataUrl, createdAt = new Date().toISOString()) {
+  // details may carry where the screenshot shows values a bug report can mask.
+  function addScreenshot(recording, eventReference, dataUrl, createdAt = new Date().toISOString(), details = {}) {
     const result = normalize(recording);
     if (result.metadata.finishedAt) throw new Error("Completed recording evidence is immutable.");
     const event = result.events.find(item =>
@@ -215,7 +216,9 @@
     );
     if (!event) throw new Error(`Canonical screenshot event not found: ${eventReference}`);
     const eventNo = event.raw?.eventNo || event.sequence;
-    const asset = { ...assetFor(result.id, eventNo, dataUrl), createdAt };
+    const asset = { ...assetFor(result.id, eventNo, dataUrl), createdAt,
+      ...(Array.isArray(details?.valueRegions) ? { valueRegions: clone(details.valueRegions),
+        valueRegionsComplete: details.valueRegionsComplete !== false } : {}) };
     if (event.screenshotAssetId) {
       if (!result.assets.some(item => item.id === event.screenshotAssetId)) {
         throw new Error(`Missing canonical screenshot asset: ${event.screenshotAssetId}`);

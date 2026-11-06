@@ -1,3 +1,7 @@
+## 4.7.235
+- Bug report: new reports no longer mask values by default. Select Mask values in the report to mask the steps and cover the screenshots; reports that already have a choice keep it.
+- Bug report: Mask values now also covers screenshots. While a bug report is recorded, each screenshot notes where it shows amounts, prices and balances, customer, vendor and contact names, email addresses and phone numbers; the report, PDF and email show those regions covered, while items, quantities, dates, status and document numbers stay visible. Adjust masking under each screenshot lets you show a covered region, cover more by dragging over the image or adding a region, and restore the automatic regions. The original screenshot is kept, and if a screenshot cannot be masked nothing is exported. Screenshots recorded before this version are not measured; the report says so and you can cover regions by hand. Regenerating the report keeps the adjustments.
+
 ## 4.7.234
 - Bug report: Mask values is now chosen in each report. Amounts, email addresses and IDs in the steps are masked by default, in the report, PDF, email and summary alike; clear the box to show the recorded values for that report. Passwords are always masked, placeholders follow the document language, and step text you edited is left as written.
 

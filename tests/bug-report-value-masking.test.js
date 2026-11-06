@@ -83,8 +83,11 @@ const steps = [
 const maskedSteps = [
   { taskId: "t1", instruction: "Ange __[belopp]__ i **Belopp**." },
   { taskId: "t2", instruction: "Välj **Bokför**." }];
-const created = service.createBugReportFromRecording(recording, steps, {
+// A new report shows the recorded values until the user chooses to mask them.
+const fresh = service.createBugReportFromRecording(recording, steps, {
   documentLanguage: "sv-SE", maskedSteps, now: "2026-11-06T10:02:00Z" });
+assert.deepStrictEqual(fresh.privacy, { maskValues: false });
+const created = model.updateHumanContent(fresh, { privacy: { maskValues: true } });
 assert.deepStrictEqual(created.privacy, { maskValues: true });
 assert.strictEqual(created.reproduction.steps[0].instruction, "Ange __1 250,00__ i **Belopp**.");
 assert.strictEqual(created.reproduction.steps[0].maskedInstruction, "Ange __[belopp]__ i **Belopp**.");
@@ -98,6 +101,7 @@ assert.strictEqual(generator.hasMaskableValues(created), true);
 // The choice decides what the report, the summary and the issue package (PDF, email) show.
 const shown = report => generator.project(report).sections
   .find(section => section.id === "reproduction").content.map(step => step.instruction);
+assert.deepStrictEqual(shown(fresh), ["Ange __1 250,00__ i **Belopp**.", "Välj **Bokför**."]);
 assert.deepStrictEqual(shown(created), ["Ange __[belopp]__ i **Belopp**.", "Välj **Bokför**."]);
 assert.ok(exporter.summary(generator.project(created)).text.includes("Ange [belopp] i"));
 assert.ok(!JSON.stringify(issuePackage.build(created).reproduction).includes("1 250,00"));
@@ -120,6 +124,8 @@ assert.strictEqual(generator.hasMaskableValues(older), false);
 const regenerated = service.regenerate(unmasked, recording, steps, { maskedSteps });
 assert.deepStrictEqual(regenerated.privacy, { maskValues: false });
 assert.strictEqual(regenerated.reproduction.steps[0].maskedInstruction, "Ange __[belopp]__ i **Belopp**.");
+assert.deepStrictEqual(service.regenerate(created, recording, steps, { maskedSteps }).privacy,
+  { maskValues: true });
 
 // The recorder keeps values for bug reports and derives the masked steps when a report is made.
 const background = read("src/recorder/background.js");

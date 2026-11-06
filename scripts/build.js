@@ -151,7 +151,7 @@ copyFile(
   path.join(dist, "capture-surface-mode.js")
 );
 
-for (const file of ["capture-field-privacy.js", "capture-indicator-i18n.js"]) {
+for (const file of ["capture-field-privacy.js", "capture-value-regions.js", "capture-indicator-i18n.js"]) {
   copyFile(path.join(src, "recorder", file), path.join(dist, file));
 }
 

@@ -601,7 +601,16 @@ async function technicalDiagnosticsPolicyEnabled() {
   }
 }
 
-async function capture(tabId) {
+// Value regions measured for recent bug report screenshots, by image, until the image is
+// stored with its event.
+const captureValueRegions = new Map();
+function valueRegionsFor(image) {
+  const details = captureValueRegions.get(image);
+  captureValueRegions.delete(image);
+  return details ? { valueRegions: details.regions, valueRegionsComplete: details.complete } : {};
+}
+
+async function capture(tabId, options = {}) {
   const captureId = crypto.randomUUID();
   let captureFrames = [0];
   try {
@@ -612,13 +621,24 @@ async function capture(tabId) {
       const frames = await chrome.webNavigation.getAllFrames({ tabId });
       captureFrames = [...new Set([0, ...(frames || []).map(frame => frame.frameId)])];
     } catch {}
-    await Promise.allSettled(captureFrames.map(frameId => chrome.tabs.sendMessage(tabId, {
-      type: "T9_SET_INDICATOR_CAPTURE_VISIBILITY", captureId, hidden: true
+    const hidden = await Promise.allSettled(captureFrames.map(frameId => chrome.tabs.sendMessage(tabId, {
+      type: "T9_SET_INDICATOR_CAPTURE_VISIBILITY", captureId, hidden: true,
+      collectValueRegions: Boolean(options.valueRegions)
     }, { frameId })));
 
-    return await chrome.tabs.captureVisibleTab(tab.windowId, {
+    const image = await chrome.tabs.captureVisibleTab(tab.windowId, {
       format: "png"
     });
+    if (image && options.valueRegions) {
+      // A frame that did not answer may show values that were not measured.
+      captureValueRegions.set(image, {
+        regions: hidden.flatMap(result => result.value?.valueRegions || []).slice(0, 1000),
+        complete: hidden.every(result => Array.isArray(result.value?.valueRegions)) });
+      while (captureValueRegions.size > 8) {
+        captureValueRegions.delete(captureValueRegions.keys().next().value);
+      }
+    }
+    return image;
   } catch (error) {
     screenshotStats.errors += 1;
     await setDebug({
@@ -752,8 +772,11 @@ async function processScreenshotQueue() {
         continue;
       }
 
-      const image = await capture(item.tabId || state.tabId);
+      const itemSession = await getSession(item.sessionId);
+      const image = await capture(item.tabId || state.tabId,
+        { valueRegions: itemSession?.recordingPurpose === "bug-report" });
       lastScreenshotAt = Date.now();
+      const regionDetails = image ? valueRegionsFor(image) : {};
 
       if (!image) {
         screenshotStats.dropped += 1;
@@ -774,7 +797,7 @@ async function processScreenshotQueue() {
         },
         associate(target) {
           return canonicalStore.associateScreenshot(
-            item.sessionId, target.eventId, image, capturedAt
+            item.sessionId, target.eventId, image, capturedAt, regionDetails
           );
         }
       });
@@ -933,7 +956,8 @@ async function recordEvent(rawEvent, captureContext = {}) {
         }
         if (preActionSaved) {
           await canonicalStore.associateScreenshot(recordingId,
-            canonicalEvent.id, preActionImage, new Date().toISOString());
+            canonicalEvent.id, preActionImage, new Date().toISOString(),
+            valueRegionsFor(preActionImage));
           lastScreenshotAt = Date.now();
           screenshotStats.captured += 1;
         } else {
@@ -1109,10 +1133,11 @@ async function captureBcErrorEvidence(input, sender) {
   evidence = await saveBcErrorEvidence({ ...evidence,
     canonicalEventId: recorded?.canonicalEvent?.id || null,
     screenshotStatus: "screenshot-requested" });
-  const image = await capture(sender.tab?.id || state.tabId);
+  const image = await capture(sender.tab?.id || state.tabId, { valueRegions: true });
   if (image && recorded?.canonicalEvent) {
     const associatedRecording = await canonicalStore.associateScreenshot(
-      state.sessionId, recorded.canonicalEvent.id, image, new Date().toISOString());
+      state.sessionId, recorded.canonicalEvent.id, image, new Date().toISOString(),
+      valueRegionsFor(image));
     const associated = associatedRecording.events.find(item =>
       item.id === recorded.canonicalEvent.id);
     await saveScreenshot(state.sessionId, String(recorded.event.eventNo), image);
@@ -1150,7 +1175,7 @@ const CONTENT_SCRIPT_ID = "thinknine-bc-recorder-main";
 // Must match manifest.json content_scripts so dynamically injected frames get
 // the same capture helpers as statically injected ones.
 const CAPTURE_SCRIPT_FILES = Object.freeze([
-  "engine/business-central-version-capture.js", "capture-field-privacy.js",
+  "engine/business-central-version-capture.js", "capture-field-privacy.js", "capture-value-regions.js",
   "capture-focus-session.js", "capture-keyboard.js", "capture-delivery.js", "capture-surface-mode.js",
   "engine/bc-client-captions.js", "bc-error-detector.js",
   "capture-indicator-i18n.js", "content.js"
@@ -1843,7 +1868,8 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
         screenshotStats.requested += 1;
         const entry = { sessionId: preActionState.sessionId,
           tabId: preActionTabId, createdAt: Date.now(),
-          promise: capture(preActionTabId) };
+          promise: capture(preActionTabId,
+            { valueRegions: preActionSession?.recordingPurpose === "bug-report" }) };
         preActionCaptures.set(message.interactionId, entry);
         setTimeout(() => {
           if (preActionCaptures.get(message.interactionId) === entry) {
