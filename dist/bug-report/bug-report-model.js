@@ -115,6 +115,9 @@
     if (patch.annotations) result.annotations = clone(patch.annotations)
       .map(item => ({ ...item, authorship: "human" }));
     if (patch.status && STATUSES.includes(patch.status)) result.status = patch.status;
+    if (patch.privacy && typeof patch.privacy.maskValues === "boolean") {
+      result.privacy = { ...(result.privacy || {}), maskValues: patch.privacy.maskValues };
+    }
     result.updatedAt = updatedAt || result.updatedAt;
     return normalize(result);
   }

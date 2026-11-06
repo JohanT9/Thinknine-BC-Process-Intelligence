@@ -1084,7 +1084,14 @@
     "The tenant license is active. Sign in with Microsoft for user registration and statistics. No consultant license is needed.": "La licence du locataire est active. Connectez-vous avec Microsoft pour l’enregistrement de l’utilisateur et les statistiques. Aucune licence de consultant n’est nécessaire.",
     "error report": "rapport d’erreur",
     "Business Central error": "Erreur Business Central",
-    "Reported Business Central problem": "Problème Business Central signalé"
+    "Reported Business Central problem": "Problème Business Central signalé",
+    "[masked]": "[masqué]",
+    "[email address]": "[adresse e-mail]",
+    "[current customer]": "[client actuel]",
+    "[current vendor]": "[fournisseur actuel]",
+    "[current item]": "[article actuel]",
+    "[amount]": "[montant]",
+    "[ID]": "[ID]"
   },
   "de-DE": {
     "Correct the file name template.": "Korrigieren Sie die Dateinamensvorlage.",
@@ -2169,7 +2176,14 @@
     "The tenant license is active. Sign in with Microsoft for user registration and statistics. No consultant license is needed.": "Die Mandantenlizenz ist aktiv. Melden Sie sich mit Microsoft für die Benutzerregistrierung und Statistik an. Eine Beraterlizenz ist nicht erforderlich.",
     "error report": "Fehlerbericht",
     "Business Central error": "Business Central-Fehler",
-    "Reported Business Central problem": "Gemeldetes Business Central-Problem"
+    "Reported Business Central problem": "Gemeldetes Business Central-Problem",
+    "[masked]": "[maskiert]",
+    "[email address]": "[E-Mail-Adresse]",
+    "[current customer]": "[aktueller Debitor]",
+    "[current vendor]": "[aktueller Kreditor]",
+    "[current item]": "[aktueller Artikel]",
+    "[amount]": "[Betrag]",
+    "[ID]": "[ID]"
   },
   "es-ES": {
     "Correct the file name template.": "Corrija la plantilla de nombre de archivo.",
@@ -3254,7 +3268,14 @@
     "The tenant license is active. Sign in with Microsoft for user registration and statistics. No consultant license is needed.": "La licencia del inquilino está activa. Inicie sesión con Microsoft para el registro de usuarios y las estadísticas. No se necesita una licencia de consultor.",
     "error report": "informe de errores",
     "Business Central error": "Error de Business Central",
-    "Reported Business Central problem": "Problema de Business Central notificado"
+    "Reported Business Central problem": "Problema de Business Central notificado",
+    "[masked]": "[oculto]",
+    "[email address]": "[dirección de correo]",
+    "[current customer]": "[cliente actual]",
+    "[current vendor]": "[proveedor actual]",
+    "[current item]": "[producto actual]",
+    "[amount]": "[importe]",
+    "[ID]": "[ID]"
   },
   "da-DK": {
     "Correct the file name template.": "Ret skabelonen til filnavnet.",
@@ -4339,7 +4360,14 @@
     "The tenant license is active. Sign in with Microsoft for user registration and statistics. No consultant license is needed.": "Tenantlicensen er aktiv. Log ind med Microsoft til brugerregistrering og statistik. En konsulentlicens er ikke nødvendig.",
     "error report": "fejlrapport",
     "Business Central error": "Business Central-fejl",
-    "Reported Business Central problem": "Rapporteret Business Central-problem"
+    "Reported Business Central problem": "Rapporteret Business Central-problem",
+    "[masked]": "[maskeret]",
+    "[email address]": "[mailadresse]",
+    "[current customer]": "[aktuel debitor]",
+    "[current vendor]": "[aktuel kreditor]",
+    "[current item]": "[aktuel vare]",
+    "[amount]": "[beløb]",
+    "[ID]": "[id]"
   },
   "fi-FI": {
     "Correct the file name template.": "Korjaa tiedostonimen malli.",
@@ -5424,7 +5452,14 @@
     "The tenant license is active. Sign in with Microsoft for user registration and statistics. No consultant license is needed.": "Vuokraajan lisenssi on aktiivinen. Kirjaudu Microsoft-tilillä käyttäjärekisteröintiä ja tilastoja varten. Konsulttilisenssiä ei tarvita.",
     "error report": "virheraportti",
     "Business Central error": "Business Central -virhe",
-    "Reported Business Central problem": "Ilmoitettu Business Central -ongelma"
+    "Reported Business Central problem": "Ilmoitettu Business Central -ongelma",
+    "[masked]": "[peitetty]",
+    "[email address]": "[sähköpostiosoite]",
+    "[current customer]": "[nykyinen asiakas]",
+    "[current vendor]": "[nykyinen toimittaja]",
+    "[current item]": "[nykyinen nimike]",
+    "[amount]": "[summa]",
+    "[ID]": "[tunnus]"
   },
   "nb-NO": {
     "Correct the file name template.": "Rett malen for filnavn.",
@@ -6509,7 +6544,14 @@
     "The tenant license is active. Sign in with Microsoft for user registration and statistics. No consultant license is needed.": "Leietakerlisensen er aktiv. Logg på med Microsoft for brukerregistrering og statistikk. Ingen konsulentlisens er nødvendig.",
     "error report": "feilrapport",
     "Business Central error": "Business Central-feil",
-    "Reported Business Central problem": "Rapportert Business Central-problem"
+    "Reported Business Central problem": "Rapportert Business Central-problem",
+    "[masked]": "[maskert]",
+    "[email address]": "[e-postadresse]",
+    "[current customer]": "[aktuell kunde]",
+    "[current vendor]": "[aktuell leverandør]",
+    "[current item]": "[aktuell vare]",
+    "[amount]": "[beløp]",
+    "[ID]": "[id]"
   }
 };
   for (const values of Object.values(catalogs)) Object.freeze(values);

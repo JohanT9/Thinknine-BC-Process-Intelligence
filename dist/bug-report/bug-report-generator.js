@@ -51,11 +51,19 @@
     return (evidence || []).filter(item => !wanted.size || wanted.has(
       item.errorEvidenceId)).map(clone);
   }
-  function resolvedInstruction(step) {
-    return Object.prototype.hasOwnProperty.call(step.stepOverride?.fields || {},
-      "instruction") ? text(step.stepOverride.fields.instruction) :
-      text(step.instruction);
+  // Values are masked unless the report chooses to show them; text the user wrote is
+  // shown as written.
+  const masksValues = report => report?.privacy?.maskValues !== false;
+  function resolvedInstruction(step, report) {
+    if (Object.prototype.hasOwnProperty.call(step.stepOverride?.fields || {}, "instruction")) {
+      return text(step.stepOverride.fields.instruction);
+    }
+    return masksValues(report) && text(step.maskedInstruction)
+      ? text(step.maskedInstruction) : text(step.instruction);
   }
+  // Whether any recorded step reads differently when its values are masked.
+  const hasMaskableValues = report => (report?.reproduction?.steps || []).some(step =>
+    text(step.maskedInstruction) && text(step.maskedInstruction) !== text(step.instruction));
   function project(report, context = {}) {
     const documentLanguage = languages.normalize(report.documentLanguage);
     const localized = (en, sv) => languages.translate(en, documentLanguage, sv);
@@ -72,7 +80,7 @@
       text(primary?.rawMessage || errors[0]?.rawMessage);
     const reproduction = (report.reproduction?.steps || []).filter(step =>
       step.visibility !== "hidden").map((step, index) => ({ ...clone(step),
-      number: index + 1, instruction: resolvedInstruction(step),
+      number: index + 1, instruction: resolvedInstruction(step, report),
       screenshotAssetIds: [...(step.source?.screenshotAssetIds || [])] }));
     const diagnostics = report.technicalDiagnostics || [];
     const diagnosticRows = errors.flatMap(item => Object.entries(
@@ -168,5 +176,6 @@
     exportPolicy: "full-technical-report-local", generatedFromUpdatedAt:
       report.updatedAt || null });
   }
-  return { LABELS, SECTION_ORDER, TITLES, project };
+  return { LABELS, SECTION_ORDER, TITLES, project, hasMaskableValues,
+    displayInstruction: resolvedInstruction };
 });
