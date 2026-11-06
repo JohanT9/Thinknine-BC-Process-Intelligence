@@ -205,6 +205,25 @@
     return normalize(result);
   }
 
+  // The user's changes to the regions covered in a screenshot when the report masks values.
+  function updateScreenshotRedactions(report, assetId, redactions, updatedAt) {
+    const result = normalize(report);
+    const index = result.evidence.screenshots.findIndex(item => item.assetId === String(assetId || ""));
+    if (index < 0) throw new TypeError("Screenshot was not found.");
+    const added = (Array.isArray(redactions?.added) ? redactions.added : []).flatMap(region => {
+      const value = key => Math.min(1, Math.max(0, Number(region?.[key])));
+      const box = { x: value("x"), y: value("y"), width: value("width"), height: value("height") };
+      return region?.id && Object.values(box).every(Number.isFinite) && box.width > 0 && box.height > 0
+        ? [{ id: String(region.id).slice(0, 80), ...box }] : [];
+    }).slice(0, 200);
+    const removed = [...new Set((redactions?.removed || []).map(String)
+      .filter(id => /^auto:\d+$/u.test(id)))];
+    result.evidence.screenshots[index] = { ...result.evidence.screenshots[index],
+      redactions: { removed, added } };
+    result.updatedAt = updatedAt || result.updatedAt;
+    return normalize(result);
+  }
+
   function attachTelemetry(report, errorEvidenceId, enrichment, updatedAt) {
     const result = normalize(report);
     const current = result.enrichment.telemetry?.byErrorEvidenceId || {};
@@ -217,5 +236,6 @@
 
   return { CATEGORIES, SCHEMA_VERSION, STATUSES, normalize, normalizeStep,
     addReproductionStep, attachTelemetry, selectPrimaryError,
-    updateHumanContent, updateReproductionStep, updateScreenshotVisibility };
+    updateHumanContent, updateReproductionStep, updateScreenshotVisibility,
+    updateScreenshotRedactions };
 });

@@ -162,10 +162,10 @@
             sourceEventIds.get(recordingId));
         }, "append-event");
       },
-      associateScreenshot(recordingId, eventId, dataUrl, createdAt) {
+      associateScreenshot(recordingId, eventId, dataUrl, createdAt, details = {}) {
         return enqueue(recordingId, current => {
           if (!current) throw new Error(`Recording not found: ${recordingId}`);
-          return canonical.addScreenshot(current, eventId, dataUrl, createdAt);
+          return canonical.addScreenshot(current, eventId, dataUrl, createdAt, details);
       }, "associate-screenshot");
       },
       rename(recordingId, title) {

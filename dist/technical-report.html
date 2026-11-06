@@ -60,7 +60,14 @@
 .recipient-suggestions li{padding:6px 10px;cursor:pointer;overflow-wrap:anywhere}.recipient-suggestions li[aria-selected=true],.recipient-suggestions li:hover{background:var(--c-bg-f5f7fa)}
 .recipient-suggestions .suggestion-address{display:block;font-size:.875rem;opacity:.8}.people-search{display:flex;flex-wrap:wrap;align-items:center;gap:4px 12px;margin:0 0 8px;font-size:.875rem}.people-search button{margin:0}
 .send-confirm .primary-send{background:var(--c-bg-008c95);color:var(--c-fg-ffffff);border:1px solid var(--c-bd-007078);border-radius:4px}
-@media(max-width:420px){.send-confirm dl{grid-template-columns:1fr}.send-confirm .send-help-gap{display:none}}#regenerateDialog{width:min(560px,calc(100vw - 24px))}</style>
+@media(max-width:420px){.send-confirm dl{grid-template-columns:1fr}.send-confirm .send-help-gap{display:none}}#regenerateDialog{width:min(560px,calc(100vw - 24px))}
+#redactionDialog{width:min(1200px,calc(100vw - 24px))}#redactionDialog button{min-height:44px}#redactionDialog .primary-send{background:var(--c-bg-008c95);color:var(--c-fg-ffffff);border:1px solid var(--c-bd-007078);border-radius:4px}
+.redaction-note{padding:8px 12px;border-left:4px solid var(--c-bd-b76e00);background:var(--c-bg-fffaf0)}
+.redaction-stage{position:relative;margin:12px 0;line-height:0;cursor:crosshair;touch-action:none;user-select:none;border:1px solid var(--c-bd-ccd5df)}.redaction-stage img{display:block;width:100%;height:auto;max-width:100%}
+.redaction-boxes{position:absolute;inset:0}.redaction-box{position:absolute;box-sizing:border-box;margin:0;padding:0;min-height:0!important;min-width:0;background:rgba(59,64,72,.88);border:2px solid rgba(59,64,72,.95);border-radius:2px;cursor:pointer}
+.redaction-box.is-manual{border:2px dashed var(--c-bg-008c95)}.redaction-box.is-removed{background:transparent;border:2px dashed var(--c-bd-b42318)}
+.redaction-box:focus-visible{outline:var(--focusWidth) solid var(--colorFocusIndicator);outline-offset:1px;z-index:1}
+.adjust-masking{margin-top:6px}</style>
 </head>
 <body>
   <header>
@@ -125,6 +132,21 @@
       <button id="cancelRegenerate" type="button" data-i18n="technical.cancel" autofocus>Cancel</button>
     </div>
   </dialog>
+  <dialog id="redactionDialog" class="redaction-dialog" aria-labelledby="redactionTitle" aria-describedby="redactionHelp">
+    <h2 id="redactionTitle" data-i18n="technical.maskingTitle">Adjust masking</h2>
+    <p id="redactionHelp" data-i18n="technical.maskingHelp">Covered regions are dark. Choose a measured region to show or cover it again. Drag over the image to cover more, or add a region and move it with the arrow keys (Shift+arrow changes its size). Choose an added region, or press Delete, to remove it.</p>
+    <p id="redactionUnmeasured" class="redaction-note" data-i18n="technical.maskUnmeasuredImage" hidden>This screenshot was captured before values were measured. Add the regions to cover yourself.</p>
+    <div id="redactionStage" class="redaction-stage">
+      <img id="redactionImage" alt="" draggable="false">
+      <div id="redactionBoxes" class="redaction-boxes"></div>
+    </div>
+    <div class="secondary-actions">
+      <button id="addRedaction" type="button" data-i18n="technical.addBox">Add region</button>
+      <button id="resetRedactions" type="button" data-i18n="technical.resetBoxes">Restore automatic regions</button>
+      <button id="saveRedactions" type="button" class="primary-send" data-i18n="technical.done">Done</button>
+      <button id="cancelRedactions" type="button" data-i18n="technical.cancel">Cancel</button>
+    </div>
+  </dialog>
   <main id="technicalReport"></main>
   <script src="engine/locale-catalogs.js"></script>
   <script src="engine/language-registry.js"></script>
@@ -139,6 +161,7 @@
   <script src="bug-report/bug-report-generator.js"></script>
   <script src="bug-report/bug-report-text-export.js"></script>
   <script src="bug-report/technical-report-workspace.js"></script>
+  <script src="bug-report/screenshot-redaction.js"></script>
   <script src="bug-report/email-draft.js"></script>
 <script src="engine/tenant-license-config.js"></script>
 <script src="bug-report/outlook-draft.js"></script>

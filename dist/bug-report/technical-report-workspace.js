@@ -55,6 +55,9 @@
       updateScreenshotVisibility(assetId, visibility, now) {
         return commit(model.updateScreenshotVisibility(report, assetId, visibility, now));
       },
+      updateScreenshotRedactions(assetId, redactions, now) {
+        return commit(model.updateScreenshotRedactions(report, assetId, redactions, now));
+      },
       undo() { if (historyIndex > 0) { historyIndex -= 1; revision += 1;
         report = model.normalize(history[historyIndex]); saveState = "unsaved";
         notify(); } return report; },

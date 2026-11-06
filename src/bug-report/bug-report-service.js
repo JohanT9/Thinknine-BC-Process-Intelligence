@@ -189,8 +189,8 @@
       schemaVersion: model.SCHEMA_VERSION, recordingId: recording.id,
       documentLanguage,
       createdAt: now, updatedAt: now, status: "draft",
-      // Values are masked unless the report chooses to show them.
-      privacy: { maskValues: true },
+      // Values are shown until the user chooses to mask them in the report.
+      privacy: { maskValues: false },
       summary: { title: String(context.title || "").trim() ||
           draftTitle(recording, derivedSteps, steps, errorEvidence, documentLanguage),
         summary: "", severity: "", category: "", authorship: "human" },
@@ -253,7 +253,12 @@
         ...clone(current.reproduction.steps.filter(step => step.origin === "manual"))] },
       evidence: { ...regenerated.evidence,
         screenshots: unique([
-          ...regenerated.evidence.screenshots.map(item => JSON.stringify(item)),
+          // The user's masking adjustments belong to the image and are kept.
+          ...regenerated.evidence.screenshots.map(item => {
+            const redactions = current.evidence.screenshots.find(entry =>
+              entry.assetId === item.assetId && entry.redactions)?.redactions;
+            return JSON.stringify(redactions ? { ...item, redactions: clone(redactions) } : item);
+          }),
           ...current.evidence.screenshots.map(item => JSON.stringify(item))
         ]).map(item => JSON.parse(item)),
         diagnosticRefs: clone(current.evidence.diagnosticRefs),

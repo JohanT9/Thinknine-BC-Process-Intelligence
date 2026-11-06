@@ -493,7 +493,21 @@
         if (acknowledged) return;
         acknowledged = true;
         clearTimeout(fallback);
-        sendResponse({ ok: true });
+        // For a bug report, where this frame shows values the report may mask, measured as
+        // the screenshot is taken.
+        let valueRegions;
+        if (message.collectValueRegions) {
+          try {
+            valueRegions = globalThis.T9CaptureValueRegions?.collect(document, element =>
+              viewportBounds(element.getBoundingClientRect(), element)) || [];
+            // A frame that cannot be placed in the tab cannot be measured; when it shows
+            // values, the screenshot counts as not measured rather than as having none.
+            if (!valueRegions.length && !frameReachesTop() &&
+              globalThis.T9CaptureValueRegions.collect(document, () =>
+                ({ x: 0, y: 0, width: 1, height: 1 }), 1).length) valueRegions = undefined;
+          } catch { valueRegions = undefined; }
+        }
+        sendResponse(valueRegions ? { ok: true, valueRegions } : { ok: true });
       };
       const fallback = setTimeout(acknowledge, 100);
       requestAnimationFrame(() => requestAnimationFrame(acknowledge));
@@ -897,6 +911,17 @@
     }
     return right > left && bottom > top
       ? { x: left, y: top, width: right - left, height: bottom - top } : null;
+  }
+
+  function frameReachesTop() {
+    try {
+      let view = window;
+      while (view !== view.top) {
+        if (!view.frameElement) return false;
+        view = view.parent;
+      }
+      return true;
+    } catch { return false; }
   }
 
   function viewportBounds(bounds, element) {

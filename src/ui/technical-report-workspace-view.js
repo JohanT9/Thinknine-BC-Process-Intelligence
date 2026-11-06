@@ -135,11 +135,18 @@
     mask.addEventListener("change", () => onEdit("privacy", { maskValues: mask.checked }));
     maskLabel.append(mask, element(doc, "span", uiKey("technical.maskValues", locale,
       "Mask values")));
-    const maskHelp = element(doc, "p", generator?.hasMaskableValues?.(workspaceState.report) === false
-      ? uiKey("technical.maskValuesNone", locale, "The steps contain no values that are masked.")
+    // The page says whether screenshots were measured; steps are checked here.
+    const masking = options.masking || {};
+    const nothingToMask = generator?.hasMaskableValues?.(workspaceState.report) === false &&
+      !masking.coveredScreenshots && !masking.unmeasuredScreenshots;
+    const maskHelp = element(doc, "p", [nothingToMask
+      ? uiKey("technical.maskValuesNone", locale,
+        "No values to mask were found in the steps or screenshots.")
       : uiKey("technical.maskValuesHelp", locale,
-        "Amounts, email addresses and IDs in the steps are replaced in the report, PDF, email and summary. Passwords are always masked."),
-    "report-privacy-help");
+        "Amounts, names, email addresses, phone numbers and IDs are covered in the steps and screenshots of the report, PDF, email and summary. The Business Central error message is not masked. Passwords are always masked."),
+    masking.unmeasuredScreenshots ? uiKey("technical.maskUnmeasured", locale,
+      "Some screenshots were not measured when they were taken; adjust the masking for them.") : ""]
+      .filter(Boolean).join(" "), "report-privacy-help");
     maskHelp.id = "technical-report-mask-help";
     privacy.append(maskLabel, maskHelp); container.appendChild(privacy);
     const editor = doc.createElement("fieldset");
@@ -391,7 +398,18 @@
             figure.appendChild(image);
           }
           figure.appendChild(element(doc, "figcaption",
-            screenshotLabel(screenshot))); parent.appendChild(figure);
+            screenshotLabel(screenshot)));
+          if (options.onEditRedactions && workspaceState.report.privacy?.maskValues !== false) {
+            const adjust = element(doc, "button", uiKey("technical.adjustMasking", locale,
+              "Adjust masking"), "adjust-masking");
+            adjust.type = "button";
+            adjust.dataset.focusKey = `redact-${screenshot.assetId}`;
+            adjust.setAttribute("aria-label", `${uiKey("technical.adjustMasking", locale,
+              "Adjust masking")}: ${screenshotLabel(screenshot)}`);
+            adjust.addEventListener("click", () => options.onEditRedactions(screenshot.assetId));
+            figure.appendChild(adjust);
+          }
+          parent.appendChild(figure);
         };
         if (primary) appendScreenshot(node, primary, "primary-evidence");
         const supporting = screenshots.filter(item => item !== primary);
