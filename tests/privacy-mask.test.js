@@ -20,7 +20,9 @@ assert.strictEqual(privacy.mask("Antal", "500", { maskValues: false }), "500");
 const background = fs.readFileSync(path.join(__dirname,
   "../src/recorder/background.js"), "utf8");
 assert(background.includes('importScripts("engine/privacy-mask.js")'));
-assert(/globalThis\.T9PrivacyMask\s*\.maskFieldValues\(sourceEvent, settings\)/u.test(background));
+// Recordings mask with the settings at capture; a bug report recording masks secrets only and
+// chooses masking in the report (see bug-report-value-masking.test.js).
+assert(/globalThis\.T9PrivacyMask\s*\.maskFieldValues\(sourceEvent, session\.recordingPurpose === "bug-report" &&\s+settings\.maskValues !== false \? \{ \.\.\.settings, maskValues: "secrets" \} : settings\)/u.test(background));
 
 // Both the new and the previous field value are masked, without mutating input.
 const fieldEvent = { fieldName: "Lösenord", value: "nytt", previousValue: "gammalt" };

@@ -124,6 +124,24 @@
     severity.addEventListener("change", () => onEdit("severity", severity.value));
     const severityHeader = element(doc, "div", "", "report-severity-header");
     severityHeader.append(severityLabel, severity); container.appendChild(severityHeader);
+    // Masking is chosen for each report and applies to everything made from it.
+    const generator = globalThis.T9BugReportGenerator;
+    const privacy = element(doc, "div", "", "report-privacy");
+    const maskLabel = element(doc, "label", "", "report-privacy-choice");
+    const mask = doc.createElement("input"); mask.type = "checkbox";
+    mask.id = "technical-report-mask-values"; mask.dataset.focusKey = "mask-values";
+    mask.checked = workspaceState.report.privacy?.maskValues !== false;
+    mask.setAttribute("aria-describedby", "technical-report-mask-help");
+    mask.addEventListener("change", () => onEdit("privacy", { maskValues: mask.checked }));
+    maskLabel.append(mask, element(doc, "span", uiKey("technical.maskValues", locale,
+      "Mask values")));
+    const maskHelp = element(doc, "p", generator?.hasMaskableValues?.(workspaceState.report) === false
+      ? uiKey("technical.maskValuesNone", locale, "The steps contain no values that are masked.")
+      : uiKey("technical.maskValuesHelp", locale,
+        "Amounts, email addresses and IDs in the steps are replaced in the report, PDF, email and summary. Passwords are always masked."),
+    "report-privacy-help");
+    maskHelp.id = "technical-report-mask-help";
+    privacy.append(maskLabel, maskHelp); container.appendChild(privacy);
     const editor = doc.createElement("fieldset");
     editor.className = "report-core-fields";
     editor.appendChild(element(doc, "legend", ui("Describe the problem", locale)));
@@ -181,9 +199,12 @@
           .map((step, index) => ({ ...step, number: index + 1,
             hasInstructionOverride: Object.prototype.hasOwnProperty.call(
               step.stepOverride?.fields || {}, "instruction"),
-            instruction: Object.prototype.hasOwnProperty.call(
-              step.stepOverride?.fields || {}, "instruction")
-              ? step.stepOverride.fields.instruction : step.instruction,
+            // The text as the report shows it, so that editing a masked step does not
+            // bring its values back.
+            instruction: generator?.displayInstruction
+              ? generator.displayInstruction(step, workspaceState.report)
+              : Object.prototype.hasOwnProperty.call(step.stepOverride?.fields || {}, "instruction")
+                ? step.stepOverride.fields.instruction : step.instruction,
             included: step.visibility !== "hidden", manual: step.origin === "manual" }));
         if (options.onEditReproductionStep) {
           const editor = doc.createElement("details");

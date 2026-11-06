@@ -20,14 +20,18 @@
     return `bug-report:${String(recordingId)}`;
   }
 
-  function reproductionStep(step, index, recordingId) {
+  function reproductionStep(step, index, recordingId, maskedStep = null) {
     const canonicalIds = unique(step.sourceEventIds ||
       step.sourceCanonicalEventIds);
     const screenshots = unique(step.screenshotAssetIds || [
       step.screenshotAssetId, step.canonicalScreenshotAssetId
     ]);
+    const instruction = step.instruction || step.displayText || "";
+    const maskedInstruction = maskedStep ? maskedStep.instruction || maskedStep.displayText || "" : "";
     return { reproductionStepId: `bug-step:${step.taskId || step.stepId || index + 1}`,
-      order: index + 1, instruction: step.instruction || step.displayText || "",
+      order: index + 1, instruction,
+      // The same step derived from masked values, kept only where it differs.
+      ...(maskedInstruction && maskedInstruction !== instruction ? { maskedInstruction } : {}),
       ...(step.stepOverride ? { stepOverride: clone(step.stepOverride) } : {}),
       ...(step.visibility ? { visibility: step.visibility } : {}),
       authorship: "derived", source: { recordingId,
@@ -148,8 +152,16 @@
     const now = context.now || recording.updatedAt || new Date().toISOString();
     // A step without text, such as the open error dialog itself when the report was made
     // from an error already on screen, describes nothing to reproduce.
+    // Masked steps are matched to the steps by their task, or by position when both
+    // derivations produced the same number of steps.
+    const maskedSteps = Array.isArray(context.maskedSteps) ? context.maskedSteps : [];
+    const stepKey = step => String(step.taskId || step.stepId || "");
+    const maskedById = new Map(maskedSteps.filter(stepKey).map(step => [stepKey(step), step]));
+    const maskedFor = (step, index) => (stepKey(step) && maskedById.get(stepKey(step))) ||
+      (maskedSteps.length === derivedSteps.length ? maskedSteps[index] : null);
     let steps = derivedSteps.map((step, index) =>
-      reproductionStep(step, index, recording.id)).filter(step => step.instruction.trim() ||
+      reproductionStep(step, index, recording.id, maskedFor(step, index)))
+      .filter(step => step.instruction.trim() ||
       String(step.stepOverride?.fields?.instruction || "").trim());
     const canonicalEventIds = unique(steps.flatMap(step =>
       step.source.sourceCanonicalEventIds));
@@ -177,6 +189,8 @@
       schemaVersion: model.SCHEMA_VERSION, recordingId: recording.id,
       documentLanguage,
       createdAt: now, updatedAt: now, status: "draft",
+      // Values are masked unless the report chooses to show them.
+      privacy: { maskValues: true },
       summary: { title: String(context.title || "").trim() ||
           draftTitle(recording, derivedSteps, steps, errorEvidence, documentLanguage),
         summary: "", severity: "", category: "", authorship: "human" },
@@ -220,6 +234,7 @@
       createdAt: current.createdAt,
       updatedAt: context.updatedAt || regenerated.updatedAt,
       summary: clone(current.summary), expectedResult: clone(current.expectedResult),
+      privacy: clone(current.privacy || regenerated.privacy),
       actualResult: { ...regenerated.actualResult,
         human: clone(current.actualResult.human),
         capturedErrorRef: current.actualResult.capturedErrorRef,

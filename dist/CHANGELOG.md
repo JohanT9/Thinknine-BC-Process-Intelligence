@@ -1,3 +1,6 @@
+## 4.7.234
+- Bug report: Mask values is now chosen in each report. Amounts, email addresses and IDs in the steps are masked by default, in the report, PDF, email and summary alike; clear the box to show the recorded values for that report. Passwords are always masked, placeholders follow the document language, and step text you edited is left as written.
+
 ## 4.7.233
 - Bug report: Send directly sends the report from your own mailbox without opening Outlook. The email is prepared first and shown with its recipient, subject and attachment; you can add more recipients and copy (Cc) recipients, and each address is checked before anything is sent. The fields suggest addresses you have sent reports to, and people from Microsoft 365 after you approve People.Read with Search people in Microsoft 365. The email is sent only when you choose Send; a copy is kept in Sent Items. Sending uses its own Microsoft permission, Mail.Send, asked for the first time you send directly, so drafts keep working where it is not approved. If Microsoft does not confirm the send, the report says it may have been sent and does not send it again.
 

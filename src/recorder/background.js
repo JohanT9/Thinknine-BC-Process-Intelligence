@@ -851,8 +851,11 @@ async function recordEvent(rawEvent, captureContext = {}) {
       }
     };
 
+    // A bug report keeps its values, apart from secrets, so that masking can be chosen in
+    // each report; it derives a masked version of its steps when it is created.
     const privacySafeEvent = globalThis.T9PrivacyMask
-      .maskFieldValues(sourceEvent, settings);
+      .maskFieldValues(sourceEvent, session.recordingPurpose === "bug-report" &&
+        settings.maskValues !== false ? { ...settings, maskValues: "secrets" } : settings);
 
     const rawResult = await rawEventStore.appendRawEvent(
       recordingId, privacySafeEvent, { maxEvents: settings.maxEvents }
@@ -1607,12 +1610,10 @@ async function stopSession(finalName = "", documentLanguage = "") {
   return session;
 }
 
-async function createAndOpenBugReport(recordingId, reportTitle = "", regenerateCurrent = null) {
-  const recording = await getCanonicalRecording(recordingId);
+async function deriveBugReportTasks(recording, screenshotManifest) {
   const normalized = globalThis.T9EventNormalization.normalizeRecording(recording);
   const grouped = globalThis.T9EventStepGrouping.group(normalized);
   const legacy = globalThis.T9CanonicalRecording.legacyView(recording);
-  const screenshotManifest = await screenshotAssetStore.manifest(recordingId);
   const screenshots = globalThis.T9ScreenshotAssetPaths.eventPathsFromKeys(
     screenshotManifest.keys);
   const projectedEvents = legacy.events.map((event, index) => ({ ...event,
@@ -1628,13 +1629,41 @@ async function createAndOpenBugReport(recordingId, reportTitle = "", regenerateC
     groupingDiagnostics: grouped.diagnostics,
     imagePaths: screenshots, knowledgePacks: packResult.packs || [] });
   const byCanonicalId = new Map(recording.events.map(event => [event.id, event]));
-  const tasks = (interpretation.businessTasks || []).map(task => ({ ...task,
+  return (interpretation.businessTasks || []).map(task => ({ ...task,
     screenshotAssetIds: [...new Set((task.sourceEventIds || []).map(id =>
       byCanonicalId.get(id)?.screenshotAssetId).filter(Boolean))] }));
+}
+
+async function createAndOpenBugReport(recordingId, reportTitle = "", regenerateCurrent = null) {
+  const recording = await getCanonicalRecording(recordingId);
+  const screenshotManifest = await screenshotAssetStore.manifest(recordingId);
+  // Steps are derived twice: with the captured values, and with them masked as a recording
+  // masks them, so that each report can choose. Placeholders follow the document language;
+  // the recording itself is not changed.
+  const language = globalThis.T9LanguageRegistry.normalize(
+    recording.metadata?.documentLanguage, "document");
+  const placeholder = (english, swedish) =>
+    globalThis.T9LanguageRegistry.translate(english, language, swedish);
+  const labels = { secret: placeholder("[masked]", "[maskerat]"),
+    email: placeholder("[email address]", "[e-postadress]"),
+    customer: placeholder("[current customer]", "[aktuell kund]"),
+    vendor: placeholder("[current vendor]", "[aktuell leverantör]"),
+    item: placeholder("[current item]", "[aktuell artikel]"),
+    amount: placeholder("[amount]", "[belopp]"), id: placeholder("[ID]", "[id]") };
+  const settings = await getSettings();
+  const maskEvent = (event, maskValues) =>
+    globalThis.T9PrivacyMask.maskRecordedEvent(event, { ...settings, maskValues, labels });
+  const masked = maskValues => ({ ...recording, events: (recording.events || []).map(event =>
+    maskEvent(event, maskValues)) });
+  const kept = masked("secrets");
+  const tasks = await deriveBugReportTasks(kept, screenshotManifest);
+  const maskedSteps = globalThis.T9PrivacyMask.maskedStepTexts(tasks,
+    await deriveBugReportTasks(masked(true), screenshotManifest), kept.events,
+    event => maskEvent(event, true));
   const errors = await getBcErrorEvidenceForRecording(recordingId);
   let report = globalThis.T9BugReportService.createBugReportFromRecording(
     recording, tasks, { extensionVersion: VERSION, productVersion: VERSION,
-      errorEvidence: errors,
+      errorEvidence: errors, maskedSteps,
       documentLanguage: globalThis.T9LanguageRegistry.normalize(
         recording.metadata?.documentLanguage, "document"
       ),
@@ -1643,7 +1672,7 @@ async function createAndOpenBugReport(recordingId, reportTitle = "", regenerateC
     if (!tasks.length) throw new Error("Inga rapportsteg kunde återskapas. Befintlig rapport har inte ändrats.");
     report = globalThis.T9BugReportService.regenerate({ ...regenerateCurrent,
       evidence: { ...regenerateCurrent.evidence, screenshots: [] } }, recording, tasks, {
-      extensionVersion: VERSION, productVersion: VERSION, errorEvidence: errors,
+      extensionVersion: VERSION, productVersion: VERSION, errorEvidence: errors, maskedSteps,
       updatedAt: new Date().toISOString() });
   }
   const saved = await bugReportStore.save(report);

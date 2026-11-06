@@ -275,8 +275,11 @@ assert(fs.readFileSync("src/recorder/background.js", "utf8")
   view.render(hiddenContainer, controller.state(), {
     onEditReproductionStep: () => {}
   }, fakeDocument);
+  // The step inclusion toggles; the report's Mask values choice is a separate checkbox.
   const allHiddenToggles = allElements(hiddenContainer).filter(item =>
-    item.type === "checkbox");
+    item.type === "checkbox" && String(item.dataset.focusKey || "").startsWith("step-include-"));
+  assert.strictEqual(allElements(hiddenContainer).filter(item =>
+    item.dataset.focusKey === "mask-values").length, 1);
   assert.strictEqual(allHiddenToggles.length, 1);
   assert.strictEqual(allHiddenToggles[0].checked, false,
     "a removed step must remain available for restoration");

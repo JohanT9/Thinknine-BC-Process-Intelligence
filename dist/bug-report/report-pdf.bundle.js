@@ -1127,7 +1127,14 @@
             "The tenant license is active. Sign in with Microsoft for user registration and statistics. No consultant license is needed.": "La licence du locataire est active. Connectez-vous avec Microsoft pour l\u2019enregistrement de l\u2019utilisateur et les statistiques. Aucune licence de consultant n\u2019est n\xE9cessaire.",
             "error report": "rapport d\u2019erreur",
             "Business Central error": "Erreur Business Central",
-            "Reported Business Central problem": "Probl\xE8me Business Central signal\xE9"
+            "Reported Business Central problem": "Probl\xE8me Business Central signal\xE9",
+            "[masked]": "[masqu\xE9]",
+            "[email address]": "[adresse e-mail]",
+            "[current customer]": "[client actuel]",
+            "[current vendor]": "[fournisseur actuel]",
+            "[current item]": "[article actuel]",
+            "[amount]": "[montant]",
+            "[ID]": "[ID]"
           },
           "de-DE": {
             "Correct the file name template.": "Korrigieren Sie die Dateinamensvorlage.",
@@ -2220,7 +2227,14 @@
             "The tenant license is active. Sign in with Microsoft for user registration and statistics. No consultant license is needed.": "Die Mandantenlizenz ist aktiv. Melden Sie sich mit Microsoft f\xFCr die Benutzerregistrierung und Statistik an. Eine Beraterlizenz ist nicht erforderlich.",
             "error report": "Fehlerbericht",
             "Business Central error": "Business Central-Fehler",
-            "Reported Business Central problem": "Gemeldetes Business Central-Problem"
+            "Reported Business Central problem": "Gemeldetes Business Central-Problem",
+            "[masked]": "[maskiert]",
+            "[email address]": "[E-Mail-Adresse]",
+            "[current customer]": "[aktueller Debitor]",
+            "[current vendor]": "[aktueller Kreditor]",
+            "[current item]": "[aktueller Artikel]",
+            "[amount]": "[Betrag]",
+            "[ID]": "[ID]"
           },
           "es-ES": {
             "Correct the file name template.": "Corrija la plantilla de nombre de archivo.",
@@ -3313,7 +3327,14 @@
             "The tenant license is active. Sign in with Microsoft for user registration and statistics. No consultant license is needed.": "La licencia del inquilino est\xE1 activa. Inicie sesi\xF3n con Microsoft para el registro de usuarios y las estad\xEDsticas. No se necesita una licencia de consultor.",
             "error report": "informe de errores",
             "Business Central error": "Error de Business Central",
-            "Reported Business Central problem": "Problema de Business Central notificado"
+            "Reported Business Central problem": "Problema de Business Central notificado",
+            "[masked]": "[oculto]",
+            "[email address]": "[direcci\xF3n de correo]",
+            "[current customer]": "[cliente actual]",
+            "[current vendor]": "[proveedor actual]",
+            "[current item]": "[producto actual]",
+            "[amount]": "[importe]",
+            "[ID]": "[ID]"
           },
           "da-DK": {
             "Correct the file name template.": "Ret skabelonen til filnavnet.",
@@ -4406,7 +4427,14 @@
             "The tenant license is active. Sign in with Microsoft for user registration and statistics. No consultant license is needed.": "Tenantlicensen er aktiv. Log ind med Microsoft til brugerregistrering og statistik. En konsulentlicens er ikke n\xF8dvendig.",
             "error report": "fejlrapport",
             "Business Central error": "Business Central-fejl",
-            "Reported Business Central problem": "Rapporteret Business Central-problem"
+            "Reported Business Central problem": "Rapporteret Business Central-problem",
+            "[masked]": "[maskeret]",
+            "[email address]": "[mailadresse]",
+            "[current customer]": "[aktuel debitor]",
+            "[current vendor]": "[aktuel kreditor]",
+            "[current item]": "[aktuel vare]",
+            "[amount]": "[bel\xF8b]",
+            "[ID]": "[id]"
           },
           "fi-FI": {
             "Correct the file name template.": "Korjaa tiedostonimen malli.",
@@ -5499,7 +5527,14 @@
             "The tenant license is active. Sign in with Microsoft for user registration and statistics. No consultant license is needed.": "Vuokraajan lisenssi on aktiivinen. Kirjaudu Microsoft-tilill\xE4 k\xE4ytt\xE4j\xE4rekister\xF6inti\xE4 ja tilastoja varten. Konsulttilisenssi\xE4 ei tarvita.",
             "error report": "virheraportti",
             "Business Central error": "Business Central -virhe",
-            "Reported Business Central problem": "Ilmoitettu Business Central -ongelma"
+            "Reported Business Central problem": "Ilmoitettu Business Central -ongelma",
+            "[masked]": "[peitetty]",
+            "[email address]": "[s\xE4hk\xF6postiosoite]",
+            "[current customer]": "[nykyinen asiakas]",
+            "[current vendor]": "[nykyinen toimittaja]",
+            "[current item]": "[nykyinen nimike]",
+            "[amount]": "[summa]",
+            "[ID]": "[tunnus]"
           },
           "nb-NO": {
             "Correct the file name template.": "Rett malen for filnavn.",
@@ -6592,7 +6627,14 @@
             "The tenant license is active. Sign in with Microsoft for user registration and statistics. No consultant license is needed.": "Leietakerlisensen er aktiv. Logg p\xE5 med Microsoft for brukerregistrering og statistikk. Ingen konsulentlisens er n\xF8dvendig.",
             "error report": "feilrapport",
             "Business Central error": "Business Central-feil",
-            "Reported Business Central problem": "Rapportert Business Central-problem"
+            "Reported Business Central problem": "Rapportert Business Central-problem",
+            "[masked]": "[maskert]",
+            "[email address]": "[e-postadresse]",
+            "[current customer]": "[aktuell kunde]",
+            "[current vendor]": "[aktuell leverand\xF8r]",
+            "[current item]": "[aktuell vare]",
+            "[amount]": "[bel\xF8p]",
+            "[ID]": "[id]"
           }
         };
         for (const values2 of Object.values(catalogs)) Object.freeze(values2);
